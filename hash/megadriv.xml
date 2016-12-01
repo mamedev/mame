@@ -3,33 +3,33 @@
 <!--
     UNDUMPED / TO BE REDUMPED LIST
 
-    ADVANCED DAISENRYAKU            JAPAN       we have Rev A, Rev 0 needed (does it exist?)
-    CAPTAIN PLANET              ASIA
-    DYNAMITE HEADDY SAMPLE          JAPAN
-    ECCO JR                 USA/PAL     graphic corruption on later revision
-    F-22 (JUNE 1992)                USA/PAL     needs proper dump
-    FATAL FURY 2                PAL     Australia-only PAL release
-    FERRARI GRAND PRIX CHALLENGE        PAL     we have Rev A, Rev 0 needed (does it exist?)
-    FIFA SOCCER                 JAPAN
-    FIRE SHARK                  PAL     dump check
-    GALAXY FORCE II             ALL     we have Rev B, Rev 0 and Rev A needed (does it exist?)
+    ADVANCED DAISENRYAKU                JAPAN       we have Rev A, Rev 0 needed (does it exist?)
+    CAPTAIN PLANET                      ASIA
+    DYNAMITE HEADDY SAMPLE              JAPAN
+    ECCO JR                             USA/PAL     graphic corruption on later revision
+    F-22 (JUNE 1992)                    USA/PAL     needs proper dump
+    FATAL FURY 2                        PAL         Australia-only PAL release
+    FERRARI GRAND PRIX CHALLENGE        PAL         we have Rev A, Rev 0 needed (does it exist?)
+    FIFA SOCCER                         JAPAN
+    FIRE SHARK                          PAL         dump check
+    GALAXY FORCE II                     ALL         we have Rev B, Rev 0 and Rev A needed (does it exist?)
     INTERNATIONAL SUPERSTAR SOCCER      BRAZIL
-    JEWEL MASTER                USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
+    JEWEL MASTER                        USA/PAL     we have Rev A, Rev 0 needed (does it match Japanese release?)
     NBA PLAYOFFS - BULLS VS BLAZERS     JAPAN       (alt) version contain a checksum check which have been wiped out of the non-alt revision
-    NFL PRO FOOTBALL '94            JAPAN
-    OSAKA BANK MY LINE              JAPAN
-    OSAKA BANK MY LINE DEMO         JAPAN
-    OUTBACK JOEY - PERSONAL TRAINER     ???     http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
-    PGA TOUR GOLF               USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
-    ROAD RASH                   USA     needs proper dump
-    SIDE POCKET                 JAPAN/USA   conflict in current info
-    SMURFS                  PAL     we have Rev A, Rev 0 needed (does it exist?)
-    SUMISEI HOME TANMATSU           JAPAN
-    TOM & JERRY                 JAPAN
-    VALIS III                   JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
-    WONDER MIDI                 JAPAN
-    WORLD CUP SOCCER                JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
-    WORLD OF ILLUSION               JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
+    NFL PRO FOOTBALL '94                JAPAN
+    OSAKA BANK MY LINE                  JAPAN
+    OSAKA BANK MY LINE DEMO             JAPAN
+    OUTBACK JOEY - PERSONAL TRAINER     ???         http://www.guardiana.net/MDG-Database/Mega%20Drive/Outback%20Joey/#v3553
+    PGA TOUR GOLF                       USA/PAL     we have v1.1 and v1.2, v1.0 needed (does it exist?)
+    ROAD RASH                           USA         needs proper dump
+    SIDE POCKET                         JAPAN/USA   conflict in current info
+    SMURFS                              PAL         we have Rev A, Rev 0 needed (does it exist?)
+    SUMISEI HOME TANMATSU               JAPAN
+    TOM & JERRY                         JAPAN
+    VALIS III                           JAPAN       we have v1.1 (Rev A?), v1.0 (Rev 0?) needed
+    WONDER MIDI                         JAPAN
+    WORLD CUP SOCCER                    JAPAN/USA   we have v1.0 (Rev ?), v1.2 (Rev ?) and v1.3 (Rev B), v1.1 (Rev ?) needed
+    WORLD OF ILLUSION                   JAPAN       we have v1.0 (Rev 0?), v1.1 (Rev A?) needed (confirmed by Xacrow)
 -->
 
 <!--
@@ -1682,6 +1682,25 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 		</part>
 	</software>
 
+	<software name="coolspotp" cloneof="coolspot">
+		<description>Cool Spot (Euro, Prototype)</description>
+		<year>1993</year>
+		<publisher>Virgin Games</publisher>
+		<part name="cart" interface="megadriv_cart">
+			<feature name="pcb" value="171-5694-01"/>
+			<feature name="ic1" value="IC1"/> <!-- EPROM1 -->
+			<feature name="ic2" value="IC2"/> <!-- EPROM2 -->
+			<feature name="ic3" value="IC3"/> <!-- EPROM3 -->
+			<feature name="ic4" value="IC4"/> <!-- EPROM4 -->
+			<feature name="ic5" value="IC5"/> <!-- 74HC139P -->
+			<dataarea name="rom" width="16" endianness="big" size="1048576">
+				<rom name="Cool Spot Sega Mega Drive EP ROM 0 of 4.ic1" size="262144" crc="eaa7a911" sha1="663b8394eee1d6b679db7ae45ee39df9e3aaabd6" offset="0x000000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 1 of 4.ic2" size="262144" crc="c7bc6cfb" sha1="e5d818993d162b5f2ed18b74848a514525cfd587" offset="0x040000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 2 of 4.ic3" size="262144" crc="3dff64f4" sha1="380c1e183769d8a32b9e52ce7465090ac3872580" offset="0x080000"/>
+				<rom name="Cool Spot Sega Mega Drive EP ROM 3 of 4.ic4" size="262144" crc="8fcce53a" sha1="cbe736a696319771b670c6c539f49d7d1956cd8e" offset="0x0c0000"/>
+			</dataarea>
+		</part>
+	</software>
 
 	<software name="coolspotu" cloneof="coolspot">
 		<description>Cool Spot (USA)</description>
@@ -19603,7 +19622,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		</part>
 	</software>
 
-	<software name="f1heromd">
+	<software name="f1heromd" cloneof="ferrari">
 		<description>Nakajima Satoru Kanshuu F1 Hero MD (Jpn)</description>
 		<year>1992</year>
 		<publisher>Varie</publisher>
@@ -21536,7 +21555,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<info name="serial" value="G-5525"/>
 		<info name="release" value="19931029"/>
-		<info name="alt_title" value="ペブルビーチの波濤"/>
+		<info name="alt_title" value="ペブルビーチの波涛"/>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_sram"/>
 			<dataarea name="rom" width="16" endianness="big" size="1572864">
@@ -28924,7 +28943,7 @@ Notice that these are not working on real hardware due to bugged code with VDP i
 		<publisher>Sega</publisher>
 		<part name="cart" interface="megadriv_cart">
 			<feature name="slot" value="rom_eeprom"/>
-			<dataarea name="rom" width="16" endianness="big" size="655360">
+			<dataarea name="rom" width="16" endianness="big" size="786432">
 				<rom name="wonder boy v - monster world iii (jul 25, 1991 prototype).bin" size="786432" crc="334035f8" sha1="1677039ede9a4cf51ac182cfe27d797c864290c8" offset="0x000000" />
 			</dataarea>
 		</part>

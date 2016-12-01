@@ -73,8 +73,8 @@ public:
 	DECLARE_READ8_MEMBER(tty_r);
 	IRQ_CALLBACK_MEMBER(mod8_irq_callback);
 private:
-	UINT16 m_tty_data;
-	UINT8 m_tty_key_data;
+	uint16_t m_tty_data;
+	uint8_t m_tty_key_data;
 	int m_tty_cnt;
 	virtual void machine_reset() override;
 	required_device<teleprinter_device> m_teleprinter;
@@ -102,7 +102,7 @@ WRITE8_MEMBER( mod8_state::tty_w )
 
 READ8_MEMBER( mod8_state::tty_r )
 {
-	UINT8 d = m_tty_key_data & 1;
+	uint8_t d = m_tty_key_data & 1;
 	m_tty_key_data >>= 1;
 	return d;
 }

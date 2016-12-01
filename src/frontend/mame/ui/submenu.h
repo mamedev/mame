@@ -7,10 +7,10 @@
     UI options menu.
 
 ***************************************************************************/
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SUBMENU_H
 #define MAME_FRONTEND_UI_SUBMENU_H
+
+#pragma once
 
 #include "emuopts.h"
 #include "ui/menu.h"
@@ -67,7 +67,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	std::vector<option> m_options;

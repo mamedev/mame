@@ -1,34 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
 /// @ref gtc_quaternion
 /// @file glm/gtc/quaternion.inl
-/// @date 2009-05-21 / 2011-06-15
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
 
 #include "../trigonometric.hpp"
 #include "../geometric.hpp"
@@ -38,13 +9,58 @@
 namespace glm{
 namespace detail
 {
-	template <typename T, precision P>
-	struct compute_dot<tquat, T, P>
+	template <typename T, precision P, bool Aligned>
+	struct compute_dot<tquat, T, P, Aligned>
 	{
-		static GLM_FUNC_QUALIFIER T call(tquat<T, P> const & x, tquat<T, P> const & y)
+		static GLM_FUNC_QUALIFIER T call(tquat<T, P> const& x, tquat<T, P> const& y)
 		{
 			tvec4<T, P> tmp(x.x * y.x, x.y * y.y, x.z * y.z, x.w * y.w);
 			return (tmp.x + tmp.y) + (tmp.z + tmp.w);
+		}
+	};
+
+	template <typename T, precision P, bool Aligned>
+	struct compute_quat_add
+	{
+		static tquat<T, P> call(tquat<T, P> const& q, tquat<T, P> const& p)
+		{
+			return tquat<T, P>(q.w + p.w, q.x + p.x, q.y + p.y, q.z + p.z);
+		}
+	};
+
+	template <typename T, precision P, bool Aligned>
+	struct compute_quat_sub
+	{
+		static tquat<T, P> call(tquat<T, P> const& q, tquat<T, P> const& p)
+		{
+			return tquat<T, P>(q.w - p.w, q.x - p.x, q.y - p.y, q.z - p.z);
+		}
+	};
+
+	template <typename T, precision P, bool Aligned>
+	struct compute_quat_mul_scalar
+	{
+		static tquat<T, P> call(tquat<T, P> const& q, T s)
+		{
+			return tquat<T, P>(q.w * s, q.x * s, q.y * s, q.z * s);
+		}
+	};
+
+	template <typename T, precision P, bool Aligned>
+	struct compute_quat_div_scalar
+	{
+		static tquat<T, P> call(tquat<T, P> const& q, T s)
+		{
+			return tquat<T, P>(q.w / s, q.x / s, q.y / s, q.z / s);
+		}
+	};
+
+	template <typename T, precision P, bool Aligned>
+	struct compute_quat_mul_vec4
+	{
+		static tvec4<T, P> call(tquat<T, P> const & q, tvec4<T, P> const & v)
+		{
+			return tvec4<T, P>(q * tvec3<T, P>(v), v.w);
 		}
 	};
 }//namespace detail
@@ -144,7 +160,7 @@ namespace detail
 	GLM_FUNC_QUALIFIER tquat<T, P>::tquat(tvec3<T, P> const & u, tvec3<T, P> const & v)
 	{
 		tvec3<T, P> const LocalW(cross(u, v));
-		T Dot = detail::compute_dot<tvec3, T, P>::call(u, v);
+		T Dot = detail::compute_dot<tvec3, T, P, detail::is_aligned<P>::value>::call(u, v);
 		tquat<T, P> q(T(1) + Dot, LocalW.x, LocalW.y, LocalW.z);
 
 		*this = normalize(q);
@@ -227,13 +243,16 @@ namespace detail
 
 	template <typename T, precision P>
 	template <typename U>
-	GLM_FUNC_QUALIFIER tquat<T, P> & tquat<T, P>::operator+=(tquat<U, P> const & q)
+	GLM_FUNC_QUALIFIER tquat<T, P> & tquat<T, P>::operator+=(tquat<U, P> const& q)
 	{
-		this->w += static_cast<T>(q.w);
-		this->x += static_cast<T>(q.x);
-		this->y += static_cast<T>(q.y);
-		this->z += static_cast<T>(q.z);
-		return *this;
+		return (*this = detail::compute_quat_add<T, P, detail::is_aligned<P>::value>::call(*this, tquat<T, P>(q)));
+	}
+
+	template <typename T, precision P>
+	template <typename U>
+	GLM_FUNC_QUALIFIER tquat<T, P> & tquat<T, P>::operator-=(tquat<U, P> const& q)
+	{
+		return (*this = detail::compute_quat_sub<T, P, detail::is_aligned<P>::value>::call(*this, tquat<T, P>(q)));
 	}
 
 	template <typename T, precision P>
@@ -254,22 +273,14 @@ namespace detail
 	template <typename U>
 	GLM_FUNC_QUALIFIER tquat<T, P> & tquat<T, P>::operator*=(U s)
 	{
-		this->w *= static_cast<U>(s);
-		this->x *= static_cast<U>(s);
-		this->y *= static_cast<U>(s);
-		this->z *= static_cast<U>(s);
-		return *this;
+		return (*this = detail::compute_quat_mul_scalar<T, P, detail::is_aligned<P>::value>::call(*this, static_cast<U>(s)));
 	}
 
 	template <typename T, precision P>
 	template <typename U>
 	GLM_FUNC_QUALIFIER tquat<T, P> & tquat<T, P>::operator/=(U s)
 	{
-		this->w /= static_cast<U>(s);
-		this->x /= static_cast<U>(s);
-		this->y /= static_cast<U>(s);
-		this->z /= static_cast<U>(s);
-		return *this;
+		return (*this = detail::compute_quat_div_scalar<T, P, detail::is_aligned<P>::value>::call(*this, static_cast<U>(s)));
 	}
 
 	// -- Unary bit operators --
@@ -317,9 +328,9 @@ namespace detail
 	}
 
 	template <typename T, precision P>
-	GLM_FUNC_QUALIFIER tvec4<T, P> operator*(tquat<T, P> const & q,	tvec4<T, P> const & v)
+	GLM_FUNC_QUALIFIER tvec4<T, P> operator*(tquat<T, P> const& q, tvec4<T, P> const& v)
 	{
-		return tvec4<T, P>(q * tvec3<T, P>(v), v.w);
+		return detail::compute_quat_mul_vec4<T, P, detail::is_aligned<P>::value>::call(q, v);
 	}
 
 	template <typename T, precision P>
@@ -592,17 +603,17 @@ namespace detail
 		T qwy(q.w * q.y);
 		T qwz(q.w * q.z);
 
-		Result[0][0] = 1 - 2 * (qyy +  qzz);
-		Result[0][1] = 2 * (qxy + qwz);
-		Result[0][2] = 2 * (qxz - qwy);
+		Result[0][0] = T(1) - T(2) * (qyy +  qzz);
+		Result[0][1] = T(2) * (qxy + qwz);
+		Result[0][2] = T(2) * (qxz - qwy);
 
-		Result[1][0] = 2 * (qxy - qwz);
-		Result[1][1] = 1 - 2 * (qxx +  qzz);
-		Result[1][2] = 2 * (qyz + qwx);
+		Result[1][0] = T(2) * (qxy - qwz);
+		Result[1][1] = T(1) - T(2) * (qxx +  qzz);
+		Result[1][2] = T(2) * (qyz + qwx);
 
-		Result[2][0] = 2 * (qxz + qwy);
-		Result[2][1] = 2 * (qyz - qwx);
-		Result[2][2] = 1 - 2 * (qxx +  qyy);
+		Result[2][0] = T(2) * (qxz + qwy);
+		Result[2][1] = T(2) * (qyz - qwx);
+		Result[2][2] = T(1) - T(2) * (qxx +  qyy);
 		return Result;
 	}
 
@@ -766,4 +777,25 @@ namespace detail
 			Result[i] = x[i] != y[i];
 		return Result;
 	}
+
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tvec4<bool, P> isnan(tquat<T, P> const& q)
+	{
+		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'isnan' only accept floating-point inputs");
+
+		return tvec4<bool, P>(isnan(q.x), isnan(q.y), isnan(q.z), isnan(q.w));
+	}
+
+	template <typename T, precision P>
+	GLM_FUNC_QUALIFIER tvec4<bool, P> isinf(tquat<T, P> const& q)
+	{
+		GLM_STATIC_ASSERT(std::numeric_limits<T>::is_iec559, "'isinf' only accept floating-point inputs");
+
+		return tvec4<bool, P>(isinf(q.x), isinf(q.y), isinf(q.z), isinf(q.w));
+	}
 }//namespace glm
+
+#if GLM_ARCH != GLM_ARCH_PURE && GLM_HAS_ALIGNED_TYPE
+#	include "quaternion_simd.inl"
+#endif
+

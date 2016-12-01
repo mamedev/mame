@@ -29,17 +29,17 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* video-related */
-	required_shared_ptr<UINT8> m_spriteram1;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_spriteram3;
-	UINT8 m_flip_bit;
+	required_shared_ptr<uint8_t> m_spriteram1;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_spriteram3;
+	uint8_t m_flip_bit;
 	DECLARE_WRITE8_MEMBER(hanaroku_out_0_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_1_w);
 	DECLARE_WRITE8_MEMBER(hanaroku_out_2_w);
 	DECLARE_WRITE8_MEMBER(albazc_vregs_w);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(albazc);
-	UINT32 screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -52,7 +52,7 @@ public:
 
 PALETTE_INIT_MEMBER(albazc_state, albazc)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int r, g, b;
 
@@ -96,7 +96,7 @@ void albazc_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t albazc_state::screen_update_hanaroku(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);   // ???
 	draw_sprites(bitmap, cliprect);
@@ -150,7 +150,7 @@ WRITE8_MEMBER(albazc_state::albazc_vregs_w)
 {
 	#ifdef UNUSED_FUNCTION
 	{
-		static UINT8 x[5];
+		static uint8_t x[5];
 		x[offset] = data;
 		popmessage("%02x %02x %02x %02x %02x",x[0],x[1],x[2],x[3],x[4]);
 	}

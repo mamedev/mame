@@ -319,7 +319,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(citycon_state,citycon)
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int i;
 
 	/*

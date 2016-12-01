@@ -278,7 +278,7 @@ WRITE8_MEMBER( _88games_state::banking_callback )
 
 void _88games_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base() + 0x10000;
+	uint8_t *ROM = memregion("maincpu")->base() + 0x10000;
 
 	m_bank0000->configure_entries(0, 8, &ROM[0x0000], 0x2000);
 	m_bank1000->configure_entries(0, 8, &ROM[0x1000], 0x2000);

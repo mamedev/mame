@@ -45,7 +45,7 @@ available but I never found the specs on the web. The SAB 3021 was
 produced by Valvo which doesn't exist anymore (bought by Phillips
 if I remember correctly). If you have more luck finding the specs
 I'm still interested.
-There also was a complementary chip for the recieving side but that
+There also was a complementary chip for the receiving side but that
 was not used in the KC unfortunately. They choosed to measure the
 pulses sent by the U807 via PIO and CTC.
 
@@ -435,7 +435,7 @@ INPUT_PORTS_END
 //-------------------------------------------------
 //  kc_keyboard_device - constructor
 //-------------------------------------------------
-kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+kc_keyboard_device::kc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KC_KEYBOARD, "KC Keyboard", tag, owner, clock, "kc_keyboard", __FILE__),
 	m_write_out(*this)
 {
@@ -525,7 +525,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 			// scan all lines (excluding shift)
 			for (int i=0; i<8; i++)
 			{
-				UINT8 keyboard_line_data = ioport(keynames[i])->read();
+				uint8_t keyboard_line_data = ioport(keynames[i])->read();
 
 				// scan through each bit
 				for (int b=0; b<8; b++)
@@ -534,7 +534,7 @@ void kc_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int 
 					if ((keyboard_line_data & (1<<b)) != 0)
 					{
 						// generate fake code
-						UINT8 code = (i<<3) | b;
+						uint8_t code = (i<<3) | b;
 						LOG(("Code: %02x\n",code));
 
 						transmit_scancode(code);
@@ -590,7 +590,7 @@ void kc_keyboard_device::add_bit(int bit)
 //  begin pulse transmit
 //-------------------------------------------------
 
-void kc_keyboard_device::transmit_scancode(UINT8 scan_code)
+void kc_keyboard_device::transmit_scancode(uint8_t scan_code)
 {
 	// initial pulse -> start of code
 	add_pulse_to_transmit_buffer(1);

@@ -30,10 +30,10 @@ class adam_digital_data_pack_device :  public device_t,
 {
 public:
 	// construction/destruction
-	adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adam_digital_data_pack_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// not really public

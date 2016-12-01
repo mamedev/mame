@@ -42,11 +42,11 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)> upd65031_screen_update_delegate;
-typedef device_delegate<void (int bank, UINT16 page, int rams)> upd65031_memory_update_delegate;
+typedef device_delegate<void (bitmap_ind16 &bitmap, uint16_t sbf, uint16_t hires0, uint16_t hires1, uint16_t lores0, uint16_t lores1, int flash)> upd65031_screen_update_delegate;
+typedef device_delegate<void (int bank, uint16_t page, int rams)> upd65031_memory_update_delegate;
 
-#define UPD65031_SCREEN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, UINT16 sbf, UINT16 hires0, UINT16 hires1, UINT16 lores0, UINT16 lores1, int flash)
-#define UPD65031_MEMORY_UPDATE(_name) void _name(int bank, UINT16 page, int rams)
+#define UPD65031_SCREEN_UPDATE(_name) void _name(bitmap_ind16 &bitmap, uint16_t sbf, uint16_t hires0, uint16_t hires1, uint16_t lores0, uint16_t lores1, int flash)
+#define UPD65031_MEMORY_UPDATE(_name) void _name(int bank, uint16_t page, int rams)
 
 
 // ======================> upd65031_device
@@ -55,7 +55,7 @@ class upd65031_device : public device_t
 {
 public:
 	// construction/destruction
-	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd65031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_kb_rd_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_read_kb.set_callback(object); }
 	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<upd65031_device &>(device).m_write_int.set_callback(object); }
@@ -69,7 +69,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( flp_w );
 	DECLARE_WRITE_LINE_MEMBER( btl_w );
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -94,16 +94,16 @@ private:
 	upd65031_memory_update_delegate m_out_mem_cb;        // callback for update bankswitch
 
 	int     m_mode;
-	UINT16  m_lcd_regs[5];      // LCD registers
-	UINT8   m_tim[5];           // RTC registers
-	UINT8   m_sr[4];            // segment registers
-	UINT8   m_sta;              // interrupt status
-	UINT8   m_int;              // interrupts mask
-	UINT8   m_ack;              // interrupts acknowledge
-	UINT8   m_tsta;             // timer interrupt status
-	UINT8   m_tmk;              // timer interrupt mask
-	UINT8   m_tack;             // timer interrupts acknowledge
-	UINT8   m_com;              // command register
+	uint16_t  m_lcd_regs[5];      // LCD registers
+	uint8_t   m_tim[5];           // RTC registers
+	uint8_t   m_sr[4];            // segment registers
+	uint8_t   m_sta;              // interrupt status
+	uint8_t   m_int;              // interrupts mask
+	uint8_t   m_ack;              // interrupts acknowledge
+	uint8_t   m_tsta;             // timer interrupt status
+	uint8_t   m_tmk;              // timer interrupt mask
+	uint8_t   m_tack;             // timer interrupts acknowledge
+	uint8_t   m_com;              // command register
 	int     m_flash;            // cursor flash
 	int     m_speaker_state;    // spkr line
 

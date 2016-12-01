@@ -23,7 +23,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	virtual void video_start() override;
-	UINT32 screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 };
 
@@ -32,7 +32,7 @@ void sanremmg_state::video_start()
 {
 }
 
-UINT32 sanremmg_state::screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sanremmg_state::screen_update_sanremmg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

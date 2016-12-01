@@ -8,7 +8,7 @@
 
 READ8_MEMBER(btime_state::mmonkey_protection_r)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	int ret = 0;
 
 	if (offset == 0x0000)
@@ -25,7 +25,7 @@ READ8_MEMBER(btime_state::mmonkey_protection_r)
 
 WRITE8_MEMBER(btime_state::mmonkey_protection_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	if (offset == 0)
 	{

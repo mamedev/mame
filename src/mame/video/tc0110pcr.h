@@ -7,7 +7,7 @@
 class tc0110pcr_device : public device_t
 {
 public:
-	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0110pcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0110pcr_device() {}
 
 	DECLARE_READ16_MEMBER( word_r );
@@ -26,7 +26,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	std::unique_ptr<UINT16[]>     m_ram;
+	std::unique_ptr<uint16_t[]>     m_ram;
 	int          m_type;
 	int          m_addr;
 	required_device<palette_device> m_palette;

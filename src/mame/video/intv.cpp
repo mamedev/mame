@@ -14,7 +14,7 @@ void intv_state::video_start()
 
 READ8_MEMBER( intv_state::intvkbd_tms9927_r )
 {
-	UINT8 rv;
+	uint8_t rv;
 	switch (offset)
 	{
 		case 8:
@@ -58,16 +58,16 @@ WRITE8_MEMBER( intv_state::intvkbd_tms9927_w )
 }
 
 
-UINT32 intv_state::screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t intv_state::screen_update_intv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_stic->screen_update(screen, bitmap, cliprect);
 	return 0;
 }
 
 
-UINT32 intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t intv_state::screen_update_intvkbd(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int x,y,offs;
 	int current_row;
 //  char c;

@@ -68,7 +68,7 @@
 
 #define LINK_FREQ (LINK_BAUD / LINK_BITS)
 
-/* Sync up the instances 8 times for each byte transfered */
+/* Sync up the instances 8 times for each byte transferred */
 #define SYNC_MULT (4)
 
 #define SYNC_FREQ (15000000 / 20) //(LINK_FREQ * SYNC_MULT)
@@ -85,11 +85,11 @@
 static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
 	int fd;
-	osd_shared_mem *os_shmem = (osd_shared_mem *) osd_malloc(sizeof(osd_shared_mem));
+	osd_shared_mem *os_shmem = (osd_shared_mem *)malloc(sizeof(osd_shared_mem));
 
 	if (create)
 	{
-		char *buf = (char *) osd_malloc_array(size);
+		char *buf = (char *) malloc(size);
 		memset(buf,0, size);
 
 		fd = open(path, O_RDWR | O_CREAT, S_IRWXU);
@@ -101,12 +101,12 @@ static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t 
 		fd = open(path, O_RDWR);
 		if (fd == -1)
 		{
-			osd_free(os_shmem);
+			free(os_shmem);
 			return nullptr;
 		}
 		os_shmem->creator = 0;
 	}
-	os_shmem->fn = (char *) osd_malloc_array(strlen(path)+1);
+	os_shmem->fn = (char *) malloc(strlen(path)+1);
 	strcpy(os_shmem->fn, path);
 
 	assert(fd != -1);
@@ -122,8 +122,8 @@ static void osd_sharedmem_free(osd_shared_mem *os_shmem)
 	munmap(os_shmem->ptr, os_shmem->size);
 	if (os_shmem->creator)
 		unlink(os_shmem->fn);
-	osd_free(os_shmem->fn);
-	osd_free(os_shmem);
+	free(os_shmem->fn);
+	free(os_shmem);
 }
 
 static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
@@ -133,19 +133,19 @@ static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
 #else
 static osd_shared_mem *osd_sharedmem_alloc(const char *path, int create, size_t size)
 {
-	osd_shared_mem *os_shmem = (osd_shared_mem *) osd_malloc(sizeof(osd_shared_mem));
+	osd_shared_mem *os_shmem = (osd_shared_mem *) malloc(sizeof(osd_shared_mem));
 
 	os_shmem->creator = 0;
 
-	os_shmem->ptr = (void *) osd_malloc_array(size);
+	os_shmem->ptr = (void *) malloc(size);
 	os_shmem->size = size;
 	return os_shmem;
 }
 
 static void osd_sharedmem_free(osd_shared_mem *os_shmem)
 {
-	osd_free(os_shmem->ptr);
-	osd_free(os_shmem);
+	free(os_shmem->ptr);
+	free(os_shmem);
 }
 
 static void *osd_sharedmem_ptr(osd_shared_mem *os_shmem)
@@ -170,7 +170,7 @@ static void buf_reset(buf_t *buf)
 
 const device_type GAELCO_SERIAL = &device_creator<gaelco_serial_device>;
 
-gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gaelco_serial_device::gaelco_serial_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GAELCO_SERIAL, "Gaelco 3D Serial Hardware", tag, owner, clock, "gaelco_serial", __FILE__),
 	m_irq_handler(*this),
 	m_status(0),
@@ -253,14 +253,14 @@ void gaelco_serial_device::device_stop()
 
 TIMER_CALLBACK_MEMBER( gaelco_serial_device::set_status_cb )
 {
-	UINT8 mask = param >> 8;
-	UINT8 set = param & 0xff;
+	uint8_t mask = param >> 8;
+	uint8_t set = param & 0xff;
 
 	m_status &= mask;
 	m_status |= set;
 }
 
-void gaelco_serial_device::set_status(UINT8 mask, UINT8 set, int wait)
+void gaelco_serial_device::set_status(uint8_t mask, uint8_t set, int wait)
 {
 	machine().scheduler().timer_set(attotime::from_hz(wait), timer_expired_delegate(FUNC(gaelco_serial_device::set_status_cb), this), (mask << 8)|set);
 }
@@ -338,7 +338,7 @@ WRITE8_MEMBER( gaelco_serial_device::irq_enable )
 
 READ8_MEMBER( gaelco_serial_device::status_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 
@@ -366,7 +366,7 @@ WRITE8_MEMBER( gaelco_serial_device::data_w)
 
 READ8_MEMBER( gaelco_serial_device::data_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	std::lock_guard<std::mutex> guard(m_mutex);
 	process_in();

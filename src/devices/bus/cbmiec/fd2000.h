@@ -39,8 +39,8 @@ class fd2000_device :  public device_t,
 {
 public:
 	// construction/destruction
-	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	fd2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	fd2000_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 
 	enum
 	{
@@ -49,7 +49,7 @@ public:
 	};
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_READ8_MEMBER( via_pa_r );
@@ -84,7 +84,7 @@ class fd4000_device :  public fd2000_device
 {
 public:
 	// construction/destruction
-	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd4000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

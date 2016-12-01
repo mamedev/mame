@@ -78,13 +78,13 @@ public:
 	required_device<trs80m2_keyboard_device> m_kb;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -112,8 +112,8 @@ public:
 	int m_msel;
 
 	// keyboard state
-	UINT8 m_key_latch;
-	UINT8 m_key_data;
+	uint8_t m_key_latch;
+	uint8_t m_key_data;
 	int m_key_bit;
 	int m_kbclk;
 	int m_kbdata;
@@ -156,9 +156,9 @@ public:
 	DECLARE_WRITE8_MEMBER( ual_w );
 	DECLARE_WRITE8_MEMBER( tcl_w );
 
-	UINT16 m_ual;
-	UINT8 m_limit[2];
-	UINT8 m_offset[2];
+	uint16_t m_ual;
+	uint8_t m_limit[2];
+	uint8_t m_offset[2];
 };
 
 #endif

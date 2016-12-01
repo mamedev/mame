@@ -40,20 +40,20 @@ bool m20_format::supports_save() const
 	return false;
 }
 
-int m20_format::identify(io_generic *io, UINT32 form_factor)
+int m20_format::identify(io_generic *io, uint32_t form_factor)
 {
 	if(io_generic_size(io) == 286720)
 		return 50;
 	return 0;
 }
 
-bool m20_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool m20_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
 	for(int track = 0; track < 35; track++)
 		for(int head = 0; head < 2; head ++) {
 			bool mfm = track || head;
 			desc_pc_sector sects[16];
-			UINT8 sectdata[16*256];
+			uint8_t sectdata[16*256];
 			io_generic_read(io, sectdata, 16*256*(track*2+head), 16*256);
 			for(int i=0; i<16; i++) {
 				int j = i/2 + (i & 1 ? 0 : 8);

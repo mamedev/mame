@@ -130,7 +130,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
 	required_device<address_map_bank_device> m_ems;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 	required_device<palette_device> m_palette;
 
 	DECLARE_READ16_MEMBER(ems_r);
@@ -142,10 +142,10 @@ public:
 
 	struct
 	{
-		UINT8 index;
-		UINT8 data[0x100];
+		uint8_t index;
+		uint8_t data[0x100];
 		struct {
-			UINT16 data;
+			uint16_t data;
 		} bios_timer; // 1.19 MHz tclk signal
 		struct {
 			int seconds, minutes, hours, days;
@@ -164,14 +164,14 @@ public:
 	void machine_reset() override;
 	void machine_start() override;
 
-	UINT32 screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pasogo_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(vg230_timer);
 	DECLARE_INPUT_CHANGED_MEMBER(contrast);
 
 	memory_region *m_cart_rom;
-	UINT8 m_ems_index;
-	UINT16 m_ems_bank[28];
+	uint8_t m_ems_index;
+	uint16_t m_ems_bank[28];
 };
 
 
@@ -208,7 +208,7 @@ void pasogo_state::machine_start()
 	system_time systime;
 
 	memset(&m_vg230, 0, sizeof(m_vg230));
-	m_vg230.pmu.write_protected = TRUE;
+	m_vg230.pmu.write_protected = true;
 	machine().base_datetime(systime);
 
 	m_vg230.rtc.seconds = systime.local_time.second;
@@ -221,8 +221,8 @@ void pasogo_state::machine_start()
 
 READ8_MEMBER( pasogo_state::vg230_io_r )
 {
-	int log = TRUE;
-	UINT8 data = 0;
+	int log = true;
+	uint8_t data = 0;
 
 	m_vg230.bios_timer.data += 0x100; //HACK
 	if (offset&1)
@@ -246,22 +246,22 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 			case 0x31:
 				data = m_vg230.bios_timer.data >> 8;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x70:
 				data = m_vg230.rtc.seconds;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x71:
 				data = m_vg230.rtc.minutes;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x72:
 				data = m_vg230.rtc.hours;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x73:
@@ -274,7 +274,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 			case 0x79:
 				/*rtc status*/
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x7a:
@@ -289,8 +289,8 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 				data &= ~1;
 				if (m_vg230.pmu.write_protected)
 					data |= 1;
-				m_vg230.pmu.write_protected = FALSE;
-				log = FALSE;
+				m_vg230.pmu.write_protected = false;
+				log = false;
 				break;
 		}
 
@@ -307,7 +307,7 @@ READ8_MEMBER( pasogo_state::vg230_io_r )
 
 WRITE8_MEMBER( pasogo_state::vg230_io_w )
 {
-	int log = TRUE;
+	int log = true;
 
 	if (offset & 1)
 	{
@@ -357,14 +357,14 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 			case 0x79:
 				m_vg230.rtc.onehertz_interrupt_on = data & 1;
 				m_vg230.rtc.alarm_interrupt_on = data & 2;
-				log = FALSE;
+				log = false;
 				break;
 
 			case 0x7a:
 				if (data & 2)
 				{
-					m_vg230.rtc.alarm_interrupt_request = FALSE;
-					m_vg230.rtc.onehertz_interrupt_request = FALSE; /* update interrupt */
+					m_vg230.rtc.alarm_interrupt_request = false;
+					m_vg230.rtc.onehertz_interrupt_request = false; /* update interrupt */
 				}
 				break;
 		}
@@ -379,8 +379,8 @@ WRITE8_MEMBER( pasogo_state::vg230_io_w )
 
 READ16_MEMBER( pasogo_state::ems_r )
 {
-	UINT8 data = 0;
-	UINT8 index;
+	uint8_t data = 0;
+	uint8_t index;
 
 	switch (offset)
 	{
@@ -399,7 +399,7 @@ READ16_MEMBER( pasogo_state::ems_r )
 
 WRITE16_MEMBER( pasogo_state::ems_w )
 {
-	UINT8 index;
+	uint8_t index;
 
 	switch (offset)
 	{
@@ -488,17 +488,17 @@ INPUT_CHANGED_MEMBER(pasogo_state::contrast)
 	}
 }
 
-UINT32 pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pasogo_state::screen_update_pasogo(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *vram = (UINT8 *)m_vram.target();
+	uint8_t *vram = (uint8_t *)m_vram.target();
 	int x, y;
 	for (y=0; y<240; y++)
 	{
 		for (x=0; x<(320/8); x++)
 		{
 			int a = (y & 3) * 0x2000;
-			UINT8 d1 = vram[a + (y >> 2) * 80 + x];
-			UINT16 *line = &bitmap.pix16(y, x << 3);
+			uint8_t d1 = vram[a + (y >> 2) * 80 + x];
+			uint16_t *line = &bitmap.pix16(y, x << 3);
 			*line++ = ((d1 >> 7) & 1);
 			*line++ = ((d1 >> 6) & 1);
 			*line++ = ((d1 >> 5) & 1);

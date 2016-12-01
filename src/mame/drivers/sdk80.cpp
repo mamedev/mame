@@ -61,8 +61,8 @@ private:
 	required_device<rs232_port_device> m_rs232;
 	required_ioport m_usart_baud_rate;
 
-	UINT8 m_usart_divide_counter;
-	UINT8 m_usart_clock_state;
+	uint8_t m_usart_divide_counter;
+	uint8_t m_usart_clock_state;
 };
 
 static ADDRESS_MAP_START(sdk80_mem, AS_PROGRAM, 8, sdk80_state)
@@ -94,10 +94,10 @@ INPUT_PORTS_END
 
 WRITE_LINE_MEMBER( sdk80_state::usart_clock_tick )
 {
-	UINT8 old_counter = m_usart_divide_counter;
+	uint8_t old_counter = m_usart_divide_counter;
 	m_usart_divide_counter++;
 
-	UINT8 transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
+	uint8_t transition = (old_counter ^ m_usart_divide_counter) & m_usart_baud_rate->read();
 	if (transition)
 	{
 		m_usart->write_txc(m_usart_clock_state);

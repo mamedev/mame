@@ -29,14 +29,14 @@
 class raiden2cop_device : public device_t
 {
 public:
-	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	raiden2cop_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Command Table
-	UINT16 cop_func_trigger[0x100/8];       /* function trigger */
-	UINT16 cop_func_value[0x100/8];         /* function value (?) */
-	UINT16 cop_func_mask[0x100/8];          /* function mask (?) */
-	UINT16 cop_program[0x100];              /* program "code" */
-	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
+	uint16_t cop_func_trigger[0x100/8];       /* function trigger */
+	uint16_t cop_func_value[0x100/8];         /* function value (?) */
+	uint16_t cop_func_mask[0x100/8];          /* function mask (?) */
+	uint16_t cop_program[0x100];              /* program "code" */
+	uint16_t cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
 
 	DECLARE_WRITE16_MEMBER( cop_pgm_data_w );
 	DECLARE_WRITE16_MEMBER( cop_pgm_addr_w );
@@ -46,18 +46,18 @@ public:
 
 	// these are used by legionna.c to find the command based on trigger value
 	// legionna/seicop implementation then looks up the command based on hardcoded sequences in the driver rather than actually using the trigger value (should be changed)
-	UINT16 get_func_value(int command) { return cop_func_value[command]; }
-	UINT16 get_func_mask(int command) { return cop_func_mask[command]; }
-	int find_trigger_match(UINT16 triggerval, UINT16 mask);
-	int check_command_matches(int command, UINT16 seq0, UINT16 seq1, UINT16 seq2, UINT16 seq3, UINT16 seq4, UINT16 seq5, UINT16 seq6, UINT16 seq7, UINT16 _funcval_, UINT16 _funcmask_);
+	uint16_t get_func_value(int command) { return cop_func_value[command]; }
+	uint16_t get_func_mask(int command) { return cop_func_mask[command]; }
+	int find_trigger_match(uint16_t triggerval, uint16_t mask);
+	int check_command_matches(int command, uint16_t seq0, uint16_t seq1, uint16_t seq2, uint16_t seq3, uint16_t seq4, uint16_t seq5, uint16_t seq6, uint16_t seq7, uint16_t _funcval_, uint16_t _funcmask_);
 
 	// DMA
-	UINT16 cop_dma_v1, cop_dma_v2, cop_dma_mode;
-	UINT16 cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200];
-	UINT16 cop_dma_adr_rel;
+	uint16_t cop_dma_v1, cop_dma_v2, cop_dma_mode;
+	uint16_t cop_dma_src[0x200], cop_dma_dst[0x200], cop_dma_size[0x200];
+	uint16_t cop_dma_adr_rel;
 
-	UINT16 pal_brightness_val;
-	UINT16 pal_brightness_mode;
+	uint16_t pal_brightness_val;
+	uint16_t pal_brightness_mode;
 
 	DECLARE_WRITE16_MEMBER( cop_dma_v1_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_v2_w );
@@ -74,7 +74,7 @@ public:
 
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 
-	UINT8 fade_table(int v);
+	uint8_t fade_table(int v);
 
 	template<class _Object> static devcb_base &set_m_videoramout_cb(device_t &device, _Object object) { return downcast<raiden2cop_device &>(device).m_videoramout_cb.set_callback(object); }
 
@@ -85,9 +85,9 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_itoa_mode_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 
-	UINT32 cop_itoa;
-	UINT16 cop_itoa_mode;
-	UINT8 cop_itoa_digits[10];
+	uint32_t cop_itoa;
+	uint16_t cop_itoa_mode;
+	uint8_t cop_itoa_digits[10];
 
 	// Main COP functionality
 
@@ -112,12 +112,12 @@ public:
 	DECLARE_WRITE16_MEMBER(cop_hitbox_baseadr_w);
 
 
-	UINT32 cop_regs[8];
-	UINT16 cop_status, cop_scale, cop_angle, cop_dist;
+	uint32_t cop_regs[8];
+	uint16_t cop_status, cop_scale, cop_angle, cop_dist;
 
 
-	UINT16 cop_angle_target;
-	UINT16 cop_angle_step;
+	uint16_t cop_angle_target;
+	uint16_t cop_angle_step;
 
 
 	struct colinfo {
@@ -135,27 +135,27 @@ public:
 		}
 
 
-		INT16 pos[3];
-		INT8 dx[3];
-		UINT8 size[3];
+		int16_t pos[3];
+		int8_t dx[3];
+		uint8_t size[3];
 		bool allow_swap;
-		UINT16 flags_swap;
-		UINT32 spradr;
-		INT16 min[3], max[3];
+		uint16_t flags_swap;
+		uint32_t spradr;
+		int16_t min[3], max[3];
 
 
 	};
 
 	colinfo cop_collision_info[2];
 
-	UINT16 cop_hit_status, cop_hit_baseadr;
-	INT16 cop_hit_val[3];
-	UINT16 cop_hit_val_stat;
+	uint16_t cop_hit_status, cop_hit_baseadr;
+	int16_t cop_hit_val[3];
+	uint16_t cop_hit_val_stat;
 
 	// Sort DMA (zeroteam, cupsoc)
 
-	UINT32 cop_sort_ram_addr, cop_sort_lookup;
-	UINT16 cop_sort_param;
+	uint32_t cop_sort_ram_addr, cop_sort_lookup;
+	uint16_t cop_sort_param;
 
 	DECLARE_WRITE16_MEMBER(cop_sort_lookup_hi_w);
 	DECLARE_WRITE16_MEMBER(cop_sort_lookup_lo_w);
@@ -165,14 +165,14 @@ public:
 	DECLARE_WRITE16_MEMBER(cop_sort_dma_trig_w);
 
 	// RNG (cupsoc)
-	UINT16 m_cop_rng_max_value;
+	uint16_t m_cop_rng_max_value;
 	DECLARE_READ16_MEMBER(cop_prng_r);
 	DECLARE_WRITE16_MEMBER(cop_prng_maxvalue_w);
 	DECLARE_READ16_MEMBER(cop_prng_maxvalue_r);
 
 	// misc 68k (grainbow)
-	UINT32 m_cop_sprite_dma_param;
-	UINT32 m_cop_sprite_dma_src;
+	uint32_t m_cop_sprite_dma_param;
+	uint32_t m_cop_sprite_dma_src;
 
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_hi_w);
 	DECLARE_WRITE16_MEMBER(cop_sprite_dma_param_lo_w);
@@ -183,11 +183,11 @@ public:
 	int m_cop_sprite_dma_size;
 
 	// misc 68k
-	UINT16 m_cop_unk_param_a,m_cop_unk_param_b;
+	uint16_t m_cop_unk_param_a,m_cop_unk_param_b;
 	DECLARE_WRITE16_MEMBER(cop_unk_param_a_w);
 	DECLARE_WRITE16_MEMBER(cop_unk_param_b_w);
 
-	UINT16 m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_precmd;
+	uint16_t m_cop_rom_addr_lo,m_cop_rom_addr_hi,m_cop_precmd;
 	DECLARE_WRITE16_MEMBER(cop_precmd_w);
 	DECLARE_WRITE16_MEMBER(cop_rom_addr_lo_w);
 	DECLARE_WRITE16_MEMBER(cop_rom_addr_hi_w);
@@ -215,63 +215,63 @@ private:
 	cpu_device *m_host_cpu;      /**< reference to the host cpu */
 	address_space *m_host_space; /**< reference to the host cpu space */
 	bool m_host_endian;          /**< reference to the host cpu endianness, some commands cares! */
-	UINT8 m_byte_endian_val;     /**< 2 if m_host_endian is big (68k) else 0 */
-	UINT8 m_word_endian_val;     /**< 3 if m_host_endian is big (68k) else 0 */
+	uint8_t m_byte_endian_val;     /**< 2 if m_host_endian is big (68k) else 0 */
+	uint8_t m_word_endian_val;     /**< 3 if m_host_endian is big (68k) else 0 */
 
 
-	void cop_collision_read_pos(int slot, UINT32 spradr, bool allow_swap);
+	void cop_collision_read_pos(int slot, uint32_t spradr, bool allow_swap);
 
 	// commands, TODO: needs commenting!
-	void execute_8100(int offset, UINT16 data);
-	void execute_8900(int offset, UINT16 data);
+	void execute_8100(int offset, uint16_t data);
+	void execute_8900(int offset, uint16_t data);
 
-	void execute_42c2(int offset, UINT16 data);
-	void execute_4aa0(int offset, UINT16 data);
-	void execute_6200(int offset, UINT16 data);
+	void execute_42c2(int offset, uint16_t data);
+	void execute_4aa0(int offset, uint16_t data);
+	void execute_6200(int offset, uint16_t data);
 
-	void execute_338e(int offset, UINT16 data);
-	void execute_2288(int offset, UINT16 data);
-	void execute_0205(int offset, UINT16 data);
-	void execute_3b30(int offset, UINT16 data);
-	void execute_130e(int offset, UINT16 data);
-	void execute_0904(int offset, UINT16 data);
-	void execute_2a05(int offset, UINT16 data);
-	void execute_7e05(int offset, UINT16 data);
-	void execute_5205(int offset, UINT16 data);
-	void execute_5a05(int offset, UINT16 data);
+	void execute_338e(int offset, uint16_t data);
+	void execute_2288(int offset, uint16_t data);
+	void execute_0205(int offset, uint16_t data);
+	void execute_3b30(int offset, uint16_t data);
+	void execute_130e(int offset, uint16_t data);
+	void execute_0904(int offset, uint16_t data);
+	void execute_2a05(int offset, uint16_t data);
+	void execute_7e05(int offset, uint16_t data);
+	void execute_5205(int offset, uint16_t data);
+	void execute_5a05(int offset, uint16_t data);
 
-	void execute_f205(int offset, UINT16 data);
-	void execute_a100(int offset, UINT16 data);
-	void execute_a900(int offset, UINT16 data);
-	void execute_b100(int offset, UINT16 data);
-	void execute_b900(int offset, UINT16 data);
-	void execute_f105(int offset, UINT16 data);
+	void execute_f205(int offset, uint16_t data);
+	void execute_a100(int offset, uint16_t data);
+	void execute_a900(int offset, uint16_t data);
+	void execute_b100(int offset, uint16_t data);
+	void execute_b900(int offset, uint16_t data);
+	void execute_f105(int offset, uint16_t data);
 
 	// TODO: remove/rename these
-	//void LEGACY_execute_130e(int offset, UINT16 data);
-	void LEGACY_execute_130e_cupsoc(int offset, UINT16 data);
-	//void LEGACY_execute_3b30(int offset, UINT16 data);
-	//void LEGACY_execute_42c2(int offset, UINT16 data);
-	void LEGACY_execute_e30e(int offset, UINT16 data);
-	void LEGACY_execute_6200(int offset, UINT16 data);
-	void LEGACY_execute_dde5(int offset, UINT16 data);
-	void LEGACY_execute_d104(int offset, UINT16 data);
-	void LEGACY_execute_6980(int offset, UINT16 data);
-	void LEGACY_execute_c480(int offset, UINT16 data);
+	//void LEGACY_execute_130e(int offset, uint16_t data);
+	void LEGACY_execute_130e_cupsoc(int offset, uint16_t data);
+	//void LEGACY_execute_3b30(int offset, uint16_t data);
+	//void LEGACY_execute_42c2(int offset, uint16_t data);
+	void LEGACY_execute_e30e(int offset, uint16_t data);
+	void LEGACY_execute_6200(int offset, uint16_t data);
+	void LEGACY_execute_dde5(int offset, uint16_t data);
+	void LEGACY_execute_d104(int offset, uint16_t data);
+	void LEGACY_execute_6980(int offset, uint16_t data);
+	void LEGACY_execute_c480(int offset, uint16_t data);
 
-	void cop_collision_update_hitbox(UINT16 data, int slot, UINT32 hitadr);
+	void cop_collision_update_hitbox(uint16_t data, int slot, uint32_t hitadr);
 	void bcd_update();
 
-	UINT16 cop_read_word(int address);
-	UINT8 cop_read_byte(int address);
-	void cop_write_word(int address, UINT16 data);
-	void cop_write_byte(int address, UINT8 data);
+	uint16_t cop_read_word(int address);
+	uint8_t cop_read_byte(int address);
+	void cop_write_word(int address, uint16_t data);
+	void cop_write_byte(int address, uint8_t data);
 
 	void dma_tilemap_buffer();
 	void dma_palette_buffer();
 	void dma_fill();
 	void dma_palette_brightness();
-	void dma_zsorting(UINT16 data);
+	void dma_zsorting(uint16_t data);
 };
 
 extern const device_type RAIDEN2COP;

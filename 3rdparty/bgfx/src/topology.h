@@ -26,7 +26,30 @@ namespace bgfx
 	///
 	/// @attention C99 equivalent is `bgfx_topology_convert`.
 	///
-	uint32_t topologyConvert(TopologyConvert::Enum _conversion, void* _dst, uint32_t _dstSize, const void* _indices, uint32_t _numIndices, bool _index32, bx::AllocatorI* _allocator);
+	uint32_t topologyConvert(
+		  TopologyConvert::Enum _conversion
+		, void* _dst
+		, uint32_t _dstSize
+		, const void* _indices
+		, uint32_t _numIndices
+		, bool _index32
+		, bx::AllocatorI* _allocator
+		);
+
+	///
+	void topologySortTriList(
+		  TopologySort::Enum _sort
+		, void* _dst
+		, uint32_t _dstSize
+		, const float _dir[3]
+		, const float _pos[3]
+		, const void* _vertices
+		, uint32_t _stride
+		, const void* _indices
+		, uint32_t _numIndices
+		, bool _index32
+		, bx::AllocatorI* _allocator
+		);
 
 } // namespace bgfx
 

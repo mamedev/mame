@@ -17,42 +17,27 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-/** @brief  alignment values; 128 bytes is the largest cache line on typical architectures today. */
-const UINT32 BITMAP_OVERALL_ALIGN = 128;
-/** @brief  The bitmap rowbytes align. */
-const UINT32 BITMAP_ROWBYTES_ALIGN = 128;
-
-
-
-//**************************************************************************
 //  INLINE HELPERS
 //**************************************************************************
 
 //-------------------------------------------------
-//  compute_rowpixels - compute an aligned
-//  rowpixels value
+//  compute_rowpixels - compute a rowpixels value
 //-------------------------------------------------
 
-inline INT32 bitmap_t::compute_rowpixels(int width, int xslop)
+inline int32_t bitmap_t::compute_rowpixels(int width, int xslop)
 {
-	int rowpixels_align = BITMAP_ROWBYTES_ALIGN / (m_bpp / 8);
-	return ((width + 2 * xslop + (rowpixels_align - 1)) / rowpixels_align) * rowpixels_align;
+	return width + 2 * xslop;
 }
 
 
 //-------------------------------------------------
-//  compute_base - compute an aligned bitmap base
-//  address with the given slop values
+//  compute_base - compute a bitmap base address
+//  with the given slop values
 //-------------------------------------------------
 
 inline void bitmap_t::compute_base(int xslop, int yslop)
 {
 	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
-	UINT64 aligned_base = ((reinterpret_cast<UINT64>(m_base) + (BITMAP_OVERALL_ALIGN - 1)) / BITMAP_OVERALL_ALIGN) * BITMAP_OVERALL_ALIGN;
-	m_base = reinterpret_cast<void *>(aligned_base);
 }
 
 
@@ -190,8 +175,7 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 
 	// allocate memory for the bitmap itself
 	m_allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
-	m_allocbytes += BITMAP_OVERALL_ALIGN - 1;
-	m_alloc = new UINT8[m_allocbytes];
+	m_alloc = new uint8_t[m_allocbytes];
 
 	// clear to 0 by default
 	memset(m_alloc, 0, m_allocbytes);
@@ -225,8 +209,7 @@ void bitmap_t::resize(int width, int height, int xslop, int yslop)
 
 	// determine how much memory we need for the new bitmap
 	int new_rowpixels = compute_rowpixels(width, xslop);
-	UINT32 new_allocbytes = new_rowpixels * (height + 2 * yslop) * m_bpp / 8;
-	new_allocbytes += BITMAP_OVERALL_ALIGN - 1;
+	uint32_t new_allocbytes = new_rowpixels * (height + 2 * yslop) * m_bpp / 8;
 
 	// if we need more memory, just realloc
 	if (new_allocbytes > m_allocbytes)
@@ -354,7 +337,7 @@ void bitmap_t::set_palette(palette_t *palette)
 }
 
 /**
- * @fn  void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
+ * @fn  void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
  *
  * @brief   -------------------------------------------------
  *            fill -- fill a bitmap with a solid color
@@ -364,7 +347,7 @@ void bitmap_t::set_palette(palette_t *palette)
  * @param   cliprect    The cliprect.
  */
 
-void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
+void bitmap_t::fill(uint32_t color, const rectangle &cliprect)
 {
 	// if we have a cliprect, intersect with that
 	rectangle fill = cliprect;
@@ -377,29 +360,29 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 	{
 		case 8:
 			// 8bpp always uses memset
-			for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-				memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width());
+			for (int32_t y = fill.min_y; y <= fill.max_y; y++)
+				memset(raw_pixptr(y, fill.min_x), (uint8_t)color, fill.width());
 			break;
 
 		case 16:
 			// 16bpp can use memset if the bytes are equal
-			if ((UINT8)(color >> 8) == (UINT8)color)
+			if ((uint8_t)(color >> 8) == (uint8_t)color)
 			{
-				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(raw_pixptr(y, fill.min_x), (UINT8)color, fill.width() * 2);
+				for (int32_t y = fill.min_y; y <= fill.max_y; y++)
+					memset(raw_pixptr(y, fill.min_x), (uint8_t)color, fill.width() * 2);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT16 *destrow = &pixt<UINT16>(fill.min_y);
-				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
-					destrow[x] = (UINT16)color;
+				uint16_t *destrow = &pixt<uint16_t>(fill.min_y);
+				for (int32_t x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (uint16_t)color;
 
 				// For the other lines, just copy the first one
-				void *destrow0 = &pixt<UINT16>(fill.min_y, fill.min_x);
-				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
+				void *destrow0 = &pixt<uint16_t>(fill.min_y, fill.min_x);
+				for (int32_t y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pixt<UINT16>(y, fill.min_x);
+					destrow = &pixt<uint16_t>(y, fill.min_x);
 					memcpy(destrow, destrow0, fill.width() * 2);
 				}
 			}
@@ -407,23 +390,23 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 
 		case 32:
 			// 32bpp can use memset if the bytes are equal
-			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
+			if ((uint8_t)(color >> 8) == (uint8_t)color && (uint16_t)(color >> 16) == (uint16_t)color)
 			{
-				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT32>(y, fill.min_x), (UINT8)color, fill.width() * 4);
+				for (int32_t y = fill.min_y; y <= fill.max_y; y++)
+					memset(&pixt<uint32_t>(y, fill.min_x), (uint8_t)color, fill.width() * 4);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT32 *destrow  = &pixt<UINT32>(fill.min_y);
-				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
-					destrow[x] = (UINT32)color;
+				uint32_t *destrow  = &pixt<uint32_t>(fill.min_y);
+				for (int32_t x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (uint32_t)color;
 
 				// For the other lines, just copy the first one
-				UINT32 *destrow0 = &pixt<UINT32>(fill.min_y, fill.min_x);
-				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
+				uint32_t *destrow0 = &pixt<uint32_t>(fill.min_y, fill.min_x);
+				for (int32_t y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pixt<UINT32>(y, fill.min_x);
+					destrow = &pixt<uint32_t>(y, fill.min_x);
 					memcpy(destrow, destrow0, fill.width() * 4);
 				}
 			}
@@ -431,23 +414,23 @@ void bitmap_t::fill(UINT32 color, const rectangle &cliprect)
 
 		case 64:
 			// 64bpp can use memset if the bytes are equal
-			if ((UINT8)(color >> 8) == (UINT8)color && (UINT16)(color >> 16) == (UINT16)color)
+			if ((uint8_t)(color >> 8) == (uint8_t)color && (uint16_t)(color >> 16) == (uint16_t)color)
 			{
-				for (INT32 y = fill.min_y; y <= fill.max_y; y++)
-					memset(&pixt<UINT64>(y, fill.min_x), (UINT8)color, fill.width() * 8);
+				for (int32_t y = fill.min_y; y <= fill.max_y; y++)
+					memset(&pixt<uint64_t>(y, fill.min_x), (uint8_t)color, fill.width() * 8);
 			}
 			else
 			{
 				// Fill the first line the hard way
-				UINT64 *destrow  = &pixt<UINT64>(fill.min_y);
-				for (INT32 x = fill.min_x; x <= fill.max_x; x++)
-					destrow[x] = (UINT64)color;
+				uint64_t *destrow  = &pixt<uint64_t>(fill.min_y);
+				for (int32_t x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (uint64_t)color;
 
 				// For the other lines, just copy the first one
-				UINT64 *destrow0 = &pixt<UINT64>(fill.min_y, fill.min_x);
-				for (INT32 y = fill.min_y + 1; y <= fill.max_y; y++)
+				uint64_t *destrow0 = &pixt<uint64_t>(fill.min_y, fill.min_x);
+				for (int32_t y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					destrow = &pixt<UINT64>(y, fill.min_x);
+					destrow = &pixt<uint64_t>(y, fill.min_x);
 					memcpy(destrow, destrow0, fill.width() * 8);
 				}
 			}

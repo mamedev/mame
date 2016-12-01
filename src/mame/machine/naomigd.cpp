@@ -26,17 +26,17 @@
 
 const device_type NAOMI_GDROM_BOARD = &device_creator<naomi_gdrom_board>;
 
-const UINT32 naomi_gdrom_board::DES_LEFTSWAP[] = {
+const uint32_t naomi_gdrom_board::DES_LEFTSWAP[] = {
 	0x00000000, 0x00000001, 0x00000100, 0x00000101, 0x00010000, 0x00010001, 0x00010100, 0x00010101,
 	0x01000000, 0x01000001, 0x01000100, 0x01000101, 0x01010000, 0x01010001, 0x01010100, 0x01010101
 };
 
-const UINT32 naomi_gdrom_board::DES_RIGHTSWAP[] = {
+const uint32_t naomi_gdrom_board::DES_RIGHTSWAP[] = {
 	0x00000000, 0x01000000, 0x00010000, 0x01010000, 0x00000100, 0x01000100, 0x00010100, 0x01010100,
 	0x00000001, 0x01000001, 0x00010001, 0x01010001, 0x00000101, 0x01000101, 0x00010101, 0x01010101,
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX1[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX1[] = {
 	0x00808200, 0x00000000, 0x00008000, 0x00808202, 0x00808002, 0x00008202, 0x00000002, 0x00008000,
 	0x00000200, 0x00808200, 0x00808202, 0x00000200, 0x00800202, 0x00808002, 0x00800000, 0x00000002,
 	0x00000202, 0x00800200, 0x00800200, 0x00008200, 0x00008200, 0x00808000, 0x00808000, 0x00800202,
@@ -47,7 +47,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX1[] = {
 	0x00000202, 0x00800200, 0x00800200, 0x00000000, 0x00008002, 0x00008200, 0x00000000, 0x00808002
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX2[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX2[] = {
 	0x40084010, 0x40004000, 0x00004000, 0x00084010, 0x00080000, 0x00000010, 0x40080010, 0x40004010,
 	0x40000010, 0x40084010, 0x40084000, 0x40000000, 0x40004000, 0x00080000, 0x00000010, 0x40080010,
 	0x00084000, 0x00080010, 0x40004010, 0x00000000, 0x40000000, 0x00004000, 0x00084010, 0x40080000,
@@ -58,7 +58,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX2[] = {
 	0x00084000, 0x00000000, 0x40004000, 0x00004010, 0x40000000, 0x40080010, 0x40084010, 0x00084000
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX3[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX3[] = {
 	0x00000104, 0x04010100, 0x00000000, 0x04010004, 0x04000100, 0x00000000, 0x00010104, 0x04000100,
 	0x00010004, 0x04000004, 0x04000004, 0x00010000, 0x04010104, 0x00010004, 0x04010000, 0x00000104,
 	0x04000000, 0x00000004, 0x04010100, 0x00000100, 0x00010100, 0x04010000, 0x04010004, 0x00010104,
@@ -69,7 +69,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX3[] = {
 	0x04010000, 0x04000104, 0x00000104, 0x04010000, 0x00010104, 0x00000004, 0x04010004, 0x00010100
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX4[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX4[] = {
 	0x80401000, 0x80001040, 0x80001040, 0x00000040, 0x00401040, 0x80400040, 0x80400000, 0x80001000,
 	0x00000000, 0x00401000, 0x00401000, 0x80401040, 0x80000040, 0x00000000, 0x00400040, 0x80400000,
 	0x80000000, 0x00001000, 0x00400000, 0x80401000, 0x00000040, 0x00400000, 0x80001000, 0x00001040,
@@ -80,7 +80,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX4[] = {
 	0x80001000, 0x00001040, 0x00400000, 0x80401000, 0x00000040, 0x00400000, 0x00001000, 0x00401040
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX5[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX5[] = {
 	0x00000080, 0x01040080, 0x01040000, 0x21000080, 0x00040000, 0x00000080, 0x20000000, 0x01040000,
 	0x20040080, 0x00040000, 0x01000080, 0x20040080, 0x21000080, 0x21040000, 0x00040080, 0x20000000,
 	0x01000000, 0x20040000, 0x20040000, 0x00000000, 0x20000080, 0x21040080, 0x21040080, 0x01000080,
@@ -91,7 +91,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX5[] = {
 	0x00040080, 0x01000080, 0x20000080, 0x00040000, 0x00000000, 0x20040000, 0x01040080, 0x20000080
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX6[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX6[] = {
 	0x10000008, 0x10200000, 0x00002000, 0x10202008, 0x10200000, 0x00000008, 0x10202008, 0x00200000,
 	0x10002000, 0x00202008, 0x00200000, 0x10000008, 0x00200008, 0x10002000, 0x10000000, 0x00002008,
 	0x00000000, 0x00200008, 0x10002008, 0x00002000, 0x00202000, 0x10002008, 0x00000008, 0x10200008,
@@ -102,7 +102,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX6[] = {
 	0x00002000, 0x00200008, 0x10002008, 0x00000000, 0x10202000, 0x10000000, 0x00200008, 0x10002008
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX7[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX7[] = {
 	0x00100000, 0x02100001, 0x02000401, 0x00000000, 0x00000400, 0x02000401, 0x00100401, 0x02100400,
 	0x02100401, 0x00100000, 0x00000000, 0x02000001, 0x00000001, 0x02000000, 0x02100001, 0x00000401,
 	0x02000400, 0x00100401, 0x00100001, 0x02000400, 0x02000001, 0x02100000, 0x02100400, 0x00100001,
@@ -113,7 +113,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX7[] = {
 	0x00000000, 0x00100401, 0x02100000, 0x00000400, 0x02000001, 0x02000400, 0x00000400, 0x00100001
 };
 
-const UINT32 naomi_gdrom_board::DES_SBOX8[] = {
+const uint32_t naomi_gdrom_board::DES_SBOX8[] = {
 	0x08000820, 0x00000800, 0x00020000, 0x08020820, 0x08000000, 0x08000820, 0x00000020, 0x08000000,
 	0x00020020, 0x08020000, 0x08020820, 0x00020800, 0x08020800, 0x00020820, 0x00000800, 0x00000020,
 	0x08020000, 0x08000020, 0x08000800, 0x00000820, 0x00020800, 0x00020020, 0x08020020, 0x08020800,
@@ -124,7 +124,7 @@ const UINT32 naomi_gdrom_board::DES_SBOX8[] = {
 	0x08020820, 0x00020800, 0x00020800, 0x00000820, 0x00000820, 0x00020020, 0x08000000, 0x08020800
 };
 
-const UINT32 naomi_gdrom_board::DES_MASK_TABLE[] = {
+const uint32_t naomi_gdrom_board::DES_MASK_TABLE[] = {
 	0x24000000, 0x10000000, 0x08000000, 0x02080000, 0x01000000,
 	0x00200000, 0x00100000, 0x00040000, 0x00020000, 0x00010000,
 	0x00002000, 0x00001000, 0x00000800, 0x00000400, 0x00000200,
@@ -136,22 +136,22 @@ const UINT32 naomi_gdrom_board::DES_MASK_TABLE[] = {
 	0x00000020, 0x00000011, 0x00000004, 0x00000002
 };
 
-const UINT8 naomi_gdrom_board::DES_ROTATE_TABLE[16] = {
+const uint8_t naomi_gdrom_board::DES_ROTATE_TABLE[16] = {
 	1, 1, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1
 };
 
-void naomi_gdrom_board::permutate(UINT32 &a, UINT32 &b, UINT32 m, int shift)
+void naomi_gdrom_board::permutate(uint32_t &a, uint32_t &b, uint32_t m, int shift)
 {
-	UINT32 temp;
+	uint32_t temp;
 	temp = ((a>>shift) ^ b) & m;
 	a ^= temp<<shift;
 	b ^= temp;
 }
 
-void naomi_gdrom_board::des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
+void naomi_gdrom_board::des_generate_subkeys(const uint64_t key, uint32_t *subkeys)
 {
-	UINT32 l = key >> 32;
-	UINT32 r = key;
+	uint32_t l = key >> 32;
+	uint32_t r = key;
 
 	permutate(r, l, 0x0f0f0f0f, 4);
 	permutate(r, l, 0x10101010, 0);
@@ -232,10 +232,10 @@ void naomi_gdrom_board::des_generate_subkeys(const UINT64 key, UINT32 *subkeys)
 	}
 }
 
-UINT64 naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, UINT64 src, const UINT32 *des_subkeys)
+uint64_t naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, uint64_t src, const uint32_t *des_subkeys)
 {
-	UINT32 r = (src & 0x00000000ffffffffULL) >> 0;
-	UINT32 l = (src & 0xffffffff00000000ULL) >> 32;
+	uint32_t r = (src & 0x00000000ffffffffULL) >> 0;
+	uint32_t l = (src & 0xffffffff00000000ULL) >> 32;
 
 	permutate(l, r, 0x0f0f0f0f, 4);
 	permutate(l, r, 0x0000ffff, 16);
@@ -250,7 +250,7 @@ UINT64 naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, UINT64 src, const UI
 		subkey = 0;
 
 	for(int i = 0; i < 32 ; i+=4) {
-		UINT32 temp;
+		uint32_t temp;
 
 		temp = ((r<<1) | (r>>31)) ^ des_subkeys[subkey];
 		l ^= DES_SBOX8[ (temp>>0)  & 0x3f ];
@@ -291,12 +291,12 @@ UINT64 naomi_gdrom_board::des_encrypt_decrypt(bool decrypt, UINT64 src, const UI
 	permutate(r, l, 0x0000ffff, 16);
 	permutate(r, l, 0x0f0f0f0f, 4);
 
-	return (UINT64(r) << 32) | UINT64(l);
+	return (uint64_t(r) << 32) | uint64_t(l);
 }
 
-UINT64 naomi_gdrom_board::rev64(UINT64 src)
+uint64_t naomi_gdrom_board::rev64(uint64_t src)
 {
-	UINT64 ret;
+	uint64_t ret;
 
 	ret = ((src & 0x00000000000000ffULL) << 56)
 		| ((src & 0x000000000000ff00ULL) << 40)
@@ -310,24 +310,24 @@ UINT64 naomi_gdrom_board::rev64(UINT64 src)
 	return ret;
 }
 
-UINT64 naomi_gdrom_board::read_to_qword(const UINT8 *region)
+uint64_t naomi_gdrom_board::read_to_qword(const uint8_t *region)
 {
-	UINT64 ret = 0;
+	uint64_t ret = 0;
 
 	for(int i=0;i<8;i++)
-		ret |= UINT64(region[i]) << (56-(8*i));
+		ret |= uint64_t(region[i]) << (56-(8*i));
 
 	return ret;
 }
 
-void naomi_gdrom_board::write_from_qword(UINT8 *region, UINT64 qword)
+void naomi_gdrom_board::write_from_qword(uint8_t *region, uint64_t qword)
 {
 	for(int i=0;i<8;i++)
 		region[i] = qword >> (56-(i*8));
 }
 
-naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega NAOMI GDROM Board", tag, owner, clock, "naomi_gdrom_board", __FILE__)
+naomi_gdrom_board::naomi_gdrom_board(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: naomi_board(mconfig, NAOMI_GDROM_BOARD, "Sega DIMM Board", tag, owner, clock, "segadimm", __FILE__)
 {
 	image_tag = nullptr;
 	pic_tag = nullptr;
@@ -340,12 +340,12 @@ void naomi_gdrom_board::static_set_tags(device_t &device, const char *_image_tag
 	dev.pic_tag = _pic_tag;
 }
 
-void naomi_gdrom_board::find_file(const char *name, const UINT8 *dir_sector, UINT32 &file_start, UINT32 &file_size)
+void naomi_gdrom_board::find_file(const char *name, const uint8_t *dir_sector, uint32_t &file_start, uint32_t &file_size)
 {
 	file_start = 0;
 	file_size = 0;
 	logerror("Looking for file [%s]\n", name);
-	for(UINT32 pos = 0; pos < 2048; pos += dir_sector[pos]) {
+	for(uint32_t pos = 0; pos < 2048; pos += dir_sector[pos]) {
 		int fnlen = 0;
 		if(!(dir_sector[pos+25] & 2)) {
 			int len = dir_sector[pos+32];
@@ -394,11 +394,11 @@ void naomi_gdrom_board::device_start()
 	char name[128];
 	memset(name,'\0',128);
 
-	UINT64 key;
-	UINT8 netpic = 0;
+	uint64_t key;
+	uint8_t netpic = 0;
 
 	memory_region *mr = memregion(pic_tag);
-	const UINT8 *picdata = mr->base();
+	const uint8_t *picdata = mr->base();
 
 	if(picdata) {
 		if(memregion(pic_tag)->bytes() >= 0x4000) {
@@ -410,7 +410,7 @@ void naomi_gdrom_board::device_start()
 
 			key = 0;
 			for(int i=0;i<7;i++)
-				key |= UINT64(picdata[0x780+i*2]) << (56 - i*8);
+				key |= uint64_t(picdata[0x780+i*2]) << (56 - i*8);
 
 			key |= picdata[0x7a0];
 
@@ -421,25 +421,25 @@ void naomi_gdrom_board::device_start()
 			memcpy(name, picdata+33, 7);
 			memcpy(name+7, picdata+25, 7);
 
-			key =((UINT64(picdata[0x31]) << 56) |
-					(UINT64(picdata[0x32]) << 48) |
-					(UINT64(picdata[0x33]) << 40) |
-					(UINT64(picdata[0x34]) << 32) |
-					(UINT64(picdata[0x35]) << 24) |
-					(UINT64(picdata[0x36]) << 16) |
-					(UINT64(picdata[0x37]) << 8)  |
-					(UINT64(picdata[0x29]) << 0));
+			key =((uint64_t(picdata[0x31]) << 56) |
+					(uint64_t(picdata[0x32]) << 48) |
+					(uint64_t(picdata[0x33]) << 40) |
+					(uint64_t(picdata[0x34]) << 32) |
+					(uint64_t(picdata[0x35]) << 24) |
+					(uint64_t(picdata[0x36]) << 16) |
+					(uint64_t(picdata[0x37]) << 8)  |
+					(uint64_t(picdata[0x29]) << 0));
 		}
 
-		logerror("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
+		logerror("key is %08x%08x\n", (uint32_t)((key & 0xffffffff00000000ULL)>>32), (uint32_t)(key & 0x00000000ffffffffULL));
 
-		UINT8 buffer[2048];
+		uint8_t buffer[2048];
 		cdrom_file *gdromfile = cdrom_open(machine().rom_load().get_disk_handle(image_tag));
 		// primary volume descriptor
 		// read frame 0xb06e (frame=sector+150)
 		// dimm board firmware starts straight from this frame
 		cdrom_read_data(gdromfile, (netpic ? 0 : 45000) + 16, buffer, CD_TRACK_MODE1);
-		UINT32 path_table = ((buffer[0x8c+0] << 0) |
+		uint32_t path_table = ((buffer[0x8c+0] << 0) |
 								(buffer[0x8c+1] << 8) |
 								(buffer[0x8c+2] << 16) |
 								(buffer[0x8c+3] << 24));
@@ -447,12 +447,12 @@ void naomi_gdrom_board::device_start()
 		cdrom_read_data(gdromfile, path_table, buffer, CD_TRACK_MODE1);
 
 		// directory
-		UINT8 dir_sector[2048];
+		uint8_t dir_sector[2048];
 		// find data of file
-		UINT32 file_start, file_size;
+		uint32_t file_start, file_size;
 
 		if (netpic == 0) {
-			UINT32 dir = ((buffer[0x2 + 0] << 0) |
+			uint32_t dir = ((buffer[0x2 + 0] << 0) |
 				(buffer[0x2 + 1] << 8) |
 				(buffer[0x2 + 2] << 16) |
 				(buffer[0x2 + 3] << 24));
@@ -468,12 +468,12 @@ void naomi_gdrom_board::device_start()
 				memcpy(name, buffer + 0xc0, FILENAME_LENGTH - 1);
 			}
 		} else {
-			UINT32 i = 0;
+			uint32_t i = 0;
 			while (i < 2048 && buffer[i] != 0)
 			{
 				if (buffer[i] == 3 && buffer[i + 8] == 'R' && buffer[i + 9] == 'O' && buffer[i + 10] == 'M')    // find ROM dir
 				{
-					UINT32 dir = ((buffer[i + 2] << 0) |
+					uint32_t dir = ((buffer[i + 2] << 0) |
 						(buffer[i + 3] << 8) |
 						(buffer[i + 4] << 16) |
 						(buffer[i + 5] << 24));
@@ -488,18 +488,18 @@ void naomi_gdrom_board::device_start()
 		find_file(name, dir_sector, file_start, file_size);
 
 		if (file_start) {
-			UINT32 file_rounded_size = (file_size + 2047) & -2048;
+			uint32_t file_rounded_size = (file_size + 2047) & -2048;
 			for (dimm_data_size = 4096; dimm_data_size < file_rounded_size; dimm_data_size <<= 1);
-			dimm_data = auto_alloc_array(machine(), UINT8, dimm_data_size);
+			dimm_data = auto_alloc_array(machine(), uint8_t, dimm_data_size);
 			if (dimm_data_size != file_rounded_size)
 				memset(dimm_data + file_rounded_size, 0, dimm_data_size - file_rounded_size);
 
 			// read encrypted data into dimm_data
-			UINT32 sectors = file_rounded_size / 2048;
-			for (UINT32 sec = 0; sec != sectors; sec++)
+			uint32_t sectors = file_rounded_size / 2048;
+			for (uint32_t sec = 0; sec != sectors; sec++)
 				cdrom_read_data(gdromfile, file_start + sec, dimm_data + 2048 * sec, CD_TRACK_MODE1);
 
-			UINT32 des_subkeys[32];
+			uint32_t des_subkeys[32];
 			des_generate_subkeys(rev64(key), des_subkeys);
 
 			for (int i = 0; i < file_rounded_size; i += 8)
@@ -523,20 +523,65 @@ void naomi_gdrom_board::device_reset()
 	dimm_cur_address = 0;
 }
 
-void naomi_gdrom_board::board_setup_address(UINT32 address, bool is_dma)
+void naomi_gdrom_board::board_setup_address(uint32_t address, bool is_dma)
 {
 	dimm_cur_address = address & (dimm_data_size-1);
 }
 
-void naomi_gdrom_board::board_get_buffer(UINT8 *&base, UINT32 &limit)
+void naomi_gdrom_board::board_get_buffer(uint8_t *&base, uint32_t &limit)
 {
 	base = dimm_data + dimm_cur_address;
 	limit = dimm_data_size - dimm_cur_address;
 }
 
-void naomi_gdrom_board::board_advance(UINT32 size)
+void naomi_gdrom_board::board_advance(uint32_t size)
 {
 	dimm_cur_address += size;
 	if(dimm_cur_address >= dimm_data_size)
 		dimm_cur_address %= dimm_data_size;
+}
+
+// DIMM firmwares:
+//  FPR-23489C - 1.02 not VxWorks based, no network, can not be software updated to 2.xx+
+// Net-DIMM firmwares:
+// all VxWorkx based, can be updated up to 4.0x, actually 1MB in size, must have CRC32 FFFFFFFF, 1st MB of flash ROM contain stock version, 2nd MB have some updated version
+//  ?          - 2.03 factory only, introduced ALL.net features, so far was seen only as stock firmware in 1st half of flash ROM, factory updated to some newer ver in 2nd ROM half
+//  FPR23718   - 2.06 factory only, most common version of NAOMI Net-DIMMs, have stock 2.03, IC label need verification
+//  ?            2.13 factory or update (NAOMI VF4)
+//  ?            2.17 factory or update (NAOMI VF4 Evolution)
+//  ?          - 3.01 added network boot support, supports Triforce and Chihiro
+//  FPR23905   - 3.03 factory or update (NAOMI WCCF)
+//  ?            3.12 factory only
+//  ?            3.17 latest known 3.xx version, factory or update (NAOMI VF4 Final Tuned or statndalone disks for Chihiro and Triforce)
+// update only - 4.01 supports Compact Flash GD-ROM-replacement
+//              "4.02" hack of 4.01 with CF card vendor check disabled
+
+ROM_START( dimm )
+	ROM_REGION( 0x200000, "segadimm", 0)
+	// Altera FLEX EPF10K30 firmwares (implements PCI IDE controller)
+	ROM_LOAD("315-6301.ic11", 0x000000, 0x01ff01, NO_DUMP ) // GD-only DIMM
+	ROM_LOAD("315-6334.ic11", 0x000000, 0x01ff01, CRC(534c342d) SHA1(3e879f432c82305487922ab28c07107cf0f3c5cf) ) // Net-DIMM
+
+	// unused and/or unknown security PICs
+	// 253-5508-0352E 317-0352-EXP BFC.BIN unknown, presumable some mahjong game (MJ1 ?)
+	ROM_LOAD("317-0352-exp.pic", 0x00, 0x4000, CRC(b216fbfc) SHA1(da2341003b35d1600d63fbe34d13ff3b42bdc939) )
+	// 253-5508-0456J 317-0456-JPN BEG.BIN WCCF 2005-2006 undumped Japan version
+	ROM_LOAD("317-0456-jpn.pic", 0x00, 0x4000, CRC(cf3bd834) SHA1(6236cdb780260d34c02806478a39c9f3432a45e8) )
+	// 253-5508-0506J 317-0506-JPN BPK.BIN unknown, something Chihiro ?
+	ROM_LOAD("317-0506-jpn.pic", 0x00, 0x4000, CRC(e105c6c8) SHA1(63e17b330a2f7d30bf0c263b163469f7f8e6a495) )
+
+	// main firmwares
+	ROM_LOAD16_WORD_SWAP( "fpr-23489c.ic14", 0x000000, 0x200000, CRC(bc38bea1) SHA1(b36fcc6902f397d9749e9d02de1bbb7a5e29d468) )
+	ROM_LOAD16_WORD_SWAP( "203_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(6f55f1ae0606816a4eca6645ed36eb7f9c7ad9cf) )
+	ROM_LOAD16_WORD_SWAP( "fpr23718.ic36",   0x000000, 0x200000, CRC(a738ea1c) SHA1(b7b5a55a6a4cf0aa2df1b3dff62ff67f864c55e8) )
+	ROM_LOAD16_WORD_SWAP( "213_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(17131f318632610b87bc095156ffad4597fed4ca) )
+	ROM_LOAD16_WORD_SWAP( "217_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(e5a229ae7ed48b2955cad63529fd938c6db555e5) )
+	ROM_LOAD16_WORD_SWAP( "fpr23905.ic36",   0x000000, 0x200000, CRC(ffffffff) SHA1(acade4362807c7571b1c2a48ed6067e4bddd404b) )
+	ROM_LOAD16_WORD_SWAP( "317_312.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(31d698cd659446ee09a2eeedec6e4bc6a19d05e8) )
+	ROM_LOAD16_WORD_SWAP( "401_203.bin",     0x000000, 0x200000, CRC(a738ea1c) SHA1(edb52597108462bcea8eb2a47c19e51e5fb60638) )
+ROM_END
+
+const tiny_rom_entry *naomi_gdrom_board::device_rom_region() const
+{
+	return ROM_NAME(dimm);
 }

@@ -529,7 +529,7 @@ DRIVER_INIT_MEMBER(starwars_state,starwars)
 
 DRIVER_INIT_MEMBER(starwars_state,esb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
 	m_slapstic_device->slapstic_init();

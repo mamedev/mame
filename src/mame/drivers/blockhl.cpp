@@ -47,7 +47,7 @@ public:
 
 	K052109_CB_MEMBER(tile_callback);
 	K051960_CB_MEMBER(sprite_callback);
-	UINT32 screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(k052109_051960_r);
 	DECLARE_WRITE8_MEMBER(k052109_051960_w);
 
@@ -122,7 +122,7 @@ K051960_CB_MEMBER( blockhl_state::sprite_callback )
 	*color = sprite_colorbase + (*color & 0x0f);
 }
 
-UINT32 blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t blockhl_state::screen_update_blockhl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen.priority().fill(0, cliprect);
 

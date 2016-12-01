@@ -235,7 +235,7 @@
   an oscilloscope, I measured a value of 60 uS = 1538 Hz. We used a NMI period of 1536 Hz due
   to a better binary composition (1024+512).
 
-  Inputs/Ouputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
+  Inputs/Outputs are driven through 74LS251 and 74LS259 multiplexers. Each one handles 1 bit
   from data bus, and there are many devices as addressed ports (8x 74LS251 and 8x 74LS259).
 
   Input ports are mapped to offsets 0xC410 through 0xC417. Output ports are mapped to 0xC4000
@@ -316,7 +316,7 @@
   - Reworked the color routines switching to resnet system.
   - Added a resistor network diagram.
   - Switch to pre-defined crystal value.
-  - Changed the WATCHDOG_TIME_INIT to be based on miliseconds instead of hertz.
+  - Changed the WATCHDOG_TIME_INIT to be based on milliseconds instead of hertz.
   - Other minor cleanup/fixes.
   - Updated technical notes.
 
@@ -1373,12 +1373,12 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ampoker2_state, rabbitpk)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int size = memregion("maincpu")->bytes();
 	int start = 0;
 	int i;
 
-	UINT8 dec_base[32] =
+	uint8_t dec_base[32] =
 	{
 		0x00, 0x43, 0x45, 0x06, 0xc3, 0x80, 0x86, 0xc5,
 		0x84, 0xc7, 0xc1, 0x82, 0x47, 0x04, 0x02, 0x41,
@@ -1425,7 +1425,7 @@ DRIVER_INIT_MEMBER(ampoker2_state, piccolop)
 
 */
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	// NOP'ing the mortal jump...
 	rom[0x154b] = 0x00;

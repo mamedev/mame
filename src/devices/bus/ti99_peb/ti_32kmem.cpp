@@ -7,7 +7,7 @@
     unbuffered 32 KiB. Yet it was a very popular card since it was
     required for any kind of advanced programming beyond the console BASIC.
 
-    As a peripheral box card, it is connected via the 8-bit mutiplexed data bus.
+    As a peripheral box card, it is connected via the 8-bit multiplexed data bus.
     Later, modifications of the console became increasingly popular which
     avoided the bus multiplex so that the full 16bit access was possible.
     This helped to noticeably speed up the system.
@@ -34,7 +34,7 @@
 
 #define RAMREGION "ram32k"
 
-ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI_32KMEM, "TI-99 32KiB memory expansion card", tag, owner, clock, "ti99_32k", __FILE__),
 	m_ram(*this, RAMREGION)
 {
@@ -42,7 +42,7 @@ ti_32k_expcard_device::ti_32k_expcard_device(const machine_config &mconfig, cons
 
 READ8Z_MEMBER(ti_32k_expcard_device::readz)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 	/*
 	    The problem for mapping the memory into the address space is that
 	    we have a block at 2000-3FFF and another one at A000-FFFF. The trick

@@ -24,7 +24,7 @@
 // device type definition
 const device_type TC8830F = &device_creator<tc8830f_device>;
 
-tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_playing(false),
@@ -81,7 +81,7 @@ void tc8830f_device::device_clock_changed()
 
 void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT32 mix = 0;
+	int32_t mix = 0;
 
 	for (int i = 0; i < samples; i++)
 	{
@@ -149,7 +149,7 @@ void tc8830f_device::reset()
 }
 
 
-void tc8830f_device::write_p(UINT8 data)
+void tc8830f_device::write_p(uint8_t data)
 {
 	m_stream->update();
 	data &= 0xf;
@@ -231,7 +231,7 @@ void tc8830f_device::write_p(UINT8 data)
 					m_phrase = (m_phrase & 0x0f) | (data << 4 & 0x30);
 
 					// update addresses and start
-					UINT8 offs = m_phrase * 4;
+					uint8_t offs = m_phrase * 4;
 					m_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();
 					offs += 4;
 					m_stop_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();

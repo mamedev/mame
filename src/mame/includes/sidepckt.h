@@ -29,17 +29,17 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_bg_tilemap;
-	const UINT8* m_prot_table[3];
-	UINT8 m_i8751_return;
-	UINT8 m_current_ptr;
-	UINT8 m_current_table;
-	UINT8 m_in_math;
-	UINT8 m_math_param;
+	const uint8_t* m_prot_table[3];
+	uint8_t m_i8751_return;
+	uint8_t m_current_ptr;
+	uint8_t m_current_table;
+	uint8_t m_in_math;
+	uint8_t m_math_param;
 
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_READ8_MEMBER(i8751_r);
@@ -57,6 +57,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sidepckt);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

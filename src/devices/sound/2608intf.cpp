@@ -142,7 +142,7 @@ void ym2608_device::device_start()
 	m_timer[1] = timer_alloc(1);
 
 	/* stream system initialize */
-	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(FUNC(ym2608_device::stream_generate),this));
+	m_stream = machine().sound().stream_alloc(*this,0,2,rate, stream_update_delegate(&ym2608_device::stream_generate,this));
 	/* setup adpcm buffers */
 	pcmbufa  = m_region->base();
 	pcmsizea = m_region->bytes();
@@ -185,7 +185,7 @@ WRITE8_MEMBER( ym2608_device::write )
 
 const device_type YM2608 = &device_creator<ym2608_device>;
 
-ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2608_device::ym2608_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2608, "YM2608", tag, owner, clock, PSG_TYPE_YM, 1, 2, "ym2608", __FILE__),
 		m_irq_handler(*this),
 		m_region(*this, DEVICE_SELF)
@@ -226,7 +226,7 @@ ROM_START( ym2608 )
 ROM_END
 
 
-const rom_entry *ym2608_device::device_rom_region() const
+const tiny_rom_entry *ym2608_device::device_rom_region() const
 {
 	return ROM_NAME( ym2608 );
 }

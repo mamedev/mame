@@ -416,14 +416,14 @@ GFXDECODE_END
 
 static const rgb_t arcadia_colors[] =
 {
-	rgb_t::white,                  /* white */
+	rgb_t::white(),                /* white */
 	rgb_t(0xff, 0xff, 0x00), /* yellow */
 	rgb_t(0x00, 0xff, 0xff), /* cyan */
 	rgb_t(0x00, 0xff, 0x00), /* green */
 	rgb_t(0xff, 0x00, 0xff), /* magenta */
 	rgb_t(0xff, 0x00, 0x00), /* red */
 	rgb_t(0x00, 0x00, 0xff), /* blue */
-	rgb_t::black                   /* black */
+	rgb_t::black()                 /* black */
 };
 
 static const unsigned short arcadia_palette[128+8] =  /* bgnd, fgnd */
@@ -676,16 +676,16 @@ ROM_END
 DRIVER_INIT_MEMBER(arcadia_state,arcadia)
 {
 	int i;
-	UINT8 *gfx=memregion("gfx1")->base();
+	uint8_t *gfx=memregion("gfx1")->base();
 	for (i=0; i<256; i++) gfx[i]=i;
 #if 0
 	// this is here to allow developement of some simple testroutines
 	// for a real console
 	{
-		UINT8 *rom=memregion("maincpu")->base();
+		uint8_t *rom=memregion("maincpu")->base();
 		/* this is a simple routine to display all rom characters
 		   on the display for a snapshot */
-		static const UINT8 prog[]={ // address 0 of course
+		static const uint8_t prog[]={ // address 0 of course
 		0x20, // eorz, 0
 		0x1b, 0x01, // bctr,a $0004
 		0x17, // retc a

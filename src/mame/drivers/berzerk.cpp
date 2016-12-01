@@ -41,16 +41,16 @@ public:
 	required_device<exidy_sound_device> m_custom;
 	required_device<screen_device> m_screen;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_magicram_control;
-	UINT8 m_last_shift_data;
-	UINT8 m_intercept;
+	uint8_t m_magicram_control;
+	uint8_t m_last_shift_data;
+	uint8_t m_intercept;
 	emu_timer *m_irq_timer;
 	emu_timer *m_nmi_timer;
-	UINT8 m_irq_enabled;
-	UINT8 m_nmi_enabled;
+	uint8_t m_irq_enabled;
+	uint8_t m_nmi_enabled;
 	int m_p1_counter_74ls161;
 	int m_p1_direction;
 	int m_p2_counter_74ls161;
@@ -79,12 +79,12 @@ public:
 	virtual void sound_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(irq_callback);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
-	void vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256);
-	int vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256);
+	void vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256);
+	int vsync_chain_counter_to_vpos(uint8_t counter, uint8_t v256);
 	void create_irq_timer();
 	void start_irq_timer();
 	void create_nmi_timer();
@@ -108,11 +108,11 @@ public:
 #define IRQS_PER_FRAME              (2)
 #define NMIS_PER_FRAME              (8)
 
-static const UINT8 irq_trigger_counts[IRQS_PER_FRAME] = { 0x80, 0xda };
-static const UINT8 irq_trigger_v256s [IRQS_PER_FRAME] = { 0x00, 0x01 };
+static const uint8_t irq_trigger_counts[IRQS_PER_FRAME] = { 0x80, 0xda };
+static const uint8_t irq_trigger_v256s [IRQS_PER_FRAME] = { 0x00, 0x01 };
 
-static const UINT8 nmi_trigger_counts[NMIS_PER_FRAME] = { 0x30, 0x50, 0x70, 0x90, 0xb0, 0xd0, 0xf0, 0xf0 };
-static const UINT8 nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
+static const uint8_t nmi_trigger_counts[NMIS_PER_FRAME] = { 0x30, 0x50, 0x70, 0x90, 0xb0, 0xd0, 0xf0, 0xf0 };
+static const uint8_t nmi_trigger_v256s [NMIS_PER_FRAME] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 };
 
 
 /*************************************
@@ -157,7 +157,7 @@ WRITE8_MEMBER(berzerk_state::led_off_w)
  *
  *************************************/
 
-void berzerk_state::vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 *v256)
+void berzerk_state::vpos_to_vsync_chain_counter(int vpos, uint8_t *counter, uint8_t *v256)
 {
 	/* convert from a vertical position to the actual values on the vertical sync counters */
 	*v256 = ((vpos < VBEND) || (vpos >= VBSTART));
@@ -176,7 +176,7 @@ void berzerk_state::vpos_to_vsync_chain_counter(int vpos, UINT8 *counter, UINT8 
 }
 
 
-int berzerk_state::vsync_chain_counter_to_vpos(UINT8 counter, UINT8 v256)
+int berzerk_state::vsync_chain_counter_to_vpos(uint8_t counter, uint8_t v256)
 {
 	/* convert from the vertical sync counters to an actual vertical position */
 	int vpos;
@@ -213,8 +213,8 @@ WRITE8_MEMBER(berzerk_state::irq_enable_w)
 TIMER_CALLBACK_MEMBER(berzerk_state::irq_callback)
 {
 	int irq_number = param;
-	UINT8 next_counter;
-	UINT8 next_v256;
+	uint8_t next_counter;
+	uint8_t next_v256;
 	int next_vpos;
 	int next_irq_number;
 
@@ -290,8 +290,8 @@ READ8_MEMBER(berzerk_state::nmi_disable_r)
 TIMER_CALLBACK_MEMBER(berzerk_state::nmi_callback)
 {
 	int nmi_number = param;
-	UINT8 next_counter;
-	UINT8 next_v256;
+	uint8_t next_counter;
+	uint8_t next_v256;
 	int next_vpos;
 	int next_nmi_number;
 
@@ -378,15 +378,15 @@ void berzerk_state::video_start()
 
 WRITE8_MEMBER(berzerk_state::magicram_w)
 {
-	UINT8 alu_output;
+	uint8_t alu_output;
 
-	UINT8 current_video_data = m_videoram[offset];
+	uint8_t current_video_data = m_videoram[offset];
 
 	/* shift data towards LSB.  MSB bits are filled by data from last_shift_data.
 	   The shifter consists of 5 74153 devices @ 7A, 8A, 9A, 10A and 11A,
 	   followed by 4 more 153's at 11B, 10B, 9B and 8B, which optionally
 	   reverse the order of the resulting bits */
-	UINT8 shift_flop_output = (((UINT16)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
+	uint8_t shift_flop_output = (((uint16_t)m_last_shift_data << 8) | data) >> (m_magicram_control & 0x07);
 
 	if (m_magicram_control & 0x08)
 		shift_flop_output = BITSWAP8(shift_flop_output, 0, 1, 2, 3, 4, 5, 6, 7);
@@ -425,8 +425,8 @@ WRITE8_MEMBER(berzerk_state::magicram_control_w)
 
 READ8_MEMBER(berzerk_state::intercept_v256_r)
 {
-	UINT8 counter;
-	UINT8 v256;
+	uint8_t counter;
+	uint8_t v256;
 
 	vpos_to_vsync_chain_counter(m_screen->vpos(), &counter, &v256);
 
@@ -454,21 +454,21 @@ void berzerk_state::get_pens(rgb_t *pens)
 
 	for (int color = 0; color < 0x10; color++)
 	{
-		UINT8 r_bit = (color >> 0) & 0x01;
-		UINT8 g_bit = (color >> 1) & 0x01;
-		UINT8 b_bit = (color >> 2) & 0x01;
-		UINT8 i_bit = (color >> 3) & 0x01;
+		uint8_t r_bit = (color >> 0) & 0x01;
+		uint8_t g_bit = (color >> 1) & 0x01;
+		uint8_t b_bit = (color >> 2) & 0x01;
+		uint8_t i_bit = (color >> 3) & 0x01;
 
-		UINT8 r = combine_2_weights(color_weights, r_bit & i_bit, r_bit);
-		UINT8 g = combine_2_weights(color_weights, g_bit & i_bit, g_bit);
-		UINT8 b = combine_2_weights(color_weights, b_bit & i_bit, b_bit);
+		uint8_t r = combine_2_weights(color_weights, r_bit & i_bit, r_bit);
+		uint8_t g = combine_2_weights(color_weights, g_bit & i_bit, g_bit);
+		uint8_t b = combine_2_weights(color_weights, b_bit & i_bit, b_bit);
 
 		pens[color] = rgb_t(r, g, b);
 	}
 }
 
 
-UINT32 berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	rgb_t pens[0x10];
 	get_pens(pens);
@@ -477,15 +477,15 @@ UINT32 berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	{
 		int i;
 
-		UINT8 data = m_videoram[offs];
-		UINT8 color = m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
+		uint8_t data = m_videoram[offs];
+		uint8_t color = m_colorram[((offs >> 2) & 0x07e0) | (offs & 0x001f)];
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
 
 		for (i = 0; i < 4; i++)
 		{
-			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black;
+			rgb_t pen = (data & 0x80) ? pens[color >> 4] : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
@@ -494,7 +494,7 @@ UINT32 berzerk_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 		for (; i < 8; i++)
 		{
-			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black;
+			rgb_t pen = (data & 0x80) ? pens[color & 0x0f] : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			x = x + 1;
@@ -929,8 +929,8 @@ READ8_MEMBER(berzerk_state::moonwarp_p1_r)
 	// the dial input to go open bus. This is used in moon war 2 to switch between player 1
 	// and player 2 dials, which share a single port. moonwarp uses separate ports for the dials.
 	signed char dialread = ioport("P1_DIAL")->read();
-	UINT8 ret;
-	UINT8 buttons = (ioport("P1")->read()&0xe0);
+	uint8_t ret;
+	uint8_t buttons = (ioport("P1")->read()&0xe0);
 	if (dialread < 0) m_p1_direction = 0;
 	else if (dialread > 0) m_p1_direction = 0x10;
 	m_p1_counter_74ls161 += abs(dialread);
@@ -944,8 +944,8 @@ READ8_MEMBER(berzerk_state::moonwarp_p2_r)
 {
 	// same as above, but for player 2 in cocktail mode
 	signed char dialread = ioport("P2_DIAL")->read();
-	UINT8 ret;
-	UINT8 buttons = (ioport("P2")->read()&0xe0);
+	uint8_t ret;
+	uint8_t buttons = (ioport("P2")->read()&0xe0);
 	if (dialread < 0) m_p2_direction = 0;
 	else if (dialread > 0) m_p2_direction = 0x10;
 	m_p2_counter_74ls161 += abs(dialread);

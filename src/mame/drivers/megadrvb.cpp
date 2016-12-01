@@ -409,7 +409,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 
 READ16_MEMBER(md_boot_state::bl_710000_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	int pc = space.device().safe_pc();
 	logerror("%06x reading from bl_710000_r\n", pc);
 
@@ -694,7 +694,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
 static MACHINE_CONFIG_START( megadrvb_6b, md_boot_state )
@@ -790,7 +790,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	 * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
 	 */
 	#if ENERGY_CONSOLE_MODE
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
 	#endif
 
@@ -805,7 +805,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 // after this decode look like intentional changes
 DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
@@ -870,7 +870,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 {
-	UINT8* rom = memregion("maincpu")->base();
+	uint8_t* rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{

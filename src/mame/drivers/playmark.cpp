@@ -215,7 +215,7 @@ WRITE8_MEMBER(playmark_state::playmark_oki_banking_w)
 
 		if (((m_old_oki_bank - 1) * 0x40000) < memregion("oki")->bytes())
 		{
-			m_oki->set_bank_base(0x40000 * (m_old_oki_bank - 1));
+			m_oki->set_rom_bank(m_old_oki_bank - 1);
 		}
 	}
 }
@@ -260,7 +260,7 @@ WRITE8_MEMBER(playmark_state::hrdtimes_snd_control_w)
 
 		if ((m_old_oki_bank * 0x40000) < memregion("oki")->bytes())
 		{
-			m_oki->set_bank_base(0x40000 * m_old_oki_bank);
+			m_oki->set_rom_bank(m_old_oki_bank);
 		}
 	}
 
@@ -1977,7 +1977,7 @@ ROM_START( luckboomh )
 ROM_END
 
 
-UINT8 playmark_state::playmark_asciitohex(UINT8 data)
+uint8_t playmark_state::playmark_asciitohex(uint8_t data)
 {
 	/* Convert ASCII data to HEX */
 
@@ -1990,12 +1990,12 @@ UINT8 playmark_state::playmark_asciitohex(UINT8 data)
 
 void playmark_state::playmark_decode_pic_hex_dump(void)
 {
-	UINT8 *playmark_PICROM_HEX = memregion("user1")->base();
-	UINT16 *playmark_PICROM = (UINT16 *)memregion("audiocpu")->base();
-	INT32 offs, data;
-	UINT16 src_pos = 0;
-	UINT16 dst_pos = 0;
-	UINT8 data_hi, data_lo;
+	uint8_t *playmark_PICROM_HEX = memregion("user1")->base();
+	uint16_t *playmark_PICROM = (uint16_t *)memregion("audiocpu")->base();
+	int32_t offs, data;
+	uint16_t src_pos = 0;
+	uint16_t dst_pos = 0;
+	uint8_t data_hi, data_lo;
 
 	/**** Convert the PIC16C57 ASCII HEX dumps to pure HEX ****/
 	do

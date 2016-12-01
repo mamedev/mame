@@ -48,52 +48,52 @@ public:
 			{ }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_sprite_extension;
-	required_shared_ptr<UINT16> m_spriteram;
-	std::unique_ptr<UINT16[]>        m_spriteram_buffered;
-	std::unique_ptr<UINT16[]>        m_spriteram_delayed;
-	optional_shared_ptr<UINT16> m_cchip2_ram;           // for megablst only
+	optional_shared_ptr<uint16_t> m_sprite_extension;
+	required_shared_ptr<uint16_t> m_spriteram;
+	std::unique_ptr<uint16_t[]>        m_spriteram_buffered;
+	std::unique_ptr<uint16_t[]>        m_spriteram_delayed;
+	optional_shared_ptr<uint16_t> m_cchip2_ram;           // for megablst only
 
 	/* video-related */
 	std::unique_ptr<struct f2_tempsprite[]> m_spritelist;
 	int             m_sprite_type;
 
-	UINT16          m_spritebank[8];
-//  UINT16          m_spritebank_eof[8];
-	UINT16          m_spritebank_buffered[8];
+	uint16_t          m_spritebank[8];
+//  uint16_t          m_spritebank_eof[8];
+	uint16_t          m_spritebank_buffered[8];
 
-	INT32           m_sprites_disabled;
-	INT32           m_sprites_active_area;
-	INT32           m_sprites_master_scrollx;
-	INT32           m_sprites_master_scrolly;
+	int32_t           m_sprites_disabled;
+	int32_t           m_sprites_active_area;
+	int32_t           m_sprites_master_scrollx;
+	int32_t           m_sprites_master_scrolly;
 	/* remember flip status over frames because driftout can fail to set it */
-	INT32           m_sprites_flipscreen;
+	int32_t           m_sprites_flipscreen;
 
 	/* On the left hand screen edge (assuming horiz screen, no
 	   screenflip: in screenflip it is the right hand edge etc.)
 	   there may be 0-3 unwanted pixels in both tilemaps *and*
 	   sprites. To erase this we use f2_hide_pixels (0 to +3). */
 
-	INT32           m_hide_pixels;
-	INT32           m_flip_hide_pixels; /* Different in some games */
+	int32_t           m_hide_pixels;
+	int32_t           m_flip_hide_pixels; /* Different in some games */
 
-	INT32           m_pivot_xdisp;  /* Needed in games with a pivot layer */
-	INT32           m_pivot_ydisp;
+	int32_t           m_pivot_xdisp;  /* Needed in games with a pivot layer */
+	int32_t           m_pivot_ydisp;
 
-	INT32           m_game;
+	int32_t           m_game;
 
-	UINT8           m_tilepri[6]; // todo - move into taitoic.c
-	UINT8           m_spritepri[6]; // todo - move into taitoic.c
-	UINT8           m_spriteblendmode; // todo - move into taitoic.c
+	uint8_t           m_tilepri[6]; // todo - move into taitoic.c
+	uint8_t           m_spritepri[6]; // todo - move into taitoic.c
+	uint8_t           m_spriteblendmode; // todo - move into taitoic.c
 
 	int             m_prepare_sprites;
 
 	/* misc */
-	INT32           m_mjnquest_input;
+	int32_t           m_mjnquest_input;
 	int             m_last[2];
 	int             m_nibble;
-	INT32           m_driveout_sound_latch;
-	INT32           m_oki_bank;
+	int32_t           m_driveout_sound_latch;
+	int32_t           m_oki_bank;
 	emu_timer       *m_int6_timer;
 
 	/* devices */
@@ -161,14 +161,14 @@ public:
 	DECLARE_VIDEO_START(taitof2_deadconxj);
 	DECLARE_VIDEO_START(taitof2_dinorex);
 	DECLARE_VIDEO_START(taitof2_quiz);
-	UINT32 screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_ssi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_pri_roz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_pri(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_thundfox(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_ssi(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_deadconx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_yesnoj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitof2_metalb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitof2_no_buffer(screen_device &screen, bool state);
 	void screen_eof_taitof2_partial_buffer_delayed(screen_device &screen, bool state);
 	void screen_eof_taitof2_partial_buffer_delayed_thundfox(screen_device &screen, bool state);
@@ -181,9 +181,9 @@ public:
 	void update_spritebanks(  );
 	void taitof2_handle_sprite_buffering(  );
 	void taitof2_update_sprites_active_area(  );
-	void draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32 priority);
+	void draw_roz_layer( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t priority);
 	void taito_f2_tc360_spritemixdraw(screen_device &screen, bitmap_ind16 &dest_bmp, const rectangle &clip, gfx_element *gfx,
-	UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
+	uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy, int scalex, int scaley );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

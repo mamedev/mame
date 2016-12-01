@@ -376,10 +376,10 @@ ROM_END
 /******************************************************************************/
 
 #if TUMBLEP_HACK
-void ::tumblep_patch_code(UINT16 offset)
+void ::tumblep_patch_code(uint16_t offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;   // andi.w  #$f3ff, D0
 }

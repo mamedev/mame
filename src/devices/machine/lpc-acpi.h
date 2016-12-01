@@ -10,10 +10,10 @@
 
 class lpc_acpi_device : public lpc_device {
 public:
-	lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lpc_acpi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual void map_device(UINT64 memory_window_start, UINT64 memory_window_end, UINT64 memory_offset, address_space *memory_space,
-							UINT64 io_window_start, UINT64 io_window_end, UINT64 io_offset, address_space *io_space) override;
+	virtual void map_device(uint64_t memory_window_start, uint64_t memory_window_end, uint64_t memory_offset, address_space *memory_space,
+							uint64_t io_window_start, uint64_t io_window_end, uint64_t io_offset, address_space *io_space) override;
 
 	DECLARE_READ16_MEMBER( pm1_sts_r);
 	DECLARE_WRITE16_MEMBER(pm1_sts_w);
@@ -74,11 +74,11 @@ protected:
 	void device_reset() override;
 
 private:
-	UINT32 pm1_cnt, proc_cnt, gpe0_sts, gpe0_en, smi_en, smi_sts;
-	UINT16 pm1_sts, pm1_en, alt_gp_smi_en, alt_gp_smi_sts, devact_sts, devtrap_en;
-	UINT16 tco1_sts, tco2_sts, tco1_cnt, tco2_cnt;
-	UINT8  tco_rld, tco_tmr, tco_dat_in, tco_dat_out, tco_message1, tco_message2;
-	UINT8  tco_wdstatus, sw_irq_gen;
+	uint32_t pm1_cnt, proc_cnt, gpe0_sts, gpe0_en, smi_en, smi_sts;
+	uint16_t pm1_sts, pm1_en, alt_gp_smi_en, alt_gp_smi_sts, devact_sts, devtrap_en;
+	uint16_t tco1_sts, tco2_sts, tco1_cnt, tco2_cnt;
+	uint8_t  tco_rld, tco_tmr, tco_dat_in, tco_dat_out, tco_message1, tco_message2;
+	uint8_t  tco_wdstatus, sw_irq_gen;
 
 	DECLARE_ADDRESS_MAP(map, 32);
 };

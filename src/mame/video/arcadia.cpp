@@ -224,7 +224,7 @@ collisions, one is for sprite/sprite collisions.
 
 #include "includes/arcadia.h"
 
-static const UINT8 chars[0x40][8]={
+static const uint8_t chars[0x40][8]={
 	// read from the screen generated from a palladium
 	{ 0,0,0,0,0,0,0,0 },                        // 00 (space)
 	{ 1,2,4,8,16,32,64,128 },                   // 01 (\)
@@ -312,7 +312,7 @@ void arcadia_state::video_start()
 
 READ8_MEMBER( arcadia_state::video_r )
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	switch (offset)
 	{
 	case 0xff: data = m_charline|0xf0;break;
@@ -421,7 +421,7 @@ WRITE8_MEMBER( arcadia_state::video_w )
 	}
 }
 
-void arcadia_state::draw_char(UINT8 *ch, int charcode, int y, int x)
+void arcadia_state::draw_char(uint8_t *ch, int charcode, int y, int x)
 {
 	int k,b,cc,sc, colour;
 	if (m_multicolor)
@@ -474,10 +474,10 @@ void arcadia_state::draw_char(UINT8 *ch, int charcode, int y, int x)
 }
 
 
-void arcadia_state::vh_draw_line(int y, UINT8 chars1[16])
+void arcadia_state::vh_draw_line(int y, uint8_t chars1[16])
 {
 	int x, ch, j, h;
-	int graphics = m_graphics;
+	bool graphics = m_graphics;
 	h = m_doublescan ? 16 : 8 ;
 
 	if (m_bitmap->height() - m_line < h)
@@ -495,8 +495,8 @@ void arcadia_state::vh_draw_line(int y, UINT8 chars1[16])
 		{
 			switch (ch)
 			{
-				case 0xc0: graphics=TRUE;break;
-				case 0x40: graphics=FALSE;break;
+				case 0xc0: graphics=true;break;
+				case 0x40: graphics=false;break;
 //        case 0x80:
 //        alien invaders shields are empty 0x80
 //            popmessage(5, "graphics code 0x80 used");
@@ -514,9 +514,9 @@ int arcadia_state::sprite_collision(int n1, int n2)
 {
 	int k, b1, b2, x;
 	if (m_pos[n1].x+8<=m_pos[n2].x)
-		return FALSE;
+		return false;
 	if (m_pos[n1].x>=m_pos[n2].x+8)
-		return FALSE;
+		return false;
 
 	for (k=0; k<8; k++)
 	{
@@ -532,22 +532,22 @@ int arcadia_state::sprite_collision(int n1, int n2)
 		if (x>0)
 			b1>>=x;
 		if (b1&b2)
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 
 void arcadia_state::draw_sprites()
 {
 	int i, k, x, y, color=0;
-	UINT8 b;
+	uint8_t b;
 
 	m_reg.d.collision_bg|=0xf;
 	m_reg.d.collision_sprite|=0x3f;
 	for (i=0; i<4; i++)
 	{
-		int doublescan = FALSE;
+		int doublescan = false;
 		if (m_pos[i].y<=-YPOS) continue;
 		if (m_pos[i].y>=m_bitmap->height()-YPOS-8) continue;
 		if (m_pos[i].x<=-XPOS) continue;
@@ -557,19 +557,19 @@ void arcadia_state::draw_sprites()
 		{
 		case 0:
 			color=(m_reg.d.pal[3]>>3)&7;
-			doublescan=m_reg.d.pal[3]&0x80?FALSE:TRUE;
+			doublescan=m_reg.d.pal[3]&0x80?false:true;
 			break;
 		case 1:
 			color=m_reg.d.pal[3]&7;
-			doublescan=m_reg.d.pal[3]&0x40?FALSE:TRUE;
+			doublescan=m_reg.d.pal[3]&0x40?false:true;
 			break;
 		case 2:
 			color=(m_reg.d.pal[2]>>3)&7;
-			doublescan=m_reg.d.pal[2]&0x80?FALSE:TRUE;
+			doublescan=m_reg.d.pal[2]&0x80?false:true;
 			break;
 		case 3:
 			color=m_reg.d.pal[2]&7;
-			doublescan=m_reg.d.pal[2]&0x40?FALSE:TRUE;
+			doublescan=m_reg.d.pal[2]&0x40?false:true;
 			break;
 		}
 		for (k=0; k<8; k++)
@@ -669,7 +669,7 @@ READ8_MEMBER( arcadia_state::vsync_r )
 	return m_line>=216 ? 0x80 : 0 ;
 }
 
-UINT32 arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t arcadia_state::screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;

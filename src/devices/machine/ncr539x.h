@@ -27,7 +27,7 @@ class ncr539x_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr539x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_drq_callback(device_t &device, _Object object) { return downcast<ncr539x_device &>(device).m_out_drq_cb.set_callback(object); }
@@ -36,8 +36,8 @@ public:
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
 
-	void dma_read_data(int bytes, UINT8 *pData);
-	void dma_write_data(int bytes, UINT8 *pData);
+	void dma_read_data(int bytes, uint8_t *pData);
+	void dma_write_data(int bytes, uint8_t *pData);
 
 protected:
 	// device-level overrides
@@ -46,37 +46,37 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	void fifo_write(UINT8 data);
+	void fifo_write(uint8_t data);
 	void check_fifo_executable();
 	void exec_fifo();
 	void update_fifo_internal_state(int bytes);
 
-	UINT32 m_xfer_count;
-	UINT32 m_dma_size;
-	UINT8 m_command;
-	UINT8 m_last_id;
-	UINT8 m_timeout;
-	UINT8 m_sync_xfer_period;
-	UINT8 m_sync_offset;
-	UINT8 m_control1, m_control2, m_control3, m_control4;
-	UINT8 m_clock_factor;
-	UINT8 m_forced_test;
-	UINT8 m_data_alignment;
+	uint32_t m_xfer_count;
+	uint32_t m_dma_size;
+	uint8_t m_command;
+	uint8_t m_last_id;
+	uint8_t m_timeout;
+	uint8_t m_sync_xfer_period;
+	uint8_t m_sync_offset;
+	uint8_t m_control1, m_control2, m_control3, m_control4;
+	uint8_t m_clock_factor;
+	uint8_t m_forced_test;
+	uint8_t m_data_alignment;
 
 	bool m_selected;
 	bool m_chipid_available, m_chipid_lock;
 
 	static const int m_fifo_size = 16;
-	UINT8 m_fifo_ptr, m_fifo_read_ptr, m_fifo[m_fifo_size];
+	uint8_t m_fifo_ptr, m_fifo_read_ptr, m_fifo[m_fifo_size];
 
 	//int m_xfer_remaining;   // amount in the FIFO when we're in data in phase
 
 	// read-only registers
-	UINT8 m_status, m_irq_status, m_internal_state, m_fifo_internal_state;
+	uint8_t m_status, m_irq_status, m_internal_state, m_fifo_internal_state;
 
 	static const int m_buffer_size = 2048;
 
-	UINT8 m_buffer[m_buffer_size];
+	uint8_t m_buffer[m_buffer_size];
 	int m_buffer_offset, m_buffer_remaining, m_total_data;
 
 	emu_timer *m_operation_timer;

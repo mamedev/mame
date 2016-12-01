@@ -19,7 +19,7 @@ class kaneko_pandora_device : public device_t,
 								public device_video_interface
 {
 public:
-	kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~kaneko_pandora_device() {}
 
 	// static configuration
@@ -50,11 +50,11 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT8[]>        m_spriteram;
+	std::unique_ptr<uint8_t[]>        m_spriteram;
 	std::unique_ptr<bitmap_ind16> m_sprites_bitmap; /* bitmap to render sprites to, Pandora seems to be frame'buffered' */
 	int             m_clear_bitmap;
 	int             m_bg_pen; // might work some other way..
-	UINT8           m_gfx_region;
+	uint8_t           m_gfx_region;
 	int             m_xoffset;
 	int             m_yoffset;
 	required_device<gfxdecode_device> m_gfxdecode;

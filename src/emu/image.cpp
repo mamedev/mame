@@ -10,19 +10,13 @@
 ***************************************************************************/
 
 #include <ctype.h>
-#include <regex>
 
 #include "emu.h"
 #include "emuopts.h"
 #include "image.h"
 #include "config.h"
 #include "xmlfile.h"
-
-//**************************************************************************
-//  STATIC VARIABLES
-//**************************************************************************
-
-static std::regex s_softlist_regex("\\w+\\:\\w+\\:\\w+");
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -47,18 +41,23 @@ image_manager::image_manager(running_machine &machine)
 		const char *image_name_ptr = machine.options().value(image.instance_name());
 		if ((image_name_ptr != nullptr) && (image_name_ptr[0] != '\0'))
 		{
+			image_init_result result = image_init_result::FAIL;
 			std::string image_name(image_name_ptr);
 
 			// mark init state
 			image.set_init_phase();
 
-			// is this image really a softlist part?
-			bool is_softlist_part = std::regex_match(image_name, s_softlist_regex);
+			// try as a softlist
+			if (software_name_parse(image_name))
+				result = image.load_software(image_name);
 
-			// try to load this image
-			image_init_result result = is_softlist_part
-				? image.load_software(image_name)
-				: image.load(image_name.c_str());
+			// failing that, try as an image
+			if (result != image_init_result::PASS)
+				result = image.load(image_name);
+
+			// failing that, try creating it (if appropriate)
+			if (result != image_init_result::PASS && image.support_command_line_image_creation())
+				result = image.create(image_name);
 
 			// did the image load fail?
 			if (result != image_init_result::PASS)
@@ -77,7 +76,7 @@ image_manager::image_manager(running_machine &machine)
 		}
 	}
 
-	machine.configuration().config_register("image_directories", config_saveload_delegate(FUNC(image_manager::config_load), this), config_saveload_delegate(FUNC(image_manager::config_save), this));
+	machine.configuration().config_register("image_directories", config_saveload_delegate(&image_manager::config_load, this), config_saveload_delegate(&image_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -98,22 +97,22 @@ void image_manager::unload_all()
 
 void image_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
 {
-	xml_data_node *node;
+	xml_data_node const *node;
 	const char *dev_instance;
 	const char *working_directory;
 
 	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
 	{
-		for (node = xml_get_sibling(parentnode->child, "device"); node; node = xml_get_sibling(node->next, "device"))
+		for (node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
-			dev_instance = xml_get_attribute_string(node, "instance", nullptr);
+			dev_instance = node->get_attribute_string("instance", nullptr);
 
 			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
 					if (!strcmp(dev_instance, image.instance_name())) {
-						working_directory = xml_get_attribute_string(node, "directory", nullptr);
+						working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
 							image.set_working_directory(working_directory);
 					}
@@ -140,11 +139,11 @@ void image_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
 		{
 			dev_instance = image.instance_name();
 
-			node = xml_add_child(parentnode, "device", nullptr);
+			node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
 			{
-				xml_set_attribute(node, "instance", dev_instance);
-				xml_set_attribute(node, "directory", image.working_directory());
+				node->set_attribute("instance", dev_instance);
+				node->set_attribute("directory", image.working_directory().c_str());
 			}
 		}
 	}
@@ -208,23 +207,6 @@ void image_manager::options_extract()
 
 
 /*-------------------------------------------------
- image_mandatory_scan - search for devices which
- need an image to be loaded
- -------------------------------------------------*/
-
-std::string &image_manager::mandatory_scan(std::string &mandatory)
-{
-	mandatory.clear();
-	// make sure that any required image has a mounted file
-	for (device_image_interface &image : image_interface_iterator(machine().root_device()))
-	{
-		if (image.filename() == nullptr && image.must_be_loaded())
-			mandatory.append("\"").append(image.instance_name()).append("\", ");
-	}
-	return mandatory;
-}
-
-/*-------------------------------------------------
     postdevice_init - initialize devices for a specific
     running_machine
 -------------------------------------------------*/
@@ -251,5 +233,5 @@ void image_manager::postdevice_init()
 		}
 	}
 	/* add a callback for when we shut down */
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(image_manager::unload_all), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&image_manager::unload_all, this));
 }

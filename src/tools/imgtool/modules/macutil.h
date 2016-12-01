@@ -29,9 +29,9 @@ enum mac_filecategory_t
 
 
 /* converting Classic Mac OS time <==> Imgtool time */
-time_t mac_crack_time(UINT32 t);
-UINT32 mac_setup_time(time_t t);
-UINT32 mac_time_now(void);
+time_t mac_crack_time(uint32_t t);
+uint32_t mac_setup_time(time_t t);
+uint32_t mac_time_now(void);
 
 imgtoolerr_t mac_identify_fork(const char *fork_string, mac_fork_t *fork_num);
 

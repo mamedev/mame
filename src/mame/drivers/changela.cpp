@@ -132,7 +132,7 @@ READ8_MEMBER(changela_state::changela_31_r)
 	/* If the new value is less than the old value, and it did not wrap around,
 	   or if the new value is greater than the old value, and it did wrap around,
 	   then we are moving LEFT. */
-	UINT8 curr_value = ioport("WHEEL")->read();
+	uint8_t curr_value = ioport("WHEEL")->read();
 
 	if ((curr_value < m_prev_value_31 && (m_prev_value_31 - curr_value) < 0x80)
 	||  (curr_value > m_prev_value_31 && (curr_value - m_prev_value_31) > 0x80))
@@ -394,7 +394,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(changela_state::changela_scanline)
 
 INTERRUPT_GEN_MEMBER(changela_state::chl_mcu_irq)
 {
-	generic_pulse_irq_line(m_mcu, 0, 1);
+	generic_pulse_irq_line(*m_mcu, 0, 1);
 }
 
 void changela_state::machine_start()

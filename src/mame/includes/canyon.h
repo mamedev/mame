@@ -33,7 +33,7 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	required_device<discrete_device> m_discrete;
 
@@ -46,7 +46,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(canyon);
-	UINT32 screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_canyon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(canyon_motor_w);
 	DECLARE_WRITE8_MEMBER(canyon_explode_w);
 	DECLARE_WRITE8_MEMBER(canyon_attract_w);

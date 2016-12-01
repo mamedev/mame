@@ -70,7 +70,7 @@ public:
 	virtual void machine_reset() override;
 
 	DECLARE_PALETTE_INIT(tk2000);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(ram_r);
 	DECLARE_WRITE8_MEMBER(ram_w);
@@ -85,15 +85,15 @@ private:
 	int m_speaker_state;
 	int m_cassette_state;
 
-	UINT8 m_strobe;
+	uint8_t m_strobe;
 
 	bool m_page2;
 
-	UINT8 *m_ram_ptr;
+	uint8_t *m_ram_ptr;
 	int m_ram_size;
 
 	void do_io(address_space &space, int offset);
-	UINT8 read_floatingbus();
+	uint8_t read_floatingbus();
 };
 
 /***************************************************************************
@@ -152,7 +152,7 @@ PALETTE_INIT_MEMBER(tk2000_state, tk2000)
 	m_video->palette_init_apple2(palette);
 }
 
-UINT32 tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tk2000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_video->hgr_update(screen, bitmap, cliprect, 0, 191);
 	return 0;
@@ -287,7 +287,7 @@ WRITE8_MEMBER(tk2000_state::c100_w)
 }
 
 // floating bus code from old machine/apple2: needs to be reworked based on real beam position to enable e.g. Bob Bishop's screen splitter
-UINT8 tk2000_state::read_floatingbus()
+uint8_t tk2000_state::read_floatingbus()
 {
 	enum
 	{

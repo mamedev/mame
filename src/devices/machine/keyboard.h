@@ -36,7 +36,7 @@ INPUT_PORTS_EXTERN( generic_keyboard );
     TYPE DECLARATIONS
 ***************************************************************************/
 
-template <UINT8 ROW_COUNT>
+template <uint8_t ROW_COUNT>
 class device_matrix_keyboard_interface : public device_interface
 {
 protected:
@@ -51,15 +51,15 @@ protected:
 	void stop_processing();
 	void reset_key_state();
 
-	void typematic_start(UINT8 row, UINT8 column, attotime const &delay, attotime const &interval);
+	void typematic_start(uint8_t row, uint8_t column, attotime const &delay, attotime const &interval);
 	void typematic_restart(attotime const &delay, attotime const &interval);
 	void typematic_stop();
-	bool typematic_is(UINT8 row, UINT8 column) const { return (m_typematic_row == row) && (m_typematic_column == column); }
+	bool typematic_is(uint8_t row, uint8_t column) const { return (m_typematic_row == row) && (m_typematic_column == column); }
 
-	virtual void key_make(UINT8 row, UINT8 column) = 0;
-	virtual void key_repeat(UINT8 row, UINT8 column);
-	virtual void key_break(UINT8 row, UINT8 column);
-	virtual void will_scan_row(UINT8 row);
+	virtual void key_make(uint8_t row, uint8_t column) = 0;
+	virtual void key_repeat(uint8_t row, uint8_t column);
+	virtual void key_break(uint8_t row, uint8_t column);
+	virtual void will_scan_row(uint8_t row);
 
 	bool are_all_keys_up();
 
@@ -76,10 +76,10 @@ private:
 	emu_timer       *m_typematic_timer;
 	required_ioport m_key_rows[ROW_COUNT];
 	ioport_value    m_key_states[ROW_COUNT];
-	UINT8           m_next_row;
-	UINT8           m_processing;
-	UINT8           m_typematic_row;
-	UINT8           m_typematic_column;
+	uint8_t           m_next_row;
+	uint8_t           m_processing;
+	uint8_t           m_typematic_row;
+	uint8_t           m_typematic_column;
 };
 
 
@@ -92,14 +92,14 @@ public:
 			char const *name,
 			char const *tag,
 			device_t *owner,
-			UINT32 clock,
+			uint32_t clock,
 			char const *shortname,
 			char const *source);
 	generic_keyboard_device(
 			const machine_config &mconfig,
 			const char *tag,
 			device_t *owner,
-			UINT32 clock);
+			uint32_t clock);
 
 	template <class Object> static devcb_base &set_keyboard_callback(device_t &device, Object object) { return downcast<generic_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
 
@@ -109,23 +109,23 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void key_make(UINT8 row, UINT8 column) override;
-	virtual void key_repeat(UINT8 row, UINT8 column) override;
-	virtual void send_key(UINT8 code);
-	virtual bool translate(UINT8 code, UINT8 &translated) const;
+	virtual void key_make(uint8_t row, uint8_t column) override;
+	virtual void key_repeat(uint8_t row, uint8_t column) override;
+	virtual void send_key(uint8_t code);
+	virtual bool translate(uint8_t code, uint8_t &translated) const;
 
 	required_ioport m_config;
 	required_ioport m_modifiers;
 
 private:
-	virtual void will_scan_row(UINT8 row) override;
+	virtual void will_scan_row(uint8_t row) override;
 
 	void typematic();
-	void send_translated(UINT8 code);
+	void send_translated(uint8_t code);
 	attotime typematic_delay() const;
 	attotime typematic_period() const;
 
-	UINT16          m_last_modifiers;
+	uint16_t          m_last_modifiers;
 	devcb_write8    m_keyboard_cb;
 };
 

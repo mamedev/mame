@@ -22,12 +22,12 @@ public:
 		m_p_attributes(*this, "p_attributes"),
 		m_maincpu(*this, "maincpu") { }
 
-	UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_attributes;
+	uint8_t *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_attributes;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -58,17 +58,17 @@ void m79152pc_state::video_start()
 	m_p_chargen = memregion("chargen")->base()+4;
 }
 
-UINT32 m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m79152pc_state::screen_update_m79152pc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 // Attributes are unknown so are not implemented
-	UINT8 y,ra,chr,gfx; //,attr;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx; //,attr;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 25; y++)
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{

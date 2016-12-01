@@ -233,9 +233,9 @@ void ginganin_state::machine_reset()
 	m_flipscreen = 0;
 }
 
-WRITE8_MEMBER(ginganin_state::ptm_irq)
+WRITE_LINE_MEMBER(ginganin_state::ptm_irq)
 {
-	m_audiocpu->set_input_line(0, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -253,7 +253,7 @@ static MACHINE_CONFIG_START( ginganin, ginganin_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(SOUND_CLOCK/2)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(ginganin_state, ptm_irq))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(ginganin_state, ptm_irq))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -361,10 +361,10 @@ ROM_END
 
 DRIVER_INIT_MEMBER(ginganin_state,ginganin)
 {
-	UINT16 *rom;
+	uint16_t *rom;
 
 	/* main cpu patches */
-	rom = (UINT16 *)memregion("maincpu")->base();
+	rom = (uint16_t *)memregion("maincpu")->base();
 	/* avoid writes to rom getting to the log */
 	rom[0x408 / 2] = 0x6000;
 	rom[0x40a / 2] = 0x001c;

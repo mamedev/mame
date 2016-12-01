@@ -72,10 +72,10 @@ public:
 		m_bank(*this, "bank"){ }
 
 	int m_lastvalue;
-	UINT8 m_disk_data[2];
-	UINT8 m_port_b_data;
-	UINT8 m_status;
-	UINT8 m_clr_status;
+	uint8_t m_disk_data[2];
+	uint8_t m_port_b_data;
+	uint8_t m_status;
+	uint8_t m_clr_status;
 
 	DECLARE_READ8_MEMBER(disk_iobank_r);
 	DECLARE_WRITE8_MEMBER(disk_iobank_w);
@@ -99,9 +99,9 @@ class isa8_cga_filetto_device : public isa8_cga_device
 {
 public:
 	// construction/destruction
-	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
@@ -110,7 +110,7 @@ const device_type ISA8_CGA_FILETTO = &device_creator<isa8_cga_filetto_device>;
 //  isa8_cga_filetto_device - constructor
 //-------------------------------------------------
 
-isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_filetto_device::isa8_cga_filetto_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_cga_device( mconfig, ISA8_CGA_FILETTO, "ISA8_CGA_FILETTO", tag, owner, clock, "filetto_cga", __FILE__)
 {
 }
@@ -120,7 +120,7 @@ ROM_START( filetto_cga )
 	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
 ROM_END
 
-const rom_entry *isa8_cga_filetto_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_filetto_device::device_rom_region() const
 {
 	return ROM_NAME( filetto_cga );
 }
@@ -131,16 +131,16 @@ class isa8_cga_tetriskr_device : public isa8_cga_superimpose_device
 {
 public:
 	// construction/destruction
-	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) override;
 	virtual void device_start() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(bg_bank_r);
 	DECLARE_WRITE8_MEMBER(bg_bank_w);
 private:
-	UINT8 m_bg_bank;
+	uint8_t m_bg_bank;
 };
 
 
@@ -151,7 +151,7 @@ const device_type ISA8_CGA_TETRISKR = &device_creator<isa8_cga_tetriskr_device>;
 //  isa8_cga_tetriskr_device - constructor
 //-------------------------------------------------
 
-isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_cga_tetriskr_device::isa8_cga_tetriskr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_cga_superimpose_device( mconfig, ISA8_CGA_TETRISKR, "ISA8_CGA_TETRISKR", tag, owner, clock, "tetriskr_cga", __FILE__)
 {
 }
@@ -175,15 +175,15 @@ READ8_MEMBER(isa8_cga_tetriskr_device::bg_bank_r)
 }
 
 
-UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int yi;
-	const UINT8 *bg_rom = memregion("gfx2")->base();
+	const uint8_t *bg_rom = memregion("gfx2")->base();
 
 	//popmessage("%04x",m_start_offs);
 
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	for(y=0;y<200/8;y++)
 	{
@@ -191,7 +191,7 @@ UINT32 isa8_cga_tetriskr_device::screen_update(screen_device &screen, bitmap_rgb
 		{
 			for(x=0;x<320/8;x++)
 			{
-				UINT8 color;
+				uint8_t color;
 				int xi,pen_i;
 
 				for(xi=0;xi<8;xi++)
@@ -228,7 +228,7 @@ ROM_START( tetriskr_cga )
 	ROM_LOAD( "b-9.u43", 0x70000, 0x10000, CRC(4ea22349) SHA1(14dfd3dbd51f8bd6f3290293b8ea1c165e8cf7fd))
 ROM_END
 
-const rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
+const tiny_rom_entry *isa8_cga_tetriskr_device::device_rom_region() const
 {
 	return ROM_NAME( tetriskr_cga );
 }
@@ -327,7 +327,7 @@ WRITE8_MEMBER(pcxt_state::port_b_w)
 
 READ8_MEMBER(pcxt_state::fdc765_status_r)
 {
-	UINT8 tmp;
+	uint8_t tmp;
 	tmp = m_status | 0x80;
 	m_clr_status++;
 	if(m_clr_status == 0x10)

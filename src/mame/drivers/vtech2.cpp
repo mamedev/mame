@@ -360,7 +360,7 @@ GFXDECODE_END
 
 static const rgb_t vt_colors[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x00, 0x7f),  /* blue */
 	rgb_t(0x00, 0x7f, 0x00),  /* green */
 	rgb_t(0x00, 0x7f, 0x7f),  /* cyan */
@@ -375,7 +375,7 @@ static const rgb_t vt_colors[] =
 	rgb_t(0xff, 0x00, 0x00),  /* bright red */
 	rgb_t(0xff, 0x00, 0xff),  /* bright magenta */
 	rgb_t(0xff, 0xff, 0x00),  /* bright yellow */
-	rgb_t::white
+	rgb_t::white()
 };
 
 

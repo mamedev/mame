@@ -31,9 +31,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	const UINT8 *m_p_chargen;
-	UINT32 screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint32_t screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
 	DECLARE_PALETTE_INIT(vta2000);
 private:
 	virtual void machine_reset() override;
@@ -67,12 +67,12 @@ void vta2000_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 /* Cursor is missing. */
 {
-	static UINT8 framecnt=0;
-	UINT8 y,ra,gfx,attr,fg,bg;
-	UINT16 sy=0,ma=0,x,xx=0,chr;
+	static uint8_t framecnt=0;
+	uint8_t y,ra,gfx,attr,fg,bg;
+	uint16_t sy=0,ma=0,x,xx=0,chr;
 
 	framecnt++;
 
@@ -80,7 +80,7 @@ UINT32 vta2000_state::screen_update_vta2000(screen_device &screen, bitmap_ind16 
 	{
 		for (ra = 0; ra < 12; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			xx = ma << 1;
 			for (x = ma; x < ma + 80; x++)
@@ -152,7 +152,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(vta2000_state, vta2000)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }

@@ -89,11 +89,11 @@ public:
 	DECLARE_READ8_MEMBER(cartslot_io_r);
 	DECLARE_WRITE8_MEMBER(cartslot_io_w);
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 m_vblank_irq_state;
-	UINT8 m_cassette_clk;
-	UINT8 m_cassette_data;
+	uint8_t m_vblank_irq_state;
+	uint8_t m_cassette_clk;
+	uint8_t m_cassette_data;
 	iq151cart_slot_device * m_carts[5];
 	DECLARE_DRIVER_INIT(iq151);
 	INTERRUPT_GEN_MEMBER(iq151_vblank_interrupt);
@@ -104,7 +104,7 @@ public:
 READ8_MEMBER(iq151_state::keyboard_row_r)
 {
 	char kbdrow[6];
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -118,7 +118,7 @@ READ8_MEMBER(iq151_state::keyboard_row_r)
 READ8_MEMBER(iq151_state::keyboard_column_r)
 {
 	char kbdrow[6];
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -132,7 +132,7 @@ READ8_MEMBER(iq151_state::keyboard_column_r)
 
 READ8_MEMBER(iq151_state::ppi_portc_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	if (m_cassette_data & 0x06)
 	{
@@ -168,7 +168,7 @@ WRITE8_MEMBER(iq151_state::boot_bank_w)
 
 READ8_MEMBER(iq151_state::cartslot_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_carts)
 		elem->read(offset, data);
@@ -184,7 +184,7 @@ WRITE8_MEMBER(iq151_state::cartslot_w)
 
 READ8_MEMBER(iq151_state::cartslot_io_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (auto & elem : m_carts)
 		elem->io_read(offset, data);
@@ -331,7 +331,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(iq151_state::cassette_timer)
 
 DRIVER_INIT_MEMBER(iq151_state,iq151)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entry(0, RAM + 0xf800);
 	membank("boot")->configure_entry(1, RAM + 0x0000);
 
@@ -351,7 +351,7 @@ void iq151_state::machine_reset()
 }
 
 // this machine don't have a built-in video controller, but uses external cartridge
-UINT32 iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t iq151_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( iq151, iq151_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(iq151_state, screen_update)

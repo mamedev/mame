@@ -53,7 +53,7 @@ READ64_MEMBER( macpci_state::unk1_r )
 READ64_MEMBER( macpci_state::unk2_r )
 {
 	if (ACCESSING_BITS_32_47)
-		return (UINT64)0xe1 << 32; //PC=fff04810
+		return (uint64_t)0xe1 << 32; //PC=fff04810
 
 	return 0;
 }
@@ -72,7 +72,7 @@ static ADDRESS_MAP_START(pippin_mem, AS_PROGRAM, 64, macpci_state)
 	AM_RANGE(0xf00dfff8, 0xf00dffff) AM_READ(unk2_r)
 	AM_RANGE(0xf3008800, 0xf3008807) AM_READ(unk1_r)
 
-	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xf3016000, 0xf3017fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU)
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom",0)
 ADDRESS_MAP_END
@@ -82,7 +82,7 @@ static INPUT_PORTS_START( pippin )
 INPUT_PORTS_END
 
 
-UINT32 macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t macpci_state::screen_update_pippin(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

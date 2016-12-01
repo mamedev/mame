@@ -4,7 +4,7 @@
 // a single cart in slot 1, with pre-defined cart type
 #define NEOGEO_CONFIG_ONE_FIXED_CARTSLOT(_default)    \
 	MCFG_NEOGEO_CARTRIDGE_ADD("cslot1", neogeo_cart, _default)    \
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 
 
 // machine configw for one-game fixed config, loaded without using softlists
@@ -1145,6 +1145,32 @@ ROM_START( burningfh ) /* AES VERSION (US) */
 	ROM_LOAD16_BYTE( "018-c2.c2", 0x000001, 0x100000, CRC(d4378876) SHA1(45659aa1755d96b992c977042186e47fff68bba9) ) /* Plane 2,3 */ /* HN62408 */
 	ROM_LOAD16_BYTE( "018-c3.c3", 0x200000, 0x100000, CRC(862b60da) SHA1(e2303eb1609f1050f0b4f46693a15e37deb176fb) ) /* Plane 0,1 */ /* HN62408 */
 	ROM_LOAD16_BYTE( "018-c4.c4", 0x200001, 0x100000, CRC(e2e0aff7) SHA1(1c691c092a6e2787de4f433b0eb9252bfdaa7e16) ) /* Plane 2,3 */ /* HN62408 */
+ROM_END
+
+ROM_START( burningfpa ) /* later prototype - Sx, Vx and Cx data all matches final game, but with different rom arranagement, Px & Mx unique */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_BYTE( "018-p1.bin", 0x000001, 0x080000, CRC(f7d15752) SHA1(334b7e5c8e9099d39424e72db66846d0b9e534de) )
+	ROM_LOAD16_BYTE( "018-p2.bin", 0x000000, 0x080000, CRC(ffae22fb) SHA1(82f2f81fe96b3c6953985964e12e93e79410ab9e) )
+
+	NEO_SFIX_128K( "018-s1.bin", CRC(6799ea0d) SHA1(ec75ef9dfdcb0b123574fc6d81ebaaadfba32fb5) )
+
+	NEO_BIOS_AUDIO_128K( "018-m1.bin", CRC(2b0c0415) SHA1(a5a0d5e3ea2ef77b6f5cd14f2907ab2f1aed76b7) )
+
+	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "018-v11.bin", 0x000000, 0x080000, CRC(b55b9670) SHA1(b0ff38b2dca1361ad155e90be3674dbea1c0a53c) )
+	ROM_LOAD( "018-v12.bin", 0x080000, 0x080000, CRC(a0bcf260) SHA1(5d1f2613cf4a292557f37e6f44a90b20d11ed8cd) )
+	ROM_LOAD( "018-v13.bin", 0x100000, 0x080000, CRC(270f4707) SHA1(29e763acc9fd4b94d8b5d0ad917e20d8a66bbe49) )
+	ROM_LOAD( "018-v24.bin", 0x180000, 0x080000, CRC(924e3d69) SHA1(927091f9a098f00eb303f5567f4ee926bcb170e3) )
+
+	ROM_REGION( 0x400000, "cslot1:sprites", 0 ) // note, ROM_LOAD32_BYTE
+	ROM_LOAD32_BYTE( "018-c1.bin", 0x000000, 0x80000, CRC(3a441c6a) SHA1(0347d47a689af67426be42b4c99da101ee01ce11) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "018-c2.bin", 0x000002, 0x80000, CRC(bb72404b) SHA1(7620fccc50ecacf732bb1382abef42212d369f8c) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "018-c3.bin", 0x000001, 0x80000, CRC(87bffd2f) SHA1(0f7c835029a3f561861a1a07987dad23a32a899c) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "018-c4.bin", 0x000003, 0x80000, CRC(33803163) SHA1(888ba63618a2ca541883a612f0c75ffa96f1c528) ) /* Plane 3 */
+	ROM_LOAD32_BYTE( "018-c5.bin", 0x200000, 0x80000, CRC(74391952) SHA1(0f7451ff74901e7250214a7604a37add56ad7e1f) ) /* Plane 0 */
+	ROM_LOAD32_BYTE( "018-c6.bin", 0x200002, 0x80000, CRC(95e220e6) SHA1(cef4f7c697ab6d20e1b5c85df773d0f1a79e3008) ) /* Plane 2 */
+	ROM_LOAD32_BYTE( "018-c7.bin", 0x200001, 0x80000, CRC(41326c0d) SHA1(64bbecb560d2795ae5292776604ea318a9ae53a6) ) /* Plane 1 */
+	ROM_LOAD32_BYTE( "018-c8.bin", 0x200003, 0x80000, CRC(ed3b1f04) SHA1(0cb0d30e294e7ff398d553d0f08befb53ac65269) ) /* Plane 3 */
 ROM_END
 
 ROM_START( burningfp ) /* early prototype - all roms were hand labeled with CRCs, dumps verified against them */ /* AES VERSION */
@@ -5039,11 +5065,9 @@ ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	ROM_LOAD( "236-m1.m1", 0x00000, 0x20000, CRC(880a1abd) SHA1(905afa157aba700e798243b842792e50729b19a0) ) /* TC531001 */
 	ROM_RELOAD( 0x10000, 0x20000 )
 
-	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
+	ROM_REGION( 0x300000, "cslot1:ymsnd", 0 )
 	ROM_LOAD( "236-v1.v1", 0x000000, 0x200000, CRC(5f89c3b4) SHA1(dc8fd561cf8dfdd41696dcf14ea8d2d0ac4eec4b) ) /* TC5316200 */
-
-	ROM_REGION( 0x100000, "cslot1:ymsnd.deltat", 0 )
-	ROM_LOAD( "236-v2.v2", 0x000000, 0x100000, CRC(1e843567) SHA1(30d63887b4900571025b3077b9e41099a59c3ad9) ) /* TC538200 */
+	ROM_LOAD( "236-v2.v2", 0x200000, 0x100000, CRC(72e3add7) SHA1(dc49f05274693255416d2e41ecc088027b798eb9) ) /* TC538200 */
 
 	ROM_REGION( 0x0800000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "236-c1.c1", 0x000000, 0x400000, CRC(c1d47902) SHA1(727001c34f979226fc8f581113ce2aaac4fc0d42) ) /* Plane 0,1 */ /* TC5332205 */
@@ -5267,6 +5291,32 @@ ROM_START( mslug2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "241-c3.c3", 0x1000000, 0x800000, CRC(9f6bfa6f) SHA1(a4319b48004e723f81a980887678e3e296049a53) ) /* Plane 0,1 */ /* TC5364205 */
 	ROM_LOAD16_BYTE( "241-c4.c4", 0x1000001, 0x800000, CRC(7d3e306f) SHA1(1499316fb381775218d897b81a6a0c3465d1a37c) ) /* Plane 2,3 */ /* TC5364205 */
 ROM_END
+
+
+/****************************************
+ ID-0941 - community produced hack
+****************************************/
+ROM_START( mslug2t )
+	ROM_REGION( 0x300000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "941-p1.p1",  0x000000, 0x100000, CRC(df5d6fbc) SHA1(b9cc3e29afc12dc98daac9afb4f94e2cdd8b455c) ) /* TC538200 */
+	ROM_LOAD16_WORD_SWAP( "241-p2.sp2", 0x100000, 0x200000, CRC(38883f44) SHA1(fcf34b8c6e37774741542393b963635412484a27) ) /* TC5316200 */
+
+	NEO_SFIX_128K( "241-s1.s1", CRC(f3d32f0f) SHA1(2dc38b7dfd3ff14f64d5c0733c510b6bb8c692d0) ) /* TC531000 */
+
+	NEO_BIOS_AUDIO_128K( "241-m1.m1", CRC(94520ebd) SHA1(f8a1551cebcb91e416f30f50581feed7f72899e9) ) /* TC531001 */
+
+	ROM_REGION( 0x800000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "241-v1.v1", 0x000000, 0x400000, CRC(99ec20e8) SHA1(80597707f1fe115eed1941bb0701fc00790ad504) ) /* TC5332204 */
+	ROM_LOAD( "241-v2.v2", 0x400000, 0x400000, CRC(ecb16799) SHA1(b4b4ddc680836ed55942c66d7dfe756314e02211) ) /* TC5332204 */
+
+	ROM_REGION( 0x2000000, "cslot1:sprites", 0 )
+	/* Different layout with 8xC (16 mbit) also exists; naming sheme 241-Cx */
+	ROM_LOAD16_BYTE( "241-c1.c1", 0x0000000, 0x800000, CRC(394b5e0d) SHA1(4549926f5054ee6aa7689cf920be0327e3908a50) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "241-c2.c2", 0x0000001, 0x800000, CRC(e5806221) SHA1(1e5475cfab129c77acc610f09369ca42ba5aafa5) ) /* Plane 2,3 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "241-c3.c3", 0x1000000, 0x800000, CRC(9f6bfa6f) SHA1(a4319b48004e723f81a980887678e3e296049a53) ) /* Plane 0,1 */ /* TC5364205 */
+	ROM_LOAD16_BYTE( "241-c4.c4", 0x1000001, 0x800000, CRC(7d3e306f) SHA1(1499316fb381775218d897b81a6a0c3465d1a37c) ) /* Plane 2,3 */ /* TC5364205 */
+ROM_END
+
 
 /****************************************
  ID-0242
@@ -8186,7 +8236,7 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 	ROM_REGION( 0x200000, "cslot1:ymsnd", 0 )
 	ROM_LOAD( "dig-v1.bin", 0x000000, 0x080000, CRC(ee15bda4) SHA1(fe2206728e6efd02d6302869a98b196eb19a17df) )
 
-	ROM_REGION( 0x400000, "cslot1:sprites", 0 )
+	ROM_REGION( 0x100000, "cslot1:sprites", 0 )
 	ROM_LOAD16_BYTE( "dig-c1.bin", 0x000000, 0x080000, CRC(3db0a4ed) SHA1(6214faa883d97ea05809b6af7e0c85a236a18a28) ) /* Plane 0,1 */
 	ROM_LOAD16_BYTE( "dig-c2.bin", 0x000001, 0x080000, CRC(3e632161) SHA1(83711c4286fb1d9f3f91414ac6e5fed36618033e) ) /* Plane 2,3 */
 ROM_END
@@ -8589,7 +8639,7 @@ GAME( 1990, nam1975,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1990, bstars,     neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGM-002)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, bstarsh,    bstars,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars Professional (NGH-002)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, tpgolf,     neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Top Player's Golf (NGM-003 ~ NGH-003)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, mahretsu,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004 ~ NGH-004)", MACHINE_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode
+GAME( 1990, mahretsu,   neogeo,   neogeo_mj, mjneogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Mahjong Kyo Retsuden (NGM-004 ~ NGH-004)", MACHINE_SUPPORTS_SAVE ) // does not support mahjong panel in MVS mode <- it actually works fine???
 GAME( 1990, ridhero,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Riding Hero (NGM-006 ~ NGH-006)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ridheroh,   ridhero,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Riding Hero (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, alpham2,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Alpha Mission II / ASO II - Last Guardian (NGM-007 ~ NGH-007)", MACHINE_SUPPORTS_SAVE )
@@ -8603,7 +8653,8 @@ GAME( 1991, sengoku,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1991, sengokuh,   sengoku,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Sengoku / Sengoku Denshou (NGH-017, US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, burningf,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Burning Fight (NGM-018 ~ NGH-018)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, burningfh,  burningf, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Burning Fight (NGH-018, US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, burningfp,  burningf, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Burning Fight (prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, burningfpa, burningf, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Burning Fight (prototype, ver 23.3, 910326)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, burningfp,  burningf, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Burning Fight (prototype, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, lbowling,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "League Bowling (NGM-019 ~ NGH-019)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gpilots,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Ghost Pilots (NGM-020 ~ NGH-020)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, gpilotsh,   gpilots,  neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Ghost Pilots (NGH-020, US)", MACHINE_SUPPORTS_SAVE )
@@ -8669,7 +8720,7 @@ GAME( 1997, kof97,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1997, kof97h,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (NGH-2320)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97k,     kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '97 (Korean release)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kof97pls,   kof97,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Plus (bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Oroshi Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, kof97oro,   kof97,    kof97oro,  neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "The King of Fighters '97 Chongchu Jianghu Plus 2003 (bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, kog,        kof97,    kog,       neogeo, neogeo_state,   neogeo,   ROT0, "bootleg", "King of Gladiator (The King of Fighters '97 bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // protected bootleg
 GAME( 1997, lastblad,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGM-2340)", MACHINE_SUPPORTS_SAVE )
 GAME( 1997, lastbladh,  lastblad, neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The Last Blade / Bakumatsu Roman - Gekka no Kenshi (NGH-2340)", MACHINE_SUPPORTS_SAVE )
@@ -8679,6 +8730,7 @@ GAME( 1998, rbff2,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1998, rbff2h,     rbff2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode
 GAME( 1998, mslug2,     neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410)", MACHINE_SUPPORTS_SAVE )
+GAME( 2015, mslug2t,    mslug2,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Hack", "Metal Slug 2 Turbo (NGM-9410)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98,      neogeo,   kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98a,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420, alt board)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98k,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board)", MACHINE_SUPPORTS_SAVE )

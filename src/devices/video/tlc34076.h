@@ -34,7 +34,7 @@ class tlc34076_device : public device_t
 {
 public:
 	// construction/destruction
-	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tlc34076_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void static_set_bits(device_t &device, tlc34076_bits bits);
@@ -51,12 +51,12 @@ protected:
 
 private:
 	// internal state
-	UINT8 m_local_paletteram[0x300];
-	UINT8 m_regs[0x10];
-	UINT8 m_palettedata[3];
-	UINT8 m_writeindex;
-	UINT8 m_readindex;
-	UINT8 m_dacbits;
+	uint8_t m_local_paletteram[0x300];
+	uint8_t m_regs[0x10];
+	uint8_t m_palettedata[3];
+	uint8_t m_writeindex;
+	uint8_t m_readindex;
+	uint8_t m_dacbits;
 	rgb_t m_pens[0x100];
 };
 

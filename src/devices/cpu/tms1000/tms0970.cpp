@@ -36,19 +36,19 @@ ADDRESS_MAP_END
 
 
 // device definitions
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms1000_cpu_device(mconfig, TMS0970, "TMS0970", tag, owner, clock, 8 /* o pins */, 11 /* r pins */, 6 /* pc bits */, 8 /* byte width */, 2 /* x width */, 10 /* prg width */, ADDRESS_MAP_NAME(program_10bit_8), 6 /* data width */, ADDRESS_MAP_NAME(data_64x4), "tms0970", __FILE__)
 { }
 
-tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 o_pins, UINT8 r_pins, UINT8 pc_bits, UINT8 byte_bits, UINT8 x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
+tms0970_cpu_device::tms0970_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t o_pins, uint8_t r_pins, uint8_t pc_bits, uint8_t byte_bits, uint8_t x_bits, int prgwidth, address_map_constructor program, int datawidth, address_map_constructor data, const char *shortname, const char *source)
 	: tms1000_cpu_device(mconfig, type, name, tag, owner, clock, o_pins, r_pins, pc_bits, byte_bits, x_bits, prgwidth, program, datawidth, data, shortname, source)
 { }
 
-tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms0950_cpu_device::tms0950_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0970_cpu_device(mconfig, TMS0950, "TMS0950", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms0950", __FILE__)
 { }
 
-tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms1990_cpu_device::tms1990_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms0970_cpu_device(mconfig, TMS1990, "TMS1990", tag, owner, clock, 8, 11, 6, 8, 2, 10, ADDRESS_MAP_NAME(program_10bit_8), 6, ADDRESS_MAP_NAME(data_64x4), "tms1990", __FILE__)
 { }
 
@@ -97,9 +97,9 @@ void tms0970_cpu_device::device_reset()
 
 	// pre-decode instructionset
 	m_fixed_decode.resize(0x100);
-	memset(&m_fixed_decode[0], 0, 0x100*sizeof(UINT32));
+	memset(&m_fixed_decode[0], 0, 0x100*sizeof(uint32_t));
 	m_micro_decode.resize(0x100);
-	memset(&m_micro_decode[0], 0, 0x100*sizeof(UINT32));
+	memset(&m_micro_decode[0], 0, 0x100*sizeof(uint32_t));
 
 	for (int op = 0; op < 0x100; op++)
 	{
@@ -108,26 +108,26 @@ void tms0970_cpu_device::device_reset()
 			m_fixed_decode[op] = (op & 0x40) ? F_CALL: F_BR;
 
 		// 5 output bits select a microinstruction index
-		UINT32 imask = m_ipla->read(op);
-		UINT8 msel = imask & 0x1f;
+		uint32_t imask = m_ipla->read(op);
+		uint8_t msel = imask & 0x1f;
 
 		// but if (from bottom to top) term 1 is active and output bit 5 is 0, R2,R4-R7 directly select a microinstruction index
 		if (imask & 0x40 && (imask & 0x20) == 0)
 			msel = (op & 0xf) | (op >> 1 & 0x10);
 
 		msel = BITSWAP8(msel,7,6,5,0,1,2,3,4); // lines are reversed
-		UINT32 mmask = m_mpla->read(msel);
+		uint32_t mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
 
 		//                             _____  _____  _____  _____  ______  _____  ______  _____              _____
-		const UINT32 md[15] = { M_CKM, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_CIN, M_AUTA, M_AUTY, M_STO };
+		const uint32_t md[15] = { M_CKM, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_CIN, M_AUTA, M_AUTY, M_STO };
 
 		for (int bit = 0; bit < 15; bit++)
 			if (mmask & (1 << bit))
 				m_micro_decode[op] |= md[bit];
 
 		// the other ipla terms each select a fixed instruction
-		const UINT32 id[8] = { F_LDP, F_TDO, F_COMX, F_LDX, F_SBIT, F_RBIT, F_SETR, F_RETN };
+		const uint32_t id[8] = { F_LDP, F_TDO, F_COMX, F_LDX, F_SBIT, F_RBIT, F_SETR, F_RETN };
 
 		for (int bit = 0; bit < 8; bit++)
 			if (imask & (0x80 << bit))
@@ -137,7 +137,7 @@ void tms0970_cpu_device::device_reset()
 
 
 // i/o handling
-void tms0970_cpu_device::write_o_output(UINT8 index)
+void tms0970_cpu_device::write_o_output(uint8_t index)
 {
 	m_o_index = index;
 	m_o = m_spla->read(index);

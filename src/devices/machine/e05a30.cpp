@@ -22,7 +22,7 @@
 
 const device_type E05A30 = &device_creator<e05a30_device>;
 
-e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+e05a30_device::e05a30_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, E05A30, "E05A30", tag, owner, clock, "e05a30", __FILE__),
 	m_write_printhead(*this),
 	m_write_pf_stepper(*this),
@@ -73,13 +73,13 @@ void e05a30_device::device_reset()
 	m_cr_stepper = 0x00;
 
 	/* centronics init */
-	m_centronics_nack = FALSE;
-	m_centronics_busy = FALSE;
+	m_centronics_nack = false;
+	m_centronics_busy = false;
 	m_write_centronics_ack   (!m_centronics_nack);
 	m_write_centronics_busy  ( m_centronics_busy);
-	m_write_centronics_perror(FALSE);
-	m_write_centronics_fault (TRUE);
-	m_write_centronics_select(TRUE);
+	m_write_centronics_perror(false);
+	m_write_centronics_fault (true);
+	m_write_centronics_select(true);
 
 	m_write_ready(1);
 }
@@ -94,14 +94,14 @@ void e05a30_device::device_reset()
  * MMIO 0xC005 keeps the 9th pin in the MSB.
  */
 
-void e05a30_device::update_printhead(int pos, UINT8 data)
+void e05a30_device::update_printhead(int pos, uint8_t data)
 {
 	if (pos == 0) {
 		m_printhead &= 0x01fe;
 		m_printhead |= (data >> 7);
 	} else {
 		m_printhead &= 0x0001;
-		m_printhead |= (UINT16) (data << 1);
+		m_printhead |= (uint16_t) (data << 1);
 	}
 	m_write_printhead(m_printhead);
 }
@@ -119,13 +119,13 @@ void e05a30_device::update_printhead(int pos, UINT8 data)
  * For the PF motor, the output data is fed directly to the stepper motor.
  */
 
-void e05a30_device::update_pf_stepper(UINT8 data)
+void e05a30_device::update_pf_stepper(uint8_t data)
 {
 	m_pf_stepper = data & 0x0f;
 	m_write_pf_stepper(m_pf_stepper);
 }
 
-static UINT8 cr_sla7020m(UINT8 data)
+static uint8_t cr_sla7020m(uint8_t data)
 {
 	bool ina = BIT(data, 0);
 	bool inb = BIT(data, 1);
@@ -137,7 +137,7 @@ static UINT8 cr_sla7020m(UINT8 data)
 	bool outb1 = !inb && tdb;
 	return (outb1<<3)|(outb0<<2)|(outa1<<1)|(outa0<<0);
 }
-void e05a30_device::update_cr_stepper(UINT8 data)
+void e05a30_device::update_cr_stepper(uint8_t data)
 {
 	m_cr_stepper = data & 0x0f;
 	m_write_cr_stepper(cr_sla7020m(m_cr_stepper));
@@ -150,11 +150,11 @@ void e05a30_device::update_cr_stepper(UINT8 data)
 
 WRITE_LINE_MEMBER( e05a30_device::centronics_input_strobe )
 {
-	if (m_centronics_strobe == TRUE && state == FALSE && !m_centronics_busy) {
+	if (m_centronics_strobe == true && state == false && !m_centronics_busy) {
 		m_centronics_data_latch   = m_centronics_data;
 
-		m_centronics_data_latched = TRUE;
-		m_centronics_busy         = TRUE;
+		m_centronics_data_latched = true;
+		m_centronics_busy         = true;
 		m_write_centronics_busy(m_centronics_busy);
 	}
 
@@ -180,7 +180,7 @@ WRITE8_MEMBER( e05a30_device::write )
 		 * assume the busy signal cannot be reset while the data hasn't been
 		 * read. */
 		if (m_centronics_data_latched)
-			m_centronics_busy = TRUE;
+			m_centronics_busy = true;
 		m_write_centronics_ack (!m_centronics_nack);
 		m_write_centronics_busy( m_centronics_busy);
 		break;
@@ -196,7 +196,7 @@ WRITE8_MEMBER( e05a30_device::write )
 
 READ8_MEMBER( e05a30_device::read )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	LOG("%s: e05a30_r([0xC0%02x]): ", space.machine().describe_context(), offset);
 
@@ -206,7 +206,7 @@ READ8_MEMBER( e05a30_device::read )
 		break;
 	case 0x03:
 		result = m_centronics_data_latch;
-		m_centronics_data_latched = FALSE;
+		m_centronics_data_latched = false;
 		break;
 	case 0x04:
 		result |= m_centronics_busy << 0;

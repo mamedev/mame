@@ -10,117 +10,117 @@
 
 struct VC2_t
 {
-	UINT16 nRegister[0x21];
-	UINT16 nRAM[0x8000];
-	UINT8 nRegIdx;
-	UINT16 nRegData;
+	uint16_t nRegister[0x21];
+	uint16_t nRAM[0x8000];
+	uint8_t nRegIdx;
+	uint16_t nRegData;
 };
 
 
 struct XMAP_t
 {
-	UINT32 nRegister[0x08];
-	UINT32 nModeTable[0x20];
+	uint32_t nRegister[0x08];
+	uint32_t nModeTable[0x20];
 };
 
 struct REX3_t
 {
-	UINT32 nDrawMode1;
-	UINT32 nDrawMode0;
-	UINT32 nLSMode;
-	UINT32 nLSPattern;
-	UINT32 nLSPatSave;
-	UINT32 nZPattern;
-	UINT32 nColorBack;
-	UINT32 nColorVRAM;
-	UINT32 nAlphaRef;
-	//UINT32 nStall0;
-	UINT32 nSMask0X;
-	UINT32 nSMask0Y;
-	UINT32 nSetup;
-	UINT32 nStepZ;
-	UINT32 nXStart;
-	UINT32 nYStart;
-	UINT32 nXEnd;
-	UINT32 nYEnd;
-	UINT32 nXSave;
-	UINT32 nXYMove;
-	UINT32 nBresD;
-	UINT32 nBresS1;
-	UINT32 nBresOctInc1;
-	UINT32 nBresRndInc2;
-	UINT32 nBresE1;
-	UINT32 nBresS2;
-	UINT32 nAWeight0;
-	UINT32 nAWeight1;
-	UINT32 nXStartF;
-	UINT32 nYStartF;
-	UINT32 nXEndF;
-	UINT32 nYEndF;
-	UINT32 nXStartI;
-	//UINT32 nYEndF1;
-	UINT32 nXYStartI;
-	UINT32 nXYEndI;
-	UINT32 nXStartEndI;
-	UINT32 nColorRed;
-	UINT32 nColorAlpha;
-	UINT32 nColorGreen;
-	UINT32 nColorBlue;
-	UINT32 nSlopeRed;
-	UINT32 nSlopeAlpha;
-	UINT32 nSlopeGreen;
-	UINT32 nSlopeBlue;
-	UINT32 nWriteMask;
-	UINT32 nZeroFract;
-	UINT32 nZeroOverflow;
-	//UINT32 nColorIndex;
-	UINT32 nHostDataPortMSW;
-	UINT32 nHostDataPortLSW;
-	UINT32 nDCBMode;
-	UINT32 nDCBRegSelect;
-	UINT32 nDCBSlvSelect;
-	UINT32 nDCBDataMSW;
-	UINT32 nDCBDataLSW;
-	UINT32 nSMask1X;
-	UINT32 nSMask1Y;
-	UINT32 nSMask2X;
-	UINT32 nSMask2Y;
-	UINT32 nSMask3X;
-	UINT32 nSMask3Y;
-	UINT32 nSMask4X;
-	UINT32 nSMask4Y;
-	UINT32 nTopScanline;
-	UINT32 nXYWin;
-	UINT32 nClipMode;
-	UINT32 nConfig;
-	UINT32 nStatus;
-	UINT8 nXFerWidth;
+	uint32_t nDrawMode1;
+	uint32_t nDrawMode0;
+	uint32_t nLSMode;
+	uint32_t nLSPattern;
+	uint32_t nLSPatSave;
+	uint32_t nZPattern;
+	uint32_t nColorBack;
+	uint32_t nColorVRAM;
+	uint32_t nAlphaRef;
+	//uint32_t nStall0;
+	uint32_t nSMask0X;
+	uint32_t nSMask0Y;
+	uint32_t nSetup;
+	uint32_t nStepZ;
+	uint32_t nXStart;
+	uint32_t nYStart;
+	uint32_t nXEnd;
+	uint32_t nYEnd;
+	uint32_t nXSave;
+	uint32_t nXYMove;
+	uint32_t nBresD;
+	uint32_t nBresS1;
+	uint32_t nBresOctInc1;
+	uint32_t nBresRndInc2;
+	uint32_t nBresE1;
+	uint32_t nBresS2;
+	uint32_t nAWeight0;
+	uint32_t nAWeight1;
+	uint32_t nXStartF;
+	uint32_t nYStartF;
+	uint32_t nXEndF;
+	uint32_t nYEndF;
+	uint32_t nXStartI;
+	//uint32_t nYEndF1;
+	uint32_t nXYStartI;
+	uint32_t nXYEndI;
+	uint32_t nXStartEndI;
+	uint32_t nColorRed;
+	uint32_t nColorAlpha;
+	uint32_t nColorGreen;
+	uint32_t nColorBlue;
+	uint32_t nSlopeRed;
+	uint32_t nSlopeAlpha;
+	uint32_t nSlopeGreen;
+	uint32_t nSlopeBlue;
+	uint32_t nWriteMask;
+	uint32_t nZeroFract;
+	uint32_t nZeroOverflow;
+	//uint32_t nColorIndex;
+	uint32_t nHostDataPortMSW;
+	uint32_t nHostDataPortLSW;
+	uint32_t nDCBMode;
+	uint32_t nDCBRegSelect;
+	uint32_t nDCBSlvSelect;
+	uint32_t nDCBDataMSW;
+	uint32_t nDCBDataLSW;
+	uint32_t nSMask1X;
+	uint32_t nSMask1Y;
+	uint32_t nSMask2X;
+	uint32_t nSMask2Y;
+	uint32_t nSMask3X;
+	uint32_t nSMask3Y;
+	uint32_t nSMask4X;
+	uint32_t nSMask4Y;
+	uint32_t nTopScanline;
+	uint32_t nXYWin;
+	uint32_t nClipMode;
+	uint32_t nConfig;
+	uint32_t nStatus;
+	uint8_t nXFerWidth;
 #if 0
-	UINT32 nCurrentX;
-	UINT32 nCurrentY;
+	uint32_t nCurrentX;
+	uint32_t nCurrentY;
 #endif
-	UINT32 nKludge_SkipLine;
+	uint32_t nKludge_SkipLine;
 };
 
 
 struct CMAP_t
 {
-	UINT16 nPaletteIndex;
-	UINT32 nPalette[0x10000];
+	uint16_t nPaletteIndex;
+	uint32_t nPalette[0x10000];
 };
 
 
 class newport_video_device : public device_t
 {
 public:
-	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	newport_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~newport_video_device() {}
 
 
 	DECLARE_READ32_MEMBER( rex3_r );
 	DECLARE_WRITE32_MEMBER( rex3_w );
 
-	UINT32 screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -146,8 +146,8 @@ private:
 	XMAP_t m_XMAP0;
 	XMAP_t m_XMAP1;
 	REX3_t m_REX3;
-	std::unique_ptr<UINT32[]> m_base;
-	UINT8  m_nDrawGreen;
+	std::unique_ptr<uint32_t[]> m_base;
+	uint8_t  m_nDrawGreen;
 	CMAP_t m_CMAP0;
 };
 

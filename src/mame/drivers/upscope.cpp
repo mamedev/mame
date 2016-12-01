@@ -41,11 +41,11 @@ public:
 	m_parallel_data(0xff)
 	{ }
 
-	UINT8 m_nvram[0x100];
-	UINT8 m_prev_cia1_porta;
-	UINT8 m_parallel_data;
-	UINT8 m_nvram_address_latch;
-	UINT8 m_nvram_data_latch;
+	uint8_t m_nvram[0x100];
+	uint8_t m_prev_cia1_porta;
+	uint8_t m_parallel_data;
+	uint8_t m_nvram_address_latch;
+	uint8_t m_nvram_data_latch;
 
 	DECLARE_READ8_MEMBER(upscope_cia_0_portb_r);
 	DECLARE_WRITE8_MEMBER(upscope_cia_0_portb_w);

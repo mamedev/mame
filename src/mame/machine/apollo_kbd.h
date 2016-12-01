@@ -47,7 +47,7 @@ class apollo_kbd_device :   public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_kbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_tx_w.set_callback(object); }
 	template<class _Object> static devcb_base &set_german_cb(device_t &device, _Object object) { return downcast<apollo_kbd_device &>(device).m_german_r.set_callback(object); }
@@ -65,7 +65,7 @@ private:
 	virtual void rcv_complete() override;    // Rx completed receiving byte
 	virtual void tra_complete() override;    // Tx completed sending byte
 	virtual void tra_callback() override;    // Tx send bit
-	void input_callback(UINT8 state);
+	void input_callback(uint8_t state);
 
 	TIMER_CALLBACK_MEMBER( kbd_scan_timer );
 
@@ -73,15 +73,15 @@ private:
 	template <typename Format, typename... Params>
 	void logerror(Format &&fmt, Params &&... args) const;
 
-	void kgetchar(UINT8 data);
+	void kgetchar(uint8_t data);
 
 	int keyboard_is_german();
 
-	void set_mode(UINT16 mode);
-	void putdata(const UINT8 *data, int data_length);
+	void set_mode(uint16_t mode);
+	void putdata(const uint8_t *data, int data_length);
 	void putstring(const char *data);
 
-	int push_scancode( UINT8 code, UINT8 repeat);
+	int push_scancode( uint8_t code, uint8_t repeat);
 	void scan_keyboard();
 
 	// the keyboard beeper
@@ -121,11 +121,11 @@ private:
 
 	static const int XMIT_RING_SIZE = 64;
 
-	UINT8 m_xmitring[XMIT_RING_SIZE];
+	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
 
-	void xmit_char(UINT8 data);
+	void xmit_char(uint8_t data);
 
 	beeper  m_beeper;
 	mouse   m_mouse;
@@ -141,18 +141,18 @@ private:
 	ioport_port *m_io_mouse3;
 
 	/* Receiver */
-	UINT32 m_rx_message;
-	UINT16 m_loopback_mode;
+	uint32_t m_rx_message;
+	uint16_t m_loopback_mode;
 
 	emu_timer* m_timer;
-	UINT16 m_mode;
-	UINT16 m_delay;         // key press delay after initial press
-	UINT16 m_repeat;        // key press repeat rate
-	UINT16 m_last_pressed;  // last key pressed, for repeat key handling
+	uint16_t m_mode;
+	uint16_t m_delay;         // key press delay after initial press
+	uint16_t m_repeat;        // key press repeat rate
+	uint16_t m_last_pressed;  // last key pressed, for repeat key handling
 	int m_keytime[0x80];    // time until next key press (1 ms)
-	UINT8 m_keyon[0x80];    // is 1 if key is pressed
+	uint8_t m_keyon[0x80];    // is 1 if key is pressed
 
-	static UINT16 m_code_table[];
+	static uint16_t m_code_table[];
 };
 
 // device type definition

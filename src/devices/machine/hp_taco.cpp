@@ -280,7 +280,7 @@ static const hp_taco_device::tape_pos_t tape_holes[] = {
 const device_type HP_TACO = &device_creator<hp_taco_device>;
 
 // Constructors
-hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 			device_image_interface(mconfig , *this),
 			m_irq_handler(*this),
@@ -291,7 +291,7 @@ hp_taco_device::hp_taco_device(const machine_config &mconfig, device_type type, 
 		clear_state();
 }
 
-hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hp_taco_device::hp_taco_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, HP_TACO, "HP TACO", tag, owner, clock, "TACO", __FILE__),
 			device_image_interface(mconfig , *this),
 			m_irq_handler(*this),
@@ -336,7 +336,7 @@ WRITE16_MEMBER(hp_taco_device::reg_w)
 
 READ16_MEMBER(hp_taco_device::reg_r)
 {
-		UINT16 res = 0;
+		uint16_t res = 0;
 
 		// Any I/O activity clears IRQ
 		irq_w(false);
@@ -671,7 +671,7 @@ void hp_taco_device::update_tach_reg(void)
 		tape_pos_t pos = current_tape_pos();
 		tape_pos_t pos_int = pos / TAPE_POS_FRACT;
 		tape_pos_t ref_int = m_tach_reg_ref / TAPE_POS_FRACT;
-		UINT16 reg_value = (UINT16)(abs(pos_int - ref_int) + m_tach_reg);
+		uint16_t reg_value = (uint16_t)(abs(pos_int - ref_int) + m_tach_reg);
 
 		LOG_0(("Tach = %04x @ pos = %d, ref_pos = %d\n" , reg_value , pos , m_tach_reg_ref));
 
@@ -741,11 +741,11 @@ attotime hp_taco_device::time_to_stopping_pos(void) const
 		return time_to_distance(m_tape_fast ? FAST_BRAKE_DIST : SLOW_BRAKE_DIST);
 }
 
-bool hp_taco_device::start_tape_cmd(UINT16 cmd_reg , UINT16 must_be_1 , UINT16 must_be_0)
+bool hp_taco_device::start_tape_cmd(uint16_t cmd_reg , uint16_t must_be_1 , uint16_t must_be_0)
 {
 		m_cmd_reg = cmd_reg;
 
-		UINT16 to_be_tested = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
+		uint16_t to_be_tested = (m_cmd_reg & CMD_REG_MASK) | (m_status_reg & STATUS_REG_MASK);
 		// Bits in STATUS_ERR_MASK must always be 0
 		must_be_0 |= STATUS_ERR_MASK;
 
@@ -1054,8 +1054,8 @@ void hp_taco_device::clear_tape(void)
 void hp_taco_device::dump_sequence(tape_track_t::const_iterator it_start , unsigned n_words)
 {
 	if (n_words) {
-		UINT32 tmp32;
-		UINT16 tmp16;
+		uint32_t tmp32;
+		uint16_t tmp16;
 
 		tmp32 = n_words;
 		fwrite(&tmp32 , sizeof(tmp32));
@@ -1072,7 +1072,7 @@ void hp_taco_device::dump_sequence(tape_track_t::const_iterator it_start , unsig
 
 void hp_taco_device::save_tape(void)
 {
-	UINT32 tmp32;
+	uint32_t tmp32;
 
 	fseek(0, SEEK_SET);
 
@@ -1094,14 +1094,14 @@ void hp_taco_device::save_tape(void)
 		}
 		dump_sequence(it_start , n_words);
 		// End of track
-		tmp32 = (UINT32)-1;
+		tmp32 = (uint32_t)-1;
 		fwrite(&tmp32 , sizeof(tmp32));
 	}
 }
 
 bool hp_taco_device::load_track(tape_track_t& track)
 {
-		UINT32 tmp32;
+		uint32_t tmp32;
 
 		track.clear();
 
@@ -1110,7 +1110,7 @@ bool hp_taco_device::load_track(tape_track_t& track)
 						return false;
 				}
 
-				if (tmp32 == (UINT32)-1) {
+				if (tmp32 == (uint32_t)-1) {
 						return true;
 				}
 
@@ -1123,7 +1123,7 @@ bool hp_taco_device::load_track(tape_track_t& track)
 				tape_pos_t pos = (tape_pos_t)tmp32;
 
 				for (unsigned i = 0; i < n_words; i++) {
-						UINT16 tmp16;
+						uint16_t tmp16;
 
 						if (fread(&tmp16 , sizeof(tmp16)) != sizeof(tmp16)) {
 								return false;
@@ -1137,7 +1137,7 @@ bool hp_taco_device::load_track(tape_track_t& track)
 
 bool hp_taco_device::load_tape(void)
 {
-		UINT32 magic;
+		uint32_t magic;
 
 		if (fread(&magic , sizeof(magic)) != sizeof(magic) ||
 			magic != FILE_MAGIC) {
@@ -1536,7 +1536,7 @@ void hp_taco_device::cmd_fsm(void)
 		}
 }
 
-void hp_taco_device::start_cmd_exec(UINT16 new_cmd_reg)
+void hp_taco_device::start_cmd_exec(uint16_t new_cmd_reg)
 {
 		LOG_0(("New cmd %02x @ %g cmd %02x st %d\n" , CMD_CODE(new_cmd_reg) , machine().time().as_double() , CMD_CODE(m_cmd_reg) , m_cmd_state));
 

@@ -288,9 +288,9 @@ public:
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
 
-	UINT8 m_led_reg0;
-	UINT8 m_led_reg1;
-	required_shared_ptr<UINT32> m_work_ram;
+	uint8_t m_led_reg0;
+	uint8_t m_led_reg1;
+	required_shared_ptr<uint32_t> m_work_ram;
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_dsp;
@@ -299,14 +299,14 @@ public:
 	required_device<adc12138_device> m_adc12138;
 	required_ioport m_in0, m_in1, m_in2, m_dsw, m_analog1, m_analog2, m_analog3, m_analog4, m_analog5;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 	emu_timer *m_sound_irq_timer;
 	int m_fpga_uploaded;
 	int m_lanc2_ram_r;
 	int m_lanc2_ram_w;
-	UINT8 m_lanc2_reg[3];
-	std::unique_ptr<UINT8[]> m_lanc2_ram;
-	std::unique_ptr<UINT32[]> m_sharc_dataram;
+	uint8_t m_lanc2_reg[3];
+	std::unique_ptr<uint8_t[]> m_lanc2_ram;
+	std::unique_ptr<uint32_t[]> m_sharc_dataram;
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(sysreg_r);
 	DECLARE_WRITE32_MEMBER(sysreg_w);
@@ -325,7 +325,7 @@ public:
 	DECLARE_DRIVER_INIT(nwktr);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void lanc2_init();
 };
@@ -345,7 +345,7 @@ WRITE_LINE_MEMBER(nwktr_state::voodoo_vblank_0)
 }
 
 
-UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo0");
 
@@ -367,7 +367,7 @@ UINT32 nwktr_state::screen_update_nwktr(screen_device &screen, bitmap_rgb32 &bit
 
 READ32_MEMBER(nwktr_state::sysreg_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (offset == 0)
 	{
 		if (ACCESSING_BITS_24_31)
@@ -444,7 +444,7 @@ void nwktr_state::lanc2_init()
 	m_fpga_uploaded = 0;
 	m_lanc2_ram_r = 0;
 	m_lanc2_ram_w = 0;
-	m_lanc2_ram = std::make_unique<UINT8[]>(0x8000);
+	m_lanc2_ram = std::make_unique<uint8_t[]>(0x8000);
 }
 
 READ32_MEMBER(nwktr_state::lanc1_r)
@@ -453,7 +453,7 @@ READ32_MEMBER(nwktr_state::lanc1_r)
 	{
 		case 0x40/4:
 		{
-			UINT32 r = 0;
+			uint32_t r = 0;
 
 			r |= (m_fpga_uploaded) ? (1 << 6) : 0;
 			r |= 1 << 5;
@@ -476,7 +476,7 @@ WRITE32_MEMBER(nwktr_state::lanc1_w)
 
 READ32_MEMBER(nwktr_state::lanc2_r)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 
 	if (offset == 0)
 	{
@@ -510,7 +510,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			UINT8 value = data >> 24;
+			uint8_t value = data >> 24;
 
 			value = ((value >> 7) & 0x01) |
 					((value >> 5) & 0x02) |
@@ -522,7 +522,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 					((value << 7) & 0x80);
 
 			m_fpga_uploaded = 1;
-			m_lanc2_reg[0] = (UINT8)(data >> 24);
+			m_lanc2_reg[0] = (uint8_t)(data >> 24);
 
 			//printf("lanc2_fpga_w: %02X at %08X\n", value, space.device().safe_pc());
 		}
@@ -530,7 +530,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 		{
 			m_lanc2_ram_r = 0;
 			m_lanc2_ram_w = 0;
-			m_lanc2_reg[1] = (UINT8)(data >> 8);
+			m_lanc2_reg[1] = (uint8_t)(data >> 8);
 		}
 		else if (ACCESSING_BITS_16_23)
 		{
@@ -539,7 +539,7 @@ WRITE32_MEMBER(nwktr_state::lanc2_w)
 				m_lanc2_ram[2] = (data >> 20) & 0xf;
 				m_lanc2_ram[3] = 0;
 			}
-			m_lanc2_reg[2] = (UINT8)(data >> 16);
+			m_lanc2_reg[2] = (uint8_t)(data >> 16);
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
@@ -618,7 +618,7 @@ void nwktr_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x003fffff, false, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(nwktr_state::sound_irq), this));
 }
@@ -840,7 +840,7 @@ DRIVER_INIT_MEMBER(nwktr_state, nwktr)
 {
 	machine().device<konppc_device>("konppc")->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 
-	m_sharc_dataram = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram = std::make_unique<uint32_t[]>(0x100000/4);
 	m_led_reg0 = m_led_reg1 = 0x7f;
 
 	lanc2_init();

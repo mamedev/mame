@@ -26,22 +26,22 @@ public:
 		{ }
 
 	optional_device<deco146_device> m_deco146;
-	required_shared_ptr<UINT32> m_mlc_ram;
-	required_shared_ptr<UINT32> m_irq_ram;
-	required_shared_ptr<UINT32> m_mlc_clip_ram;
-	required_shared_ptr<UINT32> m_mlc_vram;
+	required_shared_ptr<uint32_t> m_mlc_ram;
+	required_shared_ptr<uint32_t> m_irq_ram;
+	required_shared_ptr<uint32_t> m_mlc_clip_ram;
+	required_shared_ptr<uint32_t> m_mlc_vram;
 	timer_device *m_raster_irq_timer;
 	int m_mainCpuIsArm;
-	UINT32 m_mlc_raster_table_1[4*256];
-	UINT32 m_mlc_raster_table_2[4*256];
-	UINT32 m_mlc_raster_table_3[4*256];
-	UINT32 m_vbl_i;
+	uint32_t m_mlc_raster_table_1[4*256];
+	uint32_t m_mlc_raster_table_2[4*256];
+	uint32_t m_mlc_raster_table_3[4*256];
+	uint32_t m_vbl_i;
 	int m_lastScanline[9];
-	UINT32 m_colour_mask;
+	uint32_t m_colour_mask;
 
-	std::unique_ptr<UINT16[]> m_mlc_spriteram;
-	std::unique_ptr<UINT16[]> m_mlc_spriteram_spare;
-	std::unique_ptr<UINT16[]> m_mlc_buffered_spriteram;
+	std::unique_ptr<uint16_t[]> m_mlc_spriteram;
+	std::unique_ptr<uint16_t[]> m_mlc_spriteram_spare;
+	std::unique_ptr<uint16_t[]> m_mlc_buffered_spriteram;
 	DECLARE_READ32_MEMBER(test2_r);
 	DECLARE_READ32_MEMBER(mlc_440008_r);
 	DECLARE_READ32_MEMBER(mlc_44001c_r);
@@ -66,10 +66,10 @@ public:
 	DECLARE_DRIVER_INIT(avengrgs);
 	DECLARE_MACHINE_RESET(mlc);
 	DECLARE_VIDEO_START(mlc);
-	UINT32 screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_mlc(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_gen);
-	void draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest);
+	void draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest);
 	void descramble_sound(  );
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -77,8 +77,8 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
-	required_region_ptr<UINT8> m_gfx2;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
+	required_region_ptr<uint8_t> m_gfx2;
 
 	DECLARE_READ16_MEMBER( sh96_protection_region_0_146_r );
 	DECLARE_WRITE16_MEMBER( sh96_protection_region_0_146_w );

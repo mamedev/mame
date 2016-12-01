@@ -264,9 +264,9 @@ READ8_MEMBER(bwidow_state::spacduel_IN3_r)
 	int res2;
 	int res3;
 
-	res1 = ioport("IN3")->read();
-	res2 = ioport("IN4")->read();
-	res3 = read_safe(ioport("DSW2"), 0);
+	res1 = m_in3->read();
+	res2 = m_in4->read();
+	res3 = m_dsw2.read_safe(0);
 	res = 0x00;
 
 	switch (offset & 0x07)
@@ -315,7 +315,7 @@ CUSTOM_INPUT_MEMBER(bwidow_state::clock_r)
 
 READ8_MEMBER(bwidow_state::bwidowp_in_r)
 {
-	return (ioport("IN4")->read() & 0x0f) | ((ioport("IN3")->read() & 0x0f) << 4);
+	return (m_in4->read() & 0x0f) | ((m_in3->read() & 0x0f) << 4);
 }
 
 /*************************************

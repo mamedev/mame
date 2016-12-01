@@ -188,7 +188,7 @@ class mos6530_base_t :  public device_t
 {
 public:
 	// construction/destruction
-	mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mos6530_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pa_rd_callback(device_t &device, _Object object) { return downcast<mos6530_base_t &>(device).m_in_pa_cb.set_callback(object); }
@@ -261,12 +261,12 @@ protected:
 	void update_pa();
 	virtual void update_pb();
 	virtual void update_irq();
-	virtual UINT8 get_irq_flags();
+	virtual uint8_t get_irq_flags();
 	void edge_detect();
 	void pa_w(int bit, int state);
 	void pb_w(int bit, int state);
-	void timer_w(offs_t offset, UINT8 data, bool ie);
-	UINT8 timer_r(bool ie);
+	void timer_w(offs_t offset, uint8_t data, bool ie);
+	uint8_t timer_r(bool ie);
 
 	DECLARE_READ8_MEMBER( rom_r ) { return m_rom[offset]; }
 	DECLARE_READ8_MEMBER( ram_r ) { return m_ram[offset]; }
@@ -286,8 +286,8 @@ protected:
 	DECLARE_WRITE8_MEMBER( timer_on_w );
 	DECLARE_WRITE8_MEMBER( edge_w );
 
-	optional_shared_ptr<UINT8> m_ram;
-	optional_region_ptr<UINT8> m_rom;
+	optional_shared_ptr<uint8_t> m_ram;
+	optional_region_ptr<uint8_t> m_rom;
 
 	devcb_write_line m_irq_cb;
 	devcb_read8    m_in_pa_cb;
@@ -327,15 +327,15 @@ protected:
 	devcb_write_line m_out_pb6_cb;
 	devcb_write_line m_out_pb7_cb;
 
-	UINT8 m_pa_in;
-	UINT8 m_pa_out;
-	UINT8 m_pa_ddr;
+	uint8_t m_pa_in;
+	uint8_t m_pa_out;
+	uint8_t m_pa_ddr;
 	int m_pa7;
 	int m_pa7_dir;
 
-	UINT8 m_pb_in;
-	UINT8 m_pb_out;
-	UINT8 m_pb_ddr;
+	uint8_t m_pb_in;
+	uint8_t m_pb_out;
+	uint8_t m_pb_ddr;
 
 	bool m_ie_timer;
 	bool m_irq_timer;
@@ -343,7 +343,7 @@ protected:
 	bool m_irq_edge;
 
 	int m_prescale;
-	UINT8 m_timer;
+	uint8_t m_timer;
 
 	enum {
 		IDLE,
@@ -356,7 +356,7 @@ protected:
 		attotime tm, tm_irq;
 		attotime period;
 		int state, next_state;
-		UINT8 value;
+		uint8_t value;
 	};
 
 	live_info cur_live, checkpoint_live;
@@ -376,7 +376,7 @@ class mos6530_t :  public mos6530_base_t
 {
 public:
 	// construction/destruction
-	mos6530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(rom_map, 8);
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
@@ -388,7 +388,7 @@ protected:
 
 	void update_pb() override;
 	void update_irq() override;
-	UINT8 get_irq_flags() override;
+	uint8_t get_irq_flags() override;
 };
 
 
@@ -396,7 +396,7 @@ class mos6532_t :  public mos6530_base_t
 {
 public:
 	// construction/destruction
-	mos6532_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6532_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(ram_map, 8);
 	virtual DECLARE_ADDRESS_MAP(io_map, 8);

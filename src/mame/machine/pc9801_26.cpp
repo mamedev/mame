@@ -109,7 +109,7 @@ ioport_constructor pc9801_26_device::device_input_ports() const
 //  pc9801_26_device - constructor
 //-------------------------------------------------
 
-pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc9801_26_device::pc9801_26_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_26, "pc9801_26", tag, owner, clock, "pc9801_26", __FILE__),
 //      m_maincpu(*this, "^maincpu"),
 		m_opn(*this, "opn")
@@ -161,7 +161,7 @@ void pc9801_26_device::device_start()
 
 void pc9801_26_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPN_DSW")->read() & 1) << 8;
+	uint16_t port_base = (ioport("OPN_DSW")->read() & 1) << 8;
 	install_device(port_base + 0x0088, port_base + 0x008b, read8_delegate(FUNC(pc9801_26_device::pc9801_26_r), this), write8_delegate(FUNC(pc9801_26_device::pc9801_26_w), this) );
 }
 

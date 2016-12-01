@@ -17,6 +17,7 @@
 #include "sound/samples.h"
 #include "sound/tms36xx.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 /*************************************
@@ -30,7 +31,7 @@
 
 const device_type SEGA005 = &device_creator<sega005_sound_device>;
 
-sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega005_sound_device::sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEGA005, "Sega 005 Audio Custom", tag, owner, clock, "sega005_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_sega005_sound_timer(nullptr),
@@ -74,7 +75,7 @@ void sega005_sound_device::device_start()
 void sega005_sound_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	segag80r_state *state = machine().driver_data<segag80r_state>();
-	const UINT8 *sound_prom = state->memregion("proms")->base();
+	const uint8_t *sound_prom = state->memregion("proms")->base();
 	int i;
 
 	/* no implementation yet */
@@ -245,7 +246,7 @@ MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(11)
 	MCFG_SAMPLES_NAMES(astrob_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -263,7 +264,7 @@ WRITE8_MEMBER(segag80r_state::astrob_sound_w)
 	};
 	float freq_factor;
 
-	UINT8 diff = data ^ m_sound_state[offset];
+	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;
 
 	switch (offset)
@@ -437,10 +438,10 @@ MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(7)
 	MCFG_SAMPLES_NAMES(sega005_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("005", SEGA005, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -452,7 +453,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
 {
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* LARGE EXPL: channel 0 */
@@ -482,8 +483,8 @@ WRITE8_MEMBER(segag80r_state::sega005_sound_a_w)
 
 inline void segag80r_state::sega005_update_sound_data()
 {
-	UINT8 newval = memregion("005")->base()[m_sound_addr];
-	UINT8 diff = newval ^ m_sound_data;
+	uint8_t newval = memregion("005")->base()[m_sound_addr];
+	uint8_t diff = newval ^ m_sound_data;
 
 	//osd_printf_debug("  [%03X] = %02X\n", m_sound_addr, newval);
 
@@ -514,7 +515,7 @@ WRITE8_MEMBER(segag80r_state::sega005_sound_b_w)
 	       D4: 1 = hold/reset address counter to 0
 	    D3-D0: upper 4 bits of ROM address
 	*/
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	//osd_printf_debug("sound[%d] = %02X\n", 1, data);
@@ -595,7 +596,7 @@ MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(11)
 	MCFG_SAMPLES_NAMES(spaceod_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -607,7 +608,7 @@ MACHINE_CONFIG_END
 
 WRITE8_MEMBER(segag80r_state::spaceod_sound_w)
 {
-	UINT8 diff = data ^ m_sound_state[offset];
+	uint8_t diff = data ^ m_sound_state[offset];
 	m_sound_state[offset] = data;
 
 	switch (offset)
@@ -690,7 +691,7 @@ static ADDRESS_MAP_START( monsterb_7751_portmap, AS_IO, 8, segag80r_state )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("audio_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
@@ -721,15 +722,16 @@ MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 	MCFG_SOUND_ADD("samples", SAMPLES, 0)
 	MCFG_SAMPLES_CHANNELS(2)
 	MCFG_SAMPLES_NAMES(monsterb_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_TMS36XX_ADD("music", 247)
 	MCFG_TMS36XX_TYPE(TMS3617)
 	MCFG_TMS36XX_DECAY_TIMES(0.5, 0.5, 0.5, 0.5, 0.5, 0.5)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -762,7 +764,7 @@ WRITE8_MEMBER(segag80r_state::monsterb_sound_a_w)
 
 WRITE8_MEMBER(segag80r_state::monsterb_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* SHOT: channel 0 */

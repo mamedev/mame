@@ -99,7 +99,7 @@ static const POCKETC_FIGURE /*busy={
 
 READ8_MEMBER(pc1350_state::pc1350_lcd_read)
 {
-	UINT8 data = m_reg[offset&0xfff];
+	uint8_t data = m_reg[offset&0xfff];
 	logerror("pc1350 read %.3x %.2x\n",offset,data);
 	return data;
 }
@@ -127,7 +127,7 @@ static const int pc1350_addr[4]={ 0, 0x40, 0x1e, 0x5e };
 #define DOWN 45
 #define RIGHT 76
 
-UINT32 pc1350_state::screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc1350_state::screen_update_pc1350(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y=DOWN, i, j, k=0, b;
 	int color[4];

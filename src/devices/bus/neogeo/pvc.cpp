@@ -19,14 +19,14 @@
 const device_type NEOGEO_PVC_CART = &device_creator<neogeo_pvc_cart>;
 
 
-neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source) :
+neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
 	neogeo_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
 	m_pvc_prot(*this, "pvc_prot")
 {}
 
-neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_pvc_cart::neogeo_pvc_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_PVC_CART, "Neo Geo PVC Cart", tag, owner, clock, "neocart_pvc", __FILE__),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot"),
@@ -71,7 +71,7 @@ machine_config_constructor neogeo_pvc_cart::device_mconfig_additions() const
 
 const device_type NEOGEO_PVC_MSLUG5_CART = &device_creator<neogeo_pvc_mslug5_cart>;
 
-neogeo_pvc_mslug5_cart::neogeo_pvc_mslug5_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_pvc_mslug5_cart::neogeo_pvc_mslug5_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_pvc_cart(mconfig, NEOGEO_PVC_MSLUG5_CART, "Neo Geo Metal Slug 5 PVC Cart", tag, owner, clock, "neocart_mslug5", __FILE__) {}
 
 void neogeo_pvc_mslug5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
@@ -89,7 +89,7 @@ void neogeo_pvc_mslug5_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_SVC_CART = &device_creator<neogeo_pvc_svc_cart>;
 
-neogeo_pvc_svc_cart::neogeo_pvc_svc_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_pvc_svc_cart::neogeo_pvc_svc_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_pvc_cart(mconfig, NEOGEO_PVC_SVC_CART, "Neo Geo SNK vs Capcom PVC Cart", tag, owner, clock, "neocart_svc", __FILE__)
 {}
 
@@ -109,7 +109,7 @@ void neogeo_pvc_svc_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_KOF2003_CART = &device_creator<neogeo_pvc_kof2003_cart>;
 
-neogeo_pvc_kof2003_cart::neogeo_pvc_kof2003_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_pvc_kof2003_cart::neogeo_pvc_kof2003_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003_CART, "Neo Geo KOF 2003 PVC Cart", tag, owner, clock, "neocart_kof2003", __FILE__)
 {}
 
@@ -128,7 +128,7 @@ void neogeo_pvc_kof2003_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_PVC_KOF2003H_CART = &device_creator<neogeo_pvc_kof2003h_cart>;
 
-neogeo_pvc_kof2003h_cart::neogeo_pvc_kof2003h_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_pvc_kof2003h_cart::neogeo_pvc_kof2003h_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_pvc_cart(mconfig, NEOGEO_PVC_KOF2003H_CART, "Neo Geo KOF 2003 AES PVC Cart", tag, owner, clock, "neocart_kof2003h", __FILE__)
 {}
 

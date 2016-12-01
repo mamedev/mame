@@ -49,11 +49,11 @@
 // description of the motion objects
 struct atari_rle_objects_config
 {
-	struct entry { UINT16 data[8]; };
+	struct entry { uint16_t data[8]; };
 
-	UINT16          m_leftclip;           // left clip coordinate
-	UINT16          m_rightclip;          // right clip coordinate
-	UINT16          m_palettebase;        // base palette entry
+	uint16_t          m_leftclip;           // left clip coordinate
+	uint16_t          m_rightclip;          // right clip coordinate
+	uint16_t          m_palettebase;        // base palette entry
 
 	entry           m_code_entry;           // mask for the code index
 	entry           m_color_entry;          // mask for the color
@@ -78,7 +78,7 @@ class atari_rle_objects_device : public device_t,
 {
 public:
 	// construction/destruction
-	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_rle_objects_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void static_set_config(device_t &device, const atari_rle_objects_config &config);
@@ -105,27 +105,27 @@ private:
 	public:
 		sprite_parameter();
 		bool set(const atari_rle_objects_config::entry &input) { return set(input.data); }
-		bool set(const UINT16 input[8]);
-		UINT16 extract(memory_array &array, int offset) const { return (array.read(offset + m_word) >> m_shift) & m_mask; }
-		UINT16 shift() const { return m_shift; }
-		UINT16 mask() const { return m_mask; }
+		bool set(const uint16_t input[8]);
+		uint16_t extract(memory_array &array, int offset) const { return (array.read(offset + m_word) >> m_shift) & m_mask; }
+		uint16_t shift() const { return m_shift; }
+		uint16_t mask() const { return m_mask; }
 
 	private:
-		UINT16          m_word;             // word index
-		UINT16          m_shift;            // shift amount
-		UINT16          m_mask;             // final mask
+		uint16_t          m_word;             // word index
+		uint16_t          m_shift;            // shift amount
+		uint16_t          m_mask;             // final mask
 	};
 
 	// internal structure describing each object in the ROMs
 	struct object_info
 	{
-		INT16           width;
-		INT16           height;
-		INT16           xoffs;
-		INT16           yoffs;
-		UINT8           bpp;
-		const UINT16 *  table;
-		const UINT16 *  data;
+		int16_t           width;
+		int16_t           height;
+		int16_t           xoffs;
+		int16_t           yoffs;
+		uint8_t           bpp;
+		const uint16_t *  table;
+		const uint16_t *  data;
 	};
 
 	// internal helpers
@@ -136,8 +136,8 @@ private:
 	void compute_checksum();
 	void sort_and_render();
 	void draw_rle(bitmap_ind16 &bitmap, const rectangle &clip, int code, int color, int hflip, int vflip, int x, int y, int xscale, int yscale);
-	void draw_rle_zoom(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, UINT32 palette, int sx, int sy, int scalex, int scaley);
-	void draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, UINT32 palette, int sx, int sy, int scalex, int scaley);
+	void draw_rle_zoom(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, uint32_t palette, int sx, int sy, int scalex, int scaley);
+	void draw_rle_zoom_hflip(bitmap_ind16 &bitmap, const rectangle &clip, const object_info &info, uint32_t palette, int sx, int sy, int scalex, int scaley);
 	void hilite_object(bitmap_ind16 &bitmap, int hilite);
 
 	// derived state
@@ -159,7 +159,7 @@ private:
 	sprite_parameter    m_vrammask;           // mask for the VRAM target
 
 	// ROM information
-	required_region_ptr<UINT16> m_rombase;    // pointer to the base of the GFX ROM
+	required_region_ptr<uint16_t> m_rombase;    // pointer to the base of the GFX ROM
 	int                 m_objectcount;        // number of objects in the ROM
 	std::vector<object_info> m_info;               // list of info records
 
@@ -168,15 +168,15 @@ private:
 	int                 m_partial_scanline;   // partial update scanline
 
 	// control state
-	UINT8               m_control_bits;       // current control bits
-	UINT8               m_command;            // current command
-	UINT16              m_checksums[256];     // checksums for each 0x40000 bytes
+	uint8_t               m_control_bits;       // current control bits
+	uint8_t               m_command;            // current command
+	uint16_t              m_checksums[256];     // checksums for each 0x40000 bytes
 	memory_array        m_ram;
 
 	// tables
-	UINT8               m_rle_bpp[8];
-	UINT16 *            m_rle_table[8];
-	UINT16              m_rle_table_data[0x500];
+	uint8_t               m_rle_bpp[8];
+	uint16_t *            m_rle_table[8];
+	uint16_t              m_rle_table_data[0x500];
 };
 
 

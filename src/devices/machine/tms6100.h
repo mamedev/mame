@@ -94,8 +94,8 @@
 class tms6100_device : public device_t
 {
 public:
-	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void enable_4bit_mode(device_t &device) { downcast<tms6100_device &>(device).m_4bit_mode = true; }
 
@@ -113,22 +113,22 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	void handle_command(UINT8 cmd);
+	void handle_command(uint8_t cmd);
 
 	// internal state
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	bool m_reverse_bits;
 	bool m_4bit_mode;
 
-	UINT32 m_rommask;
-	UINT32 m_address;   // internal address + chipselect
-	UINT8 m_sa;         // romdata shift register
-	UINT8 m_count;      // TB/LA counter (-> PLA)
-	UINT8 m_prev_cmd;   // previous handled command
-	UINT8 m_prev_m;     // previous valid m0/m1 state
+	uint32_t m_rommask;
+	uint32_t m_address;   // internal address + chipselect
+	uint8_t m_sa;         // romdata shift register
+	uint8_t m_count;      // TB/LA counter (-> PLA)
+	uint8_t m_prev_cmd;   // previous handled command
+	uint8_t m_prev_m;     // previous valid m0/m1 state
 
-	UINT8 m_add;        // ADD/DATA pins input
-	UINT8 m_data;       // ADD/DATA pins output
+	uint8_t m_add;        // ADD/DATA pins input
+	uint8_t m_data;       // ADD/DATA pins output
 	int m_m0;
 	int m_m1;
 	int m_cs;           // chipselect pin
@@ -140,7 +140,7 @@ protected:
 class m58819_device : public tms6100_device
 {
 public:
-	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides

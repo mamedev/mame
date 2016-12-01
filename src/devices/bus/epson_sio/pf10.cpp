@@ -48,7 +48,7 @@ ROM_START( pf10 )
 	ROM_LOAD("k3pf1.bin", 0x0000, 0x2000, CRC(eef4593a) SHA1(bb176e4baf938fe58c2d32f7c46d7bb7b0627755))
 ROM_END
 
-const rom_entry *epson_pf10_device::device_rom_region() const
+const tiny_rom_entry *epson_pf10_device::device_rom_region() const
 {
 	return ROM_NAME( pf10 );
 }
@@ -91,7 +91,7 @@ machine_config_constructor epson_pf10_device::device_mconfig_additions() const
 //  epson_pf10_device - constructor
 //-------------------------------------------------
 
-epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_pf10_device::epson_pf10_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_PF10, "EPSON PF-10 Portable Floppy Unit", tag, owner, clock, "epson_pf10", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "maincpu"),

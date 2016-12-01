@@ -68,7 +68,7 @@ PCB Layout
 |----------------------------------------------------------|
 Notes:
       V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
-      Z80 clock    - 3.579545MHz [28.63636/8]
+      Z80 clock    - 3.579545MHz [28.63636/8]. /NMI, /BUSREQ and /WAIT tied high/unused.
       YM2151 clock - 3.579545MHz [28.63636/8]
       M6295 clocks - 1.022MHz [28.63636/28] and pin 7 HIGH (both)
       CXK58258     - Sony CXK58258 32k x8 SRAM (= 62256)
@@ -173,6 +173,8 @@ Protection Notes:
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "sound/3812intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 #include "machine/r2crypt.h"
@@ -201,12 +203,12 @@ void raiden2_state::machine_start()
 }
 
 /*
-UINT16 raiden2_state::rps()
+uint16_t raiden2_state::rps()
 {
     return m_maincpu->state_int(NEC_CS);
 }
 
-UINT16 raiden2_state::rpc()
+uint16_t raiden2_state::rpc()
 {
     return m_maincpu->state_int(NEC_IP);
 }
@@ -245,9 +247,9 @@ WRITE16_MEMBER(raiden2_state::m_videoram_private_w)
 
 
 
-void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
+void raiden2_state::combine32(uint32_t *val, int offset, uint16_t data, uint16_t mem_mask)
 {
-	UINT16 *dest = (UINT16 *)val + BYTE_XOR_LE(offset);
+	uint16_t *dest = (uint16_t *)val + BYTE_XOR_LE(offset);
 	COMBINE_DATA(dest);
 }
 
@@ -257,7 +259,7 @@ void raiden2_state::combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_m
 
 void raiden2_state::draw_sprites(const rectangle &cliprect)
 {
-	UINT16 *source = sprites + (0x1000/2)-4;
+	uint16_t *source = sprites + (0x1000/2)-4;
 	sprite_buffer.fill(0xf, cliprect);
 
 	gfx_element *gfx = m_gfxdecode->gfx(2);
@@ -515,20 +517,20 @@ TILE_GET_INFO_MEMBER(raiden2_state::get_text_tile_info)
 
 VIDEO_START_MEMBER(raiden2_state,raiden2)
 {
-	back_data = make_unique_clear<UINT16[]>(0x800/2);
-	fore_data =  make_unique_clear<UINT16[]>(0x800/2);
-	mid_data =  make_unique_clear<UINT16[]>(0x800/2);
-	text_data =  make_unique_clear<UINT16[]>(0x1000/2);
+	back_data = make_unique_clear<uint16_t[]>(0x800/2);
+	fore_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	mid_data =  make_unique_clear<uint16_t[]>(0x800/2);
+	text_data =  make_unique_clear<uint16_t[]>(0x1000/2);
 
 	save_pointer(NAME(back_data.get()), 0x800/2);
 	save_pointer(NAME(fore_data.get()), 0x800/2);
 	save_pointer(NAME(mid_data.get()), 0x800/2);
 	save_pointer(NAME(text_data.get()), 0x1000/2);
 
-	text_layer       = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
-	background_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	midground_layer  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
-	foreground_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	text_layer       = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64,32 );
+	background_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_back_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	midground_layer  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_mid_tile_info),this),  TILEMAP_SCAN_ROWS, 16,16, 32,32 );
+	foreground_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(raiden2_state::get_fore_tile_info),this), TILEMAP_SCAN_ROWS, 16,16, 32,32 );
 }
 
 /* screen_update_raiden2 (move to video file) */
@@ -541,10 +543,10 @@ void raiden2_state::blend_layer(bitmap_rgb32 &bitmap, const rectangle &cliprect,
 	const pen_t *pens = &m_palette->pen(0);
 	layer <<= 14;
 	for(int y = cliprect.min_y; y <= cliprect.max_y; y++) {
-		const UINT16 *src = &source.pix16(y, cliprect.min_x);
-		UINT32 *dst = &bitmap.pix32(y, cliprect.min_x);
+		const uint16_t *src = &source.pix16(y, cliprect.min_x);
+		uint32_t *dst = &bitmap.pix32(y, cliprect.min_x);
 		for(int x = cliprect.min_x; x <= cliprect.max_x; x++) {
-			UINT16 val = *src++;
+			uint16_t val = *src++;
 			if((val & 0xc000) == layer && (val & 0x000f) != 0x000f) {
 				val &= 0x07ff;
 
@@ -564,7 +566,7 @@ void raiden2_state::tilemap_draw_and_blend(screen_device &screen, bitmap_rgb32 &
 	blend_layer(bitmap, cliprect, tile_buffer, 0);
 }
 
-UINT32 raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t raiden2_state::screen_update_raiden2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	if (!(raiden2_tilemap_enable & 16)) {
@@ -622,11 +624,11 @@ INTERRUPT_GEN_MEMBER(raiden2_state::raiden2_interrupt)
 
 // Sprite encryption key upload
 
-static UINT32 sprcpt_adr, sprcpt_idx;
+static uint32_t sprcpt_adr, sprcpt_idx;
 
-static UINT16 sprcpt_flags2;
-static UINT32 sprcpt_val[2], sprcpt_flags1;
-static UINT32 sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
+static uint16_t sprcpt_flags2;
+static uint32_t sprcpt_val[2], sprcpt_flags1;
+static uint32_t sprcpt_data_1[0x100], sprcpt_data_2[0x40], sprcpt_data_3[6], sprcpt_data_4[4];
 
 void raiden2_state::sprcpt_init(void)
 {
@@ -830,18 +832,18 @@ READ16_MEMBER(raiden2_state::sprite_prot_src_seg_r)
 WRITE16_MEMBER(raiden2_state::sprite_prot_src_w)
 {
 	sprite_prot_src_addr[1] = data;
-	UINT32 src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
+	uint32_t src = (sprite_prot_src_addr[0]<<4)+sprite_prot_src_addr[1];
 
-	int x = INT16((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
-	int y = INT16((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
+	int x = int16_t((space.read_dword(src+0x08) >> 16) - (sprite_prot_x));
+	int y = int16_t((space.read_dword(src+0x04) >> 16) - (sprite_prot_y));
 
-	UINT16 head1 = space.read_word(src+cop_spr_off);
-	UINT16 head2 = space.read_word(src+cop_spr_off+2);
+	uint16_t head1 = space.read_word(src+cop_spr_off);
+	uint16_t head2 = space.read_word(src+cop_spr_off+2);
 
 	int w = (((head1 >> 8 ) & 7) + 1) << 4;
 	int h = (((head1 >> 12) & 7) + 1) << 4;
 
-	UINT16 flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
+	uint16_t flag = x-w/2 > -w && x-w/2 < cop_spr_maxx+w && y-h/2 > -h && y-h/2 < 256+h ? 1 : 0;
 
 	flag = (space.read_word(src) & 0xfffe) | flag;
 	space.write_word(src, flag);
@@ -1058,6 +1060,45 @@ static ADDRESS_MAP_START( xsedae_mem, AS_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
 	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("maincpu", 0x20000)
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( raiden2_sound_map, AS_PROGRAM, 8, raiden2_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
+	AM_RANGE(0x6002, 0x6002) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x4004, 0x4004) AM_NOP
+	AM_RANGE(0x401a, 0x401a) AM_NOP
+ADDRESS_MAP_END
+
+ADDRESS_MAP_START( zeroteam_sound_map, AS_PROGRAM, 8, raiden2_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 
@@ -1377,7 +1418,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,raiden2)
 
-	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(XTAL_28_63636MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/8)
+	MCFG_CPU_PROGRAM_MAP(raiden2_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1399,13 +1441,24 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(XTAL_28_63636MHz/8,XTAL_28_63636MHz/28,1,2)
-	// the sound z80 has /NMI, /BUSREQ and /WAIT tied high/unused
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_YM2151_ADD("ymsnd", XTAL_28_63636MHz/8)
+	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-/* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
-/* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
+	MCFG_OKIM6295_ADD("oki1", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
+	MCFG_OKIM6295_ADD("oki2", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
@@ -1436,7 +1489,8 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 
 	MCFG_MACHINE_RESET_OVERRIDE(raiden2_state,zeroteam)
 
-	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(XTAL_28_63636MHz/8)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_28_63636MHz/8)
+	MCFG_CPU_PROGRAM_MAP(zeroteam_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1459,7 +1513,20 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MCFG_VIDEO_START_OVERRIDE(raiden2_state,raiden2)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(XTAL_28_63636MHz/8, 1320000/* ? */)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_28_63636MHz/8)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000/* ? */, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 /* ROM LOADING */
@@ -3007,7 +3074,7 @@ ROM_START( xsedae )
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )   /* ADPCM samples */
 ROM_END
 
-const UINT16 raiden2_state::raiden_blended_colors[] = {
+const uint16_t raiden2_state::raiden_blended_colors[] = {
 	// bridge tunnel entrance shadow
 	0x380,
 
@@ -3055,7 +3122,7 @@ const UINT16 raiden2_state::raiden_blended_colors[] = {
 	0xffff,
 };
 
-void raiden2_state::init_blending(const UINT16 *table)
+void raiden2_state::init_blending(const uint16_t *table)
 {
 	for(auto & elem : blend_active)
 		elem = false;
@@ -3083,7 +3150,7 @@ DRIVER_INIT_MEMBER(raiden2_state,raidendx)
 	raiden2_decrypt_sprites(machine());
 }
 
-const UINT16 raiden2_state::xsedae_blended_colors[] = {
+const uint16_t raiden2_state::xsedae_blended_colors[] = {
 	0xffff,
 };
 
@@ -3095,7 +3162,7 @@ DRIVER_INIT_MEMBER(raiden2_state,xsedae)
 	/* doesn't have banking */
 }
 
-const UINT16 raiden2_state::zeroteam_blended_colors[] = {
+const uint16_t raiden2_state::zeroteam_blended_colors[] = {
 	// Player selection
 	0x37e,
 	// Boss spear shadow

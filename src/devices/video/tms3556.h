@@ -69,7 +69,7 @@ class tms3556_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms3556_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( vram_r );
 	DECLARE_WRITE8_MEMBER( vram_w );
@@ -79,7 +79,7 @@ public:
 
 	void interrupt(running_machine &machine);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -91,22 +91,22 @@ protected:
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 
-	void draw_line_empty(UINT16 *ln);
-	void draw_line_text_common(UINT16 *ln);
-	void draw_line_bitmap_common(UINT16 *ln);
-	void draw_line_text(UINT16 *ln);
-	void draw_line_bitmap(UINT16 *ln);
-	void draw_line_mixed(UINT16 *ln);
+	void draw_line_empty(uint16_t *ln);
+	void draw_line_text_common(uint16_t *ln);
+	void draw_line_bitmap_common(uint16_t *ln);
+	void draw_line_text(uint16_t *ln);
+	void draw_line_bitmap(uint16_t *ln);
+	void draw_line_mixed(uint16_t *ln);
 	void draw_line(bitmap_ind16 &bmp, int line);
 	void interrupt_start_vblank(void);
 
 private:
 	// registers
-	UINT8 m_control_regs[8];
-	UINT16 m_address_regs[8];
+	uint8_t m_control_regs[8];
+	uint16_t m_address_regs[8];
 
 	// register interface
 	int m_reg_access_phase;
@@ -115,8 +115,8 @@ private:
 	int m_bamp_written;
 	int m_colrow;
 	dma_mode_tt m_vdp_acmpxy_mode;
-	UINT16 m_vdp_acmpxy;
-	UINT16 m_vdp_acmp;
+	uint16_t m_vdp_acmpxy;
+	uint16_t m_vdp_acmp;
 	int m_init_read;
 
 	int m_scanline;             // scanline counter

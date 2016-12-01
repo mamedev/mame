@@ -8,7 +8,7 @@
     IMPLEMENTATION
 ***************************************************************************/
 
-static const UINT8 terminal_font[256*16] =
+static const uint8_t terminal_font[256*16] =
 {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 	0x00, 0x10, 0x38, 0x7c, 0xfe, 0x7c, 0x38, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -140,7 +140,7 @@ static const UINT8 terminal_font[256*16] =
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_palette(*this, "palette")
 	, m_io_term_conf(*this, "TERM_CONF")
@@ -153,7 +153,7 @@ generic_terminal_device::generic_terminal_device(const machine_config &mconfig, 
 {
 }
 
-generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+generic_terminal_device::generic_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: generic_terminal_device(mconfig, GENERIC_TERMINAL, "Generic Terminal", tag, owner, clock, "generic_terminal", __FILE__)
 {
 }
@@ -164,7 +164,7 @@ void generic_terminal_device::scroll_line()
 	memset(m_buffer + TERMINAL_WIDTH*(TERMINAL_HEIGHT-1),0x20,TERMINAL_WIDTH);
 }
 
-void generic_terminal_device::write_char(UINT8 data)
+void generic_terminal_device::write_char(uint8_t data)
 {
 	m_buffer[m_y_pos*TERMINAL_WIDTH+m_x_pos] = data;
 	m_x_pos++;
@@ -187,7 +187,7 @@ void generic_terminal_device::clear()
 	m_y_pos = 0;
 }
 
-void generic_terminal_device::term_write(UINT8 data)
+void generic_terminal_device::term_write(uint8_t data)
 {
 	if (data > 0x1f)
 	{
@@ -196,7 +196,7 @@ void generic_terminal_device::term_write(UINT8 data)
 	}
 	else
 	{
-		const UINT16 options = m_io_term_conf->read();
+		const uint16_t options = m_io_term_conf->read();
 		switch(data)
 		{
 		case 0x07: // bell
@@ -209,7 +209,7 @@ void generic_terminal_device::term_write(UINT8 data)
 			break;
 
 		case 0x09: // horizontal tab
-			m_x_pos = (std::min<UINT8>)((m_x_pos & 0xf8) + 8, TERMINAL_WIDTH - 1);
+			m_x_pos = (std::min<uint8_t>)((m_x_pos & 0xf8) + 8, TERMINAL_WIDTH - 1);
 			break;
 
 		case 0x0d: // carriage return
@@ -245,12 +245,12 @@ void generic_terminal_device::term_write(UINT8 data)
 /***************************************************************************
     VIDEO HARDWARE
 ***************************************************************************/
-UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT16 options = m_io_term_conf->read();
-	UINT16 cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	const uint16_t options = m_io_term_conf->read();
+	uint16_t cursor = m_y_pos * TERMINAL_WIDTH + m_x_pos;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	switch (options & 0x030)
 	{
@@ -258,7 +258,7 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 		m_palette->set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00));
 		break;
 	case 0x020:
-		m_palette->set_pen_color(1, rgb_t::white);
+		m_palette->set_pen_color(1, rgb_t::white());
 		break;
 	default:
 		m_palette->set_pen_color(1, rgb_t(0x00, 0xff, 0x00));
@@ -272,7 +272,7 @@ UINT32 generic_terminal_device::update(screen_device &device, bitmap_rgb32 &bitm
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT32  *p = &bitmap.pix32(sy++);
+			uint32_t  *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + TERMINAL_WIDTH; x++)
 			{
@@ -323,7 +323,7 @@ WRITE8_MEMBER( generic_terminal_device::kbd_put )
 ***************************************************************************/
 
 static MACHINE_CONFIG_FRAGMENT( generic_terminal )
-	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white)
+	MCFG_SCREEN_ADD_MONOCHROME(TERMINAL_SCREEN_TAG, RASTER, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(TERMINAL_WIDTH*8, TERMINAL_HEIGHT*10)
@@ -427,7 +427,7 @@ INPUT_PORTS_START( generic_terminal )
 	PORT_CONFSETTING(     0x000, "Green"         )
 	PORT_CONFSETTING(     0x010, "Amber"         )
 	PORT_CONFSETTING(     0x020, "White"         )
-	PORT_CONFNAME( 0x040, 0x000, "Auto CR on LF" )
+	PORT_CONFNAME( 0x040, 0x040, "Auto CR on LF" )
 	PORT_CONFSETTING(     0x000, DEF_STR(No)     )
 	PORT_CONFSETTING(     0x040, DEF_STR(Yes)    )
 	PORT_CONFNAME( 0x080, 0x000, "Auto LF on CR" )

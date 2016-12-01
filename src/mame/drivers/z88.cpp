@@ -549,8 +549,8 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)memregion("bios")->base();
-	m_ram_base = (UINT8*)m_ram->pointer();
+	m_bios = (uint8_t*)memregion("bios")->base();
+	m_ram_base = (uint8_t*)m_ram->pointer();
 
 	// configure the memory banks
 	membank("bank1")->configure_entry(0, m_bios);
@@ -576,7 +576,7 @@ void z88_state::machine_reset()
 
 READ8_MEMBER(z88_state::kb_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(offset & 0x80))
 		data &= ioport("LINE7")->read();

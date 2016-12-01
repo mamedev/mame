@@ -33,20 +33,20 @@ public:
 
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram_a;
-	required_shared_ptr<UINT8> m_videoram_b;
+	required_shared_ptr<uint8_t> m_videoram_a;
+	required_shared_ptr<uint8_t> m_videoram_b;
 
-	required_shared_ptr<UINT8> m_color_select;
-	required_shared_ptr<UINT8> m_screen_flip;
-	required_shared_ptr<UINT8> m_screenb_enable;
-	required_shared_ptr<UINT8> m_screena_enable;
+	required_shared_ptr<uint8_t> m_color_select;
+	required_shared_ptr<uint8_t> m_screen_flip;
+	required_shared_ptr<uint8_t> m_screenb_enable;
+	required_shared_ptr<uint8_t> m_screena_enable;
 
 	/* misc */
-	UINT8    m_port_select;
-	UINT8    m_main_to_sound_data;
-	UINT8    m_sound_to_main_data;
-	UINT16   m_sample_offset;
-	UINT8    m_sample_count;
+	uint8_t    m_port_select;
+	uint8_t    m_main_to_sound_data;
+	uint8_t    m_sound_to_main_data;
+	uint16_t   m_sample_offset;
+	uint8_t    m_sample_count;
 
 	/* devices */
 	required_device<address_map_bank_device> m_vrambank;
@@ -74,7 +74,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(crgolf);
 	DECLARE_PALETTE_INIT(mastrglf);
-	UINT32 screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_crgolf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(main_to_sound_callback);
 	TIMER_CALLBACK_MEMBER(sound_to_main_callback);
 	void get_pens( pen_t *pens );

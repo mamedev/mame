@@ -25,8 +25,8 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_main_ram;
-	UINT16 m_spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code
+	required_shared_ptr<uint8_t> m_main_ram;
+	uint16_t m_spriteram16[0x800/2]; // a 16-bit copy of spriteram for use with the MXC06 code
 
 	/* misc */
 	int            m_trio_control_select;
@@ -45,5 +45,5 @@ public:
 	DECLARE_WRITE8_MEMBER(actfancr_buffer_spriteram_w);
 	DECLARE_MACHINE_START(triothep);
 	DECLARE_MACHINE_RESET(triothep);
-	UINT32 screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_actfancr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

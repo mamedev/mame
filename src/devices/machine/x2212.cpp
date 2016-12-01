@@ -38,7 +38,7 @@ const device_type X2210 = &device_creator<x2210_device>;
 //  x2212_device - constructor
 //-------------------------------------------------
 
-x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x2212_device::x2212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, X2212, "X2212 NVRAM", tag, owner, clock, "x2212", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -52,7 +52,7 @@ x2212_device::x2212_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int size_data)
+x2212_device::x2212_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int size_data)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_memory_interface(mconfig, *this),
 		device_nvram_interface(mconfig, *this),
@@ -131,7 +131,7 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(emu_file &file)
 {
-	UINT8 *buffer = (UINT8 *) alloca(m_size_data);
+	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
 	file.read(buffer, m_size_data);
 	for (int byte = 0; byte < m_size_data; byte++)
 	{
@@ -152,7 +152,7 @@ void x2212_device::nvram_write(emu_file &file)
 	if (m_auto_save)
 		store();
 
-	UINT8 *buffer = (UINT8 *) alloca(m_size_data);
+	uint8_t *buffer = (uint8_t *) alloca(m_size_data);
 	for (int byte = 0; byte < m_size_data; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
 	file.write(buffer, m_size_data);
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER( x2212_device::recall )
 }
 
 
-x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x2210_device::x2210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: x2212_device(mconfig, X2210, "X2210", tag, owner, clock, "x2210", __FILE__, 0x40)
 {
 }

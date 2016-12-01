@@ -93,7 +93,7 @@ WRITE16_MEMBER(jpmsys5_state::sys5_tms34061_w)
 
 READ16_MEMBER(jpmsys5_state::sys5_tms34061_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 	int func = (offset >> 19) & 3;
 	int row = (offset >> 7) & 0x1ff;
 	int col;
@@ -142,7 +142,7 @@ WRITE16_MEMBER(jpmsys5_state::ramdac_w)
 	}
 }
 
-UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 
@@ -156,12 +156,12 @@ UINT32 jpmsys5_state::screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32
 
 	for (y = cliprect.min_y; y <= cliprect.max_y; ++y)
 	{
-		UINT8 *src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
-		UINT32 *dest = &bitmap.pix32(y, cliprect.min_x);
+		uint8_t *src = &m_tms34061->m_display.vram[(m_tms34061->m_display.dispstart & 0xffff)*2 + 256 * y];
+		uint32_t *dest = &bitmap.pix32(y, cliprect.min_x);
 
 		for (x = cliprect.min_x; x <= cliprect.max_x; x +=2)
 		{
-			UINT8 pen = src[(x-cliprect.min_x)>>1];
+			uint8_t pen = src[(x-cliprect.min_x)>>1];
 
 			/* Draw two 4-bit pixels */
 			*dest++ = m_palette->pen((pen >> 4) & 0xf);
@@ -191,7 +191,7 @@ void jpmsys5_state::sys5_draw_lamps()
 
 WRITE16_MEMBER(jpmsys5_state::rombank_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	data &= 0x1f;
 	membank("bank1")->set_base(&rom[0x20000 + 0x20000 * data]);
 }
@@ -531,11 +531,11 @@ WRITE_LINE_MEMBER(jpmsys5_state::ptm_irq)
 	m_maincpu->set_input_line(INT_6840PTM, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
+WRITE_LINE_MEMBER(jpmsys5_state::u26_o1_callback)
 {
-	if (m_mpxclk !=data)
+	if (m_mpxclk != state)
 	{
-		if (!data) //falling edge
+		if (!state) //falling edge
 		{
 			m_lamp_strobe++;
 			if (m_lamp_strobe >15)
@@ -545,7 +545,7 @@ WRITE8_MEMBER(jpmsys5_state::u26_o1_callback)
 		}
 		sys5_draw_lamps();
 	}
-	m_mpxclk = data;
+	m_mpxclk = state;
 }
 
 
@@ -672,7 +672,7 @@ static MACHINE_CONFIG_START( jpmsys5v, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 MACHINE_CONFIG_END
 
@@ -877,7 +877,7 @@ MACHINE_CONFIG_START( jpmsys5_ym, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 
@@ -930,7 +930,7 @@ MACHINE_CONFIG_START( jpmsys5, jpmsys5_state )
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(jpmsys5_state, u26_o1_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(jpmsys5_state, u26_o1_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(jpmsys5_state, ptm_irq))
 	MCFG_DEFAULT_LAYOUT(layout_jpmsys5)
 

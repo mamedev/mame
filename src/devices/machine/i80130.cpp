@@ -30,7 +30,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER( i80130_device::io_r )
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch (offset)
 	{
@@ -87,7 +87,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *i80130_device::device_rom_region() const
+const tiny_rom_entry *i80130_device::device_rom_region() const
 {
 	return ROM_NAME( i80130 );
 }
@@ -130,7 +130,7 @@ machine_config_constructor i80130_device::device_mconfig_additions() const
 //  i80130_device - constructor
 //-------------------------------------------------
 
-i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i80130_device::i80130_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I80130, "I80130", tag, owner, clock, "i80130", __FILE__),
 		m_pic(*this, "pic"),
 		m_pit(*this, "pit"),

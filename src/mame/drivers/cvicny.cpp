@@ -49,8 +49,8 @@ public:
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_WRITE8_MEMBER(segment_w );
-	UINT8 m_digit;
-	UINT8 m_digit_last;
+	uint8_t m_digit;
+	uint8_t m_digit_last;
 };
 
 WRITE8_MEMBER( cvicny_state::segment_w ) // output segments on the selected digit
@@ -68,7 +68,7 @@ WRITE8_MEMBER( cvicny_state::digit_w ) // set keyboard scanning row; set digit t
 
 READ8_MEMBER( cvicny_state::key_r )
 {
-	UINT8 data;
+	uint8_t data;
 	char kbdrow[6];
 	sprintf(kbdrow,"X%d",m_digit);
 	data = ioport(kbdrow)->read();

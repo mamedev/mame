@@ -31,16 +31,16 @@ class watchdog_timer_device : public device_t
 {
 public:
 	// construction/destruction
-	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	watchdog_timer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_vblank_count(device_t &device, const char *screen_tag, INT32 count);
+	static void static_set_vblank_count(device_t &device, const char *screen_tag, int32_t count);
 	static void static_set_time(device_t &device, attotime time);
 
 	// watchdog control
 	void watchdog_reset();
 	void watchdog_enable(bool enable = true);
-	INT32 get_vblank_counter() const { return m_counter; }
+	int32_t get_vblank_counter() const { return m_counter; }
 
 	// read/write handlers
 	DECLARE_WRITE8_MEMBER( reset_w );
@@ -63,13 +63,13 @@ private:
 	void watchdog_vblank(screen_device &screen, bool vblank_state);
 
 	// configuration data
-	INT32                   m_vblank_count; // number of VBLANKs until resetting the machine
+	int32_t                   m_vblank_count; // number of VBLANKs until resetting the machine
 	attotime                m_time;         // length of time until resetting the machine
 	const char *            m_screen_tag;   // the tag of the screen this timer tracks
 
 	// internal state
 	bool                    m_enabled;      // is the watchdog enabled?
-	INT32                   m_counter;      // counter for VBLANK tracking
+	int32_t                   m_counter;      // counter for VBLANK tracking
 	emu_timer *             m_timer;        // timer for triggering reset
 };
 

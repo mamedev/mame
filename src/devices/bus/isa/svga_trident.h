@@ -26,11 +26,11 @@ class isa16_svga_tgui9680_device :
 {
 public:
 		// construction/destruction
-		isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		isa16_svga_tgui9680_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		DECLARE_READ8_MEMBER(input_port_0_r);
 protected:

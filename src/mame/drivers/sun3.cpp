@@ -236,8 +236,8 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	optional_shared_ptr<UINT32> m_p_ram;
-	optional_shared_ptr<UINT32> m_bw2_vram;
+	optional_shared_ptr<uint32_t> m_p_ram;
+	optional_shared_ptr<uint32_t> m_bw2_vram;
 	optional_device<address_map_bank_device> m_type0space, m_type1space, m_type2space, m_type3space;
 	required_memory_region m_rom, m_idprom;
 	required_device<ram_device> m_ram;
@@ -255,25 +255,25 @@ public:
 	DECLARE_READ8_MEMBER( rtc7170_r );
 	DECLARE_WRITE8_MEMBER( rtc7170_w );
 
-	UINT32 bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(sun3_timer);
 
 private:
-	UINT32 *m_rom_ptr, *m_ram_ptr;
-	UINT8 *m_idprom_ptr;
-	UINT32 m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
-	UINT8 m_buserr;
+	uint32_t *m_rom_ptr, *m_ram_ptr;
+	uint8_t *m_idprom_ptr;
+	uint32_t m_enable, m_diag, m_dvma_enable, m_parregs[8], m_irqctrl, m_ecc[4];
+	uint8_t m_buserr;
 
-	UINT32 m_context;
-	UINT8 m_segmap[8][2048];
-	UINT32 m_pagemap[4096];
-	UINT32 m_ram_size, m_ram_size_words;
+	uint32_t m_context;
+	uint8_t m_segmap[8][2048];
+	uint32_t m_pagemap[4096];
+	uint32_t m_ram_size, m_ram_size_words;
 	bool m_bInBusErr;
 
-	UINT32 m_cache_tags[0x4000], m_cache_data[0x4000];
+	uint32_t m_cache_tags[0x4000], m_cache_data[0x4000];
 };
 
 READ32_MEMBER( sun3_state::ram_r )
@@ -385,7 +385,7 @@ WRITE32_MEMBER( sun3_state::ram_w )
 
 READ32_MEMBER( sun3_state::tl_mmu_r )
 {
-	UINT8 fc = m_maincpu->get_fc();
+	uint8_t fc = m_maincpu->get_fc();
 
 	if ((fc == 3) && !space.debugger_access())
 	{
@@ -459,8 +459,8 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 	}
 
 	// it's translation time
-	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
-	UINT32 entry = (pmeg << 4) + ((offset >> 11) & 0xf);
+	uint8_t pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
+	uint32_t entry = (pmeg << 4) + ((offset >> 11) & 0xf);
 
 	//printf("sun3: Context = %d, pmeg = %d, offset >> 15 = %x, entry = %d, page = %d\n", m_context&7, pmeg, (offset >> 15) & 0x7ff, entry, (offset >> 11) & 0xf);
 
@@ -477,7 +477,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 		m_pagemap[entry] |= PM_ACCESSED;
 
-		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
 		//printf("pmeg %d, entry %d = %08x, virt %08x => tmp %08x\n", pmeg, entry, m_pagemap[entry], offset << 2, tmp);
@@ -522,7 +522,7 @@ READ32_MEMBER( sun3_state::tl_mmu_r )
 
 WRITE32_MEMBER( sun3_state::tl_mmu_w )
 {
-	UINT8 fc = m_maincpu->get_fc();
+	uint8_t fc = m_maincpu->get_fc();
 
 	//printf("sun3: Write %08x (FC %d, mask %08x, PC=%x) to %08x\n", data, fc, mem_mask, m_maincpu->pc, offset<<1);
 
@@ -612,8 +612,8 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 	}
 
 	// it's translation time
-	UINT8 pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
-	UINT32 entry = (pmeg << 4) + ((offset >> 11) & 0xf);
+	uint8_t pmeg = m_segmap[m_context & 7][(offset >> 15) & 0x7ff];
+	uint32_t entry = (pmeg << 4) + ((offset >> 11) & 0xf);
 
 	if (m_pagemap[entry] & PM_VALID)
 	{
@@ -630,7 +630,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 
 		m_pagemap[entry] |= (PM_ACCESSED | PM_MODIFIED);
 
-		UINT32 tmp = (m_pagemap[entry] & 0x7ffff) << 11;
+		uint32_t tmp = (m_pagemap[entry] & 0x7ffff) << 11;
 		tmp |= (offset & 0x7ff);
 
 		//if (!space.debugger_access()) printf("sun3: Translated addr: %08x, type %d (page entry %08x, orig virt %08x)\n", tmp << 2, (m_pagemap[entry] >> 26) & 3, m_pagemap[entry], offset<<2);
@@ -670,7 +670,7 @@ WRITE32_MEMBER( sun3_state::tl_mmu_w )
 
 READ32_MEMBER(sun3_state::parity_r)
 {
-	UINT32 rv = m_parregs[offset];
+	uint32_t rv = m_parregs[offset];
 
 	if (offset == 0)    // clear interrupt if any
 	{
@@ -811,7 +811,7 @@ READ32_MEMBER(sun3_state::ecc_r)
 		m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
 	}
 
-	UINT32 rv = m_ecc[offset & 0xf];
+	uint32_t rv = m_ecc[offset & 0xf];
 
 	if ((offset & 0xf) == 0) rv |= 0x06000000;  // indicate each ECC board is 32MB, for 128MB total
 
@@ -836,13 +836,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(sun3_state::sun3_timer)
 	}
 }
 
-UINT32 sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 900; y++)
 	{
@@ -864,13 +864,13 @@ UINT32 sun3_state::bw2_update(screen_device &screen, bitmap_rgb32 &bitmap, const
 	return 0;
 }
 
-UINT32 sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)m_bw2_vram.target();
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)m_bw2_vram.target();
 
 	for (y = 0; y < 1100; y++)
 	{
@@ -892,13 +892,13 @@ UINT32 sun3_state::bw2_16x11_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	return 0;
 }
 
-UINT32 sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sun3_state::bw2_350_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
-	static const UINT32 palette[2] = { 0, 0xffffff };
-	UINT8 *m_vram = (UINT8 *)&m_ram_ptr[(0x100000>>2)];
+	uint8_t pixels;
+	static const uint32_t palette[2] = { 0, 0xffffff };
+	uint8_t *m_vram = (uint8_t *)&m_ram_ptr[(0x100000>>2)];
 
 	for (y = 0; y < 900; y++)
 	{
@@ -926,9 +926,9 @@ INPUT_PORTS_END
 
 void sun3_state::machine_start()
 {
-	m_rom_ptr = (UINT32 *)m_rom->base();
-	m_ram_ptr = (UINT32 *)m_ram->pointer();
-	m_idprom_ptr = (UINT8 *)m_idprom->base();
+	m_rom_ptr = (uint32_t *)m_rom->base();
+	m_ram_ptr = (uint32_t *)m_ram->pointer();
+	m_idprom_ptr = (uint8_t *)m_idprom->base();
 	m_ram_size = m_ram->size();
 	m_ram_size_words = m_ram_size >> 2;
 }

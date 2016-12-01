@@ -42,30 +42,30 @@ const device_type NES_JY_TYPEB = &device_creator<nes_jy_typeb_device>;
 const device_type NES_JY_TYPEC = &device_creator<nes_jy_typec_device>;
 
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: nes_nrom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_latch(0), m_extra_chr_bank(0), m_extra_chr_mask(0), m_bank_6000(0),
 	m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0), m_irq_down(0), irq_timer(nullptr)
 				{
 }
 
-nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_jy_typea_device::nes_jy_typea_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_JY_TYPEA, "NES Cart JY Company Type A PCB", tag, owner, clock, "nes_jya", __FILE__), m_latch(0), m_extra_chr_bank(0),
 	m_extra_chr_mask(0), m_bank_6000(0), m_irq_mode(0), m_irq_count(0), m_irq_prescale(0), m_irq_prescale_mask(0), m_irq_flip(0), m_irq_enable(0), m_irq_up(0),
 	m_irq_down(0), irq_timer(nullptr)
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: nes_jy_typea_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_jy_typeb_device::nes_jy_typeb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_jy_typea_device(mconfig, NES_JY_TYPEB, "NES Cart JY Company Type B PCB", tag, owner, clock, "nes_jyb", __FILE__)
 {
 }
 
-nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_jy_typec_device::nes_jy_typec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_jy_typeb_device(mconfig, NES_JY_TYPEC, "NES Cart JY Company Type C PCB", tag, owner, clock, "nes_jyc", __FILE__)
 {
 }
@@ -163,7 +163,7 @@ READ8_MEMBER(nes_jy_typea_device::chr_r)
 
 void nes_jy_typea_device::irq_clock(int mode, int blanked)
 {
-	bool clock = FALSE, fire = FALSE;
+	bool clock = false, fire = false;
 
 	if (m_irq_mode != mode)
 		return;
@@ -177,7 +177,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 	{
 		if ((m_irq_prescale & m_irq_prescale_mask) == 0)
 		{
-			clock = TRUE;
+			clock = true;
 			m_irq_prescale = (m_irq_prescale_mask == 7) ? ((m_irq_prescale & 0xf8) | 7) : 0xff;
 		}
 		else
@@ -188,7 +188,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 	{
 		if ((m_irq_prescale & m_irq_prescale_mask) == m_irq_prescale_mask)
 		{
-			clock = TRUE;
+			clock = true;
 			m_irq_prescale = (m_irq_prescale_mask == 7) ? (m_irq_prescale & 0xf8) : 0;
 		}
 		else
@@ -202,7 +202,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 		{
 			if (m_irq_count == 0)
 			{
-				fire = TRUE;
+				fire = true;
 				m_irq_count = 0xff;
 			}
 			else
@@ -213,7 +213,7 @@ void nes_jy_typea_device::irq_clock(int mode, int blanked)
 		{
 			if (m_irq_count == 0xff)
 			{
-				fire = TRUE;
+				fire = true;
 				m_irq_count = 0;
 			}
 			else
@@ -296,15 +296,15 @@ READ8_MEMBER(nes_jy_typea_device::read_m)
 }
 
 
-inline UINT8 nes_jy_typea_device::unscramble(UINT8 bank)
+inline uint8_t nes_jy_typea_device::unscramble(uint8_t bank)
 {
 	return BITSWAP8(bank & 0x7f,7,0,1,2,3,4,5,6);
 }
 
 void nes_jy_typea_device::update_prg()
 {
-	UINT8 exPrg = (m_reg[3] & 0x06) << 5;
-	UINT8 last = (m_reg[0] & 0x04) ? m_mmc_prg_bank[3] : 0x3f;
+	uint8_t exPrg = (m_reg[3] & 0x06) << 5;
+	uint8_t last = (m_reg[0] & 0x04) ? m_mmc_prg_bank[3] : 0x3f;
 
 	switch (m_reg[0] & 0x03)
 	{
@@ -351,9 +351,9 @@ void nes_jy_typea_device::update_chr()
 
 	// docs suggest m_reg[3] & 0x1f for chr_page below,
 	// but 45 in 1 (JY-120A) menu requires to use this (from NEStopia)
-	UINT8 chr_page = (m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2);
-	UINT32 extra_chr_base = BIT(m_reg[3], 5) ? 0 : (chr_page * 0x100);
-	UINT32 extra_chr_mask = BIT(m_reg[3], 5) ? 0xffffff : 0xff;
+	uint8_t chr_page = (m_reg[3] & 1) | ((m_reg[3] & 0x18) >> 2);
+	uint32_t extra_chr_base = BIT(m_reg[3], 5) ? 0 : (chr_page * 0x100);
+	uint32_t extra_chr_mask = BIT(m_reg[3], 5) ? 0xffffff : 0xff;
 
 	switch (m_reg[0] & 0x18)
 	{

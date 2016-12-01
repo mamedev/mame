@@ -12,14 +12,14 @@
 
 static const pen_t pens_from_color_prom[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0xff, 0x00),
 	rgb_t(0x00, 0x00, 0xff),
 	rgb_t(0x00, 0xff, 0xff),
 	rgb_t(0xff, 0x00, 0x00),
 	rgb_t(0xff, 0xff, 0x00),
 	rgb_t(0xff, 0x00, 0xff),
-	rgb_t::white
+	rgb_t::white()
 };
 
 
@@ -30,11 +30,11 @@ WRITE8_MEMBER(vicdual_state::palette_bank_w)
 }
 
 
-UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x = 0;
-	UINT8 y = cliprect.min_y;
-	UINT8 video_data = 0;
+	uint8_t x = 0;
+	uint8_t y = cliprect.min_y;
+	uint8_t video_data = 0;
 
 	while (1)
 	{
@@ -43,7 +43,7 @@ UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitm
 		if ((x & 0x07) == 0)
 		{
 			offs_t offs;
-			UINT8 char_code;
+			uint8_t char_code;
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
@@ -55,7 +55,7 @@ UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitm
 		}
 
 		/* plot the current pixel */
-		pen = (video_data & 0x80) ? rgb_t::white : rgb_t::black;
+		pen = (video_data & 0x80) ? rgb_t::white() : rgb_t::black();
 		bitmap.pix32(y, x) = pen;
 
 		/* next pixel */
@@ -80,12 +80,12 @@ UINT32 vicdual_state::screen_update_bw(screen_device &screen, bitmap_rgb32 &bitm
 }
 
 
-UINT32 vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *color_prom = (UINT8 *)m_proms->base();
-	UINT8 x = 0;
-	UINT8 y = cliprect.min_y;
-	UINT8 video_data = 0;
+	uint8_t *color_prom = (uint8_t *)m_proms->base();
+	uint8_t x = 0;
+	uint8_t y = cliprect.min_y;
+	uint8_t video_data = 0;
 	pen_t back_pen = 0;
 	pen_t fore_pen = 0;
 
@@ -96,7 +96,7 @@ UINT32 vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &b
 		if ((x & 0x07) == 0)
 		{
 			offs_t offs;
-			UINT8 char_code;
+			uint8_t char_code;
 
 			/* read the character code */
 			offs = (y >> 3 << 5) | (x >> 3);
@@ -138,7 +138,7 @@ UINT32 vicdual_state::screen_update_color(screen_device &screen, bitmap_rgb32 &b
 }
 
 
-UINT32 vicdual_state::screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vicdual_state::screen_update_bw_or_color(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (is_cabinet_color())
 		screen_update_color(screen, bitmap, cliprect);

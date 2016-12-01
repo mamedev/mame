@@ -46,41 +46,41 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_char_ram;
-	required_shared_ptr<UINT16> m_hud_ram;
-	required_shared_ptr<UINT16> m_scene_ram;
-	required_shared_ptr<UINT16> m_ground_ram;
-	required_shared_ptr<UINT16> m_object_ram;
+	required_shared_ptr<uint16_t> m_char_ram;
+	required_shared_ptr<uint16_t> m_hud_ram;
+	required_shared_ptr<uint16_t> m_scene_ram;
+	required_shared_ptr<uint16_t> m_ground_ram;
+	required_shared_ptr<uint16_t> m_object_ram;
 
 	/* video-related */
 	tilemap_t       *m_tilemap;
-	UINT8           m_ground_ctrl;
-	UINT16          m_scroll_h;
-	UINT16          m_scroll_v;
+	uint8_t           m_ground_ctrl;
+	uint16_t          m_scroll_h;
+	uint16_t          m_scroll_v;
 	std::unique_ptr<bitmap_ind16> m_front_buffer;
 	std::unique_ptr<bitmap_ind16> m_back_buffer;
 	emu_timer       *m_bufend_timer;
 	emu_timer       *m_cursor_timer;
 
 	/* Rotation Control */
-	UINT16      m_xsal;
-	UINT16      m_x0ll;
-	UINT16      m_dx0ll;
-	UINT16      m_dxll;
-	UINT16      m_ysal;
-	UINT16      m_y0ll;
-	UINT16      m_dy0ll;
-	UINT16      m_dyll;
+	uint16_t      m_xsal;
+	uint16_t      m_x0ll;
+	uint16_t      m_dx0ll;
+	uint16_t      m_dxll;
+	uint16_t      m_ysal;
+	uint16_t      m_y0ll;
+	uint16_t      m_dy0ll;
+	uint16_t      m_dyll;
 
 	/* Object palette RAM control */
-	UINT32      m_iden;
-	std::unique_ptr<UINT8[]>       m_obj_pal_ram;
-	UINT32      m_obj_pal_latch;
-	UINT32      m_obj_pal_addr;
+	uint32_t      m_iden;
+	std::unique_ptr<uint8_t[]>       m_obj_pal_ram;
+	uint32_t      m_obj_pal_latch;
+	uint32_t      m_obj_pal_addr;
 
 	/* misc */
-	UINT8       m_ctrl_reg;
-	UINT32      m_main_inten;
+	uint8_t       m_ctrl_reg;
+	uint32_t      m_main_inten;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -127,7 +127,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lockon);
-	UINT32 screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lockon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_lockon(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(cursor_callback);
 	TIMER_CALLBACK_MEMBER(bufend_callback);

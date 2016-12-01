@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVICE_H__
-#define __DEVICE_H__
+#ifndef MAME_EMU_DEVICE_H
+#define MAME_EMU_DEVICE_H
 
 
 
@@ -81,19 +81,19 @@ class device_missing_dependencies : public emu_exception { };
 
 
 // a device_type is simply a pointer to its alloc function
-typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 
 // this template function creates a stub which constructs a device
 template<class _DeviceClass>
-device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 {
 	return global_alloc_clear<_DeviceClass>(mconfig, tag, owner, clock);
 }
 
 
 // timer IDs for devices
-typedef UINT32 device_timer_id;
+typedef u32 device_timer_id;
 
 // ======================> device_t
 
@@ -111,7 +111,7 @@ class device_t : public delegate_late_bind
 		friend class device_t;
 		friend class machine_config;
 
-public:
+	public:
 		// construction/destruction
 		subdevice_list() { }
 
@@ -125,7 +125,7 @@ public:
 		auto_iterator begin() const { return m_list.begin(); }
 		auto_iterator end() const { return m_list.end(); }
 
-private:
+	private:
 		// private helpers
 		device_t *find(const std::string &name) const
 		{
@@ -149,19 +149,28 @@ private:
 		friend class device_state_interface;
 		friend class device_execute_interface;
 
-public:
+	public:
 		class auto_iterator
 		{
-public:
+		public:
+			typedef std::ptrdiff_t difference_type;
+			typedef device_interface value_type;
+			typedef device_interface *pointer;
+			typedef device_interface &reference;
+			typedef std::forward_iterator_tag iterator_category;
+
 			// construction/destruction
 			auto_iterator(device_interface *intf) : m_current(intf) { }
 
-			// required operator overrides
+			// required operator overloads
+			bool operator==(const auto_iterator &iter) const { return m_current == iter.m_current; }
 			bool operator!=(const auto_iterator &iter) const { return m_current != iter.m_current; }
 			device_interface &operator*() const { return *m_current; }
-			const auto_iterator &operator++();
+			device_interface *operator->() const { return m_current; }
+			auto_iterator &operator++();
+			auto_iterator operator++(int);
 
-private:
+		private:
 			// private state
 			device_interface *m_current;
 		};
@@ -176,8 +185,8 @@ private:
 		auto_iterator begin() const { return auto_iterator(m_head); }
 		auto_iterator end() const { return auto_iterator(nullptr); }
 
-private:
-		device_interface *      m_head;         // head of interface list
+	private:
+		device_interface *m_head;               // head of interface list
 		device_execute_interface *m_execute;    // pre-cached pointer to execute interface
 		device_memory_interface *m_memory;      // pre-cached pointer to memory interface
 		device_state_interface *m_state;        // pre-cached pointer to state interface
@@ -185,7 +194,7 @@ private:
 
 protected:
 	// construction/destruction
-	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 public:
 	virtual ~device_t();
 
@@ -200,14 +209,15 @@ public:
 	const char *source() const { return m_source.c_str(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
-	UINT32 configured_clock() const { return m_configured_clock; }
+	u32 configured_clock() const { return m_configured_clock; }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
-	const rom_entry *rom_region() const { return device_rom_region(); }
+	const std::vector<rom_entry> &rom_region_vector() const;
+	const rom_entry *rom_region() const { return rom_region_vector().data(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
-	UINT8 default_bios() const { return m_default_bios; }
-	UINT8 system_bios() const { return m_system_bios; }
+	u8 default_bios() const { return m_default_bios; }
+	u8 system_bios() const { return m_system_bios; }
 	std::string default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
@@ -245,7 +255,7 @@ public:
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
-	static void static_set_clock(device_t &device, UINT32 clock);
+	static void static_set_clock(device_t &device, u32 clock);
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
@@ -257,13 +267,13 @@ public:
 	void reset();
 
 	// clock/timing accessors
-	UINT32 clock() const { return m_clock; }
-	UINT32 unscaled_clock() const { return m_unscaled_clock; }
-	void set_unscaled_clock(UINT32 clock);
+	u32 clock() const { return m_clock; }
+	u32 unscaled_clock() const { return m_unscaled_clock; }
+	void set_unscaled_clock(u32 clock);
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
-	attotime clocks_to_attotime(UINT64 clocks) const;
-	UINT64 attotime_to_clocks(const attotime &duration) const;
+	attotime clocks_to_attotime(u64 clocks) const;
+	u64 attotime_to_clocks(const attotime &duration) const;
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
@@ -275,15 +285,15 @@ public:
 	template<typename _ItemType>
 	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, UINT32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
 	offs_t safe_pc() const;
 	offs_t safe_pcbase() const;
 
-	void set_default_bios(UINT8 bios) { m_default_bios = bios; }
-	void set_system_bios(UINT8 bios) { m_system_bios = bios; }
+	void set_default_bios(u8 bios) { m_default_bios = bios; }
+	void set_system_bios(u8 bios) { m_system_bios = bios; }
 	bool findit(bool isvalidation = false) const;
 
 	// misc
@@ -304,7 +314,7 @@ protected:
 	//------------------- begin derived class overrides
 
 	// device-level overrides
-	virtual const rom_entry *device_rom_region() const;
+	virtual const tiny_rom_entry *device_rom_region() const;
 	virtual machine_config_constructor device_mconfig_additions() const;
 	virtual ioport_constructor device_input_ports() const;
 	virtual void device_config_complete();
@@ -335,9 +345,9 @@ protected:
 	interface_list          m_interfaces;           // container for list of interfaces
 
 	// device clocks
-	UINT32                  m_configured_clock;     // originally configured device clock
-	UINT32                  m_unscaled_clock;       // current unscaled device clock
-	UINT32                  m_clock;                // current device clock, after scaling
+	u32                     m_configured_clock;     // originally configured device clock
+	u32                     m_unscaled_clock;       // current unscaled device clock
+	u32                     m_clock;                // current device clock, after scaling
 	double                  m_clock_scale;          // clock scale factor
 	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
@@ -345,8 +355,8 @@ protected:
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
-	UINT8                   m_system_bios;          // the system BIOS we wish to load
-	UINT8                   m_default_bios;         // the default system BIOS
+	u8                      m_system_bios;          // the system BIOS we wish to load
+	u8                      m_default_bios;         // the default system BIOS
 	std::string             m_default_bios_tag;     // tag of the default system BIOS
 
 private:
@@ -361,6 +371,7 @@ private:
 	bool                    m_config_complete;      // have we completed our configuration?
 	bool                    m_started;              // true if the start function has succeeded
 	finder_base *           m_auto_finder_list;     // list of objects to auto-find
+	mutable std::vector<rom_entry>  m_rom_entries;
 
 	// string formatting buffer for logerror
 	mutable util::ovectorstream m_string_buffer;
@@ -766,12 +777,19 @@ inline device_t *device_t::siblingdevice(const char *tag) const
 }
 
 
-// this operator requires device_interface to be a complete type
-inline const device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
+// these operators requires device_interface to be a complete type
+inline device_t::interface_list::auto_iterator &device_t::interface_list::auto_iterator::operator++()
 {
 	m_current = m_current->interface_next();
 	return *this;
 }
 
+inline device_t::interface_list::auto_iterator device_t::interface_list::auto_iterator::operator++(int)
+{
+	auto_iterator result(*this);
+	m_current = m_current->interface_next();
+	return result;
+}
 
-#endif  /* __DEVICE_H__ */
+
+#endif  /* MAME_EMU_DEVICE_H */

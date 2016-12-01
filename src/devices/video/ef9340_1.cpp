@@ -17,13 +17,13 @@
 const device_type EF9340_1 = &device_creator<ef9340_1_device>;
 
 
-static const UINT8 bgr2rgb[8] =
+static const uint8_t bgr2rgb[8] =
 {
 	0x00, 0x04, 0x02, 0x06, 0x01, 0x05, 0x03, 0x07
 };
 
 
-ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ef9340_1_device::ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EF9340_1, "EF9340+EF9341", tag, owner, clock, "ef9340_1", __FILE__)
 	, device_video_interface(mconfig, *this), m_line_timer(nullptr)
 //, m_start_vpos(START_Y)
@@ -84,7 +84,7 @@ void ef9340_1_device::device_timer(emu_timer &timer, device_timer_id id, int par
 }
 
 
-UINT16 ef9340_1_device::ef9340_get_c_addr(UINT8 x, UINT8 y)
+uint16_t ef9340_1_device::ef9340_get_c_addr(uint8_t x, uint8_t y)
 {
 	if ( ( y & 0x18 ) == 0x18 )
 	{
@@ -113,9 +113,9 @@ void ef9340_1_device::ef9340_inc_c()
 }
 
 
-UINT16 ef9340_1_device::external_chargen_address(UINT8 b, UINT8 slice)
+uint16_t ef9340_1_device::external_chargen_address(uint8_t b, uint8_t slice)
 {
-	UINT8 cc = b & 0x7f;
+	uint8_t cc = b & 0x7f;
 
 	if ( slice & 8 )
 	{
@@ -127,7 +127,7 @@ UINT16 ef9340_1_device::external_chargen_address(UINT8 b, UINT8 slice)
 }
 
 
-void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
+void ef9340_1_device::ef9341_write( uint8_t command, uint8_t b, uint8_t data )
 {
 	logerror("ef9341 %s write, t%s, data %02X\n", command ? "command" : "data", b ? "B" : "A", data );
 
@@ -174,7 +174,7 @@ void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 	{
 		if ( b )
 		{
-			UINT16 addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
+			uint16_t addr = ef9340_get_c_addr( m_ef9340.X, m_ef9340.Y ) & 0x3ff;
 
 			m_ef9341.TB = data;
 			m_ef9341.busy = 0x80;
@@ -204,9 +204,9 @@ void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 
 				case 0x80:  /* Write slice */
 					{
-						UINT8 a = m_ef934x_ram_a[addr];
-						UINT8 b = m_ef934x_ram_b[addr];
-						UINT8 slice = ( m_ef9340.M & 0x0f ) % 10;
+						uint8_t a = m_ef934x_ram_a[addr];
+						uint8_t b = m_ef934x_ram_b[addr];
+						uint8_t slice = ( m_ef9340.M & 0x0f ) % 10;
 
 						if ( b >= 0xa0 )
 						{
@@ -232,9 +232,9 @@ void ef9340_1_device::ef9341_write( UINT8 command, UINT8 b, UINT8 data )
 }
 
 
-UINT8 ef9340_1_device::ef9341_read( UINT8 command, UINT8 b )
+uint8_t ef9340_1_device::ef9341_read( uint8_t command, uint8_t b )
 {
-	UINT8   data;
+	uint8_t   data;
 
 	logerror("ef9341 %s read, t%s\n", command ? "command" : "data", b ? "B" : "A" );
 	if ( command )
@@ -301,12 +301,12 @@ void ef9340_1_device::ef9340_scanline(int vpos)
 
 		for ( int x = 0; x < 40; x++ )
 		{
-			UINT16 addr = ef9340_get_c_addr( x, y_row );
-			UINT8 a = m_ef934x_ram_a[addr];
-			UINT8 b = m_ef934x_ram_b[addr];
-			UINT8 fg = 0;
-			UINT8 bg = 0;
-			UINT8 char_data = 0x00;
+			uint16_t addr = ef9340_get_c_addr( x, y_row );
+			uint8_t a = m_ef934x_ram_a[addr];
+			uint8_t b = m_ef934x_ram_b[addr];
+			uint8_t fg = 0;
+			uint8_t bg = 0;
+			uint8_t char_data = 0x00;
 
 			if ( a & 0x80 )
 			{

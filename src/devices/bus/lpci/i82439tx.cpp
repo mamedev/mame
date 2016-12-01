@@ -16,7 +16,7 @@
 const device_type I82439TX = &device_creator<i82439tx_device>;
 
 
-i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: northbridge_device(mconfig, I82439TX, "Intel 82439TX", tag, owner, clock, "i82439tx", __FILE__),
 	pci_device_interface( mconfig, *this ),
 	m_cpu_tag( nullptr ),
@@ -26,7 +26,7 @@ i82439tx_device::i82439tx_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-void i82439tx_device::i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t end)
+void i82439tx_device::i82439tx_configure_memory(uint8_t val, offs_t begin, offs_t end)
 {
 	switch (val & 0x03)
 	{
@@ -53,9 +53,9 @@ void i82439tx_device::i82439tx_configure_memory(UINT8 val, offs_t begin, offs_t 
     PCI INTERFACE
 ***************************************************************************/
 
-UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
+uint32_t i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask)
 {
-	UINT32 result;
+	uint32_t result;
 
 	if (function != 0)
 		return 0;
@@ -142,7 +142,7 @@ UINT32 i82439tx_device::pci_read(pci_bus_device *pcibus, int function, int offse
 	return result;
 }
 
-void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask)
+void i82439tx_device::pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask)
 {
 	if (function != 0)
 		return;

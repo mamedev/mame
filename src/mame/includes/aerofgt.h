@@ -32,14 +32,14 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg1videoram;
-	optional_shared_ptr<UINT16> m_bg2videoram;
-	optional_shared_ptr<UINT16> m_rasterram;
-	optional_shared_ptr<UINT16> m_bitmapram;
-	optional_shared_ptr<UINT16> m_spriteram1;
-	optional_shared_ptr<UINT16> m_spriteram2;
-	required_shared_ptr<UINT16> m_spriteram3;
-	optional_shared_ptr<UINT16> m_tx_tilemap_ram;
+	required_shared_ptr<uint16_t> m_bg1videoram;
+	optional_shared_ptr<uint16_t> m_bg2videoram;
+	optional_shared_ptr<uint16_t> m_rasterram;
+	optional_shared_ptr<uint16_t> m_bitmapram;
+	optional_shared_ptr<uint16_t> m_spriteram1;
+	optional_shared_ptr<uint16_t> m_spriteram2;
+	required_shared_ptr<uint16_t> m_spriteram3;
+	optional_shared_ptr<uint16_t> m_tx_tilemap_ram;
 
 	/* devices referenced above */
 	required_device<cpu_device> m_maincpu;
@@ -58,21 +58,21 @@ public:
 	/* video-related */
 	tilemap_t   *m_bg1_tilemap;
 	tilemap_t   *m_bg2_tilemap;
-	UINT8     m_gfxbank[8];
-	UINT16    m_bank[4];
-	UINT16    m_bg1scrollx;
-	UINT16    m_bg1scrolly;
-	UINT16    m_bg2scrollx;
-	UINT16    m_bg2scrolly;
-	UINT16    m_wbbc97_bitmap_enable;
+	uint8_t     m_gfxbank[8];
+	uint16_t    m_bank[4];
+	uint16_t    m_bg1scrollx;
+	uint16_t    m_bg1scrolly;
+	uint16_t    m_bg2scrollx;
+	uint16_t    m_bg2scrolly;
+	uint16_t    m_wbbc97_bitmap_enable;
 	int       m_charpalettebank;
 	int       m_spritepalettebank;
 	int       m_sprite_gfx;
 	int       m_spikes91_lookup;
-	UINT32 aerofgt_tile_callback( UINT32 code );
+	uint32_t aerofgt_tile_callback( uint32_t code );
 
-	UINT32 aerofgt_old_tile_callback( UINT32 code );
-	UINT32 aerofgt_ol2_tile_callback( UINT32 code );
+	uint32_t aerofgt_old_tile_callback( uint32_t code );
+	uint32_t aerofgt_ol2_tile_callback( uint32_t code );
 
 	/* misc */
 	int       m_pending_command;
@@ -120,16 +120,16 @@ public:
 	DECLARE_VIDEO_START(turbofrc);
 	DECLARE_VIDEO_START(wbbc97);
 	DECLARE_DRIVER_INIT(banked_oki);
-	UINT32 screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_karatblz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spinlbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_turbofrc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aerofgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pspikes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spikes91(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pspikesb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_karatblz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spinlbrk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_turbofrc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aerofgt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aerfboot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aerfboo2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_wbbc97(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void aerofgt_register_state_globals(  );
 	void setbank( tilemap_t *tmap, int num, int bank );
 	void aerfboo2_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int chip, int chip_disabled_pri );

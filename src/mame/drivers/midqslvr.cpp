@@ -40,15 +40,15 @@ public:
 	{
 	}
 
-	std::unique_ptr<UINT32[]> m_bios_ram;
-	std::unique_ptr<UINT32[]> m_bios_ext1_ram;
-	std::unique_ptr<UINT32[]> m_bios_ext2_ram;
-	std::unique_ptr<UINT32[]> m_bios_ext3_ram;
-	std::unique_ptr<UINT32[]> m_bios_ext4_ram;
-	std::unique_ptr<UINT32[]> m_isa_ram1;
-	std::unique_ptr<UINT32[]> m_isa_ram2;
-	UINT8 m_mtxc_config_reg[256];
-	UINT8 m_piix4_config_reg[4][256];
+	std::unique_ptr<uint32_t[]> m_bios_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ext1_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ext2_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ext3_ram;
+	std::unique_ptr<uint32_t[]> m_bios_ext4_ram;
+	std::unique_ptr<uint32_t[]> m_isa_ram1;
+	std::unique_ptr<uint32_t[]> m_isa_ram2;
+	uint8_t m_mtxc_config_reg[256];
+	uint8_t m_piix4_config_reg[4][256];
 
 	DECLARE_WRITE32_MEMBER( isa_ram1_w );
 	DECLARE_WRITE32_MEMBER( isa_ram2_w );
@@ -67,7 +67,7 @@ public:
 
 // Intel 82439TX System Controller (MTXC)
 
-static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t mtxc_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 //  osd_printf_debug("MTXC: read %d, %02X\n", function, reg);
@@ -78,7 +78,7 @@ static UINT8 mtxc_config_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_mtxc_config_reg[reg];
 }
 
-static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void mtxc_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 	printf("MTXC: write %d, %02X, %02X\n",  function, reg, data);
@@ -170,9 +170,9 @@ void midqslvr_state::intel82439tx_init()
 	m_mtxc_config_reg[0x65] = 0x02;
 }
 
-static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82439tx_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= mtxc_config_r(busdevice, device, function, reg + 3) << 24;
@@ -192,7 +192,7 @@ static UINT32 intel82439tx_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -214,7 +214,7 @@ static void intel82439tx_pci_w(device_t *busdevice, device_t *device, int functi
 
 // Intel 82371AB PCI-to-ISA / IDE bridge (PIIX4)
 
-static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
+static uint8_t piix4_config_r(device_t *busdevice, device_t *device, int function, int reg)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 	address_space &space = state->m_maincpu->space( AS_PROGRAM );
@@ -226,14 +226,14 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 
 	if(reg == 0xe)
 	{
-		const UINT8 header_type_val[4] = { 0x80, 0x00, 0x00, 0x00 };
+		const uint8_t header_type_val[4] = { 0x80, 0x00, 0x00, 0x00 };
 		return header_type_val[function];
 	}
 
 	if((reg & 0xfc) == 0x8)
 	{
 		/* TODO: reg 8 indicates Revision ID */
-		const UINT32 class_code_val[4] = { 0x06010000, 0x01018000, 0x0c030000, 0x06800000 };
+		const uint32_t class_code_val[4] = { 0x06010000, 0x01018000, 0x0c030000, 0x06800000 };
 
 		return (((class_code_val[function]) >> (reg & 3)*8) & 0xff);
 	}
@@ -243,7 +243,7 @@ static UINT8 piix4_config_r(device_t *busdevice, device_t *device, int function,
 	return state->m_piix4_config_reg[function][reg];
 }
 
-static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, UINT8 data)
+static void piix4_config_w(device_t *busdevice, device_t *device, int function, int reg, uint8_t data)
 {
 	midqslvr_state *state = busdevice->machine().driver_data<midqslvr_state>();
 	printf("PIIX4: write %d, %02X, %02X\n", function, reg, data);
@@ -253,9 +253,9 @@ static void piix4_config_w(device_t *busdevice, device_t *device, int function, 
 	state->m_piix4_config_reg[function][reg] = data;
 }
 
-static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t intel82371ab_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
-	UINT32 r = 0;
+	uint32_t r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
 		r |= piix4_config_r(busdevice, device, function, reg + 3) << 24;
@@ -275,7 +275,7 @@ static UINT32 intel82371ab_pci_r(device_t *busdevice, device_t *device, int func
 	return r;
 }
 
-static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void intel82371ab_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	if (ACCESSING_BITS_24_31)
 	{
@@ -385,13 +385,13 @@ ADDRESS_MAP_END
 
 void midqslvr_state::machine_start()
 {
-	m_bios_ram = std::make_unique<UINT32[]>(0x10000/4);
-	m_bios_ext1_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_ext2_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_ext3_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_bios_ext4_ram = std::make_unique<UINT32[]>(0x4000/4);
-	m_isa_ram1 = std::make_unique<UINT32[]>(0x4000/4);
-	m_isa_ram2 = std::make_unique<UINT32[]>(0x4000/4);
+	m_bios_ram = std::make_unique<uint32_t[]>(0x10000/4);
+	m_bios_ext1_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_ext2_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_ext3_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_bios_ext4_ram = std::make_unique<uint32_t[]>(0x4000/4);
+	m_isa_ram1 = std::make_unique<uint32_t[]>(0x4000/4);
+	m_isa_ram2 = std::make_unique<uint32_t[]>(0x4000/4);
 	intel82439tx_init();
 
 }

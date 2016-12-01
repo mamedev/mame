@@ -53,7 +53,7 @@ protected:
 	bool                            m_create_ok;
 
 	// methods
-	virtual void hook_load(std::string filename, bool softlist);
+	virtual void hook_load(const std::string &filename);
 	virtual void handle() override;
 
 private:
@@ -65,7 +65,7 @@ private:
 	std::string                     m_software_info_name;
 
 	// methods
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	void test_create(bool &can_create, bool &need_confirm);
 	void load_software_part();
 };

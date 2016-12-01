@@ -64,7 +64,7 @@ ioport_constructor joystick_interface_device::device_input_ports() const
 //  joystick_interface_device - constructor
 //-------------------------------------------------
 
-joystick_interface_device::joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+joystick_interface_device::joystick_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, JOYSTICK_INTERFACE, "Laser/VZ Joystick Interface", tag, owner, clock, "joystick", __FILE__),
 	device_ioexp_interface(mconfig, *this),
 	m_joy0(*this, "joystick_0"),
@@ -98,7 +98,7 @@ void joystick_interface_device::device_reset()
 
 READ8_MEMBER( joystick_interface_device::joystick_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(offset, 0)) data &= m_joy0->read();
 	if (!BIT(offset, 1)) data &= m_joy0_arm->read();

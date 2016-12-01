@@ -37,7 +37,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s100_mds_ad_device::device_rom_region() const
+const tiny_rom_entry *s100_mds_ad_device::device_rom_region() const
 {
 	return ROM_NAME( mds_ad );
 }
@@ -82,7 +82,7 @@ machine_config_constructor s100_mds_ad_device::device_mconfig_additions() const
 //  s100_mds_ad_device - constructor
 //-------------------------------------------------
 
-s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_mds_ad_device::s100_mds_ad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_MDS_AD, "MDS-A-D", tag, owner, clock, "nsmdsad", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_floppy0(*this, "floppy0"),
@@ -116,7 +116,7 @@ void s100_mds_ad_device::device_reset()
 //  s100_smemr_r - memory read
 //-------------------------------------------------
 
-UINT8 s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
+uint8_t s100_mds_ad_device::s100_smemr_r(address_space &space, offs_t offset)
 {
 	return 0;
 }

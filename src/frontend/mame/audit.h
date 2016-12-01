@@ -105,8 +105,8 @@ public:
 		audit_status status() const { return m_status; }
 		audit_substatus substatus() const { return m_substatus; }
 		const char *name() const { return m_name; }
-		UINT64 expected_length() const { return m_explength; }
-		UINT64 actual_length() const { return m_length; }
+		uint64_t expected_length() const { return m_explength; }
+		uint64_t actual_length() const { return m_length; }
 		const util::hash_collection &expected_hashes() const { return m_exphashes; }
 		const util::hash_collection &actual_hashes() const { return m_hashes; }
 		device_t *shared_device() const { return m_shared_device; }
@@ -118,13 +118,13 @@ public:
 			m_substatus = substatus;
 		}
 
-		void set_actual(const util::hash_collection &hashes, UINT64 length = 0)
+		void set_actual(const util::hash_collection &hashes, uint64_t length = 0)
 		{
 			m_hashes = hashes;
 			m_length = length;
 		}
 
-		void set_actual(util::hash_collection &&hashes, UINT64 length = 0)
+		void set_actual(util::hash_collection &&hashes, uint64_t length = 0)
 		{
 			m_hashes = std::move(hashes);
 			m_length = length;
@@ -141,8 +141,8 @@ public:
 		audit_status        m_status;               // status of audit on this item
 		audit_substatus     m_substatus;            // finer-detail status
 		const char *        m_name;                 // name of item
-		UINT64              m_explength;            // expected length of item
-		UINT64              m_length;               // actual length of item
+		uint64_t              m_explength;            // expected length of item
+		uint64_t              m_length;               // actual length of item
 		util::hash_collection     m_exphashes;            // expected hash data
 		util::hash_collection     m_hashes;               // actual hash information
 		device_t *          m_shared_device;        // device that shares the rom
@@ -158,7 +158,7 @@ public:
 	// audit operations
 	summary audit_media(const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_device(device_t &device, const char *validation = AUDIT_VALIDATE_FULL);
-	summary audit_software(const char *list_name, const software_info *swinfo, const char *validation = AUDIT_VALIDATE_FULL);
+	summary audit_software(const std::string &list_name, const software_info *swinfo, const char *validation = AUDIT_VALIDATE_FULL);
 	summary audit_samples();
 	summary summarize(const char *name, std::ostream *output = nullptr) const;
 
@@ -168,7 +168,7 @@ private:
 	audit_record &audit_one_rom(const rom_entry *rom);
 	audit_record &audit_one_disk(const rom_entry *rom, const char *locationtag);
 	void compute_status(audit_record &record, const rom_entry *rom, bool found);
-	device_t *find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, UINT64 romlength);
+	device_t *find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength);
 
 	// internal state
 	record_list                 m_record_list;

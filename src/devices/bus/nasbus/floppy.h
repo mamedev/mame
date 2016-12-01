@@ -26,7 +26,7 @@ class nascom_fdc_device : public device_t, public device_nasbus_card_interface
 {
 public:
 	// construction/destruction
-	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nascom_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(select_r);
 	DECLARE_WRITE8_MEMBER(select_w);
@@ -52,7 +52,7 @@ private:
 	floppy_image_device *m_floppy;
 	emu_timer *m_motor;
 
-	UINT8 m_select;
+	uint8_t m_select;
 };
 
 // device type definition

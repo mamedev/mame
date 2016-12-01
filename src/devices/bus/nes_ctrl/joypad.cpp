@@ -173,36 +173,36 @@ machine_config_constructor nes_arcstick_device::device_mconfig_additions() const
 //  nes_joypad_device - constructor
 //-------------------------------------------------
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 					device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 
-nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_joypad_device::nes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NES_JOYPAD, "Nintendo NES / FC Control Pad", tag, owner, clock, "nes_joypad", __FILE__),
 					device_nes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"), m_latch(0)
 {
 }
 
-nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_fcpad2_device::nes_fcpad2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					nes_joypad_device(mconfig, NES_FCPAD_P2, "Nintendo Family Computer P2 Pad", tag, owner, clock, "nes_fcpad2", __FILE__)
 {
 }
 
-nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_ccpadl_device::nes_ccpadl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					nes_joypad_device(mconfig, NES_CCPAD_LEFT, "FC Crazy Climber Left Pad", tag, owner, clock, "nes_ccpadl", __FILE__)
 {
 }
 
-nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_ccpadr_device::nes_ccpadr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					nes_joypad_device(mconfig, NES_CCPAD_RIGHT, "FC Crazy Climber Right Pad", tag, owner, clock, "nes_ccpadr", __FILE__)
 {
 }
 
-nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nes_arcstick_device::nes_arcstick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						nes_joypad_device(mconfig, NES_ARCSTICK, "Nintendo Family Computer Arcade Stick", tag, owner, clock, "nes_arcstick", __FILE__),
 						m_daisychain(*this, "subexp"),
 						m_cfg(*this, "CONFIG")
@@ -234,16 +234,16 @@ void nes_joypad_device::device_reset()
 //  read
 //-------------------------------------------------
 
-UINT8 nes_joypad_device::read_bit0()
+uint8_t nes_joypad_device::read_bit0()
 {
-	UINT8 ret = m_latch & 1;
+	uint8_t ret = m_latch & 1;
 	m_latch >>= 1;
 	return ret;
 }
 
-UINT8 nes_fcpad2_device::read_exp(offs_t offset)
+uint8_t nes_fcpad2_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (!offset)    // microphone input
 		ret |= m_joypad->read() & 0x04;
 
@@ -256,9 +256,9 @@ UINT8 nes_fcpad2_device::read_exp(offs_t offset)
 // with each other? currently, we only support the following setup:
 // if the first pad is set as P1, the daisy chained pad is checked
 // for P2 only, and vice versa.
-UINT8 nes_arcstick_device::read_exp(offs_t offset)
+uint8_t nes_arcstick_device::read_exp(offs_t offset)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	if (offset == 0)    //$4016
 	{
 		if ((m_cfg->read() & 2) == 0)   // we are P1 input
@@ -287,7 +287,7 @@ UINT8 nes_arcstick_device::read_exp(offs_t offset)
 //  write
 //-------------------------------------------------
 
-void nes_joypad_device::write(UINT8 data)
+void nes_joypad_device::write(uint8_t data)
 {
 	if (data & 0x01)
 		return;
@@ -295,7 +295,7 @@ void nes_joypad_device::write(UINT8 data)
 	m_latch = m_joypad->read();
 }
 
-void nes_fcpad2_device::write(UINT8 data)
+void nes_fcpad2_device::write(uint8_t data)
 {
 	if (data & 0x01)
 		return;
@@ -304,7 +304,7 @@ void nes_fcpad2_device::write(UINT8 data)
 	m_latch = m_joypad->read() & ~0x04;
 }
 
-void nes_arcstick_device::write(UINT8 data)
+void nes_arcstick_device::write(uint8_t data)
 {
 	m_daisychain->write(data);
 

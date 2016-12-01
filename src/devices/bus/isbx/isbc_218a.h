@@ -29,7 +29,7 @@ class isbc_218a_device : public device_t,
 {
 public:
 	// construction/destruction
-	isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	isbc_218a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -44,12 +44,12 @@ protected:
 	virtual void device_reset() override;
 
 	// device_isbx_card_interface overrides
-	virtual UINT8 mcs0_r(address_space &space, offs_t offset) override;
-	virtual void mcs0_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 mcs1_r(address_space &space, offs_t offset) override;
-	virtual void mcs1_w(address_space &space, offs_t offset, UINT8 data) override;
-	virtual UINT8 mdack_r(address_space &space, offs_t offset) override;
-	virtual void mdack_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t mcs0_r(address_space &space, offs_t offset) override;
+	virtual void mcs0_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t mcs1_r(address_space &space, offs_t offset) override;
+	virtual void mcs1_w(address_space &space, offs_t offset, uint8_t data) override;
+	virtual uint8_t mdack_r(address_space &space, offs_t offset) override;
+	virtual void mdack_w(address_space &space, offs_t offset, uint8_t data) override;
 	virtual void opt0_w(int state) override;
 
 private:

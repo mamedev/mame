@@ -235,7 +235,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")                   PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // No physical toggle
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("kbrow.9")
@@ -266,11 +266,11 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{
-		PALETTE_INIT_NAME( amstrad_cpc_green )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc_green )(*m_palette);
 	}
 	else
 	{
-		PALETTE_INIT_NAME( amstrad_cpc )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc )(*m_palette);
 	}
 }
 
@@ -627,7 +627,7 @@ static INPUT_PORTS_START( gx4000 )
 
 	PORT_START("kbrow.3")
 	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_START ) PORT_NAME(DEF_STR(Pause))
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
 	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.4")

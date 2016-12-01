@@ -21,20 +21,17 @@
 // - T15 tape drive
 // - Software list to load optional ROMs
 // - Beeper
+// - Correct character generator ROMs (a huge "thank you" to Ansgar Kueckes for the dumps!)
 // What's not yet in:
 // - Better naming of tape drive image (it's now "magt", should be "t15")
 // - Better documentation of this file
 // What's wrong:
-// - I'm using character generator from HP64K (another driver of mine): no known dump of the original one
 // - Speed, as usual
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/hp9845.h"
 #include "softlist.h"
-#include "cpu/hphybrid/hphybrid.h"
-#include "machine/hp_taco.h"
 #include "bus/hp_optroms/hp_optrom.h"
-#include "sound/beep.h"
 
 #define BIT_MASK(n) (1U << (n))
 
@@ -92,141 +89,16 @@ public:
 		driver_device(mconfig, type, tag)
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 static INPUT_PORTS_START( hp9845 )
 INPUT_PORTS_END
 
-class hp9845b_state : public driver_device
+uint32_t hp9845_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-public:
-	hp9845b_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device(mconfig, type, tag),
-				m_lpu(*this , "lpu"),
-				m_ppu(*this , "ppu"),
-				m_screen(*this , "screen"),
-				m_palette(*this , "palette"),
-				m_gv_timer(*this , "gv_timer"),
-		m_io_key0(*this , "KEY0"),
-		m_io_key1(*this , "KEY1"),
-		m_io_key2(*this , "KEY2"),
-		m_io_key3(*this , "KEY3"),
-		m_t15(*this , "t15"),
-		m_beeper(*this , "beeper"),
-		m_beep_timer(*this , "beep_timer")
-	{ }
-
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-
-		virtual void machine_start() override;
-		virtual void machine_reset() override;
-
-		TIMER_DEVICE_CALLBACK_MEMBER(scanline_timer);
-		TIMER_DEVICE_CALLBACK_MEMBER(gv_timer);
-
-		void vblank_w(screen_device &screen, bool state);
-
-		void set_graphic_mode(bool graphic);
-	DECLARE_READ16_MEMBER(graphic_r);
-	DECLARE_WRITE16_MEMBER(graphic_w);
-		attotime time_to_gv_mem_availability(void) const;
-		void advance_gv_fsm(bool ds , bool trigger);
-		void update_graphic_bits(void);
-
-		IRQ_CALLBACK_MEMBER(irq_callback);
-	void update_irq(void);
-
-	TIMER_DEVICE_CALLBACK_MEMBER(kb_scan);
-	DECLARE_READ16_MEMBER(kb_scancode_r);
-	DECLARE_READ16_MEMBER(kb_status_r);
-	DECLARE_WRITE16_MEMBER(kb_irq_clear_w);
-	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off);
-
-		DECLARE_WRITE8_MEMBER(pa_w);
-
-		DECLARE_WRITE_LINE_MEMBER(t15_irq_w);
-		DECLARE_WRITE_LINE_MEMBER(t15_flg_w);
-		DECLARE_WRITE_LINE_MEMBER(t15_sts_w);
-
-private:
-		required_device<hp_5061_3001_cpu_device> m_lpu;
-		required_device<hp_5061_3001_cpu_device> m_ppu;
-		required_device<screen_device> m_screen;
-	required_device<palette_device> m_palette;
-		required_device<timer_device> m_gv_timer;
-	required_ioport m_io_key0;
-	required_ioport m_io_key1;
-	required_ioport m_io_key2;
-	required_ioport m_io_key3;
-		required_device<hp_taco_device> m_t15;
-	required_device<beep_device> m_beeper;
-	required_device<timer_device> m_beep_timer;
-
-		void set_video_mar(UINT16 mar);
-		void video_fill_buff(bool buff_idx);
-		void video_render_buff(unsigned video_scanline , unsigned line_in_row, bool buff_idx);
-		void graphic_video_render(unsigned video_scanline);
-
-	// Character generator
-	const UINT8 *m_chargen;
-
-		// Text mode video I/F
-		typedef struct {
-				UINT8 chars[ 80 ];
-				UINT8 attrs[ 80 ];
-				bool full;
-		} video_buffer_t;
-
-	bitmap_rgb32 m_bitmap;
-		offs_t m_video_mar;
-		UINT16 m_video_word;
-		bool m_video_load_mar;
-		bool m_video_first_mar;
-		bool m_video_byte_idx;
-		UINT8 m_video_attr;
-		bool m_video_buff_idx;
-		bool m_video_blanked;
-		video_buffer_t m_video_buff[ 2 ];
-
-		// Graphic video
-		typedef enum {
-				GV_STAT_RESET,
-				GV_STAT_WAIT_DS_0 = GV_STAT_RESET,
-				GV_STAT_WAIT_TRIG_0,
-				GV_STAT_WAIT_MEM_0,
-				GV_STAT_WAIT_DS_1,
-				GV_STAT_WAIT_DS_2,
-				GV_STAT_WAIT_TRIG_1,
-				GV_STAT_WAIT_MEM_1,
-				GV_STAT_WAIT_MEM_2
-		} gv_fsm_state_t;
-
-		bool m_graphic_sel;
-		gv_fsm_state_t m_gv_fsm_state;
-		bool m_gv_int_en;
-		bool m_gv_dma_en;
-		bool m_gv_ready;
-		UINT8 m_gv_cmd; // U65 (GC)
-		UINT16 m_gv_data_w;     // U29, U45, U28 & U44 (GC)
-		UINT16 m_gv_data_r;     // U59 & U60 (GC)
-		UINT16 m_gv_io_counter; // U1, U2, U14 & U15 (GC)
-		UINT16 m_gv_cursor_w;   // U38 & U39 (GS)
-		UINT16 m_gv_cursor_x;   // U31 & U23 (GS)
-		UINT16 m_gv_cursor_y;   // U15 & U8 (GS)
-		bool m_gv_cursor_gc;    // U8 (GS)
-		bool m_gv_cursor_fs;    // U8 (GS)
-		std::vector<UINT16> m_graphic_mem;
-
-		// Interrupt handling
-		UINT8 m_irl_pending;
-		UINT8 m_irh_pending;
-
-		// State of keyboard
-		ioport_value m_kb_state[ 4 ];
-		UINT8 m_kb_scancode;
-		UINT16 m_kb_status;
-};
+	return 0;
+}
 
 static INPUT_PORTS_START(hp9845b)
 		// Keyboard is arranged in a 8 x 16 matrix. Of the 128 possible positions, 118 are used.
@@ -372,12 +244,25 @@ static INPUT_PORTS_START(hp9845b)
 
 INPUT_PORTS_END
 
-UINT32 hp9845_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+hp9845b_state::hp9845b_state(const machine_config &mconfig, device_type type, const char *tag) :
+			  driver_device(mconfig, type, tag),
+			  m_lpu(*this , "lpu"),
+			  m_ppu(*this , "ppu"),
+			  m_screen(*this , "screen"),
+			  m_palette(*this , "palette"),
+			  m_gv_timer(*this , "gv_timer"),
+			  m_io_key0(*this , "KEY0"),
+			  m_io_key1(*this , "KEY1"),
+			  m_io_key2(*this , "KEY2"),
+			  m_io_key3(*this , "KEY3"),
+			  m_t15(*this , "t15"),
+			  m_beeper(*this , "beeper"),
+			  m_beep_timer(*this , "beep_timer"),
+			  m_io_slot0(*this , "slot0")
 {
-	return 0;
 }
 
-UINT32 hp9845b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp9845b_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 		if (m_graphic_sel) {
 				copybitmap(bitmap, m_bitmap, 0, 0, GVIDEO_HBEND, GVIDEO_VBEND, cliprect);
@@ -394,39 +279,54 @@ void hp9845b_state::machine_start()
 
 		m_chargen = memregion("chargen")->base();
 
+	m_optional_chargen = memregion("optional_chargen")->base();
+
 				m_graphic_mem.resize(GVIDEO_MEM_SIZE);
+}
+
+void hp9845b_state::device_reset()
+{
+	// FLG & STS are to be reset before sub-devices,
+	// because the latter may set the former in their own reset functions
+	m_flg_status = 0;
+	m_sts_status = 0;
 }
 
 void hp9845b_state::machine_reset()
 {
-		m_lpu->halt_w(1);
-		m_ppu->halt_w(0);
+	m_lpu->halt_w(1);
+	m_ppu->halt_w(0);
 
-		// Some sensible defaults
-		m_video_mar = VIDEO_BUFFER_BASE;
-		m_video_load_mar = false;
-				m_video_first_mar = false;
-		m_video_byte_idx = false;
-		m_video_attr = 0;
-		m_video_buff_idx = false;
-		m_video_blanked = false;
-				m_graphic_sel = false;
-				m_gv_fsm_state = GV_STAT_RESET;
-				m_gv_int_en = false;
-				m_gv_dma_en = false;
-				m_gv_ready = true;
+	// Some sensible defaults
+	m_video_mar = VIDEO_BUFFER_BASE;
+	m_video_load_mar = false;
+	m_video_first_mar = false;
+	m_video_byte_idx = false;
+	m_video_attr = 0;
+	m_video_buff_idx = false;
+	m_video_blanked = false;
+	m_graphic_sel = false;
+	m_gv_fsm_state = GV_STAT_RESET;
+	m_gv_int_en = false;
+	m_gv_dma_en = false;
 
-		m_irl_pending = 0;
-				m_irh_pending = 0;
+	m_irl_pending = 0;
+	m_irh_pending = 0;
+	m_pa = 0;
 
-		memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
-		m_kb_scancode = 0x7f;
-		m_kb_status = 0;
+	sts_w(GVIDEO_PA , true);
+	update_graphic_bits();
 
-		m_beeper->set_state(0);
+	memset(&m_kb_state[ 0 ] , 0 , sizeof(m_kb_state));
+	m_kb_scancode = 0x7f;
+	m_kb_status = 0;
+
+	m_beeper->set_state(0);
+
+	logerror("STS=%04x FLG=%04x\n" , m_sts_status , m_flg_status);
 }
 
-void hp9845b_state::set_video_mar(UINT16 mar)
+void hp9845b_state::set_video_mar(uint16_t mar)
 {
 		m_video_mar = (mar & 0xfff) | VIDEO_BUFFER_BASE;
 }
@@ -435,7 +335,7 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 {
 		unsigned char_idx = 0;
 		unsigned iters = 0;
-		UINT8 byte;
+		uint8_t byte;
 		address_space& prog_space = m_ppu->space(AS_PROGRAM);
 
 		m_video_buff[ buff_idx ].full = false;
@@ -459,12 +359,12 @@ void hp9845b_state::video_fill_buff(bool buff_idx)
 						} else {
 								// Read normal word from frame buffer, start parsing at MSB
 								set_video_mar(m_video_mar + 1);
-								byte = (UINT8)(m_video_word >> 8);
+								byte = (uint8_t)(m_video_word >> 8);
 								m_video_byte_idx = true;
 						}
 				} else {
 						// Parse LSB
-						byte = (UINT8)(m_video_word & 0xff);
+						byte = (uint8_t)(m_video_word & 0xff);
 						m_video_byte_idx = false;
 				}
 				if ((byte & 0xc0) == 0x80) {
@@ -515,12 +415,10 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 				bool char_blink = BIT(video_frame , 4);
 
 				for (unsigned i = 0; i < 80; i++) {
-						UINT8 charcode = m_video_buff[ buff_idx ].chars[ i ];
-						UINT8 attrs = m_video_buff[ buff_idx ].attrs[ i ];
-						UINT8 chargen_byte = m_chargen[ line_in_row  | ((unsigned)charcode << 4) ];
-						UINT16 pixels;
-
-						// TODO: Check if order of bits in "pixels" is ok
+						uint8_t charcode = m_video_buff[ buff_idx ].chars[ i ];
+						uint8_t attrs = m_video_buff[ buff_idx ].attrs[ i ];
+						uint16_t chrgen_addr = ((uint16_t)(charcode ^ 0x7f) << 4) | line_in_row;
+						uint16_t pixels;
 
 						if ((ul_line && BIT(attrs , 3)) ||
 							(cursor_line && cursor_blink && BIT(attrs , 0))) {
@@ -528,10 +426,9 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 						} else if (char_blink && BIT(attrs , 2)) {
 								pixels = 0;
 						} else if (BIT(attrs , 4)) {
-								// Optional character generator ROM not installed, it reads as 1 everywhere
-								pixels = 0x7f << 1;
+							pixels = (uint16_t)(m_optional_chargen[ chrgen_addr ] & 0x7f) << 1;
 						} else {
-								pixels = (UINT16)(chargen_byte & 0x7f) << 1;
+							pixels = (uint16_t)(m_chargen[ chrgen_addr ] & 0x7f) << 1;
 						}
 
 						if (BIT(attrs , 1)) {
@@ -539,7 +436,7 @@ void hp9845b_state::video_render_buff(unsigned video_scanline , unsigned line_in
 						}
 
 						for (unsigned j = 0; j < 9; j++) {
-								bool pixel = (pixels & (1U << (8 - j))) != 0;
+								bool pixel = (pixels & (1U << j)) != 0;
 
 								m_bitmap.pix32(video_scanline , i * 9 + j) = pen[ pixel ? 1 : 0 ];
 						}
@@ -606,7 +503,7 @@ void hp9845b_state::set_graphic_mode(bool graphic)
 
 READ16_MEMBER(hp9845b_state::graphic_r)
 {
-		UINT16 res = 0;
+		uint16_t res = 0;
 
 		switch (offset) {
 		case 0:
@@ -657,7 +554,7 @@ WRITE16_MEMBER(hp9845b_state::graphic_w)
 
 		case 1:
 				// R5: command register
-				m_gv_cmd = (UINT8)(data & 0xf);
+				m_gv_cmd = (uint8_t)(data & 0xf);
 				if (BIT(data , 5)) {
 						m_gv_fsm_state = GV_STAT_RESET;
 				}
@@ -818,7 +715,7 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
 						if (time_mem_av.is_zero()) {
 								// Write a single pixel to graphic memory
 								//logerror("wr gv pixel @%04x:%x = %d\n" , m_gv_io_counter , m_gv_data_w & 0xf , BIT(m_gv_data_w , 15));
-								UINT16 mask = 0x8000 >> (m_gv_data_w & 0xf);
+								uint16_t mask = 0x8000 >> (m_gv_data_w & 0xf);
 								if (BIT(m_gv_data_w , 15)) {
 										// Set pixel
 										m_graphic_mem[ m_gv_io_counter ] |= mask;
@@ -849,27 +746,19 @@ void hp9845b_state::advance_gv_fsm(bool ds , bool trigger)
 
 void hp9845b_state::update_graphic_bits(void)
 {
-		m_gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
+		bool gv_ready = m_gv_fsm_state == GV_STAT_WAIT_DS_0 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_1 ||
 			m_gv_fsm_state == GV_STAT_WAIT_DS_2;
 
-		bool irq = m_gv_int_en && !m_gv_dma_en && m_gv_ready;
+		flg_w(GVIDEO_PA , gv_ready);
 
-		if (irq) {
-				BIT_SET(m_irh_pending, GVIDEO_PA - 8);
-		} else {
-				BIT_CLR(m_irh_pending, GVIDEO_PA - 8);
-		}
+		bool irq = m_gv_int_en && !m_gv_dma_en && gv_ready;
 
-		update_irq();
+		irq_w(GVIDEO_PA , irq);
 
-		bool dmar = m_gv_ready && m_gv_dma_en;
+		bool dmar = gv_ready && m_gv_dma_en;
 
 		m_ppu->dmar_w(dmar);
-
-		if (m_ppu->pa_r() == GVIDEO_PA) {
-				m_ppu->flag_w(m_gv_ready);
-		}
 }
 
 void hp9845b_state::graphic_video_render(unsigned video_scanline)
@@ -892,9 +781,9 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 
 		unsigned mem_idx = 36 * (video_scanline - GVIDEO_VBEND);
 		for (unsigned i = 0; i < GVIDEO_HPIXELS; i += 16) {
-				UINT16 word = m_graphic_mem[ mem_idx++ ];
+				uint16_t word = m_graphic_mem[ mem_idx++ ];
 				unsigned x = i;
-				for (UINT16 mask = 0x8000; mask != 0; mask >>= 1) {
+				for (uint16_t mask = 0x8000; mask != 0; mask >>= 1) {
 						unsigned cnt_h = x + GVIDEO_HBEND + GVIDEO_HCNT_OFF;
 						bool xc = cnt_h == (m_gv_cursor_x + 6);
 						bool xw = m_gv_cursor_fs || (cnt_h >= (m_gv_cursor_x + 2) && cnt_h <= (m_gv_cursor_x + 10));
@@ -914,10 +803,10 @@ void hp9845b_state::graphic_video_render(unsigned video_scanline)
 IRQ_CALLBACK_MEMBER(hp9845b_state::irq_callback)
 {
 		if (irqline == HPHYBRID_IRL) {
-						logerror("irq ack L %02x\n" , m_irl_pending);
+			//logerror("irq ack L %02x\n" , m_irl_pending);
 				return m_irl_pending;
 		} else {
-						logerror("irq ack H %02x\n" , m_irh_pending);
+			//logerror("irq ack H %02x\n" , m_irh_pending);
 				return m_irh_pending;
 		}
 }
@@ -926,6 +815,64 @@ void hp9845b_state::update_irq(void)
 {
 		m_ppu->set_input_line(HPHYBRID_IRL , m_irl_pending != 0);
 		m_ppu->set_input_line(HPHYBRID_IRH , m_irh_pending != 0);
+}
+
+void hp9845b_state::irq_w(uint8_t sc , int state)
+{
+	unsigned bit_n = sc % 8;
+
+	if (sc < 8) {
+		if (state) {
+			BIT_SET(m_irl_pending, bit_n);
+		} else {
+			BIT_CLR(m_irl_pending, bit_n);
+		}
+	} else {
+		if (state) {
+			BIT_SET(m_irh_pending, bit_n);
+		} else {
+			BIT_CLR(m_irh_pending, bit_n);
+		}
+	}
+	update_irq();
+}
+
+void hp9845b_state::update_flg_sts(void)
+{
+	bool sts = BIT(m_sts_status , m_pa);
+	bool flg = BIT(m_flg_status , m_pa);
+	m_ppu->status_w(sts);
+	m_ppu->flag_w(flg);
+}
+
+void hp9845b_state::sts_w(uint8_t sc , int state)
+{
+	if (state) {
+		BIT_SET(m_sts_status, sc);
+	} else {
+		BIT_CLR(m_sts_status, sc);
+	}
+	if (sc == m_pa) {
+		update_flg_sts();
+	}
+}
+
+void hp9845b_state::flg_w(uint8_t sc , int state)
+{
+	if (state) {
+		BIT_SET(m_flg_status, sc);
+	} else {
+		BIT_CLR(m_flg_status, sc);
+	}
+	if (sc == m_pa) {
+		update_flg_sts();
+	}
+}
+
+void hp9845b_state::install_readwrite_handler(uint8_t sc , read16_delegate rhandler, write16_delegate whandler)
+{
+	// Install r/w handlers to cover all I/O addresses of PPU belonging to "sc" select code
+	m_ppu->space(AS_IO).install_readwrite_handler(sc * 4 , sc * 4 + 3 , rhandler , whandler);
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
@@ -984,9 +931,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::kb_scan)
 				if ((input[ idx ] & ~m_kb_state[ idx ]) & mask) {
 						// Key pressed, store scancode & generate IRL
 						m_kb_scancode = i;
-						BIT_SET(m_irl_pending , 0);
+						irq_w(0 , 1);
 						BIT_SET(m_kb_status, 0);
-						update_irq();
 
 						// Special case: pressing stop key sets LPU "status" flag
 						if (i == 0x47) {
@@ -1010,9 +956,8 @@ READ16_MEMBER(hp9845b_state::kb_status_r)
 
 WRITE16_MEMBER(hp9845b_state::kb_irq_clear_w)
 {
-		BIT_CLR(m_irl_pending , 0);
+		irq_w(0 , 0);
 		BIT_CLR(m_kb_status, 0);
-		update_irq();
 		m_lpu->status_w(0);
 
 		if (BIT(data , 15)) {
@@ -1029,42 +974,25 @@ TIMER_DEVICE_CALLBACK_MEMBER(hp9845b_state::beeper_off)
 
 WRITE8_MEMBER(hp9845b_state::pa_w)
 {
-		if (data == T15_PA) {
-						// RHS tape drive (T15)
-						m_ppu->status_w(m_t15->sts_r());
-						m_ppu->flag_w(m_t15->flg_r());
-				} else if (data == GVIDEO_PA) {
-						// Graphic video
-						m_ppu->status_w(1);
-						m_ppu->flag_w(m_gv_ready);
-		} else {
-				m_ppu->status_w(0);
-				m_ppu->flag_w(0);
-		}
+	if (data != m_pa) {
+		m_pa = data;
+		update_flg_sts();
+	}
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_irq_w)
 {
-		if (state) {
-				BIT_SET(m_irh_pending , T15_PA - 8);
-		} else {
-				BIT_CLR(m_irh_pending , T15_PA - 8);
-		}
-		update_irq();
+	irq_w(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_flg_w)
 {
-	if (m_ppu->pa_r() == T15_PA) {
-				m_ppu->flag_w(state);
-		}
+	flg_w(T15_PA , state);
 }
 
 WRITE_LINE_MEMBER(hp9845b_state::t15_sts_w)
 {
-	if (m_ppu->pa_r() == T15_PA) {
-				m_ppu->status_w(state);
-		}
+	sts_w(T15_PA , state);
 }
 
 static MACHINE_CONFIG_START( hp9845a, hp9845_state )
@@ -1136,7 +1064,7 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 		MCFG_HPHYBRID_PA_CHANGED(WRITE8(hp9845b_state , pa_w))
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(hp9845b_state, screen_update)
 		// These parameters are for alpha video
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_PIXEL_CLOCK , VIDEO_HTOTAL , 0 , VIDEO_HBSTART , VIDEO_VTOTAL , 0 , VIDEO_ACTIVE_SCANLINES)
@@ -1183,7 +1111,9 @@ static MACHINE_CONFIG_START( hp9845b, hp9845b_state )
 	MCFG_DEVICE_ADD("drawer8", HP_OPTROM_SLOT, 0)
 	MCFG_DEVICE_SLOT_INTERFACE(hp_optrom_slot_device, NULL, false)
 
-		MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+	MCFG_SOFTWARE_LIST_ADD("optrom_list", "hp9845b_rom")
+
+	MCFG_HP9845_IO_SLOT_ADD("slot0")
 MACHINE_CONFIG_END
 
 ROM_START( hp9845a )
@@ -1220,8 +1150,10 @@ ROM_END
 
 ROM_START( hp9845b )
 	ROM_REGION(0x800 , "chargen" , 0)
-		// Don't have the real character generator from HP9845, use the one from HP64000 for now
-	ROM_LOAD("1818_2668.bin" , 0 , 0x800 , BAD_DUMP CRC(32a52664) SHA1(8b2a49a32510103ff424e8481d5ed9887f609f2f))
+	ROM_LOAD("chrgen.bin" , 0 , 0x800 , CRC(fe9e844f) SHA1(0c45ae00766ceba94a19bd5e154bd6d23e208cca))
+
+	ROM_REGION(0x800 , "optional_chargen" , 0)
+	ROM_LOAD("optional_chrgen.bin" , 0 , 0x800 , CRC(0ecfa63b) SHA1(c295e6393d1503d903c1d2ce576fa597df9746bf))
 
 		ROM_REGION(0x10000, "lpu", ROMREGION_16BIT | ROMREGION_BE)
 		ROM_LOAD("9845-LPU-Standard-Processor.bin", 0, 0x10000, CRC(dc266c1b) SHA1(1cf3267f13872fbbfc035b70f8b4ec6b5923f182))

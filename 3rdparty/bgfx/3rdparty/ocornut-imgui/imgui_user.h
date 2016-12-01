@@ -44,3 +44,5 @@ namespace ImGui
 
 #include "widgets/file_list.h"
 #include "widgets/memory_editor.h"
+#include "widgets/gizmo.h"
+#include "widgets/dock.h"

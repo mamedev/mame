@@ -140,7 +140,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mc80_state::mc8020_kbd)
 {
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
 	char kbdrow[6];
-	UINT8 i;
+	uint8_t i;
 	for (i = 1; i < 8; i++)
 	{
 		sprintf(kbdrow,"X%X", i);

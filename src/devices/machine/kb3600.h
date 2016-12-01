@@ -101,10 +101,10 @@ class ay3600_device :   public device_t
 {
 public:
 	// construction/destruction
-	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay3600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// public interface
-	UINT16 b_r();
+	uint16_t b_r();
 
 	template<class _Object> static devcb_base &set_x0_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x0.set_callback(rd); }
 	template<class _Object> static devcb_base &set_x1_cb(device_t &device, _Object rd) { return downcast<ay3600_device &>(device).m_read_x1.set_callback(rd); }

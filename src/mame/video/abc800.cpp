@@ -72,7 +72,7 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 
 	for (int y = m_hrs; y < std::min(cliprect.max_y + 1, m_hrs + 480); y += 2)
 	{
@@ -80,17 +80,17 @@ void abc800c_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 data = m_video_ram[addr++];
+			uint8_t data = m_video_ram[addr++];
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
-				UINT8 fgctl = m_fgctl_prom->base()[fgctl_addr];
+				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				uint8_t fgctl = m_fgctl_prom->base()[fgctl_addr];
 				int color = fgctl & 0x07;
 
 				if (color)
 				{
-					bool black = bitmap.pix32(y, x) == rgb_t::black;
+					bool black = bitmap.pix32(y, x) == rgb_t::black();
 					bool opaque = !BIT(fgctl, 3);
 
 					if (black || opaque)
@@ -123,10 +123,10 @@ void abc800_state::video_start()
 //  SCREEN_UPDATE( abc800c )
 //-------------------------------------------------
 
-UINT32 abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc800c_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	// draw text
 	if (!BIT(m_fgctl, 7))
@@ -200,7 +200,7 @@ MACHINE_CONFIG_END
 
 void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT16 addr = 0;
+	uint16_t addr = 0;
 
 	const pen_t *pen = m_palette->pens();
 
@@ -210,11 +210,11 @@ void abc800m_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 		for (int sx = 0; sx < 64; sx++)
 		{
-			UINT8 data = m_video_ram[addr++];
+			uint8_t data = m_video_ram[addr++];
 
 			for (int dot = 0; dot < 4; dot++)
 			{
-				UINT16 fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
+				uint16_t fgctl_addr = ((m_fgctl & 0x7f) << 2) | ((data >> 6) & 0x03);
 				int color = (m_fgctl_prom->base()[fgctl_addr] & 0x07) ? 1 : 0;
 
 				bitmap.pix32(y, x++) = pen[color];
@@ -242,8 +242,8 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 	{
 		int bit;
 
-		UINT16 address = (m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
-		UINT8 data = (m_char_rom->base()[address & 0x7ff] & 0x3f);
+		uint16_t address = (m_char_ram[(ma + column) & 0x7ff] << 4) | (ra & 0x0f);
+		uint8_t data = (m_char_rom->base()[address & 0x7ff] & 0x3f);
 
 		if (column == cursor_x)
 		{
@@ -271,10 +271,10 @@ MC6845_UPDATE_ROW( abc800m_state::abc800m_update_row )
 //  SCREEN_UPDATE( abc800m )
 //-------------------------------------------------
 
-UINT32 abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc800m_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	// draw HR graphics
 	hr_update(bitmap, cliprect);

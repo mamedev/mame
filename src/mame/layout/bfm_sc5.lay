@@ -1491,7 +1491,7 @@
 	</backdrop>
 
 	<!-- the rest of the elements tend to be used for 7-segs
-			so render them as both -->
+	        so render them as both -->
 	<backdrop name="matrix160" element="matrixlamp" state="0">
 		<bounds y="0" x="280" width="3" height="3"/>
 	</backdrop>

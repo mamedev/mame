@@ -13,7 +13,7 @@
 
 static const rgb_t PALETTE_1512[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x00, 0xaa),
 	rgb_t(0x00, 0xaa, 0x00),
 	rgb_t(0x00, 0xaa, 0xaa),
@@ -28,7 +28,7 @@ static const rgb_t PALETTE_1512[] =
 	rgb_t(0xff, 0x55, 0x55),
 	rgb_t(0xff, 0x55, 0xff),
 	rgb_t(0xff, 0xff, 0x55),
-	rgb_t::white
+	rgb_t::white()
 };
 
 static const int PALETTE_0[] = { 0, 3, 5, 7 };
@@ -72,7 +72,7 @@ enum
 
 READ8_MEMBER( pc1512_state::video_ram_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (get_display_mode(m_vdu_mode))
 	{
@@ -130,7 +130,7 @@ WRITE8_MEMBER( pc1512_state::video_ram_w )
 
 READ8_MEMBER( pc1512_state::vdu_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset)
 	{
@@ -363,7 +363,7 @@ WRITE8_MEMBER( pc1512_state::vdu_w )
 //  mc6845
 //-------------------------------------------------
 
-int pc1512_state::get_display_mode(UINT8 mode)
+int pc1512_state::get_display_mode(uint8_t mode)
 {
 	if (mode & MODE_GRAPHICS)
 	{
@@ -397,7 +397,7 @@ offs_t pc1512_state::get_char_rom_offset()
 MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 {
 	offs_t char_rom_offset = get_char_rom_offset();
-	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
 
 	if (get_display_mode(m_vdu_mode) == ALPHA_40)
 		p = &bitmap.pix32(y + vbp, hbp);
@@ -406,8 +406,8 @@ MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) << 1];
-		UINT8 attr = m_video_ram[((ma + column) << 1) + 1];
+		uint8_t code = m_video_ram[(ma + column) << 1];
+		uint8_t attr = m_video_ram[((ma + column) << 1) + 1];
 		int fg = attr & 0x0f;
 		int bg = attr >> 4;
 
@@ -422,7 +422,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 		}
 
 		offs_t addr = char_rom_offset | (code << 3) | (ra & 0x07);
-		UINT8 data = m_char_rom->base()[addr & 0x1fff];
+		uint8_t data = m_char_rom->base()[addr & 0x1fff];
 
 		if ((column == cursor_x) && m_cursor)
 		{
@@ -440,7 +440,7 @@ MC6845_UPDATE_ROW( pc1512_state::draw_alpha )
 	}
 }
 
-int pc1512_state::get_color(UINT8 data)
+int pc1512_state::get_color(uint8_t data)
 {
 	if (data == 0) return m_vdu_color & 0x0f;
 
@@ -467,13 +467,13 @@ MC6845_UPDATE_ROW( pc1512_state::draw_graphics_1 )
 {
 	if (y > 199) return;
 
-	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
 		offs_t offset = ((ra & 0x01) << 15) | ((ma + column) << 3);
 
-		UINT16 b = (m_video_ram[offset | 3] << 8) | m_video_ram[offset | 7];
+		uint16_t b = (m_video_ram[offset | 3] << 8) | m_video_ram[offset | 7];
 
 		for (int x = 0; x < 8; x++)
 		{
@@ -487,16 +487,16 @@ MC6845_UPDATE_ROW( pc1512_state::draw_graphics_2 )
 {
 	if (y > 199) return;
 
-	UINT32 *p = &bitmap.pix32(y + vbp, hbp);
+	uint32_t *p = &bitmap.pix32(y + vbp, hbp);
 
 	for (int column = 0; column < x_count; column++)
 	{
 		offs_t offset = ((ra & 0x01) << 15) | ((ma + column) << 3);
 
-		UINT16 i = BIT(m_vdu_color, 3) ? ((m_video_ram[offset | 0] << 8) | m_video_ram[offset | 4]) : 0;
-		UINT16 r = BIT(m_vdu_color, 2) ? ((m_video_ram[offset | 1] << 8) | m_video_ram[offset | 5]) : 0;
-		UINT16 g = BIT(m_vdu_color, 1) ? ((m_video_ram[offset | 2] << 8) | m_video_ram[offset | 6]) : 0;
-		UINT16 b = BIT(m_vdu_color, 0) ? ((m_video_ram[offset | 3] << 8) | m_video_ram[offset | 7]) : 0;
+		uint16_t i = BIT(m_vdu_color, 3) ? ((m_video_ram[offset | 0] << 8) | m_video_ram[offset | 4]) : 0;
+		uint16_t r = BIT(m_vdu_color, 2) ? ((m_video_ram[offset | 1] << 8) | m_video_ram[offset | 5]) : 0;
+		uint16_t g = BIT(m_vdu_color, 1) ? ((m_video_ram[offset | 2] << 8) | m_video_ram[offset | 6]) : 0;
+		uint16_t b = BIT(m_vdu_color, 0) ? ((m_video_ram[offset | 3] << 8) | m_video_ram[offset | 7]) : 0;
 
 		for (int x = 0; x < 16; x++)
 		{
@@ -533,7 +533,7 @@ void pc1512_state::video_start()
 }
 
 
-UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_vdu_mode & MODE_ENABLE_VIDEO)
 	{
@@ -580,7 +580,7 @@ UINT32 pc1512_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;

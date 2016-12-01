@@ -336,23 +336,23 @@ public:
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<sega315_5124_device> m_vdp2;
 
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 	required_memory_region m_maincpu_region;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank0d;
 	optional_memory_bank m_bank1d;
 
 	// Analog input related
-	UINT8 m_port_select;
-	UINT16 m_last1;
-	UINT16 m_last2;
-	UINT16 m_diff1;
-	UINT16 m_diff2;
+	uint8_t m_port_select;
+	uint16_t m_last1;
+	uint16_t m_last2;
+	uint16_t m_diff1;
+	uint16_t m_diff2;
 
 	// Video RAM
-	UINT8 m_vram[2][0x4000 * 2];
+	uint8_t m_vram[2][0x4000 * 2];
 
-	UINT32 screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -458,7 +458,7 @@ void systeme_state::machine_start()
 /*- Hang On Jr. Specific -*/
 READ8_MEMBER( systeme_state::hangonjr_port_f8_read )
 {
-	UINT8 temp;
+	uint8_t temp;
 
 	temp = 0;
 
@@ -823,6 +823,14 @@ static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( slapshtr )
+	PORT_INCLUDE( segae_joy1_generic )
+
+	PORT_MODIFY("f3")   /* Read from Port 0xf3 */
+	// todo
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_INCLUDE( segae_hangonjr_generic )
 
@@ -923,6 +931,17 @@ ROM_START( tetrisse )
 	/* ic2 unpopulated */
 ROM_END
 
+// ROM BD # 834-5930
+ROM_START( slapshtr )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "epr-7351.ic7",   0x00000, 0x08000, CRC(894adb04) SHA1(e38d296aa56c531985cde75423ae03f0d9cc8f5d) ) /* Fixed Code */
+
+	ROM_LOAD( "epr-7352.ic5",   0x10000, 0x08000, CRC(61c938b6) SHA1(bdce617050371c7b2880967c7c7356f34b91911d) )
+	ROM_LOAD( "epr-7353.ic4",   0x18000, 0x08000, CRC(8ee2951a) SHA1(562fef28e6358cbbb4889cc7cd592ca659c238fb) )
+	ROM_LOAD( "epr-7354.ic3",   0x20000, 0x08000, CRC(41482aa0) SHA1(280d5a1c5685c692a924c62ed928fc25fec2352a) )
+	ROM_LOAD( "epr-7355.ic2",   0x28000, 0x08000, CRC(c67e1aef) SHA1(121bc40d652449c7b1b5f66a837baeaffb7af0b9) )
+ROM_END
+
 
 ROM_START( fantzn2 )
 	ROM_REGION( 0x50000, "maincpu", 0 )
@@ -952,7 +971,7 @@ ROM_START( opaopa )
 ROM_END
 
 
-UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap_rgb32 &vdp1_bitmap = m_vdp1->get_bitmap();
 	bitmap_rgb32 &vdp2_bitmap = m_vdp2->get_bitmap();
@@ -960,10 +979,10 @@ UINT32 systeme_state::screen_update_systeme(screen_device &screen, bitmap_rgb32 
 
 	for( int y = cliprect.min_y; y <= cliprect.max_y; y++ )
 	{
-		UINT32 *dest_ptr = &bitmap.pix32(y);
-		UINT32 *vdp1_ptr = &vdp1_bitmap.pix32(y);
-		UINT32 *vdp2_ptr = &vdp2_bitmap.pix32(y);
-		UINT8 *y1_ptr = &vdp2_y1.pix8(y);
+		uint32_t *dest_ptr = &bitmap.pix32(y);
+		uint32_t *vdp1_ptr = &vdp1_bitmap.pix32(y);
+		uint32_t *vdp2_ptr = &vdp2_bitmap.pix32(y);
+		uint8_t *y1_ptr = &vdp2_y1.pix8(y);
 
 		for ( int x = cliprect.min_x; x <= cliprect.max_x; x++ )
 		{
@@ -1042,7 +1061,7 @@ DRIVER_INIT_MEMBER(systeme_state, ridleofp)
 
 DRIVER_INIT_MEMBER(systeme_state, opaopa)
 {
-	UINT8 *banked_decrypted_opcodes = auto_alloc_array(machine(), UINT8, m_maincpu_region->bytes());
+	uint8_t *banked_decrypted_opcodes = auto_alloc_array(machine(), uint8_t, m_maincpu_region->bytes());
 	mc8123_decode(m_maincpu_region->base(), banked_decrypted_opcodes, memregion("key")->base(), m_maincpu_region->bytes());
 
 	m_bank0d->set_base(banked_decrypted_opcodes);
@@ -1064,3 +1083,4 @@ GAME( 1986, ridleofp, 0,        systeme,  ridleofp, systeme_state, ridleofp, ROT
 GAME( 1987, opaopa,   0,        systemeb, opaopa,   systeme_state, opaopa,   ROT0,   "Sega", "Opa Opa (MC-8123, 317-0042)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, fantzn2,  0,        systemex, fantzn2,  systeme_state, fantzn2,  ROT0,   "Sega", "Fantasy Zone II - The Tears of Opa-Opa (MC-8123, 317-0057)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tetrisse, 0,        systeme,  tetrisse, driver_device, 0,        ROT0,   "Sega", "Tetris (Japan, System E)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, slapshtr, 0,        systeme,  slapshtr, driver_device, 0,        ROT0,   "Sega", "Slap Shooter", MACHINE_SUPPORTS_SAVE) // 1986 date from flyer

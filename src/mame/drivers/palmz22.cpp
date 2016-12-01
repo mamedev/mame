@@ -87,7 +87,7 @@ public:
 	required_device<s3c2410_device> m_s3c2410;
 	nand_device *m_nand;
 
-	UINT32 m_port[8];
+	uint32_t m_port[8];
 	DECLARE_DRIVER_INIT(palmz22);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -138,7 +138,7 @@ WRITE8_MEMBER( palmz22_state::s3c2410_nand_address_w )
 
 READ8_MEMBER( palmz22_state::s3c2410_nand_data_r )
 {
-	UINT8 data = m_nand->data_r();
+	uint8_t data = m_nand->data_r();
 	verboselog(9, "s3c2410_nand_data_r %02X\n", data);
 	return data;
 }
@@ -152,7 +152,7 @@ WRITE8_MEMBER( palmz22_state::s3c2410_nand_data_w )
 /*
 READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
 {
-    UINT8 data = m_nand->is_busy();
+    uint8_t data = m_nand->is_busy();
     verboselog(9, "s3c2410_nand_busy_r %02X\n", data);
     return data;
 }
@@ -162,7 +162,7 @@ READ8_MEMBER( palmz22_state::s3c2410_nand_busy_r )
 
 READ32_MEMBER(palmz22_state::s3c2410_gpio_port_r)
 {
-	UINT32 data = m_port[offset];
+	uint32_t data = m_port[offset];
 	switch (offset)
 	{
 		case S3C2410_GPIO_PORT_E :
@@ -221,7 +221,7 @@ READ32_MEMBER(palmz22_state::s3c2410_core_pin_r)
 
 READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch (offset)
 	{
 		case 0 + 0 : data = 0x2EE + (PALM_Z22_BATTERY_LEVEL * 0xFF / 100); break;
@@ -237,13 +237,13 @@ READ32_MEMBER(palmz22_state::s3c2410_adc_data_r )
 
 INPUT_CHANGED_MEMBER(palmz22_state::palmz22_input_changed)
 {
-	if (((int)(FPTR)param) == 0)
+	if (((int)(uintptr_t)param) == 0)
 	{
 		m_s3c2410->s3c2410_touch_screen( (newval & 0x01) ? 1 : 0);
 	}
 	else
 	{
-		m_s3c2410->s3c2410_request_eint( (FPTR)param - 1);
+		m_s3c2410->s3c2410_request_eint( (uintptr_t)param - 1);
 	}
 }
 

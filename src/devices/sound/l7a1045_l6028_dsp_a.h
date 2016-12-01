@@ -10,17 +10,17 @@ struct l7a1045_voice
 						pos(0),
 		frac(0), l_volume(0), r_volume(0)
 	{
-		//memset(regs, 0, sizeof(UINT32)*8);
+		//memset(regs, 0, sizeof(uint32_t)*8);
 		start = 0;
 	}
 
-	UINT32 start;
-	UINT32 end;
+	uint32_t start;
+	uint32_t end;
 	bool mode;
-	UINT32 pos;
-	UINT32 frac;
-	UINT16 l_volume;
-	UINT16 r_volume;
+	uint32_t pos;
+	uint32_t frac;
+	uint16_t l_volume;
+	uint16_t r_volume;
 };
 
 // ======================> l7a1045_sound_device
@@ -29,10 +29,10 @@ class l7a1045_sound_device : public device_t,
 							public device_sound_interface
 {
 public:
-	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	l7a1045_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~l7a1045_sound_device() { }
 
-//  void set_base(INT8* base) { m_base = base; }
+//  void set_base(int8_t* base) { m_base = base; }
 
 	DECLARE_WRITE16_MEMBER( l7a1045_sound_w );
 	DECLARE_READ16_MEMBER( l7a1045_sound_r );
@@ -47,14 +47,14 @@ protected:
 private:
 	sound_stream *m_stream;
 	l7a1045_voice m_voice[32];
-	UINT32    m_key;
-	required_region_ptr<UINT8> m_rom;
+	uint32_t    m_key;
+	required_region_ptr<uint8_t> m_rom;
 
-	UINT8 m_audiochannel;
-	UINT8 m_audioregister;
+	uint8_t m_audiochannel;
+	uint8_t m_audioregister;
 
 	struct l7a1045_48bit_data {
-		UINT16 dat[3];
+		uint16_t dat[3];
 	};
 
 	l7a1045_48bit_data m_audiodat[0x10][0x20];

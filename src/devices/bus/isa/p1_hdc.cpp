@@ -80,7 +80,7 @@ machine_config_constructor p1_hdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *p1_hdc_device::device_rom_region() const
+const tiny_rom_entry *p1_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( p1_hdc );
 }
@@ -93,7 +93,7 @@ const rom_entry *p1_hdc_device::device_rom_region() const
 
 READ8_MEMBER(p1_hdc_device::p1_HDC_r)
 {
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	switch (offset >> 8) {
 		case 8:     data = m_hdc->read(space, offset & 255);
@@ -115,7 +115,7 @@ WRITE8_MEMBER(p1_hdc_device::p1_HDC_w)
 //  p1_hdc_device - constructor
 //-------------------------------------------------
 
-p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+p1_hdc_device::p1_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, P1_HDC, "Poisk-1 MFM disk B942", tag, owner, clock, "p1_hdc", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_hdc(*this, KM1809VG7_TAG)

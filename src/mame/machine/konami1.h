@@ -5,20 +5,20 @@
 
 class konami1_device : public m6809_base_device {
 public:
-	konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	konami1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void set_encryption_boundary(UINT16 adr);
+	void set_encryption_boundary(uint16_t adr);
 
 protected:
 	class mi_konami1 : public mi_default {
 	public:
-		UINT16 m_boundary;
-		mi_konami1(UINT16 boundary);
+		uint16_t m_boundary;
+		mi_konami1(uint16_t boundary);
 		virtual ~mi_konami1() {}
-		virtual UINT8 read_opcode(UINT16 adr) override;
+		virtual uint8_t read_opcode(uint16_t adr) override;
 	};
 
-	UINT16 m_boundary;
+	uint16_t m_boundary;
 
 	virtual void device_start() override;
 };

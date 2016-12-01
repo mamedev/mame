@@ -56,7 +56,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *cbm8000_hsg_t::device_rom_region() const
+const tiny_rom_entry *cbm8000_hsg_t::device_rom_region() const
 {
 	return ROM_NAME( cbm8000_hsg );
 }
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_a )
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9365_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 512)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 512-1)
@@ -108,7 +108,7 @@ MACHINE_CONFIG_END
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( cbm8000_hsg_b )
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(EF9366_TAG, ef9365_device, screen_update)
 	MCFG_SCREEN_SIZE(512, 256)
 	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 256-1)
@@ -149,7 +149,7 @@ machine_config_constructor cbm8000_hsg_b_t::device_mconfig_additions() const
 //  cbm8000_hsg_t - constructor
 //-------------------------------------------------
 
-cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_pet_expansion_card_interface(mconfig, *this),
 	m_gdc(*this, EF9365_TAG),
@@ -158,12 +158,12 @@ cbm8000_hsg_t::cbm8000_hsg_t(const machine_config &mconfig, device_type type, co
 {
 }
 
-cbm8000_hsg_a_t::cbm8000_hsg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm8000_hsg_a_t::cbm8000_hsg_a_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_A, "CBM 8000 High Speed Graphics (A)", tag, owner, clock, "cbm8000_hsg_a", __FILE__)
 {
 }
 
-cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cbm8000_hsg_b_t::cbm8000_hsg_b_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cbm8000_hsg_t(mconfig, CBM8000_HSG_B, "CBM 8000 High Speed Graphics (B)", tag, owner, clock, "cbm8000_hsg_b", __FILE__)
 {
 }
@@ -202,7 +202,7 @@ int cbm8000_hsg_t::pet_norom_r(address_space &space, offs_t offset, int sel)
 //  pet_bd_r - buffered data read
 //-------------------------------------------------
 
-UINT8 cbm8000_hsg_t::pet_bd_r(address_space &space, offs_t offset, UINT8 data, int &sel)
+uint8_t cbm8000_hsg_t::pet_bd_r(address_space &space, offs_t offset, uint8_t data, int &sel)
 {
 	switch (sel)
 	{
@@ -251,7 +251,7 @@ UINT8 cbm8000_hsg_t::pet_bd_r(address_space &space, offs_t offset, UINT8 data, i
 //  pet_bd_w - buffered data write
 //-------------------------------------------------
 
-void cbm8000_hsg_t::pet_bd_w(address_space &space, offs_t offset, UINT8 data, int &sel)
+void cbm8000_hsg_t::pet_bd_w(address_space &space, offs_t offset, uint8_t data, int &sel)
 {
 	if (offset == 0xaf00)
 	{

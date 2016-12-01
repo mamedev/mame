@@ -68,11 +68,11 @@ public:
 
 	/* video-related */
 	tilemap_t  *m_m14_tilemap;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_color_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_color_ram;
 
 	/* input-related */
-	UINT8 m_hop_mux;
+	uint8_t m_hop_mux;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -90,7 +90,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(m14);
-	UINT32 screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(m14_irq);
 };
 
@@ -113,7 +113,7 @@ PALETTE_INIT_MEMBER(m14_state, m14)
 		if (i & 0x01)
 			color = rgb_t(pal1bit(i >> 1), pal1bit(i >> 2), pal1bit(i >> 3));
 		else
-			color = (i & 0x10) ? rgb_t::white : rgb_t::black;
+			color = (i & 0x10) ? rgb_t::white() : rgb_t::black();
 
 		palette.set_pen_color(i, color);
 	}
@@ -134,10 +134,10 @@ TILE_GET_INFO_MEMBER(m14_state::m14_get_tile_info)
 
 void m14_state::video_start()
 {
-	m_m14_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_m14_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m14_state::m14_get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t m14_state::screen_update_m14(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_m14_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -183,7 +183,7 @@ READ8_MEMBER(m14_state::input_buttons_r)
 #if 0
 WRITE8_MEMBER(m14_state::test_w)
 {
-	static UINT8 x[5];
+	static uint8_t x[5];
 
 	x[offset] = data;
 

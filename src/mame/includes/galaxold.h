@@ -57,43 +57,43 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_attributesram;
-	optional_shared_ptr<UINT8> m_bulletsram;
-	optional_shared_ptr<UINT8> m_rockclim_videoram;
-	optional_shared_ptr<UINT8> m_racknrol_tiles_bank;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_attributesram;
+	optional_shared_ptr<uint8_t> m_bulletsram;
+	optional_shared_ptr<uint8_t> m_rockclim_videoram;
+	optional_shared_ptr<uint8_t> m_racknrol_tiles_bank;
 
 	int m_irq_line;
-	UINT8 m__4in1_bank;
+	uint8_t m__4in1_bank;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_rockclim_tilemap;
 	int m_spriteram2_present;
-	UINT8 m_gfxbank[5];
-	UINT8 m_flipscreen_x;
-	UINT8 m_flipscreen_y;
-	UINT8 m_color_mask;
+	uint8_t m_gfxbank[5];
+	uint8_t m_flipscreen_x;
+	uint8_t m_flipscreen_y;
+	uint8_t m_color_mask;
 	tilemap_t *m_dambustr_tilemap2;
-	std::unique_ptr<UINT8[]> m_dambustr_videoram2;
+	std::unique_ptr<uint8_t[]> m_dambustr_videoram2;
 	int m_leftclip;
 
-	void (galaxold_state::*m_modify_charcode)(UINT16 *code, UINT8 x);     /* function to call to do character banking */
-	void (galaxold_state::*m_modify_spritecode)(UINT8 *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
-	void (galaxold_state::*m_modify_color)(UINT8 *color);   /* function to call to do modify how the color codes map to the PROM */
-	void (galaxold_state::*m_modify_ypos)(UINT8*);  /* function to call to do modify how vertical positioning bits are connected */
+	void (galaxold_state::*m_modify_charcode)(uint16_t *code, uint8_t x);     /* function to call to do character banking */
+	void (galaxold_state::*m_modify_spritecode)(uint8_t *spriteram, int*, int*, int*, int); /* function to call to do sprite banking */
+	void (galaxold_state::*m_modify_color)(uint8_t *color);   /* function to call to do modify how the color codes map to the PROM */
+	void (galaxold_state::*m_modify_ypos)(uint8_t*);  /* function to call to do modify how vertical positioning bits are connected */
 
-	UINT8 m_timer_adjusted;
-	UINT8 m_darkplnt_bullet_color;
+	uint8_t m_timer_adjusted;
+	uint8_t m_darkplnt_bullet_color;
 	void (galaxold_state::*m_draw_bullets)(bitmap_ind16 &,const rectangle &, int, int, int);  /* function to call to draw a bullet */
 
-	UINT8 m_background_enable;
-	UINT8 m_background_red;
-	UINT8 m_background_green;
-	UINT8 m_background_blue;
+	uint8_t m_background_enable;
+	uint8_t m_background_red;
+	uint8_t m_background_green;
+	uint8_t m_background_blue;
 	void (galaxold_state::*m_draw_background)(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);   /* function to call to draw the background */
-	UINT16 m_rockclim_v;
-	UINT16 m_rockclim_h;
+	uint16_t m_rockclim_v;
+	uint16_t m_rockclim_h;
 	int m_dambustr_bg_split_line;
 	int m_dambustr_bg_color_1;
 	int m_dambustr_bg_color_2;
@@ -103,9 +103,9 @@ public:
 
 	void (galaxold_state::*m_draw_stars)(bitmap_ind16 &, const rectangle &);      /* function to call to draw the star layer */
 	int m_stars_colors_start;
-	INT32 m_stars_scrollpos;
-	UINT8 m_stars_on;
-	UINT8 m_stars_blink_state;
+	int32_t m_stars_scrollpos;
+	uint8_t m_stars_on;
+	uint8_t m_stars_blink_state;
 	emu_timer *m_stars_blink_timer;
 	emu_timer *m_stars_scroll_timer;
 	struct star_gold m_stars[STAR_COUNT];
@@ -209,8 +209,8 @@ public:
 	DECLARE_VIDEO_START(harem);
 	DECLARE_VIDEO_START(bagmanmc);
 
-	UINT32 screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_galaxold(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dambustr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(hunchbks_vh_interrupt);
 	TIMER_CALLBACK_MEMBER(stars_blink_callback);
@@ -220,24 +220,24 @@ public:
 
 	void state_save_register();
 	void video_start_common();
-	void pisces_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void mooncrst_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void batman2_modify_charcode(UINT16 *code, UINT8 x);
+	void pisces_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void mooncrst_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void batman2_modify_charcode(uint16_t *code, uint8_t x);
 	void rockclim_draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void rockclim_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void harem_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void mooncrst_modify_charcode(UINT16 *code, UINT8 x);
-	void pisces_modify_charcode(UINT16 *code, UINT8 x);
-	void mimonkey_modify_charcode(UINT16 *code, UINT8 x);
-	void mariner_modify_charcode(UINT16 *code, UINT8 x);
-	void dambustr_modify_charcode(UINT16 *code, UINT8 x);
-	void mshuttle_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void mimonkey_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void batman2_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void dkongjrm_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void ad2083_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void dambustr_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
-	void drivfrcg_modify_color(UINT8 *color);
+	void rockclim_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void harem_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void mooncrst_modify_charcode(uint16_t *code, uint8_t x);
+	void pisces_modify_charcode(uint16_t *code, uint8_t x);
+	void mimonkey_modify_charcode(uint16_t *code, uint8_t x);
+	void mariner_modify_charcode(uint16_t *code, uint8_t x);
+	void dambustr_modify_charcode(uint16_t *code, uint8_t x);
+	void mshuttle_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void mimonkey_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void batman2_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void dkongjrm_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void ad2083_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void dambustr_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void drivfrcg_modify_color(uint8_t *color);
 	void galaxold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void scrambold_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
 	void darkplnt_draw_bullets(bitmap_ind16 &bitmap, const rectangle &cliprect, int offs, int x, int y);
@@ -261,9 +261,9 @@ public:
 	void start_stars_blink_timer(double ra, double rb, double c);
 	void start_stars_scroll_timer();
 	void draw_bullets_common(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites(bitmap_ind16 &bitmap, UINT8 *spriteram, size_t spriteram_size);
-	void bagmanmc_modify_charcode(UINT16 *code, UINT8 x);
-	void bagmanmc_modify_spritecode(UINT8 *spriteram, int *code, int *flipx, int *flipy, int offs);
+	void draw_sprites(bitmap_ind16 &bitmap, uint8_t *spriteram, size_t spriteram_size);
+	void bagmanmc_modify_charcode(uint16_t *code, uint8_t x);
+	void bagmanmc_modify_spritecode(uint8_t *spriteram, int *code, int *flipx, int *flipy, int offs);
 	void machine_reset_common(int line);
 };
 

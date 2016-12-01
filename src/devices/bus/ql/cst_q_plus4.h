@@ -27,10 +27,10 @@ class cst_q_plus4_t : public device_t,
 {
 public:
 	// construction/destruction
-	cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cst_q_plus4_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	DECLARE_WRITE_LINE_MEMBER( exp1_extintl_w ) { m_exp1_extinl = state; update_extintl(); }
@@ -43,8 +43,8 @@ protected:
 	virtual void device_start() override;
 
 	// device_ql_expansion_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
-	virtual void write(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
+	virtual void write(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	void update_extintl() { m_slot->extintl_w(m_exp1_extinl || m_exp2_extinl || m_exp3_extinl || m_exp4_extinl); }

@@ -58,7 +58,7 @@ void kaneko16_state::kaneko16_fill_bitmap(_BitmapClass &bitmap, const rectangle 
 
 
 template<class _BitmapClass>
-UINT32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
+uint32_t kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -80,7 +80,7 @@ UINT32 kaneko16_state::screen_update_common(screen_device &screen, _BitmapClass 
 
 
 
-UINT32 kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kaneko16_state::screen_update_kaneko16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	kaneko16_fill_bitmap(bitmap,cliprect);
 
@@ -112,7 +112,7 @@ PALETTE_INIT_MEMBER(kaneko16_berlwall_state,berlwall)
 
 VIDEO_START_MEMBER(kaneko16_berlwall_state,berlwall)
 {
-	UINT8 *RAM  =   memregion("gfx3")->base();
+	uint8_t *RAM  =   memregion("gfx3")->base();
 
 	/* Render the hi-color static backgrounds held in the ROMs */
 
@@ -218,8 +218,8 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 	}
 
 	const pen_t *pal = m_bgpalette->pens();
-	UINT16* srcbitmap;
-	UINT32* dstbitmap;
+	uint16_t* srcbitmap;
+	uint32_t* dstbitmap;
 
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
@@ -230,7 +230,7 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 pix;
+			uint16_t pix;
 
 			if (!flip)  pix = srcbitmap[        (x - scrollx) & 0xff  ];
 			else        pix = srcbitmap[ 255 - ((x - scrollx) & 0xff) ];
@@ -240,7 +240,7 @@ void kaneko16_berlwall_state::kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap,
 	}
 }
 
-UINT32 kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t kaneko16_berlwall_state::screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// berlwall uses a 15bpp bitmap as a bg, not a solid fill
 	kaneko16_render_15bpp_bitmap(bitmap,cliprect);

@@ -29,7 +29,7 @@ public:
 	{
 	public:
 		packable_rectangle() : m_hash(0), m_width(-1), m_height(-1) { }
-		packable_rectangle(UINT32 hash, UINT32 format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
+		packable_rectangle(uint32_t hash, uint32_t format, int width, int height, int rowpixels, const rgb_t *palette, void *base)
 			: m_hash(hash)
 			, m_format(format)
 			, m_width(width)
@@ -40,8 +40,8 @@ public:
 		{
 		}
 
-		UINT32 hash() const { return m_hash; }
-		UINT32 format() const { return m_format; }
+		uint32_t hash() const { return m_hash; }
+		uint32_t format() const { return m_format; }
 		int width() const { return m_width; }
 		int height() const { return m_height; }
 		int rowpixels() const { return m_rowpixels; }
@@ -49,8 +49,8 @@ public:
 		void* base() const { return m_base; }
 
 	private:
-		UINT32 m_hash;
-		UINT32 m_format;
+		uint32_t m_hash;
+		uint32_t m_format;
 		int m_width;
 		int m_height;
 		int m_rowpixels;
@@ -74,7 +74,7 @@ public:
 			, m_base(rect.m_base)
 		{
 		}
-		packed_rectangle(UINT32 hash, UINT32 format, int width, int height, int x, int y, int rowpixels, const rgb_t *palette, void *base)
+		packed_rectangle(uint32_t hash, uint32_t format, int width, int height, int x, int y, int rowpixels, const rgb_t *palette, void *base)
 			: m_hash(hash)
 			, m_format(format)
 			, m_width(width)
@@ -87,8 +87,8 @@ public:
 		{
 		}
 
-		UINT32 hash() const { return m_hash; }
-		UINT32 format() const { return m_format; }
+		uint32_t hash() const { return m_hash; }
+		uint32_t format() const { return m_format; }
 		int width() const { return m_width; }
 		int height() const { return m_height; }
 		int x() const { return m_x; }
@@ -98,8 +98,8 @@ public:
 		void* base() const { return m_base; }
 
 	private:
-		UINT32 m_hash;
-		UINT32 m_format;
+		uint32_t m_hash;
+		uint32_t m_format;
 		int m_width;
 		int m_height;
 		int m_x;
@@ -130,7 +130,7 @@ private:
 			children[1] = -1;
 		}
 
-		rectangle(int x, int y, int w, int h, int hash, UINT32 format, int rowpixels, const rgb_t *palette, void *base)
+		rectangle(int x, int y, int w, int h, int hash, uint32_t format, int rowpixels, const rgb_t *palette, void *base)
 			: x(x)
 			, y(y)
 			, w(w)
@@ -161,7 +161,7 @@ private:
 		int             w;
 		int             h;
 		int             hash;
-		UINT32          format;
+		uint32_t          format;
 		int             rowpixels;
 		const rgb_t*    palette;
 		void*           base;

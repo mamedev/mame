@@ -80,7 +80,7 @@ void t10spc::ExecCommand()
 	}
 }
 
-void t10spc::ReadData( UINT8 *data, int dataLength )
+void t10spc::ReadData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -123,7 +123,7 @@ void t10spc::ReadData( UINT8 *data, int dataLength )
 	}
 }
 
-void t10spc::WriteData( UINT8 *data, int dataLength )
+void t10spc::WriteData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -136,7 +136,7 @@ void t10spc::WriteData( UINT8 *data, int dataLength )
 	}
 }
 
-void t10spc::SetCommand( UINT8 *_command, int _commandLength )
+void t10spc::SetCommand( uint8_t *_command, int _commandLength )
 {
 	if( _commandLength > sizeof( command ) )
 	{

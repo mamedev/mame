@@ -52,7 +52,7 @@ struct video_info
 	int last_frame;
 	int last_chapter;
 	int cadence;
-	UINT32 cadence_history;
+	uint32_t cadence_history;
 	int prev_whitefield;
 	int min_overall;
 	int max_overall;
@@ -126,19 +126,19 @@ static void *open_avi(const char *filename, movie_info &info)
 //  read_avi - read a frame from an AVI file
 //-------------------------------------------------
 
-static bool read_avi(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, INT16 *rsound, int &samples)
+static bool read_avi(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound, int16_t *rsound, int &samples)
 {
 	avi_file *avifile = reinterpret_cast<avi_file *>(file);
 
 	// read the frame
 	avi_file::error avierr = avifile->read_video_frame(frame, bitmap);
 	if (avierr != avi_file::error::NONE)
-		return FALSE;
+		return false;
 
 	// read the samples
 	const avi_file::movie_info &aviinfo = avifile->get_movie_info();
-	UINT32 firstsample = (UINT64(aviinfo.audio_samplerate) * UINT64(frame) * UINT64(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / UINT64(aviinfo.video_timescale);
-	UINT32 lastsample = (UINT64(aviinfo.audio_samplerate) * UINT64(frame + 1) * UINT64(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / UINT64(aviinfo.video_timescale);
+	uint32_t firstsample = (uint64_t(aviinfo.audio_samplerate) * uint64_t(frame) * uint64_t(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / uint64_t(aviinfo.video_timescale);
+	uint32_t lastsample = (uint64_t(aviinfo.audio_samplerate) * uint64_t(frame + 1) * uint64_t(aviinfo.video_sampletime) + aviinfo.video_timescale - 1) / uint64_t(aviinfo.video_timescale);
 	avierr = avifile->read_sound_samples(0, firstsample, lastsample - firstsample, lsound);
 	avierr = avifile->read_sound_samples(1, firstsample, lastsample - firstsample, rsound);
 	if (avierr != avi_file::error::NONE)
@@ -225,7 +225,7 @@ static void *open_chd(const char *filename, movie_info &info)
 //  read_chd - read a frame from a CHD file
 //-------------------------------------------------
 
-static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, INT16 *rsound, int &samples)
+static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, int16_t *lsound, int16_t *rsound, int &samples)
 {
 	chd_file *chdfile = reinterpret_cast<chd_file *>(file);
 
@@ -239,7 +239,7 @@ static int read_chd(void *file, int frame, bitmap_yuy16 &bitmap, INT16 *lsound, 
 		avconfig.video.wrap(&bitmap.pix16(fieldnum), bitmap.width(), bitmap.height() / interlace_factor, bitmap.rowpixels() * interlace_factor);
 
 		// configure the codec
-		UINT32 numsamples;
+		uint32_t numsamples;
 		avconfig.maxsamples = 48000;
 		avconfig.actsamples = &numsamples;
 		avconfig.audio[0] = &lsound[samples];
@@ -335,7 +335,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			// if we haven't seen lead-in yet, detect it
 			if (!video.saw_leadin)
 			{
-				video.saw_leadin = TRUE;
+				video.saw_leadin = true;
 				printf("%6d.%d: lead-in code detected\n", frame, fieldnum);
 			}
 
@@ -350,7 +350,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			// if we haven't seen lead-in yet, detect it
 			if (!video.saw_leadout)
 			{
-				video.saw_leadout = TRUE;
+				video.saw_leadout = true;
 				printf("%6d.%d: lead-out code detected\n", frame, fieldnum);
 				if (video.last_frame != -1)
 					printf("%6d.%d: final frame number was %d\n", frame, fieldnum, video.last_frame);
@@ -372,7 +372,7 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 			if (!video.saw_leadin)
 			{
 				printf("%6d.%d: detected frame number but never saw any lead-in (WARNING)\n", frame, fieldnum);
-				video.saw_leadin = TRUE;
+				video.saw_leadin = true;
 			}
 
 			// if this is the first frame, make sure it's 1
@@ -476,9 +476,9 @@ static void verify_video(video_info &video, int frame, bitmap_yuy16 &bitmap)
 		}
 
 		// now examine the active video signal
-		UINT32 yhisto[256] = { 0 };
-		UINT32 crhisto[256] = { 0 };
-		UINT32 cbhisto[256] = { 0 };
+		uint32_t yhisto[256] = { 0 };
+		uint32_t crhisto[256] = { 0 };
+		uint32_t cbhisto[256] = { 0 };
 		int pixels = 0;
 		for (int y = 22*2 + fieldnum; y < bitmap.height(); y += 2)
 		{
@@ -629,7 +629,7 @@ static void init_audio(audio_info &audio)
 //  verify_audio - verify audio data
 //-------------------------------------------------
 
-static void verify_audio(audio_info &audio, const INT16 *lsound, const INT16 *rsound, int samples)
+static void verify_audio(audio_info &audio, const int16_t *lsound, const int16_t *rsound, int samples)
 {
 	// count the overall samples
 	audio.sample_count += samples;
@@ -683,8 +683,8 @@ static void verify_audio(audio_info &audio, const INT16 *lsound, const INT16 *rs
 static void verify_audio_final(audio_info &audio)
 {
 	printf("\nAudio summary:\n");
-	printf("  Overall channel 0 range: %d-%d (%04X-%04X)\n", audio.min_lsample, audio.max_lsample, UINT16(audio.min_lsample), UINT16(audio.max_lsample));
-	printf("  Overall channel 1 range: %d-%d (%04X-%04X)\n", audio.min_rsample, audio.max_rsample, UINT16(audio.min_rsample), UINT16(audio.max_rsample));
+	printf("  Overall channel 0 range: %d-%d (%04X-%04X)\n", audio.min_lsample, audio.max_lsample, uint16_t(audio.min_lsample), uint16_t(audio.max_lsample));
+	printf("  Overall channel 1 range: %d-%d (%04X-%04X)\n", audio.min_rsample, audio.max_rsample, uint16_t(audio.min_rsample), uint16_t(audio.max_rsample));
 }
 
 
@@ -724,9 +724,9 @@ int main(int argc, char *argv[])
 		if (srcfilelen < 4)
 			return usage();
 		bool isavi;
-		if (tolower((UINT8)srcfile[srcfilelen-3]) == 'a' && tolower((UINT8)srcfile[srcfilelen-2]) == 'v' && tolower((UINT8)srcfile[srcfilelen-1]) == 'i')
+		if (tolower((uint8_t)srcfile[srcfilelen-3]) == 'a' && tolower((uint8_t)srcfile[srcfilelen-2]) == 'v' && tolower((uint8_t)srcfile[srcfilelen-1]) == 'i')
 			isavi = true;
-		else if (tolower((UINT8)srcfile[srcfilelen-3]) == 'c' && tolower((UINT8)srcfile[srcfilelen-2]) == 'h' && tolower((UINT8)srcfile[srcfilelen-1]) == 'd')
+		else if (tolower((uint8_t)srcfile[srcfilelen-3]) == 'c' && tolower((uint8_t)srcfile[srcfilelen-2]) == 'h' && tolower((uint8_t)srcfile[srcfilelen-1]) == 'd')
 			isavi = false;
 		else
 			return usage();
@@ -762,8 +762,8 @@ int main(int argc, char *argv[])
 		bitmap_yuy16 bitmap(info.width, info.height);
 
 		// allocate sound buffers
-		std::vector<INT16> lsound(info.samplerate);
-		std::vector<INT16> rsound(info.samplerate);
+		std::vector<int16_t> lsound(info.samplerate);
+		std::vector<int16_t> rsound(info.samplerate);
 
 		// loop over frames
 		int frame = 0;

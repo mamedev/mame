@@ -13,7 +13,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-northbridge_device::northbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+northbridge_device::northbridge_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_maincpu(*this, ":maincpu"),
 	m_ram(*this, ":" RAM_TAG)

@@ -61,13 +61,13 @@ void hyhoo_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in hyhoo_state::device_timer");
+		assert_always(false, "Unknown id in hyhoo_state::device_timer");
 	}
 }
 
 void hyhoo_state::hyhoo_gfxdraw()
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 
 	int x, y;
 	int dx1, dx2, dy;
@@ -76,7 +76,7 @@ void hyhoo_state::hyhoo_gfxdraw()
 	int skipx, skipy;
 	int ctrx, ctry;
 	int gfxaddr, gfxlen;
-	UINT8 color, color1, color2;
+	uint8_t color, color1, color2;
 	int r, g, b;
 	pen_t pen;
 
@@ -243,12 +243,12 @@ void hyhoo_state::video_start()
 }
 
 
-UINT32 hyhoo_state::screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hyhoo_state::screen_update_hyhoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_dispflag)
 		copybitmap(bitmap, m_tmpbitmap, m_flipscreen, m_flipscreen, 0, 0, cliprect);
 	else
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 
 	return 0;
 }

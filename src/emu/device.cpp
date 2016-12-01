@@ -23,7 +23,7 @@
 //  from the provided config
 //-------------------------------------------------
 
-device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+device_t::device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
 	: m_type(type),
 		m_name(name),
 		m_shortname(shortname),
@@ -157,7 +157,7 @@ std::string device_t::parameter(const char *tag) const
 //  a device
 //-------------------------------------------------
 
-void device_t::static_set_clock(device_t &device, UINT32 clock)
+void device_t::static_set_clock(device_t &device, u32 clock)
 {
 	// derive the clock from our owner if requested
 	if ((clock & 0xff000000) == 0xff000000)
@@ -237,7 +237,7 @@ void device_t::reset()
 //  unscaled clock
 //-------------------------------------------------
 
-void device_t::set_unscaled_clock(UINT32 clock)
+void device_t::set_unscaled_clock(u32 clock)
 {
 	m_unscaled_clock = clock;
 	m_clock = m_unscaled_clock * m_clock_scale;
@@ -265,15 +265,15 @@ void device_t::set_clock_scale(double clockscale)
 //  clock ticks to an attotime
 //-------------------------------------------------
 
-attotime device_t::clocks_to_attotime(UINT64 numclocks) const
+attotime device_t::clocks_to_attotime(u64 numclocks) const
 {
 	if (numclocks < m_clock)
 		return attotime(0, numclocks * m_attoseconds_per_clock);
 	else
 	{
-		UINT32 remainder;
-		UINT32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
-		return attotime(quotient, (UINT64)remainder * (UINT64)m_attoseconds_per_clock);
+		u32 remainder;
+		u32 quotient = divu_64x32_rem(numclocks, m_clock, &remainder);
+		return attotime(quotient, u64(remainder) * u64(m_attoseconds_per_clock));
 	}
 }
 
@@ -283,9 +283,9 @@ attotime device_t::clocks_to_attotime(UINT64 numclocks) const
 //  attotime to CPU clock ticks
 //-------------------------------------------------
 
-UINT64 device_t::attotime_to_clocks(const attotime &duration) const
+u64 device_t::attotime_to_clocks(const attotime &duration) const
 {
-	return mulu_32x32(duration.seconds(), m_clock) + (UINT64)duration.attoseconds() / (UINT64)m_attoseconds_per_clock;
+	return mulu_32x32(duration.seconds(), m_clock) + u64(duration.attoseconds()) / u64(m_attoseconds_per_clock);
 }
 
 
@@ -323,14 +323,14 @@ void device_t::set_machine(running_machine &machine)
 }
 
 //-------------------------------------------------
-//  findit - seach for all objects in auto finder
+//  findit - search for all objects in auto finder
 //  list and return status
 //-------------------------------------------------
 
 bool device_t::findit(bool isvalidation) const
 {
 	bool allfound = true;
-	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->m_next)
+	for (finder_base *autodev = m_auto_finder_list; autodev != nullptr; autodev = autodev->next())
 	{
 		if (isvalidation)
 		{
@@ -530,7 +530,7 @@ void device_t::device_validity_check(validity_checker &valid) const
 //  rom region description for this device
 //-------------------------------------------------
 
-const rom_entry *device_t::device_rom_region() const
+const tiny_rom_entry *device_t::device_rom_region() const
 {
 	// none by default
 	return nullptr;
@@ -564,7 +564,7 @@ ioport_constructor device_t::device_input_ports() const
 
 //-------------------------------------------------
 //  device_reset - actually handle resetting of
-//  a device; designed to be overriden by the
+//  a device; designed to be overridden by the
 //  actual device implementation
 //-------------------------------------------------
 
@@ -577,7 +577,7 @@ void device_t::device_reset()
 //-------------------------------------------------
 //  device_reset_after_children - hook to do
 //  reset logic that must happen after the children
-//  are reset; designed to be overriden by the
+//  are reset; designed to be overridden by the
 //  actual device implementation
 //-------------------------------------------------
 
@@ -920,4 +920,18 @@ void device_interface::interface_clock_changed()
 void device_interface::interface_debug_setup()
 {
 	// do nothing by default
+}
+
+
+//-------------------------------------------------
+// rom_region_vector
+//-------------------------------------------------
+
+const std::vector<rom_entry> &device_t::rom_region_vector() const
+{
+	if (m_rom_entries.empty())
+	{
+		m_rom_entries = rom_build_entries(device_rom_region());
+	}
+	return m_rom_entries;
 }

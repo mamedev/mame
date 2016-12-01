@@ -553,8 +553,8 @@ int _main_(int _argc, char** _argv)
 			| (mouseState.m_buttons[entry::MouseButton::Right ] ? IMGUI_MBUT_RIGHT  : 0)
 			| (mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
 			, mouseState.m_mz
-			, width
-			, height
+			, uint16_t(width)
+			, uint16_t(height)
 			);
 
 		static int32_t rightScrollArea = 0;
@@ -564,10 +564,16 @@ int _main_(int _argc, char** _argv)
 		imguiIndent();
 		imguiBool("IBL Diffuse",  settings.m_doDiffuseIbl);
 		imguiBool("IBL Specular", settings.m_doSpecularIbl);
-		currentLightProbe = LightProbe::Enum(imguiTabs(currentLightProbe, true, ImguiAlign::LeftIndented, 16, 2, 2
-													   , "Bolonga"
-													   , "Kyoto"
-													   ) );
+		currentLightProbe = LightProbe::Enum(imguiTabs(
+								  uint8_t(currentLightProbe)
+								, true
+								, ImguiAlign::LeftIndented
+								, 16
+								, 2
+								, 2
+								, "Bolonga"
+								, "Kyoto"
+								) );
 		if (imguiCube(lightProbes[currentLightProbe].m_tex, settings.m_lod, settings.m_crossCubemapPreview, true) )
 		{
 			settings.m_crossCubemapPreview = ImguiCubemap::Enum( (settings.m_crossCubemapPreview+1) % ImguiCubemap::Count);
@@ -592,14 +598,21 @@ int _main_(int _argc, char** _argv)
 		imguiIndent();
 		{
 			int32_t selection;
-			if      (0.0f == settings.m_bgType) { selection = 0; }
-			else if (7.0f == settings.m_bgType) { selection = 2; }
-			else                                { selection = 1; }
-			selection = imguiTabs(selection, true, ImguiAlign::LeftIndented, 16, 2, 3
-								 , "Skybox"
-								 , "Radiance"
-								 , "Irradiance"
-								 );
+			if      (0.0f == settings.m_bgType) { selection = UINT8_C(0); }
+			else if (7.0f == settings.m_bgType) { selection = UINT8_C(2); }
+			else                                { selection = UINT8_C(1); }
+
+			selection = imguiTabs(
+							  uint8_t(selection)
+							, true
+							, ImguiAlign::LeftIndented
+							, 16
+							, 2
+							, 3
+							, "Skybox"
+							, "Radiance"
+							, "Irradiance"
+							);
 			if      (0 == selection) { settings.m_bgType = 0.0f; }
 			else if (2 == selection) { settings.m_bgType = 7.0f; }
 			else                     { settings.m_bgType = settings.m_radianceSlider; }
@@ -622,7 +635,7 @@ int _main_(int _argc, char** _argv)
 
 		imguiLabel("Mesh:");
 		imguiIndent();
-		settings.m_meshSelection = imguiChoose(settings.m_meshSelection, "Bunny", "Orbs");
+		settings.m_meshSelection = uint8_t(imguiChoose(settings.m_meshSelection, "Bunny", "Orbs") );
 		imguiUnindent();
 
 		const bool isBunny = (0 == settings.m_meshSelection);
@@ -719,8 +732,8 @@ int _main_(int _argc, char** _argv)
 		bgfx::setViewTransform(1, view, proj);
 
 		// View rect.
-		bgfx::setViewRect(0, 0, 0, width, height);
-		bgfx::setViewRect(1, 0, 0, width, height);
+		bgfx::setViewRect(0, 0, 0, uint16_t(width), uint16_t(height) );
+		bgfx::setViewRect(1, 0, 0, uint16_t(width), uint16_t(height) );
 
 		// Env rotation.
 		const float amount = bx::fmin(deltaTimeSec/0.12f, 1.0f);
@@ -731,7 +744,7 @@ int _main_(int _argc, char** _argv)
 		camera.envViewMtx(mtxEnvView);
 		float mtxEnvRot[16];
 		bx::mtxRotateY(mtxEnvRot, settings.m_envRotCurr);
-		bx::mtxMul(uniforms.m_mtx, mtxEnvView, mtxEnvRot);
+		bx::mtxMul(uniforms.m_mtx, mtxEnvView, mtxEnvRot); // Used for Skybox.
 
 		// Submit view 0.
 		bgfx::setTexture(0, s_texCube, lightProbes[currentLightProbe].m_tex);
@@ -742,6 +755,7 @@ int _main_(int _argc, char** _argv)
 		bgfx::submit(0, programSky);
 
 		// Submit view 1.
+		memcpy(uniforms.m_mtx, mtxEnvRot, 16*sizeof(float)); // Used for IBL.
 		if (0 == settings.m_meshSelection)
 		{
 			// Submit bunny.
@@ -749,6 +763,7 @@ int _main_(int _argc, char** _argv)
 			bx::mtxSRT(mtx, 1.0f, 1.0f, 1.0f, 0.0f, bx::pi, 0.0f, 0.0f, -0.80f, 0.0f);
 			bgfx::setTexture(0, s_texCube,    lightProbes[currentLightProbe].m_tex);
 			bgfx::setTexture(1, s_texCubeIrr, lightProbes[currentLightProbe].m_texIrr);
+			uniforms.submit();
 			meshSubmit(meshBunny, 1, programMesh, mtx);
 		}
 		else

@@ -101,11 +101,11 @@ extern const device_type STEPPER;
 class stepper_device : public device_t
 {
 public:
-	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	stepper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_optic_handler(device_t &device, _Object object) { return downcast<stepper_device &>(device).m_optic_cb.set_callback(object); }
 
-	static void set_reel_type(device_t &device, UINT8 type)
+	static void set_reel_type(device_t &device, uint8_t type)
 	{
 		downcast<stepper_device &>(device).m_type = type;
 		switch ( type )
@@ -131,11 +131,11 @@ public:
 			break;
 		}
 	}
-	static void set_max_steps(device_t &device, INT16 steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
-	static void set_start_index(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_start = index; }
-	static void set_end_index(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_end = index; }
-	static void set_index_pattern(device_t &device, INT16 index) { downcast<stepper_device &>(device).m_index_patt = index; }
-	static void set_init_phase(device_t &device, UINT8 phase)
+	static void set_max_steps(device_t &device, int16_t steps) { downcast<stepper_device &>(device).m_max_steps = steps; }
+	static void set_start_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_start = index; }
+	static void set_end_index(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_end = index; }
+	static void set_index_pattern(device_t &device, int16_t index) { downcast<stepper_device &>(device).m_index_patt = index; }
+	static void set_init_phase(device_t &device, uint8_t phase)
 	{
 		downcast<stepper_device &>(device).m_initphase = phase;
 		downcast<stepper_device &>(device).m_phase = phase;
@@ -143,7 +143,7 @@ public:
 	}
 
 	/* update a motor */
-	int update(UINT8 pattern);
+	int update(uint8_t pattern);
 
 	/* get current position in half steps */
 	int get_position()          { return m_step_pos; }
@@ -158,19 +158,19 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 m_pattern;      /* coil pattern */
-	UINT8 m_old_pattern;  /* old coil pattern */
-	UINT8 m_initphase;
-	UINT8 m_phase;        /* motor phase */
-	UINT8 m_old_phase;    /* old phase */
-	UINT8 m_type;         /* reel type */
-	INT16 m_step_pos;     /* step position 0 - max_steps */
-	INT16 m_max_steps;    /* maximum step position */
-	INT32 m_abs_step_pos; /* absolute step position */
-	INT16 m_index_start;  /* start position of index (in half steps) */
-	INT16 m_index_end;    /* end position of index (in half steps) */
-	INT16 m_index_patt;   /* pattern needed on coils (0=don't care) */
-	UINT8 m_optic;
+	uint8_t m_pattern;      /* coil pattern */
+	uint8_t m_old_pattern;  /* old coil pattern */
+	uint8_t m_initphase;
+	uint8_t m_phase;        /* motor phase */
+	uint8_t m_old_phase;    /* old phase */
+	uint8_t m_type;         /* reel type */
+	int16_t m_step_pos;     /* step position 0 - max_steps */
+	int16_t m_max_steps;    /* maximum step position */
+	int32_t m_abs_step_pos; /* absolute step position */
+	int16_t m_index_start;  /* start position of index (in half steps) */
+	int16_t m_index_end;    /* end position of index (in half steps) */
+	int16_t m_index_patt;   /* pattern needed on coils (0=don't care) */
+	uint8_t m_optic;
 
 	void update_optic();
 	devcb_write_line m_optic_cb;

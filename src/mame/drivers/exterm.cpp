@@ -63,13 +63,13 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms34010/tms34010.h"
+#include "includes/exterm.h"
 #include "cpu/m6502/m6502.h"
-#include "sound/dac.h"
-#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
-#include "includes/exterm.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
 
 
 
@@ -98,15 +98,15 @@ READ16_MEMBER(exterm_state::exterm_host_data_r)
  *
  *************************************/
 
-UINT16 exterm_state::exterm_trackball_port_r(int which, UINT16 mem_mask)
+uint16_t exterm_state::exterm_trackball_port_r(int which, uint16_t mem_mask)
 {
-	UINT16 port;
+	uint16_t port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = ioport(which ? "DIAL1" : "DIAL0")->read();
+	uint8_t trackball_pos = ioport(which ? "DIAL1" : "DIAL0")->read();
 
 	/* Calculate the change from the last position. */
-	UINT8 trackball_diff = m_trackball_old[which] - trackball_pos;
+	uint8_t trackball_diff = m_trackball_old[which] - trackball_pos;
 
 	/* Store the new position for the next comparision. */
 	m_trackball_old[which] = trackball_pos;
@@ -238,14 +238,6 @@ READ8_MEMBER(exterm_state::sound_slave_latch_r)
 }
 
 
-WRITE8_MEMBER(exterm_state::sound_slave_dac_w)
-{
-	/* DAC A is used to modulate DAC B */
-	m_dac_value[offset & 1] = data;
-	m_dac->write_unsigned16((m_dac_value[0] ^ 0xff) * m_dac_value[1]);
-}
-
-
 READ8_MEMBER(exterm_state::sound_nmi_to_slave_r)
 {
 	/* a read from here triggers an NMI pulse to the slave */
@@ -320,7 +312,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_slave_map, AS_PROGRAM, 8, exterm_state )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x3800) AM_RAM
 	AM_RANGE(0x4000, 0x5fff) AM_READ(sound_slave_latch_r)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(sound_slave_dac_w)
+	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x3ffe) AM_DEVWRITE("dacvol", dac_byte_interface, write)
+	AM_RANGE(0x8001, 0x8001) AM_MIRROR(0x3ffe) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -406,7 +399,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(master_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(exterm_state, scanline_update)     /* scanline updater (indexed16) */
@@ -415,7 +408,7 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 	MCFG_CPU_ADD("slave", TMS34010, 40000000)
 	MCFG_CPU_PROGRAM_MAP(slave_map)
-	MCFG_TMS340X0_HALT_ON_RESET(TRUE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(true) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(40000000/8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_TO_SHIFTREG_CB(exterm_state, to_shiftreg_slave)   /* write to shiftreg function */
@@ -447,13 +440,16 @@ static MACHINE_CONFIG_START( exterm, exterm_state )
 
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", AD7528, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // ad7528j.e2
+	MCFG_SOUND_ADD("dacvol", AD7528, 0) // ad7528j.e2
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dacvol", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

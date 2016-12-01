@@ -147,14 +147,14 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	*/
 
-	UINT8 header[0x16] = { 0 };
+	uint8_t header[0x16] = { 0 };
 	void *ptr;
 
 	image.fread(header, 0x16);
 
-	UINT16 start_address = pick_integer_le(header, 0x10, 2);
-	UINT16 run_address = pick_integer_le(header, 0x12, 2);
-	UINT16 size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = pick_integer_le(header, 0x10, 2);
+	uint16_t run_address = pick_integer_le(header, 0x12, 2);
+	uint16_t size = pick_integer_le(header, 0x14, 2);
 
 	if (LOG)
 	{
@@ -492,7 +492,7 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_keylatch)
 	{
@@ -530,7 +530,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* 2400 Hz input */
 	data |= m_hz2400 << 4;
@@ -651,7 +651,7 @@ void atom_state::machine_start()
 	generator. I don't know if this is hardware, or random data because the
 	ram chips are not cleared at start-up. So at this time, these numbers
 	are poked into the memory to simulate it. When I have more details I will fix it */
-	UINT8 *m_baseram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
+	uint8_t *m_baseram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
 
 	m_baseram[0x08] = machine().rand() & 0x0ff;
 	m_baseram[0x09] = machine().rand() & 0x0ff;
@@ -677,7 +677,7 @@ void atomeb_state::machine_start()
 
 image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 
 	if (size > 0x1000)
 	{

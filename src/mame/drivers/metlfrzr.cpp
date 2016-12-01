@@ -45,19 +45,19 @@ public:
 	void legacy_bg_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void legacy_obj_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT32 screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_decrypted_opcodes;
-	required_shared_ptr<UINT8> m_work_ram;
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_video_regs;
+	required_shared_ptr<uint8_t> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_work_ram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_video_regs;
 	required_device<palette_device> m_palette;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	DECLARE_DRIVER_INIT(metlfrzr);
 	DECLARE_WRITE8_MEMBER(output_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
-	UINT8 m_fg_tilebank;
+	uint8_t m_fg_tilebank;
 	bool m_rowscroll_enable;
 };
 
@@ -78,11 +78,11 @@ void metlfrzr_state::video_start()
 void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(m_fg_tilebank);
-	const UINT16 vram_mask = m_vram.mask() >> 1;
+	const uint16_t vram_mask = m_vram.mask() >> 1;
 	int count;
 	int x_scroll_base;
 	int x_scroll_shift;
-	UINT16 x_scroll_value;
+	uint16_t x_scroll_value;
 	x_scroll_value = m_video_regs[0x17] + ((m_video_regs[0x06] & 1) << 8);
 	x_scroll_base = (x_scroll_value >> 3) * 32;
 
@@ -101,8 +101,8 @@ void metlfrzr_state::legacy_bg_draw(bitmap_ind16 &bitmap,const rectangle &clipre
 		int x = (count / 32);
 
 
-		UINT16 tile = m_vram[tile_base*2+0] + ((m_vram[tile_base*2+1] & 0xf0) << 4);
-		UINT8 color = m_vram[tile_base*2+1] & 0xf;
+		uint16_t tile = m_vram[tile_base*2+0] + ((m_vram[tile_base*2+1] & 0xf0) << 4);
+		uint8_t color = m_vram[tile_base*2+1] & 0xf;
 
 		gfx->transpen(bitmap,cliprect,tile,color,0,0,x*8-x_scroll_shift,y*8,0xf);
 	}
@@ -127,14 +127,14 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 	gfx_element *gfx_2 = m_gfxdecode->gfx(2);
 	gfx_element *gfx_3 = m_gfxdecode->gfx(3);
 	int count;
-	UINT8 *base_spriteram = m_work_ram + 0xe00;
+	uint8_t *base_spriteram = m_work_ram + 0xe00;
 
 	for(count=0x200-4;count>-1;count-=4)
 	{
 		gfx_element *cur_gfx = base_spriteram[count+1] & 0x40 ? gfx_3 : gfx_2;
-		UINT8 tile_bank = (base_spriteram[count+1] & 0x30) >> 4;
-		UINT16 tile = base_spriteram[count] | (tile_bank << 8);
-		UINT8 color = base_spriteram[count+1] & 0xf;
+		uint8_t tile_bank = (base_spriteram[count+1] & 0x30) >> 4;
+		uint16_t tile = base_spriteram[count] | (tile_bank << 8);
+		uint8_t color = base_spriteram[count+1] & 0xf;
 		int y = base_spriteram[count+2];
 		int x = base_spriteram[count+3];
 		if(base_spriteram[count+1] & 0x80)
@@ -144,7 +144,7 @@ void metlfrzr_state::legacy_obj_draw(bitmap_ind16 &bitmap,const rectangle &clipr
 	}
 }
 
-UINT32 metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t metlfrzr_state::screen_update_metlfrzr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -428,7 +428,7 @@ ROM_END
 DRIVER_INIT_MEMBER(metlfrzr_state, metlfrzr)
 {
 	// same as cshooter.cpp
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int A = 0x0000;A < 0x8000;A++)
 	{

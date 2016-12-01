@@ -49,7 +49,7 @@ public:
 		, m_7a(*this, "7a")
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_READ8_MEMBER(ppic_r);
@@ -78,14 +78,14 @@ public:
 	DECLARE_DRIVER_INIT(inder1);
 private:
 	bool m_pc0;
-	UINT8 m_game;
-	UINT8 m_portc;
-	UINT8 m_row;
-	UINT8 m_segment[8];
-	UINT8 m_sndcmd;
-	UINT8 m_sndbank;
-	UINT32 m_sound_addr;
-	UINT8 *m_p_speech;
+	uint8_t m_game;
+	uint8_t m_portc;
+	uint8_t m_row;
+	uint8_t m_segment[8];
+	uint8_t m_sndcmd;
+	uint8_t m_sndbank;
+	uint32_t m_sound_addr;
+	uint8_t *m_p_speech;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
@@ -1137,22 +1137,22 @@ WRITE8_MEMBER( inder_state::sol_brvteam_w )
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
-		if BIT(data, 1)
+		if (BIT(data, 1))
 			m_samples->start(0, 7); // left sling near bumpers "canon izq"
 
-		if BIT(data, 2)
+		if (BIT(data, 2))
 			m_samples->start(1, 7); // right sling near bumpers "canon der"
 
-		if BIT(data, 3)
+		if (BIT(data, 3))
 			m_samples->start(0, 5); // outhole
 
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_samples->start(2, 0); // left bumper
 
-		if BIT(data, 6)
+		if (BIT(data, 6))
 			m_samples->start(3, 0); // right bumper
 
-		if BIT(data, 7)
+		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
 }
@@ -1162,23 +1162,23 @@ WRITE8_MEMBER( inder_state::sol_canasta_w )
 {
 	if ((data & 0xee) && BIT(data, 4)) // solenoid selected & activated
 	{
-		if BIT(data, 3)
+		if (BIT(data, 3))
 			m_samples->start(0, 5); // outhole
 
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_samples->start(2, 0); // left bumper
 
-		if BIT(data, 6)
+		if (BIT(data, 6))
 			m_samples->start(3, 0); // right bumper
 
-		if BIT(data, 7)
+		if (BIT(data, 7))
 			m_samples->start(4, 0); // middle bumper
 	}
 }
 
 WRITE8_MEMBER( inder_state::disp_w )
 {
-	UINT8 i;
+	uint8_t i;
 	if (offset < 8)
 		m_segment[offset] = data;
 	else
@@ -1194,8 +1194,8 @@ WRITE8_MEMBER( inder_state::disp_w )
 WRITE8_MEMBER( inder_state::ppi60a_w )
 {
 	if (data)
-		for (UINT8 i = 0; i < 8; i++)
-			if BIT(data, i)
+		for (uint8_t i = 0; i < 8; i++)
+			if (BIT(data, i))
 				m_row = i;
 }
 
@@ -1203,16 +1203,16 @@ WRITE8_MEMBER( inder_state::ppi60a_w )
 WRITE8_MEMBER( inder_state::ppi60b_w )
 {
 	if (data & 7)
-		for (UINT8 i = 0; i < 3; i++)
-			if BIT(data, i)
+		for (uint8_t i = 0; i < 3; i++)
+			if (BIT(data, i))
 				m_row = i+8;
 }
 
 WRITE8_MEMBER( inder_state::ppi64c_w )
 {
-	UINT8 i;
+	uint8_t i;
 	data &= 15;
-	if BIT(data, 3) // 8 to 15
+	if (BIT(data, 3)) // 8 to 15)
 	{
 		data ^= 15; // now 7 to 0
 		for (i = 0; i < 5; i++)
@@ -1227,7 +1227,7 @@ WRITE8_MEMBER( inder_state::ppi64c_w )
 WRITE8_MEMBER( inder_state::sndbank_w )
 {
 	m_sndbank = data;
-	UINT8 i;
+	uint8_t i;
 	// look for last rom enabled
 	for (i = 0; i < 4; i++)
 		if (!(BIT(data, i)))
@@ -1289,7 +1289,7 @@ WRITE8_MEMBER( inder_state::ppic_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc, 5))
-		m_msm->set_prescaler_selector(m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm->set_prescaler_selector(*m_msm, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_7a->clock_w(BIT(data, 6));
 	m_7a->preset_w(!BIT(data, 7));
 	m_9a->preset_w(!BIT(data, 7));
@@ -1621,21 +1621,21 @@ ROM_END
 
 
 // old cpu board, 6 digits, sn76489
-GAME(1985,  brvteam,    0,    brvteam,  brvteam,  driver_device, 0,    ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL)
+GAME(1985,  brvteam,    0,    brvteam,  brvteam,  driver_device, 0,    ROT0, "Inder", "Brave Team",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, ay8910
-GAME(1986,  canasta,    0,    canasta,  canasta,  driver_device, 0,    ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL)
+GAME(1986,  canasta,    0,    canasta,  canasta,  driver_device, 0,    ROT0, "Inder", "Canasta '86'",       MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // old cpu board, 7 digits, sound cpu with 2x ay8910
-GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, driver_device, 0,    ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL)
+GAME(1986,  lapbylap,   0,    lapbylap, lapbylap, driver_device, 0,    ROT0, "Inder", "Lap By Lap",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, sound board with msm5205
-GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL)
-GAME(1988,  pinclown,   0,    inder,    pinclown, inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL)
-GAME(1989,  corsario,   0,    inder,    corsario, inder_state, inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL)
-GAME(1990,  mundial,    0,    inder,    mundial,  inder_state, inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL)
-GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL)
-GAME(1992,  ind250cc,   0,    inder,    ind250cc, inder_state, inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL)
+GAME(1987,  pinmoonl,   0,    inder,    pinmoonl, inder_state, inder,  ROT0, "Inder", "Moon Light (Inder)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1988,  pinclown,   0,    inder,    pinclown, inder_state, inder1, ROT0, "Inder", "Clown (Inder)",      MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1989,  corsario,   0,    inder,    corsario, inder_state, inder1, ROT0, "Inder", "Corsario",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1990,  mundial,    0,    inder,    mundial,  inder_state, inder1, ROT0, "Inder", "Mundial 90",         MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1991,  atleta,     0,    inder,    atleta,   inder_state, inder1, ROT0, "Inder", "Atleta",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1992,  ind250cc,   0,    inder,    ind250cc, inder_state, inder1, ROT0, "Inder", "250 CC",             MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 
 // new cpu board, later revision of msm5205 sound board
 GAME(1992,  metalman,   0,    inder,    metalman, inder_state, inder,  ROT0, "Inder", "Metal Man",          MACHINE_IS_SKELETON_MECHANICAL)

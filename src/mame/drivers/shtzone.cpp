@@ -60,7 +60,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 static ADDRESS_MAP_START( shtzone_map, AS_PROGRAM, 8, shtzone_state )
@@ -86,7 +86,7 @@ void shtzone_state::video_start()
 }
 
 
-UINT32 shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shtzone_state::screen_update_shtzone(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

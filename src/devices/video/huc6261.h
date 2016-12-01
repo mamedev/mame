@@ -31,7 +31,7 @@ class huc6261_device :  public device_t,
 {
 public:
 	// construction/destruction
-	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	huc6261_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_vdc1_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_a_tag = tag; }
 	static void set_vdc2_tag(device_t &device, const char *tag) { downcast<huc6261_device &>(device).m_huc6270_b_tag = tag; }
@@ -40,7 +40,7 @@ public:
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 
-	inline UINT32 yuv2rgb(UINT32 yuv);
+	inline uint32_t yuv2rgb(uint32_t yuv);
 
 protected:
 	// device-level overrides
@@ -58,20 +58,20 @@ private:
 	int     m_last_v;
 	int     m_height;
 
-	UINT16  m_palette[512];
-	UINT16  m_address;
-	UINT16  m_palette_latch;
-	UINT16  m_register;
-	UINT16  m_control;
-	UINT8   m_priority[7];
+	uint16_t  m_palette[512];
+	uint16_t  m_address;
+	uint16_t  m_palette_latch;
+	uint16_t  m_register;
+	uint16_t  m_control;
+	uint8_t   m_priority[7];
 
-	UINT8   m_pixels_per_clock; /* Number of pixels to output per colour clock */
-	UINT16  m_pixel_data;
-	UINT8   m_pixel_clock;
+	uint8_t   m_pixels_per_clock; /* Number of pixels to output per colour clock */
+	uint16_t  m_pixel_data;
+	uint8_t   m_pixel_clock;
 
 	emu_timer   *m_timer;
 	std::unique_ptr<bitmap_rgb32>  m_bmp;
-	INT32   m_uv_lookup[65536][3];
+	int32_t   m_uv_lookup[65536][3];
 };
 
 

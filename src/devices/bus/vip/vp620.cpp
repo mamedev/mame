@@ -61,7 +61,7 @@ machine_config_constructor vp620_device::device_mconfig_additions() const
 //  vp620_device - constructor
 //-------------------------------------------------
 
-vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp620_device::vp620_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP620, "VP620", tag, owner, clock, "vp620", __FILE__),
 	device_vip_byteio_port_interface(mconfig, *this),
 	m_keydata(0),
@@ -83,7 +83,7 @@ void vp620_device::device_start()
 //  vip_in_r - byte input read
 //-------------------------------------------------
 
-UINT8 vp620_device::vip_in_r()
+uint8_t vp620_device::vip_in_r()
 {
 	return m_keydata;
 }

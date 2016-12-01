@@ -129,7 +129,7 @@ static void recompute_filter(lp_filter *iir, double k, double q, double fc)
 	iir->coef[0] = k;
 }
 
-void micro3d_sound_device::noise_sh_w(UINT8 data)
+void micro3d_sound_device::noise_sh_w(uint8_t data)
 {
 	micro3d_state *state = machine().driver_data<micro3d_state>();
 
@@ -167,7 +167,7 @@ void micro3d_sound_device::noise_sh_w(UINT8 data)
 
 const device_type MICRO3D = &device_creator<micro3d_sound_device>;
 
-micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MICRO3D, "Microprose Audio Custom", tag, owner, clock, "micro3d_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_gain(0),
@@ -177,7 +177,7 @@ micro3d_sound_device::micro3d_sound_device(const machine_config &mconfig, const 
 		m_stream(nullptr)
 
 {
-		memset(m_dac, 0, sizeof(UINT8)*4);
+		memset(m_dac, 0, sizeof(uint8_t)*4);
 }
 
 //-------------------------------------------------

@@ -44,7 +44,7 @@ class hd66421_device :  public device_t,
 {
 public:
 	// construction/destruction
-	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd66421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( reg_idx_r );
 	DECLARE_WRITE8_MEMBER( reg_idx_w );
@@ -52,7 +52,7 @@ public:
 	DECLARE_WRITE8_MEMBER( reg_dat_w );
 	DECLARE_PALETTE_INIT(hd66421);
 
-	UINT32 update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -65,13 +65,13 @@ protected:
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 
-	void plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color);
+	void plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color);
 
 private:
-	UINT8 m_cmd, m_reg[32];
+	uint8_t m_cmd, m_reg[32];
 	int m_x, m_y;
 	required_device<palette_device> m_palette;
 };

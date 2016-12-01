@@ -317,8 +317,8 @@ ROM_END
 
 void compgolf_state::compgolf_expand_bg()
 {
-	UINT8 *GFXDST = memregion("gfx2")->base();
-	UINT8 *GFXSRC = memregion("gfx4")->base();
+	uint8_t *GFXDST = memregion("gfx2")->base();
+	uint8_t *GFXSRC = memregion("gfx4")->base();
 
 	int x;
 

@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_DATMENU_H
 #define MAME_FRONTEND_UI_DATMENU_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -23,6 +23,7 @@
 struct ui_software_info;
 
 namespace ui {
+
 //-------------------------------------------------
 //  class dats menu
 //-------------------------------------------------
@@ -39,9 +40,9 @@ protected:
 
 private:
 	// draw dats menu
-	virtual void draw(UINT32 flags) override;
+	virtual void draw(uint32_t flags) override;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	int visible_items;
@@ -51,7 +52,6 @@ private:
 	std::string m_list, m_short, m_long, m_parent;
 	void get_data();
 	void get_data_sw();
-	void init_items();
 	bool m_issoft;
 	struct list_items
 	{

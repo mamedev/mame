@@ -17,7 +17,7 @@ TODO:
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/dac.h"
-
+#include "sound/volt_reg.h"
 #include "quizshow.lh"
 
 
@@ -46,13 +46,13 @@ public:
 	{ }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
-	required_shared_ptr<UINT8> m_main_ram;
+	required_device<dac_bit_interface> m_dac;
+	required_shared_ptr<uint8_t> m_main_ram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 
 	tilemap_t *m_tilemap;
-	UINT32 m_clocks;
+	uint32_t m_clocks;
 	int m_blink_state;
 	int m_category_enable;
 	int m_tape_head_pos;
@@ -73,7 +73,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(quizshow);
-	UINT32 screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(quizshow_clock_timer_cb);
 };
 
@@ -86,8 +86,8 @@ public:
 
 PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 {
-	palette.set_indirect_color(0, rgb_t::black);
-	palette.set_indirect_color(1, rgb_t::white);
+	palette.set_indirect_color(0, rgb_t::black());
+	palette.set_indirect_color(1, rgb_t::white());
 
 	// normal, blink/off, invert, blink+invert
 	const int lut_pal[16] = {
@@ -103,20 +103,20 @@ PALETTE_INIT_MEMBER(quizshow_state, quizshow)
 
 TILE_GET_INFO_MEMBER(quizshow_state::get_tile_info)
 {
-	UINT8 code = m_main_ram[tile_index];
+	uint8_t code = m_main_ram[tile_index];
 
 	// d6: blink, d7: invert
-	UINT8 color = (code & (m_blink_state | 0x80)) >> 6;
+	uint8_t color = (code & (m_blink_state | 0x80)) >> 6;
 
 	SET_TILE_INFO_MEMBER(0, code & 0x3f, color, 0);
 }
 
 void quizshow_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizshow_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 16, 32, 16);
 }
 
-UINT32 quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizshow_state::screen_update_quizshow(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_OPAQUE, 0);
 	return 0;
@@ -173,7 +173,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_tape_control_w)
 WRITE8_MEMBER(quizshow_state::quizshow_audio_w)
 {
 	// d1: audio out
-	m_dac->write_signed8((data & 2) ? 0x7f : 0);
+	m_dac->write(BIT(data, 1));
 
 	// d0, d2-d7: N/C
 }
@@ -186,7 +186,7 @@ WRITE8_MEMBER(quizshow_state::quizshow_video_disable_w)
 
 READ8_MEMBER(quizshow_state::quizshow_timing_r)
 {
-	UINT8 ret = 0x80;
+	uint8_t ret = 0x80;
 
 	// d0-d3: 1R-8R (16-line counter)
 	ret |= m_clocks >> 1 & 0xf;
@@ -397,10 +397,11 @@ static MACHINE_CONFIG_START( quizshow, quizshow_state )
 	MCFG_PALETTE_INIT_OWNER(quizshow_state, quizshow)
 
 	/* sound hardware (discrete) */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -432,8 +433,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(quizshow_state,quizshow)
 {
-	UINT8 *gfxdata = memregion("user1")->base();
-	UINT8 *dest = memregion("gfx1")->base();
+	uint8_t *gfxdata = memregion("user1")->base();
+	uint8_t *dest = memregion("gfx1")->base();
 
 	int tile, line;
 

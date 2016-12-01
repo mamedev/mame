@@ -17,7 +17,7 @@ an eraser. (See notes)
 Game              Board
 ----------------  ---------
 Ninja Kid II      UPL-87003
-Mutant Night      UPL-?????
+Mutant Night      UPL-87007
 Ark Area          UPL-87007
 Atomic Robo-Kid   UPL-88013
 Omega Fighter     UPL-89016
@@ -178,9 +178,9 @@ SAMPLES_START_CB_MEMBER(ninjakd2_state::ninjakd2_init_samples)
 		return;
 	}
 
-	const UINT8* const rom = m_pcm_region->base();
+	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
-	INT16* sampledata = auto_alloc_array(machine(), INT16, length);
+	int16_t* sampledata = auto_alloc_array(machine(), int16_t, length);
 
 	// convert unsigned 8-bit PCM to signed 16-bit
 	for (int i = 0; i < length; ++i)
@@ -199,7 +199,7 @@ WRITE8_MEMBER(ninjakd2_state::ninjakd2_pcm_play_w)
 		return;
 	}
 
-	const UINT8* const rom = m_pcm_region->base();
+	const uint8_t* const rom = m_pcm_region->base();
 	const int length = m_pcm_region->bytes();
 	const int start = data << 8;
 
@@ -248,7 +248,7 @@ void ninjakd2_state::omegaf_io_protection_reset()
 
 READ8_MEMBER(ninjakd2_state::omegaf_io_protection_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	switch (m_omegaf_io_protection[1] & 3)
 	{
@@ -1240,27 +1240,52 @@ ROM_END
 
 ROM_START( mnight )
 	ROM_REGION( 0x30000, "maincpu", 0 )
-	ROM_LOAD( "mn6-j19.bin",  0x00000, 0x8000, CRC(56678d14) SHA1(acf3a97ca29db8ab9cad69599c5567464af3ae44) )
-	ROM_LOAD( "mn5-j17.bin",  0x10000, 0x8000, CRC(2a73f88e) SHA1(0a7b769174f2b976650453d808cb23668dff0260) )   // banked at 8000-bfff
-	ROM_LOAD( "mn4-j16.bin",  0x18000, 0x8000, CRC(c5e42bb4) SHA1(1956e737ae393e987cb7e8eae520518f1e0f597f) )
-	ROM_LOAD( "mn3-j14.bin",  0x20000, 0x8000, CRC(df6a4f7a) SHA1(ce3cb84b514220d686b12c03567289fd23da0fe1) )
-	ROM_LOAD( "mn2-j12.bin",  0x28000, 0x8000, CRC(9c391d1b) SHA1(06e8c202337e3eba38c479e8b7e29a3f8ffc4ed1) )
+	ROM_LOAD( "1.j19",  0x00000, 0x8000, CRC(56678d14) SHA1(acf3a97ca29db8ab9cad69599c5567464af3ae44) )
+	ROM_LOAD( "2.j17",  0x10000, 0x8000, CRC(2a73f88e) SHA1(0a7b769174f2b976650453d808cb23668dff0260) )   // banked at 8000-bfff
+	ROM_LOAD( "3.j16",  0x18000, 0x8000, CRC(c5e42bb4) SHA1(1956e737ae393e987cb7e8eae520518f1e0f597f) )
+	ROM_LOAD( "4.j14",  0x20000, 0x8000, CRC(df6a4f7a) SHA1(ce3cb84b514220d686b12c03567289fd23da0fe1) )
+	ROM_LOAD( "5.j12",  0x28000, 0x8000, CRC(9c391d1b) SHA1(06e8c202337e3eba38c479e8b7e29a3f8ffc4ed1) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "mn1-j7.bin",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
+	ROM_LOAD( "6.j7",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
-	ROM_LOAD( "mn10-b10.bin", 0x00000, 0x08000, CRC(37b8221f) SHA1(ac86e0ae8039fd30a028a893d08ce099f7765615) )
+	ROM_LOAD( "13.b10", 0x00000, 0x08000, CRC(8c177a19) SHA1(328df41b5bacd1999f97d99781c6ef8afc9989a3) )
 
 	ROM_REGION( 0x30000, "gfx2", 0 )    // sprites (need lineswapping)
-	ROM_LOAD( "mn7-e11.bin",  0x00000, 0x10000, CRC(4883059c) SHA1(53d4b9b0f0725c25e302ee1549a306778ec74d85) )
-	ROM_LOAD( "mn8-e12.bin",  0x10000, 0x10000, CRC(02b91445) SHA1(f0cf85f9e17c40248de16bca8df6d745e359b92d) )
-	ROM_LOAD( "mn9-e14.bin",  0x20000, 0x10000, CRC(9f08d160) SHA1(1a0041ad138e7e6598d4d03d7cbd52a7244557ac) )
+	ROM_LOAD( "9.e11",  0x00000, 0x10000, CRC(4883059c) SHA1(53d4b9b0f0725c25e302ee1549a306778ec74d85) )
+	ROM_LOAD( "8.e12",  0x10000, 0x10000, CRC(02b91445) SHA1(f0cf85f9e17c40248de16bca8df6d745e359b92d) )
+	ROM_LOAD( "7.e14",  0x20000, 0x10000, CRC(9f08d160) SHA1(1a0041ad138e7e6598d4d03d7cbd52a7244557ac) )
 
 	ROM_REGION( 0x30000, "gfx3", 0 )    // bg tiles (need lineswapping)
-	ROM_LOAD( "mn11-b20.bin", 0x00000, 0x10000, CRC(4d37e0f4) SHA1(a6d9aaccd97769197622cda45474e223c2ee1d98) )
-	ROM_LOAD( "mn12-b22.bin", 0x10000, 0x10000, CRC(b22cbbd3) SHA1(70984f1051fd236730d97011bc87dacb3ca38594) )
-	ROM_LOAD( "mn13-b23.bin", 0x20000, 0x10000, CRC(65714070) SHA1(48f3c130c97d00e8f0535904dc2237277067c475) )
+	ROM_LOAD( "12.b20", 0x00000, 0x10000, CRC(4d37e0f4) SHA1(a6d9aaccd97769197622cda45474e223c2ee1d98) )
+	ROM_LOAD( "11.b22", 0x10000, 0x10000, CRC(b22cbbd3) SHA1(70984f1051fd236730d97011bc87dacb3ca38594) )
+	ROM_LOAD( "10.b23", 0x20000, 0x10000, CRC(65714070) SHA1(48f3c130c97d00e8f0535904dc2237277067c475) )
+ROM_END
+
+ROM_START( mnightj )
+	ROM_REGION( 0x30000, "maincpu", 0 )
+	ROM_LOAD( "1.j19",  0x00000, 0x8000, CRC(56678d14) SHA1(acf3a97ca29db8ab9cad69599c5567464af3ae44) )
+	ROM_LOAD( "2.j17",  0x10000, 0x8000, CRC(2a73f88e) SHA1(0a7b769174f2b976650453d808cb23668dff0260) )   // banked at 8000-bfff
+	ROM_LOAD( "3.j16",  0x18000, 0x8000, CRC(c5e42bb4) SHA1(1956e737ae393e987cb7e8eae520518f1e0f597f) )
+	ROM_LOAD( "4.j14",  0x20000, 0x8000, CRC(df6a4f7a) SHA1(ce3cb84b514220d686b12c03567289fd23da0fe1) )
+	ROM_LOAD( "5.j12",  0x28000, 0x8000, CRC(9c391d1b) SHA1(06e8c202337e3eba38c479e8b7e29a3f8ffc4ed1) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "6.j7",   0x00000, 0x10000, CRC(a0782a31) SHA1(8abd2f0b0c2c2eb876f324f7a095a5cdc773c187) )
+
+	ROM_REGION( 0x08000, "gfx1", 0 )    // fg tiles (need lineswapping)
+	ROM_LOAD( "13.b10", 0x00000, 0x08000, CRC(37b8221f) SHA1(ac86e0ae8039fd30a028a893d08ce099f7765615) )
+
+	ROM_REGION( 0x30000, "gfx2", 0 )    // sprites (need lineswapping)
+	ROM_LOAD( "9.e11",  0x00000, 0x10000, CRC(4883059c) SHA1(53d4b9b0f0725c25e302ee1549a306778ec74d85) )
+	ROM_LOAD( "8.e12",  0x10000, 0x10000, CRC(02b91445) SHA1(f0cf85f9e17c40248de16bca8df6d745e359b92d) )
+	ROM_LOAD( "7.e14",  0x20000, 0x10000, CRC(9f08d160) SHA1(1a0041ad138e7e6598d4d03d7cbd52a7244557ac) )
+
+	ROM_REGION( 0x30000, "gfx3", 0 )    // bg tiles (need lineswapping)
+	ROM_LOAD( "12.b20", 0x00000, 0x10000, CRC(4d37e0f4) SHA1(a6d9aaccd97769197622cda45474e223c2ee1d98) )
+	ROM_LOAD( "11.b22", 0x10000, 0x10000, CRC(b22cbbd3) SHA1(70984f1051fd236730d97011bc87dacb3ca38594) )
+	ROM_LOAD( "10.b23", 0x20000, 0x10000, CRC(65714070) SHA1(48f3c130c97d00e8f0535904dc2237277067c475) )
 ROM_END
 
 ROM_START( arkarea )
@@ -1577,8 +1602,8 @@ by one place all the intervening bits.
 void ninjakd2_state::lineswap_gfx_roms(const char *region, const int bit)
 {
 	const int length = memregion(region)->bytes();
-	UINT8* const src = memregion(region)->base();
-	dynamic_buffer temp(length);
+	uint8_t* const src = memregion(region)->base();
+	std::vector<uint8_t> temp(length);
 	const int mask = (1 << (bit + 1)) - 1;
 
 	for (int sa = 0; sa < length; sa++)
@@ -1626,13 +1651,15 @@ READ8_MEMBER(ninjakd2_state::robokid_motion_error_verbose_r)
 	return 0xe6;
 }
 
-void ninjakd2_state::robokid_motion_error_kludge(UINT16 offset)
+void ninjakd2_state::robokid_motion_error_kludge(uint16_t offset)
 {
 	// patch out rare "5268 MOTION ERROR" (MT 05024)
 	// It looks like it's due to a buggy random number generator,
 	// then it possibly happens on the real arcade cabinet too.
 	// I doubt it is protection related, but you can never be sure.
-	UINT8 *ROM = memregion("maincpu")->base() + offset;
+	// Update 131016: there's also a 5208 VECTOR ERROR happening at worm mid-boss on stage 10, I'm prone to think it's
+	// a timing/sprite fault on our side therefore marking as UNEMULATED_PROTECTION until this is resolved. -AS
+	uint8_t *ROM = memregion("maincpu")->base() + offset;
 	ROM[0] = 0xe6;
 	ROM[1] = 0x03; // and 3
 	ROM[2] = 0x18;
@@ -1667,14 +1694,15 @@ GAME( 1987, ninjakd2c, ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, R
 GAME( 1987, rdaction,  ninjakd2, ninjakd2, rdaction, ninjakd2_state, ninjakd2, ROT0,   "UPL (World Games license)",       "Rad Action / NinjaKun Ashura no Shou", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, jt104,     ninjakd2, ninjakd2, rdaction, ninjakd2_state, bootleg,  ROT0,   "UPL (United Amusements license)", "JT-104 (title screen modification of Rad Action)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnight,    0,        mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL", "Mutant Night", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, mnightj,   mnight,   mnight,   mnight,   ninjakd2_state, mnight,   ROT0,   "UPL (Kawakus license)", "Mutant Night (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, arkarea,   0,        arkarea,  arkarea,  ninjakd2_state, mnight,   ROT0,   "UPL", "Ark Area", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE ) // 3-digit highscore names
-GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, robokidj3, robokid,  robokid,  robokidj, driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, robokid,   0,        robokid,  robokid,  ninjakd2_state, robokid,  ROT0,   "UPL", "Atomic Robo-kid (World, Type-2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // 3-digit highscore names
+GAME( 1988, robokidj,  robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj2, robokid,  robokid,  robokidj, ninjakd2_state, robokidj, ROT0,   "UPL", "Atomic Robo-kid (Japan, Type-2, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1988, robokidj3, robokid,  robokid,  robokidj, driver_device,  0,        ROT0,   "UPL", "Atomic Robo-kid (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
 
 GAME( 1989, omegaf,    0,        omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, omegafs,   omegaf,   omegaf,   omegaf,   driver_device,  0,        ROT270, "UPL", "Omega Fighter Special", MACHINE_SUPPORTS_SAVE )

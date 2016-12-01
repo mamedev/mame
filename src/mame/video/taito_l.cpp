@@ -60,9 +60,9 @@ VIDEO_START_MEMBER(taitol_state,taitol)
 {
 	int i;
 
-	m_bg18_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg19_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_ch1a_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg18_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg18_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg19_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_bg19_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_ch1a_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(taitol_state::get_ch1a_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_bg18_tilemap->set_transparent_pen(0);
 	m_ch1a_tilemap->set_transparent_pen(0);
@@ -266,7 +266,7 @@ void taitol_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, co
 }
 
 
-UINT32 taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t taitol_state::screen_update_taitol(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int dx, dy;
 
@@ -313,7 +313,7 @@ void taitol_state::screen_eof_taitol(screen_device &screen, bool state)
 	// rising edge
 	if (state)
 	{
-		UINT8 *spriteram = m_rambanks + 0xb000;
+		uint8_t *spriteram = m_rambanks + 0xb000;
 
 		memcpy(m_buff_spriteram, spriteram, TAITOL_SPRITERAM_SIZE);
 	}

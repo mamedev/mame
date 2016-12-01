@@ -54,7 +54,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 //  cdi68070_device - constructor
 //-------------------------------------------------
 
-cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdi68070_device::cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MACHINE_CDI68070, "CDI68070", tag, owner, clock, "cdi68070", __FILE__)
 {
 }
@@ -210,8 +210,8 @@ void cdi68070_device::device_reset()
 		m_mmu.desc[index].base = 0;
 	}
 
-	memset(m_seeds, 0, 10 * sizeof(UINT16));
-	memset(m_state, 0, 8 * sizeof(UINT8));
+	memset(m_seeds, 0, 10 * sizeof(uint16_t));
+	memset(m_state, 0, 8 * sizeof(uint8_t));
 	m_mcu_value = 0;
 	m_mcu_ack = 0;
 }
@@ -222,7 +222,7 @@ void cdi68070_device::set_timer_callback(int channel)
 	{
 		case 0:
 		{
-			UINT32 compare = 0x10000 - m_timers.timer0;
+			uint32_t compare = 0x10000 - m_timers.timer0;
 			attotime period = attotime::from_hz(CLOCK_A/192) * compare;
 			m_timers.timer0_timer->adjust(period);
 			break;
@@ -234,12 +234,12 @@ void cdi68070_device::set_timer_callback(int channel)
 	}
 }
 
-void cdi68070_device::set_quizard_mcu_ack(UINT8 ack)
+void cdi68070_device::set_quizard_mcu_ack(uint8_t ack)
 {
 	m_mcu_ack = ack;
 }
 
-void cdi68070_device::set_quizard_mcu_value(UINT16 value)
+void cdi68070_device::set_quizard_mcu_value(uint16_t value)
 {
 	m_mcu_value = value;
 }
@@ -252,7 +252,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::timer0_callback )
 	m_timers.timer_status_register |= TSR_OV0;
 	if(m_picr1 & 7)
 	{
-		UINT8 interrupt = m_picr1 & 7;
+		uint8_t interrupt = m_picr1 & 7;
 		m_timers.timer_status_register |= TSR_OV0;
 		if(interrupt)
 		{
@@ -268,7 +268,7 @@ void cdi68070_device::uart_rx_check()
 {
 	if((m_uart.command_register & 3) == 1)
 	{
-		UINT32 div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
+		uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
 		m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 	}
 	else
@@ -293,7 +293,7 @@ void cdi68070_device::uart_tx_check()
 
 		if(m_uart.tx_timer->remaining() == attotime::never)
 		{
-			UINT32 div = 0x10000 >> (m_uart.clock_select & 7);
+			uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
 			m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 	}
@@ -303,14 +303,14 @@ void cdi68070_device::uart_tx_check()
 	}
 }
 
-void cdi68070_device::uart_rx(UINT8 data)
+void cdi68070_device::uart_rx(uint8_t data)
 {
 	m_uart.receive_pointer++;
 	m_uart.receive_buffer[m_uart.receive_pointer] = data;
 	uart_rx_check();
 }
 
-void cdi68070_device::uart_tx(UINT8 data)
+void cdi68070_device::uart_tx(uint8_t data)
 {
 	m_uart.transmit_pointer++;
 	m_uart.transmit_buffer[m_uart.transmit_pointer] = data;
@@ -338,7 +338,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 		{
 			verboselog(*this, 2, "scc68070_rx_callback: Receiving %02x\n", m_uart.receive_holding_register);
 
-			UINT8 interrupt = (m_picr2 >> 4) & 7;
+			uint8_t interrupt = (m_picr2 >> 4) & 7;
 			if(interrupt)
 			{
 				state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -346,7 +346,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 			}
 
 			m_uart.status_register |= USR_RXRDY;
-			UINT32 div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
+			uint32_t div = 0x10000 >> ((m_uart.clock_select >> 4) & 7);
 			m_uart.rx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 		else
@@ -362,13 +362,13 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::rx_callback )
 	uart_rx_check();
 }
 
-void cdi68070_device::quizard_rx(UINT8 data)
+void cdi68070_device::quizard_rx(uint8_t data)
 {
 	uart_rx(0x5a);
 	uart_rx(data);
 }
 
-void cdi68070_device::quizard_set_seeds(UINT8 *rx)
+void cdi68070_device::quizard_set_seeds(uint8_t *rx)
 {
 	m_seeds[0] = (rx[1] << 8) | rx[0];
 	m_seeds[1] = (rx[3] << 8) | rx[2];
@@ -384,12 +384,12 @@ void cdi68070_device::quizard_set_seeds(UINT8 *rx)
 
 void cdi68070_device::quizard_calculate_state()
 {
-	//const UINT16 desired_bitfield = mcu_value;
-	const UINT16 field0 = 0x00ff;
-	const UINT16 field1 = m_mcu_value ^ 0x00ff;
+	//const uint16_t desired_bitfield = mcu_value;
+	const uint16_t field0 = 0x00ff;
+	const uint16_t field1 = m_mcu_value ^ 0x00ff;
 
-	UINT16 total0 = 0;
-	UINT16 total1 = 0;
+	uint16_t total0 = 0;
+	uint16_t total1 = 0;
 
 	for(int index = 0; index < 10; index++)
 	{
@@ -403,19 +403,19 @@ void cdi68070_device::quizard_calculate_state()
 		}
 	}
 
-	UINT16 hi0 = (total0 >> 8) + 0x40;
+	uint16_t hi0 = (total0 >> 8) + 0x40;
 	m_state[2] = hi0 / 2;
 	m_state[3] = hi0 - m_state[2];
 
-	UINT16 lo0 = (total0 & 0x00ff) + 0x40;
+	uint16_t lo0 = (total0 & 0x00ff) + 0x40;
 	m_state[0] = lo0 / 2;
 	m_state[1] = lo0 - m_state[0];
 
-	UINT16 hi1 = (total1 >> 8) + 0x40;
+	uint16_t hi1 = (total1 >> 8) + 0x40;
 	m_state[6] = hi1 / 2;
 	m_state[7] = hi1 - m_state[6];
 
-	UINT16 lo1 = (total1 & 0x00ff) + 0x40;
+	uint16_t lo1 = (total1 & 0x00ff) + 0x40;
 	m_state[4] = lo1 / 2;
 	m_state[5] = lo1 - m_state[4];
 }
@@ -436,9 +436,9 @@ void cdi68070_device::mcu_frame()
 void cdi68070_device::quizard_handle_byte_tx()
 {
 	static int state = 0;
-	static UINT8 rx[0x100];
-	static UINT8 rx_ptr = 0xff;
-	UINT8 tx = m_uart.transmit_holding_register;
+	static uint8_t rx[0x100];
+	static uint8_t rx_ptr = 0xff;
+	uint8_t tx = m_uart.transmit_holding_register;
 
 	switch(state)
 	{
@@ -535,7 +535,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 
 	if(((m_uart.command_register >> 2) & 3) == 1)
 	{
-		UINT8 interrupt = m_picr2 & 7;
+		uint8_t interrupt = m_picr2 & 7;
 		if(interrupt)
 		{
 			state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -554,7 +554,7 @@ TIMER_CALLBACK_MEMBER( cdi68070_device::tx_callback )
 			}
 			m_uart.transmit_pointer--;
 
-			UINT32 div = 0x10000 >> (m_uart.clock_select & 7);
+			uint32_t div = 0x10000 >> (m_uart.clock_select & 7);
 			m_uart.tx_timer->adjust(attotime::from_hz((49152000 / div) / 8));
 		}
 		else
@@ -993,7 +993,7 @@ WRITE16_MEMBER( cdi68070_device::periphs_w )
 				m_timers.timer_status_register &= ~(data >> 8);
 				if(!m_timers.timer_status_register)
 				{
-					UINT8 interrupt = m_picr1 & 7;
+					uint8_t interrupt = m_picr1 & 7;
 					state->m_maincpu->set_input_line(M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
 				}
 			}

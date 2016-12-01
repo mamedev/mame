@@ -42,16 +42,16 @@ class apricot_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_txd_wr_callback(device_t &device, _Object object) { return downcast<apricot_keyboard_device &>(device).m_write_txd.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT8 read_keyboard();
+	uint8_t read_keyboard();
 
 	DECLARE_READ8_MEMBER( kb_lo_r );
 	DECLARE_READ8_MEMBER( kb_hi_r );
@@ -70,22 +70,10 @@ protected:
 private:
 	devcb_write_line   m_write_txd;
 
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
-	required_ioport m_yc;
+	required_ioport_array<13> m_y;
 	required_ioport m_modifiers;
 
-	UINT16 m_kb_y;
+	uint16_t m_kb_y;
 };
 
 

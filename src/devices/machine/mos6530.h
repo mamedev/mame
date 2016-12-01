@@ -39,9 +39,9 @@
 
 struct mos6530_port
 {
-	UINT8 m_in;
-	UINT8 m_out;
-	UINT8 m_ddr;
+	uint8_t m_in;
+	uint8_t m_out;
+	uint8_t m_ddr;
 };
 
 /***************************************************************************
@@ -51,7 +51,7 @@ struct mos6530_port
 class mos6530_device : public device_t
 {
 public:
-	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6530_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~mos6530_device() {}
 
 	template<class _Object> static devcb_base &set_in_pa_callback(device_t &device, _Object object) { return downcast<mos6530_device &>(device).m_in_pa_cb.set_callback(object); }
@@ -62,11 +62,11 @@ public:
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
-	UINT8 porta_in_get();
-	UINT8 portb_in_get();
+	uint8_t porta_in_get();
+	uint8_t portb_in_get();
 
-	UINT8 porta_out_get();
-	UINT8 portb_out_get();
+	uint8_t porta_out_get();
+	uint8_t portb_out_get();
 
 protected:
 	// device-level overrides
@@ -84,20 +84,20 @@ private:
 
 	mos6530_port    m_port[2];
 
-	UINT8           m_irqstate;
-	UINT8           m_irqenable;
+	uint8_t           m_irqstate;
+	uint8_t           m_irqenable;
 
-	UINT8           m_timershift;
-	UINT8           m_timerstate;
+	uint8_t           m_timershift;
+	uint8_t           m_timerstate;
 	emu_timer *     m_timer;
 
-	UINT32          m_clock;
+	uint32_t          m_clock;
 
 	void update_irqstate();
-	UINT8 get_timer();
+	uint8_t get_timer();
 
-	void porta_in_set(UINT8 data, UINT8 mask);
-	void portb_in_set(UINT8 data, UINT8 mask);
+	void porta_in_set(uint8_t data, uint8_t mask);
+	void portb_in_set(uint8_t data, uint8_t mask);
 
 	enum
 	{

@@ -87,7 +87,7 @@ private:
 	required_device<tmpz84c015_device> m_subcpu;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
-	UINT8 io_SEL, io_LD, io_LE, io_SC, io_KY;
+	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
 WRITE_LINE_MEMBER( pve500_state::GPI_w )

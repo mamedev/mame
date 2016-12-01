@@ -34,18 +34,18 @@ public:
 	required_device<samples_device> m_samples;
 	required_device<sn76477_device> m_sn;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	DECLARE_READ8_MEMBER(port29_r);
 	DECLARE_WRITE8_MEMBER(port28_w);
 	DECLARE_WRITE8_MEMBER(port30_w);
 
 	bool m_flipscreen;
-	UINT8 m_last;
+	uint8_t m_last;
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_interrupt);
 };
@@ -75,7 +75,7 @@ void rotaryf_state::machine_start()
 
 READ8_MEMBER( rotaryf_state::port29_r )
 {
-	UINT8 data = ioport("INPUTS")->read();
+	uint8_t data = ioport("INPUTS")->read();
 
 	if (m_flipscreen) return data;
 
@@ -84,7 +84,7 @@ READ8_MEMBER( rotaryf_state::port29_r )
 
 WRITE8_MEMBER( rotaryf_state::port28_w )
 {
-	UINT8 rising_bits = data & ~m_last;
+	uint8_t rising_bits = data & ~m_last;
 
 	if (BIT(rising_bits, 0)) m_samples->start (3, 7);   /* Hit Saucer */
 	if (BIT(rising_bits, 2)) m_samples->start (5, 8);   /* Bonus */
@@ -141,13 +141,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(rotaryf_state::rotaryf_interrupt)
  *
  *************************************/
 
-UINT32 rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rotaryf_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 	pen_t pens[2];
-	pens[0] = rgb_t::black;
-	pens[1] = rgb_t::white;
-	UINT8 i,x,y,data;
+	pens[0] = rgb_t::black();
+	pens[1] = rgb_t::white();
+	uint8_t i,x,y,data;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{

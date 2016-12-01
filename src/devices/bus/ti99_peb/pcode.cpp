@@ -94,7 +94,7 @@
 #define TRACE_CRU 0
 #define TRACE_SWITCH 0
 
-ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_pcode_card_device::ti_pcode_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_P_CODE, "TI-99 P-Code Card", tag, owner, clock, "ti99_pcode", __FILE__),
 	m_rom(nullptr),
 	m_bank_select(0),
@@ -137,7 +137,7 @@ SETADDRESS_DBIN_MEMBER( ti_pcode_card_device::setaddress_dbin )
 	}
 }
 
-void ti_pcode_card_device::debugger_read(address_space& space, UINT16 offset, UINT8& value)
+void ti_pcode_card_device::debugger_read(address_space& space, uint16_t offset, uint8_t& value)
 {
 	// The debuger does not call setaddress
 	if (m_active && ((offset & m_select_mask)==m_select_value))
@@ -273,6 +273,16 @@ void ti_pcode_card_device::device_start()
 	m_grom[6] = downcast<tmc0430_device*>(subdevice(PGROM6_TAG));
 	m_grom[7] = downcast<tmc0430_device*>(subdevice(PGROM7_TAG));
 	m_rom = memregion(PCODE_ROM_TAG)->base();
+
+	save_item(NAME(m_bank_select));
+	save_item(NAME(m_active));
+	save_item(NAME(m_clock_count));
+	save_item(NAME(m_clockhigh));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_isrom0));
+	save_item(NAME(m_isrom12));
+	save_item(NAME(m_isgrom));
+	save_item(NAME(m_address));
 }
 
 void ti_pcode_card_device::device_reset()
@@ -352,7 +362,7 @@ machine_config_constructor ti_pcode_card_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( ti99_pcode );
 }
 
-const rom_entry *ti_pcode_card_device::device_rom_region() const
+const tiny_rom_entry *ti_pcode_card_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_pcode );
 }

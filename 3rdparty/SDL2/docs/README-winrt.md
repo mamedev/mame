@@ -2,11 +2,8 @@ WinRT
 =====
 
 This port allows SDL applications to run on Microsoft's platforms that require
-use of "Windows Runtime", aka. "WinRT", APIs.  WinRT apps are currently
-full-screen only, and run in what Microsoft sometimes refers to as their
-"Modern" (formerly, "Metro"), environment.  For Windows 8.x, Microsoft may also
-refer to them as "Windows Store" apps, due to them being distributed,
-primarily, via a Microsoft-run online store (of the same name).
+use of "Windows Runtime", aka. "WinRT", APIs.  Microsoft may, in some cases,
+refer to them as either "Windows Store", or for Windows 10, "UWP" apps.
 
 Some of the operating systems that include WinRT, are:
 
@@ -82,7 +79,9 @@ Here is a rough list of what works, and what doens't:
 
 * What partially works:
   * keyboard input.  Most of WinRT's documented virtual keys are supported, as
-    well as many keys with documented hardware scancodes.
+    well as many keys with documented hardware scancodes.  Converting
+    SDL_Scancodes to or from SDL_Keycodes may not work, due to missing APIs
+    (MapVirualKey()) in Microsoft's Windows Store / UWP APIs.
   * SDLmain.  WinRT uses a different signature for each app's main() function.
     SDL-based apps that use this port must compile in SDL_winrt_main_NonXAML.cpp
     (in `SDL\src\main\winrt\`) directly in order for their C-style main()
@@ -160,7 +159,9 @@ following, at a high-level:
    the linker, and will copy SDL's .dll files to your app's final output.
 4. adjust your app's build settings, at minimum, telling it where to find SDL's
    header files.
-5. add a file that contains a WinRT-appropriate main function.
+5. add files that contains a WinRT-appropriate main function, along with some
+   data to make sure mouse-cursor-hiding (via SDL_ShowCursor(SDL_DISABLE) calls)
+   work properly.
 6. add SDL-specific app code.
 7. build and run your app.
 
@@ -268,38 +269,37 @@ To change these settings:
 10. close the dialog, saving settings, by clicking the "OK" button
 
 
-### 5. Add a WinRT-appropriate main function to the app. ###
+### 5. Add a WinRT-appropriate main function, and a blank-cursor image, to the app. ###
 
-C/C++-based WinRT apps do contain a `main` function that the OS will invoke when 
-the app starts launching. The parameters of WinRT main functions are different 
-than those found on other platforms, Win32 included.  SDL/WinRT provides a 
-platform-appropriate main function that will perform these actions, setup key 
-portions of the app, then invoke a classic, C/C++-style main function (that take 
-in "argc" and "argv" parameters).  The code for this file is contained inside 
-SDL's source distribution, under `src/main/winrt/SDL_winrt_main_NonXAML.cpp`.  
-You'll need to add this file, or a copy of it, to your app's project, and make 
-sure it gets compiled using a Microsoft-specific set of C++ extensions called 
-C++/CX.
+A few files should be included directly in your app's MSVC project, specifically:
+1. a WinRT-appropriate main function (which is different than main() functions on
+   other platforms)
+2. a Win32-style cursor resource, used by SDL_ShowCursor() to hide the mouse cursor
+   (if and when the app needs to do so).  *If this cursor resource is not
+   included, mouse-position reporting may fail if and when the cursor is
+   hidden, due to possible bugs/design-oddities in Windows itself.*
 
-**NOTE: C++/CX compilation is currently required in at least one file of your 
-app's project.  This is to make sure that Visual C++'s linker builds a 'Windows 
-Metadata' file (.winmd) for your app.  Not doing so can lead to build errors.**
-
-To include `SDL_winrt_main_NonXAML.cpp`:
+To include these files:
 
 1. right-click on your project (again, in Visual C++'s Solution Explorer), 
    navigate to "Add", then choose "Existing Item...".
-2. open `SDL_winrt_main_NonXAML.cpp`, which is found inside SDL's source 
-   distribution, under `src/main/winrt/`.  Make sure that the open-file dialog 
-   closes, either by double-clicking on the file, or single-clicking on it and 
-   then clicking Add.
-3. right-click on the file (as listed in your project), then click on 
-   "Properties...".
+2. navigate to the directory containing SDL's source code, then into its
+   subdirectory, 'src/main/winrt/'.  Select, then add, the following files:
+   - `SDL_winrt_main_NonXAML.cpp`
+   - `SDL2-WinRTResources.rc`
+   - `SDL2-WinRTResource_BlankCursor.cur`
+3. right-click on the file `SDL_winrt_main_NonXAML.cpp` (as listed in your
+   project), then click on "Properties...".
 4. in the drop-down box next to "Configuration", choose, "All Configurations"
 5. in the drop-down box next to "Platform", choose, "All Platforms"
 6. in the left-hand list, click on "C/C++"
 7. change the setting for "Consume Windows Runtime Extension" to "Yes (/ZW)".
 8. click the OK button.  This will close the dialog.
+
+
+**NOTE: C++/CX compilation is currently required in at least one file of your 
+app's project.  This is to make sure that Visual C++'s linker builds a 'Windows 
+Metadata' file (.winmd) for your app.  Not doing so can lead to build errors.**
 
 
 ### 6. Add app code and assets ###
@@ -466,3 +466,13 @@ section.
 
     /nodefaultlib:vccorlibd /nodefaultlib:msvcrtd vccorlibd.lib msvcrtd.lib
 
+
+#### Mouse-motion events fail to get sent, or SDL_GetMouseState() fails to return updated values
+
+This may be caused by a bug in Windows itself, whereby hiding the mouse
+cursor can cause mouse-position reporting to fail.
+
+SDL provides a workaround for this, but it requires that an app links to a
+set of Win32-style cursor image-resource files.  A copy of suitable resource
+files can be found in `src/main/winrt/`.  Adding them to an app's Visual C++
+project file should be sufficient to get the app to use them.

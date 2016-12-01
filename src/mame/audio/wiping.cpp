@@ -16,7 +16,7 @@ static const int defgain = 48;
 
 const device_type WIPING = &device_creator<wiping_sound_device>;
 
-wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WIPING, "Wiping Audio Custom", tag, owner, clock, "wiping_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 	m_last_channel(nullptr),
@@ -31,7 +31,7 @@ wiping_sound_device::wiping_sound_device(const machine_config &mconfig, const ch
 	m_mixer_buffer_2(nullptr)
 {
 	memset(m_channel_list, 0, sizeof(wp_sound_channel)*MAX_VOICES);
-	memset(m_soundregs, 0, sizeof(UINT8)*0x4000);
+	memset(m_soundregs, 0, sizeof(uint8_t)*0x4000);
 }
 
 
@@ -91,7 +91,7 @@ void wiping_sound_device::make_mixer_table(int voices, int gain)
 	int i;
 
 	/* allocate memory */
-	m_mixer_table = make_unique_clear<INT16[]>(256 * voices);
+	m_mixer_table = make_unique_clear<int16_t[]>(256 * voices);
 
 	/* find the middle of the table */
 	m_mixer_lookup = m_mixer_table.get() + (128 * voices);
@@ -185,7 +185,7 @@ void wiping_sound_device::sound_stream_update(sound_stream &stream, stream_sampl
 		/* only update if we have non-zero volume and frequency */
 		if (v && f)
 		{
-			const UINT8 *w = voice->wave;
+			const uint8_t *w = voice->wave;
 			int c = voice->counter;
 
 			mix = m_mixer_buffer.get();

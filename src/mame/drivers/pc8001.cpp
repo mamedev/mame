@@ -126,7 +126,7 @@ READ8_MEMBER( pc8001_state::port40_r )
 
 	*/
 
-	UINT8 data = 0x08;
+	uint8_t data = 0x08;
 
 	data |= m_centronics_busy;
 	data |= m_centronics_ack << 1;
@@ -354,19 +354,19 @@ INPUT_PORTS_END
 
 static const rgb_t PALETTE_PC8001[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0x00, 0x00, 0xff),
 	rgb_t(0xff, 0x00, 0x00),
 	rgb_t(0xff, 0x00, 0xff),
 	rgb_t(0x00, 0xff, 0x00),
 	rgb_t(0x00, 0xff, 0xff),
 	rgb_t(0xff, 0xff, 0x00),
-	rgb_t::white
+	rgb_t::white()
 };
 
 UPD3301_DRAW_CHARACTER_MEMBER( pc8001_state::pc8001_display_pixels )
 {
-	UINT8 data = m_char_rom->base()[(cc << 3) | lc];
+	uint8_t data = m_char_rom->base()[(cc << 3) | lc];
 	int i;
 
 	if (lc >= 8) return;
@@ -431,7 +431,7 @@ void pc8001_state::machine_start()
 	m_dma->ready_w(1);
 
 	/* setup memory banking */
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	membank("bank1")->configure_entry(1, m_rom->base());
 	program.install_read_bank(0x0000, 0x5fff, "bank1");

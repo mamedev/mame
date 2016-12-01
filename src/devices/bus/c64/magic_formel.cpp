@@ -162,7 +162,7 @@ ioport_constructor c64_magic_formel_cartridge_device::device_input_ports() const
 //  c64_magic_formel_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_magic_formel_cartridge_device::c64_magic_formel_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_MAGIC_FORMEL, "C64 Magic Formel cartridge", tag, owner, clock, "c64_magic_formel", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_pia(*this, MC6821_TAG),
@@ -215,7 +215,7 @@ void c64_magic_formel_cartridge_device::device_reset()
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!romh)
 	{
@@ -236,7 +236,7 @@ UINT8 c64_magic_formel_cartridge_device::c64_cd_r(address_space &space, offs_t o
 //  c64_cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!io1 && !m_ram_oe)
 	{
@@ -246,7 +246,7 @@ void c64_magic_formel_cartridge_device::c64_cd_w(address_space &space, offs_t of
 	else if (!io2 && !(!m_u9b && m_ram_oe))
 	{
 		offs_t addr = (offset >> 6) & 0x03;
-		UINT8 new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
+		uint8_t new_data = (BIT(data, 1) << 7) | (offset & 0x3f);
 
 		m_pia->write(space, addr, new_data);
 	}

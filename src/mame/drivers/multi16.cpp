@@ -30,12 +30,12 @@ public:
 	required_device<palette_device> m_palette;
 	DECLARE_WRITE8_MEMBER(multi16_6845_address_w);
 	DECLARE_WRITE8_MEMBER(multi16_6845_data_w);
-	required_shared_ptr<UINT16> m_p_vram;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
+	required_shared_ptr<uint16_t> m_p_vram;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -61,7 +61,7 @@ void multi16_state::video_start()
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-UINT32 multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t multi16_state::screen_update_multi16(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count;

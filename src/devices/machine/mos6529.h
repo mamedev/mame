@@ -67,7 +67,7 @@ class mos6529_device :  public device_t
 {
 public:
 	// construction/destruction
-	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos6529_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_p0_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p0_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_p1_handler(device_t &device, _Object object) { return downcast<mos6529_device &>(device).m_p1_handler.set_callback(object); }
@@ -94,7 +94,7 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	UINT8 m_input;
+	uint8_t m_input;
 
 	devcb_write_line m_p0_handler;
 	devcb_write_line m_p1_handler;

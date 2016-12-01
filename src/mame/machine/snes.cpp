@@ -28,7 +28,7 @@
 
 #define DMA_REG(a) m_dma_regs[a - 0x4300]   // regs 0x4300-0x437f
 
-UINT32 snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t snes_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	/* NTSC SNES draw range is 1-225. */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -69,7 +69,7 @@ void snes_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		snes_hblank_tick(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in snes_state::device_timer");
+		assert_always(false, "Unknown id in snes_state::device_timer");
 	}
 }
 
@@ -262,8 +262,8 @@ TIMER_CALLBACK_MEMBER(snes_state::snes_hblank_tick)
 
 READ8_MEMBER( snes_state::snes_open_bus_r )
 {
-	static UINT8 recurse = 0;
-	UINT16 result;
+	static uint8_t recurse = 0;
+	uint16_t result;
 
 	/* prevent recursion */
 	if (recurse)
@@ -388,7 +388,7 @@ WRITE8_MEMBER( snes_state::snes_io_dma_w )
  */
 READ8_MEMBER( snes_state::snes_r_io )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	// PPU accesses are from 2100 to 213f
 	if (offset >= INIDISP && offset < APU00)
@@ -594,7 +594,7 @@ WRITE8_MEMBER( snes_state::snes_w_io )
 
 }
 
-void snes_state::write_joy_latch(UINT8 data)
+void snes_state::write_joy_latch(uint8_t data)
 {
 	if (m_oldjoy1_latch == (data & 0x01))
 		return;
@@ -607,7 +607,7 @@ void snes_state::write_joy_latch(UINT8 data)
 }
 
 
-void snes_state::wrio_write(UINT8 data)
+void snes_state::wrio_write(uint8_t data)
 {
 	if (!(SNES_CPU_REG(WRIO) & 0x80) && (data & 0x80))
 	{
@@ -696,11 +696,11 @@ address               |         |          |       |     |         |        |   
 
 */
 
-inline UINT8 snes_state::snes_rom_access(UINT32 offset)
+inline uint8_t snes_state::snes_rom_access(uint32_t offset)
 {
-	UINT32 addr;
-	UINT8 value = 0xff;
-	UINT8 base_bank = (offset < 0x800000) ? 0x80 : 0x00;
+	uint32_t addr;
+	uint8_t value = 0xff;
+	uint8_t base_bank = (offset < 0x800000) ? 0x80 : 0x00;
 
 	switch (m_cart.mode)
 	{
@@ -723,8 +723,8 @@ inline UINT8 snes_state::snes_rom_access(UINT32 offset)
 /* 0x000000 - 0x7dffff */
 READ8_MEMBER(snes_state::snes_r_bank1)
 {
-	UINT8 value = 0xff;
-	UINT16 address = offset & 0xffff;
+	uint8_t value = 0xff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -787,8 +787,8 @@ READ8_MEMBER(snes_state::snes_r_bank1)
 /* 0x800000 - 0xffffff */
 READ8_MEMBER(snes_state::snes_r_bank2)
 {
-	UINT8 value = 0;
-	UINT16 address = offset & 0xffff;
+	uint8_t value = 0;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -835,7 +835,7 @@ READ8_MEMBER(snes_state::snes_r_bank2)
 /* 0x000000 - 0x7dffff */
 WRITE8_MEMBER(snes_state::snes_w_bank1)
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -892,7 +892,7 @@ WRITE8_MEMBER(snes_state::snes_w_bank1)
 /* 0x800000 - 0xffffff */
 WRITE8_MEMBER(snes_state::snes_w_bank2)
 {
-	UINT16 address = offset & 0xffff;
+	uint16_t address = offset & 0xffff;
 
 	if (offset < 0x400000)
 	{
@@ -988,7 +988,7 @@ WRITE8_MEMBER(snes_state::io_read)
 }
 
 
-UINT8 snes_state::oldjoy1_read(int latched)
+uint8_t snes_state::oldjoy1_read(int latched)
 {
 	if (latched)
 		return 0;
@@ -999,7 +999,7 @@ UINT8 snes_state::oldjoy1_read(int latched)
 		return (m_data1[0] >> (15 - m_read_idx[0]++)) & 0x01;
 }
 
-UINT8 snes_state::oldjoy2_read(int latched)
+uint8_t snes_state::oldjoy2_read(int latched)
 {
 	if (latched)
 		return 0;
@@ -1147,7 +1147,7 @@ void snes_state::machine_reset()
 }
 
 
-void snes_state::rom_map_setup(UINT32 size)
+void snes_state::rom_map_setup(uint32_t size)
 {
 	int i;
 	// setup the rom_bank_map array to faster ROM read
@@ -1177,11 +1177,11 @@ DRIVER_INIT_MEMBER(snes_state,snes)
 	m_cart.m_nvram_size = 0;
 	if (m_cart.m_rom[0x7fd8] > 0)
 	{
-		UINT32 nvram_size = (1024 << m_cart.m_rom[0x7fd8]);
+		uint32_t nvram_size = (1024 << m_cart.m_rom[0x7fd8]);
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
+		m_cart.m_nvram = make_unique_clear<uint8_t[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 
@@ -1198,11 +1198,11 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 	m_cart.m_nvram_size = 0;
 	if (m_cart.m_rom[0xffd8] > 0)
 	{
-		UINT32 nvram_size = (1024 << m_cart.m_rom[0xffd8]);
+		uint32_t nvram_size = (1024 << m_cart.m_rom[0xffd8]);
 		if (nvram_size > 0x40000)
 			nvram_size = 0x40000;
 
-		m_cart.m_nvram = make_unique_clear<UINT8[]>(nvram_size);
+		m_cart.m_nvram = make_unique_clear<uint8_t[]>(nvram_size);
 		m_cart.m_nvram_size = nvram_size;
 	}
 
@@ -1216,7 +1216,7 @@ DRIVER_INIT_MEMBER(snes_state,snes_hirom)
 
 *************************************/
 
-inline int snes_state::dma_abus_valid( UINT32 address )
+inline int snes_state::dma_abus_valid( uint32_t address )
 {
 	if((address & 0x40ff00) == 0x2100) return 0;  //$[00-3f|80-bf]:[2100-21ff]
 	if((address & 0x40fe00) == 0x4000) return 0;  //$[00-3f|80-bf]:[4000-41ff]
@@ -1226,7 +1226,7 @@ inline int snes_state::dma_abus_valid( UINT32 address )
 	return 1;
 }
 
-inline UINT8 snes_state::abus_read( address_space &space, UINT32 abus )
+inline uint8_t snes_state::abus_read( address_space &space, uint32_t abus )
 {
 	if (!dma_abus_valid(abus))
 		return 0;
@@ -1234,7 +1234,7 @@ inline UINT8 snes_state::abus_read( address_space &space, UINT32 abus )
 	return space.read_byte(abus);
 }
 
-inline void snes_state::dma_transfer( address_space &space, UINT8 dma, UINT32 abus, UINT16 bbus )
+inline void snes_state::dma_transfer( address_space &space, uint8_t dma, uint32_t abus, uint16_t bbus )
 {
 	if (m_dma_channel[dma].dmap & 0x80)  /* PPU->CPU */
 	{
@@ -1273,12 +1273,12 @@ inline void snes_state::dma_transfer( address_space &space, UINT8 dma, UINT32 ab
 
 /* WIP: These have the advantage to automatically update the address, but then we would need to
 check again if the transfer is direct/indirect at each step... is it worth? */
-inline UINT32 snes_state::get_hdma_addr( int dma )
+inline uint32_t snes_state::get_hdma_addr( int dma )
 {
 	return (m_dma_channel[dma].bank << 16) | (m_dma_channel[dma].hdma_addr++);
 }
 
-inline UINT32 snes_state::get_hdma_iaddr( int dma )
+inline uint32_t snes_state::get_hdma_iaddr( int dma )
 {
 	return (m_dma_channel[dma].ibank << 16) | (m_dma_channel[dma].trans_size++);
 }
@@ -1297,7 +1297,7 @@ inline int snes_state::is_last_active_channel( int dma )
 
 void snes_state::hdma_update( address_space &space, int dma )
 {
-	UINT32 abus = get_hdma_addr(dma);
+	uint32_t abus = get_hdma_addr(dma);
 
 	m_dma_channel[dma].hdma_line_counter = abus_read(space, abus);
 
@@ -1340,8 +1340,8 @@ void snes_state::hdma_init( address_space &space )
 
 void snes_state::hdma( address_space &space )
 {
-	UINT16 bbus;
-	UINT32 abus;
+	uint16_t bbus;
+	uint32_t abus;
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1420,12 +1420,12 @@ void snes_state::hdma( address_space &space )
 	}
 }
 
-void snes_state::dma( address_space &space, UINT8 channels )
+void snes_state::dma( address_space &space, uint8_t channels )
 {
-	INT8 increment;
-	UINT16 bbus;
-	UINT32 abus, abus_bank;
-	UINT16 length;
+	int8_t increment;
+	uint16_t bbus;
+	uint32_t abus, abus_bank;
+	uint16_t length;
 
 	/* FIXME: we also need to round to the nearest 8 master cycles */
 

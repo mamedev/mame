@@ -40,9 +40,9 @@ enum
 void micro3d_state::video_start()
 {
 	/* Allocate 512x12 x 2 3D frame buffers */
-	m_frame_buffers[0] = std::make_unique<UINT16[]>(1024 * 512);
-	m_frame_buffers[1] = std::make_unique<UINT16[]>(1024 * 512);
-	m_tmp_buffer = std::make_unique<UINT16[]>(1024 * 512);
+	m_frame_buffers[0] = std::make_unique<uint16_t[]>(1024 * 512);
+	m_frame_buffers[1] = std::make_unique<uint16_t[]>(1024 * 512);
+	m_tmp_buffer = std::make_unique<uint16_t[]>(1024 * 512);
 }
 
 
@@ -64,13 +64,13 @@ void micro3d_state::video_reset()
 
 TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 {
-	UINT16 *src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
-	UINT16 *dest = &bitmap.pix16(scanline);
+	uint16_t *src = &m_sprite_vram[(params->rowaddr << 8) & 0x7fe00];
+	uint16_t *dest = &bitmap.pix16(scanline);
 	int coladdr = params->coladdr;
 	int sd_11_7 = (m_creg & 0x1f) << 7;
 	int x;
 
-	UINT16 *frame_src;
+	uint16_t *frame_src;
 
 	scanline = std::max((scanline - params->veblnk), 0);
 	frame_src = m_frame_buffers[m_display_buffer].get() + (scanline << 10);
@@ -80,7 +80,7 @@ TMS340X0_SCANLINE_IND16_CB_MEMBER(micro3d_state::scanline_update)
 	/* Copy the non-blanked portions of this scanline */
 	for (x = params->heblnk; x < params->hsblnk; x += 2)
 	{
-		UINT16 pix = src[coladdr++ & 0x1ff];
+		uint16_t pix = src[coladdr++ & 0x1ff];
 
 		/*
 		    TODO: The upper four bits of the 3D buffer affect priority
@@ -234,9 +234,9 @@ micro3d_vtx micro3d_state::intersect(micro3d_vtx *v1, micro3d_vtx *v2, enum plan
 	return vo;
 }
 
-inline void micro3d_state::write_span(UINT32 y, UINT32 x)
+inline void micro3d_state::write_span(uint32_t y, uint32_t x)
 {
-	UINT32 *draw_dpram = m_draw_dpram;
+	uint32_t *draw_dpram = m_draw_dpram;
 	int addr = y << 1;
 
 	if (draw_dpram[addr] == 0x3ff000)
@@ -261,18 +261,18 @@ inline void micro3d_state::write_span(UINT32 y, UINT32 x)
 }
 
 /* This is the same algorithm used in the 3D tests */
-void micro3d_state::draw_line(UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
+void micro3d_state::draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2)
 {
-	UINT32 tmp2;
-	UINT32 acc;
-	UINT32 y_inc;
+	uint32_t tmp2;
+	uint32_t acc;
+	uint32_t y_inc;
 
-	UINT32 dx;
-	UINT32 dy;
+	uint32_t dx;
+	uint32_t dy;
 
 	if (x2 < x1)
 	{
-		UINT32 tmp;
+		uint32_t tmp;
 
 		tmp = x1;
 		x1 = x2;
@@ -364,7 +364,7 @@ void micro3d_state::draw_line(UINT32 x1, UINT32 y1, UINT32 x2, UINT32 y2)
 	}
 }
 
-void micro3d_state::rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr)
+void micro3d_state::rasterise_spans(uint32_t min_y, uint32_t max_y, uint32_t attr)
 {
 	int y;
 	int color = attr & 0xfff;
@@ -375,7 +375,7 @@ void micro3d_state::rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr)
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &m_tmp_buffer[y * 1024];
+			uint16_t *dest = &m_tmp_buffer[y * 1024];
 
 			if (m_draw_dpram[addr] == 0x3ff000)
 			{
@@ -397,7 +397,7 @@ void micro3d_state::rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr)
 		    I don't know the LFSR arrangement inside the DRAW2 ASIC
 		    but here are some possible tap arrangements
 		*/
-		static const UINT8 taps[8][4] =
+		static const uint8_t taps[8][4] =
 		{
 			{9, 8, 7, 2},
 			{9, 8, 6, 5},
@@ -416,7 +416,7 @@ void micro3d_state::rasterise_spans(UINT32 min_y, UINT32 max_y, UINT32 attr)
 		{
 			int x;
 			int addr = y << 1;
-			UINT16 *dest = &m_tmp_buffer[y * 1024];
+			uint16_t *dest = &m_tmp_buffer[y * 1024];
 
 			if (m_draw_dpram[addr] == 0x3ff000)
 			{
@@ -479,10 +479,10 @@ int micro3d_state::clip_triangle(micro3d_vtx *v, micro3d_vtx *vout, int num_vert
 	return clip_verts;
 }
 
-void micro3d_state::draw_triangles(UINT32 attr)
+void micro3d_state::draw_triangles(uint32_t attr)
 {
 	int i;
-	int triangles = 0;
+	bool triangles = false;
 	int vertices = m_fifo_idx / 3;
 	int min_y = 0x3ff;
 	int max_y = 0;
@@ -548,7 +548,7 @@ void micro3d_state::draw_triangles(UINT32 attr)
 			micro3d_vtx a = vclip_list[0];
 			micro3d_vtx b = vclip_list[1];
 
-			triangles = TRUE;
+			triangles = true;
 
 			a.x += m_x_mid;
 			a.y += m_y_mid;
@@ -589,7 +589,7 @@ void micro3d_state::draw_triangles(UINT32 attr)
 		}
 	}
 
-	if (triangles == TRUE)
+	if (triangles == true)
 		rasterise_spans(min_y, max_y, attr);
 }
 
@@ -621,7 +621,7 @@ bc000000-1fc DPRAM address for read access
 
 WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 {
-	UINT32 opcode = data >> 24;
+	uint32_t opcode = data >> 24;
 
 	switch (m_draw_state)
 	{
@@ -644,7 +644,7 @@ WRITE32_MEMBER(micro3d_state::micro3d_fifo_w)
 				}
 				case 0xbc:
 				{
-					UINT32 dpram_r_addr = (((data & 0x01ff) << 1) | m_dpram_bank);
+					uint32_t dpram_r_addr = (((data & 0x01ff) << 1) | m_dpram_bank);
 					m_pipe_data = m_draw_dpram[dpram_r_addr];
 					m_drmath->set_input_line(AM29000_INTR1, ASSERT_LINE);
 					break;

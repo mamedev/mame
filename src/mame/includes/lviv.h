@@ -28,14 +28,14 @@ public:
 
 	unsigned char * m_video_ram;
 	unsigned short m_colortable[1][4];
-	UINT8 m_ppi_port_outputs[2][3];
-	UINT8 m_startup_mem_map;
+	uint8_t m_ppi_port_outputs[2][3];
+	uint8_t m_startup_mem_map;
 	DECLARE_READ8_MEMBER(lviv_io_r);
 	DECLARE_WRITE8_MEMBER(lviv_io_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(lviv);
-	UINT32 screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lviv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_porta_r);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_portb_r);
 	DECLARE_READ8_MEMBER(lviv_ppi_0_portc_r);
@@ -53,11 +53,11 @@ public:
 	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_ram;
 	required_device<palette_device> m_palette;
-	void lviv_update_palette(UINT8 pal);
+	void lviv_update_palette(uint8_t pal);
 	void lviv_update_memory ();
-	void lviv_setup_snapshot (UINT8 * data);
+	void lviv_setup_snapshot (uint8_t * data);
 	void dump_registers();
-	image_verify_result lviv_verify_snapshot(UINT8 * data, UINT32 size);
+	image_verify_result lviv_verify_snapshot(uint8_t * data, uint32_t size);
 	DECLARE_SNAPSHOT_LOAD_MEMBER( lviv );
 	DECLARE_INPUT_CHANGED_MEMBER(lviv_reset);
 };

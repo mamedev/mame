@@ -289,7 +289,7 @@ machine_config_constructor sega_segacd_device::device_mconfig_additions() const
 }
 
 
-sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME( segacd )),
 		m_scdcpu(*this, "segacd_68k"),
@@ -305,26 +305,26 @@ sega_segacd_device::sega_segacd_device(const machine_config &mconfig, device_typ
 {
 }
 
-sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_us_device::sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_US, "sega_segacd_us", tag, owner, clock, "sega_segacd_us", __FILE__)
 {
 }
 
-sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_japan_device::sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_JAPAN, "sega_segacd_japan", tag, owner, clock, "sega_segacd_japan", __FILE__)
 {
 }
 
-sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_segacd_europe_device::sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_segacd_device(mconfig, SEGA_SEGACD_EUROPE, "sega_segacd_europe", tag, owner, clock, "sega_segacd_europe", __FILE__)
 {
 }
 
 
-inline void sega_segacd_device::write_pixel(UINT8 pix, int pixeloffset)
+inline void sega_segacd_device::write_pixel(uint8_t pix, int pixeloffset)
 {
 	int shift = 12-(4*(pixeloffset&0x3));
-	UINT16 datamask = (0x000f) << shift;
+	uint16_t datamask = (0x000f) << shift;
 
 	int offset = pixeloffset>>3;
 	if (pixeloffset&4) offset++;
@@ -368,7 +368,7 @@ inline void sega_segacd_device::write_pixel(UINT8 pix, int pixeloffset)
 // Wily Beamish and Citizen X appear to rely on this
 // however, it breaks the megacdj bios (megacd2j still works!)
 //  (maybe that's a timing issue instead?)
-UINT16 sega_segacd_device::segacd_1meg_mode_word_read(int offset, UINT16 mem_mask)
+uint16_t sega_segacd_device::segacd_1meg_mode_word_read(int offset, uint16_t mem_mask)
 {
 	offset *= 2;
 
@@ -381,7 +381,7 @@ UINT16 sega_segacd_device::segacd_1meg_mode_word_read(int offset, UINT16 mem_mas
 }
 
 
-void sega_segacd_device::segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm)
+void sega_segacd_device::segacd_1meg_mode_word_write(int offset, uint16_t data, uint16_t mem_mask, int use_pm)
 {
 	offset *= 2;
 
@@ -444,7 +444,7 @@ void sega_segacd_device::segacd_1meg_mode_word_write(int offset, UINT16 data, UI
 
 WRITE16_MEMBER( sega_segacd_device::scd_a12000_halt_reset_w )
 {
-	UINT16 old_halt = m_a12000_halt_reset_reg;
+	uint16_t old_halt = m_a12000_halt_reset_reg;
 
 	COMBINE_DATA(&m_a12000_halt_reset_reg);
 
@@ -714,14 +714,14 @@ WRITE16_MEMBER( sega_segacd_device::segacd_comms_flags_maincpu_w )
 
 READ16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_r )
 {
-	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
+	uint16_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 	return m_prgram[realoffset];
 
 }
 
 WRITE16_MEMBER( sega_segacd_device::scd_4m_prgbank_ram_w )
 {
-	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
+	uint16_t realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
 
 	// todo:
 	// check for write protection? (or does that only apply to writes on the SubCPU side?
@@ -1032,7 +1032,7 @@ TILE_GET_INFO_MEMBER( sega_segacd_device::get_stampmap_32x32_16x16_tile_info )
 
 // non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
 
-inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
@@ -1066,11 +1066,11 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_1x1_tile_info_pixel(int xpos
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
@@ -1104,11 +1104,11 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_1x1_tile_info_pixel(int xpos
 
 	if (tileno==0) return 0x00; // does this apply in this mode?
 
-	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
@@ -1142,11 +1142,11 @@ inline UINT8 sega_segacd_device::get_stampmap_16x16_16x16_tile_info_pixel(int xp
 
 	if (tileno==0) return 0x00; // does this apply in this mode
 
-	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
-inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos)
+inline uint8_t sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos)
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
@@ -1180,7 +1180,7 @@ inline UINT8 sega_segacd_device::get_stampmap_32x32_16x16_tile_info_pixel(int xp
 
 	if (tileno==0) return 0x00;
 
-	const UINT8* srcdata = gfx(tile_region)->get_data(tileno);
+	const uint8_t* srcdata = gfx(tile_region)->get_data(tileno);
 	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
 }
 
@@ -1196,7 +1196,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_w )
 
 READ16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_r )
 {
-	INT32 result = (m_stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
+	int32_t result = (m_stopwatch_timer->time_elapsed() * ATTOSECONDS_TO_HZ(ATTOSECONDS_IN_USEC(30.72))).as_double();
 
 	return result & 0xfff;
 }
@@ -1209,7 +1209,7 @@ READ16_MEMBER( sega_segacd_device::segacd_stopwatch_timer_r )
 
 READ16_MEMBER( sega_segacd_device::segacd_sub_led_ready_r )
 {
-	UINT16 retdata = 0x0000;
+	uint16_t retdata = 0x0000;
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1265,7 +1265,7 @@ READ16_MEMBER( sega_segacd_device::segacd_sub_dataram_part1_r )
 	else if ((scd_rammode&2)==RAM_MODE_1MEG)
 	{
 //      printf("Unspported: segacd_sub_dataram_part1_r in mode 1 (Word RAM Expander - 1 Byte Per Pixel)\n");
-		UINT16 data;
+		uint16_t data;
 
 		if (scd_rammode&1)
 		{
@@ -1388,7 +1388,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_sub_dataram_part2_w )
 
 READ16_MEMBER( sega_segacd_device::segacd_stampsize_r )
 {
-	UINT16 retdata = 0x0000;
+	uint16_t retdata = 0x0000;
 
 	retdata |= segacd_conversion_active<<15;
 
@@ -1428,7 +1428,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_stampsize_w )
 // the lower 3 bits of segacd_imagebuffer_hdot_size are set
 
 // this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
-inline UINT8 sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y)
+inline uint8_t sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y)
 {
 /*
     if (!srcbitmap)
@@ -1439,7 +1439,7 @@ inline UINT8 sega_segacd_device::read_pixel_from_stampmap(bitmap_ind16* srcbitma
     if (x >= srcbitmap->width) return 0;
     if (y >= srcbitmap->height) return 0;
 
-    UINT16* cacheptr = &srcbitmap->pix16(y, x);
+    uint16_t* cacheptr = &srcbitmap->pix16(y, x);
 
     return cacheptr[0] & 0xf;
 */
@@ -1487,15 +1487,15 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 		int line;
 		//bitmap_ind16 *srcbitmap = segacd_stampmap[segacd_get_active_stampmap_tilemap(->pixmap()]);
 		bitmap_ind16 *srcbitmap = nullptr;
-		UINT32 bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
+		uint32_t bufferstart = ((segacd_imagebuffer_start_address&0xfff8)*2)<<3;
 
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
 		{
 			int currbase = base + line * 0x8;
 
 			// are the 256x256 tile modes using the same sign bits?
-			INT16 tilemapxoffs,tilemapyoffs;
-			INT16 deltax,deltay;
+			int16_t tilemapxoffs,tilemapyoffs;
+			int16_t deltax,deltay;
 
 			tilemapxoffs = m_dataram[(currbase+0x0)>>1];
 			tilemapyoffs = m_dataram[(currbase+0x2)>>1];
@@ -1511,7 +1511,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 			for (count=0;count<(segacd_imagebuffer_hdot_size);count++)
 			{
 				//int i;
-				UINT8 pix = 0x0;
+				uint8_t pix = 0x0;
 
 				pix = read_pixel_from_stampmap(srcbitmap, xbase>>(3+8), ybase>>(3+8));
 
@@ -1524,7 +1524,7 @@ WRITE16_MEMBER( sega_segacd_device::segacd_trace_vector_base_address_w )
 
 				int countx = count + (segacd_imagebuffer_offset&0x7);
 
-				UINT32 offset;
+				uint32_t offset;
 
 				offset = bufferstart+((((segacd_imagebuffer_vcell_size+1)*0x10)*(countx>>3))<<3);
 
@@ -1670,7 +1670,7 @@ READ16_MEMBER( sega_segacd_device::font_converted_r )
 {
 	int scbg = (m_font_color & 0x0f);
 	int scfg = (m_font_color & 0xf0)>>4;
-	UINT16 retdata = 0;
+	uint16_t retdata = 0;
 	int bit;
 
 	for (bit=0;bit<4;bit++)
@@ -1812,10 +1812,10 @@ TIMER_DEVICE_CALLBACK_MEMBER( sega_segacd_device::dma_timer_callback )
 }
 
 // todo: tidy up, too many CDC internals here
-void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination )
+void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination )
 {
 	int length = dmacount;
-	UINT16 *dest;
+	uint16_t *dest;
 	int srcoffset = 0;
 	int dstoffset = 0;
 	address_space& space = m_scdcpu->space(AS_PROGRAM);
@@ -1835,7 +1835,7 @@ void sega_segacd_device::SegaCD_CDC_Do_DMA(int &dmacount, UINT8 *CDC_BUFFER, UIN
 
 	while (dmacount--)
 	{
-		UINT16 data = (CDC_BUFFER[dma_addrc+srcoffset]<<8) | CDC_BUFFER[dma_addrc+srcoffset+1];
+		uint16_t data = (CDC_BUFFER[dma_addrc+srcoffset]<<8) | CDC_BUFFER[dma_addrc+srcoffset+1];
 
 		if (destination==DMA_PRG)
 		{

@@ -4,26 +4,26 @@
 
     ACT Apricot Keyboard Interface
 
-	Host interface: 9-pin D-SUB
+    Host interface: 9-pin D-SUB
 
-	1  +12V
-	2  OUT
-	3  IN
-	4  N/C
-	5  N/C
-	6  GND
-	7  -12V
-	8  0V
-	9  N/C
+    1  +12V
+    2  OUT
+    3  IN
+    4  N/C
+    5  N/C
+    6  GND
+    7  -12V
+    8  0V
+    9  N/C
 
-	Keyboard interface:
+    Keyboard interface:
 
-	A  0V
-	B  +12V
-	C  -12V
-	D  N/C
-	E  OUT
-	F  IN
+    A  0V
+    B  +12V
+    C  -12V
+    D  N/C
+    E  OUT
+    F  IN
 
 ***************************************************************************/
 
@@ -59,7 +59,7 @@ class apricot_keyboard_bus_device : public device_t, public device_slot_interfac
 {
 public:
 	// construction/destruction
-	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apricot_keyboard_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apricot_keyboard_bus_device();
 
 	// callbacks

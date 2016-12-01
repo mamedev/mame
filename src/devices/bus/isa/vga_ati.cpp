@@ -123,17 +123,17 @@ machine_config_constructor isa16_vga_mach64_device::device_mconfig_additions() c
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_vga_gfxultra_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_gfxultra_device::device_rom_region() const
 {
 	return ROM_NAME( gfxultra );
 }
 
-const rom_entry *isa16_vga_gfxultrapro_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_gfxultrapro_device::device_rom_region() const
 {
 	return ROM_NAME( gfxultrp );
 }
 
-const rom_entry *isa16_vga_mach64_device::device_rom_region() const
+const tiny_rom_entry *isa16_vga_mach64_device::device_rom_region() const
 {
 	return ROM_NAME( mach64 );
 }
@@ -146,19 +146,19 @@ const rom_entry *isa16_vga_mach64_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_vga_gfxultra_device::isa16_vga_gfxultra_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_VGA_GFXULTRA, "ATi Graphics Ultra Card", tag, owner, clock, "gfxultra", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr), m_8514(nullptr)
 {
 }
 
-isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_vga_gfxultrapro_device::isa16_vga_gfxultrapro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_GFXULTRAPRO, "ATi Graphics Ultra Pro Card", tag, owner, clock, "gfxultrp", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
 }
 
-isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_vga_mach64_device::isa16_vga_mach64_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_MACH64, "ATi mach64 Card", tag, owner, clock, "mach64", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {

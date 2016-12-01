@@ -37,7 +37,7 @@ const device_type DMAC = &device_creator<dmac_device>;
 //  dmac_device - constructor
 //-------------------------------------------------
 
-dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DMAC, "DMAC DMA Controller", tag, owner, clock, "dmac", __FILE__),
 	amiga_autoconfig(),
 	m_cfgout_handler(*this),
@@ -174,7 +174,7 @@ void dmac_device::start_dma()
 
 READ16_MEMBER( dmac_device::register_read )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	// autoconfig handles this
 	if (offset < 0x20)
@@ -275,7 +275,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 			logerror("%s('%s'): write wtc hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_wtc &= 0x0000ffff;
-		m_wtc |= ((UINT32) data) << 16;
+		m_wtc |= ((uint32_t) data) << 16;
 		break;
 
 	case 0x41:
@@ -291,7 +291,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 			logerror("%s('%s'): write acr hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_acr &= 0x0000ffff;
-		m_acr |= ((UINT32) data) << 16;
+		m_acr |= ((uint32_t) data) << 16;
 		break;
 
 	case 0x43:

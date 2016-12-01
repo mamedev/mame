@@ -112,7 +112,7 @@ void crgolf_state::machine_start()
 {
 	if (membank("bank1"))
 	{
-		UINT32 size = memregion("maindata")->bytes();
+		uint32_t size = memregion("maindata")->bytes();
 
 		/* configure the banking */
 		membank("bank1")->configure_entries(0, size/0x2000, memregion("maindata")->base(), 0x2000);
@@ -242,7 +242,7 @@ WRITE_LINE_MEMBER(crgolf_state::vck_callback)
 	/* only play back if we have data remaining */
 	if (m_sample_count != 0xff)
 	{
-		UINT8 data = memregion("adpcm")->base()[m_sample_offset >> 1];
+		uint8_t data = memregion("adpcm")->base()[m_sample_offset >> 1];
 
 		/* write the next nibble and advance */
 		m_msm->data_w((data >> (4 * (~m_sample_offset & 1))) & 0x0f);

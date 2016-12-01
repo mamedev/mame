@@ -78,7 +78,7 @@ machine_config_constructor vp550_device::device_mconfig_additions() const
 //  vp550_device - constructor
 //-------------------------------------------------
 
-vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vp550_device::vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VP550, "VP550", tag, owner, clock, "vp550", __FILE__),
 	device_vip_expansion_card_interface(mconfig, *this),
 	m_pfg_a(*this, CDP1863_A_TAG),
@@ -116,7 +116,7 @@ void vp550_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 //  vip_program_w - program write
 //-------------------------------------------------
 
-void vp550_device::vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh)
+void vp550_device::vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh)
 {
 	if (BIT(offset, 15))
 	{

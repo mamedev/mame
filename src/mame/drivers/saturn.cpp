@@ -581,7 +581,7 @@ INPUT_PORTS_END
 /* TODO: if you change the driver configuration then NVRAM contents gets screwed, needs mods in MAME framework */
 void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[64] = {
+	static const uint8_t init[64] = {
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
 	'B', 'a', 'c', 'k', 'U', 'p', 'R', 'a', 'm', ' ', 'F', 'o', 'r', 'm', 'a', 't',
@@ -591,11 +591,65 @@ void sat_console_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 	memcpy(data, init, sizeof(init));
 }
 
+void saturn_state::debug_scuirq_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+	const char *const irqnames[16] = {
+		"VBlank-in", "VBlank-out", "HBlank-in", "Timer 0", "Timer 1", "SCU DSP end", "Sound request", "SMPC", "Pad", "DMA lv 2", "DMA lv 1", "DMA lv 0", "DMA illegal", "VDP1 end", "A-Bus" };
+
+
+	for(int irq_lv = 0;irq_lv<16;irq_lv++)
+		con.printf("%s irq enabled: %s\n",irqnames[irq_lv],(m_scu.ism & (1 << irq_lv)) == 0 ? "1" : "0");
+}
+
+void saturn_state::debug_scudma_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+
+	for(int ch=0;ch<3;ch++)
+	{
+		con.printf("DMA LV%02d: src = %08x dst = %08x size = %08x\n",ch,m_scu.src[ch],m_scu.dst[ch],m_scu.size[ch]);
+		con.printf("    adds: src = %08x dst = %08x\n",m_scu.src_add[ch],m_scu.dst_add[ch]);
+		con.printf("indirect: index = %08x\n",m_scu.index[ch]);
+		con.printf("  enable: mask = %08x start factor = %08x\n",m_scu.enable_mask[ch],m_scu.start_factor[ch]);
+	}
+}
+
+void saturn_state::debug_help_command(int ref, int params, const char **param)
+{
+	debugger_console con = machine().debugger().console();
+
+	con.printf("Available Saturn commands:\n");
+	con.printf("   saturn scudma -- pretty prints current state of SCU DMA registers\n");
+	con.printf("   saturn scuirq -- pretty prints current state of SCU IRQ registers\n");
+	con.printf("   saturn help -- this list\n");
+}
+
+
+void saturn_state::debug_commands(int ref, int params, const char **param)
+{
+	if (params < 1)
+		return;
+
+	if (strcmp("scudma", param[0]) == 0)
+		debug_scudma_command(ref, params - 1, param + 1);
+	else if(strcmp("scuirq", param[0]) == 0)
+		debug_scuirq_command(ref, params - 1, param + 1);
+	else if(strcmp("help", param[0]) == 0)
+		debug_help_command(ref, params - 1, param + 1);
+}
+
 
 MACHINE_START_MEMBER(sat_console_state, saturn)
 {
 	system_time systime;
 	machine().base_datetime(systime);
+
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("saturn", CMDFLAG_NONE, 0, 1, 4, std::bind(&saturn_state::debug_commands, this, _1, _2, _3));
+	}
 
 	machine().device<scsp_device>("scsp")->set_ram_base(m_sound_ram);
 
@@ -672,7 +726,7 @@ MACHINE_START_MEMBER(sat_console_state, saturn)
 	save_item(NAME(m_smpc.SR));
 	save_item(NAME(m_smpc.SMEM));
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(sat_console_state::stvcd_exit), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&sat_console_state::stvcd_exit, this));
 
 	m_smpc.rtc_data[0] = DectoBCD(systime.local_time.year /100);
 	m_smpc.rtc_data[1] = DectoBCD(systime.local_time.year %100);
@@ -858,9 +912,9 @@ void sat_console_state::saturn_init_driver(int rgn)
 	m_minit_boost_timeslice = attotime::zero;
 	m_sinit_boost_timeslice = attotime::zero;
 
-	m_scu_regs = make_unique_clear<UINT32[]>(0x100/4);
-	m_scsp_regs = make_unique_clear<UINT16[]>(0x1000/2);
-	m_backupram = make_unique_clear<UINT8[]>(0x8000);
+	m_scu_regs = make_unique_clear<uint32_t[]>(0x100/4);
+	m_scsp_regs = make_unique_clear<uint16_t[]>(0x1000/2);
+	m_backupram = make_unique_clear<uint8_t[]>(0x8000);
 }
 
 DRIVER_INIT_MEMBER(sat_console_state,saturnus)

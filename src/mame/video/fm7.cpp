@@ -24,7 +24,7 @@
 
 READ8_MEMBER(fm7_state::fm7_subintf_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if(m_video.sub_busy != 0 || m_video.sub_halt != 0)
 		ret |= 0x80;
@@ -101,9 +101,9 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm77av_alu_task_end)
 	m_alu.busy = 0;
 }
 
-void fm7_state::fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
+void fm7_state::fm7_alu_mask_write(uint32_t offset, int bank, uint8_t dat)
 {
-	UINT8 temp;
+	uint8_t temp;
 	int page = 0;
 
 	if(offset >= 0xc000)
@@ -130,19 +130,19 @@ void fm7_state::fm7_alu_mask_write(UINT32 offset, int bank, UINT8 dat)
 	m_video_ram[(offset & 0x3fff) + (bank * 0x4000) + (page * 0xc000)] = temp | dat;
 }
 
-void fm7_state::fm7_alu_function_compare(UINT32 offset)
+void fm7_state::fm7_alu_function_compare(uint32_t offset)
 {
 	// COMPARE - compares which colors match those in the compare registers
 	// can be used on its own, or when bit 6 of the command register is high.
 
-	UINT8 red,green,blue;
-	UINT8 dat = 0;
-	UINT8 colour;
-	UINT8 banks;
+	uint8_t red,green,blue;
+	uint8_t dat = 0;
+	uint8_t colour;
+	uint8_t banks;
 	int x,y;
 	int match;
 	int page = 0;
-	UINT8 bit = 0x80;
+	uint8_t bit = 0x80;
 
 	if(offset >= 0xc000)
 	{
@@ -185,13 +185,13 @@ void fm7_state::fm7_alu_function_compare(UINT32 offset)
 	m_alu.compare_data = dat;
 }
 
-void fm7_state::fm7_alu_function_pset(UINT32 offset)
+void fm7_state::fm7_alu_function_pset(uint32_t offset)
 {
 	// PSET - simply sets the pixels to the selected logical colour
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -222,12 +222,12 @@ void fm7_state::fm7_alu_function_pset(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_or(UINT32 offset)
+void fm7_state::fm7_alu_function_or(uint32_t offset)
 {
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -261,12 +261,12 @@ void fm7_state::fm7_alu_function_or(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_and(UINT32 offset)
+void fm7_state::fm7_alu_function_and(uint32_t offset)
 {
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -300,12 +300,12 @@ void fm7_state::fm7_alu_function_and(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_xor(UINT32 offset)
+void fm7_state::fm7_alu_function_xor(uint32_t offset)
 {
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -339,12 +339,12 @@ void fm7_state::fm7_alu_function_xor(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_not(UINT32 offset)
+void fm7_state::fm7_alu_function_not(uint32_t offset)
 {
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -378,13 +378,13 @@ void fm7_state::fm7_alu_function_not(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_invalid(UINT32 offset)
+void fm7_state::fm7_alu_function_invalid(uint32_t offset)
 {
 	// Invalid function, still does something though (used by Laydock)
 	int x;
-	UINT8 dat;
+	uint8_t dat;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -410,13 +410,13 @@ void fm7_state::fm7_alu_function_invalid(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function_tilepaint(UINT32 offset)
+void fm7_state::fm7_alu_function_tilepaint(uint32_t offset)
 {
 	// TILEPAINT - writes to VRAM based on the tilepaint colour registers
 	int x;
-	UINT8 dat = 0;
+	uint8_t dat = 0;
 	int page = 0;
-	UINT8 mask;
+	uint8_t mask;
 
 	if(m_alu.command & 0x40)
 		fm7_alu_function_compare(offset);
@@ -454,7 +454,7 @@ void fm7_state::fm7_alu_function_tilepaint(UINT32 offset)
 	}
 }
 
-void fm7_state::fm7_alu_function(UINT32 offset)
+void fm7_state::fm7_alu_function(uint32_t offset)
 {
 	switch(m_alu.command & 0x07)
 	{
@@ -485,10 +485,10 @@ void fm7_state::fm7_alu_function(UINT32 offset)
 	}
 }
 
-UINT32 fm7_state::fm7_line_set_pixel(int x, int y)
+uint32_t fm7_state::fm7_line_set_pixel(int x, int y)
 {
-	UINT32 addr;
-	static const UINT8 pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
+	uint32_t addr;
+	static const uint8_t pixel_mask[8] = {0x7f, 0xbf, 0xdf, 0xef, 0xf7, 0xfb, 0xfd, 0xfe };
 
 
 	if(m_video.modestatus & 0x40) // 320 pixels wide
@@ -566,7 +566,7 @@ void fm7_state::fm77av_line_draw()
 READ8_MEMBER(fm7_state::fm7_vram_r)
 {
 	int offs;
-	UINT16 page = 0x0000;
+	uint16_t page = 0x0000;
 
 	if(m_video.active_video_page != 0)
 		page = 0xc000;
@@ -603,7 +603,7 @@ READ8_MEMBER(fm7_state::fm7_vram_r)
 WRITE8_MEMBER(fm7_state::fm7_vram_w)
 {
 	int offs;
-	UINT16 page = 0x0000;
+	uint16_t page = 0x0000;
 
 	if(m_video.active_video_page != 0)
 		page = 0xc000;
@@ -643,7 +643,7 @@ WRITE8_MEMBER(fm7_state::fm7_vram_w)
 WRITE8_MEMBER(fm7_state::fm7_vram_banked_w)
 {
 	int offs;
-	UINT16 page = 0x0000;
+	uint16_t page = 0x0000;
 
 	if(!m_video.sub_halt)  // no access if sub CPU is not halted.
 		return;
@@ -850,7 +850,7 @@ WRITE8_MEMBER(fm7_state::fm7_crt_w)
  */
 WRITE8_MEMBER(fm7_state::fm7_vram_offset_w)
 {
-	UINT16 new_offset = 0;
+	uint16_t new_offset = 0;
 
 	switch(offset)
 	{
@@ -974,7 +974,7 @@ WRITE8_MEMBER(fm7_state::fm77av_analog_palette_w)
  */
 READ8_MEMBER(fm7_state::fm77av_video_flags_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	if(machine().first_screen()->vblank())
 		ret &= ~0x80;
@@ -993,7 +993,7 @@ READ8_MEMBER(fm7_state::fm77av_video_flags_r)
 
 WRITE8_MEMBER(fm7_state::fm77av_video_flags_w)
 {
-	UINT8* RAM = memregion("subsyscg")->base();
+	uint8_t* RAM = memregion("subsyscg")->base();
 
 	m_video.cgrom = data & 0x03;
 	membank("bank20")->set_base(RAM+(m_video.cgrom*0x800));
@@ -1012,7 +1012,7 @@ WRITE8_MEMBER(fm7_state::fm77av_video_flags_w)
  */
 READ8_MEMBER(fm7_state::fm77av_sub_modestatus_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	ret |= 0xbc;
 	ret |= (m_video.modestatus & 0x40);
@@ -1050,8 +1050,8 @@ WRITE8_MEMBER(fm7_state::fm77av_sub_modestatus_w)
  */
 WRITE8_MEMBER(fm7_state::fm77av_sub_bank_w)
 {
-//  UINT8* RAM = memregion("sub")->base();
-	UINT8* ROM;
+//  uint8_t* RAM = memregion("sub")->base();
+	uint8_t* ROM;
 
 	if((data & 0x03) == (m_sb_prev & 0x03))
 		return;
@@ -1147,7 +1147,7 @@ READ8_MEMBER(fm7_state::fm77av_alu_r)
 
 WRITE8_MEMBER(fm7_state::fm77av_alu_w)
 {
-	UINT16 dat;
+	uint16_t dat;
 
 	switch(offset)
 	{
@@ -1274,8 +1274,8 @@ TIMER_CALLBACK_MEMBER(fm7_state::fm77av_vsync)
 // called when banked into main CPU space by the MMR, available only if sub CPU is halted
 READ8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_r)
 {
-	UINT8* RAM = memregion("maincpu")->base();
-	UINT8* ROM;
+	uint8_t* RAM = memregion("maincpu")->base();
+	uint8_t* ROM;
 
 	if(!m_video.sub_halt)
 		return 0xff;
@@ -1325,7 +1325,7 @@ READ8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_r)
 
 WRITE8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_w)
 {
-	UINT8* RAM = memregion("maincpu")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	if(!m_video.sub_halt)
 		return;
@@ -1381,7 +1381,7 @@ WRITE8_MEMBER(fm7_state::fm7_sub_ram_ports_banked_w)
 
 READ8_MEMBER(fm7_state::fm7_console_ram_banked_r)
 {
-	UINT8* RAM = memregion("maincpu")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	if(!m_video.sub_halt)
 		return 0xff;
@@ -1391,7 +1391,7 @@ READ8_MEMBER(fm7_state::fm7_console_ram_banked_r)
 
 WRITE8_MEMBER(fm7_state::fm7_console_ram_banked_w)
 {
-	UINT8* RAM = memregion("maincpu")->base();
+	uint8_t* RAM = memregion("maincpu")->base();
 
 	if(!m_video.sub_halt)
 		return;
@@ -1416,15 +1416,15 @@ void fm7_state::video_start()
 	m_video.vsync_flag = 0;
 }
 
-UINT32 fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t fm7_state::screen_update_fm7(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code_r = 0,code_g = 0,code_b = 0;
-	UINT8 code_r2 = 0,code_g2 = 0,code_b2 = 0;
-	UINT8 code_r3 = 0,code_g3 = 0,code_b3 = 0;
-	UINT8 code_r4 = 0,code_g4 = 0,code_b4 = 0;
-	UINT16 col;
+	uint8_t code_r = 0,code_g = 0,code_b = 0;
+	uint8_t code_r2 = 0,code_g2 = 0,code_b2 = 0;
+	uint8_t code_r3 = 0,code_g3 = 0,code_b3 = 0;
+	uint8_t code_r4 = 0,code_g4 = 0,code_b4 = 0;
+	uint16_t col;
 	int y, x, b;
-	UINT16 page = 0x0000;
+	uint16_t page = 0x0000;
 
 	if(m_video.display_video_page != 0)
 		page = 0xc000;

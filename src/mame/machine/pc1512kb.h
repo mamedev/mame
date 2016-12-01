@@ -13,6 +13,7 @@
 
 
 #include "emu.h"
+#include "bus/vcs_ctrl/ctrl.h"
 #include "cpu/mcs48/mcs48.h"
 
 
@@ -21,7 +22,7 @@
 //  MACROS / CONSTANTS
 //**************************************************************************
 
-#define PC1512_KEYBOARD_TAG "pc1512_keyboard"
+#define PC1512_KEYBOARD_TAG "kb"
 
 
 
@@ -30,10 +31,10 @@
 //**************************************************************************
 
 #define MCFG_PC1512_KEYBOARD_CLOCK_CALLBACK(_write) \
-	devcb = &pc1512_keyboard_device::set_clock_wr_callback(*device, DEVCB_##_write);
+	devcb = &pc1512_keyboard_t::set_clock_wr_callback(*device, DEVCB_##_write);
 
 #define MCFG_PC1512_KEYBOARD_DATA_CALLBACK(_write) \
-	devcb = &pc1512_keyboard_device::set_data_wr_callback(*device, DEVCB_##_write);
+	devcb = &pc1512_keyboard_t::set_data_wr_callback(*device, DEVCB_##_write);
 
 
 
@@ -41,19 +42,19 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> pc1512_keyboard_device
+// ======================> pc1512_keyboard_t
 
-class pc1512_keyboard_device :  public device_t
+class pc1512_keyboard_t :  public device_t
 {
 public:
 	// construction/destruction
-	pc1512_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc1512_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_clock.set_callback(object); }
-	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_device &>(device).m_write_data.set_callback(object); }
+	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_t &>(device).m_write_clock.set_callback(object); }
+	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<pc1512_keyboard_t &>(device).m_write_data.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -83,18 +84,9 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_com;
+	required_device<vcs_control_port_device> m_joy;
+
+	required_ioport_array<11> m_y;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;

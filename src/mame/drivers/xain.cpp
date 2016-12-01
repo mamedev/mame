@@ -356,7 +356,7 @@ WRITE8_MEMBER(xain_state::m68705_ddr_c_w)
 
 CUSTOM_INPUT_MEMBER(xain_state::mcu_status_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	if (m_mcu != nullptr)
 	{

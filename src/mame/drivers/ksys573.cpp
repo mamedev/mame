@@ -456,8 +456,8 @@ public:
 	DECLARE_WRITE8_MEMBER( punchmania_output_callback );
 	ADC083X_INPUT_CB(analogue_inputs_callback);
 
-	void cdrom_dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size );
-	void cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size );
+	void cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size );
+	void cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size );
 	void sys573_vblank( screen_device &screen, bool vblank_state );
 	double m_pad_position[ 6 ];
 	required_ioport m_analog0;
@@ -472,8 +472,8 @@ protected:
 private:
 	inline void ATTR_PRINTF( 3,4 ) verboselog( int n_level, const char *s_fmt, ... );
 	void update_disc();
-	void gx700pwbf_output( int offset, UINT8 data );
-	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask ) );
+	void gx700pwbf_output( int offset, uint8_t data );
+	void gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask ) );
 	void gn845pwbb_do_w( int offset, int data );
 	void gn845pwbb_clk_w( int offset, int data );
 
@@ -485,17 +485,17 @@ private:
 	int m_atapi_xferbase;
 	int m_atapi_xfersize;
 
-	UINT32 m_control;
-	UINT16 m_n_security_control;
+	uint32_t m_control;
+	uint16_t m_n_security_control;
 
-	required_region_ptr<UINT8> m_h8_response;
+	required_region_ptr<uint8_t> m_h8_response;
 	int m_h8_index;
 	int m_h8_clk;
 
-	UINT8 m_gx700pwbf_output_data[ 4 ];
-	void ( ksys573_state::*m_gx700pwfbf_output_callback )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask );
+	uint8_t m_gx700pwbf_output_data[ 4 ];
+	void ( ksys573_state::*m_gx700pwfbf_output_callback )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask );
 
-	UINT32 m_stage_mask;
+	uint32_t m_stage_mask;
 	struct
 	{
 		int DO;
@@ -518,7 +518,7 @@ private:
 	int m_hyperbbc_lamp_strobe2;
 	int m_hyperbbc_lamp_strobe3;
 
-	UINT32 *m_p_n_psxram;
+	uint32_t *m_p_n_psxram;
 
 	int m_tank_shutter_position;
 	int m_cable_holder_release;
@@ -629,15 +629,15 @@ TIMER_CALLBACK_MEMBER( ksys573_state::atapi_xfer_end )
 
 	for( int i = 0; i < m_atapi_xfersize; i++ )
 	{
-		UINT32 d = m_ata->read_cs0( space, (UINT32) 0, (UINT32) 0xffff ) << 0;
-		d |= m_ata->read_cs0( space, (UINT32) 0, (UINT32) 0xffff ) << 16;
+		uint32_t d = m_ata->read_cs0( space, (uint32_t) 0, (uint32_t) 0xffff ) << 0;
+		d |= m_ata->read_cs0( space, (uint32_t) 0, (uint32_t) 0xffff ) << 16;
 
 		m_p_n_psxram[ m_atapi_xferbase / 4 ] = d;
 		m_atapi_xferbase += 4;
 	}
 
 	/// HACK: konami80s only works if you dma more data than requested
-	if( ( m_ata->read_cs1( space, (UINT32) 6, (UINT32) 0xffff ) & 8 ) != 0 )
+	if( ( m_ata->read_cs1( space, (uint32_t) 6, (uint32_t) 0xffff ) & 8 ) != 0 )
 	{
 		m_atapi_timer->adjust( m_maincpu->cycles_to_attotime( ( ATAPI_CYCLES_PER_SECTOR * ( m_atapi_xfersize / 64 ) ) ) );
 	}
@@ -656,13 +656,13 @@ WRITE16_MEMBER( ksys573_state::atapi_reset_w )
 	}
 }
 
-void ksys573_state::cdrom_dma_read( UINT32 *ram, UINT32 n_address, INT32 n_size )
+void ksys573_state::cdrom_dma_read( uint32_t *ram, uint32_t n_address, int32_t n_size )
 {
 	verboselog( 2, "cdrom_dma_read( %08x, %08x )\n", n_address, n_size );
 //  osd_printf_debug( "DMA read: address %08x size %08x\n", n_address, n_size );
 }
 
-void ksys573_state::cdrom_dma_write( UINT32 *ram, UINT32 n_address, INT32 n_size )
+void ksys573_state::cdrom_dma_write( uint32_t *ram, uint32_t n_address, int32_t n_size )
 {
 	m_p_n_psxram = ram;
 
@@ -686,7 +686,7 @@ WRITE16_MEMBER( ksys573_state::security_w )
 
 READ16_MEMBER( ksys573_state::security_r )
 {
-	UINT16 data = m_n_security_control;
+	uint16_t data = m_n_security_control;
 	verboselog( 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
@@ -752,7 +752,7 @@ void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *) m_ram->pointer();
+		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
 
 		/* install cd */
 
@@ -776,7 +776,7 @@ void ksys573_state::sys573_vblank( screen_device &screen, bool vblank_state )
 	{
 		/* patch out security-plate error */
 
-		UINT32 *p_n_psxram = (UINT32 *) m_ram->pointer();
+		uint32_t *p_n_psxram = (uint32_t *) m_ram->pointer();
 
 		/* 8001f850: jal $8003221c */
 		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
@@ -838,7 +838,7 @@ todo:
 
 READ16_MEMBER( ksys573_state::ge765pwbba_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	switch( offset )
 	{
@@ -910,7 +910,7 @@ Analogue I/O board
 
 READ16_MEMBER( ksys573_state::gx700pwbf_io_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch( offset )
 	{
 	case 0x40:
@@ -939,7 +939,7 @@ READ16_MEMBER( ksys573_state::gx700pwbf_io_r )
 	return data;
 }
 
-void ksys573_state::gx700pwbf_output( int offset, UINT8 data )
+void ksys573_state::gx700pwbf_output( int offset, uint8_t data )
 {
 	if( m_gx700pwfbf_output_callback != nullptr )
 	{
@@ -986,7 +986,7 @@ WRITE16_MEMBER( ksys573_state::gx700pwbf_io_w )
 	}
 }
 
-void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask ) )
+void ksys573_state::gx700pwfbf_init( void ( ksys573_state::*output_callback_func )( address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED uint8_t data, ATTR_UNUSED uint8_t mem_mask ) )
 {
 	memset( m_gx700pwbf_output_data, 0, sizeof( m_gx700pwbf_output_data ) );
 
@@ -1966,7 +1966,7 @@ CUSTOM_INPUT_MEMBER( ksys573_state::gunmania_cable_holder_sensor )
 
 READ16_MEMBER( ksys573_state::gunmania_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	switch( offset )
 	{
@@ -2025,8 +2025,8 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 	MCFG_RAM_MODIFY( "maincpu:ram" )
 	MCFG_RAM_DEFAULT_SIZE( "4M" )
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( ksys573_state::cdrom_dma_read ), (ksys573_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( ksys573_state::cdrom_dma_write ), (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&ksys573_state::cdrom_dma_read, (ksys573_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate(&ksys573_state::cdrom_dma_write, (ksys573_state *) owner ) )
 
 	MCFG_MACHINE_RESET_OVERRIDE( ksys573_state, konami573 )
 
@@ -2064,7 +2064,7 @@ static MACHINE_CONFIG_START( konami573, ksys573_state )
 
 	/* video hardware */
 	MCFG_PSXGPU_ADD( "maincpu", "gpu", CXD8561Q, 0x200000, XTAL_53_693175MHz )
-	MCFG_PSXGPU_VBLANK_CALLBACK( vblank_state_delegate( FUNC( ksys573_state::sys573_vblank ), (ksys573_state *) owner ) )
+	MCFG_PSXGPU_VBLANK_CALLBACK(vblank_state_delegate(&ksys573_state::sys573_vblank, (ksys573_state *) owner ))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
@@ -2876,6 +2876,8 @@ INPUT_PORTS_END
 	ROMX_LOAD( "700a01(gchgchmp).22g",  0x000000,  0x080000, CRC(39ebb0ca) SHA1(9aab8c637dd2be84d79007e52f108abe92bf29dd), ROM_BIOS(2) ) \
 	ROM_SYSTEM_BIOS( 2, "dsem2",      "Found on Dancing Stage Euro Mix 2" ) \
 	ROMX_LOAD( "700b01.22g",   0x0000000, 0x080000, CRC(6cf852af) SHA1(a2421d0a494892c0e71003c96995ce8f945064dd), ROM_BIOS(3) ) \
+	ROM_REGION( 0x8000, "mcu", 0 ) \
+	ROM_LOAD( "hd6473644h.18e", 0, 0x8000, NO_DUMP) \
 	ROM_REGION( 0x40, "h8_response", 0 ) \
 	ROMX_LOAD( "h8a01.bin",    0x000000, 0x000040, CRC(131e0359) SHA1(967f66578ebc0cf6b044d71af09b59bce1f4a1d0), ROM_BIOS(1) ) \
 	ROMX_LOAD( "h8a01.bin",    0x000000, 0x000040, CRC(131e0359) SHA1(967f66578ebc0cf6b044d71af09b59bce1f4a1d0), ROM_BIOS(2) ) \

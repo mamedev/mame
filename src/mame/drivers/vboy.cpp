@@ -52,7 +52,7 @@
 
 #define WRITE_FONT(woffs) \
 	COMBINE_DATA(&m_font[woffs]); /* normal */ \
-	UINT16 dat = m_font[woffs]; \
+	uint16_t dat = m_font[woffs]; \
 	m_font[((woffs) + 0x4000)] = dat;     /* normal */ \
 	m_font[((woffs) + 0x8000) ^ 7] = dat; /* flip y */ \
 	m_font[((woffs) + 0xc000) ^ 7] = dat; /* flip y */ \
@@ -63,40 +63,40 @@
 	m_font[((woffs) + 0x1c000) ^ 7] = dat; /* flip x+y */
 
 
-/* FIXME: most if not all of these must be UINT8 */
+/* FIXME: most if not all of these must be uint8_t */
 struct vboy_regs_t
 {
-	UINT32 lpc, lpc2, lpt, lpr;
-	UINT32 khb, klb;
-	UINT8 thb, tlb;
-	UINT32 tcr, wcr, kcr;
+	uint32_t lpc, lpc2, lpt, lpr;
+	uint32_t khb, klb;
+	uint8_t thb, tlb;
+	uint32_t tcr, wcr, kcr;
 };
 
 struct vip_regs_t
 {
-	UINT16 INTPND;
-	UINT16 INTENB;
-	UINT16 DPSTTS;
-	UINT16 DPCTRL;
-	UINT16 BRTA;
-	UINT16 BRTB;
-	UINT16 BRTC;
-	UINT16 REST;
-	UINT16 FRMCYC;
-	UINT16 CTA;
-	UINT16 XPSTTS;
-	UINT16 XPCTRL;
-	UINT16 VER;
-	UINT16 SPT[4];
-	UINT16 GPLT[4];
-	UINT16 JPLT[4];
-	UINT16 BKCOL;
+	uint16_t INTPND;
+	uint16_t INTENB;
+	uint16_t DPSTTS;
+	uint16_t DPCTRL;
+	uint16_t BRTA;
+	uint16_t BRTB;
+	uint16_t BRTC;
+	uint16_t REST;
+	uint16_t FRMCYC;
+	uint16_t CTA;
+	uint16_t XPSTTS;
+	uint16_t XPCTRL;
+	uint16_t VER;
+	uint16_t SPT[4];
+	uint16_t GPLT[4];
+	uint16_t JPLT[4];
+	uint16_t BKCOL;
 };
 
 struct vboy_timer_t
 {
-	UINT16 count;
-	UINT16 latch;
+	uint16_t count;
+	uint16_t latch;
 };
 
 struct vboy_timer_t;
@@ -182,40 +182,40 @@ public:
 	DECLARE_WRITE8_MEMBER(lfb1_w);
 	DECLARE_WRITE8_MEMBER(rfb0_w);
 	DECLARE_WRITE8_MEMBER(rfb1_w);
-	std::unique_ptr<UINT16[]> m_font;
-	std::unique_ptr<UINT16[]> m_bgmap;
-	std::unique_ptr<UINT8[]> m_l_frame_0;
-	std::unique_ptr<UINT8[]> m_l_frame_1;
-	std::unique_ptr<UINT8[]> m_r_frame_0;
-	std::unique_ptr<UINT8[]> m_r_frame_1;
+	std::unique_ptr<uint16_t[]> m_font;
+	std::unique_ptr<uint16_t[]> m_bgmap;
+	std::unique_ptr<uint8_t[]> m_l_frame_0;
+	std::unique_ptr<uint8_t[]> m_l_frame_1;
+	std::unique_ptr<uint8_t[]> m_r_frame_0;
+	std::unique_ptr<uint8_t[]> m_r_frame_1;
 	vboy_regs_t m_vboy_regs;
 	vip_regs_t m_vip_regs;
 	vboy_timer_t m_vboy_timer;
-	std::unique_ptr<INT32[]> m_ovr_tempdraw_map;
-	UINT16 m_frame_count;
-	UINT8 m_displayfb;
-	UINT8 m_drawfb;
-	UINT8 m_row_num;
+	std::unique_ptr<int32_t[]> m_ovr_tempdraw_map;
+	uint16_t m_frame_count;
+	uint8_t m_displayfb;
+	uint8_t m_drawfb;
+	uint8_t m_row_num;
 	attotime m_input_latch_time;
 	void m_timer_tick(void);
-	void m_scanline_tick(int scanline, UINT8 screen_type);
-	void m_set_irq(UINT16 irq_vector);
+	void m_scanline_tick(int scanline, uint8_t screen_type);
+	void m_set_irq(uint16_t irq_vector);
 
-	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal);
-	void fill_ovr_char(UINT16 code, UINT8 pal);
-	INT8 get_bg_map_pixel(int num, int xpos, int ypos);
-	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
-											UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
-	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
-												UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num);
-	UINT8 display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
+	void put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal);
+	void fill_ovr_char(uint16_t code, uint8_t pal);
+	int8_t get_bg_map_pixel(int num, int xpos, int ypos);
+	void draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my,int h, int w,
+											uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+	void draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
+												uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num);
+	uint8_t display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt);
 	void m_set_brightness(void);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vboy);
-	UINT32 screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_main_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_pad_tick);
 	TIMER_DEVICE_CALLBACK_MEMBER(vboy_scanlineL);
@@ -225,22 +225,22 @@ public:
 void vboy_state::video_start()
 {
 	// Allocate memory for temporary screens
-	m_ovr_tempdraw_map = make_unique_clear<INT32[]>(0x40);
+	m_ovr_tempdraw_map = make_unique_clear<int32_t[]>(0x40);
 
 	// Allocate memory for framebuffers
-	m_l_frame_0 = make_unique_clear<UINT8[]>(0x6000);
-	m_l_frame_1 = make_unique_clear<UINT8[]>(0x6000);
-	m_r_frame_0 = make_unique_clear<UINT8[]>(0x6000);
-	m_r_frame_1 = make_unique_clear<UINT8[]>(0x6000);
+	m_l_frame_0 = make_unique_clear<uint8_t[]>(0x6000);
+	m_l_frame_1 = make_unique_clear<uint8_t[]>(0x6000);
+	m_r_frame_0 = make_unique_clear<uint8_t[]>(0x6000);
+	m_r_frame_1 = make_unique_clear<uint8_t[]>(0x6000);
 
-	m_font  = make_unique_clear<UINT16[]>((0x8000 >> 1)*4 * 2);
-	m_bgmap = make_unique_clear<UINT16[]>(0x20000 >> 1);
+	m_font  = make_unique_clear<uint16_t[]>((0x8000 >> 1)*4 * 2);
+	m_bgmap = make_unique_clear<uint16_t[]>(0x20000 >> 1);
 }
 
-void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, UINT16 code, UINT8 pal)
+void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, uint16_t code, uint8_t pal)
 {
-	UINT16 data;
-	UINT8 yi, xi, dat, col;
+	uint16_t data;
+	uint8_t yi, xi, dat, col;
 
 	for (yi = 0; yi < 8; yi++)
 	{
@@ -268,10 +268,10 @@ void vboy_state::put_obj(bitmap_ind16 &bitmap, const rectangle &cliprect, int x,
 
 
 
-void vboy_state::fill_ovr_char(UINT16 code, UINT8 pal)
+void vboy_state::fill_ovr_char(uint16_t code, uint8_t pal)
 {
-	UINT16 data;
-	UINT8 yi, xi, dat;
+	uint16_t data;
+	uint8_t yi, xi, dat;
 	int col;
 
 	for (yi = 0; yi < 8; yi++)
@@ -291,23 +291,23 @@ void vboy_state::fill_ovr_char(UINT16 code, UINT8 pal)
 	}
 }
 
-inline INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
+inline int8_t vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 {
 //  g_profiler.start(PROFILER_USER1);
 	int x, y;
-	UINT8 stepx, stepy;
+	uint8_t stepx, stepy;
 
 	y = ypos >>3;
 	x = xpos >>3;
 
 	stepx = (x & 0x1c0) >> 6;
 	stepy = ((y & 0x1c0) >> 6) * (stepx+1);
-	UINT16 val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
+	uint16_t val = READ_BGMAP((x & 0x3f) + (64 * (y & 0x3f)) + ((num + stepx + stepy) * 0x1000));
 	int pal = m_vip_regs.GPLT[(val >> 14) & 3];
 	int code = val & 0x3fff;
 
-	UINT16 data;
-	UINT8 yi, xi, dat;
+	uint16_t data;
+	uint8_t yi, xi, dat;
 
 	yi = ypos & 7;
 	data = READ_FONT(code * 8 + yi);
@@ -323,15 +323,15 @@ inline INT8 vboy_state::get_bg_map_pixel(int num, int xpos, int ypos)
 	return (pal >> (dat*2)) & 3;
 }
 
-void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
-													UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
+void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int mode, int gx, int gp, int gy, int mx, int mp, int my, int h, int w,
+													uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
 //  g_profiler.start(PROFILER_USER2);
 	int x,y;
 
 	for(y=0;y<=h;y++)
 	{
-		INT32 y1 = (y+gy);
+		int32_t y1 = (y+gy);
 
 		if ((y1 < cliprect.min_y) || (y1 > cliprect.max_y))
 			continue;
@@ -340,7 +340,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 
 		for(x=0;x<=w;x++)
 		{
-			INT32 x1 = (x+gx);
+			int32_t x1 = (x+gx);
 
 			x1 += right ? -gp : gp;
 
@@ -350,7 +350,7 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 			int src_x;
 			src_x = x+mx;
 			if (mode==1)
-				src_x += (INT16)READ_BGMAP(param_base + (y*2+(right ^ 1)));
+				src_x += (int16_t)READ_BGMAP(param_base + (y*2+(right ^ 1)));
 
 			src_x += right ? -mp : mp;
 
@@ -381,33 +381,33 @@ void vboy_state::draw_bg_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UI
 //  g_profiler.stop();
 }
 
-void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16 param_base, int gx, int gp, int gy, int h, int w,
-														UINT16 x_mask, UINT16 y_mask, UINT8 ovr, bool right, int bg_map_num)
+void vboy_state::draw_affine_map(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t param_base, int gx, int gp, int gy, int h, int w,
+														uint16_t x_mask, uint16_t y_mask, uint8_t ovr, bool right, int bg_map_num)
 {
 //  g_profiler.start(PROFILER_USER3);
 	int x,y;
 
 	for(y=0;y<=h;y++)
 	{
-		float h_skw = (INT16)READ_BGMAP(param_base + (y*8+0)) / 8.0;
-		float prlx = (INT16)READ_BGMAP(param_base + (y*8+1)) / 8.0;
-		float v_skw = (INT16)READ_BGMAP(param_base + (y*8+2)) / 8.0;
-		float h_scl = (INT16)READ_BGMAP(param_base + (y*8+3)) / 512.0;
-		float v_scl = (INT16)READ_BGMAP(param_base + (y*8+4)) / 512.0;
+		float h_skw = (int16_t)READ_BGMAP(param_base + (y*8+0)) / 8.0;
+		float prlx = (int16_t)READ_BGMAP(param_base + (y*8+1)) / 8.0;
+		float v_skw = (int16_t)READ_BGMAP(param_base + (y*8+2)) / 8.0;
+		float h_scl = (int16_t)READ_BGMAP(param_base + (y*8+3)) / 512.0;
+		float v_scl = (int16_t)READ_BGMAP(param_base + (y*8+4)) / 512.0;
 
 		h_skw += right ? -prlx : prlx;
 
 		for(x=0;x<=w;x++)
 		{
-			INT32 src_x,src_y;
-			INT16 y1 = (y+gy);
-			INT16 x1 = (x+gx);
+			int32_t src_x,src_y;
+			int16_t y1 = (y+gy);
+			int16_t x1 = (x+gx);
 			int pix = 0;
 
 			x1 += right ? -gp : gp;
 
-			src_x = (INT32)((h_skw) + (h_scl * x));
-			src_y = (INT32)((v_skw) + (v_scl * x));
+			src_x = (int32_t)((h_skw) + (h_scl * x));
+			src_y = (int32_t)((v_skw) + (v_scl * x));
 
 			if(ovr && (src_y > y_mask || src_x > x_mask || src_x < 0 || src_y < 0))
 			{
@@ -438,28 +438,28 @@ x--- ---- ---- ---- [0] LON
 ---- ---- ---- xxxx     BGMAP_BASE
 */
 
-UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt)
+uint8_t vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &cliprect, bool right, int &cur_spt)
 {
 	num <<= 4;
-	UINT16 def = READ_WORLD(num);
-	UINT8 lon = (def >> 15) & 1;
-	UINT8 ron = (def >> 14) & 1;
-	UINT8 mode = (def >> 12) & 3;
-	UINT16 scx = 64 << ((def >> 10) & 3);
-	UINT16 scy = 64 << ((def >> 8) & 3);
-	UINT8 ovr = (def >> 7) & 1;
-	UINT8 end = (def >> 6) & 1;
-	INT16 gx  = READ_WORLD(num+1);
-	INT16 gp  = READ_WORLD(num+2);
-	INT16 gy  = READ_WORLD(num+3);
-	INT16 mx  = READ_WORLD(num+4);
-	INT16 mp  = READ_WORLD(num+5);
-	INT16 my  = READ_WORLD(num+6);
-	UINT16 w  = READ_WORLD(num+7);
-	UINT16 h  = READ_WORLD(num+8);
-	UINT16 param_base = READ_WORLD(num+9) & 0xfff0;
-	UINT16 ovr_char = READ_BGMAP(READ_WORLD(num+10));
-	UINT8 bg_map_num = def & 0x0f;
+	uint16_t def = READ_WORLD(num);
+	uint8_t lon = (def >> 15) & 1;
+	uint8_t ron = (def >> 14) & 1;
+	uint8_t mode = (def >> 12) & 3;
+	uint16_t scx = 64 << ((def >> 10) & 3);
+	uint16_t scy = 64 << ((def >> 8) & 3);
+	uint8_t ovr = (def >> 7) & 1;
+	uint8_t end = (def >> 6) & 1;
+	int16_t gx  = READ_WORLD(num+1);
+	int16_t gp  = READ_WORLD(num+2);
+	int16_t gy  = READ_WORLD(num+3);
+	int16_t mx  = READ_WORLD(num+4);
+	int16_t mp  = READ_WORLD(num+5);
+	int16_t my  = READ_WORLD(num+6);
+	uint16_t w  = READ_WORLD(num+7);
+	uint16_t h  = READ_WORLD(num+8);
+	uint16_t param_base = READ_WORLD(num+9) & 0xfff0;
+	uint16_t ovr_char = READ_BGMAP(READ_WORLD(num+10));
+	uint8_t bg_map_num = def & 0x0f;
 	int i;
 
 	if(end)
@@ -514,13 +514,13 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 		i = start_offs;
 		do
 		{
-			UINT16 start_ndx = i * 4;
-			INT16 jx = READ_OBJECTS(start_ndx+0);
-			INT16 jp = READ_OBJECTS(start_ndx+1) & 0x3fff;
-			INT16 jy = READ_OBJECTS(start_ndx+2) & 0x1ff;
-			UINT16 val = READ_OBJECTS(start_ndx+3);
-			UINT8 jlon = (READ_OBJECTS(start_ndx+1) & 0x8000) >> 15;
-			UINT8 jron = (READ_OBJECTS(start_ndx+1) & 0x4000) >> 14;
+			uint16_t start_ndx = i * 4;
+			int16_t jx = READ_OBJECTS(start_ndx+0);
+			int16_t jp = READ_OBJECTS(start_ndx+1) & 0x3fff;
+			int16_t jy = READ_OBJECTS(start_ndx+2) & 0x1ff;
+			uint16_t val = READ_OBJECTS(start_ndx+3);
+			uint8_t jlon = (READ_OBJECTS(start_ndx+1) & 0x8000) >> 15;
+			uint8_t jron = (READ_OBJECTS(start_ndx+1) & 0x4000) >> 14;
 
 			if (!right && jlon)
 				put_obj(bitmap, cliprect, (jx-jp) & 0x1ff, jy, val & 0x3fff, m_vip_regs.JPLT[(val>>14) & 3]);
@@ -539,7 +539,7 @@ UINT8 vboy_state::display_world(int num, bitmap_ind16 &bitmap, const rectangle &
 	return 0;
 }
 
-UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(m_vip_regs.BKCOL), cliprect);
 	int cur_spt;
@@ -559,8 +559,8 @@ UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &
 		{
 			for(x=0;x<384;x++)
 			{
-				UINT8 pen;
-				UINT8 pix;
+				uint8_t pen;
+				uint8_t pix;
 				int yi;
 
 				pen = m_l_frame_1[(x*0x40)+(y >> 2)];
@@ -575,7 +575,7 @@ UINT32 vboy_state::screen_update_vboy_left(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-UINT32 vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(m_vip_regs.BKCOL), cliprect);
 	int cur_spt;
@@ -598,7 +598,7 @@ UINT32 vboy_state::screen_update_vboy_right(screen_device &screen, bitmap_ind16 
 
 READ32_MEMBER( vboy_state::io_r )
 {
-	UINT32 value = 0x00;
+	uint32_t value = 0x00;
 
 	switch ((offset << 2))
 	{
@@ -783,7 +783,7 @@ READ16_MEMBER( vboy_state::vip_r )
 */
 		case 0x20:  //DPSTTS
 		{
-			UINT16 res;
+			uint16_t res;
 
 			res = m_vip_regs.DPCTRL & 0x0702;
 
@@ -828,7 +828,7 @@ READ16_MEMBER( vboy_state::vip_r )
 			---- ---- ---- --x- XPEN (starts drawing at beginning of game frame)
 			---- ---- ---- ---x XPRST (force drawing process to idle)
 			*/
-			UINT16 res;
+			uint16_t res;
 
 			//printf("%d\n",row_num);
 
@@ -1249,13 +1249,13 @@ TIMER_DEVICE_CALLBACK_MEMBER(vboy_state::timer_pad_tick)
 
 PALETTE_INIT_MEMBER(vboy_state, vboy)
 {
-	palette.set_pen_color(0, rgb_t::black);
-	palette.set_pen_color(1, rgb_t::black);
-	palette.set_pen_color(2, rgb_t::black);
-	palette.set_pen_color(3, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::black());
+	palette.set_pen_color(2, rgb_t::black());
+	palette.set_pen_color(3, rgb_t::black());
 }
 
-void vboy_state::m_set_irq(UINT16 irq_vector)
+void vboy_state::m_set_irq(uint16_t irq_vector)
 {
 	m_vip_regs.INTPND |= irq_vector;
 
@@ -1267,7 +1267,7 @@ void vboy_state::m_set_irq(UINT16 irq_vector)
 }
 
 /* TODO: obviously all of this needs clean-ups and better implementation ... */
-void vboy_state::m_scanline_tick(int scanline, UINT8 screen_type)
+void vboy_state::m_scanline_tick(int scanline, uint8_t screen_type)
 {
 	//int frame_num = machine().first_screen()->frame_number();
 

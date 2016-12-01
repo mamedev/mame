@@ -31,7 +31,7 @@
 class dl1416_device : public device_t
 {
 public:
-	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	dl1416_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~dl1416_device() {}
 
 	template<class _Object> static devcb_base &set_update_handler(device_t &device, _Object object) { return downcast<dl1416_device &>(device).m_update.set_callback(object); }
@@ -54,14 +54,14 @@ private:
 	int m_cursor_enable;
 	devcb_write16 m_update;
 
-	UINT16 m_digit_ram[4]; // holds the digit code for each position
-	UINT8 m_cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on
+	uint16_t m_digit_ram[4]; // holds the digit code for each position
+	uint8_t m_cursor_state[4]; // holds the cursor state for each position, 0=off, 1=on
 };
 
 class dl1416b_device : public dl1416_device
 {
 public:
-	dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dl1416b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type DL1416B;
@@ -69,7 +69,7 @@ extern const device_type DL1416B;
 class dl1416t_device : public dl1416_device
 {
 public:
-	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dl1416t_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type DL1416T;

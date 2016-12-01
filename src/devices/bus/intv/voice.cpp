@@ -21,7 +21,7 @@
 
 const device_type INTV_ROM_VOICE = &device_creator<intv_voice_device>;
 
-intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intv_voice_device::intv_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: intv_rom_device(mconfig, INTV_ROM_VOICE, "Intellivision Intellivoice Expansion", tag, owner, clock, "intv_voice", __FILE__),
 				m_speech(*this, "sp0256_speech"),
 				m_subslot(*this, "subslot"),
@@ -96,7 +96,7 @@ ROM_START( intellivoice )
 	ROM_LOAD( "sp0256-012.bin",   0x1000, 0x0800, CRC(0de7579d) SHA1(618563e512ff5665183664f52270fa9606c9d289) )
 ROM_END
 
-const rom_entry *intv_voice_device::device_rom_region() const
+const tiny_rom_entry *intv_voice_device::device_rom_region() const
 {
 	return ROM_NAME( intellivoice );
 }

@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Ville Linde, Barry Rodewald, Carl, Philip Bennett
-UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
+uint8_t i386_device::i386_shift_rotate8(uint8_t modrm, uint32_t value, uint8_t shift)
 {
-	UINT32 src = value & 0xff;
-	UINT8 dst = value;
+	uint32_t src = value & 0xff;
+	uint8_t dst = value;
 
 	if( shift == 0 ) {
 		CYCLES_RM(modrm, 3, 7);
@@ -50,7 +50,7 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 7:         /* SAR rm8, 1 */
-				dst = (INT8)(src) >> 1;
+				dst = (int8_t)(src) >> 1;
 				m_CF = src & 0x1;
 				m_OF = 0;
 				SetSZPF8(dst);
@@ -72,8 +72,8 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 					break;
 				}
 				shift &= 7;
-				dst = ((src & ((UINT8)0xff >> shift)) << shift) |
-						((src & ((UINT8)0xff << (8-shift))) >> (8-shift));
+				dst = ((src & ((uint8_t)0xff >> shift)) << shift) |
+						((src & ((uint8_t)0xff << (8-shift))) >> (8-shift));
 				m_CF = dst & 0x1;
 				m_OF = (dst & 1) ^ (dst >> 7);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
@@ -89,16 +89,16 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 					break;
 				}
 				shift &= 7;
-				dst = ((src & ((UINT8)0xff << shift)) >> shift) |
-						((src & ((UINT8)0xff >> (8-shift))) << (8-shift));
+				dst = ((src & ((uint8_t)0xff << shift)) >> shift) |
+						((src & ((uint8_t)0xff >> (8-shift))) << (8-shift));
 				m_CF = (dst >> 7) & 1;
 				m_OF = ((dst >> 7) ^ (dst >> 6)) & 1;
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
 				break;
 			case 2:         /* RCL rm8, i8 */
 				shift %= 9;
-				dst = ((src & ((UINT8)0xff >> shift)) << shift) |
-						((src & ((UINT8)0xff << (9-shift))) >> (9-shift)) |
+				dst = ((src & ((uint8_t)0xff >> shift)) << shift) |
+						((src & ((uint8_t)0xff << (9-shift))) >> (9-shift)) |
 						(m_CF << (shift-1));
 				if(shift) m_CF = (src >> (8-shift)) & 0x1;
 				m_OF = m_CF ^ ((dst >> 7) & 1);
@@ -106,8 +106,8 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 				break;
 			case 3:         /* RCR rm8, i8 */
 				shift %= 9;
-				dst = ((src & ((UINT8)0xff << shift)) >> shift) |
-						((src & ((UINT8)0xff >> (8-shift))) << (9-shift)) |
+				dst = ((src & ((uint8_t)0xff << shift)) >> shift) |
+						((src & ((uint8_t)0xff >> (8-shift))) << (9-shift)) |
 						(m_CF << (8-shift));
 				if(shift) m_CF = (src >> (shift-1)) & 0x1;
 				m_OF = ((dst >> 7) ^ (dst >> 6)) & 1;
@@ -130,7 +130,7 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 				break;
 			case 7:         /* SAR rm8, i8 */
 				shift &= 31;
-				dst = (INT8)src >> shift;
+				dst = (int8_t)src >> shift;
 				m_CF = (src & (1 << (shift-1))) ? 1 : 0;
 				SetSZPF8(dst);
 				CYCLES_RM(modrm, CYCLES_ROTATE_REG, CYCLES_ROTATE_MEM);
@@ -145,8 +145,8 @@ UINT8 i386_device::i386_shift_rotate8(UINT8 modrm, UINT32 value, UINT8 shift)
 
 void i386_device::i386_adc_rm8_r8()        // Opcode 0x10
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -154,7 +154,7 @@ void i386_device::i386_adc_rm8_r8()        // Opcode 0x10
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = ADC8(dst, src, m_CF);
@@ -165,8 +165,8 @@ void i386_device::i386_adc_rm8_r8()        // Opcode 0x10
 
 void i386_device::i386_adc_r8_rm8()        // Opcode 0x12
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -174,7 +174,7 @@ void i386_device::i386_adc_r8_rm8()        // Opcode 0x12
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = ADC8(dst, src, m_CF);
@@ -185,7 +185,7 @@ void i386_device::i386_adc_r8_rm8()        // Opcode 0x12
 
 void i386_device::i386_adc_al_i8()     // Opcode 0x14
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = ADC8(dst, src, m_CF);
@@ -195,8 +195,8 @@ void i386_device::i386_adc_al_i8()     // Opcode 0x14
 
 void i386_device::i386_add_rm8_r8()        // Opcode 0x00
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -204,7 +204,7 @@ void i386_device::i386_add_rm8_r8()        // Opcode 0x00
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = ADD8(dst, src);
@@ -215,8 +215,8 @@ void i386_device::i386_add_rm8_r8()        // Opcode 0x00
 
 void i386_device::i386_add_r8_rm8()        // Opcode 0x02
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -224,7 +224,7 @@ void i386_device::i386_add_r8_rm8()        // Opcode 0x02
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = ADD8(dst, src);
@@ -235,7 +235,7 @@ void i386_device::i386_add_r8_rm8()        // Opcode 0x02
 
 void i386_device::i386_add_al_i8()     // Opcode 0x04
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = ADD8(dst, src);
@@ -245,8 +245,8 @@ void i386_device::i386_add_al_i8()     // Opcode 0x04
 
 void i386_device::i386_and_rm8_r8()        // Opcode 0x20
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -254,7 +254,7 @@ void i386_device::i386_and_rm8_r8()        // Opcode 0x20
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = AND8(dst, src);
@@ -265,8 +265,8 @@ void i386_device::i386_and_rm8_r8()        // Opcode 0x20
 
 void i386_device::i386_and_r8_rm8()        // Opcode 0x22
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -274,7 +274,7 @@ void i386_device::i386_and_r8_rm8()        // Opcode 0x22
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = AND8(dst, src);
@@ -285,7 +285,7 @@ void i386_device::i386_and_r8_rm8()        // Opcode 0x22
 
 void i386_device::i386_and_al_i8()         // Opcode 0x24
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = AND8(dst, src);
@@ -309,7 +309,7 @@ void i386_device::i386_cli()               // Opcode 0xfa
 {
 	if(PROTECTED_MODE)
 	{
-		UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
+		uint8_t IOPL = m_IOP1 | (m_IOP2 << 1);
 		if(m_CPL > IOPL)
 			FAULT(FAULT_GP,0);
 	}
@@ -325,15 +325,15 @@ void i386_device::i386_cmc()               // Opcode 0xf5
 
 void i386_device::i386_cmp_rm8_r8()        // Opcode 0x38
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
 		SUB8(dst, src);
 		CYCLES(CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		SUB8(dst, src);
@@ -343,15 +343,15 @@ void i386_device::i386_cmp_rm8_r8()        // Opcode 0x38
 
 void i386_device::i386_cmp_r8_rm8()        // Opcode 0x3a
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
 		SUB8(dst, src);
 		CYCLES(CYCLES_CMP_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		SUB8(dst, src);
@@ -361,7 +361,7 @@ void i386_device::i386_cmp_r8_rm8()        // Opcode 0x3a
 
 void i386_device::i386_cmp_al_i8()         // Opcode 0x3c
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	SUB8(dst, src);
@@ -370,8 +370,8 @@ void i386_device::i386_cmp_al_i8()         // Opcode 0x3c
 
 void i386_device::i386_cmpsb()             // Opcode 0xa6
 {
-	UINT32 eas, ead;
-	UINT8 src, dst;
+	uint32_t eas, ead;
+	uint8_t src, dst;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -388,23 +388,23 @@ void i386_device::i386_cmpsb()             // Opcode 0xa6
 
 void i386_device::i386_in_al_i8()          // Opcode 0xe4
 {
-	UINT16 port = FETCH();
-	UINT8 data = READPORT8(port);
+	uint16_t port = FETCH();
+	uint8_t data = READPORT8(port);
 	REG8(AL) = data;
 	CYCLES(CYCLES_IN_VAR);
 }
 
 void i386_device::i386_in_al_dx()          // Opcode 0xec
 {
-	UINT16 port = REG16(DX);
-	UINT8 data = READPORT8(port);
+	uint16_t port = REG16(DX);
+	uint8_t data = READPORT8(port);
 	REG8(AL) = data;
 	CYCLES(CYCLES_IN);
 }
 
 void i386_device::i386_ja_rel8()           // Opcode 0x77
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_CF == 0 && m_ZF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -415,7 +415,7 @@ void i386_device::i386_ja_rel8()           // Opcode 0x77
 
 void i386_device::i386_jbe_rel8()          // Opcode 0x76
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_CF != 0 || m_ZF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -426,7 +426,7 @@ void i386_device::i386_jbe_rel8()          // Opcode 0x76
 
 void i386_device::i386_jc_rel8()           // Opcode 0x72
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_CF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -437,7 +437,7 @@ void i386_device::i386_jc_rel8()           // Opcode 0x72
 
 void i386_device::i386_jg_rel8()           // Opcode 0x7f
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_ZF == 0 && (m_SF == m_OF) ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -448,7 +448,7 @@ void i386_device::i386_jg_rel8()           // Opcode 0x7f
 
 void i386_device::i386_jge_rel8()          // Opcode 0x7d
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if(m_SF == m_OF) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -459,7 +459,7 @@ void i386_device::i386_jge_rel8()          // Opcode 0x7d
 
 void i386_device::i386_jl_rel8()           // Opcode 0x7c
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( (m_SF != m_OF) ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -470,7 +470,7 @@ void i386_device::i386_jl_rel8()           // Opcode 0x7c
 
 void i386_device::i386_jle_rel8()      // Opcode 0x7e
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_ZF != 0 || (m_SF != m_OF) ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -481,7 +481,7 @@ void i386_device::i386_jle_rel8()      // Opcode 0x7e
 
 void i386_device::i386_jnc_rel8()          // Opcode 0x73
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_CF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -492,7 +492,7 @@ void i386_device::i386_jnc_rel8()          // Opcode 0x73
 
 void i386_device::i386_jno_rel8()          // Opcode 0x71
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_OF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -503,7 +503,7 @@ void i386_device::i386_jno_rel8()          // Opcode 0x71
 
 void i386_device::i386_jnp_rel8()          // Opcode 0x7b
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_PF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -514,7 +514,7 @@ void i386_device::i386_jnp_rel8()          // Opcode 0x7b
 
 void i386_device::i386_jns_rel8()          // Opcode 0x79
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_SF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -525,7 +525,7 @@ void i386_device::i386_jns_rel8()          // Opcode 0x79
 
 void i386_device::i386_jnz_rel8()          // Opcode 0x75
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_ZF == 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -536,7 +536,7 @@ void i386_device::i386_jnz_rel8()          // Opcode 0x75
 
 void i386_device::i386_jo_rel8()           // Opcode 0x70
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_OF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -547,7 +547,7 @@ void i386_device::i386_jo_rel8()           // Opcode 0x70
 
 void i386_device::i386_jp_rel8()           // Opcode 0x7a
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_PF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -558,7 +558,7 @@ void i386_device::i386_jp_rel8()           // Opcode 0x7a
 
 void i386_device::i386_js_rel8()           // Opcode 0x78
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_SF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -569,7 +569,7 @@ void i386_device::i386_js_rel8()           // Opcode 0x78
 
 void i386_device::i386_jz_rel8()           // Opcode 0x74
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	if( m_ZF != 0 ) {
 		NEAR_BRANCH(disp);
 		CYCLES(CYCLES_JCC_DISP8);      /* TODO: Timing = 7 + m */
@@ -580,7 +580,7 @@ void i386_device::i386_jz_rel8()           // Opcode 0x74
 
 void i386_device::i386_jmp_rel8()          // Opcode 0xeb
 {
-	INT8 disp = FETCH();
+	int8_t disp = FETCH();
 	NEAR_BRANCH(disp);
 	CYCLES(CYCLES_JMP_SHORT);      /* TODO: Timing = 7 + m */
 }
@@ -593,7 +593,7 @@ void i386_device::i386_lahf()              // Opcode 0x9f
 
 void i386_device::i386_lodsb()             // Opcode 0xac
 {
-	UINT32 eas;
+	uint32_t eas;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -606,14 +606,14 @@ void i386_device::i386_lodsb()             // Opcode 0xac
 
 void i386_device::i386_mov_rm8_r8()        // Opcode 0x88
 {
-	UINT8 src;
-	UINT8 modrm = FETCH();
+	uint8_t src;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		STORE_RM8(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		WRITE8(ea, src);
 		CYCLES(CYCLES_MOV_REG_MEM);
@@ -622,14 +622,14 @@ void i386_device::i386_mov_rm8_r8()        // Opcode 0x88
 
 void i386_device::i386_mov_r8_rm8()        // Opcode 0x8a
 {
-	UINT8 src;
-	UINT8 modrm = FETCH();
+	uint8_t src;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		STORE_REG8(modrm, src);
 		CYCLES(CYCLES_MOV_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		STORE_REG8(modrm, src);
 		CYCLES(CYCLES_MOV_MEM_REG);
@@ -638,14 +638,14 @@ void i386_device::i386_mov_r8_rm8()        // Opcode 0x8a
 
 void i386_device::i386_mov_rm8_i8()        // Opcode 0xc6
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT8 value = FETCH();
+		uint8_t value = FETCH();
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_MOV_IMM_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT8 value = FETCH();
+		uint32_t ea = GetEA(modrm,1);
+		uint8_t value = FETCH();
 		WRITE8(ea, value);
 		CYCLES(CYCLES_MOV_IMM_MEM);
 	}
@@ -655,8 +655,8 @@ void i386_device::i386_mov_r32_cr()        // Opcode 0x0f 20
 {
 	if(PROTECTED_MODE && m_CPL)
 		FAULT(FAULT_GP, 0);
-	UINT8 modrm = FETCH();
-	UINT8 cr = (modrm >> 3) & 0x7;
+	uint8_t modrm = FETCH();
+	uint8_t cr = (modrm >> 3) & 0x7;
 
 	STORE_RM32(modrm, m_cr[cr]);
 	CYCLES(CYCLES_MOV_CR_REG);
@@ -666,8 +666,8 @@ void i386_device::i386_mov_r32_dr()        // Opcode 0x0f 21
 {
 	if(PROTECTED_MODE && m_CPL)
 		FAULT(FAULT_GP, 0);
-	UINT8 modrm = FETCH();
-	UINT8 dr = (modrm >> 3) & 0x7;
+	uint8_t modrm = FETCH();
+	uint8_t dr = (modrm >> 3) & 0x7;
 
 	STORE_RM32(modrm, m_dr[dr]);
 	switch(dr)
@@ -689,9 +689,9 @@ void i386_device::i386_mov_cr_r32()        // Opcode 0x0f 22
 {
 	if(PROTECTED_MODE && m_CPL)
 		FAULT(FAULT_GP, 0);
-	UINT8 modrm = FETCH();
-	UINT8 cr = (modrm >> 3) & 0x7;
-	UINT32 data = LOAD_RM32(modrm);
+	uint8_t modrm = FETCH();
+	uint8_t cr = (modrm >> 3) & 0x7;
+	uint32_t data = LOAD_RM32(modrm);
 	switch(cr)
 	{
 		case 0:
@@ -715,8 +715,8 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 {
 	if(PROTECTED_MODE && m_CPL)
 		FAULT(FAULT_GP, 0);
-	UINT8 modrm = FETCH();
-	UINT8 dr = (modrm >> 3) & 0x7;
+	uint8_t modrm = FETCH();
+	uint8_t dr = (modrm >> 3) & 0x7;
 
 	m_dr[dr] = LOAD_RM32(modrm);
 	switch(dr)
@@ -739,7 +739,7 @@ void i386_device::i386_mov_dr_r32()        // Opcode 0x0f 23
 
 void i386_device::i386_mov_al_m8()         // Opcode 0xa0
 {
-	UINT32 offset, ea;
+	uint32_t offset, ea;
 	if( m_address_size ) {
 		offset = FETCH32();
 	} else {
@@ -757,7 +757,7 @@ void i386_device::i386_mov_al_m8()         // Opcode 0xa0
 
 void i386_device::i386_mov_m8_al()         // Opcode 0xa2
 {
-	UINT32 offset, ea;
+	uint32_t offset, ea;
 	if( m_address_size ) {
 		offset = FETCH32();
 	} else {
@@ -775,7 +775,7 @@ void i386_device::i386_mov_m8_al()         // Opcode 0xa2
 
 void i386_device::i386_mov_rm16_sreg()     // Opcode 0x8c
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	int s = (modrm >> 3) & 0x7;
 
 	if( modrm >= 0xc0 ) {
@@ -785,7 +785,7 @@ void i386_device::i386_mov_rm16_sreg()     // Opcode 0x8c
 			STORE_RM16(modrm, m_sreg[s].selector);
 		CYCLES(CYCLES_MOV_SREG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE16(ea, m_sreg[s].selector);
 		CYCLES(CYCLES_MOV_SREG_MEM);
 	}
@@ -793,8 +793,8 @@ void i386_device::i386_mov_rm16_sreg()     // Opcode 0x8c
 
 void i386_device::i386_mov_sreg_rm16()     // Opcode 0x8e
 {
-	UINT16 selector;
-	UINT8 modrm = FETCH();
+	uint16_t selector;
+	uint8_t modrm = FETCH();
 	bool fault;
 	int s = (modrm >> 3) & 0x7;
 
@@ -802,7 +802,7 @@ void i386_device::i386_mov_sreg_rm16()     // Opcode 0x8e
 		selector = LOAD_RM16(modrm);
 		CYCLES(CYCLES_MOV_REG_SREG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		selector = READ16(ea);
 		CYCLES(CYCLES_MOV_MEM_SREG);
 	}
@@ -868,8 +868,8 @@ void i386_device::i386_mov_bh_i8()         // Opcode 0xb7
 
 void i386_device::i386_movsb()             // Opcode 0xa4
 {
-	UINT32 eas, ead;
-	UINT8 v;
+	uint32_t eas, ead;
+	uint8_t v;
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
 	} else {
@@ -885,8 +885,8 @@ void i386_device::i386_movsb()             // Opcode 0xa4
 
 void i386_device::i386_or_rm8_r8()         // Opcode 0x08
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -894,7 +894,7 @@ void i386_device::i386_or_rm8_r8()         // Opcode 0x08
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = OR8(dst, src);
@@ -905,8 +905,8 @@ void i386_device::i386_or_rm8_r8()         // Opcode 0x08
 
 void i386_device::i386_or_r8_rm8()         // Opcode 0x0a
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -914,7 +914,7 @@ void i386_device::i386_or_r8_rm8()         // Opcode 0x0a
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = OR8(dst, src);
@@ -925,7 +925,7 @@ void i386_device::i386_or_r8_rm8()         // Opcode 0x0a
 
 void i386_device::i386_or_al_i8()          // Opcode 0x0c
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = OR8(dst, src);
@@ -935,16 +935,16 @@ void i386_device::i386_or_al_i8()          // Opcode 0x0c
 
 void i386_device::i386_out_al_i8()         // Opcode 0xe6
 {
-	UINT16 port = FETCH();
-	UINT8 data = REG8(AL);
+	uint16_t port = FETCH();
+	uint8_t data = REG8(AL);
 	WRITEPORT8(port, data);
 	CYCLES(CYCLES_OUT_VAR);
 }
 
 void i386_device::i386_out_al_dx()         // Opcode 0xee
 {
-	UINT16 port = REG16(DX);
-	UINT8 data = REG8(AL);
+	uint16_t port = REG16(DX);
+	uint8_t data = REG8(AL);
 	WRITEPORT8(port, data);
 	CYCLES(CYCLES_OUT);
 }
@@ -952,9 +952,9 @@ void i386_device::i386_out_al_dx()         // Opcode 0xee
 
 void i386_device::i386_arpl()           // Opcode 0x63
 {
-	UINT16 src, dst;
-	UINT8 modrm = FETCH();
-	UINT8 flag = 0;
+	uint16_t src, dst;
+	uint8_t modrm = FETCH();
+	uint8_t flag = 0;
 
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -967,7 +967,7 @@ void i386_device::i386_arpl()           // Opcode 0x63
 				STORE_RM16(modrm, dst);
 			}
 		} else {
-			UINT32 ea = GetEA(modrm,1);
+			uint32_t ea = GetEA(modrm,1);
 			src = LOAD_REG16(modrm);
 			dst = READ16(ea);
 			if( (dst&0x3) < (src&0x3) ) {
@@ -984,17 +984,17 @@ void i386_device::i386_arpl()           // Opcode 0x63
 
 void i386_device::i386_push_i8()           // Opcode 0x6a
 {
-	UINT8 value = FETCH();
+	uint8_t value = FETCH();
 	PUSH8(value);
 	CYCLES(CYCLES_PUSH_IMM);
 }
 
 void i386_device::i386_ins_generic(int size)
 {
-	UINT32 ead;
-	UINT8 vb;
-	UINT16 vw;
-	UINT32 vd;
+	uint32_t ead;
+	uint8_t vb;
+	uint16_t vw;
+	uint32_t vd;
 
 	ead = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1 );
 
@@ -1037,10 +1037,10 @@ void i386_device::i386_insd()              // Opcode 0x6d
 
 void i386_device::i386_outs_generic(int size)
 {
-	UINT32 eas;
-	UINT8 vb;
-	UINT16 vw;
-	UINT32 vd;
+	uint32_t eas;
+	uint8_t vb;
+	uint16_t vw;
+	uint32_t vd;
 
 	if( m_segment_prefix ) {
 		eas = i386_translate(m_segment_override, m_address_size ? REG32(ESI) : REG16(SI), 0 );
@@ -1087,14 +1087,14 @@ void i386_device::i386_outsd()             // Opcode 0x6f
 
 void i386_device::i386_repeat(int invert_flag)
 {
-	UINT32 repeated_eip = m_eip;
-	UINT32 repeated_pc = m_pc;
-	UINT8 opcode; // = FETCH();
-//  UINT32 eas, ead;
-	UINT32 count;
-	INT32 cycle_base = 0, cycle_adjustment = 0;
-	UINT8 prefix_flag=1;
-	UINT8 *flag = nullptr;
+	uint32_t repeated_eip = m_eip;
+	uint32_t repeated_pc = m_pc;
+	uint8_t opcode; // = FETCH();
+//  uint32_t eas, ead;
+	uint32_t count;
+	int32_t cycle_base = 0, cycle_adjustment = 0;
+	uint8_t prefix_flag=1;
+	uint8_t *flag = nullptr;
 
 
 	do {
@@ -1246,7 +1246,7 @@ void i386_device::i386_repeat(int invert_flag)
 		{
 			i386_decode_opcode();
 		}
-		catch (UINT64 e)
+		catch (uint64_t e)
 		{
 			m_eip = m_prev_eip;
 			throw e;
@@ -1293,8 +1293,8 @@ void i386_device::i386_sahf()              // Opcode 0x9e
 
 void i386_device::i386_sbb_rm8_r8()        // Opcode 0x18
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -1302,7 +1302,7 @@ void i386_device::i386_sbb_rm8_r8()        // Opcode 0x18
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = SBB8(dst, src, m_CF);
@@ -1313,8 +1313,8 @@ void i386_device::i386_sbb_rm8_r8()        // Opcode 0x18
 
 void i386_device::i386_sbb_r8_rm8()        // Opcode 0x1a
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -1322,7 +1322,7 @@ void i386_device::i386_sbb_r8_rm8()        // Opcode 0x1a
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = SBB8(dst, src, m_CF);
@@ -1333,7 +1333,7 @@ void i386_device::i386_sbb_r8_rm8()        // Opcode 0x1a
 
 void i386_device::i386_sbb_al_i8()         // Opcode 0x1c
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = SBB8(dst, src, m_CF);
@@ -1343,8 +1343,8 @@ void i386_device::i386_sbb_al_i8()         // Opcode 0x1c
 
 void i386_device::i386_scasb()             // Opcode 0xae
 {
-	UINT32 eas;
-	UINT8 src, dst;
+	uint32_t eas;
+	uint8_t src, dst;
 	eas = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 0 );
 	src = READ8(eas);
 	dst = REG8(AL);
@@ -1365,8 +1365,8 @@ void i386_device::i386_setalc()            // Opcode 0xd6 (undocumented)
 
 void i386_device::i386_seta_rm8()          // Opcode 0x0f 97
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_CF == 0 && m_ZF == 0 ) {
 		value = 1;
 	}
@@ -1374,7 +1374,7 @@ void i386_device::i386_seta_rm8()          // Opcode 0x0f 97
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1382,8 +1382,8 @@ void i386_device::i386_seta_rm8()          // Opcode 0x0f 97
 
 void i386_device::i386_setbe_rm8()         // Opcode 0x0f 96
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_CF != 0 || m_ZF != 0 ) {
 		value = 1;
 	}
@@ -1391,7 +1391,7 @@ void i386_device::i386_setbe_rm8()         // Opcode 0x0f 96
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1399,8 +1399,8 @@ void i386_device::i386_setbe_rm8()         // Opcode 0x0f 96
 
 void i386_device::i386_setc_rm8()          // Opcode 0x0f 92
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_CF != 0 ) {
 		value = 1;
 	}
@@ -1408,7 +1408,7 @@ void i386_device::i386_setc_rm8()          // Opcode 0x0f 92
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1416,8 +1416,8 @@ void i386_device::i386_setc_rm8()          // Opcode 0x0f 92
 
 void i386_device::i386_setg_rm8()          // Opcode 0x0f 9f
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_ZF == 0 && (m_SF == m_OF) ) {
 		value = 1;
 	}
@@ -1425,7 +1425,7 @@ void i386_device::i386_setg_rm8()          // Opcode 0x0f 9f
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1433,8 +1433,8 @@ void i386_device::i386_setg_rm8()          // Opcode 0x0f 9f
 
 void i386_device::i386_setge_rm8()         // Opcode 0x0f 9d
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if(m_SF == m_OF) {
 		value = 1;
 	}
@@ -1442,7 +1442,7 @@ void i386_device::i386_setge_rm8()         // Opcode 0x0f 9d
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1450,8 +1450,8 @@ void i386_device::i386_setge_rm8()         // Opcode 0x0f 9d
 
 void i386_device::i386_setl_rm8()          // Opcode 0x0f 9c
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_SF != m_OF ) {
 		value = 1;
 	}
@@ -1459,7 +1459,7 @@ void i386_device::i386_setl_rm8()          // Opcode 0x0f 9c
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1467,8 +1467,8 @@ void i386_device::i386_setl_rm8()          // Opcode 0x0f 9c
 
 void i386_device::i386_setle_rm8()         // Opcode 0x0f 9e
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_ZF != 0 || (m_SF != m_OF) ) {
 		value = 1;
 	}
@@ -1476,7 +1476,7 @@ void i386_device::i386_setle_rm8()         // Opcode 0x0f 9e
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1484,8 +1484,8 @@ void i386_device::i386_setle_rm8()         // Opcode 0x0f 9e
 
 void i386_device::i386_setnc_rm8()         // Opcode 0x0f 93
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_CF == 0 ) {
 		value = 1;
 	}
@@ -1493,7 +1493,7 @@ void i386_device::i386_setnc_rm8()         // Opcode 0x0f 93
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1501,8 +1501,8 @@ void i386_device::i386_setnc_rm8()         // Opcode 0x0f 93
 
 void i386_device::i386_setno_rm8()         // Opcode 0x0f 91
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_OF == 0 ) {
 		value = 1;
 	}
@@ -1510,7 +1510,7 @@ void i386_device::i386_setno_rm8()         // Opcode 0x0f 91
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1518,8 +1518,8 @@ void i386_device::i386_setno_rm8()         // Opcode 0x0f 91
 
 void i386_device::i386_setnp_rm8()         // Opcode 0x0f 9b
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_PF == 0 ) {
 		value = 1;
 	}
@@ -1527,7 +1527,7 @@ void i386_device::i386_setnp_rm8()         // Opcode 0x0f 9b
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1535,8 +1535,8 @@ void i386_device::i386_setnp_rm8()         // Opcode 0x0f 9b
 
 void i386_device::i386_setns_rm8()         // Opcode 0x0f 99
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_SF == 0 ) {
 		value = 1;
 	}
@@ -1544,7 +1544,7 @@ void i386_device::i386_setns_rm8()         // Opcode 0x0f 99
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1552,8 +1552,8 @@ void i386_device::i386_setns_rm8()         // Opcode 0x0f 99
 
 void i386_device::i386_setnz_rm8()         // Opcode 0x0f 95
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_ZF == 0 ) {
 		value = 1;
 	}
@@ -1561,7 +1561,7 @@ void i386_device::i386_setnz_rm8()         // Opcode 0x0f 95
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1569,8 +1569,8 @@ void i386_device::i386_setnz_rm8()         // Opcode 0x0f 95
 
 void i386_device::i386_seto_rm8()          // Opcode 0x0f 90
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_OF != 0 ) {
 		value = 1;
 	}
@@ -1578,7 +1578,7 @@ void i386_device::i386_seto_rm8()          // Opcode 0x0f 90
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1586,8 +1586,8 @@ void i386_device::i386_seto_rm8()          // Opcode 0x0f 90
 
 void i386_device::i386_setp_rm8()          // Opcode 0x0f 9a
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_PF != 0 ) {
 		value = 1;
 	}
@@ -1595,7 +1595,7 @@ void i386_device::i386_setp_rm8()          // Opcode 0x0f 9a
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1603,8 +1603,8 @@ void i386_device::i386_setp_rm8()          // Opcode 0x0f 9a
 
 void i386_device::i386_sets_rm8()          // Opcode 0x0f 98
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_SF != 0 ) {
 		value = 1;
 	}
@@ -1612,7 +1612,7 @@ void i386_device::i386_sets_rm8()          // Opcode 0x0f 98
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1620,8 +1620,8 @@ void i386_device::i386_sets_rm8()          // Opcode 0x0f 98
 
 void i386_device::i386_setz_rm8()          // Opcode 0x0f 94
 {
-	UINT8 modrm = FETCH();
-	UINT8 value = 0;
+	uint8_t modrm = FETCH();
+	uint8_t value = 0;
 	if( m_ZF != 0 ) {
 		value = 1;
 	}
@@ -1629,7 +1629,7 @@ void i386_device::i386_setz_rm8()          // Opcode 0x0f 94
 		STORE_RM8(modrm, value);
 		CYCLES(CYCLES_SETCC_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		WRITE8(ea, value);
 		CYCLES(CYCLES_SETCC_MEM);
 	}
@@ -1651,7 +1651,7 @@ void i386_device::i386_sti()               // Opcode 0xfb
 {
 	if(PROTECTED_MODE)
 	{
-		UINT8 IOPL = m_IOP1 | (m_IOP2 << 1);
+		uint8_t IOPL = m_IOP1 | (m_IOP2 << 1);
 		if(m_CPL > IOPL)
 			FAULT(FAULT_GP,0);
 	}
@@ -1661,7 +1661,7 @@ void i386_device::i386_sti()               // Opcode 0xfb
 
 void i386_device::i386_stosb()             // Opcode 0xaa
 {
-	UINT32 ead;
+	uint32_t ead;
 	ead = i386_translate(ES, m_address_size ? REG32(EDI) : REG16(DI), 1 );
 	WRITE8(ead, REG8(AL));
 	BUMP_DI(1);
@@ -1670,8 +1670,8 @@ void i386_device::i386_stosb()             // Opcode 0xaa
 
 void i386_device::i386_sub_rm8_r8()        // Opcode 0x28
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -1679,7 +1679,7 @@ void i386_device::i386_sub_rm8_r8()        // Opcode 0x28
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = SUB8(dst, src);
@@ -1690,8 +1690,8 @@ void i386_device::i386_sub_rm8_r8()        // Opcode 0x28
 
 void i386_device::i386_sub_r8_rm8()        // Opcode 0x2a
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -1699,7 +1699,7 @@ void i386_device::i386_sub_r8_rm8()        // Opcode 0x2a
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = SUB8(dst, src);
@@ -1710,7 +1710,7 @@ void i386_device::i386_sub_r8_rm8()        // Opcode 0x2a
 
 void i386_device::i386_sub_al_i8()         // Opcode 0x2c
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(EAX);
 	dst = SUB8(dst, src);
@@ -1720,8 +1720,8 @@ void i386_device::i386_sub_al_i8()         // Opcode 0x2c
 
 void i386_device::i386_test_al_i8()        // Opcode 0xa8
 {
-	UINT8 src = FETCH();
-	UINT8 dst = REG8(AL);
+	uint8_t src = FETCH();
+	uint8_t dst = REG8(AL);
 	dst = src & dst;
 	SetSZPF8(dst);
 	m_CF = 0;
@@ -1731,8 +1731,8 @@ void i386_device::i386_test_al_i8()        // Opcode 0xa8
 
 void i386_device::i386_test_rm8_r8()       // Opcode 0x84
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -1742,7 +1742,7 @@ void i386_device::i386_test_rm8_r8()       // Opcode 0x84
 		m_OF = 0;
 		CYCLES(CYCLES_TEST_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = src & dst;
@@ -1755,17 +1755,17 @@ void i386_device::i386_test_rm8_r8()       // Opcode 0x84
 
 void i386_device::i386_xchg_r8_rm8()       // Opcode 0x86
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
-		UINT8 src = LOAD_RM8(modrm);
-		UINT8 dst = LOAD_REG8(modrm);
+		uint8_t src = LOAD_RM8(modrm);
+		uint8_t dst = LOAD_REG8(modrm);
 		STORE_REG8(modrm, src);
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_XCHG_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
-		UINT8 src = READ8(ea);
-		UINT8 dst = LOAD_REG8(modrm);
+		uint32_t ea = GetEA(modrm,1);
+		uint8_t src = READ8(ea);
+		uint8_t dst = LOAD_REG8(modrm);
 		WRITE8(ea, dst);
 		STORE_REG8(modrm, src);
 		CYCLES(CYCLES_XCHG_REG_MEM);
@@ -1774,8 +1774,8 @@ void i386_device::i386_xchg_r8_rm8()       // Opcode 0x86
 
 void i386_device::i386_xor_rm8_r8()        // Opcode 0x30
 {
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_REG8(modrm);
 		dst = LOAD_RM8(modrm);
@@ -1783,7 +1783,7 @@ void i386_device::i386_xor_rm8_r8()        // Opcode 0x30
 		STORE_RM8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		src = LOAD_REG8(modrm);
 		dst = READ8(ea);
 		dst = XOR8(dst, src);
@@ -1794,8 +1794,8 @@ void i386_device::i386_xor_rm8_r8()        // Opcode 0x30
 
 void i386_device::i386_xor_r8_rm8()        // Opcode 0x32
 {
-	UINT32 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t src, dst;
+	uint8_t modrm = FETCH();
 	if( modrm >= 0xc0 ) {
 		src = LOAD_RM8(modrm);
 		dst = LOAD_REG8(modrm);
@@ -1803,7 +1803,7 @@ void i386_device::i386_xor_r8_rm8()        // Opcode 0x32
 		STORE_REG8(modrm, dst);
 		CYCLES(CYCLES_ALU_REG_REG);
 	} else {
-		UINT32 ea = GetEA(modrm,0);
+		uint32_t ea = GetEA(modrm,0);
 		src = READ8(ea);
 		dst = LOAD_REG8(modrm);
 		dst = XOR8(dst, src);
@@ -1814,7 +1814,7 @@ void i386_device::i386_xor_r8_rm8()        // Opcode 0x32
 
 void i386_device::i386_xor_al_i8()         // Opcode 0x34
 {
-	UINT8 src, dst;
+	uint8_t src, dst;
 	src = FETCH();
 	dst = REG8(AL);
 	dst = XOR8(dst, src);
@@ -1826,9 +1826,9 @@ void i386_device::i386_xor_al_i8()         // Opcode 0x34
 
 void i386_device::i386_group80_8()         // Opcode 0x80
 {
-	UINT32 ea;
-	UINT8 src, dst;
-	UINT8 modrm = FETCH();
+	uint32_t ea;
+	uint8_t src, dst;
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
@@ -1963,9 +1963,9 @@ void i386_device::i386_group80_8()         // Opcode 0x80
 
 void i386_device::i386_groupC0_8()         // Opcode 0xc0
 {
-	UINT8 dst;
-	UINT8 modrm = FETCH();
-	UINT8 shift;
+	uint8_t dst;
+	uint8_t modrm = FETCH();
+	uint8_t shift;
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM8(modrm);
@@ -1973,7 +1973,7 @@ void i386_device::i386_groupC0_8()         // Opcode 0xc0
 		dst = i386_shift_rotate8(modrm, dst, shift);
 		STORE_RM8(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ8(ea);
 		shift = FETCH() & 0x1f;
 		dst = i386_shift_rotate8(modrm, dst, shift);
@@ -1983,15 +1983,15 @@ void i386_device::i386_groupC0_8()         // Opcode 0xc0
 
 void i386_device::i386_groupD0_8()         // Opcode 0xd0
 {
-	UINT8 dst;
-	UINT8 modrm = FETCH();
+	uint8_t dst;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM8(modrm);
 		dst = i386_shift_rotate8(modrm, dst, 1);
 		STORE_RM8(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ8(ea);
 		dst = i386_shift_rotate8(modrm, dst, 1);
 		WRITE8(ea, dst);
@@ -2000,15 +2000,15 @@ void i386_device::i386_groupD0_8()         // Opcode 0xd0
 
 void i386_device::i386_groupD2_8()         // Opcode 0xd2
 {
-	UINT8 dst;
-	UINT8 modrm = FETCH();
+	uint8_t dst;
+	uint8_t modrm = FETCH();
 
 	if( modrm >= 0xc0 ) {
 		dst = LOAD_RM8(modrm);
 		dst = i386_shift_rotate8(modrm, dst, REG8(CL));
 		STORE_RM8(modrm, dst);
 	} else {
-		UINT32 ea = GetEA(modrm,1);
+		uint32_t ea = GetEA(modrm,1);
 		dst = READ8(ea);
 		dst = i386_shift_rotate8(modrm, dst, REG8(CL));
 		WRITE8(ea, dst);
@@ -2017,22 +2017,22 @@ void i386_device::i386_groupD2_8()         // Opcode 0xd2
 
 void i386_device::i386_groupF6_8()         // Opcode 0xf6
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 0:         /* TEST Rm8, i8 */
 			if( modrm >= 0xc0 ) {
-				UINT8 dst = LOAD_RM8(modrm);
-				UINT8 src = FETCH();
+				uint8_t dst = LOAD_RM8(modrm);
+				uint8_t src = FETCH();
 				dst &= src;
 				m_CF = m_OF = m_AF = 0;
 				SetSZPF8(dst);
 				CYCLES(CYCLES_TEST_IMM_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,0);
-				UINT8 dst = READ8(ea);
-				UINT8 src = FETCH();
+				uint32_t ea = GetEA(modrm,0);
+				uint8_t dst = READ8(ea);
+				uint8_t src = FETCH();
 				dst &= src;
 				m_CF = m_OF = m_AF = 0;
 				SetSZPF8(dst);
@@ -2041,13 +2041,13 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 			break;
 		case 2:         /* NOT Rm8 */
 			if( modrm >= 0xc0 ) {
-				UINT8 dst = LOAD_RM8(modrm);
+				uint8_t dst = LOAD_RM8(modrm);
 				dst = ~dst;
 				STORE_RM8(modrm, dst);
 				CYCLES(CYCLES_NOT_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT8 dst = READ8(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint8_t dst = READ8(ea);
 				dst = ~dst;
 				WRITE8(ea, dst);
 				CYCLES(CYCLES_NOT_MEM);
@@ -2055,13 +2055,13 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 			break;
 		case 3:         /* NEG Rm8 */
 			if( modrm >= 0xc0 ) {
-				UINT8 dst = LOAD_RM8(modrm);
+				uint8_t dst = LOAD_RM8(modrm);
 				dst = SUB8(0, dst );
 				STORE_RM8(modrm, dst);
 				CYCLES(CYCLES_NEG_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT8 dst = READ8(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint8_t dst = READ8(ea);
 				dst = SUB8(0, dst );
 				WRITE8(ea, dst);
 				CYCLES(CYCLES_NEG_MEM);
@@ -2069,67 +2069,67 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 			break;
 		case 4:         /* MUL AL, Rm8 */
 			{
-				UINT16 result;
-				UINT8 src, dst;
+				uint16_t result;
+				uint8_t src, dst;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM8(modrm);
 					CYCLES(CYCLES_MUL8_ACC_REG);       /* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ8(ea);
 					CYCLES(CYCLES_MUL8_ACC_MEM);       /* TODO: Correct multiply timing */
 				}
 
 				dst = REG8(AL);
-				result = (UINT16)src * (UINT16)dst;
-				REG16(AX) = (UINT16)result;
+				result = (uint16_t)src * (uint16_t)dst;
+				REG16(AX) = (uint16_t)result;
 
 				m_CF = m_OF = (REG16(AX) > 0xff);
 			}
 			break;
 		case 5:         /* IMUL AL, Rm8 */
 			{
-				INT16 result;
-				INT16 src, dst;
+				int16_t result;
+				int16_t src, dst;
 				if( modrm >= 0xc0 ) {
-					src = (INT16)(INT8)LOAD_RM8(modrm);
+					src = (int16_t)(int8_t)LOAD_RM8(modrm);
 					CYCLES(CYCLES_IMUL8_ACC_REG);      /* TODO: Correct multiply timing */
 				} else {
-					UINT32 ea = GetEA(modrm,0);
-					src = (INT16)(INT8)READ8(ea);
+					uint32_t ea = GetEA(modrm,0);
+					src = (int16_t)(int8_t)READ8(ea);
 					CYCLES(CYCLES_IMUL8_ACC_MEM);      /* TODO: Correct multiply timing */
 				}
 
-				dst = (INT16)(INT8)REG8(AL);
+				dst = (int16_t)(int8_t)REG8(AL);
 				result = src * dst;
 
-				REG16(AX) = (UINT16)result;
+				REG16(AX) = (uint16_t)result;
 
-				m_CF = m_OF = !(result == (INT16)(INT8)result);
+				m_CF = m_OF = !(result == (int16_t)(int8_t)result);
 			}
 			break;
 		case 6:         /* DIV AL, Rm8 */
 			{
-				UINT16 quotient, remainder, result;
-				UINT8 src;
+				uint16_t quotient, remainder, result;
+				uint8_t src;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM8(modrm);
 					CYCLES(CYCLES_DIV8_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ8(ea);
 					CYCLES(CYCLES_DIV8_ACC_MEM);
 				}
 
-				quotient = (UINT16)REG16(AX);
+				quotient = (uint16_t)REG16(AX);
 				if( src ) {
-					remainder = quotient % (UINT16)src;
-					result = quotient / (UINT16)src;
+					remainder = quotient % (uint16_t)src;
+					result = quotient / (uint16_t)src;
 					if( result > 0xff ) {
 						/* TODO: Divide error */
 					} else {
-						REG8(AH) = (UINT8)remainder & 0xff;
-						REG8(AL) = (UINT8)result & 0xff;
+						REG8(AH) = (uint8_t)remainder & 0xff;
+						REG8(AL) = (uint8_t)result & 0xff;
 
 						// this flag is actually undefined, enable on non-cyrix
 						if (m_cpuid_id0 != 0x69727943)
@@ -2142,26 +2142,26 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 			break;
 		case 7:         /* IDIV AL, Rm8 */
 			{
-				INT16 quotient, remainder, result;
-				UINT8 src;
+				int16_t quotient, remainder, result;
+				uint8_t src;
 				if( modrm >= 0xc0 ) {
 					src = LOAD_RM8(modrm);
 					CYCLES(CYCLES_IDIV8_ACC_REG);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					src = READ8(ea);
 					CYCLES(CYCLES_IDIV8_ACC_MEM);
 				}
 
-				quotient = (INT16)REG16(AX);
+				quotient = (int16_t)REG16(AX);
 				if( src ) {
-					remainder = quotient % (INT16)(INT8)src;
-					result = quotient / (INT16)(INT8)src;
+					remainder = quotient % (int16_t)(int8_t)src;
+					result = quotient / (int16_t)(int8_t)src;
 					if( result > 0xff ) {
 						/* TODO: Divide error */
 					} else {
-						REG8(AH) = (UINT8)remainder & 0xff;
-						REG8(AL) = (UINT8)result & 0xff;
+						REG8(AH) = (uint8_t)remainder & 0xff;
+						REG8(AL) = (uint8_t)result & 0xff;
 
 						// this flag is actually undefined, enable on non-cyrix
 						if (m_cpuid_id0 != 0x69727943)
@@ -2177,19 +2177,19 @@ void i386_device::i386_groupF6_8()         // Opcode 0xf6
 
 void i386_device::i386_groupFE_8()         // Opcode 0xfe
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 
 	switch( (modrm >> 3) & 0x7 )
 	{
 		case 0:         /* INC Rm8 */
 			if( modrm >= 0xc0 ) {
-				UINT8 dst = LOAD_RM8(modrm);
+				uint8_t dst = LOAD_RM8(modrm);
 				dst = INC8(dst);
 				STORE_RM8(modrm, dst);
 				CYCLES(CYCLES_INC_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT8 dst = READ8(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint8_t dst = READ8(ea);
 				dst = INC8(dst);
 				WRITE8(ea, dst);
 				CYCLES(CYCLES_INC_MEM);
@@ -2197,13 +2197,13 @@ void i386_device::i386_groupFE_8()         // Opcode 0xfe
 			break;
 		case 1:         /* DEC Rm8 */
 			if( modrm >= 0xc0 ) {
-				UINT8 dst = LOAD_RM8(modrm);
+				uint8_t dst = LOAD_RM8(modrm);
 				dst = DEC8(dst);
 				STORE_RM8(modrm, dst);
 				CYCLES(CYCLES_DEC_REG);
 			} else {
-				UINT32 ea = GetEA(modrm,1);
-				UINT8 dst = READ8(ea);
+				uint32_t ea = GetEA(modrm,1);
+				uint8_t dst = READ8(ea);
 				dst = DEC8(dst);
 				WRITE8(ea, dst);
 				CYCLES(CYCLES_DEC_MEM);
@@ -2211,11 +2211,11 @@ void i386_device::i386_groupFE_8()         // Opcode 0xfe
 			break;
 		case 6:         /* PUSH Rm8*/
 			{
-				UINT8 value;
+				uint8_t value;
 				if( modrm >= 0xc0 ) {
 					value = LOAD_RM8(modrm);
 				} else {
-					UINT32 ea = GetEA(modrm,0);
+					uint32_t ea = GetEA(modrm,0);
 					value = READ8(ea);
 				}
 				if( m_operand_size ) {
@@ -2348,10 +2348,10 @@ void i386_device::i386_into()              // Opcode 0xce
 	}
 }
 
-static UINT32 i386_escape_ea;   // hack around GCC 4.6 error because we need the side effects of GetEA()
+static uint32_t i386_escape_ea;   // hack around GCC 4.6 error because we need the side effects of GetEA()
 void i386_device::i386_escape()            // Opcodes 0xd8 - 0xdf
 {
-	UINT8 modrm = FETCH();
+	uint8_t modrm = FETCH();
 	if(modrm < 0xc0)
 	{
 		i386_escape_ea = GetEA(modrm,0);
@@ -2372,13 +2372,13 @@ void i386_device::i386_hlt()               // Opcode 0xf4
 
 void i386_device::i386_decimal_adjust(int direction)
 {
-	UINT8 tmpAL = REG8(AL);
-	UINT8 tmpCF = m_CF;
+	uint8_t tmpAL = REG8(AL);
+	uint8_t tmpCF = m_CF;
 
 	if (m_AF || ((REG8(AL) & 0xf) > 9))
 	{
-		UINT16 t= (UINT16)REG8(AL) + (direction * 0x06);
-		REG8(AL) = (UINT8)t&0xff;
+		uint16_t t= (uint16_t)REG8(AL) + (direction * 0x06);
+		REG8(AL) = (uint8_t)t&0xff;
 		m_AF = 1;
 		if (t & 0x100)
 			m_CF = 1;
@@ -2442,9 +2442,9 @@ void i386_device::i386_aas()               // Opcode 0x3f
 
 void i386_device::i386_aad()               // Opcode 0xd5
 {
-	UINT8 tempAL = REG8(AL);
-	UINT8 tempAH = REG8(AH);
-	UINT8 i = FETCH();
+	uint8_t tempAL = REG8(AL);
+	uint8_t tempAH = REG8(AH);
+	uint8_t i = FETCH();
 
 	REG8(AL) = (tempAL + (tempAH * i)) & 0xff;
 	REG8(AH) = 0;
@@ -2454,8 +2454,8 @@ void i386_device::i386_aad()               // Opcode 0xd5
 
 void i386_device::i386_aam()               // Opcode 0xd4
 {
-	UINT8 tempAL = REG8(AL);
-	UINT8 i = FETCH();
+	uint8_t tempAL = REG8(AL);
+	uint8_t i = FETCH();
 
 	if(!i)
 	{
@@ -2506,7 +2506,7 @@ void i386_device::i386_loadall()       // Opcode 0x0f 0x07 (0x0f 0x05 on 80286),
 {
 	if(PROTECTED_MODE && (m_CPL != 0))
 		FAULT(FAULT_GP,0)
-	UINT32 ea = i386_translate(ES, REG32(EDI), 0);
+	uint32_t ea = i386_translate(ES, REG32(EDI), 0);
 	m_cr[0] = READ32(ea) & 0xfffeffff; // wp not supported on 386
 	set_flags(READ32(ea + 0x04));
 	m_eip = READ32(ea + 0x08);
@@ -2574,7 +2574,7 @@ void i386_device::i386_invalid()
 
 void i386_device::i386_xlat()          // Opcode 0xd7
 {
-	UINT32 ea;
+	uint32_t ea;
 	if( m_segment_prefix ) {
 		if(!m_address_size)
 		{

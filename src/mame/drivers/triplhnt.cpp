@@ -31,8 +31,8 @@ void triplhnt_state::triplhnt_set_collision(int code)
 
 void triplhnt_state::triplhnt_update_misc(address_space &space, int offset)
 {
-	UINT8 is_witch_hunt;
-	UINT8 bit = offset >> 1;
+	uint8_t is_witch_hunt;
+	uint8_t bit = offset >> 1;
 
 	/* BIT0 => UNUSED      */
 	/* BIT1 => LAMP        */
@@ -225,7 +225,7 @@ static const gfx_layout triplhnt_small_sprite_layout =
 };
 
 
-static const UINT32 triplhnt_large_sprite_layout_xoffset[64] =
+static const uint32_t triplhnt_large_sprite_layout_xoffset[64] =
 {
 		0x00, 0x00, 0x01, 0x01, 0x02, 0x02, 0x03, 0x03,
 		0x04, 0x04, 0x05, 0x05, 0x06, 0x06, 0x07, 0x07,
@@ -237,7 +237,7 @@ static const UINT32 triplhnt_large_sprite_layout_xoffset[64] =
 		0x1C, 0x1C, 0x1D, 0x1D, 0x1E, 0x1E, 0x1F, 0x1F
 };
 
-static const UINT32 triplhnt_large_sprite_layout_yoffset[64] =
+static const uint32_t triplhnt_large_sprite_layout_yoffset[64] =
 {
 		0x000, 0x000, 0x020, 0x020, 0x040, 0x040, 0x060, 0x060,
 		0x080, 0x080, 0x0A0, 0x0A0, 0x0C0, 0x0C0, 0x0E0, 0x0E0,

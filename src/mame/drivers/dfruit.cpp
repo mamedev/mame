@@ -36,13 +36,13 @@ public:
 	required_device<tc0091lvc_device> m_vdp;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 
-	UINT8 m_ram_bank[4];
-	UINT8 m_rom_bank;
-	UINT8 m_irq_vector[3];
-	UINT8 m_irq_enable;
+	uint8_t m_ram_bank[4];
+	uint8_t m_rom_bank;
+	uint8_t m_irq_vector[3];
+	uint8_t m_irq_enable;
 
 	DECLARE_READ8_MEMBER(dfruit_rom_r);
 
@@ -64,8 +64,8 @@ public:
 	DECLARE_READ8_MEMBER(dfruit_irq_enable_r);
 	DECLARE_WRITE8_MEMBER(dfruit_irq_enable_w);
 
-	UINT8 ram_bank_r(UINT16 offset, UINT8 bank_num);
-	void ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num);
+	uint8_t ram_bank_r(uint16_t offset, uint8_t bank_num);
+	void ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num);
 	TIMER_DEVICE_CALLBACK_MEMBER(dfruit_irq_scanline);
 };
 
@@ -73,7 +73,7 @@ void dfruit_state::video_start()
 {
 }
 
-UINT32 dfruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dfruit_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -92,7 +92,7 @@ void dfruit_state::screen_eof(screen_device &screen, bool state)
 
 READ8_MEMBER(dfruit_state::dfruit_rom_r)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	return ROM[offset + m_rom_bank * 0x2000];
 }
@@ -137,13 +137,13 @@ WRITE8_MEMBER(dfruit_state::dfruit_ram_bank_w)
 	m_ram_bank[offset] = data;
 }
 
-UINT8 dfruit_state::ram_bank_r(UINT16 offset, UINT8 bank_num)
+uint8_t dfruit_state::ram_bank_r(uint16_t offset, uint8_t bank_num)
 {
 	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
 	return vdp_space.read_byte(offset + (m_ram_bank[bank_num]) * 0x1000);;
 }
 
-void dfruit_state::ram_bank_w(UINT16 offset, UINT8 data, UINT8 bank_num)
+void dfruit_state::ram_bank_w(uint16_t offset, uint8_t data, uint8_t bank_num)
 {
 	address_space &vdp_space = machine().device<tc0091lvc_device>("tc0091lvc")->space();
 	vdp_space.write_byte(offset + (m_ram_bank[bank_num]) * 0x1000,data);;

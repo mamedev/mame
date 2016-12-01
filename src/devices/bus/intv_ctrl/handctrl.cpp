@@ -85,7 +85,7 @@ ioport_constructor intv_handctrl_device::device_input_ports() const
 //  intv_handctrl_device - constructor
 //-------------------------------------------------
 
-intv_handctrl_device::intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+intv_handctrl_device::intv_handctrl_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, INTV_HANDCTRL, "Mattel Intellivision Hand Controller", tag, owner, clock, "intv_hand", __FILE__),
 					device_intv_control_port_interface(mconfig, *this),
 					m_cfg(*this, "OPTIONS"),
@@ -119,21 +119,21 @@ void intv_handctrl_device::device_reset()
 //  read_ctrl
 //-------------------------------------------------
 
-UINT8 intv_handctrl_device::read_ctrl()
+uint8_t intv_handctrl_device::read_ctrl()
 {
-	static const UINT8 keypad_table[] =
+	static const uint8_t keypad_table[] =
 	{
 		0xff, 0x3f, 0x9f, 0x5f, 0xd7, 0xb7, 0x77, 0xdb,
 		0xbb, 0x7b, 0xdd, 0xbd, 0x7d, 0xde, 0xbe, 0x7e
 	};
 
-	static const UINT8 disc_table[] =
+	static const uint8_t disc_table[] =
 	{
 		0xf3, 0xe3, 0xe7, 0xf7, 0xf6, 0xe6, 0xee, 0xfe,
 		0xfc, 0xec, 0xed, 0xfd, 0xf9, 0xe9, 0xeb, 0xfb
 	};
 
-	static const UINT8 discyx_table[5][5] =
+	static const uint8_t discyx_table[5][5] =
 	{
 		{ 0xe3, 0xf3, 0xfb, 0xeb, 0xe9 },
 		{ 0xe7, 0xe3, 0xfb, 0xe9, 0xf9 },
@@ -143,7 +143,7 @@ UINT8 intv_handctrl_device::read_ctrl()
 	};
 
 	int x, y;
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	/* keypad */
 	x = m_keypad->read();

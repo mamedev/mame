@@ -220,7 +220,7 @@ void upd7810_device::MUL_C()
 /* 48 31: 0100 1000 0011 0001 */
 void upd7810_device::RLR_A()
 {
-	UINT8 carry=(PSW&CY)<<7;
+	uint8_t carry=(PSW&CY)<<7;
 	PSW = (PSW & ~CY) | (A & CY);
 	A = (A >> 1) | carry;
 }
@@ -228,7 +228,7 @@ void upd7810_device::RLR_A()
 /* 48 32: 0100 1000 0011 0010 */
 void upd7810_device::RLR_B()
 {
-	UINT8 carry=(PSW&CY)<<7;
+	uint8_t carry=(PSW&CY)<<7;
 	PSW = (PSW & ~CY) | (B & CY);
 	B = (B >> 1) | carry;
 }
@@ -236,7 +236,7 @@ void upd7810_device::RLR_B()
 /* 48 33: 0100 1000 0011 0011 */
 void upd7810_device::RLR_C()
 {
-	UINT8 carry=(PSW&CY)<<7;
+	uint8_t carry=(PSW&CY)<<7;
 	PSW = (PSW & ~CY) | (C & CY);
 	C = (C >> 1) | carry;
 }
@@ -244,7 +244,7 @@ void upd7810_device::RLR_C()
 /* 48 35: 0100 1000 0011 0101 */
 void upd7810_device::RLL_A()
 {
-	UINT8 carry=PSW&CY;
+	uint8_t carry=PSW&CY;
 	PSW = (PSW & ~CY) | ((A >> 7) & CY);
 	A = (A << 1) | carry;
 }
@@ -252,7 +252,7 @@ void upd7810_device::RLL_A()
 /* 48 36: 0100 1000 0011 0110 */
 void upd7810_device::RLL_B()
 {
-	UINT8 carry=PSW&CY;
+	uint8_t carry=PSW&CY;
 	PSW = (PSW & ~CY) | ((B >> 7) & CY);
 	B = (B << 1) | carry;
 }
@@ -260,7 +260,7 @@ void upd7810_device::RLL_B()
 /* 48 37: 0100 1000 0011 0111 */
 void upd7810_device::RLL_C()
 {
-	UINT8 carry=PSW&CY;
+	uint8_t carry=PSW&CY;
 	PSW = (PSW & ~CY) | ((C >> 7) & CY);
 	C = (C << 1) | carry;
 }
@@ -268,7 +268,7 @@ void upd7810_device::RLL_C()
 /* 48 38: 0100 1000 0011 1000 */
 void upd7810_device::RLD()
 {
-	UINT8 m = RM( HL ), tmp;
+	uint8_t m = RM( HL ), tmp;
 	tmp = (m << 4) | (A & 0x0f);
 	A = (A & 0xf0) | (m >> 4);
 	WM( HL, tmp );
@@ -277,7 +277,7 @@ void upd7810_device::RLD()
 /* 48 39: 0100 1000 0011 1001 */
 void upd7810_device::RRD()
 {
-	UINT8 m = RM( HL ), tmp;
+	uint8_t m = RM( HL ), tmp;
 	tmp = (A << 4) | (m >> 4);
 	A = (A & 0xf0) | (m & 0x0f);
 	WM( HL, tmp );
@@ -303,7 +303,7 @@ void upd7810_device::DIV_A()
 {
 	if (A)
 	{
-		UINT8 remainder;
+		uint8_t remainder;
 		remainder = EA % A;
 		EA /= A;
 		A = remainder;
@@ -317,7 +317,7 @@ void upd7810_device::DIV_B()
 {
 	if (B)
 	{
-		UINT8 remainder;
+		uint8_t remainder;
 		remainder = EA % B;
 		EA /= B;
 		B = remainder;
@@ -331,7 +331,7 @@ void upd7810_device::DIV_C()
 {
 	if (C)
 	{
-		UINT8 remainder;
+		uint8_t remainder;
 		remainder = EA % C;
 		EA /= C;
 		C = remainder;
@@ -661,7 +661,7 @@ void upd7810_device::LDEAX_Hp()
 /* 48 8b: 0100 1000 1000 1011 xxxx xxxx */
 void upd7810_device::LDEAX_D_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += DE;
 	EAL = RM( ea );
@@ -671,7 +671,7 @@ void upd7810_device::LDEAX_D_xx()
 /* 48 8c: 0100 1000 1000 1100 */
 void upd7810_device::LDEAX_H_A()
 {
-	UINT16 ea = HL + A;
+	uint16_t ea = HL + A;
 	EAL = RM( ea );
 	EAH = RM( ea + 1 );
 }
@@ -679,7 +679,7 @@ void upd7810_device::LDEAX_H_A()
 /* 48 8d: 0100 1000 1000 1101 */
 void upd7810_device::LDEAX_H_B()
 {
-	UINT16 ea = HL + B;
+	uint16_t ea = HL + B;
 	EAL = RM( ea );
 	EAH = RM( ea + 1 );
 }
@@ -687,7 +687,7 @@ void upd7810_device::LDEAX_H_B()
 /* 48 8e: 0100 1000 1000 1110 */
 void upd7810_device::LDEAX_H_EA()
 {
-	UINT16 ea = HL + EA;
+	uint16_t ea = HL + EA;
 	EAL = RM( ea );
 	EAH = RM( ea + 1 );
 }
@@ -695,7 +695,7 @@ void upd7810_device::LDEAX_H_EA()
 /* 48 8f: 0100 1000 1000 1111 xxxx xxxx */
 void upd7810_device::LDEAX_H_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += HL;
 	EAL = RM( ea );
@@ -735,7 +735,7 @@ void upd7810_device::STEAX_Hp()
 /* 48 9b: 0100 1000 1000 1011 xxxx xxxx */
 void upd7810_device::STEAX_D_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += DE;
 	WM( ea, EAL );
@@ -745,7 +745,7 @@ void upd7810_device::STEAX_D_xx()
 /* 48 9c: 0100 1000 1000 1100 */
 void upd7810_device::STEAX_H_A()
 {
-	UINT16 ea = HL + A;
+	uint16_t ea = HL + A;
 	WM( ea, EAL );
 	WM( ea + 1, EAH );
 }
@@ -753,7 +753,7 @@ void upd7810_device::STEAX_H_A()
 /* 48 9d: 0100 1000 1000 1101 */
 void upd7810_device::STEAX_H_B()
 {
-	UINT16 ea = HL + B;
+	uint16_t ea = HL + B;
 	WM( ea, EAL );
 	WM( ea + 1, EAH );
 }
@@ -761,7 +761,7 @@ void upd7810_device::STEAX_H_B()
 /* 48 9e: 0100 1000 1000 1110 */
 void upd7810_device::STEAX_H_EA()
 {
-	UINT16 ea = HL + EA;
+	uint16_t ea = HL + EA;
 	WM( ea, EAL );
 	WM( ea + 1, EAH );
 }
@@ -769,7 +769,7 @@ void upd7810_device::STEAX_H_EA()
 /* 48 9f: 0100 1000 1000 1111 xxxx xxxx */
 void upd7810_device::STEAX_H_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += HL;
 	WM( ea, EAL );
@@ -793,7 +793,7 @@ void upd7810_device::DSLL_EA()
 /* 48 a8: 0100 1000 1010 1000 */
 void upd7810_device::TABLE()
 {
-	UINT16 ea = PC + A + 1;
+	uint16_t ea = PC + A + 1;
 	C = RM( ea );
 	B = RM( ea + 1 );
 }
@@ -801,7 +801,7 @@ void upd7810_device::TABLE()
 /* 48 b0: 0100 1000 1011 0000 */
 void upd7810_device::DRLR_EA()
 {
-	UINT8 carry=PSW&CY;
+	uint8_t carry=PSW&CY;
 	PSW = (PSW & ~CY) | (EA & CY);
 	EA = (EA >> 1) | (carry << 15);
 }
@@ -809,7 +809,7 @@ void upd7810_device::DRLR_EA()
 /* 48 b4: 0100 1000 1011 0100 */
 void upd7810_device::DRLL_EA()
 {
-	UINT8 carry=PSW&CY;
+	uint8_t carry=PSW&CY;
 	PSW = (PSW & ~CY) | ((EA >> 15) & CY);
 	EA = (EA << 1) | carry;
 }
@@ -906,7 +906,7 @@ void upd7810_device::MOV_A_SMH()
 void upd7810_device::MOV_A_EOM()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
+	uint8_t eom = EOM & 0x22;
 	A = eom;
 }
 
@@ -1265,7 +1265,7 @@ void upd7810_device::ORA_L_A()
 /* 60 20: 0110 0000 0010 0000 */
 void upd7810_device::ADDNC_V_A()
 {
-	UINT8 tmp = V + A;
+	uint8_t tmp = V + A;
 	ZHC_ADD( tmp, V, 0 );
 	V = tmp;
 	SKIP_NC;
@@ -1274,7 +1274,7 @@ void upd7810_device::ADDNC_V_A()
 /* 60 21: 0110 0000 0010 0001 */
 void upd7810_device::ADDNC_A_A()
 {
-	UINT8 tmp = A + A;
+	uint8_t tmp = A + A;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -1283,7 +1283,7 @@ void upd7810_device::ADDNC_A_A()
 /* 60 22: 0110 0000 0010 0010 */
 void upd7810_device::ADDNC_B_A()
 {
-	UINT8 tmp = B + A;
+	uint8_t tmp = B + A;
 	ZHC_ADD( tmp, B, 0 );
 	B = tmp;
 	SKIP_NC;
@@ -1292,7 +1292,7 @@ void upd7810_device::ADDNC_B_A()
 /* 60 23: 0110 0000 0010 0011 */
 void upd7810_device::ADDNC_C_A()
 {
-	UINT8 tmp = C + A;
+	uint8_t tmp = C + A;
 	ZHC_ADD( tmp, C, 0 );
 	C = tmp;
 	SKIP_NC;
@@ -1301,7 +1301,7 @@ void upd7810_device::ADDNC_C_A()
 /* 60 24: 0110 0000 0010 0100 */
 void upd7810_device::ADDNC_D_A()
 {
-	UINT8 tmp = D + A;
+	uint8_t tmp = D + A;
 	ZHC_ADD( tmp, D, 0 );
 	D = tmp;
 	SKIP_NC;
@@ -1310,7 +1310,7 @@ void upd7810_device::ADDNC_D_A()
 /* 60 25: 0110 0000 0010 0101 */
 void upd7810_device::ADDNC_E_A()
 {
-	UINT8 tmp = E + A;
+	uint8_t tmp = E + A;
 	ZHC_ADD( tmp, E, 0 );
 	E = tmp;
 	SKIP_NC;
@@ -1319,7 +1319,7 @@ void upd7810_device::ADDNC_E_A()
 /* 60 26: 0110 0000 0010 0110 */
 void upd7810_device::ADDNC_H_A()
 {
-	UINT8 tmp = H + A;
+	uint8_t tmp = H + A;
 	ZHC_ADD( tmp, H, 0 );
 	H = tmp;
 	SKIP_NC;
@@ -1328,7 +1328,7 @@ void upd7810_device::ADDNC_H_A()
 /* 60 27: 0110 0000 0010 0111 */
 void upd7810_device::ADDNC_L_A()
 {
-	UINT8 tmp = L + A;
+	uint8_t tmp = L + A;
 	ZHC_ADD( tmp, L, 0 );
 	L = tmp;
 	SKIP_NC;
@@ -1337,7 +1337,7 @@ void upd7810_device::ADDNC_L_A()
 /* 60 28: 0110 0000 0010 1000 */
 void upd7810_device::GTA_V_A()
 {
-	UINT16 tmp = V - A - 1;
+	uint16_t tmp = V - A - 1;
 	ZHC_SUB( tmp, V, 0 );
 	SKIP_NC;
 }
@@ -1345,7 +1345,7 @@ void upd7810_device::GTA_V_A()
 /* 60 29: 0110 0000 0010 1001 */
 void upd7810_device::GTA_A_A()
 {
-	UINT16 tmp = A - A - 1;
+	uint16_t tmp = A - A - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -1353,7 +1353,7 @@ void upd7810_device::GTA_A_A()
 /* 60 2a: 0110 0000 0010 1010 */
 void upd7810_device::GTA_B_A()
 {
-	UINT16 tmp = B - A - 1;
+	uint16_t tmp = B - A - 1;
 	ZHC_SUB( tmp, B, 0 );
 	SKIP_NC;
 }
@@ -1361,7 +1361,7 @@ void upd7810_device::GTA_B_A()
 /* 60 2b: 0110 0000 0010 1011 */
 void upd7810_device::GTA_C_A()
 {
-	UINT16 tmp = C - A - 1;
+	uint16_t tmp = C - A - 1;
 	ZHC_SUB( tmp, C, 0 );
 	SKIP_NC;
 }
@@ -1369,7 +1369,7 @@ void upd7810_device::GTA_C_A()
 /* 60 2c: 0110 0000 0010 1100 */
 void upd7810_device::GTA_D_A()
 {
-	UINT16 tmp = D - A - 1;
+	uint16_t tmp = D - A - 1;
 	ZHC_SUB( tmp, D, 0 );
 	SKIP_NC;
 }
@@ -1377,7 +1377,7 @@ void upd7810_device::GTA_D_A()
 /* 60 2d: 0110 0000 0010 1101 */
 void upd7810_device::GTA_E_A()
 {
-	UINT16 tmp = E - A - 1;
+	uint16_t tmp = E - A - 1;
 	ZHC_SUB( tmp, E, 0 );
 	SKIP_NC;
 }
@@ -1385,7 +1385,7 @@ void upd7810_device::GTA_E_A()
 /* 60 2e: 0110 0000 0010 1110 */
 void upd7810_device::GTA_H_A()
 {
-	UINT16 tmp = H - A - 1;
+	uint16_t tmp = H - A - 1;
 	ZHC_SUB( tmp, H, 0 );
 	SKIP_NC;
 }
@@ -1393,7 +1393,7 @@ void upd7810_device::GTA_H_A()
 /* 60 2f: 0110 0000 0010 1111 */
 void upd7810_device::GTA_L_A()
 {
-	UINT16 tmp = L - A - 1;
+	uint16_t tmp = L - A - 1;
 	ZHC_SUB( tmp, L, 0 );
 	SKIP_NC;
 }
@@ -1401,7 +1401,7 @@ void upd7810_device::GTA_L_A()
 /* 60 30: 0110 0000 0011 0000 */
 void upd7810_device::SUBNB_V_A()
 {
-	UINT8 tmp = V - A;
+	uint8_t tmp = V - A;
 	ZHC_SUB( tmp, V, 0 );
 	V = tmp;
 	SKIP_NC;
@@ -1410,7 +1410,7 @@ void upd7810_device::SUBNB_V_A()
 /* 60 31: 0110 0000 0011 0001 */
 void upd7810_device::SUBNB_A_A()
 {
-	UINT8 tmp = A - A;
+	uint8_t tmp = A - A;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -1419,7 +1419,7 @@ void upd7810_device::SUBNB_A_A()
 /* 60 32: 0110 0000 0011 0010 */
 void upd7810_device::SUBNB_B_A()
 {
-	UINT8 tmp = B - A;
+	uint8_t tmp = B - A;
 	ZHC_SUB( tmp, B, 0 );
 	B = tmp;
 	SKIP_NC;
@@ -1428,7 +1428,7 @@ void upd7810_device::SUBNB_B_A()
 /* 60 33: 0110 0000 0011 0011 */
 void upd7810_device::SUBNB_C_A()
 {
-	UINT8 tmp = C - A;
+	uint8_t tmp = C - A;
 	ZHC_SUB( tmp, C, 0 );
 	C = tmp;
 	SKIP_NC;
@@ -1437,7 +1437,7 @@ void upd7810_device::SUBNB_C_A()
 /* 60 34: 0110 0000 0011 0100 */
 void upd7810_device::SUBNB_D_A()
 {
-	UINT8 tmp = D - A;
+	uint8_t tmp = D - A;
 	ZHC_SUB( tmp, D, 0 );
 	D = tmp;
 	SKIP_NC;
@@ -1446,7 +1446,7 @@ void upd7810_device::SUBNB_D_A()
 /* 60 35: 0110 0000 0011 0101 */
 void upd7810_device::SUBNB_E_A()
 {
-	UINT8 tmp = E - A;
+	uint8_t tmp = E - A;
 	ZHC_SUB( tmp, E, 0 );
 	E = tmp;
 	SKIP_NC;
@@ -1455,7 +1455,7 @@ void upd7810_device::SUBNB_E_A()
 /* 60 36: 0110 0000 0011 0110 */
 void upd7810_device::SUBNB_H_A()
 {
-	UINT8 tmp = H - A;
+	uint8_t tmp = H - A;
 	ZHC_SUB( tmp, H, 0 );
 	H = tmp;
 	SKIP_NC;
@@ -1464,7 +1464,7 @@ void upd7810_device::SUBNB_H_A()
 /* 60 37: 0110 0000 0011 0111 */
 void upd7810_device::SUBNB_L_A()
 {
-	UINT8 tmp = L - A;
+	uint8_t tmp = L - A;
 	ZHC_SUB( tmp, L, 0 );
 	L = tmp;
 	SKIP_NC;
@@ -1473,7 +1473,7 @@ void upd7810_device::SUBNB_L_A()
 /* 60 38: 0110 0000 0011 1000 */
 void upd7810_device::LTA_V_A()
 {
-	UINT8 tmp = V - A;
+	uint8_t tmp = V - A;
 	ZHC_SUB( tmp, V, 0 );
 	SKIP_CY;
 }
@@ -1481,7 +1481,7 @@ void upd7810_device::LTA_V_A()
 /* 60 39: 0110 0000 0011 1001 */
 void upd7810_device::LTA_A_A()
 {
-	UINT8 tmp = A - A;
+	uint8_t tmp = A - A;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -1489,7 +1489,7 @@ void upd7810_device::LTA_A_A()
 /* 60 3a: 0110 0000 0011 1010 */
 void upd7810_device::LTA_B_A()
 {
-	UINT8 tmp = B - A;
+	uint8_t tmp = B - A;
 	ZHC_SUB( tmp, B, 0 );
 	SKIP_CY;
 }
@@ -1497,7 +1497,7 @@ void upd7810_device::LTA_B_A()
 /* 60 3b: 0110 0000 0011 1011 */
 void upd7810_device::LTA_C_A()
 {
-	UINT8 tmp = C - A;
+	uint8_t tmp = C - A;
 	ZHC_SUB( tmp, C, 0 );
 	SKIP_CY;
 }
@@ -1505,7 +1505,7 @@ void upd7810_device::LTA_C_A()
 /* 60 3c: 0110 0000 0011 1100 */
 void upd7810_device::LTA_D_A()
 {
-	UINT8 tmp = D - A;
+	uint8_t tmp = D - A;
 	ZHC_SUB( tmp, D, 0 );
 	SKIP_CY;
 }
@@ -1513,7 +1513,7 @@ void upd7810_device::LTA_D_A()
 /* 60 3d: 0110 0000 0011 1101 */
 void upd7810_device::LTA_E_A()
 {
-	UINT8 tmp = E - A;
+	uint8_t tmp = E - A;
 	ZHC_SUB( tmp, E, 0 );
 	SKIP_CY;
 }
@@ -1521,7 +1521,7 @@ void upd7810_device::LTA_E_A()
 /* 60 3e: 0110 0000 0011 1110 */
 void upd7810_device::LTA_H_A()
 {
-	UINT8 tmp = H - A;
+	uint8_t tmp = H - A;
 	ZHC_SUB( tmp, H, 0 );
 	SKIP_CY;
 }
@@ -1529,7 +1529,7 @@ void upd7810_device::LTA_H_A()
 /* 60 3f: 0110 0000 0011 1111 */
 void upd7810_device::LTA_L_A()
 {
-	UINT8 tmp = L - A;
+	uint8_t tmp = L - A;
 	ZHC_SUB( tmp, L, 0 );
 	SKIP_CY;
 }
@@ -1537,7 +1537,7 @@ void upd7810_device::LTA_L_A()
 /* 60 40: 0110 0000 0100 0000 */
 void upd7810_device::ADD_V_A()
 {
-	UINT8 tmp = V + A;
+	uint8_t tmp = V + A;
 	ZHC_ADD( tmp, V, 0 );
 	V = tmp;
 }
@@ -1545,7 +1545,7 @@ void upd7810_device::ADD_V_A()
 /* 60 41: 0110 0000 0100 0001 */
 void upd7810_device::ADD_A_A()
 {
-	UINT8 tmp = A + A;
+	uint8_t tmp = A + A;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -1553,7 +1553,7 @@ void upd7810_device::ADD_A_A()
 /* 60 42: 0110 0000 0100 0010 */
 void upd7810_device::ADD_B_A()
 {
-	UINT8 tmp = B + A;
+	uint8_t tmp = B + A;
 	ZHC_ADD( tmp, B, 0 );
 	B = tmp;
 }
@@ -1561,7 +1561,7 @@ void upd7810_device::ADD_B_A()
 /* 60 43: 0110 0000 0100 0011 */
 void upd7810_device::ADD_C_A()
 {
-	UINT8 tmp = C + A;
+	uint8_t tmp = C + A;
 	ZHC_ADD( tmp, C, 0 );
 	C = tmp;
 }
@@ -1569,7 +1569,7 @@ void upd7810_device::ADD_C_A()
 /* 60 44: 0110 0000 0100 0100 */
 void upd7810_device::ADD_D_A()
 {
-	UINT8 tmp = D + A;
+	uint8_t tmp = D + A;
 	ZHC_ADD( tmp, D, 0 );
 	D = tmp;
 }
@@ -1577,7 +1577,7 @@ void upd7810_device::ADD_D_A()
 /* 60 45: 0110 0000 0100 0101 */
 void upd7810_device::ADD_E_A()
 {
-	UINT8 tmp = E + A;
+	uint8_t tmp = E + A;
 	ZHC_ADD( tmp, E, 0 );
 	E = tmp;
 }
@@ -1585,7 +1585,7 @@ void upd7810_device::ADD_E_A()
 /* 60 46: 0110 0000 0100 0110 */
 void upd7810_device::ADD_H_A()
 {
-	UINT8 tmp = H + A;
+	uint8_t tmp = H + A;
 	ZHC_ADD( tmp, H, 0 );
 	H = tmp;
 }
@@ -1593,7 +1593,7 @@ void upd7810_device::ADD_H_A()
 /* 60 47: 0110 0000 0100 0111 */
 void upd7810_device::ADD_L_A()
 {
-	UINT8 tmp = L + A;
+	uint8_t tmp = L + A;
 	ZHC_ADD( tmp, L, 0 );
 	L = tmp;
 }
@@ -1601,7 +1601,7 @@ void upd7810_device::ADD_L_A()
 /* 60 50: 0110 0000 0101 0000 */
 void upd7810_device::ADC_V_A()
 {
-	UINT8 tmp = V + A + (PSW & CY);
+	uint8_t tmp = V + A + (PSW & CY);
 	ZHC_ADD( tmp, V, (PSW & CY) );
 	V = tmp;
 }
@@ -1609,7 +1609,7 @@ void upd7810_device::ADC_V_A()
 /* 60 51: 0110 0000 0101 0001 */
 void upd7810_device::ADC_A_A()
 {
-	UINT8 tmp = A + A + (PSW & CY);
+	uint8_t tmp = A + A + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -1617,7 +1617,7 @@ void upd7810_device::ADC_A_A()
 /* 60 52: 0110 0000 0101 0010 */
 void upd7810_device::ADC_B_A()
 {
-	UINT8 tmp = B + A + (PSW & CY);
+	uint8_t tmp = B + A + (PSW & CY);
 	ZHC_ADD( tmp, B, (PSW & CY) );
 	B = tmp;
 }
@@ -1625,7 +1625,7 @@ void upd7810_device::ADC_B_A()
 /* 60 53: 0110 0000 0101 0011 */
 void upd7810_device::ADC_C_A()
 {
-	UINT8 tmp = C + A + (PSW & CY);
+	uint8_t tmp = C + A + (PSW & CY);
 	ZHC_ADD( tmp, C, (PSW & CY) );
 	C = tmp;
 }
@@ -1633,7 +1633,7 @@ void upd7810_device::ADC_C_A()
 /* 60 54: 0110 0000 0101 0100 */
 void upd7810_device::ADC_D_A()
 {
-	UINT8 tmp = D + A + (PSW & CY);
+	uint8_t tmp = D + A + (PSW & CY);
 	ZHC_ADD( tmp, D, (PSW & CY) );
 	D = tmp;
 }
@@ -1641,7 +1641,7 @@ void upd7810_device::ADC_D_A()
 /* 60 55: 0110 0000 0101 0101 */
 void upd7810_device::ADC_E_A()
 {
-	UINT8 tmp = E + A + (PSW & CY);
+	uint8_t tmp = E + A + (PSW & CY);
 	ZHC_ADD( tmp, E, (PSW & CY) );
 	E = tmp;
 }
@@ -1649,7 +1649,7 @@ void upd7810_device::ADC_E_A()
 /* 60 56: 0110 0000 0101 0110 */
 void upd7810_device::ADC_H_A()
 {
-	UINT8 tmp = H + A + (PSW & CY);
+	uint8_t tmp = H + A + (PSW & CY);
 	ZHC_ADD( tmp, H, (PSW & CY) );
 	H = tmp;
 }
@@ -1657,7 +1657,7 @@ void upd7810_device::ADC_H_A()
 /* 60 57: 0110 0000 0101 0111 */
 void upd7810_device::ADC_L_A()
 {
-	UINT8 tmp = L + A + (PSW & CY);
+	uint8_t tmp = L + A + (PSW & CY);
 	ZHC_ADD( tmp, L, (PSW & CY) );
 	L = tmp;
 }
@@ -1665,7 +1665,7 @@ void upd7810_device::ADC_L_A()
 /* 60 60: 0110 0000 0110 0000 */
 void upd7810_device::SUB_V_A()
 {
-	UINT8 tmp = V - A;
+	uint8_t tmp = V - A;
 	ZHC_SUB( tmp, V, 0 );
 	V = tmp;
 }
@@ -1673,7 +1673,7 @@ void upd7810_device::SUB_V_A()
 /* 60 61: 0110 0000 0110 0001 */
 void upd7810_device::SUB_A_A()
 {
-	UINT8 tmp = A - A;
+	uint8_t tmp = A - A;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -1681,7 +1681,7 @@ void upd7810_device::SUB_A_A()
 /* 60 62: 0110 0000 0110 0010 */
 void upd7810_device::SUB_B_A()
 {
-	UINT8 tmp = B - A;
+	uint8_t tmp = B - A;
 	ZHC_SUB( tmp, B, 0 );
 	B = tmp;
 }
@@ -1689,7 +1689,7 @@ void upd7810_device::SUB_B_A()
 /* 60 63: 0110 0000 0110 0011 */
 void upd7810_device::SUB_C_A()
 {
-	UINT8 tmp = C - A;
+	uint8_t tmp = C - A;
 	ZHC_SUB( tmp, C, 0 );
 	C = tmp;
 }
@@ -1697,7 +1697,7 @@ void upd7810_device::SUB_C_A()
 /* 60 64: 0110 0000 0110 0100 */
 void upd7810_device::SUB_D_A()
 {
-	UINT8 tmp = D - A;
+	uint8_t tmp = D - A;
 	ZHC_SUB( tmp, D, 0 );
 	D = tmp;
 }
@@ -1705,7 +1705,7 @@ void upd7810_device::SUB_D_A()
 /* 60 65: 0110 0000 0110 0101 */
 void upd7810_device::SUB_E_A()
 {
-	UINT8 tmp = E - A;
+	uint8_t tmp = E - A;
 	ZHC_SUB( tmp, E, 0 );
 	E = tmp;
 }
@@ -1713,7 +1713,7 @@ void upd7810_device::SUB_E_A()
 /* 60 66: 0110 0000 0110 0110 */
 void upd7810_device::SUB_H_A()
 {
-	UINT8 tmp = H - A;
+	uint8_t tmp = H - A;
 	ZHC_SUB( tmp, H, 0 );
 	H = tmp;
 }
@@ -1721,7 +1721,7 @@ void upd7810_device::SUB_H_A()
 /* 60 67: 0110 0000 0110 0111 */
 void upd7810_device::SUB_L_A()
 {
-	UINT8 tmp = L - A;
+	uint8_t tmp = L - A;
 	ZHC_SUB( tmp, L, 0 );
 	L = tmp;
 }
@@ -1729,7 +1729,7 @@ void upd7810_device::SUB_L_A()
 /* 60 68: 0110 0000 0110 1000 */
 void upd7810_device::NEA_V_A()
 {
-	UINT8 tmp = V - A;
+	uint8_t tmp = V - A;
 	ZHC_SUB( tmp, V, 0 );
 	SKIP_NZ;
 }
@@ -1737,7 +1737,7 @@ void upd7810_device::NEA_V_A()
 /* 60 69: 0110 0000 0110 1001 */
 void upd7810_device::NEA_A_A()
 {
-	UINT8 tmp = A - A;
+	uint8_t tmp = A - A;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -1745,7 +1745,7 @@ void upd7810_device::NEA_A_A()
 /* 60 6a: 0110 0000 0110 1010 */
 void upd7810_device::NEA_B_A()
 {
-	UINT8 tmp = B - A;
+	uint8_t tmp = B - A;
 	ZHC_SUB( tmp, B, 0 );
 	SKIP_NZ;
 }
@@ -1753,7 +1753,7 @@ void upd7810_device::NEA_B_A()
 /* 60 6b: 0110 0000 0110 1011 */
 void upd7810_device::NEA_C_A()
 {
-	UINT8 tmp = C - A;
+	uint8_t tmp = C - A;
 	ZHC_SUB( tmp, C, 0 );
 	SKIP_NZ;
 }
@@ -1761,7 +1761,7 @@ void upd7810_device::NEA_C_A()
 /* 60 6c: 0110 0000 0110 1100 */
 void upd7810_device::NEA_D_A()
 {
-	UINT8 tmp = D - A;
+	uint8_t tmp = D - A;
 	ZHC_SUB( tmp, D, 0 );
 	SKIP_NZ;
 }
@@ -1769,7 +1769,7 @@ void upd7810_device::NEA_D_A()
 /* 60 6d: 0110 0000 0110 1101 */
 void upd7810_device::NEA_E_A()
 {
-	UINT8 tmp = E - A;
+	uint8_t tmp = E - A;
 	ZHC_SUB( tmp, E, 0 );
 	SKIP_NZ;
 }
@@ -1777,7 +1777,7 @@ void upd7810_device::NEA_E_A()
 /* 60 6e: 0110 0000 0110 1110 */
 void upd7810_device::NEA_H_A()
 {
-	UINT8 tmp = H - A;
+	uint8_t tmp = H - A;
 	ZHC_SUB( tmp, H, 0 );
 	SKIP_NZ;
 }
@@ -1785,7 +1785,7 @@ void upd7810_device::NEA_H_A()
 /* 60 6f: 0110 0000 0110 1111 */
 void upd7810_device::NEA_L_A()
 {
-	UINT8 tmp = L - A;
+	uint8_t tmp = L - A;
 	ZHC_SUB( tmp, L, 0 );
 	SKIP_NZ;
 }
@@ -1793,7 +1793,7 @@ void upd7810_device::NEA_L_A()
 /* 60 70: 0110 0000 0111 0000 */
 void upd7810_device::SBB_V_A()
 {
-	UINT8 tmp = V - A - (PSW & CY);
+	uint8_t tmp = V - A - (PSW & CY);
 	ZHC_SUB( tmp, V, (PSW & CY) );
 	V = tmp;
 }
@@ -1801,7 +1801,7 @@ void upd7810_device::SBB_V_A()
 /* 60 71: 0110 0000 0111 0001 */
 void upd7810_device::SBB_A_A()
 {
-	UINT8 tmp = A - A - (PSW & CY);
+	uint8_t tmp = A - A - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -1809,7 +1809,7 @@ void upd7810_device::SBB_A_A()
 /* 60 72: 0110 0000 0111 0010 */
 void upd7810_device::SBB_B_A()
 {
-	UINT8 tmp = B - A - (PSW & CY);
+	uint8_t tmp = B - A - (PSW & CY);
 	ZHC_SUB( tmp, B, (PSW & CY) );
 	B = tmp;
 }
@@ -1817,7 +1817,7 @@ void upd7810_device::SBB_B_A()
 /* 60 73: 0110 0000 0111 0011 */
 void upd7810_device::SBB_C_A()
 {
-	UINT8 tmp = C - A - (PSW & CY);
+	uint8_t tmp = C - A - (PSW & CY);
 	ZHC_SUB( tmp, C, (PSW & CY) );
 	C = tmp;
 }
@@ -1825,7 +1825,7 @@ void upd7810_device::SBB_C_A()
 /* 60 74: 0110 0000 0111 0100 */
 void upd7810_device::SBB_D_A()
 {
-	UINT8 tmp = D - A - (PSW & CY);
+	uint8_t tmp = D - A - (PSW & CY);
 	ZHC_SUB( tmp, D, (PSW & CY) );
 	D = tmp;
 }
@@ -1833,7 +1833,7 @@ void upd7810_device::SBB_D_A()
 /* 60 75: 0110 0000 0111 0101 */
 void upd7810_device::SBB_E_A()
 {
-	UINT8 tmp = E - A - (PSW & CY);
+	uint8_t tmp = E - A - (PSW & CY);
 	ZHC_SUB( tmp, E, (PSW & CY) );
 	E = tmp;
 }
@@ -1841,7 +1841,7 @@ void upd7810_device::SBB_E_A()
 /* 60 76: 0110 0000 0111 0110 */
 void upd7810_device::SBB_H_A()
 {
-	UINT8 tmp = H - A - (PSW & CY);
+	uint8_t tmp = H - A - (PSW & CY);
 	ZHC_SUB( tmp, H, (PSW & CY) );
 	H = tmp;
 }
@@ -1849,7 +1849,7 @@ void upd7810_device::SBB_H_A()
 /* 60 77: 0110 0000 0111 0111 */
 void upd7810_device::SBB_L_A()
 {
-	UINT8 tmp = L - A - (PSW & CY);
+	uint8_t tmp = L - A - (PSW & CY);
 	ZHC_SUB( tmp, L, (PSW & CY) );
 	L = tmp;
 }
@@ -1857,7 +1857,7 @@ void upd7810_device::SBB_L_A()
 /* 60 78: 0110 0000 0111 1000 */
 void upd7810_device::EQA_V_A()
 {
-	UINT8 tmp = V - A;
+	uint8_t tmp = V - A;
 	ZHC_SUB( tmp, V, 0 );
 	SKIP_Z;
 }
@@ -1865,7 +1865,7 @@ void upd7810_device::EQA_V_A()
 /* 60 79: 0110 0000 0111 1001 */
 void upd7810_device::EQA_A_A()
 {
-	UINT8 tmp = A - A;
+	uint8_t tmp = A - A;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -1873,7 +1873,7 @@ void upd7810_device::EQA_A_A()
 /* 60 7a: 0110 0000 0111 1010 */
 void upd7810_device::EQA_B_A()
 {
-	UINT8 tmp = B - A;
+	uint8_t tmp = B - A;
 	ZHC_SUB( tmp, B, 0 );
 	SKIP_Z;
 }
@@ -1881,7 +1881,7 @@ void upd7810_device::EQA_B_A()
 /* 60 7b: 0110 0000 0111 1011 */
 void upd7810_device::EQA_C_A()
 {
-	UINT8 tmp = C - A;
+	uint8_t tmp = C - A;
 	ZHC_SUB( tmp, C, 0 );
 	SKIP_Z;
 }
@@ -1889,7 +1889,7 @@ void upd7810_device::EQA_C_A()
 /* 60 7c: 0110 0000 0111 1100 */
 void upd7810_device::EQA_D_A()
 {
-	UINT8 tmp = D - A;
+	uint8_t tmp = D - A;
 	ZHC_SUB( tmp, D, 0 );
 	SKIP_Z;
 }
@@ -1897,7 +1897,7 @@ void upd7810_device::EQA_D_A()
 /* 60 7d: 0110 0000 0111 1101 */
 void upd7810_device::EQA_E_A()
 {
-	UINT8 tmp = E - A;
+	uint8_t tmp = E - A;
 	ZHC_SUB( tmp, E, 0 );
 	SKIP_Z;
 }
@@ -1905,7 +1905,7 @@ void upd7810_device::EQA_E_A()
 /* 60 7e: 0110 0000 0111 1110 */
 void upd7810_device::EQA_H_A()
 {
-	UINT8 tmp = H - A;
+	uint8_t tmp = H - A;
 	ZHC_SUB( tmp, H, 0 );
 	SKIP_Z;
 }
@@ -1913,7 +1913,7 @@ void upd7810_device::EQA_H_A()
 /* 60 7f: 0110 0000 0111 1111 */
 void upd7810_device::EQA_L_A()
 {
-	UINT8 tmp = L - A;
+	uint8_t tmp = L - A;
 	ZHC_SUB( tmp, L, 0 );
 	SKIP_Z;
 }
@@ -2077,7 +2077,7 @@ void upd7810_device::ORA_A_L()
 /* 60 a0: 0110 0000 1010 0000 */
 void upd7810_device::ADDNC_A_V()
 {
-	UINT8 tmp = A + V;
+	uint8_t tmp = A + V;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2089,7 +2089,7 @@ void upd7810_device::ADDNC_A_V()
 /* 60 a2: 0110 0000 1010 0010 */
 void upd7810_device::ADDNC_A_B()
 {
-	UINT8 tmp = A + B;
+	uint8_t tmp = A + B;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2098,7 +2098,7 @@ void upd7810_device::ADDNC_A_B()
 /* 60 a3: 0110 0000 1010 0011 */
 void upd7810_device::ADDNC_A_C()
 {
-	UINT8 tmp = A + C;
+	uint8_t tmp = A + C;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2107,7 +2107,7 @@ void upd7810_device::ADDNC_A_C()
 /* 60 a4: 0110 0000 1010 0100 */
 void upd7810_device::ADDNC_A_D()
 {
-	UINT8 tmp = A + D;
+	uint8_t tmp = A + D;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2116,7 +2116,7 @@ void upd7810_device::ADDNC_A_D()
 /* 60 a5: 0110 0000 1010 0101 */
 void upd7810_device::ADDNC_A_E()
 {
-	UINT8 tmp = A + E;
+	uint8_t tmp = A + E;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2125,7 +2125,7 @@ void upd7810_device::ADDNC_A_E()
 /* 60 a6: 0110 0000 1010 0110 */
 void upd7810_device::ADDNC_A_H()
 {
-	UINT8 tmp = A + H;
+	uint8_t tmp = A + H;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2134,7 +2134,7 @@ void upd7810_device::ADDNC_A_H()
 /* 60 a7: 0110 0000 1010 0111 */
 void upd7810_device::ADDNC_A_L()
 {
-	UINT8 tmp = A + L;
+	uint8_t tmp = A + L;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2143,7 +2143,7 @@ void upd7810_device::ADDNC_A_L()
 /* 60 a8: 0110 0000 1010 1000 */
 void upd7810_device::GTA_A_V()
 {
-	UINT16 tmp = A - V - 1;
+	uint16_t tmp = A - V - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2154,7 +2154,7 @@ void upd7810_device::GTA_A_V()
 /* 60 aa: 0110 0000 1010 1010 */
 void upd7810_device::GTA_A_B()
 {
-	UINT16 tmp = A - B - 1;
+	uint16_t tmp = A - B - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2162,7 +2162,7 @@ void upd7810_device::GTA_A_B()
 /* 60 ab: 0110 0000 1010 1011 */
 void upd7810_device::GTA_A_C()
 {
-	UINT16 tmp = A - C - 1;
+	uint16_t tmp = A - C - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2170,7 +2170,7 @@ void upd7810_device::GTA_A_C()
 /* 60 ac: 0110 0000 1010 1100 */
 void upd7810_device::GTA_A_D()
 {
-	UINT16 tmp = A - D - 1;
+	uint16_t tmp = A - D - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2178,7 +2178,7 @@ void upd7810_device::GTA_A_D()
 /* 60 ad: 0110 0000 1010 1101 */
 void upd7810_device::GTA_A_E()
 {
-	UINT16 tmp = A - E - 1;
+	uint16_t tmp = A - E - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2186,7 +2186,7 @@ void upd7810_device::GTA_A_E()
 /* 60 ae: 0110 0000 1010 1110 */
 void upd7810_device::GTA_A_H()
 {
-	UINT16 tmp = A - H - 1;
+	uint16_t tmp = A - H - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2194,7 +2194,7 @@ void upd7810_device::GTA_A_H()
 /* 60 af: 0110 0000 1010 1111 */
 void upd7810_device::GTA_A_L()
 {
-	UINT16 tmp = A - L - 1;
+	uint16_t tmp = A - L - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -2202,7 +2202,7 @@ void upd7810_device::GTA_A_L()
 /* 60 b0: 0110 0000 1011 0000 */
 void upd7810_device::SUBNB_A_V()
 {
-	UINT8 tmp = A - V;
+	uint8_t tmp = A - V;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2214,7 +2214,7 @@ void upd7810_device::SUBNB_A_V()
 /* 60 b2: 0110 0000 1011 0010 */
 void upd7810_device::SUBNB_A_B()
 {
-	UINT8 tmp = A - B;
+	uint8_t tmp = A - B;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2223,7 +2223,7 @@ void upd7810_device::SUBNB_A_B()
 /* 60 b3: 0110 0000 1011 0011 */
 void upd7810_device::SUBNB_A_C()
 {
-	UINT8 tmp = A - C;
+	uint8_t tmp = A - C;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2232,7 +2232,7 @@ void upd7810_device::SUBNB_A_C()
 /* 60 b4: 0110 0000 1011 0100 */
 void upd7810_device::SUBNB_A_D()
 {
-	UINT8 tmp = A - D;
+	uint8_t tmp = A - D;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2241,7 +2241,7 @@ void upd7810_device::SUBNB_A_D()
 /* 60 b5: 0110 0000 1011 0101 */
 void upd7810_device::SUBNB_A_E()
 {
-	UINT8 tmp = A - E;
+	uint8_t tmp = A - E;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2250,7 +2250,7 @@ void upd7810_device::SUBNB_A_E()
 /* 60 b6: 0110 0000 1011 0110 */
 void upd7810_device::SUBNB_A_H()
 {
-	UINT8 tmp = A - H;
+	uint8_t tmp = A - H;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2259,7 +2259,7 @@ void upd7810_device::SUBNB_A_H()
 /* 60 b7: 0110 0000 1011 0111 */
 void upd7810_device::SUBNB_A_L()
 {
-	UINT8 tmp = A - L;
+	uint8_t tmp = A - L;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -2268,7 +2268,7 @@ void upd7810_device::SUBNB_A_L()
 /* 60 b8: 0110 0000 1011 1000 */
 void upd7810_device::LTA_A_V()
 {
-	UINT8 tmp = A - V;
+	uint8_t tmp = A - V;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2279,7 +2279,7 @@ void upd7810_device::LTA_A_V()
 /* 60 ba: 0110 0000 1011 1010 */
 void upd7810_device::LTA_A_B()
 {
-	UINT8 tmp = A - B;
+	uint8_t tmp = A - B;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2287,7 +2287,7 @@ void upd7810_device::LTA_A_B()
 /* 60 bb: 0110 0000 1011 1011 */
 void upd7810_device::LTA_A_C()
 {
-	UINT8 tmp = A - C;
+	uint8_t tmp = A - C;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2295,7 +2295,7 @@ void upd7810_device::LTA_A_C()
 /* 60 bc: 0110 0000 1011 1100 */
 void upd7810_device::LTA_A_D()
 {
-	UINT8 tmp = A - D;
+	uint8_t tmp = A - D;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2303,7 +2303,7 @@ void upd7810_device::LTA_A_D()
 /* 60 bd: 0110 0000 1011 1101 */
 void upd7810_device::LTA_A_E()
 {
-	UINT8 tmp = A - E;
+	uint8_t tmp = A - E;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2311,7 +2311,7 @@ void upd7810_device::LTA_A_E()
 /* 60 be: 0110 0000 1011 1110 */
 void upd7810_device::LTA_A_H()
 {
-	UINT8 tmp = A - H;
+	uint8_t tmp = A - H;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2319,7 +2319,7 @@ void upd7810_device::LTA_A_H()
 /* 60 bf: 0110 0000 1011 1111 */
 void upd7810_device::LTA_A_L()
 {
-	UINT8 tmp = A - L;
+	uint8_t tmp = A - L;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -2327,7 +2327,7 @@ void upd7810_device::LTA_A_L()
 /* 60 c0: 0110 0000 1100 0000 */
 void upd7810_device::ADD_A_V()
 {
-	UINT8 tmp = A + V;
+	uint8_t tmp = A + V;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2338,7 +2338,7 @@ void upd7810_device::ADD_A_V()
 /* 60 c2: 0110 0000 1100 0010 */
 void upd7810_device::ADD_A_B()
 {
-	UINT8 tmp = A + B;
+	uint8_t tmp = A + B;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2346,7 +2346,7 @@ void upd7810_device::ADD_A_B()
 /* 60 c3: 0110 0000 1100 0011 */
 void upd7810_device::ADD_A_C()
 {
-	UINT8 tmp = A + C;
+	uint8_t tmp = A + C;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2354,7 +2354,7 @@ void upd7810_device::ADD_A_C()
 /* 60 c4: 0110 0000 1100 0100 */
 void upd7810_device::ADD_A_D()
 {
-	UINT8 tmp = A + D;
+	uint8_t tmp = A + D;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2362,7 +2362,7 @@ void upd7810_device::ADD_A_D()
 /* 60 c5: 0110 0000 1100 0101 */
 void upd7810_device::ADD_A_E()
 {
-	UINT8 tmp = A + E;
+	uint8_t tmp = A + E;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2370,7 +2370,7 @@ void upd7810_device::ADD_A_E()
 /* 60 c6: 0110 0000 1100 0110 */
 void upd7810_device::ADD_A_H()
 {
-	UINT8 tmp = A + H;
+	uint8_t tmp = A + H;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2378,7 +2378,7 @@ void upd7810_device::ADD_A_H()
 /* 60 c7: 0110 0000 1100 0111 */
 void upd7810_device::ADD_A_L()
 {
-	UINT8 tmp = A + L;
+	uint8_t tmp = A + L;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -2458,7 +2458,7 @@ void upd7810_device::ONA_A_L()
 /* 60 d0: 0110 0000 1101 0000 */
 void upd7810_device::ADC_A_V()
 {
-	UINT8 tmp = A + V + (PSW & CY);
+	uint8_t tmp = A + V + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2469,7 +2469,7 @@ void upd7810_device::ADC_A_V()
 /* 60 d2: 0110 0000 1101 0010 */
 void upd7810_device::ADC_A_B()
 {
-	UINT8 tmp = A + B + (PSW & CY);
+	uint8_t tmp = A + B + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2477,7 +2477,7 @@ void upd7810_device::ADC_A_B()
 /* 60 d3: 0110 0000 1101 0011 */
 void upd7810_device::ADC_A_C()
 {
-	UINT8 tmp = A + C + (PSW & CY);
+	uint8_t tmp = A + C + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2485,7 +2485,7 @@ void upd7810_device::ADC_A_C()
 /* 60 d4: 0110 0000 1101 0100 */
 void upd7810_device::ADC_A_D()
 {
-	UINT8 tmp = A + D + (PSW & CY);
+	uint8_t tmp = A + D + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2493,7 +2493,7 @@ void upd7810_device::ADC_A_D()
 /* 60 d5: 0110 0000 1101 0101 */
 void upd7810_device::ADC_A_E()
 {
-	UINT8 tmp = A + E + (PSW & CY);
+	uint8_t tmp = A + E + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2501,7 +2501,7 @@ void upd7810_device::ADC_A_E()
 /* 60 d6: 0110 0000 1101 0110 */
 void upd7810_device::ADC_A_H()
 {
-	UINT8 tmp = A + H + (PSW & CY);
+	uint8_t tmp = A + H + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2509,7 +2509,7 @@ void upd7810_device::ADC_A_H()
 /* 60 d7: 0110 0000 1101 0111 */
 void upd7810_device::ADC_A_L()
 {
-	UINT8 tmp = A + L + (PSW & CY);
+	uint8_t tmp = A + L + (PSW & CY);
 	ZHC_ADD( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2589,7 +2589,7 @@ void upd7810_device::OFFA_A_L()
 /* 60 e0: 0110 0000 1110 0000 */
 void upd7810_device::SUB_A_V()
 {
-	UINT8 tmp = A - V;
+	uint8_t tmp = A - V;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2600,7 +2600,7 @@ void upd7810_device::SUB_A_V()
 /* 60 e2: 0110 0000 1110 0010 */
 void upd7810_device::SUB_A_B()
 {
-	UINT8 tmp = A - B;
+	uint8_t tmp = A - B;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2608,7 +2608,7 @@ void upd7810_device::SUB_A_B()
 /* 60 e3: 0110 0000 1110 0011 */
 void upd7810_device::SUB_A_C()
 {
-	UINT8 tmp = A - C;
+	uint8_t tmp = A - C;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2616,7 +2616,7 @@ void upd7810_device::SUB_A_C()
 /* 60 e4: 0110 0000 1110 0100 */
 void upd7810_device::SUB_A_D()
 {
-	UINT8 tmp = A - D;
+	uint8_t tmp = A - D;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2624,7 +2624,7 @@ void upd7810_device::SUB_A_D()
 /* 60 e5: 0110 0000 1110 0101 */
 void upd7810_device::SUB_A_E()
 {
-	UINT8 tmp = A - E;
+	uint8_t tmp = A - E;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2632,7 +2632,7 @@ void upd7810_device::SUB_A_E()
 /* 60 e6: 0110 0000 1110 0110 */
 void upd7810_device::SUB_A_H()
 {
-	UINT8 tmp = A - H;
+	uint8_t tmp = A - H;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2640,7 +2640,7 @@ void upd7810_device::SUB_A_H()
 /* 60 e7: 0110 0000 1110 0111 */
 void upd7810_device::SUB_A_L()
 {
-	UINT8 tmp = A - L;
+	uint8_t tmp = A - L;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -2648,7 +2648,7 @@ void upd7810_device::SUB_A_L()
 /* 60 e8: 0110 0000 1110 1000 */
 void upd7810_device::NEA_A_V()
 {
-	UINT8 tmp = A - V;
+	uint8_t tmp = A - V;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2659,7 +2659,7 @@ void upd7810_device::NEA_A_V()
 /* 60 ea: 0110 0000 1110 1010 */
 void upd7810_device::NEA_A_B()
 {
-	UINT8 tmp = A - B;
+	uint8_t tmp = A - B;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2667,7 +2667,7 @@ void upd7810_device::NEA_A_B()
 /* 60 eb: 0110 0000 1110 1011 */
 void upd7810_device::NEA_A_C()
 {
-	UINT8 tmp = A - C;
+	uint8_t tmp = A - C;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2675,7 +2675,7 @@ void upd7810_device::NEA_A_C()
 /* 60 ec: 0110 0000 1110 1100 */
 void upd7810_device::NEA_A_D()
 {
-	UINT8 tmp = A - D;
+	uint8_t tmp = A - D;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2683,7 +2683,7 @@ void upd7810_device::NEA_A_D()
 /* 60 ed: 0110 0000 1110 1101 */
 void upd7810_device::NEA_A_E()
 {
-	UINT8 tmp = A - E;
+	uint8_t tmp = A - E;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2691,7 +2691,7 @@ void upd7810_device::NEA_A_E()
 /* 60 ee: 0110 0000 1110 1110 */
 void upd7810_device::NEA_A_H()
 {
-	UINT8 tmp = A - H;
+	uint8_t tmp = A - H;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2699,7 +2699,7 @@ void upd7810_device::NEA_A_H()
 /* 60 ef: 0110 0000 1110 1111 */
 void upd7810_device::NEA_A_L()
 {
-	UINT8 tmp = A - L;
+	uint8_t tmp = A - L;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -2707,7 +2707,7 @@ void upd7810_device::NEA_A_L()
 /* 60 f0: 0110 0000 1111 0000 */
 void upd7810_device::SBB_A_V()
 {
-	UINT8 tmp = A - V - (PSW & CY);
+	uint8_t tmp = A - V - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2718,7 +2718,7 @@ void upd7810_device::SBB_A_V()
 /* 60 f2: 0110 0000 1111 0010 */
 void upd7810_device::SBB_A_B()
 {
-	UINT8 tmp = A - B - (PSW & CY);
+	uint8_t tmp = A - B - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2726,7 +2726,7 @@ void upd7810_device::SBB_A_B()
 /* 60 f3: 0110 0000 1111 0011 */
 void upd7810_device::SBB_A_C()
 {
-	UINT8 tmp = A - C - (PSW & CY);
+	uint8_t tmp = A - C - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2734,7 +2734,7 @@ void upd7810_device::SBB_A_C()
 /* 60 f4: 0110 0000 1111 0100 */
 void upd7810_device::SBB_A_D()
 {
-	UINT8 tmp = A - D - (PSW & CY);
+	uint8_t tmp = A - D - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2742,7 +2742,7 @@ void upd7810_device::SBB_A_D()
 /* 60 f5: 0110 0000 1111 0101 */
 void upd7810_device::SBB_A_E()
 {
-	UINT8 tmp = A - E - (PSW & CY);
+	uint8_t tmp = A - E - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2750,7 +2750,7 @@ void upd7810_device::SBB_A_E()
 /* 60 f6: 0110 0000 1111 0110 */
 void upd7810_device::SBB_A_H()
 {
-	UINT8 tmp = A - H - (PSW & CY);
+	uint8_t tmp = A - H - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2758,7 +2758,7 @@ void upd7810_device::SBB_A_H()
 /* 60 f7: 0110 0000 1111 0111 */
 void upd7810_device::SBB_A_L()
 {
-	UINT8 tmp = A - L - (PSW & CY);
+	uint8_t tmp = A - L - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -2766,7 +2766,7 @@ void upd7810_device::SBB_A_L()
 /* 60 f8: 0110 0000 1111 1000 */
 void upd7810_device::EQA_A_V()
 {
-	UINT8 tmp = A - V;
+	uint8_t tmp = A - V;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2777,7 +2777,7 @@ void upd7810_device::EQA_A_V()
 /* 60 fa: 0110 0000 1111 1010 */
 void upd7810_device::EQA_A_B()
 {
-	UINT8 tmp = A - B;
+	uint8_t tmp = A - B;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2785,7 +2785,7 @@ void upd7810_device::EQA_A_B()
 /* 60 fb: 0110 0000 1111 1011 */
 void upd7810_device::EQA_A_C()
 {
-	UINT8 tmp = A - C;
+	uint8_t tmp = A - C;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2793,7 +2793,7 @@ void upd7810_device::EQA_A_C()
 /* 60 fc: 0110 0000 1111 1100 */
 void upd7810_device::EQA_A_D()
 {
-	UINT8 tmp = A - D;
+	uint8_t tmp = A - D;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2801,7 +2801,7 @@ void upd7810_device::EQA_A_D()
 /* 60 fd: 0110 0000 1111 1101 */
 void upd7810_device::EQA_A_E()
 {
-	UINT8 tmp = A - E;
+	uint8_t tmp = A - E;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2809,7 +2809,7 @@ void upd7810_device::EQA_A_E()
 /* 60 fe: 0110 0000 1111 1110 */
 void upd7810_device::EQA_A_H()
 {
-	UINT8 tmp = A - H;
+	uint8_t tmp = A - H;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2817,7 +2817,7 @@ void upd7810_device::EQA_A_H()
 /* 60 ff: 0110 0000 1111 1111 */
 void upd7810_device::EQA_A_L()
 {
-	UINT8 tmp = A - L;
+	uint8_t tmp = A - L;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -2826,7 +2826,7 @@ void upd7810_device::EQA_A_L()
 /* 64 00: 0110 0100 0000 0000 xxxx xxxx */
 void upd7810_device::MVI_PA_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WP( UPD7810_PORTA, imm );
 }
@@ -2834,7 +2834,7 @@ void upd7810_device::MVI_PA_xx()
 /* 64 01: 0110 0100 0000 0001 xxxx xxxx */
 void upd7810_device::MVI_PB_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WP( UPD7810_PORTB, imm );
 }
@@ -2842,7 +2842,7 @@ void upd7810_device::MVI_PB_xx()
 /* 64 02: 0110 0100 0000 0010 xxxx xxxx */
 void upd7810_device::MVI_PC_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WP( UPD7810_PORTC, imm );
 }
@@ -2850,7 +2850,7 @@ void upd7810_device::MVI_PC_xx()
 /* 64 03: 0110 0100 0000 0011 xxxx xxxx */
 void upd7810_device::MVI_PD_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WP( UPD7810_PORTD, imm );
 }
@@ -2858,7 +2858,7 @@ void upd7810_device::MVI_PD_xx()
 /* 64 05: 0110 0100 0000 0101 xxxx xxxx */
 void upd7810_device::MVI_PF_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WP( UPD7810_PORTF, imm );
 }
@@ -2878,7 +2878,7 @@ void upd7810_device::MVI_MKL_xx()
 /* 64 08: 0110 0100 0000 1000 xxxx xxxx */
 void upd7810_device::ANI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA), imm;
+	uint8_t pa = RP( UPD7810_PORTA), imm;
 	RDOPARG( imm );
 	pa &= imm;
 	WP( UPD7810_PORTA, pa );
@@ -2888,7 +2888,7 @@ void upd7810_device::ANI_PA_xx()
 /* 64 09: 0110 0100 0000 1001 xxxx xxxx */
 void upd7810_device::ANI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB), imm;
+	uint8_t pb = RP( UPD7810_PORTB), imm;
 	RDOPARG( imm );
 	pb &= imm;
 	WP( UPD7810_PORTB, pb );
@@ -2898,7 +2898,7 @@ void upd7810_device::ANI_PB_xx()
 /* 64 0a: 0110 0100 0000 1010 xxxx xxxx */
 void upd7810_device::ANI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC), imm;
+	uint8_t pc = RP( UPD7810_PORTC), imm;
 	RDOPARG( imm );
 	pc &= imm;
 	WP( UPD7810_PORTC, pc );
@@ -2908,7 +2908,7 @@ void upd7810_device::ANI_PC_xx()
 /* 64 0b: 0110 0100 0000 1011 xxxx xxxx */
 void upd7810_device::ANI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
 	RDOPARG( imm );
 	pd &= imm;
 	WP( UPD7810_PORTD, pd );
@@ -2918,7 +2918,7 @@ void upd7810_device::ANI_PD_xx()
 /* 64 0d: 0110 0100 0000 1101 xxxx xxxx */
 void upd7810_device::ANI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
 	RDOPARG( imm );
 	pf &= imm;
 	WP( UPD7810_PORTF, pf );
@@ -2928,7 +2928,7 @@ void upd7810_device::ANI_PF_xx()
 /* 64 0e: 0110 0100 0000 1110 xxxx xxxx */
 void upd7810_device::ANI_MKH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKH &= imm;
 	SET_Z(MKH);
@@ -2937,7 +2937,7 @@ void upd7810_device::ANI_MKH_xx()
 /* 64 0f: 0110 0100 0000 1111 xxxx xxxx */
 void upd7810_device::ANI_MKL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKL &= imm;
 	SET_Z(MKL);
@@ -2946,7 +2946,7 @@ void upd7810_device::ANI_MKL_xx()
 /* 64 10: 0110 0100 0001 0000 xxxx xxxx */
 void upd7810_device::XRI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), imm;
+	uint8_t pa = RP( UPD7810_PORTA ), imm;
 	RDOPARG( imm );
 	pa ^= imm;
 	WP( UPD7810_PORTA, pa );
@@ -2956,7 +2956,7 @@ void upd7810_device::XRI_PA_xx()
 /* 64 11: 0110 0100 0001 0001 xxxx xxxx */
 void upd7810_device::XRI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), imm;
+	uint8_t pb = RP( UPD7810_PORTB ), imm;
 	RDOPARG( imm );
 	pb ^= imm;
 	WP( UPD7810_PORTB, pb );
@@ -2966,7 +2966,7 @@ void upd7810_device::XRI_PB_xx()
 /* 64 12: 0110 0100 0001 0010 xxxx xxxx */
 void upd7810_device::XRI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), imm;
+	uint8_t pc = RP( UPD7810_PORTC ), imm;
 	RDOPARG( imm );
 	pc ^= imm;
 	WP( UPD7810_PORTC, pc );
@@ -2976,7 +2976,7 @@ void upd7810_device::XRI_PC_xx()
 /* 64 13: 0110 0100 0001 0011 xxxx xxxx */
 void upd7810_device::XRI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
 	RDOPARG( imm );
 	pd ^= imm;
 	WP( UPD7810_PORTD, pd );
@@ -2986,7 +2986,7 @@ void upd7810_device::XRI_PD_xx()
 /* 64 15: 0110 0100 0001 0101 xxxx xxxx */
 void upd7810_device::XRI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
 	RDOPARG( imm );
 	pf ^= imm;
 	WP( UPD7810_PORTF, pf );
@@ -2996,7 +2996,7 @@ void upd7810_device::XRI_PF_xx()
 /* 64 16: 0110 0100 0001 0110 xxxx xxxx */
 void upd7810_device::XRI_MKH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKH ^= imm;
 	SET_Z(MKH);
@@ -3005,7 +3005,7 @@ void upd7810_device::XRI_MKH_xx()
 /* 64 17: 0110 0100 0001 0111 xxxx xxxx */
 void upd7810_device::XRI_MKL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKL ^= imm;
 	SET_Z(MKL);
@@ -3014,7 +3014,7 @@ void upd7810_device::XRI_MKL_xx()
 /* 64 18: 0110 0100 0001 1000 xxxx xxxx */
 void upd7810_device::ORI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), imm;
+	uint8_t pa = RP( UPD7810_PORTA ), imm;
 	RDOPARG( imm );
 	pa |= imm;
 	WP( UPD7810_PORTA, pa );
@@ -3024,7 +3024,7 @@ void upd7810_device::ORI_PA_xx()
 /* 64 19: 0110 0100 0001 1001 xxxx xxxx */
 void upd7810_device::ORI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), imm;
+	uint8_t pb = RP( UPD7810_PORTB ), imm;
 	RDOPARG( imm );
 	pb |= imm;
 	WP( UPD7810_PORTB, pb );
@@ -3034,7 +3034,7 @@ void upd7810_device::ORI_PB_xx()
 /* 64 1a: 0110 0100 0001 1010 xxxx xxxx */
 void upd7810_device::ORI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), imm;
+	uint8_t pc = RP( UPD7810_PORTC ), imm;
 	RDOPARG( imm );
 	pc |= imm;
 	WP( UPD7810_PORTC, pc );
@@ -3044,7 +3044,7 @@ void upd7810_device::ORI_PC_xx()
 /* 64 1b: 0110 0100 0001 1011 xxxx xxxx */
 void upd7810_device::ORI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
 	RDOPARG( imm );
 	pd |= imm;
 	WP( UPD7810_PORTD, pd );
@@ -3054,7 +3054,7 @@ void upd7810_device::ORI_PD_xx()
 /* 64 1d: 0110 0100 0001 1101 xxxx xxxx */
 void upd7810_device::ORI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
 	RDOPARG( imm );
 	pf |= imm;
 	WP( UPD7810_PORTF, pf );
@@ -3064,7 +3064,7 @@ void upd7810_device::ORI_PF_xx()
 /* 64 1e: 0110 0100 0001 1110 xxxx xxxx */
 void upd7810_device::ORI_MKH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKH |= imm;
 	SET_Z(MKH);
@@ -3073,7 +3073,7 @@ void upd7810_device::ORI_MKH_xx()
 /* 64 1f: 0110 0100 0001 1111 xxxx xxxx */
 void upd7810_device::ORI_MKL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	MKL |= imm;
 	SET_Z(MKL);
@@ -3082,8 +3082,8 @@ void upd7810_device::ORI_MKL_xx()
 /* 64 20: 0110 0100 0010 0000 xxxx xxxx */
 void upd7810_device::ADINC_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA );
-	UINT8 tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA );
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa + imm;
@@ -3096,8 +3096,8 @@ void upd7810_device::ADINC_PA_xx()
 /* 64 21: 0110 0100 0010 0001 xxxx xxxx */
 void upd7810_device::ADINC_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB );
-	UINT8 tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB );
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb + imm;
@@ -3110,8 +3110,8 @@ void upd7810_device::ADINC_PB_xx()
 /* 64 22: 0110 0100 0010 0010 xxxx xxxx */
 void upd7810_device::ADINC_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC );
-	UINT8 tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC );
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc + imm;
@@ -3124,8 +3124,8 @@ void upd7810_device::ADINC_PC_xx()
 /* 64 23: 0110 0100 0010 0011 xxxx xxxx */
 void upd7810_device::ADINC_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD );
-	UINT8 tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD );
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd + imm;
@@ -3138,8 +3138,8 @@ void upd7810_device::ADINC_PD_xx()
 /* 64 25: 0110 0100 0010 0101 xxxx xxxx */
 void upd7810_device::ADINC_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF );
-	UINT8 tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF );
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf + imm;
@@ -3152,7 +3152,7 @@ void upd7810_device::ADINC_PF_xx()
 /* 64 26: 0110 0100 0010 0110 xxxx xxxx */
 void upd7810_device::ADINC_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH + imm;
@@ -3165,7 +3165,7 @@ void upd7810_device::ADINC_MKH_xx()
 /* 64 27: 0110 0100 0010 0111 xxxx xxxx */
 void upd7810_device::ADINC_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL + imm;
@@ -3178,8 +3178,8 @@ void upd7810_device::ADINC_MKL_xx()
 /* 64 28: 0110 0100 0010 1000 xxxx xxxx */
 void upd7810_device::GTI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), imm;
-	UINT16 tmp;
+	uint8_t pa = RP( UPD7810_PORTA ), imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = pa - imm - 1;
@@ -3191,8 +3191,8 @@ void upd7810_device::GTI_PA_xx()
 /* 64 29: 0110 0100 0010 1001 xxxx xxxx */
 void upd7810_device::GTI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), imm;
-	UINT16 tmp;
+	uint8_t pb = RP( UPD7810_PORTB ), imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = pb - imm - 1;
@@ -3204,8 +3204,8 @@ void upd7810_device::GTI_PB_xx()
 /* 64 2a: 0110 0100 0010 1010 xxxx xxxx */
 void upd7810_device::GTI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), imm;
-	UINT16 tmp;
+	uint8_t pc = RP( UPD7810_PORTC ), imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = pc - imm - 1;
@@ -3217,8 +3217,8 @@ void upd7810_device::GTI_PC_xx()
 /* 64 2b: 0110 0100 0010 1011 xxxx xxxx */
 void upd7810_device::GTI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
-	UINT16 tmp;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = pd - imm - 1;
@@ -3230,8 +3230,8 @@ void upd7810_device::GTI_PD_xx()
 /* 64 2d: 0110 0100 0010 1101 xxxx xxxx */
 void upd7810_device::GTI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
-	UINT16 tmp;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = pf - imm - 1;
@@ -3243,8 +3243,8 @@ void upd7810_device::GTI_PF_xx()
 /* 64 2e: 0110 0100 0010 1110 xxxx xxxx */
 void upd7810_device::GTI_MKH_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = MKH - imm - 1;
@@ -3256,8 +3256,8 @@ void upd7810_device::GTI_MKH_xx()
 /* 64 2f: 0110 0100 0010 1111 xxxx xxxx */
 void upd7810_device::GTI_MKL_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = MKL - imm - 1;
@@ -3269,7 +3269,7 @@ void upd7810_device::GTI_MKL_xx()
 /* 64 30: 0110 0100 0011 0000 xxxx xxxx */
 void upd7810_device::SUINB_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa - imm;
@@ -3282,7 +3282,7 @@ void upd7810_device::SUINB_PA_xx()
 /* 64 31: 0110 0100 0011 0001 xxxx xxxx */
 void upd7810_device::SUINB_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb - imm;
@@ -3295,7 +3295,7 @@ void upd7810_device::SUINB_PB_xx()
 /* 64 32: 0110 0100 0011 0010 xxxx xxxx */
 void upd7810_device::SUINB_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc - imm;
@@ -3308,7 +3308,7 @@ void upd7810_device::SUINB_PC_xx()
 /* 64 33: 0110 0100 0011 0011 xxxx xxxx */
 void upd7810_device::SUINB_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd - imm;
@@ -3321,7 +3321,7 @@ void upd7810_device::SUINB_PD_xx()
 /* 64 35: 0110 0100 0011 0101 xxxx xxxx */
 void upd7810_device::SUINB_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf - imm;
@@ -3334,7 +3334,7 @@ void upd7810_device::SUINB_PF_xx()
 /* 64 36: 0110 0100 0011 0110 xxxx xxxx */
 void upd7810_device::SUINB_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm;
@@ -3346,7 +3346,7 @@ void upd7810_device::SUINB_MKH_xx()
 /* 64 37: 0110 0100 0011 0111 xxxx xxxx */
 void upd7810_device::SUINB_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm;
@@ -3358,7 +3358,7 @@ void upd7810_device::SUINB_MKL_xx()
 /* 64 38: 0110 0100 0011 1000 xxxx xxxx */
 void upd7810_device::LTI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 	RDOPARG( imm );
 	tmp = pa - imm;
 	ZHC_SUB( tmp, pa, 0 );
@@ -3368,7 +3368,7 @@ void upd7810_device::LTI_PA_xx()
 /* 64 39: 0110 0100 0011 1001 xxxx xxxx */
 void upd7810_device::LTI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 	RDOPARG( imm );
 	tmp = pb - imm;
 	ZHC_SUB( tmp, pb, 0 );
@@ -3378,7 +3378,7 @@ void upd7810_device::LTI_PB_xx()
 /* 64 3a: 0110 0100 0011 1010 xxxx xxxx */
 void upd7810_device::LTI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 	RDOPARG( imm );
 	tmp = pc - imm;
 	ZHC_SUB( tmp, pc, 0 );
@@ -3388,7 +3388,7 @@ void upd7810_device::LTI_PC_xx()
 /* 64 3b: 0110 0100 0011 1011 xxxx xxxx */
 void upd7810_device::LTI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 	RDOPARG( imm );
 	tmp = pd - imm;
 	ZHC_SUB( tmp, pd, 0 );
@@ -3398,7 +3398,7 @@ void upd7810_device::LTI_PD_xx()
 /* 64 3d: 0110 0100 0011 1101 xxxx xxxx */
 void upd7810_device::LTI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 	RDOPARG( imm );
 	tmp = pf - imm;
 	ZHC_SUB( tmp, pf, 0 );
@@ -3408,7 +3408,7 @@ void upd7810_device::LTI_PF_xx()
 /* 64 3e: 0110 0100 0011 1110 xxxx xxxx */
 void upd7810_device::LTI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm;
@@ -3419,7 +3419,7 @@ void upd7810_device::LTI_MKH_xx()
 /* 64 3f: 0110 0100 0011 1111 xxxx xxxx */
 void upd7810_device::LTI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm;
@@ -3430,7 +3430,7 @@ void upd7810_device::LTI_MKL_xx()
 /* 64 40: 0110 0100 0100 0000 xxxx xxxx */
 void upd7810_device::ADI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa + imm;
@@ -3442,7 +3442,7 @@ void upd7810_device::ADI_PA_xx()
 /* 64 41: 0110 0100 0100 0001 xxxx xxxx */
 void upd7810_device::ADI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb + imm;
@@ -3454,7 +3454,7 @@ void upd7810_device::ADI_PB_xx()
 /* 64 42: 0110 0100 0100 0010 xxxx xxxx */
 void upd7810_device::ADI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc + imm;
@@ -3466,7 +3466,7 @@ void upd7810_device::ADI_PC_xx()
 /* 64 43: 0110 0100 0100 0011 xxxx xxxx */
 void upd7810_device::ADI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd + imm;
@@ -3478,7 +3478,7 @@ void upd7810_device::ADI_PD_xx()
 /* 64 45: 0110 0100 0100 0101 xxxx xxxx */
 void upd7810_device::ADI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf + imm;
@@ -3490,7 +3490,7 @@ void upd7810_device::ADI_PF_xx()
 /* 64 46: 0110 0100 0100 0110 xxxx xxxx */
 void upd7810_device::ADI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH + imm;
@@ -3501,7 +3501,7 @@ void upd7810_device::ADI_MKH_xx()
 /* 64 47: 0110 0100 0100 0111 xxxx xxxx */
 void upd7810_device::ADI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL + imm;
@@ -3512,7 +3512,7 @@ void upd7810_device::ADI_MKL_xx()
 /* 64 48: 0110 0100 0100 1000 xxxx xxxx */
 void upd7810_device::ONI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), imm;
+	uint8_t pa = RP( UPD7810_PORTA ), imm;
 
 	RDOPARG( imm );
 	if (pa & imm)
@@ -3522,7 +3522,7 @@ void upd7810_device::ONI_PA_xx()
 /* 64 49: 0110 0100 0100 1001 xxxx xxxx */
 void upd7810_device::ONI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), imm;
+	uint8_t pb = RP( UPD7810_PORTB ), imm;
 
 	RDOPARG( imm );
 	if (pb & imm)
@@ -3532,7 +3532,7 @@ void upd7810_device::ONI_PB_xx()
 /* 64 4a: 0110 0100 0100 1010 xxxx xxxx */
 void upd7810_device::ONI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), imm;
+	uint8_t pc = RP( UPD7810_PORTC ), imm;
 
 	RDOPARG( imm );
 	if (pc & imm)
@@ -3542,7 +3542,7 @@ void upd7810_device::ONI_PC_xx()
 /* 64 4b: 0110 0100 0100 1011 xxxx xxxx */
 void upd7810_device::ONI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
 
 	RDOPARG( imm );
 	if (pd & imm)
@@ -3552,7 +3552,7 @@ void upd7810_device::ONI_PD_xx()
 /* 64 4d: 0110 0100 0100 1101 xxxx xxxx */
 void upd7810_device::ONI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
 
 	RDOPARG( imm );
 	if (pf & imm)
@@ -3562,7 +3562,7 @@ void upd7810_device::ONI_PF_xx()
 /* 64 4e: 0110 0100 0100 1110 xxxx xxxx */
 void upd7810_device::ONI_MKH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (MKH & imm)
@@ -3572,7 +3572,7 @@ void upd7810_device::ONI_MKH_xx()
 /* 64 4f: 0110 0100 0100 1111 xxxx xxxx */
 void upd7810_device::ONI_MKL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (MKL & imm)
@@ -3582,7 +3582,7 @@ void upd7810_device::ONI_MKL_xx()
 /* 64 50: 0110 0100 0101 0000 xxxx xxxx */
 void upd7810_device::ACI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa + imm + (PSW & CY);
@@ -3594,7 +3594,7 @@ void upd7810_device::ACI_PA_xx()
 /* 64 51: 0110 0100 0101 0001 xxxx xxxx */
 void upd7810_device::ACI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb + imm + (PSW & CY);
@@ -3606,7 +3606,7 @@ void upd7810_device::ACI_PB_xx()
 /* 64 52: 0110 0100 0101 0010 xxxx xxxx */
 void upd7810_device::ACI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc + imm + (PSW & CY);
@@ -3618,7 +3618,7 @@ void upd7810_device::ACI_PC_xx()
 /* 64 53: 0110 0100 0101 0011 xxxx xxxx */
 void upd7810_device::ACI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd + imm + (PSW & CY);
@@ -3630,7 +3630,7 @@ void upd7810_device::ACI_PD_xx()
 /* 64 55: 0110 0100 0101 0101 xxxx xxxx */
 void upd7810_device::ACI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf + imm + (PSW & CY);
@@ -3642,7 +3642,7 @@ void upd7810_device::ACI_PF_xx()
 /* 64 56: 0110 0100 0101 0110 xxxx xxxx */
 void upd7810_device::ACI_MKH_xx()
 {
-	UINT8 imm, tmp;
+	uint8_t imm, tmp;
 
 	RDOPARG( imm );
 	tmp = MKH + imm + (PSW & CY);
@@ -3653,7 +3653,7 @@ void upd7810_device::ACI_MKH_xx()
 /* 64 57: 0110 0100 0101 0111 xxxx xxxx */
 void upd7810_device::ACI_MKL_xx()
 {
-	UINT8 imm, tmp;
+	uint8_t imm, tmp;
 
 	RDOPARG( imm );
 	tmp = MKL + imm + (PSW & CY);
@@ -3664,7 +3664,7 @@ void upd7810_device::ACI_MKL_xx()
 /* 64 58: 0110 0100 0101 1000 xxxx xxxx */
 void upd7810_device::OFFI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), imm;
+	uint8_t pa = RP( UPD7810_PORTA ), imm;
 
 	RDOPARG( imm );
 	if (0 == (pa & imm))
@@ -3674,7 +3674,7 @@ void upd7810_device::OFFI_PA_xx()
 /* 64 59: 0110 0100 0101 1001 xxxx xxxx */
 void upd7810_device::OFFI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), imm;
+	uint8_t pb = RP( UPD7810_PORTB ), imm;
 
 	RDOPARG( imm );
 	if (0 == (pb & imm))
@@ -3684,7 +3684,7 @@ void upd7810_device::OFFI_PB_xx()
 /* 64 5a: 0110 0100 0101 1010 xxxx xxxx */
 void upd7810_device::OFFI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), imm;
+	uint8_t pc = RP( UPD7810_PORTC ), imm;
 
 	RDOPARG( imm );
 	if (0 == (pc & imm))
@@ -3694,7 +3694,7 @@ void upd7810_device::OFFI_PC_xx()
 /* 64 5b: 0110 0100 0101 1011 xxxx xxxx */
 void upd7810_device::OFFI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), imm;
+	uint8_t pd = RP( UPD7810_PORTD ), imm;
 
 	RDOPARG( imm );
 	if (0 == (pd & imm))
@@ -3704,7 +3704,7 @@ void upd7810_device::OFFI_PD_xx()
 /* 64 5d: 0110 0100 0101 1101 xxxx xxxx */
 void upd7810_device::OFFI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), imm;
+	uint8_t pf = RP( UPD7810_PORTF ), imm;
 
 	RDOPARG( imm );
 	if (0 == (pf & imm))
@@ -3714,7 +3714,7 @@ void upd7810_device::OFFI_PF_xx()
 /* 64 5e: 0110 0100 0101 1110 xxxx xxxx */
 void upd7810_device::OFFI_MKH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (MKH & imm))
@@ -3724,7 +3724,7 @@ void upd7810_device::OFFI_MKH_xx()
 /* 64 5f: 0110 0100 0101 1111 xxxx xxxx */
 void upd7810_device::OFFI_MKL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (MKL & imm))
@@ -3734,7 +3734,7 @@ void upd7810_device::OFFI_MKL_xx()
 /* 64 60: 0110 0100 0110 0000 xxxx xxxx */
 void upd7810_device::SUI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa - imm;
@@ -3746,7 +3746,7 @@ void upd7810_device::SUI_PA_xx()
 /* 64 61: 0110 0100 0110 0001 xxxx xxxx */
 void upd7810_device::SUI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb - imm;
@@ -3758,7 +3758,7 @@ void upd7810_device::SUI_PB_xx()
 /* 64 62: 0110 0100 0110 0010 xxxx xxxx */
 void upd7810_device::SUI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc - imm;
@@ -3770,7 +3770,7 @@ void upd7810_device::SUI_PC_xx()
 /* 64 63: 0110 0100 0110 0011 xxxx xxxx */
 void upd7810_device::SUI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd - imm;
@@ -3782,7 +3782,7 @@ void upd7810_device::SUI_PD_xx()
 /* 64 65: 0110 0100 0110 0101 xxxx xxxx */
 void upd7810_device::SUI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf - imm;
@@ -3794,7 +3794,7 @@ void upd7810_device::SUI_PF_xx()
 /* 64 66: 0110 0100 0110 0110 xxxx xxxx */
 void upd7810_device::SUI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm;
@@ -3805,7 +3805,7 @@ void upd7810_device::SUI_MKH_xx()
 /* 64 67: 0110 0100 0110 0111 xxxx xxxx */
 void upd7810_device::SUI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm;
@@ -3816,7 +3816,7 @@ void upd7810_device::SUI_MKL_xx()
 /* 64 68: 0110 0100 0110 1000 xxxx xxxx */
 void upd7810_device::NEI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa - imm;
@@ -3827,7 +3827,7 @@ void upd7810_device::NEI_PA_xx()
 /* 64 69: 0110 0100 0110 1001 xxxx xxxx */
 void upd7810_device::NEI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb - imm;
@@ -3838,7 +3838,7 @@ void upd7810_device::NEI_PB_xx()
 /* 64 6a: 0110 0100 0110 1010 xxxx xxxx */
 void upd7810_device::NEI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc - imm;
@@ -3849,7 +3849,7 @@ void upd7810_device::NEI_PC_xx()
 /* 64 6b: 0110 0100 0110 1011 xxxx xxxx */
 void upd7810_device::NEI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd - imm;
@@ -3860,7 +3860,7 @@ void upd7810_device::NEI_PD_xx()
 /* 64 6d: 0110 0100 0110 1101 xxxx xxxx */
 void upd7810_device::NEI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf - imm;
@@ -3871,7 +3871,7 @@ void upd7810_device::NEI_PF_xx()
 /* 64 6e: 0110 0100 0110 1110 xxxx xxxx */
 void upd7810_device::NEI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm;
@@ -3882,7 +3882,7 @@ void upd7810_device::NEI_MKH_xx()
 /* 64 6f: 0110 0100 0110 1111 xxxx xxxx */
 void upd7810_device::NEI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm;
@@ -3893,7 +3893,7 @@ void upd7810_device::NEI_MKL_xx()
 /* 64 70: 0110 0100 0111 0000 xxxx xxxx */
 void upd7810_device::SBI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa - imm - (PSW & CY);
@@ -3905,7 +3905,7 @@ void upd7810_device::SBI_PA_xx()
 /* 64 71: 0110 0100 0111 0001 xxxx xxxx */
 void upd7810_device::SBI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb - imm - (PSW & CY);
@@ -3917,7 +3917,7 @@ void upd7810_device::SBI_PB_xx()
 /* 64 72: 0110 0100 0111 0010 xxxx xxxx */
 void upd7810_device::SBI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc - imm - (PSW & CY);
@@ -3929,7 +3929,7 @@ void upd7810_device::SBI_PC_xx()
 /* 64 73: 0110 0100 0111 0011 xxxx xxxx */
 void upd7810_device::SBI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd - imm - (PSW & CY);
@@ -3941,7 +3941,7 @@ void upd7810_device::SBI_PD_xx()
 /* 64 75: 0110 0100 0111 0101 xxxx xxxx */
 void upd7810_device::SBI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf - imm - (PSW & CY);
@@ -3953,7 +3953,7 @@ void upd7810_device::SBI_PF_xx()
 /* 64 76: 0110 0100 0111 0110 xxxx xxxx */
 void upd7810_device::SBI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm - (PSW & CY);
@@ -3964,7 +3964,7 @@ void upd7810_device::SBI_MKH_xx()
 /* 64 77: 0110 0100 0111 0111 xxxx xxxx */
 void upd7810_device::SBI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm - (PSW & CY);
@@ -3975,7 +3975,7 @@ void upd7810_device::SBI_MKL_xx()
 /* 64 78: 0110 0100 0111 1000 xxxx xxxx */
 void upd7810_device::EQI_PA_xx()
 {
-	UINT8 pa = RP( UPD7810_PORTA ), tmp, imm;
+	uint8_t pa = RP( UPD7810_PORTA ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pa - imm;
@@ -3986,7 +3986,7 @@ void upd7810_device::EQI_PA_xx()
 /* 64 79: 0110 0100 0111 1001 xxxx xxxx */
 void upd7810_device::EQI_PB_xx()
 {
-	UINT8 pb = RP( UPD7810_PORTB ), tmp, imm;
+	uint8_t pb = RP( UPD7810_PORTB ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pb - imm;
@@ -3997,7 +3997,7 @@ void upd7810_device::EQI_PB_xx()
 /* 64 7a: 0110 0100 0111 1010 xxxx xxxx */
 void upd7810_device::EQI_PC_xx()
 {
-	UINT8 pc = RP( UPD7810_PORTC ), tmp, imm;
+	uint8_t pc = RP( UPD7810_PORTC ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pc - imm;
@@ -4008,7 +4008,7 @@ void upd7810_device::EQI_PC_xx()
 /* 64 7b: 0110 0100 0111 1011 xxxx xxxx */
 void upd7810_device::EQI_PD_xx()
 {
-	UINT8 pd = RP( UPD7810_PORTD ), tmp, imm;
+	uint8_t pd = RP( UPD7810_PORTD ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pd - imm;
@@ -4019,7 +4019,7 @@ void upd7810_device::EQI_PD_xx()
 /* 64 7d: 0110 0100 0111 1101 xxxx xxxx */
 void upd7810_device::EQI_PF_xx()
 {
-	UINT8 pf = RP( UPD7810_PORTF ), tmp, imm;
+	uint8_t pf = RP( UPD7810_PORTF ), tmp, imm;
 
 	RDOPARG( imm );
 	tmp = pf - imm;
@@ -4030,7 +4030,7 @@ void upd7810_device::EQI_PF_xx()
 /* 64 7e: 0110 0100 0111 1110 xxxx xxxx */
 void upd7810_device::EQI_MKH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKH - imm;
@@ -4041,7 +4041,7 @@ void upd7810_device::EQI_MKH_xx()
 /* 64 7f: 0110 0100 0111 1111 xxxx xxxx */
 void upd7810_device::EQI_MKL_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = MKL - imm;
@@ -4077,7 +4077,7 @@ void upd7810_device::MVI_TMM_xx()
 /* 64 88: 0110 0100 1000 1000 xxxx xxxx */
 void upd7810_device::ANI_ANM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	ANM &= imm;
@@ -4087,7 +4087,7 @@ void upd7810_device::ANI_ANM_xx()
 /* 64 89: 0110 0100 1000 1001 xxxx xxxx */
 void upd7810_device::ANI_SMH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	SMH &= imm;
@@ -4098,8 +4098,8 @@ void upd7810_device::ANI_SMH_xx()
 void upd7810_device::ANI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	/* only bits #1 and #5 can be read */
@@ -4111,7 +4111,7 @@ void upd7810_device::ANI_EOM_xx()
 /* 64 8d: 0110 0100 1000 1101 xxxx xxxx */
 void upd7810_device::ANI_TMM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	TMM &= imm;
@@ -4121,7 +4121,7 @@ void upd7810_device::ANI_TMM_xx()
 /* 64 90: 0110 0100 1001 0000 xxxx xxxx */
 void upd7810_device::XRI_ANM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	ANM ^= imm;
@@ -4131,7 +4131,7 @@ void upd7810_device::XRI_ANM_xx()
 /* 64 91: 0110 0100 1001 0001 xxxx xxxx */
 void upd7810_device::XRI_SMH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	SMH ^= imm;
@@ -4142,8 +4142,8 @@ void upd7810_device::XRI_SMH_xx()
 void upd7810_device::XRI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	/* only bits #1 and #5 can be read */
@@ -4155,7 +4155,7 @@ void upd7810_device::XRI_EOM_xx()
 /* 64 95: 0110 0100 1001 0101 xxxx xxxx */
 void upd7810_device::XRI_TMM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	TMM ^= imm;
@@ -4165,7 +4165,7 @@ void upd7810_device::XRI_TMM_xx()
 /* 64 98: 0110 0100 1001 1000 xxxx xxxx */
 void upd7810_device::ORI_ANM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	ANM |= imm;
@@ -4175,7 +4175,7 @@ void upd7810_device::ORI_ANM_xx()
 /* 64 99: 0110 0100 1001 1001 xxxx xxxx */
 void upd7810_device::ORI_SMH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	SMH |= imm;
@@ -4186,8 +4186,8 @@ void upd7810_device::ORI_SMH_xx()
 void upd7810_device::ORI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	/* only bits #1 and #5 can be read */
@@ -4199,7 +4199,7 @@ void upd7810_device::ORI_EOM_xx()
 /* 64 9d: 0110 0100 1001 1101 xxxx xxxx */
 void upd7810_device::ORI_TMM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	TMM |= imm;
@@ -4209,7 +4209,7 @@ void upd7810_device::ORI_TMM_xx()
 /* 64 a0: 0110 0100 1010 0000 xxxx xxxx */
 void upd7810_device::ADINC_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM + imm;
@@ -4222,7 +4222,7 @@ void upd7810_device::ADINC_ANM_xx()
 /* 64 a1: 0110 0100 1010 0001 xxxx xxxx */
 void upd7810_device::ADINC_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH + imm;
@@ -4236,8 +4236,8 @@ void upd7810_device::ADINC_SMH_xx()
 void upd7810_device::ADINC_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	/* only bits #1 and #5 can be read */
@@ -4252,7 +4252,7 @@ void upd7810_device::ADINC_EOM_xx()
 /* 64 a5: 0110 0100 1010 0101 xxxx xxxx */
 void upd7810_device::ADINC_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM + imm;
@@ -4265,8 +4265,8 @@ void upd7810_device::ADINC_TMM_xx()
 /* 64 a8: 0110 0100 1010 1000 xxxx xxxx */
 void upd7810_device::GTI_ANM_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = ANM - imm - 1;
@@ -4278,8 +4278,8 @@ void upd7810_device::GTI_ANM_xx()
 /* 64 a9: 0110 0100 1010 1001 xxxx xxxx */
 void upd7810_device::GTI_SMH_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = SMH - imm - 1;
@@ -4292,9 +4292,9 @@ void upd7810_device::GTI_SMH_xx()
 void upd7810_device::GTI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = eom - imm - 1;
@@ -4306,8 +4306,8 @@ void upd7810_device::GTI_EOM_xx()
 /* 64 ad: 0110 0100 1010 1101 xxxx xxxx */
 void upd7810_device::GTI_TMM_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = TMM - imm - 1;
@@ -4319,7 +4319,7 @@ void upd7810_device::GTI_TMM_xx()
 /* 64 b0: 0110 0100 1011 0000 xxxx xxxx */
 void upd7810_device::SUINB_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm;
@@ -4331,7 +4331,7 @@ void upd7810_device::SUINB_ANM_xx()
 /* 64 b1: 0110 0100 1011 0001 xxxx xxxx */
 void upd7810_device::SUINB_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm;
@@ -4344,8 +4344,8 @@ void upd7810_device::SUINB_SMH_xx()
 void upd7810_device::SUINB_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm;
@@ -4358,7 +4358,7 @@ void upd7810_device::SUINB_EOM_xx()
 /* 64 b5: 0110 0100 1011 0101 xxxx xxxx */
 void upd7810_device::SUINB_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm;
@@ -4370,7 +4370,7 @@ void upd7810_device::SUINB_TMM_xx()
 /* 64 b8: 0110 0100 1011 1000 xxxx xxxx */
 void upd7810_device::LTI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm;
@@ -4381,7 +4381,7 @@ void upd7810_device::LTI_ANM_xx()
 /* 64 b9: 0110 0100 1011 1001 xxxx xxxx */
 void upd7810_device::LTI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm;
@@ -4393,8 +4393,8 @@ void upd7810_device::LTI_SMH_xx()
 void upd7810_device::LTI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm;
@@ -4405,7 +4405,7 @@ void upd7810_device::LTI_EOM_xx()
 /* 64 bd: 0110 0100 1011 1101 xxxx xxxx */
 void upd7810_device::LTI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm;
@@ -4416,7 +4416,7 @@ void upd7810_device::LTI_TMM_xx()
 /* 64 c0: 0110 0100 1100 0000 xxxx xxxx */
 void upd7810_device::ADI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM + imm;
@@ -4428,7 +4428,7 @@ void upd7810_device::ADI_ANM_xx()
 /* 64 c1: 0110 0100 1100 0001 xxxx xxxx */
 void upd7810_device::ADI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH + imm;
@@ -4441,8 +4441,8 @@ void upd7810_device::ADI_SMH_xx()
 void upd7810_device::ADI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom + imm;
@@ -4455,7 +4455,7 @@ void upd7810_device::ADI_EOM_xx()
 /* 64 c5: 0110 0100 1100 0101 xxxx xxxx */
 void upd7810_device::ADI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM + imm;
@@ -4467,7 +4467,7 @@ void upd7810_device::ADI_TMM_xx()
 /* 64 c8: 0110 0100 1100 1000 xxxx xxxx */
 void upd7810_device::ONI_ANM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (ANM & imm)
@@ -4477,7 +4477,7 @@ void upd7810_device::ONI_ANM_xx()
 /* 64 c9: 0110 0100 1100 1001 xxxx xxxx */
 void upd7810_device::ONI_SMH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (SMH & imm)
@@ -4488,8 +4488,8 @@ void upd7810_device::ONI_SMH_xx()
 void upd7810_device::ONI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (eom & imm)
@@ -4499,7 +4499,7 @@ void upd7810_device::ONI_EOM_xx()
 /* 64 cd: 0110 0100 1100 1101 xxxx xxxx */
 void upd7810_device::ONI_TMM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (TMM & imm)
@@ -4509,7 +4509,7 @@ void upd7810_device::ONI_TMM_xx()
 /* 64 d0: 0110 0100 1101 0000 xxxx xxxx */
 void upd7810_device::ACI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM + imm + (PSW & CY);
@@ -4521,7 +4521,7 @@ void upd7810_device::ACI_ANM_xx()
 /* 64 d1: 0110 0100 1101 0001 xxxx xxxx */
 void upd7810_device::ACI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH + imm + (PSW & CY);
@@ -4534,8 +4534,8 @@ void upd7810_device::ACI_SMH_xx()
 void upd7810_device::ACI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom + imm + (PSW & CY);
@@ -4548,7 +4548,7 @@ void upd7810_device::ACI_EOM_xx()
 /* 64 d5: 0110 0100 1101 0101 xxxx xxxx */
 void upd7810_device::ACI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM + imm + (PSW & CY);
@@ -4560,7 +4560,7 @@ void upd7810_device::ACI_TMM_xx()
 /* 64 d8: 0110 0100 1101 1000 xxxx xxxx */
 void upd7810_device::OFFI_ANM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (ANM & imm))
@@ -4570,7 +4570,7 @@ void upd7810_device::OFFI_ANM_xx()
 /* 64 d9: 0110 0100 1101 1001 xxxx xxxx */
 void upd7810_device::OFFI_SMH_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (SMH & imm))
@@ -4581,8 +4581,8 @@ void upd7810_device::OFFI_SMH_xx()
 void upd7810_device::OFFI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (eom & imm))
@@ -4592,7 +4592,7 @@ void upd7810_device::OFFI_EOM_xx()
 /* 64 dd: 0110 0100 1101 1101 xxxx xxxx */
 void upd7810_device::OFFI_TMM_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (TMM & imm))
@@ -4602,7 +4602,7 @@ void upd7810_device::OFFI_TMM_xx()
 /* 64 e0: 0110 0100 1110 0000 xxxx xxxx */
 void upd7810_device::SUI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm;
@@ -4613,7 +4613,7 @@ void upd7810_device::SUI_ANM_xx()
 /* 64 e1: 0110 0100 1110 0001 xxxx xxxx */
 void upd7810_device::SUI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm;
@@ -4625,8 +4625,8 @@ void upd7810_device::SUI_SMH_xx()
 void upd7810_device::SUI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm;
@@ -4638,7 +4638,7 @@ void upd7810_device::SUI_EOM_xx()
 /* 64 e5: 0110 0100 1110 0101 xxxx xxxx */
 void upd7810_device::SUI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm;
@@ -4649,7 +4649,7 @@ void upd7810_device::SUI_TMM_xx()
 /* 64 e8: 0110 0100 1110 1000 xxxx xxxx */
 void upd7810_device::NEI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm;
@@ -4660,7 +4660,7 @@ void upd7810_device::NEI_ANM_xx()
 /* 64 e9: 0110 0100 1110 1001 xxxx xxxx */
 void upd7810_device::NEI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm;
@@ -4672,8 +4672,8 @@ void upd7810_device::NEI_SMH_xx()
 void upd7810_device::NEI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm;
@@ -4684,7 +4684,7 @@ void upd7810_device::NEI_EOM_xx()
 /* 64 ed: 0110 0100 1110 1101 xxxx xxxx */
 void upd7810_device::NEI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm;
@@ -4695,7 +4695,7 @@ void upd7810_device::NEI_TMM_xx()
 /* 64 f0: 0110 0100 1111 0000 xxxx xxxx */
 void upd7810_device::SBI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm - (PSW & CY);
@@ -4706,7 +4706,7 @@ void upd7810_device::SBI_ANM_xx()
 /* 64 f1: 0110 0100 1111 0001 xxxx xxxx */
 void upd7810_device::SBI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm - (PSW & CY);
@@ -4718,8 +4718,8 @@ void upd7810_device::SBI_SMH_xx()
 void upd7810_device::SBI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm - (PSW & CY);
@@ -4731,7 +4731,7 @@ void upd7810_device::SBI_EOM_xx()
 /* 64 f5: 0110 0100 1111 0101 xxxx xxxx */
 void upd7810_device::SBI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm - (PSW & CY);
@@ -4742,7 +4742,7 @@ void upd7810_device::SBI_TMM_xx()
 /* 64 f8: 0110 0100 1111 1000 xxxx xxxx */
 void upd7810_device::EQI_ANM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = ANM - imm;
@@ -4753,7 +4753,7 @@ void upd7810_device::EQI_ANM_xx()
 /* 64 f9: 0110 0100 1111 1001 xxxx xxxx */
 void upd7810_device::EQI_SMH_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = SMH - imm;
@@ -4765,8 +4765,8 @@ void upd7810_device::EQI_SMH_xx()
 void upd7810_device::EQI_EOM_xx()
 {
 	/* only bits #1 and #5 can be read */
-	UINT8 eom = EOM & 0x22;
-	UINT8 tmp, imm;
+	uint8_t eom = EOM & 0x22;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = eom - imm;
@@ -4777,7 +4777,7 @@ void upd7810_device::EQI_EOM_xx()
 /* 64 fd: 0110 0100 1111 1101 xxxx xxxx */
 void upd7810_device::EQI_TMM_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = TMM - imm;
@@ -4885,7 +4885,7 @@ void upd7810_device::LHLD_w()
 /* 70 41: 0111 0000 0100 0001 */
 void upd7810_device::EADD_EA_A()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA + A;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -4894,7 +4894,7 @@ void upd7810_device::EADD_EA_A()
 /* 70 42: 0111 0000 0100 0010 */
 void upd7810_device::EADD_EA_B()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA + B;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -4903,7 +4903,7 @@ void upd7810_device::EADD_EA_B()
 /* 70 43: 0111 0000 0100 0011 */
 void upd7810_device::EADD_EA_C()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA + C;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -4912,7 +4912,7 @@ void upd7810_device::EADD_EA_C()
 /* 70 61: 0111 0000 0110 0001 */
 void upd7810_device::ESUB_EA_A()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA - A;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
@@ -4921,7 +4921,7 @@ void upd7810_device::ESUB_EA_A()
 /* 70 62: 0111 0000 0110 0010 */
 void upd7810_device::ESUB_EA_B()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA - B;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
@@ -4930,7 +4930,7 @@ void upd7810_device::ESUB_EA_B()
 /* 70 63: 0111 0000 0110 0011 */
 void upd7810_device::ESUB_EA_C()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA - C;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
@@ -5274,7 +5274,7 @@ void upd7810_device::ORAX_Hm()
 /* 70 a1: 0111 0000 1010 0001 */
 void upd7810_device::ADDNCX_B()
 {
-	UINT8 tmp = A + RM( BC );
+	uint8_t tmp = A + RM( BC );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5283,7 +5283,7 @@ void upd7810_device::ADDNCX_B()
 /* 70 a2: 0111 0000 1010 0010 */
 void upd7810_device::ADDNCX_D()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5292,7 +5292,7 @@ void upd7810_device::ADDNCX_D()
 /* 70 a3: 0111 0000 1010 0011 */
 void upd7810_device::ADDNCX_H()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5301,7 +5301,7 @@ void upd7810_device::ADDNCX_H()
 /* 70 a4: 0111 0000 1010 0100 */
 void upd7810_device::ADDNCX_Dp()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	DE++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5311,7 +5311,7 @@ void upd7810_device::ADDNCX_Dp()
 /* 70 a5: 0111 0000 1010 0101 */
 void upd7810_device::ADDNCX_Hp()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	HL++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5321,7 +5321,7 @@ void upd7810_device::ADDNCX_Hp()
 /* 70 a6: 0111 0000 1010 0110 */
 void upd7810_device::ADDNCX_Dm()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	DE--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5331,7 +5331,7 @@ void upd7810_device::ADDNCX_Dm()
 /* 70 a7: 0111 0000 1010 0111 */
 void upd7810_device::ADDNCX_Hm()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	HL--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5341,7 +5341,7 @@ void upd7810_device::ADDNCX_Hm()
 /* 70 a9: 0111 0000 1010 1001 */
 void upd7810_device::GTAX_B()
 {
-	UINT16 tmp = A - RM( BC ) - 1;
+	uint16_t tmp = A - RM( BC ) - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -5349,7 +5349,7 @@ void upd7810_device::GTAX_B()
 /* 70 aa: 0111 0000 1010 1010 */
 void upd7810_device::GTAX_D()
 {
-	UINT16 tmp = A - RM( DE ) - 1;
+	uint16_t tmp = A - RM( DE ) - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -5357,7 +5357,7 @@ void upd7810_device::GTAX_D()
 /* 70 ab: 0111 0000 1010 1011 */
 void upd7810_device::GTAX_H()
 {
-	UINT16 tmp = A - RM( HL ) - 1;
+	uint16_t tmp = A - RM( HL ) - 1;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
 }
@@ -5365,7 +5365,7 @@ void upd7810_device::GTAX_H()
 /* 70 ac: 0111 0000 1010 1100 */
 void upd7810_device::GTAX_Dp()
 {
-	UINT16 tmp = A - RM( DE ) - 1;
+	uint16_t tmp = A - RM( DE ) - 1;
 	DE++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
@@ -5374,7 +5374,7 @@ void upd7810_device::GTAX_Dp()
 /* 70 ad: 0111 0000 1010 1101 */
 void upd7810_device::GTAX_Hp()
 {
-	UINT16 tmp = A - RM( HL ) - 1;
+	uint16_t tmp = A - RM( HL ) - 1;
 	HL++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
@@ -5383,7 +5383,7 @@ void upd7810_device::GTAX_Hp()
 /* 70 ae: 0111 0000 1010 1110 */
 void upd7810_device::GTAX_Dm()
 {
-	UINT16 tmp = A - RM( DE ) - 1;
+	uint16_t tmp = A - RM( DE ) - 1;
 	DE--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
@@ -5392,7 +5392,7 @@ void upd7810_device::GTAX_Dm()
 /* 70 af: 0111 0000 1010 1111 */
 void upd7810_device::GTAX_Hm()
 {
-	UINT16 tmp = A - RM( HL ) - 1;
+	uint16_t tmp = A - RM( HL ) - 1;
 	HL--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NC;
@@ -5401,7 +5401,7 @@ void upd7810_device::GTAX_Hm()
 /* 70 b1: 0111 0000 1011 0001 */
 void upd7810_device::SUBNBX_B()
 {
-	UINT8 tmp = A - RM( BC );
+	uint8_t tmp = A - RM( BC );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5410,7 +5410,7 @@ void upd7810_device::SUBNBX_B()
 /* 70 b2: 0111 0000 1011 0010 */
 void upd7810_device::SUBNBX_D()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5419,7 +5419,7 @@ void upd7810_device::SUBNBX_D()
 /* 70 b3: 0111 0000 1011 0011 */
 void upd7810_device::SUBNBX_H()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_NC;
@@ -5428,7 +5428,7 @@ void upd7810_device::SUBNBX_H()
 /* 70 b4: 0111 0000 1011 0100 */
 void upd7810_device::SUBNBX_Dp()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE++;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
@@ -5438,7 +5438,7 @@ void upd7810_device::SUBNBX_Dp()
 /* 70 b5: 0111 0000 1011 0101 */
 void upd7810_device::SUBNBX_Hp()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL++;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
@@ -5448,7 +5448,7 @@ void upd7810_device::SUBNBX_Hp()
 /* 70 b6: 0111 0000 1011 0110 */
 void upd7810_device::SUBNBX_Dm()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE--;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
@@ -5458,7 +5458,7 @@ void upd7810_device::SUBNBX_Dm()
 /* 70 b7: 0111 0000 1011 0111 */
 void upd7810_device::SUBNBX_Hm()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL--;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
@@ -5468,7 +5468,7 @@ void upd7810_device::SUBNBX_Hm()
 /* 70 b9: 0111 0000 1011 1001 */
 void upd7810_device::LTAX_B()
 {
-	UINT8 tmp = A - RM( BC );
+	uint8_t tmp = A - RM( BC );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -5476,7 +5476,7 @@ void upd7810_device::LTAX_B()
 /* 70 ba: 0111 0000 1011 1010 */
 void upd7810_device::LTAX_D()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -5484,7 +5484,7 @@ void upd7810_device::LTAX_D()
 /* 70 bb: 0111 0000 1011 1011 */
 void upd7810_device::LTAX_H()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
 }
@@ -5492,7 +5492,7 @@ void upd7810_device::LTAX_H()
 /* 70 bc: 0111 0000 1011 1100 */
 void upd7810_device::LTAX_Dp()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
@@ -5501,7 +5501,7 @@ void upd7810_device::LTAX_Dp()
 /* 70 bd: 0111 0000 1011 1101 */
 void upd7810_device::LTAX_Hp()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
@@ -5510,7 +5510,7 @@ void upd7810_device::LTAX_Hp()
 /* 70 be: 0111 0000 1011 1110 */
 void upd7810_device::LTAX_Dm()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
@@ -5519,7 +5519,7 @@ void upd7810_device::LTAX_Dm()
 /* 70 bf: 0111 0000 1011 1111 */
 void upd7810_device::LTAX_Hm()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_CY;
@@ -5528,7 +5528,7 @@ void upd7810_device::LTAX_Hm()
 /* 70 c1: 0111 0000 1100 0001 */
 void upd7810_device::ADDX_B()
 {
-	UINT8 tmp = A + RM( BC );
+	uint8_t tmp = A + RM( BC );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5536,7 +5536,7 @@ void upd7810_device::ADDX_B()
 /* 70 c2: 0111 0000 1100 0010 */
 void upd7810_device::ADDX_D()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5544,7 +5544,7 @@ void upd7810_device::ADDX_D()
 /* 70 c3: 0111 0000 1100 0011 */
 void upd7810_device::ADDX_H()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5552,7 +5552,7 @@ void upd7810_device::ADDX_H()
 /* 70 c4: 0111 0000 1100 0100 */
 void upd7810_device::ADDX_Dp()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	DE++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5561,7 +5561,7 @@ void upd7810_device::ADDX_Dp()
 /* 70 c5: 0111 0000 1100 0101 */
 void upd7810_device::ADDX_Hp()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	HL++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5570,7 +5570,7 @@ void upd7810_device::ADDX_Hp()
 /* 70 c6: 0111 0000 1100 0110 */
 void upd7810_device::ADDX_Dm()
 {
-	UINT8 tmp = A + RM( DE );
+	uint8_t tmp = A + RM( DE );
 	DE--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5579,7 +5579,7 @@ void upd7810_device::ADDX_Dm()
 /* 70 c7: 0111 0000 1100 0111 */
 void upd7810_device::ADDX_Hm()
 {
-	UINT8 tmp = A + RM( HL );
+	uint8_t tmp = A + RM( HL );
 	HL--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5655,7 +5655,7 @@ void upd7810_device::ONAX_Hm()
 /* 70 d1: 0111 0000 1101 0001 */
 void upd7810_device::ADCX_B()
 {
-	UINT8 tmp = A + RM( BC ) + (PSW & CY);
+	uint8_t tmp = A + RM( BC ) + (PSW & CY);
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5663,7 +5663,7 @@ void upd7810_device::ADCX_B()
 /* 70 d2: 0111 0000 1101 0010 */
 void upd7810_device::ADCX_D()
 {
-	UINT8 tmp = A + RM( DE ) + (PSW & CY);
+	uint8_t tmp = A + RM( DE ) + (PSW & CY);
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5671,7 +5671,7 @@ void upd7810_device::ADCX_D()
 /* 70 d3: 0111 0000 1101 0011 */
 void upd7810_device::ADCX_H()
 {
-	UINT8 tmp = A + RM( HL ) + (PSW & CY);
+	uint8_t tmp = A + RM( HL ) + (PSW & CY);
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 }
@@ -5679,7 +5679,7 @@ void upd7810_device::ADCX_H()
 /* 70 d4: 0111 0000 1101 0100 */
 void upd7810_device::ADCX_Dp()
 {
-	UINT8 tmp = A + RM( DE ) + (PSW & CY);
+	uint8_t tmp = A + RM( DE ) + (PSW & CY);
 	DE++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5688,7 +5688,7 @@ void upd7810_device::ADCX_Dp()
 /* 70 d5: 0111 0000 1101 0101 */
 void upd7810_device::ADCX_Hp()
 {
-	UINT8 tmp = A + RM( HL ) + (PSW & CY);
+	uint8_t tmp = A + RM( HL ) + (PSW & CY);
 	HL++;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5697,7 +5697,7 @@ void upd7810_device::ADCX_Hp()
 /* 70 d6: 0111 0000 1101 0110 */
 void upd7810_device::ADCX_Dm()
 {
-	UINT8 tmp = A + RM( DE ) + (PSW & CY);
+	uint8_t tmp = A + RM( DE ) + (PSW & CY);
 	DE--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5706,7 +5706,7 @@ void upd7810_device::ADCX_Dm()
 /* 70 d7: 0111 0000 1101 0111 */
 void upd7810_device::ADCX_Hm()
 {
-	UINT8 tmp = A + RM( HL ) + (PSW & CY);
+	uint8_t tmp = A + RM( HL ) + (PSW & CY);
 	HL--;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
@@ -5782,7 +5782,7 @@ void upd7810_device::OFFAX_Hm()
 /* 70 e1: 0111 0000 1110 0001 */
 void upd7810_device::SUBX_B()
 {
-	UINT8 tmp = A - RM( BC );
+	uint8_t tmp = A - RM( BC );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -5790,7 +5790,7 @@ void upd7810_device::SUBX_B()
 /* 70 e2: 0111 0000 1110 0010 */
 void upd7810_device::SUBX_D()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -5798,7 +5798,7 @@ void upd7810_device::SUBX_D()
 /* 70 e3: 0111 0000 1110 0011 */
 void upd7810_device::SUBX_H()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 }
@@ -5806,7 +5806,7 @@ void upd7810_device::SUBX_H()
 /* 70 e4: 0111 0000 1110 0100 */
 void upd7810_device::SUBX_Dp()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	DE++;
@@ -5815,7 +5815,7 @@ void upd7810_device::SUBX_Dp()
 /* 70 e5: 0111 0000 1110 0101 */
 void upd7810_device::SUBX_Hp()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	HL++;
@@ -5824,7 +5824,7 @@ void upd7810_device::SUBX_Hp()
 /* 70 e6: 0111 0000 1110 0110 */
 void upd7810_device::SUBX_Dm()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	DE--;
@@ -5833,7 +5833,7 @@ void upd7810_device::SUBX_Dm()
 /* 70 e7: 0111 0000 1110 0111 */
 void upd7810_device::SUBX_Hm()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	HL--;
@@ -5842,7 +5842,7 @@ void upd7810_device::SUBX_Hm()
 /* 70 e9: 0111 0000 1110 1001 */
 void upd7810_device::NEAX_B()
 {
-	UINT8 tmp = A - RM( BC );
+	uint8_t tmp = A - RM( BC );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -5850,7 +5850,7 @@ void upd7810_device::NEAX_B()
 /* 70 ea: 0111 0000 1110 1010 */
 void upd7810_device::NEAX_D()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -5858,7 +5858,7 @@ void upd7810_device::NEAX_D()
 /* 70 eb: 0111 0000 1110 1011 */
 void upd7810_device::NEAX_H()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
 }
@@ -5866,7 +5866,7 @@ void upd7810_device::NEAX_H()
 /* 70 ec: 0111 0000 1110 1100 */
 void upd7810_device::NEAX_Dp()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
@@ -5875,7 +5875,7 @@ void upd7810_device::NEAX_Dp()
 /* 70 ed: 0111 0000 1110 1101 */
 void upd7810_device::NEAX_Hp()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
@@ -5884,7 +5884,7 @@ void upd7810_device::NEAX_Hp()
 /* 70 ee: 0111 0000 1110 1110 */
 void upd7810_device::NEAX_Dm()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
@@ -5893,7 +5893,7 @@ void upd7810_device::NEAX_Dm()
 /* 70 ef: 0111 0000 1110 1111 */
 void upd7810_device::NEAX_Hm()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_NZ;
@@ -5902,7 +5902,7 @@ void upd7810_device::NEAX_Hm()
 /* 70 f1: 0111 0000 1111 0001 */
 void upd7810_device::SBBX_B()
 {
-	UINT8 tmp = A - RM( BC ) - (PSW & CY);
+	uint8_t tmp = A - RM( BC ) - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -5910,7 +5910,7 @@ void upd7810_device::SBBX_B()
 /* 70 f2: 0111 0000 1111 0010 */
 void upd7810_device::SBBX_D()
 {
-	UINT8 tmp = A - RM( DE ) - (PSW & CY);
+	uint8_t tmp = A - RM( DE ) - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -5918,7 +5918,7 @@ void upd7810_device::SBBX_D()
 /* 70 f3: 0111 0000 1111 0011 */
 void upd7810_device::SBBX_H()
 {
-	UINT8 tmp = A - RM( HL ) - (PSW & CY);
+	uint8_t tmp = A - RM( HL ) - (PSW & CY);
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
 }
@@ -5926,7 +5926,7 @@ void upd7810_device::SBBX_H()
 /* 70 f4: 0111 0000 1111 0100 */
 void upd7810_device::SBBX_Dp()
 {
-	UINT8 tmp = A - RM( DE ) - (PSW & CY);
+	uint8_t tmp = A - RM( DE ) - (PSW & CY);
 	DE++;
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
@@ -5935,7 +5935,7 @@ void upd7810_device::SBBX_Dp()
 /* 70 f5: 0111 0000 1111 0101 */
 void upd7810_device::SBBX_Hp()
 {
-	UINT8 tmp = A - RM( HL ) - (PSW & CY);
+	uint8_t tmp = A - RM( HL ) - (PSW & CY);
 	HL++;
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
@@ -5944,7 +5944,7 @@ void upd7810_device::SBBX_Hp()
 /* 70 f6: 0111 0000 1111 0110 */
 void upd7810_device::SBBX_Dm()
 {
-	UINT8 tmp = A - RM( DE ) - (PSW & CY);
+	uint8_t tmp = A - RM( DE ) - (PSW & CY);
 	DE--;
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
@@ -5953,7 +5953,7 @@ void upd7810_device::SBBX_Dm()
 /* 70 f7: 0111 0000 1111 0111 */
 void upd7810_device::SBBX_Hm()
 {
-	UINT8 tmp = A - RM( HL ) - (PSW & CY);
+	uint8_t tmp = A - RM( HL ) - (PSW & CY);
 	HL--;
 	ZHC_SUB( tmp, A, (PSW & CY) );
 	A = tmp;
@@ -5962,7 +5962,7 @@ void upd7810_device::SBBX_Hm()
 /* 70 f9: 0111 0000 1111 1001 */
 void upd7810_device::EQAX_B()
 {
-	UINT8 tmp = A - RM( BC );
+	uint8_t tmp = A - RM( BC );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -5970,7 +5970,7 @@ void upd7810_device::EQAX_B()
 /* 70 fa: 0111 0000 1111 1010 */
 void upd7810_device::EQAX_D()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -5978,7 +5978,7 @@ void upd7810_device::EQAX_D()
 /* 70 fb: 0111 0000 1111 1011 */
 void upd7810_device::EQAX_H()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
 }
@@ -5986,7 +5986,7 @@ void upd7810_device::EQAX_H()
 /* 70 fc: 0111 0000 1111 1100 */
 void upd7810_device::EQAX_Dp()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
@@ -5995,7 +5995,7 @@ void upd7810_device::EQAX_Dp()
 /* 70 fd: 0111 0000 1111 1101 */
 void upd7810_device::EQAX_Hp()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL++;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
@@ -6004,7 +6004,7 @@ void upd7810_device::EQAX_Hp()
 /* 70 fe: 0111 0000 1111 1110 */
 void upd7810_device::EQAX_Dm()
 {
-	UINT8 tmp = A - RM( DE );
+	uint8_t tmp = A - RM( DE );
 	DE--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
@@ -6013,7 +6013,7 @@ void upd7810_device::EQAX_Dm()
 /* 70 ff: 0111 0000 1111 1111 */
 void upd7810_device::EQAX_Hm()
 {
-	UINT8 tmp = A - RM( HL );
+	uint8_t tmp = A - RM( HL );
 	HL--;
 	ZHC_SUB( tmp, A, 0 );
 	SKIP_Z;
@@ -6023,7 +6023,7 @@ void upd7810_device::EQAX_Hm()
 /* 74 08: 0111 0100 0000 1000 xxxx xxxx */
 void upd7810_device::ANI_V_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	V &= imm;
 	SET_Z(V);
@@ -6032,7 +6032,7 @@ void upd7810_device::ANI_V_xx()
 /* 74 09: 0111 0100 0000 1001 xxxx xxxx */
 void upd7810_device::ANI_A_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	A &= imm;
 	SET_Z(A);
@@ -6041,7 +6041,7 @@ void upd7810_device::ANI_A_xx()
 /* 74 0a: 0111 0100 0000 1010 xxxx xxxx */
 void upd7810_device::ANI_B_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	B &= imm;
 	SET_Z(B);
@@ -6050,7 +6050,7 @@ void upd7810_device::ANI_B_xx()
 /* 74 0b: 0111 0100 0000 1011 xxxx xxxx */
 void upd7810_device::ANI_C_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	C &= imm;
 	SET_Z(C);
@@ -6059,7 +6059,7 @@ void upd7810_device::ANI_C_xx()
 /* 74 0c: 0111 0100 0000 1100 xxxx xxxx */
 void upd7810_device::ANI_D_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	D &= imm;
 	SET_Z(D);
@@ -6068,7 +6068,7 @@ void upd7810_device::ANI_D_xx()
 /* 74 0d: 0111 0100 0000 1101 xxxx xxxx */
 void upd7810_device::ANI_E_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	E &= imm;
 	SET_Z(E);
@@ -6077,7 +6077,7 @@ void upd7810_device::ANI_E_xx()
 /* 74 0e: 0111 0100 0000 1110 xxxx xxxx */
 void upd7810_device::ANI_H_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	H &= imm;
 	SET_Z(H);
@@ -6086,7 +6086,7 @@ void upd7810_device::ANI_H_xx()
 /* 74 0f: 0111 0100 0000 1111 xxxx xxxx */
 void upd7810_device::ANI_L_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	L &= imm;
 	SET_Z(L);
@@ -6095,7 +6095,7 @@ void upd7810_device::ANI_L_xx()
 /* 74 10: 0111 0100 0001 0000 xxxx xxxx */
 void upd7810_device::XRI_V_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	V ^= imm;
 	SET_Z(V);
@@ -6104,7 +6104,7 @@ void upd7810_device::XRI_V_xx()
 /* 74 11: 0111 0100 0001 0001 xxxx xxxx */
 void upd7810_device::XRI_A_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	A ^= imm;
 	SET_Z(A);
@@ -6113,7 +6113,7 @@ void upd7810_device::XRI_A_xx()
 /* 74 12: 0111 0100 0001 0010 xxxx xxxx */
 void upd7810_device::XRI_B_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	B ^= imm;
 	SET_Z(B);
@@ -6122,7 +6122,7 @@ void upd7810_device::XRI_B_xx()
 /* 74 13: 0111 0100 0001 0011 xxxx xxxx */
 void upd7810_device::XRI_C_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	C ^= imm;
 	SET_Z(C);
@@ -6131,7 +6131,7 @@ void upd7810_device::XRI_C_xx()
 /* 74 14: 0111 0100 0001 0100 xxxx xxxx */
 void upd7810_device::XRI_D_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	D ^= imm;
 	SET_Z(D);
@@ -6140,7 +6140,7 @@ void upd7810_device::XRI_D_xx()
 /* 74 15: 0111 0100 0001 0101 xxxx xxxx */
 void upd7810_device::XRI_E_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	E ^= imm;
 	SET_Z(E);
@@ -6149,7 +6149,7 @@ void upd7810_device::XRI_E_xx()
 /* 74 16: 0111 0100 0001 0110 xxxx xxxx */
 void upd7810_device::XRI_H_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	H ^= imm;
 	SET_Z(H);
@@ -6158,7 +6158,7 @@ void upd7810_device::XRI_H_xx()
 /* 74 17: 0111 0100 0001 0111 xxxx xxxx */
 void upd7810_device::XRI_L_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	L ^= imm;
 	SET_Z(L);
@@ -6167,7 +6167,7 @@ void upd7810_device::XRI_L_xx()
 /* 74 18: 0111 0100 0001 1000 xxxx xxxx */
 void upd7810_device::ORI_V_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	V |= imm;
 	SET_Z(V);
@@ -6176,7 +6176,7 @@ void upd7810_device::ORI_V_xx()
 /* 74 19: 0111 0100 0001 1001 xxxx xxxx */
 void upd7810_device::ORI_A_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	A |= imm;
 	SET_Z(A);
@@ -6185,7 +6185,7 @@ void upd7810_device::ORI_A_xx()
 /* 74 1a: 0111 0100 0001 1010 xxxx xxxx */
 void upd7810_device::ORI_B_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	B |= imm;
 	SET_Z(B);
@@ -6194,7 +6194,7 @@ void upd7810_device::ORI_B_xx()
 /* 74 1b: 0111 0100 0001 1011 xxxx xxxx */
 void upd7810_device::ORI_C_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	C |= imm;
 	SET_Z(C);
@@ -6203,7 +6203,7 @@ void upd7810_device::ORI_C_xx()
 /* 74 1c: 0111 0100 0001 1100 xxxx xxxx */
 void upd7810_device::ORI_D_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	D |= imm;
 	SET_Z(D);
@@ -6212,7 +6212,7 @@ void upd7810_device::ORI_D_xx()
 /* 74 1d: 0111 0100 0001 1101 xxxx xxxx */
 void upd7810_device::ORI_E_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	E |= imm;
 	SET_Z(E);
@@ -6221,7 +6221,7 @@ void upd7810_device::ORI_E_xx()
 /* 74 1e: 0111 0100 0001 1110 xxxx xxxx */
 void upd7810_device::ORI_H_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	H |= imm;
 	SET_Z(H);
@@ -6230,7 +6230,7 @@ void upd7810_device::ORI_H_xx()
 /* 74 1f: 0111 0100 0001 1111 xxxx xxxx */
 void upd7810_device::ORI_L_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	L |= imm;
 	SET_Z(L);
@@ -6239,7 +6239,7 @@ void upd7810_device::ORI_L_xx()
 /* 74 20: 0111 0100 0010 0000 xxxx xxxx */
 void upd7810_device::ADINC_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V + imm;
@@ -6252,7 +6252,7 @@ void upd7810_device::ADINC_V_xx()
 /* 74 21: 0111 0100 0010 0001 xxxx xxxx */
 void upd7810_device::ADINC_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A + imm;
@@ -6265,7 +6265,7 @@ void upd7810_device::ADINC_A_xx()
 /* 74 22: 0111 0100 0010 0010 xxxx xxxx */
 void upd7810_device::ADINC_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B + imm;
@@ -6278,7 +6278,7 @@ void upd7810_device::ADINC_B_xx()
 /* 74 23: 0111 0100 0010 0011 xxxx xxxx */
 void upd7810_device::ADINC_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C + imm;
@@ -6291,7 +6291,7 @@ void upd7810_device::ADINC_C_xx()
 /* 74 24: 0111 0100 0010 0100 xxxx xxxx */
 void upd7810_device::ADINC_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D + imm;
@@ -6304,7 +6304,7 @@ void upd7810_device::ADINC_D_xx()
 /* 74 25: 0111 0100 0010 0101 xxxx xxxx */
 void upd7810_device::ADINC_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E + imm;
@@ -6317,7 +6317,7 @@ void upd7810_device::ADINC_E_xx()
 /* 74 26: 0111 0100 0010 0110 xxxx xxxx */
 void upd7810_device::ADINC_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H + imm;
@@ -6330,7 +6330,7 @@ void upd7810_device::ADINC_H_xx()
 /* 74 27: 0111 0100 0010 0111 xxxx xxxx */
 void upd7810_device::ADINC_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L + imm;
@@ -6343,8 +6343,8 @@ void upd7810_device::ADINC_L_xx()
 /* 74 28: 0111 0100 0010 1000 xxxx xxxx */
 void upd7810_device::GTI_V_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = V - imm - 1;
@@ -6356,8 +6356,8 @@ void upd7810_device::GTI_V_xx()
 /* 74 29: 0111 0100 0010 1001 xxxx xxxx */
 void upd7810_device::GTI_A_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = A - imm - 1;
@@ -6369,8 +6369,8 @@ void upd7810_device::GTI_A_xx()
 /* 74 2a: 0111 0100 0010 1010 xxxx xxxx */
 void upd7810_device::GTI_B_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = B - imm - 1;
@@ -6382,8 +6382,8 @@ void upd7810_device::GTI_B_xx()
 /* 74 2b: 0111 0100 0010 1011 xxxx xxxx */
 void upd7810_device::GTI_C_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = C - imm - 1;
@@ -6395,8 +6395,8 @@ void upd7810_device::GTI_C_xx()
 /* 74 2c: 0111 0100 0010 1100 xxxx xxxx */
 void upd7810_device::GTI_D_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = D - imm - 1;
@@ -6408,8 +6408,8 @@ void upd7810_device::GTI_D_xx()
 /* 74 2d: 0111 0100 0010 1101 xxxx xxxx */
 void upd7810_device::GTI_E_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = E - imm - 1;
@@ -6421,8 +6421,8 @@ void upd7810_device::GTI_E_xx()
 /* 74 2e: 0111 0100 0010 1110 xxxx xxxx */
 void upd7810_device::GTI_H_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = H - imm - 1;
@@ -6434,8 +6434,8 @@ void upd7810_device::GTI_H_xx()
 /* 74 2f: 0111 0100 0010 1111 xxxx xxxx */
 void upd7810_device::GTI_L_xx()
 {
-	UINT8 imm;
-	UINT16 tmp;
+	uint8_t imm;
+	uint16_t tmp;
 
 	RDOPARG( imm );
 	tmp = L - imm - 1;
@@ -6447,7 +6447,7 @@ void upd7810_device::GTI_L_xx()
 /* 74 30: 0111 0100 0011 0000 xxxx xxxx */
 void upd7810_device::SUINB_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm;
@@ -6459,7 +6459,7 @@ void upd7810_device::SUINB_V_xx()
 /* 74 31: 0111 0100 0011 0001 xxxx xxxx */
 void upd7810_device::SUINB_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm;
@@ -6471,7 +6471,7 @@ void upd7810_device::SUINB_A_xx()
 /* 74 32: 0111 0100 0011 0010 xxxx xxxx */
 void upd7810_device::SUINB_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm;
@@ -6483,7 +6483,7 @@ void upd7810_device::SUINB_B_xx()
 /* 74 33: 0111 0100 0011 0011 xxxx xxxx */
 void upd7810_device::SUINB_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm;
@@ -6495,7 +6495,7 @@ void upd7810_device::SUINB_C_xx()
 /* 74 34: 0111 0100 0011 0100 xxxx xxxx */
 void upd7810_device::SUINB_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm;
@@ -6507,7 +6507,7 @@ void upd7810_device::SUINB_D_xx()
 /* 74 35: 0111 0100 0011 0101 xxxx xxxx */
 void upd7810_device::SUINB_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm;
@@ -6519,7 +6519,7 @@ void upd7810_device::SUINB_E_xx()
 /* 74 36: 0111 0100 0011 0110 xxxx xxxx */
 void upd7810_device::SUINB_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm;
@@ -6531,7 +6531,7 @@ void upd7810_device::SUINB_H_xx()
 /* 74 37: 0111 0100 0011 0111 xxxx xxxx */
 void upd7810_device::SUINB_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm;
@@ -6543,7 +6543,7 @@ void upd7810_device::SUINB_L_xx()
 /* 74 38: 0111 0100 0011 1000 xxxx xxxx */
 void upd7810_device::LTI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm;
@@ -6554,7 +6554,7 @@ void upd7810_device::LTI_V_xx()
 /* 74 39: 0111 0100 0011 1001 xxxx xxxx */
 void upd7810_device::LTI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm;
@@ -6565,7 +6565,7 @@ void upd7810_device::LTI_A_xx()
 /* 74 3a: 0111 0100 0011 1010 xxxx xxxx */
 void upd7810_device::LTI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm;
@@ -6576,7 +6576,7 @@ void upd7810_device::LTI_B_xx()
 /* 74 3b: 0111 0100 0011 1011 xxxx xxxx */
 void upd7810_device::LTI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm;
@@ -6587,7 +6587,7 @@ void upd7810_device::LTI_C_xx()
 /* 74 3c: 0111 0100 0011 1100 xxxx xxxx */
 void upd7810_device::LTI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm;
@@ -6598,7 +6598,7 @@ void upd7810_device::LTI_D_xx()
 /* 74 3d: 0111 0100 0011 1101 xxxx xxxx */
 void upd7810_device::LTI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm;
@@ -6609,7 +6609,7 @@ void upd7810_device::LTI_E_xx()
 /* 74 3e: 0111 0100 0011 1110 xxxx xxxx */
 void upd7810_device::LTI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm;
@@ -6620,7 +6620,7 @@ void upd7810_device::LTI_H_xx()
 /* 74 3f: 0111 0100 0011 1111 xxxx xxxx */
 void upd7810_device::LTI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm;
@@ -6631,7 +6631,7 @@ void upd7810_device::LTI_L_xx()
 /* 74 40: 0111 0100 0100 0000 xxxx xxxx */
 void upd7810_device::ADI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V + imm;
@@ -6643,7 +6643,7 @@ void upd7810_device::ADI_V_xx()
 /* 74 41: 0111 0100 0100 0001 xxxx xxxx */
 void upd7810_device::ADI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A + imm;
@@ -6655,7 +6655,7 @@ void upd7810_device::ADI_A_xx()
 /* 74 42: 0111 0100 0100 0010 xxxx xxxx */
 void upd7810_device::ADI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B + imm;
@@ -6667,7 +6667,7 @@ void upd7810_device::ADI_B_xx()
 /* 74 43: 0111 0100 0100 0011 xxxx xxxx */
 void upd7810_device::ADI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C + imm;
@@ -6679,7 +6679,7 @@ void upd7810_device::ADI_C_xx()
 /* 74 44: 0111 0100 0100 0100 xxxx xxxx */
 void upd7810_device::ADI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D + imm;
@@ -6691,7 +6691,7 @@ void upd7810_device::ADI_D_xx()
 /* 74 45: 0111 0100 0100 0101 xxxx xxxx */
 void upd7810_device::ADI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E + imm;
@@ -6703,7 +6703,7 @@ void upd7810_device::ADI_E_xx()
 /* 74 46: 0111 0100 0100 0110 xxxx xxxx */
 void upd7810_device::ADI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H + imm;
@@ -6715,7 +6715,7 @@ void upd7810_device::ADI_H_xx()
 /* 74 47: 0111 0100 0100 0111 xxxx xxxx */
 void upd7810_device::ADI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L + imm;
@@ -6727,7 +6727,7 @@ void upd7810_device::ADI_L_xx()
 /* 74 48: 0111 0100 0100 1000 xxxx xxxx */
 void upd7810_device::ONI_V_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (V & imm)
@@ -6737,7 +6737,7 @@ void upd7810_device::ONI_V_xx()
 /* 74 49: 0111 0100 0100 1001 xxxx xxxx */
 void upd7810_device::ONI_A_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (A & imm)
@@ -6747,7 +6747,7 @@ void upd7810_device::ONI_A_xx()
 /* 74 4a: 0111 0100 0100 1010 xxxx xxxx */
 void upd7810_device::ONI_B_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (B & imm)
@@ -6757,7 +6757,7 @@ void upd7810_device::ONI_B_xx()
 /* 74 4b: 0111 0100 0100 1011 xxxx xxxx */
 void upd7810_device::ONI_C_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (C & imm)
@@ -6767,7 +6767,7 @@ void upd7810_device::ONI_C_xx()
 /* 74 4c: 0111 0100 0100 1100 xxxx xxxx */
 void upd7810_device::ONI_D_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (D & imm)
@@ -6777,7 +6777,7 @@ void upd7810_device::ONI_D_xx()
 /* 74 4d: 0111 0100 0100 1101 xxxx xxxx */
 void upd7810_device::ONI_E_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (E & imm)
@@ -6787,7 +6787,7 @@ void upd7810_device::ONI_E_xx()
 /* 74 4e: 0111 0100 0100 1110 xxxx xxxx */
 void upd7810_device::ONI_H_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (H & imm)
@@ -6797,7 +6797,7 @@ void upd7810_device::ONI_H_xx()
 /* 74 4f: 0111 0100 0100 1111 xxxx xxxx */
 void upd7810_device::ONI_L_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (L & imm)
@@ -6807,7 +6807,7 @@ void upd7810_device::ONI_L_xx()
 /* 74 50: 0111 0100 0101 0000 xxxx xxxx */
 void upd7810_device::ACI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V + imm + (PSW & CY);
@@ -6818,7 +6818,7 @@ void upd7810_device::ACI_V_xx()
 /* 74 51: 0111 0100 0101 0001 xxxx xxxx */
 void upd7810_device::ACI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A + imm + (PSW & CY);
@@ -6829,7 +6829,7 @@ void upd7810_device::ACI_A_xx()
 /* 74 52: 0111 0100 0101 0010 xxxx xxxx */
 void upd7810_device::ACI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B + imm + (PSW & CY);
@@ -6840,7 +6840,7 @@ void upd7810_device::ACI_B_xx()
 /* 74 53: 0111 0100 0101 0011 xxxx xxxx */
 void upd7810_device::ACI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C + imm + (PSW & CY);
@@ -6851,7 +6851,7 @@ void upd7810_device::ACI_C_xx()
 /* 74 54: 0111 0100 0101 0100 xxxx xxxx */
 void upd7810_device::ACI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D + imm + (PSW & CY);
@@ -6862,7 +6862,7 @@ void upd7810_device::ACI_D_xx()
 /* 74 55: 0111 0100 0101 0101 xxxx xxxx */
 void upd7810_device::ACI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E + imm + (PSW & CY);
@@ -6873,7 +6873,7 @@ void upd7810_device::ACI_E_xx()
 /* 74 56: 0111 0100 0101 0110 xxxx xxxx */
 void upd7810_device::ACI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H + imm + (PSW & CY);
@@ -6884,7 +6884,7 @@ void upd7810_device::ACI_H_xx()
 /* 74 57: 0111 0100 0101 0111 xxxx xxxx */
 void upd7810_device::ACI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L + imm + (PSW & CY);
@@ -6895,7 +6895,7 @@ void upd7810_device::ACI_L_xx()
 /* 74 58: 0111 0100 0101 1000 xxxx xxxx */
 void upd7810_device::OFFI_V_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (V & imm))
@@ -6905,7 +6905,7 @@ void upd7810_device::OFFI_V_xx()
 /* 74 59: 0111 0100 0101 1001 xxxx xxxx */
 void upd7810_device::OFFI_A_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (A & imm))
@@ -6915,7 +6915,7 @@ void upd7810_device::OFFI_A_xx()
 /* 74 5a: 0111 0100 0101 1010 xxxx xxxx */
 void upd7810_device::OFFI_B_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (B & imm))
@@ -6925,7 +6925,7 @@ void upd7810_device::OFFI_B_xx()
 /* 74 5b: 0111 0100 0101 1011 xxxx xxxx */
 void upd7810_device::OFFI_C_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (C & imm))
@@ -6935,7 +6935,7 @@ void upd7810_device::OFFI_C_xx()
 /* 74 5c: 0111 0100 0101 1100 xxxx xxxx */
 void upd7810_device::OFFI_D_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (D & imm))
@@ -6945,7 +6945,7 @@ void upd7810_device::OFFI_D_xx()
 /* 74 5d: 0111 0100 0101 1101 xxxx xxxx */
 void upd7810_device::OFFI_E_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (E & imm))
@@ -6955,7 +6955,7 @@ void upd7810_device::OFFI_E_xx()
 /* 74 5e: 0111 0100 0101 1110 xxxx xxxx */
 void upd7810_device::OFFI_H_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (H & imm))
@@ -6965,7 +6965,7 @@ void upd7810_device::OFFI_H_xx()
 /* 74 5f: 0111 0100 0101 1111 xxxx xxxx */
 void upd7810_device::OFFI_L_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( imm );
 	if (0 == (L & imm))
@@ -6975,7 +6975,7 @@ void upd7810_device::OFFI_L_xx()
 /* 74 60: 0111 0100 0110 0000 xxxx xxxx */
 void upd7810_device::SUI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm;
@@ -6986,7 +6986,7 @@ void upd7810_device::SUI_V_xx()
 /* 74 61: 0111 0100 0110 0001 xxxx xxxx */
 void upd7810_device::SUI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm;
@@ -6997,7 +6997,7 @@ void upd7810_device::SUI_A_xx()
 /* 74 62: 0111 0100 0110 0010 xxxx xxxx */
 void upd7810_device::SUI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm;
@@ -7008,7 +7008,7 @@ void upd7810_device::SUI_B_xx()
 /* 74 63: 0111 0100 0110 0011 xxxx xxxx */
 void upd7810_device::SUI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm;
@@ -7019,7 +7019,7 @@ void upd7810_device::SUI_C_xx()
 /* 74 64: 0111 0100 0110 0100 xxxx xxxx */
 void upd7810_device::SUI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm;
@@ -7030,7 +7030,7 @@ void upd7810_device::SUI_D_xx()
 /* 74 65: 0111 0100 0110 0101 xxxx xxxx */
 void upd7810_device::SUI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm;
@@ -7041,7 +7041,7 @@ void upd7810_device::SUI_E_xx()
 /* 74 66: 0111 0100 0110 0110 xxxx xxxx */
 void upd7810_device::SUI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm;
@@ -7052,7 +7052,7 @@ void upd7810_device::SUI_H_xx()
 /* 74 67: 0111 0100 0110 0111 xxxx xxxx */
 void upd7810_device::SUI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm;
@@ -7063,7 +7063,7 @@ void upd7810_device::SUI_L_xx()
 /* 74 68: 0111 0100 0110 1000 xxxx xxxx */
 void upd7810_device::NEI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm;
@@ -7074,7 +7074,7 @@ void upd7810_device::NEI_V_xx()
 /* 74 69: 0111 0100 0110 1001 xxxx xxxx */
 void upd7810_device::NEI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm;
@@ -7085,7 +7085,7 @@ void upd7810_device::NEI_A_xx()
 /* 74 6a: 0111 0100 0110 1010 xxxx xxxx */
 void upd7810_device::NEI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm;
@@ -7096,7 +7096,7 @@ void upd7810_device::NEI_B_xx()
 /* 74 6b: 0111 0100 0110 1011 xxxx xxxx */
 void upd7810_device::NEI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm;
@@ -7107,7 +7107,7 @@ void upd7810_device::NEI_C_xx()
 /* 74 6c: 0111 0100 0110 1100 xxxx xxxx */
 void upd7810_device::NEI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm;
@@ -7118,7 +7118,7 @@ void upd7810_device::NEI_D_xx()
 /* 74 6d: 0111 0100 0110 1101 xxxx xxxx */
 void upd7810_device::NEI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm;
@@ -7129,7 +7129,7 @@ void upd7810_device::NEI_E_xx()
 /* 74 6e: 0111 0100 0110 1110 xxxx xxxx */
 void upd7810_device::NEI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm;
@@ -7140,7 +7140,7 @@ void upd7810_device::NEI_H_xx()
 /* 74 6f: 0111 0100 0110 1111 xxxx xxxx */
 void upd7810_device::NEI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm;
@@ -7151,7 +7151,7 @@ void upd7810_device::NEI_L_xx()
 /* 74 70: 0111 0100 0111 0000 xxxx xxxx */
 void upd7810_device::SBI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm - (PSW & CY);
@@ -7162,7 +7162,7 @@ void upd7810_device::SBI_V_xx()
 /* 74 71: 0111 0100 0111 0001 xxxx xxxx */
 void upd7810_device::SBI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm - (PSW & CY);
@@ -7173,7 +7173,7 @@ void upd7810_device::SBI_A_xx()
 /* 74 72: 0111 0100 0111 0010 xxxx xxxx */
 void upd7810_device::SBI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm - (PSW & CY);
@@ -7184,7 +7184,7 @@ void upd7810_device::SBI_B_xx()
 /* 74 73: 0111 0100 0111 0011 xxxx xxxx */
 void upd7810_device::SBI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm - (PSW & CY);
@@ -7195,7 +7195,7 @@ void upd7810_device::SBI_C_xx()
 /* 74 74: 0111 0100 0111 0100 xxxx xxxx */
 void upd7810_device::SBI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm - (PSW & CY);
@@ -7206,7 +7206,7 @@ void upd7810_device::SBI_D_xx()
 /* 74 75: 0111 0100 0111 0101 xxxx xxxx */
 void upd7810_device::SBI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm - (PSW & CY);
@@ -7217,7 +7217,7 @@ void upd7810_device::SBI_E_xx()
 /* 74 76: 0111 0100 0111 0110 xxxx xxxx */
 void upd7810_device::SBI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm - (PSW & CY);
@@ -7228,7 +7228,7 @@ void upd7810_device::SBI_H_xx()
 /* 74 77: 0111 0100 0111 0111 xxxx xxxx */
 void upd7810_device::SBI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm - (PSW & CY);
@@ -7239,7 +7239,7 @@ void upd7810_device::SBI_L_xx()
 /* 74 78: 0111 0100 0111 1000 xxxx xxxx */
 void upd7810_device::EQI_V_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = V - imm;
@@ -7250,7 +7250,7 @@ void upd7810_device::EQI_V_xx()
 /* 74 79: 0111 0100 0111 1001 xxxx xxxx */
 void upd7810_device::EQI_A_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = A - imm;
@@ -7261,7 +7261,7 @@ void upd7810_device::EQI_A_xx()
 /* 74 7a: 0111 0100 0111 1010 xxxx xxxx */
 void upd7810_device::EQI_B_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = B - imm;
@@ -7272,7 +7272,7 @@ void upd7810_device::EQI_B_xx()
 /* 74 7b: 0111 0100 0111 1011 xxxx xxxx */
 void upd7810_device::EQI_C_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = C - imm;
@@ -7283,7 +7283,7 @@ void upd7810_device::EQI_C_xx()
 /* 74 7c: 0111 0100 0111 1100 xxxx xxxx */
 void upd7810_device::EQI_D_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = D - imm;
@@ -7294,7 +7294,7 @@ void upd7810_device::EQI_D_xx()
 /* 74 7d: 0111 0100 0111 1101 xxxx xxxx */
 void upd7810_device::EQI_E_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = E - imm;
@@ -7305,7 +7305,7 @@ void upd7810_device::EQI_E_xx()
 /* 74 7e: 0111 0100 0111 1110 xxxx xxxx */
 void upd7810_device::EQI_H_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = H - imm;
@@ -7316,7 +7316,7 @@ void upd7810_device::EQI_H_xx()
 /* 74 7f: 0111 0100 0111 1111 xxxx xxxx */
 void upd7810_device::EQI_L_xx()
 {
-	UINT8 tmp, imm;
+	uint8_t tmp, imm;
 
 	RDOPARG( imm );
 	tmp = L - imm;
@@ -7421,7 +7421,7 @@ void upd7810_device::DOR_EA_HL()
 void upd7810_device::ADDNCW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 
@@ -7434,7 +7434,7 @@ void upd7810_device::ADDNCW_wa()
 /* 74 a5: 0111 0100 1010 0101 */
 void upd7810_device::DADDNC_EA_BC()
 {
-	UINT16 tmp = EA + BC;
+	uint16_t tmp = EA + BC;
 
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -7444,7 +7444,7 @@ void upd7810_device::DADDNC_EA_BC()
 /* 74 a6: 0111 0100 1010 0110 */
 void upd7810_device::DADDNC_EA_DE()
 {
-	UINT16 tmp = EA + DE;
+	uint16_t tmp = EA + DE;
 
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -7454,7 +7454,7 @@ void upd7810_device::DADDNC_EA_DE()
 /* 74 a7: 0111 0100 1010 0111 */
 void upd7810_device::DADDNC_EA_HL()
 {
-	UINT16 tmp = EA + HL;
+	uint16_t tmp = EA + HL;
 
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
@@ -7465,7 +7465,7 @@ void upd7810_device::DADDNC_EA_HL()
 void upd7810_device::GTAW_wa()
 {
 	PAIR ea = m_va;
-	UINT16 tmp;
+	uint16_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d ) - 1;
@@ -7476,7 +7476,7 @@ void upd7810_device::GTAW_wa()
 /* 74 ad: 0111 0100 1010 1101 */
 void upd7810_device::DGT_EA_BC()
 {
-	UINT32 tmp = EA - BC - 1;
+	uint32_t tmp = EA - BC - 1;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_NC;
 }
@@ -7484,7 +7484,7 @@ void upd7810_device::DGT_EA_BC()
 /* 74 ae: 0111 0100 1010 1110 */
 void upd7810_device::DGT_EA_DE()
 {
-	UINT32 tmp = EA - DE - 1;
+	uint32_t tmp = EA - DE - 1;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_NC;
 }
@@ -7492,7 +7492,7 @@ void upd7810_device::DGT_EA_DE()
 /* 74 af: 0111 0100 1010 1111 */
 void upd7810_device::DGT_EA_HL()
 {
-	UINT32 tmp = EA - HL - 1;
+	uint32_t tmp = EA - HL - 1;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_NC;
 }
@@ -7501,7 +7501,7 @@ void upd7810_device::DGT_EA_HL()
 void upd7810_device::SUBNBW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d );
@@ -7513,7 +7513,7 @@ void upd7810_device::SUBNBW_wa()
 /* 74 b5: 0111 0100 1011 0101 */
 void upd7810_device::DSUBNB_EA_BC()
 {
-	UINT16 tmp = EA - BC;
+	uint16_t tmp = EA - BC;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
 	SKIP_NC;
@@ -7522,7 +7522,7 @@ void upd7810_device::DSUBNB_EA_BC()
 /* 74 b6: 0111 0100 1011 0110 */
 void upd7810_device::DSUBNB_EA_DE()
 {
-	UINT16 tmp = EA - DE;
+	uint16_t tmp = EA - DE;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
 	SKIP_NC;
@@ -7531,7 +7531,7 @@ void upd7810_device::DSUBNB_EA_DE()
 /* 74 b7: 0111 0100 1011 0111 */
 void upd7810_device::DSUBNB_EA_HL()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - HL;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7543,7 +7543,7 @@ void upd7810_device::DSUBNB_EA_HL()
 void upd7810_device::LTAW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d );
@@ -7554,7 +7554,7 @@ void upd7810_device::LTAW_wa()
 /* 74 bd: 0111 0100 1011 1101 */
 void upd7810_device::DLT_EA_BC()
 {
-	UINT16 tmp = EA - BC;
+	uint16_t tmp = EA - BC;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_CY;
 }
@@ -7562,7 +7562,7 @@ void upd7810_device::DLT_EA_BC()
 /* 74 be: 0111 0100 1011 1110 */
 void upd7810_device::DLT_EA_DE()
 {
-	UINT16 tmp = EA - DE;
+	uint16_t tmp = EA - DE;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_CY;
 }
@@ -7570,7 +7570,7 @@ void upd7810_device::DLT_EA_DE()
 /* 74 bf: 0111 0100 1011 1111 */
 void upd7810_device::DLT_EA_HL()
 {
-	UINT16 tmp = EA - HL;
+	uint16_t tmp = EA - HL;
 	ZHC_SUB( tmp, EA, 0 );
 	SKIP_CY;
 }
@@ -7579,7 +7579,7 @@ void upd7810_device::DLT_EA_HL()
 void upd7810_device::ADDW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 	RDOPARG( ea.b.l );
 	tmp = A + RM( ea.d );
 	ZHC_ADD( tmp, A, 0 );
@@ -7589,7 +7589,7 @@ void upd7810_device::ADDW_wa()
 /* 74 c5: 0111 0100 1100 0101 */
 void upd7810_device::DADD_EA_BC()
 {
-	UINT16 tmp = EA + BC;
+	uint16_t tmp = EA + BC;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7597,7 +7597,7 @@ void upd7810_device::DADD_EA_BC()
 /* 74 c6: 0111 0100 1100 0110 */
 void upd7810_device::DADD_EA_DE()
 {
-	UINT16 tmp = EA + DE;
+	uint16_t tmp = EA + DE;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7605,7 +7605,7 @@ void upd7810_device::DADD_EA_DE()
 /* 74 c7: 0111 0100 1100 0111 */
 void upd7810_device::DADD_EA_HL()
 {
-	UINT16 tmp = EA + HL;
+	uint16_t tmp = EA + HL;
 	ZHC_ADD( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7653,7 +7653,7 @@ void upd7810_device::DON_EA_HL()
 void upd7810_device::ADCW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A + RM( ea.d ) + (PSW & CY);
@@ -7664,7 +7664,7 @@ void upd7810_device::ADCW_wa()
 /* 74 d5: 0111 0100 1101 0101 */
 void upd7810_device::DADC_EA_BC()
 {
-	UINT16 tmp = EA + BC + (PSW & CY);
+	uint16_t tmp = EA + BC + (PSW & CY);
 	ZHC_ADD( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7672,7 +7672,7 @@ void upd7810_device::DADC_EA_BC()
 /* 74 d6: 0111 0100 1101 0110 */
 void upd7810_device::DADC_EA_DE()
 {
-	UINT16 tmp = EA + DE + (PSW & CY);
+	uint16_t tmp = EA + DE + (PSW & CY);
 	ZHC_ADD( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7680,7 +7680,7 @@ void upd7810_device::DADC_EA_DE()
 /* 74 d7: 0111 0100 1101 0111 */
 void upd7810_device::DADC_EA_HL()
 {
-	UINT16 tmp = EA + HL + (PSW & CY);
+	uint16_t tmp = EA + HL + (PSW & CY);
 	ZHC_ADD( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7728,7 +7728,7 @@ void upd7810_device::DOFF_EA_HL()
 void upd7810_device::SUBW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d );
@@ -7739,7 +7739,7 @@ void upd7810_device::SUBW_wa()
 /* 74 e5: 0111 0100 1110 0101 */
 void upd7810_device::DSUB_EA_BC()
 {
-	UINT16 tmp = EA - BC;
+	uint16_t tmp = EA - BC;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7747,7 +7747,7 @@ void upd7810_device::DSUB_EA_BC()
 /* 74 e6: 0111 0100 1110 0110 */
 void upd7810_device::DSUB_EA_DE()
 {
-	UINT16 tmp = EA - DE;
+	uint16_t tmp = EA - DE;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7755,7 +7755,7 @@ void upd7810_device::DSUB_EA_DE()
 /* 74 e7: 0111 0100 1110 0111 */
 void upd7810_device::DSUB_EA_HL()
 {
-	UINT16 tmp = EA - HL;
+	uint16_t tmp = EA - HL;
 	ZHC_SUB( tmp, EA, 0 );
 	EA = tmp;
 }
@@ -7764,7 +7764,7 @@ void upd7810_device::DSUB_EA_HL()
 void upd7810_device::NEAW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d );
@@ -7775,7 +7775,7 @@ void upd7810_device::NEAW_wa()
 /* 74 ed: 0111 0100 1110 1101 */
 void upd7810_device::DNE_EA_BC()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - BC;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7785,7 +7785,7 @@ void upd7810_device::DNE_EA_BC()
 /* 74 ee: 0111 0100 1110 1110 */
 void upd7810_device::DNE_EA_DE()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - DE;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7795,7 +7795,7 @@ void upd7810_device::DNE_EA_DE()
 /* 74 ef: 0111 0100 1110 1111 */
 void upd7810_device::DNE_EA_HL()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - HL;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7806,7 +7806,7 @@ void upd7810_device::DNE_EA_HL()
 void upd7810_device::SBBW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d ) - (PSW & CY);
@@ -7817,7 +7817,7 @@ void upd7810_device::SBBW_wa()
 /* 74 f5: 0111 0100 1111 0101 */
 void upd7810_device::DSBB_EA_BC()
 {
-	UINT16 tmp = EA - BC - (PSW & CY);
+	uint16_t tmp = EA - BC - (PSW & CY);
 	ZHC_SUB( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7825,7 +7825,7 @@ void upd7810_device::DSBB_EA_BC()
 /* 74 f6: 0111 0100 1111 0110 */
 void upd7810_device::DSBB_EA_DE()
 {
-	UINT16 tmp = EA - DE - (PSW & CY);
+	uint16_t tmp = EA - DE - (PSW & CY);
 	ZHC_SUB( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7833,7 +7833,7 @@ void upd7810_device::DSBB_EA_DE()
 /* 74 f7: 0111 0100 1111 0111 */
 void upd7810_device::DSBB_EA_HL()
 {
-	UINT16 tmp = EA - HL - (PSW & CY);
+	uint16_t tmp = EA - HL - (PSW & CY);
 	ZHC_SUB( tmp, EA, (PSW & CY) );
 	EA = tmp;
 }
@@ -7842,7 +7842,7 @@ void upd7810_device::DSBB_EA_HL()
 void upd7810_device::EQAW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp;
+	uint8_t tmp;
 
 	RDOPARG( ea.b.l );
 	tmp = A - RM( ea.d );
@@ -7853,7 +7853,7 @@ void upd7810_device::EQAW_wa()
 /* 74 fd: 0111 0100 1111 1101 */
 void upd7810_device::DEQ_EA_BC()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - BC;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7863,7 +7863,7 @@ void upd7810_device::DEQ_EA_BC()
 /* 74 fe: 0111 0100 1111 1110 */
 void upd7810_device::DEQ_EA_DE()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - DE;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7873,7 +7873,7 @@ void upd7810_device::DEQ_EA_DE()
 /* 74 ff: 0111 0100 1111 1111 */
 void upd7810_device::DEQ_EA_HL()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	tmp = EA - HL;
 	ZHC_SUB( tmp, EA, 0 );
@@ -7922,7 +7922,7 @@ void upd7810_device::LXI_S_w()
 void upd7810_device::ANIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 m, imm;
+	uint8_t m, imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -7986,7 +7986,7 @@ void upd7810_device::MOV_A_L()
 /* 10: 0001 0000 */
 void upd7810_device::EXA()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = EA; EA = EA2; EA2 = tmp;
 	tmp = VA; VA = VA2; VA2 = tmp;
 }
@@ -7994,7 +7994,7 @@ void upd7810_device::EXA()
 /* 11: 0001 0001 */
 void upd7810_device::EXX()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = BC; BC = BC2; BC2 = tmp;
 	tmp = DE; DE = DE2; DE2 = tmp;
 	tmp = HL; HL = HL2; HL2 = tmp;
@@ -8003,7 +8003,7 @@ void upd7810_device::EXX()
 /* 48 AD (7807 only) */
 void upd7810_device::EXR()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = BC; BC = BC2; BC2 = tmp;
 	tmp = DE; DE = DE2; DE2 = tmp;
 	tmp = HL; HL = HL2; HL2 = tmp;
@@ -8034,7 +8034,7 @@ void upd7810_device::LXI_B_w()
 void upd7810_device::ORIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 m, imm;
+	uint8_t m, imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8102,7 +8102,7 @@ void upd7810_device::MOV_L_A()
 void upd7810_device::INRW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp, m;
+	uint8_t tmp, m;
 
 	RDOPARG( ea.b.l );
 	m = RM( ea.d );
@@ -8141,8 +8141,8 @@ void upd7810_device::LXI_D_w()
 void upd7810_device::GTIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 m, imm;
-	UINT16 tmp;
+	uint8_t m, imm;
+	uint16_t tmp;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8208,7 +8208,7 @@ void upd7810_device::LDAX_Hm()
 void upd7810_device::DCRW_wa()
 {
 	PAIR ea = m_va;
-	UINT8 tmp, m;
+	uint8_t tmp, m;
 
 	RDOPARG( ea.b.l );
 	m = RM( ea.d );
@@ -8262,7 +8262,7 @@ void upd7810_device::LXI_H_w()
 void upd7810_device::LTIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 tmp, m, imm;
+	uint8_t tmp, m, imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8344,7 +8344,7 @@ void upd7810_device::CALL_w()
 /* 41: 0100 0001 */
 void upd7810_device::INR_A()
 {
-	UINT8 tmp = A + 1;
+	uint8_t tmp = A + 1;
 	ZHC_ADD( tmp, A, 0 );
 	A = tmp;
 	SKIP_CY;
@@ -8353,7 +8353,7 @@ void upd7810_device::INR_A()
 /* 42: 0100 0010 */
 void upd7810_device::INR_B()
 {
-	UINT8 tmp = B + 1;
+	uint8_t tmp = B + 1;
 	ZHC_ADD( tmp, B, 0 );
 	B = tmp;
 	SKIP_CY;
@@ -8362,7 +8362,7 @@ void upd7810_device::INR_B()
 /* 43: 0100 0011 */
 void upd7810_device::INR_C()
 {
-	UINT8 tmp = C + 1;
+	uint8_t tmp = C + 1;
 	ZHC_ADD( tmp, C, 0 );
 	C = tmp;
 	SKIP_CY;
@@ -8379,7 +8379,7 @@ void upd7810_device::LXI_EA_s()
 void upd7810_device::ONIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8406,7 +8406,7 @@ void upd7810_device::PRE_48()
 /* 49: 0100 1001 xxxx xxxx */
 void upd7810_device::MVIX_BC_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WM( BC, imm );
 }
@@ -8414,7 +8414,7 @@ void upd7810_device::MVIX_BC_xx()
 /* 4a: 0100 1010 xxxx xxxx */
 void upd7810_device::MVIX_DE_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WM( DE, imm );
 }
@@ -8422,7 +8422,7 @@ void upd7810_device::MVIX_DE_xx()
 /* 4b: 0100 1011 xxxx xxxx */
 void upd7810_device::MVIX_HL_xx()
 {
-	UINT8 imm;
+	uint8_t imm;
 	RDOPARG( imm );
 	WM( HL, imm );
 }
@@ -8448,7 +8448,7 @@ void upd7810_device::PRE_4D()
 /* 4e: 0100 111d dddd dddd */
 void upd7810_device::JRE()
 {
-	UINT8 offs;
+	uint8_t offs;
 	RDOPARG( offs );
 	if (OP & 0x01)
 		PC -= 256 - offs;
@@ -8459,14 +8459,14 @@ void upd7810_device::JRE()
 /* 50: 0101 0000 */
 void upd7810_device::EXH()
 {
-	UINT16 tmp;
+	uint16_t tmp;
 	tmp = HL; HL = HL2; HL2 = tmp;
 }
 
 /* 51: 0101 0001 */
 void upd7810_device::DCR_A()
 {
-	UINT8 tmp = A - 1;
+	uint8_t tmp = A - 1;
 	ZHC_SUB( tmp, A, 0 );
 	A = tmp;
 	SKIP_CY;
@@ -8475,7 +8475,7 @@ void upd7810_device::DCR_A()
 /* 52: 0101 0010 */
 void upd7810_device::DCR_B()
 {
-	UINT8 tmp = B - 1;
+	uint8_t tmp = B - 1;
 	ZHC_SUB( tmp, B, 0 );
 	B = tmp;
 	SKIP_CY;
@@ -8484,7 +8484,7 @@ void upd7810_device::DCR_B()
 /* 53: 0101 0011 */
 void upd7810_device::DCR_C()
 {
-	UINT8 tmp = C - 1;
+	uint8_t tmp = C - 1;
 	ZHC_SUB( tmp, C, 0 );
 	C = tmp;
 	SKIP_CY;
@@ -8506,7 +8506,7 @@ void upd7810_device::JMP_w()
 void upd7810_device::OFFIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8612,7 +8612,7 @@ void upd7810_device::BIT_7_wa()
 /* 5d: 0101 1111 bbbb bbbb (7807 only) */
 void upd7810_device::SKN_bit()
 {
-	UINT8 imm;
+	uint8_t imm;
 	int val;
 
 	RDOPARG( imm );
@@ -8665,7 +8665,7 @@ void upd7810_device::SKN_bit()
 /* 58: 0101 1000 bbbb bbbb (7807 only) */
 void upd7810_device::SETB()
 {
-	UINT8 imm;
+	uint8_t imm;
 	int bit;
 
 	RDOPARG( imm );
@@ -8715,7 +8715,7 @@ void upd7810_device::SETB()
 /* 5b: 0101 1011 bbbb bbbb (7807 only) */
 void upd7810_device::CLR()
 {
-	UINT8 imm;
+	uint8_t imm;
 	int bit;
 
 	RDOPARG( imm );
@@ -8765,7 +8765,7 @@ void upd7810_device::CLR()
 /* 5d: 0101 1111 bbbb bbbb (7807 only) */
 void upd7810_device::SK_bit()
 {
-	UINT8 imm;
+	uint8_t imm;
 	int val;
 
 	RDOPARG( imm );
@@ -8827,7 +8827,7 @@ void upd7810_device::PRE_60()
 /* 61: 0110 0001 */
 void upd7810_device::DAA()
 {
-	UINT8 l = A & 0x0f, h = A >> 4, tmp, adj = 0x00, old_cy = PSW & CY;
+	uint8_t l = A & 0x0f, h = A >> 4, tmp, adj = 0x00, old_cy = PSW & CY;
 
 	if (0 == (PSW & HC))
 	{
@@ -8892,7 +8892,7 @@ void upd7810_device::PRE_64()
 void upd7810_device::NEIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 tmp, m, imm;
+	uint8_t tmp, m, imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -8979,7 +8979,7 @@ void upd7810_device::PRE_70()
 void upd7810_device::MVIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 imm;
+	uint8_t imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -9013,7 +9013,7 @@ void upd7810_device::PRE_74()
 void upd7810_device::EQIW_wa_xx()
 {
 	PAIR ea = m_va;
-	UINT8 tmp, m, imm;
+	uint8_t tmp, m, imm;
 
 	RDOPARG( ea.b.l );
 	RDOPARG( imm );
@@ -9147,7 +9147,7 @@ void upd7810_device::EI()
 /* ab: 1010 1011 dddd dddd */
 void upd7810_device::LDAX_D_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += DE;
 	A = RM( ea );
@@ -9156,7 +9156,7 @@ void upd7810_device::LDAX_D_xx()
 /* ac: 1010 1100 */
 void upd7810_device::LDAX_H_A()
 {
-	UINT16 ea;
+	uint16_t ea;
 	ea = HL + A;
 	A = RM( ea );
 }
@@ -9164,7 +9164,7 @@ void upd7810_device::LDAX_H_A()
 /* ad: 1010 1101 */
 void upd7810_device::LDAX_H_B()
 {
-	UINT16 ea;
+	uint16_t ea;
 	ea = HL + B;
 	A = RM( ea );
 }
@@ -9172,7 +9172,7 @@ void upd7810_device::LDAX_H_B()
 /* ae: 1010 1110 */
 void upd7810_device::LDAX_H_EA()
 {
-	UINT16 ea;
+	uint16_t ea;
 	ea = HL + EA;
 	A = RM( ea );
 }
@@ -9180,7 +9180,7 @@ void upd7810_device::LDAX_H_EA()
 /* af: 1010 1111 dddd dddd */
 void upd7810_device::LDAX_H_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += HL;
 	A = RM( ea );
@@ -9277,7 +9277,7 @@ void upd7810_device::DI()
 /* bb: 1011 1011 dddd dddd */
 void upd7810_device::STAX_D_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG(ea);
 	ea += DE;
 	WM( ea, A );
@@ -9286,7 +9286,7 @@ void upd7810_device::STAX_D_xx()
 /* bc: 1011 1100 */
 void upd7810_device::STAX_H_A()
 {
-	UINT16 ea = A;
+	uint16_t ea = A;
 	ea += HL;
 	WM( ea, A );
 }
@@ -9294,7 +9294,7 @@ void upd7810_device::STAX_H_A()
 /* bd: 1011 1101 */
 void upd7810_device::STAX_H_B()
 {
-	UINT16 ea = B;
+	uint16_t ea = B;
 	ea += HL;
 	WM( ea, A );
 }
@@ -9302,7 +9302,7 @@ void upd7810_device::STAX_H_B()
 /* be: 1011 1110 */
 void upd7810_device::STAX_H_EA()
 {
-	UINT16 ea = EA;
+	uint16_t ea = EA;
 	ea += HL;
 	WM( ea, A );
 }
@@ -9310,7 +9310,7 @@ void upd7810_device::STAX_H_EA()
 /* bf: 1011 1111 dddd dddd */
 void upd7810_device::STAX_H_xx()
 {
-	UINT16 ea;
+	uint16_t ea;
 	RDOPARG( ea );
 	ea += HL;
 	WM( ea, A );
@@ -9319,7 +9319,7 @@ void upd7810_device::STAX_H_xx()
 /* c0: 11dd dddd */
 void upd7810_device::JR()
 {
-	INT8 offs = (INT8)(OP << 2) >> 2;
+	int8_t offs = (int8_t)(OP << 2) >> 2;
 	PC += offs;
 }
 
@@ -9348,56 +9348,56 @@ void upd7810_device::CALT_7801()
 /* DCR(W) and INR(W) instructions do not modify the CY register on at least 78c05 and 78c06 */
 void upd7810_device::DCR_A_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	DCR_A();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::DCR_B_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	DCR_B();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::DCR_C_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	DCR_C();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::DCRW_wa_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	DCRW_wa();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::INR_A_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	INR_A();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::INR_B_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	INR_B();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::INR_C_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	INR_C();
 	PSW = ( PSW & ~CY ) | old_CY;
 }
 
 void upd7810_device::INRW_wa_7801()
 {
-	UINT32 old_CY = PSW & CY;
+	uint32_t old_CY = PSW & CY;
 	INRW_wa();
 	PSW = ( PSW & ~CY ) | old_CY;
 }

@@ -28,16 +28,16 @@ static void extend_palette(palette_device &palette) {
 	for( i = 0; i < 128; i ++ )
 	{
 		rgb_t   new_rgb = palette.pen_color( i );
-		UINT8   new_r =  new_rgb .r();
-		UINT8   new_g =  new_rgb .g();
-		UINT8   new_b =  new_rgb .b();
+		uint8_t   new_r =  new_rgb .r();
+		uint8_t   new_g =  new_rgb .g();
+		uint8_t   new_b =  new_rgb .b();
 
 		for ( j = 0; j < 128; j++ )
 		{
 			rgb_t   old_rgb = palette.pen_color( j );
-			UINT8   old_r =  old_rgb .r();
-			UINT8   old_g =  old_rgb .g();
-			UINT8   old_b =  old_rgb .b();
+			uint8_t   old_r =  old_rgb .r();
+			uint8_t   old_g =  old_rgb .g();
+			uint8_t   old_b =  old_rgb .b();
 
 			palette.set_pen_color(( ( i + 1 ) << 7 ) | j,
 				( new_r + old_r ) / 2,
@@ -284,9 +284,9 @@ Phase Shift 26.2
 			if (B > 1) B = 1;
 
 			palette.set_pen_color(8 * i + j,
-				(UINT8) (255 * R + 0.5),
-				(UINT8) (255 * G + 0.5),
-				(UINT8) (255 * B + 0.5));
+				(uint8_t) (255 * R + 0.5),
+				(uint8_t) (255 * G + 0.5),
+				(uint8_t) (255 * B + 0.5));
 		}
 	}
 	extend_palette( palette );
@@ -343,15 +343,15 @@ PALETTE_INIT_MEMBER(tia_pal_video_device, tia_pal)
 			if (B > 1) B = 1;
 
 			palette.set_pen_color(8 * i + j,
-				(UINT8) (255 * R + 0.5),
-				(UINT8) (255 * G + 0.5),
-				(UINT8) (255 * B + 0.5));
+				(uint8_t) (255 * R + 0.5),
+				(uint8_t) (255 * G + 0.5),
+				(uint8_t) (255 * B + 0.5));
 		}
 	}
 	extend_palette( palette );
 }
 
-tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, UINT32 clock)
+tia_video_device::tia_video_device(const machine_config &mconfig, device_type type, const char *name, const char *shortname, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_video_interface(mconfig, *this),
 		m_read_input_port_cb(*this),
@@ -367,7 +367,7 @@ const device_type TIA_PAL_VIDEO = &device_creator<tia_pal_video_device>;
 //  tia_pal_video_device - constructor
 //-------------------------------------------------
 
-tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tia_pal_video_device::tia_pal_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tia_video_device(mconfig, TIA_PAL_VIDEO, "TIA Video (PAL)", "tia_pal_video", tag, owner, clock)
 {
 }
@@ -394,7 +394,7 @@ const device_type TIA_NTSC_VIDEO = &device_creator<tia_ntsc_video_device>;
 //  tia_ntsc_video_device - constructor
 //-------------------------------------------------
 
-tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tia_ntsc_video_device::tia_ntsc_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tia_video_device(mconfig, TIA_NTSC_VIDEO, "TIA Video (NTSC)", "tia_ntsc_video", tag, owner, clock)
 {
 }
@@ -441,7 +441,7 @@ void tia_video_device::device_start()
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 tia_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tia_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	screen_height = screen.height();
 	copybitmap(bitmap, *helper[2], 0, 0, 0, 0, cliprect);
@@ -449,8 +449,8 @@ UINT32 tia_video_device::screen_update(screen_device &screen, bitmap_ind16 &bitm
 }
 
 
-void tia_video_device::draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gfx *gfx,
-	UINT8 GRP, UINT8 COLUP, UINT8 REFP)
+void tia_video_device::draw_sprite_helper(uint8_t* p, uint8_t *col, struct player_gfx *gfx,
+	uint8_t GRP, uint8_t COLUP, uint8_t REFP)
 {
 	int i;
 	int j;
@@ -482,8 +482,8 @@ void tia_video_device::draw_sprite_helper(UINT8* p, UINT8 *col, struct player_gf
 }
 
 
-void tia_video_device::draw_missile_helper(UINT8* p, UINT8* col, int horz, int skipdelay, int latch, int start,
-	UINT8 RESMP, UINT8 ENAM, UINT8 NUSIZ, UINT8 COLUM)
+void tia_video_device::draw_missile_helper(uint8_t* p, uint8_t* col, int horz, int skipdelay, int latch, int start,
+	uint8_t RESMP, uint8_t ENAM, uint8_t NUSIZ, uint8_t COLUM)
 {
 	int num = nusiz[NUSIZ & 7][0];
 	int skp = nusiz[NUSIZ & 7][2];
@@ -546,10 +546,10 @@ void tia_video_device::draw_missile_helper(UINT8* p, UINT8* col, int horz, int s
 }
 
 
-void tia_video_device::draw_playfield_helper(UINT8* p, UINT8* col, int horz,
-	UINT8 COLU, UINT8 REFPF)
+void tia_video_device::draw_playfield_helper(uint8_t* p, uint8_t* col, int horz,
+	uint8_t COLU, uint8_t REFPF)
 {
-	UINT32 PF =
+	uint32_t PF =
 		(BITSWAP8(PF0, 0, 1, 2, 3, 4, 5, 6, 7) << 0x10) |
 		(BITSWAP8(PF1, 7, 6, 5, 4, 3, 2, 1, 0) << 0x08) |
 		(BITSWAP8(PF2, 0, 1, 2, 3, 4, 5, 6, 7) << 0x00);
@@ -559,7 +559,7 @@ void tia_video_device::draw_playfield_helper(UINT8* p, UINT8* col, int horz,
 
 	if (REFPF)
 	{
-		UINT32 swap = 0;
+		uint32_t swap = 0;
 
 		for (i = 0; i < 20; i++)
 		{
@@ -592,7 +592,7 @@ void tia_video_device::draw_playfield_helper(UINT8* p, UINT8* col, int horz,
 }
 
 
-void tia_video_device::draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 ENAB)
+void tia_video_device::draw_ball_helper(uint8_t* p, uint8_t* col, int horz, uint8_t ENAB)
 {
 	int width = 1 << ((CTRLPF >> 4) & 3);
 
@@ -611,37 +611,37 @@ void tia_video_device::draw_ball_helper(UINT8* p, UINT8* col, int horz, UINT8 EN
 }
 
 
-void tia_video_device::drawS0(UINT8* p, UINT8* col)
+void tia_video_device::drawS0(uint8_t* p, uint8_t* col)
 {
 	draw_sprite_helper(p, col, &p0gfx, (VDELP0 & 1) ? prevGRP0 : GRP0, COLUP0, REFP0);
 }
 
 
-void tia_video_device::drawS1(UINT8* p, UINT8* col)
+void tia_video_device::drawS1(uint8_t* p, uint8_t* col)
 {
 	draw_sprite_helper(p, col, &p1gfx, (VDELP1 & 1) ? prevGRP1 : GRP1, COLUP1, REFP1);
 }
 
 
-void tia_video_device::drawM0(UINT8* p, UINT8* col)
+void tia_video_device::drawM0(uint8_t* p, uint8_t* col)
 {
 	draw_missile_helper(p, col, horzM0, skipM0delay, HMM0_latch, startM0, RESMP0, ENAM0, NUSIZ0, COLUP0);
 }
 
 
-void tia_video_device::drawM1(UINT8* p, UINT8* col)
+void tia_video_device::drawM1(uint8_t* p, uint8_t* col)
 {
 	draw_missile_helper(p, col, horzM1, skipM1delay, HMM1_latch, startM1, RESMP1, ENAM1, NUSIZ1, COLUP1);
 }
 
 
-void tia_video_device::drawBL(UINT8* p, UINT8* col)
+void tia_video_device::drawBL(uint8_t* p, uint8_t* col)
 {
 	draw_ball_helper(p, col, horzBL, (VDELBL & 1) ? prevENABL : ENABL);
 }
 
 
-void tia_video_device::drawPF(UINT8* p, UINT8 *col)
+void tia_video_device::drawPF(uint8_t* p, uint8_t *col)
 {
 	draw_playfield_helper(p, col, 0,
 		((CTRLPF & 6) == 2) ? COLUP0 : COLUPF, 0);
@@ -651,7 +651,7 @@ void tia_video_device::drawPF(UINT8* p, UINT8 *col)
 }
 
 
-int tia_video_device::collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
+int tia_video_device::collision_check(uint8_t* p1, uint8_t* p2, int x1, int x2)
 {
 	int i;
 
@@ -732,14 +732,14 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 	int x;
 	int y;
 
-	UINT8 linePF[160];
-	UINT8 lineP0[160];
-	UINT8 lineP1[160];
-	UINT8 lineM0[160];
-	UINT8 lineM1[160];
-	UINT8 lineBL[160];
+	uint8_t linePF[160];
+	uint8_t lineP0[160];
+	uint8_t lineP1[160];
+	uint8_t lineM0[160];
+	uint8_t lineM1[160];
+	uint8_t lineBL[160];
 
-	UINT8 temp[160];
+	uint8_t temp[160];
 
 	if (prev_y >= next_y && prev_x >= next_x)
 	{
@@ -783,7 +783,7 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 
 	for (y = prev_y; y <= next_y; y++)
 	{
-		UINT16* p;
+		uint16_t* p;
 
 		int x1 = prev_x;
 		int x2 = next_x;
@@ -990,9 +990,9 @@ void tia_video_device::update_bitmap(int next_x, int next_y)
 		if ( x2 == 160 && y % screen_height == (screen_height - 1) ) {
 			int t_y;
 			for ( t_y = 0; t_y < helper[2]->height(); t_y++ ) {
-				UINT16* l0 = &helper[current_bitmap]->pix16(t_y);
-				UINT16* l1 = &helper[1 - current_bitmap]->pix16(t_y);
-				UINT16* l2 = &helper[2]->pix16(t_y);
+				uint16_t* l0 = &helper[current_bitmap]->pix16(t_y);
+				uint16_t* l1 = &helper[1 - current_bitmap]->pix16(t_y);
+				uint16_t* l2 = &helper[2]->pix16(t_y);
 				int t_x;
 				for( t_x = 0; t_x < helper[2]->width(); t_x++ ) {
 					if ( l0[t_x] != l1[t_x] ) {
@@ -1556,10 +1556,10 @@ WRITE8_MEMBER( tia_video_device::CXCLR_w )
 #define RESXX_APPLY_PREVIOUS_HMOVE(HORZ,MOTION)                                             \
 	if ( HMOVE_started_previous != HMOVE_INACTIVE )                                         \
 	{                                                                                       \
-		UINT8   motclk = ( MOTION ^ 0x80 ) >> 4;                                            \
+		uint8_t   motclk = ( MOTION ^ 0x80 ) >> 4;                                            \
 		if ( curr_x <= HMOVE_started_previous - 228 + 5 + motclk * 4 )                      \
 		{                                                                                   \
-			UINT8   motclk_passed = ( curr_x - ( HMOVE_started_previous - 228 + 6 ) ) / 4;  \
+			uint8_t   motclk_passed = ( curr_x - ( HMOVE_started_previous - 228 + 6 ) ) / 4;  \
 			HORZ -= ( motclk - motclk_passed );                                             \
 		}                                                                                   \
 	}
@@ -1808,8 +1808,8 @@ WRITE8_MEMBER( tia_video_device::GRP1_w )
 
 READ8_MEMBER( tia_video_device::INPT_r )
 {
-	UINT64 elapsed = machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start;
-	UINT16 input = TIA_INPUT_PORT_ALWAYS_ON;
+	uint64_t elapsed = machine().device<cpu_device>("maincpu")->total_cycles() - paddle_start;
+	uint16_t input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( !m_read_input_port_cb.isnull() )
 	{
 		input = m_read_input_port_cb(offset & 3, 0xFFFF);
@@ -1820,7 +1820,7 @@ READ8_MEMBER( tia_video_device::INPT_r )
 	if ( input == TIA_INPUT_PORT_ALWAYS_OFF )
 		return 0x00;
 
-	UINT16 paddle_cycles = input * 76;
+	uint16_t paddle_cycles = input * 76;
 	return elapsed > paddle_cycles ? 0x80 : 0x00;
 }
 
@@ -1832,7 +1832,7 @@ READ8_MEMBER( tia_video_device::read )
 		 that we will call that, otherwise we will use the lower
 		 bit of the offset.
 	*/
-	UINT8 data = offset & 0x3f;
+	uint8_t data = offset & 0x3f;
 
 	if ( !m_databus_contents_cb.isnull() )
 	{

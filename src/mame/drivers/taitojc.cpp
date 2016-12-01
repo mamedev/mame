@@ -754,7 +754,7 @@ WRITE8_MEMBER(taitojc_state::hc11_output_w)
 
 READ8_MEMBER(taitojc_state::hc11_analog_r)
 {
-	return read_safe(m_analog_ports[offset], 0);
+	return m_analog_ports[offset].read_safe(0);
 }
 
 
@@ -843,7 +843,7 @@ READ16_MEMBER(taitojc_state::dsp_math_unk_r)
 READ16_MEMBER(taitojc_state::dsp_rom_r)
 {
 	assert (m_dsp_rom_pos < 0x800000); // never happens
-	return ((UINT16*)m_gfx2->base())[m_dsp_rom_pos++];
+	return ((uint16_t*)m_gfx2->base())[m_dsp_rom_pos++];
 }
 
 WRITE16_MEMBER(taitojc_state::dsp_rom_w)

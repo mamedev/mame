@@ -40,8 +40,14 @@ includedirs {
 	ext_includedir("lua"),
 	ext_includedir("zlib"),
 	ext_includedir("flac"),
+	MAME_DIR .. "3rdparty/asio/include",
 }
 
+configuration { "vs*" }
+	buildoptions {
+		"/bigobj",
+	}
+configuration { }
 if (_OPTIONS["targetos"] == "windows") then
 	defines {
 		"UI_WINDOWS",
@@ -71,6 +77,8 @@ files {
 	MAME_DIR .. "src/frontend/mame/mame.h",
 	MAME_DIR .. "src/frontend/mame/mameopts.cpp",
 	MAME_DIR .. "src/frontend/mame/mameopts.h",
+	MAME_DIR .. "src/frontend/mame/media_ident.cpp",
+	MAME_DIR .. "src/frontend/mame/media_ident.h",
 	MAME_DIR .. "src/frontend/mame/pluginopts.cpp",
 	MAME_DIR .. "src/frontend/mame/pluginopts.h",
 	MAME_DIR .. "src/frontend/mame/ui/ui.cpp",
@@ -130,8 +138,6 @@ files {
 	MAME_DIR .. "src/frontend/mame/ui/custmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/custui.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/custui.h",
-	MAME_DIR .. "src/frontend/mame/ui/datfile.cpp",
-	MAME_DIR .. "src/frontend/mame/ui/datfile.h",
 	MAME_DIR .. "src/frontend/mame/ui/datmenu.cpp",
 	MAME_DIR .. "src/frontend/mame/ui/datmenu.h",
 	MAME_DIR .. "src/frontend/mame/ui/defimg.ipp",

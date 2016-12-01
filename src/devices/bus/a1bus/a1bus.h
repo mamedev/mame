@@ -49,8 +49,8 @@ class a1bus_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -72,8 +72,8 @@ class a1bus_device : public device_t
 {
 public:
 	// construction/destruction
-	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// inline configuration
 	static void static_set_cputag(device_t &device, const char *tag);
@@ -87,7 +87,7 @@ public:
 	void set_nmi_line(int state);
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, const char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data);
 
 	DECLARE_WRITE_LINE_MEMBER( irq_w );
 	DECLARE_WRITE_LINE_MEMBER( nmi_w );
@@ -132,7 +132,7 @@ public:
 	void lower_slot_nmi() { m_a1bus->set_nmi_line(CLEAR_LINE); }
 
 	void install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler);
-	void install_bank(offs_t start, offs_t end, char *tag, UINT8 *data);
+	void install_bank(offs_t start, offs_t end, char *tag, uint8_t *data);
 
 	// inline configuration
 	static void static_set_a1bus_tag(device_t &device, const char *tag, const char *slottag);

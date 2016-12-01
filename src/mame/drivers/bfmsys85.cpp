@@ -100,9 +100,9 @@ public:
 	int m_mux_output_strobe;
 	int m_mux_input_strobe;
 	int m_mux_input;
-	UINT8 m_Inputs[64];
-	UINT8 m_codec_data[256];
-	UINT8 m_sys85_data_line_t;
+	uint8_t m_Inputs[64];
+	uint8_t m_codec_data[256];
+	uint8_t m_sys85_data_line_t;
 	DECLARE_WRITE8_MEMBER(watchdog_w);
 	DECLARE_READ8_MEMBER(irqlatch_r);
 	DECLARE_WRITE8_MEMBER(reel12_w);
@@ -211,8 +211,8 @@ WRITE8_MEMBER(bfmsys85_state::reel12_w)
 	m_reel0->update((data>>4)&0x0f);
 	m_reel1->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel1", m_reel0);
-	awp_draw_reel(machine(),"reel2", m_reel1);
+	awp_draw_reel(machine(),"reel1", *m_reel0);
+	awp_draw_reel(machine(),"reel2", *m_reel1);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -222,8 +222,8 @@ WRITE8_MEMBER(bfmsys85_state::reel34_w)
 	m_reel2->update((data>>4)&0x0f);
 	m_reel3->update( data    &0x0f);
 
-	awp_draw_reel(machine(),"reel3", m_reel2);
-	awp_draw_reel(machine(),"reel4", m_reel3);
+	awp_draw_reel(machine(),"reel3", *m_reel2);
+	awp_draw_reel(machine(),"reel4", *m_reel3);
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -672,7 +672,7 @@ int bfmsys85_state::b85_find_project_string( )
 {
 	// search for the project string to find the title (usually just at ff00)
 	char title_string[7][32] = { "PROJECT NUMBER", "PROJECT PR", "PROJECT ", "CASH ON THE NILE 2", "PR6121", "CHINA TOWN\x0d\x0a", "PROJECTNUMBER" };
-	UINT8 *src = memregion( "maincpu" )->base();
+	uint8_t *src = memregion( "maincpu" )->base();
 	int size = memregion( "maincpu" )->bytes();
 
 	for (auto & elem : title_string)
@@ -685,8 +685,8 @@ int bfmsys85_state::b85_find_project_string( )
 			int found = 1;
 			for (j=0;j<strlength;j+=1)
 			{
-				UINT8 rom = src[(i+j)];
-				UINT8 chr = elem[j];
+				uint8_t rom = src[(i+j)];
+				uint8_t chr = elem[j];
 
 				if (rom != chr)
 				{
@@ -704,7 +704,7 @@ int bfmsys85_state::b85_find_project_string( )
 
 				while (!end)
 				{
-					UINT8 rom;
+					uint8_t rom;
 					int addr;
 
 					addr = (i+count);

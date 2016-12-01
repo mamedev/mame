@@ -88,7 +88,7 @@ static const unsigned char intv_colors[] =
 PALETTE_INIT_MEMBER(intv_state, intv)
 {
 	int k = 0;
-	UINT8 r, g, b;
+	uint8_t r, g, b;
 	/* Two copies of everything (why?) */
 
 	for (int i = 0; i < 16; i++)
@@ -430,7 +430,7 @@ void intv_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		intv_btb_fill(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in intv_state::device_timer");
+		assert_always(false, "Unknown id in intv_state::device_timer");
 	}
 }
 

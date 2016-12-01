@@ -523,7 +523,7 @@ GFXDECODE_END
 WRITE8_MEMBER(dassault_state::sound_bankswitch_w)
 {
 	/* the second OKIM6295 ROM is bank switched */
-	m_oki2->set_bank_base((data & 1) * 0x40000);
+	m_oki2->set_rom_bank(data & 1);
 }
 
 /**********************************************************************************/
@@ -1048,9 +1048,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dassault_state,dassault)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx
@@ -1063,9 +1063,9 @@ DRIVER_INIT_MEMBER(dassault_state,dassault)
 
 DRIVER_INIT_MEMBER(dassault_state,thndzone)
 {
-	const UINT8 *src = memregion("gfx1")->base();
-	UINT8 *dst = memregion("gfx2")->base();
-	dynamic_buffer tmp(0x80000);
+	const uint8_t *src = memregion("gfx1")->base();
+	uint8_t *dst = memregion("gfx2")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Playfield 4 also has access to the char graphics, make things easier
 	by just copying the chars to both banks (if I just used a different gfx

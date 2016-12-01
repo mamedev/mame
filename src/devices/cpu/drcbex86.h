@@ -29,18 +29,18 @@ namespace drc {
 
 class drcbe_x86 : public drcbe_interface
 {
-	typedef UINT32 (*x86_entry_point_func)(x86code *entry);
+	typedef uint32_t (*x86_entry_point_func)(x86code *entry);
 
 public:
 	// construction/destruction
-	drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+	drcbe_x86(drcuml_state &drcuml, device_t &device, drc_cache &cache, uint32_t flags, int modes, int addrbits, int ignorebits);
 	virtual ~drcbe_x86();
 
 	// required overrides
 	virtual void reset() override;
 	virtual int execute(uml::code_handle &entry) override;
-	virtual void generate(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst) override;
-	virtual bool hash_exists(UINT32 mode, UINT32 pc) override;
+	virtual void generate(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst) override;
+	virtual bool hash_exists(uint32_t mode, uint32_t pc) override;
 	virtual void get_info(drcbe_info &info) override;
 	virtual bool logging() const override { return m_log != nullptr; }
 
@@ -62,13 +62,13 @@ private:
 		};
 
 		// represents the value of a parameter
-		typedef UINT64 be_parameter_value;
+		typedef uint64_t be_parameter_value;
 
 		// construction
 		be_parameter() : m_type(PTYPE_NONE), m_value(0) { }
 		be_parameter(const be_parameter &param) : m_type(param.m_type), m_value(param.m_value) { }
-		be_parameter(UINT64 val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
-		be_parameter(drcbe_x86 &drcbe, const uml::parameter &param, UINT32 allowed);
+		be_parameter(uint64_t val) : m_type(PTYPE_IMMEDIATE), m_value(val) { }
+		be_parameter(drcbe_x86 &drcbe, const uml::parameter &param, uint32_t allowed);
 
 		// creators for types that don't safely default
 		static inline be_parameter make_ireg(int regnum) { assert(regnum >= 0 && regnum < x86emit::REG_MAX); return be_parameter(PTYPE_INT_REGISTER, regnum); }
@@ -83,11 +83,11 @@ private:
 
 		// getters
 		be_parameter_type type() const { return m_type; }
-		UINT64 immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
+		uint64_t immediate() const { assert(m_type == PTYPE_IMMEDIATE); return m_value; }
 		int ireg() const { assert(m_type == PTYPE_INT_REGISTER); assert(m_value < x86emit::REG_MAX); return m_value; }
 		int freg() const { assert(m_type == PTYPE_FLOAT_REGISTER); assert(m_value < x86emit::REG_MAX); return m_value; }
 		int vreg() const { assert(m_type == PTYPE_VECTOR_REGISTER); assert(m_value < x86emit::REG_MAX); return m_value; }
-		void *memory(UINT32 offset = 0) const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value + offset); }
+		void *memory(uint32_t offset = 0) const { assert(m_type == PTYPE_MEMORY); return reinterpret_cast<void *>(m_value + offset); }
 
 		// type queries
 		bool is_immediate() const { return (m_type == PTYPE_IMMEDIATE); }
@@ -97,7 +97,7 @@ private:
 		bool is_memory() const { return (m_type == PTYPE_MEMORY); }
 
 		// other queries
-		bool is_immediate_value(UINT64 value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
+		bool is_immediate_value(uint64_t value) const { return (m_type == PTYPE_IMMEDIATE && m_value == value); }
 
 		// helpers
 		int select_register(int defreg) const;
@@ -118,10 +118,10 @@ private:
 	void emit_combine_z_flags(x86code *&dst);
 	void emit_combine_z_shl_flags(x86code *&dst);
 	void reset_last_upper_lower_reg();
-	void set_last_lower_reg(x86code *&dst, const be_parameter &param, UINT8 reglo);
-	void set_last_upper_reg(x86code *&dst, const be_parameter &param, UINT8 reghi);
-	bool can_skip_lower_load(x86code *&dst, UINT32 *memref, UINT8 reglo);
-	bool can_skip_upper_load(x86code *&dst, UINT32 *memref, UINT8 reghi);
+	void set_last_lower_reg(x86code *&dst, const be_parameter &param, uint8_t reglo);
+	void set_last_upper_reg(x86code *&dst, const be_parameter &param, uint8_t reghi);
+	bool can_skip_lower_load(x86code *&dst, uint32_t *memref, uint8_t reglo);
+	bool can_skip_upper_load(x86code *&dst, uint32_t *memref, uint8_t reghi);
 	void track_resolve_link(x86code *&destptr, const emit_link &linkinfo);
 
 	void fixup_label(void *parameter, drccodeptr labelcodeptr);
@@ -214,82 +214,82 @@ private:
 	void op_icopyf(x86code *&dst, const uml::instruction &inst);
 
 	// 32-bit code emission helpers
-	void emit_mov_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param);
-	void emit_mov_r32_p32_keepflags(x86code *&dst, UINT8 reg, const be_parameter &param);
+	void emit_mov_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param);
+	void emit_mov_r32_p32_keepflags(x86code *&dst, uint8_t reg, const be_parameter &param);
 	void emit_mov_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param);
-	void emit_mov_p32_r32(x86code *&dst, const be_parameter &param, UINT8 reg);
-	void emit_add_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_mov_p32_r32(x86code *&dst, const be_parameter &param, uint8_t reg);
+	void emit_add_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_add_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_adc_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_adc_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_sub_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_sub_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_sbb_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_sbb_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_cmp_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_cmp_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_and_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_test_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_test_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_or_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_or_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_xor_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_xor_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_shl_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_shl_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_shl_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_shr_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_shr_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_shr_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sar_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_sar_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_sar_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_rol_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_rol_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_rol_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_ror_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_ror_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_ror_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcl_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_rcl_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcl_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcr_r32_p32(x86code *&dst, UINT8 reg, const be_parameter &param, const uml::instruction &inst);
+	void emit_rcr_r32_p32(x86code *&dst, uint8_t reg, const be_parameter &param, const uml::instruction &inst);
 	void emit_rcr_m32_p32(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
 
 	// 64-bit code emission helpers
-	void emit_mov_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param);
-	void emit_mov_r64_p64_keepflags(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param);
+	void emit_mov_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param);
+	void emit_mov_r64_p64_keepflags(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param);
 	void emit_mov_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param);
-	void emit_mov_p64_r64(x86code *&dst, const be_parameter &param, UINT8 reglo, UINT8 reghi);
-	void emit_add_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_mov_p64_r64(x86code *&dst, const be_parameter &param, uint8_t reglo, uint8_t reghi);
+	void emit_add_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_add_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_adc_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_adc_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_adc_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sub_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_sub_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_sub_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_sbb_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_sbb_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_sbb_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_cmp_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_and_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_cmp_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_and_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_and_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_test_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_test_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_test_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_or_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_or_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_or_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_xor_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_xor_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 	void emit_xor_m64_p64(x86code *&dst, x86_memref memref, const be_parameter &param, const uml::instruction &inst);
-	void emit_shl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_shr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_sar_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rol_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_ror_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcl_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
-	void emit_rcr_r64_p64(x86code *&dst, UINT8 reglo, UINT8 reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_shl_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_shr_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_sar_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_rol_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_ror_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_rcl_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
+	void emit_rcr_r64_p64(x86code *&dst, uint8_t reglo, uint8_t reghi, const be_parameter &param, const uml::instruction &inst);
 
 	// floating-point code emission helpers
 	void emit_fld_p(x86code *&dst, int size, const be_parameter &param);
 	void emit_fstp_p(x86code *&dst, int size, const be_parameter &param);
 
 	// callback helpers
-	static int dmulu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2, int flags);
-	static int dmuls(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2, int flags);
-	static int ddivu(UINT64 &dstlo, UINT64 &dsthi, UINT64 src1, UINT64 src2);
-	static int ddivs(UINT64 &dstlo, UINT64 &dsthi, INT64 src1, INT64 src2);
+	static int dmulu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2, bool flags);
+	static int dmuls(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2, bool flags);
+	static int ddivu(uint64_t &dstlo, uint64_t &dsthi, uint64_t src1, uint64_t src2);
+	static int ddivs(uint64_t &dstlo, uint64_t &dsthi, int64_t src1, int64_t src2);
 
 	// internal state
 	drc_hash_table          m_hash;                 // hash table state
@@ -305,23 +305,23 @@ private:
 	x86code *               m_save;                 // save handler
 	x86code *               m_restore;              // restore handler
 
-	UINT32 *                m_reglo[x86emit::REG_MAX];// pointer to low part of data for each register
-	UINT32 *                m_reghi[x86emit::REG_MAX];// pointer to high part of data for each register
-	UINT8                   m_last_lower_reg;       // last register we stored a lower from
+	uint32_t *                m_reglo[x86emit::REG_MAX];// pointer to low part of data for each register
+	uint32_t *                m_reghi[x86emit::REG_MAX];// pointer to high part of data for each register
+	uint8_t                   m_last_lower_reg;       // last register we stored a lower from
 	x86code *               m_last_lower_pc;        // PC after instruction where we last stored a lower register
-	UINT32 *                m_last_lower_addr;      // address where we last stored an lower register
-	UINT8                   m_last_upper_reg;       // last register we stored an upper from
+	uint32_t *                m_last_lower_addr;      // address where we last stored an lower register
+	uint8_t                   m_last_upper_reg;       // last register we stored an upper from
 	x86code *               m_last_upper_pc;        // PC after instruction where we last stored an upper register
-	UINT32 *                m_last_upper_addr;      // address where we last stored an upper register
+	uint32_t *                m_last_upper_addr;      // address where we last stored an upper register
 	double                  m_fptemp;               // temporary storage for floating point
 
-	UINT16                  m_fpumode;              // saved FPU mode
-	UINT16                  m_fmodesave;            // temporary location for saving
+	uint16_t                  m_fpumode;              // saved FPU mode
+	uint16_t                  m_fmodesave;            // temporary location for saving
 
 	void *                  m_stacksave;            // saved stack pointer
 	void *                  m_hashstacksave;        // saved stack pointer for hashjmp
-	UINT64                  m_reslo;                // extended low result
-	UINT64                  m_reshi;                // extended high result
+	uint64_t                  m_reslo;                // extended low result
+	uint64_t                  m_reshi;                // extended high result
 
 	drc_label_fixup_delegate m_fixup_label;         // precomputed delegate for fixups
 	drc_oob_delegate        m_fixup_exception;      // precomputed delegate for exception fixups

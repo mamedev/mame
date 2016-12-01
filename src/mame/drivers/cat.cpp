@@ -266,8 +266,8 @@ public:
 	required_device<centronics_device> m_ctx;
 	required_device<output_latch_device> m_ctx_data_out;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_svram;
-	required_shared_ptr<UINT16> m_p_cat_videoram;
+	required_shared_ptr<uint16_t> m_svram;
+	required_shared_ptr<uint16_t> m_p_cat_videoram;
 	required_ioport m_y0;
 	required_ioport m_y1;
 	required_ioport m_y2;
@@ -285,7 +285,7 @@ public:
 	DECLARE_VIDEO_START(cat);
 	DECLARE_DRIVER_INIT(cat);
 
-	UINT32 screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_irq_handler);
 	DECLARE_WRITE_LINE_MEMBER(cat_duart_txa);
@@ -324,14 +324,14 @@ public:
 	   The watchdog counter and the 6ms counter are both incremented
 	   every time the KTOBF pulses.
 	 */
-	UINT16 m_6ms_counter;
-	UINT8 m_wdt_counter;
-	UINT8 m_duart_ktobf_ff;
+	uint16_t m_6ms_counter;
+	uint8_t m_wdt_counter;
+	uint8_t m_duart_ktobf_ff;
 	/* the /ACK line from the centronics printer port goes through a similar
 	   flipflop to the ktobf line as well, so duart IP4 inverts on /ACK rising edge
 	 */
-	UINT8 m_duart_prn_ack_prev_state;
-	UINT8 m_duart_prn_ack_ff;
+	uint8_t m_duart_prn_ack_prev_state;
+	uint8_t m_duart_prn_ack_ff;
 	/* Gate array 2 is in charge of serializing the video for display to the screen;
 	   Gate array 1 is in charge of vblank/hblank timing, and in charge of refreshing
 	   dram and indicating to GA2, using the /LDPS signal, what times the address it is
@@ -340,11 +340,11 @@ public:
 	   GA2 then takes: ((output_bit XNOR video_invert) AND video enable), and serially
 	   bangs the result to the analog display circuitry.
 	 */
-	UINT8 m_video_enable;
-	UINT8 m_video_invert;
-	UINT16 m_pr_cont;
-	UINT8 m_keyboard_line;
-	UINT8 m_floppy_control;
+	uint8_t m_video_enable;
+	uint8_t m_video_invert;
+	uint16_t m_pr_cont;
+	uint8_t m_keyboard_line;
+	uint8_t m_floppy_control;
 
 	//TIMER_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_CALLBACK_MEMBER(counter_6ms_callback);
@@ -358,7 +358,7 @@ protected:
 /*
 DRIVER_INIT_MEMBER( cat_state,cat )
 {
-    UINT8 *svrom = memregion("svrom")->base();
+    uint8_t *svrom = memregion("svrom")->base();
     int i;
     // fill svrom with the correct 2e80 pattern except where svrom1 sits
     // first half
@@ -525,7 +525,7 @@ READ16_MEMBER( cat_state::cat_floppy_status_r )
 // 0x80000a-0x80000b
 READ16_MEMBER( cat_state::cat_keyboard_r )
 {
-	UINT16 retVal = 0;
+	uint16_t retVal = 0;
 	// Read country code
 	if ((m_pr_cont&0xFF00) == 0x0900)
 		retVal = m_dipsw->read();
@@ -887,7 +887,7 @@ void cat_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		counter_6ms_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in cat_state::device_timer");
+		assert_always(false, "Unknown id in cat_state::device_timer");
 	}
 }
 
@@ -932,9 +932,9 @@ VIDEO_START_MEMBER(cat_state,cat)
 {
 }
 
-UINT32 cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cat_state::screen_update_cat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 
 	int addr = 0;

@@ -113,8 +113,8 @@ public:
 
 VIDEO_START_MEMBER(chinagat_state,chinagat)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(chinagat_state::background_scan),this), 16, 16, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(chinagat_state::get_fg_16color_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	m_fg_tilemap->set_transparent_pen(0);
 	m_fg_tilemap->set_scrolldy(-8, -8);
@@ -241,7 +241,7 @@ WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_rom_addr_w )
 WRITE8_MEMBER(chinagat_state::saiyugoub1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
-	UINT8 *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
+	uint8_t *saiyugoub1_adpcm_rom = memregion("adpcm")->base();
 
 	if (data & 0x80)    /* Reset m5205 and disable ADPCM ROM outputs */
 	{
@@ -899,8 +899,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(chinagat_state,chinagat)
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SUB = memregion("sub")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SUB = memregion("sub")->base();
 
 	m_technos_video_hw = 1;
 	m_sprite_irq = M6809_IRQ_LINE;

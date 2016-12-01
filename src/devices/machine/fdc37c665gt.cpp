@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "fdc37c665gt.h"
 
-fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FDC37C665GT, "FDC37C665GT", tag, owner, clock, "fdc37c665gt", __FILE__),
 	m_uart1(*this, "uart1"),
 	m_uart2(*this, "uart2")
@@ -11,7 +11,7 @@ fdc37c665gt_device::fdc37c665gt_device(const machine_config &mconfig, const char
 
 READ8_MEMBER(fdc37c665gt_device::read)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ((offset & 0x3f8) == 0x3f8)
 	{

@@ -149,7 +149,7 @@ MACHINE_RESET_MEMBER( ampro_state, ampro )
 
 DRIVER_INIT_MEMBER( ampro_state, ampro )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);

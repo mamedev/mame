@@ -78,15 +78,15 @@ int apollo_is_dn5500(void);
 int apollo_is_dsp3x00(void);
 
 // get the ram configuration byte
-UINT8 apollo_get_ram_config_byte(void);
+uint8_t apollo_get_ram_config_byte(void);
 
 //apollo_get_node_id - get the node id
-UINT32 apollo_get_node_id(void);
+uint32_t apollo_get_node_id(void);
 
 	// should be called by the CPU core before executing each instruction
 int apollo_instruction_hook(m68000_base_device *device, offs_t curpc);
 
-void apollo_set_cache_status_register(device_t *device,UINT8 mask, UINT8 data);
+void apollo_set_cache_status_register(device_t *device,uint8_t mask, uint8_t data);
 
 /*----------- machine/apollo.c -----------*/
 
@@ -129,7 +129,7 @@ public:
 			{ }
 
 	required_device<m68000_base_device> m_maincpu;
-	required_shared_ptr<UINT32> m_messram_ptr;
+	required_shared_ptr<uint32_t> m_messram_ptr;
 
 	required_device<am9517a_device> m_dma8237_1;
 	required_device<am9517a_device> m_dma8237_2;
@@ -249,8 +249,8 @@ public:
 	DECLARE_READ32_MEMBER(apollo_instruction_hook);
 
 private:
-	UINT32 ptm_counter;
-	UINT8 sio_output_data;
+	uint32_t ptm_counter;
+	uint8_t sio_output_data;
 	int m_dma_channel;
 	bool m_cur_eop;
 	emu_timer *m_dn3000_timer;
@@ -302,9 +302,9 @@ INPUT_PORTS_EXTERN(apollo_config);
 #define APOLLO_CSR_CR_FORCE_BAD_PARITY   0x0008
 #define APOLLO_CSR_CR_PARITY_BYTE_MASK   0x00f0
 
-UINT16 apollo_csr_get_control_register(void);
-UINT16 apollo_csr_get_status_register(void);
-void apollo_csr_set_status_register(UINT16 mask, UINT16 data);
+uint16_t apollo_csr_get_control_register(void);
+uint16_t apollo_csr_get_status_register(void);
+void apollo_csr_set_status_register(uint16_t mask, uint16_t data);
 
 /*----------- machine/apollo_sio.c -----------*/
 
@@ -327,7 +327,7 @@ class apollo_sio: public mc68681_device
 {
 public:
 	apollo_sio(const machine_config &mconfig, const char *tag,
-			device_t *owner, UINT32 clock);
+			device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -336,8 +336,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-		UINT8 m_csrb;
-		UINT8 m_ip6;
+		uint8_t m_csrb;
+		uint8_t m_ip6;
 };
 
 extern const device_type APOLLO_SIO;
@@ -353,7 +353,7 @@ class apollo_ni: public device_t, public device_image_interface
 {
 public:
 	// construction/destruction
-	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_ni(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~apollo_ni();
 
 	virtual iodevice_t image_type() const override { return IO_ROM; }
@@ -363,6 +363,7 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
+	virtual bool support_command_line_image_creation() const override { return 1; }
 	virtual const char *file_extensions() const override { return "ani,bin"; }
 
 	DECLARE_WRITE16_MEMBER(write);
@@ -382,8 +383,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	void set_node_id(UINT32 node_id);
-	UINT32 m_node_id;
+	void set_node_id(uint32_t node_id);
+	uint32_t m_node_id;
 };
 
 // device type definition
@@ -396,11 +397,11 @@ extern const device_type APOLLO_NI;
 class apollo_graphics_15i : public device_t
 {
 public:
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, device_type type, const char *name, const char *shortname, const char *source);
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	apollo_graphics_15i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, device_type type, const char *name, const char *shortname, const char *source);
 	~apollo_graphics_15i();
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	// monochrome control
 	DECLARE_READ8_MEMBER( apollo_mcr_r );
@@ -433,100 +434,100 @@ protected:
 	class lut_fifo;
 	class bt458;
 
-	const char *cr_text(offs_t offset, UINT8 data, UINT8 rw);
+	const char *cr_text(offs_t offset, uint8_t data, uint8_t rw);
 
 	void increment_h_clock();
 	void increment_v_clock();
 	void increment_p_clock();
 
 	void log_cr1(const char * text);
-	void set_cr1(UINT8 data);
-	void set_cr3a(UINT8 data);
-	void set_cr3b(UINT8 data);
-	void set_lut_cr(UINT8 data);
+	void set_cr1(uint8_t data);
+	void set_cr3a(uint8_t data);
+	void set_cr3b(uint8_t data);
+	void set_lut_cr(uint8_t data);
 
 	void register_vblank_callback();
 
-	UINT32 set_msb0(UINT32 value, UINT8 data)
+	uint32_t set_msb0(uint32_t value, uint8_t data)
 	{
 		return (value & 0xffffff00) | data;
 	}
-	UINT32 set_lsb0(UINT32 value, UINT8 data)
+	uint32_t set_lsb0(uint32_t value, uint8_t data)
 	{
 		return (value & 0xffff00ff) | (data << 8);
 	}
-	UINT32 set_msb1(UINT32 value, UINT8 data)
+	uint32_t set_msb1(uint32_t value, uint8_t data)
 	{
 		return (value & 0xff00ffff) | (data << 16);
 	}
-	UINT32 set_lsb1(UINT32 value, UINT8 data)
+	uint32_t set_lsb1(uint32_t value, uint8_t data)
 	{
 		return (value & 0x00ffffff) | (data << 24);
 	}
-	UINT8 get_msb1(UINT32 value)
+	uint8_t get_msb1(uint32_t value)
 	{
 		return (value >> 16) & 0xff;
 	}
-	UINT8 get_lsb1(UINT32 value)
+	uint8_t get_lsb1(uint32_t value)
 	{
 		return (value >> 24) & 0xff;
 	}
 
 	void set_status_rmw();
-	UINT16 rop(UINT16 dest_data, UINT16 src_data, UINT8 plane);
-	void set_source_data(UINT32 offset);
-	UINT32 get_source_data(UINT8 plane);
-	void blt(UINT32 dest_addr, UINT16 mem_mask);
+	uint16_t rop(uint16_t dest_data, uint16_t src_data, uint8_t plane);
+	void set_source_data(uint32_t offset);
+	uint32_t get_source_data(uint8_t plane);
+	void blt(uint32_t dest_addr, uint16_t mem_mask);
 
-	UINT8 get_pixel(UINT32 offset, UINT16 mask);
-	UINT8 c4p_read_adc(UINT8 data);
-	UINT8 c8p_read_adc(UINT8 data);
+	uint8_t get_pixel(uint32_t offset, uint16_t mask);
+	uint8_t c4p_read_adc(uint8_t data);
+	uint8_t c8p_read_adc(uint8_t data);
 
 	void screen_update1(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
-	UINT16 m_n_planes;
-	UINT16 m_width;
-	UINT16 m_height;
-	UINT16 m_buffer_width;
-	UINT16 m_buffer_height;
+	uint16_t m_n_planes;
+	uint16_t m_width;
+	uint16_t m_height;
+	uint16_t m_buffer_width;
+	uint16_t m_buffer_height;
 
-	UINT8 m_sr;
-	UINT8 m_device_id;
-	UINT16 m_write_enable_register;
-	UINT32 m_rop_register;
-	UINT16 m_diag_mem_request;
-	UINT8 m_cr0;
-	UINT8 m_cr1;
-	UINT8 m_cr2;
-	UINT8 m_cr2b;
-	UINT8 m_cr2_s_data;
-	UINT8 m_cr2_s_plane;
-	UINT8 m_cr2_d_plane;
-	UINT8 m_cr3a;
-	UINT8 m_cr3b;
-	UINT8 m_ad_result;
-	UINT8 m_ad_pending;
+	uint8_t m_sr;
+	uint8_t m_device_id;
+	uint16_t m_write_enable_register;
+	uint32_t m_rop_register;
+	uint16_t m_diag_mem_request;
+	uint8_t m_cr0;
+	uint8_t m_cr1;
+	uint8_t m_cr2;
+	uint8_t m_cr2b;
+	uint8_t m_cr2_s_data;
+	uint8_t m_cr2_s_plane;
+	uint8_t m_cr2_d_plane;
+	uint8_t m_cr3a;
+	uint8_t m_cr3b;
+	uint8_t m_ad_result;
+	uint8_t m_ad_pending;
 
-	UINT8 m_lut_control;
-	UINT8 m_lut_data;
+	uint8_t m_lut_control;
+	uint8_t m_lut_data;
 
-	UINT8 m_update_flag;
-	UINT8 m_update_pending;
+	uint8_t m_update_flag;
+	uint8_t m_update_pending;
 
-	UINT8 m_blt_cycle_count;
-	UINT32 m_image_offset;
-	UINT32 m_guard_latch[8];
+	uint8_t m_blt_cycle_count;
+	uint32_t m_image_offset;
+	uint32_t m_guard_latch[8];
 
 	int m_h_clock;
 	int m_v_clock;
 	int m_p_clock;
 	int m_data_clock;
 
-	std::unique_ptr<UINT16[]> m_image_memory;
+	std::unique_ptr<uint16_t[]> m_image_memory;
 	int m_image_plane_size;
 	int m_image_memory_size;
 
-	UINT32 m_color_lookup_table[16];
+	uint32_t m_color_lookup_table[16];
 
 	lut_fifo *m_lut_fifo;
 	bt458 *m_bt458;
@@ -555,7 +556,7 @@ public:
 		m_put_index = 0;
 	}
 
-	void put(const UINT8 data)
+	void put(const uint8_t data)
 	{
 		if (!is_full())
 		{
@@ -564,9 +565,9 @@ public:
 		}
 	}
 
-	UINT8 get()
+	uint8_t get()
 	{
-		UINT8 data = is_empty() ? 0xff : m_data[m_get_index];
+		uint8_t data = is_empty() ? 0xff : m_data[m_get_index];
 		m_get_index = (m_get_index + 1) % m_size;
 		return data;
 	}
@@ -582,10 +583,10 @@ public:
 	}
 
 private:
-	UINT16 m_size;
-	UINT16 m_get_index;
-	UINT16 m_put_index;
-	UINT8 m_data[LUT_FIFO_SIZE];
+	uint16_t m_size;
+	uint16_t m_get_index;
+	uint16_t m_put_index;
+	uint8_t m_data[LUT_FIFO_SIZE];
 };
 
 //**************************************************************************
@@ -598,9 +599,9 @@ public:
 	bt458(running_machine &running_machine);
 	void start();
 	void reset();
-	UINT8 read(UINT8 c10);
-	void write(UINT8 data, UINT8 c10);
-	UINT32 get_rgb(UINT8 index);
+	uint8_t read(uint8_t c10);
+	void write(uint8_t data, uint8_t c10);
+	uint32_t get_rgb(uint8_t index);
 
 private:
 	running_machine &machine() const
@@ -609,17 +610,17 @@ private:
 		return *m_machine;
 	}
 
-	UINT8 m_color_counter;
-	UINT8 m_red;
-	UINT8 m_green;
+	uint8_t m_color_counter;
+	uint8_t m_red;
+	uint8_t m_green;
 
-	UINT8 m_address_register;
-	UINT32 m_color_palette_RAM[256];
-	UINT32 m_overlay_color[4];
-	UINT8 m_read_mask_register;
-	UINT8 m_blink_mask_register;
-	UINT8 m_command_register;
-	UINT8 m_control_test_register;
+	uint8_t m_address_register;
+	uint32_t m_color_palette_RAM[256];
+	uint32_t m_overlay_color[4];
+	uint8_t m_read_mask_register;
+	uint8_t m_blink_mask_register;
+	uint8_t m_command_register;
+	uint8_t m_control_test_register;
 
 	running_machine *m_machine;
 };
@@ -635,7 +636,7 @@ MACHINE_CONFIG_EXTERN( apollo_graphics );
 class apollo_graphics_19i : public apollo_graphics_15i
 {
 public:
-	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	apollo_graphics_19i(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
@@ -675,7 +676,7 @@ class apollo_stdio_device: public device_t, public device_serial_interface
 public:
 	// construction/destruction
 	apollo_stdio_device(const machine_config &mconfig, const char *tag,
-			device_t *owner, UINT32 clock);
+			device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_tx_cb(device_t &device, _Object object)
 	{
@@ -696,11 +697,11 @@ private:
 	virtual void tra_callback(); // Tx send bit
 
 	TIMER_CALLBACK_MEMBER( poll_timer );
-	void xmit_char(UINT8 data);
+	void xmit_char(uint8_t data);
 
 	static const int XMIT_RING_SIZE = 64;
 
-	UINT8 m_xmitring[XMIT_RING_SIZE];
+	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
 

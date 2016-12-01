@@ -219,6 +219,27 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/bbc/fdc/fdc.h,BUSES["BBC_FDC"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_FDC"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/fdc.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/acorn.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/cumana.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/opus.h",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/fdc/watford.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/bbc/analogue/analogue.h,BUSES["BBC_ANALOGUE"] = true
 ---------------------------------------------------
 
@@ -226,6 +247,23 @@ if (BUSES["BBC_ANALOGUE"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/analogue/analogue.h",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/analogue/joystick.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/bbc/joyport/joyport.h,BUSES["BBC_JOYPORT"] = true
+---------------------------------------------------
+
+if (BUSES["BBC_JOYPORT"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joyport.h",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/joyport/joystick.h",
 	}
 end
 
@@ -239,6 +277,8 @@ if (BUSES["BBC_1MHZBUS"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.cpp",
 		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/1mhzbus.h",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.cpp",
+		MAME_DIR .. "src/devices/bus/bbc/1mhzbus/opus3.h",
 	}
 end
 
@@ -650,6 +690,8 @@ if (BUSES["ELECTRON"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/electron/exp.cpp",
 		MAME_DIR .. "src/devices/bus/electron/exp.h",
+		MAME_DIR .. "src/devices/bus/electron/plus3.cpp",
+		MAME_DIR .. "src/devices/bus/electron/plus3.h",
 		MAME_DIR .. "src/devices/bus/electron/m2105.cpp",
 		MAME_DIR .. "src/devices/bus/electron/m2105.h",
 	}
@@ -916,6 +958,8 @@ if (BUSES["ISA"]~=null) then
 		MAME_DIR .. "src/devices/bus/isa/svga_trident.h",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.cpp",
 		MAME_DIR .. "src/devices/bus/isa/num9rev.h",
+		MAME_DIR .. "src/devices/bus/isa/mcd.cpp",
+		MAME_DIR .. "src/devices/bus/isa/mcd.h",
 	}
 end
 
@@ -1174,6 +1218,14 @@ if (BUSES["POFO"]~=null) then
 		MAME_DIR .. "src/devices/bus/pofo/hpc101.h",
 		MAME_DIR .. "src/devices/bus/pofo/hpc102.cpp",
 		MAME_DIR .. "src/devices/bus/pofo/hpc102.h",
+		MAME_DIR .. "src/devices/bus/pofo/hpc104.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/hpc104.h",
+		MAME_DIR .. "src/devices/bus/pofo/ccm.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/ccm.h",
+		MAME_DIR .. "src/devices/bus/pofo/ram.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/ram.h",
+		MAME_DIR .. "src/devices/bus/pofo/rom.cpp",
+		MAME_DIR .. "src/devices/bus/pofo/rom.h",
 	}
 end
 
@@ -2363,6 +2415,7 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_multi.h",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
+		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
 	}
 end
 
@@ -2855,5 +2908,44 @@ end
 if (BUSES["HP_OPTROM"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/bus/hp_optroms/hp_optrom.cpp",
-        }
+		}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/hp9845_io/hp9845_io.h,BUSES["HP9845_IO"] = true
+---------------------------------------------------
+
+if (BUSES["HP9845_IO"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/hp9845_io/hp9845_io.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98034.cpp",
+		MAME_DIR .. "src/devices/bus/hp9845_io/98035.cpp",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/compis/graphics.h,BUSES["COMPIS_GRAPHICS"] = true
+---------------------------------------------------
+
+if (BUSES["COMPIS_GRAPHICS"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/compis/graphics.cpp",
+		MAME_DIR .. "src/devices/bus/compis/graphics.h",
+		MAME_DIR .. "src/devices/bus/compis/hrg.cpp",
+		MAME_DIR .. "src/devices/bus/compis/hrg.h",
+	}
+end
+
+---------------------------------------------------
+--
+--@src/devices/bus/pc1512/mouse.h,BUSES["PC1512"] = true
+---------------------------------------------------
+
+if (BUSES["PC1512"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.cpp",
+		MAME_DIR .. "src/devices/bus/pc1512/mouse.h",
+	}
 end

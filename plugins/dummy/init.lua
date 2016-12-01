@@ -13,13 +13,13 @@ function dummy.startplugin()
 	emu.register_start(function()
 		emu.print_verbose("Starting " .. emu.gamename())
 	end)
-    
+
 	emu.register_stop(function()
 		emu.print_verbose("Exiting " .. emu.gamename())
 	end)
 
 	local function menu_populate()
-		return {{ "This is a", "test", 32 }, { "Also a", "test", 0 }} -- 32 is MENU_FLAG_DISABLE
+		return {{ "This is a", "test", "off" }, { "Also a", "test", 0 }}
 	end
 
 	local function menu_callback(index, event)

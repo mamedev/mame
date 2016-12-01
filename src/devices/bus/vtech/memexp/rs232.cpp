@@ -24,7 +24,7 @@ ROM_START( rs232 )
 	ROM_LOAD("rs232_v15.ic2", 0x000, 0x800, CRC(6545260d) SHA1(4042f6f1e09e383f3c92f628c6187dc5f072fdb2))
 ROM_END
 
-const rom_entry *rs232_interface_device::device_rom_region() const
+const tiny_rom_entry *rs232_interface_device::device_rom_region() const
 {
 	return ROM_NAME( rs232 );
 }
@@ -53,7 +53,7 @@ machine_config_constructor rs232_interface_device::device_mconfig_additions() co
 //  rs232_interface_device - constructor
 //-------------------------------------------------
 
-rs232_interface_device::rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rs232_interface_device::rs232_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, RS232_INTERFACE, "DSE VZ-200/300 RS-232 Interface", tag, owner, clock, "vz_rs232", __FILE__),
 	device_memexp_interface(mconfig, *this),
 	m_rs232(*this, "rs232"),

@@ -371,7 +371,7 @@ Specifies a list of arguments to pas to the application when run under the debug
 
 **Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
-**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user). Removing this file (`genie clean`) will restore the default settings.
+**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
 **Scope:** solutions, projects, configurations
 
@@ -391,7 +391,7 @@ Sets the working directory for the integrated debugger.
 
 **Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
-**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user). Removing this file (`genie clean`) will restore the default settings.
+**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
 **Scope:** solutions, projects, configurations
 
@@ -758,8 +758,9 @@ _kind_ - project kind identifier. One of:
 
 * _ConsoleApp_ - console executable
 * _WindowedApp_ - application that runs in a desktop window. Does not apply on Linux.
-* _SharedLib_ - shared library or DLL
 * _StaticLib_ - static library
+* _SharedLib_ - shared library or DLL
+* _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
 
 #### Examples
 ```lua

@@ -80,7 +80,7 @@ ioport_constructor sms_light_phaser_device::device_input_ports() const
 //  sms_light_phaser_device - constructor
 //-------------------------------------------------
 
-sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_light_phaser_device::sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_LIGHT_PHASER, "Sega SMS Light Phaser", tag, owner, clock, "sms_light_phaser", __FILE__),
 	device_video_interface(mconfig, *this),
 	device_sms_control_port_interface(mconfig, *this),
@@ -115,7 +115,7 @@ void sms_light_phaser_device::device_reset()
 //  sms_peripheral_r - light phaser read
 //-------------------------------------------------
 
-UINT8 sms_light_phaser_device::peripheral_r()
+uint8_t sms_light_phaser_device::peripheral_r()
 {
 	return m_lphaser_pins->read();
 }
@@ -187,8 +187,8 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			dx_radius = ceil((float) sqrt((float) (r_x_r - (dy * dy))));
 		}
 
-		aim_area.min_x = std::max(INT32(lgun_x - dx_radius), visarea.min_x);
-		aim_area.max_x = std::min(INT32(lgun_x + dx_radius), visarea.max_x);
+		aim_area.min_x = std::max(int32_t(lgun_x - dx_radius), visarea.min_x);
+		aim_area.max_x = std::min(int32_t(lgun_x + dx_radius), visarea.max_x);
 
 		while (!new_check_point)
 		{
@@ -224,9 +224,9 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 			else
 			{
 				rgb_t color;
-				UINT8 brightness;
+				uint8_t brightness;
 				/* brightness of the lightgray color in the frame drawn by Light Phaser games */
-				const UINT8 sensor_min_brightness = 0x7f;
+				const uint8_t sensor_min_brightness = 0x7f;
 
 				color = m_port->pixel_r();
 
@@ -258,7 +258,7 @@ int sms_light_phaser_device::bright_aim_area( emu_timer *timer, int lgun_x, int 
 }
 
 
-UINT16 sms_light_phaser_device::screen_hpos_nonscaled(int scaled_hpos)
+uint16_t sms_light_phaser_device::screen_hpos_nonscaled(int scaled_hpos)
 {
 	const rectangle &visarea = m_screen->visible_area();
 	int offset_x = (scaled_hpos * (visarea.max_x - visarea.min_x)) / 255;
@@ -266,7 +266,7 @@ UINT16 sms_light_phaser_device::screen_hpos_nonscaled(int scaled_hpos)
 }
 
 
-UINT16 sms_light_phaser_device::screen_vpos_nonscaled(int scaled_vpos)
+uint16_t sms_light_phaser_device::screen_vpos_nonscaled(int scaled_vpos)
 {
 	const rectangle &visarea = m_screen->visible_area();
 	int offset_y = (scaled_vpos * (visarea.max_y - visarea.min_y)) / 255;
@@ -298,6 +298,6 @@ void sms_light_phaser_device::device_timer(emu_timer &timer, device_timer_id id,
 		sensor_check();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in sms_light_phaser_device::device_timer");
+		assert_always(false, "Unknown id in sms_light_phaser_device::device_timer");
 	}
 }

@@ -17,7 +17,7 @@
 ******************************************************************************/
 PALETTE_INIT_MEMBER(pastelg_state, pastelg)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	int bit0, bit1, bit2, bit3, r, g, b;
 
@@ -90,7 +90,7 @@ WRITE8_MEMBER(pastelg_state::threeds_output_w)
 
 READ8_MEMBER(pastelg_state::threeds_rom_readback_r)
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 
 	return GFX[(m_blitter_src_addr | (m_gfxrom << 16)) & 0x3ffff];
 }
@@ -119,7 +119,7 @@ WRITE8_MEMBER(pastelg_state::pastelg_romsel_w)
 void pastelg_state::pastelg_vramflip()
 {
 	int x, y;
-	UINT8 color1, color2;
+	uint8_t color1, color2;
 	int width = m_screen->width();
 	int height = m_screen->height();
 
@@ -147,14 +147,14 @@ void pastelg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pastelg_state::device_timer");
+		assert_always(false, "Unknown id in pastelg_state::device_timer");
 	}
 }
 
 
 void pastelg_state::pastelg_gfxdraw()
 {
-	UINT8 *GFX = memregion("gfx1")->base();
+	uint8_t *GFX = memregion("gfx1")->base();
 	int width = m_screen->width();
 
 	int x, y;
@@ -166,7 +166,7 @@ void pastelg_state::pastelg_gfxdraw()
 	int readflag;
 	int gfxaddr, gfxlen;
 	int count;
-	UINT8 color;
+	uint8_t color;
 
 	m_nb1413m3->m_busyctr = 0;
 
@@ -284,7 +284,7 @@ void pastelg_state::video_start()
 	int width = m_screen->width();
 	int height = m_screen->height();
 
-	m_videoram = make_unique_clear<UINT8[]>(width * height);
+	m_videoram = make_unique_clear<uint8_t[]>(width * height);
 
 	save_item(NAME(m_blitter_desty));
 	save_item(NAME(m_blitter_sizex));
@@ -304,7 +304,7 @@ void pastelg_state::video_start()
 
 
 ******************************************************************************/
-UINT32 pastelg_state::screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pastelg_state::screen_update_pastelg(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_dispflag)
 	{

@@ -24,13 +24,13 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vidregs;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_md_videoram;
-	required_shared_ptr<UINT16> m_rowscrollram;
-	required_shared_ptr<UINT16> m_vidregs2;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_vidregs;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_md_videoram;
+	required_shared_ptr<uint16_t> m_rowscrollram;
+	required_shared_ptr<uint16_t> m_vidregs2;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
@@ -38,13 +38,13 @@ public:
 	tilemap_t     *m_md_tilemap;
 
 	/* misc */
-	UINT16      m_snd_command;
-	UINT16      m_snd_flag;
-	UINT8       m_oki_control;
-	UINT8       m_oki_command;
-	UINT8       m_pic16c5x_port0;
-	UINT8       m_oki0_bank;
-	UINT8       m_oki1_bank;
+	uint16_t      m_snd_command;
+	uint16_t      m_snd_flag;
+	uint8_t       m_oki_control;
+	uint8_t       m_oki_command;
+	uint8_t       m_pic16c5x_port0;
+	uint8_t       m_oki0_bank;
+	uint8_t       m_oki1_bank;
 
 	/* devices */
 	required_device<okim6295_device> m_oki_1;
@@ -72,9 +72,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_drgnmst(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect );
-	UINT8 drgnmst_asciitohex( UINT8 data );
+	uint8_t drgnmst_asciitohex( uint8_t data );
 	required_device<cpu_device> m_maincpu;
 	required_device<pic16c55_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;

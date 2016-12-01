@@ -14,7 +14,7 @@ extern const device_type FD800;
 class fd800_legacy_device : public device_t
 {
 public:
-	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER( cru_r );
 	DECLARE_WRITE8_MEMBER( cru_w );
@@ -36,10 +36,10 @@ private:
 	void    do_write(void);
 	void    do_cmd(void);
 
-	UINT16 m_recv_buf;
-	UINT16 m_stat_reg;
-	UINT16 m_xmit_buf;
-	UINT16 m_cmd_reg;
+	uint16_t m_recv_buf;
+	uint16_t m_stat_reg;
+	uint16_t m_xmit_buf;
+	uint16_t m_cmd_reg;
 
 	int m_interrupt_f_f;
 	devcb_write_line m_int_line;
@@ -48,7 +48,7 @@ private:
 		bm_off, bm_read, bm_write
 	};
 
-	UINT8 m_buf[128];
+	uint8_t m_buf[128];
 	int m_buf_pos;
 	buf_mode_t m_buf_mode;
 	int m_unit;

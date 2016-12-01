@@ -1422,9 +1422,9 @@ public:
 
 	// devices
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT32> m_ram;
+	required_shared_ptr<uint32_t> m_ram;
 
-	UINT8 m_rtc_tick;
+	uint8_t m_rtc_tick;
 	DECLARE_READ32_MEMBER(pxa255_ostimer_r);
 	DECLARE_WRITE32_MEMBER(pxa255_ostimer_w);
 	DECLARE_READ32_MEMBER(pxa255_rtc_r);
@@ -1436,11 +1436,11 @@ public:
 
 	void pxa255_ostimer_irq_check();
 	void pxa255_update_interrupts();
-	void pxa255_set_irq_line(UINT32 line, int irq_state);
+	void pxa255_set_irq_line(uint32_t line, int irq_state);
 	TIMER_DEVICE_CALLBACK_MEMBER(rtc_irq_callback);
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// driver_device overrides
@@ -1471,7 +1471,7 @@ void zaurus_state::video_start()
 {
 }
 
-UINT32 zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t zaurus_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -1486,7 +1486,7 @@ void zaurus_state::pxa255_update_interrupts()
 	m_maincpu->set_input_line(ARM7_IRQ_LINE,  intc_regs->icip ? ASSERT_LINE : CLEAR_LINE);
 }
 
-void zaurus_state::pxa255_set_irq_line(UINT32 line, int irq_state)
+void zaurus_state::pxa255_set_irq_line(uint32_t line, int irq_state)
 {
 	PXA255_INTC_Regs *intc_regs = &m_intc_regs;
 

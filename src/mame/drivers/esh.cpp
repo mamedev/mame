@@ -48,8 +48,8 @@ public:
 
 	required_device<pioneer_ldv1000_device> m_laserdisc;
 	required_device<screen_device> m_screen;
-	required_shared_ptr<UINT8> m_tile_ram;
-	required_shared_ptr<UINT8> m_tile_control_ram;
+	required_shared_ptr<uint8_t> m_tile_ram;
+	required_shared_ptr<uint8_t> m_tile_control_ram;
 	bool m_ld_video_visible;
 	DECLARE_READ8_MEMBER(ldp_read);
 	DECLARE_WRITE8_MEMBER(ldp_write);
@@ -60,7 +60,7 @@ public:
 	bool m_nmi_enable;
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(esh);
-	UINT32 screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_callback_esh);
 	DECLARE_WRITE_LINE_MEMBER(ld_command_strobe_cb);
 	required_device<cpu_device> m_maincpu;
@@ -78,11 +78,11 @@ protected:
 
 
 /* VIDEO GOODS */
-UINT32 esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t esh_state::screen_update_esh(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int charx, chary;
-	const UINT8 pal_bank = m_ld_video_visible == true ? 0x10 : 0x00;
-	const UINT32 trans_mask = m_ld_video_visible == true ? 0 : -1;
+	const uint8_t pal_bank = m_ld_video_visible == true ? 0x10 : 0x00;
+	const uint32_t trans_mask = m_ld_video_visible == true ? 0 : -1;
 	gfx_element *gfx;// = m_gfxdecode->gfx(0);
 
 	/* clear */
@@ -274,7 +274,7 @@ INPUT_PORTS_END
 
 PALETTE_INIT_MEMBER(esh_state, esh)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* Oddly enough, the top 4 bits of each byte is 0 <- ??? */

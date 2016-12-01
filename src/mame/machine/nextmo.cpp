@@ -18,7 +18,7 @@ DEVICE_ADDRESS_MAP_START(map, 8, nextmo_device)
 	AM_RANGE(0x10, 0x17) AM_READWRITE(r10_r, r10_w)
 ADDRESS_MAP_END
 
-nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nextmo_device::nextmo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEXTMO, "NeXT Magneto-optical drive", tag, owner, clock, "nextmo", __FILE__),
 	r4(0),
 	irq_cb(*this),
@@ -92,16 +92,16 @@ WRITE8_MEMBER(nextmo_device::r7_w)
 	}
 }
 
-UINT8 nextmo_device::dma_r()
+uint8_t nextmo_device::dma_r()
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 	if(r7 & 0x80)
 		r = sector[sector_pos++];
 	check_dma_end();
 	return r;
 }
 
-void nextmo_device::dma_w(UINT8 data)
+void nextmo_device::dma_w(uint8_t data)
 {
 	if(r7 & 0x40)
 		sector[sector_pos++] = data;

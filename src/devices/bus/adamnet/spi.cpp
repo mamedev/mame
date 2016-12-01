@@ -42,7 +42,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *adam_spi_device::device_rom_region() const
+const tiny_rom_entry *adam_spi_device::device_rom_region() const
 {
 	return ROM_NAME( adam_spi );
 }
@@ -109,7 +109,7 @@ machine_config_constructor adam_spi_device::device_mconfig_additions() const
 //  adam_spi_device - constructor
 //-------------------------------------------------
 
-adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adam_spi_device::adam_spi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ADAM_SPI, "Adam SPI", tag, owner, clock, "adam_spi", __FILE__),
 		device_adamnet_card_interface(mconfig, *this),
 		m_maincpu(*this, M6801_TAG)
@@ -154,7 +154,7 @@ READ8_MEMBER( adam_spi_device::p2_r )
 
 	*/
 
-	UINT8 data = M6801_MODE_7;
+	uint8_t data = M6801_MODE_7;
 
 	// NET RXD
 	data |= m_bus->rxd_r(this) << 3;

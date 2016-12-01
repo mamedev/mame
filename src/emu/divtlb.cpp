@@ -36,7 +36,8 @@ device_vtlb_interface::device_vtlb_interface(const machine_config &mconfig, devi
 		m_fixed(0),
 		m_dynindex(0),
 		m_pageshift(0),
-		m_addrwidth(0)
+		m_addrwidth(0),
+		m_table_base(nullptr)
 {
 }
 
@@ -92,6 +93,8 @@ void device_vtlb_interface::interface_pre_start()
 	// allocate the lookup table
 	m_table.resize((size_t) 1 << (m_addrwidth - m_pageshift));
 	memset(&m_table[0], 0, m_table.size()*sizeof(m_table[0]));
+	// pointer to first element for quick access
+	m_table_base = &m_table[0];
 
 	// allocate the fixed page count array
 	if (m_fixed > 0)
@@ -136,7 +139,7 @@ void device_vtlb_interface::interface_pre_reset()
 //  response to an unmapped access
 //-------------------------------------------------
 
-int device_vtlb_interface::vtlb_fill(offs_t address, int intention)
+bool device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 {
 	offs_t tableindex = address >> m_pageshift;
 	vtlb_entry entry = m_table[tableindex];
@@ -155,7 +158,7 @@ int device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 #if PRINTF_TLB
 		osd_printf_debug("failed: no dynamic entries\n");
 #endif
-		return FALSE;
+		return false;
 	}
 
 	// ask the CPU core to translate for us
@@ -165,7 +168,7 @@ int device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 #if PRINTF_TLB
 		osd_printf_debug("failed: no translation\n");
 #endif
-		return FALSE;
+		return false;
 	}
 
 	// if this is the first successful translation for this address, allocate a new entry
@@ -203,7 +206,7 @@ int device_vtlb_interface::vtlb_fill(offs_t address, int intention)
 	// add the intention to the list of valid intentions and store
 	entry |= 1 << (intention & (TRANSLATE_TYPE_MASK | TRANSLATE_USER_MASK));
 	m_table[tableindex] = entry;
-	return TRUE;
+	return true;
 }
 
 
@@ -247,7 +250,7 @@ void device_vtlb_interface::vtlb_load(int entrynum, int numpages, offs_t address
 //  vtlb_dynload - load a dynamic VTLB entry
 //-------------------------------------------------
 
-void device_vtlb_interface::vtlb_dynload(UINT32 index, offs_t address, vtlb_entry value)
+void device_vtlb_interface::vtlb_dynload(u32 index, offs_t address, vtlb_entry value)
 {
 	vtlb_entry entry = m_table[index];
 
@@ -336,5 +339,5 @@ void device_vtlb_interface::vtlb_flush_address(offs_t address)
 
 const vtlb_entry *device_vtlb_interface::vtlb_table() const
 {
-	return &m_table[0];
+	return m_table_base;
 }

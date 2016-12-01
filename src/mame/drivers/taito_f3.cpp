@@ -45,7 +45,7 @@
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	int data = m_dial[num]->read();
 	return ((data & 0xf)<<12) | ((data & 0xff0)>>4);
 }
@@ -53,7 +53,7 @@ CUSTOM_INPUT_MEMBER(taito_f3_state::f3_analog_r)
 
 CUSTOM_INPUT_MEMBER(taito_f3_state::f3_coin_r)
 {
-	int num = (FPTR)param;
+	int num = (uintptr_t)param;
 	return m_coin_word[num];
 }
 
@@ -119,8 +119,8 @@ WRITE32_MEMBER(taito_f3_state::f3_sound_reset_1_w)
 WRITE32_MEMBER(taito_f3_state::f3_sound_bankswitch_w)
 {
 	if (m_f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memregion("taito_en:audiocpu")->base();
-		UINT32 idx;
+		uint16_t *rom = (uint16_t *)memregion("taito_en:audiocpu")->base();
+		uint32_t idx;
 
 		idx = (offset << 1) & 0x1e;
 		if (ACCESSING_BITS_0_15)
@@ -402,7 +402,7 @@ void taito_f3_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(3, HOLD_LINE);    // some signal from video hardware?
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taito_f3_state::device_timer");
+		assert_always(false, "Unknown id in taito_f3_state::device_timer");
 	}
 }
 
@@ -412,7 +412,7 @@ INTERRUPT_GEN_MEMBER(taito_f3_state::f3_interrupt2)
 	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(10000), TIMER_F3_INTERRUPT3);
 }
 
-static const UINT16 recalh_eeprom[64] = {
+static const uint16_t recalh_eeprom[64] = {
 	0x8554,0x0000,0x3000,0x0000,0x0000,0x0000,0x0000,0xf335,
 	0x0001,0x86a0,0x0013,0x0413,0x0000,0xc350,0x0019,0x000a,
 	0x0000,0x4e20,0x0003,0x180d,0x0000,0x2710,0x0005,0x1418,
@@ -3815,9 +3815,9 @@ ROM_END
 
 static void tile_decode(running_machine &machine)
 {
-	UINT8 lsb,msb;
-	UINT32 offset,i;
-	UINT8 *gfx = machine.root_device().memregion("gfx2")->base();
+	uint8_t lsb,msb;
+	uint32_t offset,i;
+	uint8_t *gfx = machine.root_device().memregion("gfx2")->base();
 	int size=machine.root_device().memregion("gfx2")->bytes();
 	int data;
 
@@ -3993,7 +3993,7 @@ WRITE32_MEMBER(taito_f3_state::bubsympb_oki_w)
 	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memregion("oki")->base();
+		uint8_t *snd = memregion("oki")->base();
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -4013,11 +4013,11 @@ DRIVER_INIT_MEMBER(taito_f3_state,bubsympb)
 	/* expand gfx rom */
 	{
 		int i;
-		UINT8 *gfx = memregion("gfx2")->base();
+		uint8_t *gfx = memregion("gfx2")->base();
 
 		for (i=0x200000;i<0x400000; i+=4)
 		{
-			UINT8 byte = gfx[i];
+			uint8_t byte = gfx[i];
 			gfx[i+0] = (byte & 0x80)? 1<<4 : 0<<4;
 			gfx[i+0]|= (byte & 0x40)? 1<<0 : 0<<0;
 			gfx[i+1] = (byte & 0x20)? 1<<4 : 0<<4;
@@ -4060,7 +4060,7 @@ DRIVER_INIT_MEMBER(taito_f3_state,landmakr)
 
 DRIVER_INIT_MEMBER(taito_f3_state,landmkrp)
 {
-	UINT32 *RAM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *RAM = (uint32_t *)memregion("maincpu")->base();
 
 	/* For some reason the least significant byte in the last 2 long words of
 	ROM is swapped.  As the roms have been verified ok, I assume this is some
@@ -4103,7 +4103,7 @@ DRIVER_INIT_MEMBER(taito_f3_state,pbobbl2p)
 	// which eventually causes the game to crash
 	//  -- protection check?? or some kind of checksum fail?
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	/* protection? */
 	ROM[0x40090/4]=0x00004e71|(ROM[0x40090/4]&0xffff0000);

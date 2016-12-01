@@ -15,7 +15,7 @@
 // LLC1 BASIC keyboard
 READ8_MEMBER(llc_state::llc1_port2_b_r)
 {
-	UINT8 retVal = 0;
+	uint8_t retVal = 0;
 
 	if (m_term_status)
 	{
@@ -36,7 +36,7 @@ READ8_MEMBER(llc_state::llc1_port2_a_r)
 // LLC1 Monitor keyboard
 READ8_MEMBER(llc_state::llc1_port1_a_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (!BIT(m_porta, 4))
 		data = ioport("X4")->read();
 	if (!BIT(m_porta, 5))
@@ -70,7 +70,7 @@ WRITE8_MEMBER(llc_state::llc1_port1_a_w)
 
 WRITE8_MEMBER(llc_state::llc1_port1_b_w)
 {
-	static UINT8 count = 0, digit = 0;
+	static uint8_t count = 0, digit = 0;
 
 	if (data == 0)
 	{
@@ -131,7 +131,7 @@ MACHINE_RESET_MEMBER(llc_state,llc2)
 WRITE8_MEMBER(llc_state::llc2_rom_disable_w)
 {
 	address_space &mem_space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	mem_space.install_write_bank(0x0000, 0xbfff, "bank1");
 	membank("bank1")->set_base(ram);

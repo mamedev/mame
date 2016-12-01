@@ -33,7 +33,7 @@
 
 READ8_MEMBER( pc4_state::kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int line=0; line<8; line++)
 	{
@@ -185,7 +185,7 @@ GFXDECODE_END
 void pc4_state::machine_start()
 {
 	static const char *const bitnames[] = {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7"};
-	UINT8* rom_base = (UINT8 *)memregion("maincpu")->base();
+	uint8_t* rom_base = (uint8_t *)memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 8, rom_base, 0x4000);
 	m_rombank->set_entry(0);

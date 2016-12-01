@@ -32,7 +32,7 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 #include "renderer.h"
 #include "renderer_d3d.h"
 #include "shader_dxbc.h"
-#include "hmd_ovr.h"
+#include "hmd.h"
 #include "hmd_openvr.h"
 #include "debug_renderdoc.h"
 
@@ -60,29 +60,6 @@ BX_PRAGMA_DIAGNOSTIC_POP()
 
 namespace bgfx { namespace d3d11
 {
-#if BGFX_CONFIG_USE_OVR
-	struct OVRBufferD3D11 : public OVRBufferI
-	{
-		virtual void create(const ovrSession& _session, int _eyeIdx, int _msaaSamples) BX_OVERRIDE;
-		virtual void destroy(const ovrSession& _session) BX_OVERRIDE;
-		virtual void render(const ovrSession& _session) BX_OVERRIDE;
-		virtual void postRender(const ovrSession& _session) BX_OVERRIDE;
-
-		ID3D11RenderTargetView* m_eyeRtv[4];
-		ID3D11DepthStencilView* m_depthBuffer;
-		ID3D11Texture2D* m_msaaTexture;
-		ID3D11ShaderResourceView* m_msaaSv;
-		ID3D11RenderTargetView* m_msaaRtv;
-	};
-
-	struct OVRMirrorD3D11 : public OVRMirrorI
-	{
-		virtual void create(const ovrSession& _session, int _width, int _height) BX_OVERRIDE;
-		virtual void destroy(const ovrSession& session) BX_OVERRIDE;
-		virtual void blit(const ovrSession& session) BX_OVERRIDE;
-	};
-#endif // BGFX_CONFIG_USE_OVR
-
 	struct BufferD3D11
 	{
 		BufferD3D11()
@@ -242,6 +219,7 @@ namespace bgfx { namespace d3d11
 
 		TextureD3D11()
 			: m_ptr(NULL)
+			, m_rt(NULL)
 			, m_srv(NULL)
 			, m_uav(NULL)
 			, m_numMips(0)
@@ -253,7 +231,7 @@ namespace bgfx { namespace d3d11
 		void overrideInternal(uintptr_t _ptr);
 		void update(uint8_t _side, uint8_t _mip, const Rect& _rect, uint16_t _z, uint16_t _depth, uint16_t _pitch, const Memory* _mem);
 		void commit(uint8_t _stage, uint32_t _flags, const float _palette[][4]);
-		void resolve();
+		void resolve() const;
 		TextureHandle getHandle() const;
 
 		union
@@ -261,6 +239,12 @@ namespace bgfx { namespace d3d11
 			ID3D11Resource*  m_ptr;
 			ID3D11Texture2D* m_texture2d;
 			ID3D11Texture3D* m_texture3d;
+		};
+
+		union
+		{
+			ID3D11Resource* m_rt;
+			ID3D11Texture2D* m_rt2d;
 		};
 
 		ID3D11ShaderResourceView*  m_srv;

@@ -97,7 +97,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(kb_data_ready);
 	I8275_DRAW_CHARACTER_MEMBER(wicat_display_pixels);
 
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 	required_device<m68000_device> m_maincpu;
 	required_device<mm58274c_device> m_rtc;
 	required_device<via6522_device> m_via;
@@ -119,7 +119,7 @@ public:
 	required_memory_region m_chargen;
 	required_device<fd1795_t> m_fdc;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 
@@ -129,7 +129,7 @@ private:
 	virtual void driver_start() override;
 
 	void poll_kb();
-	void send_key(UINT8 val);
+	void send_key(uint8_t val);
 
 	emu_timer* m_video_timer;
 	emu_timer* m_kb_timer;
@@ -138,15 +138,15 @@ private:
 	static const device_timer_id KB_TIMER = 1;
 	static const device_timer_id KB_SERIAL_TIMER = 2;
 
-	UINT8 m_portA;
-	UINT8 m_portB;
+	uint8_t m_portA;
+	uint8_t m_portB;
 	bool m_video_timer_irq;
 	bool m_video_kb_irq;
-	UINT8 m_nmi_enable;
-	UINT8 m_crtc_irq;
-	UINT16 m_kb_data;
-	UINT8 m_kb_bit;
-	UINT32 m_kb_keys[8];
+	uint8_t m_nmi_enable;
+	uint8_t m_crtc_irq;
+	uint16_t m_kb_data;
+	uint8_t m_kb_bit;
+	uint32_t m_kb_keys[8];
 };
 
 
@@ -337,10 +337,10 @@ void wicat_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 
 void wicat_state::poll_kb()
 {
-	UINT8 line;
-	UINT8 val = 0;
-	UINT8 x;
-	UINT32 data;
+	uint8_t line;
+	uint8_t val = 0;
+	uint8_t x;
+	uint32_t data;
 	char kbtag[8];
 
 	for(line=0;line<8;line++)
@@ -361,7 +361,7 @@ void wicat_state::poll_kb()
 	}
 }
 
-void wicat_state::send_key(UINT8 val)
+void wicat_state::send_key(uint8_t val)
 {
 	// based on settings in the terminal NOVRAM, the keyboard is using 1200 baud, 7 bits, 2 stop bits
 	logerror("Sending key %i\n",val);
@@ -489,7 +489,7 @@ WRITE8_MEMBER(wicat_state::hdc_w)
 
 READ8_MEMBER(wicat_state::fdc_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	popmessage("FDC: read offset %02x",offset);
 	switch(offset)
@@ -600,25 +600,25 @@ WRITE8_MEMBER(wicat_state::video_dma_w)
 
 READ8_MEMBER(wicat_state::video_uart0_r)
 {
-	UINT16 noff = offset >> 1;
+	uint16_t noff = offset >> 1;
 	return m_videouart0->read(space,noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart0_w)
 {
-	UINT16 noff = offset >> 1;
+	uint16_t noff = offset >> 1;
 	m_videouart0->write(space,noff,data);
 }
 
 READ8_MEMBER(wicat_state::video_uart1_r)
 {
-	UINT16 noff = offset >> 1;
+	uint16_t noff = offset >> 1;
 	return m_videouart1->read(space,noff);
 }
 
 WRITE8_MEMBER(wicat_state::video_uart1_w)
 {
-	UINT16 noff = offset >> 1;
+	uint16_t noff = offset >> 1;
 	m_videouart1->write(space,noff,data);
 }
 
@@ -659,7 +659,7 @@ WRITE8_MEMBER(wicat_state::videosram_recall_w)
 
 READ8_MEMBER(wicat_state::video_timer_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if(offset == 0x00)
 	{
@@ -741,7 +741,7 @@ WRITE_LINE_MEMBER(wicat_state::crtc_cb)
 
 I8275_DRAW_CHARACTER_MEMBER(wicat_state::wicat_display_pixels)
 {
-	UINT8 romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
+	uint8_t romdata = m_chargen->base()[((charcode << 4) | linecount) + 1];
 	const pen_t *pen = m_palette->pens();
 
 	for (int i = 0; i < 8; i++)
@@ -874,7 +874,7 @@ static MACHINE_CONFIG_START( wicat, wicat_state )
 
 	MCFG_X2210_ADD("vsram")  // XD2210
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_SIZE(720,300)
 	MCFG_SCREEN_VISIBLE_AREA(0,720-1,0,300-1)
 	MCFG_SCREEN_REFRESH_RATE(60)

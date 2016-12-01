@@ -25,6 +25,7 @@ endif
 
 BX_DIR?=../bx
 GENIE?=$(BX_DIR)/tools/bin/$(OS)/genie
+NINJA?=$(BX_DIR)/tools/bin/$(OS)/ninja
 
 .PHONY: help
 
@@ -38,28 +39,28 @@ clean: ## Clean all intermediate files.
 	@mkdir .build
 
 projgen: ## Generate project files for all configurations.
-	$(GENIE) --with-tools --with-shared-lib vs2008
-	$(GENIE) --with-tools --with-shared-lib vs2010
-	$(GENIE) --with-tools --with-shared-lib vs2012
-	$(GENIE) --with-tools --with-shared-lib vs2013
-	$(GENIE) --with-tools --with-shared-lib vs2015
-	$(GENIE) --with-tools --with-shared-lib --gcc=mingw-gcc gmake
-	$(GENIE) --with-tools --with-shared-lib --gcc=linux-gcc gmake
-	$(GENIE) --with-tools --with-shared-lib --gcc=osx gmake
-	$(GENIE) --with-tools --with-shared-lib --xcode=osx xcode4
-	$(GENIE) --with-tools --with-shared-lib --xcode=ios xcode4
-	$(GENIE) --with-shared-lib --gcc=freebsd gmake
-
-	$(GENIE) --gcc=android-arm gmake
-	$(GENIE) --gcc=android-mips gmake
-	$(GENIE) --gcc=android-x86 gmake
-	$(GENIE) --gcc=asmjs gmake
-	$(GENIE) --gcc=ios-arm gmake
-	$(GENIE) --gcc=ios-simulator gmake
-	$(GENIE) --gcc=nacl gmake
-	$(GENIE) --gcc=nacl-arm gmake
-	$(GENIE) --gcc=pnacl gmake
-	$(GENIE) --gcc=rpi gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib                     vs2008
+	$(GENIE) --with-tools --with-examples --with-shared-lib                     vs2010
+	$(GENIE) --with-tools --with-examples --with-shared-lib                     vs2012
+	$(GENIE) --with-tools --with-examples --with-shared-lib                     vs2013
+	$(GENIE) --with-tools --with-examples --with-shared-lib                     vs2015
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=mingw-gcc     gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=linux-gcc     gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=osx           gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --xcode=osx         xcode4
+	$(GENIE) --with-tools --with-examples --with-shared-lib --xcode=ios         xcode4
+	$(GENIE)              --with-examples --with-shared-lib --gcc=freebsd       gmake
+	$(GENIE)              --with-examples                   --gcc=android-arm   gmake
+	$(GENIE)              --with-examples                   --gcc=android-mips  gmake
+	$(GENIE)              --with-examples                   --gcc=android-x86   gmake
+	$(GENIE)              --with-examples                   --gcc=asmjs         gmake
+	$(GENIE)              --with-examples                   --gcc=ios-arm       gmake
+	$(GENIE)              --with-examples                   --gcc=ios-arm64     gmake
+	$(GENIE)              --with-examples                   --gcc=ios-simulator gmake
+	$(GENIE)              --with-examples                   --gcc=nacl          gmake
+	$(GENIE)              --with-examples                   --gcc=nacl-arm      gmake
+	$(GENIE)              --with-examples                   --gcc=pnacl         gmake
+	$(GENIE)              --with-examples                   --gcc=rpi           gmake
 
 .build/projects/gmake-android-arm:
 	$(GENIE) --gcc=android-arm gmake
@@ -94,7 +95,7 @@ asmjs-release: .build/projects/gmake-asmjs ## Build - Emscripten Release
 asmjs: asmjs-debug asmjs-release ## Build - Emscripten Debug and Release
 
 .build/projects/gmake-linux:
-	$(GENIE) --with-tools --with-shared-lib --gcc=linux-gcc gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=linux-gcc gmake
 linux-debug32: .build/projects/gmake-linux ## Build - Linux x86 Debug
 	$(MAKE) -R -C .build/projects/gmake-linux config=debug32
 linux-release32: .build/projects/gmake-linux ## Build - Linux x86 Release
@@ -106,7 +107,7 @@ linux-release64: .build/projects/gmake-linux ## Build - Linux x64 Release
 linux: linux-debug32 linux-release32 linux-debug64 linux-release64 ## Build - Linux x86/x64 Debug and Release
 
 .build/projects/gmake-freebsd:
-	$(GENIE) --with-tools --with-shared-lib --gcc=freebsd gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=freebsd gmake
 freebsd-debug32: .build/projects/gmake-freebsd ## Build - FreeBSD x86 Debug
 	$(MAKE) -R -C .build/projects/gmake-freebsd config=debug32
 freebsd-release32: .build/projects/gmake-freebsd ## Build - FreeBSD x86 Release
@@ -118,7 +119,7 @@ freebsd-release64: .build/projects/gmake-freebsd ## Build - FreeBSD x86 Release
 freebsd: freebsd-debug32 freebsd-release32 freebsd-debug64 freebsd-release64 ## Build - FreeBSD x86/x64 Debug and Release
 
 .build/projects/gmake-mingw-gcc:
-	$(GENIE) --with-tools --with-shared-lib --gcc=mingw-gcc gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=mingw-gcc gmake
 mingw-gcc-debug32: .build/projects/gmake-mingw-gcc ## Build - MinGW GCC x86 Debug
 	$(MAKE) -R -C .build/projects/gmake-mingw-gcc config=debug32
 mingw-gcc-release32: .build/projects/gmake-mingw-gcc ## Build - MinGW GCC x86 Release
@@ -142,7 +143,7 @@ mingw-clang-release64: .build/projects/gmake-mingw-clang ## Build - MinGW Clang 
 mingw-clang: mingw-clang-debug32 mingw-clang-release32 mingw-clang-debug64 mingw-clang-release64 ## Build - MinGW Clang x86/x64 Debug and Release
 
 .build/projects/vs2008:
-	$(GENIE) --with-tools --with-shared-lib vs2008
+	$(GENIE) --with-tools --with-examples --with-shared-lib vs2008
 vs2008-debug32: .build/projects/vs2008 ## Build - VS2008 x86 Debug
 	devenv .build/projects/vs2008/bgfx.sln /Build "Debug|Win32"
 vs2008-release32: .build/projects/vs2008 ## Build - VS2008 x86 Release
@@ -154,7 +155,7 @@ vs2008-release64: .build/projects/vs2008 ## Build - VS2008 x64 Release
 vs2008: vs2008-debug32 vs2008-release32 vs2008-debug64 vs2008-release64 ## Build - VS2008 x86/x64 Debug and Release
 
 .build/projects/vs2010:
-	$(GENIE) --with-tools --with-shared-lib vs2010
+	$(GENIE) --with-tools --with-examples --with-shared-lib vs2010
 vs2010-debug32: .build/projects/vs2010 ## Build - VS2010 x86 Debug
 	devenv .build/projects/vs2010/bgfx.sln /Build "Debug|Win32"
 vs2010-release32: .build/projects/vs2010 ## Build - VS2010 x86 Release
@@ -166,7 +167,7 @@ vs2010-release64: .build/projects/vs2010 ## Build - VS2010 x64 Release
 vs2010: vs2010-debug32 vs2010-release32 vs2010-debug64 vs2010-release64 ## Build - VS2010 x86/x64 Debug and Release
 
 .build/projects/vs2012:
-	$(GENIE) --with-tools --with-shared-lib vs2012
+	$(GENIE) --with-tools --with-examples --with-shared-lib vs2012
 vs2012-debug32: .build/projects/vs2012 ## Build - VS2012 x86 Debug
 	devenv .build/projects/vs2012/bgfx.sln /Build "Debug|Win32"
 vs2012-release32: .build/projects/vs2012 ## Build - VS2012 x86 Release
@@ -178,7 +179,7 @@ vs2012-release64: .build/projects/vs2012 ## Build - VS2012 x64 Release
 vs2012: vs2012-debug32 vs2012-release32 vs2012-debug64 vs2012-release64 ## Build - VS2012 x86/x64 Debug and Release
 
 .build/projects/vs2013:
-	$(GENIE) --with-tools --with-shared-lib vs2013
+	$(GENIE) --with-tools --with-examples --with-shared-lib vs2013
 vs2013-debug32: .build/projects/vs2013 ## Build - VS2013 x86 Debug
 	devenv .build/projects/vs2013/bgfx.sln /Build "Debug|Win32"
 vs2013-release32: .build/projects/vs2013 ## Build - VS2013 x86 Release
@@ -190,7 +191,7 @@ vs2013-release64: .build/projects/vs2013 ## Build - VS2013 x64 Release
 vs2013: vs2013-debug32 vs2013-release32 vs2013-debug64 vs2013-release64 ## Build - VS2013 x86/x64 Debug and Release
 
 .build/projects/vs2015:
-	$(GENIE) --with-tools --with-shared-lib vs2015
+	$(GENIE) --with-tools --with-examples --with-shared-lib vs2015
 vs2015-debug32: .build/projects/vs2015 ## Build - VS2015 x86 Debug
 	devenv .build/projects/vs2015/bgfx.sln /Build "Debug|Win32"
 vs2015-release32: .build/projects/vs2015 ## Build - VS2015 x86 Release
@@ -230,7 +231,7 @@ pnacl-release: .build/projects/gmake-pnacl ## Build - Portable Native Client Rel
 pnacl: pnacl-debug pnacl-release ## Build - Portable Native Client Debug and Release
 
 .build/projects/gmake-osx:
-	$(GENIE) --with-tools --with-shared-lib --gcc=osx gmake
+	$(GENIE) --with-tools --with-examples --with-shared-lib --gcc=osx gmake
 osx-debug32: .build/projects/gmake-osx ## Build - OSX x86 Debug
 	$(MAKE) -C .build/projects/gmake-osx config=debug32
 osx-release32: .build/projects/gmake-osx ## Build - OSX x86 Release
@@ -248,6 +249,14 @@ ios-arm-debug: .build/projects/gmake-ios-arm ## Build - iOS ARM Debug
 ios-arm-release: .build/projects/gmake-ios-arm ## Build - iOS ARM Release
 	$(MAKE) -R -C .build/projects/gmake-ios-arm config=release
 ios-arm: ios-arm-debug ios-arm-release ## Build - iOS ARM Debug and Release
+
+.build/projects/gmake-ios-arm64:
+	$(GENIE) --gcc=ios-arm64 gmake
+ios-arm64-debug: .build/projects/gmake-ios-arm64 ## Build - iOS ARM64 Debug
+	$(MAKE) -R -C .build/projects/gmake-ios-arm64 config=debug
+ios-arm64-release: .build/projects/gmake-ios-arm64 ## Build - iOS ARM64 Release
+	$(MAKE) -R -C .build/projects/gmake-ios-arm64 config=release
+ios-arm64: ios-arm64-debug ios-arm64-release ## Build - iOS ARM64 Debug and Release
 
 .build/projects/gmake-ios-simulator:
 	$(GENIE) --gcc=ios-simulator gmake
@@ -275,6 +284,9 @@ build: build-$(OS)
 
 rebuild-shaders:
 	$(MAKE) -R -C examples rebuild
+
+assets: # Build assets.
+	$(NINJA) -C scripts
 
 analyze:
 	cppcheck src/

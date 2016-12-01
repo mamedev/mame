@@ -316,7 +316,7 @@ inline void am9517a_device::dma_write()
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY: {
-		UINT8 v1 = m_in_memr_cb(offset);
+		uint8_t v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
 			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
 		break;
@@ -472,7 +472,7 @@ void am9517a_device::end_of_process()
 //-------------------------------------------------
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname)
+am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -499,7 +499,7 @@ am9517a_device::am9517a_device(const machine_config &mconfig, device_type type, 
 }
 
 
-am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AM9517A, "AM9517A", tag, owner, clock, "am9517a", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -526,12 +526,12 @@ am9517a_device::am9517a_device(const machine_config &mconfig, const char *tag, d
 {
 }
 
-upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd71071_v53_device::upd71071_v53_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: am9517a_device(mconfig, V53_DMAU, "V53 DMAU", tag, owner, clock, "v53_dmau")
 {
 }
 
-pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pcxport_dmac_device::pcxport_dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: am9517a_device(mconfig, PCXPORT_DMAC, "PC Transporter DMAC", tag, owner, clock, "pcx_dmac")
 {
 }
@@ -811,7 +811,7 @@ void am9517a_device::execute_run()
 
 READ8_MEMBER( am9517a_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!BIT(offset, 3))
 	{
@@ -1105,7 +1105,7 @@ void upd71071_v53_device::device_reset()
 
 READ8_MEMBER(upd71071_v53_device::read)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	int channel = m_selected_channel;
 
 	if (LOG) logerror("DMA: read from register %02x\n",offset);

@@ -1,35 +1,5 @@
-///////////////////////////////////////////////////////////////////////////////////
-/// OpenGL Mathematics (glm.g-truc.net)
-///
-/// Copyright (c) 2005 - 2015 G-Truc Creation (www.g-truc.net)
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-/// 
-/// The above copyright notice and this permission notice shall be included in
-/// all copies or substantial portions of the Software.
-/// 
-/// Restrictions:
-///		By making use of the Software for military purposes, you choose to make
-///		a Bunny unhappy.
-/// 
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-/// THE SOFTWARE.
-///
-/// @file test/core/core_type_vec4.cpp
-/// @date 2008-08-31 / 2014-11-25
-/// @author Christophe Riccio
-///////////////////////////////////////////////////////////////////////////////////
-
-#define GLM_SWIZZLE
+#define GLM_FORCE_ALIGNED
+#define GLM_FORCE_SWIZZLE
 #include <glm/vector_relational.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -98,7 +68,7 @@ int test_vec4_ctor()
 	}
 #endif
 
-#if GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#if GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_FORCE_SWIZZLE)
 	{
 		glm::vec4 A = glm::vec4(1.0f, 2.0f, 3.0f, 4.0f);
 		glm::vec4 B = A.xyzw;
@@ -127,7 +97,7 @@ int test_vec4_ctor()
 		Error += glm::all(glm::equal(A, L)) ? 0 : 1;
 		Error += glm::all(glm::equal(A, M)) ? 0 : 1;
 	}
-#endif// GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_SWIZZLE)
+#endif// GLM_HAS_UNRESTRICTED_UNIONS && defined(GLM_FORCE_SWIZZLE)
 
 	{
 		glm::vec4 A(1);
@@ -310,10 +280,31 @@ int test_vec4_operators()
 	return Error;
 }
 
+int test_vec4_equal()
+{
+	int Error = 0;
+
+	{
+		glm::vec4 const A(1, 2, 3, 4);
+		glm::vec4 const B(1, 2, 3, 4);
+		Error += A == B ? 0 : 1;
+		Error += A != B ? 1 : 0;
+	}
+
+	{
+		glm::ivec4 const A(1, 2, 3, 4);
+		glm::ivec4 const B(1, 2, 3, 4);
+		Error += A == B ? 0 : 1;
+		Error += A != B ? 1 : 0;
+	}
+
+	return Error;
+}
+
 int test_vec4_size()
 {
 	int Error = 0;
-	
+
 	Error += sizeof(glm::vec4) == sizeof(glm::lowp_vec4) ? 0 : 1;
 	Error += sizeof(glm::vec4) == sizeof(glm::mediump_vec4) ? 0 : 1;
 	Error += sizeof(glm::vec4) == sizeof(glm::highp_vec4) ? 0 : 1;
@@ -324,7 +315,7 @@ int test_vec4_size()
 	Error += 32 == sizeof(glm::highp_dvec4) ? 0 : 1;
 	Error += glm::vec4().length() == 4 ? 0 : 1;
 	Error += glm::dvec4().length() == 4 ? 0 : 1;
-	
+
 	return Error;
 }
 
@@ -488,13 +479,13 @@ int test_vec4_simd()
 {
 	int Error = 0;
 
-	glm::tvec4<float, glm::simd> a(std::clock(), std::clock(), std::clock(), std::clock());
-	glm::tvec4<float, glm::simd> b(std::clock(), std::clock(), std::clock(), std::clock());
+	glm::vec4 const a(std::clock(), std::clock(), std::clock(), std::clock());
+	glm::vec4 const b(std::clock(), std::clock(), std::clock(), std::clock());
 
-	glm::tvec4<float, glm::simd> c(b * a);
-	glm::tvec4<float, glm::simd> d(a + c);
+	glm::vec4 const c(b * a);
+	glm::vec4 const d(a + c);
 
-	Error += glm::all(glm::greaterThanEqual(d, glm::tvec4<float, glm::simd>(0))) ? 0 : 1;
+	Error += glm::all(glm::greaterThanEqual(d, glm::vec4(0))) ? 0 : 1;
 
 	return Error;
 }
@@ -503,6 +494,47 @@ int main()
 {
 	int Error(0);
 
+/*
+	{
+		glm::ivec4 const a1(2);
+		glm::ivec4 const b1 = a1 >> 1;
+
+		__m128i const e1 = _mm_set1_epi32(2);
+		__m128i const f1 = _mm_srli_epi32(e1, 1);
+
+		glm::ivec4 const g1 = *reinterpret_cast<glm::ivec4 const* const>(&f1);
+
+		glm::ivec4 const a2(-2);
+		glm::ivec4 const b2 = a2 >> 1;
+
+		__m128i const e2 = _mm_set1_epi32(-1);
+		__m128i const f2 = _mm_srli_epi32(e2, 1);
+
+		glm::ivec4 const g2 = *reinterpret_cast<glm::ivec4 const* const>(&f2);
+
+		printf("GNI\n");
+	}
+
+	{
+		glm::uvec4 const a1(2);
+		glm::uvec4 const b1 = a1 >> 1u;
+
+		__m128i const e1 = _mm_set1_epi32(2);
+		__m128i const f1 = _mm_srli_epi32(e1, 1);
+
+		glm::uvec4 const g1 = *reinterpret_cast<glm::uvec4 const* const>(&f1);
+
+		glm::uvec4 const a2(-1);
+		glm::uvec4 const b2 = a2 >> 1u;
+
+		__m128i const e2 = _mm_set1_epi32(-1);
+		__m128i const f2 = _mm_srli_epi32(e2, 1);
+
+		glm::uvec4 const g2 = *reinterpret_cast<glm::uvec4 const* const>(&f2);
+
+		printf("GNI\n");
+	}
+*/
 	glm::vec4 v;
 	assert(v.length() == 4);
 
@@ -516,6 +548,7 @@ int main()
 	Error += test_bvec4_ctor();
 	Error += test_vec4_size();
 	Error += test_vec4_operators();
+	Error += test_vec4_equal();
 	Error += test_vec4_swizzle_partial();
 	Error += test_vec4_simd();
 	Error += test_operator_increment();

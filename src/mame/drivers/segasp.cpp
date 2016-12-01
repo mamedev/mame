@@ -75,19 +75,20 @@ G  171-8278G  315-6416  2x 512Mbit  RMI
 #include "cpu/sh4/sh4.h"
 #include "debugger.h"
 #include "includes/segasp.h"
+#include "machine/naomim4.h"
 
 READ64_MEMBER(segasp_state::sp_bank_r)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_bank;
 }
 
 WRITE64_MEMBER(segasp_state::sp_bank_w)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return;
-	UINT16 bank = data & 0xffff;
+	uint16_t bank = data & 0xffff;
 	if (bank != m_sp_bank)
 		logerror("SystemSP: G2 Bank set to %08X%s\n", (bank & 0x3fff) << 16, (bank & 0x4000) ? " decrypt ON" :"" );
 	m_sp_bank = bank;
@@ -115,14 +116,14 @@ WRITE64_MEMBER(segasp_state::sn_93c46a_w)
 
 READ64_MEMBER(segasp_state::sp_eeprom_r)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return -1;
 	return m_sp_eeprom->do_read() << 4;
 }
 
 WRITE64_MEMBER(segasp_state::sp_eeprom_w)
 {
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 		return;
 	m_sp_eeprom->di_write(data & 1);
 	m_sp_eeprom->cs_write((data & 2) ? ASSERT_LINE : CLEAR_LINE);
@@ -138,12 +139,12 @@ READ64_MEMBER(segasp_state::sp_rombdflg_r)
 
 READ64_MEMBER(segasp_state::sp_io_r)
 {
-	UINT64 retval;
+	uint64_t retval;
 
 	int reg = offset * 2;
 	int shift = 0;
 
-	if (mem_mask & U64(0xffffffff00000000))
+	if (ACCESSING_BITS_32_63)
 	{
 		reg++;
 		shift = 32;
@@ -179,15 +180,15 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_MIRROR(0xa2000000) AM_ROM AM_REGION("maincpu", 0) // BIOS
 
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_sysctrl_r, dc_sysctrl_w )
-	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, U64(0xffffffffffffffff) )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, U64(0x0000ffff0000ffff) )
-	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, U64(0xffffffffffffffff) )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_MIRROR(0x02000000) AM_DEVICE32( "maple_dc", maple_dc_device, amap, 0xffffffffffffffffU )
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_MIRROR(0x02000000) AM_DEVICE16( "rom_board", naomi_board, submap, 0x0000ffff0000ffffU )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_MIRROR(0x02000000) AM_DEVICE32( "rom_board", naomi_g1_device, amap, 0xffffffffffffffffU )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_g2_ctrl_r, dc_g2_ctrl_w )
-	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, U64(0xffffffffffffffff))
-	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, U64(0xffffffffffffffff))
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, pd_dma_map, 0xffffffffffffffffU)
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_MIRROR(0x02000000) AM_DEVICE32("powervr2", powervr2_device, ta_map, 0xffffffffffffffffU)
 	AM_RANGE(0x00600000, 0x006007ff) AM_MIRROR(0x02000000) AM_READWRITE(dc_modem_r, dc_modem_w )
-	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, U64(0xffffffffffffffff))
-	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, U64(0x0000ffff0000ffff) )
+	AM_RANGE(0x00700000, 0x00707fff) AM_MIRROR(0x02000000) AM_READWRITE32(dc_aica_reg_r, dc_aica_reg_w, 0xffffffffffffffffU)
+	AM_RANGE(0x00710000, 0x0071000f) AM_MIRROR(0x02000000) AM_DEVREADWRITE16("aicartc", aicartc_device, read, write, 0x0000ffff0000ffffU )
 
 	AM_RANGE(0x00800000, 0x00ffffff) AM_MIRROR(0x02000000) AM_READWRITE(naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
 
@@ -213,7 +214,7 @@ static ADDRESS_MAP_START( segasp_map, AS_PROGRAM, 64, segasp_state )
 
 	/* Area 4 */
 	AM_RANGE(0x10000000, 0x107fffff) AM_MIRROR(0x02000000) AM_DEVWRITE("powervr2", powervr2_device, ta_fifo_poly_w)
-	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, U64(0xffffffffffffffff))
+	AM_RANGE(0x10800000, 0x10ffffff) AM_DEVWRITE8("powervr2", powervr2_device, ta_fifo_yuv_w, 0xffffffffffffffffU)
 	AM_RANGE(0x11000000, 0x11ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath0_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE0 register - cannot be written directly, only through dma / store queue)
 	/*       0x12000000 -0x13ffffff Mirror area of  0x10000000 -0x11ffffff */
 	AM_RANGE(0x13000000, 0x13ffffff) AM_DEVWRITE("powervr2", powervr2_device, ta_texture_directpath1_w) // access to texture / framebuffer memory (either 32-bit or 64-bit area depending on SB_LMMODE1 register - cannot be written directly, only through dma / store queue)
@@ -301,7 +302,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( segasp, naomi_aw_base, segasp_state )
 
 // todo, not exactly NaomiM4 (see notes at top of driver) use custom board type here instead
 	MCFG_X76F100_ADD("naomibd_eeprom")  // actually not present
-	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", "boardid", WRITE8(dc_state, g1_irq))
+	MCFG_NAOMI_M4_BOARD_ADD("rom_board", "pic_readout", "naomibd_eeprom", WRITE8(dc_state, g1_irq))
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -354,7 +355,7 @@ ROM_START( segasp )
 	SEGASPEE_EXP
 
 	ROM_REGION( 0x08000000, "rom_board", ROMREGION_ERASEFF)
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))
+	ROM_PARAMETER( ":rom_board:id", "5502" )
 	ROM_REGION( 0x800, "pic_readout", ROMREGION_ERASE00 )
 ROM_END
 
@@ -370,7 +371,7 @@ ROM_START( brickppl )
 	ROM_LOAD( "ic64",  0x08000000, 0x4000000, CRC(383e90d9) SHA1(eeca4b1bd0cd1fed7b85f045d71e0c7258d4350b) )
 	ROM_LOAD( "ic65",  0x0c000000, 0x4000000, CRC(4c29b5ac) SHA1(9e6a79ad2d2498eed5b2590c8764222e7d6c0229) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0558-com.ic15", 0, 0x800, BAD_DUMP CRC(7592d004) SHA1(632373d807f54953d68c95a9f874ed3e8011f085) )
@@ -392,7 +393,7 @@ ROM_START( dinoking )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(c78e46c2) SHA1(b8224c68face23010414d13ebb4cc05a2a9dce8a) )
 
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // actually 8x 128Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -413,7 +414,7 @@ ROM_START( dinokior )
 	ROM_LOAD( "ic68s", 0x06000000, 0x01000000, CRC(ff5ed2b8) SHA1(d8d86b3ed976c8c8fc51d225ae661e5f237b6e1d) )
 	ROM_LOAD( "ic69s", 0x07000000, 0x01000000, CRC(ab8ac4eb) SHA1(e6b3ce796ae4887011e2764261f3f437dc9939f9) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // actually 8x 128Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // actually 8x 128Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -429,7 +430,7 @@ ROM_START( lovebery )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(1bd80ed0) SHA1(d50307573389ebe71e381a75deb83811fa397b94) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -453,7 +454,7 @@ ROM_START( lovebero )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(0a23cea3) SHA1(1780d935b0d641769859b2022df8e4262e7bafd8) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(d3870287) SHA1(efd3630d54068f5a8caf242a48db410bedf48e7a) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -469,7 +470,7 @@ ROM_START( tetgiant )
 	ROM_LOAD( "ic62",  0x00000000, 0x4000000, CRC(31ba1938) SHA1(9b5a05193b3df13cd7617a38913e0b0fbd61da44) )
 	ROM_LOAD( "ic63",  0x04000000, 0x4000000, CRC(cb946213) SHA1(6195e33c44a1e8eb464dfc3558dc1c9b4d910ef3) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // 2x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )
@@ -487,7 +488,7 @@ ROM_START( dinoki25 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0047", 0, SHA1(0f97291d9c5dbe3e66a5220da05aebdfaa78b35d) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0408-com.ic15", 0, 0x800, BAD_DUMP CRC(0e94daba) SHA1(4e9722333a29afd0dbadba78b16344b77a689610) )
@@ -511,7 +512,7 @@ ROM_START( loveber3 )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0042", 0, SHA1(9992d90dae8ce7636e4153e02b779c27931b3be6) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x08))  // 8x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5508" )  // 8x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0446-com.ic15", 0, 0x800, BAD_DUMP CRC(60f56bf2) SHA1(35e697aca7213e3fb1ebe75bb8991b1b992af6d9) )
@@ -528,7 +529,7 @@ ROM_START( tetgiano )
 	DISK_REGION( "cflash" )
 	DISK_IMAGE( "mda-c0076", 0, SHA1(6987c888d2a3ada2d07f6396d47fdba507ca859d) )
 
-	ROM_REGION( 0x04, "boardid", ROMREGION_ERASEVAL(0x02))  // 2x 512Mbit FlashROMs
+	ROM_PARAMETER( ":rom_board:id", "5502" )  // 2x 512Mbit FlashROMs
 
 	ROM_REGION( 0x800, "pic_readout", 0 )
 	ROM_LOAD( "317-0604-com.ic15", 0, 0x800, BAD_DUMP CRC(e8dd2b86) SHA1(765ffd2e4a36302b1db0815e842c9656e29f2457) )

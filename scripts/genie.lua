@@ -2,6 +2,10 @@
 -- copyright-holders:MAMEdev Team
 STANDALONE = false
 
+-- Big project specific
+premake.make.makefile_ignore = true
+premake._checkgenerate = false
+
 newoption {
 	trigger = 'build-dir',
 	description = 'Build directory name',
@@ -94,6 +98,7 @@ SOUNDS  = {}
 MACHINES  = {}
 VIDEOS = {}
 BUSES  = {}
+FORMATS  = {}
 
 newoption {
 	trigger = "with-tools",
@@ -367,15 +372,6 @@ newoption {
 }
 
 newoption {
-	trigger = "USE_LIBUV",
-	description = "Use libuv.",
-	allowed = {
-		{ "0",   "Disabled"     },
-		{ "1",   "Enabled"      },
-	}
-}
-
-newoption {
 	trigger = "DEBUG_DIR",
 	description = "Default directory for debugger.",
 }
@@ -383,6 +379,11 @@ newoption {
 newoption {
 	trigger = "DEBUG_ARGS",
 	description = "Arguments for running debug build.",
+}
+
+newoption {
+	trigger = "WEBASSEMBLY",
+	description = "Produce WebAssembly output when building with Emscripten.",
 }
 
 dofile ("extlib.lua")
@@ -409,10 +410,6 @@ if not _OPTIONS["NOASM"] then
 	else
 		_OPTIONS["NOASM"] = "0"
 	end
-end
-
-if not _OPTIONS["USE_LIBUV"] then
-	_OPTIONS["USE_LIBUV"] = "1"
 end
 
 if _OPTIONS["NOASM"]=="1" and not _OPTIONS["FORCE_DRC_C_BACKEND"] then
@@ -478,6 +475,7 @@ configuration { "vs*" }
 configuration { "Debug", "vs*" }
 	flags {
 		"Symbols",
+		"NoIncrementalLink",
 	}
 
 configuration { "Release", "vs*" }
@@ -485,7 +483,7 @@ configuration { "Release", "vs*" }
 		"Optimize",
 	}
 
--- Force VS2013/15 targets to use bundled SDL2
+-- Force VS2015/17 targets to use bundled SDL2
 if string.sub(_ACTION,1,4) == "vs20" and _OPTIONS["osd"]=="sdl" then
 	if _OPTIONS["with-bundled-sdl2"]==nil then
 		_OPTIONS["with-bundled-sdl2"] = "1"
@@ -497,6 +495,12 @@ if _OPTIONS["targetos"] == "android" then
 end
 
 configuration {}
+
+if _OPTIONS["osd"] == "uwp" then
+	windowstargetplatformversion("10.0.14393.0")
+	windowstargetplatformminversion("10.0.14393.0")
+	premake._filelevelconfig = true
+end
 
 msgcompile ("Compiling $(subst ../,,$<)...")
 
@@ -526,12 +530,6 @@ configuration { "gmake or ninja" }
 
 dofile ("toolchain.lua")
 
-if _OPTIONS["USE_LIBUV"]=="0" then
-	defines {
-		"NO_LIBUV",
-	}
-end
-
 if _OPTIONS["targetos"]=="windows" then
 	configuration { "x64" }
 		defines {
@@ -552,7 +550,7 @@ configuration { "Debug" }
 	defines {
 		"MAME_DEBUG",
 		"MAME_PROFILER",
---		"BGFX_CONFIG_DEBUG=1",
+--      "BGFX_CONFIG_DEBUG=1",
 	}
 
 if _OPTIONS["FASTDEBUG"]=="1" then
@@ -694,7 +692,7 @@ if string.find(_OPTIONS["gcc"], "clang") and ((version < 30500) or (_OPTIONS["ta
 		"-std=c++1y",
 	}
 
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-x objective-c++",
 		"-std=c++1y",
 	}
@@ -704,7 +702,7 @@ else
 		"-std=c++14",
 	}
 
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-x objective-c++",
 		"-std=c++14",
 	}
@@ -929,7 +927,7 @@ if _OPTIONS["targetos"]~="freebsd" then
 end
 
 -- warnings only applicable to OBJ-C compiles
-	buildoptions_objc {
+	buildoptions_objcpp {
 		"-Wpointer-arith",
 	}
 
@@ -957,28 +955,22 @@ end
 			buildoptions {
 				"-Wno-cast-align",
 				"-Wno-tautological-compare",
-				"-Wno-dynamic-class-memaccess",
 				"-Wno-unused-value",
-				"-Wno-inline-new-delete",
 				"-Wno-constant-logical-operand",
-				"-Wno-deprecated-register",
+				"-Wno-missing-braces", -- clang is not as permissive as GCC about std::array initialization
 				"-fdiagnostics-show-note-include-stack",
 			}
 			if (version >= 30500) then
 				buildoptions {
-					"-Wno-absolute-value",
 					"-Wno-unknown-warning-option",
 					"-Wno-extern-c-compat",
-				}
-			end
-			if (version >= 70000) then
-				buildoptions {
-					"-Wno-tautological-undefined-compare",
+					"-Wno-unknown-attributes",
+					"-Wno-ignored-qualifiers"
 				}
 			end
 		else
-			if (version < 40900) then
-				print("GCC version 4.9 or later needed")
+			if (version < 50000) then
+				print("GCC version 5.0 or later needed")
 				os.exit(-1)
 			end
 				buildoptions {
@@ -1143,10 +1135,14 @@ configuration { "mingw*" }
 			"shell32",
 			"userenv",
 		}
+
 configuration { "mingw-clang" }
+	local version = str_to_version(_OPTIONS["gcc_version"])
+	if _OPTIONS["gcc"]~=nil and string.find(_OPTIONS["gcc"], "clang") and ((version < 30900)) then
 		linkoptions {
 			"-pthread",
 		}
+	end
 
 
 configuration { "vs*" }
@@ -1156,7 +1152,10 @@ configuration { "vs*" }
 			"_WIN32",
 			"_CRT_NONSTDC_NO_DEPRECATE",
 			"_CRT_SECURE_NO_DEPRECATE",
+			"_CRT_STDIO_LEGACY_WIDE_SPECIFIERS",
 		}
+-- Windows Store/Phone projects already link against the available libraries.
+if _OPTIONS["vs"]==nil or not (string.startswith(_OPTIONS["vs"], "winstore8") or string.startswith(_OPTIONS["vs"], "winphone8")) then
 		links {
 			"user32",
 			"winmm",
@@ -1169,6 +1168,7 @@ configuration { "vs*" }
 			"shell32",
 			"userenv",
 		}
+end
 
 		buildoptions {
 			"/WX",     -- Treats all compiler warnings as errors.
@@ -1276,7 +1276,7 @@ end
 		includedirs {
 			MAME_DIR .. "3rdparty/dxsdk/Include"
 		}
-configuration { "vs2015*" }
+configuration { "vs201*" }
 		buildoptions {
 			"/wd4334", -- warning C4334: '<<': result of 32-bit shift implicitly converted to 64 bits (was 64-bit shift intended?)
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
@@ -1291,19 +1291,16 @@ configuration { "vs2015*" }
 			"/wd4592", -- warning C4592: symbol will be dynamically initialized (implementation limitation)
 		}
 configuration { "winphone8* or winstore8*" }
-	removelinks {
-		"DelayImp",
-		"gdi32",
-		"psapi"
-	}
-	links {
-		"d3d11",
-		"dxgi"
-	}
 	linkoptions {
 		"/ignore:4264" -- LNK4264: archiving object file compiled with /ZW into a static library; note that when authoring Windows Runtime types it is not recommended to link with a static library that contains Windows Runtime metadata
 	}
 
+
+-- adding this till we sort out asserts in debug mode
+configuration { "Debug", "gmake" }
+	buildoptions_cpp {
+		"-Wno-terminate",
+	}
 
 configuration { }
 
@@ -1320,6 +1317,13 @@ if (not os.isfile(path.join("src", "osd",  _OPTIONS["osd"] .. ".lua"))) then
 end
 dofile(path.join("src", "osd", _OPTIONS["osd"] .. ".lua"))
 dofile(path.join("src", "lib.lua"))
+if (MACHINES["NETLIST"]~=null or _OPTIONS["with-tools"]) then
+dofile(path.join("src", "netlist.lua"))
+end
+--if (STANDALONE~=true) then
+dofile(path.join("src", "formats.lua"))
+formatsProject(_OPTIONS["target"],_OPTIONS["subtarget"])
+--end
 
 group "3rdparty"
 dofile(path.join("src", "3rdparty.lua"))

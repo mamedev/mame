@@ -29,7 +29,7 @@ class s100_wunderbus_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -48,8 +48,8 @@ protected:
 	virtual void s100_vi0_w(int state) override;
 	virtual void s100_vi1_w(int state) override;
 	virtual void s100_vi2_w(int state) override;
-	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) override;
-	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) override;
+	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) override;
 
 private:
 	required_device<pic8259_device> m_pic;
@@ -60,7 +60,7 @@ private:
 	required_ioport m_7c;
 	required_ioport m_10a;
 
-	UINT8 m_group;
+	uint8_t m_group;
 	int m_rtc_tp;
 };
 

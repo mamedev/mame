@@ -29,7 +29,7 @@ public:
 	device_intv_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_intv_control_port_interface();
 
-	virtual UINT8 read_ctrl() { return 0; };
+	virtual uint8_t read_ctrl() { return 0; };
 
 protected:
 	intv_control_port_device *m_port;
@@ -42,11 +42,11 @@ class intv_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	intv_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~intv_control_port_device();
 
 	DECLARE_READ8_MEMBER( ctrl_r ) { return read_ctrl(); }
-	UINT8 read_ctrl();
+	uint8_t read_ctrl();
 
 protected:
 	// device-level overrides

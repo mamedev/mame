@@ -213,7 +213,7 @@ GFXDECODE_END
 
 const device_type GP9001_VDP = &device_creator<gp9001vdp_device>;
 
-gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gp9001vdp_device::gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, GP9001_VDP, "GP9001 VDP", tag, owner, clock, "gp9001vdp", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
 		device_video_interface(mconfig, *this),
@@ -308,7 +308,7 @@ void gp9001vdp_device::create_tilemaps()
 
 void gp9001vdp_device::device_start()
 {
-	sp.vram16_buffer = make_unique_clear<UINT16[]>(GP9001_SPRITERAM_SIZE/2);
+	sp.vram16_buffer = make_unique_clear<uint16_t[]>(GP9001_SPRITERAM_SIZE/2);
 
 	create_tilemaps();
 
@@ -375,7 +375,7 @@ void gp9001vdp_device::device_reset()
 }
 
 
-void gp9001vdp_device::gp9001_voffs_w(UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_voffs_w(uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&gp9001_voffs);
 }
@@ -388,7 +388,7 @@ int gp9001vdp_device::gp9001_videoram16_r()
 }
 
 
-void gp9001vdp_device::gp9001_videoram16_w(UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_videoram16_w(uint16_t data, uint16_t mem_mask)
 {
 	int offs = gp9001_voffs;
 	gp9001_voffs++;
@@ -396,12 +396,12 @@ void gp9001vdp_device::gp9001_videoram16_w(UINT16 data, UINT16 mem_mask)
 }
 
 
-UINT16 gp9001vdp_device::gp9001_vdpstatus_r()
+uint16_t gp9001vdp_device::gp9001_vdpstatus_r()
 {
 	return ((m_screen->vpos() + 15) % 262) >= 245;
 }
 
-void gp9001vdp_device::gp9001_scroll_reg_select_w(UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_scroll_reg_select_w(uint16_t data, uint16_t mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -415,7 +415,7 @@ void gp9001vdp_device::gp9001_scroll_reg_select_w(UINT16 data, UINT16 mem_mask)
 	}
 }
 
-static void gp9001_set_scrollx_and_flip_reg(gp9001tilemaplayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+static void gp9001_set_scrollx_and_flip_reg(gp9001tilemaplayer* layer, uint16_t data, uint16_t mem_mask, int flip)
 {
 	COMBINE_DATA(&layer->scrollx);
 
@@ -432,7 +432,7 @@ static void gp9001_set_scrollx_and_flip_reg(gp9001tilemaplayer* layer, UINT16 da
 	layer->tmap->set_flip(layer->flip);
 }
 
-static void gp9001_set_scrolly_and_flip_reg(gp9001tilemaplayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+static void gp9001_set_scrolly_and_flip_reg(gp9001tilemaplayer* layer, uint16_t data, uint16_t mem_mask, int flip)
 {
 	COMBINE_DATA(&layer->scrolly);
 
@@ -451,7 +451,7 @@ static void gp9001_set_scrolly_and_flip_reg(gp9001tilemaplayer* layer, UINT16 da
 	layer->tmap->set_flip(layer->flip);
 }
 
-static void gp9001_set_sprite_scrollx_and_flip_reg(gp9001spritelayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+static void gp9001_set_sprite_scrollx_and_flip_reg(gp9001spritelayer* layer, uint16_t data, uint16_t mem_mask, int flip)
 {
 	if (flip)
 	{
@@ -472,7 +472,7 @@ static void gp9001_set_sprite_scrollx_and_flip_reg(gp9001spritelayer* layer, UIN
 	}
 }
 
-static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, UINT16 data, UINT16 mem_mask, int flip)
+static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, uint16_t data, uint16_t mem_mask, int flip)
 {
 	if (flip)
 	{
@@ -492,7 +492,7 @@ static void gp9001_set_sprite_scrolly_and_flip_reg(gp9001spritelayer* layer, UIN
 	}
 }
 
-void gp9001vdp_device::gp9001_scroll_reg_data_w(UINT16 data, UINT16 mem_mask)
+void gp9001vdp_device::gp9001_scroll_reg_data_w(uint16_t data, uint16_t mem_mask)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independently, so emulate it ******/
@@ -674,11 +674,11 @@ WRITE16_MEMBER( gp9001vdp_device::pipibibi_bootleg_spriteram16_w )
     Sprite Handlers
 ***************************************************************************/
 
-void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap )
+void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap )
 {
-	const UINT16 primask = (GP9001_PRIMASK << 8);
+	const uint16_t primask = (GP9001_PRIMASK << 8);
 
-	UINT16 *source;
+	uint16_t *source;
 
 	if (sp.use_sprite_buffer) source = sp.vram16_buffer.get();
 	else source = &m_spriteram[0];
@@ -787,7 +787,7 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 					const pen_t *paldata = &palette().pen(color * 16);
 					{
 						int yy, xx;
-						const UINT8* srcdata = gfx(1)->get_data(sprite);
+						const uint8_t* srcdata = gfx(1)->get_data(sprite);
 						int count = 0;
 						int ystart, yend, yinc;
 						int xstart, xend, xinc;
@@ -829,9 +829,9 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
 
 								if (cliprect.contains(drawxx, drawyy))
 								{
-									UINT8 pix = srcdata[count];
-									UINT16* dstptr = &bitmap.pix16(drawyy, drawxx);
-									UINT8* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
+									uint8_t pix = srcdata[count];
+									uint16_t* dstptr = &bitmap.pix16(drawyy, drawxx);
+									uint8_t* dstpri = &this->custom_priority_bitmap->pix8(drawyy, drawxx);
 
 									if (priority >= dstpri[0])
 									{
@@ -864,15 +864,15 @@ void gp9001vdp_device::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clip
     Draw the game screen in the given bitmap_ind16.
 ***************************************************************************/
 
-void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable )
+void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable )
 {
 	int width = m_screen->width();
 	int height = m_screen->height();
 	int y,x;
 	bitmap_ind16 &tmb = tilemap->pixmap();
-	UINT16* srcptr;
-	UINT16* dstptr;
-	UINT8* dstpriptr;
+	uint16_t* srcptr;
+	uint16_t* dstptr;
+	uint8_t* dstpriptr;
 
 	int scrollx = tilemap->scrollx(0);
 	int scrolly = tilemap->scrolly(0);
@@ -889,8 +889,8 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap
 		{
 			int realx = (x+scrollx)&0x1ff;
 
-			UINT16 pixdat = srcptr[realx];
-			UINT8 pixpri = ((pixdat & (GP9001_PRIMASK_TMAPS<<12))>>12);
+			uint16_t pixdat = srcptr[realx];
+			uint8_t pixpri = ((pixdat & (GP9001_PRIMASK_TMAPS<<12))>>12);
 
 			if (pri_enable[pixpri])
 			{
@@ -911,11 +911,11 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap
 }
 
 
-static const UINT8 gp9001_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
-//static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
-static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+static const uint8_t gp9001_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
+//static const uint8_t gp9001_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+static const uint8_t gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
 
-static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
+static const uint8_t batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };
 
 void gp9001vdp_device::gp9001_render_vdp(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

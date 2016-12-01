@@ -135,16 +135,16 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart7 ) { return load_cart(image, m_cart7, 6); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( mt_cart8 ) { return load_cart(image, m_cart8, 7); }
 
-	UINT32 screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_main(screen_device &screen, bool state);
 
 private:
-	UINT8 m_mt_cart_select_reg;
-	UINT32 m_bios_port_ctrl;
+	uint8_t m_mt_cart_select_reg;
+	uint32_t m_bios_port_ctrl;
 	int m_current_MACHINE_IS_sms; // is the current game SMS based (running on genesis z80, in VDP compatibility mode)
-	UINT32 m_bios_ctrl_inputs;
-	UINT8 m_bios_ctrl[6];
+	uint32_t m_bios_ctrl_inputs;
+	uint8_t m_bios_ctrl[6];
 	int m_mt_bank_addr;
 
 	int m_cart_is_genesis[8];
@@ -154,9 +154,9 @@ private:
 
 	void switch_cart(int gameno);
 
-	std::unique_ptr<UINT8[]> m_banked_ram;
-	std::unique_ptr<UINT8[]> sms_mainram;
-	std::unique_ptr<UINT8[]> sms_rom;
+	std::unique_ptr<uint8_t[]> m_banked_ram;
+	std::unique_ptr<uint8_t[]> sms_mainram;
+	std::unique_ptr<uint8_t[]> sms_rom;
 
 	required_device<sega315_5124_device> m_vdp1;
 	required_device<generic_slot_device> m_cart1;
@@ -365,12 +365,12 @@ void mtech_state::set_genz80_as_sms()
 	address_space &io = m_z80snd->space(AS_IO);
 
 	// main ram area
-	sms_mainram = std::make_unique<UINT8[]>(0x2000);
+	sms_mainram = std::make_unique<uint8_t[]>(0x2000);
 	prg.install_ram(0xc000, 0xdfff, 0x2000, sms_mainram.get());
 	memset(sms_mainram.get(), 0x00, 0x2000);
 
 	// fixed rom bank area
-	sms_rom = std::make_unique<UINT8[]>(0xc000);
+	sms_rom = std::make_unique<uint8_t[]>(0xc000);
 	prg.install_rom(0x0000, 0xbfff, sms_rom.get());
 
 	memcpy(sms_rom.get(), m_region_maincpu->base(), 0xc000);
@@ -493,7 +493,7 @@ WRITE8_MEMBER(mtech_state::bios_ctrl_w )
 READ8_MEMBER(mtech_state::read_68k_banked_data )
 {
 	address_space &space68k = m_maincpu->space();
-	UINT8 ret = space68k.read_byte(m_mt_bank_addr + offset);
+	uint8_t ret = space68k.read_byte(m_mt_bank_addr + offset);
 	return ret;
 }
 
@@ -546,7 +546,7 @@ WRITE8_MEMBER(mtech_state::bios_port_ctrl_w )
 /* the test mode accesses the joypad/stick inputs like this */
 READ8_MEMBER(mtech_state::bios_joypad_r )
 {
-	UINT8 retdata = 0;
+	uint8_t retdata = 0;
 
 	if (m_bios_port_ctrl == 0x55)
 	{
@@ -595,7 +595,7 @@ ADDRESS_MAP_END
 
 DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 {
-	m_banked_ram = std::make_unique<UINT8[]>(0x1000*8);
+	m_banked_ram = std::make_unique<uint8_t[]>(0x1000*8);
 
 	DRIVER_INIT_CALL(megadriv);
 
@@ -605,14 +605,14 @@ DRIVER_INIT_MEMBER(mtech_state,mt_slot)
 
 DRIVER_INIT_MEMBER(mtech_state,mt_crt)
 {
-	UINT8* pin = memregion("sms_pin")->base();
+	uint8_t* pin = memregion("sms_pin")->base();
 	DRIVER_INIT_CALL(mt_slot);
 
 	m_cart_is_genesis[0] = !pin[0] ? 1 : 0;;
 }
 
 
-UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// if we're running an sms game then use the SMS update.. maybe this should be moved to the megadrive emulation core as compatibility mode is a feature of the chip
 	if (!m_current_MACHINE_IS_sms)
@@ -624,8 +624,8 @@ UINT32 mtech_state::screen_update_main(screen_device &screen, bitmap_rgb32 &bitm
 		// when launching megatech + both sms and megadrive games, the following would be needed...
 		for (int y = 0; y < 224; y++)
 		{
-			UINT32* lineptr = &bitmap.pix32(y);
-			UINT32* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
+			uint32_t* lineptr = &bitmap.pix32(y);
+			uint32_t* srcptr =  &m_vdp->get_bitmap().pix32(y + SEGA315_5124_TBORDER_START + SEGA315_5124_NTSC_224_TBORDER_HEIGHT);
 
 			for (int x = 0; x < SEGA315_5124_WIDTH; x++)
 				lineptr[x] = srcptr[x];
@@ -669,7 +669,7 @@ MACHINE_RESET_MEMBER(mtech_state, megatech)
 	switch_cart(0);
 }
 
-UINT32 mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mtech_state::screen_update_menu(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_vdp1->screen_update(screen, bitmap, cliprect);
 	return 0;
@@ -720,9 +720,9 @@ MACHINE_CONFIG_END
 
 image_init_result mtech_state::load_cart(device_image_interface &image, generic_slot_device *slot, int gameno)
 {
-	UINT8 *ROM;
+	uint8_t *ROM;
 	const char  *pcb_name;
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 
 	if (image.software_entry() == nullptr)
 		return image_init_result::FAIL;
@@ -776,7 +776,7 @@ static MACHINE_CONFIG_DERIVED( megatech_fixedslot, megatech )
 
 	// add cart slots
 	MCFG_MEGATECH_CARTSLOT_ADD("mt_slot1", mt_cart1)
-	MCFG_SET_IMAGE_LOADABLE(FALSE)
+	MCFG_SET_IMAGE_LOADABLE(false)
 MACHINE_CONFIG_END
 
 

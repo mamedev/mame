@@ -266,14 +266,14 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_cart;
-	required_region_ptr<UINT16> m_rom;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_mouse_gfx;
+	required_region_ptr<uint16_t> m_rom;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_mouse_gfx;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(geniusiq);
-	virtual UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(input_r);
 	DECLARE_WRITE16_MEMBER(mouse_pos_w);
@@ -283,7 +283,7 @@ public:
 	DECLARE_WRITE16_MEMBER(gfx_dest_w);
 	DECLARE_WRITE16_MEMBER(gfx_color_w);
 	DECLARE_WRITE16_MEMBER(gfx_idx_w);
-	void queue_input(UINT16 data);
+	void queue_input(uint16_t data);
 	DECLARE_READ16_MEMBER(cart_state_r);
 
 	DECLARE_READ16_MEMBER(unk0_r) { return 0; }
@@ -292,18 +292,18 @@ public:
 	DECLARE_DEVICE_IMAGE_UNLOAD_MEMBER( iq128_cart );
 
 private:
-	UINT16      m_gfx_y;
-	UINT16      m_gfx_x;
-	UINT32      m_gfx_base;
-	UINT8       m_gfx_color[2];
-	UINT8       m_mouse_posx;
-	UINT8       m_mouse_posy;
-	UINT16      m_mouse_gfx_posx;
-	UINT16      m_mouse_gfx_posy;
-	UINT8       m_cart_state;
+	uint16_t      m_gfx_y;
+	uint16_t      m_gfx_x;
+	uint32_t      m_gfx_base;
+	uint8_t       m_gfx_color[2];
+	uint8_t       m_mouse_posx;
+	uint8_t       m_mouse_posy;
+	uint16_t      m_mouse_gfx_posx;
+	uint16_t      m_mouse_gfx_posy;
+	uint8_t       m_cart_state;
 	struct
 	{
-		UINT16  buffer[KEYBOARD_QUEUE_SIZE];
+		uint16_t  buffer[KEYBOARD_QUEUE_SIZE];
 		int     head;
 		int     tail;
 	} m_keyboard;
@@ -319,13 +319,13 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 
-	virtual UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	virtual uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
 {
 	// shades need to be verified
-	const UINT8 palette_val[] =
+	const uint8_t palette_val[] =
 	{
 		0x00, 0x00, 0x00,    // Black?? (used in the cursor for transparency)
 		0xff, 0xff, 0xff,    // White
@@ -349,17 +349,17 @@ PALETTE_INIT_MEMBER(geniusiq_state, geniusiq)
 		palette.set_pen_color(i, palette_val[i*3], palette_val[i*3+1], palette_val[i*3+2]);
 }
 
-UINT32 gl8008cx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gl8008cx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
-UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y=0; y<256; y++)
 		for (int x=0; x<256; x+=2)
 		{
-			UINT16 data = m_vram[(y*256 + x)>>1];
+			uint16_t data = m_vram[(y*256 + x)>>1];
 
 			for(int b=0; b<4; b++)
 			{
@@ -372,11 +372,11 @@ UINT32 geniusiq_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 	for (int y=0; y<16; y++)
 		for (int x=0; x<6; x+=2)
 		{
-			UINT16 data = m_mouse_gfx[(y*6 + x)>>1];
+			uint16_t data = m_mouse_gfx[(y*6 + x)>>1];
 
 			for(int b=0; b<8; b++)
 			{
-				UINT8 pen = (data>>14) & 0x03;
+				uint8_t pen = (data>>14) & 0x03;
 
 				// I assume color 0 is transparent
 				if(pen != 0 && screen.visible_area().contains(m_mouse_gfx_posx + x*4 + b, m_mouse_gfx_posy + y))
@@ -424,18 +424,18 @@ WRITE16_MEMBER(geniusiq_state::gfx_base_w)
 
 WRITE16_MEMBER(geniusiq_state::gfx_idx_w)
 {
-	UINT16 *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
+	uint16_t *gfx = m_rom + ((m_gfx_base + (data & 0xff)*32)>>1);
 
 	// first 16 bits are used to define the character size
-	UINT8 gfx_heigh = (gfx[0]>>0) & 0xff;
-	UINT8 gfx_width = (gfx[0]>>8) & 0xff;
+	uint8_t gfx_heigh = (gfx[0]>>0) & 0xff;
+	uint8_t gfx_width = (gfx[0]>>8) & 0xff;
 
 	for(int y=0; y<gfx_heigh; y++)
 		for(int x=0; x<gfx_width; x++)
 		{
-			UINT16 src = gfx[y + 1];
-			UINT32 dst = (m_gfx_y + y)*512 + (m_gfx_x + x);
-			UINT8 pen = m_gfx_color[BIT(src,15-x)];
+			uint16_t src = gfx[y + 1];
+			uint32_t dst = (m_gfx_y + y)*512 + (m_gfx_x + x);
+			uint8_t pen = m_gfx_color[BIT(src,15-x)];
 			int bit_pos = (3 - (dst & 3)) << 2;
 
 			m_vram[dst>>2] = (m_vram[dst>>2] & ~(0x0f << bit_pos)) | (pen << bit_pos);
@@ -453,7 +453,7 @@ READ16_MEMBER( geniusiq_state::input_r )
 	    ---- ---- -xxx xxxx     this is the scan code
 	*/
 
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	if(m_keyboard.head != m_keyboard.tail)
 	{
@@ -470,7 +470,7 @@ READ16_MEMBER( geniusiq_state::input_r )
 	return data;
 }
 
-void geniusiq_state::queue_input(UINT16 data)
+void geniusiq_state::queue_input(uint16_t data)
 {
 	m_keyboard.buffer[m_keyboard.tail] = data;
 
@@ -482,12 +482,12 @@ void geniusiq_state::queue_input(UINT16 data)
 
 INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
 {
-	UINT8 new_mouse_x = ioport("MOUSEX")->read();
-	UINT8 new_mouse_y = ioport("MOUSEY")->read();
-	UINT8 mouse_buttons = ioport("MOUSE")->read();
+	uint8_t new_mouse_x = ioport("MOUSEX")->read();
+	uint8_t new_mouse_y = ioport("MOUSEY")->read();
+	uint8_t mouse_buttons = ioport("MOUSE")->read();
 
-	UINT8 delta_x = (UINT8)(new_mouse_x - m_mouse_posx);
-	UINT8 delta_y = (UINT8)(new_mouse_y - m_mouse_posy);
+	uint8_t delta_x = (uint8_t)(new_mouse_x - m_mouse_posx);
+	uint8_t delta_y = (uint8_t)(new_mouse_y - m_mouse_posy);
 	m_mouse_posx = new_mouse_x;
 	m_mouse_posy = new_mouse_y;
 
@@ -498,7 +498,7 @@ INPUT_CHANGED_MEMBER( geniusiq_state::send_mouse_input )
 
 INPUT_CHANGED_MEMBER( geniusiq_state::send_input )
 {
-	UINT16 data = (UINT16)(FPTR)param;
+	uint16_t data = (uint16_t)(uintptr_t)param;
 
 	// set bit 7 if the key is released
 	if (!newval)
@@ -762,7 +762,7 @@ void geniusiq_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER(geniusiq_state,iq128_cart)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	// we always a 0x100000 region, for easier mapping in the memory map
 	m_cart->rom_alloc(0x100000, GENERIC_ROM16_WIDTH, ENDIANNESS_LITTLE);

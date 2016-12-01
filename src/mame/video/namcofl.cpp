@@ -11,8 +11,8 @@
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
 #ifdef UNUSED_FUNCTION
-static inline UINT16
-nth_word32( const UINT32 *source, int which )
+static inline uint16_t
+nth_word32( const uint32_t *source, int which )
 {
 	source += which/2;
 	which ^= 1; /* i960 is little-endian */
@@ -31,10 +31,10 @@ nth_word32( const UINT32 *source, int which )
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
 #ifdef UNUSED_FUNCTION
-static inline UINT8
-nth_byte32( const UINT32 *pSource, int which )
+static inline uint8_t
+nth_byte32( const uint32_t *pSource, int which )
 {
-		UINT32 data = pSource[which/4];
+		uint32_t data = pSource[which/4];
 
 		which ^= 3; /* i960 is little-endian */
 		switch( which&3 )
@@ -47,14 +47,14 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 #endif
 
-static void TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
+static void TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 }
 
 
-UINT32 namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namcofl_state::screen_update_namcofl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int pri;
 
@@ -91,6 +91,6 @@ static int FLobjcode2tile( running_machine &machine, int code )
 VIDEO_START_MEMBER(namcofl_state,namcofl)
 {
 	namco_tilemap_init(NAMCOFL_TILEGFX, memregion(NAMCOFL_TILEMASKREGION)->base(), TilemapCB );
-	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(FLobjcode2tile), &machine()));
+	c355_obj_init(NAMCOFL_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&FLobjcode2tile, &machine()));
 	c169_roz_init(NAMCOFL_ROTGFX,NAMCOFL_ROTMASKREGION);
 }

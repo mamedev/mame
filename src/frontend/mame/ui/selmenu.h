@@ -48,7 +48,7 @@ protected:
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
-	// hanlders
+	// handlers
 	void inkey_navigation();
 
 	// draw arrow
@@ -115,8 +115,15 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
 
+	game_driver const       *m_info_driver;
+	ui_software_info const  *m_info_software;
+	int                      m_info_view;
+	std::vector<std::string> m_items_list;
+	std::string              m_info_buffer;
+
 	// draw infos
-	virtual void infos_render(float x1, float y1, float x2, float y2) = 0;
+	void infos_render(float x1, float y1, float x2, float y2);
+	virtual void general_info(const game_driver *driver, std::string &buffer) = 0;
 
 	// get selected software and/or driver
 	virtual void get_selection(ui_software_info const *&software, game_driver const *&driver) const = 0;
@@ -146,13 +153,13 @@ private:
 	void get_title_search(std::string &title, std::string &search);
 
 	// handle keys
-	virtual void handle_keys(UINT32 flags, int &iptkey) override;
+	virtual void handle_keys(uint32_t flags, int &iptkey) override;
 
 	// handle mouse
-	virtual void handle_events(UINT32 flags, event &ev) override;
+	virtual void handle_events(uint32_t flags, event &ev) override;
 
 	// draw game list
-	virtual void draw(UINT32 flags) override;
+	virtual void draw(uint32_t flags) override;
 
 	// draw right panel
 	void draw_right_panel(float origx1, float origy1, float origx2, float origy2);
@@ -175,8 +182,11 @@ private:
 	cache_ptr               m_cache;
 	bool                    m_is_swlist;
 	focused_menu            m_focus;
-	bool                    m_pressed;          // mouse button held down
+	bool                    m_pressed;              // mouse button held down
 	osd_ticks_t             m_repeat;
+
+	int                     m_right_visible_lines;  // right box lines
+
 
 	render_texture          *m_icons_texture[MAX_ICONS_RENDER];
 	bitmap_ptr              m_icons_bitmap[MAX_ICONS_RENDER];

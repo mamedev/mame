@@ -29,12 +29,12 @@ class side116_device : public device_t,
 {
 public:
 	// construction/destruction
-	side116_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	side116_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -49,7 +49,7 @@ protected:
 private:
 	required_device<ata_interface_device> m_ata;
 	required_ioport m_config;
-	UINT8 m_latch;
+	uint8_t m_latch;
 };
 
 

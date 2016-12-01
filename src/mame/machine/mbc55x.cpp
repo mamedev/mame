@@ -175,10 +175,10 @@ void mbc55x_state::keyboard_reset()
 
 void mbc55x_state::scan_keyboard()
 {
-	UINT8   keyrow;
-	UINT8   row;
-	UINT8   bitno;
-	UINT8   mask;
+	uint8_t   keyrow;
+	uint8_t   row;
+	uint8_t   bitno;
+	uint8_t   mask;
 
 	char    key;
 	static const char *const keynames[] =
@@ -244,7 +244,7 @@ TIMER_CALLBACK_MEMBER(mbc55x_state::keyscan_callback)
 
 READ8_MEMBER(mbc55x_state::mbc55x_kb_usart_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 	offset>>=1;
 
 	switch (offset)
@@ -281,8 +281,8 @@ void mbc55x_state::set_ram_size()
 	int             nobanks     = ramsize / RAM_BANK_SIZE;
 	char            bank[10];
 	int             bankno;
-	UINT8           *ram        = &m_ram->pointer()[0];
-	UINT8           *map_base;
+	uint8_t           *ram        = &m_ram->pointer()[0];
+	uint8_t           *map_base;
 	int             bank_base;
 
 
@@ -373,9 +373,9 @@ static int instruction_hook(device_t &device, offs_t curpc)
 {
 	mbc55x_state    *state = device.machine().driver_data<mbc55x_state>();
 	address_space   &space = device.memory().space(AS_PROGRAM);
-	UINT8          *addr_ptr;
+	uint8_t          *addr_ptr;
 
-	addr_ptr = (UINT8*)space.get_read_ptr(curpc);
+	addr_ptr = (uint8_t*)space.get_read_ptr(curpc);
 
 	if ((addr_ptr !=nullptr) && (addr_ptr[0]==0xCD))
 	{
@@ -392,18 +392,18 @@ static void decode_dos21(device_t *device,offs_t pc)
 {
 	mbc55x_state    *state = device->machine().driver_data<mbc55x_state>();
 
-	UINT16  ax = state->m_maincpu->state_int(I8086_AX);
-	UINT16  bx = state->m_maincpu->state_int(I8086_BX);
-	UINT16  cx = state->m_maincpu->state_int(I8086_CX);
-	UINT16  dx = state->m_maincpu->state_int(I8086_DX);
-	UINT16  cs = state->m_maincpu->state_int(I8086_CS);
-	UINT16  ds = state->m_maincpu->state_int(I8086_DS);
-	UINT16  es = state->m_maincpu->state_int(I8086_ES);
-	UINT16  ss = state->m_maincpu->state_int(I8086_SS);
+	uint16_t  ax = state->m_maincpu->state_int(I8086_AX);
+	uint16_t  bx = state->m_maincpu->state_int(I8086_BX);
+	uint16_t  cx = state->m_maincpu->state_int(I8086_CX);
+	uint16_t  dx = state->m_maincpu->state_int(I8086_DX);
+	uint16_t  cs = state->m_maincpu->state_int(I8086_CS);
+	uint16_t  ds = state->m_maincpu->state_int(I8086_DS);
+	uint16_t  es = state->m_maincpu->state_int(I8086_ES);
+	uint16_t  ss = state->m_maincpu->state_int(I8086_SS);
 
-	UINT16  si = state->m_maincpu->state_int(I8086_SI);
-	UINT16  di = state->m_maincpu->state_int(I8086_DI);
-	UINT16  bp = state->m_maincpu->state_int(I8086_BP);
+	uint16_t  si = state->m_maincpu->state_int(I8086_SI);
+	uint16_t  di = state->m_maincpu->state_int(I8086_DI);
+	uint16_t  bp = state->m_maincpu->state_int(I8086_BP);
 
 	device->logerror("=======================================================================\n");
 	device->logerror("DOS Int 0x21 call at %05X\n",pc);

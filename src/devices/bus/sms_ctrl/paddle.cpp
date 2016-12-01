@@ -40,7 +40,7 @@ const device_type SMS_PADDLE = &device_creator<sms_paddle_device>;
 
 CUSTOM_INPUT_MEMBER( sms_paddle_device::rldu_pins_r )
 {
-	UINT8 data = m_paddle_x->read();
+	uint8_t data = m_paddle_x->read();
 
 	if (m_read_state)
 		data >>= 4;
@@ -89,7 +89,7 @@ ioport_constructor sms_paddle_device::device_input_ports() const
 //  sms_paddle_device - constructor
 //-------------------------------------------------
 
-sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_paddle_device::sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_PADDLE, "Sega SMS Paddle", tag, owner, clock, "sms_paddle", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_paddle_pins(*this, "CTRL_PORT"),
@@ -117,7 +117,7 @@ void sms_paddle_device::device_start()
 //  sms_peripheral_r - paddle read
 //-------------------------------------------------
 
-UINT8 sms_paddle_device::peripheral_r()
+uint8_t sms_paddle_device::peripheral_r()
 {
 	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
 	m_read_state = num_intervals & 1;

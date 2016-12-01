@@ -263,11 +263,11 @@ private:
 	int     m_keyboard_column;
 
 	// READY handling
-	line_state m_ready_old;
+	int m_ready_old;
 
 	// Latch for 9901 INT2, INT1 lines
-	line_state  m_int1;
-	line_state  m_int2;
+	int  m_int1;
+	int  m_int2;
 
 	// Connected devices
 	required_device<tms9995_device>     m_cpu;
@@ -408,7 +408,7 @@ INPUT_PORTS_END
 READ8_MEMBER( ti99_8_state::cruread )
 {
 //  if (VERBOSE>6) logerror("read access to CRU address %04x\n", offset << 4);
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	// Similar to the bus8z_devices, just let the mapper, the gromport, and the p-box
 	// decide whether they want to change the value at the CRU address
@@ -445,7 +445,7 @@ static const char *const column[] = {
 READ8_MEMBER( ti99_8_state::read_by_9901 )
 {
 	int answer=0;
-	UINT8 joyst;
+	uint8_t joyst;
 	switch (offset & 0x03)
 	{
 	case TMS9901_CB_INT7:
@@ -475,7 +475,7 @@ READ8_MEMBER( ti99_8_state::read_by_9901 )
 		break;
 
 	case TMS9901_INT8_INT15:
-		// Read pins INT8*-INT15* of TI99's 9901.
+		// Read pins int8_t*-INT15* of TI99's 9901.
 		//
 		// bit 0-2: keyboard status bits 2 to 4
 		// bit 3: tape input mirror
@@ -624,8 +624,8 @@ WRITE_LINE_MEMBER( ti99_8_state::console_reset )
 		m_tms9901->rst1_line(state);
 
 		// Pull up the CRUS and PTGEN lines (9901 outputs have been deactivated, pull-up resistors on the board show effect)
-		m_mainboard->crus_in(TRUE); // assert
-		m_mainboard->ptgen_in(TRUE); // clear
+		m_mainboard->crus_in(true); // assert
+		m_mainboard->ptgen_in(true); // clear
 
 		// Setting ready to false so that automatic wait states are enabled
 		m_cpu->ready_line(CLEAR_LINE);
@@ -689,6 +689,11 @@ MACHINE_START_MEMBER(ti99_8_state,ti99_8)
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>(SPEECHROM_REG);
 	mem->set_reverse_bit_order(true);
+
+	save_item(NAME(m_keyboard_column));
+	save_item(NAME(m_ready_old));
+	save_item(NAME(m_int1));
+	save_item(NAME(m_int2));
 }
 
 MACHINE_RESET_MEMBER(ti99_8_state, ti99_8)
@@ -742,6 +747,14 @@ static MACHINE_CONFIG_START( ti99_8, ti99_8_state )
 	MCFG_GROMPORT8_ADD( GROMPORT_TAG )
 	MCFG_GROMPORT_READY_HANDLER( DEVWRITELINE(MAINBOARD8_TAG, mainboard8_device, system_grom_ready) )
 	MCFG_GROMPORT_RESET_HANDLER( WRITELINE(ti99_8_state, console_reset) )
+
+	// RAM
+	MCFG_RAM_ADD(SRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+	MCFG_RAM_ADD(DRAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("64K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 
 	/* Software list */
 	MCFG_SOFTWARE_LIST_ADD("cart_list_ti99", "ti99_cart")
@@ -899,5 +912,5 @@ ROM_END
 #define rom_ti99_8e rom_ti99_8
 
 /*      YEAR    NAME        PARENT  COMPAT  MACHINE     INPUT   INIT      COMPANY                 FULLNAME */
-COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , 0)
-COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" , 0 )
+COMP(   1983,   ti99_8,     0,      0,  ti99_8_60hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (US)" , MACHINE_SUPPORTS_SAVE )
+COMP(   1983,   ti99_8e,    ti99_8, 0,  ti99_8_50hz,ti99_8, driver_device,  0,      "Texas Instruments",    "TI-99/8 Computer (Europe)" ,  MACHINE_SUPPORTS_SAVE )

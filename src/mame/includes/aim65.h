@@ -58,10 +58,10 @@ public:
 	DECLARE_WRITE8_MEMBER(aim65_riot_a_w);
 	DECLARE_WRITE8_MEMBER(aim65_pb_w);
 	DECLARE_READ8_MEMBER(aim65_pb_r);
-	UINT8 m_pia_a;
-	UINT8 m_pia_b;
-	UINT8 m_riot_port_a;
-	UINT8 m_pb_save;
+	uint8_t m_pia_a;
+	uint8_t m_pia_b;
+	uint8_t m_riot_port_a;
+	uint8_t m_pb_save;
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cassette_image_device> m_cassette1;

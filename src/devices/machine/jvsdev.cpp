@@ -9,7 +9,7 @@ void jvs_device::static_set_jvs_host_tag(device_t &device, const char *jvs_host_
 	jvsdev.jvs_host_tag = jvs_host_tag;
 }
 
-jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+jvs_device::jvs_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source), jvs_outputs(0), jvs_address(0), jvs_reset_counter(0)
 {
 	jvs_host_tag = nullptr;
@@ -21,17 +21,17 @@ const char *jvs_device::device_id()
 	return "";
 }
 
-UINT8 jvs_device::command_format_version()
+uint8_t jvs_device::command_format_version()
 {
 	return 0x13;
 }
 
-UINT8 jvs_device::jvs_standard_version()
+uint8_t jvs_device::jvs_standard_version()
 {
 	return 0x30;
 }
 
-UINT8 jvs_device::comm_method_version()
+uint8_t jvs_device::comm_method_version()
 {
 	return 0x10;
 }
@@ -44,7 +44,7 @@ void jvs_device::chain(jvs_device *dev)
 		next_device = dev;
 }
 
-void jvs_device::message(UINT8 dest, const UINT8 *send_buffer, UINT32 send_size, UINT8 *recv_buffer, UINT32 &recv_size)
+void jvs_device::message(uint8_t dest, const uint8_t *send_buffer, uint32_t send_size, uint8_t *recv_buffer, uint32_t &recv_size)
 {
 	recv_size = 0;
 
@@ -63,8 +63,8 @@ void jvs_device::message(UINT8 dest, const UINT8 *send_buffer, UINT32 send_size,
 
 	// dest=0xff is broadcast
 	if(dest == 0xff || dest == jvs_address) {
-		const UINT8 *s = send_buffer;
-		UINT8 *d = recv_buffer;
+		const uint8_t *s = send_buffer;
+		uint8_t *d = recv_buffer;
 		*d++ = 0x01;
 		while(s < send_buffer + send_size) {
 			int len = handle_message(s, send_size-(s-send_buffer), d);
@@ -89,9 +89,9 @@ void jvs_device::message(UINT8 dest, const UINT8 *send_buffer, UINT32 send_size,
 		next_device->message(dest, send_buffer, send_size, recv_buffer, recv_size);
 }
 
-int jvs_device::handle_message(const UINT8 *send_buffer, UINT32 send_size, UINT8 *&recv_buffer)
+int jvs_device::handle_message(const uint8_t *send_buffer, uint32_t send_size, uint8_t *&recv_buffer)
 {
-	UINT32 old_reset_counter = jvs_reset_counter;
+	uint32_t old_reset_counter = jvs_reset_counter;
 	jvs_reset_counter = 0;
 
 	switch(send_buffer[0]) {
@@ -209,44 +209,44 @@ void jvs_device::device_reset()
 	jvs_outputs = 0;
 }
 
-void jvs_device::function_list(UINT8 *&buf)
+void jvs_device::function_list(uint8_t *&buf)
 {
 }
 
-bool jvs_device::coin_counters(UINT8 *&buf, UINT8 count)
+bool jvs_device::coin_counters(uint8_t *&buf, uint8_t count)
 {
 	return false;
 }
 
-bool jvs_device::coin_add(UINT8 slot, INT32 count)
+bool jvs_device::coin_add(uint8_t slot, int32_t count)
 {
 	return false;
 }
 
 
-bool jvs_device::switches(UINT8 *&buf, UINT8 count_players, UINT8 bytes_per_switch)
+bool jvs_device::switches(uint8_t *&buf, uint8_t count_players, uint8_t bytes_per_switch)
 {
 	return false;
 }
 
-bool jvs_device::analogs(UINT8 *&buf, UINT8 count)
+bool jvs_device::analogs(uint8_t *&buf, uint8_t count)
 {
 	return false;
 }
 
-bool jvs_device::swoutputs(UINT8 count, const UINT8 *vals)
+bool jvs_device::swoutputs(uint8_t count, const uint8_t *vals)
 {
 	return false;
 }
 
-bool jvs_device::swoutputs(UINT8 id, UINT8 val)
+bool jvs_device::swoutputs(uint8_t id, uint8_t val)
 {
 	return false;
 }
 
-void jvs_device::handle_output(ioport_port *port, UINT8 id, UINT8 val)
+void jvs_device::handle_output(ioport_port *port, uint8_t id, uint8_t val)
 {
-	UINT32 m = 1 << id;
+	uint32_t m = 1 << id;
 	switch(val) {
 	case 0: jvs_outputs &= ~m; break;
 	case 1: jvs_outputs |=  m;  break;

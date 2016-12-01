@@ -12,6 +12,7 @@
 #define CHD_CD_H
 
 #include "cdrom.h"
+#include "softlist_dev.h"
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -24,8 +25,8 @@ class cdrom_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~cdrom_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<cdrom_image_device &>(device).m_interface = _interface; }
@@ -44,7 +45,6 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return m_extension_list; }
-	virtual const option_guide *create_option_guide() const override;
 
 	// specific implementation
 	cdrom_file *get_cdrom_file() { return m_cdrom_handle; }

@@ -26,12 +26,12 @@ class ef9340_1_device : public device_t,
 {
 public:
 	// construction/destruction
-	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ef9340_1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	inline bitmap_ind16 *get_bitmap() { return &m_tmp_bitmap; }
 
-	void ef9341_write( UINT8 command, UINT8 b, UINT8 data );
-	UINT8 ef9341_read( UINT8 command, UINT8 b );
+	void ef9341_write( uint8_t command, uint8_t b, uint8_t data );
+	uint8_t ef9341_read( uint8_t command, uint8_t b );
 
 protected:
 	// device-level overrides
@@ -39,11 +39,11 @@ protected:
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	inline UINT16 ef9340_get_c_addr(UINT8 x, UINT8 y);
+	inline uint16_t ef9340_get_c_addr(uint8_t x, uint8_t y);
 	inline void ef9340_inc_c();
 
 	// Calculate the external chargen address for a character and slice
-	inline UINT16 external_chargen_address(UINT8 b, UINT8 slice);
+	inline uint16_t external_chargen_address(uint8_t b, uint8_t slice);
 
 	void ef9340_scanline(int vpos);
 
@@ -56,22 +56,22 @@ protected:
 
 	struct
 	{
-		UINT8   TA;
-		UINT8   TB;
-		UINT8   busy;
+		uint8_t   TA;
+		uint8_t   TB;
+		uint8_t   busy;
 	} m_ef9341;
 	struct
 	{
-		UINT8   X;
-		UINT8   Y;
-		UINT8   Y0;
-		UINT8   R;
-		UINT8   M;
+		uint8_t   X;
+		uint8_t   Y;
+		uint8_t   Y0;
+		uint8_t   R;
+		uint8_t   M;
 		int     max_vpos;
 	} m_ef9340;
-	UINT8   m_ef934x_ram_a[1024];
-	UINT8   m_ef934x_ram_b[1024];
-	UINT8   m_ef934x_ext_char_ram[2048];   /* The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB. */
+	uint8_t   m_ef934x_ram_a[1024];
+	uint8_t   m_ef934x_ram_b[1024];
+	uint8_t   m_ef934x_ext_char_ram[2048];   /* The G7400 has 2KB of external ram hooked up. The datasheet only describes how to hookup 1KB. */
 };
 
 

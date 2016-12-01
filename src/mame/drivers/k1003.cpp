@@ -58,9 +58,9 @@ public:
 	DECLARE_WRITE8_MEMBER(disp_1_w);
 	DECLARE_WRITE8_MEMBER(disp_2_w);
 	DECLARE_WRITE8_MEMBER(disp_w);
-	UINT8 m_disp_1;
-	UINT8 m_disp_2;
-	UINT8 bit_to_dec(UINT8 val);
+	uint8_t m_disp_1;
+	uint8_t m_disp_2;
+	uint8_t bit_to_dec(uint8_t val);
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -96,7 +96,7 @@ WRITE8_MEMBER( k1003_state::disp_2_w )
 	m_disp_2 = data;
 }
 
-UINT8 k1003_state::bit_to_dec(UINT8 val)
+uint8_t k1003_state::bit_to_dec(uint8_t val)
 {
 	if (BIT(val,0)) return 0;
 	if (BIT(val,1)) return 1;

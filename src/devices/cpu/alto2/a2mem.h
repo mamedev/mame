@@ -19,19 +19,20 @@ enum {
 	ALTO2_MEM_NONE,
 	ALTO2_MEM_ODD       = (1 << 0),
 	ALTO2_MEM_RAM       = (1 << 1),
-	ALTO2_MEM_REFRESH   = (1 << 2),
-	ALTO2_MEM_INVALID   = (1 << 3)
+	ALTO2_MEM_LATCHED   = (1 << 2),
+	ALTO2_MEM_REFRESH   = (1 << 3),
+	ALTO2_MEM_INVALID   = (1 << 4)
 };
 
 struct {
-	UINT32 size;                        //!< main memory size (64K or 128K)
-	std::unique_ptr<UINT32[]> ram;      //!< main memory organized as double-words
-	std::unique_ptr<UINT8[]> hpb;       //!< Hamming Code bits (6) and Parity bits (1) per double word
-	UINT32 mar;                         //!< memory address register
-	UINT32 rmdd;                        //!< read memory data double-word
-	UINT32 wmdd;                        //!< write memory data double-word
-	UINT16 md;                          //!< memory data register
-	UINT64 cycle;                       //!< cycle when the memory address register was loaded
+	uint32_t size;                        //!< main memory size (64K or 128K)
+	std::unique_ptr<uint32_t[]> ram;      //!< main memory organized as double-words
+	std::unique_ptr<uint8_t[]> hpb;       //!< Hamming Code bits (6) and Parity bits (1) per double word
+	uint32_t mar;                         //!< memory address register
+	uint32_t rmdd;                        //!< read memory data double-word
+	uint32_t wmdd;                        //!< write memory data double-word
+	uint32_t md;                          //!< memory data register
+	uint64_t cycle;                       //!< cycle when the memory address register was loaded
 
 	/**
 	 * @brief memory access under the way if non-zero
@@ -42,9 +43,9 @@ struct {
 	 */
 	int access;
 	bool error;                         //!< non-zero after a memory error was detected
-	UINT32 mear;                        //!< memory error address register
-	UINT16 mesr;                        //!< memory error status register
-	UINT16 mecr;                        //!< memory error control register
+	uint32_t mear;                        //!< memory error address register
+	uint32_t mesr;                        //!< memory error status register
+	uint32_t mecr;                        //!< memory error control register
 }   m_mem;
 
 /**
@@ -60,7 +61,7 @@ struct {
  *
  * @return false, if memory address can be loaded
  */
-inline bool check_mem_load_mar_stall(UINT8 rsel) {
+inline bool check_mem_load_mar_stall(uint8_t rsel) {
 	if (ALTO2_MEM_NONE == m_mem.access || ALTO2_MEM_REFRESH == m_mem.access)
 		return false;
 	return cycle() < m_mem.cycle+5;
@@ -74,7 +75,7 @@ inline bool check_mem_load_mar_stall(UINT8 rsel) {
  * 2.  REQUIRED
  * 3.  SUSPEND
  * 4.  SUSPEND
- * 5.  whereever <-MD
+ * 5.  wherever <-MD
  *
  * @return false, if memory can be read without wait cycle
  */
@@ -108,27 +109,27 @@ DECLARE_WRITE16_MEMBER( mesr_w );       //!< memory error status register write 
 DECLARE_READ16_MEMBER ( mecr_r );       //!< memory error control register read
 DECLARE_WRITE16_MEMBER( mecr_w );       //!< memory error control register write
 
-//! Read or write a memory double-word and caluclate its Hamming code.
-UINT32 hamming_code(int write, UINT32 dw_addr, UINT32 dw_data);
+//! Read or write a memory double-word and calculate or compare its Hamming code.
+uint32_t hamming_code(bool write, uint32_t dw_addr, uint32_t dw_data);
 
 //! Load the memory address register with some value.
-void load_mar(UINT8 rsel, UINT32 addr);
+void load_mar(uint8_t rsel, uint32_t addr);
 
 //! Read memory or memory mapped I/O from the address in mar to md.
-UINT16 read_mem();
+uint16_t read_mem();
 
 //! Write memory or memory mapped I/O from md to the address in mar.
-void write_mem(UINT16 data);
+void write_mem(uint16_t data);
 
 //! Debugger interface to read memory.
-UINT16 debug_read_mem(UINT32 addr);
+uint16_t debug_read_mem(uint32_t addr);
 
 //! Debugger interface to write memory.
-void debug_write_mem(UINT32 addr, UINT16 data);
+void debug_write_mem(uint32_t addr, uint16_t data);
 
 #if ALTO2_DEBUG
-void watch_write(UINT32 addr, UINT32 data);
-void watch_read(UINT32 addr, UINT32 data);
+void watch_write(uint32_t addr, uint32_t data);
+void watch_read(uint32_t addr, uint32_t data);
 #endif
 
 void init_memory();                             //!< initialize the memory system

@@ -88,9 +88,9 @@ TILE_GET_INFO_MEMBER(bionicc_state::get_tx_tile_info)
 
 void bionicc_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_tx_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bionicc_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 64, 64);
 
 	m_tx_tilemap->set_transparent_pen(3);
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000); /* split type 0 is completely transparent in front half */
@@ -100,11 +100,11 @@ void bionicc_state::video_start()
 
 PALETTE_DECODER_MEMBER( bionicc_state, RRRRGGGGBBBBIIII )
 {
-	UINT8 bright = (raw & 0x0f);
+	uint8_t bright = (raw & 0x0f);
 
-	UINT8 r = ((raw >> 12) & 0x0f) * 0x11;
-	UINT8 g = ((raw >>  8) & 0x0f) * 0x11;
-	UINT8 b = ((raw >>  4) & 0x0f) * 0x11;
+	uint8_t r = ((raw >> 12) & 0x0f) * 0x11;
+	uint8_t g = ((raw >>  8) & 0x0f) * 0x11;
+	uint8_t b = ((raw >>  4) & 0x0f) * 0x11;
 
 	if ((bright & 0x08) == 0)
 	{
@@ -187,7 +187,7 @@ WRITE16_MEMBER(bionicc_state::bionicc_gfxctrl_w)
 
 
 
-UINT32 bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bionicc_state::screen_update_bionicc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, 1 | TILEMAP_DRAW_LAYER1, 0);   /* nothing in FRONT */

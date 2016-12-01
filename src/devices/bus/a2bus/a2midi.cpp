@@ -59,7 +59,7 @@ machine_config_constructor a2bus_midi_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2BUS_MIDI, "6850 MIDI card", tag, owner, clock, "a2midi", __FILE__),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),
@@ -68,7 +68,7 @@ a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, const char *
 {
 }
 
-a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_midi_device::a2bus_midi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a2bus_card_interface(mconfig, *this),
 		m_ptm(*this, MIDI_PTM_TAG),
@@ -96,7 +96,7 @@ void a2bus_midi_device::device_reset()
     read_c0nx - called for reads from this card's c0nx space
 -------------------------------------------------*/
 
-UINT8 a2bus_midi_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_midi_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	// PTM at C0n0-C0n7, ACIA at C0n8-C0n9, drum sync (?) at C0nA-C0nB
 
@@ -110,7 +110,7 @@ UINT8 a2bus_midi_device::read_c0nx(address_space &space, UINT8 offset)
 	}
 	else if (offset == 9)
 	{
-		UINT8 ret = m_acia->data_r(space, 0);
+		uint8_t ret = m_acia->data_r(space, 0);
 		return ret;
 	}
 
@@ -121,7 +121,7 @@ UINT8 a2bus_midi_device::read_c0nx(address_space &space, UINT8 offset)
     write_c0nx - called for writes to this card's c0nx space
 -------------------------------------------------*/
 
-void a2bus_midi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_midi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	if (offset < 8)
 	{

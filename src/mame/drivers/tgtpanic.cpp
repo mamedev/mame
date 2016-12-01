@@ -27,15 +27,15 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
 
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 
-	UINT8 m_color;
+	uint8_t m_color;
 
 	DECLARE_WRITE8_MEMBER(color_w);
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -50,11 +50,11 @@ void tgtpanic_state::machine_start()
  *
  *************************************/
 
-UINT32 tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 colors[4];
-	UINT32 offs;
-	UINT32 x, y;
+	uint32_t colors[4];
+	uint32_t offs;
+	uint32_t x, y;
 
 	colors[0] = 0;
 	colors[1] = 0xffffffff;
@@ -63,7 +63,7 @@ UINT32 tgtpanic_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	for (offs = 0; offs < 0x2000; ++offs)
 	{
-		UINT8 val = m_ram[offs];
+		uint8_t val = m_ram[offs];
 
 		y = (offs & 0x7f) << 1;
 		x = (offs >> 7) << 2;

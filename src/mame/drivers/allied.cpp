@@ -84,16 +84,16 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ic8_cb2_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
-	UINT32 m_player_score[6];
-	UINT8 m_display;
-	UINT8 m_bit_counter;
+	uint32_t m_player_score[6];
+	uint8_t m_display;
+	uint8_t m_bit_counter;
 	bool m_disp_data;
-	UINT8 m_ic5a;
-	UINT8 m_ic6a0;
-	UINT8 m_ic6a1;
-	UINT8 m_ic6a2;
-	UINT8 m_ic6b4;
-	UINT8 m_ic6b7;
+	uint8_t m_ic5a;
+	uint8_t m_ic6a0;
+	uint8_t m_ic6a1;
+	uint8_t m_ic6a2;
+	uint8_t m_ic6b4;
+	uint8_t m_ic6b7;
 	virtual void machine_reset() override;
 	required_device<m6504_device> m_maincpu;
 	required_device<pia6821_device> m_ic1;
@@ -382,7 +382,7 @@ WRITE_LINE_MEMBER( allied_state::ic2_cb2_w )
 	if ((m_display) && (!state))
 	{
 		m_bit_counter++;
-		if BIT(m_bit_counter, 0)
+		if (BIT(m_bit_counter, 0))
 			m_player_score[m_display-1] = (m_player_score[m_display-1] << 1) | m_disp_data;
 		if (m_bit_counter == 15)
 			m_bit_counter = 0;
@@ -402,8 +402,8 @@ READ8_MEMBER( allied_state::ic4_a_r )
 
 WRITE8_MEMBER( allied_state::ic4_b_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
-	UINT8 segment, i;
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x58, 0x4c, 0x62, 0x69, 0x78, 0 }; // 7446A
+	uint8_t segment, i;
 	for (i = 0; i < 4; i++)
 	{
 		if (!BIT(data, i+4))
@@ -586,7 +586,7 @@ WRITE_LINE_MEMBER( allied_state::ic8_cb2_w )
 
 TIMER_DEVICE_CALLBACK_MEMBER( allied_state::timer_a )
 {
-	UINT8 data = ioport("X6A")->read();
+	uint8_t data = ioport("X6A")->read();
 
 	m_ic8->ca1_w(BIT(data, 4));
 	m_ic8->cb1_w(BIT(data, 5));
@@ -708,15 +708,15 @@ ROM_END
 #define rom_starshot    rom_allied
 
 
-GAME(1977,  allied,     0,          allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Allied System", MACHINE_IS_BIOS_ROOT)
-GAME(1977,  suprpick,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Super Picker", MACHINE_MECHANICAL)
-GAME(1977,  royclark,   allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL)
-GAME(1977,  thndbolt,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Thunderbolt", MACHINE_MECHANICAL)
-GAME(1978,  hoedown,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hoe Down", MACHINE_MECHANICAL)
-GAME(1978,  takefive,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Take Five", MACHINE_MECHANICAL)
-GAME(1978,  heartspd,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hearts & Spades", MACHINE_MECHANICAL)
-GAME(1978,  foathens,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Flame of Athens", MACHINE_MECHANICAL)
-GAME(1979,  disco79,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Disco '79", MACHINE_MECHANICAL)
-GAME(1979,  erosone,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Eros One", MACHINE_MECHANICAL)
-GAME(1979,  circa33,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Circa 1933", MACHINE_MECHANICAL)
-GAME(1979,  starshot,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Star Shooter", MACHINE_MECHANICAL)
+GAME(1977,  allied,     0,          allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Allied System", MACHINE_IS_BIOS_ROOT | MACHINE_NOT_WORKING )
+GAME(1977,  suprpick,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Super Picker", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  royclark,   allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Roy Clark - The Entertainer", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1977,  thndbolt,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Thunderbolt", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  hoedown,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hoe Down", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  takefive,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Take Five", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  heartspd,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Hearts & Spades", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1978,  foathens,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Flame of Athens", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  disco79,    allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Disco '79", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  erosone,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Eros One", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  circa33,    allied,     allied, allied, driver_device, 0, ROT0, "Fascination Int.", "Circa 1933", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
+GAME(1979,  starshot,   allied,     allied, allied, driver_device, 0, ROT0, "Allied Leisure", "Star Shooter", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )

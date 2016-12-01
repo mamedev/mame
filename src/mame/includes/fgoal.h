@@ -27,19 +27,19 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_video_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
 
 	/* video-related */
 	bitmap_ind16   m_bgbitmap;
 	bitmap_ind16   m_fgbitmap;
-	UINT8      m_xpos;
-	UINT8      m_ypos;
+	uint8_t      m_xpos;
+	uint8_t      m_ypos;
 	int        m_current_color;
 
 	/* misc */
 	int        m_player;
-	UINT8      m_row;
-	UINT8      m_col;
+	uint8_t      m_row;
+	uint8_t      m_col;
 	int        m_prev_coin;
 	emu_timer  *m_interrupt_timer;
 
@@ -68,7 +68,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(fgoal);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	int intensity(int bits);
 	unsigned video_ram_address( );
 

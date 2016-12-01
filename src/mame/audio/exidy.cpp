@@ -112,7 +112,7 @@ static inline void sh6840_apply_clock(struct sh6840_timer_channel *t, int clocks
 
 inline int exidy_sound_device::sh6840_update_noise(int clocks)
 {
-	UINT32 newxor;
+	uint32_t newxor;
 	int noise_clocks = 0;
 	int i;
 
@@ -205,13 +205,13 @@ void exidy_sound_device::common_sh_start()
 
 const device_type EXIDY = &device_creator<exidy_sound_device>;
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, EXIDY, "Exidy SFX", tag, owner, clock, "exidy_sfx", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+exidy_sound_device::exidy_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_riot_irq_state(0),
@@ -247,7 +247,7 @@ void exidy_sound_device::device_config_complete()
 void exidy_sound_device::device_start()
 {
 	/* indicate no additional hardware */
-	m_has_sh8253  = FALSE;
+	m_has_sh8253  = false;
 	m_tms = nullptr;
 	m_cvsd = nullptr;
 
@@ -282,7 +282,7 @@ void exidy_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		struct sh8253_timer_channel *c;
 		int clocks_this_sample;
 		int clocks;
-		INT16 sample = 0;
+		int16_t sample = 0;
 
 		/* determine how many 6840 clocks this sample */
 		m_sh6840_clock_count += m_sh6840_clocks_per_sample;
@@ -293,7 +293,7 @@ void exidy_sound_device::sound_stream_update(sound_stream &stream, stream_sample
 		if ((sh6840_timer[0].cr & 0x01) == 0)
 		{
 			int noise_clocks_this_sample = 0;
-			UINT32 chan0_clocks;
+			uint32_t chan0_clocks;
 
 			/* generate E-clocked noise if configured to do so */
 			if (noisy && !(m_sfxctrl & 0x01))
@@ -446,7 +446,7 @@ WRITE8_MEMBER( exidy_sound_device::r6532_portb_w )
 
 READ8_MEMBER( exidy_sound_device::r6532_portb_r )
 {
-	UINT8 newdata = m_riot->portb_in_get();
+	uint8_t newdata = m_riot->portb_in_get();
 	if (m_tms != nullptr)
 	{
 		newdata &= ~0x0c;
@@ -669,7 +669,7 @@ WRITE8_MEMBER( venture_sound_device::filter_w )
 
 const device_type EXIDY_VENTURE = &device_creator<venture_sound_device>;
 
-venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+venture_sound_device::venture_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: exidy_sound_device(mconfig, EXIDY_VENTURE, "Exidy SFX+PSG", tag, owner, clock, "venture_sound", __FILE__)
 {
 }
@@ -694,7 +694,7 @@ void venture_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
@@ -742,7 +742,7 @@ void venture_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( venture_audio_map, AS_PROGRAM, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0780) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0780) AM_DEVREADWRITE("riot", riot6532_device, read, write)
@@ -808,8 +808,8 @@ READ8_MEMBER( venture_sound_device::mtrap_voiceio_r )
 {
 	if (!(offset & 0x80))
 	{
-		UINT8 porta = m_riot->porta_out_get();
-		UINT8 data = (porta & 0x06) >> 1;
+		uint8_t porta = m_riot->porta_out_get();
+		uint8_t data = (porta & 0x06) >> 1;
 		data |= (porta & 0x01) << 2;
 		data |= (porta & 0x08);
 		return data;
@@ -822,13 +822,13 @@ READ8_MEMBER( venture_sound_device::mtrap_voiceio_r )
 }
 
 
-static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( cvsd_map, AS_PROGRAM, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, driver_device )
+static ADDRESS_MAP_START( cvsd_iomap, AS_IO, 8, venture_sound_device )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xff) AM_DEVREADWRITE("custom", venture_sound_device, mtrap_voiceio_r, mtrap_voiceio_w)
 ADDRESS_MAP_END
@@ -860,7 +860,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( victory_sound_device::response_r )
 {
-	UINT8 ret = m_pia1->b_output();
+	uint8_t ret = m_pia1->b_output();
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", m_maincpu->pcbase(), ret);
 
@@ -873,7 +873,7 @@ READ8_MEMBER( victory_sound_device::response_r )
 
 READ8_MEMBER( victory_sound_device::status_r )
 {
-	UINT8 ret = (m_pia1_ca1 << 7) | (m_pia1_cb1 << 6);
+	uint8_t ret = (m_pia1_ca1 << 7) | (m_pia1_cb1 << 6);
 
 	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", m_maincpu->pcbase(), ret);
 
@@ -924,7 +924,7 @@ WRITE_LINE_MEMBER( victory_sound_device::main_ack_w )
 
 const device_type EXIDY_VICTORY = &device_creator<victory_sound_device>;
 
-victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+victory_sound_device::victory_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: exidy_sound_device(mconfig, EXIDY_VICTORY, "Exidy SFX+PSG+Speech", tag, owner, clock, "victory_sound", __FILE__),
 	m_victory_sound_response_ack_clk(0)
 {
@@ -954,7 +954,7 @@ void victory_sound_device::device_start()
 
 	m_riot = machine().device<riot6532_device>("riot");
 
-	m_has_sh8253  = TRUE;
+	m_has_sh8253  = true;
 	m_tms = nullptr;
 	m_pia0 = machine().device<pia6821_device>("pia0");
 	m_pia1 = machine().device<pia6821_device>("pia1");
@@ -1006,7 +1006,7 @@ void victory_sound_device::sound_stream_update(sound_stream &stream, stream_samp
 
 
 
-static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( victory_audio_map, AS_PROGRAM, 8, venture_sound_device )
 	AM_RANGE(0x0000, 0x00ff) AM_MIRROR(0x0f00) AM_RAM
 	AM_RANGE(0x1000, 0x107f) AM_MIRROR(0x0f80) AM_DEVREADWRITE("riot", riot6532_device, read, write)
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("pia1", pia6821_device, read, write)

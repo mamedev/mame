@@ -7,7 +7,7 @@ Template for skeleton device
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/xxx.h"
+#include "xxx.h"
 
 
 
@@ -27,20 +27,12 @@ const device_type XXX = &device_creator<xxx_device>;
 //  xxx_device - constructor
 //-------------------------------------------------
 
-xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xxx_device::xxx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, XXX, "xxx_longname", tag, owner, clock, "xxx", __FILE__)
 {
 }
 
 
-//-------------------------------------------------
-//  device_validity_check - perform validity checks
-//  on this device
-//-------------------------------------------------
-
-void xxx_device::device_validity_check(validity_checker &valid) const
-{
-}
 
 
 //-------------------------------------------------

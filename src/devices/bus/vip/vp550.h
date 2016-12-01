@@ -28,7 +28,7 @@ class vp550_device : public device_t,
 {
 public:
 	// construction/destruction
-	vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vp550_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -45,7 +45,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_vip_expansion_card_interface overrides
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) override;
+	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) override;
 	virtual void vip_sc_w(int data) override;
 	virtual void vip_q_w(int state) override;
 	virtual void vip_run_w(int state) override;

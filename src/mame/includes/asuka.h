@@ -32,22 +32,22 @@ public:
 		m_tc0220ioc(*this, "tc0220ioc") { }
 
 	/* video-related */
-	UINT16      m_video_ctrl;
-	UINT16      m_video_mask;
+	uint16_t      m_video_ctrl;
+	uint16_t      m_video_mask;
 
 	/* c-chip */
 	int         m_current_round;
 	int         m_current_bank;
 
-	UINT8       m_cval[26];
-	UINT8       m_cc_port;
-	UINT8       m_restart_status;
+	uint8_t       m_cval[26];
+	uint8_t       m_cc_port;
+	uint8_t       m_restart_status;
 
 	/* misc */
 	int         m_adpcm_pos;
 	int         m_adpcm_data;
 
-	optional_shared_ptr<UINT8> m_cadash_shared_ram;
+	optional_shared_ptr<uint8_t> m_cadash_shared_ram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -67,8 +67,8 @@ public:
 	DECLARE_WRITE8_MEMBER(asuka_msm5205_stop_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bonzeadv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_asuka(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_asuka(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(cadash_interrupt);
 

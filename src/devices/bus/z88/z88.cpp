@@ -55,7 +55,7 @@ device_z88cart_interface::~device_z88cart_interface()
 //-------------------------------------------------
 //  z88cart_slot_device - constructor
 //-------------------------------------------------
-z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+z88cart_slot_device::z88cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, Z88CART_SLOT, "Z88 Cartridge Slot", tag, owner, clock, "z88cart_slot", __FILE__),
 		device_image_interface(mconfig, *this),
 		device_slot_interface(mconfig, *this),
@@ -121,7 +121,7 @@ image_init_result z88cart_slot_device::call_load()
 	if (m_cart)
 	{
 		offs_t read_length;
-		UINT8 *cart_base = m_cart->get_cart_base();
+		uint8_t *cart_base = m_cart->get_cart_base();
 
 		if (cart_base != nullptr)
 		{

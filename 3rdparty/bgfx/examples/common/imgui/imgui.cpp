@@ -410,7 +410,15 @@ struct Imgui
 		const ImguiFontHandle handle = { m_fontHandle.alloc() };
 		const bgfx::Memory* mem = bgfx::alloc(m_textureWidth * m_textureHeight);
 		stbtt_BakeFontBitmap( (uint8_t*)_data, 0, _fontSize, mem->data, m_textureWidth, m_textureHeight, 32, 96, m_fonts[handle.idx].m_cdata);
-		m_fonts[handle.idx].m_texture = bgfx::createTexture2D(m_textureWidth, m_textureHeight, 1, bgfx::TextureFormat::R8, BGFX_TEXTURE_NONE, mem);
+		m_fonts[handle.idx].m_texture = bgfx::createTexture2D(
+			  m_textureWidth
+			, m_textureHeight
+			, false
+			, 1
+			, bgfx::TextureFormat::R8
+			, BGFX_TEXTURE_NONE
+			, mem
+			);
 		m_fonts[handle.idx].m_size = _fontSize;
 #else
 		const ImguiFontHandle handle = { bgfx::invalidHandle };
@@ -448,7 +456,15 @@ struct Imgui
 			}
 		}
 
-		return bgfx::createTexture2D(uint16_t(_width), uint16_t(_height), 0, bgfx::TextureFormat::BGRA8, 0, mem);
+		return bgfx::createTexture2D(
+					  uint16_t(_width)
+					, uint16_t(_height)
+					, false
+					, 1
+					, bgfx::TextureFormat::BGRA8
+					, 0
+					, mem
+					);
 	}
 
 	ImguiFontHandle create(float _fontSize, bx::AllocatorI* _allocator)
@@ -1488,7 +1504,7 @@ struct Imgui
 		}
 	}
 
-	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, va_list _argList)
+	uint8_t tabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, va_list _argList)
 	{
 		const char* titles[16];
 		bool tabEnabled[16];
@@ -3469,7 +3485,7 @@ void imguiInput(const char* _label, char* _str, uint32_t _len, bool _enabled, Im
 	s_imgui.input(_label, _str, _len, _enabled, _align, _r);
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, uint8_t _nEnabled, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, uint32_t _nEnabled, ...)
 {
 	va_list argList;
 	va_start(argList, _nEnabled);
@@ -3479,7 +3495,7 @@ uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int
 	return result;
 }
 
-uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint8_t _nTabs, ...)
+uint8_t imguiTabs(uint8_t _selected, bool _enabled, ImguiAlign::Enum _align, int32_t _height, int32_t _r, uint32_t _nTabs, ...)
 {
 	va_list argList;
 	va_start(argList, _nTabs);

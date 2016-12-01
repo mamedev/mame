@@ -65,7 +65,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 3b) 'chelnovu'
 
   - DSW2 bit 6 freezes the game (code at 0x000654), but when you turn
-    the Dip Swicth back to "Off", it adds credits as if COIN1 was pressed.
+    the Dip Switch back to "Off", it adds credits as if COIN1 was pressed.
     Is that the correct behaviour ?
   - Even if there is a "andi.w  #$ffff, D5" instruction at 0x000ef0,
     DSW2 bit 7 isn't tested in this set.
@@ -726,7 +726,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 {
-	UINT8 port = ioport("FAKE")->read();
+	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == m_coin_mask)
@@ -1288,7 +1288,7 @@ DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnov)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOV;
 	m_coin_mask = 0xe0;
@@ -1297,7 +1297,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVU;
 	m_coin_mask = 0xe0;
@@ -1306,7 +1306,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovj)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVJ;
 	m_coin_mask = 0xe0;

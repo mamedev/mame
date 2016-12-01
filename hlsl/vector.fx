@@ -46,7 +46,7 @@ float roundBox(float2 p, float2 b, float r)
 //-----------------------------------------------------------------------------
 
 uniform float2 ScreenDims;
-uniform float2 QuadDims;
+uniform float2 TargetDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -76,7 +76,7 @@ uniform float LengthRatio; // Size at which fade is maximum
 uniform float LengthScale; // How much length affects the vector's fade
 uniform float BeamSmooth;
 
-float GetRoundCornerFactor(float2 coord, float2 bounds, float radiusAmount, float smoothAmount)
+float GetBoundsFactor(float2 coord, float2 bounds, float radiusAmount, float smoothAmount)
 {
 	// reduce smooth amount down to radius amount
 	smoothAmount = min(smoothAmount, radiusAmount);
@@ -100,7 +100,7 @@ float GetRoundCornerFactor(float2 coord, float2 bounds, float radiusAmount, floa
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 lineSize = Input.SizeInfo / max(QuadDims.x, QuadDims.y); // normalize
+	float2 lineSize = Input.SizeInfo / max(TargetDims.x, TargetDims.y); // normalize
 
 	float lineLength = lineSize.x;
 	float lineLengthRatio = LengthRatio;
@@ -113,7 +113,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	float4 outColor = float4(timeLengthModulate, timeLengthModulate, timeLengthModulate, 1.0f);
 	outColor *= Input.Color;
 
-	float RoundCornerFactor = GetRoundCornerFactor(Input.TexCoord - 0.5f, Input.SizeInfo, 1.0f, BeamSmooth);
+	float RoundCornerFactor = GetBoundsFactor(Input.TexCoord - 0.5f, Input.SizeInfo, 1.0f, BeamSmooth);
 	outColor.rgb *= RoundCornerFactor;
 
 	return outColor;

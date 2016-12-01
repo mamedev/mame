@@ -16,17 +16,10 @@
 #include "error.h"
 #include "uint32_t.h"
 
-#if BX_COMPILER_MSVC_COMPATIBLE
-#	define fseeko64 _fseeki64
-#	define ftello64 _ftelli64
-#elif BX_PLATFORM_ANDROID || BX_PLATFORM_BSD || BX_PLATFORM_IOS || BX_PLATFORM_OSX || BX_PLATFORM_QNX
-#	define fseeko64 fseeko
-#	define ftello64 ftello
-#endif // BX_
-
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_OPEN,  BX_MAKEFOURCC('R', 'W', 0, 1) );
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_READ,  BX_MAKEFOURCC('R', 'W', 0, 2) );
 BX_ERROR_RESULT(BX_ERROR_READERWRITER_WRITE, BX_MAKEFOURCC('R', 'W', 0, 3) );
+BX_ERROR_RESULT(BX_ERROR_READERWRITER_EOF,   BX_MAKEFOURCC('R', 'W', 0, 4) );
 
 namespace bx
 {
@@ -401,7 +394,7 @@ namespace bx
 			}
 
 			int64_t remainder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
+			int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
 			m_pos += size;
 			if (size != _size)
 			{
@@ -454,7 +447,7 @@ namespace bx
 			BX_CHECK(NULL != _err, "Reader/Writer interface calling functions must handle errors.");
 
 			int64_t remainder = m_top-m_pos;
-			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
+			int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
 			memcpy(_data, &m_data[m_pos], size);
 			m_pos += size;
 			if (size != _size)
@@ -535,7 +528,7 @@ namespace bx
 			}
 
 			int64_t remainder = m_size-m_pos;
-			int32_t size = uint32_min(_size, int32_t(remainder > INT32_MAX ? INT32_MAX : remainder) );
+			int32_t size = uint32_min(_size, uint32_t(int64_min(remainder, INT32_MAX) ) );
 			memcpy(&m_data[m_pos], _data, size);
 			m_pos += size;
 			m_top = int64_max(m_top, m_pos);

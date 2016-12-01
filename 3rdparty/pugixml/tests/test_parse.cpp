@@ -1182,3 +1182,27 @@ TEST(parse_embed_pcdata)
 		CHECK_NODE_EX(doc, STR("<node>\n\t<key>value</key>\n\t<child>\n\t\t<inner1>value1</inner1>\n\t\t<inner2>value2</inner2>outer</child>\n\t<two>text<data />\n\t</two>\n</node>\n"), STR("\t"), format_indent);
 	}
 }
+
+TEST(parse_encoding_detect)
+{
+	char test[] = "<?xml version='1.0' encoding='utf-8'?><n/>";
+
+	xml_document doc;
+	CHECK(doc.load_buffer(test, sizeof(test)));
+}
+
+TEST(parse_encoding_detect_latin1)
+{
+	char test0[] = "<?xml version='1.0' encoding='utf-8'?><n/>";
+	char test1[] = "<?xml version='1.0' encoding='iso-8859-1'?><n/>";
+	char test2[] = "<?xml version='1.0' encoding = \"latin1\"?><n/>";
+	char test3[] = "<?xml version='1.0' encoding='ISO-8859-1'?><n/>";
+	char test4[] = "<?xml version='1.0' encoding = \"LATIN1\"?><n/>";
+
+	xml_document doc;
+	CHECK(doc.load_buffer(test0, sizeof(test0)).encoding == encoding_utf8);
+	CHECK(doc.load_buffer(test1, sizeof(test1)).encoding == encoding_latin1);
+	CHECK(doc.load_buffer(test2, sizeof(test2)).encoding == encoding_latin1);
+	CHECK(doc.load_buffer(test3, sizeof(test3)).encoding == encoding_latin1);
+	CHECK(doc.load_buffer(test4, sizeof(test4)).encoding == encoding_latin1);
+}

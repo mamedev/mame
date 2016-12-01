@@ -285,7 +285,7 @@ WRITE8_MEMBER( crimfght_state::banking_callback )
 
 CUSTOM_INPUT_MEMBER( crimfght_state::system_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= 1 << 4; // VCC
 	data |= m_woco << 5;

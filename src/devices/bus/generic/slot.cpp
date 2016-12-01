@@ -70,7 +70,7 @@ void device_generic_cart_interface::rom_alloc(size_t size, int width, endianness
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_generic_cart_interface::ram_alloc(UINT32 size)
+void device_generic_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 }
@@ -84,14 +84,14 @@ void device_generic_cart_interface::ram_alloc(UINT32 size)
 //-------------------------------------------------
 //  generic_slot_device - constructor
 //-------------------------------------------------
-generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+generic_slot_device::generic_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, GENERIC_SOCKET, "Generic ROM Socket / RAM Socket / Cartridge Slot", tag, owner, clock, "generic_socket", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
 						m_interface(nullptr),
 						m_default_card("rom"),
 						m_extensions("bin"),
-						m_must_be_loaded(FALSE),
+						m_must_be_loaded(false),
 						m_width(GENERIC_ROM8_WIDTH),
 						m_endianness(ENDIANNESS_LITTLE), m_cart(nullptr)
 {
@@ -140,7 +140,7 @@ image_init_result generic_slot_device::call_load()
 			return m_device_image_load(*this);
 		else
 		{
-			UINT32 len = common_get_size("rom");
+			uint32_t len = common_get_size("rom");
 
 			rom_alloc(len, m_width, m_endianness);
 			common_load_rom(get_rom_base(), len, "rom");
@@ -186,7 +186,7 @@ std::string generic_slot_device::get_default_card_software()
  for fullpath and for softlist
  -------------------------------------------------*/
 
-UINT32 generic_slot_device::common_get_size(const char *region)
+uint32_t generic_slot_device::common_get_size(const char *region)
 {
 	// if we are loading from softlist, you have to specify a region
 	assert((software_entry() == nullptr) || (region != nullptr));
@@ -199,7 +199,7 @@ UINT32 generic_slot_device::common_get_size(const char *region)
  for fullpath and for softlist
  -------------------------------------------------*/
 
-void generic_slot_device::common_load_rom(UINT8 *ROM, UINT32 len, const char *region)
+void generic_slot_device::common_load_rom(uint8_t *ROM, uint32_t len, const char *region)
 {
 	// basic sanity check
 	assert((ROM != nullptr) && (len > 0));

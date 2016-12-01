@@ -46,7 +46,7 @@
 
 const device_type STRATAFLASH = &device_creator<strataflash_device>;
 
-strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+strataflash_device::strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, STRATAFLASH, "Intel 28F640J5", tag, owner, clock, "strataflash", __FILE__),
 		device_nvram_interface(mconfig, *this)
 {
@@ -74,7 +74,7 @@ void strataflash_device::nvram_read(emu_file &file)
 	// TODO
 
 	/*
-	UINT8 buf;
+	uint8_t buf;
 	int i;
 
 	// version flag
@@ -93,7 +93,7 @@ void strataflash_device::nvram_read(emu_file &file)
 	    return 1;
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_flashmemory[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 
@@ -102,7 +102,7 @@ void strataflash_device::nvram_read(emu_file &file)
 	    return 1;
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_prot_regs[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 
@@ -124,7 +124,7 @@ void strataflash_device::nvram_write(emu_file &file)
 	// TODO
 
 	/*
-	UINT8 buf;
+	uint8_t buf;
 	int i;
 
 	// version flag
@@ -141,28 +141,28 @@ void strataflash_device::nvram_write(emu_file &file)
 	// main FEEPROM area
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_flashmemory[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 	if (file->write(m_flashmemory, FEEPROM_SIZE) != FEEPROM_SIZE)
 	    return 1;
 	for (i = 0; i < FEEPROM_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_flashmemory[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_flashmemory[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 
 	// protection registers
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_prot_regs[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 	if (file->write(m_prot_regs, PROT_REGS_SIZE) != PROT_REGS_SIZE)
 	    return 1;
 	for (i = 0; i < PROT_REGS_SIZE; i += 2)
 	{
-	    UINT16 *ptr = (UINT16 *) (&m_prot_regs[i]);
+	    uint16_t *ptr = (uint16_t *) (&m_prot_regs[i]);
 	    *ptr = little_endianize_int16(*ptr);
 	}
 
@@ -184,7 +184,7 @@ void strataflash_device::device_start(void)
 	m_mode = FM_NORMAL;
 	m_status = 0x80;
 	m_master_lock = 0;
-	m_flashmemory = std::make_unique<UINT8[]>(COMPLETE_SIZE);
+	m_flashmemory = std::make_unique<uint8_t[]>(COMPLETE_SIZE);
 
 	m_wrbuf = m_flashmemory.get() + FEEPROM_SIZE;
 	m_prot_regs = m_wrbuf + WRBUF_SIZE;
@@ -214,7 +214,7 @@ void strataflash_device::device_config_complete()
 /*
     read a 8/16-bit word from FEEPROM
 */
-UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_width_t bus_width)
+uint16_t strataflash_device::read8_16(address_space& space, offs_t offset, bus_width_t bus_width)
 {
 	switch (bus_width)
 	{
@@ -234,7 +234,7 @@ UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_wid
 		case bw_8:
 			return m_flashmemory[BYTE_XOR_LE(offset)];
 		case bw_16:
-			return *(UINT16*)(m_flashmemory.get()+offset);
+			return *(uint16_t*)(m_flashmemory.get()+offset);
 		}
 		break;
 	case FM_READSTATUS:
@@ -249,7 +249,7 @@ UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_wid
 			case bw_8:
 				return m_prot_regs[BYTE_XOR_LE(offset)];
 			case bw_16:
-				return *(UINT16*)(m_prot_regs+offset);
+				return *(uint16_t*)(m_prot_regs+offset);
 			}
 		}
 		else
@@ -404,7 +404,7 @@ UINT16 strataflash_device::read8_16(address_space& space, offs_t offset, bus_wid
 /*
     write a 8/16-bit word to FEEPROM
 */
-void strataflash_device::write8_16(address_space& space, offs_t offset, UINT16 data, bus_width_t bus_width)
+void strataflash_device::write8_16(address_space& space, offs_t offset, uint16_t data, bus_width_t bus_width)
 {
 	switch (bus_width)
 	{
@@ -562,7 +562,7 @@ void strataflash_device::write8_16(address_space& space, offs_t offset, UINT16 d
 				m_flashmemory[BYTE_XOR_LE(offset)] &= data;
 				break;
 			case bw_16:
-				*(UINT16*)(m_flashmemory.get()+offset) &= data;
+				*(uint16_t*)(m_flashmemory.get()+offset) &= data;
 				break;
 			}
 		}
@@ -633,7 +633,7 @@ void strataflash_device::write8_16(address_space& space, offs_t offset, UINT16 d
 				m_prot_regs[BYTE_XOR_LE(offset-0x100)] &= data;
 				break;
 			case bw_16:
-				*(UINT16*)(m_prot_regs+(offset-0x100)) &= data;
+				*(uint16_t*)(m_prot_regs+(offset-0x100)) &= data;
 				break;
 			}
 		}

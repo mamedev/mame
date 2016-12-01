@@ -13,6 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audiocpu_rom(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -27,6 +28,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_region_ptr<u8> m_audiocpu_rom;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -35,10 +37,10 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch; // tokib
 
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_background1_videoram;
-	required_shared_ptr<UINT16> m_background2_videoram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_scrollram;
+	required_shared_ptr<uint16_t> m_background1_videoram;
+	required_shared_ptr<uint16_t> m_background2_videoram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_scrollram;
 
 	int m_msm5205next;
 	int m_toggle;
@@ -57,6 +59,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
 	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
 
+	DECLARE_READ8_MEMBER(jujuba_z80_data_decrypt);
+
 	DECLARE_DRIVER_INIT(tokib);
 	DECLARE_DRIVER_INIT(jujuba);
 	DECLARE_DRIVER_INIT(toki);
@@ -67,8 +71,8 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_toki(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tokib(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void toki_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 	void tokib_draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 };

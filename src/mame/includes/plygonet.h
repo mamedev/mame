@@ -7,11 +7,11 @@
 #include "cpu/dsp56k/dsp56k.h"
 
 
-static const UINT16 dsp56k_bank00_size = 0x1000;
-static const UINT16 dsp56k_bank01_size = 0x1000;
-static const UINT16 dsp56k_bank02_size = 0x4000;
-static const UINT16 dsp56k_shared_ram_16_size = 0x2000;
-static const UINT16 dsp56k_bank04_size = 0x1fc0;
+static const uint16_t dsp56k_bank00_size = 0x1000;
+static const uint16_t dsp56k_bank01_size = 0x1000;
+static const uint16_t dsp56k_bank02_size = 0x4000;
+static const uint16_t dsp56k_shared_ram_16_size = 0x2000;
+static const uint16_t dsp56k_bank04_size = 0x1fc0;
 
 class polygonet_state : public driver_device
 {
@@ -45,32 +45,32 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch3;
 
 	/* 68k-side shared ram */
-	required_shared_ptr<UINT32> m_shared_ram;
+	required_shared_ptr<uint32_t> m_shared_ram;
 
-	required_shared_ptr<UINT16> m_dsp56k_p_mirror;
-	required_shared_ptr<UINT16> m_dsp56k_p_8000;
+	required_shared_ptr<uint16_t> m_dsp56k_p_mirror;
+	required_shared_ptr<uint16_t> m_dsp56k_p_8000;
 
 	ioport_port *m_inputs[4];
-	UINT8 m_sys0;
-	UINT8 m_sys1;
+	uint8_t m_sys0;
+	uint8_t m_sys1;
 
 	/* TTL text plane stuff */
 	int m_ttl_gfx_index;
 	tilemap_t *m_ttl_tilemap;
 	tilemap_t *m_roz_tilemap;
-	UINT16 m_ttl_vram[0x800];
-	UINT16 m_roz_vram[0x800];
+	uint16_t m_ttl_vram[0x800];
+	uint16_t m_roz_vram[0x800];
 
 	/* sound */
-	UINT8 m_sound_ctrl;
-	UINT8 m_sound_intck;
+	uint8_t m_sound_ctrl;
+	uint8_t m_sound_intck;
 
 	/* memory buffers */
-	UINT16 m_dsp56k_bank00_ram[2 * 8 * dsp56k_bank00_size]; /* 2 bank sets, 8 potential banks each */
-	UINT16 m_dsp56k_bank01_ram[2 * 8 * dsp56k_bank01_size];
-	UINT16 m_dsp56k_bank02_ram[2 * 8 * dsp56k_bank02_size];
-	UINT16 m_dsp56k_shared_ram_16[2 * 8 * dsp56k_shared_ram_16_size];
-	UINT16 m_dsp56k_bank04_ram[2 * 8 * dsp56k_bank04_size];
+	uint16_t m_dsp56k_bank00_ram[2 * 8 * dsp56k_bank00_size]; /* 2 bank sets, 8 potential banks each */
+	uint16_t m_dsp56k_bank01_ram[2 * 8 * dsp56k_bank01_size];
+	uint16_t m_dsp56k_bank02_ram[2 * 8 * dsp56k_bank02_size];
+	uint16_t m_dsp56k_shared_ram_16[2 * 8 * dsp56k_shared_ram_16_size];
+	uint16_t m_dsp56k_bank04_ram[2 * 8 * dsp56k_bank04_size];
 
 	DECLARE_WRITE8_MEMBER(polygonet_sys_w);
 	DECLARE_READ8_MEMBER(polygonet_inputs_r);
@@ -106,7 +106,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_polygonet(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(polygonet_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(k054539_nmi_gen);
 };

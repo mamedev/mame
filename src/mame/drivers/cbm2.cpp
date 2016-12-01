@@ -10,9 +10,296 @@
 
 */
 
-#include "includes/cbm2.h"
-#include "bus/rs232/rs232.h"
+#include "emu.h"
 #include "softlist.h"
+#include "bus/cbm2/exp.h"
+#include "bus/cbm2/user.h"
+#include "bus/ieee488/ieee488.h"
+#include "bus/pet/cass.h"
+#include "bus/rs232/rs232.h"
+#include "bus/vcs_ctrl/ctrl.h"
+#include "cpu/m6502/m6509.h"
+#include "cpu/i86/i86.h"
+#include "machine/cbm_snqk.h"
+#include "machine/6525tpi.h"
+#include "machine/ds75160a.h"
+#include "machine/ds75161a.h"
+#include "machine/mos6526.h"
+#include "machine/mos6551.h"
+#include "machine/pic8259.h"
+#include "machine/pla.h"
+#include "machine/ram.h"
+#include "sound/mos6581.h"
+#include "video/mc6845.h"
+#include "video/mos6566.h"
+
+#define M6509_TAG       "u13"
+#define PLA1_TAG        "u78"
+#define PLA2_TAG        "u88"
+#define MOS6567_TAG     "u23"
+#define MOS6569_TAG     "u23"
+#define MC68B45_TAG     "u10"
+#define MOS6581_TAG     "u4"
+#define MOS6525_1_TAG   "u20"
+#define MOS6525_2_TAG   "u102"
+#define MOS6551A_TAG    "u19"
+#define MOS6526_TAG     "u2"
+#define DS75160A_TAG    "u3"
+#define DS75161A_TAG    "u7"
+#define SCREEN_TAG      "screen"
+#define CONTROL1_TAG    "joy1"
+#define CONTROL2_TAG    "joy2"
+#define RS232_TAG       "rs232"
+
+#define EXT_I8088_TAG   "ext_u1"
+#define EXT_I8087_TAG   "ext_u4"
+#define EXT_I8259A_TAG  "ext_u3"
+#define EXT_MOS6526_TAG "ext_u15"
+#define EXT_MOS6525_TAG "ext_u16"
+
+class cbm2_state : public driver_device
+{
+public:
+	cbm2_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, M6509_TAG),
+		m_pla1(*this, PLA1_TAG),
+		m_crtc(*this, MC68B45_TAG),
+		m_palette(*this, "palette"),
+		m_sid(*this, MOS6581_TAG),
+		m_tpi1(*this, MOS6525_1_TAG),
+		m_tpi2(*this, MOS6525_2_TAG),
+		m_acia(*this, MOS6551A_TAG),
+		m_cia(*this, MOS6526_TAG),
+		m_ieee1(*this, DS75160A_TAG),
+		m_ieee2(*this, DS75161A_TAG),
+		m_joy1(*this, CONTROL1_TAG),
+		m_joy2(*this, CONTROL2_TAG),
+		m_exp(*this, CBM2_EXPANSION_SLOT_TAG),
+		m_user(*this, CBM2_USER_PORT_TAG),
+		m_ram(*this, RAM_TAG),
+		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		m_ieee(*this, IEEE488_TAG),
+		m_ext_cpu(*this, EXT_I8088_TAG),
+		m_ext_pic(*this, EXT_I8259A_TAG),
+		m_ext_cia(*this, EXT_MOS6526_TAG),
+		m_ext_tpi(*this, EXT_MOS6525_TAG),
+		m_basic(*this, "basic"),
+		m_kernal(*this, "kernal"),
+		m_charom(*this, "charom"),
+		m_buffer_ram(*this, "buffer_ram"),
+		m_extbuf_ram(*this, "extbuf_ram"),
+		m_video_ram(*this, "video_ram"),
+		m_pa(*this, "PA%u", 0),
+		m_pb(*this, "PB%u", 0),
+		m_lock(*this, "LOCK"),
+		m_dramon(1),
+		m_video_ram_size(0x800),
+		m_graphics(1),
+		m_todclk(0),
+		m_tpi1_irq(CLEAR_LINE),
+		m_acia_irq(CLEAR_LINE),
+		m_user_irq(CLEAR_LINE),
+		m_tpi2_pa(0),
+		m_tpi2_pb(0)
+	{ }
+
+	required_device<cpu_device> m_maincpu;
+	required_device<pla_device> m_pla1;
+	optional_device<mc6845_device> m_crtc;
+	optional_device<palette_device> m_palette;
+	required_device<mos6581_device> m_sid;
+	required_device<tpi6525_device> m_tpi1;
+	required_device<tpi6525_device> m_tpi2;
+	required_device<mos6551_device> m_acia;
+	required_device<mos6526_device> m_cia;
+	required_device<ds75160a_device> m_ieee1;
+	required_device<ds75161a_device> m_ieee2;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<cbm2_expansion_slot_device> m_exp;
+	required_device<cbm2_user_port_device> m_user;
+	required_device<ram_device> m_ram;
+	required_device<pet_datassette_port_device> m_cassette;
+	required_device<ieee488_device> m_ieee;
+	optional_device<cpu_device> m_ext_cpu;
+	optional_device<pic8259_device> m_ext_pic;
+	optional_device<mos6526_device> m_ext_cia;
+	optional_device<tpi6525_device> m_ext_tpi;
+	required_memory_region m_basic;
+	required_memory_region m_kernal;
+	required_memory_region m_charom;
+	optional_shared_ptr<uint8_t> m_buffer_ram;
+	optional_shared_ptr<uint8_t> m_extbuf_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<8> m_pa;
+	required_ioport_array<8> m_pb;
+	required_ioport m_lock;
+
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	DECLARE_MACHINE_START( cbm2 );
+	DECLARE_MACHINE_START( cbm2_ntsc );
+	DECLARE_MACHINE_START( cbm2_pal );
+	DECLARE_MACHINE_START( cbm2x_ntsc );
+	DECLARE_MACHINE_START( cbm2x_pal );
+	DECLARE_MACHINE_RESET( cbm2 );
+
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4);
+
+	void bankswitch(offs_t offset, int eras, int ecas, int refen, int cas, int ras, int *sysioen, int *dramen,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *buframcs, int *extbufcs, int *vidramcs,
+		int *diskromcs, int *csbank1, int *csbank2, int *csbank3, int *basiccs, int *knbcs, int *kernalcs,
+		int *crtccs, int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs);
+
+	uint8_t read_keyboard();
+	void set_busy2(int state);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( ext_read );
+	DECLARE_WRITE8_MEMBER( ext_write );
+
+	DECLARE_READ8_MEMBER( sid_potx_r );
+	DECLARE_READ8_MEMBER( sid_poty_r );
+
+	DECLARE_WRITE_LINE_MEMBER( tpi1_irq_w );
+	DECLARE_READ8_MEMBER( tpi1_pa_r );
+	DECLARE_WRITE8_MEMBER( tpi1_pa_w );
+	DECLARE_READ8_MEMBER( tpi1_pb_r );
+	DECLARE_WRITE8_MEMBER( tpi1_pb_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+
+	DECLARE_WRITE8_MEMBER( tpi2_pa_w );
+	DECLARE_WRITE8_MEMBER( tpi2_pb_w );
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
+
+	DECLARE_READ8_MEMBER( cia_pa_r );
+	DECLARE_WRITE8_MEMBER( cia_pa_w );
+	DECLARE_READ8_MEMBER( cia_pb_r );
+
+	DECLARE_READ8_MEMBER( ext_tpi_pb_r );
+	DECLARE_WRITE8_MEMBER( ext_tpi_pb_w );
+	DECLARE_WRITE8_MEMBER( ext_tpi_pc_w );
+
+	DECLARE_WRITE_LINE_MEMBER( ext_cia_irq_w );
+	DECLARE_READ8_MEMBER( ext_cia_pb_r );
+	DECLARE_WRITE8_MEMBER( ext_cia_pb_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
+
+	MC6845_UPDATE_ROW( crtc_update_row );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbmb );
+	// memory state
+	int m_dramon;
+	int m_busen1;
+	int m_busy2;
+
+	// video state
+	size_t m_video_ram_size;
+	int m_graphics;
+	int m_ntsc;
+
+	// interrupt state
+	int m_todclk;
+	int m_tpi1_irq;
+	int m_acia_irq;
+	int m_user_irq;
+
+	// keyboard state;
+	uint8_t m_tpi2_pa;
+	uint8_t m_tpi2_pb;
+	uint8_t m_cia_pa;
+
+	uint8_t m_ext_cia_pb;
+	uint8_t m_ext_tpi_pb;
+
+	// timers
+	emu_timer *m_todclk_timer;
+};
+
+
+class cbm2hp_state : public cbm2_state
+{
+public:
+	cbm2hp_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cbm2_state(mconfig, type, tag)
+	{ }
+
+	virtual void read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
+		int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4) override;
+
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
+};
+
+
+class p500_state : public cbm2_state
+{
+public:
+	p500_state(const machine_config &mconfig, device_type type, const char *tag)
+		: cbm2_state(mconfig, type, tag),
+			m_pla2(*this, PLA2_TAG),
+			m_vic(*this, MOS6569_TAG),
+			m_color_ram(*this, "color_ram"),
+			m_statvid(1),
+			m_vicdotsel(1),
+			m_vicbnksel(0x03),
+			m_vic_irq(CLEAR_LINE)
+	{ }
+
+	required_device<pla_device> m_pla2;
+	required_device<mos6566_device> m_vic;
+	optional_shared_ptr<uint8_t> m_color_ram;
+
+	DECLARE_MACHINE_START( p500 );
+	DECLARE_MACHINE_START( p500_ntsc );
+	DECLARE_MACHINE_START( p500_pal );
+	DECLARE_MACHINE_RESET( p500 );
+
+	void read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid, int refen, int ba, int aec, int srw,
+		int *datxen, int *dramxen, int *clrniben, int *segf, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr);
+
+	void read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, int segf, int bank0,
+		int *clrnibcsb, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *procvid, int *viccs, int *vidmatcs);
+
+	void bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, int busy2, int refen,
+		int *datxen, int *dramxen, int *clrniben, int *_64kcasen, int *casenb, int *viddaten, int *viddat_tr,
+		int *clrnibcs, int *extbufcs, int *discromcs, int *buframcs, int *charomcs, int *viccs, int *vidmatcs,
+		int *csbank1, int *csbank2, int *csbank3, int *basiclocs, int *basichics, int *kernalcs,
+		int *cs1, int *sidcs, int *extprtcs, int *ciacs, int *aciacs, int *tript1cs, int *tript2cs, int *aec, int *vsysaden);
+
+	uint8_t read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae);
+	void write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+
+	DECLARE_READ8_MEMBER( vic_videoram_r );
+	DECLARE_READ8_MEMBER( vic_colorram_r );
+	DECLARE_WRITE_LINE_MEMBER( vic_irq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( tpi1_irq_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi1_ca_w );
+	DECLARE_WRITE_LINE_MEMBER( tpi1_cb_w );
+
+	DECLARE_READ8_MEMBER( tpi2_pc_r );
+	DECLARE_WRITE8_MEMBER( tpi2_pc_w );
+
+	DECLARE_WRITE_LINE_MEMBER( user_irq_w );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( p500 );
+	// video state
+	int m_statvid;
+	int m_vicdotsel;
+	int m_vicbnksel;
+
+	// interrupt state
+	int m_vic_irq;
+};
+
 
 
 //**************************************************************************
@@ -32,7 +319,7 @@
 #define A0 BIT(offset, 0)
 #define VA12 BIT(va, 12)
 
-static void cbmb_quick_sethiaddress(address_space &space, UINT16 hiaddress)
+static void cbmb_quick_sethiaddress(address_space &space, uint16_t hiaddress)
 {
 	space.write_byte(0xf0046, hiaddress & 0xff);
 	space.write_byte(0xf0047, hiaddress >> 8);
@@ -59,8 +346,8 @@ QUICKLOAD_LOAD_MEMBER( p500_state, p500 )
 void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = P0 << 15 | P1 << 14 | P2 << 13 | P3 << 12 | m_busy2 << 11 | eras << 10 | ecas << 9 | refen << 8 | cas << 7 | ras << 6;
+	uint32_t data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
 	*rasseg1 = BIT(data, 1);
@@ -80,8 +367,8 @@ void cbm2_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, 
 void cbm2hp_state::read_pla(offs_t offset, int ras, int cas, int refen, int eras, int ecas,
 	int *casseg1, int *casseg2, int *casseg3, int *casseg4, int *rasseg1, int *rasseg2, int *rasseg3, int *rasseg4)
 {
-	UINT32 input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
-	UINT32 data = m_pla1->read(input);
+	uint32_t input = ras << 13 | cas << 12 | refen << 11 | eras << 10 | ecas << 9 | m_busy2 << 8 | P3 << 3 | P2 << 2 | P1 << 1 | P0;
+	uint32_t data = m_pla1->read(input);
 
 	*casseg1 = BIT(data, 0);
 	*casseg2 = BIT(data, 1);
@@ -172,7 +459,7 @@ READ8_MEMBER( cbm2_state::read )
 		&diskromcs, &csbank1, &csbank2, &csbank3, &basiccs, &knbcs, &kernalcs,
 		&crtccs, &cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs);
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!dramen)
 	{
@@ -361,7 +648,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 	int casseg1 = 1, casseg2 = 1, casseg3 = 1, casseg4 = 1, rasseg1 = 1, rasseg2 = 1, rasseg3 = 1, rasseg4 = 1;
 
 	this->read_pla(offset, ras, cas, refen, eras, ecas, &casseg1, &casseg2, &casseg3, &casseg4, &rasseg1, &rasseg2, &rasseg3, &rasseg4);
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!casseg1)
 	{
@@ -383,7 +670,7 @@ READ8_MEMBER( cbm2_state::ext_read )
 	return data;
 #endif
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (offset < 0x40000) data = m_ram->pointer()[offset];
 	return data;
 }
@@ -433,10 +720,10 @@ void p500_state::read_pla1(offs_t offset, int busy2, int clrnibcsb, int procvid,
 	int sphi2 = m_vic->phi0_r();
 	int bras = 1;
 
-	UINT32 input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
+	uint32_t input = P0 << 15 | P2 << 14 | bras << 13 | P1 << 12 | P3 << 11 | busy2 << 10 | m_statvid << 9 | sphi2 << 8 |
 			clrnibcsb << 7 | m_dramon << 6 | procvid << 5 | refen << 4 | m_vicdotsel << 3 | ba << 2 | aec << 1 | srw;
 
-	UINT32 data = m_pla1->read(input);
+	uint32_t data = m_pla1->read(input);
 
 	*datxen = BIT(data, 0);
 	*dramxen = BIT(data, 1);
@@ -459,10 +746,10 @@ void p500_state::read_pla2(offs_t offset, offs_t va, int ba, int vicen, int ae, 
 	int sphi2 = m_vic->phi0_r();
 	int bcas = 1;
 
-	UINT32 input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
+	uint32_t input = VA12 << 15 | ba << 14 | A13 << 13 | A15 << 12 | A14 << 11 | A11 << 10 | A10 << 9 | A12 << 8 |
 			sphi2 << 7 | vicen << 6 | m_statvid << 5 | m_vicdotsel << 4 | ae << 3 | segf << 2 | bcas << 1 | bank0;
 
-	UINT32 data = m_pla2->read(input);
+	uint32_t data = m_pla2->read(input);
 
 	*clrnibcsb = BIT(data, 0);
 	*extbufcs = BIT(data, 1);
@@ -549,7 +836,7 @@ void p500_state::bankswitch(offs_t offset, offs_t va, int srw, int ba, int ae, i
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
+uint8_t p500_state::read_memory(address_space &space, offs_t offset, offs_t va, int ba, int ae)
 {
 	int srw = 1, busy2 = 1, refen = 0;
 
@@ -565,7 +852,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (clrniben)
 	{
@@ -650,7 +937,7 @@ UINT8 p500_state::read_memory(address_space &space, offs_t offset, offs_t va, in
 //  write_memory -
 //-------------------------------------------------
 
-void p500_state::write_memory(address_space &space, offs_t offset, UINT8 data, int ba, int ae)
+void p500_state::write_memory(address_space &space, offs_t offset, uint8_t data, int ba, int ae)
 {
 	int srw = 0, busy2 = 1, refen = 0;
 	offs_t va = 0xffff;
@@ -777,8 +1064,8 @@ READ8_MEMBER( p500_state::vic_videoram_r )
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0xff;
-//  UINT8 clrnib = 0xf;
+	uint8_t data = 0xff;
+//  uint8_t clrnib = 0xf;
 
 	if (vsysaden)
 	{
@@ -824,7 +1111,7 @@ READ8_MEMBER( p500_state::vic_colorram_r )
 		&csbank1, &csbank2, &csbank3, &basiclocs, &basichics, &kernalcs,
 		&cs1, &sidcs, &extprtcs, &ciacs, &aciacs, &tript1cs, &tript2cs, &aec, &vsysaden);
 
-	UINT8 data = 0x0f;
+	uint8_t data = 0x0f;
 
 	if (!clrnibcs)
 	{
@@ -1039,7 +1326,7 @@ static INPUT_PORTS_START( cbm2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 9") PORT_CODE(KEYCODE_9_PAD) PORT_CHAR(UCHAR_MAMEKEY(9_PAD))
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 6") PORT_CODE(KEYCODE_6_PAD) PORT_CHAR(UCHAR_MAMEKEY(6_PAD))
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 3") PORT_CODE(KEYCODE_3_PAD) PORT_CHAR(UCHAR_MAMEKEY(3_PAD))
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 00")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_00_PAD) PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("PA7")
@@ -1113,9 +1400,9 @@ MC6845_UPDATE_ROW( cbm2_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t char_rom_addr = (ma & 0x1000) | (m_graphics << 11) | ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = m_charom->base()[char_rom_addr & 0xfff];
+		uint8_t data = m_charom->base()[char_rom_addr & 0xfff];
 
 		for (int bit = 0; bit < 9; bit++)
 		{
@@ -1148,7 +1435,7 @@ WRITE_LINE_MEMBER( p500_state::vic_irq_w )
 
 READ8_MEMBER( cbm2_state::sid_potx_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia_pa >> 6)
 	{
@@ -1175,7 +1462,7 @@ READ8_MEMBER( cbm2_state::sid_potx_r )
 
 READ8_MEMBER( cbm2_state::sid_poty_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_cia_pa >> 6)
 	{
@@ -1236,7 +1523,7 @@ READ8_MEMBER( cbm2_state::tpi1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee2->ren_r() << 2;
@@ -1297,7 +1584,7 @@ READ8_MEMBER( cbm2_state::tpi1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee2->ifc_r();
@@ -1366,26 +1653,26 @@ WRITE_LINE_MEMBER( p500_state::tpi1_cb_w )
 //  tpi6525_interface tpi2_intf
 //-------------------------------------------------
 
-UINT8 cbm2_state::read_keyboard()
+uint8_t cbm2_state::read_keyboard()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	if (!BIT(m_tpi2_pa, 0)) data &= m_pa0->read();
-	if (!BIT(m_tpi2_pa, 1)) data &= m_pa1->read();
-	if (!BIT(m_tpi2_pa, 2)) data &= m_pa2->read();
-	if (!BIT(m_tpi2_pa, 3)) data &= m_pa3->read();
-	if (!BIT(m_tpi2_pa, 4)) data &= m_pa4->read();
-	if (!BIT(m_tpi2_pa, 5)) data &= m_pa5->read();
-	if (!BIT(m_tpi2_pa, 6)) data &= m_pa6->read();
-	if (!BIT(m_tpi2_pa, 7)) data &= m_pa7->read();
-	if (!BIT(m_tpi2_pb, 0)) data &= m_pb0->read() & m_lock->read();
-	if (!BIT(m_tpi2_pb, 1)) data &= m_pb1->read();
-	if (!BIT(m_tpi2_pb, 2)) data &= m_pb2->read();
-	if (!BIT(m_tpi2_pb, 3)) data &= m_pb3->read();
-	if (!BIT(m_tpi2_pb, 4)) data &= m_pb4->read();
-	if (!BIT(m_tpi2_pb, 5)) data &= m_pb5->read();
-	if (!BIT(m_tpi2_pb, 6)) data &= m_pb6->read();
-	if (!BIT(m_tpi2_pb, 7)) data &= m_pb7->read();
+	if (!BIT(m_tpi2_pa, 0)) data &= m_pa[0]->read();
+	if (!BIT(m_tpi2_pa, 1)) data &= m_pa[1]->read();
+	if (!BIT(m_tpi2_pa, 2)) data &= m_pa[2]->read();
+	if (!BIT(m_tpi2_pa, 3)) data &= m_pa[3]->read();
+	if (!BIT(m_tpi2_pa, 4)) data &= m_pa[4]->read();
+	if (!BIT(m_tpi2_pa, 5)) data &= m_pa[5]->read();
+	if (!BIT(m_tpi2_pa, 6)) data &= m_pa[6]->read();
+	if (!BIT(m_tpi2_pa, 7)) data &= m_pa[7]->read();
+	if (!BIT(m_tpi2_pb, 0)) data &= m_pb[0]->read() & m_lock->read();
+	if (!BIT(m_tpi2_pb, 1)) data &= m_pb[1]->read();
+	if (!BIT(m_tpi2_pb, 2)) data &= m_pb[2]->read();
+	if (!BIT(m_tpi2_pb, 3)) data &= m_pb[3]->read();
+	if (!BIT(m_tpi2_pb, 4)) data &= m_pb[4]->read();
+	if (!BIT(m_tpi2_pb, 5)) data &= m_pb[5]->read();
+	if (!BIT(m_tpi2_pb, 6)) data &= m_pb[6]->read();
+	if (!BIT(m_tpi2_pb, 7)) data &= m_pb[7]->read();
 
 	return data;
 }
@@ -1501,7 +1788,7 @@ READ8_MEMBER( cbm2_state::cia_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// IEEE-488
 	data |= m_ieee1->read(space, 0);
@@ -1560,7 +1847,7 @@ READ8_MEMBER( cbm2_state::cia_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// joystick
 	data |= m_joy1->joy_r() & 0x0f;
@@ -1612,7 +1899,7 @@ READ8_MEMBER( cbm2_state::ext_tpi_pb_r )
 
 	*/
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	// _BUSY1
 	data |= !m_busen1;
@@ -1705,7 +1992,7 @@ READ8_MEMBER( cbm2_state::ext_cia_pb_r )
 
 	*/
 
-	UINT8 data = 0xc0;
+	uint8_t data = 0xc0;
 
 	// _BUSY1
 	data |= !m_busen1;
@@ -2230,7 +2517,7 @@ static MACHINE_CONFIG_START( cbm2lp_ntsc, cbm2_state )
 	MCFG_QUANTUM_PERFECT_CPU(M6509_TAG)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(MC68B45_TAG, mc6845_device, screen_update)
 
 	MCFG_SCREEN_REFRESH_RATE(60)

@@ -36,15 +36,15 @@ class cybiko_state : public driver_device
 {
 public:
 	cybiko_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_crtc(*this, "hd66421"),
-		m_speaker(*this, "speaker"),
-		m_rtc(*this, "rtc"),
-		m_ram(*this, RAM_TAG),
-		m_flash1(*this, "flash1"),
-		m_nvram(*this, "nvram"),
-		m_input(*this, "A")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_crtc(*this, "hd66421")
+		, m_speaker(*this, "speaker")
+		, m_rtc(*this, "rtc")
+		, m_ram(*this, RAM_TAG)
+		, m_flash1(*this, "flash1")
+		, m_nvram(*this, "nvram")
+		, m_input(*this, "A.%u", 0)
 	{ }
 
 	DECLARE_WRITE16_MEMBER(serflash_w);

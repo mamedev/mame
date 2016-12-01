@@ -160,8 +160,8 @@ I8275_DRAW_CHARACTER_MEMBER(mikrosha_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap + (m_mikrosha_font_page & 1) * 0x400;
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {

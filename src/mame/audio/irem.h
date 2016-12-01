@@ -9,7 +9,7 @@
 class irem_audio_device : public device_t
 {
 public:
-	irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	irem_audio_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~irem_audio_device() {}
 
 	DECLARE_WRITE8_MEMBER( cmd_w );
@@ -34,8 +34,8 @@ protected:
 
 private:
 	// internal state
-	UINT8           m_port1;
-	UINT8           m_port2;
+	uint8_t           m_port1;
+	uint8_t           m_port2;
 
 	required_device<generic_latch_8_device> m_soundlatch;
 	/* FIXME: using required / optional device would be better */
@@ -55,21 +55,21 @@ private:
 class m62_audio_device : public irem_audio_device
 {
 public:
-	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m62_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_soundc_audio_device : public irem_audio_device
 {
 public:
-	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m52_soundc_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 
 class m52_large_audio_device : public irem_audio_device
 {
 public:
-	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m52_large_audio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 };
 

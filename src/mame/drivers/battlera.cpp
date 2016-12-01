@@ -260,7 +260,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-UINT32 battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
 	return 0;

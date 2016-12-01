@@ -565,9 +565,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90,pac90,driver_device, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90,pac90,driver_device, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

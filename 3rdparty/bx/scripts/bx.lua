@@ -21,4 +21,5 @@ project "bx"
 
 	files {
 		"../include/**.h",
+		"../include/**.inl",
 	}

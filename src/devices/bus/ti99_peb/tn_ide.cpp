@@ -34,7 +34,7 @@
 
 #define CRU_BASE 0x1000
 
-#define BUFFER_TAG "ram"
+#define RAMREGION "ram"
 
 /* previously 0xff */
 #define PAGE_MASK 0x3f
@@ -49,11 +49,12 @@ enum
 	cru_reg_reset = 0x80
 };
 
-nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ti_expansion_card_device(mconfig, TI99_IDE, "Nouspikel IDE interface card", tag, owner, clock, "ti99_ide", __FILE__), m_ata_irq(false),
 	m_cru_register(0), m_rtc(nullptr),
-	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false), m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
-	m_input_latch(0), m_output_latch(0), m_ram(nullptr)
+	m_ata(*this, "ata"), m_clk_irq(false), m_sram_enable(false),
+	m_sram_enable_dip(false), m_cur_page(0), m_tms9995_mode(false),
+	m_input_latch(0), m_output_latch(0), m_ram(*this, RAMREGION)
 {
 }
 
@@ -62,7 +63,7 @@ nouspikel_ide_interface_device::nouspikel_ide_interface_device(const machine_con
 */
 READ8Z_MEMBER(nouspikel_ide_interface_device::crureadz)
 {
-	UINT8 reply = 0;
+	uint8_t reply = 0;
 	if ((offset & 0xff00)==m_cru_base)
 	{
 		int bit = (offset >> 4) & 7;
@@ -126,7 +127,7 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::cruwrite)
 */
 READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 {
-	UINT8 reply = 0;
+	uint8_t reply = 0;
 	if (space.debugger_access()) return;
 
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
@@ -140,18 +141,18 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20);
+					reply = m_rtc->xram_r(machine().dummy_space(), (addr & 0x1f) | 0x20);
 				else
 					/* RTC RAM read */
-					reply = m_rtc->xram_r(machine().driver_data()->generic_space(),addr);
+					reply = m_rtc->xram_r(machine().dummy_space(), addr);
 				break;
 			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),1);
+					reply = m_rtc->rtc_r(machine().dummy_space(), 1);
 				else
 					/* register select */
-					reply = m_rtc->rtc_r(machine().driver_data()->generic_space(),0);
+					reply = m_rtc->rtc_r(machine().dummy_space(), 0);
 				break;
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 				if (m_tms9995_mode ? (!(addr & 1)) : (addr & 1))
@@ -180,9 +181,9 @@ READ8Z_MEMBER(nouspikel_ide_interface_device::readz)
 		else
 		{   /* sram */
 			if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-				reply = m_ram[addr+0x2000 * m_cur_page];
+				reply = m_ram->pointer()[addr+0x2000 * m_cur_page];
 			else
-				reply = m_ram[addr];
+				reply = m_ram->pointer()[addr];
 		}
 		*value = reply;
 	}
@@ -211,18 +212,18 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 			case 0:     /* RTC RAM */
 				if (addr & 0x80)
 					/* RTC RAM page register */
-					m_rtc->xram_w(machine().driver_data()->generic_space(),(addr & 0x1f) | 0x20, data);
+					m_rtc->xram_w(machine().dummy_space(), (addr & 0x1f) | 0x20, data);
 				else
 					/* RTC RAM write */
-					m_rtc->xram_w(machine().driver_data()->generic_space(),addr, data);
+					m_rtc->xram_w(machine().dummy_space(), addr, data);
 				break;
 			case 1:     /* RTC registers */
 				if (addr & 0x10)
 					/* register data */
-					m_rtc->rtc_w(machine().driver_data()->generic_space(),1, data);
+					m_rtc->rtc_w(machine().dummy_space(), 1, data);
 				else
 					/* register select */
-					m_rtc->rtc_w(machine().driver_data()->generic_space(),0, data);
+					m_rtc->rtc_w(machine().dummy_space(), 0, data);
 				break;
 			case 2:     /* IDE registers set 1 (CS1Fx) */
 /*
@@ -267,9 +268,9 @@ WRITE8_MEMBER(nouspikel_ide_interface_device::write)
 			if (! (m_cru_register & cru_reg_wp))
 			{
 				if ((m_cru_register & cru_reg_page_0) || (addr >= 0x1000))
-					m_ram[addr+0x2000 * m_cur_page] = data;
+					m_ram->pointer()[addr+0x2000 * m_cur_page] = data;
 				else
-					m_ram[addr] = data;
+					m_ram->pointer()[addr] = data;
 			}
 		}
 	}
@@ -304,9 +305,17 @@ WRITE_LINE_MEMBER(nouspikel_ide_interface_device::clock_interrupt_callback)
 void nouspikel_ide_interface_device::device_start()
 {
 	m_rtc = subdevice<rtc65271_device>("ide_rtc");
-
-	m_ram = memregion(BUFFER_TAG)->base();
 	m_sram_enable_dip = false; // TODO: what is this?
+
+	save_item(NAME(m_ata_irq));
+	save_item(NAME(m_cru_register));
+	save_item(NAME(m_clk_irq));
+	save_item(NAME(m_sram_enable));
+	save_item(NAME(m_sram_enable_dip));
+	save_item(NAME(m_cur_page));
+	save_item(NAME(m_tms9995_mode));
+	save_item(NAME(m_input_latch));
+	save_item(NAME(m_output_latch));
 }
 
 void nouspikel_ide_interface_device::device_reset()
@@ -338,12 +347,11 @@ MACHINE_CONFIG_FRAGMENT( tn_ide )
 	MCFG_RTC65271_INTERRUPT_CB(WRITELINE(nouspikel_ide_interface_device, clock_interrupt_callback))
 	MCFG_ATA_INTERFACE_ADD( "ata", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(nouspikel_ide_interface_device, ide_interrupt_callback))
-MACHINE_CONFIG_END
 
-ROM_START( tn_ide )
-	ROM_REGION(0x80000, BUFFER_TAG, 0)  /* RAM buffer 512 KiB */
-	ROM_FILL(0x0000, 0x80000, 0x00)
-ROM_END
+	MCFG_RAM_ADD(RAMREGION)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_DEFAULT_VALUE(0)
+MACHINE_CONFIG_END
 
 INPUT_PORTS_START( tn_ide )
 	PORT_START( "CRUIDE" )
@@ -369,11 +377,6 @@ INPUT_PORTS_END
 machine_config_constructor nouspikel_ide_interface_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( tn_ide );
-}
-
-const rom_entry *nouspikel_ide_interface_device::device_rom_region() const
-{
-	return ROM_NAME( tn_ide );
 }
 
 ioport_constructor nouspikel_ide_interface_device::device_input_ports() const

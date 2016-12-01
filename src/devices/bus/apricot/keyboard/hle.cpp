@@ -207,7 +207,7 @@ machine_config_constructor apricot_keyboard_hle_device::device_mconfig_additions
 //  apricot_keyboard_hle_device - constructor
 //-------------------------------------------------
 
-apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+apricot_keyboard_hle_device::apricot_keyboard_hle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, APRICOT_KEYBOARD_HLE, "Apricot Keyboard (HLE)", tag, owner, clock, "apricotkb_hle", __FILE__),
 	device_apricot_keyboard_interface(mconfig, *this),
 	device_buffered_serial_interface(mconfig, *this),
@@ -258,7 +258,7 @@ void apricot_keyboard_hle_device::tra_callback()
 //  received_byte - handle received byte
 //-------------------------------------------------
 
-void apricot_keyboard_hle_device::received_byte(UINT8 byte)
+void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 {
 	if ((byte & 0xf0) == 0xf0)
 	{
@@ -266,7 +266,9 @@ void apricot_keyboard_hle_device::received_byte(UINT8 byte)
 		if (m_rtc_index >= 0)
 		{
 			m_rtc->address_w(m_rtc_index--);
-			m_rtc->data_w(machine().driver_data()->generic_space(), 0, byte);
+			m_rtc->data_w(machine().dummy_space(), 0, byte);
+			m_rtc->write_w(1);
+			m_rtc->write_w(0);
 		}
 	}
 	else
@@ -290,7 +292,7 @@ void apricot_keyboard_hle_device::received_byte(UINT8 byte)
 			for (int i = 12; i >= 0; i--)
 			{
 				m_rtc->address_w(i);
-				transmit_byte(0xf0 | m_rtc->data_r(machine().driver_data()->generic_space(), 0));
+				transmit_byte(0xf0 | m_rtc->data_r(machine().dummy_space(), 0));
 			}
 
 			break;
@@ -303,7 +305,6 @@ void apricot_keyboard_hle_device::received_byte(UINT8 byte)
 
 			// make rtc chip ready
 			m_rtc->cs_w(1);
-			m_rtc->write_w(1);
 
 			break;
 
@@ -317,7 +318,7 @@ void apricot_keyboard_hle_device::received_byte(UINT8 byte)
 //  key_make - handle a key being pressed
 //-------------------------------------------------
 
-void apricot_keyboard_hle_device::key_make(UINT8 row, UINT8 column)
+void apricot_keyboard_hle_device::key_make(uint8_t row, uint8_t column)
 {
 	// send the make code
 	transmit_byte((row << 3) | column);
@@ -327,7 +328,7 @@ void apricot_keyboard_hle_device::key_make(UINT8 row, UINT8 column)
 //  key_break - handle a key being released
 //-------------------------------------------------
 
-void apricot_keyboard_hle_device::key_break(UINT8 row, UINT8 column)
+void apricot_keyboard_hle_device::key_break(uint8_t row, uint8_t column)
 {
 	// send the break code
 	transmit_byte(0x80 | (row << 3) | column);

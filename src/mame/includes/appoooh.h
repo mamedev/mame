@@ -20,13 +20,13 @@ public:
 		m_msm(*this, "msm") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_fg_colorram;
-	required_shared_ptr<UINT8> m_spriteram_2;
-	required_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_bg_colorram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_fg_colorram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_bg_colorram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
 	tilemap_t  *m_fg_tilemap;
@@ -35,8 +35,8 @@ public:
 	int m_priority;
 
 	/* sound-related */
-	UINT32   m_adpcm_data;
-	UINT32   m_adpcm_address;
+	uint32_t   m_adpcm_data;
+	uint32_t   m_adpcm_address;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -44,7 +44,7 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<msm5205_device> m_msm;
 
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(scroll_w);
 	DECLARE_WRITE8_MEMBER(fg_videoram_w);
@@ -60,11 +60,11 @@ public:
 	DECLARE_VIDEO_START(appoooh);
 	DECLARE_PALETTE_INIT(appoooh);
 	DECLARE_PALETTE_INIT(robowres);
-	UINT32 screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_appoooh(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_robowres(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
-	void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite );
-	void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, UINT8 *sprite );
+	void appoooh_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite );
+	void robowres_draw_sprites( bitmap_ind16 &dest_bmp, const rectangle &cliprect, gfx_element *gfx, uint8_t *sprite );
 	DECLARE_WRITE_LINE_MEMBER(adpcm_int);
 };
 

@@ -298,7 +298,7 @@ static const char *const nc_bankhandler_w[]={
 void nc_state::nc_refresh_memory_bank_config(int bank)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ptr;
+	uint8_t *ptr;
 	int mem_type;
 	int mem_bank;
 	char bank1[10];
@@ -1204,7 +1204,7 @@ READ8_MEMBER(nc_state::nc200_card_battery_status_r)
 
 READ8_MEMBER(nc_state::nc200_printer_status_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	result |= m_centronics_busy;
 

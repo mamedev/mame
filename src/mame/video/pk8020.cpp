@@ -17,28 +17,28 @@ void pk8020_state::video_start()
 {
 }
 
-UINT32 pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pk8020_state::screen_update_pk8020(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, b, j;
-	UINT8 *gfx = m_region_gfx1->base();
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *gfx = m_region_gfx1->base();
+	uint8_t *ram = m_ram->pointer();
 
 	for (y = 0; y < 16; y++)
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT8 chr = ram[x +(y*64) + 0x40000];
-			UINT8 attr= ram[x +(y*64) + 0x40400];
+			uint8_t chr = ram[x +(y*64) + 0x40000];
+			uint8_t attr= ram[x +(y*64) + 0x40400];
 			for (j = 0; j < 16; j++) {
-				UINT32 addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
-				UINT8 code1 = ram[addr];
-				UINT8 code2 = ram[addr + 0x4000];
-				UINT8 code3 = ram[addr + 0x8000];
-				UINT8 code4 = gfx[((chr<<4) + j) + (m_font*0x1000)];
+				uint32_t addr = 0x10000 + x + ((y*16+j)*64) + (m_video_page * 0xC000);
+				uint8_t code1 = ram[addr];
+				uint8_t code2 = ram[addr + 0x4000];
+				uint8_t code3 = ram[addr + 0x8000];
+				uint8_t code4 = gfx[((chr<<4) + j) + (m_font*0x1000)];
 				if (attr) code4 ^= 0xff;
 				for (b = 0; b < 8; b++)
 				{
-					UINT8 col = (((code4 >> b) & 0x01) ? 0x08 : 0x00);
+					uint8_t col = (((code4 >> b) & 0x01) ? 0x08 : 0x00);
 					col |= (((code3 >> b) & 0x01) ? 0x04 : 0x00);
 					col |= (((code2 >> b) & 0x01) ? 0x02 : 0x00);
 					col |= (((code1 >> b) & 0x01) ? 0x01 : 0x00);

@@ -43,7 +43,7 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 			m_devices_menu = CreatePopupMenu();
 			for (device_image_interface &img : iter)
 			{
-				auto tc_buf = tstring_from_utf8(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]").c_str());
+				osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s : %s", img.device().name(), img.exists() ? img.filename() : "[no image]"));
 				AppendMenu(m_devices_menu, MF_ENABLED, 0, tc_buf.c_str());
 			}
 			AppendMenu(GetMenu(window()), MF_ENABLED | MF_POPUP, (UINT_PTR)m_devices_menu, TEXT("Images"));
@@ -65,8 +65,8 @@ consolewin_info::consolewin_info(debugger_windows_interface &debugger) :
 		set_maxwidth(bounds.right - bounds.left);
 
 		// position the window at the bottom-right
-		int const bestwidth = (std::min<UINT32>)(maxwidth(), work_bounds.right - work_bounds.left);
-		int const bestheight = (std::min<UINT32>)(500, work_bounds.bottom - work_bounds.top);
+		int const bestwidth = (std::min<uint32_t>)(maxwidth(), work_bounds.right - work_bounds.left);
+		int const bestheight = (std::min<uint32_t>)(500, work_bounds.bottom - work_bounds.top);
 		SetWindowPos(window(), HWND_TOP,
 					work_bounds.right - bestwidth, work_bounds.bottom - bestheight,
 					bestwidth, bestheight,
@@ -99,11 +99,9 @@ void consolewin_info::set_cpu(device_t &device)
 	m_views[1]->set_source_for_device(device);
 
 	// then update the caption
-	char curtitle[256];
-
 	std::string title = string_format("Debug: %s - %s '%s'", device.machine().system().name, device.name(), device.tag());
-	win_get_window_text_utf8(window(), curtitle, ARRAY_LENGTH(curtitle));
-	if (title.compare(curtitle) != 0)
+	std::string curtitle = win_get_window_text_utf8(window());
+	if (title != curtitle)
 		win_set_window_text_utf8(window(), title.c_str());
 
 	// and recompute the children
@@ -159,7 +157,7 @@ void consolewin_info::update_menu()
 	if (m_devices_menu != nullptr)
 	{
 		// create the image menu
-		UINT32 cnt = 0;
+		uint32_t cnt = 0;
 		for (device_image_interface &img : image_interface_iterator(machine().root_device()))
 		{
 			HMENU const devicesubmenu = CreatePopupMenu();
@@ -191,7 +189,7 @@ void consolewin_info::update_menu()
 				AppendMenu(devicesubmenu, flags_for_exists, new_item + DEVOPTION_CASSETTE_FASTFORWARD, TEXT("Fast Forward"));
 			}
 
-			auto tc_buf = tstring_from_utf8(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]").c_str());
+			osd::text::tstring tc_buf = osd::text::to_tstring(string_format("%s :%s", img.device().name(), img.exists() ? img.filename() : "[empty slot]"));
 			ModifyMenu(m_devices_menu, cnt, MF_BYPOSITION | MF_POPUP, (UINT_PTR)devicesubmenu, tc_buf.c_str());
 
 			cnt++;
@@ -204,7 +202,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 {
 	if ((HIWORD(wparam) == 0) && (LOWORD(wparam) >= ID_DEVICE_OPTIONS))
 	{
-		UINT32 const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
+		uint32_t const devid = (LOWORD(wparam) - ID_DEVICE_OPTIONS) / DEVOPTION_MAX;
 		image_interface_iterator iter(machine().root_device());
 		device_image_interface *const img = iter.byindex(devid);
 		if (img != nullptr)
@@ -216,7 +214,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, false, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						osd::text::tstring t_filter = osd::text::to_tstring(filter);
 
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
@@ -243,7 +241,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetOpenFileName(&ofn))
 						{
-							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							auto utf8_buf = osd::text::from_tstring(selectedFilename);
 							img->load(utf8_buf.c_str());
 						}
 					}
@@ -254,7 +252,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 					std::string filter;
 					build_generic_filter(img, true, filter);
 					{
-						auto t_filter = tstring_from_utf8(filter.c_str());
+						osd::text::tstring t_filter = osd::text::to_tstring(filter);
 						// convert a pipe-char delimited string into a NUL delimited string
 						for (int i = 0; t_filter[i] != '\0'; i++)
 						{
@@ -280,7 +278,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 
 						if (GetSaveFileName(&ofn))
 						{
-							auto utf8_buf = utf8_from_tstring(selectedFilename);
+							auto utf8_buf = osd::text::from_tstring(selectedFilename);
 							img->create(utf8_buf.c_str(), img->device_get_indexed_creatable_format(0), nullptr);
 						}
 					}
@@ -288,7 +286,7 @@ bool consolewin_info::handle_command(WPARAM wparam, LPARAM lparam)
 				return true;
 			case DEVOPTION_CLOSE:
 				img->unload();
-				return 1;
+				return true;
 			}
 			if (img->device().type() == CASSETTE)
 			{

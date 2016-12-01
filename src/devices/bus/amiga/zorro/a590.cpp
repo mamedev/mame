@@ -177,7 +177,7 @@ ROM_START( dmac_hdc )
 	ROM_LOAD("390333-03.u5", 0x000, 0x104, CRC(dc4a8d9b) SHA1(761a1318106e49057f95258699076ec1079967ad))
 ROM_END
 
-const rom_entry *dmac_hdc_device::device_rom_region() const
+const tiny_rom_entry *dmac_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( dmac_hdc );
 }
@@ -192,7 +192,7 @@ const rom_entry *dmac_hdc_device::device_rom_region() const
 //-------------------------------------------------
 
 dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type, const char *tag,
-	device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+	device_t *owner, uint32_t clock, const char *name, const char *shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	m_int6(false),
 	m_dmac(*this, "dmac"),
@@ -200,7 +200,7 @@ dmac_hdc_device::dmac_hdc_device(const machine_config &mconfig, device_type type
 {
 }
 
-a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a590_device::a590_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dmac_hdc_device(mconfig, A590, tag, owner, clock, "CBM A590 HD Controller", "a590"),
 	device_exp_card_interface(mconfig, *this),
 	m_dips(*this, "dips"),
@@ -210,7 +210,7 @@ a590_device::a590_device(const machine_config &mconfig, const char *tag, device_
 {
 }
 
-a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2091_device::a2091_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	dmac_hdc_device(mconfig, A2091, tag, owner, clock, "CBM A2091 HD Controller", "a2091"),
 	device_zorro2_card_interface(mconfig, *this),
 	m_jp1(*this, "jp1"),

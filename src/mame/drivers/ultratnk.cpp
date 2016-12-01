@@ -22,13 +22,13 @@ Atari Ultra Tank driver
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
 {
-	return m_collision[(FPTR) param];
+	return m_collision[(uintptr_t) param];
 }
 
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
 {
-	UINT8 joy = ioport((const char *)param)->read() & 3;
+	uint8_t joy = ioport((const char *)param)->read() & 3;
 
 	if (joy == 1)
 	{
@@ -51,7 +51,7 @@ void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in ultratnk_state::device_timer");
+		assert_always(false, "Unknown id in ultratnk_state::device_timer");
 	}
 }
 
@@ -82,7 +82,7 @@ void ultratnk_state::machine_reset()
 
 READ8_MEMBER(ultratnk_state::ultratnk_wram_r)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
@@ -109,7 +109,7 @@ READ8_MEMBER(ultratnk_state::ultratnk_options_r)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_wram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 

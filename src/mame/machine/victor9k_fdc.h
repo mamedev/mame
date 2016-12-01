@@ -45,7 +45,7 @@ class victor_9000_fdc_t :  public device_t
 {
 public:
 	// construction/destruction
-	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	victor_9000_fdc_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_irq_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_syn_wr_callback(device_t &device, _Object object) { return downcast<victor_9000_fdc_t &>(device).m_syn_cb.set_callback(object); }
@@ -94,7 +94,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:
@@ -129,10 +129,10 @@ private:
 
 		// common
 		offs_t i;
-		UINT8 e;
+		uint8_t e;
 
 		// read
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int bit_counter;
 		int sync_bit_counter;
 		int sync_byte_counter;
@@ -144,8 +144,8 @@ private:
 		int gcr_err;
 
 		// write
-		UINT16 shift_reg_write;
-		UINT8 wd;
+		uint16_t shift_reg_write;
+		uint8_t wd;
 		int wrsync;
 		int gcr_data;
 		int erase;
@@ -164,9 +164,9 @@ private:
 	required_memory_region m_gcr_rom;
 
 	void update_stepper_motor(floppy_image_device *floppy, int stp, int old_st, int st);
-	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, UINT8 &da);
-	void set_rdy0(int state);
-	void set_rdy1(int state);
+	void update_spindle_motor(floppy_image_device *floppy, emu_timer *t_tach, bool start, bool stop, bool sel, uint8_t &da);
+	void update_rpm(floppy_image_device *floppy, emu_timer *t_tach, bool sel, uint8_t &da);
+	void update_rdy();
 
 	image_init_result load0_cb(floppy_image_device *device);
 	void unload0_cb(floppy_image_device *device);
@@ -174,12 +174,12 @@ private:
 	image_init_result load1_cb(floppy_image_device *device);
 	void unload1_cb(floppy_image_device *device);
 
-	UINT8 m_p2;
+	uint8_t m_p2;
 
 	/* floppy state */
-	UINT8 m_da;
-	UINT8 m_da0;
-	UINT8 m_da1;
+	uint8_t m_da;
+	uint8_t m_da0;
+	uint8_t m_da1;
 	int m_start0;
 	int m_stop0;
 	int m_start1;
@@ -190,8 +190,14 @@ private:
 	int m_tach1;
 	int m_rdy0;
 	int m_rdy1;
-	UINT8 m_l0ms;
-	UINT8 m_l1ms;
+	int m_scp_rdy0;
+	int m_scp_rdy1;
+	int m_via_rdy0;
+	int m_via_rdy1;
+	uint8_t m_scp_l0ms;
+	uint8_t m_scp_l1ms;
+	uint8_t m_via_l0ms;
+	uint8_t m_via_l1ms;
 	int m_st0;
 	int m_st1;
 	int m_stp0;
@@ -200,7 +206,7 @@ private:
 	int m_side;
 	int m_drw;
 	int m_erase;
-	UINT8 m_wd;
+	uint8_t m_wd;
 	int m_wrsync;
 
 	int m_via4_irq;

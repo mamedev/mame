@@ -463,7 +463,7 @@ MACHINE_START_MEMBER(lastduel_state,lastduel)
 
 MACHINE_START_MEMBER(lastduel_state,madgear)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 

@@ -48,7 +48,7 @@
  @258     uPD553C  1984, Tomy Alien Chase (TN-16)
  *296     uPD553C  1984, Epoch Computer Beam Gun Professional
 
- *511     uPD557LC?1980, Gakken Game Robot 9/Mego Fabulous Fred
+ @511     uPD557LC 1980, Takatoku Toys Game Robot 9/Mego Fabulous Fred
  @512     uPD557LC 1980, Castle Toy Tactix
 
  @060     uPD650C  1979, Mattel Computer Gin
@@ -70,6 +70,7 @@ TODO:
 
 // internal artwork
 #include "efball.lh"
+#include "grobot9.lh" // clickable
 #include "mcompgin.lh"
 #include "mvbfree.lh"
 #include "tactix.lh" // clickable
@@ -88,6 +89,7 @@ void hh_ucom4_state::machine_start()
 	memset(m_display_segmask, 0, sizeof(m_display_segmask));
 
 	memset(m_port, 0, sizeof(m_port));
+	m_int = 0;
 	m_inp_mux = 0;
 	m_grid = 0;
 	m_plate = 0;
@@ -103,6 +105,7 @@ void hh_ucom4_state::machine_start()
 	save_item(NAME(m_display_segmask));
 
 	save_item(NAME(m_port));
+	save_item(NAME(m_int));
 	save_item(NAME(m_inp_mux));
 	save_item(NAME(m_grid));
 	save_item(NAME(m_plate));
@@ -110,6 +113,7 @@ void hh_ucom4_state::machine_start()
 
 void hh_ucom4_state::machine_reset()
 {
+	refresh_interrupts();
 }
 
 
@@ -125,7 +129,7 @@ void hh_ucom4_state::machine_reset()
 
 void hh_ucom4_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -138,7 +142,7 @@ void hh_ucom4_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -193,12 +197,12 @@ void hh_ucom4_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety, bool update)
+void hh_ucom4_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
@@ -209,9 +213,9 @@ void hh_ucom4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety
 
 // generic input handlers
 
-UINT8 hh_ucom4_state::read_inputs(int columns)
+uint8_t hh_ucom4_state::read_inputs(int columns)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -219,6 +223,31 @@ UINT8 hh_ucom4_state::read_inputs(int columns)
 			ret |= m_inp_matrix[i]->read();
 
 	return ret;
+}
+
+
+// interrupt handling
+
+void hh_ucom4_state::refresh_interrupts()
+{
+	m_maincpu->set_input_line(0, m_int ? ASSERT_LINE : CLEAR_LINE);
+}
+
+void hh_ucom4_state::set_interrupt(int state)
+{
+	state = state ? 1 : 0;
+
+	if (state != m_int)
+	{
+		if (machine().phase() >= MACHINE_PHASE_RESET)
+			m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
+		m_int = state;
+	}
+}
+
+INPUT_CHANGED_MEMBER(hh_ucom4_state::single_interrupt_line)
+{
+	set_interrupt(newval);
 }
 
 
@@ -265,8 +294,8 @@ public:
 
 void ufombs_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
-	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,3,2,1,0,4,5,6,7,8);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,6,9,5,8,4,0,1,2,3);
 	display_matrix(10, 9, plate, grid);
 }
 
@@ -310,7 +339,7 @@ static INPUT_PORTS_START( ufombs )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const INT16 ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t ufombs_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ufombs, ufombs_state )
 
@@ -377,7 +406,7 @@ public:
 
 void ssfball_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,10,9,8,0,1,2,4,5,6);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -456,7 +485,7 @@ static INPUT_PORTS_START( ssfball )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
 INPUT_PORTS_END
 
-static const INT16 ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t ssfball_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( ssfball, ssfball_state )
 
@@ -521,7 +550,7 @@ public:
 
 void bmsoccer_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,11,7,3,12,17,13,18,16,14,15,8,4,0,9,5,1,10,6,2);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -644,8 +673,8 @@ public:
 
 void bmsafari_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
-	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,0,1,2,3,4,5,6,7,8);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,7,10,2,9,5,8,4,0,1,6,3);
 	display_matrix(10, 9, plate, grid);
 }
 
@@ -754,7 +783,7 @@ public:
 
 void splasfgt_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,13,1,0,8,6,0,10,11,14,15,16,9,5,7,4,2,3);
 	display_matrix(16, 9, plate, m_grid);
 }
 
@@ -842,7 +871,7 @@ static INPUT_PORTS_START( splasfgt )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
-static const INT16 splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
+static const int16_t splasfgt_speaker_levels[] = { 0, 0x7fff, -0x8000, 0 };
 
 static MACHINE_CONFIG_START( splasfgt, splasfgt_state )
 
@@ -906,8 +935,8 @@ public:
 
 void bcclimbr_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
+	uint8_t grid = BITSWAP8(m_grid,7,6,0,1,2,3,4,5);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,16,17,18,19,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0);
 	display_matrix(20, 6, plate, grid);
 }
 
@@ -1124,8 +1153,8 @@ public:
 
 void invspace_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,8,9,7,6,5,4,3,2,1,0);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,9,14,13,8,15,11,10,7,11,3,2,6,10,1,5,9,0,4,8);
 	display_matrix(19, 9, plate, grid);
 }
 
@@ -1228,7 +1257,7 @@ public:
 
 void efball_state::prepare_display()
 {
-	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,4,3,0,2,1,6,10,9,5,8,7);
 	display_matrix(11, 10, plate, m_grid);
 }
 
@@ -1341,8 +1370,8 @@ public:
 
 void galaxy2_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
-	UINT16 plate = BITSWAP16(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	uint16_t plate = BITSWAP16(m_plate,15,3,2,6,1,5,4,0,11,10,7,12,14,13,8,9);
 	display_matrix(15, 10, plate, grid);
 }
 
@@ -1452,8 +1481,8 @@ public:
 
 void astrocmd_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,4,5,6,7,0,1,2,3);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,3,2,12,13,14,15,16,17,18,0,1,4,8,5,9,7,11,6,10);
 	display_matrix(17, 9, plate, grid);
 }
 
@@ -1730,8 +1759,8 @@ public:
 
 void mvbfree_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
-	UINT16 plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
+	uint16_t grid = BITSWAP16(m_grid,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+	uint16_t plate = BITSWAP16(m_plate,15,14,13,12,11,10,0,1,2,3,4,5,6,7,8,9);
 	display_matrix(10, 14, plate, grid);
 }
 
@@ -1809,6 +1838,121 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  Takatoku Toys(T.T) Game Robot 9 「ゲームロボット九」
+  * PCB label GAME ROBOT 7520
+  * NEC uCOM-43 MCU, label TTGR-512 (die label NEC D557 511)
+  * 9 lamps behind buttons
+
+  known releases:
+  - Japan: Game Robot 9
+  - USA: Fabulous Fred - The Ultimate Electronic Game, distributed by Mego
+  - Mexico: Fabuloso Fred, distributed by Ensueño Toys (also released as
+    12-button version, a clone of Tandy-12)
+
+  Accessories were included for some of the minigames.
+
+***************************************************************************/
+
+class grobot9_state : public hh_ucom4_state
+{
+public:
+	grobot9_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_ucom4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_WRITE8_MEMBER(lamps_w);
+	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE8_MEMBER(input_w);
+	DECLARE_READ8_MEMBER(input_r);
+};
+
+// handlers
+
+WRITE8_MEMBER(grobot9_state::lamps_w)
+{
+	if (offset == NEC_UCOM4_PORTE)
+	{
+		// E1: speaker out
+		m_speaker->level_w(data >> 1 & 1);
+
+		// E3: input mux high bit
+		m_inp_mux = (m_inp_mux & 7) | (data & 8);
+	}
+
+	// D,F,E0: lamps
+	m_port[offset] = data;
+	display_matrix(9, 1, m_port[NEC_UCOM4_PORTD] | m_port[NEC_UCOM4_PORTF] << 4 | m_port[NEC_UCOM4_PORTE] << 8, 1);
+}
+
+WRITE8_MEMBER(grobot9_state::input_w)
+{
+	// C012: input mux low
+	m_inp_mux = (m_inp_mux & 8) | (data & 7);
+}
+
+READ8_MEMBER(grobot9_state::input_r)
+{
+	// A: multiplexed inputs
+	return read_inputs(5);
+}
+
+
+// config
+
+static INPUT_PORTS_START( grobot9 )
+	PORT_START("IN.0") // C0 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_Q) PORT_NAME("Button 1")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_W) PORT_NAME("Button 2")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_E) PORT_NAME("Button 3")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_D) PORT_NAME("Button 4")
+
+	PORT_START("IN.1") // C1 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_C) PORT_NAME("Button 5")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_X) PORT_NAME("Button 6")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_Z) PORT_NAME("Button 7")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_A) PORT_NAME("Button 8")
+
+	PORT_START("IN.2") // C2 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_S) PORT_NAME("Button 9")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_T) PORT_NAME("Rest")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Y) PORT_NAME("Eighth Note")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.3") // E3 port A
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_B) PORT_NAME("Select")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_N) PORT_NAME("Hit")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Repeat")
+
+	PORT_START("IN.4") // INT
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_ucom4_state, single_interrupt_line, nullptr) PORT_NAME("Start-Pitch")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( grobot9, grobot9_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", NEC_D557L, 160000) // approximation
+	MCFG_UCOM4_READ_A_CB(READ8(grobot9_state, input_r))
+	MCFG_UCOM4_WRITE_C_CB(WRITE8(grobot9_state, input_w))
+	MCFG_UCOM4_WRITE_D_CB(WRITE8(grobot9_state, lamps_w))
+	MCFG_UCOM4_WRITE_E_CB(WRITE8(grobot9_state, lamps_w))
+	MCFG_UCOM4_WRITE_F_CB(WRITE8(grobot9_state, lamps_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_ucom4_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_grobot9)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Tomy(tronic) Cosmic Combat (manufactured in Japan)
   * PCB label 2E1019-E01
   * NEC uCOM-44 MCU, label D552C 042
@@ -1836,8 +1980,8 @@ public:
 
 void tccombat_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,3,2,1,0,7,6,5,4);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,11,15,3,10,14,2,9,13,1,0,12,8,15,1,5,0,3,7,2,6);
 	display_matrix(20, 9, plate, grid);
 }
 
@@ -2099,8 +2243,8 @@ public:
 
 void tmpacman_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
+	uint8_t grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,16,17,18,11,10,9,8,0,2,3,1,4,5,6,7,12,13,14,15) | 0x100;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -2204,7 +2348,7 @@ public:
 
 void tmscramb_state::prepare_display()
 {
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,18,17,3,15,2,14,1,13,16,0,12,8,4,9,5,10,6,11,7) | 0x400;
 	display_matrix(17, 10, plate, m_grid);
 }
 
@@ -2306,8 +2450,8 @@ public:
 
 void tcaveman_state::prepare_display()
 {
-	UINT8 grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
+	uint8_t grid = BITSWAP8(m_grid,0,1,2,3,4,5,6,7);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,10,11,5,6,7,8,0,9,2,18,17,16,3,15,14,13,12,4,1) | 0x40;
 	display_matrix(19, 8, plate, grid);
 }
 
@@ -2636,6 +2780,12 @@ ROM_START( mvbfree )
 ROM_END
 
 
+ROM_START( grobot9 )
+	ROM_REGION( 0x0800, "maincpu", 0 )
+	ROM_LOAD( "ttgr-511", 0x0000, 0x0800, CRC(1f25b2bb) SHA1(55ae7e23f6dd46cc6e1a65839327726678410c3a) )
+ROM_END
+
+
 ROM_START( tccombat )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "d552c-042", 0x0000, 0x0400, CRC(d7b5cfeb) SHA1(a267be8e43b7740758eb0881b655b1cc8aec43da) )
@@ -2713,9 +2863,14 @@ CONS( 1979, mcompgin, 0,        0, mcompgin, mcompgin, driver_device, 0, "Mattel
 
 CONS( 1979, mvbfree,  0,        0, mvbfree,  mvbfree,  driver_device, 0, "Mego", "Mini-Vid Break Free", MACHINE_SUPPORTS_SAVE )
 
+CONS( 1980, grobot9,  0,        0, grobot9,  grobot9,  driver_device, 0, "Takatoku Toys", "Game Robot 9", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // some of the minigames: ***
+
 CONS( 1980, tccombat, 0,        0, tccombat, tccombat, driver_device, 0, "Tomy", "Cosmic Combat", MACHINE_SUPPORTS_SAVE )
 CONS( 1980, tmtennis, 0,        0, tmtennis, tmtennis, driver_device, 0, "Tomy", "Tennis (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, tmpacman, 0,        0, tmpacman, tmpacman, driver_device, 0, "Tomy", "Pac Man (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, tmscramb, 0,        0, tmscramb, tmscramb, driver_device, 0, "Tomy", "Scramble (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1982, tcaveman, 0,        0, tcaveman, tcaveman, driver_device, 0, "Tomy", "Caveman (Tomy)", MACHINE_SUPPORTS_SAVE )
 CONS( 1984, alnchase, 0,        0, alnchase, alnchase, driver_device, 0, "Tomy", "Alien Chase", MACHINE_SUPPORTS_SAVE )
+
+// ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
+// with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

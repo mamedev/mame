@@ -23,7 +23,7 @@ Year  Game                         Manufacturer    Notes
 1997  Jingle Bell (EU, V153UE)     IGS             patched protection
 1995  Jingle Bell (EU, V141UE)     IGS             patched protection
 1995? Jingle Bell (Italy, V133I)   IGS             patched protection
-1998  Grand Prix '98               Romtec          1 reel gfx rom is bad
+1998  Grand Prix '98               Romtec
 ---------------------------------------------------------------------------
 
 ***************************************************************************/
@@ -58,14 +58,14 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_scroll;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_reel4_ram;
-	required_shared_ptr<UINT8> m_bg_scroll2;
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_reel4_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 
 	tilemap_t *m_reel1_tilemap;
 	tilemap_t *m_reel2_tilemap;
@@ -75,8 +75,8 @@ public:
 	int m_video_enable;
 	int m_nmi_enable;
 	int m_hopper;
-	UINT8 m_out[3];
-	UINT8 m_igs_magic[2];
+	uint8_t m_out[3];
+	uint8_t m_igs_magic[2];
 
 	DECLARE_WRITE8_MEMBER(reel1_ram_w);
 	DECLARE_WRITE8_MEMBER(reel2_ram_w);
@@ -114,7 +114,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_VIDEO_START(gp98);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -263,13 +263,13 @@ WRITE8_MEMBER(igs009_state::fg_color_w)
 
 void igs009_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_jingbell_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	m_reel1_tilemap->set_scroll_cols(128);
 	m_reel2_tilemap->set_scroll_cols(128);
@@ -280,13 +280,13 @@ void igs009_state::video_start()
 
 VIDEO_START_MEMBER(igs009_state,gp98)
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  0x80,0x20);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
-	m_reel4_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
+	m_reel4_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(igs009_state::get_gp98_reel4_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 128, 8);
 
 	m_reel1_tilemap->set_scroll_cols(128);
 	m_reel2_tilemap->set_scroll_cols(128);
@@ -295,7 +295,7 @@ VIDEO_START_MEMBER(igs009_state,gp98)
 }
 
 
-UINT32 igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs009_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = m_video_enable ? -1 : 0;
 
@@ -1056,12 +1056,12 @@ ROM_END
 
 void igs009_state::decrypt_jingbell()
 {
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	size_t size = memregion("maincpu")->bytes();
 
 	for (int i=0; i<size; i++)
 	{
-		UINT8 x = rom[i];
+		uint8_t x = rom[i];
 		if (i & 0x0080)
 		{
 			if ((i & 0x0420) == 0x0420) x ^= 0x20;
@@ -1084,7 +1084,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbelli)
 	decrypt_jingbell();
 
 	// protection patch
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x01f19] = 0x18;
 }
 
@@ -1093,7 +1093,7 @@ DRIVER_INIT_MEMBER(igs009_state,jingbell)
 	decrypt_jingbell();
 
 	// protection patch
-	UINT8 *rom  = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom  = (uint8_t *)memregion("maincpu")->base();
 	rom[0x0e753] = 0x18;
 }
 
@@ -1138,9 +1138,9 @@ ROM_START( gp98 )
 	ROM_COPY( "maincpu", 0x18000, 0x00000, 0x8000 )
 
 	ROM_REGION( 0x180000, "tempgfx", 0 ) // 6bpp (2bpp per rom) font at tile # 0x4000
-	ROM_LOAD( "49", 0x000000, 0x80000, BAD_DUMP CRC(a9d9367d) SHA1(91c74740fc8394f1e1cd68feb8c993afd2042d70) )
-	ROM_LOAD( "50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
-	ROM_LOAD( "51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
+	ROM_LOAD( "em-03.u49", 0x000000, 0x80000, CRC(f92c510d) SHA1(f8dc4d7d1fdc6f62fcdd86caf8fd703db4b5fb18) )
+	ROM_LOAD( "em-02.u50", 0x080000, 0x80000, CRC(48f6190d) SHA1(b430131a258b4e2fc178ac0e3e3f0010a82eac65) )
+	ROM_LOAD( "em-01.u51", 0x100000, 0x80000, CRC(30a2ef85) SHA1(38ea637acd83b175eccd2969ef21879265b88992) )
 
 	ROM_REGION( 0xc0000, "reels", 0 )
 	ROM_COPY( "tempgfx", 0x000000, 0x00000, 0x40000 )
@@ -1163,4 +1163,4 @@ GAME( 1997,  jingbella, jingbell, jingbell, jingbell, igs009_state,  jingbell,  
 GAME( 1997,  jingbellb, jingbell, jingbell, jingbell, igs009_state,  jingbell,  ROT0, "IGS",            "Jingle Bell (EU, V153UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995,  jingbellc, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (EU, V141UE)",   MACHINE_SUPPORTS_SAVE )
 GAME( 1995?, jingbelli, jingbell, jingbell, jingbell, igs009_state,  jingbelli, ROT0, "IGS",            "Jingle Bell (Italy, V133I)", MACHINE_SUPPORTS_SAVE )
-GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1998,  gp98,      0,        gp98,     jingbell, driver_device, 0,         ROT0, "Romtec Co. Ltd", "Grand Prix '98 (V100K)",     MACHINE_SUPPORTS_SAVE )

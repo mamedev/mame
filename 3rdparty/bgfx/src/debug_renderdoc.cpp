@@ -56,7 +56,7 @@ namespace bgfx
 	}
 
 	pRENDERDOC_GetAPI RENDERDOC_GetAPI;
-	static RENDERDOC_API_1_0_1* s_renderDoc;
+	static RENDERDOC_API_1_1_0* s_renderDoc;
 
 	void* loadRenderDoc()
 	{
@@ -72,14 +72,14 @@ namespace bgfx
 		{
 			RENDERDOC_GetAPI = (pRENDERDOC_GetAPI)bx::dlsym(renderdocdll, "RENDERDOC_GetAPI");
 			if (NULL != RENDERDOC_GetAPI
-			&&  1 == RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_0_0, (void**)&s_renderDoc) )
+			&&  1 == RENDERDOC_GetAPI(eRENDERDOC_API_Version_1_1_0, (void**)&s_renderDoc) )
 			{
-				s_renderDoc->SetLogFilePathTemplate("temp/bgfx");
+				s_renderDoc->SetLogFilePathTemplate(BGFX_CONFIG_RENDERDOC_LOG_FILEPATH);
 
  				s_renderDoc->SetFocusToggleKeys(NULL, 0);
 
-				RENDERDOC_InputButton captureKey = eRENDERDOC_Key_F11;
-				s_renderDoc->SetCaptureKeys(&captureKey, 1);
+				RENDERDOC_InputButton captureKeys[] = BGFX_CONFIG_RENDERDOC_CAPTURE_KEYS;
+				s_renderDoc->SetCaptureKeys(captureKeys, BX_COUNTOF(captureKeys) );
 
 				s_renderDoc->SetCaptureOptionU32(eRENDERDOC_Option_AllowVSync,      1);
 				s_renderDoc->SetCaptureOptionU32(eRENDERDOC_Option_SaveAllInitials, 1);

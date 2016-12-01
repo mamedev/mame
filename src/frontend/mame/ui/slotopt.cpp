@@ -151,7 +151,7 @@ menu_slot_devices::menu_slot_devices(mame_ui_manager &mui, render_container &con
 {
 }
 
-void menu_slot_devices::populate()
+void menu_slot_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_slot_interface &slot : slot_interface_iterator(machine().root_device()))
@@ -189,7 +189,7 @@ void menu_slot_devices::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 		{
 			mame_options::add_slot_options(machine().options());
 			machine().schedule_hard_reset();

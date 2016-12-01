@@ -62,7 +62,7 @@ public:
 
 	// sound_module
 
-	virtual void update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame);
+	virtual void update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
 private:
@@ -81,15 +81,15 @@ private:
 		EFFECT_COUNT_MAX = 10
 	};
 
-	UINT32 clamped_latency() const { return unsigned(std::max(std::min(m_audio_latency, int(LATENCY_MAX)), int(LATENCY_MIN))); }
-	UINT32 buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
-	UINT32 buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
+	uint32_t clamped_latency() const { return unsigned(std::max(std::min(m_audio_latency, int(LATENCY_MAX)), int(LATENCY_MIN))); }
+	uint32_t buffer_avail() const { return ((m_writepos >= m_playpos) ? m_buffer_size : 0) + m_playpos - m_writepos; }
+	uint32_t buffer_used() const { return ((m_playpos > m_writepos) ? m_buffer_size : 0) + m_writepos - m_playpos; }
 
-	void copy_scaled(void *dst, void const *src, UINT32 bytes) const
+	void copy_scaled(void *dst, void const *src, uint32_t bytes) const
 	{
-		bytes /= sizeof(INT16);
-		INT16 const *s = (INT16 const *)src;
-		for (INT16 *d = (INT16 *)dst; bytes > 0; bytes--, s++, d++)
+		bytes /= sizeof(int16_t);
+		int16_t const *s = (int16_t const *)src;
+		for (int16_t *d = (int16_t *)dst; bytes > 0; bytes--, s++, d++)
 			*d = (*s * m_scale) >> 7;
 	}
 
@@ -174,14 +174,14 @@ private:
 	unsigned    m_node_count;
 	node_detail m_node_details[EFFECT_COUNT_MAX + 2];
 
-	UINT32      m_sample_bytes;
-	UINT32      m_headroom;
-	UINT32      m_buffer_size;
-	INT8        *m_buffer;
-	UINT32      m_playpos;
-	UINT32      m_writepos;
+	uint32_t      m_sample_bytes;
+	uint32_t      m_headroom;
+	uint32_t      m_buffer_size;
+	int8_t        *m_buffer;
+	uint32_t      m_playpos;
+	uint32_t      m_writepos;
 	bool        m_in_underrun;
-	INT32       m_scale;
+	int32_t       m_scale;
 	unsigned    m_overflows;
 	unsigned    m_underflows;
 };
@@ -228,8 +228,8 @@ int sound_coreaudio::init(const osd_options &options)
 
 	// Allocate buffer
 	m_headroom = m_sample_bytes * (clamped_latency() * sample_rate() / 40);
-	m_buffer_size = m_sample_bytes * std::max<UINT32>(sample_rate() * (clamped_latency() + 3) / 40, 256U);
-	m_buffer = global_alloc_array_clear<INT8>(m_buffer_size);
+	m_buffer_size = m_sample_bytes * std::max<uint32_t>(sample_rate() * (clamped_latency() + 3) / 40, 256U);
+	m_buffer = global_alloc_array_clear<int8_t>(m_buffer_size);
 	if (!m_buffer)
 	{
 		osd_printf_error("Could not allocate stream buffer\n");
@@ -294,20 +294,20 @@ void sound_coreaudio::exit()
 }
 
 
-void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer, int samples_this_frame)
+void sound_coreaudio::update_audio_stream(bool is_throttled, int16_t const *buffer, int samples_this_frame)
 {
 	if ((sample_rate() == 0) || !m_buffer)
 		return;
 
-	UINT32 const bytes_this_frame = samples_this_frame * m_sample_bytes;
+	uint32_t const bytes_this_frame = samples_this_frame * m_sample_bytes;
 	if (bytes_this_frame >= buffer_avail())
 	{
 		m_overflows++;
 		return;
 	}
 
-	UINT32 const chunk = std::min(m_buffer_size - m_writepos, bytes_this_frame);
-	memcpy(m_buffer + m_writepos, (INT8 *)buffer, chunk);
+	uint32_t const chunk = std::min(m_buffer_size - m_writepos, bytes_this_frame);
+	memcpy(m_buffer + m_writepos, (int8_t *)buffer, chunk);
 	m_writepos += chunk;
 	if (m_writepos >= m_buffer_size)
 		m_writepos = 0;
@@ -316,7 +316,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 	{
 		assert(0U == m_writepos);
 		assert(m_playpos > (bytes_this_frame - chunk));
-		memcpy(m_buffer, (INT8 *)buffer + chunk, bytes_this_frame - chunk);
+		memcpy(m_buffer, (int8_t *)buffer + chunk, bytes_this_frame - chunk);
 		m_writepos += bytes_this_frame - chunk;
 	}
 }
@@ -325,7 +325,7 @@ void sound_coreaudio::update_audio_stream(bool is_throttled, INT16 const *buffer
 void sound_coreaudio::set_mastervolume(int attenuation)
 {
 	int const clamped_attenuation = std::max(std::min(attenuation, 0), -32);
-	m_scale = (-32 == clamped_attenuation) ? 0 : (INT32)(pow(10.0, clamped_attenuation / 20.0) * 128);
+	m_scale = (-32 == clamped_attenuation) ? 0 : (int32_t)(pow(10.0, clamped_attenuation / 20.0) * 128);
 }
 
 
@@ -980,8 +980,8 @@ OSStatus sound_coreaudio::render(
 		UInt32                      number_frames,
 		AudioBufferList             *data)
 {
-	UINT32 const number_bytes = number_frames * m_sample_bytes;
-	UINT32 const used = buffer_used();
+	uint32_t const number_bytes = number_frames * m_sample_bytes;
+	uint32_t const used = buffer_used();
 	if (m_in_underrun && (used < m_headroom))
 	{
 		memset(data->mBuffers[0].mData, 0, number_bytes);
@@ -996,8 +996,8 @@ OSStatus sound_coreaudio::render(
 		return noErr;
 	}
 
-	UINT32 const chunk = std::min(m_buffer_size - m_playpos, number_bytes);
-	copy_scaled((INT8 *)data->mBuffers[0].mData, m_buffer + m_playpos, chunk);
+	uint32_t const chunk = std::min(m_buffer_size - m_playpos, number_bytes);
+	copy_scaled((int8_t *)data->mBuffers[0].mData, m_buffer + m_playpos, chunk);
 	m_playpos += chunk;
 	if (m_playpos >= m_buffer_size)
 		m_playpos = 0;
@@ -1006,7 +1006,7 @@ OSStatus sound_coreaudio::render(
 	{
 		assert(0U == m_playpos);
 		assert(m_writepos >= (number_bytes - chunk));
-		copy_scaled((INT8 *)data->mBuffers[0].mData + chunk, m_buffer, number_bytes - chunk);
+		copy_scaled((int8_t *)data->mBuffers[0].mData + chunk, m_buffer, number_bytes - chunk);
 		m_playpos += number_bytes - chunk;
 	}
 

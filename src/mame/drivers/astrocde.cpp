@@ -137,13 +137,13 @@
 
 WRITE8_MEMBER(astrocde_state::protected_ram_enable_w)
 {
-	m_ram_write_enable = TRUE;
+	m_ram_write_enable = true;
 }
 
 
 READ8_MEMBER(astrocde_state::protected_ram_r)
 {
-	m_ram_write_enable = FALSE;
+	m_ram_write_enable = false;
 	return m_protected_ram[offset];
 }
 
@@ -152,7 +152,7 @@ WRITE8_MEMBER(astrocde_state::protected_ram_w)
 {
 	if (m_ram_write_enable)
 		m_protected_ram[offset] = data;
-	m_ram_write_enable = FALSE;
+	m_ram_write_enable = false;
 }
 
 
@@ -185,7 +185,7 @@ WRITE8_MEMBER(astrocde_state::seawolf2_lamps_w)
 
 WRITE8_MEMBER(astrocde_state::seawolf2_sound_1_w)// Port 40
 {
-	UINT8 rising_bits = data & ~m_port_1_last;
+	uint8_t rising_bits = data & ~m_port_1_last;
 	m_port_1_last = data;
 
 	if (rising_bits & 0x01) m_samples->start(1, 1);  /* Left Torpedo */
@@ -199,7 +199,7 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_1_w)// Port 40
 
 WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
 {
-	UINT8 rising_bits = data & ~m_port_2_last;
+	uint8_t rising_bits = data & ~m_port_2_last;
 	m_port_2_last = data;
 
 	m_samples->set_volume(0, (data & 0x80) ? 1.0 : 0.0);
@@ -234,8 +234,6 @@ WRITE8_MEMBER(astrocde_state::seawolf2_sound_2_w)// Port 41
  *
  *************************************/
 
-IOPORT_ARRAY_MEMBER(astrocde_state::trackball_inputs) { "TRACKX2", "TRACKY2", "TRACKX1", "TRACKY1" };
-
 CUSTOM_INPUT_MEMBER(astrocde_state::ebases_trackball_r)
 {
 	return m_trackball[m_input_select]->read();
@@ -265,7 +263,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 {
 	machine().bookkeeping().coin_counter_w(0, (offset >> 8) & 1);
 	machine().bookkeeping().coin_counter_w(1, (offset >> 9) & 1);
-	return m_p3handle ? m_p3handle->read() : 0xff;
+	return m_p3handle.read_safe(0xff);
 }
 
 
@@ -278,7 +276,7 @@ READ8_MEMBER(astrocde_state::spacezap_io_r)
 
 READ8_MEMBER(astrocde_state::wow_io_r)
 {
-	UINT8 data = (offset >> 8) & 1;
+	uint8_t data = (offset >> 8) & 1;
 
 	switch ((offset >> 9) & 7)
 	{
@@ -303,7 +301,7 @@ READ8_MEMBER(astrocde_state::wow_io_r)
 
 READ8_MEMBER(astrocde_state::gorf_io_1_r)
 {
-	UINT8 data = (offset >> 8) & 1;
+	uint8_t data = (offset >> 8) & 1;
 
 	switch ((offset >> 9) & 7)
 	{
@@ -329,7 +327,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 
 READ8_MEMBER(astrocde_state::gorf_io_2_r)
 {
-	UINT8 data = (offset >> 8) & 1;
+	uint8_t data = (offset >> 8) & 1;
 
 	switch ((offset >> 9) & 7)
 	{
@@ -355,7 +353,7 @@ READ8_MEMBER(astrocde_state::gorf_io_2_r)
 
 READ8_MEMBER(astrocde_state::robby_io_r)
 {
-	UINT8 data = (offset >> 8) & 1;
+	uint8_t data = (offset >> 8) & 1;
 
 	switch ((offset >> 9) & 7)
 	{
@@ -440,8 +438,6 @@ READ8_MEMBER(astrocde_state::demndrgn_io_r)
 	return 0xff;
 }
 
-
-IOPORT_ARRAY_MEMBER(astrocde_state::joystick_inputs) { "MOVEX", "MOVEY" };
 
 
 CUSTOM_INPUT_MEMBER(astrocde_state::demndragn_joystick_r)

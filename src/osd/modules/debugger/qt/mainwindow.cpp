@@ -219,7 +219,7 @@ void MainWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = dasmView->source()->device()->debug();
 
 		// Find an existing breakpoint at this address
-		INT32 bpindex = -1;
+		int32_t bpindex = -1;
 		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
 				bp != nullptr;
 				bp = bp->next())
@@ -263,7 +263,7 @@ void MainWindow::enableBreakpointAtCursor(bool changedTo)
 
 		if (bp != nullptr)
 		{
-			INT32 const bpindex = bp->index();
+			int32_t const bpindex = bp->index();
 			std::string command = string_format(bp->enabled() ? "bpdisable 0x%X" : "bpenable 0x%X", bpindex);
 			m_machine->debugger().console().execute_command(command.c_str(), true);
 		}
@@ -526,20 +526,20 @@ void MainWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MainWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void MainWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "rightbar", m_rightBar);
-	xml_set_attribute(node, "qtwindowstate", m_windowState.toPercentEncoding().data());
+	node.set_attribute_int("rightbar", m_rightBar);
+	node.set_attribute("qtwindowstate", m_windowState.toPercentEncoding().data());
 }
 
 
-void MainWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void MainWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	const char* state = xml_get_attribute_string(node, "qtwindowstate", "");
+	const char* state = node.get_attribute_string("qtwindowstate", "");
 	m_windowState = QByteArray::fromPercentEncoding(state);
-	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
+	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
 }
 
 DasmDockWidget::~DasmDockWidget()

@@ -25,6 +25,7 @@
 #define OPTION_WRITECONFIG          "writeconfig"
 
 // core search path options
+#define OPTION_HOMEPATH             "homepath"
 #define OPTION_MEDIAPATH            "rompath"
 #define OPTION_HASHPATH             "hashpath"
 #define OPTION_SAMPLEPATH           "samplepath"
@@ -36,6 +37,7 @@
 #define OPTION_CROSSHAIRPATH        "crosshairpath"
 #define OPTION_PLUGINSPATH          "pluginspath"
 #define OPTION_LANGUAGEPATH         "languagepath"
+#define OPTION_SWPATH               "swpath"
 
 // core directory options
 #define OPTION_CFG_DIRECTORY        "cfg_directory"
@@ -79,6 +81,8 @@
 #define OPTION_KEEPASPECT           "keepaspect"
 #define OPTION_UNEVENSTRETCH        "unevenstretch"
 #define OPTION_UNEVENSTRETCHX       "unevenstretchx"
+#define OPTION_UNEVENSTRETCHY       "unevenstretchy"
+#define OPTION_AUTOSTRETCHXY        "autostretchxy"
 #define OPTION_INTOVERSCAN          "intoverscan"
 #define OPTION_INTSCALEX            "intscalex"
 #define OPTION_INTSCALEY            "intscaley"
@@ -211,6 +215,7 @@ public:
 	bool write_config() const { return bool_value(OPTION_WRITECONFIG); }
 
 	// core search path options
+	const char *home_path() const { return value(OPTION_HOMEPATH); }
 	const char *media_path() const { return value(OPTION_MEDIAPATH); }
 	const char *hash_path() const { return value(OPTION_HASHPATH); }
 	const char *sample_path() const { return value(OPTION_SAMPLEPATH); }
@@ -222,6 +227,7 @@ public:
 	const char *crosshair_path() const { return value(OPTION_CROSSHAIRPATH); }
 	const char *plugins_path() const { return value(OPTION_PLUGINSPATH); }
 	const char *language_path() const { return value(OPTION_LANGUAGEPATH); }
+	const char *sw_path() const { return value(OPTION_SWPATH); }
 
 	// core directory options
 	const char *cfg_directory() const { return value(OPTION_CFG_DIRECTORY); }
@@ -265,6 +271,8 @@ public:
 	bool keep_aspect() const { return bool_value(OPTION_KEEPASPECT); }
 	bool uneven_stretch() const { return bool_value(OPTION_UNEVENSTRETCH); }
 	bool uneven_stretch_x() const { return bool_value(OPTION_UNEVENSTRETCHX); }
+	bool uneven_stretch_y() const { return bool_value(OPTION_UNEVENSTRETCHY); }
+	bool auto_stretch_xy() const { return bool_value(OPTION_AUTOSTRETCHXY); }
 	bool int_overscan() const { return bool_value(OPTION_INTOVERSCAN); }
 	int int_scale_x() const { return int_value(OPTION_INTSCALEX); }
 	int int_scale_y() const { return int_value(OPTION_INTSCALEY); }

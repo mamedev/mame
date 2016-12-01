@@ -171,8 +171,8 @@ WRITE8_MEMBER( nano_state::keylatch_w )
 void tmc2000_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	if (m_roc)
 	{
@@ -224,7 +224,7 @@ WRITE8_MEMBER( nano_state::bankswitch_w )
 {
 	/* enable RAM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	program.install_ram(0x0000, 0x0fff, 0x7000, ram);
 
 	/* write to CDP1864 tone latch */
@@ -530,7 +530,7 @@ READ_LINE_MEMBER( tmc2000_state::ef2_r )
 
 READ_LINE_MEMBER( tmc2000_state::ef3_r )
 {
-	UINT8 data = ~m_key_row[m_keylatch / 8]->read();
+	uint8_t data = ~m_key_row[m_keylatch / 8]->read();
 
 	return BIT(data, m_keylatch % 8);
 }
@@ -572,7 +572,7 @@ READ_LINE_MEMBER( nano_state::ef2_r )
 
 READ_LINE_MEMBER( nano_state::ef3_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keylatch, 3)) data &= m_ny0->read();
 	if (!BIT(m_keylatch, 4)) data &= m_ny1->read();
@@ -624,7 +624,7 @@ void osc1000b_state::machine_reset()
 
 void tmc2000_state::machine_start()
 {
-	UINT16 addr;
+	uint16_t addr;
 
 	m_colorram.allocate(TMC2000_COLORRAM_SIZE);
 
@@ -633,16 +633,6 @@ void tmc2000_state::machine_start()
 	{
 		m_colorram[addr] = machine().rand() & 0xff;
 	}
-
-	// find keyboard rows
-	m_key_row[0] = m_y0;
-	m_key_row[1] = m_y1;
-	m_key_row[2] = m_y2;
-	m_key_row[3] = m_y3;
-	m_key_row[4] = m_y4;
-	m_key_row[5] = m_y5;
-	m_key_row[6] = m_y6;
-	m_key_row[7] = m_y7;
 
 	// state saving
 	save_item(NAME(m_keylatch));
@@ -689,7 +679,7 @@ void nano_state::machine_reset()
 
 	/* enable ROM */
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = m_rom->base();
+	uint8_t *rom = m_rom->base();
 	program.install_rom(0x0000, 0x01ff, 0x7e00, rom);
 }
 
@@ -697,7 +687,7 @@ void nano_state::machine_reset()
 
 QUICKLOAD_LOAD_MEMBER( tmc1800_base_state, tmc1800 )
 {
-	UINT8 *ptr = m_rom->base();
+	uint8_t *ptr = m_rom->base();
 	int size = image.length();
 
 	if (size > m_ram->size())
@@ -866,7 +856,7 @@ void tmc1800_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_beeper->set_clock(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tmc1800_state::device_timer");
+		assert_always(false, "Unknown id in tmc1800_state::device_timer");
 	}
 }
 

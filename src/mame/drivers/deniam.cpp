@@ -62,7 +62,7 @@ WRITE16_MEMBER(deniam_state::sound_command_w)
 
 WRITE8_MEMBER(deniam_state::deniam16b_oki_rom_bank_w)
 {
-	m_oki->set_bank_base((data & 0x40) ? 0x40000 : 0x00000);
+	m_oki->set_rom_bank((data >> 6) & 1);
 }
 
 WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
@@ -70,7 +70,7 @@ WRITE16_MEMBER(deniam_state::deniam16c_oki_rom_bank_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if ((data&0xFE) != 0) popmessage("OKI bank was not 0 or 1! contact MAMEDEV!");
-		m_oki->set_bank_base((data & 0x01) ? 0x40000 : 0x00000);
+		m_oki->set_rom_bank(data & 0x01);
 	}
 }
 
@@ -249,7 +249,7 @@ void deniam_state::machine_reset()
 	doesn't matter since the coinup sfx (sample borrowed from 'tyrian' on PC)
 	exists in both banks; it properly sets the bank as soon as the ufo sfx
 	plays or a player character is selected on the character select screen */
-	m_oki->set_bank_base(0x00000);
+	m_oki->set_rom_bank(0);
 }
 
 static MACHINE_CONFIG_START( deniam16b, deniam_state )

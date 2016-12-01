@@ -27,42 +27,42 @@ class drc_hash_table
 {
 public:
 	// construction/destruction
-	drc_hash_table(drc_cache &cache, UINT32 modes, UINT8 addrbits, UINT8 ignorebits);
+	drc_hash_table(drc_cache &cache, uint32_t modes, uint8_t addrbits, uint8_t ignorebits);
 
 	// getters
 	drccodeptr ***base() const { return m_base; }
-	UINT8 l1bits() const { return m_l1bits; }
-	UINT8 l2bits() const { return m_l2bits; }
-	UINT8 l1shift() const { return m_l1shift; }
-	UINT8 l2shift() const { return m_l2shift; }
+	uint8_t l1bits() const { return m_l1bits; }
+	uint8_t l2bits() const { return m_l2bits; }
+	uint8_t l1shift() const { return m_l1shift; }
+	uint8_t l2shift() const { return m_l2shift; }
 	offs_t l1mask() const { return m_l1mask; }
 	offs_t l2mask() const { return m_l2mask; }
-	bool is_mode_populated(UINT32 mode) const { return m_base[mode] != m_emptyl1; }
+	bool is_mode_populated(uint32_t mode) const { return m_base[mode] != m_emptyl1; }
 
 	// set up and configuration
 	bool reset();
 	void set_default_codeptr(drccodeptr code);
 
 	// block begin/end
-	void block_begin(drcuml_block &block, const uml::instruction *instlist, UINT32 numinst);
+	void block_begin(drcuml_block &block, const uml::instruction *instlist, uint32_t numinst);
 	void block_end(drcuml_block &block);
 
 	// code pointer access
-	bool set_codeptr(UINT32 mode, UINT32 pc, drccodeptr code);
-	drccodeptr get_codeptr(UINT32 mode, UINT32 pc) { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
-	bool code_exists(UINT32 mode, UINT32 pc) { return get_codeptr(mode, pc) != m_nocodeptr; }
+	bool set_codeptr(uint32_t mode, uint32_t pc, drccodeptr code);
+	drccodeptr get_codeptr(uint32_t mode, uint32_t pc) { assert(mode < m_modes); return m_base[mode][(pc >> m_l1shift) & m_l1mask][(pc >> m_l2shift) & m_l2mask]; }
+	bool code_exists(uint32_t mode, uint32_t pc) { return get_codeptr(mode, pc) != m_nocodeptr; }
 
 private:
 	// internal state
 	drc_cache &     m_cache;                // cache where allocations come from
-	UINT32          m_modes;                // number of modes supported
+	uint32_t          m_modes;                // number of modes supported
 
 	drccodeptr      m_nocodeptr;            // pointer to code which will handle missing entries
 
-	UINT8           m_l1bits;               // bits worth of entries in l1 hash tables
-	UINT8           m_l2bits;               // bits worth of entries in l2 hash tables
-	UINT8           m_l1shift;              // shift to apply to the PC to get the l1 hash entry
-	UINT8           m_l2shift;              // shift to apply to the PC to get the l2 hash entry
+	uint8_t           m_l1bits;               // bits worth of entries in l1 hash tables
+	uint8_t           m_l2bits;               // bits worth of entries in l2 hash tables
+	uint8_t           m_l1shift;              // shift to apply to the PC to get the l1 hash entry
+	uint8_t           m_l2shift;              // shift to apply to the PC to get the l2 hash entry
 	offs_t          m_l1mask;               // mask to apply after shifting
 	offs_t          m_l2mask;               // mask to apply after shifting
 
@@ -79,7 +79,7 @@ class drc_map_variables
 {
 public:
 	// construction/destruction
-	drc_map_variables(drc_cache &cache, UINT64 uniquevalue);
+	drc_map_variables(drc_cache &cache, uint64_t uniquevalue);
 	~drc_map_variables();
 
 	// block begin/end
@@ -87,18 +87,18 @@ public:
 	void block_end(drcuml_block &block);
 
 	// get/set values
-	void set_value(drccodeptr codebase, UINT32 mapvar, UINT32 newvalue);
-	UINT32 get_value(drccodeptr codebase, UINT32 mapvar) const;
-	UINT32 get_last_value(UINT32 mapvar);
+	void set_value(drccodeptr codebase, uint32_t mapvar, uint32_t newvalue);
+	uint32_t get_value(drccodeptr codebase, uint32_t mapvar) const;
+	uint32_t get_last_value(uint32_t mapvar);
 
 	// static accessors to be called directly by generated code
-	static UINT32 static_get_value(drc_map_variables &map, drccodeptr codebase, UINT32 mapvar);
+	static uint32_t static_get_value(drc_map_variables &map, drccodeptr codebase, uint32_t mapvar);
 
 private:
 	// internal state
 	drc_cache &         m_cache;            // pointer to the cache
-	UINT64              m_uniquevalue;      // unique value used to find the table
-	UINT32              m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
+	uint64_t              m_uniquevalue;      // unique value used to find the table
+	uint32_t              m_mapvalue[uml::MAPVAR_END - uml::MAPVAR_M0]; // array of current values
 
 	// list of entries
 	struct map_entry
@@ -106,8 +106,8 @@ private:
 		map_entry *next() const { return m_next; }
 		map_entry *     m_next;             // pointer to next map entry
 		drccodeptr      m_codeptr;          // pointer to the relevant code
-		UINT32          m_mapvar;           // map variable id
-		UINT32          m_newval;           // value of the variable starting at codeptr
+		uint32_t          m_mapvar;           // map variable id
+		uint32_t          m_newval;           // value of the variable starting at codeptr
 	};
 	simple_list<map_entry> m_entry_list;    // list of entries
 };

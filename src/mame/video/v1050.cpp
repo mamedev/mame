@@ -58,9 +58,9 @@ MC6845_UPDATE_ROW( v1050_state::crtc_update_row )
 
 	for (column = 0; column < x_count; column++)
 	{
-		UINT16 address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
-		UINT8 data = m_video_ram[address & V1050_VIDEORAM_MASK];
-		UINT8 attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
+		uint16_t address = (((ra & 0x03) + 1) << 13) | ((ma & 0x1fff) + column);
+		uint8_t data = m_video_ram[address & V1050_VIDEORAM_MASK];
+		uint8_t attr = (m_attr & 0xfc) | (m_attr_ram[address] & 0x03);
 
 		for (bit = 0; bit < 8; bit++)
 		{
@@ -113,7 +113,7 @@ MACHINE_CONFIG_FRAGMENT( v1050_video )
 	MCFG_MC6845_UPDATE_ROW_CB(v1050_state, crtc_update_row)
 	MCFG_MC6845_OUT_VSYNC_CB(WRITELINE(v1050_state, crtc_vs_w))
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DEVICE(H46505_TAG, h46505_device, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))

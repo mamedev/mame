@@ -163,7 +163,7 @@ public:
 	// interrupts
 	virtual void s100_int_w(int state) { };
 	virtual void s100_nmi_w(int state) { };
-	virtual UINT8 s100_sinta_r(offs_t offset) { return 0; };
+	virtual uint8_t s100_sinta_r(offs_t offset) { return 0; };
 
 	// vectored interrupts
 	virtual void s100_vi0_w(int state) { };
@@ -176,12 +176,12 @@ public:
 	virtual void s100_vi7_w(int state) { };
 
 	// memory access
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) { return 0; };
-	virtual void s100_mwrt_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) { return 0; };
+	virtual void s100_mwrt_w(address_space &space, offs_t offset, uint8_t data) { };
 
 	// I/O access
-	virtual UINT8 s100_sinp_r(address_space &space, offs_t offset) { return 0; };
-	virtual void s100_sout_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t s100_sinp_r(address_space &space, offs_t offset) { return 0; };
+	virtual void s100_sout_w(address_space &space, offs_t offset, uint8_t data) { };
 
 	// configuration access
 	virtual void s100_phlda_w(int state) { }
@@ -208,7 +208,7 @@ class s100_bus_t : public device_t
 {
 public:
 	// construction/destruction
-	s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_bus_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s100_bus_t() { m_device_list.detach_all(); }
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<s100_bus_t &>(device).m_write_irq.set_callback(object); }
@@ -290,7 +290,7 @@ class s100_slot_t : public device_t,
 {
 public:
 	// construction/destruction
-	s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_slot_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;

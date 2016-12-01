@@ -106,9 +106,9 @@ public:
 	DECLARE_WRITE8_MEMBER(gate_w);
 
 private:
-	UINT16 m_dac;
-	UINT8 m_scanrow;
-	UINT8 m_comparitor;
+	uint16_t m_dac;
+	uint8_t m_scanrow;
+	uint8_t m_comparitor;
 
 	bool m_nmi_gate;
 
@@ -116,7 +116,7 @@ private:
 	bool m_ASaw, m_ATri, m_Sync, m_BSaw, m_BTri, m_PModFA, m_PModFil;
 
 	// control voltages
-	UINT16 m_CVs[CV_MAX];
+	uint16_t m_CVs[CV_MAX];
 };
 
 WRITE_LINE_MEMBER( prophet600_state::pit_ch0_tick_w )

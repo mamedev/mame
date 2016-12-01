@@ -423,7 +423,7 @@ ADDRESS_MAP_END
 /***************************************************************************/
 
 
-//static UINT8 adpcm_d[0x08];
+//static uint8_t adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
 //2 - end ROM offset LSB
@@ -1067,7 +1067,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1083,7 +1083,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolf)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 
@@ -1096,7 +1096,7 @@ DRIVER_INIT_MEMBER(opwolf_state,opwolfb)
 
 DRIVER_INIT_MEMBER(opwolf_state,opwolfp)
 {
-	UINT16* rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t* rom = (uint16_t*)memregion("maincpu")->base();
 
 	m_opwolf_region = rom[0x03fffe / 2] & 0xff;
 

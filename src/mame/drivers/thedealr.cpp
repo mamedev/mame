@@ -56,7 +56,7 @@ public:
 	DECLARE_READ8_MEMBER(iox_r);
 	DECLARE_WRITE8_MEMBER(iox_w);
 	DECLARE_READ8_MEMBER(iox_status_r);
-	UINT8 m_iox_cmd, m_iox_ret, m_iox_status, m_iox_leds, m_iox_coins;
+	uint8_t m_iox_cmd, m_iox_ret, m_iox_status, m_iox_leds, m_iox_coins;
 	void iox_reset();
 
 	// memory map
@@ -70,7 +70,7 @@ public:
 
 	// video
 	DECLARE_PALETTE_INIT(thedealr);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 };
 
@@ -82,7 +82,7 @@ public:
 
 PALETTE_INIT_MEMBER(thedealr_state,thedealr)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	for (int i = 0; i < palette.entries(); i++)
 	{
@@ -91,7 +91,7 @@ PALETTE_INIT_MEMBER(thedealr_state,thedealr)
 	}
 }
 
-UINT32 thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t thedealr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x1f0, cliprect);
 
@@ -136,7 +136,7 @@ MACHINE_RESET_MEMBER(thedealr_state,thedealr)
 // 3400
 READ8_MEMBER(thedealr_state::iox_r)
 {
-	UINT8 ret = m_iox_ret;
+	uint8_t ret = m_iox_ret;
 	m_iox_status &= ~IOX_OUT_FULL;
 
 	logerror("%s: IOX read %02X\n", machine().describe_context(), ret);
@@ -189,7 +189,7 @@ WRITE8_MEMBER(thedealr_state::iox_w)
 		{
 			case 0x01:  // inputs?
 			{
-				UINT16 buttons = ioport("IOX")->read();
+				uint16_t buttons = ioport("IOX")->read();
 				m_iox_ret = 0;
 				for (int i = 0; i < 16; ++i)
 				{

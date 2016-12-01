@@ -11,7 +11,7 @@
   GE885-PWB(A)A ( contains Toshiba tmpr3904af, ram, rom, tranceiver and glue ).
 */
 
-k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+k573mcr_device::k573mcr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_573_MEMORY_CARD_READER, "Konami 573 Memory Card Reader", tag, owner, clock, "k573mcr", __FILE__)
 {
 }
@@ -25,7 +25,7 @@ ROM_START( k573mcr )
 	ROM_LOAD( "885a01.bin",   0x000000, 0x080000, CRC(e22d093f) SHA1(927f62f63b5caa7899392decacd12fea0e6fdbea) )
 ROM_END
 
-const rom_entry *k573mcr_device::device_rom_region() const
+const tiny_rom_entry *k573mcr_device::device_rom_region() const
 {
 	return ROM_NAME( k573mcr );
 }

@@ -13,6 +13,7 @@
 #define __RTC4543_H__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -44,8 +45,8 @@ class rtc4543_device :  public device_t,
 
 public:
 	// construction/destruction
-	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *filename);
+	rtc4543_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	rtc4543_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename);
 
 	DECLARE_WRITE_LINE_MEMBER( ce_w );
 	DECLARE_WRITE_LINE_MEMBER( wr_w );
@@ -63,7 +64,7 @@ protected:
 
 	// device_rtc_interface overrides
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
 
 	// helpers
 	virtual void ce_rising();
@@ -96,7 +97,7 @@ class jrc6355e_device : public rtc4543_device
 {
 public:
 	// construction/destruction
-	jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	jrc6355e_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// rtc4543 overrides

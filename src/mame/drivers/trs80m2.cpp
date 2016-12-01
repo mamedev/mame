@@ -33,7 +33,7 @@
 
 READ8_MEMBER( trs80m2_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x800)
 	{
@@ -191,7 +191,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// 80/40 character mode*/
 	data |= m_80_40_char_en << 4;
@@ -389,9 +389,9 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = m_char_rom->base()[address];
+		uint8_t data = m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -433,11 +433,11 @@ void trs80m2_state::video_start()
 	m_video_ram.allocate(0x800);
 }
 
-UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	else
 	{
@@ -548,7 +548,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data |= (m_fdc->intrq_r() ? 0x01 : 0x00);
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	MCFG_CPU_IO_MAP(z80_io)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)

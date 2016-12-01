@@ -49,12 +49,12 @@ class ds2404_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
-	static void static_set_ref_year(device_t &device, UINT32 m_ref_year);
-	static void static_set_ref_month(device_t &device, UINT8 m_ref_month);
-	static void static_set_ref_day(device_t &device, UINT8 m_ref_day);
+	static void static_set_ref_year(device_t &device, uint32_t m_ref_year);
+	static void static_set_ref_month(device_t &device, uint8_t m_ref_month);
+	static void static_set_ref_day(device_t &device, uint8_t m_ref_day);
 
 	/* 1-wire interface reset  */
 	DECLARE_WRITE8_MEMBER(ds2404_1w_reset_w);
@@ -82,11 +82,11 @@ protected:
 
 private:
 
-	void ds2404_rom_cmd(UINT8 cmd);
-	void ds2404_cmd(UINT8 cmd);
+	void ds2404_rom_cmd(uint8_t cmd);
+	void ds2404_cmd(uint8_t cmd);
 
-	UINT8 ds2404_readmem();
-	void ds2404_writemem(UINT8 value);
+	uint8_t ds2404_readmem();
+	void ds2404_writemem(uint8_t value);
 
 	enum DS2404_STATE
 	{
@@ -105,18 +105,18 @@ private:
 	emu_timer *m_tick_timer;
 
 	// configuration state
-	UINT32  m_ref_year;
-	UINT8   m_ref_month;
-	UINT8   m_ref_day;
+	uint32_t  m_ref_year;
+	uint8_t   m_ref_month;
+	uint8_t   m_ref_day;
 
-	UINT16 m_address;
-	UINT16 m_offset;
-	UINT16 m_end_offset;
-	UINT8 m_a1;
-	UINT8 m_a2;
-	UINT8 m_sram[512];  /* 4096 bits */
-	UINT8 m_ram[32];    /* scratchpad ram, 256 bits */
-	UINT8 m_rtc[5];     /* 40-bit RTC counter */
+	uint16_t m_address;
+	uint16_t m_offset;
+	uint16_t m_end_offset;
+	uint8_t m_a1;
+	uint8_t m_a2;
+	uint8_t m_sram[512];  /* 4096 bits */
+	uint8_t m_ram[32];    /* scratchpad ram, 256 bits */
+	uint8_t m_rtc[5];     /* 40-bit RTC counter */
 	DS2404_STATE m_state[8];
 	int m_state_ptr;
 };

@@ -8,6 +8,7 @@
 
 #include "machine/gen_latch.h"
 #include "sound/msm5205.h"
+#include "sound/dac.h"
 
 class kchamp_state : public driver_device
 {
@@ -21,15 +22,16 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
+		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_decrypted_opcodes;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_decrypted_opcodes;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -45,6 +47,7 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	optional_device<msm5205_device> m_msm;
+	optional_device<dac_8bit_r2r_device> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
@@ -67,8 +70,8 @@ public:
 	DECLARE_PALETTE_INIT(kchamp);
 	DECLARE_MACHINE_START(kchampvs);
 	DECLARE_MACHINE_START(kchamp);
-	UINT32 screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kchampvs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kchamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kc_interrupt);
 	INTERRUPT_GEN_MEMBER(sound_int);
 	void kchamp_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

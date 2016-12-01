@@ -47,7 +47,7 @@
  *
  *************************************/
 
-UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -55,18 +55,18 @@ UINT32 avalnche_state::screen_update_avalnche(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 x = offs << 3;
+		uint8_t x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = m_videoram[offs];
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
 			pen_t pen;
 
 			if (m_avalance_video_inverted)
-				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			else
-				pen = (data & 0x80) ? rgb_t::black : rgb_t::white;
+				pen = (data & 0x80) ? rgb_t::black() : rgb_t::white();
 
 			bitmap.pix32(y, x) = pen;
 

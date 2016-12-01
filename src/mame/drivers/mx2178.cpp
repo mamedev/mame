@@ -45,14 +45,14 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_acia_clock);
 	MC6845_UPDATE_ROW(crtc_update_row);
 
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
 
 protected:
 	virtual void machine_reset() override;
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<z80_device> m_maincpu;
 	required_device<acia6850_device> m_acia;
 public:
@@ -85,7 +85,7 @@ READ8_MEMBER( mx2178_state::keyin_r )
 {
 	if (offset)
 	{
-		UINT8 ret = m_term_data;
+		uint8_t ret = m_term_data;
 		m_term_data = 0;
 		return ret;
 	}
@@ -102,9 +102,9 @@ WRITE8_MEMBER( mx2178_state::kbd_put )
 MC6845_UPDATE_ROW( mx2178_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( mx2178, mx2178_state )
 	MCFG_CPU_IO_MAP(mx2178_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not correct
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)

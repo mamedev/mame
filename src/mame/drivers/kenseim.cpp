@@ -224,10 +224,10 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-	UINT8 m_to_68k_cmd_low;
-	UINT8 m_to_68k_cmd_d9;
-	UINT8 m_to_68k_cmd_req;
-	UINT8 m_to_68k_cmd_LVm;
+	uint8_t m_to_68k_cmd_low;
+	uint8_t m_to_68k_cmd_d9;
+	uint8_t m_to_68k_cmd_req;
+	uint8_t m_to_68k_cmd_LVm;
 
 
 	int m_from68k_ack;
@@ -242,7 +242,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
 
-	void set_leds(UINT32 ledstates);
+	void set_leds(uint32_t ledstates);
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
@@ -257,7 +257,7 @@ public:
   Misc System Functions
  ******************************/
 
-void kenseim_state::set_leds(UINT32 ledstates)
+void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
 		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));

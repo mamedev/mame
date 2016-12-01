@@ -105,7 +105,7 @@ ROM_START( fdc344 )
 	ROM_LOAD("fdc344_42.u2", 0x0000, 0x4000, CRC(3e02567c) SHA1(b639d92435ecf2a6d4aefd3576a6955028f6bde7))
 ROM_END
 
-const rom_entry *fdc344_device::device_rom_region() const
+const tiny_rom_entry *fdc344_device::device_rom_region() const
 {
 	return ROM_NAME( fdc344 );
 }
@@ -115,7 +115,7 @@ ROM_START( fdcmag )
 	ROM_LOAD("magitronic_40.u2", 0x0000, 0x2000, CRC(41a5371b) SHA1(9c4443169a0b104395404274470e62b8b65efcf4))
 ROM_END
 
-const rom_entry *fdcmag_device::device_rom_region() const
+const tiny_rom_entry *fdcmag_device::device_rom_region() const
 {
 	return ROM_NAME( fdcmag );
 }
@@ -129,7 +129,7 @@ const rom_entry *fdcmag_device::device_rom_region() const
 //  mufdc_device - constructor
 //-------------------------------------------------
 
-mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, UINT32 clock, const char *name, const char *shortname) :
+mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock, const char *name, const char *shortname) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_fdc(*this, "fdc"),
@@ -137,12 +137,12 @@ mufdc_device::mufdc_device(const machine_config &mconfig, device_type type, cons
 {
 }
 
-fdc344_device::fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fdc344_device::fdc344_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	mufdc_device(mconfig, ISA8_FDC344, tag, owner, clock, "Ably-Tech FDC-344", "fdc344")
 {
 }
 
-fdcmag_device::fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fdcmag_device::fdcmag_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	mufdc_device(mconfig, ISA8_FDCMAG, tag, owner, clock, "Magitronic Multi Floppy Controller Card", "fdcmag")
 {
 }
@@ -187,12 +187,12 @@ WRITE_LINE_MEMBER( mufdc_device::fdc_drq_w )
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT8 mufdc_device::dack_r(int line)
+uint8_t mufdc_device::dack_r(int line)
 {
 	return m_fdc->dma_r();
 }
 
-void mufdc_device::dack_w(int line, UINT8 data)
+void mufdc_device::dack_w(int line, uint8_t data)
 {
 	return m_fdc->dma_w(data);
 }

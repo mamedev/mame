@@ -503,6 +503,8 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 #include "emu.h"
 #include "includes/williams.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MASTER_CLOCK        (XTAL_12MHz)
@@ -1459,10 +1461,10 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1476,7 +1478,7 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
@@ -1556,7 +1558,7 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
@@ -1578,7 +1580,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
@@ -1624,20 +1626,25 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
 
+	MCFG_DEVICE_MODIFY("pia_2")
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("ldac", dac_byte_interface, write))
+
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac_b", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("rdac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("wmsdac")
-	MCFG_DEVICE_REMOVE("mono")
+	MCFG_DEVICE_REMOVE("speaker")
+	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_DAC_ADD("wmsdac_b")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1678,10 +1685,10 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1698,7 +1705,7 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
@@ -1749,8 +1756,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
 
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
@@ -2729,6 +2736,11 @@ ROM_START( mysticm )
 	ROM_LOAD( "mm20_1.b57", 0x00000, 0x2000, CRC(5c0f4f46) SHA1(7dedbbeda2f34a2eac9fb14277874d9d66f468c7) ) /* IC57 */
 	ROM_LOAD( "mm21_1.b58", 0x02000, 0x2000, CRC(cb90b3c5) SHA1(f28cca2c3ff23d6c9e2952a1b08ab2875655ec70) ) /* IC58 */
 	ROM_LOAD( "mm19_1.b41", 0x04000, 0x2000, CRC(e274df86) SHA1(9876a487c5efa350ced31acbc39df22c8d414677) ) /* IC41 */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* not hooked up */
+	ROM_LOAD( "ic14.bpr",   0x00000,  0x020, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7) )
+	ROM_LOAD( "ic47.bpr",   0x00000,  0x100, CRC(efb03024) SHA1(4c3e3de374f7959a03dcfcb8a29a372685f3b273) )
+	ROM_LOAD( "ic60.bpr",   0x00000,  0x200, CRC(0ea3f7fb) SHA1(a8a2a7fbc1a3527a8e2cda71d737afaa717902f1) )
 ROM_END
 
 ROM_START( mysticmp )
@@ -2766,40 +2778,43 @@ ROM_START( mysticmp )
 ROM_END
 
 
-
-
 ROM_START( tshoot )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "rom18.cpu", 0x0d000, 0x1000, CRC(effc33f1) SHA1(cd1b16b4a4a46ce9d550d10b465b8cf1ab3c5273) )  /* IC55 */
-	ROM_LOAD( "rom2.cpu",  0x0e000, 0x1000, CRC(fd982687) SHA1(70be1ea57ea0a1e75b1bd988492a9c0244e8b91f) )  /* IC9  */
-	ROM_LOAD( "rom3.cpu",  0x0f000, 0x1000, CRC(9617054d) SHA1(8795b97a6391aa3804f68dc2d2b33866dc17f34c) )  /* IC10 */
+	ROM_LOAD( "rom18.ic55", 0x0d000, 0x1000, CRC(effc33f1) SHA1(cd1b16b4a4a46ce9d550d10b465b8cf1ab3c5273) )  /* IC55 */
+	ROM_LOAD( "rom2.ic9",   0x0e000, 0x1000, CRC(fd982687) SHA1(70be1ea57ea0a1e75b1bd988492a9c0244e8b91f) )  /* IC9  */
+	ROM_LOAD( "rom3.ic10",  0x0f000, 0x1000, CRC(9617054d) SHA1(8795b97a6391aa3804f68dc2d2b33866dc17f34c) )  /* IC10 */
 
-	ROM_LOAD( "rom11.cpu", 0x10000, 0x2000, CRC(60d5fab8) SHA1(fe75e46dedb7ca153470d6a39cea0a721e5b7b39) )  /* IC18 */
-	ROM_LOAD( "rom9.cpu",  0x12000, 0x2000, CRC(a4dd4a0e) SHA1(bb2f38c5ef2f3398b6ba605ffa0c30c89387bf14) )  /* IC16 */
-	ROM_LOAD( "rom7.cpu",  0x14000, 0x2000, CRC(f25505e6) SHA1(d075ff89b6379ad7a47d9723ed1c21468b9d1dae) )  /* IC14 */
-	ROM_LOAD( "rom5.cpu",  0x16000, 0x2000, CRC(94a7c0ed) SHA1(11f46e1ca7d79b4244ea0f60e0fba44186f1ebde) )  /* IC12 */
+	ROM_LOAD( "rom11.ic18", 0x10000, 0x2000, CRC(60d5fab8) SHA1(fe75e46dedb7ca153470d6a39cea0a721e5b7b39) )  /* IC18 */
+	ROM_LOAD( "rom9.ic16",  0x12000, 0x2000, CRC(a4dd4a0e) SHA1(bb2f38c5ef2f3398b6ba605ffa0c30c89387bf14) )  /* IC16 */
+	ROM_LOAD( "rom7.ic14",  0x14000, 0x2000, CRC(f25505e6) SHA1(d075ff89b6379ad7a47d9723ed1c21468b9d1dae) )  /* IC14 */
+	ROM_LOAD( "rom5.ic12",  0x16000, 0x2000, CRC(94a7c0ed) SHA1(11f46e1ca7d79b4244ea0f60e0fba44186f1ebde) )  /* IC12 */
 
-	ROM_LOAD( "rom17.cpu", 0x20000, 0x2000, CRC(b02d1ccd) SHA1(b08b6d9affb6f3e50a11fd9397fe4255927de3b6) )  /* IC26 */
-	ROM_LOAD( "rom15.cpu", 0x22000, 0x2000, CRC(11709935) SHA1(ae25bbadbbcab9f3cba2bb4bb92d5217705b38e3) )  /* IC24 */
+	ROM_LOAD( "rom17.ic26", 0x20000, 0x2000, CRC(b02d1ccd) SHA1(b08b6d9affb6f3e50a11fd9397fe4255927de3b6) )  /* IC26 */
+	ROM_LOAD( "rom15.ic24", 0x22000, 0x2000, CRC(11709935) SHA1(ae25bbadbbcab9f3cba2bb4bb92d5217705b38e3) )  /* IC24 */
 
-	ROM_LOAD( "rom10.cpu", 0x30000, 0x2000, CRC(0f32bad8) SHA1(7a2f559697d252ceec3a2f55fe51bc755e4bb65a) )  /* IC17 */
-	ROM_LOAD( "rom8.cpu",  0x32000, 0x2000, CRC(e9b6cbf7) SHA1(6cd6b1e1c5e8e253e779afff8ad1ff90d6116fc9) )  /* IC15 */
-	ROM_LOAD( "rom6.cpu",  0x34000, 0x2000, CRC(a49f617f) SHA1(759d25e33a09204664880329b86724805a1fe0e8) )  /* IC13 */
-	ROM_LOAD( "rom4.cpu",  0x36000, 0x2000, CRC(b026dc00) SHA1(8a068997aa19e152d64db47528893046d338389c) )  /* IC11 */
+	ROM_LOAD( "rom10.ic17", 0x30000, 0x2000, CRC(0f32bad8) SHA1(7a2f559697d252ceec3a2f55fe51bc755e4bb65a) )  /* IC17 */
+	ROM_LOAD( "rom8.ic15",  0x32000, 0x2000, CRC(e9b6cbf7) SHA1(6cd6b1e1c5e8e253e779afff8ad1ff90d6116fc9) )  /* IC15 */
+	ROM_LOAD( "rom6.ic13",  0x34000, 0x2000, CRC(a49f617f) SHA1(759d25e33a09204664880329b86724805a1fe0e8) )  /* IC13 */
+	ROM_LOAD( "rom4.ic11",  0x36000, 0x2000, CRC(b026dc00) SHA1(8a068997aa19e152d64db47528893046d338389c) )  /* IC11 */
 
-	ROM_LOAD( "rom16.cpu", 0x40000, 0x2000, CRC(69ce38f8) SHA1(a2cd678e71bfa5e6a3594d8699660c7fa8b52001) )  /* IC25 */
-	ROM_LOAD( "rom14.cpu", 0x42000, 0x2000, CRC(769a4ae5) SHA1(1cdfae2d889848d69f68f990714d027cfbca1853) )  /* IC23 */
-	ROM_LOAD( "rom13.cpu", 0x44000, 0x2000, CRC(ec016c9b) SHA1(f2e40abd14b8b4944b792dd453ebe92eb64355ae) )  /* IC21 */
-	ROM_LOAD( "rom12.cpu", 0x46000, 0x2000, CRC(98ae7afa) SHA1(6a904408419f576352bd2f895727fd17c0541ff8) )  /* IC19 */
+	ROM_LOAD( "rom16.ic25", 0x40000, 0x2000, CRC(69ce38f8) SHA1(a2cd678e71bfa5e6a3594d8699660c7fa8b52001) )  /* IC25 */
+	ROM_LOAD( "rom14.ic23", 0x42000, 0x2000, CRC(769a4ae5) SHA1(1cdfae2d889848d69f68f990714d027cfbca1853) )  /* IC23 */
+	ROM_LOAD( "rom13.ic21", 0x44000, 0x2000, CRC(ec016c9b) SHA1(f2e40abd14b8b4944b792dd453ebe92eb64355ae) )  /* IC21 */
+	ROM_LOAD( "rom12.ic19", 0x46000, 0x2000, CRC(98ae7afa) SHA1(6a904408419f576352bd2f895727fd17c0541ff8) )  /* IC19 */
 
 	/* sound CPU */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rom1.cpu", 0xe000, 0x2000, CRC(011a94a7) SHA1(9f54a742a87ba56b9517e33e556f57dce6eb2eab) )    /* IC8  */
+	ROM_LOAD( "rom1.ic8",   0xe000, 0x2000, CRC(011a94a7) SHA1(9f54a742a87ba56b9517e33e556f57dce6eb2eab) )    /* IC8  */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "rom20.cpu", 0x00000, 0x2000, CRC(c6e1d253) SHA1(c408a29f75ba2958e229996f903400b3d95e3bd3) )  /* IC57 */
-	ROM_LOAD( "rom21.cpu", 0x02000, 0x2000, CRC(9874e90f) SHA1(85282823cc862341adf9642d2d5d05972da6dff0) )  /* IC58 */
-	ROM_LOAD( "rom19.cpu", 0x04000, 0x2000, CRC(b9ce4d2a) SHA1(af5332f340d3c3ae02e77923d6e8f0dd92547728) )  /* IC41 */
+	ROM_LOAD( "rom20.ic57", 0x00000, 0x2000, CRC(c6e1d253) SHA1(c408a29f75ba2958e229996f903400b3d95e3bd3) )  /* IC57 */
+	ROM_LOAD( "rom21.ic58", 0x02000, 0x2000, CRC(9874e90f) SHA1(85282823cc862341adf9642d2d5d05972da6dff0) )  /* IC58 */
+	ROM_LOAD( "rom19.ic41", 0x04000, 0x2000, CRC(b9ce4d2a) SHA1(af5332f340d3c3ae02e77923d6e8f0dd92547728) )  /* IC41 */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* not hooked up */
+	ROM_LOAD( "82s123.ic14a", 0x00000, 0x020, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7) )
+	ROM_LOAD( "82s129.ic47",  0x00000, 0x100, CRC(efb03024) SHA1(4c3e3de374f7959a03dcfcb8a29a372685f3b273) )
+	ROM_LOAD( "7649.ic60",    0x00000, 0x200, CRC(0ea3f7fb) SHA1(a8a2a7fbc1a3527a8e2cda71d737afaa717902f1) )
 ROM_END
 
 
@@ -2981,7 +2996,7 @@ DRIVER_INIT_MEMBER(williams_state,defender)
 
 DRIVER_INIT_MEMBER(williams_state,defndjeu)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
@@ -3208,7 +3223,7 @@ GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lott
 GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
 GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
 
-GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, inferno,    0,        williams2,      inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
 

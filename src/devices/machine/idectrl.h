@@ -30,8 +30,8 @@
 class ide_controller_device : public ata_interface_device
 {
 public:
-	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ16_MEMBER(read_cs0) override;
 	virtual DECLARE_READ16_MEMBER(read_cs1) override;
@@ -53,8 +53,8 @@ extern const device_type IDE_CONTROLLER;
 class ide_controller_32_device : public ide_controller_device
 {
 public:
-	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual DECLARE_READ32_MEMBER(read_cs0);
 	virtual DECLARE_READ32_MEMBER(read_cs1);
@@ -85,8 +85,8 @@ extern const device_type IDE_CONTROLLER_32;
 class bus_master_ide_controller_device : public ide_controller_32_device
 {
 public:
-	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	static void set_bus_master_space(device_t &device, const char *bmcpu, UINT32 bmspace) {bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
+	bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	static void set_bus_master_space(device_t &device, const char *bmcpu, uint32_t bmspace) {bus_master_ide_controller_device &ide = downcast<bus_master_ide_controller_device &>(device); ide.m_bmcpu = bmcpu; ide.m_bmspace = bmspace; }
 
 	DECLARE_READ32_MEMBER( bmdma_r );
 	DECLARE_WRITE32_MEMBER( bmdma_w );
@@ -101,17 +101,17 @@ private:
 	void execute_dma();
 
 	const char *m_bmcpu;
-	UINT32 m_bmspace;
+	uint32_t m_bmspace;
 	address_space * m_dma_space;
-	UINT8 m_dma_address_xor;
+	uint8_t m_dma_address_xor;
 
 	offs_t m_dma_address;
-	UINT32 m_dma_bytes_left;
+	uint32_t m_dma_bytes_left;
 	offs_t m_dma_descriptor;
-	UINT8 m_dma_last_buffer;
-	UINT8 m_bus_master_command;
-	UINT8 m_bus_master_status;
-	UINT32 m_bus_master_descriptor;
+	uint8_t m_dma_last_buffer;
+	uint8_t m_bus_master_command;
+	uint8_t m_bus_master_status;
+	uint32_t m_bus_master_descriptor;
 	int m_irq;
 	int m_dmarq;
 };

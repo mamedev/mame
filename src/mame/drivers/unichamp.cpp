@@ -58,7 +58,7 @@ public:
 	required_device<gic_device> m_gic;
 	required_device<generic_slot_device> m_cart;
 
-	UINT8 m_ram[256];
+	uint8_t m_ram[256];
 	DECLARE_DRIVER_INIT(unichamp);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -72,7 +72,7 @@ public:
 	DECLARE_READ16_MEMBER(unichamp_trapl_r);
 	DECLARE_WRITE16_MEMBER(unichamp_trapl_w);
 
-	UINT32 screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_ioport m_ctrls;
@@ -138,7 +138,7 @@ READ8_MEMBER(unichamp_state::bext_r)
 	//The CPU outputs a MASK of whatever it needs and checks the result.
 	//EG: Any player can choose if one or two players are going to play the game for instance
 
-	UINT8 port = ioport("CTRLS")->read() & 0x0F; ////only lower nibble
+	uint8_t port = ioport("CTRLS")->read() & 0x0F; ////only lower nibble
 
 	//We need to return logical high or low on the EBCI pin
 	return (port & offset)>0?1:0;
@@ -157,10 +157,10 @@ void unichamp_state::machine_start()
 	if (m_cart->exists()){
 		//flip endians in more "this surely exists in MAME" way?
 		//NOTE The unichamp roms have the same endianness as intv on disk and in memory
-		UINT8*ptr   = m_cart->get_rom_base();
+		uint8_t*ptr   = m_cart->get_rom_base();
 		size_t size = m_cart->get_rom_size();
 		for(size_t i=0;i<size;i+=2){
-			UINT8 TEMP = ptr[i];
+			uint8_t TEMP = ptr[i];
 			ptr[i] = ptr[i+1];
 			ptr[i+1] = TEMP;
 		}
@@ -194,7 +194,7 @@ void unichamp_state::machine_reset()
 }
 
 
-UINT32 unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t unichamp_state::screen_update_unichamp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return m_gic->screen_update(screen, bitmap, cliprect);
 }

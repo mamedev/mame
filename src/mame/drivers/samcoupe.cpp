@@ -64,7 +64,7 @@ void samcoupe_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		sam_video_update_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in samcoupe_state::device_timer");
+		assert_always(false, "Unknown id in samcoupe_state::device_timer");
 	}
 }
 
@@ -117,7 +117,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_disk_w)
 READ8_MEMBER(samcoupe_state::samcoupe_pen_r)
 {
 	screen_device *scr = machine().first_screen();
-	UINT8 data;
+	uint8_t data;
 
 	if (offset & 0x100)
 	{
@@ -145,7 +145,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_clut_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_status_r)
 {
-	UINT8 data = 0xe0;
+	uint8_t data = 0xe0;
 
 	/* bit 5-7, keyboard input */
 	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0xe0;
@@ -220,7 +220,7 @@ WRITE8_MEMBER(samcoupe_state::samcoupe_midi_w)
 
 READ8_MEMBER(samcoupe_state::samcoupe_keyboard_r)
 {
-	UINT8 data = 0x1f;
+	uint8_t data = 0x1f;
 
 	/* bit 0-4, keyboard input */
 	if (!BIT(offset,  8)) data &= m_keyboard_row_fe->read() & 0x1f;
@@ -345,7 +345,7 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::irq_off)
 
 }
 
-void samcoupe_state::samcoupe_irq(UINT8 src)
+void samcoupe_state::samcoupe_irq(uint8_t src)
 {
 	/* assert irq and a timer to set it off again */
 	m_maincpu->set_input_line(0, ASSERT_LINE);
@@ -488,9 +488,9 @@ PALETTE_INIT_MEMBER(samcoupe_state, samcoupe)
 {
 	for (int i = 0; i < 128; i++)
 	{
-		UINT8 b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
-		UINT8 r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
-		UINT8 g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
+		uint8_t b = BIT(i, 0) * 2 + BIT(i, 4) * 4 + BIT(i, 3);
+		uint8_t r = BIT(i, 1) * 2 + BIT(i, 5) * 4 + BIT(i, 3);
+		uint8_t g = BIT(i, 2) * 2 + BIT(i, 6) * 4 + BIT(i, 3);
 
 		r <<= 5;
 		g <<= 5;

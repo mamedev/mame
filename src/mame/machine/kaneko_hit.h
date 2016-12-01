@@ -7,12 +7,12 @@
 
 struct calc1_hit_t
 {
-	UINT16 x1p, y1p, x1s, y1s;
-	UINT16 x2p, y2p, x2s, y2s;
+	uint16_t x1p, y1p, x1s, y1s;
+	uint16_t x2p, y2p, x2s, y2s;
 
-	INT16 x12, y12, x21, y21;
+	int16_t x12, y12, x21, y21;
 
-	UINT16 mult_a, mult_b;
+	uint16_t mult_a, mult_b;
 };
 
 struct calc3_hit_t
@@ -29,10 +29,10 @@ struct calc3_hit_t
 
 	int x1tox2, y1toy2, z1toz2;
 
-	UINT16 mult_a, mult_b;
+	uint16_t mult_a, mult_b;
 
-	UINT16 flags;
-	UINT16 mode;
+	uint16_t flags;
+	uint16_t mode;
 };
 
 
@@ -40,7 +40,7 @@ struct calc3_hit_t
 class kaneko_hit_device : public device_t
 {
 public:
-	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	kaneko_hit_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_type(device_t &device, int hittype);
 
@@ -64,8 +64,8 @@ private:
 
 	DECLARE_READ16_MEMBER(kaneko_hit_type1_r);
 	DECLARE_WRITE16_MEMBER(kaneko_hit_type1_w);
-	INT16 calc_compute_x(calc1_hit_t &hit);
-	INT16 calc_compute_y(calc1_hit_t &hit);
+	int16_t calc_compute_x(calc1_hit_t &hit);
+	int16_t calc_compute_y(calc1_hit_t &hit);
 
 	DECLARE_WRITE16_MEMBER(kaneko_hit_type2_w);
 	DECLARE_READ16_MEMBER(kaneko_hit_type2_r);

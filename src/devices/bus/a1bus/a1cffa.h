@@ -25,12 +25,12 @@ class a1bus_cffa_device:
 {
 public:
 	// construction/destruction
-	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	required_device<ata_interface_device> m_ata;
 
@@ -42,8 +42,8 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 *m_rom;
-	UINT16 m_lastdata;
+	uint8_t *m_rom;
+	uint16_t m_lastdata;
 	bool m_writeprotect;
 };
 

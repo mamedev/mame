@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_BARCODE_H
 #define MAME_FRONTEND_UI_BARCODE_H
+
+#pragma once
 
 #include "machine/bcreader.h"
 #include "ui/devctrl.h"
@@ -23,10 +23,10 @@ public:
 	virtual ~menu_barcode_reader() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
-	char  m_barcode_buffer[20];
+	std::string m_barcode_buffer;
 };
 
 } // namespace ui

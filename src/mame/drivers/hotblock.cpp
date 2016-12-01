@@ -56,14 +56,14 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 
 	/* misc */
 	int      m_port0;
 	int      m_port4;
 
 	/* memory */
-	UINT8    m_pal[0x10000];
+	uint8_t    m_pal[0x10000];
 
 	DECLARE_READ8_MEMBER(video_read);
 	DECLARE_READ8_MEMBER(port4_r);
@@ -73,7 +73,7 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -151,7 +151,7 @@ void hotblock_state::video_start()
 	save_item(NAME(m_port4)); //stored but not read for now
 }
 
-UINT32 hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hotblock_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y, x, count;
 	int i;

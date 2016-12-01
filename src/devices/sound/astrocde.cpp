@@ -57,7 +57,7 @@ const device_type ASTROCADE = &device_creator<astrocade_device>;
 //  astrocade_device - constructor
 //-------------------------------------------------
 
-astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+astrocade_device::astrocade_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASTROCADE, "Astrocade", tag, owner, clock, "astrocade", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -72,8 +72,8 @@ astrocade_device::astrocade_device(const machine_config &mconfig, const char *ta
 		m_c_count(0),
 		m_c_state(0)
 {
-	memset(m_reg, 0, sizeof(UINT8)*8);
-	memset(m_bitswap, 0, sizeof(UINT8)*256);
+	memset(m_reg, 0, sizeof(uint8_t)*8);
+	memset(m_bitswap, 0, sizeof(uint8_t)*256);
 }
 
 
@@ -105,9 +105,9 @@ void astrocade_device::device_start()
 void astrocade_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
 	stream_sample_t *dest = outputs[0];
-	UINT16 noise_state;
-	UINT8 master_count;
-	UINT8 noise_clock;
+	uint16_t noise_state;
+	uint8_t master_count;
+	uint8_t noise_clock;
 
 	/* load some locals */
 	master_count = m_master_count;

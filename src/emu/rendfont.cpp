@@ -18,7 +18,11 @@
 
 #include "ui/cmdrender.h"
 
-const UINT64 render_font::CACHED_BDF_HASH_SIZE;
+#include <cstddef>
+#include <cstring>
+
+
+const u64 render_font::CACHED_BDF_HASH_SIZE;
 
 //**************************************************************************
 //  INLINE FUNCTIONS
@@ -50,11 +54,13 @@ inline const char *next_line(const char *ptr)
 //  in a font, expanding if necessary
 //-------------------------------------------------
 
-inline render_font::glyph &render_font::get_char(unicode_char chnum)
+inline render_font::glyph &render_font::get_char(char32_t chnum)
 {
 	static glyph dummy_glyph;
 
 	// grab the table; if none, return the dummy character
+	if ((chnum / 256) >= ARRAY_LENGTH(m_glyphs))
+		return dummy_glyph;
 	if (!m_glyphs[chnum / 256] && m_format == FF_OSD)
 		m_glyphs[chnum / 256] = new glyph[256];
 	if (!m_glyphs[chnum / 256])
@@ -208,7 +214,7 @@ render_font::~render_font()
 //  character into a bitmap
 //-------------------------------------------------
 
-void render_font::char_expand(unicode_char chnum, glyph &gl)
+void render_font::char_expand(char32_t chnum, glyph &gl)
 {
 	rgb_t color = rgb_t(0xff,0xff,0xff,0xff);
 	bool is_cmd = (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT);
@@ -228,11 +234,11 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 
 		// extract the data
 		const char *ptr = gl.rawdata;
-		UINT8 accum = 0, accumbit = 7;
+		u8 accum = 0, accumbit = 7;
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height_cmd + m_yoffs_cmd - gl.yoffs - gl.bmheight;
-			UINT32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix32(desty, 0) : nullptr;
+			u32 *dest = (desty >= 0 && desty < m_height_cmd) ? &gl.bitmap.pix32(desty, 0) : nullptr;
 			{
 				for (int x = 0; x < gl.bmwidth; x++)
 				{
@@ -277,11 +283,11 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 
 		// extract the data
 		const char *ptr = gl.rawdata;
-		UINT8 accum = 0, accumbit = 7;
+		u8 accum = 0, accumbit = 7;
 		for (int y = 0; y < gl.bmheight; y++)
 		{
 			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-			UINT32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
+			u32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
 
 			// text format
 			if (m_format == FF_TEXT)
@@ -344,7 +350,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 //  bounds of the final bitmap
 //-------------------------------------------------
 
-render_texture *render_font::get_char_texture_and_bounds(float height, float aspect, unicode_char chnum, render_bounds &bounds)
+render_texture *render_font::get_char_texture_and_bounds(float height, float aspect, char32_t chnum, render_bounds &bounds)
 {
 	glyph &gl = get_char(chnum);
 
@@ -367,7 +373,7 @@ render_texture *render_font::get_char_texture_and_bounds(float height, float asp
 //  scaled bitmap and bounding rect for a char
 //-------------------------------------------------
 
-void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, unicode_char chnum, rectangle &bounds)
+void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height, float aspect, char32_t chnum, rectangle &bounds)
 {
 	glyph &gl = get_char(chnum);
 
@@ -403,7 +409,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_argb32 &dest, float height
 //  at the given height
 //-------------------------------------------------
 
-float render_font::char_width(float height, float aspect, unicode_char ch)
+float render_font::char_width(float height, float aspect, char32_t ch)
 {
 	return float(get_char(ch).width) * m_scale * height * aspect;
 }
@@ -421,7 +427,7 @@ float render_font::string_width(float height, float aspect, const char *string)
 
 	const char *ends = string + strlen(string);
 	const char *s = string;
-	unicode_char schar;
+	char32_t schar;
 
 	// loop over characters
 	while (*s != 0)
@@ -444,19 +450,19 @@ float render_font::string_width(float height, float aspect, const char *string)
 
 float render_font::utf8string_width(float height, float aspect, const char *utf8string)
 {
-	int length = strlen(utf8string);
+	std::size_t const length = std::strlen(utf8string);
 
 	// loop over the string and accumulate widths
 	int count;
-	int totwidth = 0;
-	for (int offset = 0; offset < length; offset += count)
+	s32 totwidth = 0;
+	for (std::size_t offset = 0U; offset < length; offset += unsigned(count))
 	{
-		unicode_char uchar;
+		char32_t uchar;
 		count = uchar_from_utf8(&uchar, utf8string + offset, length - offset);
-		if (count == -1)
+		if (count < 0)
 			break;
-		if (uchar < 0x10000)
-			totwidth += get_char(uchar).width;
+
+		totwidth += get_char(uchar).width;
 	}
 
 	// scale the final result based on height
@@ -484,12 +490,12 @@ bool render_font::load_cached_bdf(const char *filename)
 	m_rawdata.resize(m_rawsize + 1);
 
 	// read the first chunk
-	UINT32 bytes = file.read(&m_rawdata[0], std::min(CACHED_BDF_HASH_SIZE, m_rawsize));
+	u32 bytes = file.read(&m_rawdata[0], std::min(CACHED_BDF_HASH_SIZE, m_rawsize));
 	if (bytes != std::min(CACHED_BDF_HASH_SIZE, m_rawsize))
 		return false;
 
 	// has the chunk
-	UINT32 hash = core_crc32(0, (const UINT8 *)&m_rawdata[0], bytes) ^ (UINT32)m_rawsize;
+	u32 hash = core_crc32(0, (const u8 *)&m_rawdata[0], bytes) ^ u32(m_rawsize);
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename);
@@ -517,7 +523,7 @@ bool render_font::load_cached_bdf(const char *filename)
 	// read in the rest of the font
 	if (bytes < m_rawsize)
 	{
-		UINT32 read = file.read(&m_rawdata[bytes], m_rawsize - bytes);
+		u32 read = file.read(&m_rawdata[bytes], m_rawsize - bytes);
 		if (read != m_rawsize - bytes)
 		{
 			m_rawdata.clear();
@@ -617,7 +623,7 @@ bool render_font::load_bdf()
 			}
 
 			// if we have everything, allocate a new character
-			if (charnum >= 0 && charnum < 65536 && rawdata != nullptr && bmwidth >= 0 && bmheight >= 0)
+			if (charnum >= 0 && charnum < (256 * ARRAY_LENGTH(m_glyphs)) && rawdata != nullptr && bmwidth >= 0 && bmheight >= 0)
 			{
 				// if we don't have a subtable yet, make one
 				if (!m_glyphs[charnum / 256])
@@ -658,26 +664,26 @@ bool render_font::load_bdf()
 //  load_cached - load a font in cached format
 //-------------------------------------------------
 
-bool render_font::load_cached(emu_file &file, UINT32 hash)
+bool render_font::load_cached(emu_file &file, u32 hash)
 {
 	// get the file size
-	UINT64 filesize = file.size();
+	u64 filesize = file.size();
 
 	// first read the header
-	UINT8 header[CACHED_HEADER_SIZE];
-	UINT32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
+	u8 header[CACHED_HEADER_SIZE];
+	u32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
 	if (bytes_read != CACHED_HEADER_SIZE)
 		return false;
 
 	// validate the header
 	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
 		return false;
-	if (hash && (header[4] != (UINT8)(hash >> 24) || header[5] != (UINT8)(hash >> 16) || header[6] != (UINT8)(hash >> 8) || header[7] != (UINT8)hash))
+	if (hash && (header[4] != u8(hash >> 24) || header[5] != u8(hash >> 16) || header[6] != u8(hash >> 8) || header[7] != u8(hash)))
 		return false;
 	m_height = (header[8] << 8) | header[9];
 	m_scale = 1.0f / (float)m_height;
-	m_yoffs = (INT16)((header[10] << 8) | header[11]);
-	UINT32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
+	m_yoffs = s16((header[10] << 8) | header[11]);
+	u32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
 	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
 		return false;
 
@@ -691,10 +697,10 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 	}
 
 	// extract the data from the data
-	UINT64 offset = numchars * CACHED_CHAR_SIZE;
+	u64 offset = numchars * CACHED_CHAR_SIZE;
 	for (int chindex = 0; chindex < numchars; chindex++)
 	{
-		const UINT8 *info = reinterpret_cast<UINT8 *>(&m_rawdata[chindex * CACHED_CHAR_SIZE]);
+		const u8 *info = reinterpret_cast<u8 *>(&m_rawdata[chindex * CACHED_CHAR_SIZE]);
 		int chnum = (info[0] << 8) | info[1];
 
 		// if we don't have a subtable yet, make one
@@ -704,8 +710,8 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 		// fill in the entry
 		glyph &gl = m_glyphs[chnum / 256][chnum % 256];
 		gl.width = (info[2] << 8) | info[3];
-		gl.xoffs = (INT16)((info[4] << 8) | info[5]);
-		gl.yoffs = (INT16)((info[6] << 8) | info[7]);
+		gl.xoffs = s16((info[4] << 8) | info[5]);
+		gl.yoffs = s16((info[6] << 8) | info[7]);
 		gl.bmwidth = (info[8] << 8) | info[9];
 		gl.bmheight = (info[10] << 8) | info[11];
 		gl.rawdata = &m_rawdata[offset];
@@ -729,7 +735,7 @@ bool render_font::load_cached(emu_file &file, UINT32 hash)
 //  save_cached - save a font in cached format
 //-------------------------------------------------
 
-bool render_font::save_cached(const char *filename, UINT32 hash)
+bool render_font::save_cached(const char *filename, u32 hash)
 {
 	osd_printf_warning("Generating cached BDF font...\n");
 
@@ -741,7 +747,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 
 	// determine the number of characters
 	int numchars = 0;
-	for (int chnum = 0; chnum < 65536; chnum++)
+	for (int chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
 	{
 		if (m_glyphs[chnum / 256])
 		{
@@ -754,13 +760,13 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 	try
 	{
 		// allocate an array to hold the character data
-		dynamic_buffer chartable(numchars * CACHED_CHAR_SIZE, 0);
+		std::vector<u8> chartable(numchars * CACHED_CHAR_SIZE, 0);
 
 		// allocate a temp buffer to compress into
-		dynamic_buffer tempbuffer(65536);
+		std::vector<u8> tempbuffer(65536);
 
 		// write the header
-		UINT8 *dest = &tempbuffer[0];
+		u8 *dest = &tempbuffer[0];
 		*dest++ = 'f';
 		*dest++ = 'o';
 		*dest++ = 'n';
@@ -778,7 +784,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 		*dest++ = numchars >> 8;
 		*dest++ = numchars & 0xff;
 		assert(dest == &tempbuffer[CACHED_HEADER_SIZE]);
-		UINT32 bytes_written = file.write(&tempbuffer[0], CACHED_HEADER_SIZE);
+		u32 bytes_written = file.write(&tempbuffer[0], CACHED_HEADER_SIZE);
 		if (bytes_written != dest - &tempbuffer[0])
 			throw emu_fatalerror("Error writing cached file");
 
@@ -789,7 +795,7 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 
 		// loop over all characters
 		int tableindex = 0;
-		for (int chnum = 0; chnum < 65536; chnum++)
+		for (int chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
 		{
 			glyph &gl = get_char(chnum);
 			if (gl.width > 0)
@@ -799,14 +805,14 @@ bool render_font::save_cached(const char *filename, UINT32 hash)
 				{
 					// write the data to the tempbuffer
 					dest = &tempbuffer[0];
-					UINT8 accum = 0;
-					UINT8 accbit = 7;
+					u8 accum = 0;
+					u8 accbit = 7;
 
 					// bit-encode the character data
 					for (int y = 0; y < gl.bmheight; y++)
 					{
 						int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-						const UINT32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
+						const u32 *src = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
 						for (int x = 0; x < gl.bmwidth; x++)
 						{
 							if (src != nullptr && rgb_t(src[x]).a() != 0)

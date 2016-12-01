@@ -47,7 +47,7 @@ device_videobrain_expansion_card_interface::device_videobrain_expansion_card_int
 //  videobrain_roml_pointer - get low ROM pointer
 //-------------------------------------------------
 
-UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
+uint8_t* device_videobrain_expansion_card_interface::videobrain_rom_pointer(running_machine &machine, size_t size)
 {
 	if (m_rom.empty())
 	{
@@ -64,7 +64,7 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_rom_pointer(runnin
 //  videobrain_ram_pointer - get RAM pointer
 //-------------------------------------------------
 
-UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(running_machine &machine, size_t size)
+uint8_t* device_videobrain_expansion_card_interface::videobrain_ram_pointer(running_machine &machine, size_t size)
 {
 	if (m_ram.empty())
 	{
@@ -86,7 +86,7 @@ UINT8* device_videobrain_expansion_card_interface::videobrain_ram_pointer(runnin
 //  videobrain_expansion_slot_device - constructor
 //-------------------------------------------------
 
-videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+videobrain_expansion_slot_device::videobrain_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIDEOBRAIN_EXPANSION_SLOT, "VideoBrain expansion port", tag, owner, clock, "videobrain_expansion_slot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	device_image_interface(mconfig, *this),
@@ -152,9 +152,9 @@ std::string videobrain_expansion_slot_device::get_default_card_software()
 //  bo_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset, int cs1, int cs2)
+uint8_t videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset, int cs1, int cs2)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_cart != nullptr)
 	{
@@ -169,7 +169,7 @@ UINT8 videobrain_expansion_slot_device::bo_r(address_space &space, offs_t offset
 //  bo_w - cartridge data write
 //-------------------------------------------------
 
-void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, UINT8 data, int cs1, int cs2)
+void videobrain_expansion_slot_device::bo_w(address_space &space, offs_t offset, uint8_t data, int cs1, int cs2)
 {
 	if (m_cart != nullptr)
 	{

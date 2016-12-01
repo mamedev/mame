@@ -31,6 +31,7 @@
 #include <bx/bx.h>
 #include <bx/allocator.h>
 #include <bx/crtimpl.h>
+#include <bx/uint32_t.h>
 
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
 
@@ -269,7 +270,7 @@ namespace
 		const bgfx::Memory* mem = bgfx::alloc(4*4*4);
 		uint32_t* bgra8 = (uint32_t*)mem->data;
 		memset(bgra8, 0, 4*4*4);
-		gl->texMissing = bgfx::createTexture2D(4, 4, 0, bgfx::TextureFormat::BGRA8, 0, mem);
+		gl->texMissing = bgfx::createTexture2D(4, 4, false, 1, bgfx::TextureFormat::BGRA8, 0, mem);
 
 		gl->u_scissorMat      = bgfx::createUniform("u_scissorMat",      bgfx::UniformType::Mat3);
 		gl->u_paintMat        = bgfx::createUniform("u_paintMat",        bgfx::UniformType::Mat3);
@@ -326,8 +327,10 @@ namespace
 			mem = bgfx::copy(_rgba, tex->height * pitch);
 		}
 
-		tex->id = bgfx::createTexture2D(tex->width
+		tex->id = bgfx::createTexture2D(
+						  tex->width
 						, tex->height
+						, false
 						, 1
 						, NVG_TEXTURE_RGBA == _type ? bgfx::TextureFormat::RGBA8 : bgfx::TextureFormat::R8
 						, BGFX_TEXTURE_NONE
@@ -335,14 +338,16 @@ namespace
 
 		if (NULL != mem)
 		{
-			bgfx::updateTexture2D(tex->id
-					, 0
-					, 0
-					, 0
-					, tex->width
-					, tex->height
-					, mem
-					);
+			bgfx::updateTexture2D(
+				  tex->id
+				, 0
+				, 0
+				, 0
+				, 0
+				, tex->width
+				, tex->height
+				, mem
+				);
 		}
 
 		return bgfx::isValid(tex->id) ? tex->id.idx : 0;
@@ -366,15 +371,17 @@ namespace
 		uint32_t bytesPerPixel = NVG_TEXTURE_RGBA == tex->type ? 4 : 1;
 		uint32_t pitch = tex->width * bytesPerPixel;
 
-		bgfx::updateTexture2D(tex->id
-				, 0
-				, x
-				, y
-				, w
-				, h
-				, bgfx::copy(data + y*pitch + x*bytesPerPixel, h*pitch)
-				, pitch
-				);
+		bgfx::updateTexture2D(
+			  tex->id
+			, 0
+			, 0
+			, x
+			, y
+			, w
+			, h
+			, bgfx::copy(data + y*pitch + x*bytesPerPixel, h*pitch)
+			, pitch
+			);
 
 		return 1;
 	}
@@ -395,29 +402,6 @@ namespace
 		return 1;
 	}
 
-	static void glnvg__xformIdentity(float* t)
-	{
-		t[0] = 1.0f; t[1] = 0.0f;
-		t[2] = 0.0f; t[3] = 1.0f;
-		t[4] = 0.0f; t[5] = 0.0f;
-	}
-
-	static void glnvg__xformInverse(float* inv, float* t)
-	{
-		double invdet, det = (double)t[0] * t[3] - (double)t[2] * t[1];
-		if (det > -1e-6 && det < 1e-6) {
-			glnvg__xformIdentity(t);
-			return;
-		}
-		invdet = 1.0 / det;
-		inv[0] = (float)(t[3] * invdet);
-		inv[2] = (float)(-t[2] * invdet);
-		inv[4] = (float)( ((double)t[2] * t[5] - (double)t[3] * t[4]) * invdet);
-		inv[1] = (float)(-t[1] * invdet);
-		inv[3] = (float)(t[0] * invdet);
-		inv[5] = (float)( ((double)t[1] * t[4] - (double)t[0] * t[5]) * invdet);
-	}
-
 	static void glnvg__xformToMat3x4(float* m3, float* t)
 	{
 		m3[0] = t[0];
@@ -434,6 +418,14 @@ namespace
 		m3[11] = 0.0f;
 	}
 
+	static NVGcolor glnvg__premulColor(NVGcolor c)
+	{
+		c.r *= c.a;
+		c.g *= c.a;
+		c.b *= c.a;
+		return c;
+	}
+
 	static int glnvg__convertPaint(struct GLNVGcontext* gl, struct GLNVGfragUniforms* frag, struct NVGpaint* paint,
 								   struct NVGscissor* scissor, float width, float fringe)
 	{
@@ -442,13 +434,10 @@ namespace
 
 		memset(frag, 0, sizeof(*frag) );
 
-		frag->innerCol = paint->innerColor;
-		frag->outerCol = paint->outerColor;
+		frag->innerCol = glnvg__premulColor(paint->innerColor);
+		frag->outerCol = glnvg__premulColor(paint->outerColor);
 
-		glnvg__xformInverse(invxform, paint->xform);
-		glnvg__xformToMat3x4(frag->paintMat, invxform);
-
-		if (scissor->extent[0] < 0.5f || scissor->extent[1] < 0.5f)
+		if (scissor->extent[0] < -0.5f || scissor->extent[1] < -0.5f)
 		{
 			memset(frag->scissorMat, 0, sizeof(frag->scissorMat) );
 			frag->scissorExt[0] = 1.0f;
@@ -458,7 +447,7 @@ namespace
 		}
 		else
 		{
-			glnvg__xformInverse(invxform, scissor->xform);
+			nvgTransformInverse(invxform, scissor->xform);
 			glnvg__xformToMat3x4(frag->scissorMat, invxform);
 			frag->scissorExt[0] = scissor->extent[0];
 			frag->scissorExt[1] = scissor->extent[1];
@@ -476,8 +465,12 @@ namespace
 			{
 				return 0;
 			}
+			nvgTransformInverse(invxform, paint->xform);
 			frag->type = NSVG_SHADER_FILLIMG;
-			frag->texType = tex->type == NVG_TEXTURE_RGBA ? 0.0f : 1.0f;
+			if (tex->type == NVG_TEXTURE_RGBA)
+				frag->texType = (tex->flags & NVG_IMAGE_PREMULTIPLIED) ? 0.0f : 1.0f;
+			else
+				frag->texType = 2.0f;
 			gl->th = tex->id;
 		}
 		else
@@ -485,7 +478,10 @@ namespace
 			frag->type = NSVG_SHADER_FILLGRAD;
 			frag->radius  = paint->radius;
 			frag->feather = paint->feather;
+			nvgTransformInverse(invxform, paint->xform);
 		}
+
+		glnvg__xformToMat3x4(frag->paintMat, invxform);
 
 		return 1;
 	}
@@ -545,12 +541,12 @@ namespace
 		gl->th = handle;
 	}
 
-	static void nvgRenderViewport(void* _userPtr, int width, int height)
+	static void nvgRenderViewport(void* _userPtr, int width, int height, float devicePixelRatio)
 	{
 		struct GLNVGcontext* gl = (struct GLNVGcontext*)_userPtr;
 		gl->view[0] = (float)width;
 		gl->view[1] = (float)height;
-		bgfx::setViewRect(gl->m_viewId, 0, 0, width, height);
+		bgfx::setViewRect(gl->m_viewId, 0, 0, width * devicePixelRatio, height * devicePixelRatio);
 	}
 
 	static void fan(uint32_t _start, uint32_t _count)
@@ -704,7 +700,38 @@ namespace
 		}
 	}
 
-	static void nvgRenderFlush(void* _userPtr)
+	static const uint64_t s_blend[] =
+	{
+		BGFX_STATE_BLEND_ZERO,
+		BGFX_STATE_BLEND_ONE,
+		BGFX_STATE_BLEND_SRC_COLOR,
+		BGFX_STATE_BLEND_INV_SRC_COLOR,
+		BGFX_STATE_BLEND_DST_COLOR,
+		BGFX_STATE_BLEND_INV_DST_COLOR,
+		BGFX_STATE_BLEND_SRC_ALPHA,
+		BGFX_STATE_BLEND_INV_SRC_ALPHA,
+		BGFX_STATE_BLEND_DST_ALPHA,
+		BGFX_STATE_BLEND_INV_DST_ALPHA,
+		BGFX_STATE_BLEND_SRC_ALPHA_SAT,
+	};
+
+	static uint64_t glnvg_convertBlendFuncFactor(int factor)
+	{
+		const uint32_t numtz = bx::uint32_cnttz(factor);
+		const uint32_t idx   = bx::uint32_min(numtz, BX_COUNTOF(s_blend)-1);
+		return s_blend[idx];
+	}
+
+	static uint64_t glnvg__blendCompositeOperation(NVGcompositeOperationState op)
+	{
+		return BGFX_STATE_BLEND_FUNC_SEPARATE(
+				glnvg_convertBlendFuncFactor(op.srcRGB),
+				glnvg_convertBlendFuncFactor(op.dstRGB),
+				glnvg_convertBlendFuncFactor(op.srcAlpha),
+				glnvg_convertBlendFuncFactor(op.dstAlpha));
+	}
+
+	static void nvgRenderFlush(void* _userPtr, NVGcompositeOperationState compositeOperation)
 	{
 		struct GLNVGcontext* gl = (struct GLNVGcontext*)_userPtr;
 
@@ -714,32 +741,18 @@ namespace
 
 			int allocated = gl->tvb.size/gl->tvb.stride;
 
-			if (allocated < gl->nverts) {
+			if (allocated < gl->nverts)
+			{
 				gl->nverts = allocated;
 				BX_WARN(true, "Vertex number truncated due to transient vertex buffer overflow");
 			}
 
-
 			memcpy(gl->tvb.data, gl->verts, gl->nverts * sizeof(struct NVGvertex) );
 
-			gl->state = 0
+			gl->state = glnvg__blendCompositeOperation(compositeOperation)
 				| BGFX_STATE_RGB_WRITE
 				| BGFX_STATE_ALPHA_WRITE
 				;
-
-// 			if (alphaBlend == NVG_PREMULTIPLIED_ALPHA)
-// 			{
-// 				gl->state |= BGFX_STATE_BLEND_FUNC_SEPARATE(
-// 								  BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA
-// 								, BGFX_STATE_BLEND_ONE,       BGFX_STATE_BLEND_INV_SRC_ALPHA
-// 								);
-// 			}
-// 			else
-			{
-				gl->state |= BGFX_STATE_BLEND_FUNC(
-								BGFX_STATE_BLEND_SRC_ALPHA, BGFX_STATE_BLEND_INV_SRC_ALPHA
-								);
-			}
 
 			bgfx::setUniform(gl->u_viewSize, gl->view);
 
@@ -1088,6 +1101,22 @@ error:
 	return NULL;
 }
 
+NVGcontext* nvgCreate(int edgeaa, unsigned char _viewId) {
+	return nvgCreate(edgeaa, _viewId, NULL);
+}
+
+void nvgDelete(struct NVGcontext* ctx)
+{
+	nvgDeleteInternal(ctx);
+}
+
+uint8_t nvgViewId(struct NVGcontext* ctx)
+{
+	struct NVGparams* params = nvgInternalParams(ctx);
+	struct GLNVGcontext* gl = (struct GLNVGcontext*)params->userPtr;
+	return gl->m_viewId;
+}
+
 void nvgViewId(struct NVGcontext* ctx, unsigned char _viewId)
 {
 	struct NVGparams* params = nvgInternalParams(ctx);
@@ -1095,7 +1124,54 @@ void nvgViewId(struct NVGcontext* ctx, unsigned char _viewId)
 	gl->m_viewId = uint8_t(_viewId);
 }
 
-void nvgDelete(struct NVGcontext* ctx)
+bgfx::TextureHandle nvglImageHandle(NVGcontext* ctx, int image)
 {
-	nvgDeleteInternal(ctx);
+	GLNVGcontext* gl = (GLNVGcontext*)nvgInternalParams(ctx)->userPtr;
+	GLNVGtexture* tex = glnvg__findTexture(gl, image);
+	return tex->id;
+}
+
+NVGLUframebuffer* nvgluCreateFramebuffer(NVGcontext* ctx, int width,
+																				 int height, int imageFlags) {
+	NVGLUframebuffer* framebuffer = new NVGLUframebuffer;
+	framebuffer->ctx = ctx;
+	framebuffer->image = nvgCreateImageRGBA(ctx, width, height, imageFlags | NVG_IMAGE_PREMULTIPLIED, NULL);
+	bgfx::TextureHandle texture = nvglImageHandle(ctx, framebuffer->image);
+	if (!bgfx::isValid(texture)) {
+		nvgluDeleteFramebuffer(framebuffer);
+		return NULL;
+	}
+	framebuffer->handle = bgfx::createFrameBuffer(1, &texture, false);
+	if (!bgfx::isValid(framebuffer->handle))
+	{
+		nvgluDeleteFramebuffer(framebuffer);
+		return NULL;
+	}
+	static uint8_t s_ViewId = 1;  // may have a better way to assign new view id
+	framebuffer->viewId = s_ViewId++;
+	bgfx::setViewFrameBuffer(framebuffer->viewId, framebuffer->handle);
+	bgfx::setViewSeq(framebuffer->viewId, true);
+	return framebuffer;
+}
+
+void nvgluBindFramebuffer(NVGLUframebuffer* framebuffer) {
+	static NVGcontext* s_prevCtx = NULL;
+	static uint8_t s_prevViewId;
+	if (framebuffer != NULL) {
+		s_prevCtx = framebuffer->ctx;
+		s_prevViewId = nvgViewId(framebuffer->ctx);
+		nvgViewId(framebuffer->ctx, framebuffer->viewId);
+	} else if (s_prevCtx != NULL) {
+		nvgViewId(s_prevCtx, s_prevViewId);
+	}
+}
+
+void nvgluDeleteFramebuffer(NVGLUframebuffer* framebuffer) {
+	if (framebuffer == NULL)
+		return;
+	if (bgfx::isValid(framebuffer->handle))
+		bgfx::destroyFrameBuffer(framebuffer->handle);
+	if (framebuffer->image > 0)
+		nvgDeleteImage(framebuffer->ctx, framebuffer->image);
+	delete framebuffer;
 }

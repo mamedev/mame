@@ -101,8 +101,8 @@ public:
 	DECLARE_READ8_MEMBER(cass_r);
 	DECLARE_WRITE_LINE_MEMBER(cass_w);
 	DECLARE_QUICKLOAD_LOAD_MEMBER( ravens );
-	UINT8 m_term_char;
-	UINT8 m_term_data;
+	uint8_t m_term_char;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	optional_device<generic_terminal_device> m_terminal;
 	required_device<cassette_image_device> m_cass;
@@ -135,25 +135,25 @@ WRITE8_MEMBER( ravens_state::leds_w )
 
 READ8_MEMBER( ravens_state::port07_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0x80;
 	return ret;
 }
 
 READ8_MEMBER( ravens_state::port17_r )
 {
-	UINT8 keyin, i;
+	uint8_t keyin, i;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				return i | 0x80;
 
 	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				return i | 0x88;
 
 	keyin = ioport("X2")->read();
@@ -161,7 +161,7 @@ READ8_MEMBER( ravens_state::port17_r )
 		m_maincpu->reset();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				return (i<<4) | 0x80;
 
 	return 0;
@@ -267,7 +267,7 @@ QUICKLOAD_LOAD_MEMBER( ravens_state, ravens )
 	int quick_addr = 0x900;
 	int exec_addr;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
 	image_init_result result = image_init_result::FAIL;
 

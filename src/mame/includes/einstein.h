@@ -91,14 +91,14 @@ public:
 	int m_ctc_trigger;
 
 	/* keyboard */
-	UINT8 m_keyboard_line;
-	UINT8 m_keyboard_data;
+	uint8_t m_keyboard_line;
+	uint8_t m_keyboard_data;
 
 	/* 80 column device */
 	optional_device<mc6845_device> m_mc6845;
 	optional_device<screen_device> m_crtc_screen;
-	std::unique_ptr<UINT8[]> m_crtc_ram;
-	UINT8   m_de;
+	std::unique_ptr<uint8_t[]> m_crtc_ram;
+	uint8_t   m_de;
 
 	int m_centronics_busy;
 	int m_centronics_perror;
@@ -122,7 +122,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_MACHINE_START(einstein2);
 	DECLARE_MACHINE_RESET(einstein2);
-	UINT32 screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(einstein_ctc_trigger_callback);
 	DECLARE_WRITE_LINE_MEMBER(einstein_6845_de_changed);
@@ -166,7 +166,7 @@ class einstein_keyboard_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_keyboard_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	virtual void device_start() override;
@@ -186,7 +186,7 @@ class einstein_adc_daisy_device :   public device_t,
 {
 public:
 	// construction/destruction
-	einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_adc_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	virtual void device_start() override;
@@ -206,7 +206,7 @@ class einstein_fire_daisy_device :  public device_t,
 {
 public:
 	// construction/destruction
-	einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	einstein_fire_daisy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 private:
 	virtual void device_start() override;

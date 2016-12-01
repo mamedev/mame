@@ -21,7 +21,7 @@ Notes:
 - kicknrun does a PS4 STOP ERROR shortly after boot, but works afterwards.
   PS4 is the MC6801U4 mcu.
 
-- Kiki Kaikai suffers from random lock-up's. It happens when the sound
+- Kiki Kaikai suffers from random lock-ups. It happens when the sound
   CPU misses CTS from YM2203. The processor will loop infinitely and the main
   CPU will in turn wait forever. It's difficult to meet the required level
   of synchronization. This is kludged by filtering the 2203's busy signal.
@@ -34,9 +34,6 @@ Notes:
   activity and replicated the behaviour inaccurately because they coudln't
   figure it all out. Indeed, the 68705 code reads all the memory locations
   related to the missing collision detection, but does nothing with them.
-
-- In the KiKi KaiKai MCU simulation, I don't bother supporting the coinage dip
-  switch settings. Therefore, it's hardwired to be 1 coin / 1 credit.
 
 - Kick and Run is a rom swap for Kiki KaiKai as the pal chips are all A85-0x
   A85 is the Taito rom code for Kiki KaiKai.  Even the MCU is socketed!
@@ -67,7 +64,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 
 READ8_MEMBER(mexico86_state::kiki_ym2203_r)
 {
-	UINT8 result = m_ymsnd->read(space, offset);
+	uint8_t result = m_ymsnd->read(space, offset);
 
 	if (offset == 0)
 		result &= 0x7f;
@@ -224,8 +221,7 @@ static INPUT_PORTS_START( mexico86 )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
-	/* the following is actually service coin 1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Advance") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -283,8 +279,8 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // Ofuda in service mode
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) // Oharai
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -293,8 +289,8 @@ static INPUT_PORTS_START( kikikai )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -359,7 +355,7 @@ static INPUT_PORTS_START( kikikai )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
@@ -401,7 +397,7 @@ GFXDECODE_END
 
 void mexico86_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x08000], 0x4000);
 
@@ -417,6 +413,7 @@ void mexico86_state::machine_start()
 	save_item(NAME(m_mcu_running));
 	save_item(NAME(m_mcu_initialised));
 	save_item(NAME(m_coin_last));
+	save_item(NAME(m_coin_fract));
 
 	save_item(NAME(m_charbank));
 }
@@ -438,7 +435,9 @@ void mexico86_state::machine_reset()
 
 	m_mcu_running = 0;
 	m_mcu_initialised = 0;
-	m_coin_last = 0;
+	m_coin_last[0] = false;
+	m_coin_last[1] = false;
+	m_coin_fract = 0;
 
 	m_charbank = 0;
 }

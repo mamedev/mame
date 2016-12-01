@@ -166,8 +166,8 @@ public:
 	required_ioport m_ioport_p7;
 	required_ioport m_ioport_p8;
 
-	UINT8 cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pf, cur_pg;
-	UINT8 cur_ic32;
+	uint8_t cur_p1, cur_p2, cur_p3, cur_p5, cur_p6, cur_pa, cur_pf, cur_pg;
+	uint8_t cur_ic32;
 	float contrast;
 
 	DECLARE_READ16_MEMBER(adc0_r);
@@ -191,8 +191,8 @@ public:
 	DECLARE_READ16_MEMBER(snd_r);
 	DECLARE_WRITE16_MEMBER(snd_w);
 
-	float lightlevel(const UINT8 *src, const UINT8 *render);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	float lightlevel(const uint8_t *src, const uint8_t *render);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_start() override;
 };
 
@@ -213,9 +213,9 @@ void mu100_state::machine_start()
 	contrast = 1.0;
 }
 
-float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
+float mu100_state::lightlevel(const uint8_t *src, const uint8_t *render)
 {
-	UINT8 l = *src;
+	uint8_t l = *src;
 	if(l == 0)
 		return 1.0;
 	int slot = (src[1] << 8) | src[2];
@@ -229,16 +229,16 @@ float mu100_state::lightlevel(const UINT8 *src, const UINT8 *render)
 	return 0.95f;
 }
 
-UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *render = m_lcd->render();
-	const UINT8 *src = ymmu100_bkg + 15;
+	const uint8_t *render = m_lcd->render();
+	const uint8_t *src = ymmu100_bkg + 15;
 
 	for(int y=0; y<241; y++) {
-		UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y));
+		uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y));
 		for(int x=0; x<800; x++) {
 			float light = lightlevel(src, render);
-			UINT32 col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
+			uint32_t col = (int(0xef*light) << 16) | (int(0xf5*light) << 8);
 			*pix++ = col;
 			src += 3;
 		}
@@ -252,7 +252,7 @@ UINT32 mu100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 			int y = 55 + 65*(i >> 1);
 			for(int yy=-9; yy <= 9; yy++) {
 				int dx = int(sqrt((float)(99-yy*yy)));
-				UINT32 *pix = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
+				uint32_t *pix = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y+yy)) + (x-dx);
 				for(int xx=0; xx<2*dx+1; xx++)
 					*pix++ = 0x00ff00;
 			}
@@ -335,7 +335,7 @@ READ16_MEMBER(mu100_state::p1_r)
 	}
 
 	if(!(cur_pf & 0x02)) {
-		UINT8 val = 0xff;
+		uint8_t val = 0xff;
 		if(!(cur_ic32 & 0x20))
 			val &= m_ioport_p7->read();
 		if(!(cur_ic32 & 0x40))

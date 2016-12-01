@@ -439,33 +439,47 @@ TEST(Writer, InvalidEventSequence) {
     }
 }
 
-extern double zero; // clang -Wmissing-variable-declarations
-double zero = 0.0;	// Use global variable to prevent compiler warning
-
 TEST(Writer, NaN) {
-    double nan = zero / zero;
+    double nan = std::numeric_limits<double>::quiet_NaN();
+
     EXPECT_TRUE(internal::Double(nan).IsNan());
     StringBuffer buffer;
-    Writer<StringBuffer> writer(buffer);
-    EXPECT_FALSE(writer.Double(nan));
-
+    {
+        Writer<StringBuffer> writer(buffer);
+        EXPECT_FALSE(writer.Double(nan));
+    }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(nan));
+        EXPECT_STREQ("NaN", buffer.GetString());
+    }
     GenericStringBuffer<UTF16<> > buffer2;
     Writer<GenericStringBuffer<UTF16<> > > writer2(buffer2);
     EXPECT_FALSE(writer2.Double(nan));
 }
 
 TEST(Writer, Inf) {
-    double inf = 1.0 / zero;
+    double inf = std::numeric_limits<double>::infinity();
+
     EXPECT_TRUE(internal::Double(inf).IsInf());
     StringBuffer buffer;
     {
         Writer<StringBuffer> writer(buffer);
-        EXPECT_FALSE(writer.Double(inf));        
+        EXPECT_FALSE(writer.Double(inf));
     }
     {
         Writer<StringBuffer> writer(buffer);
         EXPECT_FALSE(writer.Double(-inf));
     }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(inf));
+    }
+    {
+        Writer<StringBuffer, UTF8<>, UTF8<>, CrtAllocator, kWriteNanAndInfFlag> writer(buffer);
+        EXPECT_TRUE(writer.Double(-inf));
+    }
+    EXPECT_STREQ("Infinity-Infinity", buffer.GetString());
 }
 
 TEST(Writer, RawValue) {

@@ -19,12 +19,12 @@ class xtide_device : public device_t,
 {
 public:
 	// construction/destruction
-	xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE8_MEMBER(write);
@@ -40,8 +40,8 @@ private:
 	required_device<ata_interface_device> m_ata;
 	required_device<eeprom_parallel_28xx_device> m_eeprom;
 
-	UINT8 m_irq_number;
-	UINT8 m_d8_d15_latch;
+	uint8_t m_irq_number;
+	uint8_t m_d8_d15_latch;
 };
 
 

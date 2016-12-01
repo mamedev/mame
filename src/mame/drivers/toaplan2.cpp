@@ -347,7 +347,15 @@ To Do / Unknowns:
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
-    - Write a RTC core for uPD4992, needed by Othello Derby and Power Kick
+
+Notes on Power Kick coin inputs:
+- The 10 yen input is "Key In" according to the bookkeeping screen, but is
+  an otherwise normal coin input with a counter and a lockout (sharing the
+  latter with the "medal" coin).
+- The 100 yen input never adds any credits except in "Coin Function Check,"
+  instead dispensing its value into the hopper immediately.
+
+To reset the NVRAM in Othello Derby, hold P1 Button 1 down while booting.
 
 *****************************************************************************/
 
@@ -356,11 +364,15 @@ To Do / Unknowns:
 #include "cpu/nec/v25.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z180/z180.h"
+#include "machine/nvram.h"
 #include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/ymz280b.h"
 #include "includes/toaplan2.h"
 #include "includes/toaplipt.h"
+
+#define UNICODE_YEN             "\xC2\xA5"
+#define PWRKICK_HOPPER_PULSE    50          // time between hopper pulses in milliseconds (probably wrong)
 
 
 /***************************************************************************
@@ -417,7 +429,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,fixeight)
 
 DRIVER_INIT_MEMBER(toaplan2_state,fixeightbl)
 {
-	UINT8 *ROM = memregion("oki")->base();
+	uint8_t *ROM = memregion("oki")->base();
 
 	membank("bank1")->configure_entries(0, 5, &ROM[0x30000], 0x10000);
 }
@@ -431,7 +443,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,vfive)
 
 DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 {
-	UINT16 *ROM = (UINT16 *)(memregion("maincpu")->base());
+	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < (0x040000/2); i += 4)
 	{
@@ -445,7 +457,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,pipibibsbl)
 
 DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	// seems to only use banks 0x0a to 0x0f
 	membank("bank1")->configure_entries(8, 8, Z80, 0x4000);
@@ -454,7 +466,7 @@ DRIVER_INIT_MEMBER(toaplan2_state,bgaregga)
 
 DRIVER_INIT_MEMBER(toaplan2_state,batrider)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, Z80, 0x4000);
 	m_sndirq_line = 4;
@@ -479,7 +491,7 @@ void toaplan2_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(param, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in toaplan2_state::device_timer");
+		assert_always(false, "Unknown id in toaplan2_state::device_timer");
 	}
 }
 
@@ -556,9 +568,17 @@ WRITE8_MEMBER(toaplan2_state::toaplan2_coin_w)
 
 WRITE8_MEMBER(toaplan2_state::pwrkick_coin_w)
 {
-	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 );
-	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 );
-	m_pwrkick_hopper = (data & 0x80) >> 7;
+	machine().bookkeeping().coin_counter_w(0, (data & 2) >> 1 ); // medal
+	machine().bookkeeping().coin_counter_w(1, (data & 8) >> 3 ); // 10 yen
+	machine().bookkeeping().coin_counter_w(2, (data & 1) ); // 100 yen
+	m_hopper->write(space, 0, data & 0x80);
+}
+
+WRITE8_MEMBER(toaplan2_state::pwrkick_coin_lockout_w)
+{
+	machine().bookkeeping().coin_lockout_w(0, (data & 4) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(1, (data & 4) ? 0 : 1);
+	machine().bookkeeping().coin_lockout_w(2, (data & 2) ? 0 : 1);
 }
 
 
@@ -597,7 +617,7 @@ WRITE16_MEMBER(toaplan2_state::shippumd_coin_word_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		toaplan2_coin_w(space, offset, data & 0xff);
-		m_oki->set_bank_base(((data & 0x10) >> 4) * 0x40000);
+		m_oki->set_rom_bank((data & 0x10) >> 4);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -647,7 +667,7 @@ CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 
 READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 {
-	INT8 value, new_value;
+	int8_t value, new_value;
 
 	new_value = ioport("PAD1")->read();
 	if (new_value == m_old_p1_paddle_h) return 0;
@@ -659,7 +679,7 @@ READ16_MEMBER(toaplan2_state::ghox_p1_h_analog_r)
 
 READ16_MEMBER(toaplan2_state::ghox_p2_h_analog_r)
 {
-	INT8 value, new_value;
+	int8_t value, new_value;
 
 	new_value = ioport("PAD2")->read();
 	if (new_value == m_old_p2_paddle_h) return 0;
@@ -755,7 +775,7 @@ WRITE16_MEMBER(toaplan2_state::oki_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki->set_bank_base((data & 1) * 0x40000);
+		m_oki->set_rom_bank(data & 1);
 	}
 }
 
@@ -763,7 +783,7 @@ WRITE16_MEMBER(toaplan2_state::oki1_bankswitch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base((data & 1) * 0x40000);
+		m_oki1->set_rom_bank(data & 1);
 	}
 }
 
@@ -876,7 +896,7 @@ WRITE16_MEMBER(toaplan2_state::batrider_z80_busreq_w)
 
 READ16_MEMBER(toaplan2_state::batrider_z80rom_r)
 {
-	UINT8 *Z80 = memregion("audiocpu")->base();
+	uint8_t *Z80 = memregion("audiocpu")->base();
 
 	return Z80[offset];
 }
@@ -1182,7 +1202,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram") // Only 10022C-10037B is actually saved as NVRAM
+	AM_RANGE(0x104000, 0x10ffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
@@ -1197,13 +1218,14 @@ static ADDRESS_MAP_START( pwrkick_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("DSWC")
 	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("SYS")
 	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
-	AM_RANGE(0x700034, 0x700035) AM_WRITE8(pwrkick_coin_w,0x00ff)
-	AM_RANGE(0x700038, 0x700039) AM_WRITENOP // lamps?
+	AM_RANGE(0x700034, 0x700035) AM_WRITE8(pwrkick_coin_w, 0x00ff)
+	AM_RANGE(0x700038, 0x700039) AM_WRITE8(pwrkick_coin_lockout_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( othldrby_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram") // Only 10331E-103401 is actually saved as NVRAM
+	AM_RANGE(0x104000, 0x10ffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x20000f) AM_DEVREADWRITE8("rtc", upd4992_device, read, write, 0x00ff )
 	AM_RANGE(0x300000, 0x30000d) AM_DEVREADWRITE("gp9001", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
@@ -2304,139 +2326,90 @@ static INPUT_PORTS_START( batsugun )
 INPUT_PORTS_END
 
 
-CUSTOM_INPUT_MEMBER(toaplan2_state::pwrkick_hopper_status_r)
-{
-	/* TODO: hopper mechanism */
-	return machine().rand() & 1;
-	//return m_pwrkick_hopper & (machine().rand() & 1);
-}
-
 static INPUT_PORTS_START( pwrkick )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW1:!1,!2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x1c, 0x00, "Payout" )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x04, "2" )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x0c, "4" )
-	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPSETTING(    0x14, "6" )
-	PORT_DIPSETTING(    0x18, "7" )
-	PORT_DIPSETTING(    0x1c, "8" )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x5c, 0x00, "Payout" ) PORT_DIPLOCATION("SW1:!3,!4,!5,!7")
+	PORT_DIPSETTING(    0x00, "110" ) // Service mode displays values as 1-8, ignoring SW1:7
+	PORT_DIPSETTING(    0x04, "105" )
+	PORT_DIPSETTING(    0x08, "100" )
+	PORT_DIPSETTING(    0x0c, "95" )
+	PORT_DIPSETTING(    0x10, "90" )
+	PORT_DIPSETTING(    0x14, "85" )
+	PORT_DIPSETTING(    0x18, "80" )
+	PORT_DIPSETTING(    0x1c, "75" )
+	PORT_DIPSETTING(    0x40, "70" )
+	PORT_DIPSETTING(    0x44, "65" )
+	PORT_DIPSETTING(    0x48, "60" )
+	PORT_DIPSETTING(    0x4c, "55" )
+	PORT_DIPSETTING(    0x50, "50" )
+	PORT_DIPSETTING(    0x54, "45" )
+	PORT_DIPSETTING(    0x58, "40" )
+	PORT_DIPSETTING(    0x5c, "35" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "Diagnostic" )
+	PORT_DIPNAME( 0x80, 0x00, "Diagnostic" ) PORT_DIPLOCATION("SW1:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x00, "Play Credit" )
-	PORT_DIPSETTING(    0x00, "10 \xC2\xA5" )
-	PORT_DIPSETTING(    0x01, "20 \xC2\xA5" )
-	PORT_DIPSETTING(    0x02, "30 \xC2\xA5" )
-	PORT_DIPSETTING(    0x03, "40 \xC2\xA5" )
-	PORT_DIPNAME( 0x0c, 0x00, "Coin Exchange" )
+	PORT_DIPNAME( 0x03, 0x00, "Play Credit" ) PORT_DIPLOCATION("SW2:!1,!2")
+	PORT_DIPSETTING(    0x00, UNICODE_YEN "10" )
+	PORT_DIPSETTING(    0x01, UNICODE_YEN "20" )
+	PORT_DIPSETTING(    0x02, UNICODE_YEN "30" )
+	PORT_DIPSETTING(    0x03, UNICODE_YEN "40" )
+	PORT_DIPNAME( 0x0c, 0x00, "Coin Exchange" ) PORT_DIPLOCATION("SW2:!3,!4")
 	PORT_DIPSETTING(    0x00, "12" )
 	PORT_DIPSETTING(    0x04, "10" )
 	PORT_DIPSETTING(    0x08, "6" )
 	PORT_DIPSETTING(    0x0c, "5" )
-	PORT_DIPNAME( 0x30, 0x00, "Game Mode" )
+	PORT_DIPNAME( 0x30, 0x00, "Game Mode" ) PORT_DIPLOCATION("SW2:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, "Shot" )
 	PORT_DIPSETTING(    0x20, "Auto" )
 	PORT_DIPSETTING(    0x30, "S-Manual" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
 
 	PORT_START("DSWC")
-	PORT_DIPNAME( 0x01, 0x00, "DSWC" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW3:!1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW3:!2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW3:!3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW3:!4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW3:!5" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW3:!6" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW3:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW3:!8" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Left Button")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Center Button")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Right Button")
-	PORT_DIPNAME( 0x10, 0x00, "IN1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_GAMBLE_KEYIN ) // 10 Yen
-	PORT_SERVICE( 0x02, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_NAME("Coin 2 (" UNICODE_YEN "10)")
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Down Button")
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, toaplan2_state, pwrkick_hopper_status_r, nullptr)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE3 ) PORT_NAME("Memory Reset")
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("hopper", ticket_dispenser_device, line_r)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_MEMORY_RESET )
+	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("SYS")
-	PORT_DIPNAME( 0x01, 0x00, "SYS" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) // 100 Yen
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE1 ) PORT_NAME("Bookkeeping")
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_NAME("Attendant Key")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) PORT_NAME("Coin Exchange (" UNICODE_YEN "100)")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_GAMBLE_BOOK )
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_GAMBLE_SERVICE ) PORT_NAME("Attendant Key")
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_NAME("Coin 1 (Medal)")
+
+	// The specific "Payout" button shown on the test screen and diagnostic menu does not exist.
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( othldrby )
@@ -3124,7 +3097,7 @@ MACHINE_CONFIG_END
 those 3 games have been seen with the NITRO905 chip, other alias are
 ts002mach for dogyuun, ts004dash for kbash and ts007spy for vfive */
 
-static const UINT8 nitro_decryption_table[256] = {
+static const uint8_t nitro_decryption_table[256] = {
 	0x1b,0x56,0x75,0x88,0x8c,0x06,0x58,0x72, 0x83,0x86,0x36,0x1a,0x5f,0xd3,0x8c,0xe9, /* 00 */
 	/* *//* *//* *//* *//* *//* *//* *//* */ /* *//* *//* *//* *//* *//* *//* *//* */
 	0x22,0x0f,0x03,0x2a,0xeb,0x2a,0xf9,0x0f, 0xa4,0xbd,0x75,0xf3,0x4f,0x53,0x8e,0xfe, /* 10 */
@@ -3440,7 +3413,7 @@ MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
 /* this one seems more different to the other tables */
-static const UINT8 ts001turbo_decryption_table[256] = {
+static const uint8_t ts001turbo_decryption_table[256] = {
 	0x90,0x05,0x57,0x5f,0xfe,0x4f,0xbd,0x36, 0x80,0x8b,0x8a,0x0a,0x89,0x90,0x47,0x80, /* 00 */
 			/*r*//*r*//*r*//*r*//*r*//*r*//*r*/ /*r*//*r*//*r*//*r*//*r*/     /*r*//*r*/
 	0x22,0x90,0x90,0x5d,0x81,0x3c,0xb5,0x83, 0x68,0xff,0x75,0x75,0x8d,0x5b,0x8a,0x38, /* 10 */
@@ -3658,6 +3631,10 @@ static MACHINE_CONFIG_START( pwrkick, toaplan2_state )
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_UPD4992_ADD("rtc")
 
+	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(PWRKICK_HOPPER_PULSE), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -3689,6 +3666,8 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_UPD4992_ADD("rtc")
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

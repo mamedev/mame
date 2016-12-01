@@ -66,7 +66,7 @@ const device_type C64_VW64 = &device_creator<c64_vizawrite_cartridge_device>;
 //  c64_vizawrite_cartridge_device - constructor
 //-------------------------------------------------
 
-c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_vizawrite_cartridge_device::c64_vizawrite_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_VW64, "VizaWrite 64", tag, owner, clock, "c64_vizawrite", __FILE__),
 	device_c64_expansion_card_interface(mconfig, *this), m_game_timer(nullptr)
 {
@@ -110,7 +110,7 @@ void c64_vizawrite_cartridge_device::device_timer(emu_timer &timer, device_timer
 //  c64_cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_vizawrite_cartridge_device::c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (!roml)
 	{

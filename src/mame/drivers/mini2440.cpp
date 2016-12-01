@@ -11,6 +11,7 @@
 #include "machine/s3c2440.h"
 #include "machine/smartmed.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -23,20 +24,20 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_s3c2440(*this, "s3c2440"),
 		m_nand(*this, "nand"),
-		m_dac1(*this, "dac1"),
-		m_dac2(*this, "dac2"),
+		m_ldac(*this, "ldac"),
+		m_rdac(*this, "rdac"),
 		m_penx(*this, "PENX"),
 		m_peny(*this, "PENY") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<s3c2440_device> m_s3c2440;
 	required_device<nand_device> m_nand;
-	required_device<dac_device> m_dac1;
-	required_device<dac_device> m_dac2;
+	required_device<dac_word_interface> m_ldac;
+	required_device<dac_word_interface> m_rdac;
 	required_ioport m_penx;
 	required_ioport m_peny;
 
-	UINT32 m_port[9];
+	uint32_t m_port[9];
 	DECLARE_DRIVER_INIT(mini2440);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -75,7 +76,7 @@ inline void mini2440_state::verboselog(int n_level, const char *s_fmt, ...)
 
 READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
 {
-	UINT32 data = m_port[offset];
+	uint32_t data = m_port[offset];
 	switch (offset)
 	{
 		case S3C2440_GPIO_PORT_G :
@@ -92,6 +93,10 @@ READ32_MEMBER(mini2440_state::s3c2440_gpio_port_r)
 
 WRITE32_MEMBER(mini2440_state::s3c2440_gpio_port_w)
 {
+	// tout2/gb2 -> uda1341ts l3mode
+	// tout3/gb3 -> uda1341ts l3data
+	// tclk0/gb4 -> uda1341ts l3clock
+
 	m_port[offset] = data;
 	switch (offset)
 	{
@@ -154,16 +159,16 @@ WRITE8_MEMBER(mini2440_state::s3c2440_nand_data_w )
 WRITE16_MEMBER(mini2440_state::s3c2440_i2s_data_w )
 {
 	if ( offset )
-		m_dac1->write_signed16(data + 0x8000);
+		m_ldac->write(data);
 	else
-		m_dac2->write_signed16(data + 0x8000);
+		m_rdac->write(data);
 }
 
 // ADC
 
 READ32_MEMBER(mini2440_state::s3c2440_adc_data_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 	switch (offset)
 	{
 		case 2 + 0 : data = m_penx->read(); break;
@@ -227,10 +232,11 @@ static MACHINE_CONFIG_START( mini2440, mini2440_state )
 	MCFG_SCREEN_UPDATE_DEVICE("s3c2440", s3c2440_device, screen_update)
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_SOUND_ADD("dac1", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MCFG_SOUND_ADD("dac2", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0) // uda1341ts.u12
+	MCFG_SOUND_ADD("rdac", UDA1341TS, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0) // uda1341ts.u12
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_DEVICE_ADD("s3c2440", S3C2440, 12000000)
 	MCFG_S3C2440_PALETTE("palette")

@@ -148,12 +148,12 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 
 #include "emu.h"
 #include "includes/segas16a.h"
-#include "machine/segacrp2_device.h"
+#include "includes/segaipt.h"
 #include "machine/fd1089.h"
 #include "machine/nvram.h"
+#include "machine/segacrp2_device.h"
 #include "sound/dac.h"
-#include "includes/segaipt.h"
-
+#include "sound/volt_reg.h"
 
 //**************************************************************************
 //  PPI READ/WRITE CALLBACKS
@@ -660,10 +660,10 @@ void segas16a_state::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void segas16a_state::dumpmtmt_i8751_sim()
 {
-	UINT8 flag = m_workram[0x200/2] >> 8;
-	UINT8 tick = m_workram[0x200/2] & 0xff;
-	UINT8 sec = m_workram[0x202/2] >> 8;
-	UINT8 min = m_workram[0x202/2] & 0xff;
+	uint8_t flag = m_workram[0x200/2] >> 8;
+	uint8_t tick = m_workram[0x200/2] & 0xff;
+	uint8_t sec = m_workram[0x202/2] >> 8;
+	uint8_t min = m_workram[0x202/2] & 0xff;
 
 	// signal a VBLANK to the main CPU
 	m_maincpu->set_input_line(4, HOLD_LINE);
@@ -792,9 +792,9 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// upper bit of the trackball controls
 				case 0:
 				{
-					UINT8 buttons = ioport("SERVICE")->read();
-					UINT8 analog1 = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
-					UINT8 analog2 = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
+					uint8_t buttons = ioport("SERVICE")->read();
+					uint8_t analog1 = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					uint8_t analog2 = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -804,8 +804,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// player 1 select switch mapped to bit 7
 				case 1:
 				{
-					UINT8 buttons = ioport("BUTTONS1")->read();
-					UINT8 analog = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
+					uint8_t buttons = ioport("BUTTONS1")->read();
+					uint8_t analog = ioport((m_video_control & 4) ? "ANALOGY1" : "ANALOGX1")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -816,8 +816,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 						return (ioport("ANALOGZ1")->read() >> 4) | (ioport("ANALOGZ2")->read() & 0xf0);
 					else
 					{
-						UINT8 buttons1 = ioport("BUTTONS1")->read();
-						UINT8 buttons2 = ioport("BUTTONS2")->read();
+						uint8_t buttons1 = ioport("BUTTONS1")->read();
+						uint8_t buttons2 = ioport("BUTTONS2")->read();
 
 						if (!(buttons1 & 0x01))
 							m_last_buttons1 = 0;
@@ -845,8 +845,8 @@ READ16_MEMBER( segas16a_state::mjleague_custom_io_r )
 				// player 2 select switch mapped to bit 7
 				case 3:
 				{
-					UINT8 buttons = ioport("BUTTONS2")->read();
-					UINT8 analog = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
+					uint8_t buttons = ioport("BUTTONS2")->read();
+					uint8_t analog = ioport((m_video_control & 4) ? "ANALOGY2" : "ANALOGX2")->read();
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
@@ -917,19 +917,18 @@ READ16_MEMBER( segas16a_state::sdi_custom_io_r )
 
 READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 {
-	static const char *const portname[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5" };
 	switch (offset & (0x3000/2))
 	{
 		case 0x1000/2:
 			switch (offset & 3)
 			{
 				case 1:
-					if (read_safe(ioport(portname[m_mj_input_num]), 0xff) != 0xff)
+					if (m_mj_inputs[m_mj_input_num].read_safe(0xff) != 0xff)
 						return 0xff & ~(1 << m_mj_input_num);
 					return 0xff;
 
 				case 2:
-					return read_safe(ioport(portname[m_mj_input_num]), 0xff);
+					return m_mj_inputs[m_mj_input_num].read_safe(0xff);
 			}
 			break;
 	}
@@ -937,7 +936,7 @@ READ16_MEMBER( segas16a_state::sjryuko_custom_io_r )
 }
 
 
-void segas16a_state::sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval)
+void segas16a_state::sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval)
 {
 	if ((changed & 4) && (newval & 4))
 		m_mj_input_num = (m_mj_input_num + 1) % 6;
@@ -1004,7 +1003,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, segas16a_state )
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS)  AM_READ(n7751_rom_r)
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1)   AM_READ(n7751_t1_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1)   AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2)   AM_READWRITE(n7751_p2_r, n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
@@ -1931,16 +1930,17 @@ static MACHINE_CONFIG_START( system16a, segas16a_state )
 	MCFG_PALETTE_ADD("palette", 2048*3)
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_PORT_WRITE_HANDLER(WRITE8(segas16a_state, n7751_control_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.43)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1980,9 +1980,10 @@ static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_no7751p, system16a_no7751 )
@@ -1997,9 +1998,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( system16a_i8751_no7751, system16a_i8751 )
     MCFG_DEVICE_REMOVE("n7751")
     MCFG_DEVICE_REMOVE("dac")
+    MCFG_DEVICE_REMOVE("vref")
 
     MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 */
 
@@ -2009,9 +2011,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089a_no7751, system16a_fd1089a )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
@@ -2020,9 +2023,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1089b_no7751, system16a_fd1089b )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
@@ -2031,9 +2035,10 @@ static MACHINE_CONFIG_DERIVED( system16a_fd1094_no7751, system16a_fd1094 )
 
 	MCFG_DEVICE_REMOVE("n7751")
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3660,7 +3665,7 @@ DRIVER_INIT_MEMBER(segas16a_state,aceattaca)
 DRIVER_INIT_MEMBER(segas16a_state,dumpmtmt)
 {
 	DRIVER_INIT_CALL(generic);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::dumpmtmt_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::dumpmtmt_i8751_sim, this);
 }
 
 DRIVER_INIT_MEMBER(segas16a_state,mjleague)
@@ -3678,7 +3683,7 @@ DRIVER_INIT_MEMBER(segas16a_state,passsht16a)
 DRIVER_INIT_MEMBER(segas16a_state,quartet)
 {
 	DRIVER_INIT_CALL(generic);
-	m_i8751_vblank_hook = i8751_sim_delegate(FUNC(segas16a_state::quartet_i8751_sim), this);
+	m_i8751_vblank_hook = i8751_sim_delegate(&segas16a_state::quartet_i8751_sim, this);
 }
 
 
@@ -3692,7 +3697,7 @@ DRIVER_INIT_MEMBER(segas16a_state,sjryukoa)
 {
 	DRIVER_INIT_CALL(generic);
 	m_custom_io_r = read16_delegate(FUNC(segas16a_state::sjryuko_custom_io_r), this);
-	m_lamp_changed_w = lamp_changed_delegate(FUNC(segas16a_state::sjryuko_lamp_changed_w), this);
+	m_lamp_changed_w = lamp_changed_delegate(&segas16a_state::sjryuko_lamp_changed_w, this);
 }
 
 

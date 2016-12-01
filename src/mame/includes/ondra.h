@@ -36,9 +36,9 @@ public:
 		m_line9(*this, "LINE9"),
 		m_nmi(*this, "NMI") { }
 
-	UINT8 m_video_enable;
-	UINT8 m_bank1_status;
-	UINT8 m_bank2_status;
+	uint8_t m_video_enable;
+	uint8_t m_bank1_status;
+	uint8_t m_bank2_status;
 	DECLARE_READ8_MEMBER(ondra_keyboard_r);
 	DECLARE_WRITE8_MEMBER(ondra_port_03_w);
 	DECLARE_WRITE8_MEMBER(ondra_port_09_w);
@@ -46,7 +46,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ondra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ondra_interrupt);
 	TIMER_CALLBACK_MEMBER(nmi_check_callback);
 

@@ -61,7 +61,7 @@ READ8_MEMBER( bw2_state::read )
 {
 	int rom = 1, vram = 1, ram1 = 1, ram2 = 1, ram3 = 1, ram4 = 1, ram5 = 1, ram6 = 1;
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_bank)
 	{
@@ -441,20 +441,11 @@ READ8_MEMBER( bw2_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	switch (m_kb)
+	if (m_kb < 10)
 	{
-	case 0: data = m_y0->read(); break;
-	case 1: data = m_y1->read(); break;
-	case 2: data = m_y2->read(); break;
-	case 3: data = m_y3->read(); break;
-	case 4: data = m_y4->read(); break;
-	case 5: data = m_y5->read(); break;
-	case 6: data = m_y6->read(); break;
-	case 7: data = m_y7->read(); break;
-	case 8: data = m_y8->read(); break;
-	case 9: data = m_y9->read(); break;
+		data = m_y[m_kb]->read();
 	}
 
 	return data;
@@ -485,7 +476,7 @@ READ8_MEMBER( bw2_state::ppi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// centronics busy
 	data |= m_centronics_busy << 4;

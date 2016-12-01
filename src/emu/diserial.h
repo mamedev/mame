@@ -23,7 +23,7 @@ public:
 	enum
 	{
 		/* receive is waiting for start bit. The transition from high-low indicates
-		start of start bit. This is used to synchronise with the data being transfered */
+		start of start bit. This is used to synchronise with the data being transferred */
 		RECEIVE_REGISTER_WAITING_FOR_START_BIT = 0x01,
 
 		/* receive is synchronised with data, data bits will be clocked in */
@@ -92,20 +92,20 @@ protected:
 
 	void set_rcv_rate(const attotime &rate);
 	void set_tra_rate(const attotime &rate);
-	void set_rcv_rate(UINT32 clock, int div) { set_rcv_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
-	void set_tra_rate(UINT32 clock, int div) { set_tra_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
+	void set_rcv_rate(u32 clock, int div) { set_rcv_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
+	void set_tra_rate(u32 clock, int div) { set_tra_rate((clock && div) ? (attotime::from_hz(clock) * div) : attotime::never); }
 	void set_rcv_rate(int baud) { set_rcv_rate(baud ? attotime::from_hz(baud) : attotime::never); }
 	void set_tra_rate(int baud) { set_tra_rate(baud ? attotime::from_hz(baud) : attotime::never); }
 	void set_rate(const attotime &rate) { set_rcv_rate(rate); set_tra_rate(rate); }
-	void set_rate(UINT32 clock, int div) { set_rcv_rate(clock, div); set_tra_rate(clock, div); }
+	void set_rate(u32 clock, int div) { set_rcv_rate(clock, div); set_tra_rate(clock, div); }
 	void set_rate(int baud) { set_rcv_rate(baud); set_tra_rate(baud); }
 
 	void transmit_register_reset();
 	void transmit_register_add_bit(int bit);
-	void transmit_register_setup(UINT8 data_byte);
-	UINT8 transmit_register_get_data_bit();
+	void transmit_register_setup(u8 data_byte);
+	u8 transmit_register_get_data_bit();
 
-	UINT8 serial_helper_get_parity(UINT8 data) { return m_serial_parity_table[data]; }
+	u8 serial_helper_get_parity(u8 data) { return m_serial_parity_table[data]; }
 
 	bool is_receive_register_full();
 	bool is_transmit_register_empty();
@@ -114,7 +114,7 @@ protected:
 	bool is_receive_framing_error() const { return m_rcv_framing_error; }
 	bool is_receive_parity_error() const { return m_rcv_parity_error; }
 
-	UINT8 get_received_char() const { return m_rcv_byte_received; }
+	u8 get_received_char() const { return m_rcv_byte_received; }
 
 	virtual void tra_callback() { }
 	virtual void rcv_callback() { receive_register_update_bit(m_rcv_line); }
@@ -137,48 +137,48 @@ protected:
 private:
 	enum { TRA_TIMER_ID = 10000, RCV_TIMER_ID };
 
-	UINT8 m_serial_parity_table[256];
+	u8 m_serial_parity_table[256];
 
 	// Data frame
 	// number of start bits
 	int m_df_start_bit_count;
 	// length of word in bits
-	UINT8 m_df_word_length;
+	u8 m_df_word_length;
 	// parity state
-	UINT8 m_df_parity;
+	u8 m_df_parity;
 	// number of stop bits
-	UINT8 m_df_stop_bit_count;
+	u8 m_df_stop_bit_count;
 
 	// Receive register
 	/* data */
-	UINT16 m_rcv_register_data;
+	u16 m_rcv_register_data;
 	/* flags */
-	UINT8 m_rcv_flags;
+	u8 m_rcv_flags;
 	/* bit count received */
-	UINT8 m_rcv_bit_count_received;
+	u8 m_rcv_bit_count_received;
 	/* length of data to receive - includes data bits, parity bit and stop bit */
-	UINT8 m_rcv_bit_count;
+	u8 m_rcv_bit_count;
 	/* the byte of data received */
-	UINT8 m_rcv_byte_received;
+	u8 m_rcv_byte_received;
 
 	bool m_rcv_framing_error;
 	bool m_rcv_parity_error;
 
 	// Transmit register
 	/* data */
-	UINT16 m_tra_register_data;
+	u16 m_tra_register_data;
 	/* flags */
-	UINT8 m_tra_flags;
+	u8 m_tra_flags;
 	/* number of bits transmitted */
-	UINT8 m_tra_bit_count_transmitted;
+	u8 m_tra_bit_count_transmitted;
 	/* length of data to send */
-	UINT8 m_tra_bit_count;
+	u8 m_tra_bit_count;
 
 	emu_timer *m_rcv_clock;
 	emu_timer *m_tra_clock;
 	attotime m_rcv_rate;
 	attotime m_tra_rate;
-	UINT8 m_rcv_line;
+	u8 m_rcv_line;
 
 	int m_tra_clock_state, m_rcv_clock_state;
 
@@ -187,7 +187,7 @@ private:
 };
 
 
-template <UINT32 FIFO_LENGTH>
+template <u32 FIFO_LENGTH>
 class device_buffered_serial_interface : public device_serial_interface
 {
 protected:
@@ -219,7 +219,7 @@ protected:
 		m_empty = 1U;
 	}
 
-	void transmit_byte(UINT8 byte)
+	void transmit_byte(u8 byte)
 	{
 		assert(!m_empty || (m_head == m_tail));
 		assert(m_head < ARRAY_LENGTH(m_fifo));
@@ -260,11 +260,11 @@ protected:
 	}
 
 private:
-	virtual void received_byte(UINT8 byte) = 0;
+	virtual void received_byte(u8 byte) = 0;
 
-	UINT8   m_fifo[FIFO_LENGTH];
-	UINT32  m_head = 0U, m_tail = 0U;
-	UINT8   m_empty = 1U;
+	u8  m_fifo[FIFO_LENGTH];
+	u32 m_head = 0U, m_tail = 0U;
+	u8  m_empty = 1U;
 };
 
 #endif  // MAME_EMU_DISERIAL_H

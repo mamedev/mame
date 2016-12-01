@@ -238,8 +238,8 @@ void dec0_state::birdtry_i8751_write(int data)
 		/*"Sprite control"*/
 		case 0x22a: m_i8751_return = 0x200;    break;
 
-		/* Gives an O.B. otherwise (it must be > 0xb0 )*/
-		case 0x3c7: m_i8751_return = 0x7ff;    break;
+		/* velocity of the ball, controlled by power and height formula? */
+		case 0x3c7: m_i8751_return = 0x2fff;    break;
 
 		/*Enables shot checks*/
 		case 0x33c: m_i8751_return = 0x200;     break;
@@ -264,7 +264,7 @@ void dec0_state::birdtry_i8751_write(int data)
 		case 0x10b: pwr = 0x5c;             break; /*PW*/
 		case 0x10c: pwr = 0x60;             break; /*SW*/
 		case 0x10d: pwr = 0x80;             break; /*PT*/
-		case 0x481: m_i8751_return = pwr;     break; /*Power meter*/
+		case 0x481: m_i8751_return = pwr*9;     break; /*Power meter*/
 
 /*  0x200-0x20f values are for shot height(STRONG=0x200<<-->>WEAK=0x20f).    *
  *  Returned value to i8751 doesn't matter,but send the result to 0x534.     *
@@ -346,7 +346,7 @@ WRITE16_MEMBER(dec0_state::robocop_68000_share_w)
 void dec0_state::h6280_decrypt(const char *cputag)
 {
 	int i;
-	UINT8 *RAM = memregion(cputag)->base();
+	uint8_t *RAM = memregion(cputag)->base();
 
 	/* Read each byte, decrypt it */
 	for (i = 0x00000; i < 0x10000; i++)
@@ -355,7 +355,7 @@ void dec0_state::h6280_decrypt(const char *cputag)
 
 DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 {
-	UINT8 *RAM = memregion("sub")->base();
+	uint8_t *RAM = memregion("sub")->base();
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x180000, 0x18003f, read16_delegate(FUNC(dec0_state::hippodrm_68000_share_r),this), write16_delegate(FUNC(dec0_state::hippodrm_68000_share_w),this));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xffc800, 0xffcfff, write16_delegate(FUNC(dec0_state::sprite_mirror_w),this));
 
@@ -373,7 +373,7 @@ DRIVER_INIT_MEMBER(dec0_state,hippodrm)
 
 DRIVER_INIT_MEMBER(dec0_state,slyspy)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 	h6280_decrypt("audiocpu");
 
 	/* Slyspy sound cpu has some protection */

@@ -27,18 +27,18 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_data;
-	required_shared_ptr<UINT16> m_fg_data;
-	required_shared_ptr<UINT16> m_tx_data;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_scrollram;
-	std::unique_ptr<UINT16[]>    m_buffered_spriteram;
+	required_shared_ptr<uint16_t> m_bg_data;
+	required_shared_ptr<uint16_t> m_fg_data;
+	required_shared_ptr<uint16_t> m_tx_data;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_scrollram;
+	std::unique_ptr<uint16_t[]>    m_buffered_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_layer;
 	tilemap_t     *m_fg_layer;
 	tilemap_t     *m_tx_layer;
-	UINT16      m_fg_bank;
+	uint16_t      m_fg_bank;
 
 	/* misc */
 	int         m_msm5205next;
@@ -67,7 +67,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_goal92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_goal92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_goal92(screen_device &screen, bool state);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
 	DECLARE_WRITE_LINE_MEMBER(irqhandler);

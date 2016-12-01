@@ -108,11 +108,11 @@ data / ay8910-#0 read
 81 ay8910-#1 read port
 
 write:
-60 ay8910-#0 controll port
+60 ay8910-#0 control port
 61 ay8910-#0 data port
-80 ay8910-#1 controll port
+80 ay8910-#1 control port
 81 ay8910-#1 data port
-   ay8910-A  : NMI controll ?
+   ay8910-A  : NMI control ?
 a0 unknown
 e0 unknown (watch dog?)
 
@@ -171,7 +171,7 @@ int gsword_state::coins_in(void)
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
 READ8_MEMBER(gsword_state::gsword_hack_r)
 {
-	UINT8 data = m_cpu2_ram[offset + 4];
+	uint8_t data = m_cpu2_ram[offset + 4];
 
 	/*if(offset==1)osd_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
 
@@ -274,7 +274,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 		break;
 	}
 	/* bit1= nmi disable , for ram check */
-	logerror("NMI controll %02x\n",data);
+	logerror("NMI control %02x\n",data);
 #endif
 }
 
@@ -875,7 +875,7 @@ ROM_END
 DRIVER_INIT_MEMBER(gsword_state,gsword)
 {
 #if 0
-	UINT8 *ROM2 = memregion("sub")->base();
+	uint8_t *ROM2 = memregion("sub")->base();
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 
 	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
@@ -890,7 +890,7 @@ DRIVER_INIT_MEMBER(gsword_state,gsword)
 DRIVER_INIT_MEMBER(gsword_state,gsword2)
 {
 #if 0
-	UINT8 *ROM2 = memregion("sub")->base();
+	uint8_t *ROM2 = memregion("sub")->base();
 
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 	ROM2[0x726] = 0;    /* patch for sound protection or time out function */

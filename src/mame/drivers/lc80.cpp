@@ -64,9 +64,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lc80_io, AS_IO, 8, lc80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x1f)
-	AM_RANGE(0xf4, 0xf7) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
-	AM_RANGE(0xf8, 0xfb) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
-	AM_RANGE(0xec, 0xef) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
+	AM_RANGE(0x14, 0x17) AM_DEVREADWRITE(Z80PIO1_TAG, z80pio_device, read, write)
+	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE(Z80PIO2_TAG, z80pio_device, read, write)
+	AM_RANGE(0x0c, 0x0f) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -237,7 +237,7 @@ READ8_MEMBER( lc80_state::pio2_pb_r )
 
 	*/
 
-	UINT8 data = 0xf0;
+	uint8_t data = 0xf0;
 	int i;
 
 	for (i = 0; i < 6; i++)
@@ -272,7 +272,7 @@ void lc80_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT8 *ROM = memregion(Z80_TAG)->base();
+	uint8_t *ROM = memregion(Z80_TAG)->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entry(0, &ROM[0]); // TODO

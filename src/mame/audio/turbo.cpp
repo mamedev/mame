@@ -76,7 +76,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 #if (!DISCRETE_TEST)
 #endif
 #if (!DISCRETE_TEST)
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 #endif
 	m_sound_state[0] = data;
 
@@ -124,7 +124,7 @@ WRITE8_MEMBER(turbo_state::turbo_sound_a_w)
 
 WRITE8_MEMBER(turbo_state::turbo_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* ACC0-ACC5 */
@@ -294,7 +294,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_a_w)
 }
 
 
-inline void turbo_state::subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 dir)
+inline void turbo_state::subroc3d_update_volume(int leftchan, uint8_t dis, uint8_t dir)
 {
 	float volume = (float)(15 - dis) / 16.0f;
 	float lvol, rvol;
@@ -316,7 +316,7 @@ inline void turbo_state::subroc3d_update_volume(int leftchan, UINT8 dis, UINT8 d
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* bit 0 latches direction/volume for missile */
@@ -370,7 +370,7 @@ WRITE8_MEMBER(turbo_state::subroc3d_sound_b_w)
 
 WRITE8_MEMBER(turbo_state::subroc3d_sound_c_w)
 {
-	UINT8 diff = data ^ m_sound_state[2];
+	uint8_t diff = data ^ m_sound_state[2];
 	m_sound_state[2] = data;
 
 	/* /FIRE TRIG */
@@ -486,7 +486,7 @@ void turbo_state::buckrog_update_samples()
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 {
-	UINT8 diff = data ^ m_sound_state[0];
+	uint8_t diff = data ^ m_sound_state[0];
 	m_sound_state[0] = data;
 
 	/* clock HIT DIS from bits 0-2 */
@@ -510,7 +510,7 @@ WRITE8_MEMBER(turbo_state::buckrog_sound_a_w)
 
 WRITE8_MEMBER(turbo_state::buckrog_sound_b_w)
 {
-	UINT8 diff = data ^ m_sound_state[1];
+	uint8_t diff = data ^ m_sound_state[1];
 	m_sound_state[1] = data;
 
 	/* /ALARM3: channel 0 */

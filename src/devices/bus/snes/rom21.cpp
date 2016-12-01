@@ -19,19 +19,19 @@ const device_type SNS_HIROM = &device_creator<sns_rom21_device>;
 const device_type SNS_HIROM_SRTC = &device_creator<sns_rom21_srtc_device>;
 
 
-sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom21_device::sns_rom21_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_sns_cart_interface( mconfig, *this )
 {
 }
 
-sns_rom21_device::sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom21_device::sns_rom21_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, SNS_HIROM, "SNES Cart (HiROM)", tag, owner, clock, "sns_rom21", __FILE__),
 						device_sns_cart_interface( mconfig, *this )
 {
 }
 
-sns_rom21_srtc_device::sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom21_srtc_device::sns_rom21_srtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: sns_rom21_device(mconfig, SNS_HIROM_SRTC, "SNES Cart (HiROM) + S-RTC", tag, owner, clock, "sns_rom21_srtc", __FILE__), m_mode(0), m_index(0)
 				{
 }
@@ -94,7 +94,7 @@ READ8_MEMBER(sns_rom21_device::read_h)
 
  ***************************************************************************/
 
-static const UINT8 srtc_months[12] =
+static const uint8_t srtc_months[12] =
 {
 	31, 28, 31,
 	30, 31, 30,
@@ -124,10 +124,10 @@ void sns_rom21_srtc_device::update_time()
 // Returns day-of-week for specified date
 // e.g. 0 = Sunday, 1 = Monday, ... 6 = Saturday
 // Usage: weekday(2008, 1, 1) returns the weekday of January 1st, 2008
-UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day )
+uint8_t sns_rom21_srtc_device::srtc_weekday( uint32_t year, uint32_t month, uint32_t day )
 {
-	UINT32 y = 1900, m = 1; // Epoch is 1900-01-01
-	UINT32 sum = 0;         // Number of days passed since epoch
+	uint32_t y = 1900, m = 1; // Epoch is 1900-01-01
+	uint32_t sum = 0;         // Number of days passed since epoch
 
 	year = std::max(1900U, year);
 	month = std::max(1U, std::min(12U, month));
@@ -135,7 +135,7 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 
 	while (y < year)
 	{
-		UINT8 leapyear = 0;
+		uint8_t leapyear = 0;
 		if ((y % 4) == 0)
 		{
 			leapyear = 1;
@@ -150,10 +150,10 @@ UINT8 sns_rom21_srtc_device::srtc_weekday( UINT32 year, UINT32 month, UINT32 day
 
 	while (m < month)
 	{
-		UINT32 days = srtc_months[m - 1];
+		uint32_t days = srtc_months[m - 1];
 		if (days == 28)
 		{
-			UINT8 leapyear = 0;
+			uint8_t leapyear = 0;
 			if ((y % 4) == 0)
 			{
 				leapyear = 1;
@@ -225,9 +225,9 @@ WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 			if (m_index == 12)
 			{
 				// Day of week is automatically calculated and written
-				UINT32 day   = m_rtc_ram[6] + m_rtc_ram[7] * 10;
-				UINT32 month = m_rtc_ram[8];
-				UINT32 year  = m_rtc_ram[9] + m_rtc_ram[10] * 10 + m_rtc_ram[11] * 100;
+				uint32_t day   = m_rtc_ram[6] + m_rtc_ram[7] * 10;
+				uint32_t month = m_rtc_ram[8];
+				uint32_t year  = m_rtc_ram[9] + m_rtc_ram[10] * 10 + m_rtc_ram[11] * 100;
 				year += 1000;
 
 				m_rtc_ram[m_index++] = srtc_weekday(year, month, day);
@@ -243,7 +243,7 @@ WRITE8_MEMBER(sns_rom21_srtc_device::chip_write)
 		}
 		else if (data == 4)
 		{
-			UINT8 i;
+			uint8_t i;
 			m_mode = RTCM_Ready;
 			m_index = -1;
 			for(i = 0; i < 13; i++)

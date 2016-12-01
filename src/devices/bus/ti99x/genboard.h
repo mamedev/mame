@@ -21,6 +21,7 @@
 #include "machine/at29x.h"
 #include "bus/ti99_peb/peribox.h"
 #include "sound/sn76496.h"
+#include "machine/ram.h"
 
 extern const device_type GENEVE_MOUSE;
 extern const device_type GENEVE_KEYBOARD;
@@ -31,7 +32,7 @@ extern const device_type GENEVE_MAPPER;
 class geneve_mouse_device : public device_t
 {
 public:
-	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void poll();
 	line_state  left_button();  // left button is not connected to the V9938 but to a TMS9901 pin
 
@@ -59,11 +60,11 @@ private:
 class geneve_keyboard_device : public device_t
 {
 public:
-	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_WRITE_LINE_MEMBER( reset_line );
 	DECLARE_WRITE_LINE_MEMBER( send_scancodes );
 	DECLARE_WRITE_LINE_MEMBER( clock_control );
-	UINT8 get_recent_key();
+	uint8_t get_recent_key();
 
 	template<class _Object> static devcb_base &static_set_int_callback(device_t &device, _Object object) { return downcast<geneve_keyboard_device &>(device).m_interrupt.set_callback(object); }
 
@@ -81,10 +82,10 @@ private:
 
 	bool    m_key_reset;
 	int     m_key_queue_length;
-	UINT8   m_key_queue[KEYQUEUESIZE];
+	uint8_t   m_key_queue[KEYQUEUESIZE];
 	int     m_key_queue_head;
 	bool    m_key_in_buffer;
-	UINT32  m_key_state_save[4];
+	uint32_t  m_key_state_save[4];
 	bool    m_key_numlock_state;
 
 	int     m_key_ctrl_state;
@@ -111,7 +112,7 @@ private:
 class geneve_mapper_device : public device_t
 {
 public:
-	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	geneve_mapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void set_geneve_mode(bool geneve);
 	void set_direct_mode(bool direct);
 	void set_cartridge_size(int size);
@@ -202,18 +203,18 @@ private:
 	int     m_ext_waitcount;
 
 	// Devices
-	mm58274c_device*        m_clock;
-	tms9995_device*         m_cpu;
-	at29c040_device*         m_pfm512;
-	at29c040a_device*        m_pfm512a;
-	sn76496_base_device*    m_sound;
+	required_device<mm58274c_device>     m_clock;
+	required_device<tms9995_device>      m_cpu;
+	required_device<at29c040_device>     m_pfm512;
+	required_device<at29c040a_device>    m_pfm512a;
+	required_device<sn76496_base_device> m_sound;
 
-	geneve_keyboard_device* m_keyboard;
-	v9938_device*           m_video;
-	peribox_device*          m_peribox;
-	UINT8*                  m_eprom;
-	UINT8*                  m_sram;
-	UINT8*                  m_dram;
+	required_device<geneve_keyboard_device> m_keyboard;
+	required_device<v9938_device>           m_video;
+	required_device<peribox_device>         m_peribox;
+	uint8_t*                  m_eprom;
+	required_device<ram_device> m_sram;
+	required_device<ram_device> m_dram;
 };
 
 #define MCFG_GENEVE_READY_HANDLER( _intcallb ) \

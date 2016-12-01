@@ -105,8 +105,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port06_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(dauphin_c);
 private:
-	UINT8 m_cass_data;
-	UINT8 m_last_key;
+	uint8_t m_cass_data;
+	uint8_t m_last_key;
 	bool m_cass_state;
 	bool m_cassold;
 	bool m_speaker_state;
@@ -138,18 +138,18 @@ WRITE8_MEMBER( dauphin_state::port06_w )
 
 READ8_MEMBER( dauphin_state::port07_r )
 {
-	UINT8 keyin, i, data = 0x40;
+	uint8_t keyin, i, data = 0x40;
 
 	keyin = ioport("X0")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc0;
 
 	keyin = ioport("X1")->read();
 	if (keyin != 0xff)
 		for (i = 0; i < 8; i++)
-			if BIT(~keyin, i)
+			if (BIT(~keyin, i))
 				data = i | 0xc8;
 
 	if (data == m_last_key)

@@ -186,7 +186,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *epson_ex800_t::device_rom_region() const
+const tiny_rom_entry *epson_ex800_t::device_rom_region() const
 {
 	return ROM_NAME( ex800 );
 }
@@ -357,7 +357,7 @@ ioport_constructor epson_ex800_t::device_input_ports() const
 //  epson_ex800_t - constructor
 //-------------------------------------------------
 
-epson_ex800_t::epson_ex800_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_ex800_t::epson_ex800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_EX800, "Epson EX-800", tag, owner, clock, "ex800", __FILE__),
 	device_centronics_peripheral_interface(mconfig, *this),
 	m_maincpu(*this, "maincpu"),

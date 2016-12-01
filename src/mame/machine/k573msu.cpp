@@ -71,7 +71,7 @@
 
 */
 
-k573msu_device::k573msu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+k573msu_device::k573msu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, KONAMI_573_MULTI_SESSION_UNIT, "Konami 573 Multi Session Unit", tag, owner, clock, "k573msu", __FILE__)
 {
 }
@@ -88,7 +88,7 @@ ROM_START( k573msu )
 	ROM_LOAD( "m48t58y.6t",   0x000000, 0x002000, CRC(609ef020) SHA1(71b87c8b25b9613b4d4511c53d0a3a3aacf1499d) )
 ROM_END
 
-const rom_entry *k573msu_device::device_rom_region() const
+const tiny_rom_entry *k573msu_device::device_rom_region() const
 {
 	return ROM_NAME( k573msu );
 }

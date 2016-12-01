@@ -279,12 +279,11 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	// memm variant interface
-	DECLARE_WRITE16_MEMBER(key_w);
+	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(range_r);
 	DECLARE_WRITE16_MEMBER(bank_w);
 
 	// memn variant interface
-	DECLARE_WRITE16_MEMBER(crypto_switch_w);
 	DECLARE_READ16_MEMBER(nand_status_r);
 	DECLARE_WRITE8_MEMBER(nand_address1_w);
 	DECLARE_WRITE8_MEMBER(nand_address2_w);
@@ -305,8 +304,8 @@ public:
 	DECLARE_READ16_MEMBER (sprot_r);
 	DECLARE_WRITE16_MEMBER(sprot_w);
 
-	UINT8 *nand_base;
-	void nand_copy( UINT32 *dst, UINT32 address, int len );
+	uint8_t *nand_base;
+	void nand_copy( uint32_t *dst, uint32_t address, int len );
 
 private:
 	enum {
@@ -315,21 +314,20 @@ private:
 		I2CP_RECIEVE_ACK_1,
 		I2CP_RECIEVE_ACK_0
 	};
-	UINT16 key;
-	UINT8  cnt;
-	UINT32 bank_base;
-	UINT32 nand_address;
-	UINT16 block[0x1ff];
+
+	uint32_t bank_base;
+	uint32_t nand_address;
+	uint16_t block[0x1ff];
 	ns10_decrypter_device* decrypter;
 
-	UINT16 i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
+	uint16_t i2c_host_clock, i2c_host_data, i2c_dev_clock, i2c_dev_data, i2c_prev_clock, i2c_prev_data;
 	int i2cp_mode;
-	UINT8 i2c_byte;
+	uint8_t i2c_byte;
 	int i2c_bit;
 
 	int sprot_bit, sprot_byte;
-	UINT16 nand_read( UINT32 address );
-	UINT16 nand_read2( UINT32 address );
+	uint16_t nand_read( uint32_t address );
+	uint16_t nand_read2( uint32_t address );
 
 	void i2c_update();
 public:
@@ -369,55 +367,36 @@ ADDRESS_MAP_END
 // know until the decryption is done.
 //
 // bios copies 62000-37ffff from the flash to 80012000 in ram through the
-// decryption in range_r then jumps there (and dies horribly, of course)
+// decryption in range_r then jumps there
 
-WRITE16_MEMBER(namcos10_state::key_w )
+WRITE16_MEMBER(namcos10_state::crypto_switch_w)
 {
-	key = (data >> 15) | (data << 1);
-	logerror("key_w %04x\n", key);
-	cnt = 0;
+	printf("crypto_switch_w: %04x\n", data);
+	if (decrypter == nullptr)
+		return;
+
+	if (BIT(data, 15) != 0)
+		decrypter->activate(data & 0xf);
+	else
+		decrypter->deactivate();
 }
 
 WRITE16_MEMBER(namcos10_state::bank_w)
 {
-	bank_base = 0x80000 * offset;
+	bank_base = 0x100000 * offset;
 }
 
 READ16_MEMBER(namcos10_state::range_r)
 {
-	UINT32 d16 = ((const UINT16 *)(memregion("maincpu:rom")->base()))[offset+bank_base];
+	uint16_t data = ((const uint16_t *)(memregion("maincpu:rom")->base()))[bank_base+offset];
 
-	/* This is not entirely correct, but not entirely incorrect either...
-	   It's also specific to mrdriller2, it seems.
-	*/
+	if (decrypter == nullptr)
+		return data;
 
-	UINT16 dd16 = d16 ^ key;
-
-	key = d16;
-
-	key =
-		//((    BIT(d16,  3) ^ (BIT(cnt, 0) & !BIT(cnt, 2))) << 15) |
-		((1 ^ BIT(key,  3) ^  BIT(d16, 0))                 << 15) |
-		((1 ^ BIT(key, 13) ^  BIT(cnt, 0))                 << 14) |
-		((1 ^ BIT(key, 11) ^  BIT(d16, 5) ^  BIT(d16, 2))  << 13) |
-		((    BIT(key,  9) ^  BIT(cnt, 3))                 << 12) |
-		((1 ^ BIT(key,  2))                                << 11) |
-		((    BIT(key, 10) ^ (BIT(d16, 4) &  BIT(cnt, 1))) << 10) |
-		((1 ^ BIT(key,  6) ^  BIT(cnt, 4))                 <<  9) |
-		((1 ^ BIT(d16,  6) ^  BIT(key, 5))                 <<  8) |
-		((    BIT(key,  1) ^ (BIT(d16, 5) |  BIT(d16, 4))) <<  7) |
-		((    BIT(key, 15))                                <<  6) |
-		((1 ^ BIT(key,  4) ^  BIT(cnt, 3) ^  BIT(d16, 2))  <<  5) |
-		((1 ^ BIT(key,  7) ^  BIT(cnt, 5))                 <<  4) |
-		((1 ^ BIT(key,  8) ^ (BIT(cnt, 7) |  BIT(d16, 3))) <<  3) |
-		((    BIT(key, 14) ^ (BIT(cnt, 1) |  BIT(d16, 7))) <<  2) |
-		((1 ^ BIT(key, 12) ^ (BIT(cnt, 7) &  BIT(d16, 7))) <<  1) |
-		//((                   (BIT(cnt, 0) |  BIT(cnt, 2))) <<  0);
-		((1 ^ BIT(key,  0) ^ BIT(cnt, 2))                  <<  0);
-
-	cnt++;
-
-	return dd16;
+	if (decrypter->is_active())
+		return decrypter->decrypt(data);
+	else
+		return data;
 }
 
 READ16_MEMBER(namcos10_state::control_r)
@@ -453,13 +432,13 @@ READ16_MEMBER(namcos10_state::sprot_r)
 	// If line 3 has 0x30/0x31 in it, something happens.  That
 	// something currently kills the system though.
 
-	const static UINT8 prot[0x40] = {
+	const static uint8_t prot[0x40] = {
 		0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f,
 		0x20, 0x21, 0x22, 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29, 0x2a, 0x2b, 0x2c, 0x2d, 0x2e, 0x2f,
 		0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51, 0x50, 0x51,
 		0x40, 0x41, 0x42, 0x43, 0x44, 0x45, 0x46, 0x47, 0x48, 0x49, 0x4a, 0x4b, 0x4c, 0x4d, 0x4e, 0x4f,
 	};
-	UINT16 res = sprot_byte >= 0x20 ? 0x3 :
+	uint16_t res = sprot_byte >= 0x20 ? 0x3 :
 		(((prot[sprot_byte     ] >> sprot_bit) & 1) ? 1 : 0) |
 		(((prot[sprot_byte+0x20] >> sprot_bit) & 1) ? 2 : 0);
 
@@ -473,7 +452,7 @@ READ16_MEMBER(namcos10_state::sprot_r)
 
 READ16_MEMBER(namcos10_state::i2c_clock_r)
 {
-	UINT16 res = i2c_dev_clock & i2c_host_clock & 1;
+	uint16_t res = i2c_dev_clock & i2c_host_clock & 1;
 	//  logerror("i2c_clock_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
@@ -488,7 +467,7 @@ WRITE16_MEMBER(namcos10_state::i2c_clock_w)
 
 READ16_MEMBER(namcos10_state::i2c_data_r)
 {
-	UINT16 res = i2c_dev_data & i2c_host_data & 1;
+	uint16_t res = i2c_dev_data & i2c_host_data & 1;
 	//  logerror("i2c_data_r %d (%x)\n", res, space.device().safe_pc());
 	return res;
 }
@@ -503,8 +482,8 @@ WRITE16_MEMBER(namcos10_state::i2c_data_w)
 
 void namcos10_state::i2c_update()
 {
-	UINT16 clock = i2c_dev_clock & i2c_host_clock & 1;
-	UINT16 data = i2c_dev_data & i2c_host_data & 1;
+	uint16_t clock = i2c_dev_clock & i2c_host_clock & 1;
+	uint16_t data = i2c_dev_data & i2c_host_data & 1;
 
 	if(i2c_prev_data == data && i2c_prev_clock == clock)
 		return;
@@ -556,7 +535,7 @@ void namcos10_state::i2c_update()
 }
 
 static ADDRESS_MAP_START( namcos10_memm_map, AS_PROGRAM, 32, namcos10_state )
-	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(key_w, 0x0000ffff)
+	AM_RANGE(0x1f300000, 0x1f300003) AM_WRITE16(crypto_switch_w, 0x0000ffff)
 	AM_RANGE(0x1f400000, 0x1f5fffff) AM_READ16(range_r, 0xffffffff)
 	AM_RANGE(0x1fb40000, 0x1fb4000f) AM_WRITE16(bank_w, 0xffffffff)
 
@@ -568,18 +547,6 @@ ADDRESS_MAP_END
 //
 // Block access to the nand.  Something strange is going on with the
 // status port.  Interaction with the decryption is unclear at best.
-
-WRITE16_MEMBER(namcos10_state::crypto_switch_w)
-{
-	printf("crypto_switch_w: %04x\n", data);
-	if (decrypter == nullptr)
-		return;
-
-	if (BIT(data, 15) != 0)
-		decrypter->activate(data & 0xf);
-	else
-		decrypter->deactivate();
-}
 
 READ16_MEMBER(namcos10_state::nand_status_r )
 {
@@ -610,13 +577,13 @@ WRITE8_MEMBER( namcos10_state::nand_address4_w )
 	logerror("nand_a4_w %08x (%08x) -> %08x\n", data, space.device().safe_pc(), nand_address*2);
 }
 
-UINT16 namcos10_state::nand_read( UINT32 address )
+uint16_t namcos10_state::nand_read( uint32_t address )
 {
 	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
 	return nand_base[ index ] | ( nand_base[ index + 1 ] << 8 );
 }
 
-UINT16 namcos10_state::nand_read2( UINT32 address )
+uint16_t namcos10_state::nand_read2( uint32_t address )
 {
 	int index = ( ( address / 512 ) * 528 ) + ( address % 512 );
 	return nand_base[ index + 1 ] | ( nand_base[ index ] << 8 );
@@ -624,7 +591,7 @@ UINT16 namcos10_state::nand_read2( UINT32 address )
 
 READ16_MEMBER( namcos10_state::nand_data_r )
 {
-	UINT16 data = nand_read2( nand_address * 2 );
+	uint16_t data = nand_read2( nand_address * 2 );
 
 	//  logerror("read %08x = %04x\n", nand_address*2, data);
 	// printf("read %08x = %04x\n", nand_address*2, data);
@@ -642,7 +609,7 @@ READ16_MEMBER( namcos10_state::nand_data_r )
 		return data;
 }
 
-void namcos10_state::nand_copy( UINT32 *dst, UINT32 address, int len )
+void namcos10_state::nand_copy( uint32_t *dst, uint32_t address, int len )
 {
 	while( len > 0 )
 	{
@@ -678,19 +645,19 @@ ADDRESS_MAP_END
 
 void namcos10_state::memn_driver_init(  )
 {
-	UINT8 *BIOS = (UINT8 *)memregion( "maincpu:rom" )->base();
-	nand_base = (UINT8 *)memregion( "user2" )->base();
+	uint8_t *BIOS = (uint8_t *)memregion( "maincpu:rom" )->base();
+	nand_base = (uint8_t *)memregion( "user2" )->base();
 	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 
-	nand_copy( (UINT32 *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
-	nand_copy( (UINT32 *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
+	nand_copy( (uint32_t *)( BIOS + 0x0000000 ), 0x08000, 0x001c000 );
+	nand_copy( (uint32_t *)( BIOS + 0x0020000 ), 0x24000, 0x03e0000 );
 }
 
 static void decrypt_bios( running_machine &machine, const char *regionName, int start, int end, int b15, int b14, int b13, int b12, int b11, int b10, int b9, int b8,
 	int b7, int b6, int b5, int b4, int b3, int b2, int b1, int b0 )
 {
 	memory_region *region = machine.root_device().memregion( regionName );
-	UINT16 *BIOS = (UINT16 *)( region->base() + start );
+	uint16_t *BIOS = (uint16_t *)( region->base() + start );
 	int len = (end - start) / 2;
 
 	for( int i = 0; i < len; i++ )
@@ -703,7 +670,10 @@ static void decrypt_bios( running_machine &machine, const char *regionName, int 
 DRIVER_INIT_MEMBER(namcos10_state,mrdrilr2)
 {
 	int regSize = machine().root_device().memregion("maincpu:rom")->bytes();
-	decrypt_bios(machine(), "maincpu:rom", 0, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+
+	decrypt_bios(machine(), "maincpu:rom", 0, 0x62000, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+	decrypt_bios(machine(), "maincpu:rom", 0x380000, regSize, 0xc, 0xd, 0xf, 0xe, 0xb, 0xa, 0x9, 0x8, 0x7, 0x6, 0x4, 0x1, 0x2, 0x5, 0x0, 0x3);
+	decrypter = static_cast<ns10_decrypter_device*>(machine().root_device().subdevice("decrypter"));
 }
 
 DRIVER_INIT_MEMBER(namcos10_state,gjspace)
@@ -847,6 +817,11 @@ static MACHINE_CONFIG_START( namcos10_memn, namcos10_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED(ns10_mrdrilr2, namcos10_memm)
+/* decrypter device (CPLD in hardware?) */
+MCFG_DEVICE_ADD("decrypter", MRDRILR2_DECRYPTER, 0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(ns10_chocovdr, namcos10_memn)
@@ -1077,8 +1052,8 @@ ROM_START( konotako )
 ROM_END
 
 
-GAME( 2000, mrdrilr2,  0,        namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
-GAME( 2000, mrdrlr2a,  mrdrilr2, namcos10_memm, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrilr2,  0,        ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Japan, DR21 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
+GAME( 2000, mrdrlr2a,  mrdrilr2, ns10_mrdrilr2, namcos10, namcos10_state, mrdrilr2, ROT0, "Namco", "Mr. Driller 2 (Asia, DR22 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND ) // PORT_4WAY joysticks
 GAME( 2000, ptblank3,  0,        namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Point Blank 3 (Asia, GNN2 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2000, gunbalina, ptblank3, namcos10_memn, namcos10, namcos10_state, gunbalna, ROT0, "Namco", "Gunbalina (Japan, GNN1 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2001, gjspace,   0,        ns10_gjspace , namcos10, namcos10_state, gjspace,  ROT0, "Namco / Metro", "Gekitoride-Jong Space (10011 Ver.A)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

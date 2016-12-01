@@ -8,15 +8,15 @@
 
 // internal helpers
 
-inline UINT8 ucom4_cpu_device::ram_r()
+inline uint8_t ucom4_cpu_device::ram_r()
 {
-	UINT16 address = m_dph << 4 | m_dpl;
+	uint16_t address = m_dph << 4 | m_dpl;
 	return m_data->read_byte(address & m_datamask) & 0xf;
 }
 
-inline void ucom4_cpu_device::ram_w(UINT8 data)
+inline void ucom4_cpu_device::ram_w(uint8_t data)
 {
-	UINT16 address = m_dph << 4 | m_dpl;
+	uint16_t address = m_dph << 4 | m_dpl;
 	m_data->write_byte(address & m_datamask, data & 0xf);
 }
 
@@ -105,7 +105,7 @@ void ucom4_cpu_device::op_tla()
 void ucom4_cpu_device::op_xm()
 {
 	// XM X: Exchange ACC with RAM, xor DPh with X
-	UINT8 old_acc = m_acc;
+	uint8_t old_acc = m_acc;
 	m_acc = ram_r();
 	ram_w(old_acc);
 	m_dph ^= (m_op & 0x03);
@@ -468,12 +468,12 @@ enum
 	UCOM43_F
 };
 
-inline UINT8 ucom4_cpu_device::ucom43_reg_r(int index)
+inline uint8_t ucom4_cpu_device::ucom43_reg_r(int index)
 {
 	return m_data->read_byte(m_datamask - index) & 0xf;
 }
 
-inline void ucom4_cpu_device::ucom43_reg_w(int index, UINT8 data)
+inline void ucom4_cpu_device::ucom43_reg_w(int index, uint8_t data)
 {
 	m_data->write_byte(m_datamask - index, data & 0xf);
 }
@@ -527,7 +527,7 @@ void ucom4_cpu_device::op_xaw()
 
 	// XAW: Exchange ACC with W
 	m_icount--;
-	UINT8 old_acc = m_acc;
+	uint8_t old_acc = m_acc;
 	m_acc = ucom43_reg_r(UCOM43_W);
 	ucom43_reg_w(UCOM43_W, old_acc);
 }
@@ -538,7 +538,7 @@ void ucom4_cpu_device::op_xaz()
 
 	// XAZ: Exchange ACC with Z
 	m_icount--;
-	UINT8 old_acc = m_acc;
+	uint8_t old_acc = m_acc;
 	m_acc = ucom43_reg_r(UCOM43_Z);
 	ucom43_reg_w(UCOM43_Z, old_acc);
 }
@@ -549,7 +549,7 @@ void ucom4_cpu_device::op_xhr()
 
 	// XHR: Exchange DPh with R
 	m_icount--;
-	UINT8 old_dph = m_dph;
+	uint8_t old_dph = m_dph;
 	m_dph = ucom43_reg_r(UCOM43_R);
 	ucom43_reg_w(UCOM43_R, old_dph);
 }
@@ -560,7 +560,7 @@ void ucom4_cpu_device::op_xhx()
 
 	// XHX: Exchange DPh with X
 	m_icount--;
-	UINT8 old_dph = m_dph;
+	uint8_t old_dph = m_dph;
 	m_dph = ucom43_reg_r(UCOM43_X);
 	ucom43_reg_w(UCOM43_X, old_dph);
 }
@@ -571,7 +571,7 @@ void ucom4_cpu_device::op_xls()
 
 	// XLS: Exchange DPl with S
 	m_icount--;
-	UINT8 old_dpl = m_dpl;
+	uint8_t old_dpl = m_dpl;
 	m_dpl = ucom43_reg_r(UCOM43_S);
 	ucom43_reg_w(UCOM43_S, old_dpl);
 }
@@ -582,7 +582,7 @@ void ucom4_cpu_device::op_xly()
 
 	// XLY: Exchange DPl with Y
 	m_icount--;
-	UINT8 old_dpl = m_dpl;
+	uint8_t old_dpl = m_dpl;
 	m_dpl = ucom43_reg_r(UCOM43_Y);
 	ucom43_reg_w(UCOM43_Y, old_dpl);
 }
@@ -592,7 +592,7 @@ void ucom4_cpu_device::op_xc()
 	if (!check_op_43()) return;
 
 	// XC: Exchange Carry F/F with Carry Save F/F
-	UINT8 c = m_carry_f;
+	uint8_t c = m_carry_f;
 	m_carry_f = m_carry_s_f;
 	m_carry_s_f = c;
 }
@@ -644,7 +644,7 @@ void ucom4_cpu_device::op_rar()
 	if (!check_op_43()) return;
 
 	// RAR: Rotate ACC Right through Carry F/F
-	UINT8 c = m_acc & 1;
+	uint8_t c = m_acc & 1;
 	m_acc = m_acc >> 1 | m_carry_f << 3;
 	m_carry_f = c;
 }
@@ -657,7 +657,7 @@ void ucom4_cpu_device::op_inm()
 	if (!check_op_43()) return;
 
 	// INM: Increment RAM, skip next on carry
-	UINT8 val = (ram_r() + 1) & 0xf;
+	uint8_t val = (ram_r() + 1) & 0xf;
 	ram_w(val);
 	m_skip = (val == 0);
 }
@@ -667,7 +667,7 @@ void ucom4_cpu_device::op_dem()
 	if (!check_op_43()) return;
 
 	// DEM: Decrement RAM, skip next on carry
-	UINT8 val = (ram_r() - 1) & 0xf;
+	uint8_t val = (ram_r() - 1) & 0xf;
 	ram_w(val);
 	m_skip = (val == 0xf);
 }

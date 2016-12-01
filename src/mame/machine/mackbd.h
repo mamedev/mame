@@ -42,7 +42,7 @@ public:
 	template<class _Object> static devcb_base &set_dataout_handler(device_t &device, _Object object) { return downcast<mackbd_device &>(device).m_dataout_handler.set_callback(object); }
 
 	// construction/destruction
-	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mackbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(p0_r);
 	DECLARE_WRITE8_MEMBER(p0_w);
@@ -59,13 +59,13 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	required_device<cpu_device> m_maincpu;
 
 private:
-	UINT8 p0, p1, p2, data_from_mac, data_to_mac;
+	uint8_t p0, p1, p2, data_from_mac, data_to_mac;
 
 	devcb_write_line m_clkout_handler;
 	devcb_write_line m_dataout_handler;

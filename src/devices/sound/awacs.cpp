@@ -24,7 +24,7 @@ const device_type AWACS = &device_creator<awacs_device>;
 //  awacs_device - constructor
 //-------------------------------------------------
 
-awacs_device::awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+awacs_device::awacs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AWACS, "AWACS", tag, owner, clock, "awacs", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr), m_play_ptr(0), m_buffer_size(0), m_buffer_num(0), m_playback_enable(false), m_dma_space(nullptr), m_dma_offset_0(0), m_dma_offset_1(0), m_timer(nullptr)
 {
@@ -93,15 +93,15 @@ void awacs_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	{
 		for (int i = 0; i < samples; i++)
 		{
-			outL[i] = (INT16)m_dma_space->read_word(offset + m_play_ptr);
-			outR[i] = (INT16)m_dma_space->read_word(offset + m_play_ptr + 2);
+			outL[i] = (int16_t)m_dma_space->read_word(offset + m_play_ptr);
+			outR[i] = (int16_t)m_dma_space->read_word(offset + m_play_ptr + 2);
 			m_play_ptr += 4;
 		}
 
 		// out of buffer?
 		if (m_play_ptr >= m_buffer_size)
 		{
-			UINT8 bufflag[2] = { 0x40, 0x80 };
+			uint8_t bufflag[2] = { 0x40, 0x80 };
 
 			m_regs[0x18] |= bufflag[m_buffer_num];
 			m_buffer_num ^= 1;

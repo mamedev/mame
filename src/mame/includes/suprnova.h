@@ -6,17 +6,17 @@
 
 struct hit_t
 {
-	UINT16 x1p, y1p, z1p, x1s, y1s, z1s;
-	UINT16 x2p, y2p, z2p, x2s, y2s, z2s;
-	UINT16 org;
+	uint16_t x1p, y1p, z1p, x1s, y1s, z1s;
+	uint16_t x2p, y2p, z2p, x2s, y2s, z2s;
+	uint16_t org;
 
-	UINT16 x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
-	UINT16 x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
-	UINT16 x1tox2, y1toy2, z1toz2;
-	INT16 x_in, y_in, z_in;
-	UINT16 flag;
+	uint16_t x1_p1, x1_p2, y1_p1, y1_p2, z1_p1, z1_p2;
+	uint16_t x2_p1, x2_p2, y2_p1, y2_p2, z2_p1, z2_p2;
+	uint16_t x1tox2, y1toy2, z1toz2;
+	int16_t x_in, y_in, z_in;
+	uint16_t flag;
 
-	UINT8 disconnect;
+	uint8_t disconnect;
 };
 
 
@@ -46,17 +46,17 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT32> m_spriteram;
-	required_shared_ptr<UINT32> m_spc_regs;
-	required_shared_ptr<UINT32> m_v3_regs;
-	required_shared_ptr<UINT32> m_tilemapA_ram;
-	required_shared_ptr<UINT32> m_tilemapB_ram;
-	required_shared_ptr<UINT32> m_v3slc_ram;
-	required_shared_ptr<UINT32> m_pal_regs;
-	required_shared_ptr<UINT32> m_palette_ram;
-	required_shared_ptr<UINT32> m_v3t_ram;
-	required_shared_ptr<UINT32> m_main_ram;
-	required_shared_ptr<UINT32> m_cache_ram;
+	required_shared_ptr<uint32_t> m_spriteram;
+	required_shared_ptr<uint32_t> m_spc_regs;
+	required_shared_ptr<uint32_t> m_v3_regs;
+	required_shared_ptr<uint32_t> m_tilemapA_ram;
+	required_shared_ptr<uint32_t> m_tilemapB_ram;
+	required_shared_ptr<uint32_t> m_v3slc_ram;
+	required_shared_ptr<uint32_t> m_pal_regs;
+	required_shared_ptr<uint32_t> m_palette_ram;
+	required_shared_ptr<uint32_t> m_v3t_ram;
+	required_shared_ptr<uint32_t> m_main_ram;
+	required_shared_ptr<uint32_t> m_cache_ram;
 
 	hit_t m_hit;
 	bitmap_ind16 m_sprite_bitmap;
@@ -68,18 +68,18 @@ public:
 	int m_depthB;
 	int m_use_spc_bright;
 	int m_use_v3_bright;
-	UINT8 m_bright_spc_b;
-	UINT8 m_bright_spc_g;
-	UINT8 m_bright_spc_r;
-	UINT8 m_bright_spc_b_trans;
-	UINT8 m_bright_spc_g_trans;
-	UINT8 m_bright_spc_r_trans;
-	UINT8 m_bright_v3_b;
-	UINT8 m_bright_v3_g;
-	UINT8 m_bright_v3_r;
-	UINT8 m_bright_v3_b_trans;
-	UINT8 m_bright_v3_g_trans;
-	UINT8 m_bright_v3_r_trans;
+	uint8_t m_bright_spc_b;
+	uint8_t m_bright_spc_g;
+	uint8_t m_bright_spc_r;
+	uint8_t m_bright_spc_b_trans;
+	uint8_t m_bright_spc_g_trans;
+	uint8_t m_bright_spc_r_trans;
+	uint8_t m_bright_v3_b;
+	uint8_t m_bright_v3_g;
+	uint8_t m_bright_v3_r;
+	uint8_t m_bright_v3_b_trans;
+	uint8_t m_bright_v3_g_trans;
+	uint8_t m_bright_v3_r_trans;
 	int m_spc_changed;
 	int m_v3_changed;
 	int m_palette_updated;
@@ -87,8 +87,8 @@ public:
 	int m_alt_enable_sprites;
 	tilemap_t *m_tilemap_A;
 	tilemap_t *m_tilemap_B;
-	UINT8 *m_btiles;
-	UINT8 m_region;
+	uint8_t *m_btiles;
+	uint8_t m_region;
 
 	DECLARE_WRITE32_MEMBER(hit_w);
 	DECLARE_WRITE32_MEMBER(hit2_w);
@@ -150,15 +150,15 @@ public:
 
 	TILE_GET_INFO_MEMBER(get_tilemap_A_tile_info);
 	TILE_GET_INFO_MEMBER(get_tilemap_B_tile_info);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
-	void draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram);
-	void palette_set_rgb_brightness (int offset, UINT8 brightness_r, UINT8 brightness_g, UINT8 brightness_b);
+	void draw_roz(bitmap_ind16 &bitmap, bitmap_ind8& bitmapflags, const rectangle &cliprect, tilemap_t *tmap, uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, uint32_t* scrollram);
+	void palette_set_rgb_brightness (int offset, uint8_t brightness_r, uint8_t brightness_g, uint8_t brightness_b);
 	void palette_update();
 	void draw_a( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran );
 	void draw_b( bitmap_ind16 &bitmap, bitmap_ind8 &bitmap_flags, const rectangle &cliprect, int tran );
 	void hit_recalc();
 	void init_drc();
-	void set_drc_pcflush(UINT32 addr);
+	void set_drc_pcflush(uint32_t addr);
 };

@@ -88,11 +88,11 @@ public:
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
 	required_device<input_merger_active_high_device> m_irqs;
-	required_shared_ptr<UINT16> m_p_scrollram;
-	required_shared_ptr<UINT16> m_p_paletteram;
+	required_shared_ptr<uint16_t> m_p_scrollram;
+	required_shared_ptr<uint16_t> m_p_paletteram;
 	required_device<palette_device> m_palette;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
@@ -109,7 +109,7 @@ public:
 //  VIDEO
 //**************************************************************************
 
-UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
@@ -120,7 +120,7 @@ UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			UINT16 data = program.read_word(addr);
+			uint16_t data = program.read_word(addr);
 
 			if (m_40_80)
 			{
@@ -160,7 +160,7 @@ READ16_MEMBER( f1_state::palette_r )
 
 WRITE16_MEMBER( f1_state::palette_w )
 {
-	UINT8 i,r,g,b;
+	uint8_t i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus

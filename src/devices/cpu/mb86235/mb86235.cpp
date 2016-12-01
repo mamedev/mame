@@ -39,7 +39,7 @@ void mb86235_cpu_device::mb86235_illegal()
 /* Execute cycles */
 void mb86235_cpu_device::execute_run()
 {
-	UINT32 opcode;
+	uint32_t opcode;
 
 	do
 	{
@@ -68,7 +68,8 @@ void mb86235_cpu_device::device_start()
 
 	// Register state for debugger
 	//state_add( CP1610_R0, "PC", m_pc ).formatstr("%02X");
-	state_add( STATE_GENPC, "curpc", m_pc ).noshow();
+	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_flags ).noshow();
 
 	m_icountptr = &m_icount;
@@ -101,7 +102,7 @@ void mb86235_cpu_device::execute_set_input(int irqline, int state)
 }
 #endif
 
-mb86235_cpu_device::mb86235_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mb86235_cpu_device::mb86235_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, MB86235, "MB86235", tag, owner, clock, "mb86235", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 64, 32, -3)
 {
@@ -122,8 +123,8 @@ void mb86235_cpu_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-offs_t mb86235_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t mb86235_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mb86235 );
-	return CPU_DISASSEMBLE_NAME(mb86235)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(mb86235)(this, stream, pc, oprom, opram, options);
 }

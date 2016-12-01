@@ -27,7 +27,7 @@
 
 const device_type INTV_ROM_ECS = &device_creator<intv_ecs_device>;
 
-intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+intv_ecs_device::intv_ecs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: intv_rom_device(mconfig, INTV_ROM_ECS, "Intellivision ECS Expansion", tag, owner, clock, "intv_ecs", __FILE__),
 					m_snd(*this, "ay8914"),
 					m_subslot(*this, "subslot"),
@@ -120,7 +120,7 @@ ROM_START( ecs )
 	ROM_LOAD16_WORD_SWAP( "ecs_rom.e0", 0x1c000, 0x2000, CRC(c2ebcd90) SHA1(b3c14955f56c57e6f0d8fbb695771946cfcf6582))
 ROM_END
 
-const rom_entry *intv_ecs_device::device_rom_region() const
+const tiny_rom_entry *intv_ecs_device::device_rom_region() const
 {
 	return ROM_NAME( ecs );
 }

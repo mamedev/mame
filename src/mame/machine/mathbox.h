@@ -19,7 +19,7 @@
 class mathbox_device : public device_t
 {
 public:
-	mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mathbox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( go_w );
 	DECLARE_READ8_MEMBER( status_r );
@@ -36,10 +36,10 @@ protected:
 	// internal state
 
 	/* math box scratch registers */
-	INT16 m_reg[16];
+	int16_t m_reg[16];
 
 	/* math box result */
-	INT16 m_result;
+	int16_t m_result;
 };
 
 extern const device_type MATHBOX;

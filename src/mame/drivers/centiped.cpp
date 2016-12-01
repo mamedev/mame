@@ -502,7 +502,7 @@ WRITE8_MEMBER(centiped_state::irq_ack_w)
 
 inline int centiped_state::read_trackball(int idx, int switch_port)
 {
-	UINT8 newpos;
+	uint8_t newpos;
 	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 	static const char *const tracknames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
@@ -546,7 +546,7 @@ READ8_MEMBER(centiped_state::milliped_IN1_r)
 
 READ8_MEMBER(centiped_state::milliped_IN2_r)
 {
-	UINT8 data = ioport("IN2")->read();
+	uint8_t data = ioport("IN2")->read();
 
 	/* MSH - 15 Feb, 2007
 	 * The P2 X Joystick inputs are not properly handled in
@@ -558,7 +558,7 @@ READ8_MEMBER(centiped_state::milliped_IN2_r)
 	if (m_control_select != 0)
 	{
 		/* Bottom 4 bits is our joystick inputs */
-		UINT8 joy2data = ioport("IN3")->read() & 0x0f;
+		uint8_t joy2data = ioport("IN3")->read() & 0x0f;
 		data = data & 0xf0; /* Keep the top 4 bits */
 		data |= (joy2data & 0x0a) >> 1; /* flip left and up */
 		data |= (joy2data & 0x05) << 1; /* flip right and down */
@@ -2168,8 +2168,8 @@ DRIVER_INIT_MEMBER(centiped_state,bullsdrt)
 
 DRIVER_INIT_MEMBER(centiped_state,multiped)
 {
-	UINT8 *src = memregion("user1")->base();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *src = memregion("user1")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 
 	// descramble rom and put in maincpu region
 	for (int i = 0; i < 0x10000; i++)

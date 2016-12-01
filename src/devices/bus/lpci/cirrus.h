@@ -20,10 +20,10 @@ class cirrus_device : public device_t,
 {
 public:
 		// construction/destruction
-	cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual UINT32 pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask) override;
-	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask) override;
+	virtual uint32_t pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask) override;
+	virtual void pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask) override;
 
 	DECLARE_WRITE8_MEMBER( cirrus_42E8_w );
 

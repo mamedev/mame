@@ -326,7 +326,7 @@ READ8_MEMBER( m5_state::sts_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// cassette input
 	data |= m_cassette->input() >= 0 ? 1 : 0;
@@ -1222,13 +1222,15 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 void m5_state::machine_start()
 {
+	m_cart_ram = nullptr;
+	m_cart = nullptr;
+
 	// register for state saving
 	save_item(NAME(m_fd5_data));
 	save_item(NAME(m_fd5_com));
 	save_item(NAME(m_intra));
 	save_item(NAME(m_ibfa));
 	save_item(NAME(m_obfa));
-
 }
 
 void m5_state::machine_reset()
@@ -1240,26 +1242,28 @@ void m5_state::machine_reset()
 	if (m_cart1->exists())
 	{
 		if (m_cart1->get_type() > 0)
-			m_cart_ram=m_cart1;
+			m_cart_ram = m_cart1;
 		else
-			m_cart=m_cart1;
+			m_cart = m_cart1;
 	}
+
 	if (m_cart2->exists())
 	{
 		if (m_cart2->get_type() > 0)
-			m_cart_ram=m_cart2;
+			m_cart_ram = m_cart2;
 		else
-			m_cart=m_cart2;
+			m_cart = m_cart2;
 	}
+
 	// no cart inserted - there is nothing to do - not allowed in original Sord m5
 	if (m_cart_ram == nullptr && m_cart == nullptr)
-		{
-			membank("bank1r")->set_base(memregion(Z80_TAG)->base());
-			program.unmap_write(0x0000, 0x1fff);
-		//  program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on real hw
-			program.unmap_readwrite(0x8000, 0xffff);
-			return;
-		}
+	{
+		membank("bank1r")->set_base(memregion(Z80_TAG)->base());
+		program.unmap_write(0x0000, 0x1fff);
+	//  program.unmap_readwrite(0x2000, 0x6fff); //if you uncomment this line Sord starts cassette loading but it is not correct on real hw
+		program.unmap_readwrite(0x8000, 0xffff);
+		return;
+	}
 
 	//cart is ram module
 	if (m_cart_ram)

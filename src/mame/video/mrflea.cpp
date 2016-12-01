@@ -44,8 +44,8 @@ WRITE8_MEMBER(mrflea_state::mrflea_spriteram_w)
 void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	const UINT8 *source = m_spriteram;
-	const UINT8 *finish = source + 0x100;
+	const uint8_t *source = m_spriteram;
+	const uint8_t *finish = source + 0x100;
 	rectangle clip = m_screen->visible_area();
 
 	clip.max_x -= 24;
@@ -73,7 +73,7 @@ void mrflea_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect
 
 void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *source = m_videoram;
+	const uint8_t *source = m_videoram;
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int sx, sy;
 	int base = 0;
@@ -100,7 +100,7 @@ void mrflea_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-UINT32 mrflea_state::screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mrflea_state::screen_update_mrflea(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);

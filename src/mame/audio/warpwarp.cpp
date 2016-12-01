@@ -18,7 +18,7 @@
 
 const device_type WARPWARP = &device_creator<warpwarp_sound_device>;
 
-warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, WARPWARP, "Warp Warp Audio Custom", tag, owner, clock, "warpwarp_sound", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_decay(nullptr),
@@ -48,10 +48,10 @@ warpwarp_sound_device::warpwarp_sound_device(const machine_config &mconfig, cons
 
 void warpwarp_sound_device::device_start()
 {
-	m_decay = std::make_unique<INT16[]>(32768);
+	m_decay = std::make_unique<int16_t[]>(32768);
 
 	for (int i = 0; i < 0x8000; i++)
-		m_decay[0x7fff - i] = (INT16) (0x7fff/exp(1.0*i/4096));
+		m_decay[0x7fff - i] = (int16_t) (0x7fff/exp(1.0*i/4096));
 
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, CLOCK_16H);
 
@@ -87,7 +87,7 @@ void warpwarp_sound_device::device_timer(emu_timer &timer, device_timer_id id, i
 			break;
 
 		default:
-			assert_always(FALSE, "Unknown id in warpwarp_sound_device::device_timer");
+			assert_always(false, "Unknown id in warpwarp_sound_device::device_timer");
 	}
 }
 

@@ -55,11 +55,11 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf4_rowscroll;
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_shared_ram;
-	required_shared_ptr<UINT16> m_ram2;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_shared_ram;
+	required_shared_ptr<uint16_t> m_ram2;
 
 	DECLARE_READ16_MEMBER(dassault_control_r);
 	DECLARE_WRITE16_MEMBER(dassault_control_w);
@@ -73,7 +73,7 @@ public:
 	DECLARE_DRIVER_INIT(thndzone);
 	DECLARE_DRIVER_INIT(dassault);
 	virtual void video_start() override;
-	UINT32 screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, UINT16 pri, UINT16 primask, UINT16 penbase, UINT8 alpha);
+	uint32_t screen_update_dassault(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void mixdassaultlayer(bitmap_rgb32 &bitmap, bitmap_ind16* sprite_bitmap, const rectangle &cliprect, uint16_t pri, uint16_t primask, uint16_t penbase, uint8_t alpha);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 };

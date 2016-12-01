@@ -32,7 +32,7 @@ enum s3520cf_state_t
 
 struct rtc_regs_t
 {
-	UINT8 sec, min, hour, day, wday, month, year;
+	uint8_t sec, min, hour, day, wday, month, year;
 };
 
 
@@ -42,7 +42,7 @@ class s3520cf_device :  public device_t
 {
 public:
 	// construction/destruction
-	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_READ_LINE_MEMBER( read_bit );
@@ -57,17 +57,17 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	inline UINT8 rtc_read(UINT8 offset);
-	inline void rtc_write(UINT8 offset,UINT8 data);
+	inline uint8_t rtc_read(uint8_t offset);
+	inline void rtc_write(uint8_t offset,uint8_t data);
 
 	int m_dir;
 	int m_latch;
 	int m_reset_line;
 	int m_read_latch;
-	UINT8 m_current_cmd;
-	UINT8 m_cmd_stream_pos;
-	UINT8 m_rtc_addr;
-	UINT8 m_mode, m_sysr;
+	uint8_t m_current_cmd;
+	uint8_t m_cmd_stream_pos;
+	uint8_t m_rtc_addr;
+	uint8_t m_mode, m_sysr;
 
 	s3520cf_state_t m_rtc_state;
 	rtc_regs_t m_rtc;

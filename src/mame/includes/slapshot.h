@@ -51,17 +51,17 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_spriteext;
-	std::unique_ptr<UINT16[]>    m_spriteram_buffered;
-	std::unique_ptr<UINT16[]>    m_spriteram_delayed;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteext;
+	std::unique_ptr<uint16_t[]>    m_spriteram_buffered;
+	std::unique_ptr<uint16_t[]>    m_spriteram_delayed;
 
 	/* video-related */
 	struct      slapshot_tempsprite *m_spritelist;
-	INT32       m_sprites_disabled;
-	INT32       m_sprites_active_area;
-	INT32       m_sprites_master_scrollx;
-	INT32       m_sprites_master_scrolly;
+	int32_t       m_sprites_disabled;
+	int32_t       m_sprites_active_area;
+	int32_t       m_sprites_master_scrollx;
+	int32_t       m_sprites_master_scrolly;
 	int         m_sprites_flipscreen;
 	int         m_prepare_sprites;
 	int         m_dislayer[5];
@@ -82,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_taito_no_buffer(screen_device &screen, bool state);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int *primasks, int y_offset );
 	void taito_handle_sprite_buffering(  );

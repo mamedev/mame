@@ -58,7 +58,7 @@ const device_type TVC_HBF = &device_creator<tvc_hbf_device>;
 //  tvc_hbf_device - constructor
 //-------------------------------------------------
 
-tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tvc_hbf_device::tvc_hbf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, TVC_HBF, "HBF floppy interface", tag, owner, clock, "tvc_hbf", __FILE__),
 		device_tvcexp_interface( mconfig, *this ),
 		m_fdc(*this, "fdc"), m_rom(nullptr), m_ram(nullptr), m_rom_bank(0)
@@ -98,7 +98,7 @@ machine_config_constructor tvc_hbf_device::device_mconfig_additions() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *tvc_hbf_device::device_rom_region() const
+const tiny_rom_entry *tvc_hbf_device::device_rom_region() const
 {
 	return ROM_NAME( tvc_hbf );
 }

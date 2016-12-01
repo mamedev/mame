@@ -7,7 +7,7 @@
 const device_type MSX_CART_DOOLY = &device_creator<msx_cart_dooly>;
 
 
-msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_dooly::msx_cart_dooly(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_DOOLY, "MSX Cartridge - Dooly", tag, owner, clock, "msx_cart_dooly", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_prot(0)
@@ -40,7 +40,7 @@ READ8_MEMBER(msx_cart_dooly::read_cart)
 {
 	if (offset >= 0x4000 && offset < 0xc000)
 	{
-		UINT8 data = get_rom_base()[offset - 0x4000];
+		uint8_t data = get_rom_base()[offset - 0x4000];
 
 		switch (m_prot)
 		{

@@ -224,7 +224,7 @@ void tdv2324_state::video_start()
 }
 
 
-UINT32 tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tdv2324_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -267,7 +267,7 @@ static MACHINE_CONFIG_START( tdv2324, tdv2324_state )
 	MCFG_CPU_PROGRAM_MAP(tdv2324_fdc_mem)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DRIVER(tdv2324_state, screen_update)
 	MCFG_SCREEN_SIZE(800, 400)

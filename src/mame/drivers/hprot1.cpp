@@ -91,8 +91,8 @@ ADDRESS_MAP_END
 DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 bitswapped_ROM[0x10000];
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t bitswapped_ROM[0x10000];
 
 	for(i=0x0000;i<0x10000;i++)
 		bitswapped_ROM[i] = ROM[i];
@@ -195,7 +195,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 	{
 		case 0x01:
 		{
-			UINT8 value = ioport("inputs")->read();
+			uint8_t value = ioport("inputs")->read();
 #if LOG_IO_PORTS
 			printf("value:%02X\n", value);
 #endif
@@ -212,7 +212,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 /*
 WRITE8_MEMBER(hprot1_state::henry_io_w)
 {
-    static UINT8 p0=0, p1=0, p2=0, p3=0;
+    static uint8_t p0=0, p1=0, p2=0, p3=0;
     switch (offset)
     {
         case 0x00:

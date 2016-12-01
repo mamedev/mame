@@ -46,7 +46,7 @@ machine_config_constructor isa16_svga_cirrus_device::device_mconfig_additions() 
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 {
 	return ROM_NAME( dm_clgd5430 );
 }
@@ -59,7 +59,7 @@ const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_CIRRUS, "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)", tag, owner, clock, "dm_clgd5430", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -132,7 +132,7 @@ machine_config_constructor isa16_svga_cirrus_gd542x_device::device_mconfig_addit
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 {
 	return ROM_NAME( clgd542x );
 }
@@ -145,7 +145,7 @@ const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_CIRRUS_GD542X, "Generic Cirrus Logic GD542x Graphics Card (BIOS v1.20)", tag, owner, clock, "clgd542x", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {

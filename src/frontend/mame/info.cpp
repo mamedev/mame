@@ -16,7 +16,7 @@
 #include "xmlfile.h"
 #include "config.h"
 #include "drivenum.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 
 #include <ctype.h>
 
@@ -515,21 +515,23 @@ void info_xml_creator::output_bios()
 	if (m_drivlist.driver().rom == nullptr)
 		return;
 
+	auto rom_entries = rom_build_entries(m_drivlist.driver().rom);
+
 	// first determine the default BIOS name
 	std::string defaultname;
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			defaultname = ROM_GETNAME(rom);
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			defaultname = ROM_GETNAME(&rom);
 
 	// iterate over ROM entries and look for BIOSes
-	for (const rom_entry *rom = m_drivlist.driver().rom; !ROMENTRY_ISEND(rom); rom++)
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+	for (const rom_entry &rom : rom_entries)
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
 			// output extracted name and descriptions
 			fprintf(m_output, "\t\t<biosset");
-			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)));
-			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(rom)));
-			if (defaultname == ROM_GETNAME(rom))
+			fprintf(m_output, " name=\"%s\"", xml_normalize_string(ROM_GETNAME(&rom)));
+			fprintf(m_output, " description=\"%s\"", xml_normalize_string(ROM_GETHASHDATA(&rom)));
+			if (defaultname == ROM_GETNAME(&rom))
 				fprintf(m_output, " default=\"yes\"");
 			fprintf(m_output, "/>\n");
 		}
@@ -577,7 +579,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (!is_disk && is_bios)
 				{
 					// scan backwards through the ROM entries
-					for (const rom_entry *brom = rom - 1; brom != m_drivlist.driver().rom; brom--)
+					for (const rom_entry *brom = rom - 1; brom != device.rom_region(); brom--)
 						if (ROMENTRY_ISSYSTEM_BIOS(brom))
 						{
 							strcpy(bios_name, ROM_GETNAME(brom));
@@ -690,7 +692,7 @@ void info_xml_creator::output_chips(device_t &device, const char *root_tag)
 	// iterate over sound devices
 	for (device_sound_interface &sound : sound_interface_iterator(device))
 	{
-		if (strcmp(sound.device().tag(), device.tag()))
+		if (strcmp(sound.device().tag(), device.tag()) != 0 && sound.issound())
 		{
 			std::string newtag(sound.device().tag()), oldtag(":");
 			newtag = newtag.substr(newtag.find(oldtag.append(root_tag)) + oldtag.length());
@@ -859,10 +861,10 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 	};
 
 	// directions
-	const UINT8 DIR_UP = 0x01;
-	const UINT8 DIR_DOWN = 0x02;
-	const UINT8 DIR_LEFT = 0x04;
-	const UINT8 DIR_RIGHT = 0x08;
+	const uint8_t DIR_UP = 0x01;
+	const uint8_t DIR_DOWN = 0x02;
+	const uint8_t DIR_LEFT = 0x04;
+	const uint8_t DIR_RIGHT = 0x08;
 
 	// initialize the list of control types
 	struct
@@ -874,11 +876,11 @@ void info_xml_creator::output_input(const ioport_list &portlist)
 		int             maxbuttons;     // max index of buttons (using IPT_BUTTONn) [probably to be removed soonish]
 		int             ways;           // directions for joystick
 		bool            analog;         // is analog input?
-		UINT8           helper[3];      // for dual joysticks [possibly to be removed soonish]
-		INT32           min;            // analog minimum value
-		INT32           max;            // analog maximum value
-		INT32           sensitivity;    // default analog sensitivity
-		INT32           keydelta;       // default analog keydelta
+		uint8_t           helper[3];      // for dual joysticks [possibly to be removed soonish]
+		int32_t           min;            // analog minimum value
+		int32_t           max;            // analog maximum value
+		int32_t           sensitivity;    // default analog sensitivity
+		int32_t           keydelta;       // default analog keydelta
 		bool            reverse;        // default analog reverse setting
 	} control_info[CTRL_COUNT * CTRL_PCOUNT];
 
@@ -1561,7 +1563,7 @@ void info_xml_creator::output_software_list()
 {
 	for (const software_list_device &swlist : software_list_device_iterator(m_drivlist.config().root_device()))
 	{
-		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name());
+		fprintf(m_output, "\t\t<softwarelist name=\"%s\" ", swlist.list_name().c_str());
 		fprintf(m_output, "status=\"%s\" ", (swlist.list_type() == SOFTWARE_LIST_ORIGINAL_SYSTEM) ? "original" : "compatible");
 		if (swlist.filter())
 			fprintf(m_output, "filter=\"%s\" ", swlist.filter());

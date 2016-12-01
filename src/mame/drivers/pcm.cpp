@@ -90,14 +90,14 @@ public:
 	DECLARE_READ8_MEMBER( pcm_85_r );
 	DECLARE_WRITE_LINE_MEMBER( pcm_82_w );
 	DECLARE_WRITE8_MEMBER( pcm_85_w );
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 	bool m_cone;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 m_85;
+	uint8_t m_85;
 };
 
 
@@ -133,7 +133,7 @@ There is also a HALT LED, connected directly to the processor.
 
 READ8_MEMBER( pcm_state::pcm_85_r )
 {
-	UINT8 data = m_85 & 0x7f;
+	uint8_t data = m_85 & 0x7f;
 
 	if ((m_cass)->input() > 0.03)
 		data |= 0x80;
@@ -188,16 +188,16 @@ void pcm_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pcm_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0x400,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0x400,x;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{

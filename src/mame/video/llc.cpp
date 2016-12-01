@@ -17,16 +17,16 @@ void llc_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 llc_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t llc_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,inv;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,inv;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{
@@ -52,17 +52,17 @@ UINT32 llc_state::screen_update_llc1(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 llc_state::screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t llc_state::screen_update_llc2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,inv, inv1=m_rv ? 0xff : 0;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,inv, inv1=m_rv ? 0xff : 0;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
 			inv = 0;
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 64; x++)
 			{

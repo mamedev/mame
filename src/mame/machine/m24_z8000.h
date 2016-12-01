@@ -15,9 +15,9 @@
 class m24_z8000_device :  public device_t
 {
 public:
-	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m24_z8000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	template<class _Object> static devcb_base &set_halt_callback(device_t &device, _Object object) { return downcast<m24_z8000_device &>(device).m_halt_out.set_callback(object); }
 
@@ -45,9 +45,9 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<pic8259_device> m_pic;
 	devcb_write_line m_halt_out;
-	static const UINT8 pmem_table[16][4];
-	static const UINT8 dmem_table[16][4];
-	UINT8 m_handshake, m_irq;
+	static const uint8_t pmem_table[16][4];
+	static const uint8_t dmem_table[16][4];
+	uint8_t m_handshake, m_irq;
 	bool m_z8000_halt, m_z8000_mem, m_timer_irq;
 };
 

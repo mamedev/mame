@@ -184,14 +184,15 @@ other supported games as well.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/m72.h"
+#include "includes/iremipt.h"
+#include "cpu/mcs51/mcs51.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
+#include "cpu/z80/z80.h"
 #include "machine/irem_cpu.h"
 #include "sound/ym2151.h"
-#include "includes/iremipt.h"
-#include "includes/m72.h"
-#include "cpu/mcs51/mcs51.h"
+#include "sound/volt_reg.h"
 
 #define MASTER_CLOCK        XTAL_32MHz
 #define SOUND_CLOCK         XTAL_3_579545MHz
@@ -334,9 +335,9 @@ The protection device does
 
 TIMER_CALLBACK_MEMBER(m72_state::delayed_ram16_w)
 {
-	UINT16 val = ((UINT32) param) & 0xffff;
-	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
-	UINT16 *ram = (UINT16 *)ptr;
+	uint16_t val = ((uint32_t) param) & 0xffff;
+	uint16_t offset = (((uint32_t) param) >> 16) & 0xffff;
+	uint16_t *ram = (uint16_t *)ptr;
 
 	ram[offset] = val;
 }
@@ -356,7 +357,7 @@ WRITE16_MEMBER(m72_state::main_mcu_sound_w)
 
 WRITE16_MEMBER(m72_state::main_mcu_w)
 {
-	UINT16 val = m_protection_ram[offset];
+	uint16_t val = m_protection_ram[offset];
 
 	COMBINE_DATA(&val);
 
@@ -378,7 +379,7 @@ WRITE16_MEMBER(m72_state::main_mcu_w)
 
 WRITE8_MEMBER(m72_state::mcu_data_w)
 {
-	UINT16 val;
+	uint16_t val;
 	if (offset&1) val = (m_protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (m_protection_ram[offset/2] & 0xff00) | (data&0xff);
 
@@ -387,7 +388,7 @@ WRITE8_MEMBER(m72_state::mcu_data_w)
 
 READ8_MEMBER(m72_state::mcu_data_r)
 {
-	UINT8 ret;
+	uint8_t ret;
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
@@ -409,7 +410,7 @@ INTERRUPT_GEN_MEMBER(m72_state::mcu_int)
 
 READ8_MEMBER(m72_state::mcu_sample_r)
 {
-	UINT8 sample;
+	uint8_t sample;
 	sample = memregion("samples")->base()[m_mcu_sample_addr++];
 	return sample;
 }
@@ -466,7 +467,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	address_space &io = m_maincpu->space(AS_IO);
 	address_space &sndio = m_soundcpu->space(AS_IO);
 
-	m_protection_ram = std::make_unique<UINT16[]>(0x10000/2);
+	m_protection_ram = std::make_unique<uint16_t[]>(0x10000/2);
 	program.install_read_bank(0xb0000, 0xbffff, "bank1");
 	program.install_write_handler(0xb0000, 0xb0fff, write16_delegate(FUNC(m72_state::main_mcu_w),this));
 	membank("bank1")->configure_entry(0, m_protection_ram.get());
@@ -480,7 +481,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	io.install_write_handler(0xc0, 0xc1, write16_delegate(FUNC(m72_state::main_mcu_sound_w),this));
 
 	/* sound cpu */
-	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_device::write_unsigned8),(dac_device*)m_dac));
+	sndio.install_write_handler(0x82, 0x82, write8_delegate(FUNC(dac_byte_interface::write),(dac_byte_interface *)m_dac));
 	sndio.install_read_handler (0x84, 0x84, read8_delegate(FUNC(m72_state::snd_cpu_sample_r),this));
 
 	/* lohtb2 */
@@ -491,7 +492,7 @@ DRIVER_INIT_MEMBER(m72_state,m72_8751)
 	 * prefetching on the V30.
 	 */
 	{
-		UINT8 *rom=memregion("mcu")->base();
+		uint8_t *rom=memregion("mcu")->base();
 
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
@@ -531,7 +532,7 @@ the NMI handler in the other games.
 #if 0
 int m72_state::find_sample(int num)
 {
-	UINT8 *rom = memregion("samples")->base();
+	uint8_t *rom = memregion("samples")->base();
 	int len = memregion("samples")->bytes();
 	int addr = 0;
 
@@ -654,7 +655,7 @@ running, but they have not been derived from the real 8751 code.
 #define CRC_LEN 18
 
 /* Battle Chopper / Mr. Heli */
-static const UINT8 bchopper_code[CODE_LEN] =
+static const uint8_t bchopper_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -674,11 +675,11 @@ static const UINT8 bchopper_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x68,0x01,0x40,0x00    // jmp  0040:$0168
 };
-static const UINT8 bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
+static const uint8_t bchopper_crc[CRC_LEN] =  {   0x1a,0x12,0x5c,0x08, 0x84,0xb6,0x73,0xd1,
 												0x54,0x91,0x94,0xeb, 0x00,0x00 };
 
 /* Ninja Spirit */
-static const UINT8 nspirit_code[CODE_LEN] =
+static const uint8_t nspirit_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -697,10 +698,10 @@ static const UINT8 nspirit_code[CODE_LEN] =
 	0x1f,                       // pop ds
 	0xea,0x00,0x00,0x40,0x00    // jmp  0040:$0000
 };
-static const UINT8 nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
+static const uint8_t nspirit_crc[CRC_LEN] =   {   0xfe,0x94,0x6e,0x4e, 0xc8,0x33,0xa7,0x2d,
 												0xf2,0xa3,0xf9,0xe1, 0xa9,0x6c,0x02,0x95, 0x00,0x00 };
 /* Image Fight */
-static const UINT8 imgfight_code[CODE_LEN] =
+static const uint8_t imgfight_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -725,11 +726,11 @@ static const UINT8 imgfight_code[CODE_LEN] =
 };
 
 // these are for the japan set where we have the mcu anyway...
-static const UINT8 imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
+static const uint8_t imgfightj_crc[CRC_LEN] =  {  0x7e,0xcc,0xec,0x03, 0x04,0x33,0xb6,0xc5,
 												0xbf,0x37,0x92,0x94, 0x00,0x00 };
 
 /* Legend of Hero Tonma */
-static const UINT8 loht_code[CODE_LEN] =
+static const uint8_t loht_code[CODE_LEN] =
 {
 	0x68,0x00,0xa0,             // push 0a000h
 	0x1f,                       // pop ds
@@ -747,21 +748,21 @@ static const UINT8 loht_code[CODE_LEN] =
 	0xea,0x5d,0x01,0x40,0x00    // jmp  0040:$015d
 
 };
-static const UINT8 loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
+static const uint8_t loht_crc[CRC_LEN] =    { 0x39,0x00,0x82,0xae, 0x2c,0x9d,0x4b,0x73,
 												0xfb,0xac,0xd4,0x6d, 0x6d,0x5b,0x77,0xc0, 0x00,0x00 };
 
 
 
 /* Dragon Breed */
-static const UINT8 dbreedm72_code[CODE_LEN] =
+static const uint8_t dbreedm72_code[CODE_LEN] =
 {
 	0xea,0x6c,0x00,0x00,0x00    // jmp  0000:$006c
 };
-static const UINT8 dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
+static const uint8_t dbreedm72_crc[CRC_LEN] =   { 0xa4,0x96,0x5f,0xc0, 0xab,0x49,0x9f,0x19,
 												0x84,0xe6,0xd6,0xca, 0x00,0x00 };
 
 /* Air Duel */
-static const UINT8 airduelm72_code[CODE_LEN] =
+static const uint8_t airduelm72_code[CODE_LEN] =
 {
 	0x68,0x00,0xd0,             // push 0d000h
 	0x1f,                       // pop ds
@@ -771,20 +772,20 @@ static const UINT8 airduelm72_code[CODE_LEN] =
 	0xc6,0x06,0xc0,0x1c,0x57,   // mov [1cc0h], byte 057h
 	0xea,0x69,0x0b,0x00,0x00    // jmp  0000:$0b69
 };
-static const UINT8 airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
+static const uint8_t airduelm72_crc[CRC_LEN] =     { 0x72,0x9c,0xca,0x85, 0xc9,0x12,0xcc,0xea,
 												0x00,0x00 };
 
 /* Daiku no Gensan */
-static const UINT8 dkgenm72_code[CODE_LEN] =
+static const uint8_t dkgenm72_code[CODE_LEN] =
 {
 	0xea,0x3d,0x00,0x00,0x10    // jmp  1000:$003d
 };
-static const UINT8 dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
+static const uint8_t dkgenm72_crc[CRC_LEN] =  {   0xc8,0xb4,0xdc,0xf8, 0xd3,0xba,0x48,0xed,
 												0x79,0x08,0x1c,0xb3, 0x00,0x00 };
 
 
 
-void m72_state::copy_le(UINT16 *dest, const UINT8 *src, UINT8 bytes)
+void m72_state::copy_le(uint16_t *dest, const uint8_t *src, uint8_t bytes)
 {
 	int i;
 
@@ -809,9 +810,9 @@ WRITE16_MEMBER(m72_state::protection_w)
 		copy_le(&m_protection_ram[0x0fe0],m_protection_crc,CRC_LEN);
 }
 
-void m72_state::install_protection_handler(const UINT8 *code,const UINT8 *crc)
+void m72_state::install_protection_handler(const uint8_t *code,const uint8_t *crc)
 {
-	m_protection_ram = std::make_unique<UINT16[]>(0x1000/2);
+	m_protection_ram = std::make_unique<uint16_t[]>(0x1000/2);
 	m_protection_code = code;
 	m_protection_crc =  crc;
 	m_maincpu->space(AS_PROGRAM).install_read_bank(0xb0000, 0xb0fff, "bank1");
@@ -1869,18 +1870,19 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_FRAGMENT( m72_audio_chips )
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("m72", M72, 0);
+	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( m72_base, m72_state )
@@ -1923,7 +1925,6 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 	MCFG_CPU_ADD("mcu",I8751, XTAL_8MHz) /* Uses its own XTAL */
 	MCFG_CPU_IO_MAP(mcu_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", m72_state,  mcu_int)
-
 MACHINE_CONFIG_END
 
 
@@ -1935,6 +1936,7 @@ static MACHINE_CONFIG_DERIVED( rtype, m72_base )
 	MCFG_CPU_IO_MAP(rtype_sound_portmap)
 
 	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( m72_xmultipl, m72_8751 )

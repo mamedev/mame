@@ -50,7 +50,7 @@ ioport_constructor vcs_paddles_device::device_input_ports() const
 //  vcs_paddles_device - constructor
 //-------------------------------------------------
 
-vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vcs_paddles_device::vcs_paddles_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VCS_PADDLES, "Atari / CBM Digital paddles", tag, owner, clock, "vcs_paddles", __FILE__),
 	device_vcs_control_port_interface(mconfig, *this),
 	m_joy(*this, "JOY"),
@@ -73,7 +73,7 @@ void vcs_paddles_device::device_start()
 //  vcs_joy_r - joystick read
 //-------------------------------------------------
 
-UINT8 vcs_paddles_device::vcs_joy_r()
+uint8_t vcs_paddles_device::vcs_joy_r()
 {
 	return m_joy->read();
 }
@@ -83,7 +83,7 @@ UINT8 vcs_paddles_device::vcs_joy_r()
 //  vcs_pot_x_r - potentiometer X read
 //-------------------------------------------------
 
-UINT8 vcs_paddles_device::vcs_pot_x_r()
+uint8_t vcs_paddles_device::vcs_pot_x_r()
 {
 	return m_potx->read();
 }
@@ -93,7 +93,7 @@ UINT8 vcs_paddles_device::vcs_pot_x_r()
 //  vcs_pot_y_r - potentiometer Y read
 //-------------------------------------------------
 
-UINT8 vcs_paddles_device::vcs_pot_y_r()
+uint8_t vcs_paddles_device::vcs_pot_y_r()
 {
 	return m_poty->read();
 }

@@ -27,19 +27,19 @@ public:
 	required_device<namco_cus30_device> m_cus30;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_rthunder_videoram1;
-	required_shared_ptr<UINT8> m_rthunder_videoram2;
-	required_shared_ptr<UINT8> m_rthunder_spriteram;
-	optional_region_ptr<UINT8> m_user1_ptr;
+	required_shared_ptr<uint8_t> m_rthunder_videoram1;
+	required_shared_ptr<uint8_t> m_rthunder_videoram2;
+	required_shared_ptr<uint8_t> m_rthunder_spriteram;
+	optional_region_ptr<uint8_t> m_user1_ptr;
 
-	UINT8 *m_spriteram;
+	uint8_t *m_spriteram;
 	int m_wdog;
 	int m_tilebank;
 	int m_xscroll[4];
 	int m_yscroll[4];
 	tilemap_t *m_bg_tilemap[4];
 	int m_backcolor;
-	const UINT8 *m_tile_address_prom;
+	const uint8_t *m_tile_address_prom;
 	int m_copy_sprites;
 
 	DECLARE_WRITE8_MEMBER(bankswitch1_w);
@@ -75,12 +75,12 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(namcos86);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void scroll_w(address_space &space, int offset, int data, int layer);
 
 private:
-	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,UINT8 *vram);
+	inline void get_tile_info(tile_data &tileinfo,int tile_index,int layer,uint8_t *vram);
 	void set_scroll(int layer);
 };

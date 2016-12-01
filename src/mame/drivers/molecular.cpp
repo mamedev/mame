@@ -68,12 +68,12 @@ public:
 	required_device<cpu_device> m_filecpu;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *m_file_rom;
-	UINT8 *m_app_rom;
-	std::unique_ptr<UINT8[]> m_file_ram;
-	std::unique_ptr<UINT8[]> m_app_ram;
+	uint8_t *m_file_rom;
+	uint8_t *m_app_rom;
+	std::unique_ptr<uint8_t[]> m_file_ram;
+	std::unique_ptr<uint8_t[]> m_app_ram;
 	DECLARE_READ8_MEMBER(file_r);
 	DECLARE_WRITE8_MEMBER(file_w);
 
@@ -86,8 +86,8 @@ public:
 	DECLARE_READ8_MEMBER( sio_r );
 	DECLARE_WRITE8_MEMBER( sio_w );
 
-	UINT8 app_ram_enable;
-	UINT8 file_ram_enable;
+	uint8_t app_ram_enable;
+	uint8_t file_ram_enable;
 
 	DECLARE_PALETTE_INIT(molecula);
 
@@ -103,7 +103,7 @@ void molecula_state::video_start()
 {
 }
 
-UINT32 molecula_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
+uint32_t molecula_state::screen_update( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
 	return 0;
 }
@@ -267,8 +267,8 @@ void molecula_state::machine_start()
 	m_file_rom = memregion("fileipl")->base();
 	m_app_rom = memregion("appipl")->base();
 
-	m_file_ram = make_unique_clear<UINT8[]>(0x10000);
-	m_app_ram = make_unique_clear<UINT8[]>(0x10000);
+	m_file_ram = make_unique_clear<uint8_t[]>(0x10000);
+	m_app_ram = make_unique_clear<uint8_t[]>(0x10000);
 }
 
 void molecula_state::machine_reset()

@@ -45,8 +45,8 @@ public:
 		m_soundlatch(*this, "soundlatch"),
 		m_generic_paletteram_16(*this, "paletteram") { }
 
-	required_shared_ptr<UINT16> m_npvidram;
-	required_shared_ptr<UINT16> m_npvidregs;
+	required_shared_ptr<uint16_t> m_npvidram;
+	required_shared_ptr<uint16_t> m_npvidregs;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<upd4990a_device> m_upd4990a;
@@ -54,11 +54,11 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
+	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
 
-	UINT8 m_audio_result;
-	UINT8 m_bank_val;
-	UINT8 m_vblank;
+	uint8_t m_audio_result;
+	uint8_t m_bank_val;
+	uint8_t m_vblank;
 	DECLARE_READ8_MEMBER(neoprint_calendar_r);
 	DECLARE_WRITE8_MEMBER(neoprint_calendar_w);
 	DECLARE_READ8_MEMBER(neoprint_unk_r);
@@ -77,8 +77,8 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_MACHINE_RESET(nprsp);
-	UINT32 screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,int layer,int data_shift);
 	void audio_cpu_assert_nmi();
 };
@@ -101,7 +101,7 @@ void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 {
 	int i, y, x;
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	INT16 scrollx, scrolly;
+	int16_t scrollx, scrolly;
 
 	i = (m_npvidregs[((layer*8)+0x06)/2] & 7) * 0x1000/4;
 	scrollx = ((m_npvidregs[((layer*8)+0x00)/2] - (0xd8 + layer*4)) & 0x03ff);
@@ -114,14 +114,14 @@ void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 dat = m_npvidram[i*2] >> data_shift; // a video register?
-			UINT16 color;
+			uint16_t dat = m_npvidram[i*2] >> data_shift; // a video register?
+			uint16_t color;
 			if(m_npvidram[i*2+1] & 0x0020) // TODO: 8bpp switch?
 				color = ((m_npvidram[i*2+1] & 0x8000) << 1) | 0x200 | ((m_npvidram[i*2+1] & 0xff00) >> 7);
 			else
 				color = ((m_npvidram[i*2+1] & 0xff00) >> 8) | ((m_npvidram[i*2+1] & 0x0010) << 4);
-			UINT8 fx = (m_npvidram[i*2+1] & 0x0040);
-			UINT8 fy = (m_npvidram[i*2+1] & 0x0080);
+			uint8_t fx = (m_npvidram[i*2+1] & 0x0040);
+			uint8_t fy = (m_npvidram[i*2+1] & 0x0080);
 
 			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
 			gfx->transpen(bitmap,cliprect,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
@@ -134,7 +134,7 @@ void neoprint_state::draw_layer(bitmap_ind16 &bitmap,const rectangle &cliprect,i
 	}
 }
 
-UINT32 neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -144,7 +144,7 @@ UINT32 neoprint_state::screen_update_neoprint(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t neoprint_state::screen_update_nprsp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -213,7 +213,7 @@ WRITE8_MEMBER(neoprint_state::audio_command_w)
 
 READ8_MEMBER(neoprint_state::audio_command_r)
 {
-	UINT8 ret = m_soundlatch->read(space, 0);
+	uint8_t ret = m_soundlatch->read(space, 0);
 
 	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", space.device().safe_pc(), ret);
 
@@ -255,7 +255,7 @@ ADDRESS_MAP_END
 
 WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 {
-	UINT8 r,g,b,i;
+	uint8_t r,g,b,i;
 
 	COMBINE_DATA(&m_generic_paletteram_16[offset]);
 
@@ -272,7 +272,7 @@ WRITE16_MEMBER(neoprint_state::nprsp_palette_w)
 		return;
 
 	{
-		UINT32 pal_entry;
+		uint32_t pal_entry;
 
 		pal_entry = ((offset & 0xfffe) >> 1) + ((offset & 0x20000) ? 0x8000 : 0);
 
@@ -295,7 +295,7 @@ WRITE8_MEMBER(neoprint_state::nprsp_bank_w)
 
 READ16_MEMBER(neoprint_state::rom_window_r)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	return rom[offset | 0x80000/2 | m_bank_val*0x40000/2];
 }
@@ -637,7 +637,7 @@ ROM_END
 /* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 DRIVER_INIT_MEMBER(neoprint_state,npcartv1)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	ROM[0x1260/2] = 0x4e71;
 
@@ -647,14 +647,14 @@ DRIVER_INIT_MEMBER(neoprint_state,npcartv1)
 
 DRIVER_INIT_MEMBER(neoprint_state,98best44)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	ROM[0x1312/2] = 0x4e71;
 }
 
 DRIVER_INIT_MEMBER(neoprint_state,nprsp)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	ROM[0x13a4/2] = 0x4e71;
 	ROM[0x13bc/2] = 0x4e71;
@@ -666,7 +666,7 @@ DRIVER_INIT_MEMBER(neoprint_state,nprsp)
 
 DRIVER_INIT_MEMBER(neoprint_state,unkneo)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 	ROM[0x12c2/2] = 0x4e71;
 }
 

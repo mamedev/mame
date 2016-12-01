@@ -62,11 +62,11 @@ public:
 		m_pia_u3(*this, "pia_u3") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	int        m_timer;
-	UINT8      m_clear_tv;
+	uint8_t      m_clear_tv;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -89,7 +89,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sn2_ca2_u2_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(toratora_timer);
 };
 
@@ -113,7 +113,7 @@ WRITE_LINE_MEMBER(toratora_state::cb2_u2_w)
  *
  *************************************/
 
-UINT32 toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -121,13 +121,13 @@ UINT32 toratora_state::screen_update_toratora(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
-		UINT8 data = m_videoram[offs];
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;

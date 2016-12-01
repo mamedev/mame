@@ -22,7 +22,7 @@ class rtc65271_device : public device_t,
 {
 public:
 	// construction/destruction
-	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 protected:
 	// device-level overrides
 	virtual void device_start() override;
@@ -39,8 +39,8 @@ public:
 	DECLARE_WRITE8_MEMBER( rtc_w );
 	DECLARE_WRITE8_MEMBER( xram_w );
 private:
-	UINT8 read(int xramsel, offs_t offset);
-	void write(int xramsel, offs_t offset, UINT8 data);
+	uint8_t read(int xramsel, offs_t offset);
+	void write(int xramsel, offs_t offset, uint8_t data);
 	void field_interrupts();
 
 	TIMER_CALLBACK_MEMBER(rtc_SQW_cb);
@@ -48,19 +48,19 @@ private:
 	TIMER_CALLBACK_MEMBER(rtc_end_update_cb);
 	/* 64 8-bit registers (10 clock registers, 4 control/status registers, and
 	50 bytes of user RAM) */
-	UINT8 m_regs[64];
-	UINT8 m_cur_reg;
+	uint8_t m_regs[64];
+	uint8_t m_cur_reg;
 
 	/* extended RAM: 4kbytes of battery-backed RAM (in pages of 32 bytes) */
-	UINT8 m_xram[4096];
-	UINT8 m_cur_xram_page;
+	uint8_t m_xram[4096];
+	uint8_t m_cur_xram_page;
 
 	/* update timer: called every second */
 	emu_timer *m_update_timer;
 
 	/* SQW timer: called every periodic clock half-period */
 	emu_timer *m_SQW_timer;
-	UINT8 m_SQW_internal_state;
+	uint8_t m_SQW_internal_state;
 
 	/* callback called when interrupt pin state changes (may be nullptr) */
 	devcb_write_line    m_interrupt_cb;

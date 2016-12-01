@@ -95,18 +95,18 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( joy2_irq_w );
 
 	// memory state
-	UINT8 m_mioc;
+	uint8_t m_mioc;
 	int m_game;
 
 	// ADAMnet state
-	UINT8 m_an;
+	uint8_t m_an;
 
 	// DMA state
-	UINT16 m_ba;
+	uint16_t m_ba;
 	int m_dma;
 	int m_bwr;
-	UINT8 m_data_in;
-	UINT8 m_data_out;
+	uint8_t m_data_in;
+	uint8_t m_data_out;
 
 	// paddle state
 	int m_spindis;

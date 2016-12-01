@@ -80,8 +80,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(speaker_en_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -93,15 +93,15 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	UINT8 *m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT16 m_video_address;
+	uint8_t *m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint16_t m_video_address;
 
 private:
 	bool m_speaker_en;
-	UINT8 m_video_index;
-	UINT8 m_term_data;
-	UINT8 m_vidbyte;
+	uint8_t m_video_index;
+	uint8_t m_term_data;
+	uint8_t m_vidbyte;
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -173,9 +173,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -218,7 +218,7 @@ WRITE8_MEMBER( v6809_state::v6809_address_w )
 
 WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
-	UINT16 temp = m_video_address;
+	uint16_t temp = m_video_address;
 
 	m_crtc->register_w( space, 0, data );
 
@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
 
 READ8_MEMBER( v6809_state::pb_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -276,12 +276,12 @@ WRITE8_MEMBER( v6809_state::pa_w )
 
 // this should output 1 to enable sound, then output 0 after a short time
 // however it continuously outputs 1
-WRITE8_MEMBER( v6809_state::speaker_en_w )
+WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
 {
-	m_speaker_en = data;
+	m_speaker_en = state;
 }
 
-WRITE8_MEMBER( v6809_state::speaker_w )
+WRITE_LINE_MEMBER( v6809_state::speaker_w )
 {
 //  if (m_speaker_en)
 //      m_speaker->level_w(data);
@@ -342,8 +342,8 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
 	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_16MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_OUT1_CB(WRITE8(v6809_state, speaker_w))
-	MCFG_PTM6840_OUT2_CB(WRITE8(v6809_state, speaker_en_w))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(v6809_state, speaker_w))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(v6809_state, speaker_en_w))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)

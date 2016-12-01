@@ -158,7 +158,7 @@ protected:
 	required_ioport m_io_console_buttons;
 	required_device<a78_cart_slot_device> m_cart;
 	required_device<screen_device> m_screen;
-	required_region_ptr<UINT8> m_bios;
+	required_region_ptr<uint8_t> m_bios;
 };
 
 
@@ -445,7 +445,7 @@ upon display type.
 
 #define NTSC_ORANGE \
 	rgb_t(0x31,0x00,0x00), rgb_t(0x42,0x06,0x00), rgb_t(0x53,0x17,0x00), rgb_t(0x64,0x28,0x00), \
-	rgb_t(0x75,0x39,0x00), rgb_t(0x86,0X4A,0x00), rgb_t(0x97,0x5B,0x0A), rgb_t(0xA8,0x6C,0x1B), \
+	rgb_t(0x75,0x39,0x00), rgb_t(0x86,0x4A,0x00), rgb_t(0x97,0x5B,0x0A), rgb_t(0xA8,0x6C,0x1B), \
 	rgb_t(0xB9,0x7D,0x2C), rgb_t(0xCA,0x8E,0x3D), rgb_t(0xDB,0x9F,0x4E), rgb_t(0xEC,0xB0,0x5F), \
 	rgb_t(0xFD,0xC1,0x70), rgb_t(0xFF,0xD2,0x85), rgb_t(0xFF,0xE3,0x9C), rgb_t(0xFF,0xF4,0xB2   )
 
@@ -1307,7 +1307,7 @@ void a7800_state::machine_start()
 	save_item(NAME(m_maria_flag));
 
 	// set up RAM mirrors
-	UINT8 *ram = reinterpret_cast<UINT8 *>(memshare("6116_2")->ptr());
+	uint8_t *ram = reinterpret_cast<uint8_t *>(memshare("6116_2")->ptr());
 	membank("zpmirror")->set_base(ram + 0x0040);
 	membank("spmirror")->set_base(ram + 0x0140);
 
@@ -1436,7 +1436,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 {
-	m_ispal = FALSE;
+	m_ispal = false;
 	m_lines = 263;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;
@@ -1445,7 +1445,7 @@ DRIVER_INIT_MEMBER(a7800_state,a7800_ntsc)
 
 DRIVER_INIT_MEMBER(a7800_state,a7800_pal)
 {
-	m_ispal = TRUE;
+	m_ispal = true;
 	m_lines = 313;
 	m_p1_one_button = 1;
 	m_p2_one_button = 1;

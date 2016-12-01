@@ -7,10 +7,10 @@
     UI software menu.
 
 ***************************************************************************/
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_SELSOFT_H
 #define MAME_FRONTEND_UI_SELSOFT_H
+
+#pragma once
 
 #include "ui/custmenu.h"
 #include "ui/selmenu.h"
@@ -31,13 +31,13 @@ protected:
 
 private:
 	enum { VISIBLE_GAMES_IN_SEARCH = 200 };
-	char                m_search[40];
+	std::string         m_search;
 	const game_driver   *m_driver;
 	bool                m_has_empty_start;
 	s_filter            m_filter;
 	int                 highlight;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// draw left panel
@@ -61,11 +61,11 @@ private:
 	void find_matches(const char *str, int count);
 	void load_sw_custom_filters();
 
-	virtual void infos_render(float x1, float y1, float x2, float y2) override;
-
 	// handlers
 	void inkey_select(const event *menu_event);
 	void inkey_special(const event *menu_event);
+
+	virtual void general_info(const game_driver *driver, std::string &buffer) override {}
 };
 
 class software_parts : public menu
@@ -78,7 +78,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	ui_software_info *m_uiinfo;
@@ -95,7 +95,7 @@ protected:
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	void    *m_driver;

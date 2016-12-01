@@ -17,7 +17,7 @@ class tc0091lvc_device : public device_t,
 							public device_memory_interface
 {
 public:
-	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0091lvc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -46,14 +46,14 @@ public:
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
 	TILE_GET_INFO_MEMBER(get_tx_tile_info);
 
-	UINT8 *m_pcg1_ram;
-	UINT8 *m_pcg2_ram;
-	UINT8 *m_vram0;
-	UINT8 *m_vram1;
-	UINT8 *m_sprram;
-	UINT8 *m_tvram;
-	UINT8 m_bg0_scroll[4];
-	UINT8 m_bg1_scroll[4];
+	uint8_t *m_pcg1_ram;
+	uint8_t *m_pcg2_ram;
+	uint8_t *m_vram0;
+	uint8_t *m_vram1;
+	uint8_t *m_sprram;
+	uint8_t *m_tvram;
+	uint8_t m_bg0_scroll[4];
+	uint8_t m_bg1_scroll[4];
 
 	tilemap_t *bg0_tilemap;
 	tilemap_t *bg1_tilemap;
@@ -61,14 +61,14 @@ public:
 
 	int m_gfx_index; // for RAM tiles
 
-	UINT8 m_palette_ram[0x200];
-	UINT8 m_vregs[0x100];
-	UINT8 m_bitmap_ram[0x20000];
-	UINT8 m_pcg_ram[0x10000];
-	UINT8 m_sprram_buffer[0x400];
+	uint8_t m_palette_ram[0x200];
+	uint8_t m_vregs[0x100];
+	uint8_t m_bitmap_ram[0x20000];
+	uint8_t m_pcg_ram[0x10000];
+	uint8_t m_sprram_buffer[0x400];
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 global_flip);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t global_flip);
 	void screen_eof(void);
 
 protected:

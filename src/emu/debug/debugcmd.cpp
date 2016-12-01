@@ -17,6 +17,7 @@
 #include "express.h"
 #include "debughlp.h"
 #include "debugvw.h"
+#include "natkeyboard.h"
 #include "render.h"
 #include <ctype.h>
 
@@ -33,7 +34,7 @@ const size_t debugger_commands::MAX_GLOBALS = 1000;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cheat_address_is_valid - return TRUE if the
+    cheat_address_is_valid - return true if the
     given address is valid for cheating
 -------------------------------------------------*/
 
@@ -48,15 +49,15 @@ bool debugger_commands::cheat_address_is_valid(address_space &space, offs_t addr
     the current cheat width, if signed
 -------------------------------------------------*/
 
-UINT64 debugger_commands::cheat_sign_extend(const cheat_system *cheatsys, UINT64 value)
+u64 debugger_commands::cheat_sign_extend(const cheat_system *cheatsys, u64 value)
 {
 	if (cheatsys->signed_cheat)
 	{
 		switch (cheatsys->width)
 		{
-			case 1: value = (INT8)value;    break;
-			case 2: value = (INT16)value;   break;
-			case 4: value = (INT32)value;   break;
+			case 1: value = s8(value);    break;
+			case 2: value = s16(value);   break;
+			case 4: value = s32(value);   break;
 		}
 	}
 	return value;
@@ -66,7 +67,7 @@ UINT64 debugger_commands::cheat_sign_extend(const cheat_system *cheatsys, UINT64
     cheat_byte_swap - swap a value
 -------------------------------------------------*/
 
-UINT64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, UINT64 value)
+u64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, u64 value)
 {
 	if (cheatsys->swapped_cheat)
 	{
@@ -74,8 +75,8 @@ UINT64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, UINT64 v
 		{
 			case 2: value = ((value >> 8) & 0x00ff) | ((value << 8) & 0xff00);  break;
 			case 4: value = ((value >> 24) & 0x000000ff) | ((value >> 8) & 0x0000ff00) | ((value << 8) & 0x00ff0000) | ((value << 24) & 0xff000000);    break;
-			case 8: value = ((value >> 56) & U64(0x00000000000000ff)) | ((value >> 40) & U64(0x000000000000ff00)) | ((value >> 24) & U64(0x0000000000ff0000)) | ((value >> 8) & U64(0x00000000ff000000)) |
-							((value << 8) & U64(0x000000ff00000000)) | ((value << 24) & U64(0x0000ff0000000000)) | ((value << 40) & U64(0x00ff000000000000)) | ((value << 56) & U64(0xff00000000000000));   break;
+			case 8: value = ((value >> 56) & 0x00000000000000ffU) | ((value >> 40) & 0x000000000000ff00U) | ((value >> 24) & 0x0000000000ff0000U) | ((value >> 8) & 0x00000000ff000000U) |
+							((value << 8) & 0x000000ff00000000U) | ((value << 24) & 0x0000ff0000000000U) | ((value << 40) & 0x00ff000000000000U) | ((value << 56) & 0xff00000000000000U);   break;
 		}
 	}
 	return value;
@@ -87,9 +88,9 @@ UINT64 debugger_commands::cheat_byte_swap(const cheat_system *cheatsys, UINT64 v
     and swapping if necessary
 -------------------------------------------------*/
 
-UINT64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
+u64 debugger_commands::cheat_read_extended(const cheat_system *cheatsys, address_space &space, offs_t address)
 {
-	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, m_cpu.read_memory(space, address, cheatsys->width, TRUE)));
+	return cheat_sign_extend(cheatsys, cheat_byte_swap(cheatsys, m_cpu.read_memory(space, address, cheatsys->width, true)));
 }
 
 debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu, debugger_console& console)
@@ -110,7 +111,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	/* add all single-entry save state globals */
 	for (int itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
 	{
-		UINT32 valsize, valcount;
+		u32 valsize, valcount;
 		void *base;
 
 		/* stop when we run out of items */
@@ -205,9 +206,9 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 
-	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
-	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
-	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 6, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
 
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
@@ -235,8 +236,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2, _3));
 
-	m_console.register_command("trace",     CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_trace, this, _1, _2, _3));
-	m_console.register_command("traceover", CMDFLAG_NONE, 0, 1, 3, std::bind(&debugger_commands::execute_traceover, this, _1, _2, _3));
+	m_console.register_command("trace",     CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_trace, this, _1, _2, _3));
+	m_console.register_command("traceover", CMDFLAG_NONE, 0, 1, 4, std::bind(&debugger_commands::execute_traceover, this, _1, _2, _3));
 	m_console.register_command("traceflush",CMDFLAG_NONE, 0, 0, 0, std::bind(&debugger_commands::execute_traceflush, this, _1, _2, _3));
 
 	m_console.register_command("history",   CMDFLAG_NONE, 0, 0, 2, std::bind(&debugger_commands::execute_history, this, _1, _2, _3));
@@ -280,7 +281,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-UINT64 debugger_commands::execute_min(symbol_table &table, void *ref, int params, const UINT64 *param)
+u64 debugger_commands::execute_min(symbol_table &table, void *ref, int params, const u64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -290,7 +291,7 @@ UINT64 debugger_commands::execute_min(symbol_table &table, void *ref, int params
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-UINT64 debugger_commands::execute_max(symbol_table &table, void *ref, int params, const UINT64 *param)
+u64 debugger_commands::execute_max(symbol_table &table, void *ref, int params, const u64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -300,7 +301,7 @@ UINT64 debugger_commands::execute_max(symbol_table &table, void *ref, int params
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-UINT64 debugger_commands::execute_if(symbol_table &table, void *ref, int params, const UINT64 *param)
+u64 debugger_commands::execute_if(symbol_table &table, void *ref, int params, const u64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -315,15 +316,15 @@ UINT64 debugger_commands::execute_if(symbol_table &table, void *ref, int params,
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-UINT64 debugger_commands::global_get(symbol_table &table, void *ref)
+u64 debugger_commands::global_get(symbol_table &table, void *ref)
 {
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
-		case 1:     return *(UINT8 *)global->base;
-		case 2:     return *(UINT16 *)global->base;
-		case 4:     return *(UINT32 *)global->base;
-		case 8:     return *(UINT64 *)global->base;
+		case 1:     return *(u8 *)global->base;
+		case 2:     return *(u16 *)global->base;
+		case 4:     return *(u32 *)global->base;
+		case 8:     return *(u64 *)global->base;
 	}
 	return ~0;
 }
@@ -333,15 +334,15 @@ UINT64 debugger_commands::global_get(symbol_table &table, void *ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-void debugger_commands::global_set(symbol_table &table, void *ref, UINT64 value)
+void debugger_commands::global_set(symbol_table &table, void *ref, u64 value)
 {
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
 	{
-		case 1:     *(UINT8 *)global->base = value; break;
-		case 2:     *(UINT16 *)global->base = value;    break;
-		case 4:     *(UINT32 *)global->base = value;    break;
-		case 8:     *(UINT64 *)global->base = value;    break;
+		case 1:     *(u8 *)global->base = value; break;
+		case 2:     *(u16 *)global->base = value;    break;
+		case 4:     *(u32 *)global->base = value;    break;
+		case 8:     *(u64 *)global->base = value;    break;
 	}
 }
 
@@ -356,7 +357,7 @@ void debugger_commands::global_set(symbol_table &table, void *ref, UINT64 value)
     number parameter
 -------------------------------------------------*/
 
-bool debugger_commands::validate_number_parameter(const char *param, UINT64 *result)
+bool debugger_commands::validate_number_parameter(const char *param, u64 *result)
 {
 	/* nullptr parameter does nothing and returns no error */
 	if (param == nullptr)
@@ -387,15 +388,18 @@ bool debugger_commands::validate_number_parameter(const char *param, UINT64 *res
 bool debugger_commands::validate_boolean_parameter(const char *param, bool *result)
 {
 	/* nullptr parameter does nothing and returns no error */
-	if (param == nullptr)
+	if (param == nullptr || strlen(param) == 0)
 		return true;
 
 	/* evaluate the expression; success if no error */
-	bool is_true = (strcmp(param, "true") == 0 || strcmp(param, "TRUE") == 0 || strcmp(param, "1") == 0);
-	bool is_false = (strcmp(param, "false") == 0 || strcmp(param, "FALSE") == 0 || strcmp(param, "0") == 0);
+	bool is_true = (core_stricmp(param, "true") == 0 || strcmp(param, "1") == 0);
+	bool is_false = (core_stricmp(param, "false") == 0 || strcmp(param, "0") == 0);
 
 	if (!is_true && !is_false)
+	{
+		m_console.printf("Invalid boolean '%s'\n", param);
 		return false;
+	}
 
 	*result = is_true;
 
@@ -428,7 +432,7 @@ bool debugger_commands::validate_cpu_parameter(const char *param, device_t **res
 		return true;
 
 	/* then evaluate as an expression; on an error assume it was a tag */
-	UINT64 cpunum;
+	u64 cpunum;
 	try
 	{
 		parsed_expression expression(m_cpu.get_visible_symtable(), param, &cpunum);
@@ -548,7 +552,7 @@ void debugger_commands::execute_help(int ref, int params, const char *param[])
 void debugger_commands::execute_print(int ref, int params, const char *param[])
 {
 	/* validate the other parameters */
-	UINT64 values[MAX_COMMAND_PARAMS];
+	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 0; i < params; i++)
 		if (!validate_number_parameter(param[i], &values[i]))
 			return;
@@ -564,7 +568,7 @@ void debugger_commands::execute_print(int ref, int params, const char *param[])
     mini_printf - safe printf to a buffer
 -------------------------------------------------*/
 
-int debugger_commands::mini_printf(char *buffer, const char *format, int params, UINT64 *param)
+int debugger_commands::mini_printf(char *buffer, const char *format, int params, u64 *param)
 {
 	const char *f = format;
 	char *p = buffer;
@@ -620,11 +624,11 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 						m_console.printf("Not enough parameters for format!\n");
 						return 0;
 					}
-					if ((UINT32)(*param >> 32) != 0)
-						p += sprintf(p, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, (UINT32)(*param >> 32));
+					if (u32(*param >> 32) != 0)
+						p += sprintf(p, zerofill ? "%0*X" : "%*X", (width <= 8) ? 1 : width - 8, u32(*param >> 32));
 					else if (width > 8)
 						p += sprintf(p, zerofill ? "%0*X" : "%*X", width - 8, 0);
-					p += sprintf(p, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, (UINT32)*param);
+					p += sprintf(p, zerofill ? "%0*X" : "%*X", (width < 8) ? width : 8, u32(*param));
 					param++;
 					params--;
 					break;
@@ -636,7 +640,7 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 						m_console.printf("Not enough parameters for format!\n");
 						return 0;
 					}
-					p += sprintf(p, zerofill ? "%0*d" : "%*d", width, (UINT32)*param);
+					p += sprintf(p, zerofill ? "%0*d" : "%*d", width, u32(*param));
 					param++;
 					params--;
 					break;
@@ -661,7 +665,7 @@ int debugger_commands::mini_printf(char *buffer, const char *format, int params,
 void debugger_commands::execute_printf(int ref, int params, const char *param[])
 {
 	/* validate the other parameters */
-	UINT64 values[MAX_COMMAND_PARAMS];
+	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params; i++)
 		if (!validate_number_parameter(param[i], &values[i]))
 			return;
@@ -680,7 +684,7 @@ void debugger_commands::execute_printf(int ref, int params, const char *param[])
 void debugger_commands::execute_logerror(int ref, int params, const char *param[])
 {
 	/* validate the other parameters */
-	UINT64 values[MAX_COMMAND_PARAMS];
+	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params; i++)
 		if (!validate_number_parameter(param[i], &values[i]))
 			return;
@@ -699,7 +703,7 @@ void debugger_commands::execute_logerror(int ref, int params, const char *param[
 void debugger_commands::execute_tracelog(int ref, int params, const char *param[])
 {
 	/* validate the other parameters */
-	UINT64 values[MAX_COMMAND_PARAMS];
+	u64 values[MAX_COMMAND_PARAMS];
 	for (int i = 1; i < params; i++)
 		if (!validate_number_parameter(param[i], &values[i]))
 			return;
@@ -728,7 +732,7 @@ void debugger_commands::execute_quit(int ref, int params, const char *param[])
 
 void debugger_commands::execute_do(int ref, int params, const char *param[])
 {
-	UINT64 dummy;
+	u64 dummy;
 	validate_number_parameter(param[0], &dummy);
 }
 
@@ -740,7 +744,7 @@ void debugger_commands::execute_do(int ref, int params, const char *param[])
 void debugger_commands::execute_step(int ref, int params, const char *param[])
 {
 	/* if we have a parameter, use it */
-	UINT64 steps = 1;
+	u64 steps = 1;
 	if (!validate_number_parameter(param[0], &steps))
 		return;
 
@@ -755,7 +759,7 @@ void debugger_commands::execute_step(int ref, int params, const char *param[])
 void debugger_commands::execute_over(int ref, int params, const char *param[])
 {
 	/* if we have a parameter, use it */
-	UINT64 steps = 1;
+	u64 steps = 1;
 	if (!validate_number_parameter(param[0], &steps))
 		return;
 
@@ -779,7 +783,7 @@ void debugger_commands::execute_out(int ref, int params, const char *param[])
 
 void debugger_commands::execute_go(int ref, int params, const char *param[])
 {
-	UINT64 addr = ~0;
+	u64 addr = ~0;
 
 	/* if we have a parameter, use it instead */
 	if (!validate_number_parameter(param[0], &addr))
@@ -806,7 +810,7 @@ void debugger_commands::execute_go_vblank(int ref, int params, const char *param
 
 void debugger_commands::execute_go_interrupt(int ref, int params, const char *param[])
 {
-	UINT64 irqline = -1;
+	u64 irqline = -1;
 
 	/* if we have a parameter, use it instead */
 	if (!validate_number_parameter(param[0], &irqline))
@@ -822,7 +826,7 @@ void debugger_commands::execute_go_interrupt(int ref, int params, const char *pa
 
 void debugger_commands::execute_go_time(int ref, int params, const char *param[])
 {
-	UINT64 milliseconds = -1;
+	u64 milliseconds = -1;
 
 	/* if we have a parameter, use it instead */
 	if (!validate_number_parameter(param[0], &milliseconds))
@@ -983,7 +987,7 @@ void debugger_commands::execute_observe(int ref, int params, const char *param[]
 void debugger_commands::execute_comment_add(int ref, int params, const char *param[])
 {
 	device_t *cpu;
-	UINT64 address;
+	u64 address;
 
 	/* param 1 is the address for the comment */
 	if (!validate_number_parameter(param[0], &address))
@@ -1013,7 +1017,7 @@ void debugger_commands::execute_comment_add(int ref, int params, const char *par
 void debugger_commands::execute_comment_del(int ref, int params, const char *param[])
 {
 	device_t *cpu;
-	UINT64 address;
+	u64 address;
 
 	/* param 1 can either be a command or the address for the comment */
 	if (!validate_number_parameter(param[0], &address))
@@ -1089,7 +1093,7 @@ void debugger_commands::execute_bpset(int ref, int params, const char *param[])
 {
 	device_t *cpu;
 	const char *action = nullptr;
-	UINT64 address;
+	u64 address;
 	int bpnum;
 
 	/* CPU is implicit */
@@ -1122,7 +1126,7 @@ void debugger_commands::execute_bpset(int ref, int params, const char *param[])
 
 void debugger_commands::execute_bpclear(int ref, int params, const char *param[])
 {
-	UINT64 bpindex;
+	u64 bpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1142,9 +1146,9 @@ void debugger_commands::execute_bpclear(int ref, int params, const char *param[]
 			if (device.debug()->breakpoint_clear(bpindex))
 				found = true;
 		if (found)
-			m_console.printf("Breakpoint %X cleared\n", (UINT32)bpindex);
+			m_console.printf("Breakpoint %X cleared\n", u32(bpindex));
 		else
-			m_console.printf("Invalid breakpoint number %X\n", (UINT32)bpindex);
+			m_console.printf("Invalid breakpoint number %X\n", u32(bpindex));
 	}
 }
 
@@ -1156,7 +1160,7 @@ void debugger_commands::execute_bpclear(int ref, int params, const char *param[]
 
 void debugger_commands::execute_bpdisenable(int ref, int params, const char *param[])
 {
-	UINT64 bpindex;
+	u64 bpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1179,9 +1183,9 @@ void debugger_commands::execute_bpdisenable(int ref, int params, const char *par
 			if (device.debug()->breakpoint_enable(bpindex, ref))
 				found = true;
 		if (found)
-			m_console.printf("Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
+			m_console.printf("Breakpoint %X %s\n", u32(bpindex), ref ? "enabled" : "disabled");
 		else
-			m_console.printf("Invalid breakpoint number %X\n", (UINT32)bpindex);
+			m_console.printf("Invalid breakpoint number %X\n", u32(bpindex));
 	}
 }
 
@@ -1229,7 +1233,7 @@ void debugger_commands::execute_wpset(int ref, int params, const char *param[])
 {
 	address_space *space;
 	const char *action = nullptr;
-	UINT64 address, length;
+	u64 address, length;
 	int type;
 	int wpnum;
 
@@ -1280,7 +1284,7 @@ void debugger_commands::execute_wpset(int ref, int params, const char *param[])
 
 void debugger_commands::execute_wpclear(int ref, int params, const char *param[])
 {
-	UINT64 wpindex;
+	u64 wpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1300,9 +1304,9 @@ void debugger_commands::execute_wpclear(int ref, int params, const char *param[]
 			if (device.debug()->watchpoint_clear(wpindex))
 				found = true;
 		if (found)
-			m_console.printf("Watchpoint %X cleared\n", (UINT32)wpindex);
+			m_console.printf("Watchpoint %X cleared\n", u32(wpindex));
 		else
-			m_console.printf("Invalid watchpoint number %X\n", (UINT32)wpindex);
+			m_console.printf("Invalid watchpoint number %X\n", u32(wpindex));
 	}
 }
 
@@ -1314,7 +1318,7 @@ void debugger_commands::execute_wpclear(int ref, int params, const char *param[]
 
 void debugger_commands::execute_wpdisenable(int ref, int params, const char *param[])
 {
-	UINT64 wpindex;
+	u64 wpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1337,9 +1341,9 @@ void debugger_commands::execute_wpdisenable(int ref, int params, const char *par
 			if (device.debug()->watchpoint_enable(wpindex, ref))
 				found = true;
 		if (found)
-			m_console.printf("Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
+			m_console.printf("Watchpoint %X %s\n", u32(wpindex), ref ? "enabled" : "disabled");
 		else
-			m_console.printf("Invalid watchpoint number %X\n", (UINT32)wpindex);
+			m_console.printf("Invalid watchpoint number %X\n", u32(wpindex));
 	}
 }
 
@@ -1422,7 +1426,7 @@ void debugger_commands::execute_rpset(int ref, int params, const char *param[])
 
 void debugger_commands::execute_rpclear(int ref, int params, const char *param[])
 {
-	UINT64 rpindex;
+	u64 rpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1442,9 +1446,9 @@ void debugger_commands::execute_rpclear(int ref, int params, const char *param[]
 			if (device.debug()->registerpoint_clear(rpindex))
 				found = true;
 		if (found)
-			m_console.printf("Registerpoint %X cleared\n", (UINT32)rpindex);
+			m_console.printf("Registerpoint %X cleared\n", u32(rpindex));
 		else
-			m_console.printf("Invalid registerpoint number %X\n", (UINT32)rpindex);
+			m_console.printf("Invalid registerpoint number %X\n", u32(rpindex));
 	}
 }
 
@@ -1456,7 +1460,7 @@ void debugger_commands::execute_rpclear(int ref, int params, const char *param[]
 
 void debugger_commands::execute_rpdisenable(int ref, int params, const char *param[])
 {
-	UINT64 rpindex;
+	u64 rpindex;
 
 	/* if 0 parameters, clear all */
 	if (params == 0)
@@ -1479,9 +1483,9 @@ void debugger_commands::execute_rpdisenable(int ref, int params, const char *par
 			if (device.debug()->registerpoint_enable(rpindex, ref))
 				found = true;
 		if (found)
-			m_console.printf("Registerpoint %X %s\n", (UINT32)rpindex, ref ? "enabled" : "disabled");
+			m_console.printf("Registerpoint %X %s\n", u32(rpindex), ref ? "enabled" : "disabled");
 		else
-			m_console.printf("Invalid registerpoint number %X\n", (UINT32)rpindex);
+			m_console.printf("Invalid registerpoint number %X\n", u32(rpindex));
 	}
 }
 
@@ -1548,10 +1552,10 @@ void debugger_commands::execute_hotspot(int ref, int params, const char *param[]
 	device_t *device = nullptr;
 	if (!validate_cpu_parameter((params > 0) ? param[0] : nullptr, &device))
 		return;
-	UINT64 count = 64;
+	u64 count = 64;
 	if (!validate_number_parameter(param[1], &count))
 		return;
-	UINT64 threshhold = 250;
+	u64 threshhold = 250;
 	if (!validate_number_parameter(param[2], &threshhold))
 		return;
 
@@ -1598,10 +1602,10 @@ void debugger_commands::execute_stateload(int ref, int params, const char *param
 
 void debugger_commands::execute_save(int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length;
+	u64 offset, endoffset, length;
 	address_space *space;
 	FILE *f;
-	UINT64 i;
+	u64 i;
 
 	/* validate parameters */
 	if (!validate_number_parameter(param[1], &offset))
@@ -1626,7 +1630,7 @@ void debugger_commands::execute_save(int ref, int params, const char *param[])
 	/* now write the data out */
 	for (i = offset; i <= endoffset; i++)
 	{
-		UINT8 byte = m_cpu.read_byte(*space, i, TRUE);
+		u8 byte = m_cpu.read_byte(*space, i, true);
 		fwrite(&byte, 1, 1, f);
 	}
 
@@ -1642,10 +1646,10 @@ void debugger_commands::execute_save(int ref, int params, const char *param[])
 
 void debugger_commands::execute_load(int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length;
+	u64 offset, endoffset, length;
 	address_space *space;
 	FILE *f;
-	UINT64 i;
+	u64 i;
 
 	/* validate parameters */
 	if (!validate_number_parameter(param[1], &offset))
@@ -1668,7 +1672,7 @@ void debugger_commands::execute_load(int ref, int params, const char *param[])
 	}
 
 	/* now read the data in, ignore endoffset and load entire file if length has been set to zero (offset-1) */
-	UINT8 byte;
+	u8 byte;
 	for (i = offset; i <= endoffset || endoffset == offset - 1 ; i++)
 	{
 		fread(&byte, 1, 1, f);
@@ -1693,24 +1697,28 @@ void debugger_commands::execute_load(int ref, int params, const char *param[])
 void debugger_commands::execute_dump(int ref, int params, const char *param[])
 {
 	/* validate parameters */
-	UINT64 offset;
+	u64 offset;
 	if (!validate_number_parameter(param[1], &offset))
 		return;
 
-	UINT64 length;
+	u64 length;
 	if (!validate_number_parameter(param[2], &length))
 		return;
 
-	UINT64 width = 0;
+	u64 width = 0;
 	if (!validate_number_parameter(param[3], &width))
 		return;
 
-	UINT64 ascii = 1;
+	u64 ascii = 1;
 	if (!validate_number_parameter(param[4], &ascii))
 		return;
 
+	u64 rowsize = 16;
+	if (!validate_number_parameter(param[5], &rowsize))
+		return;
+
 	address_space *space;
-	if (!validate_cpu_space_parameter((params > 5) ? param[5] : nullptr, ref, space))
+	if (!validate_cpu_space_parameter((params > 6) ? param[6] : nullptr, ref, space))
 		return;
 
 	/* further validation */
@@ -1723,7 +1731,13 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 		m_console.printf("Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
-	UINT64 endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
+	if (rowsize == 0 || (rowsize % width) != 0)
+	{
+		m_console.printf("Invalid row size! (must be a positive multiple of %d)", width);
+		return;
+	}
+
+	u64 endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 	offset = space->address_to_byte(offset) & space->bytemask();
 
 	/* open the file */
@@ -1737,23 +1751,23 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 	/* now write the data out */
 	util::ovectorstream output;
 	output.reserve(200);
-	for (UINT64 i = offset; i <= endoffset; i += 16)
+	for (u64 i = offset; i <= endoffset; i += rowsize)
 	{
 		output.clear();
 		output.rdbuf()->clear();
 
 		/* print the address */
-		util::stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(i));
+		util::stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(i)));
 
 		/* print the bytes */
-		for (UINT64 j = 0; j < 16; j += width)
+		for (u64 j = 0; j < rowsize; j += width)
 		{
 			if (i + j <= endoffset)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					UINT64 value = m_cpu.read_memory(*space, i + j, width, TRUE);
+					u64 value = m_cpu.read_memory(*space, i + j, width, true);
 					util::stream_format(output, " %0*X", width * 2, value);
 				}
 				else
@@ -1769,12 +1783,12 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 		if (ascii)
 		{
 			util::stream_format(output, "  ");
-			for (UINT64 j = 0; j < 16 && (i + j) <= endoffset; j++)
+			for (u64 j = 0; j < rowsize && (i + j) <= endoffset; j++)
 			{
 				offs_t curaddr = i + j;
 				if (space->device().memory().translate(space->spacenum(), TRANSLATE_READ_DEBUG, curaddr))
 				{
-					UINT8 byte = m_cpu.read_byte(*space, i + j, TRUE);
+					u8 byte = m_cpu.read_byte(*space, i + j, true);
 					util::stream_format(output, "%c", (byte >= 32 && byte < 127) ? byte : '.');
 				}
 				else
@@ -1801,11 +1815,11 @@ void debugger_commands::execute_dump(int ref, int params, const char *param[])
 
 void debugger_commands::execute_cheatinit(int ref, int params, const char *param[])
 {
-	UINT64 offset, length = 0, real_length = 0;
+	u64 offset, length = 0, real_length = 0;
 	address_space *space;
-	UINT32 active_cheat = 0;
-	UINT64 curaddr;
-	UINT8 i, region_count = 0;
+	u32 active_cheat = 0;
+	u64 curaddr;
+	u8 i, region_count = 0;
 
 	cheat_region_map cheat_region[100];
 
@@ -1818,16 +1832,16 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 	if (ref == 0)
 	{
 		m_cheat.width = 1;
-		m_cheat.signed_cheat = FALSE;
-		m_cheat.swapped_cheat = FALSE;
+		m_cheat.signed_cheat = false;
+		m_cheat.swapped_cheat = false;
 		if (params > 0)
 		{
 			char *srtpnt = (char*)param[0];
 
 			if (*srtpnt == 's')
-				m_cheat.signed_cheat = TRUE;
+				m_cheat.signed_cheat = true;
 			else if (*srtpnt == 'u')
-				m_cheat.signed_cheat = FALSE;
+				m_cheat.signed_cheat = false;
 			else
 			{
 				m_console.printf("Invalid sign: expected s or u\n");
@@ -1849,9 +1863,9 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 			}
 
 			if (*(++srtpnt) == 's')
-				m_cheat.swapped_cheat = TRUE;
+				m_cheat.swapped_cheat = true;
 			else
-				m_cheat.swapped_cheat = FALSE;
+				m_cheat.swapped_cheat = false;
 		}
 	}
 
@@ -1863,14 +1877,14 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 			cheat_region[region_count].offset = space->address_to_byte(entry.m_addrstart) & space->bytemask();
 			cheat_region[region_count].endoffset = space->address_to_byte(entry.m_addrend) & space->bytemask();
 			cheat_region[region_count].share = entry.m_share;
-			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? FALSE : TRUE;
+			cheat_region[region_count].disabled = (entry.m_write.m_type == AMH_RAM) ? false : true;
 
 			/* disable double share regions */
 			if (entry.m_share != nullptr)
 				for (i = 0; i < region_count; i++)
 					if (cheat_region[i].share != nullptr)
 						if (strcmp(cheat_region[i].share, entry.m_share) == 0)
-							cheat_region[region_count].disabled = TRUE;
+							cheat_region[region_count].disabled = true;
 
 			region_count++;
 		}
@@ -1887,7 +1901,7 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 		cheat_region[region_count].offset = space->address_to_byte(offset) & space->bytemask();
 		cheat_region[region_count].endoffset = space->address_to_byte(offset + length - 1) & space->bytemask();
 		cheat_region[region_count].share = nullptr;
-		cheat_region[region_count].disabled = FALSE;
+		cheat_region[region_count].disabled = false;
 		region_count++;
 	}
 
@@ -1955,10 +1969,10 @@ void debugger_commands::execute_cheatinit(int ref, int params, const char *param
 void debugger_commands::execute_cheatnext(int ref, int params, const char *param[])
 {
 	address_space *space;
-	UINT64 cheatindex;
-	UINT32 active_cheat = 0;
-	UINT8 condition;
-	UINT64 comp_value = 0;
+	u64 cheatindex;
+	u32 active_cheat = 0;
+	u8 condition;
+	u64 comp_value = 0;
 
 	enum
 	{
@@ -2024,9 +2038,9 @@ void debugger_commands::execute_cheatnext(int ref, int params, const char *param
 	for (cheatindex = 0; cheatindex < m_cheat.cheatmap.size(); cheatindex += 1)
 		if (m_cheat.cheatmap[cheatindex].state == 1)
 		{
-			UINT64 cheat_value = cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset);
-			UINT64 comp_byte = (ref == 0) ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
-			UINT8 disable_byte = FALSE;
+			u64 cheat_value = cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset);
+			u64 comp_byte = (ref == 0) ? m_cheat.cheatmap[cheatindex].previous_value : m_cheat.cheatmap[cheatindex].first_value;
+			u8 disable_byte = false;
 
 			switch (condition)
 			{
@@ -2051,30 +2065,30 @@ void debugger_commands::execute_cheatnext(int ref, int params, const char *param
 
 				case CHEAT_DECREASE:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value >= (INT64)comp_byte);
+						disable_byte = (s64(cheat_value) >= s64(comp_byte));
 					else
-						disable_byte = ((UINT64)cheat_value >= (UINT64)comp_byte);
+						disable_byte = (u64(cheat_value) >= u64(comp_byte));
 					break;
 
 				case CHEAT_INCREASE:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value <= (INT64)comp_byte);
+						disable_byte = (s64(cheat_value) <= s64(comp_byte));
 					else
-						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_byte);
+						disable_byte = (u64(cheat_value) <= u64(comp_byte));
 					break;
 
 				case CHEAT_DECREASE_OR_EQUAL:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value > (INT64)comp_byte);
+						disable_byte = (s64(cheat_value) > s64(comp_byte));
 					else
-						disable_byte = ((UINT64)cheat_value > (UINT64)comp_byte);
+						disable_byte = (u64(cheat_value) > u64(comp_byte));
 					break;
 
 				case CHEAT_INCREASE_OR_EQUAL:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value < (INT64)comp_byte);
+						disable_byte = (s64(cheat_value) < s64(comp_byte));
 					else
-						disable_byte = ((UINT64)cheat_value < (UINT64)comp_byte);
+						disable_byte = (u64(cheat_value) < u64(comp_byte));
 					break;
 
 				case CHEAT_DECREASEOF:
@@ -2087,16 +2101,16 @@ void debugger_commands::execute_cheatnext(int ref, int params, const char *param
 
 				case CHEAT_SMALLEROF:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value >= (INT64)comp_value);
+						disable_byte = (s64(cheat_value) >= s64(comp_value));
 					else
-						disable_byte = ((UINT64)cheat_value >= (UINT64)comp_value);
+						disable_byte = (u64(cheat_value) >= u64(comp_value));
 					break;
 
 				case CHEAT_GREATEROF:
 					if (m_cheat.signed_cheat)
-						disable_byte = ((INT64)cheat_value <= (INT64)comp_value);
+						disable_byte = (s64(cheat_value) <= s64(comp_value));
 					else
-						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_value);
+						disable_byte = (u64(cheat_value) <= u64(comp_value));
 					break;
 				case CHEAT_CHANGEDBY:
 					if (cheat_value > comp_byte)
@@ -2134,9 +2148,9 @@ void debugger_commands::execute_cheatlist(int ref, int params, const char *param
 	char spaceletter, sizeletter;
 	address_space *space;
 	device_t *cpu;
-	UINT32 active_cheat = 0;
-	UINT64 cheatindex;
-	UINT64 sizemask;
+	u32 active_cheat = 0;
+	u64 cheatindex;
+	u64 sizemask;
 	FILE *f = nullptr;
 
 	if (!validate_cpu_space_parameter(m_cheat.cpu, AS_PROGRAM, space))
@@ -2159,10 +2173,10 @@ void debugger_commands::execute_cheatlist(int ref, int params, const char *param
 	switch (m_cheat.width)
 	{
 		default:
-		case 1:                     sizeletter = 'b';   sizemask = 0xff;                    break;
-		case 2:                     sizeletter = 'w';   sizemask = 0xffff;                  break;
-		case 4:                     sizeletter = 'd';   sizemask = 0xffffffff;              break;
-		case 8:                     sizeletter = 'q';   sizemask = U64(0xffffffffffffffff); break;
+		case 1:                     sizeletter = 'b';   sizemask = 0xffU;               break;
+		case 2:                     sizeletter = 'w';   sizemask = 0xffffU;             break;
+		case 4:                     sizeletter = 'd';   sizemask = 0xffffffffU;         break;
+		case 8:                     sizeletter = 'q';   sizemask = 0xffffffffffffffffU; break;
 	}
 
 	/* write the cheat list */
@@ -2171,7 +2185,7 @@ void debugger_commands::execute_cheatlist(int ref, int params, const char *param
 	{
 		if (m_cheat.cheatmap[cheatindex].state == 1)
 		{
-			UINT64 value = cheat_byte_swap(&m_cheat, cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset)) & sizemask;
+			u64 value = cheat_byte_swap(&m_cheat, cheat_read_extended(&m_cheat, *space, m_cheat.cheatmap[cheatindex].offset)) & sizemask;
 			offs_t address = space->byte_to_address(m_cheat.cheatmap[cheatindex].offset);
 
 			if (params > 0)
@@ -2212,8 +2226,8 @@ void debugger_commands::execute_cheatlist(int ref, int params, const char *param
 
 void debugger_commands::execute_cheatundo(int ref, int params, const char *param[])
 {
-	UINT64 cheatindex;
-	UINT32 undo_count = 0;
+	u64 cheatindex;
+	u32 undo_count = 0;
 
 	if (m_cheat.undo > 0)
 	{
@@ -2241,10 +2255,10 @@ void debugger_commands::execute_cheatundo(int ref, int params, const char *param
 
 void debugger_commands::execute_find(int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length;
+	u64 offset, endoffset, length;
 	address_space *space;
-	UINT64 data_to_find[256];
-	UINT8 data_size[256];
+	u64 data_to_find[256];
+	u8 data_size[256];
 	int cur_data_size;
 	int data_count = 0;
 	int found = 0;
@@ -2286,10 +2300,10 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 		{
 			/* check for a 'b','w','d',or 'q' prefix */
 			data_size[data_count] = cur_data_size;
-			if (tolower((UINT8)pdata[0]) == 'b' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 1; pdata += 2; }
-			if (tolower((UINT8)pdata[0]) == 'w' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 2; pdata += 2; }
-			if (tolower((UINT8)pdata[0]) == 'd' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 4; pdata += 2; }
-			if (tolower((UINT8)pdata[0]) == 'q' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 8; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'b' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 1; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'w' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 2; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'd' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 4; pdata += 2; }
+			if (tolower(u8(pdata[0])) == 'q' && pdata[1] == '.') { data_size[data_count] = cur_data_size = 8; pdata += 2; }
 
 			/* look for a wildcard */
 			if (!strcmp(pdata, "?"))
@@ -2302,7 +2316,7 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 	}
 
 	/* now search */
-	for (UINT64 i = offset; i <= endoffset; i += data_size[0])
+	for (u64 i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
 		int match = 1;
@@ -2312,10 +2326,10 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 		{
 			switch (data_size[j])
 			{
-				case 1: match = ((UINT8)m_cpu.read_byte(*space, i + suboffset, TRUE) == (UINT8)data_to_find[j]);    break;
-				case 2: match = ((UINT16)m_cpu.read_word(*space, i + suboffset, TRUE) == (UINT16)data_to_find[j]);  break;
-				case 4: match = ((UINT32)m_cpu.read_dword(*space, i + suboffset, TRUE) == (UINT32)data_to_find[j]); break;
-				case 8: match = ((UINT64)m_cpu.read_qword(*space, i + suboffset, TRUE) == (UINT64)data_to_find[j]); break;
+				case 1: match = (u8(m_cpu.read_byte(*space, i + suboffset, true)) == u8(data_to_find[j]));    break;
+				case 2: match = (u16(m_cpu.read_word(*space, i + suboffset, true)) == u16(data_to_find[j]));  break;
+				case 4: match = (u32(m_cpu.read_dword(*space, i + suboffset, true)) == u32(data_to_find[j])); break;
+				case 8: match = (u64(m_cpu.read_qword(*space, i + suboffset, true)) == u64(data_to_find[j])); break;
 				default:    /* all other cases are wildcards */     break;
 			}
 			suboffset += data_size[j] & 0x0f;
@@ -2325,7 +2339,7 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 		if (match)
 		{
 			found++;
-			m_console.printf("Found at %0*X\n", space->addrchars(), (UINT32)space->byte_to_address(i));
+			m_console.printf("Found at %0*X\n", space->addrchars(), u32(space->byte_to_address(i)));
 		}
 	}
 
@@ -2341,7 +2355,7 @@ void debugger_commands::execute_find(int ref, int params, const char *param[])
 
 void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 {
-	UINT64 offset, length, bytes = 1;
+	u64 offset, length, bytes = 1;
 	int minbytes, maxbytes, byteswidth;
 	address_space *space, *decrypted_space;
 	FILE *f;
@@ -2387,25 +2401,27 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 
 	/* now write the data out */
 	util::ovectorstream output;
+	util::ovectorstream disasm;
 	output.reserve(512);
-	for (UINT64 i = 0; i < length; )
+	for (u64 i = 0; i < length; )
 	{
 		int pcbyte = space->address_to_byte(offset + i) & space->bytemask();
-		char disasm[200];
 		const char *comment;
 		offs_t tempaddr;
 		int numbytes = 0;
 		output.clear();
 		output.rdbuf()->clear();
+		disasm.clear();
+		disasm.seekp(0);
 
 		/* print the address */
-		stream_format(output, "%0*X: ", space->logaddrchars(), (UINT32)space->byte_to_address(pcbyte));
+		stream_format(output, "%0*X: ", space->logaddrchars(), u32(space->byte_to_address(pcbyte)));
 
 		/* make sure we can translate the address */
 		tempaddr = pcbyte;
 		if (space->device().memory().translate(space->spacenum(), TRANSLATE_FETCH_DEBUG, tempaddr))
 		{
-			UINT8 opbuf[64], argbuf[64];
+			u8 opbuf[64], argbuf[64];
 
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
@@ -2431,7 +2447,8 @@ void debugger_commands::execute_dasm(int ref, int params, const char *param[])
 		}
 
 		/* add the disassembly */
-		stream_format(output, "%s", disasm);
+		disasm.put('\0');
+		stream_format(output, "%s", &disasm.vec()[0]);
 
 		/* attempt to add the comment */
 		comment = space->device().debug()->comment_text(tempaddr);
@@ -2482,7 +2499,7 @@ void debugger_commands::execute_trace_internal(int ref, int params, const char *
 		return;
 	if (!validate_boolean_parameter((params > 2) ? param[2] : nullptr, &detect_loops))
 		return;
-	if (!debug_command_parameter_command(action = param[3]))
+	if (!debug_command_parameter_command(action = (params > 3) ? param[3] : nullptr))
 		return;
 
 	/* open the file */
@@ -2559,7 +2576,7 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 	else
 		decrypted_space = space;
 
-	UINT64 count = device_debug::HISTORY_SIZE;
+	u64 count = device_debug::HISTORY_SIZE;
 	if (!validate_number_parameter(param[1], &count))
 		return;
 
@@ -2583,17 +2600,18 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 
 		/* fetch the bytes up to the maximum */
 		offs_t pcbyte = space->address_to_byte(pc) & space->bytemask();
-		UINT8 opbuf[64], argbuf[64];
+		u8 opbuf[64], argbuf[64];
 		for (int numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
 			opbuf[numbytes] = m_cpu.read_opcode(*decrypted_space, pcbyte + numbytes, 1);
 			argbuf[numbytes] = m_cpu.read_opcode(*space, pcbyte + numbytes, 1);
 		}
 
-		char buffer[200];
+		util::ovectorstream buffer;
 		dasmintf->disassemble(buffer, pc, opbuf, argbuf);
+		buffer.put('\0');
 
-		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, buffer);
+		m_console.printf("%0*X: %s\n", space->logaddrchars(), pc, &buffer.vec()[0]);
 	}
 }
 
@@ -2605,7 +2623,7 @@ void debugger_commands::execute_history(int ref, int params, const char *param[]
 void debugger_commands::execute_trackpc(int ref, int params, const char *param[])
 {
 	// Gather the on/off switch (if present)
-	UINT64 turnOn = true;
+	u64 turnOn = true;
 	if (!validate_number_parameter(param[0], &turnOn))
 		return;
 
@@ -2615,7 +2633,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 		return;
 
 	// Should we clear the existing data?
-	UINT64 clear = false;
+	u64 clear = false;
 	if (!validate_number_parameter(param[2], &clear))
 		return;
 
@@ -2625,7 +2643,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 		// Insert current pc
 		if (m_cpu.get_visible_cpu() == cpu)
 		{
-			const offs_t pc = cpu->safe_pc();
+			const offs_t pc = cpu->safe_pcbase();
 			cpu->debug()->set_track_pc_visited(pc);
 		}
 		m_console.printf("PC tracking enabled\n");
@@ -2647,7 +2665,7 @@ void debugger_commands::execute_trackpc(int ref, int params, const char *param[]
 void debugger_commands::execute_trackmem(int ref, int params, const char *param[])
 {
 	// Gather the on/off switch (if present)
-	UINT64 turnOn = true;
+	u64 turnOn = true;
 	if (!validate_number_parameter(param[0], &turnOn))
 		return;
 
@@ -2657,7 +2675,7 @@ void debugger_commands::execute_trackmem(int ref, int params, const char *param[
 		return;
 
 	// Should we clear the existing data?
-	UINT64 clear = false;
+	u64 clear = false;
 	if (!validate_number_parameter(param[2], &clear))
 		return;
 
@@ -2685,7 +2703,7 @@ void debugger_commands::execute_trackmem(int ref, int params, const char *param[
 void debugger_commands::execute_pcatmem(int ref, int params, const char *param[])
 {
 	// Gather the required address parameter
-	UINT64 address;
+	u64 address;
 	if (!validate_number_parameter(param[0], &address))
 		return;
 
@@ -2701,7 +2719,7 @@ void debugger_commands::execute_pcatmem(int ref, int params, const char *param[]
 
 	// Get the value of memory at the address
 	const int native_data_width = space->data_width() / 8;
-	const UINT64 data = m_cpu.read_memory(*space, space->address_to_byte(address), native_data_width, true);
+	const u64 data = m_cpu.read_memory(*space, space->address_to_byte(address), native_data_width, true);
 
 	// Recover the pc & print
 	const address_spacenum space_num = (address_spacenum)ref;
@@ -2777,7 +2795,7 @@ void debugger_commands::execute_map(int ref, int params, const char *param[])
 {
 	address_space *space;
 	offs_t taddress;
-	UINT64 address;
+	u64 address;
 	int intention;
 
 	/* validate parameters */
@@ -2885,7 +2903,7 @@ void debugger_commands::execute_symlist(int ref, int params, const char **param)
 	{
 		const symbol_entry *entry = symtable->find(namelist[symnum]);
 		assert(entry != nullptr);
-		UINT64 value = entry->value();
+		u64 value = entry->value();
 
 		/* only display "register" type symbols */
 		m_console.printf("%s = %X", namelist[symnum], value);

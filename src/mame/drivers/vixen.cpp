@@ -79,7 +79,7 @@ READ8_MEMBER( vixen_state::opram_r )
 		membank("bank3")->set_entry(0); // read videoram
 	bool const prev_debugger_access(m_program->debugger_access());
 	m_program->set_debugger_access(space.debugger_access());
-	UINT8 const data(m_program->read_byte(offset));
+	uint8_t const data(m_program->read_byte(offset));
 	m_program->set_debugger_access(prev_debugger_access);
 	return data;
 }
@@ -112,7 +112,7 @@ READ8_MEMBER( vixen_state::status_r )
 
 	*/
 
-	UINT8 data = 0xf8;
+	uint8_t data = 0xf8;
 
 	// vertical sync interrupt enable
 	data |= m_cmd_d0;
@@ -187,7 +187,7 @@ READ8_MEMBER( vixen_state::ieee488_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* attention */
 	data |= m_ieee488->atn_r();
@@ -238,7 +238,7 @@ READ8_MEMBER( vixen_state::port3_r )
 
 	*/
 
-	UINT8 data = 0xfc;
+	uint8_t data = 0xfc;
 
 	// ring indicator
 	data |= m_rs232->ri_r();
@@ -420,10 +420,10 @@ void vixen_state::video_start()
 //  SCREEN_UPDATE( vixen )
 //-------------------------------------------------
 
-UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
-	UINT8 x, y, chr, gfx, inv, ra;
+	uint8_t x, y, chr, gfx, inv, ra;
 
 	for (y = 0; y < 26; y++)
 	{
@@ -431,8 +431,8 @@ UINT32 vixen_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 		{
 			for (x = 0; x < 128; x++)
 			{
-				UINT16 sync_addr = ((y+1) << 7) + x + 1; // it's out by a row and a column
-				UINT8 sync_data = m_sync_rom[sync_addr & 0xfff];
+				uint16_t sync_addr = ((y+1) << 7) + x + 1; // it's out by a row and a column
+				uint8_t sync_data = m_sync_rom[sync_addr & 0xfff];
 				bool blank = BIT(sync_data, 4);
 				/*
 				int clrchadr = BIT(sync_data, 7);
@@ -501,7 +501,7 @@ DISCRETE_SOUND_END
 
 READ8_MEMBER( vixen_state::i8155_pa_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i = 0; i < 8; i++)
 		if (!BIT(m_col, i)) data &= m_key[i]->read();
@@ -746,7 +746,7 @@ static MACHINE_CONFIG_START( vixen, vixen_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(vixen_state,vixen_int_ack)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::amber())
 	MCFG_SCREEN_UPDATE_DRIVER(vixen_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_23_9616MHz/2, 96*8, 0*8, 81*8, 27*10, 0*10, 26*10)
 

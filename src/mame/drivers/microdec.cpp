@@ -57,8 +57,8 @@ public:
 	DECLARE_WRITE8_MEMBER(portf8_w);
 	DECLARE_DRIVER_INIT(microdec);
 private:
-	UINT8 m_term_data;
-	UINT8 m_portf8;
+	uint8_t m_term_data;
+	uint8_t m_portf8;
 	bool m_fdc_rdy;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -77,7 +77,7 @@ READ8_MEMBER( microdec_state::status_r )
 
 READ8_MEMBER( microdec_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -91,7 +91,7 @@ READ8_MEMBER( microdec_state::portf5_r )
 {
 	m_fdc->set_ready_line_connected(m_fdc_rdy);
 
-	UINT8 data = m_portf8 | ioport("DIAG")->read() | 0xc0;
+	uint8_t data = m_portf8 | ioport("DIAG")->read() | 0xc0;
 	return data;
 }
 
@@ -194,7 +194,7 @@ SLOT_INTERFACE_END
 
 DRIVER_INIT_MEMBER( microdec_state, microdec )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x1000]);

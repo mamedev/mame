@@ -29,8 +29,8 @@ class e01_device : public device_t,
 {
 public:
 	// construction/destruction
-	e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	e01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e01_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	e01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	enum
 	{
@@ -73,7 +73,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -124,7 +124,7 @@ class e01s_device :  public e01_device
 {
 public:
 	// construction/destruction
-	e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	e01s_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

@@ -19,7 +19,7 @@ public:
 		m_maincpu(*this, "maincpu") { }
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -43,7 +43,7 @@ void dct11em_state::video_start()
 {
 }
 
-UINT32 dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dct11em_state::screen_update_dct11em(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

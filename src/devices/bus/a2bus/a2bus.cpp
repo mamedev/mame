@@ -87,13 +87,13 @@ const device_type A2BUS_SLOT = &device_creator<a2bus_slot_device>;
 //-------------------------------------------------
 //  a2bus_slot_device - constructor
 //-------------------------------------------------
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2BUS_SLOT, "Apple II Slot", tag, owner, clock, "a2bus_slot", __FILE__),
 		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
 }
 
-a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_slot_device::a2bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this), m_a2bus_tag(nullptr), m_a2bus_slottag(nullptr)
 {
@@ -137,7 +137,7 @@ void a2bus_device::static_set_cputag(device_t &device, const char *tag)
 //  a2bus_device - constructor
 //-------------------------------------------------
 
-a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A2BUS, "Apple II Bus", tag, owner, clock, "a2bus", __FILE__), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
@@ -145,7 +145,7 @@ a2bus_device::a2bus_device(const machine_config &mconfig, const char *tag, devic
 {
 }
 
-a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_device::a2bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr), m_maincpu_space(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this),
@@ -203,12 +203,12 @@ void a2bus_device::add_a2bus_card(int slot, device_a2bus_card_interface *card)
 	m_device_list[slot] = card;
 }
 
-UINT8 a2bus_device::get_a2bus_irq_mask()
+uint8_t a2bus_device::get_a2bus_irq_mask()
 {
 	return m_slot_irq_mask;
 }
 
-UINT8 a2bus_device::get_a2bus_nmi_mask()
+uint8_t a2bus_device::get_a2bus_nmi_mask()
 {
 	return m_slot_nmi_mask;
 }
@@ -246,26 +246,26 @@ void a2bus_device::set_maincpu_halt(int state)
 	m_maincpu->set_input_line(INPUT_LINE_HALT, state);
 }
 
-UINT8 a2bus_device::dma_r(address_space &space, UINT16 offset)
+uint8_t a2bus_device::dma_r(address_space &space, uint16_t offset)
 {
 	m_maincpu_space->set_debugger_access(space.debugger_access());
 
 	return m_maincpu_space->read_byte(offset);
 }
 
-void a2bus_device::dma_w(address_space &space, UINT16 offset, UINT8 data)
+void a2bus_device::dma_w(address_space &space, uint16_t offset, uint8_t data)
 {
 	m_maincpu_space->set_debugger_access(space.debugger_access());
 
 	m_maincpu_space->write_byte(offset, data);
 }
 
-UINT8 a2bus_device::dma_nospace_r(UINT16 offset)
+uint8_t a2bus_device::dma_nospace_r(uint16_t offset)
 {
 	return m_maincpu_space->read_byte(offset);
 }
 
-void a2bus_device::dma_nospace_w(UINT16 offset, UINT8 data)
+void a2bus_device::dma_nospace_w(uint16_t offset, uint8_t data)
 {
 	m_maincpu_space->write_byte(offset, data);
 }

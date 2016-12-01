@@ -54,13 +54,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette") { }
 
-	UINT8 m_rom_page;
-	UINT32 m_vdisk_addr;
-	UINT8 m_key_code;
-	UINT8 m_keyboard_clk;
-	UINT8 m_video_mode;
-	UINT8 m_tick50_mark;
-	UINT8 m_floppy_ctrl;
+	uint8_t m_rom_page;
+	uint32_t m_vdisk_addr;
+	uint8_t m_key_code;
+	uint8_t m_keyboard_clk;
+	uint8_t m_video_mode;
+	uint8_t m_tick50_mark;
+	uint8_t m_floppy_ctrl;
 	DECLARE_READ8_MEMBER(rom_page_r);
 	DECLARE_WRITE8_MEMBER(rom_page_w);
 	DECLARE_WRITE8_MEMBER(vdisk_page_w);
@@ -79,7 +79,7 @@ public:
 	DECLARE_READ8_MEMBER(floppy_r);
 	MC6845_UPDATE_ROW(pyl601_update_row);
 	MC6845_UPDATE_ROW(pyl601a_update_row);
-	UINT8 selectedline(UINT16 data);
+	uint8_t selectedline(uint16_t data);
 	required_device<speaker_sound_device> m_speaker;
 	required_device<upd765a_device> m_fdc;
 	required_device<ram_device> m_ram;
@@ -139,15 +139,15 @@ WRITE8_MEMBER(pyl601_state::vdisk_data_w)
 
 READ8_MEMBER(pyl601_state::vdisk_data_r)
 {
-	UINT8 retVal = m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)];
+	uint8_t retVal = m_ram->pointer()[0x10000 + (m_vdisk_addr & 0x7ffff)];
 	m_vdisk_addr++;
 	m_vdisk_addr &= 0x7ffff;
 	return retVal;
 }
 
-UINT8 pyl601_state::selectedline(UINT16 data)
+uint8_t pyl601_state::selectedline(uint16_t data)
 {
-	UINT8 i;
+	uint8_t i;
 	for(i = 0; i < 16; i++)
 		if (BIT(data, i))
 			return i;
@@ -157,22 +157,22 @@ UINT8 pyl601_state::selectedline(UINT16 data)
 
 READ8_MEMBER(pyl601_state::keyboard_r)
 {
-	UINT8 ret = m_key_code;
+	uint8_t ret = m_key_code;
 	m_key_code = 0xff;
 	return ret;
 }
 
 READ8_MEMBER(pyl601_state::keycheck_r)
 {
-	UINT8 retVal = 0x3f;
-	UINT8 *keyboard = memregion("keyboard")->base();
-	UINT16 row1 = ioport("ROW1")->read();
-	UINT16 row2 = ioport("ROW2")->read();
-	UINT16 row3 = ioport("ROW3")->read();
-	UINT16 row4 = ioport("ROW4")->read();
-	UINT16 row5 = ioport("ROW5")->read();
-	UINT16 all = row1 | row2 | row3 | row4 | row5;
-	UINT16 addr = ioport("MODIFIERS")->read();
+	uint8_t retVal = 0x3f;
+	uint8_t *keyboard = memregion("keyboard")->base();
+	uint16_t row1 = ioport("ROW1")->read();
+	uint16_t row2 = ioport("ROW2")->read();
+	uint16_t row3 = ioport("ROW3")->read();
+	uint16_t row4 = ioport("ROW4")->read();
+	uint16_t row5 = ioport("ROW5")->read();
+	uint16_t all = row1 | row2 | row3 | row4 | row5;
+	uint16_t addr = ioport("MODIFIERS")->read();
 	if (all)
 	{
 		addr |= selectedline(all) << 2;
@@ -205,7 +205,7 @@ READ8_MEMBER(pyl601_state::video_mode_r)
 
 READ8_MEMBER(pyl601_state::timer_r)
 {
-	UINT8 retVal= m_tick50_mark | 0x37;
+	uint8_t retVal= m_tick50_mark | 0x37;
 	m_tick50_mark = 0;
 	return retVal;
 }
@@ -217,7 +217,7 @@ WRITE8_MEMBER(pyl601_state::speaker_w)
 
 WRITE8_MEMBER(pyl601_state::led_w)
 {
-//  UINT8 caps_led = BIT(data,4);
+//  uint8_t caps_led = BIT(data,4);
 }
 
 WRITE8_MEMBER(pyl601_state::floppy_w)
@@ -369,7 +369,7 @@ INPUT_PORTS_END
 
 void pyl601_state::machine_reset()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	m_key_code = 0xff;
 	membank("bank1")->set_base(ram + 0x0000);
 	membank("bank2")->set_base(ram + 0xc000);
@@ -388,15 +388,15 @@ void pyl601_state::video_start()
 MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charrom = memregion("chargen")->base();
+	uint8_t *charrom = memregion("chargen")->base();
 
 	int column, bit, i;
-	UINT8 data;
+	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
+			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
 			code = ((code << 1) | (code >> 7)) & 0xff;
 			if (column == cursor_x-2)
 				data = 0xff;
@@ -430,15 +430,15 @@ MC6845_UPDATE_ROW( pyl601_state::pyl601_update_row )
 MC6845_UPDATE_ROW( pyl601_state::pyl601a_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *charrom = memregion("chargen")->base();
+	uint8_t *charrom = memregion("chargen")->base();
 
 	int column, bit, i;
-	UINT8 data;
+	uint8_t data;
 	if (BIT(m_video_mode, 5) == 0)
 	{
 		for (column = 0; column < x_count; column++)
 		{
-			UINT8 code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
+			uint8_t code = m_ram->pointer()[(((ma + column) & 0x0fff) + 0xf000)];
 			data = charrom[((code << 4) | (ra & 0x07)) & 0xfff];
 			if (column == cursor_x)
 				data = 0xff;
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( pyl601, pyl601_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pyl601_state,  pyl601_interrupt)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 200)

@@ -42,13 +42,13 @@ public:
 		, m_io_joy2(*this, "JOY2")
 	{ }
 
-	UINT8 m_keyboard_line;
+	uint8_t m_keyboard_line;
 	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
 	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
 	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
@@ -74,19 +74,19 @@ protected:
 	required_ioport m_io_joy2;
 	ioport_port *m_io_port[10];
 
-	void pk8000_set_bank(UINT8 data);
+	void pk8000_set_bank(uint8_t data);
 };
 
 
 
-void pk8000_state::pk8000_set_bank(UINT8 data)
+void pk8000_state::pk8000_set_bank(uint8_t data)
 {
-	UINT8 *rom = m_region_maincpu->base();
-	UINT8 *ram = m_ram->pointer();
-	UINT8 block1 = data & 3;
-	UINT8 block2 = (data >> 2) & 3;
-	UINT8 block3 = (data >> 4) & 3;
-	UINT8 block4 = (data >> 6) & 3;
+	uint8_t *rom = m_region_maincpu->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t block1 = data & 3;
+	uint8_t block2 = (data >> 2) & 3;
+	uint8_t block3 = (data >> 4) & 3;
+	uint8_t block4 = (data >> 6) & 3;
 
 	switch(block1) {
 		case 0:
@@ -163,13 +163,13 @@ WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
 
 READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
 {
-	UINT8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
 READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
 {
-	UINT8 retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
+	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy2->read() & 0x7f;
 	return retVal;
 }
@@ -338,7 +338,7 @@ void pk8000_state::video_start()
 {
 }
 
-UINT32 pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return pk8000_video_update(screen, bitmap, cliprect, m_ram->pointer());
 }

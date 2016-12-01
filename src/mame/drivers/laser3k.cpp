@@ -100,7 +100,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(laser3k);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
 	void dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow);
@@ -110,20 +110,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
 private:
-	UINT8 m_bank0val, m_bank1val, m_bank2val, m_bank3val;
+	uint8_t m_bank0val, m_bank1val, m_bank2val, m_bank3val;
 	int m_flash;
 	int m_speaker_state;
 	int m_disp_page;
 	int m_bg_color, m_fg_color, m_border_color;
-	UINT16 m_lastchar, m_strobe;
-	UINT8 m_transchar;
+	uint16_t m_lastchar, m_strobe;
+	uint8_t m_transchar;
 	bool m_80col;
 	bool m_mix;
 	int m_gfxmode;
-	std::unique_ptr<UINT16[]> m_hires_artifact_map;
-	std::unique_ptr<UINT16[]> m_dhires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_hires_artifact_map;
+	std::unique_ptr<uint16_t[]> m_dhires_artifact_map;
 
-	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code, const UINT8 *textgfx_data, UINT32 textgfx_datalen);
+	void plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code, const uint8_t *textgfx_data, uint32_t textgfx_datalen);
 	void do_io(int offset);
 };
 
@@ -148,13 +148,13 @@ ADDRESS_MAP_END
 
 void laser3k_state::machine_start()
 {
-	static const UINT8 hires_artifact_color_table[] =
+	static const uint8_t hires_artifact_color_table[] =
 	{
 		BLACK,  PURPLE, GREEN,  WHITE,
 		BLACK,  BLUE,   ORANGE, WHITE
 	};
 
-	static const UINT8 dhires_artifact_color_table[] =
+	static const uint8_t dhires_artifact_color_table[] =
 	{
 		BLACK,      DKGREEN,    BROWN,  GREEN,
 		DKRED,      DKGRAY,     ORANGE, YELLOW,
@@ -162,13 +162,13 @@ void laser3k_state::machine_start()
 		PURPLE,     LTBLUE,     PINK,   WHITE
 	};
 	int i, j;
-	UINT16 c;
+	uint16_t c;
 
 	/* 2^3 dependent pixels * 2 color sets * 2 offsets */
-	m_hires_artifact_map = std::make_unique<UINT16[]>(8 * 2 * 2);
+	m_hires_artifact_map = std::make_unique<uint16_t[]>(8 * 2 * 2);
 
 	/* 2^4 dependent pixels */
-	m_dhires_artifact_map = std::make_unique<UINT16[]>(16);
+	m_dhires_artifact_map = std::make_unique<uint16_t[]>(16);
 
 	/* build hires artifact map */
 	for (i = 0; i < 8; i++)
@@ -229,7 +229,7 @@ void laser3k_state::machine_reset()
 	m_mix = false;
 	m_gfxmode = TEXT;
 
-	UINT8 *rom = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *rom = (uint8_t *)memregion("maincpu")->base();
 
 	// patch out disk controller ID for now so it drops right into BASIC
 	rom[0x4607] = 0;
@@ -392,7 +392,7 @@ READ8_MEMBER( laser3k_state::io_r )
 
 		case 0x10:  // keyboard strobe
 			{
-				UINT8 rv = m_transchar | m_strobe;
+				uint8_t rv = m_transchar | m_strobe;
 				m_strobe = 0;
 				return rv;
 			}
@@ -479,14 +479,14 @@ READ8_MEMBER( laser3k_state::io2_r )
 	return 0xff;
 }
 
-void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, UINT32 code,
-	const UINT8 *textgfx_data, UINT32 textgfx_datalen)
+void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos, int xscale, uint32_t code,
+	const uint8_t *textgfx_data, uint32_t textgfx_datalen)
 {
 	int x, y, i;
 	int fg = m_fg_color;
 	int bg = m_bg_color;
-	const UINT8 *chardata;
-	UINT16 color;
+	const uint8_t *chardata;
+	uint16_t color;
 
 	/* look up the character data */
 	chardata = &textgfx_data[(code * 8) % textgfx_datalen];
@@ -516,9 +516,9 @@ void laser3k_state::plot_text_character(bitmap_ind16 &bitmap, int xpos, int ypos
 void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
 	int row, col;
-	UINT32 start_address;
-	UINT32 address;
-	UINT8 *m_a2_videoram = m_ram->pointer();
+	uint32_t start_address;
+	uint32_t address;
+	uint8_t *m_a2_videoram = m_ram->pointer();
 
 	if (m_80col)
 	{
@@ -564,14 +564,14 @@ void laser3k_state::text_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const UINT8 *vram;
+	const uint8_t *vram;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[42]  ;
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
-	UINT16 *artifact_map_ptr;
+	uint8_t vram_row[42]  ;
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
+	uint16_t *artifact_map_ptr;
 
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
@@ -598,9 +598,9 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		for (col = 0; col < 40; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			artifact_map_ptr = &m_hires_artifact_map[((vram_row[col+1] & 0x80) >> 7) * 16];
 			for (b = 0; b < 7; b++)
@@ -615,13 +615,13 @@ void laser3k_state::hgr_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int beginrow, int endrow)
 {
-	const UINT8 *vram;
+	const uint8_t *vram;
 	int row, col, b;
 	int offset;
-	UINT8 vram_row[82];
-	UINT16 v;
-	UINT16 *p;
-	UINT32 w;
+	uint8_t vram_row[82];
+	uint16_t v;
+	uint16_t *p;
+	uint32_t w;
 
 	/* sanity checks */
 	if (beginrow < cliprect.min_y)
@@ -657,9 +657,9 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 
 		for (col = 0; col < 80; col++)
 		{
-			w =     (((UINT32) vram_row[col+0] & 0x7f) <<  0)
-				|   (((UINT32) vram_row[col+1] & 0x7f) <<  7)
-				|   (((UINT32) vram_row[col+2] & 0x7f) << 14);
+			w =     (((uint32_t) vram_row[col+0] & 0x7f) <<  0)
+				|   (((uint32_t) vram_row[col+1] & 0x7f) <<  7)
+				|   (((uint32_t) vram_row[col+2] & 0x7f) << 14);
 
 			for (b = 0; b < 7; b++)
 			{
@@ -670,7 +670,7 @@ void laser3k_state::dhgr_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	}
 }
 
-UINT32 laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t laser3k_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	switch (m_gfxmode)
 	{
@@ -730,7 +730,7 @@ READ_LINE_MEMBER(laser3k_state::ay3600_control_r)
 	return CLEAR_LINE;
 }
 
-static const UINT8 key_remap[0x32][4] =
+static const uint8_t key_remap[0x32][4] =
 {
 /*    norm shft ctrl both */
 	{ 0x33,0x23,0x33,0x23 },    /* 3 #     00     */
@@ -934,7 +934,7 @@ INPUT_PORTS_END
 // actual laser3000 has a digital RGB palette...
 static const rgb_t laser3k_palette[] =
 {
-	rgb_t::black,
+	rgb_t::black(),
 	rgb_t(0xE3, 0x1E, 0x60), /* Dark Red */
 	rgb_t(0x60, 0x4E, 0xBD), /* Dark Blue */
 	rgb_t(0xFF, 0x44, 0xFD), /* Purple */

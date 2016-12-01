@@ -1,14 +1,14 @@
 img[alt*="-50r."]
-{ 
-	width:  30%; 
+{
+	width:  30%;
 	display: block;
 	float: right;
 }
 .fragment
-{ 
+{
 	clear: both;
 }
 .footer
-{ 
+{
 	clear: both;
 }

@@ -54,7 +54,7 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 
 private:
-	UINT8 m_portb;
+	uint8_t m_portb;
 	required_device<cassette_image_device> m_cass;
 public:
 	required_device<palette_device> m_palette;
@@ -192,8 +192,8 @@ MC6845_UPDATE_ROW( lola8a_state::crtc_update_row )
 
 	for (int sx = 0; sx < x_count; sx++)
 	{
-		UINT16 addr = 0xa000 + sx*8 + ra + ma * 8;
-		UINT8 code = program.read_byte(addr);
+		uint16_t addr = 0xa000 + sx*8 + ra + ma * 8;
+		uint8_t code = program.read_byte(addr);
 
 		for (int x = 0; x <= 8; x++)
 		{

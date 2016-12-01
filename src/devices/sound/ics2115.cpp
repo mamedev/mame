@@ -17,7 +17,7 @@
 // device type definition
 const device_type ICS2115 = &device_creator<ics2115_device>;
 
-ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ics2115_device::ics2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ICS2115, "ICS2115", tag, owner, clock, "ics2115", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_rom(*this, DEVICE_SELF),
@@ -48,14 +48,14 @@ void ics2115_device::device_start()
 	}
 
 	//u-Law table as per MIL-STD-188-113
-	UINT16 lut[8];
-	UINT16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
+	uint16_t lut[8];
+	uint16_t lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
 	for(int i = 0; i < 8; i++)
 		lut[i] = (lut_initial << i) - lut_initial;
 	for(int i = 0; i < 256; i++) {
-		UINT8 exponent = (~i >> 4) & 0x07;
-		UINT8 mantissa = ~i & 0x0f;
-		INT16 value = lut[exponent] + (mantissa << (exponent + 3));
+		uint8_t exponent = (~i >> 4) & 0x07;
+		uint8_t mantissa = ~i & 0x0f;
+		int16_t value = lut[exponent] + (mantissa << (exponent + 3));
 		m_ulaw[i] = (i & 0x80) ? -value : value;
 	}
 
@@ -180,7 +180,7 @@ int ics2115_voice::update_volume_envelope()
 	return ret;
 }
 
-/*UINT32 ics2115_voice::next_address()
+/*uint32_t ics2115_voice::next_address()
 {
     //Patent 6,246,774 B1, Column 111, Row 25
     //LEN   BLEN    DIR     BC      NextAddress
@@ -242,8 +242,8 @@ int ics2115_voice::update_oscillator()
 //TODO: proper interpolation for uLaw (fill_output doesn't use this) and 8-bit samples (looping)
 stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
-	UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
-	UINT32 nextaddr;
+	uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+	uint32_t nextaddr;
 
 	if (voice.state.bitflags.on && voice.osc_conf.bitflags.loop && !voice.osc_conf.bitflags.loop_bidir &&
 			(voice.osc.left < (voice.osc.fc <<2))) {
@@ -254,15 +254,15 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 		nextaddr = curaddr + 2;
 
 
-	INT16 sample1, sample2;
+	int16_t sample1, sample2;
 	if (voice.osc_conf.bitflags.eightbit) {
-		sample1 = ((INT8)m_rom[curaddr]) << 8;
-		sample2 = ((INT8)m_rom[curaddr + 1]) << 8;
+		sample1 = ((int8_t)m_rom[curaddr]) << 8;
+		sample2 = ((int8_t)m_rom[curaddr + 1]) << 8;
 	}
 	else {
-		sample1 = m_rom[curaddr + 0] | (((INT8)m_rom[curaddr + 1]) << 8);
-		sample2 = m_rom[nextaddr+ 0] | (((INT8)m_rom[nextaddr+ 1]) << 8);
-		//sample2 = m_rom[curaddr + 2] | (((INT8)m_rom[curaddr + 3]) << 8);
+		sample1 = m_rom[curaddr + 0] | (((int8_t)m_rom[curaddr + 1]) << 8);
+		sample2 = m_rom[nextaddr+ 0] | (((int8_t)m_rom[nextaddr+ 1]) << 8);
+		//sample2 = m_rom[curaddr + 2] | (((int8_t)m_rom[curaddr + 3]) << 8);
 	}
 
 	//no need for interpolation since it's around 1 note a cycle?
@@ -271,12 +271,12 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 
 	//linear interpolation as in US patent 6,246,774 B1, column 2 row 59
 	//LEN=1, BLEN=0, DIR=0, start+end interpolation
-	INT32 sample, diff;
-	UINT16 fract;
+	int32_t sample, diff;
+	uint16_t fract;
 	diff = sample2 - sample1;
 	fract = (voice.osc.acc >> 3) & 0x1ff;
 
-	sample = (((INT32)sample1 << 9) + diff * fract) >> 9;
+	sample = (((int32_t)sample1 << 9) + diff * fract) >> 9;
 	//sample = sample1;
 	return sample;
 }
@@ -304,14 +304,14 @@ void ics2115_voice::update_ramp() {
 int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples)
 {
 	bool irq_invalid = false;
-	UINT16 fine = 1 << (3*(voice.vol.incr >> 6));
+	uint16_t fine = 1 << (3*(voice.vol.incr >> 6));
 	voice.vol.add = (voice.vol.incr & 0x3F)<< (10 - fine);
 
 	for (int i = 0; i < samples; i++) {
-		UINT32 volacc = (voice.vol.acc >> 10) & 0xffff;
-		UINT32 volume = (m_volume[volacc >> 4] * voice.state.bitflags.ramp) >> 6;
-		UINT16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
-		UINT16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
+		uint32_t volacc = (voice.vol.acc >> 10) & 0xffff;
+		uint32_t volume = (m_volume[volacc >> 4] * voice.state.bitflags.ramp) >> 6;
+		uint16_t vleft = volume; //* (255 - voice.vol.pan) / 0x80];
+		uint16_t vright = volume; //* (voice.vol.pan + 1) / 0x80];
 
 		//From GUS doc:
 		//In general, it is necessary to remember that all voices are being summed in to the
@@ -320,7 +320,7 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
 		//(austere note: this will of course fix some of the glitches due to multiple transition)
 		stream_sample_t sample;
 		if(voice.osc_conf.bitflags.ulaw) {
-			UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+			uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
 			sample = m_ulaw[m_rom[curaddr]];
 		}
 		else
@@ -359,13 +359,13 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 #endif
 /*
 #ifdef ICS2115_DEBUG
-        UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+        uint32_t curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
         stream_sample_t sample;
         if(voice.osc_conf.bitflags.ulaw)
             sample = m_ulaw[m_rom[curaddr]];
         else
             sample = get_sample(voice);
-        printf("[%06x=%04x]", curaddr, (INT16)sample);
+        printf("[%06x=%04x]", curaddr, (int16_t)sample);
 #endif
 */
 		if(fill_output(voice, outputs, samples))
@@ -410,8 +410,8 @@ void ics2115_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 }
 
 //Helper Function (Reads off current register)
-UINT16 ics2115_device::reg_read() {
-	UINT16 ret;
+uint16_t ics2115_device::reg_read() {
+	uint16_t ret;
 	ics2115_voice& voice = m_voice[m_osc_select];
 
 	switch(m_reg_select) {
@@ -564,7 +564,7 @@ UINT16 ics2115_device::reg_read() {
 	return ret;
 }
 
-void ics2115_device::reg_write(UINT8 data, bool msb) {
+void ics2115_device::reg_write(uint8_t data, bool msb) {
 	ics2115_voice& voice = m_voice[m_osc_select];
 
 	switch(m_reg_select) {
@@ -759,7 +759,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 
 READ8_MEMBER(ics2115_device::read)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch(offset) {
 		case 0:
@@ -782,7 +782,7 @@ READ8_MEMBER(ics2115_device::read)
 			ret = m_reg_select;
 			break;
 		case 2:
-			ret = (UINT8)(reg_read());
+			ret = (uint8_t)(reg_read());
 			break;
 		case 3:
 			ret = reg_read() >> 8;
@@ -873,10 +873,10 @@ TIMER_CALLBACK_MEMBER( ics2115_device::timer_cb_1 )
 void ics2115_device::recalc_timer(int timer)
 {
 	//Old regression-based formula (minus constant)
-	//UINT64 period = m_timer[timer].preset * (m_timer[timer].scale << 16) / 60;
+	//uint64_t period = m_timer[timer].preset * (m_timer[timer].scale << 16) / 60;
 
 	//New formula based on O.Galibert's reverse engineering of ICS2115 card firmware
-	UINT64 period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
+	uint64_t period  = ((m_timer[timer].scale & 0x1f) + 1) * (m_timer[timer].preset + 1);
 	period = (period << (4 + (m_timer[timer].scale >> 5)))*78125/2646;
 
 	if(m_timer[timer].period != period) {

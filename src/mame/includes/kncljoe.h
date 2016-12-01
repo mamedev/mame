@@ -26,9 +26,9 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_scrollregs;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_scrollregs;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t    *m_bg_tilemap;
@@ -37,8 +37,8 @@ public:
 	int        m_flipscreen;
 
 	/* misc */
-	UINT8      m_port1;
-	UINT8      m_port2;
+	uint8_t      m_port1;
+	uint8_t      m_port2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -64,7 +64,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(kncljoe);
-	UINT32 screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kncljoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

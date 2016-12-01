@@ -6,7 +6,7 @@
 
 PALETTE_INIT_MEMBER(munchmo_state, munchmo)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -56,7 +56,7 @@ void munchmo_state::draw_status( bitmap_ind16 &bitmap, const rectangle &cliprect
 	for (row = 0; row < 4; row++)
 	{
 		int sy, sx = (row & 1) * 8;
-		const UINT8 *source = m_status_vram + (~row & 1) * 32;
+		const uint8_t *source = m_status_vram + (~row & 1) * 32;
 		if (row <= 1)
 		{
 			source += 2 * 32;
@@ -80,7 +80,7 @@ void munchmo_state::draw_background( bitmap_ind16 &bitmap, const rectangle &clip
     ROM B1.2C contains 256 tilemaps defining 4x4 configurations of
     the tiles in ROM B2.2B
 */
-	UINT8 *rom = memregion("gfx2")->base();
+	uint8_t *rom = memregion("gfx2")->base();
 	gfx_element *gfx = m_gfxdecode->gfx(1);
 	int offs;
 
@@ -146,7 +146,7 @@ void munchmo_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 munchmo_state::screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t munchmo_state::screen_update_mnchmobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_background(bitmap, cliprect);
 	draw_sprites(bitmap, cliprect);

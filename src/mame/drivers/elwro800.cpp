@@ -40,7 +40,7 @@ public:
 		m_i8251(*this, "i8251"),
 		m_i8255(*this, "ppi8255"),
 		m_centronics(*this, "centronics"),
-		m_io_line8(*this, "LINE8"),
+		m_io_ports(*this, {"LINE7", "LINE6", "LINE5", "LINE4", "LINE3", "LINE2", "LINE1", "LINE0", "LINE8"}),
 		m_io_line9(*this, "LINE9"),
 		m_io_network_id(*this, "NETWORK ID")
 	{
@@ -48,11 +48,11 @@ public:
 
 	/* for elwro800 */
 	/* RAM mapped at 0 */
-	UINT8 m_ram_at_0000;
+	uint8_t m_ram_at_0000;
 
 	/* NR signal */
-	UINT8 m_NR;
-	UINT8 m_df_on_databus;
+	uint8_t m_NR;
+	uint8_t m_df_on_databus;
 
 	DECLARE_DIRECT_UPDATE_MEMBER(elwro800_direct_handler);
 	DECLARE_WRITE8_MEMBER(elwro800jr_fdc_control_w);
@@ -68,11 +68,11 @@ protected:
 	required_device<i8251_device> m_i8251;
 	required_device<i8255_device> m_i8255;
 	required_device<centronics_device> m_centronics;
-	required_ioport m_io_line8;
+	required_ioport_array<9> m_io_ports;
 	required_ioport m_io_line9;
 	required_ioport m_io_network_id;
 
-	void elwro800jr_mmu_w(UINT8 data);
+	void elwro800jr_mmu_w(uint8_t data);
 
 	int m_centronics_ack;
 };
@@ -118,12 +118,12 @@ WRITE8_MEMBER(elwro800_state::elwro800jr_fdc_control_w)
  *
  *************************************/
 
-void elwro800_state::elwro800jr_mmu_w(UINT8 data)
+void elwro800_state::elwro800jr_mmu_w(uint8_t data)
 {
-	UINT8 *prom = memregion("proms")->base() + 0x200;
-	UINT8 *messram = m_ram->pointer();
-	UINT8 cs;
-	UINT8 ls175;
+	uint8_t *prom = memregion("proms")->base() + 0x200;
+	uint8_t *messram = m_ram->pointer();
+	uint8_t cs;
+	uint8_t ls175;
 
 	ls175 = BITSWAP8(data, 7, 6, 5, 4, 4, 5, 7, 6) & 0x0f;
 
@@ -225,8 +225,8 @@ WRITE8_MEMBER(elwro800_state::i8255_port_c_w)
 
 READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 {
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 cs = prom[offset & 0x1ff];
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
 	{
@@ -234,7 +234,6 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 		int mask = 0x8000;
 		int data = 0xff;
 		int i;
-		ioport_port *io_ports[9] = { m_io_line7, m_io_line6, m_io_line5, m_io_line4, m_io_line3, m_io_line2, m_io_line1, m_io_line0, m_io_line8 };
 
 		if ( !m_NR )
 		{
@@ -242,7 +241,7 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 			{
 				if (!(offset & mask))
 				{
-					data &= io_ports[i]->read();
+					data &= m_io_ports[i]->read();
 				}
 			}
 
@@ -310,8 +309,8 @@ READ8_MEMBER(elwro800_state::elwro800jr_io_r)
 
 WRITE8_MEMBER(elwro800_state::elwro800jr_io_w)
 {
-	UINT8 *prom = memregion("proms")->base();
-	UINT8 cs = prom[offset & 0x1ff];
+	uint8_t *prom = memregion("proms")->base();
+	uint8_t cs = prom[offset & 0x1ff];
 
 	if (!BIT(cs,0))
 	{
@@ -495,7 +494,7 @@ INPUT_PORTS_END
 
 MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_df_on_databus = 0xdf;
 	memset(messram, 0, 64*1024);
@@ -508,7 +507,7 @@ MACHINE_RESET_MEMBER(elwro800_state,elwro800)
 	// this is a reset of ls175 in mmu
 	elwro800jr_mmu_w(0);
 
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(elwro800_state::elwro800_direct_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&elwro800_state::elwro800_direct_handler, this));
 }
 
 INTERRUPT_GEN_MEMBER(elwro800_state::elwro800jr_interrupt)

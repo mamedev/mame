@@ -15,8 +15,8 @@ struct M92_pf_layer_info
 {
 	tilemap_t *     tmap;
 	tilemap_t *     wide_tmap;
-	UINT16          vram_base;
-	UINT16          control[4];
+	uint16_t          vram_base;
+	uint16_t          control[4];
 };
 
 class m92_state : public driver_device
@@ -43,8 +43,8 @@ public:
 	{ }
 
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_vram_data;
-	required_shared_ptr<UINT16> m_spritecontrol;
+	required_shared_ptr<uint16_t> m_vram_data;
+	required_shared_ptr<uint16_t> m_spritecontrol;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_soundcpu;
 	optional_device<okim6295_device> m_oki;
@@ -54,16 +54,16 @@ public:
 	required_device<pic8259_device> m_upd71059c;
 	optional_device<generic_latch_8_device> m_soundlatch;
 
-	UINT16 m_sound_status;
-	UINT32 m_raster_irq_position;
-	UINT16 m_videocontrol;
-	UINT8 m_sprite_buffer_busy;
-	UINT8 m_game_kludge;
+	uint16_t m_sound_status;
+	uint32_t m_raster_irq_position;
+	uint16_t m_videocontrol;
+	uint8_t m_sprite_buffer_busy;
+	uint8_t m_game_kludge;
 	M92_pf_layer_info m_pf_layer[3];
-	UINT16 m_pf_master_control[4];
-	INT32 m_sprite_list;
-	UINT8 m_palette_bank;
-	std::vector<UINT16> m_paletteram;
+	uint16_t m_pf_master_control[4];
+	int32_t m_sprite_list;
+	uint8_t m_palette_bank;
+	std::vector<uint16_t> m_paletteram;
 
 	DECLARE_READ16_MEMBER(m92_eeprom_r);
 	DECLARE_WRITE16_MEMBER(m92_eeprom_w);
@@ -96,8 +96,8 @@ public:
 	DECLARE_MACHINE_RESET(m92);
 	DECLARE_VIDEO_START(m92);
 	DECLARE_VIDEO_START(ppan);
-	UINT32 screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_m92(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ppan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(m92_scanline_interrupt);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ppan_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);

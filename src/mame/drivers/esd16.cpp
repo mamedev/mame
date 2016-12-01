@@ -28,7 +28,8 @@ Year + Game            PCB             Notes
 00  Deluxe 5           ESD            (no date is marked on PCB)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
-01  Jumping Pop        ESD 11-09-98   (also original version by Emag Soft)
+01  Jumping Pop        ESD 11-09-98   (version by Emag Soft)
+01  Jumping Pop        ESD 12-04-00   (ESD branded version)
 ---------------------------------------------------------------------------
 
 Other ESD games:
@@ -581,7 +582,7 @@ GFXDECODE_END
 
 void esd16_state::machine_start()
 {
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	uint8_t *AUDIO = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 
@@ -1267,6 +1268,31 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
 ROM_END
 
+
+ROM_START( deluxe4u ) /* Deluxe 4 U - Removes Blackjack game, but otherwise same as Deluxe 5 */
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.cu02", 0x000000, 0x040000,  CRC(db213e1f) SHA1(bf9c49635f79b92a761715138528200106aa86ae) )
+	ROM_LOAD16_BYTE( "1.cu03", 0x000001, 0x040000,  CRC(fbf14d74) SHA1(5ff5bf4ff55609452d5b8a49d8658f878541ce60) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
+
+	ROM_REGION( 0x180000, "spr", 0 )    /* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+ROM_END
+
+
 /* Tang Tang
 
 Tang Tang (ESD)
@@ -1425,6 +1451,7 @@ ESD, 2001
 PCB Layout
 ----------
 
+ESD 12-04-00
 |------------------------------------------------------|
 | TDA1519A                62256         PAL            |
 | SAMPLES.BIN YM3014      62256         BG0.BIN        |
@@ -1564,7 +1591,7 @@ GAME( 1999, multchmp, 0,        esd16,    multchmp, driver_device, 0, ROT0, "ESD
 GAME( 1998, multchmpk,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (Korea, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, multchmpa,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (World, older)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE ) /* Redesigned(?) ESD 11-09-98 with no ID# */
+GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, jumppope, jumppop,  jumppop,  jumppop, driver_device,  0, ROT0, "Emag Soft",   "Jumping Pop (set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
@@ -1578,9 +1605,10 @@ GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, driver_device, 0, ROT0, "ESD
 GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 3 sets report the same version number?
+GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
 GAME( 2000, deluxe5a, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, deluxe5b, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, swatpolc, 0,        hedpanic, swatpolc, driver_device, 0, ROT0, "ESD",         "SWAT Police", MACHINE_SUPPORTS_SAVE )

@@ -44,10 +44,10 @@ public:
 		m_screen(*this, "screen") { }
 
 	pen_t m_pens[NUM_PENS];
-	required_shared_ptr<UINT8> m_backup_ram;
-	required_shared_ptr<UINT8> m_ram_attr;
-	required_shared_ptr<UINT8> m_ram_video;
-	std::unique_ptr<UINT8[]> m_ram_palette;
+	required_shared_ptr<uint8_t> m_backup_ram;
+	required_shared_ptr<uint8_t> m_ram_attr;
+	required_shared_ptr<uint8_t> m_ram_video;
+	std::unique_ptr<uint8_t[]> m_ram_palette;
 	DECLARE_READ8_MEMBER(palette_r);
 	DECLARE_WRITE8_MEMBER(palette_w);
 	DECLARE_WRITE_LINE_MEMBER(hsync_changed);
@@ -110,8 +110,8 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 	int extra_video_bank_bit = 0; // not used?
 	int lscnblk = 0; // not used?
 
-	UINT8 *gfx[2];
-	UINT16 x = 0;
+	uint8_t *gfx[2];
+	uint16_t x = 0;
 	int rlen;
 
 	gfx[0] = memregion("gfx1")->base();
@@ -119,14 +119,14 @@ MC6845_UPDATE_ROW( slotcarn_state::crtc_update_row )
 	rlen = memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int i;
 		int attr = m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
 		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		UINT8   *data;
+		uint8_t   *data;
 
 		addr &= (rlen-1);
 		data = gfx[region];
@@ -524,7 +524,7 @@ GFXDECODE_END
 
 void slotcarn_state::machine_start()
 {
-	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 }
 

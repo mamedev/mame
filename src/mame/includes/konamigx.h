@@ -64,15 +64,15 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	optional_shared_ptr<UINT32> m_workram;
-	optional_shared_ptr<UINT32> m_psacram;
-	optional_shared_ptr<UINT32> m_subpaletteram32;
-	optional_shared_ptr<UINT16> m_k053936_0_ctrl;
-	optional_shared_ptr<UINT16> m_k053936_0_linectrl;
-	optional_shared_ptr<UINT16> m_k053936_0_ctrl_16;
-	optional_shared_ptr<UINT16> m_k053936_0_linectrl_16;
-	optional_shared_ptr<UINT32> m_konamigx_type3_psac2_bank;
-	optional_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_shared_ptr<uint32_t> m_workram;
+	optional_shared_ptr<uint32_t> m_psacram;
+	optional_shared_ptr<uint32_t> m_subpaletteram32;
+	optional_shared_ptr<uint16_t> m_k053936_0_ctrl;
+	optional_shared_ptr<uint16_t> m_k053936_0_linectrl;
+	optional_shared_ptr<uint16_t> m_k053936_0_ctrl_16;
+	optional_shared_ptr<uint16_t> m_k053936_0_linectrl_16;
+	optional_shared_ptr<uint32_t> m_konamigx_type3_psac2_bank;
+	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	optional_ioport m_an0, m_an1, m_light0_x, m_light0_y, m_light1_x, m_light1_y, m_eepromout;
 
@@ -119,9 +119,9 @@ public:
 	DECLARE_VIDEO_START(konamigx_type4);
 	DECLARE_VIDEO_START(konamigx_type4_vsn);
 	DECLARE_VIDEO_START(konamigx_type4_sd2);
-	UINT32 screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_konamigx(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_konamigx_left(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_konamigx_right(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(konamigx_type2_vblank_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type2_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(konamigx_type4_scanline);
@@ -153,7 +153,7 @@ public:
 	void gx_draw_basic_extended_tilemaps_1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub1, int sub1flags, int rushingheroes_hack, int offs);
 	void gx_draw_basic_extended_tilemaps_2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int mixerflags, int code, tilemap_t *sub2, int sub2flags, bitmap_ind16 *extra_bitmap, int offs);
 
-	void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
+	void konamigx_esc_alert(uint32_t *srcbase, int srcoffs, int count, int mode);
 	void konamigx_precache_registers(void);
 
 	void wipezbuf(int noshadow);
@@ -162,29 +162,29 @@ public:
 
 	void konamigx_mixer_init(screen_device &screen, int objdma);
 	void konamigx_objdma(void);
-	void generate_sprites(address_space &space, UINT32 src, UINT32 spr, int count);
+	void generate_sprites(address_space &space, uint32_t src, uint32_t spr, int count);
 
 	void fantjour_dma_install();
 
 	void konamigx_mixer_primode(int mode);
 
-	typedef void (konamigx_state::*esc_cb)(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+	typedef void (konamigx_state::*esc_cb)(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
 
-	void tkmmpzdm_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	void dragoonj_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	void sal2_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	void sexyparo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	void tbyahhoo_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
-	void daiskiss_esc(address_space &space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+	void tkmmpzdm_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void dragoonj_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void sal2_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void sexyparo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void tbyahhoo_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
+	void daiskiss_esc(address_space &space, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t p4);
 
 	inline int K053247GX_combine_c18(int attrib);
 	inline int K055555GX_decode_objcolor(int c18);
 	inline int K055555GX_decode_inpri(int c18);
 	int K055555GX_decode_vmixcolor(int layer, int *color);
 
-	UINT8 m_sound_ctrl;
-	UINT8 m_sound_intck;
-	UINT32 m_fantjour_dma[8];
+	uint8_t m_sound_ctrl;
+	uint8_t m_sound_intck;
+	uint32_t m_fantjour_dma[8];
 	int m_konamigx_current_frame;
 	int m_gx_objdma, m_gx_primode;
 	emu_timer *m_dmadelay_timer;
@@ -193,14 +193,14 @@ public:
 	int m_gx_cfgport;
 	int m_suspension_active, m_resume_trigger;
 	int m_last_prot_op, m_last_prot_clk;
-	UINT8 m_prev_pixel_clock;
+	uint8_t m_prev_pixel_clock;
 
-	UINT8 m_esc_program[4096];
+	uint8_t m_esc_program[4096];
 	esc_cb m_esc_cb;
 
-	UINT16 m_prot_data[0x20];
+	uint16_t m_prot_data[0x20];
 
-	UINT16 *m_gx_spriteram;
+	uint16_t *m_gx_spriteram;
 
 	// mirrored K054338 settings
 	int *m_K054338_shdRGB;
@@ -212,14 +212,14 @@ public:
 	int m_opri, m_oinprion;
 	int m_vcblk[6], m_ocblk;
 	int m_vinmix, m_vmixon, m_osinmix, m_osmixon;
-	UINT8  m_gx_wrport1_0, m_gx_wrport1_1;
-	UINT16 m_gx_wrport2;
+	uint8_t  m_gx_wrport1_0, m_gx_wrport1_1;
+	uint16_t m_gx_wrport2;
 
 	// 2nd-Tier GX/MW Graphics Variables
-	UINT8 *m_gx_objzbuf;
-	std::unique_ptr<UINT8[]> m_gx_shdzbuf;
+	uint8_t *m_gx_objzbuf;
+	std::unique_ptr<uint8_t[]> m_gx_shdzbuf;
 	int m_layer_colorbase[4];
-	INT32 m_gx_tilebanks[8], m_gx_oldbanks[8];
+	int32_t m_gx_tilebanks[8], m_gx_oldbanks[8];
 	int m_gx_tilemode, m_gx_rozenable, m_psac_colorbase, m_last_psac_colorbase;
 	int m_gx_specialrozenable; // type 1 roz, with voxel height-map, rendered from 2 source tilemaps (which include height data) to temp bitmap for further processing
 	int m_gx_rushingheroes_hack;

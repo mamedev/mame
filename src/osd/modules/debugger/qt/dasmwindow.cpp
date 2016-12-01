@@ -142,7 +142,7 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		INT32 bpindex = -1;
+		int32_t bpindex = -1;
 		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
 				bp != nullptr;
 				bp = bp->next())
@@ -189,7 +189,7 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 		if (bp != nullptr)
 		{
 			cpuinfo->breakpoint_enable(bp->index(), !bp->enabled());
-			m_machine->debugger().console().printf("Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+			m_machine->debugger().console().printf("Breakpoint %X %s\n", (uint32_t)bp->index(), bp->enabled() ? "enabled" : "disabled");
 			m_machine->debug_view().update_all();
 			m_machine->debugger().refresh_display();
 		}
@@ -302,16 +302,16 @@ void DasmWindowQtConfig::applyToQWidget(QWidget* widget)
 	rightBarGroup->actions()[m_rightBar]->trigger();
 }
 
-void DasmWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void DasmWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "cpu", m_cpu);
-	xml_set_attribute_int(node, "rightbar", m_rightBar);
+	node.set_attribute_int("cpu", m_cpu);
+	node.set_attribute_int("rightbar", m_rightBar);
 }
 
-void DasmWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void DasmWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_cpu = xml_get_attribute_int(node, "cpu", m_cpu);
-	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
+	m_cpu = node.get_attribute_int("cpu", m_cpu);
+	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
 }

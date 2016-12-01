@@ -34,7 +34,7 @@ ROM_START( floppy )
 	ROM_LOAD("vzdos.rom", 0x0000, 0x2000, CRC(b6ed6084) SHA1(59d1cbcfa6c5e1906a32704fbf0d9670f0d1fd8b))
 ROM_END
 
-const rom_entry *floppy_controller_device::device_rom_region() const
+const tiny_rom_entry *floppy_controller_device::device_rom_region() const
 {
 	return ROM_NAME( floppy );
 }
@@ -67,7 +67,7 @@ machine_config_constructor floppy_controller_device::device_mconfig_additions() 
 //  floppy_controller_device - constructor
 //-------------------------------------------------
 
-floppy_controller_device::floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+floppy_controller_device::floppy_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FLOPPY_CONTROLLER, "Laser/VZ Floppy Disk Controller", tag, owner, clock, "laserfdc", __FILE__),
 	device_memexp_interface(mconfig, *this),
 	m_memexp(*this, "mem"),
@@ -92,7 +92,7 @@ void floppy_controller_device::device_start()
 
 	// TODO: save m_write_buffer and rebuild m_floppy after load
 
-	UINT8 *bios = memregion("software")->base();
+	uint8_t *bios = memregion("software")->base();
 
 	// Obvious bugs... must have worked by sheer luck and very subtle
 	// timings.  Our current z80 is not subtle enough.
@@ -138,7 +138,7 @@ void floppy_controller_device::device_reset()
 
 WRITE8_MEMBER(floppy_controller_device::latch_w)
 {
-	UINT8 diff = m_latch ^ data;
+	uint8_t diff = m_latch ^ data;
 	m_latch = data;
 
 	floppy_image_device *newflop = nullptr;
@@ -157,7 +157,7 @@ WRITE8_MEMBER(floppy_controller_device::latch_w)
 		if(newflop) {
 			newflop->set_rpm(85);
 			newflop->mon_w(0);
-			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(FUNC(floppy_controller_device::index_callback), this));
+			newflop->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&floppy_controller_device::index_callback, this));
 			m_current_cyl = newflop->get_cyl() << 1;
 		}
 		m_floppy = newflop;

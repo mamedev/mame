@@ -37,8 +37,8 @@ end
 
 function pkgconfigcmd()
 	local pkgconfig = os.getenv("PKG_CONFIG")
-	if pkgconfig == nil then 
-		return "pkg-config" 
+	if pkgconfig == nil then
+		return "pkg-config"
 	end
 	return pkgconfig
 end
@@ -60,6 +60,7 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/netdev/netdev_module.h",
 		MAME_DIR .. "src/osd/modules/sound/sound_module.h",
 		MAME_DIR .. "src/osd/modules/diagnostics/diagnostics_module.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_module.h",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.cpp",
 		MAME_DIR .. "src/osd/modules/lib/osdobj_common.h",
 		MAME_DIR .. "src/osd/modules/diagnostics/none.cpp",
@@ -100,27 +101,21 @@ function osdmodulesbuild()
 		MAME_DIR .. "src/osd/modules/input/input_xinput.cpp",
 		MAME_DIR .. "src/osd/modules/input/input_xinput.h",
 		MAME_DIR .. "src/osd/modules/input/input_winhybrid.cpp",
+		MAME_DIR .. "src/osd/modules/input/input_uwp.cpp",
 		MAME_DIR .. "src/osd/modules/output/output_module.h",
 		MAME_DIR .. "src/osd/modules/output/none.cpp",
 		MAME_DIR .. "src/osd/modules/output/console.cpp",
 		MAME_DIR .. "src/osd/modules/output/network.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.cpp",
 		MAME_DIR .. "src/osd/modules/output/win32_output.h",
-		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/tcp_connection.h",
-		MAME_DIR .. "src/osd/modules/ipc/tcp_server.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/tcp_server.h",
-		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_connection.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_connection.h",
-		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_server.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/raw_tcp_server.h",
-		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_connection.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_connection.h",
-		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.cpp",
-		MAME_DIR .. "src/osd/modules/ipc/rtc_tcp_server.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_common.h",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_common.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_win32.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_dxgi.cpp",
+		MAME_DIR .. "src/osd/modules/monitor/monitor_sdl.cpp",
 	}
 	includedirs {
-		ext_includedir("uv"),
+		MAME_DIR .. "3rdparty/asio/include",
 	}
 
 	if _OPTIONS["targetos"]=="windows" then

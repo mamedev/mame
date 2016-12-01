@@ -49,7 +49,7 @@ std::string zippath_combine(const std::string &path1, const std::string &path2);
 // ----- file operations -----
 
 // opens a zip path file
-osd_file::error zippath_fopen(const std::string &filename, UINT32 openflags, util::core_file::ptr &file, std::string &revised_path);
+osd_file::error zippath_fopen(const std::string &filename, uint32_t openflags, util::core_file::ptr &file, std::string &revised_path);
 
 
 // ----- directory operations ----- */
@@ -63,8 +63,8 @@ void zippath_closedir(zippath_directory *directory);
 // reads a directory entry
 const osd::directory::entry *zippath_readdir(zippath_directory *directory);
 
-// returns TRUE if this path is a ZIP path or FALSE if not
-int zippath_is_zip(zippath_directory *directory);
+// returns true if this path is a ZIP path or false if not
+bool zippath_is_zip(zippath_directory *directory);
 
 } // namespace util
 

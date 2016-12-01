@@ -12,13 +12,6 @@
 #include "cdrom.h"
 #include "chd_cd.h"
 
-
-static OPTION_GUIDE_START(cd_option_guide)
-	OPTION_INT('K', "hunksize",         "Hunk Bytes")
-OPTION_GUIDE_END
-
-static const char cd_option_spec[] = "K512/1024/2048/[4096]";
-
 // device type definition
 const device_type CDROM = &device_creator<cdrom_image_device>;
 
@@ -26,7 +19,7 @@ const device_type CDROM = &device_creator<cdrom_image_device>;
 //  cdrom_image_device - constructor
 //-------------------------------------------------
 
-cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDROM, "CD-ROM Image", tag, owner, clock, "cdrom_image", __FILE__),
 		device_image_interface(mconfig, *this),
 		m_cdrom_handle(nullptr),
@@ -35,7 +28,7 @@ cdrom_image_device::cdrom_image_device(const machine_config &mconfig, const char
 {
 }
 
-cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+cdrom_image_device::cdrom_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name,  tag, owner, clock, shortname, source),
 		device_image_interface(mconfig, *this),
 		m_cdrom_handle(nullptr),
@@ -61,15 +54,10 @@ void cdrom_image_device::device_config_complete()
 {
 	m_extension_list = "chd,cue,toc,nrg,gdi,iso,cdr";
 
-	add_format("chdcd", "CD-ROM drive", m_extension_list, cd_option_spec);
+	add_format("chdcd", "CD-ROM drive", m_extension_list, "");
 
 	// set brief and instance name
 	update_names();
-}
-
-const option_guide *cdrom_image_device::create_option_guide() const
-{
-	return cd_option_guide;
 }
 
 //-------------------------------------------------

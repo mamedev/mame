@@ -26,12 +26,12 @@
 
 const device_type IDE_CONTROLLER = &device_creator<ide_controller_device>;
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ata_interface_device(mconfig, IDE_CONTROLLER, "IDE Controller", tag, owner, clock, "ide_controller", __FILE__)
 {
 }
 
-ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ide_controller_device::ide_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	ata_interface_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -89,19 +89,19 @@ WRITE16_MEMBER( ide_controller_device::write_cs1 )
 
 const device_type IDE_CONTROLLER_32 = &device_creator<ide_controller_32_device>;
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_device(mconfig, IDE_CONTROLLER, "IDE Controller (32 bit)", tag, owner, clock, "ide_controller32", __FILE__)
 {
 }
 
-ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+ide_controller_32_device::ide_controller_32_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	ide_controller_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
 READ32_MEMBER(ide_controller_32_device::read_cs0)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -120,7 +120,7 @@ READ32_MEMBER(ide_controller_32_device::read_cs0)
 
 READ32_MEMBER(ide_controller_32_device::read_cs1)
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	if (ACCESSING_BITS_0_15)
 	{
@@ -168,7 +168,7 @@ WRITE32_MEMBER(ide_controller_32_device::write_cs1)
 
 const device_type BUS_MASTER_IDE_CONTROLLER = &device_creator<bus_master_ide_controller_device>;
 
-bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+bus_master_ide_controller_device::bus_master_ide_controller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	ide_controller_32_device(mconfig, BUS_MASTER_IDE_CONTROLLER, "Bus Master IDE Controller", tag, owner, clock, "bus_master_ide_controller", __FILE__),
 	m_dma_address(0),
 	m_dma_bytes_left(0),
@@ -275,8 +275,8 @@ WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 		if( ACCESSING_BITS_0_7 )
 		{
 			/* Bus Master IDE Command register */
-			UINT8 old = m_bus_master_command;
-			UINT8 val = data & 0xff;
+			uint8_t old = m_bus_master_command;
+			uint8_t val = data & 0xff;
 
 			/* save the "Read or Write Control" bit 3 and the "Start/Stop Bus Master" bit 0 */
 			m_bus_master_command = (old & 0xf6) | (val & 0x09);
@@ -307,8 +307,8 @@ WRITE32_MEMBER( bus_master_ide_controller_device::bmdma_w )
 		if( ACCESSING_BITS_16_23 )
 		{
 			/* Bus Master IDE Status register */
-			UINT8 old = m_bus_master_status;
-			UINT8 val = data >> 16;
+			uint8_t old = m_bus_master_status;
+			uint8_t val = data >> 16;
 
 			/* save the DMA capable bits */
 			m_bus_master_status = (old & 0x9f) | (val & 0x60);
@@ -360,7 +360,7 @@ void bus_master_ide_controller_device::execute_dma()
 		if (m_bus_master_command & 8)
 		{
 			// read from ata bus
-			UINT16 data = read_dma();
+			uint16_t data = read_dma();
 
 			// write to memory
 			m_dma_space->write_byte(m_dma_address++, data & 0xff);
@@ -369,7 +369,7 @@ void bus_master_ide_controller_device::execute_dma()
 		else
 		{
 			// read from memory;
-			UINT16 data = m_dma_space->read_byte(m_dma_address++);
+			uint16_t data = m_dma_space->read_byte(m_dma_address++);
 			data |= m_dma_space->read_byte(m_dma_address++) << 8;
 
 			// write to ata bus

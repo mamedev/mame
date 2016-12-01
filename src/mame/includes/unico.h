@@ -17,12 +17,12 @@ public:
 		m_generic_paletteram_16(*this, "paletteram"),
 		m_generic_paletteram_32(*this, "paletteram") { }
 
-	std::unique_ptr<UINT16[]> m_vram;
-	std::unique_ptr<UINT16[]> m_scroll;
+	std::unique_ptr<uint16_t[]> m_vram;
+	std::unique_ptr<uint16_t[]> m_scroll;
 	tilemap_t *m_tilemap[3];
 	int m_sprites_scrolldx;
 	int m_sprites_scrolldy;
-	std::unique_ptr<UINT16[]> m_spriteram;
+	std::unique_ptr<uint16_t[]> m_spriteram;
 	DECLARE_WRITE16_MEMBER(zeropnt_sound_bank_w);
 	DECLARE_READ16_MEMBER(unico_gunx_0_msb_r);
 	DECLARE_READ16_MEMBER(unico_guny_0_msb_r);
@@ -49,7 +49,7 @@ public:
 	DECLARE_MACHINE_RESET(unico);
 	DECLARE_VIDEO_START(unico);
 	DECLARE_MACHINE_RESET(zeropt);
-	UINT32 screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_unico(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void unico_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	optional_device<okim6295_device> m_oki;
@@ -57,6 +57,6 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-	optional_shared_ptr<UINT16> m_generic_paletteram_16;
-	optional_shared_ptr<UINT32> m_generic_paletteram_32;
+	optional_shared_ptr<uint16_t> m_generic_paletteram_16;
+	optional_shared_ptr<uint32_t> m_generic_paletteram_32;
 };

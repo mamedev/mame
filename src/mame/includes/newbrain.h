@@ -40,22 +40,7 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_rom(*this, Z80_TAG),
 		m_char_rom(*this, "chargen"),
-		m_y0(*this, "Y0"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_y10(*this, "Y10"),
-		m_y11(*this, "Y11"),
-		m_y12(*this, "Y12"),
-		m_y13(*this, "Y13"),
-		m_y14(*this, "Y14"),
-		m_y15(*this, "Y15"),
+		m_y(*this, "Y%u", 0),
 		m_pwrup(0),
 		m_userint(1),
 		m_clkint(1),
@@ -65,7 +50,7 @@ public:
 	{
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mreq_r );
 	DECLARE_WRITE8_MEMBER( mreq_w );
@@ -109,7 +94,7 @@ protected:
 	int get_pwrup_t();
 
 	void screen_update(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	void tvl(UINT8 data, int a6);
+	void tvl(uint8_t data, int a6);
 
 	required_device<z80_device> m_maincpu;
 	required_device<cop400_cpu_device> m_cop;
@@ -122,22 +107,7 @@ protected:
 	required_device<ram_device> m_ram;
 	required_memory_region m_rom;
 	required_memory_region m_char_rom;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
-	required_ioport m_y13;
-	required_ioport m_y14;
-	required_ioport m_y15;
+	required_ioport_array<16> m_y;
 
 	int m_clk;
 	int m_tvp;
@@ -154,14 +124,14 @@ protected:
 
 	int m_keylatch;
 	int m_keydata;
-	UINT16 m_segment_data;
+	uint16_t m_segment_data;
 
 	int m_rv;
 	int m_fs;
 	int m_32_40;
 	int m_ucr;
 	int m_80l;
-	UINT16 m_tvl;
+	uint16_t m_tvl;
 };
 
 

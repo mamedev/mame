@@ -46,7 +46,7 @@ const device_type IQ151_MS151A = &device_creator<iq151_ms151a_device>;
 //  iq151_ms151a_device - constructor
 //-------------------------------------------------
 
-iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, IQ151_MS151A, "IQ151 MS151A", tag, owner, clock, "iq151_ms151a", __FILE__),
 		device_iq151cart_interface( mconfig, *this ), m_rom(nullptr), m_posx(0), m_posy(0), m_pen(0), m_paper(nullptr)
 	{
@@ -58,7 +58,7 @@ iq151_ms151a_device::iq151_ms151a_device(const machine_config &mconfig, const ch
 
 void iq151_ms151a_device::device_start()
 {
-	m_rom = (UINT8*)memregion("ms151a")->base();
+	m_rom = (uint8_t*)memregion("ms151a")->base();
 
 	// allocate a bitmap for represent the paper
 	m_paper = std::make_unique<bitmap_ind16>(PAPER_WIDTH, PAPER_HEIGHT);
@@ -81,7 +81,7 @@ void iq151_ms151a_device::device_stop()
 
 	if (filerr == osd_file::error::NONE)
 	{
-		static const rgb_t png_palette[] = { rgb_t::white, rgb_t::black };
+		static const rgb_t png_palette[] = { rgb_t::white(), rgb_t::black() };
 
 		// save the paper into a png
 		png_write_bitmap(file, nullptr, *m_paper, 2, png_palette);
@@ -93,7 +93,7 @@ void iq151_ms151a_device::device_stop()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *iq151_ms151a_device::device_rom_region() const
+const tiny_rom_entry *iq151_ms151a_device::device_rom_region() const
 {
 	return ROM_NAME( iq151_ms151a );
 }
@@ -102,7 +102,7 @@ const rom_entry *iq151_ms151a_device::device_rom_region() const
 //  read
 //-------------------------------------------------
 
-void iq151_ms151a_device::read(offs_t offset, UINT8 &data)
+void iq151_ms151a_device::read(offs_t offset, uint8_t &data)
 {
 	// interal ROM is mapped at 0xc000-0xc7ff
 	if (offset >= 0xc000 && offset < 0xc800)
@@ -113,7 +113,7 @@ void iq151_ms151a_device::read(offs_t offset, UINT8 &data)
 //  IO read
 //-------------------------------------------------
 
-void iq151_ms151a_device::io_read(offs_t offset, UINT8 &data)
+void iq151_ms151a_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (offset == 0xc4)
 		data = plotter_status();
@@ -123,7 +123,7 @@ void iq151_ms151a_device::io_read(offs_t offset, UINT8 &data)
 //  IO write
 //-------------------------------------------------
 
-void iq151_ms151a_device::io_write(offs_t offset, UINT8 data)
+void iq151_ms151a_device::io_write(offs_t offset, uint8_t data)
 {
 	if (offset >= 0xc0 && offset <= 0xc4)
 		plotter_update(offset - 0xc0, data);
@@ -134,7 +134,7 @@ void iq151_ms151a_device::io_write(offs_t offset, UINT8 data)
 //  XY 4130/4131
 //**************************************************************************
 
-UINT8 iq151_ms151a_device::plotter_status()
+uint8_t iq151_ms151a_device::plotter_status()
 {
 	/*
 	    bit 7 - plotter READY line
@@ -143,7 +143,7 @@ UINT8 iq151_ms151a_device::plotter_status()
 	return 0x80;
 }
 
-void iq151_ms151a_device::plotter_update(UINT8 offset, UINT8 data)
+void iq151_ms151a_device::plotter_update(uint8_t offset, uint8_t data)
 {
 	// update pen and paper positions
 	switch (offset)

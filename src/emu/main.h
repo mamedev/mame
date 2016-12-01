@@ -13,8 +13,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef MAME_EMU_MAIN_H
+#define MAME_EMU_MAIN_H
 
 #include <time.h>
 
@@ -94,4 +94,4 @@ protected:
 };
 
 
-#endif  /* __MAIN_H__ */
+#endif  /* MAME_EMU_MAIN_H */

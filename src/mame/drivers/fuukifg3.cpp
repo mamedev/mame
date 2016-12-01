@@ -175,7 +175,7 @@ FG-3J ROM-J 507KA0301P04       Rev:1.3
 READ32_MEMBER(fuuki32_state::snd_020_r)
 {
 	machine().scheduler().synchronize();
-	UINT32 retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
+	uint32_t retdata = m_shared_ram[offset * 2] << 16 | m_shared_ram[(offset * 2) + 1];
 	return retdata;
 }
 
@@ -243,7 +243,7 @@ WRITE8_MEMBER(fuuki32_state::sound_bw_w)
 
 READ8_MEMBER(fuuki32_state::snd_z80_r)
 {
-	UINT8 retdata = m_shared_ram[offset];
+	uint8_t retdata = m_shared_ram[offset];
 	return retdata;
 }
 
@@ -514,14 +514,14 @@ void fuuki32_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_raster_interrupt_timer->adjust(m_screen->frame_period());
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in fuuki32_state::device_timer");
+		assert_always(false, "Unknown id in fuuki32_state::device_timer");
 	}
 }
 
 
 void fuuki32_state::machine_start()
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x10000], 0x8000);
 

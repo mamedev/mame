@@ -33,7 +33,7 @@ PALETTE_INIT_MEMBER(nes_state, nes)
 
 ***************************************************************************/
 
-UINT32 nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nes_state::screen_update_nes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// render the ppu
 	m_ppu->render(bitmap, 0, 0, 0, 0);

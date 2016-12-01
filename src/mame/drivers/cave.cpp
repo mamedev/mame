@@ -30,7 +30,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702   013             Z80
 96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
 96 Poka Poka Satan    Kato's        PPS-MAIN    038 9444WX010   013 9607EX013
-97 Dodonpachi         Atlus         ATC03D2     038             013
+97 Dodonpachi         Atlus         AT-C03 D2   038 9341E7010   013 9338EX701
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       038 9841WX002   013 9838EX002
 98 Uo Poko            Jaleco        CV02        038 9749WX001   013 9749EX004
@@ -257,7 +257,7 @@ READ16_MEMBER(cave_state::soundlatch_ack_r)
 {
 	if (m_soundbuf_len > 0)
 	{
-		UINT8 data = m_soundbuf_data[0];
+		uint8_t data = m_soundbuf_data[0];
 		memmove(m_soundbuf_data, m_soundbuf_data + 1, (32 - 1) * sizeof(m_soundbuf_data[0]));
 		m_soundbuf_len--;
 		return data;
@@ -790,12 +790,12 @@ WRITE16_MEMBER(cave_state::ppsatan_io_mux_w)
 	COMBINE_DATA(&m_ppsatan_io_mux);
 }
 
-UINT16 cave_state::ppsatan_touch_r(int player)
+uint16_t cave_state::ppsatan_touch_r(int player)
 {
-	UINT8 ret_x = 0, ret_y = 0;
+	uint8_t ret_x = 0, ret_y = 0;
 
-	UINT16 x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
-	UINT16 y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
+	uint16_t x = ioport(player ? "TOUCH2_X" : "TOUCH1_X")->read();
+	uint16_t y = ioport(player ? "TOUCH2_Y" : "TOUCH1_Y")->read();
 
 	if (x & 0x8000) // touching
 	{
@@ -856,7 +856,7 @@ WRITE16_MEMBER(cave_state::ppsatan_out_w)
 		output().set_led_value(6, data & 0x0400);    // not tested in service mode
 		output().set_led_value(7, data & 0x0800);    // not tested in service mode
 
-		m_oki->set_bank_base((data & 0x8000) ? 0x40000 : 0);
+		m_oki->set_rom_bank((data & 0x8000) >> 15);
 	}
 
 //  popmessage("OUT %04x", data);
@@ -913,9 +913,9 @@ READ16_MEMBER(cave_state::pwrinst2_eeprom_r)
 	return ~8 + ((m_eeprom->do_read() & 1) ? 8 : 0);
 }
 
-inline void cave_state::vctrl_w(address_space &space, offs_t offset, UINT16 data, UINT16 mem_mask, int GFX)
+inline void cave_state::vctrl_w(address_space &space, offs_t offset, uint16_t data, uint16_t mem_mask, int GFX)
 {
-	UINT16 *VCTRL = m_vctrl[GFX];
+	uint16_t *VCTRL = m_vctrl[GFX];
 	if (offset == 4 / 2)
 	{
 		switch (data & 0x000f)
@@ -2596,9 +2596,23 @@ static MACHINE_CONFIG_START( pwrinst2, cave_state )
 MACHINE_CONFIG_END
 
 
+
+
 /***************************************************************************
                         Sailor Moon / Air Gallet
 ***************************************************************************/
+
+TIMER_DEVICE_CALLBACK_MEMBER( cave_state::sailormn_startup )
+{
+	m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
+}
+
+MACHINE_RESET_MEMBER(cave_state,sailormn)
+{
+	timer_device *startup = machine().device<timer_device>("startup");
+	startup->adjust(attotime::from_usec(1000), 0, attotime::zero);
+	MACHINE_RESET_CALL_MEMBER(cave);
+}
 
 static MACHINE_CONFIG_START( sailormn, cave_state )
 
@@ -2607,6 +2621,9 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_CPU_PROGRAM_MAP(sailormn_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cave_state,  cave_interrupt)
 
+	// could be a wachdog, but if it is then our watchdog address is incorrect as there are periods where the game doesn't write it.
+	MCFG_TIMER_DRIVER_ADD("startup", cave_state, sailormn_startup)
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz) // Bidirectional Communication
 	MCFG_CPU_PROGRAM_MAP(sailormn_sound_map)
 	MCFG_CPU_IO_MAP(sailormn_sound_portmap)
@@ -2614,7 +2631,7 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 //  MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
 	MCFG_MACHINE_START_OVERRIDE(cave_state,cave)
-	MCFG_MACHINE_RESET_OVERRIDE(cave_state,cave)
+	MCFG_MACHINE_RESET_OVERRIDE(cave_state,sailormn)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", cave_state, cave_vblank_start)
@@ -2649,6 +2666,8 @@ static MACHINE_CONFIG_START( sailormn, cave_state )
 	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki2_map)
+
+
 MACHINE_CONFIG_END
 
 
@@ -2751,14 +2770,14 @@ MACHINE_CONFIG_END
 /* 4 bits -> 8 bits. Even and odd pixels are swapped */
 void cave_state::unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data = *src--;
+		uint8_t data = *src--;
 		/* swap even and odd pixels */
 		*dst-- = data >> 4;     *dst-- = data & 0xF;
 	}
@@ -2768,17 +2787,17 @@ void cave_state::unpack_sprites(const char *region)
 /* 4 bits -> 8 bits. Even and odd pixels and even and odd words, are swapped */
 void cave_state::ddonpach_unpack_sprites(const char *region)
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn          =   memregion(region)->base();
-	UINT8 *src          =   rgn + len / 2 - 1;
-	UINT8 *dst          =   rgn + len - 1;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn          =   memregion(region)->base();
+	uint8_t *src          =   rgn + len / 2 - 1;
+	uint8_t *dst          =   rgn + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data1 = *src--;
-		UINT8 data2 = *src--;
-		UINT8 data3 = *src--;
-		UINT8 data4 = *src--;
+		uint8_t data1 = *src--;
+		uint8_t data2 = *src--;
+		uint8_t data3 = *src--;
+		uint8_t data4 = *src--;
 
 		/* swap even and odd pixels, and even and odd words */
 		*dst-- = data2 & 0xF;       *dst-- = data2 >> 4;
@@ -2792,13 +2811,13 @@ void cave_state::ddonpach_unpack_sprites(const char *region)
 /* 2 pages of 4 bits -> 8 bits */
 void cave_state::esprade_unpack_sprites(const char *region)
 {
-	UINT8 *src      =   memregion(region)->base();
-	UINT8 *dst      =   src + memregion(region)->bytes();
+	uint8_t *src      =   memregion(region)->base();
+	uint8_t *dst      =   src + memregion(region)->bytes();
 
 	while(src < dst)
 	{
-		UINT8 data1 = src[0];
-		UINT8 data2 = src[1];
+		uint8_t data1 = src[0];
+		uint8_t data2 = src[1];
 
 		src[0] = ((data1 & 0x0f)<<4) + (data2 & 0x0f);
 		src[1] = (data1 & 0xf0) + ((data2 & 0xf0)>>4);
@@ -2849,12 +2868,7 @@ BP962A.U77  23C16000    GFX
 
 ***************************************************************************/
 
-
-
-#define ROMS_AGALLET \
-	ROM_REGION( 0x400000, "maincpu", 0 ) \
-	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
-	\
+#define ROMS_AGALLET_COMMON \
 	ROM_REGION( 0x80000, "audiocpu", 0 ) \
 	ROM_LOAD( "bp962a.u9",  0x00000, 0x80000, CRC(06caddbe) SHA1(6a3cc50558ba19a31b21b7f3ec6c6e2846244ff1) ) \
 	\
@@ -2881,6 +2895,14 @@ BP962A.U77  23C16000    GFX
 	\
 	ROM_REGION( 0x200000, "oki2", 0 )   \
 	ROM_LOAD( "bp962a.u47", 0x000000, 0x200000, CRC(6d4e9737) SHA1(81c7ecdfc2d38d0b35e26745866f6672f566f936) )
+
+
+// these roms were dumped from a board set to Taiwanese region.
+#define ROMS_AGALLET \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "bp962a.u45", 0x000000, 0x080000, CRC(24815046) SHA1(f5eeae60b923ae850b335e7898a2760407631d8b) ) \
+	ROMS_AGALLET_COMMON
+
 /* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
 ROM_START( agallet )
 	ROMS_AGALLET
@@ -2919,6 +2941,55 @@ ROM_END
 
 ROM_START( agalleth )
 	ROMS_AGALLET
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
+ROM_END
+
+// these roms were dumped from a board set to the Japanese region.
+#define ROMS_AGALLETA \
+	ROM_REGION( 0x400000, "maincpu", 0 ) \
+	ROM_LOAD16_WORD_SWAP( "u45", 0x000000, 0x080000, CRC(2cab18b0) SHA1(5e779b74d8520cb482697b5efba4746854e7c9fe) ) \
+	ROMS_AGALLET_COMMON
+
+/* the regions differ only in the EEPROM, hence the macro above - all EEPROMs are Factory Defaulted */
+ROM_START( agalleta )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_europe.nv", 0x0000, 0x0080, CRC(ec38bf65) SHA1(cb8d9eacc0cf55a0c6b187e6673e3354554314b5) )
+ROM_END
+
+ROM_START( agalletau )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_usa.nv", 0x0000, 0x0080, CRC(72e65056) SHA1(abf1a86df01064d9d5d8c418e8367817319ec335) )
+ROM_END
+
+ROM_START( agalletaj ) // the dumped board was this region
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_japan.nv", 0x0000, 0x0080, CRC(0753f547) SHA1(aabb987470406b8729894108bc4d050f7200917d) )
+ROM_END
+
+ROM_START( agalletak )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_korea.nv", 0x0000, 0x0080, CRC(7f41c253) SHA1(50793d4da0ad6eb590941d26a729a1cf4b3c25c2) )
+ROM_END
+
+ROM_START( agalletat )
+	ROMS_AGALLETA
+
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
+	ROM_LOAD16_WORD( "agallet_taiwan.nv", 0x0000, 0x0080, CRC(0af46742) SHA1(37b704c4c573b2aabd6f016e9e8dd458f95148f7) )
+ROM_END
+
+ROM_START( agalletah )
+	ROMS_AGALLETA
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD16_WORD( "agallet_hongkong.nv", 0x0000, 0x0080, CRC(998d1a74) SHA1(13e7e27a18417949d49e97d521781fc0feeef792) )
@@ -4665,14 +4736,14 @@ ROM_END
    Expand the 2 bit part into a 4 bit layout, so we can decode it */
 void cave_state::sailormn_unpack_tiles( const char *region )
 {
-	const UINT32 len    =   memregion(region)->bytes();
-	UINT8 *rgn      =   memregion(region)->base();
-	UINT8 *src      =   rgn + (len/4)*3 - 1;
-	UINT8 *dst      =   rgn + (len/4)*4 - 2;
+	const uint32_t len    =   memregion(region)->bytes();
+	uint8_t *rgn      =   memregion(region)->base();
+	uint8_t *src      =   rgn + (len/4)*3 - 1;
+	uint8_t *dst      =   rgn + (len/4)*4 - 2;
 
 	while(src <= dst)
 	{
-		UINT8 data = src[0];
+		uint8_t data = src[0];
 
 		dst[0] = ((data & 0x03) << 4) + ((data & 0x0c) >> 2);
 		dst[1] = ((data & 0x30) >> 0) + ((data & 0xc0) >> 6);
@@ -4694,7 +4765,7 @@ void cave_state::init_cave()
 
 DRIVER_INIT_MEMBER(cave_state,agallet)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 	init_cave();
 
 	membank("z80bank")->configure_entries(0, 0x20, &ROM[0x00000], 0x4000);
@@ -4756,7 +4827,7 @@ DRIVER_INIT_MEMBER(cave_state,esprade)
 
 #if 0       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0x118A/2] = 0x4e71;         //palette fix   118A: 5548              SUBQ.W  #2,A0       --> NOP
 	}
 #endif
@@ -4783,7 +4854,7 @@ DRIVER_INIT_MEMBER(cave_state,guwange)
 
 DRIVER_INIT_MEMBER(cave_state,hotdogst)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4800,8 +4871,8 @@ DRIVER_INIT_MEMBER(cave_state,hotdogst)
 
 DRIVER_INIT_MEMBER(cave_state,mazinger)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4813,7 +4884,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 	membank("okibank2")->configure_entries(0, 4, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -4829,7 +4900,7 @@ DRIVER_INIT_MEMBER(cave_state,mazinger)
 
 DRIVER_INIT_MEMBER(cave_state,metmqstr)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	init_cave();
 
@@ -4866,8 +4937,8 @@ DRIVER_INIT_MEMBER(cave_state,ppsatan)
 
 DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 	int i, j;
 
@@ -4875,7 +4946,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2j)
 
 	membank("z80bank")->configure_entries(0, 8, &ROM[0x00000], 0x4000);
 
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		for(i = 0; i < len/2; i++)
 		{
@@ -4902,7 +4973,7 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 #if 1       //ROM PATCH
 	{
-		UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+		uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 		rom[0xd46c / 2] = 0xd482;           // kurara dash fix  0xd400 -> 0xd482
 	}
 #endif
@@ -4911,8 +4982,8 @@ DRIVER_INIT_MEMBER(cave_state,pwrinst2)
 
 DRIVER_INIT_MEMBER(cave_state,sailormn)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
-	UINT8 *src = memregion("sprites0")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
+	uint8_t *src = memregion("sprites0")->base();
 	int len = memregion("sprites0")->bytes();
 
 	init_cave();
@@ -4928,7 +4999,7 @@ DRIVER_INIT_MEMBER(cave_state,sailormn)
 	membank("oki2bank2")->configure_entries(0, 0x10, &ROM[0x00000], 0x20000);
 
 	/* decrypt sprites */
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	{
 		int i;
 		for (i = 0; i < len; i++)
@@ -5032,6 +5103,15 @@ GAME( 1996, agalletj,   agallet,  sailormn, cave, cave_state,     agallet,  ROT2
 GAME( 1996, agalletk,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Korea)",     MACHINE_SUPPORTS_SAVE )
 GAME( 1996, agallett,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Taiwan)",    MACHINE_SUPPORTS_SAVE )
 GAME( 1996, agalleth,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (Hong Kong)", MACHINE_SUPPORTS_SAVE )
+// this set appears to be older, there is some kind of reset circuit / watchdog circuit check on startup, the same check exists in the above set but the code skips over it so presumably it was removed
+// to avoid boards simply hanging on a black screen if the circuit didn't fire.
+GAME( 1996, agalleta,    agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Europe)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletau,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, USA)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletaj,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Akuu Gallet (older, Japan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletak,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Korea)",     MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletat,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Taiwan)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1996, agalletah,   agallet,  sailormn, cave, cave_state,     agallet,  ROT270, "Gazelle (Banpresto license)",            "Air Gallet (older, Hong Kong)", MACHINE_SUPPORTS_SAVE )
+
 
 GAME( 1996, hotdogst,   0,        hotdogst, cave, cave_state,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)", MACHINE_SUPPORTS_SAVE )
 

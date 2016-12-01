@@ -14,6 +14,7 @@
 #include "mameopts.h"
 #include "pluginopts.h"
 #include "drivenum.h"
+#include "natkeyboard.h"
 
 #include "uiinput.h"
 #include "ui/ui.h"
@@ -36,9 +37,9 @@ menu_keyboard_mode::menu_keyboard_mode(mame_ui_manager &mui, render_container &c
 {
 }
 
-void menu_keyboard_mode::populate()
+void menu_keyboard_mode::populate(float &customtop, float &custombottom)
 {
-	bool natural = ui().use_natural_keyboard();
+	bool natural = machine().ioport().natkeyboard().in_use();
 	item_append(_("Keyboard Mode:"), natural ? _("Natural") : _("Emulated"), natural ? FLAG_LEFT_ARROW : FLAG_RIGHT_ARROW, nullptr);
 }
 
@@ -48,7 +49,7 @@ menu_keyboard_mode::~menu_keyboard_mode()
 
 void menu_keyboard_mode::handle()
 {
-	bool natural = ui().use_natural_keyboard();
+	bool natural = machine().ioport().natkeyboard().in_use();
 
 	/* process the menu */
 	const event *menu_event = process(0);
@@ -57,7 +58,7 @@ void menu_keyboard_mode::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
-			ui().set_use_natural_keyboard(natural ^ true);
+			machine().ioport().natkeyboard().set_in_use(!natural);
 			reset(reset_options::REMEMBER_REF);
 		}
 	}
@@ -73,12 +74,12 @@ menu_bios_selection::menu_bios_selection(mame_ui_manager &mui, render_container 
 {
 }
 
-void menu_bios_selection::populate()
+void menu_bios_selection::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		if (device.rom_region())
+		if (device.rom_region() != nullptr && !ROMENTRY_ISEND(device.rom_region()))
 		{
 			const char *val = "default";
 			for (const rom_entry *rom = device.rom_region(); !ROMENTRY_ISEND(rom); rom++)
@@ -111,15 +112,15 @@ void menu_bios_selection::handle()
 
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		if ((FPTR)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
+		if ((uintptr_t)menu_event->itemref == 1 && menu_event->iptkey == IPT_UI_SELECT)
 			machine().schedule_hard_reset();
 		else if (menu_event->iptkey == IPT_UI_LEFT || menu_event->iptkey == IPT_UI_RIGHT)
 		{
 			device_t *dev = (device_t *)menu_event->itemref;
 			int cnt = 0;
-			for (const rom_entry *rom = dev->rom_region(); !ROMENTRY_ISEND(rom); rom++)
+			for (const rom_entry &rom : dev->rom_region_vector())
 			{
-				if (ROMENTRY_ISSYSTEM_BIOS(rom)) cnt ++;
+				if (ROMENTRY_ISSYSTEM_BIOS(&rom)) cnt ++;
 			}
 			int val = dev->system_bios() + ((menu_event->iptkey == IPT_UI_LEFT) ? -1 : +1);
 			if (val<1) val=cnt;
@@ -155,7 +156,7 @@ menu_network_devices::~menu_network_devices()
     network device menu
 -------------------------------------------------*/
 
-void menu_network_devices::populate()
+void menu_network_devices::populate(float &customtop, float &custombottom)
 {
 	/* cycle through all devices for this system */
 	for (device_network_interface &network : network_interface_iterator(machine().root_device()))
@@ -210,9 +211,8 @@ void menu_bookkeeping::handle()
 	curtime = machine().time();
 	if (prevtime.seconds() != curtime.seconds())
 	{
-		reset(reset_options::SELECT_FIRST);
 		prevtime = curtime;
-		populate();
+		repopulate(reset_options::SELECT_FIRST);
 	}
 
 	/* process the menu */
@@ -232,7 +232,7 @@ menu_bookkeeping::~menu_bookkeeping()
 {
 }
 
-void menu_bookkeeping::populate()
+void menu_bookkeeping::populate(float &customtop, float &custombottom)
 {
 	int tickets = machine().bookkeeping().get_dispensed_tickets();
 	std::ostringstream tempstring;
@@ -249,7 +249,7 @@ void menu_bookkeeping::populate()
 		util::stream_format(tempstring, _("Tickets dispensed: %1$d\n\n"), tickets);
 
 	/* loop over coin counters */
-	for (ctrnum = 0; ctrnum < COIN_COUNTERS; ctrnum++)
+	for (ctrnum = 0; ctrnum < bookkeeping_manager::COIN_COUNTERS; ctrnum++)
 	{
 		int count = machine().bookkeeping().coin_counter_get_count(ctrnum);
 
@@ -374,13 +374,13 @@ menu_crosshair::menu_crosshair(mame_ui_manager &mui, render_container &container
 {
 }
 
-void menu_crosshair::populate()
+void menu_crosshair::populate(float &customtop, float &custombottom)
 {
 	crosshair_item_data *data;
 	char temp_text[16];
 	int player;
-	UINT8 use_auto = false;
-	UINT32 flags = 0;
+	uint8_t use_auto = false;
+	uint32_t flags = 0;
 
 	/* loop over player and add the manual items */
 	for (player = 0; player < MAX_PLAYERS; player++)
@@ -531,7 +531,7 @@ menu_quit_game::~menu_quit_game()
 {
 }
 
-void menu_quit_game::populate()
+void menu_quit_game::populate(float &customtop, float &custombottom)
 {
 }
 
@@ -568,7 +568,7 @@ void menu_export::handle()
 	const event *menu_event = process(PROCESS_NOIMAGE);
 	if (menu_event != nullptr && menu_event->itemref != nullptr)
 	{
-		switch ((FPTR)menu_event->itemref)
+		switch ((uintptr_t)menu_event->itemref)
 		{
 			case 1:
 			case 3:
@@ -604,7 +604,7 @@ void menu_export::handle()
 							drvlist.include(driver_list::find(*elem));
 
 						info_xml_creator creator(drvlist);
-						creator.output(pfile, ((FPTR)menu_event->itemref == 1) ? false : true);
+						creator.output(pfile, ((uintptr_t)menu_event->itemref == 1) ? false : true);
 						fclose(pfile);
 						machine().popmessage(_("%s.xml saved under ui folder."), filename.c_str());
 					}
@@ -661,12 +661,12 @@ void menu_export::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_export::populate()
+void menu_export::populate(float &customtop, float &custombottom)
 {
 	// add options items
-	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(FPTR)1);
-	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(FPTR)3);
-	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(FPTR)2);
+	item_append(_("Export list in XML format (like -listxml)"), "", 0, (void *)(uintptr_t)1);
+	item_append(_("Export list in XML format (like -listxml, but exclude devices)"), "", 0, (void *)(uintptr_t)3);
+	item_append(_("Export list in TXT format (like -listfull)"), "", 0, (void *)(uintptr_t)2);
 	item_append(menu_item_type::SEPARATOR);
 }
 
@@ -681,6 +681,7 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 	, x0(_x0)
 	, y0(_y0)
 	, m_curbios(0)
+	, m_fav_reset(false)
 {
 	// parse the INI file
 	std::string error;
@@ -690,6 +691,8 @@ menu_machine_configure::menu_machine_configure(mame_ui_manager &mui, render_cont
 
 menu_machine_configure::~menu_machine_configure()
 {
+	if (m_fav_reset)
+		reset_topmost(reset_options::SELECT_FIRST);
 }
 
 //-------------------------------------------------
@@ -705,7 +708,7 @@ void menu_machine_configure::handle()
 	{
 		if (menu_event->iptkey == IPT_UI_SELECT)
 		{
-			switch ((FPTR)menu_event->itemref)
+			switch ((uintptr_t)menu_event->itemref)
 			{
 				case SAVE:
 				{
@@ -724,10 +727,15 @@ void menu_machine_configure::handle()
 					mame_machine_manager::instance()->favorite().add_favorite_game(m_drv);
 					reset(reset_options::REMEMBER_POSITION);
 					break;
-
 				case DELFAV:
 					mame_machine_manager::instance()->favorite().remove_favorite_game();
-					reset(reset_options::REMEMBER_POSITION);
+					if (main_filters::actual == FILTER_FAVORITE)
+					{
+						m_fav_reset = true;
+						menu::stack_pop();
+					}
+					else
+						reset(reset_options::REMEMBER_POSITION);
 					break;
 				case CONTROLLER:
 					if (menu_event->iptkey == IPT_UI_SELECT)
@@ -760,22 +768,22 @@ void menu_machine_configure::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_machine_configure::populate()
+void menu_machine_configure::populate(float &customtop, float &custombottom)
 {
 	// add options items
 	item_append(_("Bios"), "", FLAG_DISABLE | FLAG_UI_HEADING, nullptr);
 	if (!m_bios.empty())
 	{
-		UINT32 arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
-		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(FPTR)BIOS);
+		uint32_t arrows = get_arrow_flags(std::size_t(0), m_bios.size() - 1, m_curbios);
+		item_append(_("Driver"), m_bios[m_curbios].first, arrows, (void *)(uintptr_t)BIOS);
 	}
 	else
 		item_append(_("This machine has no bios."), "", FLAG_DISABLE, nullptr);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(FPTR)ADVANCED);
-	item_append(_(submenu::video_options[0].description), "", 0, (void *)(FPTR)VIDEO);
-	item_append(_(submenu::control_options[0].description), "", 0, (void *)(FPTR)CONTROLLER);
+	item_append(_(submenu::advanced_options[0].description), "", 0, (void *)(uintptr_t)ADVANCED);
+	item_append(_(submenu::video_options[0].description), "", 0, (void *)(uintptr_t)VIDEO);
+	item_append(_(submenu::control_options[0].description), "", 0, (void *)(uintptr_t)CONTROLLER);
 	item_append(menu_item_type::SEPARATOR);
 
 	if (!mame_machine_manager::instance()->favorite().isgame_favorite(m_drv))
@@ -784,7 +792,7 @@ void menu_machine_configure::populate()
 		item_append(_("Remove From Favorites"), "", 0, (void *)DELFAV);
 
 	item_append(menu_item_type::SEPARATOR);
-	item_append(_("Save machine configuration"), "", 0, (void *)(FPTR)SAVE);
+	item_append(_("Save machine configuration"), "", 0, (void *)(uintptr_t)SAVE);
 	item_append(menu_item_type::SEPARATOR);
 	customtop = 2.0f * ui().get_line_height() + 3.0f * UI_BOX_TB_BORDER;
 }
@@ -805,7 +813,7 @@ void menu_machine_configure::custom_render(void *selectedref, float top, float b
 	for (auto & elem : text)
 	{
 		ui().draw_text_full(container(), elem.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 		width += 2 * UI_BOX_LR_BORDER;
 		maxwidth = std::max(maxwidth, width);
 	}
@@ -838,20 +846,22 @@ void menu_machine_configure::setup_bios()
 	if (m_drv->rom == nullptr)
 		return;
 
+	auto entries = rom_build_entries(m_drv->rom);
+
 	std::string specbios(m_opts.bios());
 	std::string default_name;
-	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISDEFAULT_BIOS(rom))
-			default_name = ROM_GETNAME(rom);
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISDEFAULT_BIOS(&rom))
+			default_name = ROM_GETNAME(&rom);
 
 	std::size_t bios_count = 0;
-	for (const rom_entry *rom = m_drv->rom; !ROMENTRY_ISEND(rom); ++rom)
+	for (const rom_entry &rom : entries)
 	{
-		if (ROMENTRY_ISSYSTEM_BIOS(rom))
+		if (ROMENTRY_ISSYSTEM_BIOS(&rom))
 		{
-			std::string name(ROM_GETHASHDATA(rom));
-			std::string biosname(ROM_GETNAME(rom));
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
+			std::string name(ROM_GETHASHDATA(&rom));
+			std::string biosname(ROM_GETNAME(&rom));
+			int bios_flags = ROM_GETBIOSFLAGS(&rom);
 			std::string bios_number = std::to_string(bios_flags - 1);
 
 			// check biosnumber and name
@@ -923,7 +933,7 @@ void menu_plugins_configure::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_plugins_configure::populate()
+void menu_plugins_configure::populate(float &customtop, float &custombottom)
 {
 	plugin_options& plugins = mame_machine_manager::instance()->plugins();
 
@@ -933,7 +943,7 @@ void menu_plugins_configure::populate()
 		{
 			auto enabled = std::string(curentry.value()) == "1";
 			item_append(curentry.description(), enabled ? _("On") : _("Off"),
-				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(FPTR)curentry.name());
+				enabled ? FLAG_RIGHT_ARROW : FLAG_LEFT_ARROW, (void *)(uintptr_t)curentry.name());
 		}
 	}
 	item_append(menu_item_type::SEPARATOR);
@@ -949,7 +959,7 @@ void menu_plugins_configure::custom_render(void *selectedref, float top, float b
 	float width;
 
 	ui().draw_text_full(container(), _("Plugins"), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 

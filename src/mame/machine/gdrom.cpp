@@ -23,7 +23,7 @@
 /*
   Following data contain real command reply obfuscated, it is extracted by such code:
 
-   for (UINT32 i = 0, offset = 0; i < length; i++)
+   for (uint32_t i = 0, offset = 0; i < length; i++)
    {
      offset++;
      offset += GDROM_Cmd71_Reply[offset] - 2;
@@ -35,7 +35,7 @@
  SysCalls/BIOS uses same extract routine for command 0x72 (14 bytes), but it seems not used on practice
 */
 
-static const UINT8 GDROM_Cmd71_Reply[] =
+static const uint8_t GDROM_Cmd71_Reply[] =
 {
 	0x96, 0x0B, 0x45, 0xF0, 0x7E, 0xFF, 0x3D, 0x06, 0x4D, 0x7D, 0x10, 0xBF, 0x07, 0x00, 0x73, 0xCF,
 	0x9C, 0x00, 0xBC, 0x0C, 0x1C, 0xAF, 0x1C, 0x30, 0xE7, 0xA7, 0x03, 0xA8, 0x98, 0x00, 0xBD, 0x0F,
@@ -106,7 +106,7 @@ static const UINT8 GDROM_Cmd71_Reply[] =
 
 void gdrom_device::device_reset()
 {
-	static const UINT8 GDROM_Def_Cmd11_Reply[32] =
+	static const uint8_t GDROM_Def_Cmd11_Reply[32] =
 	{
 		0x00, 0x00, 0x00, 0x00, 0x00, 0xB4, 0x19, 0x00, 0x00, 0x08, 0x53, 0x45, 0x20, 0x20, 0x20, 0x20,
 		0x20, 0x20, 0x52, 0x65, 0x76, 0x20, 0x36, 0x2E, 0x34, 0x32, 0x39, 0x39, 0x30, 0x33, 0x31, 0x36
@@ -267,10 +267,10 @@ void gdrom_device::ExecCommand()
 //
 // Read data from the device resulting from the execution of a command
 
-void gdrom_device::ReadData( UINT8 *data, int dataLength )
+void gdrom_device::ReadData( uint8_t *data, int dataLength )
 {
 	int i;
-	UINT8 tmp_buffer[2048];
+	uint8_t tmp_buffer[2048];
 
 	switch ( command[0] )
 	{
@@ -327,7 +327,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 						int len;
 						int in_len;
 						int dptr;
-						UINT32 tstart;
+						uint32_t tstart;
 
 						start_trk = command[2];
 						if( start_trk == 0 )
@@ -418,7 +418,7 @@ void gdrom_device::ReadData( UINT8 *data, int dataLength )
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-void gdrom_device::WriteData( UINT8 *data, int dataLength )
+void gdrom_device::WriteData( uint8_t *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{
@@ -435,7 +435,7 @@ void gdrom_device::WriteData( UINT8 *data, int dataLength )
 // device type definition
 const device_type GDROM = &device_creator<gdrom_device>;
 
-gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gdrom_device::gdrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	atapi_cdrom_device(mconfig, GDROM, "GDROM", tag, owner, clock, "gdrom", __FILE__)
 {
 }

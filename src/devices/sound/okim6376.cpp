@@ -112,7 +112,7 @@ static void reset_adpcm(struct ADPCMVoice *voice)
 
 const device_type OKIM6376 = &device_creator<okim6376_device>;
 
-okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+okim6376_device::okim6376_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM6376, "OKI6376", tag, owner, clock, "okim6376", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_region_base(*this, DEVICE_SELF),
@@ -202,7 +202,7 @@ void okim6376_device::device_reset()
 
 ***********************************************************************************************/
 
-static INT16 clock_adpcm(struct ADPCMVoice *voice, UINT8 nibble)
+static int16_t clock_adpcm(struct ADPCMVoice *voice, uint8_t nibble)
 {
 	voice->signal += diff_lookup[voice->step * 16 + (nibble & 15)];
 
@@ -300,12 +300,12 @@ void okim6376_device::oki_process(int channel, int command)
 
 ***********************************************************************************************/
 
-void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, INT16 *buffer, int samples,int channel)
+void okim6376_device::generate_adpcm(struct ADPCMVoice *voice, int16_t *buffer, int samples,int channel)
 {
 	/* if this voice is active */
 	if (voice->playing)
 	{
-		UINT8 *base = m_region_base + voice->base_offset;
+		uint8_t *base = m_region_base + voice->base_offset;
 		int sample = voice->sample;
 		int count = voice->count;
 
@@ -551,7 +551,7 @@ void okim6376_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 	{
 		struct ADPCMVoice *voice = &m_voice[i];
 		stream_sample_t *buffer = outputs[0];
-		INT16 sample_data[MAX_SAMPLE_CHUNK];
+		int16_t sample_data[MAX_SAMPLE_CHUNK];
 		int remaining = samples;
 		if (i == 0) //channel 1 is the only channel to affect NAR
 		{

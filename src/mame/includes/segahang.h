@@ -38,6 +38,7 @@ public:
 			m_workram(*this, "workram"),
 			m_sharrier_video(false),
 			m_adc_select(0),
+			m_adc_ports(*this, {"ADC0", "ADC1", "ADC2", "ADC3"}),
 			m_decrypted_opcodes(*this, "decrypted_opcodes")
 	{ }
 
@@ -56,7 +57,7 @@ public:
 	// Z80 sound CPU read/write handlers
 	DECLARE_READ8_MEMBER( sound_data_r );
 
-	// I8751-related VBLANK interrupt hanlders
+	// I8751-related VBLANK interrupt handlers
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
 
 	// game-specific driver init
@@ -67,7 +68,7 @@ public:
 	DECLARE_DRIVER_INIT(endurob2);
 
 	// video updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// internal types
@@ -101,14 +102,15 @@ protected:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	// memory pointers
-	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
 	bool                    m_sharrier_video;
 	i8751_sim_delegate      m_i8751_vblank_hook;
 
 	// internal state
-	UINT8                   m_adc_select;
+	uint8_t                   m_adc_select;
+	optional_ioport_array<4> m_adc_ports;
 	bool                    m_shadow;
-	optional_shared_ptr<UINT16> m_decrypted_opcodes;
+	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 };

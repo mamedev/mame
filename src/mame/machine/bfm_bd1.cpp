@@ -33,7 +33,7 @@ const device_type BFM_BD1 = &device_creator<bfm_bd1_t>;
 
   */
 
-static const UINT16 BD1charset[]=
+static const uint16_t BD1charset[]=
 {           // FEDC BA98 7654 3210
 	0xA626, // 1010 0110 0010 0110 @.
 	0xE027, // 1110 0000 0010 0111 A.
@@ -101,7 +101,7 @@ static const UINT16 BD1charset[]=
 	0x4406, // 0100 0100 0000 0110 ?
 };
 
-bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+bfm_bd1_t::bfm_bd1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BFM_BD1, "BFM BD1 VFD controller", tag, owner, clock, "bfm_bd1", __FILE__),
 	m_port_val(0)
 {
@@ -162,7 +162,7 @@ void bfm_bd1_t::device_reset()
 	memset(m_attrs, 0, sizeof(m_attrs));
 }
 
-UINT16 bfm_bd1_t::set_display(UINT16 segin)
+uint16_t bfm_bd1_t::set_display(uint16_t segin)
 {
 	return BITSWAP16(segin,8,12,11,7,6,4,10,3,14,15,0,13,9,5,1,2);
 }

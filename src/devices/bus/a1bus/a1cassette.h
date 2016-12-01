@@ -24,12 +24,12 @@ class a1bus_cassette_device:
 {
 public:
 	// construction/destruction
-	a1bus_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	a1bus_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	a1bus_cassette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	a1bus_cassette_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	optional_device<cassette_image_device> m_cassette;
 
@@ -43,7 +43,7 @@ protected:
 	void cassette_toggle_output();
 
 private:
-	UINT8 *m_rom;
+	uint8_t *m_rom;
 	int m_cassette_output_flipflop;
 };
 

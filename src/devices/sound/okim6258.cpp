@@ -46,7 +46,7 @@ const device_type OKIM6258 = &device_creator<okim6258_device>;
 //  okim6258_device - constructor
 //-------------------------------------------------
 
-okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+okim6258_device::okim6258_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, OKIM6258, "OKI6258", tag, owner, clock, "okim6258", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_status(0),
@@ -159,7 +159,7 @@ void okim6258_device::sound_stream_update(sound_stream &stream, stream_sample_t 
 			int nibble = (m_data_in >> nibble_shift) & 0xf;
 
 			/* Output to the buffer */
-			INT16 sample = clock_adpcm(nibble);
+			int16_t sample = clock_adpcm(nibble);
 
 			nibble_shift ^= 4;
 
@@ -198,10 +198,10 @@ void okim6258_device::okim6258_state_save_register()
 }
 
 
-INT16 okim6258_device::clock_adpcm(UINT8 nibble)
+int16_t okim6258_device::clock_adpcm(uint8_t nibble)
 {
-	INT32 max = (1 << (m_output_bits - 1)) - 1;
-	INT32 min = -(1 << (m_output_bits - 1));
+	int32_t max = (1 << (m_output_bits - 1)) - 1;
+	int32_t min = -(1 << (m_output_bits - 1));
 
 	m_signal += diff_lookup[m_step * 16 + (nibble & 15)];
 

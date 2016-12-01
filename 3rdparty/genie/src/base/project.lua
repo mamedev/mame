@@ -17,7 +17,7 @@
 --    contains a reference back to the original project: prj = tr.project.
 --
 
-	function premake.project.buildsourcetree(prj)
+	function premake.project.buildsourcetree(prj, allfiles)
 		local tr = premake.tree.new(prj.name)
 		tr.project = prj
 
@@ -27,7 +27,7 @@
 			node.isvpath = isvpath
 		end
 
-		for fcfg in premake.project.eachfile(prj) do
+		for fcfg in premake.project.eachfile(prj, allfiles) do
 			isvpath = (fcfg.name ~= fcfg.vpath)
 			local node = premake.tree.add(tr, fcfg.vpath, onadd)
 			node.cfg = fcfg
@@ -65,15 +65,16 @@
 -- Iterator for a project's files; returns a file configuration object.
 --
 
-	function premake.project.eachfile(prj)
+	function premake.project.eachfile(prj, allfiles)
 		-- project root config contains the file config list
 		if not prj.project then prj = premake.getconfig(prj) end
 		local i = 0
-		local t = prj.files
+		local t = iif(allfiles, prj.allfiles, prj.files)
+		local c = iif(allfiles, prj.__allfileconfigs, prj.__fileconfigs)
 		return function ()
 			i = i + 1
 			if (i <= #t) then
-				local fcfg = prj.__fileconfigs[t[i]]
+				local fcfg = c[t[i]]
 				fcfg.vpath = premake.project.getvpath(prj, fcfg.name)
 				return fcfg
 			end
@@ -326,6 +327,8 @@
 				return premake.iscppproject(target)
 			elseif premake.isdotnetproject(source) then
 				return premake.isdotnetproject(target)
+			elseif premake.isswiftproject(source) then
+				return premake.isswiftproject(source) or premake.iscppproject(source)
 			end
 		end
 
@@ -576,6 +579,8 @@
 			return premake.gcc
 		elseif premake.isdotnetproject(cfg) then
 			return premake.dotnet
+		elseif premake.isswiftproject(cfg) then
+			return premake.swift
 		else
 			return premake.valac
 		end
@@ -598,8 +603,14 @@
 
 		local fname = path.getname(abspath)
 		local max = abspath:len() - fname:len()
+        
+        -- First check for an exact match from the inverse vpaths
+        if prj.inversevpaths and prj.inversevpaths[abspath] then
+            return path.join(prj.inversevpaths[abspath], fname)
+        end
 
 		-- Look for matching patterns
+        local matches = {}
 		for replacement, patterns in pairs(prj.vpaths or {}) do
 			for _, pattern in ipairs(patterns) do
 				local i = abspath:find(path.wildcards(pattern))
@@ -644,11 +655,16 @@
 						leaf = path.getname(leaf)
 					end
 
-					vpath = path.join(stem, leaf)
-
+					table.insert(matches, path.join(stem, leaf))
 				end
 			end
 		end
+        
+        if #matches > 0 then
+            -- for the sake of determinism, return the first alphabetically
+            table.sort(matches)
+            vpath = matches[1]
+        end
 
 		return path.trimdots(vpath)
 	end
@@ -715,4 +731,12 @@
 
 	function premake.isvalaproject(prj)
 		return (prj.language == "Vala")
+	end
+
+--
+-- Returns true if the project uses the Swift language.
+--
+
+	function premake.isswiftproject(prj)
+		return (prj.language == "Swift")
 	end

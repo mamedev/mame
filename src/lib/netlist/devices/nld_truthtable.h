@@ -261,7 +261,7 @@ namespace netlist
 		}
 
 	public:
-		void inc_active() override
+		void inc_active() noexcept override
 		{
 			if (m_NI > 1)
 				if (++m_active == 1)
@@ -270,12 +270,12 @@ namespace netlist
 				}
 		}
 
-		void dec_active() override
+		void dec_active() noexcept override
 		{
 			/* FIXME:
 			 * Based on current measurements there is no point to disable
 			 * 1 input devices. This should actually be a parameter so that we
-			 * can decide for each individual gate whether it is benefitial to
+			 * can decide for each individual gate whether it is beneficial to
 			 * ignore deactivation.
 			 */
 			if (m_NI > 1)

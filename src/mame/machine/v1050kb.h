@@ -36,12 +36,12 @@ class v1050_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v1050_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_tx_handler(device_t &device, _Object object) { return downcast<v1050_keyboard_device &>(device).m_out_tx_handler.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -60,21 +60,10 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<discrete_sound_device> m_discrete;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_ya;
-	required_ioport m_yb;
+	required_ioport_array<12> m_y;
 	devcb_write_line   m_out_tx_handler;
 
-	UINT8 m_y;
+	uint8_t m_keylatch;
 };
 
 

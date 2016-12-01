@@ -49,7 +49,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(balsente_state::balsente_interrupt_timer)
 	/* if we're a shooter, we do a little more work */
 	if (m_shooter)
 	{
-		UINT8 tempx, tempy;
+		uint8_t tempx, tempy;
 
 		/* we latch the beam values on the first interrupt after VBLANK */
 		if (param == 64)
@@ -186,8 +186,8 @@ void balsente_state::machine_reset()
 
 void balsente_state::poly17_init()
 {
-	UINT32 i, x = 0;
-	UINT8 *p, *r;
+	uint32_t i, x = 0;
+	uint8_t *p, *r;
 
 	/* allocate memory */
 	p = m_poly17;
@@ -209,8 +209,8 @@ void balsente_state::poly17_init()
 inline void balsente_state::noise_gen_chip(int chip, int count, short *buffer)
 {
 	/* noise generator runs at 100kHz */
-	UINT32 step = (100000 << 14) / CEM3394_SAMPLE_RATE;
-	UINT32 noise_counter = m_noise_position[chip];
+	uint32_t step = (100000 << 14) / CEM3394_SAMPLE_RATE;
+	uint32_t noise_counter = m_noise_position[chip];
 
 	while (count--)
 	{
@@ -244,7 +244,7 @@ WRITE8_MEMBER(balsente_state::balsente_random_reset_w)
 
 READ8_MEMBER(balsente_state::balsente_random_num_r)
 {
-	UINT32 cc;
+	uint32_t cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = m_maincpu->total_cycles();
@@ -328,7 +328,7 @@ WRITE8_MEMBER(balsente_state::balsente_misc_output_w)
 
 void balsente_state::m6850_update_io()
 {
-	UINT8 new_state;
+	uint8_t new_state;
 
 	/* sound -> main CPU communications */
 	if (!(m_m6850_sound_status & 0x02))
@@ -940,7 +940,7 @@ READ8_MEMBER(balsente_state::balsente_counter_state_r)
 
 WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
 {
-	UINT8 diff_counter_control = m_counter_control ^ data;
+	uint8_t diff_counter_control = m_counter_control ^ data;
 
 	/* set the new global value */
 	m_counter_control = data;
@@ -987,7 +987,7 @@ WRITE8_MEMBER(balsente_state::balsente_counter_control_w)
 
 WRITE8_MEMBER(balsente_state::balsente_chip_select_w)
 {
-	static const UINT8 register_map[8] =
+	static const uint8_t register_map[8] =
 	{
 		CEM3394_VCO_FREQUENCY,
 		CEM3394_FINAL_GAIN,
@@ -1059,7 +1059,7 @@ WRITE8_MEMBER(balsente_state::balsente_dac_data_w)
 	/* if there are open channels, force the values in */
 	if ((m_chip_select & 0x3f) != 0x3f)
 	{
-		UINT8 temp = m_chip_select;
+		uint8_t temp = m_chip_select;
 		balsente_chip_select_w(space, 0, 0x3f);
 		balsente_chip_select_w(space, 0, temp);
 	}
@@ -1102,7 +1102,7 @@ WRITE8_MEMBER(balsente_state::spiker_expand_w)
 
 READ8_MEMBER(balsente_state::spiker_expand_r)
 {
-	UINT8 left, right;
+	uint8_t left, right;
 
 	/* first rotate each nibble */
 	m_spiker_expand_bits = ((m_spiker_expand_bits << 1) & 0xee) | ((m_spiker_expand_bits >> 3) & 0x11);
@@ -1121,8 +1121,8 @@ READ8_MEMBER(balsente_state::spiker_expand_r)
 
 void balsente_state::update_grudge_steering()
 {
-	UINT8 wheel[3];
-	INT8 diff[3];
+	uint8_t wheel[3];
+	int8_t diff[3];
 
 	/* read the current steering values */
 	wheel[0] = ioport("AN0")->read();
@@ -1177,7 +1177,7 @@ READ8_MEMBER(balsente_state::grudge_steering_r)
 
 READ8_MEMBER(balsente_state::shrike_shared_6809_r)
 {
-	UINT16 mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
+	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 
 	switch( offset )
 	{
@@ -1191,7 +1191,7 @@ READ8_MEMBER(balsente_state::shrike_shared_6809_r)
 
 WRITE8_MEMBER(balsente_state::shrike_shared_6809_w)
 {
-	UINT16 mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
+	uint16_t mem_mask_int = offset & 1 ? 0xff00 : 0x00ff;
 	m_shrike_shared[offset >> 1] = ( m_shrike_shared[offset >> 1] & mem_mask_int ) | ( data << ( mem_mask_int & 0x8 ) );
 }
 

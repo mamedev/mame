@@ -27,9 +27,9 @@ public:
 		: radio86_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
-	UINT8 m_out0;
-	UINT8 m_out1;
-	UINT8 m_out2;
+	uint8_t m_out0;
+	uint8_t m_out1;
+	uint8_t m_out2;
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out0_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out1_changed);
 	DECLARE_WRITE_LINE_MEMBER(pit8253_out2_changed);
@@ -144,7 +144,7 @@ static INPUT_PORTS_START( apogee )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Rus/Lat") PORT_CODE(KEYCODE_LALT) PORT_CODE(KEYCODE_RALT)
 INPUT_PORTS_END
 
-static const INT16 speaker_levels[] = {-32767, -10922, 10922, 32767};
+static const int16_t speaker_levels[] = {-32767, -10922, 10922, 32767};
 
 WRITE_LINE_MEMBER(apogee_state::pit8253_out0_changed)
 {
@@ -168,8 +168,8 @@ I8275_DRAW_CHARACTER_MEMBER(apogee_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap + (gpa & 1) * 0x400;
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap + (gpa & 1) * 0x400;
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {

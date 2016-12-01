@@ -11,7 +11,9 @@
 #include "emu.h"
 #include "crsshair.h"
 #include "emuopts.h"
+#include "natkeyboard.h"
 #include "mame.h"
+#include "luaengine.h"
 #include "ui/menu.h"
 #include "ui/filemngr.h"
 #include "ui/barcode.h"
@@ -29,7 +31,6 @@
 #include "ui/videoopt.h"
 #include "imagedev/cassette.h"
 #include "machine/bcreader.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/datmenu.h"
 #include "ui/pluginopt.h"
@@ -48,7 +49,7 @@ menu_main::menu_main(mame_ui_manager &mui, render_container &container) : menu(m
 {
 }
 
-void menu_main::populate()
+void menu_main::populate(float &customtop, float &custombottom)
 {
 	/* add input menu items */
 	item_append(_("Input (general)"), "", 0, (void *)INPUT_GROUPS);
@@ -56,11 +57,11 @@ void menu_main::populate()
 	item_append(_("Input (this Machine)"), "", 0, (void *)INPUT_SPECIFIC);
 
 	/* add optional input-related menus */
-	if (machine().ioport().has_analog())
+	if (ui().machine_info().has_analog())
 		item_append(_("Analog Controls"), "", 0, (void *)ANALOG);
-	if (machine().ioport().has_dips())
+	if (ui().machine_info().has_dips())
 		item_append(_("Dip Switches"), "", 0, (void *)SETTINGS_DIP_SWITCHES);
-	if (machine().ioport().has_configs())
+	if (ui().machine_info().has_configs())
 	{
 		item_append(_("Machine Configuration"), "", 0, (void *)SETTINGS_DRIVER_CONFIG);
 	}
@@ -92,7 +93,7 @@ void menu_main::populate()
 	if (pty_interface_iterator(machine().root_device()).first() != nullptr)
 		item_append(_("Pseudo terminals"), "", 0, (void *)PTY_INFO);
 
-	if (machine().ioport().has_bioses())
+	if (ui().machine_info().has_bioses())
 		item_append(_("Bios Selection"), "", 0, (void *)BIOS_SELECTION);
 
 	/* add slot info menu */
@@ -108,7 +109,7 @@ void menu_main::populate()
 		item_append(_("Network Devices"), "", 0, (void*)NETWORK_DEVICES);
 
 	/* add keyboard mode menu */
-	if (machine().ioport().has_keyboard() && machine().ioport().natkeyboard().can_post())
+	if (ui().machine_info().has_keyboard() && machine().ioport().natkeyboard().can_post())
 		item_append(_("Keyboard Mode"), "", 0, (void *)KEYBOARD_MODE);
 
 	/* add sliders menu */
@@ -129,7 +130,7 @@ void menu_main::populate()
 		item_append(_("Plugin Options"), "", 0, (void *)PLUGINS);
 
 	// add dats menu
-	if (ui().options().enabled_dats() && mame_machine_manager::instance()->datfile().has_data())
+	if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", "", true))
 		item_append(_("External DAT View"), "", 0, (void *)EXTERNAL_DATS);
 
 	item_append(menu_item_type::SEPARATOR);

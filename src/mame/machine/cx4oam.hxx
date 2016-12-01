@@ -13,16 +13,16 @@
 //Build OAM
 static void CX4_op00_00(running_machine &machine)
 {
-	INT32 i;
+	int32_t i;
 
-	UINT32 oamptr = cx4.ram[0x626] << 2;
-	UINT16 globalx, globaly;
-	UINT32 oamptr2;
-	INT16 sprx, spry;
-	UINT8 sprname, sprattr;
-	UINT8 sprcount;
-	UINT8 offset;
-	UINT32 srcptr;
+	uint32_t oamptr = cx4.ram[0x626] << 2;
+	uint16_t globalx, globaly;
+	uint32_t oamptr2;
+	int16_t sprx, spry;
+	uint8_t sprname, sprattr;
+	uint8_t sprcount;
+	uint8_t offset;
+	uint32_t srcptr;
 
 	for(i = 0x1fd; i > oamptr && i >= 0; i -= 4)
 	{
@@ -49,7 +49,7 @@ static void CX4_op00_00(running_machine &machine)
 	address_space &space = machine.device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x620]; i > 0 && sprcount > 0; i--, srcptr += 16)
 	{
-		UINT32 spraddr = CX4_readl(srcptr + 7);
+		uint32_t spraddr = CX4_readl(srcptr + 7);
 
 		sprx = CX4_readw(srcptr)     - globalx;
 		spry = CX4_readw(srcptr + 2) - globaly;
@@ -58,11 +58,11 @@ static void CX4_op00_00(running_machine &machine)
 
 		if(space.read_byte(spraddr))
 		{
-			INT16 x, y;
-			INT32 sprcnt;
+			int16_t x, y;
+			int32_t sprcnt;
 			for(sprcnt = space.read_byte(spraddr++); sprcnt > 0 && sprcount > 0; sprcnt--, spraddr += 4)
 			{
-				x = (INT8)space.read_byte(spraddr + 1);
+				x = (int8_t)space.read_byte(spraddr + 1);
 				if(sprattr & 0x40)
 				{
 					x = -x - ((space.read_byte(spraddr) & 0x20) ? 16 : 8);
@@ -70,7 +70,7 @@ static void CX4_op00_00(running_machine &machine)
 				x += sprx;
 				if(x >= -16 && x <= 272)
 				{
-					y = (INT8)space.read_byte(spraddr + 2);
+					y = (int8_t)space.read_byte(spraddr + 2);
 					if(sprattr & 0x80)
 					{
 						y = -y - ((space.read_byte(spraddr) & 0x20) ? 16 : 8);
@@ -78,8 +78,8 @@ static void CX4_op00_00(running_machine &machine)
 					y += spry;
 					if(y >= -16 && y <= 224)
 					{
-						cx4.ram[oamptr    ] = (UINT8)x;
-						cx4.ram[oamptr + 1] = (UINT8)y;
+						cx4.ram[oamptr    ] = (uint8_t)x;
+						cx4.ram[oamptr + 1] = (uint8_t)y;
 						cx4.ram[oamptr + 2] = sprname + space.read_byte(spraddr + 3);
 						cx4.ram[oamptr + 3] = sprattr ^ (space.read_byte(spraddr) & 0xc0);
 						cx4.ram[oamptr2] &= ~(3 << offset);
@@ -104,8 +104,8 @@ static void CX4_op00_00(running_machine &machine)
 		}
 		else if(sprcount > 0)
 		{
-			cx4.ram[oamptr    ] = (UINT8)sprx;
-			cx4.ram[oamptr + 1] = (UINT8)spry;
+			cx4.ram[oamptr    ] = (uint8_t)sprx;
+			cx4.ram[oamptr + 1] = (uint8_t)spry;
 			cx4.ram[oamptr + 2] = sprname;
 			cx4.ram[oamptr + 3] = sprattr;
 			cx4.ram[oamptr2] &= ~(3 << offset);
@@ -137,8 +137,8 @@ static void CX4_op00_03(void)
 //Transform Lines
 static void CX4_op00_05(running_machine &machine)
 {
-	INT32 i;
-	UINT32 ptr = 0, ptr2 = 0;
+	int32_t i;
+	uint32_t ptr = 0, ptr2 = 0;
 
 	cx4.C4WFX2Val = CX4_read(0x1f83);
 	cx4.C4WFY2Val = CX4_read(0x1f86);
@@ -195,21 +195,21 @@ static void CX4_op00_08(running_machine &machine)
 //Disintegrate
 static void CX4_op00_0b(running_machine &machine)
 {
-	UINT8  width, height;
-	UINT32 startx, starty;
-	UINT32 srcptr;
-	UINT32 x, y;
-	INT32  scalex, scaley;
-	INT32  cx, cy;
-	INT32  i, j;
+	uint8_t  width, height;
+	uint32_t startx, starty;
+	uint32_t srcptr;
+	uint32_t x, y;
+	int32_t  scalex, scaley;
+	int32_t  cx, cy;
+	int32_t  i, j;
 
 	width  = CX4_read(0x1f89);
 	height = CX4_read(0x1f8c);
 	cx     = CX4_readw(0x1f80);
 	cy     = CX4_readw(0x1f83);
 
-	scalex = (INT16)CX4_readw(0x1f86);
-	scaley = (INT16)CX4_readw(0x1f8f);
+	scalex = (int16_t)CX4_readw(0x1f86);
+	scaley = (int16_t)CX4_readw(0x1f8f);
 	startx = -cx * scalex + (cx << 8);
 	starty = -cy * scaley + (cy << 8);
 	srcptr = 0x600;
@@ -225,9 +225,9 @@ static void CX4_op00_0b(running_machine &machine)
 		{
 			if((x >> 8) < width && (y >> 8) < height && (y >> 8) * width + (x >> 8) < 0x2000)
 			{
-				UINT8 pixel = (j & 1) ? (cx4.ram[srcptr] >> 4) : (cx4.ram[srcptr]);
-				INT32 index = (y >> 11) * width * 4 + (x >> 11) * 32 + ((y >> 8) & 7) * 2;
-				UINT8 mask = 0x80 >> ((x >> 8) & 7);
+				uint8_t pixel = (j & 1) ? (cx4.ram[srcptr] >> 4) : (cx4.ram[srcptr]);
+				int32_t index = (y >> 11) * width * 4 + (x >> 11) * 32 + ((y >> 8) & 7) * 2;
+				uint8_t mask = 0x80 >> ((x >> 8) & 7);
 
 				if(pixel & 1) cx4.ram[index     ] |= mask;
 				if(pixel & 2) cx4.ram[index +  1] |= mask;
@@ -246,19 +246,19 @@ static void CX4_op00_0b(running_machine &machine)
 static void CX4_op00_0c(running_machine &machine)
 {
 	int i, j;
-	UINT32 destptr = 0;
-	UINT32 waveptr = CX4_read(0x1f83);
-	UINT16 mask1   = 0xc0c0;
-	UINT16 mask2   = 0x3f3f;
+	uint32_t destptr = 0;
+	uint32_t waveptr = CX4_read(0x1f83);
+	uint16_t mask1   = 0xc0c0;
+	uint16_t mask2   = 0x3f3f;
 
 	for(j = 0; j < 0x10; j++)
 	{
 		do
 		{
-			INT16 height = -((INT8)CX4_read(waveptr + 0xb00)) - 16;
+			int16_t height = -((int8_t)CX4_read(waveptr + 0xb00)) - 16;
 			for(i = 0; i < 40; i++)
 			{
-				UINT16 temp = CX4_readw(destptr + CX4_wave_data[i]) & mask2;
+				uint16_t temp = CX4_readw(destptr + CX4_wave_data[i]) & mask2;
 				if(height >= 0)
 				{
 					if(height < 8)
@@ -281,10 +281,10 @@ static void CX4_op00_0c(running_machine &machine)
 
 		do
 		{
-			INT16 height = -((INT8)CX4_read(waveptr + 0xb00)) - 16;
+			int16_t height = -((int8_t)CX4_read(waveptr + 0xb00)) - 16;
 			for(i = 0; i < 40; i++)
 			{
-				UINT16 temp = CX4_readw(destptr + CX4_wave_data[i]) & mask2;
+				uint16_t temp = CX4_readw(destptr + CX4_wave_data[i]) & mask2;
 				if(height >= 0)
 				{
 					if(height < 8)

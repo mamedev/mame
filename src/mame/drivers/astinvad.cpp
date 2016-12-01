@@ -66,15 +66,15 @@ public:
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	std::unique_ptr<UINT8[]>    m_colorram;
+	std::unique_ptr<uint8_t[]>    m_colorram;
 	emu_timer  *m_int_timer;
-	UINT8      m_sound_state[2];
-	UINT8      m_screen_flip;
-	UINT8      m_screen_red;
-	UINT8      m_flip_yoffs;
-	UINT8      m_color_latch;
+	uint8_t      m_sound_state[2];
+	uint8_t      m_screen_flip;
+	uint8_t      m_screen_red;
+	uint8_t      m_flip_yoffs;
+	uint8_t      m_color_latch;
 
 	required_device<samples_device> m_samples;
 	required_device<screen_device> m_screen;
@@ -98,11 +98,11 @@ public:
 	DECLARE_MACHINE_START(spaceint);
 	DECLARE_MACHINE_RESET(spaceint);
 	DECLARE_VIDEO_START(spaceint);
-	UINT32 screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
-	void plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color );
+	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -117,7 +117,7 @@ protected:
 
 VIDEO_START_MEMBER(astinvad_state,spaceint)
 {
-	m_colorram = std::make_unique<UINT8[]>(m_videoram.bytes());
+	m_colorram = std::make_unique<uint8_t[]>(m_videoram.bytes());
 
 	save_item(NAME(m_color_latch));
 	save_pointer(NAME(m_colorram.get()), m_videoram.bytes());
@@ -144,33 +144,33 @@ WRITE8_MEMBER(astinvad_state::spaceint_videoram_w)
  *
  *************************************/
 
-void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, UINT8 y, UINT8 x, UINT8 data, UINT8 color )
+void astinvad_state::plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color )
 {
-	UINT8 flip_xor = m_screen_flip & 7;
+	uint8_t flip_xor = m_screen_flip & 7;
 
-	bitmap.pix32(y, x + (0 ^ flip_xor)) = (data & 0x01) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (1 ^ flip_xor)) = (data & 0x02) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (2 ^ flip_xor)) = (data & 0x04) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (3 ^ flip_xor)) = (data & 0x08) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (4 ^ flip_xor)) = (data & 0x10) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (5 ^ flip_xor)) = (data & 0x20) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (6 ^ flip_xor)) = (data & 0x40) ? m_palette->pen_color(color) : rgb_t::black;
-	bitmap.pix32(y, x + (7 ^ flip_xor)) = (data & 0x80) ? m_palette->pen_color(color) : rgb_t::black;
+	bitmap.pix32(y, x + (0 ^ flip_xor)) = (data & 0x01) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (1 ^ flip_xor)) = (data & 0x02) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (2 ^ flip_xor)) = (data & 0x04) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (3 ^ flip_xor)) = (data & 0x08) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (4 ^ flip_xor)) = (data & 0x10) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (5 ^ flip_xor)) = (data & 0x20) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (6 ^ flip_xor)) = (data & 0x40) ? m_palette->pen_color(color) : rgb_t::black();
+	bitmap.pix32(y, x + (7 ^ flip_xor)) = (data & 0x80) ? m_palette->pen_color(color) : rgb_t::black();
 }
 
 
-UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
-	UINT8 yoffs = m_flip_yoffs & m_screen_flip;
+	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
 	int x, y;
 
 	/* render the visible pixels */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
-			UINT8 color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
-			UINT8 data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
+			uint8_t color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
+			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
 			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
 
@@ -178,11 +178,11 @@ UINT32 astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rgb3
 }
 
 
-UINT32 astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t astinvad_state::screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	offs_t offs,n;
-	UINT8 x,y,data,color;
+	uint8_t x,y,data,color;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
@@ -229,7 +229,7 @@ void astinvad_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		kamizake_int_gen(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in astinvad_state::device_timer");
+		assert_always(false, "Unknown id in astinvad_state::device_timer");
 	}
 }
 
@@ -302,7 +302,7 @@ INPUT_CHANGED_MEMBER(astinvad_state::spaceint_coin_inserted)
 
 READ8_MEMBER(astinvad_state::kamikaze_ppi_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))

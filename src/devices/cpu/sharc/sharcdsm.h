@@ -73,7 +73,7 @@ static const char mr_regnames[16][8] =
 
 struct SHARC_DASM_OP
 {
-	UINT32 op_mask;
-	UINT32 op_bits;
-	UINT32 (* handler)(UINT32, UINT64);
+	uint32_t op_mask;
+	uint32_t op_bits;
+	uint32_t (* handler)(uint32_t, uint64_t);
 };

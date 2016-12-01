@@ -19,12 +19,12 @@
 const device_type NEOGEO_BOOTLEG_CART = &device_creator<neogeo_bootleg_cart>;
 
 
-neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source) :
+neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
 	neogeo_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_prot(*this, "bootleg_prot")
 {}
 
-neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_bootleg_cart::neogeo_bootleg_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_BOOTLEG_CART, "Neo Geo Bootleg Protected Cart", tag, owner, clock, "neocart_boot", __FILE__),
 	m_prot(*this, "bootleg_prot")
 {}
@@ -64,7 +64,7 @@ machine_config_constructor neogeo_bootleg_cart::device_mconfig_additions() const
 
 const device_type NEOGEO_GAROUBL_CART = &device_creator<neogeo_garoubl_cart>;
 
-neogeo_garoubl_cart::neogeo_garoubl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_garoubl_cart::neogeo_garoubl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_GAROUBL_CART, "Neo Geo Garou Bootleg Cart", tag, owner, clock, "neocart_garoubl", __FILE__)
 {}
 
@@ -82,7 +82,7 @@ void neogeo_garoubl_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_KOF97ORO_CART = &device_creator<neogeo_kof97oro_cart>;
 
-neogeo_kof97oro_cart::neogeo_kof97oro_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kof97oro_cart::neogeo_kof97oro_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KOF97ORO_CART, "Neo Geo KOF 97 Orochi Bootleg Cart", tag, owner, clock, "neocart_kof97oro", __FILE__)
 {}
 
@@ -101,7 +101,7 @@ void neogeo_kof97oro_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_KF10THEP_CART = &device_creator<neogeo_kf10thep_cart>;
 
-neogeo_kf10thep_cart::neogeo_kf10thep_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kf10thep_cart::neogeo_kf10thep_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KF10THEP_CART, "Neo Geo KOF 10th Ann. EP Bootleg Cart", tag, owner, clock, "neocart_kf10thep", __FILE__)
 {}
 
@@ -119,7 +119,7 @@ void neogeo_kf10thep_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_KF2K5UNI_CART = &device_creator<neogeo_kf2k5uni_cart>;
 
-neogeo_kf2k5uni_cart::neogeo_kf2k5uni_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kf2k5uni_cart::neogeo_kf2k5uni_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K5UNI_CART, "Neo Geo KOF 2005 Unique Bootleg Cart", tag, owner, clock, "neocart_kf2k5uni", __FILE__)
 {}
 
@@ -138,7 +138,7 @@ void neogeo_kf2k5uni_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_KF2K4SE_CART = &device_creator<neogeo_kf2k4se_cart>;
 
-neogeo_kf2k4se_cart::neogeo_kf2k4se_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kf2k4se_cart::neogeo_kf2k4se_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KF2K4SE_CART, "Neo Geo KOF 2004 SE Bootleg Cart", tag, owner, clock, "neocart_kf2k4se", __FILE__)
 {}
 
@@ -155,7 +155,7 @@ void neogeo_kf2k4se_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_LANS2004_CART = &device_creator<neogeo_lans2004_cart>;
 
-neogeo_lans2004_cart::neogeo_lans2004_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_lans2004_cart::neogeo_lans2004_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_LANS2004_CART, "Neo Geo Lansquenet 2004 Bootleg Cart", tag, owner, clock, "neocart_lans2004", __FILE__)
 {}
 
@@ -174,7 +174,7 @@ void neogeo_lans2004_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_SAMSHO5B_CART = &device_creator<neogeo_samsho5b_cart>;
 
-neogeo_samsho5b_cart::neogeo_samsho5b_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_samsho5b_cart::neogeo_samsho5b_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_SAMSHO5B_CART, "Neo Geo Samurai Shodown 5 Bootleg Cart", tag, owner, clock, "neocart_samsho5b", __FILE__)
 {}
 
@@ -193,7 +193,7 @@ void neogeo_samsho5b_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_MSLUG3B6_CART = &device_creator<neogeo_mslug3b6_cart>;
 
-neogeo_mslug3b6_cart::neogeo_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_mslug3b6_cart::neogeo_mslug3b6_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_MSLUG3B6_CART, "Neo Geo Metal Slug 6 Bootleg Cart", tag, owner, clock, "neocart_mslug3b6", __FILE__),
 	m_cmc_prot(*this, "cmc_prot")
 {}
@@ -221,7 +221,7 @@ machine_config_constructor neogeo_mslug3b6_cart::device_mconfig_additions() cons
 
 const device_type NEOGEO_MS5PLUS_CART = &device_creator<neogeo_ms5plus_cart>;
 
-neogeo_ms5plus_cart::neogeo_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_ms5plus_cart::neogeo_ms5plus_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_MS5PLUS_CART, "Neo Geo Metal Slug 5 Plus Bootleg Cart", tag, owner, clock, "neocart_ms5plus", __FILE__),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_pcm2_prot(*this, "pcm2_prot")
@@ -253,7 +253,7 @@ machine_config_constructor neogeo_ms5plus_cart::device_mconfig_additions() const
 
 const device_type NEOGEO_KOG_CART = &device_creator<neogeo_kog_cart>;
 
-neogeo_kog_cart::neogeo_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kog_cart::neogeo_kog_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_bootleg_cart(mconfig, NEOGEO_KOG_CART, "Neo Geo King of Gladiators Bootleg Cart", tag, owner, clock, "neocart_kog", __FILE__),
 	m_jumper(*this, "JUMPER")
 {}

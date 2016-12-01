@@ -1386,18 +1386,17 @@ Note: on screen copyright is (c)1998 Coinmaster.
 /*------------------------------
     update timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int no )
+void seta_state::uPD71054_update_timer(device_t *cpu, int no)
 {
-	seta_state *state = machine.driver_data<seta_state>();
-	uPD71054_state *uPD71054 = &state->m_uPD71054;
-	UINT16 max = uPD71054->max[no]&0xffff;
+	uPD71054_state *uPD71054 = &m_uPD71054;
+	uint16_t max = uPD71054->max[no]&0xffff;
 
 	if( max != 0 ) {
-		attotime period = attotime::from_hz(machine.device("maincpu")->unscaled_clock()) * (16 * max);
+		attotime period = attotime::from_hz(m_maincpu->unscaled_clock()) * (16 * max);
 		uPD71054->timer[no]->adjust( period, no );
 	} else {
 		uPD71054->timer[no]->adjust( attotime::never, no);
-		state->logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
+		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
 				(cpu != nullptr) ? cpu->safe_pc() : -1, no );
 	}
 }
@@ -1410,7 +1409,7 @@ static void uPD71054_update_timer( running_machine &machine, device_t *cpu, int 
 TIMER_CALLBACK_MEMBER(seta_state::uPD71054_timer_callback)
 {
 	m_maincpu->set_input_line(4, HOLD_LINE );
-	uPD71054_update_timer( machine(), nullptr, param );
+	uPD71054_update_timer( nullptr, param );
 }
 
 
@@ -1459,7 +1458,7 @@ WRITE16_MEMBER(seta_state::timer_regs_w)
 			uPD71054->max[offset] = (uPD71054->max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054->max[offset] != 0 ) {
-			uPD71054_update_timer( machine(), &space.device(), offset );
+			uPD71054_update_timer( &space.device(), offset );
 		}
 		break;
 		case 0x0003:
@@ -1522,7 +1521,7 @@ WRITE_LINE_MEMBER(seta_state::pit_out0)
 
 READ16_MEMBER(seta_state::sharedram_68000_r)
 {
-	return ((UINT16)m_sharedram[offset]) & 0xff;
+	return ((uint16_t)m_sharedram[offset]) & 0xff;
 }
 
 WRITE16_MEMBER(seta_state::sharedram_68000_w)
@@ -1573,7 +1572,7 @@ WRITE16_MEMBER(seta_state::sub_ctrl_w)
 /* DSW reading for 16 bit CPUs */
 READ16_MEMBER(seta_state::seta_dsw_r)
 {
-	UINT16 dsw = ioport("DSW")->read();
+	uint16_t dsw = ioport("DSW")->read();
 	if (offset == 0)    return (dsw >> 8) & 0xff;
 	else                return (dsw >> 0) & 0xff;
 }
@@ -1583,12 +1582,12 @@ READ16_MEMBER(seta_state::seta_dsw_r)
 
 READ8_MEMBER(seta_state::dsw1_r)
 {
-	return (ioport("DSW")->read() >> 8) & 0xff;
+	return (m_dsw->read() >> 8) & 0xff;
 }
 
 READ8_MEMBER(seta_state::dsw2_r)
 {
-	return (ioport("DSW")->read() >> 0) & 0xff;
+	return (m_dsw->read() >> 0) & 0xff;
 }
 
 
@@ -1683,15 +1682,15 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::calibr50_ip_r)
 {
-	int dir1 = ioport("ROT1")->read();  // analog port
-	int dir2 = ioport("ROT2")->read();  // analog port
+	int dir1 = m_rot[0]->read();  // analog port
+	int dir2 = m_rot[1]->read();  // analog port
 
 	switch (offset)
 	{
-		case 0x00/2:    return ioport("P1")->read();    // p1
-		case 0x02/2:    return ioport("P2")->read();    // p2
+		case 0x00/2:    return m_p1->read();        // p1
+		case 0x02/2:    return m_p2->read();        // p2
 
-		case 0x08/2:    return ioport("COINS")->read(); // Coins
+		case 0x08/2:    return m_coins->read();     // Coins
 
 		case 0x10/2:    return (dir1 & 0xff);       // lower 8 bits of p1 rotation
 		case 0x12/2:    return (dir1 >> 8);         // upper 4 bits of p1 rotation
@@ -1746,10 +1745,10 @@ READ16_MEMBER(seta_state::usclssic_dsw_r)
 {
 	switch (offset)
 	{
-		case 0/2:   return (ioport("DSW")->read() >>  8) & 0xf;
-		case 2/2:   return (ioport("DSW")->read() >> 12) & 0xf;
-		case 4/2:   return (ioport("DSW")->read() >>  0) & 0xf;
-		case 6/2:   return (ioport("DSW")->read() >>  4) & 0xf;
+		case 0/2:   return (m_dsw->read() >>  8) & 0xf;
+		case 2/2:   return (m_dsw->read() >> 12) & 0xf;
+		case 4/2:   return (m_dsw->read() >>  0) & 0xf;
+		case 6/2:   return (m_dsw->read() >>  4) & 0xf;
 	}
 	return 0;
 }
@@ -1963,7 +1962,7 @@ WRITE16_MEMBER(seta_state::zombraid_gun_w)
 
 READ16_MEMBER(seta_state::extra_r)
 {
-	return read_safe(ioport("EXTRA"), 0xff);
+	return m_extra_port.read_safe(0xff);
 }
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
@@ -2107,7 +2106,7 @@ ADDRESS_MAP_END
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static const UINT16 keroppi_protection_word[] = {
+static const uint16_t keroppi_protection_word[] = {
 	0x0000,
 	0x0000, 0x0000, 0x0000,
 	0x2000, 0x2000, 0x2000,
@@ -2119,7 +2118,7 @@ static const UINT16 keroppi_protection_word[] = {
 
 READ16_MEMBER(seta_state::keroppi_protection_r)
 {
-	UINT16 result = keroppi_protection_word[m_keroppi_protection_count];
+	uint16_t result = keroppi_protection_word[m_keroppi_protection_count];
 
 	m_keroppi_protection_count++;
 	if (m_keroppi_protection_count > 15)
@@ -2137,7 +2136,7 @@ READ16_MEMBER(seta_state::keroppi_protection_init_r)
 
 READ16_MEMBER(seta_state::keroppi_coin_r)
 {
-	UINT16 result = ioport("COINS")->read();
+	uint16_t result = m_coins->read();
 
 	if (m_keroppi_prize_hop == 2)
 	{
@@ -2358,7 +2357,7 @@ WRITE16_MEMBER(seta_state::setaroul_spritecode_w)
 
 READ16_MEMBER(seta_state::setaroul_spritecode_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	if ((offset&1)==1)
 		ret = m_seta001->spritecodelow_r8(space, offset>>1);
 	else
@@ -2548,10 +2547,10 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta_state::krzybowl_input_r)
 {
 	// analog ports
-	int dir1x = ioport("TRACK1_X")->read() & 0xfff;
-	int dir1y = ioport("TRACK1_Y")->read() & 0xfff;
-	int dir2x = ioport("TRACK2_X")->read() & 0xfff;
-	int dir2y = ioport("TRACK2_Y")->read() & 0xfff;
+	int dir1x = m_track1_x->read() & 0xfff;
+	int dir1y = m_track1_y->read() & 0xfff;
+	int dir2x = m_track2_x->read() & 0xfff;
+	int dir2y = m_track2_y->read() & 0xfff;
 
 	switch (offset)
 	{
@@ -2698,6 +2697,7 @@ ADDRESS_MAP_END
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
+// TODO: not NVRAM!!!
 READ16_MEMBER(seta_state::kiwame_nvram_r)
 {
 	return m_kiwame_nvram[offset] & 0xff;
@@ -2724,7 +2724,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 	{
 		case 0x00/2:    return ioport(keynames[i])->read();
 		case 0x02/2:    return 0xffff;
-		case 0x04/2:    return ioport("COINS")->read();
+		case 0x04/2:    return m_coins->read();
 //      case 0x06/2:
 		case 0x08/2:    return 0xffff;
 
@@ -2736,8 +2736,7 @@ READ16_MEMBER(seta_state::kiwame_input_r)
 
 static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM                             // ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // NVRAM + Regs ?
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("nvram")                            // RAM
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spritecode_r16, spritecode_w16)     // Sprites Code + X + Attr
 /**/AM_RANGE(0x900000, 0x900001) AM_RAM                             // ? 0x4000
 /**/AM_RANGE(0xa00000, 0xa005ff) AM_RAM AM_DEVREADWRITE("spritegen", seta001_device, spriteylow_r16, spriteylow_w16)     // Sprites Y
@@ -2746,6 +2745,7 @@ static ADDRESS_MAP_START( kiwame_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0xc00000, 0xc03fff) AM_DEVREADWRITE("x1snd", x1_010_device, word_r, word_w)   // Sound
 	AM_RANGE(0xd00000, 0xd00009) AM_READ(kiwame_input_r)            // mahjong panel
 	AM_RANGE(0xe00000, 0xe00003) AM_READ(seta_dsw_r)                // DSW
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(kiwame_nvram_r, kiwame_nvram_w) AM_SHARE("kiwame_nvram")  // TODO: actual unknown device
 ADDRESS_MAP_END
 
 
@@ -2991,20 +2991,20 @@ ADDRESS_MAP_END
 READ16_MEMBER(seta_state::inttoote_dsw_r)
 {
 	int shift = offset * 4;
-	return  ((((ioport("DSW1")->read() >> shift)       & 0xf)) << 0) |
-			((((ioport("DSW2_3")->read() >> shift)     & 0xf)) << 4) |
-			((((ioport("DSW2_3")->read() >> (shift+8)) & 0xf)) << 8) ;
+	return  ((((m_dsw1->read() >> shift)       & 0xf)) << 0) |
+			((((m_dsw2_3->read() >> shift)     & 0xf)) << 4) |
+			((((m_dsw2_3->read() >> (shift+8)) & 0xf)) << 8) ;
 }
 
 READ16_MEMBER(seta_state::inttoote_key_r)
 {
 	switch( *m_inttoote_key_select )
 	{
-		case 0x08:  return ioport("BET0")->read();
-		case 0x10:  return ioport("BET1")->read();
-		case 0x20:  return ioport("BET2")->read();
-		case 0x40:  return ioport("BET3")->read();
-		case 0x80:  return ioport("BET4")->read();
+		case 0x08:  return m_bet[0]->read();
+		case 0x10:  return m_bet[1]->read();
+		case 0x20:  return m_bet[2]->read();
+		case 0x40:  return m_bet[3]->read();
+		case 0x80:  return m_bet[4]->read();
 	}
 
 	logerror("%06X: unknown read, select = %04x\n",space.device().safe_pc(), *m_inttoote_key_select);
@@ -3055,11 +3055,11 @@ READ16_MEMBER(seta_state::jockeyc_mux_r)
 {
 	switch( m_jockeyc_key_select )
 	{
-		case 0x08:  return ioport("BET0")->read();
-		case 0x10:  return ioport("BET1")->read();
-		case 0x20:  return ioport("BET2")->read();
-		case 0x40:  return ioport("BET3")->read();
-		case 0x80:  return ioport("BET4")->read();
+		case 0x08:  return m_bet[0]->read();
+		case 0x10:  return m_bet[1]->read();
+		case 0x20:  return m_bet[2]->read();
+		case 0x40:  return m_bet[3]->read();
+		case 0x80:  return m_bet[4]->read();
 	}
 
 	return 0xffff;
@@ -3124,7 +3124,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(seta_state::sub_bankswitch_w)
 {
-	UINT8 *rom = memregion("sub")->base();
+	uint8_t *rom = memregion("sub")->base();
 	int bank = data >> 4;
 
 	membank("bank1")->set_base(&rom[bank * 0x4000 + 0xc000]);
@@ -7498,6 +7498,12 @@ static GFXDECODE_START( tndrcade )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*0, 32 ) // [0] Sprites
 GFXDECODE_END
 
+// TODO: pairlove sets up two identical palette banks at 0-1ff and 0x200-0x3ff in-game, 0x200-0x3ff only in service mode.
+//       Maybe there's a color offset register to somewhere?
+static GFXDECODE_START( pairlove )
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms, 512*1, 32 ) // [0] Sprites
+GFXDECODE_END
+
 /***************************************************************************
                                 Orbs
 ***************************************************************************/
@@ -7918,7 +7924,7 @@ static MACHINE_CONFIG_START( calibr50, seta_state )
 	MCFG_CPU_ADD("sub", M65C02, XTAL_16MHz/8) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(calibr50_sub_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(seta_state, irq0_line_hold, 4*60)  /* IRQ: 4/frame
-                               NMI: when the 68k writes the sound latch */
+	                           NMI: when the 68k writes the sound latch */
 
 	MCFG_MACHINE_RESET_OVERRIDE(seta_state,calibr50)
 
@@ -9017,8 +9023,10 @@ static MACHINE_CONFIG_START( kiwame, seta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 16000000)   /* 16 MHz */
 	MCFG_CPU_PROGRAM_MAP(kiwame_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)/* lev 1-7 are the same. WARNING:
-                                   the interrupt table is written to. */
+	/* lev 1-7 are the same. WARNING: the interrupt table is written to. */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", seta_state,  irq1_line_hold)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
@@ -9457,7 +9465,7 @@ static MACHINE_CONFIG_START( pairlove, seta_state )
 	MCFG_SCREEN_UPDATE_DRIVER(seta_state, screen_update_seta_no_layers)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tndrcade)
+	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pairlove)
 	MCFG_PALETTE_ADD("palette", 2048)   /* sprites only */
 
 	MCFG_VIDEO_START_OVERRIDE(seta_state,seta_no_layers)
@@ -10752,6 +10760,10 @@ ROM_START( kiwame )
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "fp001006.bin", 0x000000, 0x080000, CRC(96cf395d) SHA1(877b291598e3a42e5003b2f50a16d162348ce72d) )
 	ROM_LOAD( "fp001005.bin", 0x080000, 0x080000, CRC(65b5fe9a) SHA1(35605be00c7c455551d18386fcb5ad013aa2907e) )
+
+	// default NVRAM, avoids "BACKUP RAM ERROR" at boot (useful for inp record/playback)
+	ROM_REGION( 0x10000, "nvram", 0 )
+	ROM_LOAD( "nvram.bin", 0, 0x10000, CRC(1f719400) SHA1(c63bbe5d3a0a917f74c1bd5e57cd44389e4e645c) )
 ROM_END
 
 ROM_START( krzybowl )
@@ -11405,7 +11417,7 @@ READ16_MEMBER(seta_state::downtown_protection_r)
 	{
 		case 0xa3:
 		{
-			static const UINT8 word[] = "WALTZ0";
+			static const uint8_t word[] = "WALTZ0";
 			if (offset >= 0x100/2 && offset <= 0x10a/2) return word[offset-0x100/2];
 			else                                        return 0;
 		}
@@ -11447,7 +11459,7 @@ DRIVER_INIT_MEMBER(seta_state,arbalest)
 
 DRIVER_INIT_MEMBER(seta_state,metafox)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	/* This game uses the 21c000-21ffff area for protection? */
 //  m_maincpu->space(AS_PROGRAM).nop_readwrite(0x21c000, 0x21ffff);
@@ -11463,11 +11475,11 @@ DRIVER_INIT_MEMBER(seta_state,blandia)
 	/* rearrange the gfx data so it can be decoded in the same way as the other set */
 
 	int rom_size;
-	UINT8 *rom;
+	uint8_t *rom;
 	int rpos;
 
 	rom_size = 0x80000;
-	dynamic_buffer buf(rom_size);
+	std::vector<uint8_t> buf(rom_size);
 
 	rom = memregion("gfx2")->base() + 0x40000;
 
@@ -11504,7 +11516,7 @@ DRIVER_INIT_MEMBER(seta_state,zombraid)
 
 DRIVER_INIT_MEMBER(seta_state,kiwame)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	/* WARNING: This game writes to the interrupt vector
 	   table. Lev 1 routine address is stored at $100 */
@@ -11521,9 +11533,9 @@ DRIVER_INIT_MEMBER(seta_state,rezon)
 
 DRIVER_INIT_MEMBER(seta_state,wiggie)
 {
-	UINT8 *src;
+	uint8_t *src;
 	int len;
-	UINT8 temp[16];
+	uint8_t temp[16];
 	int i,j;
 
 	src = memregion("maincpu")->base();
@@ -11555,7 +11567,7 @@ DRIVER_INIT_MEMBER(seta_state,wiggie)
 
 DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 {
-	UINT16 *RAM = (UINT16 *) memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *) memregion("maincpu")->base();
 
 	// protection check at boot
 	RAM[0x1078/2] = 0x4e71;
@@ -11572,7 +11584,7 @@ DRIVER_INIT_MEMBER(seta_state,crazyfgt)
 
 DRIVER_INIT_MEMBER(seta_state,inttoote)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
 	m_vregs.allocate(3);
@@ -11586,7 +11598,7 @@ DRIVER_INIT_MEMBER(seta_state,inttoote)
 
 DRIVER_INIT_MEMBER(seta_state,inttootea)
 {
-	//UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	//uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	// missing / unused video regs
 	m_vregs.allocate(3);

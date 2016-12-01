@@ -53,10 +53,10 @@ public:
 	DECLARE_WRITE8_MEMBER(fk1_disk_w);
 	DECLARE_READ8_MEMBER(fk1_mouse_r);
 	DECLARE_WRITE8_MEMBER(fk1_reset_int_w);
-	UINT8 m_video_rol;
-	UINT8 m_int_vector;
+	uint8_t m_video_rol;
+	uint8_t m_int_vector;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(vsync_callback);
 	IRQ_CALLBACK_MEMBER(fk1_irq_callback);
@@ -250,7 +250,7 @@ WRITE8_MEMBER( fk1_state::fk1_intr_w )
 READ8_MEMBER( fk1_state::fk1_bank_ram_r )
 {
 	address_space &space_mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	space_mem.install_write_bank(0x0000, 0x3fff, "bank1");
 	membank("bank1")->set_base(ram);
@@ -374,7 +374,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(fk1_state::vsync_callback)
 void fk1_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	space.unmap_write(0x0000, 0x3fff);
 	membank("bank1")->set_base(memregion("maincpu")->base()); // ROM
@@ -383,11 +383,11 @@ void fk1_state::machine_reset()
 	membank("bank4")->set_base(ram + 0xc000);
 }
 
-UINT32 fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t fk1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code;
+	uint8_t code;
 	int y, x, b;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	for (x = 0; x < 64; x++)
 	{
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( fk1, fk1_state )
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(fk1_state,fk1_irq_callback)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(fk1_state, screen_update)

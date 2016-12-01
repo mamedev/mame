@@ -15,7 +15,7 @@
  */
 READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 {
-	UINT16 data = 0177777;
+	uint16_t data = 0177777;
 	switch (offset & 3) {
 	case 0:
 		data = machine().root_device().ioport("ROW0")->read();
@@ -44,7 +44,7 @@ READ16_MEMBER( alto2_cpu_device::kbd_ad_r )
 	return data;
 }
 
-void alto2_cpu_device::init_kbd(UINT16 bootkey)
+void alto2_cpu_device::init_kbd(uint16_t bootkey)
 {
 	m_kbd.bootkey = bootkey;
 }

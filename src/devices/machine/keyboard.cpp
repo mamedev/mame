@@ -29,15 +29,15 @@ WRITE8_MEMBER( xxx_state::kbd_put )
 
 
 namespace {
-UINT8 const TRANSLATION_TABLE[][2][4][16] = {
+uint8_t const TRANSLATION_TABLE[][2][4][16] = {
 	{
-		{	// ANSI
+		{   // ANSI
 			{ '`',   '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '=',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '[',   ']',   '\\',  0xffU, 0xffU },
 			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, '\\',  'z',   'x',   'c',   'v',   'b',   'n',   'm',   ',',   '.',   '/',   0xffU, 0xffU, 0xffU, ' '   }
 		},
-		{	// JIS
+		{   // JIS
 			{ '\\',  '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   '-',   '^',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'q',   'w',   'e',   'r',   't',   'y',   'u',   'i',   'o',   'p',   '@',   '[',   ']',   0xffU, 0xffU },
 			{ 0xffU, 'a',   's',   'd',   'f',   'g',   'h',   'j',   'k',   'l',   ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -45,13 +45,13 @@ UINT8 const TRANSLATION_TABLE[][2][4][16] = {
 		}
 	},
 	{
-		{	// ANSI shift
+		{   // ANSI shift
 			{ '~',   '!',   '@',   '#',   '$',   '%',   '^',   '&',   '*',   '(',   ')',   '_',   '+',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '{',   '}',   '|',   0xffU, 0xffU },
 			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   ':',   '"',   0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, '_',   'Z',   'X',   'C',   'V',   'B',   'N',   'M',   '<',   '>',   '?',   0xffU, 0xffU, 0xffU, ' '   }
 		},
-		{	// JIS shift
+		{   // JIS shift
 			{ '|',   '!',   '"',   '#',   '$',   '%',   '&',   '\'',  '(',   ')',   0xffU, '=',   '~',   0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 'Q',   'W',   'E',   'R',   'T',   'Y',   'U',   'I',   'O',   'P',   '`',   '{',   '}',   0xffU, 0xffU },
 			{ 0xffU, 'A',   'S',   'D',   'F',   'G',   'H',   'J',   'K',   'L',   '+',   '*',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -59,13 +59,13 @@ UINT8 const TRANSLATION_TABLE[][2][4][16] = {
 		}
 	},
 	{
-		{	// ANSI ctrl
+		{   // ANSI ctrl
 			{ 0x00U, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x1bU, 0x1dU, 0x1cU, 0xffU, 0xffU },
 			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   '\'',  0x0dU, 0xffU, 0xffU, 0x0aU },
 			{ 0xffU, 0x1cU, 0x1aU, 0x18U, 0x03U, 0x16U, 0x02U, 0x0eU, 0x0dU, ',',   '.',   0x1fU, 0xffU, 0xffU, 0xffU, 0x00U }
 		},
-		{	// JIS ctrl
+		{   // JIS ctrl
 			{ 0x1cU, '1',   '2',   '3',   '4',   '5',   '6',   '7',   '8',   '9',   '0',   0x1fU, 0x1eU, 0x08U, 0x7fU, 0x1bU },
 			{ 0x09U, 0x11U, 0x17U, 0x05U, 0x12U, 0x14U, 0x19U, 0x15U, 0x09U, 0x0fU, 0x10U, 0x00U, 0x1bU, 0x1dU, 0xffU, 0xffU },
 			{ 0xffU, 0x01U, 0x13U, 0x04U, 0x06U, 0x07U, 0x08U, 0x0aU, 0x0bU, 0x0cU, ';',   ':',   0x0dU, 0xffU, 0xffU, 0x0aU },
@@ -180,7 +180,7 @@ INPUT_PORTS_START( generic_keyboard )
 	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_O)                                                                                   PORT_CHAR('o')   PORT_CHAR('O')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_P)                                                                                   PORT_CHAR('p')   PORT_CHAR('P')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('[')   PORT_CHAR('{')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('@')   PORT_CHAR('`')  
+	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_OPENBRACE)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('@')   PORT_CHAR('`')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR(']')   PORT_CHAR('}')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR('[')   PORT_CHAR('{')
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_BACKSLASH)  PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('\\')  PORT_CHAR('|')
@@ -190,19 +190,19 @@ INPUT_PORTS_START( generic_keyboard )
 
 	PORT_START("GENKBD_ROW2")
 	PORT_BIT( 0x0001U, IP_ACTIVE_HIGH, IPT_UNUSED   )
-	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                                                                   PORT_CHAR('a')   PORT_CHAR('Q')
-	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                                                                   PORT_CHAR('s')   PORT_CHAR('W')
-	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                                                                   PORT_CHAR('d')   PORT_CHAR('E')
-	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                                                                   PORT_CHAR('f')   PORT_CHAR('R')
-	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                                                                   PORT_CHAR('g')   PORT_CHAR('T')
-	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                                                                   PORT_CHAR('h')   PORT_CHAR('Y')
-	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                                                                   PORT_CHAR('j')   PORT_CHAR('U')
-	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                                                                   PORT_CHAR('k')   PORT_CHAR('I')
-	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                                                                   PORT_CHAR('l')   PORT_CHAR('O')
+	PORT_BIT( 0x0002U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_A)                                                                                   PORT_CHAR('a')   PORT_CHAR('A')
+	PORT_BIT( 0x0004U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_S)                                                                                   PORT_CHAR('s')   PORT_CHAR('S')
+	PORT_BIT( 0x0008U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_D)                                                                                   PORT_CHAR('d')   PORT_CHAR('D')
+	PORT_BIT( 0x0010U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_F)                                                                                   PORT_CHAR('f')   PORT_CHAR('F')
+	PORT_BIT( 0x0020U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_G)                                                                                   PORT_CHAR('g')   PORT_CHAR('G')
+	PORT_BIT( 0x0040U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_H)                                                                                   PORT_CHAR('h')   PORT_CHAR('H')
+	PORT_BIT( 0x0080U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_J)                                                                                   PORT_CHAR('j')   PORT_CHAR('J')
+	PORT_BIT( 0x0100U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_K)                                                                                   PORT_CHAR('k')   PORT_CHAR('K')
+	PORT_BIT( 0x0200U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_L)                                                                                   PORT_CHAR('l')   PORT_CHAR('L')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR(';')   PORT_CHAR(':')
 	PORT_BIT( 0x0400U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_COLON)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(';')   PORT_CHAR('+')
 	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x00)                         PORT_CHAR('\'')  PORT_CHAR('"')
-	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(':')   PORT_CHAR('*')  
+	PORT_BIT( 0x0800U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_QUOTE)      PORT_CONDITION("GENKBD_CFG", 0x01, EQUALS, 0x01)                         PORT_CHAR(':')   PORT_CHAR('*')
 	PORT_BIT( 0x1000U, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_CODE(KEYCODE_ENTER)                                                        PORT_NAME("Return")    PORT_CHAR(0x0dU)
 	PORT_BIT( 0x2000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
 	PORT_BIT( 0x4000U, IP_ACTIVE_HIGH, IPT_UNUSED   )
@@ -247,7 +247,7 @@ generic_keyboard_device::generic_keyboard_device(
 		char const *name,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock,
+		uint32_t clock,
 		char const *shortname,
 		char const *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
@@ -260,7 +260,7 @@ generic_keyboard_device::generic_keyboard_device(
 }
 
 
-generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+generic_keyboard_device::generic_keyboard_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: generic_keyboard_device(mconfig, GENERIC_KEYBOARD, "Generic Keyboard", tag, owner, clock, "generic_keyboard", __FILE__)
 {
 }
@@ -296,40 +296,40 @@ void generic_keyboard_device::device_timer(emu_timer &timer, device_timer_id id,
 }
 
 
-void generic_keyboard_device::key_make(UINT8 row, UINT8 column)
+void generic_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
 	send_translated((row << 4) | column);
 	typematic_start(row, column, typematic_delay(), typematic_period());
 }
 
 
-void generic_keyboard_device::key_repeat(UINT8 row, UINT8 column)
+void generic_keyboard_device::key_repeat(uint8_t row, uint8_t column)
 {
 	send_translated((row << 4) | column);
 }
 
 
-void generic_keyboard_device::send_key(UINT8 code)
+void generic_keyboard_device::send_key(uint8_t code)
 {
 	m_keyboard_cb(offs_t(0), code);
 }
 
 
-bool generic_keyboard_device::translate(UINT8 code, UINT8 &translated) const
+bool generic_keyboard_device::translate(uint8_t code, uint8_t &translated) const
 {
 	unsigned const row((code >> 4) & 0x03U);
 	unsigned const col((code >> 0) & 0x0fU);
 
 	unsigned const layout(m_config->read() & 0x0001U);
 
-	UINT16 const modifiers(m_modifiers->read());
+	uint16_t const modifiers(m_modifiers->read());
 	bool const shift(bool(modifiers & 0x02U) != (bool(modifiers & 0x04U) && CAPS_TABLE[row][col]));
 	bool const ctrl(modifiers & 0x01U);
 	bool const meta(modifiers & 0x08U);
 
 	unsigned const map(ctrl ? 2U : shift ? 1U : 0U);
-	UINT8 const result(TRANSLATION_TABLE[map][layout][row][col]);
-	if (result == UINT8(~0U))
+	uint8_t const result(TRANSLATION_TABLE[map][layout][row][col]);
+	if (result == uint8_t(~0U))
 	{
 		return false;
 	}
@@ -341,9 +341,9 @@ bool generic_keyboard_device::translate(UINT8 code, UINT8 &translated) const
 }
 
 
-void generic_keyboard_device::will_scan_row(UINT8 row)
+void generic_keyboard_device::will_scan_row(uint8_t row)
 {
-	UINT16 const modifiers(m_modifiers->read());
+	uint16_t const modifiers(m_modifiers->read());
 	if (modifiers != m_last_modifiers)
 		typematic_restart(typematic_delay(), typematic_period());
 
@@ -351,9 +351,9 @@ void generic_keyboard_device::will_scan_row(UINT8 row)
 }
 
 
-void generic_keyboard_device::send_translated(UINT8 code)
+void generic_keyboard_device::send_translated(uint8_t code)
 {
-	UINT8 translated;
+	uint8_t translated;
 	if (translate(code, translated))
 		send_key(translated);
 }

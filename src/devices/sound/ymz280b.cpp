@@ -56,7 +56,7 @@ static const int index_scale[8] = { 0x0e6, 0x0e6, 0x0e6, 0x0e6, 0x133, 0x199, 0x
 static int diff_lookup[16];
 
 
-UINT8 ymz280b_device::ymz280b_read_memory(UINT32 offset)
+uint8_t ymz280b_device::ymz280b_read_memory(uint32_t offset)
 {
 	if (m_ext_read_handler.isnull())
 	{
@@ -110,7 +110,7 @@ void ymz280b_device::update_step(struct YMZ280BVoice *voice)
 		frequency = m_master_clock * (double)((voice->fnum & 0x0ff) + 1) * (1.0 / 256.0);
 	else
 		frequency = m_master_clock * (double)((voice->fnum & 0x1ff) + 1) * (1.0 / 256.0);
-	voice->output_step = (UINT32)(frequency * (double)FRAC_ONE / INTERNAL_SAMPLE_RATE);
+	voice->output_step = (uint32_t)(frequency * (double)FRAC_ONE / INTERNAL_SAMPLE_RATE);
 }
 
 
@@ -184,7 +184,7 @@ static void compute_tables(void)
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, int samples)
+int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
 {
 	int position = voice->position;
 	int signal = voice->signal;
@@ -296,7 +296,7 @@ int ymz280b_device::generate_adpcm(struct YMZ280BVoice *voice, INT16 *buffer, in
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int samples)
+int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -311,7 +311,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 			val = ymz280b_read_memory(position / 2);
 
 			/* output to the buffer, scaling by the volume */
-			*buffer++ = (INT8)val * 256;
+			*buffer++ = (int8_t)val * 256;
 			samples--;
 
 			/* next! */
@@ -334,7 +334,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 			val = ymz280b_read_memory(position / 2);
 
 			/* output to the buffer, scaling by the volume */
-			*buffer++ = (INT8)val * 256;
+			*buffer++ = (int8_t)val * 256;
 			samples--;
 
 			/* next! */
@@ -366,7 +366,7 @@ int ymz280b_device::generate_pcm8(struct YMZ280BVoice *voice, INT16 *buffer, int
 
 ***********************************************************************************************/
 
-int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, int samples)
+int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, int16_t *buffer, int samples)
 {
 	int position = voice->position;
 	int val;
@@ -378,7 +378,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
+			val = (int16_t)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -401,7 +401,7 @@ int ymz280b_device::generate_pcm16(struct YMZ280BVoice *voice, INT16 *buffer, in
 		while (samples)
 		{
 			/* fetch the current value */
-			val = (INT16)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
+			val = (int16_t)((ymz280b_read_memory(position / 2 + 1) << 8) + ymz280b_read_memory(position / 2 + 0));
 
 			/* output to the buffer, scaling by the volume */
 			*buffer++ = val;
@@ -449,13 +449,13 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	for (v = 0; v < 8; v++)
 	{
 		struct YMZ280BVoice *voice = &m_voice[v];
-		INT16 prev = voice->last_sample;
-		INT16 curr = voice->curr_sample;
-		INT16 *curr_data = m_scratch.get();
-		INT32 *ldest = lacc;
-		INT32 *rdest = racc;
-		UINT32 new_samples, samples_left;
-		UINT32 final_pos;
+		int16_t prev = voice->last_sample;
+		int16_t curr = voice->curr_sample;
+		int16_t *curr_data = m_scratch.get();
+		int32_t *ldest = lacc;
+		int32_t *rdest = racc;
+		uint32_t new_samples, samples_left;
+		uint32_t final_pos;
 		int remaining = samples;
 		int lvol = voice->output_left;
 		int rvol = voice->output_right;
@@ -473,7 +473,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 		/* interpolate */
 		while (remaining > 0 && voice->output_pos < FRAC_ONE)
 		{
-			int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
+			int interp_sample = (((int32_t)prev * (FRAC_ONE - voice->output_pos)) + ((int32_t)curr * voice->output_pos)) >> FRAC_BITS;
 			*ldest++ += interp_sample * lvol;
 			*rdest++ += interp_sample * rvol;
 			voice->output_pos += voice->output_step;
@@ -537,7 +537,7 @@ void ymz280b_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			/* interpolate */
 			while (remaining > 0 && voice->output_pos < FRAC_ONE)
 			{
-				int interp_sample = (((INT32)prev * (FRAC_ONE - voice->output_pos)) + ((INT32)curr * voice->output_pos)) >> FRAC_BITS;
+				int interp_sample = (((int32_t)prev * (FRAC_ONE - voice->output_pos)) + ((int32_t)curr * voice->output_pos)) >> FRAC_BITS;
 				*ldest++ += interp_sample * lvol;
 				*rdest++ += interp_sample * rvol;
 				voice->output_pos += voice->output_step;
@@ -601,7 +601,7 @@ void ymz280b_device::device_start()
 
 	/* allocate memory */
 	assert(MAX_SAMPLE_CHUNK < 0x10000);
-	m_scratch = std::make_unique<INT16[]>(MAX_SAMPLE_CHUNK);
+	m_scratch = std::make_unique<int16_t[]>(MAX_SAMPLE_CHUNK);
 
 	/* state save */
 	save_item(NAME(m_current_register));
@@ -683,7 +683,7 @@ void ymz280b_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	if (id < 8)
 		update_irq_state_timer_common( id );
 	else
-		assert_always(FALSE, "Unknown id in ymz280b_device::device_timer");
+		assert_always(false, "Unknown id in ymz280b_device::device_timer");
 }
 
 
@@ -886,7 +886,7 @@ void ymz280b_device::write_to_register(int data)
 
 int ymz280b_device::compute_status()
 {
-	UINT8 result;
+	uint8_t result;
 
 	/* force an update */
 	m_stream->update();
@@ -916,7 +916,7 @@ READ8_MEMBER( ymz280b_device::read )
 			return 0xff;
 
 		/* read from external memory */
-		UINT8 ret = m_ext_readlatch;
+		uint8_t ret = m_ext_readlatch;
 		m_ext_readlatch = ymz280b_read_memory(m_ext_mem_address);
 		m_ext_mem_address = (m_ext_mem_address + 1) & 0xffffff;
 		return ret;
@@ -942,7 +942,7 @@ WRITE8_MEMBER( ymz280b_device::write )
 
 const device_type YMZ280B = &device_creator<ymz280b_device>;
 
-ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ymz280b_device::ymz280b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YMZ280B, "YMZ280B", tag, owner, clock, "ymz280b", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_current_register(0),

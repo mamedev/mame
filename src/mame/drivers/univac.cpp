@@ -44,15 +44,15 @@ public:
 	DECLARE_READ8_MEMBER(vram_r);
 	DECLARE_WRITE8_MEMBER(vram_w);
 	DECLARE_WRITE8_MEMBER(port43_w);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	bool m_screen_num;
-	UINT8 m_framecnt;
+	uint8_t m_framecnt;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<nvram_device> m_nvram;
 	required_device<z80ctc_device> m_ctc;
 	required_device<z80dart_device> m_dart;
@@ -111,7 +111,7 @@ void univac_state::machine_reset()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// this is used to get the ctc to pass the test
 	bool state = BIT(m_framecnt,0);
@@ -120,9 +120,9 @@ UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	m_ctc->trg2(state);
 	m_ctc->trg3(state);
 
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 *videoram = m_p_videoram;//+(m_screen_num ? 0x2000 : 0);
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t *videoram = m_p_videoram;//+(m_screen_num ? 0x2000 : 0);
 
 	m_framecnt++;
 
@@ -130,7 +130,7 @@ UINT32 univac_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, 
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -173,7 +173,7 @@ static MACHINE_CONFIG_START( uts20, univac_state )
 	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DRIVER(univac_state, screen_update)

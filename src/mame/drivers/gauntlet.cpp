@@ -150,7 +150,7 @@ void gauntlet_state::scanline_update(screen_device &screen, int scanline)
 
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		m_soundcomm->sound_irq_gen(m_audiocpu);
+		m_soundcomm->sound_irq_gen(*m_audiocpu);
 	else
 		m_soundcomm->sound_irq_ack_r(space, 0);
 }
@@ -400,10 +400,10 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( vindctr2 )
 	PORT_START("803000")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Left Stick Fire")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Right Stick Fire")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Left Stick Thumb")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Right Stick Thumb")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_2WAY PORT_PLAYER(1)
@@ -411,10 +411,10 @@ static INPUT_PORTS_START( vindctr2 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("803002")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Left Stick Fire")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Right Stick Fire")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Left Stick Thumb")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Right Stick Thumb")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_2WAY PORT_PLAYER(2)
@@ -1636,8 +1636,8 @@ ROM_END
 
 void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 {
-	UINT8 *p1 = (UINT8 *)ptr1;
-	UINT8 *p2 = (UINT8 *)ptr2;
+	uint8_t *p1 = (uint8_t *)ptr1;
+	uint8_t *p2 = (uint8_t *)ptr2;
 	while (bytes--)
 	{
 		int temp = *p1;
@@ -1648,7 +1648,7 @@ void gauntlet_state::swap_memory(void *ptr1, void *ptr2, int bytes)
 
 void gauntlet_state::common_init(int vindctr2)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	slapstic_configure(*m_maincpu, 0x038000, 0, memregion("maincpu")->base() + 0x38000);
 
 	/* swap the top and bottom halves of the main CPU ROM images */
@@ -1671,8 +1671,8 @@ DRIVER_INIT_MEMBER(gauntlet_state,gauntlet)
 
 DRIVER_INIT_MEMBER(gauntlet_state,vindctr2)
 {
-	UINT8 *gfx2_base = memregion("gfx2")->base();
-	dynamic_buffer data(0x8000);
+	uint8_t *gfx2_base = memregion("gfx2")->base();
+	std::vector<uint8_t> data(0x8000);
 	int i;
 
 	common_init(1);

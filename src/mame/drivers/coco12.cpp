@@ -24,15 +24,16 @@
 ***************************************************************************/
 
 #include "includes/coco12.h"
-#include "imagedev/cassette.h"
-#include "cpu/m6809/m6809.h"
 #include "bus/coco/coco_232.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_pak.h"
 #include "bus/coco/coco_fdc.h"
 #include "bus/coco/coco_multi.h"
 #include "bus/coco/coco_dwsock.h"
+#include "cpu/m6809/m6809.h"
 #include "formats/coco_cas.h"
+#include "imagedev/cassette.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 
 //**************************************************************************
@@ -270,11 +271,12 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 MACHINE_CONFIG_FRAGMENT( coco_sound )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 

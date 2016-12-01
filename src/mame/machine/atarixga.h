@@ -4,23 +4,42 @@
 
     atarixga.h
 
-    Atari XGA encryption FPGA
+    Atari XGA encryption FPGAs
 
 *************************************************************************/
 
 #ifndef __MACHINE_ATARIXGA__
 #define __MACHINE_ATARIXGA__
 
-extern const device_type ATARI_XGA;
+extern const device_type ATARI_136094_0072;
+extern const device_type ATARI_136095_0072;
 
-class atari_xga_device :  public device_t
+class atari_xga_device : public device_t
 {
 public:
 	// construction/destruction
-	atari_xga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_xga_device(const machine_config &mconfig, device_type type, const char *tag,
+					device_t *owner, uint32_t clock, const char *name, const char *shortname)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, __FILE__)
+	{}
 
-	DECLARE_WRITE32_MEMBER(write);
-	DECLARE_READ32_MEMBER(read);
+	virtual DECLARE_WRITE32_MEMBER(write) = 0;
+	virtual DECLARE_READ32_MEMBER(read) = 0;
+
+protected:
+	virtual void device_start() override = 0;
+	virtual void device_reset() override = 0;
+
+	std::unique_ptr<uint16_t[]> m_ram; // CY7C185-45PC, only 16-Kbit used
+};
+
+class atari_136094_0072_device : public atari_xga_device
+{
+public:
+	atari_136094_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	virtual DECLARE_WRITE32_MEMBER(write) override;
+	virtual DECLARE_READ32_MEMBER(read) override;
 
 protected:
 	virtual void device_start() override;
@@ -29,6 +48,11 @@ protected:
 private:
 	static const size_t RAM_WORDS = 2048;
 
+	uint16_t powers2(uint8_t k, uint16_t x);
+	uint16_t lfsr2(uint16_t x);
+	uint16_t lfsr1(uint16_t x);
+	uint16_t decipher(uint8_t k, uint16_t c);
+
 	enum fpga_mode
 	{
 		FPGA_RESET,
@@ -36,18 +60,51 @@ private:
 		FPGA_DECIPHER
 	};
 
-	UINT16 powers2(UINT8 k, UINT16 x);
-	UINT16 lfsr2(UINT16 x);
-	UINT16 lfsr1(UINT16 x);
-	UINT16 parity(UINT16 x);
-	size_t popcount(UINT16 x);
-	UINT16 ctz(UINT16 x);
-	UINT16 decipher(UINT8 k, UINT16 c);
+	fpga_mode m_mode;
+	uint16_t m_address;    // last written address
+	uint16_t m_ciphertext; // last written ciphertext
+};
+
+class atari_136095_0072_device : public atari_xga_device
+{
+public:
+	atari_136095_0072_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	DECLARE_WRITE32_MEMBER(polylsb_write);
+	DECLARE_READ32_MEMBER(polylsb_read);
+
+	virtual DECLARE_WRITE32_MEMBER(write) override;
+	virtual DECLARE_READ32_MEMBER(read) override;
+
+protected:
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+private:
+	static const size_t RAM_WORDS = 4096;
+
+	uint16_t powers2(uint8_t k, uint16_t x);
+	uint16_t lfsr2(uint16_t x);
+	uint16_t lfsr1(uint16_t x);
+	uint16_t decipher(uint8_t k, uint16_t c);
+
+	enum fpga_mode
+	{
+		FPGA_SETKEY,
+		FPGA_DECIPHER,
+		FPGA_PROCESS,
+		FPGA_RESULT
+	};
+
+	struct
+	{
+		uint16_t addr;
+		uint32_t data[64];
+	} m_update;
 
 	fpga_mode m_mode;
-	UINT16 m_address;    // last written address
-	UINT16 m_ciphertext; // last written ciphertext
-	std::unique_ptr<UINT16[]> m_ram; // CY7C185-45PC, only 16-Kbit used
+	uint8_t m_poly_lsb;
+	uint16_t m_reply;
 };
 
 

@@ -9,13 +9,13 @@
 #include "emu.h"
 #include "includes/pc4.h"
 
-void pc4_state::set_busy_flag(UINT16 usec)
+void pc4_state::set_busy_flag(uint16_t usec)
 {
 	m_busy_flag = 1;
 	m_busy_timer->adjust( attotime::from_usec( usec ) );
 }
 
-UINT32 pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -23,7 +23,7 @@ UINT32 pc4_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 		for (int l=0; l<4; l++)
 			for (int i=0; i<40; i++)
 			{
-				UINT16 char_pos = l*40 + i;
+				uint16_t char_pos = l*40 + i;
 
 				for (int y=0; y<8; y++)
 					for (int x=0; x<5; x++)
@@ -94,7 +94,7 @@ WRITE8_MEMBER(pc4_state::lcd_control_w)
 	}
 	else if (BIT(data, 4))
 	{
-		UINT8 direct = (BIT(data, 2)) ? +1 : -1;
+		uint8_t direct = (BIT(data, 2)) ? +1 : -1;
 
 		if (BIT(data, 3))
 			m_disp_shift += direct;
@@ -181,7 +181,7 @@ WRITE8_MEMBER(pc4_state::lcd_data_w)
 
 READ8_MEMBER(pc4_state::lcd_data_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (m_ac_mode == 0)
 		data = m_ddram[m_ac];

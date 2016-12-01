@@ -16,6 +16,7 @@
 #include "winutf8.h"
 
 #include "winutil.h"
+#include "modules/lib/osdobj_common.h"
 
 
 bool debugwin_info::s_window_class_registered = false;
@@ -35,7 +36,7 @@ debugwin_info::debugwin_info(debugger_windows_interface &debugger, bool is_main_
 	register_window_class();
 
 	m_wnd = win_create_window_ex_utf8(DEBUG_WINDOW_STYLE_EX, "MAMEDebugWindow", title, DEBUG_WINDOW_STYLE,
-			0, 0, 100, 100, osd_common_t::s_window_list.front()->platform_window<HWND>(), create_standard_menubar(), GetModuleHandleUni(), this);
+			0, 0, 100, 100, std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window(), create_standard_menubar(), GetModuleHandleUni(), this);
 	if (m_wnd == nullptr)
 		return;
 
@@ -562,7 +563,7 @@ LRESULT CALLBACK debugwin_info::static_window_proc(HWND wnd, UINT message, WPARA
 		return 0;
 	}
 
-	debugwin_info *const info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	debugwin_info *const info = (debugwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	if (info == nullptr)
 		return DefWindowProc(wnd, message, wparam, lparam);
 

@@ -42,7 +42,7 @@
 class sega_segacd_device : public device_t, public device_gfx_interface
 {
 public:
-	sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	sega_segacd_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	required_device<cpu_device> m_scdcpu;
 	required_device<rf5c68_device> m_rfsnd;
@@ -53,59 +53,59 @@ public:
 	required_device<timer_device> m_dma_timer;
 	//required_device<timer_device> m_hock_timer;
 
-	required_shared_ptr<UINT16> m_prgram;
-	required_shared_ptr<UINT16> m_dataram;
-	required_shared_ptr<UINT16> m_font_bits;
+	required_shared_ptr<uint16_t> m_prgram;
+	required_shared_ptr<uint16_t> m_dataram;
+	required_shared_ptr<uint16_t> m_font_bits;
 
 	// can't use a memshare because it's 8-bit RAM in a 16-bit address space
-	std::vector<UINT8> m_backupram;
+	std::vector<uint8_t> m_backupram;
 
-	UINT8 m_font_color;
+	uint8_t m_font_color;
 
-	UINT16 scd_rammode;
-	UINT32 scd_mode_dmna_ret_flags ;
+	uint16_t scd_rammode;
+	uint32_t scd_mode_dmna_ret_flags ;
 
 	tilemap_t    *segacd_stampmap[4];
 
 
-	UINT8 segacd_ram_writeprotect_bits;
+	uint8_t segacd_ram_writeprotect_bits;
 	int segacd_4meg_prgbank;// = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 	int segacd_memory_priority_mode;// = 0;
 	int segacd_stampsize;
 
-	UINT16 segacd_hint_register;
-	UINT16 segacd_imagebuffer_vdot_size;
-	UINT16 segacd_imagebuffer_vcell_size;
-	UINT16 segacd_imagebuffer_hdot_size;
+	uint16_t segacd_hint_register;
+	uint16_t segacd_imagebuffer_vdot_size;
+	uint16_t segacd_imagebuffer_vcell_size;
+	uint16_t segacd_imagebuffer_hdot_size;
 
 	int segacd_conversion_active;// = 0;
-	UINT16 segacd_stampmap_base_address;
-	UINT16 segacd_imagebuffer_start_address;
-	UINT16 segacd_imagebuffer_offset;
+	uint16_t segacd_stampmap_base_address;
+	uint16_t segacd_imagebuffer_start_address;
+	uint16_t segacd_imagebuffer_offset;
 
 
-	UINT16 segacd_comms_flags;// = 0x0000;
-	UINT16 segacd_comms_part1[0x8];
-	UINT16 segacd_comms_part2[0x8];
+	uint16_t segacd_comms_flags;// = 0x0000;
+	uint16_t segacd_comms_part1[0x8];
+	uint16_t segacd_comms_part2[0x8];
 
 	int segacd_redled;// = 0;
 	int segacd_greenled;// = 0;
 	int segacd_ready;// = 1; // actually set 100ms after startup?
-	UINT8 m_irq3_timer_reg;
+	uint8_t m_irq3_timer_reg;
 
 
 	TIMER_DEVICE_CALLBACK_MEMBER( irq3_timer_callback );
 	TIMER_DEVICE_CALLBACK_MEMBER( stamp_timer_callback );
 
-	inline void write_pixel(UINT8 pix, int pixeloffset);
-	UINT16 segacd_1meg_mode_word_read(int offset, UINT16 mem_mask);
-	void segacd_1meg_mode_word_write(int offset, UINT16 data, UINT16 mem_mask, int use_pm);
+	inline void write_pixel(uint8_t pix, int pixeloffset);
+	uint16_t segacd_1meg_mode_word_read(int offset, uint16_t mem_mask);
+	void segacd_1meg_mode_word_write(int offset, uint16_t data, uint16_t mem_mask, int use_pm);
 
 	DECLARE_READ16_MEMBER( segacd_dmaaddr_r );
 	DECLARE_WRITE16_MEMBER( segacd_dmaaddr_w );
-	UINT16 m_dmaaddr;
+	uint16_t m_dmaaddr;
 
-	UINT16 m_a12000_halt_reset_reg;
+	uint16_t m_a12000_halt_reset_reg;
 
 	int m_framerate;
 	int m_base_total_scanlines;
@@ -129,10 +129,10 @@ public:
 	TILE_GET_INFO_MEMBER( get_stampmap_16x16_16x16_tile_info );
 	TILE_GET_INFO_MEMBER( get_stampmap_32x32_16x16_tile_info );
 
-	UINT8 get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
-	UINT8 get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
-	UINT8 get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos);
-	UINT8 get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_16x16_1x1_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_32x32_1x1_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_16x16_16x16_tile_info_pixel(int xpos, int ypos);
+	uint8_t get_stampmap_32x32_16x16_tile_info_pixel(int xpos, int ypos);
 
 	WRITE16_MEMBER( scd_a12000_halt_reset_w );
 	READ16_MEMBER( scd_a12000_halt_reset_r );
@@ -182,7 +182,7 @@ public:
 	READ16_MEMBER( segacd_stampsize_r );
 	WRITE16_MEMBER( segacd_stampsize_w );
 
-	UINT8 read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
+	uint8_t read_pixel_from_stampmap(bitmap_ind16* srcbitmap, int x, int y);
 
 	WRITE16_MEMBER( segacd_trace_vector_base_address_w );
 	READ16_MEMBER( segacd_imagebuffer_vdot_size_r );
@@ -207,7 +207,7 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER( dma_timer_callback );
 	IRQ_CALLBACK_MEMBER(segacd_sub_int_callback);
 
-	void SegaCD_CDC_Do_DMA( int &dmacount, UINT8 *CDC_BUFFER, UINT16 &dma_addrc, UINT16 &destination );
+	void SegaCD_CDC_Do_DMA( int &dmacount, uint8_t *CDC_BUFFER, uint16_t &dma_addrc, uint16_t &destination );
 
 protected:
 	virtual void device_start() override;
@@ -225,7 +225,7 @@ private:
 class sega_segacd_us_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_us_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	protected:
 
 };
@@ -233,7 +233,7 @@ class sega_segacd_us_device : public sega_segacd_device
 class sega_segacd_japan_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_japan_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	protected:
 //      virtual machine_config_constructor device_mconfig_additions() const;
 };
@@ -241,7 +241,7 @@ class sega_segacd_japan_device : public sega_segacd_device
 class sega_segacd_europe_device : public sega_segacd_device
 {
 	public:
-		sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+		sega_segacd_europe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	protected:
 //      virtual machine_config_constructor device_mconfig_additions() const;
 };

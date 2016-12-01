@@ -167,8 +167,8 @@ READ16_MEMBER( rohga_state::wf_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -176,7 +176,7 @@ WRITE16_MEMBER( rohga_state::wf_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -217,8 +217,8 @@ READ16_MEMBER( rohga_state::nb_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -226,7 +226,7 @@ WRITE16_MEMBER( rohga_state::nb_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -276,7 +276,7 @@ static ADDRESS_MAP_START( schmeisr_map, AS_PROGRAM, 16, rohga_state )
 	AM_RANGE(0x310002, 0x310003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x310000, 0x310009) AM_WRITENOP /* Palette control? */
 	AM_RANGE(0x31000a, 0x31000b) AM_DEVWRITE("deco_common", decocomn_device, palette_dma_w) /* Write 1111 for dma?  (Or any value?) */
-	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* ? */
+	AM_RANGE(0x320000, 0x320001) AM_WRITENOP /* bit 4: cleared on irq routine start, set on end */
 	AM_RANGE(0x322000, 0x322001) AM_DEVWRITE("deco_common", decocomn_device, priority_w)
 	AM_RANGE(0x321100, 0x321101) AM_WRITE(wizdfire_irq_ack_w)  /* Irq ack?  Value not used */
 
@@ -593,27 +593,27 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x000e, 0x000e, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x000a, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0070, 0x0070, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0070, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_6C ) )
 	PORT_SERVICE( 0x0080, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
@@ -650,7 +650,7 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0008, 0x0008, "Debug Mode" )
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
@@ -756,8 +756,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(rohga_state::sound_bankswitch_w)
 {
-	m_oki1->set_bank_base(BIT(data, 0) * 0x40000);
-	m_oki2->set_bank_base(BIT(data, 1) * 0x40000);
+	m_oki1->set_rom_bank(BIT(data, 0));
+	m_oki2->set_rom_bank(BIT(data, 1));
 }
 
 /**********************************************************************************/
@@ -787,7 +787,7 @@ DECOSPR_COLOUR_CB_MEMBER(rohga_state::rohga_col_callback)
 
 DECOSPR_COLOUR_CB_MEMBER(rohga_state::schmeisr_col_callback)
 {
-	UINT16 colour = ((col >> 9) & 0xf) << 2;
+	uint16_t colour = ((col >> 9) & 0xf) << 2;
 	if (col & 0x8000)
 		colour++;
 
@@ -1745,8 +1745,8 @@ DRIVER_INIT_MEMBER(rohga_state,nitrobal)
 
 DRIVER_INIT_MEMBER(rohga_state,schmeisr)
 {
-	const UINT8 *src = memregion("gfx2")->base();
-	UINT8 *dst = memregion("gfx1")->base();
+	const uint8_t *src = memregion("gfx2")->base();
+	uint8_t *dst = memregion("gfx1")->base();
 
 	memcpy(dst, src, 0x20000);
 	memcpy(dst + 0x20000, src + 0x80000, 0x20000);
@@ -1770,4 +1770,4 @@ GAME( 1992, nitrobal,  0,        nitrobal, nitrobal, rohga_state, nitrobal, ROT2
 GAME( 1992, nitrobala, nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Nitro Ball (World, set 2)", MACHINE_SUPPORTS_SAVE ) // was marked 'US' but doesn't seem to have a 'Winners Don't Use Drugs' screen, so unlikely
 GAME( 1992, gunball,   nitrobal, nitrobal, nitrobal, rohga_state, nitrobal, ROT270, "Data East Corporation", "Gun Ball (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, schmeisr,  0,        schmeisr, schmeisr, rohga_state, schmeisr, ROT0,   "Hot-B",                 "Schmeiser Robo (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

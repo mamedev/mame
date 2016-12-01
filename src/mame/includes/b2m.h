@@ -28,20 +28,20 @@ public:
 		m_ram(*this, RAM_TAG),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_b2m_8255_porta;
-	UINT8 m_b2m_video_scroll;
-	UINT8 m_b2m_8255_portc;
+	uint8_t m_b2m_8255_porta;
+	uint8_t m_b2m_video_scroll;
+	uint8_t m_b2m_8255_portc;
 
-	UINT8 m_b2m_video_page;
-	UINT8 m_b2m_drive;
-	UINT8 m_b2m_side;
+	uint8_t m_b2m_video_page;
+	uint8_t m_b2m_drive;
+	uint8_t m_b2m_side;
 
-	UINT8 m_b2m_romdisk_lsb;
-	UINT8 m_b2m_romdisk_msb;
+	uint8_t m_b2m_romdisk_lsb;
+	uint8_t m_b2m_romdisk_msb;
 
-	UINT8 m_b2m_color[4];
-	UINT8 m_b2m_localmachine;
-	UINT8 m_vblank_state;
+	uint8_t m_b2m_color[4];
+	uint8_t m_b2m_localmachine;
+	uint8_t m_vblank_state;
 	required_device<cpu_device> m_maincpu;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<pit8253_device> m_pit;
@@ -61,7 +61,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(b2m);
-	UINT32 screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_b2m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(b2m_vblank_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(bm2_pit_out1);
 	DECLARE_WRITE8_MEMBER(b2m_8255_porta_w);

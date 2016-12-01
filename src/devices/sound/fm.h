@@ -25,7 +25,7 @@
 #define FM_INTERNAL_TIMER 0
 
 /* --- speedup optimize --- */
-/* busy flag enulation , The definition of FM_GET_TIME_NOW() is necessary. */
+/* busy flag emulation , The definition of FM_GET_TIME_NOW() is necessary. */
 #define FM_BUSY_FLAG_SUPPORT 1
 
 /* --- external SSG(YM2149/AY-3-8910)emulator interface port */
@@ -38,7 +38,7 @@ struct ssg_callbacks
 	void (*reset)(void *param);
 };
 
-/* --- external callback funstions for realtime update --- */
+/* --- external callback functions for realtime update --- */
 
 #if FM_BUSY_FLAG_SUPPORT
 #define TIME_TYPE                   attotime
@@ -77,7 +77,7 @@ struct ssg_callbacks
 typedef stream_sample_t FMSAMPLE;
 /*
 #if (FM_SAMPLE_BITS==16)
-typedef INT16 FMSAMPLE;
+typedef int16_t FMSAMPLE;
 #endif
 #if (FM_SAMPLE_BITS==8)
 typedef unsigned char  FMSAMPLE;
@@ -111,6 +111,11 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 */
 void * ym2203_init(void *param, device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
+
+/*
+** YM2203 clock changed notifier
+*/
+void ym2203_clock_changed(void *chip, int clock, int rate);
 
 /*
 ** shutdown the YM2203 emulators
@@ -187,6 +192,7 @@ void ym2610_postload(void *chip);
 #if (BUILD_YM2612||BUILD_YM3438)
 void * ym2612_init(void *param, device_t *device, int baseclock, int rate,
 				FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
+void ym2612_clock_changed(void *chip, int clock, int rate);
 void ym2612_shutdown(void *chip);
 void ym2612_reset_chip(void *chip);
 void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length);

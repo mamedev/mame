@@ -28,7 +28,7 @@ class k051316_device : public device_t,
 						public device_gfx_interface
 {
 public:
-	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k051316_device() {}
 
 	static const gfx_layout charlayout4;
@@ -67,7 +67,7 @@ public:
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( rom_r );
 	DECLARE_WRITE8_MEMBER( ctrl_w );
-	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,UINT32 priority);
+	void zoom_draw(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int flags,uint32_t priority);
 	void wraparound_enable(int status);
 
 	void mark_gfx_dirty(offs_t byteoffset) { gfx(0)->mark_dirty(byteoffset * m_pixels_per_byte / (16 * 16)); }
@@ -80,11 +80,11 @@ protected:
 
 private:
 	// internal state
-	std::vector<UINT8> m_ram;
-	UINT8 m_ctrlram[16];
+	std::vector<uint8_t> m_ram;
+	uint8_t m_ctrlram[16];
 	tilemap_t *m_tmap;
 
-	optional_region_ptr<UINT8> m_zoom_rom;
+	optional_region_ptr<uint8_t> m_zoom_rom;
 
 	int m_dx, m_dy;
 	int m_wrap;

@@ -12,6 +12,7 @@
 #define CASSETTE_H
 
 #include "formats/cassimg.h"
+#include "softlist_dev.h"
 
 
 enum cassette_state
@@ -46,7 +47,7 @@ class cassette_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~cassette_image_device();
 
 	static void static_set_formats(device_t &device, const struct CassetteFormat*  const *formats) { downcast<cassette_image_device &>(device).m_formats = formats; }
@@ -95,13 +96,14 @@ protected:
 	// device-level overrides
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
+	virtual const bool use_software_list_file_extension_for_filetype() const override { return true; }
 
 private:
 	cassette_image  *m_cassette;
 	cassette_state  m_state;
 	double          m_position;
 	double          m_position_time;
-	INT32           m_value;
+	int32_t           m_value;
 	int             m_channel;
 	double          m_speed; // speed multiplier for tape speeds other than standard 1.875ips (used in adam driver)
 	int             m_direction; // direction select

@@ -101,17 +101,17 @@ public:
 	int m_digitsel;
 	int m_segment;
 	emu_timer *m_displayena_timer;
-	UINT8 m_segment_state[10];
-	UINT8 m_old_segment_state[10];
-	UINT8 m_LED_state;
+	uint8_t m_segment_state[10];
+	uint8_t m_old_segment_state[10];
+	uint8_t m_LED_state;
 	emu_timer *m_joy1x_timer;
 	emu_timer *m_joy1y_timer;
 	emu_timer *m_joy2x_timer;
 	emu_timer *m_joy2y_timer;
 	device_image_interface *m_rs232_fp;
-	UINT8 m_rs232_rts;
+	uint8_t m_rs232_rts;
 	emu_timer *m_rs232_input_timer;
-	UINT8 m_bogus_read_save;
+	uint8_t m_bogus_read_save;
 
 	DECLARE_WRITE8_MEMBER( external_operation );
 
@@ -202,13 +202,13 @@ MACHINE_RESET_MEMBER(tm990189_state,tm990_189_v)
 
 TIMER_CALLBACK_MEMBER(tm990189_state::clear_load)
 {
-	m_load_state = FALSE;
+	m_load_state = false;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, CLEAR_LINE);
 }
 
 void tm990189_state::hold_load()
 {
-	m_load_state = TRUE;
+	m_load_state = true;
 	m_tms9980a->set_input_line(INT_9980A_LOAD, ASSERT_LINE);
 	machine().scheduler().timer_set(attotime::from_msec(100), timer_expired_delegate(FUNC(tm990189_state::clear_load),this));
 }
@@ -238,7 +238,7 @@ void tm990189_state::draw_digit()
 
 TIMER_DEVICE_CALLBACK_MEMBER(tm990189_state::display_callback)
 {
-	UINT8 i;
+	uint8_t i;
 	char ledname[8];
 	// since the segment data is cleared after being used, the old_segment is there
 	// in case the segment data hasn't been refreshed yet.
@@ -309,7 +309,7 @@ WRITE8_MEMBER( tm990189_state::sys9901_interrupt_callback )
 
 READ8_MEMBER( tm990189_state::sys9901_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (offset == TMS9901_CB_INT7)
 	{
 		static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8" };
@@ -429,7 +429,7 @@ class tm990_189_rs232_image_device :    public device_t,
 {
 public:
 	// construction/destruction
-	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_SERIAL; }
@@ -453,7 +453,7 @@ protected:
 
 const device_type TM990_189_RS232 = &device_creator<tm990_189_rs232_image_device>;
 
-tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tm990_189_rs232_image_device::tm990_189_rs232_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TM990_189_RS232, "TM990/189 RS232 port", tag, owner, clock, "tm990_189_rs232_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -471,7 +471,7 @@ void tm990_189_rs232_image_device::device_start()
 void tm990_189_rs232_image_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	//tm990189_state *state = machine.driver_data<tm990189_state>();
-	UINT8 buf;
+	uint8_t buf;
 	if (/*state->m_rs232_rts &&*/ /*(mame_ftell(state->m_rs232_fp) < mame_fsize(state->m_rs232_fp))*/1)
 	{
 		tms9902_device* tms9902 = static_cast<tms9902_device*>(machine().device("tms9902"));
@@ -513,7 +513,7 @@ void tm990_189_rs232_image_device::call_unload()
 
 WRITE8_MEMBER( tm990189_state::xmit_callback )
 {
-	UINT8 buf = data;
+	uint8_t buf = data;
 	if (m_rs232_fp) m_rs232_fp->fwrite(&buf, 1);
 }
 
@@ -597,7 +597,7 @@ WRITE8_MEMBER( tm990189_state::video_vdp_w )
 
 READ8_MEMBER( tm990189_state::video_joy_r )
 {
-	UINT8 data = ioport("BUTTONS")->read();
+	uint8_t data = ioport("BUTTONS")->read();
 
 	if (m_joy1x_timer->remaining() < attotime::zero)
 		data |= 0x01;

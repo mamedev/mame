@@ -97,14 +97,14 @@ public:
 
 	void dodge_nvram_init(nvram_device &nvram, void *base, size_t size);
 	pen_t m_pens[NUM_PENS];
-	required_shared_ptr<UINT8> m_ram_attr;
-	required_shared_ptr<UINT8> m_ram_video;
-	std::unique_ptr<UINT8[]> m_ram_palette;
-	UINT8 m_lscnblk;
+	required_shared_ptr<uint8_t> m_ram_attr;
+	required_shared_ptr<uint8_t> m_ram_video;
+	std::unique_ptr<uint8_t[]> m_ram_palette;
+	uint8_t m_lscnblk;
 	int m_extra_video_bank_bit;
 	int m_question_address;
 	int m_decryption_key;
-	optional_shared_ptr<UINT8> m_backup_ram;
+	optional_shared_ptr<uint8_t> m_backup_ram;
 	DECLARE_READ8_MEMBER(questions_r);
 	DECLARE_WRITE8_MEMBER(low_offset_w);
 	DECLARE_WRITE8_MEMBER(med_offset_w);
@@ -137,7 +137,7 @@ public:
 void merit_state::machine_start()
 {
 	m_question_address = 0;
-	m_ram_palette = std::make_unique<UINT8[]>(RAM_PALETTE_SIZE);
+	m_ram_palette = std::make_unique<uint8_t[]>(RAM_PALETTE_SIZE);
 
 	save_pointer(NAME(m_ram_palette.get()), RAM_PALETTE_SIZE);
 	save_item(NAME(m_lscnblk));
@@ -149,7 +149,7 @@ void merit_state::machine_start()
 
 READ8_MEMBER(merit_state::questions_r)
 {
-	UINT8 *questions = memregion("user1")->base();
+	uint8_t *questions = memregion("user1")->base();
 	int address;
 
 	switch(m_question_address >> 16)
@@ -258,8 +258,8 @@ MC6845_BEGIN_UPDATE( merit_state::crtc_begin_update )
 
 MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 {
-	UINT8 *gfx[2];
-	UINT16 x = 0;
+	uint8_t *gfx[2];
+	uint16_t x = 0;
 	int rlen;
 
 	gfx[0] = memregion("gfx1")->base();
@@ -267,14 +267,14 @@ MC6845_UPDATE_ROW( merit_state::crtc_update_row )
 	rlen = memregion("gfx2")->bytes();
 
 	//ma = ma ^ 0x7ff;
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
 		int i;
 		int attr = m_ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
 		int addr = ((m_ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (m_extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
-		UINT8   *data;
+		uint8_t   *data;
 
 		addr &= (rlen-1);
 		data = gfx[region];
@@ -868,8 +868,8 @@ static INPUT_PORTS_START( mroundup ) // todo: Find were Player 2 "Play" is mappe
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )     PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, "Points Per Coin" )       PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x10, "1 Point" )
 	PORT_DIPSETTING(    0x00, "5 Points" )
@@ -913,6 +913,22 @@ static INPUT_PORTS_START( pitbossb )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) )       PORT_DIPLOCATION("SW:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mdchoice ) /* Does one of the dips (1 through 4) control number of Jokers? Currently there are 2 */
+	PORT_INCLUDE( pitboss )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown) )       PORT_DIPLOCATION("SW:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown) )       PORT_DIPLOCATION("SW:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, "Coin Lockout" )      PORT_DIPLOCATION("SW:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x30, "2 Coins" )
+	PORT_DIPSETTING(    0x20, "10 Coins" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mpchoice ) /* pitbossc games but dips like The Round Up */
@@ -970,7 +986,7 @@ static INPUT_PORTS_START( casino5 )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )    /* AKA Diagnostics - Shows simple Statistics */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )    /* 1 displays additional screens in attract mode - custom ads screen (requires optional Keyboard to set up) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )     /* Controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" - Need to verify values */
+	PORT_DIPNAME( 0xc0, 0xc0, "Percentage Out" )    PORT_DIPLOCATION("Special:1,2") /* Controls Percentage out, 75%, 80%, 85% & 90%  as per manual's "Tab Positions" (pins #52 & #51??)- Need to verify values */
 	PORT_DIPSETTING(    0x00, "75%" )
 	PORT_DIPSETTING(    0x80, "80%" )
 	PORT_DIPSETTING(    0xc0, "85%" )
@@ -1002,14 +1018,15 @@ static INPUT_PORTS_START( casino5 )
 	PORT_DIPNAME( 0x10, 0x10, "Enable Acey Deucey" )    PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "2 Jokers in Deck" )      PORT_DIPLOCATION("SW1:6") /* Only used in "Points Replay" mode ? */
-	PORT_DIPSETTING(    0x00, "Bet 4 Points" )
-	PORT_DIPSETTING(    0x20, "Always" )
-	PORT_DIPNAME( 0xc0, 0x00, "Maximum Bet" )       PORT_DIPLOCATION("SW1:7,8") /* Only used in "Points Replay" mode */
-	PORT_DIPSETTING(    0x40, "1" )
-	PORT_DIPSETTING(    0xc0, "10" )
-	PORT_DIPSETTING(    0x80, "20" )
-	PORT_DIPSETTING(    0x00, "50" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
@@ -1326,7 +1343,7 @@ INPUT_PORTS_END
 void merit_state::dodge_nvram_init(nvram_device &nvram, void *base, size_t size)
 {
 	memset(base, 0x00, size);
-	reinterpret_cast<UINT8 *>(base)[0x1040] = 0xc9; /* ret */
+	reinterpret_cast<uint8_t *>(base)[0x1040] = 0xc9; /* ret */
 }
 
 MACHINE_START_MEMBER(merit_state,casino5)
@@ -1468,12 +1485,12 @@ ROM_START( pitboss ) /* Program roms on a CTR-202 daughter card - Internal desig
 	ROM_LOAD( "2214-04_u7-0.u7",   0x6000, 0x4000, CRC(c5cf7060) SHA1(4a3209ad24ae649348b0e0470fc446d37b667975) ) /* 27128 eprom */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.rom.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
+	ROM_LOAD( "chr7_u40a.u40",  0x0000, 0x2000, CRC(db62c5ec) SHA1(a9967eb51436f342902fa3ce9c43d4d1ec5e0f3c) )
 ROM_END
 
 ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 */
@@ -1483,12 +1500,12 @@ ROM_START( pitbossa ) /* Roms also found labeled simply as "PBHD" U5 through U7 
 	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 ROM_START( pitbossa1 ) /* Specific build for localized region with no Free Hand Bonus */
@@ -1498,27 +1515,27 @@ ROM_START( pitbossa1 ) /* Specific build for localized region with no Free Hand 
 	ROM_LOAD( "2214-03_u7-0.u7",  0x4000, 0x2000, CRC(023e8cb8) SHA1(cdb180a94d801137466c13ddfaf65918cb608c5a) ) /* Joker Poker, Blackjack, Foto Finish & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
-ROM_START( pitbossb ) /* Roms also found labeled simply as "PSB1" U5 through U7 */
+ROM_START( pitbossb ) /* Roms also found labeled as U5-0C, U6-0 & U7-0 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "u5-0c.u5", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
-	ROM_LOAD( "u6-0.u6",  0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Games included in this set are: */
-	ROM_LOAD( "u7-0.u7",  0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
+	ROM_LOAD( "psb1_u5.u5", 0x0000, 0x2000, CRC(d8902656) SHA1(06da829201f6141a6b23afa0e277a3c7a122c26e) ) /* Internal designation: PSB1REV0 */
+	ROM_LOAD( "psb1_u6.u6", 0x2000, 0x2000, CRC(bf903b01) SHA1(1f5f69cfd3eb105bd9bad071016931a79defa16b) ) /* Games included in this set are: */
+	ROM_LOAD( "psb1_u7.u7", 0x4000, 0x2000, CRC(306351b9) SHA1(32cd243aa65571ee7fc72971b6a16beeb4ed9d85) ) /* Joker Poker, Blackjack, Super Slots & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) ) /* Shows: */
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) ) /* (c) 1983 Merit industries */
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) ) /* Cheltenham PA. 19012      */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 /* Known to exist is Pit Boss version M4A2 (confirmed via manual) and likely a M4A3 as well (not confirmed, but M4A4 is dumped) */
@@ -1530,12 +1547,27 @@ ROM_START( pitbossc )
 	ROM_LOAD( "m4a1_u7.u7",   0x4000, 0x2000, CRC(5fa5d436) SHA1(9f3fd81eae7f378268f3b4af8fd299ffb97d7fb6) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
-	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Phila. PA. */
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                   */
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Phila. PA. */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                   */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+ROM_END
+
+ROM_START( mdchoice )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "e4a1_u5.u5",   0x0000, 0x2000, CRC(bd77f8dc) SHA1(c9c85e3180be30e7a1d37abb6d4e7c777acfda81) ) /* Internal designation: E4A1REV0 */
+	ROM_LOAD( "e4a1_u6.u6",   0x2000, 0x2000, CRC(e5219c9a) SHA1(66511f5f9bcd64f3028bbf55a51a1b0db391567c) ) /* Games included in this set are: */
+	ROM_LOAD( "e4a1_u7.u7",   0x4000, 0x2000, CRC(9451d8db) SHA1(c2431b25543218fd8bc5a4eb79e8a77690e26c5e) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* MFG FOR:              */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* EEI-CVS International */
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
 ROM_START( mpchoice ) /* Same games as pitbossc but different dips & can control the payout percentage (like The Round Up below) */
@@ -1545,27 +1577,42 @@ ROM_START( mpchoice ) /* Same games as pitbossc but different dips & can control
 	ROM_LOAD( "m4c1_u7.u7",   0x4000, 0x2000, CRC(f2b6aff8) SHA1(c5c1a4ba808d9830604bc2399e66b60c56bd6f05) ) /* Draw Poker, Blackjack, Acey Deucey & The Dice Game */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr2.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
-	ROM_LOAD( "chr2.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Philadelphia PA. */
-	ROM_LOAD( "chr2.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                         */
+	ROM_LOAD( "chr2_u39.u39",  0x0000, 0x2000, CRC(f9613e7b) SHA1(1e8cafe142a235d65b43c7e46a79ed4f6272b61c) ) /* Shows: */
+	ROM_LOAD( "chr2_u38.u38",  0x2000, 0x2000, CRC(7af28902) SHA1(04f685389958d581aaf2c86940d1b8b8cec05d7a) ) /* (c) 1983 Merit industries   Philadelphia PA. */
+	ROM_LOAD( "chr2_u37.u37",  0x4000, 0x2000, CRC(ea6f0c59) SHA1(f2c0ff99518c2cec3eb1b4042fa3754a702c0e34) ) /* All Rights Reserverd                         */
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr2.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
+	ROM_LOAD( "chr2_u40.u40",  0x0000, 0x2000, CRC(40c94dce) SHA1(86611e3a1048b2a3fffcc0110811656a2d0fc4a5) )
 ROM_END
 
-ROM_START( casino5 ) /* Standard version, the rom set with 3315-02 U5-1 is the "Minnesota" version and is undumped */
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "3315-02_u5-0.u5", 0x0000, 0x2000, CRC(abe240d8) SHA1(296eb3251dd51147d6984a8c08c3be22e5ed8e86) ) /* Program roms on a CTR-202A daughter card */
+ROM_START( casino5 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program roms on a CTR-202A daughter card */
+	ROM_LOAD( "3315-02_u5-2b.u5", 0x0000, 0x2000, CRC(31640f41) SHA1(22d22ea1b1ae1ff189629ffd4963fabcc300fca8) ) /* Internal designation: PACASINO FIVE 331502 U5-0B */
+	ROM_LOAD( "3315-02_u6-2b.u6", 0x2000, 0x4000, CRC(03851536) SHA1(904bf76567f965e70c0baf545e2f77d07f1c286b) )
+	ROM_LOAD( "3315-02_u7-2b.u7", 0x6000, 0x4000, CRC(76acb03f) SHA1(87bfd82015dd704a732f4a03dd470980af1dee72) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+ROM_END
+
+ROM_START( casino5a ) /* Standard version, the rom set with 3315-02 U5-1 is the "Minnesota" version and is undumped */
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* Program roms on a CTR-202A daughter card */
+	ROM_LOAD( "3315-02_u5-0.u5", 0x0000, 0x2000, CRC(abe240d8) SHA1(296eb3251dd51147d6984a8c08c3be22e5ed8e86) ) /* Internal designation: PCFS1 331502-0 */
 	ROM_LOAD( "3315-02_u6-0.u6", 0x2000, 0x4000, CRC(4d9f0c57) SHA1(d19b4b4f42d329ea35907d17c15a55b954b07295) )
 	ROM_LOAD( "3315-02_u7-0.u7", 0x6000, 0x4000, CRC(d3bc510d) SHA1(6222badabf629dd6334591867596f811883aed52) ) /* There is known to be a 3315-02 U7-0-A version (not dumped) */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
+	ROM_LOAD( "chr8_u40a.u40", 0x0000, 0x2000, CRC(b13a3fb1) SHA1(25760aa27c88b8be248a87df724bf8797d179e7a) )
 ROM_END
 
 ROM_START( mroundup )
@@ -1575,18 +1622,18 @@ ROM_START( mroundup )
 	ROM_LOAD( "kru1cd_u7.u7",  0x4000, 0x2000, CRC(72131230) SHA1(e7c08b537848a7c6e6e987c6d0644a031bb238d4) ) /* Draw Poker, Blackjack, Foto Finish */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "chr7.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
-	ROM_LOAD( "chr7.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
-	ROM_LOAD( "chr7.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
+	ROM_LOAD( "chr7_u39.u39",   0x0000, 0x2000, CRC(6662f607) SHA1(6b423f8de011d196700839af0be37effbf87383f) )
+	ROM_LOAD( "chr7_u38.u38",   0x2000, 0x2000, CRC(a014b44f) SHA1(906d426b1de75f26030c19dcd599b6570909f510) )
+	ROM_LOAD( "chr7_u37.u37",   0x4000, 0x2000, CRC(cb12e139) SHA1(06fe91281faae5d0c0ae4b3cd8ad103bd3995c38) )
 
 	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "chr7.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
+	ROM_LOAD( "chr7_u40.u40",   0x0000, 0x2000, CRC(52298162) SHA1(79aa6c4ab6bec6450d882615e64f61cfef934153) )
 ROM_END
 
 ROM_START( chkndraw )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "2131-04_u5-1.u5", 0x0000, 0x2000, CRC(abc38151) SHA1(a56f7e535e265cbff697863fdfa5e5c2ef8b690a) ) /* 02131-10 U50 U60 U70 102984 */
-	ROM_LOAD( "2131-04_u6-0.u6", 0x2000, 0x2000, CRC(a0ad37b6) SHA1(f6722a8920d894cbce43fa78f2812cd81e5e9185) )
+	ROM_LOAD( "2131-04_u6-1.u6", 0x2000, 0x2000, CRC(a0ad37b6) SHA1(f6722a8920d894cbce43fa78f2812cd81e5e9185) ) /* Need to verify label, different then U6 rom from chkndrawa below */
 	ROM_LOAD( "2131-04_u7-0.u7", 0x4000, 0x2000, CRC(c8af231d) SHA1(97f36420c9f4dd75c673003b9fd8287517b948f0) )
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
@@ -1598,6 +1645,21 @@ ROM_START( chkndraw )
 //  ROM_LOAD( "u40",  0x0000, 0x2000, BAD_DUMP CRC(01722f98) SHA1(c75c9511c07379ea087be5d75cbc3e705628c824) )
 //  ROM_LOAD( "u40a", 0x0000, 0x2000, BAD_DUMP CRC(03543d67) SHA1(5ae08dbc0f736c11070befb4cfad87ddaa24cef2) )
 	ROM_LOAD( "u40b", 0x0000, 0x2000, BAD_DUMP CRC(c53a9e90) SHA1(2076d045c279405083fec8949425532e7e7e7844) )
+ROM_END
+
+ROM_START( chkndrawa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2131-04_u5-0.u5", 0x0000, 0x2000, CRC(8edcd0a0) SHA1(e876061997b1577e6e06ab036de0b2b037372815) ) /* 02131-00D U50 U60 U70 102984 */
+	ROM_LOAD( "2131-04_u6-0.u6", 0x2000, 0x2000, CRC(491466d7) SHA1(42a374612720ab6b642313fa0075e96dd306d207) )
+	ROM_LOAD( "2131-04_u7-0.u7", 0x4000, 0x2000, CRC(c8af231d) SHA1(97f36420c9f4dd75c673003b9fd8287517b948f0) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "chr5_u39.u39", 0x0000, 0x2000, CRC(b5a5f7da) SHA1(51a3cda89d514c0230f9dd85626ffefb87bae3a6) )
+	ROM_LOAD( "chr5_u38.u38", 0x2000, 0x2000, CRC(5c2cc495) SHA1(7b475d8bcbee5ecaadce48ae8e52a18c76b0b2ea) )
+	ROM_LOAD( "chr5_u37.u37", 0x4000, 0x2000, CRC(4c584ff0) SHA1(9718124577a2132b8c6a117b86b3699041417204) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "chr5_u40.u40", 0x0000, 0x2000, CRC(45b84a7c) SHA1(e1d386dace8f73f07cf75fabb674668af6d8d833) )
 ROM_END
 
 ROM_START( riviera ) /* PAL16L8ANC labeled DEC-003 at U13 */
@@ -2320,7 +2382,7 @@ DRIVER_INIT_MEMBER(merit_state,key_7)
 
 DRIVER_INIT_MEMBER(merit_state,couple)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	#if 0 //quick rom compare test
 	{
@@ -2346,7 +2408,7 @@ DRIVER_INIT_MEMBER(merit_state,couple)
 DRIVER_INIT_MEMBER(merit_state,dtrvwz5)
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	/* fill b000 - b0ff with ret 0xc9 */
 	for ( i = 0xb000; i < 0xb100; i++ )
 		ROM[i] = 0xc9;
@@ -2378,25 +2440,28 @@ GAME( 1983, pitbossa, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "
 GAME( 1983, pitbossa1,pitboss, pitboss,  pitbossa1,driver_device,  0,   ROT0,  "Merit", "The Pit Boss (2214-03, U5-1C)",     MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossb, pitboss, pitboss,  pitbossa, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (PSB1)",               MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossc, pitboss, pitboss,  pitbossb, driver_device,  0,   ROT0,  "Merit", "The Pit Boss (M4A1)",               MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1983, mpchoice, 0,       pitboss,  mpchoice, driver_device,  0,   ROT0,  "Merit", "Player's Choice (M4C1)",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1983, mdchoice, pitboss, pitboss,  mdchoice, driver_device,  0,   ROT0,  "Merit", "Dealer's Choice (E4A1)",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS ) /* Copyright year based on other Pit Boss sets */
+GAME( 1983, mpchoice, pitboss, pitboss,  mpchoice, driver_device,  0,   ROT0,  "Merit", "Player's Choice (M4C1)",            MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1984, casino5,  0,       casino5,  casino5,  driver_device,  0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
+GAME( 1989, casino5,  0,       casino5,  casino5,   driver_device, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-2B)",      MACHINE_SUPPORTS_SAVE )
+GAME( 1984, casino5a, casino5, casino5,  casino5,   driver_device, 0,   ROT0,  "Merit", "Casino Five (3315-02, U5-0)",       MACHINE_SUPPORTS_SAVE )
 
-GAME( 1984, mroundup, 0,       pitboss,  mroundup, driver_device,  0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1984, mroundup, 0,         pitboss, mroundup, driver_device, 0,   ROT0,  "Merit", "The Round Up",                      MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
-GAME( 1984, chkndraw, 0,       pitboss,  chkndraw, driver_device,  0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-01)",     MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndraw,  0,        pitboss, chkndraw, driver_device, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-1)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1984, chkndrawa, chkndraw, pitboss, chkndraw, driver_device, 0,   ROT0,  "Merit", "Chicken Draw (2131-04, U5-0)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1987, riviera,  0,       dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivieraa, riviera, dodge,    riviera,  driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1986, rivierab, riviera, dodge,    rivierab, driver_device,  0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1987, riviera,  0,       dodge,    riviera,   driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4A)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivieraa, riviera, dodge,    riviera,   driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-4)",  MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1986, rivierab, riviera, dodge,    rivierab,  driver_device, 0,   ROT0,  "Merit", "Riviera Hi-Score (2131-08, U5-2D)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 
-GAME( 1986, bigappg,  0,       bigappg,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1986, misdraw,  0,       misdraw,  bigappg,  driver_device,  0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
-GAME( 1990, iowapp,   0,       dodge,    iowapp,   driver_device,  0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
+GAME( 1986, bigappg,  0,       bigappg,  bigappg,   driver_device, 0,   ROT0,  "Big Apple Games / Merit", "The Big Apple (2131-13, U5-0)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1986, misdraw,  0,       misdraw,  bigappg,   driver_device, 0,   ROT0,  "Big Apple Games / Merit", "Michigan Super Draw (2131-16, U5-2)",   MACHINE_SUPPORTS_SAVE )
+GAME( 1990, iowapp,   0,       dodge,    iowapp,    driver_device, 0,   ROT0,  "Merit",                   "Iowa Premium Player (2131-21, U5-1)",   MACHINE_SUPPORTS_SAVE ) /* Copyright year based on rom label */
 
-GAME( 1986, dodgectya,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
-GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,    driver_device,  0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectya,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0D)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyb,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-50)",      MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
+GAME( 1986, dodgectyc,dodgecty,dodge,    dodge,     driver_device, 0,   ROT0,  "Merit", "Dodge City (2131-82, U5-0 GT)",    MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 
 /* Trivia and Word games */
 

@@ -2,7 +2,7 @@
 // copyright-holders:Aaron Giles
 /***************************************************************************
 
-    audit.c
+    audit.cpp
 
     ROM set auditing functions.
 
@@ -14,7 +14,8 @@
 #include "chd.h"
 #include "drivenum.h"
 #include "sound/samples.h"
-#include "softlist.h"
+#include "softlist_dev.h"
+
 
 //**************************************************************************
 //  CORE FUNCTIONS
@@ -149,7 +150,7 @@ media_auditor::summary media_auditor::audit_device(device_t &device, const char 
 //-------------------------------------------------
 //  audit_software
 //-------------------------------------------------
-media_auditor::summary media_auditor::audit_software(const char *list_name, const software_info *swinfo, const char *validation)
+media_auditor::summary media_auditor::audit_software(const std::string &list_name, const software_info *swinfo, const char *validation)
 {
 	// start fresh
 	m_record_list.clear();
@@ -171,7 +172,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 
 	// now iterate over software parts
 	for (const software_part &part : swinfo->parts())
-		audit_regions(part.romdata(), locationtag.c_str(), found, required);
+		audit_regions(part.romdata().data(), locationtag.c_str(), found, required);
 
 	if ((found == 0) && (required > 0))
 	{
@@ -180,7 +181,7 @@ media_auditor::summary media_auditor::audit_software(const char *list_name, cons
 	}
 
 	// return a summary
-	return summarize(list_name);
+	return summarize(list_name.c_str());
 }
 
 
@@ -379,7 +380,7 @@ media_auditor::audit_record &media_auditor::audit_one_rom(const rom_entry *rom)
 	audit_record &record = *m_record_list.emplace(m_record_list.end(), *rom, media_type::ROM);
 
 	// see if we have a CRC and extract it if so
-	UINT32 crc = 0;
+	uint32_t crc = 0;
 	bool const has_crc = record.expected_hashes().crc(crc);
 
 	// find the file and checksum it, getting the file length along the way
@@ -480,7 +481,7 @@ void media_auditor::compute_status(audit_record &record, const rom_entry *rom, b
 //  shares a media entry with the same hashes
 //-------------------------------------------------
 
-device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, UINT64 romlength)
+device_t *media_auditor::find_shared_device(device_t &device, const char *name, const util::hash_collection &romhashes, uint64_t romlength)
 {
 	bool const dumped = !romhashes.flag(util::hash_collection::FLAG_NO_DUMP);
 

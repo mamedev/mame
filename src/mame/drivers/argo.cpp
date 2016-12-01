@@ -44,16 +44,16 @@ public:
 	DECLARE_WRITE8_MEMBER(argo_videoram_w);
 	DECLARE_READ8_MEMBER(argo_io_r);
 	DECLARE_WRITE8_MEMBER(argo_io_w);
-	required_shared_ptr<UINT8> m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_framecnt;
-	UINT8 m_cursor_pos[3];
-	UINT8 m_p_cursor_pos;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint8_t m_framecnt;
+	uint8_t m_cursor_pos[3];
+	uint8_t m_p_cursor_pos;
 	bool m_ram_ctrl;
-	UINT8 m_scroll_ctrl;
+	uint8_t m_scroll_ctrl;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(argo);
 
 protected:
@@ -63,7 +63,7 @@ protected:
 // write to videoram if following 'out b9,61' otherwise write to the unknown 'extra' ram
 WRITE8_MEMBER(argo_state::argo_videoram_w)
 {
-	UINT8 *RAM;
+	uint8_t *RAM;
 	if (m_ram_ctrl)
 		RAM = memregion("videoram")->base();
 	else
@@ -74,7 +74,7 @@ WRITE8_MEMBER(argo_state::argo_videoram_w)
 
 READ8_MEMBER(argo_state::argo_io_r)
 {
-	UINT8 low_io = offset;
+	uint8_t low_io = offset;
 
 	switch (low_io)
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(argo_state::argo_io_r)
 
 WRITE8_MEMBER(argo_state::argo_io_w)
 {
-	UINT8 low_io = offset;
+	uint8_t low_io = offset;
 
 	switch (low_io)
 	{
@@ -110,7 +110,7 @@ WRITE8_MEMBER(argo_state::argo_io_w)
 	case 0xE8: // hardware scroll - we should use ports E0,E1,E2,E3
 		if ((m_scroll_ctrl == 2) & (data == 0xe3))
 		{
-			UINT8 *RAM = memregion("videoram")->base();
+			uint8_t *RAM = memregion("videoram")->base();
 			m_scroll_ctrl = 0;
 			memcpy(RAM, RAM+80, 24*80);
 		}
@@ -266,7 +266,7 @@ void argo_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		membank("boot")->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in argo_state::device_timer");
+		assert_always(false, "Unknown id in argo_state::device_timer");
 	}
 }
 
@@ -278,7 +278,7 @@ void argo_state::machine_reset()
 
 DRIVER_INIT_MEMBER(argo_state,argo)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("boot")->configure_entries(0, 2, &RAM[0x0000], 0xf800);
 }
 
@@ -287,11 +287,11 @@ void argo_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
-	UINT8 *p_vram = m_p_videoram;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
+	uint8_t *p_vram = m_p_videoram;
 
 	m_framecnt++;
 
@@ -299,7 +299,7 @@ UINT32 argo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, co
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 1; x < 81; x++) // align x to the cursor position numbers
 			{

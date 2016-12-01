@@ -16,7 +16,7 @@ class psxcard_device :  public device_t,
 						public device_image_interface
 {
 public:
-	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psxcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
@@ -38,8 +38,8 @@ private:
 	int state;
 	bool m_disabled;
 
-	UINT8 m_odata;
-	UINT8 m_idata;
+	uint8_t m_odata;
+	uint8_t m_idata;
 	int m_bit;
 	int m_count;
 	bool m_pad;
@@ -56,7 +56,7 @@ private:
 	void write_card(const unsigned short addr, unsigned char *buf);
 	unsigned char checksum_data(const unsigned char *buf, const unsigned int sz);
 	void do_card();
-	bool transfer(UINT8 to, UINT8 *from);
+	bool transfer(uint8_t to, uint8_t *from);
 	void ack_timer(void *ptr, int param);
 
 public:

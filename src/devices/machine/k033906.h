@@ -33,7 +33,7 @@ class k033906_device :  public device_t
 {
 public:
 	// construction/destruction
-	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	static void set_voodoo_tag(device_t &device, const char *tag) { downcast<k033906_device &>(device).m_voodoo.set_tag(tag); }
 
@@ -50,8 +50,8 @@ protected:
 
 private:
 
-	UINT32 reg_r(int reg);
-	void reg_w(int reg, UINT32 data);
+	uint32_t reg_r(int reg);
+	void reg_w(int reg, uint32_t data);
 
 	/* i/o lines */
 
@@ -59,8 +59,8 @@ private:
 
 	required_device<voodoo_device> m_voodoo;
 
-	UINT32       m_reg[256];
-	UINT32       m_ram[32768];
+	uint32_t       m_reg[256];
+	uint32_t       m_ram[32768];
 };
 
 

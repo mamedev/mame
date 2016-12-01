@@ -38,14 +38,14 @@ public:
 		m_led_vram_hi(*this, "led_vrahi"),
 		m_maincpu(*this, "maincpu") { }
 
-	required_shared_ptr<UINT8> m_led_vram_lo;
-	required_shared_ptr<UINT8> m_led_vram_hi;
+	required_shared_ptr<uint8_t> m_led_vram_lo;
+	required_shared_ptr<uint8_t> m_led_vram_hi;
 	DECLARE_READ8_MEMBER(test1_r);
 	DECLARE_READ8_MEMBER(test2_r);
 	DECLARE_READ8_MEMBER(in_r);
 	DECLARE_READ8_MEMBER(ld_r);
 	virtual void video_start() override;
-	UINT32 screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(ld_irq);
 	required_device<cpu_device> m_maincpu;
@@ -57,7 +57,7 @@ void timetrv_state::video_start()
 {
 }
 
-UINT32 timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t timetrv_state::screen_update_timetrv(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	popmessage("%s%s",reinterpret_cast<char *>(m_led_vram_lo.target()),reinterpret_cast<char *>(m_led_vram_hi.target()));
 	return 0;

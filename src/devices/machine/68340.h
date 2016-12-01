@@ -21,7 +21,7 @@
 
 class m68340cpu_device : public fscpu32_device {
 public:
-	m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68340cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 
 	int m68340_currentcs;
@@ -32,11 +32,13 @@ public:
 	m68340_serial* m68340SERIAL;
 	m68340_timer*  m68340TIMER;
 
-	UINT32 m68340_base;
+	uint32_t m68340_base;
 
-	UINT16 m_avr;
-	UINT16 m_picr;
-	UINT16 m_pitr;
+	uint16_t m_avr;
+	uint16_t m_picr;
+	uint16_t m_pitr;
+
+	uint16_t get_cs(offs_t address);
 
 	READ32_MEMBER( m68340_internal_base_r );
 	WRITE32_MEMBER( m68340_internal_base_w );
@@ -65,8 +67,6 @@ protected:
 };
 
 static const device_type M68340 = &device_creator<m68340cpu_device>;
-
-extern UINT16 m68340_get_cs(m68340cpu_device *device, offs_t address);
 
 
 

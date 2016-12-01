@@ -117,6 +117,21 @@ void ym2612_device::device_start()
 	assert_always(m_chip != nullptr, "Error creating YM2612 chip");
 }
 
+void ym2612_device::device_clock_changed()
+{
+	calculate_rates();
+	ym2612_clock_changed(m_chip, clock(), clock() / 72);
+}
+
+void ym2612_device::calculate_rates()
+{
+	int rate = clock() / 72;
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this,0,2,rate);
+}
 
 //-------------------------------------------------
 //  device_stop - device-specific stop
@@ -150,14 +165,14 @@ WRITE8_MEMBER( ym2612_device::write )
 
 const device_type YM2612 = &device_creator<ym2612_device>;
 
-ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2612_device::ym2612_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, YM2612, "YM2612", tag, owner, clock, "ym2612", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
 {
 }
 
-ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ym2612_device::ym2612_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_irq_handler(*this)
@@ -177,7 +192,7 @@ void ym2612_device::device_config_complete()
 
 const device_type YM3438 = &device_creator<ym3438_device>;
 
-ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym3438_device::ym3438_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ym2612_device(mconfig, YM3438, "YM3438", tag, owner, clock, "ym3438", __FILE__)
 {
 }

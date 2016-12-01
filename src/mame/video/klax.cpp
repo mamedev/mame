@@ -20,8 +20,8 @@
 
 TILE_GET_INFO_MEMBER(klax_state::get_playfield_tile_info)
 {
-	UINT16 data1 = tilemap.basemem_read(tile_index);
-	UINT16 data2 = tilemap.extmem_read(tile_index) >> 8;
+	uint16_t data1 = tilemap.basemem_read(tile_index);
+	uint16_t data2 = tilemap.extmem_read(tile_index) >> 8;
 	int code = data1 & 0x1fff;
 	int color = data2 & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, (data1 >> 15) & 1);
@@ -93,7 +93,7 @@ WRITE16_MEMBER( klax_state::klax_latch_w )
  *
  *************************************/
 
-UINT32 klax_state::screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t klax_state::screen_update_klax(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// start drawing
 	m_mob->draw_async(cliprect);
@@ -106,8 +106,8 @@ UINT32 klax_state::screen_update_klax(screen_device &screen, bitmap_ind16 &bitma
 	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *mo = &mobitmap.pix16(y);
-			UINT16 *pf = &bitmap.pix16(y);
+			uint16_t *mo = &mobitmap.pix16(y);
+			uint16_t *pf = &bitmap.pix16(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 				if (mo[x] != 0xffff)
 				{

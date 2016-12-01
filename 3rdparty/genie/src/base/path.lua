@@ -220,7 +220,7 @@
 		end
 		return result
 	end
-	
+
 
 --
 -- Returns true if the filename has a particular extension.
@@ -252,11 +252,11 @@
 --
 
 	function path.iscfile(fname)
-		return path.hasextension(fname, { ".c", ".s", ".m" })
+		return path.hasextension(fname, { ".c", ".m" })
 	end
-	
+
 	function path.iscppfile(fname)
-		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm" })
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".m", ".mm" })
 	end
 
 	function path.iscxfile(fname)
@@ -275,8 +275,12 @@
 		return path.hasextension(fname, ".appxmanifest")
 	end
 
+	function path.isnatvis(fname)
+		return path.hasextension(fname, ".natvis")
+	end
+
 	function path.isSourceFile(fname)
-		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm", ".vala" })
+		return path.hasextension(fname, { ".cc", ".cpp", ".cxx", ".c", ".s", ".m", ".mm", ".vala", ".swift" })
 	end
 
 	function path.isSourceFileVS(fname)
@@ -285,7 +289,11 @@
 	end
 
 	function path.isasmfile(fname)
-		return path.hasextension(fname, ".asm")
+		return path.hasextension(fname, { ".asm", ".s" })
+	end
+
+	function path.isswiftfile(fname)
+		return path.hasextension(fname, ".swift")
 	end
 
 --

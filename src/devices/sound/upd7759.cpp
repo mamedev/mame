@@ -144,7 +144,7 @@
 #define FRAC_MASK       (FRAC_ONE - 1)
 
 
-upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, device_sound_interface(mconfig, *this)
 	, m_channel(nullptr)
@@ -181,14 +181,14 @@ upd775x_device::upd775x_device(const machine_config &mconfig, device_type type, 
 
 const device_type UPD7759 = &device_creator<upd7759_device>;
 
-upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7759_device::upd7759_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd775x_device(mconfig, UPD7759, "uPD7759", tag, owner, clock, "upd7759", __FILE__)
 	, m_timer(nullptr)
 {
 }
 
 
-upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: upd775x_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_timer(nullptr)
 {
@@ -197,7 +197,7 @@ upd7759_device::upd7759_device(const machine_config &mconfig, device_type type, 
 
 const device_type UPD7756 = &device_creator<upd7756_device>;
 
-upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd7756_device::upd7756_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd775x_device(mconfig, UPD7756, "uPD7756", tag, owner, clock, "upd7756", __FILE__)
 {
 }
@@ -234,7 +234,7 @@ void upd7759_device::device_start()
 	m_rom = m_rombase;
 	if (m_rombase != nullptr)
 	{
-		UINT32 romsize = m_rombase.bytes();
+		uint32_t romsize = m_rombase.bytes();
 		if (romsize >= 0x20000)
 		{
 			m_rommask = 0x1ffff;
@@ -315,7 +315,7 @@ void upd7756_device::device_start()
 	m_rom = m_rombase;
 	if (m_rombase != nullptr)
 	{
-		UINT32 romsize = m_rombase.bytes();
+		uint32_t romsize = m_rombase.bytes();
 		if (romsize >= 0x20000)
 		{
 			m_rommask = 0x1ffff;
@@ -696,7 +696,7 @@ void upd775x_device::advance_state()
 
 void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT8 olddrq = m_drq;
+	uint8_t olddrq = m_drq;
 
 	switch (id)
 	{
@@ -719,7 +719,7 @@ void upd7759_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		break;
 
 		default:
-			assert_always(FALSE, "Unknown id in upd7759_device::device_timer");
+			assert_always(false, "Unknown id in upd7759_device::device_timer");
 	}
 }
 
@@ -746,7 +746,7 @@ void upd775x_device::postload()
 WRITE_LINE_MEMBER( upd775x_device::reset_w )
 {
 	/* update the reset value */
-	UINT8 oldreset = m_reset;
+	uint8_t oldreset = m_reset;
 	m_reset = (state != 0);
 
 	/* update the stream first */
@@ -760,7 +760,7 @@ WRITE_LINE_MEMBER( upd775x_device::reset_w )
 WRITE_LINE_MEMBER( upd7759_device::start_w )
 {
 	/* update the start value */
-	UINT8 oldstart = m_start;
+	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
 	logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
@@ -782,7 +782,7 @@ WRITE_LINE_MEMBER( upd7759_device::start_w )
 WRITE_LINE_MEMBER( upd7756_device::start_w )
 {
 	/* update the start value */
-	UINT8 oldstart = m_start;
+	uint8_t oldstart = m_start;
 	m_start = (state != 0);
 
 	logerror("upd7759_start_w: %d->%d\n", oldstart, m_start);
@@ -812,7 +812,7 @@ READ_LINE_MEMBER( upd775x_device::busy_r )
 }
 
 
-void upd775x_device::set_bank_base(UINT32 base)
+void upd775x_device::set_bank_base(uint32_t base)
 {
 	assert(m_rombase != nullptr);
 	m_rom = m_rombase + base;
@@ -825,10 +825,10 @@ void upd775x_device::set_bank_base(UINT32 base)
 
 void upd775x_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT32 clocks_left = m_clocks_left;
-	INT16 sample = m_sample;
-	UINT32 step = m_step;
-	UINT32 pos = m_pos;
+	int32_t clocks_left = m_clocks_left;
+	int16_t sample = m_sample;
+	uint32_t step = m_step;
+	uint32_t pos = m_pos;
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop until done */

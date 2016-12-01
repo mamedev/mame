@@ -50,7 +50,7 @@ public:
 		, m_msm_m(*this, "msm_m")
 		, m_ic5a(*this, "ic5a")
 		, m_ic5m(*this, "ic5m")
-		, m_switches(*this, "SW")
+		, m_switches(*this, "SW.%u", 0)
 	{ }
 
 	DECLARE_WRITE8_MEMBER(p1_w);
@@ -86,28 +86,28 @@ public:
 	DECLARE_DRIVER_INIT(game1);
 	DECLARE_DRIVER_INIT(game2);
 	DECLARE_PALETTE_INIT(spinb);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	bool m_pc0a;
 	bool m_pc0m;
-	UINT8 m_game;
-	UINT8 m_portc_a;
-	UINT8 m_portc_m;
-	UINT8 m_row;
-	UINT8 m_p3;
-	UINT8 m_p32;
-	UINT8 m_dmdcmd;
-	UINT8 m_dmdbank;
-	UINT8 m_dmdextaddr;
-	UINT8 m_dmdram[0x2000];
-	UINT8 m_sndcmd;
-	UINT8 m_sndbank_a;
-	UINT8 m_sndbank_m;
-	UINT32 m_sound_addr_a;
-	UINT32 m_sound_addr_m;
-	UINT8 *m_p_audio;
-	UINT8 *m_p_music;
-	UINT8 *m_p_dmdcpu;
+	uint8_t m_game;
+	uint8_t m_portc_a;
+	uint8_t m_portc_m;
+	uint8_t m_row;
+	uint8_t m_p3;
+	uint8_t m_p32;
+	uint8_t m_dmdcmd;
+	uint8_t m_dmdbank;
+	uint8_t m_dmdextaddr;
+	uint8_t m_dmdram[0x2000];
+	uint8_t m_sndcmd;
+	uint8_t m_sndbank_a;
+	uint8_t m_sndbank_m;
+	uint32_t m_sound_addr_a;
+	uint32_t m_sound_addr_m;
+	uint8_t *m_p_audio;
+	uint8_t *m_p_music;
+	uint8_t *m_p_dmdcpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -378,8 +378,8 @@ WRITE8_MEMBER( spinb_state::disp_w )
 WRITE8_MEMBER( spinb_state::ppi60a_w )
 {
 	if (data)
-		for (UINT8 i = 0; i < 8; i++)
-			if BIT(data, i)
+		for (uint8_t i = 0; i < 8; i++)
+			if (BIT(data, i))
 				m_row = i;
 }
 
@@ -387,8 +387,8 @@ WRITE8_MEMBER( spinb_state::ppi60a_w )
 WRITE8_MEMBER( spinb_state::ppi60b_w )
 {
 	if (data & 7)
-		for (UINT8 i = 0; i < 3; i++)
-			if BIT(data, i)
+		for (uint8_t i = 0; i < 3; i++)
+			if (BIT(data, i))
 				m_row = i+8;
 }
 
@@ -403,11 +403,9 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_a |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_a |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_a = 0xff;
 }
 
@@ -418,11 +416,9 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 
 	if (!BIT(data, 6))
 		m_sound_addr_m |= (1<<19);
-	else
-	if (!BIT(data, 5))
+	else if (!BIT(data, 5))
 		m_sound_addr_m |= (2<<19);
-	else
-	if BIT(data, 7)
+	else if (BIT(data, 7))
 		m_sndbank_m = 0xff;
 }
 
@@ -504,7 +500,7 @@ WRITE8_MEMBER( spinb_state::ppia_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_a, 5))
-		m_msm_a->set_prescaler_selector(m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_a->set_prescaler_selector(*m_msm_a, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_msm_a->reset_w(BIT(data, 6));
 	m_ic5a->clear_w(!BIT(data, 6));
 	m_portc_a = data & 0xfe;
@@ -514,7 +510,7 @@ WRITE8_MEMBER( spinb_state::ppim_c_w )
 {
 	// pc4 - READY line back to cpu board, but not used
 	if (BIT(data, 5) != BIT(m_portc_m, 5))
-		m_msm_m->set_prescaler_selector(m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
+		m_msm_m->set_prescaler_selector(*m_msm_m, BIT(data, 5) ? MSM5205_S48_4B : MSM5205_S96_4B); // S1 pin
 	m_msm_m->reset_w(BIT(data, 6));
 	m_ic5m->clear_w(!BIT(data, 6));
 	m_portc_m = data & 0xfe;
@@ -564,10 +560,10 @@ PALETTE_INIT_MEMBER( spinb_state, spinb )
 	palette.set_pen_color(2, rgb_t(0x7c, 0x55, 0x00));
 }
 
-UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,gfx,gfx1;
-	UINT16 sy=0,ma,x;
+	uint8_t y,gfx,gfx1;
+	uint16_t sy=0,ma,x;
 	address_space &internal = m_dmdcpu->space(AS_DATA);
 	ma = internal.read_byte(0x05) << 8; // find where display memory is
 
@@ -578,7 +574,7 @@ UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		for(y=0; y<32; y++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 			for(x = 0; x < 16; x++)
 			{
 				gfx = m_dmdram[ma+0x200];
@@ -601,7 +597,7 @@ UINT32 spinb_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 		for(y=0; y<32; y++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 			for(x = 0; x < 16; x++)
 			{
 				gfx = m_dmdram[ma++];

@@ -79,6 +79,7 @@
 #include "unzip.h"
 #include "debug/debugvw.h"
 #include "debug/debugcpu.h"
+#include "dirtc.h"
 #include "image.h"
 #include "network.h"
 #include "ui/uimain.h"
@@ -129,9 +130,12 @@ running_machine::running_machine(const machine_config &_config, machine_manager 
 		m_memory(*this),
 		m_ioport(*this),
 		m_parameters(*this),
-		m_scheduler(*this)
+		m_scheduler(*this),
+		m_dummy_space(_config, "dummy_space", &root_device(), 0)
 {
 	memset(&m_base_time, 0, sizeof(m_base_time));
+
+	m_dummy_space.set_machine(*this);
 
 	// set the machine on all devices
 	device_iterator iter(root_device());
@@ -252,8 +256,8 @@ void running_machine::start()
 	manager().create_custom(*this);
 
 	// register callbacks for the devices, then start them
-	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(FUNC(running_machine::reset_all_devices), this));
-	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(running_machine::stop_all_devices), this));
+	add_notifier(MACHINE_NOTIFY_RESET, machine_notify_delegate(&running_machine::reset_all_devices, this));
+	add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&running_machine::stop_all_devices, this));
 	save().register_presave(save_prepost_delegate(FUNC(running_machine::presave_all_devices), this));
 	start_all_devices();
 	save().register_postload(save_prepost_delegate(FUNC(running_machine::postload_all_devices), this));
@@ -266,7 +270,6 @@ void running_machine::start()
 	// if we're in autosave mode, schedule a load
 	else if (options().autosave() && (m_system.flags & MACHINE_SUPPORTS_SAVE) != 0)
 		schedule_load("auto");
-
 
 	manager().update_machine();
 }
@@ -300,7 +303,7 @@ int running_machine::run(bool quiet)
 		// then finish setting up our local machine
 		start();
 
-		// load the configuration settings and NVRAM
+		// load the configuration settings
 		m_configuration->load_settings();
 
 		// disallow save state registrations starting here.
@@ -308,7 +311,12 @@ int running_machine::run(bool quiet)
 		// devices with timers.
 		m_save.allow_registration(false);
 
+		// load the NVRAM
 		nvram_load();
+
+		// set the time on RTCs (this may overwrite parts of NVRAM)
+		set_rtc_datetime(system_time(m_base_time));
+
 		sound().ui_mute(false);
 		if (!quiet)
 			sound().start_recording();
@@ -337,10 +345,7 @@ int running_machine::run(bool quiet)
 
 			// execute CPUs if not paused
 			if (!m_paused)
-			{
 				m_scheduler.timeslice();
-				emulator_info::periodic_check();
-			}
 			// otherwise, just pump video updates through
 			else
 				m_video->frame_update();
@@ -796,10 +801,23 @@ void running_machine::current_datetime(system_time &systime)
 
 
 //-------------------------------------------------
+//  set_rtc_datetime - set the current time on
+//  battery-backed RTCs
+//-------------------------------------------------
+
+void running_machine::set_rtc_datetime(const system_time &systime)
+{
+	for (device_rtc_interface &rtc : rtc_interface_iterator(root_device()))
+		if (rtc.has_battery())
+			rtc.set_current_time(systime);
+}
+
+
+//-------------------------------------------------
 //  rand - standardized random numbers
 //-------------------------------------------------
 
-UINT32 running_machine::rand()
+u32 running_machine::rand()
 {
 	m_rand_seed = 1664525 * m_rand_seed + 1013904223;
 
@@ -845,7 +863,7 @@ void running_machine::handle_saveload()
 		}
 		else
 		{
-			UINT32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
+			u32 const openflags = (m_saveload_schedule == SLS_LOAD) ? OPEN_FLAG_READ : (OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS);
 
 			// open the file
 			emu_file file(m_saveload_searchpath, openflags);
@@ -909,7 +927,7 @@ void running_machine::handle_saveload()
 //  of the system
 //-------------------------------------------------
 
-void running_machine::soft_reset(void *ptr, INT32 param)
+void running_machine::soft_reset(void *ptr, s32 param)
 {
 	logerror("Soft reset\n");
 
@@ -945,6 +963,8 @@ void running_machine::logfile_callback(const char *buffer)
 
 void running_machine::start_all_devices()
 {
+	m_dummy_space.start();
+
 	// iterate through the devices
 	int last_failed_starts = -1;
 	while (last_failed_starts != 0)
@@ -1171,6 +1191,11 @@ system_time::system_time()
 	set(0);
 }
 
+system_time::system_time(time_t t)
+{
+	set(t);
+}
+
 
 //-------------------------------------------------
 //  set - fills out a system_time structure
@@ -1202,6 +1227,48 @@ void system_time::full_time::set(struct tm &t)
 	is_dst  = t.tm_isdst;
 }
 
+
+
+//**************************************************************************
+//  DUMMY ADDRESS SPACE
+//**************************************************************************
+
+READ8_MEMBER(dummy_space_device::read)
+{
+	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
+}
+
+WRITE8_MEMBER(dummy_space_device::write)
+{
+	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
+}
+
+static ADDRESS_MAP_START(dummy, AS_0, 8, dummy_space_device)
+	AM_RANGE(0x00000000, 0xffffffff) AM_READWRITE(read, write)
+ADDRESS_MAP_END
+
+const device_type DUMMY_SPACE = &device_creator<dummy_space_device>;
+
+dummy_space_device::dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	device_t(mconfig, DUMMY_SPACE, "Dummy Space", tag, owner, clock, "dummy_space", __FILE__),
+	device_memory_interface(mconfig, *this),
+	m_space_config("dummy", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(dummy))
+{
+}
+
+void dummy_space_device::device_start()
+{
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *dummy_space_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : nullptr;
+}
 
 
 //**************************************************************************

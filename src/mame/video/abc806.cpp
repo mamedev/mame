@@ -117,8 +117,8 @@ READ8_MEMBER( abc806_state::cli_r )
 
 	*/
 
-	UINT16 hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
-	UINT8 data = m_hru2_prom->base()[hru2_addr] & 0x0f;
+	uint16_t hru2_addr = (m_hru2_a8 << 8) | (offset >> 8);
+	uint8_t data = m_hru2_prom->base()[hru2_addr] & 0x0f;
 
 	logerror("HRU II %03x : %01x\n", hru2_addr, data);
 
@@ -228,9 +228,9 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 data = m_char_ram[(ma + column) & 0x7ff];
-		UINT8 attr = m_attr_ram[(ma + column) & 0x7ff];
-		UINT8 rad_data;
+		uint8_t data = m_char_ram[(ma + column) & 0x7ff];
+		uint8_t attr = m_attr_ram[(ma + column) & 0x7ff];
+		uint8_t rad_data;
 
 		if ((attr & 0x07) == ((attr >> 3) & 0x07))
 		{
@@ -288,12 +288,12 @@ MC6845_UPDATE_ROW( abc806_state::abc806_update_row )
 		}
 		else
 		{
-			UINT16 rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 4) | (m_flshclk << 5) | (ra & 0x0f);
+			uint16_t rad_addr = (e6 << 8) | (e5 << 7) | (flash << 6) | (underline << 4) | (m_flshclk << 5) | (ra & 0x0f);
 			rad_data = m_rad_prom->base()[rad_addr] & 0x0f;
 		}
 
-		UINT16 chargen_addr = (th << 12) | (data << 4) | rad_data;
-		UINT8 chargen_data = m_char_rom->base()[chargen_addr & 0xfff] << 2;
+		uint16_t chargen_addr = (th << 12) | (data << 4) | rad_data;
+		uint8_t chargen_data = m_char_rom->base()[chargen_addr & 0xfff] << 2;
 		int x = hbp + (column + 4) * ABC800_CHAR_WIDTH;
 
 		for (int bit = 0; bit < ABC800_CHAR_WIDTH; bit++)
@@ -385,20 +385,20 @@ void abc806_state::hr_update(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 
-	UINT32 addr = (m_hrs & 0x0f) << 15;
+	uint32_t addr = (m_hrs & 0x0f) << 15;
 
 	for (int y = m_sync + VERTICAL_PORCH_HACK; y < std::min(cliprect.max_y + 1, m_sync + VERTICAL_PORCH_HACK + 240); y++)
 	{
 		for (int sx = 0; sx < 128; sx++)
 		{
-			UINT8 data = m_video_ram[addr++];
-			UINT16 dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
+			uint8_t data = m_video_ram[addr++];
+			uint16_t dot = (m_hrc[data >> 4] << 8) | m_hrc[data & 0x0f];
 
 			for (int pixel = 0; pixel < 4; pixel++)
 			{
 				int x = HORIZONTAL_PORCH_HACK + (ABC800_CHAR_WIDTH * 4) - 16 + (sx * 4) + pixel;
 
-				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black))
+				if (BIT(dot, 15) || (bitmap.pix32(y, x) == rgb_t::black()))
 				{
 					bitmap.pix32(y, x) = pen[(dot >> 12) & 0x07];
 				}
@@ -448,10 +448,10 @@ void abc806_state::video_start()
 //  SCREEN_UPDATE( abc806 )
 //-------------------------------------------------
 
-UINT32 abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t abc806_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	// clear screen
-	bitmap.fill(rgb_t::black, cliprect);
+	bitmap.fill(rgb_t::black(), cliprect);
 
 	if (!m_txoff)
 	{

@@ -191,7 +191,7 @@ WRITE16_MEMBER(mcr68_state::spyhunt2_control_w)
  *      1111 = right/down full
  */
 
-static const UINT8 translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
+static const uint8_t translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
 READ16_MEMBER(mcr68_state::archrivl_port_1_r)
 {
@@ -281,8 +281,8 @@ READ16_MEMBER(mcr68_state::pigskin_port_2_r)
 
 READ16_MEMBER(mcr68_state::trisport_port_1_r)
 {
-	int xaxis = (INT8)ioport("AN1")->read();
-	int yaxis = (INT8)ioport("AN2")->read();
+	int xaxis = (int8_t)ioport("AN1")->read();
+	int yaxis = (int8_t)ioport("AN2")->read();
 	int result = ioport("IN1")->read();
 
 	result |= (xaxis & 0x3c) << 6;
@@ -1059,9 +1059,9 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,zwackery)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_MIDWAY_CHIP_SQUEAK_DELUXE_ADD("csd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("csd", MIDWAY_CHIP_SQUEAK_DELUXE, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1093,22 +1093,22 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_VIDEO_START_OVERRIDE(mcr68_state,mcr68)
 
 	/* sound hardware -- determined by specific machine */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_WATCHDOG_MODIFY("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 800)
@@ -1118,26 +1118,26 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_MIDWAY_SOUNDS_GOOD_ADD("sg")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MCFG_MIDWAY_TURBO_CHIP_SQUEAK_ADD("tcs")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sg", MIDWAY_SOUNDS_GOOD, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
+	MCFG_SOUND_ADD("tcs", MIDWAY_TURBO_CHIP_SQUEAK, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(pigskin_map)
@@ -1147,8 +1147,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 
 	/* basic machine hardware */
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(trisport_map)

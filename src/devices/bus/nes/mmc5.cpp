@@ -44,7 +44,7 @@ static const int m_mmc5_attrib[4] = {0x00, 0x55, 0xaa, 0xff};
 const device_type NES_EXROM = &device_creator<nes_exrom_device>;
 
 
-nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_exrom_device::nes_exrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_nrom_device(mconfig, NES_EXROM, "NES Cart ExROM (MMC-5) PCB", tag, owner, clock, "nes_exrom", __FILE__), m_irq_count(0),
 	m_irq_status(0), m_irq_enable(0), m_mult1(0), m_mult2(0), m_mmc5_scanline(0), m_vrom_page_a(0), m_vrom_page_b(0), m_floodtile(0), m_floodattr(0),
 	m_prg_mode(0), m_chr_mode(0), m_wram_protect_1(0), m_wram_protect_2(0), m_exram_control(0), m_wram_base(0), m_last_chr(0), m_ex1_chr(0),
@@ -279,11 +279,11 @@ inline bool nes_exrom_device::in_split()
 	if (tile < 34)
 	{
 		if (!m_split_rev && tile < m_split_ctrl)
-			return TRUE;
+			return true;
 		if (m_split_rev && tile >= m_split_ctrl)
-			return TRUE;
+			return true;
 	}
-	return FALSE;
+	return false;
 }
 
 READ8_MEMBER(nes_exrom_device::nt_r)
@@ -359,9 +359,9 @@ WRITE8_MEMBER(nes_exrom_device::nt_w)
 	}
 }
 
-inline UINT8 nes_exrom_device::base_chr_r(int bank, UINT32 offset)
+inline uint8_t nes_exrom_device::base_chr_r(int bank, uint32_t offset)
 {
-	UINT32 helper = 0;
+	uint32_t helper = 0;
 
 	switch (m_chr_mode)
 	{
@@ -385,15 +385,15 @@ inline UINT8 nes_exrom_device::base_chr_r(int bank, UINT32 offset)
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
-inline UINT8 nes_exrom_device::split_chr_r(UINT32 offset)
+inline uint8_t nes_exrom_device::split_chr_r(uint32_t offset)
 {
-	UINT32 helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
+	uint32_t helper = (m_split_bank * 0x1000) + (offset & 0x3f8) + (m_split_yst & 7);
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 
-inline UINT8 nes_exrom_device::bg_ex1_chr_r(UINT32 offset)
+inline uint8_t nes_exrom_device::bg_ex1_chr_r(uint32_t offset)
 {
-	UINT32 helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
+	uint32_t helper = (m_ex1_bank * 0x1000) + (offset & 0xfff);
 	return m_vrom[helper & (m_vrom_size - 1)];
 }
 

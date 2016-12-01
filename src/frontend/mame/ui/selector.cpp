@@ -21,7 +21,7 @@ namespace ui {
 //  ctor / dtor
 //-------------------------------------------------
 
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, UINT16 &s_actual, int category, int _hover)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> const &s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)
@@ -33,7 +33,7 @@ menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, 
 	m_searchlist[0] = nullptr;
 }
 
-menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, UINT16 &s_actual, int category, int _hover)
+menu_selector::menu_selector(mame_ui_manager &mui, render_container &container, std::vector<std::string> &&s_sel, uint16_t &s_actual, int category, int _hover)
 	: menu(mui, container)
 	, m_selector(s_actual)
 	, m_category(category)
@@ -99,28 +99,14 @@ void menu_selector::handle()
 		}
 		else if (menu_event->iptkey == IPT_SPECIAL)
 		{
-			auto const buflen = strlen(m_search);
-			if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-			{
-				// if it's a backspace and we can handle it, do so
-				if (0 < buflen)
-				{
-					*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-					reset(reset_options::SELECT_FIRST);
-				}
-			}
-			else if (menu_event->is_char_printable())
-			{
-				// if it's any other key and we're not maxed out, update
-				if (menu_event->append_char(m_search, buflen))
-					reset(reset_options::SELECT_FIRST);
-			}
+			if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+				reset(reset_options::SELECT_FIRST);
 		}
 
 		// escape pressed with non-empty text clears the text
 		else if (menu_event->iptkey == IPT_UI_CANCEL && m_search[0] != 0)
 		{
-			m_search[0] = '\0';
+			m_search.clear();
 			reset(reset_options::SELECT_FIRST);
 		}
 	}
@@ -130,11 +116,11 @@ void menu_selector::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_selector::populate()
+void menu_selector::populate(float &customtop, float &custombottom)
 {
-	if (m_search[0] != 0)
+	if (!m_search.empty())
 	{
-		find_matches(m_search);
+		find_matches(m_search.c_str());
 
 		for (int curitem = 0; m_searchlist[curitem]; ++curitem)
 			item_append(*m_searchlist[curitem], "", 0, (void *)m_searchlist[curitem]);
@@ -168,7 +154,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 
 	// get the size of the text
 	ui().draw_text_full(container(), tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += (2.0f * UI_BOX_LR_BORDER) + 0.01f;
 	float maxwidth = std::max(width, origx2 - origx1);
 
@@ -196,7 +182,7 @@ void menu_selector::custom_render(void *selectedref, float top, float bottom, fl
 	tempbuf = string_format(_("Double click or press %1$s to select"), ui_select_text);
 
 	ui().draw_text_full(container(), tempbuf.c_str(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::NEVER,
-		mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+		mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	maxwidth = std::max(maxwidth, width);
 

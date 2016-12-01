@@ -95,18 +95,18 @@ static const int SQW_freq_table[16] =
 */
 
 /*
-    Increment a binary-encoded UINT8
+    Increment a binary-encoded uint8_t
 */
-static UINT8 increment_binary(UINT8 data)
+static uint8_t increment_binary(uint8_t data)
 {
 	return data+1;
 }
 
 
 /*
-    Increment a BCD-encoded UINT8
+    Increment a BCD-encoded uint8_t
 */
-static UINT8 increment_BCD(UINT8 data)
+static uint8_t increment_BCD(uint8_t data)
 {
 	if ((data & 0x0f) < 0x09)
 	{
@@ -127,9 +127,9 @@ static UINT8 increment_BCD(UINT8 data)
 
 
 /*
-    Convert a binary-encoded UINT8 to BCD
+    Convert a binary-encoded uint8_t to BCD
 */
-static UINT8 binary_to_BCD(UINT8 data)
+static uint8_t binary_to_BCD(uint8_t data)
 {
 	data %= 100;
 
@@ -138,9 +138,9 @@ static UINT8 binary_to_BCD(UINT8 data)
 
 
 /*
-    Convert a BCD-encoded UINT8 to binary
+    Convert a BCD-encoded uint8_t to binary
 */
-static UINT8 BCD_to_binary(UINT8 data)
+static uint8_t BCD_to_binary(uint8_t data)
 {
 	if ((data & 0x0f) >= 0x0a)
 		data = data - 0x0a + 0x10;
@@ -175,7 +175,7 @@ void rtc65271_device::nvram_default()
 
 void rtc65271_device::nvram_read(emu_file &file)
 {
-	UINT8 buf;
+	uint8_t buf;
 
 	/* version flag */
 	if (file.read(&buf, 1) != 1)
@@ -208,7 +208,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 		return;
 
 	m_regs[reg_D] |= reg_D_VRT; /* the data was backed up successfully */
-	/*m_dirty = FALSE;*/
+	/*m_dirty = false;*/
 
 	{
 		system_time systime;
@@ -261,7 +261,7 @@ void rtc65271_device::nvram_read(emu_file &file)
 
 void rtc65271_device::nvram_write(emu_file &file)
 {
-	UINT8 buf;
+	uint8_t buf;
 
 
 	/* version flag */
@@ -300,7 +300,7 @@ void rtc65271_device::nvram_write(emu_file &file)
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-UINT8 rtc65271_device::read(int xramsel, offs_t offset)
+uint8_t rtc65271_device::read(int xramsel, offs_t offset)
 {
 	int reply;
 
@@ -362,7 +362,7 @@ READ8_MEMBER( rtc65271_device::xram_r )
     xramsel: select RTC register if 0, XRAM if 1
     offset: address (A0-A5 pins)
 */
-void rtc65271_device::write(int xramsel, offs_t offset, UINT8 data)
+void rtc65271_device::write(int xramsel, offs_t offset, uint8_t data)
 {
 	if (xramsel)
 	{
@@ -508,7 +508,7 @@ TIMER_CALLBACK_MEMBER(rtc65271_device::rtc_end_update_cb)
 		31,28,31, 30,31,30,
 		31,31,30, 31,30,31
 	};
-	UINT8 (*increment)(UINT8 data);
+	uint8_t (*increment)(uint8_t data);
 	int c59, c23, c12, c11, c29;
 
 	if (! (m_regs[reg_A] & reg_A_UIP))
@@ -652,7 +652,7 @@ const device_type RTC65271 = &device_creator<rtc65271_device>;
 //  rtc65271_device - constructor
 //-------------------------------------------------
 
-rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rtc65271_device::rtc65271_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RTC65271, "RTC-65271", tag, owner, clock, "rtc65271", __FILE__),
 		device_nvram_interface(mconfig, *this),
 		m_interrupt_cb(*this)

@@ -39,11 +39,11 @@ Encryption PAL 16R4 on CPU board
 
 DRIVER_INIT_MEMBER(stfight_state,empcity)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
-	for (UINT32 A = 0; A < 0x8000; ++A)
+	for (uint32_t A = 0; A < 0x8000; ++A)
 	{
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 
 		// decode opcode
 		m_decrypted_opcodes[A] =
@@ -75,6 +75,9 @@ DRIVER_INIT_MEMBER(stfight_state,cshooter)
 
 void stfight_state::machine_start()
 {
+	membank("mainbank")->configure_entries(0, 4, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("mainbank")->set_entry(0);
+
 	save_item(NAME(m_fm_data));
 	save_item(NAME(m_cpu_to_mcu_data));
 	save_item(NAME(m_cpu_to_mcu_empty));
@@ -82,7 +85,6 @@ void stfight_state::machine_start()
 	save_item(NAME(m_adpcm_nibble));
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_coin_state));
-	save_item(NAME(m_sprite_base));
 	save_item(NAME(m_portA_out));
 	save_item(NAME(m_portA_in));
 	save_item(NAME(m_portB_out));
@@ -94,6 +96,7 @@ void stfight_state::machine_start()
 	save_item(NAME(m_ddrC));
 }
 
+
 void stfight_state::machine_reset()
 {
 	m_fm_data = 0;
@@ -102,27 +105,21 @@ void stfight_state::machine_reset()
 
 	// Coin signals are active low
 	m_coin_state = 3;
-
-	// initialise ROM bank
-	stfight_bank_w(m_maincpu->space(AS_PROGRAM), 0, 0);
 }
 
 // It's entirely possible that this bank is never switched out
 // - in fact I don't even know how/where it's switched in!
 WRITE8_MEMBER(stfight_state::stfight_bank_w)
 {
-	UINT8   *ROM2 = memregion("maincpu")->base() + 0x10000;
-	UINT16 bank_num;
-
-	bank_num = 0;
+	uint8_t bank_num = 0;
 
 	if(data & 0x80)
-		bank_num |= 0x8000;
+		bank_num |= 2;
 
 	if(data & 0x04)
-		bank_num |= 0x4000;
+		bank_num |= 1;
 
-	membank("bank1")->set_base(&ROM2[bank_num]);
+	membank("mainbank")->set_entry(bank_num);
 }
 
 /*
@@ -138,7 +135,7 @@ void stfight_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xd7);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in stfight_state::device_timer");
+		assert_always(false, "Unknown id in stfight_state::device_timer");
 	}
 }
 
@@ -191,8 +188,8 @@ WRITE_LINE_MEMBER(stfight_state::stfight_adpcm_int)
 
 	if (!m_adpcm_reset)
 	{
-		const UINT8 *samples = memregion("adpcm")->base();
-		UINT8 adpcm_data = samples[m_adpcm_data_offs & 0x7fff];
+		const uint8_t *samples = memregion("adpcm")->base();
+		uint8_t adpcm_data = samples[m_adpcm_data_offs & 0x7fff];
 
 		if (m_adpcm_nibble == 0)
 			adpcm_data >>= 4;
@@ -217,7 +214,7 @@ WRITE8_MEMBER(stfight_state::stfight_fm_w)
 
 READ8_MEMBER(stfight_state::stfight_fm_r)
 {
-	UINT8 data = m_fm_data;
+	uint8_t data = m_fm_data;
 
 	// Acknowledge the command
 	m_fm_data &= ~0x80;

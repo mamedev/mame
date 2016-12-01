@@ -71,8 +71,8 @@ MB89372 - Uses 3 serial data transfer protocols: ASYNC, COP & BOP. Has a built
 //  CONSTANTS
 //**************************************************************************
 
-const UINT32 MASTER_CLOCK = 50000000;
-const UINT32 SOUND_CLOCK = 32215900;
+const uint32_t MASTER_CLOCK = 50000000;
+const uint32_t SOUND_CLOCK = 32215900;
 
 // use this to fiddle with the IRQ2 timing
 #define TWEAK_IRQ2_SCANLINE     (0)
@@ -106,16 +106,13 @@ READ16_MEMBER( segaybd_state::analog_r )
 WRITE16_MEMBER( segaybd_state::analog_w )
 {
 	int selected = ((offset & 3) == 3) ? (3 + (m_misc_io_data[0x08/2] & 3)) : (offset & 3);
-	m_analog_data[offset & 3] = read_safe(m_adc_ports[selected], 0xff);
+	m_analog_data[offset & 3] = m_adc_ports[selected].read_safe(0xff);
 }
 
 
 //-------------------------------------------------
 //  io_chip_r - handle reads from the I/O chip
 //-------------------------------------------------
-
-IOPORT_ARRAY_MEMBER( segaybd_state::digital_ports )
-{ "P1", "GENERAL", "LIMITSW", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 
 READ16_MEMBER( segaybd_state::io_chip_r )
 {
@@ -169,7 +166,7 @@ READ16_MEMBER( segaybd_state::io_chip_r )
 
 WRITE16_MEMBER( segaybd_state::io_chip_w )
 {
-	UINT8 old;
+	uint8_t old;
 
 	// generic implementation
 	offset &= 0x1f/2;
@@ -397,7 +394,7 @@ void segaybd_state::device_timer(emu_timer &timer, device_timer_id id, int param
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb1(UINT16 data)
+void segaybd_state::gforce2_output_cb1(uint16_t data)
 {
 	logerror("gforce2_output_cb1: '%02X'\n", data & 0xFF);
 	//bits 4, 5, and 7 seem to be used to multiplex the "LIMITSW" port signals
@@ -411,7 +408,7 @@ void segaybd_state::gforce2_output_cb1(UINT16 data)
 //  Galaxy Force
 //-------------------------------------------------
 
-void segaybd_state::gforce2_output_cb2(UINT16 data)
+void segaybd_state::gforce2_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 }
@@ -422,7 +419,7 @@ void segaybd_state::gforce2_output_cb2(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb1(UINT16 data)
+void segaybd_state::gloc_output_cb1(uint16_t data)
 {
 	if (data < 32)
 	{
@@ -456,7 +453,7 @@ void segaybd_state::gloc_output_cb1(UINT16 data)
 //  G-Loc
 //-------------------------------------------------
 
-void segaybd_state::gloc_output_cb2(UINT16 data)
+void segaybd_state::gloc_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("danger_lamp", BIT(data, 5));
@@ -469,7 +466,7 @@ void segaybd_state::gloc_output_cb2(UINT16 data)
 //  G-Loc R360
 //-------------------------------------------------
 
-void segaybd_state::r360_output_cb2(UINT16 data)
+void segaybd_state::r360_output_cb2(uint16_t data)
 {
 	// r360 cabinet
 	output().set_value("start_lamp", BIT(data, 2));
@@ -483,7 +480,7 @@ void segaybd_state::r360_output_cb2(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb1(UINT16 data)
+void segaybd_state::pdrift_output_cb1(uint16_t data)
 {
 	// Note:  this is an approximation to get a relatively accurate bank value.  It is obviously not 100%
 
@@ -642,7 +639,7 @@ void segaybd_state::pdrift_output_cb1(UINT16 data)
 //  Power Drift
 //-------------------------------------------------
 
-void segaybd_state::pdrift_output_cb2(UINT16 data)
+void segaybd_state::pdrift_output_cb2(uint16_t data)
 {
 	output().set_value("start_lamp", BIT(data, 2));
 	output().set_value("upright_wheel_motor", BIT(data, 1));
@@ -654,7 +651,7 @@ void segaybd_state::pdrift_output_cb2(UINT16 data)
 //  Rail Chase
 //-------------------------------------------------
 
-void segaybd_state::rchase_output_cb2(UINT16 data)
+void segaybd_state::rchase_output_cb2(uint16_t data)
 {
 	output().set_value("left_start_lamp", BIT(data, 2));
 	output().set_value("right_start_lamp", BIT(data, 1));
@@ -807,21 +804,23 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( link_map, AS_PROGRAM, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM // 0x2000-0x2*** maybe shared with other boards?
 	AM_RANGE(0x4000, 0x47ff) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
+#if 0
 READ8_MEMBER(segaybd_state::link_portc0_r)
 {
 	return 0xf8;
 }
+#endif
 
 static ADDRESS_MAP_START( link_portmap, AS_IO, 8, segaybd_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 
-//  AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkDSW")
-	AM_RANGE(0xc0, 0xc0) AM_READ(link_portc0_r)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("LinkID_DSW1")
+	AM_RANGE(0xc0, 0xc0) AM_READ_PORT("LinkID_DSW2")
 ADDRESS_MAP_END
 
 
@@ -1226,11 +1225,11 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x00, "Free Play (if Coin A too) or 1/1" )
 
-	PORT_START("LinkDSW")
+	PORT_START("LinkID_DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )  // Affects how the z80 access memory at 0x2000-0x2***
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
@@ -1251,6 +1250,39 @@ static INPUT_PORTS_START( pdriftl )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("LinkID_DSW2")
+	PORT_DIPNAME( 0x0f, 0x01, "Cabinet ID" )
+	PORT_DIPSETTING(    0x00, "0" )
+	PORT_DIPSETTING(    0x01, "1" ) // accessed unmapped areas if stand-alone isn't setup properly?
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x05, "5" )
+	PORT_DIPSETTING(    0x06, "6" )
+	PORT_DIPSETTING(    0x07, "7" )
+	PORT_DIPSETTING(    0x08, "8" )
+	PORT_DIPSETTING(    0x09, "9" )
+	PORT_DIPSETTING(    0x0a, "10" )
+	PORT_DIPSETTING(    0x0b, "11" )
+	// enabled for debugging
+	PORT_DIPSETTING(    0x0c, "12 (invalid)" )
+	PORT_DIPSETTING(    0x0d, "13 (invalid)" )
+	PORT_DIPSETTING(    0x0e, "14 (invalid)" )
+	PORT_DIPSETTING(    0x0f, "15 (invalid)" )
+
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, "Communication Mode" )
+	PORT_DIPSETTING(    0x80, "Master/Slave" )
+	PORT_DIPSETTING(    0x00, "Stand-Alone" )
 INPUT_PORTS_END
 
 
@@ -2722,16 +2754,16 @@ DRIVER_INIT_MEMBER(segaybd_state,generic)
 DRIVER_INIT_MEMBER(segaybd_state,gforce2)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gforce2_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gforce2_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gforce2_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gforce2_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,gloc)
 {
 	// because some of the output data isn't fully understood we need to "center" the rams
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::gloc_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::gloc_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::gloc_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::gloc_output_cb2, this);
 
 	output().set_value("left_motor_position_nor", 16);
 	output().set_value("right_motor_position_nor", 16);
@@ -2740,21 +2772,21 @@ DRIVER_INIT_MEMBER(segaybd_state,gloc)
 DRIVER_INIT_MEMBER(segaybd_state,r360)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::r360_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::r360_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,pdrift)
 {
 	// because some of the output data isn't fully understood we need to "center" the motor
 	DRIVER_INIT_CALL(generic);
-	m_output_cb1 = output_delegate(FUNC(segaybd_state::pdrift_output_cb1), this);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::pdrift_output_cb2), this);
+	m_output_cb1 = output_delegate(&segaybd_state::pdrift_output_cb1, this);
+	m_output_cb2 = output_delegate(&segaybd_state::pdrift_output_cb2, this);
 }
 
 DRIVER_INIT_MEMBER(segaybd_state,rchase)
 {
 	DRIVER_INIT_CALL(generic);
-	m_output_cb2 = output_delegate(FUNC(segaybd_state::rchase_output_cb2), this);
+	m_output_cb2 = output_delegate(&segaybd_state::rchase_output_cb2, this);
 }
 
 
@@ -2777,7 +2809,8 @@ GAMEL(1988, pdrift,    0,        yboard,      pdrift,   segaybd_state, pdrift,  
 GAMEL(1988, pdrifta,   pdrift,   yboard,      pdrift,   segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
 GAMEL(1988, pdrifte,   pdrift,   yboard,      pdrifte,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (World, Earlier)", MACHINE_SUPPORTS_SAVE, layout_pdrift )
 GAMEL(1988, pdriftj,   pdrift,   yboard,      pdriftj,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan)", MACHINE_SUPPORTS_SAVE,          layout_pdrift )
-GAMEL(1988, pdriftl,   pdrift,   yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift (Japan, Link Version)", MACHINE_SUPPORTS_SAVE|MACHINE_NOT_WORKING, layout_pdrift)
+
+GAMEL(1988, pdriftl,   0,        yboard_link, pdriftl,  segaybd_state, pdrift,  ROT0,   "Sega", "Power Drift - Link Version (Japan, Rev A)", MACHINE_SUPPORTS_SAVE, layout_pdrift)
 
 GAME( 1991, rchase,    0,        yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, rchasej,   rchase,   yboard,      rchase,   segaybd_state, rchase,  ROT0,   "Sega", "Rail Chase (Japan)", MACHINE_SUPPORTS_SAVE )

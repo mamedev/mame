@@ -29,7 +29,7 @@ inline void ATTR_PRINTF( 3, 4 ) zs01_device::verboselog( int n_level, const char
 // device type definition
 const device_type ZS01 = &device_creator<zs01_device>;
 
-zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock )
+zs01_device::zs01_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock )
 	: device_t( mconfig, ZS01, "Konami ZS01 PIC", tag, owner, clock, "zs01", __FILE__ ),
 	device_nvram_interface(mconfig, *this),
 	m_region(*this, DEVICE_SELF),
@@ -117,14 +117,14 @@ WRITE_LINE_MEMBER( zs01_device::write_cs )
 	m_cs = state;
 }
 
-void zs01_device::decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
+void zs01_device::decrypt( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint8_t previous_byte )
 {
-	UINT32 a0;
-	UINT32 v1;
-	UINT32 v0;
-	UINT32 a1;
-	UINT32 t1;
-	UINT32 t0;
+	uint32_t a0;
+	uint32_t v1;
+	uint32_t v0;
+	uint32_t a1;
+	uint32_t t1;
+	uint32_t t0;
 
 	length--;
 	if( length >= 0 )
@@ -164,15 +164,15 @@ void zs01_device::decrypt( UINT8 *destination, UINT8 *source, int length, UINT8 
 	}
 }
 
-void zs01_device::decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT8 previous_byte )
+void zs01_device::decrypt2( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint8_t previous_byte )
 {
-	UINT32 a0;
-	UINT32 v1;
-	UINT32 v0;
-	UINT32 a1;
-	UINT32 t2;
-	UINT32 t1;
-	UINT32 t0;
+	uint32_t a0;
+	uint32_t v1;
+	uint32_t v0;
+	uint32_t a1;
+	uint32_t t2;
+	uint32_t t1;
+	uint32_t t0;
 
 	t2 = 0;
 	if( length >= 0 )
@@ -212,13 +212,13 @@ void zs01_device::decrypt2( UINT8 *destination, UINT8 *source, int length, UINT8
 	}
 }
 
-void zs01_device::encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 *key, UINT32 previous_byte )
+void zs01_device::encrypt( uint8_t *destination, uint8_t *source, int length, uint8_t *key, uint32_t previous_byte )
 {
-	UINT32 t0;
-	UINT32 v0;
-	UINT32 v1;
-	UINT32 a0;
-	UINT32 a1;
+	uint32_t t0;
+	uint32_t v0;
+	uint32_t v1;
+	uint32_t a0;
+	uint32_t a1;
 
 	length--;
 	if( length >= 0 )
@@ -260,12 +260,12 @@ void zs01_device::encrypt( UINT8 *destination, UINT8 *source, int length, UINT8 
 	}
 }
 
-UINT16 zs01_device::calc_crc( UINT8 *buffer, UINT32 length )
+uint16_t zs01_device::calc_crc( uint8_t *buffer, uint32_t length )
 {
-	UINT32 v1;
-	UINT32 a3;
-	UINT32 v0;
-	UINT32 a2;
+	uint32_t v1;
+	uint32_t a3;
+	uint32_t v0;
+	uint32_t a2;
 
 	v1 = 0xffff;
 	a3 = 0;
@@ -392,7 +392,7 @@ WRITE_LINE_MEMBER( zs01_device::write_scl )
 								decrypt2( &m_write_buffer[ 2 ], &m_write_buffer[ 2 ], SIZE_DATA_BUFFER, m_data_key, 0x00 );
 							}
 
-							UINT16 crc = calc_crc( m_write_buffer, 10 );
+							uint16_t crc = calc_crc( m_write_buffer, 10 );
 
 							if( crc == ( ( m_write_buffer[ 10 ] << 8 ) | m_write_buffer[ 11 ] ) )
 							{
@@ -592,7 +592,7 @@ void zs01_device::nvram_default()
 	}
 	else
 	{
-		UINT8 *region = m_region->base();
+		uint8_t *region = m_region->base();
 
 		memcpy( m_response_to_reset, region, sizeof( m_response_to_reset ) ); region += sizeof( m_response_to_reset );
 		memcpy( m_command_key, region, sizeof( m_command_key ) ); region += sizeof( m_command_key );

@@ -19,8 +19,8 @@
 class pc_keyboard_device : public device_t
 {
 public:
-	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	pc_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	pc_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER(read);
 	DECLARE_WRITE_LINE_MEMBER(enable);
@@ -40,7 +40,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	void queue_insert(UINT8 data);
+	void queue_insert(uint8_t data);
 	void clear_buffer(void);
 
 	int m_numlock;
@@ -48,24 +48,24 @@ protected:
 
 private:
 	void polling(void);
-	UINT32 readport(int port);
-	UINT8 unicode_char_to_at_keycode(unicode_char ch);
+	uint32_t readport(int port);
+	uint8_t unicode_char_to_at_keycode(char32_t ch);
 
 	virtual void standard_scancode_insert(int our_code, int pressed);
 	virtual void extended_scancode_insert(int code, int pressed) { }
 	int queue_size(void);
-	int queue_chars(const unicode_char *text, size_t text_len);
-	bool accept_char(unicode_char ch);
+	int queue_chars(const char32_t *text, size_t text_len);
+	bool accept_char(char32_t ch);
 	bool charqueue_empty();
 
 	bool m_on;
-	UINT8 m_delay;   /* 240/60 -> 0,25s */
-	UINT8 m_repeat;   /* 240/ 8 -> 30/s */
+	uint8_t m_delay;   /* 240/60 -> 0,25s */
+	uint8_t m_repeat;   /* 240/ 8 -> 30/s */
 
-	UINT8 m_queue[256];
-	UINT8 m_head;
-	UINT8 m_tail;
-	UINT8 m_make[128];
+	uint8_t m_queue[256];
+	uint8_t m_head;
+	uint8_t m_tail;
+	uint8_t m_make[128];
 
 	optional_ioport m_ioport_0;
 	optional_ioport m_ioport_1;
@@ -83,7 +83,7 @@ private:
 class at_keyboard_device : public pc_keyboard_device
 {
 public:
-	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	at_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE8_MEMBER( write );
 

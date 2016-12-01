@@ -8,6 +8,7 @@
 #define _IMAGEDEV_DIABLO_H_
 
 #include "harddisk.h"
+#include "softlist_dev.h"
 
 #define DIABLO_TAG(_id) "diablo"#_id
 
@@ -22,7 +23,7 @@ class diablo_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	diablo_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~diablo_image_device();
 
 	static void static_set_device_load(device_t &device, device_image_load_delegate callback) { downcast<diablo_image_device &>(device).m_device_image_load = callback; }
@@ -44,7 +45,7 @@ public:
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return "chd,dsk"; }
-	virtual const option_guide *create_option_guide() const override;
+	virtual const util::option_guide &create_option_guide() const override;
 
 	// specific implementation
 	hard_disk_file *get_hard_disk_file() { return m_hard_disk_handle; }
@@ -79,10 +80,10 @@ extern const device_type DIABLO;
 	MCFG_DEVICE_ADD(_tag, DIABLO, 0)
 
 #define MCFG_DIABLO_LOAD(_class,_method)                                \
-	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), #_class "::device_image_load_" #_method, downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_load(*device, device_image_load_delegate(&DEVICE_IMAGE_LOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 #define MCFG_DIABLO_UNLOAD(_class,_method)                            \
-	diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), #_class "::device_image_unload_" #_method, downcast<_class *>(owner)));
+	diablo_image_device::static_set_device_unload(*device, device_image_func_delegate(&DEVICE_IMAGE_UNLOAD_NAME(_class,_method), downcast<_class *>(owner)));
 
 #define MCFG_DIABLO_INTERFACE(_interface)                         \
 	diablo_image_device::static_set_interface(*device, _interface);

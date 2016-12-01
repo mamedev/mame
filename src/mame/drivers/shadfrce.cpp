@@ -234,7 +234,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 
 READ16_MEMBER(shadfrce_state::input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{
@@ -388,7 +388,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )

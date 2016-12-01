@@ -1464,8 +1464,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Gear Shift Up")
 
 	NAMCOS2_MCU_PORT_C_DEFAULT
 
@@ -1482,9 +1482,9 @@ static INPUT_PORTS_START( dirtfox )
 	PORT_START("AN5")       /* Steering Wheel */
 	PORT_BIT( 0xff,  0x80, IPT_PADDLE ) PORT_SENSITIVITY(70) PORT_KEYDELTA(50)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_NAME("Brake")
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Accelerator")
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -3653,8 +3653,9 @@ ROM_START( marvland )
 	ROM_LOAD16_BYTE( "mv2_spr0",  0x000000, 0x010000, CRC(aa418f29) SHA1(413798d9c1d98cfcadb045a5436aaee61ce6718f) )
 	ROM_LOAD16_BYTE( "mv2_spr1",  0x000001, 0x010000, CRC(dbd94def) SHA1(56a8d7acd483bc4d12c8bc5b7e90ffdb132be670) )
 
+	// This needs re-dumping, sound is very poor in this version and doesn't match Japanese version or any of the ports.  High res photos of PCB required too.
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
+	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, BAD_DUMP CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
 	ROM_CONTINUE(          0x010000, 0x01c000 )
 	ROM_RELOAD(            0x010000, 0x020000 )
 
@@ -5526,14 +5527,14 @@ DRIVER_INIT_MEMBER(namcos2_state,marvland)
 DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
 {
 	/* unscramble sprites */
-	UINT8 *data = memregion("gfx1")->base();
+	uint8_t *data = memregion("gfx1")->base();
 	for (int i=0; i<0x200000; i+=32*32)
 	{
 		for (int j=0; j<32*32; j+=32*4)
 		{
 			for (int k=0; k<32; k+=4)
 			{
-				UINT8 v;
+				uint8_t v;
 				int a;
 
 				a = i+j+k+32;
@@ -5662,7 +5663,7 @@ DRIVER_INIT_MEMBER(namcos2_state,bubbletr)
 
 DRIVER_INIT_MEMBER(namcos2_state,luckywld)
 {
-	UINT8 *pData = (UINT8 *)memregion( "gfx5" )->base();
+	uint8_t *pData = (uint8_t *)memregion( "gfx5" )->base();
 	int i;
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */
@@ -5718,7 +5719,7 @@ GAME( 1989, finehour,   0,        default2, default,  namcos2_state, finehour, R
 GAME( 1989, burnforc,   0,        default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
 GAME( 1989, burnforco,  burnforc, default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
-GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
+GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
 GAME( 1989, marvlandj,  marvland, default,  default,  namcos2_state, marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
 GAME( 1990, kyukaidk,   0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )

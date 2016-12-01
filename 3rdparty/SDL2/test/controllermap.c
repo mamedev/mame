@@ -26,11 +26,8 @@
 #define SCREEN_HEIGHT   480
 #else
 #define SCREEN_WIDTH    512
-#define SCREEN_HEIGHT   317
+#define SCREEN_HEIGHT   320
 #endif
-
-#define MAP_WIDTH 512
-#define MAP_HEIGHT 317
 
 #define MARKER_BUTTON 1
 #define MARKER_AXIS 2
@@ -47,7 +44,7 @@ typedef struct MappingStep
 
 
 SDL_Texture *
-LoadTexture(SDL_Renderer *renderer, char *file, SDL_bool transparent)
+LoadTexture(SDL_Renderer *renderer, const char *file, SDL_bool transparent)
 {
     SDL_Surface *temp;
     SDL_Texture *texture;
@@ -226,7 +223,7 @@ WatchJoystick(SDL_Joystick * joystick)
             SDL_RenderCopy(screen, background, NULL, NULL);
             SDL_SetTextureAlphaMod(marker, alpha);
             SDL_SetTextureColorMod(marker, 10, 255, 21);
-            SDL_RenderCopyEx(screen, marker, NULL, &dst, step->angle, NULL, 0);
+            SDL_RenderCopyEx(screen, marker, NULL, &dst, step->angle, NULL, SDL_FLIP_NONE);
             SDL_RenderPresent(screen);
             
             if (SDL_PollEvent(&event)) {

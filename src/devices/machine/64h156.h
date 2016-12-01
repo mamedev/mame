@@ -92,7 +92,7 @@ class c64h156_device :  public device_t
 {
 public:
 	// construction/destruction
-	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64h156_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_atn_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_atn.set_callback(object); }
 	template<class _Object> static devcb_base &set_sync_wr_callback(device_t &device, _Object object) { return downcast<c64h156_device &>(device).m_write_sync.set_callback(object); }
@@ -141,18 +141,18 @@ private:
 		int oe;
 		int soe;
 		int accl;
-		UINT8 accl_yb;
+		uint8_t accl_yb;
 
 		attotime edge;
-		UINT16 shift_reg;
+		uint16_t shift_reg;
 		int cycle_counter;
 		int cell_counter;
 		int bit_counter;
 		int zero_counter;
 		int cycles_until_random_flux;
 
-		UINT8 yb;
-		UINT8 shift_reg_write;
+		uint8_t yb;
+		uint8_t shift_reg_write;
 		attotime write_start_time;
 		attotime write_buffer[32];
 		int write_position;
@@ -171,7 +171,7 @@ private:
 	int m_soe;
 	int m_oe;
 	int m_ted;
-	UINT8 m_yb;
+	uint8_t m_yb;
 	int m_atni;
 	int m_atna;
 

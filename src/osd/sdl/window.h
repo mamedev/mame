@@ -35,7 +35,7 @@ typedef uintptr_t HashT;
 
 #define OSDWORK_CALLBACK(name)  void *name(void *param, ATTR_UNUSED int threadid)
 
-class sdl_window_info : public osd_window
+class sdl_window_info : public osd_window_t<SDL_Window*>
 {
 public:
 	sdl_window_info(running_machine &a_machine, int index, std::shared_ptr<osd_monitor_info> a_monitor,
@@ -48,7 +48,7 @@ public:
 	void update() override;
 	void toggle_full_screen();
 	void modify_prescale(int dir);
-	void resize(INT32 width, INT32 height);
+	void resize(int32_t width, int32_t height);
 	void destroy() override;
 
 	void capture_pointer() override;

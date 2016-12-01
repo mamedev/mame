@@ -26,7 +26,7 @@
 
 namespace ui {
 class menu_item;
-
+class machine_info;
 } // namespace ui
 
 /***************************************************************************
@@ -68,7 +68,7 @@ class menu_item;
 #define UI_SLIDER_COLOR         decode_ui_color(15)
 
 /* cancel return value for a UI handler */
-#define UI_HANDLER_CANCEL       ((UINT32)~0)
+#define UI_HANDLER_CANCEL       ((uint32_t)~0)
 
 #define SLIDER_DEVICE_SPACING   0x0ff
 #define SLIDER_SCREEN_SPACING   0x0f
@@ -129,13 +129,14 @@ enum
 ***************************************************************************/
 
 class mame_ui_manager;
-typedef UINT32 (*ui_callback)(mame_ui_manager &, render_container &, UINT32);
+typedef uint32_t (*ui_callback)(mame_ui_manager &, render_container &, uint32_t);
 
 enum class ui_callback_type
 {
 	GENERAL,
 	MODAL,
-	MENU
+	MENU,
+	VIEWER
 };
 
 // ======================> mame_ui_manager
@@ -152,6 +153,7 @@ public:
 
 	// construction/destruction
 	mame_ui_manager(running_machine &machine);
+	~mame_ui_manager();
 
 	void init();
 
@@ -159,6 +161,7 @@ public:
 	running_machine &machine() const { return m_machine; }
 	bool single_step() const { return m_single_step; }
 	ui_options &options() { return m_ui_options; }
+	ui::machine_info &machine_info() const { assert(m_machine_info != nullptr); return *m_machine_info; }
 
 	// setters
 	void set_single_step(bool single_step) { m_single_step = single_step; }
@@ -167,14 +170,14 @@ public:
 	void initialize(running_machine &machine);
 	std::vector<ui::menu_item> slider_init(running_machine &machine);
 
-	void set_handler(ui_callback_type callback_type, const std::function<UINT32 (render_container &)> &&callback);
+	void set_handler(ui_callback_type callback_type, const std::function<uint32_t (render_container &)> &&callback);
 
 	void display_startup_screens(bool first_time);
 	virtual void set_startup_text(const char *text, bool force) override;
 	void update_and_render(render_container &container);
 	render_font *get_font();
 	float get_line_height();
-	float get_char_width(unicode_char ch);
+	float get_char_width(char32_t ch);
 	float get_string_width(const char *s, float text_size = 1.0f);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor);
 	void draw_outlined_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t fgcolor, rgb_t bgcolor);
@@ -201,7 +204,6 @@ public:
 	virtual bool is_menu_active() override;
 	bool can_paste();
 	void paste();
-	void set_use_natural_keyboard(bool use_natural_keyboard);
 	void image_handler_ingame();
 	void increase_frameskip();
 	void decrease_frameskip();
@@ -212,9 +214,6 @@ public:
 	void draw_profiler(render_container &container);
 	void start_save_state();
 	void start_load_state();
-
-	// print the game info string into a buffer
-	std::string &game_info_astring(std::string &str);
 
 	// slider controls
 	std::vector<ui::menu_item>&  get_slider_list(void);
@@ -227,7 +226,7 @@ public:
 	int wrap_text(render_container &container, const char *origs, float x, float y, float origwrapwidth, std::vector<int> &xstart, std::vector<int> &xend, float text_size = 1.0f);
 
 	// draw an outlined box with given line color and filled with a texture
-	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, UINT32 flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	void draw_textured_box(render_container &container, float x0, float y0, float x1, float y1, rgb_t backcolor, rgb_t linecolor, render_texture *texture = nullptr, uint32_t flags = PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	virtual void popup_time_string(int seconds, std::string message) override;
 
 	virtual void menu_reset() override;
@@ -235,19 +234,21 @@ public:
 private:
 	// instance variables
 	render_font *           m_font;
-	std::function<UINT32 (render_container &)> m_handler_callback;
+	std::function<uint32_t (render_container &)> m_handler_callback;
 	ui_callback_type        m_handler_callback_type;
-	UINT32                  m_handler_param;
+	uint32_t                  m_handler_param;
 	bool                    m_single_step;
 	bool                    m_showfps;
 	osd_ticks_t             m_showfps_end;
 	bool                    m_show_profiler;
 	osd_ticks_t             m_popup_text_end;
-	std::unique_ptr<UINT8[]> m_non_char_keys_down;
+	std::unique_ptr<uint8_t[]> m_non_char_keys_down;
 	render_texture *        m_mouse_arrow_texture;
 	bool                    m_mouse_show;
 	bool                    m_load_save_hold;
 	ui_options              m_ui_options;
+
+	std::unique_ptr<ui::machine_info> m_machine_info;
 
 	// static variables
 	static std::string      messagebox_text;
@@ -257,47 +258,44 @@ private:
 	static std::vector<ui::menu_item> slider_list;
 	static slider_state     *slider_current;
 
-	// text generators
-	std::string &warnings_string(std::string &buffer);
-
 	// UI handlers
-	UINT32 handler_messagebox(render_container &container);
-	UINT32 handler_messagebox_anykey(render_container &container);
-	UINT32 handler_ingame(render_container &container);
-	UINT32 handler_load_save(render_container &container, UINT32 state);
-	UINT32 handler_confirm_quit(render_container &container);
+	uint32_t handler_messagebox(render_container &container);
+	uint32_t handler_messagebox_anykey(render_container &container);
+	uint32_t handler_ingame(render_container &container);
+	uint32_t handler_load_save(render_container &container, uint32_t state);
+	uint32_t handler_confirm_quit(render_container &container);
 
 	// private methods
 	void exit();
-	slider_state* slider_alloc(running_machine &machine, int id, const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, void *arg);
+	slider_state* slider_alloc(running_machine &machine, int id, const char *title, int32_t minval, int32_t defval, int32_t maxval, int32_t incval, void *arg);
 
 	// slider controls
-	virtual INT32 slider_changed(running_machine &machine, void *arg, int id, std::string *str, INT32 newval) override;
+	virtual int32_t slider_changed(running_machine &machine, void *arg, int id, std::string *str, int32_t newval) override;
 
-	INT32 slider_volume(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_overclock(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_refresh(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_brightness(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_contrast(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_gamma(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_xscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_yscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_overxscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_overyscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_overxoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_overyoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_flicker(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
+	int32_t slider_volume(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_mixervol(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_adjuster(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_overclock(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_refresh(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_brightness(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_contrast(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_gamma(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_xscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_yscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_xoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_yoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_overxscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_overyscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_overxoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_overyoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_flicker(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_beam_width_min(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_beam_width_max(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_beam_intensity_weight(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	std::string slider_get_screen_desc(screen_device &screen);
 	#ifdef MAME_DEBUG
-	INT32 slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
-	INT32 slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, INT32 newval);
+	int32_t slider_crossscale(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
+	int32_t slider_crossoffset(running_machine &machine, void *arg, int id, std::string *str, int32_t newval);
 	#endif
 };
 

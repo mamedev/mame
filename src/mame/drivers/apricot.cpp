@@ -86,7 +86,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(data_selector_rts_w) { m_data_selector_rts = state; };
 
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT32 screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	virtual void machine_start() override;
@@ -106,7 +106,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_screen_buffer;
+	required_shared_ptr<uint16_t> m_screen_buffer;
 
 	int m_data_selector_dtr;
 	int m_data_selector_rts;
@@ -155,7 +155,7 @@ WRITE_LINE_MEMBER( apricot_state::write_centronics_perror )
 
 READ8_MEMBER( apricot_state::i8255_portc_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_perror << 0;
 	// schematic page 294 says pc1 is centronics pin 34, which is n/c.
@@ -279,12 +279,12 @@ SLOT_INTERFACE_END
 //  VIDEO EMULATION
 //**************************************************************************
 
-UINT32 apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t apricot_state::screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_on)
 		m_crtc->screen_update(screen, bitmap, cliprect);
 	else
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 
 	return 0;
 }
@@ -295,9 +295,9 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT16 code = m_screen_buffer[(ma + i) & 0x7ff];
-		UINT16 offset = ((code & 0x7ff) << 5) | (ra << 1);
-		UINT16 data = m_cpu->space(AS_PROGRAM).read_word(offset);
+		uint16_t code = m_screen_buffer[(ma + i) & 0x7ff];
+		uint16_t offset = ((code & 0x7ff) << 5) | (ra << 1);
+		uint16_t data = m_cpu->space(AS_PROGRAM).read_word(offset);
 
 		if (m_video_mode)
 		{
@@ -392,7 +392,7 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_RAM_DEFAULT_SIZE("256k")
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_SIZE(800, 400)
 	MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 400-1)
 	MCFG_SCREEN_REFRESH_RATE(72)

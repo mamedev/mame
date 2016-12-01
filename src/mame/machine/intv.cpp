@@ -15,12 +15,12 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
 	RAM  = m_region_keyboard->base();
-	RAM[offset] = (UINT8) (data >> 0);
+	RAM[offset] = (uint8_t) (data >> 0);
 }
 
 READ8_MEMBER( intv_state::intvkbd_dualport8_lsb_r )
 {
-	return (UINT8) (m_intvkbd_dualport_ram[offset] >> 0);
+	return (uint8_t) (m_intvkbd_dualport_ram[offset] >> 0);
 }
 
 WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
@@ -28,7 +28,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	unsigned char *RAM;
 
 	m_intvkbd_dualport_ram[offset] &= ~0x00FF;
-	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
+	m_intvkbd_dualport_ram[offset] |= ((uint16_t) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
 	RAM = m_region_keyboard->base();
@@ -307,7 +307,7 @@ READ8_MEMBER( intv_state::intvkb_iocart_r )
 	else if (m_iocart2->exists())
 		return m_iocart2->read_rom(space, offset, mem_mask);
 	else
-		return m_region_keyboard->u8(offset + 0xe000);
+		return m_region_keyboard->as_u8(offset + 0xe000);
 }
 
 
@@ -405,7 +405,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
 
 TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 {
-	UINT8 row = m_backtab_row;
+	uint8_t row = m_backtab_row;
 	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
 
 	for (int column = 0; column < STIC_BACKTAB_WIDTH; column++)

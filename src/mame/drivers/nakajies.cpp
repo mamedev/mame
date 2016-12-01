@@ -293,7 +293,7 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	void nakajies_update_irqs();
 	DECLARE_READ8_MEMBER( irq_clear_r );
@@ -305,7 +305,7 @@ public:
 	DECLARE_READ8_MEMBER( keyboard_r );
 	DECLARE_WRITE8_MEMBER( banking_w );
 	void update_banks();
-	void bank_w(UINT8 banknr, offs_t offset, UINT8 data);
+	void bank_w(uint8_t banknr, offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER( bank0_w );
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_WRITE8_MEMBER( bank2_w );
@@ -316,25 +316,25 @@ public:
 	DECLARE_WRITE8_MEMBER( bank7_w );
 
 	/* IRQ handling */
-	UINT8   m_irq_enabled;
-	UINT8   m_irq_active;
+	uint8_t   m_irq_enabled;
+	uint8_t   m_irq_active;
 
-	UINT8   m_lcd_memory_start;
-	UINT8*  m_ram_base1;
+	uint8_t   m_lcd_memory_start;
+	uint8_t*  m_ram_base1;
 
-	UINT8   m_matrix;
+	uint8_t   m_matrix;
 
 	/* ROM */
-	UINT8   *m_rom_base;
-	UINT32  m_rom_size;
+	uint8_t   *m_rom_base;
+	uint32_t  m_rom_size;
 
 	/* RAM */
-	UINT8   *m_ram_base;
-	UINT32  m_ram_size;
+	uint8_t   *m_ram_base;
+	uint32_t  m_ram_size;
 
 	/* Banking */
-	UINT8   m_bank[8];
-	UINT8   *m_bank_base[8];
+	uint8_t   m_bank[8];
+	uint8_t   *m_bank_base[8];
 	DECLARE_PALETTE_INIT(nakajies);
 	DECLARE_INPUT_CHANGED_MEMBER(trigger_irq);
 	TIMER_DEVICE_CALLBACK_MEMBER(kb_timer);
@@ -371,7 +371,7 @@ void nakajies_state::update_banks()
 	membank( "bank7" )->set_base( m_bank_base[7] );
 }
 
-void nakajies_state::bank_w( UINT8 banknr, offs_t offset, UINT8 data )
+void nakajies_state::bank_w( uint8_t banknr, offs_t offset, uint8_t data )
 {
 	if ( m_bank[banknr] & 0x10 )
 	{
@@ -409,8 +409,8 @@ void nakajies_state::nakajies_update_irqs()
 {
 	// Hack: IRQ mask is temporarily disabled because doesn't allow the IRQ vector 0xFA
 	// and 0xFB that are used for scan the kb, this need further investigation.
-	UINT8 irq = m_irq_active; // & m_irq_enabled;
-	UINT8 vector = 0xff;
+	uint8_t irq = m_irq_active; // & m_irq_enabled;
+	uint8_t vector = 0xff;
 
 	if (LOG)
 		logerror("nakajies_update_irqs: irq_enabled = %02x, irq_active = %02x\n", m_irq_enabled, m_irq_active );
@@ -505,7 +505,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(nakajies_state::trigger_irq)
 {
-	UINT8 irqs = ioport( "debug" )->read();
+	uint8_t irqs = ioport( "debug" )->read();
 
 	m_irq_active |= irqs;
 	nakajies_update_irqs();
@@ -657,15 +657,15 @@ void nakajies_state::machine_reset()
 	update_banks();
 }
 
-UINT32 nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nakajies_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
+	uint8_t* lcd_memory_start = m_ram_base + (m_lcd_memory_start<<9);
 	int height = screen.height();
 
 	for (int y=0; y<height; y++)
 		for (int x=0; x<60; x++)
 		{
-			UINT8 data = lcd_memory_start[y*64 + x];
+			uint8_t data = lcd_memory_start[y*64 + x];
 
 			for (int px=0; px<8; px++)
 			{

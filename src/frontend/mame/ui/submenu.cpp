@@ -22,7 +22,6 @@ std::vector<submenu::option> const submenu::misc_options = {
 	{ submenu::option_type::HEAD, __("Miscellaneous Options") },
 	{ submenu::option_type::UI,   __("Re-select last machine played"),           OPTION_REMEMBER_LAST },
 	{ submenu::option_type::UI,   __("Enlarge images in the right panel"),       OPTION_ENLARGE_SNAPS },
-	{ submenu::option_type::UI,   __("DATs info"),                               OPTION_DATS_ENABLED },
 	{ submenu::option_type::EMU,  __("Cheats"),                                  OPTION_CHEAT },
 	{ submenu::option_type::EMU,  __("Show mouse pointer"),                      OPTION_UI_MOUSE },
 	{ submenu::option_type::EMU,  __("Confirm quit from machines"),              OPTION_CONFIRM_QUIT },
@@ -140,7 +139,7 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 	else
 		opts = dynamic_cast<core_options*>(options);
 
-	for (auto & sm_option : m_options)
+	for (option & sm_option : m_options)
 	{
 		switch (sm_option.type)
 		{
@@ -176,6 +175,12 @@ submenu::submenu(mame_ui_manager &mui, render_container &container, std::vector<
 				sm_option.value.clear();
 				std::string descr(sm_option.entry->description()), delim(", ");
 				descr.erase(0, descr.find(":") + 2);
+
+				std::string default_value(sm_option.entry->default_value());
+				std::string auto_value(OSDOPTVAL_AUTO);
+				if (default_value == auto_value)
+					descr = auto_value + delim + descr;
+
 				size_t p1, p2 = 0;
 				while ((p1 = descr.find_first_not_of(delim, p2)) != std::string::npos)
 				{
@@ -308,13 +313,13 @@ void submenu::handle()
 //  populate
 //-------------------------------------------------
 
-void submenu::populate()
+void submenu::populate(float &customtop, float &custombottom)
 {
-	UINT32 arrow_flags;
-
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)
 	{
+		uint32_t arrow_flags;
+
 		// skip first heading (is menu title)
 		if (sm_option == m_options.begin() && sm_option->type == option_type::HEAD) continue;
 
@@ -421,7 +426,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 	float width;
 
 	ui().draw_text_full(container(), _(m_options[0].description), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-			mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+			mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 	width += 2 * UI_BOX_LR_BORDER;
 	float maxwidth = std::max(origx2 - origx1, width);
 
@@ -449,7 +454,7 @@ void submenu::custom_render(void *selectedref, float top, float bottom, float or
 		if (selected_sm_option.entry != nullptr)
 		{
 			ui().draw_text_full(container(), selected_sm_option.entry->description(), 0.0f, 0.0f, 1.0f, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NONE, rgb_t::white, rgb_t::black, &width, nullptr);
+					mame_ui_manager::NONE, rgb_t::white(), rgb_t::black(), &width, nullptr);
 
 			width += 2 * UI_BOX_LR_BORDER;
 			maxwidth = std::max(origx2 - origx1, width);

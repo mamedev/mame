@@ -12,7 +12,7 @@ void maple_device::static_set_host(device_t &device, const char *_host_tag, int 
 }
 
 
-maple_device::maple_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+maple_device::maple_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) : device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 	host_tag = nullptr;
 	host_port = 0;
@@ -58,7 +58,7 @@ void maple_device::reply_ready()
 	host->end_of_reply();
 }
 
-void maple_device::copy_with_spaces(UINT8 *dest, const char *source, int len)
+void maple_device::copy_with_spaces(uint8_t *dest, const char *source, int len)
 {
 	int i;
 	for(i=0; i<len && source[i]; i++)
@@ -67,14 +67,14 @@ void maple_device::copy_with_spaces(UINT8 *dest, const char *source, int len)
 		*dest++ = 0x20;
 }
 
-void maple_device::maple_r(UINT32 *data, UINT32 &out_size, bool &partial)
+void maple_device::maple_r(uint32_t *data, uint32_t &out_size, bool &partial)
 {
 	out_size = reply_size;
 	memcpy(data, reply_buffer, out_size*4);
 	partial = reply_partial;
 }
 
-void maple_device::reply_start(UINT8 code, UINT8 source, UINT8 size)
+void maple_device::reply_start(uint8_t code, uint8_t source, uint8_t size)
 {
 	reply_buffer[0] = ((size-1) << 24) | (host_port << 22) | (source << 16) | (host_port << 8) | code;
 	reply_size = size;

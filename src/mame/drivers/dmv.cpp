@@ -74,7 +74,7 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<dmv_keyboard_device> m_keyboard;
 	required_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_device<palette_device> m_palette;
 	required_memory_region m_ram;
 	required_memory_region m_bootrom;
@@ -141,16 +141,16 @@ public:
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 
-	UINT8 program_read(address_space &space, int cas, offs_t offset);
-	void program_write(address_space &space, int cas, offs_t offset, UINT8 data);
+	uint8_t program_read(address_space &space, int cas, offs_t offset);
+	void program_write(address_space &space, int cas, offs_t offset, uint8_t data);
 
-	void ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data);
-	void ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data);
-	DECLARE_READ8_MEMBER(ifsel0_r)  { UINT8 data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel1_r)  { UINT8 data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel2_r)  { UINT8 data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel3_r)  { UINT8 data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
-	DECLARE_READ8_MEMBER(ifsel4_r)  { UINT8 data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
+	void ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data);
+	void ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data);
+	DECLARE_READ8_MEMBER(ifsel0_r)  { uint8_t data = 0xff;   ifsel_r(space, 0, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel1_r)  { uint8_t data = 0xff;   ifsel_r(space, 1, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel2_r)  { uint8_t data = 0xff;   ifsel_r(space, 2, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel3_r)  { uint8_t data = 0xff;   ifsel_r(space, 3, offset, data);   return data; }
+	DECLARE_READ8_MEMBER(ifsel4_r)  { uint8_t data = 0xff;   ifsel_r(space, 4, offset, data);   return data; }
 	DECLARE_WRITE8_MEMBER(ifsel0_w) { ifsel_w(space, 0, offset, data); }
 	DECLARE_WRITE8_MEMBER(ifsel1_w) { ifsel_w(space, 1, offset, data); }
 	DECLARE_WRITE8_MEMBER(ifsel2_w) { ifsel_w(space, 2, offset, data); }
@@ -255,7 +255,7 @@ READ8_MEMBER(dmv_state::sys_status_r)
 	    ---- --x- 16-bit CPU available (active low)
 	    ---- ---x FDD motor (active low)
 	*/
-	UINT8 data = 0x00;
+	uint8_t data = 0x00;
 
 	if (m_floppy_motor)
 		data |= 0x01;
@@ -287,9 +287,9 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 	if (m_color_mode)
 	{
 		// 96KB videoram (32KB green + 32KB red + 32KB blue)
-		UINT16 green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
-		UINT16 red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
-		UINT16 blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
+		uint16_t green = m_video_ram[(0x00000 + (address & 0x7fff)) >> 1];
+		uint16_t red   = m_video_ram[(0x08000 + (address & 0x7fff)) >> 1];
+		uint16_t blue  = m_video_ram[(0x10000 + (address & 0x7fff)) >> 1];
 
 		for(int xi=0; xi<16; xi++)
 		{
@@ -306,7 +306,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( dmv_state::hgdc_display_pixels )
 		const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 		// 32KB videoram
-		UINT16 gfx = m_video_ram[(address & 0xffff) >> 1];
+		uint16_t gfx = m_video_ram[(address & 0xffff) >> 1];
 
 		for(int xi=0;xi<16;xi++)
 		{
@@ -320,8 +320,8 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 {
 	for( int x = 0; x < pitch; x++ )
 	{
-		UINT8 tile = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff;
-		UINT8 attr = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8;
+		uint8_t tile = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] & 0xff;
+		uint8_t attr = m_video_ram[(((addr+x)*2) & 0x1ffff) >> 1] >> 8;
 
 		rgb_t bg, fg;
 		if (m_color_mode)
@@ -338,7 +338,7 @@ UPD7220_DRAW_TEXT_LINE_MEMBER( dmv_state::hgdc_draw_text )
 
 		for( int yi = 0; yi < lr; yi++)
 		{
-			UINT8 tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
+			uint8_t tile_data = m_chargen->base()[(tile*16+yi) & 0x7ff];
 
 			if(cursor_on && cursor_addr == addr+x) //TODO
 				tile_data^=0xff;
@@ -368,14 +368,14 @@ static SLOT_INTERFACE_START( dmv_floppies )
 SLOT_INTERFACE_END
 
 
-void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_state::ifsel_r(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
 	for(auto & slot : slots)
 		slot->io_read(space, ifsel, offset, data);
 }
 
-void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_state::ifsel_w(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
 	for(auto & slot : slots)
@@ -461,7 +461,7 @@ void dmv_state::update_irqs(int slot, int state)
 	}
 }
 
-void dmv_state::program_write(address_space &space, int cas, offs_t offset, UINT8 data)
+void dmv_state::program_write(address_space &space, int cas, offs_t offset, uint8_t data)
 {
 	bool tramd = false;
 	dmvcart_slot_device *slots[] = { m_slot2, m_slot2a, m_slot3, m_slot4, m_slot5, m_slot6, m_slot7, m_slot7a };
@@ -477,9 +477,9 @@ void dmv_state::program_write(address_space &space, int cas, offs_t offset, UINT
 	}
 }
 
-UINT8 dmv_state::program_read(address_space &space, int cas, offs_t offset)
+uint8_t dmv_state::program_read(address_space &space, int cas, offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (m_ramoutdis && offset < 0x2000)
 	{
 		data = m_bootrom->base()[offset];

@@ -52,7 +52,7 @@ mappings, this is another situation where natural keyboard comes very handy!    
 
 INPUT_CHANGED_MEMBER(pecom_state::ef_w)
 {
-	m_cdp1802->set_input_line((int)(FPTR)param, newval);
+	m_cdp1802->set_input_line((int)(uintptr_t)param, newval);
 }
 
 static INPUT_PORTS_START( pecom )

@@ -187,7 +187,8 @@ void melps4_cpu_device::device_start()
 	save_item(NAME(m_w));
 
 	// register state for debugger
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_cy).formatstr("%9s").noshow();
 
 	state_add(MELPS4_PC, "PC", m_pc).formatstr("%04X");
@@ -246,7 +247,7 @@ void melps4_cpu_device::device_reset()
 //  i/o handling
 //-------------------------------------------------
 
-UINT8 melps4_cpu_device::read_gen_port(int port)
+uint8_t melps4_cpu_device::read_gen_port(int port)
 {
 	// input generic port
 	switch (port)
@@ -263,7 +264,7 @@ UINT8 melps4_cpu_device::read_gen_port(int port)
 	return 0;
 }
 
-void melps4_cpu_device::write_gen_port(int port, UINT8 data)
+void melps4_cpu_device::write_gen_port(int port, uint8_t data)
 {
 	// output generic port
 	switch (port)
@@ -292,7 +293,7 @@ int melps4_cpu_device::read_d_pin(int bit)
 {
 	// read port D, return state of selected pin
 	bit &= 0xf;
-	UINT16 d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
+	uint16_t d = (m_port_d | m_read_d(bit, 0xffff)) & m_d_mask;
 	return d >> bit & 1;
 }
 

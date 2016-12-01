@@ -235,8 +235,8 @@ static MACHINE_CONFIG_START( carpolo, carpolo_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)       /* 940.75 kHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", carpolo_state,  carpolo_timer_interrupt)   /* this not strictly VBLANK,
-                                                       but it's supposed to happen 60
-                                                       times a sec, so it's a good place */
+	                                                   but it's supposed to happen 60
+	                                                   times a sec, so it's a good place */
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(carpolo_state, pia_0_port_b_r))
@@ -344,7 +344,7 @@ ROM_END
 DRIVER_INIT_MEMBER(carpolo_state,carpolo)
 {
 	size_t i, len;
-	UINT8 *ROM;
+	uint8_t *ROM;
 
 
 	/* invert gfx PROM since the bits are active LO */

@@ -16,9 +16,9 @@
 struct uPD71054_state
 {
 	emu_timer *timer[3];            // Timer
-	UINT16  max[3];             // Max counter
-	UINT16  write_select;       // Max counter write select
-	UINT8   reg[4];             //
+	uint16_t  max[3];             // Max counter
+	uint16_t  write_select;       // Max counter write select
+	uint8_t   reg[4];             //
 };
 
 struct game_offset
@@ -41,6 +41,19 @@ public:
 		m_x1(*this, "x1snd"),
 		m_soundlatch(*this, "soundlatch"),
 		m_soundlatch2(*this, "soundlatch2"),
+		m_dsw(*this, "DSW"),
+		m_rot(*this, {"ROT1", "ROT2"}),
+		m_p1(*this, "P1"),
+		m_p2(*this, "P2"),
+		m_coins(*this, "COINS"),
+		m_extra_port(*this, "EXTRA"),
+		m_track1_x(*this, "TRACK1_X"),
+		m_track1_y(*this, "TRACK1_Y"),
+		m_track2_x(*this, "TRACK2_X"),
+		m_track2_y(*this, "TRACK2_Y"),
+		m_dsw1(*this, "DSW1"),
+		m_dsw2_3(*this, "DSW2_3"),
+		m_bet(*this, {"BET0", "BET1", "BET2", "BET3", "BET4"}),
 		m_sharedram(*this,"sharedram"),
 		m_workram(*this,"workram"),
 		m_vregs(*this,"vregs"),
@@ -64,18 +77,32 @@ public:
 	optional_device<generic_latch_8_device> m_soundlatch;
 	optional_device<generic_latch_8_device> m_soundlatch2;
 
-	optional_shared_ptr<UINT8> m_sharedram;
-	optional_shared_ptr<UINT16> m_workram;
-	optional_shared_ptr<UINT16> m_vregs;
-	optional_shared_ptr<UINT16> m_vram_0;
-	optional_shared_ptr<UINT16> m_vctrl_0;
-	optional_shared_ptr<UINT16> m_vram_2;
-	optional_shared_ptr<UINT16> m_vctrl_2;
-	optional_shared_ptr<UINT16> m_paletteram;
-	optional_shared_ptr<UINT16> m_paletteram2;
-	optional_shared_ptr<UINT16> m_kiwame_nvram;
-	optional_shared_ptr<UINT16> m_inttoote_key_select;
-	optional_shared_ptr<UINT16> m_inttoote_700000;
+	optional_ioport m_dsw;
+	optional_ioport_array<2> m_rot;
+	optional_ioport m_p1;
+	optional_ioport m_p2;
+	optional_ioport m_coins;
+	optional_ioport m_extra_port;
+	optional_ioport m_track1_x;
+	optional_ioport m_track1_y;
+	optional_ioport m_track2_x;
+	optional_ioport m_track2_y;
+	optional_ioport m_dsw1;
+	optional_ioport m_dsw2_3;
+	optional_ioport_array<5> m_bet;
+
+	optional_shared_ptr<uint8_t> m_sharedram;
+	optional_shared_ptr<uint16_t> m_workram;
+	optional_shared_ptr<uint16_t> m_vregs;
+	optional_shared_ptr<uint16_t> m_vram_0;
+	optional_shared_ptr<uint16_t> m_vctrl_0;
+	optional_shared_ptr<uint16_t> m_vram_2;
+	optional_shared_ptr<uint16_t> m_vctrl_2;
+	optional_shared_ptr<uint16_t> m_paletteram;
+	optional_shared_ptr<uint16_t> m_paletteram2;
+	optional_shared_ptr<uint16_t> m_kiwame_nvram;
+	optional_shared_ptr<uint16_t> m_inttoote_key_select;
+	optional_shared_ptr<uint16_t> m_inttoote_700000;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
@@ -103,22 +130,22 @@ public:
 	int m_gun_bit_count;
 	int m_gun_old_clock;
 
-	UINT8 m_usclssic_port_select;
+	uint8_t m_usclssic_port_select;
 	int m_keroppi_prize_hop;
 	int m_keroppi_protection_count;
 
 	int m_wiggie_soundlatch;
 
-	UINT8 m_jockeyc_key_select;
+	uint8_t m_jockeyc_key_select;
 
-	UINT8 m_twineagl_xram[8];
+	uint8_t m_twineagl_xram[8];
 	int m_twineagl_tilebank[4];
 
-	UINT16 m_magspeed_lights[3];
+	uint16_t m_magspeed_lights[3];
 
-	UINT16 m_pairslove_protram[0x200];
-	UINT16 m_pairslove_protram_old[0x200];
-	UINT16 m_downtown_protection[0x200/2];
+	uint16_t m_pairslove_protram[0x200];
+	uint16_t m_pairslove_protram_old[0x200];
+	uint16_t m_downtown_protection[0x200/2];
 
 	DECLARE_WRITE16_MEMBER(seta_vregs_w);
 	DECLARE_WRITE16_MEMBER(seta_vram_0_w);
@@ -215,14 +242,15 @@ public:
 	DECLARE_MACHINE_START(keroppi);
 	DECLARE_VIDEO_START(oisipuzl_2_layers);
 	DECLARE_PALETTE_INIT(inttoote);
-	UINT32 screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_seta_no_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_seta(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_usclssic(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_setaroul(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_inttoote(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_seta_layers(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_seta_buffer_sprites(screen_device &screen, bool state);
 	void screen_eof_setaroul(screen_device &screen, bool state);
+	void uPD71054_update_timer(device_t *cpu, int no);
 	INTERRUPT_GEN_MEMBER(wrofaero_interrupt);
 	TIMER_CALLBACK_MEMBER(uPD71054_timer_callback);
 	TIMER_CALLBACK_MEMBER(keroppi_prize_hop_callback);

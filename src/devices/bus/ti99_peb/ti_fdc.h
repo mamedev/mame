@@ -22,7 +22,7 @@ extern const device_type TI99_FDC;
 class ti_fdc_device : public ti_expansion_card_device
 {
 public:
-	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
@@ -41,12 +41,15 @@ protected:
 	void device_reset() override;
 	void device_config_complete() override;
 
-	const rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override;
 	machine_config_constructor device_mconfig_additions() const override;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
+	// For debugger access
+	void debug_read(offs_t offset, uint8_t* value);
+
 	// Wait state logic
 	void operate_ready_line();
 
@@ -60,18 +63,18 @@ private:
 	int     m_address;
 
 	// Holds the status of the DRQ and IRQ lines.
-	line_state  m_DRQ, m_IRQ;
+	int  m_DRQ, m_IRQ;
 
 	// Needed for triggering the motor monoflop
-	UINT8   m_lastval;
+	uint8_t   m_lastval;
 
-	// Signal DVENA. When TRUE, makes some drive turning.
-	line_state  m_DVENA;
+	// Signal DVENA. When true, makes some drive turning.
+	int  m_DVENA;
 
 	// Set when address is in card area
 	bool    m_inDsrArea;
 
-	// When TRUE the CPU is halted while DRQ/IRQ are true.
+	// When true the CPU is halted while DRQ/IRQ are true.
 	bool    m_WAITena;
 
 	// WD chip selected
@@ -85,7 +88,7 @@ private:
 	int         m_DSEL;
 
 	// Signal SIDSEL. 0 or 1, indicates the selected head.
-	line_state        m_SIDSEL;
+	int        m_SIDSEL;
 
 	// count 4.23s from rising edge of motor_on
 	emu_timer*  m_motor_on_timer;
@@ -94,13 +97,13 @@ private:
 	required_device<fd1771_t>   m_fd1771;
 
 	// DSR ROM
-	UINT8*  m_dsrrom;
+	uint8_t*  m_dsrrom;
 
 	// Link to the attached floppy drives
 	floppy_image_device*    m_floppy[3];
 
 	// Currently selected floppy drive
-	floppy_image_device*    m_current_floppy;
+	int  m_current;
 
 	// Debugging
 	bool m_debug_dataout;

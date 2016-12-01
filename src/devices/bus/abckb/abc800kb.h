@@ -30,10 +30,10 @@ class abc800_keyboard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	abc800_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -58,18 +58,7 @@ private:
 	inline void key_down(int state);
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_x0;
-	required_ioport m_x1;
-	required_ioport m_x2;
-	required_ioport m_x3;
-	required_ioport m_x4;
-	required_ioport m_x5;
-	required_ioport m_x6;
-	required_ioport m_x7;
-	required_ioport m_x8;
-	required_ioport m_x9;
-	required_ioport m_x10;
-	required_ioport m_x11;
+	required_ioport_array<12> m_x;
 
 	int m_row;
 	int m_txd;

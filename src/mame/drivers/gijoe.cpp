@@ -142,7 +142,7 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 
 void gijoe_state::gijoe_objdma(  )
 {
-	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
+	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = m_spriteram;
 	src_tail = m_spriteram + 255 * 8;

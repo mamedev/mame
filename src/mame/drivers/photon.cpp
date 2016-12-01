@@ -36,22 +36,22 @@ public:
 	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
 	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
-	void pk8000_set_bank(UINT8 data);
+	void pk8000_set_bank(uint8_t data);
 	required_device<speaker_sound_device> m_speaker;
 };
 
 
-void photon_state::pk8000_set_bank(UINT8 data)
+void photon_state::pk8000_set_bank(uint8_t data)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *ram = memregion("maincpu")->base();
-	UINT8 block1 = data & 3;
-	UINT8 block2 = (data >> 2) & 3;
-	UINT8 block3 = (data >> 4) & 3;
-	UINT8 block4 = (data >> 6) & 3;
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *ram = memregion("maincpu")->base();
+	uint8_t block1 = data & 3;
+	uint8_t block2 = (data >> 2) & 3;
+	uint8_t block3 = (data >> 4) & 3;
+	uint8_t block4 = (data >> 6) & 3;
 
 	switch(block1) {
 		case 0:
@@ -175,7 +175,7 @@ void photon_state::video_start()
 {
 }
 
-UINT32 photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return pk8000_video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }

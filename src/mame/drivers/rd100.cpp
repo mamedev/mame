@@ -26,7 +26,7 @@ public:
 
 	DECLARE_DRIVER_INIT(rd100);
 	DECLARE_MACHINE_RESET(rd100);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -46,7 +46,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( rd100 )
 INPUT_PORTS_END
 
-UINT32 rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  for (int y = 0; y < 32*8; y++)
 //  {
@@ -54,13 +54,13 @@ UINT32 rd100_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 
 //      for (int sx = 0; sx < 64; sx++)
 //      {
-//          UINT8 code = m_video_ram[offset++];
-//          UINT8 attr = m_video_ram[offset++];
+//          uint8_t code = m_video_ram[offset++];
+//          uint8_t attr = m_video_ram[offset++];
 
 //          offs_t char_offs = ((code & 0x7f) << 3) | (y & 0x07);
 //          if (BIT(code, 7)) char_offs = ((code & 0x7f) << 3) | ((y >> 1) & 0x07);
 
-//          UINT8 data = m_char_rom->base()[char_offs];
+//          uint8_t data = m_char_rom->base()[char_offs];
 
 //          rgb_t fg = m_palette->pen_color(attr & 0x07);
 //          rgb_t bg = m_palette->pen_color((attr >> 3) & 0x07);
@@ -94,7 +94,7 @@ static MACHINE_CONFIG_START( rd100, rd100_state )
 	MCFG_MACHINE_RESET_OVERRIDE(rd100_state, rd100)
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(250))
 	MCFG_SCREEN_UPDATE_DRIVER(rd100_state, screen_update)

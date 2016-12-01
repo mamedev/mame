@@ -6,7 +6,7 @@
 
 const device_type MSX_SLOT_RAM = &device_creator<msx_slot_ram_device>;
 
-msx_slot_ram_device::msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_ram_device::msx_slot_ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_RAM, "MSX Internal RAM", tag, owner, clock, "msx_slot_ram", __FILE__)
 	, msx_internal_slot_interface()
 {

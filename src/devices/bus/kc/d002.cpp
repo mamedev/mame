@@ -108,7 +108,7 @@ const device_type KC_D002 = &device_creator<kc_d002_device>;
 //  kc_d002_device - constructor
 //-------------------------------------------------
 
-kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+kc_d002_device::kc_d002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, KC_D002, "D002 Bus Driver", tag, owner, clock, "kc_d002", __FILE__),
 		device_kcexp_interface( mconfig, *this ), m_slot(nullptr)
 	{
@@ -159,7 +159,7 @@ ioport_constructor kc_d002_device::device_input_ports() const
 //  read
 //-------------------------------------------------
 
-void kc_d002_device::read(offs_t offset, UINT8 &data)
+void kc_d002_device::read(offs_t offset, uint8_t &data)
 {
 	for (auto & elem : m_expansions)
 		elem->read(offset, data);
@@ -169,7 +169,7 @@ void kc_d002_device::read(offs_t offset, UINT8 &data)
 //  write
 //-------------------------------------------------
 
-void kc_d002_device::write(offs_t offset, UINT8 data)
+void kc_d002_device::write(offs_t offset, uint8_t data)
 {
 	for (auto & elem : m_expansions)
 		elem->write(offset, data);
@@ -179,11 +179,11 @@ void kc_d002_device::write(offs_t offset, UINT8 data)
 //  IO read
 //-------------------------------------------------
 
-void kc_d002_device::io_read(offs_t offset, UINT8 &data)
+void kc_d002_device::io_read(offs_t offset, uint8_t &data)
 {
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if ((slot_id & 0xf0) == ioport("ID")->read() && !(slot_id & 0x03))
 			data = m_expansions[(slot_id>>2) & 3]->module_id_r();
@@ -201,11 +201,11 @@ void kc_d002_device::io_read(offs_t offset, UINT8 &data)
 //  IO write
 //-------------------------------------------------
 
-void kc_d002_device::io_write(offs_t offset, UINT8 data)
+void kc_d002_device::io_write(offs_t offset, uint8_t data)
 {
 	if ((offset & 0xff) == 0x80)
 	{
-		UINT8 slot_id = (offset>>8) & 0xff;
+		uint8_t slot_id = (offset>>8) & 0xff;
 
 		if ((slot_id & 0xf0) == ioport("ID")->read() && !(slot_id & 0x03))
 			m_expansions[(slot_id>>2) & 3]->control_w(data);

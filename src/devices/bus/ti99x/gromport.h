@@ -12,6 +12,8 @@
 #include "emu.h"
 #include "ti99defs.h"
 #include "machine/tmc0430.h"
+#include "softlist_dev.h"
+
 
 extern const device_type GROMPORT;
 
@@ -20,7 +22,7 @@ class ti99_cartridge_connector_device;
 class gromport_device : public bus8z_device, public device_slot_interface
 {
 public:
-	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gromport_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_READ8Z_MEMBER(crureadz);
@@ -40,6 +42,7 @@ public:
 	template<class _Object> static devcb_base &static_set_reset_callback(device_t &device, _Object object) { return downcast<gromport_device &>(device).m_console_reset.set_callback(object); }
 
 	void    cartridge_inserted();
+	bool    is_grom_idle();
 
 protected:
 	virtual void device_start() override;
@@ -83,7 +86,7 @@ class ti99_cartridge_pcb;
 class ti99_cartridge_device : public bus8z_device, public device_image_interface
 {
 public:
-	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_cartridge_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -98,12 +101,13 @@ public:
 
 	bool    is_available() { return m_pcb != nullptr; }
 	void    set_slot(int i);
+	bool    is_grom_idle();
 
 protected:
 	virtual void device_start() override { };
 	virtual void device_config_complete() override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 
 	// Image handling: implementation of methods which are abstract in the parent
 	image_init_result call_load() override;
@@ -157,11 +161,10 @@ public:
 
 	virtual void insert(int index, ti99_cartridge_device* cart) { m_gromport->cartridge_inserted(); };
 	virtual void remove(int index) { };
-	// UINT16 grom_base();
-	// UINT16 grom_mask();
+	virtual bool is_grom_idle() =0;
 
 protected:
-	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ti99_cartridge_connector_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual void device_config_complete() override;
 
 	gromport_device*    m_gromport;
@@ -174,7 +177,7 @@ protected:
 class single_conn_device : public ti99_cartridge_connector_device
 {
 public:
-	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	single_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -183,6 +186,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(romgq_line) override;
 	DECLARE_WRITE8_MEMBER(set_gromlines) override;
 	DECLARE_WRITE_LINE_MEMBER(gclock_in) override;
+
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -205,7 +210,7 @@ private:
 class multi_conn_device : public ti99_cartridge_connector_device
 {
 public:
-	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	multi_conn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -218,6 +223,8 @@ public:
 	void insert(int index, ti99_cartridge_device* cart) override;
 	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( switch_changed );
+
+	bool is_grom_idle() override;
 
 protected:
 	virtual void device_start() override;
@@ -242,7 +249,7 @@ private:
 class gkracker_device : public ti99_cartridge_connector_device, public device_nvram_interface
 {
 public:
-	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gkracker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -256,12 +263,15 @@ public:
 	void remove(int index) override;
 	DECLARE_INPUT_CHANGED_MEMBER( gk_changed );
 
+	// We may have a cartridge plugged into the GK
+	bool is_grom_idle() override;
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry* device_rom_region() const override;
+	virtual const tiny_rom_entry* device_rom_region() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
 	// device_nvram_interface
@@ -275,8 +285,8 @@ private:
 	bool    m_romspace_selected;
 	int     m_ram_page;
 	int     m_grom_address;
-	UINT8*  m_ram_ptr;
-	UINT8*  m_grom_ptr;
+	uint8_t*  m_ram_ptr;
+	uint8_t*  m_grom_ptr;
 
 	bool    m_waddr_LSB;
 
@@ -315,23 +325,25 @@ protected:
 	void                set_cartridge(ti99_cartridge_device *cart);
 	const char*         tag() { return m_tag; }
 	void                set_tag(const char* tag) { m_tag = tag; }
+	bool                is_grom_idle() { return m_grom_idle; }
 
 	ti99_cartridge_device*  m_cart;
 	tmc0430_device*     m_grom[5];
+	bool                m_grom_idle;
 	int                 m_grom_size;
 	int                 m_rom_size;
 	int                 m_ram_size;
 
-	UINT8*              m_rom_ptr;
-	UINT8*              m_ram_ptr;
+	uint8_t*              m_rom_ptr;
+	uint8_t*              m_ram_ptr;
 	bool                m_romspace_selected;
 	int                 m_rom_page;     // for some cartridge types
-	UINT8*              m_grom_ptr;     // for gromemu
+	uint8_t*              m_grom_ptr;     // for gromemu
 	int                 m_grom_address; // for gromemu
 	int                 m_ram_page;     // for super
 	const char*         m_tag;
-	dynamic_buffer      m_nvram;    // for MiniMemory
-	dynamic_buffer      m_ram;  // for MBX
+	std::vector<uint8_t>      m_nvram;    // for MiniMemory
+	std::vector<uint8_t>      m_ram;  // for MBX
 };
 
 /******************** Standard cartridge ******************************/
@@ -476,21 +488,21 @@ class rpk_socket
 	friend class rpk;
 
 public:
-	rpk_socket(const char *id, int length, UINT8 *contents);
-	rpk_socket(const char *id, int length, UINT8 *contents, const char *pathname);
+	rpk_socket(const char *id, int length, uint8_t *contents);
+	rpk_socket(const char *id, int length, uint8_t *contents, const char *pathname);
 	~rpk_socket() {}
 
 	const char*     id() { return m_id; }
 	int             get_content_length() { return m_length; }
-	UINT8*          get_contents() { return m_contents; }
+	uint8_t*          get_contents() { return m_contents; }
 	bool            persistent_ram() { return m_pathname != nullptr; }
 	const char*     get_pathname() { return m_pathname; }
 	void            cleanup() { if (m_contents != nullptr) global_free_array(m_contents); }
 
 private:
 	const char*     m_id;
-	UINT32          m_length;
-	UINT8*          m_contents;
+	uint32_t          m_length;
+	uint8_t*          m_contents;
 	const char*     m_pathname;
 };
 
@@ -503,9 +515,9 @@ public:
 	rpk *open(emu_options &options, const char *filename, const char *system_name);
 
 private:
-	int             find_file(util::archive_file &zip, const char *filename, UINT32 crc);
-	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, xml_data_node* rom_resource_node, const char* socketname);
-	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, xml_data_node* ram_resource_node, const char* socketname, const char* system_name);
+	int             find_file(util::archive_file &zip, const char *filename, uint32_t crc);
+	std::unique_ptr<rpk_socket> load_rom_resource(util::archive_file &zip, xml_data_node const* rom_resource_node, const char* socketname);
+	std::unique_ptr<rpk_socket> load_ram_resource(emu_options &options, xml_data_node const* ram_resource_node, const char* socketname, const char* system_name);
 	const pcb_type* m_types;
 };
 
@@ -517,7 +529,7 @@ public:
 	~rpk();
 
 	int         get_type(void) { return m_type; }
-	UINT8*      get_contents_of_socket(const char *socket_name);
+	uint8_t*      get_contents_of_socket(const char *socket_name);
 	int         get_resource_length(const char *socket_name);
 	void        close();
 

@@ -241,8 +241,8 @@ enum input_event
 struct KeyPressEventArgs
 {
 	input_event event_id;
-	UINT8 vkey;
-	UINT8 scancode;
+	uint8_t vkey;
+	uint8_t scancode;
 };
 
 struct MouseButtonEventArgs
@@ -258,8 +258,10 @@ struct _EXCEPTION_POINTERS;
 
 class windows_osd_interface : public osd_common_t
 {
+#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 	// Access to exception filter static method
 	friend int main(int argc, char *argv[]);
+#endif
 
 public:
 	// construction/destruction
@@ -274,7 +276,7 @@ public:
 	virtual void customize_input_type_list(simple_list<input_type_entry> &typelist) override;
 
 	// video overridables
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 
 	virtual void video_register() override;
 

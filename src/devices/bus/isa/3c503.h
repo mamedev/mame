@@ -13,7 +13,7 @@ class el2_3c503_device: public device_t,
 					public device_isa8_card_interface
 {
 public:
-	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	el2_3c503_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	void el2_3c503_irq_w(int state);
@@ -24,38 +24,38 @@ public:
 	DECLARE_READ8_MEMBER(el2_3c503_hiport_r);
 	DECLARE_WRITE8_MEMBER(el2_3c503_hiport_w);
 	void eop_w(int state) override;
-	UINT8 dack_r(int line) override;
-	void dack_w(int line, UINT8 data) override;
+	uint8_t dack_r(int line) override;
+	void dack_w(int line, uint8_t data) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
 	required_device<dp8390d_device> m_dp8390;
-	UINT8 m_board_ram[8*1024];
-	UINT8 m_rom[8*1024];
-	UINT8 m_prom[32];
-	UINT8 m_irq_state;
+	uint8_t m_board_ram[8*1024];
+	uint8_t m_rom[8*1024];
+	uint8_t m_prom[32];
+	uint8_t m_irq_state;
 
-	UINT8 el2_3c503_mem_read(offs_t offset);
-	void el2_3c503_mem_write(offs_t offset, UINT8 data);
+	uint8_t el2_3c503_mem_read(offs_t offset);
+	void el2_3c503_mem_write(offs_t offset, uint8_t data);
 
 	void set_irq(int state);
 	void set_drq(int state);
 
 	struct {
-		UINT8 pstr;
-		UINT8 pspr;
-		UINT8 dqtr;
-		UINT8 bcfr;
-		UINT8 pcfr;
-		UINT8 gacfr;
-		UINT8 ctrl;
-		UINT8 streg;
-		UINT8 idcfr;
-		UINT16 da;
-		UINT32 vptr;
-		UINT8 rfmsb;
-		UINT8 rflsb;
+		uint8_t pstr;
+		uint8_t pspr;
+		uint8_t dqtr;
+		uint8_t bcfr;
+		uint8_t pcfr;
+		uint8_t gacfr;
+		uint8_t ctrl;
+		uint8_t streg;
+		uint8_t idcfr;
+		uint16_t da;
+		uint32_t vptr;
+		uint8_t rfmsb;
+		uint8_t rflsb;
 	} m_regs;
 };
 

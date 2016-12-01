@@ -29,7 +29,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_IRQ = &device_creator<psxirq_device>;
 
-psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxirq_device::psxirq_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_IRQ, "Sony PSX IRQ", tag, owner, clock, "psxirq", __FILE__), n_irqdata(0), n_irqmask(0),
 	m_irq_handler(*this)
 {
@@ -56,7 +56,7 @@ void psxirq_device::device_start()
 	save_item( NAME( n_irqmask ) );
 }
 
-void psxirq_device::set( UINT32 bitmask )
+void psxirq_device::set( uint32_t bitmask )
 {
 	verboselog( *this, 2, "psx_irq_set %08x\n", bitmask );
 	n_irqdata |= bitmask;

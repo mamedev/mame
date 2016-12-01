@@ -83,7 +83,7 @@ const device_type CIRRUS = &device_creator<cirrus_device>;
 //  cirrus_device - constructor
 //-------------------------------------------------
 
-cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cirrus_device::cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, CIRRUS, "CIRRUS", tag, owner, clock, "cirrus", __FILE__),
 		pci_device_interface( mconfig, *this )
 {
@@ -109,9 +109,9 @@ void cirrus_device::device_reset()
 //  pci_read - implementation of PCI read
 //-------------------------------------------------
 
-UINT32 cirrus_device::pci_read(pci_bus_device *pcibus, int function, int offset, UINT32 mem_mask)
+uint32_t cirrus_device::pci_read(pci_bus_device *pcibus, int function, int offset, uint32_t mem_mask)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 
 	if (function == 0)
 	{
@@ -145,7 +145,7 @@ UINT32 cirrus_device::pci_read(pci_bus_device *pcibus, int function, int offset,
 //  pci_write - implementation of PCI write
 //-------------------------------------------------
 
-void cirrus_device::pci_write(pci_bus_device *pcibus, int function, int offset, UINT32 data, UINT32 mem_mask)
+void cirrus_device::pci_write(pci_bus_device *pcibus, int function, int offset, uint32_t data, uint32_t mem_mask)
 {
 	if (LOG_PCIACCESS)
 		logerror("cirrus5430_pci_write(): function=%d offset=0x%02X data=0x%04X\n", function, offset, data);

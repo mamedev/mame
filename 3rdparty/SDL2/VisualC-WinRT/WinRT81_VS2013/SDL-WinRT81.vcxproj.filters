@@ -174,9 +174,6 @@
     <ClInclude Include="..\..\src\audio\SDL_audiodev_c.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\audio\SDL_audiomem.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\audio\SDL_audio_c.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -391,6 +388,9 @@
     <ClInclude Include="..\..\src\haptic\windows\SDL_dinputhaptic_c.h" />
     <ClInclude Include="..\..\src\haptic\windows\SDL_xinputhaptic_c.h" />
     <ClInclude Include="..\..\src\thread\windows\SDL_systhread_c.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\video\winrt\SDL_winrtgamebar_cpp.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -708,6 +708,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\thread\windows\SDL_syssem.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\video\winrt\SDL_winrtgamebar.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

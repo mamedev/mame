@@ -674,7 +674,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(angelkds_state,angelkds)
 {
-	UINT8 *RAM = memregion("user1")->base();
+	uint8_t *RAM = memregion("user1")->base();
 	membank("bank1")->configure_entries(0, 16, &RAM[0x0000], 0x4000);
 }
 

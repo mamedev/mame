@@ -16,12 +16,12 @@ void vector06_state::video_start()
 {
 }
 
-UINT32 vector06_state::screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vector06_state::screen_update_vector06(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code1,code2,code3,code4;
-	UINT8 col;
+	uint8_t code1,code2,code3,code4;
+	uint8_t col;
 	int y, x, b,draw_y;
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	int width = (m_video_mode==0x00) ? 256 : 512;
 	rectangle screen_area(0,width+64-1,0,256+64-1);
@@ -56,6 +56,6 @@ UINT32 vector06_state::screen_update_vector06(screen_device &screen, bitmap_ind1
 
 PALETTE_INIT_MEMBER(vector06_state, vector06)
 {
-	for (UINT8 i=0; i<16; i++)
-		m_palette->set_pen_color( i, rgb_t::black );
+	for (uint8_t i=0; i<16; i++)
+		m_palette->set_pen_color(i, rgb_t::black());
 }

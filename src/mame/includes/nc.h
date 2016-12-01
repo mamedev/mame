@@ -75,7 +75,7 @@ public:
 	DECLARE_PALETTE_INIT(nc);
 	DECLARE_MACHINE_START(nc200);
 	DECLARE_MACHINE_RESET(nc200);
-	UINT32 screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nc_keyboard_timer_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(dummy_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(nc100_tc8521_alarm_callback);
@@ -124,7 +124,7 @@ public: // HACK FOR MC6845
 	emu_timer *m_keyboard_timer;
 	int m_membank_rom_mask;
 	int m_membank_internal_ram_mask;
-	UINT8 m_poweroff_control;
+	uint8_t m_poweroff_control;
 	int m_card_status;
 	unsigned char m_uart_control;
 	int m_irq_mask;
@@ -134,12 +134,12 @@ public: // HACK FOR MC6845
 	int m_sound_channel_periods[2];
 	int m_previous_inputport_10_state;
 	int m_previous_alarm_state;
-	UINT8 m_nc200_uart_interrupt_irq;
+	uint8_t m_nc200_uart_interrupt_irq;
 	memory_region *m_card_ram;
 	int m_membank_card_ram_mask;
 	int m_card_size;
 	unsigned long m_display_memory_start;
-	UINT8 m_type;
+	uint8_t m_type;
 	int m_nc200_backlight;
 
 	int m_centronics_ack;

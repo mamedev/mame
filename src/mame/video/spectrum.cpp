@@ -108,12 +108,12 @@ void spectrum_state::screen_eof_spectrum(screen_device &screen, bool state)
 
 ***************************************************************************/
 
-inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void spectrum_state::spectrum_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
-UINT32 spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t spectrum_state::screen_update_spectrum(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const rectangle rect(SPEC_LEFT_BORDER, SPEC_LEFT_BORDER + SPEC_DISPLAY_XSIZE - 1, SPEC_TOP_BORDER, SPEC_TOP_BORDER + SPEC_DISPLAY_YSIZE - 1);
 
@@ -215,23 +215,23 @@ void spectrum_state::spectrum_UpdateScreenBitmap(bool eof)
 
 		do
 		{
-			UINT16 scrx = m_previous_screen_x - SPEC_LEFT_BORDER;
-			UINT16 scry = m_previous_screen_y - SPEC_TOP_BORDER;
+			uint16_t scrx = m_previous_screen_x - SPEC_LEFT_BORDER;
+			uint16_t scry = m_previous_screen_y - SPEC_TOP_BORDER;
 
 			if (scrx < SPEC_DISPLAY_XSIZE && scry < SPEC_DISPLAY_YSIZE)
 			{
 				// this can/must be optimised
 				if ((scrx & 7) == 0) {
-					UINT16 *bm = &m_screen_bitmap.pix16(m_previous_screen_y, m_previous_screen_x);
-					UINT8 attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
-					UINT8 scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
-					UINT16 ink = (attr & 0x07) + ((attr >> 3) & 0x08);
-					UINT16 pap = (attr >> 3) & 0x0f;
+					uint16_t *bm = &m_screen_bitmap.pix16(m_previous_screen_y, m_previous_screen_x);
+					uint8_t attr = *(m_screen_location + ((scry & 0xF8) << 2) + (scrx >> 3) + 0x1800);
+					uint8_t scr = *(m_screen_location + ((scry & 7) << 8) + ((scry & 0x38) << 2) + ((scry & 0xC0) << 5) + (scrx >> 3));
+					uint16_t ink = (attr & 0x07) + ((attr >> 3) & 0x08);
+					uint16_t pap = (attr >> 3) & 0x0f;
 
 					if (m_flash_invert && (attr & 0x80))
 						scr = ~scr;
 
-					for (UINT8 b = 0x80; b != 0; b >>= 1)
+					for (uint8_t b = 0x80; b != 0; b >>= 1)
 						*bm++ = (scr & b) ? ink : pap;
 				}
 			}
@@ -265,7 +265,7 @@ void spectrum_state::spectrum_UpdateBorderBitmap()
 
 	if (m_border_bitmap.valid())
 	{
-		UINT16 border = m_port_fe_data & 0x07;
+		uint16_t border = m_port_fe_data & 0x07;
 
 		//printf("update border from %d,%d to %d,%d\n", m_previous_border_x, m_previous_border_y, x, y);
 

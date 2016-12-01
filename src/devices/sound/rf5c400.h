@@ -46,27 +46,27 @@ struct rf5c400_channel
 		env_scale(0.0)
 	{ }
 
-	UINT16  startH;
-	UINT16  startL;
-	UINT16  freq;
-	UINT16  endL;
-	UINT16  endHloopH;
-	UINT16  loopL;
-	UINT16  pan;
-	UINT16  effect;
-	UINT16  volume;
+	uint16_t  startH;
+	uint16_t  startL;
+	uint16_t  freq;
+	uint16_t  endL;
+	uint16_t  endHloopH;
+	uint16_t  loopL;
+	uint16_t  pan;
+	uint16_t  effect;
+	uint16_t  volume;
 
-	UINT16  attack;
-	UINT16  decay;
-	UINT16  release;
+	uint16_t  attack;
+	uint16_t  decay;
+	uint16_t  release;
 
-	UINT16  cutoff;
+	uint16_t  cutoff;
 
-	UINT64 pos;
-	UINT64 step;
-	UINT16 keyon;
+	uint64_t pos;
+	uint64_t step;
+	uint16_t keyon;
 
-	UINT8 env_phase;
+	uint8_t env_phase;
 	double env_level;
 	double env_step;
 	double env_scale;
@@ -79,7 +79,7 @@ class rf5c400_device : public device_t,
 						public device_sound_interface
 {
 public:
-	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rf5c400_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~rf5c400_device() { }
 
 protected:
@@ -95,12 +95,12 @@ public:
 
 private:
 	void rf5c400_init_chip();
-	UINT8 decode80(UINT8 val);
+	uint8_t decode80(uint8_t val);
 
 private:
-	required_region_ptr<INT16> m_rom;
+	required_region_ptr<int16_t> m_rom;
 
-	UINT32 m_rommask;
+	uint32_t m_rommask;
 
 	sound_stream *m_stream;
 
@@ -110,8 +110,8 @@ private:
 
 	rf5c400_channel m_channels[32];
 
-	UINT32 m_ext_mem_address;
-	UINT16 m_ext_mem_data;
+	uint32_t m_ext_mem_address;
+	uint16_t m_ext_mem_data;
 };
 
 extern const device_type RF5C400;

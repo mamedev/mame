@@ -22,7 +22,7 @@
 
 READ8_MEMBER(tnzs_state::mcu_tnzs_r)
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = m_mcu->upi41_master_r(space, offset & 1);
 	space.device().execute().yield();
@@ -84,8 +84,7 @@ READ8_MEMBER(tnzs_state::arknoid2_sh_f000_r)
 {
 //  logerror("PC %04x: read input %04x\n", space.device().safe_pc(), 0xf000 + offset);
 
-	ioport_port *port = (offset / 2) ? m_an2 : m_an1;
-	int val = port ? port->read() : 0;
+	int val = ((offset / 2) ? m_an2 : m_an1).read_safe(0);
 
 	if (offset & 1)
 		return ((val >> 8) & 0xff);
@@ -526,7 +525,7 @@ DRIVER_INIT_MEMBER(tnzs_state,tnzsb)
 
 DRIVER_INIT_MEMBER(tnzs_state,kabukiz)
 {
-	UINT8 *SOUND = memregion("audiocpu")->base();
+	uint8_t *SOUND = memregion("audiocpu")->base();
 	m_mcu_type = MCU_NONE_KABUKIZ;
 
 	m_audiobank->configure_entries(0, 8, &SOUND[0x00000], 0x4000);
@@ -640,7 +639,7 @@ MACHINE_RESET_MEMBER(tnzs_state,jpopnics)
 
 MACHINE_START_MEMBER(tnzs_state,tnzs_common)
 {
-	UINT8 *SUB = memregion("sub")->base();
+	uint8_t *SUB = memregion("sub")->base();
 
 	m_subbank->configure_entries(0, 4, &SUB[0x08000], 0x2000);
 	m_subbank->set_entry(m_bank2);

@@ -79,7 +79,7 @@ public:
 	DECLARE_WRITE16_MEMBER(portff82_w);
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	DECLARE_WRITE8_MEMBER(kbd_put_16);
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 	DECLARE_DRIVER_INIT(p8k);
@@ -149,7 +149,7 @@ READ8_MEMBER( p8k_state::p8k_port0_r )
 // see memory explanation above
 WRITE8_MEMBER( p8k_state::p8k_port0_w )
 {
-	UINT8 breg = m_maincpu->state_int(Z80_B) >> 4;
+	uint8_t breg = m_maincpu->state_int(Z80_B) >> 4;
 	if ((data==1) || (data==2) || (data==4))
 	{
 		char banknum[8];
@@ -194,8 +194,8 @@ WRITE8_MEMBER( p8k_state::kbd_put )
 	// This is a dreadful hack..
 	// simulate interrupt by saving current pc on
 	// the stack and jumping to interrupt handler.
-	UINT16 spreg = m_maincpu->state_int(Z80_SP);
-	UINT16 pcreg = m_maincpu->state_int(Z80_PC);
+	uint16_t spreg = m_maincpu->state_int(Z80_SP);
+	uint16_t pcreg = m_maincpu->state_int(Z80_PC);
 	spreg--;
 	mem.write_byte(spreg, pcreg >> 8);
 	spreg--;
@@ -314,7 +314,7 @@ MACHINE_RESET_MEMBER(p8k_state,p8k)
 
 DRIVER_INIT_MEMBER(p8k_state,p8k)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	membank("bank0")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
 	membank("bank1")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
 	membank("bank2")->configure_entries(0, 48, &RAM[0x0000], 0x1000);
@@ -346,8 +346,8 @@ WRITE8_MEMBER( p8k_state::kbd_put_16 )
 	// keyboard int handler is at 0x0700
 	m_term_data = data;
 	// This is another dire hack..
-	UINT8 offs = mem.read_byte(0x43a5);
-	UINT16 addr = 0x41b0 + (UINT16) offs;
+	uint8_t offs = mem.read_byte(0x43a5);
+	uint16_t addr = 0x41b0 + (uint16_t) offs;
 	mem.write_byte(addr, data);
 	mem.write_byte(0x43a0, 1);
 }

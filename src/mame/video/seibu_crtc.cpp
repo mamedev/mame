@@ -269,7 +269,7 @@ WRITE16_MEMBER( seibu_crtc_device::layer_scroll_base_w)
 //  seibu_crtc_device - constructor
 //-------------------------------------------------
 
-seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+seibu_crtc_device::seibu_crtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SEIBU_CRTC, "Seibu CRT Controller", tag, owner, clock, "seibu_crtc", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -337,7 +337,7 @@ const address_space_config *seibu_crtc_device::memory_space_config(address_space
 //  read_word - read a word at the given address
 //-------------------------------------------------
 
-inline UINT16 seibu_crtc_device::read_word(offs_t address)
+inline uint16_t seibu_crtc_device::read_word(offs_t address)
 {
 	return space().read_word(address << 1);
 }
@@ -346,7 +346,7 @@ inline UINT16 seibu_crtc_device::read_word(offs_t address)
 //  write_word - write a word at the given address
 //-------------------------------------------------
 
-inline void seibu_crtc_device::write_word(offs_t address, UINT16 data)
+inline void seibu_crtc_device::write_word(offs_t address, uint16_t data)
 {
 	space().write_word(address << 1, data);
 }

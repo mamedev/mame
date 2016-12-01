@@ -174,7 +174,7 @@ void simpsons_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_maincpu->set_input_line(KONAMI_FIRQ_LINE, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in simpsons_state::device_timer");
+		assert_always(false, "Unknown id in simpsons_state::device_timer");
 	}
 }
 
@@ -282,7 +282,7 @@ INPUT_PORTS_END
 void simpsons_state::simpsons_objdma(  )
 {
 	int counter, num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	m_k053246->k053247_get_ram(&dst);
 

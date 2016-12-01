@@ -138,7 +138,7 @@ public:
 	required_device<mb90082_device> m_mb90082;
 	required_device<s3520cf_device> m_s3520cf;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( port_81_r );
 	DECLARE_READ8_MEMBER( port_83_r );
@@ -153,7 +153,7 @@ public:
 	DECLARE_WRITE8_MEMBER(spc_ram_100_w);
 };
 
-UINT32 sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t sfcbox_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_mb90082->screen_update(screen,bitmap,cliprect);
 	return 0;
@@ -219,7 +219,7 @@ READ8_MEMBER( sfcbox_state::port_81_r )
     ---- --x-   SNES Transfer ACK from SNES  (Bit3 of WRIO/RDIO on SNES side)
     ---- ---x   Int0 Request (Coin-Input, Low for 44ms..80ms) (0=IRQ, 1=No)
 */
-	UINT8 res;
+	uint8_t res;
 
 	res = (m_screen->vblank() & 1) << 7;
 	res = 1 << 6;

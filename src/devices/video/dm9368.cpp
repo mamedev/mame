@@ -25,7 +25,7 @@ const device_type DM9368 = &device_creator<dm9368_device>;
 #define LOG 0
 
 
-const UINT8 dm9368_device::m_segment_data[16] =
+const uint8_t dm9368_device::m_segment_data[16] =
 {
 	0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
 };
@@ -40,7 +40,7 @@ const UINT8 dm9368_device::m_segment_data[16] =
 //  dm9368_device - constructor
 //-------------------------------------------------
 
-dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dm9368_device::dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DM9368, "DM9368 7-Segment Decoder", tag, owner, clock, "dm9368", __FILE__),
 	device_output_interface(mconfig, *this),
 	m_write_rbo(*this),
@@ -69,10 +69,10 @@ void dm9368_device::device_start()
 //  a_w -
 //-------------------------------------------------
 
-void dm9368_device::a_w(UINT8 data)
+void dm9368_device::a_w(uint8_t data)
 {
 	int a = data & 0x0f;
-	UINT8 value = 0;
+	uint8_t value = 0;
 
 	if (!m_rbi && !a)
 	{

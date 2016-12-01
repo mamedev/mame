@@ -17,8 +17,8 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef device_delegate<double (UINT8 input)> adc083x_input_delegate;
-#define ADC083X_INPUT_CB(name)  double name(UINT8 input)
+typedef device_delegate<double (uint8_t input)> adc083x_input_delegate;
+#define ADC083X_INPUT_CB(name)  double name(uint8_t input)
 
 #define MCFG_ADC083X_INPUT_CB(_class, _method) \
 	adc083x_device::set_input_callback(*device, adc083x_input_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -46,7 +46,7 @@ typedef device_delegate<double (UINT8 input)> adc083x_input_delegate;
 class adc083x_device : public device_t
 {
 public:
-	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	adc083x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// static configuration helpers
 	static void set_input_callback(device_t &device, adc083x_input_delegate input_callback) { downcast<adc083x_device &>(device).m_input_callback = input_callback; }
@@ -62,27 +62,27 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-	INT32 m_mux_bits;
+	int32_t m_mux_bits;
 
 private:
-	UINT8 conversion();
+	uint8_t conversion();
 
 	void clear_sars();
 
 	// internal state
-	INT32 m_cs;
-	INT32 m_clk;
-	INT32 m_di;
-	INT32 m_se;
-	INT32 m_sars;
-	INT32 m_do;
-	INT32 m_sgl;
-	INT32 m_odd;
-	INT32 m_sel1;
-	INT32 m_sel0;
-	INT32 m_state;
-	INT32 m_bit;
-	INT32 m_output;
+	int32_t m_cs;
+	int32_t m_clk;
+	int32_t m_di;
+	int32_t m_se;
+	int32_t m_sars;
+	int32_t m_do;
+	int32_t m_sgl;
+	int32_t m_odd;
+	int32_t m_sel1;
+	int32_t m_sel0;
+	int32_t m_state;
+	int32_t m_bit;
+	int32_t m_output;
 
 	adc083x_input_delegate m_input_callback;
 };
@@ -90,7 +90,7 @@ private:
 class adc0831_device : public adc083x_device
 {
 public:
-	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0831_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC0831;
@@ -99,7 +99,7 @@ extern const device_type ADC0831;
 class adc0832_device : public adc083x_device
 {
 public:
-	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0832_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC0832;
@@ -108,7 +108,7 @@ extern const device_type ADC0832;
 class adc0834_device : public adc083x_device
 {
 public:
-	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0834_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC0834;
@@ -117,7 +117,7 @@ extern const device_type ADC0834;
 class adc0838_device : public adc083x_device
 {
 public:
-	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0838_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type ADC0838;

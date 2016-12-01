@@ -40,6 +40,14 @@ WRITE16_MEMBER(asterix_state::control2_w)
 
 		/* bit 5 is select tile bank */
 		m_k056832->set_tile_bank((data & 0x20) >> 5);
+		// TODO: looks like 0xffff is used from time to time for chip selection/reset something, not unlike Jackal
+		if((data & 0xff) != 0xff)
+		{
+			machine().bookkeeping().coin_counter_w(0, data & 0x08);
+			machine().bookkeeping().coin_counter_w(1, data & 0x10);
+			machine().bookkeeping().coin_lockout_w(0, data & 0x40);
+			machine().bookkeeping().coin_lockout_w(1, data & 0x80);
+		}
 	}
 }
 
@@ -60,7 +68,7 @@ void asterix_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in asterix_state::device_timer");
+		assert_always(false, "Unknown id in asterix_state::device_timer");
 	}
 }
 
@@ -85,13 +93,13 @@ WRITE16_MEMBER(asterix_state::protection_w)
 
 	if (offset == 1)
 	{
-		UINT32 cmd = (m_prot[0] << 16) | m_prot[1];
+		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
 		switch (cmd >> 24)
 		{
 		case 0x64:
 			{
-			UINT32 param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
-			UINT32 param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
+			uint32_t param1 = (read_word(cmd & 0xffffff) << 16) | read_word((cmd & 0xffffff) + 2);
+			uint32_t param2 = (read_word((cmd & 0xffffff) + 4) << 16) | read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
 			{
@@ -123,14 +131,14 @@ WRITE16_MEMBER(asterix_state::protection_w)
 
 	if (offset == 1)
 	{
-		UINT32 cmd = (m_prot[0] << 16) | m_prot[1];
+		uint32_t cmd = (m_prot[0] << 16) | m_prot[1];
 		switch (cmd >> 24)
 		{
 		case 0x64:
 		{
-			UINT32 param1 = (space.read_word(cmd & 0xffffff) << 16)
+			uint32_t param1 = (space.read_word(cmd & 0xffffff) << 16)
 				| space.read_word((cmd & 0xffffff) + 2);
-			UINT32 param2 = (space.read_word((cmd & 0xffffff) + 4) << 16)
+			uint32_t param2 = (space.read_word((cmd & 0xffffff) + 4) << 16)
 				| space.read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
@@ -424,8 +432,8 @@ ROM_END
 DRIVER_INIT_MEMBER(asterix_state,asterix)
 {
 #if 0
-	*(UINT16 *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
-	*(UINT16 *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
+	*(uint16_t *)(memregion("maincpu")->base() + 0x07f34) = 0x602a;
+	*(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x0400;
 #endif
 }
 

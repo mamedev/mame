@@ -75,14 +75,14 @@ ioport_constructor sv807_device::device_input_ports() const
 //  sv807_device - constructor
 //-------------------------------------------------
 
-sv807_device::sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sv807_device::sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SV803, "SV-807 64k RAM Cartridge", tag, owner, clock, "sv807", __FILE__),
 	device_svi_slot_interface(mconfig, *this),
 	m_switch(*this, "S"),
 	m_bk21(1), m_bk22(1), m_bk31(1), m_bk32(1)
 {
-	m_ram_bank1 = std::make_unique<UINT8[]>(0x8000);
-	m_ram_bank2 = std::make_unique<UINT8[]>(0x8000);
+	m_ram_bank1 = std::make_unique<uint8_t[]>(0x8000);
+	m_ram_bank2 = std::make_unique<uint8_t[]>(0x8000);
 	memset(m_ram_bank1.get(), 0xff, 0x8000);
 	memset(m_ram_bank2.get(), 0xff, 0x8000);
 }

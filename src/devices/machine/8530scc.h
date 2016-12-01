@@ -29,22 +29,22 @@ public:
 		IRQ_B_EXT
 	};
 
-	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	scc8530_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_intrq_wr_callback(device_t &device, _Object object) { return downcast<scc8530_t &>(device).intrq_cb.set_callback(object); }
 
-	UINT8 get_reg_a(int reg);
-	UINT8 get_reg_b(int reg);
-	void set_reg_a(int reg, UINT8 data);
-	void set_reg_b(int reg, UINT8 data);
+	uint8_t get_reg_a(int reg);
+	uint8_t get_reg_b(int reg);
+	void set_reg_a(int reg, uint8_t data);
+	void set_reg_b(int reg, uint8_t data);
 
 	void set_status(int status);
 
 	DECLARE_READ8_MEMBER(reg_r);
 	DECLARE_WRITE8_MEMBER(reg_w);
 
-	void write_reg(int offset, UINT8 data);
-	UINT8 read_reg(int offset);
+	void write_reg(int offset, uint8_t data);
+	uint8_t read_reg(int offset);
 
 protected:
 	virtual void device_start() override;
@@ -68,12 +68,12 @@ private:
 		bool syncHunt;
 		bool DCDEnable;
 		bool CTSEnable;
-		UINT8 rxData;
-		UINT8 txData;
+		uint8_t rxData;
+		uint8_t txData;
 
 		emu_timer *baudtimer;
 
-		UINT8 reg_val[16];
+		uint8_t reg_val[16];
 	};
 
 	int mode;
@@ -92,9 +92,9 @@ private:
 	void initchannel(int ch);
 	void resetchannel(int ch);
 	void acknowledge();
-	UINT8 getareg();
-	UINT8 getbreg();
-	void putreg(int ch, UINT8 data);
+	uint8_t getareg();
+	uint8_t getbreg();
+	void putreg(int ch, uint8_t data);
 };
 
 /***************************************************************************

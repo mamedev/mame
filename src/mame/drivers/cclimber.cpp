@@ -433,6 +433,27 @@ static ADDRESS_MAP_START( toprollr_map, AS_PROGRAM, 8, cclimber_state )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( bagmanf_map, AS_PROGRAM, 8, cclimber_state )
+	AM_RANGE(0x0000, 0x5fff) AM_ROM
+	AM_RANGE(0x6000, 0x6bff) AM_RAM             /* Crazy Kong only */
+	AM_RANGE(0x8000, 0x83ff) AM_RAM
+	AM_RANGE(0x8800, 0x88ff) AM_RAM AM_SHARE("bigspriteram")
+	AM_RANGE(0x8900, 0x8bff) AM_RAM             /* not used, but initialized */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_SHARE("videoram")
+	AM_RANGE(0xffe0, 0xffff) AM_RAM AM_SHARE("column_scroll") // wrong, is this area even connected?
+	AM_RANGE(0x9800, 0x981f) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x98dc, 0x98df) AM_RAM AM_SHARE("bigspritectrl") // wrong
+	AM_RANGE(0x9800, 0x9bff) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0x9c00, 0x9fff) AM_RAM  /* not used, but initialized */
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1") AM_WRITE(nmi_mask_w)
+	AM_RANGE(0xa001, 0xa002) AM_WRITEONLY AM_SHARE("flip_screen")
+	AM_RANGE(0xa004, 0xa004) AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_trigger_w)
+
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("P2") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_rate_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW") AM_DEVWRITE("cclimber_audio", cclimber_audio_device, sample_volume_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("SYSTEM")
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( toprollr_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cclimber_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROMBANK("bank1d")
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu", 0xc000)
@@ -589,6 +610,54 @@ static INPUT_PORTS_START( ckong )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bagmanf )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN4 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x03, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x00, "2C/1C 1C/1C 1C/3C 1C/7C" )
+	PORT_DIPSETTING(    0x04, "1C/1C 1C/2C 1C/6C 1C/14C" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Language ) )         PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(    0x40, "30000" )
+	PORT_DIPSETTING(    0x00, "40000" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) ) /* Cabinet type set through edge connector, not dip switch (verified on real pcb) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+
+	PORT_START("SYSTEM")
 INPUT_PORTS_END
 
 /* Similar to normal Crazy Kong except for the lives per game */
@@ -1035,6 +1104,12 @@ INTERRUPT_GEN_MEMBER(cclimber_state::vblank_irq)
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
+INTERRUPT_GEN_MEMBER(cclimber_state::bagmanf_vblank_irq)
+{
+	if(m_nmi_mask)
+		device.execute().set_input_line(0, HOLD_LINE);
+}
+
 static MACHINE_CONFIG_START( root, cclimber_state )
 
 	/* basic machine hardware */
@@ -1065,7 +1140,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cclimber, root )
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_CCLIMBER_AUDIO_ADD("cclimber_audio")
 MACHINE_CONFIG_END
@@ -1084,6 +1159,14 @@ static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 
 	/* video hardware */
 	MCFG_GFXDECODE_MODIFY("gfxdecode", cannonb)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bagmanf, cclimber )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bagmanf_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", cclimber_state, bagmanf_vblank_irq)
 MACHINE_CONFIG_END
 
 
@@ -1109,13 +1192,13 @@ static MACHINE_CONFIG_DERIVED( yamato, root )
 	MCFG_SCREEN_UPDATE_DRIVER(cclimber_state, screen_update_yamato)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1171,15 +1254,15 @@ static MACHINE_CONFIG_START( swimmer, cclimber_state )
 	MCFG_VIDEO_START_OVERRIDE(cclimber_state,swimmer)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( guzzler, swimmer )
@@ -2204,19 +2287,14 @@ ROM_START( bagmanf )
 	ROM_LOAD( "05.l5.bin",  0x4000, 0x1000, CRC(4f0088ab) SHA1(a8009f5b8517ba4d84fbc483b199f2514f24eae8) )
 	ROM_LOAD( "2732 05 pos dboard.bin",  0x5000, 0x1000, CRC(91570033) SHA1(7cd7fe9541da36c3919324bc65e6db1d1ca635e0) )
 
+	// not 100% trusted, but close (unless bad tiles are supposed to be masked by color)
 	ROM_REGION( 0x4000, "gfx1", 0 )
-	ROM_LOAD( "09.l11.bin", 0x0000, 0x0800, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
-	/* 0x0800-0x0fff - empty */
-	ROM_CONTINUE(           0x1000, 0x0800 )
-	/* 0x1800-0x0fff - empty */
-	ROM_LOAD( "11.h11.bin", 0x2000, 0x0800, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
-	/* 0x2800-0x0fff - empty */
-	ROM_CONTINUE(           0x3000, 0x0800 )
-	/* 0x3800-0x0fff - empty */
+	ROM_LOAD( "10.n11.bin",   0x2000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
+	ROM_LOAD( "09.l11.bin",   0x3000, 0x1000, CRC(060b044c) SHA1(3121f07adb661663a2303085eea1b662968f8f98) )
+	ROM_LOAD( "12.k11.bin",   0x0000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
+	ROM_LOAD( "11.h11.bin",   0x1000, 0x1000, CRC(8043bc1a) SHA1(bd2f3dfe26cf8d987d9ecaa41eac4bdc4e16a692) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 )
-	ROM_LOAD( "10.n11.bin",   0x0000, 0x1000, CRC(c680ef04) SHA1(79406bc786374abfcd9f548268c445b5c8d8858d) )
-	ROM_LOAD( "12.k11.bin",   0x1000, 0x1000, CRC(4a0a6b55) SHA1(955f8bd4bd9b0fc3c6c359c25ba543ba26c04cbd) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x0060, "proms", 0 )
 	ROM_LOAD( "v6",      0x0000, 0x0020, CRC(b3fc1505) SHA1(5b94adde0428a26b815c7eb9b3f3716470d349c7) )
@@ -2506,7 +2584,7 @@ DRIVER_INIT_MEMBER(cclimber_state,yamato)
 
 DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 {
-	m_opcodes = std::make_unique<UINT8[]>(0x6000*3);
+	m_opcodes = std::make_unique<uint8_t[]>(0x6000*3);
 
 	segacrpt_z80_device* cpu = (segacrpt_z80_device*)machine().device(":maincpu");
 
@@ -2532,7 +2610,7 @@ DRIVER_INIT_MEMBER(cclimber_state,toprollr)
 
 DRIVER_INIT_MEMBER(cclimber_state,dking)
 {
-	UINT8 *rom = memregion( "maincpu" )->base();
+	uint8_t *rom = memregion( "maincpu" )->base();
 	int i;
 	int j;
 
@@ -2542,6 +2620,19 @@ DRIVER_INIT_MEMBER(cclimber_state,dking)
 		for (i=0x0d00;i<0x1000;i++)  rom[i+j] ^=0xff;
 	}
 
+}
+
+DRIVER_INIT_MEMBER(cclimber_state,rpatrol)
+{
+	uint8_t *rom = memregion( "maincpu" )->base();
+
+	/* Bits are inverted */
+	for (int i = 0x0000; i < 0x5000; i++)
+	{
+		rom[i] = rom[i] ^ 0x79;
+		i++;
+		rom[i] = rom[i] ^ 0x5b;
+	}
 }
 
 
@@ -2576,15 +2667,15 @@ GAME( 1981, ckongpt2j,   ckongpt2, cclimber, ckong, driver_device,    0,        
 GAME( 1981, ckongpt2jeu, ckongpt2, cclimber, ckong, driver_device,    0,        ROT270, "bootleg (Jeutel)", "Crazy Kong Part II (Jeutel bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, ckongpt2b,   ckongpt2, cclimber, ckongb, cclimber_state,   ckongb,   ROT270, "bootleg", "Crazy Kong Part II (alternative levels)", MACHINE_SUPPORTS_SAVE )
 
-// see bagman.c for parent
-GAME( 1981, bagmanf,     bagman,   cclimber, ckong, driver_device,    0,        ROT270, "bootleg", "Bagman (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+// see bagman.cpp for parent
+GAME( 1982, bagmanf,     bagman,   bagmanf,  bagmanf, driver_device,    0,        ROT270, "bootleg", "Le Bagnard (bootleg on Crazy Kong hardware)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1981, rpatrol,     0,        cclimber, rpatrol, driver_device,  0,        ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // TODO: encrypted, suicide battery on PCB
+GAME( 1981, rpatrol,     0,        cclimber, rpatrol, cclimber_state,  rpatrol,  ROT0,   "Orca", "River Patrol (Japan)", MACHINE_SUPPORTS_SAVE)
 GAME( 1981, rpatrola,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, rpatrolb,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "bootleg", "River Patrol (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, silvland,    rpatrol,  cclimber, rpatrol, driver_device,  0,        ROT0,   "Falcon", "Silver Land", MACHINE_SUPPORTS_SAVE )
 
-// see pacman.c for parent
+// see pacman.cpp for parent
 GAME( 1985, cannonb,     cannonbp, cannonb,  cannonb, cclimber_state,  cannonb,  ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 1, buggy)" , MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb2,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (TV Game Gruenberg)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 2, buggy)", MACHINE_SUPPORTS_SAVE ) // bootleggers missed protection after bonus game
 GAME( 1985, cannonb3,    cannonbp, cannonb,  cannonb, cclimber_state,  cannonb2, ROT90,  "bootleg (Soft)", "Cannon Ball (bootleg on Crazy Kong hardware) (set 3, no bonus game)", MACHINE_SUPPORTS_SAVE ) // the bonus game is patched out, thus avoiding the protection issue

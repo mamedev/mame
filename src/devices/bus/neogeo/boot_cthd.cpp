@@ -19,12 +19,12 @@
 const device_type NEOGEO_CTHD2K3_CART = &device_creator<neogeo_cthd2k3_cart>;
 
 
-neogeo_cthd2k3_cart::neogeo_cthd2k3_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT16 clock, const char *shortname, const char *source) :
+neogeo_cthd2k3_cart::neogeo_cthd2k3_cart(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint16_t clock, const char *shortname, const char *source) :
 	neogeo_rom_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_prot(*this, "cthd_prot")
 {}
 
-neogeo_cthd2k3_cart::neogeo_cthd2k3_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT16 clock) :
+neogeo_cthd2k3_cart::neogeo_cthd2k3_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint16_t clock) :
 	neogeo_rom_device(mconfig, NEOGEO_CTHD2K3_CART, "Neo Geo CTHD 2003 Cart", tag, owner, clock, "neocart_ct2k3", __FILE__),
 	m_prot(*this, "cthd_prot")
 {}
@@ -76,7 +76,7 @@ void neogeo_cthd2k3_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_CT2K3SP_CART = &device_creator<neogeo_ct2k3sp_cart>;
 
-neogeo_ct2k3sp_cart::neogeo_ct2k3sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_ct2k3sp_cart::neogeo_ct2k3sp_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_CT2K3SP_CART, "Neo Geo CTHD 2003 Sp Cart", tag, owner, clock, "neocart_ct2k3sp", __FILE__)
 {}
 
@@ -92,7 +92,7 @@ void neogeo_ct2k3sp_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_CT2K3SA_CART = &device_creator<neogeo_ct2k3sa_cart>;
 
-neogeo_ct2k3sa_cart::neogeo_ct2k3sa_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_ct2k3sa_cart::neogeo_ct2k3sa_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_CT2K3SA_CART, "Neo Geo CTHD 2003 Sp Alt Cart", tag, owner, clock, "neocart_ct2k3sa", __FILE__)
 {}
 
@@ -109,7 +109,7 @@ void neogeo_ct2k3sa_cart::decrypt_all(DECRYPT_ALL_PARAMS)
 
 const device_type NEOGEO_MATRIMBL_CART = &device_creator<neogeo_matrimbl_cart>;
 
-neogeo_matrimbl_cart::neogeo_matrimbl_cart(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_matrimbl_cart::neogeo_matrimbl_cart(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	neogeo_cthd2k3_cart(mconfig, NEOGEO_MATRIMBL_CART, "Neo Geo Matrimelee Bootleg Cart", tag, owner, clock, "neocart_matrimbl", __FILE__),
 	m_cmc_prot(*this, "cmc_prot"),
 	m_kof2k2_prot(*this, "kof2k2_prot")

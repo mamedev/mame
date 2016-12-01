@@ -144,24 +144,24 @@
 void atarisy2_state::update_interrupts()
 {
 	if (m_video_int_state)
-		m_maincpu->set_input_line(8, ASSERT_LINE);
+		m_maincpu->set_input_line(3, ASSERT_LINE);
 	else
-		m_maincpu->set_input_line(8, CLEAR_LINE);
+		m_maincpu->set_input_line(3, CLEAR_LINE);
 
 	if (m_scanline_int_state)
-		m_maincpu->set_input_line(4, ASSERT_LINE);
-	else
-		m_maincpu->set_input_line(4, CLEAR_LINE);
-
-	if (m_p2portwr_state)
 		m_maincpu->set_input_line(2, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(2, CLEAR_LINE);
 
-	if (m_p2portrd_state)
+	if (m_p2portwr_state)
 		m_maincpu->set_input_line(1, ASSERT_LINE);
 	else
 		m_maincpu->set_input_line(1, CLEAR_LINE);
+
+	if (m_p2portrd_state)
+		m_maincpu->set_input_line(0, ASSERT_LINE);
+	else
+		m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -421,9 +421,9 @@ READ8_MEMBER(atarisy2_state::leta_r)
 
 			case 2: /* Fake Spinner */
 			{
-				INT32  diff;
-				UINT32 temp;
-				UINT32 rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
+				int32_t  diff;
+				uint32_t temp;
+				uint32_t rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
 				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
 				 * we use it to generate the LETA0 Center encoder count
 				 */
@@ -522,7 +522,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
     Also the CH1 output is referenced to 2.5V.  Anything
     above is positive, below is negative.  Then amplified
     by 6.556 and clipped to -15V and (15V-1.5V=13.5V).
-    This is usefull to work out the relative signal levels
+    This is useful to work out the relative signal levels
     of each effect.
 
     This then goes to the stage you were asking about.  We
@@ -3157,7 +3157,7 @@ ROM_END
 DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3186,7 +3186,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3201,7 +3201,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 

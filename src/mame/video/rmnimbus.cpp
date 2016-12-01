@@ -49,7 +49,7 @@
 
 READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 
 	switch (offset)
 	{
@@ -98,9 +98,9 @@ READ16_MEMBER(rmnimbus_state::nimbus_video_io_r)
 	return result;
 }
 
-UINT8 rmnimbus_state::get_pixel(UINT16 x, UINT16 y)
+uint8_t rmnimbus_state::get_pixel(uint16_t x, uint16_t y)
 {
-	UINT8   result = 0;
+	uint8_t   result = 0;
 
 	if((x<640) && (y<250))
 	{
@@ -113,9 +113,9 @@ UINT8 rmnimbus_state::get_pixel(UINT16 x, UINT16 y)
 	return result;
 }
 
-UINT16 rmnimbus_state::read_pixel_line(UINT16 x, UINT16 y, UINT8 pixels, UINT8 bpp)
+uint16_t rmnimbus_state::read_pixel_line(uint16_t x, uint16_t y, uint8_t pixels, uint8_t bpp)
 {
-	UINT16 colour = 0;
+	uint16_t colour = 0;
 	int i;
 	x *= pixels;
 
@@ -134,9 +134,9 @@ UINT16 rmnimbus_state::read_pixel_line(UINT16 x, UINT16 y, UINT8 pixels, UINT8 b
 	return colour | get_pixel(x + i, y);
 }
 
-UINT16 rmnimbus_state::read_pixel_data(UINT16 x, UINT16 y)
+uint16_t rmnimbus_state::read_pixel_data(uint16_t x, uint16_t y)
 {
-	UINT16  result=0;
+	uint16_t  result=0;
 
 	if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
 		logerror("read_pixel_data(x=%d, y=%d), reg022=%04X\n",x,y,m_op);
@@ -204,7 +204,7 @@ UINT16 rmnimbus_state::read_pixel_data(UINT16 x, UINT16 y)
 
 WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
 {
-	UINT16 colours = data;
+	uint16_t colours = data;
 	if(offset < 0x14)
 	{
 		if(DEBUG_SET(DEBUG_TEXT))
@@ -287,7 +287,7 @@ WRITE16_MEMBER(rmnimbus_state::nimbus_video_io_w)
 		write_pixel_data(m_x, m_y, colours);
 }
 
-void rmnimbus_state::set_pixel(UINT16 x, UINT16 y, UINT8 colour)
+void rmnimbus_state::set_pixel(uint16_t x, uint16_t y, uint8_t colour)
 {
 	if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
 		logerror("set_pixel(x=%d, y=%d, colour=%04X), IS_XOR=%02X\n",x,y,colour,IS_XOR);
@@ -301,16 +301,16 @@ void rmnimbus_state::set_pixel(UINT16 x, UINT16 y, UINT8 colour)
 	}
 }
 
-void rmnimbus_state::set_pixel40( UINT16 x, UINT16 y, UINT8 colour)
+void rmnimbus_state::set_pixel40( uint16_t x, uint16_t y, uint8_t colour)
 {
 	set_pixel((x*2),y,colour);
 	set_pixel((x*2)+1,y,colour);
 }
 
-void rmnimbus_state::write_pixel_line(UINT16 x, UINT16 y, UINT16 data, UINT8 pixels, UINT8 bpp)
+void rmnimbus_state::write_pixel_line(uint16_t x, uint16_t y, uint16_t data, uint8_t pixels, uint8_t bpp)
 {
-	UINT8 colour;
-	UINT8 mask = (1 << bpp) - 1;
+	uint8_t colour;
+	uint8_t mask = (1 << bpp) - 1;
 	x *= pixels;
 
 	if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
@@ -334,7 +334,7 @@ void rmnimbus_state::write_pixel_line(UINT16 x, UINT16 y, UINT16 data, UINT8 pix
 	}
 }
 
-void rmnimbus_state::move_pixel_line(UINT16 x, UINT16 y, UINT8 pixels)
+void rmnimbus_state::move_pixel_line(uint16_t x, uint16_t y, uint8_t pixels)
 {
 	x *= pixels;
 	if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
@@ -375,7 +375,7 @@ void rmnimbus_state::move_pixel_line(UINT16 x, UINT16 y, UINT8 pixels)
     1   pixels are xor'ed onto the screen
 */
 
-void rmnimbus_state::write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
+void rmnimbus_state::write_pixel_data(uint16_t x, uint16_t y, uint16_t    data)
 {
 	if(DEBUG_SET(DEBUG_TEXT | DEBUG_PIXEL))
 		logerror("write_pixel_data(x=%d, y=%d, data=%04X), reg022=%04X\n",x,y,data,m_op);
@@ -456,7 +456,7 @@ void rmnimbus_state::write_pixel_data(UINT16 x, UINT16 y, UINT16    data)
 	}
 }
 
-void rmnimbus_state::change_palette(UINT8 bank, UINT16 colours)
+void rmnimbus_state::change_palette(uint8_t bank, uint16_t colours)
 {
 	// loop over changing colours
 	for(int colourno = (bank * 4); colourno < ((bank + 1) * 4); colourno++)
@@ -507,7 +507,7 @@ void rmnimbus_state::video_reset()
 	m_yline = 0;
 }
 
-UINT32 rmnimbus_state::screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rmnimbus_state::screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_video_mem, 0, 0, 0, 0, cliprect);
 

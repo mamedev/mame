@@ -203,7 +203,7 @@ static MACHINE_CONFIG_START( kayproii, kaypro_state )
 	MCFG_MACHINE_RESET_OVERRIDE(kaypro_state, kaypro )
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(80*7, 24*10)
@@ -329,8 +329,8 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER( kaypro_state, kaypro )
 {
-	UINT8 *main = memregion("roms")->base();
-	UINT8 *ram = memregion("rambank")->base();
+	uint8_t *main = memregion("roms")->base();
+	uint8_t *ram = memregion("rambank")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &ram[0x0000]);

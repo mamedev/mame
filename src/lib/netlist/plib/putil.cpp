@@ -22,7 +22,7 @@ namespace plib
 				if (ret == "")
 					ret = elem;
 				else
-					#ifdef WIN32
+					#ifdef _WIN32
 					ret = ret + '\\' + elem;
 					#else
 					ret = ret + '/' + elem;

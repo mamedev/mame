@@ -84,7 +84,7 @@ ioport_constructor neogeo_kizuna4p_device::device_input_ports() const
 //  neogeo_kizuna4p_device - constructor
 //-------------------------------------------------
 
-neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+neogeo_kizuna4p_device::neogeo_kizuna4p_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, NEOGEO_KIZ4P, "SNK Neo Geo Kizuna 4P Controller", tag, owner, clock, "neogeo_kiz4p", __FILE__),
 					device_neogeo_ctrl_edge_interface(mconfig, *this),
 					m_joy1(*this, "JOY1"),
@@ -123,7 +123,7 @@ void neogeo_kizuna4p_device::device_reset()
 
 READ8_MEMBER(neogeo_kizuna4p_device::in0_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	if (m_ctrl_sel & 0x01)
 		res = m_joy3->read();
 	else
@@ -140,7 +140,7 @@ READ8_MEMBER(neogeo_kizuna4p_device::in0_r)
 
 READ8_MEMBER(neogeo_kizuna4p_device::in1_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	if (m_ctrl_sel & 0x01)
 		res = m_joy4->read();
 	else
@@ -155,7 +155,7 @@ READ8_MEMBER(neogeo_kizuna4p_device::in1_r)
 //  read_start_sel
 //-------------------------------------------------
 
-UINT8 neogeo_kizuna4p_device::read_start_sel()
+uint8_t neogeo_kizuna4p_device::read_start_sel()
 {
 	return (BIT(m_ss1->read(), m_ctrl_sel & 0x01)) | (BIT(m_ss2->read(), m_ctrl_sel & 0x01) << 2);
 }
@@ -165,7 +165,7 @@ UINT8 neogeo_kizuna4p_device::read_start_sel()
 //  write_ctrlsel
 //-------------------------------------------------
 
-void neogeo_kizuna4p_device::write_ctrlsel(UINT8 data)
+void neogeo_kizuna4p_device::write_ctrlsel(uint8_t data)
 {
 	m_ctrl_sel = data;
 }

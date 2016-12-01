@@ -23,7 +23,7 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_cassette(nullptr),
@@ -138,7 +138,7 @@ void cassette_image_device::change_state(cassette_state state, cassette_state ma
 
 double cassette_image_device::input()
 {
-	INT32 sample;
+	int32_t sample;
 	double double_value;
 
 	update();
@@ -161,7 +161,7 @@ void cassette_image_device::output(double value)
 		value = std::min(value, 1.0);
 		value = std::max(value, -1.0);
 
-		m_value = (INT32) (value * 0x7FFFFFFF);
+		m_value = (int32_t) (value * 0x7FFFFFFF);
 	}
 }
 
@@ -263,36 +263,42 @@ image_init_result cassette_image_device::call_load()
 
 image_init_result cassette_image_device::internal_load(bool is_create)
 {
-	casserr_t err;
-	int cassette_flags;
-	int is_writable;
+	cassette_image::error err;
 	device_image_interface *image = nullptr;
 	interface(image);
 
-	if (is_create || (length() == 0))
+	if (is_create)
 	{
-		/* creating an image */
+		// creating an image
 		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 	else
 	{
-		/* opening an image */
+		// opening an image
+		bool retry;
 		do
 		{
-			is_writable = !is_readonly();
-			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			std::string fname;
-			err = cassette_open_choices((void *)image, &image_ioprocs, filetype().c_str(), m_formats, cassette_flags, &m_cassette);
+			// we probably don't want to retry...
+			retry = false;
 
-			/* this is kind of a hack */
-			if (err && is_writable)
+			// try opening the cassette
+			int cassette_flags = is_readonly()
+				? CASSETTE_FLAG_READONLY
+				: (CASSETTE_FLAG_READWRITE | CASSETTE_FLAG_SAVEONEXIT);
+			err = cassette_open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, &m_cassette);
+
+			// special case - if we failed due to readwrite not being supported, make the image be read only and retry
+			if (err == cassette_image::error::READ_WRITE_UNSUPPORTED)
+			{
 				make_readonly();
+				retry = true;
+			}
 		}
-		while(err && is_writable);
+		while(retry);
 
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 
@@ -314,16 +320,16 @@ error:
 	image_error_t imgerr = IMAGE_ERROR_UNSPECIFIED;
 	switch(err)
 	{
-		case CASSETTE_ERROR_INTERNAL:
+		case cassette_image::error::INTERNAL:
 			imgerr = IMAGE_ERROR_INTERNAL;
 			break;
-		case CASSETTE_ERROR_UNSUPPORTED:
+		case cassette_image::error::UNSUPPORTED:
 			imgerr = IMAGE_ERROR_UNSUPPORTED;
 			break;
-		case CASSETTE_ERROR_OUTOFMEMORY:
+		case cassette_image::error::OUT_OF_MEMORY:
 			imgerr = IMAGE_ERROR_OUTOFMEMORY;
 			break;
-		case CASSETTE_ERROR_INVALIDIMAGE:
+		case cassette_image::error::INVALID_IMAGE:
 			imgerr = IMAGE_ERROR_INVALIDIMAGE;
 			break;
 		default:

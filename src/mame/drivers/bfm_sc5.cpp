@@ -28,7 +28,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 	// clearly a duart of some kind, write patterns are the same as SC4 games
 //  printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 
-	if (mem_mask &0xff00)
+	if (ACCESSING_BITS_8_15)
 	{
 		m_duart->write(space,offset,(data>>8)&0x00ff);
 	}

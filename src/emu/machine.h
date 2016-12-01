@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MACHINE_H__
-#define __MACHINE_H__
+#ifndef MAME_EMU_MACHINE_H
+#define MAME_EMU_MACHINE_H
 
 #include <functional>
 
@@ -107,26 +107,53 @@ class system_time
 {
 public:
 	system_time();
+	explicit system_time(time_t t);
 	void set(time_t t);
 
 	struct full_time
 	{
 		void set(struct tm &t);
 
-		UINT8       second;     // seconds (0-59)
-		UINT8       minute;     // minutes (0-59)
-		UINT8       hour;       // hours (0-23)
-		UINT8       mday;       // day of month (1-31)
-		UINT8       month;      // month (0-11)
-		INT32       year;       // year (1=1 AD)
-		UINT8       weekday;    // day of week (0-6)
-		UINT16      day;        // day of year (0-365)
-		UINT8       is_dst;     // is this daylight savings?
+		u8          second;     // seconds (0-59)
+		u8          minute;     // minutes (0-59)
+		u8          hour;       // hours (0-23)
+		u8          mday;       // day of month (1-31)
+		u8          month;      // month (0-11)
+		s32         year;       // year (1=1 AD)
+		u8          weekday;    // day of week (0-6)
+		u16         day;        // day of year (0-365)
+		u8          is_dst;     // is this daylight savings?
 	};
 
-	INT64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
+	s64           time;       // number of seconds elapsed since midnight, January 1 1970 UTC
 	full_time       local_time; // local time
 	full_time       utc_time;   // UTC coordinated time
+};
+
+
+
+// ======================> dummy_space_device
+
+// a dummy address space for passing to handlers outside of the memory system
+
+class dummy_space_device : public device_t,
+	public device_memory_interface
+{
+public:
+	dummy_space_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+
+	DECLARE_READ8_MEMBER(read);
+	DECLARE_WRITE8_MEMBER(write);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+
+	// device_memory_interface overrides
+	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
+
+private:
+	const address_space_config  m_space_config;
 };
 
 
@@ -141,6 +168,7 @@ class running_machine
 	DISABLE_COPYING(running_machine);
 
 	friend class sound_manager;
+	friend class memory_manager;
 
 	typedef std::function<void(const char*)> logerror_callback;
 
@@ -226,13 +254,15 @@ public:
 	// date & time
 	void base_datetime(system_time &systime);
 	void current_datetime(system_time &systime);
+	void set_rtc_datetime(const system_time &systime);
 
 	// misc
+	address_space &dummy_space() const { return m_dummy_space.space(AS_PROGRAM); }
 	void popmessage() const { popmessage(static_cast<char const *>(nullptr)); }
 	template <typename Format, typename... Params> void popmessage(Format &&fmt, Params &&... args) const;
 	template <typename Format, typename... Params> void logerror(Format &&fmt, Params &&... args) const;
 	void strlog(const char *str) const;
-	UINT32 rand();
+	u32 rand();
 	const char *describe_context();
 	std::string compose_saveload_filename(const char *base_filename, const char **searchpath = nullptr);
 
@@ -245,7 +275,7 @@ private:
 
 public:
 	// debugger-related information
-	UINT32                  debug_flags;        // the current debug flags
+	u32                     debug_flags;        // the current debug flags
 
 private:
 	// internal helpers
@@ -255,7 +285,7 @@ private:
 	void set_saveload_filename(const char *filename);
 	std::string get_statename(const char *statename_opt) const;
 	void handle_saveload();
-	void soft_reset(void *ptr = nullptr, INT32 param = 0);
+	void soft_reset(void *ptr = nullptr, s32 param = 0);
 	std::string nvram_filename(device_t &device) const;
 	void nvram_load();
 	void nvram_save();
@@ -302,7 +332,7 @@ private:
 	emu_timer *             m_soft_reset_timer;     // timer used to schedule a soft reset
 
 	// misc state
-	UINT32                  m_rand_seed;            // current random number seed
+	u32                     m_rand_seed;            // current random number seed
 	bool                    m_ui_active;            // ui active or not (useful for games / systems with keyboard inputs)
 	time_t                  m_base_time;            // real time at initial emulation time
 	std::string             m_basename;             // basename used for game-related paths
@@ -354,6 +384,9 @@ private:
 
 	// string formatting buffer
 	mutable util::ovectorstream m_string_buffer;
+
+	// configuration state
+	dummy_space_device m_dummy_space;
 };
 
 
@@ -403,4 +436,4 @@ inline void running_machine::logerror(Format &&fmt, Params &&... args) const
 	}
 }
 
-#endif  /* __MACHINE_H__ */
+#endif  /* MAME_EMU_MACHINE_H */

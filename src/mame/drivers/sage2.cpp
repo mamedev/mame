@@ -37,7 +37,7 @@
 
 READ8_MEMBER( sage2_state::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_reset || (offset >= 0xfe0000 && offset < 0xff4000))
 	{
@@ -296,7 +296,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data = m_fdc->get_irq();
@@ -557,7 +557,7 @@ DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 DRIVER_INIT_MEMBER(sage2_state,sage2)
 {
 	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), this));
+	program.set_direct_update_handler(direct_update_delegate(&sage2_state::sage2_direct_update_handler, this));
 }
 
 

@@ -24,7 +24,6 @@
 
  misc non-modular/non-68K boards
 
- RISC 2500 (Skeleton, does not work, and not sure the same internal chessboard connections are used)
  Academy 65C02 4.9152mhz
  Monte Carlo IV, Mega IV and any others not listed above have correct ROM/RAM and maybe LCD, not much else for now
 
@@ -81,7 +80,6 @@ Bit 5+6  LED 1-8 enable
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6502/m65c02.h"
-#include "cpu/arm/arm.h"
 #include "sound/beep.h"
 //#include "machine/mos6551.h"
 #include "video/hd44780.h"
@@ -90,31 +88,31 @@ Bit 5+6  LED 1-8 enable
 
 #include "machine/nvram.h"
 
-//static UINT16 unknown2_data = 0;
+//static uint16_t unknown2_data = 0;
 // Berlin Pro 68020
-static UINT32 BPL32latch_data = 0;
+static uint32_t BPL32latch_data = 0;
 
 
 // Mephisto Academy
-static UINT8 academyallowNMI = 0;
+static uint8_t academyallowNMI = 0;
 
 //Monte Carlo IV key/board selects
 
-static UINT8 monteciv_select[2] = { 0xff,0xff };
-static UINT8 montecivtop = 0, montecivbot = 0;
-static UINT8 montecivtopnew = 0, montecivbotnew = 0;
+static uint8_t monteciv_select[2] = { 0xff,0xff };
+static uint8_t montecivtop = 0, montecivbot = 0;
+static uint8_t montecivtopnew = 0, montecivbotnew = 0;
 
 //Mephisto Mega IV latch
-UINT8 latch2400 = 0;
+uint8_t latch2400 = 0;
 
-UINT8 diablo68_3c0000 = 0;
+uint8_t diablo68_3c0000 = 0;
 
-UINT8 sfortea_latch = 0;
+uint8_t sfortea_latch = 0;
 
 
 INPUT_PORTS_EXTERN( chessboard );
 
-UINT8 lcd32_char;
+uint8_t lcd32_char;
 
 class polgar_state : public driver_device
 {
@@ -130,10 +128,10 @@ public:
 	optional_device<hd44780_device> m_lcdc;
 	optional_device<beep_device> m_beeper;
 
-	UINT8 led_status;
-	UINT8 lcd_char;
-	//UINT8 led7;
-	UINT8 latch_data;
+	uint8_t led_status;
+	uint8_t lcd_char;
+	//uint8_t led7;
+	uint8_t latch_data;
 	DECLARE_WRITE8_MEMBER(write_polgar_IO);
 	DECLARE_WRITE8_MEMBER(write_LCD_polgar);
 	DECLARE_READ8_MEMBER(read_1ff1_sfortea);
@@ -180,8 +178,6 @@ public:
 	DECLARE_WRITE16_MEMBER(write_unknown2);
 	DECLARE_READ32_MEMBER(read_unknown3_32);
 	DECLARE_READ16_MEMBER(read_unknown3);
-	DECLARE_READ32_MEMBER(read_1800000);
-	DECLARE_WRITE32_MEMBER(write_1000000);
 	DECLARE_DRIVER_INIT(polgar);
 	DECLARE_MACHINE_START(polgar);
 	DECLARE_MACHINE_RESET(polgar);
@@ -192,7 +188,6 @@ public:
 	DECLARE_MACHINE_RESET(monteciv);
 	DECLARE_MACHINE_START(diablo68);
 	DECLARE_MACHINE_START(van16);
-	DECLARE_MACHINE_START(risc);
 	DECLARE_MACHINE_RESET(academy);
 	DECLARE_PALETTE_INIT(chess_lcd);
 	TIMER_DEVICE_CALLBACK_MEMBER(cause_nmi);
@@ -201,12 +196,12 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq2);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_update_irq_academy);
 	void common_chess_start();
-	UINT8 convert_imputmask(UINT8 input);
-	UINT8 convertMCIV2LED(UINT8 codedchar);
+	uint8_t convert_imputmask(uint8_t input);
+	uint8_t convertMCIV2LED(uint8_t codedchar);
 	void write_IOenable(unsigned char data,address_space &space);
 };
 
-UINT8 polgar_state::convert_imputmask(UINT8 input)
+uint8_t polgar_state::convert_imputmask(uint8_t input)
 {
 	input^=0xff;
 	switch (input) {
@@ -275,7 +270,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_polgar)
 
 READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 {
-	UINT8 data;
+	uint8_t data;
 	data = ioport("BUTTONS_SFOR1")->read();
 	logerror("1ff0 data %02x\n",data);
 	return 0;
@@ -284,13 +279,13 @@ READ8_MEMBER(polgar_state::read_1ff1_sfortea)
 
 READ8_MEMBER(polgar_state::read_1ff0_sfortea)
 {
-	UINT8 data;
+	uint8_t data;
 	data = ioport("BUTTONS_SFOR2")->read();
 	logerror("1ff0 data %02x\n",data);
 	return 0;
 //  return data;
 
-//  static UINT8 temp = 0;
+//  static uint8_t temp = 0;
 //  temp++;
 //  logerror("read 1ff0 %02x\n",temp);
 //  printf("read 1ff0 %02x\n",temp);
@@ -356,7 +351,7 @@ WRITE8_MEMBER(polgar_state::write_LCD_academy)
 READ16_MEMBER(polgar_state::diablo68_aciaread)
 {
 //  device_t *acia = machine().device("acia65c51");
-    UINT16 result;
+    uint16_t result;
 //  result = acia_6551_r(acia, offset & 0x03);
 //  logerror("ACIA read offset %02x\n",offset);
 //  printf("ACIA read offset %02x\n",offset);
@@ -398,7 +393,7 @@ WRITE16_MEMBER(polgar_state::diablo68_write_LCD)
 
 WRITE8_MEMBER(polgar_state::milano_write_LED)
 {
-	UINT8 LED_offset = 100;
+	uint8_t LED_offset = 100;
 	if (data == 0xff)   output().set_led_value(LED_offset+offset,1);
 	else                output().set_led_value(LED_offset+offset,0);
 
@@ -524,9 +519,9 @@ WRITE8_MEMBER(polgar_state::polgar_write_LED)
 	logerror("LEDs  Offset = %d Data = %d\n",offset,data);
 }
 
-UINT8 polgar_state::convertMCIV2LED(UINT8 codedchar)
+uint8_t polgar_state::convertMCIV2LED(uint8_t codedchar)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if (BIT(codedchar,0)) data |= 0x80;
 	if (BIT(codedchar,1)) data |= 0x01;
 	if (BIT(codedchar,2)) data |= 0x20;
@@ -541,8 +536,8 @@ UINT8 polgar_state::convertMCIV2LED(UINT8 codedchar)
 WRITE8_MEMBER(polgar_state::monteciv_write_LCD)
 // first write == 00 (start) then 8 writes (to 74595) x 4 chars, then ff to finish
 {
-	static UINT8 charstodisplay[4] = { 0,0,0,0 };
-	static UINT8 tempchar = 0,shift = 0, whichchar = 0;
+	static uint8_t charstodisplay[4] = { 0,0,0,0 };
+	static uint8_t tempchar = 0,shift = 0, whichchar = 0;
 
 	if ((montecivtop == 0) && (montecivbot == 0)) {  // if both are 0 then no screen chosen
 		montecivbotnew = 1;
@@ -646,8 +641,8 @@ READ8_MEMBER(polgar_state::milano_read_board)
 	static const char *const board_lines[8] =
 			{ "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
-	UINT8 data = 0x00;
-	UINT8 tmp; // = 0xff;
+	uint8_t data = 0x00;
+	uint8_t tmp; // = 0xff;
 
 	if (latch_data)
 	{
@@ -665,7 +660,7 @@ READ8_MEMBER(polgar_state::milano_read_board)
 
 READ8_MEMBER(polgar_state::read_keys)
 {
-	UINT8 data;
+	uint8_t data;
 	static const char *const keynames[1][8] =
 	{
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
@@ -678,7 +673,7 @@ READ8_MEMBER(polgar_state::read_keys)
 
 READ8_MEMBER(polgar_state::read_keys_megaiv)
 {
-	UINT8 data;
+	uint8_t data;
 	static const char *const keynames[1][8] =
 	{
 		{ "KEY1_0", "KEY1_1", "KEY1_2", "KEY1_3", "KEY1_4", "KEY1_5", "KEY1_6", "KEY1_7" }
@@ -692,8 +687,8 @@ READ8_MEMBER(polgar_state::read_keys_megaiv)
 
 READ32_MEMBER(polgar_state::read_keys_BPL32)
 {
-	UINT32 data = 0;
-	UINT8 tmp = 0xff, line = 0;
+	uint32_t data = 0;
+	uint8_t tmp = 0xff, line = 0;
 	static const char *const board_lines[8] =
 			{ "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
@@ -741,7 +736,7 @@ WRITE8_MEMBER(polgar_state::monteciv_select_line)
 // FIXME : unlike polgar, academy shares port IO for keys and board, and i just can't seem to get the board latched right (H7 and H8 are always flashing) -- Cow
 READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (monteciv_select[0] == 0xff && monteciv_select[1] == 0xff) {
 			//data = mboard_read_board_8(space,0);
@@ -773,8 +768,8 @@ READ8_MEMBER(polgar_state::read_keys_board_monteciv)
 READ8_MEMBER(polgar_state::read_keys_board_academy)
 {
 //  static int startup = 0;
-	UINT8 data = 0;
-//  UINT8 tmp = 0xff, line = 0;
+	uint8_t data = 0;
+//  uint8_t tmp = 0xff, line = 0;
 //  static const char *const board_lines[8] =
 //          { "LINE.0", "LINE.1", "LINE.2", "LINE.3", "LINE.4", "LINE.5", "LINE.6", "LINE.7" };
 
@@ -821,7 +816,7 @@ WRITE32_MEMBER(polgar_state::write_board_BPL32)
 
 READ32_MEMBER(polgar_state::read_buttons_gen32)
 {
-	UINT32 data;
+	uint32_t data;
 	static const char *const keynames[4] = { "BUTTON_1", "BUTTON_2", "", "BUTTON_3" };
 
 	data = ioport(keynames[offset])->read();
@@ -833,7 +828,7 @@ READ32_MEMBER(polgar_state::read_buttons_gen32)
 
 READ32_MEMBER(polgar_state::read_buttons_van32)
 {
-	UINT32 data;
+	uint32_t data;
 	static const char *const keynames[4] = { "BUTTON_1", "", "BUTTON_2", "BUTTON_3" };
 
 
@@ -846,7 +841,7 @@ READ32_MEMBER(polgar_state::read_buttons_van32)
 
 READ16_MEMBER(polgar_state::read_buttons_van16)
 {
-	UINT16 data;
+	uint16_t data;
 	static const char *const keynames[3] = { "BUTTON_1", "BUTTON_2", "BUTTON_3" };
 
 
@@ -957,16 +952,6 @@ READ16_MEMBER(polgar_state::read_unknown3)
 
 }
 
-READ32_MEMBER(polgar_state::read_1800000)
-{
-	logerror("Read from RISC2500 1800000\n");
-	return 0;
-}
-
-WRITE32_MEMBER(polgar_state::write_1000000)
-{
-	logerror("Write to  RISC2500 1000000\n");
-}
 
 TIMER_DEVICE_CALLBACK_MEMBER(polgar_state::timer_update_irq6)
 {
@@ -992,16 +977,11 @@ MACHINE_START_MEMBER(polgar_state,van32)
 // patch LCD delay loop on the 68030 machines until waitstates and/or opcode timings are fixed in MAME core
 // patches gen32 gen32_41 lond030
 
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	if(rom[0x870] == 0x0c && rom[0x871] == 0x78) {
 		rom[0x870] = 0x38;
 	}
-}
-
-
-MACHINE_START_MEMBER(polgar_state,risc)
-{
 }
 
 
@@ -1179,14 +1159,6 @@ static ADDRESS_MAP_START(alm32_mem, AS_PROGRAM, 32, polgar_state )
 
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START(risc_mem, AS_PROGRAM, 32, polgar_state )
-
-	AM_RANGE( 0x02000000,  0x0201ffff )  AM_ROM AM_REGION("maincpu", 0) // AM_MIRROR(0x2000000)
-	AM_RANGE( 0x01000000,  0x01000003 )  AM_WRITE(write_1000000 )
-	AM_RANGE( 0x01800000,  0x01800003 )  AM_READ(read_1800000 )
-	AM_RANGE( 0x00000000,  0x0001ffff )  AM_RAM
-
-	ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(van16_mem, AS_PROGRAM, 16, polgar_state )
 
@@ -1639,18 +1611,6 @@ static MACHINE_CONFIG_START( van32, polgar_state )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( risc, polgar_state )
-	MCFG_CPU_ADD("maincpu", ARM, 14000000)
-	MCFG_CPU_PROGRAM_MAP(risc_mem)
-	MCFG_MACHINE_START_OVERRIDE(polgar_state,risc)
-	MCFG_MACHINE_RESET_OVERRIDE(polgar_state,van16)
-	//MCFG_TIMER_DRIVER_ADD_PERIODIC("artwork_timer", polgar_state, mboard_update_artwork, attotime::from_hz(120))
-
-	MCFG_FRAGMENT_ADD( chess_common )
-//  MCFG_NVRAM_ADD_0FILL("nvram")
-
-MACHINE_CONFIG_END
-
 static MACHINE_CONFIG_START( gen32, polgar_state )
 	MCFG_CPU_ADD("maincpu", M68030, XTAL_33_333MHz)
 	MCFG_CPU_PROGRAM_MAP(gen32_mem)
@@ -1799,11 +1759,6 @@ ROM_START( van32 )
 ROM_END
 
 
-ROM_START( risc )
-	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD("s2500.bin", 0x000000, 0x20000, CRC(7a707e82) SHA1(87187fa58117a442f3abd30092cfcc2a4d7c7efc))
-ROM_END
-
 ROM_START( gen32 )
 	ROM_REGION32_BE( 0x40000, "maincpu", 0 )
 	ROM_LOAD("gen32_4.bin", 0x00000, 0x40000,CRC(6CC4DA88) SHA1(EA72ACF9C67ED17C6AC8DE56A165784AA629C4A1))
@@ -1859,7 +1814,6 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 	CONS(  1991, diablo68, 0,       0,      diablo68,  sfortea, driver_device,  0,       "Novag",                     "Novag Diablo 68000 Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van16,    0,       0,      van16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1991, van32,    van16,   0,      van32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Vancouver 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1992, risc,     0,       0,      risc,      van16, driver_device,    0,       "Saitek",                    "RISC2500", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32,    van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.00", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1993, gen32_41, van16,   0,      gen32,     gen32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Genius030 V4.01", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1994, berlinp,  van16,   0,      bpl32,     bpl32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Berlin Pro 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

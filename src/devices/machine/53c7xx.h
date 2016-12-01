@@ -72,7 +72,7 @@ class ncr53c7xx_device : public nscsi_device,
 {
 public:
 	// construction/destruction
-	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<ncr53c7xx_device &>(device).m_irq_handler.set_callback(object); }
@@ -178,40 +178,40 @@ private:
 
 
 	// SCSI registers
-	UINT8   m_scntl[2];
-	UINT8   m_sdid;
-	UINT8   m_sien;
-	UINT8   m_scid;
-	UINT8   m_sxfer;
-	UINT8   m_sodl;
-	UINT8   m_socl;
-	UINT8   m_sfbr;
-	UINT8   m_sidl;
-	UINT8   m_sbdl;
-	UINT8   m_sbcl;
-	UINT8   m_dstat;
-	UINT8   m_sstat[3];
-	UINT8   m_ctest[8];
-	UINT32  m_temp;
-	UINT8   m_dfifo;
-	UINT8   m_istat;
-	UINT32  m_dbc;
-	UINT8   m_dcmd;
-	UINT32  m_dnad;
-	UINT32  m_dsp;
-	UINT32  m_dsps;
-	UINT8   m_dmode;
-	UINT8   m_dien;
-	UINT8   m_dwt;
-	UINT8   m_dcntl;
+	uint8_t   m_scntl[2];
+	uint8_t   m_sdid;
+	uint8_t   m_sien;
+	uint8_t   m_scid;
+	uint8_t   m_sxfer;
+	uint8_t   m_sodl;
+	uint8_t   m_socl;
+	uint8_t   m_sfbr;
+	uint8_t   m_sidl;
+	uint8_t   m_sbdl;
+	uint8_t   m_sbcl;
+	uint8_t   m_dstat;
+	uint8_t   m_sstat[3];
+	uint8_t   m_ctest[8];
+	uint32_t  m_temp;
+	uint8_t   m_dfifo;
+	uint8_t   m_istat;
+	uint32_t  m_dbc;
+	uint8_t   m_dcmd;
+	uint32_t  m_dnad;
+	uint32_t  m_dsp;
+	uint32_t  m_dsps;
+	uint8_t   m_dmode;
+	uint8_t   m_dien;
+	uint8_t   m_dwt;
+	uint8_t   m_dcntl;
 
 
 	// other state
 	int     m_scsi_state;
 	bool    m_connected;
 	bool    m_finished;
-	UINT8   m_last_data;
-	UINT32  m_xfr_phase;
+	uint8_t   m_last_data;
+	uint32_t  m_xfr_phase;
 	emu_timer *m_tm;
 
 	int     m_scripts_state;

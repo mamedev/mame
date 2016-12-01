@@ -105,7 +105,7 @@ private:
 	required_device<pit68230_device> m_pit;
 
 	// Pointer to System ROMs needed by bootvect_r
-	UINT16  *m_sysrom;
+	uint16_t  *m_sysrom;
 };
 
 static ADDRESS_MAP_START (fcisio1_mem, AS_PROGRAM, 16, fcisio1_state)
@@ -127,7 +127,7 @@ void fcisio1_state::machine_start ()
 	LOG (("machine_start\n"));
 
 	/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-	m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0xf00000);
+	m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0xf00000);
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0x80000 to 0x0 */
@@ -141,7 +141,7 @@ READ8_MEMBER (fcisio1_state::not_implemented_r){
 		logerror(TODO);
 		printf(TODO);
 	}
-	return (UINT8) 0;
+	return (uint8_t) 0;
 }
 
 WRITE8_MEMBER (fcisio1_state::not_implemented_w){
@@ -155,7 +155,7 @@ WRITE8_MEMBER (fcisio1_state::not_implemented_w){
 
 // TODO: Get a manual to understand the config options for real
 READ8_MEMBER (fcisio1_state::config_rd){
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	LOG(("%s\n", FUNCNAME));
 
 	// Port B bit #7, 0x80 Self test bit, choose either of these two lines

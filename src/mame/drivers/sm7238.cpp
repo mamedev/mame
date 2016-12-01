@@ -76,7 +76,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER( scanline_callback );
 	DECLARE_PALETTE_INIT(sm7238);
@@ -88,22 +88,22 @@ public:
 	DECLARE_WRITE8_MEMBER(text_control_w);
 
 private:
-	UINT32 draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline);
+	uint32_t draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline);
 	rectangle m_tmpclip;
 	bitmap_ind16 m_tmpbmp;
 
 	void text_memory_clear();
 	void recompute_parameters();
 
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	struct {
-		UINT8 control;
-		UINT8 stride;
-		UINT16 ptr;
+		uint8_t control;
+		uint8_t stride;
+		uint16_t ptr;
 	} m_video;
 
 protected:
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 	required_device<nvram_device> m_nvram;
 	required_device<pic8259_device> m_pic8259;
@@ -195,10 +195,10 @@ WRITE_LINE_MEMBER(sm7238_state::write_printer_clock)
 	m_i8251prn->write_rxc(state);
 }
 
-UINT32 sm7238_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
+uint32_t sm7238_state::draw_scanline(uint16_t *p, uint16_t offset, uint8_t scanline)
 {
-	UINT8 attr, fg, bg, ra, gfx;
-	UINT16 x, chr;
+	uint8_t attr, fg, bg, ra, gfx;
+	uint16_t x, chr;
 	int dw;
 
 	ra = scanline % 10;
@@ -257,8 +257,8 @@ UINT32 sm7238_state::draw_scanline(UINT16 *p, UINT16 offset, UINT8 scanline)
 
 TIMER_DEVICE_CALLBACK_MEMBER(sm7238_state::scanline_callback)
 {
-	UINT16 y = m_screen->vpos();
-	UINT16 o = m_video.ptr;
+	uint16_t y = m_screen->vpos();
+	uint16_t o = m_video.ptr;
 
 	if (y < KSM_VERT_START) return;
 	y -= KSM_VERT_START;
@@ -299,7 +299,7 @@ void sm7238_state::recompute_parameters()
 		HZ_TO_ATTOSECONDS((m_video.stride == 80) ? 60 : 57.1 ));
 }
 
-UINT32 sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sm7238_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (BIT(m_video.control, 3))
 	copybitmap(bitmap, m_tmpbmp, 0, 0, KSM_HORZ_START, KSM_VERT_START, cliprect);
@@ -332,7 +332,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sm7238_state, sm7238)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, 0x00, 0xc0, 0x00); // green
 	palette.set_pen_color(2, 0x00, 0xff, 0x00); // highlight
 }

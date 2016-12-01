@@ -3,7 +3,6 @@
 ///
 /// GLM is a header only library. There is nothing to compile. 
 /// dummy.cpp exist only a wordaround for CMake file.
-///////////////////////////////////////////////////////////////////////////////////
 
 /*
 #define GLM_MESSAGES

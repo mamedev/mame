@@ -42,7 +42,7 @@ class k051960_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_gradius3);
 
 public:
-	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k051960_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k051960_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
@@ -87,9 +87,9 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT8[]>   m_ram;
+	std::unique_ptr<uint8_t[]>   m_ram;
 
-	required_region_ptr<UINT8> m_sprite_rom;
+	required_region_ptr<uint8_t> m_sprite_rom;
 
 	required_device<screen_device> m_screen;
 	emu_timer *m_scanline_timer;
@@ -100,7 +100,7 @@ private:
 	devcb_write_line m_firq_handler;
 	devcb_write_line m_nmi_handler;
 
-	UINT8    m_spriterombank[3];
+	uint8_t    m_spriterombank[3];
 	int      m_romoffset;
 	int      m_spriteflip, m_readroms;
 	int m_nmi_enabled;

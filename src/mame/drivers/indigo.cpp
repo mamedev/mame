@@ -54,24 +54,24 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	struct hpc_t
 	{
-		UINT8 m_misc_status;
-		UINT32 m_parbuf_ptr;
-		UINT32 m_local_ioreg0_mask;
-		UINT32 m_local_ioreg1_mask;
-		UINT32 m_vme_intmask0;
-		UINT32 m_vme_intmask1;
-		UINT32 m_scsi0_descriptor;
-		UINT32 m_scsi0_dma_ctrl;
+		uint8_t m_misc_status;
+		uint32_t m_parbuf_ptr;
+		uint32_t m_local_ioreg0_mask;
+		uint32_t m_local_ioreg1_mask;
+		uint32_t m_vme_intmask0;
+		uint32_t m_vme_intmask1;
+		uint32_t m_scsi0_descriptor;
+		uint32_t m_scsi0_dma_ctrl;
 	};
 
 	struct rtc_t
 	{
-		UINT8 nRAM[32];
+		uint8_t nRAM[32];
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -110,7 +110,7 @@ void indigo_state::video_start()
 {
 }
 
-UINT32 indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -276,7 +276,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 		#if 0
 		if (data & 0x80)
 		{
-			UINT32 next;
+			uint32_t next;
 
 			osd_printf_info("DMA activated for SCSI0\n");
 			osd_printf_info("Descriptor block:\n");
@@ -493,7 +493,7 @@ void indigo_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		indigo_timer_rtc();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in indigo_state::device_timer");
+		assert_always(false, "Unknown id in indigo_state::device_timer");
 	}
 }
 

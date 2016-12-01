@@ -43,9 +43,9 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
-	required_shared_ptr<UINT16> m_p_base;
+	required_shared_ptr<uint16_t> m_p_base;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
 };
@@ -67,7 +67,7 @@ INPUT_PORTS_END
 
 void ms9540_state::machine_reset()
 {
-	UINT8* ROM = memregion("9540")->base();
+	uint8_t* ROM = memregion("9540")->base();
 	memcpy(m_p_base, ROM, 8);
 	m_maincpu->reset();
 }

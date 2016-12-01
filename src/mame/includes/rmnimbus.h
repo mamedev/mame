@@ -97,17 +97,17 @@ public:
 
 	bitmap_ind16 m_video_mem;
 
-	UINT32 m_debug_machine;
-	UINT8 m_mcu_reg080;
-	UINT8 m_iou_reg092;
-	UINT8 m_last_playmode;
-	UINT8 m_ay8910_a;
-	UINT16 m_x, m_y, m_yline;
-	UINT8 m_colours, m_mode, m_op;
-	UINT32 m_debug_video;
-	UINT8 m_vector;
-	UINT8 m_eeprom_bits;
-	UINT8 m_eeprom_state;
+	uint32_t m_debug_machine;
+	uint8_t m_mcu_reg080;
+	uint8_t m_iou_reg092;
+	uint8_t m_last_playmode;
+	uint8_t m_ay8910_a;
+	uint16_t m_x, m_y, m_yline;
+	uint8_t m_colours, m_mode, m_op;
+	uint32_t m_debug_video;
+	uint8_t m_vector;
+	uint8_t m_eeprom_bits;
+	uint8_t m_eeprom_state;
 
 	DECLARE_READ8_MEMBER(nimbus_mcu_r);
 	DECLARE_WRITE8_MEMBER(nimbus_mcu_w);
@@ -132,7 +132,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	virtual void video_reset() override;
-	UINT32 screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nimbus(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(sio_interrupt);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(nimbus_fdc_drq_w);
@@ -145,21 +145,21 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(nimbus_msm5205_vck);
 	DECLARE_WRITE_LINE_MEMBER(write_scsi_iena);
 
-	UINT8 get_pixel(UINT16 x, UINT16 y);
-	UINT16 read_pixel_line(UINT16 x, UINT16 y, UINT8 pixels, UINT8 bpp);
-	UINT16 read_pixel_data(UINT16 x, UINT16 y);
-	void set_pixel(UINT16 x, UINT16 y, UINT8 colour);
-	void set_pixel40(UINT16 x, UINT16 y, UINT8 colour);
-	void write_pixel_line(UINT16 x, UINT16 y, UINT16, UINT8 pixels, UINT8 bpp);
-	void move_pixel_line(UINT16 x, UINT16 y, UINT8 width);
-	void write_pixel_data(UINT16 x, UINT16 y, UINT16    data);
-	void change_palette(UINT8 bank, UINT16 colours);
-	void external_int(UINT8 vector, bool state);
+	uint8_t get_pixel(uint16_t x, uint16_t y);
+	uint16_t read_pixel_line(uint16_t x, uint16_t y, uint8_t pixels, uint8_t bpp);
+	uint16_t read_pixel_data(uint16_t x, uint16_t y);
+	void set_pixel(uint16_t x, uint16_t y, uint8_t colour);
+	void set_pixel40(uint16_t x, uint16_t y, uint8_t colour);
+	void write_pixel_line(uint16_t x, uint16_t y, uint16_t, uint8_t pixels, uint8_t bpp);
+	void move_pixel_line(uint16_t x, uint16_t y, uint8_t width);
+	void write_pixel_data(uint16_t x, uint16_t y, uint16_t    data);
+	void change_palette(uint8_t bank, uint16_t colours);
+	void external_int(uint8_t vector, bool state);
 	DECLARE_READ8_MEMBER(cascade_callback);
 	void nimbus_bank_memory();
 	void memory_reset();
 	void fdc_reset();
-	UINT8 fdc_driveno(UINT8 drivesel);
+	uint8_t fdc_driveno(uint8_t drivesel);
 	void hdc_reset();
 	void hdc_post_rw();
 	void hdc_drq(bool state);
@@ -187,34 +187,34 @@ public:
 	// Static data related to Floppy and SCSI hard disks
 	struct
 	{
-		UINT8   reg400;
+		uint8_t   reg400;
 	} m_nimbus_drives;
 
 	/* 8031 Peripheral controller */
 	struct
 	{
-		UINT8   ipc_in;
-		UINT8   ipc_out;
-		UINT8   status_in;
-		UINT8   status_out;
+		uint8_t   ipc_in;
+		uint8_t   ipc_out;
+		uint8_t   status_in;
+		uint8_t   status_out;
 	} m_ipc_interface;
 
 	/* Mouse/Joystick */
 	struct
 	{
-		UINT8   m_mouse_px;
-		UINT8   m_mouse_py;
+		uint8_t   m_mouse_px;
+		uint8_t   m_mouse_py;
 
-		UINT8   m_mouse_x;
-		UINT8   m_mouse_y;
-		UINT8   m_mouse_pc;
-		UINT8   m_mouse_pcx;
-		UINT8   m_mouse_pcy;
+		uint8_t   m_mouse_x;
+		uint8_t   m_mouse_y;
+		uint8_t   m_mouse_pc;
+		uint8_t   m_mouse_pcx;
+		uint8_t   m_mouse_pcy;
 
-		UINT8   m_intstate_x;
-		UINT8   m_intstate_y;
+		uint8_t   m_intstate_x;
+		uint8_t   m_intstate_y;
 
-		UINT8   m_reg0a4;
+		uint8_t   m_reg0a4;
 
 		emu_timer   *m_mouse_timer;
 	} m_nimbus_mouse;

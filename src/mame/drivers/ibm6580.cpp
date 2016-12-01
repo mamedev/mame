@@ -27,9 +27,9 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-	const UINT8 *m_p_chargen;
+	const uint8_t *m_p_chargen;
 	DECLARE_PALETTE_INIT(ibm6580);
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( ibm6580 )
 INPUT_PORTS_END
 
-UINT32 ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ibm6580_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

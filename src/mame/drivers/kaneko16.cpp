@@ -249,7 +249,7 @@ WRITE8_MEMBER(kaneko16_state::eeprom_w)
 
 READ16_MEMBER(kaneko16_berlwall_state::berlwall_oki_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	if (mem_mask == 0xff00) // reads / writes to the upper byte only appear to act as a mirror to the lower byte, 16-bit reads/writes only access the lower byte.
 	{
@@ -338,7 +338,7 @@ ADDRESS_MAP_END
 WRITE16_MEMBER(kaneko16_state::bakubrkr_oki_bank_w)
 {
 	if (ACCESSING_BITS_0_7) {
-		m_oki->set_bank_base(0x40000 * (data & 0x7) );
+		m_oki->set_rom_bank(data & 0x7);
 		logerror("%s:Selecting OKI bank %02X\n",machine().describe_context(),data&0xff);
 	}
 }
@@ -400,7 +400,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xf) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -409,7 +409,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bloodwar_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 //      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -464,7 +464,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base(0x40000 * (data & 0xF));
+		m_oki1->set_rom_bank(data & 0xf);
 		logerror("%s: OKI0  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -473,7 +473,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::bonkadv_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base(0x40000 * data );
+		m_oki2->set_rom_bank(data);
 		logerror("%s: OKI1  bank %08X\n",machine().describe_context(),data);
 	}
 }
@@ -533,7 +533,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_0_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki1->set_bank_base( 0x40000 * (data & 0xF) );
+		m_oki1->set_rom_bank(data & 0xf);
 //      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -542,7 +542,7 @@ WRITE16_MEMBER(kaneko16_gtmr_state::gtmr_oki_1_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		m_oki2->set_bank_base( 0x40000 * (data & 0x1) );
+		m_oki2->set_rom_bank(data & 0x1);
 //      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",space.device().safe_pc(),data);
 	}
 }
@@ -690,8 +690,8 @@ ADDRESS_MAP_END
 
 void kaneko16_state::kaneko16_common_oki_bank_w(  const char *bankname, const char* tag, int bank, size_t fixedsize, size_t bankedsize )
 {
-	UINT32 bankaddr;
-	UINT8* samples = memregion(tag)->base();
+	uint32_t bankaddr;
+	uint8_t* samples = memregion(tag)->base();
 	size_t length = memregion(tag)->bytes();
 
 	bankaddr = fixedsize + (bankedsize * bank);
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(kaneko16_state::wingforc_oki_bank_w)
 {
 	if (data <= 2)
-		m_oki->set_bank_base(0x40000 * data);
+		m_oki->set_rom_bank(data);
 	else
 		logerror("%s: unknown OKI bank %02X\n", machine().describe_context(), data);
 }
@@ -1299,8 +1299,8 @@ static INPUT_PORTS_START( gtmr )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1309,8 +1309,8 @@ static INPUT_PORTS_START( gtmr )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1377,8 +1377,8 @@ static INPUT_PORTS_START( gtmr2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1387,8 +1387,8 @@ static INPUT_PORTS_START( gtmr2 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // swapped for consistency:
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // button1 is usually accel.
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -2332,7 +2332,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(kaneko16_state::shogwarr_interrupt)
 }
 
 /*
-static const UINT16 shogwarr_default_eeprom[64] = {
+static const uint16_t shogwarr_default_eeprom[64] = {
     0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
     0x4B41, 0x4E45, 0x4B4F, 0x2F41, 0x544F, 0x5020, 0x3139, 0x3932,
     0x4655, 0x4A49, 0xFFFF, 0x4D41, 0x2042, 0x5553, 0x5445, 0x5220,
@@ -2345,7 +2345,7 @@ static const UINT16 shogwarr_default_eeprom[64] = {
 */
 // the above eeprom looks corrupt, some of the text is wrong, the game never writes this text tho.. maybe it should be as below
 // leaving both here incase they relate to which tables get 'locked out' by the MCU somehow
-static const UINT16 shogwarr_default_eeprom[64] = {
+static const uint16_t shogwarr_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x4B41, 0x4E45, 0x4B4F, 0x2F41, 0x544F, 0x5020, 0x3139, 0x3932,
 	0x4655, 0x4A49, 0x5941, 0x4D41, 0x2042, 0x5553, 0x5445, 0x5220,
@@ -2425,7 +2425,7 @@ static MACHINE_CONFIG_START( shogwarr, kaneko16_shogwarr_state )
 MACHINE_CONFIG_END
 
 
-static const UINT16 brapboys_default_eeprom[64] = {
+static const uint16_t brapboys_default_eeprom[64] = {
 	0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000,
 	0x0000, 0x0005, 0x0006, 0x2030, 0x0003, 0x6818, 0x0101, 0x0101,
 	0x0101, 0x0001, 0x0004, 0x0008, 0x4B41, 0x4E45, 0x4B4F, 0x2020,
@@ -2474,7 +2474,7 @@ void kaneko16_state::kaneko16_unscramble_tiles(const char *region)
 		return;
 	}
 
-	UINT8 *ram = tile_region->base();
+	uint8_t *ram = tile_region->base();
 	int size = tile_region->bytes();
 
 	for (int i = 0; i < size; i ++)
@@ -2495,7 +2495,7 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	   possible combinations of these and swap between them.
 	*/
 	int bank;
-	UINT8 *src0;
+	uint8_t *src0;
 
 	if (memregion(region)->bytes() < 0x40000 * 16)
 		fatalerror("gtmr SOUND1 region too small\n");
@@ -2504,8 +2504,8 @@ void kaneko16_state::kaneko16_expand_sample_banks(const char *region)
 	src0 = memregion(region)->base();
 	for (bank = 15; bank > 0; bank--)
 	{
-		UINT8 *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
-		UINT8 *dst = src0 + 0x40000 * bank;
+		uint8_t *srcn = src0 + 0x10000 * (bank < 3 ? 3 : bank);
+		uint8_t *dst = src0 + 0x40000 * bank;
 
 		memcpy(dst + 0x30000, srcn + 0x00000, 0x10000);
 		memcpy(dst + 0x00000, src0 + 0x00000, 0x30000);

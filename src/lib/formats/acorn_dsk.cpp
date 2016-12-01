@@ -29,23 +29,23 @@ const char *acorn_ssd_format::extensions() const
 	return "ssd,bbc,img";
 }
 
-int acorn_ssd_format::find_size(io_generic *io, UINT32 form_factor)
+int acorn_ssd_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 cat[8];
-	UINT32 sectors0, sectors2;
+	uint8_t cat[8];
+	uint32_t sectors0, sectors2;
 
 	// read sector count from side 0 catalogue
 	io_generic_read(io, cat, 0x100, 8);
 	sectors0 = ((cat[6] & 3) << 8) + cat[7];
 	LOG_FORMATS("ssd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if ((size <= (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
+		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
 			if (f.head_count == 2)
 			{
 				// read sector count from side 2 catalogue
@@ -66,7 +66,7 @@ int acorn_ssd_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int acorn_ssd_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_ssd_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -124,23 +124,23 @@ const char *acorn_dsd_format::extensions() const
 	return "dsd";
 }
 
-int acorn_dsd_format::find_size(io_generic *io, UINT32 form_factor)
+int acorn_dsd_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 cat[8];
-	UINT32 sectors0, sectors2;
+	uint8_t cat[8];
+	uint32_t sectors0, sectors2;
 
 	// read sector count from side 0 catalogue
 	io_generic_read(io, cat, 0x100, 8);
 	sectors0 = ((cat[6] & 3) << 8) + cat[7];
 	LOG_FORMATS("dsd: sector count 0: %d %s\n", sectors0, sectors0 % 10 != 0 ? "invalid" : "");
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for (int i = 0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if ((size <= (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
+		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
 			// read sector count from side 2 catalogue
 			io_generic_read(io, cat, 0xb00, 8); // interleaved
 			sectors2 = ((cat[6] & 3) << 8) + cat[7];
@@ -154,7 +154,7 @@ int acorn_dsd_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int acorn_dsd_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_dsd_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -204,23 +204,23 @@ const char *opus_ddos_format::extensions() const
 	return "dds";
 }
 
-int opus_ddos_format::find_size(io_generic *io, UINT32 form_factor)
+int opus_ddos_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 cat[8];
-	UINT32 sectors0, sectors2;
+	uint8_t cat[8];
+	uint32_t sectors0, sectors2;
 
 	// read sector count from side 0 catalogue
 	io_generic_read(io, cat, 0x1000, 8);
 	sectors0 = (cat[1] << 8) + cat[2];
 	LOG_FORMATS("ddos: sector count 0: %d %s\n", sectors0, sectors0 % 18 != 0 ? "invalid" : "");
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for (int i = 0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if ((size <= (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
+		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (sectors0 <= f.track_count * f.sector_count)) {
 			if (f.head_count == 2)
 			{
 				// read sector count from side 2 catalogue
@@ -241,7 +241,7 @@ int opus_ddos_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int opus_ddos_format::identify(io_generic *io, UINT32 form_factor)
+int opus_ddos_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -299,11 +299,11 @@ const char *acorn_adfs_old_format::extensions() const
 	return "adf,ads,adm,adl";
 }
 
-int acorn_adfs_old_format::find_size(io_generic *io, UINT32 form_factor)
+int acorn_adfs_old_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 map[3];
-	UINT32 sectors;
-	UINT8 oldmap[4];
+	uint8_t map[3];
+	uint32_t sectors;
+	uint8_t oldmap[4];
 
 	// read sector count from free space map
 	io_generic_read(io, map, 0xfc, 3);
@@ -314,14 +314,14 @@ int acorn_adfs_old_format::find_size(io_generic *io, UINT32 form_factor)
 	io_generic_read(io, oldmap, 0x201, 4);
 	LOG_FORMATS("adfs_o: map identifier %s %s\n", oldmap, memcmp(oldmap, "Hugo", 4) != 0 ? "invalid" : "");
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
 		// valid images will have map identifier 'Hugo' and sector counts adfs-s = 0x280; adfs-m = 0x500; adfs-l = 0xa00; though many adfs-s images are incorrect
-		if ((size <= (UINT64)compute_track_size(f) * f.track_count * f.head_count) && memcmp(oldmap, "Hugo", 4) == 0 && (sectors == 0x280 || sectors == 0x500 || sectors == 0xa00 || size == 819200)) {
+		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && memcmp(oldmap, "Hugo", 4) == 0 && (sectors == 0x280 || sectors == 0x500 || sectors == 0xa00 || size == 819200)) {
 			return i;
 		}
 	}
@@ -329,7 +329,7 @@ int acorn_adfs_old_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int acorn_adfs_old_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_adfs_old_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -395,10 +395,10 @@ const char *acorn_adfs_new_format::extensions() const
 	return "adf";
 }
 
-int acorn_adfs_new_format::find_size(io_generic *io, UINT32 form_factor)
+int acorn_adfs_new_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 dform[4];
-	UINT8 eform[4];
+	uint8_t dform[4];
+	uint8_t eform[4];
 
 	// read map identifiers for D and E formats
 	io_generic_read(io, dform, 0x401, 4);
@@ -406,14 +406,14 @@ int acorn_adfs_new_format::find_size(io_generic *io, UINT32 form_factor)
 	io_generic_read(io, eform, 0x801, 4);
 	LOG_FORMATS("adfs_n: map identifier (E format) %s %s\n", eform, memcmp(eform, "Nick", 4) != 0 ? "invalid" : "");
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for (int i = 0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
 		// valid images will have map identifier Nick
-		if ((size == (UINT64)compute_track_size(f) * f.track_count * f.head_count) && (memcmp(dform, "Nick", 4) == 0 || memcmp(eform, "Nick", 4) == 0)) {
+		if ((size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (memcmp(dform, "Nick", 4) == 0 || memcmp(eform, "Nick", 4) == 0)) {
 			return i;
 		}
 	}
@@ -421,7 +421,7 @@ int acorn_adfs_new_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int acorn_adfs_new_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_adfs_new_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -471,18 +471,18 @@ const char *acorn_dos_format::extensions() const
 	return "img,adl";
 }
 
-int acorn_dos_format::find_size(io_generic *io, UINT32 form_factor)
+int acorn_dos_format::find_size(io_generic *io, uint32_t form_factor)
 {
-	UINT8 cat[3];
-	UINT32 sectors;
+	uint8_t cat[3];
+	uint32_t sectors;
 
-	UINT64 size = io_generic_size(io);
+	uint64_t size = io_generic_size(io);
 	for(int i=0; formats[i].form_factor; i++) {
 		const format &f = formats[i];
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if (size == (UINT64)compute_track_size(f) * f.track_count * f.head_count) {
+		if (size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count) {
 			switch (size)
 			{
 				case 640 * 1024: // 640K Acorn (Bootable) DOS Format
@@ -513,7 +513,7 @@ int acorn_dos_format::find_size(io_generic *io, UINT32 form_factor)
 	return -1;
 }
 
-int acorn_dos_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_dos_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 
@@ -567,9 +567,9 @@ const char *acorn_cpm_format::extensions() const
 	return "img,ssd,dsd";
 }
 
-int acorn_cpm_format::identify(io_generic *io, UINT32 form_factor)
+int acorn_cpm_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 h[8];
+	uint8_t h[8];
 
 	io_generic_read(io, h, 0, 8);
 
@@ -627,7 +627,7 @@ const char *torch_cpn_format::extensions() const
 	return "dsd";
 }
 
-int torch_cpn_format::identify(io_generic *io, UINT32 form_factor)
+int torch_cpn_format::identify(io_generic *io, uint32_t form_factor)
 {
 	int type = find_size(io, form_factor);
 

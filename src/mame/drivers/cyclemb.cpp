@@ -101,22 +101,22 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_vram;
-	required_shared_ptr<UINT8> m_cram;
-	required_shared_ptr<UINT8> m_obj1_ram;
-	required_shared_ptr<UINT8> m_obj2_ram;
-	required_shared_ptr<UINT8> m_obj3_ram;
+	required_shared_ptr<uint8_t> m_vram;
+	required_shared_ptr<uint8_t> m_cram;
+	required_shared_ptr<uint8_t> m_obj1_ram;
+	required_shared_ptr<uint8_t> m_obj2_ram;
+	required_shared_ptr<uint8_t> m_obj3_ram;
 
 	struct
 	{
-		UINT8 rxd;
-		UINT8 txd;
-		UINT8 rst;
-		UINT8 state;
-		UINT8 packet_type;
+		uint8_t rxd;
+		uint8_t txd;
+		uint8_t rst;
+		uint8_t state;
+		uint8_t packet_type;
 	} m_mcu[2];
 
-	UINT16 m_dsw_pc_hack;
+	uint16_t m_dsw_pc_hack;
 
 	DECLARE_WRITE8_MEMBER(cyclemb_bankswitch_w);
 //  DECLARE_READ8_MEMBER(mcu_status_r);
@@ -131,8 +131,8 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(cyclemb);
 
-	UINT32 screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -144,7 +144,7 @@ public:
 
 PALETTE_INIT_MEMBER(cyclemb_state, cyclemb)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i,r,g,b,val;
 	int bit0,bit1,bit2;
 
@@ -221,9 +221,9 @@ void cyclemb_state::cyclemb_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 	*/
 void cyclemb_state::cyclemb_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 col,fx,fy,region;
-	UINT16 spr_offs,i;
-	INT16 x,y;
+	uint8_t col,fx,fy,region;
+	uint16_t spr_offs,i;
+	int16_t x,y;
 
 	/*
 	0x3b-0x3c-0x3d tire (0x13 0x00 / 0x17 0x00 )
@@ -321,9 +321,9 @@ void cyclemb_state::skydest_draw_tilemap(screen_device &screen, bitmap_ind16 &bi
 
 void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 col,fx,fy,region;
-	UINT16 spr_offs,i;
-	INT16 x,y;
+	uint8_t col,fx,fy,region;
+	uint16_t spr_offs,i;
+	int16_t x,y;
 
 //  popmessage("%d %d",m_obj2_ram[0x0d], 0xf1 - m_obj2_ram[0x0c+1] + 68);
 
@@ -361,14 +361,14 @@ void cyclemb_state::skydest_draw_sprites(screen_device &screen, bitmap_ind16 &bi
 	}
 }
 
-UINT32 cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cyclemb_state::screen_update_cyclemb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	cyclemb_draw_tilemap(screen,bitmap,cliprect);
 	cyclemb_draw_sprites(screen,bitmap,cliprect);
 	return 0;
 }
 
-UINT32 cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cyclemb_state::screen_update_skydest(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -430,7 +430,7 @@ READ8_MEMBER( cyclemb_state::skydest_i8741_0_r )
 	}
 	else
 	{
-		UINT8 i,pt;
+		uint8_t i,pt;
 
 		//printf("%04x\n",m_maincpu->pc());
 

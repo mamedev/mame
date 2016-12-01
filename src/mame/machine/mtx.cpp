@@ -30,7 +30,7 @@
 READ8_MEMBER(mtx_state::mtx_strobe_r)
 {
 	/* set STROBE low */
-	m_centronics->write_strobe(FALSE);
+	m_centronics->write_strobe(false);
 
 	return 0xff;
 }
@@ -56,7 +56,7 @@ READ8_MEMBER(mtx_state::mtx_strobe_r)
     by RAM in this mode.
 */
 
-void mtx_state::bankswitch(UINT8 data)
+void mtx_state::bankswitch(uint8_t data)
 {
 	/*
 
@@ -75,9 +75,9 @@ void mtx_state::bankswitch(UINT8 data)
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	ram_device *messram = m_ram;
 
-//  UINT8 cbm_mode = data >> 7 & 0x01;
-	UINT8 rom_page = data >> 4 & 0x07;
-	UINT8 ram_page = data >> 0 & 0x0f;
+//  uint8_t cbm_mode = data >> 7 & 0x01;
+	uint8_t rom_page = data >> 4 & 0x07;
+	uint8_t ram_page = data >> 0 & 0x0f;
 
 	/* set rom bank (switches between basic and assembler rom or cartridges) */
 	membank("bank2")->set_entry(rom_page);
@@ -177,10 +177,10 @@ READ8_MEMBER(mtx_state::mtx_prt_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* reset STROBE to high */
-	m_centronics->write_strobe( TRUE);
+	m_centronics->write_strobe( true);
 
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_fault << 1;
@@ -205,7 +205,7 @@ WRITE8_MEMBER(mtx_state::mtx_sense_w)
 
 READ8_MEMBER(mtx_state::mtx_key_lo_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read();
 	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read();
@@ -225,7 +225,7 @@ READ8_MEMBER(mtx_state::mtx_key_lo_r)
 
 READ8_MEMBER(mtx_state::mtx_key_hi_r)
 {
-	UINT8 data = ioport("country_code")->read();
+	uint8_t data = ioport("country_code")->read();
 
 	if (!(m_key_sense & 0x01)) data &= ioport("ROW0")->read() >> 8;
 	if (!(m_key_sense & 0x02)) data &= ioport("ROW1")->read() >> 8;
@@ -339,7 +339,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	void *ptr;
-	UINT8 header[18];
+	uint8_t header[18];
 
 	// read header
 	image.fread(&header, sizeof(header));
@@ -358,10 +358,10 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 	image.message("Loading '%s'", tape_name);
 
 	// start of system variables area
-	UINT16 system_variables_base = pick_integer_le(header, 16, 2);
+	uint16_t system_variables_base = pick_integer_le(header, 16, 2);
 
 	// write system variables
-	UINT16 system_variables_size = 0;
+	uint16_t system_variables_size = 0;
 
 	if (system_variables_base != 0)
 	{
@@ -371,7 +371,7 @@ SNAPSHOT_LOAD_MEMBER( mtx_state, mtx )
 	}
 
 	// write actual image data
-	UINT16 data_size = snapshot_size - 18 - system_variables_size;
+	uint16_t data_size = snapshot_size - 18 - system_variables_size;
 
 	ptr = program.get_write_ptr(0x4000);
 	image.fread(ptr, 0x4000);

@@ -166,9 +166,9 @@ void menu_audit::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_audit::populate()
+void menu_audit::populate(float &customtop, float &custombottom)
 {
-	item_append("Dummy", "", 0, (void *)(FPTR)1);
+	item_append("Dummy", "", 0, (void *)(uintptr_t)1);
 }
 
 //-------------------------------------------------

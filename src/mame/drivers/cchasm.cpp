@@ -15,15 +15,15 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/cchasm.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "machine/6840ptm.h"
 #include "machine/z80ctc.h"
 #include "machine/watchdog.h"
-#include "includes/cchasm.h"
+#include "sound/ay8910.h"
+#include "sound/volt_reg.h"
 
 #define CCHASM_68K_CLOCK (XTAL_8MHz)
 
@@ -169,7 +169,7 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_SCREEN_UPDATE_DEVICE("vector", vector_device, screen_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
@@ -177,16 +177,16 @@ static MACHINE_CONFIG_START( cchasm, cchasm_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch4")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1818182)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.2)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_SOUND_ADD("dac2", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT)
 
 	/* 6840 PTM */
 	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)

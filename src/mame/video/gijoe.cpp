@@ -73,7 +73,7 @@ void gijoe_state::video_start()
 	save_item(NAME(m_layer_pri));
 }
 
-UINT32 gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gijoe_state::screen_update_gijoe(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[4];

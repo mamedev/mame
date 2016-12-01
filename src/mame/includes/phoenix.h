@@ -16,17 +16,17 @@ public:
 	required_device<cpu_device> m_maincpu;
 	optional_device<pleiads_sound_device> m_pleiads_custom;
 	required_device<gfxdecode_device> m_gfxdecode;
-	std::unique_ptr<UINT8[]> m_videoram_pg[2];
-	UINT8 m_videoram_pg_index;
-	UINT8 m_palette_bank;
-	UINT8 m_cocktail_mode;
-	UINT8 m_pleiads_protection_question;
-	UINT8 m_survival_protection_value;
+	std::unique_ptr<uint8_t[]> m_videoram_pg[2];
+	uint8_t m_videoram_pg_index;
+	uint8_t m_palette_bank;
+	uint8_t m_cocktail_mode;
+	uint8_t m_pleiads_protection_question;
+	uint8_t m_survival_protection_value;
 	int m_survival_sid_value;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
-	UINT8 m_survival_input_latches[2];
-	UINT8 m_survival_input_readc;
+	uint8_t m_survival_input_latches[2];
+	uint8_t m_survival_input_readc;
 	DECLARE_WRITE8_MEMBER(phoenix_videoram_w);
 	DECLARE_WRITE8_MEMBER(phoenix_videoreg_w);
 	DECLARE_WRITE8_MEMBER(pleiads_videoreg_w);
@@ -43,7 +43,7 @@ public:
 	DECLARE_PALETTE_INIT(phoenix);
 	DECLARE_PALETTE_INIT(survival);
 	DECLARE_PALETTE_INIT(pleiads);
-	UINT32 screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_phoenix(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_READ8_MEMBER(survival_protection_r);
 	DECLARE_READ_LINE_MEMBER(survival_sid_callback);
 };
@@ -66,24 +66,24 @@ public:
 
 struct c_state
 {
-	INT32 counter;
-	INT32 level;
+	int32_t counter;
+	int32_t level;
 };
 
 struct n_state
 {
-	INT32 counter;
-	INT32 polyoffs;
-	INT32 polybit;
-	INT32 lowpass_counter;
-	INT32 lowpass_polybit;
+	int32_t counter;
+	int32_t polyoffs;
+	int32_t polybit;
+	int32_t lowpass_counter;
+	int32_t lowpass_polybit;
 };
 
 class phoenix_sound_device : public device_t,
 									public device_sound_interface
 {
 public:
-	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	phoenix_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~phoenix_sound_device() {}
 
 	DECLARE_WRITE8_MEMBER( control_a_w );
@@ -101,9 +101,9 @@ private:
 	struct c_state      m_c24_state;
 	struct c_state      m_c25_state;
 	struct n_state      m_noise_state;
-	UINT8               m_sound_latch_a;
+	uint8_t               m_sound_latch_a;
 	sound_stream *      m_channel;
-	std::unique_ptr<UINT32[]>                m_poly18;
+	std::unique_ptr<uint32_t[]>                m_poly18;
 	discrete_device *m_discrete;
 	tms36xx_device *m_tms;
 

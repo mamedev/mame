@@ -25,9 +25,9 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 		m_colour_mask=0x1f;
 
 //  temp_bitmap = std::make_unique<bitmap_rgb32>(512, 512 );
-	m_mlc_buffered_spriteram = std::make_unique<UINT16[]>(0x3000/2);
-	m_mlc_spriteram_spare = std::make_unique<UINT16[]>(0x3000/2);
-	m_mlc_spriteram = std::make_unique<UINT16[]>(0x3000/2);
+	m_mlc_buffered_spriteram = std::make_unique<uint16_t[]>(0x3000/2);
+	m_mlc_spriteram_spare = std::make_unique<uint16_t[]>(0x3000/2);
+	m_mlc_spriteram = std::make_unique<uint16_t[]>(0x3000/2);
 
 
 	save_pointer(NAME(m_mlc_spriteram.get()), 0x3000/2);
@@ -38,8 +38,8 @@ VIDEO_START_MEMBER(deco_mlc_state,mlc)
 
 
 static void mlc_drawgfxzoomline(deco_mlc_state *state,
-		UINT32* dest,const rectangle &clip,gfx_element *gfx,
-		UINT32 code1,UINT32 code2, UINT32 color,int flipx,int sx,
+		uint32_t* dest,const rectangle &clip,gfx_element *gfx,
+		uint32_t code1,uint32_t code2, uint32_t color,int flipx,int sx,
 		int transparent_color,int use8bpp,
 		int scalex, int alpha, int srcline  )
 {
@@ -96,14 +96,14 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 		if( ex>sx )
 		{ /* skip if inner loop doesn't draw anything */
 			const pen_t *pal = &state->m_palette->pen(gfx->colorbase() + gfx->granularity() * (color % gfx->colors()));
-			const UINT8 *code_base1 = gfx->get_data(code1 % gfx->elements());
+			const uint8_t *code_base1 = gfx->get_data(code1 % gfx->elements());
 
 			/* no alpha */
 			if (alpha == 0xff)
 			{
-				const UINT8 *code_base2 = gfx->get_data(code2 % gfx->elements());
-				const UINT8 *source1 = code_base1 + (srcline) * gfx->rowbytes();
-				const UINT8 *source2 = code_base2 + (srcline) * gfx->rowbytes();
+				const uint8_t *code_base2 = gfx->get_data(code2 % gfx->elements());
+				const uint8_t *source1 = code_base1 + (srcline) * gfx->rowbytes();
+				const uint8_t *source2 = code_base2 + (srcline) * gfx->rowbytes();
 
 				int x, x_index = x_index_base;
 
@@ -120,7 +120,7 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 			}
 			else
 			{
-				const UINT8 *source = code_base1 + (srcline) * gfx->rowbytes();
+				const uint8_t *source = code_base1 + (srcline) * gfx->rowbytes();
 
 				int x, x_index = x_index_base;
 				for( x=sx; x<ex; x++ )
@@ -135,13 +135,13 @@ static void mlc_drawgfxzoomline(deco_mlc_state *state,
 }
 
 
-void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT32* dest)
+void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, uint32_t* dest)
 {
-	UINT32 *index_ptr=nullptr;
+	uint32_t *index_ptr=nullptr;
 	int offs,fx=0,fy=0,x,y,color,colorOffset,sprite,indx,h,w,bx,by,fx1,fy1;
 	int xoffs,yoffs;
-	UINT8 *rom = m_gfx2 + 0x20000, *index_ptr8;
-	UINT8 *rawrom = m_gfx2;
+	uint8_t *rom = m_gfx2 + 0x20000, *index_ptr8;
+	uint8_t *rawrom = m_gfx2;
 	int blockIsTilemapIndex=0;
 	int sprite2=0,indx2=0,use8bppMode=0;
 	int yscale,xscale;
@@ -153,7 +153,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 
 	int clipper=0;
 	rectangle user_clip;
-	UINT16* mlc_spriteram=m_mlc_buffered_spriteram.get(); // spriteram32
+	uint16_t* mlc_spriteram=m_mlc_buffered_spriteram.get(); // spriteram32
 
 	//printf("%d - (%08x %08x %08x) (%08x %08x %08x) (%08x %08x %08x)\n", scanline, m_irq_ram[6], m_irq_ram[7], m_irq_ram[8], m_irq_ram[9], m_irq_ram[10], m_irq_ram[11] , m_irq_ram[12] , m_irq_ram[13] , m_irq_ram[14]);
 
@@ -298,7 +298,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			sprite |= (index_ptr8[4]&3)<<16;
 
 			if (use8bppMode) {
-				UINT8* index_ptr28=rom + indx2*8;
+				uint8_t* index_ptr28=rom + indx2*8;
 				sprite2=(index_ptr28[7]<<8)|index_ptr28[6];
 			}
 			//unused byte 5
@@ -327,7 +327,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			if (!w) w=16;
 
 			if (use8bppMode) {
-				UINT32* index_ptr2=m_mlc_vram + ((indx2*4)&0x7fff);
+				uint32_t* index_ptr2=m_mlc_vram + ((indx2*4)&0x7fff);
 				sprite2=((index_ptr2[2]&0x3)<<16) | (index_ptr2[3]&0xffff);
 			}
 
@@ -478,11 +478,11 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 			if (blockIsTilemapIndex) {
 				if (useIndicesInRom)
 				{
-					const UINT8* ptr=rawrom+(tile*2);
+					const uint8_t* ptr=rawrom+(tile*2);
 					tile=(*ptr) + ((*(ptr+1))<<8);
 
 					if (use8bppMode) {
-						const UINT8* ptr2=rawrom+(tile2*2);
+						const uint8_t* ptr2=rawrom+(tile2*2);
 						tile2=(*ptr2) + ((*(ptr2+1))<<8);
 					}
 					else
@@ -505,7 +505,7 @@ void deco_mlc_state::draw_sprites( const rectangle &cliprect, int scanline, UINT
 				}
 				else
 				{
-					const UINT32* ptr=m_mlc_vram + ((tile)&0x7fff);
+					const uint32_t* ptr=m_mlc_vram + ((tile)&0x7fff);
 					tile=(*ptr)&0xffff;
 
 					if (tileFormat)
@@ -551,7 +551,7 @@ void deco_mlc_state::screen_eof_mlc(screen_device &screen, bool state)
 	}
 }
 
-UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 //  temp_bitmap->fill(0, cliprect);
 	bitmap.fill(m_palette->pen(0), cliprect); /* Pen 0 fill colour confirmed from Skull Fang level 2 */
@@ -562,7 +562,7 @@ UINT32 deco_mlc_state::screen_update_mlc(screen_device &screen, bitmap_rgb32 &bi
 
 	for (int i=cliprect.min_y;i<=cliprect.max_y;i++)
 	{
-		UINT32 *dest = &bitmap.pix32(i);
+		uint32_t *dest = &bitmap.pix32(i);
 
 		/*
 		printf("%d -", i);

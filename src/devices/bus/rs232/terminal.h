@@ -12,7 +12,7 @@ class serial_terminal_device : public generic_terminal_device,
 	public device_rs232_port_interface
 {
 public:
-	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	serial_terminal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_WRITE_LINE_MEMBER( input_txd ) override { device_buffered_serial_interface::rx_w(state); }
 
@@ -25,10 +25,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void tra_callback() override;
-	virtual void send_key(UINT8 code) override;
+	virtual void send_key(uint8_t code) override;
 
 private:
-	virtual void received_byte(UINT8 byte) override;
+	virtual void received_byte(uint8_t byte) override;
 
 	required_ioport m_rs232_txbaud;
 	required_ioport m_rs232_rxbaud;

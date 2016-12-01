@@ -22,7 +22,7 @@ void pacman_state::acitya_decrypt_rom_8()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	RAM = memregion("maincpu")->base();
 
@@ -57,7 +57,7 @@ void pacman_state::acitya_decrypt_rom_9()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	RAM = memregion("maincpu")->base();
 
@@ -89,7 +89,7 @@ void pacman_state::acitya_decrypt_rom_A()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	RAM = memregion("maincpu")->base();
 
@@ -121,7 +121,7 @@ void pacman_state::acitya_decrypt_rom_B()
 {
 	int oldbyte,inverted_oldbyte,newbyte;
 	int mem;
-	UINT8 *RAM;
+	uint8_t *RAM;
 
 	RAM = memregion("maincpu")->base();
 
@@ -180,7 +180,7 @@ READ8_MEMBER(pacman_state::acitya_decrypt_rom )
 
 MACHINE_START_MEMBER(pacman_state,acitya)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	/* While the PAL supports up to 16 decryption methods, only four
 	    are actually used in the PAL.  Therefore, we'll take a little

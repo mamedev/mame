@@ -12,8 +12,8 @@ class nes_namcot3433_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3433_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_namcot3433_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -23,7 +23,7 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	UINT8 m_latch;
+	uint8_t m_latch;
 };
 
 
@@ -33,7 +33,7 @@ class nes_namcot3446_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3446_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -42,7 +42,7 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	UINT8 m_latch;
+	uint8_t m_latch;
 };
 
 
@@ -52,7 +52,7 @@ class nes_namcot3425_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot3425_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -61,8 +61,8 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	UINT8 m_latch;
-	UINT8 m_reg[4];
+	uint8_t m_latch;
+	uint8_t m_reg[4];
 };
 
 
@@ -72,8 +72,8 @@ class nes_namcot340_device : public nes_nrom_device
 {
 public:
 	// construction/destruction
-	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot340_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	nes_namcot340_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -88,7 +88,7 @@ public:
 	virtual void pcb_reset() override;
 
 protected:
-	UINT16 m_irq_count;
+	uint16_t m_irq_count;
 	int m_irq_enable;
 
 	static const device_timer_id TIMER_IRQ = 0;
@@ -96,7 +96,7 @@ protected:
 
 	// Namcot-163 chip contains 8K of internal ram, possibly battery backed up (not emulated yet)
 	// was it also present in 175 & 340 chips?
-	UINT8 m_n163_ram[0x2000];
+	uint8_t m_n163_ram[0x2000];
 };
 
 
@@ -106,7 +106,7 @@ class nes_namcot175_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot175_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -117,7 +117,7 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	UINT8 m_wram_protect;
+	uint8_t m_wram_protect;
 };
 
 
@@ -127,7 +127,7 @@ class nes_namcot163_device : public nes_namcot340_device
 {
 public:
 	// construction/destruction
-	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_namcot163_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -144,9 +144,9 @@ public:
 	virtual void pcb_reset() override;
 
 private:
-	void set_mirror(UINT8 page, UINT8 data);
+	void set_mirror(uint8_t page, uint8_t data);
 
-	UINT8 m_wram_protect, m_latch, m_chr_bank;
+	uint8_t m_wram_protect, m_latch, m_chr_bank;
 	// TODO: add emulation of the sound part of the chip
 };
 

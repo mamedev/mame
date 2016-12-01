@@ -35,11 +35,11 @@ public:
 	DECLARE_READ8_MEMBER(port77_r);
 	DECLARE_READ8_MEMBER(portff_r);
 	DECLARE_WRITE8_MEMBER(kbd_put);
-	UINT32 screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<UINT8> m_p_videoram;
+	uint32_t screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	required_shared_ptr<uint8_t> m_p_videoram;
 private:
-	UINT8 m_term_data;
-	const UINT8 *m_p_chargen;
+	uint8_t m_term_data;
+	const uint8_t *m_p_chargen;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 };
@@ -70,7 +70,7 @@ READ8_MEMBER( modellot_state::port77_r)
 
 READ8_MEMBER( modellot_state::portff_r)
 {
-	UINT8 data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
+	uint8_t data = (m_term_data) ? m_term_data ^ 0x7f : 0xff;
 	m_term_data = 0;
 	return data;
 }
@@ -104,16 +104,16 @@ static GFXDECODE_START( modellot )
 GFXDECODE_END
 
 
-UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx,inv;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx,inv;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 16; y++)
 	{
 		for (ra = 0; ra < 16; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = 0; x < 64; x++)
 			{
@@ -121,7 +121,7 @@ UINT32 modellot_state::screen_update_modellot(screen_device &screen, bitmap_ind1
 
 				chr = m_p_videoram[x+ma];
 
-				if BIT(chr, 7) inv = 0xff;
+				if (BIT(chr, 7)) inv = 0xff;
 
 				chr &= 0x7f; // cursor
 
@@ -155,7 +155,7 @@ static MACHINE_CONFIG_START( modellot, modellot_state )
 	MCFG_CPU_IO_MAP(modellot_io)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(64*8, 16*16)

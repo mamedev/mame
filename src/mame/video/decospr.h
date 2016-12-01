@@ -1,20 +1,20 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail, David Haywood
 
-typedef device_delegate<UINT16 (UINT16 pri)> decospr_pri_cb_delegate;
-typedef device_delegate<UINT16 (UINT16 col)> decospr_col_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t pri)> decospr_pri_cb_delegate;
+typedef device_delegate<uint16_t (uint16_t col)> decospr_col_cb_delegate;
 
 
 // function definition for a callback
-#define DECOSPR_PRIORITY_CB_MEMBER(_name)   UINT16 _name(UINT16 pri)
-#define DECOSPR_COLOUR_CB_MEMBER(_name)     UINT16 _name(UINT16 col)
+#define DECOSPR_PRIORITY_CB_MEMBER(_name)   uint16_t _name(uint16_t pri)
+#define DECOSPR_COLOUR_CB_MEMBER(_name)     uint16_t _name(uint16_t col)
 
 
 class decospr_device : public device_t,
 						public device_video_interface
 {
 public:
-	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
@@ -32,14 +32,14 @@ public:
 		dev.m_y_offset = y_offset;
 	}
 
-	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
-	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip = false );
+	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip = false );
+	void draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip = false );
 	void set_alt_format(bool alt) { m_alt_format = alt; };
-	void set_pix_mix_mask(UINT16 mask) { m_pixmask = mask; };
-	void set_pix_raw_shift(UINT16 shift) { m_raw_shift = shift; };
+	void set_pix_mix_mask(uint16_t mask) { m_pixmask = mask; };
+	void set_pix_raw_shift(uint16_t shift) { m_raw_shift = shift; };
 
 	void alloc_sprite_bitmap();
-	void inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask, UINT8 alpha = 0xff);
+	void inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t priority_mask, uint16_t colbase, uint16_t palmask, uint8_t alpha = 0xff);
 	bitmap_ind16& get_sprite_temp_bitmap() { assert(m_sprite_bitmap.valid()); return m_sprite_bitmap; };
 
 	DECOSPR_PRIORITY_CB_MEMBER(default_col_cb);
@@ -47,13 +47,13 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	UINT8 m_gfxregion;
+	uint8_t m_gfxregion;
 	decospr_pri_cb_delegate m_pri_cb;
 	decospr_col_cb_delegate m_col_cb;
 	bitmap_ind16 m_sprite_bitmap;// optional sprite bitmap (should be INDEXED16)
 	bool m_alt_format;
-	UINT16 m_pixmask;
-	UINT16 m_raw_shift;
+	uint16_t m_pixmask;
+	uint16_t m_raw_shift;
 
 	// used by various bootleg / clone chips.
 	bool m_is_bootleg; // used by various bootlegs (disables masking of sprite tile number when multi-sprite is used)
@@ -64,7 +64,7 @@ protected:
 
 private:
 	template<class _BitmapClass>
-	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip);
+	void draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 

@@ -126,7 +126,7 @@ menu_cheat::menu_cheat(mame_ui_manager &mui, render_container &container) : menu
 {
 }
 
-void menu_cheat::populate()
+void menu_cheat::populate(float &customtop, float &custombottom)
 {
 	/* iterate over cheats */
 	std::string text;
@@ -142,7 +142,7 @@ void menu_cheat::populate()
 	if (!mame_machine_manager::instance()->cheat().entries().empty()) {
 		for (auto &curcheat : mame_machine_manager::instance()->cheat().entries())
 		{
-			UINT32 flags;
+			uint32_t flags;
 			curcheat->menu_text(text, subtext, flags);
 			if (text == MENU_SEPARATOR_ITEM)
 				item_append(menu_item_type::SEPARATOR, flags);
@@ -264,7 +264,7 @@ void menu_autofire::handle()
     menu
 -------------------------------------------------*/
 
-void menu_autofire::populate()
+void menu_autofire::populate(float &customtop, float &custombottom)
 {
 	char temp_text[64];
 

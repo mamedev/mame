@@ -48,22 +48,22 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	bitmap_ind16 m_bitmap;
 
 	memory_region   *m_fontram_region;
 	memory_region *m_vram_region;
-	UINT8   *m_fontram;
-	UINT8   *m_vram;
-	UINT8   *m_ram_0000;
-	UINT8   *m_ram_c000;
-	UINT8   m_temp_attr;
+	uint8_t   *m_fontram;
+	uint8_t   *m_vram;
+	uint8_t   *m_ram_0000;
+	uint8_t   *m_ram_c000;
+	uint8_t   m_temp_attr;
 	emu_timer *m_video_timer;
 
 	/* PIA 0 (UD12) */
-	UINT8   m_pia0_porta;
-	UINT8   m_pia0_portb;
+	uint8_t   m_pia0_porta;
+	uint8_t   m_pia0_portb;
 	int     m_pia0_irq_state;
 	int     m_pia0_cb2;         /* 60/50 */
 
@@ -71,11 +71,11 @@ public:
 	int     m_pia1_irq_state;
 
 	/* Vblank counter ("RTC") */
-	UINT8   m_rtc;
+	uint8_t   m_rtc;
 
 	void set_banks()
 	{
-		UINT8 *ram_ptr = m_messram->pointer();
+		uint8_t *ram_ptr = m_messram->pointer();
 
 		m_ram_0000 = ram_ptr;
 
@@ -142,7 +142,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_0000_w)
 
 READ8_MEMBER(osbexec_state::osbexec_c000_r)
 {
-	UINT8   data = m_ram_c000[offset];
+	uint8_t   data = m_ram_c000[offset];
 
 	if ( ( m_pia0_porta & 0x40 ) && offset < 0x1000 )
 	{
@@ -166,7 +166,7 @@ WRITE8_MEMBER(osbexec_state::osbexec_c000_w)
 
 READ8_MEMBER(osbexec_state::osbexec_kbd_r)
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	if ( offset & 0x0100 )
 		data &= ioport( "ROW0" )->read();
@@ -315,7 +315,7 @@ void osbexec_state::video_start()
 	machine().first_screen()->register_screen_bitmap(m_bitmap);
 }
 
-UINT32 osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t osbexec_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -455,16 +455,16 @@ TIMER_CALLBACK_MEMBER(osbexec_state::osbexec_video_callback)
 	}
 	if ( y < 240 )
 	{
-		UINT16 row_addr = ( y / 10 ) * 128;
-		UINT16 *p = &m_bitmap.pix16(y);
-		UINT8 char_line = y % 10;
+		uint16_t row_addr = ( y / 10 ) * 128;
+		uint16_t *p = &m_bitmap.pix16(y);
+		uint8_t char_line = y % 10;
 
 		for ( int x = 0; x < 80; x++ )
 		{
-			UINT8 ch = m_vram[ row_addr + x ];
-			UINT8 attr = m_vram[ 0x1000 + row_addr + x ];
-			UINT8 fg_col = ( attr & 0x80 ) ? 2 : 1;
-			UINT8 font_bits = m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
+			uint8_t ch = m_vram[ row_addr + x ];
+			uint8_t attr = m_vram[ 0x1000 + row_addr + x ];
+			uint8_t fg_col = ( attr & 0x80 ) ? 2 : 1;
+			uint8_t font_bits = m_fontram[ ( ( attr & 0x10 ) ? 0x800 : 0 ) + ( ch & 0x7f ) * 16 + char_line ];
 
 			/* Check for underline */
 			if ( ( attr & 0x40 ) && char_line == 9 )
@@ -530,7 +530,7 @@ static MACHINE_CONFIG_START( osbexec, osbexec_state )
 	MCFG_CPU_IO_MAP( osbexec_io)
 	MCFG_Z80_DAISY_CHAIN( osbexec_daisy_config )
 
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(osbexec_state, screen_update)
 	MCFG_SCREEN_RAW_PARAMS( MAIN_CLOCK/2, 768, 0, 640, 260, 0, 240 )    /* May not be correct */
 	MCFG_SCREEN_PALETTE("palette")

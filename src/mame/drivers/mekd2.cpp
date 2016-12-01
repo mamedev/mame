@@ -115,10 +115,10 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
-	UINT8 m_cass_data[4];
-	UINT8 m_segment;
-	UINT8 m_digit;
-	UINT8 m_keydata;
+	uint8_t m_cass_data[4];
+	uint8_t m_segment;
+	uint8_t m_digit;
+	uint8_t m_keydata;
 	bool m_cass_state;
 	bool m_cassold;
 	required_device<cpu_device> m_maincpu;
@@ -205,7 +205,7 @@ void mekd2_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in mekd2_state::device_timer");
+		assert_always(false, "Unknown id in mekd2_state::device_timer");
 	}
 }
 
@@ -234,7 +234,7 @@ READ_LINE_MEMBER( mekd2_state::mekd2_key40_r )
 READ8_MEMBER( mekd2_state::mekd2_key_r )
 {
 	char kbdrow[4];
-	UINT8 i;
+	uint8_t i;
 	m_keydata = 0xff;
 
 	for (i = 0; i < 6; i++)
@@ -276,7 +276,7 @@ WRITE8_MEMBER( mekd2_state::mekd2_segment_w )
 
 WRITE8_MEMBER( mekd2_state::mekd2_digit_w )
 {
-	UINT8 i;
+	uint8_t i;
 	if (data < 0x3f)
 	{
 		for (i = 0; i < 6; i++)
@@ -305,8 +305,8 @@ QUICKLOAD_LOAD_MEMBER( mekd2_state, mekd2_quik )
 {
 	static const char magic[] = "MEK6800D2";
 	char buff[9];
-	UINT16 addr, size;
-	UINT8 ident, *RAM = memregion("maincpu")->base();
+	uint16_t addr, size;
+	uint8_t ident, *RAM = memregion("maincpu")->base();
 
 	image.fread(buff, sizeof (buff));
 	if (memcmp(buff, magic, sizeof (buff)))
@@ -346,7 +346,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mekd2_state::mekd2_p)
 {
 	/* cassette - turn 1200/2400Hz to a bit */
 	m_cass_data[1]++;
-	UINT8 cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
+	uint8_t cass_ws = (m_cass->input() > +0.03) ? 1 : 0;
 
 	if (cass_ws != m_cass_data[0])
 	{

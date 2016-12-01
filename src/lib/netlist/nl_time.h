@@ -36,13 +36,13 @@ namespace netlist
 		using mult_type = std::uint_fast64_t;
 		static constexpr internal_type resolution = RES;
 
-		constexpr ptime() NOEXCEPT : m_time(0) {}
-		constexpr ptime(const ptime &rhs) NOEXCEPT = default;
-		constexpr ptime(ptime &&rhs) NOEXCEPT = default;
+		constexpr ptime() noexcept : m_time(0) {}
+		constexpr ptime(const ptime &rhs) noexcept = default;
+		constexpr ptime(ptime &&rhs) noexcept = default;
 
 		constexpr explicit ptime(const double t) = delete;
 		//: m_time((internal_type) ( t * (double) resolution)) { }
-		constexpr explicit ptime(const internal_type nom, const internal_type den) NOEXCEPT
+		constexpr explicit ptime(const internal_type nom, const internal_type den) noexcept
 		: m_time(nom * (resolution / den)) { }
 
 		ptime &operator=(const ptime rhs) { m_time = rhs.m_time; return *this; }

@@ -56,6 +56,7 @@ const options_entry osd_options::s_option_entries[] =
 	{ OSDOPTION_MAXIMIZE ";max",              "1",              OPTION_BOOLEAN,   "default to maximized windows; otherwise, windows will be minimized" },
 	{ OSDOPTION_WAITVSYNC ";vs",              "0",              OPTION_BOOLEAN,   "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ OSDOPTION_SYNCREFRESH ";srf",           "0",              OPTION_BOOLEAN,   "enable using the start of VBLANK for throttling instead of the game time" },
+	{ OSD_MONITOR_PROVIDER,                   OSDOPTVAL_AUTO,   OPTION_STRING,    "monitor discovery method" },
 
 	// per-window options
 	{ nullptr,                                nullptr,          OPTION_HEADER,    "OSD PER-WINDOW VIDEO OPTIONS" },
@@ -179,6 +180,7 @@ osd_common_t::osd_common_t(osd_options &options)
 		m_lightgun_input(nullptr),
 		m_joystick_input(nullptr),
 		m_output(nullptr),
+		m_monitor_module(nullptr),
 		m_watchdog(nullptr)
 {
 	osd_output::push(this);
@@ -191,7 +193,7 @@ osd_common_t::osd_common_t(osd_options &options)
 osd_common_t::~osd_common_t()
 {
 	for(unsigned int i= 0; i < m_video_names.size(); ++i)
-		osd_free(const_cast<char*>(m_video_names[i]));
+		free(const_cast<char*>(m_video_names[i]));
 	//m_video_options,reset();
 	osd_output::pop(this);
 }
@@ -212,6 +214,10 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, SOUND_JS);
 	REGISTER_MODULE(m_mod_man, SOUND_SDL);
 	REGISTER_MODULE(m_mod_man, SOUND_NONE);
+
+	REGISTER_MODULE(m_mod_man, MONITOR_SDL);
+	REGISTER_MODULE(m_mod_man, MONITOR_WIN32);
+	REGISTER_MODULE(m_mod_man, MONITOR_DXGI);
 
 #ifdef SDLMAME_MACOSX
 	REGISTER_MODULE(m_mod_man, DEBUG_OSX);
@@ -236,6 +242,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_WIN32);
+	REGISTER_MODULE(m_mod_man, KEYBOARDINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, KEYBOARD_NONE);
 
 	REGISTER_MODULE(m_mod_man, MOUSEINPUT_SDL);
@@ -245,6 +252,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, MOUSE_NONE);
 
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_X11);
+	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_RAWINPUT);
 	REGISTER_MODULE(m_mod_man, LIGHTGUNINPUT_WIN32);
 	REGISTER_MODULE(m_mod_man, LIGHTGUN_NONE);
 
@@ -252,6 +260,7 @@ void osd_common_t::register_options()
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_WINHYBRID);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_DINPUT);
 	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_XINPUT);
+	REGISTER_MODULE(m_mod_man, JOYSTICKINPUT_UWP);
 	REGISTER_MODULE(m_mod_man, JOYSTICK_NONE);
 
 	REGISTER_MODULE(m_mod_man, OUTPUT_NONE);
@@ -264,8 +273,15 @@ void osd_common_t::register_options()
 
 	const char *names[20];
 	int num;
-	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
 	std::vector<const char *> dnames;
+
+	m_mod_man.get_module_names(OSD_MONITOR_PROVIDER, 20, &num, names);
+	for (int i = 0; i < num; i++)
+		dnames.push_back(names[i]);
+	update_option(OSD_MONITOR_PROVIDER, dnames);
+
+	m_mod_man.get_module_names(OSD_FONT_PROVIDER, 20, &num, names);
+	dnames.clear();
 	for (int i = 0; i < num; i++)
 		dnames.push_back(names[i]);
 	update_option(OSD_FONT_PROVIDER, dnames);
@@ -328,7 +344,7 @@ void osd_common_t::register_options()
 	update_option(OSDOPTION_VIDEO, m_video_names);
 }
 
-void osd_common_t::update_option(const char * key, std::vector<const char *> &values)
+void osd_common_t::update_option(const char * key, std::vector<const char *> &values) const
 {
 	std::string current_value(m_options.description(key));
 	std::string new_option_value("");
@@ -421,7 +437,7 @@ void osd_common_t::init(running_machine &machine)
 		set_verbose(true);
 
 	// ensure we get called on the way out
-	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(osd_common_t::osd_exit), this));
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&osd_common_t::osd_exit, this));
 
 
 	/* now setup watchdog */
@@ -500,7 +516,7 @@ void osd_common_t::debugger_update()
 //  stream
 //-------------------------------------------------
 
-void osd_common_t::update_audio_stream(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::update_audio_stream(const int16_t *buffer, int samples_this_frame)
 {
 	//
 	// This method is called whenever the system has new audio data to stream.
@@ -565,7 +581,7 @@ std::vector<ui::menu_item> osd_common_t::get_slider_list()
 //  to an AVI recording if one is active
 //-------------------------------------------------
 
-void osd_common_t::add_audio_to_recording(const INT16 *buffer, int samples_this_frame)
+void osd_common_t::add_audio_to_recording(const int16_t *buffer, int samples_this_frame)
 {
 	// Do nothing
 }
@@ -609,14 +625,18 @@ bool osd_common_t::execute_command(const char *command)
 
 }
 
-static void output_notifier_callback(const char *outname, INT32 value, void *param)
+static void output_notifier_callback(const char *outname, int32_t value, void *param)
 {
-	osd_common_t *osd = (osd_common_t*)param;
-	osd->notify(outname, value);
+	static_cast<osd_common_t*>(param)->notify(outname, value);
 }
 
 void osd_common_t::init_subsystems()
 {
+	// monitors have to be initialized before video init
+	m_monitor_module = select_module_options<monitor_module *>(options(), OSD_MONITOR_PROVIDER);
+	assert(m_monitor_module != nullptr);
+	m_monitor_module->init(options());
+
 	if (!video_init())
 	{
 		video_exit();
@@ -650,8 +670,8 @@ void osd_common_t::init_subsystems()
 
 	input_init();
 	// we need pause callbacks
-	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(osd_common_t::input_pause), this));
-	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(osd_common_t::input_resume), this));
+	machine().add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&osd_common_t::input_pause, this));
+	machine().add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&osd_common_t::input_resume, this));
 }
 
 bool osd_common_t::video_init()

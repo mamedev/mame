@@ -75,7 +75,7 @@ inline void im6402_device::set_tre(int state)
 //  im6402_device - constructor
 //-------------------------------------------------
 
-im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+im6402_device::im6402_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, IM6402, "Intersil IM6402", tag, owner, clock, "im6402", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_write_tro(*this),
@@ -340,6 +340,9 @@ WRITE_LINE_MEMBER( im6402_device::crl_w )
 		else parity = PARITY_ODD;
 
 		set_data_frame(1, data_bit_count, parity, stop_bits);
+
+		receive_register_reset();
+		transmit_register_reset();
 	}
 }
 

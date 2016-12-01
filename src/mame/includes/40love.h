@@ -26,22 +26,22 @@ public:
 		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_video_ctrl;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram2;
-	optional_shared_ptr<UINT8> m_mcu_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_video_ctrl;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	optional_shared_ptr<uint8_t> m_mcu_ram;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap1;
 	std::unique_ptr<bitmap_ind16>    m_tmp_bitmap2;
 	tilemap_t     *m_bg_tilemap;
-	UINT8       m_flipscreen;
-	UINT8       m_pix_redraw;
-	UINT8       m_xoffset;
-	std::unique_ptr<UINT8[]>       m_pixram1;
-	std::unique_ptr<UINT8[]>       m_pixram2;
+	uint8_t       m_flipscreen;
+	uint8_t       m_pix_redraw;
+	uint8_t       m_xoffset;
+	std::unique_ptr<uint8_t[]>       m_pixram1;
+	std::unique_ptr<uint8_t[]>       m_pixram2;
 	bitmap_ind16    *m_pixel_bitmap1;
 	bitmap_ind16    *m_pixel_bitmap2;
 	int         m_pixram_sel;
@@ -53,24 +53,24 @@ public:
 	int         m_pending_nmi;
 
 	/* fake mcu */
-	UINT8       m_from_mcu;
+	uint8_t       m_from_mcu;
 	int         m_mcu_sent;
 	int         m_main_sent;
-	UINT8       m_mcu_in[2][16];
-	UINT8       m_mcu_out[2][16];
+	uint8_t       m_mcu_in[2][16];
+	uint8_t       m_mcu_out[2][16];
 	int         m_mcu_cmd;
 
 	/* misc */
 	int         m_pix_color[4];
-	UINT8       m_pix1;
-	UINT8       m_pix2[2];
-	UINT8       m_snd_data;
-	UINT8       m_snd_flag;
+	uint8_t       m_pix1;
+	uint8_t       m_pix2[2];
+	uint8_t       m_snd_data;
+	uint8_t       m_snd_flag;
 	int         m_vol_ctrl[16];
-	UINT8       m_snd_ctrl0;
-	UINT8       m_snd_ctrl1;
-	UINT8       m_snd_ctrl2;
-	UINT8       m_snd_ctrl3;
+	uint8_t       m_snd_ctrl0;
+	uint8_t       m_snd_ctrl1;
+	uint8_t       m_snd_ctrl2;
+	uint8_t       m_snd_ctrl3;
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
@@ -118,7 +118,7 @@ public:
 	DECLARE_MACHINE_RESET(undoukai);
 	DECLARE_MACHINE_RESET(common);
 	DECLARE_MACHINE_RESET(ta7630);
-	UINT32 screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_fortyl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void redraw_pixels();
 	void fortyl_set_scroll_x( int offset );
 	void fortyl_plot_pix( int offset );

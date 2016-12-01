@@ -39,7 +39,7 @@ const device_type ES8712 = &device_creator<es8712_device>;
 //  es8712_device - constructor
 //-------------------------------------------------
 
-es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+es8712_device::es8712_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ES8712, "ES8712", tag, owner, clock, "es8712", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_rom(*this, DEVICE_SELF),
@@ -156,7 +156,7 @@ void es8712_device::generate_adpcm(stream_sample_t *buffer, int samples)
 	/* if this chip is active */
 	if (m_playing)
 	{
-		UINT8 *base = &m_rom[m_bank_offset + m_base_offset];
+		uint8_t *base = &m_rom[m_bank_offset + m_base_offset];
 		int sample = m_sample;
 		int signal = m_signal;
 		int count = m_count;

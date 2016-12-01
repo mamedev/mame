@@ -45,20 +45,20 @@ ROM_END
 //  hd44780_device - constructor
 //-------------------------------------------------
 
-hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
-	device_t(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__),
-	m_cgrom(*this, DEVICE_SELF)
+hd44780_device::hd44780_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: hd44780_device(mconfig, HD44780, "HD44780 A00", tag, owner, clock, "hd44780_a00", __FILE__)
 {
 	set_charset_type(CHARSET_HD44780_A00);
 }
 
-hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
-	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-	m_cgrom(*this, DEVICE_SELF)
+hd44780_device::hd44780_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_cgrom(nullptr)
+	, m_cgrom_region(*this, DEVICE_SELF)
 {
 }
 
-ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	hd44780_device(mconfig, KS0066_F05, "KS0066 F05", tag, owner, clock, "ks0066_f05", __FILE__)
 {
 	set_charset_type(CHARSET_KS0066_F05);
@@ -69,7 +69,7 @@ ks0066_f05_device::ks0066_f05_device(const machine_config &mconfig, const char *
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *hd44780_device::device_rom_region() const
+const tiny_rom_entry *hd44780_device::device_rom_region() const
 {
 	switch (m_charset_type)
 	{
@@ -86,8 +86,7 @@ const rom_entry *hd44780_device::device_rom_region() const
 
 void hd44780_device::device_start()
 {
-	if (!m_cgrom.found())
-		m_cgrom.set_target(memregion("cgrom")->base(), 0x1000);
+	m_cgrom = m_cgrom_region.found() ? m_cgrom_region : memregion("cgrom")->base();
 
 	m_pixel_update_cb.bind_relative_to(*owner());
 
@@ -178,7 +177,7 @@ void hd44780_device::set_charset_type(int type)
 	m_charset_type = type;
 }
 
-void hd44780_device::set_busy_flag(UINT16 usec)
+void hd44780_device::set_busy_flag(uint16_t usec)
 {
 	m_busy_flag = true;
 	m_busy_timer->adjust( attotime::from_usec( usec ) );
@@ -233,7 +232,7 @@ void hd44780_device::update_nibble(int rs, int rw)
 	m_nibble = !m_nibble;
 }
 
-inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8 pos, UINT8 y, UINT8 x, int state)
+inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, uint8_t line, uint8_t pos, uint8_t y, uint8_t x, int state)
 {
 	if (!m_pixel_update_cb.isnull())
 	{
@@ -241,7 +240,7 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 	}
 	else
 	{
-		UINT8 line_height = (m_char_size == 8) ? m_char_size : m_char_size + 1;
+		uint8_t line_height = (m_char_size == 8) ? m_char_size : m_char_size + 1;
 
 		if (m_lines <= 2)
 		{
@@ -274,19 +273,19 @@ inline void hd44780_device::pixel_update(bitmap_ind16 &bitmap, UINT8 line, UINT8
 //  device interface
 //**************************************************************************
 
-const UINT8 *hd44780_device::render()
+const uint8_t *hd44780_device::render()
 {
 	memset(m_render_buf, 0, sizeof(m_render_buf));
 
 	if (m_display_on)
 	{
-		UINT8 line_size = 80 / m_num_line;
+		uint8_t line_size = 80 / m_num_line;
 
 		for (int line = 0; line < m_num_line; line++)
 		{
 			for (int pos = 0; pos < line_size; pos++)
 			{
-				UINT16 char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
+				uint16_t char_pos = line * 0x40 + ((pos + m_disp_shift) % line_size);
 
 				int char_base;
 				if (m_ddram[char_pos] < 0x10)
@@ -303,8 +302,8 @@ const UINT8 *hd44780_device::render()
 					char_base = m_ddram[char_pos] * 0x10;
 				}
 
-				const UINT8 * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
-				UINT8 *dest = m_render_buf + 16 * (line * line_size + pos);
+				const uint8_t * charset = (m_ddram[char_pos] < 0x10) ? m_cgram : m_cgrom;
+				uint8_t *dest = m_render_buf + 16 * (line * line_size + pos);
 				memcpy (dest, charset + char_base, m_char_size);
 
 				if (char_pos == m_ac)
@@ -323,18 +322,18 @@ const UINT8 *hd44780_device::render()
 	return m_render_buf;
 }
 
-UINT32 hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t hd44780_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
-	const UINT8 *img = render();
+	const uint8_t *img = render();
 
-	UINT8 line_size = 80 / m_num_line;
+	uint8_t line_size = 80 / m_num_line;
 
 	for (int line = 0; line < m_num_line; line++)
 	{
 		for (int pos = 0; pos < line_size; pos++)
 		{
-			const UINT8 *src = img + 16 * (line * line_size + pos);
+			const uint8_t *src = img + 16 * (line * line_size + pos);
 			for (int y = 0; y < m_char_size; y++)
 				for (int x = 0; x < 5; x++)
 					pixel_update(bitmap, line, pos, y, x, BIT(src[y], 4 - x));
@@ -544,7 +543,7 @@ WRITE8_MEMBER(hd44780_device::data_write)
 
 READ8_MEMBER(hd44780_device::data_read)
 {
-	UINT8 data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
+	uint8_t data = (m_active_ram == DDRAM) ? m_ddram[m_ac] : m_cgram[m_ac];
 
 	if (LOG) logerror("HD44780 '%s': %sRAM read %x %c\n", tag(), m_active_ram == DDRAM ? "DD" : "CG", m_ac, data);
 

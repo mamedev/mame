@@ -74,7 +74,7 @@ WRITE_LINE_MEMBER(segas18_state::set_vdp_enable)
 }
 
 
-void segas18_state::set_vdp_mixing(UINT8 mixing)
+void segas18_state::set_vdp_mixing(uint8_t mixing)
 {
 	if (mixing != m_vdp_mixing)
 	{
@@ -99,11 +99,11 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
 	bitmap_ind8 &priority_bitmap = screen.priority();
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-	//  UINT16 *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
-	//  UINT16 *src2 = vdp->m_render_line_raw;
+	//  uint16_t *src = vdp->m_render_line; // can't use this because we're not in RGB32, which we'll need to be if there are palette effects
+	//  uint16_t *src2 = vdp->m_render_line_raw;
 
-		UINT16 *dst = &bitmap.pix(y);
-		UINT8 *pri = &priority_bitmap.pix(y);
+		uint16_t *dst = &bitmap.pix(y);
+		uint8_t *pri = &priority_bitmap.pix(y);
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
 			if (m_vdp->m_render_line_raw[x] & 0x100)
@@ -137,7 +137,7 @@ void segas18_state::draw_vdp(screen_device &screen, bitmap_ind16 &bitmap, const 
  *
  *************************************/
 
-UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 /*
     Current understanding of VDP mixing:
@@ -225,13 +225,13 @@ UINT32 segas18_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (int y = rect->min_y; y <= rect->max_y; y++)
 		{
-			UINT16 *dest = &bitmap.pix(y);
-			UINT16 *src = &sprites.pix(y);
-			UINT8 *pri = &screen.priority().pix(y);
+			uint16_t *dest = &bitmap.pix(y);
+			uint16_t *src = &sprites.pix(y);
+			uint8_t *pri = &screen.priority().pix(y);
 			for (int x = rect->min_x; x <= rect->max_x; x++)
 			{
 				// only process written pixels
-				UINT16 pix = src[x];
+				uint16_t pix = src[x];
 				if (pix != 0xffff)
 				{
 					// compare sprite priority against tilemap priority

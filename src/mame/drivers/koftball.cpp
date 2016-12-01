@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 King Of Football (c)1995 BMC
@@ -50,14 +50,14 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT16> m_main_ram;
-	required_shared_ptr<UINT16> m_bmc_1_videoram;
-	required_shared_ptr<UINT16> m_bmc_2_videoram;
+	required_shared_ptr<uint16_t> m_main_ram;
+	required_shared_ptr<uint16_t> m_bmc_1_videoram;
+	required_shared_ptr<uint16_t> m_bmc_2_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	tilemap_t *m_tilemap_1;
 	tilemap_t *m_tilemap_2;
-	UINT16 m_prot_data;
+	uint16_t m_prot_data;
 
 	DECLARE_READ16_MEMBER(random_number_r);
 	DECLARE_READ16_MEMBER(prot_r);
@@ -68,7 +68,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_t1_tile_info);
 	TILE_GET_INFO_MEMBER(get_t2_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(bmc_interrupt);
 };
 
@@ -93,13 +93,13 @@ TILE_GET_INFO_MEMBER(koftball_state::get_t2_tile_info)
 
 void koftball_state::video_start()
 {
-	m_tilemap_1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_tilemap_2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t1_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_tilemap_2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(koftball_state::get_t2_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_tilemap_1->set_transparent_pen(0);
 }
 
-UINT32 koftball_state::screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t koftball_state::screen_update_koftball(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_tilemap_2->draw(screen, bitmap, cliprect, 0, 0);
 	m_tilemap_1->draw(screen, bitmap, cliprect, 0, 0);
@@ -274,7 +274,7 @@ ROM_END
 
 #if NVRAM_HACK
 
-static const UINT16 nvram[]=
+static const uint16_t nvram[]=
 {
 	0x0000,0x5555,0x0000,0x5555,0x0000,0x5555,0x0000,0x5555,
 	0x0000,0x5555,0x0000,0x0000,0x0000,0x0000,0x5555,0x5555,

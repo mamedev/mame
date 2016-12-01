@@ -159,7 +159,7 @@ Fax                  1982  6502   FXL, FLA
 
 CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 {
-	UINT8 dial = ioport("DIAL")->read();
+	uint8_t dial = ioport("DIAL")->read();
 	int result = 0;
 
 	result = (dial != m_last_dial) << 4;
@@ -1456,7 +1456,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0xf8;
@@ -1467,7 +1467,7 @@ DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 
 DRIVER_INIT_MEMBER(exidy_state,targ)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x5c;
@@ -1478,7 +1478,7 @@ DRIVER_INIT_MEMBER(exidy_state,targ)
 
 DRIVER_INIT_MEMBER(exidy_state,spectar)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1488,7 +1488,7 @@ DRIVER_INIT_MEMBER(exidy_state,spectar)
 
 DRIVER_INIT_MEMBER(exidy_state,rallys)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1498,7 +1498,7 @@ DRIVER_INIT_MEMBER(exidy_state,rallys)
 
 DRIVER_INIT_MEMBER(exidy_state,phantoma)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1513,25 +1513,25 @@ DRIVER_INIT_MEMBER(exidy_state,phantoma)
 
 DRIVER_INIT_MEMBER(exidy_state,mtrap)
 {
-	exidy_video_config(0x14, 0x00, FALSE);
+	exidy_video_config(0x14, 0x00, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,venture)
 {
-	exidy_video_config(0x04, 0x04, FALSE);
+	exidy_video_config(0x04, 0x04, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,teetert)
 {
-	exidy_video_config(0x0c, 0x0c, FALSE);
+	exidy_video_config(0x0c, 0x0c, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,pepper2)
 {
-	exidy_video_config(0x14, 0x04, TRUE);
+	exidy_video_config(0x14, 0x04, true);
 }
 
 
@@ -1539,7 +1539,7 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	exidy_video_config(0x04, 0x04, TRUE);
+	exidy_video_config(0x04, 0x04, true);
 
 	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x2000);
 }

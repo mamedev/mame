@@ -152,12 +152,12 @@ class DebugDrawApp : public entry::AppI
 				ddDraw(sphere);
 				ddSetWireframe(false);
 
-				ddSetColor(0xf0ffc0ff);
+				ddSetColor(0xc0ffc0ff);
 				sphere.m_center[0] = -2.0f;
 				ddSetLod(2);
 				ddDraw(sphere);
 
-				ddSetColor(0xc0f0ffff);
+				ddSetColor(0xa0f0ffff);
 				sphere.m_center[0] = -4.0f;
 				ddSetLod(1);
 				ddDraw(sphere);
@@ -197,6 +197,12 @@ class DebugDrawApp : public entry::AppI
 					float from[3] = {  -9.0f, 2.0f, -1.0f };
 					float to[3]   = { -11.0f, 4.0f,  0.0f };
 					ddDrawCylinder(from, to, 0.5f );
+				}
+
+				{
+					float from[3] = {  0.0f, 7.0f, 0.0f };
+					float to[3]   = { -6.0f, 7.0f, 0.0f };
+					ddDrawCylinder(from, to, 0.5f, true);
 				}
 			ddPop();
 

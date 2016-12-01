@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /***********************************
  Super Speed Race Jr (c) 1985 Taito
@@ -43,7 +43,7 @@ void ssrj_state::machine_start()
 
 void ssrj_state::machine_reset()
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
 	m_oldport = 0x80;

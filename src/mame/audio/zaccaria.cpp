@@ -2,11 +2,11 @@
 // copyright-holders:Vas Crabb
 #include "emu.h"
 #include "audio/zaccaria.h"
-
 #include "cpu/m6800/m6800.h"
 #include "machine/clock.h"
 #include "machine/rescap.h"
 #include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 //**************************************************************************
@@ -128,7 +128,7 @@ static ADDRESS_MAP_START(zac1b11142_audio_map, AS_PROGRAM, 8, zac1b11142_audio_d
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x007f) AM_RAM // 6802 internal RAM
 	AM_RANGE(0x0090, 0x0093) AM_MIRROR(0x8f6c) AM_DEVREADWRITE("pia_1i", pia6821_device, read, write)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x83ff) AM_DEVWRITE("dac_1f", dac_device, write_unsigned8) // MC1408
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x83ff) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x1400, 0x1400) AM_MIRROR(0xc3ff) AM_WRITE(melody_command_w)
 	AM_RANGE(0x1800, 0x1800) AM_MIRROR(0xc3ff) AM_READ(host_command_r)
 	AM_RANGE(0x2000, 0x2fff) AM_MIRROR(0x8000) AM_ROM // ROM 8 with A12 low
@@ -200,8 +200,9 @@ MACHINE_CONFIG_DERIVED(zac1b11142_config, zac1b111xx_base_config)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("speech", tms5220_device, data_w))
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(zac1b11142_audio_device, pia_1i_portb_w))
 
-	MCFG_DAC_ADD("dac_1f")
-	MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.80, 0)
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_MIXER_ROUTE(ALL_OUTPUTS, DEVICE_SELF_OWNER, 0.40, 0) // mc1408.1f
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	// There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF)
 	// 162kHz measured on pin 3 20 minutes after power on, clock would then be 162.3*4=649.2kHz
@@ -241,7 +242,7 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 		char const *name,
 		char const *tag,
 		device_t *owner,
-		UINT32 clock,
+		uint32_t clock,
 		char const *shortname,
 		char const *source)
 	: device_t(mconfig, devtype, name, tag, owner, clock, shortname, source)
@@ -256,8 +257,8 @@ zac1b111xx_melody_base::zac1b111xx_melody_base(
 
 READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 {
-	UINT8 const control = m_melodypia->b_output();
-	UINT8 data = 0xff;
+	uint8_t const control = m_melodypia->b_output();
+	uint8_t data = 0xff;
 
 	if (0x01 == (control & 0x03))
 		data &= m_melodypsg1->data_r(space, 0);
@@ -270,7 +271,7 @@ READ8_MEMBER(zac1b111xx_melody_base::melodypia_porta_r)
 
 WRITE8_MEMBER(zac1b111xx_melody_base::melodypia_porta_w)
 {
-	UINT8 const control = m_melodypia->b_output();
+	uint8_t const control = m_melodypia->b_output();
 
 	if (control & 0x02)
 		m_melodypsg1->data_address_w(space, (control >> 0) & 0x01, data);
@@ -309,7 +310,7 @@ void zac1b111xx_melody_base::device_reset()
 //  1B11107-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+zac1b11107_audio_device::zac1b11107_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11107, "Zaccaria 1B11107 Sound Board", tag, owner, clock, "zac1b11107", __FILE__)
 {
 }
@@ -363,7 +364,7 @@ machine_config_constructor zac1b11107_audio_device::device_mconfig_additions() c
 //  1B11142-SPECIFIC IMPLEMENTATION
 //**************************************************************************
 
-zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, UINT32 clock)
+zac1b11142_audio_device::zac1b11142_audio_device(machine_config const &mconfig, char const *tag, device_t *owner, uint32_t clock)
 	: zac1b111xx_melody_base(mconfig, ZACCARIA_1B11142, "Zaccaria 1B11142 Sound Board", tag, owner, clock, "zac1b11142", __FILE__)
 	, m_acs_cb(*this)
 	, m_audiocpu(*this, "audiocpu")

@@ -29,7 +29,7 @@ class sms_light_phaser_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_light_phaser_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -43,7 +43,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 peripheral_r() override;
+	virtual uint8_t peripheral_r() override;
 
 private:
 	required_ioport m_lphaser_pins;
@@ -57,8 +57,8 @@ private:
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void sensor_check();
 	int bright_aim_area( emu_timer *timer, int lgun_x, int lgun_y );
-	UINT16 screen_hpos_nonscaled(int scaled_hpos);
-	UINT16 screen_vpos_nonscaled(int scaled_vpos);
+	uint16_t screen_hpos_nonscaled(int scaled_hpos);
+	uint16_t screen_vpos_nonscaled(int scaled_vpos);
 };
 
 

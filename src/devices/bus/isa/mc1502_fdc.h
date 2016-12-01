@@ -26,11 +26,11 @@ class mc1502_fdc_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	DECLARE_FLOPPY_FORMATS( floppy_formats );
 	TIMER_CALLBACK_MEMBER( motor_callback );
@@ -50,10 +50,10 @@ private:
 	emu_timer *motor_timer;
 
 public:
-	void mc1502_wd17xx_aux_w(UINT8 data);
-	UINT8 mc1502_wd17xx_aux_r();
-	UINT8 mc1502_wd17xx_drq_r();
-	UINT8 mc1502_wd17xx_motor_r();
+	void mc1502_wd17xx_aux_w(uint8_t data);
+	uint8_t mc1502_wd17xx_aux_r();
+	uint8_t mc1502_wd17xx_drq_r();
+	uint8_t mc1502_wd17xx_motor_r();
 
 };
 

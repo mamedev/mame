@@ -27,7 +27,7 @@
 
 struct SPRITE_HELPER
 {
-	UINT8 bitmap[10],x1,x2,y1,y2, res1, res2;
+	uint8_t bitmap[10],x1,x2,y1,y2, res1, res2;
 };
 
 struct SPRITE
@@ -38,7 +38,7 @@ struct SPRITE
 	int delay;
 	int size;
 	int y;
-	UINT8 scolor;
+	uint8_t scolor;
 	int finished;
 	int finished_now;
 };
@@ -47,29 +47,29 @@ struct vc4000_video_t
 {
 	SPRITE sprites[4];
 	int line;
-	UINT8 sprite_collision;
-	UINT8 background_collision;
+	uint8_t sprite_collision;
+	uint8_t background_collision;
 	union
 	{
-		UINT8 data[0x100];
+		uint8_t data[0x100];
 		struct
 		{
 			SPRITE_HELPER sprites[3];
-			UINT8 res[0x10];
+			uint8_t res[0x10];
 			SPRITE_HELPER sprite4;
-			UINT8 res2[0x30];
-			UINT8 grid[20][2];
-			UINT8 grid_control[5];
-			UINT8 res3[0x13];
-			UINT8 sprite_sizes;
-			UINT8 sprite_colors[2];
-			UINT8 score_control;
-			UINT8 res4[2];
-			UINT8 background;
-			UINT8 sound;
-			UINT8 bcd[2];
-			UINT8 background_collision;
-			UINT8 sprite_collision;
+			uint8_t res2[0x30];
+			uint8_t grid[20][2];
+			uint8_t grid_control[5];
+			uint8_t res3[0x13];
+			uint8_t sprite_sizes;
+			uint8_t sprite_colors[2];
+			uint8_t score_control;
+			uint8_t res4[2];
+			uint8_t background;
+			uint8_t sound;
+			uint8_t bcd[2];
+			uint8_t background_collision;
+			uint8_t sprite_collision;
 		} d;
 	} reg;
 } ;
@@ -110,19 +110,19 @@ public:
 	DECLARE_READ8_MEMBER(elektor_cass_r);
 	DECLARE_WRITE8_MEMBER(elektor_cass_w);
 	vc4000_video_t m_video;
-	UINT8 m_sprite_collision[0x20];
-	UINT8 m_background_collision[0x20];
-	UINT8 m_joy1_x;
-	UINT8 m_joy1_y;
-	UINT8 m_joy2_x;
-	UINT8 m_joy2_y;
-	UINT8 m_objects[512];
-	UINT8 m_irq_pause;
+	uint8_t m_sprite_collision[0x20];
+	uint8_t m_background_collision[0x20];
+	uint8_t m_joy1_x;
+	uint8_t m_joy1_y;
+	uint8_t m_joy2_x;
+	uint8_t m_joy2_y;
+	uint8_t m_objects[512];
+	uint8_t m_irq_pause;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(vc4000);
-	UINT32 screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vc4000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vc4000_video_line);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(vc4000);
 
@@ -148,11 +148,11 @@ protected:
 	required_ioport m_joys;
 	required_ioport m_config;
 #endif
-	inline UINT8 vc4000_joystick_return_to_centre(UINT8 joy);
+	inline uint8_t vc4000_joystick_return_to_centre(uint8_t joy);
 	void vc4000_draw_digit(bitmap_ind16 &bitmap, int x, int y, int d, int line);
-	inline void vc4000_collision_plot(UINT8 *collision, UINT8 data, UINT8 color, int scale);
-	void vc4000_sprite_update(bitmap_ind16 &bitmap, UINT8 *collision, SPRITE *This);
-	inline void vc4000_draw_grid(UINT8 *collision);
+	inline void vc4000_collision_plot(uint8_t *collision, uint8_t data, uint8_t color, int scale);
+	void vc4000_sprite_update(bitmap_ind16 &bitmap, uint8_t *collision, SPRITE *This);
+	inline void vc4000_draw_grid(uint8_t *collision);
 };
 
 #endif /* VC4000_H_ */

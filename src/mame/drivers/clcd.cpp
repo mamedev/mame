@@ -106,7 +106,7 @@ public:
 		palette.set_pen_color(1, rgb_t(2,4,2));
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 	{
 		if (m_lcd_mode & LCD_MODE_GRAPH)
 		{
@@ -116,7 +116,7 @@ public:
 
 				for (int x = 0; x < 60; x++)
 				{
-					UINT8 bit = m_ram->pointer()[offset++];
+					uint8_t bit = m_ram->pointer()[offset++];
 
 					bitmap.pix16(y, (x * 8) + 0) = (bit >> 7) & 1;
 					bitmap.pix16(y, (x * 8) + 1) = (bit >> 6) & 1;
@@ -131,7 +131,7 @@ public:
 		}
 		else
 		{
-			UINT8 *font = m_lcd_char_rom->base();
+			uint8_t *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
 				font += 1024;
@@ -145,8 +145,8 @@ public:
 
 				for (int x = 0; x < 480; x++)
 				{
-					UINT8 ch = m_ram->pointer()[offset + (x / chrw)];
-					UINT8 bit = font[((ch & 0x7f) * chrw) + (x % chrw)];
+					uint8_t ch = m_ram->pointer()[offset + (x / chrw)];
+					uint8_t bit = font[((ch & 0x7f) * chrw) + (x % chrw)];
 					if (ch & 0x80)
 					{
 						bit = ~bit;
@@ -577,15 +577,15 @@ private:
 	int m_irq_acia;
 	int m_mmu_mode;
 	int m_mmu_saved_mode;
-	UINT8 m_mmu_offset1;
-	UINT8 m_mmu_offset2;
-	UINT8 m_mmu_offset3;
-	UINT8 m_mmu_offset4;
-	UINT8 m_mmu_offset5;
+	uint8_t m_mmu_offset1;
+	uint8_t m_mmu_offset2;
+	uint8_t m_mmu_offset3;
+	uint8_t m_mmu_offset4;
+	uint8_t m_mmu_offset5;
 	int m_key_clk;
 	int m_key_poll;
 	int m_key_column;
-	UINT16 m_key_shift;
+	uint16_t m_key_shift;
 	int m_key_force_format;
 	required_ioport m_col0;
 	required_ioport m_col1;

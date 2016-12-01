@@ -2,7 +2,7 @@
 // copyright-holders:smf
 #include "atapihle.h"
 
-atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,const char *shortname, const char *source)
+atapi_hle_device::atapi_hle_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,const char *shortname, const char *source)
 	: ata_hle_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_packet(0),
 	m_data_size(0)

@@ -159,10 +159,10 @@ WRITE32_MEMBER(superchs_state::superchs_input_w)
 
 READ32_MEMBER(superchs_state::superchs_stick_r)
 {
-	UINT8 b0 = ioport("UNKNOWN")->read();
-	UINT8 b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
-	UINT8 b2 = ioport("ACCEL")->read() ^ 0xff;
-	UINT8 b3 = ioport("WHEEL")->read();
+	uint8_t b0 = ioport("UNKNOWN")->read();
+	uint8_t b1 = ((ioport("SOUND")->read() * 255) / 100) ^ 0xff; // 00 = full, ff = silent
+	uint8_t b2 = ioport("ACCEL")->read() ^ 0xff;
+	uint8_t b3 = ioport("WHEEL")->read();
 
 	return b3 << 24 | b2 << 16 | b1 << 8 | b0;
 }

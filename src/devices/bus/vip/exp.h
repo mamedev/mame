@@ -81,20 +81,20 @@ class vip_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vip_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_int_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_int.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_out_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_out.set_callback(object); }
 	template<class _Object> static devcb_base &set_dma_in_wr_callback(device_t &device, _Object object) { return downcast<vip_expansion_slot_device &>(device).m_write_dma_in.set_callback(object); }
 
 	// computer interface
-	UINT8 program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
-	void program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh);
-	UINT8 io_r(address_space &space, offs_t offset);
-	void io_w(address_space &space, offs_t offset, UINT8 data);
-	UINT8 dma_r(address_space &space, offs_t offset);
-	void dma_w(address_space &space, offs_t offset, UINT8 data);
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint8_t program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh);
+	void program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh);
+	uint8_t io_r(address_space &space, offs_t offset);
+	void io_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t dma_r(address_space &space, offs_t offset);
+	void dma_w(address_space &space, offs_t offset, uint8_t data);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ_LINE_MEMBER( ef1_r );
 	DECLARE_READ_LINE_MEMBER( ef3_r );
 	DECLARE_READ_LINE_MEMBER( ef4_r );
@@ -131,16 +131,16 @@ public:
 
 protected:
 	// runtime
-	virtual UINT8 vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) { return 0xff; };
-	virtual void vip_program_w(address_space &space, offs_t offset, UINT8 data, int cdef, int *minh) { };
+	virtual uint8_t vip_program_r(address_space &space, offs_t offset, int cs, int cdef, int *minh) { return 0xff; };
+	virtual void vip_program_w(address_space &space, offs_t offset, uint8_t data, int cdef, int *minh) { };
 
-	virtual UINT8 vip_io_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void vip_io_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t vip_io_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void vip_io_w(address_space &space, offs_t offset, uint8_t data) { };
 
-	virtual UINT8 vip_dma_r(address_space &space, offs_t offset) { return 0xff; };
-	virtual void vip_dma_w(address_space &space, offs_t offset, UINT8 data) { };
+	virtual uint8_t vip_dma_r(address_space &space, offs_t offset) { return 0xff; };
+	virtual void vip_dma_w(address_space &space, offs_t offset, uint8_t data) { };
 
-	virtual UINT32 vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
+	virtual uint32_t vip_screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect) { return 0; }
 
 	virtual int vip_ef1_r() { return CLEAR_LINE; }
 	virtual int vip_ef3_r() { return CLEAR_LINE; }

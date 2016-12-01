@@ -6,7 +6,7 @@
 
 const device_type RF5C296 = &device_creator<rf5c296_device>;
 
-rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rf5c296_device::rf5c296_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PCCARD_SLOT, "PCCARD SLOT", tag, owner, clock, "pccard", __FILE__), m_rf5c296_reg(0), m_pccard(nullptr), m_pccard_name(nullptr)
 {
 }
@@ -16,7 +16,7 @@ void rf5c296_device::device_start()
 	m_pccard = machine().device<pccard_slot_device>(m_pccard_name);
 }
 
-void rf5c296_device::reg_w(ATTR_UNUSED UINT8 reg, UINT8 data)
+void rf5c296_device::reg_w(ATTR_UNUSED uint8_t reg, uint8_t data)
 {
 	//  fprintf(stderr, "rf5c296_reg_w %02x, %02x (%s)\n", reg, data, machine().describe_context());
 	switch (reg)
@@ -35,7 +35,7 @@ void rf5c296_device::reg_w(ATTR_UNUSED UINT8 reg, UINT8 data)
 	}
 }
 
-UINT8 rf5c296_device::reg_r(ATTR_UNUSED UINT8 reg)
+uint8_t rf5c296_device::reg_r(ATTR_UNUSED uint8_t reg)
 {
 	//  fprintf(stderr, "rf5c296_reg_r %02x (%s)\n", reg, machine().describe_context());
 	return 0x00;
@@ -80,7 +80,7 @@ READ16_MEMBER(rf5c296_device::io_r)
 		offset++;
 	}
 
-	UINT16 data;
+	uint16_t data;
 
 	switch( offset )
 	{

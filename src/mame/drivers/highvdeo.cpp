@@ -115,10 +115,10 @@ public:
 		m_okim6376(*this, "oki"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT16> m_blit_ram;
-	UINT16 m_vblank_bit;
-	UINT16 m_brasil_prot_latch;
-	UINT16 m_grancapi_prot_latch;
+	required_shared_ptr<uint16_t> m_blit_ram;
+	uint16_t m_vblank_bit;
+	uint16_t m_brasil_prot_latch;
+	uint16_t m_grancapi_prot_latch;
 	DECLARE_READ16_MEMBER(read0_r);
 	DECLARE_READ16_MEMBER(read1_r);
 	DECLARE_READ16_MEMBER(read2_r);
@@ -147,8 +147,8 @@ public:
 	DECLARE_DRIVER_INIT(ciclone);
 	DECLARE_DRIVER_INIT(record);
 	DECLARE_VIDEO_START(tourvisn);
-	UINT32 screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(vblank_irq_80186);
 	required_device<cpu_device> m_maincpu;
@@ -163,7 +163,7 @@ VIDEO_START_MEMBER(highvdeo_state,tourvisn)
 {
 }
 
-UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -173,7 +173,7 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 	{
 		for(x=0;x<(screen.visible_area().max_x+1)/2;x++)
 		{
-			UINT32 color;
+			uint32_t color;
 
 			color = ((m_blit_ram[count]) & 0x00ff)>>0;
 
@@ -193,7 +193,7 @@ UINT32 highvdeo_state::screen_update_tourvisn(screen_device &screen, bitmap_rgb3
 }
 
 /*Later HW, RGB565 instead of RAM-based pens (+ ramdac).*/
-UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -203,10 +203,10 @@ UINT32 highvdeo_state::screen_update_brasil(screen_device &screen, bitmap_rgb32 
 	{
 		for(x=0;x<400;x++)
 		{
-			UINT32 color;
-			UINT32 b;
-			UINT32 g;
-			UINT32 r;
+			uint32_t color;
+			uint32_t b;
+			uint32_t g;
+			uint32_t r;
 
 			color = (m_blit_ram[count]) & 0xffff;
 
@@ -243,8 +243,8 @@ READ16_MEMBER(highvdeo_state::read2_r)
 
 WRITE16_MEMBER(highvdeo_state::tv_vcf_bankselect_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	/* bits 0, 1 select the ROM bank */
 	bankaddress = (data & 0x03) * 0x40000;
@@ -409,8 +409,8 @@ WRITE16_MEMBER(highvdeo_state::nyj_write2_w)
 
 WRITE16_MEMBER(highvdeo_state::tv_tcf_bankselect_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	/* bits 0, 1, 2 select the ROM bank */
 	bankaddress = (data & 0x07) * 0x40000;
@@ -508,7 +508,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(highvdeo_state::brasil_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -525,8 +525,8 @@ READ16_MEMBER(highvdeo_state::brasil_status_r)
 /*bankaddress might be incorrect.*/
 WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
@@ -544,7 +544,7 @@ WRITE16_MEMBER(highvdeo_state::brasil_status_w)
 
 READ16_MEMBER(highvdeo_state::grancapi_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -561,8 +561,8 @@ READ16_MEMBER(highvdeo_state::grancapi_status_r)
 /*bankaddress might be incorrect.*/
 WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 {
-	UINT32 bankaddress;
-	UINT8 *ROM = memregion("user1")->base();
+	uint32_t bankaddress;
+	uint8_t *ROM = memregion("user1")->base();
 
 	switch(data & 3) //data & 7?
 	{
@@ -580,7 +580,7 @@ WRITE16_MEMBER(highvdeo_state::grancapi_status_w)
 
 READ16_MEMBER(highvdeo_state::magicbom_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 
 	switch(offset*2)
 	{
@@ -1496,7 +1496,7 @@ ROM_END
 /*Ciclone*/
 READ16_MEMBER(highvdeo_state::ciclone_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 	switch(offset*2)
 	{
 		case 0:
@@ -1623,7 +1623,7 @@ ROM_END
 
 READ16_MEMBER(highvdeo_state::record_status_r)
 {
-	static UINT16 resetpulse;
+	static uint16_t resetpulse;
 	switch(offset*2)
 	{
 		case 0:

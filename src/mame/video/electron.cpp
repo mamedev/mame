@@ -72,17 +72,17 @@ void electron_state::video_start()
 	m_scanline_timer->adjust( machine().first_screen()->time_until_pos(0), 0, machine().first_screen()->scan_period() );
 }
 
-inline UINT8 electron_state::read_vram(  UINT16 addr )
+inline uint8_t electron_state::read_vram(  uint16_t addr )
 {
 	return m_ula.vram[ addr % m_ula.screen_size ];
 }
 
-inline void electron_state::electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void electron_state::electron_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
-	bitmap.pix16(y, x) = (UINT16)color;
+	bitmap.pix16(y, x) = (uint16_t)color;
 }
 
-UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t electron_state::screen_update_electron(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 	int x = 0;
@@ -115,7 +115,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	case 0:
 		for( i = 0; i < 80; i++ )
 		{
-			UINT8 pattern = read_vram( m_ula.screen_addr + (i << 3) );
+			uint8_t pattern = read_vram( m_ula.screen_addr + (i << 3) );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)& 1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>5)& 1] );
@@ -133,7 +133,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	case 1:
 		for( i = 0; i < 80; i++ )
 		{
-			UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+			uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>2]] );
@@ -151,7 +151,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	case 2:
 		for( i = 0; i < 80; i++ )
 		{
-			UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+			uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map16[pattern>>1]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map16[pattern>>1]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map16[pattern>>1]] );
@@ -173,7 +173,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 		{
 			for( i = 0; i < 80; i++ )
 			{
-				UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+				uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>5)&1] );
@@ -193,7 +193,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	case 7:
 		for( i = 0; i < 40; i++ )
 		{
-			UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+			uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)&1] );
@@ -219,7 +219,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 	case 5:
 		for( i = 0; i < 40; i++ )
 		{
-			UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+			uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>3]] );
 			electron_plot_pixel( bitmap, x++, scanline, pal[m_map4[pattern>>3]] );
@@ -249,7 +249,7 @@ UINT32 electron_state::screen_update_electron(screen_device &screen, bitmap_ind1
 		{
 			for( i = 0; i < 40; i++ )
 			{
-				UINT8 pattern = read_vram( m_ula.screen_addr + i * 8 );
+				uint8_t pattern = read_vram( m_ula.screen_addr + i * 8 );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>7)&1] );
 				electron_plot_pixel( bitmap, x++, scanline, pal[(pattern>>6)&1] );

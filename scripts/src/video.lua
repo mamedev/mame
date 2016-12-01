@@ -246,6 +246,18 @@ end
 
 --------------------------------------------------
 --
+--@src/devices/video/mga2064w.h,VIDEOS["MGA2064W"] = true
+--------------------------------------------------
+
+if (VIDEOS["MGA2064W"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/mga2064w.cpp",
+		MAME_DIR .. "src/devices/video/mga2064w.h",
+	}
+end
+
+--------------------------------------------------
+--
 --@src/devices/video/hd44102.h,VIDEOS["HD44102"] = true
 --------------------------------------------------
 
@@ -874,5 +886,29 @@ if (VIDEOS["GB_LCD"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/video/gb_lcd.cpp",
 		MAME_DIR .. "src/devices/video/gb_lcd.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/gba_lcd.h,VIDEOS["GBA_LCD"] = true
+--------------------------------------------------
+
+if (VIDEOS["GBA_LCD"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/gba_lcd.cpp",
+		MAME_DIR .. "src/devices/video/gba_lcd.h",
+	}
+end
+
+--------------------------------------------------
+--
+--@src/devices/video/ef9369.h,VIDEOS["EF9369"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9369"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9369.cpp",
+		MAME_DIR .. "src/devices/video/ef9369.h",
 	}
 end

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 
 /* Field Combat (c)1985 Jaleco
@@ -327,11 +327,11 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(fcombat_state,fcombat)
 {
-	UINT32 oldaddr, newaddr, length;
-	UINT8 *src, *dst;
+	uint32_t oldaddr, newaddr, length;
+	uint8_t *src, *dst;
 
 	/* allocate some temporary space */
-	dynamic_buffer temp(0x10000);
+	std::vector<uint8_t> temp(0x10000);
 
 	/* make a temporary copy of the character data */
 	src = &temp[0];

@@ -45,7 +45,7 @@ device_astrocade_cart_interface::~device_astrocade_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_astrocade_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_astrocade_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -62,7 +62,7 @@ void device_astrocade_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //-------------------------------------------------
 //  astrocade_cart_slot_device - constructor
 //-------------------------------------------------
-astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+astrocade_cart_slot_device::astrocade_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, ASTROCADE_CART_SLOT, "Bally Astrocade Cartridge Slot", tag, owner, clock, "astrocade_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -150,7 +150,7 @@ image_init_result astrocade_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 		m_cart->rom_alloc(size, tag());
 
 		if (software_entry() == nullptr)
@@ -192,7 +192,7 @@ std::string astrocade_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = m_file->size();
+		uint32_t size = m_file->size();
 		int type = ASTROCADE_STD;
 
 		if (size == 0x40000)

@@ -2,18 +2,16 @@
 // copyright-holders:David Haywood, Angelo Salese, Olivier Galibert, Mariusz Wojcieszek, R. Belmont
 
 #include "includes/saturn.h"
-#include "machine/gen_latch.h"
+#include "audio/rax.h"
 
 class stv_state : public saturn_state
 {
 public:
 	stv_state(const machine_config &mconfig, device_type type, const char *tag)
 		: saturn_state(mconfig, type, tag),
-		m_adsp(*this, "adsp"),
-		m_adsp_pram(*this, "adsp_pram"),
+		m_rax(*this, "rax"),
 		m_cryptdevice(*this, "315_5881"),
-		m_5838crypt(*this, "315_5838"),
-		m_soundlatch(*this, "soundlatch")
+		m_5838crypt(*this, "315_5838")
 	{
 	}
 
@@ -91,28 +89,15 @@ public:
 	DECLARE_MACHINE_START(stv);
 	DECLARE_MACHINE_RESET(stv);
 
-	/* Batman Forever specifics */
-	optional_device<adsp2181_device>    m_adsp;
-	optional_shared_ptr<UINT32> m_adsp_pram;
-
-	struct
-	{
-		UINT16 bdma_internal_addr;
-		UINT16 bdma_external_addr;
-		UINT16 bdma_control;
-		UINT16 bdma_word_count;
-	} m_adsp_regs;
-
 	DECLARE_MACHINE_RESET(batmanfr);
-	DECLARE_READ16_MEMBER( adsp_control_r );
-	DECLARE_WRITE16_MEMBER( adsp_control_w );
 	DECLARE_WRITE32_MEMBER(batmanfr_sound_comms_w);
+	optional_device<acclaim_rax_device> m_rax;
 
 	// protection specific variables and functions (see machine/stvprot.c)
-	UINT32 m_abus_protenable;
-	UINT32 m_abus_protkey;
+	uint32_t m_abus_protenable;
+	uint32_t m_abus_protkey;
 
-	UINT32 m_a_bus[4];
+	uint32_t m_a_bus[4];
 
 	DECLARE_READ32_MEMBER( common_prot_r );
 	DECLARE_WRITE32_MEMBER( common_prot_w );
@@ -120,14 +105,11 @@ public:
 	void install_common_protection();
 	void stv_register_protection_savestates();
 
-
-
 	optional_device<sega_315_5881_crypt_device> m_cryptdevice;
 	optional_device<sega_315_5838_comp_device> m_5838crypt;
-	optional_device<generic_latch_16_device> m_soundlatch; // batmanfr
-	UINT16 crypt_read_callback(UINT32 addr);
-	UINT16 crypt_read_callback_ch1(UINT32 addr);
-	UINT16 crypt_read_callback_ch2(UINT32 addr);
+	uint16_t crypt_read_callback(uint32_t addr);
+	uint16_t crypt_read_callback_ch1(uint32_t addr);
+	uint16_t crypt_read_callback_ch2(uint32_t addr);
 };
 
 

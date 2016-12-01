@@ -74,7 +74,7 @@ const device_type UPD3301 = &device_creator<upd3301_device>;
 //  upd3301_device - constructor
 //-------------------------------------------------
 
-upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+upd3301_device::upd3301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, UPD3301, "UPD3301", tag, owner, clock, "upd3301", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_write_int(*this),
@@ -224,7 +224,7 @@ void upd3301_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 READ8_MEMBER( upd3301_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x01)
 	{
@@ -462,7 +462,7 @@ void upd3301_device::draw_scanline()
 		for (int sx = 0; sx < m_h; sx++)
 		{
 			int y = m_y + lc;
-			UINT8 cc = m_data_fifo[sx][!m_input_fifo];
+			uint8_t cc = m_data_fifo[sx][!m_input_fifo];
 			int hlgt = 0; // TODO
 			int rvv = 0; // TODO
 			int vsp = 0; // TODO
@@ -483,7 +483,7 @@ void upd3301_device::draw_scanline()
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t upd3301_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_bitmap = &bitmap;
 	if (m_status & STATUS_VE)

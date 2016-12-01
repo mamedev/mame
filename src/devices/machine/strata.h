@@ -7,7 +7,7 @@
 class strataflash_device : public device_t, public device_nvram_interface
 {
 public:
-	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	strataflash_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// 8-bit access
 	DECLARE_READ8_MEMBER( read8 );
@@ -36,8 +36,8 @@ private:
 		bw_16
 	};
 
-	UINT16 read8_16(address_space& space, offs_t offset, bus_width_t bus_width);
-	void   write8_16(address_space& space, offs_t offset, UINT16 data, bus_width_t bus_width);
+	uint16_t read8_16(address_space& space, offs_t offset, bus_width_t bus_width);
+	void   write8_16(address_space& space, offs_t offset, uint16_t data, bus_width_t bus_width);
 
 	enum fm_mode_t
 	{
@@ -63,10 +63,10 @@ private:
 	offs_t      m_wrbuf_base;       // start address in write buffer command
 	int         m_wrbuf_len;        // count converted into byte length in write buffer command
 	int         m_wrbuf_count;      // current count in write buffer command
-	UINT8*      m_wrbuf;            // write buffer used by write buffer command
-	std::unique_ptr<UINT8[]>      m_flashmemory;      // main FEEPROM area
-	UINT8*      m_blocklock;        // block lock flags
-	UINT8*      m_prot_regs;        // protection registers
+	uint8_t*      m_wrbuf;            // write buffer used by write buffer command
+	std::unique_ptr<uint8_t[]>      m_flashmemory;      // main FEEPROM area
+	uint8_t*      m_blocklock;        // block lock flags
+	uint8_t*      m_prot_regs;        // protection registers
 };
 
 extern const device_type STRATAFLASH;

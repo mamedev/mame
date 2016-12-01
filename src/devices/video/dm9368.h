@@ -46,9 +46,9 @@ class dm9368_device :   public device_t,
 {
 public:
 	// construction/destruction
-	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dm9368_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void a_w(UINT8 data);
+	void a_w(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( rbi_w ) { m_rbi = state; }
 	DECLARE_READ_LINE_MEMBER( rbo_r ) { return m_rbo; }
@@ -63,7 +63,7 @@ private:
 	int m_rbi;
 	int m_rbo;
 
-	static const UINT8 m_segment_data[];
+	static const uint8_t m_segment_data[];
 };
 
 

@@ -461,13 +461,13 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_nvram;
-	required_shared_ptr<UINT8> m_workram;
-	required_shared_ptr<UINT8> m_tileram;
-	required_shared_ptr<UINT8> m_colram;
+	required_shared_ptr<uint8_t> m_nvram;
+	required_shared_ptr<uint8_t> m_workram;
+	required_shared_ptr<uint8_t> m_tileram;
+	required_shared_ptr<uint8_t> m_colram;
 
-	UINT8* m_vram;
-	UINT8 m_bank;
+	uint8_t* m_vram;
+	uint8_t m_bank;
 	int m_irq0_ack;
 	int m_backupram_enabled;
 	int m_m5205_next;
@@ -494,7 +494,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
@@ -509,7 +509,7 @@ void mastboy_state::video_start()
 	save_pointer(NAME(m_vram), 0x10000);
 }
 
-UINT32 mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mastboy_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int y,x,i;
 	int count = 0x000;
@@ -565,7 +565,7 @@ READ8_MEMBER(mastboy_state::banked_ram_r)
 
 		if (bank>0x3) // ROM access
 		{
-			UINT8 *src    = memregion( "gfx1" )->base();
+			uint8_t *src    = memregion( "gfx1" )->base();
 			bank &=0x3;
 			return src[offset+(bank*0x4000)];
 		}
@@ -578,7 +578,7 @@ READ8_MEMBER(mastboy_state::banked_ram_r)
 	}
 	else
 	{
-		UINT8 *src;
+		uint8_t *src;
 		int bank;
 		bank = m_bank & 0x7f;
 		src = memregion       ( "user1" )->base() + bank * 0x4000;

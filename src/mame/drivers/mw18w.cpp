@@ -138,7 +138,7 @@ WRITE8_MEMBER(mw18w_state::mw18w_lamps_w)
 WRITE8_MEMBER(mw18w_state::mw18w_led_display_w)
 {
 	// d0-3: 7448 (BCD to LED segment)
-	const UINT8 _7448_map[16] =
+	const uint8_t _7448_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	// d4-7: 7442 (BCD to decimal) -> pick digit panel

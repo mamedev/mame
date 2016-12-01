@@ -47,9 +47,9 @@ public:
 	required_ioport m_key;
 	required_ioport m_panel;
 
-	UINT16 m_lamps[16];
-	UINT16 m_leds[16];
-	//UINT16 m_chars[14];
+	uint16_t m_lamps[16];
+	uint16_t m_leds[16];
+	//uint16_t m_chars[14];
 //  void update_display();
 	int m_optic_pattern;
 	DECLARE_WRITE_LINE_MEMBER(reel0_optic_cb) { if (state) m_optic_pattern |= 0x01; else m_optic_pattern &= ~0x01; }
@@ -204,8 +204,8 @@ public:
 		m_reel0->update( data    &0x0f);
 		m_reel1->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel1", m_reel0);
-		awp_draw_reel(machine(),"reel2", m_reel1);
+		awp_draw_reel(machine(),"reel1", *m_reel0);
+		awp_draw_reel(machine(),"reel2", *m_reel1);
 	}
 
 	DECLARE_WRITE8_MEMBER(ppi8255_ic23_write_b_reel23)
@@ -213,8 +213,8 @@ public:
 		m_reel2->update( data    &0x0f);
 		m_reel3->update((data>>4)&0x0f);
 
-		awp_draw_reel(machine(),"reel3", m_reel2);
-		awp_draw_reel(machine(),"reel4", m_reel3);
+		awp_draw_reel(machine(),"reel3", *m_reel2);
+		awp_draw_reel(machine(),"reel4", *m_reel3);
 	}
 
 	DECLARE_READ8_MEMBER(ppi8255_ic23_read_c_key)

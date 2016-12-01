@@ -28,7 +28,7 @@ class action_replay_device : public device_t, public device_exp_card_interface
 public:
 	// construction/destruction
 	action_replay_device(const machine_config &mconfig, device_type type, const char *tag,
-		device_t *owner, UINT32 clock, const char *name, const char *shortname);
+		device_t *owner, uint32_t clock, const char *name, const char *shortname);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -48,30 +48,30 @@ class action_replay_mk1_device : public action_replay_device
 {
 public:
 	// construction/destruction
-	action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	action_replay_mk1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class action_replay_mk2_device : public action_replay_device
 {
 public:
 	// construction/destruction
-	action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	action_replay_mk2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 class action_replay_mk3_device : public action_replay_device
 {
 public:
 	// construction/destruction
-	action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	action_replay_mk3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

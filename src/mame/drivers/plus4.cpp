@@ -11,10 +11,158 @@
 
 */
 
-#include "includes/plus4.h"
-#include "machine/cbm_snqk.h"
-#include "sound/t6721a.h"
+#include "emu.h"
 #include "softlist.h"
+#include "bus/cbmiec/cbmiec.h"
+#include "bus/pet/cass.h"
+#include "bus/plus4/exp.h"
+#include "bus/plus4/user.h"
+#include "bus/vcs_ctrl/ctrl.h"
+#include "cpu/m6502/m7501.h"
+#include "imagedev/snapquik.h"
+#include "machine/cbm_snqk.h"
+#include "machine/mos6529.h"
+#include "machine/mos6551.h"
+#include "machine/mos8706.h"
+#include "machine/pla.h"
+#include "machine/ram.h"
+#include "sound/mos7360.h"
+#include "sound/t6721a.h"
+
+#define MOS7501_TAG         "u2"
+#define MOS7360_TAG         "u1"
+#define MOS6551_TAG         "u3"
+#define MOS6529_USER_TAG    "u5"
+#define MOS6529_KB_TAG      "u27"
+#define T6721A_TAG          "t6721a"
+#define MOS8706_TAG         "mos8706"
+#define PLA_TAG             "u19"
+#define SCREEN_TAG          "screen"
+#define CONTROL1_TAG        "joy1"
+#define CONTROL2_TAG        "joy2"
+#define PET_USER_PORT_TAG   "user"
+
+class plus4_state : public driver_device
+{
+public:
+	plus4_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
+		m_maincpu(*this, MOS7501_TAG),
+		m_pla(*this, PLA_TAG),
+		m_ted(*this, MOS7360_TAG),
+		m_acia(*this, MOS6551_TAG),
+		m_spi_user(*this, MOS6529_USER_TAG),
+		m_spi_kb(*this, MOS6529_KB_TAG),
+		m_vslsi(*this, MOS8706_TAG),
+		m_iec(*this, CBM_IEC_TAG),
+		m_joy1(*this, CONTROL1_TAG),
+		m_joy2(*this, CONTROL2_TAG),
+		m_exp(*this, PLUS4_EXPANSION_SLOT_TAG),
+		m_user(*this, PET_USER_PORT_TAG),
+		m_ram(*this, RAM_TAG),
+		m_cassette(*this, PET_DATASSETTE_PORT_TAG),
+		m_kernal(*this, "kernal"),
+		m_function(*this, "function"),
+		m_c2(*this, "c2"),
+		m_row(*this, "ROW%u", 0),
+		m_lock(*this, "LOCK"),
+		m_addr(0),
+		m_ted_irq(CLEAR_LINE),
+		m_acia_irq(CLEAR_LINE),
+		m_exp_irq(CLEAR_LINE)
+	{ }
+
+	required_device<m7501_device> m_maincpu;
+	required_device<pla_device> m_pla;
+	required_device<mos7360_device> m_ted;
+	optional_device<mos6551_device> m_acia;
+	optional_device<mos6529_device> m_spi_user;
+	required_device<mos6529_device> m_spi_kb;
+	optional_device<mos8706_device> m_vslsi;
+	required_device<cbm_iec_device> m_iec;
+	required_device<vcs_control_port_device> m_joy1;
+	required_device<vcs_control_port_device> m_joy2;
+	required_device<plus4_expansion_slot_device> m_exp;
+	optional_device<pet_user_port_device> m_user;
+	required_device<ram_device> m_ram;
+	required_device<pet_datassette_port_device> m_cassette;
+	required_memory_region m_kernal;
+	optional_memory_region m_function;
+	optional_memory_region m_c2;
+	required_ioport_array<8> m_row;
+	required_ioport m_lock;
+
+	virtual void machine_start() override;
+	virtual void machine_reset() override;
+
+	void check_interrupts();
+	void bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal);
+	uint8_t read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal);
+
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
+	DECLARE_READ8_MEMBER( ted_videoram_r );
+
+	DECLARE_READ8_MEMBER( cpu_r );
+	DECLARE_WRITE8_MEMBER( cpu_w );
+
+	DECLARE_WRITE_LINE_MEMBER( ted_irq_w );
+	DECLARE_READ8_MEMBER( ted_k_r );
+
+	DECLARE_WRITE_LINE_MEMBER( write_kb0 ) { if (state) m_kb |= 1; else m_kb &= ~1; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb1 ) { if (state) m_kb |= 2; else m_kb &= ~2; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb2 ) { if (state) m_kb |= 4; else m_kb &= ~4; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb3 ) { if (state) m_kb |= 8; else m_kb &= ~8; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb4 ) { if (state) m_kb |= 16; else m_kb &= ~16; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb5 ) { if (state) m_kb |= 32; else m_kb &= ~32; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb6 ) { if (state) m_kb |= 64; else m_kb &= ~64; }
+	DECLARE_WRITE_LINE_MEMBER( write_kb7 ) { if (state) m_kb |= 128; else m_kb &= ~128; }
+
+	DECLARE_WRITE_LINE_MEMBER( acia_irq_w );
+
+	DECLARE_WRITE_LINE_MEMBER( exp_irq_w );
+
+	DECLARE_QUICKLOAD_LOAD_MEMBER( cbm_c16 );
+
+	enum
+	{
+		CS0_BASIC = 0,
+		CS0_FUNCTION_LO,
+		CS0_C1_LOW,
+		CS0_C2_LOW
+	};
+
+	enum
+	{
+		CS1_KERNAL = 0,
+		CS1_FUNCTION_HI,
+		CS1_C1_HIGH,
+		CS1_C2_HIGH
+	};
+
+	// memory state
+	uint8_t m_addr;
+
+	// interrupt state
+	int m_ted_irq;
+	int m_acia_irq;
+	int m_exp_irq;
+
+	// keyboard state
+	uint8_t m_kb;
+};
+
+
+class c16_state : public plus4_state
+{
+public:
+	c16_state(const machine_config &mconfig, device_type type, const char *tag)
+		: plus4_state(mconfig, type, tag)
+	{ }
+
+	DECLARE_READ8_MEMBER( cpu_r );
+};
+
 
 
 //**************************************************************************
@@ -62,8 +210,8 @@ void plus4_state::check_interrupts()
 
 void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs, int *phi2, int *user, int *_6551, int *addr_clk, int *keyport, int *kernal)
 {
-	UINT16 i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
-/*  UINT8 data = m_pla->read(i);
+	uint16_t i = ras << 15 | BA10 << 14 | BA11 << 13 | BA13 << 12 | BA9 << 11 | BA8 << 10 | BA14 << 9 | mux << 8 | BA12 << 7 | BA7 << 6 | BA6 << 5 | BA5 << 4 | BA4 << 3 | BA15 << 2 | phi0 << 1 | 1;
+/*  uint8_t data = m_pla->read(i);
 
     *scs = BIT(data, 0);
     *phi2 = BIT(data, 1);
@@ -133,10 +281,10 @@ void plus4_state::bankswitch(offs_t offset, int phi0, int mux, int ras, int *scs
 //  read_memory -
 //-------------------------------------------------
 
-UINT8 plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
+uint8_t plus4_state::read_memory(address_space &space, offs_t offset, int ba, int scs, int phi2, int user, int _6551, int addr_clk, int keyport, int kernal)
 {
 	int cs0 = 1, cs1 = 1, c1l = 1, c1h = 1, c2l = 1, c2h = 1;
-	UINT8 data = m_ted->read(space, offset, cs0, cs1);
+	uint8_t data = m_ted->read(space, offset, cs0, cs1);
 
 	//logerror("offset %04x user %u 6551 %u addr_clk %u keyport %u kernal %u cs0 %u cs1 %u\n", offset,user,_6551,addr_clk,keyport,kernal,cs0,cs1);
 
@@ -480,7 +628,7 @@ READ8_MEMBER( plus4_state::cpu_r )
 
 	*/
 
-	UINT8 data = 0x2f;
+	uint8_t data = 0x2f;
 
 	// cassette read
 	data |= m_cassette->read() << 4;
@@ -511,7 +659,7 @@ READ8_MEMBER( c16_state::cpu_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// cassette read
 	data |= m_cassette->read() << 4;
@@ -589,12 +737,12 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	// joystick
 	if (!BIT(offset, 2))
 	{
-		UINT8 joy_a = m_joy1->joy_r();
+		uint8_t joy_a = m_joy1->joy_r();
 
 		data &= (0xf0 | (joy_a & 0x0f));
 		data &= ~(!BIT(joy_a, 5) << 6);
@@ -602,21 +750,21 @@ READ8_MEMBER( plus4_state::ted_k_r )
 
 	if (!BIT(offset, 1))
 	{
-		UINT8 joy_b = m_joy2->joy_r();
+		uint8_t joy_b = m_joy2->joy_r();
 
 		data &= (0xf0 | (joy_b & 0x0f));
 		data &= ~(!BIT(joy_b, 5) << 7);
 	}
 
 	// keyboard
-	if (!BIT(m_kb, 7)) data &= m_row7->read();
-	if (!BIT(m_kb, 6)) data &= m_row6->read();
-	if (!BIT(m_kb, 5)) data &= m_row5->read();
-	if (!BIT(m_kb, 4)) data &= m_row4->read();
-	if (!BIT(m_kb, 3)) data &= m_row3->read();
-	if (!BIT(m_kb, 2)) data &= m_row2->read();
-	if (!BIT(m_kb, 1)) data &= m_row1->read() & m_lock->read();
-	if (!BIT(m_kb, 0)) data &= m_row0->read();
+	if (!BIT(m_kb, 7)) data &= m_row[7]->read();
+	if (!BIT(m_kb, 6)) data &= m_row[6]->read();
+	if (!BIT(m_kb, 5)) data &= m_row[5]->read();
+	if (!BIT(m_kb, 4)) data &= m_row[4]->read();
+	if (!BIT(m_kb, 3)) data &= m_row[3]->read();
+	if (!BIT(m_kb, 2)) data &= m_row[2]->read();
+	if (!BIT(m_kb, 1)) data &= m_row[1]->read() & m_lock->read();
+	if (!BIT(m_kb, 0)) data &= m_row[0]->read();
 
 	return data;
 }
@@ -669,7 +817,7 @@ SLOT_INTERFACE_END
 void plus4_state::machine_start()
 {
 	// initialize memory
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (offs_t offset = 0; offset < m_ram->size(); offset++)
 	{

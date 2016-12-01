@@ -1,8 +1,10 @@
 *~
 .*.sw?
 *.mo
+*.orig
 *.pyc
 *.pyo
+*.rej
 .DS_Store
 
 /*
@@ -45,3 +47,4 @@ regtests/jedutil/output
 /src/devices/cpu/m68000/m68kmake.*
 /src/devices/cpu/m68000/m68kmake
 !/src/devices/cpu/m68000/m68kmake.cpp
+/samples

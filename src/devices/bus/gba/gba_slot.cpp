@@ -46,17 +46,17 @@ device_gba_cart_interface::~device_gba_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gba_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
 		if (size < 0x4000000)
 		// we always alloc 32MB of rom region!
-			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		else
 		{
-			m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
-			m_romhlp = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
+			m_romhlp = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
 		}
 		m_rom_size = size;
 	}
@@ -67,9 +67,9 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  nvram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gba_cart_interface::nvram_alloc(UINT32 size)
+void device_gba_cart_interface::nvram_alloc(uint32_t size)
 {
-	m_nvram.resize(size/sizeof(UINT32));
+	m_nvram.resize(size/sizeof(uint32_t));
 }
 
 
@@ -80,7 +80,7 @@ void device_gba_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  gba_cart_slot_device - constructor
 //-------------------------------------------------
-gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, GBA_CART_SLOT, "Game Boy Advance Cartridge Slot", tag, owner, clock, "gba_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -180,8 +180,8 @@ image_init_result gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM;
-		UINT32 size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+		uint8_t *ROM;
+		uint32_t size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
 		if (size > 0x4000000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
@@ -189,7 +189,7 @@ image_init_result gba_cart_slot_device::call_load()
 		}
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (software_entry() == nullptr)
 		{
@@ -230,7 +230,7 @@ image_init_result gba_cart_slot_device::call_load()
 				break;
 		}
 		if (size == 0x4000000)
-			memcpy((UINT8 *)m_cart->get_romhlp_base(), ROM, 0x2000000);
+			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x2000000);
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
@@ -259,7 +259,7 @@ void gba_cart_slot_device::call_unload()
  fullpath
  -------------------------------------------------*/
 
-static inline std::string gba_chip_string( UINT32 chip )
+static inline std::string gba_chip_string( uint32_t chip )
 {
 	std::string str;
 	if (chip == 0) str += "NONE ";
@@ -276,7 +276,7 @@ static inline std::string gba_chip_string( UINT32 chip )
 }
 
 
-static inline int gba_chip_has_conflict( UINT32 chip )
+static inline int gba_chip_has_conflict( uint32_t chip )
 {
 	int count1 = 0, count2 = 0;
 	if (chip & GBA_CHIP_EEPROM) count1++;
@@ -290,9 +290,9 @@ static inline int gba_chip_has_conflict( UINT32 chip )
 }
 
 
-int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
-	UINT32 chip = 0;
+	uint32_t chip = 0;
 	int type = GBA_STD;
 	bool has_rtc = false;
 	bool has_rumble = false;
@@ -319,7 +319,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	if (gba_chip_has_conflict(chip))
 	{
 		char game_code[5] = { 0 };
-		bool resolved = FALSE;
+		bool resolved = false;
 
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
@@ -335,7 +335,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip |= item->chip;
-				resolved = TRUE;
+				resolved = true;
 				break;
 			}
 		}
@@ -432,8 +432,8 @@ std::string gba_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = m_file->size();
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
 		int type;
 
 		m_file->read(&rom[0], len);
@@ -500,6 +500,6 @@ WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
  Internal header logging
  -------------------------------------------------*/
 
-void gba_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void gba_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
 {
 }

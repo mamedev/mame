@@ -67,7 +67,7 @@ class output_win32 : public osd_module, public output_module
 {
 public:
 	output_win32()
-		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module()
+		: osd_module(OSD_OUTPUT_PROVIDER, "windows"), output_module(), m_output_hwnd(nullptr), m_clientlist(nullptr)
 	{
 	}
 	virtual ~output_win32() { }
@@ -77,7 +77,7 @@ public:
 
 	// output_module
 
-	virtual void notify(const char *outname, INT32 value) override;
+	virtual void notify(const char *outname, int32_t value) override;
 
 	int create_window_class(void);
 	LRESULT register_client(HWND hwnd, LPARAM id);
@@ -110,6 +110,22 @@ int output_win32::init(const osd_options &options)
 	assert(result == 0);
 	(void)result; // to silence gcc 4.6
 
+	// allocate message ids before creating the window
+	// since the window proc gets called during creation
+	om_mame_start = RegisterWindowMessage(OM_MAME_START);
+	assert(om_mame_start != 0);
+	om_mame_stop = RegisterWindowMessage(OM_MAME_STOP);
+	assert(om_mame_stop != 0);
+	om_mame_update_state = RegisterWindowMessage(OM_MAME_UPDATE_STATE);
+	assert(om_mame_update_state != 0);
+
+	om_mame_register_client = RegisterWindowMessage(OM_MAME_REGISTER_CLIENT);
+	assert(om_mame_register_client != 0);
+	om_mame_unregister_client = RegisterWindowMessage(OM_MAME_UNREGISTER_CLIENT);
+	assert(om_mame_unregister_client != 0);
+	om_mame_get_id_string = RegisterWindowMessage(OM_MAME_GET_ID_STRING);
+	assert(om_mame_get_id_string != 0);
+
 	// create a window
 	m_output_hwnd = CreateWindowEx(
 						WINDOW_STYLE_EX,
@@ -126,21 +142,6 @@ int output_win32::init(const osd_options &options)
 
 	// set a pointer to the running machine
 	SetWindowLongPtr(m_output_hwnd, GWLP_USERDATA, (LONG_PTR)this);
-
-	// allocate message ids
-	om_mame_start = RegisterWindowMessage(OM_MAME_START);
-	assert(om_mame_start != 0);
-	om_mame_stop = RegisterWindowMessage(OM_MAME_STOP);
-	assert(om_mame_stop != 0);
-	om_mame_update_state = RegisterWindowMessage(OM_MAME_UPDATE_STATE);
-	assert(om_mame_update_state != 0);
-
-	om_mame_register_client = RegisterWindowMessage(OM_MAME_REGISTER_CLIENT);
-	assert(om_mame_register_client != 0);
-	om_mame_unregister_client = RegisterWindowMessage(OM_MAME_UNREGISTER_CLIENT);
-	assert(om_mame_unregister_client != 0);
-	om_mame_get_id_string = RegisterWindowMessage(OM_MAME_GET_ID_STRING);
-	assert(om_mame_get_id_string != 0);
 
 	// broadcast a startup message
 	PostMessage(HWND_BROADCAST, om_mame_start, (WPARAM)m_output_hwnd, 0);
@@ -174,7 +175,7 @@ void output_win32::exit()
 
 int output_win32::create_window_class(void)
 {
-	static UINT8 classes_created = FALSE;
+	static bool classes_created = false;
 
 	/* only do this once */
 	if (!classes_created)
@@ -191,7 +192,7 @@ int output_win32::create_window_class(void)
 		// register the class; fail if we can't
 		if (!RegisterClass(&wc))
 			return 1;
-		classes_created = TRUE;
+		classes_created = true;
 	}
 
 	return 0;
@@ -262,7 +263,7 @@ LRESULT output_win32::register_client(HWND hwnd, LPARAM id)
 LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 {
 	registered_client **client;
-	int found = FALSE;
+	bool found = false;
 
 	// find any matching IDs in the list and remove them
 	for (client = &m_clientlist; *client != nullptr; client = &(*client)->next)
@@ -271,7 +272,7 @@ LRESULT output_win32::unregister_client(HWND hwnd, LPARAM id)
 			registered_client *temp = *client;
 			*client = (*client)->next;
 			global_free(temp);
-			found = TRUE;
+			found = true;
 			break;
 		}
 
@@ -302,7 +303,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 
 	// allocate memory for the message
 	datalen = sizeof(copydata_id_string) + strlen(name) + 1;
-	dynamic_buffer buffer(datalen);
+	std::vector<uint8_t> buffer(datalen);
 	copydata_id_string *temp = (copydata_id_string *)&buffer[0];
 	temp->id = id;
 	strcpy(temp->string, name);
@@ -321,7 +322,7 @@ LRESULT output_win32::send_id_string(HWND hwnd, LPARAM id)
 //  notifier_callback
 //============================================================
 
-void output_win32::notify(const char *outname, INT32 value)
+void output_win32::notify(const char *outname, int32_t value)
 {
 	registered_client *client;
 	// loop over clients and notify them

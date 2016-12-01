@@ -300,7 +300,7 @@ static ADDRESS_MAP_START( sg1000m3_io, AS_IO, 8, sms_state )
 	AM_RANGE(0x40, 0x7f)                 AM_READWRITE(sms_count_r, sms_psg_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, vram_read, vram_write)
 	AM_RANGE(0x81, 0x81) AM_MIRROR(0x3e) AM_DEVREADWRITE("sms_vdp", sega315_5124_device, register_read, register_write)
-	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r,sg1000m3_peripheral_w)
+	AM_RANGE(0xc0, 0xc7) AM_MIRROR(0x38) AM_READWRITE(sg1000m3_peripheral_r, sg1000m3_peripheral_w)
 ADDRESS_MAP_END
 
 
@@ -377,7 +377,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( sms )
 	PORT_START("PAUSE")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START ) PORT_NAME(DEF_STR(Pause))
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sg1000m3 )
@@ -870,8 +870,15 @@ static MACHINE_CONFIG_DERIVED( sms1_kr, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(smskr_io)
 
+	// need to replace the cartridge slot with the Japanese version, so to
+	// keep the usual media order, remove and reinsert all of them.
 	MCFG_DEVICE_REMOVE("slot")
+	MCFG_DEVICE_REMOVE("mycard")
+	MCFG_DEVICE_REMOVE("smsexp")
 	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
+	MCFG_SMS_EXPANSION_ADD("smsexp", sms_expansion_devices, nullptr)
+
 	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	MCFG_DEVICE_MODIFY("sms_vdp")
@@ -883,6 +890,8 @@ static MACHINE_CONFIG_DERIVED( smsj, sms1_kr )
 	MCFG_CPU_IO_MAP(smsj_io)
 
 	MCFG_SOUND_ADD("ym2413", YM2413, XTAL_10_738635MHz/3)
+	// if this output gain is changed, the gain set when unmute the output need
+	// to be changed too, probably along the gain set for the Mark III FM Unit.
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
@@ -890,12 +899,16 @@ static MACHINE_CONFIG_DERIVED( sg1000m3, sms1_ntsc )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(sg1000m3_io)
 
+	// Remove and reinsert all media slots, as done with the sms1_kr config,
+	// and also replace the expansion slot with the SG-1000 version.
 	MCFG_DEVICE_REMOVE("slot")
-	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
-	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
-
+	MCFG_DEVICE_REMOVE("mycard")
 	MCFG_DEVICE_REMOVE("smsexp")
+	MCFG_SG1000MK3_CARTRIDGE_ADD("slot", sg1000mk3_cart, nullptr)
+	MCFG_SMS_CARD_ADD("mycard", sms_cart, nullptr)
 	MCFG_SG1000_EXPANSION_ADD("sgexp", sg1000_expansion_devices, nullptr, false)
+
+	MCFG_SOFTWARE_LIST_ADD("cart_list2","sg1000")
 
 	// Mark III does not have TH connected.
 	MCFG_SMS_CONTROL_PORT_MODIFY(CONTROL1_TAG)
@@ -932,6 +945,7 @@ static MACHINE_CONFIG_START( gamegear, sms_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker","rspeaker")
 
+	/* actually, PSG is embedded in the VDP chip */
 	MCFG_SOUND_ADD("gamegear", GAMEGEAR, MASTER_CLOCK_GG/9)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.00)

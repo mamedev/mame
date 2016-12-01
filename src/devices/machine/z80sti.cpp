@@ -63,7 +63,7 @@ const int z80sti_device::INT_LEVEL_TIMER[] =
 };
 
 // interrupt vectors
-const UINT8 z80sti_device::INT_VECTOR[] =
+const uint8_t z80sti_device::INT_VECTOR[] =
 {
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0a, 0x0c, 0x0e,
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1a, 0x1c, 0x1e
@@ -82,7 +82,7 @@ const int z80sti_device::PRESCALER[] = { 0, 4, 10, 16, 50, 64, 100, 200 };
 //  z80sti_device - constructor
 //-------------------------------------------------
 
-z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z80sti_device::z80sti_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Z80STI, "Mostek MK3801", tag, owner, clock, "z80sti", __FILE__),
 		device_serial_interface(mconfig, *this),
 		device_z80daisy_interface(mconfig, *this),
@@ -269,7 +269,7 @@ int z80sti_device::z80daisy_irq_ack()
 		// find the first channel with an interrupt requested
 		if (m_int_state[i] & Z80_DAISY_INT)
 		{
-			UINT8 vector = (m_pvr & 0xe0) | INT_VECTOR[i];
+			uint8_t vector = (m_pvr & 0xe0) | INT_VECTOR[i];
 
 			// clear interrupt, switch to the IEO state, and update the IRQs
 			m_int_state[i] = Z80_DAISY_IEO;
@@ -370,7 +370,7 @@ void z80sti_device::take_interrupt(int level)
 
 READ8_MEMBER( z80sti_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x0f)
 	{

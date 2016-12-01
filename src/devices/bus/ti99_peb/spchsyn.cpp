@@ -31,7 +31,7 @@
 
 /****************************************************************************/
 
-ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ti_speech_synthesizer_device::ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : ti_expansion_card_device(mconfig, TI99_SPEECH, "TI-99 Speech synthesizer (on adapter card)", tag, owner, clock, "ti99_speech", __FILE__),
 	m_vsp(nullptr), m_reading(false), m_sbe(false)
 {
@@ -104,7 +104,7 @@ SETADDRESS_DBIN_MEMBER( ti_speech_synthesizer_device::setaddress_dbin )
 
 WRITE_LINE_MEMBER( ti_speech_synthesizer_device::speech_ready )
 {
-	// The TMS5200 implementation uses TRUE/FALSE, not ASSERT/CLEAR semantics
+	// The TMS5200 implementation uses true/false, not ASSERT/CLEAR semantics
 	// and we have to adapt a /READY to a READY line.
 	// The real synthesizer board uses a transistor for that purpose.
 	m_slot->set_ready((state==0)? ASSERT_LINE : CLEAR_LINE);
@@ -121,6 +121,11 @@ void ti_speech_synthesizer_device::device_start()
 	// Need to configure the speech ROM for inverse bit order
 	speechrom_device* mem = subdevice<speechrom_device>("vsm");
 	mem->set_reverse_bit_order(true);
+
+	// We don't need to save m_space because the calling method
+	// combined_rsq_wsq_w only needs the address space formally.
+	save_item(NAME(m_reading));
+	save_item(NAME(m_sbe));
 }
 
 void ti_speech_synthesizer_device::device_reset()
@@ -161,7 +166,7 @@ machine_config_constructor ti_speech_synthesizer_device::device_mconfig_addition
 	return MACHINE_CONFIG_NAME( ti99_speech );
 }
 
-const rom_entry *ti_speech_synthesizer_device::device_rom_region() const
+const tiny_rom_entry *ti_speech_synthesizer_device::device_rom_region() const
 {
 	return ROM_NAME( ti99_speech );
 }

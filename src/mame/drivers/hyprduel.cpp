@@ -198,7 +198,7 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::magerror_irq_callback)
 
 READ16_MEMBER(hyprduel_state::hyprduel_bankedrom_r)
 {
-	UINT8 *ROM = memregion("gfx1")->base();
+	uint8_t *ROM = memregion("gfx1")->base();
 	size_t  len = memregion("gfx1")->bytes();
 
 	offset = offset * 2 + 0x10000 * (*m_rombank);
@@ -259,12 +259,12 @@ TIMER_CALLBACK_MEMBER(hyprduel_state::hyprduel_blit_done)
 	update_irq_state();
 }
 
-inline int hyprduel_state::blt_read( const UINT8 *ROM, const int offs )
+inline int hyprduel_state::blt_read( const uint8_t *ROM, const int offs )
 {
 	return ROM[offs];
 }
 
-void hyprduel_state::blt_write( address_space &space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+void hyprduel_state::blt_write( address_space &space, const int tmap, const offs_t offs, const uint16_t data, const uint16_t mask )
 {
 	switch( tmap )
 	{
@@ -282,15 +282,15 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 	if (offset == 0xc / 2)
 	{
-		UINT8 *src = memregion("gfx1")->base();
+		uint8_t *src = memregion("gfx1")->base();
 		size_t  src_len = memregion("gfx1")->bytes();
 
-		UINT32 tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
-		UINT32 src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
-		UINT32 dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
+		uint32_t tmap = (m_blitter_regs[0x00 / 2] << 16) + m_blitter_regs[0x02 / 2];
+		uint32_t src_offs = (m_blitter_regs[0x04 / 2] << 16) + m_blitter_regs[0x06 / 2];
+		uint32_t dst_offs = (m_blitter_regs[0x08 / 2] << 16) + m_blitter_regs[0x0a / 2];
 
 		int shift = (dst_offs & 0x80) ? 0 : 8;
-		UINT16 mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
+		uint16_t mask = (dst_offs & 0x80) ? 0x00ff : 0xff00;
 
 //      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n", space.device().safe_pc(), tmap, src_offs, dst_offs);
 
@@ -308,7 +308,7 @@ WRITE16_MEMBER(hyprduel_state::hyprduel_blitter_w)
 
 		while (1)
 		{
-			UINT16 b1, b2, count;
+			uint16_t b1, b2, count;
 
 			src_offs %= src_len;
 			b1 = blt_read(src, src_offs);

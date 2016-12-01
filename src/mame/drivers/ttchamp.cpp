@@ -83,11 +83,11 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 
-	UINT16 m_paloff;
-	UINT16 m_port10;
-	UINT8 m_rombank;
-	UINT16 m_videoram0[0x10000 / 2];
-	UINT16 m_videoram2[0x10000 / 2];
+	uint16_t m_paloff;
+	uint16_t m_port10;
+	uint8_t m_rombank;
+	uint16_t m_videoram0[0x10000 / 2];
+	uint16_t m_videoram2[0x10000 / 2];
 
 	enum picmode
 	{
@@ -106,15 +106,15 @@ public:
 	int m_pic_latched;
 	int m_pic_writelatched;
 
-	std::unique_ptr<UINT8[]> m_bakram;
+	std::unique_ptr<uint8_t[]> m_bakram;
 
-	UINT16 m_mainram[0x10000 / 2];
+	uint16_t m_mainram[0x10000 / 2];
 
 	int m_spritesinit;
 	int m_spriteswidth;
 	int m_spritesaddr;
-	UINT16* m_rom16;
-	UINT8* m_rom8;
+	uint16_t* m_rom16;
+	uint8_t* m_rom8;
 
 	DECLARE_WRITE16_MEMBER(paloff_w);
 	DECLARE_WRITE16_MEMBER(paldat_w);
@@ -137,7 +137,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(irq);
 };
@@ -147,12 +147,12 @@ ALLOW_SAVE_TYPE(ttchamp_state::picmode);
 
 void ttchamp_state::machine_start()
 {
-	m_rom16 = (UINT16*)memregion("maincpu")->base();
+	m_rom16 = (uint16_t*)memregion("maincpu")->base();
 	m_rom8 = memregion("maincpu")->base();
 
 	m_picmodex = PIC_IDLE;
 
-	m_bakram = std::make_unique<UINT8[]>(0x100);
+	m_bakram = std::make_unique<uint8_t[]>(0x100);
 	machine().device<nvram_device>("backram")->set_base(m_bakram.get(), 0x100);
 
 	save_item(NAME(m_paloff));
@@ -176,7 +176,7 @@ void ttchamp_state::video_start()
 {
 }
 
-UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	logerror("update\n");
 	int y,x,count;
@@ -184,12 +184,12 @@ UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	static const int xxx=320,yyy=204;
 
 	bitmap.fill(m_palette->black_pen());
-	UINT8 *videoramfg;
-	UINT8* videorambg;
+	uint8_t *videoramfg;
+	uint8_t* videorambg;
 
 	count=0;
-	videorambg = (UINT8*)m_videoram0;
-	videoramfg = (UINT8*)m_videoram2;
+	videorambg = (uint8_t*)m_videoram0;
+	videoramfg = (uint8_t*)m_videoram2;
 
 	for (y=0;y<yyy;y++)
 	{
@@ -202,12 +202,12 @@ UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	/*
 	count=0;
-	videoram = (UINT8*)m_videoram1;
+	videoram = (uint8_t*)m_videoram1;
 	for (y=0;y<yyy;y++)
 	{
 	    for(x=0;x<xxx;x++)
 	    {
-	        UINT8 pix = videoram[BYTE_XOR_LE(count)];
+	        uint8_t pix = videoram[BYTE_XOR_LE(count)];
 	        if (pix) bitmap.pix16(y, x) = pix+0x200;
 	        count++;
 	    }
@@ -219,7 +219,7 @@ UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for(x=0;x<xxx;x++)
 		{
-			UINT8 pix = videoramfg[BYTE_XOR_LE(count)];
+			uint8_t pix = videoramfg[BYTE_XOR_LE(count)];
 			if (pix)
 			{
 				// first pen values seem to be special
@@ -231,12 +231,12 @@ UINT32 ttchamp_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 				if (pix == 0x01) // blend mode 1
 				{
-					UINT8 pix = videorambg[BYTE_XOR_LE(count)];
+					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
 					bitmap.pix16(y, x) = pix + 0x200;
 				}
 				else if (pix == 0x02) // blend mode 2
 				{
-					UINT8 pix = videorambg[BYTE_XOR_LE(count)];
+					uint8_t pix = videorambg[BYTE_XOR_LE(count)];
 					bitmap.pix16(y, x) = pix + 0x100;
 				}
 				else
@@ -354,7 +354,7 @@ READ16_MEMBER(ttchamp_state::mem_r)
 {
 	// bits 0xf0 are used too, so this is likely wrong.
 
-	UINT16* vram;
+	uint16_t* vram;
 	if ((m_port10&0xf) == 0x00)
 		vram = m_videoram0;
 	else if ((m_port10&0xf)  == 0x01)
@@ -377,7 +377,7 @@ READ16_MEMBER(ttchamp_state::mem_r)
 	}
 	else
 	{
-		UINT16 *src = m_rom16 + (0x100000/2); // can the CPU ever see the lower bank?
+		uint16_t *src = m_rom16 + (0x100000/2); // can the CPU ever see the lower bank?
 		return src[offset];
 	}
 }
@@ -389,7 +389,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 
 	// bits 0xf0 are used too, so this is likely wrong.
 
-	UINT16* vram;
+	uint16_t* vram;
 	if ((m_port10&0xf)  == 0x00)
 		vram = m_videoram0;
 	else if ((m_port10&0xf)  == 0x01)
@@ -442,7 +442,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 			// 0x30000-0x3ffff used, on Spider it's 0x20000-0x2ffff
 			offset &= 0x7fff;
 
-			UINT8 *src = m_rom8;
+			uint8_t *src = m_rom8;
 
 			if (m_rombank)
 				src += 0x100000;
@@ -466,7 +466,7 @@ WRITE16_MEMBER(ttchamp_state::mem_w)
 				}
 				else
 				{
-					UINT8 data;
+					uint8_t data;
 
 					data = (src[(m_spritesaddr * 2) + 1]);
 					//data |= vram[offset] >> 8;

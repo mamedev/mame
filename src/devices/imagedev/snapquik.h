@@ -11,6 +11,8 @@
 #ifndef __SNAPQUIK_H__
 #define __SNAPQUIK_H__
 
+#include "softlist_dev.h"
+
 typedef delegate<image_init_result (device_image_interface &,const char *, int)> snapquick_load_delegate;
 
 // ======================> snapshot_image_device
@@ -19,8 +21,8 @@ class snapshot_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	snapshot_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	snapshot_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~snapshot_image_device();
 
 	static void static_set_interface(device_t &device, const char *_interface) { downcast<snapshot_image_device &>(device).m_interface = _interface; }
@@ -62,7 +64,7 @@ class quickload_image_device : public snapshot_image_device
 {
 public:
 	// construction/destruction
-	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	quickload_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
 };
@@ -77,13 +79,13 @@ extern const device_type QUICKLOAD;
 #define SNAPSHOT_LOAD_NAME(_class,_name)           _class::SNAPSHOT_LOAD_MEMBER_NAME(_name)
 #define DECLARE_SNAPSHOT_LOAD_MEMBER(_name)        image_init_result SNAPSHOT_LOAD_MEMBER_NAME(_name)(device_image_interface &image, const char *file_type, int snapshot_size)
 #define SNAPSHOT_LOAD_MEMBER(_class,_name)         image_init_result SNAPSHOT_LOAD_NAME(_class,_name)(device_image_interface &image, const char *file_type, int snapshot_size)
-#define SNAPSHOT_LOAD_DELEGATE(_class,_name)       snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(_class,_name),#_class "::snapshot_load_" #_name, downcast<_class *>(device->owner()))
+#define SNAPSHOT_LOAD_DELEGATE(_class,_name)       snapquick_load_delegate(&SNAPSHOT_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
 
 #define QUICKLOAD_LOAD_MEMBER_NAME(_name)           quickload_load##_name
 #define QUICKLOAD_LOAD_NAME(_class,_name)           _class::QUICKLOAD_LOAD_MEMBER_NAME(_name)
 #define DECLARE_QUICKLOAD_LOAD_MEMBER(_name)        image_init_result QUICKLOAD_LOAD_MEMBER_NAME(_name)(device_image_interface &image, const char *file_type, int quickload_size)
 #define QUICKLOAD_LOAD_MEMBER(_class,_name)         image_init_result QUICKLOAD_LOAD_NAME(_class,_name)(device_image_interface &image, const char *file_type, int quickload_size)
-#define QUICKLOAD_LOAD_DELEGATE(_class,_name)       snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(_class,_name),#_class "::quickload_load_" #_name, downcast<_class *>(device->owner()))
+#define QUICKLOAD_LOAD_DELEGATE(_class,_name)       snapquick_load_delegate(&QUICKLOAD_LOAD_NAME(_class,_name), downcast<_class *>(device->owner()))
 
 #define MCFG_SNAPSHOT_ADD(_tag, _class, _load, _file_extensions, _delay) \
 	MCFG_DEVICE_ADD(_tag, SNAPSHOT, 0) \

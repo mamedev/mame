@@ -95,8 +95,8 @@ READ8_MEMBER(einstein_state::einstein_80col_ram_r)
 MC6845_UPDATE_ROW( einstein_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 *data = m_region_gfx1->base();
-	UINT8 char_code, data_byte;
+	uint8_t *data = m_region_gfx1->base();
+	uint8_t char_code, data_byte;
 	int i, x;
 
 	for (i = 0, x = 0; i < x_count; i++, x += 8)
@@ -127,7 +127,7 @@ WRITE_LINE_MEMBER(einstein_state::einstein_6845_de_changed)
  */
 READ8_MEMBER(einstein_state::einstein_80col_state_r)
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	result |= m_de;
 	result |= m_80column_dips->read() & 0x06;
@@ -155,7 +155,7 @@ static const z80_daisy_config einstein_daisy_chain[] =
 /* refresh keyboard data. It is refreshed when the keyboard line is written */
 void einstein_state::einstein_scan_keyboard()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(m_keyboard_line, 0)) data &= m_line0->read();
 	if (!BIT(m_keyboard_line, 1)) data &= m_line1->read();
@@ -310,7 +310,7 @@ WRITE_LINE_MEMBER(einstein_state::write_centronics_fault)
 
 READ8_MEMBER(einstein_state::einstein_kybintmsk_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* clear key int. a read of this I/O port will do this or a reset */
 	m_interrupt &= ~EINSTEIN_KEY_INT;
@@ -397,7 +397,7 @@ void einstein_state::machine_start()
 void einstein_state::machine_reset()
 {
 	//device_t *floppy;
-	//UINT8 config = m_config->read();
+	//uint8_t config = m_config->read();
 
 	/* initialize memory mapping */
 	m_bank2->set_base(m_ram->pointer());
@@ -431,14 +431,14 @@ MACHINE_RESET_MEMBER(einstein_state,einstein2)
 	einstein_state::machine_reset();
 
 	/* 80 column card palette */
-	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, rgb_t::black);
+	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE, rgb_t::black());
 	m_palette->set_pen_color(TMS9928A_PALETTE_SIZE + 1, rgb_t(0, 224, 0));
 }
 
 MACHINE_START_MEMBER(einstein_state,einstein2)
 {
-	m_crtc_ram = std::make_unique<UINT8[]>(2048);
-	memset(m_crtc_ram.get(), 0, sizeof(UINT8) * 2048);
+	m_crtc_ram = std::make_unique<uint8_t[]>(2048);
+	memset(m_crtc_ram.get(), 0, sizeof(uint8_t) * 2048);
 	einstein_state::machine_start();
 }
 
@@ -447,7 +447,7 @@ MACHINE_START_MEMBER(einstein_state,einstein2)
     VIDEO EMULATION
 ***************************************************************************/
 
-UINT32 einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t einstein_state::screen_update_einstein2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (&screen == m_color_screen)
 	{

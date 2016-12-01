@@ -25,7 +25,7 @@
 // device type definition
 const device_type SPEECHROM = &device_creator<speechrom_device>;
 
-speechrom_device::speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+speechrom_device::speechrom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SPEECHROM, "SPEECHROM", tag, owner, clock, "speechrom", __FILE__), m_speechrom_data(nullptr), m_speechROMlen(0),
 	m_speechROMaddr(0),
 	m_load_pointer(0),

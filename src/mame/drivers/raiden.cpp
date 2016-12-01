@@ -133,6 +133,35 @@ ADDRESS_MAP_END
 
 /*****************************************************************************/
 
+static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( raiden_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, raiden_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sei80bu_encrypted_full_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+ADDRESS_MAP_END
+
+
+/*****************************************************************************/
+
 static INPUT_PORTS_START( raiden )
 	SEIBU_COIN_INPUTS /* coin inputs read through sound cpu */
 
@@ -276,7 +305,8 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
-	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -297,11 +327,29 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // frequency and pin 7 verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( raidene, raiden )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(raiden_sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( raidenu, raidene )
@@ -591,24 +639,24 @@ encryption method! The technique is a combination of a XOR table plus
 bit-swapping */
 void raiden_state::common_decrypt()
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 	int i;
 
 	for (i = 0; i < 0x20000; i++)
 	{
-		static const UINT16 xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0x00c0 };
-		UINT16 data = RAM[0xc0000/2 + i];
+		static const uint16_t xor_table[] = { 0x200e,0x0006,0x000a,0x0002,0x240e,0x000e,0x04c2,0x00c2,0x008c,0x0004,0x0088,0x0000,0x048c,0x000c,0x04c0,0x00c0 };
+		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x0f];
 		data = BITSWAP16(data, 15,14,10,12,11,13,9,8,3,2,5,4,7,1,6,0);
 		RAM[0xc0000/2 + i] = data;
 	}
 
-	RAM = (UINT16 *)memregion("sub")->base();
+	RAM = (uint16_t *)memregion("sub")->base();
 
 	for (i = 0; i < 0x20000; i++)
 	{
-		static const UINT16 xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
-		UINT16 data = RAM[0xc0000/2 + i];
+		static const uint16_t xor_table[] = { 0x0080,0x0080,0x0244,0x0288,0x0288,0x0288,0x1041,0x1009 };
+		uint16_t data = RAM[0xc0000/2 + i];
 		data ^= xor_table[i & 0x07];
 		data = BITSWAP16(data, 15,14,13,9,11,10,12,8,2,0,5,4,7,3,1,6);
 		RAM[0xc0000/2 + i] = data;
@@ -621,15 +669,6 @@ DRIVER_INIT_MEMBER(raiden_state,raiden)
 	common_decrypt();
 }
 
-DRIVER_INIT_MEMBER(raiden_state,raidenk)
-{
-	common_decrypt();
-}
-
-DRIVER_INIT_MEMBER(raiden_state,raidenu)
-{
-}
-
 
 /***************************************************************************/
 
@@ -640,10 +679,10 @@ GAME( 1990, raidenu,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "
 GAME( 1990, raident,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 /* Same as above, but the sound CPU code is not encrypted */
-GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )

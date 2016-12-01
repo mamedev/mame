@@ -20,13 +20,13 @@
 
 const device_type PLEIADS = &device_creator<pleiads_sound_device>;
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PLEIADS, "Pleiads Audio Custom", tag, owner, clock, "pleiads_sound", __FILE__),
 		device_sound_interface(mconfig, *this)
 {
 }
 
-pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pleiads_sound_device::pleiads_sound_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
 		m_channel(nullptr),
@@ -119,7 +119,7 @@ void pleiads_sound_device::device_start()
 
 const device_type NAUGHTYB = &device_creator<naughtyb_sound_device>;
 
-naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+naughtyb_sound_device::naughtyb_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, NAUGHTYB, "Naughty Boy Audio Custom", tag, owner, clock, "naughtyb_sound", __FILE__)
 {
 }
@@ -197,7 +197,7 @@ void naughtyb_sound_device::device_start()
 
 const device_type POPFLAME = &device_creator<popflame_sound_device>;
 
-popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+popflame_sound_device::popflame_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pleiads_sound_device(mconfig, POPFLAME, "Pop Flamer Audio Custom", tag, owner, clock, "popflame_sound", __FILE__)
 {
 }
@@ -371,7 +371,7 @@ inline int pleiads_sound_device::tone23(int samplerate)
 /*****************************************************************************
  * Tone #4 comes from upper half of the lower 556 (IC98 in Pop Flamer)
  * It's modulated by the voltage at C49, which is then divided between
- * 0V or 5V, depending on the polynome output bit.
+ * 0V or 5V, depending on the polynomial output bit.
  * The tone signal gates two signals (bits 5 of latches A and C), but
  * these are also swept between two levels (C52 and C53 in Pop Flamer).
  *****************************************************************************/
@@ -575,7 +575,7 @@ inline int pleiads_sound_device::noise(int samplerate)
 		m_polybit = (m_poly18[m_noise.polyoffs>>5] >> (m_noise.polyoffs & 31)) & 1;
 	}
 
-	/* The polynome output bit is used to gate bits 6 + 7 of
+	/* The polynomial output bit is used to gate bits 6 + 7 of
 	 * sound latch A through the upper half of a 4066 chip.
 	 * Bit 6 is sweeping a capacitor between 0V and 4.7V
 	 * while bit 7 is connected directly to the 4066.
@@ -649,16 +649,16 @@ WRITE8_MEMBER( pleiads_sound_device::control_c_w )
 void pleiads_sound_device::common_start()
 {
 	int i, j;
-	UINT32 shiftreg;
+	uint32_t shiftreg;
 
 	m_tms = machine().device<tms36xx_device>("tms");
 	m_pc4.level = PC4_MIN;
-	m_poly18 = make_unique_clear<UINT32[]>(1ul << (18-5));
+	m_poly18 = make_unique_clear<uint32_t[]>(1ul << (18-5));
 
 	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
 	{
-		UINT32 bits = 0;
+		uint32_t bits = 0;
 		for( j = 0; j < 32; j++ )
 		{
 			bits = (bits >> 1) | (shiftreg << 31);

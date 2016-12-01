@@ -7,10 +7,10 @@
     General core utilities and macros used throughout the emulator.
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_EMUCORE_H
+#define MAME_EMU_EMUCORE_H
 
-#ifndef __EMUCORE_H__
-#define __EMUCORE_H__
+#pragma once
 
 // standard C includes
 #include <assert.h>
@@ -27,6 +27,7 @@
 #endif
 
 // standard C++ includes
+#include <cassert>
 #include <exception>
 #include <type_traits>
 #include <typeinfo>
@@ -54,14 +55,24 @@
 //  FUNDAMENTAL TYPES
 //**************************************************************************
 
+// explicitly sized integers
+using osd::u8;
+using osd::u16;
+using osd::u32;
+using osd::u64;
+using osd::s8;
+using osd::s16;
+using osd::s32;
+using osd::s64;
+
 // genf is a generic function pointer; cast function pointers to this instead of void *
 typedef void genf(void);
 
 // pen_t is used to represent pixel values in bitmaps
-typedef UINT32 pen_t;
+typedef u32 pen_t;
 
 // stream_sample_t is used to represent a single sample in a sound stream
-typedef INT32 stream_sample_t;
+typedef s32 stream_sample_t;
 
 // running_machine is core to pretty much everything
 class running_machine;
@@ -72,38 +83,22 @@ class running_machine;
 //  USEFUL COMPOSITE TYPES
 //**************************************************************************
 
-// generic_ptr is a union of pointers to various sizes
-union generic_ptr
-{
-	generic_ptr(void *value) { v = value; }
-	void *      v;
-	INT8 *      i8;
-	UINT8 *     u8;
-	INT16 *     i16;
-	UINT16 *    u16;
-	INT32 *     i32;
-	UINT32 *    u32;
-	INT64 *     i64;
-	UINT64 *    u64;
-};
-
-
 // PAIR is an endian-safe union useful for representing 32-bit CPU registers
 union PAIR
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h,h2,h3; } b;
-	struct { UINT16 l,h; } w;
-	struct { INT8 l,h,h2,h3; } sb;
-	struct { INT16 l,h; } sw;
+	struct { u8 l,h,h2,h3; } b;
+	struct { u16 l,h; } w;
+	struct { s8 l,h,h2,h3; } sb;
+	struct { s16 l,h; } sw;
 #else
-	struct { UINT8 h3,h2,h,l; } b;
-	struct { INT8 h3,h2,h,l; } sb;
-	struct { UINT16 h,l; } w;
-	struct { INT16 h,l; } sw;
+	struct { u8 h3,h2,h,l; } b;
+	struct { s8 h3,h2,h,l; } sb;
+	struct { u16 h,l; } w;
+	struct { s16 h,l; } sw;
 #endif
-	UINT32 d;
-	INT32 sd;
+	u32 d;
+	s32 sd;
 };
 
 
@@ -111,14 +106,14 @@ union PAIR
 union PAIR16
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h; } b;
-	struct { INT8 l,h; } sb;
+	struct { u8 l,h; } b;
+	struct { s8 l,h; } sb;
 #else
-	struct { UINT8 h,l; } b;
-	struct { INT8 h,l; } sb;
+	struct { u8 h,l; } b;
+	struct { s8 h,l; } sb;
 #endif
-	UINT16 w;
-	INT16 sw;
+	u16 w;
+	s16 sw;
 };
 
 
@@ -126,22 +121,22 @@ union PAIR16
 union PAIR64
 {
 #ifdef LSB_FIRST
-	struct { UINT8 l,h,h2,h3,h4,h5,h6,h7; } b;
-	struct { UINT16 l,h,h2,h3; } w;
-	struct { UINT32 l,h; } d;
-	struct { INT8 l,h,h2,h3,h4,h5,h6,h7; } sb;
-	struct { INT16 l,h,h2,h3; } sw;
-	struct { INT32 l,h; } sd;
+	struct { u8 l,h,h2,h3,h4,h5,h6,h7; } b;
+	struct { u16 l,h,h2,h3; } w;
+	struct { u32 l,h; } d;
+	struct { s8 l,h,h2,h3,h4,h5,h6,h7; } sb;
+	struct { s16 l,h,h2,h3; } sw;
+	struct { s32 l,h; } sd;
 #else
-	struct { UINT8 h7,h6,h5,h4,h3,h2,h,l; } b;
-	struct { UINT16 h3,h2,h,l; } w;
-	struct { UINT32 h,l; } d;
-	struct { INT8 h7,h6,h5,h4,h3,h2,h,l; } sb;
-	struct { INT16 h3,h2,h,l; } sw;
-	struct { INT32 h,l; } sd;
+	struct { u8 h7,h6,h5,h4,h3,h2,h,l; } b;
+	struct { u16 h3,h2,h,l; } w;
+	struct { u32 h,l; } d;
+	struct { s8 h7,h6,h5,h4,h3,h2,h,l; } sb;
+	struct { s16 h3,h2,h,l; } sw;
+	struct { s32 h,l; } sd;
 #endif
-	UINT64 q;
-	INT64 sq;
+	u64 q;
+	s64 sq;
 };
 
 
@@ -240,36 +235,28 @@ inline TYPE operator--(TYPE &value, int) { TYPE const old(value); --value; retur
 #define ENDIAN_VALUE_NE_NNE(endian,neval,nneval) (((endian) == ENDIANNESS_NATIVE) ? (neval) : (nneval))
 
 
-// useful macros to deal with bit shuffling encryptions
-#define BIT(x,n) (((x)>>(n))&1)
+// useful functions to deal with bit shuffling encryptions
+template <typename T, typename U> constexpr T BIT(T x, U n) { return (x >> n) & T(1); }
 
-#define BITSWAP8(val,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B7) << 7) | (BIT(val,B6) << 6) | (BIT(val,B5) << 5) | (BIT(val,B4) << 4) | \
-		(BIT(val,B3) << 3) | (BIT(val,B2) << 2) | (BIT(val,B1) << 1) | (BIT(val,B0) << 0))
+template <typename T, typename U> constexpr T bitswap(T val, U b)
+{
+	return BIT(val, b) << 0U;
+}
 
-#define BITSWAP16(val,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
+template <typename T, typename U, typename... V> constexpr T bitswap(T val, U b, V... c)
+{
+	return (BIT(val, b) << sizeof...(c)) | bitswap(val, c...);
+}
 
-#define BITSWAP24(val,B23,B22,B21,B20,B19,B18,B17,B16,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B23) << 23) | (BIT(val,B22) << 22) | (BIT(val,B21) << 21) | (BIT(val,B20) << 20) | \
-		(BIT(val,B19) << 19) | (BIT(val,B18) << 18) | (BIT(val,B17) << 17) | (BIT(val,B16) << 16) | \
-		(BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
-
-#define BITSWAP32(val,B31,B30,B29,B28,B27,B26,B25,B24,B23,B22,B21,B20,B19,B18,B17,B16,B15,B14,B13,B12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
-	((BIT(val,B31) << 31) | (BIT(val,B30) << 30) | (BIT(val,B29) << 29) | (BIT(val,B28) << 28) | \
-		(BIT(val,B27) << 27) | (BIT(val,B26) << 26) | (BIT(val,B25) << 25) | (BIT(val,B24) << 24) | \
-		(BIT(val,B23) << 23) | (BIT(val,B22) << 22) | (BIT(val,B21) << 21) | (BIT(val,B20) << 20) | \
-		(BIT(val,B19) << 19) | (BIT(val,B18) << 18) | (BIT(val,B17) << 17) | (BIT(val,B16) << 16) | \
-		(BIT(val,B15) << 15) | (BIT(val,B14) << 14) | (BIT(val,B13) << 13) | (BIT(val,B12) << 12) | \
-		(BIT(val,B11) << 11) | (BIT(val,B10) << 10) | (BIT(val, B9) <<  9) | (BIT(val, B8) <<  8) | \
-		(BIT(val, B7) <<  7) | (BIT(val, B6) <<  6) | (BIT(val, B5) <<  5) | (BIT(val, B4) <<  4) | \
-		(BIT(val, B3) <<  3) | (BIT(val, B2) <<  2) | (BIT(val, B1) <<  1) | (BIT(val, B0) <<  0))
+// explicit versions that check number of bit position arguments
+template <typename T, typename... U> constexpr T BITSWAP8(T val, U... b) { static_assert(sizeof...(b) == 8U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP16(T val, U... b) { static_assert(sizeof...(b) == 16U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP24(T val, U... b) { static_assert(sizeof...(b) == 24U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP32(T val, U... b) { static_assert(sizeof...(b) == 32U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP40(T val, U... b) { static_assert(sizeof...(b) == 40U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP48(T val, U... b) { static_assert(sizeof...(b) == 48U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP56(T val, U... b) { static_assert(sizeof...(b) == 56U, "wrong number of bits"); return bitswap(val, b...); }
+template <typename T, typename... U> constexpr T BITSWAP64(T val, U... b) { static_assert(sizeof...(b) == 64U, "wrong number of bits"); return bitswap(val, b...); }
 
 
 
@@ -353,14 +340,33 @@ inline Dest downcast(Source &src)
 	return static_cast<Dest>(src);
 }
 
+// template function which takes a strongly typed enumerator and returns its value as a compile-time constant
+template <typename E>
+using enable_enum_t = typename std::enable_if_t<std::is_enum<E>::value, typename std::underlying_type_t<E>>;
+
+template <typename E>
+constexpr inline enable_enum_t<E>
+underlying_value(E e) noexcept
+{
+	return static_cast< typename std::underlying_type<E>::type >( e );
+}
+
+// template function which takes an integral value and returns its representation as enumerator (even strongly typed)
+template <typename E , typename T>
+constexpr inline typename std::enable_if_t<std::is_enum<E>::value && std::is_integral<T>::value, E>
+enum_value(T value) noexcept
+{
+	return static_cast<E>(value);
+}
+
 
 
 //**************************************************************************
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
-ATTR_NORETURN void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
-ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
+[[noreturn]] void fatalerror(const char *format, ...) ATTR_PRINTF(1,2);
+[[noreturn]] void fatalerror_exitcode(running_machine &machine, int exitcode, const char *format, ...) ATTR_PRINTF(3,4);
 
 //**************************************************************************
 //  INLINE FUNCTIONS
@@ -368,7 +374,7 @@ ATTR_NORETURN void fatalerror_exitcode(running_machine &machine, int exitcode, c
 
 // population count
 #if !defined(__NetBSD__)
-inline int popcount(UINT32 val)
+inline int popcount(u32 val)
 {
 	int count;
 
@@ -380,11 +386,11 @@ inline int popcount(UINT32 val)
 
 
 // convert a series of 32 bits into a float
-inline float u2f(UINT32 v)
+inline float u2f(u32 v)
 {
 	union {
 		float ff;
-		UINT32 vv;
+		u32 vv;
 	} u;
 	u.vv = v;
 	return u.ff;
@@ -392,11 +398,11 @@ inline float u2f(UINT32 v)
 
 
 // convert a float into a series of 32 bits
-inline UINT32 f2u(float f)
+inline u32 f2u(float f)
 {
 	union {
 		float ff;
-		UINT32 vv;
+		u32 vv;
 	} u;
 	u.ff = f;
 	return u.vv;
@@ -404,11 +410,11 @@ inline UINT32 f2u(float f)
 
 
 // convert a series of 64 bits into a double
-inline double u2d(UINT64 v)
+inline double u2d(u64 v)
 {
 	union {
 		double dd;
-		UINT64 vv;
+		u64 vv;
 	} u;
 	u.vv = v;
 	return u.dd;
@@ -416,14 +422,14 @@ inline double u2d(UINT64 v)
 
 
 // convert a double into a series of 64 bits
-inline UINT64 d2u(double d)
+inline u64 d2u(double d)
 {
 	union {
 		double dd;
-		UINT64 vv;
+		u64 vv;
 	} u;
 	u.dd = d;
 	return u.vv;
 }
 
-#endif  /* __EMUCORE_H__ */
+#endif  /* MAME_EMU_EMUCORE_H */

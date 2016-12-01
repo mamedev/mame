@@ -28,7 +28,7 @@ class k052109_device : public device_t, public device_gfx_interface
 	DECLARE_GFXDECODE_MEMBER(gfxinfo_ram);
 
 public:
-	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k052109_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~k052109_device() {}
 
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object)
@@ -65,7 +65,7 @@ public:
 	void tilemap_update();
 	int is_irq_enabled();
 	void tilemap_mark_dirty(int tmap_num);
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, UINT32 flags, UINT8 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int tmap_num, uint32_t flags, uint8_t priority);
 
 	void vblank_callback(screen_device &screen, bool state);
 
@@ -76,27 +76,27 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT8[]>   m_ram;
-	UINT8    *m_videoram_F;
-	UINT8    *m_videoram_A;
-	UINT8    *m_videoram_B;
-	UINT8    *m_videoram2_F;
-	UINT8    *m_videoram2_A;
-	UINT8    *m_videoram2_B;
-	UINT8    *m_colorram_F;
-	UINT8    *m_colorram_A;
-	UINT8    *m_colorram_B;
+	std::unique_ptr<uint8_t[]>   m_ram;
+	uint8_t    *m_videoram_F;
+	uint8_t    *m_videoram_A;
+	uint8_t    *m_videoram_B;
+	uint8_t    *m_videoram2_F;
+	uint8_t    *m_videoram2_A;
+	uint8_t    *m_videoram2_B;
+	uint8_t    *m_colorram_F;
+	uint8_t    *m_colorram_A;
+	uint8_t    *m_colorram_B;
 
 	tilemap_t  *m_tilemap[3];
 	int      m_tileflip_enable;
-	UINT8    m_charrombank[4];
-	UINT8    m_charrombank_2[4];
-	UINT8    m_has_extra_video_ram;
-	INT32    m_rmrd_line;
-	UINT8    m_irq_enabled;
-	UINT8    m_romsubbank, m_scrollctrl;
+	uint8_t    m_charrombank[4];
+	uint8_t    m_charrombank_2[4];
+	uint8_t    m_has_extra_video_ram;
+	int32_t    m_rmrd_line;
+	uint8_t    m_irq_enabled;
+	uint8_t    m_romsubbank, m_scrollctrl;
 
-	optional_region_ptr<UINT8> m_char_rom;
+	optional_region_ptr<uint8_t> m_char_rom;
 
 	optional_device<screen_device> m_screen;
 
@@ -110,7 +110,7 @@ private:
 	TILE_GET_INFO_MEMBER(get_tile_info1);
 	TILE_GET_INFO_MEMBER(get_tile_info2);
 
-	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, UINT8 *cram, UINT8 *vram1, UINT8 *vram2 );
+	void get_tile_info( tile_data &tileinfo, int tile_index, int layer, uint8_t *cram, uint8_t *vram1, uint8_t *vram2 );
 	void tileflip_reset();
 };
 

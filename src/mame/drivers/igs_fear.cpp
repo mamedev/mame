@@ -23,7 +23,7 @@ public:
 	DECLARE_DRIVER_INIT(igs_fear);
 	//virtual void video_start();
 	virtual void video_start_igs_fear();
-	UINT32 screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void pgm_create_dummy_internal_arm_region();
 	required_device<cpu_device> m_maincpu;
 	optional_device<gfxdecode_device> m_gfxdecode;
@@ -36,7 +36,7 @@ void igs_fear_state::video_start_igs_fear()
 }
 
 
-UINT32 igs_fear_state::screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs_fear_state::screen_update_igs_fear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -134,7 +134,7 @@ ROM_END
 
 void igs_fear_state::pgm_create_dummy_internal_arm_region()
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 
 	// fill with RX 14
 	int i;

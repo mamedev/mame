@@ -56,8 +56,8 @@ Heavy use is made of sprite zooming.
 
 void superchs_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,const int *primasks,int x_offs,int y_offs)
 {
-	UINT32 *spriteram32 = m_spriteram;
-	UINT16 *spritemap = (UINT16 *)memregion("user1")->base();
+	uint32_t *spriteram32 = m_spriteram;
+	uint16_t *spritemap = (uint16_t *)memregion("user1")->base();
 	int offs, data, tilenum, color, flipx, flipy;
 	int x, y, priority, dblsize, curx, cury;
 	int sprites_flipscreen = 0;
@@ -198,10 +198,10 @@ logerror("Sprite number %04x had %02x invalid chunks\n",tilenum,bad_chunks);
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 superchs_state::screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t superchs_state::screen_update_superchs(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[5];
-	UINT16 priority;
+	uint8_t layer[5];
+	uint16_t priority;
 	static const int primasks[4] = {0xfffc, 0xfff0, 0xff00, 0x0};
 
 	m_tc0480scp->tilemap_update();

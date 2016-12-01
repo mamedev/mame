@@ -35,8 +35,8 @@ public:
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_ticket;
-	UINT8   m_ctrl;
-	UINT8   m_digit_idx;
+	uint8_t   m_ctrl;
+	uint8_t   m_digit_idx;
 };
 
 

@@ -26,18 +26,18 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_vram_1;
-	required_shared_ptr<UINT16> m_vram_0;
-	required_shared_ptr<UINT16> m_scroll_1;
-	required_shared_ptr<UINT16> m_scroll_0;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram_1;
+	required_shared_ptr<uint16_t> m_vram_0;
+	required_shared_ptr<uint16_t> m_scroll_1;
+	required_shared_ptr<uint16_t> m_scroll_0;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t     *m_tilemap_0;
 	tilemap_t     *m_tilemap_1;
 
 	/* input-related */
-	UINT8       m_pot_wheel;    // blmbycar
+	uint8_t       m_pot_wheel;    // blmbycar
 	int         m_old_val;  // blmbycar
 	int         m_retvalue; // waterball
 
@@ -65,6 +65,6 @@ public:
 	DECLARE_MACHINE_START(watrball);
 	DECLARE_MACHINE_RESET(watrball);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

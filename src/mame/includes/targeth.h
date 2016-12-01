@@ -16,9 +16,9 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	tilemap_t *m_pant[2];
 
@@ -33,6 +33,6 @@ public:
 
 	TIMER_DEVICE_CALLBACK_MEMBER(interrupt);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

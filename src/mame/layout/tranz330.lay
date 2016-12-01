@@ -1,0 +1,227 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="vfd0"><led16segsc><color red="0" green="0.6" blue="1.0" /></led16segsc></element>
+
+	<element name="front"><rect><color red="0.15" green="0.15" blue="0.15" /></rect></element>
+	<element name="vfd_back"><rect><color red="0.03" green="0.03" blue="0.03" /></rect></element>
+	<element name="button_digit_back"><rect><color red="0.75" green="0.75" blue="0.75" /></rect></element>
+	<element name="button_aux_back"><rect><color red="0.57" green="0.57" blue="0.57" /></rect></element>
+	<element name="button_enter_back"><rect><color red="0.25" green="0.625" blue="0.875" /></rect></element>
+
+	<element name="hl" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="button_1_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="QZ."><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_1_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="1"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_2_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="ABC"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_2_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="2"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_3_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="DEF"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_3_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="3"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_4_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="GHI"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_4_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="4"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_5_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="JKL"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_5_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="5"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_6_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="MNO"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_6_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="6"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_7_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="PRS"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_7_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="7"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_8_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="TUV"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_8_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="8"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_9_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="WXY"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_9_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="9"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_0_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="-SP"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_0_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="0"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_star_text">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string=",'&quot;"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_star_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="*"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_hash_num">
+		<rect><color red="0.75" green="0.75" blue="0.75" /></rect>
+		<text string="#"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_clear_text">
+		<rect><color red="0.57" green="0.57" blue="0.57" /></rect>
+		<text string="CLEAR"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_back_text">
+		<rect><color red="0.57" green="0.57" blue="0.57" /></rect>
+		<text string="BACK"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_space_text">
+		<rect><color red="0.57" green="0.57" blue="0.57" /></rect>
+		<text string="SPACE"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_alpha_text">
+		<rect><color red="0.57" green="0.57" blue="0.57" /></rect>
+		<text string="ALPHA"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_func_text">
+		<rect><color red="0.25" green="0.625" blue="0.875" /></rect>
+		<text string="FUNC"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+	<element name="button_enter_text">
+		<rect><color red="0.25" green="0.625" blue="0.875" /></rect>
+		<text string="ENTER"><color red="0.0" green="0.0" blue="0.0" /></text>
+	</element>
+
+	<element name="button_enter_line"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+
+	<view name="Internal Layout">
+		<backdrop name="case_bg"      element="front">            <bounds x="  0" y="  0" width="162" height="190"/></backdrop>
+		<backdrop name="button_1"     element="button_digit_back"><bounds x=" 18" y=" 50" width="25" height="25"/></backdrop>
+		<backdrop name="button_2"     element="button_digit_back"><bounds x=" 52" y=" 50" width="25" height="25"/></backdrop>
+		<backdrop name="button_3"     element="button_digit_back"><bounds x=" 86" y=" 50" width="25" height="25"/></backdrop>
+		<backdrop name="button_4"     element="button_digit_back"><bounds x=" 18" y=" 84" width="25" height="25"/></backdrop>
+		<backdrop name="button_5"     element="button_digit_back"><bounds x=" 52" y=" 84" width="25" height="25"/></backdrop>
+		<backdrop name="button_6"     element="button_digit_back"><bounds x=" 86" y=" 84" width="25" height="25"/></backdrop>
+		<backdrop name="button_7"     element="button_digit_back"><bounds x=" 18" y="118" width="25" height="25"/></backdrop>
+		<backdrop name="button_8"     element="button_digit_back"><bounds x=" 52" y="118" width="25" height="25"/></backdrop>
+		<backdrop name="button_9"     element="button_digit_back"><bounds x=" 86" y="118" width="25" height="25"/></backdrop>
+		<backdrop name="button_0"     element="button_digit_back"><bounds x=" 52" y="152" width="25" height="25"/></backdrop>
+		<backdrop name="button_star"  element="button_digit_back"><bounds x=" 18" y="152" width="25" height="25"/></backdrop>
+		<backdrop name="button_hash"  element="button_digit_back"><bounds x=" 86" y="152" width="25" height="25"/></backdrop>
+		<backdrop name="button_clear" element="button_aux_back">  <bounds x="120" y=" 50" width="25" height="25"/></backdrop>
+		<backdrop name="button_back"  element="button_aux_back">  <bounds x="120" y=" 84" width="25" height="25"/></backdrop>
+		<backdrop name="button_alpha" element="button_aux_back">  <bounds x="120" y="118" width="25" height="25"/></backdrop>
+		<backdrop name="button_enter" element="button_enter_back"><bounds x="120" y="152" width="25" height="25"/></backdrop>
+
+		<backdrop name="vfd_backdrop" element="vfd_back">         <bounds x=" 0" y=" 0" width="162" height="32"/></backdrop>
+
+		<bezel name="vfd0"  element="vfd0" state="0"><bounds x="  9" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd1"  element="vfd0" state="0"><bounds x=" 18" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd2"  element="vfd0" state="0"><bounds x=" 27" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd3"  element="vfd0" state="0"><bounds x=" 36" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd4"  element="vfd0" state="0"><bounds x=" 45" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd5"  element="vfd0" state="0"><bounds x=" 54" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd6"  element="vfd0" state="0"><bounds x=" 63" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd7"  element="vfd0" state="0"><bounds x=" 72" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd8"  element="vfd0" state="0"><bounds x=" 81" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd9"  element="vfd0" state="0"><bounds x=" 90" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd10" element="vfd0" state="0"><bounds x=" 99" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd11" element="vfd0" state="0"><bounds x="108" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd12" element="vfd0" state="0"><bounds x="117" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd13" element="vfd0" state="0"><bounds x="126" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd14" element="vfd0" state="0"><bounds x="135" y="9" width="9" height="14"/></bezel>
+		<bezel name="vfd15" element="vfd0" state="0"><bounds x="144" y="9" width="9" height="14"/></bezel>
+
+		<bezel name="button_1_text1"     element="button_1_text">    <bounds x=" 18" y=" 54" width="25" height="8"/></bezel>
+		<bezel name="button_1_text2"     element="button_1_num">     <bounds x=" 18" y=" 64" width="25" height="8"/></bezel>
+		<bezel name="button_2_text1"     element="button_2_text">    <bounds x=" 52" y=" 54" width="25" height="8"/></bezel>
+		<bezel name="button_2_text2"     element="button_2_num">     <bounds x=" 52" y=" 64" width="25" height="8"/></bezel>
+		<bezel name="button_3_text1"     element="button_3_text">    <bounds x=" 86" y=" 54" width="25" height="8"/></bezel>
+		<bezel name="button_3_text2"     element="button_3_num">     <bounds x=" 86" y=" 64" width="25" height="8"/></bezel>
+		<bezel name="button_4_text1"     element="button_4_text">    <bounds x=" 18" y=" 88" width="25" height="8"/></bezel>
+		<bezel name="button_4_text2"     element="button_4_num">     <bounds x=" 18" y=" 98" width="25" height="8"/></bezel>
+		<bezel name="button_5_text1"     element="button_5_text">    <bounds x=" 52" y=" 88" width="25" height="8"/></bezel>
+		<bezel name="button_5_text2"     element="button_5_num">     <bounds x=" 52" y=" 98" width="25" height="8"/></bezel>
+		<bezel name="button_6_text1"     element="button_6_text">    <bounds x=" 86" y=" 88" width="25" height="8"/></bezel>
+		<bezel name="button_6_text2"     element="button_6_num">     <bounds x=" 86" y=" 98" width="25" height="8"/></bezel>
+		<bezel name="button_7_text1"     element="button_7_text">    <bounds x=" 18" y="122" width="25" height="8"/></bezel>
+		<bezel name="button_7_text2"     element="button_7_num">     <bounds x=" 18" y="132" width="25" height="8"/></bezel>
+		<bezel name="button_8_text1"     element="button_8_text">    <bounds x=" 52" y="122" width="25" height="8"/></bezel>
+		<bezel name="button_8_text2"     element="button_8_num">     <bounds x=" 52" y="132" width="25" height="8"/></bezel>
+		<bezel name="button_9_text1"     element="button_9_text">    <bounds x=" 86" y="122" width="25" height="8"/></bezel>
+		<bezel name="button_9_text2"     element="button_9_num">     <bounds x=" 86" y="132" width="25" height="8"/></bezel>
+		<bezel name="button_star_text1"  element="button_star_text"> <bounds x=" 18" y="156" width="25" height="8"/></bezel>
+		<bezel name="button_star_text2"  element="button_star_num">  <bounds x=" 18" y="166" width="25" height="8"/></bezel>
+		<bezel name="button_0_text1"     element="button_0_text">    <bounds x=" 52" y="156" width="25" height="8"/></bezel>
+		<bezel name="button_0_text2"     element="button_0_num">     <bounds x=" 52" y="166" width="25" height="8"/></bezel>
+		<bezel name="button_hash_text"   element="button_hash_num">  <bounds x=" 86" y="161" width="25" height="8"/></bezel>
+		<bezel name="button_clear_text1" element="button_clear_text"><bounds x="120" y=" 59" width="25" height="7"/></bezel>
+		<bezel name="button_back_text1"  element="button_back_text"> <bounds x="120" y=" 88" width="25" height="7"/></bezel>
+		<bezel name="button_space_text1" element="button_space_text"><bounds x="120" y=" 98" width="25" height="7"/></bezel>
+		<bezel name="button_alpha_text1" element="button_alpha_text"><bounds x="120" y="127" width="25" height="7"/></bezel>
+		<bezel name="button_func_text1"  element="button_func_text"> <bounds x="120" y="156" width="25" height="7"/></bezel>
+		<bezel name="button_enter_text1" element="button_enter_text"><bounds x="120" y="166" width="25" height="7"/></bezel>
+		<bezel name="enter_line_strike"  element="button_enter_line"><bounds x="122.5" y="164" width="20" height="1"/></bezel>
+
+		<bezel element="hl" inputtag="COL.0" inputmask="0x01"><bounds x=" 20" y=" 52" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x02"><bounds x=" 20" y=" 86" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x04"><bounds x=" 20" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.0" inputmask="0x08"><bounds x=" 20" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x01"><bounds x=" 54" y=" 52" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x02"><bounds x=" 54" y=" 86" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x04"><bounds x=" 54" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.1" inputmask="0x08"><bounds x=" 54" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x01"><bounds x=" 88" y=" 52" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x02"><bounds x=" 88" y=" 86" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x04"><bounds x=" 88" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.2" inputmask="0x08"><bounds x=" 88" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x01"><bounds x="122" y=" 52" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x02"><bounds x="122" y=" 86" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x04"><bounds x="122" y="120" width="21" height="21" /><color alpha="0.2" /></bezel>
+		<bezel element="hl" inputtag="COL.3" inputmask="0x08"><bounds x="122" y="154" width="21" height="21" /><color alpha="0.2" /></bezel>
+	</view>
+</mamelayout>

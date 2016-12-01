@@ -1,21 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
-/* Notes: DJH 04 Jan 2008
-
-  fixed gridiron079gre (shared access to spriteram was broken)
-
-  The inputs seem to be a hacky mess (although there was reportedly a
-  hardware joystick hack for tehkanwc via plugin logic subboard, is this
-  attempting to simulate it?
-
-  Also there is a hack to reset the sound CPU...
-
-*/
-
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
-
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -89,6 +76,17 @@ TO DO :
   - Confirm "Difficulty" Dip Switch in 'teedoff'
 
 ***************************************************************************/
+/* Notes: DJH 04 Jan 2008
+
+  fixed gridiron079gre (shared access to spriteram was broken)
+
+  The inputs seem to be a hacky mess (although there was reportedly a
+  hardware joystick hack for tehkanwc via plugin logic subboard, is this
+  attempting to simulate it?
+
+  Also there is a hack to reset the sound CPU...
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
@@ -163,7 +161,7 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tehkanwc_state::device_timer");
+		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
 	}
 }
 
@@ -207,7 +205,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 
 WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 {
-	UINT8 *SAMPLES = memregion("adpcm")->base();
+	uint8_t *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
@@ -665,12 +663,12 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -701,7 +699,7 @@ DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
 	    023A: 00          nop
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

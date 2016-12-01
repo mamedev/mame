@@ -13,7 +13,7 @@
 #include "fileio.h"
 
 
-const UINT32 OPEN_FLAG_HAS_CRC  = 0x10000;
+const u32 OPEN_FLAG_HAS_CRC  = 0x10000;
 
 
 
@@ -22,47 +22,99 @@ const UINT32 OPEN_FLAG_HAS_CRC  = 0x10000;
 //**************************************************************************
 
 //-------------------------------------------------
-//  path_iterator - constructor
+//  path_iterator - constructors
 //-------------------------------------------------
 
-path_iterator::path_iterator(const char *rawsearchpath)
-	: m_base(rawsearchpath),
-		m_current(m_base),
-		m_index(0)
+path_iterator::path_iterator(std::string &&searchpath)
+	: m_searchpath(std::move(searchpath))
+	, m_current(m_searchpath.cbegin())
+	, m_is_first(true)
+{
+}
+
+path_iterator::path_iterator(std::string const &searchpath)
+	: m_searchpath(searchpath)
+	, m_current(m_searchpath.cbegin())
+	, m_is_first(true)
+{
+}
+
+path_iterator::path_iterator(path_iterator &&that)
+{
+	operator=(std::move(that));
+}
+
+path_iterator::path_iterator(path_iterator const &that)
+	: m_searchpath(that.m_searchpath)
+	, m_current(std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current)))
+	, m_is_first(that.m_is_first)
 {
 }
 
 
 //-------------------------------------------------
-//  path_iterator_get_next - get the next entry
-//  in a multipath sequence
+//  path_iterator - assignement operators
+//-------------------------------------------------
+
+path_iterator &path_iterator::operator=(path_iterator &&that)
+{
+	auto const current(std::distance(that.m_searchpath.cbegin(), that.m_current));
+	m_searchpath = std::move(that.m_searchpath);
+	m_current = std::next(m_searchpath.cbegin(), current);
+	m_is_first = that.m_is_first;
+	return *this;
+}
+
+path_iterator &path_iterator::operator=(path_iterator const &that)
+{
+	m_searchpath = that.m_searchpath;
+	m_current = std::next(m_searchpath.cbegin(), std::distance(that.m_searchpath.cbegin(), that.m_current));
+	m_is_first = that.m_is_first;
+	return *this;
+}
+
+
+//-------------------------------------------------
+//  path_iterator::next - get the next entry in a
+//  multipath sequence
 //-------------------------------------------------
 
 bool path_iterator::next(std::string &buffer, const char *name)
 {
-	// if none left, return FALSE to indicate we are done
-	if (m_index != 0 && *m_current == 0)
+	// if none left, return false to indicate we are done
+	if (!m_is_first && (m_searchpath.cend() == m_current))
 		return false;
 
-	// copy up to the next semicolon
-	const char *semi = strchr(m_current, ';');
-	if (semi == nullptr)
-		semi = m_current + strlen(m_current);
-	buffer.assign(m_current, semi - m_current);
-	m_current = (*semi == 0) ? semi : semi + 1;
+	// copy up to the next separator
+	auto const sep(std::find(m_current, m_searchpath.cend(), ';')); // FIXME this should be a macro - UNIX prefers :
+	buffer.assign(m_current, sep);
+	m_current = sep;
+	if (m_searchpath.cend() != m_current)
+		++m_current;
 
 	// append the name if we have one
-	if (name != nullptr)
+	if (name)
 	{
 		// compute the full pathname
-		if (buffer.length() > 0)
+		if (!buffer.empty() && (*buffer.rbegin() != *PATH_SEPARATOR))
 			buffer.append(PATH_SEPARATOR);
 		buffer.append(name);
 	}
 
-	// bump the index and return TRUE
-	m_index++;
+	// bump the index and return true
+	m_is_first = false;
 	return true;
+}
+
+
+//-------------------------------------------------
+//  path_iteratr::reset - let's go again
+//-------------------------------------------------
+
+void path_iterator::reset()
+{
+	m_current = m_searchpath.cbegin();
+	m_is_first = true;
 }
 
 
@@ -72,27 +124,6 @@ bool path_iterator::next(std::string &buffer, const char *name)
 //**************************************************************************
 
 //-------------------------------------------------
-//  file_enumerator - constructor
-//-------------------------------------------------
-
-file_enumerator::file_enumerator(const char *searchpath)
-	: m_iterator(searchpath),
-		m_curdir(nullptr)/*,
-        m_buflen(0)*/
-{
-}
-
-
-//-------------------------------------------------
-//  ~file_enumerator - destructor
-//-------------------------------------------------
-
-file_enumerator::~file_enumerator()
-{
-}
-
-
-//-------------------------------------------------
 //  next - return information about the next file
 //  in the search path
 //-------------------------------------------------
@@ -100,7 +131,7 @@ file_enumerator::~file_enumerator()
 const osd::directory::entry *file_enumerator::next()
 {
 	// loop over potentially empty directories
-	while (1)
+	while (true)
 	{
 		// if no open directory, get the next path
 		while (!m_curdir)
@@ -114,8 +145,8 @@ const osd::directory::entry *file_enumerator::next()
 		}
 
 		// get the next entry from the current directory
-		const osd::directory::entry *result = m_curdir->read();
-		if (result != nullptr)
+		const osd::directory::entry *const result = m_curdir->read();
+		if (result)
 			return result;
 
 		// we're done; close this directory
@@ -133,32 +164,32 @@ const osd::directory::entry *file_enumerator::next()
 //  emu_file - constructor
 //-------------------------------------------------
 
-emu_file::emu_file(UINT32 openflags)
-	: m_file(nullptr),
-		m_iterator(""),
-		m_mediapaths(""),
-		m_crc(0),
-		m_openflags(openflags),
-		m_zipfile(nullptr),
-		m_ziplength(0),
-		m_remove_on_close(false),
-		m_restrict_to_mediapath(false)
+emu_file::emu_file(u32 openflags)
+	: m_file()
+	, m_iterator(std::string())
+	, m_mediapaths(std::string())
+	, m_crc(0)
+	, m_openflags(openflags)
+	, m_zipfile(nullptr)
+	, m_ziplength(0)
+	, m_remove_on_close(false)
+	, m_restrict_to_mediapath(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
 		throw emu_fatalerror("Attempted to open a file for write with OPEN_FLAG_HAS_CRC");
 }
 
-emu_file::emu_file(const char *searchpath, UINT32 openflags)
-	: m_file(nullptr),
-		m_iterator(searchpath),
-		m_mediapaths(searchpath),
-		m_crc(0),
-		m_openflags(openflags),
-		m_zipfile(nullptr),
-		m_ziplength(0),
-		m_remove_on_close(false),
-		m_restrict_to_mediapath(false)
+emu_file::emu_file(std::string &&searchpath, u32 openflags)
+	: m_file()
+	, m_iterator(searchpath)
+	, m_mediapaths(std::move(searchpath))
+	, m_crc(0)
+	, m_openflags(openflags)
+	, m_zipfile(nullptr)
+	, m_ziplength(0)
+	, m_remove_on_close(false)
+	, m_restrict_to_mediapath(false)
 {
 	// sanity check the open flags
 	if ((m_openflags & OPEN_FLAG_HAS_CRC) && (m_openflags & OPEN_FLAG_WRITE))
@@ -226,7 +257,7 @@ util::hash_collection &emu_file::hashes(const char *types)
 	}
 
 	// read the data if we can
-	const UINT8 *filedata = (const UINT8 *)m_file->buffer();
+	const u8 *filedata = (const u8 *)m_file->buffer();
 	if (filedata == nullptr)
 		return m_hashes;
 
@@ -270,7 +301,7 @@ osd_file::error emu_file::open(const std::string &name1, const std::string &name
 	return open(name1 + name2 + name3 + name4);
 }
 
-osd_file::error emu_file::open(const std::string &name, UINT32 crc)
+osd_file::error emu_file::open(const std::string &name, u32 crc)
 {
 	// remember the filename and CRC info
 	m_filename = name;
@@ -282,19 +313,19 @@ osd_file::error emu_file::open(const std::string &name, UINT32 crc)
 	return open_next();
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, UINT32 crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2, crc);
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, UINT32 crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2 + name3, crc);
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, UINT32 crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2 + name3 + name4, crc);
@@ -338,7 +369,7 @@ osd_file::error emu_file::open_next()
 //  just an array of data in RAM
 //-------------------------------------------------
 
-osd_file::error emu_file::open_ram(const void *data, UINT32 length)
+osd_file::error emu_file::open_ram(const void *data, u32 length)
 {
 	// set a fake filename and CRC
 	m_filename = "RAM";
@@ -402,7 +433,7 @@ bool emu_file::compressed_file_ready(void)
 //  seek - seek within a file
 //-------------------------------------------------
 
-int emu_file::seek(INT64 offset, int whence)
+int emu_file::seek(s64 offset, int whence)
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -420,7 +451,7 @@ int emu_file::seek(INT64 offset, int whence)
 //  tell - return the current file position
 //-------------------------------------------------
 
-UINT64 emu_file::tell()
+u64 emu_file::tell()
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -456,7 +487,7 @@ bool emu_file::eof()
 //  size - returns the size of a file
 //-------------------------------------------------
 
-UINT64 emu_file::size()
+u64 emu_file::size()
 {
 	// use the ZIP length if present
 	if (m_zipfile != nullptr)
@@ -474,7 +505,7 @@ UINT64 emu_file::size()
 //  read - read from a file
 //-------------------------------------------------
 
-UINT32 emu_file::read(void *buffer, UINT32 length)
+u32 emu_file::read(void *buffer, u32 length)
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -546,7 +577,7 @@ char *emu_file::gets(char *s, int n)
 //  write - write to a file
 //-------------------------------------------------
 
-UINT32 emu_file::write(const void *buffer, UINT32 length)
+u32 emu_file::write(const void *buffer, u32 length)
 {
 	// write the data if we can
 	if (m_file)

@@ -14,13 +14,13 @@
 
 VIDEO_START_MEMBER(special_state,special)
 {
-	m_palette->set_pen_color(0,rgb_t::black); /* black */
-	m_palette->set_pen_color(1,rgb_t::white); /* white */
+	m_palette->set_pen_color(0, rgb_t::black());
+	m_palette->set_pen_color(1, rgb_t::white());
 }
 
-UINT32 special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t special_state::screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code;
+	uint8_t code;
 	int y, x, b;
 
 	for (x = 0; x < 48; x++)
@@ -38,9 +38,9 @@ VIDEO_START_MEMBER(special_state,specialp)
 {
 }
 
-UINT32 special_state::screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t special_state::screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code;
+	uint8_t code;
 	int y, x, b;
 
 	for (x = 0; x < 64; x++)
@@ -83,12 +83,12 @@ PALETTE_INIT_MEMBER(special_state,specimx)
 
 VIDEO_START_MEMBER(special_state,specimx)
 {
-	m_specimx_colorram = std::make_unique<UINT8[]>(0x3000);
+	m_specimx_colorram = std::make_unique<uint8_t[]>(0x3000);
 }
 
-UINT32 special_state::screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t special_state::screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code, color;
+	uint8_t code, color;
 	int y, x, b;
 
 	for (x = 0; x < 48; x++)
@@ -125,11 +125,11 @@ VIDEO_START_MEMBER(special_state,erik)
 {
 }
 
-UINT32 special_state::screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t special_state::screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 code1, code2, color1, color2;
+	uint8_t code1, code2, color1, color2;
 	int y, x, b;
-	UINT8 *erik_video_ram_p1, *erik_video_ram_p2;
+	uint8_t *erik_video_ram_p1, *erik_video_ram_p2;
 
 	erik_video_ram_p1 = m_ram->pointer() + 0x9000;
 	erik_video_ram_p2 = m_ram->pointer() + 0xd000;

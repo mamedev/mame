@@ -30,40 +30,40 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<jaleco_blend_device> m_blend;
 
-	optional_shared_ptr<UINT8> m_bg0_scrollx;
-	optional_shared_ptr<UINT8> m_bg0_scrolly;
-	required_shared_ptr<UINT8> m_bg1_scrollx;
-	required_shared_ptr<UINT8> m_bg1_scrolly;
-	required_shared_ptr<UINT8> m_paletteram;
-	optional_shared_ptr<UINT8> m_txram;
-	optional_shared_ptr<UINT8> m_bg1ram;
-	required_shared_ptr<UINT8> m_spriteram;
-	optional_shared_ptr<UINT8> m_butasan_bg1ram;
+	optional_shared_ptr<uint8_t> m_bg0_scrollx;
+	optional_shared_ptr<uint8_t> m_bg0_scrolly;
+	required_shared_ptr<uint8_t> m_bg1_scrollx;
+	required_shared_ptr<uint8_t> m_bg1_scrolly;
+	required_shared_ptr<uint8_t> m_paletteram;
+	optional_shared_ptr<uint8_t> m_txram;
+	optional_shared_ptr<uint8_t> m_bg1ram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	optional_shared_ptr<uint8_t> m_butasan_bg1ram;
 
 	// common
-	UINT8 m_bg_status;
-	UINT8 m_flipscreen;
-	UINT16 m_palette_intensity;
+	uint8_t m_bg_status;
+	uint8_t m_flipscreen;
+	uint16_t m_palette_intensity;
 
 	// argus specific
-	std::unique_ptr<UINT8[]> m_dummy_bg0ram;
+	std::unique_ptr<uint8_t[]> m_dummy_bg0ram;
 	int m_lowbitscroll;
 	int m_prvscrollx;
 
 	// butasan specific
-	UINT8 *m_butasan_txram;
-	UINT8 *m_butasan_bg0ram;
-	UINT8 *m_butasan_bg0backram;
-	UINT8 *m_butasan_txbackram;
-	std::unique_ptr<UINT8[]> m_butasan_pagedram[2];
-	UINT8 m_butasan_page_latch;
-	UINT8 m_butasan_bg1_status;
-	UINT8 m_butasan_unknown;
+	uint8_t *m_butasan_txram;
+	uint8_t *m_butasan_bg0ram;
+	uint8_t *m_butasan_bg0backram;
+	uint8_t *m_butasan_txbackram;
+	std::unique_ptr<uint8_t[]> m_butasan_pagedram[2];
+	uint8_t m_butasan_page_latch;
+	uint8_t m_butasan_bg1_status;
+	uint8_t m_butasan_unknown;
 
 	// valtric specific
-	UINT8 m_valtric_mosaic;
+	uint8_t m_valtric_mosaic;
 	bitmap_rgb32 m_mosaicbitmap;
-	UINT8 m_valtric_unknown;
+	uint8_t m_valtric_unknown;
 	int m_mosaic;
 
 	tilemap_t *m_tx_tilemap;
@@ -113,9 +113,9 @@ public:
 	DECLARE_VIDEO_START(butasan);
 	DECLARE_VIDEO_RESET(butasan);
 
-	UINT32 screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_argus(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_valtric(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_butasan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(butasan_scanline);

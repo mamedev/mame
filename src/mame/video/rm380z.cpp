@@ -76,10 +76,10 @@ void rm380z_state::config_videomode()
 // 3=reverse
 
 
-void rm380z_state::decode_videoram_char(int pos,UINT8& chr,UINT8& attrib)
+void rm380z_state::decode_videoram_char(int pos,uint8_t& chr,uint8_t& attrib)
 {
-	UINT8 ch1=m_vramchars[pos];
-	UINT8 ch2=m_vramattribs[pos];
+	uint8_t ch1=m_vramchars[pos];
+	uint8_t ch2=m_vramattribs[pos];
 
 	// "special" (unknown) cases first
 	if ((ch1==0x80)&&(ch2==0x04))
@@ -161,7 +161,7 @@ void rm380z_state::scroll_videoram()
 
 void rm380z_state::check_scroll_register()
 {
-	UINT8 r[3];
+	uint8_t r[3];
 
 	r[0]=m_old_old_fbfd;
 	r[1]=m_old_fbfd;
@@ -253,7 +253,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int c=0;c<RM380Z_CHDIMX;c++)
 				{
-					UINT8 chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+c)])==0xff?0:1;
+					uint8_t chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+c)])==0xff?0:1;
 
 					if (attrRev)
 					{
@@ -270,7 +270,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 						}
 					}
 
-					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
+					uint16_t *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
 					*dest=chval;
 				}
 			}
@@ -278,7 +278,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			// last pixel of underline
 			if (attrUnder&&(!attrRev))
 			{
-				UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+(RM380Z_CHDIMY-1),(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
+				uint16_t *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+(RM380Z_CHDIMY-1),(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
 				*dest=attrRev?0:1;
 			}
 
@@ -287,7 +287,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int r=0;r<RM380Z_CHDIMY;r++)
 				{
-					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
+					uint16_t *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+RM380Z_CHDIMX);
 					*dest=1;
 				}
 			}
@@ -301,7 +301,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
 				{
-					UINT8 chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+(c/2))])==0xff?0:1;
+					uint8_t chval=(chsb[((basey+r)*(RM380Z_CHDIMX*RM380Z_NCX))+(basex+(c/2))])==0xff?0:1;
 
 					if (attrRev)
 					{
@@ -318,8 +318,8 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 						}
 					}
 
-					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
-					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
+					uint16_t *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
+					uint16_t *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
 					*dest=chval;
 					*dest2=chval;
 				}
@@ -328,8 +328,8 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			// last 2 pixels of underline
 			if (attrUnder)
 			{
-				UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2));
-				UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2)+1);
+				uint16_t *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2));
+				uint16_t *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+RM380Z_CHDIMY-1 , ((x*(RM380Z_CHDIMX+1))*2)+(RM380Z_CHDIMX*2)+1);
 				*dest=attrRev?0:1;
 				*dest2=attrRev?0:1;
 			}
@@ -339,8 +339,8 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int r=0;r<RM380Z_CHDIMY;r++)
 				{
-					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2));
-					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2)+1);
+					uint16_t *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2));
+					uint16_t *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+((RM380Z_CHDIMX)*2)+1);
 					*dest=1;
 					*dest2=1;
 				}
@@ -356,7 +356,7 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int c=0;c<RM380Z_CHDIMX;c++)
 				{
-					UINT16 *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
+					uint16_t *dest=&bitmap.pix16((y*(RM380Z_CHDIMY+1))+r,(x*(RM380Z_CHDIMX+1))+c);
 					*dest=m_graphic_chars[charnum&0x3f][c+(r*(RM380Z_CHDIMX+1))];
 				}
 			}
@@ -367,8 +367,8 @@ void rm380z_state::putChar(int charnum,int attribs,int x,int y,bitmap_ind16 &bit
 			{
 				for (int c=0;c<(RM380Z_CHDIMX*2);c+=2)
 				{
-					UINT16 *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
-					UINT16 *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
+					uint16_t *dest=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c);
+					uint16_t *dest2=&bitmap.pix16( (y*(RM380Z_CHDIMY+1))+r,((x*(RM380Z_CHDIMX+1))*2)+c+1);
 					*dest=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
 					*dest2=m_graphic_chars[charnum&0x3f][(c/2)+(r*(RM380Z_CHDIMX+1))];
 				}
@@ -397,7 +397,7 @@ void rm380z_state::update_screen(bitmap_ind16 &bitmap)
 	{
 		for (int col=0;col<ncols;col++)
 		{
-			UINT8 curch,attribs;
+			uint8_t curch,attribs;
 			decode_videoram_char((row*lineWidth)+col,curch,attribs);
 			putChar(curch,attribs,col,row,bitmap,pChar,m_videomode);
 			//putChar(0x44,0x00,10,10,bitmap,pChar,m_videomode);

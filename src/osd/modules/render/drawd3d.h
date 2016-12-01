@@ -65,7 +65,7 @@ public:
 	virtual void save() override;
 	virtual void record() override;
 	virtual void toggle_fsfx() override;
-	virtual void add_audio_to_recording(const INT16 *buffer, int samples_this_frame) override;
+	virtual void add_audio_to_recording(const int16_t *buffer, int samples_this_frame) override;
 	virtual std::vector<ui::menu_item> get_slider_list() override;
 	virtual void set_sliders_dirty() override;
 
@@ -78,14 +78,14 @@ public:
 	void                    update_presentation_parameters();
 	void                    update_gamma_ramp();
 
-	int                     device_verify_caps();
+	bool                    device_verify_caps();
 	int                     device_test_cooperative();
 
 	int                     config_adapter_mode();
 	void                    pick_best_mode();
 	int                     get_adapter_for_monitor();
 
-	int                     update_window_size();
+	bool                    update_window_size();
 
 	int                     pre_window_draw_check();
 	void                    begin_frame();
@@ -126,7 +126,7 @@ public:
 	D3DFORMAT               get_pixel_format() const { return m_pixformat; }
 	D3DDISPLAYMODE          get_origmode() const { return m_origmode; }
 
-	UINT32                  get_last_texture_flags() const { return m_last_texture_flags; }
+	uint32_t                  get_last_texture_flags() const { return m_last_texture_flags; }
 
 	d3d_texture_manager *   get_texture_manager() const { return m_texture_manager; }
 	texture_info *          get_default_texture();
@@ -161,13 +161,13 @@ private:
 	D3DFORMAT               m_screen_format;            // format to use for screen textures
 
 	texture_info *          m_last_texture;             // previous texture
-	UINT32                  m_last_texture_flags;       // previous texture flags
+	uint32_t                  m_last_texture_flags;       // previous texture flags
 	int                     m_last_blendenable;         // previous blendmode
 	int                     m_last_blendop;             // previous blendmode
 	int                     m_last_blendsrc;            // previous blendmode
 	int                     m_last_blenddst;            // previous blendmode
 	int                     m_last_filter;              // previous texture filter
-	UINT32                  m_last_wrap;                // previous wrap state
+	uint32_t                  m_last_wrap;                // previous wrap state
 	int                     m_last_modmode;             // previous texture modulation
 
 	shaders *               m_shaders;                  // HLSL interface

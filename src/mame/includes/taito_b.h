@@ -40,8 +40,8 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
-	optional_shared_ptr<UINT16> m_pixelram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	optional_shared_ptr<uint16_t> m_pixelram;
 
 	/* video-related */
 	/* framebuffer is a raw bitmap, remapped as a last step */
@@ -49,16 +49,16 @@ public:
 	std::unique_ptr<bitmap_ind16> m_pixel_bitmap;
 	std::unique_ptr<bitmap_ind16> m_realpunc_bitmap;
 
-	UINT16        m_pixel_scroll[2];
+	uint16_t        m_pixel_scroll[2];
 
 	int           m_b_fg_color_base;
 	int           m_b_sp_color_base;
 
 	/* misc */
-	UINT16        m_eep_latch;
-	UINT16        m_coin_word;
+	uint16_t        m_eep_latch;
+	uint16_t        m_coin_word;
 
-	UINT16        m_realpunc_video_ctrl;
+	uint16_t        m_realpunc_video_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -108,8 +108,8 @@ public:
 	DECLARE_VIDEO_RESET(hitice);
 	DECLARE_VIDEO_START(realpunc);
 	DECLARE_VIDEO_START(taitob_core);
-	UINT32 screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_taitob(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_realpunc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void screen_eof_taitob(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(rastansaga2_interrupt);
 	INTERRUPT_GEN_MEMBER(crimec_interrupt);

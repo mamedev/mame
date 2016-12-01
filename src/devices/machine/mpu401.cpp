@@ -106,7 +106,7 @@ machine_config_constructor mpu401_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mpu401_device::device_rom_region() const
+const tiny_rom_entry *mpu401_device::device_rom_region() const
 {
 	return ROM_NAME( mpu401 );
 }
@@ -119,7 +119,7 @@ const rom_entry *mpu401_device::device_rom_region() const
 //  mpu401_device - constructor
 //-------------------------------------------------
 
-mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mpu401_device::mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MPU401, "Roland MPU-401 I/O box", tag, owner, clock, "mpu401", __FILE__),
 	m_ourcpu(*this, M6801_TAG),
 	write_irq(*this)

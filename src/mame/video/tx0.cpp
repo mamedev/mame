@@ -15,7 +15,7 @@
 
 
 
-inline void tx0_state::tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, UINT32 color)
+inline void tx0_state::tx0_plot_pixel(bitmap_ind16 &bitmap, int x, int y, uint32_t color)
 {
 	bitmap.pix16(y, x) = color;
 }
@@ -64,7 +64,7 @@ void tx0_state::tx0_plot(int x, int y)
 /*
     screen_update_tx0: effectively redraw the screen
 */
-UINT32 tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tx0_state::screen_update_tx0(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_crt->update(bitmap);
 
@@ -343,7 +343,7 @@ enum
 
 void tx0_state::tx0_typewriter_linefeed()
 {
-	UINT8 buf[typewriter_window_width];
+	uint8_t buf[typewriter_window_width];
 	int y;
 
 	for (y=0; y<typewriter_window_height-typewriter_scroll_step; y++)

@@ -25,7 +25,7 @@ class sv807_device : public device_t, public device_svi_slot_interface
 {
 public:
 	// construction/destruction
-	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sv807_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
@@ -45,8 +45,8 @@ protected:
 private:
 	required_ioport m_switch;
 
-	std::unique_ptr<UINT8[]> m_ram_bank1;
-	std::unique_ptr<UINT8[]> m_ram_bank2;
+	std::unique_ptr<uint8_t[]> m_ram_bank1;
+	std::unique_ptr<uint8_t[]> m_ram_bank2;
 
 	int m_bk21;
 	int m_bk22;

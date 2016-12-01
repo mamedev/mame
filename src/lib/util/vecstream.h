@@ -17,6 +17,8 @@
 #ifndef MAME_UTIL_VECSTREAM_H
 #define MAME_UTIL_VECSTREAM_H
 
+#pragma once
+
 #include <algorithm>
 #include <cassert>
 #include <ios>
@@ -31,6 +33,7 @@
 #include <vector>
 
 namespace util {
+
 template <typename CharT, typename Traits = std::char_traits<CharT>, typename Allocator = std::allocator<CharT> >
 class basic_vectorbuf : public std::basic_streambuf<CharT, Traits>
 {
@@ -392,6 +395,13 @@ template <typename CharT, typename Traits, typename Allocator>
 void swap(basic_ovectorstream<CharT, Traits, Allocator> &a, basic_ovectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
 template <typename CharT, typename Traits, typename Allocator>
 void swap(basic_vectorstream<CharT, Traits, Allocator> &a, basic_vectorstream<CharT, Traits, Allocator> &b) { a.swap(b); }
+
+extern template class basic_ivectorstream<char>;
+extern template class basic_ivectorstream<wchar_t>;
+extern template class basic_ovectorstream<char>;
+extern template class basic_ovectorstream<wchar_t>;
+extern template class basic_vectorstream<char>;
+extern template class basic_vectorstream<wchar_t>;
 
 } // namespace util
 

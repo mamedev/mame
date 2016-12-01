@@ -155,16 +155,16 @@ PALETTE_INIT_MEMBER(arabian_state, arabian)
 
 void arabian_state::video_start()
 {
-	UINT8 *gfxbase = memregion("gfx1")->base();
+	uint8_t *gfxbase = memregion("gfx1")->base();
 	int offs;
 
 	/* allocate a common bitmap to use for both planes */
 	/* plane A (top plane with motion objects) is in the upper 4 bits */
 	/* plane B (bottom plane with playfield) is in the lower 4 bits */
-	m_main_bitmap = std::make_unique<UINT8[]>(BITMAP_WIDTH * BITMAP_HEIGHT);
+	m_main_bitmap = std::make_unique<uint8_t[]>(BITMAP_WIDTH * BITMAP_HEIGHT);
 
 	/* allocate memory for the converted graphics data */
-	m_converted_gfx = std::make_unique<UINT8[]>(0x8000 * 2);
+	m_converted_gfx = std::make_unique<uint8_t[]>(0x8000 * 2);
 
 	/*--------------------------------------------------
 	    transform graphics data into more usable format
@@ -221,20 +221,20 @@ void arabian_state::video_start()
  *
  *************************************/
 
-void arabian_state::blit_area( UINT8 plane, UINT16 src, UINT8 x, UINT8 y, UINT8 sx, UINT8 sy )
+void arabian_state::blit_area( uint8_t plane, uint16_t src, uint8_t x, uint8_t y, uint8_t sx, uint8_t sy )
 {
-	UINT8 *srcdata = &m_converted_gfx[src * 4];
+	uint8_t *srcdata = &m_converted_gfx[src * 4];
 	int i,j;
 
 	/* loop over X, then Y */
 	for (i = 0; i <= sx; i++, x += 4)
 		for (j = 0; j <= sy; j++)
 		{
-			UINT8 p1 = *srcdata++;
-			UINT8 p2 = *srcdata++;
-			UINT8 p3 = *srcdata++;
-			UINT8 p4 = *srcdata++;
-			UINT8 *base;
+			uint8_t p1 = *srcdata++;
+			uint8_t p2 = *srcdata++;
+			uint8_t p3 = *srcdata++;
+			uint8_t p4 = *srcdata++;
+			uint8_t *base;
 
 			/* get a pointer to the bitmap */
 			base = &m_main_bitmap[((y + j) & 0xff) * BITMAP_WIDTH + (x & 0xff)];
@@ -298,8 +298,8 @@ WRITE8_MEMBER(arabian_state::arabian_blitter_w)
 
 WRITE8_MEMBER(arabian_state::arabian_videoram_w)
 {
-	UINT8 *base;
-	UINT8 x, y;
+	uint8_t *base;
+	uint8_t x, y;
 
 	/* determine X/Y */
 	x = (offset >> 8) << 2;
@@ -365,7 +365,7 @@ WRITE8_MEMBER(arabian_state::arabian_videoram_w)
  *
  *************************************/
 
-UINT32 arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pens = &m_palette->pen((m_video_control >> 3) << 8);
 	int y;
@@ -380,7 +380,7 @@ UINT32 arabian_state::screen_update_arabian(screen_device &screen, bitmap_ind16 
 		/* flipped case */
 		else
 		{
-			UINT8 scanline[BITMAP_WIDTH];
+			uint8_t scanline[BITMAP_WIDTH];
 			int x;
 			for (x = 0; x < BITMAP_WIDTH; x++)
 				scanline[BITMAP_WIDTH - 1 - x] = m_main_bitmap[y * BITMAP_WIDTH + x];

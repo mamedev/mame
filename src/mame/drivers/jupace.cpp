@@ -93,7 +93,7 @@ public:
 
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( io_r );
 	DECLARE_WRITE8_MEMBER( io_w );
@@ -131,8 +131,8 @@ private:
 	required_device<centronics_device> m_centronics;
 	required_device<ram_device> m_ram;
 	required_device<sp0256_device> m_sp0256;
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_char_ram;
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_char_ram;
 	required_ioport m_a8;
 	required_ioport m_a9;
 	required_ioport m_a10;
@@ -160,7 +160,7 @@ private:
 SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 {
 	cpu_device *cpu = m_maincpu;
-	UINT8 *RAM = memregion(cpu->tag())->base();
+	uint8_t *RAM = memregion(cpu->tag())->base();
 	address_space &space = cpu->space(AS_PROGRAM);
 	unsigned char ace_repeat, ace_byte, loop;
 	int done=0, ace_index=0x2000;
@@ -257,7 +257,7 @@ SNAPSHOT_LOAD_MEMBER( ace_state, ace )
 
 READ8_MEMBER( ace_state::io_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!BIT(offset, 8)) data &= m_a8->read();
 	if (!BIT(offset, 9)) data &= m_a9->read();
@@ -569,16 +569,16 @@ TIMER_DEVICE_CALLBACK_MEMBER(ace_state::clear_irq)
 }
 
 
-UINT32 ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ace_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=56,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=56,ma=0,x;
 
 	for (y = 0; y < 24; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++, 40);
+			uint16_t *p = &bitmap.pix16(sy++, 40);
 
 			for (x = ma; x < ma+32; x++)
 			{

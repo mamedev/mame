@@ -44,7 +44,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *turbo_kontroller_device::device_rom_region() const
+const tiny_rom_entry *turbo_kontroller_device::device_rom_region() const
 {
 	return ROM_NAME( turbo_kontroller );
 }
@@ -109,7 +109,7 @@ machine_config_constructor turbo_kontroller_device::device_mconfig_additions() c
 //  turbo_kontroller_device - constructor
 //-------------------------------------------------
 
-turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+turbo_kontroller_device::turbo_kontroller_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TURBO_KONTROLLER, "Turbo-Kontroller", tag, owner, clock, "unidisk", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)
@@ -144,6 +144,6 @@ void turbo_kontroller_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void turbo_kontroller_device::abcbus_cs(UINT8 data)
+void turbo_kontroller_device::abcbus_cs(uint8_t data)
 {
 }

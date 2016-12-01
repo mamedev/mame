@@ -24,7 +24,7 @@ const device_type ST0016 = &device_creator<st0016_device>;
 //  st0016_device - constructor
 //-------------------------------------------------
 
-st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+st0016_device::st0016_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ST0016, "ST0016 (Audio)", tag, owner, clock, "st0016_audio", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -33,7 +33,7 @@ st0016_device::st0016_device(const machine_config &mconfig, const char *tag, dev
 	memset(m_vpos, 0, sizeof(int)*8);
 	memset(m_frac, 0, sizeof(int)*8);
 	memset(m_lponce, 0, sizeof(int)*8);
-	memset(m_regs, 0, sizeof(UINT8)*0x100);
+	memset(m_regs, 0, sizeof(uint8_t)*0x100);
 }
 
 
@@ -61,9 +61,9 @@ void st0016_device::sound_stream_update(sound_stream &stream, stream_sample_t **
 {
 	int v, i, snum;
 	unsigned char *slot;
-	INT32 mix[48000*2];
-	INT32 *mixp;
-	INT16 sample;
+	int32_t mix[48000*2];
+	int32_t *mixp;
+	int16_t sample;
 	int sptr, eptr, freq, lsptr, leptr;
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);

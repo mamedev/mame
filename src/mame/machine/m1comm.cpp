@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( m1comm_io, AS_IO, 8, m1comm_device )
 	AM_RANGE(0x20, 0x2F) AM_READWRITE(dma_reg_r, dma_reg_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(syn_r, syn_w)
 	AM_RANGE(0x60, 0x60) AM_READWRITE(zfg_r, zfg_w)
-	AM_RANGE(0xFFFF, 0xFFFF) AM_RAM
+	AM_RANGE(0xFF, 0xFF) AM_RAM
 ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( m1comm )
@@ -88,7 +88,7 @@ MACHINE_CONFIG_END
 
 ROM_START( m1comm )
 	ROM_REGION( 0x20000, Z80_TAG, ROMREGION_ERASEFF )
-	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950E771) )
+	ROM_LOAD( "epr-15112.17", 0x0000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
 ROM_END
 
 //**************************************************************************
@@ -111,7 +111,7 @@ machine_config_constructor m1comm_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *m1comm_device::device_rom_region() const
+const tiny_rom_entry *m1comm_device::device_rom_region() const
 {
 	return ROM_NAME( m1comm );
 }
@@ -124,7 +124,7 @@ const rom_entry *m1comm_device::device_rom_region() const
 //  m1comm_device - constructor
 //-------------------------------------------------
 
-m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m1comm_device::m1comm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, M1COMM, "MODEL-1 COMMUNICATION BD", tag, owner, clock, "m1comm", __FILE__),
 	m_commcpu(*this, Z80_TAG),
 	m_line_rx(OPEN_FLAG_WRITE | OPEN_FLAG_CREATE ),
@@ -177,7 +177,7 @@ READ8_MEMBER(m1comm_device::dlc_reg_r)
 	}
 	// dirty hack to keep Z80 in RESET state
 
-	UINT8 result = m_dlc_reg[offset];
+	uint8_t result = m_dlc_reg[offset];
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-dlc_reg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -194,7 +194,7 @@ WRITE8_MEMBER(m1comm_device::dlc_reg_w)
 
 READ8_MEMBER(m1comm_device::dma_reg_r)
 {
-	UINT8 result = m_dma_reg[offset];
+	uint8_t result = m_dma_reg[offset];
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-dma_reg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -211,7 +211,7 @@ WRITE8_MEMBER(m1comm_device::dma_reg_w)
 
 READ8_MEMBER(m1comm_device::syn_r)
 {
-	UINT8 result = m_syn | 0xFC;
+	uint8_t result = m_syn | 0xFC;
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-syn_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -242,7 +242,7 @@ WRITE8_MEMBER(m1comm_device::syn_w)
 
 READ8_MEMBER(m1comm_device::zfg_r)
 {
-	UINT8 result = m_zfg | (~m_fg << 7) | 0x7e;
+	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M1COMM_VERBOSE__
 	osd_printf_verbose("m1comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -435,7 +435,7 @@ void m1comm_device::comm_tick()
 							recv = m_line_rx.read(m_buffer, togo);
 							togo -= recv;
 						}
-						osd_printf_verbose("M1COMM: droped a message...\n");
+						osd_printf_verbose("M1COMM: dropped a message...\n");
 					}
 
 					if (m_linkalive == 0x00)
@@ -533,7 +533,7 @@ void m1comm_device::comm_tick()
 						recv = m_line_rx.read(m_buffer, togo);
 						togo -= recv;
 					}
-					osd_printf_verbose("M1COMM: droped a message...\n");
+					osd_printf_verbose("M1COMM: dropped a message...\n");
 				}
 				recv = m_line_rx.read(m_buffer, dataSize);
 			}

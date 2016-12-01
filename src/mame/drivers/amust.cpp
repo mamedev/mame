@@ -127,15 +127,15 @@ public:
 	DECLARE_WRITE8_MEMBER(kbd_put);
 	INTERRUPT_GEN_MEMBER(irq_vs);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT8 *m_p_videoram;
-	const UINT8 *m_p_chargen;
+	uint8_t *m_p_videoram;
+	const uint8_t *m_p_chargen;
 	required_device<palette_device> m_palette;
 private:
-	UINT8 m_port04;
-	UINT8 m_port06;
-	UINT8 m_port08;
-	UINT8 m_port0a;
-	UINT8 m_term_data;
+	uint8_t m_port04;
+	uint8_t m_port06;
+	uint8_t m_port08;
+	uint8_t m_port0a;
+	uint8_t m_term_data;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	required_device<cpu_device> m_maincpu;
 	required_device<beep_device> m_beep;
@@ -152,7 +152,7 @@ void amust_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in amust_state::device_timer");
+		assert_always(false, "Unknown id in amust_state::device_timer");
 	}
 }
 
@@ -213,7 +213,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( amust_state::port00_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -307,7 +307,7 @@ WRITE8_MEMBER( amust_state::port0a_w )
 
 WRITE8_MEMBER( amust_state::port0d_w )
 {
-	UINT16 video_address = m_port08 | ((m_port0a & 7) << 8);
+	uint16_t video_address = m_port08 | ((m_port0a & 7) << 8);
 	m_p_videoram[video_address] = data;
 }
 
@@ -337,9 +337,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( amust_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,inv;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,inv;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -381,7 +381,7 @@ MACHINE_RESET_MEMBER( amust_state, amust )
 
 DRIVER_INIT_MEMBER( amust_state, amust )
 {
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0xf800]);
 	membank("bankr0")->configure_entry(0, &main[0x10800]);
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( amust, amust_state )
 	MCFG_MACHINE_RESET_OVERRIDE(amust_state, amust)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(640, 480)

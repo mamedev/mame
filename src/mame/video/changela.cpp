@@ -21,8 +21,8 @@ Todo: Priority between tree0 and tree1.
 
 void changela_state::video_start()
 {
-	m_memory_devices = std::make_unique<UINT8[]>(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
-	m_tree_ram = std::make_unique<UINT8[]>(2 * 0x20);
+	m_memory_devices = std::make_unique<uint8_t[]>(4 * 0x800); /* 0 - not connected, 1,2,3 - RAMs*/
+	m_tree_ram = std::make_unique<uint8_t[]>(2 * 0x20);
 
 	m_screen->register_screen_bitmap(m_obj0_bitmap);
 	m_screen->register_screen_bitmap(m_river_bitmap);
@@ -46,26 +46,26 @@ void changela_state::draw_obj0( bitmap_ind16 &bitmap, int sy )
 {
 	int sx, i;
 
-	UINT8* ROM = memregion("user1")->base();
-	UINT8* RAM = m_spriteram;
+	uint8_t* ROM = memregion("user1")->base();
+	uint8_t* RAM = m_spriteram;
 
 	for (sx = 0; sx < 256; sx++)
 	{
 		int vr = (RAM[sx * 4 + 0] & 0x80) >> 7;
 		int hr = (RAM[sx * 4 + 0] & 0x40) >> 6;
 		int hs = (RAM[sx * 4 + 0] & 0x20) >> 5;
-		UINT32 vsize = RAM[sx * 4 + 0] & 0x1f;
-		UINT8 ypos = ~RAM[sx * 4 + 1];
-		UINT8 tile = RAM[sx * 4 + 2];
-		UINT8 xpos = RAM[sx * 4 + 3];
+		uint32_t vsize = RAM[sx * 4 + 0] & 0x1f;
+		uint8_t ypos = ~RAM[sx * 4 + 1];
+		uint8_t tile = RAM[sx * 4 + 2];
+		uint8_t xpos = RAM[sx * 4 + 3];
 
 		if (sy - ypos <= vsize)
 		{
 			for (i = 0; i < 16; i++)
 			{
-				UINT32 A7, A8, rom_addr;
-				UINT8 counter, data;
-				UINT8 sum = sy - ypos;
+				uint32_t A7, A8, rom_addr;
+				uint8_t counter, data;
+				uint8_t sum = sy - ypos;
 
 				counter = i;
 				if (hr) counter ^= 0x0f;
@@ -108,13 +108,13 @@ void changela_state::draw_obj1( bitmap_ind16 &bitmap )
 {
 	int sx, sy;
 
-	UINT8* ROM = memregion("gfx2")->base();
-	UINT8* RAM = m_videoram;
+	uint8_t* ROM = memregion("gfx2")->base();
+	uint8_t* RAM = m_videoram;
 
-	UINT8 reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
+	uint8_t reg[4] = { 0 }; /* 4x4-bit registers (U58, U59) */
 
-	UINT8 tile;
-	UINT8 attrib = 0;
+	uint8_t tile;
+	uint8_t attrib = 0;
 
 	for (sy = 0; sy < 256; sy++)
 	{
@@ -172,22 +172,22 @@ void changela_state::draw_river( bitmap_ind16 &bitmap, int sy )
 {
 	int sx, i, j;
 
-	UINT8* ROM = memregion("user2")->base();
-	UINT8* RAM = m_memory_devices.get() + 0x800;
-	UINT8* TILE_ROM = memregion("gfx1")->base();
-	UINT8* TILE_RAM = m_memory_devices.get() + 0x1000;
-	UINT8* PROM = memregion("proms")->base();
+	uint8_t* ROM = memregion("user2")->base();
+	uint8_t* RAM = m_memory_devices.get() + 0x800;
+	uint8_t* TILE_ROM = memregion("gfx1")->base();
+	uint8_t* TILE_RAM = m_memory_devices.get() + 0x1000;
+	uint8_t* PROM = memregion("proms")->base();
 
 	int preload = ((sy < 32) ? 1 : 0);
 
-	UINT8 math_train[10] = { 0 };
-	UINT8 pre_train[3] = { 0 };
+	uint8_t math_train[10] = { 0 };
+	uint8_t pre_train[3] = { 0 };
 
-	UINT8 curr_state = 0;
-	UINT8 prev_state = 0;
+	uint8_t curr_state = 0;
+	uint8_t prev_state = 0;
 
-	UINT8 ram_count = 0;
-	UINT8 rom_count = 0;
+	uint8_t ram_count = 0;
+	uint8_t rom_count = 0;
 
 	int hosc = 0;
 	int carry = 0;
@@ -351,26 +351,26 @@ void changela_state::draw_tree( bitmap_ind16 &bitmap, int sy, int tree_num )
 	int sx, i, j;
 
 	/* State machine */
-	UINT8* ROM = memregion("user2")->base();
-	UINT8* RAM = m_memory_devices.get() + 0x840 + 0x40 * tree_num;
-	UINT8* PROM = memregion("proms")->base();
+	uint8_t* ROM = memregion("user2")->base();
+	uint8_t* RAM = m_memory_devices.get() + 0x840 + 0x40 * tree_num;
+	uint8_t* PROM = memregion("proms")->base();
 
 	/* Tree Data */
-	UINT8* RAM2 = m_tree_ram.get() + 0x20 * tree_num;
-	UINT8* TILE_ROM = (tree_num ? (memregion("user3")->base() + 0x1000) : (memregion("gfx1")->base() + 0x2000));
-	UINT8* TILE_RAM = (tree_num ? (memregion("user3")->base()) : (m_memory_devices.get() + 0x1800));
+	uint8_t* RAM2 = m_tree_ram.get() + 0x20 * tree_num;
+	uint8_t* TILE_ROM = (tree_num ? (memregion("user3")->base() + 0x1000) : (memregion("gfx1")->base() + 0x2000));
+	uint8_t* TILE_RAM = (tree_num ? (memregion("user3")->base()) : (m_memory_devices.get() + 0x1800));
 
 	int preload = ((sy < 32) ? 1 : 0);
 
-	UINT8 math_train[10] = { 0 };
-	UINT8 pre_train[3] = { 0 };
-	UINT8 tree_train[3] = { 0 };
+	uint8_t math_train[10] = { 0 };
+	uint8_t pre_train[3] = { 0 };
+	uint8_t tree_train[3] = { 0 };
 
-	UINT8 curr_state = 0;
-	UINT8 prev_state = 0;
+	uint8_t curr_state = 0;
+	uint8_t prev_state = 0;
 
-	UINT8 ram_count = 0;
-	UINT8 rom_count = 0;
+	uint8_t ram_count = 0;
+	uint8_t rom_count = 0;
 
 	int hosc = 0;
 	int carry = 0;
@@ -717,7 +717,7 @@ TIMER_CALLBACK_MEMBER(changela_state::changela_scanline_callback)
 	m_scanline_timer->adjust(m_screen->time_until_pos(sy), sy);
 }
 
-UINT32 changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t changela_state::screen_update_changela(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_river_bitmap, 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, m_obj0_bitmap,  0, 0, 0, 0, cliprect, 0);
@@ -745,10 +745,10 @@ WRITE8_MEMBER(changela_state::changela_colors_w)
 	    111     |   3.819   (2.2k)
 	Which were normalized to produce the following table: */
 
-	static const UINT8 color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
+	static const uint8_t color_table[8] = { 0, 7, 18, 31, 58, 88, 146, 255 };
 
 	int r, g, b;
-	UINT32 c, color_index;
+	uint32_t c, color_index;
 
 	c = (data) | ((offset & 0x01) << 8); /* a0 used as D8 bit input */
 

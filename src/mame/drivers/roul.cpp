@@ -83,9 +83,9 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_reg[0x10];
-	std::unique_ptr<UINT8[]> m_videobuf;
-	UINT8 m_lamp_old;
+	uint8_t m_reg[0x10];
+	std::unique_ptr<uint8_t[]> m_videobuf;
+	uint8_t m_lamp_old;
 
 	DECLARE_READ8_MEMBER(blitter_status_r);
 	DECLARE_WRITE8_MEMBER(blitter_cmd_w);
@@ -95,7 +95,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(roul);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -104,7 +104,7 @@ public:
 
 PALETTE_INIT_MEMBER(roul_state, roul)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit6, bit7, bit0, bit1, r, g, b;
 	int i;
 
@@ -225,14 +225,14 @@ ADDRESS_MAP_END
 
 void roul_state::video_start()
 {
-	m_videobuf = make_unique_clear<UINT8[]>(VIDEOBUF_SIZE);
+	m_videobuf = make_unique_clear<uint8_t[]>(VIDEOBUF_SIZE);
 
 	save_item(NAME(m_reg));
 	save_pointer(NAME(m_videobuf.get()), VIDEOBUF_SIZE);
 	save_item(NAME(m_lamp_old));
 }
 
-UINT32 roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t roul_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,j;
 	for (i = 0; i < 256; i++)

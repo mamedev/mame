@@ -8,51 +8,51 @@
 
 namespace {
 /*
-	TODO: dump 8048 mcu
+    TODO: dump 8048 mcu
 
-	There seem to be a lot of guesses in this code - actual scan rate,
-	FIFO length, command processing, etc. don't seem to be evidence-
-	based.  The modifier handling seems very odd as it has aliasing and
-	overflow all over the place.
+    There seem to be a lot of guesses in this code - actual scan rate,
+    FIFO length, command processing, etc. don't seem to be evidence-
+    based.  The modifier handling seems very odd as it has aliasing and
+    overflow all over the place.
 
-	Layout is selected with a set of four jumpers on the keyboard MCU.
-	We need to bring these out to DIP switches, work out which command
-	is the layout request, and respond appropriately.
+    Layout is selected with a set of four jumpers on the keyboard MCU.
+    We need to bring these out to DIP switches, work out which command
+    is the layout request, and respond appropriately.
 
-	Available layouts:
-	Italian
-	German
-	French
-	British
-	USA ASCII
-	Spanish
-	Portuguese
-	Swedish - Finnish
-	Danish
-	Katakana
-	Yugoslavian
-	Norwegian
-	Greek
-	Swiss - French
-	Swiss - German
+    Available layouts:
+    Italian
+    German
+    French
+    British
+    USA ASCII
+    Spanish
+    Portuguese
+    Swedish - Finnish
+    Danish
+    Katakana
+    Yugoslavian
+    Norwegian
+    Greek
+    Swiss - French
+    Swiss - German
 
-	The keyboard MCU drives a buzzer.  We should work out what the bell
-	on/off commands are and emulate it.
+    The keyboard MCU drives a buzzer.  We should work out what the bell
+    on/off commands are and emulate it.
 
-	There are apparently no break codes.
-	The scancodes are arranged to read in alphabetical order with the QWERTY layout.
-	Modifiers apparently modify the make codes.
-	We are using a matrix here that corresponds to the logical scan codes - the physical matrix apparently doesn't match this.
+    There are apparently no break codes.
+    The scancodes are arranged to read in alphabetical order with the QWERTY layout.
+    Modifiers apparently modify the make codes.
+    We are using a matrix here that corresponds to the logical scan codes - the physical matrix apparently doesn't match this.
 
-	00  1c  1d  1e  1f  20  21  22  23  24  25  26  27   c3     cd  ce  cf  d0
-	 ??   12  18  06  13  15  1a  16  0a  10  11  28  29  c2    ca  cb  cc  d1
-	   ??  02  14  05  07  08  09  0b  0c  0d  2a  2b  2c  c1   c7  c8  c9  d2
-	??   01  1b  19  04  17  03  0f  0e  2d  2e  2f   ??        c4  c5  c6  d3
-		                       c0
+    00  1c  1d  1e  1f  20  21  22  23  24  25  26  27   c3     cd  ce  cf  d0
+     ??   12  18  06  13  15  1a  16  0a  10  11  28  29  c2    ca  cb  cc  d1
+       ??  02  14  05  07  08  09  0b  0c  0d  2a  2b  2c  c1   c7  c8  c9  d2
+    ??   01  1b  19  04  17  03  0f  0e  2d  2e  2f   ??        c4  c5  c6  d3
+                               c0
 
-	Ths is the 72-key version of the keyboard.
-	The katakana kayout has 75 keys, but we don't have a diagram for it.
-	?? are modifiers, which are read directly, not through the 8x9 scan matrix.
+    Ths is the 72-key version of the keyboard.
+    The katakana kayout has 75 keys, but we don't have a diagram for it.
+    ?? are modifiers, which are read directly, not through the 8x9 scan matrix.
 */
 // Italian layout (QZERTY typewriter)
 static INPUT_PORTS_START( m20_keyboard )
@@ -123,7 +123,7 @@ static INPUT_PORTS_START( m20_keyboard )
 	PORT_BIT(0x08,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("S2")        PORT_CODE(KEYCODE_BACKSPACE)
 	PORT_BIT(0x10,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad .")  PORT_CODE(KEYCODE_DEL_PAD)    PORT_CHAR(UCHAR_MAMEKEY(DEL_PAD))
 	PORT_BIT(0x20,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_0_PAD)      PORT_CHAR(UCHAR_MAMEKEY(0_PAD))
-	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Keypad 00") PORT_CODE(KEYCODE_ENTER_PAD)
+	PORT_BIT(0x40,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_ENTER_PAD)  PORT_CHAR(UCHAR_MAMEKEY(00_PAD))
 	PORT_BIT(0x80,IP_ACTIVE_HIGH,IPT_KEYBOARD)                        PORT_CODE(KEYCODE_1_PAD)      PORT_CHAR(UCHAR_MAMEKEY(1_PAD))
 
 	PORT_START("LINE7")
@@ -153,7 +153,7 @@ INPUT_PORTS_END
 } // anonymous namespace
 
 
-m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, UINT32 clock)
+m20_keyboard_device::m20_keyboard_device(const machine_config& mconfig, const char* tag, device_t* owner, uint32_t clock)
 	: buffered_rs232_device(mconfig, M20_KEYBOARD, "M20 Keyboard", tag, owner, 0, "m20_keyboard", __FILE__)
 	, device_matrix_keyboard_interface(mconfig, *this, "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8")
 	, m_modifiers(*this, "MODIFIERS")
@@ -195,11 +195,11 @@ void m20_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int
 }
 
 
-void m20_keyboard_device::key_make(UINT8 row, UINT8 column)
+void m20_keyboard_device::key_make(uint8_t row, uint8_t column)
 {
-	UINT8 const row_code(((row < 6U) ? row : (0x18U | (row - 6U))) << 3);
-	UINT8 const modifiers(m_modifiers->read());
-	UINT8 mod_code(0U);
+	uint8_t const row_code(((row < 6U) ? row : (0x18U | (row - 6U))) << 3);
+	uint8_t const modifiers(m_modifiers->read());
+	uint8_t mod_code(0U);
 	switch (modifiers)
 	{
 	case 0x01U: // COMMAND
@@ -218,7 +218,7 @@ void m20_keyboard_device::key_make(UINT8 row, UINT8 column)
 }
 
 
-void m20_keyboard_device::received_byte(UINT8 byte)
+void m20_keyboard_device::received_byte(uint8_t byte)
 {
 	switch (byte)
 	{

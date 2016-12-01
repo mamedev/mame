@@ -38,7 +38,7 @@ private:
 		const software_part *part;
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	// variables
@@ -57,7 +57,7 @@ class menu_software_list : public menu
 public:
 	menu_software_list(mame_ui_manager &mui, render_container &container, software_list_device *swlist, const char *interface, std::string &result);
 	virtual ~menu_software_list() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 private:
@@ -77,8 +77,8 @@ private:
 	software_list_device *          m_swlist; // currently selected list
 	const char *                    m_interface;
 	std::string &                   m_result;
-	std::vector<entry_info>         m_entrylist;
-	char                            m_filename_buffer[1024];
+	std::list<entry_info>           m_entrylist;
+	std::string                     m_filename_buffer;
 	bool                            m_ordered_by_shortname;
 
 	// functions
@@ -94,7 +94,7 @@ class menu_software : public menu
 public:
 	menu_software(mame_ui_manager &mui, render_container &container, const char *interface, software_list_device **result);
 	virtual ~menu_software() override;
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 private:

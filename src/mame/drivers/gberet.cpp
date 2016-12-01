@@ -87,7 +87,7 @@
 
 TIMER_DEVICE_CALLBACK_MEMBER(gberet_state::gberet_interrupt_tick)
 {
-	UINT8 ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
+	uint8_t ticks_mask = ~m_interrupt_ticks & (m_interrupt_ticks + 1); // 0->1
 	m_interrupt_ticks++;
 
 	// NMI on d0
@@ -130,7 +130,7 @@ WRITE8_MEMBER(gberet_state::mrgoemon_coin_counter_w)
 WRITE8_MEMBER(gberet_state::gberet_flipscreen_w)
 {
 	/* bits 0/1/2 = interrupt enable */
-	UINT8 ack_mask = ~data & m_interrupt_mask; // 1->0
+	uint8_t ack_mask = ~data & m_interrupt_mask; // 1->0
 
 	if (ack_mask & 1)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
@@ -541,8 +541,8 @@ ROM_START( gberetb )
 	ROM_LOAD( "577h11.6f",    0x0020, 0x0100, CRC(2a1a992b) SHA1(77cff7c9c8433f999a87776021935864cf9dccb4) ) // characters
 	ROM_LOAD( "577h10.5f",    0x0120, 0x0100, CRC(e9de1e53) SHA1(406b8dfe54e6176082005cc5545e79c098672547) ) // sprites
 
-	ROM_REGION( 0x0001, "plds", 0 )
-	ROM_LOAD( "ic35.5h.bin",  0x0000, 0x0001, NO_DUMP ) /* PAL16R6ACN */
+	ROM_REGION( 0x0200, "plds", 0 )
+	ROM_LOAD( "pal16r6_ic35.5h", 0x0000, 0x0104, CRC(bd76fb53) SHA1(2d0634e8edb3289a103719466465e9777606086e) )
 ROM_END
 
 ROM_START( mrgoemon )
@@ -573,7 +573,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gberet_state,mrgoemon)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x800);
 }
 

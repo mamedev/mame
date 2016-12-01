@@ -263,7 +263,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
  *
  *************************************/
 
-void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, UINT8 data)
+void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -463,7 +463,7 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * chip;
+		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
 		device->data_w(m_adpcm_data[chip] >> 4);
@@ -2110,7 +2110,7 @@ DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 DRIVER_INIT_MEMBER(ddragon_state,toffy)
 {
 	int i, length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
@@ -2150,7 +2150,7 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
 {
 	int i;
-	UINT8 *dst,*src;
+	uint8_t *dst,*src;
 
 	src = memregion("chars")->base();
 	dst = memregion("gfx1")->base();

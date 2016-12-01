@@ -9,7 +9,7 @@
 extern const device_type FATFURY2_PROT = &device_creator<fatfury2_prot_device>;
 
 
-fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+fatfury2_prot_device::fatfury2_prot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, FATFURY2_PROT, "Neo Geo Fatal Fury 2 Protection", tag, owner, clock, "fatfury2_prot", __FILE__),
 	m_prot_data(0)
 {
@@ -33,7 +33,7 @@ void fatfury2_prot_device::device_reset()
 /* 0x2xxxxx range. There are several checks all around the code. */
 READ16_MEMBER( fatfury2_prot_device::protection_r )
 {
-	UINT16 res = m_prot_data >> 24;
+	uint16_t res = m_prot_data >> 24;
 
 	switch (offset)
 	{

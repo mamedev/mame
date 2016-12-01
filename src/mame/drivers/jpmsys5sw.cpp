@@ -15,6 +15,30 @@
 #include "emu.h"
 #include "includes/jpmsys5.h"
 
+// MFME2MAME layouts:
+#include "j5ar80cla.lh"
+#include "j5cira.lh"
+#include "j5fairp.lh"
+#include "j5firebl.lh"
+#include "j5hollyc.lh"
+#include "j5hotdoga.lh"
+#include "j5indsum.lh"
+#include "j5intr.lh"
+#include "j5movie.lh"
+#include "j5nite.lh"
+#include "j5palma.lh"
+#include "j5popeye.lh"
+#include "j5sizl.lh"
+#include "j5supbara.lh"
+#include "j5suphi.lh"
+#include "j5swop.lh"
+#include "j5term.lh"
+#include "j5topshp.lh"
+#include "j5trail.lh"
+#include "j5ujb.lh"
+#include "j5wsc.lh"
+
+
 MACHINE_CONFIG_EXTERN( jpmsys5 );
 MACHINE_CONFIG_EXTERN( jpmsys5_ym );
 INPUT_PORTS_EXTERN( popeye );
@@ -1384,7 +1408,7 @@ ROM_END
 
 
 
-#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND
+#define GAME_FLAGS MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK|MACHINE_MECHANICAL|MACHINE_NO_SOUND|MACHINE_CLICKABLE_ARTWORK
 
 GAME( 199?, j5tstal     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "JPM System 5 Alpha Display Test Utility (JPM) (SYSTEM5)", GAME_FLAGS )
 GAME( 199?, j5tst1      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "JPM System 5 Test Set (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
@@ -1398,9 +1422,9 @@ GAME( 199?, j5fifth     , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "
 GAME( 199?, j5clbnud    , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Club Nudger (JPM) (SYSTEM5-SAA, set 1)", GAME_FLAGS )
 GAME( 199?, j5clbnuda   , j5clbnud  , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Club Nudger (JPM) (SYSTEM5-SAA, set 2)", GAME_FLAGS )
 
-GAME( 199?, j5firebl    , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 1)", GAME_FLAGS )
-GAME( 199?, j5firebla   , j5firebl  , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 2)", GAME_FLAGS )
-GAME( 199?, j5fireblb   , j5firebl  , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 3)", GAME_FLAGS )
+GAMEL( 199?, j5firebl    , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 1)", GAME_FLAGS, layout_j5firebl )
+GAMEL( 199?, j5firebla   , j5firebl  , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 2)", GAME_FLAGS, layout_j5firebl )
+GAMEL( 199?, j5fireblb   , j5firebl  , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fireball (JPM) (SYSTEM5-SAA, set 3)", GAME_FLAGS, layout_j5firebl )
 
 GAME( 199?, j5frmag     , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Fruit Magic (JPM) (SYSTEM5-SAA)", GAME_FLAGS )
 
@@ -1410,9 +1434,9 @@ GAME( 199?, j5reelgh    , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "
 
 GAME( 199?, j5sup4      , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Super 4 (JPM) (SYSTEM5-SAA)", GAME_FLAGS )
 
-GAME( 199?, j5suphi     , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Super Hi-Lo (JPM) (SYSTEM5-SAA)", GAME_FLAGS )
+GAMEL( 199?, j5suphi     , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Super Hi-Lo (JPM) (SYSTEM5-SAA)", GAME_FLAGS, layout_j5suphi )
 
-GAME( 199?, j5swop      , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Swop A Fruit Club (JPM) (SYSTEM5-SAA)", GAME_FLAGS )
+GAMEL( 199?, j5swop      , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Swop A Fruit Club (JPM) (SYSTEM5-SAA)", GAME_FLAGS, layout_j5swop )
 
 GAME( 199?, j5td        , 0         , jpmsys5, popeye, driver_device, 0, ROT0, "JPM", "Tumbling Dice (JPM) (SYSTEM5-SAA)", GAME_FLAGS )
 
@@ -1426,19 +1450,19 @@ GAME( 199?, j5ar80b     , j5ar80    , jpmsys5_ym, popeye, driver_device, 0, ROT0
 GAME( 199?, j5ar80c     , j5ar80    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World In Eighty Days (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
 GAME( 199?, j5ar80d     , j5ar80    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World In Eighty Days (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
 
-GAME( 199?, j5ar80cl    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5ar80cla   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5ar80clb   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5ar80clc   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
+GAMEL( 199?, j5ar80cl    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5ar80cla )
+GAMEL( 199?, j5ar80cla   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5ar80cla )
+GAMEL( 199?, j5ar80clb   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5ar80cla )
+GAMEL( 199?, j5ar80clc   , j5ar80cl  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Around The World Club (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5ar80cla )
 
 GAME( 199?, j5buc       , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Buccaneer (JPM) (SYSTEM5)", GAME_FLAGS )
 
-GAME( 199?, j5cir       , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5cira      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5cirb      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5circ      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
-GAME( 199?, j5cird      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
-GAME( 199?, j5cire      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 6)", GAME_FLAGS )
+GAMEL( 199?, j5cir       , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5cira )
+GAMEL( 199?, j5cira      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5cira )
+GAMEL( 199?, j5cirb      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5cira )
+GAMEL( 199?, j5circ      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5cira )
+GAMEL( 199?, j5cird      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 5)", GAME_FLAGS, layout_j5cira )
+GAMEL( 199?, j5cire      , j5cir     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Circus (JPM) (SYSTEM5, set 6)", GAME_FLAGS, layout_j5cira )
 
 
 GAME( 199?, j5daytn     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Daytona (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
@@ -1459,24 +1483,24 @@ GAME( 199?, j5fairgdc   , j5fairgd  , jpmsys5_ym, popeye, driver_device, 0, ROT0
 GAME( 199?, j5fairgdd   , j5fairgd  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground Attraction Club (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
 GAME( 199?, j5fairgde   , j5fairgd  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground Attraction Club (JPM) (SYSTEM5, set 6)", GAME_FLAGS )
 
-GAME( 199?, j5fair      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5faira     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5fairb     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5fairc     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
-GAME( 199?, j5faird     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
-GAME( 199?, j5faire     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 6)", GAME_FLAGS )
-GAME( 199?, j5fairf     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 7)", GAME_FLAGS )
-GAME( 199?, j5fairg     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 8)", GAME_FLAGS )
-GAME( 199?, j5fairh     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 9)", GAME_FLAGS )
-GAME( 199?, j5fairi     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 10)", GAME_FLAGS )
-GAME( 199?, j5fairj     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 11)", GAME_FLAGS )
-GAME( 199?, j5fairk     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 12)", GAME_FLAGS )
-GAME( 199?, j5fairl     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 13)", GAME_FLAGS )
-GAME( 199?, j5fairm     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 14)", GAME_FLAGS )
-GAME( 199?, j5fairn     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 15)", GAME_FLAGS )
-GAME( 199?, j5fairo     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 16)", GAME_FLAGS )
-GAME( 199?, j5fairp     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 17)", GAME_FLAGS )
-GAME( 199?, j5fairq     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 18)", GAME_FLAGS )
+GAMEL( 199?, j5fair      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5faira     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairb     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairc     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5faird     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 5)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5faire     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 6)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairf     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 7)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairg     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 8)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairh     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 9)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairi     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 10)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairj     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 11)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairk     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 12)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairl     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 13)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairm     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 14)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairn     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 15)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairo     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 16)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairp     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 17)", GAME_FLAGS, layout_j5fairp )
+GAMEL( 199?, j5fairq     , j5fair    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Fairground (JPM) (SYSTEM5, set 18)", GAME_FLAGS, layout_j5fairp )
 
 GAME( 199?, j5filth     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Filthy Rich (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5filtha    , j5filth   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Filthy Rich (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
@@ -1508,23 +1532,23 @@ GAME( 199?, j5hagshoa   , j5hagsho  , jpmsys5_ym, popeye, driver_device, 0, ROT0
 GAME( 199?, j5hagshob   , j5hagsho  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hagar Showcase (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
 GAME( 199?, j5hagshoc   , j5hagsho  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hagar Showcase (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
 
-GAME( 199?, j5holly     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5hollya    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5hollyb    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5hollyc    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
-GAME( 199?, j5hollyd    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
-GAME( 199?, j5hollye    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 6)", GAME_FLAGS )
+GAMEL( 199?, j5holly     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5hollyc )
+GAMEL( 199?, j5hollya    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5hollyc )
+GAMEL( 199?, j5hollyb    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5hollyc )
+GAMEL( 199?, j5hollyc    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5hollyc )
+GAMEL( 199?, j5hollyd    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 5)", GAME_FLAGS, layout_j5hollyc )
+GAMEL( 199?, j5hollye    , j5holly   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hollywood Nights (JPM) (SYSTEM5, set 6)", GAME_FLAGS, layout_j5hollyc )
 
-GAME( 199?, j5hotdog    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hot Dogs (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5hotdoga   , j5hotdog  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hot Dogs (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
+GAMEL( 199?, j5hotdog    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hot Dogs (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5hotdoga )
+GAMEL( 199?, j5hotdoga   , j5hotdog  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hot Dogs (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5hotdoga )
 
-GAME( 199?, j5indsum    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Indian Summer (JPM) (SYSTEM5)", GAME_FLAGS )
+GAMEL( 199?, j5indsum    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Indian Summer (JPM) (SYSTEM5)", GAME_FLAGS, layout_j5indsum )
 
 
-GAME( 199?, j5intr      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5intra     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5intrb     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5intrc     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
+GAMEL( 199?, j5intr      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5intr )
+GAMEL( 199?, j5intra     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5intr )
+GAMEL( 199?, j5intrb     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5intr )
+GAMEL( 199?, j5intrc     , j5intr    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Intrigue (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5intr )
 
 GAME( 199?, j5jokgld    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Jokers Gold (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5jokglda   , j5jokgld  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Jokers Gold (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
@@ -1536,25 +1560,25 @@ GAME( 199?, j5jokgldf   , j5jokgld  , jpmsys5_ym, popeye, driver_device, 0, ROT0
 GAME( 199?, j5jokgldg   , j5jokgld  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Jokers Gold (JPM) (SYSTEM5, set 8)", GAME_FLAGS )
 GAME( 199?, j5jokgldh   , j5jokgld  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Jokers Gold (JPM) (SYSTEM5, set 9)", GAME_FLAGS )
 
-GAME( 199?, j5nite      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Nite Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5nitea     , j5nite    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Nite Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
+GAMEL( 199?, j5nite      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Nite Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5nite )
+GAMEL( 199?, j5nitea     , j5nite    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Nite Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5nite )
 
-GAME( 199?, j5palm      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Palm Springs (JPM) (SYSTEM5, set 1)", GAME_FLAGS ) // doesn't behave well
-GAME( 199?, j5palma     , j5palm    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Palm Springs (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
+GAMEL( 199?, j5palm      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Palm Springs (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5palma ) // doesn't behave well
+GAMEL( 199?, j5palma     , j5palm    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Palm Springs (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5palma )
 
 GAME( 199?, j5phnx      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Phoenix (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5phnxa     , j5phnx    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Phoenix (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
 
-GAME( 199?, j5popeye    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 1)", GAME_FLAGS ) // (20p/8 GBP Token) ?
-GAME( 199?, j5popeyea   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5popeyeb   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
-GAME( 199?, j5popeyec   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 4)", GAME_FLAGS )
-GAME( 199?, j5popeyed   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 5)", GAME_FLAGS )
-GAME( 199?, j5popeyee   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 6)", GAME_FLAGS )
-GAME( 199?, j5popeyef   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 7)", GAME_FLAGS )
-GAME( 199?, j5popeyeg   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 8)", GAME_FLAGS )
-GAME( 199?, j5popeyeh   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 9)", GAME_FLAGS )
-GAME( 199?, j5popeyei   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 10)", GAME_FLAGS )
+GAMEL( 199?, j5popeye    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5popeye ) // (20p/8 GBP Token) ?
+GAMEL( 199?, j5popeyea   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyeb   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyec   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 4)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyed   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 5)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyee   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 6)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyef   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 7)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyeg   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 8)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyeh   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 9)", GAME_FLAGS, layout_j5popeye )
+GAMEL( 199?, j5popeyei   , j5popeye  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye (JPM) (SYSTEM5, set 10)", GAME_FLAGS, layout_j5popeye )
 
 GAME( 199?, j5popth     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye's Treasure Hunt (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5poptha    , j5popth   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Popeye's Treasure Hunt (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
@@ -1581,33 +1605,33 @@ GAME( 199?, j5slvstrb   , j5slvstr  , jpmsys5_ym, popeye, driver_device, 0, ROT0
 GAME( 199?, j5street    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Streetwise (JPM) (SYSTEM5)", GAME_FLAGS ) // doesn't behave well
 
 
-GAME( 199?, j5supbar    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Super Bars (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5supbara   , j5supbar  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Super Bars (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
+GAMEL( 199?, j5supbar    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Super Bars (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5supbara )
+GAMEL( 199?, j5supbara   , j5supbar  , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Super Bars (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5supbara )
 
 
-GAME( 199?, j5term      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Terminator (JPM) (SYSTEM5)", GAME_FLAGS )
+GAMEL( 199?, j5term      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Terminator (JPM) (SYSTEM5)", GAME_FLAGS, layout_j5term )
 
-GAME( 199?, j5topshp    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Top Of The Shop Club (JPM) (SYSTEM5)", GAME_FLAGS )
+GAMEL( 199?, j5topshp    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Top Of The Shop Club (JPM) (SYSTEM5)", GAME_FLAGS, layout_j5topshp )
 
-GAME( 199?, j5trail     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5traila    , j5trail   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5trailb    , j5trail   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
+GAMEL( 199?, j5trail     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5trail )
+GAMEL( 199?, j5traila    , j5trail   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5trail )
+GAMEL( 199?, j5trailb    , j5trail   , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Trailblazer Club (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5trail )
 
 
-GAME( 199?, j5uj        , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5uja       , j5uj      , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
-GAME( 199?, j5ujb       , j5uj      , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 3)", GAME_FLAGS )
+GAMEL( 199?, j5uj        , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5ujb )
+GAMEL( 199?, j5uja       , j5uj      , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5ujb )
+GAMEL( 199?, j5ujb       , j5uj      , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Union Jackpot (JPM) (SYSTEM5, set 3)", GAME_FLAGS, layout_j5ujb )
 
-GAME( 199?, j5wsc       , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Wall Street Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
-GAME( 199?, j5wsca      , j5wsc     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Wall Street Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
+GAMEL( 199?, j5wsc       , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Wall Street Club (JPM) (SYSTEM5, set 1)", GAME_FLAGS, layout_j5wsc )
+GAMEL( 199?, j5wsca      , j5wsc     , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Wall Street Club (JPM) (SYSTEM5, set 2)", GAME_FLAGS, layout_j5wsc )
 
-GAME( 199?, j5movie     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "Crystal", "Movie Magic Club (Crystal) (SYSTEM5)", GAME_FLAGS ) // apparently by Crystal
+GAMEL( 199?, j5movie     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "Crystal", "Movie Magic Club (Crystal) (SYSTEM5)", GAME_FLAGS, layout_j5movie ) // apparently by Crystal
 
 GAME( 199?, j5nudfic    , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Nudge Fiction (JPM) (SYSTEM5)", GAME_FLAGS )
 
 GAME( 199?, j5revo      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Revolver (JPM) (SYSTEM5, set 1)", GAME_FLAGS )
 GAME( 199?, j5revoa     , j5revo    , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Revolver (JPM) (SYSTEM5, set 2)", GAME_FLAGS )
 
-GAME( 199?, j5sizl      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Sizzling (JPM) (SYSTEM5)", GAME_FLAGS )
+GAMEL( 199?, j5sizl      , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Sizzling (JPM) (SYSTEM5)", GAME_FLAGS, layout_j5sizl )
 
 GAME( 199?, j5hilos     , 0         , jpmsys5_ym, popeye, driver_device, 0, ROT0, "JPM", "Hi Lo Silver (JPM) (SYSTEM5)", GAME_FLAGS )

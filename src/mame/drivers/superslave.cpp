@@ -34,15 +34,15 @@ Oxx,yy          = Out port
 
 READ8_MEMBER( superslave_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
-	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
+	offs_t boundary = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
 	if ((offset < 0x1000) && BIT(m_cmd, 0))
 	{
 		data = m_rom->base()[offset & 0x7ff];
 	}
-	else if (offset < boundry)
+	else if (offset < boundary)
 	{
 		if (BIT(m_memctrl, 0))
 		{
@@ -68,9 +68,9 @@ READ8_MEMBER( superslave_state::read )
 
 WRITE8_MEMBER( superslave_state::write )
 {
-	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
+	offs_t boundary = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
-	if (offset < boundry)
+	if (offset < boundary)
 	{
 		if (BIT(m_memctrl, 0))
 		{
@@ -145,7 +145,7 @@ READ8_MEMBER( superslave_state::status_r)
 
 	*/
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	// RS-232
 	data |= m_rs232d->dsr_r() << 4;

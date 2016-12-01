@@ -79,7 +79,7 @@ READ8_MEMBER( tandy2k_state::videoram_r )
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	offs_t addr = (m_vram_base << 15) | (offset << 1);
-	UINT16 data = program.read_word(addr);
+	uint16_t data = program.read_word(addr);
 
 	// character
 	m_drb0->write(space, 0, data & 0xff);
@@ -107,7 +107,7 @@ READ8_MEMBER( tandy2k_state::enable_r )
 
 	*/
 
-	UINT8 data = 0x80;
+	uint8_t data = 0x80;
 
 	data |= m_rs232->ri_r();
 	data |= m_rs232->dcd_r() << 1;
@@ -351,21 +351,21 @@ INPUT_PORTS_END
 
 // Video
 
-UINT32 tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t tandy2k_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *pen = m_palette->pens();
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
 	for (int y = 0; y < 400; y++)
 	{
-		UINT8 cgra = y % 16;
+		uint8_t cgra = y % 16;
 
 		for (int sx = 0; sx < 80; sx++)
 		{
 			offs_t addr = m_ram->size() - 0x1400 + (((y / 16) * 80) + sx) * 2;
-			UINT16 vidla = program.read_word(addr);
-			UINT8 attr = vidla >> 8;
-			UINT8 data = m_char_ram[((vidla & 0xff) << 4) | cgra];
+			uint16_t vidla = program.read_word(addr);
+			uint8_t attr = vidla >> 8;
+			uint8_t data = m_char_ram[((vidla & 0xff) << 4) | cgra];
 			if(attr & 0x80)
 				data = ~data;
 
@@ -492,7 +492,7 @@ TIMER_DEVICE_CALLBACK_MEMBER( tandy2k_state::vidldsh_tick )
 		m_cgra |= m_sld << 3;
 	}
 
-	UINT8 vidd = m_char_ram[(m_vidla << 4) | m_cgra];
+	uint8_t vidd = m_char_ram[(m_vidla << 4) | m_cgra];
 	m_vac->write(vidd);
 
 	m_drb0->rclk_w(1);
@@ -583,7 +583,7 @@ READ8_MEMBER( tandy2k_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_pb_sel)
 	{
@@ -729,7 +729,7 @@ READ8_MEMBER( tandy2k_state::irq_callback )
 void tandy2k_state::machine_start()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 	int ram_size = m_ram->size();
 
 	program.install_ram(0x00000, ram_size - 1, ram);
@@ -767,7 +767,7 @@ static MACHINE_CONFIG_START( tandy2k, tandy2k_state )
 	MCFG_80186_IRQ_SLAVE_ACK(DEVREAD8(DEVICE_SELF, tandy2k_state, irq_callback))
 
 	// video hardware
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
 	MCFG_SCREEN_SIZE(640, 400)

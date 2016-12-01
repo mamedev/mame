@@ -2,17 +2,18 @@
 // copyright-holders:Nicola Salmoria,Aaron Giles
 /*********************************************************************
 
-	romentry.h
+    romentry.h
 
-	ROM loading functions.
+    ROM loading functions.
 
 *********************************************************************/
 
-#ifndef MAME_EMU_ROMENTRY_H_
-#define MAME_EMU_ROMENTRY_H_
+#ifndef MAME_EMU_ROMENTRY_H
+#define MAME_EMU_ROMENTRY_H
 
 #include <string>
 
+#include "emucore.h"
 #include "osdcomm.h"
 
 /***************************************************************************
@@ -115,23 +116,25 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
+// ======================> tiny_rom_entry
+
+struct tiny_rom_entry
+{
+	const char *name;
+	const char *hashdata;
+	u32 offset;
+	u32 length;
+	u32 flags;
+};
+
+
 // ======================> rom_entry
 
 class rom_entry
 {
 public:
-	rom_entry(const char *name, const char *hashdata, UINT32 offset, UINT32 length, UINT32 flags)
-		: m_name(name != nullptr ? name : "")
-		, m_hashdata(hashdata != nullptr ? hashdata : "")
-		, m_offset(offset)
-		, m_length(length)
-		, m_flags(flags) {}
-	rom_entry(std::string &&name, std::string &&hashdata, UINT32 offset, UINT32 length, UINT32 flags)
-		: m_name(std::move(name))
-		, m_hashdata(std::move(hashdata))
-		, m_offset(offset)
-		, m_length(length)
-		, m_flags(flags) {}
+	rom_entry(const tiny_rom_entry &ent);
+	rom_entry(std::string &&name, std::string &&hashdata, u32 offset, u32 length, u32 flags);
 	rom_entry(rom_entry const &) = default;
 	rom_entry(rom_entry &&) = default;
 	rom_entry &operator=(rom_entry const &) = default;
@@ -140,18 +143,18 @@ public:
 	// accessors
 	const std::string &name() const { return m_name; }
 	const std::string &hashdata() const { return m_hashdata; }
-	UINT32 offset() const { return m_offset; }
-	UINT32 length() const { return m_length; }
-	UINT32 flags() const { return m_flags; }
-	void set_flags(UINT32 flags) { m_flags = flags; }
+	u32 offset() const { return m_offset; }
+	u32 length() const { return m_length; }
+	u32 flags() const { return m_flags; }
+	void set_flags(u32 flags) { m_flags = flags; }
 
 private:
-	std::string		m_name;
-	std::string		m_hashdata;
-	UINT32			m_offset;
-	UINT32			m_length;
-	UINT32			m_flags;
+	std::string     m_name;
+	std::string     m_hashdata;
+	u32             m_offset;
+	u32             m_length;
+	u32             m_flags;
 };
 
 
-#endif // MAME_EMU_ROMENTRY_H_
+#endif // MAME_EMU_ROMENTRY_H

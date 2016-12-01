@@ -13,7 +13,7 @@
 
 const device_type K057714 = &device_creator<k057714_device>;
 
-k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k057714_device::k057714_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K057714, "K057714 GCU", tag, owner, clock, "k057714", __FILE__),
 	m_irq(*this)
 {
@@ -23,7 +23,7 @@ void k057714_device::device_start()
 {
 	m_irq.resolve_safe();
 
-	m_vram = std::make_unique<UINT32[]>(0x2000000/4);
+	m_vram = std::make_unique<uint32_t[]>(0x2000000/4);
 	memset(m_vram.get(), 0, 0x2000000);
 }
 
@@ -281,7 +281,7 @@ WRITE32_MEMBER(k057714_device::fifo_w)
 		if (m_ext_fifo_count != 0)      // first access is a dummy write
 		{
 			int count = m_ext_fifo_count - 1;
-			UINT32 addr = (((m_ext_fifo_addr >> 10) + m_ext_fifo_line) * 1024) + count;
+			uint32_t addr = (((m_ext_fifo_addr >> 10) + m_ext_fifo_line) * 1024) + count;
 
 			if ((count & 1) == 0)
 			{
@@ -306,7 +306,7 @@ WRITE32_MEMBER(k057714_device::fifo_w)
 
 int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *vram16 = (UINT16*)m_vram.get();
+	uint16_t *vram16 = (uint16_t*)m_vram.get();
 
 	int x = 0;
 	int y = 0;
@@ -328,19 +328,19 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 
 	for (int j=0; j < height; j++)
 	{
-		UINT16 *d = &bitmap.pix16(j, x);
+		uint16_t *d = &bitmap.pix16(j, x);
 		int li = ((j+y) * fb_pitch) + x;
-		UINT32 fbaddr0 = m_frame[0].base + li;
-		UINT32 fbaddr1 = m_frame[1].base + li;
-		UINT32 fbaddr2 = m_frame[2].base + li;
-//      UINT32 fbaddr3 = m_frame[3].base + li;
+		uint32_t fbaddr0 = m_frame[0].base + li;
+		uint32_t fbaddr1 = m_frame[1].base + li;
+		uint32_t fbaddr2 = m_frame[2].base + li;
+//      uint32_t fbaddr3 = m_frame[3].base + li;
 
 		for (int i=0; i < width; i++)
 		{
-			UINT16 pix0 = vram16[fbaddr0 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-			UINT16 pix1 = vram16[fbaddr1 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-			UINT16 pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
-//          UINT16 pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+			uint16_t pix0 = vram16[fbaddr0 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+			uint16_t pix1 = vram16[fbaddr1 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+			uint16_t pix2 = vram16[fbaddr2 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+//          uint16_t pix3 = vram16[fbaddr3 ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
 			d[i] = 0;
 
@@ -367,7 +367,7 @@ int k057714_device::draw(screen_device &screen, bitmap_ind16 &bitmap, const rect
 	return 0;
 }
 
-void k057714_device::draw_object(UINT32 *cmd)
+void k057714_device::draw_object(uint32_t *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------   command (5)
 	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
@@ -398,7 +398,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 	bool yflip = (cmd[1] & 0x08000000) ? true : false;
 	bool alpha_enable = (cmd[1] & 0x30000000) ? true : false;
 	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
-	UINT32 address = cmd[0] & 0xffffff;
+	uint32_t address = cmd[0] & 0xffffff;
 	int alpha_level = (cmd[2] >> 27) & 0x1f;
 	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
 
@@ -408,7 +408,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 		y += m_fb_origin_y;
 	}
 
-	UINT16 *vram16 = (UINT16*)m_vram.get();
+	uint16_t *vram16 = (uint16_t*)m_vram.get();
 
 	if (xscale == 0 || yscale == 0)
 	{
@@ -429,7 +429,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 	{
 		int index;
 		int xinc;
-		UINT32 fbaddr = ((j+y) * fb_pitch) + x;
+		uint32_t fbaddr = ((j+y) * fb_pitch) + x;
 
 		if (yflip)
 		{
@@ -453,7 +453,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 		int u = 0;
 		for (int i=0; i < width; i++)
 		{
-			UINT16 pix = vram16[((index + (u >> 6)) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)) & 0xffffff];
+			uint16_t pix = vram16[((index + (u >> 6)) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)) & 0xffffff];
 			bool draw = !trans_enable || (trans_enable && (pix & 0x8000));
 			if (alpha_enable)
 			{
@@ -461,14 +461,14 @@ void k057714_device::draw_object(UINT32 *cmd)
 				{
 					if ((pix & 0x7fff) != 0)
 					{
-						UINT16 srcpix = vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+						uint16_t srcpix = vram16[fbaddr ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
-						UINT32 sr = (srcpix >> 10) & 0x1f;
-						UINT32 sg = (srcpix >>  5) & 0x1f;
-						UINT32 sb = (srcpix >>  0) & 0x1f;
-						UINT32 r = (pix >> 10) & 0x1f;
-						UINT32 g = (pix >>  5) & 0x1f;
-						UINT32 b = (pix >>  0) & 0x1f;
+						uint32_t sr = (srcpix >> 10) & 0x1f;
+						uint32_t sg = (srcpix >>  5) & 0x1f;
+						uint32_t sb = (srcpix >>  0) & 0x1f;
+						uint32_t r = (pix >> 10) & 0x1f;
+						uint32_t g = (pix >>  5) & 0x1f;
+						uint32_t b = (pix >>  0) & 0x1f;
 
 						sr += (r * alpha_level) >> 4;
 						sg += (g * alpha_level) >> 4;
@@ -498,7 +498,7 @@ void k057714_device::draw_object(UINT32 *cmd)
 	}
 }
 
-void k057714_device::fill_rect(UINT32 *cmd)
+void k057714_device::fill_rect(uint32_t *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------       command (4)
 	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
@@ -528,7 +528,7 @@ void k057714_device::fill_rect(UINT32 *cmd)
 		y += m_fb_origin_y;
 	}
 
-	UINT16 color[4];
+	uint16_t color[4];
 	color[0] = (cmd[2] >> 16);
 	color[1] = (cmd[2] & 0xffff);
 	color[2] = (cmd[3] >> 16);
@@ -543,13 +543,13 @@ void k057714_device::fill_rect(UINT32 *cmd)
 	int y1 = y;
 	int y2 = y + height;
 
-	UINT16 *vram16 = (UINT16*)m_vram.get();
+	uint16_t *vram16 = (uint16_t*)m_vram.get();
 
 	int fb_pitch = 1024;
 
 	for (int j=y1; j < y2; j++)
 	{
-		UINT32 fbaddr = j * fb_pitch;
+		uint32_t fbaddr = j * fb_pitch;
 		for (int i=x1; i < x2; i++)
 		{
 			vram16[(fbaddr+i) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)] = color[i&3];
@@ -557,7 +557,7 @@ void k057714_device::fill_rect(UINT32 *cmd)
 	}
 }
 
-void k057714_device::draw_character(UINT32 *cmd)
+void k057714_device::draw_character(uint32_t *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------   command (7)
 	// 0x00: ---x---- -------- -------- --------   0: absolute coordinates
@@ -577,8 +577,8 @@ void k057714_device::draw_character(UINT32 *cmd)
 
 	int x = cmd[1] & 0x3ff;
 	int y = (cmd[1] >> 10) & 0x3fff;
-	UINT32 address = cmd[0] & 0xffffff;
-	UINT16 color[4];
+	uint32_t address = cmd[0] & 0xffffff;
+	uint16_t color[4];
 	bool relative_coords = (cmd[0] & 0x10000000) ? true : false;
 	bool double_height = (cmd[1] & 0x01000000) ? true : false;
 	bool trans_enable = (cmd[1] & 0x40000000) ? true : false;
@@ -598,14 +598,14 @@ void k057714_device::draw_character(UINT32 *cmd)
 	printf("%s Draw Char %08X, x %d, y %d\n", basetag(), address, x, y);
 #endif
 
-	UINT16 *vram16 = (UINT16*)m_vram.get();
+	uint16_t *vram16 = (uint16_t*)m_vram.get();
 	int fb_pitch = 1024;
 	int height = double_height ? 16 : 8;
 
 	for (int j=0; j < height; j++)
 	{
-		UINT32 fbaddr = (y+j) * fb_pitch;
-		UINT16 line = vram16[address ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
+		uint32_t fbaddr = (y+j) * fb_pitch;
+		uint16_t line = vram16[address ^ NATIVE_ENDIAN_VALUE_LE_BE(1,0)];
 
 		address += 4;
 
@@ -619,7 +619,7 @@ void k057714_device::draw_character(UINT32 *cmd)
 	}
 }
 
-void k057714_device::fb_config(UINT32 *cmd)
+void k057714_device::fb_config(uint32_t *cmd)
 {
 	// 0x00: xxx----- -------- -------- --------   command (3)
 
@@ -637,7 +637,7 @@ void k057714_device::fb_config(UINT32 *cmd)
 	m_fb_origin_y = cmd[3] & 0x3fff;
 }
 
-void k057714_device::execute_display_list(UINT32 addr)
+void k057714_device::execute_display_list(uint32_t addr)
 {
 	bool end = false;
 
@@ -650,7 +650,7 @@ void k057714_device::execute_display_list(UINT32 addr)
 	addr /= 2;
 	while (!end && counter < 0x1000 && addr < (0x2000000/4))
 	{
-		UINT32 *cmd = &m_vram[addr];
+		uint32_t *cmd = &m_vram[addr];
 		addr += 4;
 
 		int command = (cmd[0] >> 29) & 0x7;
@@ -693,7 +693,7 @@ void k057714_device::execute_display_list(UINT32 addr)
 	};
 }
 
-void k057714_device::execute_command(UINT32* cmd)
+void k057714_device::execute_command(uint32_t* cmd)
 {
 	int command = (cmd[0] >> 29) & 0x7;
 

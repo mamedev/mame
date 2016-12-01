@@ -27,16 +27,16 @@ class hd44352_device :
 {
 public:
 	// construction/destruction
-	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hd44352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_on_callback(device_t &device, _Object object) { return downcast<hd44352_device &>(device).m_on_cb.set_callback(object); }
 
 	// device interface
-	UINT8 data_read();
-	void data_write(UINT8 data);
-	void control_write(UINT8 data);
+	uint8_t data_read();
+	void data_write(uint8_t data);
+	void control_write(uint8_t data);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -46,34 +46,34 @@ protected:
 	virtual void device_validity_check(validity_checker &valid) const override;
 
 private:
-	UINT8 compute_newval(UINT8 type, UINT8 oldval, UINT8 newval);
-	UINT8 get_char(UINT16 pos);
+	uint8_t compute_newval(uint8_t type, uint8_t oldval, uint8_t newval);
+	uint8_t get_char(uint16_t pos);
 
 	static const device_timer_id ON_TIMER = 1;
 	emu_timer *m_on_timer;
 
-	UINT8 m_video_ram[2][0x180];
-	UINT8 m_control_lines;
-	UINT8 m_data_bus;
-	UINT8 m_par[3];
-	UINT8 m_state;
-	UINT16 m_bank;
-	UINT16 m_offset;
-	UINT8 m_char_width;
-	UINT8 m_lcd_on;
-	UINT8 m_scroll;
-	UINT32 m_contrast;
+	uint8_t m_video_ram[2][0x180];
+	uint8_t m_control_lines;
+	uint8_t m_data_bus;
+	uint8_t m_par[3];
+	uint8_t m_state;
+	uint16_t m_bank;
+	uint16_t m_offset;
+	uint8_t m_char_width;
+	uint8_t m_lcd_on;
+	uint8_t m_scroll;
+	uint32_t m_contrast;
 
-	UINT8 m_custom_char[4][8];      // 4 chars * 8 bytes
-	UINT8 m_byte_count;
-	UINT8 m_cursor_status;
-	UINT8 m_cursor[8];
-	UINT8 m_cursor_x;
-	UINT8 m_cursor_y;
-	UINT8 m_cursor_lcd;
+	uint8_t m_custom_char[4][8];      // 4 chars * 8 bytes
+	uint8_t m_byte_count;
+	uint8_t m_cursor_status;
+	uint8_t m_cursor[8];
+	uint8_t m_cursor_x;
+	uint8_t m_cursor_y;
+	uint8_t m_cursor_lcd;
 
 	devcb_write_line    m_on_cb;        // ON line callback
-	required_region_ptr<UINT8> m_char_rom;
+	required_region_ptr<uint8_t> m_char_rom;
 };
 
 // device type definition

@@ -108,28 +108,22 @@ static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const char* _name
 {
 	char filePath[512];
 
-	const char* shaderPath = "shaders/dx9/";
+	const char* shaderPath = "???";
 
 	switch (bgfx::getRendererType() )
 	{
+	case bgfx::RendererType::Noop:
+	case bgfx::RendererType::Direct3D9:  shaderPath = "shaders/dx9/";   break;
 	case bgfx::RendererType::Direct3D11:
-	case bgfx::RendererType::Direct3D12:
-		shaderPath = "shaders/dx11/";
-		break;
+	case bgfx::RendererType::Direct3D12: shaderPath = "shaders/dx11/";  break;
+	case bgfx::RendererType::Gnm:        shaderPath = "shaders/pssl/";  break;
+	case bgfx::RendererType::Metal:      shaderPath = "shaders/metal/"; break;
+	case bgfx::RendererType::OpenGL:     shaderPath = "shaders/glsl/";  break;
+	case bgfx::RendererType::OpenGLES:   shaderPath = "shaders/essl/";  break;
+	case bgfx::RendererType::Vulkan:     shaderPath = "shaders/spirv/"; break;
 
-	case bgfx::RendererType::OpenGL:
-		shaderPath = "shaders/glsl/";
-		break;
-
-	case bgfx::RendererType::Metal:
-		shaderPath = "shaders/metal/";
-		break;
-
-	case bgfx::RendererType::OpenGLES:
-		shaderPath = "shaders/gles/";
-		break;
-
-	default:
+	case bgfx::RendererType::Count:
+		BX_CHECK(false, "You should not be here!");
 		break;
 	}
 
@@ -240,6 +234,8 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 						break;
 
 					case LCT_PALETTE:
+						format = bgfx::TextureFormat::R8;
+						bpp    = 8;
 						break;
 					}
 					break;
@@ -304,7 +300,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 
 		if (NULL != out)
 		{
-			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), 1
+			handle = bgfx::createTexture2D(uint16_t(width), uint16_t(height), false, 1
 											, format
 											, _flags
 											, bgfx::copy(out, width*height*bpp/8)
@@ -317,6 +313,7 @@ bgfx::TextureHandle loadTexture(bx::FileReaderI* _reader, const char* _filePath,
 					, uint16_t(width)
 					, uint16_t(height)
 					, 0
+					, false
 					, false
 					, 1
 					, format
@@ -757,7 +754,7 @@ Args::Args(int _argc, char** _argv)
 	}
 	else if (cmdLine.hasArg("noop") )
 	{
-		m_type = bgfx::RendererType::Null;
+		m_type = bgfx::RendererType::Noop;
 	}
 	else if (BX_ENABLED(BX_PLATFORM_WINDOWS) )
 	{

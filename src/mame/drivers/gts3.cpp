@@ -43,7 +43,7 @@ public:
 		, m_maincpu(*this, "maincpu")
 		, m_u4(*this, "u4")
 		, m_u5(*this, "u5")
-		, m_switches(*this, "X")
+		, m_switches(*this, "X.%u", 0)
 	{ }
 
 	DECLARE_DRIVER_INIT(gts3);
@@ -56,10 +56,10 @@ public:
 private:
 	bool m_dispclk;
 	bool m_lampclk;
-	UINT8 m_digit;
-	UINT8 m_row; // for lamps and switches
-	UINT8 m_segment[4];
-	UINT8 m_u4b;
+	uint8_t m_digit;
+	uint8_t m_row; // for lamps and switches
+	uint8_t m_segment[4];
+	uint8_t m_u4b;
 	virtual void machine_reset() override;
 	required_device<m65c02_device> m_maincpu;
 	required_device<via6522_device> m_u4;
@@ -216,7 +216,7 @@ WRITE_LINE_MEMBER( gts3_state::nmi_w )
 
 WRITE8_MEMBER( gts3_state::segbank_w )
 {
-	UINT32 seg1,seg2;
+	uint32_t seg1,seg2;
 	m_segment[offset] = data;
 	seg1 = m_segment[offset&2] | (m_segment[offset|1] << 8);
 	seg2 = BITSWAP32(seg1,16,16,16,16,16,16,16,16,16,16,16,16,16,16,15,14,9,7,13,11,10,6,8,12,5,4,3,3,2,1,0,0);
@@ -229,7 +229,7 @@ WRITE8_MEMBER( gts3_state::u4b_w )
 	bool clk_bit = BIT(data, 6);
 	if ((!m_dispclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 5)
+		if (BIT(data, 5))
 			m_digit = 0;
 		else
 			m_digit++;
@@ -239,7 +239,7 @@ WRITE8_MEMBER( gts3_state::u4b_w )
 	clk_bit = BIT(data, 1);
 	if ((!m_lampclk) && clk_bit) // 0->1 is valid
 	{
-		if BIT(data, 0)
+		if (BIT(data, 0))
 			m_row = 0;
 		else
 			m_row++;

@@ -77,7 +77,7 @@ void spdodgeb_state::spd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * chip;
+		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
 		device->data_w(m_adpcm_data[chip] >> 4);
@@ -166,8 +166,8 @@ void spdodgeb_state::mcu63705_update_inputs()
 #define A 0x10
 #define D 0x20
 
-	UINT8 curr_port[2];
-	UINT8 curr_dash[2];
+	uint8_t curr_port[2];
+	uint8_t curr_dash[2];
 	int p;
 
 	for (p=0; p<=1; p++)

@@ -45,6 +45,7 @@ SOUNDS["MSM5205"] = true
 --SOUNDS["YM3812"] = true
 --SOUNDS["CEM3394"] = true
 --SOUNDS["VOTRAX"] = true
+SOUNDS["VOLT_REG"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -124,7 +125,7 @@ files{
   MAME_DIR .. "src/mame/includes/mario.h",
   MAME_DIR .. "src/mame/video/mario.cpp",
   MAME_DIR .. "src/mame/audio/mario.cpp",
-	
+
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",
 	MAME_DIR .. "src/mame/video/m62.cpp",

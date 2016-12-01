@@ -24,6 +24,7 @@
 #include "sound/tms5220.h"
 #include "gromport.h"
 #include "bus/ti99_peb/peribox.h"
+#include "machine/ram.h"
 
 extern const device_type MAINBOARD8;
 
@@ -31,9 +32,6 @@ extern const device_type MAINBOARD8;
 #define MOFETTA_TAG "mofetta"
 #define AMIGO_TAG "amigo"
 #define OSO_TAG "oso"
-
-#define SRAM_SIZE 2048
-#define DRAM_SIZE 65536
 
 class mainboard8_device;
 extern const device_type VAQUERRO;
@@ -114,7 +112,7 @@ public:
 class vaquerro_device : public device_t
 {
 public:
-	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vaquerro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void device_start() override;
 	void device_reset() override;
 
@@ -156,7 +154,7 @@ private:
 	bool m_video_wait;
 
 	// State of the CRUS line
-	line_state m_crus;
+	int m_crus;
 
 	// Are the GROM libraries turned on?
 	bool m_crugl;
@@ -179,16 +177,16 @@ private:
 	int m_gromsel;
 
 	// Outgoing READY
-	line_state m_ggrdy;
+	int m_ggrdy;
 
 	// Outgoing READY latch (common flipflop driving SRY)
 	bool m_sry;
 
 	// Holds the A14 address line state. We need this for the clock_in method.
-	line_state m_a14;
+	int m_a14;
 
 	// Keeps the recent DBIN level
-	line_state m_dbin_level;
+	int m_dbin_level;
 
 	// Wait state logic components
 	grom_waitstate_generator m_sgmws, m_tsgws, m_p8gws, m_p3gws;
@@ -204,7 +202,7 @@ private:
 class mofetta_device : public device_t
 {
 public:
-	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mofetta_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void device_start() override;
 	void device_reset() override;
@@ -240,7 +238,7 @@ private:
 	// DRAM access
 	bool m_skdrcs;
 
-	// Holds the decoding result; essentially names the selected line
+	// Indicates the UP level of the GROMCLK
 	bool m_gromclk_up;
 
 	// Have we got the upper word of the address?
@@ -276,7 +274,7 @@ private:
 	int m_gromclock_count;
 
 	// Remember last msast state for edge detection
-	line_state m_msast;
+	int m_msast;
 
 	// Pointer to mainboard
 	mainboard8_device* m_mainboard;
@@ -288,7 +286,7 @@ private:
 class amigo_device : public device_t
 {
 public:
-	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	amigo_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	void device_start() override;
 	void device_reset() override;
 
@@ -308,7 +306,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( sramcs_out );
 	DECLARE_READ_LINE_MEMBER( skdrcs_out );
 
-	void connect_sram(UINT8* sram) { m_sram = sram; }
+	void connect_sram(uint8_t* sram) { m_sram = sram; }
 	bool mapper_accessed() { return m_mapper_accessed; }
 
 private:
@@ -321,28 +319,28 @@ private:
 
 	// Address mapper registers. Each offset is selected by the first 4 bits
 	// of the logical address.
-	UINT32  m_base_register[16];
+	uint32_t  m_base_register[16];
 
 	// Indicates a logical space access
 	bool m_logical_space;
 
 	// Physical address
-	UINT32  m_physical_address;
+	uint32_t  m_physical_address;
 
 	// Pointer to SRAM where AMIGO needs to upload/download its map values
-	UINT8* m_sram;
+	uint8_t* m_sram;
 
 	// Pointer to mainboard
 	mainboard8_device* m_mainboard;
 
 	// Keep the system ready state
-	line_state m_srdy;
+	int m_srdy;
 
 	// Outgoing READY level
-	line_state m_ready_out;
+	int m_ready_out;
 
 	// Keep the CRUS setting
-	line_state m_crus;
+	int m_crus;
 
 	// State of the address creation
 	int m_amstate;
@@ -363,13 +361,13 @@ private:
 	bool m_hold_acknowledged;
 
 	// Address in SRAM during DMA
-	UINT32  m_sram_address;
+	uint32_t  m_sram_address;
 
 	// Number of the currently loaded/save base register
 	int m_basereg;
 
 	// Latched value for mapper DMA transfer
-	UINT32 m_mapvalue;
+	uint32_t m_mapvalue;
 };
 
 /*
@@ -378,22 +376,22 @@ private:
 class oso_device : public device_t
 {
 public:
-	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	oso_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	void device_start() override;
 
 private:
-	UINT8 m_data;
-	UINT8 m_status;
-	UINT8 m_control;
-	UINT8 m_xmit;
+	uint8_t m_data;
+	uint8_t m_status;
+	uint8_t m_control;
+	uint8_t m_xmit;
 };
 
 class mainboard8_device : public device_t
 {
 public:
-	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mainboard8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// Memory space
 	DECLARE_READ8_MEMBER( read );
@@ -471,7 +469,7 @@ private:
 
 	// Hold the value of the data bus. In a real machine, the data bus continues
 	// to show that value, but in this emulation we have a push mechanism.
-	UINT8   m_latched_data;
+	uint8_t   m_latched_data;
 
 	// Hold the level of the GROMCLK line
 	int m_gromclk;
@@ -488,7 +486,7 @@ private:
 	bool m_pbox_ready;
 
 	// Keeps the recent DBIN level
-	line_state m_dbin_level;
+	int m_dbin_level;
 
 	// Ready line to the CPU
 	devcb_write_line m_ready;
@@ -505,17 +503,17 @@ private:
 	required_device<amigo_device>    m_amigo;
 	required_device<oso_device>       m_oso;
 
+	// More devices
+	required_device<tms9928a_device>        m_video;
+	required_device<sn76496_base_device>    m_sound;
+	required_device<cd2501ecd_device>       m_speech;
+	required_device<gromport_device>        m_gromport;
+	required_device<peribox_device>         m_peb;
+	required_device<ram_device>             m_sram;
+	required_device<ram_device>             m_dram;
+
 	// Debugging
-	line_state m_last_ready;
-
-	// Video processor
-	tms9118_device* m_video;
-
-	// Sound generator
-	sn76496_base_device* m_sound;
-
-	// Speech processor
-	cd2501ecd_device* m_speech;
+	int m_last_ready;
 
 	// System GROM library
 	tmc0430_device* m_sgrom[3];
@@ -529,20 +527,16 @@ private:
 	// Pascal 3 GROM library
 	tmc0430_device* m_p3grom[3];
 
-	// Gromport (cartridge port)
-	gromport_device* m_gromport;
-
-	// Peripheral box
-	peribox_device* m_peb;
-
-	// Memory
-	std::unique_ptr<UINT8[]>    m_sram;
-	std::unique_ptr<UINT8[]>    m_dram;
+	// Idle flags for GROMs
+	bool m_sgrom_idle;
+	bool m_tsgrom_idle;
+	bool m_p8grom_idle;
+	bool m_p3grom_idle;
 
 	// ROM area of the system.
-	UINT8*   m_rom0;
-	UINT8*   m_rom1;
-	UINT8*   m_pascalrom;
+	uint8_t*   m_rom0;
+	uint8_t*   m_rom1;
+	uint8_t*   m_pascalrom;
 };
 
 #define MCFG_MAINBOARD8_READY_CALLBACK(_write) \

@@ -208,7 +208,7 @@ WRITE8_MEMBER(jedi_state::rom_banksel_w)
 
 READ8_MEMBER(jedi_state::a2d_data_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_a2d_select)
 	{

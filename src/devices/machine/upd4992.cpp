@@ -33,7 +33,7 @@ const device_type UPD4992 = &device_creator<upd4992_device>;
 //  upd4992_device - constructor
 //-------------------------------------------------
 
-upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd4992_device::upd4992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD4992, "uPD4992 RTC", tag, owner, clock, "upd4992", __FILE__),
 		device_rtc_interface(mconfig, *this), m_timer_clock(nullptr)
 {
@@ -58,16 +58,6 @@ void upd4992_device::device_start()
 {
 	m_timer_clock = timer_alloc(TIMER_CLOCK);
 	m_timer_clock->adjust(attotime::from_hz(clock() / 32768), 0, attotime::from_hz(clock() / 32768));
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void upd4992_device::device_reset()
-{
-	set_current_time(machine());
 }
 
 

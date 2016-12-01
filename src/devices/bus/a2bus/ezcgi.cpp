@@ -96,42 +96,42 @@ machine_config_constructor a2bus_ezcgi_9958_device::device_mconfig_additions() c
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_EZCGI, "E-Z Color Graphics Interface", tag, owner, clock, "a2ezcgi", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ezcgi_device::a2bus_ezcgi_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_EZCGI_9938, "E-Z Color Graphics Interface (TMS9938)", tag, owner, clock, "a2ezcgi3", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ezcgi_9938_device::a2bus_ezcgi_9938_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_EZCGI_9958, "E-Z Color Graphics Interface (TMS9958)", tag, owner, clock, "a2ezcgi5", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_ezcgi_9958_device::a2bus_ezcgi_9958_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
@@ -178,7 +178,7 @@ void a2bus_ezcgi_9958_device::device_reset()
     1 - TMS write
 */
 
-UINT8 a2bus_ezcgi_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_ezcgi_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -192,7 +192,7 @@ UINT8 a2bus_ezcgi_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_ezcgi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ezcgi_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -206,7 +206,7 @@ void a2bus_ezcgi_device::write_c0nx(address_space &space, UINT8 offset, UINT8 da
 	}
 }
 
-UINT8 a2bus_ezcgi_9938_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_ezcgi_9938_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -220,7 +220,7 @@ UINT8 a2bus_ezcgi_9938_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_ezcgi_9938_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ezcgi_9938_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -242,7 +242,7 @@ void a2bus_ezcgi_9938_device::write_c0nx(address_space &space, UINT8 offset, UIN
 	}
 }
 
-UINT8 a2bus_ezcgi_9958_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_ezcgi_9958_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -256,7 +256,7 @@ UINT8 a2bus_ezcgi_9958_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0xff;
 }
 
-void a2bus_ezcgi_9958_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_ezcgi_9958_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

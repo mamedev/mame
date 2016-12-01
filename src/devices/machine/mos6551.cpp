@@ -12,7 +12,7 @@
 
 const device_type MOS6551 = &device_creator<mos6551_device>;
 
-mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mos6551_device::mos6551_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MOS6551, "MOS6551", tag, owner, clock, "mos6551", __FILE__),
 	m_internal_clock(*this, "clock"),
 	m_irq_handler(*this),
@@ -269,15 +269,15 @@ void mos6551_device::update_divider()
 	m_internal_clock->set_clock_scale(scale);
 }
 
-UINT8 mos6551_device::read_rdr()
+uint8_t mos6551_device::read_rdr()
 {
 	m_status &= ~(SR_PARITY_ERROR | SR_FRAMING_ERROR | SR_OVERRUN | SR_RDRF);
 	return m_rdr;
 }
 
-UINT8 mos6551_device::read_status()
+uint8_t mos6551_device::read_status()
 {
-	UINT8 status = m_status;
+	uint8_t status = m_status;
 
 	if (m_cts)
 	{
@@ -293,23 +293,23 @@ UINT8 mos6551_device::read_status()
 	return status;
 }
 
-UINT8 mos6551_device::read_command()
+uint8_t mos6551_device::read_command()
 {
 	return m_command;
 }
 
-UINT8 mos6551_device::read_control()
+uint8_t mos6551_device::read_control()
 {
 	return m_control;
 }
 
-void mos6551_device::write_tdr(UINT8 data)
+void mos6551_device::write_tdr(uint8_t data)
 {
 	m_tdr = data;
 	m_status &= ~SR_TDRE;
 }
 
-void mos6551_device::write_reset(UINT8 data)
+void mos6551_device::write_reset(uint8_t data)
 {
 	m_status &= ~SR_OVERRUN;
 	m_irq_state &= ~(IRQ_DCD | IRQ_DSR);
@@ -317,7 +317,7 @@ void mos6551_device::write_reset(UINT8 data)
 	write_command(m_command & ~0x1f);
 }
 
-void mos6551_device::write_control(UINT8 data)
+void mos6551_device::write_control(uint8_t data)
 {
 	m_control = data;
 
@@ -338,7 +338,7 @@ void mos6551_device::write_control(UINT8 data)
 	}
 }
 
-void mos6551_device::write_command(UINT8 data)
+void mos6551_device::write_command(uint8_t data)
 {
 	m_command = data;
 
@@ -437,7 +437,7 @@ int mos6551_device::stoplength()
 	return m_divide;
 }
 
-void mos6551_device::set_xtal(UINT32 xtal)
+void mos6551_device::set_xtal(uint32_t xtal)
 {
 	m_xtal = xtal;
 
@@ -573,7 +573,7 @@ WRITE_LINE_MEMBER(mos6551_device::receiver_clock)
 					{
 						m_rx_counter = 0;
 
-						if (LOG) logerror("MOS6551 '%s': RX FALSE START BIT\n", tag());
+						if (LOG) logerror("MOS6551 '%s': RX false START BIT\n", tag());
 					}
 				}
 				break;

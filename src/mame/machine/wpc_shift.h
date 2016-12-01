@@ -12,7 +12,7 @@
 class wpc_shift_device : public device_t
 {
 public:
-	wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	wpc_shift_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~wpc_shift_device();
 
 	DECLARE_ADDRESS_MAP(registers, 8);
@@ -27,8 +27,8 @@ public:
 	DECLARE_WRITE8_MEMBER(val2_w);
 
 protected:
-	UINT16 adr;
-	UINT8 val1, val2;
+	uint16_t adr;
+	uint8_t val1, val2;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;

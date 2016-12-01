@@ -47,7 +47,7 @@ machine_config_constructor cpc_rom_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_rom_device::cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_rom_device::cpc_rom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_ROM, "ROM Box", tag, owner, clock, "cpc_rom", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this)
 {
@@ -79,7 +79,7 @@ const device_type ROMSLOT = &device_creator<rom_image_device>;
 //  rom_image_device - constructor
 //-------------------------------------------------
 
-rom_image_device::rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rom_image_device::rom_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ROMSLOT, "ROM image", tag, owner, clock, "rom_image", __FILE__),
 		device_image_interface(mconfig, *this), m_base(nullptr)
 {
@@ -108,9 +108,9 @@ void rom_image_device::device_start()
 image_init_result rom_image_device::call_load()
 {
 	device_image_interface* image = this;
-	UINT64 size = image->length();
+	uint64_t size = image->length();
 
-	m_base = std::make_unique<UINT8[]>(16384);
+	m_base = std::make_unique<uint8_t[]>(16384);
 	if(size <= 16384)
 	{
 		image->fread(m_base.get(),size);

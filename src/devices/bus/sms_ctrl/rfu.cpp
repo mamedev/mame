@@ -62,7 +62,7 @@ ioport_constructor sms_rapid_fire_device::device_input_ports() const
 //  sms_rapid_fire_device - constructor
 //-------------------------------------------------
 
-sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_RAPID_FIRE, "Sega SMS Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
@@ -92,9 +92,9 @@ void sms_rapid_fire_device::device_start()
 //  sms_peripheral_r - rapid fire read
 //-------------------------------------------------
 
-UINT8 sms_rapid_fire_device::peripheral_r()
+uint8_t sms_rapid_fire_device::peripheral_r()
 {
-	UINT8 data;
+	uint8_t data;
 
 	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
 	m_read_state = num_intervals & 1;
@@ -117,7 +117,7 @@ UINT8 sms_rapid_fire_device::peripheral_r()
 //  sms_peripheral_w - rapid fire write
 //-------------------------------------------------
 
-void sms_rapid_fire_device::peripheral_w(UINT8 data)
+void sms_rapid_fire_device::peripheral_w(uint8_t data)
 {
 	m_subctrl_port->port_w(data);
 }

@@ -22,7 +22,7 @@ static const int daysmonth[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 3
 
 
 
-static const UINT32 exception_priority_default[] = {
+static const uint32_t exception_priority_default[] = {
 	EXPPRI(1,1,0,0),             /* Power-on Reset */
 	EXPPRI(1,2,0,1),             /* Manual Reset */
 	EXPPRI(1,1,0,2),             /* H-UDI Reset */
@@ -260,7 +260,7 @@ void sh34_base_device::sh4_change_register_bank(int to)
 void sh34_base_device::sh4_swap_fp_registers()
 {
 	int s;
-	UINT32 z;
+	uint32_t z;
 
 	for (s = 0;s <= 15;s++)
 	{
@@ -273,7 +273,7 @@ void sh34_base_device::sh4_swap_fp_registers()
 void sh34_base_device::sh4_swap_fp_couples()
 {
 	int s;
-	UINT32 z;
+	uint32_t z;
 
 	for (s = 0;s <= 15;s = s+2)
 	{
@@ -369,7 +369,7 @@ void sh34_base_device::sh4_exception_checkunrequest(int exception)
 
 void sh34_base_device::sh4_exception(const char *message, int exception) // handle exception
 {
-	UINT32 vector;
+	uint32_t vector;
 
 
 	if (m_cpu_type == CPU_TYPE_SH4)
@@ -462,17 +462,17 @@ void sh34_base_device::sh4_exception(const char *message, int exception) // hand
 }
 
 
-UINT32 sh34_base_device::compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
+uint32_t sh34_base_device::compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)
 {
 	// elapsed:total = x : ticks
 	// x=elapsed*tics/total -> x=elapsed*(double)100000000/rtcnt_div[(m_m[RTCSR] >> 3) & 7]
 	// ticks/total=ticks / ((rtcnt_div[(m_m[RTCSR] >> 3) & 7] * ticks) / 100000000)=1/((rtcnt_div[(m_m[RTCSR] >> 3) & 7] / 100000000)=100000000/rtcnt_div[(m_m[RTCSR] >> 3) & 7]
-	return base + (UINT32)((timer->elapsed().as_double() * (double)hertz) / (double)divisor);
+	return base + (uint32_t)((timer->elapsed().as_double() * (double)hertz) / (double)divisor);
 }
 
 void sh34_base_device::sh4_refresh_timer_recompute()
 {
-	UINT32 ticks;
+	uint32_t ticks;
 
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_refresh_timer_recompute uses m_m[] with SH3\n");
@@ -638,7 +638,7 @@ void sh34_base_device::sh4_dmac_nmi() // manage dma when nmi gets asserted
 	}
 }
 
-void sh34_base_device::sh4_handler_ipra_w(UINT32 data, UINT32 mem_mask)
+void sh34_base_device::sh4_handler_ipra_w(uint32_t data, uint32_t mem_mask)
 {
 	COMBINE_DATA(&m_SH4_IPRA);
 	/* 15 - 12 TMU0 */
@@ -665,37 +665,117 @@ void sh34_base_device::sh4_handler_ipra_w(UINT32 data, UINT32 mem_mask)
 WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 {
 	int a;
-	UINT32 addr = (offset << 2) + 0xfe000000;
+	uint32_t addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
 
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_w uses m_m[] with SH3\n");
 
-	UINT32 old = m_m[offset];
+	uint32_t old = m_m[offset];
 	COMBINE_DATA(m_m+offset);
 
 //  printf("sh4_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, data, mem_mask);
 
 	switch( offset )
 	{
+	case PTEH: // for use with LDTLB opcode
+		m_m[PTEH] &= 0xffffffff;
+		/*
+		    NNNN NNNN NNNN NNNN NNNN NN-- AAAA AAAA
+
+		    N = VPM = Virtual Page Number
+		    A = ASID = Address Space Identifier
+
+		    same as the address table part of the utlb but with 2 unused bits (these are sourced from PTEL instead when LDTLB is called)
+		*/
+
+
+		break;
+
+	case PTEL:
+		m_m[PTEL] &= 0xffffffff;
+		/*
+		     ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+
+		     same format as data array 1 of the utlb
+		*/
+		break;
+
+	case PTEA:
+		m_m[PTEA] &= 0xffffffff;
+		/*
+		    ---- ---- ---- ---- ---- ---- ---- TSSS
+
+		    same format as data array 2 of the utlb
+		*/
+		break;
+
+	case TTB:
+		m_m[TTB] &= 0xffffffff;
+		logerror("TTB set to %08x\n", data);
+		break;
+
+	case TEA:
+		m_m[TEA] &= 0xffffffff;
+		logerror("TEA set to %08x\n", data);
+		break;
+
+
 	case MMUCR: // MMU Control
+		logerror("%s: MMUCR %08x\n", machine().describe_context(), data);
+		m_m[MMUCR] &= 0xffffffff;
+		/*
+		    LLLL LL-- BBBB BB-- CCCC CCQV ---- -T-A
+
+		    L = LRUI = Least recently used ITLB
+		    B = URB = UTLB replace boundary
+		    C = URC = UTLB replace counter
+		    Q = SQMD = Store Queue Mode Bit
+		    V = SV = Single Virtual Mode Bit
+		    T = TI = TLB invaldiate
+		    A = AT = Address translation bit (enable)
+		*/
+
+
+
 		if (data & MMUCR_AT)
 		{
-			printf("SH4 MMU Enabled\n");
-			printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
-			printf("The MMU emulation is a hack specific to that system\n");
 			m_sh4_mmu_enabled = 1;
 
-			// should be a different bit!
-			{
-				int i;
-				for (i=0;i<64;i++)
-				{
-					m_sh4_tlb_address[i] = 0;
-					m_sh4_tlb_data[i] = 0;
-				}
 
+			if (m_mmuhack == 1)
+			{
+				printf("SH4 MMU Enabled\n");
+				printf("If you're seeing this, but running something other than a Naomi GD-ROM game then chances are it won't work\n");
+				printf("The MMU emulation is a hack specific to that system\n");
 			}
+
+
+			if (m_mmuhack == 2)
+			{
+				for (int i = 0;i < 64;i++)
+				{
+					if (m_utlb[i].V)
+					{
+						printf("(entry %02x | ASID: %02x VPN: %08x V: %02x PPN: %08x SZ: %02x SH: %02x C: %02x PPR: %02x D: %02x WT %02x: SA: %02x TC: %02x)\n",
+							i,
+							m_utlb[i].ASID,
+							m_utlb[i].VPN << 10,
+							m_utlb[i].V,
+							m_utlb[i].PPN << 10,
+							m_utlb[i].PSZ,
+							m_utlb[i].SH,
+							m_utlb[i].C,
+							m_utlb[i].PPR,
+							m_utlb[i].D,
+							m_utlb[i].WT,
+							m_utlb[i].SA,
+							m_utlb[i].TC);
+					}
+				}
+			}
+
+
 		}
 		else
 		{
@@ -854,11 +934,11 @@ WRITE32_MEMBER( sh4_base_device::sh4_internal_w )
 		m_ioport16_direction &= 0xffff;
 		m_ioport16_pullup = (m_ioport16_pullup | m_ioport16_direction) ^ 0xffff;
 		if (m_m[BCR2] & 1)
-			m_io->write_dword(SH4_IOPORT_16, (UINT64)(m_m[PDTRA] & m_ioport16_direction) | ((UINT64)m_m[PCTRA] << 16));
+			m_io->write_dword(SH4_IOPORT_16, (uint64_t)(m_m[PDTRA] & m_ioport16_direction) | ((uint64_t)m_m[PCTRA] << 16));
 		break;
 	case PDTRA:
 		if (m_m[BCR2] & 1)
-			m_io->write_dword(SH4_IOPORT_16, (UINT64)(m_m[PDTRA] & m_ioport16_direction) | ((UINT64)m_m[PCTRA] << 16));
+			m_io->write_dword(SH4_IOPORT_16, (uint64_t)(m_m[PDTRA] & m_ioport16_direction) | ((uint64_t)m_m[PCTRA] << 16));
 		break;
 	case PCTRB:
 		m_ioport4_pullup = 0;
@@ -894,7 +974,7 @@ READ32_MEMBER( sh4_base_device::sh4_internal_r )
 	if (m_cpu_type != CPU_TYPE_SH4)
 		fatalerror("sh4_internal_r uses m_m[] with SH3\n");
 
-	UINT32 addr = (offset << 2) + 0xfe000000;
+	uint32_t addr = (offset << 2) + 0xfe000000;
 	offset = ((addr & 0xfc) >> 2) | ((addr & 0x1fe0000) >> 11);
 
 //  printf("sh4_internal_r:  Read %08x (%x) @ %08x\n", 0xfe000000+((offset & 0x3fc0) << 11)+((offset & 0x3f) << 2), offset, mem_mask);
@@ -1184,55 +1264,202 @@ void sh34_base_device::sh4_parse_configuration()
 	}
 }
 
-UINT32 sh34_base_device::sh4_getsqremap(UINT32 address)
+uint32_t sh34_base_device::get_remap(uint32_t address)
 {
-	if (!m_sh4_mmu_enabled)
+	return address;
+}
+
+uint32_t sh4_base_device::get_remap(uint32_t address)
+{
+	if (m_mmuhack != 2)
+		return address;
+
+	// is this the correct way around?
+	int i;
+	uint32_t topaddr = address&0xfff00000;
+
+	for (i=0;i<64;i++)
+	{
+		if (m_utlb[i].V)
+		{
+			uint32_t topcmp = (m_utlb[i].PPN << 10) & 0xfff00000;
+			if (topcmp == topaddr)
+				return (address & 0x000fffff) | ((m_utlb[i].VPN << 10) & 0xfff00000);
+		}
+	}
+
+	//printf("address not in UTLB? %08x\n", address);
+
+
+	return address;
+}
+
+uint32_t sh34_base_device::sh4_getsqremap(uint32_t address)
+{
+	return address;
+}
+
+uint32_t sh4_base_device::sh4_getsqremap(uint32_t address)
+{
+	if (!m_sh4_mmu_enabled || (m_mmuhack != 1))
 		return address;
 	else
 	{
 		int i;
-		UINT32 topaddr = address&0xfff00000;
+		uint32_t topaddr = address&0xfff00000;
 
 		for (i=0;i<64;i++)
 		{
-			UINT32 topcmp = m_sh4_tlb_address[i]&0xfff00000;
+			uint32_t topcmp = (m_utlb[i].VPN<<10)&0xfff00000;
 			if (topcmp==topaddr)
-				return (address&0x000fffff) | ((m_sh4_tlb_data[i])&0xfff00000);
+				return (address&0x000fffff) | ((m_utlb[i].PPN<<10)&0xfff00000);
 		}
-
 	}
 
 	return address;
 }
 
-READ64_MEMBER( sh4_base_device::sh4_tlb_r )
-{
-	int offs = offset*8;
 
-	if (offs >= 0x01000000)
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_address_array_w )
+{
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
+    bit 7 of the address enables 'associative' mode, causing a search
+    operation rather than a direct write.
+
+    NNNN NNNN NNNN NNNN NNNN NNDV AAAA AAAA
+
+    N = VPN = Virtual Page Number
+    D = Dirty Bit
+    V = Validity Bit
+    A = ASID = Address Space Identifier
+*/
+
+	logerror("sh4_utlb_address_array_w %08x %08x\n", offset, data);
+	int offs = offset << 3;
+
+	uint8_t associative = (offs >> 7) & 1;
+
+	if (!associative)
 	{
-		UINT8 i = (offs>>8)&63;
-		return m_sh4_tlb_data[i];
+		// non-associative mode
+		uint8_t i = (offs >> 8) & 63;
+
+		m_utlb[i].VPN =  (data & 0xfffffc00) >> 10;
+		m_utlb[i].D =    (data & 0x00000200) >> 9;
+		m_utlb[i].V =    (data & 0x00000100) >> 8;
+		m_utlb[i].ASID = (data & 0x000000ff) >> 0;
 	}
 	else
 	{
-		UINT8 i = (offs>>8)&63;
-		return m_sh4_tlb_address[i];
+		// associative mode
+		fatalerror("SH4MMU: associative mode writes unsupported\n");
 	}
 }
 
-WRITE64_MEMBER( sh4_base_device::sh4_tlb_w )
+READ64_MEMBER( sh4_base_device::sh4_utlb_address_array_r )
 {
+	// associative bit is ignored for reads
 	int offs = offset*8;
 
-	if (offs >= 0x01000000)
-	{
-		UINT8 i = (offs>>8)&63;
-		m_sh4_tlb_data[i]  = data&0xffffffff;
-	}
-	else
-	{
-		UINT8 i = (offs>>8)&63;
-		m_sh4_tlb_address[i] = data&0xffffffff;
-	}
+	uint32_t ret = 0;
+
+	uint8_t i = (offs >> 8) & 63;
+
+	ret |= m_utlb[i].VPN << 10;
+	ret |= m_utlb[i].D << 9;
+	ret |= m_utlb[i].V << 8;
+	ret |= m_utlb[i].ASID << 0;
+
+	return ret;
+}
+
+
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array1_w )
+{
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
+
+    ---P PPPP PPPP PPPP PPPP PP-V zRRz CDHW
+
+    P = PPN = Physical page number
+    V = Validity bit
+    z = SZ = Page Size (2 bits, split)
+    D = Dirty Bit
+    R = PR = Protection Key Data
+    C = Cacheable bit
+    H = Share status
+    W = Write through
+    - = unused (should be 0)
+*/
+	logerror("sh4_utlb_data_array1_w %08x %08x\n", offset, data);
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	m_utlb[i].PPN = (data & 0x1ffffc00) >> 10;
+	m_utlb[i].V =   (data & 0x00000100) >> 8;
+	m_utlb[i].PSZ = (data & 0x00000080) >> 6;
+	m_utlb[i].PSZ |=(data & 0x00000010) >> 4;
+	m_utlb[i].PPR=  (data & 0x00000060) >> 5;
+	m_utlb[i].C =   (data & 0x00000008) >> 3;
+	m_utlb[i].D =   (data & 0x00000004) >> 2;
+	m_utlb[i].SH =  (data & 0x00000002) >> 1;
+	m_utlb[i].WT =  (data & 0x00000001) >> 0;
+}
+
+
+READ64_MEMBER(sh4_base_device::sh4_utlb_data_array1_r)
+{
+	uint32_t ret = 0;
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	ret |= m_utlb[i].PPN << 10;
+	ret |= m_utlb[i].V << 8;
+	ret |= (m_utlb[i].PSZ & 2) << 6;
+	ret |= (m_utlb[i].PSZ & 1) << 4;
+	ret |= m_utlb[i].PPR << 5;
+	ret |= m_utlb[i].C << 3;
+	ret |= m_utlb[i].D << 2;
+	ret |= m_utlb[i].SH << 1;
+	ret |= m_utlb[i].WT << 0;
+
+	return ret;
+}
+
+
+
+WRITE64_MEMBER( sh4_base_device::sh4_utlb_data_array2_w )
+{
+/*  uses bits 13:8 of address to select which UTLB entry we're addressing
+
+    ---- ---- ---- ---- ---- ---- ---- TSSS
+
+    T = TC = Timing Control
+    S = SA = Space attributes
+    - = unused (should be 0)
+
+*/
+
+	logerror("sh4_utlb_data_array2_w %08x %08x\n", offset, data);
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	m_utlb[i].TC = (data & 0x00000008) >> 3;
+	m_utlb[i].SA = (data & 0x00000007) >> 0;
+}
+
+
+READ64_MEMBER(sh4_base_device::sh4_utlb_data_array2_r)
+{
+	uint32_t ret = 0;
+	int offs = offset*8;
+
+	uint8_t i = (offs>>8)&63;
+
+	ret |= m_utlb[i].TC << 3;
+	ret |= m_utlb[i].SA << 0;
+
+	return ret;
 }

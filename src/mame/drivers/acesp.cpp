@@ -3848,11 +3848,11 @@ ROM_START( sp_cpal )
 	SP_CPAL_SOUND
 ROM_END
 
-static void descramble_crystal( UINT8* region, int start, int end, UINT8 extra_xor)
+static void descramble_crystal( uint8_t* region, int start, int end, uint8_t extra_xor)
 {
 	for (int i=start;i<end;i++)
 	{
-		UINT8 x = region[i];
+		uint8_t x = region[i];
 		switch (i & 0x58)
 		{
 		case 0x00: // same as 0x08

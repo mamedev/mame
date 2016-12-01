@@ -35,10 +35,11 @@
 //**************************************************************************
 
 class segapcm_device : public device_t,
-						public device_sound_interface
+					   public device_sound_interface,
+					   public device_rom_interface
 {
 public:
-	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	segapcm_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~segapcm_device() { }
 
 	// static configuration
@@ -54,10 +55,12 @@ protected:
 	// sound stream update overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
+
 private:
-	required_region_ptr<UINT8> m_rom;
-	std::unique_ptr<UINT8[]> m_ram;
-	UINT8 m_low[16];
+	std::unique_ptr<uint8_t[]> m_ram;
+	uint8_t m_low[16];
 	int m_bank;
 	int m_bankshift;
 	int m_bankmask;

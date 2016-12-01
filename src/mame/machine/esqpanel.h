@@ -56,15 +56,15 @@ class esqpanel_device :  public device_t, public device_serial_interface
 {
 public:
 	// construction/destruction
-	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	esqpanel_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	template<class _Object> static devcb_base &set_tx_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_tx.set_callback(object); }
 	template<class _Object> static devcb_base &set_analog_wr_callback(device_t &device, _Object object) { return downcast<esqpanel_device &>(device).m_write_analog.set_callback(object); }
 
-	virtual void send_to_display(UINT8 data) = 0;
+	virtual void send_to_display(uint8_t data) = 0;
 
-	void xmit_char(UINT8 data);
-	void set_analog_value(offs_t offset, UINT16 value);
+	void xmit_char(uint8_t data);
+	void set_analog_value(offs_t offset, uint16_t value);
 
 protected:
 	// device-level overrides
@@ -87,18 +87,18 @@ private:
 
 	devcb_write_line m_write_tx;
 	devcb_write16 m_write_analog;
-	UINT8 m_xmitring[XMIT_RING_SIZE];
+	uint8_t m_xmitring[XMIT_RING_SIZE];
 	int m_xmit_read, m_xmit_write;
 	bool m_tx_busy;
 };
 
 class esqpanel1x22_device : public esqpanel_device {
 public:
-	esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esqpanel1x22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<esq1x22_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -108,11 +108,11 @@ private:
 
 class esqpanel2x40_device : public esqpanel_device {
 public:
-	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esqpanel2x40_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<esq2x40_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -122,11 +122,11 @@ private:
 
 class esqpanel2x40_sq1_device : public esqpanel_device {
 public:
-	esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esqpanel2x40_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<esq2x40_sq1_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
@@ -137,11 +137,11 @@ private:
 // --- SQ1 - Parduz --------------------------------------------------------------------------------------------------------------------------
 class esqpanel2x16_sq1_device : public esqpanel_device {
 public:
-	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esqpanel2x16_sq1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	required_device<esq2x16_sq1_t> m_vfd;
 
-	virtual void send_to_display(UINT8 data) override { m_vfd->write_char(data); }
+	virtual void send_to_display(uint8_t data) override { m_vfd->write_char(data); }
 
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;

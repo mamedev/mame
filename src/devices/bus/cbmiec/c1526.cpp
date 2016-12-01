@@ -48,7 +48,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c1526_t::device_rom_region() const
+const tiny_rom_entry *c1526_t::device_rom_region() const
 {
 	return ROM_NAME( c1526 );
 }
@@ -68,7 +68,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *c4023_t::device_rom_region() const
+const tiny_rom_entry *c4023_t::device_rom_region() const
 {
 	return ROM_NAME( c4023 );
 }
@@ -79,7 +79,7 @@ const rom_entry *c4023_t::device_rom_region() const
 //-------------------------------------------------
 
 static ADDRESS_MAP_START( c1526_mem, AS_PROGRAM, 8, c1526_base_t )
-	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION(M6504_TAG, 0)
+	AM_RANGE(0x0000, 0x1fff) AM_ROM AM_REGION(M6504_TAG, 0)
 ADDRESS_MAP_END
 
 
@@ -170,7 +170,7 @@ ioport_constructor c4023_t::device_input_ports() const
 //  c1526_base_t - constructor
 //-------------------------------------------------
 
-c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -180,7 +180,7 @@ c1526_base_t:: c1526_base_t(const machine_config &mconfig, device_type type, con
 //  c1526_t - constructor
 //-------------------------------------------------
 
-c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	c1526_base_t(mconfig, C1526, "MPS802/C1526 Printer", tag, owner, clock, "c1526", __FILE__),
 	device_cbm_iec_interface(mconfig, *this)
 {
@@ -191,7 +191,7 @@ c1526_t::c1526_t(const machine_config &mconfig, const char *tag, device_t *owner
 //  c4023_t - constructor
 //-------------------------------------------------
 
-c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c4023_t::c4023_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	c1526_base_t(mconfig, C4023, "C4023 Printer", tag, owner, clock, "c4023", __FILE__),
 	device_ieee488_interface(mconfig, *this)
 {

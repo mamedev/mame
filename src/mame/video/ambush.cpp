@@ -22,7 +22,7 @@
 
 PALETTE_INIT_MEMBER(ambush_state, ambush)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -59,7 +59,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int code, sx, sy, col;
-		UINT8 scroll;
+		uint8_t scroll;
 
 		sy = (offs / 32);
 		sx = (offs % 32);
@@ -89,7 +89,7 @@ void ambush_state::draw_chars( bitmap_ind16 &bitmap, const rectangle &cliprect, 
 }
 
 
-UINT32 ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ambush_state::screen_update_ambush(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int offs;
 

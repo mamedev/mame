@@ -51,7 +51,7 @@ void gameplan_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		via_0_ca1_timer_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in gameplan_state::device_timer");
+		assert_always(false, "Unknown id in gameplan_state::device_timer");
 	}
 }
 
@@ -79,10 +79,10 @@ void gameplan_state::leprechn_get_pens( pen_t *pens )
 
 	for (i = 0; i < LEPRECHN_NUM_PENS; i++)
 	{
-		UINT8 bk = (i & 8) ? 0x40 : 0x00;
-		UINT8 r = (i & 1) ? 0xff : bk;
-		UINT8 g = (i & 2) ? 0xff : bk;
-		UINT8 b = (i & 4) ? 0xff : bk;
+		uint8_t bk = (i & 8) ? 0x40 : 0x00;
+		uint8_t r = (i & 1) ? 0xff : bk;
+		uint8_t g = (i & 2) ? 0xff : bk;
+		uint8_t b = (i & 4) ? 0xff : bk;
 
 		pens[i] = rgb_t(r, g, b);
 	}
@@ -96,7 +96,7 @@ void gameplan_state::leprechn_get_pens( pen_t *pens )
  *
  *************************************/
 
-UINT32 gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[GAMEPLAN_NUM_PENS];
 	offs_t offs;
@@ -105,8 +105,8 @@ UINT32 gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb3
 
 	for (offs = 0; offs < m_videoram_size; offs++)
 	{
-		UINT8 y = offs >> 8;
-		UINT8 x = offs & 0xff;
+		uint8_t y = offs >> 8;
+		uint8_t x = offs & 0xff;
 
 		bitmap.pix32(y, x) = pens[m_videoram[offs] & 0x07];
 	}
@@ -115,7 +115,7 @@ UINT32 gameplan_state::screen_update_gameplan(screen_device &screen, bitmap_rgb3
 }
 
 
-UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	pen_t pens[LEPRECHN_NUM_PENS];
 	offs_t offs;
@@ -124,8 +124,8 @@ UINT32 gameplan_state::screen_update_leprechn(screen_device &screen, bitmap_rgb3
 
 	for (offs = 0; offs < m_videoram_size; offs++)
 	{
-		UINT8 y = offs >> 8;
-		UINT8 x = offs & 0xff;
+		uint8_t y = offs >> 8;
+		uint8_t x = offs & 0xff;
 
 		bitmap.pix32(y, x) = pens[m_videoram[offs] & (LEPRECHN_NUM_PENS-1)];
 	}
@@ -268,7 +268,7 @@ TIMER_CALLBACK_MEMBER(gameplan_state::via_0_ca1_timer_callback)
 VIDEO_START_MEMBER(gameplan_state,common)
 {
 	m_videoram_size = (HBSTART - HBEND) * (VBSTART - VBEND);
-	m_videoram = std::make_unique<UINT8[]>(m_videoram_size);
+	m_videoram = std::make_unique<uint8_t[]>(m_videoram_size);
 
 	m_via_0_ca1_timer = timer_alloc(TIMER_VIA_0_CAL);
 

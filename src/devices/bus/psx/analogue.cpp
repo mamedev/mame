@@ -5,7 +5,7 @@
 const device_type PSX_ANALOG_JOYSTICK = &device_creator<psx_analog_joystick_device>;
 const device_type PSX_DUALSHOCK = &device_creator<psx_dualshock_device>;
 
-psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+psx_analog_controller_device::psx_analog_controller_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_psx_controller_interface(mconfig, *this),
 		m_type(),
@@ -23,13 +23,13 @@ psx_analog_controller_device::psx_analog_controller_device(const machine_config 
 {
 }
 
-psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psx_dualshock_device::psx_dualshock_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		psx_analog_controller_device(mconfig, PSX_DUALSHOCK, "Playstation Dualshock Pad", tag, owner, clock, "psx_dualshock_pad", __FILE__)
 {
 	m_type = DUALSHOCK;
 }
 
-psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psx_analog_joystick_device::psx_analog_joystick_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		psx_analog_controller_device(mconfig, PSX_ANALOG_JOYSTICK, "Playstation Analog Joystick", tag, owner, clock, "psx_analog_joystick", __FILE__)
 {
 	m_type = JOYSTICK;
@@ -44,9 +44,9 @@ void psx_analog_controller_device::device_reset()
 	m_cmd = 0;
 }
 
-UINT8 psx_analog_controller_device::pad_data(int count, bool analog)
+uint8_t psx_analog_controller_device::pad_data(int count, bool analog)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch(count)
 	{
 		case 2:
@@ -73,7 +73,7 @@ UINT8 psx_analog_controller_device::pad_data(int count, bool analog)
 	return data;
 }
 
-bool psx_analog_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
+bool psx_analog_controller_device::get_pad(int count, uint8_t *odata, uint8_t idata)
 {
 	if(m_confmode)
 	{
@@ -116,7 +116,7 @@ bool psx_analog_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
 						break;
 					case 0x45: // get mode ?
 					{
-						const UINT8 val[] = { 1, 2, 0, 2, 1, 0 };
+						const uint8_t val[] = { 1, 2, 0, 2, 1, 0 };
 						if(count == 4)
 							*odata = m_analogmode;
 						else
@@ -125,7 +125,7 @@ bool psx_analog_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
 					}
 					case 0x46: // query act (vibrate) ?
 					{
-						const UINT8 val[2][6] = {{ 0, 0, 1, 2, 0, 10 },
+						const uint8_t val[2][6] = {{ 0, 0, 1, 2, 0, 10 },
 												{ 0, 0, 1, 1, 1, 14 }};
 						*odata = val[m_temp][count-2];
 						if(count == 3)
@@ -134,7 +134,7 @@ bool psx_analog_controller_device::get_pad(int count, UINT8 *odata, UINT8 idata)
 					}
 					case 0x47: // query comb (combination?) ?
 					{
-						const UINT8 val[] = { 0, 0, 2, 0, 1, 0 };
+						const uint8_t val[] = { 0, 0, 2, 0, 1, 0 };
 						*odata = val[count-2];
 						break;
 					}

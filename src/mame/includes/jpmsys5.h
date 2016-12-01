@@ -41,7 +41,7 @@ public:
 	optional_device<palette_device> m_palette;
 	optional_device<meters_device> m_meters; //jpmsys5v doesn't use this
 
-	UINT8 m_palette_val[16][3];
+	uint8_t m_palette_val[16][3];
 	int m_pal_addr;
 	int m_pal_idx;
 	int m_touch_state;
@@ -54,9 +54,9 @@ public:
 	int m_muxram[255];
 	int m_alpha_clock;
 	int m_chop;
-	UINT8 m_a0_data_out;
-	UINT8 m_a1_data_out;
-	UINT8 m_a2_data_out;
+	uint8_t m_a0_data_out;
+	uint8_t m_a1_data_out;
+	uint8_t m_a2_data_out;
 	DECLARE_WRITE_LINE_MEMBER(generate_tms34061_interrupt);
 	DECLARE_WRITE16_MEMBER(sys5_tms34061_w);
 	DECLARE_READ16_MEMBER(sys5_tms34061_r);
@@ -71,7 +71,7 @@ public:
 	DECLARE_WRITE16_MEMBER(jpm_upd7759_w);
 	DECLARE_READ16_MEMBER(jpm_upd7759_r);
 	DECLARE_WRITE_LINE_MEMBER(ptm_irq);
-	DECLARE_WRITE8_MEMBER(u26_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(u26_o1_callback);
 	DECLARE_WRITE_LINE_MEMBER(pia_irq);
 	DECLARE_READ8_MEMBER(u29_porta_r);
 	DECLARE_WRITE8_MEMBER(u29_portb_w);
@@ -89,6 +89,6 @@ public:
 	DECLARE_MACHINE_RESET(jpmsys5v);
 	DECLARE_MACHINE_START(jpmsys5);
 	DECLARE_MACHINE_RESET(jpmsys5);
-	UINT32 screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jpmsys5v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(touch_cb);
 };

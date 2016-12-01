@@ -52,13 +52,13 @@
 
 #define POLL_TIMER 1
 
-mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mecmouse_device::mecmouse_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: joyport_attached_device(mconfig, MECMOUSE, "Mechatronics Mouse", tag, owner, clock, "mecmouse", __FILE__), m_last_select(0), m_read_y_axis(false), m_x(0), m_y(0), m_x_buf(0), m_y_buf(0), m_last_mx(0), m_last_my(0), m_poll_timer(nullptr)
 {
 }
 
 
-UINT8 mecmouse_device::read_dev()
+uint8_t mecmouse_device::read_dev()
 {
 	int answer;
 	int buttons = ioport("MOUSE0")->read() & 3;
@@ -80,7 +80,7 @@ UINT8 mecmouse_device::read_dev()
 /*
     Used to select lines. data = 0x01 (Joy1), 0x02 (Joy2)
 */
-void mecmouse_device::write_dev(UINT8 data)
+void mecmouse_device::write_dev(uint8_t data)
 {
 	if (data == 0x02) {
 		if (m_last_select == 0x01) {
@@ -175,6 +175,15 @@ void mecmouse_device::device_start(void)
 	// has no clock line on the joystick port. The rate is not mentioned in
 	// the specs; however, if it is too low, the mouse pointer will do jumps
 	m_poll_timer->adjust(attotime::from_hz(100), 0, attotime::from_hz(100));
+
+	save_item(NAME(m_last_select));
+	save_item(NAME(m_read_y_axis));
+	save_item(NAME(m_x));
+	save_item(NAME(m_y));
+	save_item(NAME(m_x_buf));
+	save_item(NAME(m_y_buf));
+	save_item(NAME(m_last_mx));
+	save_item(NAME(m_last_my));
 }
 
 void mecmouse_device::device_reset(void)

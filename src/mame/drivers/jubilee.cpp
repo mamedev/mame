@@ -48,10 +48,10 @@
   the 2114 find the 74148 or 74ls148, all 9980 cpu's use one, pin3 will generate a reset.
   The 5517 ram is compatible with 6116 or 2018.
 
-  The 9980 has 3 interupt inputs, but they are binary.
-  The ls148 encodes the interupts to the cpu - the highest interupt is reset.
+  The 9980 has 3 interrupt inputs, but they are binary.
+  The ls148 encodes the interrupts to the cpu - the highest interrupt is reset.
 
-  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interupt
+  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interrupt
   on pins 23, 24 and 25. The TC5517 checks out ok as a 6116.
 
   The crystal seems ok and this clock makes it throught to pin 34 of the MPU.
@@ -213,11 +213,11 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	UINT8 mux_sel;
-	UINT8 muxlamps;
+	uint8_t mux_sel;
+	uint8_t muxlamps;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(jubileep_videoram_w);
 	DECLARE_WRITE8_MEMBER(jubileep_colorram_w);
@@ -225,7 +225,7 @@ public:
 	DECLARE_READ8_MEMBER(mux_port_r);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void video_start() override;
-	UINT32 screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jubileep_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -267,11 +267,11 @@ TILE_GET_INFO_MEMBER(jubilee_state::get_bg_tile_info)
 
 void jubilee_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jubilee_state::get_bg_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_bg_tilemap->set_scrolldx(8, 0); /* guess */
 }
 
-UINT32 jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jubilee_state::screen_update_jubileep(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

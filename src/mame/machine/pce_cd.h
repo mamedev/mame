@@ -42,7 +42,7 @@ class pce_cd_device : public device_t
 {
 public:
 	// construction/destruction
-	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_cd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cd_device() {}
 
 	// device-level overrides
@@ -65,9 +65,9 @@ public:
 	void nvram_init(nvram_device &nvram, void *data, size_t size);
 
 private:
-	void adpcm_stop(UINT8 irq_flag);
+	void adpcm_stop(uint8_t irq_flag);
 	void adpcm_play();
-	void reply_status_byte(UINT8 status);
+	void reply_status_byte(uint8_t status);
 	void test_unit_ready();
 	void read_6();
 	void nec_set_audio_start_position();
@@ -81,9 +81,9 @@ private:
 	void handle_message_output();
 	void handle_message_input();
 	void set_irq_line(int num, int state);
-	void set_adpcm_ram_byte(UINT8 val);
-	UINT8 get_cd_data_byte();
-	UINT8 get_adpcm_ram_byte();
+	void set_adpcm_ram_byte(uint8_t val);
+	uint8_t get_cd_data_byte();
+	uint8_t get_adpcm_ram_byte();
 
 	TIMER_CALLBACK_MEMBER(data_timer_callback);
 	TIMER_CALLBACK_MEMBER(cdda_fadeout_callback);
@@ -95,22 +95,22 @@ private:
 
 	required_device<cpu_device> m_maincpu;
 
-	UINT8   m_regs[16];
-	std::unique_ptr<UINT8[]>   m_bram;
-	std::unique_ptr<UINT8[]>   m_adpcm_ram;
+	uint8_t   m_regs[16];
+	std::unique_ptr<uint8_t[]>   m_bram;
+	std::unique_ptr<uint8_t[]>   m_adpcm_ram;
 	int     m_bram_locked;
 	int     m_adpcm_read_ptr;
-	UINT8   m_adpcm_read_buf;
+	uint8_t   m_adpcm_read_buf;
 	int     m_adpcm_write_ptr;
-	UINT8   m_adpcm_write_buf;
+	uint8_t   m_adpcm_write_buf;
 	int     m_adpcm_length;
 	int     m_adpcm_clock_divider;
-	UINT32  m_msm_start_addr;
-	UINT32  m_msm_end_addr;
-	UINT32  m_msm_half_addr;
-	UINT8   m_msm_nibble;
-	UINT8   m_msm_idle;
-	UINT8   m_msm_repeat;
+	uint32_t  m_msm_start_addr;
+	uint32_t  m_msm_end_addr;
+	uint32_t  m_msm_half_addr;
+	uint8_t   m_msm_nibble;
+	uint8_t   m_msm_idle;
+	uint8_t   m_msm_repeat;
 
 	/* SCSI signals */
 	int     m_scsi_BSY;   /* Busy. Bus in use */
@@ -125,33 +125,33 @@ private:
 	int     m_scsi_last_RST;  /* To catch setting of RST signal */
 	int     m_cd_motor_on;
 	int     m_selected;
-	std::unique_ptr<UINT8[]>  m_command_buffer;
+	std::unique_ptr<uint8_t[]>  m_command_buffer;
 	int     m_command_buffer_index;
 	int     m_status_sent;
 	int     m_message_after_status;
 	int     m_message_sent;
-	std::unique_ptr<UINT8[]> m_data_buffer;
+	std::unique_ptr<uint8_t[]> m_data_buffer;
 	int     m_data_buffer_size;
 	int     m_data_buffer_index;
 	int     m_data_transferred;
 
 	/* Arcade Card specific */
-	std::unique_ptr<UINT8[]>  m_acard_ram;
-	UINT8   m_acard_latch;
-	UINT8   m_acard_ctrl[4];
-	UINT32  m_acard_base_addr[4];
-	UINT16  m_acard_addr_offset[4];
-	UINT16  m_acard_addr_inc[4];
-	UINT32  m_acard_shift;
-	UINT8   m_acard_shift_reg;
+	std::unique_ptr<uint8_t[]>  m_acard_ram;
+	uint8_t   m_acard_latch;
+	uint8_t   m_acard_ctrl[4];
+	uint32_t  m_acard_base_addr[4];
+	uint16_t  m_acard_addr_offset[4];
+	uint16_t  m_acard_addr_inc[4];
+	uint32_t  m_acard_shift;
+	uint8_t   m_acard_shift_reg;
 
-	UINT32  m_current_frame;
-	UINT32  m_end_frame;
-	UINT32  m_last_frame;
-	UINT8   m_cdda_status;
-	UINT8   m_cdda_play_mode;
-	std::unique_ptr<UINT8[]>   m_subcode_buffer;
-	UINT8   m_end_mark;
+	uint32_t  m_current_frame;
+	uint32_t  m_end_frame;
+	uint32_t  m_last_frame;
+	uint8_t   m_cdda_status;
+	uint8_t   m_cdda_play_mode;
+	std::unique_ptr<uint8_t[]>   m_subcode_buffer;
+	uint8_t   m_end_mark;
 
 	required_device<msm5205_device> m_msm;
 	required_device<cdda_device> m_cdda;

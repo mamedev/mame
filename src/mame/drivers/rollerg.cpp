@@ -58,7 +58,7 @@ void rollerg_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in rollerg_state::device_timer");
+		assert_always(false, "Unknown id in rollerg_state::device_timer");
 	}
 }
 
@@ -102,7 +102,6 @@ static ADDRESS_MAP_START( rollerg_sound_map, AS_PROGRAM, 8, rollerg_state )
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -217,7 +216,7 @@ WRITE_LINE_MEMBER(rollerg_state::rollerg_irq_ack_w)
 
 void rollerg_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 	membank("bank1")->configure_entries(6, 2, &ROM[0x10000], 0x4000);

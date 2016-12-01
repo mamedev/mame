@@ -84,7 +84,7 @@ void groundfx_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(5, HOLD_LINE); //from 5... ADC port
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in groundfx_state::device_timer");
+		assert_always(false, "Unknown id in groundfx_state::device_timer");
 	}
 }
 
@@ -413,8 +413,8 @@ READ32_MEMBER(groundfx_state::irq_speedup_r_groundfx)
 
 DRIVER_INIT_MEMBER(groundfx_state,groundfx)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx3")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx3")->base();
 	int size=memregion("gfx3")->bytes();
 	int data;
 

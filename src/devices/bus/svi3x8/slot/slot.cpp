@@ -19,7 +19,7 @@ const device_type SVI_SLOT_BUS = &device_creator<svi_slot_bus_device>;
 //  svi_slot_bus_device - constructor
 //-------------------------------------------------
 
-svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+svi_slot_bus_device::svi_slot_bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SVI_SLOT_BUS, "SVI Slot Bus", tag, owner, clock, "svislotbus", __FILE__),
 	m_int_handler(*this),
 	m_romdis_handler(*this),
@@ -73,7 +73,7 @@ void svi_slot_bus_device::add_card(device_svi_slot_interface *card)
 READ8_MEMBER( svi_slot_bus_device::mreq_r )
 {
 	device_svi_slot_interface *entry = m_dev.first();
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	while (entry)
 	{
@@ -106,7 +106,7 @@ WRITE8_MEMBER( svi_slot_bus_device::mreq_w )
 READ8_MEMBER( svi_slot_bus_device::iorq_r )
 {
 	device_svi_slot_interface *entry = m_dev.first();
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	while (entry)
 	{
@@ -203,7 +203,7 @@ const device_type SVI_SLOT = &device_creator<svi_slot_device>;
 //  svi_slot_device - constructor
 //-------------------------------------------------
 
-svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+svi_slot_device::svi_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SVI_SLOT, "SVI Slot", tag, owner, clock, "svislot", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_bus_tag(nullptr)

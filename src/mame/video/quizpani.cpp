@@ -68,15 +68,15 @@ WRITE16_MEMBER(quizpani_state::tilesbank_w)
 
 void quizpani_state::video_start()
 {
-	m_bg_tilemap  = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
-	m_txt_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_bg_tilemap  = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::bg_tile_info),this), tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
+	m_txt_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(quizpani_state::txt_tile_info),this),tilemap_mapper_delegate(FUNC(quizpani_state::bg_scan),this),16,16,256,32);
 	m_txt_tilemap->set_transparent_pen(15);
 
 	save_item(NAME(m_bgbank));
 	save_item(NAME(m_txtbank));
 }
 
-UINT32 quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t quizpani_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_scrollreg[0] - 64);
 	m_bg_tilemap->set_scrolly(0, m_scrollreg[1] + 16);

@@ -35,7 +35,7 @@ editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_co
 	// create an edit box and override its key handling
 	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), nullptr, EDIT_BOX_STYLE,
 			0, 0, 100, 100, window(), nullptr, GetModuleHandleUni(), nullptr);
-	m_original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(m_editwnd, GWLP_WNDPROC);
+	m_original_editproc = (WNDPROC)(uintptr_t)GetWindowLongPtr(m_editwnd, GWLP_WNDPROC);
 	SetWindowLongPtr(m_editwnd, GWLP_USERDATA, (LONG_PTR)this);
 	SetWindowLongPtr(m_editwnd, GWLP_WNDPROC, (LONG_PTR)&editwin_info::static_edit_proc);
 	SendMessage(m_editwnd, WM_SETFONT, (WPARAM)metrics().debug_font(), (LPARAM)FALSE);
@@ -79,7 +79,7 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 
 void editwin_info::set_editwnd_text(char const *text)
 {
-	auto tc_buffer = tstring_from_utf8(text);
+	auto tc_buffer = osd::text::to_tstring(text);
 	SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer.c_str());
 }
 
@@ -187,7 +187,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 						// process
 						{
-							auto utf8_buffer = utf8_from_tstring(buffer);
+							auto utf8_buffer = osd::text::from_tstring(buffer);
 							process_string(utf8_buffer.c_str());
 						}
 						break;
@@ -226,7 +226,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 LRESULT CALLBACK editwin_info::static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	editwin_info *const info = (editwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	editwin_info *const info = (editwin_info *)(uintptr_t)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	assert(info->m_editwnd == wnd);
 	return info->edit_proc(message, wparam, lparam);
 }

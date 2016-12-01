@@ -42,7 +42,7 @@ const device_type INS8154 = &device_creator<ins8154_device>;
 //  ins8154_device - constructor
 //-------------------------------------------------
 
-ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ins8154_device::ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INS8154, "INS8154 RAM I/O", tag, owner, clock, "ins8154", __FILE__),
 	m_in_a_cb(*this),
 	m_out_a_cb(*this),
@@ -94,7 +94,7 @@ void ins8154_device::device_reset()
 
 READ8_MEMBER(ins8154_device::ins8154_r)
 {
-	UINT8 val = 0xff;
+	uint8_t val = 0xff;
 
 	if (offset > 0x24)
 	{

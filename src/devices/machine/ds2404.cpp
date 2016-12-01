@@ -24,7 +24,7 @@ const device_type DS2404 = &device_creator<ds2404_device>;
 //  ds2404_device - constructor
 //-------------------------------------------------
 
-ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS2404, "DS2404", tag, owner, clock, "ds2404", __FILE__),
 		device_nvram_interface(mconfig, *this), m_tick_timer(nullptr), m_ref_year(0), m_ref_month(0), m_ref_day(0),
 		m_address(0),
@@ -43,7 +43,7 @@ ds2404_device::ds2404_device(const machine_config &mconfig, const char *tag, dev
 //  to set the reference year
 //-------------------------------------------------
 
-void ds2404_device::static_set_ref_year(device_t &device, UINT32 year)
+void ds2404_device::static_set_ref_year(device_t &device, uint32_t year)
 {
 	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
 	ds2404.m_ref_year = year;
@@ -55,7 +55,7 @@ void ds2404_device::static_set_ref_year(device_t &device, UINT32 year)
 //  to set the reference month
 //-------------------------------------------------
 
-void ds2404_device::static_set_ref_month(device_t &device, UINT8 month)
+void ds2404_device::static_set_ref_month(device_t &device, uint8_t month)
 {
 	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
 	ds2404.m_ref_month = month;
@@ -67,7 +67,7 @@ void ds2404_device::static_set_ref_month(device_t &device, UINT8 month)
 //  to set the reference day
 //-------------------------------------------------
 
-void ds2404_device::static_set_ref_day(device_t &device, UINT8 day)
+void ds2404_device::static_set_ref_day(device_t &device, uint8_t day)
 {
 	ds2404_device &ds2404 = downcast<ds2404_device &>(device);
 	ds2404.m_ref_day = day;
@@ -107,7 +107,7 @@ void ds2404_device::device_start()
 }
 
 
-void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
+void ds2404_device::ds2404_rom_cmd(uint8_t cmd)
 {
 	switch(cmd)
 	{
@@ -121,7 +121,7 @@ void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
 	}
 }
 
-void ds2404_device::ds2404_cmd(UINT8 cmd)
+void ds2404_device::ds2404_cmd(uint8_t cmd)
 {
 	switch(cmd)
 	{
@@ -155,7 +155,7 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 	}
 }
 
-UINT8 ds2404_device::ds2404_readmem()
+uint8_t ds2404_device::ds2404_readmem()
 {
 	if( m_address < 0x200 )
 	{
@@ -168,7 +168,7 @@ UINT8 ds2404_device::ds2404_readmem()
 	return 0;
 }
 
-void ds2404_device::ds2404_writemem(UINT8 value)
+void ds2404_device::ds2404_writemem(uint8_t value)
 {
 	if( m_address < 0x200 )
 	{
@@ -194,7 +194,7 @@ WRITE8_MEMBER( ds2404_device::ds2404_3w_reset_w )
 
 READ8_MEMBER( ds2404_device::ds2404_data_r )
 {
-	UINT8 value = 0;
+	uint8_t value = 0;
 	switch(m_state[m_state_ptr])
 	{
 		case DS2404_STATE_IDLE:
@@ -366,7 +366,7 @@ void ds2404_device::device_timer(emu_timer &timer, device_timer_id id, int param
 		}
 
 		default:
-			assert_always(FALSE, "Unknown id in ds2404_device::device_timer");
+			assert_always(false, "Unknown id in ds2404_device::device_timer");
 			break;
 	}
 }

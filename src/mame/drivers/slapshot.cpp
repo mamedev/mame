@@ -154,7 +154,7 @@ void slapshot_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in slapshot_state::device_timer");
+		assert_always(false, "Unknown id in slapshot_state::device_timer");
 	}
 }
 
@@ -669,8 +669,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(slapshot_state,slapshot)
 {
-	UINT32 offset,i;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint32_t offset,i;
+	uint8_t *gfx = memregion("gfx2")->base();
 	int size = memregion("gfx2")->bytes();
 	int data;
 

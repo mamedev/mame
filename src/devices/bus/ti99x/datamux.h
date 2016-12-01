@@ -20,6 +20,7 @@
 #include "bus/ti99_peb/peribox.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
+#include "machine/ram.h"
 
 extern const device_type DATAMUX;
 
@@ -29,7 +30,7 @@ extern const device_type DATAMUX;
 class ti99_datamux_device : public device_t
 {
 public:
-	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -55,32 +56,44 @@ protected:
 
 private:
 	// Link to the video processor
-	tms9928a_device* m_video;
+	optional_device<tms9928a_device> m_video;
 
 	// Link to the sound processor
-	sn76496_base_device* m_sound;
+	optional_device<sn76496_base_device> m_sound;
 
 	// Link to the peripheral expansion box
-	peribox_device* m_peb;
+	required_device<peribox_device> m_peb;
 
 	// Link to the cartridge port (aka GROM port)
-	gromport_device* m_gromport;
+	required_device<gromport_device> m_gromport;
+
+	// Memory expansion (internal, 16 bit)
+	required_device<ram_device> m_ram16b;
+
+	// Console RAM
+	required_device<ram_device> m_padram;
 
 	// Keeps the address space pointer
 	address_space* m_spacep;
 
+	// Console ROM
+	uint16_t* m_consolerom;
+
+	// Console GROMs
+	tmc0430_device* m_grom[3];
+
 	// Common read routine
-	void read_all(address_space& space, UINT16 addr, UINT8 *target);
+	void read_all(address_space& space, uint16_t addr, uint8_t *target);
 
 	// Common write routine
-	void write_all(address_space& space, UINT16 addr, UINT8 value);
+	void write_all(address_space& space, uint16_t addr, uint8_t value);
 
 	// Common set address method
-	void setaddress_all(address_space& space, UINT16 addr);
+	void setaddress_all(address_space& space, uint16_t addr);
 
 	// Debugger access
-	UINT16 debugger_read(address_space& space, UINT16 addr);
-	void debugger_write(address_space& space, UINT16 addr, UINT16 data);
+	uint16_t debugger_read(address_space& space, uint16_t addr);
+	void debugger_write(address_space& space, uint16_t addr, uint16_t data);
 
 	// Join own READY and external READY
 	void ready_join();
@@ -89,43 +102,34 @@ private:
 	devcb_write_line m_ready;
 
 	// Address latch (emu). In reality, the address bus remains constant.
-	UINT16 m_addr_buf;
+	uint16_t m_addr_buf;
 
 	// DBIN line
-	line_state m_dbin;
+	int m_dbin;
 
 	// Own ready state.
-	line_state  m_muxready;
+	int  m_muxready;
 
 	// Ready state. Needed to control wait state generation via inbound READY
-	line_state  m_sysready;
+	int  m_sysready;
 
-	/* Latch which stores the first (odd) byte */
-	UINT8 m_latch;
+	// Latch which stores the first (odd) byte
+	uint8_t m_latch;
 
-	/* Counter for the wait states. */
+	// Counter for the wait states.
 	int   m_waitcount;
 
-	/* Memory expansion (internal, 16 bit). */
-	std::unique_ptr<UINT16[]> m_ram16b;
-
-	// Console RAM
-	std::unique_ptr<UINT16[]> m_padram;
-
-	// Console ROM
-	UINT16* m_consolerom;
-
-	// Console GROMs
-	tmc0430_device* m_grom[3];
-
-	/* Use the memory expansion? */
+	// Use the memory expansion?
 	bool m_use32k;
 
-	/* Memory base for piggy-back 32K expansion. If 0, expansion is not used. */
-	UINT16  m_base32k;
+	// Memory base for piggy-back 32K expansion. If 0, expansion is not used.
+	uint16_t  m_base32k;
 
 	// Console GROMs are available (the HSGPL expects them to be removed)
 	bool m_console_groms_present;
+
+	// GROMs are idle, no need to propagate the clock
+	bool m_grom_idle;
 };
 
 /******************************************************************************/

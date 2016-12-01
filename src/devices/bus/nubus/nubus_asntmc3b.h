@@ -21,11 +21,11 @@ class nubus_mac8390_device :
 {
 public:
 		// construction/destruction
-		nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+		nubus_mac8390_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 		// optional information overrides
 		virtual machine_config_constructor device_mconfig_additions() const override;
-		virtual const rom_entry *device_rom_region() const override;
+		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		void dp_irq_w(int state);
 		DECLARE_READ8_MEMBER(dp_mem_read);
@@ -44,21 +44,21 @@ protected:
 		required_device<dp8390_device> m_dp83902;
 
 private:
-		UINT8 m_ram[0x20000];
-		UINT8 m_prom[16];
+		uint8_t m_ram[0x20000];
+		uint8_t m_prom[16];
 };
 
 class nubus_asntmc3nb_device : public nubus_mac8390_device
 {
 public:
-	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nubus_asntmc3nb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class nubus_appleenet_device : public nubus_mac8390_device
 {
 public:
-	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	virtual const rom_entry *device_rom_region() const override;
+	nubus_appleenet_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual const tiny_rom_entry *device_rom_region() const override;
 };
 
 // device type definition

@@ -7,30 +7,21 @@
     Core templates for basic non-string types.
 
 ***************************************************************************/
+#ifndef MAME_UTIL_CORETMPL_H
+#define MAME_UTIL_CORETMPL_H
 
 #pragma once
 
-#ifndef __CORETMPL_H__
-#define __CORETMPL_H__
-
+#include "osdcomm.h"
 #include "osdcore.h"
 #include "corealloc.h"
 
+#include <array>
+#include <cstddef>
+#include <iterator>
+#include <stdexcept>
+#include <utility>
 #include <vector>
-
-#if defined(_MSC_VER) && (_MSC_VER < 1900)
-#include <yvals.h>
-#define noexcept _NOEXCEPT
-#endif
-
-// TEMPORARY helper to catch is_pod assertions in the debugger
-#if 0
-#undef assert
-#define assert(x) do { if (!(x)) { fprintf(stderr, "Assert: %s\n", #x); osd_break_into_debugger("Assertion failed"); } } while (0)
-#endif
-
-
-typedef std::vector<UINT8> dynamic_buffer;
 
 
 // ======================> simple_list
@@ -43,32 +34,53 @@ class simple_list final
 public:
 	class auto_iterator
 	{
-public:
+	public:
+		typedef int difference_type;
+		typedef _ElementType value_type;
+		typedef _ElementType *pointer;
+		typedef _ElementType &reference;
+		typedef std::forward_iterator_tag iterator_category;
+
 		// construction/destruction
+		auto_iterator() noexcept : m_current(nullptr) { }
 		auto_iterator(_ElementType *ptr) noexcept : m_current(ptr) { }
 
-		// required operator overrides
+		// required operator overloads
+		bool operator==(const auto_iterator &iter) const noexcept { return m_current == iter.m_current; }
 		bool operator!=(const auto_iterator &iter) const noexcept { return m_current != iter.m_current; }
 		_ElementType &operator*() const noexcept { return *m_current; }
+		_ElementType *operator->() const noexcept { return m_current; }
 		// note that _ElementType::next() must not return a const ptr
-		const auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
+		auto_iterator &operator++() noexcept { m_current = m_current->next(); return *this; }
+		auto_iterator operator++(int) noexcept { auto_iterator result(*this); m_current = m_current->next(); return result; }
 
-private:
+	private:
 		// private state
 		_ElementType *m_current;
 	};
+
+	// construction/destruction
+	simple_list() noexcept
+		: m_head(nullptr)
+		, m_tail(nullptr)
+		, m_count(0)
+	{
+	}
+	~simple_list() noexcept { reset(); }
 
 	// we don't support deep copying
 	simple_list(const simple_list &) = delete;
 	simple_list &operator=(const simple_list &) = delete;
 
-	// construction/destruction
-	simple_list() noexcept
-		: m_head(nullptr),
-			m_tail(nullptr),
-			m_count(0) { }
-
-	~simple_list() noexcept { reset(); }
+	// but we do support cheap swap/move
+	simple_list(simple_list &&list) : simple_list() { operator=(std::move(list)); }
+	simple_list &operator=(simple_list &&list)
+	{
+		using std::swap;
+		swap(m_head, list.m_head);
+		swap(m_tail, list.m_tail);
+		swap(m_count, list.m_count);
+	}
 
 	// simple getters
 	_ElementType *first() const noexcept { return m_head; }
@@ -225,7 +237,7 @@ private:
 		return object;
 	}
 
-	// deatch the entire list, returning the head, but don't free memory
+	// detach the entire list, returning the head, but don't free memory
 	_ElementType *detach_all() noexcept
 	{
 		_ElementType *result = m_head;
@@ -339,4 +351,206 @@ private:
 };
 
 
-#endif
+// ======================> contiguous_sequence_wrapper
+
+namespace util {
+
+using osd::u8;
+using osd::u16;
+using osd::u32;
+using osd::u64;
+
+using osd::s8;
+using osd::s16;
+using osd::s32;
+using osd::s64;
+
+
+// wraps an existing sequence of values
+template<typename T>
+class contiguous_sequence_wrapper
+{
+public:
+	typedef std::ptrdiff_t difference_type;
+	typedef std::size_t size_type;
+	typedef T value_type;
+	typedef T &reference;
+	typedef const T &const_reference;
+	typedef T *pointer;
+	typedef T *iterator;
+	typedef const T *const_iterator;
+	typedef std::reverse_iterator<iterator> reverse_iterator;
+	typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
+
+	contiguous_sequence_wrapper(T *ptr, std::size_t size)
+		: m_begin(ptr)
+		, m_end(ptr + size)
+	{
+	}
+
+	contiguous_sequence_wrapper(const contiguous_sequence_wrapper &that) = default;
+
+	// iteration
+	iterator begin() { return m_begin; }
+	const_iterator begin() const { return m_begin; }
+	const_iterator cbegin() const { return m_begin; }
+	iterator end() { return m_end; }
+	const_iterator end() const { return m_end; }
+	const_iterator cend() const { return m_end; }
+
+	// reverse iteration
+	reverse_iterator rbegin() { return std::reverse_iterator<iterator>(end()); }
+	const_reverse_iterator rbegin() const { return std::reverse_iterator<const_iterator>(end()); }
+	const_reverse_iterator crbegin() const { return std::reverse_iterator<const_iterator>(cend()); }
+	reverse_iterator rend() { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator rend() const { return std::reverse_iterator<iterator>(begin()); }
+	const_reverse_iterator crend() const { return std::reverse_iterator<iterator>(begin()); }
+
+	// capacity
+	size_type size() const { return m_end - m_begin; }
+	size_type max_size() const { return size(); }
+	bool empty() const { return size() == 0; }
+
+	// element access
+	reference front() { return operator[](0); }
+	const_reference front() const { return operator[](0); }
+	reference back() { return operator[](size() - 1); }
+	const_reference back() const { return operator[](size() - 1); }
+	reference operator[] (size_type n) { return m_begin[n]; }
+	const_reference operator[] (size_type n) const { return m_begin[n]; }
+	reference at(size_type n) { check_in_bounds(n); return operator[](n); }
+	const_reference at(size_type n) const { check_in_bounds(n); return operator[](n); }
+
+private:
+	iterator m_begin;
+	iterator m_end;
+
+	void check_in_bounds(size_type n)
+	{
+		if (n < 0 || n >= size())
+			throw std::out_of_range("invalid contiguous_sequence_wrapper<T> subscript");
+	}
+};
+
+
+template <typename T, std::size_t N, bool WriteWrap = false, bool ReadWrap = WriteWrap>
+class fifo : protected std::array<T, N>
+{
+public:
+	fifo()
+		: std::array<T, N>()
+		, m_head(this->begin())
+		, m_tail(this->begin())
+		, m_empty(true)
+	{
+		static_assert(0U < N, "FIFO must have at least one element");
+	}
+	fifo(fifo<T, N, WriteWrap, ReadWrap> const &) = delete;
+	fifo(fifo<T, N, WriteWrap, ReadWrap> &&) = delete;
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> const &) = delete;
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> &&) = delete;
+
+	template <bool W, bool R>
+	fifo(fifo<T, N, W, R> const &that)
+		: std::array<T, N>(that)
+		, m_head(std::advance(this->begin(), std::distance(that.begin(), that.m_head)))
+		, m_tail(std::advance(this->begin(), std::distance(that.begin(), that.m_tail)))
+		, m_empty(that.m_empty)
+	{
+	}
+
+	template <bool W, bool R>
+	fifo(fifo<T, N, W, R> &&that)
+		: std::array<T, N>(std::move(that))
+		, m_head(std::advance(this->begin(), std::distance(that.begin(), that.m_head)))
+		, m_tail(std::advance(this->begin(), std::distance(that.begin(), that.m_tail)))
+		, m_empty(that.m_empty)
+	{
+	}
+
+	template <bool W, bool R>
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, W, R> const &that)
+	{
+		std::array<T, N>::operator=(that);
+		m_head = std::advance(this->begin(), std::distance(that.begin(), that.m_head));
+		m_tail = std::advance(this->begin(), std::distance(that.begin(), that.m_tail));
+		m_empty = that.m_empty;
+		return *this;
+	}
+
+	template <bool W, bool R>
+	fifo<T, N, WriteWrap, ReadWrap> &operator=(fifo<T, N, WriteWrap, ReadWrap> &&that)
+	{
+		std::array<T, N>::operator=(std::move(that));
+		m_head = std::advance(this->begin(), std::distance(that.begin(), that.m_head));
+		m_tail = std::advance(this->begin(), std::distance(that.begin(), that.m_tail));
+		m_empty = that.m_empty;
+		return *this;
+	}
+
+	bool full() const { return !m_empty && (m_head == m_tail); }
+	bool empty() const { return m_empty; }
+
+	void enqueue(T const &v)
+	{
+		if (WriteWrap || m_empty || (m_head != m_tail))
+		{
+			*m_tail = v;
+			if (this->end() == ++m_tail)
+				m_tail = this->begin();
+			m_empty = false;
+		}
+	}
+
+	void enqueue(T &&v)
+	{
+		if (WriteWrap || m_empty || (m_head != m_tail))
+		{
+			*m_tail = std::move(v);
+			if (this->end() == ++m_tail)
+				m_tail = this->begin();
+			m_empty = false;
+		}
+	}
+
+	T const &dequeue()
+	{
+		T const &result(*m_head);
+		if (ReadWrap || !m_empty)
+		{
+			if (this->end() == ++m_head)
+				m_head = this->begin();
+			m_empty = (m_head == m_tail);
+		}
+		return result;
+	}
+
+	void poke(T &v)
+	{
+		*m_tail = v;
+	}
+
+	void poke(T &&v)
+	{
+		*m_tail = std::move(v);
+	}
+
+	T const &peek() const
+	{
+		return *m_head;
+	}
+
+	void clear()
+	{
+		m_head = m_tail = this->begin();
+		m_empty = true;
+	}
+
+private:
+	typename fifo::iterator m_head, m_tail;
+	bool                    m_empty;
+};
+
+}; // namespace util
+
+#endif // MAME_UTIL_CORETMPL_H

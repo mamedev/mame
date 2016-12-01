@@ -14,7 +14,6 @@
 
 #include "ui/ui.h"
 #include "ui/miscmenu.h"
-#include "ui/datfile.h"
 #include "ui/inifile.h"
 #include "ui/datmenu.h"
 #include "ui/optsmenu.h"
@@ -31,26 +30,12 @@
 #include "mame.h"
 #include "rendfont.h"
 #include "rendutil.h"
-#include "softlist.h"
+#include "softlist_dev.h"
 #include "uiinput.h"
-
+#include "luaengine.h"
 extern const char UI_VERSION_TAG[];
 
 namespace ui {
-namespace {
-char const *const dats_info[] = {
-	__("General Info"),
-	__("History"),
-	__("Mameinfo"),
-	__("Sysinfo"),
-	__("Messinfo"),
-	__("Command"),
-	__("Gameinit"),
-	__("Mamescore")
-};
-
-} // anonymous namespace
-
 bool menu_select_game::first_start = true;
 std::vector<const game_driver *> menu_select_game::m_sortedlist;
 int menu_select_game::m_isabios = 0;
@@ -61,10 +46,6 @@ int menu_select_game::m_isabios = 0;
 
 menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &container, const char *gamename)
 	: menu_select_launch(mui, container, false)
-	, m_info_buffer()
-	, m_info_driver(nullptr)
-	, m_info_software(nullptr)
-	, m_info_view(-1)
 {
 	highlight = 0;
 	std::string error_string, last_filter, sub_filter;
@@ -139,10 +120,11 @@ menu_select_game::menu_select_game(mame_ui_manager &mui, render_container &conta
 	mui.machine().options().set_value(OPTION_SOFTWARENAME, "", OPTION_PRIORITY_CMDLINE, error_string);
 
 	ui_globals::curimage_view = FIRST_VIEW;
-	ui_globals::curdats_view = UI_FIRST_LOAD;
+	ui_globals::curdats_view = 0;
 	ui_globals::switch_image = false;
 	ui_globals::default_image = true;
 	ui_globals::panels_status = moptions.hide_panels();
+	ui_globals::curdats_total = 1;
 	m_searchlist[0] = nullptr;
 }
 
@@ -156,11 +138,15 @@ menu_select_game::~menu_select_game()
 	game_driver const *const driver(isfavorite() ? nullptr : reinterpret_cast<game_driver const *>(get_selection_ref()));
 	ui_software_info *const swinfo(isfavorite() ? reinterpret_cast<ui_software_info *>(get_selection_ref()) : nullptr);
 
-	if ((FPTR)driver > skip_main_items)
+	if (reinterpret_cast<uintptr_t>(driver) > skip_main_items)
 		last_driver = driver->name;
+	else if (driver && m_prev_selected)
+		last_driver = reinterpret_cast<game_driver const *>(m_prev_selected)->name;
 
-	if ((FPTR)swinfo > skip_main_items)
+	if (reinterpret_cast<uintptr_t>(swinfo) > skip_main_items)
 		last_driver = swinfo->shortname;
+	else if (swinfo && m_prev_selected)
+		last_driver = reinterpret_cast<ui_software_info *>(m_prev_selected)->shortname;
 
 	std::string filter(main_filters::text[main_filters::actual]);
 	if (main_filters::actual == FILTER_MANUFACTURER)
@@ -185,7 +171,6 @@ void menu_select_game::handle()
 		m_prev_selected = item[0].ref;
 
 	bool check_filter = false;
-	bool enabled_dats = ui().options().enabled_dats();
 
 	// if i have to load datfile, performe an hard reset
 	if (ui_globals::reset)
@@ -199,7 +184,7 @@ void menu_select_game::handle()
 	// if i have to reselect a software, force software list submenu
 	if (reselect_last::get())
 	{
-		const game_driver *driver = (const game_driver *)item[selected].ref;
+		const game_driver *const driver = reinterpret_cast<const game_driver *>(get_selection_ref());
 		menu::stack_push<menu_select_software>(ui(), container(), driver);
 		return;
 	}
@@ -270,7 +255,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view > UI_FIRST_LOAD)
+					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view > 0)
 					{
 						ui_globals::curdats_view--;
 						m_topline_datsview = 0;
@@ -279,12 +264,12 @@ void menu_select_game::handle()
 				else
 				{
 					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view > UI_FIRST_LOAD)
+					if (drv->startempty == 1 && ui_globals::curdats_view > 0)
 					{
 						ui_globals::curdats_view--;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
+					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view > 0)
 					{
 						ui_globals::cur_sw_dats_view--;
 						m_topline_datsview = 0;
@@ -308,7 +293,7 @@ void menu_select_game::handle()
 				if (!isfavorite())
 				{
 					const game_driver *drv = (const game_driver *)menu_event->itemref;
-					if ((FPTR)drv > skip_main_items && ui_globals::curdats_view < UI_LAST_LOAD)
+					if ((uintptr_t)drv > skip_main_items && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
@@ -317,12 +302,12 @@ void menu_select_game::handle()
 				else
 				{
 					ui_software_info *drv = (ui_software_info *)menu_event->itemref;
-					if (drv->startempty == 1 && ui_globals::curdats_view < UI_LAST_LOAD)
+					if (drv->startempty == 1 && ui_globals::curdats_view < (ui_globals::curdats_total - 1))
 					{
 						ui_globals::curdats_view++;
 						m_topline_datsview = 0;
 					}
-					else if ((FPTR)drv > skip_main_items && ui_globals::cur_sw_dats_view < 1)
+					else if ((uintptr_t)drv > skip_main_items && ui_globals::cur_sw_dats_view < (ui_globals::cur_sw_dats_total - 1))
 					{
 						ui_globals::cur_sw_dats_view++;
 						m_topline_datsview = 0;
@@ -356,26 +341,25 @@ void menu_select_game::handle()
 			m_search[0] = '\0';
 			reset(reset_options::SELECT_FIRST);
 		}
-		else if (menu_event->iptkey == IPT_UI_DATS && enabled_dats)
+		else if (menu_event->iptkey == IPT_UI_DATS)
 		{
 			// handle UI_DATS
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((FPTR)driver > skip_main_items && mame_machine_manager::instance()->datfile().has_data(driver))
+				if ((uintptr_t)driver > skip_main_items && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", driver->name, true))
 					menu::stack_push<menu_dats_view>(ui(), container(), driver);
 			}
 			else
 			{
 				ui_software_info *ui_swinfo  = (ui_software_info *)menu_event->itemref;
-				datfile_manager &mdat = mame_machine_manager::instance()->datfile();
 
-				if ((FPTR)ui_swinfo > skip_main_items)
+				if ((uintptr_t)ui_swinfo > skip_main_items)
 				{
-					if (ui_swinfo->startempty == 1 && mdat.has_history(ui_swinfo->driver))
+					if (ui_swinfo->startempty == 1 && mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", ui_swinfo->driver->name, true))
 						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo->driver);
-					else if (mdat.has_software(ui_swinfo->listname, ui_swinfo->shortname, ui_swinfo->parentname) || !ui_swinfo->usage.empty())
-						menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
+					else if (mame_machine_manager::instance()->lua()->call_plugin_check<const char *>("data_list", std::string(ui_swinfo->shortname).append(1, ',').append(ui_swinfo->listname).c_str()) || !ui_swinfo->usage.empty())
+							menu::stack_push<menu_dats_view>(ui(), container(), ui_swinfo);
 				}
 			}
 		}
@@ -385,7 +369,7 @@ void menu_select_game::handle()
 			if (!isfavorite())
 			{
 				const game_driver *driver = (const game_driver *)menu_event->itemref;
-				if ((FPTR)driver > skip_main_items)
+				if ((uintptr_t)driver > skip_main_items)
 				{
 					favorite_manager &mfav = mame_machine_manager::instance()->favorite();
 					if (!mfav.isgame_favorite(driver))
@@ -404,7 +388,7 @@ void menu_select_game::handle()
 			else
 			{
 				ui_software_info *swinfo = (ui_software_info *)menu_event->itemref;
-				if ((FPTR)swinfo > skip_main_items)
+				if ((uintptr_t)swinfo > skip_main_items)
 				{
 					machine().popmessage(_("%s\n removed from favorites list."), swinfo->longname.c_str());
 					mame_machine_manager::instance()->favorite().remove_favorite_game(*swinfo);
@@ -412,7 +396,7 @@ void menu_select_game::handle()
 				}
 			}
 		}
-		else if (menu_event->iptkey == IPT_UI_EXPORT && !isfavorite())
+		else if (menu_event->iptkey == IPT_UI_EXPORT)
 		{
 			// handle UI_EXPORT
 			inkey_export();
@@ -509,17 +493,17 @@ void menu_select_game::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate()
+void menu_select_game::populate(float &customtop, float &custombottom)
 {
 	ui_globals::redraw_icon = true;
 	ui_globals::switch_image = true;
 	int old_item_selected = -1;
-	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 
 	if (!isfavorite())
 	{
 		// if search is not empty, find approximate matches
-		if (m_search[0] != 0 && !isfavorite())
+		if (m_search[0] != 0)
 			populate_search();
 		else
 		{
@@ -567,36 +551,37 @@ void menu_select_game::populate()
 			}
 		}
 	}
-	// populate favorites list
 	else
 	{
+		// populate favorites list
 		m_search[0] = '\0';
 		int curitem = 0;
+
 		// iterate over entries
-		for (auto & mfavorite : mame_machine_manager::instance()->favorite().m_list)
+		for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
 		{
 			auto flags = flags_ui | FLAG_UI_FAVORITE;
-			if (mfavorite.startempty == 1)
+			if (favmap.second.startempty == 1)
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
 
-				bool cloneof = strcmp(mfavorite.driver->parent, "0");
+				bool cloneof = strcmp(favmap.second.driver->parent, "0");
 				if (cloneof)
 				{
-					int cx = driver_list::find(mfavorite.driver->parent);
+					int cx = driver_list::find(favmap.second.driver->parent);
 					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
 						cloneof = false;
 				}
 
-				item_append(mfavorite.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&mfavorite);
+				item_append(favmap.second.longname, "", (cloneof) ? (flags | FLAG_INVERT) : flags, (void *)&favmap.second);
 			}
 			else
 			{
-				if (old_item_selected == -1 && mfavorite.shortname == reselect_last::driver)
+				if (old_item_selected == -1 && favmap.second.shortname == reselect_last::driver)
 					old_item_selected = curitem;
-				item_append(mfavorite.longname, mfavorite.devicetype,
-					mfavorite.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&mfavorite);
+				item_append(favmap.second.longname, favmap.second.devicetype,
+							favmap.second.parentname.empty() ? flags : (FLAG_INVERT | flags), (void *)&favmap.second);
 			}
 			curitem++;
 		}
@@ -607,12 +592,12 @@ void menu_select_game::populate()
 	// add special items
 	if (stack_has_special_main_menu())
 	{
-		item_append(_("Configure Options"), "", flags_ui, (void *)(FPTR)CONF_OPTS);
-		item_append(_("Configure Machine"), "", flags_ui, (void *)(FPTR)CONF_MACHINE);
+		item_append(_("Configure Options"), "", flags_ui, (void *)(uintptr_t)CONF_OPTS);
+		item_append(_("Configure Machine"), "", flags_ui, (void *)(uintptr_t)CONF_MACHINE);
 		skip_main_items = 2;
 		if (machine().options().plugins())
 		{
-			item_append(_("Plugins"), "", flags_ui, (void *)(FPTR)CONF_PLUGINS);
+			item_append(_("Plugins"), "", flags_ui, (void *)(uintptr_t)CONF_PLUGINS);
 			skip_main_items++;
 		}
 	}
@@ -661,7 +646,7 @@ void menu_select_game::build_available_list()
 
 		// build a name for it
 		for (src = dir->name; *src != 0 && *src != '.' && dst < &drivername[ARRAY_LENGTH(drivername) - 1]; ++src)
-			*dst++ = tolower((UINT8) * src);
+			*dst++ = tolower((uint8_t) * src);
 
 		*dst = 0;
 		int drivnum = driver_list::find(drivername);
@@ -680,7 +665,8 @@ void menu_select_game::build_available_list()
 			auto driver = &driver_list::driver(x);
 			if (!m_included[x] && driver != &GAME_NAME(___empty))
 			{
-				const rom_entry *rom = driver->rom;
+				auto entries = rom_build_entries(driver->rom);
+				const rom_entry *rom = entries.data();
 				bool noroms = true;
 
 				// check NO-DUMP
@@ -699,8 +685,7 @@ void menu_select_game::build_available_list()
 					if (cx != -1 && m_included[cx])
 					{
 						auto drv = &driver_list::driver(cx);
-						auto parentrom = drv->rom;
-						if ((rom = driver->rom) == parentrom)
+						if (driver->rom == drv->rom)
 							noroms = true;
 
 						// check if clone < parent
@@ -715,9 +700,10 @@ void menu_select_game::build_available_list()
 									if (hashes.flag(util::hash_collection::FLAG_NO_DUMP) || ROM_ISOPTIONAL(rom))
 										continue;
 
-									UINT64 lenght = ROM_GETLENGTH(rom);
+									uint64_t lenght = ROM_GETLENGTH(rom);
 									auto found = false;
-									for (parentrom = drv->rom; !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
+									auto parent_entries = rom_build_entries(drv->rom);
+									for (auto parentrom = parent_entries.data(); !ROMENTRY_ISEND(parentrom) && found == false; ++parentrom)
 									{
 										if (ROMENTRY_ISFILE(parentrom) && ROM_GETLENGTH(parentrom) == lenght)
 										{
@@ -787,11 +773,11 @@ void menu_select_game::inkey_select(const event *menu_event)
 	const game_driver *driver = (const game_driver *)menu_event->itemref;
 
 	// special case for configure options
-	if ((FPTR)driver == CONF_OPTS)
+	if ((uintptr_t)driver == CONF_OPTS)
 		menu::stack_push<menu_game_options>(ui(), container());
 
 	// special case for configure machine
-	else if (FPTR(driver) == CONF_MACHINE)
+	else if (uintptr_t(driver) == CONF_MACHINE)
 	{
 		if (m_prev_selected)
 			menu::stack_push<menu_machine_configure>(ui(), container(), reinterpret_cast<const game_driver *>(m_prev_selected));
@@ -799,7 +785,7 @@ void menu_select_game::inkey_select(const event *menu_event)
 	}
 
 	// special case for configure plugins
-	else if ((FPTR)driver == CONF_PLUGINS)
+	else if ((uintptr_t)driver == CONF_PLUGINS)
 	{
 		menu::stack_push<menu_plugins_configure>(ui(), container());
 	}
@@ -856,12 +842,12 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 	ui_software_info *ui_swinfo = (ui_software_info *)menu_event->itemref;
 	ui_options &mopt = ui().options();
 
-	if ((FPTR)ui_swinfo == CONF_OPTS)
+	if ((uintptr_t)ui_swinfo == CONF_OPTS)
 	{
 		// special case for configure options
 		menu::stack_push<menu_game_options>(ui(), container());
 	}
-	else if ((FPTR)ui_swinfo == CONF_MACHINE)
+	else if ((uintptr_t)ui_swinfo == CONF_MACHINE)
 	{
 		// special case for configure machine
 		if (m_prev_selected)
@@ -871,7 +857,7 @@ void menu_select_game::inkey_select_favorite(const event *menu_event)
 		}
 		return;
 	}
-	else if ((FPTR)ui_swinfo == CONF_PLUGINS)
+	else if ((uintptr_t)ui_swinfo == CONF_PLUGINS)
 	{
 		// special case for configure plugins
 		menu::stack_push<menu_plugins_configure>(ui(), container());
@@ -983,23 +969,8 @@ void menu_select_game::inkey_special(const event *menu_event)
 {
 	if (!isfavorite())
 	{
-		auto const buflen = std::strlen(m_search);
-
-		if ((menu_event->unichar == 8) || (menu_event->unichar == 0x7f))
-		{
-			// if it's a backspace and we can handle it, do so
-			if (0 < buflen)
-			{
-				*const_cast<char *>(utf8_previous_char(&m_search[buflen])) = 0;
-				reset(reset_options::SELECT_FIRST);
-			}
-		}
-		else if (menu_event->is_char_printable())
-		{
-			// if it's any other key and we're not maxed out, update
-			if (menu_event->append_char(m_search, buflen))
-				reset(reset_options::SELECT_FIRST);
-		}
+		if (input_character(m_search, menu_event->unichar, uchar_is_printable))
+			reset(reset_options::SELECT_FIRST);
 	}
 }
 
@@ -1010,9 +981,6 @@ void menu_select_game::inkey_special(const event *menu_event)
 
 void menu_select_game::build_list(const char *filter_text, int filter, bool bioscheck, std::vector<const game_driver *> s_drivers)
 {
-	int cx = 0;
-	bool cloneof = false;
-
 	if (s_drivers.empty())
 	{
 		filter = main_filters::actual;
@@ -1054,20 +1022,21 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 
 		case FILTER_PARENT:
 		case FILTER_CLONES:
-			cloneof = strcmp(s_driver->parent, "0");
-			if (cloneof)
 			{
-				cx = driver_list::find(s_driver->parent);
-				if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
-					cloneof = false;
+				bool cloneof = strcmp(s_driver->parent, "0");
+				if (cloneof)
+				{
+					auto cx = driver_list::find(s_driver->parent);
+					if (cx != -1 && ((driver_list::driver(cx).flags & MACHINE_IS_BIOS_ROOT) != 0))
+						cloneof = false;
+				}
+
+				if (filter == FILTER_CLONES && cloneof)
+					m_displaylist.push_back(s_driver);
+				else if (filter == FILTER_PARENT && !cloneof)
+					m_displaylist.push_back(s_driver);
 			}
-
-			if (filter == FILTER_CLONES && cloneof)
-				m_displaylist.push_back(s_driver);
-			else if (filter == FILTER_PARENT && !cloneof)
-				m_displaylist.push_back(s_driver);
 			break;
-
 		case FILTER_NOT_WORKING:
 			if (s_driver->flags & MACHINE_NOT_WORKING)
 				m_displaylist.push_back(s_driver);
@@ -1111,18 +1080,22 @@ void menu_select_game::build_list(const char *filter_text, int filter, bool bios
 			}
 			break;
 		case FILTER_CHD:
-			for (const rom_entry *rom = s_driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-				if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
-				{
-					m_displaylist.push_back(s_driver);
-					break;
+			{
+				auto entries = rom_build_entries(s_driver->rom);
+				for (const rom_entry &rom : entries)
+					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
+					{
+						m_displaylist.push_back(s_driver);
+						break;
+					}
 				}
 			break;
 		case FILTER_NOCHD:
 			{
+				auto entries = rom_build_entries(s_driver->rom);
 				bool found = false;
-				for (const rom_entry *rom = s_driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-					if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+				for (const rom_entry &rom : entries)
+					if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
 					{
 						found = true;
 						break;
@@ -1236,7 +1209,7 @@ void menu_select_game::populate_search()
 	}
 
 	(index < VISIBLE_GAMES_IN_SEARCH) ? m_searchlist[index] = nullptr : m_searchlist[VISIBLE_GAMES_IN_SEARCH] = nullptr;
-	UINT32 flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
+	uint32_t flags_ui = FLAG_LEFT_ARROW | FLAG_RIGHT_ARROW;
 	for (int curitem = 0; m_searchlist[curitem]; ++curitem)
 	{
 		bool cloneof = strcmp(m_searchlist[curitem]->parent, "0");
@@ -1267,7 +1240,7 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	if (cloneof != -1)
 		util::stream_format(str, _("Driver is Clone of: %1$-.100s\n"), driver_list::driver(cloneof).description);
 	else
-		str << _("Driver is Parent\n");
+		str << _("Driver is Parent:\n");
 
 	if (driver->flags & MACHINE_NOT_WORKING)
 		str << _("Overall: NOT WORKING\n");
@@ -1301,8 +1274,9 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	util::stream_format(str, _("Support Save: %1$s\n"), ((driver->flags & MACHINE_SUPPORTS_SAVE) ? _("Yes") : _("No")));
 	util::stream_format(str, _("Screen Orientation: %1$s\n"), ((driver->flags & ORIENTATION_SWAP_XY) ? _("Vertical") : _("Horizontal")));
 	bool found = false;
-	for (const rom_entry *rom = driver->rom; !ROMENTRY_ISEND(rom); ++rom)
-		if (ROMENTRY_ISREGION(rom) && ROMREGION_ISDISKDATA(rom))
+	auto entries = rom_build_entries(driver->rom);
+	for (const rom_entry &rom : entries)
+		if (ROMENTRY_ISREGION(&rom) && ROMREGION_ISDISKDATA(&rom))
 		{
 			found = true;
 			break;
@@ -1334,6 +1308,24 @@ void menu_select_game::general_info(const game_driver *driver, std::string &buff
 	else
 		str << _("Roms Audit Pass: Disabled\nSamples Audit Pass: Disabled\n");
 
+	std::istringstream istr(str.str());
+	std::string line;
+	float spacewid = ui().get_char_width(0x200a);
+	str.clear();
+	str.seekp(0);
+	str << "#jp\n";
+	while(std::getline(istr, line))
+	{
+		int nspace = floor((0.35 - ui().get_string_width(line.c_str())) / spacewid);
+		if(nspace < 5)
+			nspace = 5;
+		std::string newstr;
+		newstr.reserve((nspace * 3) + line.length());
+		newstr.append(line.substr(0, line.find(':')));
+		for(int i = 0; i < nspace; i++)
+			newstr.append("\xE2\x80\x8A");
+		str << newstr.append(line.substr(line.find(':') + 1, line.npos)).append("\n");
+	}
 	buffer = str.str();
 }
 
@@ -1347,8 +1339,23 @@ void menu_select_game::inkey_export()
 	}
 	else
 	{
-		list = m_displaylist;
+		if (isfavorite())
+		{
+			// iterate over favorites
+			for (auto & favmap : mame_machine_manager::instance()->favorite().m_list)
+			{
+				if (favmap.second.startempty == 1)
+					list.push_back(favmap.second.driver);
+				else
+					return;
+			}
+		}
+		else
+		{
+			list = m_displaylist;
+		}
 	}
+
 	menu::stack_push<menu_export>(ui(), container(), std::move(list));
 }
 
@@ -1411,11 +1418,10 @@ bool menu_select_game::load_available_machines()
 
 	file.gets(rbuf, MAX_CHAR_INFO);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	int avsize = 0, unavsize = 0;
 	file.gets(rbuf, MAX_CHAR_INFO);
-	avsize = atoi(rbuf);
+	auto avsize = atoi(rbuf);
 	file.gets(rbuf, MAX_CHAR_INFO);
-	unavsize = atoi(rbuf);
+	auto unavsize = atoi(rbuf);
 
 	// load available list
 	for (int x = 0; x < avsize; ++x)
@@ -1553,12 +1559,12 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
 			rgb_t fgcolor = UI_TEXT_COLOR;
 
-			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y1 + line_height_max > mouse_y)
+			if (mouse_in_rect(x1, y1, x2, y1 + line_height_max))
 			{
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				fgcolor = UI_MOUSEOVER_COLOR;
 				hover = phover + filter;
-				menu::highlight(x1, y1, x2, y1+ line_height_max, bgcolor);
+				menu::highlight(x1, y1, x2, y1 + line_height_max, bgcolor);
 			}
 
 			if (highlight == filter && get_focus() == focused_menu::left)
@@ -1566,7 +1572,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
 				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
 				ui().draw_textured_box(container(), x1, y1, x2, y1 + line_height_max, bgcolor, rgb_t(255, 43, 43, 43),
-						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
+						hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(1));
 			}
 
 			float x1t = x1 + text_sign;
@@ -1620,7 +1626,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;
@@ -1643,7 +1649,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;
@@ -1654,312 +1660,6 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 	}
 }
 
-//-------------------------------------------------
-//  draw infos
-//-------------------------------------------------
-
-void menu_select_game::infos_render(float origx1, float origy1, float origx2, float origy2)
-{
-	float const line_height = ui().get_line_height();
-	float text_size = ui().options().infos_size();
-	std::vector<int> xstart;
-	std::vector<int> xend;
-
-	ui_software_info const *software;
-	game_driver const *driver;
-	get_selection(software, driver);
-
-	if (software && ((software->startempty != 1) || !driver))
-	{
-		m_info_driver = nullptr;
-
-		float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-		float ud_arrow_width = line_height * machine().render().ui_aspect();
-		float oy1 = origy1 + line_height;
-
-		// apply title to right panel
-		if (software->usage.empty())
-		{
-			ui().draw_text_full(container(), _("History"), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-					mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			ui_globals::cur_sw_dats_view = 0;
-		}
-		else
-		{
-			float title_size = 0.0f;
-			float txt_length = 0.0f;
-			std::string t_text[2];
-			t_text[0] = _("History");
-			t_text[1] = _("Usage");
-
-			for (auto & elem: t_text)
-			{
-				ui().draw_text_full(container(), elem.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER, ui::text_layout::TRUNCATE,
-						mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
-				txt_length += 0.01f;
-				title_size = (std::max)(txt_length, title_size);
-			}
-
-			rgb_t fgcolor = UI_TEXT_COLOR;
-			rgb_t bgcolor = UI_TEXT_BG_COLOR;
-			if (get_focus() == focused_menu::rightbottom)
-			{
-				fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-				bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-			}
-
-			float middle = origx2 - origx1;
-
-			if (bgcolor != UI_TEXT_BG_COLOR)
-			{
-				ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-						origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-			}
-
-			ui().draw_text_full(container(), t_text[ui_globals::cur_sw_dats_view].c_str(), origx1, origy1, origx2 - origx1,
-					ui::text_layout::CENTER, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr);
-
-			draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::cur_sw_dats_view, 0, 1, title_size);
-		}
-
-		if (m_info_software != software || m_info_view != ui_globals::cur_sw_dats_view)
-		{
-			m_info_buffer.clear();
-			m_info_view = ui_globals::cur_sw_dats_view;
-			m_info_software = software;
-			if (ui_globals::cur_sw_dats_view == 0)
-			{
-				if (software->startempty == 1)
-					mame_machine_manager::instance()->datfile().load_data_info(software->driver, m_info_buffer, UI_HISTORY_LOAD);
-				else
-					mame_machine_manager::instance()->datfile().load_software_info(software->listname, m_info_buffer, software->shortname, software->parentname);
-			}
-			else
-				m_info_buffer = software->usage;
-		}
-
-		if (m_info_buffer.empty())
-		{
-			ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
-					ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			return;
-		}
-		else
-		{
-			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
-		}
-
-		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-		if (m_total_lines < r_visible_lines)
-			r_visible_lines = m_total_lines;
-		if (m_topline_datsview < 0)
-			m_topline_datsview = 0;
-		if (m_topline_datsview + r_visible_lines >= m_total_lines)
-			m_topline_datsview = m_total_lines - r_visible_lines;
-
-		for (int r = 0; r < r_visible_lines; ++r)
-		{
-			int itemline = r + m_topline_datsview;
-			std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-
-			// up arrow
-			if (r == 0 && m_topline_datsview != 0)
-				draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			// bottom arrow
-			else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
-				draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			else
-				ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-						ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-			oy1 += (line_height * text_size);
-		}
-
-		// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-		right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
-	}
-	else if (driver)
-	{
-		m_info_software = nullptr;
-
-		float gutter_width = 0.4f * line_height * machine().render().ui_aspect() * 1.3f;
-		float ud_arrow_width = line_height * machine().render().ui_aspect();
-		float oy1 = origy1 + line_height;
-
-		// MAMESCORE? Full size text
-		if (ui_globals::curdats_view == UI_STORY_LOAD)
-			text_size = 1.0f;
-
-		std::string snaptext(_(dats_info[ui_globals::curdats_view]));
-
-		// apply title to right panel
-		float title_size = 0.0f;
-		float txt_length = 0.0f;
-
-		for (int x = UI_FIRST_LOAD; x < UI_LAST_LOAD; ++x)
-		{
-			ui().draw_text_full(container(), _(dats_info[x]), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-					ui::text_layout::NEVER, mame_ui_manager::NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &txt_length, nullptr);
-			txt_length += 0.01f;
-			title_size = (std::max)(txt_length, title_size);
-		}
-
-		rgb_t fgcolor = UI_TEXT_COLOR;
-		rgb_t bgcolor = UI_TEXT_BG_COLOR;
-		if (get_focus() == focused_menu::rightbottom)
-		{
-			fgcolor = rgb_t(0xff, 0xff, 0xff, 0x00);
-			bgcolor = rgb_t(0xff, 0xff, 0xff, 0xff);
-		}
-
-		float middle = origx2 - origx1;
-
-		// check size
-		float sc = title_size + 2.0f * gutter_width;
-		float tmp_size = (sc > middle) ? ((middle - 2.0f * gutter_width) / sc) : 1.0f;
-		title_size *= tmp_size;
-
-		if (bgcolor != UI_TEXT_BG_COLOR)
-		{
-			ui().draw_textured_box(container(), origx1 + ((middle - title_size) * 0.5f), origy1, origx1 + ((middle + title_size) * 0.5f),
-					origy1 + line_height, bgcolor, rgb_t(255, 43, 43, 43), hilight_main_texture(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXWRAP(TRUE));
-		}
-
-		ui().draw_text_full(container(), snaptext.c_str(), origx1, origy1, origx2 - origx1, ui::text_layout::CENTER,
-				ui::text_layout::NEVER, mame_ui_manager::NORMAL, fgcolor, bgcolor, nullptr, nullptr, tmp_size);
-
-		draw_common_arrow(origx1, origy1, origx2, origy2, ui_globals::curdats_view, UI_FIRST_LOAD, UI_LAST_LOAD, title_size);
-
-		if (driver != m_info_driver || ui_globals::curdats_view != m_info_view)
-		{
-			m_info_buffer.clear();
-			m_info_driver = driver;
-			m_info_view = ui_globals::curdats_view;
-			m_topline_datsview = 0;
-			m_total_lines = 0;
-			std::vector<std::string> m_item;
-
-			if (ui_globals::curdats_view == UI_GENERAL_LOAD)
-				general_info(driver, m_info_buffer);
-			else if (ui_globals::curdats_view != UI_COMMAND_LOAD)
-				mame_machine_manager::instance()->datfile().load_data_info(driver, m_info_buffer, ui_globals::curdats_view);
-			else
-				mame_machine_manager::instance()->datfile().command_sub_menu(driver, m_item);
-
-			if (!m_item.empty() && ui_globals::curdats_view == UI_COMMAND_LOAD)
-			{
-				for (size_t x = 0; x < m_item.size(); ++x)
-				{
-					std::string t_buffer;
-					m_info_buffer.append(m_item[x]).append("\n");
-					mame_machine_manager::instance()->datfile().load_command_info(t_buffer, m_item[x]);
-					if (!t_buffer.empty())
-						m_info_buffer.append(t_buffer).append("\n");
-				}
-				convert_command_glyph(m_info_buffer);
-			}
-		}
-
-		if (m_info_buffer.empty())
-		{
-			ui().draw_text_full(container(), _("No Infos Available"), origx1, (origy2 + origy1) * 0.5f, origx2 - origx1, ui::text_layout::CENTER,
-					ui::text_layout::WORD, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr);
-			return;
-		}
-		else if (ui_globals::curdats_view != UI_STORY_LOAD && ui_globals::curdats_view != UI_COMMAND_LOAD)
-			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), origx1, origy1, origx2 - origx1 - (2.0f * gutter_width), xstart, xend, text_size);
-		else
-			m_total_lines = ui().wrap_text(container(), m_info_buffer.c_str(), 0.0f, 0.0f, 1.0f - (2.0f * gutter_width), xstart, xend, text_size);
-
-		int r_visible_lines = floor((origy2 - oy1) / (line_height * text_size));
-		if (m_total_lines < r_visible_lines)
-			r_visible_lines = m_total_lines;
-		if (m_topline_datsview < 0)
-			m_topline_datsview = 0;
-		if (m_topline_datsview + r_visible_lines >= m_total_lines)
-			m_topline_datsview = m_total_lines - r_visible_lines;
-
-		sc = origx2 - origx1 - (2.0f * UI_BOX_LR_BORDER);
-		for (int r = 0; r < r_visible_lines; ++r)
-		{
-			int itemline = r + m_topline_datsview;
-			std::string tempbuf(m_info_buffer.substr(xstart[itemline], xend[itemline] - xstart[itemline]));
-
-			// up arrow
-			if (r == 0 && m_topline_datsview != 0)
-				draw_info_arrow(0, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			// bottom arrow
-			else if (r == r_visible_lines - 1 && itemline != m_total_lines - 1)
-				draw_info_arrow(1, origx1, origx2, oy1, line_height, text_size, ud_arrow_width);
-			// special case for mamescore
-			else if (ui_globals::curdats_view == UI_STORY_LOAD)
-			{
-				// check size
-				float textlen = ui().get_string_width(tempbuf.c_str(), text_size);
-				float tmp_size2 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
-
-				size_t last_underscore = tempbuf.find_last_of("_");
-				if (last_underscore == std::string::npos)
-				{
-					ui().draw_text_full(container(), tempbuf.c_str(), origx1, oy1, origx2 - origx1, ui::text_layout::CENTER,
-							ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size2);
-				}
-				else
-				{
-					float effective_width = origx2 - origx1 - gutter_width;
-					float effective_left = origx1 + gutter_width;
-					std::string last_part(tempbuf.substr(last_underscore + 1));
-					std::string first_part(tempbuf.substr(0, tempbuf.find("___")));
-					float item_width;
-
-					ui().draw_text_full(container(), first_part.c_str(), effective_left, oy1, effective_width,
-							ui::text_layout::LEFT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &item_width, nullptr, tmp_size2);
-
-					ui().draw_text_full(container(), last_part.c_str(), effective_left + item_width, oy1,
-							origx2 - origx1 - 2.0f * gutter_width - item_width, ui::text_layout::RIGHT, ui::text_layout::TRUNCATE,
-							mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size2);
-				}
-			}
-
-			// special case for command
-			else if (ui_globals::curdats_view == UI_COMMAND_LOAD || ui_globals::curdats_view == UI_GENERAL_LOAD)
-			{
-				// check size
-				float textlen = ui().get_string_width(tempbuf.c_str(), text_size);
-				float tmp_size3 = (textlen > sc) ? text_size * (sc / textlen) : text_size;
-
-				int first_dspace = (ui_globals::curdats_view == UI_COMMAND_LOAD) ? tempbuf.find("  ") : tempbuf.find(":");
-				if (first_dspace > 0)
-				{
-					float effective_width = origx2 - origx1 - gutter_width;
-					float effective_left = origx1 + gutter_width;
-					std::string first_part(tempbuf.substr(0, first_dspace));
-					std::string last_part(tempbuf.substr(first_dspace + 1));
-					strtrimspace(last_part);
-					ui().draw_text_full(container(), first_part.c_str(), effective_left, oy1, effective_width, ui::text_layout::LEFT,
-							ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
-
-					ui().draw_text_full(container(), last_part.c_str(), effective_left, oy1, origx2 - origx1 - 2.0f * gutter_width,
-							ui::text_layout::RIGHT, ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
-				}
-				else
-				{
-					ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-							ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, tmp_size3);
-				}
-			}
-			else
-			{
-				ui().draw_text_full(container(), tempbuf.c_str(), origx1 + gutter_width, oy1, origx2 - origx1, ui::text_layout::LEFT,
-						ui::text_layout::TRUNCATE, mame_ui_manager::NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, nullptr, nullptr, text_size);
-			}
-
-			oy1 += (line_height * text_size);
-		}
-
-		// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
-		right_visible_lines = r_visible_lines - (m_topline_datsview != 0) - (m_topline_datsview + r_visible_lines != m_total_lines);
-	}
-}
 
 
 //-------------------------------------------------
@@ -1979,7 +1679,6 @@ void menu_select_game::get_selection(ui_software_info const *&software, game_dri
 		driver = reinterpret_cast<game_driver const *>(get_selection_ptr());
 	}
 }
-
 
 void menu_select_game::make_topbox_text(std::string &line0, std::string &line1, std::string &line2) const
 {

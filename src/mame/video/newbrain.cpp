@@ -12,7 +12,7 @@
 #define NEWBRAIN_VIDEO_UCR              0x08
 #define NEWBRAIN_VIDEO_80L              0x40
 
-void newbrain_state::tvl(UINT8 data, int a6)
+void newbrain_state::tvl(uint8_t data, int a6)
 {
 	/* latch video address counter bits A5-A0 */
 	m_tvl = m_80l ? 0x04 : 0x02;
@@ -69,8 +69,8 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 	int excess = m_32_40 ? 4 : 24;
 	int gr = 0;
 
-	UINT16 videoram_addr = m_tvl;
-	UINT8 rc = 0;
+	uint16_t videoram_addr = m_tvl;
+	uint8_t rc = 0;
 
 	for (int y = 0; y < 200; y++)
 	{
@@ -78,8 +78,8 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 
 		for (int sx = 0; sx < columns; sx++)
 		{
-			UINT8 videoram_data = m_ram->pointer()[(videoram_addr + sx) & 0x7fff];
-			UINT8 charrom_data;
+			uint8_t videoram_data = m_ram->pointer()[(videoram_addr + sx) & 0x7fff];
+			uint8_t charrom_data;
 
 			if (gr)
 			{
@@ -89,7 +89,7 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 			else
 			{
 				/* render character rom data */
-				UINT16 charrom_addr = (rc << 8) | ((BIT(videoram_data, 7) && m_fs) << 7) | (videoram_data & 0x7f);
+				uint16_t charrom_addr = (rc << 8) | ((BIT(videoram_data, 7) && m_fs) << 7) | (videoram_data & 0x7f);
 				charrom_data = m_char_rom->base()[charrom_addr & 0xfff];
 
 				if ((videoram_data & 0x80) && !m_fs)
@@ -143,7 +143,7 @@ void newbrain_state::screen_update(bitmap_rgb32 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_tvp)
 	{
@@ -151,7 +151,7 @@ UINT32 newbrain_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -180,7 +180,7 @@ GFXDECODE_END
 MACHINE_CONFIG_FRAGMENT( newbrain_video )
 	MCFG_DEFAULT_LAYOUT(layout_newbrain)
 
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_UPDATE_DRIVER(newbrain_state, screen_update)
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */

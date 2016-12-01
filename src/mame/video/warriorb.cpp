@@ -72,9 +72,9 @@ void warriorb_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
                 SCREEN REFRESH
 **************************************************************/
 
-UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn)
+uint32_t warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int xoffs, tc0100scn_device *tc0100scn)
 {
-	UINT8 layer[3], nodraw;
+	uint8_t layer[3], nodraw;
 
 	tc0100scn->tilemap_update();
 
@@ -104,5 +104,5 @@ UINT32 warriorb_state::update_screen(screen_device &screen, bitmap_ind16 &bitmap
 	return 0;
 }
 
-UINT32 warriorb_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, m_tc0100scn_1); }
-UINT32 warriorb_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, m_tc0100scn_2); }
+uint32_t warriorb_state::screen_update_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 0, m_tc0100scn_1); }
+uint32_t warriorb_state::screen_update_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect){ return update_screen(screen, bitmap, cliprect, 40 * 8 * 1, m_tc0100scn_2); }

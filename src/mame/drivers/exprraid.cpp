@@ -818,7 +818,7 @@ void exprraid_state::exprraid_gfx_expand()
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8   *gfx = memregion("gfx3")->base();
+	uint8_t   *gfx = memregion("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 
@@ -837,7 +837,7 @@ void exprraid_state::exprraid_gfx_expand()
 
 DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];

@@ -38,7 +38,7 @@ const device_type CDP1861 = &device_creator<cdp1861_device>;
 //  cdp1861_device - constructor
 //-------------------------------------------------
 
-cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1861_device::cdp1861_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDP1861, "CDP1861", tag, owner, clock, "cdp1861", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_write_irq(*this),
@@ -201,7 +201,7 @@ WRITE8_MEMBER( cdp1861_device::dma_w )
 
 	for (x = 0; x < 8; x++)
 	{
-		pen_t color = BIT(data, 7) ? rgb_t::white : rgb_t::black;
+		pen_t color = BIT(data, 7) ? rgb_t::white() : rgb_t::black();
 		m_bitmap.pix32(y, sx + x) = color;
 		data <<= 1;
 	}
@@ -239,7 +239,7 @@ WRITE_LINE_MEMBER( cdp1861_device::disp_off_w )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdp1861_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
@@ -247,7 +247,7 @@ UINT32 cdp1861_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	return 0;
 }

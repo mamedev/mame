@@ -31,13 +31,13 @@ public:
 		fgpa_after_rom_write_addr = 0xffff;
 	}
 
-	UINT32* m_cpuregion;
+	uint32_t* m_cpuregion;
 	int  m_cpuregion_size;
-	std::unique_ptr<UINT32[]> m_mainram;
+	std::unique_ptr<uint32_t[]> m_mainram;
 
-	UINT32* m_slavecpuregion;
+	uint32_t* m_slavecpuregion;
 	int  m_slavecpuregion_size;
-	std::unique_ptr<UINT32[]> m_slaveram;
+	std::unique_ptr<uint32_t[]> m_slaveram;
 
 
 
@@ -49,9 +49,9 @@ public:
 
 
 	// ports move above from game to game..
-	UINT16 fgpa_rom_write_addr;
-	UINT16 fgpa_first_read_addr;
-	UINT16 fgpa_after_rom_write_addr;
+	uint16_t fgpa_rom_write_addr;
+	uint16_t fgpa_first_read_addr;
+	uint16_t fgpa_after_rom_write_addr;
 
 	DECLARE_READ8_MEMBER( astra_fgpa_r )
 	{
@@ -133,7 +133,7 @@ public:
 READ32_MEMBER(astrafr_state::astrafr_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -161,7 +161,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 {
 	int pc = space.device().safe_pc();
 	int address = offset * 4;
-	int cs = m68340_get_cs(m_maincpu, address);
+	int cs = m_maincpu->get_cs(address);
 
 
 	switch ( cs )
@@ -170,10 +170,10 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 		case 3:
 			address &= 0xfffff;
 
-			if (mem_mask&0xff000000) astra_fgpa_w(space, address+0, data >> 24);
-			if (mem_mask&0x00ff0000) astra_fgpa_w(space, address+1, data >> 16);
-			if (mem_mask&0x0000ff00) astra_fgpa_w(space, address+2, data >> 8);
-			if (mem_mask&0x000000ff) astra_fgpa_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_w(space, address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_w(space, address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_w(space, address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_w(space, address+3, data >> 0);
 			break;
 
 		case 2:
@@ -190,7 +190,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_mem_w)
 READ32_MEMBER(astrafr_state::astrafr_slave_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_slavecpu, offset * 4);
+	int cs = m_slavecpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -216,7 +216,7 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 {
 	int pc = space.device().safe_pc();
 	int address = offset * 4;
-	int cs = m68340_get_cs(m_slavecpu, address);
+	int cs = m_slavecpu->get_cs(address);
 
 
 	switch ( cs )
@@ -225,10 +225,10 @@ WRITE32_MEMBER(astrafr_state::astrafr_slave_mem_w)
 		case 3:
 			address &= 0xfffff;
 
-			if (mem_mask&0xff000000) astra_fgpa_slave_w(space, address+0, data >> 24);
-			if (mem_mask&0x00ff0000) astra_fgpa_slave_w(space, address+1, data >> 16);
-			if (mem_mask&0x0000ff00) astra_fgpa_slave_w(space, address+2, data >> 8);
-			if (mem_mask&0x000000ff) astra_fgpa_slave_w(space, address+3, data >> 0);
+			if (ACCESSING_BITS_24_31) astra_fgpa_slave_w(space, address+0, data >> 24);
+			if (ACCESSING_BITS_16_23) astra_fgpa_slave_w(space, address+1, data >> 16);
+			if (ACCESSING_BITS_8_15) astra_fgpa_slave_w(space, address+2, data >> 8);
+			if (ACCESSING_BITS_0_7) astra_fgpa_slave_w(space, address+3, data >> 0);
 			break;
 
 		case 2:
@@ -268,15 +268,15 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(astrafr_state,astra_common)
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
 	m_cpuregion_size = memregion( "maincpu" )->bytes()/4;
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 
 	if (memregion("slavecpu"))
 	{
-		m_slavecpuregion = (UINT32*)memregion( "slavecpu" )->base();
+		m_slavecpuregion = (uint32_t*)memregion( "slavecpu" )->base();
 		m_slavecpuregion_size = memregion( "slavecpu" )->bytes()/4;
-		m_slaveram = make_unique_clear<UINT32[]>(0x10000);
+		m_slaveram = make_unique_clear<uint32_t[]>(0x10000);
 	}
 
 
@@ -2093,9 +2093,9 @@ ROM_END
 
 
 
-static void astra_addresslines( UINT16* src, size_t srcsize, int small )
+static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
 {
-	std::vector<UINT16> dst(srcsize/2);
+	std::vector<uint16_t> dst(srcsize/2);
 
 	int blocksize;
 
@@ -2117,26 +2117,26 @@ static void astra_addresslines( UINT16* src, size_t srcsize, int small )
 
 DRIVER_INIT_MEMBER(astrafr_state,astradec)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 }
 
 
 
 DRIVER_INIT_MEMBER(astrafr_state,astradec_dual)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
-	astra_addresslines( (UINT16*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 0 );
 }
 
 DRIVER_INIT_MEMBER(astrafr_state,astradec_sml)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
 }
 
 DRIVER_INIT_MEMBER(astrafr_state,astradec_sml_dual)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
-	astra_addresslines( (UINT16*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 1 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 1 );
+	astra_addresslines( (uint16_t*)memregion( "slavecpu" )->base(), memregion( "slavecpu" )->bytes(), 1 );
 }
 
 // Single games?

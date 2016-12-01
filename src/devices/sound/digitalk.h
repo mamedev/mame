@@ -24,7 +24,7 @@ class digitalker_device : public device_t,
 							public device_sound_interface
 {
 public:
-	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	digitalker_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~digitalker_device() { }
 
 	void digitalker_0_cs_w(int line);
@@ -43,10 +43,10 @@ public:
 	DECLARE_WRITE8_MEMBER(digitalker_data_w);
 
 private:
-	void digitalker_write(UINT8 *adr, UINT8 vol, INT8 dac);
-	UINT8 digitalker_pitch_next(UINT8 val, UINT8 prev, int step);
-	void digitalker_set_intr(UINT8 intr);
-	void digitalker_start_command(UINT8 cmd);
+	void digitalker_write(uint8_t *adr, uint8_t vol, int8_t dac);
+	uint8_t digitalker_pitch_next(uint8_t val, uint8_t prev, int step);
+	void digitalker_set_intr(uint8_t intr);
+	void digitalker_start_command(uint8_t cmd);
 	void digitalker_step_mode_0();
 	void digitalker_step_mode_1();
 	void digitalker_step_mode_2();
@@ -59,40 +59,40 @@ private:
 	void digitalker_register_for_save();
 
 private:
-	required_region_ptr<UINT8> m_rom;
+	required_region_ptr<uint8_t> m_rom;
 	sound_stream *m_stream;
 
 	// Port/lines state
-	UINT8 m_data;
-	UINT8 m_cs;
-	UINT8 m_cms;
-	UINT8 m_wr;
-	UINT8 m_intr;
+	uint8_t m_data;
+	uint8_t m_cs;
+	uint8_t m_cms;
+	uint8_t m_wr;
+	uint8_t m_intr;
 
 	// Current decoding state
-	UINT16 m_bpos;
-	UINT16 m_apos;
+	uint16_t m_bpos;
+	uint16_t m_apos;
 
-	UINT8 m_mode;
-	UINT8 m_cur_segment;
-	UINT8 m_cur_repeat;
-	UINT8 m_segments;
-	UINT8 m_repeats;
+	uint8_t m_mode;
+	uint8_t m_cur_segment;
+	uint8_t m_cur_repeat;
+	uint8_t m_segments;
+	uint8_t m_repeats;
 
-	UINT8 m_prev_pitch;
-	UINT8 m_pitch;
-	UINT8 m_pitch_pos;
+	uint8_t m_prev_pitch;
+	uint8_t m_pitch;
+	uint8_t m_pitch_pos;
 
-	UINT8 m_stop_after;
-	UINT8 m_cur_dac;
-	UINT8 m_cur_bits;
+	uint8_t m_stop_after;
+	uint8_t m_cur_dac;
+	uint8_t m_cur_bits;
 
 	// Zero-range size
-	UINT32 m_zero_count; // 0 for done
+	uint32_t m_zero_count; // 0 for done
 
 	// Waveform and current index in it
-	UINT8 m_dac_index; // 128 for done
-	INT16 m_dac[128];
+	uint8_t m_dac_index; // 128 for done
+	int16_t m_dac[128];
 };
 
 extern const device_type DIGITALKER;

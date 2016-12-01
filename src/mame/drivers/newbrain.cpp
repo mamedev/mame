@@ -89,7 +89,7 @@ READ8_MEMBER( newbrain_state::mreq_r )
 {
 	bool romov = 1, raminh = 0;
 	int exrm = 0;
-	UINT8 data = m_exp->mreq_r(space, offset, 0xff, romov, exrm, raminh);
+	uint8_t data = m_exp->mreq_r(space, offset, 0xff, romov, exrm, raminh);
 
 	int rom0 = 1, rom1 = 1, rom2 = 1;
 	int a15_14_13 = romov ? (offset >> 13) : exrm;
@@ -155,7 +155,7 @@ WRITE8_MEMBER( newbrain_state::mreq_w )
 READ8_MEMBER( newbrain_state::iorq_r )
 {
 	bool prtov = 0;
-	UINT8 data = m_exp->iorq_r(space, offset, 0xff, prtov);
+	uint8_t data = m_exp->iorq_r(space, offset, 0xff, prtov);
 
 	if (!prtov)
 	{
@@ -305,7 +305,7 @@ READ8_MEMBER( newbrain_state::ust_a_r )
 
 	*/
 
-	UINT8 data = 0x5d;
+	uint8_t data = 0x5d;
 
 	// powered up
 	data |= m_pwrup << 1;
@@ -339,7 +339,7 @@ READ8_MEMBER( newbrain_state::ust_b_r )
 
 	*/
 
-	UINT8 data = 0x5c;
+	uint8_t data = 0x5c;
 
 	// V24
 	data |= m_rs232_v24->rxd_r();
@@ -372,7 +372,7 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 
 	*/
 
-	UINT8 data = 0xe;
+	uint8_t data = 0xe;
 
 	// keyboard
 	data |= BIT(m_keydata, 2);
@@ -400,7 +400,7 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 
 	*/
 
-	UINT8 data = 0x1;
+	uint8_t data = 0x1;
 
 	// keyboard
 	data |= BIT(m_keydata, 1) << 1;
@@ -490,25 +490,7 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 
 	if (!m_cop_k6 && k6) {
 		//CD4076 CLK
-		switch (m_keylatch)
-		{
-		case 0: m_keydata = m_y0->read(); break;
-		case 1: m_keydata = m_y1->read(); break;
-		case 2: m_keydata = m_y2->read(); break;
-		case 3: m_keydata = m_y3->read(); break;
-		case 4: m_keydata = m_y4->read(); break;
-		case 5: m_keydata = m_y5->read(); break;
-		case 6: m_keydata = m_y6->read(); break;
-		case 7: m_keydata = m_y7->read(); break;
-		case 8: m_keydata = m_y8->read(); break;
-		case 9: m_keydata = m_y9->read(); break;
-		case 10: m_keydata = m_y10->read(); break;
-		case 11: m_keydata = m_y11->read(); break;
-		case 12: m_keydata = m_y12->read(); break;
-		case 13: m_keydata = m_y13->read(); break;
-		case 14: m_keydata = m_y14->read(); break;
-		case 15: m_keydata = m_y15->read(); break;
-		}
+		m_keydata = m_y[m_keylatch]->read();
 
 		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_keydata);
 	} else if (m_cop_k6 && k6) {

@@ -56,19 +56,19 @@ void mem_reset(dsp56k_core* cpustate);
 #define TSMB1    (cpustate->peripheral_ram[A2O(0xfffd)])
 
 /* Interrupt priority register (IPR) bits */
-void IPR_set(dsp56k_core* cpustate, UINT16 value);
+void IPR_set(dsp56k_core* cpustate, uint16_t value);
 
 /* A return value of -1 means disabled */
-INT8 irqa_ipl(dsp56k_core* cpustate);
-INT8 irqb_ipl(dsp56k_core* cpustate);
-UINT8 irqa_trigger(dsp56k_core* cpustate);
-UINT8 irqb_trigger(dsp56k_core* cpustate);
+int8_t irqa_ipl(dsp56k_core* cpustate);
+int8_t irqb_ipl(dsp56k_core* cpustate);
+uint8_t irqa_trigger(dsp56k_core* cpustate);
+uint8_t irqb_trigger(dsp56k_core* cpustate);
 
-INT8 codec_ipl(dsp56k_core* cpustate);
-INT8 host_ipl(dsp56k_core* cpustate);
-INT8 ssi0_ipl(dsp56k_core* cpustate);
-INT8 ssi1_ipl(dsp56k_core* cpustate);
-INT8 tm_ipl(dsp56k_core* cpustate);
+int8_t codec_ipl(dsp56k_core* cpustate);
+int8_t host_ipl(dsp56k_core* cpustate);
+int8_t ssi0_ipl(dsp56k_core* cpustate);
+int8_t ssi1_ipl(dsp56k_core* cpustate);
+int8_t tm_ipl(dsp56k_core* cpustate);
 
 
 /***************************************************************************
@@ -91,107 +91,107 @@ void dsp56k_host_interface_reset(dsp56k_core* cpustate);
 /* DSP56k SIDE */
 /***************/
 /* Host Control Register (HCR) Bits */
-void HCR_set(dsp56k_core* cpustate, UINT16 value);
+void HCR_set(dsp56k_core* cpustate, uint16_t value);
 
-//UINT16 HF3_bit(dsp56k_core* cpustate);  #define hf3BIT  ((HCR & 0x0010) != 0)
-//UINT16 HF2_bit(dsp56k_core* cpustate);  #define hf2BIT  ((HCR & 0x0008) != 0)
-UINT16 HCIE_bit(dsp56k_core* cpustate);
-UINT16 HTIE_bit(dsp56k_core* cpustate);
-UINT16 HRIE_bit(dsp56k_core* cpustate);
+//uint16_t HF3_bit(dsp56k_core* cpustate);  #define hf3BIT  ((HCR & 0x0010) != 0)
+//uint16_t HF2_bit(dsp56k_core* cpustate);  #define hf2BIT  ((HCR & 0x0008) != 0)
+uint16_t HCIE_bit(dsp56k_core* cpustate);
+uint16_t HTIE_bit(dsp56k_core* cpustate);
+uint16_t HRIE_bit(dsp56k_core* cpustate);
 
-void HF3_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HF2_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HCIE_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HTIE_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HRIE_bit_set(dsp56k_core* cpustate, UINT16 value);
+void HF3_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HF2_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HCIE_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HTIE_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HRIE_bit_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Host Status Register (HSR) Bits */
-//void HSR_set(dsp56k_core* cpustate, UINT16 value);
+//void HSR_set(dsp56k_core* cpustate, uint16_t value);
 
-//UINT16 DMA_bit(dsp56k_core* cpustate);  #define dmaBIT  ((HSR & 0x0080) != 0)
-//UINT16 HF1_bit(dsp56k_core* cpustate);  #define hf1BIT  ((HSR & 0x0010) != 0)
-//UINT16 HF0_bit(dsp56k_core* cpustate);  #define hf0BIT  ((HSR & 0x0008) != 0)
-//UINT16 HCP_bit(dsp56k_core* cpustate);  #define hcpBIT  ((HSR & 0x0004) != 0)
-UINT16 HTDE_bit(dsp56k_core* cpustate);
-UINT16 HRDF_bit(dsp56k_core* cpustate);
+//uint16_t DMA_bit(dsp56k_core* cpustate);  #define dmaBIT  ((HSR & 0x0080) != 0)
+//uint16_t HF1_bit(dsp56k_core* cpustate);  #define hf1BIT  ((HSR & 0x0010) != 0)
+//uint16_t HF0_bit(dsp56k_core* cpustate);  #define hf0BIT  ((HSR & 0x0008) != 0)
+//uint16_t HCP_bit(dsp56k_core* cpustate);  #define hcpBIT  ((HSR & 0x0004) != 0)
+uint16_t HTDE_bit(dsp56k_core* cpustate);
+uint16_t HRDF_bit(dsp56k_core* cpustate);
 
-void DMA_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HF1_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HF0_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HCP_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HTDE_bit_set(dsp56k_core* cpustate, UINT16 value);
-void HRDF_bit_set(dsp56k_core* cpustate, UINT16 value);
+void DMA_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HF1_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HF0_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HCP_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HTDE_bit_set(dsp56k_core* cpustate, uint16_t value);
+void HRDF_bit_set(dsp56k_core* cpustate, uint16_t value);
 
 /*************/
 /* HOST SIDE */
 /*************/
 /* Interrupt Control Register (ICR) Bits */
-void ICR_set(dsp56k_core* cpustate, UINT8 value);
+void ICR_set(dsp56k_core* cpustate, uint8_t value);
 
-//UINT8 INIT_bit(dsp56k_core* cpustate); #define x_initBIT ((dsp56k.HI.ICR & 0x0080) != 0)
-//UINT8 HM1_bit(dsp56k_core* cpustate);  #define x_hm1BIT  ((dsp56k.HI.ICR & 0x0040) != 0)
-//UINT8 HM0_bit(dsp56k_core* cpustate);  #define x_hm0BIT  ((dsp56k.HI.ICR & 0x0020) != 0)
-//UINT8 HF1_bit_host(dsp56k_core* cpustate);  #define x_hf1BIT  ((dsp56k.HI.ICR & 0x0010) != 0)
-//UINT8 HF0_bit_host(dsp56k_core* cpustate);  #define x_hf0BIT  ((dsp56k.HI.ICR & 0x0008) != 0)
-//UINT8 TREQ_bit(dsp56k_core* cpustate); #define x_treqBIT ((dsp56k.HI.ICR & 0x0002) != 0)
-//UINT8 RREQ_bit(dsp56k_core* cpustate); #define x_rreqBIT ((dsp56k.HI.ICR & 0x0001) != 0)
+//uint8_t INIT_bit(dsp56k_core* cpustate); #define x_initBIT ((dsp56k.HI.ICR & 0x0080) != 0)
+//uint8_t HM1_bit(dsp56k_core* cpustate);  #define x_hm1BIT  ((dsp56k.HI.ICR & 0x0040) != 0)
+//uint8_t HM0_bit(dsp56k_core* cpustate);  #define x_hm0BIT  ((dsp56k.HI.ICR & 0x0020) != 0)
+//uint8_t HF1_bit_host(dsp56k_core* cpustate);  #define x_hf1BIT  ((dsp56k.HI.ICR & 0x0010) != 0)
+//uint8_t HF0_bit_host(dsp56k_core* cpustate);  #define x_hf0BIT  ((dsp56k.HI.ICR & 0x0008) != 0)
+//uint8_t TREQ_bit(dsp56k_core* cpustate); #define x_treqBIT ((dsp56k.HI.ICR & 0x0002) != 0)
+//uint8_t RREQ_bit(dsp56k_core* cpustate); #define x_rreqBIT ((dsp56k.HI.ICR & 0x0001) != 0)
 
-//void INIT_bit_set(dsp56k_core* cpustate, UINT8 value); #define CLEAR_x_initBIT() (dsp56k.HI.ICR &= (~0x0080))
-//void HM1_bit_set(dsp56k_core* cpustate, UINT8 value);  #define CLEAR_x_hm1BIT()  (dsp56k.HI.ICR &= (~0x0040))
-//void HM0_bit_set(dsp56k_core* cpustate, UINT8 value);  #define CLEAR_x_hm0BIT()  (dsp56k.HI.ICR &= (~0x0020))
-void HF1_bit_host_set(dsp56k_core* cpustate, UINT8 value);
-void HF0_bit_host_set(dsp56k_core* cpustate, UINT8 value);
-void TREQ_bit_set(dsp56k_core* cpustate, UINT8 value);
-void RREQ_bit_set(dsp56k_core* cpustate, UINT8 value);
+//void INIT_bit_set(dsp56k_core* cpustate, uint8_t value); #define CLEAR_x_initBIT() (dsp56k.HI.ICR &= (~0x0080))
+//void HM1_bit_set(dsp56k_core* cpustate, uint8_t value);  #define CLEAR_x_hm1BIT()  (dsp56k.HI.ICR &= (~0x0040))
+//void HM0_bit_set(dsp56k_core* cpustate, uint8_t value);  #define CLEAR_x_hm0BIT()  (dsp56k.HI.ICR &= (~0x0020))
+void HF1_bit_host_set(dsp56k_core* cpustate, uint8_t value);
+void HF0_bit_host_set(dsp56k_core* cpustate, uint8_t value);
+void TREQ_bit_set(dsp56k_core* cpustate, uint8_t value);
+void RREQ_bit_set(dsp56k_core* cpustate, uint8_t value);
 
 /* Command Vector Register (CVR) Bits */
-void CVR_set(dsp56k_core* cpustate, UINT8 value);
+void CVR_set(dsp56k_core* cpustate, uint8_t value);
 
-//UINT8 HC_bit();
-UINT8 HV_bits(dsp56k_core* cpustate);
+//uint8_t HC_bit();
+uint8_t HV_bits(dsp56k_core* cpustate);
 
-void HC_bit_set(dsp56k_core* cpustate, UINT8 value);
-void HV_bits_set(dsp56k_core* cpustate, UINT8 value);
+void HC_bit_set(dsp56k_core* cpustate, uint8_t value);
+void HV_bits_set(dsp56k_core* cpustate, uint8_t value);
 
 /* Interrupt Status Register (ISR) Bits */
-// void ISR_set(dsp56k_core* cpustate, UINT8 value);
+// void ISR_set(dsp56k_core* cpustate, uint8_t value);
 
-//UINT8 HREQ_bit(dsp56k_core* cpustate); #define x_hreqBIT ((dsp56k.HI.ISR & 0x0080) != 0)
-//UINT8 DMA_bit(dsp56k_core* cpustate);  #define x_dmaBIT  ((dsp56k.HI.ISR & 0x0040) != 0)
-//UINT8 HF3_bit_host(dsp56k_core* cpustate);  #define x_hf3BIT  ((dsp56k.HI.ISR & 0x0010) != 0)
-//UINT8 HF2_bit_host(dsp56k_core* cpustate);  #define x_hf2BIT  ((dsp56k.HI.ISR & 0x0008) != 0)
-//UINT8 TRDY_bit(dsp56k_core* cpustate); #define x_trdyBIT ((dsp56k.HI.ISR & 0x0004) != 0)
-UINT8 TXDE_bit(dsp56k_core* cpustate);
-UINT8 RXDF_bit(dsp56k_core* cpustate);
+//uint8_t HREQ_bit(dsp56k_core* cpustate); #define x_hreqBIT ((dsp56k.HI.ISR & 0x0080) != 0)
+//uint8_t DMA_bit(dsp56k_core* cpustate);  #define x_dmaBIT  ((dsp56k.HI.ISR & 0x0040) != 0)
+//uint8_t HF3_bit_host(dsp56k_core* cpustate);  #define x_hf3BIT  ((dsp56k.HI.ISR & 0x0010) != 0)
+//uint8_t HF2_bit_host(dsp56k_core* cpustate);  #define x_hf2BIT  ((dsp56k.HI.ISR & 0x0008) != 0)
+//uint8_t TRDY_bit(dsp56k_core* cpustate); #define x_trdyBIT ((dsp56k.HI.ISR & 0x0004) != 0)
+uint8_t TXDE_bit(dsp56k_core* cpustate);
+uint8_t RXDF_bit(dsp56k_core* cpustate);
 
-//void HREQ_bit_set(dsp56k_core* cpustate, UINT8 value); #define CLEAR_x_hreqBIT() (dsp56k.HI.ISR &= (~0x0080))
-//void DMA_bit_set(dsp56k_core* cpustate, UINT8 value);  #define CLEAR_x_dmaBIT()  (dsp56k.HI.ISR &= (~0x0040))
-void HF3_bit_host_set(dsp56k_core* cpustate, UINT8 value);
-void HF2_bit_host_set(dsp56k_core* cpustate, UINT8 value);
-//void TRDY_bit_set(dsp56k_core* cpustate, UINT8 value); #define CLEAR_x_trdyBIT() (dsp56k.HI.ISR &= (~0x0004))
-void TXDE_bit_set(dsp56k_core* cpustate, UINT8 value);
-void RXDF_bit_set(dsp56k_core* cpustate, UINT8 value);
+//void HREQ_bit_set(dsp56k_core* cpustate, uint8_t value); #define CLEAR_x_hreqBIT() (dsp56k.HI.ISR &= (~0x0080))
+//void DMA_bit_set(dsp56k_core* cpustate, uint8_t value);  #define CLEAR_x_dmaBIT()  (dsp56k.HI.ISR &= (~0x0040))
+void HF3_bit_host_set(dsp56k_core* cpustate, uint8_t value);
+void HF2_bit_host_set(dsp56k_core* cpustate, uint8_t value);
+//void TRDY_bit_set(dsp56k_core* cpustate, uint8_t value); #define CLEAR_x_trdyBIT() (dsp56k.HI.ISR &= (~0x0004))
+void TXDE_bit_set(dsp56k_core* cpustate, uint8_t value);
+void RXDF_bit_set(dsp56k_core* cpustate, uint8_t value);
 
 /* Interrupt Vector Register (IVR) Bits */
-//void IVR_set(dsp56k_core* cpustate, UINT8 value);
+//void IVR_set(dsp56k_core* cpustate, uint8_t value);
 
-//UINT8 IV7_bit(dsp56k_core* cpustate);
-//UINT8 IV6_bit(dsp56k_core* cpustate);
-//UINT8 IV5_bit(dsp56k_core* cpustate);
-//UINT8 IV4_bit(dsp56k_core* cpustate);
-//UINT8 IV3_bit(dsp56k_core* cpustate);
-//UINT8 IV2_bit(dsp56k_core* cpustate);
-//UINT8 IV1_bit(dsp56k_core* cpustate);
-//UINT8 IV0_bit(dsp56k_core* cpustate);
+//uint8_t IV7_bit(dsp56k_core* cpustate);
+//uint8_t IV6_bit(dsp56k_core* cpustate);
+//uint8_t IV5_bit(dsp56k_core* cpustate);
+//uint8_t IV4_bit(dsp56k_core* cpustate);
+//uint8_t IV3_bit(dsp56k_core* cpustate);
+//uint8_t IV2_bit(dsp56k_core* cpustate);
+//uint8_t IV1_bit(dsp56k_core* cpustate);
+//uint8_t IV0_bit(dsp56k_core* cpustate);
 
-//void IV7_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV6_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV5_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV4_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV3_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV2_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV1_bit_set(dsp56k_core* cpustate, UINT8 value);
-//void IV0_bit_set(dsp56k_core* cpustate, UINT8 value);
+//void IV7_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV6_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV5_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV4_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV3_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV2_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV1_bit_set(dsp56k_core* cpustate, uint8_t value);
+//void IV0_bit_set(dsp56k_core* cpustate, uint8_t value);
 
 
 /* PROTOTYPES */
@@ -205,36 +205,36 @@ void dsp56k_host_interface_host_to_HTX(dsp56k_core* cpustate);
 void dsp56k_io_reset(dsp56k_core* cpustate);
 
 /* Port A Bus Control Register (BCR) */
-void BCR_set(dsp56k_core* cpustate, UINT16 value);
+void BCR_set(dsp56k_core* cpustate, uint16_t value);
 
-//UINT16 RH_bit(dsp56k_core* cpustate);
-//UINT16 BS_bit(dsp56k_core* cpustate);
-//UINT16 external_x_wait_states(dsp56k_core* cpustate);
-//UINT16 external_p_wait_states(dsp56k_core* cpustate);
+//uint16_t RH_bit(dsp56k_core* cpustate);
+//uint16_t BS_bit(dsp56k_core* cpustate);
+//uint16_t external_x_wait_states(dsp56k_core* cpustate);
+//uint16_t external_p_wait_states(dsp56k_core* cpustate);
 
-void RH_bit_set(dsp56k_core* cpustate, UINT16 value);
-void BS_bit_set(dsp56k_core* cpustate, UINT16 value);
-void external_x_wait_states_set(dsp56k_core* cpustate, UINT16 value);
-void external_p_wait_states_set(dsp56k_core* cpustate, UINT16 value);
+void RH_bit_set(dsp56k_core* cpustate, uint16_t value);
+void BS_bit_set(dsp56k_core* cpustate, uint16_t value);
+void external_x_wait_states_set(dsp56k_core* cpustate, uint16_t value);
+void external_p_wait_states_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Port B Control Register (PBC) */
-void PBC_set(dsp56k_core* cpustate, UINT16 value);
+void PBC_set(dsp56k_core* cpustate, uint16_t value);
 //int host_interface_active(dsp56k_core* cpustate);
 
 /* Port B Data Direction Register (PBDDR) */
-void PBDDR_set(dsp56k_core* cpustate, UINT16 value);
+void PBDDR_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Port B Data Register (PBD) */
-void PBD_set(dsp56k_core* cpustate, UINT16 value);
+void PBD_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Port C Control Register (PCC) */
-void PCC_set(dsp56k_core* cpustate, UINT16 value);
+void PCC_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Port C Data Direction Register (PCDDR) */
-void PCDDR_set(dsp56k_core* cpustate, UINT16 value);
+void PCDDR_set(dsp56k_core* cpustate, uint16_t value);
 
 /* Port C Dtaa Register (PCD) */
-void PCD_set(dsp56k_core* cpustate, UINT16 value);
+void PCD_set(dsp56k_core* cpustate, uint16_t value);
 
 } // namespace DSP56K
 

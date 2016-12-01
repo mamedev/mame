@@ -6,7 +6,7 @@
    (decrement, compare the same)
    (like in the m6502 processors)
 */
-UINT8 lh5801_cpu_device::lh5801_add_generic(int left, int right, int carry)
+uint8_t lh5801_cpu_device::lh5801_add_generic(int left, int right, int carry)
 {
 	int res=left+right+carry;
 	int v,c;
@@ -23,21 +23,21 @@ UINT8 lh5801_cpu_device::lh5801_add_generic(int left, int right, int carry)
 	return res;
 }
 
-UINT16 lh5801_cpu_device::lh5801_readop_word()
+uint16_t lh5801_cpu_device::lh5801_readop_word()
 {
-	UINT16 r;
+	uint16_t r;
 	r=m_direct->read_byte(P++)<<8;
 	r|=m_direct->read_byte(P++);
 	return r;
 }
 
 
-void lh5801_cpu_device::lh5801_adc(UINT8 data)
+void lh5801_cpu_device::lh5801_adc(uint8_t data)
 {
 	m_a=lh5801_add_generic(m_a,data,m_t&C);
 }
 
-void lh5801_cpu_device::lh5801_add_mem(address_space &space, int addr, UINT8 data)
+void lh5801_cpu_device::lh5801_add_mem(address_space &space, int addr, uint8_t data)
 {
 	int v=lh5801_add_generic(space.read_byte(addr),data,0);
 	space.write_byte(addr,v);
@@ -51,20 +51,20 @@ void lh5801_cpu_device::lh5801_adr(PAIR *reg)
 	}
 }
 
-void lh5801_cpu_device::lh5801_sbc(UINT8 data)
+void lh5801_cpu_device::lh5801_sbc(uint8_t data)
 {
 	m_a=lh5801_add_generic(m_a,data^0xff,m_t&C);
 }
 
-void lh5801_cpu_device::lh5801_cpa(UINT8 a, UINT8 b)
+void lh5801_cpu_device::lh5801_cpa(uint8_t a, uint8_t b)
 {
 	lh5801_add_generic(a, b^0xff, 1);
 }
 
-UINT8 lh5801_cpu_device::lh5801_decimaladd_generic(int left, int right, int carry)
+uint8_t lh5801_cpu_device::lh5801_decimaladd_generic(int left, int right, int carry)
 {
 	int res=lh5801_add_generic(left, right, carry);
-	UINT8 da;
+	uint8_t da;
 
 	//DA values taken from official documentation
 	if (!(m_t&C) && !(m_t&H))
@@ -79,25 +79,25 @@ UINT8 lh5801_cpu_device::lh5801_decimaladd_generic(int left, int right, int carr
 	return res + da;
 }
 
-void lh5801_cpu_device::lh5801_dca(UINT8 data)
+void lh5801_cpu_device::lh5801_dca(uint8_t data)
 {
 	m_a += 0x66;    //taken from official documentation
 	m_a=lh5801_decimaladd_generic(m_a, data, m_t&C);
 }
 
-void lh5801_cpu_device::lh5801_dcs(UINT8 data)
+void lh5801_cpu_device::lh5801_dcs(uint8_t data)
 {
 	m_a=lh5801_decimaladd_generic(m_a, data^0xff, m_t&C);
 }
 
-void lh5801_cpu_device::lh5801_and(UINT8 data)
+void lh5801_cpu_device::lh5801_and(uint8_t data)
 {
 	m_a&=data;
 	m_t&=~Z;
 	if (!m_a) m_t|=Z;
 }
 
-void lh5801_cpu_device::lh5801_and_mem(address_space &space, int addr, UINT8 data)
+void lh5801_cpu_device::lh5801_and_mem(address_space &space, int addr, uint8_t data)
 {
 	data&=space.read_byte(addr);
 	m_t&=~Z;
@@ -105,27 +105,27 @@ void lh5801_cpu_device::lh5801_and_mem(address_space &space, int addr, UINT8 dat
 	space.write_byte(addr,data);
 }
 
-void lh5801_cpu_device::lh5801_bit(UINT8 a, UINT8 b)
+void lh5801_cpu_device::lh5801_bit(uint8_t a, uint8_t b)
 {
 	m_t&=~Z;
 	if (!(a&b)) m_t|=Z;
 }
 
-void lh5801_cpu_device::lh5801_eor(UINT8 data)
+void lh5801_cpu_device::lh5801_eor(uint8_t data)
 {
 	m_a^=data;
 	m_t&=~Z;
 	if (!m_a) m_t|=Z;
 }
 
-void lh5801_cpu_device::lh5801_ora(UINT8 data)
+void lh5801_cpu_device::lh5801_ora(uint8_t data)
 {
 	m_a|=data;
 	m_t&=~Z;
 	if (!m_a) m_t|=Z;
 }
 
-void lh5801_cpu_device::lh5801_ora_mem(address_space &space, int addr, UINT8 data)
+void lh5801_cpu_device::lh5801_ora_mem(address_space &space, int addr, uint8_t data)
 {
 	data|=space.read_byte(addr);
 	m_t&=~Z;
@@ -133,7 +133,7 @@ void lh5801_cpu_device::lh5801_ora_mem(address_space &space, int addr, UINT8 dat
 	space.write_byte(addr,data);
 }
 
-void lh5801_cpu_device::lh5801_lda(UINT8 data)
+void lh5801_cpu_device::lh5801_lda(uint8_t data)
 {
 	m_a=data;
 	m_t&=~Z;
@@ -166,12 +166,12 @@ void lh5801_cpu_device::lh5801_sin(PAIR *reg)
 	m_program->write_byte(reg->w.l++, m_a);
 }
 
-void lh5801_cpu_device::lh5801_dec(UINT8 *adr)
+void lh5801_cpu_device::lh5801_dec(uint8_t *adr)
 {
 	*adr=lh5801_add_generic(*adr,0xff,0);
 }
 
-void lh5801_cpu_device::lh5801_inc(UINT8 *adr)
+void lh5801_cpu_device::lh5801_inc(uint8_t *adr)
 {
 	*adr=lh5801_add_generic(*adr,1,0);
 }
@@ -203,25 +203,25 @@ void lh5801_cpu_device::lh5801_rti()
 	m_t=m_program->read_byte(++S);
 }
 
-void lh5801_cpu_device::lh5801_push(UINT8 data)
+void lh5801_cpu_device::lh5801_push(uint8_t data)
 {
 	m_program->write_byte(S--, data);
 }
 
-void lh5801_cpu_device::lh5801_push_word(UINT16 data)
+void lh5801_cpu_device::lh5801_push_word(uint16_t data)
 {
 	m_program->write_byte(S--, data&0xff);
 	m_program->write_byte(S--, data>>8);
 }
 
-void lh5801_cpu_device::lh5801_jmp(UINT16 adr)
+void lh5801_cpu_device::lh5801_jmp(uint16_t adr)
 {
 	P=adr;
 }
 
 void lh5801_cpu_device::lh5801_branch_plus(int doit)
 {
-	UINT8 t=m_direct->read_byte(P++);
+	uint8_t t=m_direct->read_byte(P++);
 	if (doit) {
 		m_icount-=3;
 		P+=t;
@@ -230,7 +230,7 @@ void lh5801_cpu_device::lh5801_branch_plus(int doit)
 
 void lh5801_cpu_device::lh5801_branch_minus(int doit)
 {
-	UINT8 t=m_direct->read_byte(P++);
+	uint8_t t=m_direct->read_byte(P++);
 	if (doit) {
 		m_icount-=3;
 		P-=t;
@@ -239,7 +239,7 @@ void lh5801_cpu_device::lh5801_branch_minus(int doit)
 
 void lh5801_cpu_device::lh5801_lop()
 {
-	UINT8 t=m_direct->read_byte(P++);
+	uint8_t t=m_direct->read_byte(P++);
 	m_icount-=8;
 	if (UL--) {
 		m_icount-=3;
@@ -249,7 +249,7 @@ void lh5801_cpu_device::lh5801_lop()
 
 void lh5801_cpu_device::lh5801_sjp()
 {
-	UINT16 n=lh5801_readop_word();
+	uint16_t n=lh5801_readop_word();
 	lh5801_push_word(P);
 	P=n;
 }
@@ -267,14 +267,14 @@ void lh5801_cpu_device::lh5801_vector(int doit, int nr)
 
 void lh5801_cpu_device::lh5801_aex()
 {
-	UINT8 t=m_a;
+	uint8_t t=m_a;
 	m_a=(t<<4)|(t>>4);
 	// flags?
 }
 
 void lh5801_cpu_device::lh5801_drl(address_space &space, int adr)
 {
-	UINT16 t=m_a|(space.read_byte(adr)<<8);
+	uint16_t t=m_a|(space.read_byte(adr)<<8);
 
 	m_a=t>>8;
 	space.write_byte(adr,t>>4);
@@ -282,7 +282,7 @@ void lh5801_cpu_device::lh5801_drl(address_space &space, int adr)
 
 void lh5801_cpu_device::lh5801_drr(address_space &space, int adr)
 {
-	UINT16 t=space.read_byte(adr)|(m_a<<8);
+	uint16_t t=space.read_byte(adr)|(m_a<<8);
 
 	m_a=t;
 	space.write_byte(adr,t>>4);

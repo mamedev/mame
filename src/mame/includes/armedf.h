@@ -32,22 +32,22 @@ public:
 	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	std::unique_ptr<UINT8[]> m_text_videoram;
-	required_shared_ptr<UINT16> m_spr_pal_clut;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_bg_videoram;
-	UINT16 m_legion_cmd[4]; // legionjb only!
+	std::unique_ptr<uint8_t[]> m_text_videoram;
+	required_shared_ptr<uint16_t> m_spr_pal_clut;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	uint16_t m_legion_cmd[4]; // legionjb only!
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 	tilemap_t  *m_fg_tilemap;
 	tilemap_t  *m_tx_tilemap;
-	UINT16   m_scroll_msb;
-	UINT16   m_vreg;
-	UINT16   m_fg_scrollx;
-	UINT16   m_fg_scrolly;
-	UINT16   m_bg_scrollx;
-	UINT16   m_bg_scrolly;
+	uint16_t   m_scroll_msb;
+	uint16_t   m_vreg;
+	uint16_t   m_fg_scrollx;
+	uint16_t   m_fg_scrolly;
+	uint16_t   m_bg_scrollx;
+	uint16_t   m_bg_scrolly;
 	int      m_scroll_type;
 	int      m_sprite_offy;
 	int      m_old_mcu_mode;
@@ -98,10 +98,10 @@ public:
 	DECLARE_MACHINE_RESET(armedf);
 	DECLARE_VIDEO_START(terraf);
 	DECLARE_VIDEO_START(armedf);
-	UINT32 screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_armedf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int priority );
 	void armedf_drawgfx(bitmap_ind16 &dest_bmp,const rectangle &clip,gfx_element *gfx,
-						UINT32 code,UINT32 color, UINT32 clut,int flipx,int flipy,int offsx,int offsy,
+						uint32_t code,uint32_t color, uint32_t clut,int flipx,int flipy,int offsx,int offsy,
 						int transparent_color);
 };
 
@@ -112,12 +112,12 @@ public:
 		: armedf_state(mconfig, type, tag),
 		m_sharedram(*this, "sharedram") { }
 
-	required_shared_ptr<UINT16> m_sharedram;
+	required_shared_ptr<uint16_t> m_sharedram;
 
 	/* misc */
 	int           m_read_latch;
-	UINT8         m_mcu_input_snippet;
-	UINT8         m_mcu_jsr_snippet;
+	uint8_t         m_mcu_input_snippet;
+	uint8_t         m_mcu_jsr_snippet;
 
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE16_MEMBER(sharedram_w);

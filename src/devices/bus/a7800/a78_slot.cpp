@@ -62,7 +62,7 @@ device_a78_cart_interface::~device_a78_cart_interface ()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_a78_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -86,7 +86,7 @@ void device_a78_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the on-cart RAM
 //-------------------------------------------------
 
-void device_a78_cart_interface::ram_alloc(UINT32 size)
+void device_a78_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 	device().save_item(NAME(m_ram));
@@ -97,7 +97,7 @@ void device_a78_cart_interface::ram_alloc(UINT32 size)
 //  ram_alloc - alloc the space for the on-cart RAM
 //-------------------------------------------------
 
-void device_a78_cart_interface::nvram_alloc(UINT32 size)
+void device_a78_cart_interface::nvram_alloc(uint32_t size)
 {
 	m_nvram.resize(size);
 	device().save_item(NAME(m_nvram));
@@ -112,7 +112,7 @@ void device_a78_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  a78_cart_slot_device - constructor
 //-------------------------------------------------
-a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a78_cart_slot_device::a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, A78_CART_SLOT, "Atari 7800 Cartridge Slot", tag, owner, clock, "a78_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this), m_cart(nullptr), m_type(0)
@@ -346,13 +346,13 @@ image_init_result a78_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len;
+		uint32_t len;
 
 		if (software_entry() != nullptr)
 		{
 			const char *pcb_name;
-			bool has_ram = get_software_region("ram") ? TRUE : FALSE;
-			bool has_nvram = get_software_region("nvram") ? TRUE : FALSE;
+			bool has_ram = get_software_region("ram") ? true : false;
+			bool has_nvram = get_software_region("nvram") ? true : false;
 			len = get_software_region_length("rom");
 
 			m_cart->rom_alloc(len, tag());
@@ -389,7 +389,7 @@ image_init_result a78_cart_slot_device::call_load()
 			}
 
 			// let's try to auto-fix some common errors in the header
-			mapper = validate_header((head[53] << 8) | head[54], TRUE);
+			mapper = validate_header((head[53] << 8) | head[54], true);
 
 			switch (mapper & 0x2e)
 			{
@@ -449,7 +449,7 @@ image_init_result a78_cart_slot_device::call_load()
 				osd_printf_info("Run it through the expansion to exploit this feature.\n");
 			}
 
-			internal_header_logging((UINT8 *)head, length());
+			internal_header_logging((uint8_t *)head, length());
 
 			m_cart->rom_alloc(len, tag());
 			fread(m_cart->get_rom_base(), len);
@@ -523,14 +523,14 @@ std::string a78_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		dynamic_buffer head(128);
+		std::vector<uint8_t> head(128);
 		int type = A78_TYPE0, mapper;
 
 		// Load and check the header
 		m_file->read(&head[0], 128);
 
 		// let's try to auto-fix some common errors in the header
-		mapper = validate_header((head[53] << 8) | head[54], FALSE);
+		mapper = validate_header((head[53] << 8) | head[54], false);
 
 		switch (mapper & 0x2e)
 		{
@@ -714,14 +714,14 @@ WRITE8_MEMBER(a78_cart_slot_device::write_40xx)
 
  -------------------------------------------------*/
 
-void a78_cart_slot_device::internal_header_logging(UINT8 *header, UINT32 len)
+void a78_cart_slot_device::internal_header_logging(uint8_t *header, uint32_t len)
 {
 	char head_title[35];
-	UINT32 head_length = (header[49] << 24) | (header[50] << 16) | (header[51] << 8) | header[52];
-	UINT16 head_mapper = (header[53] << 8) | header[54];
-	UINT8 head_ctrl1 = header[55];
-	UINT8 head_ctrl2 = header[56];
-	UINT8 head_ispal = header[57];
+	uint32_t head_length = (header[49] << 24) | (header[50] << 16) | (header[51] << 8) | header[52];
+	uint16_t head_mapper = (header[53] << 8) | header[54];
+	uint8_t head_ctrl1 = header[55];
+	uint8_t head_ctrl2 = header[56];
+	uint8_t head_ispal = header[57];
 	std::string cart_mapper, ctrl1, ctrl2;
 	memcpy(head_title, header + 0x11, 0x20);
 

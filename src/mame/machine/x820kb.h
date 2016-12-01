@@ -35,16 +35,16 @@ class xerox_820_keyboard_t :  public device_t
 {
 public:
 	// construction/destruction
-	xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	xerox_820_keyboard_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_kbstb_wr_callback(device_t &device, _Object object) { return downcast<xerox_820_keyboard_t &>(device).m_kbstb_cb.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
-	UINT8 read() { return m_bus; }
+	uint8_t read() { return m_bus; }
 
 	DECLARE_READ8_MEMBER( kb_p1_r );
 	DECLARE_WRITE8_MEMBER( kb_p1_w );
@@ -61,21 +61,12 @@ protected:
 
 private:
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_yf;
+	required_ioport_array<16> m_y;
 
 	devcb_write_line   m_kbstb_cb;
 
-	UINT8 m_p1;
-	UINT8 m_bus;
+	uint8_t m_p1;
+	uint8_t m_bus;
 };
 
 

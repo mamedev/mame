@@ -187,13 +187,13 @@ void nbmj8900_state::vramflip(int vram)
 
 void nbmj8900_state::update_pixel0(int x, int y)
 {
-	UINT8 color = m_videoram0[(y * m_screen_width) + x];
+	uint8_t color = m_videoram0[(y * m_screen_width) + x];
 	m_tmpbitmap0.pix16(y, x) = m_palette->pen(color);
 }
 
 void nbmj8900_state::update_pixel1(int x, int y)
 {
-	UINT8 color = m_videoram1[(y * m_screen_width) + x];
+	uint8_t color = m_videoram1[(y * m_screen_width) + x];
 	m_tmpbitmap1.pix16(y, x) = m_palette->pen(color);
 }
 
@@ -205,7 +205,7 @@ void nbmj8900_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_nb1413m3->m_busyflag = 1;
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in nbmj8900_state::device_timer");
+		assert_always(false, "Unknown id in nbmj8900_state::device_timer");
 	}
 }
 
@@ -373,12 +373,12 @@ void nbmj8900_state::video_start()
 
 	m_screen->register_screen_bitmap(m_tmpbitmap0);
 	m_screen->register_screen_bitmap(m_tmpbitmap1);
-	m_videoram0 = std::make_unique<UINT8[]>(m_screen_width * m_screen_height);
-	m_videoram1 = std::make_unique<UINT8[]>(m_screen_width * m_screen_height);
-	m_palette_ptr = std::make_unique<UINT8[]>(0x200);
-	m_clut = std::make_unique<UINT8[]>(0x800);
-	memset(m_videoram0.get(), 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
-	memset(m_videoram1.get(), 0xff, (m_screen_width * m_screen_height * sizeof(UINT8)));
+	m_videoram0 = std::make_unique<uint8_t[]>(m_screen_width * m_screen_height);
+	m_videoram1 = std::make_unique<uint8_t[]>(m_screen_width * m_screen_height);
+	m_palette_ptr = std::make_unique<uint8_t[]>(0x200);
+	m_clut = std::make_unique<uint8_t[]>(0x800);
+	memset(m_videoram0.get(), 0xff, (m_screen_width * m_screen_height * sizeof(uint8_t)));
+	memset(m_videoram1.get(), 0xff, (m_screen_width * m_screen_height * sizeof(uint8_t)));
 //  m_palette->pen(0x07f) = 0xff;    /* palette_transparent_pen */
 	m_gfxdraw_mode = 1;
 	m_screen_refresh = 1;
@@ -413,7 +413,7 @@ void nbmj8900_state::postload()
 
 
 ******************************************************************************/
-UINT32 nbmj8900_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nbmj8900_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 

@@ -41,13 +41,13 @@ public:
 	virtual void machine_start() override;
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE8_MEMBER( p2_w );
 	DECLARE_READ8_MEMBER( p3_r );
 	DECLARE_WRITE8_MEMBER( p3_w );
 	DECLARE_PALETTE_INIT(jtc_es40);
-	optional_shared_ptr<UINT8> m_video_ram;
+	optional_shared_ptr<uint8_t> m_video_ram;
 
 	int m_centronics_busy;
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_busy);
@@ -71,7 +71,7 @@ public:
 	{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -83,16 +83,16 @@ public:
 	{ }
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( videoram_w );
 	DECLARE_WRITE8_MEMBER( banksel_w );
 
-	UINT8 m_video_bank;
-	std::unique_ptr<UINT8[]> m_color_ram_r;
-	std::unique_ptr<UINT8[]> m_color_ram_g;
-	std::unique_ptr<UINT8[]> m_color_ram_b;
+	uint8_t m_video_bank;
+	std::unique_ptr<uint8_t[]> m_color_ram_r;
+	std::unique_ptr<uint8_t[]> m_color_ram_g;
+	std::unique_ptr<uint8_t[]> m_color_ram_b;
 };
 
 
@@ -140,7 +140,7 @@ READ8_MEMBER( jtc_state::p3_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= ((m_cassette)->input() < 0.0) ? 1 : 0;
 	data |= m_centronics_busy << 3;
@@ -174,7 +174,7 @@ WRITE8_MEMBER( jtc_state::p3_w )
 
 READ8_MEMBER( jtces40_state::videoram_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_video_bank & 0x80) data |= m_color_ram_r[offset];
 	if (m_video_bank & 0x40) data |= m_color_ram_g[offset];
@@ -582,7 +582,7 @@ void jtc_state::video_start()
 {
 }
 
-UINT32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -590,7 +590,7 @@ UINT32 jtc_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (sx = 0; sx < 8; sx++)
 		{
-			UINT8 data = m_video_ram[(y * 8) + sx];
+			uint8_t data = m_video_ram[(y * 8) + sx];
 
 			for (x = 0; x < 8; x++)
 			{
@@ -607,7 +607,7 @@ void jtces23_state::video_start()
 {
 }
 
-UINT32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -615,7 +615,7 @@ UINT32 jtces23_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (sx = 0; sx < 16; sx++)
 		{
-			UINT8 data = m_video_ram[(y * 16) + sx];
+			uint8_t data = m_video_ram[(y * 16) + sx];
 
 			for (x = 0; x < 8; x++)
 			{
@@ -636,9 +636,9 @@ void jtces40_state::video_start()
 {
 	/* allocate memory */
 	m_video_ram.allocate(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_r = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_g = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
-	m_color_ram_b = std::make_unique<UINT8[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_r = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_g = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
+	m_color_ram_b = std::make_unique<uint8_t[]>(JTC_ES40_VIDEORAM_SIZE);
 
 	/* register for state saving */
 	save_item(NAME(m_video_bank));
@@ -649,7 +649,7 @@ void jtces40_state::video_start()
 	save_item(NAME(m_centronics_busy));
 }
 
-UINT32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, sx;
 
@@ -657,10 +657,10 @@ UINT32 jtces40_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 	{
 		for (sx = 0; sx < 40; sx++)
 		{
-			UINT8 data = m_video_ram[(y * 40) + sx];
-			UINT8 color_r = m_color_ram_r[(y * 40) + sx];
-			UINT8 color_g = m_color_ram_g[(y * 40) + sx];
-			UINT8 color_b = m_color_ram_b[(y * 40) + sx];
+			uint8_t data = m_video_ram[(y * 40) + sx];
+			uint8_t color_r = m_color_ram_r[(y * 40) + sx];
+			uint8_t color_g = m_color_ram_g[(y * 40) + sx];
+			uint8_t color_b = m_color_ram_b[(y * 40) + sx];
 
 			for (x = 0; x < 8; x++)
 			{

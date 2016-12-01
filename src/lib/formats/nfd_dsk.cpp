@@ -100,9 +100,9 @@ const char *nfd_format::extensions() const
 	return "nfd";
 }
 
-int nfd_format::identify(io_generic *io, UINT32 form_factor)
+int nfd_format::identify(io_generic *io, uint32_t form_factor)
 {
-	UINT8 h[16];
+	uint8_t h[16];
 	io_generic_read(io, h, 0, 16);
 
 	if (strncmp((const char *)h, "T98FDDIMAGE.R0", 14) == 0 || strncmp((const char *)h, "T98FDDIMAGE.R1", 14) == 0)
@@ -111,25 +111,25 @@ int nfd_format::identify(io_generic *io, UINT32 form_factor)
 	return 0;
 }
 
-bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
+bool nfd_format::load(io_generic *io, uint32_t form_factor, floppy_image *image)
 {
-	UINT64 size = io_generic_size(io);
-	UINT8 h[0x120], hsec[0x10];
+	uint64_t size = io_generic_size(io);
+	uint8_t h[0x120], hsec[0x10];
 	io_generic_read(io, h, 0, 0x120);
 	int format_version = !strncmp((const char *)h, "T98FDDIMAGE.R0", 14) ? 0 : 1;
 
 	// sector map (the 164th entry is only used by rev.1 format, loops with track < 163 are correct for rev.0)
-	UINT8 disk_type = 0;
-	UINT8 num_secs[164];
-	UINT8 num_specials[164];
-	UINT32 track_sizes[164];
-	UINT8 tracks[164 * 26];
-	UINT8 heads[164 * 26];
-	UINT8 secs[164 * 26];
-	UINT8 mfm[164 * 26];
-	UINT8 sec_sizes[164 * 26];
+	uint8_t disk_type = 0;
+	uint8_t num_secs[164];
+	uint8_t num_specials[164];
+	uint32_t track_sizes[164];
+	uint8_t tracks[164 * 26];
+	uint8_t heads[164 * 26];
+	uint8_t secs[164 * 26];
+	uint8_t mfm[164 * 26];
+	uint8_t sec_sizes[164 * 26];
 
-	UINT32 hsize = little_endianize_int32(*(UINT32 *)(h+0x110));
+	uint32_t hsize = little_endianize_int32(*(uint32_t *)(h+0x110));
 
 	int pos = 0x120;
 
@@ -142,7 +142,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 			// read sector map absolute location
 			io_generic_read(io, hsec, pos, 4);
 			pos += 4;
-			UINT32 secmap_addr = little_endianize_int32(*(UINT32 *)(hsec));
+			uint32_t secmap_addr = little_endianize_int32(*(uint32_t *)(hsec));
 
 			if (secmap_addr)
 			{
@@ -151,8 +151,8 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 				// first WORD is # of sectors, second WORD is # of special data sectors
 				io_generic_read(io, hsec, secmap_addr, 0x10);
 				secmap_addr += 0x10;
-				num_secs[track] = little_endianize_int16(*(UINT16 *)(hsec));
-				num_specials[track] = little_endianize_int16(*(UINT16 *)(hsec + 0x2));
+				num_secs[track] = little_endianize_int16(*(uint16_t *)(hsec));
+				num_specials[track] = little_endianize_int16(*(uint16_t *)(hsec + 0x2));
 
 				for (int sect = 0; sect < num_secs[track]; sect++)
 				{
@@ -177,7 +177,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 					{
 						io_generic_read(io, hsec, secmap_addr, 0x10);
 						secmap_addr += 0x10;
-						curr_track_size += (hsec[9] + 1) * little_endianize_int32(*(UINT32 *)(hsec + 0x0a));
+						curr_track_size += (hsec[9] + 1) * little_endianize_int32(*(uint32_t *)(hsec + 0x0a));
 					}
 				}
 			}
@@ -239,7 +239,7 @@ bool nfd_format::load(io_generic *io, UINT32 form_factor, floppy_image *image)
 	}
 
 	desc_pc_sector sects[256];
-	UINT8 sect_data[65536];
+	uint8_t sect_data[65536];
 	int cur_sec_map = 0, sector_size;
 	pos = hsize;
 

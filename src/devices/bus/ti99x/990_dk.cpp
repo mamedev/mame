@@ -42,7 +42,7 @@ enum
 
 const device_type FD800 = &device_creator<fd800_legacy_device>;
 
-fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+fd800_legacy_device::fd800_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, FD800, "TI FD800 Diablo floppy disk controller", tag, owner, clock, "fd800", __FILE__),
 	m_recv_buf(0), m_stat_reg(0), m_xmit_buf(0), m_cmd_reg(0), m_interrupt_f_f(0),
 	m_int_line(*this), m_buf_pos(0), m_buf_mode(), m_unit(0), m_sector(0)
@@ -100,11 +100,11 @@ void fd800_machine_init(void (*interrupt_callback)(running_machine &machine, int
     cylinder_id: cylinder ID read
     sector_id: sector ID read
 
-    Return TRUE if an ID was found
+    Return true if an ID was found
 */
 int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sector_id)
 {
-	//UINT8 revolution_count;*/
+	//uint8_t revolution_count;*/
 	// chrn_id id;
 
 	//revolution_count = 0;*/
@@ -117,11 +117,11 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
 	            *cylinder_id = id.C;
 	        if (sector_id)
 	            *sector_id = id.R;
-	        return TRUE;
+	        return true;
 	    }
 	}*/
 
-	return FALSE;
+	return false;
 }
 
 /*
@@ -132,11 +132,11 @@ int fd800_legacy_device::read_id(int unit, int head, int *cylinder_id, int *sect
     sector: sector ID to search
     data_id: data ID to be used when calling sector read/write functions
 
-    Return TRUE if the given sector ID was found
+    Return true if the given sector ID was found
 */
 int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_id)
 {
-/*  UINT8 revolution_count;
+/*  uint8_t revolution_count;
     chrn_id id;
 
     revolution_count = 0;
@@ -151,12 +151,12 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
                 *data_id = id.data_id;
                 // get ddam status
                 // w->ddam = id.flags & ID_FLAG_DELETED_DATA;
-                return TRUE;
+                return true;
             }
         }
     }
 */
-	return FALSE;
+	return false;
 }
 
 /*
@@ -166,7 +166,7 @@ int fd800_legacy_device::find_sector(int unit, int head, int sector, int *data_i
     cylinder: track to seek for
     head: head for which the seek is performed
 
-    Return FALSE if the seek was successful
+    Return false if the seek was successful
 */
 int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 {
@@ -175,13 +175,13 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
     if (cylinder > 76)
     {
         m_stat_reg |= status_invalid_cmd;
-        return TRUE;
+        return true;
     }
 
     if (m_drv[unit].img == nullptr || !m_drv[unit].img->exists())
     {
         m_stat_reg |= status_drv_not_ready;
-        return TRUE;
+        return true;
     }
 
     if (m_drv[unit].log_cylinder[head] == -1)
@@ -189,14 +189,14 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         if (!read_id(unit, head, &m_drv[unit].log_cylinder[head], nullptr))
         {
             m_stat_reg |= status_ID_not_found;
-            return TRUE;
+            return true;
         }
     }
 
     if (m_drv[unit].log_cylinder[head] == cylinder)
     {
 
-        return FALSE;
+        return false;
     }
     for (retries=0; retries<10; retries++)
     {
@@ -209,19 +209,19 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
         {
             m_drv[unit].log_cylinder[head] = -1;
             m_stat_reg |= status_ID_not_found;
-            return TRUE;
+            return true;
         }
 
         if (m_drv[unit].log_cylinder[head] == cylinder)
         {
 
-            return FALSE;
+            return false;
         }
     }
 
     m_stat_reg |= status_seek_err;
     */
-	return TRUE;
+	return true;
 }
 
 /*
@@ -229,7 +229,7 @@ int fd800_legacy_device::do_seek(int unit, int cylinder, int head)
 
     unit: floppy drive index
 
-    Return FALSE if the restore was successful
+    Return false if the restore was successful
 */
 int fd800_legacy_device::do_restore(int unit)
 {
@@ -239,7 +239,7 @@ int fd800_legacy_device::do_restore(int unit)
     if (!m_drv[unit].img->exists())
     {
         m_stat_reg |= status_drv_not_ready;
-        return TRUE;
+        return true;
     }
 
 

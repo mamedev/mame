@@ -34,7 +34,7 @@ const device_type JANGOU_BLITTER = &device_creator<jangou_blitter_device>;
 //  jangou_blitter_device - constructor
 //-------------------------------------------------
 
-jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+jangou_blitter_device::jangou_blitter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, JANGOU_BLITTER, "Jangou Blitter Custom Chip", tag, owner, clock, "jangou_blitter", __FILE__)
 {
 }
@@ -75,7 +75,7 @@ void jangou_blitter_device::device_reset()
 //**************************************************************************
 
 // TODO: inline these
-UINT8 jangou_blitter_device::gfx_nibble( UINT32 niboffset )
+uint8_t jangou_blitter_device::gfx_nibble( uint32_t niboffset )
 {
 	if (niboffset & 1)
 		return (m_gfxrom[(niboffset >> 1) & m_gfxrommask] & 0xf0) >> 4;
@@ -83,7 +83,7 @@ UINT8 jangou_blitter_device::gfx_nibble( UINT32 niboffset )
 		return (m_gfxrom[(niboffset >> 1) & m_gfxrommask] & 0x0f);
 }
 
-void jangou_blitter_device::plot_gfx_pixel( UINT8 pix, int x, int y )
+void jangou_blitter_device::plot_gfx_pixel( uint8_t pix, int x, int y )
 {
 	if (y < 0 || y >= 256)
 		return;
@@ -138,8 +138,8 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 			{
 				int drawx = (x + xcount) & 0xff;
 				int drawy = (y + ycount) & 0xff;
-				UINT8 dat = gfx_nibble(src + count);
-				UINT8 cur_pen = m_pen_data[dat & 0x0f];
+				uint8_t dat = gfx_nibble(src + count);
+				uint8_t cur_pen = m_pen_data[dat & 0x0f];
 
 				//dat = cur_pen_lo | (cur_pen_hi << 4);
 
@@ -153,7 +153,7 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 			}
 		}
 
-		//UINT32 new_src = src + count;
+		//uint32_t new_src = src + count;
 
 		// update source and height after blitter operation
 		// TODO: Jangou doesn't agree with this, later HW?
@@ -170,7 +170,7 @@ WRITE8_MEMBER( jangou_blitter_device::process_w )
 // Sexy Gal swaps around upper src address
 WRITE8_MEMBER( jangou_blitter_device::alt_process_w )
 {
-	const UINT8 translate_addr[7] = { 0, 1, 6, 2, 3, 4, 5 };
+	const uint8_t translate_addr[7] = { 0, 1, 6, 2, 3, 4, 5 };
 
 	process_w(space,translate_addr[offset],data);
 }

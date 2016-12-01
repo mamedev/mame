@@ -59,8 +59,8 @@ public:
 	required_device<address_map_bank_device> m_bank;
 	required_device<x2212_device> m_nvram;
 	required_device<palette_device> m_palette;
-	required_region_ptr<UINT16> m_rom;
-	required_shared_ptr<UINT16> m_video_ram;
+	required_region_ptr<uint16_t> m_rom;
+	required_shared_ptr<uint16_t> m_video_ram;
 	required_ioport m_monitor;
 	optional_device<lk201_device> m_lk201;
 
@@ -103,17 +103,56 @@ public:
 	DECLARE_DRIVER_INIT(vt240);
 	virtual void machine_reset() override;
 	UPD7220_DISPLAY_PIXELS_MEMBER(hgdc_draw);
+	void irq_encoder(int irq, int state);
+	DECLARE_WRITE_LINE_MEMBER(irq7_w);
+	DECLARE_WRITE_LINE_MEMBER(irq9_w);
+	DECLARE_WRITE_LINE_MEMBER(irq13_w);
 
-	UINT8 m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
-	UINT8 m_mem_map[16];
-	UINT8 m_mem_map_sel;
-	UINT8 m_char_buf[16];
-	UINT8 m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
-	UINT8 m_vom[16];
-	UINT8 m_vpat, m_patmult, m_patcnt, m_patidx;
+	uint8_t m_i8085_out, m_t11_out, m_i8085_rdy, m_t11;
+	uint8_t m_mem_map[16];
+	uint8_t m_mem_map_sel;
+	uint8_t m_char_buf[16];
+	uint8_t m_char_idx, m_mask, m_reg0, m_reg1, m_lu;
+	uint8_t m_vom[16];
+	uint8_t m_vpat, m_patmult, m_patcnt, m_patidx;
+	uint16_t m_irqs;
 	bool m_lb;
-	UINT16 m_scrl;
+	uint16_t m_scrl;
 };
+
+void vt240_state::irq_encoder(int irq, int state)
+{
+	if(state == ASSERT_LINE)
+		m_irqs |= (1 << irq);
+	else
+		m_irqs &= ~(1 << irq);
+
+	int i;
+	for(i = 15; i > 0; i--)
+	{
+		if(m_irqs & (1 << i))
+			break;
+	}
+	m_maincpu->set_input_line(3, (i & 8) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(2, (i & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(1, (i & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_maincpu->set_input_line(0, (i & 1) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq7_w)
+{
+	irq_encoder(7, state);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq9_w)
+{
+	irq_encoder(9, state);
+}
+
+WRITE_LINE_MEMBER(vt240_state::irq13_w)
+{
+	irq_encoder(13, state);
+}
 
 WRITE_LINE_MEMBER(vt240_state::write_keyboard_clock)
 {
@@ -147,7 +186,7 @@ WRITE_LINE_MEMBER(vt240_state::tx_w)
 
 WRITE_LINE_MEMBER(vt240_state::i8085_rdy_w)
 {
-	m_maincpu->set_input_line(3, state ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(3, state ? CLEAR_LINE : ASSERT_LINE);
 	m_i8085_rdy = state;
 }
 
@@ -161,7 +200,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( vt240_state::hgdc_draw )
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 
 	int xi, gfx1, gfx2;
-	UINT8 vom;
+	uint8_t vom;
 
 	if(!BIT(m_reg0, 7))
 	{
@@ -239,12 +278,12 @@ WRITE8_MEMBER(vt240_state::duart_w)
 
 WRITE8_MEMBER(vt240_state::duartout_w)
 {
-	m_host->write_rts(BIT(data, 0) ? CLEAR_LINE : ASSERT_LINE);
-	m_host->write_dtr(BIT(data, 2) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
-	m_maincpu->set_input_line(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
+	m_host->write_rts(BIT(data, 0) ? ASSERT_LINE : CLEAR_LINE);
+	m_host->write_dtr(BIT(data, 2) ? ASSERT_LINE : CLEAR_LINE);
+	irq_encoder(15, BIT(data, 4) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(14, BIT(data, 5) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(11, BIT(data, 6) ? CLEAR_LINE : ASSERT_LINE);
+	irq_encoder(10, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 READ8_MEMBER(vt240_state::mem_map_cs_r)
@@ -345,7 +384,7 @@ READ16_MEMBER(vt240_state::vram_r)
 
 WRITE16_MEMBER(vt240_state::vram_w)
 {
-	UINT8 *video_ram = (UINT8 *)(&m_video_ram[0]);
+	uint8_t *video_ram = (uint8_t *)(&m_video_ram[0]);
 	offset <<= 1;
 	offset = ((offset & 0x30000) >> 1) | (offset & 0x7fff);
 	if(!BIT(m_reg0, 3))
@@ -361,7 +400,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 			data &= 0xff;
 	}
 	offset &= 0xffff;
-	UINT8 chr = data;
+	uint8_t chr = data;
 
 	if(BIT(m_reg0, 4))
 	{
@@ -385,8 +424,8 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		{
 			if(ps == 0)
 				i++;
-			UINT8 mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
-			UINT8 out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
+			uint8_t mem = video_ram[(offset & 0x7fff) + (0x8000 * i)];
+			uint8_t out = 0, ifore = BIT(m_lu, (i ? 5 : 4)), iback = BIT(m_lu, (i ? 3 : 2));
 			for(int j = 0; j < 8; j++)
 				out |= BIT(chr, j) ? (ifore << j) : (iback << j);
 			switch(m_lu >> 6)
@@ -409,7 +448,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 				out = (out & data) | (mem & ~data);
 			if(BIT(m_reg1, 3))
 			{
-				UINT8 out2 = out;
+				uint8_t out2 = out;
 				if(BIT(m_reg1, 2))
 				{
 					out = video_ram[((offset & 0x7ffe) | 0) + (0x8000 * i)];
@@ -434,7 +473,7 @@ WRITE16_MEMBER(vt240_state::vram_w)
 		data = (chr & data) | (video_ram[offset] & ~data);
 	if(BIT(m_reg1, 3))
 	{
-		UINT8 data2 = data;
+		uint8_t data2 = data;
 		if(BIT(m_reg1, 2))
 		{
 			data = video_ram[(offset & ~1) | 0];
@@ -570,6 +609,7 @@ void vt240_state::machine_reset()
 	m_patcnt = 0;
 	m_patidx = 0;
 	m_reg0 = 0x80;
+	m_irqs = 0;
 }
 
 static const gfx_layout vt240_chars_8x10 =
@@ -629,7 +669,7 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_MC68681_ADD("duart", XTAL_3_6864MHz) /* 2681 duart (not 68681!) */
-	MCFG_MC68681_IRQ_CALLBACK(INPUTLINE("maincpu", 13))
+	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
 	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
 	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
 	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
@@ -637,8 +677,8 @@ static MACHINE_CONFIG_START( vt240, vt240_state )
 	MCFG_DEVICE_ADD("i8251", I8251, 0)
 	MCFG_I8251_TXD_HANDLER(WRITELINE(vt240_state, tx_w))
 	MCFG_I8251_DTR_HANDLER(WRITELINE(vt240_state, lben_w))
-	MCFG_I8251_RXRDY_HANDLER(INPUTLINE("maincpu", 9))
-	MCFG_I8251_TXRDY_HANDLER(INPUTLINE("maincpu", 7))
+	MCFG_I8251_RXRDY_HANDLER(WRITELINE(vt240_state, irq9_w))
+	MCFG_I8251_TXRDY_HANDLER(WRITELINE(vt240_state, irq7_w))
 
 	MCFG_DEVICE_ADD("lk201", LK201, 0)
 	MCFG_LK201_TX_HANDLER(DEVWRITELINE("i8251", i8251_device, write_rxd))

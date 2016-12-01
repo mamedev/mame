@@ -69,14 +69,14 @@ public:
 		m_stars(*this, "stars"){ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
 	int m_blink_count;
-	UINT8 m_sound_latch;
-	UINT8 m_last_sound_data;
-	UINT8 m_protection_data;
-	UINT8 m_flip_screen;
+	uint8_t m_sound_latch;
+	uint8_t m_last_sound_data;
+	uint8_t m_protection_data;
+	uint8_t m_flip_screen;
 
 	emu_timer *m_interrupt_clear_timer;
 	emu_timer *m_interrupt_assert_timer;
@@ -86,8 +86,8 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<screen_device> m_screen;
 	optional_device<palette_device> m_palette;
-	optional_region_ptr<UINT8> m_colors;
-	optional_region_ptr<UINT8> m_stars;
+	optional_region_ptr<uint8_t> m_colors;
+	optional_region_ptr<uint8_t> m_stars;
 
 	DECLARE_READ8_MEMBER(dip_switch_r);
 	DECLARE_WRITE8_MEMBER(sound_data_w);
@@ -99,12 +99,12 @@ public:
 	DECLARE_DRIVER_INIT(enigma2);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(interrupt_clear_callback);
 	TIMER_CALLBACK_MEMBER(interrupt_assert_callback);
-	inline UINT16 vpos_to_vysnc_chain_counter( int vpos );
-	inline int vysnc_chain_counter_to_vpos( UINT16 counter );
+	inline uint16_t vpos_to_vysnc_chain_counter( int vpos );
+	inline int vysnc_chain_counter_to_vpos( uint16_t counter );
 	void create_interrupt_timers(  );
 	void start_interrupt_timers(  );
 };
@@ -117,13 +117,13 @@ public:
  *************************************/
 
 
-UINT16 enigma2_state::vpos_to_vysnc_chain_counter( int vpos )
+uint16_t enigma2_state::vpos_to_vysnc_chain_counter( int vpos )
 {
 	return vpos + VCOUNTER_START;
 }
 
 
-int enigma2_state::vysnc_chain_counter_to_vpos( UINT16 counter )
+int enigma2_state::vysnc_chain_counter_to_vpos( uint16_t counter )
 {
 	return counter - VCOUNTER_START;
 }
@@ -137,13 +137,13 @@ TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_clear_callback)
 
 TIMER_CALLBACK_MEMBER(enigma2_state::interrupt_assert_callback)
 {
-	UINT16 next_counter;
+	uint16_t next_counter;
 	int next_vpos;
 
 	/* compute vector and set the interrupt line */
 	int vpos = m_screen->vpos();
-	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
-	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
+	uint16_t counter = vpos_to_vysnc_chain_counter(vpos);
+	uint8_t vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
 	m_maincpu->set_input_line_and_vector(0, ASSERT_LINE, vector);
 
 	/* set up for next interrupt */
@@ -205,21 +205,21 @@ void enigma2_state::machine_reset()
  *
  *************************************/
 
-UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const rectangle &visarea = screen.visible_area();
 
-	UINT8 x = 0;
-	UINT16 bitmap_y = visarea.min_y;
-	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
-	UINT8 video_data = 0;
-	UINT8 fore_color = 0;
-	UINT8 star_color = 0;
+	uint8_t x = 0;
+	uint16_t bitmap_y = visarea.min_y;
+	uint8_t y = (uint8_t)vpos_to_vysnc_chain_counter(bitmap_y);
+	uint8_t video_data = 0;
+	uint8_t fore_color = 0;
+	uint8_t star_color = 0;
 
 	while (1)
 	{
-		UINT8 bit;
-		UINT8 color;
+		uint8_t bit;
+		uint8_t color;
 
 		/* read the video RAM */
 		if ((x & 0x07) == 0x00)
@@ -292,17 +292,17 @@ UINT32 enigma2_state::screen_update_enigma2(screen_device &screen, bitmap_rgb32 
 }
 
 
-UINT32 enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 	const rectangle &visarea = screen.visible_area();
-	UINT16 bitmap_y = visarea.min_y;
-	UINT8 y = (UINT8)vpos_to_vysnc_chain_counter(bitmap_y);
-	UINT8 video_data = 0;
+	uint16_t bitmap_y = visarea.min_y;
+	uint8_t y = (uint8_t)vpos_to_vysnc_chain_counter(bitmap_y);
+	uint8_t video_data = 0;
 
 	while (1)
 	{
-		UINT8 bit;
+		uint8_t bit;
 		pen_t pen;
 
 		/* read the video RAM */
@@ -329,7 +329,7 @@ UINT32 enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32
 			video_data = video_data >> 1;
 		}
 
-		pen = bit ? rgb_t::white : rgb_t::black;
+		pen = bit ? rgb_t::white() : rgb_t::black();
 		bitmap.pix32(bitmap_y, x) = pen;
 
 		/* next pixel */
@@ -355,7 +355,7 @@ UINT32 enigma2_state::screen_update_enigma2a(screen_device &screen, bitmap_rgb32
 
 READ8_MEMBER(enigma2_state::dip_switch_r)
 {
-	UINT8 ret = 0x00;
+	uint8_t ret = 0x00;
 
 	if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, space.device().safe_pc(), m_protection_data);
 	switch (offset)
@@ -694,7 +694,7 @@ ROM_END
 DRIVER_INIT_MEMBER(enigma2_state,enigma2)
 {
 	offs_t i;
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 
 	for(i = 0; i < 0x2000; i++)
 	{

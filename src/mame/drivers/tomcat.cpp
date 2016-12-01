@@ -52,8 +52,8 @@ public:
 
 	required_device<tms5220_device> m_tms;
 	int m_control_num;
-	required_shared_ptr<UINT16> m_shared_ram;
-	UINT8 m_nvram[0x800];
+	required_shared_ptr<uint16_t> m_shared_ram;
+	uint8_t m_nvram[0x800];
 	int m_dsp_BIO;
 	int m_dsp_idle;
 	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
@@ -106,7 +106,7 @@ READ16_MEMBER(tomcat_state::tomcat_adcread_r)
 
 READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 	if (ACCESSING_BITS_8_15)
 		result |= ioport("IN0")->read() << 8;
 
@@ -353,10 +353,10 @@ INPUT_PORTS_END
 
 void tomcat_state::machine_start()
 {
-	((UINT16*)m_shared_ram)[0x0000] = 0xf600;
-	((UINT16*)m_shared_ram)[0x0001] = 0x0000;
-	((UINT16*)m_shared_ram)[0x0002] = 0xf600;
-	((UINT16*)m_shared_ram)[0x0003] = 0x0000;
+	((uint16_t*)m_shared_ram)[0x0000] = 0xf600;
+	((uint16_t*)m_shared_ram)[0x0001] = 0x0000;
+	((uint16_t*)m_shared_ram)[0x0002] = 0xf600;
+	((uint16_t*)m_shared_ram)[0x0003] = 0x0000;
 
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 

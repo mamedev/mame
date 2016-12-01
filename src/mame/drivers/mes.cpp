@@ -21,11 +21,11 @@ public:
 	m_p_videoram(*this, "p_videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
-	const UINT8 *m_p_chargen;
-	required_shared_ptr<UINT8> m_p_videoram;
+	const uint8_t *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -56,11 +56,11 @@ void mes_state::video_start()
 
 /* This system appears to have 2 screens. Not implemented.
     Also the screen dimensions are a guess. */
-UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	//static UINT8 framecnt=0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x,xx;
+	//static uint8_t framecnt=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x,xx;
 
 	//framecnt++;
 
@@ -68,7 +68,7 @@ UINT32 mes_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			xx = ma;
 			for (x = ma; x < ma + 80; x++)

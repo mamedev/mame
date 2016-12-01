@@ -73,14 +73,14 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(asr733_device, asr733)
 {
-	palette.set_pen_color(0,rgb_t::white); /* white */
-	palette.set_pen_color(1,rgb_t::black); /* black */
+	palette.set_pen_color(0, rgb_t::white()); /* white */
+	palette.set_pen_color(1, rgb_t::black()); /* black */
 }
 
 
 const device_type ASR733 = &device_creator<asr733_device>;
 
-asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+asr733_device::asr733_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ASR733, "733 ASR", tag, owner, clock, "asr733", __FILE__),
 		device_gfx_interface(mconfig, *this, GFXDECODE_NAME(asr733), "palette"),
 		m_keyint_line(*this),
@@ -109,7 +109,7 @@ void asr733_device::device_start()
 
 	m_line_timer = timer_alloc(0);
 
-	UINT8 *dst;
+	uint8_t *dst;
 
 	static const unsigned char fontdata6x8[asrfontdata_size] =
 	{   /* ASCII characters */
@@ -205,7 +205,7 @@ void asr733_device::draw_char(int character, int x, int y, int color)
 
 void asr733_device::linefeed()
 {
-	UINT8 buf[asr_window_width];
+	uint8_t buf[asr_window_width];
 
 	for (int y=asr_window_offset_y; y<asr_window_offset_y+asr_window_height-asr_scroll_step; y++)
 	{
@@ -222,7 +222,7 @@ void asr733_device::linefeed()
 	m_bitmap->fill(0, asr_scroll_clear_window);
 }
 
-void asr733_device::transmit(UINT8 data)
+void asr733_device::transmit(uint8_t data)
 {
 	switch (data)
 	{
@@ -608,8 +608,8 @@ void asr733_device::check_keyboard()
 
 	enum { repeat_delay = 5 /* approx. 1/10s */ };
 
-	//UINT16 key_buf[6];
-	UINT16 key_buf[4];
+	//uint16_t key_buf[6];
+	uint16_t key_buf[4];
 	int i, j;
 	modifier_state_t modifier_state;
 	int repeat_mode;
@@ -703,7 +703,7 @@ void asr733_device::check_keyboard()
 	}
 }
 
-UINT32 asr733_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t asr733_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	refresh(bitmap, 0, 0);
 	return 0;

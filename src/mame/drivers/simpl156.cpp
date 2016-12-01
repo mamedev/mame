@@ -135,7 +135,7 @@ WRITE32_MEMBER(simpl156_state::simpl156_eeprom_w)
 
 	//okibank = data & 0x07;
 
-	m_okimusic->set_bank_base(0x40000 * (data & 0x7));
+	m_okimusic->set_rom_bank(data & 0x7);
 
 	m_eeprom->clk_write(BIT(data, 5) ? ASSERT_LINE : CLEAR_LINE);
 	m_eeprom->di_write(BIT(data, 4));
@@ -1017,16 +1017,16 @@ ROM_END
 
 DRIVER_INIT_MEMBER(simpl156_state,simpl156)
 {
-	UINT8 *rom = memregion("okimusic")->base();
+	uint8_t *rom = memregion("okimusic")->base();
 	int length = memregion("okimusic")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	/* hmm low address line goes to banking chip instead? */
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,

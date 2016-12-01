@@ -5,7 +5,7 @@
 #define CF      (m_CarryVal!=0)
 #define SF      (m_SignVal<0)
 #define ZF      (m_ZeroVal==0)
-#define PF      m_parity_table[(UINT8)m_ParityVal]
+#define PF      m_parity_table[(uint8_t)m_ParityVal]
 #define AF      (m_AuxVal!=0)
 #define OF      (m_OverVal!=0)
 
@@ -15,37 +15,37 @@
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
-UINT8 i8086_common_cpu_device::read_byte(UINT32 addr)
+uint8_t i8086_common_cpu_device::read_byte(uint32_t addr)
 {
 	return m_program->read_byte(addr);
 }
 
-UINT16 i8086_common_cpu_device::read_word(UINT32 addr)
+uint16_t i8086_common_cpu_device::read_word(uint32_t addr)
 {
 	return m_program->read_word_unaligned(addr);
 }
 
-void i8086_common_cpu_device::write_byte(UINT32 addr, UINT8 data)
+void i8086_common_cpu_device::write_byte(uint32_t addr, uint8_t data)
 {
 	m_program->write_byte(addr, data);
 }
 
 
-void i8086_common_cpu_device::write_word(UINT32 addr, UINT16 data)
+void i8086_common_cpu_device::write_word(uint32_t addr, uint16_t data)
 {
 	m_program->write_word_unaligned(addr, data);
 }
 
-inline UINT16 i8086_common_cpu_device::fetch_word()
+inline uint16_t i8086_common_cpu_device::fetch_word()
 {
-	UINT16 data = fetch();
+	uint16_t data = fetch();
 	data |= ( fetch() << 8 );
 	return data;
 }
 
-inline UINT8 i8086_common_cpu_device::repx_op()
+inline uint8_t i8086_common_cpu_device::repx_op()
 {
-	UINT8 next = fetch_op();
+	uint8_t next = fetch_op();
 	bool seg_prefix = false;
 	int seg = 0;
 
@@ -82,19 +82,19 @@ inline UINT8 i8086_common_cpu_device::repx_op()
 }
 
 
-inline void i8086_common_cpu_device::CLK(UINT8 op)
+inline void i8086_common_cpu_device::CLK(uint8_t op)
 {
 	m_icount -= m_timing[op];
 }
 
 
-inline void i8086_common_cpu_device::CLKM(UINT8 op_reg, UINT8 op_mem)
+inline void i8086_common_cpu_device::CLKM(uint8_t op_reg, uint8_t op_mem)
 {
 	m_icount -= ( m_modrm >= 0xc0 ) ? m_timing[op_reg] : m_timing[op_mem];
 }
 
 
-inline UINT32 i8086_common_cpu_device::get_ea(int size, int op)
+inline uint32_t i8086_common_cpu_device::get_ea(int size, int op)
 {
 	switch( m_modrm & 0xc7 )
 	{
@@ -141,91 +141,91 @@ inline UINT32 i8086_common_cpu_device::get_ea(int size, int op)
 
 	case 0x40:
 		m_icount -= 11;
-		m_eo = m_regs.w[BX] + m_regs.w[SI] + (INT8)fetch();
+		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x41:
 		m_icount -= 12;
-		m_eo = m_regs.w[BX] + m_regs.w[DI] + (INT8)fetch();
+		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x42:
 		m_icount -= 12;
-		m_eo = m_regs.w[BP] + m_regs.w[SI] + (INT8)fetch();
+		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x43:
 		m_icount -= 11;
-		m_eo = m_regs.w[BP] + m_regs.w[DI] + (INT8)fetch();
+		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x44:
 		m_icount -= 9;
-		m_eo = m_regs.w[SI] + (INT8)fetch();
+		m_eo = m_regs.w[SI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x45:
 		m_icount -= 9;
-		m_eo = m_regs.w[DI] + (INT8)fetch();
+		m_eo = m_regs.w[DI] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x46:
 		m_icount -= 9;
-		m_eo = m_regs.w[BP] + (INT8)fetch();
+		m_eo = m_regs.w[BP] + (int8_t)fetch();
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x47:
 		m_icount -= 9;
-		m_eo = m_regs.w[BX] + (INT8)fetch();
+		m_eo = m_regs.w[BX] + (int8_t)fetch();
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 
 	case 0x80:
 		m_icount -= 11;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BX] + m_regs.w[SI] + (INT16)m_e16;
+		m_eo = m_regs.w[BX] + m_regs.w[SI] + (int16_t)m_e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x81:
 		m_icount -= 12;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BX] + m_regs.w[DI] + (INT16)m_e16;
+		m_eo = m_regs.w[BX] + m_regs.w[DI] + (int16_t)m_e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x82:
 		m_icount -= 11;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + m_regs.w[SI] + (INT16)m_e16;
+		m_eo = m_regs.w[BP] + m_regs.w[SI] + (int16_t)m_e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x83:
 		m_icount -= 11;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + m_regs.w[DI] + (INT16)m_e16;
+		m_eo = m_regs.w[BP] + m_regs.w[DI] + (int16_t)m_e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x84:
 		m_icount -= 9;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[SI] + (INT16)m_e16;
+		m_eo = m_regs.w[SI] + (int16_t)m_e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x85:
 		m_icount -= 9;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[DI] + (INT16)m_e16;
+		m_eo = m_regs.w[DI] + (int16_t)m_e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	case 0x86:
 		m_icount -= 9;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BP] + (INT16)m_e16;
+		m_eo = m_regs.w[BP] + (int16_t)m_e16;
 		m_ea = calc_addr(SS, m_eo, size, op);
 		break;
 	case 0x87:
 		m_icount -= 9;
 		m_e16 = fetch_word();
-		m_eo = m_regs.w[BX] + (INT16)m_e16;
+		m_eo = m_regs.w[BX] + (int16_t)m_e16;
 		m_ea = calc_addr(DS, m_eo, size, op);
 		break;
 	}
@@ -234,7 +234,7 @@ inline UINT32 i8086_common_cpu_device::get_ea(int size, int op)
 }
 
 
-inline void i8086_common_cpu_device::PutbackRMByte(UINT8 data)
+inline void i8086_common_cpu_device::PutbackRMByte(uint8_t data)
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -247,7 +247,7 @@ inline void i8086_common_cpu_device::PutbackRMByte(UINT8 data)
 }
 
 
-inline void i8086_common_cpu_device::PutbackRMWord(UINT16 data)
+inline void i8086_common_cpu_device::PutbackRMWord(uint16_t data)
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -267,12 +267,12 @@ inline void i8086_common_cpu_device::PutImmRMWord()
 	}
 	else
 	{
-		UINT32 addr = get_ea(2, I8086_WRITE);
+		uint32_t addr = get_ea(2, I8086_WRITE);
 		write_word( addr, fetch_word() );
 	}
 }
 
-inline void i8086_common_cpu_device::PutRMWord(UINT16 val)
+inline void i8086_common_cpu_device::PutRMWord(uint16_t val)
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -285,7 +285,7 @@ inline void i8086_common_cpu_device::PutRMWord(UINT16 val)
 }
 
 
-inline void i8086_common_cpu_device::PutRMByte(UINT8 val)
+inline void i8086_common_cpu_device::PutRMByte(uint8_t val)
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -306,7 +306,7 @@ inline void i8086_common_cpu_device::PutImmRMByte()
 	}
 	else
 	{
-		UINT32 addr = get_ea(1, I8086_WRITE);
+		uint32_t addr = get_ea(1, I8086_WRITE);
 		write_byte( addr, fetch() );
 	}
 }
@@ -359,31 +359,31 @@ inline void i8086_common_cpu_device::DEF_axd16()
 
 
 
-inline void i8086_common_cpu_device::RegByte(UINT8 data)
+inline void i8086_common_cpu_device::RegByte(uint8_t data)
 {
 	m_regs.b[ m_Mod_RM.reg.b[ m_modrm ] ] = data;
 }
 
 
-inline void i8086_common_cpu_device::RegWord(UINT16 data)
+inline void i8086_common_cpu_device::RegWord(uint16_t data)
 {
 	m_regs.w[ m_Mod_RM.reg.w[ m_modrm ] ] = data;
 }
 
 
-inline UINT8 i8086_common_cpu_device::RegByte()
+inline uint8_t i8086_common_cpu_device::RegByte()
 {
 	return m_regs.b[ m_Mod_RM.reg.b[ m_modrm ] ];
 }
 
 
-inline UINT16 i8086_common_cpu_device::RegWord()
+inline uint16_t i8086_common_cpu_device::RegWord()
 {
 	return m_regs.w[ m_Mod_RM.reg.w[ m_modrm ] ];
 }
 
 
-inline UINT16 i8086_common_cpu_device::GetRMWord()
+inline uint16_t i8086_common_cpu_device::GetRMWord()
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -396,15 +396,15 @@ inline UINT16 i8086_common_cpu_device::GetRMWord()
 }
 
 
-inline UINT16 i8086_common_cpu_device::GetnextRMWord()
+inline uint16_t i8086_common_cpu_device::GetnextRMWord()
 {
-	UINT32 addr = ( m_ea & ~0xffff ) | ( ( m_ea + 2 ) & 0xffff );
+	uint32_t addr = ( m_ea & ~0xffff ) | ( ( m_ea + 2 ) & 0xffff );
 
 	return read_word( addr );
 }
 
 
-inline UINT8 i8086_common_cpu_device::GetRMByte()
+inline uint8_t i8086_common_cpu_device::GetRMByte()
 {
 	if ( m_modrm >= 0xc0 )
 	{
@@ -417,25 +417,25 @@ inline UINT8 i8086_common_cpu_device::GetRMByte()
 }
 
 
-inline void i8086_common_cpu_device::PutMemB(int seg, UINT16 offset, UINT8 data)
+inline void i8086_common_cpu_device::PutMemB(int seg, uint16_t offset, uint8_t data)
 {
 	write_byte( calc_addr(seg, offset, 1, I8086_WRITE), data);
 }
 
 
-inline void i8086_common_cpu_device::PutMemW(int seg, UINT16 offset, UINT16 data)
+inline void i8086_common_cpu_device::PutMemW(int seg, uint16_t offset, uint16_t data)
 {
 	write_word( calc_addr( seg, offset, 2, I8086_WRITE), data);
 }
 
 
-inline UINT8 i8086_common_cpu_device::GetMemB(int seg, UINT16 offset)
+inline uint8_t i8086_common_cpu_device::GetMemB(int seg, uint16_t offset)
 {
 	return read_byte( calc_addr(seg, offset, 1, I8086_READ) );
 }
 
 
-inline UINT16 i8086_common_cpu_device::GetMemW(int seg, UINT16 offset)
+inline uint16_t i8086_common_cpu_device::GetMemW(int seg, uint16_t offset)
 {
 	return read_word( calc_addr(seg, offset, 2, I8086_READ) );
 }
@@ -443,68 +443,68 @@ inline UINT16 i8086_common_cpu_device::GetMemW(int seg, UINT16 offset)
 
 // Setting flags
 
-inline void i8086_common_cpu_device::set_CFB(UINT32 x)
+inline void i8086_common_cpu_device::set_CFB(uint32_t x)
 {
 	m_CarryVal = x & 0x100;
 }
 
-inline void i8086_common_cpu_device::set_CFW(UINT32 x)
+inline void i8086_common_cpu_device::set_CFW(uint32_t x)
 {
 	m_CarryVal = x & 0x10000;
 }
 
-inline void i8086_common_cpu_device::set_AF(UINT32 x,UINT32 y,UINT32 z)
+inline void i8086_common_cpu_device::set_AF(uint32_t x,uint32_t y,uint32_t z)
 {
 	m_AuxVal = (x ^ (y ^ z)) & 0x10;
 }
 
-inline void i8086_common_cpu_device::set_SF(UINT32 x)
+inline void i8086_common_cpu_device::set_SF(uint32_t x)
 {
 	m_SignVal = x;
 }
 
-inline void i8086_common_cpu_device::set_ZF(UINT32 x)
+inline void i8086_common_cpu_device::set_ZF(uint32_t x)
 {
 	m_ZeroVal = x;
 }
 
-inline void i8086_common_cpu_device::set_PF(UINT32 x)
+inline void i8086_common_cpu_device::set_PF(uint32_t x)
 {
 	m_ParityVal = x;
 }
 
-inline void i8086_common_cpu_device::set_SZPF_Byte(UINT32 x)
+inline void i8086_common_cpu_device::set_SZPF_Byte(uint32_t x)
 {
-	m_SignVal = m_ZeroVal = m_ParityVal = (INT8)x;
+	m_SignVal = m_ZeroVal = m_ParityVal = (int8_t)x;
 }
 
-inline void i8086_common_cpu_device::set_SZPF_Word(UINT32 x)
+inline void i8086_common_cpu_device::set_SZPF_Word(uint32_t x)
 {
-	m_SignVal = m_ZeroVal = m_ParityVal = (INT16)x;
+	m_SignVal = m_ZeroVal = m_ParityVal = (int16_t)x;
 }
 
-inline void i8086_common_cpu_device::set_OFW_Add(UINT32 x,UINT32 y,UINT32 z)
+inline void i8086_common_cpu_device::set_OFW_Add(uint32_t x,uint32_t y,uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x8000;
 }
 
-inline void i8086_common_cpu_device::set_OFB_Add(UINT32 x,UINT32 y,UINT32 z)
+inline void i8086_common_cpu_device::set_OFB_Add(uint32_t x,uint32_t y,uint32_t z)
 {
 	m_OverVal = (x ^ y) & (x ^ z) & 0x80;
 }
 
-inline void i8086_common_cpu_device::set_OFW_Sub(UINT32 x,UINT32 y,UINT32 z)
+inline void i8086_common_cpu_device::set_OFW_Sub(uint32_t x,uint32_t y,uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x8000;
 }
 
-inline void i8086_common_cpu_device::set_OFB_Sub(UINT32 x,UINT32 y,UINT32 z)
+inline void i8086_common_cpu_device::set_OFB_Sub(uint32_t x,uint32_t y,uint32_t z)
 {
 	m_OverVal = (z ^ y) & (z ^ x) & 0x80;
 }
 
 
-inline UINT16 i8086_common_cpu_device::CompressFlags() const
+inline uint16_t i8086_common_cpu_device::CompressFlags() const
 {
 	return (CF ? 1 : 0)
 		| (1 << 1)
@@ -521,7 +521,7 @@ inline UINT16 i8086_common_cpu_device::CompressFlags() const
 		| (m_MF << 15);
 }
 
-inline void i8086_common_cpu_device::ExpandFlags(UINT16 f)
+inline void i8086_common_cpu_device::ExpandFlags(uint16_t f)
 {
 	m_CarryVal = (f) & 1;
 	m_ParityVal = !((f) & 4);
@@ -539,7 +539,7 @@ inline void i8086_common_cpu_device::ExpandFlags(UINT16 f)
 
 inline void i8086_common_cpu_device::i_insb()
 {
-	UINT32 ea = calc_addr(ES, m_regs.w[DI], 1, I8086_WRITE);
+	uint32_t ea = calc_addr(ES, m_regs.w[DI], 1, I8086_WRITE);
 	write_byte(ea, read_port_byte(m_regs.w[DX]));
 	m_regs.w[DI] += -2 * m_DF + 1;
 	CLK(IN_IMM8);
@@ -547,7 +547,7 @@ inline void i8086_common_cpu_device::i_insb()
 
 inline void i8086_common_cpu_device::i_insw()
 {
-	UINT32 ea = calc_addr(ES, m_regs.w[DI], 2, I8086_WRITE);
+	uint32_t ea = calc_addr(ES, m_regs.w[DI], 2, I8086_WRITE);
 	write_word(ea, read_port_word(m_regs.w[DX]));
 	m_regs.w[DI] += -4 * m_DF + 2;
 	CLK(IN_IMM16);
@@ -569,7 +569,7 @@ inline void i8086_common_cpu_device::i_outsw()
 
 inline void i8086_common_cpu_device::i_movsb()
 {
-	UINT8 tmp = GetMemB( DS, m_regs.w[SI] );
+	uint8_t tmp = GetMemB( DS, m_regs.w[SI] );
 	PutMemB( ES, m_regs.w[DI], tmp);
 	m_regs.w[DI] += -2 * m_DF + 1;
 	m_regs.w[SI] += -2 * m_DF + 1;
@@ -578,7 +578,7 @@ inline void i8086_common_cpu_device::i_movsb()
 
 inline void i8086_common_cpu_device::i_movsw()
 {
-	UINT16 tmp = GetMemW( DS, m_regs.w[SI] );
+	uint16_t tmp = GetMemW( DS, m_regs.w[SI] );
 	PutMemW( ES, m_regs.w[DI], tmp );
 	m_regs.w[DI] += -4 * m_DF + 2;
 	m_regs.w[SI] += -4 * m_DF + 2;
@@ -654,7 +654,7 @@ inline void i8086_common_cpu_device::i_scasw()
 
 inline void i8086_common_cpu_device::i_popf()
 {
-	UINT32 tmp = POP();
+	uint32_t tmp = POP();
 
 	ExpandFlags(tmp | 0xf000);
 	CLK(POPF);
@@ -665,9 +665,9 @@ inline void i8086_common_cpu_device::i_popf()
 }
 
 
-inline UINT32 i8086_common_cpu_device::ADDB()
+inline uint32_t i8086_common_cpu_device::ADDB()
 {
-	UINT32 res = m_dst + m_src;
+	uint32_t res = m_dst + m_src;
 
 	set_OFB_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -677,9 +677,9 @@ inline UINT32 i8086_common_cpu_device::ADDB()
 }
 
 
-inline UINT32 i8086_common_cpu_device::ADDX()
+inline uint32_t i8086_common_cpu_device::ADDX()
 {
-	UINT32 res = m_dst + m_src;
+	uint32_t res = m_dst + m_src;
 
 	set_OFW_Add(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -689,9 +689,9 @@ inline UINT32 i8086_common_cpu_device::ADDX()
 }
 
 
-inline UINT32 i8086_common_cpu_device::SUBB()
+inline uint32_t i8086_common_cpu_device::SUBB()
 {
-	UINT32 res = m_dst - m_src;
+	uint32_t res = m_dst - m_src;
 
 	set_OFB_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -701,9 +701,9 @@ inline UINT32 i8086_common_cpu_device::SUBB()
 }
 
 
-inline UINT32 i8086_common_cpu_device::SUBX()
+inline uint32_t i8086_common_cpu_device::SUBX()
 {
-	UINT32 res = m_dst - m_src;
+	uint32_t res = m_dst - m_src;
 
 	set_OFW_Sub(res,m_src,m_dst);
 	set_AF(res,m_src,m_dst);
@@ -811,7 +811,7 @@ inline void i8086_common_cpu_device::RORC_WORD()
 	m_dst >>= 1;
 }
 
-inline void i8086_common_cpu_device::SHL_BYTE(UINT8 c)
+inline void i8086_common_cpu_device::SHL_BYTE(uint8_t c)
 {
 	while (c--)
 		m_dst <<= 1;
@@ -821,7 +821,7 @@ inline void i8086_common_cpu_device::SHL_BYTE(UINT8 c)
 	PutbackRMByte(m_dst);
 }
 
-inline void i8086_common_cpu_device::SHL_WORD(UINT8 c)
+inline void i8086_common_cpu_device::SHL_WORD(uint8_t c)
 {
 	while (c--)
 		m_dst <<= 1;
@@ -831,7 +831,7 @@ inline void i8086_common_cpu_device::SHL_WORD(UINT8 c)
 	PutbackRMWord(m_dst);
 }
 
-inline void i8086_common_cpu_device::SHR_BYTE(UINT8 c)
+inline void i8086_common_cpu_device::SHR_BYTE(uint8_t c)
 {
 	while (c--)
 	{
@@ -843,7 +843,7 @@ inline void i8086_common_cpu_device::SHR_BYTE(UINT8 c)
 	PutbackRMByte(m_dst);
 }
 
-inline void i8086_common_cpu_device::SHR_WORD(UINT8 c)
+inline void i8086_common_cpu_device::SHR_WORD(uint8_t c)
 {
 	while (c--)
 	{
@@ -855,24 +855,24 @@ inline void i8086_common_cpu_device::SHR_WORD(UINT8 c)
 	PutbackRMWord(m_dst);
 }
 
-inline void i8086_common_cpu_device::SHRA_BYTE(UINT8 c)
+inline void i8086_common_cpu_device::SHRA_BYTE(uint8_t c)
 {
 	while (c--)
 	{
 		m_CarryVal = m_dst & 0x01;
-		m_dst = ((INT8) m_dst) >> 1;
+		m_dst = ((int8_t) m_dst) >> 1;
 	}
 
 	set_SZPF_Byte(m_dst);
 	PutbackRMByte(m_dst);
 }
 
-inline void i8086_common_cpu_device::SHRA_WORD(UINT8 c)
+inline void i8086_common_cpu_device::SHRA_WORD(uint8_t c)
 {
 	while (c--)
 	{
 		m_CarryVal = m_dst & 0x01;
-		m_dst = ((INT16) m_dst) >> 1;
+		m_dst = ((int16_t) m_dst) >> 1;
 	}
 
 	set_SZPF_Word(m_dst);
@@ -880,19 +880,19 @@ inline void i8086_common_cpu_device::SHRA_WORD(UINT8 c)
 }
 
 
-inline void i8086_common_cpu_device::XchgAXReg(UINT8 reg)
+inline void i8086_common_cpu_device::XchgAXReg(uint8_t reg)
 {
-	UINT16 tmp = m_regs.w[reg];
+	uint16_t tmp = m_regs.w[reg];
 
 	m_regs.w[reg] = m_regs.w[AX];
 	m_regs.w[AX] = tmp;
 }
 
 
-inline void i8086_common_cpu_device::IncWordReg(UINT8 reg)
+inline void i8086_common_cpu_device::IncWordReg(uint8_t reg)
 {
-	UINT32 tmp = m_regs.w[reg];
-	UINT32 tmp1 = tmp+1;
+	uint32_t tmp = m_regs.w[reg];
+	uint32_t tmp1 = tmp+1;
 
 	m_OverVal = (tmp == 0x7fff);
 	set_AF(tmp1,tmp,1);
@@ -901,10 +901,10 @@ inline void i8086_common_cpu_device::IncWordReg(UINT8 reg)
 }
 
 
-inline void i8086_common_cpu_device::DecWordReg(UINT8 reg)
+inline void i8086_common_cpu_device::DecWordReg(uint8_t reg)
 {
-	UINT32 tmp = m_regs.w[reg];
-	UINT32 tmp1 = tmp-1;
+	uint32_t tmp = m_regs.w[reg];
+	uint32_t tmp1 = tmp-1;
 
 	m_OverVal = (tmp == 0x8000);
 	set_AF(tmp1,tmp,1);
@@ -913,16 +913,16 @@ inline void i8086_common_cpu_device::DecWordReg(UINT8 reg)
 }
 
 
-inline void i8086_common_cpu_device::PUSH(UINT16 data)
+inline void i8086_common_cpu_device::PUSH(uint16_t data)
 {
 	write_word(calc_addr(SS, m_regs.w[SP] - 2, 2, I8086_WRITE, false), data);
 	m_regs.w[SP] -= 2;
 }
 
 
-inline UINT16 i8086_common_cpu_device::POP()
+inline uint16_t i8086_common_cpu_device::POP()
 {
-	UINT16 data = read_word(calc_addr(SS, m_regs.w[SP], 2, I8086_READ, false));
+	uint16_t data = read_word(calc_addr(SS, m_regs.w[SP], 2, I8086_READ, false));
 
 	m_regs.w[SP] += 2;
 	return data;
@@ -931,7 +931,7 @@ inline UINT16 i8086_common_cpu_device::POP()
 
 inline void i8086_common_cpu_device::JMP(bool cond)
 {
-	int rel  = (int)((INT8)fetch());
+	int rel  = (int)((int8_t)fetch());
 
 	if (cond)
 	{
@@ -943,11 +943,11 @@ inline void i8086_common_cpu_device::JMP(bool cond)
 }
 
 
-inline void i8086_common_cpu_device::ADJ4(INT8 param1,INT8 param2)
+inline void i8086_common_cpu_device::ADJ4(int8_t param1,int8_t param2)
 {
 	if (AF || ((m_regs.b[AL] & 0xf) > 9))
 	{
-		UINT16 tmp;
+		uint16_t tmp;
 		tmp = m_regs.b[AL] + param1;
 		m_regs.b[AL] = tmp;
 		m_AuxVal = 1;
@@ -962,7 +962,7 @@ inline void i8086_common_cpu_device::ADJ4(INT8 param1,INT8 param2)
 }
 
 
-inline void i8086_common_cpu_device::ADJB(INT8 param1, INT8 param2)
+inline void i8086_common_cpu_device::ADJB(int8_t param1, int8_t param2)
 {
 	if (AF || ((m_regs.b[AL] & 0xf) > 9))
 	{

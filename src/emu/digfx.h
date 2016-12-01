@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIGFX_H__
-#define __DIGFX_H__
+#ifndef MAME_EMU_DIGFX_H
+#define MAME_EMU_DIGFX_H
 
 
 
@@ -23,9 +23,9 @@
 //  CONSTANTS
 //**************************************************************************
 
-const int MAX_GFX_ELEMENTS = 32;
-const int MAX_GFX_PLANES = 8;
-const int MAX_GFX_SIZE = 32;
+constexpr u8 MAX_GFX_ELEMENTS = 32;
+constexpr u16 MAX_GFX_PLANES = 8;
+constexpr u16 MAX_GFX_SIZE = 32;
 
 
 
@@ -160,29 +160,29 @@ class palette_device;
 
 struct gfx_layout
 {
-	UINT32 xoffs(int x) const { return (extxoffs != nullptr) ? extxoffs[x] : xoffset[x]; }
-	UINT32 yoffs(int y) const { return (extyoffs != nullptr) ? extyoffs[y] : yoffset[y]; }
+	u32 xoffs(int x) const { return (extxoffs != nullptr) ? extxoffs[x] : xoffset[x]; }
+	u32 yoffs(int y) const { return (extyoffs != nullptr) ? extyoffs[y] : yoffset[y]; }
 
-	UINT16          width;              // pixel width of each element
-	UINT16          height;             // pixel height of each element
-	UINT32          total;              // total number of elements, or RGN_FRAC()
-	UINT16          planes;             // number of bitplanes
-	UINT32          planeoffset[MAX_GFX_PLANES]; // bit offset of each bitplane
-	UINT32          xoffset[MAX_GFX_SIZE]; // bit offset of each horizontal pixel
-	UINT32          yoffset[MAX_GFX_SIZE]; // bit offset of each vertical pixel
-	UINT32          charincrement;      // distance between two consecutive elements (in bits)
-	const UINT32 *  extxoffs;           // extended X offset array for really big layouts
-	const UINT32 *  extyoffs;           // extended Y offset array for really big layouts
+	u16             width;              // pixel width of each element
+	u16             height;             // pixel height of each element
+	u32             total;              // total number of elements, or RGN_FRAC()
+	u16             planes;             // number of bitplanes
+	u32             planeoffset[MAX_GFX_PLANES]; // bit offset of each bitplane
+	u32             xoffset[MAX_GFX_SIZE]; // bit offset of each horizontal pixel
+	u32             yoffset[MAX_GFX_SIZE]; // bit offset of each vertical pixel
+	u32             charincrement;      // distance between two consecutive elements (in bits)
+	const u32 *     extxoffs;           // extended X offset array for really big layouts
+	const u32 *     extyoffs;           // extended Y offset array for really big layouts
 };
 
 struct gfx_decode_entry
 {
 	const char *    memory_region;      // memory region where the data resides
-	UINT32          start;              // offset of beginning of data to decode
+	u32             start;              // offset of beginning of data to decode
 	const gfx_layout *gfxlayout;        // pointer to gfx_layout describing the layout; nullptr marks the end of the array
-	UINT16          color_codes_start;  // offset in the color lookup table where color codes start
-	UINT16          total_color_codes;  // total number of color codes
-	UINT32          flags;              // flags and optional scaling factors
+	u16             color_codes_start;  // offset in the color lookup table where color codes start
+	u16             total_color_codes;  // total number of color codes
+	u32             flags;              // flags and optional scaling factors
 };
 
 // ======================> device_gfx_interface
@@ -200,14 +200,14 @@ public:
 	static void static_set_palette(device_t &device, const char *tag);
 
 	// getters
-	palette_device &palette() const { return *m_palette; }
-	gfx_element *gfx(int index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
+	palette_device &palette() const { assert(m_palette != nullptr); return *m_palette; }
+	gfx_element *gfx(u8 index) const { assert(index < MAX_GFX_ELEMENTS); return m_gfx[index].get(); }
 
 	// decoding
 	void decode_gfx(const gfx_decode_entry *gfxdecodeinfo);
 	void decode_gfx() { decode_gfx(m_gfxdecodeinfo); }
 
-	void set_gfx(int index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
+	void set_gfx(u8 index, std::unique_ptr<gfx_element> &&element) { assert(index < MAX_GFX_ELEMENTS); m_gfx[index] = std::move(element); }
 
 protected:
 	// interface-level overrides
@@ -232,4 +232,4 @@ private:
 typedef device_interface_iterator<device_gfx_interface> gfx_interface_iterator;
 
 
-#endif  /* __DIGFX_H__ */
+#endif  /* MAME_EMU_DIGFX_H */

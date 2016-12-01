@@ -71,7 +71,7 @@ class lmc1992_device :  public device_t,
 {
 public:
 	// construction/destruction
-	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	lmc1992_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_WRITE_LINE_MEMBER( clock_w );
 	DECLARE_WRITE_LINE_MEMBER( data_w );
@@ -92,7 +92,7 @@ private:
 	int m_enable;                   // enable latch
 	int m_data;                     // data latch
 	int m_clk;                      // clock latch
-	UINT16 m_si;                    // serial in shift register
+	uint16_t m_si;                    // serial in shift register
 
 	int m_input;                    // input select
 	int m_bass;                     // bass

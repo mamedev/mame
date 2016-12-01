@@ -230,7 +230,7 @@ void saturn_state::smpc_system_reset()
 
 TIMER_CALLBACK_MEMBER( saturn_state::smpc_change_clock )
 {
-	UINT32 xtal;
+	uint32_t xtal;
 
 	if(LOG_SMPC) printf ("Clock change execute at (%d %d)\n",machine().first_screen()->hpos(),machine().first_screen()->vpos());
 
@@ -382,18 +382,18 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 
 	if(LOG_PAD_CMD) printf("%d %d %d\n", m_smpc.intback_stage - 1, machine().first_screen()->vpos(), (int)machine().first_screen()->frame_number());
 
-	UINT8 status1 = m_ctrl1 ? m_ctrl1->read_status() : 0xf0;
-	UINT8 status2 = m_ctrl2 ? m_ctrl2->read_status() : 0xf0;
+	uint8_t status1 = m_ctrl1 ? m_ctrl1->read_status() : 0xf0;
+	uint8_t status2 = m_ctrl2 ? m_ctrl2->read_status() : 0xf0;
 
-	UINT8 reg_offset = 0;
-	UINT8 ctrl1_offset = 0;     // this is used when there is segatap or multitap connected
-	UINT8 ctrl2_offset = 0;     // this is used when there is segatap or multitap connected
+	uint8_t reg_offset = 0;
+	uint8_t ctrl1_offset = 0;     // this is used when there is segatap or multitap connected
+	uint8_t ctrl2_offset = 0;     // this is used when there is segatap or multitap connected
 
 	m_smpc.OREG[reg_offset++] = status1;
 	// read ctrl1
 	for (int i = 0; i < (status1 & 0xf); i++)
 	{
-		UINT8 id = m_ctrl1->read_id(i);
+		uint8_t id = m_ctrl1->read_id(i);
 		m_smpc.OREG[reg_offset++] = id;
 		for (int j = 0; j < (id & 0xf); j++)
 			m_smpc.OREG[reg_offset++] = m_ctrl1->read_ctrl(j + ctrl1_offset);
@@ -403,7 +403,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::intback_peripheral )
 	// read ctrl2
 	for (int i = 0; i < (status2 & 0xf); i++)
 	{
-		UINT8 id = m_ctrl2->read_id(i);
+		uint8_t id = m_ctrl2->read_id(i);
 		m_smpc.OREG[reg_offset++] = id;
 		for (int j = 0; j < (id & 0xf); j++)
 			m_smpc.OREG[reg_offset++] = m_ctrl2->read_ctrl(j + ctrl2_offset);
@@ -538,7 +538,7 @@ TIMER_CALLBACK_MEMBER( saturn_state::smpc_audio_reset_line_pulse )
  *
  *******************************************/
 
-void saturn_state::smpc_comreg_exec(address_space &space, UINT8 data, UINT8 is_stv)
+void saturn_state::smpc_comreg_exec(address_space &space, uint8_t data, uint8_t is_stv)
 {
 	switch (data)
 	{
@@ -786,12 +786,12 @@ WRITE8_MEMBER( saturn_state::stv_SMPC_w )
  *
  *******************************************/
 
-UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
+uint8_t saturn_state::smpc_th_control_mode(uint8_t pad_n)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 	int th = (pad_n == 0) ? ((m_smpc.PDR1 >> 5) & 3) : ((m_smpc.PDR2 >> 5) & 3);
 
-	UINT16 ctrl_read = 0;
+	uint16_t ctrl_read = 0;
 	if (m_ctrl1 && pad_n == 0)
 		ctrl_read = m_ctrl1->read_direct();
 	if (m_ctrl2 && pad_n == 1)
@@ -832,12 +832,12 @@ UINT8 saturn_state::smpc_th_control_mode(UINT8 pad_n)
 	return res;
 }
 
-UINT8 saturn_state::smpc_direct_mode(UINT8 pad_n)
+uint8_t saturn_state::smpc_direct_mode(uint8_t pad_n)
 {
 	int hshake = (pad_n == 0) ? ((m_smpc.PDR1 >> 5) & 3) : ((m_smpc.PDR2 >> 5) & 3);
 	const int shift_bit[4] = { 4, 12, 8, 0 };
 
-	UINT16 ctrl_read = 0;
+	uint16_t ctrl_read = 0;
 	if (m_ctrl1 && pad_n == 0)
 		ctrl_read = m_ctrl1->read_direct();
 	if (m_ctrl2 && pad_n == 1)
@@ -850,7 +850,7 @@ UINT8 saturn_state::smpc_direct_mode(UINT8 pad_n)
 
 READ8_MEMBER( saturn_state::saturn_SMPC_r )
 {
-	UINT8 return_data = 0;
+	uint8_t return_data = 0;
 
 	if (!(offset & 1)) // avoid reading to even bytes (TODO: is it 0s or 1s?)
 		return 0x00;
@@ -871,7 +871,7 @@ READ8_MEMBER( saturn_state::saturn_SMPC_r )
 	{
 		if ((m_smpc.IOSEL1 && offset == 0x75) || (m_smpc.IOSEL2 && offset == 0x77))
 		{
-			UINT8 cur_ddr;
+			uint8_t cur_ddr;
 
 			if (((m_ctrl1 && m_ctrl1->read_id(0) != 0x02) || (m_ctrl2 && m_ctrl2->read_id(0) != 0x02)) && !(space.debugger_access()))
 			{

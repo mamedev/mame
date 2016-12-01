@@ -134,7 +134,7 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	                X               0->1 trigger IRQ on sound CPU
 	                        x   x   coin counters
 	*/
-	UINT16 old = m_CPUA_register;
+	uint16_t old = m_CPUA_register;
 	COMBINE_DATA(&m_CPUA_register);
 	if (m_CPUA_register != old)
 	{

@@ -142,7 +142,7 @@ const device_type WD2010 = &device_creator<wd2010_device>;
 //  wd2010_device - constructor
 //-------------------------------------------------
 
-wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+wd2010_device::wd2010_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, WD2010, "Western Digital WD2010", tag, owner, clock, "wd2010", __FILE__),
 m_out_intrq_cb(*this),
 m_out_bdrq_cb(*this),
@@ -224,7 +224,7 @@ void wd2010_device::device_reset()
 
 READ8_MEMBER(wd2010_device::read)
 {
-	UINT8 data;
+	uint8_t data;
 
 	switch (offset)
 	{
@@ -358,9 +358,9 @@ WRITE8_MEMBER(wd2010_device::write)
 //-------------------------------------------------
 //  compute_correction -
 //-------------------------------------------------
-void wd2010_device::compute_correction(UINT8 data)
+void wd2010_device::compute_correction(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	complete_cmd(newstatus);
 }
 
@@ -368,9 +368,9 @@ void wd2010_device::compute_correction(UINT8 data)
 //-------------------------------------------------
 //  set_parameter -
 //-------------------------------------------------
-void wd2010_device::set_parameter(UINT8 data)
+void wd2010_device::set_parameter(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	complete_cmd(newstatus);
 }
 
@@ -378,9 +378,9 @@ void wd2010_device::set_parameter(UINT8 data)
 //-------------------------------------------------
 //  restore -
 //-------------------------------------------------
-void wd2010_device::restore(UINT8 data)
+void wd2010_device::restore(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
@@ -450,9 +450,9 @@ void wd2010_device::restore(UINT8 data)
 // FIXME : step rate, drive change (!)
 
 // NOT IMPLEMENTED: IMPLIED SEEK ("wait until rising edge of SC signal")
-void wd2010_device::seek(UINT8 data)
+void wd2010_device::seek(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
 	m_error = 0;
@@ -467,7 +467,7 @@ void wd2010_device::seek(UINT8 data)
 
 	// Calculate number of steps by comparing the cylinder registers
 	//           HI/LO with the internally stored position.
-	UINT32 cylinder_registers = CYLINDER;
+	uint32_t cylinder_registers = CYLINDER;
 	if (m_present_cylinder > cylinder_registers)
 	{
 		step_pulses = m_present_cylinder - cylinder_registers;
@@ -535,9 +535,9 @@ void wd2010_device::seek(UINT8 data)
 //-------------------------------------------------
 // FIXME: multiple sector transfers, ID / CYL / HEAD / SIZE match
 //        + ERROR HANDLING (...)
-void wd2010_device::read_sector(UINT8 data)
+void wd2010_device::read_sector(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 	int intrq_at_end = 0; // (default) : (I = 1  INTRQ occurs when the command
 
 	m_out_intrq_cb(CLEAR_LINE); // reset INTRQ, errors, set BUSY, CIP
@@ -647,7 +647,7 @@ void wd2010_device::read_sector(UINT8 data)
 //-------------------------------------------------
 // FIXME: SEEK, SEEK_COMPLETE, Drive # change (!)
 // as well as CYL.register + internal CYL.register comparisons
-void wd2010_device::write_sector(UINT8 data)
+void wd2010_device::write_sector(uint8_t data)
 {
 	m_error = 0; // De-assert ERROR + DRQ
 	m_status &= ~(STATUS_DRQ);
@@ -665,9 +665,9 @@ void wd2010_device::write_sector(UINT8 data)
 //-------------------------------------------------
 //  write_sector (stage II)
 //-------------------------------------------------
-void wd2010_device::complete_write_sector(UINT8 data)
+void wd2010_device::complete_write_sector(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY | STATUS_SC;
+	uint8_t newstatus = STATUS_RDY | STATUS_SC;
 
 	m_out_bdrq_cb(0); // DE-Assert BDRQ (...and DRQ !)
 	m_status &= ~(STATUS_DRQ);
@@ -729,7 +729,7 @@ void wd2010_device::complete_write_sector(UINT8 data)
 
 	// * does nothing right now *
 // ******************************************************
-void wd2010_device::auto_scan_id(UINT8 data)
+void wd2010_device::auto_scan_id(uint8_t data)
 {
 	static int last_drive;
 
@@ -747,7 +747,7 @@ void wd2010_device::auto_scan_id(UINT8 data)
 // ******************************************************
 
 // What to do here (just update present_cylinder with CYLINDER)...?
-void wd2010_device::update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new_cylinder, UINT8 new_sectornr)
+void wd2010_device::update_sdh(uint8_t new_sector_size, uint8_t new_head, uint16_t new_cylinder, uint8_t new_sectornr)
 {
 	// "Update SDH"
 	/*
@@ -774,9 +774,9 @@ void wd2010_device::update_sdh(UINT8 new_sector_size, UINT8 new_head, UINT16 new
 //  and writes this into the Present Cylinder Position Register.
 
 //  FIXME: NO ID HANDLING (ID FOUND / NOT FOUND), NO BAD BLOCK; NO CRC
-void wd2010_device::scan_id(UINT8 data)
+void wd2010_device::scan_id(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY;
+	uint8_t newstatus = STATUS_RDY;
 
 	m_out_intrq_cb(CLEAR_LINE);
 	m_error = 0;
@@ -811,9 +811,9 @@ void wd2010_device::scan_id(UINT8 data)
 // SECTOR NUMBER REG.= number of bytes - 3 (for GAP 1 + 3)
 // = 40 decimal on DEC RD51 with WUTIL 3.2
 //--------------------------------------------------------
-void wd2010_device::format(UINT8 data)
+void wd2010_device::format(uint8_t data)
 {
-	UINT8 newstatus = STATUS_RDY;
+	uint8_t newstatus = STATUS_RDY;
 
 	m_out_intrq_cb(CLEAR_LINE);
 	m_error = 0;
@@ -859,7 +859,7 @@ void wd2010_device::format(UINT8 data)
 		return;
 	}
 
-	//  UINT8 format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
+	//  uint8_t format_sector_count = m_task_file[TASK_FILE_SECTOR_COUNT];
 	//  do
 	//  {
 	//      < WRITE GAP 1 or GAP 3 >
@@ -955,7 +955,7 @@ void wd2010_device::device_timer(emu_timer &timer, device_timer_id tid, int para
 }
 
 // Called by 'device_timer' -
-void wd2010_device::complete_immediate(UINT8 status)
+void wd2010_device::complete_immediate(uint8_t status)
 {
 	// re-evaluate external signals at end of command
 	status &= ~(STATUS_RDY | STATUS_WF | STATUS_SC); // RDY  0x40  / WF 0x20 /  SC 0x10
@@ -983,7 +983,7 @@ void wd2010_device::complete_immediate(UINT8 status)
 	m_out_bcr_cb(1);
 }
 
-void wd2010_device::complete_cmd(UINT8 status)
+void wd2010_device::complete_cmd(uint8_t status)
 {
 	cmd_timer->adjust(attotime::from_msec(1), status);
 }
