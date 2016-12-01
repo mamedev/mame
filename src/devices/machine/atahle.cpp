@@ -813,9 +813,6 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 		LOG(("%s:IDE cs0 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
 	//  fprintf(stderr, "ide write %03x %02x mem_mask=%d\n", offset, data, size);
 
-	// apply mask
-	data &= mem_mask;
-
 	if (m_dmack)
 	{
 		logerror( "%s: %s dev %d write_cs0 %04x %04x %04x ignored (DMACK)\n", machine().describe_context(), tag(), dev(), offset, data, mem_mask );
@@ -855,7 +852,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 
 			/* sector count */
 			case IDE_CS0_SECTOR_COUNT_RW:
-				m_sector_count = data ? data : 256;
+				m_sector_count = (data & 0xff) ? (data & 0xff) : 0x100;
 				break;
 
 			/* current sector */
@@ -922,9 +919,6 @@ WRITE16_MEMBER( ata_hle_device::write_cs1 )
 {
 	/* logit */
 	LOG(("%s:IDE cs1 write to %X = %08X, mem_mask=%d\n", machine().describe_context(), offset, data, mem_mask));
-
-	// apply mask
-	data &= mem_mask;
 
 	if (m_dmack)
 	{
