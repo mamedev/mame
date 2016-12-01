@@ -203,8 +203,8 @@ private:
 	uint32_t                           m_underflows;
 	BOOL                             m_in_underflow;
 	BOOL                             m_initialized;
-	DYNAMIC_API(xaudio2, "dwrite.dll");
-	DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
+	OSD_DYNAMIC_API(xaudio2, "dwrite.dll");
+	OSD_DYNAMIC_API_FN(xaudio2, HRESULT, WINAPI, XAudio2Create, IXAudio2 **, uint32_t, XAUDIO2_PROCESSOR);
 
 public:
 	sound_xaudio2() :
@@ -264,7 +264,7 @@ private:
 
 bool sound_xaudio2::probe()
 {
-	return DYNAMIC_API_TEST(XAudio2Create);
+	return OSD_DYNAMIC_API_TEST(XAudio2Create);
 }
 
 //============================================================
@@ -281,14 +281,14 @@ int sound_xaudio2::init(osd_options const &options)
 	CoInitializeEx(nullptr, COINIT_MULTITHREADED);
 
 	// Make sure our XAudio2Create entrypoint is bound
-	if (!DYNAMIC_API_TEST(XAudio2Create))
+	if (!OSD_DYNAMIC_API_TEST(XAudio2Create))
 	{
 		osd_printf_error("Could not find XAudio2. Please try to reinstall DirectX runtime package.\n");
 		return 1;
 	}
 
 	// Create the IXAudio2 object
-	HR_GOERR(DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
+	HR_GOERR(OSD_DYNAMIC_CALL(XAudio2Create, m_xAudio2.GetAddressOf(), 0, XAUDIO2_DEFAULT_PROCESSOR));
 
 	// make a format description for what we want
 	format.wBitsPerSample = 16;
