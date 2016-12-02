@@ -65,7 +65,6 @@ public:
 	uint8_t *m_xrom_base;
 	uint32_t m_master_length;
 	uint32_t m_slave_length;
-	uint32_t m_xrom_length;
 	int m_dangerz_x;
 	int m_dangerz_y;
 	uint8_t m_analog_result;
@@ -93,6 +92,7 @@ public:
 	uint8_t m_gfxbank;
 	uint16_t m_last_scanline;
 	emu_timer *m_scanline_timer;
+
 	DECLARE_READ8_MEMBER(cerberus_dial_1_r);
 	DECLARE_READ8_MEMBER(cerberus_dial_2_r);
 	DECLARE_WRITE8_MEMBER(alleymas_joystick_kludge);
@@ -138,6 +138,12 @@ public:
 	DECLARE_WRITE8_MEMBER(ataxx_svram_port_w);
 	DECLARE_READ8_MEMBER(ataxx_mvram_port_r);
 	DECLARE_READ8_MEMBER(ataxx_svram_port_r);
+	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
+	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
+	DECLARE_READ8_MEMBER(leland_sound_port_r);
+	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
+	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
+
 	DECLARE_DRIVER_INIT(dblplay);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(quarterb);
@@ -171,6 +177,7 @@ public:
 	DECLARE_VIDEO_START(leland);
 	DECLARE_VIDEO_START(leland2);
 	DECLARE_VIDEO_START(ataxx);
+
 	uint32_t screen_update_leland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_ataxx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(leland_master_interrupt);
@@ -178,15 +185,12 @@ public:
 	TIMER_CALLBACK_MEMBER(ataxx_interrupt_callback);
 	TIMER_CALLBACK_MEMBER(scanline_callback);
 	TIMER_CALLBACK_MEMBER(leland_delayed_mvram_w);
-	DECLARE_READ8_MEMBER(ataxx_eeprom_r);
-	DECLARE_WRITE8_MEMBER(ataxx_eeprom_w);
-	DECLARE_READ8_MEMBER(leland_sound_port_r);
-	DECLARE_WRITE8_MEMBER(leland_sound_port_w);
-	DECLARE_WRITE8_MEMBER(leland_gfx_port_w);
+
 	void leland_video_addr_w(address_space &space, int offset, int data, int num);
 	int leland_vram_port_r(address_space &space, int offset, int num);
 	void leland_vram_port_w(address_space &space, int offset, int data, int num);
 	int dial_compute_value(int new_val, int indx);
+
 	void update_dangerz_xy();
 	void cerberus_bankswitch();
 	void mayhem_bankswitch();
