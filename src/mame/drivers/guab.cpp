@@ -64,7 +64,9 @@ public:
 		m_sn(*this, "snsnd"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:0"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sound_buffer(0), m_sound_latch(false)
+	{ }
 
 	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE16_MEMBER(tms34061_w);
@@ -78,9 +80,10 @@ public:
 	DECLARE_WRITE8_MEMBER(output5_w);
 	DECLARE_WRITE8_MEMBER(output6_w);
 	DECLARE_READ8_MEMBER(sn76489_ready_r);
-	DECLARE_WRITE8_MEMBER(floppy_ctrl_w);
+	DECLARE_WRITE8_MEMBER(sn76489_buffer_w);
+	DECLARE_WRITE8_MEMBER(system_w);
+	DECLARE_READ8_MEMBER(watchdog_r);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -96,6 +99,9 @@ private:
 	required_device<wd1773_t> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<palette_device> m_palette;
+
+	uint8_t m_sound_buffer;
+	bool m_sound_latch;
 };
 
 
@@ -109,10 +115,7 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c0000, 0x0c0007) AM_DEVREADWRITE8("i8255_1", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0020, 0x0c0027) AM_DEVREADWRITE8("i8255_2", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0040, 0x0c0047) AM_DEVREADWRITE8("i8255_3", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0060, 0x0c0061) AM_READ8(sn76489_ready_r, 0x00ff) AM_DEVWRITE8("snsnd", sn76489_device, write, 0x00ff)
-	AM_RANGE(0x0c0062, 0x0c0063) AM_WRITE8(floppy_ctrl_w, 0x00ff)
-	AM_RANGE(0x0c0064, 0x0c0065) AM_WRITE8(watchdog_w, 0x00ff)
-	AM_RANGE(0x0c0066, 0x0c0067) AM_WRITE8(unknown_w, 0x00ff)
+	AM_RANGE(0x0c0060, 0x0c0067) AM_DEVREADWRITE8("i8255_4", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0080, 0x0c0081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0c00a0, 0x0c00a1) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_r, control_w, 0x00ff)
@@ -285,19 +288,36 @@ void guab_state::machine_start()
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
-WRITE8_MEMBER( guab_state::watchdog_w )
+READ8_MEMBER( guab_state::watchdog_r )
 {
-	// nibbles only
-	// reads from the port, then writes the sequence
-	// b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
-	// after that it just continues writing f to it
+	// only read after writing the sequence below
+	return 0xff;
 }
 
-WRITE8_MEMBER( guab_state::unknown_w )
+WRITE8_MEMBER( guab_state::watchdog_w )
 {
-	// unknown
-	// at startup, 0x88 or 0x98 is written here
-	// while the game is running only 0x88
+	// watchdog?
+	// writes b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
+	// then later toggles between 0 and f
+}
+
+WRITE8_MEMBER( guab_state::system_w )
+{
+	// bit 0, sound latch
+	if (m_sound_latch != bool(BIT(data, 0)))
+	{
+		// falling edge
+		if (!m_sound_latch)
+			m_sn->write(m_sound_buffer);
+
+		m_sound_latch = bool(BIT(data, 0));
+	}
+
+	// bit 3, floppy drive side select
+	m_floppy->get_device()->ss_w(BIT(data, 3));
+
+	// one of those bits will probably control the motor, we just let it run all the time for now
+	m_floppy->get_device()->mon_w(0);
 }
 
 
@@ -397,22 +417,19 @@ WRITE8_MEMBER( guab_state::output6_w )
 
 READ8_MEMBER( guab_state::sn76489_ready_r )
 {
-	// bit 7 connected to sn76489 ready output (0 = ready)
+	// bit 7 connected to sn76489 ready output (0 = ready)^
 	return ~(m_sn->ready_r() << 7);
+}
+
+WRITE8_MEMBER( guab_state::sn76489_buffer_w )
+{
+	m_sound_buffer = data;
 }
 
 
 //**************************************************************************
 //  FLOPPY DRIVE
 //**************************************************************************
-
-WRITE8_MEMBER( guab_state::floppy_ctrl_w )
-{
-	m_floppy->get_device()->ss_w(BIT(data, 3));
-
-	// one of those bits will probably control the motor, we just let it run all the time for now
-	m_floppy->get_device()->mon_w(0);
-}
 
 FLOPPY_FORMATS_MEMBER( guab_state::floppy_formats )
 	FLOPPY_GUAB_FORMAT
@@ -476,6 +493,13 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, output4_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, output5_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, output6_w))
+
+	MCFG_DEVICE_ADD("i8255_4", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(guab_state, sn76489_ready_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, sn76489_buffer_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, system_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(guab_state, watchdog_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, watchdog_w))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
 
