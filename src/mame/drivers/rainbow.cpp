@@ -8,7 +8,7 @@
 // - Registers of graphics option not directly mapped (indirect access via mode register)
 // - write mask is 16 bits wide (not only 8)
 // - scroll register is 8 bits wide - not 16.
-// - no "DMA SCROLL", "LINE ERASE MODE", no ZOOM hardware (factor must always be 1)
+// - no "LINE ERASE MODE", 7220 DMA lines are unused. No ZOOM hardware (factor must always be 1)
 
 // Two modes: highres and medres mode (different bank length..?)
 // - MEDRES: palette of 16 colors out of 4096.   384 x 240
@@ -34,14 +34,12 @@ SCREEN 1 vs. SCREEN 2 IN EMULATION
 // The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
 
 BUGS
-- MEDRES LOOKS CORRECT
-- HIRES-MODE SEMI BROKEN (colors OK, else untested).
-- GDC diagnostic disk bails out on 10 of 13 low level tests. Separate SCROLL CHECK crashes CPU. Readback from GDC fails?
-- VECTOR MODE SEEMS TO DISPLAY NOTHING AT ALL (16 bit access botched here in driver?)
+- MEDRES and HIRES MODE APPEAR TO BE CORRECT 
+- GDC diagnostic disk bails out on 9 of 13 tests (tests 4 and 6 - 13). Scroll check doesn't...
+
 Interaction of Upd7220 and Rainbow.cpp:
-- FIG directions / params appear to be odd (lines go 45 degrees up or down instead of straight dir.),
-- RDAT with MOD 2 is unimplemented. WDAT appears to set "m_bitmap_mod" wrongly ("2" means all pixels will be reset)...
-Freeware to try: MMIND (MasterMind, after BMP logo), SOLIT (Solitaire), CANON (high resolution + vectors).
+- RDAT with MOD 2 is unimplemented (other modes than 00). Effect of missing R-M-W...?
+Software to try: MMIND (MasterMind, after BMP logo), SOLIT (Solitaire), CANON (high resolution + vectors), GDC Test Disk.
 
 UNIMPLEMENTED:
 // - Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
@@ -49,21 +47,19 @@ UNIMPLEMENTED:
 UNKNOWN IMPLEMENTATION DETAILS:
 // a. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
 
-// b. SCROLL BUFFER initialization (details) unclear. What happens when a programs does not write all 256 bytes? Value of uninitialized areas?
-   Play, then retry (y) SCRAM to see the effect. Scram doesn't seem to write all (256) bytes, a GDC RESET is only executed at startup...
+// b. SCROLL BUFFER details unclear. What happens when a programs does not write all 256 bytes? Value of uninitialized areas?
+   Play, then retry (y) SCRAM to see the effect. Scram doesn't seem to write all (256) bytes, a GDC RESET is only executed ONCE.
    (PAGE 48 OF PDF HAS A SUPERFICIAL DESCRIPTION OF THE SCROLL BUFFER)
 
-// c. UNVERIFIED XTAL / CLOCK:
-// There is a 31.188 Mhz crystal in DUELL's hand written Option Graphics circuit (not to be found in XTAL).
-// According to the datasheet, the NEC 7220 was certified for  4.0 , 5.0, and 5.5 Mhz and the 7220A for 6.0, 7.0, and 8.0 Mhz
+// c. UNVERIFIED DIVIDER (31.188 Mhz / 32) is at least close to 1 Mhz (as seen on the VT240)
 
-// d. UPD7220 oddities: * refresh rate much too fast at 32Mhz/4 (Upd7220 LOG says 492 Mhz?!).
-//                      * pixels are stretched out too wide at 384 x 240. Compare the real SCRAM screenshot online!
+// d. UPD7220 / CORE oddities: 
+   * pixels are stretched out too wide at 384 x 240 (not fixable here). -KEEPASPECT?
 
-// e. FIXME (MAME/MESS): what happens when the left screen is at 50 Hz and the right at 60 Hz?
-//  According to Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-//  (the partial update system gets very confused because it expects both the screens to end at the same time
-//  and if that isn't the case large parts of one screen end up not updating at all)
+// * (MAME core): what happens when the left screen is at 50 Hz and the right at 60 Hz?
+//                According to Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
+//                (the partial update system gets very confused because it expects both the screens to end at the same time
+//                and if that isn't the case large parts of one screen end up not updating at all)
 */
 
 // license:GPL-2.0+
@@ -72,7 +68,7 @@ UNKNOWN IMPLEMENTATION DETAILS:
 DEC Rainbow 100
 
 Driver-in-progress by R. Belmont and Miodrag Milanovic.
-Keyboard fix by Cracyc (June 2016), Baud rate generator by Shattered (July 2016)
+Keyboard & GDC fixes by Cracyc (June - Nov. 2016), Baud rate generator by Shattered (July 2016)
 Portions (2013 - 2016) by Karl-Ludwig Deisenhofer (Floppy, ClikClok RTC, NVRAM, DIPs, hard disk, Color Graphics).
 
 To unlock floppy drives A-D compile with WORKAROUND_RAINBOW_B (prevents a side effect of ERROR 13).
@@ -92,8 +88,8 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF OCTOBER 2016
-------------------------
+STATE AS OF DECE;BER 2016
+-------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
 The public domain file RBCONVERT.ZIP documents how model 'A' differs from version B.
@@ -733,8 +729,15 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	uint16_t plane0, plane1, plane2, plane3;
 	uint8_t pen;
 
-	if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO))
+	if(m_ONBOARD_GRAPHICS_SELECTED && (m_inp13->read() != DUAL_MONITOR) )
+	{	
+		for(xi=0;xi<16;xi++) // blank screen when VT102 output active (..)
+		{			
+			if (bitmap.cliprect().contains(x + xi, y))
+				bitmap.pix32(y, x + xi) = 0; 
+		}
 		return; // no output from graphics option
+	}
 
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
@@ -2432,6 +2435,8 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 							}
 
 							case COLOR_MONITOR:
+									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO)) 
+										red = blue = 0; // Page 21 of PDF AA-AE36A (PDF) explains why
 									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
 									green = uint8_t( mono * 17 *  ( (255-video_levels[ mono ])  / 255.0f) ); // BCC-17 cable (red, mono -> green, blue)
 									blue  = uint8_t( blue  * 17 *  ( (255-video_levels[ blue ] )  / 255.0f) );
@@ -3071,7 +3076,8 @@ MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
-MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 4) // Duell schematics shows a 31.188 Mhz clock (confirmed by RFKA; not in XTAL)
+// While the OSC frequency is confirmed, the divider is not. Refresh rate is ~60 Hz with 32.
+MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
 MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
 MCFG_DEVICE_ADDRESS_MAP(AS_0, upd7220_map)
