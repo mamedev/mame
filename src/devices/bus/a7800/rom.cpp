@@ -32,6 +32,7 @@ const device_type A78_ROM_POKEY = &device_creator<a78_rom_pokey_device>;
 const device_type A78_ROM_SG_POKEY = &device_creator<a78_rom_sg_pokey_device>;
 const device_type A78_ROM_SG_RAM = &device_creator<a78_rom_sg_ram_device>;
 const device_type A78_ROM_SG9 = &device_creator<a78_rom_sg9_device>;
+const device_type A78_ROM_MRAM = &device_creator<a78_rom_mram_device>;
 const device_type A78_ROM_ABSOLUTE = &device_creator<a78_rom_abs_device>;
 const device_type A78_ROM_ACTIVISION = &device_creator<a78_rom_act_device>;
 
@@ -66,6 +67,16 @@ a78_rom_pokey_device::a78_rom_pokey_device(const machine_config &mconfig, const 
 {
 }
 
+
+a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source)
+{
+}
+
+a78_rom_mram_device::a78_rom_mram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+					: a78_rom_device(mconfig, A78_ROM_MRAM, "Atari 7800 ROM Carts + Mirror RAM", tag, owner, clock, "a78_rom_mram", __FILE__)
+{
+}
 
 a78_rom_sg_device::a78_rom_sg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: a78_rom_device(mconfig, type, name, tag, owner, clock, shortname, source), m_bank(0)
@@ -259,6 +270,35 @@ WRITE8_MEMBER(a78_rom_pokey_device::write_40xx)
 machine_config_constructor a78_rom_pokey_device::device_mconfig_additions() const
 {
 	return MACHINE_CONFIG_NAME( a78_pokey );
+}
+
+/*-------------------------------------------------
+
+ Carts with no bankswitch + mRAM chip
+ The RAM chips are accessed by writing at
+ 0x4000-0x7fff.
+ The A8 line of the RAM chip isn't used, to create
+ mirrors of even pages at odd page locations.
+
+ GAMES: Rescue on Fractalus (proto)
+
+ -------------------------------------------------*/
+
+
+READ8_MEMBER(a78_rom_mram_device::read_40xx)
+{
+	if (offset < 0x4000)
+		return m_ram[offset & 0xfeff];
+	if (offset + 0x4000 < m_base_rom)
+		return 0xff;
+	else
+		return m_rom[offset + 0x4000 - m_base_rom];
+}
+
+WRITE8_MEMBER(a78_rom_mram_device::write_40xx)
+{
+	if (offset < 0x4000)
+		m_ram[offset&0xfeff] = data;
 }
 
 
