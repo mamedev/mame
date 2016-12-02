@@ -1703,6 +1703,8 @@ device_debug::device_debug(device_t &device)
 				m_symtable.add("logunmapd", (void *)&m_memory->space(AS_DATA), get_logunmap, set_logunmap);
 			if (m_memory->has_space(AS_IO))
 				m_symtable.add("logunmapi", (void *)&m_memory->space(AS_IO), get_logunmap, set_logunmap);
+			if (m_memory->has_space(AS_DECRYPTED_OPCODES))
+				m_symtable.add("logunmapo", (void *)&m_memory->space(AS_DECRYPTED_OPCODES), get_logunmap, set_logunmap);
 		}
 
 		// add all registers into it
