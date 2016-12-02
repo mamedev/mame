@@ -156,4 +156,4 @@ ROM_START( magnum )
 	ROM_LOAD("hd44780_a00.bin", 0x0000, 0x1000,  BAD_DUMP CRC(01d108e2) SHA1(bc0cdf0c9ba895f22e183c7bd35a3f655f2ca96f))
 ROM_END
 
-COMP( 1983, magnum, 0, 0, magnum, 0, driver_device, 0, "Dulmont", "Magnum", MACHINE_NO_SOUND_HW)
+COMP( 1983, magnum, 0, 0, magnum, 0, driver_device, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
