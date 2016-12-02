@@ -7705,8 +7705,8 @@ ROM_START( shaktam )
 	DISK_IMAGE_READONLY( "gds-0002b", 0, SHA1(c656497b44d5ca4743aa1a8d836af2bfa3484dd5) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	// PIC label is unknown
-	ROM_LOAD("317-xxxx-com.pic", 0x00, 0x4000, CRC(9e1a8971) SHA1(022a1781b5d7346b61defe921dbabf11331834d7) )
+	// PIC number is guess
+	ROM_LOAD("317-0299-com.pic", 0x00, 0x4000, CRC(9e1a8971) SHA1(022a1781b5d7346b61defe921dbabf11331834d7) )
 ROM_END
 
 ROM_START( sprtjam )
