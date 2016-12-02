@@ -1,3 +1,2 @@
 bin
 build/*/obj
-src/host/scripts.c

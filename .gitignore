@@ -17,6 +17,7 @@
 !/docs/
 !/hash/
 !/hlsl/
+!/ini/
 !/keymaps/
 !/language/
 !/nl_examples/
@@ -47,4 +48,3 @@ regtests/jedutil/output
 /src/devices/cpu/m68000/m68kmake.*
 /src/devices/cpu/m68000/m68kmake
 !/src/devices/cpu/m68000/m68kmake.cpp
-/samples
