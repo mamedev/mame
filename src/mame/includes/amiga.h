@@ -504,6 +504,8 @@ public:
 		custom_chip_w(m_maincpu->space(AS_PROGRAM), offset, data, mem_mask);
 	}
 
+	void blitter_setup();
+
 protected:
 	// agnus/alice chip id
 	enum
@@ -660,7 +662,7 @@ private:
 
 	void serial_adjust();
 	void serial_shift();
-	void rx_write(amiga_state *state, int level);
+	void rx_write(int level);
 
 	uint32_t amiga_gethvpos();
 };
