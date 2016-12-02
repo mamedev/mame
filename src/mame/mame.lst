@@ -17624,6 +17624,9 @@ magictga                        // (c) 199? Acclaim
 @source:magmax.cpp
 magmax                          // (c) 1985
 
+@source:magnum.cpp
+magnum                          //
+
 @source:magtouch.cpp
 magtouch                        // (c) 1995
 
