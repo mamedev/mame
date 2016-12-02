@@ -22,6 +22,7 @@
         count gets updated in the code. Each game requires a unique
         security PAL - maybe this is related? I'm poking the coin values
         directly into RAM for now.
+        * Game hangs when you try to 'collect' cash
         * Verify WD FDC type
         * Are IRQs 1 or 2 connected to something?
         * Hook up ACIA properly (IRQ 4)
@@ -333,7 +334,7 @@ WRITE8_MEMBER( guab_state::output2_w )
 {
 	output().set_value("led_8", BIT(data, 0));
 	output().set_value("led_9", BIT(data, 1));
-	output().set_value("led_10", BIT(data, 2));
+	output().set_value("led_10", BIT(data, 2));	// start
 	output().set_value("led_11", BIT(data, 3));
 	output().set_value("led_12", BIT(data, 4));
 	output().set_value("led_13", BIT(data, 5));
@@ -349,32 +350,32 @@ WRITE8_MEMBER( guab_state::output3_w )
 	output().set_value("led_19", BIT(data, 3));
 	output().set_value("led_20", BIT(data, 4));
 	output().set_value("led_21", BIT(data, 5));
-	output().set_value("led_22", BIT(data, 6));
-	output().set_value("led_23", BIT(data, 7));
+	output().set_value("led_22", BIT(data, 6));	// a
+	output().set_value("led_23", BIT(data, 7));	// b
 }
 
 WRITE8_MEMBER( guab_state::output4_w )
 {
-	output().set_value("led_24", BIT(data, 0));
+	output().set_value("led_24", BIT(data, 0));	// select
 	output().set_value("led_25", BIT(data, 1));
 	output().set_value("led_26", BIT(data, 2));
 	output().set_value("led_27", BIT(data, 3));
-	output().set_value("led_28", BIT(data, 4));
-	output().set_value("led_29", BIT(data, 5));
+	output().set_value("led_28", BIT(data, 4));	// c
+	output().set_value("led_29", BIT(data, 5));	// d
 	output().set_value("led_30", BIT(data, 6));
 	output().set_value("led_31", BIT(data, 7));
 }
 
 WRITE8_MEMBER( guab_state::output5_w )
 {
-	output().set_value("led_32", BIT(data, 0));
-	output().set_value("led_33", BIT(data, 1));
-	output().set_value("led_34", BIT(data, 2));
-	output().set_value("led_35", BIT(data, 3));
-	output().set_value("led_36", BIT(data, 4));
-	output().set_value("led_37", BIT(data, 5));
-	output().set_value("led_38", BIT(data, 6));
-	output().set_value("led_39", BIT(data, 7));
+	output().set_value("led_32", BIT(data, 0));	// top bezel
+	output().set_value("led_33", BIT(data, 1));	// top bezel
+	output().set_value("led_34", BIT(data, 2));	// top bezel
+	output().set_value("led_35", BIT(data, 3));	// top bezel
+	output().set_value("led_36", BIT(data, 4));	// top bezel
+	output().set_value("led_37", BIT(data, 5));	// top bezel
+	output().set_value("led_38", BIT(data, 6));	// top bezel
+	output().set_value("led_39", BIT(data, 7));	// top bezel
 }
 
 WRITE8_MEMBER( guab_state::output6_w )
