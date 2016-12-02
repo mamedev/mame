@@ -37034,6 +37034,7 @@ id4f_201                        //
 jplstw20                        //
 jplstw22                        //
 lostspc                         //
+lostspcf                        //
 lostspcg                        //
 lostspc_d1                      //
 mononew                         //
@@ -37171,6 +37172,7 @@ wackadoo                        //
 xfiles2                         //
 xfiles20                        //
 xfilesp                         //
+xfilespf                        //
 
 @source:wicat.cpp
 wicat                           //
