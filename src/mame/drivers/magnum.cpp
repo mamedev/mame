@@ -1,6 +1,10 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl
 
+// Dulmont Magnum
+// Additional info https://www.youtube.com/watch?v=st7H_vqSaQc and
+// http://www.eevblog.com/forum/blog/eevblog-949-vintage-australian-made-laptop-teardown/msg1080508/#msg1080508
+
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/cdp1879.h"
