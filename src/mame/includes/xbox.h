@@ -129,6 +129,7 @@ private:
 	void dump_dpc_command(int ref, int params, const char **param);
 	void dump_timer_command(int ref, int params, const char **param);
 	void curthread_command(int ref, int params, const char **param);
+	void threadlist_command(int ref, int params, const char **param);
 	void generate_irq_command(int ref, int params, const char **param);
 	void nv2a_combiners_command(int ref, int params, const char **param);
 	void waitvblank_command(int ref, int params, const char **param);

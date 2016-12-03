@@ -562,7 +562,6 @@ public:
 private:
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, int params, const char **param);
-	void threadlist_command(int ref, int params, const char **param);
 	void chihiro_help_command(int ref, int params, const char **param);
 	void debug_commands(int ref, int params, const char **param);
 };
@@ -694,42 +693,12 @@ void chihiro_state::jamtable_disasm_command(int ref, int params, const char **pa
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::threadlist_command(int ref, int params, const char **param)
-{
-	address_space &space = m_maincpu->space();
-	debugger_cpu &cpu = machine().debugger().cpu();
-	debugger_console &con = machine().debugger().console();
-
-	con.printf("Pri. _KTHREAD   Stack  Function\n");
-	con.printf("-------------------------------\n");
-	for (int pri=0;pri < 16;pri++)
-	{
-		uint32_t curr = debugc_bios->parameter[1-1] + pri * 8;
-		uint32_t next = cpu.read_dword(space, curr, true);
-
-		while (next != curr)
-		{
-			uint32_t kthrd = next - debugc_bios->parameter[2-1];
-			uint32_t topstack = cpu.read_dword(space, kthrd + debugc_bios->parameter[3-1], true);
-			uint32_t tlsdata = cpu.read_dword(space, kthrd + debugc_bios->parameter[4-1], true);
-			uint32_t function;
-			if (tlsdata == 0)
-				function = cpu.read_dword(space, topstack - debugc_bios->parameter[5-1] - debugc_bios->parameter[6-1], true);
-			else
-				function = cpu.read_dword(space, tlsdata - debugc_bios->parameter[6-1], true);
-			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = cpu.read_dword(space, next, true);
-		}
-	}
-}
-
 void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
 {
 	debugger_console &con = machine().debugger().console();
 
 	con.printf("Available Chihiro commands:\n");
 	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
-	con.printf("  chihiro threadlist -- list of currently active threads\n");
 	con.printf("  chihiro help -- this list\n");
 }
 
@@ -739,8 +708,6 @@ void chihiro_state::debug_commands(int ref, int params, const char **param)
 		return;
 	if (strcmp("jamdis", param[0]) == 0)
 		jamtable_disasm_command(ref, params - 1, param + 1);
-	else if (strcmp("threadlist", param[0]) == 0)
-		threadlist_command(ref, params - 1, param + 1);
 	else
 		chihiro_help_command(ref, params - 1, param + 1);
 }

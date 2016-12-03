@@ -297,6 +297,35 @@ void xbox_base_state::curthread_command(int ref, int params, const char **param)
 	con.printf("Current thread function is %08X\n", cpu.read_dword(space, address, true));
 }
 
+void xbox_base_state::threadlist_command(int ref, int params, const char **param)
+{
+	address_space &space = m_maincpu->space();
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
+
+	con.printf("Pri. _KTHREAD   Stack  Function\n");
+	con.printf("-------------------------------\n");
+	for (int pri = 0; pri < 16; pri++)
+	{
+		uint32_t curr = debugc_bios->parameter[1 - 1] + pri * 8;
+		uint32_t next = cpu.read_dword(space, curr, true);
+
+		while ((next != curr) && (next != 0))
+		{
+			uint32_t kthrd = next - debugc_bios->parameter[2 - 1];
+			uint32_t topstack = cpu.read_dword(space, kthrd + debugc_bios->parameter[3 - 1], true);
+			uint32_t tlsdata = cpu.read_dword(space, kthrd + debugc_bios->parameter[4 - 1], true);
+			uint32_t function;
+			if (tlsdata == 0)
+				function = cpu.read_dword(space, topstack - debugc_bios->parameter[5 - 1] - debugc_bios->parameter[6 - 1], true);
+			else
+				function = cpu.read_dword(space, tlsdata - debugc_bios->parameter[6 - 1], true);
+			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
+			next = cpu.read_dword(space, next, true);
+		}
+	}
+}
+
 void xbox_base_state::generate_irq_command(int ref, int params, const char **param)
 {
 	uint64_t irq;
@@ -426,6 +455,7 @@ void xbox_base_state::help_command(int ref, int params, const char **param)
 	con.printf("  xbox dump_dpc,<address> -- Dump _KDPC object at <address>\n");
 	con.printf("  xbox dump_timer,<address> -- Dump _KTIMER object at <address>\n");
 	con.printf("  xbox curthread -- Print information about current thread\n");
+	con.printf("  xbox threadlist -- list of currently active threads\n");
 	con.printf("  xbox irq,<number> -- Generate interrupt with irq number 0-15\n");
 	con.printf("  xbox nv2a_combiners -- Toggle use of register combiners\n");
 	con.printf("  xbox waitvblank -- Toggle support for wait vblank method\n");
@@ -451,6 +481,8 @@ void xbox_base_state::xbox_debug_commands(int ref, int params, const char **para
 		dump_timer_command(ref, params - 1, param + 1);
 	else if (strcmp("curthread", param[0]) == 0)
 		curthread_command(ref, params - 1, param + 1);
+	else if (strcmp("threadlist", param[0]) == 0)
+		threadlist_command(ref, params - 1, param + 1);
 	else if (strcmp("irq", param[0]) == 0)
 		generate_irq_command(ref, params - 1, param + 1);
 	else if (strcmp("nv2a_combiners", param[0]) == 0)
