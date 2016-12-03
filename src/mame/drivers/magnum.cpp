@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "cpu/i86/i186.h"
 #include "machine/cdp1879.h"
+#include "sound/beep.h"
 
 class magnum_state : public driver_device
 {
@@ -15,11 +16,13 @@ public:
 	magnum_state(const machine_config &mconfig, device_type type, const char *tag) :
 	driver_device(mconfig, type, tag),
 	m_palette(*this, "palette"),
-	m_cgrom(*this, "cgrom")
+	m_cgrom(*this, "cgrom"),
+	m_beep(*this, "beep")
 	{}
 
 	DECLARE_READ8_MEMBER(lcd_r);
 	DECLARE_WRITE8_MEMBER(lcd_w);
+	DECLARE_WRITE8_MEMBER(beep_w);
 	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 protected:
 	virtual void machine_reset() override;
@@ -27,6 +30,8 @@ protected:
 private:
 	required_device<palette_device> m_palette;
 	required_memory_region m_cgrom;
+	required_device<beep_device> m_beep;
+
 	struct lcd
 	{
 		u8 vram[640];
@@ -112,6 +117,12 @@ WRITE8_MEMBER(magnum_state::lcd_w)
 	}
 }
 
+WRITE8_MEMBER(magnum_state::beep_w)
+{
+	if (data & ~1) printf("beep_w unmapped bits %02x\n", data);
+	m_beep->set_state(BIT(data, 0));
+}
+
 static ADDRESS_MAP_START( magnum_map, AS_PROGRAM, 16, magnum_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM // fixed 256k for now
 	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
@@ -122,6 +133,7 @@ static ADDRESS_MAP_START( magnum_io, AS_IO, 16, magnum_state )
 	//AM_RANGE(0x000a, 0x000b) cdp1854 1
 	//AM_RANGE(0x000e, 0x000f) cpd1854 2
 	AM_RANGE(0x0018, 0x001f) AM_READWRITE8(lcd_r, lcd_w, 0x00ff)
+	AM_RANGE(0x0056, 0x0057) AM_WRITE8(beep_w, 0x00ff)
 	AM_RANGE(0x0080, 0x008f) AM_DEVREADWRITE8("rtc", cdp1879_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
@@ -140,6 +152,10 @@ static MACHINE_CONFIG_START( magnum, magnum_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*80-1, 0, 9*16-1)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
+
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("beep", BEEP, 500) /// frequency is guessed
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( magnum )
@@ -160,4 +176,4 @@ ROM_START( magnum )
 	ROM_LOAD("hd44780_a00.bin", 0x0000, 0x1000,  BAD_DUMP CRC(01d108e2) SHA1(bc0cdf0c9ba895f22e183c7bd35a3f655f2ca96f))
 ROM_END
 
-COMP( 1983, magnum, 0, 0, magnum, 0, driver_device, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, magnum, 0, 0, magnum, 0, driver_device, 0, "Dulmont", "Magnum", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
