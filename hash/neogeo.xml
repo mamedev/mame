@@ -979,9 +979,47 @@
 		</part>
 	</software>
 
+	<software name="burningfpa" cloneof="burningf">
+		<!-- later prototype - Sx, Vx and Cx data all matches final game, but with different rom arranagement, Px & Mx unique -->
+		<description>Burning Fight (prototype, ver 23.3, 910326)</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_byte" name="018_p1_1f28.podd" offset="0x000001" size="0x080000" crc="f7d15752" sha1="334b7e5c8e9099d39424e72db66846d0b9e534de" />
+				<rom loadflag="load16_byte" name="018_p2_3217.peven" offset="0x000000" size="0x080000" crc="ffae22fb" sha1="82f2f81fe96b3c6953985964e12e93e79410ab9e" />
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="018_s1_4491.s1" crc="6799ea0d" sha1="ec75ef9dfdcb0b123574fc6d81ebaaadfba32fb5" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="018_m1_d13e.m1" crc="2b0c0415" sha1="a5a0d5e3ea2ef77b6f5cd14f2907ab2f1aed76b7" />
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="018_v11_6c00.v11" offset="0x000000" size="0x080000" crc="b55b9670" sha1="b0ff38b2dca1361ad155e90be3674dbea1c0a53c" />
+				<rom name="018_v12_8146.v12" offset="0x080000" size="0x080000" crc="a0bcf260" sha1="5d1f2613cf4a292557f37e6f44a90b20d11ed8cd" />
+				<rom name="018_v13_b813.v13" offset="0x100000" size="0x080000" crc="270f4707" sha1="29e763acc9fd4b94d8b5d0ad917e20d8a66bbe49" />
+				<rom name="018_v24_22ee.v24" offset="0x180000" size="0x080000" crc="924e3d69" sha1="927091f9a098f00eb303f5567f4ee926bcb170e3" />
+			</dataarea>
+			<dataarea name="sprites" size="0x400000">
+				<!-- note, load32_byte -->
+				<rom loadflag="load32_byte" name="018_c1_2505.c11" offset="0x000000" size="0x080000" crc="3a441c6a" sha1="0347d47a689af67426be42b4c99da101ee01ce11" />
+				<rom loadflag="load32_byte" name="018_c2_3f55.c12" offset="0x000002" size="0x080000" crc="bb72404b" sha1="7620fccc50ecacf732bb1382abef42212d369f8c" />
+				<rom loadflag="load32_byte" name="018_c3_a20d.c13" offset="0x000001" size="0x080000" crc="87bffd2f" sha1="0f7c835029a3f561861a1a07987dad23a32a899c" />
+				<rom loadflag="load32_byte" name="018_c4_c6e1.c14" offset="0x000003" size="0x080000" crc="33803163" sha1="888ba63618a2ca541883a612f0c75ffa96f1c528" />
+				<rom loadflag="load32_byte" name="018_c5_2cd1.c15" offset="0x200000" size="0x080000" crc="74391952" sha1="0f7451ff74901e7250214a7604a37add56ad7e1f" />
+				<rom loadflag="load32_byte" name="018_c6_8135.c16" offset="0x200002" size="0x080000" crc="95e220e6" sha1="cef4f7c697ab6d20e1b5c85df773d0f1a79e3008" />
+				<rom loadflag="load32_byte" name="018_c7_d009.c17" offset="0x200001" size="0x080000" crc="41326c0d" sha1="64bbecb560d2795ae5292776604ea318a9ae53a6" />
+				<rom loadflag="load32_byte" name="018_c8_dc63.c18" offset="0x200003" size="0x080000" crc="ed3b1f04" sha1="0cb0d30e294e7ff398d553d0f08befb53ac65269" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="burningfp" cloneof="burningf">
 		<!-- early prototype - all roms were hand labeled with CRCs, dumps verified against them -->
-		<description>Burning Fight (prototype)</description>
+		<description>Burning Fight (prototype, older)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="AES" />
