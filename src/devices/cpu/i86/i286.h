@@ -79,6 +79,7 @@ protected:
 	virtual void device_start() override;
 
 	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual uint32_t execute_input_lines() const override { return 1; }

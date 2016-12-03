@@ -247,7 +247,7 @@ void i80286_cpu_device::device_start()
 	state_add( I286_ES_LIMIT, "ESLIMIT", m_limit[ES]).formatstr("%04X");
 	state_add( I286_ES_FLAGS, "ESFLAGS", m_rights[ES]).formatstr("%02X");
 	state_add( I286_CS, "CS", m_sregs[CS] ).callimport().formatstr("%04X");
-	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).formatstr("%06X");
+	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).callimport().formatstr("%06X");
 	state_add( I286_CS_LIMIT, "CSLIMIT", m_limit[CS]).formatstr("%04X");
 	state_add( I286_CS_FLAGS, "CSFLAGS", m_rights[CS]).formatstr("%02X");
 	state_add( I286_SS, "SS", m_sregs[SS] ).formatstr("%04X");
@@ -278,6 +278,45 @@ void i80286_cpu_device::device_start()
 	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 
 	m_out_shutdown_func.resolve_safe();
+}
+
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void i80286_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case I286_IP:
+	case I286_CS_BASE:
+		m_pc = m_base[CS] + m_ip;
+		break;
+
+	case I286_CS:
+		// TODO: should this call data_descriptor to update the current segment?
+		break;
+
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		if (m_pc - m_base[CS] > m_limit[CS])
+		{
+			// TODO: should this call data_descriptor instead of ignoring jumps outside the current segment?
+			if (PM)
+			{
+				m_pc = m_base[CS] + m_ip;
+			}
+			else
+			{
+				m_sregs[CS] = m_pc >> 4;
+				m_base[CS] = m_sregs[CS] << 4;
+			}
+		}
+		m_ip = m_pc - m_base[CS];
+		break;
+	}
 }
 
 

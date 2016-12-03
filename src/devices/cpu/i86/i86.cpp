@@ -320,6 +320,7 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 }
 
+
 //-------------------------------------------------
 //  state_import - import state into the device,
 //  after it has been set
@@ -336,8 +337,9 @@ void i8086_common_cpu_device::state_import(const device_state_entry &entry)
 
 	case STATE_GENPC:
 	case STATE_GENPCBASE:
-		m_sregs[CS] = m_pc >> 4;
-		m_ip = m_pc & 0xf;
+		if (m_pc - (m_sregs[CS] << 4) > 0xffff)
+			m_sregs[CS] = m_pc >> 4;
+		m_ip = m_pc - (m_sregs[CS] << 4);
 		break;
 	}
 }
