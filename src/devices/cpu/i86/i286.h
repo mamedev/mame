@@ -77,7 +77,10 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
+
+	// device_state_interface overrides
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;
