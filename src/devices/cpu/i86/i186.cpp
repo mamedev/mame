@@ -555,7 +555,7 @@ void i80186_cpu_device::device_start()
 	state_add( I8086_DS, "DS", m_sregs[DS] ).formatstr("%04X");
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "PC", m_pc).formatstr("%05X");
+	state_add(STATE_GENPC, "PC", m_pc).callimport().formatstr("%05X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().formatstr("%05X");
 
 	// register for savestates

@@ -273,7 +273,7 @@ void i8086_cpu_device::device_start()
 	state_add( I8086_DS, "DS", m_sregs[DS] ).formatstr("%04X");
 	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "PC", m_pc).formatstr("%05X");
+	state_add(STATE_GENPC, "PC", m_pc).callimport().formatstr("%05X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().formatstr("%05X");
 }
 
@@ -340,6 +340,12 @@ void i8086_common_cpu_device::state_import(const device_state_entry &entry)
 		break;
 	}
 }
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {

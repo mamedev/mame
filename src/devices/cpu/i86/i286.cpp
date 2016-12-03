@@ -273,10 +273,16 @@ void i80286_cpu_device::device_start()
 	state_add( I286_MSW, "MSW", m_msw ).formatstr("%04X");
 	state_add( I286_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "PC", m_pc).formatstr("%06X");
+	state_add(STATE_GENPC, "PC", m_pc).callimport().formatstr("%06X");
 	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().formatstr("%06X");
 	m_out_shutdown_func.resolve_safe();
 }
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
