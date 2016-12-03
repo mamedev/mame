@@ -112,6 +112,9 @@ void isbc_208_device::device_reset()
 {
 	m_aux = 0;
 	m_seg = 0;
+	// set from jumper all drives must be same type
+	if(m_fdc->subdevice<floppy_connector>("0")->get_device()->get_form_factor() == floppy_image::FF_8)
+		m_fdc->set_rate(500000);
 }
 
 void isbc_208_device::device_start()
