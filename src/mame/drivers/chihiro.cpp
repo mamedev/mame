@@ -696,7 +696,6 @@ void chihiro_state::jamtable_disasm_command(int ref, int params, const char **pa
 
 void chihiro_state::threadlist_command(int ref, int params, const char **param)
 {
-	const uint32_t thlists = 0x8003aae0; // magic address
 	address_space &space = m_maincpu->space();
 	debugger_cpu &cpu = machine().debugger().cpu();
 	debugger_console &con = machine().debugger().console();
@@ -705,19 +704,19 @@ void chihiro_state::threadlist_command(int ref, int params, const char **param)
 	con.printf("-------------------------------\n");
 	for (int pri=0;pri < 16;pri++)
 	{
-		uint32_t curr = thlists + pri * 8;
+		uint32_t curr = debugc_bios->parameter[1-1] + pri * 8;
 		uint32_t next = cpu.read_dword(space, curr, true);
 
 		while (next != curr)
 		{
-			uint32_t kthrd = next - 0x5c;
-			uint32_t topstack = cpu.read_dword(space, kthrd + 0x1c, true);
-			uint32_t tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
+			uint32_t kthrd = next - debugc_bios->parameter[2-1];
+			uint32_t topstack = cpu.read_dword(space, kthrd + debugc_bios->parameter[3-1], true);
+			uint32_t tlsdata = cpu.read_dword(space, kthrd + debugc_bios->parameter[4-1], true);
 			uint32_t function;
 			if (tlsdata == 0)
-				function = cpu.read_dword(space, topstack - 0x210 - 8, true);
+				function = cpu.read_dword(space, topstack - debugc_bios->parameter[5-1] - debugc_bios->parameter[6-1], true);
 			else
-				function = cpu.read_dword(space, tlsdata - 8, true);
+				function = cpu.read_dword(space, tlsdata - debugc_bios->parameter[6-1], true);
 			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
 			next = cpu.read_dword(space, next, true);
 		}
@@ -756,7 +755,8 @@ void chihiro_state::hack_eeprom()
 }
 
 #define HACK_ITEMS 5
-static const struct {
+static const struct
+{
 	const char *game_name;
 	const bool disable_usb;
 	struct {

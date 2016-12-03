@@ -115,6 +115,12 @@ public:
 	bool usb_hack_enabled;
 	required_device<cpu_device> m_maincpu;
 	ohci_usb_controller *ohci_usb;
+	static const struct debugger_constants
+	{
+		uint32_t id;
+		uint32_t parameter[8]; // c c c ? ? ? x x
+	} debugp[];
+	const debugger_constants *debugc_bios;
 
 private:
 	void dump_string_command(int ref, int params, const char **param);
@@ -131,6 +137,9 @@ private:
 	void vprogdis_command(int ref, int params, const char **param);
 	void help_command(int ref, int params, const char **param);
 	void xbox_debug_commands(int ref, int params, const char **param);
+	int find_bios_index(running_machine &mach);
+	bool find_bios_hash(running_machine &mach, int bios, uint32_t &crc32);
+	void find_debug_params(running_machine &mach);
 };
 
 ADDRESS_MAP_EXTERN(xbox_base_map, 32);

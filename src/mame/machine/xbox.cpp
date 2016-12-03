@@ -21,6 +21,59 @@
 #define LOG_PCI
 //#define LOG_AUDIO
 
+const xbox_base_state::debugger_constants xbox_base_state::debugp[] = { 
+	{ 0x66232714, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }, 
+	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} } 
+};
+
+int xbox_base_state::find_bios_index(running_machine &mach)
+{
+	u8 sb = mach.driver_data()->system_bios();
+	return sb;
+}
+
+bool xbox_base_state::find_bios_hash(running_machine &mach, int bios, uint32_t &crc32)
+{
+	uint32_t crc = 0;
+	const std::vector<rom_entry> &rev = mach.root_device().rom_region_vector();
+
+	for (rom_entry re : rev)
+	{
+		if ((re.flags() & ROMENTRY_TYPEMASK) == ROMENTRYTYPE_ROM)
+		{
+			if ((re.flags() & ROM_BIOSFLAGSMASK) == ROM_BIOS(bios + 1))
+			{
+				const std::string &h = re.hashdata();
+				util::hash_collection hc(h.c_str());
+				if (hc.crc(crc) == true)
+				{
+					crc32 = crc;
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+void xbox_base_state::find_debug_params(running_machine &mach)
+{
+	uint32_t crc;
+	int sb;
+
+	sb = (int)find_bios_index(machine());
+	debugc_bios = debugp;
+	if (find_bios_hash(machine(), sb - 1, crc) == true)
+	{
+		for (int n = 0; n < 2; n++)
+			if (debugp[n].id == crc)
+			{
+				debugc_bios = &debugp[n];
+				break;
+			}
+	}
+}
+
 void xbox_base_state::dump_string_command(int ref, int params, const char **param)
 {
 	debugger_cpu &cpu = machine().debugger().cpu();
@@ -50,6 +103,7 @@ void xbox_base_state::dump_string_command(int ref, int params, const char **para
 	con.printf("MaximumLength %d word\n", maximumlength);
 	con.printf("Buffer %08X byte* ", buffer);
 
+	// limit the number of characters to avoid flooding
 	if (length > 256)
 		length = 256;
 
@@ -221,25 +275,25 @@ void xbox_base_state::curthread_command(int ref, int params, const char **param)
 	offs_t address;
 
 	uint64_t fsbase = m_maincpu->state_int(44); // base of FS register
-	address = (offs_t)fsbase + 0x28;
+	address = (offs_t)fsbase + (offs_t)debugc_bios->parameter[7-1];
 	if (!m_maincpu->translate(AS_PROGRAM, TRANSLATE_READ_DEBUG, address))
 	{
 		con.printf("Address is unmapped.\n");
 		return;
 	}
-	address = (offs_t)fsbase + 0x28;
+	address = (offs_t)fsbase + (offs_t)debugc_bios->parameter[7-1];
 
 	uint32_t kthrd = cpu.read_dword(space, address, true);
 	con.printf("Current thread is %08X\n", kthrd);
-	address = (offs_t)kthrd + 0x1c;
+	address = (offs_t)(kthrd + debugc_bios->parameter[8-1]);
 	uint32_t topstack = cpu.read_dword(space, address, true);
 	con.printf("Current thread stack top is %08X\n", topstack);
-	address = (offs_t)kthrd + 0x28;
+	address = (offs_t)(kthrd + debugc_bios->parameter[4-1]);
 	uint32_t tlsdata = cpu.read_dword(space, address, true);
 	if (tlsdata == 0)
-		address = (offs_t)topstack - 0x210 - 8;
+		address = (offs_t)(topstack - debugc_bios->parameter[5-1] - debugc_bios->parameter[6-1]);
 	else
-		address = (offs_t)tlsdata - 8;
+		address = (offs_t)(tlsdata - debugc_bios->parameter[6-1]);
 	con.printf("Current thread function is %08X\n", cpu.read_dword(space, address, true));
 }
 
@@ -1114,6 +1168,7 @@ ADDRESS_MAP_END
 
 void xbox_base_state::machine_start()
 {
+	find_debug_params(machine());
 	nvidia_nv2a = std::make_unique<nv2a_renderer>(machine());
 	memset(pic16lc_buffer, 0, sizeof(pic16lc_buffer));
 	pic16lc_buffer[0] = 'B';
