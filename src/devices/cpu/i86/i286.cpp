@@ -273,8 +273,10 @@ void i80286_cpu_device::device_start()
 	state_add( I286_MSW, "MSW", m_msw ).formatstr("%04X");
 	state_add( I286_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "PC", m_pc).callimport().formatstr("%06X");
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).callimport().formatstr("%06X");
+	state_add( I286_PC, "PC", m_pc).callimport().formatstr("%06X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%06X").noshow();
+	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
+
 	m_out_shutdown_func.resolve_safe();
 }
 

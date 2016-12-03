@@ -10,9 +10,9 @@ extern const device_type I80286;
 
 enum
 {   // same order as I8086 registers
-	I286_PC = 0,
+	I286_PC = STATE_GENPC,
 
-	I286_IP,
+	I286_IP = 1,
 	I286_AX,
 	I286_CX,
 	I286_DX,
@@ -29,7 +29,7 @@ enum
 	I286_DS,
 
 	I286_VECTOR,
-	I286_PENDING,
+	I286_HALT,
 
 	I286_ES_BASE,
 	I286_ES_LIMIT,
