@@ -133,6 +133,34 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	void pc_update_bit(uint8_t bit, uint8_t state);
 	void update_tin(uint8_t);
 
+	DECLARE_WRITE_LINE_MEMBER( pa0_w ){ pa_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa1_w ){ pa_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa2_w ){ pa_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa3_w ){ pa_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa4_w ){ pa_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa5_w ){ pa_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa6_w ){ pa_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pa7_w ){ pa_update_bit(7, state); }
+
+	DECLARE_WRITE_LINE_MEMBER( pb0_w ){ pb_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb1_w ){ pb_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb2_w ){ pb_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb3_w ){ pb_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb4_w ){ pb_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb5_w ){ pb_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb6_w ){ pb_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pb7_w ){ pb_update_bit(7, state); }
+
+	DECLARE_WRITE_LINE_MEMBER( pc0_w ){ pc_update_bit(0, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc1_w ){ pc_update_bit(1, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc2_w ){ pc_update_bit(2, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc3_w ){ pc_update_bit(3, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc4_w ){ pc_update_bit(4, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc5_w ){ pc_update_bit(5, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc6_w ){ pc_update_bit(6, state); }
+	DECLARE_WRITE_LINE_MEMBER( pc7_w ){ pc_update_bit(7, state); }
+
+ private:
 	void wr_pitreg_pgcr(uint8_t data);
 	void wr_pitreg_psrr(uint8_t data);
 	void wr_pitreg_paddr(uint8_t data);
