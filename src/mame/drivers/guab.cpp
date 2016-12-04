@@ -32,6 +32,7 @@
         * Create layouts
 
     Notes:
+        * Toggle both 'Back door' and 'Key switch' to enter test mode
         * Video hardware seems to match JPM System 5
 
 ***************************************************************************/
@@ -340,13 +341,13 @@ INPUT_CHANGED_MEMBER( guab_state::coin_inserted )
 
 WRITE8_MEMBER( guab_state::output1_w )
 {
-	output().set_value("led_0", BIT(data, 0));
-	output().set_value("led_1", BIT(data, 1));
+	output().set_value("led_0", BIT(data, 0)); // cash in (ten up: cash in)
+	output().set_value("led_1", BIT(data, 1)); // cash out (ten up: cash out)
 	output().set_value("led_2", BIT(data, 2));
 	output().set_value("led_3", BIT(data, 3));
 	output().set_value("led_4", BIT(data, 4));
 	output().set_value("led_5", BIT(data, 5));
-	output().set_value("led_6", BIT(data, 6));
+	output().set_value("led_6", BIT(data, 6)); // (ten up: 10p/100p drive)
 	output().set_value("led_7", BIT(data, 7));
 }
 
@@ -354,48 +355,48 @@ WRITE8_MEMBER( guab_state::output2_w )
 {
 	output().set_value("led_8", BIT(data, 0));
 	output().set_value("led_9", BIT(data, 1));
-	output().set_value("led_10", BIT(data, 2));	// start
-	output().set_value("led_11", BIT(data, 3));
-	output().set_value("led_12", BIT(data, 4));
-	output().set_value("led_13", BIT(data, 5));
-	output().set_value("led_14", BIT(data, 6));
-	output().set_value("led_15", BIT(data, 7));
+	output().set_value("led_10", BIT(data, 2));	// start (ten up: start)
+	output().set_value("led_11", BIT(data, 3)); // (ten up: feature 6)
+	output().set_value("led_12", BIT(data, 4)); // (ten up: feature 11)
+	output().set_value("led_13", BIT(data, 5)); // (ten up: feature 13)
+	output().set_value("led_14", BIT(data, 6));	// lamp a (ten up: feature 12)
+	output().set_value("led_15", BIT(data, 7));	// lamp b (ten up: pass)
 }
 
 WRITE8_MEMBER( guab_state::output3_w )
 {
-	output().set_value("led_16", BIT(data, 0));
-	output().set_value("led_17", BIT(data, 1));
-	output().set_value("led_18", BIT(data, 2));
-	output().set_value("led_19", BIT(data, 3));
-	output().set_value("led_20", BIT(data, 4));
-	output().set_value("led_21", BIT(data, 5));
-	output().set_value("led_22", BIT(data, 6));	// a
-	output().set_value("led_23", BIT(data, 7));	// b
+	output().set_value("led_16", BIT(data, 0));	// select (ten up: collect)
+	output().set_value("led_17", BIT(data, 1)); // (ten up: feature 14)
+	output().set_value("led_18", BIT(data, 2)); // (ten up: feature 9)
+	output().set_value("led_19", BIT(data, 3)); //   (ten up: lamp a)
+	output().set_value("led_20", BIT(data, 4));	// lamp c (ten up: lamp b)
+	output().set_value("led_21", BIT(data, 5));	// lamp d (ten up: lamp c)
+	output().set_value("led_22", BIT(data, 6));
+	output().set_value("led_23", BIT(data, 7));
 }
 
 WRITE8_MEMBER( guab_state::output4_w )
 {
-	output().set_value("led_24", BIT(data, 0));	// select
-	output().set_value("led_25", BIT(data, 1));
-	output().set_value("led_26", BIT(data, 2));
-	output().set_value("led_27", BIT(data, 3));
-	output().set_value("led_28", BIT(data, 4));	// c
-	output().set_value("led_29", BIT(data, 5));	// d
-	output().set_value("led_30", BIT(data, 6));
-	output().set_value("led_31", BIT(data, 7));
+	output().set_value("led_24", BIT(data, 0));	// feature 1 (ten up: feature 1)
+	output().set_value("led_25", BIT(data, 1));	// feature 2 (ten up: feature 10)
+	output().set_value("led_26", BIT(data, 2));	// feature 3 (ten up: feature 7)
+	output().set_value("led_27", BIT(data, 3));	// feature 4 (ten up: feature 2)
+	output().set_value("led_28", BIT(data, 4));	// feature 5 (ten up: feature 8)
+	output().set_value("led_29", BIT(data, 5));	// feature 6 (ten up: feature 3)
+	output().set_value("led_30", BIT(data, 6));	// feature 7 (ten up: feature 4)
+	output().set_value("led_31", BIT(data, 7));	// feature 8 (ten up: feature 5)
 }
 
 WRITE8_MEMBER( guab_state::output5_w )
 {
-	output().set_value("led_32", BIT(data, 0));	// top bezel
-	output().set_value("led_33", BIT(data, 1));	// top bezel
-	output().set_value("led_34", BIT(data, 2));	// top bezel
-	output().set_value("led_35", BIT(data, 3));	// top bezel
-	output().set_value("led_36", BIT(data, 4));	// top bezel
-	output().set_value("led_37", BIT(data, 5));	// top bezel
-	output().set_value("led_38", BIT(data, 6));	// top bezel
-	output().set_value("led_39", BIT(data, 7));	// top bezel
+	output().set_value("led_32", BIT(data, 0));
+	output().set_value("led_33", BIT(data, 1));
+	output().set_value("led_34", BIT(data, 2));
+	output().set_value("led_35", BIT(data, 3));
+	output().set_value("led_36", BIT(data, 4));
+	output().set_value("led_37", BIT(data, 5));
+	output().set_value("led_38", BIT(data, 6));
+	output().set_value("led_39", BIT(data, 7)); // mech lamp (ten up: mech lamp)
 }
 
 WRITE8_MEMBER( guab_state::output6_w )
@@ -404,8 +405,8 @@ WRITE8_MEMBER( guab_state::output6_w )
 	output().set_value("led_41", BIT(data, 1));
 	output().set_value("led_42", BIT(data, 2));
 	output().set_value("led_43", BIT(data, 3));
-	output().set_value("led_44", BIT(data, 4));
-	output().set_value("led_45", BIT(data, 5));
+	output().set_value("led_44", BIT(data, 4)); // 50p drive (ten up: 10p drive)
+	output().set_value("led_45", BIT(data, 5)); // 100p drive (ten up: 100p drive)
 	output().set_value("led_46", BIT(data, 6));
 	output().set_value("led_47", BIT(data, 7));
 }
@@ -417,7 +418,7 @@ WRITE8_MEMBER( guab_state::output6_w )
 
 READ8_MEMBER( guab_state::sn76489_ready_r )
 {
-	// bit 7 connected to sn76489 ready output (0 = ready)^
+	// bit 7 connected to sn76489 ready output (0 = ready)
 	return ~(m_sn->ready_r() << 7);
 }
 
