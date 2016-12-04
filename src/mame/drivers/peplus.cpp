@@ -9411,7 +9411,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  SF  RF  (Bonus)
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000060p.u66",   0x00000, 0x10000, CRC(1ec1ad4d) SHA1(19bc46fe86e0ff23c43ffc072b1c461b60481f0f) ) /* Standard Draw Poker */
+	ROM_LOAD( "x000060p.u66",   0x00000, 0x10000, CRC(1ec1ad4d) SHA1(19bc46fe86e0ff23c43ffc072b1c461b60481f0f) ) /* Standard Draw Poker - 02/28/95   @ IGT  AZI */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */
@@ -10498,7 +10498,7 @@ PayTable   Js+  2PR  3K   STR  FL  FH  4K  4K  4A  SF  RF  (Bonus)
 	ROM_LOAD( "xp000038.u67",   0x00000, 0x10000, CRC(8707ab9e) SHA1(3e00a2ad8017e1495c6d6fe900d0efa68a1772b8) ) /*  09/05/95   @ IGT  L95-2452 */
 
 	ROM_REGION( 0x10000, "user1", 0 )
-	ROM_LOAD( "x000763p.u66",   0x00000, 0x10000, CRC(bf7dda7d) SHA1(1a6089d1159c199199e608f3dd2ba7b45a29b31c) ) /* 4 of a Kind Bonus Poker */
+	ROM_LOAD( "x000763p.u66",   0x00000, 0x10000, CRC(bf7dda7d) SHA1(1a6089d1159c199199e608f3dd2ba7b45a29b31c) ) /* 4 of a Kind Bonus Poker - 05/30/95   @IGT  L95-1278  */
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
 	ROM_LOAD( "mro-cg2242.u77",  0x00000, 0x8000, CRC(963a7e7d) SHA1(ebb159f6c731a3f912382745ef9a9c6d4fa2fc99) ) /*  03/19/96   @ IGT  L96-0703 */
@@ -13743,13 +13743,75 @@ Joker Poker          P17A      95.50%
 	ROM_LOAD( "capx2174.u43", 0x0000, 0x0200, CRC(50bdad55) SHA1(958d463c7effb3457c1f9c44c9b7822339c04e8b) )
 ROM_END
 
-ROM_START( pexmp013 ) /* Superboard : 5-in-1 Wingboard (XMP00013) Program in Spanish, Requires Spanish Wingboard CG rom set */
 /*
 
-The CG2346 set seems to support all games supported in CG2298 as well as graphics support for the following XnnnnnnP Data game types:
+Known Wingboard compatible program roms:
+
+   XMP00007 (CG2298+CAPX2298 - not dumped)
+   XMP00009 (CG2230+CAPX2230 - not dumped - MGM exclusive)
+   XMP00011
+   XMP00013 - Spanish
+   XMP00014 - International (CG2352+CAPX2352 - not dumped)
+   XMP00017
+   XMP00022 - Spanish
+   XMP00026 - Spanish
+   XMP00030
+
+Wingboard programs are not compatible with:
+ Lucky Deal Poker, Shockwave Poker, Ace$ Bonus Poker, Jackpot Poker, any mid-hand pay games like
+ Dealt Deuces Bonus, Barbaric Deuces, Pay the Ace (No Face) or any other specialty poker games.
+
+The CG2298 graphics can support the following XnnnnnnP Data game types (as displayed):
+
+  Bonus Poker, Bonus Poker Dlx, Crazy Eights, Deluxe Deuces, Deuces Joker, Deuces Bonus, Deuces Wild
+  Double Bonus, Double Deuces, Dbl Dbl Bonus, Double Joker, Jacks or Better, Joker Poker, Loose Deuces
+  Nevada Bonus, Nevada Draw, Odds & Ends, Full House Bonus, Royal Deuces, Sevens or Better, Tens or Better
+  Triple Bonus, Two Pair, White Hot Aces
+
+  Super Aces shows as just Bonus Poker, Triple Bonus Poker Plus shows as just Triple Bonus
+
+
+The CG2346 Spanish set supports all games supported in CG2298 as well as graphics support for the following XnnnnnnP Data game types:
   Triple Double Bonus, Black Jack Poker
 
+The CG2426 set supersedes CG2298 and adds graphics support for the following XnnnnnnP Data game types (as displayed):
+  BlackJack Bonus, Tpl Dbl Bonus, Super Dbl Bonus
+
+The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the following XnnnnnnP Data game types (as displayed):
+  Dbl Dbl Bonus Plus
+
 */
+
+ROM_START( pexmp011 ) /* Superboard : 5-in-1 Wingboard (XMP00011) - PSR Verified */
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "xmp00011.u67",   0x00000, 0x10000, CRC(540c90a3) SHA1(9ba25e1669d07c4985fcde5043f555af6bb2fe40) ) /*  04/11/97   @ IGT  MO  */
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "x000006p.u66",   0x00000, 0x10000, CRC(0ee609a1) SHA1(57043ac2c6ff4377479dd7b66d7e379053f3f602) ) /* Standard Draw Poker - 03/23/95   @ IGT  L95-0826 */
+
+	ROM_REGION( 0x10000, "user2", 0 )
+	ROM_LOAD( "x000057p.u66",   0x00000, 0x10000, CRC(2046710a) SHA1(3fcc7c3069ea54d0e4982814aca1d7b327bb2074) ) /* Deuces Wild Poker - 05/04/95   @ IGT  L95-1143 */
+
+	ROM_REGION( 0x10000, "user3", 0 )
+	ROM_LOAD( "x000588p.u66",   0x00000, 0x10000, CRC(baa448cc) SHA1(0f1da407304f7dafbe06119d068f7caf99404cb4) ) /* Joker Poker - 10/31/94   IGT  L94-2068 */
+
+	ROM_REGION( 0x10000, "user4", 0 )
+	ROM_LOAD( "x000515p.u66",   0x00000, 0x10000, CRC(4311224a) SHA1(69e6657dacd6e09c2d1514417994adc561f63a83) ) /* Double Bonus Poker - 03/08/95   @ IGT  L95-0748 */
+
+	ROM_REGION( 0x10000, "user5", 0 )
+	ROM_LOAD( "x002037p.u66",   0x00000, 0x10000, CRC(12aea90e) SHA1(26ff0e7b81271252573739f26db9d20f35af274b) ) /* Nevada Bonus Poker */
+
+	ROM_REGION( 0x040000, "gfx1", 0 )
+	ROM_LOAD( "mro-cg2298.u77",  0x00000, 0x10000, CRC(8c35dc7f) SHA1(90e9566e816287e6248d7cab318dee3ad6fac871) )
+	ROM_LOAD( "mgo-cg2298.u78",  0x10000, 0x10000, CRC(3663174a) SHA1(c203a4a59f6bc1625d47f35426ffc5b4d279251a) )
+	ROM_LOAD( "mbo-cg2298.u79",  0x20000, 0x10000, CRC(9088cdbe) SHA1(dc62951c584463a1e795a774f5752f890d8e3f65) )
+	ROM_LOAD( "mxo-cg2298.u80",  0x30000, 0x10000, CRC(8d3aafc8) SHA1(931bc82398b94c63ed9f6f1bd95723aa801894cc) )
+
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
+ROM_END
+
+ROM_START( pexmp013 ) /* Superboard : 5-in-1 Wingboard (XMP00013) Program in Spanish - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00013.u67",   0x00000, 0x10000, CRC(76ca7c2b) SHA1(cdcbfc648d007362bb50541e6415354c07815d66) )
 
@@ -13778,34 +13840,7 @@ The CG2346 set seems to support all games supported in CG2298 as well as graphic
 	ROM_LOAD( "capx2346.u43", 0x0000, 0x0200, CRC(8df8ad29) SHA1(2d6a598fdc4290abe83a3d95c0ec8da6eb0f0e84) )
 ROM_END
 
-ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
-/*
-
-Known Wingboard compatible program roms:
-   XMP00007 (CG2298+CAPX2298 - not dumped)
-   XMP00009 (CG2230+CAPX2230 - not dumped - MGM exclusive)
-   XMP00011 (CG2298+CAPX2298 - not dumped)
-   XMP00013 - Spanish
-   XMP00014 - International (CG2352+CAPX2352 - not dumped)
-   XMP00017
-   XMP00022 - Spanish
-   XMP00026 - Spanish
-   XMP00030
-
-Wingboard programs are not compatible with:
- Lucky Deal Poker, Shockwave Poker, Ace$ Bonus Poker, Dealt Deuces Bonus, Barbaric Deuces, Pay the Ace (No Face)
- and many other "specialty" poker games.
-
-The CG2298 graphics can support the following XnnnnnnP Data game types (as displayed):
-
-  Bonus Poker, Bonus Poker Dlx, Crazy Eights, Deluxe Deuces, Deuces Joker, Deuces Bonus, Deuces Wild
-  Double Bonus, Double Deuces, Dbl Dbl Bonus, Double Joker, Jacks or Better, Joker Poker, Loose Deuces
-  Nevada Bonus, Nevada Draw, Odds & Ends, Full House Bonus, Royal Deuces, Sevens or Better, Tens or Better
-  Triple Bonus, Two Pair, White Hot Aces
-
-  Super Aces shows as just Bonus Poker, Triple Bonus Poker Plus shows as just Triple Bonus
-
-*/
+ROM_START( pexmp017 ) /* Superboard : 5-in-1 Wingboard (XMP00017) - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) ) /*  09/17/97   @ IGT  L97-2154  */
 
@@ -13870,13 +13905,7 @@ Same set of games as CG2298 but includes graphics for International currency.
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) ) /* Wrong!! Should be CAPX2352 - However colors should be correct */
 ROM_END
 
-ROM_START( pexmp017b ) /* Superboard : 5-in-1 Wingboard (XMP00017) */
-/*
-
-The CG2426 set supersedes CG2298 and adds graphics support for the following XnnnnnnP Data game types (as displayed):
-  BlackJack Bonus, Tpl Dbl Bonus, Super Dbl Bonus
-
-*/
+ROM_START( pexmp017b ) /* Superboard : 5-in-1 Wingboard (XMP00017) - PSR originally states CG2298 but also commonly found with CG2426 */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00017.u67",   0x00000, 0x10000, CRC(129e6eaa) SHA1(1dd2b83a672a618f338b553a6cbd598b6d4ce672) ) /*  09/17/97   @ IGT  L97-2154  */
 
@@ -13905,7 +13934,7 @@ The CG2426 set supersedes CG2298 and adds graphics support for the following Xnn
 	ROM_LOAD( "capx2298.u43", 0x0000, 0x0200, CRC(77856036) SHA1(820487c8494965408402ddee6a54511906218e66) )
 ROM_END
 
-ROM_START( pexmp022 ) /* Superboard : 5-in-1 Wingboard (XMP00022) Program in Spanish, Requires Spanish Wingboard CG rom set */
+ROM_START( pexmp022 ) /* Superboard : 5-in-1 Wingboard (XMP00022) Program in Spanish - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00022.u67",   0x00000, 0x10000, CRC(ea21f38d) SHA1(d9712371e1286ed5957a71a14d868b78f741388d) )
 
@@ -13934,7 +13963,7 @@ ROM_START( pexmp022 ) /* Superboard : 5-in-1 Wingboard (XMP00022) Program in Spa
 	ROM_LOAD( "capx2346.u43", 0x0000, 0x0200, CRC(8df8ad29) SHA1(2d6a598fdc4290abe83a3d95c0ec8da6eb0f0e84) )
 ROM_END
 
-ROM_START( pexmp026 ) /* Superboard : 5-in-1 Wingboard (XMP00026) Program in Spanish, Requires Spanish Wingboard CG rom set */
+ROM_START( pexmp026 ) /* Superboard : 5-in-1 Wingboard (XMP00026) Program in Spanish - PSR Verified */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00026.u67",   0x00000, 0x10000, CRC(0b82387f) SHA1(8348c586cf692c5cbecfe7b52a4271e5aec55027) )
 
@@ -13964,12 +13993,6 @@ ROM_START( pexmp026 ) /* Superboard : 5-in-1 Wingboard (XMP00026) Program in Spa
 ROM_END
 
 ROM_START( pexmp030 ) /* Superboard : 5-in-1 Wingboard (XMP00030) - PSR Verified */
-/*
-
-The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the following XnnnnnnP Data game types (as displayed):
-  Dbl Dbl Bonus Plus
-
-*/
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "xmp00030.u67",   0x00000, 0x10000, CRC(da3fcb6f) SHA1(114e581e5ebb5c40c3f3da2784122d3281f269ee) ) /*  11/12/00   @ IGT  L01-0197  */
 
@@ -13977,13 +14000,13 @@ The CG2451 set supersedes CG2298 & CG2426 and adds graphics support for the foll
 	ROM_LOAD( "x002377p.u66",   0x00000, 0x10000, CRC(541320d2) SHA1(670b17432e994fe1937091e5e96e1d58b9afbf29) ) /* Super Double Bonus Poker */
 
 	ROM_REGION( 0x10000, "user2", 0 )
-	ROM_LOAD( "x002111p.u66",   0x00000, 0x10000, CRC(f19dd63e) SHA1(0fe16cd0c75a9759e34bf95ce428e5b2da236215) ) /* 4 of a Kind Bonus Poker with Sequential Royal Flush */
+	ROM_LOAD( "x002111p.u66",   0x00000, 0x10000, CRC(f19dd63e) SHA1(0fe16cd0c75a9759e34bf95ce428e5b2da236215) ) /* 4 of a Kind Bonus Poker with Sequential Royal Flush - 01/17/96   @ IGT  L96-0184 */
 
 	ROM_REGION( 0x10000, "user3", 0 )
 	ROM_LOAD( "x000455p.u66",   0x00000, 0x10000, CRC(4992c51f) SHA1(8c70c59bdb16feba438230b30765076cebd44b53) ) /* Joker Poker */
 
 	ROM_REGION( 0x10000, "user4", 0 )
-	ROM_LOAD( "x000006p.u66",   0x00000, 0x10000, CRC(0ee609a1) SHA1(57043ac2c6ff4377479dd7b66d7e379053f3f602) ) /* Standard Draw Poker */
+	ROM_LOAD( "x000006p.u66",   0x00000, 0x10000, CRC(0ee609a1) SHA1(57043ac2c6ff4377479dd7b66d7e379053f3f602) ) /* Standard Draw Poker - 03/23/95   @ IGT  L95-0826 */
 
 	ROM_REGION( 0x10000, "user5", 0 )
 	ROM_LOAD( "x002474p.u66",   0x00000, 0x10000, CRC(74cc1423) SHA1(0522cee3a7e123ce51739c69f38915ca92bd03e5) ) /* Double Double Bonus Plus */
@@ -14551,6 +14574,7 @@ GAMEL(1995, pexm009p,  0,        peplus,  peplus_poker, peplus_state, peplussb, 
 GAMEL(1995, pexm013p,  0,        peplus,  peplus_poker, peplus_state, peplussb, ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XM00013P+XMP00025) Multi-Poker",        0, layout_pe_poker )
 
 /* Superboard : Multi-Poker (Wingboard) */
+GAMEL(1995, pexmp011,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00011) 5-in-1 Wingboard (CG2298)",   0, layout_pe_poker )
 GAMEL(1995, pexmp013,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00013) 5-in-1 Wingboard (CG2346) - Spanish", 0, layout_pe_poker )
 GAMEL(1995, pexmp017,  0,        peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2298)",   0, layout_pe_poker )
 GAMEL(1995, pexmp017a, pexmp017, peplus,  peplus_poker, peplus_state, peplussbw,ROT0,  "IGT - International Game Technology", "Player's Edge Plus (XMP00017) 5-in-1 Wingboard (CG2352)",   0, layout_pe_poker )
