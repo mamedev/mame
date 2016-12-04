@@ -149,7 +149,7 @@ void xbox_state::machine_reset()
 	atapi_cdrom_device *devc;
 	uint16_t *id;
 
-	// set some neede parameters
+	// set some needed parameters
 	devh = machine().device<ata_mass_storage_device>("ide:0:hdd");
 	id = devh->identify_device_buffer();
 	id[88] |= (1 << 2); // ultra dma mode 2 supported
@@ -215,9 +215,9 @@ ROM_START( xbox )
 
 	ROM_REGION( 0x1000000, "tbp", 0 ) // To Be Processed, of course
 	ROM_LOAD( "5101_256k.bin", 0x000000, 0x040000, CRC(e8a9224e) SHA1(5108e1025f48071c07a6823661d708c66dee97a9) )
-	ROM_LOAD( "xbox-5530.bin", 0x000000, 0x040000, CRC(9569c4d3) SHA1(40fa73277013be3168135e1768b09623a987ff63) )
-	ROM_LOAD( "xbox-5713.bin", 0x040000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
-	ROM_LOAD( "5838_256k.bin", 0x000000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
+	ROM_LOAD( "xbox-5530.bin", 0x040000, 0x040000, CRC(9569c4d3) SHA1(40fa73277013be3168135e1768b09623a987ff63) )
+	ROM_LOAD( "xbox-5713.bin", 0x080000, 0x040000, CRC(58fd8173) SHA1(8b7ccc4648ccd78cdb7b65cfca09621eaf2d4238) )
+	ROM_LOAD( "5838_256k.bin", 0x0C0000, 0x040000, CRC(5be2413d) SHA1(b9489e883c650b5e5fe2f83a32237dbf74f0e9f1) )
 ROM_END
 // See src/emu/gamedrv.h for details
 // For a game:
