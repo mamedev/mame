@@ -276,6 +276,7 @@ static MACHINE_CONFIG_START( rpc86, isbc_state )
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir6_w))
+	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE("pic_0", pic8259_device, ir7_w))
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
