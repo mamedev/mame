@@ -323,8 +323,7 @@ MACHINE_CONFIG_FRAGMENT( cmi01a_device )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi01a_device, pia_1_irqa))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi01a_device, pia_1_irqb))
 
-	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 0) // ptm_cmi01a_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("cmi01a_ptm", PTM6840, 2000000) // ptm_cmi01a_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000, 500000, 500000)
 	MCFG_PTM6840_OUT0_CB(WRITELINE(cmi01a_device, ptm_out0))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi01a_device, ptm_irq))
@@ -2793,8 +2792,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(cmi_state, q133_1_portb_w));
 
 	MCFG_DEVICE_ADD("q133_pia_2", PIA6821, 0) // pia_q133_2_config
-	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 0) // ptm_q133_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("q133_ptm", PTM6840, 2000000) // ptm_q133_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(1024, 1, 111) // Third is todo
 
 	MCFG_DEVICE_ADD("q219_pia", PIA6821, 0) // pia_q219_config
@@ -2804,8 +2802,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(cmi_state, pia_q219_irqa))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(cmi_state, pia_q219_irqb))
 
-	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 0) // ptm_q219_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("q219_ptm", PTM6840, 2000000) // ptm_q219_config
 	MCFG_PTM6840_EXTERNAL_CLOCKS(HBLANK_FREQ, VBLANK_FREQ, 1000000)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, ptm_q219_irq))
 
@@ -2814,8 +2811,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 
 	MCFG_DEVICE_ADD("cmi02_pia_2", PIA6821, 0) // pia_cmi02_2_config
 
-	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 0) // ptm_cmi02_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_DEVICE_ADD("cmi02_ptm", PTM6840, 2000000) // ptm_cmi02_config TODO
 	MCFG_PTM6840_OUT1_CB(WRITELINE(cmi_state, cmi02_ptm_o1))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi02_ptm_irq))
 
@@ -2870,8 +2866,7 @@ static MACHINE_CONFIG_START( cmi2x, cmi_state )
 	MCFG_DEVICE_ADD("ank_pia_clock", CLOCK, 9600)
 	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE("ank_pia", pia6821_device, ca1_w))
 
-	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 0) // ptm_cmi07_config
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000) // TODO
+	MCFG_DEVICE_ADD("cmi07_ptm", PTM6840, 2000000) // ptm_cmi07_config TODO
 	MCFG_PTM6840_IRQ_CB(WRITELINE(cmi_state, cmi07_irq))
 
 	MCFG_FD1791_ADD("wd1791", XTAL_16MHz / 8) // wd1791_interface
