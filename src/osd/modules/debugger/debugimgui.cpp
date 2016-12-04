@@ -1378,7 +1378,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
-
+	ImGui::PushStyleColor(ImGuiCol_ComboBg,ImVec4(0.4f,0.4f,0.4f,0.9f));
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
@@ -1420,7 +1420,7 @@ void debug_imgui::update()
 		global_free(to_delete);
 	}
 
-	ImGui::PopStyleColor(12);
+	ImGui::PopStyleColor(13);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)
