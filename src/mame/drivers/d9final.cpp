@@ -288,6 +288,7 @@ GFXDECODE_END
 void d9final_state::machine_start()
 {
 	membank("bank1")->configure_entries(0, 8, memregion("maincpu")->base() + 0x10000, 0x4000);
+	membank("bank1")->set_entry(0);
 }
 
 static MACHINE_CONFIG_START( d9final, d9final_state )
