@@ -73,7 +73,6 @@ private:
 	};
 
 	u8 m_regs[10];
-	int m_seconds;
 	bool m_comparator_state;
 
 	// timers
