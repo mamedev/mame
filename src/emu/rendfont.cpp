@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     rendfont.c
@@ -16,10 +16,432 @@
 #include "osdepend.h"
 #include "uismall.fh"
 
-#include "ui/cmdrender.h"
+#include "ui/uicmd14.fh"
+#include "ui/cmddata.h"
 
+#include <algorithm>
 #include <cstddef>
 #include <cstring>
+#include <iterator>
+#include <limits>
+
+
+#define VERBOSE 0
+
+#define LOG(...) do { if (VERBOSE) osd_printf_verbose(__VA_ARGS__); } while (0)
+
+
+namespace {
+
+template <typename Iterator>
+class bdf_helper
+{
+public:
+	bdf_helper(Iterator const &begin, Iterator const &end)
+		: m_keyword_begin(begin)
+		, m_keyword_end(begin)
+		, m_value_begin(begin)
+		, m_value_end(begin)
+		, m_line_end(begin)
+		, m_end(end)
+	{
+		next_line();
+	}
+
+	bool at_end() const { return m_end == m_keyword_begin; }
+
+	void next_line()
+	{
+		m_keyword_begin = m_line_end;
+		while ((m_end != m_keyword_begin) && (('\r' == *m_keyword_begin) || ('\n' == *m_keyword_begin)))
+			++m_keyword_begin;
+
+		m_keyword_end = m_keyword_begin;
+		while ((m_end != m_keyword_end) && (' ' != *m_keyword_end) && ('\t' != *m_keyword_end) && ('\r' != *m_keyword_end) && ('\n' != *m_keyword_end))
+			++m_keyword_end;
+
+		m_value_begin = m_keyword_end;
+		while ((m_end != m_value_begin) && ((' ' == *m_value_begin) || ('\t' == *m_value_begin)) && ('\r' != *m_value_begin) && ('\n' != *m_value_begin))
+			++m_value_begin;
+
+		m_value_end = m_line_end = m_value_begin;
+		while ((m_end != m_line_end) && ('\r' != *m_line_end) && ('\n' != *m_line_end))
+		{
+			if ((' ' != *m_line_end) && ('\t' != *m_line_end))
+				m_value_end = ++m_line_end;
+			else
+				++m_line_end;
+		}
+	}
+
+	bool is_keyword(char const *keyword) const
+	{
+		Iterator pos(m_keyword_begin);
+		while (true)
+		{
+			if (m_keyword_end == pos)
+			{
+				return '\0' == *keyword;
+			}
+			else if (('\0' == *keyword) || (*pos != *keyword))
+			{
+				return false;
+			}
+			else
+			{
+				++pos;
+				++keyword;
+			}
+		}
+	}
+
+	Iterator const &keyword_begin() const { return m_keyword_begin; }
+	Iterator const &keyword_end() const { return m_keyword_end; }
+	auto keyword_length() const { return std::distance(m_keyword_begin, m_keyword_end); }
+
+	Iterator const &value_begin() const { return m_value_begin; }
+	Iterator const &value_end() const { return m_value_end; }
+	auto value_length() const { return std::distance(m_value_begin, m_value_end); }
+
+private:
+	Iterator        m_keyword_begin;
+	Iterator        m_keyword_end;
+	Iterator        m_value_begin;
+	Iterator        m_value_end;
+	Iterator        m_line_end;
+	Iterator const  m_end;
+};
+
+
+class bdc_header
+{
+public:
+	static constexpr unsigned MAJVERSION = 1;
+	static constexpr unsigned MINVERSION = 0;
+
+	bool read(emu_file &f)
+	{
+		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+	bool write(emu_file &f)
+	{
+		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+
+	bool check_magic() const
+	{
+		return !std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_MAJVERSION - OFFS_MAGIC);
+	}
+	unsigned get_major_version() const
+	{
+		return m_data[OFFS_MAJVERSION];
+	}
+	unsigned get_minor_version() const
+	{
+		return m_data[OFFS_MINVERSION];
+	}
+	u64 get_original_length() const
+	{
+		return
+				(u64(m_data[OFFS_ORIGLENGTH + 0]) << (7 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 1]) << (6 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 2]) << (5 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 3]) << (4 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 4]) << (3 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 5]) << (2 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 6]) << (1 * 8)) |
+				(u64(m_data[OFFS_ORIGLENGTH + 7]) << (0 * 8));
+	}
+	u32 get_original_hash() const
+	{
+		return
+				(u32(m_data[OFFS_ORIGHASH + 0]) << (3 * 8)) |
+				(u32(m_data[OFFS_ORIGHASH + 1]) << (2 * 8)) |
+				(u32(m_data[OFFS_ORIGHASH + 2]) << (1 * 8)) |
+				(u32(m_data[OFFS_ORIGHASH + 3]) << (0 * 8));
+	}
+	u32 get_glyph_count() const
+	{
+		return
+				(u32(m_data[OFFS_GLYPHCOUNT + 0]) << (3 * 8)) |
+				(u32(m_data[OFFS_GLYPHCOUNT + 1]) << (2 * 8)) |
+				(u32(m_data[OFFS_GLYPHCOUNT + 2]) << (1 * 8)) |
+				(u32(m_data[OFFS_GLYPHCOUNT + 3]) << (0 * 8));
+	}
+	u16 get_height() const
+	{
+		return
+				(u16(m_data[OFFS_HEIGHT + 0]) << (1 * 8)) |
+				(u16(m_data[OFFS_HEIGHT + 1]) << (0 * 8));
+	}
+	s16 get_y_offset() const
+	{
+		return
+				(u16(m_data[OFFS_YOFFSET + 0]) << (1 * 8)) |
+				(u16(m_data[OFFS_YOFFSET + 1]) << (0 * 8));
+	}
+	s32 get_default_character() const
+	{
+		return
+				(u32(m_data[OFFS_DEFCHAR + 0]) << (3 * 8)) |
+				(u32(m_data[OFFS_DEFCHAR + 1]) << (2 * 8)) |
+				(u32(m_data[OFFS_DEFCHAR + 2]) << (1 * 8)) |
+				(u32(m_data[OFFS_DEFCHAR + 3]) << (0 * 8));
+	}
+
+	void set_magic()
+	{
+		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_MAJVERSION - OFFS_MAGIC);
+	}
+	void set_version()
+	{
+		m_data[OFFS_MAJVERSION] = MAJVERSION;
+		m_data[OFFS_MINVERSION] = MINVERSION;
+	}
+	void set_original_length(u64 value)
+	{
+		m_data[OFFS_ORIGLENGTH + 0] = u8((value >> (7 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 1] = u8((value >> (6 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 2] = u8((value >> (5 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 3] = u8((value >> (4 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 4] = u8((value >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 5] = u8((value >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 6] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGLENGTH + 7] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_original_hash(u32 value)
+	{
+		m_data[OFFS_ORIGHASH + 0] = u8((value >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGHASH + 1] = u8((value >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGHASH + 2] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_ORIGHASH + 3] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_glyph_count(u32 value)
+	{
+		m_data[OFFS_GLYPHCOUNT + 0] = u8((value >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_GLYPHCOUNT + 1] = u8((value >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_GLYPHCOUNT + 2] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_GLYPHCOUNT + 3] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_height(u16 value)
+	{
+		m_data[OFFS_HEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_HEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_y_offset(s16 value)
+	{
+		m_data[OFFS_YOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_YOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_default_character(s32 value)
+	{
+		m_data[OFFS_DEFCHAR + 0] = u8((value >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_DEFCHAR + 1] = u8((value >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_DEFCHAR + 2] = u8((value >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_DEFCHAR + 3] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+
+private:
+	static constexpr std::size_t    OFFS_MAGIC      = 0x00; // 0x06 bytes
+	static constexpr std::size_t    OFFS_MAJVERSION = 0x06; // 0x01 bytes (binary integer)
+	static constexpr std::size_t    OFFS_MINVERSION = 0x07; // 0x01 bytes (binary integer)
+	static constexpr std::size_t    OFFS_ORIGLENGTH = 0x08; // 0x08 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_ORIGHASH   = 0x10; // 0x04 bytes
+	static constexpr std::size_t    OFFS_GLYPHCOUNT = 0x14; // 0x04 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_HEIGHT     = 0x18; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_YOFFSET    = 0x1a; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_DEFCHAR    = 0x1c; // 0x04 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_END        = 0x20;
+
+	static u8 const                 MAGIC[OFFS_MAJVERSION - OFFS_MAGIC];
+
+	u8                              m_data[OFFS_END];
+};
+
+u8 const bdc_header::MAGIC[OFFS_MAJVERSION - OFFS_MAGIC] = { 'b', 'd', 'c', 'f', 'n', 't' };
+
+
+class bdc_table_entry
+{
+public:
+	bdc_table_entry(void *bytes)
+		: m_ptr(reinterpret_cast<u8 *>(bytes))
+	{
+	}
+	bdc_table_entry(bdc_table_entry const &that) = default;
+	bdc_table_entry(bdc_table_entry &&that) = default;
+
+	bdc_table_entry get_next() const
+	{
+		return bdc_table_entry(m_ptr + OFFS_END);
+	}
+
+	u32 get_encoding() const
+	{
+		return
+				(u32(m_ptr[OFFS_ENCODING + 0]) << (3 * 8)) |
+				(u32(m_ptr[OFFS_ENCODING + 1]) << (2 * 8)) |
+				(u32(m_ptr[OFFS_ENCODING + 2]) << (1 * 8)) |
+				(u32(m_ptr[OFFS_ENCODING + 3]) << (0 * 8));
+	}
+	u16 get_x_advance() const
+	{
+		return
+				(u16(m_ptr[OFFS_XADVANCE + 0]) << (1 * 8)) |
+				(u16(m_ptr[OFFS_XADVANCE + 1]) << (0 * 8));
+	}
+	s16 get_bb_x_offset() const
+	{
+		return
+				(u16(m_ptr[OFFS_BBXOFFSET + 0]) << (1 * 8)) |
+				(u16(m_ptr[OFFS_BBXOFFSET + 1]) << (0 * 8));
+	}
+	s16 get_bb_y_offset() const
+	{
+		return
+				(u16(m_ptr[OFFS_BBYOFFSET + 0]) << (1 * 8)) |
+				(u16(m_ptr[OFFS_BBYOFFSET + 1]) << (0 * 8));
+	}
+	u16 get_bb_width() const
+	{
+		return
+				(u16(m_ptr[OFFS_BBWIDTH + 0]) << (1 * 8)) |
+				(u16(m_ptr[OFFS_BBWIDTH + 1]) << (0 * 8));
+	}
+	u16 get_bb_height() const
+	{
+		return
+				(u16(m_ptr[OFFS_BBHEIGHT + 0]) << (1 * 8)) |
+				(u16(m_ptr[OFFS_BBHEIGHT + 1]) << (0 * 8));
+	}
+
+	void set_encoding(u32 value)
+	{
+		m_ptr[OFFS_ENCODING + 0] = u8((value >> (3 * 8)) & 0x00ff);
+		m_ptr[OFFS_ENCODING + 1] = u8((value >> (2 * 8)) & 0x00ff);
+		m_ptr[OFFS_ENCODING + 2] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_ENCODING + 3] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_x_advance(u16 value)
+	{
+		m_ptr[OFFS_XADVANCE + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_XADVANCE + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_bb_x_offset(s16 value)
+	{
+		m_ptr[OFFS_BBXOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_BBXOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_bb_y_offset(s16 value)
+	{
+		m_ptr[OFFS_BBYOFFSET + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_BBYOFFSET + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_bb_width(u16 value)
+	{
+		m_ptr[OFFS_BBWIDTH + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_BBWIDTH + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+	void set_bb_height(u16 value)
+	{
+		m_ptr[OFFS_BBHEIGHT + 0] = u8((value >> (1 * 8)) & 0x00ff);
+		m_ptr[OFFS_BBHEIGHT + 1] = u8((value >> (0 * 8)) & 0x00ff);
+	}
+
+	bdc_table_entry &operator=(bdc_table_entry const &that) = default;
+	bdc_table_entry &operator=(bdc_table_entry &&that) = default;
+
+	static std::size_t size()
+	{
+		return OFFS_END;
+	}
+
+private:
+	static constexpr std::size_t    OFFS_ENCODING   = 0x00; // 0x04 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_XADVANCE   = 0x04; // 0x02 bytes (big-endian binary integer)
+	// two bytes reserved
+	static constexpr std::size_t    OFFS_BBXOFFSET  = 0x08; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_BBYOFFSET  = 0x0a; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_BBWIDTH    = 0x0c; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_BBHEIGHT   = 0x0e; // 0x02 bytes (big-endian binary integer)
+	static constexpr std::size_t    OFFS_END        = 0x10;
+
+	u8                              *m_ptr;
+};
+
+} // anonymous namespace
+
+
+void convert_command_glyph(std::string &str)
+{
+	str.c_str(); // force NUL-termination - we depend on it later
+	std::size_t const len(str.length());
+	std::vector<char> buf(2 * (len + 1));
+	std::size_t j(0);
+	for (std::size_t i = 0; len > i; )
+	{
+		// decode UTF-8
+		char32_t uchar;
+		int const codelen(uchar_from_utf8(&uchar, &str[i], len - i));
+		if (0 >= codelen)
+			break;
+		i += codelen;
+
+		// check for three metacharacters
+		fix_command_t const *fixcmd(nullptr);
+		switch (uchar)
+		{
+		case COMMAND_CONVERT_TEXT:
+			for (fix_strings_t *fixtext = convert_text; fixtext->glyph_code; ++fixtext)
+			{
+				if (!fixtext->glyph_str_len)
+					fixtext->glyph_str_len = std::strlen(fixtext->glyph_str);
+
+				if (!std::strncmp(fixtext->glyph_str, &str[i], fixtext->glyph_str_len))
+				{
+					uchar = fixtext->glyph_code + COMMAND_UNICODE;
+					i += strlen(fixtext->glyph_str);
+					break;
+				}
+			}
+			break;
+
+		case COMMAND_DEFAULT_TEXT:
+			fixcmd = default_text;
+			break;
+
+		case COMMAND_EXPAND_TEXT:
+			fixcmd = expand_text;
+			break;
+		}
+
+		// this substitutes a single character
+		if (fixcmd)
+		{
+			if (str[i] == uchar)
+			{
+				++i;
+			}
+			else
+			{
+				while (fixcmd->glyph_code && (fixcmd->glyph_char != str[i]))
+					++fixcmd;
+				if (fixcmd->glyph_code)
+				{
+					uchar = COMMAND_UNICODE + fixcmd->glyph_code;
+					++i;
+				}
+			}
+		}
+
+		// copy character to output
+		int const outlen(utf8_from_uchar(&buf[j], buf.size() - j, uchar));
+		if (0 >= outlen)
+			break;
+		j += outlen;
+	}
+	str.assign(&buf[0], j);
+}
 
 
 const u64 render_font::CACHED_BDF_HASH_SIZE;
@@ -58,30 +480,36 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 {
 	static glyph dummy_glyph;
 
-	// grab the table; if none, return the dummy character
-	if ((chnum / 256) >= ARRAY_LENGTH(m_glyphs))
-		return dummy_glyph;
-	if (!m_glyphs[chnum / 256] && m_format == FF_OSD)
-		m_glyphs[chnum / 256] = new glyph[256];
-	if (!m_glyphs[chnum / 256])
+	unsigned const page(chnum / 256);
+	if (page >= ARRAY_LENGTH(m_glyphs))
+	{
+		if ((0 <= m_defchar) && (chnum != m_defchar))
+			return get_char(m_defchar);
+		else
+			return dummy_glyph;
+	}
+	else if (!m_glyphs[page])
 	{
 		//mamep: make table for command glyph
-		if (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT)
-			m_glyphs[chnum / 256] = new glyph[256];
+		if ((m_format == format::OSD) || ((chnum >= COMMAND_UNICODE) && (chnum < COMMAND_UNICODE + MAX_GLYPH_FONT)))
+			m_glyphs[page] = new glyph[256];
+		else if ((0 <= m_defchar) && (chnum != m_defchar))
+			return get_char(m_defchar);
 		else
 			return dummy_glyph;
 	}
 
 	// if the character isn't generated yet, do it now
-	glyph &gl = m_glyphs[chnum / 256][chnum % 256];
+	glyph &gl = m_glyphs[page][chnum % 256];
 	if (!gl.bitmap.valid())
 	{
 		//mamep: command glyph support
 		if (m_height_cmd && chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT)
 		{
-			glyph &glyph_ch = m_glyphs_cmd[chnum / 256][chnum % 256];
-			float scale = (float)m_height / (float)m_height_cmd;
-			if (m_format == FF_OSD) scale *= 0.90f;
+			glyph &glyph_ch = m_glyphs_cmd[page][chnum % 256];
+			float scale = float(m_height) / float(m_height_cmd);
+			if (m_format == format::OSD)
+				scale *= 0.90f;
 
 			if (!glyph_ch.bitmap.valid())
 				char_expand(chnum, glyph_ch);
@@ -89,11 +517,11 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 			//mamep: for color glyph
 			gl.color = glyph_ch.color;
 
-			gl.width = (int)(glyph_ch.width * scale + 0.5f);
-			gl.xoffs = (int)(glyph_ch.xoffs * scale + 0.5f);
-			gl.yoffs = (int)(glyph_ch.yoffs * scale + 0.5f);
-			gl.bmwidth = (int)(glyph_ch.bmwidth * scale + 0.5f);
-			gl.bmheight = (int)(glyph_ch.bmheight * scale + 0.5f);
+			gl.width = int(glyph_ch.width * scale + 0.5f);
+			gl.xoffs = int(glyph_ch.xoffs * scale + 0.5f);
+			gl.yoffs = int(glyph_ch.yoffs * scale + 0.5f);
+			gl.bmwidth = int(glyph_ch.bmwidth * scale + 0.5f);
+			gl.bmheight = int(glyph_ch.bmheight * scale + 0.5f);
 
 			gl.bitmap.allocate(gl.bmwidth, gl.bmheight);
 			rectangle clip;
@@ -107,10 +535,11 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 			gl.texture->set_bitmap(gl.bitmap, gl.bitmap.cliprect(), TEXFORMAT_ARGB32);
 		}
 		else
+		{
 			char_expand(chnum, gl);
+		}
 	}
 
-	// return the resulting character
 	return gl;
 }
 
@@ -125,55 +554,53 @@ inline render_font::glyph &render_font::get_char(char32_t chnum)
 //-------------------------------------------------
 
 render_font::render_font(render_manager &manager, const char *filename)
-	: m_manager(manager),
-		m_format(FF_UNKNOWN),
-		m_height(0),
-		m_yoffs(0),
-		m_scale(1.0f),
-		m_rawsize(0),
-		m_osdfont(),
-		m_height_cmd(0),
-		m_yoffs_cmd(0)
+	: m_manager(manager)
+	, m_format(format::UNKNOWN)
+	, m_height(0)
+	, m_yoffs(0)
+	, m_defchar(-1)
+	, m_scale(1.0f)
+	, m_rawsize(0)
+	, m_osdfont()
+	, m_height_cmd(0)
+	, m_yoffs_cmd(0)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
 	memset(m_glyphs_cmd, 0, sizeof(m_glyphs_cmd));
 
 	// if this is an OSD font, we're done
-	if (filename != nullptr)
+	if (filename)
 	{
 		m_osdfont = manager.machine().osd().font_alloc();
-		if (m_osdfont)
+		if (m_osdfont && m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
 		{
-			if (m_osdfont->open(manager.machine().options().font_path(), filename, m_height))
-			{
-				m_scale = 1.0f / (float)m_height;
-				m_format = FF_OSD;
+			m_scale = 1.0f / float(m_height);
+			m_format = format::OSD;
 
-				//mamep: allocate command glyph font
-				render_font_command_glyph();
-				return;
-			}
-			m_osdfont.reset();
+			//mamep: allocate command glyph font
+			render_font_command_glyph();
+			return;
 		}
+		m_osdfont.reset();
 	}
 
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
-	if (filename != nullptr && core_stricmp(filename, "default") == 0)
+	if (filename && !core_stricmp(filename, "default"))
 		filename = "ui.bdf";
 
-	// attempt to load the cached version of the font first
-	if (filename != nullptr && load_cached_bdf(filename))
+	// attempt to load an external BDF font first
+	if (filename && load_cached_bdf(filename))
 	{
 		//mamep: allocate command glyph font
 		render_font_command_glyph();
 		return;
 	}
 
-	// load the raw data instead
+	// load the compiled in data instead
 	emu_file ramfile(OPEN_FLAG_READ);
-	osd_file::error filerr = ramfile.open_ram(font_uismall, sizeof(font_uismall));
-	if (filerr == osd_file::error::NONE)
-		load_cached(ramfile, 0);
+	osd_file::error const filerr(ramfile.open_ram(font_uismall, sizeof(font_uismall)));
+	if (osd_file::error::NONE == filerr)
+		load_cached(ramfile, 0, 0);
 	render_font_command_glyph();
 }
 
@@ -216,15 +643,15 @@ render_font::~render_font()
 
 void render_font::char_expand(char32_t chnum, glyph &gl)
 {
-	rgb_t color = rgb_t(0xff,0xff,0xff,0xff);
-	bool is_cmd = (chnum >= COMMAND_UNICODE && chnum < COMMAND_UNICODE + MAX_GLYPH_FONT);
+	LOG("render_font::char_expand: expanding character %u\n", unsigned(chnum));
 
-	if (gl.color)
-		color = gl.color;
+	rgb_t const fgcol(gl.color ? gl.color : rgb_t(0xff, 0xff, 0xff, 0xff));
+	rgb_t const bgcol(0x00, 0xff, 0xff, 0xff);
+	bool const is_cmd((chnum >= COMMAND_UNICODE) && (chnum < COMMAND_UNICODE + MAX_GLYPH_FONT));
 
 	if (is_cmd)
 	{
-		// punt if nothing there
+		// abort if nothing there
 		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == nullptr)
 			return;
 
@@ -245,37 +672,47 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
 		}
 	}
-	// if we're an OSD font, query the info
-	else if (m_format == FF_OSD)
+	else if (m_format == format::OSD)
 	{
-		// we set bmwidth to -1 if we've previously queried and failed
-		if (gl.bmwidth == -1)
+		// if we're an OSD font, query the info
+		if (0 > gl.bmwidth)
+		{
+			// we set bmwidth to -1 if we've previously queried and failed
+			LOG("render_font::char_expand: previously failed to get bitmap from OSD font\n");
 			return;
-
-		// attempt to get the font bitmap; if we fail, set bmwidth to -1
+		}
 		if (!m_osdfont->get_bitmap(chnum, gl.bitmap, gl.width, gl.xoffs, gl.yoffs))
 		{
+			// attempt to get the font bitmap failed - set bmwidth to -1
+			LOG("render_font::char_expand: get bitmap from OSD font failed\n");
 			gl.bitmap.reset();
 			gl.bmwidth = -1;
 			return;
 		}
-
-		// populate the bmwidth/bmheight fields
-		gl.bmwidth = gl.bitmap.width();
-		gl.bmheight = gl.bitmap.height();
+		else
+		{
+			// populate the bmwidth/bmheight fields
+			LOG("render_font::char_expand: got %dx%d bitmap from OSD font\n", gl.bitmap.width(), gl.bitmap.height());
+			gl.bmwidth = gl.bitmap.width();
+			gl.bmheight = gl.bitmap.height();
+		}
 	}
-	// other formats need to parse their data
+	else if (!gl.bmwidth || !gl.bmheight || !gl.rawdata)
+	{
+		// abort if nothing there
+		LOG("render_font::char_expand: empty bitmap bounds or no raw data\n");
+		return;
+	}
 	else
 	{
-		// punt if nothing there
-		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == nullptr)
-			return;
+		// other formats need to parse their data
+		LOG("render_font::char_expand: building bitmap from raw data\n");
 
 		// allocate a new bitmap of the size we need
 		gl.bitmap.allocate(gl.bmwidth, m_height);
@@ -283,55 +720,55 @@ void render_font::char_expand(char32_t chnum, glyph &gl)
 
 		// extract the data
 		const char *ptr = gl.rawdata;
-		u8 accum = 0, accumbit = 7;
-		for (int y = 0; y < gl.bmheight; y++)
+		u8 accum(0), accumbit(7);
+		for (int y = 0; y < gl.bmheight; ++y)
 		{
-			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-			u32 *dest = (desty >= 0 && desty < m_height) ? &gl.bitmap.pix32(desty) : nullptr;
+			int const desty(y + m_height + m_yoffs - gl.yoffs - gl.bmheight);
+			u32 *dest(((0 <= desty) && (m_height > desty)) ? &gl.bitmap.pix32(desty) : nullptr);
 
-			// text format
-			if (m_format == FF_TEXT)
+			if (m_format == format::TEXT)
 			{
-				// loop over bytes
-				for (int x = 0; x < gl.bmwidth; x += 4)
+				if (dest)
 				{
-					// scan for the next hex digit
-					int bits = -1;
-					while (*ptr != 13 && bits == -1)
+					for (int x = 0; gl.bmwidth > x; )
 					{
-						if (*ptr >= '0' && *ptr <= '9')
-							bits = *ptr++ - '0';
-						else if (*ptr >= 'A' && *ptr <= 'F')
-							bits = *ptr++ - 'A' + 10;
-						else if (*ptr >= 'a' && *ptr <= 'f')
-							bits = *ptr++ - 'a' + 10;
-						else
-							ptr++;
-					}
+						// scan for the next hex digit
+						int bits = -1;
+						while (('\r' != *ptr) && ('\n' != *ptr) && (0 > bits))
+						{
+							if (*ptr >= '0' && *ptr <= '9')
+								bits = *ptr++ - '0';
+							else if (*ptr >= 'A' && *ptr <= 'F')
+								bits = *ptr++ - 'A' + 10;
+							else if (*ptr >= 'a' && *ptr <= 'f')
+								bits = *ptr++ - 'a' + 10;
+							else
+								ptr++;
+						}
 
-					// expand the four bits
-					if (dest != nullptr)
-					{
-						*dest++ = (bits & 8) ? color : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 4) ? color : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 2) ? color : rgb_t(0x00,0xff,0xff,0xff);
-						*dest++ = (bits & 1) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						// expand the four bits
+						*dest++ = (bits & 8) ? fgcol : bgcol;
+						if (gl.bmwidth > ++x)
+							*dest++ = (bits & 4) ? fgcol : bgcol;
+						if (gl.bmwidth > ++x)
+							*dest++ = (bits & 2) ? fgcol : bgcol;
+						if (gl.bmwidth > ++x)
+							*dest++ = (bits & 1) ? fgcol : bgcol;
+						++x;
 					}
 				}
 
 				// advance to the next line
 				ptr = next_line(ptr);
 			}
-
-			// cached format
-			else if (m_format == FF_CACHED)
+			else if (m_format == format::CACHED)
 			{
 				for (int x = 0; x < gl.bmwidth; x++)
 				{
 					if (accumbit == 7)
 						accum = *ptr++;
 					if (dest != nullptr)
-						*dest++ = (accum & (1 << accumbit)) ? color : rgb_t(0x00,0xff,0xff,0xff);
+						*dest++ = (accum & (1 << accumbit)) ? fgcol : bgcol;
 					accumbit = (accumbit - 1) & 7;
 				}
 			}
@@ -479,27 +916,45 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 
 bool render_font::load_cached_bdf(const char *filename)
 {
+	osd_file::error filerr;
+	u32 chunk;
+	u64 bytes;
+
 	// first try to open the BDF itself
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_READ);
-	osd_file::error filerr = file.open(filename);
+	filerr = file.open(filename);
 	if (filerr != osd_file::error::NONE)
 		return false;
 
 	// determine the file size and allocate memory
-	m_rawsize = file.size();
-	m_rawdata.resize(m_rawsize + 1);
-
-	// read the first chunk
-	u32 bytes = file.read(&m_rawdata[0], std::min(CACHED_BDF_HASH_SIZE, m_rawsize));
-	if (bytes != std::min(CACHED_BDF_HASH_SIZE, m_rawsize))
+	try
+	{
+		m_rawsize = file.size();
+		std::vector<char>::size_type const sz(m_rawsize + 1);
+		if (u64(sz) != (m_rawsize + 1))
+			return false;
+		m_rawdata.resize(sz);
+	}
+	catch (...)
+	{
 		return false;
+	}
 
-	// has the chunk
-	u32 hash = core_crc32(0, (const u8 *)&m_rawdata[0], bytes) ^ u32(m_rawsize);
+	// read the first chunk and hash it
+	chunk = u32((std::min<u64>)(CACHED_BDF_HASH_SIZE, m_rawsize));
+	bytes = file.read(&m_rawdata[0], chunk);
+	if (bytes != chunk)
+	{
+		m_rawdata.clear();
+		return false;
+	}
+	u32 const hash(core_crc32(0, reinterpret_cast<u8 const *>(&m_rawdata[0]), bytes));
 
 	// create the cached filename, changing the 'F' to a 'C' on the extension
 	std::string cachedname(filename);
-	cachedname.erase(cachedname.length() - 3, 3).append("bdc");
+	if ((4U < cachedname.length()) && !core_stricmp(&cachedname[cachedname.length() - 4], ".bdf"))
+		cachedname.erase(cachedname.length() - 4);
+	cachedname.append(".bdc");
 
 	// attempt to open the cached version of the font
 	{
@@ -508,38 +963,36 @@ bool render_font::load_cached_bdf(const char *filename)
 		if (filerr == osd_file::error::NONE)
 		{
 			// if we have a cached version, load it
-			bool result = load_cached(cachefile, hash);
+			bool const result = load_cached(cachefile, m_rawsize, hash);
 
 			// if that worked, we're done
 			if (result)
-			{
-				// don't do that - glyphs data point into this array ...
-				// m_rawdata.reset();
 				return true;
-			}
 		}
 	}
 
-	// read in the rest of the font
-	if (bytes < m_rawsize)
+	// read in the rest of the font and NUL-terminate it
+	while (bytes < m_rawsize)
 	{
-		u32 read = file.read(&m_rawdata[bytes], m_rawsize - bytes);
-		if (read != m_rawsize - bytes)
+		chunk = u32((std::min<u64>)(std::numeric_limits<u32>::max(), m_rawsize - bytes));
+		u32 const read(file.read(&m_rawdata[bytes], chunk));
+		bytes += read;
+		if (read != chunk)
 		{
 			m_rawdata.clear();
 			return false;
 		}
 	}
-
-	// NULL-terminate the data and attach it to the font
-	m_rawdata[m_rawsize] = 0;
+	m_rawdata[m_rawsize] = '\0';
 
 	// load the BDF
-	bool result = load_bdf();
+	bool const result = load_bdf();
 
 	// if we loaded okay, create a cached one
 	if (result)
-		save_cached(cachedname.c_str(), hash);
+		save_cached(cachedname.c_str(), m_rawsize, hash);
+	else
+		m_rawdata.clear();
 
 	// close the file
 	return result;
@@ -553,109 +1006,344 @@ bool render_font::load_cached_bdf(const char *filename)
 bool render_font::load_bdf()
 {
 	// set the format to text
-	m_format = FF_TEXT;
+	m_format = format::TEXT;
 
-	// first find the FONTBOUNDINGBOX tag
-	const char *ptr;
-	for (ptr = &m_rawdata[0]; ptr != nullptr; ptr = next_line(ptr))
+	bdf_helper<std::vector<char>::const_iterator> helper(std::cbegin(m_rawdata), std::cend(m_rawdata));
+
+	// the first thing we want to see is the STARTFONT declaration, failing that we can't do much
+	for ( ; !helper.is_keyword("STARTFONT"); helper.next_line())
 	{
-		// we only care about a tiny few fields
-		if (strncmp(ptr, "FONTBOUNDINGBOX ", 16) == 0)
+		if (helper.at_end())
 		{
-			int dummy1, dummy2;
-			if (sscanf(ptr + 16, "%d %d %d %d", &dummy1, &m_height, &dummy2, &m_yoffs) != 4)
+			osd_printf_error("render_font::load_bdf: expected STARTFONT\n");
+			return false;
+		}
+	}
+
+	// parse out the global information we need
+	bool have_bbox(false);
+	bool have_properties(false);
+	bool have_defchar(false);
+	for (helper.next_line(); !helper.is_keyword("CHARS"); helper.next_line())
+	{
+		if (helper.at_end())
+		{
+			// font with no characters is useless
+			osd_printf_error("render_font::load_bdf: no glyph section found\n");
+			return false;
+		}
+		else if (helper.is_keyword("FONTBOUNDINGBOX"))
+		{
+			// check for duplicate bounding box
+			if (have_bbox)
+			{
+				osd_printf_error("render_font::load_bdf: found additional bounding box \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
 				return false;
-			break;
+			}
+			have_bbox = true;
+
+			// parse bounding box and check that it's at least half sane
+			int width, xoffs;
+			if (4 == sscanf(&*helper.value_begin(), "%d %d %d %d", &width, &m_height, &xoffs, &m_yoffs))
+			{
+				LOG("render_font::load_bdf: got bounding box %dx%d %d,%d\n", width, m_height, xoffs, m_yoffs);
+				if ((0 >= m_height) || (0 >= width))
+				{
+					osd_printf_error("render_font::load_bdf: bounding box is invalid\n");
+					return false;
+				}
+			}
+			else
+			{
+				osd_printf_error("render_font::load_bdf: failed to parse bounding box \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+				return false;
+			}
+		}
+		else if (helper.is_keyword("STARTPROPERTIES"))
+		{
+			// check for duplicated properties section
+			if (have_properties)
+			{
+				osd_printf_error("render_font::load_bdf: found additional properties\n");
+				return false;
+			}
+			have_properties = true;
+
+			// get property count for sanity check
+			int propcount;
+			if (1 != sscanf(&*helper.value_begin(), "%d", &propcount))
+			{
+				osd_printf_error("render_font::load_bdf: failed to parse property count \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+				return false;
+			}
+
+			int actual(0);
+			for (helper.next_line(); !helper.is_keyword("ENDPROPERTIES"); helper.next_line())
+			{
+				++actual;
+				if (helper.at_end())
+				{
+					// unterminated properties section
+					osd_printf_error("render_font::load_bdf: end of properties not found\n");
+					return false;
+				}
+				else if (helper.is_keyword("DEFAULT_CHAR"))
+				{
+					// check for duplicate default character
+					if (have_defchar)
+					{
+						osd_printf_error("render_font::load_bdf: found additional default character \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+					have_defchar = true;
+
+					// parse default character
+					if (1 == sscanf(&*helper.value_begin(), "%d", &m_defchar))
+					{
+						LOG("render_font::load_bdf: got default character 0x%x\n", m_defchar);
+					}
+					else
+					{
+						osd_printf_error("render_font::load_bdf: failed to parse default character \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+				}
+			}
+
+			// sanity check on number of properties
+			if (actual != propcount)
+			{
+				osd_printf_error("render_font::load_bdf: incorrect number of properties %d\n", actual);
+				return false;
+			}
 		}
 	}
 
 	// compute the scale factor
-	m_scale = 1.0f / (float)m_height;
+	if (!have_bbox)
+	{
+		osd_printf_error("render_font::load_bdf: no bounding box found\n");
+		return false;
+	}
+	m_scale = 1.0f / float(m_height);
+
+	// get expected character count
+	int expected;
+	if (1 == sscanf(&*helper.value_begin(), "%d", &expected))
+	{
+		LOG("render_font::load_bdf: got character count %d\n", expected);
+	}
+	else
+	{
+		osd_printf_error("render_font::load_bdf: failed to parse character count \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+		return false;
+	}
 
 	// now scan for characters
+	auto const nothex([] (char ch) { return (('0' > ch) || ('9' < ch)) && (('A' > ch) || ('Z' < ch)) && (('a' > ch) || ('z' < ch)); });
 	int charcount = 0;
-	for ( ; ptr != nullptr; ptr = next_line(ptr))
+	for (helper.next_line(); !helper.is_keyword("ENDFONT"); helper.next_line())
 	{
-		// stop at ENDFONT
-		if (strncmp(ptr, "ENDFONT", 7) == 0)
-			break;
-
-		// once we hit a STARTCHAR, parse until the end
-		if (strncmp(ptr, "STARTCHAR ", 10) == 0)
+		if (helper.at_end())
 		{
-			int bmwidth = -1, bmheight = -1, xoffs = -1, yoffs = -1;
-			const char *rawdata = nullptr;
-			int charnum = -1;
-			int width = -1;
+			// unterminated font
+			osd_printf_error("render_font::load_bdf: end of font not found\n");
+			return false;
+		}
+		else if (helper.is_keyword("STARTCHAR"))
+		{
+			// required glyph properties
+			bool have_encoding(false);
+			bool have_advance(false);
+			bool have_bbounds(false);
+			int encoding(-1);
+			int xadvance(-1);
+			int bbw(-1), bbh(-1), bbxoff(-1), bbyoff(-1);
 
-			// scan for interesting per-character tags
-			for ( ; ptr != nullptr; ptr = next_line(ptr))
+			// stuff for the bitmap data
+			bool in_bitmap(false);
+			int bitmap_rows(0);
+			char const *bitmap_data(nullptr);
+
+			// parse a glyph
+			for (helper.next_line(); !helper.is_keyword("ENDCHAR"); helper.next_line())
 			{
-				// ENCODING tells us which character
-				if (strncmp(ptr, "ENCODING ", 9) == 0)
+				if (helper.at_end())
 				{
-					if (sscanf(ptr + 9, "%d", &charnum) != 1)
-						return 1;
+					// unterminated glyph
+					osd_printf_error("render_font::load_bdf: end of glyph not found\n");
+					return false;
 				}
-
-				// DWIDTH tells us the width to the next character
-				else if (strncmp(ptr, "DWIDTH ", 7) == 0)
+				else if (in_bitmap)
 				{
-					int dummy1;
-					if (sscanf(ptr + 7, "%d %d", &width, &dummy1) != 2)
-						return 1;
+					// quick sanity check
+					if ((2 * ((bbw + 7) / 8)) != helper.keyword_length())
+					{
+						osd_printf_error("render_font::load_bdf: incorrect length for bitmap line \"%.*s\"\n", int(helper.keyword_length()), &*helper.keyword_begin());
+						return false;
+					}
+					else if (std::find_if(helper.keyword_begin(), helper.keyword_end(), nothex) != helper.keyword_end())
+					{
+						osd_printf_error("render_font::load_bdf: found invalid character in bitmap line \"%.*s\"\n", int(helper.keyword_length()), &*helper.keyword_begin());
+						return false;
+					}
+
+					// track number of rows
+					if (1 == ++bitmap_rows)
+						bitmap_data = &*helper.keyword_begin();
+
 				}
-
-				// BBX tells us the height/width of the bitmap and the offsets
-				else if (strncmp(ptr, "BBX ", 4) == 0)
+				else if (helper.is_keyword("ENCODING"))
 				{
-					if (sscanf(ptr + 4, "%d %d %d %d", &bmwidth, &bmheight, &xoffs, &yoffs) != 4)
-						return 1;
+					// check for duplicate glyph encoding
+					if (have_encoding)
+					{
+						osd_printf_error("render_font::load_bdf: found additional glyph encoding \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+					have_encoding = true;
+
+					// need to support Adobe Standard Encoding "123" and non-standard glyph index "-1 123"
+					std::string const value(helper.value_begin(), helper.value_end());
+					int aux;
+					int const cnt(sscanf(value.c_str(), "%d %d", &encoding, &aux));
+					if ((2 == cnt) && (-1 == encoding) && (0 <= aux))
+					{
+						encoding = aux;
+					}
+					else if ((1 != cnt) || (0 > encoding))
+					{
+						osd_printf_error("render_font::load_bdf: failed to parse glyph encoding \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+					LOG("render_font::load_bdf: got glyph encoding %d\n", encoding);
 				}
-
-				// BITMAP is the start of the data
-				else if (strncmp(ptr, "BITMAP", 6) == 0)
+				else if (helper.is_keyword("DWIDTH"))
 				{
-					// stash the raw pointer and scan for the end of the character
-					for (rawdata = ptr = next_line(ptr); ptr != nullptr && strncmp(ptr, "ENDCHAR", 7) != 0; ptr = next_line(ptr)) { }
-					break;
+					// check for duplicate advance
+					if (have_advance)
+					{
+						osd_printf_error("render_font::load_bdf: found additional pixel width \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+					have_advance = true;
+
+					// completely ignore vertical advance
+					int yadvance;
+					if (2 == sscanf(&*helper.value_begin(), "%d %d", &xadvance, &yadvance))
+					{
+						LOG("render_font::load_bdf: got pixel width %d,%d\n", xadvance, yadvance);
+					}
+					else
+					{
+						osd_printf_error("render_font::load_bdf: failed to parse pixel width \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+				}
+				else if (helper.is_keyword("BBX"))
+				{
+					// check for duplicate black pixel box
+					if (have_bbounds)
+					{
+						osd_printf_error("render_font::load_bdf: found additional pixel width \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+					have_bbounds = true;
+
+					// extract position/size of black pixel area
+					if (4 == sscanf(&*helper.value_begin(), "%d %d %d %d", &bbw, &bbh, &bbxoff, &bbyoff))
+					{
+						LOG("render_font::load_bdf: got black pixel box %dx%d %d,%d\n", bbw, bbh, bbxoff, bbyoff);
+						if ((0 > bbw) || (0 > bbh))
+						{
+							osd_printf_error("render_font::load_bdf: black pixel box is invalid\n");
+							return false;
+						}
+					}
+					else
+					{
+						osd_printf_error("render_font::load_bdf: failed to parse black pixel box \"%.*s\"\n", int(helper.value_length()), &*helper.value_begin());
+						return false;
+					}
+				}
+				else if (helper.is_keyword("BITMAP"))
+				{
+					// this is the bitmap - we need to already have properties before we get here
+					if (!have_advance)
+					{
+						osd_printf_error("render_font::load_bdf: glyph has no pixel width\n");
+						return false;
+					}
+					else if (!have_bbounds)
+					{
+						osd_printf_error("render_font::load_bdf: glyph has no black pixel box\n");
+						return false;
+					}
+					in_bitmap = true;
 				}
 			}
 
-			// if we have everything, allocate a new character
-			if (charnum >= 0 && charnum < (256 * ARRAY_LENGTH(m_glyphs)) && rawdata != nullptr && bmwidth >= 0 && bmheight >= 0)
+			// now check that we have what we need
+			if (!in_bitmap)
+			{
+				osd_printf_error("render_font::load_bdf: glyph has no bitmap\n");
+				return false;
+			}
+			else if (bitmap_rows != bbh)
+			{
+				osd_printf_error("render_font::load_bdf: incorrect number of bitmap lines %d\n", bitmap_rows);
+				return false;
+			}
+
+			// some kinds of characters will screw us up
+			if (0 > xadvance)
+			{
+				LOG("render_font::load_bdf: ignoring character with negative x advance\n");
+			}
+			else if ((256 * ARRAY_LENGTH(m_glyphs)) <= encoding)
+			{
+				LOG("render_font::load_bdf: ignoring character with encoding outside range\n");
+			}
+			else
 			{
 				// if we don't have a subtable yet, make one
-				if (!m_glyphs[charnum / 256])
-					m_glyphs[charnum / 256] = new glyph[256];
+				if (!m_glyphs[encoding / 256])
+				{
+					try
+					{
+						m_glyphs[encoding / 256] = new glyph[256];
+					}
+					catch (...)
+					{
+						osd_printf_error("render_font::load_bdf: allocation failed\n");
+						return false;
+					}
+				}
 
 				// fill in the entry
-				glyph &gl = m_glyphs[charnum / 256][charnum % 256];
-				gl.width = width;
-				gl.bmwidth = bmwidth;
-				gl.bmheight = bmheight;
-				gl.xoffs = xoffs;
-				gl.yoffs = yoffs;
-				gl.rawdata = rawdata;
+				glyph &gl = m_glyphs[encoding / 256][encoding % 256];
+				gl.width = xadvance;
+				gl.bmwidth = bbw;
+				gl.bmheight = bbh;
+				gl.xoffs = bbxoff;
+				gl.yoffs = bbyoff;
+				gl.rawdata = bitmap_data;
 			}
 
 			// some progress for big fonts
-			if (++charcount % 256 == 0)
+			if (0 == (++charcount % 256))
 				osd_printf_warning("Loading BDF font... (%d characters loaded)\n", charcount);
 		}
 	}
 
-	// make sure all the numbers are the same width
-	if (m_glyphs[0])
+	// check number of characters
+	if (expected != charcount)
 	{
-		int maxwidth = 0;
-		for (int ch = '0'; ch <= '9'; ch++)
-			if (m_glyphs[0][ch].bmwidth > maxwidth)
-				maxwidth = m_glyphs[0][ch].width;
-		for (int ch = '0'; ch <= '9'; ch++)
-			m_glyphs[0][ch].width = maxwidth;
+		osd_printf_error("render_font::load_bdf: incorrect character count %d\n", charcount);
+		return false;
 	}
 
+	// should have bailed by now if something went wrong
 	return true;
 }
 
@@ -664,69 +1352,104 @@ bool render_font::load_bdf()
 //  load_cached - load a font in cached format
 //-------------------------------------------------
 
-bool render_font::load_cached(emu_file &file, u32 hash)
+bool render_font::load_cached(emu_file &file, u64 length, u32 hash)
 {
-	// get the file size
-	u64 filesize = file.size();
-
-	// first read the header
-	u8 header[CACHED_HEADER_SIZE];
-	u32 bytes_read = file.read(header, CACHED_HEADER_SIZE);
-	if (bytes_read != CACHED_HEADER_SIZE)
-		return false;
-
-	// validate the header
-	if (header[0] != 'f' || header[1] != 'o' || header[2] != 'n' || header[3] != 't')
-		return false;
-	if (hash && (header[4] != u8(hash >> 24) || header[5] != u8(hash >> 16) || header[6] != u8(hash >> 8) || header[7] != u8(hash)))
-		return false;
-	m_height = (header[8] << 8) | header[9];
-	m_scale = 1.0f / (float)m_height;
-	m_yoffs = s16((header[10] << 8) | header[11]);
-	u32 numchars = (header[12] << 24) | (header[13] << 16) | (header[14] << 8) | header[15];
-	if (filesize - CACHED_HEADER_SIZE < numchars * CACHED_CHAR_SIZE)
-		return false;
-
-	// now read the rest of the data
-	m_rawdata.resize(filesize - CACHED_HEADER_SIZE);
-	bytes_read = file.read(&m_rawdata[0], filesize - CACHED_HEADER_SIZE);
-	if (bytes_read != filesize - CACHED_HEADER_SIZE)
+	// get the file size, read the header, and check that it looks good
+	u64 const filesize(file.size());
+	bdc_header header;
+	if (!header.read(file))
 	{
-		m_rawdata.clear();
+		osd_printf_warning("render_font::load_cached: error reading BDC header\n");
+		return false;
+	}
+	else if (!header.check_magic() || (bdc_header::MAJVERSION != header.get_major_version()) || (bdc_header::MINVERSION != header.get_minor_version()))
+	{
+		LOG("render_font::load_cached: incompatible BDC file\n");
+		return false;
+	}
+	else if (length && ((header.get_original_length() != length) || (header.get_original_hash() != hash)))
+	{
+		LOG("render_font::load_cached: BDC file does not match original BDF file\n");
 		return false;
 	}
 
-	// extract the data from the data
-	u64 offset = numchars * CACHED_CHAR_SIZE;
-	for (int chindex = 0; chindex < numchars; chindex++)
+	// get global properties from the header
+	m_height = header.get_height();
+	m_scale = 1.0f / float(m_height);
+	m_yoffs = header.get_y_offset();
+	m_defchar = header.get_default_character();
+	u32 const numchars(header.get_glyph_count());
+	if ((file.tell() + (u64(numchars) * bdc_table_entry::size())) > filesize)
 	{
-		const u8 *info = reinterpret_cast<u8 *>(&m_rawdata[chindex * CACHED_CHAR_SIZE]);
-		int chnum = (info[0] << 8) | info[1];
+		LOG("render_font::load_cached: BDC file is too small to hold glyph table\n");
+		return false;
+	}
 
+	// now read the rest of the data
+	u64 const remaining(filesize - file.tell());
+	try
+	{
+		m_rawdata.resize(std::size_t(remaining));
+	}
+	catch (...)
+	{
+		osd_printf_error("render_font::load_cached: allocation error\n");
+	}
+	for (u64 bytes_read = 0; remaining > bytes_read; )
+	{
+		u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
+		if (file.read(&m_rawdata[bytes_read], chunk) != chunk)
+		{
+			osd_printf_error("render_font::load_cached: error reading BDC data\n");
+			m_rawdata.clear();
+			return false;
+		}
+		bytes_read += chunk;
+	}
+
+	// extract the data from the data
+	std::size_t offset(std::size_t(numchars) * bdc_table_entry::size());
+	bdc_table_entry entry(m_rawdata.empty() ? nullptr : &m_rawdata[0]);
+	for (unsigned chindex = 0; chindex < numchars; chindex++, entry = entry.get_next())
+	{
 		// if we don't have a subtable yet, make one
+		int const chnum(entry.get_encoding());
+		LOG("render_font::load_cached: loading character %d\n", chnum);
 		if (!m_glyphs[chnum / 256])
-			m_glyphs[chnum / 256] = new glyph[256];
+		{
+			try
+			{
+				m_glyphs[chnum / 256] = new glyph[256];
+			}
+			catch (...)
+			{
+				osd_printf_error("render_font::load_cached: allocation error\n");
+				m_rawdata.clear();
+				return false;
+			}
+		}
 
 		// fill in the entry
 		glyph &gl = m_glyphs[chnum / 256][chnum % 256];
-		gl.width = (info[2] << 8) | info[3];
-		gl.xoffs = s16((info[4] << 8) | info[5]);
-		gl.yoffs = s16((info[6] << 8) | info[7]);
-		gl.bmwidth = (info[8] << 8) | info[9];
-		gl.bmheight = (info[10] << 8) | info[11];
+		gl.width = entry.get_x_advance();
+		gl.xoffs = entry.get_bb_x_offset();
+		gl.yoffs = entry.get_bb_y_offset();
+		gl.bmwidth = entry.get_bb_width();
+		gl.bmheight = entry.get_bb_height();
 		gl.rawdata = &m_rawdata[offset];
 
 		// advance the offset past the character
 		offset += (gl.bmwidth * gl.bmheight + 7) / 8;
-		if (offset > filesize - CACHED_HEADER_SIZE)
+		if (m_rawdata.size() < offset)
 		{
+			osd_printf_verbose("render_font::load_cached: BDC file too small to hold all glyphs\n");
 			m_rawdata.clear();
 			return false;
 		}
 	}
 
-	// reuse the chartable as a temporary buffer
-	m_format = FF_CACHED;
+	// got everything
+	m_format = format::CACHED;
 	return true;
 }
 
@@ -735,76 +1458,73 @@ bool render_font::load_cached(emu_file &file, u32 hash)
 //  save_cached - save a font in cached format
 //-------------------------------------------------
 
-bool render_font::save_cached(const char *filename, u32 hash)
+bool render_font::save_cached(const char *filename, u64 length, u32 hash)
 {
 	osd_printf_warning("Generating cached BDF font...\n");
 
 	// attempt to open the file
 	emu_file file(m_manager.machine().options().font_path(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE);
-	osd_file::error filerr = file.open(filename);
-	if (filerr != osd_file::error::NONE)
+	osd_file::error const filerr = file.open(filename);
+	if (osd_file::error::NONE != filerr)
 		return false;
 
-	// determine the number of characters
-	int numchars = 0;
-	for (int chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
+	// count glyphs
+	unsigned numchars = 0;
+	for (glyph const *const page : m_glyphs)
 	{
-		if (m_glyphs[chnum / 256])
+		for (unsigned chnum = 0; page && (256 > chnum); ++chnum)
 		{
-			glyph &gl = m_glyphs[chnum / 256][chnum % 256];
-			if (gl.width > 0)
-				numchars++;
+			if (0 < page[chnum].width)
+				++numchars;
 		}
 	}
+	LOG("render_font::save_cached: %u glyphs with positive advance to save\n", numchars);
 
 	try
 	{
+		u32 bytes_written;
+
+		{
+			LOG("render_font::save_cached: writing header\n");
+			bdc_header hdr;
+			hdr.set_magic();
+			hdr.set_version();
+			hdr.set_original_length(length);
+			hdr.set_original_hash(hash);
+			hdr.set_glyph_count(numchars);
+			hdr.set_height(m_height);
+			hdr.set_y_offset(m_yoffs);
+			hdr.set_default_character(m_defchar);
+			if (!hdr.write(file))
+				throw emu_fatalerror("Error writing cached file");
+		}
+		u64 const table_offs(file.tell());
+
 		// allocate an array to hold the character data
-		std::vector<u8> chartable(numchars * CACHED_CHAR_SIZE, 0);
+		std::vector<u8> chartable(std::size_t(numchars) * bdc_table_entry::size(), 0);
 
 		// allocate a temp buffer to compress into
 		std::vector<u8> tempbuffer(65536);
 
-		// write the header
-		u8 *dest = &tempbuffer[0];
-		*dest++ = 'f';
-		*dest++ = 'o';
-		*dest++ = 'n';
-		*dest++ = 't';
-		*dest++ = hash >> 24;
-		*dest++ = hash >> 16;
-		*dest++ = hash >> 8;
-		*dest++ = hash & 0xff;
-		*dest++ = m_height >> 8;
-		*dest++ = m_height & 0xff;
-		*dest++ = m_yoffs >> 8;
-		*dest++ = m_yoffs & 0xff;
-		*dest++ = numchars >> 24;
-		*dest++ = numchars >> 16;
-		*dest++ = numchars >> 8;
-		*dest++ = numchars & 0xff;
-		assert(dest == &tempbuffer[CACHED_HEADER_SIZE]);
-		u32 bytes_written = file.write(&tempbuffer[0], CACHED_HEADER_SIZE);
-		if (bytes_written != dest - &tempbuffer[0])
-			throw emu_fatalerror("Error writing cached file");
-
 		// write the empty table to the beginning of the file
-		bytes_written = file.write(&chartable[0], numchars * CACHED_CHAR_SIZE);
-		if (bytes_written != numchars * CACHED_CHAR_SIZE)
+		bytes_written = file.write(&chartable[0], chartable.size());
+		if (bytes_written != chartable.size())
 			throw emu_fatalerror("Error writing cached file");
 
 		// loop over all characters
-		int tableindex = 0;
-		for (int chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
+		bdc_table_entry table_entry(chartable.empty() ? nullptr : &chartable[0]);
+		for (unsigned chnum = 0; chnum < (256 * ARRAY_LENGTH(m_glyphs)); chnum++)
 		{
-			glyph &gl = get_char(chnum);
-			if (gl.width > 0)
+			if (m_glyphs[chnum / 256] && (0 < m_glyphs[chnum / 256][chnum % 256].width))
 			{
+				LOG("render_font::save_cached: writing glyph %u\n", chnum);
+				glyph &gl(get_char(chnum));
+
 				// write out a bit-compressed bitmap if we have one
 				if (gl.bitmap.valid())
 				{
 					// write the data to the tempbuffer
-					dest = &tempbuffer[0];
+					u8 *dest = &tempbuffer[0];
 					u8 accum = 0;
 					u8 accbit = 7;
 
@@ -842,32 +1562,135 @@ bool render_font::save_cached(const char *filename, u32 hash)
 				}
 
 				// compute the table entry
-				dest = &chartable[tableindex++ * CACHED_CHAR_SIZE];
-				*dest++ = chnum >> 8;
-				*dest++ = chnum & 0xff;
-				*dest++ = gl.width >> 8;
-				*dest++ = gl.width & 0xff;
-				*dest++ = gl.xoffs >> 8;
-				*dest++ = gl.xoffs & 0xff;
-				*dest++ = gl.yoffs >> 8;
-				*dest++ = gl.yoffs & 0xff;
-				*dest++ = gl.bmwidth >> 8;
-				*dest++ = gl.bmwidth & 0xff;
-				*dest++ = gl.bmheight >> 8;
-				*dest++ = gl.bmheight & 0xff;
+				table_entry.set_encoding(chnum);
+				table_entry.set_x_advance(gl.width);
+				table_entry.set_bb_x_offset(gl.xoffs);
+				table_entry.set_bb_y_offset(gl.yoffs);
+				table_entry.set_bb_width(gl.bmwidth);
+				table_entry.set_bb_height(gl.bmheight);
+				table_entry = table_entry.get_next();
 			}
 		}
 
 		// seek back to the beginning and rewrite the table
-		file.seek(CACHED_HEADER_SIZE, SEEK_SET);
-		bytes_written = file.write(&chartable[0], numchars * CACHED_CHAR_SIZE);
-		if (bytes_written != numchars * CACHED_CHAR_SIZE)
-			throw emu_fatalerror("Error writing cached file");
+		if (!chartable.empty())
+		{
+			LOG("render_font::save_cached: writing character table\n");
+			file.seek(table_offs, SEEK_SET);
+			u8 const *bytes(&chartable[0]);
+			for (u64 remaining = chartable.size(); remaining; )
+			{
+				u32 const chunk((std::min<u64>)(std::numeric_limits<u32>::max(), remaining));
+				bytes_written = file.write(bytes, chunk);
+				if (chunk != bytes_written)
+					throw emu_fatalerror("Error writing cached file");
+				bytes += chunk;
+				remaining -= chunk;
+			}
+		}
+
+		// no trouble?
 		return true;
 	}
 	catch (...)
 	{
 		file.remove_on_close();
 		return false;
+	}
+}
+
+
+void render_font::render_font_command_glyph()
+{
+	// FIXME: this is copy/pasta from the BDC loading, and it shouldn't be injected into every font
+	emu_file file(OPEN_FLAG_READ);
+	if (file.open_ram(font_uicmd14, sizeof(font_uicmd14)) == osd_file::error::NONE)
+	{
+		// get the file size, read the header, and check that it looks good
+		u64 const filesize(file.size());
+		bdc_header header;
+		if (!header.read(file))
+		{
+			osd_printf_warning("render_font::render_font_command_glyph: error reading BDC header\n");
+			return;
+		}
+		else if (!header.check_magic() || (bdc_header::MAJVERSION != header.get_major_version()) || (bdc_header::MINVERSION != header.get_minor_version()))
+		{
+			LOG("render_font::render_font_command_glyph: incompatible BDC file\n");
+			return;
+		}
+
+		// get global properties from the header
+		m_height_cmd = header.get_height();
+		m_yoffs_cmd = header.get_y_offset();
+		u32 const numchars(header.get_glyph_count());
+		if ((file.tell() + (u64(numchars) * bdc_table_entry::size())) > filesize)
+		{
+			LOG("render_font::render_font_command_glyph: BDC file is too small to hold glyph table\n");
+			return;
+		}
+
+		// now read the rest of the data
+		u64 const remaining(filesize - file.tell());
+		try
+		{
+			m_rawdata_cmd.resize(std::size_t(remaining));
+		}
+		catch (...)
+		{
+			osd_printf_error("render_font::render_font_command_glyph: allocation error\n");
+		}
+		for (u64 bytes_read = 0; remaining > bytes_read; )
+		{
+			u32 const chunk((std::min)(u64(std::numeric_limits<u32>::max()), remaining));
+			if (file.read(&m_rawdata_cmd[bytes_read], chunk) != chunk)
+			{
+				osd_printf_error("render_font::render_font_command_glyph: error reading BDC data\n");
+				m_rawdata_cmd.clear();
+				return;
+			}
+			bytes_read += chunk;
+		}
+
+		// extract the data from the data
+		std::size_t offset(std::size_t(numchars) * bdc_table_entry::size());
+		bdc_table_entry entry(m_rawdata_cmd.empty() ? nullptr : &m_rawdata_cmd[0]);
+		for (unsigned chindex = 0; chindex < numchars; chindex++, entry = entry.get_next())
+		{
+			// if we don't have a subtable yet, make one
+			int const chnum(entry.get_encoding());
+			LOG("render_font::render_font_command_glyph: loading character %d\n", chnum);
+			if (!m_glyphs_cmd[chnum / 256])
+			{
+				try
+				{
+					m_glyphs_cmd[chnum / 256] = new glyph[256];
+				}
+				catch (...)
+				{
+					osd_printf_error("render_font::render_font_command_glyph: allocation error\n");
+					m_rawdata_cmd.clear();
+					return;
+				}
+			}
+
+			// fill in the entry
+			glyph &gl = m_glyphs_cmd[chnum / 256][chnum % 256];
+			gl.width = entry.get_x_advance();
+			gl.xoffs = entry.get_bb_x_offset();
+			gl.yoffs = entry.get_bb_y_offset();
+			gl.bmwidth = entry.get_bb_width();
+			gl.bmheight = entry.get_bb_height();
+			gl.rawdata = &m_rawdata_cmd[offset];
+
+			// advance the offset past the character
+			offset += (gl.bmwidth * gl.bmheight + 7) / 8;
+			if (m_rawdata_cmd.size() < offset)
+			{
+				osd_printf_verbose("render_font::render_font_command_glyph: BDC file too small to hold all glyphs\n");
+				m_rawdata_cmd.clear();
+				return;
+			}
+		}
 	}
 }

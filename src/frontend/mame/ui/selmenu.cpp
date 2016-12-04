@@ -139,12 +139,6 @@ menu_select_launch::cache::~cache()
 
 menu_select_launch::~menu_select_launch()
 {
-	// need to manually clean up icon textures for now
-	for (auto &texture : m_icons_texture)
-	{
-		if (texture)
-			machine().render().texture_free(texture);
-	}
 }
 
 
@@ -164,6 +158,7 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 	, m_pressed(false)
 	, m_repeat(0)
 	, m_right_visible_lines(0)
+	, m_icons(MAX_ICONS_RENDER)
 {
 	// set up persistent cache for machine run
 	{
@@ -181,18 +176,6 @@ menu_select_launch::menu_select_launch(mame_ui_manager &mui, render_container &c
 			add_cleanup_callback(&menu_select_launch::exit);
 		}
 	}
-
-	// initialise icon cache
-	if (is_swlist)
-	{
-		std::fill(std::begin(m_icons_texture), std::end(m_icons_texture), nullptr);
-	}
-	else
-	{
-		std::generate(std::begin(m_icons_texture), std::end(m_icons_texture), [&render = machine().render()]() { return render.texture_alloc(); });
-		std::generate(std::begin(m_icons_bitmap), std::end(m_icons_bitmap), []() { return std::make_unique<bitmap_argb32>(); });
-	}
-	std::fill(std::begin(m_old_icons), std::end(m_old_icons), nullptr);
 }
 
 
@@ -624,9 +607,15 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 	auto x1 = x0 + ud_arrow_width;
 	auto y1 = y0 + ui().get_line_height();
 
-	if (m_old_icons[linenum] != driver || ui_globals::redraw_icon)
+	icon_cache::iterator icon(m_icons.find(driver));
+	if ((m_icons.end() == icon) || ui_globals::redraw_icon)
 	{
-		m_old_icons[linenum] = driver;
+		if (m_icons.end() == icon)
+		{
+			texture_ptr texture(machine().render().texture_alloc(), [&render = machine().render()] (render_texture *texture) { render.texture_free(texture); });
+			bitmap_ptr bitmap(std::make_unique<bitmap_argb32>());
+			icon = m_icons.emplace(std::piecewise_construct, std::forward_as_tuple(driver), std::forward_as_tuple(std::move(texture), std::move(bitmap))).first;
+		}
 
 		// set clone status
 		bool cloneof = strcmp(driver->parent, "0");
@@ -657,6 +646,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
 		}
 
+		bitmap_argb32 &bitmap(*icon->second.second);
 		if (tmp->valid())
 		{
 			float panel_width = x1 - x0;
@@ -697,24 +687,25 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			else
 				dest_bitmap = tmp;
 
-			m_icons_bitmap[linenum]->allocate(panel_width_pixel, panel_height_pixel);
-
+			bitmap.allocate(panel_width_pixel, panel_height_pixel);
 			for (int x = 0; x < dest_xPixel; x++)
 				for (int y = 0; y < dest_yPixel; y++)
-					m_icons_bitmap[linenum]->pix32(y, x) = dest_bitmap->pix32(y, x);
+					bitmap.pix32(y, x) = dest_bitmap->pix32(y, x);
 
 			auto_free(machine(), dest_bitmap);
 
-			m_icons_texture[linenum]->set_bitmap(*m_icons_bitmap[linenum], m_icons_bitmap[linenum]->cliprect(), TEXFORMAT_ARGB32);
+			icon->second.first->set_bitmap(bitmap, bitmap.cliprect(), TEXFORMAT_ARGB32);
 		}
-		else if (m_icons_bitmap[linenum] != nullptr)
-			m_icons_bitmap[linenum]->reset();
+		else
+		{
+			bitmap.reset();
+		}
 
 		auto_free(machine(), tmp);
 	}
 
-	if (m_icons_bitmap[linenum] != nullptr && m_icons_bitmap[linenum]->valid())
-		container().add_quad(x0, y0, x1, y1, rgb_t::white(), m_icons_texture[linenum], PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	if (icon->second.second->valid())
+		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon->second.first.get(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	return ud_arrow_width * 1.5f;
 }

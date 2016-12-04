@@ -104,7 +104,9 @@ private:
 	using cache_ptr = std::shared_ptr<cache>;
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
-	static constexpr std::size_t MAX_ICONS_RENDER = 40;
+	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_ptr> >;
+
+	static constexpr std::size_t MAX_ICONS_RENDER = 128;
 
 	void reset_pressed() { m_pressed = false; m_repeat = 0; }
 	bool mouse_pressed() const { return (osd_ticks() >= m_repeat); }
@@ -115,11 +117,11 @@ private:
 	// draw left panel
 	virtual float draw_left_panel(float x1, float y1, float x2, float y2) = 0;
 
-	game_driver const       *m_info_driver;
-	ui_software_info const  *m_info_software;
-	int                      m_info_view;
-	std::vector<std::string> m_items_list;
-	std::string              m_info_buffer;
+	game_driver const           *m_info_driver;
+	ui_software_info const      *m_info_software;
+	int                         m_info_view;
+	std::vector<std::string>    m_items_list;
+	std::string                 m_info_buffer;
 
 	// draw infos
 	void infos_render(float x1, float y1, float x2, float y2);
@@ -187,10 +189,7 @@ private:
 
 	int                     m_right_visible_lines;  // right box lines
 
-
-	render_texture          *m_icons_texture[MAX_ICONS_RENDER];
-	bitmap_ptr              m_icons_bitmap[MAX_ICONS_RENDER];
-	game_driver const       *m_old_icons[MAX_ICONS_RENDER];
+	icon_cache              m_icons;
 
 	static std::mutex       s_cache_guard;
 	static cache_ptr_map    s_caches;
