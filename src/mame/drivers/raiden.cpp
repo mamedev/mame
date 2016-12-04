@@ -10,13 +10,6 @@
     Raiden (Korean license)         (c) 1990 Seibu Kaihatsu
     Raiden (Taiwanese license)      (c) 1990 Seibu Kaihatsu
 
-    The alternate hardware version is probably newer than the main sets.
-    It looks closer to the newer 68000 games, while the main set looks
-    closer to Dynamite Duke (1989 game) in terms of graphics registers used, etc.
-
-    As well as different graphics registers the alternate set has a
-    different memory map, and different fix char layer memory layout!
-
     To access test mode, reset with both start buttons held.
 
     The country byte is stored at 0xffffd in the main cpu region,
@@ -37,14 +30,42 @@
     Sound: YM3812, OKI M6295
     Custom ICs:
     - SEI0160 QFP60 (2 on main PCB, 3 on OBJ1 PCB)
-    - S1S6091 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
+    - S1S6091 or SEI0181 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
     - Altera EP910PC-40 EPLD, one next to each V30
     - SEI0050BU DIP40
-    - SEI80BU DIP42
+    - SEI80BU DIP42 (next to encrypted Z80 ROM)
     - SEI0100BU "YM3931"
-    - many CMOS Gate Arrays
+    - SEI0010BU TC17G008AN-0025 (2 near mask ROMs, 1 near CHR ROMs)
+    - SEI0021BU TC17G008AN-0022 (4 between mask ROMs)
+    - SG0140 TC110G05AN-0012 (2)
 
-    One of the sets is SEI8904 with SEI9008 subboard.
+    The following alternate main PCB types have been observed:
+
+    1. "SEI8904 MAIN"; custom chips are similar to the common dedicated
+       hardware, but PCB layout is vastly different, resembling Dynamite
+       Duke (Seibu's previous game); the format of CHR RAM is transposed
+       here. One (undumped) set, perhaps the earliest revision of the game,
+       has a half-empty SEI8904-ROM subboard which has the BG and sprite
+       tiles in ROMs with even numbers starting at 20, 30, 40; another set
+       instead has a SEI9008 subboard that replaces these 12 ROMs with the
+       SEI420, SEI430 and SEI440 mask ROMs found on later non-bootleg sets.
+
+    2. Newer Seibu hardware, lacking the encryption PLDs and many of the
+       older-generation custom ICs listed above, though the mask ROMs and
+       OBJ1 subboard remain the same. The graphics registers here are very
+       different from previous licensed sets, having the CRTC-style format
+       of all subsequent Seibu arcade games.
+
+    3. Korean bootleg hardware, with no custom ICs and an enormous subboard
+       with four ROMs amidst over 100 TTL chips. (This is almost certainly
+       different from the dumped raidenk set, despite displaying the IBL
+       license on the title screen.)
+
+    On some boards (both the common dedicated hardware and the older
+    SEI8904), the SEI0050BU has been replaced with a small daughterboard
+    with six TTL chips and two PLDs labeled S50P01 and S50P02. A bootleg
+    set has been observed with a (larger) daughterboard likewise standing
+    in for a Xilinx PLD.
 
 ***************************************************************************/
 
@@ -684,5 +705,5 @@ GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
 GAME( 1990, raidenua, raiden, raidenu, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
 
-/* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? It also sports Seibu custom CRTC. */
+/* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )
