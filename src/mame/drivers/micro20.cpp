@@ -34,7 +34,8 @@ public:
 		m_maincpu(*this, MAINCPU_TAG),
 		m_rom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
-		m_pit(*this, PIT_TAG)
+		m_pit(*this, PIT_TAG),
+		m_rtc(*this, RTC_TAG)
 	{
 	}
 
@@ -42,6 +43,7 @@ public:
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<pit68230_device> m_pit;
+	required_device<msm58321_device> m_rtc;
 	
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -51,6 +53,8 @@ public:
 	
 	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
 	DECLARE_WRITE_LINE_MEMBER(h4_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
 
 private:
 
@@ -74,7 +78,8 @@ void micro20_state::machine_reset()
 
 TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 {
-//	m_pit->  TODO: write this to TIN on the 68230 when it supports that
+	m_pit->update_tin(ASSERT_LINE);
+	m_pit->update_tin(CLEAR_LINE);
 }
 
 WRITE_LINE_MEMBER(micro20_state::h4_w)
@@ -86,6 +91,23 @@ WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
 {
 	// startup test explicitly checks if the m68k RESET opcode resets the 68230
 	m_pit->reset();
+}
+
+WRITE8_MEMBER(micro20_state::portb_w)
+{
+	m_rtc->d0_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d1_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d2_w((data & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d3_w((data & 8) ? ASSERT_LINE : CLEAR_LINE);	
+}
+
+WRITE8_MEMBER(micro20_state::portc_w)
+{
+	m_rtc->stop_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->write_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->read_w((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->address_write_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->test_w((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 READ32_MEMBER(micro20_state::buserror_r)
@@ -127,9 +149,17 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
 	
 	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
-	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w));
+	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(micro20_state, portb_w))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(micro20_state, portc_w))
 	
 	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
+	MCFG_MSM58321_YEAR0(1984)
+	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb0_w))
+	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb1_w))
+	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb2_w))
+	MCFG_MSM58321_D3_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb3_w))
+	MCFG_MSM58321_BUSY_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb7_w))
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(100))
 MACHINE_CONFIG_END
