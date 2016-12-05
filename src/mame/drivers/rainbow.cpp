@@ -2451,7 +2451,7 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 							}
 
 							case COLOR_MONITOR:
-									// Doesnt work as intended, so diabled:
+									
 									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO)) 
 										red = blue = 0; // Page 21 of PDF AA-AE36A (PDF) explains why
 									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
