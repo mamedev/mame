@@ -754,7 +754,6 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		return; // no output from graphics option
 	}
 
-	// IF-ABFRAGE AUF VEKTOR-MODUS MUSS AUSKOMMENTIERT WERDEN, WENN DER GRAFISCHE SCROLL_TEST FUNKTIONIEREN SOLL:
 	address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
