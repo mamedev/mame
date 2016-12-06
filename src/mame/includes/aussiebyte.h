@@ -47,6 +47,7 @@ public:
 		, m_floppy0(*this, "fdc:0")
 		, m_floppy1(*this, "fdc:1")
 		, m_crtc(*this, "crtc")
+		, m_rtc(*this, "rtc")
 		, m_speaker(*this, "speaker")
 		, m_votrax(*this, "votrax")
 	{}
@@ -80,6 +81,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdya_w);
 	DECLARE_WRITE_LINE_MEMBER(sio2_rdyb_w);
 	DECLARE_WRITE_LINE_MEMBER(clock_w);
+	DECLARE_READ_LINE_MEMBER(clock_r);
+	DECLARE_READ8_MEMBER(rtc_data_r);
+	DECLARE_WRITE8_MEMBER(rtc_data_w);
 	DECLARE_MACHINE_RESET(aussiebyte);
 	DECLARE_DRIVER_INIT(aussiebyte);
 	DECLARE_WRITE_LINE_MEMBER(ctc_z0_w);
@@ -122,6 +126,7 @@ private:
 	required_device<floppy_connector> m_floppy0;
 	optional_device<floppy_connector> m_floppy1;
 	required_device<mc6845_device> m_crtc;
+	required_device<msm5832_device> m_rtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<votrax_sc01_device> m_votrax;
 };
