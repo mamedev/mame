@@ -1967,7 +1967,7 @@ READ16_MEMBER(seta_state::extra_r)
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")     // RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM (pointer for zombraid crosshair hack)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM                             // RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                             // RAM (wrofaero only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
@@ -1999,6 +1999,11 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 #endif
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP                        // ? Sound  IRQ Ack
+ADDRESS_MAP_END 
+
+static ADDRESS_MAP_START( zombraid_map, AS_PROGRAM, 16, seta_state )
+	AM_IMPORT_FROM( wrofaero_map )
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")			// actually 8K x8 SRAM
 ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::zingzipbl_unknown_r)
@@ -8555,6 +8560,18 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+/***************************************************************************
+                                Zombie Raid
+***************************************************************************/
+
+static MACHINE_CONFIG_DERIVED( zombraid, gundhara )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zombraid_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 J.J.Squawkers
@@ -10988,6 +11005,9 @@ ROM_START( zombraid )
 	// skip 80000-fffff (banked region)
 	ROM_CONTINUE(            0x100000, 0x180000  )
 	ROM_LOAD( "fy001011.a",  0x280000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 /* Notes about the Proto/Test roms:
@@ -11049,6 +11069,9 @@ ROM_START( zombraidp ) /* Prototype or test board version.  Data matches release
 	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
 	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
 	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches released MASK rom version */
@@ -11094,6 +11117,9 @@ ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches releas
 	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
 	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
 	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 ROM_START( madshark )
@@ -11751,8 +11777,8 @@ GAME( 1995, gundharac, gundhara,gundhara, gundhara, driver_device, 0,        ROT
 
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp,zombraid, gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid,gundhara, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid, 0,        zombraid, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp,zombraid, zombraid, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid,zombraid, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
