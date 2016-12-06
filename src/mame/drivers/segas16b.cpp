@@ -1380,10 +1380,6 @@ void segas16b_state::altbeas5_i8751_sim()
 	altbeast_common_i8751_sim(0x3098/2, 0x3096/2, 1);
 }
 
-void segas16b_state::altbeast_i8751_sim()
-{
-	altbeast_common_i8751_sim(0x30c4/2, 0x30c2/2, 0);
-}
 
 
 //-------------------------------------------------
@@ -1893,10 +1889,18 @@ ADDRESS_MAP_END
 //  I8751 MCU ADDRESS MAPS
 //**************************************************************************
 
+WRITE8_MEMBER(segas16b_state::spin_68k_w)
+{
+	// this is probably a hack but otherwise the 68k and i8751 end up fighting
+	// on 'goldnaxe' causing hangs in various places.  maybe the interrupts
+	// should happen at different times, or there's some way to steal the bus?
+	m_maincpu->spin_until_time(m_maincpu->cycles_to_attotime(20000));
+}
+
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, segas16b_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x001f) AM_MIRROR(0xff00) AM_DEVREADWRITE("mapper", sega_315_5195_mapper_device, read, write)
-	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE")
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ_PORT("SERVICE") AM_WRITE(spin_68k_w)
 ADDRESS_MAP_END
 
 
@@ -6197,7 +6201,7 @@ ROM_START( goldnaxe )
 	ROM_LOAD( "mpr-12384.ic6", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0123a.c2", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "317-0123a.c2", 0x00000, 0x1000, CRC(cf19e7d4) SHA1(51356ae7f278c04aed6dfe4572e8a32a82859d71) )
 ROM_END
 
 //*************************************************************************************************************************
@@ -8673,15 +8677,6 @@ DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5704)
 	m_i8751_initial_config = memory_control_5704;
 }
 
-DRIVER_INIT_MEMBER(segas16b_state,goldnaxe_5797)
-{
-	DRIVER_INIT_CALL(generic_5797);
-	m_i8751_vblank_hook = i8751_sim_delegate(&segas16b_state::goldnaxe_i8751_sim, this);
-
-	static const uint8_t memory_control_5797[0x10] =
-		{ 0x02,0x00, 0x00,0x1f, 0x00,0x1e, 0x00,0xff, 0x00,0x20, 0x01,0x10, 0x00,0x14, 0x00,0xc4 };
-	m_i8751_initial_config = memory_control_5797;
-}
 
 DRIVER_INIT_MEMBER(segas16b_state,hwchamp_5521)
 {
@@ -8823,7 +8818,7 @@ GAME( 1988, exctleag,   0,        system16b_fd1094,    exctleag, segas16b_state,
 GAME( 1989, fpoint,     0,        system16b_fd1094,    fpoint,   segas16b_state,generic_5358,       ROT0,   "Sega", "Flash Point (set 2, Japan) (FD1094 317-0127A)", 0 )
 GAME( 1989, fpoint1,    fpoint,   system16b_fd1094,    fpoint,   segas16b_state,generic_5704,       ROT0,   "Sega", "Flash Point (set 1, Japan) (FD1094 317-0127A)", 0 )
 
-GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,goldnaxe_5797,      ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
+GAME( 1989, goldnaxe,   0,        system16b_i8751_5797,goldnaxe, segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 6, US) (8751 317-123A)", 0 )
 GAME( 1989, goldnaxeu,  goldnaxe, system16b_fd1094_5797,goldnaxe,segas16b_state,generic_5797,       ROT0,   "Sega", "Golden Axe (set 5, US) (FD1094 317-0122)", 0 )
 GAME( 1989, goldnaxej,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 4, Japan) (FD1094 317-0121)", 0 )
 GAME( 1989, goldnaxe3,  goldnaxe, system16b_fd1094,    goldnaxe, segas16b_state,generic_5704,       ROT0,   "Sega", "Golden Axe (set 3, World) (FD1094 317-0120)", 0)

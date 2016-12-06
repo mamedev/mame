@@ -89,6 +89,7 @@ public:
 	// other callbacks
 	DECLARE_WRITE_LINE_MEMBER(upd7759_generate_nmi);
 	INTERRUPT_GEN_MEMBER( i8751_main_cpu_vblank );
+	DECLARE_WRITE8_MEMBER(spin_68k_w);
 
 	// ROM board-specific driver init
 	DECLARE_DRIVER_INIT(generic_5521);
@@ -122,7 +123,6 @@ public:
 	DECLARE_DRIVER_INIT(dunkshot_5358_small);
 	DECLARE_DRIVER_INIT(timescan_5358_small);
 	DECLARE_DRIVER_INIT(shinobi3_5358);
-	DECLARE_DRIVER_INIT(goldnaxe_5797);
 	DECLARE_DRIVER_INIT(altbeas4_5521);
 	DECLARE_DRIVER_INIT(aliensyn7_5358_small);
 
@@ -170,7 +170,6 @@ protected:
 	void altbeast_common_i8751_sim(offs_t soundoffs, offs_t inputoffs, int alt_bank);
 	void altbeasj_i8751_sim();
 	void altbeas5_i8751_sim();
-	void altbeast_i8751_sim();
 	void ddux_i8751_sim();
 	void goldnaxe_i8751_sim();
 	void tturf_i8751_sim();
