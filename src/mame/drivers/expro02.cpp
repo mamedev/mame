@@ -1862,7 +1862,7 @@ GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "C
 GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
 
 GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
-GAME( 2002, missw02,  0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Diagom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
+GAME( 2002, missw02,  0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
 
 GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )
