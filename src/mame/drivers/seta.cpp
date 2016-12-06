@@ -1967,7 +1967,7 @@ READ16_MEMBER(seta_state::extra_r)
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM                             // RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                             // RAM (wrofaero only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
