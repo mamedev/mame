@@ -34,32 +34,38 @@ SCREEN 1 vs. SCREEN 2 IN EMULATION
 // The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
 
 BUGS
-- MEDRES and HIRES MODE APPEAR TO BE CORRECT 
-- GDC diagnostic disk bails out on 9 of 13 tests (tests 4 and 6 - 13). Scroll check doesn't...
+- GDC diagnostic disk fails on 9 of 13 tests (tests 4 and 6 - 13). 
 
-Interaction of Upd7220 and Rainbow.cpp:
-- RDAT with MOD 2 is unimplemented (other modes than 00). Effect of missing R-M-W...?
-Software to try: MMIND (MasterMind, after BMP logo), SOLIT (Solitaire), CANON (high resolution + vectors), GDC Test Disk.
+Details
+a. (Rainbow driver) : interaction between DEC's external hardware and the NEC 7220 isn't fully understood (see page 173 of AA-AE36A)
+   It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'. 
+   For now, we provide sane defaults for both vector and bitmap units without disturbing display mode(s) or the NEC 7220.
+b. the HBLANK / VBLANK ratio is plainly wrong (QUICK TEST / subtest #6),
+c. IRQs are flagged as 'erratic' (QUICK TEST / subtest #12). 
+d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when QUICK TEST #4 floods the queue)
+e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel) 
+
+Programs with initialization / redraw / reentrance problems (invocation order after reset * matters *, at least in emulation):
+- CANON (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
+  plus the Monitor Aligment Test (from the GDC test disk). 
+
+Graphical apps. that work well: MMIND (MasterMind), PACMAN, SCRAM, (G)OTELO.
 
 UNIMPLEMENTED:
 // - Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
 
 UNKNOWN IMPLEMENTATION DETAILS:
-// a. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
+// 1. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
 
-// b. SCROLL BUFFER details unclear. What happens when a programs does not write all 256 bytes? Value of uninitialized areas?
-   Play, then retry (y) SCRAM to see the effect. Scram doesn't seem to write all (256) bytes, a GDC RESET is only executed ONCE.
-   (PAGE 48 OF PDF HAS A SUPERFICIAL DESCRIPTION OF THE SCROLL BUFFER)
+// 2. UNVERIFIED DIVIDER (31.188 Mhz / 32) is at least close to 1 Mhz (as on the VT240, which uses a very similar design)
 
-// c. UNVERIFIED DIVIDER (31.188 Mhz / 32) is at least close to 1 Mhz (as seen on the VT240)
+// 3. UPD7220 / CORE oddities: 
+// 3.1. occasional redraw problems (only when screen 1 runs at 60 Hz and screen 2 at 29.99 Hz interlaced = HIRES ?).
+// Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
+//                  (the partial update system gets very confused because it expects both the screens to end at the same time
+//                  and if that isn't the case large parts of one screen end up not updating at all)
 
-// d. UPD7220 / CORE oddities: 
-   * pixels are stretched out too wide at 384 x 240 (not fixable here). -KEEPASPECT?
-
-// * (MAME core): what happens when the left screen is at 50 Hz and the right at 60 Hz?
-//                According to Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-//                (the partial update system gets very confused because it expects both the screens to end at the same time
-//                and if that isn't the case large parts of one screen end up not updating at all)
+   3.2 pixels are stretched out too wide at 384 x 240 (not fixable in Rainbow driver, -keepaspect seems to have no effect)
 */
 
 // license:GPL-2.0+
@@ -88,7 +94,7 @@ PLEASE USE THE RIGHT SLOT - AND ALWAYS SAVE YOUR DATA BEFORE MOUNTING FOREIGN DI
 You * should * also reassign SETUP (away from F3, where it sits on a LK201).
 DATA LOSS POSSIBLE: when in partial emulation mode, F3 performs a hard reset!
 
-STATE AS OF DECE;BER 2016
+STATE AS OF DECEMBER 2016
 -------------------------
 Driver is based entirely on the DEC-100 'B' variant (DEC-190 and DEC-100 A models are treated as clones).
 While this is OK for the compatible -190, it doesn't do justice to ancient '100 A' hardware.
@@ -626,7 +632,6 @@ private:
 
 	uint8_t m_GDC_WRITE_BUFFER[16]; // 16 x 8 bits for CPU, 8 x 16 for GDC
 	uint8_t m_GDC_COLOR_MAP[32];
-	uint8_t m_GDC_SCROLL_BUFFER_PRELOAD[256];
 	uint8_t m_GDC_SCROLL_BUFFER[256];
 
 	uint8_t  m_GDC_INDIRECT_REGISTER, m_GDC_MODE_REGISTER, m_GDC_scroll_index, m_GDC_color_map_index, m_GDC_write_buffer_index;
@@ -634,7 +639,7 @@ private:
 	uint8_t  m_vpat, m_patmult, m_patcnt, m_patidx;
 
 	uint16_t m_GDC_WRITE_MASK;
-	bool m_scroll_buffer_changed, m_color_map_changed;
+	bool m_color_map_changed;
 	bool m_ONBOARD_GRAPHICS_SELECTED;   // (internal switch, on board video to mono out)
 
 	bool m_SCREEN_BLANK;
@@ -692,25 +697,35 @@ private:
 };
 
 
+// It * should be * OK to RESET the SCROLL_BUFFER and the COLOR_MAP (at least with WELL WRITTEN programs)
+
+// Situation less clear for vector mode (some programs work extensively * before * OPTION_GRFX_RESET
+
+// THIS MACRO * RESETS *  the PATTERN TO DEFAULT.
+// NOTE 2: m_patmult  MUST BE LOADED BEFORE !!
+#define OPTION_RESET_PATTERNS \
+m_vpat = 0xff;				  \
+if(m_patmult == 0)  m_patmult = 0x01;\
+if(m_patcnt == 0)   m_patcnt = m_patmult;\
+if(m_patidx == 0)	m_patidx = 7; 
+
+
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
-#define GDC_RESET_MACRO                                     \
+#define OPTION_GRFX_RESET                                   \
+lower_8088_irq(IRQ_GRF_INTR_L);                             \
 m_PORT50 = 0;                                               \
 m_GDC_INDIRECT_REGISTER = 0;                                \
-m_GDC_MODE_REGISTER = 0;                                    \
-m_GDC_WRITE_MASK = 0;                                       \
-m_GDC_write_buffer_index = 0;                               \
 m_GDC_color_map_index = 0;                                  \
-m_GDC_ALU_PS_REGISTER = 0;                                  \
-m_vpat  = 0;                                                \
-m_patmult = 1;                                              \
-m_patcnt = 0;                                               \
-m_patidx  = 7;                                              \
-m_GDC_FG_BG = 0;                                            \
 m_color_map_changed = true;                                 \
-for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = m_GDC_SCROLL_BUFFER_PRELOAD[i] = i; };\
-m_GDC_scroll_index = 255;                                   \
-m_scroll_buffer_changed = true;                             \
-printf("\n** NEC 7220 GDC RESET **\n");
+for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = i; };  \
+m_GDC_scroll_index = 0;                                     \
+m_GDC_write_buffer_index = 0;                               \
+m_GDC_WRITE_MASK = 0x00;									\
+m_GDC_ALU_PS_REGISTER = 0x0F;                               \
+m_GDC_FG_BG = 0xF0;                                         \
+m_GDC_MODE_REGISTER &= GDC_MODE_VECTOR | GDC_MODE_HIGHRES | GDC_MODE_ENABLE_WRITES | GDC_MODE_READONLY_SCROLL_MAP;\
+m_GDC_MODE_REGISTER |= GDC_MODE_ENABLE_VIDEO;				\
+printf("\n** OPTION GRFX. RESET **\n");
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 {
@@ -738,6 +753,8 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		}
 		return; // no output from graphics option
 	}
+
+	address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
@@ -1140,8 +1157,13 @@ void rainbow_state::machine_reset()
 	m_fdc->dden_w(0);
 
 	// *********** NEC 7220 DISPLAY CONTROLLER [ OPTIONAL ]
-	GDC_RESET_MACRO
+	OPTION_GRFX_RESET
+		
+	OPTION_RESET_PATTERNS
 
+	for(int i=0; i <32; i++) { m_GDC_COLOR_MAP[i] = 0x00; };  
+	m_GDC_color_map_index = 0;
+	m_color_map_changed = true;
 	// *********** Z80
 
 	m_z80->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -2129,7 +2151,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 	int fdc_write_gate = 0;
 	int last_dir = 0;
 
-	printf("\nFLOPPY %02d - ", m_unit);
+//	printf("\nFLOPPY %02d - ", m_unit);
 	if (m_fdc)
 	{
 			track = m_fdc->track_r(space, 0);
@@ -2367,17 +2389,11 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 	// VERIFICATION NEEDED: IRQ raised before or after new palette loaded...?
 	if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VSYNC_IRQ) // 0x40
 		raise_8088_irq(IRQ_GRF_INTR_L);
+	else
+		lower_8088_irq(IRQ_GRF_INTR_L);
 
 	uint8_t red, green, blue, mono;
 	int xi;
-
-	if(m_scroll_buffer_changed)
-	{
-		m_scroll_buffer_changed = false;
-
-		for(xi = 0; xi < m_GDC_scroll_index; xi++) // LOAD REAL SCROLL BUFFER FROM PRELOAD (up to scroll_index...?)
-				m_GDC_SCROLL_BUFFER[xi] = m_GDC_SCROLL_BUFFER_PRELOAD[xi];
-	}
 
 	if(m_color_map_changed)
 	{
@@ -2435,6 +2451,7 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 							}
 
 							case COLOR_MONITOR:
+									
 									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO)) 
 										red = blue = 0; // Page 21 of PDF AA-AE36A (PDF) explains why
 									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
@@ -2461,6 +2478,8 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 			 if ( m_inp13->read() == DUAL_MONITOR)
 				printf(" [HINT: DUAL MONITOR (DIP SWITCH) WRONG! NO GREEN PALETTE] ");
 	} // color map changed?
+
+
 } // 7220 vblank IRQ
 
 
@@ -2790,7 +2809,7 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 }
 
 // (READ)
-// Read _preloaded_ scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
+// Read  scroll buffer (see GDC Diagnostic Disk, SCROLL BUFFER test)
 READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 {
 	uint8_t out = 0;
@@ -2804,7 +2823,7 @@ READ8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_r)
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_SCROLL_MAP ) // 0x80
 			{
 				// Documentation says it is always incremented (read and write):
-				out = m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )
+				out = m_GDC_SCROLL_BUFFER[m_GDC_scroll_index++]; // // * READ * SCROLL_MAP ( 256 x 8 )
 				m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
 				break;
 			}
@@ -2840,10 +2859,14 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		case 0: // Mode register must be reloaded following any write to port 50 (software reset).
 			// FIXME: "Any write to this port also resynchronizes the
 			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
-			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1; most programs just set bit 0.
-			{
-				GDC_RESET_MACRO // Graphics option software reset (separate from GDC reset...)
-				printf("(PC=%x)\n", machine().device("maincpu")->safe_pc());
+
+			//if( (!(m_PORT50 & 1)) && (data & 1)) // PDF QV069 suggests 1 -> 0 -> 1			
+			if( data & 1 ) // ; most programs just set bit 0 (PACMAN).
+			{	
+				// Graphics option software reset (separate from GDC reset...)
+				OPTION_GRFX_RESET 
+
+				OPTION_RESET_PATTERNS
 			}
 			m_PORT50  = data;
 			break;
@@ -2883,21 +2906,18 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			{
 				if(!( m_GDC_MODE_REGISTER & GDC_MODE_READONLY_SCROLL_MAP)) // ? READONLY / WRITE logic  correct...?
 				{
-					m_GDC_SCROLL_BUFFER_PRELOAD[m_GDC_scroll_index] = data; // // WRITE TO SCROLL_MAP ( 256 x 8 )
+					m_GDC_SCROLL_BUFFER[m_GDC_scroll_index] = data; // // WRITE TO SCROLL_MAP ( 256 x 8 )
 
 					if(m_GDC_scroll_index == 255)
 									printf("\n ---- SCROLL MAP FULLY LOADED ---*");
 					m_GDC_scroll_index++;
 					m_GDC_scroll_index &= 0xFF; // 0...255  (CPU accesses 256 bytes)
-
-					m_scroll_buffer_changed = true;
 				}
 				break;
 			}
 
 			// -----------------PATTERN + MULTIPLIER USED IN VECTOR MODE ONLY!
 			// SEE PAGE 37 OF AA-AE36A (PDF).
-			// NOTE : Pattern Multiplier MUST BE LOADED before loading PATTERN.
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN_MULTIPLIER)
 			{
 				// On a Rainbow, 12 indicates a multiplier of 16-12 = 4 (example)
@@ -2907,9 +2927,9 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 			if(m_GDC_INDIRECT_REGISTER & GDC_SELECT_PATTERN)
 			{
+				// NOTE : Pattern Multiplier MUST BE LOADED before (!)
+				OPTION_RESET_PATTERNS
 				m_vpat = data;
-				m_patcnt = m_patmult;
-				m_patidx = 7; // correct...?
 				break;
 			}
 
