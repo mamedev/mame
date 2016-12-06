@@ -4,17 +4,15 @@
 *
 *   Motorola MC68230 PI/T Parallel Interface and Timer
 *
-* PORT MODES INCLUDE :
-* - BIT I/O
-* - UNIDIRECTIONAL 8 BIT AND 16 BIT
-* - BIDIRECTIONAL 8 BIT AND 16 BIT
-* PROGRAMMABLE HANDSHAKING OPTIONS
-* 24-BIT PROGRAMMABLE TIMER MODES
-* FIVE SEPARATE INTERRUPT VECTORS SEPARATE PORT AND TIMER INTERRUPT SERVICE REQUESTS
-* REGISTERS AREREAD/WRITEAND DIRECTLY ADDRESSABLE
-* REGISTERS ARE ADDRESSED FOR MOVEP (Move Peripheral) AND DMAC COMPATIBILITY
-*
-*  Revisions: 2015-07-15 JLE initial
+* Port modes include :
+* - bit i/o
+* - unidirectional 8 bit and 16 bit
+* - bidirectional 8 bit and 16 bit
+* Programmable handshaking options
+* 24-bit programmable timer modes
+* Five separate interrupt vectors separate port and timer interrupt service requests
+* Registers are read/write and directly addressable
+* Registers are addressed for movep (move peripheral) and dmac compatibility
 *
 *  Todo
 *  - Complete support for clock and timers
@@ -229,23 +227,64 @@ void pit68230_device::h1_set (uint8_t state)
 	if (state) m_psr |= 1; else m_psr &= ~1;
 }
 
+// TODO: remove this method and replace it with a call to pb_update_bit() in force68k.cpp
 void pit68230_device::portb_setbit(uint8_t bit, uint8_t state)
 {
 	if (state) m_pbdr |= (1 << bit); else m_pbdr &= ~(1 << bit);
 }
 
-// Bit updaters will make it possible to move registers to private data
-// TODO: Make sure to only update input bits and that the port is in the right alternate mode
-void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state){ if (state) m_padr |= (1 << bit); else m_padr &= ~(1 << bit); }
-void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state){ if (state) m_pbdr |= (1 << bit); else m_pbdr &= ~(1 << bit); }
-void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state){ if (state) m_pcdr |= (1 << bit); else m_pcdr &= ~(1 << bit); }
+void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state)
+{
+	LOG(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_paddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port A that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_padr |= (1 << bit);
+	else
+		m_padr &= ~(1 << bit);
+}
+
+void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state)
+{
+	LOG(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_pbddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port B that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_pbdr |= (1 << bit);
+	else
+		m_pbdr &= ~(1 << bit);
+}
+
+// TODO: Make sure port C is in the right alternate mode
+void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state)
+{
+	LOG(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_pcddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port C that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_pcdr |= (1 << bit);
+	else
+		m_pcdr &= ~(1 << bit);
+}
 
 void pit68230_device::update_tin(uint8_t state)
-{ 
+{
 	// Tick clock on falling edge. TODO: check what flank is correct
 	if (state == CLEAR_LINE)
 	{
-		tick_clock(); 
+		tick_clock();
 	}
 
 	pc_update_bit(REG_PCDR_TIN_BIT, state == ASSERT_LINE ? 0 : 1);
@@ -324,7 +363,7 @@ void pit68230_device::wr_pitreg_pacr(uint8_t data)
 	 * 1 X1  Output pin - asserted, H2S is always cleared.
 	 */
 	if (m_pgcr & REG_PGCR_H12_ENABLE)
-	{ 
+	{
 		if (m_pacr & REG_PACR_H2_CTRL_IN_OUT)
 		{
 			switch(m_pacr & REG_PACR_H2_CTRL_MASK)
@@ -350,7 +389,7 @@ void pit68230_device::wr_pitreg_pacr(uint8_t data)
 	else
 	{
 		LOG((" - H2 cleared because beeing disabled in PGCR\n"));
-		m_h2_out_cb(CLEAR_LINE); 
+		m_h2_out_cb(CLEAR_LINE);
 	}
 }
 
@@ -393,7 +432,7 @@ void pit68230_device::wr_pitreg_pbcr(uint8_t data)
 void pit68230_device::wr_pitreg_padr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_padr |= (data & m_paddr);
+	m_padr = (data & m_paddr);
 
 	// callback
 	m_pa_out_cb ((offs_t)0, m_padr);
@@ -402,7 +441,7 @@ void pit68230_device::wr_pitreg_padr(uint8_t data)
 void pit68230_device::wr_pitreg_pbdr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_pbdr |= (data & m_pbddr);
+	m_pbdr = (data & m_pbddr);
 
 	// callback
 	m_pb_out_cb ((offs_t)0, m_pbdr & m_pbddr);
@@ -411,7 +450,7 @@ void pit68230_device::wr_pitreg_pbdr(uint8_t data)
 void pit68230_device::wr_pitreg_pcdr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_pcdr |= (data & m_pcddr);
+	m_pcdr = (data & m_pcddr);
 
 	// callback
 	m_pc_out_cb ((offs_t)0, m_pcdr);
