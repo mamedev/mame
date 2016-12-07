@@ -38,15 +38,17 @@ struct zeus2_poly_extra_data
 	const void *    palbase;
 	const void *    texbase;
 	uint16_t          solidcolor;
-	int16_t           zoffset;
+	int32_t           zbufmin;
 	uint16_t          transcolor;
 	uint16_t          texwidth;
 	uint16_t          color;
 	uint32_t          alpha;
 	uint32_t          ctrl_word;
 	bool            blend_enable;
+	bool            depth_min_enable;
 	bool            depth_test_enable;
 	bool            depth_write_enable;
+	uint8_t(*get_texel)(const void *, int, int, int);
 };
 
 /*************************************
@@ -128,6 +130,8 @@ public:
 
 	rectangle zeus_cliprect;
 
+	int m_palSize;
+	int m_zbufmin;
 	float zeus_matrix[3][3];
 	float zeus_point[3];
 	float zeus_point2[3];
@@ -135,12 +139,12 @@ public:
 	int zeus_quad_size;
 	uint32_t m_renderAddr;
 	bool m_thegrid;
-	uint32_t *m_directCmd;
 
 	uint32_t *waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
-	std::unique_ptr<uint16_t[]> m_frameDepth;
+	std::unique_ptr<uint32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
+	uint32_t m_ucode[0x200];
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
@@ -160,7 +164,8 @@ private:
 	void zeus2_register_update(offs_t offset, uint32_t oldval, int logit);
 	bool zeus2_fifo_process(const uint32_t *data, int numwords);
 	void zeus2_pointer_write(uint8_t which, uint32_t value, int logit);
-	void load_pal_table(void *wavePtr, uint32_t ctrl, int logit);
+	void load_pal_table(void *wavePtr, uint32_t ctrl, int type, int logit);
+	void load_ucode(void *wavePtr, uint32_t ctrl, int logit);
 	void zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit);
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void print_fifo_command(const uint32_t *data, int numwords, const char *suffix);
@@ -339,19 +344,17 @@ public:
 	/*************************************
 	*  Inlines for texel accesses
 	*************************************/
-	inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
+	static inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 		return WAVERAM_READ8(base, byteoffs);
 	}
 
-#ifdef UNUSED_FUNCTION
-	inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
+	static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
-#endif
 
 };
 
