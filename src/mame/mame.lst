@@ -13268,6 +13268,7 @@ rushatck                        // GX577 (c) 1985
 
 @source:gcpinbal.cpp
 gcpinbal                        // (c) 1994 Excellent System
+pwrflip                         // (c) 1994 Excellent System
 
 @source:gei.cpp
 amuse                           // (c) 1982 Greyhound Electronics

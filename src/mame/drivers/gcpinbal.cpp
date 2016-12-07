@@ -2,8 +2,13 @@
 // copyright-holders:David Graves, R. Belmont
 /***************************************************************************
 
-Grand Cross Pinball
-===================
+Excellent System's ES-9209B Hardware
+
+Games supported:
+
+   Grand Cross Pinball
+   Power Flipper Shooting Pinball
+
 
 Made from Raine source
 
@@ -23,6 +28,7 @@ TODO
  - Hook up ES-8712
  - Sort out the IOC commands for the M6585 & ES-8712
  - Is SW3 actually used?
+ - Missing row scroll (column scroll?)
 
 BGMs (controlled by OKI MSM6585 sound chip)
   MSM6585: is an upgraded MSM5205 voice synth IC.
@@ -70,6 +76,9 @@ Custom: EXCELLENT SYSTEM ES-9208 347102 (QFP160)
         ES-9303 EXCELLENT 9338 C001 (QFP120)
 
 * Denotes unpopulated components
+
+NOTE: Mask roms from Power Flipper Shooting Pinball have not been dumped, but assumed to
+      be the same data.
 
 ***************************************************************************/
 
@@ -500,6 +509,30 @@ MACHINE_CONFIG_END
                                   DRIVERS
 ***************************************************************************/
 
+ROM_START( pwrflip ) /* Updated version of Grand Cross Pinball or semi-sequel? */
+	ROM_REGION( 0x200000, "maincpu", 0 )  /* 512k for 68000 program */
+	ROM_LOAD16_WORD_SWAP( "p.f_1.33.u43",  0x000000, 0x80000, CRC(d760c987) SHA1(9200604377542193afc866c84733f2d3b5aa1c80) ) /* hand written labels on genuine EXCELLENT labels */
+	ROM_FILL            ( 0x80000,  0x080000, 0x00 ) /* unpopulated 27C4096 socket at U44 */
+	ROM_LOAD16_WORD_SWAP( "p.f.u45",       0x100000, 0x80000, CRC(6ad1a457) SHA1(8746c38efa05e3318e9b1a371470d149803fb6bb) )
+	ROM_LOAD16_WORD_SWAP( "p.f.u46",       0x180000, 0x80000, CRC(e0f3a1b4) SHA1(761dddf374a92c1a1e4a211ead215d5be461a082) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )  /* BG0 (16 x 16) */
+	ROM_LOAD( "u1",      0x000000, 0x100000, CRC(afa459bb) SHA1(7a7c64bcb80d71b8cf3fdd3209ef109997b6417c) ) /* 23C8000 MASK ROMs */
+	ROM_LOAD( "u6",      0x100000, 0x100000, CRC(c3f024e5) SHA1(d197e2b715b154fc64ff9a61f8c6df111d6fd446) )
+
+	ROM_REGION( 0x020000, "gfx2", 0 )  /* FG0 (8 x 8) */
+	ROM_LOAD( "p.f.u10",   0x000000, 0x020000, CRC(50e34549) SHA1(ca1808513ff3feb8bcd34d9aafd7b374e4244732) )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )  /* Sprites (16 x 16) */
+	ROM_LOAD( "u13",     0x000000, 0x200000, CRC(62f3952f) SHA1(7dc9ccb753d46b6aaa791bcbf6e18e6d872f6b79) ) /* 23C16000 MASK ROM */
+
+	ROM_REGION( 0x080000, "oki", 0 )   /* M6295 acc to Raine */
+	ROM_LOAD( "u55",   0x000000, 0x080000, CRC(b3063351) SHA1(825e63e8a824d67d235178897528e5b0b41e4485) ) /* OKI M534001B MASK ROM */
+
+	ROM_REGION( 0x200000, "msm", 0 )   /* M6585 acc to Raine but should be for ES-8712??? */
+	ROM_LOAD( "u56",   0x000000, 0x200000, CRC(092b2c0f) SHA1(2ec1904e473ddddb50dbeaa0b561642064d45336) ) /* 23C16000 MASK ROM */
+ROM_END
+
 ROM_START( gcpinbal )
 	ROM_REGION( 0x200000, "maincpu", 0 )  /* 512k for 68000 program */
 	ROM_LOAD16_WORD_SWAP( "2_excellent.u43",  0x000000, 0x80000, CRC(d174bd7f) SHA1(0e6c17265e1400de941e3e2ca3be835aaaff6695) ) /* Red line across label */
@@ -525,5 +558,5 @@ ROM_START( gcpinbal )
 ROM_END
 
 
-
-GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Grand Cross", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, pwrflip,  0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Power Flipper Pinball Shooting v1.33", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, gcpinbal, 0, gcpinbal, gcpinbal, driver_device, 0, ROT270, "Excellent System", "Grand Cross v1.02F", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
