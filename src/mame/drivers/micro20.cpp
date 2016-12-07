@@ -57,7 +57,7 @@ public:
 	DECLARE_WRITE8_MEMBER(portc_w);
 
 private:
-
+	u8 m_tin;
 };
 
 void micro20_state::machine_start()
@@ -66,20 +66,22 @@ void micro20_state::machine_start()
 
 void micro20_state::machine_reset()
 {
-	uint32_t *pROM = (uint32_t *)m_rom->base();
-	uint32_t *pRAM = (uint32_t *)m_mainram.target();
+	u32 *pROM = (uint32_t *)m_rom->base();
+	u32 *pRAM = (uint32_t *)m_mainram.target();
 	
 	pRAM[0] = pROM[2];
 	pRAM[1] = pROM[3];
 	m_maincpu->reset();
 	
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(micro20_state::m68k_reset_callback),this));
+	
+	m_tin = 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
 {
-	m_pit->update_tin(ASSERT_LINE);
-	m_pit->update_tin(CLEAR_LINE);
+	m_pit->update_tin(m_tin);
+	m_tin ^= 1;
 }
 
 WRITE_LINE_MEMBER(micro20_state::h4_w)
@@ -103,6 +105,10 @@ WRITE8_MEMBER(micro20_state::portb_w)
 
 WRITE8_MEMBER(micro20_state::portc_w)
 {
+	// MSM58321 CS1 and CS2 are tied to /RST, inverted RESET.  
+	// So they're always high when the system is not reset.
+	m_rtc->cs1_w(ASSERT_LINE);
+	m_rtc->cs2_w(ASSERT_LINE);
 	m_rtc->stop_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->write_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
 	m_rtc->read_w((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
@@ -154,14 +160,14 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(micro20_state, portc_w))
 	
 	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
-	MCFG_MSM58321_YEAR0(1984)
+	MCFG_MSM58321_DEFAULT_24H(false)
 	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb0_w))
 	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb1_w))
 	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb2_w))
 	MCFG_MSM58321_D3_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb3_w))
 	MCFG_MSM58321_BUSY_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb7_w))
 
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(100))
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(200))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( micro20 )
