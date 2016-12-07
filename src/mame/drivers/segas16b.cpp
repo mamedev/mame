@@ -6452,7 +6452,15 @@ ROM_START( goldnaxe2 )
 	ROM_LOAD( "mpr-12384.a11", 0x10000, 0x20000, CRC(6218d8e7) SHA1(5a745c750efb4a61716f99befb7ed14cc84e9973) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  // Intel i8751 protection MCU
-	ROM_LOAD( "317-0112.c2", 0x00000, 0x1000, NO_DUMP )
+	/* NOT CURRENTLY USED
+	
+	   this chip was faulty, the internal checksum routine fails.  actual code looks like it should be 99.99% the
+	   same as the 'goldnaxe' set but unused areas have different garbage fill data, so finding the bad bits is
+	   difficult. 
+
+	   Calculated checksum: 5F8F
+	   File checksum:       5E8F */
+	ROM_LOAD( "317-0112.c2", 0x00000, 0x1000, BAD_DUMP CRC(d8f2f1c0) SHA1(04594ed5558af63cde62de6cc4020b35b8a5889e) )
 ROM_END
 
 //*************************************************************************************************************************
