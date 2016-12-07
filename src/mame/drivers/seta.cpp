@@ -10722,7 +10722,7 @@ ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted 
 	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
 ROM_END
 
-ROM_START( simpsonjr ) /* bootleg of J. J. Squawkers by Diagom */
+ROM_START( simpsonjr ) /* bootleg of J. J. Squawkers by Daigom */
 	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "4.bin", 0x000000, 0x080000, CRC(469cc203) SHA1(4ecd8dce936f24acb149ef2fdf34595bd4a20a74) )
 	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x080000, CRC(740a7366) SHA1(2539f9a9b4fed1a1e2c354d144b8d455ed4bc144) )
