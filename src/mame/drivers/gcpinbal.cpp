@@ -7,7 +7,7 @@ Excellent System's ES-9209B Hardware
 Games supported:
 
    Grand Cross Pinball
-   Power Flipper Shooting Pinball
+   Power Flipper Pinball Shooting
 
 
 Made from Raine source
