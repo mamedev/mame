@@ -28,6 +28,20 @@ WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
+READ16_MEMBER(vaportra_state::irq6_ack_r)
+{
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line (6, CLEAR_LINE);
+
+	return (0);
+}
+
+WRITE16_MEMBER(vaportra_state::irq6_ack_w)
+{
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line (6, CLEAR_LINE);
+}
+
 READ16_MEMBER(vaportra_state::vaportra_control_r)
 {
 	switch (offset << 1)
@@ -59,7 +73,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
 	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x308000, 0x308001) AM_NOP
+	AM_RANGE(0x308000, 0x308001) AM_READWRITE(irq6_ack_r, irq6_ack_w)
 	AM_RANGE(0x30c000, 0x30c001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
 	AM_RANGE(0x318000, 0x3187ff) AM_MIRROR(0xce0000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -219,7 +233,7 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
