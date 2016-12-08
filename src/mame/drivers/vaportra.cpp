@@ -1,10 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 /***************************************************************************
 
   Vapor Trail (World version)  (c) 1989 Data East Corporation
   Vapor Trail (USA version)    (c) 1989 Data East USA
   Kuhga (Japanese version)     (c) 1989 Data East Corporation
+
+  Notes:
+  -----
+  - If you activate the service mode dip switch during the gameplay, it acts like invicibility
+    either for player 1 and player 2. It works for all sets.
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
   added pal & prom-maps - Highwayman.
@@ -852,15 +858,14 @@ C3D54*
 DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
 
-	for (i = 0x00000; i < 0x80000; i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 		RAM[i] = BITSWAP8(RAM[i],0,6,5,4,3,2,1,7);
 }
 
 /******************************************************************************/
 
-GAME( 1989, vaportra, 0,        vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportra3,vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportrau,vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East USA", "Vapor Trail - Hyper Offence Formation (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kuhga,    vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra,  0,        vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra3, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportrau, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East USA",         "Vapor Trail - Hyper Offence Formation (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kuhga,     vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)",   MACHINE_SUPPORTS_SAVE )
