@@ -64,6 +64,7 @@ READ8_MEMBER(yunsung8_state::sound_command_r)
 
 WRITE8_MEMBER (yunsung8_state::sound_command_w)
 {
+	m_soundlatch->write (space, 0, data);
 	m_audiocpu->set_input_line (0, ASSERT_LINE);
 }
 
@@ -118,8 +119,7 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 WRITE8_MEMBER(yunsung8_state::adpcm_w)
 {
-	/* Swap the nibbles */
-	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
+	m_adpcm = data;
 }
 
 
@@ -457,10 +457,11 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
 {
-	m_msm->data_w(m_adpcm >> 4);
-	m_adpcm <<= 4;
+	m_msm->data_w(m_adpcm & 0x0F);
+	m_adpcm >>= 4;
 
 	m_toggle ^= 1;
+
 	if (m_toggle)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
