@@ -332,8 +332,8 @@ WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
 
 void yunsung8_state::machine_start()
 {
-	m_videoram_0 = m_videoram + 0x0000; // Ram is banked
-	m_videoram_1 = m_videoram + 0x2000;
+	m_bg_vram = m_videoram + 0x0000; // Ram is banked
+	m_fg_vram = m_videoram + 0x2000;
 
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
