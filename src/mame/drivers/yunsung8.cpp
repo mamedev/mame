@@ -25,10 +25,6 @@ Notes:
 - "Magix" can change title to "Rock" through a DSW
 - In service mode press Service Coin (e.g. '9')
 
-To Do:
-
-- Better Sound
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -68,6 +64,11 @@ WRITE8_MEMBER (yunsung8_state::sound_command_w)
 	m_audiocpu->set_input_line (0, ASSERT_LINE);
 }
 
+WRITE8_MEMBER (yunsung8_state::main_irq_ack_w)
+{
+	m_maincpu->set_input_line (0, CLEAR_LINE);
+}
+
 /*
     Banked Video RAM:
 
@@ -94,7 +95,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(flipscreen_w)    // Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITENOP    // ? (end of IRQ, random value)
+	AM_RANGE(0x07, 0x07) AM_WRITE(main_irq_ack_w)
 ADDRESS_MAP_END
 
 
@@ -359,7 +360,7 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state,  irq0_line_hold)   /* No nmi routine */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)          /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)

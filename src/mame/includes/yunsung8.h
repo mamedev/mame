@@ -49,6 +49,7 @@ public:
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(main_irq_ack_w);
 	DECLARE_WRITE8_MEMBER(adpcm_w);
 	DECLARE_WRITE8_MEMBER(videobank_w);
 	DECLARE_READ8_MEMBER(videoram_r);
