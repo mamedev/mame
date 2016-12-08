@@ -386,6 +386,11 @@ newoption {
 	description = "Produce WebAssembly output when building with Emscripten.",
 }
 
+newoption {
+	trigger = "PROJECT",
+	description = "Select projects to be built. Will look into project folder for files.",
+}
+
 dofile ("extlib.lua")
 
 if _OPTIONS["SHLIB"]=="1" then
@@ -516,7 +521,14 @@ msgprecompile ("Precompiling $(subst ../,,$<)...")
 
 messageskip { "SkipCreatingMessage", "SkipBuildingMessage", "SkipCleaningMessage" }
 
-if (_OPTIONS["SOURCES"] == nil) then
+if (_OPTIONS["PROJECT"] ~= nil) then
+	PROJECT_DIR = path.join(path.getabsolute(".."),"projects",_OPTIONS["PROJECT"]) .. "/"
+	if (not os.isfile(path.join("..", "projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
+		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
+	end
+	dofile (path.join(".." ,"projects", _OPTIONS["PROJECT"], "scripts", "target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))
+end
+if (_OPTIONS["SOURCES"] == nil and _OPTIONS["PROJECT"] == nil) then
 	if (not os.isfile(path.join("target", _OPTIONS["target"],_OPTIONS["subtarget"] .. ".lua"))) then
 		error("File definition for TARGET=" .. _OPTIONS["target"] .. " SUBTARGET=" .. _OPTIONS["subtarget"] .. " does not exist")
 	end

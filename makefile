@@ -217,6 +217,10 @@ endif
 # build scripts will be run from
 # scripts/target/$(TARGET)/$(SUBTARGET).lua
 #-------------------------------------------------
+ifdef PROJECT
+PARAMS += --PROJECT='$(PROJECT)'
+TARGET := $(PROJECT)
+endif
 
 ifndef TARGET
 TARGET := mame
@@ -800,7 +804,11 @@ SCRIPTS += scripts/target/$(TARGET)/mess.lua
 endif
 
 ifndef SOURCES
+ifdef PROJECT 
+SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+else
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
+endif
 endif
 
 ifdef REGENIE
