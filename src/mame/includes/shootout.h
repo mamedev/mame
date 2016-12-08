@@ -29,7 +29,9 @@ public:
 
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
+
 	int m_bFlicker;
+	int m_ccnt_old_val;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_READ8_MEMBER(sound_cpu_command_r);
@@ -42,7 +44,10 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
 	DECLARE_DRIVER_INIT(shootout);
+
+	virtual void machine_reset() override;
 	virtual void video_start() override;
+
 	DECLARE_PALETTE_INIT(shootout);
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);

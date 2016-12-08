@@ -23,7 +23,6 @@
 
     TODO:
 
-    - Fix coin counter
     - Lots of unmapped memory reads
 
 *******************************************************************************/
@@ -69,9 +68,24 @@ WRITE8_MEMBER(shootout_state::flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
+/*
+	This is actually a 'real' counter... the first write is always 0x40, then when a coin is inserted the game starts to count from 0x01,
+	then it counts from 0x02 to 0x09 but strangely it skips the 'hexadecimal letters'... so from 0x09 it goes to
+	0x10, 0x11, 0x12, ...0x19, 0x20, and so on...
+	The game counts up to 0x99, after that, 0x99 is always written... 
+
+	On the shootoutj and shootoutb sets, it works as above but it counts up to 0x09 instead of 0x99.
+*/
 WRITE8_MEMBER(shootout_state::coincounter_w)
 {
-	machine().bookkeeping().coin_counter_w(0, data);
+	if (data != m_ccnt_old_val)
+	{
+		// Do a coin pulse
+		machine().bookkeeping().coin_counter_w(0, 0);
+		machine().bookkeeping().coin_counter_w(0, 1);
+	
+		m_ccnt_old_val = data;
+	}
 }
 
 /*******************************************************************************/
@@ -182,8 +196,8 @@ static INPUT_PORTS_START( shootout )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) /* this is set when either coin is inserted */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) // This needs to be low to allows both coins to be accepted...
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_CUSTOM ) PORT_VBLANK("screen")
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shootouj )
@@ -240,7 +254,10 @@ static GFXDECODE_START( shootout )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_layout,   0,        16 ) /* tiles */
 GFXDECODE_END
 
-
+void shootout_state::machine_reset ()
+{
+	m_ccnt_old_val = 0x40;
+}
 
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
