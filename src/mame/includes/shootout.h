@@ -32,6 +32,7 @@ public:
 	int m_bFlicker;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
+	DECLARE_READ8_MEMBER(sound_cpu_command_r);
 	DECLARE_WRITE8_MEMBER(sound_cpu_command_w);
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(coincounter_w);
