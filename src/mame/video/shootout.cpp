@@ -84,6 +84,7 @@ void shootout_state::video_start()
 	m_foreground->set_transparent_pen(0 );
 
 	save_item(NAME(m_bFlicker));
+	save_item(NAME(m_ccnt_old_val));
 }
 
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
