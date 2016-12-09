@@ -77,7 +77,7 @@ Custom: EXCELLENT SYSTEM ES-9208 347102 (QFP160)
 
 * Denotes unpopulated components
 
-NOTE: Mask roms from Power Flipper Shooting Pinball have not been dumped, but assumed to
+NOTE: Mask roms from Power Flipper Pinball Shooting have not been dumped, but assumed to
       be the same data.
 
 ***************************************************************************/
