@@ -12,6 +12,7 @@ Research Machines RM 380Z
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "imagedev/cassette.h"
 #include "machine/ram.h"
 #include "imagedev/flopdrv.h"
 #include "machine/wd_fdc.h"
@@ -66,6 +67,7 @@ protected:
 public:
 
 	uint8_t m_port0;
+	uint8_t m_port0_mask;
 	uint8_t m_port0_kbd;
 	uint8_t m_port1;
 	uint8_t m_fbfd;
@@ -88,6 +90,7 @@ public:
 	int m_old_videomode;
 
 	required_device<cpu_device> m_maincpu;
+	required_device<cassette_image_device> m_cassette;
 	required_device<ram_device> m_messram;
 	required_device<fd1771_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
@@ -96,6 +99,7 @@ public:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
+		m_cassette(*this, "cassette"),
 		m_messram(*this, RAM_TAG),
 		m_fdc(*this, "wd1771"),
 		m_floppy0(*this, "wd1771:0"),
@@ -123,6 +127,11 @@ public:
 	DECLARE_WRITE8_MEMBER(disk_0_control);
 
 	DECLARE_WRITE8_MEMBER( keyboard_put );
+	
+	DECLARE_DRIVER_INIT(rm380z);
+	DECLARE_DRIVER_INIT(rm380z34d);
+	DECLARE_DRIVER_INIT(rm380z34e);
+	DECLARE_DRIVER_INIT(rm480z);
 
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);
