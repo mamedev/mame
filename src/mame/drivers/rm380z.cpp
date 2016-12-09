@@ -8,6 +8,9 @@ Microcomputer produced by Research Machines Limited, Oxford, UK
 MESS driver by Wilbert Pol and friol (dantonag (at) gmail.com)
 Driver started on 22/12/2011
 
+Stefano Bodrato, 09/12/2016 - skeleton for cassette support
+True tape samples are needed to continue !
+
 ===
 
 Memory map from sevice manual:
@@ -146,6 +149,12 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
+	/* cassette */
+	MCFG_CASSETTE_ADD( "cassette" )
+//	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)
+	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_ENABLED)
+	//m_cassette->change_state((BIT(data,x)) ? CASSETTE_MOTOR_DISABLED : CASSETTE_MOTOR_ENABLED, CASSETTE_MASK_MOTOR);
+
 	/* RAM configurations */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("56K")
@@ -161,10 +170,28 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
-/* ROM definition */
+
+
+/* ROM definitions */
+
+ROM_START( rm380z34d )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )	
+	ROM_LOAD( "cos34d-f.bin", 0x0000, 0x1000, CRC(eb128b40) SHA1(c46f358fb76459987e41750d052995563f2f7d53))
+	// chargen ROM is undumped, afaik
+	ROM_REGION( 0x1680, "chargen", 0 )
+	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
+ROM_END
+
+ROM_START( rm380z34e )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
+	// chargen ROM is undumped, afaik
+	ROM_REGION( 0x1680, "chargen", 0 )
+	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
+ROM_END
+
 ROM_START( rm380z )
 	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
-//  ROM_LOAD( "cos34e-m.bin", 0x0000, 0x1000, CRC(20e2ddf4) SHA1(3177b28793d5a348c94fd0ae6393d74e2e9a8662))
 	// I'm not sure of how those roms have been dumped. I don't know if those are good dumps or not.
 	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, BAD_DUMP CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
 	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, BAD_DUMP CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
@@ -172,8 +199,15 @@ ROM_START( rm380z )
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "chargen", 0 )
 	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
+	// The characters on the 480Z are very close (or identical) to the 380Z ones
+	//ROM_REGION( 0x2000, "chargen", 0 )
+	//ROM_LOAD( "CG06.BIN", 0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289))
 ROM_END
 
-/* Driver */
 
-COMP(1978, rm380z, 0,      0,       rm380z,    rm380z, driver_device,  0,    "Research Machines", "RM-380Z", MACHINE_NO_SOUND_HW)
+/* Driver */
+/*   YEAR  NAME        PARENT    COMPAT   MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME */
+COMP(1978, rm380z,       0,        0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B", MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z34d,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D", MACHINE_BTANB_FLAGS)
+COMP(1978, rm380z34e,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E", MACHINE_BTANB_FLAGS)
+
