@@ -16,6 +16,11 @@
     strangely features the same encryption as used on the DE-0219 board. It
     also has some edited graphics.
 
+	The DE-0219 PCB seems to have only one 12 MHz XTAL, some images with recognizable XTAL value can be found here:
+	- http://www.jammarcade.net/images/2016/04/Shootout.jpg
+	- http://thumbs.picclick.com/00/s/MTIwMFgxNjAw/z/7iIAAOSw5ClXxbrB/$/Data-East-Shootout-Arcade-Video-Game-Pcb-Circuit-_57.jpg
+
+
     Driver by:
         Ernesto Corvi (ernesto@imagina.com)
         Phil Stroffolino
@@ -266,18 +271,18 @@ void shootout_state::machine_reset ()
 static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)  /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz?
 	MCFG_CPU_PROGRAM_MAP(shootout_map)
 
-	MCFG_CPU_ADD("audiocpu", M6502, 1500000)
+	MCFG_CPU_ADD("audiocpu", M6502, XTAL_12MHz / 8) // 1.5 MHz
 	MCFG_CPU_PROGRAM_MAP(shootout_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
+ 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
+	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
+	
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -290,7 +295,7 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz / 8) // 1.5 MHz
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
@@ -299,15 +304,15 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, 2000000) /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	
+ 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
+	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
+	
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -320,7 +325,7 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz / 8) // 1.5 MHz (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("maincpu", M6502_IRQ_LINE))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(shootout_state, bankswitch_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(shootout_state, flipscreen_w))
@@ -330,7 +335,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( shootouk, shootouj )
 	/* the Korean 'bootleg' has the usual DECO222 style encryption */
 	MCFG_DEVICE_REMOVE("maincpu")
-	MCFG_CPU_ADD("maincpu", DECO_222, 2000000)  /* 2 MHz? */
+	MCFG_CPU_ADD("maincpu", DECO_222, XTAL_12MHz / 6) // 2 MHz? (Assuming the same XTAL as DE-0219 pcb)
 	MCFG_CPU_PROGRAM_MAP(shootouj_map)
 MACHINE_CONFIG_END
 
