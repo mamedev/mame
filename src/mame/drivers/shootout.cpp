@@ -23,7 +23,7 @@
 
     TODO:
 
-    - Lots of unmapped memory reads
+    - Lots of unmapped memory reads and writes (sprram or vram mirrors, perhaps...), bg_vram is also read.
 	- Does the korean bootleg really have the DECO 222 CPU? I think it should use the shootclr.003 prom to decrypt the opcodes.
 	  Something like -> rom [addr] = (rom [addr] & 0x0F) | proms [rom [addr] >> 4]]);
 
@@ -112,6 +112,7 @@ static ADDRESS_MAP_START( shootouj_map, AS_PROGRAM, 8, shootout_state )
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("P1")
 	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("P2")
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1004, 0x17ff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(coincounter_w)
 	AM_RANGE(0x2000, 0x21ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
