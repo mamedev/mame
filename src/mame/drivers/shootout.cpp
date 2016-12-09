@@ -76,12 +76,15 @@ WRITE8_MEMBER(shootout_state::flipscreen_w)
 }
 
 /*
-	This is actually a 'real' counter... the first write is always 0x40, then when a coin is inserted the game starts to count from 0x01,
-	then it counts from 0x02 to 0x09 but strangely it skips the 'hexadecimal letters'... so from 0x09 it goes to
-	0x10, 0x11, 0x12, ...0x19, 0x20, and so on...
-	The game counts up to 0x99, after that, 0x99 is always written... 
+	This is actually a double BCD counter (2 BCD digits packet in a byte)...
+	The first write is always 0x40, then when a coin is inserted it starts to count from 0x01 up to 0x99.
+	When it reaches 99 credits, 0x99 is always written... 
 
-	On the shootoutj and shootoutb sets, it works as above but it counts up to 0x09 instead of 0x99.
+	On the shootoutj and shootoutb sets, it works as above but it counts up to 0x09 instead of 0x99 (Single BCD digit).
+
+	Note:
+	This should be an input for a BCD to 7-segment decoder (e.g. a 74LS47), but all the PCBs I've seen don't have 'onboard'
+	display(s), so this was implemented as normal "coin counter" (after all, they both have the same goal: count credits ;))
 */
 WRITE8_MEMBER(shootout_state::coincounter_w)
 {
