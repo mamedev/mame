@@ -850,6 +850,7 @@ peplus.cpp
 peyper.cpp
 pgm.cpp
 pgm2.cpp
+pgm3.cpp
 phoenix.cpp
 photon.cpp
 photon2.cpp
