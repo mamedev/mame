@@ -8730,7 +8730,7 @@ GAME( 1998, rbff2,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1998, rbff2h,     rbff2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers / Real Bout Garou Densetsu 2 - The Newcomers (NGH-2400)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, rbff2k,     rbff2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Real Bout Fatal Fury 2 - The Newcomers (Korean release)", MACHINE_SUPPORTS_SAVE ) // no Japanese title / mode
 GAME( 1998, mslug2,     neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410)", MACHINE_SUPPORTS_SAVE )
-GAME( 2015, mslug2t,    mslug2,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "Hack", "Metal Slug 2 Turbo (NGM-9410)", MACHINE_SUPPORTS_SAVE )
+GAME( 2015, mslug2t,    mslug2,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "hack (trap15)", "Metal Slug 2 Turbo (NGM-9410) (hack)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98,      neogeo,   kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98a,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420, alt board)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, kof98k,     kof98,    kof98,     neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (Korean board)", MACHINE_SUPPORTS_SAVE )
