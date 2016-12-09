@@ -17,7 +17,6 @@
     - Hard drive controllers and drives
     - Test Centronics printer
     - PIO connections
-    - RTC not working
 
     Note of MAME restrictions:
     - Votrax doesn't sound anything like the real thing
@@ -64,12 +63,11 @@ static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	AM_RANGE(0x1a, 0x1a) AM_WRITE(port1a_w) // membank
 	AM_RANGE(0x1b, 0x1b) AM_WRITE(port1b_w) // winchester control
 	AM_RANGE(0x1c, 0x1f) AM_WRITE(port1c_w) // gpebh select
-	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("pio2", z80pio_device, read, write)	// kpio
+	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("pio2", z80pio_device, read, write)
 	AM_RANGE(0x24, 0x27) AM_DEVREADWRITE("sio2", z80sio0_device, ba_cd_r, ba_cd_w)
 	AM_RANGE(0x28, 0x28) AM_READ(port28_r) AM_DEVWRITE("votrax", votrax_sc01_device, write)
 	AM_RANGE(0x2c, 0x2c) AM_DEVWRITE("votrax", votrax_sc01_device, inflection_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(address_w)
-	//AM_RANGE(0x30, 0x30) AM_DEVWRITE("crtc", mc6845_device, address_w)
 	AM_RANGE(0x31, 0x31) AM_DEVREAD("crtc", mc6845_device, status_r)
 	AM_RANGE(0x32, 0x32) AM_WRITE(register_w)
 	AM_RANGE(0x33, 0x33) AM_READ(port33_r)
@@ -77,11 +75,7 @@ static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	AM_RANGE(0x35, 0x35) AM_WRITE(port35_w) // data to vram and aram
 	AM_RANGE(0x36, 0x36) AM_READ(port36_r) // data from vram and aram
 	AM_RANGE(0x37, 0x37) AM_READ(port37_r) // read dispen flag
-	AM_RANGE(0x40, 0x4f) AM_READWRITE(rtc_data_r, rtc_data_w)
-	//AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", msm5832_device, data_r, data_w)
-	//AM_RANGE(0x40, 0x4f) AM_DEVREAD("rtc", msm5832_device, data_r)
-	//AM_RANGE(0x40, 0x4f) AM_DEVWRITE("rtc", msm5832_device, data_w)
-
+	AM_RANGE(0x40, 0x4f) AM_READWRITE(rtc_r, rtc_w)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -97,31 +91,6 @@ INPUT_PORTS_END
     I/O Ports
 
 ************************************************************/
-
-
-// Realt Time Clock.
-// Enable signals are controlled by port 20h,
-// 40h .. 4fh reach the clock data
-
-READ8_MEMBER( aussiebyte_state::rtc_data_r )
-{
-	m_rtc->address_w(offset & 0x0f);
-	m_rtc->write_w(0);
-	m_rtc->read_w(1);
-	return (m_rtc->data_r(space,0));
-}
-
-WRITE8_MEMBER( aussiebyte_state::rtc_data_w )
-{
-	m_rtc->write_w(0);
-	m_rtc->read_w(0);
-	m_rtc->address_w(offset & 0x0f);
-	//m_rtc->data_w(space,0,data & 0x0f);
-	m_rtc->data_w(space,0,data);
-	m_rtc->write_w(1);
-}
-
-
 WRITE8_MEMBER( aussiebyte_state::port15_w )
 {
 	membank("bankr0")->set_entry(m_port15); // point at ram
@@ -242,17 +211,40 @@ WRITE8_MEMBER( aussiebyte_state::port1c_w )
 {
 }
 
-// kpio
 WRITE8_MEMBER( aussiebyte_state::port20_w )
 {
 	m_speaker->level_w(BIT(data, 7));
-	m_rtc->cs_w(BIT(data, 6));	// BIOS keeps bit 6 always set
-	m_rtc->hold_w(BIT(data, 0));	// BIOS outputs to $41/$40, for RTC, in comments is is said to set/reset "hold line"
 }
 
 READ8_MEMBER( aussiebyte_state::port28_r )
 {
 	return m_port28;
+}
+
+/***********************************************************
+
+    RTC
+
+************************************************************/
+READ8_MEMBER( aussiebyte_state::rtc_r )
+{
+	m_rtc->cs_w(1);
+	m_rtc->read_w(1);
+	m_rtc->address_w(offset);
+	uint8_t data = m_rtc->data_r(space,0);
+	m_rtc->read_w(0);
+	m_rtc->cs_w(0);
+	return data;
+}
+
+WRITE8_MEMBER( aussiebyte_state::rtc_w )
+{
+	m_rtc->cs_w(1);
+	m_rtc->address_w(offset);
+	m_rtc->data_w(space,0,data);
+	m_rtc->write_w(1);
+	m_rtc->write_w(0);
+	m_rtc->cs_w(0);
 }
 
 /***********************************************************
@@ -469,7 +461,6 @@ MACHINE_RESET_MEMBER( aussiebyte_state, aussiebyte )
 	membank("bankw0")->set_entry(1); // always write to ram
 	membank("bank1")->set_entry(2);
 	membank("bank2")->set_entry(3);
-
 	m_maincpu->reset();
 }
 
@@ -530,7 +521,6 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_Z80PIO_IN_PB_CB(DEVREAD8("cent_data_in", input_buffer_device, read))
 	MCFG_Z80PIO_OUT_ARDY_CB(DEVWRITELINE("centronics", centronics_device, write_strobe)) MCFG_DEVCB_INVERT
 
-	// kpio
 	MCFG_DEVICE_ADD("pio2", Z80PIO, XTAL_16MHz / 4)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_Z80PIO_OUT_PA_CB(WRITE8(aussiebyte_state, port20_w))
