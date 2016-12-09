@@ -30,7 +30,6 @@ public:
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
 
-	int m_bFlicker;
 	int m_ccnt_old_val;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);

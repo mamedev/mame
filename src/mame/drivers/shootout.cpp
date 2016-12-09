@@ -264,7 +264,6 @@ GFXDECODE_END
 
 void shootout_state::machine_reset ()
 {
-	m_bFlicker     = 0;
 	m_ccnt_old_val = 0x40;
 }
 
