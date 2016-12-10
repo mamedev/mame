@@ -754,20 +754,19 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		return; // no output from graphics option
 	}
 
-	address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
 	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 	{
+			address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 			plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
 			plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
 			plane2 = plane3 = 0;
 	}
 		else
 	{
+			address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 			// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 (4) MONOCHROME SHADES)
-			// MANUAL SAYS:   (GDC "sees" 4 planes X 16 bits X 8K words)!
 			plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
 			plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
 			plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
@@ -2727,14 +2726,10 @@ READ16_MEMBER(rainbow_state::vram_r)
 // NOTE: Rainbow has separate registers for fore and background.
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
-	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR))
-	{
-		// SCROLL_MAP IN BITMAP MODE ONLY...?
-		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
+	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
-		else
+	else
 			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
-	}
 
 	offset &= 0xffff; // same as in VT240?
 	uint16_t chr = data; // VT240 : uint8_t
@@ -2868,7 +2863,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 				OPTION_RESET_PATTERNS
 			}
-			m_PORT50  = data;
+			//m_PORT50  = data;
 			break;
 
 		case 1: //  51h - DATA loaded into register previously written to 53h.
