@@ -878,6 +878,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 		/* dump opcodes in qwords from a qword-sized bus */
 		case 88:
+		case 86: // sharc case, 48-bits opcodes
 			break;
 
 		default:
@@ -925,6 +926,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 			break;
 
 		case 8:
+		case 6:
 			result = space.direct().read_qword(address & ~7, addrxor);
 			if (!QWORD_ALIGNED(address))
 			{
@@ -3426,6 +3428,7 @@ void device_debug::tracer::update(offs_t pc)
 	// log this PC
 	m_nextdex = (m_nextdex + 1) % TRACE_LOOPS;
 	m_history[m_nextdex] = pc;
+	fflush(&m_file);
 }
 
 
@@ -3437,6 +3440,7 @@ void device_debug::tracer::vprintf(const char *format, va_list va)
 {
 	// pass through to the file
 	vfprintf(&m_file, format, va);
+	fflush(&m_file);
 }
 
 

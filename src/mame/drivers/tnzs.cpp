@@ -413,7 +413,7 @@ TODO:
 - Find out how the hardware credit-counter works (MPU)
 - Fix MCU simulation errors :
     * avoid credits to be increased when in "test mode" to avoid coin lockout
-      (needed to complete special test mode in 'extermatn' and 'arknoid2')
+      (needed to complete special test mode in 'extrmatn' and 'arknoid2')
     * why are credits limited to 9 in some games ?
       pressing SERVICE1 allows to go up to 100 and cause this :
         . 'plumppop' : freeze
@@ -770,12 +770,23 @@ static ADDRESS_MAP_START( sub_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
 	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xc000, 0xc001) AM_READWRITE(tnzs_mcu_r, tnzs_mcu_w)   /* not present in insectx */
+	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)   /* not present in insectx */
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)    /* paddles in arkanoid2/plumppop. The ports are */
-						/* read but not used by the other games, and are not read at */
-						/* all by insectx. */
+															/* read but not used by the other games, and are not read at */
+															/* all by insectx. */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( arknoid2_sub_map, AS_PROGRAM, 8, tnzs_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("subbank")
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(arknoid2_mcu_reset_w)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
+	AM_RANGE(0xc000, 0xc001) AM_READWRITE(arknoid2_mcu_r, arknoid2_mcu_w)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM
+	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
+	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)    /* paddles in arkanoid2/plumppop. The ports are */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kageki_sub_map, AS_PROGRAM, 8, tnzs_state )
@@ -846,13 +857,12 @@ static ADDRESS_MAP_START( tnzsb_io_map, AS_IO, 8, tnzs_state )
 	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8742_io_map, AS_IO, 8, tnzs_state )
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(tnzs_port1_r)
-	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(tnzs_port2_r, tnzs_port2_w)
+static ADDRESS_MAP_START( i8742_map, AS_IO, 8, tnzs_state )
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READ(mcu_port1_r)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mcu_port2_r, mcu_port2_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ_PORT("COIN1")
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ_PORT("COIN2")
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( jpopnics_main_map, AS_PROGRAM, 8, tnzs_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -1538,101 +1548,7 @@ WRITE_LINE_MEMBER(tnzs_state::irqhandler)
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static MACHINE_CONFIG_START( arknoid2, tnzs_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  arknoid2_interrupt)
-
-	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/2)  /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  irq0_line_hold)
-
-	MCFG_FRAGMENT_ADD(tnzs_mainbank)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
-	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
-
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-
-	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_START( drtoppel, tnzs_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  arknoid2_interrupt)
-
-	MCFG_CPU_ADD("sub", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_PROGRAM_MAP(sub_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  irq0_line_hold)
-
-	MCFG_FRAGMENT_ADD(tnzs_mainbank)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
-	MCFG_MACHINE_START_OVERRIDE(tnzs_state,tnzs)
-	MCFG_MACHINE_RESET_OVERRIDE(tnzs_state,tnzs)
-
-	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
-	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MCFG_SCREEN_SIZE(32*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(tnzs_state, screen_update_tnzs)
-	MCFG_SCREEN_VBLANK_DRIVER(tnzs_state, screen_eof_tnzs)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tnzs)
-	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
-	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-
-	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
-	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
-	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_START( tnzs, tnzs_state )
-
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)       /* 6.0 MHz ??? - Main board Crystal is 12MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
@@ -1643,7 +1559,7 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("mcu", I8742, 12000000/2)  /* 400KHz ??? - Main board Crystal is 12MHz */
-	MCFG_CPU_IO_MAP(i8742_io_map)
+	MCFG_CPU_IO_MAP(i8742_map)
 
 	MCFG_FRAGMENT_ADD(tnzs_mainbank)
 
@@ -1678,6 +1594,25 @@ static MACHINE_CONFIG_START( tnzs, tnzs_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( extrmatn, tnzs )
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( arknoid2, tnzs )
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", tnzs_state,  arknoid2_interrupt)
+
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(arknoid2_sub_map)
+
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_DEVICE_DISABLE()
+
+	MCFG_PALETTE_MODIFY("palette")
+	MCFG_PALETTE_INIT_OWNER(tnzs_state,arknoid2)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( insectx, tnzs_state )
 
@@ -1907,8 +1842,8 @@ ROM_START( plumppop )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "a98-11.bin", 0x00000, 0x10000, CRC(bc56775c) SHA1(0c22c22c0e9d7ec0e34f8ab4bfe61068f65e8759) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "plmp8742.bin", 0x0000, 0x0800, NO_DUMP )
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Chip label is a guess, also unknown if it actually uses the same MCU as drtoppel/extrmatn, but it appears to work fine */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "a98-01.bin", 0x00000, 0x10000, CRC(f3033dca) SHA1(130744998f0531a82de2814231dddea3ad710f60) )
@@ -1959,8 +1894,8 @@ ROM_START( extrmatn )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b06-19.4e", 0x00000, 0x10000, CRC(8de43ed9) SHA1(53e6d8fa93889c38733d169e983f2caf1da71f43) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
@@ -1981,8 +1916,8 @@ ROM_START( extrmatnu )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b06-22.4e", 0x00000, 0x10000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
@@ -2004,8 +1939,8 @@ ROM_START( extrmatnur )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b06_17", 0x00000, 0x10000, CRC(744f2c84) SHA1(7565c1594c2a3bae1ae45afcbf93363fe2b12d58) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
@@ -2026,8 +1961,8 @@ ROM_START( extrmatnj )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b06-07.4e", 0x00000, 0x10000, CRC(b37fb8b3) SHA1(10696914b9e39d34d56069a69b9d641339ea2309) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "extr8742.4f", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14 */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b06-01.13a", 0x00000, 0x20000, CRC(d2afbf7e) SHA1(28b4cf94798f049a9f8375464741dbef208d7290) )
@@ -2048,7 +1983,7 @@ ROM_START( arknoid2 )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b08_13.3e", 0x00000, 0x10000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2070,7 +2005,7 @@ ROM_START( arknoid2u )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b08_12.3e", 0x00000, 0x10000, CRC(dc84e27d) SHA1(d549d8c9fbec0521517f0c5f5cee763e27d48633) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2092,7 +2027,7 @@ ROM_START( arknoid2j )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b08_06.3e", 0x00000, 0x10000, CRC(adfcd40c) SHA1(f91299407ed21e2dd244c9b1a315b27ed32f5514) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2114,7 +2049,7 @@ ROM_START( arknoid2b )
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
 	ROM_LOAD( "b08_13.3e", 0x00000, 0x10000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2136,8 +2071,8 @@ ROM_START( drtoppel )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b19-15.3e", 0x00000, 0x10000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
@@ -2162,8 +2097,8 @@ ROM_START( drtoppelu )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b19-14.3e", 0x00000, 0x10000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
@@ -2188,8 +2123,8 @@ ROM_START( drtoppelj )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b19-11.3e", 0x00000, 0x10000, CRC(524dc249) SHA1(158b2de0fcd17ad16ba72bb24888122bf704e216) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )    /* M-Chip (i8742 internal ROM) */
-	ROM_LOAD( "drt8742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B06-14, reused from Extermination, under printed label "Taito M-001, 128P, 720100" */
+	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
@@ -2326,7 +2261,7 @@ ROM_START( chukatai )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b44-12w", 0x00000, 0x10000, CRC(e80ecdca) SHA1(cd96403ca97f18f630118dcb3dc2179c01147213) ) /* Hacked??, need correct Taito rom number */
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2348,7 +2283,7 @@ ROM_START( chukataiu )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b44-12u", 0x00000, 0x10000, CRC(9f09fd5c) SHA1(ae92f2e893e1e666dcabbd793f1a778c5e3d7bab) ) /* Hacked??, need correct Taito rom number */
 
-	ROM_REGION( 0x1000, "mcu", 0 )  /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x1000, "mcu", 0 )  /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2370,7 +2305,7 @@ ROM_START( chukataij )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b44-12", 0x00000, 0x10000, CRC(0600ace6) SHA1(3d5767b91ea63128bfbff3527ddcf90fcf43af2e) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2517,7 +2452,7 @@ Taito ID: K1100356A
 Seta ID: P0-041A
 */
 /* This pcb is similar but not identical to the Chuka Taisen pcb;
-   There is an M-chip i8742 (with Taito silkscreen) and no 3rd z80.
+   There is an M-chip i8x42 (with Taito silkscreen) and no 3rd z80.
    There is no daughter-pcb like the later TNZS pcb has. */
 ROM_START( tnzsjo )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
@@ -2526,7 +2461,7 @@ ROM_START( tnzsjo )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b53-11.27c512.u38", 0x00000, 0x10000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2554,7 +2489,7 @@ ROM_START( tnzsuo )
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b53-13.27c512.u38", 0x00000, 0x10000, CRC(c09f4d28) SHA1(f1fd3202869738e17abcbb757f9ce7260707dd3d) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2574,14 +2509,14 @@ ROM_START( tnzsuo )
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
-	ROM_START( tnzso )
+ROM_START( tnzso )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-unknown.27c1001d.u32", 0x00000, 0x20000, CRC(edf3b39e) SHA1(be221c99e50795d569611dba454c3954a259a859) ) // ROM LABEL FOR THIS SET IS UNKNOWN
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "b53-unknown.27c512.u38", 0x00000, 0x10000, CRC(60340d63) SHA1(12a26d19dc8e407e502f25617a5a4c9cea131ce2) ) // ROM LABEL FOR THIS SET IS UNKNOWN
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2610,7 +2545,7 @@ ROM_START( tnzsop ) // prototype/location test version?
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
 	ROM_LOAD( "ns_e-3.27c512.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) )
 
-	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8742 internal ROM) */
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -2737,22 +2672,22 @@ ROM_END
 
 
 //    YEAR, NAME,      PARENT,   MACHINE,  INPUT,    INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
-GAME( 1987, plumppop,  0,        drtoppel, plumppop, tnzs_state,    plumpop,  ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, plumppop,  0,        extrmatn, plumppop, tnzs_state,    plumpop,  ROT0,   "Taito Corporation", "Plump Pop (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, jpopnics,  0,        jpopnics, jpopnics, driver_device, 0,        ROT0,   "Nics",              "Jumping Pop (Nics, Korean hack of Plump Pop)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, extrmatn,  0,        arknoid2, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnu, extrmatn, arknoid2, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnur,extrmatn, arknoid2, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, extrmatnj, extrmatn, arknoid2, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatn,  0,        extrmatn, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito Corporation Japan",                         "Extermination (World)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnu, extrmatn, extrmatn, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito (World Games license)",                     "Extermination (US, World Games)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnur,extrmatn, extrmatn, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito America Corporation (Romstar license)",     "Extermination (US, Romstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, extrmatnj, extrmatn, extrmatn, extrmatn, tnzs_state,    extrmatn, ROT270, "Taito Corporation",                               "Extermination (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, arknoid2,  0,        arknoid2, arknoid2, tnzs_state,    arknoid2, ROT270, "Taito Corporation Japan",                     "Arkanoid - Revenge of DOH (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2u, arknoid2, arknoid2, arknid2u, tnzs_state,    arknoid2, ROT270, "Taito America Corporation (Romstar license)", "Arkanoid - Revenge of DOH (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2j, arknoid2, arknoid2, arknid2u, tnzs_state,    arknoid2, ROT270, "Taito Corporation",                           "Arkanoid - Revenge of DOH (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, arknoid2b, arknoid2, arknoid2, arknid2u, tnzs_state,    arknoid2, ROT270, "bootleg",                                     "Arkanoid - Revenge of DOH (Japan bootleg)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1987, drtoppel,  0,        drtoppel, drtoppel, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelu, drtoppel, drtoppel, drtopplu, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
-GAME( 1987, drtoppelj, drtoppel, drtoppel, drtopplu, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, drtoppel,  0,        extrmatn, drtoppel, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito Corporation Japan",   "Dr. Toppel's Adventure (World)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelu, drtoppel, extrmatn, drtopplu, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito America Corporation", "Dr. Toppel's Adventure (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
+GAME( 1987, drtoppelj, drtoppel, extrmatn, drtopplu, tnzs_state,    drtoppel, ROT90,  "Kaneko / Taito Corporation",         "Dr. Toppel's Tankentai (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kageki,    0,        kageki,   kageki,   tnzs_state,    kageki,   ROT90,  "Kaneko / Taito America Corporation (Romstar license)", "Kageki (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kagekij,   kageki,   kageki,   kagekij,  tnzs_state,    kageki,   ROT90,  "Kaneko / Taito Corporation",                           "Kageki (Japan)", MACHINE_SUPPORTS_SAVE )

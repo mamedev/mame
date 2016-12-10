@@ -12,16 +12,12 @@
 
 enum
 {
-	MCU_NONE_INSECTX = 0,
+	MCU_ARKANOID_SIM = 0,
+	MCU_MCHIP_LLE,
+	MCU_NONE_INSECTX,
 	MCU_NONE_KAGEKI,
 	MCU_NONE_TNZSB,
-	MCU_NONE_KABUKIZ,
-	MCU_EXTRMATN,
-	MCU_ARKANOID,
-	MCU_PLUMPOP,
-	MCU_DRTOPPEL,
-	MCU_CHUKATAI,
-	MCU_TNZS
+	MCU_NONE_KABUKIZ
 };
 
 class tnzs_state : public driver_device
@@ -48,8 +44,9 @@ public:
 		m_coin1(*this, "COIN1"),
 		m_coin2(*this, "COIN2"),
 		m_an1(*this, "AN1"),
-		m_an2(*this, "AN2")
-		{ }
+		m_an2(*this, "AN2"),
+		m_lockout_level(false)
+	{ }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -92,23 +89,26 @@ public:
 	uint8_t    m_mcu_coins_b;
 	uint8_t    m_mcu_credits;
 	int      m_bank2;
+	bool	 m_lockout_level;
+
+	DECLARE_READ8_MEMBER(mcu_port1_r);
+	DECLARE_READ8_MEMBER(mcu_port2_r);
+	DECLARE_WRITE8_MEMBER(mcu_port2_w );
+	DECLARE_READ8_MEMBER(mcu_r);
+	DECLARE_WRITE8_MEMBER(mcu_w);
 
 	DECLARE_WRITE8_MEMBER(tnzsb_sound_command_w);
 	DECLARE_WRITE8_MEMBER(jpopnics_subbankswitch_w);
 	DECLARE_READ8_MEMBER(tnzs_port1_r);
 	DECLARE_READ8_MEMBER(tnzs_port2_r);
 	DECLARE_WRITE8_MEMBER(tnzs_port2_w);
+	DECLARE_WRITE8_MEMBER(extrmatn_port2_w);
 	DECLARE_READ8_MEMBER(arknoid2_sh_f000_r);
-	DECLARE_READ8_MEMBER(tnzs_mcu_r);
-	DECLARE_WRITE8_MEMBER(tnzs_mcu_w);
 	DECLARE_WRITE8_MEMBER(tnzs_ramrom_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tnzs_bankswitch1_w);
-	DECLARE_READ8_MEMBER(mcu_tnzs_r);
-	DECLARE_WRITE8_MEMBER(mcu_tnzs_w);
-	DECLARE_READ8_MEMBER(mcu_arknoid2_r);
-	DECLARE_WRITE8_MEMBER(mcu_arknoid2_w);
-	DECLARE_READ8_MEMBER(mcu_extrmatn_r);
-	DECLARE_WRITE8_MEMBER(mcu_extrmatn_w);
+	DECLARE_READ8_MEMBER(arknoid2_mcu_r);
+	DECLARE_WRITE8_MEMBER(arknoid2_mcu_w);
+	DECLARE_WRITE8_MEMBER(arknoid2_mcu_reset_w);
 	DECLARE_READ8_MEMBER(kageki_csport_r);
 	DECLARE_WRITE8_MEMBER(kageki_csport_w);
 	DECLARE_WRITE8_MEMBER(kabukiz_sound_bank_w);
@@ -137,6 +137,6 @@ public:
 
 	INTERRUPT_GEN_MEMBER(arknoid2_interrupt);
 
-	void mcu_reset();
+	void arknoid2_mcu_reset();
 	void mcu_handle_coins(int coin);
 };
