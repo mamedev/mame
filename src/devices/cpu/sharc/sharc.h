@@ -171,6 +171,17 @@ public:
 
 	void enable_recompiler();
 
+	DECLARE_READ64_MEMBER( pm0_r);
+	DECLARE_WRITE64_MEMBER(pm0_w);
+	DECLARE_READ64_MEMBER( pm1_r);
+	DECLARE_WRITE64_MEMBER(pm1_w);
+	DECLARE_READ32_MEMBER( dmw0_r);
+	DECLARE_WRITE32_MEMBER(dmw0_w);
+	DECLARE_READ32_MEMBER( dmw1_r);
+	DECLARE_WRITE32_MEMBER(dmw1_w);
+	DECLARE_READ32_MEMBER( iop_r);
+	DECLARE_WRITE32_MEMBER(iop_w);
+
 	enum ASTAT_FLAGS
 	{
 		// ASTAT flags
@@ -257,15 +268,11 @@ protected:
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : ( (spacenum == AS_DATA) ? &m_data_config : nullptr ); }
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value) override;
-	virtual bool memory_readop(offs_t offset, int size, uint64_t &value) override;
 
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 6; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
-
-	direct_read_data *m_direct;
 
 private:
 	address_space_config m_program_config;
@@ -448,21 +455,18 @@ private:
 	uml::code_handle *m_swap_r0_7;
 	uml::code_handle *m_swap_r8_15;
 
-	uint16_t *m_internal_ram_block0, *m_internal_ram_block1;
-
 	address_space *m_program;
 	address_space *m_data;
-	opcode_func m_sharc_op[512];
 
-	uint16_t m_internal_ram[2 * 0x10000]; // 2x 128KB
+	required_shared_ptr<uint32_t> m_block0, m_block1;
+
+	opcode_func m_sharc_op[512];
 
 	bool m_enable_drc;
 
 	inline void CHANGE_PC(uint32_t newpc);
 	inline void CHANGE_PC_DELAYED(uint32_t newpc);
 	void sharc_iop_delayed_w(uint32_t reg, uint32_t data, int cycles);
-	uint32_t sharc_iop_r(uint32_t address);
-	void sharc_iop_w(uint32_t address, uint32_t data);
 	uint32_t pm_read32(uint32_t address);
 	void pm_write32(uint32_t address, uint32_t data);
 	uint64_t pm_read48(uint32_t address);
