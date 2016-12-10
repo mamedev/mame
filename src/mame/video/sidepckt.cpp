@@ -15,9 +15,8 @@
 PALETTE_INIT_MEMBER(sidepckt_state, sidepckt)
 {
 	const uint8_t *color_prom = memregion("proms")->base();
-	int i;
 
-	for (i = 0;i < palette.entries();i++)
+	for (int i = 0;i < palette.entries();i++)
 	{
 		int bit0,bit1,bit2,bit3,r,g,b;
 
@@ -126,22 +125,22 @@ void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 {
 	for (int offs = 0;offs < m_spriteram.bytes(); offs += 4)
 	{
-		int sx,sy,code,color,flipx,flipy;
+		int attr  = m_spriteram[offs | 1];
+		int code  = ((attr & 0x03) << 8) | m_spriteram[offs | 3];
+		int color = (attr & 0xf0) >> 4;
 
-		code = m_spriteram[offs+3] + ((m_spriteram[offs+1] & 0x03) << 8);
-		color = (m_spriteram[offs+1] & 0xf0) >> 4;
+		int sx = m_spriteram[offs | 2] - 2;
+		int sy = m_spriteram[offs];
 
-		sx = m_spriteram[offs+2]-2;
-		sy = m_spriteram[offs];
-
-		flipx = m_spriteram[offs+1] & 0x08;
-		flipy = m_spriteram[offs+1] & 0x04;
+		int flipx = attr & 0x08;
+		int flipy = attr & 0x04;
 
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
 				color,
 				flipx,flipy,
 				sx,sy,0);
+
 		/* wraparound */
 		m_gfxdecode->gfx(1)->transpen(bitmap,cliprect,
 				code,
