@@ -198,6 +198,25 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 
 MACHINE_CONFIG_END
 
+ROM_START( ms3 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "3b5060ax.u8",  0x000000, 0x080000, CRC(aff8d874) SHA1(1cb972759ee12c944a1cfdbe68848c9b2e64a4d3) ) 
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "ea5006ax.u21", 0x000000, 0x080000, CRC(9109b2e2) SHA1(daa1f01315caf6e08c3cf8b0e4925c86d2cd8dc3) ) 
+	ROM_LOAD16_BYTE( "ea5006ax.u5",  0x000001, 0x080000, CRC(66c33cf6) SHA1(600f75ab112348f43b38cafd6f871559372f2807) ) 
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "1g5032ax.u48", 0x000000, 0x040000, CRC(aba6002f) SHA1(2ed51aa8bbc1e703cd63f633d745dfa4fa7f3dd0) ) 
+	ROM_LOAD16_BYTE( "1g5032ax.u47", 0x000001, 0x040000, CRC(605a71ec) SHA1(13fe64c611c0903a7b79d8680de3ac81f3226a67) ) 
+
+	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "1g5032ax.u20", 0x000000, 0x100000, CRC(517e7478) SHA1(316a8e48ad6502f9508b06f900555d53ef40b464) ) 
+	ROM_LOAD16_BYTE( "1g5032ax.u4",  0x000001, 0x100000, CRC(e67c878f) SHA1(b03f8d28924351e96bb9f24d32f0e4a40a51910c) ) 
+	
+	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_LOAD( "1h5053xx.u6",  0x000000, 0x080000, CRC(6735c65a) SHA1(198cacec5441aa615c0de63a0b4e47265636bcee) )	
+ROM_END
 
 ROM_START( ms72c )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -389,7 +408,7 @@ ROM_START( gkkey )
 	ROM_REGION( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
-
+GAME( 1994, ms3,      0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, ms72c,    0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,   0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms, gkigt4,       igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
