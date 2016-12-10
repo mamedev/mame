@@ -15,7 +15,7 @@ i8751 protection simulation and other fixes by Bryan McPhail, 15/10/00.
 
 
 ToDo:
-- 
+- sidepcktj: Intermission screen's background for player 2 is completely screwed (Maybe wrong/missing I8751 simulation for "cocktail mode" ?)
 
 
 Stephh's notes (based on the games M6809 code and some tests) :
