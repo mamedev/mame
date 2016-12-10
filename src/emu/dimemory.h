@@ -99,11 +99,6 @@ public:
 	// address translation
 	bool translate(address_spacenum spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
 
-	// read/write access
-	bool read(address_spacenum spacenum, offs_t offset, int size, u64 &value) { return memory_read(spacenum, offset, size, value); }
-	bool write(address_spacenum spacenum, offs_t offset, int size, u64 value) { return memory_write(spacenum, offset, size, value); }
-	bool readop(offs_t offset, int size, u64 &value) { return memory_readop(offset, size, value); }
-
 	// deliberately ambiguous functions; if you have the memory interface
 	// just use it
 	device_memory_interface &memory() { return *this; }
@@ -114,9 +109,6 @@ protected:
 
 	// optional operation overrides
 	virtual bool memory_translate(address_spacenum spacenum, int intention, offs_t &address);
-	virtual bool memory_read(address_spacenum spacenum, offs_t offset, int size, u64 &value);
-	virtual bool memory_write(address_spacenum spacenum, offs_t offset, int size, u64 value);
-	virtual bool memory_readop(offs_t offset, int size, u64 &value);
 
 	// interface-level overrides
 	virtual void interface_validity_check(validity_checker &valid) const override;

@@ -369,15 +369,10 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 	space.set_debugger_access(true);
 
 	/* translate if necessary; if not mapped, return 0xff */
-	u64 custom;
 	u8 result;
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 	{
 		result = 0xff;
-	}
-	else if (memory.read(space.spacenum(), address, 1, custom))
-	{   /* if there is a custom read handler, and it returns true, use that value */
-		result = custom;
 	}
 	else
 	{   /* otherwise, call the byte reading function for the translated address */
@@ -422,14 +417,9 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffff */
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = 0xffff;
-		}
-		else if (memory.read(space.spacenum(), address, 2, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -475,14 +465,9 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 		m_debugger_access = true;
 		space.set_debugger_access(true);
 
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
-		}
-		else if (memory.read(space.spacenum(), address, 4, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -529,14 +514,9 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = ~u64(0);
-		}
-		else if (memory.read(space.spacenum(), address, 8, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -591,10 +571,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		;
 
-	/* if there is a custom write handler, and it returns true, use that */
-	else if (memory.write(space.spacenum(), address, 1, data))
-		;
-
 	/* otherwise, call the byte reading function for the translated address */
 	else
 		space.write_byte(address, data);
@@ -645,10 +621,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 2, data))
-			;
-
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_word(address, data);
@@ -697,10 +669,6 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			;
-
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -754,10 +722,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 8, data))
-			;
-
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_qword(address, data);
@@ -802,15 +766,8 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	/* keep in logical range */
 	address &= space.logbytemask();
 
-	/* return early if we got the result directly */
 	m_debugger_access = true;
 	space.set_debugger_access(true);
-	if (memory.readop(address, size, result2))
-	{
-		m_debugger_access = false;
-		space.set_debugger_access(false);
-		return result2;
-	}
 
 	/* if we're bigger than the address bus, break into smaller pieces */
 	if (size > space.data_width() / 8)
