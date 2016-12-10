@@ -53,6 +53,7 @@
 
 
 /*
+Sega 315-5649 IO IC, functional same as 315-5338A, also used in Model 2/3, integrated into 315-6146 'MIE' MCU, etc
 I/O overview:                   Connector (as described in service manual)
     PORT-A  1st player inputs   JAMMA (56P)
     PORT-B  2nd player inputs   JAMMA (56P)
@@ -75,17 +76,17 @@ offsets:
     0x0009 PORT-E (P3)
     0x000b PORT-F (P4 / Extra 6B layout)
     0x000d PORT-G
-    0x000f
-    0x0011 PORT_SEL?
+    0x000f unused
+    0x0011 PORT_DIRECTION (each bit configure above IO ports, 1 - input, 0 - output)
     ---x ---- joystick/mahjong panel select
     ---- x--- used in danchih (different mux scheme for the hanafuda panel?)
-    0x0013
-    0x0015 SERIAL COM Tx
-    0x0017
-    0x0019 SERIAL COM Rx
-    0x001b
-    0x001d <Technical Bowling>
-    0x001f PORT-AD
+    0x0013 RS422 TXD1
+    0x0015 RS422 TXD2 SERIAL COM Tx
+    0x0017 RS422 RXD1
+    0x0019 RS422 RXD2 SERIAL COM Rx
+    0x001b RS422 FLAG
+    0x001d MODE (bit 7 - set PORT-G to counter-mode, bits 0-5 - RS422 satellite mode and node#)  <Technical Bowling>
+    0x001f PORT-AD (8ch, write: bits 0-2 - set channel, read: channel data with autoinc channel number)
 */
 
 READ8_MEMBER(stv_state::stv_ioga_r)
@@ -103,7 +104,7 @@ READ8_MEMBER(stv_state::stv_ioga_r)
 		case 0x01: res = ioport("PORTA")->read(); break; // P1
 		case 0x03: res = ioport("PORTB")->read(); break; // P2
 		case 0x05: res = ioport("PORTC")->read(); break; // SYSTEM
-		case 0x07: res = m_system_output | 0xf0; break; // port D, read-backs value written
+		case 0x07: res = m_system_output; break; // port D, read-backs value written
 		case 0x09: res = ioport("PORTE")->read(); break; // P3
 		case 0x0b: res = ioport("PORTF")->read(); break; // P4
 		case 0x1b: res = 0; break; // Serial COM READ status
@@ -122,7 +123,7 @@ WRITE8_MEMBER(stv_state::stv_ioga_w)
 	switch(offset)
 	{
 		case 0x07:
-			m_system_output = data & 0xf;
+			m_system_output = data;
 			/*Why does the BIOS tests these as ACTIVE HIGH? A program bug?*/
 			machine().bookkeeping().coin_counter_w(0,~data & 0x01);
 			machine().bookkeeping().coin_counter_w(1,~data & 0x02);
@@ -201,7 +202,7 @@ READ8_MEMBER(stv_state::stvmp_ioga_r)
 	{
 		case 0x01:
 		case 0x03:
-			if(m_port_sel & 0x10) // joystick select
+			if(m_port_sel & 0x10) // joystick select <<< this is obviously wrong, this bit only select PORTE direction
 				res = stv_ioga_r(space,offset);
 			else // mahjong panel select
 			{
@@ -1783,7 +1784,7 @@ ROM_START( astrass )
 	ROM_LOAD16_WORD_SWAP( "mpr20832.8",     0x1c00000, 0x0400000, CRC(af1b0985) SHA1(d7a0e4e0a8b0556915f924bdde8c3d14e5b3423e) ) // good (was .18s)
 	ROM_LOAD16_WORD_SWAP( "mpr20833.9",     0x2000000, 0x0400000, CRC(cb6af231) SHA1(4a2e5d7c2fd6179c19cdefa84a03f9a34fbb9e70) ) // good (was .19s)
 
-	// 25349801    1998     317-5040-COM   ST-V      (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
+	// 610-0374-90   1998     317-5040-COM   ST-V      (yes, the 317-5040-COM chip was reused for 3 different games and on both Naomi and ST-V!)
 	ROM_PARAMETER( ":315_5881:key", "052e2901" )
 ROM_END
 
@@ -1930,7 +1931,7 @@ ROM_START( elandore )
 	ROM_LOAD16_WORD_SWAP( "mpr21306.1",    0x1800000, 0x0400000, CRC(87a5929c) SHA1(b259341d7b0e1fa98959bf52d23db5c308a8efdd) ) // good (was .17)
 	ROM_LOAD16_WORD_SWAP( "mpr21308.8",    0x1c00000, 0x0400000, CRC(336ec1a4) SHA1(20d1fce050cf6132d284b91853a4dd5626372ef0) ) // good (was .18s)
 
-	//             1998     317-5043-COM   ST-V
+	// 610-0374-126   1998     317-5043-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "05226d41" )
 ROM_END
 
@@ -1946,7 +1947,7 @@ ROM_START( ffrevng10 )
 	ROM_LOAD16_WORD_SWAP( "mpr21877.6",   0x1400000, 0x0400000, CRC(c22a4a75) SHA1(3276bc0628e71b432f21ba9a4f5ff7ccc8769cd9) ) // good (was .16)
 	ROM_LOAD16_WORD_SWAP( "opr21878.1",   0x1800000, 0x0200000, CRC(2ea4a64d) SHA1(928a973dce5eba0a1628d61ba56a530de990a946) ) // good (was .17)
 
-	//             1998     317-5049-COM   ST-V
+	// 610-0374-128   1998     317-5049-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "0524ac01" )
 ROM_END
 
@@ -1965,7 +1966,7 @@ ROM_START( ffreveng )
 	ROM_LOAD16_WORD_SWAP( "mpr21877.6",   0x1400000, 0x0400000, CRC(c22a4a75) SHA1(3276bc0628e71b432f21ba9a4f5ff7ccc8769cd9) ) // good (was .16)
 	ROM_LOAD16_WORD_SWAP( "opr21878.1",   0x1800000, 0x0200000, CRC(2ea4a64d) SHA1(928a973dce5eba0a1628d61ba56a530de990a946) ) // good (was .17)
 
-	//             1998     317-5049-COM   ST-V
+	// 610-0374-128   1998     317-5049-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "0524ac01" )
 ROM_END
 
@@ -2224,7 +2225,7 @@ ROM_START( rsgun )
 	ROM_LOAD16_WORD_SWAP( "mpr20961.4",   0x0c00000, 0x0400000, CRC(0e06295c) SHA1(0ec2842622f3e9dc5689abd58aeddc7e5603b97a) ) // good (was .14)
 	ROM_LOAD16_WORD_SWAP( "mpr20962.5",   0x1000000, 0x0400000, CRC(f1e6c7fc) SHA1(0ba0972f1bc7c56f4e0589d3e363523cea988bb0) ) // good (was .15)
 
-	//             1998     317-5041-COM   ST-V
+	// 610-0374-96   1998     317-5041-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "05272d01" )
 ROM_END
 
@@ -2415,7 +2416,7 @@ ROM_START( sss )
 	ROM_REGION16_BE( 0x80, "eeprom", 0 ) // preconfigured to 1 player
 	ROM_LOAD( "sss.nv", 0x0000, 0x0080, CRC(3473b2f3) SHA1(6480b4b321af8ee6e967710e74f2556c17bfca97) )
 
-	//             1998     317-5042-COM   ST-V
+	// 610-0374-107   1998     317-5042-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "052b6901" )
 ROM_END
 
@@ -2448,7 +2449,7 @@ ROM_START( twcup98 )
 	ROM_LOAD16_WORD_SWAP( "mpr20823.14",    0x0c00000, 0x0400000, CRC(6e6d4e95) SHA1(c387d03ba27580c62ac0bf780915fdf41552df6f) ) // tested as IC4
 	ROM_LOAD16_WORD_SWAP( "mpr20824.15",    0x1000000, 0x0400000, CRC(4cf18a25) SHA1(310961a5f114fea8938a3f514dffd5231e910a5a) ) // tested as IC5
 
-	// 25209801    1998     317-5039-COM   ST-V
+	// 610-0374-89   1998     317-5039-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "05200913" )
 ROM_END
 
@@ -2464,7 +2465,7 @@ ROM_START( twsoc98 )
 	ROM_LOAD16_WORD_SWAP( "mpr20823.14",    0x0c00000, 0x0400000, CRC(6e6d4e95) SHA1(c387d03ba27580c62ac0bf780915fdf41552df6f) ) // tested as IC4
 	ROM_LOAD16_WORD_SWAP( "mpr20824.15",    0x1000000, 0x0400000, CRC(4cf18a25) SHA1(310961a5f114fea8938a3f514dffd5231e910a5a) ) // tested as IC5
 
-	// 25209801    1998     317-5039-COM   ST-V
+	// 610-0374-91   1998     317-5039-COM   ST-V
 	ROM_PARAMETER( ":315_5881:key", "05200913" )
 ROM_END
 
