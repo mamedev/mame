@@ -517,6 +517,7 @@ DRIVER_INIT_MEMBER(sidepckt_state,sidepcktj)
 	save_item(NAME(m_current_table));
 	save_item(NAME(m_in_math));
 	save_item(NAME(m_math_param));
+	save_item(NAME(m_scroll_y));
 }
 
 
