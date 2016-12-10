@@ -1083,7 +1083,6 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				m_AC &= ~7;		// clear CC
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
-				printf("t1 %08x t2 %08x\n", t1, t2);
 				if ((t1 & 0xff000000) == (t2 & 0xff000000) ||
 					(t1 & 0x00ff0000) == (t2 & 0x00ff0000) ||
 					(t1 & 0x0000ff00) == (t2 & 0x0000ff00) ||
