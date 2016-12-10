@@ -140,11 +140,9 @@ static ADDRESS_MAP_START( igt_gameking_mem, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
 
-	AM_RANGE(0x10000000, 0x1000001f) AM_RAM
-	AM_RANGE(0x10000020, 0x1000021f) AM_RAM // strange range to test, correct or CPU issue?
-	AM_RANGE(0x10000220, 0x1003ffff) AM_RAM
+	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM
 	
-	AM_RANGE(0x1807d000, 0x1807dfff) AM_RAM	// used by MS3 for the restart IAC and afterwards
+	AM_RANGE(0x18070000, 0x180fffff) AM_RAM	// used by MS3 for the restart IAC and afterwards
 
 	AM_RANGE(0x28010008, 0x2801000b) AM_READ(igt_gk_28010008_r)
 	AM_RANGE(0x28020000, 0x280205ff) AM_RAM
