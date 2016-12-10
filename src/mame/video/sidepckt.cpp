@@ -100,10 +100,19 @@ WRITE8_MEMBER(sidepckt_state::colorram_w)
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(sidepckt_state::flipscreen_w)
+READ8_MEMBER(sidepckt_state::scroll_y_r)
 {
-	int flipscreen = data;
-	machine().tilemap().set_flip_all(flipscreen ? TILEMAP_FLIPY : TILEMAP_FLIPX);
+	return (m_scroll_y);
+}
+
+WRITE8_MEMBER(sidepckt_state::scroll_y_w)
+{
+	// Bits 0-5: Scroll y
+	m_scroll_y = data & 0x3F;
+
+	// Other bits: Unknown, but they seem never written
+	if (data > 0x3F)
+		logerror ("scroll_y_w: Unknown write -> data = 0x%02X\n", data);
 }
 
 
@@ -145,6 +154,8 @@ void sidepckt_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 uint32_t sidepckt_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
+	m_bg_tilemap->set_scrolly (0, m_scroll_y);
+
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1,0);
 	draw_sprites(bitmap,cliprect);
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER0,0);
