@@ -93,16 +93,16 @@
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 // Frequency of digit multiplexing in clock chip
-#define DIGIT_MUX_FREQ	(XTAL_32_768kHz / 64)
+#define DIGIT_MUX_FREQ  (XTAL_32_768kHz / 64)
 
 // Duration of key presses
-#define KEY_PRESS_SHORT	1	// 1.95 ms
-#define KEY_PRESS_LONG	512	// 1 s
+#define KEY_PRESS_SHORT 1   // 1.95 ms
+#define KEY_PRESS_LONG  512 // 1 s
 
 // Mask of keys in m_clock_keys
-#define KEY_READ_MASK	1
-#define KEY_SET_MASK	2
-#define KEY_CHG_MASK	4
+#define KEY_READ_MASK   1
+#define KEY_SET_MASK    2
+#define KEY_CHG_MASK    4
 
 // Timers
 enum {
@@ -112,33 +112,33 @@ enum {
 
 // 7-segment display
 // Mapping of 7 segments on NP input port is as follows:
-// Bit	Segment
+// Bit  Segment
 // ============
-//	7	N/U (1)
-//  6	N/U (1)
-//  5	Seg "G"
-//	4	Seg "F"
-//	3	Seg "E"
-//	2	Seg "C"
-//	1	Seg "B"
-//	0	Seg "A"
+//  7   N/U (1)
+//  6   N/U (1)
+//  5   Seg "G"
+//  4   Seg "F"
+//  3   Seg "E"
+//  2   Seg "C"
+//  1   Seg "B"
+//  0   Seg "A"
 //
 // Segment "D" is not mapped as it's not needed to tell decimal digits apart.
 // A segment is ON when its bit is "0".
-#define SEVEN_SEG_OFF	0xff	// All segments off
-#define SEVEN_SEG_A		0xc0	// "A"
-#define SEVEN_SEG_P		0xc4	// "P"
+#define SEVEN_SEG_OFF   0xff    // All segments off
+#define SEVEN_SEG_A     0xc0    // "A"
+#define SEVEN_SEG_P     0xc4    // "P"
 static const uint8_t dec_2_seven_segs[] = {
-	0xe0,	// 0
-	0xf9,	// 1
-	0xd4,	// 2
-	0xd8,	// 3
-	0xc9,	// 4
-	0xca,	// 5
-	0xc2,	// 6
-	0xf8,	// 7
-	0xc0,	// 8
-	0xc8	// 9
+	0xe0,   // 0
+	0xf9,   // 1
+	0xd4,   // 2
+	0xd8,   // 3
+	0xc9,   // 4
+	0xca,   // 5
+	0xc2,   // 6
+	0xf8,   // 7
+	0xc0,   // 8
+	0xc8    // 9
 };
 
 hp98035_io_card::hp98035_io_card(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)

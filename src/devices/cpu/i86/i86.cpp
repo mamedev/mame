@@ -267,14 +267,15 @@ void i8086_cpu_device::execute_run()
 void i8086_cpu_device::device_start()
 {
 	i8086_common_cpu_device::device_start();
-	state_add( I8086_ES, "ES", m_sregs[ES] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_CS, "CS", m_sregs[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_SS, "SS", m_sregs[SS] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add( I8086_ES, "ES", m_sregs[ES] ).formatstr("%04X");
+	state_add( I8086_CS, "CS", m_sregs[CS] ).callimport().formatstr("%04X");
+	state_add( I8086_SS, "SS", m_sregs[SS] ).formatstr("%04X");
+	state_add( I8086_DS, "DS", m_sregs[DS] ).formatstr("%04X");
+	state_add( I8086_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%05X");
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%05X");
+	state_add( I8086_PC, "PC", m_pc ).callimport().formatstr("%05X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%05X").noshow();
+	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
 }
 
 i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
@@ -319,15 +320,40 @@ i8086_common_cpu_device::i8086_common_cpu_device(const machine_config &mconfig, 
 	memset(m_sregs, 0x00, sizeof(m_sregs));
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void i8086_common_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case I8086_IP:
+	case I8086_CS:
+		m_pc = (m_sregs[CS] << 4) + m_ip;
+		break;
+
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		if (m_pc - (m_sregs[CS] << 4) > 0xffff)
+			m_sregs[CS] = m_pc >> 4;
+		m_ip = m_pc - (m_sregs[CS] << 4);
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
+
 void i8086_common_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case STATE_GENPC:
-		case STATE_GENPCBASE:
-			str = string_format("%08X", (m_sregs[CS] << 4) + m_ip);
-			break;
-
 		case STATE_GENFLAGS:
 			{
 				uint16_t flags = CompressFlags();
@@ -385,18 +411,17 @@ void i8086_common_cpu_device::device_start()
 	save_item(NAME(m_halt));
 
 	// Register state for debugger
-//  state_add( I8086_PC, "PC", m_PC ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_IP, "IP", m_ip         ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_AX, "AX", m_regs.w[AX] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_CX, "CX", m_regs.w[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_DX, "DX", m_regs.w[DX] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_BX, "BX", m_regs.w[BX] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_SP, "SP", m_regs.w[SP] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_BP, "BP", m_regs.w[BP] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_SI, "SI", m_regs.w[SI] ).callimport().callexport().formatstr("%04X");
-	state_add( I8086_DI, "DI", m_regs.w[DI] ).callimport().callexport().formatstr("%04X");
+	state_add( I8086_IP, "IP", m_ip         ).callimport().formatstr("%04X");
+	state_add( I8086_AX, "AX", m_regs.w[AX] ).formatstr("%04X");
+	state_add( I8086_CX, "CX", m_regs.w[CS] ).formatstr("%04X");
+	state_add( I8086_DX, "DX", m_regs.w[DX] ).formatstr("%04X");
+	state_add( I8086_BX, "BX", m_regs.w[BX] ).formatstr("%04X");
+	state_add( I8086_SP, "SP", m_regs.w[SP] ).formatstr("%04X");
+	state_add( I8086_BP, "BP", m_regs.w[BP] ).formatstr("%04X");
+	state_add( I8086_SI, "SI", m_regs.w[SI] ).formatstr("%04X");
+	state_add( I8086_DI, "DI", m_regs.w[DI] ).formatstr("%04X");
 
-	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).callimport().callexport().formatstr("%16s").noshow();
+	state_add(STATE_GENFLAGS, "GENFLAGS", m_TF).formatstr("%16s").noshow();
 
 	m_icountptr = &m_icount;
 

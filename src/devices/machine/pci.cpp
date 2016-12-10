@@ -284,7 +284,7 @@ void pci_device::map_device(uint64_t memory_window_start, uint64_t memory_window
 		case 5: space->install_readwrite_handler(start, end, read32_delegate(FUNC(pci_device::unmapped5_r), this), write32_delegate(FUNC(pci_device::unmapped5_w), this)); break;
 		}
 
-		space->install_device_delegate(start, end, *this, bi.map);
+		space->install_device_delegate(start, end, *bi.device, bi.map);
 		logerror("map %s at %0*x-%0*x\n", bi.map.name(), bi.flags & M_IO ? 4 : 8, uint32_t(start), bi.flags & M_IO ? 4 : 8, uint32_t(end));
 	}
 
@@ -317,11 +317,12 @@ void pci_device::skip_map_regs(int count)
 	assert(bank_reg_count <= 6);
 }
 
-void pci_device::add_map(uint64_t size, int flags, address_map_delegate &map)
+void pci_device::add_map(uint64_t size, int flags, address_map_delegate &map, device_t *relative_to)
 {
 	assert(bank_count < 6);
 	int bid = bank_count++;
 	bank_infos[bid].map = map;
+	bank_infos[bid].device = relative_to ? relative_to : this;
 	bank_infos[bid].adr = 0;
 	bank_infos[bid].size = size;
 	bank_infos[bid].flags = flags;

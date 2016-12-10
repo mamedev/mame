@@ -493,8 +493,8 @@ protected:
 
 	enum
 	{
-		TYPE_Z80SIO		= 0x001,
-		TYPE_UPD7201	= 0x002
+		TYPE_Z80SIO     = 0x001,
+		TYPE_UPD7201    = 0x002
 	};
 
 	enum

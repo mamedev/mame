@@ -37,9 +37,9 @@ enum {
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 // Bits in m_flags
-#define NANO_DC0_BIT	0	// DC0
-#define NANO_E_BIT	(NANO_DC0_BIT + HP_NANO_DC_NO)	// Extend flag
-#define NANO_I_BIT	(NANO_E_BIT + 1)	// Interrupt flag
+#define NANO_DC0_BIT    0   // DC0
+#define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
+#define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
 const device_type HP_NANOPROCESSOR = &device_creator<hp_nanoprocessor_device>;
 

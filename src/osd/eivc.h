@@ -10,7 +10,7 @@
 
 #ifndef __EIVC__
 #define __EIVC__
-#include <intrin.h>  
+#include <intrin.h>
 #pragma intrinsic(_BitScanReverse)
 
 

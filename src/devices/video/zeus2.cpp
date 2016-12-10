@@ -69,7 +69,7 @@ void zeus2_device::device_start()
 	/* allocate memory for "wave" RAM */
 	waveram = auto_alloc_array(machine(), uint32_t, WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8/4);
 	m_frameColor = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	m_frameDepth = std::make_unique<uint16_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
+	m_frameDepth = std::make_unique<uint32_t[]>(WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 
 	/* initialize polygon engine */
 	poly = auto_alloc(machine(), zeus2_renderer(this));
@@ -91,7 +91,7 @@ void zeus2_device::device_start()
 	/* save states */
 	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2);
 	save_pointer(NAME(m_frameColor.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
-	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT);
+	save_pointer(NAME(m_frameDepth.get()), WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 2);
 	save_pointer(NAME(m_zeusbase), 0x80);
 	save_pointer(NAME(m_renderRegs), 0x50);
 	save_pointer(NAME(m_pal_table), 0x100);
@@ -117,6 +117,7 @@ void zeus2_device::device_reset()
 	memset(m_zeusbase, 0, sizeof(m_zeusbase[0]) * 0x80);
 	memset(m_renderRegs, 0, sizeof(m_renderRegs[0]) * 0x50);
 
+	m_palSize = 0;
 	zbase = 32.0f;
 	m_yScale = 0;
 	yoffs = 0x1dc000;
@@ -126,12 +127,6 @@ void zeus2_device::device_reset()
 	m_fill_color = 0;
 	m_fill_depth = 0;
 	m_renderAddr = 0;
-	m_directCmd = nullptr;
-
-	// Setup a linear pal conversion table for thegrid
-	for (int i = 0; i < 0x100; ++i) {
-		m_pal_table[i] = (i << 16) | (i << 8) | (i << 0);
-	}
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -204,11 +199,12 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 	poly->wait("SCREEN_UPDATE");
 
-	if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase += machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
-	if (machine().input().code_pressed(KEYCODE_UP)) { zbase -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
+	//if (machine().input().code_pressed(KEYCODE_DOWN)) { zbase += machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
+	//if (machine().input().code_pressed(KEYCODE_UP)) { zbase -= machine().input().code_pressed(KEYCODE_LSHIFT) ? 0x10 : 1; popmessage("Zbase = %f", (double)zbase); }
 
 	/* normal update case */
-	if (!machine().input().code_pressed(KEYCODE_W))
+	//if (!machine().input().code_pressed(KEYCODE_W))
+	if (1)
 	{
 		int xoffs = screen.visible_area().min_x;
 		for (y = cliprect.min_y; y <= cliprect.max_y; y++)
@@ -413,6 +409,48 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			zeus2_pointer_write(m_zeusbase[0x20] >> 24, (m_zeusbase[0x20] & 0xffffff), logit);
 			break;
 
+		case 0x22:
+			if (logit)
+				logerror("\tRend Setup 0");
+			break;
+
+		case 0x23:
+			if (logit)
+				logerror("\tRend Setup 1");
+			break;
+
+		case 0x24:
+			if (logit)
+				logerror("\tRend Setup 4");
+			break;
+
+		case 0x2a:
+			// 0x000000c0 = bilenear off
+			if (logit)
+				logerror("\tRend Force Off");
+			break;
+
+		case 0x2b:
+			if (logit)
+				logerror("\tRend Force On");
+			break;
+
+		case 0x2c:
+			if (logit)
+				logerror("\tRend AE Flag");
+			break;
+
+		case 0x2d:
+			if (logit)
+				logerror("\tRend AF Flag");
+			break;
+
+		case 0x2f:
+			if (logit)
+				logerror("\tPixel Proc Setup");
+			break;
+
+
 		case 0x30:
 			{
 				m_yScale = (((m_zeusbase[0x39] >> 16) & 0xfff) < 0x100) ? 0 : 1;
@@ -456,50 +494,44 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			break;
 
 		case 0x40:
-			/* in direct mode it latches values */
-			if ((m_zeusbase[0x4e] & 0x20) && m_zeusbase[0x40] == 0x00820000)
-			{
-				const void *src = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
-				m_zeusbase[0x48] = WAVERAM_READ32(src, 0);
-				m_zeusbase[0x49] = WAVERAM_READ32(src, 1);
+		{
+			int code = (m_zeusbase[0x40] >> 16) & 0xf;
+			if (code == 0x2) {
+				/* in direct mode it latches values */
+				if ((m_zeusbase[0x4e] & 0x20))
+				{
+					const void *src = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
+					m_zeusbase[0x48] = WAVERAM_READ32(src, 0);
+					m_zeusbase[0x49] = WAVERAM_READ32(src, 1);
 
-				if (m_zeusbase[0x4e] & 0x40)
-				{
-					m_zeusbase[0x41]++;
-					m_zeusbase[0x41] += (m_zeusbase[0x41] & 0x400) << 6;
-					m_zeusbase[0x41] &= ~0xfc00;
+					if (m_zeusbase[0x4e] & 0x40)
+					{
+						m_zeusbase[0x41]++;
+						m_zeusbase[0x41] += (m_zeusbase[0x41] & 0x400) << 6;
+						m_zeusbase[0x41] &= ~0xfc00;
+					}
 				}
+				// mwskinsa 0xE085001F -- light table?
+				// thegrid 0x0055002C ???
+				// crusnexo 0x005500FF ???
+				// crusnexo 0x00A20000 ???
 			}
-			// mwskinsa 0xE085001F -- pal 555?
-			// thegrid 0x0055002C ???
-			// crusnexo 0x005500FF ???
-			// crusnexo 0x00A20000 ???
-			// Zeus render info
-			if ((m_zeusbase[0x40] >> 16) == 0xc085) {
+			else if (code == 0x5) {
+				// Zeus burst from waveram
 				if (logit)
-					logerror("\t-- pal table argb32 load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
-				// Load pal table from ARGB32
-				poly->wait("PAL_TABLE_WRITE");
+					logerror("\t-- ucode load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
+				// Load ucode from waveram
+				poly->wait("UCODE_LOAD");
 				void *dataPtr = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
-				load_pal_table(dataPtr, m_zeusbase[0x40], logit);
-			} else if ((m_zeusbase[0x40] >> 16) == 0x0084) {
-				// Load pal table from RGB555
-				poly->wait("PAL_TABLE_WRITE");
-				void *dataPtr = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
-				load_pal_table(dataPtr, m_zeusbase[0x40], logit);
-				if (logit)
-					logerror("\t-- pal table rgb555 load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
-			}
-			else if ((((m_zeusbase[0x40] >> 24) & 0xff) == 0x38) ||
-				(((m_zeusbase[0x40] >> 24) & 0xff) == 0x2d)) {
-				// Direct command buffer
-				m_directCmd = (uint32_t*)waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
-				if (logit)
-					logerror("\t-- direct cmd: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
-				{
+				load_ucode(dataPtr, m_zeusbase[0x40], logit);
+				if (((m_zeusbase[0x40] >> 24) & 0xff) == 0xc0) {
+					// Light table load
+					if (logit) logerror("\t-- light table loaded");
+				}
+				else {
 					// Zeus Quad Size
 					switch (m_zeusbase[0x40]) {
-					case 0x38550083: case 0x3885007B: case 0x2D550083:
+					case 0x38550083: case 0x2D550083: case 0x3885007B:
 						zeus_quad_size = 14;
 						break;
 					case 0x3855006F: case 0x38550088: case 0x388500A9:
@@ -515,13 +547,13 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 						zeus_quad_size = 10;
 						break;
 					default:
-						logerror("default quad size 10\n");
+						logerror(" default quad size 10\n");
 						zeus_quad_size = 10;
 						break;
 					}
 				}
 				if (1 && logit) {
-					uint32_t *wavePtr = (uint32_t*)WAVERAM_BLOCK0(m_zeusbase[0x41]);
+					uint32_t *wavePtr = (uint32_t*)waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
 					uint32_t waveData;
 					int size = m_zeusbase[0x40] & 0xff;
 					logerror("\n Setup size=%d [40]=%08X [41]=%08X [4e]=%08X\n", zeus_quad_size, m_zeusbase[0x40], m_zeusbase[0x41], m_zeusbase[0x4e]);
@@ -536,7 +568,20 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					logerror("\n");
 				}
 			}
-			break;
+			else if (code == 0x4) {
+				// Load pal table from RGB555
+				if (logit)
+					logerror("\t-- pal table rgb555 load: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
+				poly->wait("PAL_TABLE_WRITE");
+				void *dataPtr = waveram0_ptr_from_expanded_addr(m_zeusbase[0x41]);
+				load_pal_table(dataPtr, m_zeusbase[0x40], 0, logit);
+			}
+			else {
+				if (logit)
+					logerror("\t-- unknown burst: control: %08X addr: %08X", m_zeusbase[0x40], m_zeusbase[0x41]);
+			}
+		}
+		break;
 		case 0x41:
 			/* this is the address, except in read mode, where it latches values */
 			if (m_zeusbase[0x4e] & 0x10)
@@ -603,7 +648,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				if (m_zeusbase[0x51] == 0x00400000) {
 					// SGRAM Color Register
 					m_fill_color = m_zeusbase[0x58];
-					m_fill_depth = m_zeusbase[0x5a];
+					m_fill_depth = ((m_zeusbase[0x5a] & 0xffff) << 16) | ((m_zeusbase[0x58]>>24)<<8);
+					m_fill_depth >>= 8;  // Sign extend down to 24 bits
 					if (m_zeusbase[0x58] != m_zeusbase[0x59])
 						logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 				}
@@ -627,7 +673,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				if (logit)
 					logerror(" -- Clearing buffer: numBytes: %08X addr: %08X reg51: %08X", numBytes, addr, m_zeusbase[0x51]);
 				memset(&m_frameColor[addr], m_fill_color, numBytes);
-				memset(&m_frameDepth[addr], m_fill_depth, numBytes/2);
+				memset(&m_frameDepth[addr], m_fill_depth, numBytes);
 			}
 			else if ((m_zeusbase[0x5e] >> 16) != 0xf208 && !(m_zeusbase[0x5e] & 0xffff)) {
 			/* If 0x5e==0xf20a0000 (atlantis) or 0xf20d0000 (the grid) then process the read/write now */
@@ -649,8 +695,8 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					frame_read();
 				}
 				/* make sure we log anything else */
-				else if (logit || m_zeusbase[0x50] != 0x0)
-					logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
+				//else if (logit || m_zeusbase[0x50] != 0x0)
+				//	logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
 			}
 			break;
 		case 0x51:
@@ -711,10 +757,96 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					logerror("\t[50]=%08X [5E]=%08X", m_zeusbase[0x50], m_zeusbase[0x5e]);
 			break;
 
-		case 0x63: case 0x6a: case 0x6b:
-		case 0x76: case 0x77:
+		// 0x60, 0x61, 0x62 Translation matrix, set using fifo command
+
+		case 0x63:
 			if (logit)
-				logerror("\tfloatIEEE754 = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+				logerror("\tMAC Trans3 HSR Correction Factor = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x64:
+			if (logit)
+				logerror("\tMAC Offset");
+			break;
+
+		case 0x65:
+			if (logit)
+				logerror("\tMAC Offset");
+			break;
+
+		case 0x66:
+			if (logit)
+				logerror("\tMultiply Offset");
+			break;
+
+		case 0x67:
+			if (logit)
+				logerror("\tMath MAC Setup");
+			break;
+
+		case 0x68:
+			if (logit)
+				logerror("\tALU Float Offset");
+			break;
+
+		case 0x6A:
+			if (logit)
+				logerror("\tALU RegC X_OFF = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x6B:
+			if (logit)
+				logerror("\tALU RegD Y_OFF = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x6c:
+			if (logit)
+				logerror("\tALU Inv Offset");
+			break;
+
+		case 0x6f:
+			if (logit)
+				logerror("\tLight Table Setup");
+			break;
+
+		case 0x76:
+			if (logit)
+				logerror("\tMath Comp Reg0 XClip = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x77:
+			if (logit)
+				logerror("\tMath Comp Reg1 YClip = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x78:
+			if (logit)
+				logerror("\tMath Comp Reg2 ZClip = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x79:
+			if (logit)
+				logerror("\tMath Comp Reg3 YRange = %8.2f", reinterpret_cast<float&>(m_zeusbase[offset]));
+			break;
+
+		case 0x7a:
+			if (logit)
+				logerror("\tMath Conditional Branch Setup");
+			break;
+
+		case 0x7c:
+			if (logit)
+				logerror("\tMath Compare Setup 1");
+			break;
+
+		case 0x7D:
+			if (logit)
+				logerror("\tMath FIFO AF / AE Input FIFO AF / AE");
+			break;
+
+		case 0x7f:
+			if (logit)
+				logerror("\tMath Setup Reg");
 			break;
 
 	}
@@ -725,12 +857,13 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 /*************************************
 *  Load pal table from waveram
 *************************************/
-void zeus2_device::load_pal_table(void *wavePtr, uint32_t ctrl, int logit)
+void zeus2_device::load_pal_table(void *wavePtr, uint32_t ctrl, int type, int logit)
 {
-	uint32_t *tablePtr = m_pal_table;
-	int count = ctrl & 0xff;
-	uint32_t cmd = ctrl >> 24;
-	if (cmd == 0x0) {
+	int count = ctrl & 0xffff;
+	m_palSize = (count + 1) * 4;
+	uint32_t addr = (ctrl >> 24) << 1;
+	uint32_t *tablePtr = &m_pal_table[addr];
+	if (type == 0) {
 		// Convert from RGB555
 		uint16_t *src = (uint16_t*)wavePtr;
 		for (int i = 0; i <= count; ++i) {
@@ -739,13 +872,38 @@ void zeus2_device::load_pal_table(void *wavePtr, uint32_t ctrl, int logit)
 			*tablePtr++ = conv_rgb555_to_rgb32(*src++);
 			*tablePtr++ = conv_rgb555_to_rgb32(*src++);
 		}
-	} else if (cmd==0xc0) {
-		// The data seems to be in ARGB32 format
+	}
+	else {
+		// Raw Copy
 		uint32_t *src = (uint32_t*)wavePtr;
 		for (int i = 0; i <= count; ++i) {
 			*tablePtr++ = *src++;
 			*tablePtr++ = *src++;
 		}
+	}
+	if (logit) {
+		logerror("\ntable: ");
+		tablePtr = &m_pal_table[addr];
+		for (int i = 0; i <= count*4; ++i) {
+			logerror(" %08X", *tablePtr++);
+			if (0 && (i + 1) % 16 == 0)
+				logerror("\n");
+		}
+		logerror("\n");
+	}
+}
+/*************************************
+*  Load microcode from waveram
+*************************************/
+void zeus2_device::load_ucode(void *wavePtr, uint32_t ctrl, int logit)
+{
+	int count = ctrl & 0xffff;
+	uint32_t addr = (ctrl >> 24) << 1;
+	uint32_t *src = (uint32_t*)wavePtr;
+	uint32_t *tablePtr = &m_ucode[addr];
+	for (int i = 0; i <= count; ++i) {
+		*tablePtr++ = *src++;
+		*tablePtr++ = *src++;
 	}
 }
 
@@ -780,26 +938,109 @@ if (subregdata_count[which] < 256)
 
 	switch (which)
 	{
-		case 0x40:
+		case 0x01:
+			// Limit to 16 bits
+			m_renderRegs[which] &= 0xffff;
 			if (logit)
-				logerror("\t(R%02X) = %06x Render Unknown", which, value);
+				logerror("\t(R%02X) = %4i Rend XClip", which & 0xffff, value);
 			break;
 
-		case 0xff:
-			// Reset???
+		case 0x02:
+			// Limit to 16 bits
+			m_renderRegs[which] &= 0xffff;
 			if (logit)
-				logerror("\tRender Reset");
+				logerror("\t(R%02X) = %4i Rend YClip", which & 0xffff, value);
+			break;
+
+		case 0x03:
+			if (logit)
+				logerror("\t(R%02X) = %06x Rend XOffset", which, value);
 			break;
 
 		case 0x04:
 			if (logit)
-				logerror("\t(R%02X) = %06x Render Loc", which, value);
+				logerror("\t(R%02X) = %06x Rend YOffset", which, value);
 			break;
 
 		case 0x05:
 			zeus_texbase = value % (WAVERAM0_HEIGHT * WAVERAM0_WIDTH);
 			if (logit)
 				logerror("\t(R%02X)  texbase = %06x", which, zeus_texbase);
+			break;
+
+		case 0x07:
+			if (logit)
+				logerror("\t(R%02X)  texel mask = %06x", which, zeus_texbase);
+			break;
+
+		case 0x08:
+			{
+				//int blockNum = ((m_renderRegs[0x9] >> 16) * 1024 + (m_renderRegs[0x9] & 0xffff));
+				int blockNum = m_renderRegs[0x9];
+				void *dataPtr = (void *)(&waveram[blockNum * 2]);
+				if (logit)
+					logerror("\t(R%02X) = %06x PAL Control Load Table Byte Addr = %08X", which, value, blockNum * 8);
+				load_pal_table(dataPtr, m_renderRegs[0x8], 0, logit);
+			}
+			break;
+
+		case 0x09:
+			if (logit)
+				logerror("\t(R%02X) = %06x PAL Addr", which, value);
+			break;
+
+		case 0x0a:
+			if (logit)
+				logerror("\t(R%02X) = %4i Pixel ALU IntA", which, value);
+			break;
+
+		case 0x0b:
+			if (logit)
+				logerror("\t(R%02X) = %4i Pixel ALU IntB", which, value);
+			break;
+
+		case 0x0c:
+			if (logit)
+				logerror("\t(R%02X) = %4i Pixel ALU IntC (Translucency FG)", which, value);
+			break;
+
+		case 0x0d:
+			if (logit)
+				logerror("\t(R%02X) = %4i Pixel ALU IntD (Translucency BG)", which, value);
+			break;
+
+		case 0x11:
+			if (logit)
+				logerror("\t(R%02X)  Texel Setup = %06x", which, zeus_texbase);
+			break;
+
+		case 0x12:
+			if (logit)
+				logerror("\t(R%02X)  Pixel FIFO Setup = %06x", which, value);
+			break;
+
+		case 0x14:
+			if (logit)
+				logerror("\t(R%02X) = %06x ZBuf Control", which, value);
+			break;
+
+		case 0x15:
+			m_zbufmin = int32_t((value & 0xffffff) << 8) >> 8;
+			if (logit)
+				logerror("\t(R%02X) = %d zbufmin", which, m_zbufmin / 4096.0f);
+			break;
+
+		case 0x40:
+			// 0x004000 no shading
+			// 0x024004 gouraud shading
+			if (logit)
+				logerror("\t(R%02X) = %06x Pixel ALU Control", which, value);
+			break;
+
+		case 0xff:
+			// Reset???
+			if (logit)
+				logerror("\tRender Reset");
 			break;
 
 		default:
@@ -856,6 +1097,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		case 0x08:
 			if (numwords < 14)
 				return false;
+			zeus2_register32_w(0x63, data[1], log_fifo);
 			dataoffs = 1;
 
 		/* 0x07: set matrix and point (crusnexo) */
@@ -922,7 +1164,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				if (numwords < 3)
 					return false;
 				if (log_fifo)
-					log_fifo_command(data, numwords, " -- unknown control\n");
+					log_fifo_command(data, numwords, " -- Init light source\n");
 				break;
 			}
 		// 0x1b: thegrid
@@ -1202,11 +1444,11 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	if (logit)
 		m_state->logerror("quad %d\n", m_state->zeus_quad_size);
 
-	if (machine().input().code_pressed(KEYCODE_Q) && (m_state->m_renderRegs[0x5] != 0x1fdf00)) return;
-	if (machine().input().code_pressed(KEYCODE_E) && (m_state->m_renderRegs[0x5] != 0x07f540)) return;
-	if (machine().input().code_pressed(KEYCODE_R) && (m_state->m_renderRegs[0x5] != 0x081580)) return;
-	if (machine().input().code_pressed(KEYCODE_T) && (m_state->m_renderRegs[0x5] != 0x14db00)) return;
-	if (machine().input().code_pressed(KEYCODE_Y) && (m_state->m_renderRegs[0x5] != 0x14d880)) return;
+	//if (machine().input().code_pressed(KEYCODE_Q) && (m_state->m_renderRegs[0x5] != 0x1fdf00)) return;
+	//if (machine().input().code_pressed(KEYCODE_E) && (m_state->m_renderRegs[0x5] != 0x07f540)) return;
+	//if (machine().input().code_pressed(KEYCODE_R) && (m_state->m_renderRegs[0x5] != 0x081580)) return;
+	//if (machine().input().code_pressed(KEYCODE_T) && (m_state->m_renderRegs[0x5] != 0x14db00)) return;
+	//if (machine().input().code_pressed(KEYCODE_Y) && (m_state->m_renderRegs[0x5] != 0x14d880)) return;
 	//if (machine().input().code_pressed(KEYCODE_Q) && (texdata & 0xffff) == 0x119) return;
 	//if (machine().input().code_pressed(KEYCODE_E) && (texdata & 0xffff) == 0x01d) return;
 	//if (machine().input().code_pressed(KEYCODE_R) && (texdata & 0xffff) == 0x11d) return;
@@ -1291,26 +1533,26 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		vert[0].x = (int16_t)databuffer[2];
 		vert[0].y = (int16_t)databuffer[3];
 		vert[0].p[0] = (int16_t)databuffer[6];
-		vert[0].p[1] = (databuffer[1] >> 2) & 0xff;
-		vert[0].p[2] = (databuffer[1] >> 18) & 0xff;
+		vert[0].p[1] = (databuffer[1] >> 0) & 0x3ff;
+		vert[0].p[2] = (databuffer[1] >> 16) & 0x3ff;
 
 		vert[1].x = (int16_t)(databuffer[2] >> 16);
 		vert[1].y = (int16_t)(databuffer[3] >> 16);
 		vert[1].p[0] = (int16_t)(databuffer[6] >> 16);
-		vert[1].p[1] = (databuffer[4] >> 2) & 0xff;
-		vert[1].p[2] = (databuffer[4] >> 12) & 0xff;
+		vert[1].p[1] = (databuffer[4] >> 0) & 0x3ff;
+		vert[1].p[2] = (databuffer[4] >> 10) & 0x3ff;
 
 		vert[2].x = (int16_t)databuffer[8];
 		vert[2].y = (int16_t)databuffer[9];
 		vert[2].p[0] = (int16_t)databuffer[7];
-		vert[2].p[1] = (databuffer[4] >> 22) & 0xff;
-		vert[2].p[2] = (databuffer[5] >> 2) & 0xff;
+		vert[2].p[1] = (databuffer[4] >> 20) & 0x3ff;
+		vert[2].p[2] = (databuffer[5] >> 0) & 0x3ff;
 
 		vert[3].x = (int16_t)(databuffer[8] >> 16);
 		vert[3].y = (int16_t)(databuffer[9] >> 16);
 		vert[3].p[0] = (int16_t)(databuffer[7] >> 16);
-		vert[3].p[1] = (databuffer[5] >> 12) & 0xff;
-		vert[3].p[2] = (databuffer[5] >> 22) & 0xff;
+		vert[3].p[1] = (databuffer[5] >> 10) & 0x3ff;
+		vert[3].p[2] = (databuffer[5] >> 20) & 0x3ff;
 	}
 	int unknown[8];
 	float unknownFloat[4];
@@ -1358,20 +1600,18 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 
 	int logextra = 1;
 
-	//float xScale = 1.0f / 8.0f;
-	//float yScale = 1.0f / 8.0f;
-	//float zScale = 1.0f / 8.0f;
+	int intScale = m_state->m_zeusbase[0x66] - 0x8e;
+	float fScale = pow(2.0f, intScale);
 	for (i = 0; i < 4; i++)
 	{
 		float x = vert[i].x;
 		float y = vert[i].y;
 		float z = vert[i].p[0];
-		//if (0) {
-		//  x *= xScale;
-		//  y *= yScale;
-		//  z *= zScale;
-
-		//}
+		if (1) {
+		  x *= fScale;
+		  y *= fScale;
+		  z *= fScale;
+		}
 		vert[i].x = x * m_state->zeus_matrix[0][0] + y * m_state->zeus_matrix[0][1] + z * m_state->zeus_matrix[0][2];
 		vert[i].y = x * m_state->zeus_matrix[1][0] + y * m_state->zeus_matrix[1][1] + z * m_state->zeus_matrix[1][2];
 		vert[i].p[0] = x * m_state->zeus_matrix[2][0] + y * m_state->zeus_matrix[2][1] + z * m_state->zeus_matrix[2][2];
@@ -1381,17 +1621,20 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].y += m_state->zeus_point[1];
 			vert[i].p[0] += m_state->zeus_point[2];
 		}
-		if (0)
-			vert[i].p[0] += m_state->zbase;
-		else {
+		//if (0)
+		//	//vert[i].p[0] += m_state->zbase;
+		//	vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//else {
 			int shift;
 			shift = 1024 >> m_state->m_zeusbase[0x6c];
 			vert[i].p[0] += shift;
-		}
+		//	//float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//	//vert[i].p[0] += zScale;
+		//}
 
-		vert[i].p[2] += texdata >> 16;
-		vert[i].p[1] *= 256.0f;
-		vert[i].p[2] *= 256.0f;
+		vert[i].p[2] += (texdata >> 16) << 2;
+		vert[i].p[1] *= 256.0f / 4.0f;
+		vert[i].p[2] *= 256.0f / 4.0f;
 
 		// back face cull using polygon normal and first vertex
 		if (1 && i == 0)
@@ -1426,8 +1669,9 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
-	bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x1);
+	bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x2);
 	float clipVal = enable_perspective ? 1.0f / 512.0f / 4.0f : 0.0f;
+	//float clipVal = m_state->m_zbufmin / 4096.0f;
 	numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
 	if (numverts < 3)
 		return;
@@ -1436,7 +1680,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	float yOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6b]);
 
 	float oozBase = (m_state->m_atlantis) ? 1024.0f : (m_state->m_thegrid) ? 512.0f : 512.0f;
-
+	//oozBase = 1 << m_state->m_zeusbase[0x6c];
 	maxx = maxy = -1000.0f;
 	for (i = 0; i < numverts; i++)
 	{
@@ -1445,13 +1689,13 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		if (enable_perspective) {
 			// 412.0f here works for crusnexo
 			// 1024.0f works for mwskinsa
-			float ooz = oozBase / clipvert[i].p[0];
+			 float ooz = oozBase / clipvert[i].p[0];
 			//float ooz = 1024.0f / clipvert[i].p[0];
 			//float ooz = float(1 << m_state->m_zeusbase[0x6c]) / clipvert[i].p[0];
-
-			clipvert[i].x *= ooz;
-			clipvert[i].y *= ooz;
+			 clipvert[i].x *= ooz;
+			 clipvert[i].y *= ooz;
 		}
+
 		if (1) {
 			//clipvert[i].x += 256.5f / 1.0f;
 			//clipvert[i].y += 200.5f / 1.0f;
@@ -1533,7 +1777,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//}
 
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
-	extra.zoffset = m_state->m_renderRegs[0x15] & 0xffff;
+	extra.zbufmin = m_state->m_zbufmin;
 	extra.alpha = 0;//m_zeusbase[0x4e];
 	extra.transcolor = 0x100; // !(texmode & 100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
@@ -1541,10 +1785,11 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x020000);
 	// crusnexo text is R14=0x4062
 	extra.depth_test_enable = !(m_state->m_renderRegs[0x14] & 0x000020);
+	extra.depth_min_enable = false; // !(m_state->m_renderRegs[0x14] & 0x000040);
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x000002);
 	//extra.depth_test_enable = true; // (texmode & 0x0010);
 	extra.depth_write_enable = true;
-
+	extra.get_texel = (m_state->m_palSize==256) ? m_state->get_texel_8bit : m_state->get_texel_4bit;
 	// Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
 	//       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
@@ -1580,49 +1825,37 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 	int x;
 
 	uint32_t addr = m_state->frame_addr_from_xy(0, scanline, true);
-	uint16_t *depthptr = &m_state->m_frameDepth[addr];
+	uint32_t *depthptr = &m_state->m_frameDepth[addr];
 	uint32_t *colorptr = &m_state->m_frameColor[addr];
 	for (x = extent.startx; x < extent.stopx; x++)
 	{
 		bool depth_pass = true;
 		if (object.depth_test_enable) {
-			//uint16_t *depthptr = WAVERAM_PTRDEPTH(m_state->zeus_renderbase, scanline, x);
-			int32_t depth = (curz >> 16) + object.zoffset;
-			//if (depth > 0x7fff) depth = 0x7fff;
-			if (depth > 0xffff) depth = 0xffff;
-			if (depth < 0 || depth > depthptr[x])
+			if (object.depth_min_enable && curz < object.zbufmin)
+				depth_pass = false;
+			if (curz < 0 || curz > depthptr[x])
 				depth_pass = false;
 			else if (object.depth_write_enable)
-				depthptr[x] = depth;
+				depthptr[x] = curz; // Should limit to 24 bits
 		}
 		if (depth_pass) {
 			int u0 = (curu >> 8);// & (texwidth - 1);
 			int v0 = (curv >> 8);// & 255;
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
-			uint8_t texel0 = m_state->get_texel_8bit(texbase, v0, u0, texwidth);
-			if (texel0 == object.transcolor)
-				continue;
-			uint8_t texel1 = m_state->get_texel_8bit(texbase, v0, u1, texwidth);
-			uint8_t texel2 = m_state->get_texel_8bit(texbase, v1, u0, texwidth);
-			uint8_t texel3 = m_state->get_texel_8bit(texbase, v1, u1, texwidth);
+			uint8_t texel0 = object.get_texel(texbase, v0, u0, texwidth);
+			//if (texel0 == object.transcolor)
+			//	continue;
+			uint8_t texel1 = object.get_texel(texbase, v0, u1, texwidth);
+			uint8_t texel2 = object.get_texel(texbase, v1, u0, texwidth);
+			uint8_t texel3 = object.get_texel(texbase, v1, u1, texwidth);
 			if (texel0 != transcolor)
 			{
 				uint32_t color0 = m_state->m_pal_table[texel0];
 				uint32_t color1 = m_state->m_pal_table[texel1];
 				uint32_t color2 = m_state->m_pal_table[texel2];
 				uint32_t color3 = m_state->m_pal_table[texel3];
-				//uint32_t color0 = WAVERAM_READ16(palbase, texel0);
-				//uint32_t color1 = WAVERAM_READ16(palbase, texel1);
-				//uint32_t color2 = WAVERAM_READ16(palbase, texel2);
-				//uint32_t color3 = WAVERAM_READ16(palbase, texel3);
-				//color0 = ((color0 & 0x7c00) << 9) | ((color0 & 0x3e0) << 6) | ((color0 & 0x1f) << 3);
-				//color1 = ((color1 & 0x7c00) << 9) | ((color1 & 0x3e0) << 6) | ((color1 & 0x1f) << 3);
-				//color2 = ((color2 & 0x7c00) << 9) | ((color2 & 0x3e0) << 6) | ((color2 & 0x1f) << 3);
-				//color3 = ((color3 & 0x7c00) << 9) | ((color3 & 0x3e0) << 6) | ((color3 & 0x1f) << 3);
 				rgb_t filtered = rgbaint_t::bilinear_filter(color0, color1, color2, color3, curu, curv);
-				//WAVERAM_WRITEPIX(m_state->zeus_renderbase, scanline, x, filtered);
-				//*depthptr = depth;
 				colorptr[x] = filtered;
 			}
 		}

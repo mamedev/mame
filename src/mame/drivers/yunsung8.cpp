@@ -25,10 +25,6 @@ Notes:
 - "Magix" can change title to "Rock" through a DSW
 - In service mode press Service Coin (e.g. '9')
 
-To Do:
-
-- Better Sound
-
 ***************************************************************************/
 
 #include "emu.h"
@@ -56,6 +52,23 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 		logerror("CPU #0 - PC %04X: Bank %02X\n", space.device().safe_pc(), data);
 }
 
+READ8_MEMBER(yunsung8_state::sound_command_r)
+{
+	m_audiocpu->set_input_line (0, CLEAR_LINE);
+	return (m_soundlatch->read (space, 0));
+}
+
+WRITE8_MEMBER (yunsung8_state::sound_command_w)
+{
+	m_soundlatch->write (space, 0, data);
+	m_audiocpu->set_input_line (0, ASSERT_LINE);
+}
+
+WRITE8_MEMBER (yunsung8_state::main_irq_ack_w)
+{
+	m_maincpu->set_input_line (0, CLEAR_LINE);
+}
+
 /*
     Banked Video RAM:
 
@@ -78,11 +91,11 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, yunsung8_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(videobank_w)  // video RAM bank
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(bankswitch_w) // ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write) // To Sound CPU
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(sound_command_w) // To Sound CPU
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(flipscreen_w)    // Flip Screen
-	AM_RANGE(0x07, 0x07) AM_WRITENOP    // ? (end of IRQ, random value)
+	AM_RANGE(0x07, 0x07) AM_WRITE(main_irq_ack_w)
 ADDRESS_MAP_END
 
 
@@ -107,20 +120,19 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 
 WRITE8_MEMBER(yunsung8_state::adpcm_w)
 {
-	/* Swap the nibbles */
-	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
+	m_adpcm = data;
 }
 
 
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")    // Banked ROM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w   )   // ROM Bank
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
+	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r) // From Main CPU
 ADDRESS_MAP_END
 
 
@@ -134,186 +146,10 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-/***************************************************************************
-                                    Magix
-***************************************************************************/
-
-static INPUT_PORTS_START( magix )
-	PORT_START("SYSTEM")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)    // same as button1 !?
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-
-	PORT_START("P2")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)    // same as button1 !?
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-
-	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Title" )
-	PORT_DIPSETTING(    0x01, "Magix" )
-	PORT_DIPSETTING(    0x00, "Rock" )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )   // the rest seems unused
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown 2-2" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown 2-3" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-/***************************************************************************
-                                Cannon Ball
-***************************************************************************/
-
-static INPUT_PORTS_START( cannball )
-	PORT_START("SYSTEM")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1 )
-
-	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-
-	PORT_START("P2")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-
-	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown 2-1" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Bombs" )
-	PORT_DIPSETTING(    0x04, "1" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown 2-4" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown 2-5" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown 2-6" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( cannbalv )
-	PORT_INCLUDE(cannball)
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
-INPUT_PORTS_END
 
 /***************************************************************************
                                     Rock Tris
 ***************************************************************************/
-
 static INPUT_PORTS_START( rocktris )
 	PORT_START("SYSTEM")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -328,8 +164,8 @@ static INPUT_PORTS_START( rocktris )
 	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)    // same as button1 !?
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) // Bomb
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) // Rotate
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -338,8 +174,8 @@ static INPUT_PORTS_START( rocktris )
 	PORT_START("P2")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)    // same as button1 !?
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) // Bomb
+	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) // Rotate
 	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
@@ -396,6 +232,45 @@ static INPUT_PORTS_START( rocktris )
 INPUT_PORTS_END
 
 /***************************************************************************
+                                    Magix
+***************************************************************************/
+static INPUT_PORTS_START( magix )
+	PORT_INCLUDE(rocktris) // BTN1 = Rotate, BTN2 = Rotate (Again! ...same dir as BTN1)
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Title" )
+	PORT_DIPSETTING(    0x01, "Magix" )
+	PORT_DIPSETTING(    0x00, "Rock" )
+INPUT_PORTS_END
+
+/***************************************************************************
+                                Cannon Ball
+***************************************************************************/
+static INPUT_PORTS_START( cannball )
+	PORT_INCLUDE(rocktris)
+
+	PORT_MODIFY("P1")
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) // BTN1 = Launch, BTN2 = Rotate, BTN3 = Bomb
+
+	PORT_MODIFY("P2")
+	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) // BTN1 = Launch, BTN2 = Rotate, BTN3 = Bomb
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x0c, 0x0c, "Bombs" )
+	PORT_DIPSETTING(    0x04, "1" )
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( cannbalv )
+	PORT_INCLUDE(cannball)
+
+	PORT_MODIFY("SYSTEM")
+	PORT_BIT(  0x40, IP_ACTIVE_HIGH, IPT_SPECIAL  ) // always activated, otherwise the game resets. a simple check for horizontal / vertical version of the game?
+INPUT_PORTS_END
+
+/***************************************************************************
 
 
                                 Graphics Layouts
@@ -446,18 +321,19 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
 {
-	m_msm->data_w(m_adpcm >> 4);
-	m_adpcm <<= 4;
+	m_msm->data_w(m_adpcm & 0x0F);
+	m_adpcm >>= 4;
 
 	m_toggle ^= 1;
+
 	if (m_toggle)
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 void yunsung8_state::machine_start()
 {
-	m_videoram_0 = m_videoram + 0x0000; // Ram is banked
-	m_videoram_1 = m_videoram + 0x2000;
+	m_bg_vram = m_videoram + 0x0000; // Ram is banked
+	m_fg_vram = m_videoram + 0x2000;
 
 	membank("mainbank")->configure_entries(0, 8, memregion("maincpu")->base(), 0x4000);
 	membank("soundbank")->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
@@ -484,12 +360,10 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)           /* Z80B @ 8MHz? */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state,  irq0_line_hold)   /* No nmi routine */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state, irq0_line_assert)   /* No nmi routine */
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)          /* ? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", yunsung8_state,  irq0_line_hold)   /* NMI caused by the MSM5205? */
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -735,8 +609,8 @@ ROM_END
 
 ***************************************************************************/
 
-GAME( 1995,  cannball,  0,        yunsung8, cannball, driver_device, 0, ROT0,   "Yun Sung / Soft Vision", "Cannon Ball (Yun Sung, horizontal)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, driver_device, 0, ROT270, "Yun Sung / T&K",         "Cannon Ball (Yun Sung, vertical)",   MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magix,     0,        yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",               "Magix / Rock",                       MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1995,  magixb,    magix,    yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",               "Magix / Rock (no copyright message)",MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
-GAME( 1994?, rocktris,  0,        yunsung8, rocktris, driver_device, 0, ROT0,   "Yun Sung",               "Rock Tris",                          MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannball,  0,        yunsung8, cannball, driver_device, 0, ROT0,   "Yun Sung / Soft Vision",    "Cannon Ball (Yun Sung, horizontal)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  cannballv, cannball, yunsung8, cannbalv, driver_device, 0, ROT270, "Yun Sung / J&K Production", "Cannon Ball (Yun Sung, vertical)",    MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magix,     0,        yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",                  "Magix / Rock",                        MACHINE_SUPPORTS_SAVE )
+GAME( 1995,  magixb,    magix,    yunsung8, magix,    driver_device, 0, ROT0,   "Yun Sung",                  "Magix / Rock (no copyright message)", MACHINE_SUPPORTS_SAVE ) // was marked as bootleg, but has been seen on original PCBs
+GAME( 1994?, rocktris,  0,        yunsung8, rocktris, driver_device, 0, ROT0,   "Yun Sung",                  "Rock Tris",                           MACHINE_SUPPORTS_SAVE )

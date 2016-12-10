@@ -20,10 +20,10 @@
 @implementation MAMEMemoryViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*memoryScroll;
-	NSView			*expressionContainer;
-	NSPopUpButton	*actionButton;
-	NSRect			expressionFrame;
+	NSScrollView    *memoryScroll;
+	NSView          *expressionContainer;
+	NSPopUpButton   *actionButton;
+	NSRect          expressionFrame;
 
 	if (!(self = [super initWithMachine:m title:@"Memory" console:c]))
 		return nil;

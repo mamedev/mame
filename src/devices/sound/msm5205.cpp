@@ -252,6 +252,11 @@ void msm5205_device::data_w(int data)
 		m_data = (data & 0x07) << 1; /* unknown */
 }
 
+WRITE8_MEMBER(msm5205_device::data_w)
+{
+	data_w(data);
+}
+
 /*
  *    Handle a change of the selector
  */

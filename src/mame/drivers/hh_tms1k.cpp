@@ -710,7 +710,7 @@ MACHINE_CONFIG_END
   Bandai System Control Car: Cheetah 「システムコントロールカー チーター」
   * TMS1000NLL MP0915 (die label 1000B, MP0915)
   * 2 motors (one for back axis, one for steering), no sound
-  
+
   It's a programmable buggy, like Big Track but much simpler. To add a command
   step in program-mode, press a direction key and one of the time delay number
   keys at the same time. To run the program(max 24 steps), switch to run-mode
@@ -2557,7 +2557,7 @@ MACHINE_CONFIG_END
   Entex Space Battle
   * TMS1000 EN-6004 MP0920 (die label 1000B, MP0920)
   * 2 7seg LEDs, and other LEDs behind bezel, 1-bit sound
-  
+
   The Japanese version was published by Gakken, same name.
 
   led translation table: led zz from game PCB = MAME y.x:
@@ -6397,7 +6397,7 @@ MACHINE_CONFIG_END
   (Tandy) Radio Shack Monkey See (1982 version)
   * TMS1000 MP0271 (die label 1000E, MP0271), only half of ROM space used
   * 2 LEDs(one red, one green), 1-bit sound
-  
+
   This is the TMS1000 version, the one from 1977 has a MM5780.
   To play, enter an equation followed by the ?-key, and the calculator will
   tell you if it was right(green) or wrong(red). For example 1+2=3?

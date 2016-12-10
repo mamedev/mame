@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Angelo Salese, hap
 /* Air Raid (aka Cross Shooter) (c) 1987 Seibu
 
@@ -292,12 +292,12 @@ static ADDRESS_MAP_START( airraid_sound_map, AS_PROGRAM, 8, airraid_state )
 	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
 	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( airraid_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, airraid_state )
 	AM_RANGE(0x0000, 0x1fff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM AM_REGION("audiocpu", 0x8000)
 ADDRESS_MAP_END
 
 
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( airraid, airraid_state )
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
-	MCFG_SEIBU_SOUND_CPU("audiocpu") //_ENCRYPTED_LOW("audiocpu")
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2151_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2151_device, write))
 

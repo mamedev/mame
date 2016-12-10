@@ -63,7 +63,7 @@ project("mametests")
 	configuration { "rpi" }
 		targetextension ""
 
-	
+
 	configuration { }
 
 	links {

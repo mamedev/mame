@@ -64,7 +64,7 @@ namespace sol
 				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
 			}
 			else
-				lua_pop(L, -1); 
+				lua_pop(L, -1);
 
 			luaL_pushresultsize(&buff, len);
 		}
@@ -814,7 +814,7 @@ void lua_engine::initialize()
 								auto ret = func();
 								if (ret.valid()) {
 									const char *tmp = ret.get<const char *>();
-									if (tmp != nullptr) 
+									if (tmp != nullptr)
 										ctx.result = tmp;
 									else
 										exit(0);

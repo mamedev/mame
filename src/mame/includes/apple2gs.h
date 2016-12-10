@@ -21,9 +21,9 @@
 #include "machine/z80scc.h"
 
 #define ADBMICRO_TAG    "adbmicro"
-#define SCC_TAG		"scc"
-#define RS232A_TAG	"printer"
-#define RS232B_TAG	"modem"
+#define SCC_TAG     "scc"
+#define RS232A_TAG  "printer"
+#define RS232B_TAG  "modem"
 
 // IIgs clocks as marked on the schematics
 #define APPLE2GS_28M  (XTAL_28_63636MHz) // IIGS master clock

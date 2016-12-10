@@ -81,14 +81,15 @@ DONE (x) (p=partly)         NMOS         CMOS       ESCC      EMSCC
 #define VERBOSE 0
 #define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
 #define LOG(x)      {} LOGPRINT(x)
-#define LOGR(x)     {} LOGPRINT(x)
+#define LOGR(x)     {}
 #define LOGSETUP(x) {} LOGPRINT(x)
-#define LOGINT(x)   {} LOGPRINT(x)
-#define LOGTX(x)    {} LOGPRINT(x)
-#define LOGRCV(x)   {} LOGPRINT(x)
-#define LOGCTS(x)   {} LOGPRINT(x)
-#define LOGDCD(x)   {} LOGPRINT(x)
-#define LOGSYNC(x)  {} LOGPRINT(x)
+#define LOGINT(x)   {}
+#define LOGCMD(x)   {}
+#define LOGTX(x)    {}
+#define LOGRCV(x)   {}
+#define LOGCTS(x)   {}
+#define LOGDCD(x)   {}
+#define LOGSYNC(x)  {}
 #if VERBOSE == 2
 #define logerror printf
 #endif
@@ -295,30 +296,30 @@ conditions. In addition, there are four sources per channel: 0) Transmitt 1) Ext
 which affects the way the interrupt vector is formed. The sources in more detail
 
 INT_RECEIVE:  The sources of receive interrupts consist of Receive Character Available and Special Receive Condition.
-		      The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
-			  End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming
+              The Special Receive Condition can be subdivided into Receive Overrun, Framing Error (Asynchronous) or
+              End of Frame (SDLC). In addition, a parity error can be a special receive condition by programming
 
 INT_EXTERNAL: The External/status interrupts have several sources which may be individually enabled in WR15.
               The sources are zero count, /DCD, Sync/Hunt, /CTS, transmitter under-run/EOM and Break/Abort.
 
 INT_TRANSMIT: The NMOS/CMOS version of the SCC only has a one byte deep transmit buffer. The status of the
-		      transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
-			  transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
-			  a channel reset, this bit is set to 1.
-			  While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
-			  (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
-			  must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
-			  will not be set until after the first character is written to the NMOS/CMOS.
+              transmit buffer can be determined through TBE bit in RR0, bit D2, which shows whether the
+              transmit buffer is empty or not. After a hardware reset (including a hardware reset by software), or
+              a channel reset, this bit is set to 1.
+              While transmit interrupts are enabled, the NMOS/CMOS version sets the Transmit Interrupt Pending
+              (TxIP) bit whenever the transmit buffer becomes empty. This means that the transmit buffer
+              must be full before the TxIP can be set. Thus, when transmit interrupts are first enabled, the TxIP
+              will not be set until after the first character is written to the NMOS/CMOS.
 
 INT_SPECIAL:  This mode allows the receiver to interrupt only on
               characters with a special receive condition. When an interrupt occurs, the data containing the error
-			  is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
-			  with a DMA, the DMA is initialized and enabled before any characters have been
-			  received by the ESCC. This eliminates the time-critical section of code required in the Receive
-			  Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
-			  DMA so that the CPU need not handle the first received character as a special case. In SDLC
-			  mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
-			  for receive data available is generated and the Receive FIFO is not locked.
+              is held in the Receive FIFO until an Error Reset command is issued. When using this mode in conjunction
+              with a DMA, the DMA is initialized and enabled before any characters have been
+              received by the ESCC. This eliminates the time-critical section of code required in the Receive
+              Interrupt on First Character or Special Condition mode. Hence, all data can be transferred via the
+              DMA so that the CPU need not handle the first received character as a special case. In SDLC
+              mode, if the SDLC Frame Status FIFO is enabled and an EOF is received, an interrupt with vector
+              for receive data available is generated and the Receive FIFO is not locked.
 
 To allow for control over the daisy chain, the SCC has a Disable Lower Chain (DLC) software command (WR9 bit 2)
 that pulls IEO Low. This selectively deactivates parts of the daisy chain regardless of the interrupt status.
@@ -1321,7 +1322,7 @@ uint8_t z80scc_channel::do_sccreg_rr0()
 {
 	uint8_t rr0 = m_rr0;
 
-	LOGINT(("%s %c %s <- %02x\n",tag(), 'A' + m_index, FUNCNAME, m_rr0));
+	LOG(("%s %c %s <- %02x\n",tag(), 'A' + m_index, FUNCNAME, m_rr0));
 	if (m_extint_latch == 1)
 	{
 		rr0 &=                     ((~m_wr15) | WR15_WR7PRIME | WR15_STATUS_FIFO);  // clear enabled bits, saving 2 unrelated bits
@@ -1330,7 +1331,7 @@ uint8_t z80scc_channel::do_sccreg_rr0()
 	}
 	else
 	{
-		LOGINT(("- %c returning unlatched value: %02x\n", 'A' + m_index, rr0));
+		LOG(("- %c returning unlatched value: %02x\n", 'A' + m_index, rr0));
 	}
 
 	return rr0;
@@ -1626,30 +1627,6 @@ uint8_t z80scc_channel::control_read()
 	return data;
 }
 
-/* CRC Initialization Code handling - candidate for breaking out in a z80sio_base class
- Handle the WR0 CRC Reset/Init bits separatelly, needed by derived devices separatelly from the commands */
-void z80scc_channel::do_sccreg_wr0_resets(uint8_t data)
-{
-	LOG(("%s(%02x) %s",FUNCNAME, data, tag()));
-	switch (data & WR0_CRC_RESET_CODE_MASK)
-	{
-	case WR0_CRC_RESET_NULL:
-		LOG((" CRC_RESET_NULL\n"));
-		break;
-	case WR0_CRC_RESET_RX: /* In Synchronous mode: all Os (zeros) (CCITT-O CRC-16) */
-		LOGSYNC((" CRC_RESET_RX - not implemented\n"));
-		break;
-	case WR0_CRC_RESET_TX: /* In HDLC mode: all 1s (ones) (CCITT-1) */
-		LOGSYNC((" CRC_RESET_TX - not implemented\n"));
-		break;
-	case WR0_CRC_RESET_TX_UNDERRUN: /* Resets Tx underrun/EOM bit (D6 of the RRO register) */
-		LOGSYNC((" CRC_RESET_TX_UNDERRUN - not implemented\n"));
-		break;
-	default: /* Will not happen unless someone messes with the mask */
-		logerror(" Wrong CRC reset/init command:%02x\n", data & WR0_CRC_RESET_CODE_MASK);
-	}
-}
-
 /**/
 void z80scc_channel::do_sccreg_wr0(uint8_t data)
 {
@@ -1688,7 +1665,7 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  (there are two transitions), another interrupt is not generated. Exceptions to this
 		  rule are detailed in the RR0 description.*/
 
-		LOGINT(("%s %s %c - Reset External/Status Interrupt, latch %s\n", m_owner->tag(), FUNCNAME, 'A' + m_index,
+		LOGCMD(("%s %c - Reset External/Status Interrupt, latch %s\n", m_owner->tag(), 'A' + m_index,
 			 m_extint_latch == 1? "is released" : "was already released"));
 		// Release latch if no other external or status sources are active
 		if ((m_extint_latch = m_uart->update_extint(m_index)) == 0)
@@ -1702,18 +1679,18 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		if (m_uart->m_variant & (SET_NMOS))
 		{
 			logerror("WR0 SWI ack command not supported on NMOS\n");
-			LOGINT(("\"%s\" %s: %c : Reset Highest IUS command not available on NMOS!\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+			LOGCMD(("%s: %c : WR0_RESET_HIGHEST_IUS command not available on NMOS!\n", m_owner->tag(), 'A' + m_index));
 		}
 		else
 		{
-			LOGINT(("\"%s\" %s: %c : Reset Highest IUS\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
+			LOGCMD(("%s: %c : Reset Highest IUS\n", m_owner->tag(), 'A' + m_index));
 			// loop over all interrupt sources
 			for (auto & elem : m_uart->m_int_state)
 			{
 				// find the first channel with an interrupt requested
 				if (elem & Z80_DAISY_INT)
 				{
-					LOGINT(("- %c found IUS bit to clear\n", 'A' + m_index));
+					LOGCMD(("- %c found IUS bit to clear\n", 'A' + m_index));
 					elem = 0; // Clear IUS bit (called IEO in z80 daisy lingo)
 					m_uart->check_interrupts();
 					break;
@@ -1727,30 +1704,44 @@ void z80scc_channel::do_sccreg_wr0(uint8_t data)
 		  data with the special condition is held in the Receive FIFO until this command is issued. If either
 		  of these modes is selected and this command is issued before the data has been read from the
 		  Receive FIFO, the data is lost */
-		LOG(("\"%s\" %s: %c : WR0_ERROR_RESET\n", m_owner->tag(), FUNCNAME, 'A' + m_index));
-		//do_sccreg_wr0(data); // reset status registers
+		LOGCMD(("%s: %c : WR0_ERROR_RESET - not implemented\n", m_owner->tag(), 'A' + m_index));
 		m_rx_fifo_rp_step(); // Reset error state in fifo and unlock it. unlock == step to next slot in fifo.
 		break;
-	case WR0_SEND_ABORT:
-		data &= 0xef; // convert SCC SEND_ABORT command to a SIO SEND_ABORT command and fall through
-		/* The following commands relies on the SIO default behviour */
-	case WR0_NULL:
-		LOG(("\"%s\" Channel %c : Null\n", m_owner->tag(), 'A' + m_index));
+	case WR0_SEND_ABORT: // Flush transmitter and Send 8-13 bits of '1's, used with SDLC
+		LOGCMD(("%s: %c : WR0_SEND_ABORT - not implemented\n", m_owner->tag(), 'A' + m_index));
 		break;
-	case WR0_ENABLE_INT_NEXT_RX:
-		// enable interrupt on next receive character
-		LOG(("\"%s\" Channel %c : Enable Interrupt on Next Received Character\n", m_owner->tag(), 'A' + m_index));
+	case WR0_NULL: // Do nothing
+		LOGCMD(("%s: %c : WR0_NULL\n", m_owner->tag(), 'A' + m_index));
+		break;
+	case WR0_ENABLE_INT_NEXT_RX: // enable interrupt on next receive character
+		LOGCMD(("%s: %c : WR0_ENABLE_INT_NEXT\n", m_owner->tag(), 'A' + m_index));
 		m_rx_first = 1;
 		break;
-	case WR0_RESET_TX_INT:
-		// reset transmitter interrupt pending
-		LOG(("\"%s\" Channel %c : Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index));
-		logerror("\"%s\" Channel %c : unsupported command: Reset Transmitter Interrupt Pending\n", m_owner->tag(), 'A' + m_index);
+	case WR0_RESET_TX_INT: // reset transmitter interrupt pending
+		LOGCMD(("%s: %c : WR0_RESET_TX_INT - not implemented\n", m_owner->tag(), 'A' + m_index));
 		break;
 	default:
 		break;
 	}
-	do_sccreg_wr0_resets(data);
+
+	/* CRC Initialization Code handling */
+	switch (data & WR0_CRC_RESET_CODE_MASK)
+	{
+	case WR0_CRC_RESET_NULL:
+		LOGCMD((" CRC_RESET_NULL\n"));
+		break;
+	case WR0_CRC_RESET_RX: /* In Synchronous mode: all Os (zeros) (CCITT-O CRC-16) */
+		LOGCMD((" CRC_RESET_RX - not implemented\n"));
+		break;
+	case WR0_CRC_RESET_TX: /* In HDLC mode: all 1s (ones) (CCITT-1) */
+		LOGCMD((" CRC_RESET_TX - not implemented\n"));
+		break;
+	case WR0_CRC_RESET_TX_UNDERRUN: /* Resets Tx underrun/EOM bit (D6 of the RRO register) */
+		LOGCMD((" CRC_RESET_TX_UNDERRUN - not implemented\n"));
+		break;
+	default: /* Will not happen unless someone messes with the mask */
+		logerror(" Wrong CRC reset/init command:%02x\n", data & WR0_CRC_RESET_CODE_MASK);
+	}
 
 	if ( m_uart->m_variant & SET_Z85X3X)
 	{
@@ -1847,9 +1838,9 @@ void z80scc_channel::do_sccreg_wr4(uint8_t data)
 		m_wr4 = data;
 		LOG(("- Parity    : %s\n", (data & WR4_PARITY_ENABLE) ? ((data & WR4_PARITY_EVEN) ? "Even" : "Odd") : "None"));
 		LOG(("- Stop Bits : %s\n", data & WR4_STOP_BITS_MASK ? stop_bits_tostring(get_stop_bits()) : "not used, sync modes enabled" ));
-		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ? 
-			 (data & WR4_BIT5 ? 
-			  (data & WR4_BIT4 ? "External Sync Mode - /SYNC is used as input!" : "SDLC - not implemented") 
+		LOG(("- Sync Mode : %s\n", !(data & WR4_STOP_BITS_MASK) ?
+			 (data & WR4_BIT5 ?
+			  (data & WR4_BIT4 ? "External Sync Mode - /SYNC is used as input!" : "SDLC - not implemented")
 			  : (data & WR4_BIT4 ? "16 bit" : "8 bit"))
 			 : "Disabled"));
 		LOG(("- Clock Mode: %uX\n", get_clock_mode()));
@@ -1946,7 +1937,7 @@ void z80scc_channel::do_sccreg_wr9(uint8_t data)
 	}
 }
 
-/* WR10 contains miscellaneous control bits for both the receiver and the transmitter. 
+/* WR10 contains miscellaneous control bits for both the receiver and the transmitter.
    On the ESCC and 85C30 with the Extended Read option enabled, this register may be read as RR11.*/
 void z80scc_channel::do_sccreg_wr10(uint8_t data)
 {
@@ -2278,26 +2269,13 @@ uint8_t z80scc_channel::data_read()
 		data = m_rx_fifo_rp_data();
 
 		// load error status from the FIFO
-		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp]; //  TODO: Status FIFO needs to be fixed
+		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
 
-		// trigger interrup and lock the fifo if an error is present
+		// trigger interrupt and lock the fifo if an error is present
 		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
 		{
 			logerror("Rx Error %02x\n", m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
-			switch (m_wr1 & WR1_RX_INT_MODE_MASK)
-			{
-			case WR1_RX_INT_FIRST:
-				if (!m_rx_first)
-				{
-					m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-				}
-				break;
-
-			case WR1_RX_INT_ALL_PARITY:
-			case WR1_RX_INT_ALL:
-				m_uart->trigger_interrupt(m_index, INT_SPECIAL);
-				break;
-			}
+			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
 		}
 		else
 		{
@@ -2420,7 +2398,7 @@ void z80scc_channel::data_write(uint8_t data)
 		}
 	}
 	else
-    {
+	{
 		LOGTX(("- Transmitter disabled\n"));
 	}
 	/* "While transmit interrupts are enabled, the nmos/cmos version sets the transmit interrupt pending
@@ -2446,22 +2424,30 @@ void z80scc_channel::data_write(uint8_t data)
 
 
 //-------------------------------------------------
-//  receive_data - receive data word into fifo
+//  receive_data - put received data word into fifo
 //-------------------------------------------------
 
 void z80scc_channel::receive_data(uint8_t data)
 {
-	LOG(("\"%s\": %c : Receive Data Byte '%02x'\n", m_owner->tag(), 'A' + m_index, data));
+	LOG(("\"%s\": %c : Received Data Byte '%c'/%02x put into FIFO\n", m_owner->tag(), 'A' + m_index, isprint(data) ? data : ' ', data));
 
 	if (m_rx_fifo_wp + 1 == m_rx_fifo_rp || ( (m_rx_fifo_wp + 1 == m_rx_fifo_sz) && (m_rx_fifo_rp == 0) ))
 	{
 		// receive overrun error detected
-		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
+		m_rx_error_fifo[m_rx_fifo_wp] |= RR1_RX_OVERRUN_ERROR;
+
+		// store received character but do not step the fifo
+		m_rx_data_fifo[m_rx_fifo_wp] = data;
+
 		logerror("Receive_data() Error %02x\n", m_rx_error_fifo[m_rx_fifo_wp] & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 	}
 	else
 	{
-		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR; // = m_rx_error;  TODO: Status FIFO needs to be fixed
+		m_rx_error_fifo[m_rx_fifo_wp] &= ~RR1_RX_OVERRUN_ERROR;
+
+		// store received character
+		m_rx_data_fifo[m_rx_fifo_wp] = data;
+
 		m_rx_fifo_wp++;
 		if (m_rx_fifo_wp >= m_rx_fifo_sz)
 		{
@@ -2469,13 +2455,9 @@ void z80scc_channel::receive_data(uint8_t data)
 		}
 	}
 
-	// store received character
-	m_rx_data_fifo[m_rx_fifo_wp] = data;
-
 	m_rr0 |= RR0_RX_CHAR_AVAILABLE;
 
-#if 0 // interrupt on exit from fifo
-	// receive interrupt
+	// receive interrupt on FIRST and ALL character
 	switch (m_wr1 & WR1_RX_INT_MODE_MASK)
 	{
 	case WR1_RX_INT_FIRST:
@@ -2487,12 +2469,10 @@ void z80scc_channel::receive_data(uint8_t data)
 		}
 		break;
 
-	case WR1_RX_INT_ALL_PARITY:
 	case WR1_RX_INT_ALL:
 		m_uart->trigger_interrupt(m_index, INT_RECEIVE);
 		break;
 	}
-#endif
 }
 
 
@@ -2520,7 +2500,7 @@ WRITE_LINE_MEMBER( z80scc_channel::cts_w )
 		if (state) m_rr0 |= RR0_CTS; else  m_rr0 &= ~RR0_CTS; // Raw pin/status value
 
 		if (m_extint_latch == 0 && (m_wr1 & WR1_EXT_INT_ENABLE) && (m_wr15 & WR15_CTS))
-	 	{
+		{
 			// trigger interrupt
 			LOGCTS((" - Trigger CTS interrupt\n"));
 			m_uart->trigger_interrupt(m_index, INT_EXTERNAL);
@@ -2755,7 +2735,7 @@ void z80scc_channel::update_serial()
 			parity = PARITY_ODD;
 	}
 	else
-    {
+	{
 		parity = PARITY_NONE;
 	}
 

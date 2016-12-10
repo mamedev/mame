@@ -136,15 +136,15 @@ kron180_state(const machine_config &mconfig, device_type type, const char *tag) 
 	uint8_t *m_vram;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(keyb_interrupt);
-	DECLARE_WRITE8_MEMBER( sn74259_w ){ 	LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
-	DECLARE_WRITE8_MEMBER( ap5_w ){ 		LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( ap5_r ){ 			LOGIO(("%s() %02x = %02x\n",  FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( wkb_w ){ 		LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( sn74299_w ){		LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_READ8_MEMBER( sn74299_r ){ 		LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
-	DECLARE_WRITE8_MEMBER( txen_w ){ 		LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( kbd_reset_w ){ 	LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
-	DECLARE_WRITE8_MEMBER( dreq_w ){ 		LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER( sn74259_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset & 0x07, offset & 0x08 ? 1 : 0)); }
+	DECLARE_WRITE8_MEMBER( ap5_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER( ap5_r ){          LOGIO(("%s() %02x = %02x\n",  FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER( wkb_w ){         LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER( sn74299_w ){     LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_READ8_MEMBER( sn74299_r ){      LOGIO(("%s() %02x = %02x\n", FUNCNAME, offset, 1)); return 1; }
+	DECLARE_WRITE8_MEMBER( txen_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER( kbd_reset_w ){   LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
+	DECLARE_WRITE8_MEMBER( dreq_w ){        LOGIO(("%s %02x = %02x\n", FUNCNAME, offset, data)); }
 protected:
 	required_device<cpu_device> m_maincpu;
 	required_shared_ptr<uint8_t> m_videoram;
@@ -320,5 +320,5 @@ ROM_START (kron180)
 ROM_END
 
 /* Driver */
-/*	  YEAR	NAME		  PARENT  COMPAT   MACHINE		   INPUT	 CLASS			INIT COMPANY				  FULLNAME			FLAGS */
-COMP (1995, kron180,	  0,	  0,	   kron180,		   kron180, driver_device, 0,	"Kron Ltd",				"Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
+COMP (1995, kron180,      0,      0,       kron180,        kron180, driver_device, 0,   "Kron Ltd",             "Kron K-180", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

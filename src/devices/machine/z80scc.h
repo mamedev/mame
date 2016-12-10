@@ -310,10 +310,10 @@ protected:
 	{
 		REG_WR0_COMMAND_REGPT   = 0,
 		REG_WR1_INT_DMA_ENABLE  = 1,
-		REG_WR2_INT_VECTOR  	= 2,
-		REG_WR3_RX_CONTROL  	= 3,
-		REG_WR4_RX_TX_MODES 	= 4,
-		REG_WR5_TX_CONTROL  	= 5,
+		REG_WR2_INT_VECTOR      = 2,
+		REG_WR3_RX_CONTROL      = 3,
+		REG_WR4_RX_TX_MODES     = 4,
+		REG_WR5_TX_CONTROL      = 5,
 		REG_WR6_SYNC_OR_SDLC_A  = 6,
 		REG_WR7_SYNC_OR_SDLC_F  = 7,
 		REG_WR8_TRANSMIT_DATA   = 8,
@@ -322,30 +322,30 @@ protected:
 		REG_WR11_CLOCK_MODES    = 11,
 		REG_WR12_LO_BAUD_GEN    = 12,
 		REG_WR13_HI_BAUD_GEN    = 13,
-		REG_WR14_MISC_CTRL  	= 14,
+		REG_WR14_MISC_CTRL      = 14,
 		REG_WR15_EXT_ST_INT_CTRL= 15
 	};
 
 	enum
 	{
 		RR0_RX_CHAR_AVAILABLE   = 0x01,
-		RR0_ZC          		= 0x02,
-		RR0_TX_BUFFER_EMPTY		= 0x04,
-		RR0_DCD        			= 0x08,
-		RR0_SYNC_HUNT       	= 0x10,
-		RR0_CTS         		= 0x20,
-		RR0_TX_UNDERRUN     	= 0x40,
-		RR0_BREAK_ABORT     	= 0x80 
+		RR0_ZC                  = 0x02,
+		RR0_TX_BUFFER_EMPTY     = 0x04,
+		RR0_DCD                 = 0x08,
+		RR0_SYNC_HUNT           = 0x10,
+		RR0_CTS                 = 0x20,
+		RR0_TX_UNDERRUN         = 0x40,
+		RR0_BREAK_ABORT         = 0x80
 	};
 
 	enum
 	{
-		RR1_ALL_SENT        	= 0x01,
+		RR1_ALL_SENT            = 0x01,
 		RR1_RESIDUE_CODE_MASK   = 0x0e,
-		RR1_PARITY_ERROR    	= 0x10,
+		RR1_PARITY_ERROR        = 0x10,
 		RR1_RX_OVERRUN_ERROR    = 0x20,
 		RR1_CRC_FRAMING_ERROR   = 0x40,
-		RR1_END_OF_FRAME    	= 0x80 
+		RR1_END_OF_FRAME        = 0x80
 	};
 
 	enum
@@ -413,17 +413,17 @@ protected:
 		WR1_RX_INT_ALL      = 0x18,
 		WR1_WRDY_ON_RX_TX   = 0x20,
 		WR1_WRDY_FUNCTION   = 0x40,
-		WR1_WRDY_ENABLE     = 0x80 
+		WR1_WRDY_ENABLE     = 0x80
 	};
 
 	enum
 	{
-		WR3_RX_ENABLE           	= 0x01,
+		WR3_RX_ENABLE               = 0x01,
 		WR3_SYNC_CHAR_LOAD_INHIBIT  = 0x02,
 		WR3_ADDRESS_SEARCH_MODE     = 0x04,
-		WR3_RX_CRC_ENABLE			= 0x08,
+		WR3_RX_CRC_ENABLE           = 0x08,
 		WR3_ENTER_HUNT_MODE         = 0x10,
-		WR3_AUTO_ENABLES        	= 0x20,
+		WR3_AUTO_ENABLES            = 0x20,
 		WR3_RX_WORD_LENGTH_MASK     = 0xc0,
 		WR3_RX_WORD_LENGTH_5        = 0x00,
 		WR3_RX_WORD_LENGTH_7        = 0x40,
@@ -442,9 +442,9 @@ protected:
 		WR4_SYNC_MODE_MASK  = 0x30,
 		WR4_SYNC_MODE_8_BIT = 0x00,
 		WR4_SYNC_MODE_16_BIT = 0x10,
-		WR4_BIT4			= 0x10,
+		WR4_BIT4            = 0x10,
 		WR4_SYNC_MODE_SDLC  = 0x20,
-		WR4_BIT5			= 0x20,
+		WR4_BIT5            = 0x20,
 		WR4_SYNC_MODE_EXT   = 0x30,
 		WR4_CLOCK_RATE_MASK = 0xc0,
 		WR4_CLOCK_RATE_X1   = 0x00,
@@ -455,11 +455,11 @@ protected:
 
 	enum
 	{
-		WR5_TX_CRC_ENABLE   	= 0x01,
-		WR5_RTS         		= 0x02,
-		WR5_CRC16       		= 0x04,
-		WR5_TX_ENABLE       	= 0x08,
-		WR5_SEND_BREAK      	= 0x10,
+		WR5_TX_CRC_ENABLE       = 0x01,
+		WR5_RTS                 = 0x02,
+		WR5_CRC16               = 0x04,
+		WR5_TX_ENABLE           = 0x08,
+		WR5_SEND_BREAK          = 0x10,
 		WR5_TX_WORD_LENGTH_MASK = 0x60,
 		WR5_TX_WORD_LENGTH_5    = 0x00,
 		WR5_TX_WORD_LENGTH_6    = 0x40,
@@ -481,27 +481,27 @@ protected:
 		WR9_CMD_CHNB_RESET  = 0x40,
 		WR9_CMD_CHNA_RESET  = 0x80,
 		WR9_CMD_HW_RESET    = 0xC0,
-		WR9_BIT_VIS     	= 0x01,
-		WR9_BIT_NV      	= 0x02,
-		WR9_BIT_DLC     	= 0x04,
-		WR9_BIT_MIE     	= 0x08,
+		WR9_BIT_VIS         = 0x01,
+		WR9_BIT_NV          = 0x02,
+		WR9_BIT_DLC         = 0x04,
+		WR9_BIT_MIE         = 0x08,
 		WR9_BIT_SHSL        = 0x10,
 		WR9_BIT_IACK        = 0x20
 	};
 
 	enum
 	{
-		WR10_8_6_BIT_SYNC		 = 0x01,
-		WR10_LOOP_MODE   		 = 0x02,
+		WR10_8_6_BIT_SYNC        = 0x01,
+		WR10_LOOP_MODE           = 0x02,
 		WR10_ABORT_FLAG_UNDERRUN = 0x04,
 		WR10_MARK_FLAG_IDLE      = 0x08,
 		WR10_GO_ACTIVE_ON_POLL   = 0x10,
 		WR10_ENCODING_MASK       = 0x60,
 		WR10_NRZ_ENCODING        = 0x00,
 		WR10_NRZI_ENCODING       = 0x20,
-		WR10_BIT5			     = 0x20,
+		WR10_BIT5                = 0x20,
 		WR10_FM1_ENCODING        = 0x40,
-		WR10_BIT6			     = 0x40,
+		WR10_BIT6                = 0x40,
 		WR10_FM0_ENCODING        = 0x60,
 		WR10_CRC_PRESET          = 0x80
 	};

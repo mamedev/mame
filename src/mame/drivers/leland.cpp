@@ -60,9 +60,7 @@
 
 #include "emu.h"
 #include "includes/leland.h"
-#include "cpu/i86/i186.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 
@@ -2670,6 +2668,9 @@ DRIVER_INIT_MEMBER(leland_state,dangerz)
 	m_master->space(AS_IO).install_read_handler(0xf4, 0xf4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
 	m_master->space(AS_IO).install_read_handler(0xf8, 0xf8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),this));
 	m_master->space(AS_IO).install_read_handler(0xfc, 0xfc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),this));
+
+	save_item(NAME(m_dangerz_x));
+	save_item(NAME(m_dangerz_y));
 }
 
 
@@ -2749,6 +2750,9 @@ DRIVER_INIT_MEMBER(leland_state,viper)
 	m_master->space(AS_IO).install_read_handler(0xa4, 0xa4, read8_delegate(FUNC(leland_state::dangerz_input_upper_r),this));
 	m_master->space(AS_IO).install_read_handler(0xb8, 0xb8, read8_delegate(FUNC(leland_state::dangerz_input_y_r),this));
 	m_master->space(AS_IO).install_read_handler(0xbc, 0xbc, read8_delegate(FUNC(leland_state::dangerz_input_x_r),this));
+
+	save_item(NAME(m_dangerz_x));
+	save_item(NAME(m_dangerz_y));
 }
 
 

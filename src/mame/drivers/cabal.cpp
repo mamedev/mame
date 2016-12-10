@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( cabalbl2_sound_map, AS_PROGRAM, 8, cabal_state )
 	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
 	AM_RANGE(0x6005, 0x6006) AM_DEVWRITE("adpcm2", seibu_adpcm_device, adr_w)
 	AM_RANGE(0x601a, 0x601a) AM_DEVWRITE("adpcm2", seibu_adpcm_device, ctl_w)
-	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cabalbl2_predecrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, cabal_state )

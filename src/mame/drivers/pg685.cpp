@@ -68,13 +68,13 @@ HD:             SRM2064C-15, WD2010B-AL, 10,000000 MHz crystal
 
 6ES5675-OUA11
 
-The PG-675 shares the housing with the PG-685, but uses dual 48 tpi floppy drives instead of the harddisk/96 tpi 
+The PG-675 shares the housing with the PG-685, but uses dual 48 tpi floppy drives instead of the harddisk/96 tpi
 drive combo.
 
-CPU/Video:		8KB BIOS/CHAR EPROM, Intel 8088 CPU, SAB 8259AP, 12,288 MHz crystal, 2xHM6116LP-3,
-				HD46505SP-1 (HD68A45SP), D8279C-5, D8251AFC
-Module/Floppy:	Crystal 4.000 MHz, SAB 1797-02P, 2xP8255A, MM58167AN, 4xHM6116LP-3, D8251AFC
-Memory: 		54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
+CPU/Video:      8KB BIOS/CHAR EPROM, Intel 8088 CPU, SAB 8259AP, 12,288 MHz crystal, 2xHM6116LP-3,
+                HD46505SP-1 (HD68A45SP), D8279C-5, D8251AFC
+Module/Floppy:  Crystal 4.000 MHz, SAB 1797-02P, 2xP8255A, MM58167AN, 4xHM6116LP-3, D8251AFC
+Memory:         54x 64KBit RAM, 18 empty sockets, 9 bit and 4 bit wire straps
 
 ****************************************************************************/
 
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	AM_RANGE(0xf9f78, 0xf9f79) AM_WRITE8(f9f79_w, 0xff00)
 	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, status_r, address_w, 0x00ff)
 	AM_RANGE(0xf9f80, 0xf9f81) AM_DEVREADWRITE8("crtc", mc6845_device, register_r, register_w, 0xff00)
-	AM_RANGE(0xfc000,0xfffff) AM_RAM	// BIOS RAM shadow
+	AM_RANGE(0xfc000,0xfffff) AM_RAM    // BIOS RAM shadow
 	AM_RANGE(0xffc000,0xffffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
@@ -317,7 +317,7 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row )
 		uint8_t data = fontram[ chr_base + chr * 16 ];
 		uint8_t fg = 1;
 		uint8_t bg = 0;
-	
+
 		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
@@ -345,7 +345,7 @@ MC6845_UPDATE_ROW( pg685_state::crtc_update_row_oua12 )
 		uint8_t data = fontram[ chr_base + chr * 16 ];
 		uint8_t fg = 1;
 		uint8_t bg = 0;
-	
+
 		*p = palette[( data & 0x80 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x40 ) ? fg : bg]; p++;
 		*p = palette[( data & 0x20 ) ? fg : bg]; p++;
@@ -402,7 +402,7 @@ static MACHINE_CONFIG_START( pg675, pg685_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
-	
+
 	// sound hardware
 
 	// devices
@@ -443,7 +443,7 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 	MCFG_MC6845_UPDATE_ROW_CB(pg685_state, crtc_update_row)
-	
+
 	// sound hardware
 
 	// devices

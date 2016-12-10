@@ -138,7 +138,7 @@ static ADDRESS_MAP_START (fcscsi1_mem, AS_PROGRAM, 16, fcscsi1_state)
 	AM_RANGE (0x002000, 0x01ffff) AM_RAM /* Dual Ported RAM */
 	AM_RANGE (0xe00000, 0xe7ffff) AM_ROM /* System EPROM Area 32Kb DEBUGGER supplied */
 	AM_RANGE (0xd00000, 0xd0003f) AM_DEVREADWRITE8 ("pit", pit68230_device, read, write, 0x00ff)
-//	AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
+//  AM_RANGE (0xc40000, 0xc4001f) AM_DEVREADWRITE8("scsi", ncr5386_device, read, write, 0x00ff) /* SCSI Controller interface - device support not yet available*/
 	AM_RANGE (0xc40000, 0xc4001f) AM_READWRITE8 (scsi_r, scsi_w, 0x00ff)
 	AM_RANGE (0xc80000, 0xc800ff) AM_DEVREADWRITE("mc68450", hd63450_device, read, write)  /* DMA Controller interface */
 	AM_RANGE (0xcc0000, 0xcc0007) AM_DEVREADWRITE8("fdc", wd1772_t, read, write, 0x00ff)      /* Floppy Controller interface */

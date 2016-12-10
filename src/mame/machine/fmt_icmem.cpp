@@ -148,7 +148,7 @@ READ8_MEMBER(fmt_icmem_device::status_r)
 	if(m_change)
 		ret |= 0x80;
 	m_change = false;
-		
+
 	return ret;
 }
 

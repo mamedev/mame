@@ -230,7 +230,7 @@ WRITE8_MEMBER(amusco_state::output_a_w)
 	output().set_lamp_value(4, (data >> 4) & 1);    // Lamp 4 (Hold/Disc 2)
 	output().set_lamp_value(5, (data >> 5) & 1);    // Lamp 5 (Hold/Disc 4)
 
-//	logerror("Writing %02Xh to PPI output A\n", data);
+//  logerror("Writing %02Xh to PPI output A\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_b_w)
@@ -251,12 +251,12 @@ WRITE8_MEMBER(amusco_state::output_b_w)
 
 	//machine().bookkeeping().coin_counter_w(0, ~data & 0x10); // Probably not coin-related
 
-//	logerror("Writing %02Xh to PPI output B\n", data);
+//  logerror("Writing %02Xh to PPI output B\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_c_w)
 {
-//	logerror("Writing %02Xh to PPI output C\n", data);
+//  logerror("Writing %02Xh to PPI output C\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::vram_w)

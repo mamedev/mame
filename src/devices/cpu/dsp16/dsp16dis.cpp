@@ -339,7 +339,7 @@ CPU_DISASSEMBLE(dsp16a)
 			std::string fString = disasmF1Field(F1, D, S);
 			std::string xString = (X ? "*pt++i" : "*pt++");
 			std::string aString = (opcode == 0x19) ? "a0" : "a1";
-			
+
 			if (Y != 0x00)
 				util::stream_format(stream, "UNKNOWN");
 			else

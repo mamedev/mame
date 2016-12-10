@@ -403,7 +403,7 @@ void crystal_state::TimerStart(int which)
 	attotime period = attotime::from_hz(43000000) * ((PD + 1) * (TCV + 1));
 	m_Timer[which]->adjust(period);
 
-//	printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
+//  printf("timer %d start, PD = %x TCV = %x period = %s\n", which, PD, TCV, period.as_string());
 }
 
 TIMER_CALLBACK_MEMBER(crystal_state::Timercb)
@@ -438,7 +438,7 @@ void crystal_state::Timer_w( address_space &space, int which, uint32_t data, uin
 		{
 			// Timer stop
 			m_Timer[which]->adjust(attotime::never);
-//			printf("timer %d stop\n", which);
+//          printf("timer %d stop\n", which);
 		}
 	}
 }
@@ -720,15 +720,15 @@ READ32_MEMBER(crystal_state::crzyddz2_key_r)
 	uint8_t data = 0x3f;
 	for (int i = 0; i < sizeof(key_names)/sizeof(key_names[0]); ++i)
 		if (!BIT(mux,i))
-			data = 	ioport(key_names[i])->read();
+			data =  ioport(key_names[i])->read();
 
 /*
-crzyddz2	in		out
-			00		40
-			40		00
-			c0		80
+crzyddz2    in      out
+            00      40
+            40      00
+            c0      80
 */
-//	m_crzyddz2_prot = (m_PIO >> 8) & 0xc0) ^ 0x40;
+//  m_crzyddz2_prot = (m_PIO >> 8) & 0xc0) ^ 0x40;
 	m_crzyddz2_prot = (machine().rand() & 0xc0);
 
 	return 0xffffff00 | data | m_crzyddz2_prot;
@@ -1242,7 +1242,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START(crzyddz2)
-	PORT_START("P1_P2")	// 1500002 & 1500000
+	PORT_START("P1_P2") // 1500002 & 1500000
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) // up
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) // down  (next secret code)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) // left  (inc secret code)
@@ -1515,8 +1515,8 @@ ROM_START( crzyddz2 )
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(0f3a1987) SHA1(6cad943846c79db31226676c7391f32216cfff79) )
 
 	ROM_REGION( 0x1000000, "maincpu", ROMREGION_ERASEFF )
-	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 )	// copy flash here
-	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) )	// 1ST AND 2ND HALF IDENTICAL
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
+	ROM_LOAD( "27c322.u49", 0x000000, 0x0200000, CRC(b3177f39) SHA1(2a28bf8045bd2e053d88549b79fbc11f30ef9a32) ) // 1ST AND 2ND HALF IDENTICAL
 	ROM_CONTINUE(           0x000000, 0x0200000 )
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04
@@ -1539,7 +1539,7 @@ ROM_START( menghong )
 	ROM_LOAD( "rom.u48", 0x000000, 0x1000000, CRC(e24257c4) SHA1(569d79a61ff6d35100ba5727069363146df9e0b7) )
 
 	ROM_REGION( 0x1000000, "maincpu", 0 )
-	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 )	// copy flash here
+	ROM_COPY( "user1",      0x000000, 0x000000, 0x1000000 ) // copy flash here
 	ROM_LOAD( "060511_08-01-18.u49",  0x000000, 0x0200000, CRC(b0c12107) SHA1(b1753757bbdb7d996df563ac6abdc6b46676704b) ) // 27C160
 
 	ROM_REGION( 0x4280, "pic", 0 ) // hy04

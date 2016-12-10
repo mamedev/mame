@@ -1182,7 +1182,7 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			}
 			else
 				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
-		
+
 			if (insn & INSN_BDT_W)
 			{
 				if (rb==0xf)

@@ -735,7 +735,7 @@ void rsp_device::execute_run()
 		{
 			int i, l;
 			static uint32_t prev_regs[32];
-			
+
 			util::ovectorstream string;
 			rsp_dasm_one(string, m_ppc, op);
 			string.put('\0');

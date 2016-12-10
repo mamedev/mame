@@ -88,12 +88,12 @@ DONE (x) (p=partly)         NMOS         CMOS
 #define VERBOSE 0
 
 #define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x)		{} 
-#define LOGR(x)		{} 
-#define LOGTX(x)   	{} 
-#define LOGRX(x)	{} 
-#define LOGSETUP(x)	{} LOGPRINT(x)
-#define LOGINT(x)	{} 
+#define LOG(x)      {}
+#define LOGR(x)     {}
+#define LOGTX(x)    {}
+#define LOGRX(x)    {}
+#define LOGSETUP(x) {} LOGPRINT(x)
+#define LOGINT(x)   {}
 
 #if VERBOSE > 1
 #define logerror printf

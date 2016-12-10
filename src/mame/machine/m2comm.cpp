@@ -238,7 +238,7 @@ void m2comm_device::device_reset()
 
 READ8_MEMBER(m2comm_device::zfg_r)
 {
-	uint8_t result = m_zfg | 0xFE;
+	uint8_t result = m_zfg | (~m_fg << 7) | 0x7e;
 #ifdef __M2COMM_VERBOSE__
 	osd_printf_verbose("m2comm-zfg_r: read register %02x for value %02x\n", offset, result);
 #endif
@@ -272,7 +272,7 @@ WRITE8_MEMBER(m2comm_device::share_w)
 
 READ8_MEMBER(m2comm_device::cn_r)
 {
-	return m_cn;
+	return m_cn | 0xfe;
 }
 
 WRITE8_MEMBER(m2comm_device::cn_w)
@@ -288,6 +288,9 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		// reset command
 		osd_printf_verbose("M2COMM: board disabled\n");
 		m_linkenable = 0x00;
+		m_zfg = 0;
+		m_cn = 0;
+		m_fg = 0;
 	}
 	else
 	{
@@ -297,9 +300,25 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 		m_linkid = 0x00;
 		m_linkalive = 0x00;
 		m_linkcount = 0x00;
-		m_linktimer = 0x00E8; // 58 fps * 4s
+		m_linktimer = 0x00e8; // 58 fps * 4s
 
-		comm_init();
+		// zero memory
+		for (int i = 0; i < 0x4000; i++)
+		{
+			m_shared[i] = 0x00;
+		}
+
+		// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
+		// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
+
+		// frameSize - 0x0e00
+		m_shared[0x12] = 0x00;
+		m_shared[0x13] = 0x0e;
+
+		// frameOffset - 0x01c0
+		m_shared[0x14] = 0xc0;
+		m_shared[0x15] = 0x01;
+
 		comm_tick();
 	}
 #endif
@@ -307,7 +326,7 @@ WRITE8_MEMBER(m2comm_device::cn_w)
 
 READ8_MEMBER(m2comm_device::fg_r)
 {
-	return m_fg | (~m_zfg << 7);
+	return m_fg | (~m_zfg << 7) | 0x7e;
 }
 
 WRITE8_MEMBER(m2comm_device::fg_w)
@@ -324,20 +343,6 @@ void m2comm_device::check_vint_irq()
 }
 
 #ifdef __M2COMM_SIMULATION__
-void m2comm_device::comm_init()
-{
-	// TODO - check EPR-16726 on Daytona USA and Sega Rally Championship
-	// EPR-18643(A) - these are accessed by VirtuaON and Sega Touring Car Championship
-
-	// frameSize - 0xe00
-	m_shared[0x12] = 0x00;
-	m_shared[0x13] = 0x0e;
-
-	// frameOffset - 0x1c0
-	m_shared[0x14] = 0xc0;
-	m_shared[0x15] = 0x01;
-}
-
 void m2comm_device::comm_tick()
 {
 	if (m_linkenable == 0x01)
@@ -465,6 +470,7 @@ void m2comm_device::comm_tick()
 						m_buffer[1] = 0x01;
 						m_buffer[2] = 0x00;
 						m_line_tx.write(m_buffer, dataSize);
+						m_linktimer = 0x00e8; // 58 fps * 4s
 					}
 
 					// send second packet

@@ -302,6 +302,7 @@ static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ym1", ym2203_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ym1", ym2203_device, write))
 

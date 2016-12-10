@@ -19,7 +19,7 @@ Instead of using a daisy chain, the IM2 vectors are calculated by a prom (u77). 
 contents make no sense at all (mostly FF), so the vectors for IRQ0 and IRQ2 are hard-coded. Other IRQ
 vectors are not used as yet.
 
-Three companies are known to have sold the Zorba over its lifetime: Telcon Industries, Modular Micros 
+Three companies are known to have sold the Zorba over its lifetime: Telcon Industries, Modular Micros
 (a subsidiary of Modular Computers (ModComp)), and Gemini Electronics. 7-inch and 9-inch models were
 available from Telcon and Modular Micros, while Gemini exclusively sold the 9-inch version. The ROM dumps
 currently used in this emulation originate from a Modular Micros Zorba.

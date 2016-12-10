@@ -54,26 +54,21 @@ public:
 	}
 };
 
-typedef DWORD(WINAPI *dxgi_create_factory_fn)(REFIID, void**);
 
 class dxgi_monitor_module : public monitor_module_base
 {
 private:
-	osd::dynamic_module::ptr m_dxgi_module;
-	dxgi_create_factory_fn   m_create_factory_fn;
-
+	OSD_DYNAMIC_API(dxgi, "dxgi.dll");
+	OSD_DYNAMIC_API_FN(dxgi, DWORD, WINAPI, CreateDXGIFactory1, REFIID, void**);
 public:
 	dxgi_monitor_module()
-		: monitor_module_base(OSD_MONITOR_PROVIDER, "dxgi"),
-			m_dxgi_module(osd::dynamic_module::open({"dxgi.dll"})),
-			m_create_factory_fn(nullptr)
+		: monitor_module_base(OSD_MONITOR_PROVIDER, "dxgi")
 	{
 	}
 
 	bool probe() override
 	{
-		m_create_factory_fn = m_dxgi_module->bind<dxgi_create_factory_fn>("CreateDXGIFactory1");
-		if (m_create_factory_fn == nullptr)
+		if(!OSD_DYNAMIC_API_TEST(CreateDXGIFactory1))
 			return false;
 
 		return true;
@@ -133,7 +128,7 @@ protected:
 		ComPtr<IDXGIFactory2> factory;
 		ComPtr<IDXGIAdapter> adapter;
 
-		result = m_create_factory_fn(__uuidof(IDXGIFactory2), reinterpret_cast<void**>(factory.GetAddressOf()));
+		result = OSD_DYNAMIC_CALL(CreateDXGIFactory1, __uuidof(IDXGIFactory2), reinterpret_cast<void**>(factory.GetAddressOf()));
 		if (result != ERROR_SUCCESS)
 		{
 			osd_printf_error("CreateDXGIFactory1 failed with error 0x%x\n", static_cast<unsigned int>(result));

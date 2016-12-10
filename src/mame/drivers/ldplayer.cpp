@@ -15,7 +15,6 @@
 #include "machine/ldpr8210.h"
 #include "machine/ldv1000.h"
 #include <ctype.h>
-#include "imagedev/chd_cd.h"
 #include "ui/uimain.h"
 
 #include "pr8210.lh"
@@ -627,9 +626,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( ldv1000, ldplayer_ntsc, ldv1000_state )
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("ld_cdrom")
 MACHINE_CONFIG_END
 
 
@@ -642,9 +638,6 @@ static MACHINE_CONFIG_DERIVED_CLASS( pr8210, ldplayer_ntsc, pr8210_state )
 	MCFG_SOUND_MODIFY("laserdisc")
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
-
-	MCFG_CDROM_ADD( "cdrom" )
-	MCFG_CDROM_INTERFACE("ld_cdrom")
 MACHINE_CONFIG_END
 
 
@@ -672,5 +665,5 @@ ROM_END
  *
  *************************************/
 
-GAME( 2008, simldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", MACHINE_NOT_WORKING )
-GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", MACHINE_NOT_WORKING, layout_pr8210 )
+GAME( 2008, simldv1000, 0, ldv1000, ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAMEL(2008, simpr8210,  0, pr8210,  ldplayer, driver_device, 0, ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )

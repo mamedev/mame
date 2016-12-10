@@ -28,11 +28,11 @@
 @implementation MAMEDebugConsole
 
 - (id)initWithMachine:(running_machine &)m {
-	NSSplitView		*regSplit, *dasmSplit;
-	NSScrollView	*regScroll, *dasmScroll, *consoleScroll;
-	NSView			*consoleContainer;
-	NSPopUpButton	*actionButton;
-	NSRect			rct;
+	NSSplitView     *regSplit, *dasmSplit;
+	NSScrollView    *regScroll, *dasmScroll, *consoleScroll;
+	NSView          *consoleContainer;
+	NSPopUpButton   *actionButton;
+	NSRect          rct;
 
 	// initialise superclass
 	if (!(self = [super initWithMachine:m title:@"Debug"]))
@@ -133,24 +133,24 @@
 	[window makeFirstResponder:commandField];
 
 	// calculate the optimal size for everything
-	NSRect const	available = [[NSScreen mainScreen] visibleFrame];
-	NSSize const	regCurrent = [regScroll frame].size;
-	NSSize const	regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
+	NSRect const    available = [[NSScreen mainScreen] visibleFrame];
+	NSSize const    regCurrent = [regScroll frame].size;
+	NSSize const    regSize = [NSScrollView frameSizeForContentSize:[regView maximumFrameSize]
 											  hasHorizontalScroller:YES
 												hasVerticalScroller:YES
 														 borderType:[regScroll borderType]];
-	NSSize const	dasmCurrent = [dasmScroll frame].size;
-	NSSize const	dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
+	NSSize const    dasmCurrent = [dasmScroll frame].size;
+	NSSize const    dasmSize = [NSScrollView frameSizeForContentSize:[dasmView maximumFrameSize]
 											  hasHorizontalScroller:YES
 												hasVerticalScroller:YES
 														 borderType:[dasmScroll borderType]];
-	NSSize const	consoleCurrent = [consoleContainer frame].size;
-	NSSize			consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
+	NSSize const    consoleCurrent = [consoleContainer frame].size;
+	NSSize          consoleSize = [NSScrollView frameSizeForContentSize:[consoleView maximumFrameSize]
 												  hasHorizontalScroller:YES
 													hasVerticalScroller:YES
 															 borderType:[consoleScroll borderType]];
-	NSRect			windowFrame = [window frame];
-	NSSize			adjustment;
+	NSRect          windowFrame = [window frame];
+	NSSize          adjustment;
 
 	consoleSize.width += consoleCurrent.width - [consoleScroll frame].size.width;
 	consoleSize.height += consoleCurrent.height - [consoleScroll frame].size.height;
@@ -405,7 +405,7 @@
 			}
 			return YES;
 		}
-    }
+	}
 	return NO;
 }
 
@@ -430,8 +430,8 @@
 
 
 - (CGFloat)splitView:(NSSplitView *)sender constrainMaxCoordinate:(CGFloat)max ofSubviewAt:(NSInteger)offs {
-	NSSize	sz = [sender bounds].size;
-	CGFloat	allowed = ([sender isVertical] ? sz.width : sz.height) - 100 - [sender dividerThickness];
+	NSSize  sz = [sender bounds].size;
+	CGFloat allowed = ([sender isVertical] ? sz.width : sz.height) - 100 - [sender dividerThickness];
 	return (max > allowed) ? allowed : max;
 }
 

@@ -20,7 +20,7 @@
 
     Horizontal scan rate: 15.606kHz
     Vertical scan rate: 60.024Hz
-	
+
     pixel clock:         6.000MHz, 166ns per pixel
 
     htotal:             64.076us, 386 pixels
@@ -373,7 +373,7 @@ static MACHINE_CONFIG_START( bionicc, bionicc_state )
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", bionicc_state, bionicc_scanline, "screen", 0, 1)
 
 	/* Protection MCU Intel C8751H-88 runs at 24MHz / 4 = 6MHz */
-	
+
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)   /* EXO3 C,B=GND, A=5V ==> Divisor 2^2 */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* FIXME: interrupt timing

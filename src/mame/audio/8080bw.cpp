@@ -66,6 +66,7 @@ WRITE8_MEMBER(_8080bw_state::invadpt2_sh_port_2_w)
 	if (rising_bits & 0x10) m_samples->start(3, 7);     /* SAUCER HIT */
 
 	m_flip_screen = BIT(data, 5) & ioport(CABINET_PORT_TAG)->read();
+	m_color_map = BIT(data, 5);
 
 	m_port_2_last_extra = data;
 }

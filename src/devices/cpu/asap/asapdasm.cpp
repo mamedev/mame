@@ -141,6 +141,6 @@ CPU_DISASSEMBLE(asap)
 						util::stream_format(stream, "jmp%s  %s[%s]", setcond[cond], reg[rsrc1], src2(op,2));
 			break;
 		case 0x1f:  util::stream_format(stream, "trap   $1f"); flags = DASMFLAG_STEP_OVER;                              break;
-	}	
+	}
 	return 4 | flags | DASMFLAG_SUPPORTED;
 }

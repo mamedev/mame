@@ -66,11 +66,6 @@ static const float POINTS_PER_DIP = (3.0f / 4.0f);
 #define HR_RET0( CALL ) HR_RET(CALL, 0)
 #define HR_RET1( CALL ) HR_RET(CALL, 1)
 
-// Typedefs for dynamically loaded functions
-typedef HRESULT (WINAPI *d2d_create_factory_fn)(D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
-typedef HRESULT (WINAPI *dwrite_create_factory_fn)(DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
-typedef int (WINAPI *get_user_default_locale_name)(LPWSTR, int);
-
 // Debugging functions
 #ifdef DWRITE_DEBUGGING
 
@@ -85,18 +80,17 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<ID2D1Factory1> d2dfactory;
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
+	
+	OSD_DYNAMIC_API(dwrite, "dwrite.dll");
+	OSD_DYNAMIC_API(d2d1, "d2d1.dll");
+	OSD_DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	OSD_DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
 
-	osd::dynamic_module::ptr d2d1_dll = osd::dynamic_module::open({ "d2d1.dll" });
-	osd::dynamic_module::ptr dwrite_dll = osd::dynamic_module::open({ "dwrite.dll" });
-
-	d2d_create_factory_fn pfn_D2D1CreateFactory = d2d1_dll->bind<d2d_create_factory_fn>("D2D1CreateFactory");
-	dwrite_create_factory_fn pfn_DWriteCreateFactory = dwrite_dll->bind<dwrite_create_factory_fn>("DWriteCreateFactory");
-
-	if (!pfn_D2D1CreateFactory || !pfn_DWriteCreateFactory)
+	if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 		return ERROR_DLL_NOT_FOUND;
 
 	// Create a Direct2D factory
-	HR_RETHR((*pfn_D2D1CreateFactory)(
+	HR_RETHR(OSD_DYNAMIC_CALL(D2D1CreateFactory,
 		D2D1_FACTORY_TYPE_SINGLE_THREADED,
 		__uuidof(ID2D1Factory1),
 		nullptr,
@@ -106,7 +100,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 	// Create a DirectWrite factory.
-	HR_RETHR((*pfn_DWriteCreateFactory)(
+	HR_RETHR(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 		DWRITE_FACTORY_TYPE_SHARED,
 		__uuidof(IDWriteFactory),
 		reinterpret_cast<IUnknown **>(dwriteFactory.GetAddressOf())));
@@ -349,7 +343,7 @@ public:
 	}
 
 	virtual ~osd_font_dwrite() { osd_font_dwrite::close(); }
-	
+
 	virtual bool open(std::string const &font_path, std::string const &_name, int &height) override
 	{
 		if (m_d2dfactory == nullptr || m_dwriteFactory == nullptr || m_wicFactory == nullptr)
@@ -653,12 +647,12 @@ private:
 class font_dwrite : public osd_module, public font_module
 {
 private:
-	osd::dynamic_module::ptr     m_d2d1_dll;
-	osd::dynamic_module::ptr     m_dwrite_dll;
-	osd::dynamic_module::ptr     m_kernel32_dll;
-	d2d_create_factory_fn        m_pfnD2D1CreateFactory;
-	dwrite_create_factory_fn     m_pfnDWriteCreateFactory;
-	get_user_default_locale_name m_pfnGetUserDefaultLocaleName;
+	OSD_DYNAMIC_API(dwrite, "dwrite.dll");
+	OSD_DYNAMIC_API(d2d1, "d2d1.dll");
+	OSD_DYNAMIC_API(locale, "kernel32.dll");
+	OSD_DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);
+	OSD_DYNAMIC_API_FN(d2d1, HRESULT, WINAPI, D2D1CreateFactory, D2D1_FACTORY_TYPE, REFIID, const D2D1_FACTORY_OPTIONS *, void **);
+	OSD_DYNAMIC_API_FN(locale, int, WINAPI, GetUserDefaultLocaleName, LPWSTR, int);
 	ComPtr<ID2D1Factory>         m_d2dfactory;
 	ComPtr<IDWriteFactory>       m_dwriteFactory;
 	ComPtr<IWICImagingFactory>   m_wicFactory;
@@ -667,9 +661,6 @@ public:
 	font_dwrite() :
 		osd_module(OSD_FONT_PROVIDER, "dwrite"),
 		font_module(),
-		m_pfnD2D1CreateFactory(nullptr),
-		m_pfnDWriteCreateFactory(nullptr),
-		m_pfnGetUserDefaultLocaleName(nullptr),
 		m_d2dfactory(nullptr),
 		m_dwriteFactory(nullptr),
 		m_wicFactory(nullptr)
@@ -678,14 +669,8 @@ public:
 
 	virtual bool probe() override
 	{
-		m_d2d1_dll = osd::dynamic_module::open({ "d2d1.dll" });
-		m_dwrite_dll = osd::dynamic_module::open({ "dwrite.dll" });
-
-		m_pfnD2D1CreateFactory = m_d2d1_dll->bind<d2d_create_factory_fn>("D2D1CreateFactory");
-		m_pfnDWriteCreateFactory = m_dwrite_dll->bind<dwrite_create_factory_fn>("DWriteCreateFactory");
-
 		// This module is available if it can load the expected API Functions
-		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
+		if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 			return false;
 
 		return true;
@@ -698,21 +683,16 @@ public:
 		osd_printf_verbose("FontProvider: Initializing DirectWrite\n");
 
 		// Make sure we can initialize our api functions
-		if (!m_pfnD2D1CreateFactory || !m_pfnDWriteCreateFactory)
+		if (!OSD_DYNAMIC_API_TEST(D2D1CreateFactory) || !OSD_DYNAMIC_API_TEST(DWriteCreateFactory))
 		{
 			osd_printf_error("ERROR: FontProvider: Failed to load DirectWrite functions.\n");
 			return -1;
 		}
 
-		// Init our kernel32 dynamic functions
-		m_kernel32_dll = osd::dynamic_module::open({ "Kernel32.dll" });
-		assert(m_kernel32_dll != nullptr);
-
-		// Attempt to map this function. It only exists on Vista+, so we don't fail if it can't be mapped
-		m_pfnGetUserDefaultLocaleName = m_kernel32_dll->bind<get_user_default_locale_name>("GetUserDefaultLocaleName");
+		assert(OSD_DYNAMIC_API_TEST(GetUserDefaultLocaleName));
 
 		// Create a Direct2D factory.
-		HR_RET1((*m_pfnD2D1CreateFactory)(
+		HR_RET1(OSD_DYNAMIC_CALL(D2D1CreateFactory,
 			D2D1_FACTORY_TYPE_SINGLE_THREADED,
 			__uuidof(ID2D1Factory),
 			nullptr,
@@ -722,7 +702,7 @@ public:
 		CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
 		// Create a DirectWrite factory.
-		HR_RET1((*m_pfnDWriteCreateFactory)(
+		HR_RET1(OSD_DYNAMIC_CALL(DWriteCreateFactory,
 			DWRITE_FACTORY_TYPE_SHARED,
 			__uuidof(IDWriteFactory),
 			reinterpret_cast<IUnknown **>(m_dwriteFactory.GetAddressOf())));
@@ -811,10 +791,10 @@ private:
 
 		// Get the default locale for this user if possible.
 		// GetUserDefaultLocaleName doesn't exist on XP, so don't assume.
-		if (m_pfnGetUserDefaultLocaleName)
+		if (OSD_DYNAMIC_API_TEST(GetUserDefaultLocaleName))
 		{
 			wchar_t name_buffer[LOCALE_NAME_MAX_LENGTH];
-			int len = m_pfnGetUserDefaultLocaleName(name_buffer, LOCALE_NAME_MAX_LENGTH);
+			int len = OSD_DYNAMIC_CALL(GetUserDefaultLocaleName, name_buffer, LOCALE_NAME_MAX_LENGTH);
 			if (len != 0)
 				locale_name = name_buffer;
 		}

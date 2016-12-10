@@ -767,7 +767,7 @@ private:
 
 
 /***************************************************************************
-	DISASSEMBLING
+    DISASSEMBLING
 ***************************************************************************/
 
 unsigned dasmmips3(std::ostream &stream, unsigned pc, uint32_t op);

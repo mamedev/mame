@@ -249,6 +249,6 @@ CPU_DISASSEMBLE(h6280)
 
 		default:
 			util::stream_format(stream, "%-5s$%02X", token[opc], OP >> 1);
-	}	
+	}
 	return (PC - pc) | flags | DASMFLAG_SUPPORTED;
 }

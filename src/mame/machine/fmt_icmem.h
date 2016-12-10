@@ -59,7 +59,7 @@ public:
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
-	
+
 private:
 	required_ioport m_writeprotect;
 	std::unique_ptr<uint8_t[]> m_memcard_ram;

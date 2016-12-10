@@ -1681,7 +1681,7 @@ Info on Sega chip labels (from Sunbeam / Digital Corruption)
 			</dataarea>
 		</part>
 	</software>
-    
+
 	<software name="coolspotp" cloneof="coolspot">
 		<description>Cool Spot (Euro, Prototype)</description>
 		<year>1993</year>

@@ -179,6 +179,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("wpd",       CMDFLAG_NONE, AS_DATA, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2, _3));
 	m_console.register_command("wpiset",    CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2, _3));
 	m_console.register_command("wpi",       CMDFLAG_NONE, AS_IO, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2, _3));
+	m_console.register_command("wposet",    CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2, _3));
+	m_console.register_command("wpo",       CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 5, std::bind(&debugger_commands::execute_wpset, this, _1, _2, _3));
 	m_console.register_command("wpclear",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpclear, this, _1, _2, _3));
 	m_console.register_command("wpdisable", CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2, _3));
 	m_console.register_command("wpenable",  CMDFLAG_NONE, 1, 0, 1, std::bind(&debugger_commands::execute_wpdisenable, this, _1, _2, _3));
@@ -201,14 +203,17 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("save",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2, _3));
 	m_console.register_command("saved",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2, _3));
 	m_console.register_command("savei",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2, _3));
+	m_console.register_command("saveo",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 4, std::bind(&debugger_commands::execute_save, this, _1, _2, _3));
 
 	m_console.register_command("load",      CMDFLAG_NONE, AS_PROGRAM, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 	m_console.register_command("loadd",     CMDFLAG_NONE, AS_DATA, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 	m_console.register_command("loadi",     CMDFLAG_NONE, AS_IO, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
+	m_console.register_command("loado",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 4, std::bind(&debugger_commands::execute_load, this, _1, _2, _3));
 
 	m_console.register_command("dump",      CMDFLAG_NONE, AS_PROGRAM, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
 	m_console.register_command("dumpd",     CMDFLAG_NONE, AS_DATA, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
 	m_console.register_command("dumpi",     CMDFLAG_NONE, AS_IO, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
+	m_console.register_command("dumpo",     CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 3, 7, std::bind(&debugger_commands::execute_dump, this, _1, _2, _3));
 
 	m_console.register_command("cheatinit", CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
 	m_console.register_command("ci",        CMDFLAG_NONE, 0, 0, 4, std::bind(&debugger_commands::execute_cheatinit, this, _1, _2, _3));
@@ -233,6 +238,8 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("findd",     CMDFLAG_KEEP_QUOTES, AS_DATA, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2, _3));
 	m_console.register_command("fi",        CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2, _3));
 	m_console.register_command("findi",     CMDFLAG_KEEP_QUOTES, AS_IO, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2, _3));
+	m_console.register_command("fo",        CMDFLAG_KEEP_QUOTES, AS_DECRYPTED_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2, _3));
+	m_console.register_command("findo",     CMDFLAG_KEEP_QUOTES, AS_DECRYPTED_OPCODES, 3, MAX_COMMAND_PARAMS, std::bind(&debugger_commands::execute_find, this, _1, _2, _3));
 
 	m_console.register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, std::bind(&debugger_commands::execute_dasm, this, _1, _2, _3));
 
@@ -247,6 +254,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("pcatmemp",  CMDFLAG_NONE, AS_PROGRAM, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2, _3));
 	m_console.register_command("pcatmemd",  CMDFLAG_NONE, AS_DATA,    1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2, _3));
 	m_console.register_command("pcatmemi",  CMDFLAG_NONE, AS_IO,      1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2, _3));
+	m_console.register_command("pcatmemo",  CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 1, 2, std::bind(&debugger_commands::execute_pcatmem, this, _1, _2, _3));
 
 	m_console.register_command("snap",      CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_snap, this, _1, _2, _3));
 
@@ -255,6 +263,7 @@ debugger_commands::debugger_commands(running_machine& machine, debugger_cpu& cpu
 	m_console.register_command("map",       CMDFLAG_NONE, AS_PROGRAM, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2, _3));
 	m_console.register_command("mapd",      CMDFLAG_NONE, AS_DATA, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2, _3));
 	m_console.register_command("mapi",      CMDFLAG_NONE, AS_IO, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2, _3));
+	m_console.register_command("mapo",      CMDFLAG_NONE, AS_DECRYPTED_OPCODES, 1, 1, std::bind(&debugger_commands::execute_map, this, _1, _2, _3));
 	m_console.register_command("memdump",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_memdump, this, _1, _2, _3));
 
 	m_console.register_command("symlist",   CMDFLAG_NONE, 0, 0, 1, std::bind(&debugger_commands::execute_symlist, this, _1, _2, _3));
@@ -2168,6 +2177,7 @@ void debugger_commands::execute_cheatlist(int ref, int params, const char *param
 		case AS_PROGRAM:    spaceletter = 'p';  break;
 		case AS_DATA:   spaceletter = 'd';  break;
 		case AS_IO:     spaceletter = 'i';  break;
+		case AS_DECRYPTED_OPCODES: spaceletter = 'o'; break;
 	}
 
 	switch (m_cheat.width)

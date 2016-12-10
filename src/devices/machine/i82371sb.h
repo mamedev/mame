@@ -84,7 +84,7 @@ public:
 	DECLARE_WRITE8_MEMBER (ctltmr_w);
 	DECLARE_READ8_MEMBER  (cthtmr_r);
 	DECLARE_WRITE8_MEMBER (cthtmr_w);
-	
+
 	// southbridge
 	DECLARE_READ8_MEMBER(at_page8_r);
 	DECLARE_WRITE8_MEMBER(at_page8_w);
@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_dma_write_byte);
 	DECLARE_READ8_MEMBER(pc_dma_read_word);
 	DECLARE_WRITE8_MEMBER(pc_dma_write_word);
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -145,7 +145,7 @@ private:
 	uint8_t dlc, smicntl, ftmr, ctlmtr, cthmtr;
 
 	void map_bios(address_space *memory_space, uint32_t start, uint32_t end);
-	
+
 
 	//southbridge
 	required_device<cpu_device> m_maincpu;
@@ -158,7 +158,7 @@ private:
 	required_device<speaker_sound_device> m_speaker;
 	required_device<ds12885_device> m_ds12885;
 	required_device<pc_kbdc_device> m_pc_kbdc;
-	
+
 	uint8_t m_at_spkrdata;
 	uint8_t m_pit_out2;
 	int m_dma_channel;

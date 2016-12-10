@@ -62,10 +62,10 @@ static ADDRESS_MAP_START( cedar_magnet_sound_io, AS_IO, 8, cedar_magnet_sound_de
 
 	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("aysnd0", ay8910_device, address_w)
 	AM_RANGE(0x0d, 0x0d) AM_DEVWRITE("aysnd0", ay8910_device, data_w)
-	
+
 	AM_RANGE(0x10, 0x10) AM_DEVWRITE("aysnd1", ay8910_device, address_w)
 	AM_RANGE(0x11, 0x11) AM_DEVWRITE("aysnd1", ay8910_device, data_w)
-	
+
 	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_r)
 
 ADDRESS_MAP_END
@@ -84,12 +84,12 @@ WRITE8_MEMBER(cedar_magnet_sound_device::ay1_porta_w)
 
 WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z0_w)
 {
-//	printf("USED ctc0_z0_w %d\n", state);
+//  printf("USED ctc0_z0_w %d\n", state);
 }
 
 WRITE_LINE_MEMBER(cedar_magnet_sound_device::ctc0_z1_w)
 {
-//	printf("USED  ctc0_z1_w %d\n", state);
+//  printf("USED  ctc0_z1_w %d\n", state);
 }
 
 
@@ -148,8 +148,8 @@ TIMER_CALLBACK_MEMBER(cedar_magnet_sound_device::reset_assert_callback)
 INTERRUPT_GEN_MEMBER(cedar_magnet_sound_device::fake_irq)
 {
 	// these should be coming from the CTC...
-//	if (m_fake_counter==0) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xe6);
-//	if (m_fake_counter==1) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xee);
+//  if (m_fake_counter==0) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xe6);
+//  if (m_fake_counter==1) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xee);
 	if (m_fake_counter==2) m_cpu->set_input_line_and_vector(0, HOLD_LINE,0xf6); // drives the AY, should be from ctc1 4th counter?
 
 	m_fake_counter++;
@@ -161,19 +161,19 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sound )
 	MCFG_CPU_ADD("topcpu", Z80,4000000)
 	MCFG_CPU_PROGRAM_MAP(cedar_magnet_sound_map)
 	MCFG_CPU_IO_MAP(cedar_magnet_sound_io)
-//	MCFG_Z80_DAISY_CHAIN(daisy_chain)
+//  MCFG_Z80_DAISY_CHAIN(daisy_chain)
 	MCFG_CPU_PERIODIC_INT_DRIVER(cedar_magnet_sound_device, fake_irq, 4*60)
 
 	MCFG_DEVICE_ADD("ctc0", Z80CTC, 4000000/8 )
-//	MCFG_Z80CTC_INTR_CB(INPUTLINE("topcpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80CTC_INTR_CB(INPUTLINE("topcpu", INPUT_LINE_IRQ0))
 	MCFG_Z80CTC_INTR_CB(WRITELINE(cedar_magnet_sound_device, ctc0_int_w))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(cedar_magnet_sound_device, ctc0_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cedar_magnet_sound_device, ctc0_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(cedar_magnet_sound_device, ctc0_z2_w))
 
 	MCFG_DEVICE_ADD("ctc1", Z80CTC, 4000000/8 )
-//	MCFG_Z80CTC_INTR_CB(INPUTLINE("topcpu", INPUT_LINE_IRQ0))
-//	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("ctc0", z80ctc_device, trg0))
+//  MCFG_Z80CTC_INTR_CB(INPUTLINE("topcpu", INPUT_LINE_IRQ0))
+//  MCFG_Z80CTC_INTR_CB(DEVWRITELINE("ctc0", z80ctc_device, trg0))
 	MCFG_Z80CTC_INTR_CB(WRITELINE(cedar_magnet_sound_device, ctc1_int_w))
 	MCFG_Z80CTC_ZC0_CB(WRITELINE(cedar_magnet_sound_device, ctc1_z0_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(cedar_magnet_sound_device, ctc1_z1_w))

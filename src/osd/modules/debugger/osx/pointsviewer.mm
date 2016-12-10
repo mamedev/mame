@@ -15,11 +15,11 @@
 @implementation MAMEPointsViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDebugView	*breakView, *watchView;
-	NSScrollView	*breakScroll, *watchScroll;
-	NSTabViewItem	*breakTab, *watchTab;
-	NSPopUpButton	*actionButton, *subviewButton;
-	NSRect			subviewFrame;
+	MAMEDebugView   *breakView, *watchView;
+	NSScrollView    *breakScroll, *watchScroll;
+	NSTabViewItem   *breakTab, *watchTab;
+	NSPopUpButton   *actionButton, *subviewButton;
+	NSRect          subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
 		return nil;

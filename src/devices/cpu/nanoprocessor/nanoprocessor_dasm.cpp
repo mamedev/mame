@@ -114,9 +114,9 @@ static const dis_entry_t dis_table[] = {
 
 CPU_DISASSEMBLE(hp_nanoprocessor)
 {
-    const uint8_t opcode = *oprom;
+	const uint8_t opcode = *oprom;
 
-    opram++;
+	opram++;
 
 	for (const dis_entry_t& ent : dis_table) {
 		if ((opcode & ent.m_op_mask) == ent.m_opcode) {

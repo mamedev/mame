@@ -25,9 +25,9 @@ class menu_plugin : public menu
 {
 public:
 	menu_plugin(mame_ui_manager &mui, render_container &container);
-	
+
 	static void show_menu(mame_ui_manager &mui, render_container &container, char *menu);
-	
+
 	virtual ~menu_plugin();
 
 private:

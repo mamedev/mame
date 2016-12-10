@@ -4090,7 +4090,7 @@ void mips3_device::log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desc
 		}
 		else
 			buffer << "???";
-		
+
 		const std::string buffer_string = buffer.str();
 		drcuml->log_printf("%08X [%08X] t:%08X f:%s: %-30s", desclist->pc, desclist->physpc, desclist->targetpc, log_desc_flags_to_string(desclist->flags), buffer_string.c_str());
 

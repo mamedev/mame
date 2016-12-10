@@ -16,6 +16,7 @@
 #include "machine/msm58321.h"
 #include "machine/wd_fdc.h"
 #include "machine/68230pit.h"
+#include "bus/rs232/rs232.h"
 #include "softlist.h"
 
 #define MAINCPU_TAG "maincpu"
@@ -33,7 +34,8 @@ public:
 		m_maincpu(*this, MAINCPU_TAG),
 		m_rom(*this, "bootrom"),
 		m_mainram(*this, "mainram"),
-		m_pit(*this, PIT_TAG)
+		m_pit(*this, PIT_TAG),
+		m_rtc(*this, RTC_TAG)
 	{
 	}
 
@@ -41,14 +43,21 @@ public:
 	required_memory_region m_rom;
 	required_shared_ptr<uint32_t> m_mainram;
 	required_device<pit68230_device> m_pit;
+	required_device<msm58321_device> m_rtc;
 	
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	
 	DECLARE_WRITE_LINE_MEMBER(m68k_reset_callback);
+	DECLARE_READ32_MEMBER(buserror_r);
 	
-private:
+	TIMER_DEVICE_CALLBACK_MEMBER(micro20_timer);
+	DECLARE_WRITE_LINE_MEMBER(h4_w);
+	DECLARE_WRITE8_MEMBER(portb_w);
+	DECLARE_WRITE8_MEMBER(portc_w);
 
+private:
+	u8 m_tin;
 };
 
 void micro20_state::machine_start()
@@ -57,14 +66,27 @@ void micro20_state::machine_start()
 
 void micro20_state::machine_reset()
 {
-	uint32_t *pROM = (uint32_t *)m_rom->base();
-	uint32_t *pRAM = (uint32_t *)m_mainram.target();
+	u32 *pROM = (uint32_t *)m_rom->base();
+	u32 *pRAM = (uint32_t *)m_mainram.target();
 	
-	pRAM[0] = pROM[0];
-	pRAM[1] = pROM[1];
+	pRAM[0] = pROM[2];
+	pRAM[1] = pROM[3];
 	m_maincpu->reset();
 	
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(micro20_state::m68k_reset_callback),this));
+	
+	m_tin = 0;
+}
+
+TIMER_DEVICE_CALLBACK_MEMBER(micro20_state::micro20_timer)
+{
+	m_pit->update_tin(m_tin);
+	m_tin ^= 1;
+}
+
+WRITE_LINE_MEMBER(micro20_state::h4_w)
+{
+	printf("h4_w: %d\n", state);
 }
 
 WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
@@ -73,12 +95,40 @@ WRITE_LINE_MEMBER(micro20_state::m68k_reset_callback)
 	m_pit->reset();
 }
 
+WRITE8_MEMBER(micro20_state::portb_w)
+{
+	m_rtc->d0_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d1_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d2_w((data & 4) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->d3_w((data & 8) ? ASSERT_LINE : CLEAR_LINE);	
+}
+
+WRITE8_MEMBER(micro20_state::portc_w)
+{
+	// MSM58321 CS1 and CS2 are tied to /RST, inverted RESET.  
+	// So they're always high when the system is not reset.
+	m_rtc->cs1_w(ASSERT_LINE);
+	m_rtc->cs2_w(ASSERT_LINE);
+	m_rtc->stop_w((data & 1) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->write_w((data & 2) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->read_w((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->address_write_w((data & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->test_w((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+}
+
+READ32_MEMBER(micro20_state::buserror_r)
+{
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, ASSERT_LINE);
+	m_maincpu->set_input_line(M68K_LINE_BUSERROR, CLEAR_LINE);
+	return 0xffff;
+}
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
 
 static ADDRESS_MAP_START(micro20_map, AS_PROGRAM, 32, micro20_state )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x00200000, 0x002fffff) AM_READ(buserror_r)
 	AM_RANGE(0x00800000, 0x0083ffff) AM_ROM AM_REGION("bootrom", 0)
 	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, status_r, cmd_w,    0xff000000)	
 	AM_RANGE(0xffff8000, 0xffff8003) AM_DEVREADWRITE8(FDC_TAG, wd1772_t, track_r, track_w,   0x00ff0000)	
@@ -95,18 +145,29 @@ static MACHINE_CONFIG_START( micro20, micro20_state )
 	MCFG_CPU_PROGRAM_MAP(micro20_map)
 	
 	MCFG_MC68681_ADD(DUART_A_TAG, XTAL_3_6864MHz)
-//	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(vt240_state, irq13_w))
-//	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("host", rs232_port_device, write_txd))
-//	MCFG_MC68681_B_TX_CALLBACK(DEVWRITELINE("printer", rs232_port_device, write_txd))
-//	MCFG_MC68681_OUTPORT_CALLBACK(WRITE8(vt240_state, duartout_w))
+	MCFG_MC68681_A_TX_CALLBACK(DEVWRITELINE("rs232", rs232_port_device, write_txd))
+
+	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(DUART_A_TAG, mc68681_device, rx_a_w))
 
 	MCFG_MC68681_ADD(DUART_B_TAG, XTAL_3_6864MHz)
-	
-	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
 	
 	MCFG_WD1772_ADD(FDC_TAG, XTAL_16_67MHz / 2)
 	
 	MCFG_DEVICE_ADD(PIT_TAG, PIT68230, XTAL_16_67MHz / 2)
+	MCFG_PIT68230_H4_CB(WRITELINE(micro20_state, h4_w))
+	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(micro20_state, portb_w))
+	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(micro20_state, portc_w))
+	
+	MCFG_DEVICE_ADD(RTC_TAG, MSM58321, XTAL_32_768kHz)
+	MCFG_MSM58321_DEFAULT_24H(false)
+	MCFG_MSM58321_D0_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb0_w))
+	MCFG_MSM58321_D1_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb1_w))
+	MCFG_MSM58321_D2_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb2_w))
+	MCFG_MSM58321_D3_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb3_w))
+	MCFG_MSM58321_BUSY_HANDLER(DEVWRITELINE(PIT_TAG, pit68230_device, pb7_w))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer", micro20_state, micro20_timer, attotime::from_hz(200))
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( micro20 )

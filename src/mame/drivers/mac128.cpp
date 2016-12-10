@@ -4,9 +4,9 @@
 
     drivers/mac128.cpp
     Original-style Macintosh family emulation
- 
+
     The cutoff here is Macs with 128k-style video and audio and no ADB
- 
+
     Nate Woods, Raphael Nabet, R. Belmont
 
         0x000000 - 0x3fffff     RAM/ROM (switches based on overlay)
@@ -36,7 +36,7 @@
         SCC:
             PB_EXT (DCDB)  from mouse Y circuitry
             PA_EXT (DCDA)  from mouse X circuitry
-            
+
 SCC Init:
 
 Control B:
@@ -130,10 +130,10 @@ enum mac128model_t
 #define MAC_ALT_SND_BUF_OFFSET  (0x5F00>>1)
 
 #define LOG_KEYBOARD    0
-#define LOG_GENERAL		0
-#define LOG_MAC_IWM		0
-#define LOG_VIA			0
-#define LOG_MEMORY		0
+#define LOG_GENERAL     0
+#define LOG_MAC_IWM     0
+#define LOG_VIA         0
+#define LOG_MEMORY      0
 
 class mac128_state : public driver_device
 {
@@ -235,7 +235,7 @@ public:
 	DECLARE_WRITE16_MEMBER ( macplus_scsi_w );
 	DECLARE_WRITE_LINE_MEMBER(mac_scsi_irq);
 	DECLARE_WRITE_LINE_MEMBER(set_scc_interrupt);
-	
+
 	TIMER_DEVICE_CALLBACK_MEMBER(mac_scanline);
 	DECLARE_DRIVER_INIT(mac128k512k);
 	DECLARE_DRIVER_INIT(mac512ke);
@@ -348,7 +348,7 @@ void mac128_state::field_interrupts()
 		take_interrupt = 1;
 	}
 
-//	printf("field_interrupts: take %d\n", take_interrupt);
+//  printf("field_interrupts: take %d\n", take_interrupt);
 
 	if (m_last_taken_interrupt > -1)
 	{
@@ -365,7 +365,7 @@ void mac128_state::field_interrupts()
 
 WRITE_LINE_MEMBER(mac128_state::set_scc_interrupt)
 {
-//	printf("SCC IRQ: %d\n", state);
+//  printf("SCC IRQ: %d\n", state);
 	m_scc_interrupt = state;
 	field_interrupts();
 }
@@ -474,59 +474,59 @@ void mac128_state::scc_mouse_irq(int x, int y)
 
 	if (x && y)
 	{
-		if (m_last_was_x) 
+		if (m_last_was_x)
 		{
-			if(x == 2) 
+			if(x == 2)
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
-		} 
-		else 
+		}
+		else
 		{
-			if(y == 2) 
+			if(y == 2)
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 0;
@@ -539,59 +539,59 @@ void mac128_state::scc_mouse_irq(int x, int y)
 	}
 	else
 	{
-		if (x) 
+		if (x)
 		{
-			if(x == 2) 
+			if(x == 2)
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lastx) 
+				if(lastx)
 				{
 					m_scc->dcda_w(CLEAR_LINE);
 					m_mouse_bit_x = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcda_w(ASSERT_LINE);
 					m_mouse_bit_x = 0;
 				}
 			}
 			lastx = !lastx;
-		} 
-		else 
+		}
+		else
 		{
-			if(y == 2) 
+			if(y == 2)
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 0;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 1;
 				}
-			} 
-			else 
+			}
+			else
 			{
-				if(lasty) 
+				if(lasty)
 				{
 					m_scc->dcdb_w(CLEAR_LINE);
 					m_mouse_bit_y = 1;
-				} 
-				else 
+				}
+				else
 				{
 					m_scc->dcdb_w(ASSERT_LINE);
 					m_mouse_bit_y = 0;
@@ -740,7 +740,7 @@ WRITE8_MEMBER(mac128_state::mac_via_out_a)
 	/* Early Mac models had VIA A4 control overlaying.  In the Mac SE (and
 	 * possibly later models), overlay was set on reset, but cleared on the
 	 * first access to the ROM. */
-	
+
 	if (((data & 0x10) >> 4) != m_overlay)
 	{
 		m_overlay = (data & 0x10) >> 4;
@@ -1336,7 +1336,7 @@ static MACHINE_CONFIG_START( mac512ke, mac128_state )
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("512K")
-	
+
 	// software list
 	MCFG_SOFTWARE_LIST_ADD("flop35_list","mac_flop")
 	MCFG_SOFTWARE_LIST_ADD("hdd_list", "mac_hdd")
@@ -1515,12 +1515,34 @@ ROM_END
 
 ROM_START( mac128k )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac128k.rom",  0x00000, 0x10000, CRC(6d0c8a28) SHA1(9d86c883aa09f7ef5f086d9e32330ef85f1bc93b) )
+	// Apple used at least 3 manufacturers for these ROMs, but they're always Apple part numbers 342-0220-A and 342-0221-A
+	ROMX_LOAD("342-0220-a.u6d",  0x00000, 0x08000, CRC(198210ad) SHA1(2590ff4af5ac0361babdf0dc5da18e2eecad454a), ROM_SKIP(1) )
+ 	ROMX_LOAD("342-0221-a.u8d",  0x00001, 0x08000, CRC(fd2665c2) SHA1(8507932a854bd28196a17785c8b1851cb53eaf64), ROM_SKIP(1) )
+	/* Labels seen in the wild:
+	VTi:
+	"<VTi logo along side> // 416 VH 2605 // 23256-1020 // 342-0220-A // (C)APPLE 83 // KOREA-AE"
+	"<VTi logo along side> // 416 VH 2826 // 23256-1023 // 342-0221-A // (C)APPLE 83 // KOREA-AE"
+	Synertek:
+	"<Synertek 'S' logo> 8416 G // C19728 // 342-0220-A // (C)APPLE 83"
+	"<Synertek 'S' logo> 8410 G // C19729 // 342-0221-A // (C)APPLE 83"
+	Hitachi:
+	[can't find reference for rom-hi]
+	"<Hitachi 'target' logo> 8413 // 3256 016 JAPAN // (C)APPLE 83 // 342-0221-A"
+	
+	References:
+	http://www.vintagecomputer.net/apple/Macintosh/Macintosh_motherboard.jpg
+	https://upload.wikimedia.org/wikipedia/commons/3/34/Macintosh-motherboard.jpg
+	https://68kmla.org/forums/uploads/monthly_01_2016/post-2105-0-31195100-1452296677.jpg
+	https://68kmla.org/forums/uploads/monthly_12_2014/post-2597-0-46269000-1419299800.jpg
+	http://cdn.cultofmac.com/wp-content/uploads/2014/01/12A-128k-Motherboard.jpg
+	*/
 ROM_END
 
 ROM_START( mac512k )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
-	ROM_LOAD16_WORD( "mac512k.rom",  0x00000, 0x10000, CRC(cf759e0d) SHA1(5b1ced181b74cecd3834c49c2a4aa1d7ffe944d7) )
+	ROMX_LOAD("342-0220-b.u6d",  0x00000, 0x08000, CRC(0dce9a3f) SHA1(101ca6570f5a273e400d1a8bc63e15ee0e94153e), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6434 // 23256-1104 // 342-0220-B // (C) APPLE 84 // KOREA-A"
+	ROMX_LOAD("342-0221-b.u8d",  0x00001, 0x08000, CRC(d51f376e) SHA1(575586109e876cffa4a4d472cb38771aa21b70cb), ROM_SKIP(1) ) // "<VTi logo along side> 512 VH 6709 // 23256-1105 // 342-0221-B // (C) APPLE 84 // KOREA-A"
+	// reference: http://i.ebayimg.com/images/g/Uj8AAOSwvzRXy2tW/s-l1600.jpg
 ROM_END
 
 ROM_START( unitron )
@@ -1531,8 +1553,8 @@ ROM_END
 ROM_START( utrn1024 )
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	// CRCs match the original "Lonely Hearts" version 1 Mac Plus ROM: 4d1eeee1
-	ROM_LOAD16_BYTE( "macplus_mem_h.e6", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b) )
-	ROM_LOAD16_BYTE( "macplus_mem_l.e7", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7) )
+	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) ) // not correct label
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) ) // not correct label
 ROM_END
 
 /*
@@ -1554,7 +1576,7 @@ ROM_END
  * 04 <- 20 x1 clock, Sync Modes Enable, SDLC Mode (01111110 Flag)
  * 0a <- e0 CRC preset to '1's, FM0 encoding scheme
  * 06 <- 00 Receiver SDLC ADR0-ADR7 bits
- * 07 <- 7e Receiver SDLC Flag character (0x7e as expected) 
+ * 07 <- 7e Receiver SDLC Flag character (0x7e as expected)
  * 0c <- 06 Low baudrate divider
  * 0d <- 00 Hi baudrate divider
  * 0e <- c0 Set FM Mode Command
@@ -1562,40 +1584,86 @@ ROM_END
  * 02 <- 00 Interrupt vector
  * 0f <- 08 External/Status Control: DCD interrupts enabled
  * 01 <- 09 Enable External Interrupts + Rx Int On First Character or Special Condition
- * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled! 
+ * 09 <- 0a Master Interrupt Control: No vector and Interrupts enabled!
  * 0b <- 70 Rx Clock is DPLL Output, Tx Clock is BRG output + TTL Clock on RTxC
  * 0e <- 21 Enter Search Mode Command + BRG enable + RTxC as BRG clock
- * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled 
+ * 05 <- 60 Tx 8 bit, Tx disable, SDLC CRC Polynomial selected, Tx CRC disabled
  * 06 <- 01 Receiver SDLC ADR0-ADR7 bits updated
  * 0f <- 88 External/Status Control: Abort/Break and DCD interrupts enabled
 */
 
-ROM_START( mac512ke )
-	ROM_REGION16_BE(0x100000, "bootrom", 0)
-	ROM_LOAD16_WORD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f))
-ROM_END
-
-
-ROM_START( macplus )
+ROM_START( mac512ke ) // 512ke has been observed with any of the v3, v2 or v1 macplus romsets installed, and v1 romsets are more common here than in the plus, since the 512ke lacks scsi, which is the cause of the major bug fixed between v1 and v2, hence 512ke is unaffected and was a good way for apple to use up the buggy roms rather than destroying them.
 	ROM_REGION16_BE(0x100000, "bootrom", 0)
 	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
-	ROMX_LOAD( "macplus.rom",  0x00000, 0x20000, CRC(b2102e8e) SHA1(7d2f808a045aa3a1b242764f0e2c7d13e288bf1f), ROM_GROUPWORD | ROM_BIOS(1) )
-	ROM_FILL(0x20000, 0x2, 0xff)	// ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
+	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
-	ROMX_LOAD( "23512-1007__342-0342-a.rom-lo.u7d", 0x000000, 0x010000, CRC(5aaa4a2f) SHA1(5dfbfbe279ddadfae691c95f552fd9db41e3ed90), ROM_SKIP(1) | ROM_BIOS(2) )
-	ROMX_LOAD( "23512-1010__342-0341-b.rom-hi.u6d", 0x000001, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
-	ROMX_LOAD( "4d1eeee1 - macplus v1.rom", 0x000000, 0x020000, CRC(4fa5b399) SHA1(e0da7165b92dee90d8b1522429c033729fa73fd2), ROM_GROUPWORD | ROM_BIOS(3) )
+	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROM_FILL(0x20000, 0x2, 0xff)
+	ROM_FILL(0x40000, 0x2, 0xaa)
+	/* from Technical note HW11 (https://www.fenestrated.net/mirrors/Apple%20Technotes%20(As%20of%202002)/hw/hw_11.html)
+	1st version (Lonely Hearts, checksum 4D 1E EE E1)
+	Bug in the SCSI driver; won't boot if external drive is turned off. We only produced about
+	one and a half months worth of these.
+	
+	2nd version (Lonely Heifers, checksum 4D 1E EA E1):
+	Fixed boot bug. This version is the vast majority of beige Macintosh Pluses.
+	
+	3rd version (Loud Harmonicas, checksum 4D 1F 81 72):
+	Fixed bug for drives that return Unit Attention on power up or reset. Basically took the
+	SCSI bus Reset command out of the boot sequence loop, so it will only reset once
+	during boot sequence. 
+	*/
+	/* Labels seen in the wild:
+	v3/4d1f8172:
+		'ROM-HI' @ U6D:
+			"VLSI // 740 SA 1262 // 23512-1054 // 342-0341-C // (C)APPLE '83-'86 // KOREA A"
+			"342-0341-C // (C)APPLE 85,86 // (M)AMI 8849MBL // PHILLIPINES"
+		'ROM-LO' @ U8D:
+			"VLSI // 740 SA 1342 // 23512-1055 // 342-0342-B // (C)APPLE '83-'86 // KOREA A"
+			"<VLSI logo>VLSI // 8905AV 0 AS759 // 23512-1055 // 342-0342-B // (C)APPLE '85-'86"
+	v2/4d1eeae1:
+		'ROM-HI' @ U6D:
+			"VTI // 624 V0 8636 // 23512-1010 // 342-0341-B // (C)APPLE '85 // MEXICO R"
+		'ROM-LO' @ U8D:
+			"VTI // 622 V0 B637 // 23512-1007 // 342-0342-A // (C)APPLE '83-'85 // KOREA A"
+	v1/4d1eeee1:
+		'ROM-HI' @ U6D:
+			GUESSED, since this ROM is very rare: "VTI // 62? V0 86?? // 23512-1008 // 342-0341-A // (C)APPLE '83-'85 // KOREA A"
+		'ROM-LO' @ U8D is same as v2/4d1eeae1 'ROM-LO' @ U8D
+	*/
+ROM_END
+
+ROM_START( macplus ) // same notes as above apply here as well
+	ROM_REGION16_BE(0x100000, "bootrom", 0)
+	ROM_SYSTEM_BIOS(0, "v3", "Loud Harmonicas")
+	ROMX_LOAD( "342-0341-c.u6d", 0x000000, 0x010000, CRC(f69697e6) SHA1(41317614ac71eb94941e9952f6ea37407e21ffff), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROMX_LOAD( "342-0342-b.u8d", 0x000001, 0x010000, CRC(49f25913) SHA1(72f658c02bae265e8845899582575fb7c784ee87), ROM_SKIP(1) | ROM_BIOS(1) )
+	ROM_FILL(0x20000, 0x2, 0xff)    // ROM checks for same contents at 20000 and 40000 to determine if SCSI is present
+	ROM_FILL(0x40000, 0x2, 0xaa)
+	ROM_SYSTEM_BIOS(1, "v2", "Lonely Heifers")
+	ROMX_LOAD( "342-0341-b.u6d", 0x000000, 0x010000, CRC(65341487) SHA1(bf43fa4f5a3dcbbac20f1fe1deedee0895454379), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(2) )
+	ROM_FILL(0x20000, 0x2, 0xff)
+	ROM_FILL(0x40000, 0x2, 0xaa)
+	ROM_SYSTEM_BIOS(2, "v1", "Lonely Hearts")
+	ROMX_LOAD( "342-0341-a.u6d", 0x000000, 0x010000, CRC(5095fe39) SHA1(be780580033d914b5035d60b5ebbd66bd1d28a9b), ROM_SKIP(1) | ROM_BIOS(3) )
+	ROMX_LOAD( "342-0342-a.u8d", 0x000001, 0x010000, CRC(fb766270) SHA1(679f529fbfc05f9cc98924c53457d2996dfcb1a7), ROM_SKIP(1) | ROM_BIOS(3) )
 	ROM_FILL(0x20000, 0x2, 0xff)
 	ROM_FILL(0x40000, 0x2, 0xaa)
 	ROM_SYSTEM_BIOS(3, "romdisk", "mac68k.info self-boot (1/1/2015)")
 	ROMX_LOAD( "modplus-harp2.bin", 0x000000, 0x028000, CRC(ba56078d) SHA1(debdf328ac73e1662d274a044d8750224f47edef), ROM_GROUPWORD | ROM_BIOS(4) )
 	ROM_SYSTEM_BIOS(4, "romdisk2", "bigmessofwires.com ROMinator (2/25/2015)")
-	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(5) ) 
-	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) ) 
+	ROMX_LOAD( "rominator-20150225-lo.bin", 0x000001, 0x080000, CRC(62cf2a0b) SHA1(f78ebb0919dd9e094bef7952b853b70e66d05e01), ROM_SKIP(1) | ROM_BIOS(5) )
+	ROMX_LOAD( "rominator-20150225-hi.bin", 0x000000, 0x080000, CRC(a28ba8ec) SHA1(9ddcf500727955c60db0ff24b5ca2458f53fd89a), ROM_SKIP(1) | ROM_BIOS(5) )
 ROM_END
 
 /*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT     COMPANY          FULLNAME */

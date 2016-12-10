@@ -141,7 +141,7 @@ private:
 
 	std::unique_ptr<uint8_t[]> m_fx1b_fram;
 	std::unique_ptr<uint8_t[]> m_nbajamex_sram;
-	
+
 	uint32_t m_nbajamex_rombank[2];
 
 	uint16_t m_vt83c461_latch;
@@ -1891,7 +1891,7 @@ WRITE16_MEMBER(zn_state::nbajamex_bank_w)
 	}
 
 	m_nbajamex_rombank[offset] = data;
-	
+
 	uint32_t bankbase0 = ((m_nbajamex_rombank[0] & 0x10) ? 0x200000 : 0) + (m_nbajamex_rombank[0] & 7) * 0x400000;
 	uint32_t bankbase1 = ((m_nbajamex_rombank[1] & 0x10) ? 0 : 0x200000) + (m_nbajamex_rombank[1] & 7) * 0x400000;
 
@@ -2552,6 +2552,22 @@ static INPUT_PORTS_START( zn )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "S551:3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "S551:4" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( nbajamex )
+	PORT_INCLUDE( zn )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("P3")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(3)
+
+	PORT_MODIFY("P4")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zn4w )
@@ -5111,8 +5127,8 @@ GAME( 1996, primrag2,  coh1000w, coh1000w,    primrag2, driver_device, 0, ROT0, 
 
 /* Acclaim */
 GAME( 1995, coh1000a,  0,        coh1000a,    zn,       driver_device, 0, ROT0, "Acclaim", "Acclaim PSX", MACHINE_IS_BIOS_ROOT )
-GAME( 1996, nbajamex,  coh1000a, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1996, nbajamexa, nbajamex, nbajamex,    zn,       zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, nbajamex,  coh1000a, nbajamex,    nbajamex, zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.10I)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1996, nbajamexa, nbajamex, nbajamex,    nbajamex, zn_state, nbajamex, ROT0, "Acclaim", "NBA Jam Extreme (ver. 1.04)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, jdredd,    coh1000a, jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev C Dec. 17 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1996, jdreddb,   jdredd,   jdredd,      jdredd,   driver_device, 0, ROT0, "Acclaim", "Judge Dredd (Rev B Nov. 26 1997)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 

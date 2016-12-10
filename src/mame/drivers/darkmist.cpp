@@ -13,6 +13,10 @@ driver by
 Main CPU : z80 (with encryption, external to z80)
 Sound CPU: custom T5182 cpu (like seibu sound system but with internal code)
 
+The SEI8608B sound board, which features the T5182 "CPU CUSTOM" and YM2151, also
+has unpopulated locations for a 76489AN, 2x MSM5205, 2x 27512 EPROM (presumably
+for ADPCM samples), and additional TTL chips to support all these.
+
 $e000 - coins (two bytes)
 $e2b7 - player 1 energy
 

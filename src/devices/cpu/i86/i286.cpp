@@ -242,51 +242,93 @@ void i80286_cpu_device::device_start()
 	save_item(NAME(m_amask));
 	save_item(NAME(m_shutdown));
 
-	state_add( I286_ES, "ES", m_sregs[ES] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).callimport().callexport().formatstr("%06X");
-	state_add( I286_ES_LIMIT, "ESLIMIT", m_limit[ES]).callimport().callexport().formatstr("%04X");
-	state_add( I286_ES_FLAGS, "ESFLAGS", m_rights[ES]).callimport().callexport().formatstr("%02X");
-	state_add( I286_CS, "CS", m_sregs[CS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_CS_LIMIT, "CSLIMIT", m_limit[CS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_CS_FLAGS, "CSFLAGS", m_rights[CS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_SS, "SS", m_sregs[SS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_SS_BASE, "SSBASE", m_base[SS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_SS_LIMIT, "SSLIMIT", m_limit[SS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_SS_FLAGS, "SSFLAGS", m_rights[SS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_DS, "DS", m_sregs[DS] ).callimport().callexport().formatstr("%04X");
-	state_add( I286_DS_BASE, "DSBASE", m_base[DS]).callimport().callexport().formatstr("%06X");
-	state_add( I286_DS_LIMIT, "DSLIMIT", m_limit[DS]).callimport().callexport().formatstr("%04X");
-	state_add( I286_DS_FLAGS, "DSFLAGS", m_rights[DS]).callimport().callexport().formatstr("%02X");
-	state_add( I286_GDTR_BASE, "GDTRBASE", m_gdtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_GDTR_LIMIT, "GDTRLIMIT", m_gdtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_IDTR_BASE, "IDTRBASE", m_idtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_IDTR_LIMIT, "IDTRLIMIT", m_idtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR, "LDTR", m_ldtr.sel ).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR_BASE, "LDTRBASE", m_ldtr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_LDTR_LIMIT, "LDTRLIMIT", m_ldtr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_LDTR_FLAGS, "LDTRFLAGS", m_ldtr.rights).callimport().callexport().formatstr("%02X");
-	state_add( I286_TR, "TR", m_tr.sel ).callimport().callexport().formatstr("%04X");
-	state_add( I286_TR_BASE, "TRBASE", m_tr.base).callimport().callexport().formatstr("%06X");
-	state_add( I286_TR_LIMIT, "TRLIMIT", m_tr.limit).callimport().callexport().formatstr("%04X");
-	state_add( I286_TR_FLAGS, "TRFLAGS", m_tr.rights).callimport().callexport().formatstr("%02X");
-	state_add( I286_MSW, "MSW", m_msw ).callimport().callexport().formatstr("%04X");
-	state_add( I286_VECTOR, "V", m_int_vector).callimport().callexport().formatstr("%02X");
+	state_add( I286_ES, "ES", m_sregs[ES] ).formatstr("%04X");
+	state_add( I286_ES_BASE, "ESBASE", m_base[ES]).formatstr("%06X");
+	state_add( I286_ES_LIMIT, "ESLIMIT", m_limit[ES]).formatstr("%04X");
+	state_add( I286_ES_FLAGS, "ESFLAGS", m_rights[ES]).formatstr("%02X");
+	state_add( I286_CS, "CS", m_sregs[CS] ).callimport().formatstr("%04X");
+	state_add( I286_CS_BASE, "CSBASE", m_base[CS]).callimport().formatstr("%06X");
+	state_add( I286_CS_LIMIT, "CSLIMIT", m_limit[CS]).formatstr("%04X");
+	state_add( I286_CS_FLAGS, "CSFLAGS", m_rights[CS]).formatstr("%02X");
+	state_add( I286_SS, "SS", m_sregs[SS] ).formatstr("%04X");
+	state_add( I286_SS_BASE, "SSBASE", m_base[SS]).formatstr("%06X");
+	state_add( I286_SS_LIMIT, "SSLIMIT", m_limit[SS]).formatstr("%04X");
+	state_add( I286_SS_FLAGS, "SSFLAGS", m_rights[SS]).formatstr("%02X");
+	state_add( I286_DS, "DS", m_sregs[DS] ).formatstr("%04X");
+	state_add( I286_DS_BASE, "DSBASE", m_base[DS]).formatstr("%06X");
+	state_add( I286_DS_LIMIT, "DSLIMIT", m_limit[DS]).formatstr("%04X");
+	state_add( I286_DS_FLAGS, "DSFLAGS", m_rights[DS]).formatstr("%02X");
+	state_add( I286_GDTR_BASE, "GDTRBASE", m_gdtr.base).formatstr("%06X");
+	state_add( I286_GDTR_LIMIT, "GDTRLIMIT", m_gdtr.limit).formatstr("%04X");
+	state_add( I286_IDTR_BASE, "IDTRBASE", m_idtr.base).formatstr("%06X");
+	state_add( I286_IDTR_LIMIT, "IDTRLIMIT", m_idtr.limit).formatstr("%04X");
+	state_add( I286_LDTR, "LDTR", m_ldtr.sel ).formatstr("%04X");
+	state_add( I286_LDTR_BASE, "LDTRBASE", m_ldtr.base).formatstr("%06X");
+	state_add( I286_LDTR_LIMIT, "LDTRLIMIT", m_ldtr.limit).formatstr("%04X");
+	state_add( I286_LDTR_FLAGS, "LDTRFLAGS", m_ldtr.rights).formatstr("%02X");
+	state_add( I286_TR, "TR", m_tr.sel ).formatstr("%04X");
+	state_add( I286_TR_BASE, "TRBASE", m_tr.base).formatstr("%06X");
+	state_add( I286_TR_LIMIT, "TRLIMIT", m_tr.limit).formatstr("%04X");
+	state_add( I286_TR_FLAGS, "TRFLAGS", m_tr.rights).formatstr("%02X");
+	state_add( I286_MSW, "MSW", m_msw ).formatstr("%04X");
+	state_add( I286_VECTOR, "V", m_int_vector).formatstr("%02X");
 
-	state_add(STATE_GENPC, "GENPC", m_pc).callexport().formatstr("%06X");
-	state_add(STATE_GENPCBASE, "CURPC", m_pc).callexport().formatstr("%06X");
+	state_add( I286_PC, "PC", m_pc).callimport().formatstr("%06X");
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).callimport().formatstr("%06X").noshow();
+	state_add( I8086_HALT, "HALT", m_halt ).mask(1);
+
 	m_out_shutdown_func.resolve_safe();
 }
+
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
+void i80286_cpu_device::state_import(const device_state_entry &entry)
+{
+	switch (entry.index())
+	{
+	case I286_IP:
+	case I286_CS_BASE:
+		m_pc = m_base[CS] + m_ip;
+		break;
+
+	case I286_CS:
+		// TODO: should this call data_descriptor to update the current segment?
+		break;
+
+	case STATE_GENPC:
+	case STATE_GENPCBASE:
+		if (m_pc - m_base[CS] > m_limit[CS])
+		{
+			// TODO: should this call data_descriptor instead of ignoring jumps outside the current segment?
+			if (PM)
+			{
+				m_pc = m_base[CS] + m_ip;
+			}
+			else
+			{
+				m_sregs[CS] = m_pc >> 4;
+				m_base[CS] = m_sregs[CS] << 4;
+			}
+		}
+		m_ip = m_pc - m_base[CS];
+		break;
+	}
+}
+
+
+//-------------------------------------------------
+//  state_string_export - export state as a string
+//  for the debugger
+//-------------------------------------------------
 
 void i80286_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
 {
 	switch (entry.index())
 	{
-		case STATE_GENPC:
-		case STATE_GENPCBASE:
-			str = string_format("%08X", m_base[CS] + m_ip);
-			break;
-
 		case STATE_GENFLAGS:
 			{
 				uint16_t flags = CompressFlags();

@@ -184,7 +184,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_phoenix[] = {
 	{ 0, nullptr }
 };
 
-const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {	
+const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 	{0x01, "Processor test; Processor status verification" },
 	{0x02, "Processor test 2; Read/Write and verify all CPU registers" },
 	{0x03, "Initialize chips; Disable NMI, PIE, AIE, UEI, SQWV.  Disable video, parity checking, DMA.  Reset math coprocessor.  Clear all page registers and CMOS shutdown.  Initialize DMA controller 0 and 1.  Initialize interrupt controllers 0 and 1." },
@@ -251,7 +251,7 @@ const pcipc_state::boot_state_info pcipc_state::boot_state_infos_award[] = {
 	{0xFF, "Boot loader" },
 	{ 0, nullptr }
 };
-	
+
 WRITE8_MEMBER(pcipc_state::boot_state_phoenix_w)
 {
 	const char *desc = "";
@@ -291,7 +291,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START(pcipctx, pcipc_state)
 	MCFG_CPU_ADD("maincpu", PENTIUM, 60000000)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pci:07.0:pic8259_master", pic8259_device, inta_cb)
-	
+
 	MCFG_PCI_ROOT_ADD(    ":pci")
 	MCFG_I82439TX_ADD(    ":pci:00.0", ":maincpu", 256*1024*1024)
 	MCFG_I82371SB_ISA_ADD(":pci:07.0")
@@ -309,9 +309,9 @@ ROM_START(pcipc)
 	ROM_SYSTEM_BIOS(2, "crisis", "Version 07/01/98, for flash recovery")
 	ROMX_LOAD("crisis.rom", 0x00000, 0x40000, CRC(38a1458a) SHA1(8881ac336392cca79a772b4168f63efc31f953dd), ROM_BIOS(3) )
 	ROM_SYSTEM_BIOS(3, "5hx29", "5hx29") \
-	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(4) ) 
+	ROMX_LOAD("5hx29.bin",   0x20000, 0x20000, CRC(07719a55) SHA1(b63993fd5186cdb4f28c117428a507cd069e1f68), ROM_BIOS(4) )
 	ROM_REGION(0x8000,"ibm_vga", 0)
-	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )	
+	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 ROM_START(pcipctx)
@@ -320,7 +320,7 @@ ROM_START(pcipctx)
 	ROMX_LOAD("gb_ga586t2.bin",  0x20000, 0x20000, CRC(3a50a6e1) SHA1(dea859b4f1492d0d08aacd260ed1e83e00ebac08), ROM_BIOS(1))
 
 	ROM_REGION(0x8000,"ibm_vga", 0)
-	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )	
+	ROM_LOAD("ibm-vga.bin", 0x00000, 0x8000, BAD_DUMP CRC(74e3fadb) SHA1(dce6491424f1726203776dfae9a967a98a4ba7b5) )
 ROM_END
 
 static INPUT_PORTS_START(pcipc)

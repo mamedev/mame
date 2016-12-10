@@ -1124,28 +1124,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-
-	AM_RANGE(0x0C2010, 0x0C2011) AM_READ_PORT("IN0")
-	AM_RANGE(0x0C2012, 0x0C2013) AM_READ(atombjt_unkr_r)
-	AM_RANGE(0x0C2014, 0x0C2015) AM_READ(atombjt_unkr_r)
-
-	AM_RANGE(0x0C2016, 0x0C2017) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0C2018, 0x0C2019) AM_READ_PORT("DSW2")
-
-	AM_RANGE(0x100000, 0x101fff) AM_RAM
-
-	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
-	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
-
-	AM_RANGE(0x080014, 0x080015) AM_WRITE(nmk_flipscreen_w)
-//  AM_RANGE(0x084000, 0x084001) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
-//  AM_RANGE(0x084010, 0x084011) AM_DEVREADWRITE8("oki2", okim6295_device, read, write, 0x00ff)
-//  AM_RANGE(0x084020, 0x08402f) AM_DEVWRITE("nmk112", nmk112_device, okibank_lsb_w)
+	AM_RANGE(0x080014, 0x080015) AM_NOP // always 1 in this bootleg. Flip-screen switch not present according to dip sheet.
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x094000, 0x094001) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x094002, 0x094003) AM_WRITENOP    /* IRQ enable? */
 	AM_RANGE(0x09c000, 0x09cfff) AM_MIRROR(0x1000) AM_RAM_WRITE(nmk_bgvideoram0_w) AM_SHARE("nmk_bgvideoram0")
+	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
+	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
+	AM_RANGE(0x0c2014, 0x0c2015) AM_READ(atombjt_unkr_r)
+	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
+//	AM_RANGE(0x0c201c, 0x0c201d) // oki banking related?
+	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
+	AM_RANGE(0x100000, 0x101fff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vandyke )
@@ -2956,6 +2948,20 @@ static INPUT_PORTS_START( bjtwin )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( atombjt ) // verified with dip sheet
+	PORT_INCLUDE(bjtwin)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) )       PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( nouryoku )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -3977,6 +3983,7 @@ static MACHINE_CONFIG_START( mustangb, nmk16_state )
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
@@ -4163,6 +4170,7 @@ static MACHINE_CONFIG_START( tdragonb, nmk16_state )    /* bootleg using Raiden 
 
 	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
 	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
 	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
 	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
@@ -4631,7 +4639,7 @@ static MACHINE_CONFIG_START( atombjt, nmk16_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki1", 16000000/4, OKIM6295_PIN7_LOW) // ?? mhz, I see no 16 crystal
+	MCFG_OKIM6295_ADD("oki1", 10000000/8, OKIM6295_PIN7_LOW) // divider and pin not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
@@ -7912,11 +7920,11 @@ GAME( 1992, sabotenb, 0,        bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,
 GAME( 1992, sabotenba,sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "NMK / Tecmo",                  "Saboten Bombers (set 2)", MACHINE_NO_COCKTAIL )
 GAME( 1992, cactus,   sabotenb, bjtwin,   sabotenb, nmk16_state, nmk,      ROT0,   "bootleg",                      "Cactus (bootleg of Saboten Bombers)", MACHINE_NO_COCKTAIL ) // PCB marked 'Cactus', no title screen
 
-GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
-GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin, driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
-GAME( 1993, bjtwinpa, bjtwin,   bjtwin,   bjtwin, nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
-GAME( 1993, atombjt,  bjtwin,   atombjt,  bjtwin, driver_device, 0,        ROT270, "bootleg",                      "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw (playmark hardware?)
+GAME( 1993, bjtwin,   0,        bjtwin,   bjtwin,  nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 1)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwina,  bjtwin,   bjtwin,   bjtwin,  nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (set 2)", MACHINE_NO_COCKTAIL )
+GAME( 1993, bjtwinp,  bjtwin,   bjtwin,   bjtwin,  driver_device, 0,        ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 1)", MACHINE_NO_COCKTAIL ) // Cheap looking PCB, but Genuine NMK PCB, GFX aren't encrypted (maybe Korean version not proto?)
+GAME( 1993, bjtwinpa, bjtwin,   bjtwin,   bjtwin,  nmk16_state,   bjtwin,   ROT270, "NMK",                          "Bombjack Twin (prototype? with adult pictures, set 2)", MACHINE_NO_COCKTAIL ) // same PCB as above, different program revision, GFX are encrypted
+GAME( 1993, atombjt,  bjtwin,   atombjt,  atombjt, driver_device, 0,        ROT270, "bootleg (Kyon K.)",            "Atom (bootleg of Bombjack Twin)", MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // some non-trivial mods to the gfx and sound hw (playmark hardware?)
 
 
 GAME( 1995, nouryoku, 0,        bjtwin,   nouryoku, nmk16_state,   nmk,      ROT0,   "Tecmo",                        "Nouryoku Koujou Iinkai", MACHINE_NO_COCKTAIL )

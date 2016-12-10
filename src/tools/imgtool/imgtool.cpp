@@ -520,7 +520,7 @@ imgtoolerr_t imgtool::image::list_partitions(std::vector<imgtool::partition_info
 		// default implementation
 		partitions.emplace_back(module().imgclass, 0, ~0);
 	}
-	return IMGTOOLERR_SUCCESS;	
+	return IMGTOOLERR_SUCCESS;
 }
 
 
@@ -646,7 +646,7 @@ imgtoolerr_t imgtool::partition::open(imgtool::image &image, int partition_index
 	if ((partition_index < 0) || (partition_index >= partitions.size()) || (!partitions[partition_index].imgclass().get_info && !partitions[partition_index].imgclass().derived_get_info))
 		return IMGTOOLERR_INVALIDPARTITION;
 
-	// use this partition 
+	// use this partition
 	const imgtool_class &imgclass(partitions[partition_index].imgclass());
 	uint64_t base_block = partitions[partition_index].base_block();
 	uint64_t block_count = partitions[partition_index].block_count();

@@ -1,9 +1,9 @@
 {
   "plugin": {
-    "name": "cheat",
+	"name": "cheat",
 	"description": "Cheat plugin",
-    "version": "0.0.1",
-    "author": "Carl",
+	"version": "0.0.1",
+	"author": "Carl",
 	"type": "plugin",
 	"start": "false"
   }

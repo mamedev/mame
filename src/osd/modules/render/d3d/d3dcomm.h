@@ -155,7 +155,7 @@ private:
 	vec2f                   m_rawdims;                  // raw dims of the texture
 	int                     m_type;                     // what type of texture are we?
 	int                     m_xprescale, m_yprescale;   // X/Y prescale factor
-	int						m_xborderpix, m_yborderpix;	// X/Y border pixels
+	int                     m_xborderpix, m_yborderpix; // X/Y border pixels
 	int                     m_cur_frame;                // what is our current frame?
 	IDirect3DTexture9 *     m_d3dtex;                   // Direct3D texture pointer
 	IDirect3DSurface9 *     m_d3dsurface;               // Direct3D offscreen plain surface pointer

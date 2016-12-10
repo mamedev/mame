@@ -105,6 +105,13 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 		switch(mode) {
 		case 0x4:
 			return m_r[abase];
+			
+		case 0x5:	// address of this instruction + the offset dword + 8
+			// which in reality is "address of next instruction + the offset dword"
+			ret = m_direct->read_dword(m_IP);
+			m_IP += 4;
+			ret += m_IP;
+			return ret;
 
 		case 0x7:
 			return m_r[abase] + (m_r[index] << scale);
@@ -357,6 +364,7 @@ void i960_cpu_device::bxx(uint32_t opcode, int mask)
 {
 	if(m_AC & mask) {
 		m_IP += get_disp(opcode);
+		m_IP &= ~3;
 	}
 }
 
@@ -364,6 +372,7 @@ void i960_cpu_device::bxx_s(uint32_t opcode, int mask)
 {
 	if(m_AC & mask) {
 		m_IP += get_disp_s(opcode);
+		m_IP &= ~3;
 	}
 }
 
@@ -1067,6 +1076,20 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				t2 = get_2_ri(opcode);
 				cmp_s(t1, t2);
 				set_ri(opcode, t2-1);
+				break;
+				
+			case 0xc: // scanbyte
+				m_icount -= 2;
+				m_AC &= ~7;		// clear CC
+				t1 = get_1_ri(opcode);
+				t2 = get_2_ri(opcode);
+				if ((t1 & 0xff000000) == (t2 & 0xff000000) ||
+					(t1 & 0x00ff0000) == (t2 & 0x00ff0000) ||
+					(t1 & 0x0000ff00) == (t2 & 0x0000ff00) ||
+					(t1 & 0x000000ff) == (t2 & 0x000000ff))
+				{
+					m_AC |= 2;
+				}
 				break;
 
 			case 0xe: // chkbit

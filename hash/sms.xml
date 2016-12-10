@@ -7600,10 +7600,10 @@
 				<rom name="SG11004A 79ST0086END 9045" size="0x080000" crc="cdbfe86e" sha1="83d6f261471dca20f8d2e33b9807d670e9b4eb9c" offset="000000" />
 			</dataarea>
 			<dataarea name="ram" size="16384">
-			</dataarea> 
+			</dataarea>
 		</part>
 	</software>
-    
+
 <!-- The next items have been compiled from original source code written by Jeroen Tel.
   It is unsure if Probe has ever written any game code for these licensed titles -->
 

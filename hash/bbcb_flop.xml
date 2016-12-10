@@ -50,11 +50,11 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="alps.rom" size="16384" crc="75e5219e" sha1="bb03788d7f58e222795f460767bcdf198c21140a" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="alps.rom" size="16384" crc="75e5219e" sha1="bb03788d7f58e222795f460767bcdf198c21140a" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -360,12 +360,12 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom1" interface="bbc_rom">
-			<feature name="part_id" value="Dragon ROM"/>
-			<dataarea name="rom" size="16384">
-				<rom name="dragon_rom.bin" size="16384" crc="6d92ca4f" sha1="1f5df3ffb0b982881e52bbf00b29f52e5e32d868" offset="0" />
-			</dataarea>
-		</part>
+        <part name="rom1" interface="bbc_rom">
+            <feature name="part_id" value="Dragon ROM"/>
+            <dataarea name="rom" size="16384">
+                <rom name="dragon_rom.bin" size="16384" crc="6d92ca4f" sha1="1f5df3ffb0b982881e52bbf00b29f52e5e32d868" offset="0" />
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -721,13 +721,13 @@
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Side 1"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" offset="0" />
+				<rom name="The Times Crosswords Volume 1-Side1.ssd" size="102400" crc="9b84fe62" sha1="d1ccb5057557cc380a9839cbf365bd0bb4dfe1a3" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="flop" size="102400">
-				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="59bf18805722ef0e6b3672d35f9ac7192936f3b3" offset="0" />
+				<rom name="The Times Crosswords Volume 1-Side2.ssd" size="102400" crc="6328fef8" sha1="02ee8578ad37ac07a52ba4114dd448fba1d80c62" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -1074,11 +1074,11 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="viewspell v1.0 (1985)(acornsoft).bin" size="16384" crc="224a0fbc" sha1="251ffce5b169d8e09d89f38b7eee4176533f8e8d" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="viewspell v1.0 (1985)(acornsoft).bin" size="16384" crc="224a0fbc" sha1="251ffce5b169d8e09d89f38b7eee4176533f8e8d" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -1299,11 +1299,11 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="bcpl v7.0 (1982)(richards computer products).bin" size="16384" crc="81c373b2" sha1="09ff6358ff4c58046f4531abe739a888898cb8d3" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="bcpl v7.0 (1982)(richards computer products).bin" size="16384" crc="81c373b2" sha1="09ff6358ff4c58046f4531abe739a888898cb8d3" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -1342,16 +1342,16 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="pascal v1.1-1 (19xx)(-).bin" size="16384" crc="ed1a7497" sha1="44cfe2d7fb0895a6c8858f09aaf5a96bcdcc3767" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="rom2" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="pascal v1.1-2 (19xx)(-).bin" size="16384" crc="73455b67" sha1="0e2354e8d93d9858dbd9d24dfa0aa96a206b0b25" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom1" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="pascal v1.1-1 (19xx)(-).bin" size="16384" crc="ed1a7497" sha1="44cfe2d7fb0895a6c8858f09aaf5a96bcdcc3767" offset="0"/>
+            </dataarea>
+        </part>
+        <part name="rom2" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="pascal v1.1-2 (19xx)(-).bin" size="16384" crc="73455b67" sha1="0e2354e8d93d9858dbd9d24dfa0aa96a206b0b25" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -1367,16 +1367,16 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom1" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="logo 1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0"/>
-			</dataarea>
-		</part>
-		<part name="rom2" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="logo 2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom1" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="logo 1.rom" size="16384" crc="a0defcf9" sha1="57fdd30894679400cb7c10b331cefd1a2362aeae" offset="0"/>
+            </dataarea>
+        </part>
+        <part name="rom2" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="logo 2.rom" size="16384" crc="753ab82e" sha1="9a22a865ae594a91f0c3c4a88861ae6050d025c3" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 
@@ -1390,11 +1390,11 @@
 			</dataarea>
 		</part>
 <!--
-		<part name="rom" interface="bbc_rom">
-			<dataarea name="rom" size="16384">
-				<rom name="oxford pascal v2.1 (19xx)(oxford computers).bin" size="16384" crc="771cd1da" sha1="898229668f03f0c5cdb73a0e59687175553c1692" offset="0"/>
-			</dataarea>
-		</part>
+        <part name="rom" interface="bbc_rom">
+            <dataarea name="rom" size="16384">
+                <rom name="oxford pascal v2.1 (19xx)(oxford computers).bin" size="16384" crc="771cd1da" sha1="898229668f03f0c5cdb73a0e59687175553c1692" offset="0"/>
+            </dataarea>
+        </part>
 -->
 	</software>
 

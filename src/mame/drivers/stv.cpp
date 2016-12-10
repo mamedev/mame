@@ -3387,7 +3387,7 @@ GAME( 1997, cotton2,   stvbios, stv,      stv, stv_state,        cotton2,    ROT
 GAME( 1998, cottonbm,  stvbios, stv,      stv, stv_state,        cottonbm,   ROT0,   "Success",                      "Cotton Boomerang (JUET 980709 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1995, critcrsh,  stvbios, stv,      critcrsh, stv_state,   critcrsh,   ROT0,   "Sega",                         "Critter Crusher (EA 951204 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1999, danchih,   stvbios, stv,      stvmp, stv_state,      danchih,    ROT0,   "Altron (Tecmo license)",       "Danchi de Hanafuda (J 990607 V1.400)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 2000, danchiq,   stvbios, stv,      stv, stv_state,        danchiq,    ROT0,   "Altron",                       "Danchi de Quiz Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 2000, danchiq,   stvbios, stv,      stv, stv_state,        danchiq,    ROT0,   "Altron",                       "Danchi de Quiz: Okusan Yontaku Desuyo! (J 001128 V1.200)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, diehard,   stvbios, stv,      stv, stv_state,        diehard,    ROT0,   "Sega",                         "Die Hard Arcade (UET 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1996, dnmtdeka,  diehard, stv,      stv, stv_state,        dnmtdeka,   ROT0,   "Sega",                         "Dynamite Deka (J 960515 V1.000)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND  )
 GAME( 1995, ejihon,    stvbios, stv,      stv, stv_state,        stv,        ROT0,   "Sega",                         "Ejihon Tantei Jimusyo (J 950613 V1.000)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
@@ -3503,7 +3503,6 @@ This is the known list of undumped ST-V games:
     Name Club (other versions)
     Print Club 2 (other versions)
     Youen Denshi Mahjong Yuugi Gal Jan
-    Danchi de Quiz: Okusan 4taku Desu yo!
     NBA Action (?)
     Quiz Omaeni Pipon Cho! (?)
 Others may exist as well...

@@ -43,6 +43,7 @@ FLOPPY_FORMATS_MEMBER( isbc_218a_device::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( isbc_218a_floppies )
+	SLOT_INTERFACE( "8dd", FLOPPY_8_DSDD )
 	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
 SLOT_INTERFACE_END
 
@@ -105,6 +106,13 @@ void isbc_218a_device::device_reset()
 {
 	m_reset = false;
 	m_motor = false;
+	// set from jumper all drives must be same type
+	m_fd8 = m_floppy0->get_device()->get_form_factor() == floppy_image::FF_8;
+	if(m_fd8)
+	{
+		m_floppy0->get_device()->mon_w(0);
+		m_fdc->set_rate(500000);
+	}
 }
 
 
@@ -171,7 +179,8 @@ void isbc_218a_device::mcs1_w(address_space &space, offs_t offset, uint8_t data)
 		break;
 	case 4:
 		m_motor = data & 1;
-		m_floppy0->get_device()->mon_w(!(data & 1));
+		if(!m_fd8)
+			m_floppy0->get_device()->mon_w(!(data & 1));
 		break;
 	case 6: m_fdc->tc_w(data & 1); break;
 	}

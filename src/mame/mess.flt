@@ -309,6 +309,7 @@ lisa.cpp
 llc.cpp
 lola8a.cpp
 lviv.cpp
+lwriter.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -318,6 +319,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+magnum.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
