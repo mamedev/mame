@@ -44,34 +44,40 @@
 //**************************************************************************
 
 #define MCFG_PIT68230_PA_INPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pa_in_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pa_in_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PA_OUTPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pa_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pa_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_INPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pb_in_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pb_in_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PB_OUTPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pb_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pb_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_INPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pc_in_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pc_in_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_PC_OUTPUT_CB(_devcb) \
-		devcb = &pit68230_device::set_pc_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_pc_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H1_CB(_devcb) \
-		devcb = &pit68230_device::set_h1_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_h1_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H2_CB(_devcb) \
-		devcb = &pit68230_device::set_h2_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_h2_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H3_CB(_devcb) \
-		devcb = &pit68230_device::set_h3_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_h3_out_callback (*device, DEVCB_##_devcb);
 
 #define MCFG_PIT68230_H4_CB(_devcb) \
-		devcb = &pit68230_device::set_h4_out_callback (*device, DEVCB_##_devcb);
+	devcb = &pit68230_device::set_h4_out_callback (*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_TIMER_IRQ_CB(_devcb) \
+	devcb = &pit68230_device::set_tirq_out_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_PIT68230_PORT_IRQ_CB(_devcb) \
+	devcb = &pit68230_device::set_pirq_out_callback(*device, DEVCB_##_devcb);
 
 /*-----------------------------------------------------------------------
  * Registers                RS1-RS5   R/W Description
@@ -119,13 +125,14 @@ class pit68230_device :  public device_t//, public device_execute_interface
 	template<class _Object> static devcb_base &set_h2_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h2_out_cb.set_callback (object); }
 	template<class _Object> static devcb_base &set_h3_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h3_out_cb.set_callback (object); }
 	template<class _Object> static devcb_base &set_h4_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_h4_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_tirq_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_tirq_out_cb.set_callback (object); }
+	template<class _Object> static devcb_base &set_pirq_out_callback (device_t &device, _Object object){ return downcast<pit68230_device &>(device).m_pirq_out_cb.set_callback (object); }
 
 	DECLARE_WRITE8_MEMBER (write);
 	DECLARE_READ8_MEMBER (read);
 
 	void h1_set (uint8_t state);
 	void portb_setbit (uint8_t bit, uint8_t state);
-	void tick_clock();
 
 	// Bit updaters
 	void pa_update_bit(uint8_t bit, uint8_t state);
@@ -286,10 +293,17 @@ protected:
 		REG_TCR_TOUT_PC7_INT    = 0xe0, // 1 1 1
 	};
 
+	void tick_clock();
+
 	// device-level overrides
 	virtual void device_start () override;
 	virtual void device_reset () override;
 	virtual void device_timer (emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+
+	// Interrupt methods
+	void trigger_interrupt(int source);
+	uint8_t irq_tiack();
+	uint8_t irq_piack();
 
 	int m_icount;
 
@@ -303,8 +317,10 @@ protected:
 	devcb_write_line    m_h2_out_cb;
 	devcb_write_line    m_h3_out_cb;
 	devcb_write_line    m_h4_out_cb;
+	devcb_write_line    m_tirq_out_cb;
+	devcb_write_line    m_pirq_out_cb;
 
-	// peripheral ports
+	// registers
 	uint8_t m_pgcr;           // Port General Control register
 	uint8_t m_psrr;           // Port Service Request register
 	uint8_t m_paddr;          // Port A Data Direction register
@@ -322,6 +338,13 @@ protected:
 	int 	m_cpr;            // Counter Preload Registers (3 x 8 = 24 bits)
 	int   	m_cntr;           // - The 24 bit Counter
 	uint8_t m_tsr;            // Timer Status Register
+
+
+	// Interrupt sources
+	enum
+	{
+		INT_TIMER
+	};
 
 	// Timers
 	emu_timer *pit_timer;
