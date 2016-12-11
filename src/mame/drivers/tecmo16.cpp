@@ -13,7 +13,7 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title
+- wrong background in fstarfrc title (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
