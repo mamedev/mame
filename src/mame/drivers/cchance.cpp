@@ -39,19 +39,20 @@ cha3    $10d8
 #include "includes/tnzs.h"
 #include "sound/ay8910.h"
 
-class cchance_state : public tnzs_state
+class cchance_state : public tnzs_base_state
 {
 public:
 	cchance_state(const machine_config &mconfig, device_type type, const char *tag)
-		: tnzs_state(mconfig, type, tag) { }
+		: tnzs_base_state(mconfig, type, tag) { }
+
+	void machine_reset() override;
+	void machine_start() override;
 
 	uint8_t m_hop_io;
 	uint8_t m_bell_io;
 	DECLARE_WRITE8_MEMBER(output_0_w);
 	DECLARE_READ8_MEMBER(input_1_r);
 	DECLARE_WRITE8_MEMBER(output_1_w);
-	DECLARE_MACHINE_START(cchance);
-	DECLARE_MACHINE_RESET(cchance);
 };
 
 
@@ -191,18 +192,17 @@ static GFXDECODE_START( cchance )
 	GFXDECODE_ENTRY( "gfx1", 0, cchance_layout,   0x0, 32  )
 GFXDECODE_END
 
-MACHINE_START_MEMBER(cchance_state,cchance)
+void cchance_state::machine_start()
 {
 	save_item(NAME(m_hop_io));
 	save_item(NAME(m_bell_io));
 }
 
-MACHINE_RESET_MEMBER(cchance_state,cchance)
+void cchance_state::machine_reset()
 {
-	m_mcu_type = -1;
+	tnzs_base_state::machine_reset();
 	m_hop_io = 0;
 	m_bell_io = 0;
-
 }
 
 static MACHINE_CONFIG_START( cchance, cchance_state )
@@ -210,9 +210,6 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_CPU_ADD("maincpu", Z80,4000000)         /* ? MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cchance_state,  irq0_line_hold)
-
-	MCFG_MACHINE_START_OVERRIDE(cchance_state,cchance)
-	MCFG_MACHINE_RESET_OVERRIDE(cchance_state,cchance)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", cchance)
 
@@ -230,7 +227,7 @@ static MACHINE_CONFIG_START( cchance, cchance_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 512)
-	MCFG_PALETTE_INIT_OWNER(cchance_state,arknoid2)
+	MCFG_PALETTE_INIT_OWNER(tnzs_base_state, prompalette)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
