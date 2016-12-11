@@ -28,6 +28,7 @@
 #undef min
 #undef max
 #include <utility>
+#include <iostream>
 
 //============================================================
 //  PROTOTYPES
@@ -1061,7 +1062,11 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 
 int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
+	static double ct = 0;
+
 	int next_index = source_index;
+	float dt;
+	double t;
 
 	// skip phosphor if no influencing settings
 	if (options->phosphor[0] == 0.0f && options->phosphor[1] == 0.0f && options->phosphor[2] == 0.0f)
@@ -1069,11 +1074,16 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 		return next_index;
 	}
 
+	// Shader needs time between last update
+	t = machine->time().as_double();
+	dt = (float) (t - ct);
+	ct = t;
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
+	curr_effect->set_float("dt", dt);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
