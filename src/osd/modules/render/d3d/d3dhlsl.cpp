@@ -28,7 +28,6 @@
 #undef min
 #undef max
 #include <utility>
-#include <iostream>
 
 //============================================================
 //  PROTOTYPES
