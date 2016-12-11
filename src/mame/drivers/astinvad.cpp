@@ -39,7 +39,8 @@ enum
 	SND_FLEET2,
 	SND_FLEET3,
 	SND_FLEET4,
-	SND_UFOHIT
+	SND_UFOHIT,
+	SND_BONUS
 };
 
 
@@ -370,7 +371,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	if (bits_gone_hi & 0x02) m_samples->start(1, SND_SHOT);
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
-	if (bits_gone_hi & 0x10) m_samples->start(3, SND_INVADERHIT);
+	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
 
 	machine().sound().system_enable(data & 0x20);
 }
@@ -404,7 +405,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
 	if (bits_gone_hi & 0x02) m_samples->start(1, SND_SHOT);
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
-
+	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
 	machine().sound().system_enable(data & 0x20);
 	m_screen_red = data & 0x04; // ?
 }
@@ -640,6 +641,7 @@ static const char *const astinvad_sample_names[] =
 	"6",
 	"7",
 	"8",
+	"9",
 	nullptr
 };
 
