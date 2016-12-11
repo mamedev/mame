@@ -134,7 +134,7 @@ public:
 			uint8_t *font = m_lcd_char_rom->base();
 			if (m_lcd_mode & LCD_MODE_ALT)
 			{
-				font += 1024;
+				font += 2048;
 			}
 
 			int chrw = (m_lcd_size & LCD_SIZE_CHRW) ? 8 : 6;
