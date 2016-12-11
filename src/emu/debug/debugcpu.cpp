@@ -220,7 +220,7 @@ bool debugger_cpu::comment_save()
 	bool comments_saved = false;
 
 	// if we don't have a root, bail
-	xml_data_node *const root = xml_data_node::file_create();
+	util::xml::data_node *const root = util::xml::data_node::file_create();
 	if (root == nullptr)
 		return false;
 
@@ -228,13 +228,13 @@ bool debugger_cpu::comment_save()
 	try
 	{
 		// create a comment node
-		xml_data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
+		util::xml::data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
 		if (commentnode == nullptr)
 			throw emu_exception();
 		commentnode->set_attribute_int("version", COMMENT_VERSION);
 
 		// create a system node
-		xml_data_node *const systemnode = commentnode->add_child("system", nullptr);
+		util::xml::data_node *const systemnode = commentnode->add_child("system", nullptr);
 		if (systemnode == nullptr)
 			throw emu_exception();
 		systemnode->set_attribute("name", m_machine.system().name);
@@ -245,7 +245,7 @@ bool debugger_cpu::comment_save()
 			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
-				xml_data_node *const curnode = systemnode->add_child("cpu", nullptr);
+				util::xml::data_node *const curnode = systemnode->add_child("cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
 				curnode->set_attribute("tag", device.tag());
@@ -295,7 +295,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	xml_data_node *const root = xml_data_node::file_read(file, nullptr);
+	util::xml::data_node *const root = util::xml::data_node::file_read(file, nullptr);
 	try
 	{
 		// read the file
@@ -303,7 +303,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 			throw emu_exception();
 
 		// find the config node
-		xml_data_node const *const commentnode = root->get_child("mamecommentfile");
+		util::xml::data_node const *const commentnode = root->get_child("mamecommentfile");
 		if (commentnode == nullptr)
 			throw emu_exception();
 
@@ -313,13 +313,13 @@ bool debugger_cpu::comment_load(bool is_inline)
 			throw emu_exception();
 
 		// check to make sure the file is applicable
-		xml_data_node const *const systemnode = commentnode->get_child("system");
+		util::xml::data_node const *const systemnode = commentnode->get_child("system");
 		const char *const name = systemnode->get_attribute_string("name", "");
 		if (strcmp(name, m_machine.system().name) != 0)
 			throw emu_exception();
 
 		// iterate over devices
-		for (xml_data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
+		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
 		{
 			const char *cputag_name = cpunode->get_attribute_string("tag", "");
 			device_t *device = m_machine.device(cputag_name);
@@ -2539,12 +2539,12 @@ const char *device_debug::comment_text(offs_t addr) const
 //  given XML data node
 //-------------------------------------------------
 
-bool device_debug::comment_export(xml_data_node &curnode)
+bool device_debug::comment_export(util::xml::data_node &curnode)
 {
 	// iterate through the comments
 	for (const auto & elem : m_comment_set)
 	{
-		xml_data_node *datanode = curnode.add_child("comment", xml_normalize_string(elem.m_text.c_str()));
+		util::xml::data_node *datanode = curnode.add_child("comment", util::xml::normalize_string(elem.m_text.c_str()));
 		if (datanode == nullptr)
 			return false;
 		datanode->set_attribute_int("address", elem.m_address);
@@ -2560,10 +2560,10 @@ bool device_debug::comment_export(xml_data_node &curnode)
 //  given XML data node
 //-------------------------------------------------
 
-bool device_debug::comment_import(xml_data_node const &cpunode, bool is_inline)
+bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_inline)
 {
 	// iterate through nodes
-	for (xml_data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
+	for (util::xml::data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
 	{
 		// extract attributes
 		offs_t address = datanode->get_attribute_int("address", 0);
