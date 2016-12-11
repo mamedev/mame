@@ -371,7 +371,7 @@ WRITE32_MEMBER(atlantis_state::status_leds_w)
 			}
 			//popmessage("LED: %c", digit);
 			osd_printf_debug("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
-			logerror("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
+			if (0) logerror("%06X: status_leds_w digit: %c %08x = %02x\n", machine().device("maincpu")->safe_pc(), digit, offset, data);
 		}
 	}
 }
