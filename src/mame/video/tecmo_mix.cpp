@@ -91,23 +91,23 @@ void tecmo_mix_device::set_bgpen(device_t &device, int bgpen)
 
 uint32_t tecmo_mix_device::sum_colors (const pen_t *pal, int c1_idx, int c2_idx)
 {
-	pen_t c1 = pal [c1_idx];
-	pen_t c2 = pal [c2_idx];
-	
-	uint8_t c1_a = c1 >> 24;
-	uint8_t c1_r = c1 >> 16;
-	uint8_t c1_g = c1 >> 8;
-	uint8_t c1_b = c1;
+	const pen_t c1 = pal [c1_idx];
+	const pen_t c2 = pal [c2_idx];
 
-	uint8_t c2_a = c2 >> 24;
-	uint8_t c2_r = c2 >> 16;
-	uint8_t c2_g = c2 >> 8;
-	uint8_t c2_b = c2;
+	const int c1_a = (c1 >> 24) & 0xFF;
+	const int c1_r = (c1 >> 16) & 0xFF;
+	const int c1_g = (c1 >> 8)  & 0xFF;
+	const int c1_b = c1 & 0xFF;
 
-	uint8_t a = std::min (0xFF, c1_a + c2_a);
-	uint8_t r = std::min (0xFF, c1_r + c2_r);
-	uint8_t g = std::min (0xFF, c1_g + c2_g);
-	uint8_t b = std::min (0xFF, c1_b + c2_b);
+	const int c2_a = (c2 >> 24) & 0xFF;
+	const int c2_r = (c2 >> 16) & 0xFF;
+	const int c2_g = (c2 >> 8)  & 0xFF;
+	const int c2_b = c2 & 0xFF;
+
+	const uint8_t a = std::min (0xFF, c1_a + c2_a);
+	const uint8_t r = std::min (0xFF, c1_r + c2_r);
+	const uint8_t g = std::min (0xFF, c1_g + c2_g);
+	const uint8_t b = std::min (0xFF, c1_b + c2_b);
 
 	return ((a << 24) | (r << 16) | (g << 8) | b);
 }
