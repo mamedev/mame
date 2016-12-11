@@ -2523,6 +2523,24 @@ ROM_START( gldncrwn )
 	ROM_LOAD("gcrpal.bin", 0, 8 , CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7))
 ROM_END
 
+ROM_START( gldncrwnhop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("95752007.gam", 0x00000, 0x10000, CRC(ba009ab7) SHA1(df58f5ff4e9fdf8db5931833b909fb0e4ba8e23d))
+
+	ROM_REGION( 0x20000, "adder2", 0 )
+	ROM_LOAD("95770146.vid", 0x00000, 0x20000, CRC(f3109cd5) SHA1(8da5207c07015d6f5a72397eaa6ab70800785f7f))
+
+	ROM_REGION( 0x20000, "upd", 0 )
+	ROM_LOAD("95770139.snd", 0x00000, 0x20000, CRC(e76ca414) SHA1(2c441e3369e374c033b5585e8f6a9c34a4c5ec0f))
+
+	ROM_REGION( 0x40000, "gfx1", ROMREGION_ERASEFF )
+	ROM_LOAD("95770147.chr", 0x00000, 0x20000, CRC(5a4d2b79) SHA1(c2f2f39ef6816e0da1b2ff4b723612c671c6215f))
+
+	ROM_REGION( 0x10, "proms", 0 )
+	ROM_LOAD("gcrpal.bin", 0, 8 , BAD_DUMP CRC(4edd5a1d) SHA1(d6fe38377d5f2291d33ee8ed808548871e63c4d7)) // This was missing with dump, using gldncrwn
+ROM_END
+
+
 // ROM definition Dutch Paradice //////////////////////////////////////////
 
 ROM_START( paradice )
@@ -7646,6 +7664,7 @@ GAMEL( 1996, sltblgpo, 0,         scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsb
 GAMEL( 1996, sltblgp1, sltblgpo,  scorpion2_vid, sltblgpo, bfm_sc2_state,  sltsbelg,   0,       "BFM/ELAM", "Slots (Belgian Cash, Game Card 95-752-008)",   MACHINE_SUPPORTS_SAVE,layout_sltblgpo )
 
 GAMEL( 1997, gldncrwn, 0,         scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown (Dutch, Game Card 95-752-011)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
+GAMEL( 1997, gldncrwnhop,gldncrwn,scorpion2_vid, gldncrwn, bfm_sc2_state,  gldncrwn,   0,       "BFM/ELAM", "Golden Crown Hopper (Dutch, Game Card)",   MACHINE_SUPPORTS_SAVE,layout_gldncrwn )
 
 /* Non-Video */
 

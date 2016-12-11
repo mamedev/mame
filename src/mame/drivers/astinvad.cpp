@@ -39,7 +39,8 @@ enum
 	SND_FLEET2,
 	SND_FLEET3,
 	SND_FLEET4,
-	SND_UFOHIT
+	SND_UFOHIT,
+	SND_BONUS
 };
 
 
@@ -53,31 +54,15 @@ public:
 	};
 
 	astinvad_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_ppi8255_0(*this, "ppi8255_0"),
-		m_ppi8255_1(*this, "ppi8255_1"),
-		m_palette(*this, "palette"),
-		m_videoram(*this, "videoram"),
-		m_samples(*this, "samples"),
-		m_screen(*this, "screen"){ }
-
-	required_device<cpu_device> m_maincpu;
-	optional_device<i8255_device>  m_ppi8255_0;
-	optional_device<i8255_device>  m_ppi8255_1;
-	required_device<palette_device> m_palette;
-	required_shared_ptr<uint8_t> m_videoram;
-
-	std::unique_ptr<uint8_t[]>    m_colorram;
-	emu_timer  *m_int_timer;
-	uint8_t      m_sound_state[2];
-	uint8_t      m_screen_flip;
-	uint8_t      m_screen_red;
-	uint8_t      m_flip_yoffs;
-	uint8_t      m_color_latch;
-
-	required_device<samples_device> m_samples;
-	required_device<screen_device> m_screen;
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ppi8255_0(*this, "ppi8255_0")
+		, m_ppi8255_1(*this, "ppi8255_1")
+		, m_palette(*this, "palette")
+		, m_videoram(*this, "videoram")
+		, m_samples(*this, "samples")
+		, m_screen(*this, "screen")
+		{ }
 
 	DECLARE_WRITE8_MEMBER(color_latch_w);
 	DECLARE_WRITE8_MEMBER(spaceint_videoram_w);
@@ -99,13 +84,31 @@ public:
 	DECLARE_MACHINE_RESET(spaceint);
 	DECLARE_VIDEO_START(spaceint);
 	uint32_t screen_update_astinvad(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_spaceint(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(kamikaze_int_off);
 	TIMER_CALLBACK_MEMBER(kamizake_int_gen);
+
+private:
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	void plot_byte( bitmap_rgb32 &bitmap, uint8_t y, uint8_t x, uint8_t data, uint8_t color );
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	std::unique_ptr<uint8_t[]>    m_colorram;
+	emu_timer  *m_int_timer;
+	uint8_t      m_sound_state[2];
+	uint8_t      m_screen_flip;
+	uint8_t      m_screen_red;
+	uint8_t      m_flip_yoffs;
+	uint8_t      m_color_latch;
+	bool         m_player;
+
+	required_device<cpu_device> m_maincpu;
+	optional_device<i8255_device>  m_ppi8255_0;
+	optional_device<i8255_device>  m_ppi8255_1;
+	required_device<palette_device> m_palette;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_device<samples_device> m_samples;
+	required_device<screen_device> m_screen;
 };
 
 
@@ -170,6 +173,25 @@ uint32_t astinvad_state::screen_update_astinvad(screen_device &screen, bitmap_rg
 		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
 		{
 			uint8_t color = color_prom[((y & 0xf8) << 2) | (x >> 3)] >> (m_screen_flip ? 0 : 4);
+			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
+			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
+		}
+
+	return 0;
+}
+
+
+uint32_t astinvad_state::screen_update_spcking2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+{
+	const uint8_t *color_prom = memregion("proms")->base();
+	uint8_t yoffs = m_flip_yoffs & m_screen_flip;
+	int x, y;
+
+	/* render the visible pixels */
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
+		for (x = cliprect.min_x & ~7; x <= cliprect.max_x; x += 8)
+		{
+			uint8_t color = color_prom[(((y & 0xf8) << 2) | (x >> 3)) ^ (m_screen_flip ? 0x3ff : m_player ? 0 : 0x3ff)] >> (m_player ? 4 : 0);
 			uint8_t data = m_videoram[(((y ^ m_screen_flip) + yoffs) << 5) | ((x ^ m_screen_flip) >> 3)];
 			plot_byte(bitmap, y, x, data, m_screen_red ? 1 : color & 0x07);
 		}
@@ -349,7 +371,7 @@ WRITE8_MEMBER(astinvad_state::kamikaze_sound1_w)
 	if (bits_gone_hi & 0x02) m_samples->start(1, SND_SHOT);
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
-	if (bits_gone_hi & 0x10) m_samples->start(3, SND_INVADERHIT);
+	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
 
 	machine().sound().system_enable(data & 0x20);
 }
@@ -383,7 +405,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound1_w)
 	if (bits_gone_hi & 0x02) m_samples->start(1, SND_SHOT);
 	if (bits_gone_hi & 0x04) m_samples->start(2, SND_BASEHIT);
 	if (bits_gone_hi & 0x08) m_samples->start(3, SND_INVADERHIT);
-
+	if (bits_gone_hi & 0x10) m_samples->start(2, SND_BONUS);
 	machine().sound().system_enable(data & 0x20);
 	m_screen_red = data & 0x04; // ?
 }
@@ -400,6 +422,7 @@ WRITE8_MEMBER(astinvad_state::spcking2_sound2_w)
 	if (bits_gone_hi & 0x10) m_samples->start(4, SND_UFOHIT);
 
 	m_screen_flip = (ioport("CABINET")->read() & data & 0x20) ? 0xff : 0x00;
+	m_player = BIT(data, 5);
 }
 
 WRITE8_MEMBER(astinvad_state::spcking2_sound3_w)
@@ -618,6 +641,7 @@ static const char *const astinvad_sample_names[] =
 	"6",
 	"7",
 	"8",
+	"9",
 	nullptr
 };
 
@@ -675,6 +699,7 @@ static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
+	MCFG_SCREEN_UPDATE_DRIVER(astinvad_state, screen_update_spcking2)
 MACHINE_CONFIG_END
 
 
