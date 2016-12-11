@@ -186,11 +186,6 @@ VIDEO_START_MEMBER(phoenix_state,phoenix)
 
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-	m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-	m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-	m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-
 	save_pointer(NAME(m_videoram_pg[0].get()), 0x1000);
 	save_pointer(NAME(m_videoram_pg[1].get()), 0x1000);
 	save_item(NAME(m_videoram_pg_index));
@@ -233,7 +228,7 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoram_w)
 			m_fg_tilemap->mark_tile_dirty(offset & 0x3ff);
 	}
 
-	/* as part of the protecion, Survival executes code from $43a4 */
+	/* as part of the protection, Survival executes code from $43a4 */
 	rom[offset + 0x4000] = data;
 }
 
@@ -247,6 +242,21 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 		membank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
+
+		if (m_cocktail_mode)
+		{
+			m_fg_tilemap->set_scrolldx(0, 0);
+			m_bg_tilemap->set_scrolldx(0, 0);
+			m_fg_tilemap->set_scrolldy(0, 0);
+			m_bg_tilemap->set_scrolldy(0, 0);
+		}
+		else
+		{
+			m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+			m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+			m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+			m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+		}
 
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();
@@ -270,6 +280,21 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 		membank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
+
+		if (m_cocktail_mode)
+		{
+			m_fg_tilemap->set_scrolldx(0, 0);
+			m_bg_tilemap->set_scrolldx(0, 0);
+			m_fg_tilemap->set_scrolldy(0, 0);
+			m_bg_tilemap->set_scrolldy(0, 0);
+		}
+		else
+		{
+			m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+			m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
+			m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+			m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
+		}
 
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();
@@ -360,7 +385,12 @@ CUSTOM_INPUT_MEMBER(phoenix_state::pleiads_protection_r)
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_MEMBER(phoenix_state::survival_input_port_0_r)
 {
-	uint8_t ret = ~ioport("IN0")->read();
+	uint8_t ret;
+
+	if (m_cocktail_mode)
+		ret = ~ioport("IN1")->read();
+	else
+		ret = ~ioport("IN0")->read();
 
 	if( m_survival_input_readc++ == 2 )
 	{
