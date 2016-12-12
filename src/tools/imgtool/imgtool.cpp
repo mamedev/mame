@@ -67,18 +67,6 @@ char *strncpyz(char *dest, const char *source, size_t len)
 	return s;
 }
 
-char *strncatz(char *dest, const char *source, size_t len)
-{
-	size_t l;
-	l = strlen(dest);
-	dest += l;
-	if (len > l)
-		len -= l;
-	else
-		len = 0;
-	return strncpyz(dest, source, len);
-}
-
 //-------------------------------------------------
 //  markerrorsource - marks where an error source
 //-------------------------------------------------
