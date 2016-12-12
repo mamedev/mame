@@ -763,7 +763,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
 		plane2 = plane3 = 0;
 	}
-		else
+	else
 	{
 		address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
 		// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 -or 4- MONOCHROME SHADES)
@@ -2727,31 +2727,31 @@ READ16_MEMBER(rainbow_state::vram_r)
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
 	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
-			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
+		offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
 	else
-			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
+		offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
 
 	offset &= 0xffff; // same as in VT240?
 	uint16_t chr = data; // VT240 : uint8_t
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER)
 	{
-			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
-			chr |= (chr << 8);
-			if(m_patcnt-- == 0)
-			{
-				m_patcnt = m_patmult;
-				if(m_patidx-- == 0)
-					m_patidx = 7;
-			}
+		chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+		chr |= (chr << 8);
+		if(m_patcnt-- == 0)
+		{
+			m_patcnt = m_patmult;
+			if(m_patidx-- == 0)
+				m_patidx = 7;
+		}
 	}
-		else
+	else
 	{
-			chr = m_GDC_WRITE_BUFFER[ m_GDC_write_buffer_index++ ];
-			m_GDC_write_buffer_index &= 0xf;
+		chr = m_GDC_WRITE_BUFFER[ m_GDC_write_buffer_index++ ];
+		m_GDC_write_buffer_index &= 0xf;
 
-			chr |= (m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] << 8);
-			m_GDC_write_buffer_index &= 0xf;
+		chr |= (m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] << 8);
+		m_GDC_write_buffer_index &= 0xf;
 	}
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
@@ -2786,10 +2786,10 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 						break;
 				}
 
-				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : (NOT VECTOR MODE) Text Mode and Write Mask Batch
+				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : Text Mode and Write Mask Batch
 					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK); // // M_MASK (1st use)
 				else
-					out = (out & ~data) | (mem & data); // VECTOR MODE !
+					out = (out & ~data) | (mem & data); // vector mode
 
 				if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
 					m_video_ram[(offset & 0xffff) + (0x8000 * i)] = out;
@@ -2840,13 +2840,13 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 	if(offset > 0) // Port $50 reset done @ boot ROM 1EB4/8 regardless if option present.
 		if (m_inp7->read() != 1)
 		{
-				if(last_message != 1)
-				{
-					printf("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN RESTART.\n");
-					printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
-					last_message = 1;
-				}
-				return;
+			if(last_message != 1)
+			{
+				printf("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN RESTART.\n");
+				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
+				last_message = 1;
+			}
+			return;
 		}
 
 	switch(offset)
@@ -2855,12 +2855,10 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// FIXME: "Any write to this port also resynchronizes the
 			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
 
-			//if( (!(m_PORT50 & 1)) && (data & 1)) // PDF QV069 suggests 1 -> 0 -> 1			
-			if( data & 1 ) // ; most programs just set bit 0 (PACMAN).
+			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1. Most programs just set bit 0 (PACMAN).
 			{	
 				// Graphics option software reset (separate from GDC reset...)
 				OPTION_GRFX_RESET 
-
 				OPTION_RESET_PATTERNS
 			}
 			break;
