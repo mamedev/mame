@@ -46,7 +46,7 @@ protected:
 	int m_bgpen;
 
 private:
-	uint32_t sum_colors (const pen_t *pal, int c1_idx, int c2_idx);
+	uint32_t sum_colors(const pen_t *pal, int c1_idx, int c2_idx);
 };
 
 extern const device_type TECMO_MIXER;
