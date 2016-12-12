@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Nathan Woods
-#pragma once
+#ifndef MAME_BUS_COCO_T4426_H__
+#define MAME_BUS_COCO_T4426_H__
 
-#ifndef __COCO_T4426_H__
-#define __COCO_T4426_H__
+#pragma once
 
 #include "emu.h"
 #include "cococart.h"
@@ -53,4 +53,4 @@ private:
 // device type definition
 extern const device_type COCO_T4426;
 
-#endif  /* __COCO_T4426_H__ */
+#endif  /* MAME_BUS_COCO_T4426_H__ */

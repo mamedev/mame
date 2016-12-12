@@ -39,11 +39,15 @@
  *
  ***************************************************************************/
 
+#include "emu.h"
+#include "coco_t4426.h"
+#include "includes/coco.h"
+
 #define VERBOSE 0
 
-#define LOGPRINT(x) do { if (VERBOSE) logerror x; } while (0)
-#define LOG(x)      {} LOGPRINT(x)
-#define LOGSETUP(x) {}
+#define LOGPRINT(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
+#define LOG(...)      {} LOGPRINT(__VA_ARGS__)
+#define LOGSETUP(...) {}
 
 #if VERBOSE >= 2
 #define logerror printf
@@ -54,10 +58,6 @@
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
-
-#include "emu.h"
-#include "coco_t4426.h"
-#include "includes/coco.h"
 
 /***************************************************************************
     CONSTANTS
@@ -178,8 +178,8 @@ READ8_MEMBER(coco_t4426_device::read)
 {
 	uint8_t result = 0x00;
 
-	LOG(("%s()\n", FUNCNAME));
-	LOGSETUP((" * Offs:%02x -> %02x\n", offset, result));
+	LOG("%s()\n", FUNCNAME);
+	LOGSETUP(" * Offs:%02x -> %02x\n", offset, result);
 
 	return result;
 }
@@ -190,6 +190,6 @@ READ8_MEMBER(coco_t4426_device::read)
 
 WRITE8_MEMBER(coco_t4426_device::write)
 {
-	LOG(("%s(%02x)\n", FUNCNAME, data));
-	LOGSETUP((" * Offs:%02x <- %02x\n", offset, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
+	LOGSETUP(" * Offs:%02x <- %02x\n", offset, data);
 }
