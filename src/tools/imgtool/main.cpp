@@ -179,7 +179,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtool_dirent ent;
 	char buf[512];
 	char last_modified[19];
-	const char *path;
+	std::string path;
 	int partition_index = 0;
 	std::string info;
 
@@ -193,7 +193,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	path = argc > 2 ? argv[2] : nullptr;
+	path = argc > 2 ? argv[2] : "";
 
 	err = imgtool::directory::open(*partition, path, imgenum);
 	if (err)
@@ -204,7 +204,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	total_count = 0;
 	total_size = 0;
 
-	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
+	fprintf(stdout, "Contents of %s:%s\n", argv[1], path.c_str());
 
 	info = image->info();
 	if (!info.empty())
