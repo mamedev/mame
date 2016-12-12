@@ -2,7 +2,7 @@
 // ENABLE BY UNCOMMENTING.  ADDITIONALLY, SET SMOOTH SCROLL IN EMULATION (DISABLE BY SETTING JUMP SCROLL. To enter SETUP hit ScrollLock)-
 //#define BOOST_DEBUG_PERFORMANCE
 
-
+	
 /* GDC COLOR EMULATION
 //-------------------- Differences to VT240: ---------------------------------------------------
 // - Registers of graphics option not directly mapped (indirect access via mode register)
@@ -758,19 +758,19 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
 	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 	{
-			address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-			plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
-			plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
-			plane2 = plane3 = 0;
+		address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
+		plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
+		plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
+		plane2 = plane3 = 0;
 	}
 		else
 	{
-			address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-			// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 (4) MONOCHROME SHADES)
-			plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
-			plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
-			plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
-			plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
+		address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
+		// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 -or 4- MONOCHROME SHADES)
+		plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
+		plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
+		plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
+		plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
 	}
 
 	bool mono = (m_inp13->read() == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR
@@ -828,7 +828,7 @@ void rainbow_state::machine_start()
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
-		rom[0xf4000 + 0x135e] = 0x00; // FLOPPY / RX-50 WORKAROUND: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
+		rom[0xf4000 + 0x135e] = 0x00; // Floppy / RX-50 workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
 	}
@@ -843,7 +843,7 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 // There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 // shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
 
-// (*) ED000 - ED0FF is the area the DEC-100-B BIOS accesses and checks
+// (*) ED000 - ED0FF is the area the DEC-100-B Bios accesses and checks
 
 //  - Specs say that the CPU has direct access to volatile RAM only.
 //    So NVRAM is hidden and loads & saves are triggered within the
@@ -2863,7 +2863,6 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 
 				OPTION_RESET_PATTERNS
 			}
-			//m_PORT50  = data;
 			break;
 
 		case 1: //  51h - DATA loaded into register previously written to 53h.
