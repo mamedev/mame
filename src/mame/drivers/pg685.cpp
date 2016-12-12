@@ -106,7 +106,7 @@ public:
 		m_vram(*this, "framebuffer"),
 		m_vram16(*this, "framebuffer16"),
 		m_fontram(*this, "charcopy"),
-		m_fdc (*this, "fdc"),
+		m_fdc(*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
 		m_floppy1(*this, "fdc:1")
 		{ }
