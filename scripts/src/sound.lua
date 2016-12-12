@@ -1401,3 +1401,26 @@ if (SOUNDS["VOLT_REG"]~=null) then
 		MAME_DIR .. "src/devices/sound/volt_reg.h",
 	}
 end
+
+---------------------------------------------------
+-- DAC-76 COMDAC
+--@src/devices/sound/dac76.h,SOUNDS["DAC76"] = true
+---------------------------------------------------
+if (SOUNDS["DAC76"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/dac76.cpp",
+		MAME_DIR .. "src/devices/sound/dac76.h",
+	}
+end
+
+---------------------------------------------------
+-- MM5837 Noise Generator
+--@src/devices/sound/mm5837.h,MACHINES["MM5837"] = true
+---------------------------------------------------
+
+if (SOUNDS["MM5837"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/sound/mm5837.cpp",
+		MAME_DIR .. "src/devices/sound/mm5837.h",
+	}
+end

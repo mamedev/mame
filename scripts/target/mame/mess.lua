@@ -264,6 +264,8 @@ SOUNDS["GB_SOUND"] = true
 SOUNDS["PCD3311"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["MEA8000"] = true
+--SOUNDS["DAC76"] = true
+--SOUNDS["MM5837"] = true
 
 --------------------------------------------------
 -- specify available video cores

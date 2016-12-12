@@ -263,6 +263,8 @@ SOUNDS["AD1848"] = true
 --SOUNDS["UPD1771"] = true
 SOUNDS["VOLT_REG"] = true
 --SOUNDS["MEA8000"] = true
+SOUNDS["DAC76"] = true
+SOUNDS["MM5837"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -3969,10 +3971,6 @@ files {
 createMAMEProjects(_target, _subtarget, "tong")
 files {
 	MAME_DIR .. "src/mame/drivers/beezer.cpp",
-	MAME_DIR .. "src/mame/includes/beezer.h",
-	MAME_DIR .. "src/mame/machine/beezer.cpp",
-	MAME_DIR .. "src/mame/video/beezer.cpp",
-	MAME_DIR .. "src/mame/audio/beezer.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "unico")
