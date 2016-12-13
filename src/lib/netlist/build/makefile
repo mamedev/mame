@@ -66,6 +66,7 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nld_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
+	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
 	$(NLOBJ)/devices/nld_7448.o \

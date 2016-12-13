@@ -91,6 +91,8 @@ project "netlist"
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_w.h",
 		MAME_DIR .. "src/lib/netlist/solver/nld_ms_direct_lu.h",
 		MAME_DIR .. "src/lib/netlist/solver/vector_base.h",
+		MAME_DIR .. "src/lib/netlist/devices/nld_2716.cpp",
+		MAME_DIR .. "src/lib/netlist/devices/nld_2716.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.cpp",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4020.h",
 		MAME_DIR .. "src/lib/netlist/devices/nld_4066.cpp",
