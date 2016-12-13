@@ -33,6 +33,7 @@
 #include "nld_74279.h"
 #include "nld_74ls629.h"
 #include "nld_82S16.h"
+#include "nld_82S126.h"
 #include "nld_9310.h"
 #include "nld_9312.h"
 #include "nld_9316.h"
