@@ -43,6 +43,10 @@
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                      \
 	netlist_mame_int_input_t::static_set_params(*device, _name, _mask, _shift);
 
+#define MCFG_NETLIST_ROM(_basetag, _tag, _name, _region) \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_ROM_REGION, 0, _region) \
+	netlist_mame_rom_t::static_set_params(*device, _name);
+
 #define MCFG_NETLIST_STREAM_INPUT(_basetag, _chan, _name)                           \
 	MCFG_DEVICE_ADD(_basetag ":cin" # _chan, NETLIST_STREAM_INPUT, 0)               \
 	netlist_mame_stream_input_t::static_set_params(*device, _chan, _name);
@@ -503,6 +507,35 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_rom_t
+// ----------------------------------------------------------------------------------------
+
+class netlist_mame_rom_t :  public device_t,
+                            public netlist_mame_sub_interface
+{
+public:
+
+	// construction/destruction
+	netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char* region_tag);
+	virtual ~netlist_mame_rom_t() { }
+
+	static void static_set_params(device_t &device, const char *param_name);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override
+	{
+		m_param->setTo(m_rom);
+	}
+
+private:
+	netlist::param_rom_t *m_param;
+	pstring m_param_name;
+	required_region_ptr<uint8_t> m_rom;
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_stream_input_t
 // ----------------------------------------------------------------------------------------
 
@@ -761,6 +794,7 @@ extern const device_type NETLIST_SOUND;
 extern const device_type NETLIST_ANALOG_INPUT;
 extern const device_type NETLIST_LOGIC_INPUT;
 extern const device_type NETLIST_INT_INPUT;
+extern const device_type NETLIST_ROM_REGION;
 
 extern const device_type NETLIST_ANALOG_OUTPUT;
 extern const device_type NETLIST_STREAM_INPUT;

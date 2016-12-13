@@ -201,6 +201,9 @@ struct input_t
 			case netlist::param_t::LOGIC:
 				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
 				break;
+			case netlist::param_t::ROM:
+				static_cast<netlist::param_logic_t*>(m_param)->setTo(nullptr);
+				break;
 		}
 	}
 

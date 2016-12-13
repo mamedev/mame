@@ -832,7 +832,8 @@ namespace netlist
 			STRING,
 			DOUBLE,
 			INTEGER,
-			LOGIC
+			LOGIC,
+			ROM // Special-case which is always initialized at netlist startup time
 		};
 
 		param_t(const param_type_t atype, device_t &device, const pstring &name);
@@ -868,6 +869,7 @@ namespace netlist
 	using param_str_t = param_template_t<pstring, param_t::STRING>;
 
 	using param_logic_t = param_template_t<bool, param_t::LOGIC>;
+	using param_rom_t = param_template_t<std::uint_fast8_t*, param_t::ROM>;
 
 	class param_model_t : public param_str_t
 	{
