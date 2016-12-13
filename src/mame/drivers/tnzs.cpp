@@ -1708,7 +1708,7 @@ ROM_START( plumppop )
 	ROM_LOAD( "a98-11.bin", 0x00000, 0x10000, CRC(bc56775c) SHA1(0c22c22c0e9d7ec0e34f8ab4bfe61068f65e8759) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Chip label is a guess, also unknown if it actually uses the same MCU as drtoppel/extrmatn, but it appears to work fine */
+	ROM_LOAD( "a98-14.1g", 0x0000, 0x0800, BAD_DUMP CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Chip label and location is a guess, also unknown if it actually uses the same MCU as drtoppel/extrmatn, but it appears to work fine, marked as bad until verified that it uses same M-001 mcu */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "a98-01.bin", 0x00000, 0x10000, CRC(f3033dca) SHA1(130744998f0531a82de2814231dddea3ad710f60) )
