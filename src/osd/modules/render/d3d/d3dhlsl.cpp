@@ -164,14 +164,15 @@ private:
 
 shaders::shaders() :
 	d3dintf(nullptr), machine(nullptr), d3d(nullptr), post_fx_enable(false), oversampling_enable(false),
-	num_screens(0), curr_screen(0), shadow_texture(nullptr), options(nullptr), black_surface(nullptr),
-	black_texture(nullptr), recording_movie(false), render_snap(false), snap_copy_target(nullptr),
-	snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr), snap_width(0), snap_height(0),
-	initialized(false), backbuffer(nullptr), curr_effect(nullptr), default_effect(nullptr),
-	prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr), focus_effect(nullptr),
-	phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr), ntsc_effect(nullptr),
-	bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr), curr_texture(nullptr),
-	curr_render_target(nullptr), curr_poly(nullptr), d3dx_create_effect_from_file_ptr(nullptr)
+	num_screens(0), curr_screen(0), acc_t(0), delta_t(0), shadow_texture(nullptr), options(nullptr),
+	black_surface(nullptr), black_texture(nullptr), recording_movie(false), render_snap(false),
+	snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
+	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr),
+	default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
+	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr),
+	ntsc_effect(nullptr), bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr),
+	curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	d3dx_create_effect_from_file_ptr(nullptr)
 {
 }
 
@@ -900,6 +901,18 @@ void shaders::blit(
 	curr_effect->end();
 }
 
+double shaders::delta_time()
+{
+	double t;
+
+	if (curr_screen == 0) {
+		t = machine->time().as_double();
+		delta_t = t - acc_t;
+		acc_t = t;
+	}
+	return delta_t;
+}
+
 
 //============================================================
 //  shaders::find_render_target
@@ -1061,11 +1074,7 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 
 int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
-	static double ct = 0;
-
 	int next_index = source_index;
-	float dt;
-	double t;
 
 	// skip phosphor if no influencing settings
 	if (options->phosphor[0] == 0.0f && options->phosphor[1] == 0.0f && options->phosphor[2] == 0.0f)
@@ -1074,15 +1083,12 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	}
 
 	// Shader needs time between last update
-	t = machine->time().as_double();
-	dt = (float) (t - ct);
-	ct = t;
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
 	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
-	curr_effect->set_float("dt", dt);
+	curr_effect->set_float("DeltaTime", delta_time());
 
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);

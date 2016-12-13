@@ -319,7 +319,7 @@ private:
 	void                    enumerate_screens();
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
-
+	double                  delta_time();  // Time since last call to itself; only updates for Screen 0
 	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index);
 
 	rgb_t                   apply_color_convolution(rgb_t color);
@@ -349,6 +349,8 @@ private:
 	bool                    oversampling_enable;        // oversampling enable flag
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
+	double                  acc_t;                      // accumulated machine time
+	double                  delta_t;                    // time since last call to delta_time
 	bitmap_argb32           shadow_bitmap;              // shadow mask bitmap for post-processing shader
 	texture_info *          shadow_texture;             // shadow mask texture for post-processing shader
 	hlsl_options *          options;                    // current options
