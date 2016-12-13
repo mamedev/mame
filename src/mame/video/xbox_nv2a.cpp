@@ -4,7 +4,7 @@
 #include "video/poly.h"
 #include "bitmap.h"
 #include "machine/pic8259.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 
 //#define LOG_NV2A
 
@@ -2653,7 +2653,6 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 
 uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
-#if 1
 	nv2avertex_t *vi[3];
 	nv2avertex_t vo[16];
 	int idx_prev, idx_curr;
@@ -2661,11 +2660,9 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 	double tfactor;
 	int idx;
 	const double wthreshold = 0.00000001;
-#endif
 
 	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
 		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
-#if 1
 	// assign the elements of the array
 	vi[0] = &_v1;
 	vi[1] = &_v2;
@@ -2763,7 +2760,6 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		else
 			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 2], vo[n + 1]);
 	}
-#endif
 	return 0;
 }
 
