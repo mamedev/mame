@@ -28,7 +28,7 @@ namespace netlist
 		object_array_t<logic_input_t, 8> m_A;
 		logic_input_t m_CE1Q;
 		logic_input_t m_CE2Q;
-		object_array_t<logic_output_t, 8> m_O;
+		object_array_t<logic_output_t, 4> m_O;
 
 		param_rom_t m_ROM; // 1024 bits, 32x32, used as 256x4
 	};

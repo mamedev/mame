@@ -27,6 +27,7 @@
 #include "nld_74123.h"
 #include "nld_74153.h"
 #include "nld_74161.h"
+#include "nld_74174.h"
 #include "nld_74175.h"
 #include "nld_74192.h"
 #include "nld_74193.h"

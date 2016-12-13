@@ -79,6 +79,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
 	$(NLOBJ)/devices/nld_74161.o \
+	$(NLOBJ)/devices/nld_74174.o \
 	$(NLOBJ)/devices/nld_74175.o \
 	$(NLOBJ)/devices/nld_74192.o \
 	$(NLOBJ)/devices/nld_74193.o \
