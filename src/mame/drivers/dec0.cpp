@@ -43,7 +43,8 @@ Original Service Manuals and Service Mode (when available).
 
 ToDo:
 - Fix protection simulation in Birdie Try (that part needs at least comparison with a real board);
-- graphics are completely broken in Automat and Secret Agent (bootleg);
+- Fix remaining graphical problems in Automat (bootleg);
+- graphics and sound are completely broken in Secret Agent (bootleg);
 - Fighting Fantasy (bootleg) doesn't boot at all;
 - Hook up the 68705 in Midnight Resistance (bootleg) (it might not be used, leftover from the Fighting Fantasy bootleg on the same PCB?)
 - Get rid of ROM patches in Sly Spy and Hippodrome;
@@ -531,9 +532,14 @@ ADDRESS_MAP_END
 
 void dec0_automat_state::machine_start()
 {
-	save_item(NAME(m_automat_adpcm_byte));
-	save_item(NAME(m_automat_msm5205_vclk_toggle));
+	m_adpcm_toggle1 = false;
+	m_adpcm_toggle2 = false;
+	save_item(NAME(m_adpcm_toggle1));
+	save_item(NAME(m_adpcm_toggle2));
 	save_item(NAME(m_automat_scroll_regs));
+
+	m_soundbank->configure_entries(0, 4, memregion("audiocpu")->base(), 0x4000);
+	m_soundbank->set_entry(0);
 }
 
 
@@ -584,6 +590,8 @@ static ADDRESS_MAP_START( automat_map, AS_PROGRAM, 16, dec0_automat_state )
 	AM_RANGE(0x400000, 0x400007) AM_WRITE(automat_scroll_w)
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(dec0_priority_w)
 
+	AM_RANGE(0x500000, 0x500001) AM_WRITENOP // ???
+
 	AM_RANGE(0xff8000, 0xffbfff) AM_RAM AM_SHARE("ram")             /* Main ram */
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM AM_SHARE("spriteram")           /* Sprites */
 ADDRESS_MAP_END
@@ -616,19 +624,16 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 ADDRESS_MAP_END
 
 
-WRITE8_MEMBER(dec0_automat_state::automat_adpcm_w)
-{
-	m_automat_adpcm_byte = data;
-}
-
 static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
-	AM_RANGE(0x0103, 0x0103) AM_WRITENOP
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc801) AM_DEVWRITE("2203a", ym2203_device, write)
-	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0xd000, 0xd001) AM_DEVWRITE("2203b", ym2203_device, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(automat_adpcm_w)
-	AM_RANGE(0x0000, 0xffff) AM_ROM
+	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("2203a", ym2203_device, read, write)
+	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("2203b", ym2203_device, read, write)
+	AM_RANGE(0xd800, 0xd800) AM_READ(sound_command_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, dec0_state )
@@ -1358,19 +1363,37 @@ static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
 MACHINE_CONFIG_END
 
 
-WRITE_LINE_MEMBER(dec0_automat_state::automat_vclk_cb)
+READ8_MEMBER(dec0_automat_state::sound_command_r)
 {
-	if (m_automat_msm5205_vclk_toggle == 0)
-	{
-		m_msm->data_w(m_automat_adpcm_byte & 0xf);
-	}
-	else
-	{
-		m_msm->data_w(m_automat_adpcm_byte >> 4);
-		//device->m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE); // gives some scratch samples but breaks other sounds too
-	}
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch->read(space, 0);
+}
 
-	m_automat_msm5205_vclk_toggle ^= 1;
+WRITE8_MEMBER(dec0_automat_state::sound_bankswitch_w)
+{
+	m_msm1->reset_w(BIT(data, 3));
+	m_msm2->reset_w(BIT(data, 4));
+
+	m_soundbank->set_entry(data & 3);
+}
+
+WRITE_LINE_MEMBER(dec0_automat_state::msm1_vclk_cb)
+{
+	if (!state)
+		return;
+
+	m_adpcm_toggle1 = !m_adpcm_toggle1;
+	m_adpcm_select1->select_w(m_adpcm_toggle1);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_adpcm_toggle1);
+}
+
+WRITE_LINE_MEMBER(dec0_automat_state::msm2_vclk_cb)
+{
+	if (!state)
+		return;
+
+	m_adpcm_toggle2 = !m_adpcm_toggle2;
+	m_adpcm_select2->select_w(m_adpcm_toggle2);
 }
 
 
@@ -1418,21 +1441,32 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203a", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("2203b", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203b", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000/2)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, automat_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
+	MCFG_74LS157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+
+	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
+	MCFG_74LS157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm2_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1481,23 +1515,33 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("2203a", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("2203b", YM2203, 1500000)
+	MCFG_SOUND_ADD("2203b", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
 	MCFG_SOUND_ROUTE(1, "mono", 0.90)
 	MCFG_SOUND_ROUTE(2, "mono", 0.90)
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MCFG_SOUND_ADD("msm", MSM5205, 384000/2)
-	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, automat_vclk_cb))
-	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
+	MCFG_74LS157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+
+	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
+	MCFG_74LS157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+
+	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MCFG_SOUND_ADD("msm2", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm2_vclk_cb))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3331,5 +3375,5 @@ GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl
 GAME( 1988, drgninjab2, baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   secretag, secretab, slyspy, dec0_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, automat,    robocop,  automat,  robocop,  dec0_state,  robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   secretag, secretab, slyspy,   driver_device,     0, ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

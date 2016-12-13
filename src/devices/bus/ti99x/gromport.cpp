@@ -2628,7 +2628,7 @@ int rpk_reader::find_file(util::archive_file &zip, const char *filename, uint32_
 /*
     Load a rom resource and put it in a pcb socket instance.
 */
-std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zip, xml_data_node const* rom_resource_node, const char* socketname)
+std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zip, util::xml::data_node const* rom_resource_node, const char* socketname)
 {
 	const char* file;
 	const char* crcstr;
@@ -2693,7 +2693,7 @@ std::unique_ptr<rpk_socket> rpk_reader::load_rom_resource(util::archive_file &zi
 /*
     Load a ram resource and put it in a pcb socket instance.
 */
-std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, xml_data_node const* ram_resource_node, const char* socketname, const char* system_name)
+std::unique_ptr<rpk_socket> rpk_reader::load_ram_resource(emu_options &options, util::xml::data_node const* ram_resource_node, const char* socketname, const char* system_name)
 {
 	const char* length_string;
 	const char* ram_type;
@@ -2787,7 +2787,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 	util::archive_file::ptr zipfile;
 
 	std::vector<char> layout_text;
-	xml_data_node *layout_xml = nullptr;
+	util::xml::data_node *layout_xml = nullptr;
 
 	int i;
 
@@ -2816,25 +2816,25 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		layout_text[zipfile->current_uncompressed_length()] = '\0';  // Null-terminate
 
 		/* parse the layout text */
-		layout_xml = xml_data_node::string_read(&layout_text[0], nullptr);
+		layout_xml = util::xml::data_node::string_read(&layout_text[0], nullptr);
 		if (!layout_xml) throw rpk_exception(RPK_XML_ERROR);
 
 		// Now we work within the XML tree
 
 		// romset is the root node
-		xml_data_node const *const romset_node = layout_xml->get_child("romset");
+		util::xml::data_node const *const romset_node = layout_xml->get_child("romset");
 		if (!romset_node) throw rpk_exception(RPK_INVALID_LAYOUT, "document element must be <romset>");
 
 		// resources is a child of romset
-		xml_data_node const *const resources_node = romset_node->get_child("resources");
+		util::xml::data_node const *const resources_node = romset_node->get_child("resources");
 		if (!resources_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <resources> child");
 
 		// configuration is a child of romset; we're actually interested in ...
-		xml_data_node const *const configuration_node = romset_node->get_child("configuration");
+		util::xml::data_node const *const configuration_node = romset_node->get_child("configuration");
 		if (!configuration_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<romset> must have a <configuration> child");
 
 		// ... pcb, which is a child of configuration
-		xml_data_node const *const pcb_node = configuration_node->get_child("pcb");
+		util::xml::data_node const *const pcb_node = configuration_node->get_child("pcb");
 		if (!pcb_node) throw rpk_exception(RPK_INVALID_LAYOUT, "<configuration> must have a <pcb> child");
 
 		// We'll try to find the PCB type on the provided type list.
@@ -2856,7 +2856,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 		if (m_types[i].id==0) throw rpk_exception(RPK_UNKNOWN_PCB_TYPE);
 
 		// Find the sockets and load their respective resource
-		for (xml_data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
+		for (util::xml::data_node const *socket_node = pcb_node->get_first_child();  socket_node != nullptr; socket_node = socket_node->get_next_sibling())
 		{
 			if (strcmp(socket_node->get_name(), "socket")!=0) throw rpk_exception(RPK_INVALID_LAYOUT, "<pcb> element has only <socket> children");
 			char const *const id = socket_node->get_attribute_string("id", nullptr);
@@ -2866,7 +2866,7 @@ rpk* rpk_reader::open(emu_options &options, const char *filename, const char *sy
 
 			bool found = false;
 			// Locate the resource node
-			for (xml_data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
+			for (util::xml::data_node const *resource_node = resources_node->get_first_child(); resource_node != nullptr; resource_node = resource_node->get_next_sibling())
 			{
 				char const *const resource_name = resource_node->get_attribute_string("id", nullptr);
 				if (!resource_name) throw rpk_exception(RPK_INVALID_LAYOUT, "resource node must have an 'id' attribute");

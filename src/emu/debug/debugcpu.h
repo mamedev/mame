@@ -18,6 +18,9 @@
 #include <set>
 
 
+namespace util { namespace xml { class data_node; } }
+
+
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
@@ -35,9 +38,6 @@ constexpr int COMMENT_VERSION       = 1;
 //**************************************************************************
 
 typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
-
-
-class xml_data_node;
 
 
 // ======================> device_debug
@@ -242,8 +242,8 @@ public:
 	const char *comment_text(offs_t addr) const;
 	u32 comment_count() const { return m_comment_set.size(); }
 	u32 comment_change_count() const { return m_comment_change; }
-	bool comment_export(xml_data_node &node);
-	bool comment_import(xml_data_node const &node, bool is_inline);
+	bool comment_export(util::xml::data_node &node);
+	bool comment_import(util::xml::data_node const &node, bool is_inline);
 	u32 compute_opcode_crc32(offs_t pc) const;
 
 	// history

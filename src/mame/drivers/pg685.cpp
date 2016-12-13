@@ -105,7 +105,10 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_vram(*this, "framebuffer"),
 		m_vram16(*this, "framebuffer16"),
-		m_fontram(*this, "charcopy")
+		m_fontram(*this, "charcopy"),
+		m_fdc(*this, "fdc"),
+		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1")
 		{ }
 
 	MC6845_UPDATE_ROW(crtc_update_row);
@@ -122,6 +125,8 @@ public:
 	DECLARE_READ8_MEMBER(f9f78_r);
 	DECLARE_WRITE8_MEMBER(f9f78_w);
 	DECLARE_WRITE8_MEMBER(f9f79_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
+	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 
 private:
 	virtual void machine_reset() override;
@@ -130,6 +135,9 @@ private:
 	optional_shared_ptr<uint8_t> m_vram;
 	optional_shared_ptr<uint16_t> m_vram16;
 	optional_shared_ptr<uint8_t> m_fontram;
+	required_device<fd1797_t> m_fdc;
+	required_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
 };
 
 //**************************************************************************
@@ -147,7 +155,7 @@ static ADDRESS_MAP_START(pg675_mem, AS_PROGRAM, 8, pg685_state)
 	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE("mainpic", pic8259_device, read, write)
 	AM_RANGE(0xf9f08, 0xf9f08) AM_DEVREADWRITE("mainuart", i8251_device, data_r, data_w)
 	AM_RANGE(0xf9f09, 0xf9f09) AM_DEVREADWRITE("mainuart", i8251_device, status_r, control_w)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", wd2797_t, read, write)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE("fdc", fd1797_t, read, write)
 	AM_RANGE(0xf9f24, 0xf9f24) AM_READWRITE(f9f24_r, f9f24_w)
 	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE("modppi1", i8255_device, read, write)
 	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE("modppi2", i8255_device, read, write)
@@ -183,7 +191,7 @@ static ADDRESS_MAP_START(pg685oua12_mem, AS_PROGRAM, 16, pg685_state)
 	AM_RANGE(0xf9f06, 0xf9f07) AM_DEVREADWRITE8("mainpic", pic8259_device, read, write, 0xffff)
 	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0xf9f08, 0xf9f09) AM_DEVREADWRITE8("mainuart", i8251_device, status_r, control_w, 0xff00)
-	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", wd2797_t, read, write, 0xffff)
+	AM_RANGE(0xf9f20, 0xf9f23) AM_DEVREADWRITE8("fdc", fd1797_t, read, write, 0xffff)
 	AM_RANGE(0xf9f24, 0xf9f25) AM_READWRITE8(f9f24_r, f9f24_w, 0x00ff)
 	AM_RANGE(0xf9f28, 0xf9f2b) AM_DEVREADWRITE8("modppi1", i8255_device, read, write, 0xffff)
 	AM_RANGE(0xf9f2c, 0xf9f2f) AM_DEVREADWRITE8("modppi2", i8255_device, read, write, 0xffff)
@@ -256,6 +264,15 @@ READ8_MEMBER(pg685_state::f9f3f_r)
 //  FLOPPY
 //**************************************************************************
 
+static SLOT_INTERFACE_START( pg675_floppies )
+	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+SLOT_INTERFACE_END
+
+static SLOT_INTERFACE_START( pg685_floppies )
+	SLOT_INTERFACE( "525qd", FLOPPY_525_QD )
+SLOT_INTERFACE_END
+
+
 READ8_MEMBER(pg685_state::f9f24_r)
 {
 	logerror("Reading from F9F24\n");
@@ -266,6 +283,7 @@ WRITE8_MEMBER(pg685_state::f9f24_w)
 {
 	logerror("Writing %02X to F9F24\n", data);
 }
+
 
 //**************************************************************************
 //  HARDDISK
@@ -370,7 +388,7 @@ static MACHINE_CONFIG_FRAGMENT(pg685_backplane)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_FRAGMENT(pg685_module)
-	MCFG_DEVICE_ADD("fdc", WD2797, XTAL_4MHz / 2) // divider guessed
+	MCFG_DEVICE_ADD("fdc", FD1797, XTAL_4MHz / 2) // divider guessed
 	MCFG_WD_FDC_INTRQ_CALLBACK(DEVWRITELINE("mainpic", pic8259_device, ir4_w))
 
 	MCFG_DEVICE_ADD("modppi1", I8255, 0)
@@ -379,6 +397,7 @@ static MACHINE_CONFIG_FRAGMENT(pg685_module)
 	MCFG_DEVICE_ADD("moduart", I8251, XTAL_4MHz / 2) // divider guessed
 
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( pg675, pg685_state )
@@ -419,6 +438,12 @@ static MACHINE_CONFIG_START( pg675, pg685_state )
 	// printer
 
 	// floppy
+	// MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(zorba_state, fdc_intrq_w))
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pg675_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 MACHINE_CONFIG_END
 
@@ -462,6 +487,10 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 
 	// floppy
 
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	
 	// harddisk
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))
@@ -506,6 +535,10 @@ static MACHINE_CONFIG_START( pg685oua12, pg685_state )
 	// printer
 
 	// floppy
+
+	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	// harddisk
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed

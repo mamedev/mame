@@ -294,18 +294,9 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	{
 		if (LOG) logerror("8155 Timer Count Reached\n");
 
-		switch (m_command & COMMAND_TM_MASK)
-		{
-		case COMMAND_TM_STOP_AFTER_TC:
-			// stop timer
-			m_timer->enable(0);
-
-			if (LOG) logerror("8155 Timer Stopped\n");
-			break;
-		}
-
 		switch (get_timer_mode())
 		{
+		case TIMER_MODE_LOW:
 		case TIMER_MODE_SQUARE_WAVE:
 			// toggle timer output
 			m_to = !m_to;
@@ -313,15 +304,8 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			break;
 
 		case TIMER_MODE_SINGLE_PULSE:
-			// single pulse upon TC being reached
-			pulse_timer_output();
-
-			// clear timer mode setting
-			m_command &= ~COMMAND_TM_MASK;
-			break;
-
 		case TIMER_MODE_AUTOMATIC_RELOAD:
-			// automatic reload, i.e. single pulse every time TC is reached
+			// pulse upon TC being reached
 			pulse_timer_output();
 			break;
 		}
@@ -329,8 +313,28 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// set timer flag
 		m_status |= STATUS_TIMER;
 
-		// reload timer counter
-		m_counter = m_count_length & 0x3fff;
+		if ((m_command & COMMAND_TM_MASK) == COMMAND_TM_START)
+		{
+			// load new timer counter
+			m_counter = m_count_length & 0x3fff;
+
+			if (LOG) logerror("8155 Timer New Start\n");
+		}
+		else if ((m_command & COMMAND_TM_MASK) == COMMAND_TM_STOP_AFTER_TC || get_timer_mode() == TIMER_MODE_SINGLE_PULSE)
+		{
+			// stop timer
+			m_timer->enable(0);
+
+			if (LOG) logerror("8155 Timer Stopped\n");
+		}
+		else
+		{
+			// automatically reload the counter
+			m_counter = m_count_length & 0x3fff;
+		}
+
+		// clear timer command
+		m_command &= ~COMMAND_TM_MASK;
 	}
 }
 
@@ -455,6 +459,9 @@ void i8155_device::register_w(int offset, uint8_t data)
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length & 0x3fff;
 				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
+
+				// clear timer command so this won't execute twice
+				m_command &= ~COMMAND_TM_MASK;
 			}
 			break;
 		}

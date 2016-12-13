@@ -2,7 +2,7 @@
 // ENABLE BY UNCOMMENTING.  ADDITIONALLY, SET SMOOTH SCROLL IN EMULATION (DISABLE BY SETTING JUMP SCROLL. To enter SETUP hit ScrollLock)-
 //#define BOOST_DEBUG_PERFORMANCE
 
-
+	
 /* GDC COLOR EMULATION
 //-------------------- Differences to VT240: ---------------------------------------------------
 // - Registers of graphics option not directly mapped (indirect access via mode register)
@@ -754,24 +754,23 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 		return; // no output from graphics option
 	}
 
-	address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
-
 	// ********************* GET BITMAP DATA FOR 4 PLANES ***************************************
 	// _READ_ BIT MAP  from 2 or 4 planes (plane 0 is least, plane 3 most significant). See page 42 / 43
 	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
 	{
-			plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
-			plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
-			plane2 = plane3 = 0;
+		address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x7FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
+		plane0 = m_video_ram[((address & 0x7fff) + 0x00000) >> 1];
+		plane1 = m_video_ram[((address & 0x7fff) + 0x10000) >> 1];
+		plane2 = plane3 = 0;
 	}
-		else
+	else
 	{
-			// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 (4) MONOCHROME SHADES)
-			// MANUAL SAYS:   (GDC "sees" 4 planes X 16 bits X 8K words)!
-			plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
-			plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
-			plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
-			plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
+		address = ( m_GDC_SCROLL_BUFFER[ ((address & 0x3FC0) >> 7) & 0xff ] << 7) |  (address & 0x7F);
+		// MED.RESOLUTION (4 planes, 4 color bits, 16 color map entries / 16 -or 4- MONOCHROME SHADES)
+		plane0 = m_video_ram[((address & 0x3fff) + 0x00000) >> 1];
+		plane1 = m_video_ram[((address & 0x3fff) + 0x10000) >> 1];
+		plane2 = m_video_ram[((address & 0x3fff) + 0x20000) >> 1];
+		plane3 = m_video_ram[((address & 0x3fff) + 0x30000) >> 1];
 	}
 
 	bool mono = (m_inp13->read() == MONO_MONITOR) ? true : false; // 1 = MONO, 2 = COLOR, 3 = DUAL MONITOR
@@ -829,7 +828,7 @@ void rainbow_state::machine_start()
 	if (rom[0xf4000 + 0x3ffc] == 0x31) // 100-B (5.01)    0x35 would test for V5.05
 	{
 		rom[0xf4000 + 0x0303] = 0x00; // disable CRC check
-		rom[0xf4000 + 0x135e] = 0x00; // FLOPPY / RX-50 WORKAROUND: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
+		rom[0xf4000 + 0x135e] = 0x00; // Floppy / RX-50 workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
 	}
@@ -844,7 +843,7 @@ AM_RANGE(0x10000, END_OF_RAM) AM_RAM
 // There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 // shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
 
-// (*) ED000 - ED0FF is the area the DEC-100-B BIOS accesses and checks
+// (*) ED000 - ED0FF is the area the DEC-100-B Bios accesses and checks
 
 //  - Specs say that the CPU has direct access to volatile RAM only.
 //    So NVRAM is hidden and loads & saves are triggered within the
@@ -2727,36 +2726,32 @@ READ16_MEMBER(rainbow_state::vram_r)
 // NOTE: Rainbow has separate registers for fore and background.
 WRITE16_MEMBER(rainbow_state::vram_w)
 {
-	if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR))
-	{
-		// SCROLL_MAP IN BITMAP MODE ONLY...?
-		if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
-			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
-		else
-			offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
-	}
+	if(m_GDC_MODE_REGISTER & GDC_MODE_HIGHRES)
+		offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x3FC0) >> 6 ] << 6) |  (offset & 0x3F);
+	else
+		offset = ( m_GDC_SCROLL_BUFFER[ (offset & 0x1FC0) >> 6 ] << 6) |  (offset & 0x3F);
 
 	offset &= 0xffff; // same as in VT240?
 	uint16_t chr = data; // VT240 : uint8_t
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR) // VT240 : if(SELECT_VECTOR_PATTERN_REGISTER)
 	{
-			chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
-			chr |= (chr << 8);
-			if(m_patcnt-- == 0)
-			{
-				m_patcnt = m_patmult;
-				if(m_patidx-- == 0)
-					m_patidx = 7;
-			}
+		chr = BITSWAP8(m_vpat, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx, m_patidx);
+		chr |= (chr << 8);
+		if(m_patcnt-- == 0)
+		{
+			m_patcnt = m_patmult;
+			if(m_patidx-- == 0)
+				m_patidx = 7;
+		}
 	}
-		else
+	else
 	{
-			chr = m_GDC_WRITE_BUFFER[ m_GDC_write_buffer_index++ ];
-			m_GDC_write_buffer_index &= 0xf;
+		chr = m_GDC_WRITE_BUFFER[ m_GDC_write_buffer_index++ ];
+		m_GDC_write_buffer_index &= 0xf;
 
-			chr |= (m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] << 8);
-			m_GDC_write_buffer_index &= 0xf;
+		chr |= (m_GDC_WRITE_BUFFER[m_GDC_write_buffer_index++] << 8);
+		m_GDC_write_buffer_index &= 0xf;
 	}
 
 	if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
@@ -2791,10 +2786,10 @@ WRITE16_MEMBER(rainbow_state::vram_w)
 						break;
 				}
 
-				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : (NOT VECTOR MODE) Text Mode and Write Mask Batch
+				if(!(m_GDC_MODE_REGISTER & GDC_MODE_VECTOR)) // 0 : Text Mode and Write Mask Batch
 					out = (out & ~m_GDC_WRITE_MASK) | (mem & m_GDC_WRITE_MASK); // // M_MASK (1st use)
 				else
-					out = (out & ~data) | (mem & data); // VECTOR MODE !
+					out = (out & ~data) | (mem & data); // vector mode
 
 				if(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_WRITES) // 0x10
 					m_video_ram[(offset & 0xffff) + (0x8000 * i)] = out;
@@ -2845,13 +2840,13 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 	if(offset > 0) // Port $50 reset done @ boot ROM 1EB4/8 regardless if option present.
 		if (m_inp7->read() != 1)
 		{
-				if(last_message != 1)
-				{
-					printf("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN RESTART.\n");
-					printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
-					last_message = 1;
-				}
-				return;
+			if(last_message != 1)
+			{
+				printf("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN RESTART.\n");
+				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
+				last_message = 1;
+			}
+			return;
 		}
 
 	switch(offset)
@@ -2860,15 +2855,12 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			// FIXME: "Any write to this port also resynchronizes the
 			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
 
-			//if( (!(m_PORT50 & 1)) && (data & 1)) // PDF QV069 suggests 1 -> 0 -> 1			
-			if( data & 1 ) // ; most programs just set bit 0 (PACMAN).
+			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1. Most programs just set bit 0 (PACMAN).
 			{	
 				// Graphics option software reset (separate from GDC reset...)
 				OPTION_GRFX_RESET 
-
 				OPTION_RESET_PATTERNS
 			}
-			m_PORT50  = data;
 			break;
 
 		case 1: //  51h - DATA loaded into register previously written to 53h.

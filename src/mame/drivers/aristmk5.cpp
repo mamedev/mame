@@ -991,7 +991,23 @@ MACHINE_CONFIG_END
 	ROM_REGION16_BE( 0x100, "eeprom0", ROMREGION_ERASEFF ) \
 	ROM_REGION16_BE( 0x100, "eeprom1", ROMREGION_ERASEFF ) \
 
+#define ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS \
+	ROM_REGION( 0x400000, "set_4.04.09", ROMREGION_ERASEFF ) /* setchip v4.04.08 4meg */ \
+	ROM_LOAD32_WORD( "setchip v4.04.09.u7",  0x000000, 0x80000, CRC(e8e8dc75) SHA1(201fe95256459ce34fdb6f7498135ab5016d07f3) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.09.u11", 0x000002, 0x80000, CRC(ff7a9035) SHA1(4352c4336e61947c555fdc80c61f944076f64b64) ) \
+	ROM_REGION( 0x400000, "set_4.04.00", ROMREGION_ERASEFF ) /* setchip v4.04.00 4meg 42pin */ \
+	ROM_LOAD32_WORD( "setchip v4.04.00.u7",  0x000000, 0x80000, CRC(2453137e) SHA1(b59998e75ae3924da16faf47b9cfe9afd60d810c) ) \
+	ROM_LOAD32_WORD( "setchip v4.04.00.u11", 0x000002, 0x80000, CRC(82dfa12a) SHA1(86fd0f0ad8d5d1bc503392a40bbcdadb055b2765) ) \
+	ROM_REGION( 0x400000, "set_4.02.04", ROMREGION_ERASEFF ) /* setchip v4.02.04 */ \
+	ROM_LOAD32_WORD( "setchip v4.02.04.u7",  0x000000, 0x80000, CRC(5a254b22) SHA1(8444f237b392df2a3cb42ea349e7af32f47dd544) ) \
+	ROM_LOAD32_WORD( "setchip v4.02.04.u11", 0x000002, 0x80000, CRC(def36617) SHA1(c7ba5b08e884a8fb36c9fb51c08e243e32c81f89) ) \
+	/* GALs */ \
+	ROM_REGION( 0x600, "gals", 0 ) \
+	ROM_LOAD( "a562837.u36",  0x000000, 0x000157, CRC(1f269234) SHA1(29940dd50fb55c632935f62ff44ca724379c7a43) ) \
+	ROM_LOAD( "a562838.u65",  0x000200, 0x000157, CRC(f2f3c40a) SHA1(b795dfa5cc4e8127c3f3a0906664910d1325ec92) ) \
+	ROM_LOAD( "a562840.u22",  0x000400, 0x000157, CRC(941d4cdb) SHA1(1ca091fba69e92f262dbb3d40f515703c8981793) ) \
 
+	
 ROM_START( aristmk5 )
 	ARISTOCRAT_MK5_BIOS
 
@@ -1545,23 +1561,16 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( chickna5u )
 	ARISTOCRAT_MK5_BIOS
-	/*
-	    Checksum code found at 0x000d08
-	    0x000000-0x0a6917 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
-	        Expected Checksum   0x0d44c6b0
-	        Calculated Checksum 0xc47bc6b0  (BAD)
-	    0x0a6918-0x35040b is the non-Checksummed range (unusual endpoint)
-	*/
+
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	// the checksum only covers part of the first 2 roms, marked all as BAD_DUMP because it can't be trusted without a full redump.
-	ROM_LOAD32_WORD( "rhg073003.u7",  0x000000, 0x80000, BAD_DUMP CRC(ca196b37) SHA1(6b204204c1574439ccea1b6145d867a73bad304f) )  // 92.588%
-	ROM_LOAD32_WORD( "rhg073003.u11", 0x000002, 0x80000, BAD_DUMP CRC(b0d7be28) SHA1(6998dce808bf7970500b9e1ce6efed3940ee2d63) )  // 92.588%
-	ROM_LOAD32_WORD( "rhg073003.u8",  0x100000, 0x80000, BAD_DUMP CRC(80e3e34c) SHA1(3ad73c5fc21c4d9647ea514bf367073bbeb981a9) )  // base
-	ROM_LOAD32_WORD( "rhg073003.u12", 0x100002, 0x80000, BAD_DUMP CRC(63d5ec8e) SHA1(dca76342ecee6843e6fc656aafc8ee2e4d19fd65) )  // base
-	ROM_LOAD32_WORD( "rhg073003.u9",  0x200000, 0x80000, BAD_DUMP CRC(662ff210) SHA1(bbd2410fa2cd67e327981c3b2e16342fb9393401) )  // base
-	ROM_LOAD32_WORD( "rhg073003.u13", 0x200002, 0x80000, BAD_DUMP CRC(c3cef8ae) SHA1(4e65787d61387b511972e514047528495e1de11c) )  // base
-	ROM_LOAD32_WORD( "rhg073003.u10", 0x300000, 0x80000, BAD_DUMP CRC(8b3f7d6b) SHA1(7f1a04556c448976145652b05b690142376764d4) )  // base
-	ROM_LOAD32_WORD( "rhg073003.u14", 0x300002, 0x80000, BAD_DUMP CRC(240f7759) SHA1(1fa5ba0185b027101dae207ec5d28b07d3d73fc2) )  // base
+	ROM_LOAD32_WORD( "rhg073003.u7",  0x000000, 0x080000, CRC(06558129) SHA1(be726c0d35776faf1ecd20eb0a193e68a1fb1a84) ) 	
+	ROM_LOAD32_WORD( "rhg073003.u11", 0x000002, 0x080000, CRC(0eadf5d4) SHA1(b783f6e1911fc098d1b4d1d8c75862e031078e5b) ) 
+	ROM_LOAD32_WORD( "rhg073003.u8",  0x100000, 0x080000, CRC(683e96bc) SHA1(bca8e87bea9f7044fa29dc4518e2ac5b429e3313) ) 
+	ROM_LOAD32_WORD( "rhg073003.u12", 0x100002, 0x080000, CRC(8313b03b) SHA1(d2a91bae8063d89ec9a1edab6df3e6711719d2c2) ) 
+	ROM_LOAD32_WORD( "rhg073003.u9",  0x200000, 0x080000, CRC(9c08aefa) SHA1(fe3ffa8eb308ab216cc08dd2ce51113b4ef74c4a) ) 
+	ROM_LOAD32_WORD( "rhg073003.u13", 0x200002, 0x080000, CRC(69fd4f89) SHA1(4e0469caecf9293197a4a5de960eb9dcfee39ca3) ) 
+	ROM_LOAD32_WORD( "rhg073003.u10", 0x300000, 0x080000, CRC(9aae49d7) SHA1(5cf87b747ea7561766fe0ffc15967fea657b252b) ) 	
+	ROM_LOAD32_WORD( "rhg073003.u14", 0x300002, 0x080000, CRC(240f7759) SHA1(1fa5ba0185b027101dae207ec5d28b07d3d73fc2) ) 
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -1642,7 +1651,7 @@ ROM_END
 // CUCKOO - Export C - 02/02/00.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( cuckoou )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0a588b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -1660,6 +1669,19 @@ ROM_START( cuckoou )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(415b9c77) SHA1(86a3b3aabd81f5fcf767dd53f7034f7d58f2020e) ) 
+	
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(64c895fe) SHA1(12c75338dd1b2260d0581744cef1b705c718727f) ) 
+	
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
+
 ROM_END
 
 
@@ -1808,7 +1830,7 @@ ROM_END
 // Dolphin Treasure - Export B - 06/12/96.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( dolphntru )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec8b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -1826,6 +1848,18 @@ ROM_START( dolphntru )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(1fc27753) SHA1(7e5008faaf115dc506481430272285117c989d8e) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(0063e5ca) SHA1(a3d7b636bc9d792e93d11cb2babf24fbdd6d7776) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 
@@ -2127,7 +2161,7 @@ ROM_START( incasun )
 ROM_END
 
 ROM_START( incasunu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
 	ROM_LOAD32_WORD("chg1458.u7",  0x0000000, 0x0080000, CRC(20c78b79) SHA1(d7402ff89160f25c9f4f67bbf688621d4ce22205) )
@@ -2140,6 +2174,18 @@ ROM_START( incasunu )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(b3efdb60) SHA1(f219175019b7237f1e2d132f36803097f2a1d174) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(a68e890e) SHA1(8ab087a09cfee8d3e2d84b1003b6798c7223be03) ) 
+	
+	ROM_REGION( 0x20, "rtc", 0 )	
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 ROM_START( incasunsp )
@@ -2385,7 +2431,7 @@ ROM_END
 // MV4115 - 5,10,20 Credit Multiplier / 9 Line Multiline.
 // Magic Mask [Reel Game] - Export A - 09/05/2000.
 ROM_START( magimask )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e8527 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2403,6 +2449,18 @@ ROM_START( magimask )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(6e485bbc) SHA1(3d6c8d120c69ed2804f267c50681974f73e1ee51) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(538c7523) SHA1(1e6516b77daf855e397c1ec590e73637ce3b8406) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )	
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 
@@ -2418,7 +2476,7 @@ ROM_END
 // dhg1309.u11    ahg1548.u11    17.786026%
 // dhg1309.u7     ahg1548.u7     16.893578%
 ROM_START( magimaska )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9597 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2436,6 +2494,18 @@ ROM_START( magimaska )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(a10501f9) SHA1(34fdcd16bd7dc474baadc0836e2083abaf589549) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",       0x000000, 0x080000, CRC(5365446b) SHA1(9ae7a72d0ed3e7f7523a2e0a8f0dc014c6490438) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )	
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 
@@ -2514,7 +2584,7 @@ ROM_END
 // Mine, Mine, Mine - Export E - 14/02/96.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( minemine )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d10
 	    0x000000-0x0a7203 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2532,6 +2602,18 @@ ROM_START( minemine )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(8421e7c2) SHA1(fc1b07d5b7aadafc4a0f2e4dfa698e7c72340717) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(883f5023) SHA1(e526e337b5b0fc77091b4946b503b56307c390e9) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) )
 ROM_END
 
 
@@ -2704,7 +2786,7 @@ ROM_END
 // Party Gras [Reel Game] - Export A - 10/11/2001.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( partygrs )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d18
 	    0x000000-0x0e9b47 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2722,6 +2804,18 @@ ROM_START( partygrs )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(a10501f9) SHA1(34fdcd16bd7dc474baadc0836e2083abaf589549) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(fec1b1df) SHA1(5981e2961692d4c8633afea4ecb4828eabba65bd) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 
@@ -2843,7 +2937,7 @@ ROM_END
 // Penguin Pays - Export B - 14/07/97.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( pengpayu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0cd21b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -2861,6 +2955,18 @@ ROM_START( pengpayu )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	 	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(8421e7c2) SHA1(fc1b07d5b7aadafc4a0f2e4dfa698e7c72340717) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(4e5b9702) SHA1(b2b645db80c4ece24fae8ce6fb660e77ac8e5810) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) )
 ROM_END
 
 
@@ -3020,7 +3126,7 @@ ROM_END
 // All devices are 27c4002 instead of 27c4096.
 // Even when it's a NSW/ACT, the program seems to be for US-Export platforms...
 ROM_START( qnileu )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x08ec87 is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3038,6 +3144,18 @@ ROM_START( qnileu )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+	
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(1fc27753) SHA1(7e5008faaf115dc506481430272285117c989d8e) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(5a7bb53a) SHA1(cdac900925d0ee8f98209a377b9f8760de0c2883) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 
@@ -3309,10 +3427,9 @@ ROM_END
 
 ROM_START( topbana )
 	ARISTOCRAT_MK5_BIOS
-	// checksum code not found (due to bad rom)
 	ROM_REGION( 0x400000, "game_prg", ROMREGION_ERASEFF )
-	ROM_LOAD32_WORD("0100550v.u7",  0x0000000, 0x0080000, CRC(1f60241c) SHA1(3a6207d9c919319fc10b6de63bc030f8d335588e) )
-	ROM_LOAD32_WORD("0100550v.u11", 0x0000002, 0x007fffa, BAD_DUMP CRC(140a73bc) SHA1(3fd88797b6310f5849e901d032fbeb8a2d8604fb) )   // This is a bad .u8 from Indian Dream, not proper Top Banana .u11!!
+	ROM_LOAD32_WORD( "0100550v.u11", 0x000002, 0x080000, CRC(1c64b3b6) SHA1(80bbc6e3f47ab932e9c07e0c6063197a2d8e81f7) ) 
+	ROM_LOAD32_WORD( "0100550v.u7",  0x000000, 0x080000, CRC(9c5e2d66) SHA1(658143706c0e1f3b43b3ec301da1052363fe5244) ) 
 
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
@@ -3561,7 +3678,7 @@ ROM_END
 // Wild Cougar - Export D - 19/05/97.
 // All devices are 27c4002 instead of 27c4096.
 ROM_START( wcougaru )
-	ARISTOCRAT_MK5_BIOS
+	ARISTOCRAT_MK5_BIOS_HAVE_EEPROMS
 	/*
 	    Checksum code found at 0x000d08
 	    0x000000-0x0b0d5b is the Checksummed Range (excluding 0x000020-0x000027 where Checksum is stored)
@@ -3579,6 +3696,18 @@ ROM_START( wcougaru )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x20000*4, "sram", ROMREGION_ERASE00 )
+	
+	ROM_REGION16_BE( 0x100, "eeprom0", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom0",      0x000000, 0x000100, CRC(fea8a821) SHA1(c744cac6af7621524fc3a2b0a9a135a32b33c81b) ) 
+		
+	ROM_REGION16_BE( 0x100, "eeprom1", 0 )
+	ROM_LOAD16_WORD_SWAP( "eeprom1",      0x000000, 0x000100, CRC(8421e7c2) SHA1(fc1b07d5b7aadafc4a0f2e4dfa698e7c72340717) ) 
+
+	ROM_REGION( 0x80000, "nvram", 0 )
+	ROM_LOAD( "nvram",        0x000000, 0x080000, CRC(dfe52286) SHA1(db31fb64e2fff8aa5ba0cc6d3d73860e8019406c) ) 
+
+	ROM_REGION( 0x20, "rtc", 0 )
+	ROM_LOAD( "rtc",          0x000000, 0x00001f, CRC(6909acb0) SHA1(6a4589599cd1c477e916474e7b029e9a4e92019b) ) 
 ROM_END
 
 

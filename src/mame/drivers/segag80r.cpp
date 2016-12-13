@@ -172,8 +172,8 @@ offs_t segag80r_state::decrypt_offset(address_space &space, offs_t offset)
 	if ((uint16_t)pc == 0xffff || space.read_byte(pc) != 0x32)
 		return offset;
 
-	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*m_decrypt)(pc, space.read_byte(pc + 1));
+	/* munge the low byte of the address */
+	return (offset & 0xff00) | (*m_decrypt)(pc, offset & 0xff);
 }
 
 WRITE8_MEMBER(segag80r_state::mainram_w)

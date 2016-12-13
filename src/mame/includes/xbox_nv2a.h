@@ -358,7 +358,7 @@ public:
 
 	struct nv2avertex_t : public vertex_t
 	{
-		float w;
+		double w;
 	};
 
 	nv2a_renderer(running_machine &machine) : poly_manager<double, nvidia_object_data, 13, 8192>(machine)

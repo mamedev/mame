@@ -182,52 +182,6 @@ bool device_memory_interface::memory_translate(address_spacenum spacenum, int in
 
 
 //-------------------------------------------------
-//  memory_read - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal read operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_read(address_spacenum spacenum, offs_t offset, int size, u64 &value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_write - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal write operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_write(address_spacenum spacenum, offs_t offset, int size, u64 value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_readop - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal opcode fetching
-//  operations are handled by bypassing the memory
-//  system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_readop(offs_t offset, int size, u64 &value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
 //  interface_validity_check - perform validity
 //  checks on the memory configuration
 //-------------------------------------------------

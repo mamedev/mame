@@ -169,8 +169,6 @@ TODO:
 - bassline imperfect. This is just the square wave output of the 5232 at the moment.
   It should go through analog stages.
 
-- properly emulate the 8155 on the sound board.
-
 - implement low-pass filters on the DAC output
 
 - the purpose of the sound PROM is unclear. From the schematics, it seems it
@@ -365,6 +363,7 @@ D                                                                               
 #include "cpu/alph8201/alph8201.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/i8155.h"
 #include "machine/nvram.h"
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
@@ -385,9 +384,10 @@ D                                                                               
 /******************************************************************************/
 // Sound
 
-TIMER_CALLBACK_MEMBER(equites_state::equites_nmi_callback)
+WRITE_LINE_MEMBER(equites_state::equites_8155_timer_pulse)
 {
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
+	if (!state) // active low
+		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 TIMER_CALLBACK_MEMBER(equites_state::equites_frq_adjuster_callback)
@@ -518,10 +518,33 @@ WRITE8_MEMBER(equites_state::equites_dac_latch_w)
 	equites_update_dac();
 }
 
+WRITE8_MEMBER(equites_state::equites_8155_porta_w)
+{
+	m_eq8155_port_a = data;
+	m_msm->set_output_gain(0, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(1, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(2, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(3, (data >> 4) / 15.0);  /* group1 from msm5232 */
+	m_msm->set_output_gain(4, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(5, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(6, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+	m_msm->set_output_gain(7, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
+}
+
 WRITE8_MEMBER(equites_state::equites_8155_portb_w)
 {
 	m_eq8155_port_b = data;
 	equites_update_dac();
+}
+
+WRITE8_MEMBER(equites_state::equites_8155_portc_w)
+{
+	m_eq8155_port_c = data;
+	m_msm->set_output_gain(8, (data & 0x0f) / 15.0);    /* SOLO  8' from msm5232 */
+	if (data & 0x20)
+		m_msm->set_output_gain(9, (data & 0x0f) / 15.0);    /* SOLO 16' from msm5232 */
+	else
+		m_msm->set_output_gain(9, 0);   /* SOLO 16' from msm5232 */
 }
 
 WRITE_LINE_MEMBER(equites_state::equites_msm5232_gate)
@@ -553,47 +576,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(equites_state::splndrbt_scanline)
 
 	if(scanline == 32) // vblank-in irq
 		m_maincpu->set_input_line(2, HOLD_LINE);
-}
-
-WRITE8_MEMBER(equites_state::equites_8155_w)
-{
-	// FIXME proper 8155 emulation must be implemented
-	switch( offset )
-	{
-		case 0: //logerror( "8155 Command register write %x, timer command = %x, interrupt enable = %x, ports = %x\n", data, (data >> 6) & 3, (data >> 4) & 3, data & 0xf );
-			if (((data >> 6) & 3) == 3)
-				m_nmi_timer->adjust(attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count), 0, attotime::from_hz(XTAL_6_144MHz/2 / m_timer_count));
-			break;
-		case 1: //logerror( "8155 I/O Port A write %x\n", data );
-			m_eq8155_port_a = data;
-			m_msm->set_output_gain(0, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(1, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(2, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(3, (data >> 4) / 15.0);  /* group1 from msm5232 */
-			m_msm->set_output_gain(4, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(5, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(6, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			m_msm->set_output_gain(7, (data & 0x0f) / 15.0);    /* group2 from msm5232 */
-			break;
-		case 2: //logerror( "8155 I/O Port B write %x\n", data );
-			equites_8155_portb_w(space, 0, data);
-			break;
-		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
-			m_eq8155_port_c = data;
-			m_msm->set_output_gain(8, (data & 0x0f) / 15.0);    /* SOLO  8' from msm5232 */
-			if (data & 0x20)
-				m_msm->set_output_gain(9, (data & 0x0f) / 15.0);    /* SOLO 16' from msm5232 */
-			else
-				m_msm->set_output_gain(9, 0);   /* SOLO 16' from msm5232 */
-
-			break;
-		case 4: //logerror( "8155 Timer low 8 bits write %x\n", data );
-			m_timer_count = (m_timer_count & 0xff00) | data;
-			break;
-		case 5: //logerror( "8155 Timer high 6 bits write %x, timer mode %x\n", data & 0x3f, (data >> 6) & 3);
-			m_timer_count = (m_timer_count & 0x00ff) | ((data & 0x3f) << 8);
-			break;
-	}
 }
 
 
@@ -717,11 +699,11 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, equites_state )
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)  // followed by 1 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0e0, 0xc0e0) AM_WRITE(equites_dac_latch_w)  // followed by 2 (and usually 0) on 8155 port B
 	AM_RANGE(0xc0f8, 0xc0ff) AM_WRITE(equites_c0f8_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_RAM
+	AM_RANGE(0xe000, 0xe0ff) AM_DEVREADWRITE("audio8155", i8155_device, memory_r, memory_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, equites_state )
-	AM_RANGE(0x00e0, 0x00e5) AM_WRITE(equites_8155_w)
+	AM_RANGE(0x00e0, 0x00e7) AM_DEVREADWRITE("audio8155", i8155_device, io_r, io_w)
 ADDRESS_MAP_END
 
 
@@ -1056,6 +1038,12 @@ static MACHINE_CONFIG_FRAGMENT( common_sound )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 
+	MCFG_DEVICE_ADD("audio8155", I8155, XTAL_6_144MHz/2)
+	MCFG_I8155_OUT_PORTA_CB(WRITE8(equites_state, equites_8155_porta_w))
+	MCFG_I8155_OUT_PORTB_CB(WRITE8(equites_state, equites_8155_portb_w))
+	MCFG_I8155_OUT_PORTC_CB(WRITE8(equites_state, equites_8155_portc_w))
+	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(equites_state, equites_8155_timer_pulse))
+
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
@@ -1132,8 +1120,6 @@ void equites_state::machine_start()
 	save_item(NAME(m_hihatvol));
 	save_item(NAME(m_timer_count));
 	save_item(NAME(m_gekisou_unknown_bit));
-
-	m_nmi_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_nmi_callback), this));
 
 	m_adjuster_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(equites_state::equites_frq_adjuster_callback), this));
 	m_adjuster_timer->adjust(attotime::from_hz(60), 0, attotime::from_hz(60));

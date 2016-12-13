@@ -311,7 +311,7 @@ crosshair_manager::crosshair_manager(running_machine &machine)
 
 	/* register callbacks for when we load/save configurations */
 	if (m_usage)
-		machine.configuration().config_register("crosshairs", config_saveload_delegate(&crosshair_manager::config_load, this), config_saveload_delegate(&crosshair_manager::config_save, this));
+		machine.configuration().config_register("crosshairs", config_load_delegate(&crosshair_manager::config_load, this), config_save_delegate(&crosshair_manager::config_save, this));
 
 	/* register the animation callback */
 	if (machine.first_screen() != nullptr)
@@ -381,15 +381,12 @@ void crosshair_manager::render(screen_device &screen)
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void crosshair_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	/* Note: crosshair_load() is only registered if croshairs are used */
 
-	xml_data_node const *crosshairnode;
-	int auto_time;
-
 	/* we only care about game files */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	/* might not have any data */
@@ -397,11 +394,9 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 		return;
 
 	/* loop and get player crosshair info */
-	for (crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
+	for (util::xml::data_node const *crosshairnode = parentnode->get_child("crosshair"); crosshairnode; crosshairnode = crosshairnode->get_next_sibling("crosshair"))
 	{
-		int  player, mode;
-
-		player = crosshairnode->get_attribute_int("player", -1);
+		int const player = crosshairnode->get_attribute_int("player", -1);
 
 		// check to make sure we have a valid player
 		if (player >= 0 && player < MAX_PLAYERS)
@@ -411,7 +406,7 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 			if (crosshair.is_used())
 			{
 				// get, check, and store visibility mode
-				mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
+				int const mode = crosshairnode->get_attribute_int("mode", CROSSHAIR_VISIBILITY_DEFAULT);
 				if (mode >= CROSSHAIR_VISIBILITY_OFF && mode <= CROSSHAIR_VISIBILITY_AUTO)
 				{
 					crosshair.set_mode(u8(mode));
@@ -427,10 +422,10 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
 	}
 
 	/* get, check, and store auto visibility time */
-	crosshairnode = parentnode->get_child("autotime");
-	if (crosshairnode != nullptr)
+	util::xml::data_node const *crosshairnode = parentnode->get_child("autotime");
+	if (crosshairnode)
 	{
-		auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
+		int const auto_time = crosshairnode->get_attribute_int("val", CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT);
 		if ((auto_time >= CROSSHAIR_VISIBILITY_AUTOTIME_MIN) && (auto_time <= CROSSHAIR_VISIBILITY_AUTOTIME_MAX))
 			m_auto_time = u8(auto_time);
 	}
@@ -442,25 +437,22 @@ void crosshair_manager::config_load(config_type cfg_type, xml_data_node *parentn
     configuration file
 -------------------------------------------------*/
 
-void crosshair_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void crosshair_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	/* Note: crosshair_save() is only registered if crosshairs are used */
 
-	xml_data_node *crosshairnode;
-	int player;
-
 	/* we only care about game files */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
-	for (player = 0; player < MAX_PLAYERS; player++)
+	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
 		const render_crosshair &crosshair = *m_crosshair[player];
 
 		if (crosshair.is_used())
 		{
 			/* create a node */
-			crosshairnode = parentnode->add_child("crosshair", nullptr);
+			util::xml::data_node *const crosshairnode = parentnode->add_child("crosshair", nullptr);
 
 			if (crosshairnode != nullptr)
 			{
@@ -492,7 +484,7 @@ void crosshair_manager::config_save(config_type cfg_type, xml_data_node *parentn
 	if (m_auto_time != CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT)
 	{
 		/* create a node */
-		crosshairnode = parentnode->add_child("autotime", nullptr);
+		util::xml::data_node *const crosshairnode = parentnode->add_child("autotime", nullptr);
 
 		if (crosshairnode != nullptr)
 			crosshairnode->set_attribute_int("val", m_auto_time);

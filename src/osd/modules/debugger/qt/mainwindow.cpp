@@ -526,7 +526,7 @@ void MainWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void MainWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
+void MainWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 	node.set_attribute_int("rightbar", m_rightBar);
@@ -534,7 +534,7 @@ void MainWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 }
 
 
-void MainWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
+void MainWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 	const char* state = node.get_attribute_string("qtwindowstate", "");

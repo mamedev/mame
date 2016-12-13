@@ -631,26 +631,6 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 }
 
 
-bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
-{
-	/* TODO: alignment if offset is odd */
-	if (spacenum == AS_PROGRAM)
-	{
-		value = (PM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_DATA)
-	{
-		value = (DM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_IO)
-	{
-		value = m_io->read_word(offset);
-	}
-	return 1;
-}
-
-
-
 void tms32053_device::device_reset()
 {
 	// reset registers
