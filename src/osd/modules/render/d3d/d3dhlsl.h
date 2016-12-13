@@ -347,6 +347,7 @@ private:
 
 	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
+	bool                    update_t;                   // signal for delta_t to be updated
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
 	double                  acc_t;                      // accumulated machine time
