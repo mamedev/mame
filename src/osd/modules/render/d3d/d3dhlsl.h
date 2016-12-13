@@ -320,7 +320,7 @@ private:
 
 	void                    render_snapshot(IDirect3DSurface9 *surface);
 	// Time since last call, only updates once per render of all screens
-	double                  delta_time();
+	double                  delta_time() { return delta_t; }
 	d3d_render_target*      find_render_target(int source_width, int source_height, uint32_t screen_index);
 
 	rgb_t                   apply_color_convolution(rgb_t color);
@@ -348,7 +348,6 @@ private:
 
 	bool                    post_fx_enable;             // overall enable flag
 	bool                    oversampling_enable;        // oversampling enable flag
-	bool                    update_t;                   // signal for delta_t to be updated
 	int                     num_screens;                // number of emulated physical screens
 	int                     curr_screen;                // current screen for render target operations
 	double                  acc_t;                      // accumulated machine time
