@@ -84,7 +84,7 @@ void netlist_mame_analog_input_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_analog_output_t::netlist_mame_analog_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_ANALOG_INPUT, "Netlist Analog Output", tag, owner, clock, "netlist_analog_output", __FILE__),
+		: device_t(mconfig, NETLIST_ANALOG_OUTPUT, "Netlist Analog Output", tag, owner, clock, "netlist_analog_output", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_in("")
 {
@@ -119,7 +119,7 @@ void netlist_mame_analog_output_t::device_start()
 // ----------------------------------------------------------------------------------------
 
 netlist_mame_int_input_t::netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: device_t(mconfig, NETLIST_INT_INPUT, "Netlist Logic Input", tag, owner, clock, "netlist_logic_input", __FILE__),
+		: device_t(mconfig, NETLIST_INT_INPUT, "Netlist Integer Input", tag, owner, clock, "netlist_logic_input", __FILE__),
 			netlist_mame_sub_interface(*owner),
 			m_param(nullptr),
 			m_mask(0xffffffff),

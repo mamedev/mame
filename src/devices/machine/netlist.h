@@ -35,12 +35,12 @@
 				netlist_analog_output_delegate(& _class :: _member,                 \
 						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
-#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)              \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)                      \
+#define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)             \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)              \
 	netlist_mame_logic_input_t::static_set_params(*device, _name, _shift);
 
-#define MCFG_NETLIST_INT_INPUT(_basetag, _tag, _name, _shift, _mask)                \
-	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                      \
+#define MCFG_NETLIST_INT_INPUT(_basetag, _tag, _name, _shift, _mask)        \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_INT_INPUT, 0)                \
 	netlist_mame_int_input_t::static_set_params(*device, _name, _mask, _shift);
 
 #define MCFG_NETLIST_ROM(_basetag, _tag, _name, _region) \
@@ -55,6 +55,7 @@
 	MCFG_DEVICE_ADD(_basetag ":cout" # _chan, NETLIST_STREAM_OUTPUT, 0)             \
 	netlist_mame_stream_output_t::static_set_params(*device, _chan, _name);
 
+#define MCFG_NETLIST_ROM_ACCESS(
 
 #define NETLIST_LOGIC_PORT_CHANGED(_base, _tag)                                     \
 	PORT_CHANGED_MEMBER(_base ":" _tag, netlist_mame_logic_input_t, input_changed, 0)
@@ -416,16 +417,22 @@ private:
 
 
 // ----------------------------------------------------------------------------------------
-// netlist_mame_int_input_t
+// netlist_mame_rom_t
 // ----------------------------------------------------------------------------------------
 
-class netlist_mame_int_input_t :  public device_t,
-									public netlist_mame_sub_interface
+class netlist_mame_rom_t :  public device_t,
+							public netlist_mame_sub_interface
 {
 public:
 
 	// construction/destruction
-	netlist_mame_int_input_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner)
+		: device_t(mconfig, NETLIST_ROM, "Netlist ROM Interface", tag, owner, 0, "netlist_rom", __FILE__),
+			netlist_mame_sub_interface(*owner),
+			m_in("")
+			m_mask(0xffffffff),
+			m_shift(0),
+	{ }
 	virtual ~netlist_mame_int_input_t() { }
 
 	static void static_set_params(device_t &device, const char *param_name, const uint32_t mask, const uint32_t shift);
@@ -460,6 +467,7 @@ private:
 	uint32_t m_shift;
 	pstring m_param_name;
 };
+
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_logic_input_t
@@ -798,6 +806,8 @@ extern const device_type NETLIST_INT_INPUT;
 extern const device_type NETLIST_ROM_REGION;
 
 extern const device_type NETLIST_ANALOG_OUTPUT;
+//extern const device_type NETLIST_LOGIC_OUTPUT;
+extern const device_type NETLIST_INT_OUTPUT;
 extern const device_type NETLIST_STREAM_INPUT;
 extern const device_type NETLIST_STREAM_OUTPUT;
 
