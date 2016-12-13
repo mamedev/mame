@@ -302,14 +302,14 @@ void DasmWindowQtConfig::applyToQWidget(QWidget* widget)
 	rightBarGroup->actions()[m_rightBar]->trigger();
 }
 
-void DasmWindowQtConfig::addToXmlDataNode(xml_data_node &node) const
+void DasmWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 	node.set_attribute_int("cpu", m_cpu);
 	node.set_attribute_int("rightbar", m_rightBar);
 }
 
-void DasmWindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
+void DasmWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 	m_cpu = node.get_attribute_int("cpu", m_cpu);

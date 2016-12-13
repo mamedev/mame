@@ -3126,6 +3126,8 @@ OP(op,ff) { rst(0x38);                                                          
 
 void z80_device::take_nmi()
 {
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
+
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3145,6 +3147,8 @@ void z80_device::take_nmi()
 void z80_device::take_interrupt()
 {
 	int irq_vector;
+
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
 
 	/* Check if processor was halted */
 	leave_halt();
@@ -3230,6 +3234,8 @@ void z80_device::take_interrupt()
 
 void nsc800_device::take_interrupt_nsc800()
 {
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
+
 	/* Check if processor was halted */
 	leave_halt();
 

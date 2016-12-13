@@ -1801,6 +1801,13 @@ static MACHINE_CONFIG_START( fdes2100d, fidel6502_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fdes2000d, fdes2100d )
+
+	/* basic machine hardware */
+	MCFG_CPU_REPLACE("maincpu", R65C02, XTAL_3MHz) // R65C02P3
+	MCFG_CPU_PROGRAM_MAP(fdesdis_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( chesster, fidel6502_state )
 
 	/* basic machine hardware */
@@ -2129,7 +2136,7 @@ ROM_START( fscc12 )
 ROM_END
 
 
-ROM_START( fexcel ) // PCB label 510.1117A02
+ROM_START( fexcel ) // model 6080(B), PCB label 510.1117A02
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1080a01.ic5", 0x8000, 0x8000, CRC(846f8e40) SHA1(4e1d5b08d5ff3422192b54fa82cb3f505a69a971) ) // same as fexcelv
 ROM_END
@@ -2144,12 +2151,12 @@ ROM_START( fexcelv ) // model 6092, PCB label 510.1117A02, sound PCB 510.1117A01
 	ROM_LOAD("101-1081a01.ic2", 0x0000, 0x8000, CRC(c8ae1607) SHA1(6491ce6be60ed77f3dd931c0ca17616f13af943e) ) // PCB2, M27256
 ROM_END
 
-ROM_START( fexcela ) // PCB label 510-1099A01
+ROM_START( fexcela ) // model 6080, PCB label 510-1099A01(manuf.1985) or 510-1099B01(manuf.1986)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072a01.ic5", 0xc000, 0x4000, CRC(212b006d) SHA1(242ff851b0841cbec66bbada6a730da021010e2c) )
 ROM_END
 
-ROM_START( fexcelb ) // PCB label 510-1099A01
+ROM_START( fexcelb ) // model EP12, PCB label 510-1099A01
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD("101-1072b01.ic5", 0xc000, 0x4000, CRC(fd2f6064) SHA1(f84bb98bdb9565a04891eb6820597d7aecc90c21) ) // RCA
 ROM_END
@@ -2171,6 +2178,13 @@ ROM_START( fdes2100d ) // model 6106, PCB label 510.1130A01. The 'rev B' dump ca
 
 	ROM_REGION( 0x8000, "user1", 0 )
 	ROM_LOAD("bk3_white.ic10", 0x0000, 0x8000, CRC(3857cc35) SHA1(f073dafb9fd885c7ddb7fbff10e3653f343ef1c6) ) // WSI 27C256L-12
+ROM_END
+
+ROM_START( fdes2000d ) // model 6105, PCB label 510.1130A01
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD("27c256.ic9", 0x8000, 0x8000, CRC(b136d1a1) SHA1(8438790a62f45284ff33a0255c5c89f526726d3e) ) // 27C256, no label
+
+	ROM_REGION( 0x8000, "user1", ROMREGION_ERASEFF ) // no rom in ic10
 ROM_END
 
 
@@ -2226,10 +2240,11 @@ CONS( 1987, fexcelv,    fexcel,   0,      fexcelv,   fexcelv,   driver_device, 0
 CONS( 1987, fexceld,    fexcel,   0,      fexceld,   fexcelb,   driver_device, 0, "Fidelity Electronics", "Excel Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1985, fexcela,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model EP12)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // 1st version of The Excellence
 CONS( 1985, fexcelb,    fexcel,   0,      fexcel,    fexcel,    driver_device, 0, "Fidelity Electronics", "The Excellence (model 6080)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1986, fexcelp,    0,        0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1986, fexcelp,    fexcel,   0,      fexcelp,   fexcel,    driver_device, 0, "Fidelity Electronics", "The Par Excellence", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1989, fdes2000,   0,        0,      fdes2000,  fdes,      driver_device, 0, "Fidelity Electronics", "Designer 2000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // Excellence series hardware
 
 CONS( 1988, fdes2100d,  0,        0,      fdes2100d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2100 Display (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, fdes2000d,  fdes2100d,0,      fdes2000d, fdesdis,   fidel6502_state, fdesdis, "Fidelity Electronics", "Designer 2000 Display", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
 CONS( 1990, chesster,   0,        0,      chesster,  chesster,  fidel6502_state, chesster, "Fidelity Electronics", "Chesster Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

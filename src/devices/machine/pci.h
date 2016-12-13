@@ -94,8 +94,8 @@ protected:
 	};
 
 	struct bank_info {
-		// One of the two
 		address_map_delegate map;
+		device_t *device;
 
 		uint64_t adr;
 		uint32_t size;
@@ -123,7 +123,7 @@ protected:
 	virtual void device_reset() override;
 
 	void skip_map_regs(int count);
-	void add_map(uint64_t size, int flags, address_map_delegate &map);
+	void add_map(uint64_t size, int flags, address_map_delegate &map, device_t *relative_to = nullptr);
 	template <typename T> void add_map(uint64_t size, int flags, void (T::*map)(address_map &map), const char *name) {
 		address_map_delegate delegate(map, name, static_cast<T *>(this));
 		add_map(size, flags, delegate);

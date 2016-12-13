@@ -3144,6 +3144,7 @@ sc1zep                          // Zeppelin (Bellfruit)
 
 @source:bfm_sc2.cpp
 gldncrwn                        // 1997
+gldncrwnhop                     // 1997
 paradice                        // 1995
 pokio                           // 1994
 pyramid                         // 1996
@@ -12266,6 +12267,7 @@ cscfr                           // * French
 cscg                            // * German
 cscsp                           // * Spanish
 fdes2000                        //
+fdes2000d                       //
 fdes2100d                       //
 feasbu                          // EAS: Elite A/S Challenger (Budapest program, English)
 feasbufr                        // * French
@@ -13376,6 +13378,7 @@ gkigtez                         //
 gkkey                           //
 igtsc                           //
 ms72c                           //
+ms3								//
 
 @source:gladiatr.cpp
 gcastle                         // QB  (c) 1986 Taito Corporation (prototype?)
@@ -30514,6 +30517,13 @@ kov3                            //
 orleg2                          // (c) 2007
 orleg2o                         //
 orleg2oa                        //
+
+@source:pgm3.cpp
+kov3hd
+kov3hd104
+kov3hd103
+kov3hd102
+kov3hd101
 
 @source:phantom.cpp
 fphantom                        //

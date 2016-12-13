@@ -108,16 +108,16 @@ inline std::string number_and_format::format() const
 	switch (m_format)
 	{
 	default:
-	case xml_data_node::int_format::DECIMAL:
+	case util::xml::data_node::int_format::DECIMAL:
 		return string_format("%d", uint32_t(m_value));
 
-	case xml_data_node::int_format::DECIMAL_HASH:
+	case util::xml::data_node::int_format::DECIMAL_HASH:
 		return string_format("#%d", uint32_t(m_value));
 
-	case xml_data_node::int_format::HEX_DOLLAR:
+	case util::xml::data_node::int_format::HEX_DOLLAR:
 		return string_format("$%X", uint32_t(m_value));
 
-	case xml_data_node::int_format::HEX_C:
+	case util::xml::data_node::int_format::HEX_C:
 		return string_format("0x%X", uint32_t(m_value));
 	}
 }
@@ -132,7 +132,7 @@ inline std::string number_and_format::format() const
 //  cheat_parameter - constructor
 //-------------------------------------------------
 
-cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &paramnode)
+cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, util::xml::data_node const &paramnode)
 	: m_value(0)
 {
 	// read the core attributes
@@ -141,7 +141,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 	m_stepval = number_and_format(paramnode.get_attribute_int("step", 1), paramnode.get_attribute_int_format("step"));
 
 	// iterate over items
-	for (xml_data_node const *itemnode = paramnode.get_child("item"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("item"))
+	for (util::xml::data_node const *itemnode = paramnode.get_child("item"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("item"))
 	{
 		// check for nullptr text
 		if (itemnode->get_value() == nullptr || itemnode->get_value()[0] == 0)
@@ -153,7 +153,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 
 		// extract the parameters
 		uint64_t const value = itemnode->get_attribute_int("value", 0);
-		xml_data_node::int_format const format = itemnode->get_attribute_int_format("value");
+		util::xml::data_node::int_format const format = itemnode->get_attribute_int_format("value");
 
 		// allocate and append a new item
 		auto curitem = std::make_unique<item>(itemnode->get_value(), value, format);
@@ -317,7 +317,7 @@ bool cheat_parameter::set_next_state()
 //  cheat_script - constructor
 //-------------------------------------------------
 
-cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &scriptnode)
+cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, util::xml::data_node const &scriptnode)
 	: m_state(SCRIPT_STATE_RUN)
 {
 	// read the core attributes
@@ -332,7 +332,7 @@ cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const 
 		throw emu_fatalerror("%s.xml(%d): invalid script state '%s'\n", filename, scriptnode.line, state);
 
 	// iterate over nodes within the script
-	for (xml_data_node const *entrynode = scriptnode.get_first_child(); entrynode != nullptr; entrynode = entrynode->get_next_sibling())
+	for (util::xml::data_node const *entrynode = scriptnode.get_first_child(); entrynode != nullptr; entrynode = entrynode->get_next_sibling())
 	{
 		// handle action nodes
 		if (strcmp(entrynode->get_name(), "action") == 0)
@@ -399,7 +399,7 @@ void cheat_script::save(emu_file &cheatfile) const
 //  script_entry - constructor
 //-------------------------------------------------
 
-cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &entrynode, bool isaction)
+cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, util::xml::data_node const &entrynode, bool isaction)
 	: m_condition(&symbols),
 		m_expression(&symbols)
 {
@@ -442,7 +442,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 
 			// then parse arguments
 			int totalargs = 0;
-			for (xml_data_node const *argnode = entrynode.get_child("argument"); argnode != nullptr; argnode = argnode->get_next_sibling("argument"))
+			for (util::xml::data_node const *argnode = entrynode.get_child("argument"); argnode != nullptr; argnode = argnode->get_next_sibling("argument"))
 			{
 				auto curarg = std::make_unique<output_argument>(manager, symbols, filename, *argnode);
 				// verify we didn't overrun the argument count
@@ -608,7 +608,7 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 //  output_argument - constructor
 //-------------------------------------------------
 
-cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node const &argnode)
+cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, util::xml::data_node const &argnode)
 	: m_expression(&symbols),
 		m_count(0)
 {
@@ -676,7 +676,7 @@ void cheat_script::script_entry::output_argument::save(emu_file &cheatfile) cons
 //  cheat_entry - constructor
 //-------------------------------------------------
 
-cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node const &cheatnode)
+cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, util::xml::data_node const &cheatnode)
 	: m_manager(manager)
 	, m_symbols(&manager.machine(), &globaltable)
 	, m_state(SCRIPT_STATE_OFF)
@@ -707,7 +707,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		}
 
 		// read the first comment node
-		xml_data_node const *commentnode = cheatnode.get_child("comment");
+		util::xml::data_node const *commentnode = cheatnode.get_child("comment");
 		if (commentnode != nullptr)
 		{
 			// set the value if not nullptr
@@ -721,7 +721,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		}
 
 		// read the first parameter node
-		xml_data_node const *paramnode = cheatnode.get_child("parameter");
+		util::xml::data_node const *paramnode = cheatnode.get_child("parameter");
 		if (paramnode != nullptr)
 		{
 			// load this parameter
@@ -734,7 +734,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		}
 
 		// read the script nodes
-		for (xml_data_node const *scriptnode = cheatnode.get_child("script"); scriptnode != nullptr; scriptnode = scriptnode->get_next_sibling("script"))
+		for (util::xml::data_node const *scriptnode = cheatnode.get_child("script"); scriptnode != nullptr; scriptnode = scriptnode->get_next_sibling("script"))
 		{
 			// load this entry
 			auto curscript = global_alloc(cheat_script(manager, m_symbols, filename, *scriptnode));
@@ -1397,17 +1397,17 @@ void cheat_manager::load_cheats(const char *filename)
 			osd_printf_verbose("Loading cheats file from %s\n", cheatfile.fullpath());
 
 			// read the XML file into internal data structures
-			xml_parse_options options = { nullptr };
-			xml_parse_error error;
+			util::xml::parse_options options = { nullptr };
+			util::xml::parse_error error;
 			options.error = &error;
-			std::unique_ptr<xml_data_node, void (*)(xml_data_node *)> rootnode(xml_data_node::file_read(cheatfile, &options), [] (xml_data_node *node) { node->file_free(); });
+			std::unique_ptr<util::xml::data_node, void (*)(util::xml::data_node *)> rootnode(util::xml::data_node::file_read(cheatfile, &options), [] (util::xml::data_node *node) { node->file_free(); });
 
 			// if unable to parse the file, just bail
 			if (rootnode == nullptr)
 				throw emu_fatalerror("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
 
 			// find the layout node
-			xml_data_node *mamecheatnode = rootnode->get_child("mamecheat");
+			util::xml::data_node const *const mamecheatnode = rootnode->get_child("mamecheat");
 			if (mamecheatnode == nullptr)
 				throw emu_fatalerror("%s.xml: missing mamecheatnode node", filename);
 
@@ -1417,7 +1417,7 @@ void cheat_manager::load_cheats(const char *filename)
 				throw emu_fatalerror("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
 
 			// parse all the elements
-			for (xml_data_node const *cheatnode = mamecheatnode->get_child("cheat"); cheatnode != nullptr; cheatnode = cheatnode->get_next_sibling("cheat"))
+			for (util::xml::data_node const *cheatnode = mamecheatnode->get_child("cheat"); cheatnode != nullptr; cheatnode = cheatnode->get_next_sibling("cheat"))
 			{
 				// load this entry
 				auto curcheat = std::make_unique<cheat_entry>(*this, m_symtable, filename, *cheatnode);

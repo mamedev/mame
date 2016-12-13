@@ -24,7 +24,7 @@
 network_manager::network_manager(running_machine &machine)
 	: m_machine(machine)
 {
-	machine.configuration().config_register("network", config_saveload_delegate(&network_manager::config_load, this), config_saveload_delegate(&network_manager::config_save, this));
+	machine.configuration().config_register("network", config_load_delegate(&network_manager::config_load, this), config_save_delegate(&network_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -32,12 +32,11 @@ network_manager::network_manager(running_machine &machine)
 //  configuration file
 //-------------------------------------------------
 
-void network_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void network_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
-	xml_data_node const *node;
-	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
 	{
-		for (node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
 			const char *tag = node->get_attribute_string("tag", nullptr);
 
@@ -68,16 +67,14 @@ void network_manager::config_load(config_type cfg_type, xml_data_node *parentnod
 //  file
 //-------------------------------------------------
 
-void network_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void network_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	xml_data_node *node;
-
 	/* only care about game-specific data */
-	if (cfg_type == config_type::CONFIG_TYPE_GAME)
+	if (cfg_type == config_type::GAME)
 	{
 		for (device_network_interface &network : network_interface_iterator(machine().root_device()))
 		{
-			node = parentnode->add_child("device", nullptr);
+			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
 			{
 				node->set_attribute("tag", network.device().tag());

@@ -46,9 +46,7 @@ protected:
 	int m_bgpen;
 
 private:
-
-
-
+	uint32_t sum_colors(const pen_t *pal, int c1_idx, int c2_idx);
 };
 
 extern const device_type TECMO_MIXER;
@@ -64,7 +62,7 @@ extern const device_type TECMO_MIXER;
 #define MCFG_TECMO_MIXER_REGULARCOLS(_bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp) \
 	tecmo_mix_device::set_regularcols(*device, _bgregular_comp, _fgregular_comp, _txregular_comp, _spregular_comp);
 
-#define MCFG_TECMO_MIXER_BLENDSOUCE(_spblend_source, _fgblend_source) \
+#define MCFG_TECMO_MIXER_BLENDSOURCE(_spblend_source, _fgblend_source) \
 	tecmo_mix_device::set_blendsource(*device, _spblend_source, _fgblend_source);
 
 #define MCFG_TECMO_MIXER_REVSPRITETILE \

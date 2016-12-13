@@ -145,6 +145,8 @@ public:
 	std::unique_ptr<uint32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
+	uint32_t m_curUCodeSrc;
+	uint32_t m_curPalTableSrc;
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
@@ -353,6 +355,7 @@ public:
 	static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
+		//uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
 	}
 

@@ -4,7 +4,7 @@
 #include "video/poly.h"
 #include "bitmap.h"
 #include "machine/pic8259.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 
 //#define LOG_NV2A
 
@@ -2653,88 +2653,113 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 
 uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
 {
-#if 0
 	nv2avertex_t *vi[3];
 	nv2avertex_t vo[16];
 	int idx_prev, idx_curr;
 	int neg_prev, neg_curr;
-	float tfactor;
+	double tfactor;
 	int idx;
-#endif
+	const double wthreshold = 0.00000001;
 
 	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
 		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
-#if 0
+	// assign the elements of the array
 	vi[0] = &_v1;
 	vi[1] = &_v2;
 	vi[2] = &_v3;
-	for (int n=0;n < 3;n++)
+	// go back to the state before perpective divide
+	if (vertex_pipeline == 4)
 	{
-		// remove translate
-		vi[n]->x = vi[n]->x - translatex;
-		vi[n]->y = vi[n]->y - translatey;
-		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - translatez;
-		// remove scale
-		vi[n]->x = vi[n]->x / scalex;
-		vi[n]->y = vi[n]->y / scaley;
-		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] / scalez;
-		// remove perspective divide
-		vi[n]->x = vi[n]->x * vi[n]->w;
-		vi[n]->y = vi[n]->y * vi[n]->w;
-		vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		for (int n = 0; n < 3; n++)
+		{
+			vi[n]->x = (vi[n]->x / (double)supersample_factor_x)*vi[n]->w;
+			vi[n]->y = (vi[n]->y / (double)supersample_factor_y)*vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
+	} else
+	{
+		for (int n = 0; n < 3; n++)
+		{
+			// remove translate
+			vi[n]->x = vi[n]->x - matrix.translate[0];
+			vi[n]->y = vi[n]->y - matrix.translate[1];
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - matrix.translate[2];
+			// remove scale
+			vi[n]->x = vi[n]->x / matrix.translate[0];
+			vi[n]->y = vi[n]->y / matrix.translate[1];
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] / matrix.translate[2];
+			// remove perspective divide
+			vi[n]->x = vi[n]->x * vi[n]->w;
+			vi[n]->y = vi[n]->y * vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
 	}
+	// do the clipping
 	idx_prev = 2;
 	idx_curr = 0;
 	idx = 0;
-	neg_prev = vi[idx_prev]->w < 0.00000001 ? 1 : 0;
+	neg_prev = vi[idx_prev]->w < wthreshold ? 1 : 0;
 	while (idx_curr < 3)
 	{
-		neg_curr = vi[idx_curr]->w < 0.00000001 ? 1 : 0;
+		neg_curr = vi[idx_curr]->w < wthreshold ? 1 : 0;
 		if (neg_curr ^ neg_prev)
 		{
-			float p = (float)0.00000001;
-
-			tfactor = (p - vi[idx_prev]->w) / (vi[idx_curr]->w - vi[idx_prev]->w);
-
+			tfactor = (wthreshold - vi[idx_prev]->w) / (vi[idx_curr]->w - vi[idx_prev]->w);
+			// compute values for the new intermediate point
 			vo[idx].x = ((vi[idx_curr]->x - vi[idx_prev]->x) * tfactor) + vi[idx_prev]->x;
 			vo[idx].y = ((vi[idx_curr]->y - vi[idx_prev]->y) * tfactor) + vi[idx_prev]->y;
 			vo[idx].w = ((vi[idx_curr]->w - vi[idx_prev]->w) * tfactor) + vi[idx_prev]->w;
-			for (int n=0;n < 13;n++)
+			for (int n = 0; n < 13; n++)
 				vo[idx].p[n] = ((vi[idx_curr]->p[n] - vi[idx_prev]->p[n]) * tfactor) + vi[idx_prev]->p[n];
 			idx++;
 		}
 		if (neg_curr == 0)
 		{
-			memcpy(&vo[idx], vi[idx_curr],sizeof(nv2avertex_t));
+			vo[idx].x = vi[idx_curr]->x;
+			vo[idx].y = vi[idx_curr]->y;
+			vo[idx].w = vi[idx_curr]->w;
+			for (int n = 0; n < 13; n++)
+				vo[idx].p[n] = vi[idx_curr]->p[n];
 			idx++;
 		}
 		neg_prev = neg_curr;
 		idx_prev = idx_curr;
 		idx_curr++;
 	}
-	for (int n = 0; n < idx; n++)
+	// screen coordinates for the new points
+	if (vertex_pipeline == 4)
 	{
-		// apply perspective divide
-		vo[n].x = vo[n].x / vo[n].w;
-		vo[n].y = vo[n].y / vo[n].w;
-		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
-		// apply scale
-		vo[n].x = vo[n].x * scalex;
-		vo[n].y = vo[n].y * scaley;
-		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * scalez;
-		// apply translate
-		vo[n].x = vo[n].x + translatex;
-		vo[n].y = vo[n].y + translatey;
-		vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + translatez;
+		for (int n = 0; n < idx; n++)
+		{
+			vo[n].x = vo[n].x*(double)supersample_factor_x / vo[n].w;
+			vo[n].y = vo[n].y*(double)supersample_factor_y / vo[n].w;
+			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
+		}
+	} else
+	{
+		for (int n = 0; n < idx; n++)
+		{
+			// apply perspective divide
+			vo[n].x = vo[n].x / vo[n].w;
+			vo[n].y = vo[n].y / vo[n].w;
+			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
+			// apply scale
+			vo[n].x = vo[n].x * matrix.scale[0];
+			vo[n].y = vo[n].y * matrix.scale[1];
+			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * matrix.scale[2];
+			// apply translate
+			vo[n].x = vo[n].x + matrix.translate[0];
+			vo[n].y = vo[n].y + matrix.translate[1];
+			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + matrix.translate[2];
+		}
 	}
-	for (int n = 0; n < (idx-2); n++)
+	for (int n = 0; n < (idx - 2); n++)
 	{
 		if ((n & 1) == 0)
 			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 1], vo[n + 2]);
 		else
 			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 2], vo[n + 1]);
 	}
-#endif
 	return 0;
 }
 

@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_IMAGE_H
+#define MAME_EMU_IMAGE_H
 
-#ifndef __IMAGE_H__
-#define __IMAGE_H__
+#pragma once
 
 // ======================> image_manager
 
@@ -27,8 +27,8 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 private:
-	void config_load(config_type cfg_type, xml_data_node *parentnode);
-	void config_save(config_type cfg_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	void options_extract();
 	int write_config(emu_options &options, const char *filename, const game_driver *gamedrv);
@@ -37,4 +37,4 @@ private:
 	running_machine &   m_machine;                  // reference to our machine
 };
 
-#endif /* __IMAGE_H__ */
+#endif /* MAME_EMU_IMAGE_H */

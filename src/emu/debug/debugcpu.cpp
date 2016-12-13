@@ -220,7 +220,7 @@ bool debugger_cpu::comment_save()
 	bool comments_saved = false;
 
 	// if we don't have a root, bail
-	xml_data_node *const root = xml_data_node::file_create();
+	util::xml::data_node *const root = util::xml::data_node::file_create();
 	if (root == nullptr)
 		return false;
 
@@ -228,13 +228,13 @@ bool debugger_cpu::comment_save()
 	try
 	{
 		// create a comment node
-		xml_data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
+		util::xml::data_node *const commentnode = root->add_child("mamecommentfile", nullptr);
 		if (commentnode == nullptr)
 			throw emu_exception();
 		commentnode->set_attribute_int("version", COMMENT_VERSION);
 
 		// create a system node
-		xml_data_node *const systemnode = commentnode->add_child("system", nullptr);
+		util::xml::data_node *const systemnode = commentnode->add_child("system", nullptr);
 		if (systemnode == nullptr)
 			throw emu_exception();
 		systemnode->set_attribute("name", m_machine.system().name);
@@ -245,7 +245,7 @@ bool debugger_cpu::comment_save()
 			if (device.debug() && device.debug()->comment_count() > 0)
 			{
 				// create a node for this device
-				xml_data_node *const curnode = systemnode->add_child("cpu", nullptr);
+				util::xml::data_node *const curnode = systemnode->add_child("cpu", nullptr);
 				if (curnode == nullptr)
 					throw emu_exception();
 				curnode->set_attribute("tag", device.tag());
@@ -295,7 +295,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 		return false;
 
 	// wrap in a try/catch to handle errors
-	xml_data_node *const root = xml_data_node::file_read(file, nullptr);
+	util::xml::data_node *const root = util::xml::data_node::file_read(file, nullptr);
 	try
 	{
 		// read the file
@@ -303,7 +303,7 @@ bool debugger_cpu::comment_load(bool is_inline)
 			throw emu_exception();
 
 		// find the config node
-		xml_data_node const *const commentnode = root->get_child("mamecommentfile");
+		util::xml::data_node const *const commentnode = root->get_child("mamecommentfile");
 		if (commentnode == nullptr)
 			throw emu_exception();
 
@@ -313,13 +313,13 @@ bool debugger_cpu::comment_load(bool is_inline)
 			throw emu_exception();
 
 		// check to make sure the file is applicable
-		xml_data_node const *const systemnode = commentnode->get_child("system");
+		util::xml::data_node const *const systemnode = commentnode->get_child("system");
 		const char *const name = systemnode->get_attribute_string("name", "");
 		if (strcmp(name, m_machine.system().name) != 0)
 			throw emu_exception();
 
 		// iterate over devices
-		for (xml_data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
+		for (util::xml::data_node const *cpunode = systemnode->get_child("cpu"); cpunode; cpunode = cpunode->get_next_sibling("cpu"))
 		{
 			const char *cputag_name = cpunode->get_attribute_string("tag", "");
 			device_t *device = m_machine.device(cputag_name);
@@ -369,15 +369,10 @@ u8 debugger_cpu::read_byte(address_space &space, offs_t address, bool apply_tran
 	space.set_debugger_access(true);
 
 	/* translate if necessary; if not mapped, return 0xff */
-	u64 custom;
 	u8 result;
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 	{
 		result = 0xff;
-	}
-	else if (memory.read(space.spacenum(), address, 1, custom))
-	{   /* if there is a custom read handler, and it returns true, use that value */
-		result = custom;
 	}
 	else
 	{   /* otherwise, call the byte reading function for the translated address */
@@ -422,14 +417,9 @@ u16 debugger_cpu::read_word(address_space &space, offs_t address, bool apply_tra
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffff */
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = 0xffff;
-		}
-		else if (memory.read(space.spacenum(), address, 2, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -475,14 +465,9 @@ u32 debugger_cpu::read_dword(address_space &space, offs_t address, bool apply_tr
 		m_debugger_access = true;
 		space.set_debugger_access(true);
 
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{   /* translate if necessary; if not mapped, return 0xffffffff */
 			result = 0xffffffff;
-		}
-		else if (memory.read(space.spacenum(), address, 4, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -529,14 +514,9 @@ u64 debugger_cpu::read_qword(address_space &space, offs_t address, bool apply_tr
 		space.set_debugger_access(true);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		u64 custom;
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_READ_DEBUG, address))
 		{
 			result = ~u64(0);
-		}
-		else if (memory.read(space.spacenum(), address, 8, custom))
-		{   /* if there is a custom read handler, and it returns true, use that value */
-			result = custom;
 		}
 		else
 		{   /* otherwise, call the byte reading function for the translated address */
@@ -591,10 +571,6 @@ void debugger_cpu::write_byte(address_space &space, offs_t address, u8 data, boo
 	if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 		;
 
-	/* if there is a custom write handler, and it returns true, use that */
-	else if (memory.write(space.spacenum(), address, 1, data))
-		;
-
 	/* otherwise, call the byte reading function for the translated address */
 	else
 		space.write_byte(address, data);
@@ -645,10 +621,6 @@ void debugger_cpu::write_word(address_space &space, offs_t address, u16 data, bo
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 2, data))
-			;
-
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_word(address, data);
@@ -697,10 +669,6 @@ void debugger_cpu::write_dword(address_space &space, offs_t address, u32 data, b
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
-			;
-
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -754,10 +722,6 @@ void debugger_cpu::write_qword(address_space &space, offs_t address, u64 data, b
 		if (apply_translation && !memory.translate(space.spacenum(), TRANSLATE_WRITE_DEBUG, address))
 			;
 
-		/* if there is a custom write handler, and it returns true, use that */
-		else if (memory.write(space.spacenum(), address, 8, data))
-			;
-
 		/* otherwise, call the byte reading function for the translated address */
 		else
 			space.write_qword(address, data);
@@ -802,15 +766,8 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 	/* keep in logical range */
 	address &= space.logbytemask();
 
-	/* return early if we got the result directly */
 	m_debugger_access = true;
 	space.set_debugger_access(true);
-	if (memory.readop(address, size, result2))
-	{
-		m_debugger_access = false;
-		space.set_debugger_access(false);
-		return result2;
-	}
 
 	/* if we're bigger than the address bus, break into smaller pieces */
 	if (size > space.data_width() / 8)
@@ -878,6 +835,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 
 		/* dump opcodes in qwords from a qword-sized bus */
 		case 88:
+		case 86: // sharc case, 48-bits opcodes
 			break;
 
 		default:
@@ -925,6 +883,7 @@ u64 debugger_cpu::read_opcode(address_space &space, offs_t address, int size)
 			break;
 
 		case 8:
+		case 6:
 			result = space.direct().read_qword(address & ~7, addrxor);
 			if (!QWORD_ALIGNED(address))
 			{
@@ -2580,12 +2539,12 @@ const char *device_debug::comment_text(offs_t addr) const
 //  given XML data node
 //-------------------------------------------------
 
-bool device_debug::comment_export(xml_data_node &curnode)
+bool device_debug::comment_export(util::xml::data_node &curnode)
 {
 	// iterate through the comments
 	for (const auto & elem : m_comment_set)
 	{
-		xml_data_node *datanode = curnode.add_child("comment", xml_normalize_string(elem.m_text.c_str()));
+		util::xml::data_node *datanode = curnode.add_child("comment", util::xml::normalize_string(elem.m_text.c_str()));
 		if (datanode == nullptr)
 			return false;
 		datanode->set_attribute_int("address", elem.m_address);
@@ -2601,10 +2560,10 @@ bool device_debug::comment_export(xml_data_node &curnode)
 //  given XML data node
 //-------------------------------------------------
 
-bool device_debug::comment_import(xml_data_node const &cpunode, bool is_inline)
+bool device_debug::comment_import(util::xml::data_node const &cpunode, bool is_inline)
 {
 	// iterate through nodes
-	for (xml_data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
+	for (util::xml::data_node const *datanode = cpunode.get_child("comment"); datanode; datanode = datanode->get_next_sibling("comment"))
 	{
 		// extract attributes
 		offs_t address = datanode->get_attribute_int("address", 0);
@@ -3426,6 +3385,7 @@ void device_debug::tracer::update(offs_t pc)
 	// log this PC
 	m_nextdex = (m_nextdex + 1) % TRACE_LOOPS;
 	m_history[m_nextdex] = pc;
+	fflush(&m_file);
 }
 
 
@@ -3437,6 +3397,7 @@ void device_debug::tracer::vprintf(const char *format, va_list va)
 {
 	// pass through to the file
 	vfprintf(&m_file, format, va);
+	fflush(&m_file);
 }
 
 

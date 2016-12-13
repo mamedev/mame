@@ -1101,7 +1101,7 @@ void cli_frontend::verifysamples(const char *gamename)
 
 void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlistdev)
 {
-	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name().c_str(), xml_normalize_string(swlistdev.description().c_str()));
+	fprintf(out, "\t<softwarelist name=\"%s\" description=\"%s\">\n", swlistdev.list_name().c_str(), util::xml::normalize_string(swlistdev.description().c_str()));
 	for (const software_info &swinfo : swlistdev.get_info())
 	{
 		fprintf(out, "\t\t<software name=\"%s\"", swinfo.shortname().c_str());
@@ -1112,12 +1112,12 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 		if (swinfo.supported() == SOFTWARE_SUPPORTED_NO)
 			fprintf(out, " supported=\"no\"");
 		fprintf(out, ">\n" );
-		fprintf(out, "\t\t\t<description>%s</description>\n", xml_normalize_string(swinfo.longname().c_str()));
-		fprintf(out, "\t\t\t<year>%s</year>\n", xml_normalize_string(swinfo.year().c_str()));
-		fprintf(out, "\t\t\t<publisher>%s</publisher>\n", xml_normalize_string(swinfo.publisher().c_str()));
+		fprintf(out, "\t\t\t<description>%s</description>\n", util::xml::normalize_string(swinfo.longname().c_str()));
+		fprintf(out, "\t\t\t<year>%s</year>\n", util::xml::normalize_string(swinfo.year().c_str()));
+		fprintf(out, "\t\t\t<publisher>%s</publisher>\n", util::xml::normalize_string(swinfo.publisher().c_str()));
 
 		for (const feature_list_item &flist : swinfo.other_info())
-			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), xml_normalize_string( flist.value().c_str()) );
+			fprintf( out, "\t\t\t<info name=\"%s\" value=\"%s\"/>\n", flist.name().c_str(), util::xml::normalize_string( flist.value().c_str()) );
 
 		for (const software_part &part : swinfo.parts())
 		{
@@ -1128,7 +1128,7 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 			fprintf(out, ">\n");
 
 			for (const feature_list_item &flist : part.featurelist())
-				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), xml_normalize_string(flist.value().c_str()));
+				fprintf(out, "\t\t\t\t<feature name=\"%s\" value=\"%s\" />\n", flist.name().c_str(), util::xml::normalize_string(flist.value().c_str()));
 
 			/* TODO: display rom region information */
 			for (const rom_entry *region = part.romdata().data(); region; region = rom_next_region(region))
@@ -1145,9 +1145,9 @@ void cli_frontend::output_single_softlist(FILE *out, software_list_device &swlis
 					if ( ROMENTRY_ISFILE(rom) )
 					{
 						if (!is_disk)
-							fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", xml_normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
+							fprintf( out, "\t\t\t\t\t<rom name=\"%s\" size=\"%d\"", util::xml::normalize_string(ROM_GETNAME(rom)), rom_file_size(rom) );
 						else
-							fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", xml_normalize_string(ROM_GETNAME(rom)) );
+							fprintf( out, "\t\t\t\t\t<disk name=\"%s\"", util::xml::normalize_string(ROM_GETNAME(rom)) );
 
 						/* dump checksum information only if there is a known dump */
 						util::hash_collection hashes(ROM_GETHASHDATA(rom));

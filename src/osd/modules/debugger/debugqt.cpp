@@ -77,10 +77,10 @@ static MainWindow* mainQtWindow = nullptr;
 std::vector<WindowQtConfig*> xmlConfigurations;
 
 
-static void xml_configuration_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
+static void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// We only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// Might not have any data
@@ -92,7 +92,7 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 	xmlConfigurations.clear();
 
 	// Configuration load
-	xml_data_node const * wnode = nullptr;
+	util::xml::data_node const * wnode = nullptr;
 	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
 	{
 		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
@@ -112,10 +112,10 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 }
 
 
-static void xml_configuration_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
+static void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// We only write to game configurations
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -123,7 +123,7 @@ static void xml_configuration_save(running_machine &machine, config_type cfg_typ
 		WindowQtConfig* config = xmlConfigurations[i];
 
 		// Create an xml node
-		xml_data_node *const debugger_node = parentnode->add_child("window", nullptr);
+		util::xml::data_node *const debugger_node = parentnode->add_child("window", nullptr);
 		if (debugger_node == nullptr)
 			continue;
 
@@ -268,8 +268,8 @@ void debug_qt::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
-					config_saveload_delegate(&xml_configuration_load, &machine),
-					config_saveload_delegate(&xml_configuration_save, &machine));
+					config_load_delegate(&xml_configuration_load, &machine),
+					config_save_delegate(&xml_configuration_save, &machine));
 }
 
 

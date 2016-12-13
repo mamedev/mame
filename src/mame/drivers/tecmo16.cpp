@@ -13,7 +13,7 @@ driver by Hau, Nicola Salmoria
 special thanks to Nekomata, NTD & code-name'Siberia'
 
 TODO:
-- wrong background in fstarfrc title
+- wrong background in fstarfrc title (Video ref. -> https://www.youtube.com/watch?v=EXBTNk-0ejk)
 - there could be some priorities problems in riot
   (more noticeable in level 2)
 
@@ -397,7 +397,7 @@ static MACHINE_CONFIG_START( fstarfrc, tecmo16_state )
 	MCFG_TECMO_MIXER_SHIFTS(10,9,4)
 	MCFG_TECMO_MIXER_BLENDCOLS(   0x0400 + 0x300, 0x0400 + 0x200, 0x0400 + 0x100, 0x0400 + 0x000 )
 	MCFG_TECMO_MIXER_REGULARCOLS( 0x0000 + 0x300, 0x0000 + 0x200, 0x0000 + 0x100, 0x0000 + 0x000 )
-	MCFG_TECMO_MIXER_BLENDSOUCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
+	MCFG_TECMO_MIXER_BLENDSOURCE( 0x0800 + 0x000, 0x0800 + 0x100) // riot seems to set palettes in 0x800 + 0x200, could be more to this..
 	MCFG_TECMO_MIXER_REVSPRITETILE
 	MCFG_TECMO_MIXER_BGPEN(0x000 + 0x300)
 

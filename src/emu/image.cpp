@@ -76,7 +76,7 @@ image_manager::image_manager(running_machine &machine)
 		}
 	}
 
-	machine.configuration().config_register("image_directories", config_saveload_delegate(&image_manager::config_load, this), config_saveload_delegate(&image_manager::config_save, this));
+	machine.configuration().config_register("image_directories", config_load_delegate(&image_manager::config_load, this), config_save_delegate(&image_manager::config_save, this));
 }
 
 //-------------------------------------------------
@@ -95,24 +95,21 @@ void image_manager::unload_all()
 	}
 }
 
-void image_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void image_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
-	xml_data_node const *node;
-	const char *dev_instance;
-	const char *working_directory;
-
-	if ((cfg_type == config_type::CONFIG_TYPE_GAME) && (parentnode != nullptr))
+	if ((cfg_type == config_type::GAME) && (parentnode != nullptr))
 	{
-		for (node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
+		for (util::xml::data_node const *node = parentnode->get_child("device"); node; node = node->get_next_sibling("device"))
 		{
-			dev_instance = node->get_attribute_string("instance", nullptr);
+			const char *const dev_instance = node->get_attribute_string("instance", nullptr);
 
 			if ((dev_instance != nullptr) && (dev_instance[0] != '\0'))
 			{
 				for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 				{
-					if (!strcmp(dev_instance, image.instance_name())) {
-						working_directory = node->get_attribute_string("directory", nullptr);
+					if (!strcmp(dev_instance, image.instance_name()))
+					{
+						const char *const working_directory = node->get_attribute_string("directory", nullptr);
 						if (working_directory != nullptr)
 							image.set_working_directory(working_directory);
 					}
@@ -127,19 +124,16 @@ void image_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
     directories to the configuration file
 -------------------------------------------------*/
 
-void image_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void image_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
-	xml_data_node *node;
-	const char *dev_instance;
-
 	/* only care about game-specific data */
-	if (cfg_type == config_type::CONFIG_TYPE_GAME)
+	if (cfg_type == config_type::GAME)
 	{
 		for (device_image_interface &image : image_interface_iterator(machine().root_device()))
 		{
-			dev_instance = image.instance_name();
+			const char *const dev_instance = image.instance_name();
 
-			node = parentnode->add_child("device", nullptr);
+			util::xml::data_node *const node = parentnode->add_child("device", nullptr);
 			if (node != nullptr)
 			{
 				node->set_attribute("instance", dev_instance);
