@@ -3375,5 +3375,5 @@ GAME( 1989, ffantasybl, hippodrm, ffantasybl, ffantasybl, dec0_state, ffantasybl
 GAME( 1988, drgninjab2, baddudes, baddudes, drgninja, dec0_state, baddudes, ROT0,   "bootleg", "Dragonninja (bootleg with 68705)", MACHINE_SUPPORTS_SAVE ) // is this the same board as above? (region warning hacked to World, but still shows Japanese text)
 
 // these are different to the above but quite similar to each other
-GAME( 1988, automat,    robocop,  automat,  robocop, dec0_state,  robocop,  ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
-GAME( 1989, secretab,   secretag, secretab, slyspy, dec0_state,   slyspy,   ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, automat,    robocop,  automat,  robocop,  dec0_state,  robocop, ROT0,   "bootleg", "Automat (bootleg of Robocop)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // sound rom / music from section z with mods for ADPCM?
+GAME( 1989, secretab,   secretag, secretab, slyspy,   driver_device,     0, ROT0,   "bootleg", "Secret Agent (bootleg)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
