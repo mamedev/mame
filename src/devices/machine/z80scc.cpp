@@ -1772,17 +1772,19 @@ void z80scc_channel::do_sccreg_wr1(uint8_t data)
 		break;
 
 	case WR1_RX_INT_FIRST:
-		LOG(("- Receiver Interrupt on First Character\n"));
-		break;
-
-	case WR1_RX_INT_ALL_PARITY:
-		LOG(("- Receiver Interrupt on All Characters, Parity Affects Vector\n"));
+		LOG(("- Receiver Interrupt on First Character or Special Conditions\n"));
 		break;
 
 	case WR1_RX_INT_ALL:
-		LOG(("- Receiver Interrupt on All Characters\n"));
+		LOG(("- Receiver Interrupt on All Characters or Special Conditions\n"));
+		break;
+
+	case WR1_RX_INT_PARITY:
+		LOG(("- Receiver Interrupt on Special Conditions only\n"));
 		break;
 	}
+	if ((data & WR1_RX_INT_MODE_MASK) == WR1_PARITY_IS_SPEC_COND)
+		LOG(("- Parity error is a Special Condition\n"));
 	m_uart->check_interrupts();
 }
 
@@ -2266,13 +2268,13 @@ uint8_t z80scc_channel::data_read()
 		   received into the other bytes of the Receive FIFO.*/
 
 		// load data from the FIFO
-		data = m_rx_fifo_rp_data();
+		data = m_rx_data_fifo[m_rx_fifo_rp];
 
 		// load error status from the FIFO
 		m_rr1 = (m_rr1 & ~(RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR)) | m_rx_error_fifo[m_rx_fifo_rp];
 
 		// trigger interrupt and lock the fifo if an error is present
-		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR))
+		if (m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | ((m_wr1 & WR1_PARITY_IS_SPEC_COND) ? RR1_PARITY_ERROR : 0)))
 		{
 			logerror("Rx Error %02x\n", m_rr1 & (RR1_CRC_FRAMING_ERROR | RR1_RX_OVERRUN_ERROR | RR1_PARITY_ERROR));
 			m_uart->trigger_interrupt(m_index, INT_SPECIAL);
@@ -2291,18 +2293,6 @@ uint8_t z80scc_channel::data_read()
 
 	LOG(("  '%c' %02x\n", isascii(data) ? data : ' ', data));
 	return data;
-}
-
-/* Get data from top of fifo data but restore read pointer in case of exit latch lock */
-uint8_t z80scc_channel::m_rx_fifo_rp_data()
-{
-		uint8_t data;
-		uint8_t old_rp = m_rx_fifo_rp;
-		m_rx_fifo_rp_step();
-		data = m_rx_data_fifo[m_rx_fifo_rp];
-		m_rx_fifo_rp = old_rp;
-
-		return data;
 }
 
 /* Step read pointer */
