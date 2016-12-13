@@ -28,6 +28,7 @@ const device_type NETLIST_SOUND = &device_creator<netlist_mame_sound_device_t>;
 
 const device_type NETLIST_ANALOG_INPUT = &device_creator<netlist_mame_analog_input_t>;
 const device_type NETLIST_INT_INPUT = &device_creator<netlist_mame_int_input_t>;
+const device_type NETLIST_ROM_REGION = &device_creator<netlist_mame_rom_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
 
@@ -182,20 +183,22 @@ void netlist_mame_logic_input_t::device_start()
 // ----------------------------------------------------------------------------------------
 // netlist_mame_rom_region_t
 // ----------------------------------------------------------------------------------------
-netlist_mame_rom_t::netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char* region_tag)
+netlist_mame_rom_t::netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, NETLIST_ROM_REGION, "Netlist ROM Region", tag, owner, clock, "netlist_rom_region", __FILE__)
 		, netlist_mame_sub_interface(*owner)
 		, m_param(nullptr)
 		, m_param_name("")
-		, m_rom(*this, region_tag)
+		, m_rom_tag(nullptr)
+		, m_rom(nullptr)
 {
 }
 
-void netlist_mame_rom_t::static_set_params(device_t &device, const char *param_name)
+void netlist_mame_rom_t::static_set_params(device_t &device, const char *param_name, const char* region_tag)
 {
 	netlist_mame_rom_t &netlist = downcast<netlist_mame_rom_t &>(device);
 	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
 	netlist.m_param_name = param_name;
+	netlist.m_rom_tag = region_tag;
 }
 
 void netlist_mame_rom_t::device_start()
@@ -207,6 +210,8 @@ void netlist_mame_rom_t::device_start()
 	{
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
+
+	m_rom = memregion(m_rom_tag)->base();
 }
 
 // ----------------------------------------------------------------------------------------

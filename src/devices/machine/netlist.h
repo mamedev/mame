@@ -516,10 +516,10 @@ class netlist_mame_rom_t :  public device_t,
 public:
 
 	// construction/destruction
-	netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const char* region_tag);
+	netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~netlist_mame_rom_t() { }
 
-	static void static_set_params(device_t &device, const char *param_name);
+	static void static_set_params(device_t &device, const char *param_name, const char* region_tag);
 
 protected:
 	// device-level overrides
@@ -532,7 +532,8 @@ protected:
 private:
 	netlist::param_rom_t *m_param;
 	pstring m_param_name;
-	required_region_ptr<uint8_t> m_rom;
+	const char* m_rom_tag;
+	uint8_t* m_rom;
 };
 
 // ----------------------------------------------------------------------------------------
