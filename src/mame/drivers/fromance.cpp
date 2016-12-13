@@ -37,6 +37,11 @@ Memo:
 
 - 2player's input is not supported.
 
+- CRT Controller.
+
+- nekkyoku writes to a VRAM mirror for showing the OL gal, I guess ROM mirroring
+  is the same for all empty slots for this HW.
+
 - Communication between MAIN CPU and SUB CPU can be wrong.
 
 Notes:
@@ -1071,7 +1076,14 @@ ROM_START( nekkyoku )
 	ROM_LOAD( "ic8a.bin",    0x000000, 0x080000, CRC(599790d8) SHA1(4e4ade1a89d6cb93b0808867883d70c4c7ed78dd) )
 	ROM_LOAD( "ic9a.bin",    0x080000, 0x040000, CRC(78c1906f) SHA1(54459e0120ec58a962d3f4a1287e68d2fbb28be9) )
 	ROM_LOAD( "5-ic10a.bin", 0x0c0000, 0x008000, CRC(2e78515f) SHA1(397985c082ffc0df07cd44d54e4fef909c30a4f1) )
-	ROM_FILL(                0x0c8000, 0x038000, 0xff )
+	// 'D' OL girl is displayed via one of these mirrors
+	ROM_RELOAD(              0x0c8000, 0x008000 )
+	ROM_RELOAD(              0x0d0000, 0x008000 )
+	ROM_RELOAD(              0x0d8000, 0x008000 )
+	ROM_RELOAD(              0x0e0000, 0x008000 )
+	ROM_RELOAD(              0x0e8000, 0x008000 )
+	ROM_RELOAD(              0x0f0000, 0x008000 )
+	ROM_RELOAD(              0x0f8000, 0x008000 )
 	ROM_FILL(                0x100000, 0x100000, 0xff )
 ROM_END
 
