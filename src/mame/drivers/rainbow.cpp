@@ -2,7 +2,7 @@
 // ENABLE BY UNCOMMENTING.  ADDITIONALLY, SET SMOOTH SCROLL IN EMULATION (DISABLE BY SETTING JUMP SCROLL. To enter SETUP hit ScrollLock)-
 //#define BOOST_DEBUG_PERFORMANCE
 
-	
+
 /* GDC COLOR EMULATION
 //-------------------- Differences to VT240: ---------------------------------------------------
 // - Registers of graphics option not directly mapped (indirect access via mode register)
@@ -40,32 +40,34 @@ Details
 a. (Rainbow driver) : interaction between DEC's external hardware and the NEC 7220 isn't fully understood (see page 173 of AA-AE36A)
    It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'. 
    For now, we provide sane defaults for both vector and bitmap units without disturbing display mode(s) or the NEC 7220.
-b. the HBLANK / VBLANK ratio is plainly wrong (QUICK TEST / subtest #6),
-c. IRQs are flagged as 'erratic' (QUICK TEST / subtest #12). 
-d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when QUICK TEST #4 floods the queue)
+b. the HBLANK / VBLANK ratio is plainly wrong (quick test / subtest #6),
+c. IRQs are flagged as 'erratic' (quick test / subtest #12). 
+d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when quick test #4 floods the queue)
 e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel) 
 
-Programs with initialization / redraw / reentrance problems (invocation order after reset * matters *, at least in emulation):
-- CANON (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
-  plus the Monitor Aligment Test (from the GDC test disk). 
-
-Graphical apps. that work well: MMIND (MasterMind), PACMAN, SCRAM, (G)OTELO.
-
 UNIMPLEMENTED:
-// - Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
+- Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
 
 UNKNOWN IMPLEMENTATION DETAILS:
-// 1. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
+1. READBACK (hard copy programs like JOBSDUMP definitely use it. See also GDC diagnostics).  VRAM_R ?
 
-// 2. UNVERIFIED DIVIDER (31.188 Mhz / 32) is at least close to 1 Mhz (as on the VT240, which uses a very similar design)
+2. UNVERIFIED DIVIDERS (31.188 Mhz / 32) is at least close to 1 Mhz (as on the VT240, which uses a very similar design)
 
-// 3. UPD7220 / CORE oddities: 
-// 3.1. occasional redraw problems (only when screen 1 runs at 60 Hz and screen 2 at 29.99 Hz interlaced = HIRES ?).
-// Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-//                  (the partial update system gets very confused because it expects both the screens to end at the same time
-//                  and if that isn't the case large parts of one screen end up not updating at all)
+3. UPD7220 / CORE oddities
 
-   3.2 pixels are stretched out too wide at 384 x 240 (not fixable in Rainbow driver, -keepaspect seems to have no effect)
+To obtain pixel exact graphics use 'Graphics Only' in Video Options  plus command line switches -nowindow -aspect1 auto -nokeepaspect
+(Over-Under or Side-by-Side modes always distorted on my 1600 x 900 laptop)
+
+Programs with initialization / redraw / reentrance problems (invocation order after reset matters in emulation):
+
+- CANON (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
+  plus 'Monitor Aligment' (from the GDC test disk). 			Sloppy programming or a bug related to a) to e)...?
+
+ Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
+                    (the partial update system gets very confused because it expects both the screens to end at the same time 
+                    and if that isn't the case large parts of one screen end up not updating at all)
+
+The following games work well: MMIND (MasterMind), (G)OTELO (requires GSX), PACMAN, SCRAM (last one uses scroll extensively). 
 */
 
 // license:GPL-2.0+
@@ -126,9 +128,7 @@ CURRENTY UNEMULATED
 (a) the serial port does work one way only (incomplete null modem or wiring?), no reception yet.
  The printer interface does not work, so a non fatal ERROR 40 (serial printer interface) will appear.
 
-(b1) LOOPBACK circuit not emulated, NMI from RAM card also unemulated (NMI vector 02).
-The former is used in startup tests, the latter seems less relevant (must use menu self test "S"
- or memory diagnostic test. TODO: mem.test causes a CPU crash when reaching higher RAM regions.
+(b1) LOOPBACK circuit not emulated ( used in startup tests ).
 
 (b2) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
  to see what happens (key 3 - individual tests, then 12 - system interaction). Uses LOOPBACK too?
@@ -308,14 +308,14 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #define RD51_SECTORS_PER_TRACK 17 // OLD: #define RD51_SECTORS_PER_TRACK 16
 
 #define RTC_BASE 0xFC000
-// Do not pretend to emulate newer RAM board; stick with the old one:
-// (only affects presence bit in 'system_parameter_r')
-#define OLD_RAM_BOARD_PRESENT
 
 #ifdef      ASSUME_MODEL_A_HARDWARE
 	// Define standard and maximum RAM sizes (A model):
 	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
 	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
+
+	// Pretend to emulate older RAM board (no NMI, also affects presence bit in 'system_parameter_r'):
+	#define OLD_RAM_BOARD_PRESENT
 #else
 	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
 	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
@@ -468,6 +468,7 @@ public:
 		m_p_nvram(*this, "nvram"),
 
 		m_shared(*this, "sh_ram"),
+		m_ext_ram(*this, "ext_ram"),
 
 		m_rtc(*this, "rtc"),
 		m_hgdc(*this, "upd7220"), // GDC-NEW
@@ -536,6 +537,8 @@ public:
 	DECLARE_READ8_MEMBER(rtc_reset);
 	DECLARE_READ8_MEMBER(rtc_enable);
 	DECLARE_READ8_MEMBER(rtc_r);
+
+	DECLARE_WRITE8_MEMBER(ext_ram_w);
 
 	DECLARE_WRITE_LINE_MEMBER(mpsc_irq);
 	DECLARE_WRITE8_MEMBER(comm_bitrate_w);
@@ -608,6 +611,7 @@ private:
 	required_shared_ptr<uint8_t> m_p_vol_ram;
 	required_shared_ptr<uint8_t> m_p_nvram;
 	required_shared_ptr<uint8_t> m_shared;
+	required_shared_ptr<uint8_t> m_ext_ram;
 
 	optional_device<ds1315_device> m_rtc;
 
@@ -838,7 +842,7 @@ void rainbow_state::machine_start()
 static ADDRESS_MAP_START(rainbow8088_map, AS_PROGRAM, 8, rainbow_state)
 ADDRESS_MAP_UNMAP_HIGH
 AM_RANGE(0x00000, 0x0ffff) AM_RAM AM_SHARE("sh_ram")
-AM_RANGE(0x10000, END_OF_RAM) AM_RAM
+AM_RANGE(0x10000, END_OF_RAM) AM_RAM AM_SHARE("ext_ram") AM_WRITE(ext_ram_w)
 
 // There is a 2212 (256 x 4 bit) NVRAM from 0xed000 to 0xed0ff (*)
 // shadowed at $ec000 - $ecfff and from $ed100 - $edfff.
@@ -1065,6 +1069,10 @@ INPUT_PORTS_END
 
 void rainbow_state::machine_reset()
 {
+	// 'F3' (in partial emulation) here replaces 'CTRL-SETUP' (soft reboot on an original Rainbow) 
+	// FIXME: BIOS reports error 19 when CTRL-SETUP is pressed (Z80 or flags aren't fully reset then?)
+	popmessage("Reset");
+
 	// Configure RAM
 	address_space &program = machine().device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	uint32_t unmap_start = m_inp8->read();
@@ -1099,7 +1107,10 @@ void rainbow_state::machine_reset()
 		printf("\nNOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, NVRAM_LOCATION, check);
 
 	if(END_OF_RAM > unmap_start)
+	{
+		printf("\nUnmapping from %x to %x",unmap_start, END_OF_RAM);
 		program.unmap_readwrite(unmap_start, END_OF_RAM);
+	}
 
 	m_crtc->MHFU(MHFU_RESET_and_DISABLE);
 
@@ -1111,7 +1122,6 @@ void rainbow_state::machine_reset()
 #endif
 
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
-
 
 	//  *********** HARD DISK CONTROLLER...
 	if (m_inp5->read() == 0x01) // ...PRESENT?
@@ -1200,9 +1210,6 @@ void rainbow_state::machine_reset()
 	output().set_value("led_compose", 0); // led9
 	output().set_value("led_lock", 0);    // led10
 	output().set_value("led_hold", 0);    // led11
-
-	if (m_POWER_GOOD) // When user presses F3, a hard reset is executed.
-		machine().schedule_hard_reset(); // better ask via GUI? How...?
 }
 
 // Simulate AC_OK signal (power good) and RESET after ~ 108 ms.
@@ -1410,6 +1417,17 @@ WRITE8_MEMBER(rainbow_state::share_z80_w)
 	return;
 }
 
+// NMI logic (parity test)
+WRITE8_MEMBER(rainbow_state::ext_ram_w)
+{
+	m_ext_ram[offset] = data;
+
+#ifndef OLD_RAM_BOARD_PRESENT
+	if(m_diagnostic & 0x08)
+		if( (offset + 0x10000) >= (MOTHERBOARD_RAM + 1))
+			m_i8088->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+#endif
+}
 
 // ------------------------ClikClok (for model B; DS1315)  ---------------------------------
 // DESCRIPTION: version for 100-A plugs into NVRAM chip socket (unemulated yet)
@@ -1524,18 +1542,15 @@ hard_disk_file *(rainbow_state::rainbow_hdc_file(int drv))
 	}
 	else
 	{
-		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
-
 		uint32_t max_sector = info->cylinders * info->heads * info->sectors;
-				printf("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
+		popmessage("\n%u (%3.2f) MB HARD DISK REJECTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
 					info->cylinders, RD51_MAX_CYLINDER,
 					info->sectors, RD51_SECTORS_PER_TRACK,
 					info->sectorbytes);
-
-		printf("\n <<< === REJECTED = (SANITY CHECK FAILED) === >>> \n");
+		printf("\n <<< === HARD DISK IMAGE REJECTED = (invalid geometry) === >>> \n");
 		return nullptr;
 	}
 }
@@ -2478,7 +2493,6 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 				printf(" [HINT: DUAL MONITOR (DIP SWITCH) WRONG! NO GREEN PALETTE] ");
 	} // color map changed?
 
-
 } // 7220 vblank IRQ
 
 
@@ -2508,7 +2522,7 @@ WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
 READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
-{
+{	
 	return ((m_diagnostic & (0xf1)) |
 			m_inp1->read() |
 			m_inp2->read() |
@@ -2565,13 +2579,9 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 			printf("DATA: %x (PC=%x)\n", data, machine().device("maincpu")->safe_pc());
 	}
 
-	// BIT 3: PARITY TEST (1 = enables parity test on memory option board).
-	if(data & 0x08)
-	{
-		printf("\n*** UNEMULATED PARITY TEST [on RAM EXTENSION] - (bit 3 in diagnostic_w) ");
-		//   FIXME: parity test = NMI? When should NMI fire? Per RAM bank?
-		//   m_i8088->set_input_line_and_vector(INPUT_LINE_NMI, ASSERT_LINE, 0x02);
-	}
+	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
+	if(data & 0x08) 
+		printf("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
 
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
 	// * BIT 4: DIAG LOOPBACK (0 at power-up; 1 directs RX50 and DC12 output to printer port)
@@ -3071,10 +3081,7 @@ MCFG_CPU_VBLANK_INT_DRIVER("screen", rainbow_state, vblank_irq)
 
 /* video hardware */
 MCFG_SCREEN_ADD("screen", RASTER)
-MCFG_SCREEN_REFRESH_RATE(60)
-MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-MCFG_SCREEN_SIZE(132 * 10, 49 * 10)
-MCFG_SCREEN_VISIBLE_AREA(0, 80 * 10 - 1, 0, 48 * 10 - 1)
+MCFG_SCREEN_RAW_PARAMS(XTAL_24_0734MHz / 6, 442, 0, 400, 264, 0, 240) // ~NTSC compatible video timing (?)
 
 MCFG_SCREEN_UPDATE_DRIVER(rainbow_state, screen_update_rainbow)
 MCFG_SCREEN_PALETTE("vt100_video:palette")
@@ -3088,7 +3095,7 @@ MCFG_VT_VIDEO_RAM_CALLBACK(READ8(rainbow_state, read_video_ram_r))
 MCFG_VT_VIDEO_CLEAR_VIDEO_INTERRUPT_CALLBACK(WRITELINE(rainbow_state, clear_video_interrupt))
 
 // *************************** COLOR GRAPHICS (OPTION) **************************************
-// While the OSC frequency is confirmed, the divider is not. Refresh rate is ~60 Hz with 32.
+// While the OSC frequency is confirmed, the divider is not (refresh rate is ~60 Hz with 32).
 MCFG_DEVICE_ADD("upd7220", UPD7220, 31188000 / 32) // Duell schematics shows a 31.188 Mhz oscillator (confirmed by RFKA).
 MCFG_UPD7220_VSYNC_CALLBACK(WRITELINE(rainbow_state, GDC_vblank_irq)) // "The vsync callback line needs to be below the 7220 DEVICE_ADD line."
 
@@ -3099,12 +3106,15 @@ MCFG_PALETTE_ADD("palette2", 32)
 
 MCFG_SCREEN_ADD("screen2", RASTER)
 MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
-MCFG_SCREEN_REFRESH_RATE(60)
-MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
-MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-MCFG_SCREEN_SIZE(800, 256)                   // should be 240
-MCFG_SCREEN_VISIBLE_AREA(0, 800-1, 0, 256-1) // should be 240
+// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate ) 
+// - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
+//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240) 
+
+// Alternate configuration:
+MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240) 
+
+MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
 MCFG_FD1793_ADD(FD1793_TAG, XTAL_24_0734MHz / 24) // no separate 1 Mhz quartz
 MCFG_FLOPPY_DRIVE_ADD(FD1793_TAG ":0", rainbow_floppies, "525qd0", rainbow_state::floppy_formats)
