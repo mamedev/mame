@@ -134,6 +134,7 @@ public:
 	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);
+	DECLARE_WRITE16_MEMBER(secretab_sound_w);
 	DECLARE_READ16_MEMBER( automat_palette_r );
 	DECLARE_WRITE16_MEMBER( automat_palette_w );
 	DECLARE_WRITE16_MEMBER( automat_scroll_w )
