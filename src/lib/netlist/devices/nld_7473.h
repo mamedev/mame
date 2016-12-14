@@ -3,24 +3,24 @@
 /*
  * nld_7473.h
  *
- *  DM7473: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
- *  DM7473A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+ *  7473: Dual Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
+ *  7473A: Dual Negative-Edge-Triggered Master-Slave J-K Flip-Flops with Clear and Complementary Outputs
  *
- *          +--------------+
- *     CLK1 |1     ++    14| J1
- *     CLR1 |2           13| QQ1
- *       K1 |3           12| Q1
- *      VCC |4    7473   11| GND
- *     CLK2 |5           10| K2
- *     CLR2 |6            9| Q2
- *       J2 |7            8| QQ2
- *          +--------------+
+ *          +----------+
+ *     1CLK |1   ++  14| 1J
+ *    1CLRQ |2       13| 1QQ
+ *       1K |3       12| 1Q
+ *      VCC |4  7473 11| GND
+ *     2CLK |5       10| 2K
+ *    2CLRQ |6        9| 2Q
+ *       2J |7        8| 2QQ
+ *          +----------+
  *
  *
  *          Function table 73
  *
  *          +-----+-----+-----+---++---+-----+
- *          | CLR | CLK |  J  | K || Q | QQ  |
+ *          | CLRQ| CLK |  J  | K || Q | QQ  |
  *          +=====+=====+=====+===++===+=====+
  *          |  0  |  X  |  X  | X || 0 |  1  |
  *          |  1  |  *  |  0  | 0 || Q0| Q0Q |
@@ -38,7 +38,7 @@
  *          Function table 73A
  *
  *          +-----+-----+-----+---++---+-----+
- *          | CLR | CLK |  J  | K || Q | QQ  |
+ *          | CLRQ| CLK |  J  | K || Q | QQ  |
  *          +=====+=====+=====+===++===+=====+
  *          |  0  |  X  |  X  | X || 0 |  1  |
  *          |  1  |  F  |  0  | 0 || Q0| Q0Q |
@@ -50,7 +50,10 @@
  *
  *          THe 73A is negative triggered.
  *
- *  Naming conventions follow Fairchild Semiconductor datasheet
+ *  Naming conventions follow Texas instruments datasheet
+ *
+ *  FIXME: Currently, only the 73 is implemented.
+ *         The 73 uses the same model.
  *
  */
 
@@ -59,17 +62,21 @@
 
 #include "nl_setup.h"
 
-#define TTL_7473A(name, cCLK, cJ, cK, cCLR)	\
-		NET_REGISTER_DEV(TTL_7473A, name)	\
-		NET_CONNECT(name, CLK, cCLK)		\
-		NET_CONNECT(name, J, cJ)                                                \
-		NET_CONNECT(name, K, cK)                                                \
+#define TTL_7473(name, cCLK, cJ, cK, cCLRQ)	\
+		NET_REGISTER_DEV(TTL_7473, name)		\
+		NET_CONNECT(name, CLK, cCLK)			\
+		NET_CONNECT(name, J, cJ)				\
+		NET_CONNECT(name, K, cK)				\
 		NET_CONNECT(name, CLRQ, cCLRQ)
 
-#define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                    \
-		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
+#define TTL_7473A(name, cCLK, cJ, cK, cCLRQ)		\
+		TTL_7473(name, cCLK, cJ, cK, cCLRQ)
 
-#define TTL_74107_DIP(name)                                                     \
-		NET_REGISTER_DEV(TTL_74107_DIP, name)
+#define TTL_7473_DIP(name)						\
+		NET_REGISTER_DEV(TTL_7473_DIP, name)
 
-#endif /* NLD_74107_H_ */
+
+#define TTL_7473A_DIP(name)						\
+		NET_REGISTER_DEV(TTL_7473A_DIP, name)
+
+#endif /* NLD_7473_H_ */

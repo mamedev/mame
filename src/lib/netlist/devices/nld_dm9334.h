@@ -67,8 +67,14 @@
 
 #include "nl_setup.h"
 
-#define TTL_DM9334(name)                                                         \
-		NET_REGISTER_DEV(TTL_DM9334, name)
+#define TTL_DM9334(name, cC, cE, cD, cA0, cA1, cA2)	\
+		NET_REGISTER_DEV(TTL_DM9334, name)	\
+		NET_CONNECT(name, C,  cC)	\
+		NET_CONNECT(name, E,  cE)	\
+		NET_CONNECT(name, D,  cD)	\
+		NET_CONNECT(name, A0, cA0)	\
+		NET_CONNECT(name, A1, cA1)	\
+		NET_CONNECT(name, A2, cA2)
 
 #define TTL_DM9334_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_DM9334_DIP, name)

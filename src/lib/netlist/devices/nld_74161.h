@@ -27,8 +27,21 @@
 
 #include "nl_setup.h"
 
-#define TTL_74161(name)                                                         \
-		NET_REGISTER_DEV(TTL_74161, name)
+#define TTL_74161(name, cA, cB, cC, cD, cCLEAR, cLOAD, cCLK, cENABLEP, cENABLET, cQA, cQB, cQC, cQD)	\
+		NET_REGISTER_DEV(TTL_74161, name)	\
+		NET_CONNECT(name, A,       cA)		\
+		NET_CONNECT(name, B,       cB)		\
+		NET_CONNECT(name, C,       cC)		\
+		NET_CONNECT(name, D,       cD)		\
+		NET_CONNECT(name, CLEAR,   cCLEAR)	\
+		NET_CONNECT(name, LOAD,    cLOAD)	\
+		NET_CONNECT(name, CLK,     cCLK)	\
+		NET_CONNECT(name, ENABLEP, cENABLEP) \
+		NET_CONNECT(name, ENABLET, cENABLET) \
+		NET_CONNECT(name, QA,  cQA)			\
+		NET_CONNECT(name, QB,  cQB)			\
+		NET_CONNECT(name, QC,  cQC)			\
+		NET_CONNECT(name, QD,  cQD)			\
 
 #define TTL_74161_DIP(name)                                                     \
 		NET_REGISTER_DEV(TTL_74161_DIP, name)
