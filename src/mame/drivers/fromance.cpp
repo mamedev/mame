@@ -37,7 +37,9 @@ Memo:
 
 - 2player's input is not supported.
 
-- CRT Controller.
+- Identify CRT Controller and fix layer misalignment in nekkyoku.
+
+- nekkyoku: soft reset enables flip screen without any real reason.
 
 - nekkyoku writes to a VRAM mirror for showing the OL gal, I guess ROM mirroring
   is the same for all empty slots for this HW.
@@ -885,11 +887,10 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 
 	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
 
-
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));
 	save_item(NAME(m_portselect));
-
+	
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_vclk_left));
@@ -1265,7 +1266,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
