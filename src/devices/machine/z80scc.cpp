@@ -479,7 +479,7 @@ int z80scc_device::get_extint_priority(int type)
 	case z80scc_channel::INT_EXTERNAL: prio = z80scc_channel::INT_EXTERNAL_PRIO; break;
 	case z80scc_channel::INT_TRANSMIT: prio = z80scc_channel::INT_TRANSMIT_PRIO; break;
 	case z80scc_channel::INT_SPECIAL:  prio = z80scc_channel::INT_SPECIAL_PRIO;  break;
-	default: logerror("Bad interrupt source beeing prioritized!");
+	default: logerror("Bad interrupt source being prioritized!");
 	}
 	return prio;
 }
@@ -2121,7 +2121,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 		logerror("\"%s\": %c : %s Mics Control Bits command %02x - not implemented \n", m_owner->tag(), 'A' + m_index, FUNCNAME, data);
 	}
 	/* Based on baudrate code from 8530scc.cpp */
-	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator beeing enabled?
+	if ( !(m_wr14 & WR14_BRG_ENABLE) && (data & WR14_BRG_ENABLE) ) // baud rate generator being enabled?
 	{
 		LOG(("\"%s\": %c : %s Mics Control Bits Baudrate generator enabled with ", m_owner->tag(), 'A' + m_index, FUNCNAME));
 		if (data & WR14_BRG_SOURCE) // Do we use the PCLK as baudrate source
@@ -2140,7 +2140,7 @@ void z80scc_channel::do_sccreg_wr14(uint8_t data)
 			LOG(("external clock source\n"));
 		}
 	}
-	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator beeing disabled?
+	else if ( (m_wr14 & WR14_BRG_ENABLE) && !(data & WR14_BRG_ENABLE) ) // baud rate generator being disabled?
 	{
 #if LOCAL_BRG
 		baudtimer->adjust(attotime::never, TIMER_ID_BAUD, attotime::never); // Stop the baudrate generator
