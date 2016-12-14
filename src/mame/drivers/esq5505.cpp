@@ -923,6 +923,22 @@ ROM_START( sqrack )
 	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
 ROM_END
 
+ROM_START( sq2 )
+	ROM_REGION(0x40000, "osrom", 0)
+	ROM_LOAD16_BYTE( "sq232_2.03_9193_lower.u27", 0x000000, 0x010000, CRC(e37fbc2c) SHA1(4a74f3540756745073c8768b384905db03da47c0) ) 
+	ROM_LOAD16_BYTE( "sq232_2.03_cbcd_upper.u32", 0x000001, 0x020000, CRC(5a7dc228) SHA1(d25adecc0dbba93a094c49fae105dcc7aad317f1) ) 
+
+	ROM_REGION(0x200000, "waverom", 0)
+	ROM_LOAD16_BYTE( "sq1-u25.bin",  0x000001, 0x080000, CRC(26312451) SHA1(9f947a11592fd8420fc581914bf16e7ade75390c) )
+	ROM_LOAD16_BYTE( "sq1-u26.bin",  0x100001, 0x080000, CRC(2edaa9dc) SHA1(72fead505c4f44e5736ff7d545d72dfa37d613e2) )
+
+	ROM_REGION(0x200000, "waverom2", ROMREGION_ERASE00) // BS=1 region (16-bit)
+	ROM_LOAD( "rom2.u39",     0x000000, 0x100000, CRC(8d1b5e91) SHA1(12991083a6c574133a1a799813fa4573a33d2297) ) 
+	ROM_LOAD( "rom3.u38",     0x100000, 0x100000, CRC(cb9875ce) SHA1(82021bdc34953e9be97d45746a813d7882250ae0) ) 
+
+	ROM_REGION(0x80000, "nibbles", ROMREGION_ERASE00)
+ROM_END
+
 ROM_START( eps )
 	ROM_REGION(0x20000, "osrom", 0)
 	ROM_LOAD16_BYTE( "eps-l.bin",    0x000000, 0x008000, CRC(382beac1) SHA1(110e31edb03fcf7bbde3e17423b21929e5b32db2) )
@@ -999,4 +1015,5 @@ CONS( 1990, eps16p,eps, 0, eps,   vfx, esq5505_state, eps,    "Ensoniq", "EPS-16
 CONS( 1990, sd1,   0, 0,   vfxsd, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (21 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
 CONS( 1990, sq1,   0, 0,   sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-1", MACHINE_NOT_WORKING )      // 2x16 LCD
 CONS( 1990, sqrack,sq1, 0, sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-Rack", MACHINE_NOT_WORKING )   // 2x16 LCD
+CONS( 1991, sq2,   0, 0,   sq1,   sq1, esq5505_state, sq1,    "Ensoniq", "SQ-2", MACHINE_NOT_WORKING )      // 2x16 LCD
 CONS( 1991, sd132, sd1,0,  vfx32, vfx, esq5505_state, denib,  "Ensoniq", "SD-1 (32 voice)", MACHINE_NOT_WORKING )  // 2x40 VFD
