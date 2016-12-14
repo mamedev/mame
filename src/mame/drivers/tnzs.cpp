@@ -2405,29 +2405,29 @@ ROM_END
 
 ROM_START( tnzsop ) // prototype/location test version?
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "ns_c-11.27c1001d.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) )
+	ROM_LOAD( "c-11_6-24_1959h.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) ) // Labeled as PCB locatin, date of 6/24 & checksum - NEC D271000d  eprom
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "ns_e-3.27c512.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) )
+	ROM_LOAD( "e-3_6-24_c4ach.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) ) // Labeled as PCB locatin, date of 6/24 & checksum - TMM27512D  eprom
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+	ROM_LOAD( "b8042_88-6-22_0fcc.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) ) // Dated  '88/6/22 with checksum - Intel D8742 MCU
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "ns_a13.rom.u8",   0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) )
-	ROM_LOAD( "ns_a12.rom.u7",   0x20000, 0x20000, CRC(95880726) SHA1(f4fdedd23e80a6ccf32f737ab4bc57f9fc0925be) )
-	ROM_LOAD( "ns_a10.rom.u6",   0x40000, 0x20000, CRC(2bc4c053) SHA1(cd7668a7733e5e80c2c566d0cf63c4310e5743b4) )
-	ROM_LOAD( "ns_a08.rom.u5",   0x60000, 0x20000, CRC(8ff8d88c) SHA1(31977e39ad048a077e9b5bd712ff66b14a466d27) )
-	ROM_LOAD( "ns_a07.rom.u4",   0x80000, 0x20000, CRC(291bcaca) SHA1(4f659a0cd2ff6b4ec04ab95ee8a670222c402c2b) )
-	ROM_LOAD( "ns_a05.rom.u3",   0xa0000, 0x20000, CRC(6e762e20) SHA1(66731fe4053b9c09bc9c95d10aba212db08b4636) )
-	ROM_LOAD( "ns_a04.rom.u2",   0xc0000, 0x20000, CRC(e1fd1b9d) SHA1(6027491b927c2ab9c77fbf8895da1abcfbe32d62) )
-	ROM_LOAD( "ns_a02.rom.u1",   0xe0000, 0x20000, CRC(2ab06bda) SHA1(2b208b564e55c258665e1f66b26fe14a6c68eb96) )
+	ROM_LOAD( "a13_03e8.a13",  0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) ) // labels contain the PCB location & checksum
+	ROM_LOAD( "a12_f4ec.a12",  0x20000, 0x20000, CRC(95880726) SHA1(f4fdedd23e80a6ccf32f737ab4bc57f9fc0925be) ) // PCB CA403001A did NOT have silkscreened U1 - U8 labels
+	ROM_LOAD( "a10_f2b5.a10",  0x40000, 0x20000, CRC(2bc4c053) SHA1(cd7668a7733e5e80c2c566d0cf63c4310e5743b4) ) // PCB also labeled as P0-041-1
+	ROM_LOAD( "a08_bd49.a8",   0x60000, 0x20000, CRC(8ff8d88c) SHA1(31977e39ad048a077e9b5bd712ff66b14a466d27) )
+	ROM_LOAD( "a07_d5f3.a7",   0x80000, 0x20000, CRC(291bcaca) SHA1(4f659a0cd2ff6b4ec04ab95ee8a670222c402c2b) )
+	ROM_LOAD( "a05_662a.a5",   0xa0000, 0x20000, CRC(6e762e20) SHA1(66731fe4053b9c09bc9c95d10aba212db08b4636) )
+	ROM_LOAD( "a04_0c21.a4",   0xc0000, 0x20000, CRC(e1fd1b9d) SHA1(6027491b927c2ab9c77fbf8895da1abcfbe32d62) )
+	ROM_LOAD( "a02_904f.a2",   0xe0000, 0x20000, CRC(2ab06bda) SHA1(2b208b564e55c258665e1f66b26fe14a6c68eb96) )
 
 	ROM_REGION( 0x10000, "pal", 0 ) /* PALS not directly observed on this board but assumed to exist */
 	/* these are probably shared with extermination except for u35 */
-	ROM_LOAD( "b06-12.pal16l8a.u26.jed", 0x00000, 0x01000, NO_DUMP)
-	ROM_LOAD( "b06-13.pal16l8a.u25.jed", 0x01000, 0x01000, NO_DUMP)
-	ROM_LOAD( "b53-12.pal16l8a.u35.jed", 0x02000, 0x01000, NO_DUMP) // likely has a different name on the proto pcb...
+	ROM_LOAD( "b06-12.pal16l8a.u26.jed",  0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.u25.jed",  0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "st-6.pal16l8a.u35.jed",    0x02000, 0x01000, NO_DUMP)
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
@@ -2562,12 +2562,12 @@ GAME( 1988, chukatai,  0,        tnzs,     chukatai, driver_device, 0, ROT0,   "
 GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, driver_device, 0, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1988, chukataij, chukatai, tnzs,     chukatau, driver_device, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    driver_device, 0,  ROT0,   "Taito Corporation",       "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito Corporation",       "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (older PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, prototype?) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype?) (older PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  driver_device, 0,  ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, driver_device, 0,  ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
