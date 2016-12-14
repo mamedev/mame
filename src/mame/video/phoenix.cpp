@@ -243,21 +243,6 @@ WRITE8_MEMBER(phoenix_state::phoenix_videoreg_w)
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
 
-		if (m_cocktail_mode)
-		{
-			m_fg_tilemap->set_scrolldx(0, 0);
-			m_bg_tilemap->set_scrolldx(0, 0);
-			m_fg_tilemap->set_scrolldy(0, 0);
-			m_bg_tilemap->set_scrolldy(0, 0);
-		}
-		else
-		{
-			m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-			m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-			m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-			m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-		}
-
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();
 	}
@@ -280,21 +265,6 @@ WRITE8_MEMBER(phoenix_state::pleiads_videoreg_w)
 		membank("bank1")->set_entry(m_videoram_pg_index);
 
 		m_cocktail_mode = m_videoram_pg_index && (ioport("CAB")->read() & 0x01);
-
-		if (m_cocktail_mode)
-		{
-			m_fg_tilemap->set_scrolldx(0, 0);
-			m_bg_tilemap->set_scrolldx(0, 0);
-			m_fg_tilemap->set_scrolldy(0, 0);
-			m_bg_tilemap->set_scrolldy(0, 0);
-		}
-		else
-		{
-			m_fg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-			m_bg_tilemap->set_scrolldx(0, (HTOTAL - HBSTART));
-			m_fg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-			m_bg_tilemap->set_scrolldy(0, (VTOTAL - VBSTART));
-		}
 
 		machine().tilemap().set_flip_all(m_cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		machine().tilemap().mark_all_dirty();

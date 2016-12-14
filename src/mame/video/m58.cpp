@@ -171,6 +171,7 @@ TILEMAP_MAPPER_MEMBER(m58_state::tilemap_scan_rows)
 void m58_state::video_start()
 {
 	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(m58_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(m58_state::tilemap_scan_rows),this), 8, 8, 64, 32);
+	m_bg_tilemap->set_scrolldy(32, 32);
 
 	m_screen->register_screen_bitmap(m_scroll_panel_bitmap);
 	save_item(NAME(m_scroll_panel_bitmap));
@@ -186,24 +187,8 @@ void m58_state::video_start()
 
 WRITE8_MEMBER(m58_state::flipscreen_w)
 {
-	int width = m_screen->width();
-	int height = m_screen->height();
-	const rectangle &visarea = m_screen->visible_area();
-
 	/* screen flip is handled both by software and hardware */
-	bool flipscreen = BIT(data, 0) ^ BIT(~ioport("DSW2")->read(), 0);
-	flip_screen_set(flipscreen);
-
-	if (flipscreen)
-	{
-		m_bg_tilemap->set_scrolldx(0, 0);
-		m_bg_tilemap->set_scrolldy(0, 32);
-	}
-	else
-	{
-		m_bg_tilemap->set_scrolldx(visarea.min_x, width - (visarea.max_x + 1));
-		m_bg_tilemap->set_scrolldy(visarea.min_y - 8, height + 16 - (visarea.max_y + 1));
-	}
+	flip_screen_set(BIT(data, 0) ^ BIT(~ioport("DSW2")->read(), 0));
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x02);
 	machine().bookkeeping().coin_counter_w(1, data & 0x20);
