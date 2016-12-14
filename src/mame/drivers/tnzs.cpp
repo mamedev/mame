@@ -2405,10 +2405,10 @@ ROM_END
 
 ROM_START( tnzsop ) // prototype/location test version?
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "c-11_6-24_1959h.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) ) // Labeled as PCB locatin, date of 6/24 & checksum - NEC D271000d  eprom
+	ROM_LOAD( "c-11_6-24_1959h.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) ) // Labeled as PCB location, date of 6/24 & checksum - NEC D271000d  eprom
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "e-3_6-24_c4ach.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) ) // Labeled as PCB locatin, date of 6/24 & checksum - TMM27512D  eprom
+	ROM_LOAD( "e-3_6-24_c4ach.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) ) // Labeled as PCB location, date of 6/24 & checksum - TMM27512D  eprom
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b8042_88-6-22_0fcc.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) ) // Dated  '88/6/22 with checksum - Intel D8742 MCU
