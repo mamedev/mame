@@ -444,6 +444,7 @@ private:
 
 // LRU cache that behaves like std::map with differences:
 // * drops least-recently used items if necessary on insert to prevent size from exceeding max_size
+// * operator[], at, insert, emplace and find freshen existing entries
 // * iterates from least- to most-recently used rather than in order by key
 // * iterators to dropped items are invalidated
 // * not all map interfaces implemented

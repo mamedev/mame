@@ -62,7 +62,7 @@ protected:
 	bool    m_ui_error;
 
 private:
-	using bitmap_ptr_vector = std::vector<bitmap_ptr>;
+	using bitmap_vector = std::vector<bitmap_argb32>;
 	using texture_ptr_vector = std::vector<texture_ptr>;
 
 	class cache
@@ -78,11 +78,11 @@ private:
 		void set_snapx_driver(game_driver const *value) { m_snapx_driver = value; }
 		void set_snapx_software(ui_software_info const *software) { m_snapx_software = software; }
 
-		bitmap_argb32 &no_avail_bitmap() { return *m_no_avail_bitmap; }
+		bitmap_argb32 &no_avail_bitmap() { return m_no_avail_bitmap; }
 		render_texture *star_texture() { return m_star_texture.get(); }
 
-		bitmap_ptr_vector const &toolbar_bitmap() { return m_toolbar_bitmap; }
-		bitmap_ptr_vector const &sw_toolbar_bitmap() { return m_sw_toolbar_bitmap; }
+		bitmap_vector const &toolbar_bitmap() { return m_toolbar_bitmap; }
+		bitmap_vector const &sw_toolbar_bitmap() { return m_sw_toolbar_bitmap; }
 		texture_ptr_vector const &toolbar_texture() { return m_toolbar_texture; }
 		texture_ptr_vector const &sw_toolbar_texture() { return m_sw_toolbar_texture; }
 
@@ -92,19 +92,19 @@ private:
 		game_driver const       *m_snapx_driver;
 		ui_software_info const  *m_snapx_software;
 
-		bitmap_ptr              m_no_avail_bitmap;
-		bitmap_ptr              m_star_bitmap;
+		bitmap_argb32           m_no_avail_bitmap;
+		bitmap_argb32           m_star_bitmap;
 		texture_ptr             m_star_texture;
 
-		bitmap_ptr_vector       m_toolbar_bitmap;
-		bitmap_ptr_vector       m_sw_toolbar_bitmap;
+		bitmap_vector           m_toolbar_bitmap;
+		bitmap_vector           m_sw_toolbar_bitmap;
 		texture_ptr_vector      m_toolbar_texture;
 		texture_ptr_vector      m_sw_toolbar_texture;
 	};
 	using cache_ptr = std::shared_ptr<cache>;
 	using cache_ptr_map = std::map<running_machine *, cache_ptr>;
 
-	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_ptr> >;
+	using icon_cache = util::lru_cache_map<game_driver const *, std::pair<texture_ptr, bitmap_argb32> >;
 
 	static constexpr std::size_t MAX_ICONS_RENDER = 128;
 

@@ -78,8 +78,8 @@ menu_select_launch::cache::cache(running_machine &machine)
 	, m_snapx_texture()
 	, m_snapx_driver(nullptr)
 	, m_snapx_software(nullptr)
-	, m_no_avail_bitmap(std::make_unique<bitmap_argb32>(256, 256))
-	, m_star_bitmap(std::make_unique<bitmap_argb32>(32, 32))
+	, m_no_avail_bitmap(256, 256)
+	, m_star_bitmap(32, 32)
 	, m_star_texture()
 	, m_toolbar_bitmap()
 	, m_sw_toolbar_bitmap()
@@ -92,11 +92,11 @@ menu_select_launch::cache::cache(running_machine &machine)
 	// create a texture for snapshot
 	m_snapx_texture = texture_ptr(render.texture_alloc(render_texture::hq_scale), texture_free);
 
-	std::memcpy(&m_no_avail_bitmap->pix32(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
+	std::memcpy(&m_no_avail_bitmap.pix32(0), no_avail_bmp, 256 * 256 * sizeof(uint32_t));
 
-	std::memcpy(&m_star_bitmap->pix32(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
+	std::memcpy(&m_star_bitmap.pix32(0), favorite_star_bmp, 32 * 32 * sizeof(uint32_t));
 	m_star_texture = texture_ptr(render.texture_alloc(), texture_free);
-	m_star_texture->set_bitmap(*m_star_bitmap, m_star_bitmap->cliprect(), TEXFORMAT_ARGB32);
+	m_star_texture->set_bitmap(m_star_bitmap, m_star_bitmap.cliprect(), TEXFORMAT_ARGB32);
 
 	m_toolbar_bitmap.reserve(UI_TOOLBAR_BUTTONS);
 	m_sw_toolbar_bitmap.reserve(UI_TOOLBAR_BUTTONS);
@@ -105,28 +105,28 @@ menu_select_launch::cache::cache(running_machine &machine)
 
 	for (std::size_t i = 0; i < UI_TOOLBAR_BUTTONS; ++i)
 	{
-		m_toolbar_bitmap.emplace_back(std::make_unique<bitmap_argb32>(32, 32));
-		m_sw_toolbar_bitmap.emplace_back(std::make_unique<bitmap_argb32>(32, 32));
+		m_toolbar_bitmap.emplace_back(32, 32);
+		m_sw_toolbar_bitmap.emplace_back(32, 32);
 		m_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
 		m_sw_toolbar_texture.emplace_back(texture_ptr(render.texture_alloc(), texture_free));
 
-		std::memcpy(&m_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
-		if (m_toolbar_bitmap.back()->valid())
-			m_toolbar_texture.back()->set_bitmap(*m_toolbar_bitmap.back(), m_toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
+		std::memcpy(&m_toolbar_bitmap.back().pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
+		if (m_toolbar_bitmap.back().valid())
+			m_toolbar_texture.back()->set_bitmap(m_toolbar_bitmap.back(), m_toolbar_bitmap.back().cliprect(), TEXFORMAT_ARGB32);
 		else
-			m_toolbar_bitmap.back()->reset();
+			m_toolbar_bitmap.back().reset();
 
 		if ((i == 0U) || (i == 2U))
 		{
-			std::memcpy(&m_sw_toolbar_bitmap.back()->pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
-			if (m_sw_toolbar_bitmap.back()->valid())
-				m_sw_toolbar_texture.back()->set_bitmap(*m_sw_toolbar_bitmap.back(), m_sw_toolbar_bitmap.back()->cliprect(), TEXFORMAT_ARGB32);
+			std::memcpy(&m_sw_toolbar_bitmap.back().pix32(0), toolbar_bitmap_bmp[i], 32 * 32 * sizeof(uint32_t));
+			if (m_sw_toolbar_bitmap.back().valid())
+				m_sw_toolbar_texture.back()->set_bitmap(m_sw_toolbar_bitmap.back(), m_sw_toolbar_bitmap.back().cliprect(), TEXFORMAT_ARGB32);
 			else
-				m_sw_toolbar_bitmap.back()->reset();
+				m_sw_toolbar_bitmap.back().reset();
 		}
 		else
 		{
-			m_sw_toolbar_bitmap.back()->reset();
+			m_sw_toolbar_bitmap.back().reset();
 		}
 	}
 }
@@ -534,9 +534,9 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 	y2 -= UI_BOX_TB_BORDER;
 
 	texture_ptr_vector const &t_texture(m_is_swlist ? m_cache->sw_toolbar_texture() : m_cache->toolbar_texture());
-	bitmap_ptr_vector const &t_bitmap(m_is_swlist ? m_cache->sw_toolbar_bitmap() : m_cache->toolbar_bitmap());
+	bitmap_vector const &t_bitmap(m_is_swlist ? m_cache->sw_toolbar_bitmap() : m_cache->toolbar_bitmap());
 
-	auto const num_valid(std::count_if(std::begin(t_bitmap), std::end(t_bitmap), [](bitmap_ptr const &e) { return e && e->valid(); }));
+	auto const num_valid(std::count_if(std::begin(t_bitmap), std::end(t_bitmap), [](bitmap_argb32 const &e) { return e.valid(); }));
 
 	float const space_x = (y2 - y1) * container().manager().ui_aspect(&container());
 	float const total = (float(num_valid) * space_x) + (float(num_valid - 1) * 0.001f);
@@ -545,7 +545,7 @@ void menu_select_launch::draw_toolbar(float x1, float y1, float x2, float y2)
 
 	for (int z = 0; z < UI_TOOLBAR_BUTTONS; ++z)
 	{
-		if (t_bitmap[z] && t_bitmap[z]->valid())
+		if (t_bitmap[z].valid())
 		{
 			rgb_t color(0xEFEFEFEF);
 			if (mouse_in_rect(x1, y1, x2, y2))
@@ -613,8 +613,10 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		if (m_icons.end() == icon)
 		{
 			texture_ptr texture(machine().render().texture_alloc(), [&render = machine().render()] (render_texture *texture) { render.texture_free(texture); });
-			bitmap_ptr bitmap(std::make_unique<bitmap_argb32>());
-			icon = m_icons.emplace(std::piecewise_construct, std::forward_as_tuple(driver), std::forward_as_tuple(std::move(texture), std::move(bitmap))).first;
+			icon = m_icons.emplace(
+					std::piecewise_construct,
+					std::forward_as_tuple(driver),
+					std::forward_as_tuple(std::piecewise_construct, std::forward_as_tuple(std::move(texture)), std::tuple<>())).first;
 		}
 
 		// set clone status
@@ -646,7 +648,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 			render_load_ico(*tmp, snapfile, nullptr, fullname.c_str());
 		}
 
-		bitmap_argb32 &bitmap(*icon->second.second);
+		bitmap_argb32 &bitmap(icon->second.second);
 		if (tmp->valid())
 		{
 			float panel_width = x1 - x0;
@@ -704,7 +706,7 @@ float menu_select_launch::draw_icon(int linenum, void *selectedref, float x0, fl
 		auto_free(machine(), tmp);
 	}
 
-	if (icon->second.second->valid())
+	if (icon->second.second.valid())
 		container().add_quad(x0, y0, x1, y1, rgb_t::white(), icon->second.first.get(), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 	return ud_arrow_width * 1.5f;
