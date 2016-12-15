@@ -46,8 +46,8 @@
 #define VERBOSE 0
 
 #define LOGPRINT(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
-#define LOG(...)      {} LOGPRINT(__VA_ARGS__)
-#define LOGSETUP(...) {}
+#define LOG(...)      LOGPRINT(__VA_ARGS__)
+#define LOGSETUP(...) 
 
 #if VERBOSE >= 2
 #define logerror printf
