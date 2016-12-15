@@ -21,7 +21,7 @@ static const uint8_t skew_bits_value[4] = { 0, 1, 2, 2 };
 #define SCANS_PER_DATA_ROW   (((m_reg[2] >> 3) & 0x0f) + 1)
 #define CHARS_PER_DATA_ROW   (chars_per_row_value[(m_reg[2] >> 0) & 0x07])
 #define SKEW_BITS            (skew_bits_value[(m_reg[3] >> 6) & 0x03])
-#define DATA_ROWS_PER_FRAME  (((m_reg[3] >> 0) & 0x3f) + 1)
+#define DATA_ROWS_PER_FRAME  ((m_reg[3] & 0x3f) + 1)
 #define SCAN_LINES_PER_FRAME ((m_reg[4] * 2) + 256 + (((m_reg[1] >> 7) & 0x01) * 257))
 #define VERTICAL_DATA_START  (m_reg[5])
 #define LAST_DISP_DATA_ROW   (m_reg[6] & 0x3f)
@@ -179,7 +179,6 @@ void tms9927_device::generic_access(address_space &space, offs_t offset)
 			break;
 
 		case 0x0b:  /* Up scroll */
-osd_printf_debug("Up scroll\n");
 			m_screen->update_now();
 			m_start_datarow = (m_start_datarow + 1) % DATA_ROWS_PER_FRAME;
 			break;
@@ -215,7 +214,9 @@ WRITE8_MEMBER( tms9927_device::write )
 		case 0x0d:  /* LOAD CURSOR ROW ADDRESS */
 osd_printf_debug("Cursor address changed\n");
 			m_reg[offset - 0x0c + 7] = data;
-			recompute_parameters(false);
+			/* Recomputing parameters here will break the scrollup on the Attachè 
+			   and probably other machines due to m_start_datarow being reset ! */
+			//recompute_parameters(false);
 			break;
 
 		default:
