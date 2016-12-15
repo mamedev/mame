@@ -437,7 +437,7 @@ void pit68230_device::wr_pitreg_pacr(uint8_t data)
 	}
 	else
 	{
-		LOG((" - H2 cleared because beeing disabled in PGCR\n"));
+		LOG((" - H2 cleared because being disabled in PGCR\n"));
 		m_h2_out_cb(CLEAR_LINE);
 	}
 }
@@ -473,7 +473,7 @@ void pit68230_device::wr_pitreg_pbcr(uint8_t data)
 	}
 	else
 	{
-		LOG((" - H4 cleared because beeing disabled in PGCR\n"));
+		LOG((" - H4 cleared because being disabled in PGCR\n"));
 		m_h4_out_cb(CLEAR_LINE);
 	}
 }

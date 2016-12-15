@@ -183,7 +183,6 @@ files {
 	MAME_DIR .. "src/emu/video.h",
 	MAME_DIR .. "src/emu/rendersw.hxx",
 	MAME_DIR .. "src/emu/ui/uimain.h",
-	MAME_DIR .. "src/emu/ui/cmdrender.h", -- TODO: remove
 	MAME_DIR .. "src/emu/ui/cmddata.h",   -- TODO: remove
 	MAME_DIR .. "src/emu/debug/debugcmd.cpp",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",

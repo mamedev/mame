@@ -10703,6 +10703,7 @@ lwar_a81                        //
 lwar_a83                        //
 lwar_e90                        //
 mnfb_c27                        //
+mnfb_c29                        //
 play_a24                        //
 poto_a29                        //
 poto_a32                        //
@@ -11991,6 +11992,7 @@ sd1                             // 1990 SD-1
 sd132                           // 1991 SD-1 32
 sq1                             // 1990 SQ-1
 sqrack                          // 1990 SQ-Rack
+sq2								// 1991 SQ-2
 vfx                             // 1989 VFX
 vfxsd                           // 1989 VFX-SD
 

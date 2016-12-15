@@ -1692,6 +1692,56 @@ static MACHINE_CONFIG_DERIVED_CLASS( jpopnics, tnzs_base, jpopnics_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3)
 MACHINE_CONFIG_END
 
+/***************************************************************************
+
+  PCBs
+
+***************************************************************************/
+/*	The TNZS/Seta hardware has a variety of somewhat different pcbs, all of
+	which have both Seta and Taito Part numbers.
+	All pcbs have Z80B processors and one 6264 mainram chip and an X1-001
+	and X1-002 video chip and an X1-004 I/O? Chip, and four PALs
+
+Seta#		Taito#s				CPUS	RxM2	ROM1	MCU?	Video ram	PROMs	SETA X1	GFXROMs		QUADRATURE	ESD. PROT	Games							Picture
+P0-022-A	K1100245A J1100108A	2xZ80B	512/256	512/256	8042	4x6116		Yes, 2	03		23c1000		uPD4701AC	3x X2-003	arkanoid2, plumppop(A)			http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
+P0-025-A	K1100241A J1100107A	2xZ80B	512/256	512/256	8042	4x6116		Yes, 2	03		23c1000		N/A			3x X2-003	drtoppel,extermatn,chukatai(B)	http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
+P0-028-A	K1100416A J1100332A	2xZ80B	512/256	512/256	8042	4x6116		No		05,06	23c1000		N/A			3x X2-004	chukatai(B)						http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
+P0-038A 	M6100309A           3xZ80B	512/256	512/256	NONE	1x6164		No		05,06	23c1000		N/A			3x X2-003	kageki							http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
+P0-041-1	CA403001A          	2xZ80B	61256	27c1000	8742	1x6164		No		05,06	27c1000		N/A			5x X2-005	tnzsop(C)						http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
+P0-041-A	K1100356A J1100156A	2xZ80B	61256	27c1000	8042	1x6164		No		05,06	23c1000		N/A			5x X2-005	tnzs(j,u)o						http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
+P0-043A 	M6100356A          	3xZ80B*	61256	27512**	NONE	1x6164		No		05,06	LH534000(C)	N/A			4x X2-004	tnzs(j,u), kabukiz				http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
+P0-056A 	K1100476A J1100201A	3xZ80B	EMPTY*3	27c1000	NONE	1x6164		No		05,06	LH534000	U43???		5x X2-005	insectx(D)						http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+
+(A) It is very likely plumppop also uses this P0-022-A PCB, as the game reads
+	the quadratures the same way as arkanoid2 does.
+	arkanoid2 only has 1 x2-003 ESD protection resistor pack populated, but the
+	PCB can have 3, the other two (for more joysticks/buttons?) are not
+	populated. arkanoid2's second maincpu socket is also empty, but this is
+	clearly not the case for plumppop.
+(B) chukatai has one set which unlike its earlier sets uses the P0-025-A
+	PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
+	sockets into 8 27c1000 eprom sockets, and DOES use color PROMs!
+	The other pcb set uses P0-028-A pcb and 23c1000 mask roms and color RAM,
+	but has lower rom id numbers. The higher numbered set  was likely created
+	by Taito to 'use up' a stock of older P0-025-A pcbs.
+(C) This is a development/prototype PCB, hence it has 32 pin sockets for the
+	gfx ROMs as 27c1000 eproms, instead of 28 pin sockets for 23c1000 mask
+	ROMs. It also uses an (unprotected?) 8742 MCU.
+	Another curious thing is the Taito ID number may have accidentally been
+	printed in backwards order, i.e should be C1100304A which fits the pattern
+	of the other boards.
+(D) InsectorX has a lot of rework on its PCB, two greenwires for each of the
+	two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
+	pins 18, 19, 20, and 21, connecting it to 4 pins of a dip16 chip @ U43
+	with its markings sanded off. Is this chip at U43 a tiny MCU?
+*	tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
+	plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
+	Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
+	acts in place of the 8x42 mcu used by the older tnzs sets.
+**	This is a 28-pin 27512 in a 32-pin socket which alternately holds a 27c1000.
+*3	This is unpopulated, but the pcb can accept a 61256 SRAM here.
+*/
+
 
 /***************************************************************************
 
@@ -1708,7 +1758,7 @@ ROM_START( plumppop )
 	ROM_LOAD( "a98-11.bin", 0x00000, 0x10000, CRC(bc56775c) SHA1(0c22c22c0e9d7ec0e34f8ab4bfe61068f65e8759) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Chip label is a guess, also unknown if it actually uses the same MCU as drtoppel/extrmatn, but it appears to work fine */
+	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, BAD_DUMP CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Chip label and location is a guess, also unknown if it actually uses the same MCU as drtoppel/extrmatn, but it appears to work fine, marked as bad until verified that it uses same M-001 mcu */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "a98-01.bin", 0x00000, 0x10000, CRC(f3033dca) SHA1(130744998f0531a82de2814231dddea3ad710f60) )
@@ -1731,6 +1781,12 @@ ROM_START( plumppop )
 	ROM_REGION( 0x0400, "proms", 0 )        /* color proms */
 	ROM_LOAD( "a98-13.bpr", 0x0000, 0x200, CRC(7cde2da5) SHA1(0cccfc35fb716ebb4cffa85c75681f33ca80a56e) )   /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "a98-12.bpr", 0x0200, 0x200, CRC(90dc9da7) SHA1(f719dead7f4597e5ee6f1103599505b98cb58299) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* pals on plumppop are unknown, but very likely the same set as arkanoid2/extrmatn/drtoppel/chukataio/etc */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( jpopnics )
@@ -1771,6 +1827,12 @@ ROM_START( extrmatn )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with several other games on this hardware */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( extrmatnu )
@@ -1793,8 +1855,13 @@ ROM_START( extrmatnu )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )  /* lo bytes, AM27S29 or compatible like MB7124 */
-ROM_END
 
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with several other games on this hardware */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
+ROM_END
 
 ROM_START( extrmatnur )
 	ROM_REGION( 0x20000, "maincpu", 0 )             /* Region 0 - main cpu */
@@ -1816,6 +1883,12 @@ ROM_START( extrmatnur )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with several other games on this hardware */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( extrmatnj )
@@ -1838,18 +1911,32 @@ ROM_START( extrmatnj )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b06-09.15f", 0x00000, 0x200, CRC(f388b361) SHA1(f00db6ad6994cfe9b7ad76e30b7049b11f8c16e4) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b06-08.17f", 0x00200, 0x200, CRC(10c9aac3) SHA1(09d6f791dea358e78099af7a370b00b8504ffc97) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with several other games on this hardware */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
+
+/*
+PCB:
+Seta: P0-022-A
+Taito: K1100245A J1100108A
+
+The arknoid2 PCB has a sticker label which says "K1100245A // REVENGE OF DOH"
+*/
 
 ROM_START( arknoid2 )
 	ROM_REGION( 0x20000, "maincpu", 0 )             /* Region 0 - main cpu */
-	ROM_LOAD( "b08_05.11c", 0x00000, 0x10000, CRC(136edf9d) SHA1(f632321650897eee585511a84f451a205d1f7704) )
+	ROM_LOAD( "b08__05.11c", 0x00000, 0x10000, CRC(136edf9d) SHA1(f632321650897eee585511a84f451a205d1f7704) )
 	/* 0x10000 - 0x1ffff empty */
 
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
-	ROM_LOAD( "b08_13.3e", 0x00000, 0x10000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
+	ROM_LOAD( "b08__13.3e", 0x00000, 0x10000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "b08__09.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B08 // 09 and under printed label "?Taito M-009?", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b08-01.13a", 0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
@@ -1860,18 +1947,24 @@ ROM_START( arknoid2 )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f", 0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f", 0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( arknoid2u )
 	ROM_REGION( 0x20000, "maincpu", 0 )             /* Region 0 - main cpu */
-	ROM_LOAD( "b08_11.11c", 0x00000, 0x10000, CRC(99555231) SHA1(2798f3f5b3f1fa27598fe7a6e95c75d9142c8d34) )
+	ROM_LOAD( "b08__11.11c", 0x00000, 0x10000, CRC(99555231) SHA1(2798f3f5b3f1fa27598fe7a6e95c75d9142c8d34) )
 	/* 0x10000 - 0x1ffff empty */
 
 	ROM_REGION( 0x10000, "sub", 0 )             /* Region 2 - sound cpu */
-	ROM_LOAD( "b08_12.3e", 0x00000, 0x10000, CRC(dc84e27d) SHA1(d549d8c9fbec0521517f0c5f5cee763e27d48633) )
+	ROM_LOAD( "b08__12.3e", 0x00000, 0x10000, CRC(dc84e27d) SHA1(d549d8c9fbec0521517f0c5f5cee763e27d48633) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "b08__09.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B08 // 09 and under printed label "?Taito M-009?", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b08-01.13a", 0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
@@ -1882,6 +1975,12 @@ ROM_START( arknoid2u )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f", 0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f", 0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( arknoid2j )
@@ -1893,7 +1992,7 @@ ROM_START( arknoid2j )
 	ROM_LOAD( "b08_06.3e", 0x00000, 0x10000, CRC(adfcd40c) SHA1(f91299407ed21e2dd244c9b1a315b27ed32f5514) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "b08__09.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B08 // 09 and under printed label "?Taito M-009?", is a mask 8042 */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b08-01.13a", 0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
@@ -1904,6 +2003,12 @@ ROM_START( arknoid2j )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f", 0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f", 0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( arknoid2b )
@@ -1915,7 +2020,7 @@ ROM_START( arknoid2b )
 	ROM_LOAD( "b08_13.3e", 0x00000, 0x10000, CRC(e8035ef1) SHA1(9a54e952cff0036c4b6affd9ffb1097cdccbe255) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP )
+	ROM_LOAD( "ark28742.3g", 0x0000, 0x0800, NO_DUMP ) /* Labeled B08 // 09 and under printed label "?Taito M-009?", is a mask 8042... does the bootleg set even HAVE the mcu? */
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
 	ROM_LOAD( "b08-01.13a", 0x00000, 0x20000, CRC(2ccc86b4) SHA1(eced1d7e687db0331507726946b6a19a690a7604) )
@@ -1926,88 +2031,119 @@ ROM_START( arknoid2b )
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "b08-08.15f", 0x00000, 0x200, CRC(a4f7ebd9) SHA1(094eb63c18898c6ee8d722492bdfd28091c61773) )  /* hi bytes, AM27S29 or compatible like MB7124 */
 	ROM_LOAD( "b08-07.16f", 0x00200, 0x200, CRC(ea34d9f7) SHA1(9a46edc64f961bd96908419cabd92445d300fc19) )  /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
+/*
+PCB:
+Seta: P0-025-A
+Taito: K1100241A J1100107A
+
+The drtoppelj PCB has a sticker label which says "K1100269A // DR. ドツペル タンケン" (DoTuPeRu TaNKeN)
+*/
 ROM_START( drtoppel )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b19-09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
-	ROM_LOAD( "b19-10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
+	ROM_LOAD( "b19__09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
+	ROM_LOAD( "b19__10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b19-15.3e", 0x00000, 0x10000, CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Hacked??, need correct Taito rom number */
+	ROM_LOAD( "b19__15.3e", 0x00000, 0x10000, BAD_DUMP CRC(37a0d3fb) SHA1(f65fb9382af5f5b09725c39b660c5138b3912f53) ) /* Region-Hacked??, need correct Taito rom number */
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
+	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06 // 14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
-	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
-	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
-	ROM_LOAD( "b19-04.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
-	ROM_LOAD( "b19-05.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
-	ROM_LOAD( "b19-06.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
-	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
-	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
+	ROM_LOAD( "b19-01.23c1000.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
+	ROM_LOAD( "b19-02.23c1000.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
+	ROM_LOAD( "b19-03.23c1000.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
+	ROM_LOAD( "b19-04.23c1000.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
+	ROM_LOAD( "b19-05.23c1000.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
+	ROM_LOAD( "b19-06.23c1000.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
+	ROM_LOAD( "b19-07.23c1000.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
+	ROM_LOAD( "b19-08.23c1000.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* color proms */
-	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
-	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-13.am27s29.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-12.am27s29.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( drtoppelu )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b19-09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
-	ROM_LOAD( "b19-10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
+	ROM_LOAD( "b19__09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
+	ROM_LOAD( "b19__10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b19-14.3e", 0x00000, 0x10000, CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Hacked??, need correct Taito rom number */
+	ROM_LOAD( "b19__14.3e", 0x00000, 0x10000, BAD_DUMP CRC(05565b22) SHA1(d1aa47b438d3b44c5177337809e38b50f6445c36) ) /* Region-Hacked??, need correct Taito rom number */
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
+	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06 // 14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
-	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
-	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
-	ROM_LOAD( "b19-04.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
-	ROM_LOAD( "b19-05.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
-	ROM_LOAD( "b19-06.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
-	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
-	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
+	ROM_LOAD( "b19-01.23c1000.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
+	ROM_LOAD( "b19-02.23c1000.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
+	ROM_LOAD( "b19-03.23c1000.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
+	ROM_LOAD( "b19-04.23c1000.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
+	ROM_LOAD( "b19-05.23c1000.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
+	ROM_LOAD( "b19-06.23c1000.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
+	ROM_LOAD( "b19-07.23c1000.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
+	ROM_LOAD( "b19-08.23c1000.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* color proms */
-	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
-	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-13.am27s29.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-12.am27s29.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( drtoppelj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b19-09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
-	ROM_LOAD( "b19-10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
+	ROM_LOAD( "b19__09.11c", 0x00000, 0x10000, CRC(3e654f82) SHA1(d9e351d82546b08eb7887ea1d976fa97a259db6e) )
+	ROM_LOAD( "b19__10.9c",  0x10000, 0x10000, CRC(7e72fd25) SHA1(6035e4db75e6dc57b13bb6e92217d1c2d0ffdfd2) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b19-11.3e", 0x00000, 0x10000, CRC(524dc249) SHA1(158b2de0fcd17ad16ba72bb24888122bf704e216) )
+	ROM_LOAD( "b19__11.3e", 0x00000, 0x10000, CRC(524dc249) SHA1(158b2de0fcd17ad16ba72bb24888122bf704e216) )
 
 	ROM_REGION( 0x10000, "mcu", 0 )    /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b06-14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06-14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
+	ROM_LOAD( "b06__14.1g", 0x0000, 0x0800, CRC(28907072) SHA1(21c7017af8a8ceb8e43d7e798f48518b136fd45c) ) /* Labeled B06 // 14 and under printed label "Taito M-001, 128P, 720100", is a mask 8042 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "b19-01.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
-	ROM_LOAD( "b19-02.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
-	ROM_LOAD( "b19-03.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
-	ROM_LOAD( "b19-04.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
-	ROM_LOAD( "b19-05.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
-	ROM_LOAD( "b19-06.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
-	ROM_LOAD( "b19-07.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
-	ROM_LOAD( "b19-08.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
+	ROM_LOAD( "b19-01.23c1000.13a", 0x00000, 0x20000, CRC(a7e8a0c1) SHA1(a2f017ae5b6472d4202f126d0247b3fe4b1321d1) )
+	ROM_LOAD( "b19-02.23c1000.12a", 0x20000, 0x20000, CRC(790ae654) SHA1(5fd6b89918e1539e00c918959b96d2a9394c8abe) )
+	ROM_LOAD( "b19-03.23c1000.10a", 0x40000, 0x20000, CRC(495c4c5a) SHA1(a23b512cda4c0c535df5508a52faebe401c1797d) )
+	ROM_LOAD( "b19-04.23c1000.8a",  0x60000, 0x20000, CRC(647007a0) SHA1(10ec35a15091967038bb26fb116c47d730f69edc) )
+	ROM_LOAD( "b19-05.23c1000.7a",  0x80000, 0x20000, CRC(49f2b1a5) SHA1(5e98bb421afaa02471ad02213ea6ca23ff2f0e27) )
+	ROM_LOAD( "b19-06.23c1000.5a",  0xa0000, 0x20000, CRC(2d39f1d0) SHA1(2aa89a5cc7f026c8db9922b183319ff66ac4a071) )
+	ROM_LOAD( "b19-07.23c1000.4a",  0xc0000, 0x20000, CRC(8bb06f41) SHA1(a0c182d473317f2cdb31bdf39a2593c032002305) )
+	ROM_LOAD( "b19-08.23c1000.2a",  0xe0000, 0x20000, CRC(3584b491) SHA1(d0aca90708be241bbd3a1097220a85083337a4bc) )
 
 	ROM_REGION( 0x0400, "proms", 0 )        /* color proms */
-	ROM_LOAD( "b19-13.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
-	ROM_LOAD( "b19-12.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-13.am27s29.15f", 0x0000, 0x200, CRC(6a547980) SHA1(c82f8dfad028565b4b4e5be1167f2f290c929090) )   /* hi bytes, AM27S29 or compatible like MB7124 */
+	ROM_LOAD( "b19-12.am27s29.16f", 0x0200, 0x200, CRC(5754e9d8) SHA1(8c7d29e22c90b1f72929b95675dc15e431aae044) )   /* lo bytes, AM27S29 or compatible like MB7124 */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination */
+	ROM_LOAD( "b06-10.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 /* M6100309A PCB
-   P0-0038A */
+   P0-038A */
 ROM_START( kageki )
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "b35-16.11c", 0x00000, 0x10000, CRC(a4e6fd58) SHA1(7cfe5b3fa6c88cdab45719f5b58541270825ad30) )    /* US ver */
@@ -2017,17 +2153,23 @@ ROM_START( kageki )
 	ROM_LOAD( "b35-17.43e", 0x00000, 0x10000, CRC(fdd9c246) SHA1(ac7a59ed19d0d81748cabd8b77a6ba3937e3cc99) )    /* US ver */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "b35-01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
-	ROM_LOAD( "b35-02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
-	ROM_LOAD( "b35-03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
-	ROM_LOAD( "b35-04.8a",   0x60000, 0x20000, CRC(71c03f91) SHA1(edce6e5a52b0c83c1c3c6bf9bc6b7957f7941521) )
-	ROM_LOAD( "b35-05.7a",   0x80000, 0x20000, CRC(a4e20c08) SHA1(5d1d23d1410fea8650b18c595b0170a17e5d89a6) )
-	ROM_LOAD( "b35-06.5a",   0xa0000, 0x20000, CRC(3f8ab658) SHA1(44de7ee2bdb89bc520ed9bc812c26789c3f31411) )
-	ROM_LOAD( "b35-07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
-	ROM_LOAD( "b35-08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
+	ROM_LOAD( "b35__01.13a",  0x00000, 0x20000, CRC(01d83a69) SHA1(92a84329306b58a45f7bb443a8642eeaeb04d553) )
+	ROM_LOAD( "b35__02.12a",  0x20000, 0x20000, CRC(d8af47ac) SHA1(2ef9ca991bf55ed6c12bf3a7dc4aa904d7749d5c) )
+	ROM_LOAD( "b35__03.10a",  0x40000, 0x20000, CRC(3cb68797) SHA1(e7669b1a9a26dede560cc87695004d29510bc1f5) )
+	ROM_LOAD( "b35__04.8a",   0x60000, 0x20000, CRC(71c03f91) SHA1(edce6e5a52b0c83c1c3c6bf9bc6b7957f7941521) )
+	ROM_LOAD( "b35__05.7a",   0x80000, 0x20000, CRC(a4e20c08) SHA1(5d1d23d1410fea8650b18c595b0170a17e5d89a6) )
+	ROM_LOAD( "b35__06.5a",   0xa0000, 0x20000, CRC(3f8ab658) SHA1(44de7ee2bdb89bc520ed9bc812c26789c3f31411) )
+	ROM_LOAD( "b35__07.4a",   0xc0000, 0x20000, CRC(1b4af049) SHA1(09783816d5076219d241538e2711402eb8c4cd03) )
+	ROM_LOAD( "b35__08.2a",   0xe0000, 0x20000, CRC(deb2268c) SHA1(318bf3da6cbe20758397d5f78caf3cda02f322d7) )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
 	ROM_LOAD( "b35-15.98g",  0x00000, 0x10000, CRC(e6212a0f) SHA1(43891f4fd141b00ed458be47a107a2550a0534c2) )   /* US ver */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( kagekij )
@@ -2050,6 +2192,12 @@ ROM_START( kagekij )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
 	ROM_LOAD( "b35-12.98g", 0x00000, 0x10000, CRC(184409f1) SHA1(711bdd499670e86630ebb6820262b1d8d651c987) )    /* JP ver */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 /* Board ID is M6100309A - program rom has been hacked to say 1992 :/
@@ -2076,6 +2224,12 @@ ROM_START( kagekih )
 
 	ROM_REGION( 0x10000, "samples", 0 ) /* samples */
 	ROM_LOAD( "b35-12.98g", 0x00000, 0x10000, CRC(184409f1) SHA1(711bdd499670e86630ebb6820262b1d8d651c987) )    /* JP ver */
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 
@@ -2083,7 +2237,22 @@ ROM_END
 Chuka Taisen
 Taito, 1988
 
-PCB Layout
+This PCB comes in two variations: one which is on the older, color prom based P0-025-A PCB as used on extrmatn, drtoppel
+and one which is a unique PCB sort of an 'older version of p0-051-a' which uses color ram like tnzs.
+The color prom version is not dumped yet.
+
+The chukatai (p0-025-a) PCB has a sticker label which says "????????? // CHUKATAISEN"
+The chukatai (p0-028-a) PCB has a sticker label which says "K1100??2A // CHUKATAISEN"
+
+PCB:
+Older(technically 'newer rom ids but used to get rid of old pcb stock') set is:
+Seta: P0-025-A
+Taito: K1100241A J1100107A
+
+The two newer sets are:
+Seta: P0-028-A
+Taito: K1100416A J1100332A
+which is described in the diagram below.
 
 |--------------------------------------------------|
 |    SETA                     SETA         12MHz   |
@@ -2116,6 +2285,13 @@ PCB Layout
 Notes:
       6264: 8K x8 SRAM
       6116: 2K x8 SRAM
+
+The undumped Chuka Taisen set has a daughterboard which plugs into the
+GFX ROM sockets and allows use of 27c1000d eproms instead of 23c1000 mask roms.
+The undumped set, unlike the two here, runs on an older drtoppel/extrmatn pcb
+and uses color proms!
+
+
 */
 
 ROM_START( chukatai )
@@ -2127,7 +2303,7 @@ ROM_START( chukatai )
 	ROM_LOAD( "b44-12w", 0x00000, 0x10000, CRC(e80ecdca) SHA1(cd96403ca97f18f630118dcb3dc2179c01147213) ) /* Hacked??, need correct Taito rom number */
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
+	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) ) /* B44 // 09 is the label? what is the mask number under the label? maybe Taito M-011? last digit is definitely 1 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
@@ -2138,6 +2314,12 @@ ROM_START( chukatai )
 	ROM_LOAD( "b44-06.a05", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
 	ROM_LOAD( "b44-07.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( chukataiu )
@@ -2146,10 +2328,10 @@ ROM_START( chukataiu )
 	ROM_LOAD( "b44-11", 0x10000, 0x10000, CRC(32484094) SHA1(f320fea2910816b5085ca9aa37e30af665fb6be1) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b44-12u", 0x00000, 0x10000, CRC(9f09fd5c) SHA1(ae92f2e893e1e666dcabbd793f1a778c5e3d7bab) ) /* Hacked??, need correct Taito rom number */
+	ROM_LOAD( "b44-12u", 0x00000, 0x10000, BAD_DUMP CRC(9f09fd5c) SHA1(ae92f2e893e1e666dcabbd793f1a778c5e3d7bab) ) /* Hacked??, need correct Taito rom number */
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
+	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) ) /* B44 // 09 is the label? what is the mask number under the label? maybe Taito M-011? last digit is definitely 1 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
@@ -2160,6 +2342,12 @@ ROM_START( chukataiu )
 	ROM_LOAD( "b44-06.a05", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
 	ROM_LOAD( "b44-07.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
 ROM_START( chukataij )
@@ -2171,7 +2359,7 @@ ROM_START( chukataij )
 	ROM_LOAD( "b44-12", 0x00000, 0x10000, CRC(0600ace6) SHA1(3d5767b91ea63128bfbff3527ddcf90fcf43af2e) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) )
+	ROM_LOAD( "b44-8742.mcu", 0x0000, 0x0800, CRC(7dff3f9f) SHA1(bbf4e036d025fe8179b053d639f9b8ad401e6e68) ) /* B44 // 09 is the label? what is the mask number under the label? maybe Taito M-011? last digit is definitely 1 */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
 	ROM_LOAD( "b44-01.a13", 0x00000, 0x20000, CRC(aae7b3d5) SHA1(52809ea22d98811ece2fb27e80db6ddf4fbacb07) )
@@ -2182,17 +2370,27 @@ ROM_START( chukataij )
 	ROM_LOAD( "b44-06.a05", 0xa0000, 0x20000, CRC(269978a8) SHA1(aef7b8d3d00dcc4201e0a1e28026f6f1bdafd0b7) )
 	ROM_LOAD( "b44-07.a04", 0xc0000, 0x20000, CRC(3e0e737e) SHA1(f8d62c7b69c79da9df7ef5ce454060d3645e5884) )
 	ROM_LOAD( "b44-08.a02", 0xe0000, 0x20000, CRC(6cb1e8fc) SHA1(4ab0c2cce1de2616044a9bfb9bf17f95a49baffd) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are shared with extermination except d9 */
+	ROM_LOAD( "b06-101.pal16l8a.d9.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-11.pal16l8a.d6.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-12.pal16l8a.c3.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.c2.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
+
+/*An undumped set of chuka taisen exists with all roms in the b44-14
+thru b44-25 number range and 27c1000d gfx roms, AND COLOR PROMS, using the older p0-025-a pcb
+This set, unlike the others, does use the b06-10.pal16l8a.d9.jed "older" pal rather than the 'newer' b06-101.pal16l8a.d9.jed pal.
+*/
 
 
 /*
 The New Zealand Story
 Taito, 1988
 
-This PCB runs on Taito/Seta hardware.
-
 PCB Layout ("New style PCB" with 3x z80 and no M-chip, and a daughterboard w/roms and z80)
 ----------
+The tnzs PCB has a sticker label which says "M6100409A // N.Z.LAND STORY"
 
 M6100356A (on PCB)
 P0-043A (Seta number; on PCB)
@@ -2258,7 +2456,6 @@ Notes:
 */
 
 /* tnzs - new style PCB sets */
-
 ROM_START( tnzs )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-24.u1",   0x00000, 0x20000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
@@ -2280,7 +2477,10 @@ ROM_START( tnzs )
 	ROM_LOAD( "b53-21.ic14",  0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) ) /* Also labeled as U46U */
 
 	ROM_REGION( 0x10000, "pal", 0 )
-	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x00000, 0x01000, NO_DUMP) // on sub pcb
+	/* these are shared with extermination except for the subpcb pal */
+	ROM_LOAD( "b06-13.pal16l8a.f2.jed",  0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-101.pal16l8a.i2.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x03000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
 ROM_START( tnzsj )
@@ -2304,7 +2504,10 @@ ROM_START( tnzsj )
 	ROM_LOAD( "b53-21.ic14",  0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) ) /* Also labeled as U46U */
 
 	ROM_REGION( 0x10000, "pal", 0 )
-	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x00000, 0x01000, NO_DUMP) // on sub pcb
+	/* these are shared with extermination except for the subpcb pal */
+	ROM_LOAD( "b06-13.pal16l8a.f2.jed",  0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-101.pal16l8a.i2.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b53-15.pal16l8a.subpcb.ic6.jed", 0x03000, 0x01000, NO_DUMP) // on sub pcb
 ROM_END
 
 /* tnzs - old style PCB sets
@@ -2316,9 +2519,10 @@ Taito ID: K1100356A
           MAIN PCB
 Seta ID: P0-041A
 */
-/* This pcb is similar but not identical to the Chuka Taisen pcb;
+/* This pcb is derived from the Chuka Taisen,DrToppel and Arkanoid 2 pcbs, replacing the two color proms with color ram;
    There is an M-chip i8x42 (with Taito silkscreen) and no 3rd z80.
-   There is no daughter-pcb like the later TNZS pcb has. */
+   There is no daughter-pcb like the later TNZS pcb has.
+   GFX Roms on the pcb are 28 pin 23C1000/TC531000 128K mask roms */
 ROM_START( tnzsjo )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-10.27c1001d.u32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
@@ -2374,7 +2578,7 @@ ROM_START( tnzsuo )
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
-ROM_START( tnzso )
+ROM_START( tnzso ) // is this a legit set, or a hack, or a near-final (later than tnzsop below) prototype?
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-unknown.27c1001d.u32", 0x00000, 0x20000, CRC(edf3b39e) SHA1(be221c99e50795d569611dba454c3954a259a859) ) // ROM LABEL FOR THIS SET IS UNKNOWN
 
@@ -2403,31 +2607,36 @@ ROM_START( tnzso )
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
-ROM_START( tnzsop ) // prototype/location test version?
+/* This is a prototype CA403001A PCB (Seta: P0-041-1), and is ALMOST but not exactly the same as the K1100356A/J1100156A (Seta: P0-041A) 'tnzsuo/tnzsjo/arkanoid2/etc' pcb above:
+This pcb uses 32-pin 27c1000d eproms for the 8 gfx roms, and the final K1100356A/J1100156A pcb uses 28 pin 23c1000 mask roms instead. Some capacitors near the jamma connector were moved as well.
+No other obviously evident routing/wiring changes are present.
+This type of pcb might have been used for in-house testing of all the games on this hardware.
+*/
+ROM_START( tnzsop ) // prototype (location test?) version; has different rom labels, and the Seta X1-001 chip has prototype markings revealing it was fabbed by Yamaha, as 'YM3906'
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "ns_c-11.27c1001d.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) )
+	ROM_LOAD( "c-11__6-24__1959h.d27c1000d-15.u32", 0x00000, 0x20000, CRC(3c1dae7b) SHA1(0004fccc171714c80565326f8690f9662c5b75d9) ) // Labeled as PCB location, date of 6/24 & checksum - NEC D271000d  eprom
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "ns_e-3.27c512.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) )
+	ROM_LOAD( "e-3__6-24__c4ach.tmm27512d-20.u38", 0x00000, 0x10000, CRC(c7662e96) SHA1(be28298bfde4e3867cfe75633ffb0f8611dbbd8b) ) // Labeled as PCB location, date of 6/24 & checksum - TMM27512D  eprom
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
-	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+	ROM_LOAD( "b8042h__'88-6-22__0fcc.d8742.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) ) // Dated  '88/6/22 with checksum - Intel D8742 MCU
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD( "ns_a13.rom.u8",   0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) )
-	ROM_LOAD( "ns_a12.rom.u7",   0x20000, 0x20000, CRC(95880726) SHA1(f4fdedd23e80a6ccf32f737ab4bc57f9fc0925be) )
-	ROM_LOAD( "ns_a10.rom.u6",   0x40000, 0x20000, CRC(2bc4c053) SHA1(cd7668a7733e5e80c2c566d0cf63c4310e5743b4) )
-	ROM_LOAD( "ns_a08.rom.u5",   0x60000, 0x20000, CRC(8ff8d88c) SHA1(31977e39ad048a077e9b5bd712ff66b14a466d27) )
-	ROM_LOAD( "ns_a07.rom.u4",   0x80000, 0x20000, CRC(291bcaca) SHA1(4f659a0cd2ff6b4ec04ab95ee8a670222c402c2b) )
-	ROM_LOAD( "ns_a05.rom.u3",   0xa0000, 0x20000, CRC(6e762e20) SHA1(66731fe4053b9c09bc9c95d10aba212db08b4636) )
-	ROM_LOAD( "ns_a04.rom.u2",   0xc0000, 0x20000, CRC(e1fd1b9d) SHA1(6027491b927c2ab9c77fbf8895da1abcfbe32d62) )
-	ROM_LOAD( "ns_a02.rom.u1",   0xe0000, 0x20000, CRC(2ab06bda) SHA1(2b208b564e55c258665e1f66b26fe14a6c68eb96) )
+	ROM_LOAD( "a13__03e8.d27c1000d-15.a13",  0x00000, 0x20000, CRC(7e0bd5bb) SHA1(95dfb00ec915778e02d8bfa996735ab817191adc) ) // labels contain the PCB location & checksum
+	ROM_LOAD( "a12__f4ec.d27c1000d-15.a12",  0x20000, 0x20000, CRC(95880726) SHA1(f4fdedd23e80a6ccf32f737ab4bc57f9fc0925be) ) // PCB CA403001A did NOT have silkscreened U1 - U8 labels
+	ROM_LOAD( "a10__f2b5.d27c1000d-15.a10",  0x40000, 0x20000, CRC(2bc4c053) SHA1(cd7668a7733e5e80c2c566d0cf63c4310e5743b4) ) // PCB also labeled as P0-041-1
+	ROM_LOAD( "a08__bd49.d27c1000d-15.a8",   0x60000, 0x20000, CRC(8ff8d88c) SHA1(31977e39ad048a077e9b5bd712ff66b14a466d27) )
+	ROM_LOAD( "a07__d5f3.d27c1000d-15.a7",   0x80000, 0x20000, CRC(291bcaca) SHA1(4f659a0cd2ff6b4ec04ab95ee8a670222c402c2b) )
+	ROM_LOAD( "a05__662a.d27c1000d-15.a5",   0xa0000, 0x20000, CRC(6e762e20) SHA1(66731fe4053b9c09bc9c95d10aba212db08b4636) )
+	ROM_LOAD( "a04__0c21.d27c1000d-15.a4",   0xc0000, 0x20000, CRC(e1fd1b9d) SHA1(6027491b927c2ab9c77fbf8895da1abcfbe32d62) )
+	ROM_LOAD( "a02__904f.d27c1000d-15.a2",   0xe0000, 0x20000, CRC(2ab06bda) SHA1(2b208b564e55c258665e1f66b26fe14a6c68eb96) )
 
-	ROM_REGION( 0x10000, "pal", 0 ) /* PALS not directly observed on this board but assumed to exist */
+	ROM_REGION( 0x10000, "pal", 0 )
 	/* these are probably shared with extermination except for u35 */
-	ROM_LOAD( "b06-12.pal16l8a.u26.jed", 0x00000, 0x01000, NO_DUMP)
-	ROM_LOAD( "b06-13.pal16l8a.u25.jed", 0x01000, 0x01000, NO_DUMP)
-	ROM_LOAD( "b53-12.pal16l8a.u35.jed", 0x02000, 0x01000, NO_DUMP) // likely has a different name on the proto pcb...
+	ROM_LOAD( "b06-12.pal16l8a.u26.jed",  0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.u25.jed",  0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "st-6.pal16l8a.u35.jed",    0x02000, 0x01000, NO_DUMP)
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
@@ -2513,26 +2722,26 @@ ROM_END
 
 ROM_START( insectx )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b97-03.u32", 0x00000, 0x20000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
+	ROM_LOAD( "b97__03.u32", 0x00000, 0x20000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b97-07.u38", 0x00000, 0x10000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) ) /* Label is B97 07* with an astrix */
+	ROM_LOAD( "b97__07.u38", 0x00000, 0x10000, CRC(324b28c9) SHA1(db77a4ac60196d0f0f35dbc5c951ec29d6392463) ) /* Label is B97 07* with an asterisk */
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* Mask roms */
-	ROM_LOAD( "b97-01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
-	ROM_LOAD( "b97-02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
+	ROM_LOAD( "b97__01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
+	ROM_LOAD( "b97__02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END
 
 ROM_START( insectxj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
-	ROM_LOAD( "b97-03.u32", 0x00000, 0x20000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
+	ROM_LOAD( "b97__03.u32", 0x00000, 0x20000, CRC(18eef387) SHA1(b22633930d39be1e72fbd5b080972122da3cb3ef) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b97-04.u38", 0x00000, 0x10000, CRC(dc4549e5) SHA1(9920f7c12e047ee165418d33b3add51ea615df7e) ) /* Label is B97 04* with an astrix */
+	ROM_LOAD( "b97__04.u38", 0x00000, 0x10000, CRC(dc4549e5) SHA1(9920f7c12e047ee165418d33b3add51ea615df7e) ) /* Label is B97 04* with an asterisk */
 
 	ROM_REGION( 0x100000, "gfx1", 0 ) /* Mask roms */
-	ROM_LOAD( "b97-01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
-	ROM_LOAD( "b97-02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
+	ROM_LOAD( "b97__01.u1", 0x00000, 0x80000, CRC(d00294b1) SHA1(f43a4f7d13193ddbbcdef71a5085c1db0fc062d4) )
+	ROM_LOAD( "b97__02.u2", 0x80000, 0x80000, CRC(db5a7434) SHA1(71fac872b19a13a7ad25c8ad895c322ec9573fdc) )
 ROM_END
 
 
@@ -2562,12 +2771,12 @@ GAME( 1988, chukatai,  0,        tnzs,     chukatai, driver_device, 0, ROT0,   "
 GAME( 1988, chukataiu, chukatai, tnzs,     chukatau, driver_device, 0, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", MACHINE_SUPPORTS_SAVE ) /* Possible region hack */
 GAME( 1988, chukataij, chukatai, tnzs,     chukatau, driver_device, 0, ROT0,   "Taito Corporation",         "Chuka Taisen (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    driver_device, 0,  ROT0,   "Taito Corporation",       "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito Corporation",       "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (older PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, prototype?) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (older PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  driver_device, 0,  ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, kabukizj,  kabukiz,  kabukiz,  kabukizj, driver_device, 0,  ROT0,   "Kaneko / Taito Corporation",       "Kabuki-Z (Japan)", MACHINE_SUPPORTS_SAVE )
