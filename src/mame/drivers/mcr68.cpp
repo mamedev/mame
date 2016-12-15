@@ -88,7 +88,7 @@ READ16_MEMBER(mcr68_state::zwackery_6840_r)
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
 	space.device().execute().adjust_icount(-14);
-	return mcr68_6840_upper_r(space,offset,0xffff);
+	return m_ptm->read(space, offset) << 8 | 0x00ff;
 }
 
 
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0000, 0x0effff) AM_READ_PORT("IN1")
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
-	AM_RANGE(0x100000, 0x10000f) AM_READ(zwackery_6840_r) AM_WRITE(mcr68_6840_upper_w)
+	AM_RANGE(0x100000, 0x10000f) AM_READ(zwackery_6840_r) AM_DEVWRITE8("ptm", ptm6840_device, write, 0xff00)
 	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
@@ -357,7 +357,7 @@ static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
@@ -380,7 +380,7 @@ static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
@@ -1027,6 +1027,10 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)
 
+	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(30, 0, 512*30)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(mcr68_state, ptm_irq_w))
+
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mcr68_state, zwackery_pia0_w))
@@ -1076,6 +1080,10 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
+
+	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
+	MCFG_PTM6840_EXTERNAL_CLOCKS(30, 0, 512*30)
+	MCFG_PTM6840_IRQ_CB(WRITELINE(mcr68_state, ptm_irq_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1748,7 +1756,7 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 DRIVER_INIT_MEMBER(mcr68_state,intlaser)
@@ -1779,7 +1787,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1801,7 +1809,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 

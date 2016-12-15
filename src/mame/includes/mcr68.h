@@ -10,16 +10,7 @@
 #include "machine/watchdog.h"
 #include "audio/midway.h"
 #include "audio/williams.h"
-
-struct counter_state
-{
-	uint8_t           control;
-	uint16_t          latch;
-	uint16_t          count;
-	emu_timer *     timer;
-	uint8_t           timer_active;
-	attotime        period;
-};
+#include "machine/6840ptm.h"
 
 class mcr68_state : public driver_device
 {
@@ -36,7 +27,8 @@ public:
 		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_ptm(*this, "ptm")
 	{ }
 
 	optional_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
@@ -51,19 +43,12 @@ public:
 	attotime m_timing_factor;
 	uint8_t m_sprite_clip;
 	int8_t m_sprite_xoffset;
-	uint8_t m_m6840_status;
-	uint8_t m_m6840_status_read_since_int;
-	uint8_t m_m6840_msb_buffer;
-	uint8_t m_m6840_lsb_buffer;
 	uint8_t m_m6840_irq_state;
 	uint8_t m_m6840_irq_vector;
-	struct counter_state m_m6840_state[3];
 	uint8_t m_v493_irq_state;
 	uint8_t m_v493_irq_vector;
 	timer_expired_delegate m_v493_callback;
 	uint8_t m_zwackery_sound_data;
-	attotime m_m6840_counter_periods[3];
-	attotime m_m6840_internal_counter_period;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	DECLARE_READ16_MEMBER(zwackery_6840_r);
@@ -79,14 +64,7 @@ public:
 	DECLARE_READ16_MEMBER(pigskin_port_1_r);
 	DECLARE_READ16_MEMBER(pigskin_port_2_r);
 	DECLARE_READ16_MEMBER(trisport_port_1_r);
-	DECLARE_WRITE16_MEMBER(mcr68_6840_upper_w);
-	DECLARE_WRITE16_MEMBER(mcr68_6840_lower_w);
-	DECLARE_READ16_MEMBER(mcr68_6840_upper_r);
-	DECLARE_READ16_MEMBER(mcr68_6840_lower_r);
-	DECLARE_WRITE8_MEMBER(mcr68_6840_w_common);
-	DECLARE_READ16_MEMBER(mcr68_6840_r_common);
-	void reload_count(int counter);
-	uint16_t compute_counter(int counter);
+	DECLARE_WRITE_LINE_MEMBER(ptm_irq_w);
 	DECLARE_WRITE16_MEMBER(mcr68_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_videoram_w);
 	DECLARE_WRITE16_MEMBER(zwackery_spriteram_w);
@@ -126,7 +104,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(zwackery_pia_irq);
 	void mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void zwackery_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
-	void mcr68_common_init();
 	void update_mcr68_interrupts();
 	inline void update_interrupts();
 	void subtract_from_counter(int counter, int count);
@@ -138,4 +115,7 @@ public:
 	required_device<palette_device> m_palette;
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
+
+private:
+	required_device<ptm6840_device> m_ptm;
 };
