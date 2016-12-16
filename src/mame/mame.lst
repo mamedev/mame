@@ -17007,9 +17007,9 @@ tricktrp                        // GX771 (c) 1987
 cavenger                        // 8106 (c) 1981
 dorodon                         // Falcon
 dorodon2                        // Falcon
-ladybgb2                        // bootleg
 ladybug                         // 8110 (c) 1981
 ladybugb                        // bootleg
+ladybugb2                       // bootleg
 snapjack                        // ???? (c)
 
 @source:ladyfrog.cpp
