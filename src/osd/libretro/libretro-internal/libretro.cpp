@@ -41,9 +41,6 @@ char RPATH[512];
 
 static char option_mouse[50];
 static char option_cheats[50];
-static char option_warnings[50];
-static char option_nag[50];
-static char option_info[50];
 static char option_renderer[50];
 static char option_osd[50];
 static char option_cli[50];
@@ -140,9 +137,6 @@ void retro_set_environment(retro_environment_t cb)
 {
    sprintf(option_mouse, "%s_%s", core, "mouse_enable");
    sprintf(option_cheats, "%s_%s", core, "cheats_enable");
-   sprintf(option_info, "%s_%s",core,"hide_gameinfo");
-   sprintf(option_nag, "%s_%s",core,"hide_nagscreen");
-   sprintf(option_warnings,"%s_%s",core,"hide_warnings");
    sprintf(option_renderer,"%s_%s",core,"alternate_renderer");
    sprintf(option_osd,"%s_%s",core,"boot_to_osd");
    sprintf(option_bios,"%s_%s",core,"boot_to_bios");
@@ -166,9 +160,6 @@ void retro_set_environment(retro_environment_t cb)
     { option_mouse, "Enable in-game mouse; disabled|enabled" },
     { option_throttle, "Enable throttle; disabled|enabled" },
     { option_cheats, "Enable cheats; disabled|enabled" },
-    { option_nag, "Hide nag screen; disabled|enabled" },
-    { option_info, "Hide gameinfo screen; disabled|enabled" },
-    { option_warnings, "Hide warnings screen; disabled|enabled" },
     { option_renderer, "Alternate render method; disabled|enabled" },
 
     { option_softlist, "Enable softlists; enabled|disabled" },
