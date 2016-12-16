@@ -1000,7 +1000,7 @@ void debug_imgui::refresh_filelist()
 	util::zippath_directory* dir = nullptr;
 	const char *volume_name;
 	const osd::directory::entry *dirent;
-	uint8_t first;
+	uint8_t first = 0;
 
 	// todo
 	m_filelist.clear();
