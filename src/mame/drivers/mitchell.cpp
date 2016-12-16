@@ -1299,7 +1299,7 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
-	MCFG_74LS157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pangba, spangbl )

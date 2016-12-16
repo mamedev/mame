@@ -1476,10 +1476,10 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74LS157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74LS157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
@@ -1547,10 +1547,10 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MCFG_DEVICE_ADD("adpcm_select1", LS157, 0)
-	MCFG_74LS157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(DEVWRITE8("msm1", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("adpcm_select2", LS157, 0)
-	MCFG_74LS157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
+	MCFG_74157_OUT_CB(DEVWRITE8("msm2", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm1", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(dec0_automat_state, msm1_vclk_cb))
