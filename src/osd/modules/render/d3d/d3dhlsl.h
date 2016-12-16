@@ -82,6 +82,8 @@ public:
 		CU_PHOSPHOR_BETA,
 		CU_PHOSPHOR_GAMMA,
 
+		CU_LCD_PERSISTENCE,
+
 		CU_POST_VIGNETTING,
 		CU_POST_DISTORTION,
 		CU_POST_CUBIC_DISTORTION,
@@ -210,6 +212,7 @@ struct hlsl_options
 	float                   phosphor_tau[3];
 	float                   phosphor_beta[3];
 	float                   phosphor_gamma[3];
+	float                   lcd_persistence;
 	float                   saturation;
 
 	// NTSC

@@ -72,6 +72,7 @@
 #define WINOPTION_PHOSPHOR_TAU              "phosphor_tau"
 #define WINOPTION_PHOSPHOR_BETA             "phosphor_beta"
 #define WINOPTION_PHOSPHOR_GAMMA            "phosphor_gamma"
+#define WINOPTION_LCD_PERSISTENCE           "lcd_persistence"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
 #define WINOPTION_YIQ_JITTER                "yiq_jitter"
@@ -204,6 +205,7 @@ public:
 	const char* screen_phosphor_tau() const { return value(WINOPTION_PHOSPHOR_TAU); }
 	const char* screen_phosphor_beta() const { return value(WINOPTION_PHOSPHOR_BETA); }
 	const char* screen_phosphor_gamma() const { return value(WINOPTION_PHOSPHOR_GAMMA); }
+	float screen_lcd_persistence() const { return float_value(WINOPTION_LCD_PERSISTENCE); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
 
 	// full screen options

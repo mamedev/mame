@@ -219,6 +219,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_PHOSPHOR_TAU";fs_phosphor_tau",                 "0.026,0.026,0.026", OPTION_STRING,     "exponential time constant" },
 	{ WINOPTION_PHOSPHOR_BETA";fs_phosphor_beta",               "0.7,0.7,0.7",       OPTION_STRING,     "inverse power order" },
 	{ WINOPTION_PHOSPHOR_GAMMA";fs_phosphor_gamma",             "300,300,300",       OPTION_STRING,     "inverse power time constant" },
+	{ WINOPTION_LCD_PERSISTENCE";fs_lcd_persistence",           "0.02",              OPTION_STRING,     "LCD pixel persistence time constant" },
 	/* NTSC simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },

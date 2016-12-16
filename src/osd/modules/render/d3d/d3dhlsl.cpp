@@ -526,6 +526,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		           options->phosphor_beta, true);
 		get_vector(winoptions.screen_phosphor_gamma(), 3,
 		           options->phosphor_gamma, true);
+		options->lcd_persistence = winoptions.screen_lcd_persistence();
 		options->saturation = winoptions.screen_saturation();
 		options->yiq_enable = winoptions.screen_yiq_enable();
 		options->yiq_jitter = winoptions.screen_yiq_jitter();
@@ -797,6 +798,7 @@ int shaders::create_resources()
 	phosphor_effect->add_uniform("Tau", uniform::UT_VEC3, uniform::CU_PHOSPHOR_TAU);
 	phosphor_effect->add_uniform("Beta", uniform::UT_VEC3, uniform::CU_PHOSPHOR_BETA);
 	phosphor_effect->add_uniform("Gamma", uniform::UT_VEC3, uniform::CU_PHOSPHOR_GAMMA);
+	phosphor_effect->add_uniform("LCDTau", uniform::UT_FLOAT, uniform::CU_LCD_PERSISTENCE);
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
@@ -1078,9 +1080,12 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
+	auto stype = machine->first_screen()->screen_type();
 
 	// skip phosphor if mode is off
-	if (options->phosphor_mode == 0)
+	if ((options->phosphor_mode == 0 && stype == SCREEN_TYPE_RASTER) ||
+	    (options->phosphor_mode == 0 && stype == SCREEN_TYPE_VECTOR) ||
+	    (options->lcd_persistence == 0 && stype == SCREEN_TYPE_LCD))
 	{
 		return next_index;
 	}
@@ -1091,6 +1096,10 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
 	curr_effect->set_float("DeltaTime", delta_time());
+	if (stype == SCREEN_TYPE_LCD)
+		curr_effect->set_bool("LCD", true);
+	else
+		curr_effect->set_bool("LCD", false);
 
 	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
@@ -1962,6 +1971,7 @@ enum slider_option
 	SLIDER_PHOSPHOR_TAU,
 	SLIDER_PHOSPHOR_BETA,
 	SLIDER_PHOSPHOR_GAMMA,
+	SLIDER_LCD_PERSISTENCE,
 	SLIDER_BLOOM_BLEND_MODE,
 	SLIDER_BLOOM_SCALE,
 	SLIDER_BLOOM_OVERDRIVE,
@@ -2041,9 +2051,10 @@ slider_desc shaders::s_sliders[] =
 	{ "Signal Exponent,",                -800,     0,   800, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.01f,    "%2.2f", {} },
 	{ "Signal Floor,",                      0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
 	{ "Phosphor Persistence Mode,",         0,     0,     2, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_MODE,        0,        "%s", { "Off", "Exponential", "Inverse Power" } },
-	{ "Phosphor Persistence tau,",          0,    26,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_TAU,         0.001f,   "%3.3f", {} },
+	{ "Phosphor Persistence tau,",          1,    26,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_TAU,         0.001f,   "%3.3f", {} },
 	{ "Phosphor Persistence beta,",        50,    70,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_BETA,        0.01f,    "%2.2f", {} },
 	{ "Phosphor Persistence gamma,",        1,   300,  1000, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_GAMMA,       1,        "%.0f",    {} },
+	{ "LCD Perisistence,",                  0,    20,   100, 1, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_LCD,           SLIDER_LCD_PERSISTENCE,         0.001f,   "%3.3f", {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
@@ -2119,6 +2130,7 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_PHOSPHOR_TAU: return &(options->phosphor_tau[index]);
 		case SLIDER_PHOSPHOR_BETA: return &(options->phosphor_beta[index]);
 		case SLIDER_PHOSPHOR_GAMMA: return &(options->phosphor_gamma[index]);
+		case SLIDER_LCD_PERSISTENCE: return &(options->lcd_persistence);
 		case SLIDER_BLOOM_BLEND_MODE: return &(options->bloom_blend_mode);
 		case SLIDER_BLOOM_SCALE: return &(options->bloom_scale);
 		case SLIDER_BLOOM_OVERDRIVE: return &(options->bloom_overdrive[index]);
@@ -2416,6 +2428,9 @@ void uniform::update()
 			break;
 		case CU_PHOSPHOR_GAMMA:
 			m_shader->set_vector("Gamma", 3, options->phosphor_gamma);
+		
+		case CU_LCD_PERSISTENCE:
+			m_shader->set_float("LCDTau", options->lcd_persistence);
 
 		case CU_POST_REFLECTION:
 			m_shader->set_float("ReflectionAmount", options->reflection);
