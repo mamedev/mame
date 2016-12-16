@@ -1,4 +1,5 @@
 // license:BSD-3-Clause
+//
 // copyright-holders:Aaron Giles
 //============================================================
 //
@@ -518,7 +519,13 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		get_vector(winoptions.screen_scale(), 3, options->scale, true);
 		get_vector(winoptions.screen_power(), 3, options->power, true);
 		get_vector(winoptions.screen_floor(), 3, options->floor, true);
-		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, true);
+		options->phosphor_mode = winoptions.screen_phosphor_mode();
+		get_vector(winoptions.screen_phosphor_tau(), 3,
+		           options->phosphor_tau, true);
+		get_vector(winoptions.screen_phosphor_beta(), 3,
+		           options->phosphor_beta, true);
+		get_vector(winoptions.screen_phosphor_gamma(), 3,
+		           options->phosphor_gamma, true);
 		options->saturation = winoptions.screen_saturation();
 		options->yiq_enable = winoptions.screen_yiq_enable();
 		options->yiq_jitter = winoptions.screen_yiq_jitter();
@@ -786,7 +793,10 @@ int shaders::create_resources()
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
-	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
+	phosphor_effect->add_uniform("Mode", uniform::UT_INT, uniform::CU_PHOSPHOR_MODE);
+	phosphor_effect->add_uniform("Tau", uniform::UT_VEC3, uniform::CU_PHOSPHOR_TAU);
+	phosphor_effect->add_uniform("Beta", uniform::UT_VEC3, uniform::CU_PHOSPHOR_BETA);
+	phosphor_effect->add_uniform("Gamma", uniform::UT_VEC3, uniform::CU_PHOSPHOR_GAMMA);
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
@@ -1069,13 +1079,12 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 {
 	int next_index = source_index;
 
-	// skip phosphor if no influencing settings
-	if (options->phosphor[0] == 0.0f && options->phosphor[1] == 0.0f && options->phosphor[2] == 0.0f)
+	// skip phosphor if mode is off
+	if (options->phosphor_mode == 0)
 	{
 		return next_index;
 	}
 
-	// Shader needs time between last update
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
@@ -1949,7 +1958,10 @@ enum slider_option
 	SLIDER_SCALE,
 	SLIDER_POWER,
 	SLIDER_FLOOR,
-	SLIDER_PHOSPHOR,
+	SLIDER_PHOSPHOR_MODE,
+	SLIDER_PHOSPHOR_TAU,
+	SLIDER_PHOSPHOR_BETA,
+	SLIDER_PHOSPHOR_GAMMA,
 	SLIDER_BLOOM_BLEND_MODE,
 	SLIDER_BLOOM_SCALE,
 	SLIDER_BLOOM_OVERDRIVE,
@@ -1982,6 +1994,7 @@ enum slider_screen_type
 	SLIDER_SCREEN_TYPE_RASTER = 1,
 	SLIDER_SCREEN_TYPE_VECTOR = 2,
 	SLIDER_SCREEN_TYPE_LCD = 4,
+	SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR,
 	SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
 	SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
 };
@@ -2027,7 +2040,10 @@ slider_desc shaders::s_sliders[] =
 	{ "Signal Scale,",                   -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
 	{ "Signal Exponent,",                -800,     0,   800, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.01f,    "%2.2f", {} },
 	{ "Signal Floor,",                      0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
-	{ "Phosphor Persistence,",              0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
+	{ "Phosphor Persistence Mode,",         0,     0,     2, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_MODE,        0,        "%s", { "Off", "Exponential", "Inverse Power" } },
+	{ "Phosphor Persistence tau,",          0,    26,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_TAU,         0.001f,   "%3.3f", {} },
+	{ "Phosphor Persistence beta,",        50,    70,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_BETA,        0.01f,    "%2.2f", {} },
+	{ "Phosphor Persistence gamma,",        1,   300,  1000, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_GAMMA,       1,        "%.0f",    {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
@@ -2099,7 +2115,10 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_SCALE: return &(options->scale[index]);
 		case SLIDER_POWER: return &(options->power[index]);
 		case SLIDER_FLOOR: return &(options->floor[index]);
-		case SLIDER_PHOSPHOR: return &(options->phosphor[index]);
+		case SLIDER_PHOSPHOR_MODE: return &(options->phosphor_mode);
+		case SLIDER_PHOSPHOR_TAU: return &(options->phosphor_tau[index]);
+		case SLIDER_PHOSPHOR_BETA: return &(options->phosphor_beta[index]);
+		case SLIDER_PHOSPHOR_GAMMA: return &(options->phosphor_gamma[index]);
 		case SLIDER_BLOOM_BLEND_MODE: return &(options->bloom_blend_mode);
 		case SLIDER_BLOOM_SCALE: return &(options->bloom_scale);
 		case SLIDER_BLOOM_OVERDRIVE: return &(options->bloom_overdrive[index]);
@@ -2386,9 +2405,17 @@ void uniform::update()
 			m_shader->set_vector("Defocus", 2, &options->defocus[0]);
 			break;
 
-		case CU_PHOSPHOR_LIFE:
-			m_shader->set_vector("Phosphor", 3, options->phosphor);
+		case CU_PHOSPHOR_MODE:
+			m_shader->set_int("Mode", options->phosphor_mode);
 			break;
+		case CU_PHOSPHOR_TAU:
+			m_shader->set_vector("Tau", 3, options->phosphor_tau);
+			break;
+		case CU_PHOSPHOR_BETA:
+			m_shader->set_vector("Beta", 3, options->phosphor_beta);
+			break;
+		case CU_PHOSPHOR_GAMMA:
+			m_shader->set_vector("Gamma", 3, options->phosphor_gamma);
 
 		case CU_POST_REFLECTION:
 			m_shader->set_float("ReflectionAmount", options->reflection);

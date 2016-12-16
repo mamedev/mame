@@ -68,7 +68,10 @@
 #define WINOPTION_SCALE                     "scale"
 #define WINOPTION_POWER                     "power"
 #define WINOPTION_FLOOR                     "floor"
-#define WINOPTION_PHOSPHOR                  "phosphor_life"
+#define WINOPTION_PHOSPHOR_MODE             "phosphor_mode"
+#define WINOPTION_PHOSPHOR_TAU              "phosphor_tau"
+#define WINOPTION_PHOSPHOR_BETA             "phosphor_beta"
+#define WINOPTION_PHOSPHOR_GAMMA            "phosphor_gamma"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
 #define WINOPTION_YIQ_JITTER                "yiq_jitter"
@@ -197,7 +200,10 @@ public:
 	const char *screen_scale() const { return value(WINOPTION_SCALE); }
 	const char *screen_power() const { return value(WINOPTION_POWER); }
 	const char *screen_floor() const { return value(WINOPTION_FLOOR); }
-	const char *screen_phosphor() const { return value(WINOPTION_PHOSPHOR); }
+	int screen_phosphor_mode() const { return int_value(WINOPTION_PHOSPHOR_MODE); }
+	const char* screen_phosphor_tau() const { return value(WINOPTION_PHOSPHOR_TAU); }
+	const char* screen_phosphor_beta() const { return value(WINOPTION_PHOSPHOR_BETA); }
+	const char* screen_phosphor_gamma() const { return value(WINOPTION_PHOSPHOR_GAMMA); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
 
 	// full screen options

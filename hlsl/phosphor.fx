@@ -93,21 +93,41 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Phosphor Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform float3 Phosphor = float3(0.0f, 0.0f, 0.0f);
 uniform float DeltaTime = 0.0f;
-static const float F = 30.0f;
+uniform int Mode = 0;
+uniform float3 Tau = { 0.0f, 0.0f, 0.0f };
+uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
+uniform float3 Gamma = { 0.0f, 0.0f, 0.0f };
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 CurrPix = tex2D(DiffuseSampler, Input.TexCoord);
 	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb;
+	float r = PrevPix.r;
+	float g = PrevPix.g;
+	float b = PrevPix.b;
 
-	PrevPix.r *= Phosphor.r == 0 ? 0 : pow(Phosphor.r, F * DeltaTime);
-	PrevPix.g *= Phosphor.g == 0 ? 0 : pow(Phosphor.g, F * DeltaTime);
-	PrevPix.b *= Phosphor.b == 0 ? 0 : pow(Phosphor.b, F * DeltaTime);
-	float RedMax = max(CurrPix.r, PrevPix.r);
-	float GreenMax = max(CurrPix.g, PrevPix.g);
-	float BlueMax = max(CurrPix.b, PrevPix.b);
+	if (Mode == 0) {
+		r = 0;
+		g = 0;
+		b = 0;
+	}
+	else if (Mode == 1) {
+		r *= exp(-DeltaTime / Tau.r);
+		g *= exp(-DeltaTime / Tau.g);
+		b *= exp(-DeltaTime / Tau.b);
+	}
+	else {
+		if (r != 0.0f)
+			r = pow(Gamma.r * DeltaTime + pow(1 / r, 1 / Beta.r), -Beta.r);
+		if (g != 0.0f)
+			g = pow(Gamma.g * DeltaTime + pow(1 / g, 1 / Beta.g), -Beta.g);
+		if (b != 0.0f)
+			b = pow(Gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b), -Beta.b);
+	}
+	float RedMax = max(CurrPix.r, r);
+	float GreenMax = max(CurrPix.g, g);
+	float BlueMax = max(CurrPix.b, b);
 
 	return Passthrough ?
 	       CurrPix : float4(RedMax, GreenMax, BlueMax, CurrPix.a);
