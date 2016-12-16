@@ -84,18 +84,30 @@ MACHINE_RESET_MEMBER(mcr68_state,zwackery)
 
 /*************************************
  *
- *  Generic MCR interrupt handler
+ *  Scanline callback
  *
  *************************************/
 
-INTERRUPT_GEN_MEMBER(mcr68_state::mcr68_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER( mcr68_state::scanline_cb )
 {
-	logerror("--- VBLANK ---\n");
+	// VSYNC
+	if (param == 0)
+	{
+		if (VERBOSE)
+			logerror("--- VBLANK ---\n");
 
-	/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
-	/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
-	/* VBLANK and 493 using counter 2 */
-	machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback);
+		m_ptm->set_c1(0);
+		m_ptm->set_c1(1);
+
+		/* also set a timer to generate the 493 signal at a specific time before the next VBLANK */
+		/* the timing of this is crucial for Blasted and Tri-Sports, which check the timing of */
+		/* VBLANK and 493 using counter 2 */
+		machine().scheduler().timer_set(attotime::from_hz(30) - m_timing_factor, m_v493_callback);
+	}
+
+	// HSYNC
+	m_ptm->set_c3(0);
+	m_ptm->set_c3(1);
 }
 
 
@@ -125,7 +137,9 @@ TIMER_CALLBACK_MEMBER(mcr68_state::mcr68_493_callback)
 	m_v493_irq_state = 1;
 	update_mcr68_interrupts();
 	machine().scheduler().timer_set(m_screen->scan_period(), timer_expired_delegate(FUNC(mcr68_state::mcr68_493_off_callback),this));
-	logerror("--- (INT1) ---\n");
+
+	if (VERBOSE)
+		logerror("--- (INT1) ---\n");
 }
 
 

@@ -77,7 +77,7 @@ READ8_MEMBER(mcr68_state::zwackery_port_2_r)
 }
 
 
-READ16_MEMBER(mcr68_state::zwackery_6840_r)
+READ8_MEMBER(mcr68_state::zwackery_6840_r)
 {
 	/* Zwackery does a timer test:                          */
 	/* It loads $1388 into one of the timers clocked by E   */
@@ -88,7 +88,7 @@ READ16_MEMBER(mcr68_state::zwackery_6840_r)
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
 	space.device().execute().adjust_icount(-14);
-	return m_ptm->read(space, offset) << 8 | 0x00ff;
+	return m_ptm->read(space, offset);
 }
 
 
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM
 	AM_RANGE(0x084000, 0x084fff) AM_RAM
-	AM_RANGE(0x100000, 0x10000f) AM_READ(zwackery_6840_r) AM_DEVWRITE8("ptm", ptm6840_device, write, 0xff00)
+	AM_RANGE(0x100000, 0x10000f) AM_READ8(zwackery_6840_r, 0xff00) AM_DEVWRITE8("ptm", ptm6840_device, write, 0xff00)
 	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
@@ -1020,15 +1020,13 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    /* should be XTAL_16MHz/2 */
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
-		MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_ADD("watchdog")
 //  MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(30, 0, 512*30)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mcr68_state, ptm_irq_w))
 
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
@@ -1056,6 +1054,8 @@ static MACHINE_CONFIG_START( zwackery, mcr68_state )
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_zwackery)
 	MCFG_SCREEN_PALETTE("palette")
 
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
 	MCFG_PALETTE_ADD("palette", 4096)
 	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
@@ -1074,7 +1074,6 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
 	MCFG_CPU_PROGRAM_MAP(mcr68_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
@@ -1082,7 +1081,6 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
-	MCFG_PTM6840_EXTERNAL_CLOCKS(30, 0, 512*30)
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mcr68_state, ptm_irq_w))
 
 	/* video hardware */
@@ -1093,6 +1091,8 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
 	MCFG_PALETTE_ADD("palette", 64)

@@ -51,7 +51,7 @@ public:
 	uint8_t m_zwackery_sound_data;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
-	DECLARE_READ16_MEMBER(zwackery_6840_r);
+	DECLARE_READ8_MEMBER(zwackery_6840_r);
 	DECLARE_WRITE16_MEMBER(xenophobe_control_w);
 	DECLARE_WRITE16_MEMBER(blasted_control_w);
 	DECLARE_READ16_MEMBER(spyhunt2_port_0_r);
@@ -90,12 +90,11 @@ public:
 	DECLARE_VIDEO_START(mcr68);
 	uint32_t screen_update_zwackery(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_mcr68(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(mcr68_interrupt);
+	TIMER_DEVICE_CALLBACK_MEMBER(scanline_cb);
 	TIMER_CALLBACK_MEMBER(mcr68_493_off_callback);
 	TIMER_CALLBACK_MEMBER(mcr68_493_callback);
 	TIMER_CALLBACK_MEMBER(zwackery_493_off_callback);
 	TIMER_CALLBACK_MEMBER(zwackery_493_callback);
-	TIMER_CALLBACK_MEMBER(counter_fired_callback);
 	DECLARE_READ8_MEMBER(zwackery_port_1_r);
 	DECLARE_READ8_MEMBER(zwackery_port_3_r);
 	DECLARE_WRITE8_MEMBER(zwackery_pia0_w);
@@ -105,8 +104,6 @@ public:
 	void mcr68_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void zwackery_update_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int priority);
 	void update_mcr68_interrupts();
-	inline void update_interrupts();
-	void subtract_from_counter(int counter, int count);
 	void mcr68_common_init(int clip, int xoffset);
 	required_device<cpu_device> m_maincpu;
 	required_device<watchdog_timer_device> m_watchdog;
