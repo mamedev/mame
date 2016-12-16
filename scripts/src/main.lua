@@ -162,6 +162,11 @@ end
 
 	configuration { "asmjs" }
 		targetextension ".bc"
+-- RETRO HACK no sdl for libretro android
+if _OPTIONS["osd"] == "retro" then
+
+
+else
 		if os.getenv("EMSCRIPTEN") then
 			local emccopts = ""
 				.. " -O" .. _OPTIONS["OPTIMIZE"]
@@ -199,6 +204,7 @@ end
 				os.getenv("EMSCRIPTEN") .. "/emcc " .. emccopts .. " $(TARGET) -o " .. _MAKE.esc(MAME_DIR) .. _OPTIONS["target"] .. _OPTIONS["subtarget"] .. ".js",
 			}
 		end
+end
 	-- BEGIN libretro overrides to MAME's GENie build
 	configuration { "libretro*" }
 		kind "SharedLib"	
@@ -208,6 +214,11 @@ end
 			defines {
  				"SDLMAME_ARM=1",
 			}
+		elseif _OPTIONS["targetos"]=="asmjs" then
+			targetsuffix "_libretro_emscripten"
+			linkoptions {
+				 "-s DISABLE_EXCEPTION_CATCHING=2",
+				 "-s EXCEPTION_CATCHING_WHITELIST='[\"__ZN15running_machine17start_all_devicesEv\",\"__ZN12cli_frontend7executeEiPPc\"]'",			}
 		elseif _OPTIONS["targetos"]=="ios-arm" then
 			targetsuffix "_libretro_ios"
 			targetextension ".dylib"

@@ -85,7 +85,7 @@
 #include "ui/uimain.h"
 #include <time.h>
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) && !defined(__LIBRETRO__)
 #include <emscripten.h>
 
 void js_set_main_loop(running_machine * machine);
@@ -341,7 +341,7 @@ int running_machine::run(bool quiet)
 			//non-libco break out to LIBRETRO LOOP
 			return 0;
 #endif
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) && !defined(__LIBRETRO__)
 			// break out to our async javascript loop and halt
 			js_set_main_loop(this);
 #endif
@@ -1351,7 +1351,7 @@ const address_space_config *dummy_space_device::memory_space_config(address_spac
 //  JAVASCRIPT PORT-SPECIFIC
 //**************************************************************************
 
-#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) && !defined(__LIBRETRO__)
 
 static running_machine * jsmess_machine;
 
