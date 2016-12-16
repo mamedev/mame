@@ -289,14 +289,10 @@ void mame_ui_manager::display_startup_screens(bool first_time)
 	if (!first_time || (str > 0 && str < 60*5) || &machine().system() == &GAME_NAME(___empty) || (machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		show_gameinfo = show_warnings = show_mandatory_fileman = false;
 
-	#if defined(EMSCRIPTEN)
+#if defined(EMSCRIPTEN) || (defined(__LIBRETRO__) && !defined(HAVE_LIBCO))
 	// also disable for the JavaScript port since the startup screens do not run asynchronously
 	show_gameinfo = show_warnings = false;
-	#endif
-	#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
-	//LIBRETRO to early ,freeze without libco.
-	show_gameinfo = show_warnings = false;
-	#endif
+#endif
 	// loop over states
 	using namespace std::placeholders;
 	set_handler(ui_callback_type::GENERAL, std::bind(&mame_ui_manager::handler_ingame, this, _1));
