@@ -29,16 +29,12 @@ compilation emscripten :
 first setup your emsdk (source emsdk_env.sh) 
 
 for a tiny build :
-emmake make  OSD="retro" verbose=1 RETRO=1 USELIBCO=0 NOWERROR=1  NOASM="1"  CONFIG=libretro NO_USE_MIDI="1" SUBTARGET=tiny 
+emmake make  OSD="retro" verbose=1 RETRO=1 NOWERROR=1  NOASM="1"  CONFIG=libretro NO_USE_MIDI="1" SUBTARGET=tiny 
 
 for only one driver build :
-emmake make  OSD="retro" verbose=1 RETRO=1 USELIBCO=0 NOWERROR=1  NOASM="1"  CONFIG=libretro NO_USE_MIDI="1" SUBTARGET=pacman SOURCES=src/mame/drivers/pacman.cpp
+emmake make  OSD="retro" verbose=1 RETRO=1 NOWERROR=1  NOASM="1"  CONFIG=libretro NO_USE_MIDI="1" SUBTARGET=pacman SOURCES=src/mame/drivers/pacman.cpp
 
 
 to build only drivers atetris add :
 
 SUBTARGET=atetris SOURCES=src/mame/drivers/atetris.cpp
-
-to build without libco (experimental) add :
-
-USELIBCO=0 

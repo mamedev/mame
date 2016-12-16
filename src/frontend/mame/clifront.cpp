@@ -193,7 +193,7 @@ cli_frontend::~cli_frontend()
 	mame_options::remove_device_options(m_options);
 }
 
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 mame_machine_manager *retro_manager;
 
 void retro_execute(){
@@ -297,12 +297,12 @@ void cli_frontend::start_execution(mame_machine_manager *manager,int argc, char 
 		if (system == nullptr && *(m_options.system_name()) != 0)
 			throw emu_fatalerror(EMU_ERR_NO_SUCH_GAME, "Unknown system '%s'", m_options.system_name());
 
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
-	                retro_manager = mame_machine_manager::instance(m_options, m_osd);
-			//retro_manager = machine_manager::instance(m_options, m_osd);
-	        	m_result = retro_manager->execute();
+#if defined(__LIBRETRO__)
+      retro_manager = mame_machine_manager::instance(m_options, m_osd);
+      //retro_manager = machine_manager::instance(m_options, m_osd);
+      m_result = retro_manager->execute();
 
-			return;
+      return;
 #endif
 		// otherwise just run the game
 		m_result = manager->execute();
@@ -332,9 +332,9 @@ int cli_frontend::execute(int argc, char **argv)
 
 		manager->start_luaengine();
 
-			start_execution(manager, argc, argv, option_errors);
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
-		return m_result;
+      start_execution(manager, argc, argv, option_errors);
+#if defined(__LIBRETRO__)
+      return m_result;
 #endif
 	}
 	// handle exceptions of various types

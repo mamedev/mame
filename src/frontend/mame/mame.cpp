@@ -165,7 +165,7 @@ void mame_machine_manager::start_luaengine()
 	}
 }
 
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 extern mame_machine_manager *retro_manager;
 static running_machine *retro_global_machine;
 static const machine_config *retro_global_config;
@@ -180,7 +180,7 @@ bool started_empty = false;
 
 int mame_machine_manager::execute()
 {
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 #else
 	bool started_empty = false;
 
@@ -221,7 +221,7 @@ int mame_machine_manager::execute()
 			valid.set_verbose(false);
 			valid.check_shared_source(*system);
 		}
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 		retro_global_config= global_alloc(machine_config(*system, m_options));
 
 	        retro_global_machine=global_alloc(running_machine(*retro_global_config, *this));
@@ -267,32 +267,31 @@ int mame_machine_manager::execute()
 	return error;
 }
 
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 extern int RLOOP,retro_pause;
 extern void retro_loop(running_machine *machine);
 extern void retro_execute();
 extern core_options *retro_global_options;
 int mfirst=0;
-void mame_machine_manager::mmchange(){
+void mame_machine_manager::mmchange()
+{
+   mfirst=0;
+   // check the state of the machine
+   if (m_new_driver_pending)
+   {
+      // set up new system name and adjust device options accordingly
+      mame_options::set_system_name(m_options,m_new_driver_pending->name);
+      m_firstrun = true;
+      mfirst=1;
+   }
+   else
+   {
+      if (retro_global_machine->exit_pending()) mame_options::set_system_name(m_options,"");
+   }
 
-	mfirst=0;
-	// check the state of the machine
-	if (m_new_driver_pending)
-	{
-	// set up new system name and adjust device options accordingly
-		mame_options::set_system_name(m_options,m_new_driver_pending->name);
-		m_firstrun = true;
-		mfirst=1;
-	}
-	else
-	{
-		if (retro_global_machine->exit_pending()) mame_options::set_system_name(m_options,"");
-	}
-
-	//FIXME RETRO
-	//if (retro_global_machine->exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
-	//exit_pending = true;
-		
+   //FIXME RETRO
+   //if (retro_global_machine->exit_pending() && (!started_empty || (system == &GAME_NAME(___empty))))
+   //exit_pending = true;
 
 }
  

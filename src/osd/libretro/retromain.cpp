@@ -138,18 +138,14 @@ retro_options::retro_options()
 //  main
 //============================================================
 
-#if !defined(HAVE_LIBCO)
 retro_osd_interface *retro_global_osd;
-#endif
 
 // translated to utf8_main
 int mmain(int argc, char *argv[])
 {
 	int res = 0;
 
-#if !defined(HAVE_LIBCO)
 	static retro_options retro_global_options;
-#endif
 	// disable I/O buffering
 	setvbuf(stdout, (char *) nullptr, _IONBF, 0);
 	setvbuf(stderr, (char *) nullptr, _IONBF, 0);
@@ -172,17 +168,10 @@ int mmain(int argc, char *argv[])
 #endif
 
 	{
-#if !defined(HAVE_LIBCO)
 		retro_global_osd= global_alloc(retro_osd_interface(retro_global_options));
 		retro_global_osd->register_options();
 		res =  emulator_info::start_frontend(retro_global_options, *retro_global_osd,argc, argv);
 		return 1;
-#else
-		retro_options options;
-		retro_osd_interface osd(options);
-		osd.register_options();
-		res = emulator_info::start_frontend(options, osd, argc, argv);
-#endif
 	}
 
 #ifdef RETROMAME_UNIX

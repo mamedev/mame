@@ -10,7 +10,6 @@ TARGET ?= mame
 # TARGETOS ?= linux
 PYTHON_EXECUTABLE ?= python2
 REGENIE ?= 1
-USELIBCO ?= 1
 
 ###########################################################################
 #
@@ -83,7 +82,7 @@ endif
 #
 ###########################################################################
 
-BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI) USELIBCO=$(USELIBCO) 
+BUILDFLAGS = RETRO=$(RETRO) REGENIE=$(REGENIE) VERBOSE=$(VERBOSE) NOWERROR=$(NOWERROR) OSD="retro" NO_USE_MIDI=$(NO_USE_MIDI)
 
 ifneq ($(PYTHON_EXECUTABLE),)
 	BUILDFLAGS += PYTHON_EXECUTABLE=$(PYTHON_EXECUTABLE)

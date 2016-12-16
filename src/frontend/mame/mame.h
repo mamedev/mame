@@ -62,7 +62,7 @@ public:
 	cheat_manager &cheat() const { assert(m_cheat != nullptr); return *m_cheat; }
 	inifile_manager &inifile() const { assert(m_inifile != nullptr); return *m_inifile; }
 	favorite_manager &favorite() const { assert(m_favorite != nullptr); return *m_favorite; }
-#if defined(__LIBRETRO__) && !defined(HAVE_LIBCO)
+#if defined(__LIBRETRO__)
 	void mmchange();
 #endif
 private:

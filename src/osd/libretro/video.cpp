@@ -94,45 +94,40 @@ void retro_osd_interface::video_exit()
 //============================================================
 //  update
 //============================================================
-#if !defined(HAVE_LIBCO)
 extern int RLOOP;
-#endif
+
 void retro_osd_interface::update(bool skip_redraw)
 {
-	osd_common_t::update(skip_redraw);
+   osd_common_t::update(skip_redraw);
 
-	// if we're not skipping this redraw, update all windows
-	if (!skip_redraw)
-	{
-	retro_frame_draw_enable(true);
-//      profiler_mark(PROFILER_BLIT);
-		for (auto window : osd_common_t::s_window_list)
-			window->update();
-//      profiler_mark(PROFILER_END);
-	}
-	else retro_frame_draw_enable(false);
+   // if we're not skipping this redraw, update all windows
+   if (!skip_redraw)
+   {
+      retro_frame_draw_enable(true);
+      //      profiler_mark(PROFILER_BLIT);
+      for (auto window : osd_common_t::s_window_list)
+         window->update();
+      //      profiler_mark(PROFILER_END);
+   }
+   else retro_frame_draw_enable(false);
 
-	// poll the joystick values here
+   // poll the joystick values here
 
-//FIXME RETRO
-//	downcast<retro_osd_interface&>(machine().osd()).poll_inputs(machine());
+   //FIXME RETRO
+   //	downcast<retro_osd_interface&>(machine().osd()).poll_inputs(machine());
 
-	check_osd_inputs(machine());
-	// if we're running, disable some parts of the debugger
-	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugger_update();
+   check_osd_inputs(machine());
+   // if we're running, disable some parts of the debugger
+   if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+      debugger_update();
 
-	//RETRO POLL INPUTS
-   	input_poll_cb();
+   //RETRO POLL INPUTS
+   input_poll_cb();
 
-   	process_mouse_state(machine());
-   	process_keyboard_state(machine());
-   	process_joypad_state(machine());
-#if !defined(HAVE_LIBCO)
-	RLOOP=0;
-#else
-   	retro_switch_to_main_thread();
-#endif
+   process_mouse_state(machine());
+   process_keyboard_state(machine());
+   process_joypad_state(machine());
+   RLOOP=0;
 }
 
 //============================================================

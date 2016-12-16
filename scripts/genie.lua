@@ -386,25 +386,7 @@ newoption {
 	description = "Produce WebAssembly output when building with Emscripten.",
 }
 
--- BEGIN libretro option
-newoption {
-	trigger = "USELIBCO",
-	description = "USE LIBCO libs.",
-	allowed = {
-		{ "0",   "Disabled"  },
-		{ "1",   "Enabled"  },
-	}
-}
--- END libretro 
-
 dofile ("extlib.lua")
-
--- BEGIN libretro option
--- LIBCO by default
-if not _OPTIONS["USELIBCO"] then
-	_OPTIONS["USELIBCO"] = "1"
-end
--- END libretro 
 
 if _OPTIONS["SHLIB"]=="1" then
 	LIBTYPE = "SharedLib"
@@ -561,11 +543,6 @@ if _OPTIONS["osd"]=="retro" then
 		"-fPIC",
 	}
 
-	if _OPTIONS["USELIBCO"]=="1" then
-  		defines {
- 			"HAVE_LIBCO",
-		}
-	end
 	defines {
 		"__LIBRETRO__",
 	}
