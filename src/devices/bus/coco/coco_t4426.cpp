@@ -43,11 +43,18 @@
 #include "coco_t4426.h"
 #include "includes/coco.h"
 
+enum{
+	LOG         = 0x01,
+	LOG_SETUP   = 0x02,
+};
+
 #define VERBOSE 0
 
-#define LOGPRINT(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
-#define LOG(...)      LOGPRINT(__VA_ARGS__)
-#define LOGSETUP(...) 
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+
+#define LOG(...)      LOGMASK(LOG, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP, __VA_ARGS__)
 
 #if VERBOSE >= 2
 #define logerror printf
