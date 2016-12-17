@@ -355,7 +355,7 @@ void mb86235_device::compile_block(offs_t pc)
 
 void mb86235_device::static_generate_entry_point()
 {
-	code_label skip = 1;
+	//code_label skip = 1;
 	drcuml_block *block;
 
 	/* begin generating */
@@ -1404,65 +1404,65 @@ void mb86235_device::generate_branch_target(drcuml_block *block, compiler_state 
 }
 
 
-void mb86235_device::generate_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int cc, bool not, uml::code_label skip_label, bool condtemp)
+void mb86235_device::generate_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int cc, bool n, uml::code_label skip_label, bool condtemp)
 {
 	switch (cc)
 	{
 		case 0x00:		// MN
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_MN, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x01:		// MZ
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_MZ, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x02:		// MV
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_MV, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x03:		// MU
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_MU, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x04:		// ZD
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_ZD, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x05:		// NR
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_NR, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x06:		// IL
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_IL, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x07:		// ZC
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_ZC, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x08:		// AN
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_AN, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x09:		// AZ
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_AZ, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x0a:		// AV
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_AV, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x0b:		// AU
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_AU, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x0c:		// MD
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_MD, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		case 0x0d:		// AD
 			UML_CMP(block, condtemp ? mem(&m_core->condtemp) : FLAGS_AD, 0);
-			UML_JMPc(block, not ? COND_NE : COND_E, skip_label);
+			UML_JMPc(block, n ? COND_NE : COND_E, skip_label);
 			break;
 		default:
 			fatalerror("generate_condition: unimplemented cc %02X at %08X", cc, desc->pc);
@@ -1477,7 +1477,7 @@ void mb86235_device::generate_control(drcuml_block *block, compiler_state *compi
 	int ef1 = (op >> 16) & 0x3f;
 	int ef2 = op & 0xffff;
 	int cop = (op >> 22) & 0x1f;
-	int rel12 = (op & 0x800) ? (0xfffff000 | (op & 0xfff)) : (op & 0xfff);
+//	int rel12 = (op & 0x800) ? (0xfffff000 | (op & 0xfff)) : (op & 0xfff);
 
 	switch (cop)
 	{

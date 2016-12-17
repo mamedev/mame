@@ -171,9 +171,6 @@ private:
 
 	mb86235_internal_state  *m_core;
 
-	drc_cache m_cache;
-	std::unique_ptr<drcuml_state> m_drcuml;
-	std::unique_ptr<mb86235_frontend> m_drcfe;
 	uml::parameter   m_regmap[32];
 
 	uml::code_handle *m_entry;                      /* entry point */
@@ -191,6 +188,9 @@ private:
 	address_space_config m_program_config;
 	address_space_config m_dataa_config;
 	address_space_config m_datab_config;
+	drc_cache m_cache;
+	std::unique_ptr<drcuml_state> m_drcuml;
+	std::unique_ptr<mb86235_frontend> m_drcfe;
 
 	address_space *m_program;
 	address_space *m_dataa;
@@ -235,7 +235,7 @@ private:
 	uml::parameter get_alu1_input(int reg);
 	uml::parameter get_alu_output(int reg);
 	uml::parameter get_mul1_input(int reg);
-	void generate_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int cc, bool not, uml::code_label skip_label, bool condtemp);
+	void generate_condition(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int cc, bool n, uml::code_label skip_label, bool condtemp);
 	void generate_branch_target(drcuml_block *block, compiler_state *compiler, const opcode_desc *desc, int type, int ef2);
 	bool has_register_clash(const opcode_desc *desc, int outreg);
 	bool aluop_has_result(int aluop);
