@@ -673,7 +673,7 @@ void retro_window_info::set_starting_view(int index, const char *defview, const 
 	int viewindex;
 
 	// choose non-auto over auto
-	if (strcmp(view, "auto") == 0 && strcmp(defview, "auto") != 0)
+	if (!strcmp(view, "auto") && !strcmp(defview, "auto") != 0)
 		view = defview;
 
 	// query the video system to help us pick a view

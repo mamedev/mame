@@ -350,9 +350,9 @@ video_changed=true;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
    {
-      if (strcmp(var.value, "enabled") == 0)
+      if (!strcmp(var.value, "enabled"))
          softlist_auto = true;
-      if (strcmp(var.value, "disabled") == 0)
+      if (!strcmp(var.value, "disabled"))
          softlist_auto = false;
    }
 
@@ -361,9 +361,9 @@ video_changed=true;
 
    if (environ_cb(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
    {
-      if (strcmp(var.value, "enabled") == 0)
+      if (!strcmp(var.value, "enabled"))
          boot_to_bios_enable = true;
-      if (strcmp(var.value, "disabled") == 0)
+      if (!strcmp(var.value, "disabled"))
          boot_to_bios_enable = false;
    }
 
