@@ -72,8 +72,8 @@ unsigned int videoBuffer[1600*1200];
 retro_video_refresh_t video_cb = NULL;
 retro_environment_t environ_cb = NULL;
 
-//FIXME: re-add way to handle OGL 
-#if defined(HAVE_GL)
+/* FIXME: re-add way to handle OGL  */
+#if defined(HAVE_OPENGL) || defined(HAVE_OPENGLES)
 #include "retroogl.c"
 #endif
 
@@ -555,7 +555,7 @@ printf("w:%d h:%d a:%f\n",fb_width,fb_height,retro_aspect);
 	RLOOP=1;
 
 //FIXME: re-add way to handle OGL
-#ifdef HAVE_GL
+#if defined(HAVE_OPENGL) || defined(HAVE_OPENGLES)
    do_glflush();
 #else
    if (draw_this_frame)
@@ -579,8 +579,8 @@ bool retro_load_game(const struct retro_game_info *info)
 #endif
 
 //FIXME: re-add way to handle OGL
-#if defined(HAVE_GL)
-#ifdef GLES
+#if defined(HAVE_OPENGL) || defined(HAVE_OPENGLES)
+#if defined(HAVE_OPENGLES)
     hw_render.context_type = RETRO_HW_CONTEXT_OPENGLES2;
 #else
     hw_render.context_type = RETRO_HW_CONTEXT_OPENGL;

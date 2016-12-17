@@ -9,7 +9,7 @@
 
 #define HAVE_RGB32
 //FIXME: re-add way to handle 16/32 bit
-#if !defined(HAVE_GL) && !defined(HAVE_RGB32)
+#if (!defined(HAVE_OPENGL) && !defined(HAVE_RGB32)) || (!defined(HAVE_OPENGLES) && !defined(HAVE_RGB32))
 
 #ifndef M16B
 #define M16B
