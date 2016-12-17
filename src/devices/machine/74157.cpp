@@ -3,7 +3,7 @@
 
 /***************************************************************************
 
-    74LS157 Quad 2-Line to 1-Line Data Selectors/Multiplexers (TTL)
+    74LS157/74HCT157 Quad 2 to 1-Line Data Selectors/Multiplexers (TTL)
 
     Often used to help feed 8-bit ROM data into a MSM5205, and for many
     other purposes.
@@ -27,7 +27,12 @@ const device_type LS157 = &device_creator<ls157_device>;
 //-------------------------------------------------
 
 ls157_device::ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, LS157, "74LS157 Data Selectors/Multiplexers", tag, owner, clock, "74ls157", __FILE__)
+	: ls157_device(mconfig, LS157, "74LS157 Quad 2-to-1 Multiplexer", tag, owner, clock, "74ls157", __FILE__)
+{
+}
+
+ls157_device::ls157_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_out_cb(*this)
 {
 	m_a = 0;
@@ -199,4 +204,16 @@ void ls157_device::update_output()
 	// S low, strobe low:  Y1-Y4 = A1-A4
 	if (!m_strobe)
 		m_out_cb(m_select ? m_b : m_a);
+}
+
+
+//**************************************************************************
+//  74HCT157 DEVICE
+//**************************************************************************
+
+const device_type HCT157 = &device_creator<hct157_device>;
+
+hct157_device::hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ls157_device(mconfig, HCT157, "74HCT157 Quad 2-to-1 Multiplexer", tag, owner, clock, "74hct157", __FILE__)
+{
 }

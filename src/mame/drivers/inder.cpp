@@ -35,6 +35,7 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "machine/7474.h"
+#include "machine/74157.h"
 #include "inder.lh"
 
 class inder_state : public genpin_class
@@ -49,6 +50,7 @@ public:
 		, m_7a(*this, "7a")
 		, m_9a(*this, "9a")
 		, m_9b(*this, "9b")
+		, m_13(*this, "13")
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
@@ -77,6 +79,7 @@ public:
 	DECLARE_DRIVER_INIT(inder);
 	DECLARE_DRIVER_INIT(inder1);
 private:
+	void update_mus();
 	bool m_pc0;
 	uint8_t m_game;
 	uint8_t m_portc;
@@ -94,6 +97,7 @@ private:
 	optional_device<ttl7474_device> m_7a;
 	optional_device<ttl7474_device> m_9a;
 	optional_device<ttl7474_device> m_9b;
+	optional_device<hct157_device> m_13;
 	required_ioport_array<11> m_switches;
 };
 
@@ -1232,6 +1236,15 @@ WRITE8_MEMBER( inder_state::sndbank_w )
 	for (i = 0; i < 4; i++)
 		if (!(BIT(data, i)))
 			m_sound_addr = (m_sound_addr & 0x0ffff) | (i << 16);
+	update_mus();
+}
+
+void inder_state::update_mus()
+{
+	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
+		m_13->ab_w(m_p_speech[m_sound_addr]);
+	else
+		m_13->ab_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::vck_w )
@@ -1240,16 +1253,6 @@ WRITE_LINE_MEMBER( inder_state::vck_w )
 	m_9b->clock_w(0);
 	m_9a->clock_w(1);
 	m_9b->clock_w(1);
-
-	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-	{
-		if (!m_pc0)
-			m_msm->data_w(m_p_speech[m_sound_addr] & 15);
-		else
-			m_msm->data_w(m_p_speech[m_sound_addr] >> 4);
-	}
-	else
-		m_msm->data_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
@@ -1268,6 +1271,7 @@ WRITE_LINE_MEMBER( inder_state::qc9b_w )
 {
 	m_9a->d_w(state);
 	m_9b->d_w(state);
+	m_13->select_w(state);
 }
 
 READ8_MEMBER( inder_state::ppic_r )
@@ -1278,11 +1282,13 @@ READ8_MEMBER( inder_state::ppic_r )
 WRITE8_MEMBER( inder_state::ppia_w )
 {
 	m_sound_addr = (m_sound_addr & 0x3ff00) | data;
+	update_mus();
 }
 
 WRITE8_MEMBER( inder_state::ppib_w )
 {
 	m_sound_addr = (m_sound_addr & 0x300ff) | (data << 8);
+	update_mus();
 }
 
 WRITE8_MEMBER( inder_state::ppic_w )
@@ -1302,14 +1308,17 @@ void inder_state::machine_reset()
 	m_sound_addr = 0;
 	m_sndbank = 0xff;
 	m_row = 0;
-	if (m_7a)
+	if (m_7a.found())
+	{
 		m_7a->clear_w(1);
+		update_mus();
+	}
 }
 
 DRIVER_INIT_MEMBER( inder_state, inder )
 {
 	m_p_speech = memregion("speech")->base();
-	if (m_7a)
+	if (m_7a.found())
 	{
 		m_7a->d_w(0);
 		m_7a->clear_w(0);
@@ -1321,7 +1330,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 DRIVER_INIT_MEMBER( inder_state, inder1 )
 {
 	m_p_speech = memregion("speech")->base();
-	if (m_7a)
+	if (m_7a.found())
 	{
 		m_7a->d_w(0);
 		m_7a->clear_w(0);
@@ -1461,6 +1470,9 @@ static MACHINE_CONFIG_START( inder, inder_state )
 
 	MCFG_DEVICE_ADD("9b", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(inder_state, qc9b_w))
+
+	MCFG_DEVICE_ADD("13", HCT157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 
