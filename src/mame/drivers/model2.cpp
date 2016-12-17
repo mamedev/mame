@@ -752,14 +752,42 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (m_dsp_type == DSP_TYPE_SHARC)
 		copro_fifoin_push(machine().device("dsp"), d,offset,mem_mask);
-	else
+	else if (m_dsp_type == DSP_TYPE_TGP)
 		copro_fifoin_push(machine().device("tgp"), d,offset,mem_mask);
+	else if (m_dsp_type == DSP_TYPE_TGPX4)
+	{
+		if (m_tgpx4->is_fifoin_full())
+			printf("trying to push to full fifo! (function port)\n");
+
+		m_tgpx4->fifoin_w(d);
+	}
 }
 
 READ32_MEMBER(model2_state::copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop(space,offset,mem_mask);
+	if (m_dsp_type == DSP_TYPE_SHARC || m_dsp_type == DSP_TYPE_TGP)
+	{
+		return copro_fifoout_pop(space, offset, mem_mask);
+	}
+	else
+	{
+		// TODO
+		printf("FIFO OUT read\n");
+		if (m_tgpx4->is_fifoout0_empty())
+		{
+			/* Reading from empty FIFO causes the i960 to enter wait state */
+			downcast<i960_cpu_device &>(space.device()).i960_stall();
+			/* spin the main cpu and let the TGP catch up */
+			space.device().execute().spin_until_time(attotime::from_usec(100));
+			printf("stalled\n");
+		}
+		else
+		{
+			return (uint32_t)(m_tgpx4->fifoout0_r());
+		}
+	}
+	return 0;
 }
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
@@ -774,6 +802,19 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 		{
 			m_tgp_program[m_coprocnt] = data;
 		}
+		else if (m_dsp_type == DSP_TYPE_TGPX4)
+		{
+			if (m_coprocnt & 1)
+			{
+				m_tgpx4_program[m_coprocnt / 2] &= 0xffffffffU;
+				m_tgpx4_program[m_coprocnt / 2] |= u64(data) << 32;
+			}
+			else
+			{
+				m_tgpx4_program[m_coprocnt / 2] &= 0xffffffff00000000U;
+				m_tgpx4_program[m_coprocnt / 2] |= data;
+			}
+		}
 
 		m_coprocnt++;
 	}
@@ -785,8 +826,16 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data,offset,mem_mask);
-		else
+		else if (m_dsp_type == DSP_TYPE_TGP)
 			copro_fifoin_push(machine().device("tgp"), data,offset,mem_mask);
+		else if (m_dsp_type == DSP_TYPE_TGPX4)
+		{
+			if (m_tgpx4->is_fifoin_full())
+				printf("trying to push to full fifo!\n");
+
+			printf("push %08X at %08X\n", data, space.device().safe_pc());
+			m_tgpx4->fifoin_w(data);
+		}
 	}
 }
 
@@ -1624,7 +1673,8 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_prg_r, copro_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
