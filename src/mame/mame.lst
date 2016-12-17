@@ -19765,7 +19765,6 @@ spyhunt2                        // (c) 1987
 spyhunt2a                       // (c) 1987
 trisport                        // (c) 1989
 xenophob                        // (c) 1987
-zwackery                        // (c) 1984
 
 @source:meadows.cpp
 bowl3d                          // [1978?]
@@ -37978,6 +37977,9 @@ zrt80                           //
 
 @source:zsbc3.cpp
 zsbc3                           //
+
+@source:zwackery.cpp
+zwackery                        // (c) 1984
 
 @source:zx.cpp
 lambda                          // Lambda 8300

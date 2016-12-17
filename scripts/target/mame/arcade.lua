@@ -2513,6 +2513,7 @@ files {
 	MAME_DIR .. "src/mame/includes/mcr68.h",
 	MAME_DIR .. "src/mame/machine/mcr68.cpp",
 	MAME_DIR .. "src/mame/video/mcr68.cpp",
+	MAME_DIR .. "src/mame/drivers/zwackery.cpp",
 	MAME_DIR .. "src/mame/drivers/midqslvr.cpp",
 	MAME_DIR .. "src/mame/drivers/midtunit.cpp",
 	MAME_DIR .. "src/mame/includes/midtunit.h",
