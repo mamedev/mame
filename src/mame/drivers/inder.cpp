@@ -1308,15 +1308,17 @@ void inder_state::machine_reset()
 	m_sound_addr = 0;
 	m_sndbank = 0xff;
 	m_row = 0;
-	if (m_7a)
+	if (m_7a.found())
+	{
 		m_7a->clear_w(1);
-	update_mus();
+		update_mus();
+	}
 }
 
 DRIVER_INIT_MEMBER( inder_state, inder )
 {
 	m_p_speech = memregion("speech")->base();
-	if (m_7a)
+	if (m_7a.found())
 	{
 		m_7a->d_w(0);
 		m_7a->clear_w(0);
@@ -1328,7 +1330,7 @@ DRIVER_INIT_MEMBER( inder_state, inder )
 DRIVER_INIT_MEMBER( inder_state, inder1 )
 {
 	m_p_speech = memregion("speech")->base();
-	if (m_7a)
+	if (m_7a.found())
 	{
 		m_7a->d_w(0);
 		m_7a->clear_w(0);
