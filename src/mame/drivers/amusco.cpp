@@ -91,6 +91,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/msm5832.h"
+#include "machine/ticket.h"
 #include "amusco.lh"
 
 
@@ -102,10 +103,12 @@ public:
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode"),
+		m_pit(*this, "pit8253"),
 		m_pic(*this, "pic8259"),
 		m_rtc(*this, "rtc"),
 		m_crtc(*this, "crtc"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_hopper(*this, "hopper")
 		{ }
 
 	required_shared_ptr<uint8_t> m_videoram;
@@ -128,10 +131,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<pit8253_device> m_pit;
 	required_device<pic8259_device> m_pic;
 	required_device<msm5832_device> m_rtc;
 	required_device<mc6845_device> m_crtc;
 	required_device<screen_device> m_screen;
+	required_device<ticket_dispenser_device> m_hopper;
 	uint8_t m_mc6845_address;
 	uint16_t m_video_update_address;
 };
@@ -240,22 +245,39 @@ WRITE8_MEMBER(amusco_state::output_b_w)
   7654 3210
   ---- --x-  Unknown lamp (lits when all holds/disc are ON. Could be a Cancel lamp in an inverted Hold system).
   ---- -x--  Start/Draw lamp.
-  ---x ----  Low when sound data queued.
-  --x- ----  Safe to shutdown?
-  -x-- ----  Allow NMI?
-  x--- x--x  Unknown.
+  ---- x--x  Unknown.
+  ---x ----  Special: low when sound data queued.
+  --x- ----  Special: set by NMI routine (trigger shutdown?)
+  -x-- ----  Special: cleared in NMI routine (safe to shutdown?)
+  x--- ----  Special: NMI enable (cleared and set along with CPU interrupt flag).
 
 */
 	output().set_lamp_value(6, (data >> 2) & 1);    // Lamp 6 (Start/Draw)
 	output().set_lamp_value(7, (data >> 1) & 1);    // Lamp 7 (Unknown)
 
-	//machine().bookkeeping().coin_counter_w(0, ~data & 0x10); // Probably not coin-related
+	m_pit->write_gate0(!BIT(data, 4));
 
 //  logerror("Writing %02Xh to PPI output B\n", data);
 }
 
 WRITE8_MEMBER(amusco_state::output_c_w)
 {
+/* Lamps and counters from port C
+
+  7654 3210
+  ---- ---x  Unknown (used by Draw 88 Poker only?)
+  ---- --x-  Coin counter (bills not included).
+  ---- -x--  Unknown counter (points won?)
+  ---- x---  Unknown counter (points played?)
+  ---x ----  Coin out pulse.
+  xxx- ----  Unused.
+*/
+	if (!data)
+		return;
+
+	machine().bookkeeping().coin_counter_w(0, !BIT(data, 1));
+	m_hopper->motor_w(BIT(data, 4));
+
 //  logerror("Writing %02Xh to PPI output C\n", data);
 }
 
@@ -474,6 +496,8 @@ static MACHINE_CONFIG_START( amusco, amusco_state )
 	MCFG_I8155_OUT_PORTA_CB(WRITE8(amusco_state, rtc_control_w))
 	MCFG_I8155_IN_PORTC_CB(DEVREAD8("rtc", msm5832_device, data_r))
 	MCFG_I8155_OUT_PORTC_CB(DEVWRITE8("rtc", msm5832_device, data_w))
+
+	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(30), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
