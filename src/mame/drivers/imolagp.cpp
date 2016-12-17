@@ -501,8 +501,8 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B", 0))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	/* video hardware */
