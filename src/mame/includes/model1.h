@@ -86,6 +86,11 @@ public:
 	DECLARE_READ32_MEMBER(copro_fifoin_pop);
 	DECLARE_WRITE32_MEMBER(copro_fifoout_push);
 
+	uint16_t m_r360_state;
+	DECLARE_DRIVER_INIT(wingwar360);
+	DECLARE_READ16_MEMBER(r360_r);
+	DECLARE_WRITE16_MEMBER(r360_w);
+
 	// Rendering
 	DECLARE_VIDEO_START(model1);
 	DECLARE_READ16_MEMBER(model1_listctl_r);

@@ -1059,7 +1059,7 @@ static INPUT_PORTS_START( vr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN.2")
+	PORT_START("IN.2")   /* 8Bit RX-line from drive board */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1096,7 +1096,7 @@ static INPUT_PORTS_START( wingwar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN.2")
+	PORT_START("IN.2")   /* 8Bit RX-line from r360 board */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1668,12 +1668,76 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-GAME( 1993, vf,         0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,        0,       swa,       swa, driver_device,      0, ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwar360, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,    0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+DRIVER_INIT_MEMBER(model1_state,wingwar360)
+{
+	// install r360 hack
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00014, 0xc00015, read16_delegate(FUNC(model1_state::r360_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00022, 0xc00023, write16_delegate(FUNC(model1_state::r360_w),this));
+}
+
+READ16_MEMBER(model1_state::r360_r)
+{
+	return m_r360_state;
+}
+
+WRITE16_MEMBER(model1_state::r360_w)
+{
+	/*
+		this uses the feedback board protocol
+		command group B - these seem to be gamestates
+		
+		bf = init
+		be = attract
+		bd = setup #1 (lower safety bar etc.)
+		bc = setup #2 (push emergency button)
+		bb = ready to go
+		ba = ingame
+		b9 = game over
+
+		results:
+		40 = default status
+		41 = * (setup #1 ack)
+		42 = lowered safety bar
+		43 = closed belt
+		44 = lever up
+		45 = pushed button
+		46 = game start
+		47 = game over
+		48 = lever down
+		49 = released belt
+	*/
+	switch (data & 0xff)
+	{
+		case 0xbf:
+		case 0xbe:
+			m_r360_state = ~0x40;
+			break;
+
+		case 0xbd:
+			m_r360_state = ~0x44;
+			break;
+			
+		case 0xbc:
+			m_r360_state = ~0x45;
+			break;
+
+		case 0xbb:
+			m_r360_state = ~0x46;
+			break;
+
+		case 0xba:
+		case 0xb9:
+			m_r360_state = ~0x40;
+			break;
+	}
+}
+
+GAME( 1993, vf,         0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,       swa, driver_device,     0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
