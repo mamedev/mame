@@ -36,6 +36,7 @@ ToDo:
 #include "machine/i8255.h"
 #include "sound/msm5205.h"
 #include "machine/7474.h"
+#include "machine/74157.h"
 
 class spinb_state : public genpin_class
 {
@@ -50,6 +51,8 @@ public:
 		, m_msm_m(*this, "msm_m")
 		, m_ic5a(*this, "ic5a")
 		, m_ic5m(*this, "ic5m")
+		, m_ic14a(*this, "ic14a")
+		, m_ic14m(*this, "ic14m")
 		, m_switches(*this, "SW.%u", 0)
 	{ }
 
@@ -110,6 +113,8 @@ private:
 	uint8_t *m_p_dmdcpu;
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
+	void update_sound_a();
+	void update_sound_m();
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_musiccpu;
@@ -118,6 +123,8 @@ private:
 	required_device<msm5205_device> m_msm_m;
 	required_device<ttl7474_device> m_ic5a;
 	required_device<ttl7474_device> m_ic5m;
+	required_device<hct157_device> m_ic14a;
+	required_device<hct157_device> m_ic14m;
 	required_ioport_array<11> m_switches;
 };
 
@@ -407,6 +414,8 @@ WRITE8_MEMBER( spinb_state::sndbank_a_w )
 		m_sound_addr_a |= (2<<19);
 	else if (BIT(data, 7))
 		m_sndbank_a = 0xff;
+
+	update_sound_a();
 }
 
 WRITE8_MEMBER( spinb_state::sndbank_m_w )
@@ -420,50 +429,50 @@ WRITE8_MEMBER( spinb_state::sndbank_m_w )
 		m_sound_addr_m |= (2<<19);
 	else if (BIT(data, 7))
 		m_sndbank_m = 0xff;
+
+	update_sound_m();
 }
 
 WRITE_LINE_MEMBER( spinb_state::vck_a_w )
 {
 	m_ic5a->clock_w(0);
 	m_ic5a->clock_w(1);
+}
 
+void spinb_state::update_sound_a()
+{
 	if (m_sndbank_a != 0xff)
-	{
-		if (!m_pc0a)
-			m_msm_a->data_w(m_p_audio[m_sound_addr_a] & 15);
-		else
-			m_msm_a->data_w(m_p_audio[m_sound_addr_a] >> 4);
-	}
+		m_ic14a->ab_w(m_p_audio[m_sound_addr_a]);
 	else
-		m_msm_a->data_w(0);
+		m_ic14a->ab_w(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::vck_m_w )
 {
 	m_ic5m->clock_w(0);
 	m_ic5m->clock_w(1);
+}
 
+void spinb_state::update_sound_m()
+{
 	if (m_sndbank_m != 0xff)
-	{
-		if (!m_pc0m)
-			m_msm_m->data_w(m_p_music[m_sound_addr_m] & 15);
-		else
-			m_msm_m->data_w(m_p_music[m_sound_addr_m] >> 4);
-	}
+		m_ic14m->ab_w(m_p_music[m_sound_addr_m]);
 	else
-		m_msm_m->data_w(0);
+		m_ic14m->ab_w(0);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5a_w )
 {
 	m_pc0a = state;
 	m_ic5a->d_w(state);
+	m_ic14a->select_w(state);
 }
 
 WRITE_LINE_MEMBER( spinb_state::ic5m_w )
 {
 	m_pc0m = state;
 	m_ic5m->d_w(state);
+	m_ic14m->select_w(state);
 }
 
 READ8_MEMBER( spinb_state::ppia_c_r )
@@ -479,21 +488,25 @@ READ8_MEMBER( spinb_state::ppim_c_r )
 WRITE8_MEMBER( spinb_state::ppia_b_w )
 {
 	m_sound_addr_a = (m_sound_addr_a & 0xffff00) | data;
+	update_sound_a();
 }
 
 WRITE8_MEMBER( spinb_state::ppim_b_w )
 {
 	m_sound_addr_m = (m_sound_addr_m & 0xffff00) | data;
+	update_sound_m();
 }
 
 WRITE8_MEMBER( spinb_state::ppia_a_w )
 {
 	m_sound_addr_a = (m_sound_addr_a & 0xff00ff) | (data << 8);
+	update_sound_a();
 }
 
 WRITE8_MEMBER( spinb_state::ppim_a_w )
 {
 	m_sound_addr_m = (m_sound_addr_m & 0xff00ff) | (data << 8);
+	update_sound_m();
 }
 
 WRITE8_MEMBER( spinb_state::ppia_c_w )
@@ -523,6 +536,8 @@ void spinb_state::machine_reset()
 	m_sndbank_a = 0xff;
 	m_sndbank_m = 0xff;
 	m_row = 0;
+	update_sound_a();
+	update_sound_m();
 }
 
 void spinb_state::machine_start()
@@ -703,8 +718,14 @@ static MACHINE_CONFIG_START( spinb, spinb_state )
 	MCFG_DEVICE_ADD("ic5a", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5a_w))
 
+	MCFG_DEVICE_ADD("ic14a", HCT157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm_a", msm5205_device, data_w))
+
 	MCFG_DEVICE_ADD("ic5m", TTL7474, 0)
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(spinb_state, ic5m_w))
+
+	MCFG_DEVICE_ADD("ic14m", HCT157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm_m", msm5205_device, data_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vrnwrld, spinb )

@@ -20,10 +20,10 @@ extern const device_type I8088;
 
 enum
 {
-	I8086_PC=0,
-	I8086_IP, I8086_AX, I8086_CX, I8086_DX, I8086_BX, I8086_SP, I8086_BP, I8086_SI, I8086_DI,
+	I8086_PC = STATE_GENPC,
+	I8086_IP = 1, I8086_AX, I8086_CX, I8086_DX, I8086_BX, I8086_SP, I8086_BP, I8086_SI, I8086_DI,
 	I8086_FLAGS, I8086_ES, I8086_CS, I8086_SS, I8086_DS,
-	I8086_VECTOR, I8086_PENDING
+	I8086_VECTOR, I8086_HALT
 };
 
 
@@ -127,6 +127,7 @@ protected:
 	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
 
 	virtual void interrupt(int int_num, int trap = 1);

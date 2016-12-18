@@ -54,14 +54,12 @@ WRITE8_MEMBER(mustache_state::videoram_w)
 
 WRITE8_MEMBER(mustache_state::video_control_w)
 {
-	if (flip_screen() != (data & 0x01))
-	{
-		flip_screen_set(data & 0x01);
-		machine().tilemap().mark_all_dirty();
-	}
+	/* It is assumed that screen flipping is controlled by both
+	   hardware (via a DIP switch, labeled "Hard SW" on the
+	   operator's sheet) and software, as in some Irem games */
+	flip_screen_set((data & 0x01) ^ BIT(~m_dswb->read(), 7));
 
 	/* tile bank */
-
 	if ((m_control_byte ^ data) & 0x08)
 	{
 		m_control_byte = data;
@@ -128,7 +126,7 @@ void mustache_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		if (flip_screen())
 		{
 			sx = 240 - sx;
-			sy = 240 - sy;
+			sy = 232 - sy;
 		}
 
 		gfx->transpen(bitmap,clip,

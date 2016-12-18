@@ -264,6 +264,8 @@ SOUNDS["GB_SOUND"] = true
 SOUNDS["PCD3311"] = true
 SOUNDS["VOLT_REG"] = true
 SOUNDS["MEA8000"] = true
+--SOUNDS["DAC76"] = true
+--SOUNDS["MM5837"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -376,6 +378,7 @@ MACHINES["AY31015"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
+MACHINES["CDP1879"] = true
 MACHINES["CMOS40105"] = true
 --MACHINES["CDU76S"] = true
 MACHINES["COM8116"] = true
@@ -535,6 +538,7 @@ MACHINES["TTL74123"] = true
 MACHINES["TTL74145"] = true
 MACHINES["TTL74148"] = true
 MACHINES["TTL74153"] = true
+--MACHINES["TTL74157"] = true
 MACHINES["TTL74161"] = true
 MACHINES["TTL74175"] = true
 MACHINES["TTL74181"] = true
@@ -901,6 +905,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"dms",
 		"dragon",
 		"drc",
+		"dulmont",
 		"eaca",
 		"einis",
 		"elektor",
@@ -1224,7 +1229,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/cps1.cpp",
 	MAME_DIR .. "src/mame/includes/cps1.h",
 	MAME_DIR .. "src/mame/video/cps1.cpp",
-	MAME_DIR .. "src/mame/video/chihiro.cpp",
+	MAME_DIR .. "src/mame/video/xbox_nv2a.cpp",
 	MAME_DIR .. "src/mame/machine/xbox.cpp",
 	MAME_DIR .. "src/mame/machine/xbox_usb.cpp",
 	MAME_DIR .. "src/mame/includes/saturn.h",
@@ -1763,6 +1768,11 @@ files {
 createMESSProjects(_target, _subtarget, "drc")
 files {
 	MAME_DIR .. "src/mame/drivers/zrt80.cpp",
+}
+
+createMESSProjects(_target, _subtarget, "dulmont")
+files {
+	MAME_DIR .. "src/mame/drivers/magnum.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "eaca")
@@ -2433,6 +2443,7 @@ files {
 	MAME_DIR .. "src/mame/drivers/pc.cpp",
 	MAME_DIR .. "src/mame/drivers/pcipc.cpp",
 	MAME_DIR .. "src/mame/drivers/tandy1t.cpp",
+	MAME_DIR .. "src/mame/drivers/tosh1000.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.cpp",
 	MAME_DIR .. "src/mame/video/pc_t1t.h",
 }

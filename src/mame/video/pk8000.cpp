@@ -3,64 +3,64 @@
 #include "emu.h"
 #include "includes/pk8000.h"
 
-READ8_MEMBER(pk8000_base_state::pk8000_video_color_r)
+READ8_MEMBER(pk8000_base_state::video_color_r)
 {
-	return m_pk8000_video_color;
+	return m_video_color;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_video_color_w)
+WRITE8_MEMBER(pk8000_base_state::video_color_w)
 {
-	m_pk8000_video_color = data;
+	m_video_color = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_text_start_r)
+READ8_MEMBER(pk8000_base_state::text_start_r)
 {
-	return m_pk8000_text_start;
+	return m_text_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_text_start_w)
+WRITE8_MEMBER(pk8000_base_state::text_start_w)
 {
-	m_pk8000_text_start = data;
+	m_text_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_chargen_start_r)
+READ8_MEMBER(pk8000_base_state::chargen_start_r)
 {
-	return m_pk8000_chargen_start;
+	return m_chargen_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_chargen_start_w)
+WRITE8_MEMBER(pk8000_base_state::chargen_start_w)
 {
-	m_pk8000_chargen_start = data;
+	m_chargen_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_video_start_r)
+READ8_MEMBER(pk8000_base_state::video_start_r)
 {
-	return m_pk8000_video_start;
+	return m_video_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_video_start_w)
+WRITE8_MEMBER(pk8000_base_state::video_start_w)
 {
-	m_pk8000_video_start = data;
+	m_video_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_color_start_r)
+READ8_MEMBER(pk8000_base_state::color_start_r)
 {
-	return m_pk8000_color_start;
+	return m_color_start;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_color_start_w)
+WRITE8_MEMBER(pk8000_base_state::color_start_w)
 {
-	m_pk8000_color_start = data;
+	m_color_start = data;
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_color_r)
+READ8_MEMBER(pk8000_base_state::color_r)
 {
-	return m_pk8000_color[offset];
+	return m_color[offset];
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_color_w)
+WRITE8_MEMBER(pk8000_base_state::color_w)
 {
-	m_pk8000_color[offset] = data;
+	m_color[offset] = data;
 }
 
 static const rgb_t pk8000_palette[16] = {
@@ -87,43 +87,43 @@ PALETTE_INIT_MEMBER(pk8000_base_state, pk8000)
 	palette.set_pen_colors(0, pk8000_palette, ARRAY_LENGTH(pk8000_palette));
 }
 
-READ8_MEMBER(pk8000_base_state::pk8000_84_porta_r)
+READ8_MEMBER(pk8000_base_state::_84_porta_r)
 {
-	return m_pk8000_video_mode;
+	return m_video_mode;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_84_porta_w)
+WRITE8_MEMBER(pk8000_base_state::_84_porta_w)
 {
-	m_pk8000_video_mode = data;
+	m_video_mode = data;
 }
 
-WRITE8_MEMBER(pk8000_base_state::pk8000_84_portc_w)
+WRITE8_MEMBER(pk8000_base_state::_84_portc_w)
 {
-	m_pk8000_video_enable = BIT(data,4);
+	m_video_enable = BIT(data,4);
 }
 
-uint32_t pk8000_base_state::pk8000_video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem)
+uint32_t pk8000_base_state::video_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t *videomem)
 {
 	int x,y,j,b;
-	uint16_t offset = (m_pk8000_video_mode & 0xc0) << 8;
+	uint16_t offset = (m_video_mode & 0xc0) << 8;
 	rectangle my_rect;
 	my_rect.set(0, 256+32-1, 0, 192+32-1);
 
-	if (m_pk8000_video_enable) {
-		bitmap.fill((m_pk8000_video_color >> 4) & 0x0f, my_rect);
+	if (m_video_enable) {
+		bitmap.fill((m_video_color >> 4) & 0x0f, my_rect);
 
-		if (BIT(m_pk8000_video_mode,4)==0){
+		if (BIT(m_video_mode,4)==0){
 			// Text mode
-			if (BIT(m_pk8000_video_mode,5)==0){
+			if (BIT(m_video_mode,5)==0){
 				// 32 columns
 				for (y = 0; y < 24; y++)
 				{
 					for (x = 0; x < 32; x++)
 					{
-						uint8_t chr  = videomem[x +(y*32) + ((m_pk8000_text_start & 0x0f) << 10)+offset] ;
-						uint8_t color= m_pk8000_color[chr>>3];
+						uint8_t chr  = videomem[x +(y*32) + ((m_text_start & 0x0f) << 10)+offset] ;
+						uint8_t color= m_color[chr>>3];
 						for (j = 0; j < 8; j++) {
-							uint8_t code = videomem[((chr<<3) + j) + ((m_pk8000_chargen_start & 0x0e) << 10)+offset];
+							uint8_t code = videomem[((chr<<3) + j) + ((m_chargen_start & 0x0e) << 10)+offset];
 
 							for (b = 0; b < 8; b++)
 							{
@@ -139,12 +139,12 @@ uint32_t pk8000_base_state::pk8000_video_update(screen_device &screen, bitmap_in
 				{
 					for (x = 0; x < 42; x++)
 					{
-						uint8_t chr = videomem[x +(y*64) + ((m_pk8000_text_start & 0x0e) << 10)+offset] ;
+						uint8_t chr = videomem[x +(y*64) + ((m_text_start & 0x0e) << 10)+offset] ;
 						for (j = 0; j < 8; j++) {
-							uint8_t code = videomem[((chr<<3) + j) + ((m_pk8000_chargen_start  & 0x0e) << 10)+offset];
+							uint8_t code = videomem[((chr<<3) + j) + ((m_chargen_start  & 0x0e) << 10)+offset];
 							for (b = 2; b < 8; b++)
 							{
-								uint8_t col = ((code >> b) & 0x01) ? (m_pk8000_video_color) & 0x0f : (m_pk8000_video_color>>4) & 0x0f;
+								uint8_t col = ((code >> b) & 0x01) ? (m_video_color) & 0x0f : (m_video_color>>4) & 0x0f;
 								bitmap.pix16((y*8)+j+16, x*6+(7-b)+16+8) =  col;
 							}
 						}
@@ -155,11 +155,11 @@ uint32_t pk8000_base_state::pk8000_video_update(screen_device &screen, bitmap_in
 			//Graphics
 			for (y = 0; y < 24; y++)
 			{
-				uint16_t off_color = (((~m_pk8000_color_start) & 0x08) << 10)+offset + ((y>>3)<<11);
-				uint16_t off_code  = (((~m_pk8000_video_start) & 0x08) << 10)+offset + ((y>>3)<<11);
+				uint16_t off_color = (((~m_color_start) & 0x08) << 10)+offset + ((y>>3)<<11);
+				uint16_t off_code  = (((~m_video_start) & 0x08) << 10)+offset + ((y>>3)<<11);
 				for (x = 0; x < 32; x++)
 				{
-					uint8_t chr  = videomem[x +(y*32) + ((m_pk8000_chargen_start & 0x0e) << 10)+offset] ;
+					uint8_t chr  = videomem[x +(y*32) + ((m_chargen_start & 0x0e) << 10)+offset] ;
 					for (j = 0; j < 8; j++) {
 						uint8_t color= videomem[((chr<<3) + j)+off_color];
 						uint8_t code = videomem[((chr<<3) + j)+off_code];

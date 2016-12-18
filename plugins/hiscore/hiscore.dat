@@ -70,6 +70,11 @@
 
 ;@s:1945kiii.cpp
 
+1945kiiin:
+1945kiiio:
+@:maincpu,program,100a2d,63,03,88
+
+
 ;*******1945k III
 1945kiii:
 @:maincpu,program,100a2d,63,03,88
@@ -96,6 +101,15 @@ undoukai:
 
 
 ;@s:8080bw.cpp
+
+cosmicin:
+@:maincpu,program,20f4,02,00,00
+
+
+ozmawarsmr:
+@:maincpu,program,2043,02,00,00
+@:maincpu,program,2023,01,01,01
+
 
 ;updated when start a game
 escmars:
@@ -2413,6 +2427,10 @@ circusce:
 
 ;@s:cischeat.cpp
 
+f1gpstaro:
+@:cpu1,program,f2803,5e3,04,4d
+
+
 ;(big run (11th rallye version))
 bigrun:
 @:cpu1,program,f61da,2bc,50,05
@@ -3045,11 +3063,12 @@ rockmanj:
 
 forgottn:
 forgottnu:
-forgottnu1:
 forgottnua:
 forgottnuaa:
 lostwrld:
 lostwrldo:
+forgottnuc:
+forgottnue:
 @:maincpu,program,ffe142,50,00,20
 @:maincpu,program,ffb2a0,04,00,00
 
@@ -3932,9 +3951,9 @@ stoffyu:
 ;wwfwfestb:******www wrestlefest (us bootleg)
 ;wwfwfesta:******www wrestlefest (us tecmo)
 wwfwfest:
-wwfwfesta:
 wwfwfestb:
 wwfwfestj:
+wwfwfestu:
 @:maincpu,program,1c00c2,84,08,01
 
 
@@ -6707,6 +6726,11 @@ hvyunitu:
 
 ;@s:hyperspt.cpp
 
+roadf3:
+@:maincpu,program,3bd0,10a,01,01
+@:maincpu,program,3066,3,01,00
+
+
 roadf:
 roadf2:
 @:maincpu,program,3bd0,10a,01,01
@@ -8873,12 +8897,20 @@ mnchmobl:
 
 ;@s:mustache.cpp
 
+mustachei:
+@:maincpu,program,f000,50,00,47
+
+
 ;*******mustache boy
 mustache:
 @:maincpu,program,f000,50,00,47
 
 
 ;@s:mw8080bw.cpp
+
+blueshrkmr:
+@:maincpu,program,200a,05,00,00
+
 
 lagunar:
 @:maincpu,program,2011,9,00,00
@@ -10971,6 +11003,12 @@ btlkroadk:
 
 
 ;@s:psikyosh.cpp
+
+;(sol divide) (by Paul Priest)
+soldividk:
+@:maincpu,program,600bb50,18,00,50
+@:maincpu,program,600bb68,1e,24,02
+
 
 ;gunbarich (by tamphax)
 gnbarich:
@@ -14425,6 +14463,14 @@ tail2nos:
 
 ;@s:taito_b.cpp
 
+;** you must wait untill the hiscore table has displayed in attract mode before **
+;** starting a game, for the save to work ** 
+hiticej:
+hiticerb:
+@:maincpu,program,802830,27,00,4b
+@:maincpu,program,802852,1,56,56
+
+
 crimec:
 crimecj:
 crimecu:
@@ -16605,6 +16651,10 @@ vastar4:
 
 
 ;@s:vendetta.cpp
+
+vendetta2pun:
+@:maincpu,program,2980,28,00,48
+
 
 vendetta:
 vendetta2p:

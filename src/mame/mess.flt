@@ -319,6 +319,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+magnum.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -624,6 +625,7 @@ tm990189.cpp
 tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
+tosh1000.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp

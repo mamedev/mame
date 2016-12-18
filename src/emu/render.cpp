@@ -1701,9 +1701,9 @@ bool render_target::load_layout_file(const char *dirname, const internal_layout 
 bool render_target::load_layout_file(const char *dirname, const char *filename)
 {
 	// if the first character of the "file" is an open brace, assume it is an XML string
-	xml_data_node *rootnode;
+	util::xml::data_node *rootnode;
 	if (filename[0] == '<')
-		rootnode = xml_data_node::string_read(filename, nullptr);
+		rootnode = util::xml::data_node::string_read(filename, nullptr);
 
 	// otherwise, assume it is a file
 	else
@@ -1720,7 +1720,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			return false;
 
 		// read the file
-		rootnode = xml_data_node::file_read(layoutfile, nullptr);
+		rootnode = util::xml::data_node::file_read(layoutfile, nullptr);
 	}
 
 	// if we didn't get a properly-formatted XML file, record a warning and exit
@@ -2215,7 +2215,7 @@ int render_target::view_index(layout_view &targetview) const
 //  config_load - process config information
 //-------------------------------------------------
 
-void render_target::config_load(xml_data_node const &targetnode)
+void render_target::config_load(util::xml::data_node const &targetnode)
 {
 	// find the view
 	const char *viewname = targetnode.get_attribute_string("view", nullptr);
@@ -2290,7 +2290,7 @@ void render_target::config_load(xml_data_node const &targetnode)
 //  return false if we are the same as the default
 //-------------------------------------------------
 
-bool render_target::config_save(xml_data_node &targetnode)
+bool render_target::config_save(util::xml::data_node &targetnode)
 {
 	bool changed = false;
 
@@ -2618,7 +2618,7 @@ render_manager::render_manager(running_machine &machine)
 		m_ui_container(global_alloc(render_container(*this)))
 {
 	// register callbacks
-	machine.configuration().config_register("video", config_saveload_delegate(&render_manager::config_load, this), config_saveload_delegate(&render_manager::config_save, this));
+	machine.configuration().config_register("video", config_load_delegate(&render_manager::config_load, this), config_save_delegate(&render_manager::config_save, this));
 
 	// create one container per screen
 	for (screen_device &screen : screen_device_iterator(machine.root_device()))
@@ -2870,10 +2870,10 @@ void render_manager::container_free(render_container *container)
 //  configuration file
 //-------------------------------------------------
 
-void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void render_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// might not have any data
@@ -2881,7 +2881,7 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 		return;
 
 	// check the UI target
-	xml_data_node const *const uinode = parentnode->get_child("interface");
+	util::xml::data_node const *const uinode = parentnode->get_child("interface");
 	if (uinode != nullptr)
 	{
 		render_target *target = target_by_index(uinode->get_attribute_int("target", 0));
@@ -2890,7 +2890,7 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 	}
 
 	// iterate over target nodes
-	for (xml_data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
+	for (util::xml::data_node const *targetnode = parentnode->get_child("target"); targetnode; targetnode = targetnode->get_next_sibling("target"))
 	{
 		render_target *target = target_by_index(targetnode->get_attribute_int("index", -1));
 		if (target != nullptr)
@@ -2898,7 +2898,7 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 	}
 
 	// iterate over screen nodes
-	for (xml_data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
+	for (util::xml::data_node const *screennode = parentnode->get_child("screen"); screennode; screennode = screennode->get_next_sibling("screen"))
 	{
 		int index = screennode->get_attribute_int("index", -1);
 		render_container *container = m_screen_container_list.find(index);
@@ -2929,17 +2929,17 @@ void render_manager::config_load(config_type cfg_type, xml_data_node *parentnode
 //  file
 //-------------------------------------------------
 
-void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void render_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// write out the interface target
 	if (m_ui_target->index() != 0)
 	{
 		// create a node for it
-		xml_data_node *const uinode = parentnode->add_child("interface", nullptr);
+		util::xml::data_node *const uinode = parentnode->add_child("interface", nullptr);
 		if (uinode != nullptr)
 			uinode->set_attribute_int("target", m_ui_target->index());
 	}
@@ -2953,7 +2953,7 @@ void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode
 			break;
 
 		// create a node
-		xml_data_node *const targetnode = parentnode->add_child("target", nullptr);
+		util::xml::data_node *const targetnode = parentnode->add_child("target", nullptr);
 		if (targetnode != nullptr && !target->config_save(*targetnode))
 			targetnode->delete_node();
 	}
@@ -2963,7 +2963,7 @@ void render_manager::config_save(config_type cfg_type, xml_data_node *parentnode
 	for (render_container *container = m_screen_container_list.first(); container != nullptr; container = container->next(), scrnum++)
 	{
 		// create a node
-		xml_data_node *const screennode = parentnode->add_child("screen", nullptr);
+		util::xml::data_node *const screennode = parentnode->add_child("screen", nullptr);
 		if (screennode != nullptr)
 		{
 			bool changed = false;

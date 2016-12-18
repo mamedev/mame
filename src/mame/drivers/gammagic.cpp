@@ -31,7 +31,6 @@ Additional CD-ROM games: "99 Bottles of Beer"
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
-#include "machine/cr589.h"
 //#include "machine/i82371sb.h"
 //#include "machine/i82439tx.h"
 #include "machine/lpci.h"

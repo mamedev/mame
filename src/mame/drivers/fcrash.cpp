@@ -491,7 +491,8 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 	int num_sprites = m_gfxdecode->gfx(2)->elements();
 	int last_sprite_offset = 0x1ffc;
 	uint16_t *sprite_ram = m_gfxram;
-	uint16_t tileno,flipx,flipy,colour,xpos,ypos;
+	uint16_t tileno,colour,xpos,ypos;
+	bool flipx, flipy;
 
 	/* if we have separate sprite ram, use it */
 	if (m_bootleg_sprite_ram) sprite_ram = m_bootleg_sprite_ram.get();
@@ -509,13 +510,16 @@ void cps_state::fcrash_render_sprites( screen_device &screen, bitmap_ind16 &bitm
 			if (tileno >= num_sprites) continue; /* don't render anything outside our tiles */
 			xpos   = sprite_ram[base + pos + 2] & 0x1ff;
 			ypos   = sprite_ram[base + pos - 1] & 0x1ff;
-			flipx  = sprite_ram[base + pos + 1] & 0x20;
-			flipy  = sprite_ram[base + pos + 1] & 0x40;
+			flipx  = BIT(sprite_ram[base + pos + 1], 5);
+			flipy  = BIT(sprite_ram[base + pos + 1], 6);
 			colour = sprite_ram[base + pos + 1] & 0x1f;
 			ypos   = 256 - ypos - 16;
 			xpos   = xpos + m_sprite_x_offset + 49;
 
-			m_gfxdecode->gfx(2)->prio_transpen(bitmap,cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 0x02, 15);
+			if (flip_screen())
+				m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, !flipx, !flipy, 512-16-xpos, 256-16-ypos, screen.priority(), 2, 15);
+			else
+				m_gfxdecode->gfx(2)->prio_transpen(bitmap, cliprect, tileno, colour, flipx, flipy, xpos, ypos, screen.priority(), 2, 15);
 		}
 	}
 }

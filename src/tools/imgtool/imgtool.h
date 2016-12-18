@@ -98,12 +98,12 @@ namespace imgtool
 		~image();
 
 		static imgtoolerr_t identify_file(const char *filename, imgtool_module **modules, size_t count);
-		static imgtoolerr_t open(const imgtool_module *module, const char *filename, int read_or_write, ptr &outimg);
-		static imgtoolerr_t open(const std::string &modulename, const char *filename, int read_or_write, ptr &outimg);
-		static imgtoolerr_t create(const imgtool_module *module, const char *fname, util::option_resolution *opts, ptr &image);
-		static imgtoolerr_t create(const std::string &modulename, const char *fname, util::option_resolution *opts, ptr &image);
-		static imgtoolerr_t create(const imgtool_module *module, const char *fname, util::option_resolution *opts);
-		static imgtoolerr_t create(const std::string &modulename, const char *fname, util::option_resolution *opts);
+		static imgtoolerr_t open(const imgtool_module *module, const std::string &filename, int read_or_write, ptr &outimg);
+		static imgtoolerr_t open(const std::string &modulename, const std::string &filename, int read_or_write, ptr &outimg);
+		static imgtoolerr_t create(const imgtool_module *module, const std::string &filename, util::option_resolution *opts, ptr &image);
+		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts, ptr &image);
+		static imgtoolerr_t create(const imgtool_module *module, const std::string &filename, util::option_resolution *opts);
+		static imgtoolerr_t create(const std::string &modulename, const std::string &filename, util::option_resolution *opts);
 		static uint64_t rand();
 
 		std::string info();
@@ -129,7 +129,7 @@ namespace imgtool
 		// better C++ adoption (e.g. - std::unique_ptr<>, std:move() etc)
 		bool m_okay_to_close;
 
-		static imgtoolerr_t internal_open(const imgtool_module *module, const char *fname,
+		static imgtoolerr_t internal_open(const imgtool_module *module, const std::string &filename,
 			int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg);
 	};
 }
@@ -244,7 +244,7 @@ namespace imgtool
 		~directory();
 
 		// methods
-		static imgtoolerr_t open(imgtool::partition &partition, const char *path, ptr &outenum);
+		static imgtoolerr_t open(imgtool::partition &partition, const std::string &path, ptr &outenum);
 		imgtoolerr_t get_next(imgtool_dirent &ent);
 
 		// accessors
@@ -265,7 +265,6 @@ int imgtool_validitychecks(void);
 void unknown_partition_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info);
 
 char *strncpyz(char *dest, const char *source, size_t len);
-char *strncatz(char *dest, const char *source, size_t len);
 void rtrim(char *buf);
 
 #endif /* IMGTOOL_H */

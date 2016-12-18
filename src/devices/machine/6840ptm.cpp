@@ -71,7 +71,6 @@ const device_type PTM6840 = &device_creator<ptm6840_device>;
 
 ptm6840_device::ptm6840_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PTM6840, "6840 PTM", tag, owner, clock, "ptm6840", __FILE__),
-		m_internal_clock(0.0),
 		m_out_cb{*this, *this, *this},
 		m_irq_cb(*this)
 {
@@ -112,7 +111,6 @@ void ptm6840_device::device_start()
 	save_item(NAME(m_status_reg));
 	save_item(NAME(m_t3_divisor));
 	save_item(NAME(m_t3_scaler));
-	save_item(NAME(m_internal_clock));
 	save_item(NAME(m_irq));
 
 	save_item(NAME(m_control_reg));
@@ -170,17 +168,8 @@ void ptm6840_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 void ptm6840_device::subtract_from_counter(int counter, int count)
 {
-	double clock;
-
 	// Determine the clock frequency for this timer
-	if (m_control_reg[counter] & INTERNAL_CLK_EN)
-	{
-		clock = m_internal_clock;
-	}
-	else
-	{
-		clock = m_external_clock[counter];
-	}
+	double clk = m_control_reg[counter] & INTERNAL_CLK_EN ? static_cast<double>(clock()) : m_external_clock[counter];
 
 	// Dual-byte mode
 	if (m_control_reg[counter] & COUNT_MODE_8BIT)
@@ -234,7 +223,7 @@ void ptm6840_device::subtract_from_counter(int counter, int count)
 
 	if (m_enabled[counter])
 	{
-		attotime duration = attotime::from_hz(clock) * m_counter[counter];
+		attotime duration = attotime::from_hz(clk) * m_counter[counter];
 
 		if (counter == 2)
 		{
@@ -306,7 +295,7 @@ void ptm6840_device::update_interrupts()
 
 uint16_t ptm6840_device::compute_counter( int counter ) const
 {
-	double clock;
+	double clk;
 
 	// If there's no timer, return the count
 	if (!m_enabled[counter])
@@ -318,16 +307,16 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 	// determine the clock frequency for this timer
 	if (m_control_reg[counter] & INTERNAL_CLK_EN)
 	{
-		clock = m_internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), counter, clock));
+		clk = static_cast<double>(clock());
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), counter, clk));
 	}
 	else
 	{
-		clock = m_external_clock[counter];
-		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), counter, clock));
+		clk = m_external_clock[counter];
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), counter, clk));
 	}
 	// See how many are left
-	int remaining = (m_timer[counter]->remaining() * clock).as_double();
+	int remaining = (m_timer[counter]->remaining() * clk).as_double();
 
 	// Adjust the count for dual byte mode
 	if (m_control_reg[counter] & COUNT_MODE_8BIT)
@@ -349,7 +338,7 @@ uint16_t ptm6840_device::compute_counter( int counter ) const
 
 void ptm6840_device::reload_count(int idx)
 {
-	double clock;
+	double clk;
 
 	// Copy the latched value in
 	m_counter[idx] = m_latch[idx];
@@ -361,13 +350,13 @@ void ptm6840_device::reload_count(int idx)
 	// Determine the clock frequency for this timer
 	if (m_control_reg[idx] & INTERNAL_CLK_EN)
 	{
-		clock = m_internal_clock;
-		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), idx, clock));
+		clk = static_cast<double> (clock());
+		PLOG(("MC6840 #%s: %d internal clock freq %f \n", tag(), idx, clk));
 	}
 	else
 	{
-		clock = m_external_clock[idx];
-		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), idx, clock));
+		clk = m_external_clock[idx];
+		PLOG(("MC6840 #%s: %d external clock freq %f \n", tag(), idx, clk));
 	}
 
 	// Determine the number of clock periods before we expire
@@ -390,9 +379,9 @@ void ptm6840_device::reload_count(int idx)
 	}
 
 	// Set the timer
-	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", tag(), idx, clock, count));
+	PLOG(("MC6840 #%s: reload_count(%d): clock = %f  count = %d\n", tag(), idx, clk, count));
 
-	attotime duration = attotime::from_hz(clock) * count;
+	attotime duration = attotime::from_hz(clk) * count;
 	if (idx == 2)
 	{
 		duration *= m_t3_divisor;

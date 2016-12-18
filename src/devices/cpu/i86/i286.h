@@ -10,9 +10,9 @@ extern const device_type I80286;
 
 enum
 {   // same order as I8086 registers
-	I286_PC = 0,
+	I286_PC = STATE_GENPC,
 
-	I286_IP,
+	I286_IP = 1,
 	I286_AX,
 	I286_CX,
 	I286_DX,
@@ -29,7 +29,7 @@ enum
 	I286_DS,
 
 	I286_VECTOR,
-	I286_PENDING,
+	I286_HALT,
 
 	I286_ES_BASE,
 	I286_ES_LIMIT,
@@ -77,7 +77,11 @@ protected:
 	virtual void execute_run() override;
 	virtual void device_reset() override;
 	virtual void device_start() override;
+
+	// device_state_interface overrides
+	virtual void state_import(const device_state_entry &entry) override;
 	virtual void state_string_export(const device_state_entry &entry, std::string &str) const override;
+
 	virtual uint32_t execute_input_lines() const override { return 1; }
 	virtual void execute_set_input(int inputnum, int state) override;
 	bool memory_translate(address_spacenum spacenum, int intention, offs_t &address) override;

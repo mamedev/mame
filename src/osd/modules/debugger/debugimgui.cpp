@@ -1000,6 +1000,7 @@ void debug_imgui::refresh_filelist()
 	util::zippath_directory* dir = nullptr;
 	const char *volume_name;
 	const osd::directory::entry *dirent;
+	uint8_t first = 0;
 
 	// todo
 	m_filelist.clear();
@@ -1019,6 +1020,7 @@ void debug_imgui::refresh_filelist()
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
+		first = m_filelist.size();
 		while((dirent = util::zippath_readdir(dir)) != nullptr)
 		{
 			file_entry temp;
@@ -1040,6 +1042,9 @@ void debug_imgui::refresh_filelist()
 	}
 	if (dir != nullptr)
 		util::zippath_closedir(dir);
+
+	// sort file list, as it is not guaranteed to be in any particular order
+	std::sort(m_filelist.begin()+first,m_filelist.end(),[](file_entry x, file_entry y) { return x.basename < y.basename; } );
 }
 
 void debug_imgui::refresh_typelist()
@@ -1378,7 +1383,7 @@ void debug_imgui::update()
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabHovered,ImVec4(0.7f,0.7f,0.7f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_ScrollbarGrabActive,ImVec4(0.9f,0.9f,0.9f,0.8f));
 	ImGui::PushStyleColor(ImGuiCol_Border,ImVec4(0.7f,0.7f,0.7f,0.8f));
-
+	ImGui::PushStyleColor(ImGuiCol_ComboBg,ImVec4(0.4f,0.4f,0.4f,0.9f));
 	m_text_size = ImGui::CalcTextSize("A");  // hopefully you're using a monospaced font...
 	draw_console();  // We'll always have a console window
 
@@ -1420,7 +1425,7 @@ void debug_imgui::update()
 		global_free(to_delete);
 	}
 
-	ImGui::PopStyleColor(12);
+	ImGui::PopStyleColor(13);
 }
 
 void debug_imgui::init_debugger(running_machine &machine)

@@ -83,7 +83,7 @@ void shootout_state::video_start()
 	m_foreground = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(shootout_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_foreground->set_transparent_pen(0 );
 
-	save_item(NAME(m_bFlicker));
+	save_item(NAME(m_ccnt_old_val));
 }
 
 void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_bits )
@@ -92,7 +92,7 @@ void shootout_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 	const uint8_t *source = m_spriteram+127*4;
 	int count;
 
-	m_bFlicker = !m_bFlicker;
+	bool m_bFlicker = (screen.frame_number () & 1) != 0;
 
 	for( count=0; count<128; count++ )
 	{

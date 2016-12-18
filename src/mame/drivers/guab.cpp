@@ -22,6 +22,7 @@
         count gets updated in the code. Each game requires a unique
         security PAL - maybe this is related? I'm poking the coin values
         directly into RAM for now.
+        * Game hangs when you try to 'collect' cash
         * Verify WD FDC type
         * Are IRQs 1 or 2 connected to something?
         * Hook up ACIA properly (IRQ 4)
@@ -31,6 +32,7 @@
         * Create layouts
 
     Notes:
+        * Toggle both 'Back door' and 'Key switch' to enter test mode
         * Video hardware seems to match JPM System 5
 
 ***************************************************************************/
@@ -63,7 +65,9 @@ public:
 		m_sn(*this, "snsnd"),
 		m_fdc(*this, "fdc"),
 		m_floppy(*this, "fdc:0"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_sound_buffer(0), m_sound_latch(false)
+	{ }
 
 	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE16_MEMBER(tms34061_w);
@@ -77,9 +81,10 @@ public:
 	DECLARE_WRITE8_MEMBER(output5_w);
 	DECLARE_WRITE8_MEMBER(output6_w);
 	DECLARE_READ8_MEMBER(sn76489_ready_r);
-	DECLARE_WRITE8_MEMBER(floppy_ctrl_w);
+	DECLARE_WRITE8_MEMBER(sn76489_buffer_w);
+	DECLARE_WRITE8_MEMBER(system_w);
+	DECLARE_READ8_MEMBER(watchdog_r);
 	DECLARE_WRITE8_MEMBER(watchdog_w);
-	DECLARE_WRITE8_MEMBER(unknown_w);
 
 	DECLARE_INPUT_CHANGED_MEMBER(coin_inserted);
 
@@ -95,6 +100,9 @@ private:
 	required_device<wd1773_t> m_fdc;
 	required_device<floppy_connector> m_floppy;
 	required_device<palette_device> m_palette;
+
+	uint8_t m_sound_buffer;
+	bool m_sound_latch;
 };
 
 
@@ -108,10 +116,7 @@ static ADDRESS_MAP_START( guab_map, AS_PROGRAM, 16, guab_state )
 	AM_RANGE(0x0c0000, 0x0c0007) AM_DEVREADWRITE8("i8255_1", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0020, 0x0c0027) AM_DEVREADWRITE8("i8255_2", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0040, 0x0c0047) AM_DEVREADWRITE8("i8255_3", i8255_device, read, write, 0x00ff)
-	AM_RANGE(0x0c0060, 0x0c0061) AM_READ8(sn76489_ready_r, 0x00ff) AM_DEVWRITE8("snsnd", sn76489_device, write, 0x00ff)
-	AM_RANGE(0x0c0062, 0x0c0063) AM_WRITE8(floppy_ctrl_w, 0x00ff)
-	AM_RANGE(0x0c0064, 0x0c0065) AM_WRITE8(watchdog_w, 0x00ff)
-	AM_RANGE(0x0c0066, 0x0c0067) AM_WRITE8(unknown_w, 0x00ff)
+	AM_RANGE(0x0c0060, 0x0c0067) AM_DEVREADWRITE8("i8255_4", i8255_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0080, 0x0c0081) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0x0c0082, 0x0c0083) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x0c00a0, 0x0c00a1) AM_DEVREADWRITE8("acia6850_2", acia6850_device, status_r, control_w, 0x00ff)
@@ -284,19 +289,36 @@ void guab_state::machine_start()
 	m_fdc->set_floppy(m_floppy->get_device());
 }
 
-WRITE8_MEMBER( guab_state::watchdog_w )
+READ8_MEMBER( guab_state::watchdog_r )
 {
-	// nibbles only
-	// reads from the port, then writes the sequence
-	// b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
-	// after that it just continues writing f to it
+	// only read after writing the sequence below
+	return 0xff;
 }
 
-WRITE8_MEMBER( guab_state::unknown_w )
+WRITE8_MEMBER( guab_state::watchdog_w )
 {
-	// unknown
-	// at startup, 0x88 or 0x98 is written here
-	// while the game is running only 0x88
+	// watchdog?
+	// writes b 3 1 5 d a 2 0 4 0 8   b 3 1 5 d a 2 0 4 0 8
+	// then later toggles between 0 and f
+}
+
+WRITE8_MEMBER( guab_state::system_w )
+{
+	// bit 0, sound latch
+	if (m_sound_latch != bool(BIT(data, 0)))
+	{
+		// falling edge
+		if (!m_sound_latch)
+			m_sn->write(m_sound_buffer);
+
+		m_sound_latch = bool(BIT(data, 0));
+	}
+
+	// bit 3, floppy drive side select
+	m_floppy->get_device()->ss_w(BIT(data, 3));
+
+	// one of those bits will probably control the motor, we just let it run all the time for now
+	m_floppy->get_device()->mon_w(0);
 }
 
 
@@ -319,13 +341,13 @@ INPUT_CHANGED_MEMBER( guab_state::coin_inserted )
 
 WRITE8_MEMBER( guab_state::output1_w )
 {
-	output().set_value("led_0", BIT(data, 0));
-	output().set_value("led_1", BIT(data, 1));
+	output().set_value("led_0", BIT(data, 0)); // cash in (ten up: cash in)
+	output().set_value("led_1", BIT(data, 1)); // cash out (ten up: cash out)
 	output().set_value("led_2", BIT(data, 2));
 	output().set_value("led_3", BIT(data, 3));
 	output().set_value("led_4", BIT(data, 4));
 	output().set_value("led_5", BIT(data, 5));
-	output().set_value("led_6", BIT(data, 6));
+	output().set_value("led_6", BIT(data, 6)); // (ten up: 10p/100p drive)
 	output().set_value("led_7", BIT(data, 7));
 }
 
@@ -333,36 +355,36 @@ WRITE8_MEMBER( guab_state::output2_w )
 {
 	output().set_value("led_8", BIT(data, 0));
 	output().set_value("led_9", BIT(data, 1));
-	output().set_value("led_10", BIT(data, 2));
-	output().set_value("led_11", BIT(data, 3));
-	output().set_value("led_12", BIT(data, 4));
-	output().set_value("led_13", BIT(data, 5));
-	output().set_value("led_14", BIT(data, 6));
-	output().set_value("led_15", BIT(data, 7));
+	output().set_value("led_10", BIT(data, 2));	// start (ten up: start)
+	output().set_value("led_11", BIT(data, 3)); // (ten up: feature 6)
+	output().set_value("led_12", BIT(data, 4)); // (ten up: feature 11)
+	output().set_value("led_13", BIT(data, 5)); // (ten up: feature 13)
+	output().set_value("led_14", BIT(data, 6));	// lamp a (ten up: feature 12)
+	output().set_value("led_15", BIT(data, 7));	// lamp b (ten up: pass)
 }
 
 WRITE8_MEMBER( guab_state::output3_w )
 {
-	output().set_value("led_16", BIT(data, 0));
-	output().set_value("led_17", BIT(data, 1));
-	output().set_value("led_18", BIT(data, 2));
-	output().set_value("led_19", BIT(data, 3));
-	output().set_value("led_20", BIT(data, 4));
-	output().set_value("led_21", BIT(data, 5));
+	output().set_value("led_16", BIT(data, 0));	// select (ten up: collect)
+	output().set_value("led_17", BIT(data, 1)); // (ten up: feature 14)
+	output().set_value("led_18", BIT(data, 2)); // (ten up: feature 9)
+	output().set_value("led_19", BIT(data, 3)); //   (ten up: lamp a)
+	output().set_value("led_20", BIT(data, 4));	// lamp c (ten up: lamp b)
+	output().set_value("led_21", BIT(data, 5));	// lamp d (ten up: lamp c)
 	output().set_value("led_22", BIT(data, 6));
 	output().set_value("led_23", BIT(data, 7));
 }
 
 WRITE8_MEMBER( guab_state::output4_w )
 {
-	output().set_value("led_24", BIT(data, 0));
-	output().set_value("led_25", BIT(data, 1));
-	output().set_value("led_26", BIT(data, 2));
-	output().set_value("led_27", BIT(data, 3));
-	output().set_value("led_28", BIT(data, 4));
-	output().set_value("led_29", BIT(data, 5));
-	output().set_value("led_30", BIT(data, 6));
-	output().set_value("led_31", BIT(data, 7));
+	output().set_value("led_24", BIT(data, 0));	// feature 1 (ten up: feature 1)
+	output().set_value("led_25", BIT(data, 1));	// feature 2 (ten up: feature 10)
+	output().set_value("led_26", BIT(data, 2));	// feature 3 (ten up: feature 7)
+	output().set_value("led_27", BIT(data, 3));	// feature 4 (ten up: feature 2)
+	output().set_value("led_28", BIT(data, 4));	// feature 5 (ten up: feature 8)
+	output().set_value("led_29", BIT(data, 5));	// feature 6 (ten up: feature 3)
+	output().set_value("led_30", BIT(data, 6));	// feature 7 (ten up: feature 4)
+	output().set_value("led_31", BIT(data, 7));	// feature 8 (ten up: feature 5)
 }
 
 WRITE8_MEMBER( guab_state::output5_w )
@@ -374,7 +396,7 @@ WRITE8_MEMBER( guab_state::output5_w )
 	output().set_value("led_36", BIT(data, 4));
 	output().set_value("led_37", BIT(data, 5));
 	output().set_value("led_38", BIT(data, 6));
-	output().set_value("led_39", BIT(data, 7));
+	output().set_value("led_39", BIT(data, 7)); // mech lamp (ten up: mech lamp)
 }
 
 WRITE8_MEMBER( guab_state::output6_w )
@@ -383,8 +405,8 @@ WRITE8_MEMBER( guab_state::output6_w )
 	output().set_value("led_41", BIT(data, 1));
 	output().set_value("led_42", BIT(data, 2));
 	output().set_value("led_43", BIT(data, 3));
-	output().set_value("led_44", BIT(data, 4));
-	output().set_value("led_45", BIT(data, 5));
+	output().set_value("led_44", BIT(data, 4)); // 50p drive (ten up: 10p drive)
+	output().set_value("led_45", BIT(data, 5)); // 100p drive (ten up: 100p drive)
 	output().set_value("led_46", BIT(data, 6));
 	output().set_value("led_47", BIT(data, 7));
 }
@@ -400,18 +422,15 @@ READ8_MEMBER( guab_state::sn76489_ready_r )
 	return ~(m_sn->ready_r() << 7);
 }
 
+WRITE8_MEMBER( guab_state::sn76489_buffer_w )
+{
+	m_sound_buffer = data;
+}
+
 
 //**************************************************************************
 //  FLOPPY DRIVE
 //**************************************************************************
-
-WRITE8_MEMBER( guab_state::floppy_ctrl_w )
-{
-	m_floppy->get_device()->ss_w(BIT(data, 3));
-
-	// one of those bits will probably control the motor, we just let it run all the time for now
-	m_floppy->get_device()->mon_w(0);
-}
 
 FLOPPY_FORMATS_MEMBER( guab_state::floppy_formats )
 	FLOPPY_GUAB_FORMAT
@@ -456,8 +475,7 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_SOUND_ADD("snsnd", SN76489, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MCFG_DEVICE_ADD("6840ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(1000000)
+	MCFG_DEVICE_ADD("6840ptm", PTM6840, 1000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 3))
 
@@ -475,6 +493,13 @@ static MACHINE_CONFIG_START( guab, guab_state )
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, output4_w))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, output5_w))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, output6_w))
+
+	MCFG_DEVICE_ADD("i8255_4", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(READ8(guab_state, sn76489_ready_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(guab_state, sn76489_buffer_w))
+	MCFG_I8255_OUT_PORTB_CB(WRITE8(guab_state, system_w))
+	MCFG_I8255_IN_PORTC_CB(READ8(guab_state, watchdog_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(guab_state, watchdog_w))
 
 	MCFG_DEVICE_ADD("acia6850_1", ACIA6850, 0)
 

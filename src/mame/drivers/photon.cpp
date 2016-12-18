@@ -31,20 +31,24 @@ public:
 		: pk8000_base_state(mconfig, type, tag),
 		m_speaker(*this, "speaker") { }
 
-	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
-	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
-	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
+	DECLARE_WRITE8_MEMBER(_80_porta_w);
+	DECLARE_READ8_MEMBER(_80_portb_r);
+	DECLARE_WRITE8_MEMBER(_80_portc_w);
+
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
-	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
-	void pk8000_set_bank(uint8_t data);
+
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER(irq_callback);
+	void set_bank(uint8_t data);
+
 	required_device<speaker_sound_device> m_speaker;
 };
 
 
-void photon_state::pk8000_set_bank(uint8_t data)
+void photon_state::set_bank(uint8_t data)
 {
 	uint8_t *rom = memregion("maincpu")->base();
 	uint8_t *ram = memregion("maincpu")->base();
@@ -103,17 +107,17 @@ void photon_state::pk8000_set_bank(uint8_t data)
 				break;
 	}
 }
-WRITE8_MEMBER(photon_state::pk8000_80_porta_w)
+WRITE8_MEMBER(photon_state::_80_porta_w)
 {
-	pk8000_set_bank(data);
+	set_bank(data);
 }
 
-READ8_MEMBER(photon_state::pk8000_80_portb_r)
+READ8_MEMBER(photon_state::_80_portb_r)
 {
 	return 0xff;
 }
 
-WRITE8_MEMBER(photon_state::pk8000_80_portc_w)
+WRITE8_MEMBER(photon_state::_80_portc_w)
 {
 	m_speaker->level_w(BIT(data,7));
 }
@@ -130,14 +134,14 @@ static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, photon_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
+	AM_RANGE(0x88, 0x88) AM_READWRITE(video_color_r, video_color_w)
 	AM_RANGE(0x8c, 0x8c) AM_READ_PORT("JOY1")
 	AM_RANGE(0x8d, 0x8d) AM_READ_PORT("JOY2")
-	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(pk8000_color_start_r,pk8000_color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(pk8000_color_r,pk8000_color_w)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(text_start_r, text_start_w)
+	AM_RANGE(0x91, 0x91) AM_READWRITE(chargen_start_r, chargen_start_w)
+	AM_RANGE(0x92, 0x92) AM_READWRITE(video_start_r, video_start_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE(color_start_r, color_start_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE(color_r, color_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( photon )
@@ -155,12 +159,12 @@ static INPUT_PORTS_START( photon )
 	PORT_BIT(0xff, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(photon_state::pk8000_interrupt)
+INTERRUPT_GEN_MEMBER(photon_state::interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
+IRQ_CALLBACK_MEMBER(photon_state::irq_callback)
 {
 	return 0xff;
 }
@@ -168,16 +172,24 @@ IRQ_CALLBACK_MEMBER(photon_state::pk8000_irq_callback)
 
 void photon_state::machine_reset()
 {
-	pk8000_set_bank(0);
+	set_bank(0);
 }
 
 void photon_state::video_start()
 {
+	save_item(NAME(m_text_start));
+	save_item(NAME(m_chargen_start));
+	save_item(NAME(m_video_start));
+	save_item(NAME(m_color_start));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_video_color));
+	save_item(NAME(m_color));
+	save_item(NAME(m_video_enable));
 }
 
-uint32_t photon_state::screen_update_photon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t photon_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return pk8000_video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
+	return video_update(screen, bitmap, cliprect, memregion("maincpu")->base());
 }
 
 static MACHINE_CONFIG_START( photon, photon_state )
@@ -186,8 +198,8 @@ static MACHINE_CONFIG_START( photon, photon_state )
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)
 	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
 	MCFG_CPU_IO_MAP(pk8000_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state,  pk8000_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(photon_state,pk8000_irq_callback)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", photon_state, interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(photon_state, irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -195,21 +207,21 @@ static MACHINE_CONFIG_START( photon, photon_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256+32, 192+32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update_photon)
+	MCFG_SCREEN_UPDATE_DRIVER(photon_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(photon_state, pk8000_80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(photon_state, pk8000_80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(photon_state, pk8000_80_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(photon_state, _80_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(photon_state, _80_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(photon_state, _80_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, pk8000_84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, pk8000_84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, pk8000_84_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, _84_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, _84_porta_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, _84_portc_w))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

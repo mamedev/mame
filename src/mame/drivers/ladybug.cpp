@@ -602,7 +602,7 @@ ROM_START( ladybugb )
 	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
-ROM_START( ladybgb2 )
+ROM_START( ladybugb2 ) // bootleg by Model Racing, PCB marked CS299, manual names it "Coccinelle" (ladybugs in Italian)
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "lb1b.cpu", 0x0000, 0x1000, CRC(35d61e65) SHA1(43b797f1882e0acbf6685deea82de77e78d2c917) )
 	ROM_LOAD( "lb2b.cpu", 0x1000, 0x1000, CRC(a13e0fe4) SHA1(9e2876d8390d2b072d064b197057089a25c13a4a) )
@@ -615,7 +615,7 @@ ROM_START( ladybgb2 )
 	ROM_LOAD( "l9.f7", 0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
 	ROM_LOAD( "l0.h7", 0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_REGION( 0x2000, "gfx2", 0 ) 
 	ROM_LOAD( "l8.l7", 0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
 	ROM_LOAD( "l7.m7", 0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
 
@@ -733,10 +733,10 @@ DRIVER_INIT_MEMBER(ladybug_state,dorodon)
 }
 
 
-GAME( 1981, cavenger, 0,       ladybug, cavenger, driver_device, 0,       ROT0,   "Universal", "Cosmic Avenger", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybug,  0,       ladybug, ladybug, driver_device,  0,       ROT270, "Universal", "Lady Bug", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybugb, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, ladybgb2, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1982, dorodon,  0,       dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 1)", MACHINE_SUPPORTS_SAVE ) // license or bootleg?
-GAME( 1982, dorodon2, dorodon, dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 2)", MACHINE_SUPPORTS_SAVE ) // "
-GAME( 1982, snapjack, 0,       ladybug, snapjack, driver_device, 0,       ROT0,   "Universal", "Snap Jack", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, cavenger,  0,       ladybug, cavenger, driver_device, 0,       ROT0,   "Universal", "Cosmic Avenger", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybug,   0,       ladybug, ladybug, driver_device,  0,       ROT270, "Universal", "Lady Bug", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb,  ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg",   "Lady Bug (bootleg set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, ladybugb2, ladybug, ladybug, ladybug, driver_device,  0,       ROT270, "bootleg (Model Racing)", "Coccinelle (bootleg of Lady Bug, set 2)", MACHINE_SUPPORTS_SAVE ) // title removed, but manual names it Coccinelle
+GAME( 1982, dorodon,   0,       dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 1)", MACHINE_SUPPORTS_SAVE ) // license or bootleg?
+GAME( 1982, dorodon2,  dorodon, dorodon, dorodon, ladybug_state,  dorodon, ROT270, "UPL (Falcon license?)", "Dorodon (set 2)", MACHINE_SUPPORTS_SAVE ) // "
+GAME( 1982, snapjack,  0,       ladybug, snapjack, driver_device, 0,       ROT0,   "Universal", "Snap Jack", MACHINE_SUPPORTS_SAVE )

@@ -1650,6 +1650,23 @@ ROM_START( wownfant)
 	ROM_LOAD( "ep-4001 42750001 u1.bin",    0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
 ROM_END
 
+ROM_START( missw02)
+	ROM_REGION( 0x500000, "maincpu", 0 )    /* 68000 code */
+	ROM_LOAD16_BYTE( "8.u81",      0x000000, 0x80000,  CRC(316666d0) SHA1(0ebebc55b49c1d00adac2b04bcfe9cfb317e8e74) ) // stickered as Miss World 2002 Rev.A
+	ROM_LOAD16_BYTE( "7.u80",      0x000001, 0x80000,  CRC(d61f4d18) SHA1(caef5fb221cafc354875ef5b68e84419f91c0db7) )
+	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x200000, CRC(fdfe36ba) SHA1(128277e44e2368267e097bb3510c797cc690d1ff) )
+	ROM_LOAD16_WORD_SWAP( "4.bin", 0x300000, 0x200000, CRC(aa769a81) SHA1(2beb6da9327ddce7bec934bcf610061fc3b9ab09) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )   /* sprites */
+	ROM_LOAD( "6.u113", 0x00000, 0x80000, CRC(3e77ca1f) SHA1(f946e65a29bc02b89c02b2a869578d38cfe7e2d0) ) // same as wowfant
+	ROM_LOAD( "5.u112", 0x80000, 0x80000, CRC(ead3411d) SHA1(ee1b071e4a556b66ecdedcdc7e1ee60851c0ddb0) )
+
+	ROM_REGION( 0x100000, "oki", 0 )    /* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "2.u4", 0x00000, 0x80000, CRC(06dc889e) SHA1(726561ff01bbde43669293a6ff7ee22b048b4118) ) // these 2 same as wowfant
+	ROM_LOAD( "1.u1", 0x80000, 0x80000, CRC(864167c2) SHA1(c454b26b6dea993e6bd64546f92beef05e46d7d7) )
+ROM_END
+
 ROM_START( galhustl ) // An original PCB has been seen with genuine AFEGA labels
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "ue17.3", 0x00000, 0x80000, CRC(b2583dbb) SHA1(536f4aa2246ec816c4f270f9d42acc090718ee8b) ) // Also found as AFEGA 3
@@ -1824,27 +1841,28 @@ GAME( 1994, fantasiaa, fantasia, comad,    fantasia, expro02_state, expro02, ROT
 /* subsequent releases remove the encrypted tile (View2 layer) but leave the unused writes to it in the program code */
 GAME( 1994, fantasian,fantasia, fantasia,  fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Fantasia (940803 PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1994, supmodel, 0,        supmodel, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "Super Model",MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 GAME( 1995, newfant,  0,        fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1995 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // the only difference between the two is the gfx rom containing the copyright
 GAME( 1994, newfanta, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Comad & New Japan System", "New Fantasia (1994 copyright)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1995, fantsy95, newfant,  fantasia, fantasiaa, driver_device, 0, ROT90, "Hi-max Technology Inc.",   "Fantasy '95", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "C" nudity level
 
 // the PCB label (A/B) could be related to the 3 different levels of nudity Comad offered
-GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1996, missw96c, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1996, missw96,  0,        fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 1)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96a, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 2)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96b, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000A PCB, set 3)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "A" nudity level
+GAME( 1996, missw96c, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss World '96 (Nude) (C-3000B PCB)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )        // "B" nudity level
 
 GAME( 1996, missmw96, missw96,  fantasia, missw96,   driver_device, 0, ROT0,  "Comad",                    "Miss Mister World '96 (Nude)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1996, smissw,   0,        smissw,   missw96,   driver_device, 0, ROT0,  "Comad",                    "Super Miss World", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // 951127 PCB
 
-GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1997, fantsia2, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )      // "A" nudity level
+GAME( 1997, fantsia2a,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (Less Explicit)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 1998, fantsia2n,fantsia2, fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "Fantasia II (1998)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )          // "A" nudity level
 
-GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 2002, wownfant, 0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Comad",                    "WOW New Fantasia", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // "B" nudity level
+GAME( 2002, missw02,  0,        fantsia2, missw96,   driver_device, 0, ROT0,  "Daigom",                   "Miss World 2002", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )  // "A" nudity level
 
 GAME( 1996, pgalvip,  0,        galhustl, galhustl,  driver_device, 0, ROT0,  "ACE International / Afega","Pocket Gals V.I.P (set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE ) // roms were all AFEGA stickered, select screen seems wrong? maybe not a final version.
 GAME( 1997, pgalvipa, pgalvip,  galhustl, galhustl,  driver_device, 0, ROT0,  "<unknown>",                "Pocket Gals V.I.P (set 2)", MACHINE_SUPPORTS_SAVE )

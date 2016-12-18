@@ -4,21 +4,19 @@
 *
 *   Motorola MC68230 PI/T Parallel Interface and Timer
 *
-* PORT MODES INCLUDE :
-* - BIT I/O
-* - UNIDIRECTIONAL 8 BIT AND 16 BIT
-* - BIDIRECTIONAL 8 BIT AND 16 BIT
-* PROGRAMMABLE HANDSHAKING OPTIONS
-* 24-BIT PROGRAMMABLE TIMER MODES
-* FIVE SEPARATE INTERRUPT VECTORS SEPARATE PORT AND TIMER INTERRUPT SERVICE REQUESTS
-* REGISTERS AREREAD/WRITEAND DIRECTLY ADDRESSABLE
-* REGISTERS ARE ADDRESSED FOR MOVEP (Move Peripheral) AND DMAC COMPATIBILITY
-*
-*  Revisions: 2015-07-15 JLE initial
+* Port modes include :
+* - bit i/o
+* - unidirectional 8 bit and 16 bit
+* - bidirectional 8 bit and 16 bit
+* Programmable handshaking options
+* 24-bit programmable timer modes
+* Five separate interrupt vectors separate port and timer interrupt service requests
+* Registers are read/write and directly addressable
+* Registers are addressed for movep (move peripheral) and dmac compatibility
 *
 *  Todo
 *  - Complete support for clock and timers
-*  - Add interrupt support
+*  - Complete interrupt support
 *  - Add DMA support
 *  - Add appropriate buffering for each submode
 **********************************************************************/
@@ -30,6 +28,7 @@
 #define LOGPRINT(x) { do { if (VERBOSE) logerror x; } while (0); }
 #define LOG(x)      {} LOGPRINT(x)
 #define LOGR(x)     {} LOGPRINT(x)
+#define LOGBIT(x)   {} LOGPRINT(x)
 #define LOGDR(x)    {} LOGPRINT(x)
 #define LOGINT(x)   {} LOGPRINT(x)
 #define LOGSETUP(x) {} LOGPRINT(x)
@@ -66,6 +65,8 @@ pit68230_device::pit68230_device(const machine_config &mconfig, device_type type
 	, m_h2_out_cb (*this)
 	, m_h3_out_cb (*this)
 	, m_h4_out_cb (*this)
+	, m_tirq_out_cb (*this)
+	, m_pirq_out_cb (*this)
 	, m_pgcr(0)
 	, m_psrr(0)
 	, m_paddr(0)
@@ -102,6 +103,8 @@ pit68230_device::pit68230_device(const machine_config &mconfig, const char *tag,
 	, m_h2_out_cb(*this)
 	, m_h3_out_cb(*this)
 	, m_h4_out_cb(*this)
+	, m_tirq_out_cb (*this)
+	, m_pirq_out_cb (*this)
 	, m_pgcr(0)
 	, m_psrr(0)
 	, m_paddr(0)
@@ -143,6 +146,8 @@ void pit68230_device::device_start ()
 	m_h2_out_cb.resolve_safe();
 	m_h3_out_cb.resolve_safe();
 	m_h4_out_cb.resolve_safe();
+	m_tirq_out_cb.resolve_safe();
+	m_pirq_out_cb.resolve_safe();
 
 	// Timers
 	pit_timer = timer_alloc(TIMER_ID_PIT);
@@ -179,7 +184,7 @@ void pit68230_device::device_reset ()
 	m_paddr = 0;
 	m_pbddr = 0;
 	m_pcddr = 0;
-	m_pivr = 0x0f;
+	m_pivr = 0x0f;  m_pirq_out_cb(CLEAR_LINE);
 	m_pacr = 0; m_h2_out_cb(CLEAR_LINE);
 	m_pbcr = 0; m_h4_out_cb(CLEAR_LINE);
 	m_padr = 0; m_pa_out_cb((offs_t)0, m_padr);
@@ -187,8 +192,50 @@ void pit68230_device::device_reset ()
 	m_pcdr = 0; m_pc_out_cb((offs_t)0, m_pcdr);
 	m_psr = 0;
 	m_tcr = 0;
-	m_tivr = 0x0f;
+	m_tivr = 0x0f; m_tirq_out_cb(CLEAR_LINE);
 	m_tsr = 0;
+}
+
+/*
+ * PIACK* provides the Port vector in an iack cycle modified by source H1-H4
+ */
+uint8_t pit68230_device::irq_piack()
+{
+	LOGINT(("%s %s <- %02x\n",tag(), FUNCNAME, m_pivr));
+	return m_pivr;
+}
+
+/*
+ * TIACK* provides the Timer vector in an iack cycle
+ */
+uint8_t pit68230_device::irq_tiack()
+{
+	LOGINT(("%s %s <- %02x\n",tag(), FUNCNAME, m_tivr));
+	return m_tivr;
+}
+
+/*
+ * trigger_interrupt - called when a potential interrupt condition occurs 
+ * but will only generate an interrupt when the PIT is programmed to do so.
+ */
+void pit68230_device::trigger_interrupt(int source)
+{
+	LOGINT(("%s %s Source: %02x\n",tag(), FUNCNAME, source));
+
+	if (source == INT_TIMER)
+	{
+		// TODO: implement priorities and support nested interrupts
+		if ( (m_tcr & REG_TCR_TOUT_TIACK_MASK) == REG_TCR_TOUT_TIACK_INT ||
+			 (m_tcr & REG_TCR_TOUT_TIACK_MASK) == REG_TCR_TOUT_PC7_INT )
+			{
+				m_tirq_out_cb(ASSERT_LINE);
+			}
+	}
+	else
+	{
+		// TODO: implement priorities and support nested interrupts for the H1-H4 sources
+		m_pirq_out_cb(ASSERT_LINE);
+	}
 }
 
 void pit68230_device::tick_clock()
@@ -197,13 +244,13 @@ void pit68230_device::tick_clock()
     {
 		if (m_cntr-- == 0) // Zero detect
 		{
-			LOG(("Timer reached zero!\n"));
-			/* TODO: Check mode and use preload value if required or just rollover 24 bit */
+			LOGINT(("Timer reached zero!\n"));
 			if ((m_tcr & REG_TCR_ZD) == 0)
 				m_cntr = m_cpr;
 			else // mask off to 24 bit on rollover
 				m_cntr &= 0xffffff;
 			m_tsr = 1;
+			trigger_interrupt(INT_TIMER);
 		}
 	}
 }
@@ -219,7 +266,7 @@ void pit68230_device::device_timer (emu_timer &timer, device_timer_id id, int32_
 		tick_clock();
 		break;
 	default:
-		LOGINT(("Unhandled Timer ID %d\n", id));
+		LOG(("Unhandled Timer ID %d\n", id));
 		break;
 	}
 }
@@ -229,23 +276,64 @@ void pit68230_device::h1_set (uint8_t state)
 	if (state) m_psr |= 1; else m_psr &= ~1;
 }
 
+// TODO: remove this method and replace it with a call to pb_update_bit() in force68k.cpp
 void pit68230_device::portb_setbit(uint8_t bit, uint8_t state)
 {
 	if (state) m_pbdr |= (1 << bit); else m_pbdr &= ~(1 << bit);
 }
 
-// Bit updaters will make it possible to move registers to private data
-// TODO: Make sure to only update input bits and that the port is in the right alternate mode
-void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state){ if (state) m_padr |= (1 << bit); else m_padr &= ~(1 << bit); }
-void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state){ if (state) m_pbdr |= (1 << bit); else m_pbdr &= ~(1 << bit); }
-void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state){ if (state) m_pcdr |= (1 << bit); else m_pcdr &= ~(1 << bit); }
+void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state)
+{
+	LOGBIT(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_paddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port A that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_padr |= (1 << bit);
+	else
+		m_padr &= ~(1 << bit);
+}
+
+void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state)
+{
+	LOGBIT(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_pbddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port B that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_pbdr |= (1 << bit);
+	else
+		m_pbdr &= ~(1 << bit);
+}
+
+// TODO: Make sure port C is in the right alternate mode
+void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state)
+{
+	LOGBIT(("%s %s bit %d to %d\n",tag(), FUNCNAME, bit, state));
+	// Check if requested bit is an output bit and can't be affected
+	if (m_pcddr & (1 << bit))
+	{
+		LOG(("- 68230 PIT: tried to set input bit at port C that is programmed as output!\n"));
+		return;
+	}
+	if (state)
+		m_pcdr |= (1 << bit);
+	else
+		m_pcdr &= ~(1 << bit);
+}
 
 void pit68230_device::update_tin(uint8_t state)
-{ 
+{
 	// Tick clock on falling edge. TODO: check what flank is correct
 	if (state == CLEAR_LINE)
 	{
-		tick_clock(); 
+		tick_clock();
 	}
 
 	pc_update_bit(REG_PCDR_TIN_BIT, state == ASSERT_LINE ? 0 : 1);
@@ -324,7 +412,7 @@ void pit68230_device::wr_pitreg_pacr(uint8_t data)
 	 * 1 X1  Output pin - asserted, H2S is always cleared.
 	 */
 	if (m_pgcr & REG_PGCR_H12_ENABLE)
-	{ 
+	{
 		if (m_pacr & REG_PACR_H2_CTRL_IN_OUT)
 		{
 			switch(m_pacr & REG_PACR_H2_CTRL_MASK)
@@ -349,8 +437,8 @@ void pit68230_device::wr_pitreg_pacr(uint8_t data)
 	}
 	else
 	{
-		LOG((" - H2 cleared because beeing disabled in PGCR\n"));
-		m_h2_out_cb(CLEAR_LINE); 
+		LOG((" - H2 cleared because being disabled in PGCR\n"));
+		m_h2_out_cb(CLEAR_LINE);
 	}
 }
 
@@ -385,7 +473,7 @@ void pit68230_device::wr_pitreg_pbcr(uint8_t data)
 	}
 	else
 	{
-		LOG((" - H4 cleared because beeing disabled in PGCR\n"));
+		LOG((" - H4 cleared because being disabled in PGCR\n"));
 		m_h4_out_cb(CLEAR_LINE);
 	}
 }
@@ -393,7 +481,7 @@ void pit68230_device::wr_pitreg_pbcr(uint8_t data)
 void pit68230_device::wr_pitreg_padr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_padr |= (data & m_paddr);
+	m_padr = (data & m_paddr);
 
 	// callback
 	m_pa_out_cb ((offs_t)0, m_padr);
@@ -402,7 +490,7 @@ void pit68230_device::wr_pitreg_padr(uint8_t data)
 void pit68230_device::wr_pitreg_pbdr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_pbdr |= (data & m_pbddr);
+	m_pbdr = (data & m_pbddr);
 
 	// callback
 	m_pb_out_cb ((offs_t)0, m_pbdr & m_pbddr);
@@ -411,7 +499,7 @@ void pit68230_device::wr_pitreg_pbdr(uint8_t data)
 void pit68230_device::wr_pitreg_pcdr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": %s - %02x\n", FUNCNAME, data, tag(), FUNCNAME, data));
-	m_pcdr |= (data & m_pcddr);
+	m_pcdr = (data & m_pcddr);
 
 	// callback
 	m_pc_out_cb ((offs_t)0, m_pcdr);
@@ -502,19 +590,19 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 	case REG_TCR_PC3_PC7:
 	case REG_TCR_PC3_PC7_DC:        LOG(("- PC3 and PC7 used as I/O pins\n")); break;
 	case REG_TCR_TOUT_PC7_SQ:
-	case REG_TCR_TOUT_PC7_SQ_DC:    LOG(("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not supported yet\n")); sqr = 1; break;
-	case REG_TCR_TOUT_TIACK:        LOG(("- PC3 used as TOUT and PC7 used as TIACK - not supported yet\n")); tout = 1; tiack = 1; break;
-	case REG_TCR_TOUT_TIACK_INT:    LOG(("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled - not supported yet\n")); tout = 1; tiack = 1; irq = 1; break;
-	case REG_TCR_TOUT_PC7:          LOG(("- PC3 used as TOUT and PC7 used as I/O pin - not supported yet\n")); break;
-	case REG_TCR_TOUT_PC7_INT:      LOG(("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled - not supported yet\n")); break;
+	case REG_TCR_TOUT_PC7_SQ_DC:    LOG(("- PC3 used as SQuare wave TOUT and PC7 used as I/O pin - not implemented yet\n"));        sqr = 1; break;
+	case REG_TCR_TOUT_TIACK:        LOG(("- PC3 used as TOUT and PC7 used as TIACK - not implemented yet\n")); tout = 1; tiack = 1;          break;
+	case REG_TCR_TOUT_TIACK_INT:    LOG(("- PC3 used as TOUT and PC7 used as TIACK, Interrupts enabled\n"));   tout = 1; tiack = 1; irq = 1; break;
+	case REG_TCR_TOUT_PC7:          LOG(("- PC3 used as TOUT and PC7 used as I/O pin - not implemented yet\n"));                             break;
+	case REG_TCR_TOUT_PC7_INT:      LOG(("- PC3 used as TOUT and PC7 used as I/O pin, Interrupts enabled\n")); tout = 1; irq = 1;            break;
 	}
 
 	switch (m_tcr & REG_TCR_CC_MASK)
 	{
-	case REG_TCR_CC_PC2_CLK_PSC:    LOG(("- PC2 used as I/O pin,CLK and x32 prescaler are used\n")); clk = 1; psc = 1; break;
-	case REG_TCR_CC_TEN_CLK_PSC:    LOG(("- PC2 used as Timer enable/disable, CLK and presacaler are used\n")); pen = 1; clk = 1; psc = 1; break;
-	case REG_TCR_CC_TIN_PSC:        LOG(("- PC2 used as Timer clock and the presacaler is used - not supported yet\n")); psc = 1; break;
-	case REG_TCR_CC_TIN_RAW:        LOG(("- PC2 used as Timer clock and the presacaler is NOT used - not supported yet\n")); break;
+	case REG_TCR_CC_PC2_CLK_PSC:    LOG(("- PC2 used as I/O pin,CLK and x32 prescaler are used\n"));                                       clk = 1; psc = 1; break;
+	case REG_TCR_CC_TEN_CLK_PSC:    LOG(("- PC2 used as Timer enable/disable, CLK and presacaler are used - not implemented\n")); pen = 1; clk = 1; psc = 1; break;
+	case REG_TCR_CC_TIN_PSC:        LOG(("- PC2 used as Timer clock and the presacaler is used - not implemented\n"));                              psc = 1; break;
+	case REG_TCR_CC_TIN_RAW:        LOG(("- PC2 used as Timer clock and the presacaler is NOT used\n")); break;
 	}
 	LOG(("%s", m_tcr & REG_TCR_ZR ? "- Spec violation, should always be 0!\n" : ""));
 	LOG(("- Timer %s when reaching 0 (zero)\n", m_tcr & REG_TCR_ZD ? "rolls over" : "reload the preload values"));
@@ -523,7 +611,10 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 	if (m_tcr & REG_TCR_ENABLE)
 	{
 		m_cntr = 0;
-		if (pen == 1){ LOG(("PC2 enable/disable TBD\n")); }
+		if (pen == 1)
+		{ 
+			LOG(("PC2 enable/disable TBD\n")); 
+		}
 		if (clk == 1)
 		{
 			int rate = clock() / (psc == 1 ? 32 : 1);
@@ -568,7 +659,11 @@ void pit68230_device::wr_pitreg_cprl(uint8_t data)
 void pit68230_device::wr_pitreg_tsr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, tag()));
-	if (data & 1) m_tsr = 0; // A write resets the TSR;
+	if (data & 1) 
+	{
+		m_tsr = 0; // A write resets the TSR;
+		m_tirq_out_cb(CLEAR_LINE);
+	}
 }
 
 WRITE8_MEMBER (pit68230_device::write)

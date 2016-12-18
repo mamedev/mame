@@ -40,21 +40,25 @@ public:
 		, m_bank8(*this, "bank8")
 		, m_io_joy1(*this, "JOY1")
 		, m_io_joy2(*this, "JOY2")
+		, m_keyboard(*this, "LINE%u", 0)
 	{ }
 
 	uint8_t m_keyboard_line;
-	DECLARE_READ8_MEMBER(pk8000_joy_1_r);
-	DECLARE_READ8_MEMBER(pk8000_joy_2_r);
+
+	DECLARE_READ8_MEMBER(joy_1_r);
+	DECLARE_READ8_MEMBER(joy_2_r);
+	DECLARE_WRITE8_MEMBER(_80_porta_w);
+	DECLARE_READ8_MEMBER(_80_portb_r);
+	DECLARE_WRITE8_MEMBER(_80_portc_w);
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	uint32_t screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(pk8000_interrupt);
-	DECLARE_WRITE8_MEMBER(pk8000_80_porta_w);
-	DECLARE_READ8_MEMBER(pk8000_80_portb_r);
-	DECLARE_WRITE8_MEMBER(pk8000_80_portc_w);
 
-	IRQ_CALLBACK_MEMBER(pk8000_irq_callback);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	INTERRUPT_GEN_MEMBER(interrupt);
+	IRQ_CALLBACK_MEMBER(irq_callback);
 
 protected:
 	required_device<cpu_device> m_maincpu;
@@ -72,14 +76,14 @@ protected:
 	required_memory_bank m_bank8;
 	required_ioport m_io_joy1;
 	required_ioport m_io_joy2;
-	ioport_port *m_io_port[10];
+	required_ioport_array<10> m_keyboard;
 
-	void pk8000_set_bank(uint8_t data);
+	void set_bank(uint8_t data);
 };
 
 
 
-void pk8000_state::pk8000_set_bank(uint8_t data)
+void pk8000_state::set_bank(uint8_t data)
 {
 	uint8_t *rom = m_region_maincpu->base();
 	uint8_t *ram = m_ram->pointer();
@@ -138,20 +142,20 @@ void pk8000_state::pk8000_set_bank(uint8_t data)
 				break;
 	}
 }
-WRITE8_MEMBER(pk8000_state::pk8000_80_porta_w)
+WRITE8_MEMBER(pk8000_state::_80_porta_w)
 {
-	pk8000_set_bank(data);
+	set_bank(data);
 }
 
-READ8_MEMBER(pk8000_state::pk8000_80_portb_r)
+READ8_MEMBER(pk8000_state::_80_portb_r)
 {
 	if(m_keyboard_line>9) {
 		return 0xff;
 	}
-	return m_io_port[m_keyboard_line]->read();
+	return m_keyboard[m_keyboard_line]->read();
 }
 
-WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
+WRITE8_MEMBER(pk8000_state::_80_portc_w)
 {
 	m_keyboard_line = data & 0x0f;
 
@@ -161,13 +165,13 @@ WRITE8_MEMBER(pk8000_state::pk8000_80_portc_w)
 	m_cassette->output((BIT(data, 6)) ? +1.0 : 0.0);
 }
 
-READ8_MEMBER(pk8000_state::pk8000_joy_1_r)
+READ8_MEMBER(pk8000_state::joy_1_r)
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy1->read() & 0x7f;
 	return retVal;
 }
-READ8_MEMBER(pk8000_state::pk8000_joy_2_r)
+READ8_MEMBER(pk8000_state::joy_2_r)
 {
 	uint8_t retVal = (m_cassette->input() > 0.0038 ? 0x80 : 0);
 	retVal |= m_io_joy2->read() & 0x7f;
@@ -186,14 +190,14 @@ static ADDRESS_MAP_START( pk8000_io , AS_IO, 8, pk8000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 	AM_RANGE(0x84, 0x87) AM_DEVREADWRITE("ppi8255_2", i8255_device, read, write)
-	AM_RANGE(0x88, 0x88) AM_READWRITE(pk8000_video_color_r,pk8000_video_color_w)
-	AM_RANGE(0x8c, 0x8c) AM_READ(pk8000_joy_1_r)
-	AM_RANGE(0x8d, 0x8d) AM_READ(pk8000_joy_2_r)
-	AM_RANGE(0x90, 0x90) AM_READWRITE(pk8000_text_start_r,pk8000_text_start_w)
-	AM_RANGE(0x91, 0x91) AM_READWRITE(pk8000_chargen_start_r,pk8000_chargen_start_w)
-	AM_RANGE(0x92, 0x92) AM_READWRITE(pk8000_video_start_r,pk8000_video_start_w)
-	AM_RANGE(0x93, 0x93) AM_READWRITE(pk8000_color_start_r,pk8000_color_start_w)
-	AM_RANGE(0xa0, 0xbf) AM_READWRITE(pk8000_color_r,pk8000_color_w)
+	AM_RANGE(0x88, 0x88) AM_READWRITE(video_color_r, video_color_w)
+	AM_RANGE(0x8c, 0x8c) AM_READ(joy_1_r)
+	AM_RANGE(0x8d, 0x8d) AM_READ(joy_2_r)
+	AM_RANGE(0x90, 0x90) AM_READWRITE(text_start_r, text_start_w)
+	AM_RANGE(0x91, 0x91) AM_READWRITE(chargen_start_r, chargen_start_w)
+	AM_RANGE(0x92, 0x92) AM_READWRITE(video_start_r, video_start_w)
+	AM_RANGE(0x93, 0x93) AM_READWRITE(color_start_r, color_start_w)
+	AM_RANGE(0xa0, 0xbf) AM_READWRITE(color_r, color_w)
 ADDRESS_MAP_END
 
 /*   Input ports */
@@ -308,12 +312,12 @@ static INPUT_PORTS_START( pk8000 )
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED)
 INPUT_PORTS_END
 
-INTERRUPT_GEN_MEMBER(pk8000_state::pk8000_interrupt)
+INTERRUPT_GEN_MEMBER(pk8000_state::interrupt)
 {
 	device.execute().set_input_line(0, HOLD_LINE);
 }
 
-IRQ_CALLBACK_MEMBER(pk8000_state::pk8000_irq_callback)
+IRQ_CALLBACK_MEMBER(pk8000_state::irq_callback)
 {
 	return 0xff;
 }
@@ -321,26 +325,29 @@ IRQ_CALLBACK_MEMBER(pk8000_state::pk8000_irq_callback)
 
 void pk8000_state::machine_start()
 {
-	static const char *const keynames[] = { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-
-	for ( int i = 0; i < 10; i++ )
-	{
-		m_io_port[i] = ioport(keynames[i]);
-	}
+	save_item(NAME(m_keyboard_line));
 }
 
 void pk8000_state::machine_reset()
 {
-	pk8000_set_bank(0);
+	set_bank(0);
 }
 
 void pk8000_state::video_start()
 {
+	save_item(NAME(m_text_start));
+	save_item(NAME(m_chargen_start));
+	save_item(NAME(m_video_start));
+	save_item(NAME(m_color_start));
+	save_item(NAME(m_video_mode));
+	save_item(NAME(m_video_color));
+	save_item(NAME(m_color));
+	save_item(NAME(m_video_enable));
 }
 
-uint32_t pk8000_state::screen_update_pk8000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pk8000_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	return pk8000_video_update(screen, bitmap, cliprect, m_ram->pointer());
+	return video_update(screen, bitmap, cliprect, m_ram->pointer());
 }
 
 static MACHINE_CONFIG_START( pk8000, pk8000_state )
@@ -348,8 +355,8 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_CPU_ADD("maincpu",I8080, 1780000)
 	MCFG_CPU_PROGRAM_MAP(pk8000_mem)
 	MCFG_CPU_IO_MAP(pk8000_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8000_state,  pk8000_interrupt)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8000_state,pk8000_irq_callback)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pk8000_state,  interrupt)
+	MCFG_CPU_IRQ_ACKNOWLEDGE_DRIVER(pk8000_state, irq_callback)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -357,21 +364,21 @@ static MACHINE_CONFIG_START( pk8000, pk8000_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256+32, 192+32)
 	MCFG_SCREEN_VISIBLE_AREA(0, 256+32-1, 0, 192+32-1)
-	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update_pk8000)
+	MCFG_SCREEN_UPDATE_DRIVER(pk8000_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 16)
 	MCFG_PALETTE_INIT_OWNER(pk8000_base_state, pk8000)
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_state, pk8000_80_porta_w))
-	MCFG_I8255_IN_PORTB_CB(READ8(pk8000_state, pk8000_80_portb_r))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_state, pk8000_80_portc_w))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_state, _80_porta_w))
+	MCFG_I8255_IN_PORTB_CB(READ8(pk8000_state, _80_portb_r))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_state, _80_portc_w))
 
 	MCFG_DEVICE_ADD("ppi8255_2", I8255, 0)
-	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, pk8000_84_porta_r))
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, pk8000_84_porta_w))
-	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state,pk8000_84_portc_w))
+	MCFG_I8255_IN_PORTA_CB(READ8(pk8000_base_state, _84_porta_r))
+	MCFG_I8255_OUT_PORTA_CB(WRITE8(pk8000_base_state, _84_porta_w))
+	MCFG_I8255_OUT_PORTC_CB(WRITE8(pk8000_base_state, _84_portc_w))
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -408,6 +415,6 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1987, vesta,  0,       0,     pk8000,     pk8000, driver_device,   0,   "BP EVM",   "PK8000 Vesta",       0)
-COMP( 1987, hobby,  vesta,   0,     pk8000,     pk8000, driver_device,   0,   "BP EVM",   "PK8000 Sura/Hobby",  0)
-COMP( 1987, pk8002, vesta,   0,     pk8000,     pk8000, driver_device,   0,   "<unknown>",   "PK8002 Elf",  MACHINE_NOT_WORKING)
+COMP( 1987, vesta,  0,       0,     pk8000,     pk8000, driver_device,   0,   "BP EVM",   "PK8000 Vesta",       0 )
+COMP( 1987, hobby,  vesta,   0,     pk8000,     pk8000, driver_device,   0,   "BP EVM",   "PK8000 Sura/Hobby",  0 )
+COMP( 1987, pk8002, vesta,   0,     pk8000,     pk8000, driver_device,   0,   "<unknown>",   "PK8002 Elf",  MACHINE_NOT_WORKING )

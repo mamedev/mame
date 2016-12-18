@@ -25,6 +25,7 @@
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
 #include "lightfgt.lh" // clickable
+#include "qkracer.lh"
 
 //#include "hh_cop400_test.lh" // common test-layout - use external artwork
 
@@ -497,8 +498,7 @@ public:
 void einvaderc_state::prepare_display()
 {
 	// D0-D2 are 7segs
-	for (int y = 0; y < 3; y++)
-		m_display_segmask[y] = 0x7f;
+	set_display_segmask(7, 0x7f);
 
 	// update display
 	uint8_t l = BITSWAP8(m_l,7,6,0,1,2,3,4,5);
@@ -1150,6 +1150,129 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  National Semiconductor QuizKid Racer (COP420 version)
+  * COP420 MCU label COP420-NPG/N
+
+***************************************************************************/
+
+class qkracer_state : public hh_cop400_state
+{
+public:
+	qkracer_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_cop400_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE8_MEMBER(write_d);
+	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_WRITE8_MEMBER(write_l);
+	DECLARE_READ8_MEMBER(read_in);
+	DECLARE_WRITE_LINE_MEMBER(write_sk);
+};
+
+// handlers
+
+void qkracer_state::prepare_display()
+{
+	set_display_segmask(0xff, 0x7f);
+
+	display_matrix(7, 9, m_l, (m_d | m_g << 4 | m_sk << 8) ^ 0xff);
+}
+
+WRITE8_MEMBER(qkracer_state::write_d)
+{
+	// D: select digit, D3: input mux high bit
+	m_inp_mux = (m_inp_mux & 0xf) | (data << 1 & 0x10);
+	m_d = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(qkracer_state::write_g)
+{
+	// G: select digit, input mux
+	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
+	m_g = data;
+	prepare_display();
+}
+
+WRITE8_MEMBER(qkracer_state::write_l)
+{
+	// L0-L6: digit segment data
+	m_l = data & 0x7f;
+	prepare_display();
+}
+
+READ8_MEMBER(qkracer_state::read_in)
+{
+	// IN: multiplexed inputs
+	return read_inputs(5) & 0xf;
+}
+
+WRITE_LINE_MEMBER(qkracer_state::write_sk)
+{
+	// SK: green led
+	m_sk = state;
+	prepare_display();
+}
+
+
+// config
+
+static INPUT_PORTS_START( qkracer )
+	PORT_START("IN.0") // G0 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+
+	PORT_START("IN.1") // G1 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+
+	PORT_START("IN.2") // G2 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+
+	PORT_START("IN.3") // G3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("Slow")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_EQUALS) PORT_NAME("Fast")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+
+	PORT_START("IN.4") // D3 port IN
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Amateur")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_W) PORT_NAME("Pro")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_E) PORT_NAME("Complex")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Tables")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( qkracer, qkracer_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_WRITE_D_CB(WRITE8(qkracer_state, write_d))
+	MCFG_COP400_WRITE_G_CB(WRITE8(qkracer_state, write_g))
+	MCFG_COP400_WRITE_L_CB(WRITE8(qkracer_state, write_l))
+	MCFG_COP400_READ_IN_CB(READ8(qkracer_state, read_in))
+	MCFG_COP400_WRITE_SK_CB(WRITELINE(qkracer_state, write_sk))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_cop400_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_qkracer)
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   Game driver(s)
 
 ***************************************************************************/
@@ -1202,6 +1325,12 @@ ROM_START( bship82 )
 ROM_END
 
 
+ROM_START( qkracer )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "cop420-npg_n", 0x0000, 0x0400, CRC(17f8e538) SHA1(23d1a1819e6ba552d8da83da2948af1cf5b13d5b) )
+ROM_END
+
+
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Castle Toy", "Einstein (Castle Toy)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
@@ -1216,6 +1345,8 @@ CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mat
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   driver_device, 0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
+
+CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   driver_device, 0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.

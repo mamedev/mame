@@ -78,8 +78,9 @@ PCB board that connects to 044 boards via J6 & J7
     Adds the abillity to use legacy 038 EPROM based software
     or 039 EPROM + SIMM software
 
-
-
+More chips (from eBay auction):
+	2x Phillips / NXT 28C94 quad UART (8 serial channels total)
+	ADV476 256 color RAMDAC
 */
 
 #include "emu.h"
@@ -90,8 +91,11 @@ class igt_gameking_state : public driver_device
 {
 public:
 	igt_gameking_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag)
+		: driver_device(mconfig, type, tag),
+		m_palette(*this, "palette")
 	{ }
+
+	required_device<palette_device> m_palette;
 
 	virtual void video_start() override;
 	uint32_t screen_update_igt_gameking(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
@@ -101,7 +105,7 @@ public:
 
 	DECLARE_READ32_MEMBER(igt_gk_28010008_r)
 	{
-		return rand();
+		return rand();	// don't quite understand this one	
 	};
 
 	DECLARE_READ32_MEMBER(igt_gk_28030000_r)
@@ -109,13 +113,57 @@ public:
 		return rand();
 	};
 
+	DECLARE_READ32_MEMBER(uart_status_r);
+	DECLARE_WRITE32_MEMBER(uart_w);
+	DECLARE_WRITE32_MEMBER(clut_w);
+	DECLARE_WRITE32_MEMBER(clut_mask_w);
 
+private:
+	int m_offset, m_r, m_g, m_b, m_state;
+	bool m_bToggle;
+	u8 m_clut_mask;
 };
 
 static INPUT_PORTS_START( igt_gameking )
 INPUT_PORTS_END
 
+WRITE32_MEMBER(igt_gameking_state::clut_w)
+{
+	if (mem_mask == 0x000000ff)
+	{
+		m_offset = data & 0xff;
+		m_state = 0;
+	}
+	else if (mem_mask == 0x00ff0000)
+	{
+		switch (m_state)
+		{
+			case 0: m_r = (data>>16) & 0xff; m_state++; break;
+			case 1: m_g = (data>>16) & 0xff; m_state++; break;
+			case 2: 
+				m_b = (data>>16) & 0xff; 
+				//printf("CLUT: color %d = R %d G %d B %d\n", m_offset, m_r, m_g, m_b);
+				m_palette->set_pen_color(m_offset, m_r<<18 | m_g<<10 | m_b<<2);
+				m_state = 0;  
+				break;
+		}
+	}
+}
 
+WRITE32_MEMBER(igt_gameking_state::clut_mask_w)
+{
+	m_clut_mask = data & 0xff;
+}
+
+READ32_MEMBER(igt_gameking_state::uart_status_r)
+{
+	return 0x00040000;
+}
+
+WRITE32_MEMBER(igt_gameking_state::uart_w)
+{
+	printf("%c", (data>>16) & 0x7f);
+}
 
 void igt_gameking_state::machine_start()
 {
@@ -123,6 +171,9 @@ void igt_gameking_state::machine_start()
 
 void igt_gameking_state::machine_reset()
 {
+	m_bToggle = false;
+	m_offset = m_state = m_r = m_g = m_b = 0;
+	m_clut_mask = 0xff;
 }
 
 void igt_gameking_state::video_start()
@@ -140,14 +191,22 @@ static ADDRESS_MAP_START( igt_gameking_mem, AS_PROGRAM, 32, igt_gameking_state )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_ROM
 	AM_RANGE(0x08000000, 0x081fffff) AM_ROM AM_REGION("game", 0)
 
-	AM_RANGE(0x10000000, 0x1000001f) AM_RAM
-	AM_RANGE(0x10000020, 0x1000021f) AM_RAM // strange range to test, correct or CPU issue?
-	AM_RANGE(0x10000220, 0x1003ffff) AM_RAM
+	AM_RANGE(0x10000000, 0x10ffffff) AM_RAM
+	
+	AM_RANGE(0x18000000, 0x181fffff) AM_RAM	// igtsc writes from 18000000 to 1817ffff, ms3 all the way to 181fffff.
 
+	// 28010000-2801007f: first 28C94 QUART
 	AM_RANGE(0x28010008, 0x2801000b) AM_READ(igt_gk_28010008_r)
+	AM_RANGE(0x28010030, 0x28010033) AM_READ(uart_status_r)	// channel D
+	AM_RANGE(0x28010034, 0x28010037) AM_WRITE(uart_w)		// channel D
+	// 28020000-2802007f: second 28C94 QUART
 	AM_RANGE(0x28030000, 0x28030003) AM_READ(igt_gk_28030000_r)
+	AM_RANGE(0x28040000, 0x2804ffff) AM_RAM
+	AM_RANGE(0x28050000, 0x28050003) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0x00ff00ff)
+	AM_RANGE(0x28060000, 0x28060003) AM_WRITE(clut_w)
+	AM_RANGE(0x28060004, 0x28060007) AM_WRITE(clut_mask_w)
 
-
+	AM_RANGE(0xa1000000, 0xa1011fff) AM_RAM	// used by gkkey for restart IAC
 
 ADDRESS_MAP_END
 
@@ -198,6 +257,25 @@ static MACHINE_CONFIG_START( igt_gameking, igt_gameking_state )
 
 MACHINE_CONFIG_END
 
+ROM_START( ms3 )
+	ROM_REGION( 0x80000, "maincpu", 0 )
+	ROM_LOAD( "3b5060ax.u8",  0x000000, 0x080000, CRC(aff8d874) SHA1(1cb972759ee12c944a1cfdbe68848c9b2e64a4d3) ) 
+
+	ROM_REGION32_LE( 0x200000, "game", 0 )
+	ROM_LOAD16_BYTE( "ea5006ax.u21", 0x000000, 0x080000, CRC(9109b2e2) SHA1(daa1f01315caf6e08c3cf8b0e4925c86d2cd8dc3) ) 
+	ROM_LOAD16_BYTE( "ea5006ax.u5",  0x000001, 0x080000, CRC(66c33cf6) SHA1(600f75ab112348f43b38cafd6f871559372f2807) ) 
+
+	ROM_REGION( 0x100000, "cg", 0 )
+	ROM_LOAD16_BYTE( "1g5032ax.u48", 0x000000, 0x040000, CRC(aba6002f) SHA1(2ed51aa8bbc1e703cd63f633d745dfa4fa7f3dd0) ) 
+	ROM_LOAD16_BYTE( "1g5032ax.u47", 0x000001, 0x040000, CRC(605a71ec) SHA1(13fe64c611c0903a7b79d8680de3ac81f3226a67) ) 
+
+	ROM_REGION( 0x200000, "plx", 0 )
+	ROM_LOAD16_BYTE( "1g5032ax.u20", 0x000000, 0x100000, CRC(517e7478) SHA1(316a8e48ad6502f9508b06f900555d53ef40b464) ) 
+	ROM_LOAD16_BYTE( "1g5032ax.u4",  0x000001, 0x100000, CRC(e67c878f) SHA1(b03f8d28924351e96bb9f24d32f0e4a40a51910c) ) 
+	
+	ROM_REGION( 0x200000, "snd", 0 )
+	ROM_LOAD( "1h5053xx.u6",  0x000000, 0x080000, CRC(6735c65a) SHA1(198cacec5441aa615c0de63a0b4e47265636bcee) )	
+ROM_END
 
 ROM_START( ms72c )
 	ROM_REGION( 0x80000, "maincpu", 0 )
@@ -389,7 +467,7 @@ ROM_START( gkkey )
 	ROM_REGION( 0x200000, "snd", ROMREGION_ERASEFF )
 ROM_END
 
-
+GAME( 1994, ms3,      0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Multistar 3", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 1994, ms72c,    0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Multistar 7 2c", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4,   0,            igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
 GAME( 2003, gkigt4ms, gkigt4,       igt_gameking, igt_gameking, driver_device,  0, ROT0, "IGT", "Game King (v4.x, MS)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )

@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+#include "machine/74157.h"
 #include "machine/bankdev.h"
 #include "machine/gen_latch.h"
 #include "video/decbac06.h"
@@ -15,7 +16,6 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_subcpu(*this, "sub"),
 		m_mcu(*this, "mcu"),
-		m_msm(*this, "msm"),
 		m_palette(*this, "palette"),
 		m_tilegen1(*this, "tilegen1"),
 		m_tilegen2(*this, "tilegen2"),
@@ -33,7 +33,6 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_subcpu;
 	optional_device<cpu_device> m_mcu;
-	optional_device<msm5205_device> m_msm;
 	required_device<palette_device> m_palette;
 	optional_device<deco_bac06_device> m_tilegen1;
 	optional_device<deco_bac06_device> m_tilegen2;
@@ -115,22 +114,37 @@ class dec0_automat_state : public dec0_state
 {
 public:
 	dec0_automat_state(const machine_config &mconfig, device_type type, const char *tag)
-		: dec0_state(mconfig, type, tag) {
+		: dec0_state(mconfig, type, tag),
+		m_msm1(*this, "msm1"),
+		m_msm2(*this, "msm2"),
+		m_adpcm_select1(*this, "adpcm_select1"),
+		m_adpcm_select2(*this, "adpcm_select2"),
+		m_soundbank(*this, "soundbank")
+	{
 	}
 
-	uint8_t m_automat_adpcm_byte;
-	int m_automat_msm5205_vclk_toggle;
+	required_device<msm5205_device> m_msm1;
+	required_device<msm5205_device> m_msm2;
+	required_device<ls157_device> m_adpcm_select1;
+	required_device<ls157_device> m_adpcm_select2;
+	required_memory_bank m_soundbank;
+
+	bool m_adpcm_toggle1;
+	bool m_adpcm_toggle2;
 	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);
-	DECLARE_WRITE8_MEMBER(automat_adpcm_w);
+	DECLARE_WRITE16_MEMBER(secretab_sound_w);
 	DECLARE_READ16_MEMBER( automat_palette_r );
 	DECLARE_WRITE16_MEMBER( automat_palette_w );
 	DECLARE_WRITE16_MEMBER( automat_scroll_w )
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_WRITE_LINE_MEMBER(automat_vclk_cb);
+	DECLARE_READ8_MEMBER(sound_command_r);
+	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
+	DECLARE_WRITE_LINE_MEMBER(msm1_vclk_cb);
+	DECLARE_WRITE_LINE_MEMBER(msm2_vclk_cb);
 
 	virtual void machine_start() override;
 

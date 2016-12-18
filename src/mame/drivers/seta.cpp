@@ -1967,7 +1967,7 @@ READ16_MEMBER(seta_state::extra_r)
 
 static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM                             // ROM (up to 2MB)
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("workram")     // RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM                             // RAM
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM                             // RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM                             // RAM (wrofaero only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")                 // P1
@@ -1999,6 +1999,11 @@ static ADDRESS_MAP_START( wrofaero_map, AS_PROGRAM, 16, seta_state )
 #endif
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITENOP                        // ? Sound  IRQ Ack
+ADDRESS_MAP_END 
+
+static ADDRESS_MAP_START( zombraid_map, AS_PROGRAM, 16, seta_state )
+	AM_IMPORT_FROM( wrofaero_map )
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")			// actually 8K x8 SRAM
 ADDRESS_MAP_END
 
 READ16_MEMBER(seta_state::zingzipbl_unknown_r)
@@ -8555,6 +8560,18 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+/***************************************************************************
+                                Zombie Raid
+***************************************************************************/
+
+static MACHINE_CONFIG_DERIVED( zombraid, gundhara )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zombraid_map)
+
+	MCFG_NVRAM_ADD_0FILL("nvram")
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 J.J.Squawkers
@@ -10674,7 +10691,6 @@ ROM_START( jjsquawkb )
 	ROM_COPY( "gfxtemp", 0x000000, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x200000, 0x100000, 0x100000 )
 
-
 	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
 	ROM_COPY( "gfxtemp", 0x100000, 0x000000, 0x100000 )
 	ROM_COPY( "gfxtemp", 0x300000, 0x100000, 0x100000 )
@@ -10704,6 +10720,32 @@ ROM_START( jjsquawkb2 ) /* PCB was P0-078A, which was a Blandia board converted 
 
 	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "u70.10l", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* fe2001005.u69 + fe2001006.u70 from jjsquawk */
+ROM_END
+
+ROM_START( simpsonjr ) /* bootleg of J. J. Squawkers by Daigom */
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "4.bin", 0x000000, 0x080000, CRC(469cc203) SHA1(4ecd8dce936f24acb149ef2fdf34595bd4a20a74) )
+	ROM_LOAD16_WORD_SWAP( "3.bin", 0x100000, 0x080000, CRC(740a7366) SHA1(2539f9a9b4fed1a1e2c354d144b8d455ed4bc144) )
+
+	ROM_REGION( 0x800000, "gfxtemp", 0  )
+	ROM_LOAD( "5.bin",  0x000000, 0x400000, CRC(82952780) SHA1(83b61c726dd102491fe338036531f7653b0edefc) )
+	ROM_LOAD( "6.bin",  0x400000, 0x400000, CRC(5a22bb87) SHA1(e5f91af685eb9331c5f00d81eca6dca177a9c860) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 )   /* Sprites */
+	ROM_COPY( "gfxtemp", 0x600000, 0x000000, 0x200000 )
+	ROM_COPY( "gfxtemp", 0x200000, 0x200000, 0x200000 )
+
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_COPY( "gfxtemp", 0x400000, 0x000000, 0x100000 )
+	ROM_COPY( "gfxtemp", 0x000000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x200000, "gfx3", 0 )   /* Layer 2 */
+	ROM_COPY( "gfxtemp", 0x500000, 0x000000, 0x100000 )
+	ROM_COPY( "gfxtemp", 0x100000, 0x100000, 0x100000 )
+
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_LOAD( "1.bin", 0x000000, 0x080000, CRC(d99f2879) SHA1(66e83a6bc9093d19c72bd8ef1ec0523cfe218250) )
+	ROM_LOAD( "2.bin", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
 ROM_END
 
 ROM_START( kamenrid )
@@ -10878,44 +10920,44 @@ ROM_END
    same factory as normal boards same as daiohc.  Modified layout allowing
    split ROMs */
 ROM_START( gundharac )
-		ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
-		ROM_LOAD16_BYTE( "4.U3",  0x000000, 0x080000, CRC(14e9970a) SHA1(31964bd290cc94c40684adf3a5d129b1c3addc3b) )
-		ROM_LOAD16_BYTE( "2.U4",  0x000001, 0x080000, CRC(96dfc658) SHA1(f570bc49758535eb00d93ecce9f75832f97a0d8d) )
-		ROM_LOAD16_BYTE( "3.U103", 0x100000, 0x080000, CRC(312f58e2) SHA1(a74819d2f84a00c233489893f12c9ab1a98459cf) )
-		ROM_LOAD16_BYTE( "1.U102", 0x100001, 0x080000, CRC(8d23a23c) SHA1(9e9a6488db424c81a97edcb7115cc070fe35c077) )
+	ROM_REGION( 0x200000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "4.U3",  0x000000, 0x080000, CRC(14e9970a) SHA1(31964bd290cc94c40684adf3a5d129b1c3addc3b) )
+	ROM_LOAD16_BYTE( "2.U4",  0x000001, 0x080000, CRC(96dfc658) SHA1(f570bc49758535eb00d93ecce9f75832f97a0d8d) )
+	ROM_LOAD16_BYTE( "3.U103", 0x100000, 0x080000, CRC(312f58e2) SHA1(a74819d2f84a00c233489893f12c9ab1a98459cf) )
+	ROM_LOAD16_BYTE( "1.U102", 0x100001, 0x080000, CRC(8d23a23c) SHA1(9e9a6488db424c81a97edcb7115cc070fe35c077) )
 
-		ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
+	ROM_REGION( 0x800000, "gfx1", 0 )   /* Sprites */
 	ROM_LOAD16_BYTE( "19.U140", 0x000000, 0x080000, CRC(32d92c28) SHA1(7ba67f715f094aacf2dc2399809e4dfc7e4ca241) )
-		ROM_LOAD16_BYTE( "23.U142", 0x000001, 0x080000, CRC(ff44db9b) SHA1(76ecd3ce3b6b33f3ae0b0454d58cf37d545dd72c) )
-		ROM_LOAD16_BYTE( "21.U141", 0x100000, 0x080000, CRC(1901dc08) SHA1(b19428a7510d6e28a39bdf6ecc9732e3c2d19214) )
-		ROM_LOAD16_BYTE( "25.U143", 0x100001, 0x080000, CRC(877289a2) SHA1(7482320e319d7b641fabba5aeeaa1237b693a219) )
+	ROM_LOAD16_BYTE( "23.U142", 0x000001, 0x080000, CRC(ff44db9b) SHA1(76ecd3ce3b6b33f3ae0b0454d58cf37d545dd72c) )
+	ROM_LOAD16_BYTE( "21.U141", 0x100000, 0x080000, CRC(1901dc08) SHA1(b19428a7510d6e28a39bdf6ecc9732e3c2d19214) )
+	ROM_LOAD16_BYTE( "25.U143", 0x100001, 0x080000, CRC(877289a2) SHA1(7482320e319d7b641fabba5aeeaa1237b693a219) )
 	ROM_LOAD16_BYTE( "18.U140-B", 0x200000, 0x080000, CRC(4f023fb0) SHA1(815765c9783e44762bf57a3fbfad4385c316343a) )
 	ROM_LOAD16_BYTE( "22.U142-B", 0x200001, 0x080000, CRC(6f3fe7e7) SHA1(71bc347c06678f4ae7850799da6346c6447bf3c0) )
 	ROM_LOAD16_BYTE( "20.U141-B", 0x300000, 0x080000, CRC(7f1932e0) SHA1(13262a7322ad29cf7c85461204a3518e900c6145) )
 	ROM_LOAD16_BYTE( "24.U143-B", 0x300001, 0x080000, CRC(066a2e2b) SHA1(186729918a89535484ab86dd58caf20ccce81501) )
-		ROM_LOAD16_BYTE( "9.U144", 0x400000, 0x080000, CRC(6b4a531f) SHA1(701d6b2d87a742c8a2ab36331bd843dcd3309eae) )
-		ROM_LOAD16_BYTE( "13.U146", 0x400001, 0x080000, CRC(45be3df4) SHA1(36667bf5e4b80d17a9d7b6ce4df7498f94681c46) )
-		ROM_LOAD16_BYTE( "11.U145", 0x500000, 0x080000, CRC(f5210aa5) SHA1(4834d905f699dbec1cdacea6b320271c291aa2a7) )
-		ROM_LOAD16_BYTE( "15.U147", 0x500001, 0x080000, CRC(17003119) SHA1(a2edd65c98bc654b541dad3e3783d90931c97597) )
-		ROM_LOAD16_BYTE( "8.U144-B", 0x600000, 0x080000, CRC(ad9d9338) SHA1(33d6c881a20e2150017cc26f929473291e561718) )
-		ROM_LOAD16_BYTE( "12.U146-B", 0x600001, 0x080000, CRC(0fd4c062) SHA1(7f418d43d9ba884c504f6fe3c04b11724412ac6b) )
-		ROM_LOAD16_BYTE( "10.U145-B", 0x700000, 0x080000, CRC(7c5d12b9) SHA1(6ee45c4da6994540852153752e2818a8ea8ecf1a) )
-		ROM_LOAD16_BYTE( "14.U147-B", 0x700001, 0x080000, CRC(5a8af50f) SHA1(3b7937ba720fcbbc5e29c1b95a97c29e8ff5490a) )
+	ROM_LOAD16_BYTE( "9.U144", 0x400000, 0x080000, CRC(6b4a531f) SHA1(701d6b2d87a742c8a2ab36331bd843dcd3309eae) )
+	ROM_LOAD16_BYTE( "13.U146", 0x400001, 0x080000, CRC(45be3df4) SHA1(36667bf5e4b80d17a9d7b6ce4df7498f94681c46) )
+	ROM_LOAD16_BYTE( "11.U145", 0x500000, 0x080000, CRC(f5210aa5) SHA1(4834d905f699dbec1cdacea6b320271c291aa2a7) )
+	ROM_LOAD16_BYTE( "15.U147", 0x500001, 0x080000, CRC(17003119) SHA1(a2edd65c98bc654b541dad3e3783d90931c97597) )
+	ROM_LOAD16_BYTE( "8.U144-B", 0x600000, 0x080000, CRC(ad9d9338) SHA1(33d6c881a20e2150017cc26f929473291e561718) )
+	ROM_LOAD16_BYTE( "12.U146-B", 0x600001, 0x080000, CRC(0fd4c062) SHA1(7f418d43d9ba884c504f6fe3c04b11724412ac6b) )
+	ROM_LOAD16_BYTE( "10.U145-B", 0x700000, 0x080000, CRC(7c5d12b9) SHA1(6ee45c4da6994540852153752e2818a8ea8ecf1a) )
+	ROM_LOAD16_BYTE( "14.U147-B", 0x700001, 0x080000, CRC(5a8af50f) SHA1(3b7937ba720fcbbc5e29c1b95a97c29e8ff5490a) )
 
-		ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
-		ROM_LOAD16_BYTE( "5.U148", 0x000000, 0x080000, CRC(0c740f9b) SHA1(f6d135c3318ff0d50d40921aa108b1b332c1a086) )
-		ROM_LOAD16_BYTE( "6.U150", 0x000001, 0x080000, CRC(ba60eb98) SHA1(7204269816332bbb3401d9f20a513372ffe78500) )
-		ROM_LOAD16_BYTE( "7.U154", 0x100000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
+	ROM_REGION( 0x200000, "gfx2", 0 )   /* Layer 1 */
+	ROM_LOAD16_BYTE( "5.U148", 0x000000, 0x080000, CRC(0c740f9b) SHA1(f6d135c3318ff0d50d40921aa108b1b332c1a086) )
+	ROM_LOAD16_BYTE( "6.U150", 0x000001, 0x080000, CRC(ba60eb98) SHA1(7204269816332bbb3401d9f20a513372ffe78500) )
+	ROM_LOAD16_BYTE( "7.U154", 0x100000, 0x080000, CRC(b768e666) SHA1(473fa52c16c0a9f321e6429947a3e0fc1ef22f7e) )
 
-		ROM_REGION( 0x400000, "gfx3", 0 )   /* Layer 2 */
-		ROM_LOAD16_BYTE( "26.U164", 0x000000, 0x080000, CRC(be3ccaba) SHA1(98f8b83cbed00932866375d21f86ee5c9bddb2a6) )
-		ROM_LOAD16_BYTE( "28.U166", 0x000001, 0x080000, CRC(8a650a4e) SHA1(1f6eda27b39ad052e3d9a8a72cb0a072e7be4487) )
-		ROM_LOAD16_BYTE( "27.U165", 0x100000, 0x080000, CRC(47994ff0) SHA1(25211a9af01f77788578bb524619d95b5b86e241) )
-		ROM_LOAD16_BYTE( "29.U167", 0x100001, 0x080000, CRC(453c3d3f) SHA1(151528b6b1e7f8c059d67dbaca61e7c382e9ce04) )
+	ROM_REGION( 0x400000, "gfx3", 0 )   /* Layer 2 */
+	ROM_LOAD16_BYTE( "26.U164", 0x000000, 0x080000, CRC(be3ccaba) SHA1(98f8b83cbed00932866375d21f86ee5c9bddb2a6) )
+	ROM_LOAD16_BYTE( "28.U166", 0x000001, 0x080000, CRC(8a650a4e) SHA1(1f6eda27b39ad052e3d9a8a72cb0a072e7be4487) )
+	ROM_LOAD16_BYTE( "27.U165", 0x100000, 0x080000, CRC(47994ff0) SHA1(25211a9af01f77788578bb524619d95b5b86e241) )
+	ROM_LOAD16_BYTE( "29.U167", 0x100001, 0x080000, CRC(453c3d3f) SHA1(151528b6b1e7f8c059d67dbaca61e7c382e9ce04) )
 	ROM_LOAD16_BYTE( "16.U152", 0x200000, 0x080000, CRC(5ccc500b) SHA1(d3a2a5658cac8d788e0a1189c184309b8394b10a) )
 	ROM_LOAD16_BYTE( "17.U153", 0x300000, 0x080000, CRC(5586d086) SHA1(e43d5e8834701f40389400f68a99353e67598f6d) )
 
-		ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
+	ROM_REGION( 0x100000, "x1snd", 0 )  /* Samples */
 	ROM_LOAD( "30.U69", 0x000000, 0x080000, CRC(3111a98a) SHA1(75e17a0113060a10551b2b8c17b19890eb7aa0a6) )
 	ROM_LOAD( "31.U70", 0x080000, 0x080000, CRC(30cb2524) SHA1(85deb83262bbe481404705e163e5eb9362985b01) )
 ROM_END
@@ -10963,6 +11005,9 @@ ROM_START( zombraid )
 	// skip 80000-fffff (banked region)
 	ROM_CONTINUE(            0x100000, 0x180000  )
 	ROM_LOAD( "fy001011.a",  0x280000, 0x200000, CRC(e3c431de) SHA1(1030adacbbfabc00231417e09f3de40e3052f65c) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 /* Notes about the Proto/Test roms:
@@ -11024,6 +11069,9 @@ ROM_START( zombraidp ) /* Prototype or test board version.  Data matches release
 	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
 	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
 	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches released MASK rom version */
@@ -11069,6 +11117,9 @@ ROM_START( zombraidpj ) /* Prototype or test board version.  Data matches releas
 	ROM_LOAD( "u161_master_snd_5_599c.u161", 0x300000, 0x080000, CRC(1793dd13) SHA1(1b5b3c50e6df399c3e334c08be5313eef7d7ed95) )
 	ROM_LOAD( "u162_master_snd_6_6d2e.u162", 0x380000, 0x080000, CRC(2ece241f) SHA1(1ebe4dd788799ec10c2eddf02f9bdaee8457993b) )
 	ROM_LOAD( "u163_master_snd_7_c733.u163", 0x400000, 0x080000, CRC(d90f78b2) SHA1(e847eba6a4d6c1a3044041a9d32b6b534fb45307) )
+
+	ROM_REGION(0x10000, "nvram", 0)
+	ROM_LOAD( "nvram.bin",  0x0000, 0x10000, CRC(1a4b2ee8) SHA1(9a14fb2089fef9d13e0a5fe0a83eb7bae51fe1ae) )
 ROM_END
 
 ROM_START( madshark )
@@ -11688,6 +11739,7 @@ GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, driver_device, 0,        ROT
 GAME( 1993, jjsquawko,jjsquawk, jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers (older)", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb,jjsquawk, jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", MACHINE_IMPERFECT_SOUND )
 GAME( 1993, jjsquawkb2,jjsquawk,jjsquawk, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg, Blandia Conversion)", MACHINE_IMPERFECT_SOUND )
+GAME( 2003, simpsonjr, jjsquawk,jjsquawb, jjsquawk, driver_device, 0,        ROT0,   "bootleg",                "Simpson Junior (bootleg of J. J. Squawkers)", MACHINE_IMPERFECT_SOUND )
 
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, driver_device, 0,        ROT0,   "Banpresto / Toei",       "Masked Riders Club Battle Race", 0 )
 
@@ -11725,8 +11777,8 @@ GAME( 1995, gundharac, gundhara,gundhara, gundhara, driver_device, 0,        ROT
 
 GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, driver_device, 0,        ROT0,   "Sammy Industries",       "Sokonuke Taisen Game (Japan)", MACHINE_IMPERFECT_SOUND )
 
-GAME( 1995, zombraid, 0,        gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
-GAME( 1995, zombraidp,zombraid, gundhara, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
-GAME( 1995, zombraidpj,zombraid,gundhara, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
+GAME( 1995, zombraid, 0,        zombraid, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US)", MACHINE_NO_COCKTAIL )
+GAME( 1995, zombraidp,zombraid, zombraid, zombraid, seta_state, zombraid, ROT0,   "American Sammy",            "Zombie Raid (9/28/95, US, prototype PCB)", MACHINE_NO_COCKTAIL ) // actual code is same as the released version
+GAME( 1995, zombraidpj,zombraid,zombraid, zombraid, seta_state, zombraid, ROT0,   "Sammy Industries Co.,Ltd.", "Zombie Raid (9/28/95, Japan, prototype PCB)", MACHINE_NO_COCKTAIL ) // just 3 bytes different from above
 
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, seta_state, crazyfgt, ROT0,   "Subsino",                   "Crazy Fight", MACHINE_UNEMULATED_PROTECTION | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

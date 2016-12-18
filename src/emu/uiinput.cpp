@@ -263,7 +263,14 @@ g_profiler.start(PROFILER_INPUT);
 
 		/* if this is an autorepeat case, set a 1x delay and leave pressed = 1 */
 		else if (speed > 0 && (osd_ticks() + tps - m_next_repeat[code]) >= tps)
-			m_next_repeat[code] += 1 * speed * tps / 60;
+		{
+			// In the autorepeatcase, we need to double check the key is still pressed
+			// as there can be a delay between the key polling and our processing of the event
+			m_seqpressed[code] = machine().ioport().type_pressed(ioport_type(code));
+			pressed = (m_seqpressed[code] == SEQ_PRESSED_TRUE);
+			if (pressed)
+				m_next_repeat[code] += 1 * speed * tps / 60;
+		}
 
 		/* otherwise, reset pressed = 0 */
 		else

@@ -1,10 +1,16 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
 /***************************************************************************
 
   Vapor Trail (World version)  (c) 1989 Data East Corporation
   Vapor Trail (USA version)    (c) 1989 Data East USA
   Kuhga (Japanese version)     (c) 1989 Data East Corporation
+
+  Notes:
+  -----
+  - If you activate the service mode dip switch during the gameplay, it acts like invicibility
+    either for player 1 and player 2. It works for all sets.
 
   Emulation by Bryan McPhail, mish@tendril.co.uk
   added pal & prom-maps - Highwayman.
@@ -26,6 +32,20 @@ WRITE16_MEMBER(vaportra_state::vaportra_sound_w)
 	machine().scheduler().synchronize();
 	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, ASSERT_LINE);
+}
+
+READ16_MEMBER(vaportra_state::irq6_ack_r)
+{
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line (6, CLEAR_LINE);
+
+	return (0);
+}
+
+WRITE16_MEMBER(vaportra_state::irq6_ack_w)
+{
+	if (ACCESSING_BITS_0_7)
+		m_maincpu->set_input_line (6, CLEAR_LINE);
 }
 
 READ16_MEMBER(vaportra_state::vaportra_control_r)
@@ -59,9 +79,9 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, vaportra_state )
 	AM_RANGE(0x2c0000, 0x2c000f) AM_DEVWRITE("tilegen1", deco16ic_device, pf_control_w)
 	AM_RANGE(0x300000, 0x3009ff) AM_RAM_WRITE(vaportra_palette_24bit_rg_w) AM_SHARE("paletteram")
 	AM_RANGE(0x304000, 0x3049ff) AM_RAM_WRITE(vaportra_palette_24bit_b_w) AM_SHARE("paletteram2")
-	AM_RANGE(0x308000, 0x308001) AM_NOP
+	AM_RANGE(0x308000, 0x308001) AM_READWRITE(irq6_ack_r, irq6_ack_w)
 	AM_RANGE(0x30c000, 0x30c001) AM_DEVWRITE("spriteram", buffered_spriteram16_device, write)
-	AM_RANGE(0xff8000, 0xff87ff) AM_RAM AM_SHARE("spriteram")
+	AM_RANGE(0x318000, 0x3187ff) AM_MIRROR(0xce0000) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -110,7 +130,7 @@ static INPUT_PORTS_START( vaportra )
 	PORT_START("COINS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -219,7 +239,7 @@ static MACHINE_CONFIG_START( vaportra, vaportra_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2) /* Custom chip 59 */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state,  irq6_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", vaportra_state, irq6_line_assert)
 
 	MCFG_CPU_ADD("audiocpu", H6280, XTAL_24MHz/4) /* Custom chip 45; Audio section crystal is 32.220 MHz but CPU clock is confirmed as coming from the 24MHz crystal (6Mhz exactly on the CPU) */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -838,15 +858,14 @@ C3D54*
 DRIVER_INIT_MEMBER(vaportra_state,vaportra)
 {
 	uint8_t *RAM = memregion("maincpu")->base();
-	int i;
 
-	for (i = 0x00000; i < 0x80000; i++)
+	for (int i = 0x00000; i < 0x80000; i++)
 		RAM[i] = BITSWAP8(RAM[i],0,6,5,4,3,2,1,7);
 }
 
 /******************************************************************************/
 
-GAME( 1989, vaportra, 0,        vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportra3,vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, vaportrau,vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East USA", "Vapor Trail - Hyper Offence Formation (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, kuhga,    vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra,  0,        vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 1)",  MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportra3, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Vapor Trail - Hyper Offence Formation (World revision 3?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, vaportrau, vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East USA",         "Vapor Trail - Hyper Offence Formation (US)",                MACHINE_SUPPORTS_SAVE )
+GAME( 1989, kuhga,     vaportra, vaportra, vaportra, vaportra_state, vaportra, ROT270, "Data East Corporation", "Kuhga - Operation Code 'Vapor Trail' (Japan revision 3)",   MACHINE_SUPPORTS_SAVE )

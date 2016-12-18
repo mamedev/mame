@@ -29,6 +29,26 @@
 #define MCFG_ITEAGLE_PERIPH_ADD(_tag) \
 	MCFG_PCI_DEVICE_ADD(_tag, ITEAGLE_PERIPH, 0x1080C693, 0x00, 0x060100, 0x00)
 
+// Functional emulation of AMD AM85C30 serial controller
+// Two channels, A & B
+class iteagle_am85c30
+{
+public:
+	void reset(void);
+	void write_control(uint8_t data, int channel);
+	uint8_t read_control(int channel);
+	void write_data(uint8_t data, int channel);
+	uint8_t read_data(int channel);
+	void write_rx_str(int channel, std::string resp);
+	std::string get_tx_str(int channel) { return m_serial_tx[channel]; };
+	void clear_tx_str(int channel) { m_serial_tx[channel].clear(); };
+	bool check_interrupt(void) { return (m_rr_regs[0][3] != 0); };
+private:
+	uint8_t m_rr_regs[2][16];
+	uint8_t m_wr_regs[2][16];
+	std::string m_serial_tx[2];
+	std::string m_serial_rx[2];
+};
 
 class iteagle_fpga_device : public pci_device
 {
@@ -59,19 +79,14 @@ private:
 	uint32_t m_ram[0x20000 / 4];
 	uint32_t m_prev_reg;
 
-	std::string m_serial_str;
-	std::string m_serial_rx3;
-	uint8_t m_serial_idx;
-	bool  m_serial_data;
-	uint8_t m_serial_com0[0x10];
-	uint8_t m_serial_com1[0x10];
-	uint8_t m_serial_com2[0x10];
-	uint8_t m_serial_com3[0x10];
-
 	uint32_t m_version;
 	uint32_t m_seq_init;
 	uint32_t m_seq;
 	uint32_t m_seq_rem1, m_seq_rem2;
+
+	iteagle_am85c30 m_serial0_1;
+	iteagle_am85c30 m_serial2_3;
+
 	void update_sequence(uint32_t data);
 	void update_sequence_eg1(uint32_t data);
 

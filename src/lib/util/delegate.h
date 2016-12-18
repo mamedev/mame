@@ -552,7 +552,7 @@ public:
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
 
 	// late binding
-	void late_bind(delegate_late_bind &object) { bind((*m_latebinder)(object)); }
+	void late_bind(delegate_late_bind &object) { if(m_latebinder) bind((*m_latebinder)(object)); }
 
 protected:
 	// return the actual object (not the one we use for calling)

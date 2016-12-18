@@ -873,7 +873,7 @@ static uint32_t blit_line(amiga_state *state)
 
 TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
 {
-	amiga_state *state = machine().driver_data<amiga_state>();
+	amiga_state *state = this;
 	uint32_t blitsum = 0;
 
 	/* logging */
@@ -933,15 +933,15 @@ TIMER_CALLBACK_MEMBER( amiga_state::amiga_blitter_proc )
  *
  *************************************/
 
-static void blitter_setup(address_space &space)
+void amiga_state::blitter_setup()
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
+	amiga_state *state = this;
 	int ticks, width, height, blittime;
 
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		state->logerror("%s - This program is playing tricks with the blitter\n", space.machine().describe_context() );
+		logerror("%s - This program is playing tricks with the blitter\n", machine().describe_context() );
 		return;
 	}
 
@@ -974,7 +974,7 @@ static void blitter_setup(address_space &space)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		space.device().execute().adjust_icount(-(blittime/2) );
+		m_maincpu->adjust_icount(-(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
@@ -987,7 +987,7 @@ static void blitter_setup(address_space &space)
 	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	state->m_blitter_timer->adjust( downcast<cpu_device *>(&space.device())->cycles_to_attotime( blittime ));
+	m_blitter_timer->adjust( m_maincpu->cycles_to_attotime( blittime ));
 }
 
 
@@ -1260,7 +1260,7 @@ READ16_MEMBER( amiga_state::custom_chip_r )
 
 WRITE16_MEMBER( amiga_state::custom_chip_w )
 {
-	amiga_state *state = space.machine().driver_data<amiga_state>();
+	amiga_state *state = this;
 	uint16_t temp;
 	offset &= 0xff;
 
@@ -1349,7 +1349,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			CUSTOM_REG(REG_BLTSIZH) = data & 0x3f;
 			if ( CUSTOM_REG(REG_BLTSIZV) == 0 ) CUSTOM_REG(REG_BLTSIZV) = 0x400;
 			if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x40;
-			blitter_setup(m_maincpu->space(AS_PROGRAM));
+			blitter_setup();
 			break;
 
 		case REG_BLTSIZV:
@@ -1365,7 +1365,7 @@ WRITE16_MEMBER( amiga_state::custom_chip_w )
 			{
 				CUSTOM_REG(REG_BLTSIZH) = data & 0x7ff;
 				if ( CUSTOM_REG(REG_BLTSIZH) == 0 ) CUSTOM_REG(REG_BLTSIZH) = 0x800;
-				blitter_setup(m_maincpu->space(AS_PROGRAM));
+				blitter_setup();
 			}
 			break;
 
@@ -1693,8 +1693,10 @@ void amiga_state::rs232_tx(int state)
 		m_rs232->write_txd(state);
 }
 
-void amiga_state::rx_write(amiga_state *state, int level)
+void amiga_state::rx_write(int level)
 {
+	amiga_state *state = this;
+
 	m_rx_previous = BIT(CUSTOM_REG(REG_SERDATR), 11);
 	CUSTOM_REG(REG_SERDATR) &= ~SERDATR_RXD;
 	CUSTOM_REG(REG_SERDATR) |= level << 11;
@@ -1702,7 +1704,7 @@ void amiga_state::rx_write(amiga_state *state, int level)
 
 WRITE_LINE_MEMBER( amiga_state::rs232_rx_w )
 {
-	rx_write(this, state);
+	rx_write(state);
 
 	// start bit received?
 	if (m_rx_state == 1)

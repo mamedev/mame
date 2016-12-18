@@ -699,7 +699,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_PIT68230_PB_OUTPUT_CB(WRITE8(cpu30_state, flop_dmac_w))
 	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit1c_r))
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit1c_w))
-// MCFG_PIT68230_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq2_w)) // Interrupts not yet supported by 68230
+//	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq2_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	MCFG_DEVICE_ADD ("pit2", PIT68230, XTAL_16MHz / 2) // Th PIT clock is not verified on schema but reversed from behaviour
 	MCFG_PIT68230_PB_INPUT_CB(READ8(cpu30_state, board_mem_id_rd))
@@ -707,7 +707,7 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_PIT68230_PA_OUTPUT_CB(WRITE8(cpu30_state, pit2a_w))
 	MCFG_PIT68230_PC_INPUT_CB(READ8(cpu30_state, pit2c_r))
 	MCFG_PIT68230_PC_OUTPUT_CB(WRITE8(cpu30_state, pit2c_w))
-// MCFG_PIT68230_OUT_INT_CB(DEVWRITELINE("fga002", fga002_device, lirq3_w)) // Interrupts not yet supported by 68230
+//	MCFG_PIT68230_TIMER_IRQ_CB(DEVWRITELINE("fga002", fga002_device, lirq3_w)) // The timer interrupt seems to silence the terminal interrupt, needs invectigation
 
 	/* FGA-002, Force Gate Array */
 	MCFG_FGA002_ADD("fga002", 0)
