@@ -773,7 +773,7 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 	else
 	{
 		// TODO
-		printf("FIFO OUT read\n");
+//		printf("FIFO OUT read\n");
 		if (m_tgpx4->is_fifoout0_empty())
 		{
 			/* Reading from empty FIFO causes the i960 to enter wait state */
@@ -833,7 +833,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 			if (m_tgpx4->is_fifoin_full())
 				printf("trying to push to full fifo!\n");
 
-			printf("push %08X at %08X\n", data, space.device().safe_pc());
+//			printf("push %08X at %08X\n", data, space.device().safe_pc());
 			m_tgpx4->fifoin_w(data);
 		}
 	}
