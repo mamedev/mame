@@ -401,8 +401,9 @@ int retro_window_info::window_init()
 
 	result = complete_create();
 
-	retro_fps = ATTOSECONDS_TO_HZ(machine().first_screen()->refresh_attoseconds());
-
+	if(machine().first_screen()!= nullptr)
+		retro_fps = ATTOSECONDS_TO_HZ(machine().first_screen()->refresh_attoseconds());
+	
 
 	if(alternate_renderer==false){
 	//test correct aspect
