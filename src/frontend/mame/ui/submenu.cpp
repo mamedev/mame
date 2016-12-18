@@ -98,6 +98,7 @@ std::vector<submenu::option> const submenu::control_options = {
 std::vector<submenu::option> const submenu::video_options = {
 	{ submenu::option_type::HEAD, __("Video Options") },
 	{ submenu::option_type::OSD,  __("Video Mode"),                              OSDOPTION_VIDEO },
+#ifndef __LIBRETRO__
 	{ submenu::option_type::OSD,  __("Number Of Screens"),                       OSDOPTION_NUMSCREENS },
 #if defined(UI_WINDOWS) && !defined(UI_SDL)
 	{ submenu::option_type::OSD,  __("Triple Buffering"),                        WINOPTION_TRIPLEBUFFER },
@@ -107,10 +108,13 @@ std::vector<submenu::option> const submenu::video_options = {
 	{ submenu::option_type::OSD,  __("Bilinear Filtering"),                      OSDOPTION_FILTER },
 	{ submenu::option_type::OSD,  __("Bitmap Prescaling"),                       OSDOPTION_PRESCALE },
 	{ submenu::option_type::OSD,  __("Window Mode"),                             OSDOPTION_WINDOW },
+#endif
 	{ submenu::option_type::EMU,  __("Enforce Aspect Ratio"),                    OPTION_KEEPASPECT },
+#ifndef __LIBRETRO__
 	{ submenu::option_type::OSD,  __("Start Out Maximized"),                     OSDOPTION_MAXIMIZE },
 	{ submenu::option_type::OSD,  __("Synchronized Refresh"),                    OSDOPTION_SYNCREFRESH },
 	{ submenu::option_type::OSD,  __("Wait Vertical Sync"),                      OSDOPTION_WAITVSYNC }
+#endif
 };
 
 //std::vector<submenu::option> const submenu::export_options = {
