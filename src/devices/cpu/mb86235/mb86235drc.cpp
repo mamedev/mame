@@ -18,7 +18,6 @@
 /*
 	TODO:
 	- check jump condition before parallel ALU/MUL (flags!)
-	- PR update after all operations (double update at 0x26)
 
 */
 
@@ -673,12 +672,6 @@ void mb86235_device::generate_reg_read(drcuml_block *block, compiler_state *comp
 
 		case 0x30:	// PR
 			UML_LOAD(block, dst, m_core->pr, PRP, SIZE_DWORD, SCALE_x4);
-			if (!(desc->userflags & OP_USERFLAG_ALU_PRP_UPDATE) && !(desc->userflags & OP_USERFLAG_MUL_PRP_UPDATE))		// alu/mul have priority on PRP update
-			{
-				UML_ADD(block, PRP, PRP, 1);
-				UML_CMP(block, PRP, 24);
-				UML_MOVc(block, COND_GE, PRP, 0);
-			}
 			break;
 
 		case 0x31:	// FI
@@ -736,12 +729,6 @@ void mb86235_device::generate_reg_write(drcuml_block *block, compiler_state *com
 
 		case 0x30:		// PR
 			UML_STORE(block, m_core->pr, PWP, src, SIZE_DWORD, SCALE_x4);
-			if (!(desc->userflags & OP_USERFLAG_ALU_PWP_UPDATE) && !(desc->userflags & OP_USERFLAG_MUL_PWP_UPDATE))		// alu/mul have priority on PWP update
-			{
-				UML_ADD(block, PWP, PWP, 1);
-				UML_CMP(block, PWP, 24);
-				UML_MOVc(block, COND_GE, PWP, 0);
-			}
 			break;
 
 		case 0x34:		// PDR
@@ -966,6 +953,47 @@ bool mb86235_device::generate_opcode(drcuml_block *block, compiler_state *compil
 			return false;
 	}
 
+	// update PR and PW if needed
+	if ((desc->userflags & OP_USERFLAG_PR_MASK) != 0)
+	{
+		switch ((desc->userflags & OP_USERFLAG_PR_MASK) >> 8)
+		{
+			case 1:		// PR++
+				UML_ADD(block, PRP, PRP, 1);
+				UML_CMP(block, PRP, 24);
+				UML_MOVc(block, COND_GE, PRP, 0);
+				break;
+			case 2:		// PR--
+				UML_SUB(block, PRP, PRP, 1);
+				UML_CMP(block, PRP, 0);
+				UML_MOVc(block, COND_L, PRP, 23);
+				break;
+			case 3:		// PR#0
+				UML_MOV(block, PRP, 0);
+				break;
+		}
+	}
+
+	if ((desc->userflags & OP_USERFLAG_PW_MASK) != 0)
+	{
+		switch ((desc->userflags & OP_USERFLAG_PW_MASK) >> 10)
+		{
+			case 1:		// PW++
+				UML_ADD(block, PWP, PWP, 1);
+				UML_CMP(block, PWP, 24);
+				UML_MOVc(block, COND_GE, PWP, 0);
+				break;
+			case 2:		// PW--
+				UML_SUB(block, PWP, PWP, 1);
+				UML_CMP(block, PWP, 0);
+				UML_MOVc(block, COND_L, PWP, 23);
+				break;
+			case 3:		// PW#0
+				UML_MOV(block, PWP, 0);
+				break;
+		}
+	}
+
 	// handle repeat
 	if (desc->userflags & OP_USERFLAG_REPEATED_OP)
 	{
@@ -1007,26 +1035,10 @@ void mb86235_device::generate_alumul_input(drcuml_block *block, compiler_state *
 			break;
 
 		case 0x10:	// PR
-			UML_LOAD(block, dst, m_core->pr, PRP, SIZE_DWORD, SCALE_x4);
-			UML_ADD(block, PWP, PWP, 1);
-			UML_CMP(block, PWP, 24);
-			UML_MOVc(block, COND_GE, PWP, 0);
-			break;
 		case 0x11:	// PR++
-			UML_LOAD(block, dst, m_core->pr, PRP, SIZE_DWORD, SCALE_x4);
-			UML_ADD(block, PRP, PRP, 1);
-			UML_CMP(block, PRP, 24);
-			UML_MOVc(block, COND_GE, PRP, 0);
-			break;
 		case 0x12:	// PR--
-			UML_LOAD(block, dst, m_core->pr, PRP, SIZE_DWORD, SCALE_x4);
-			UML_SUB(block, PRP, PRP, 1);
-			UML_CMP(block, PRP, 0);
-			UML_MOVc(block, COND_L, PRP, 23);
-			break;
 		case 0x13:	// PR#0
 			UML_LOAD(block, dst, m_core->pr, PRP, SIZE_DWORD, SCALE_x4);
-			UML_MOV(block, PRP, 0);
 			break;
 
 		case 0x18:	// 0 / -1.0E+0

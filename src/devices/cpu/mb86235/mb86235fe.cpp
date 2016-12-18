@@ -138,10 +138,19 @@ void mb86235_frontend::describe_alu_input(opcode_desc &desc, int reg)
 			break;
 
 		case 0x10:	// PR
+			break;
+
 		case 0x11:	// PR++
+			desc.userflags &= ~OP_USERFLAG_PR_MASK;
+			desc.userflags |= OP_USERFLAG_PR_INC;
+			break;
 		case 0x12:	// PR--
+			desc.userflags &= ~OP_USERFLAG_PR_MASK;
+			desc.userflags |= OP_USERFLAG_PR_DEC;
+			break;
 		case 0x13:	// PR#0
-			desc.userflags |= OP_USERFLAG_ALU_PRP_UPDATE;
+			desc.userflags &= ~OP_USERFLAG_PR_MASK;
+			desc.userflags |= OP_USERFLAG_PR_ZERO;
 			break;
 
 
@@ -163,10 +172,25 @@ void mb86235_frontend::describe_mul_input(opcode_desc &desc, int reg)
 			break;
 
 		case 0x10:	// PR
+			break;
+
 		case 0x11:	// PR++
+			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)	// ALU PR update has higher priority
+			{
+				desc.userflags |= OP_USERFLAG_PR_INC;
+			}
+			break;
 		case 0x12:	// PR--
+			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)	// ALU PR update has higher priority
+			{
+				desc.userflags |= OP_USERFLAG_PR_DEC;
+			}
+			break;
 		case 0x13:	// PR#0
-			desc.userflags |= OP_USERFLAG_MUL_PRP_UPDATE;
+			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)	// ALU PR update has higher priority
+			{
+				desc.userflags |= OP_USERFLAG_PR_ZERO;
+			}
 			break;
 
 		default:
@@ -248,7 +272,10 @@ void mb86235_frontend::describe_reg_read(opcode_desc &desc, int reg)
 			break;
 
 		case 0x30:		// PR
-			desc.userflags |= OP_USERFLAG_XFER_PRP_UPDATE;
+			if ((desc.userflags & OP_USERFLAG_PR_MASK) == 0)		// ALU and MUL PR updates have higher priority
+			{
+				desc.userflags |= OP_USERFLAG_PR_INC;
+			}
 			break;
 	}
 }
@@ -304,7 +331,8 @@ void mb86235_frontend::describe_reg_write(opcode_desc &desc, int reg)
 			break;
 
 		case 0x30:		// PR
-			desc.userflags |= OP_USERFLAG_XFER_PWP_UPDATE;
+			desc.userflags &= ~OP_USERFLAG_PW_MASK;
+			desc.userflags |= OP_USERFLAG_PW_INC;
 			break;
 	}
 }
