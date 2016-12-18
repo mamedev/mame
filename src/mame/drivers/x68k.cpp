@@ -1480,7 +1480,7 @@ SLOT_INTERFACE_END
 MACHINE_RESET_MEMBER(x68k_state,x68000)
 {
 	/* The last half of the IPLROM is mapped to 0x000000 on reset only
-	   Just copying the inital stack pointer and program counter should
+	   Just copying the initial stack pointer and program counter should
 	   more or less do the same job */
 
 	int drive;
@@ -1584,7 +1584,7 @@ DRIVER_INIT_MEMBER(x68k_state,x68000)
 	}
 #endif
 
-	// copy last half of BIOS to a user region, to use for inital startup
+	// copy last half of BIOS to a user region, to use for initial startup
 	memcpy(user2,(rom+0xff0000),0x10000);
 
 	m_scanline_timer = timer_alloc(TIMER_X68K_HSYNC);
@@ -1681,7 +1681,7 @@ static MACHINE_CONFIG_START( x68000, x68k_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.45)
-	MCFG_SCREEN_SIZE(1096, 568)  // inital setting
+	MCFG_SCREEN_SIZE(1096, 568)  // initial setting
 	MCFG_SCREEN_VISIBLE_AREA(0, 767, 0, 511)
 	MCFG_SCREEN_UPDATE_DRIVER(x68k_state, screen_update_x68000)
 

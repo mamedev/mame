@@ -23,6 +23,7 @@
 			[".cpp"] = "Sources",
 			[".cxx"] = "Sources",
 			[".dylib"] = "Frameworks",
+			[".bundle"] = "Frameworks",
 			[".framework"] = "Frameworks",
 			[".tbd"] = "Frameworks",
 			[".m"] = "Sources",
@@ -78,6 +79,7 @@
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
 			[".entitlements"] = "text.xml",
+			[".bundle"]    = "wrapper.cfbundle",
 			[".framework"] = "wrapper.framework",
 			[".tbd"]       = "sourcecode.text-based-dylib-definition",
 			[".gif"]       = "image.gif",
@@ -119,6 +121,7 @@
 			[".css"]       = "text.css",
 			[".cxx"]       = "sourcecode.cpp.cpp",
 			[".entitlements"] = "text.xml",
+			[".bundle"]    = "wrapper.cfbundle",
 			[".framework"] = "wrapper.framework",
 			[".tbd"]       = "wrapper.framework",
 			[".gif"]       = "image.gif",
@@ -156,6 +159,7 @@
 			WindowedApp = "com.apple.product-type.application",
 			StaticLib   = "com.apple.product-type.library.static",
 			SharedLib   = "com.apple.product-type.library.dynamic",
+			Bundle      = "com.apple.product-type.bundle",
 		}
 		return types[node.cfg.kind]
 	end
@@ -176,6 +180,7 @@
 			WindowedApp = "wrapper.application",
 			StaticLib   = "archive.ar",
 			SharedLib   = "\"compiled.mach-o.dylib\"",
+			Bundle      = "wrapper.cfbundle",
 		}
 		return types[node.cfg.kind]
 	end
@@ -804,6 +809,7 @@
 			WindowedApp = '"$(HOME)/Applications"',
 			SharedLib = '/usr/local/lib',
 			StaticLib = '/usr/local/lib',
+			Bundle    = '"$(LOCAL_LIBRARY_DIR)/Bundles"',
 		}
 		_p(4,'INSTALL_PATH = %s;', installpaths[cfg.kind])
 
@@ -820,7 +826,16 @@
 			_p(4,'INFOPLIST_FILE = "%s";', infoplist_file)
 		end
 
+		if cfg.kind == "Bundle" then
+			_p(4, 'PRODUCT_BUNDLE_IDENTIFIER = "genie.%s";', cfg.buildtarget.basename:gsub("%s+", '.')) --replace spaces with .
+		end
+
 		_p(4,'PRODUCT_NAME = "%s";', cfg.buildtarget.basename)
+
+		if cfg.kind == "Bundle" then
+			_p(4, 'WRAPPER_EXTENSION = bundle;')
+		end
+
 		_p(3,'};')
 		_p(3,'name = "%s";', cfgname)
 		_p(2,'};')

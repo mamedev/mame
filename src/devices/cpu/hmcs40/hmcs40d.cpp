@@ -184,7 +184,7 @@ static const uint8_t hmcs40_mnemonic[0x400] =
 
 
 
-static offs_t internal_disasm_hmcs40(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(hmcs40)
 {
 	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x3ff;
 	uint8_t instr = hmcs40_mnemonic[op];
@@ -228,14 +228,4 @@ static offs_t internal_disasm_hmcs40(cpu_device *device, std::ostream &stream, o
 
 	int pos = s_next_pc[pc & 0x3f] & DASMFLAG_LENGTHMASK;
 	return pos | s_flags[instr] | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(hmcs40)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_hmcs40(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

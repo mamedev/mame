@@ -341,10 +341,10 @@ void sm8500_cpu_device::process_interrupts()
 }
 
 
-offs_t sm8500_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sm8500_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sm8500 );
-	return CPU_DISASSEMBLE_NAME(sm8500)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sm8500)(this, stream, pc, oprom, opram, options);
 }
 
 

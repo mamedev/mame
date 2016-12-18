@@ -127,7 +127,7 @@ public:
 	DECLARE_READ32_MEMBER( hp48_reg_in );
 	DECLARE_WRITE32_MEMBER( hp48_reg_out );
 
-	/* keybord interrupt system */
+	/* keyboard interrupt system */
 	DECLARE_WRITE_LINE_MEMBER( hp48_rsi );
 };
 

@@ -23,6 +23,8 @@
 
 #include "ExtractEngine.h"
 
+#include "../../../../C/DllSecur.h"
+
 #include "resource.h"
 
 using namespace NWindows;
@@ -135,6 +137,10 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 
   NT_CHECK
 
+  #ifdef _WIN32
+  LoadSecurityDlls();
+  #endif
+
   // InitCommonControls();
 
   UString archiveName, switches;
@@ -207,11 +213,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE /* hPrevInstance */,
 
   CCodecs *codecs = new CCodecs;
   CMyComPtr<IUnknown> compressCodecsInfo = codecs;
-  HRESULT result = codecs->Load();
-  if (result != S_OK)
   {
-    ShowErrorMessage(L"Can not load codecs");
-    return 1;
+    HRESULT result = codecs->Load();
+    if (result != S_OK)
+    {
+      ShowErrorMessage(L"Can not load codecs");
+      return 1;
+    }
   }
 
   const FString tempDirPath = tempDir.GetPath();

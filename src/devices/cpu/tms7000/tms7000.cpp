@@ -267,10 +267,10 @@ void tms7000_device::state_string_export(const device_state_entry &entry, std::s
 	}
 }
 
-offs_t tms7000_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms7000_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms7000 );
-	return CPU_DISASSEMBLE_NAME(tms7000)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms7000)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -902,7 +902,7 @@ WRITE8_MEMBER(tms70c46_device::control_w)
 	// known fast memory areas: internal ROM/RAM, system RAM
 	// known slow memory areas: system ROM, cartridge ROM/RAM
 
-	// d0-d3(all bits?): clock divider when d4 is set and addressbus is in slow memory area
+	// d0-d3(all bits?): clock divider when d4 is set and address bus is in slow memory area
 	// needs to be measured, i just know that $30 is full speed, and $38 is about 4 times slower
 	m_control = data;
 }

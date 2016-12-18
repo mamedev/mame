@@ -45,7 +45,7 @@ protected:
 
 	uint32_t      disasm_min_opcode_bytes() const override;
 	uint32_t      disasm_max_opcode_bytes() const override;
-	offs_t      disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 	address_space_config    m_program_config80;
 	address_space_config    m_io_config80;
 };

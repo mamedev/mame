@@ -758,8 +758,9 @@ _kind_ - project kind identifier. One of:
 
 * _ConsoleApp_ - console executable
 * _WindowedApp_ - application that runs in a desktop window. Does not apply on Linux.
-* _SharedLib_ - shared library or DLL
 * _StaticLib_ - static library
+* _SharedLib_ - shared library or DLL
+* _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
 
 #### Examples
 ```lua

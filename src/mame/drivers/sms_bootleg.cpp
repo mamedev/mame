@@ -296,7 +296,7 @@ ROM_START( smssgame )
 	ROM_LOAD( "K1.bin",  0x140000, 0x20000, CRC(dadffecd) SHA1(68ebb968539049a9e193da5200856b9f956f7e02) ) // Final Bubble Bobble (2/2)
 
 	// this mask rom appears to be taken straight from an SMS multi-game cart, bank 0 of it is even a menu just for the games in this ROM! same style, so presumably the same developer (Seo Jin 1990 copyright)
-	ROM_LOAD( "SG11004A 79ST0086END 9045.rom4",0x180000, 0x080000, CRC(cb6cbe40) SHA1(f7735f3357bb89ad2918c28eafeaf9808532f599) )
+	ROM_LOAD( "SG11004A 79ST0086END 9045.rom4",0x180000, 0x080000, CRC(cdbfe86e) SHA1(83d6f261471dca20f8d2e33b9807d670e9b4eb9c) )
 
 	// there seems to be some kind of MCU for the timer?
 ROM_END

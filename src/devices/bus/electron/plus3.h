@@ -33,6 +33,7 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual const tiny_rom_entry *device_rom_region() const override;
 
+	DECLARE_READ8_MEMBER(wd1770_status_r);
 	DECLARE_WRITE8_MEMBER(wd1770_status_w);
 
 protected:

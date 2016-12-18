@@ -24,7 +24,7 @@ public:
 	virtual ~menu_slot_devices() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	device_slot_option *slot_get_current_option(device_slot_interface &slot);

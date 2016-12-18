@@ -318,7 +318,7 @@ static const int hamming_lut[64] = {
 };
 
 /**
- * @brief Caluclate a Hamming code after reading or before writing a memory double-word.
+ * @brief Calculate a Hamming code after reading or before writing a memory double-word.
  *
  * Hamming code generation is according to the schematics described above.
  *

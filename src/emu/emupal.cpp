@@ -19,7 +19,7 @@
 
 const device_type PALETTE = &device_creator<palette_device>;
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),
 		m_entries(0),
 		m_indirect_entries(0),
@@ -122,7 +122,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 		m_indirect_colors[index] = rgb;
 
 		// update the palette for any colortable entries that reference it
-		for (uint32_t pen = 0; pen < m_indirect_pens.size(); pen++)
+		for (u32 pen = 0; pen < m_indirect_pens.size(); pen++)
 			if (m_indirect_pens[pen] == index)
 				m_palette->entry_set_color(pen, rgb);
 	}
@@ -150,9 +150,9 @@ void palette_device::set_pen_indirect(pen_t pen, indirect_pen_t index)
 //  transcolor
 //-------------------------------------------------
 
-uint32_t palette_device::transpen_mask(gfx_element &gfx, uint32_t color, indirect_pen_t transcolor)
+u32 palette_device::transpen_mask(gfx_element &gfx, u32 color, indirect_pen_t transcolor)
 {
-	uint32_t entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
+	u32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 
 	// make sure we are in range
 	assert(entry < m_indirect_pens.size());
@@ -162,7 +162,7 @@ uint32_t palette_device::transpen_mask(gfx_element &gfx, uint32_t color, indirec
 	int count = std::min(size_t(gfx.depth()), m_indirect_pens.size() - entry);
 
 	// set a bit anywhere the transcolor matches
-	uint32_t mask = 0;
+	u32 mask = 0;
 	for (int bit = 0; bit < count; bit++)
 		if (m_indirect_pens[entry++] == transcolor)
 			mask |= 1 << bit;
@@ -715,9 +715,9 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 	int ifactor = int(factor * 256.0f);
 	for (int rgb555 = 0; rgb555 < 32768; rgb555++)
 	{
-		uint8_t r = rgb_t::clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
-		uint8_t g = rgb_t::clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
-		uint8_t b = rgb_t::clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
+		u8 const r = rgb_t::clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
+		u8 const g = rgb_t::clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
+		u8 const b = rgb_t::clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
 
 		// store either 16 or 32 bit
 		rgb_t final = rgb_t(r, g, b);
@@ -859,7 +859,7 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
 
 void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
 {
-	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
+	const u8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -932,35 +932,35 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
 }
 
-rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(uint32_t raw)
+rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)
 {
-	uint8_t i = (raw >> 15) & 1;
-	uint8_t r = pal6bit(((raw >> 9) & 0x3e) | i);
-	uint8_t g = pal6bit(((raw >> 4) & 0x3e) | i);
-	uint8_t b = pal6bit(((raw << 1) & 0x3e) | i);
+	u8 const i = (raw >> 15) & 1;
+	u8 const r = pal6bit(((raw >> 9) & 0x3e) | i);
+	u8 const g = pal6bit(((raw >> 4) & 0x3e) | i);
+	u8 const b = pal6bit(((raw << 1) & 0x3e) | i);
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(uint32_t raw)
+rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(u32 raw)
 {
-	uint8_t r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
-	uint8_t g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
-	uint8_t b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
+	u8 const r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
+	u8 const g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
+	u8 const b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder(uint32_t raw)
+rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw)
 {
-	uint8_t r = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
-	uint8_t g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
-	uint8_t b = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
+	u8 const r = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
+	u8 const g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
+	u8 const b = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(uint32_t raw)
+rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 {
-	uint8_t r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
-	uint8_t g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
-	uint8_t b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
+	u8 const r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
+	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
+	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
 	return rgb_t(r, g, b);
 }

@@ -153,7 +153,7 @@ class m68000_base_device;
 #define GET_MSB_16(A) ((A) & 0x8000)
 #define GET_MSB_17(A) ((A) & 0x10000)
 #define GET_MSB_32(A) ((A) & 0x80000000)
-#define GET_MSB_33(A) ((A) & U64(0x100000000))
+#define GET_MSB_33(A) ((A) & 0x100000000U)
 
 /* Isolate nibbles */
 #define LOW_NIBBLE(A)  ((A) & 0x0f)
@@ -168,8 +168,8 @@ class m68000_base_device;
 #define MASK_OUT_BELOW_16(A) ((A) & ~0xffff)
 
 /* No need to mask if we are 32 bit */
-#define MASK_OUT_ABOVE_32(A) ((A) & U64(0xffffffff))
-#define MASK_OUT_BELOW_32(A) ((A) & ~U64(0xffffffff))
+#define MASK_OUT_ABOVE_32(A) ((A) & u64(0xffffffffU))
+#define MASK_OUT_BELOW_32(A) ((A) & ~u64(0xffffffffU))
 
 /* Shift & Rotate Macros. */
 #define LSL(A, C) ((A) << (C))
@@ -689,9 +689,15 @@ static inline uint32_t m68ki_ic_readimm16(m68000_base_device *m68k, uint32_t add
 			// do a cache fill if the line is invalid or the tags don't match
 			if ((!m68k->ic_valid[idx]) || (m68k->ic_address[idx] != tag))
 			{
+				// if the cache is frozen, don't update it
+				if (m68k->cacr & M68K_CACR_FI)
+				{
+					return m68k->readimm16(address);
+				}
+
 				uint32_t data = m68k->read32(address & ~3);
 
-//              printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
+	            //printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
 				// if no buserror occurred, validate the tag
 				if (!m68k->mmu_tmp_buserror_occurred)

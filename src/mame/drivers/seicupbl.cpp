@@ -546,7 +546,6 @@ static MACHINE_CONFIG_START( cupsocbl, seicupbl_state )
 	MCFG_DEVICE_SEIBUCOP_BOOTLEG_ADD("seibucop_boot")
 
 	/*Different Sound hardware*/
-	//SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 	MCFG_CPU_ADD("audiocpu", Z80,14318180/4)
 	MCFG_CPU_PROGRAM_MAP(cupsocbl_sound_mem)
 	//MCFG_PERIODIC_INT("screen", nmi_line_pulse)

@@ -233,7 +233,7 @@ static void aluconst(std::ostream &stream, int dest, int op)
 
 
 /* execute instructions on this CPU until icount expires */
-static offs_t internal_disasm_adsp21xx(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(adsp21xx)
 {
 	unsigned int op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16);
 	unsigned dasmflags = 0;
@@ -551,14 +551,3 @@ static offs_t internal_disasm_adsp21xx(cpu_device *device, std::ostream &stream,
 
 	return 1 | dasmflags | DASMFLAG_SUPPORTED;
 }
-
-
-CPU_DISASSEMBLE(adsp21xx)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_adsp21xx(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-

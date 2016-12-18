@@ -43,7 +43,7 @@
 //  TYPE DEFINITIONS
 //============================================================
 
-class win_window_info  : public osd_window
+class win_window_info  : public osd_window_t<HWND>
 {
 public:
 	win_window_info(running_machine &machine, int index, std::shared_ptr<osd_monitor_info> monitor, const osd_window_config *config);
@@ -58,7 +58,7 @@ public:
 	virtual bool win_has_menu() override
 	{
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-		return GetMenu(platform_window<HWND>()) ? true : false;
+		return GetMenu(platform_window()) ? true : false;
 #else
 		return false;
 #endif
@@ -68,7 +68,7 @@ public:
 	{
 #if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
 		RECT client;
-		GetClientRect(platform_window<HWND>(), &client);
+		GetClientRect(platform_window(), &client);
 		return osd_dim(client.right - client.left, client.bottom - client.top);
 #else
 		throw ref new Platform::NotImplementedException();

@@ -257,7 +257,7 @@ void driver_device::device_reset_after_children()
 //  irq_pulse_clear - clear a "pulsed" IRQ line
 //-------------------------------------------------
 
-void driver_device::irq_pulse_clear(void *ptr, int32_t param)
+void driver_device::irq_pulse_clear(void *ptr, s32 param)
 {
 	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
 	int irqline = param;
@@ -366,7 +366,7 @@ void driver_device::updateflip()
 //  flip_screen_set - set global flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_set(uint32_t on)
+void driver_device::flip_screen_set(u32 on)
 {
 	// normalize to all 1
 	if (on)
@@ -386,7 +386,7 @@ void driver_device::flip_screen_set(uint32_t on)
 //  do not call updateflip.
 //-------------------------------------------------
 
-void driver_device::flip_screen_set_no_update(uint32_t on)
+void driver_device::flip_screen_set_no_update(u32 on)
 {
 	// flip_screen_y is not updated on purpose
 	// this function is for drivers which
@@ -402,7 +402,7 @@ void driver_device::flip_screen_set_no_update(uint32_t on)
 //  flip_screen_x_set - set global horizontal flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_x_set(uint32_t on)
+void driver_device::flip_screen_x_set(u32 on)
 {
 	// normalize to all 1
 	if (on)
@@ -421,7 +421,7 @@ void driver_device::flip_screen_x_set(uint32_t on)
 //  flip_screen_y_set - set global vertical flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_y_set(uint32_t on)
+void driver_device::flip_screen_y_set(u32 on)
 {
 	// normalize to all 1
 	if (on)

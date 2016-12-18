@@ -37,9 +37,9 @@ enum {
 #define BIT_SET(w , n)  ((w) |= BIT_MASK(n))
 
 // Bits in m_flags
-#define NANO_DC0_BIT	0	// DC0
-#define NANO_E_BIT	(NANO_DC0_BIT + HP_NANO_DC_NO)	// Extend flag
-#define NANO_I_BIT	(NANO_E_BIT + 1)	// Interrupt flag
+#define NANO_DC0_BIT    0   // DC0
+#define NANO_E_BIT  (NANO_DC0_BIT + HP_NANO_DC_NO)  // Extend flag
+#define NANO_I_BIT  (NANO_E_BIT + 1)    // Interrupt flag
 
 const device_type HP_NANOPROCESSOR = &device_creator<hp_nanoprocessor_device>;
 
@@ -159,10 +159,10 @@ void hp_nanoprocessor_device::state_string_export(const device_state_entry &entr
 
 }
 
-offs_t hp_nanoprocessor_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t hp_nanoprocessor_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(hp_nanoprocessor);
-	return CPU_DISASSEMBLE_NAME(hp_nanoprocessor)(this , buffer , pc , oprom , opram , options);
+	return CPU_DISASSEMBLE_NAME(hp_nanoprocessor)(this , stream , pc , oprom , opram , options);
 }
 
 void hp_nanoprocessor_device::execute_one(uint8_t opcode)

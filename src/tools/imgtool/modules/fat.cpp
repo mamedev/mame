@@ -465,7 +465,7 @@ static imgtoolerr_t fat_partition_create(imgtool::image &image, uint64_t first_b
 #endif
 
 	/* check for limits */
-	if (block_count > U64(0xFFFFFFFFFFFF))
+	if (block_count > 0xFFFFFFFFFFFFU)
 		return IMGTOOLERR_PARAMTOOLARGE;
 
 	/* get the geometry */

@@ -1627,17 +1627,17 @@ void tms340x0_device::state_string_export(const device_state_entry &entry, std::
 }
 
 
-offs_t tms34010_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms34010_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms34010 );
 
-	return CPU_DISASSEMBLE_NAME(tms34010)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms34010)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t tms34020_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms34020_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms34020 );
 
-	return CPU_DISASSEMBLE_NAME(tms34020)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms34020)(this, stream, pc, oprom, opram, options);
 }

@@ -1,6 +1,6 @@
 local sql = require("lsqlite3")
 local datfile = {}
-local db = sql.open(mame_manager:ui():options().entries.historypath:value():match("([^;]+)") .. "/history.db")
+local db = sql.open(lfs.env_replace(mame_manager:ui():options().entries.historypath:value():match("([^;]+)")) .. "/history.db")
 if db then
 	local found = false
 	db:exec("select * from sqllite_master where name = version", function() found = true return 0 end)
@@ -49,7 +49,7 @@ function datfile.open(file, vertag, fixupcb)
 		dbver = stmt:get_value(0)
 	end
 	stmt:finalize()
-	
+
 	if not dbver then
 		db:exec("CREATE TABLE \"" .. file .. [[_idx" (
 				type VARCHAR NOT NULL,

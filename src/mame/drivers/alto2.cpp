@@ -135,7 +135,7 @@ static INPUT_PORTS_START( alto2 )
 	PORT_KEY(A2_KEY_FL2,        KEYCODE_F2,         0,              0,            "FL2"          )  //!< ADL left function key 2
 
 	PORT_START("ROW5")
-	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right funtion key 4
+	PORT_KEY(A2_KEY_FR4,        KEYCODE_F8,         0,              0,            "FR4"          )  //!< ADL right function key 4
 	PORT_KEY(A2_KEY_BW,         KEYCODE_F10,        0,              0,            "BW"           )  //!< ADL BW (?)
 
 	PORT_START("ROW6")

@@ -334,7 +334,7 @@ READ64_MEMBER(konamim2_state::irq_active_r)
 
 READ64_MEMBER(konamim2_state::unk1_r)
 {
-	return U64(0xffffffffffffffff);
+	return 0xffffffffffffffffU;
 	//return 0;
 }
 
@@ -351,7 +351,7 @@ READ64_MEMBER(konamim2_state::unk2_r)
 
 READ64_MEMBER(konamim2_state::unk3_r)
 {
-	//return U64(0xffffffffffffffff);
+	//return 0xffffffffffffffffU;
 	return m_unk3;
 }
 
@@ -474,7 +474,7 @@ WRITE64_MEMBER(konamim2_state::reset_w)
 {
 	if (ACCESSING_BITS_32_63)
 	{
-		if (data & U64(0x100000000))
+		if (data & 0x100000000U)
 		{
 			m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 			m_unk3 = 0;
@@ -1329,7 +1329,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(konamim2_state,m2)
 {
-	m_unk3 = U64(0xffffffffffffffff);
+	m_unk3 = 0xffffffffffffffffU;
 	m_unk20004 = 0;
 	cde_init();
 }

@@ -48,10 +48,10 @@
   the 2114 find the 74148 or 74ls148, all 9980 cpu's use one, pin3 will generate a reset.
   The 5517 ram is compatible with 6116 or 2018.
 
-  The 9980 has 3 interupt inputs, but they are binary.
-  The ls148 encodes the interupts to the cpu - the highest interupt is reset.
+  The 9980 has 3 interrupt inputs, but they are binary.
+  The ls148 encodes the interrupts to the cpu - the highest interrupt is reset.
 
-  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interupt
+  I tried pulling pin 3 of the 74ls148 low and yes, this sets up the reset interrupt
   on pins 23, 24 and 25. The TC5517 checks out ok as a 6116.
 
   The crystal seems ok and this clock makes it throught to pin 34 of the MPU.

@@ -50,7 +50,7 @@ address_space_config::address_space_config()
  @param internal
  @param defmap
  */
-address_space_config::address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -64,7 +64,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, uint8_t logwidth, uint8_t pageshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -78,7 +78,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, address_map_delegate internal, address_map_delegate defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_delegate internal, address_map_delegate defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -94,7 +94,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, uint8_t datawidth, uint8_t addrwidth, int8_t addrshift, uint8_t logwidth, uint8_t pageshift, address_map_delegate internal, address_map_delegate defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_delegate internal, address_map_delegate defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -178,52 +178,6 @@ bool device_memory_interface::memory_translate(address_spacenum spacenum, int in
 {
 	// by default it maps directly
 	return true;
-}
-
-
-//-------------------------------------------------
-//  memory_read - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal read operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_write - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal write operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_write(address_spacenum spacenum, offs_t offset, int size, uint64_t value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_readop - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal opcode fetching
-//  operations are handled by bypassing the memory
-//  system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_readop(offs_t offset, int size, uint64_t &value)
-{
-	// by default, we don't do anything
-	return false;
 }
 
 

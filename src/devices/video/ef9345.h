@@ -99,9 +99,9 @@ private:
 	uint8_t m_blink;                          //cursor status
 	uint8_t m_last_dial[40];                  //last chars dial (for determinate the zoom position)
 	uint8_t m_latchc0;                        //background color latch
-	uint8_t m_latchm;                         //hided atribute latch
-	uint8_t m_latchi;                         //insert atribute latch
-	uint8_t m_latchu;                         //underline atribute latch
+	uint8_t m_latchm;                         //hided attribute latch
+	uint8_t m_latchi;                         //insert attribute latch
+	uint8_t m_latchu;                         //underline attribute latch
 
 	bitmap_rgb32 m_screen_out;
 

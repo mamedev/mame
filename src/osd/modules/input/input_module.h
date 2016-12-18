@@ -23,7 +23,7 @@ public:
 	}
 
 	virtual ~input_module() { }
-	
+
 	virtual void input_init(running_machine &machine) = 0;
 	virtual void poll_if_necessary(running_machine &machine) = 0;
 	virtual void pause() = 0;

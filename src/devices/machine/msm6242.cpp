@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    MSM6242 / Epson RTC 62421 / 62423 Real Time Clock
+    MSM6242 / Epson RTC 62421 / 62423 / 72421 / 72423 Real Time Clock
 
     TODO:
     - Stop timer callbacks on every single tick
@@ -53,8 +53,12 @@ enum
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-// device type definition
+// device type definitions
 const device_type MSM6242 = &device_creator<msm6242_device>;
+const device_type RTC62421 = &device_creator<rtc62421_device>;
+const device_type RTC62423 = &device_creator<rtc62423_device>;
+const device_type RTC72421 = &device_creator<rtc72421_device>;
+const device_type RTC72423 = &device_creator<rtc72423_device>;
 
 
 //**************************************************************************
@@ -67,6 +71,13 @@ const device_type MSM6242 = &device_creator<msm6242_device>;
 
 msm6242_device::msm6242_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSM6242, "MSM6242 RTC", tag, owner, clock, "msm6242", __FILE__),
+		device_rtc_interface(mconfig, *this),
+		m_out_int_handler(*this)
+{
+}
+
+msm6242_device::msm6242_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *filename)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, filename),
 		device_rtc_interface(mconfig, *this),
 		m_out_int_handler(*this)
 {
@@ -551,4 +562,44 @@ WRITE8_MEMBER( msm6242_device::write )
 
 	// update the timer variable in response to potential changes
 	update_timer();
+}
+
+
+//-------------------------------------------------
+//  rtc62421_device - constructor
+//-------------------------------------------------
+
+rtc62421_device::rtc62421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msm6242_device(mconfig, RTC62421, "RTC-62421", tag, owner, clock, "rtc62421", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  rtc62423_device - constructor
+//-------------------------------------------------
+
+rtc62423_device::rtc62423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msm6242_device(mconfig, RTC62423, "RTC-62423", tag, owner, clock, "rtc62423", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  rtc72421_device - constructor
+//-------------------------------------------------
+
+rtc72421_device::rtc72421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msm6242_device(mconfig, RTC72421, "RTC-72421", tag, owner, clock, "rtc72421", __FILE__)
+{
+}
+
+
+//-------------------------------------------------
+//  rtc72423_device - constructor
+//-------------------------------------------------
+
+rtc72423_device::rtc72423_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: msm6242_device(mconfig, RTC72423, "RTC-72423", tag, owner, clock, "rtc72423", __FILE__)
+{
 }

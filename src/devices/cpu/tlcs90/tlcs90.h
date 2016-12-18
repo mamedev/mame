@@ -58,14 +58,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	virtual uint32_t disasm_max_opcode_bytes() const override { return 6; }
-	virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override
-	{
-		std::ostringstream stream;
-		offs_t result = disasm_disassemble(stream, pc, oprom, opram, options);
-		std::string stream_str = stream.str();
-		strcpy(buffer, stream_str.c_str());
-		return result;
-	}
+	virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 private:
 	enum e_mode {
@@ -147,7 +140,6 @@ private:
 	void t90_stop_timer(int i);
 	void t90_stop_timer4();
 	void set_irq_line(int irq, int state);
-	offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options);
 };
 
 

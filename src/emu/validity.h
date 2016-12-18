@@ -64,7 +64,7 @@ private:
 	typedef std::unordered_map<std::string,uintptr_t> int_map;
 
 	// internal helpers
-	const char *ioport_string_from_index(uint32_t index);
+	const char *ioport_string_from_index(u32 index);
 	int get_defstr_index(const char *string, bool suppress_error = false);
 
 	// core helpers
@@ -90,10 +90,10 @@ private:
 	void output_indented_errors(std::string &text, const char *header);
 
 	// random number generation
-	int32_t random_i32();
-	uint32_t random_u32();
-	int64_t random_i64();
-	uint64_t random_u64();
+	s32 random_i32();
+	u32 random_u32();
+	s64 random_i64();
+	u64 random_u64();
 
 	// internal driver list
 	driver_enumerator       m_drivlist;

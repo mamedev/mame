@@ -1,9 +1,9 @@
 {
   "plugin": {
-    "name": "hiscore",
+	"name": "hiscore",
 	"description": "Hiscore support",
-    "version": "1.0.0",
-    "author": "borgar@borgar.net",
+	"version": "1.0.0",
+	"author": "borgar@borgar.net",
 	"type": "plugin",
 	"start": "false"
   }

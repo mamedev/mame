@@ -1034,9 +1034,5 @@ static int mn102_disassemble(std::ostream &stream, uint32_t pc, const uint8_t *o
 
 CPU_DISASSEMBLE( mn10200 )
 {
-	std::ostringstream stream;
-	offs_t result = mn102_disassemble(stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
+	return mn102_disassemble(stream, pc, oprom);
 }

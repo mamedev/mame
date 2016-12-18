@@ -190,11 +190,11 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
     a single RGB component
 -------------------------------------------------*/
 
-static inline uint8_t apply_brightness_contrast_gamma(uint8_t src, float brightness, float contrast, float gamma)
+static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
 {
 	float srcval = (float)src * (1.0f / 255.0f);
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);
-	return (uint8_t)(result * 255.0f);
+	return u8(result * 255.0f);
 }
 
 

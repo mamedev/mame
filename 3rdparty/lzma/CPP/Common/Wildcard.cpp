@@ -484,7 +484,7 @@ unsigned GetNumPrefixParts_if_DrivePath(UStringVector &pathParts)
 
 #endif
 
-static unsigned GetNumPrefixParts(const UStringVector pathParts)
+static unsigned GetNumPrefixParts(const UStringVector &pathParts)
 {
   if (pathParts.IsEmpty())
     return 0;

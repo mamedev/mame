@@ -414,8 +414,8 @@ void uml::instruction::simplify()
 	if (m_flags != 0)
 		return;
 
-	static const uint64_t instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
-	static const uint64_t paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
+	static const uint64_t instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
+	static const uint64_t paramsizemask[] = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffU };
 
 	// loop until we've simplified all we can
 	opcode_t origop;
@@ -491,7 +491,7 @@ void uml::instruction::simplify()
 					m_opcode = OP_ROL;
 					m_numparams = 3;
 				}
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((U64(0xffffffffffffffff) << m_param[2].immediate()) & instsizemask[m_size]))
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((0xffffffffffffffffU << m_param[2].immediate()) & instsizemask[m_size]))
 				{
 					m_opcode = OP_SHL;
 					m_numparams = 3;

@@ -274,10 +274,7 @@ private:
 
 
 static ADDRESS_MAP_START( octopus_mem, AS_PROGRAM, 8, octopus_state )
-	AM_RANGE(0x00000, 0x1ffff) AM_RAMBANK("main_ram_bank")
-	// second 128kB for 256kB system
-	// expansion RAM, up to 512kB extra
-	AM_RANGE(0x20000, 0xcffff) AM_NOP
+	AM_RANGE(0x00000, 0xcffff) AM_RAMBANK("main_ram_bank")
 	AM_RANGE(0xd0000, 0xdffff) AM_RAM AM_SHARE("vram")
 	AM_RANGE(0xe0000, 0xe3fff) AM_NOP
 	AM_RANGE(0xe4000, 0xe5fff) AM_RAM AM_SHARE("fram")
@@ -729,9 +726,9 @@ void octopus_state::machine_start()
 {
 	m_timer_beep = timer_alloc(BEEP_TIMER);
 
-	// install extra RAM
-	if(m_ram->size() > 0x20000)
-		m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x20000,m_ram->size()-1,"extra_ram_bank");
+	// install RAM
+	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000,m_ram->size()-1,"main_ram_bank");
+	m_maincpu->space(AS_PROGRAM).nop_readwrite(m_ram->size(),0xcffff);
 }
 
 void octopus_state::machine_reset()
@@ -744,8 +741,6 @@ void octopus_state::machine_reset()
 	m_rtc_address = true;
 	m_rtc_data = false;
 	membank("main_ram_bank")->set_base(m_ram->pointer());
-	if(m_ram->size() > 0x20000)
-		membank("extra_ram_bank")->set_base(m_ram->pointer()+0x20000);
 	m_kb_uart->write_dsr(1);  // DSR is used to determine if a keyboard is connected?  If DSR is high, then the CHAR_OUT BIOS function will not output to the screen.
 }
 
@@ -813,7 +808,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 				bg = 0x7f7f7f;
 			else
 				bg = 0x000000;
-				
+
 			if(attr & 0x20)  // reverse video
 				data = ~data;
 		}
@@ -824,7 +819,7 @@ SCN2674_DRAW_CHARACTER_MEMBER(octopus_state::display_pixels)
 		if(cursor && !blink)
 		{
 			bool inverse = true;
-			
+
 			if(!(m_dswa->read() & 0x80))  // not available in monochrome mode
 				inverse = false;
 			if(m_vidctrl & 0x40)  // not enabled
@@ -955,11 +950,18 @@ static MACHINE_CONFIG_START( octopus, octopus_state )
 
 	MCFG_Z80SIO2_ADD("serial", XTAL_16MHz / 4, 0, 0, 0, 0) // clock rate not mentioned in tech manual
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("pic_master",pic8259_device, ir1_w))
+	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_txd))
+	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("serial_a",rs232_port_device, write_rts))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("serial_b",rs232_port_device, write_rts))
+
 	MCFG_RS232_PORT_ADD("serial_a", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsa_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, ria_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_PORT_ADD("serial_b", default_rs232_devices, nullptr)
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w))
+	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("serial",z80sio2_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("serial",z80sio2_device, ctsb_w)) MCFG_DEVCB_INVERT
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE("serial",z80sio2_device, rib_w)) MCFG_DEVCB_INVERT
 
 	MCFG_CENTRONICS_ADD("parallel", octopus_centronics_devices, "printer")
@@ -1008,4 +1010,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME      PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY             FULLNAME       FLAGS */
-COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+COMP( 1986, octopus,  0,      0,       octopus,   octopus, driver_device, 0,  "Digital Microsystems", "LSI Octopus", MACHINE_NOT_WORKING)

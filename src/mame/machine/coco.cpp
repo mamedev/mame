@@ -936,7 +936,7 @@ void coco_state::diecom_lightgun_clock(void)
 		else
 			m_dclg_output_v &= ~0x01;
 
-		/* Bit 9 of timer is only avaiable if state == 8*/
+		/* Bit 9 of timer is only available if state == 8*/
 		if (m_dclg_state == 8 && (((m_dclg_timer >> 9) & 0x01) == 1))
 			m_dclg_output_v |= 0x02;
 		else

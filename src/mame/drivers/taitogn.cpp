@@ -548,7 +548,7 @@ WRITE8_MEMBER(taitogn_state::coin_w)
 	   0x02=coin lock 1
 	   0x04=mahjong row select
 	   0x08=mahjong row select
-	   0x01=??
+	   0x10=??
 	   0x20=coin lock 2
 	   0x40=mahjong row select
 	   0x80=mahjong row select
@@ -857,7 +857,7 @@ static INPUT_PORTS_START( coh3002t )
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("JP1")
-	PORT_DIPNAME( 0x01, 0x00, "Bios Flash" )
+	PORT_DIPNAME( 0x01, 0x00, "Bios Flash" )            PORT_DIPLOCATION("JP1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 INPUT_PORTS_END

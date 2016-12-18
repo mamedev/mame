@@ -152,7 +152,7 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 };
 
-static offs_t internal_disasm_sc61860(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(sc61860)
 {
 	const uint8_t *base_oprom = oprom;
 	int oper=*(oprom++);
@@ -207,14 +207,4 @@ static offs_t internal_disasm_sc61860(cpu_device *device, std::ostream &stream, 
 		break;
 	}
 	return oprom - base_oprom;
-}
-
-
-CPU_DISASSEMBLE(sc61860)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_sc61860(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

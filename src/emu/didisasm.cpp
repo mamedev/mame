@@ -64,20 +64,15 @@ void device_disasm_interface::static_set_dasm_override(device_t &device, dasm_ov
 //  disassemble - interface for disassembly
 //-------------------------------------------------
 
-offs_t device_disasm_interface::disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t device_disasm_interface::disassemble(std::ostream &stream, offs_t pc, const u8 *oprom, const u8 *opram, u32 options)
 {
 	offs_t result = 0;
 
 	// check for disassembler override
 	if (!m_dasm_override.isnull())
-	{
-		std::ostringstream stream;
 		result = m_dasm_override(device(), stream, pc, oprom, opram, options);
-		std::string stream_str = stream.str();
-		strcpy(buffer, stream_str.c_str());
-	}
 	if (result == 0)
-		result = disasm_disassemble(buffer, pc, oprom, opram, options);
+		result = disasm_disassemble(stream, pc, oprom, opram, options);
 
 	// make sure we get good results
 	assert((result & DASMFLAG_LENGTHMASK) != 0);

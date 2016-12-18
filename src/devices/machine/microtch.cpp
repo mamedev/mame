@@ -120,10 +120,12 @@ void microtouch_device::device_timer(emu_timer &timer, device_timer_id id, int p
 
 	if ( m_tx_buffer_ptr < m_tx_buffer_num )
 	{
-		m_output = m_tx_buffer[m_tx_buffer_ptr++];
-		m_output_valid = true;
 		if(is_transmit_register_empty())
+		{
+			m_output = m_tx_buffer[m_tx_buffer_ptr++];
+			m_output_valid = true;
 			tra_complete();
+		}
 
 		if ( m_tx_buffer_ptr == m_tx_buffer_num )
 		{
@@ -259,6 +261,32 @@ void microtouch_device::rcv_complete()
 			m_tx_buffer[m_tx_buffer_num++] = '1';
 			m_tx_buffer[m_tx_buffer_num++] = '0';
 			m_tx_buffer[m_tx_buffer_num++] = '0';
+			m_tx_buffer[m_tx_buffer_num++] = 0x0d;
+			m_rx_buffer_ptr = 0;
+			return;
+		}
+		else if ( check_command("OS", m_rx_buffer_ptr, m_rx_buffer ) )
+		{
+			// output status
+			m_tx_buffer[m_tx_buffer_num++] = 0x01;
+
+			// ---- ---x    RAM error
+			// ---- --x-    ROM error
+			// ---- -x--    Analog-to-digital error
+			// ---- x---    NOVRAM error
+			// ---x ----    ASIC error
+			// --x- ----    Power on flag
+			// -x-- ----    Always 1
+			// x--- ----    Always 0
+			m_tx_buffer[m_tx_buffer_num++] = 0x40;
+
+			// ---- ---x    Cable NOVRAM error
+			// ---- --x-    Hard NOVRAM error
+			// ---x xx--    Reserved
+			// --x- ----    Software reset flag
+			// -x-- ----    Always 1
+			// x--- ----    Always 0
+			m_tx_buffer[m_tx_buffer_num++] = 0x40 | (m_reset_done << 5);
 			m_tx_buffer[m_tx_buffer_num++] = 0x0d;
 			m_rx_buffer_ptr = 0;
 			return;

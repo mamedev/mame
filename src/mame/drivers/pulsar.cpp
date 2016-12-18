@@ -55,6 +55,7 @@ public:
 		m_brg(*this, "brg"),
 		m_fdc (*this, "fdc"),
 		m_floppy0(*this, "fdc:0"),
+		m_floppy1(*this, "fdc:1"),
 		m_rtc(*this, "rtc")
 	{
 	}
@@ -77,6 +78,7 @@ private:
 	required_device<com8116_device> m_brg;
 	required_device<fd1797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	required_device<msm5832_device> m_rtc;
 };
 
@@ -138,41 +140,46 @@ d7     XMEMEX line (for external memory, not emulated)
 WRITE8_MEMBER( pulsar_state::ppi_pa_w )
 {
 	m_floppy = nullptr;
-	if (BIT(data, 0)) m_floppy = m_floppy0->get_device();
+	if (BIT(data, 0))
+		m_floppy = m_floppy0->get_device();
+	else
+	if (BIT(data, 1))
+		m_floppy = m_floppy1->get_device();
 	m_fdc->set_floppy(m_floppy);
 	m_fdc->dden_w(BIT(data, 5));
+	if (m_floppy)
+		m_floppy->mon_w(0);
 }
 
 /*
 d0..d3 RTC address
-d4     RTC read line (inverted in emulation)
-d5     RTC write line (inverted in emulation)
+d4     RTC read line
+d5     RTC write line
 d6     RTC hold line
 d7     Allow 64k of ram
 */
 WRITE8_MEMBER( pulsar_state::ppi_pb_w )
 {
 	m_rtc->address_w(data & 0x0f);
-	m_rtc->read_w(!BIT(data, 4));
-	m_rtc->write_w(!BIT(data, 5));
+	m_rtc->read_w(BIT(data, 4));
+	m_rtc->write_w(BIT(data, 5));
 	m_rtc->hold_w(BIT(data, 6));
 	membank("bankr1")->set_entry(BIT(data, 7));
 }
 
-/*
-d0..d3 Data lines to rtc
-d7     /2 SIDES (assumed to be side select)
-*/
+// d0..d3 Data lines to rtc
 WRITE8_MEMBER( pulsar_state::ppi_pc_w )
 {
 	m_rtc->data_w(space, 0, data & 15);
-	if (m_floppy)
-		m_floppy->ss_w(BIT(data, 7));
 }
 
+// d7     /2 SIDES
 READ8_MEMBER( pulsar_state::ppi_pc_r )
 {
-	return m_rtc->data_r(space, 0);
+	uint8_t data = 0;
+	if (m_floppy)
+		data = m_floppy->twosid_r() << 7;
+	return m_rtc->data_r(space, 0) | data;
 }
 
 static DEVICE_INPUT_DEFAULTS_START( terminal )
@@ -185,7 +192,8 @@ static DEVICE_INPUT_DEFAULTS_START( terminal )
 DEVICE_INPUT_DEFAULTS_END
 
 static SLOT_INTERFACE_START( pulsar_floppies )
-	SLOT_INTERFACE( "525dd", FLOPPY_525_DD )
+	SLOT_INTERFACE( "drive0", FLOPPY_525_HD )
+	SLOT_INTERFACE( "drive1", FLOPPY_525_HD )
 SLOT_INTERFACE_END
 
 /* Input ports */
@@ -248,7 +256,10 @@ static MACHINE_CONFIG_START( pulsar, pulsar_state )
 	MCFG_COM8116_FT_HANDLER(WRITELINE(pulsar_state, ft_w))
 
 	MCFG_FD1797_ADD("fdc", XTAL_4MHz / 2)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "525dd", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pulsar_floppies, "drive0", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", pulsar_floppies, "drive1", floppy_image_device::default_floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 /* ROM definition */

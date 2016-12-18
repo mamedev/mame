@@ -86,7 +86,7 @@ private:
 		float size;
 	};
 
-	// information about the "source" of a chracter - also in a struct
+	// information about the "source" of a character - also in a struct
 	// to facilitate copying
 	struct source_info
 	{

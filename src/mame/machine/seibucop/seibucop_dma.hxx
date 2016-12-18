@@ -41,8 +41,6 @@ void raiden2cop_device::dma_palette_brightness()
 
 	TODO:
 	- Denjin Makai mode 4 is totally guessworked.
-	- SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
-	presumably bad RAM table or bad algorithm
 	*/
 
 	//if(dma_trigger != 0x87)
@@ -60,21 +58,28 @@ void raiden2cop_device::dma_palette_brightness()
 
 		if (pal_brightness_mode == 5)
 		{
-			bt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x7c00) >> 5;
-			bt = fade_table(bt | (pal_brightness_val ^ 0));
-			b = ((m_host_space->read_word(src)) & 0x7c00) >> 5;
-			b = fade_table(b | (pal_brightness_val ^ 0x1f));
-			pal_val = ((b + bt) & 0x1f) << 10;
-			gt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x03e0);
-			gt = fade_table(gt | (pal_brightness_val ^ 0));
-			g = ((m_host_space->read_word(src)) & 0x03e0);
-			g = fade_table(g | (pal_brightness_val ^ 0x1f));
-			pal_val |= ((g + gt) & 0x1f) << 5;
-			rt = ((m_host_space->read_word(src + (cop_dma_adr_rel * 0x400))) & 0x001f) << 5;
-			rt = fade_table(rt | (pal_brightness_val ^ 0));
-			r = ((m_host_space->read_word(src)) & 0x001f) << 5;
-			r = fade_table(r | (pal_brightness_val ^ 0x1f));
-			pal_val |= ((r + rt) & 0x1f);
+			u16 paldata = m_host_space->read_word(src);
+			if (BIT(paldata, 15))
+				pal_val = paldata; // fade me not
+			else
+			{
+				u16 targetpaldata = m_host_space->read_word(src + (cop_dma_adr_rel * 0x400));
+				bt = (targetpaldata & 0x7c00) >> 5;
+				bt = fade_table(bt | (pal_brightness_val ^ 0));
+				b = (paldata & 0x7c00) >> 5;
+				b = fade_table(b | (pal_brightness_val ^ 0x1f));
+				pal_val = ((b + bt) & 0x1f) << 10;
+				gt = (targetpaldata & 0x03e0);
+				gt = fade_table(gt | (pal_brightness_val ^ 0));
+				g = (paldata & 0x03e0);
+				g = fade_table(g | (pal_brightness_val ^ 0x1f));
+				pal_val |= ((g + gt) & 0x1f) << 5;
+				rt = (targetpaldata & 0x001f) << 5;
+				rt = fade_table(rt | (pal_brightness_val ^ 0));
+				r = (paldata & 0x001f) << 5;
+				r = fade_table(r | (pal_brightness_val ^ 0x1f));
+				pal_val |= ((r + rt) & 0x1f);
+			}
 		}
 		else if (pal_brightness_mode == 4) //Denjin Makai
 		{

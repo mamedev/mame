@@ -177,7 +177,7 @@ enum
  * +-+-+-+-+-+-+----+----+----+----+----+----+----+----+----+----+          *
  *                                                                          *
  * SPRn         1=collision with sprite #n                                  *
- * BKGD         1=collsion with set background bit                          *
+ * BKGD         1=collision with set background bit                         *
  * BRDR         1=collision with screen border                              *
  *                                                                          *
  ****************************************************************************

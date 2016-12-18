@@ -156,6 +156,7 @@ private:
 
 	struct context
 	{
+		context() { busy = false; yield = false; }
 		std::string result;
 		std::condition_variable sync;
 		bool busy;

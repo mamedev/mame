@@ -404,7 +404,7 @@ WRITE16_MEMBER(alpha_8201_device::mcu_d_w)
 WRITE_LINE_MEMBER(alpha_8201_device::bus_dir_w)
 {
 	// set RAM bus direction to 0: external, 1: MCU side
-	// selects one of two 74LS245 (octal bus transceiver) for databus, addressbus via
+	// selects one of two 74LS245 (octal bus transceiver) for databus, address bus via
 	// a couple of 74LS157 (2-input multiplexer)
 	m_bus = (state) ? 1 : 0;
 	mcu_writeram();

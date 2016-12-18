@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_INFO_PTY_H
 #define MAME_FRONTEND_UI_INFO_PTY_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -23,7 +23,7 @@ public:
 	virtual ~menu_pty_info() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 

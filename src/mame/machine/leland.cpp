@@ -9,8 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/i86/i86.h"
-#include "machine/eepromser.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 
@@ -322,6 +320,21 @@ MACHINE_START_MEMBER(leland_state,leland)
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::leland_interrupt_callback),this));
+
+	save_item(NAME(m_dac_control));
+	save_item(NAME(m_wcol_enable));
+	save_item(NAME(m_analog_result));
+	save_item(NAME(m_dial_last_input));
+	save_item(NAME(m_dial_last_result));
+	save_item(NAME(m_keycard_shift));
+	save_item(NAME(m_keycard_bit));
+	save_item(NAME(m_keycard_state));
+	save_item(NAME(m_keycard_clock));
+	save_item(NAME(m_keycard_command));
+	save_item(NAME(m_top_board_bank));
+	save_item(NAME(m_sound_port_bank));
+	save_item(NAME(m_alternate_bank));
+	save_item(NAME(m_battery_ram_enable));
 }
 
 
@@ -372,6 +385,15 @@ MACHINE_START_MEMBER(leland_state,ataxx)
 
 	/* start scanline interrupts going */
 	m_master_int_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::ataxx_interrupt_callback),this));
+	
+	save_item(NAME(m_wcol_enable));
+	save_item(NAME(m_dial_last_input));
+	save_item(NAME(m_dial_last_result));
+	save_item(NAME(m_master_bank));
+	save_item(NAME(m_xrom1_addr));
+	save_item(NAME(m_xrom2_addr));
+	save_item(NAME(m_battery_ram_enable));
+	save_pointer(NAME(m_extra_tram.get()), ATAXX_EXTRA_TRAM_SIZE);
 }
 
 
@@ -381,7 +403,6 @@ MACHINE_RESET_MEMBER(leland_state,ataxx)
 	m_master_int_timer->adjust(m_screen->time_until_pos(8), 8);
 
 	/* initialize the XROM */
-	m_xrom_length = memregion("user1")->bytes();
 	m_xrom_base = memregion("user1")->base();
 	m_xrom1_addr = 0;
 	m_xrom2_addr = 0;

@@ -49,6 +49,7 @@ public:
 		, m_crtc(*this, "crtc")
 		, m_speaker(*this, "speaker")
 		, m_votrax(*this, "votrax")
+		, m_rtc(*this, "rtc")
 	{}
 
 	DECLARE_READ8_MEMBER(memory_read_byte);
@@ -71,6 +72,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port35_w);
 	DECLARE_READ8_MEMBER(port36_r);
 	DECLARE_READ8_MEMBER(port37_r);
+	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_WRITE_LINE_MEMBER(fdc_drq_w);
 	DECLARE_WRITE_LINE_MEMBER(busreq_w);
@@ -124,4 +127,5 @@ private:
 	required_device<mc6845_device> m_crtc;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<votrax_sc01_device> m_votrax;
+	required_device<msm5832_device> m_rtc;
 };

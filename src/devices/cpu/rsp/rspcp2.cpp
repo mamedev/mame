@@ -587,8 +587,6 @@ void rsp_cop2::vec_store_group4(uint32_t addr, uint32_t element, uint16_t *regp,
 }
 #endif
 
-extern offs_t rsp_dasm_one(char *buffer, offs_t pc, uint32_t op);
-
 /***************************************************************************
     Helpful Defines
 ***************************************************************************/

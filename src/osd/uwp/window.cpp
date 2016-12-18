@@ -137,7 +137,7 @@ bool windows_osd_interface::window_init()
 	{
 		bool error = false;
 		switch(current_mode)
-	{
+		{
 			case VIDEO_MODE_NONE:
 				error = renderer_none::init(machine());
 				break;
@@ -247,7 +247,7 @@ uwp_window_info::uwp_window_info(
 	running_machine &machine,
 	int index,
 	std::shared_ptr<osd_monitor_info> monitor,
-	const osd_window_config *config) : osd_window(*config),
+	const osd_window_config *config) : osd_window_t(*config),
 		m_next(nullptr),
 		m_init_state(0),
 		m_startmaximized(0),
@@ -279,24 +279,24 @@ CoreCursor^ uwp_window_info::s_cursor = nullptr;
 
 void uwp_window_info::capture_pointer()
 {
-	uwp_window()->SetPointerCapture();
+	platform_window()->SetPointerCapture();
 }
 
 void uwp_window_info::release_pointer()
 {
-	uwp_window()->ReleasePointerCapture();
+	platform_window()->ReleasePointerCapture();
 }
 
 void uwp_window_info::hide_pointer()
 {
-	auto window = uwp_window();
+	auto window = platform_window();
 	uwp_window_info::s_cursor = window->PointerCursor;
 	window->PointerCursor = nullptr;
 }
 
 void uwp_window_info::show_pointer()
 {
-	auto window = uwp_window();
+	auto window = platform_window();
 	window->PointerCursor = uwp_window_info::s_cursor;
 }
 
@@ -335,7 +335,7 @@ BOOL winwindow_has_focus(void)
 
 void winwindow_process_events(running_machine &machine, bool ingame, bool nodispatch)
 {
-//	MSG message;
+//  MSG message;
 
 	assert(GetCurrentThreadId() == main_threadid);
 
@@ -459,8 +459,8 @@ void uwp_window_info::destroy()
 	osd_common_t::s_window_list.remove(shared_from_this());
 
 	// destroy the window
-//	if (platform_window<HWND>() != nullptr)
-	//	DestroyWindow(platform_window<HWND>());
+//  if (platform_window<HWND>() != nullptr)
+	//  DestroyWindow(platform_window<HWND>());
 
 	// free the render target
 	machine().render().target_free(m_target);
@@ -496,12 +496,12 @@ void uwp_window_info::update()
 			//if (m_isminimized)
 				//SendMessage(platform_window<HWND>(), WM_USER_SET_MINSIZE, 0, 0);
 			//if (m_ismaximized)
-//				SendMessage(platform_window<HWND>(), WM_USER_SET_MAXSIZE, 0, 0);
+//              SendMessage(platform_window<HWND>(), WM_USER_SET_MAXSIZE, 0, 0);
 		}
 	}
 
 	// if we're visible and running and not in the middle of a resize, draw
-	if (platform_window<HWND>() != nullptr && m_target != nullptr && has_renderer())
+	if (platform_window() != nullptr && m_target != nullptr && has_renderer())
 	{
 		bool got_lock = true;
 		auto clock = std::chrono::high_resolution_clock();
@@ -545,7 +545,7 @@ void uwp_window_info::draw_video_contents(int update)
 	std::lock_guard<std::mutex> lock(m_render_lock);
 
 	// if we're iconic, don't bother
-	if (platform_window<HWND>() != nullptr)
+	if (platform_window() != nullptr)
 	{
 		// if no bitmap, just fill
 		if (m_primlist == nullptr)
@@ -687,9 +687,8 @@ int uwp_window_info::complete_create()
 	// get the monitor bounds
 	osd_rect monitorbounds = m_monitor->position_size();
 
-	IInspectable* raw_window = reinterpret_cast<IInspectable*>(Windows::UI::Core::CoreWindow::GetForCurrentThread());
-	raw_window->AddRef(); // TODO: Should probably figure out a way to auto-release
-	set_platform_window(raw_window);
+	auto coreWindow = Platform::Agile<CoreWindow>(CoreWindow::GetForCurrentThread());
+	set_platform_window(coreWindow);
 
 	// skip the positioning stuff for -video none */
 	if (video_config.mode == VIDEO_MODE_NONE)
@@ -1051,7 +1050,7 @@ void uwp_window_info::adjust_window_position_after_major_change()
 	if (oldrect.left != newrect.left() || oldrect.top != newrect.top() ||
 		oldrect.right != newrect.right() || oldrect.bottom != newrect.bottom())
 		//SetWindowPos(platform_window<HWND>(), fullscreen() ? HWND_TOPMOST : HWND_TOP,
-			//	newrect.left(), newrect.top(),
+			//  newrect.left(), newrect.top(),
 				//newrect.width(), newrect.height(), 0);
 
 	// take note of physical window size (used for lightgun coordinate calculation)
@@ -1102,16 +1101,16 @@ void uwp_window_info::set_fullscreen(int fullscreen)
 		//// if we have previous non-fullscreen bounds, use those
 		//if (m_non_fullscreen_bounds.right != m_non_fullscreen_bounds.left)
 		//{
-		//	SetWindowPos(platform_window<HWND>(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
-		//				rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
-		//				SWP_NOZORDER);
+		//  SetWindowPos(platform_window<HWND>(), HWND_TOP, m_non_fullscreen_bounds.left, m_non_fullscreen_bounds.top,
+		//              rect_width(&m_non_fullscreen_bounds), rect_height(&m_non_fullscreen_bounds),
+		//              SWP_NOZORDER);
 		//}
 		//
 		//// otherwise, set a small size and maximize from there
 		//else
 		//{
-		//	SetWindowPos(platform_window<HWND>(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
-		//	maximize_window();
+		//  SetWindowPos(platform_window<HWND>(), HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
+		//  maximize_window();
 		//}
 	}
 

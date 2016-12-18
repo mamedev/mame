@@ -164,7 +164,7 @@ const rgbaint_t::VECS16 rgbaint_t::scale_table[256] = {
     HIGHER LEVEL OPERATIONS
 ***************************************************************************/
 
-void rgbaint_t::blend(const rgbaint_t& other, uint8_t factor)
+void rgbaint_t::blend(const rgbaint_t& other, u8 factor)
 {
 	const VECU32 shift = vec_splat_u32(-16);
 	const VECS32 scale1 = { factor, factor, factor, factor };
@@ -189,7 +189,7 @@ void rgbaint_t::scale_and_clamp(const rgbaint_t& scale)
 	clamp_to_uint8();
 }
 
-void rgbaint_t::scale_imm_and_clamp(const int32_t scale)
+void rgbaint_t::scale_imm_and_clamp(const s32 scale)
 {
 	mul_imm(scale);
 	sra_imm(8);

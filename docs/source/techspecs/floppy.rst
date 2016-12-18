@@ -115,7 +115,7 @@ Once the cell data stream is extracted decoding depends on the encoding.  In the
 
 2.3.2. Sector-level organization
 ''''''''''''''''''''''''''''''''
-  
+
 Floppies have been designed for read/write random access to reasonably sized blocks of data.  Track selection allows for a first level of random access and sizing, but the ~6K of a double density track would be too big a block to handle.  256/512 bytes are considered a more appropriate value.  To that end data on a track is organized as a series of (sector header, sector data) pairs where the sector header indicates important information like the sector number and size, and the sector data contains the data.  Sectors have to be broken in two parts because while reading is easy, read the header then read the data if you want it, writing requires reading the header to find the correct place then once that is done switching on the writing head for the data.  Starting writing is not instantaneous and will not be perfectly phase-aligned with the read header, so space for synchronization is required between header and data.
 
 In addition somewhere in the sector header and in the sector data are pretty much always added some kind of checksum allowing to know whether the data was damaged or not.
@@ -154,7 +154,7 @@ Then for each sector:
 
 The track is finished with a stream of '1' cells.
 
-The 125KHz pulse trains are used to lock the PLL to the signal correctly.  The specific 16-cells streams allow to distinguish between clock and data bits by providing a pattern that is not supposed to happen in normal FM-encoded data.  In the sector header track numbers start at 0, heads are 0/1 depending on the size, sector numbers usually start at 1 and size code is 0 for 128 bytes, 1 for 256, 2 for 512, etc. 
+The 125KHz pulse trains are used to lock the PLL to the signal correctly.  The specific 16-cells streams allow to distinguish between clock and data bits by providing a pattern that is not supposed to happen in normal FM-encoded data.  In the sector header track numbers start at 0, heads are 0/1 depending on the size, sector numbers usually start at 1 and size code is 0 for 128 bytes, 1 for 256, 2 for 512, etc.
 
 The CRC is a cyclic redundancy check of the data bits starting with the mark just after the pulse train using polynom 0x11021.
 
@@ -209,7 +209,7 @@ Similarly two write splices are created when a sector is written at the start an
 
 3. The new implementation
 -------------------------
-  
+
 3.1. Floppy disk representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -234,7 +234,7 @@ The last cell implicit end position is of course 200,000,000.
 
 Unformatted tracks are encoded as zero-size.
 
-The "track splice" information indicates where to start writing if you try to rewrite a physical disk with the data.  Some preservation formats encode that information, it is guessed for others.  The write track function of fdcs should set it.  The representation is the angular position relative to the index. 
+The "track splice" information indicates where to start writing if you try to rewrite a physical disk with the data.  Some preservation formats encode that information, it is guessed for others.  The write track function of fdcs should set it.  The representation is the angular position relative to the index.
 
 3.2. Converting to and from the internal representation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -281,7 +281,7 @@ A number of methods are provided to simplify writing the converter classes.
 |                               **UINT8 \*cell stream,**
 |                               **int cell count,**
 |                               **floppy image)**
-| 
+|
 
   Takes a stream of cell types (0/1), MSB-first, converts it to the internal format and stores it at the given track and head in the given image.
 
@@ -344,7 +344,7 @@ A number of methods are provided to simplify writing the converter classes.
 |                      **sector size,**
 |                      **sector count,**
 |                      **UINT8 \*sector data)**
-| 
+|
 
   Extract what you'd get by reading in order 'sector size'-sized sectors from number 1 to sector count and put the result in sector data.
 

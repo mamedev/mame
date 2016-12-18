@@ -68,7 +68,7 @@
 
 #define LINK_FREQ (LINK_BAUD / LINK_BITS)
 
-/* Sync up the instances 8 times for each byte transfered */
+/* Sync up the instances 8 times for each byte transferred */
 #define SYNC_MULT (4)
 
 #define SYNC_FREQ (15000000 / 20) //(LINK_FREQ * SYNC_MULT)

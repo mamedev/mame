@@ -765,7 +765,7 @@ void sns_sa1_device::write_regs(address_space &space, uint32_t offset, uint8_t d
 				case 2: //sigma (accumulative multiplication)
 				case 3:
 					uint64_t acum = (int16_t)m_math_a * (int16_t)m_math_b;
-					uint64_t mask = U64(0xffffffffff);
+					uint64_t mask = 0xffffffffffU;
 					m_math_res += acum;
 					m_math_overflow = (m_math_res > mask) ? 0x80 : 0;
 					m_math_res &= mask;

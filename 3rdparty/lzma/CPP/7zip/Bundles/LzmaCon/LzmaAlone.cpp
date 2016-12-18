@@ -749,11 +749,10 @@ static int main2(int numArgs, const char *args[])
   }
   }
 
-  if (!stdOutMode)
-    Print_Size("Output size: ", outStreamSpec->ProcessedSize);
-
   if (outStreamSpec)
   {
+    if (!stdOutMode)
+      Print_Size("Output size: ", outStreamSpec->ProcessedSize);
     if (outStreamSpec->Close() != S_OK)
       throw "File closing error";
   }

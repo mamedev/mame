@@ -2145,7 +2145,7 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 	stv_current_rotation_parameter_table.dkast= (m_vdp2_vram[address/4 + 22] & 0x03ffffc0) | ((m_vdp2_vram[address/4 + 22] & 0x02000000) ? 0xfc000000 : 0x00000000 );
 	stv_current_rotation_parameter_table.dkax = (m_vdp2_vram[address/4 + 23] & 0x03ffffc0) | ((m_vdp2_vram[address/4 + 23] & 0x02000000) ? 0xfc000000 : 0x00000000 );
 
-	// check rotation parameter read control, override if specific bits are disabled 
+	// check rotation parameter read control, override if specific bits are disabled
 	// (Batman Forever The Riddler stage relies on this)
 	switch(rot_parameter)
 	{
@@ -2155,7 +2155,7 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 
 			if(!STV_VDP2_RAYSTRE)
 				stv_current_rotation_parameter_table.yst = 0;
-			
+
 			if(!STV_VDP2_RAKASTRE)
 				stv_current_rotation_parameter_table.dkax = 0;
 
@@ -2166,13 +2166,13 @@ void saturn_state::stv_vdp2_fill_rotation_parameter_table( uint8_t rot_parameter
 
 			if(!STV_VDP2_RBYSTRE)
 				stv_current_rotation_parameter_table.yst = 0;
-			
+
 			if(!STV_VDP2_RBKASTRE)
 				stv_current_rotation_parameter_table.dkax = 0;
-		
+
 			break;
 	}
-		
+
 #define RP  stv_current_rotation_parameter_table
 
 	if(LOG_ROZ == 1) logerror( "Rotation parameter table (%d)\n", rot_parameter );
@@ -3752,8 +3752,8 @@ void saturn_state::stv_vdp2_draw_basic_tilemap(bitmap_rgb32 &bitmap, const recta
 		}
 	}
 
-	scalex = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incx);
-	scaley = (int32_t)((int64_t)S64(0x100000000) / (int64_t)stv2_current_tilemap.incy);
+	scalex = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incx));
+	scaley = s32(s64(0x100000000U) / s64(stv2_current_tilemap.incy));
 	tilesizex = scalex * 8;
 	tilesizey = scaley * 8;
 	drawypos = drawxpos = 0;
@@ -4806,7 +4806,7 @@ void saturn_state::stv_vdp2_copy_roz_bitmap(bitmap_rgb32 &bitmap,
 			}
 		}
 		else
-		{			
+		{
 			for (hcnt = cliprect.min_x; hcnt <= cliprect.max_x; hcnt++ )
 			{
 				switch( coeff_table_size )

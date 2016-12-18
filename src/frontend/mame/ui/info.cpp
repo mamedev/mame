@@ -353,7 +353,7 @@ menu_game_info::~menu_game_info()
 {
 }
 
-void menu_game_info::populate()
+void menu_game_info::populate(float &customtop, float &custombottom)
 {
 	std::string tempstring = ui().machine_info().game_info_string();
 	item_append(std::move(tempstring), "", FLAG_MULTILINE, nullptr);
@@ -379,7 +379,7 @@ menu_image_info::~menu_image_info()
 {
 }
 
-void menu_image_info::populate()
+void menu_image_info::populate(float &customtop, float &custombottom)
 {
 	item_append(machine().system().description, "", FLAG_DISABLE, nullptr);
 	item_append("", "", FLAG_DISABLE, nullptr);

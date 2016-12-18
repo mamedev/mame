@@ -117,7 +117,7 @@ static const char* get_spr(int spid)
 	}
 }
 
-static offs_t internal_disasm_am29000(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(am29000)
 {
 	uint32_t op = (oprom[0] << 24) | (oprom[1] << 16) | (oprom[2] << 8) | oprom[3];
 	uint32_t flags = 0;
@@ -229,13 +229,4 @@ static offs_t internal_disasm_am29000(cpu_device *device, std::ostream &stream, 
 	}
 
 	return 4 | flags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(am29000)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_am29000(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

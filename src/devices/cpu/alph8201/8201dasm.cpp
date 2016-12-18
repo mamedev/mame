@@ -334,7 +334,7 @@ static void InitDasm8201(void)
 		Op[i].type  = type;
 
 		/* 2 byte code ? */
-		while (isspace((uint8_t)*p)) p++;
+		while (isspace(u8(*p))) p++;
 		if( (*p) )
 			Op[i].type |= 0x10;
 		/* number of param */
@@ -349,7 +349,7 @@ static void InitDasm8201(void)
 	OpInizialized = 1;
 }
 
-static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(alpha8201)
 {
 	offs_t dasmflags = 0;
 	int i;
@@ -412,13 +412,4 @@ static offs_t internal_disasm_alpha8201(cpu_device *device, std::ostream &stream
 	}
 
 	return cnt | dasmflags | DASMFLAG_SUPPORTED;
-}
-
-CPU_DISASSEMBLE(alpha8201)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_alpha8201(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

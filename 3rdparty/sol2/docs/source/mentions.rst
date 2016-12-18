@@ -24,7 +24,8 @@ Okay, so the features don't convince you, the documentation doesn't convince you
 | |before| | |after| |
 +----------+---------+
 
-
+* The `Multiple Arcade Machine Emulator (MAME)`_ project switched from using LuaBridge to sol2!
+	- `The pull request`_ in which it was introduced to the master branch.
 * (CppNow) sol2 was mentioned in a comparison to other scripting languages by ChaiScript developer, Jason Turner (@lefticus), at a conference!
 	- `Jason Turner's presentation`_
 * (CppCast) Showed up in CppCast with Elias Daler!
@@ -57,3 +58,5 @@ Are you using sol2 for something neat? Want it to be featured here or think it's
 .. _sol2's initial reddit release: https://www.reddit.com/r/cpp/comments/4a8gy7/sol2_lua_c_binding_framework/
 .. _Benchmarking Discussing: https://www.reddit.com/r/cpp/comments/4x82hd/plain_c_versus_lua_libraries_benchmarking_speed/
 .. _"sol2 saved my life.": https://twitter.com/EliasDaler/status/739215685264494593
+.. _Multiple Arcade Machine Emulator (MAME): http://www.mamedev.org/index.php
+.. _The pull request: https://github.com/mamedev/mame/pull/1626

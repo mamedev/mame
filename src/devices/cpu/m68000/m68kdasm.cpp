@@ -3829,7 +3829,7 @@ static void build_opcode_table(void)
 /* ======================================================================== */
 
 /* Disasemble one instruction at pc and store in str_buff */
-static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_type)
+static unsigned int m68k_disassemble(std::ostream &stream, unsigned int pc, unsigned int cpu_type)
 {
 	if(!g_initialized)
 	{
@@ -3875,7 +3875,7 @@ static unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned i
 	g_cpu_ir = read_imm_16();
 	g_opcode_type = 0;
 	g_instruction_table[g_cpu_ir]();
-	sprintf(str_buff, "%s%s", g_dasm_str, g_helper_str);
+	util::stream_format(stream, "%s%s", g_dasm_str, g_helper_str);
 	return COMBINE_OPCODE_FLAGS(g_cpu_pc - pc);
 }
 
@@ -3889,13 +3889,13 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type)
 }
 #endif
 
-unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
+unsigned int m68k_disassemble_raw(std::ostream &stream, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type)
 {
 	unsigned int result;
 
 	g_rawop = opdata;
 	g_rawbasepc = pc;
-	result = m68k_disassemble(str_buff, pc, cpu_type);
+	result = m68k_disassemble(stream, pc, cpu_type);
 	g_rawop = nullptr;
 	return result;
 }
@@ -4114,42 +4114,42 @@ unsigned int m68k_is_valid_instruction(unsigned int instruction, unsigned int cp
 
 CPU_DISASSEMBLE( m68000 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68000);
 }
 
 CPU_DISASSEMBLE( m68008 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68008);
 }
 
 CPU_DISASSEMBLE( m68010 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68010);
 }
 
 CPU_DISASSEMBLE( m68020 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68020);
 }
 
 CPU_DISASSEMBLE( m68030 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68030);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68030);
 }
 
 CPU_DISASSEMBLE( m68040 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_68040);
 }
 
 CPU_DISASSEMBLE( m68340 )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_FSCPU32);
 }
 
 CPU_DISASSEMBLE( coldfire )
 {
-	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
+	return m68k_disassemble_raw(stream, pc, oprom, opram, M68K_CPU_TYPE_COLDFIRE);
 }
 
 /* ======================================================================== */

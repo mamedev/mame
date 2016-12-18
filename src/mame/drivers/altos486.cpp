@@ -51,15 +51,15 @@ READ8_MEMBER(altos486_state::read_rmx_ack)
 
 READ16_MEMBER(altos486_state::mmu_ram_r)
 {
-	if(offset < 0x7e000)
+	if (offset < 0x7e000)
 		return m_ram[offset]; // TODO
 	else
-		return m_rom->u16(offset - 0x7e000);
+		return m_rom->as_u16(offset - 0x7e000);
 }
 
 READ16_MEMBER(altos486_state::mmu_io_r)
 {
-	if(!m_sys_mode)
+	if (!m_sys_mode)
 	{
 		m_maincpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		return 0;

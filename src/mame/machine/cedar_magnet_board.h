@@ -22,7 +22,7 @@ public:
 
 	uint8_t* m_ram;
 	z80_device* m_cpu;
-	
+
 	virtual uint8_t read_cpu_bus(int offset);
 	virtual void write_cpu_bus(int offset, uint8_t data);
 

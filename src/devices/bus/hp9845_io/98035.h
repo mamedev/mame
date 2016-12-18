@@ -83,13 +83,13 @@ private:
 
 	// Clock chip emulation
 	typedef enum {
-		CLOCK_OFF,	// Display OFF
-		CLOCK_HHMM,	// Show HH:mm
-		CLOCK_SS,	// Show   :SS
-		CLOCK_HH,	// Show HH: A/P
-		CLOCK_MIN,	// Show   :mm
-		CLOCK_MON,	// Show MM:
-		CLOCK_DOM,	// Show   :DD
+		CLOCK_OFF,  // Display OFF
+		CLOCK_HHMM, // Show HH:mm
+		CLOCK_SS,   // Show   :SS
+		CLOCK_HH,   // Show HH: A/P
+		CLOCK_MIN,  // Show   :mm
+		CLOCK_MON,  // Show MM:
+		CLOCK_DOM,  // Show   :DD
 	} clock_state_t;
 
 	emu_timer *m_clock_timer;

@@ -126,7 +126,7 @@ void menu_dats_view::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_dats_view::populate()
+void menu_dats_view::populate(float &customtop, float &custombottom)
 {
 	bool paused = machine().paused();
 	if (!paused)
@@ -151,7 +151,6 @@ void menu_dats_view::draw(uint32_t flags)
 	auto line_height = ui().get_line_height();
 	auto ud_arrow_width = line_height * machine().render().ui_aspect();
 	auto gutter_width = 0.52f * line_height * machine().render().ui_aspect();
-	mouse_x = -1, mouse_y = -1;
 	float visible_width = 1.0f - 2.0f * UI_BOX_LR_BORDER;
 	float visible_left = (1.0f - visible_width) * 0.5f;
 
@@ -160,15 +159,10 @@ void menu_dats_view::draw(uint32_t flags)
 	hover = item.size() + 1;
 	visible_items = item.size() - 2;
 	float extra_height = 2.0f * line_height;
-	float visible_extra_menu_height = customtop + custombottom + extra_height;
+	float visible_extra_menu_height = get_customtop() + get_custombottom() + extra_height;
 
 	// locate mouse
-	mouse_hit = false;
-	mouse_button = false;
-	mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-	if (mouse_target != nullptr)
-		if (mouse_target->map_point_container(mouse_target_x, mouse_target_y, container(), mouse_x, mouse_y))
-			mouse_hit = true;
+	map_mouse();
 
 	// account for extra space at the top and bottom
 	float visible_main_menu_height = 1.0f - 2.0f * UI_BOX_TB_BORDER - visible_extra_menu_height;
@@ -179,7 +173,7 @@ void menu_dats_view::draw(uint32_t flags)
 	float visible_top = (1.0f - (visible_main_menu_height + visible_extra_menu_height)) * 0.5f;
 
 	// if the menu is at the bottom of the extra, adjust
-	visible_top += customtop;
+	visible_top += get_customtop();
 
 	// compute left box size
 	float x1 = visible_left;
@@ -216,30 +210,31 @@ void menu_dats_view::draw(uint32_t flags)
 		// if we're on the top line, display the up arrow
 		if (linenum == 0 && top_line != 0)
 		{
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
-
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_UP;
 			}
+
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0);
+
 		}
 		// if we're on the bottom line, display the down arrow
 		else if (linenum == m_visible_lines - 1 && itemnum != visible_items - 1)
 		{
-			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
-				0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
-
-			if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y)
+			if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1))
 			{
 				fgcolor = UI_MOUSEOVER_COLOR;
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				highlight(line_x0, line_y0, line_x1, line_y1, bgcolor);
 				hover = HOVER_ARROW_DOWN;
 			}
+
+			draw_arrow(0.5f * (x1 + x2) - 0.5f * ud_arrow_width, line_y + 0.25f * line_height,
+					   0.5f * (x1 + x2) + 0.5f * ud_arrow_width, line_y + 0.75f * line_height, fgcolor, ROT0 ^ ORIENTATION_FLIP_Y);
 		}
 
 		// draw dats text
@@ -261,7 +256,7 @@ void menu_dats_view::draw(uint32_t flags)
 		rgb_t fgcolor = UI_SELECTED_COLOR;
 		rgb_t bgcolor = UI_SELECTED_BG_COLOR;
 
-		if (mouse_hit && line_x0 <= mouse_x && line_x1 > mouse_x && line_y0 <= mouse_y && line_y1 > mouse_y && is_selectable(pitem))
+		if (mouse_in_rect(line_x0, line_y0, line_x1, line_y1) && is_selectable(pitem))
 			hover = count;
 
 		if (pitem.type == menu_item_type::SEPARATOR)
@@ -277,7 +272,7 @@ void menu_dats_view::draw(uint32_t flags)
 	}
 
 	// if there is something special to add, do it by calling the virtual method
-	custom_render(get_selection_ref(), customtop, custombottom, x1, y1, x2, y2);
+	custom_render(get_selection_ref(), get_customtop(), get_custombottom(), x1, y1, x2, y2);
 
 	// return the number of visible lines, minus 1 for top arrow and 1 for bottom arrow
 	m_visible_items = m_visible_lines - (top_line != 0) - (top_line + m_visible_lines != visible_items);

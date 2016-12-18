@@ -9,10 +9,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_DATMENU_H
 #define MAME_FRONTEND_UI_DATMENU_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -23,6 +23,7 @@
 struct ui_software_info;
 
 namespace ui {
+
 //-------------------------------------------------
 //  class dats menu
 //-------------------------------------------------
@@ -41,7 +42,7 @@ private:
 	// draw dats menu
 	virtual void draw(uint32_t flags) override;
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	int visible_items;

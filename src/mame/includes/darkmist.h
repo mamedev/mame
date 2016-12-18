@@ -47,7 +47,7 @@ public:
 
 	DECLARE_WRITE8_MEMBER(hw_w);
 	DECLARE_WRITE8_MEMBER(tx_vram_w);
-	
+
 	TILE_GET_INFO_MEMBER(get_bgtile_info);
 	TILE_GET_INFO_MEMBER(get_fgtile_info);
 	TILE_GET_INFO_MEMBER(get_txttile_info);

@@ -288,6 +288,7 @@ void pit8253_device::set_output(pit8253_timer *timer, int output)
 	if (output != timer->output)
 	{
 		timer->output = output;
+		LOG2(("set_output(): timer %d, %s\n", timer->index, output ? "low to high" : "high to low"));
 
 		switch (timer->index)
 		{
@@ -1007,6 +1008,11 @@ WRITE8_MEMBER( pit8253_device::write )
 
 			load_count(timer, data << 8);
 			simulate2(timer, 0);
+
+			if (CTRL_MODE(timer->control) == 0)
+			{
+				set_output(timer, 0);
+			}
 			break;
 
 		case 3:

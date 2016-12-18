@@ -13,8 +13,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __MAIN_H__
-#define __MAIN_H__
+#ifndef MAME_EMU_MAIN_H
+#define MAME_EMU_MAIN_H
 
 #include <time.h>
 
@@ -59,7 +59,7 @@ public:
 	static void draw_user_interface(running_machine& machine);
 	static void periodic_check();
 	static bool frame_hook();
-	static void layout_file_cb(xml_data_node &layout);
+	static void layout_file_cb(util::xml::data_node &layout);
 	static bool standalone();
 };
 
@@ -94,4 +94,4 @@ protected:
 };
 
 
-#endif  /* __MAIN_H__ */
+#endif  /* MAME_EMU_MAIN_H */

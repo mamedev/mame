@@ -678,7 +678,7 @@ void ata_mass_storage_device::process_command()
 			(m_cylinder_high << 8) | m_cylinder_low, m_device_head & IDE_DEVICE_HEAD_HS, m_sector_number, lba_address(), m_sector_count));
 
 		/* reset the buffer */
-		m_sectors_until_int = 1;
+		m_sectors_until_int = m_block_count;
 
 		/* mark the buffer ready */
 		m_status |= IDE_STATUS_DRQ;

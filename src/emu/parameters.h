@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __PARAMETERS_H__
-#define __PARAMETERS_H__
+#ifndef MAME_EMU_PARAMETERS_H
+#define MAME_EMU_PARAMETERS_H
 
 
 //**************************************************************************
@@ -45,4 +45,4 @@ private:
 	std::unordered_map<std::string,std::string>       m_parameters;
 };
 
-#endif  // __INPTPORT_H__ */
+#endif  // MAME_EMU_PARAMETERS_H

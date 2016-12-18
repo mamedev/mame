@@ -39,6 +39,7 @@ typedef struct {
     struct wl_egl_window *egl_window;
     struct SDL_WaylandInput *keyboard_device;
     EGLSurface egl_surface;
+    struct zwp_locked_pointer_v1 *locked_pointer;
 
 #ifdef SDL_VIDEO_DRIVER_WAYLAND_QT_TOUCH
     struct qt_extended_surface *extended_surface;
@@ -49,8 +50,11 @@ extern void Wayland_ShowWindow(_THIS, SDL_Window *window);
 extern void Wayland_SetWindowFullscreen(_THIS, SDL_Window * window,
                                         SDL_VideoDisplay * _display,
                                         SDL_bool fullscreen);
+extern void Wayland_MaximizeWindow(_THIS, SDL_Window * window);
+extern void Wayland_RestoreWindow(_THIS, SDL_Window * window);
 extern int Wayland_CreateWindow(_THIS, SDL_Window *window);
 extern void Wayland_SetWindowSize(_THIS, SDL_Window * window);
+extern void Wayland_SetWindowTitle(_THIS, SDL_Window * window);
 extern void Wayland_DestroyWindow(_THIS, SDL_Window *window);
 
 extern SDL_bool

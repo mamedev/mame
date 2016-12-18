@@ -1142,8 +1142,8 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_readwrite_handler(0x28, 0x2b, 
-		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t  
+	iospace.install_readwrite_handler(0x28, 0x2b,
+		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
 		{
 			uint8_t result = 0x00;
 			if (offset == 1)
@@ -1151,7 +1151,7 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 			osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
 			return result;
 		},"write_lambda"),
-		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask) 
+		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
 		{
 			osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
 		},"read_lambda")

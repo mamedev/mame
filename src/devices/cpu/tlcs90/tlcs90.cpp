@@ -998,11 +998,11 @@ bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pr
 	{
 		case MODE_NONE:     return false;
 
-		case MODE_BIT8:     util::stream_format(stream, "%s%d",            pre,    r                                   );	return true;
-		case MODE_I8:       util::stream_format(stream, "%s$%02X",         pre,    r                                   );	return true;
-		case MODE_D8:       util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );	return true;
-		case MODE_I16:      util::stream_format(stream, "%s$%04X",         pre,    r                                   );	return true;
-		case MODE_D16:      util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );	return true;
+		case MODE_BIT8:     util::stream_format(stream, "%s%d",            pre,    r                                   );   return true;
+		case MODE_I8:       util::stream_format(stream, "%s$%02X",         pre,    r                                   );   return true;
+		case MODE_D8:       util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7f)-(r&0x80))&0xffff     );   return true;
+		case MODE_I16:      util::stream_format(stream, "%s$%04X",         pre,    r                                   );   return true;
+		case MODE_D16:      util::stream_format(stream, "%s$%04X",         pre,    (pc+2+(r&0x7fff)-(r&0x8000))&0xffff );   return true;
 		case MODE_MI16:
 			reg_name = internal_registers_names(r);
 			if (reg_name)
@@ -1010,17 +1010,17 @@ bool tlcs90_device::stream_arg(std::ostream &stream, uint32_t pc, const char *pr
 			else
 				util::stream_format(stream, "%s($%04X)",       pre,    r                                   );
 			return true;
-		case MODE_R8:       util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );	return true;
-		case MODE_R16:      util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );	return true;
-		case MODE_MR16:     util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );	return true;
+		case MODE_R8:       util::stream_format(stream, "%s%s",            pre,    r8_names[r]                         );   return true;
+		case MODE_R16:      util::stream_format(stream, "%s%s",            pre,    r16_names[r]                        );   return true;
+		case MODE_MR16:     util::stream_format(stream, "%s(%s)",          pre,    r16_names[r]                        );   return true;
 
-		case MODE_MR16R8:   util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );	return true;
-		case MODE_MR16D8:   util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );	return true;
+		case MODE_MR16R8:   util::stream_format(stream, "%s(%s+%s)",       pre,    r16_names[r],   r8_names[rb]        );   return true;
+		case MODE_MR16D8:   util::stream_format(stream, "%s(%s%c$%02X)",   pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
 
-		case MODE_CC:       util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );	return true;
+		case MODE_CC:       util::stream_format(stream, "%s%s",            pre,    cc_names[r]                         );   return true;
 
-		case MODE_R16R8:    util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );	return true;
-		case MODE_R16D8:    util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );	return true;
+		case MODE_R16R8:    util::stream_format(stream, "%s%s+%s",         pre,    r16_names[r],   r8_names[rb]        );   return true;
+		case MODE_R16D8:    util::stream_format(stream, "%s%s%c$%02X",     pre,    r16_names[r],   (rb&0x80)?'-':'+',  (rb&0x80)?((rb^0xff)+1):rb  );   return true;
 
 		default:
 			fatalerror("%04x: unimplemented addr mode = %d\n",pc,mode);
@@ -1037,9 +1037,9 @@ offs_t tlcs90_device::disasm_disassemble(std::ostream &stream, offs_t pc, const 
 	decode();
 	m_op &= ~OP_16;
 
-	util::stream_format			(stream, "%-5s",				op_names[ m_op ] ); // strlen("callr") == 5
-	bool streamed = stream_arg	(stream, pc,       " ",         m_mode1, m_r1, m_r1b );
-	stream_arg					(stream, pc, streamed ?",":"",	m_mode2, m_r2, m_r2b );
+	util::stream_format         (stream, "%-5s",                op_names[ m_op ] ); // strlen("callr") == 5
+	bool streamed = stream_arg  (stream, pc,       " ",         m_mode1, m_r1, m_r1b );
+	stream_arg                  (stream, pc, streamed ?",":"",  m_mode2, m_r2, m_r2b );
 
 	return (m_addr - pc) | DASMFLAG_SUPPORTED;
 }

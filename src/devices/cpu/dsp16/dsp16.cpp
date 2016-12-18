@@ -108,8 +108,8 @@ void dsp16_device::device_start()
 	state_add(DSP16_X,        "X",         m_x);
 	state_add(DSP16_Y,        "Y",         m_y);
 	state_add(DSP16_P,        "P",         m_p);
-	state_add(DSP16_A0,       "A0",        m_a0).mask(U64(0xfffffffff));
-	state_add(DSP16_A1,       "A1",        m_a1).mask(U64(0xfffffffff));
+	state_add(DSP16_A0,       "A0",        m_a0).mask(0xfffffffffU);
+	state_add(DSP16_A1,       "A1",        m_a1).mask(0xfffffffffU);
 	state_add(DSP16_AUC,      "AUC",       m_auc).formatstr("%8s");
 	state_add(DSP16_PSW,      "PSW",       m_psw).formatstr("%16s");
 	state_add(DSP16_C0,       "C0",        m_c0);
@@ -348,10 +348,10 @@ uint32_t dsp16_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t dsp16_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t dsp16_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( dsp16a );
-	return CPU_DISASSEMBLE_NAME(dsp16a)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(dsp16a)(this, stream, pc, oprom, opram, options);
 }
 
 

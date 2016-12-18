@@ -267,7 +267,7 @@ void saturn_state::cd_exec_command( void )
 			break;
 
 		case 0x06:    // end data transfer (TODO: needs to be worked on!)
-				// returns # of bytes transfered (24 bits) in
+				// returns # of bytes transferred (24 bits) in
 				// low byte of cr1 (MSB) and cr2 (middle byte, LSB)
 			CDROM_LOG(("%s:CD: End data transfer (%d bytes xfer'd)\n", machine().describe_context(), xferdnum))
 

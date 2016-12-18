@@ -90,10 +90,10 @@ machine_config_constructor tms1980_cpu_device::device_mconfig_additions() const
 
 
 // disasm
-offs_t tms0980_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms0980_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(tms0980);
-	return CPU_DISASSEMBLE_NAME(tms0980)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms0980)(this, stream, pc, oprom, opram, options);
 }
 
 

@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DEVICE_H__
-#define __DEVICE_H__
+#ifndef MAME_EMU_DEVICE_H
+#define MAME_EMU_DEVICE_H
 
 
 
@@ -81,19 +81,19 @@ class device_missing_dependencies : public emu_exception { };
 
 
 // a device_type is simply a pointer to its alloc function
-typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+typedef device_t *(*device_type)(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
 
 
 // this template function creates a stub which constructs a device
 template<class _DeviceClass>
-device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+device_t *device_creator(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 {
 	return global_alloc_clear<_DeviceClass>(mconfig, tag, owner, clock);
 }
 
 
 // timer IDs for devices
-typedef uint32_t device_timer_id;
+typedef u32 device_timer_id;
 
 // ======================> device_t
 
@@ -194,7 +194,7 @@ class device_t : public delegate_late_bind
 
 protected:
 	// construction/destruction
-	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	device_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 public:
 	virtual ~device_t();
 
@@ -209,15 +209,15 @@ public:
 	const char *source() const { return m_source.c_str(); }
 	device_t *owner() const { return m_owner; }
 	device_t *next() const { return m_next; }
-	uint32_t configured_clock() const { return m_configured_clock; }
+	u32 configured_clock() const { return m_configured_clock; }
 	const machine_config &mconfig() const { return m_machine_config; }
 	const input_device_default *input_ports_defaults() const { return m_input_defaults; }
 	const std::vector<rom_entry> &rom_region_vector() const;
 	const rom_entry *rom_region() const { return rom_region_vector().data(); }
 	machine_config_constructor machine_config_additions() const { return device_mconfig_additions(); }
 	ioport_constructor input_ports() const { return device_input_ports(); }
-	uint8_t default_bios() const { return m_default_bios; }
-	uint8_t system_bios() const { return m_system_bios; }
+	u8 default_bios() const { return m_default_bios; }
+	u8 system_bios() const { return m_system_bios; }
 	std::string default_bios_tag() const { return m_default_bios_tag; }
 
 	// interface helpers
@@ -255,7 +255,7 @@ public:
 	std::string parameter(const char *tag) const;
 
 	// configuration helpers
-	static void static_set_clock(device_t &device, uint32_t clock);
+	static void static_set_clock(device_t &device, u32 clock);
 	static void static_set_input_default(device_t &device, const input_device_default *config) { device.m_input_defaults = config; }
 	static void static_set_default_bios_tag(device_t &device, const char *tag) { std::string default_bios_tag(tag); device.m_default_bios_tag = default_bios_tag; }
 
@@ -267,13 +267,13 @@ public:
 	void reset();
 
 	// clock/timing accessors
-	uint32_t clock() const { return m_clock; }
-	uint32_t unscaled_clock() const { return m_unscaled_clock; }
-	void set_unscaled_clock(uint32_t clock);
+	u32 clock() const { return m_clock; }
+	u32 unscaled_clock() const { return m_unscaled_clock; }
+	void set_unscaled_clock(u32 clock);
 	double clock_scale() const { return m_clock_scale; }
 	void set_clock_scale(double clockscale);
-	attotime clocks_to_attotime(uint64_t clocks) const;
-	uint64_t attotime_to_clocks(const attotime &duration) const;
+	attotime clocks_to_attotime(u64 clocks) const;
+	u64 attotime_to_clocks(const attotime &duration) const;
 
 	// timer interfaces
 	emu_timer *timer_alloc(device_timer_id id = 0, void *ptr = nullptr);
@@ -285,15 +285,15 @@ public:
 	template<typename _ItemType>
 	void ATTR_COLD save_item(_ItemType &value, const char *valname, int index = 0) { assert(m_save != nullptr); m_save->save_item(this, name(), tag(), index, value, valname); }
 	template<typename _ItemType>
-	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, uint32_t count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
+	void ATTR_COLD save_pointer(_ItemType *value, const char *valname, u32 count, int index = 0) { assert(m_save != nullptr); m_save->save_pointer(this, name(), tag(), index, value, valname, count); }
 
 	// debugging
 	device_debug *debug() const { return m_debug.get(); }
 	offs_t safe_pc() const;
 	offs_t safe_pcbase() const;
 
-	void set_default_bios(uint8_t bios) { m_default_bios = bios; }
-	void set_system_bios(uint8_t bios) { m_system_bios = bios; }
+	void set_default_bios(u8 bios) { m_default_bios = bios; }
+	void set_system_bios(u8 bios) { m_system_bios = bios; }
 	bool findit(bool isvalidation = false) const;
 
 	// misc
@@ -345,9 +345,9 @@ protected:
 	interface_list          m_interfaces;           // container for list of interfaces
 
 	// device clocks
-	uint32_t                  m_configured_clock;     // originally configured device clock
-	uint32_t                  m_unscaled_clock;       // current unscaled device clock
-	uint32_t                  m_clock;                // current device clock, after scaling
+	u32                     m_configured_clock;     // originally configured device clock
+	u32                     m_unscaled_clock;       // current unscaled device clock
+	u32                     m_clock;                // current device clock, after scaling
 	double                  m_clock_scale;          // clock scale factor
 	attoseconds_t           m_attoseconds_per_clock;// period in attoseconds
 
@@ -355,8 +355,8 @@ protected:
 	const machine_config &  m_machine_config;       // reference to the machine's configuration
 	const input_device_default *m_input_defaults;   // devices input ports default overrides
 
-	uint8_t                   m_system_bios;          // the system BIOS we wish to load
-	uint8_t                   m_default_bios;         // the default system BIOS
+	u8                      m_system_bios;          // the system BIOS we wish to load
+	u8                      m_default_bios;         // the default system BIOS
 	std::string             m_default_bios_tag;     // tag of the default system BIOS
 
 private:
@@ -792,4 +792,4 @@ inline device_t::interface_list::auto_iterator device_t::interface_list::auto_it
 }
 
 
-#endif  /* __DEVICE_H__ */
+#endif  /* MAME_EMU_DEVICE_H */

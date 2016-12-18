@@ -440,7 +440,7 @@ void mac_state::set_memory_overlay(int overlay)
 				mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 			}
 		}
-		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIFX))
+		else if ((m_model == MODEL_MAC_PORTABLE) || (m_model == MODEL_MAC_PB100) || (m_model == MODEL_MAC_IIFX))
 		{
 			address_space& space = m_maincpu->space(AS_PROGRAM);
 			space.unmap_write(0x000000, 0x9fffff);
@@ -452,11 +452,11 @@ void mac_state::set_memory_overlay(int overlay)
 			space.unmap_write(0x000000, 0xffffff);
 			mac_install_memory(0x000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30))
+		else if ((m_model >= MODEL_MAC_II) && (m_model <= MODEL_MAC_SE30) && (m_model != MODEL_MAC_IIVX) && (m_model != MODEL_MAC_IIVI))
 		{
 			mac_install_memory(0x00000000, 0x3fffffff, memory_size, memory_data, is_rom, "bank1");
 		}
-		else if ((m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
+		else if ((m_model == MODEL_MAC_IIVX) || (m_model == MODEL_MAC_IIVI) || (m_model == MODEL_MAC_LC_III) || (m_model == MODEL_MAC_LC_III_PLUS) || (m_model >= MODEL_MAC_LC_475 && m_model <= MODEL_MAC_LC_580))   // up to 36 MB
 		{
 			mac_install_memory(0x00000000, memory_size-1, memory_size, memory_data, is_rom, "bank1");
 
@@ -498,7 +498,7 @@ READ32_MEMBER(mac_state::rom_switch_r)
 		set_memory_overlay(0);
 	}
 
-//  printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
+	//printf("rom_switch_r: offset %08x ROM_size -1 = %08x, masked = %08x\n", offset, ROM_size-1, offset & ((ROM_size - 1)>>2));
 
 	return ROM_data[offset & ((ROM_size - 1)>>2)];
 }
@@ -1963,6 +1963,10 @@ void mac_state::machine_reset()
 			m_overlay_timeout->adjust(attotime::never);
 		}
 		else if (((m_model >= MODEL_MAC_LC) && (m_model <= MODEL_MAC_COLOR_CLASSIC) && ((m_model != MODEL_MAC_LC_III) && (m_model != MODEL_MAC_LC_III_PLUS))) || (m_model == MODEL_MAC_CLASSIC_II))
+		{
+			m_overlay_timeout->adjust(attotime::never);
+		}
+		else if ((m_model >= MODEL_MAC_IIVX) && (m_model <= MODEL_MAC_IIVI))
 		{
 			m_overlay_timeout->adjust(attotime::never);
 		}

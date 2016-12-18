@@ -852,7 +852,7 @@ WRITE16_MEMBER( ata_hle_device::write_cs0 )
 
 			/* sector count */
 			case IDE_CS0_SECTOR_COUNT_RW:
-				m_sector_count = data ? data : 256;
+				m_sector_count = (data & 0xff) ? (data & 0xff) : 0x100;
 				break;
 
 			/* current sector */

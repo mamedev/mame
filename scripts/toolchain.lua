@@ -51,6 +51,8 @@ newoption {
 		{ "intel-15",      "Intel C++ Compiler XE 15.0" },
 		{ "vs2015-clang",  "Clang 3.6"         },
 		{ "vs2015-xp",     "Visual Studio 2015 targeting XP" },
+		{ "vs2017-clang",  "Clang 3.6"         },
+		{ "vs2017-xp",     "Visual Studio 2017 targeting XP" },
 		{ "winphone8",     "Windows Phone 8.0" },
 		{ "winphone81",    "Windows Phone 8.1" },
 		{ "winstore81",    "Windows Store 8.1" },
@@ -330,7 +332,6 @@ function toolchain(_buildDir, _subDir)
 		if "ci20" == _OPTIONS["gcc"] then
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-ci20")
 		end
-
 	elseif _ACTION == "vs2015" or _ACTION == "vs2015-fastbuild" then
 
 		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
@@ -386,7 +387,63 @@ function toolchain(_buildDir, _subDir)
 			premake.vstudio.toolset = ("v140_xp")
 			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
 		end
+	elseif _ACTION == "vs2017" or _ACTION == "vs2017-fastbuild" then
+
+		if (_ACTION .. "-clang") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("LLVM-" .. _ACTION)
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-clang")
+		end
+
+		if "winphone8" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v110_wp80"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winphone8")
+		end
+
+		if "winphone81" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v120_wp81"
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winphone81")
+		end
+
+		if "winstore81" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v120"
+			premake.vstudio.storeapp = "8.1"
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore81")
+		end
+
+		if "winstore82" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "v141"
+			premake.vstudio.storeapp = "8.2"
+
+			-- If needed, depending on GENie version, enable file-level configuration
+			if enablefilelevelconfig ~= nil then
+				enablefilelevelconfig()
+			end
+
+			local action = premake.action.current()
+			action.vstudio.windowsTargetPlatformVersion = windowsPlatform
+
+			platforms { "ARM" }
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-winstore82")
+		end
+
+		if "intel-14" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "Intel C++ Compiler XE 14.0"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
+		end
+
+		if "intel-15" == _OPTIONS["vs"] then
+			premake.vstudio.toolset = "Intel C++ Compiler XE 15.0"
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-intel")
+		end
+
+		if ("vs2017-xp") == _OPTIONS["vs"] then
+			premake.vstudio.toolset = ("v141_xp")
+			location (_buildDir .. "projects/" .. _subDir .. "/".. _ACTION .. "-xp")
+		end
 	elseif _ACTION == "xcode4" then
+
 
 		if "osx" == _OPTIONS["xcode"] then
 			premake.xcode.toolset = "macosx"

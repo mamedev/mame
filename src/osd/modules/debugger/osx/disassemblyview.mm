@@ -41,8 +41,8 @@
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max(0, 0);
-	debug_view_source const	*source = view->source();
+	debug_view_xy           max(0, 0);
+	debug_view_source const *source = view->source();
 	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
 	{
 		view->set_source(*source);
@@ -57,7 +57,7 @@
 
 
 - (void)addContextMenuItemsToMenu:(NSMenu *)menu {
-	NSMenuItem	*item;
+	NSMenuItem  *item;
 
 	[super addContextMenuItemsToMenu:menu];
 
@@ -122,7 +122,7 @@
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = view->source_list().indexof(*view->source());
+	const int   selected = view->source_list().indexof(*view->source());
 	if (selected != index) {
 		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
@@ -210,8 +210,8 @@
 												atIndex:index++];
 	[disableItem setKeyEquivalentModifierMask:NSShiftKeyMask];
 
-	NSMenu		*runMenu = [[menu itemWithTitle:@"Run"] submenu];
-	NSMenuItem	*runItem;
+	NSMenu      *runMenu = [[menu itemWithTitle:@"Run"] submenu];
+	NSMenuItem  *runItem;
 	if (runMenu != nil) {
 		runItem = [runMenu addItemWithTitle:@"to Cursor"
 									 action:@selector(debugRunToCursor:)

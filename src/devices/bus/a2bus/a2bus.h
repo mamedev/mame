@@ -84,7 +84,7 @@ class device_a2bus_card_interface;
 // ======================> a2bus_device
 class a2bus_device : public device_t
 {
-	// multi-card devices need to access m_device_list, so they get friend'ed here.
+	// multi-card devices need to access m_device_list, so they get friended here.
 	friend class a2bus_mcms2_device;
 public:
 	// construction/destruction

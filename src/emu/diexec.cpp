@@ -154,7 +154,7 @@ bool device_execute_interface::executing() const
 //  remaining in this timeslice
 //-------------------------------------------------
 
-int32_t device_execute_interface::cycles_remaining() const
+s32 device_execute_interface::cycles_remaining() const
 {
 	return executing() ? *m_icountptr : 0;
 }
@@ -235,7 +235,7 @@ void device_execute_interface::suspend_resume_changed()
 //  suspend - set a suspend reason for this device
 //-------------------------------------------------
 
-void device_execute_interface::suspend(uint32_t reason, bool eatcycles)
+void device_execute_interface::suspend(u32 reason, bool eatcycles)
 {
 if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
@@ -250,7 +250,7 @@ if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 //  device
 //-------------------------------------------------
 
-void device_execute_interface::resume(uint32_t reason)
+void device_execute_interface::resume(u32 reason)
 {
 if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 	// clear the suspend reason and eat cycles flag
@@ -333,7 +333,7 @@ attotime device_execute_interface::local_time() const
 //  cycles executed on this device
 //-------------------------------------------------
 
-uint64_t device_execute_interface::total_cycles() const
+u64 device_execute_interface::total_cycles() const
 {
 	if (executing())
 	{
@@ -350,7 +350,7 @@ uint64_t device_execute_interface::total_cycles() const
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-uint64_t device_execute_interface::execute_clocks_to_cycles(uint64_t clocks) const
+u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
 {
 	return clocks;
 }
@@ -361,7 +361,7 @@ uint64_t device_execute_interface::execute_clocks_to_cycles(uint64_t clocks) con
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-uint64_t device_execute_interface::execute_cycles_to_clocks(uint64_t cycles) const
+u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
 {
 	return cycles;
 }
@@ -373,7 +373,7 @@ uint64_t device_execute_interface::execute_cycles_to_clocks(uint64_t cycles) con
 //  operation can take
 //-------------------------------------------------
 
-uint32_t device_execute_interface::execute_min_cycles() const
+u32 device_execute_interface::execute_min_cycles() const
 {
 	return 1;
 }
@@ -385,7 +385,7 @@ uint32_t device_execute_interface::execute_min_cycles() const
 //  operation can take
 //-------------------------------------------------
 
-uint32_t device_execute_interface::execute_max_cycles() const
+u32 device_execute_interface::execute_max_cycles() const
 {
 	return 1;
 }
@@ -396,7 +396,7 @@ uint32_t device_execute_interface::execute_max_cycles() const
 //  of input lines for the device
 //-------------------------------------------------
 
-uint32_t device_execute_interface::execute_input_lines() const
+u32 device_execute_interface::execute_input_lines() const
 {
 	return 0;
 }
@@ -407,7 +407,7 @@ uint32_t device_execute_interface::execute_input_lines() const
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
 
-uint32_t device_execute_interface::execute_default_irq_vector() const
+u32 device_execute_interface::execute_default_irq_vector() const
 {
 	return 0;
 }
@@ -419,7 +419,7 @@ uint32_t device_execute_interface::execute_default_irq_vector() const
 //  spinning devices for performance optimization)
 //-------------------------------------------------
 
-void device_execute_interface::execute_burn(int32_t cycles)
+void device_execute_interface::execute_burn(s32 cycles)
 {
 	// by default, do nothing
 }
@@ -584,7 +584,7 @@ void device_execute_interface::interface_clock_changed()
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
 
 	// update the device's divisor
-	int64_t attos = m_attoseconds_per_cycle;
+	s64 attos = m_attoseconds_per_cycle;
 	m_divshift = 0;
 	while (attos >= (1UL << 31))
 	{
@@ -803,7 +803,7 @@ if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_line
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
-		int32_t input_event = m_queue[curevent];
+		s32 input_event = m_queue[curevent];
 
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;

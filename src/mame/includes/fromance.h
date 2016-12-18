@@ -50,7 +50,7 @@ public:
 	uint8_t    m_crtc_register;
 	uint8_t    m_crtc_data[0x10];
 	emu_timer *m_crtc_timer;
-
+	
 	/* misc */
 	uint8_t    m_directionflag;
 	uint8_t    m_commanddata;
@@ -98,7 +98,8 @@ public:
 	TIMER_CALLBACK_MEMBER(crtc_interrupt_gen);
 	inline void get_fromance_tile_info( tile_data &tileinfo, int tile_index, int layer );
 	inline void get_nekkyoku_tile_info( tile_data &tileinfo, int tile_index, int layer );
-	void init_common(  );
+	void init_common();
+	void crtc_refresh();
 	DECLARE_WRITE_LINE_MEMBER(fromance_adpcm_int);
 	required_device<cpu_device> m_maincpu;
 	optional_device<msm5205_device> m_msm;

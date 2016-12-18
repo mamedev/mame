@@ -195,7 +195,7 @@ uint16_t naomi_m2_board::read_callback(uint32_t addr)
 
 	}
 	else {
-		const uint8_t *base = &m_region->u8(2*addr);
+		const uint8_t *base = &m_region->as_u8(2*addr);
 		return base[1] | (base[0] << 8);
 	}
 }

@@ -119,7 +119,7 @@ INTERRUPT_GEN_MEMBER(vector06_state::vector06_interrupt)
 
 IRQ_CALLBACK_MEMBER(vector06_state::vector06_irq_callback)
 {
-	// Interupt is RST 7
+	// Interrupt is RST 7
 	return 0xff;
 }
 

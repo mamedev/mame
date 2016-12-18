@@ -4,7 +4,7 @@
 
     osdmodule.h
 
-    OSD module manangement
+    OSD module management
 
 *******************************************************************c********/
 

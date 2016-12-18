@@ -64,7 +64,7 @@ namespace sol
 				lua_setfield(L, LUA_REGISTRYINDEX, "sol::buffer_temp");
 			}
 			else
-				lua_pop(L, -1); 
+				lua_pop(L, -1);
 
 			luaL_pushresultsize(&buff, len);
 		}
@@ -428,9 +428,9 @@ T lua_engine::region_read(memory_region &region, offs_t address)
 			continue;
 		mem_content <<= 8;
 		if(region.endianness() == ENDIANNESS_BIG)
-			mem_content |= region.u8((BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask));
+			mem_content |= region.as_u8((BYTE8_XOR_BE(addr) & lowmask) | (addr & ~lowmask));
 		else
-			mem_content |= region.u8((BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask));
+			mem_content |= region.as_u8((BYTE8_XOR_LE(addr) & lowmask) | (addr & ~lowmask));
 	}
 
 	return mem_content;
@@ -769,18 +769,6 @@ void lua_engine::initialize()
 				return sol::make_object(sol(), sol::nil);
 			return sol::make_object(sol(), driver_list::driver(i));
 		};
-	// this throws an error when implemented as an initializer
-	emu["item"] = [this](int index) {
-			save_item *item = new save_item;
-			if(!machine().save().indexed_item(index, item->base, item->size, item->count))
-			{
-				item->base = nullptr;
-				item->size = 0;
-				item->count= 0;
-			}
-			return item;
-		};
-	emu["thread"] = []() { context *ctx = new context; ctx->busy = false; ctx->yield = false; return ctx; };
 
 	emu.new_usertype<emu_file>("file", sol::call_constructor, sol::constructors<sol::types<const char *, uint32_t>>(),
 			"read", [](emu_file &file, sol::buffer *buff) { buff->set_len(file.read(buff->get_ptr(), buff->get_len())); return buff; },
@@ -799,8 +787,7 @@ void lua_engine::initialize()
  * thread.yield - check if thread is yielded
 */
 
-	sol().new_usertype<context>("thread",
-			sol::meta_function::garbage_collect, sol::destructor([](context *ctx) { delete ctx; }),
+	emu.new_usertype<context>("thread", sol::call_constructor, sol::constructors<sol::types<>>(),
 			"start", [this](context &ctx, const char *scr) {
 					std::string script(scr);
 					if(ctx.busy)
@@ -827,7 +814,7 @@ void lua_engine::initialize()
 								auto ret = func();
 								if (ret.valid()) {
 									const char *tmp = ret.get<const char *>();
-									if (tmp != nullptr) 
+									if (tmp != nullptr)
 										ctx.result = tmp;
 									else
 										exit(0);
@@ -854,8 +841,14 @@ void lua_engine::initialize()
 			"busy", sol::readonly(&context::busy),
 			"yield", sol::readonly(&context::yield));
 
-	sol().new_usertype<save_item>("item",
-			sol::meta_function::garbage_collect, sol::destructor([](save_item *item) { delete item; }),
+	emu.new_usertype<save_item>("item", sol::call_constructor, sol::initializers([this](save_item &item, int index) {
+					if(!machine().save().indexed_item(index, item.base, item.size, item.count))
+					{
+						item.base = nullptr;
+						item.size = 0;
+						item.count= 0;
+					}
+				}),
 			"size", sol::readonly(&save_item::size),
 			"count", sol::readonly(&save_item::count),
 			"read", [this](save_item &item, int offset) -> sol::object {
@@ -916,7 +909,7 @@ void lua_engine::initialize()
  * options.entries[] - get table of option entries
  */
 
-	sol().new_usertype<core_options>("core_options", "new", sol::no_constructor,
+	sol().registry().new_usertype<core_options>("core_options", "new", sol::no_constructor,
 			"help", &core_options::output_help,
 			"command", &core_options::command,
 			"entries", sol::property([this](core_options &options) {
@@ -948,7 +941,7 @@ void lua_engine::initialize()
  * entry.has_range() - are min and max valid for entry
  */
 
-	sol().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor,
+	sol().registry().new_usertype<core_options::entry>("core_options_entry", "new", sol::no_constructor,
 			"value", sol::overload([this](core_options::entry &e, bool val) {
 					if(e.type() != OPTION_BOOLEAN)
 						luaL_error(m_lua_state, "Cannot set option to wrong type");
@@ -1015,7 +1008,7 @@ void lua_engine::initialize()
  * machine:logerror(str) - print str to log
  */
 
-	sol().new_usertype<running_machine> ("machine", "new", sol::no_constructor,
+	sol().registry().new_usertype<running_machine> ("machine", "new", sol::no_constructor,
 			"exit", &running_machine::schedule_exit,
 			"hard_reset", &running_machine::schedule_hard_reset,
 			"soft_reset", &running_machine::schedule_soft_reset,
@@ -1073,7 +1066,7 @@ void lua_engine::initialize()
 /* game_driver - this should be self explanatory
  */
 
-	sol().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
+	sol().registry().new_usertype<game_driver>("game_driver", "new", sol::no_constructor,
 			"source_file", sol::readonly(&game_driver::source_file),
 			"parent", sol::readonly(&game_driver::parent),
 			"name", sol::readonly(&game_driver::name),
@@ -1093,7 +1086,7 @@ void lua_engine::initialize()
  * device.items[] - device save state items table
  */
 
-	sol().new_usertype<device_t>("device", "new", sol::no_constructor,
+	sol().registry().new_usertype<device_t>("device", "new", sol::no_constructor,
 			"name", &device_t::name,
 			"shortname", &device_t::shortname,
 			"tag", &device_t::tag,
@@ -1142,7 +1135,7 @@ void lua_engine::initialize()
 					return table;
 				}));
 
-	sol().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>(),
+	sol().registry().new_usertype<addr_space>("addr_space", sol::call_constructor, sol::constructors<sol::types<address_space &, device_memory_interface &>>(),
 			"read_i8", &addr_space::mem_read<int8_t>,
 			"read_u8", &addr_space::mem_read<uint8_t>,
 			"read_i16", &addr_space::mem_read<int16_t>,
@@ -1212,7 +1205,7 @@ void lua_engine::initialize()
  * ioport.ports[] - ioports table
  */
 
-	sol().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
+	sol().registry().new_usertype<ioport_manager>("ioport", "new", sol::no_constructor,
 			"count_players", &ioport_manager::count_players,
 			"ports", sol::property([this](ioport_manager &im) {
 					sol::table port_table = sol().create_table();
@@ -1231,7 +1224,7 @@ void lua_engine::initialize()
  * port.field[] - get ioport_field table
  */
 
-	sol().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor,
+	sol().registry().new_usertype<ioport_port>("ioport_port", "new", sol::no_constructor,
 			"tag", &ioport_port::tag,
 			"active", &ioport_port::active,
 			"live", &ioport_port::live,
@@ -1251,7 +1244,7 @@ void lua_engine::initialize()
 /* port.field[field_tag] - this should be self explanatory
  */
 
-	sol().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
+	sol().registry().new_usertype<ioport_field>("ioport_field", "new", sol::no_constructor,
 			"set_value", &ioport_field::set_value,
 			"device", sol::property(&ioport_field::device),
 			"name", sol::property(&ioport_field::name),
@@ -1281,7 +1274,7 @@ void lua_engine::initialize()
  * parameter:lookup(tag) - get val for tag
  */
 
-	sol().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
+	sol().registry().new_usertype<parameters_manager>("parameters", "new", sol::no_constructor,
 			"add", &parameters_manager::add,
 			"lookup", &parameters_manager::lookup);
 
@@ -1298,7 +1291,7 @@ void lua_engine::initialize()
  * video.throttle_rate - throttle rate
  */
 
-	sol().new_usertype<video_manager>("video", "new", sol::no_constructor,
+	sol().registry().new_usertype<video_manager>("video", "new", sol::no_constructor,
 			"begin_recording", sol::overload([this](video_manager &vm, const char *filename) {
 					std::string fn = filename;
 					strreplace(fn, "/", PATH_SEPARATOR);
@@ -1328,7 +1321,7 @@ void lua_engine::initialize()
  * input:pressed(key) - get pressed state for key
  */
 
-	sol().new_usertype<ui_input_manager>("input", "new", sol::no_constructor,
+	sol().registry().new_usertype<ui_input_manager>("input", "new", sol::no_constructor,
 			"find_mouse", [](ui_input_manager &ui) {
 					int32_t x, y;
 					bool button;
@@ -1357,7 +1350,7 @@ void lua_engine::initialize()
  * target.zoom - enable zoom
  */
 
-	sol().new_usertype<render_target>("target", "new", sol::no_constructor,
+	sol().registry().new_usertype<render_target>("target", "new", sol::no_constructor,
 			"view_bounds", [](render_target &rt) {
 					const render_bounds b = rt.current_view()->bounds();
 					return std::tuple<float, float, float, float>(b.x0, b.x1, b.y0, b.y1);
@@ -1382,7 +1375,7 @@ void lua_engine::initialize()
 /* render:ui_container() - this should be self explanatory
  */
 
-	sol().new_usertype<render_container>("render_container", "new", sol::no_constructor,
+	sol().registry().new_usertype<render_container>("render_container", "new", sol::no_constructor,
 			"orientation", &render_container::orientation,
 			"xscale", &render_container::xscale,
 			"yscale", &render_container::yscale,
@@ -1397,7 +1390,7 @@ void lua_engine::initialize()
  * render.target[] - render_target table
  */
 
-	sol().new_usertype<render_manager>("render", "new", sol::no_constructor,
+	sol().registry().new_usertype<render_manager>("render", "new", sol::no_constructor,
 			"max_update_rate", &render_manager::max_update_rate,
 			"ui_target", &render_manager::ui_target,
 			"ui_container", &render_manager::ui_container,
@@ -1427,7 +1420,7 @@ void lua_engine::initialize()
  * screen:yscale() - screen y scale factor
 */
 
-	sol().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
+	sol().registry().new_usertype<screen_device>("screen_dev", "new", sol::no_constructor,
 			"draw_box", [](screen_device &sdev, float x1, float y1, float x2, float y2, uint32_t bgcolor, uint32_t fgcolor) {
 					int sc_width = sdev.visible_area().width();
 					int sc_height = sdev.visible_area().height();
@@ -1548,9 +1541,9 @@ void lua_engine::initialize()
  * ui:get_char_width(char) - get width of utf8 glyph char with ui font
  */
 
-	sol().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
+	sol().registry().new_usertype<mame_ui_manager>("ui", "new", sol::no_constructor,
 			"is_menu_active", &mame_ui_manager::is_menu_active,
-			"options", [](mame_ui_manager &m) { return static_cast<core_options &>(m.options()); },
+			"options", [](mame_ui_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"show_fps", sol::property(&mame_ui_manager::show_fps, &mame_ui_manager::set_show_fps),
 			"show_profiler", sol::property(&mame_ui_manager::show_profiler, &mame_ui_manager::set_show_profiler),
 			"single_step", sol::property(&mame_ui_manager::single_step, &mame_ui_manager::set_single_step),
@@ -1566,7 +1559,7 @@ void lua_engine::initialize()
  * state:is_divider() - is state a divider
  */
 
-	sol().new_usertype<device_state_entry>("dev_space", "new", sol::no_constructor,
+	sol().registry().new_usertype<device_state_entry>("dev_space", "new", sol::no_constructor,
 			"name", &device_state_entry::symbol,
 			"value", sol::property([this](device_state_entry &entry) -> uint64_t {
 					device_state_interface *state = entry.parent_state();
@@ -1594,7 +1587,7 @@ void lua_engine::initialize()
  * memory.shares[] - table of memory shares
  */
 
-	sol().new_usertype<memory_manager>("memory", "new", sol::no_constructor,
+	sol().registry().new_usertype<memory_manager>("memory", "new", sol::no_constructor,
 			"banks", sol::property([this](memory_manager &mm) {
 					sol::table table = sol().create_table();
 					for (auto &bank : mm.banks())
@@ -1614,7 +1607,7 @@ void lua_engine::initialize()
 					return table;
 				}));
 
-	sol().new_usertype<memory_region>("region", "new", sol::no_constructor,
+	sol().registry().new_usertype<memory_region>("region", "new", sol::no_constructor,
 			"read_i8", &region_read<int8_t>,
 			"read_u8", &region_read<uint8_t>,
 			"read_i16", &region_read<int16_t>,
@@ -1633,7 +1626,7 @@ void lua_engine::initialize()
 			"write_u64", &region_write<uint64_t>,
 			"size", sol::property(&memory_region::bytes));
 
-	sol().new_usertype<memory_share>("share", "new", sol::no_constructor,
+	sol().registry().new_usertype<memory_share>("share", "new", sol::no_constructor,
 			"read_i8", &share_read<int8_t>,
 			"read_u8", &share_read<uint8_t>,
 			"read_i16", &share_read<int16_t>,
@@ -1661,7 +1654,7 @@ void lua_engine::initialize()
  * output:id_to_name(index) - get name for index
  */
 
-	sol().new_usertype<output_manager>("output", "new", sol::no_constructor,
+	sol().registry().new_usertype<output_manager>("output", "new", sol::no_constructor,
 			"set_value", &output_manager::set_value,
 			"set_indexed_value", &output_manager::set_indexed_value,
 			"get_value", &output_manager::get_value,
@@ -1672,7 +1665,7 @@ void lua_engine::initialize()
 /* machine.images[] - images are floppy/cart/cdrom/tape/hdd etc, otherwise this should be self explanatory
  */
 
-	sol().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
+	sol().registry().new_usertype<device_image_interface>("image", "new", sol::no_constructor,
 			"exists", &device_image_interface::exists,
 			"filename", &device_image_interface::filename,
 			"longname", &device_image_interface::longname,
@@ -1689,7 +1682,7 @@ void lua_engine::initialize()
 			"is_creatable", sol::property(&device_image_interface::is_creatable),
 			"is_reset_on_load", sol::property(&device_image_interface::is_reset_on_load));
 
-	sol().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
+	sol().registry().new_usertype<mame_machine_manager>("manager", "new", sol::no_constructor,
 			"machine", &machine_manager::machine,
 			"options", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.options()); },
 			"plugins", [](mame_machine_manager &m) { return static_cast<core_options *>(&m.plugins()); },

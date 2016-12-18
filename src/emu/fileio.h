@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_EMU_FILEIO_H
 #define MAME_EMU_FILEIO_H
+
+#pragma once
 
 #include "corefile.h"
 #include "hash.h"
@@ -88,8 +88,8 @@ class emu_file
 {
 public:
 	// file open/creation
-	emu_file(uint32_t openflags);
-	emu_file(std::string &&searchpath, uint32_t openflags);
+	emu_file(u32 openflags);
+	emu_file(std::string &&searchpath, u32 openflags);
 	virtual ~emu_file();
 
 	// getters
@@ -97,14 +97,14 @@ public:
 	bool is_open() const { return bool(m_file); }
 	const char *filename() const { return m_filename.c_str(); }
 	const char *fullpath() const { return m_fullpath.c_str(); }
-	uint32_t openflags() const { return m_openflags; }
+	u32 openflags() const { return m_openflags; }
 	util::hash_collection &hashes(const char *types);
 	bool restrict_to_mediapath() const { return m_restrict_to_mediapath; }
 	bool part_of_mediapath(std::string path);
 
 	// setters
 	void remove_on_close() { m_remove_on_close = true; }
-	void set_openflags(uint32_t openflags) { assert(!m_file); m_openflags = openflags; }
+	void set_openflags(u32 openflags) { assert(!m_file); m_openflags = openflags; }
 	void set_restrict_to_mediapath(bool rtmp = true) { m_restrict_to_mediapath = rtmp; }
 
 	// open/close
@@ -112,31 +112,31 @@ public:
 	osd_file::error open(const std::string &name1, const std::string &name2);
 	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3);
 	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4);
-	osd_file::error open(const std::string &name, uint32_t crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, uint32_t crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, uint32_t crc);
-	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, uint32_t crc);
+	osd_file::error open(const std::string &name, u32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, u32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc);
+	osd_file::error open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, u32 crc);
 	osd_file::error open_next();
-	osd_file::error open_ram(const void *data, uint32_t length);
+	osd_file::error open_ram(const void *data, u32 length);
 	void close();
 
 	// control
 	osd_file::error compress(int compress);
 
 	// position
-	int seek(int64_t offset, int whence);
-	uint64_t tell();
+	int seek(s64 offset, int whence);
+	u64 tell();
 	bool eof();
-	uint64_t size();
+	u64 size();
 
 	// reading
-	uint32_t read(void *buffer, uint32_t length);
+	u32 read(void *buffer, u32 length);
 	int getc();
 	int ungetc(int c);
 	char *gets(char *s, int n);
 
 	// writing
-	uint32_t write(const void *buffer, uint32_t length);
+	u32 write(const void *buffer, u32 length);
 	int puts(const char *s);
 	int vprintf(util::format_argument_pack<std::ostream> const &args);
 	template <typename Format, typename... Params> int printf(Format &&fmt, Params &&...args)
@@ -155,21 +155,21 @@ private:
 	osd_file::error load_zipped_file();
 
 	// internal state
-	std::string     m_filename;                     // original filename provided
-	std::string     m_fullpath;                     // full filename
-	util::core_file::ptr m_file;                    // core file pointer
-	path_iterator   m_iterator;                     // iterator for paths
-	path_iterator   m_mediapaths;                   // media-path iterator
-	uint32_t          m_crc;                          // file's CRC
-	uint32_t          m_openflags;                    // flags we used for the open
-	util::hash_collection m_hashes;                 // collection of hashes
+	std::string             m_filename;             // original filename provided
+	std::string             m_fullpath;             // full filename
+	util::core_file::ptr    m_file;                 // core file pointer
+	path_iterator           m_iterator;             // iterator for paths
+	path_iterator           m_mediapaths;           // media-path iterator
+	u32                     m_crc;                  // file's CRC
+	u32                     m_openflags;            // flags we used for the open
+	util::hash_collection   m_hashes;               // collection of hashes
 
 	std::unique_ptr<util::archive_file> m_zipfile;  // ZIP file pointer
-	std::vector<uint8_t>  m_zipdata;                      // ZIP file data
-	uint64_t          m_ziplength;                    // ZIP file length
+	std::vector<u8>         m_zipdata;               // ZIP file data
+	u64                     m_ziplength;             // ZIP file length
 
-	bool            m_remove_on_close;              // flag: remove the file when closing
-	bool            m_restrict_to_mediapath;        // flag: restrict to paths inside the media-path
+	bool                    m_remove_on_close;       // flag: remove the file when closing
+	bool                    m_restrict_to_mediapath; // flag: restrict to paths inside the media-path
 };
 
 #endif // MAME_EMU_FILEIO_H

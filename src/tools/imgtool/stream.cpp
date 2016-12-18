@@ -24,7 +24,6 @@
 imgtool::stream::stream(bool wp)
 	: imgtype(IMG_FILE)
 	, write_protect(wp)
-	, name(nullptr)
 	, position(0)
 	, filesize(0)
 	, file()
@@ -40,7 +39,6 @@ imgtool::stream::stream(bool wp)
 imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
 	: imgtype(IMG_FILE)
 	, write_protect(wp)
-	, name(nullptr)
 	, position(0)
 	, filesize(f->size())
 	, file(std::move(f))
@@ -56,7 +54,6 @@ imgtool::stream::stream(bool wp, util::core_file::ptr &&f)
 imgtool::stream::stream(bool wp, std::size_t size)
 	: imgtype(IMG_MEM)
 	, write_protect(wp)
-	, name(nullptr)
 	, position(0)
 	, filesize(size)
 	, file()
@@ -72,7 +69,6 @@ imgtool::stream::stream(bool wp, std::size_t size)
 imgtool::stream::stream(bool wp, std::size_t size, void *buf)
 	: imgtype(IMG_MEM)
 	, write_protect(wp)
-	, name(nullptr)
 	, position(0)
 	, filesize(size)
 	, file()
@@ -96,13 +92,13 @@ imgtool::stream::~stream()
 //  open_zip
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open_zip(const char *zipname, const char *subname, int read_or_write)
+imgtool::stream::ptr imgtool::stream::open_zip(const std::string &zipname, const char *subname, int read_or_write)
 {
 	if (read_or_write)
 		return imgtool::stream::ptr();
 
 	/* check to see if the file exists */
-	FILE *f = fopen(zipname, "r");
+	FILE *f = fopen(zipname.c_str(), "r");
 	if (!f)
 		return imgtool::stream::ptr();
 	fclose(f);
@@ -139,7 +135,7 @@ imgtool::stream::ptr imgtool::stream::open_zip(const char *zipname, const char *
 //  open
 //-------------------------------------------------
 
-imgtool::stream::ptr imgtool::stream::open(const char *fname, int read_or_write)
+imgtool::stream::ptr imgtool::stream::open(const std::string &filename, int read_or_write)
 {
 	static const uint32_t write_modes[] =
 	{
@@ -151,22 +147,22 @@ imgtool::stream::ptr imgtool::stream::open(const char *fname, int read_or_write)
 	imgtool::stream::ptr s;
 	char c;
 
-	/* maybe we are just a ZIP? */
-	const char *ext = strrchr(fname, '.');
-	if (ext && !core_stricmp(ext, ".zip"))
-		return open_zip(fname, nullptr, read_or_write);
+	// maybe we are just a ZIP?
+	std::string ext = core_filename_extract_extension(filename);
+	if (!core_stricmp(ext.c_str(), ".zip"))
+		return open_zip(filename, nullptr, read_or_write);
 
 	util::core_file::ptr f = nullptr;
-	auto const filerr = util::core_file::open(fname, write_modes[read_or_write], f);
+	auto const filerr = util::core_file::open(filename, write_modes[read_or_write], f);
 	if (filerr != osd_file::error::NONE)
 	{
 		if (!read_or_write)
 		{
-			int const len = strlen(fname);
+			int const len = filename.size();
 
 			/* can't open the file; try opening ZIP files with other names */
 			std::vector<char> buf(len + 1);
-			strcpy(&buf[0], fname);
+			strcpy(&buf[0], filename.c_str());
 
 			for (int i = len-1; !s && (i >= 0); i--)
 			{
@@ -189,8 +185,7 @@ imgtool::stream::ptr imgtool::stream::open(const char *fname, int read_or_write)
 
 	imgtool::stream::ptr imgfile(new imgtool::stream(read_or_write ? false : true, std::move(f)));
 
-	/* Normal file */
-	imgfile->name = fname;
+	// normal file
 	return imgfile;
 }
 

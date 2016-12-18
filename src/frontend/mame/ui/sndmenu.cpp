@@ -124,7 +124,7 @@ void menu_sound_options::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_sound_options::populate()
+void menu_sound_options::populate(float &customtop, float &custombottom)
 {
 	uint32_t arrow_flags = get_arrow_flags(uint16_t(0), uint16_t(ARRAY_LENGTH(m_sound_rate) - 1), m_cur_rates);
 	m_sample_rate = m_sound_rate[m_cur_rates];

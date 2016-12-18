@@ -334,7 +334,7 @@ uint32_t h8_device::disasm_max_opcode_bytes() const
 	return 10;
 }
 
-void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset)
+void h8_device::disassemble_am(std::ostream &stream, int am, offs_t pc, const uint8_t *oprom, uint32_t opcode, int slot, int offset)
 {
 	static const char *const r8_names[16] = {
 		"r0h", "r1h",  "r2h", "r3h",  "r4h", "r5h",  "r6h", "r7h",
@@ -352,194 +352,194 @@ void h8_device::disassemble_am(char *&buffer, int am, offs_t pc, const uint8_t *
 
 	switch(am) {
 	case DASM_r8l:
-		buffer += sprintf(buffer, "%s", r8_names[opcode & 15]);
+		util::stream_format(stream, "%s", r8_names[opcode & 15]);
 		break;
 
 	case DASM_r8h:
-		buffer += sprintf(buffer, "%s", r8_names[(opcode >> 4) & 15]);
+		util::stream_format(stream, "%s", r8_names[(opcode >> 4) & 15]);
 		break;
 
 	case DASM_r8u:
-		buffer += sprintf(buffer, "%s", r8_names[(opcode >> 8) & 15]);
+		util::stream_format(stream, "%s", r8_names[(opcode >> 8) & 15]);
 		break;
 
 	case DASM_r16l:
-		buffer += sprintf(buffer, "%s", r16_names[opcode & 15]);
+		util::stream_format(stream, "%s", r16_names[opcode & 15]);
 		break;
 
 	case DASM_r16h:
-		buffer += sprintf(buffer, "%s", r16_names[(opcode >> 4) & 15]);
+		util::stream_format(stream, "%s", r16_names[(opcode >> 4) & 15]);
 		break;
 
 	case DASM_r32l:
-		buffer += sprintf(buffer, "%s", r32_names[opcode & 7]);
+		util::stream_format(stream, "%s", r32_names[opcode & 7]);
 		break;
 
 	case DASM_r32h:
-		buffer += sprintf(buffer, "%s", r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "%s", r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r16ih:
-		buffer += sprintf(buffer, "@%s", r16_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@%s", r16_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r16ihh:
-		buffer += sprintf(buffer, "@%s", r16_names[(opcode >> 20) & 7]);
+		util::stream_format(stream, "@%s", r16_names[(opcode >> 20) & 7]);
 		break;
 
 	case DASM_pr16h:
-		buffer += sprintf(buffer, "@-%s", r16_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@-%s", r16_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r16ph:
-		buffer += sprintf(buffer, "@%s+", r16_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@%s+", r16_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r16d16h:
-		buffer += sprintf(buffer, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r16_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r16_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32ih:
-		buffer += sprintf(buffer, "@%s", r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@%s", r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32ihh:
-		buffer += sprintf(buffer, "@%s", r32_names[(opcode >> 20) & 7]);
+		util::stream_format(stream, "@%s", r32_names[(opcode >> 20) & 7]);
 		break;
 
 	case DASM_pr32h:
-		buffer += sprintf(buffer, "@-%s", r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@-%s", r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32pl:
-		buffer += sprintf(buffer, "@%s+", r32_names[opcode & 7]);
+		util::stream_format(stream, "@%s+", r32_names[opcode & 7]);
 		break;
 
 	case DASM_r32ph:
-		buffer += sprintf(buffer, "@%s+", r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@%s+", r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32d16h:
-		buffer += sprintf(buffer, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 4) & 7]);
+		util::stream_format(stream, "@(%x, %s)", (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 4) & 7]);
 		break;
 
 	case DASM_r32d32hh:
-		buffer += sprintf(buffer, "@(%x, %s)", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 20) & 7]);
+		util::stream_format(stream, "@(%x, %s)", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1], r32_names[(opcode >> 20) & 7]);
 		break;
 
 	case DASM_psp:
-		buffer += sprintf(buffer, "@-sp");
+		util::stream_format(stream, "@-sp");
 		break;
 
 	case DASM_spp:
-		buffer += sprintf(buffer, "@sp+");
+		util::stream_format(stream, "@sp+");
 		break;
 
 	case DASM_r32n2l:
-		buffer += sprintf(buffer, "%s-%s", r32_names[opcode & 6], r32_names[(opcode & 6) + 1]);
+		util::stream_format(stream, "%s-%s", r32_names[opcode & 6], r32_names[(opcode & 6) + 1]);
 		break;
 
 	case DASM_r32n3l:
-		buffer += sprintf(buffer, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 2]);
+		util::stream_format(stream, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 2]);
 		break;
 
 	case DASM_r32n4l:
-		buffer += sprintf(buffer, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 3]);
+		util::stream_format(stream, "%s-%s", r32_names[opcode & 4], r32_names[(opcode & 4) + 3]);
 		break;
 
 	case DASM_abs8:
-		buffer += sprintf(buffer, "@%08x", 0xffffff00 | oprom[1]);
+		util::stream_format(stream, "@%08x", 0xffffff00 | oprom[1]);
 		break;
 
 	case DASM_abs16:
 		if(offset >= 6)
-			buffer += sprintf(buffer, "@%08x", int16_t((oprom[offset-4] << 8) | oprom[offset-3]));
+			util::stream_format(stream, "@%08x", int16_t((oprom[offset-4] << 8) | oprom[offset-3]));
 		else
-			buffer += sprintf(buffer, "@%08x", int16_t((oprom[offset-2] << 8) | oprom[offset-1]));
+			util::stream_format(stream, "@%08x", int16_t((oprom[offset-2] << 8) | oprom[offset-1]));
 		break;
 
 	case DASM_abs32:
 		if(slot == 3)
-			buffer += sprintf(buffer, "@%08x", (oprom[offset-6] << 24) | (oprom[offset-5] << 16) | (oprom[offset-4] << 8) | oprom[offset-3]);
+			util::stream_format(stream, "@%08x", (oprom[offset-6] << 24) | (oprom[offset-5] << 16) | (oprom[offset-4] << 8) | oprom[offset-3]);
 		else
-			buffer += sprintf(buffer, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
+			util::stream_format(stream, "@%08x", (oprom[offset-4] << 24) | (oprom[offset-3] << 16) | (oprom[offset-2] << 8) | oprom[offset-1]);
 		break;
 
 	case DASM_abs8i:
-		buffer += sprintf(buffer, "@%02x", oprom[1]);
+		util::stream_format(stream, "@%02x", oprom[1]);
 		break;
 
 	case DASM_abs16e:
-		buffer += sprintf(buffer, "%04x", (oprom[2] << 8) | oprom[3]);
+		util::stream_format(stream, "%04x", (oprom[2] << 8) | oprom[3]);
 		break;
 
 	case DASM_abs24e:
-		buffer += sprintf(buffer, "%08x", (oprom[1] << 16) | (oprom[2] << 8) | oprom[3]);
+		util::stream_format(stream, "%08x", (oprom[1] << 16) | (oprom[2] << 8) | oprom[3]);
 		break;
 
 	case DASM_rel8:
-		buffer += sprintf(buffer, "%08x", pc + 2 + int8_t(oprom[1]));
+		util::stream_format(stream, "%08x", pc + 2 + int8_t(oprom[1]));
 		break;
 
 	case DASM_rel16:
-		buffer += sprintf(buffer, "%08x", pc + 4 + int16_t((oprom[2] << 8) | oprom[3]));
+		util::stream_format(stream, "%08x", pc + 4 + int16_t((oprom[2] << 8) | oprom[3]));
 		break;
 
 	case DASM_one:
-		buffer += sprintf(buffer, "#1");
+		util::stream_format(stream, "#1");
 		break;
 
 	case DASM_two:
-		buffer += sprintf(buffer, "#2");
+		util::stream_format(stream, "#2");
 		break;
 
 	case DASM_four:
-		buffer += sprintf(buffer, "#4");
+		util::stream_format(stream, "#4");
 		break;
 
 	case DASM_imm2:
-		buffer += sprintf(buffer, "#%x", (opcode >> 4) & 3);
+		util::stream_format(stream, "#%x", (opcode >> 4) & 3);
 		break;
 
 	case DASM_imm3:
-		buffer += sprintf(buffer, "#%x", (opcode >> 4) & 7);
+		util::stream_format(stream, "#%x", (opcode >> 4) & 7);
 		break;
 
 	case DASM_imm8:
-		buffer += sprintf(buffer, "#%02x", oprom[1]);
+		util::stream_format(stream, "#%02x", oprom[1]);
 		break;
 
 	case DASM_imm16:
-		buffer += sprintf(buffer, "#%04x", (oprom[2] << 8) | oprom[3]);
+		util::stream_format(stream, "#%04x", (oprom[2] << 8) | oprom[3]);
 		break;
 
 	case DASM_imm32:
-		buffer += sprintf(buffer, "#%08x", (oprom[2] << 16) | (oprom[3] << 16) | (oprom[4] << 8) | oprom[5]);
+		util::stream_format(stream, "#%08x", (oprom[2] << 16) | (oprom[3] << 16) | (oprom[4] << 8) | oprom[5]);
 		break;
 
 	case DASM_ccr:
-		buffer += sprintf(buffer, "ccr");
+		util::stream_format(stream, "ccr");
 		break;
 
 	case DASM_exr:
-		buffer += sprintf(buffer, "exr");
+		util::stream_format(stream, "exr");
 		break;
 
 	case DASM_macl:
-		buffer += sprintf(buffer, "macl");
+		util::stream_format(stream, "macl");
 		break;
 
 	case DASM_mach:
-		buffer += sprintf(buffer, "mach");
+		util::stream_format(stream, "mach");
 		break;
 
 	default:
-		buffer += sprintf(buffer, "<%d>", am);
+		util::stream_format(stream, "<%d>", am);
 		break;
 	}
 }
 
-offs_t h8_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
+offs_t h8_device::disassemble_generic(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options, const disasm_entry *table)
 {
 	uint32_t slot[5];
 	slot[0] = (oprom[0] << 8) | oprom[1];
@@ -555,23 +555,22 @@ offs_t h8_device::disassemble_generic(char *buffer, offs_t pc, const uint8_t *op
 			break;
 	}
 	const disasm_entry &e = table[inst];
-	buffer += sprintf(buffer, "%s", e.opcode);
+	stream << e.opcode;
 
 	if(e.am1 != DASM_none) {
-		*buffer++ = ' ';
-		disassemble_am(buffer, e.am1, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
+		stream << ' ';
+		disassemble_am(stream, e.am1, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
 	}
 	if(e.am2 != DASM_none) {
-		*buffer++ = ',';
-		*buffer++ = ' ';
-		disassemble_am(buffer, e.am2, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
+		stream << ", ";
+		disassemble_am(stream, e.am2, pc, oprom, slot[e.slot], e.slot, e.flags & DASMFLAG_LENGTHMASK);
 	}
 	return e.flags | DASMFLAG_SUPPORTED;
 }
 
-offs_t h8_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t h8_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 uint16_t h8_device::read16i(uint32_t adr)
@@ -799,7 +798,7 @@ uint32_t h8_device::do_add32(uint32_t v1, uint32_t v2)
 		CCR |= F_N;
 	if(~(v1^v2) & (v1^res) & 0x80000000)
 		CCR |= F_V;
-	if(res & U64(0x100000000))
+	if(res & 0x100000000U)
 		CCR |= F_C;
 	return res;
 }
@@ -891,7 +890,7 @@ uint32_t h8_device::do_sub32(uint32_t v1, uint32_t v2)
 		CCR |= F_N;
 	if((v1^v2) & (v1^res) & 0x80000000)
 		CCR |= F_V;
-	if(res & U64(0x100000000))
+	if(res & 0x100000000U)
 		CCR |= F_C;
 	return res;
 }

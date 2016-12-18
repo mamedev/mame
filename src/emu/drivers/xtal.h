@@ -39,6 +39,11 @@
 
 **************************************************************************/
 
+#ifndef MAME_EMU_DRIVERS_XTAL_H
+#define MAME_EMU_DRIVERS_XTAL_H
+
+#pragma once
+
 enum
 {
 /*
@@ -168,6 +173,7 @@ enum
 	XTAL_21_3MHz        = 21300000,
 	XTAL_21_4772MHz     = 21477272,     /* BMC bowling, some Data East 90's games, Vtech Socrates; (6x NTSC subcarrier) */
 	XTAL_22MHz          = 22000000,
+	XTAL_22_3210MHz     = 22321000,     /* Apple LaserWriter II NT */
 	XTAL_22_1184MHz     = 22118400,     /* Amusco Poker */
 	XTAL_23_9616MHz     = 23961600,     /* Osborne 4 (Vixen) */
 	XTAL_24MHz          = 24000000,     /* Mario, 80's Data East games, 80's Konami games */
@@ -618,3 +624,5 @@ reveals the following shipping frequencies as of 1/1/2008:
 100.00MHz
 
 */
+
+#endif // MAME_EMU_DRIVERS_XTAL_H

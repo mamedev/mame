@@ -177,11 +177,20 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	imgtool::partition::ptr partition;
 	imgtool::directory::ptr imgenum;
 	imgtool_dirent ent;
-	char buf[512];
 	char last_modified[19];
-	const char *path;
+	std::string path;
 	int partition_index = 0;
 	std::string info;
+
+	// build the separator
+	const int columnwidth_filename = 30;
+	const int columnwidth_filesize = 8;
+	const int columnwidth_attributes = 15;
+	const int columnwidth_lastmodified = 18;
+	std::string separator = std::string(columnwidth_filename, '-') + " "
+		+ std::string(columnwidth_filesize, '-') + " "
+		+ std::string(columnwidth_attributes, '-') + " "
+		+ std::string(columnwidth_lastmodified, '-');
 
 	// attempt to open image
 	err = imgtool::image::open(argv[0], argv[1], OSD_FOPEN_READ, image);
@@ -193,7 +202,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	path = argc > 2 ? argv[2] : nullptr;
+	path = argc > 2 ? argv[2] : "";
 
 	err = imgtool::directory::open(*partition, path, imgenum);
 	if (err)
@@ -204,19 +213,19 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	total_count = 0;
 	total_size = 0;
 
-	fprintf(stdout, "Contents of %s:%s\n", argv[1], path ? path : "");
+	fprintf(stdout, "Contents of %s:%s\n", argv[1], path.c_str());
 
 	info = image->info();
 	if (!info.empty())
 		fprintf(stdout, "%s\n", info.c_str());
-	fprintf(stdout, "------------------------------  --------  ---------------  ------------------\n");
+
+	fprintf(stdout, "%s\n", separator.c_str());
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{
-		if (ent.directory)
-			snprintf(buf, sizeof(buf), "<DIR>");
-		else
-			snprintf(buf, sizeof(buf), "%u", (unsigned int) ent.filesize);
+		std::string filesize_string = ent.directory
+			? "<DIR>"
+			: string_format("%u", (unsigned int) ent.filesize);
 
 		if (ent.lastmodified_time != 0)
 			strftime(last_modified, sizeof(last_modified), "%d-%b-%y %H:%M:%S",
@@ -225,7 +234,11 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		if (ent.hardlink)
 			strcat(ent.filename, " <hl>");
 
-		fprintf(stdout, "%-30s  %8s  %15s  %18s\n", ent.filename, buf, ent.attr, last_modified);
+		fprintf(stdout, "%*s %*s %*s %*s\n",
+			-columnwidth_filename, ent.filename,
+			columnwidth_filesize, filesize_string.c_str(),
+			columnwidth_attributes, ent.attr,
+			columnwidth_lastmodified, last_modified);
 
 		if (ent.softlink && ent.softlink[0] != '\0')
 			fprintf(stdout, "-> %s\n", ent.softlink);
@@ -244,7 +257,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	fprintf(stdout, "------------------------  ------ ---------------\n");
+	fprintf(stdout, "%s\n", separator.c_str());
 	fprintf(stdout, "%8i File(s)        %8i bytes\n", total_count, total_size);
 	if (!freespace_err)
 		fprintf(stdout, "                        %8u bytes free\n", (unsigned int) freespace);

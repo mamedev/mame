@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_INPUTMAP_H
 #define MAME_FRONTEND_UI_INPUTMAP_H
+
+#pragma once
 
 #include "ui/menu.h"
 
@@ -24,7 +24,7 @@ public:
 	virtual ~menu_input_groups() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -83,7 +83,7 @@ public:
 	virtual ~menu_input_general() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
 
 	int group;
@@ -96,7 +96,7 @@ public:
 	virtual ~menu_input_specific() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void update_input(struct input_item_data *seqchangeditem) override;
 };
 
@@ -121,7 +121,7 @@ protected:
 	int type;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -169,10 +169,10 @@ private:
 		int                 defvalue;
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
-} // namesapce ui
+} // namespace ui
 
 #endif  /* MAME_FRONTEND_UI_INPUTMAP_H */

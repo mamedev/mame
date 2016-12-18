@@ -49,7 +49,7 @@ menu_main::menu_main(mame_ui_manager &mui, render_container &container) : menu(m
 {
 }
 
-void menu_main::populate()
+void menu_main::populate(float &customtop, float &custombottom)
 {
 	/* add input menu items */
 	item_append(_("Input (general)"), "", 0, (void *)INPUT_GROUPS);

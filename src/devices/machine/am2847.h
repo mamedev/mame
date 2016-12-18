@@ -4,16 +4,16 @@
 
     AMD Am2847/Am2896 Quad 80/96-Bit Static Shift Registers
 
-	Pin-compatible with:
-	* 2532B
-	* TMS3120
-	* TMS3409
-	* MK1007
-	* 3347
+    Pin-compatible with:
+    * 2532B
+    * TMS3120
+    * TMS3409
+    * MK1007
+    * 3347
 
 ***********************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
               ___ ___
     OUT A  1 |*  u   | 16  Vss
      RC A  2 |       | 15  IN D
@@ -24,18 +24,18 @@
     OUT C  7 |       | 10  IN C
       Vdd  8 |_______| 9   RC C
 
-	Logic Symbol:
+    Logic Symbol:
 
-	            2      5      9      14
-	            |      |      |      |
-	       _____|______|______|______|_____
-	      |   RC A   RC B   RC C   RC D    |
-	 3 ---| IN A                     OUT A |--- 1
-	 6 ---| IN A                     OUT B |--- 4
-	10 ---| IN A                     OUT C |--- 7
-	15 ---| IN A                     OUT D |--- 13
-	11 ---| CP                             |
-	      |________________________________|
+                2      5      9      14
+                |      |      |      |
+           _____|______|______|______|_____
+          |   RC A   RC B   RC C   RC D    |
+     3 ---| IN A                     OUT A |--- 1
+     6 ---| IN A                     OUT B |--- 4
+    10 ---| IN A                     OUT C |--- 7
+    15 ---| IN A                     OUT D |--- 13
+    11 ---| CP                             |
+          |________________________________|
 
 
 **********************************************************************/

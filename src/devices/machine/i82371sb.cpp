@@ -39,7 +39,7 @@ DEVICE_ADDRESS_MAP_START(internal_io_map, 32, i82371sb_isa_device)
 	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8("rtc", ds12885_device, read, write, 0xffffffff);
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r, at_page8_w, 0xffffffff);
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_slave", pic8259_device, read, write, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);	
+	AM_RANGE(0x00c0, 0x00df) AM_READWRITE8(at_dma8237_2_r, at_dma8237_2_w, 0xffffffff);
 	AM_RANGE(0x00e0, 0x00ef) AM_NOP
 
 	// VGA-HACK
@@ -109,43 +109,43 @@ static MACHINE_CONFIG_FRAGMENT( southbridge )
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir0_w))
 	MCFG_MC146818_CENTURY_INDEX(0x32)
 
-//	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
-//	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
-//	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+//  MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
+//  MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
+//  MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 //
-//	MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", nullptr, false)
-//	MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
-//	MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
+//  MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide2", ata_devices, "cdrom", nullptr, false)
+//  MCFG_ATA_INTERFACE_IRQ_HANDLER(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
+//  MCFG_BUS_MASTER_IDE_CONTROLLER_SPACE(":maincpu", AS_PROGRAM)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 //
-//	MCFG_DEVICE_ADD("isabus", ISA16, 0)
-//	MCFG_ISA16_CPU(":maincpu")
-//	MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_slave",  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
-//	MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
-//	MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir4_w))
-//	MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir5_w))
-//	MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir6_w))
-//	MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
-//	MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
-//	MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))
-//	MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir5_w))
-//	MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
-//	MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
-//	MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq0_w))
-//	MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
-//	MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
-//	MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
-//	MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq1_w))
-//	MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w))
-//	MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w))
-//	// on board devices
-//	MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", true)
-//	MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
-//	MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
+//  MCFG_DEVICE_ADD("isabus", ISA16, 0)
+//  MCFG_ISA16_CPU(":maincpu")
+//  MCFG_ISA_OUT_IRQ2_CB(DEVWRITELINE("pic8259_slave",  pic8259_device, ir2_w)) // in place of irq 2 on at irq 9 is used
+//  MCFG_ISA_OUT_IRQ3_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir3_w))
+//  MCFG_ISA_OUT_IRQ4_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir4_w))
+//  MCFG_ISA_OUT_IRQ5_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir5_w))
+//  MCFG_ISA_OUT_IRQ6_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir6_w))
+//  MCFG_ISA_OUT_IRQ7_CB(DEVWRITELINE("pic8259_master", pic8259_device, ir7_w))
+//  MCFG_ISA_OUT_IRQ10_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir3_w))
+//  MCFG_ISA_OUT_IRQ11_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir4_w))
+//  MCFG_ISA_OUT_IRQ12_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir5_w))
+//  MCFG_ISA_OUT_IRQ14_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir6_w))
+//  MCFG_ISA_OUT_IRQ15_CB(DEVWRITELINE("pic8259_slave", pic8259_device, ir7_w))
+//  MCFG_ISA_OUT_DRQ0_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq0_w))
+//  MCFG_ISA_OUT_DRQ1_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq1_w))
+//  MCFG_ISA_OUT_DRQ2_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq2_w))
+//  MCFG_ISA_OUT_DRQ3_CB(DEVWRITELINE("dma8237_1", am9517a_device, dreq3_w))
+//  MCFG_ISA_OUT_DRQ5_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq1_w))
+//  MCFG_ISA_OUT_DRQ6_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq2_w))
+//  MCFG_ISA_OUT_DRQ7_CB(DEVWRITELINE("dma8237_2", am9517a_device, dreq3_w))
+//  // on board devices
+//  MCFG_ISA16_SLOT_ADD("isabus","board1", pc_isa_onboard, "fdcsmc", true)
+//  MCFG_ISA16_SLOT_ADD("isabus","board2", pc_isa_onboard, "comat", true)
+//  MCFG_ISA16_SLOT_ADD("isabus","board3", pc_isa_onboard, "lpt", true)
 	// VGA-HACK
 	MCFG_FRAGMENT_ADD( pcvideo_vga );
 	// end-VGA-HACK
@@ -177,7 +177,7 @@ i82371sb_isa_device::i82371sb_isa_device(const machine_config &mconfig, const ch
 	m_ds12885(*this, "rtc"),
 	m_pc_kbdc(*this, "pc_kbdc")
 	, m_at_spkrdata(0), m_pit_out2(0), m_dma_channel(0), m_cur_eop(false), m_dma_high_byte(0), m_at_speaker(0), m_refresh(false), m_channel_check(0), m_nmi_enabled(0)
-	// VGA-HACK	
+	// VGA-HACK
 	,m_vga_region(*this, ":ibm_vga")
 	// end-VGA-HACK
 {
@@ -210,9 +210,9 @@ void i82371sb_isa_device::device_reset()
 	smireq = 0x0000;
 	ctlmtr = 0x00;
 	cthmtr = 0x00;
-	
-	
-	
+
+
+
 	m_at_spkrdata = 0;
 	m_pit_out2 = 1;
 	m_dma_channel = -1;
@@ -427,7 +427,7 @@ void i82371sb_isa_device::map_extra(uint64_t memory_window_start, uint64_t memor
 {
 	map_bios(memory_space, 0xfffc0000, 0xffffffff);
 	map_bios(memory_space, 0x000e0000, 0x000fffff);
-    // VGA-HACK
+	// VGA-HACK
 	vga_device *m_vga = subdevice<vga_device>("vga");
 	memory_space->install_rom(0x000c0000, 0x000c7fff, m_vga_region->base());
 	memory_space->install_readwrite_handler(0xa0000,0xbffff,read8_delegate(FUNC(vga_device::mem_r),m_vga),write8_delegate(FUNC(vga_device::mem_w),m_vga),0xffffffff);
@@ -683,7 +683,7 @@ WRITE_LINE_MEMBER( i82371sb_isa_device::at_dma8237_out_eop )
 {
 	m_cur_eop = state == ASSERT_LINE;
 	//if(m_dma_channel != -1)
-//		m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
+//      m_isabus->eop_w(m_dma_channel, m_cur_eop ? ASSERT_LINE : CLEAR_LINE );
 }
 
 void i82371sb_isa_device::pc_select_dma_channel(int channel, bool state)
@@ -691,12 +691,12 @@ void i82371sb_isa_device::pc_select_dma_channel(int channel, bool state)
 	if(!state) {
 		m_dma_channel = channel;
 		//if(m_cur_eop)
-//			m_isabus->eop_w(channel, ASSERT_LINE );
+//          m_isabus->eop_w(channel, ASSERT_LINE );
 
 	} else if(m_dma_channel == channel) {
 		m_dma_channel = -1;
 		//if(m_cur_eop)
-//			m_isabus->eop_w(channel, CLEAR_LINE );
+//          m_isabus->eop_w(channel, CLEAR_LINE );
 	}
 }
 

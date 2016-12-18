@@ -3126,6 +3126,8 @@ OP(op,ff) { rst(0x38);                                                          
 
 void z80_device::take_nmi()
 {
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
+
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3145,6 +3147,8 @@ void z80_device::take_nmi()
 void z80_device::take_interrupt()
 {
 	int irq_vector;
+
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
 
 	/* Check if processor was halted */
 	leave_halt();
@@ -3230,6 +3234,8 @@ void z80_device::take_interrupt()
 
 void nsc800_device::take_interrupt_nsc800()
 {
+	PRVPC = 0xffff; // HACK: segag80r protection kludge
+
 	/* Check if processor was halted */
 	leave_halt();
 
@@ -3669,10 +3675,10 @@ void z80_device::state_string_export(const device_state_entry &entry, std::strin
 //  helper function
 //-------------------------------------------------
 
-offs_t z80_device::disasm_disassemble( char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
+offs_t z80_device::disasm_disassemble( std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options )
 {
 	extern CPU_DISASSEMBLE( z80 );
-	return CPU_DISASSEMBLE_NAME(z80)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(z80)(this, stream, pc, oprom, opram, options);
 }
 
 

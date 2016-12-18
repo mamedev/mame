@@ -43,7 +43,7 @@ static std::shared_ptr<sdl_window_info> window_from_id(Uint32 windowID)
 	auto& windows = osd_common_t::s_window_list;
 	auto window = std::find_if(windows.begin(), windows.end(), [sdl_window](std::shared_ptr<osd_window> w)
 	{
-		return w->platform_window<SDL_Window*>() == sdl_window;
+		return std::static_pointer_cast<sdl_window_info>(w)->platform_window() == sdl_window;
 	});
 
 	if (window == windows.end())

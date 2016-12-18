@@ -70,18 +70,22 @@
 /* lets us know what version of Mac OS X we're compiling on */
 #include "AvailabilityMacros.h"
 #include "TargetConditionals.h"
+#if TARGET_OS_TV
+#undef __TVOS__
+#define __TVOS__ 1
+#endif
 #if TARGET_OS_IPHONE
-/* if compiling for iPhone */
+/* if compiling for iOS */
 #undef __IPHONEOS__
 #define __IPHONEOS__ 1
 #undef __MACOSX__
 #else
-/* if not compiling for iPhone */
+/* if not compiling for iOS */
 #undef __MACOSX__
 #define __MACOSX__  1
-#if MAC_OS_X_VERSION_MIN_REQUIRED < 1050
-# error SDL for Mac OS X only supports deploying on 10.5 and above.
-#endif /* MAC_OS_X_VERSION_MIN_REQUIRED < 1050 */
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1060
+# error SDL for Mac OS X only supports deploying on 10.6 and above.
+#endif /* MAC_OS_X_VERSION_MIN_REQUIRED < 1060 */
 #endif /* TARGET_OS_IPHONE */
 #endif /* defined(__APPLE__) */
 

@@ -420,7 +420,7 @@ case M_HL:  util::stream_format(stream, "%c[HL]", fill); break;       \
 case OP:    util::stream_format(stream, "%c$%02X", fill, op); break;      \
 case OP1:   util::stream_format(stream, "%c$%02X", fill, op1); break;
 
-static offs_t internal_disasm_minx(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(minx)
 {
 	const minxdasm *instr;
 	uint8_t op, op1;
@@ -461,14 +461,4 @@ static offs_t internal_disasm_minx(cpu_device *device, std::ostream &stream, off
 		}
 	}
 	return pos | s_flags[instr->mnemonic] | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(minx)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_minx(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

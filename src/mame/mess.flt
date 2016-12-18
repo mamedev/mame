@@ -3,12 +3,12 @@
 4dpi.cpp
 68ksbc.cpp
 a2600.cpp
-a310.cpp
 a5105.cpp
 a51xx.cpp
 a6809.cpp
 a7150.cpp
 a7800.cpp
+aa310.cpp
 abc1600.cpp
 abc80.cpp
 abc80x.cpp
@@ -309,6 +309,7 @@ lisa.cpp
 llc.cpp
 lola8a.cpp
 lviv.cpp
+lwriter.cpp
 lynx.cpp
 m20.cpp
 m24.cpp
@@ -318,6 +319,7 @@ m79152pc.cpp
 mac.cpp
 mac128.cpp
 macpci.cpp
+magnum.cpp
 mbc200.cpp
 mbc55x.cpp
 mbee.cpp
@@ -333,6 +335,7 @@ mephisto.cpp
 mes.cpp
 mice.cpp
 micral.cpp
+micro20.cpp
 microdec.cpp
 microkit.cpp
 micronic.cpp
@@ -476,6 +479,7 @@ pp01.cpp
 prestige.cpp
 primo.cpp
 pro80.cpp
+prodigy.cpp
 prof180x.cpp
 prof80.cpp
 prophet600.cpp

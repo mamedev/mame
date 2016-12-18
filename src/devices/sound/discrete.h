@@ -378,7 +378,7 @@
  ***********************************************************************
  *
  * DISCRETE_CONSTANT - Single output, fixed at compile time.
- *                     This is usefull as a placeholder for
+ *                     This is useful as a placeholder for
  *                     incomplete circuits.
  *
  *                        .----------.
@@ -446,7 +446,7 @@
  *       it if needed.
  *       If you need to access a stream from a discrete task, the stream node
  *       must be part of that task. If a given stream is used in two tasks or
- *       a task and the main task, you must declare two stream nodes acccessing the
+ *       a task and the main task, you must declare two stream nodes accessing the
  *       same stream input NUM.
  *
  * EXAMPLES: see scramble, frogger
@@ -479,7 +479,7 @@
  *                               types above if needed, or use separately with 7492.
  *                           DISC_OUT_IS_ENERGY - This will uses the x_time to
  *                                                anti-alias the count.  Might be
- *                                                usefull if not connected to other
+ *                                                useful if not connected to other
  *                                                modules.
  *                           DISC_OUT_HAS_XTIME - This will generate x_time if
  *                                                being used with DISC_CLK_IS_FREQ.
@@ -513,7 +513,7 @@
  ***********************************************************************
  *
  * DISCRETE_LFSR_NOISE - Noise waveform generator node, generates
- *                       psuedo random digital stream at the requested
+ *                       pseudo random digital stream at the requested
  *                       clock frequency.
  *
  *  Declaration syntax
@@ -767,7 +767,7 @@
  *
  ***********************************************************************
  *
- * DISCRETE_TRIANGLEW  - Triagular waveform generator, generates
+ * DISCRETE_TRIANGLEW  - Triangular waveform generator, generates
  *                       equal ramp up/down at chosen frequency
  *
  *                        .------------.
@@ -1148,7 +1148,7 @@
  *        vInRise  voltage that triggers the gate input to go high (vGate) on rise
  *        vInFall  voltage that triggers the gate input to go low (0V) on fall
  *        clamp    internal diode clamp:  [-clamp ... vb+clamp] if clamp>= 0
- *        options  bitmaped options
+ *        options  bitmapped options
  *
  *     There is a macro DEFAULT_CD40XX_VALUES(_vB) which may be used to initialize the
  *     structure with .... = { 5, DEFAULT_CD40XX_VALUES(5), DISC_OSC_INVERTER_IS_TYPE1}
@@ -1602,7 +1602,7 @@
  *     DISC_OUT_ACTIVE_HIGH  0x00 - output active high (DEFAULT)
  *
  *  NOTE: A width of 0 seconds will output a pulse of 1 sample.
- *        This is useful for a guaranteed minimun pulse, regardless
+ *        This is useful for a guaranteed minimum pulse, regardless
  *        of the sample rate.
  *
  * EXAMPLES: see Polaris
@@ -1805,7 +1805,7 @@
  =======================================================================
  ***********************************************************************
  *
- * DISCRETE_COMP_ADDER - Selecatable parallel component adder.
+ * DISCRETE_COMP_ADDER - Selectable parallel component adder.
  *                       The total netlist out will be the parallel sum of all
  *                       components with their corresponding data bit = 1.
  *                       Set cDefault to 0 if not used.
@@ -1906,7 +1906,7 @@
  *
  *    v_junction table can be set to nullptr if you want all diodes to
  *                     default to a 0.5V drop.  Otherwise use a
- *                     table of doubles to specify juntion voltages.
+ *                     table of doubles to specify junction voltages.
  *
  * EXAMPLES: see dkong
  *
@@ -2202,7 +2202,7 @@
  *   When the output of the function is 0, then the connection is held at 0V or gnd.
  *   When the output of the function is 1, then the function is an open circuit.
  *
- *   DISC_OP_AMP_TRIGGER_FUNCTION_NONE       - Not used, cicuit open.
+ *   DISC_OP_AMP_TRIGGER_FUNCTION_NONE       - Not used, circuit open.
  *   DISC_OP_AMP_TRIGGER_FUNCTION_TRG0       - Gnd when trigger 0 is 0.
  *   DISC_OP_AMP_TRIGGER_FUNCTION_TRG0_INV   - Gnd when trigger 0 is 1.
  *   DISC_OP_AMP_TRIGGER_FUNCTION_TRG1       - Gnd when trigger 1 is 0.
@@ -2773,7 +2773,7 @@
  *     DISCRETE_RCDISC5(NODE_11,NODE_10,10,100,CAP_U(1))
  *
  *  When enabled by NODE_10, C discharges from 10v as indicated by RC
- *  of 100R & 1uF. If not enabled, the capcitors keeps it load and may
+ *  of 100R & 1uF. If not enabled, the capacitors keeps it load and may
  *  still be charged through input1. The switch is assumed to be a CD4066,
  *  thus if not enabled the output will be drawn by R to GND since
  *  the switch is in high impedance mode.
@@ -3028,8 +3028,8 @@
  *                            rate, then the output may change state more then once
  *                            during the sample.  Using this flag will cause
  *                            the output to be the number of falling edges that
- *                            happened during the sample.  This is usefull to feed
- *                            to counter circuits.  The Output Type flag is ingnored
+ *                            happened during the sample.  This is useful to feed
+ *                            to counter circuits.  The Output Type flag is ignored
  *                            when this flag is used.
  *     DISC_555_OUT_COUNT_R - Same as DISC_555_OUT_COUNT_F but with rising edges.
  *     DISC_555_OUT_ENERGY  - Same SQW, but will help reduce aliasing effects.
@@ -3184,7 +3184,7 @@
  *         v_pos;           - B+ voltage of 555
  *         v_cc_source;     - Voltage of the Constant Current source
  *         v_out_high;      - High output voltage of 555 (Defaults to v_pos - 1.2V)
- *         v_cc_junction;   - The voltage drop of the Constant Current source transitor
+ *         v_cc_junction;   - The voltage drop of the Constant Current source transistor
  *                            (0 if Op Amp)
  *  }
  *
@@ -3303,7 +3303,7 @@
  *
  *  Waveform Types:
  *     DISC_566_OUT_SQUARE   - Pin 3 Square Wave Output (DEFAULT)
- *     DISC_566_OUT_ENERGY   - Pin 3 anti-alaised Square Wave Output
+ *     DISC_566_OUT_ENERGY   - Pin 3 anti-aliased Square Wave Output
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *     DISC_566_COUNT_F      - # of falling edges
@@ -3636,7 +3636,7 @@ enum
 
 #define DISC_OP_AMP_FILTER_TYPE_MASK        (0xf0 | DISC_OP_AMP_IS_NORTON)  // Used only internally.
 
-/* Sallen-Key filter Opions */
+/* Sallen-Key filter Options */
 #define DISC_SALLEN_KEY_LOW_PASS            0x01
 #define DISC_SALLEN_KEY_HIGH_PASS           0x02
 
@@ -3700,7 +3700,7 @@ enum
 #define DISC_566_OUT_AC                     0x10
 
 #define DISC_566_OUT_SQUARE                 0x00    /* Squarewave */
-#define DISC_566_OUT_ENERGY                 0x01    /* anti-alaised Squarewave */
+#define DISC_566_OUT_ENERGY                 0x01    /* anti-aliased Squarewave */
 #define DISC_566_OUT_TRIANGLE               0x02    /* Triangle waveform */
 #define DISC_566_OUT_LOGIC                  0x03    /* 0/1 logic output */
 #define DISC_566_OUT_COUNT_F                0x04
@@ -3882,16 +3882,16 @@ struct discrete_schmitt_osc_desc
 	double  trshRise;   // voltage that triggers the gate input to go high (vGate) on rise
 	double  trshFall;   // voltage that triggers the gate input to go low (0V) on fall
 	double  vGate;      // the output high voltage of the gate that gets fedback through rFeedback
-	int     options;    // bitmaped options
+	int     options;    // bitmapped options
 };
 
 
 struct discrete_comp_adder_table
 {
 	int     type;
-	double  cDefault;               // Default componet.  0 if not used.
+	double  cDefault;               // Default component.  0 if not used.
 	int     length;
-	double  c[DISC_LADDER_MAXRES];  // Componet table
+	double  c[DISC_LADDER_MAXRES];  // Component table
 };
 
 
@@ -4031,7 +4031,7 @@ struct discrete_555_cc_desc
 	double  v_pos;          /* B+ voltage of 555 */
 	double  v_cc_source;    /* Voltage of the Constant Current source */
 	double  v_out_high;     /* High output voltage of 555 (Defaults to v_pos - 1.2V) */
-	double  v_cc_junction;  /* The voltage drop of the Constant Current source transitor (0 if Op Amp) */
+	double  v_cc_junction;  /* The voltage drop of the Constant Current source transistor (0 if Op Amp) */
 };
 
 

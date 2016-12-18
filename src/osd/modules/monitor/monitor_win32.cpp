@@ -31,7 +31,7 @@ private:
 
 public:
 	win32_monitor_info(monitor_module& module, const HMONITOR handle, const char* monitor_device, float aspect)
-		: osd_monitor_info(module, std::intptr_t(handle), monitor_device, aspect)
+		: osd_monitor_info(module, std::uintptr_t(handle), monitor_device, aspect)
 	{
 		win32_monitor_info::refresh();
 	}
@@ -83,7 +83,7 @@ public:
 		if (!m_initialized)
 			return nullptr;
 
-		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromWindow(window.platform_window<HWND>(), MONITOR_DEFAULTTONEAREST)));
+		auto nearest = monitor_from_handle(reinterpret_cast<std::uintptr_t>(MonitorFromWindow(static_cast<const win_window_info &>(window).platform_window(), MONITOR_DEFAULTTONEAREST)));
 		assert(nearest != nullptr);
 		return nearest;
 	}

@@ -2534,12 +2534,13 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="アメリカントラック"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="348880">    <!-- Data CRC16: 52018 -->
-				<rom name="american truck.d88" size="348880" crc="ba06603f" sha1="dadf23cef4e56b692218f11d21f3013482258c9b" offset="0" />
+			<dataarea name="flop" size="361824">    <!-- Data CRC16: 5929 -->
+				<rom name="american truck mkii.d88" size="361824" crc="d19e7d4b" sha1="76890050eb3682f9a78eff503d3dff0f10d7d0b8" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
+	<!-- Identical except has 0x10 00 added after the header -->
 	<software name="amtrucka" cloneof="amtruck">
 		<description>American Truck (Alt)</description>
 		<year>1985</year>
@@ -2558,8 +2559,8 @@ ExtractDisk  [02]"SAGA#1          " -> "adventure land_02.d88"
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
 		<info name="alt_title" value="アメリカントラック mkⅡ版"/>
 		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="361824">    <!-- Data CRC16: 5929 -->
-				<rom name="american truck mkii.d88" size="361824" crc="d19e7d4b" sha1="76890050eb3682f9a78eff503d3dff0f10d7d0b8" offset="0" />
+			<dataarea name="flop" size="348880">    <!-- Data CRC16: 52018 -->
+				<rom name="american truck.d88" size="348880" crc="ba06603f" sha1="dadf23cef4e56b692218f11d21f3013482258c9b" offset="0" />
 			</dataarea>
 		</part>
 	</software>

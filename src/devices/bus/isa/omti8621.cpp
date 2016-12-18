@@ -109,7 +109,7 @@ public:
 
 #define OMTI_STATUS_REQ  0x01 // Request (1 = request transfer of data via data in/out register)
 #define OMTI_STATUS_IO   0x02 // In/Out (1 = direction of transfer is from controller to host)
-#define OMTI_STATUS_CD   0x04 // Command/Data ( 1 = byte transfered is command or status byte)
+#define OMTI_STATUS_CD   0x04 // Command/Data ( 1 = byte transferred is command or status byte)
 #define OMTI_STATUS_BUSY 0x08 // Busy (0 = controller is idle, 1 = controller selected)
 #define OMTI_STATUS_DREQ 0x10 // Data Request (0 = no DMA request, 1 = DMA cycle requested)
 #define OMTI_STATUS_IREQ 0x20 // Interrupt Request (0 = no interrupt, 1 = command complete)

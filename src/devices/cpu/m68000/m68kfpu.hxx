@@ -10,9 +10,9 @@
 #define FPES_OE         0x00002000
 #define FPAE_IOP        0x00000080
 
-#define DOUBLE_INFINITY                 U64(0x7ff0000000000000)
-#define DOUBLE_EXPONENT                 U64(0x7ff0000000000000)
-#define DOUBLE_MANTISSA                 U64(0x000fffffffffffff)
+#define DOUBLE_INFINITY                 0x7ff0000000000000U
+#define DOUBLE_EXPONENT                 0x7ff0000000000000U
+#define DOUBLE_MANTISSA                 0x000fffffffffffffU
 
 extern flag floatx80_is_nan( floatx80 a );
 
@@ -1239,27 +1239,27 @@ static void fpgen_rm_reg(m68000_base_device *m68k, uint16_t w2)
 				{
 					case 0x0:   // Pi
 						source.high = 0x4000;
-						source.low = U64(0xc90fdaa22168c235);
+						source.low = 0xc90fdaa22168c235U;
 						break;
 
 					case 0xb:   // log10(2)
 						source.high = 0x3ffd;
-						source.low = U64(0x9a209a84fbcff798);
+						source.low = 0x9a209a84fbcff798U;
 						break;
 
 					case 0xc:   // e
 						source.high = 0x4000;
-						source.low = U64(0xadf85458a2bb4a9b);
+						source.low = 0xadf85458a2bb4a9bU;
 						break;
 
 					case 0xd:   // log2(e)
 						source.high = 0x3fff;
-						source.low = U64(0xb8aa3b295c17f0bc);
+						source.low = 0xb8aa3b295c17f0bcU;
 						break;
 
 					case 0xe:   // log10(e)
 						source.high = 0x3ffd;
-						source.low = U64(0xde5bd8a937287195);
+						source.low = 0xde5bd8a937287195U;
 						break;
 
 					case 0xf:   // 0.0
@@ -1268,12 +1268,12 @@ static void fpgen_rm_reg(m68000_base_device *m68k, uint16_t w2)
 
 					case 0x30:  // ln(2)
 						source.high = 0x3ffe;
-						source.low = U64(0xb17217f7d1cf79ac);
+						source.low = 0xb17217f7d1cf79acU;
 						break;
 
 					case 0x31:  // ln(10)
 						source.high = 0x4000;
-						source.low = U64(0x935d8dddaaa8ac17);
+						source.low = 0x935d8dddaaa8ac17U;
 						break;
 
 					case 0x32:  // 1 (or 100?  manuals are unclear, but 1 would make more sense)
@@ -1298,47 +1298,47 @@ static void fpgen_rm_reg(m68000_base_device *m68k, uint16_t w2)
 
 					case 0x37:  // 1.0e16 - can't get the right precision from int32_t so go "direct" with constants from h/w
 						source.high = 0x4034;
-						source.low = U64(0x8e1bc9bf04000000);
+						source.low = 0x8e1bc9bf04000000U;
 						break;
 
 					case 0x38:  // 1.0e32
 						source.high = 0x4069;
-						source.low = U64(0x9dc5ada82b70b59e);
+						source.low = 0x9dc5ada82b70b59eU;
 						break;
 
 					case 0x39:  // 1.0e64
 						source.high = 0x40d3;
-						source.low = U64(0xc2781f49ffcfa6d5);
+						source.low = 0xc2781f49ffcfa6d5U;
 						break;
 
 					case 0x3a:  // 1.0e128
 						source.high = 0x41a8;
-						source.low = U64(0x93ba47c980e98ce0);
+						source.low = 0x93ba47c980e98ce0U;
 						break;
 
 					case 0x3b:  // 1.0e256
 						source.high = 0x4351;
-						source.low = U64(0xaa7eebfb9df9de8e);
+						source.low = 0xaa7eebfb9df9de8eU;
 						break;
 
 					case 0x3c:  // 1.0e512
 						source.high = 0x46a3;
-						source.low = U64(0xe319a0aea60e91c7);
+						source.low = 0xe319a0aea60e91c7U;
 						break;
 
 					case 0x3d:  // 1.0e1024
 						source.high = 0x4d48;
-						source.low = U64(0xc976758681750c17);
+						source.low = 0xc976758681750c17U;
 						break;
 
 					case 0x3e:  // 1.0e2048
 						source.high = 0x5a92;
-						source.low = U64(0x9e8b3b5dc53d5de5);
+						source.low = 0x9e8b3b5dc53d5de5U;
 						break;
 
 					case 0x3f:  // 1.0e4096
 						source.high = 0x7525;
-						source.low = U64(0xc46052028a20979b);
+						source.low = 0xc46052028a20979bU;
 						break;
 
 					default:
@@ -2002,7 +2002,7 @@ static void do_frestore_null(m68000_base_device *m68k)
 	for (i = 0; i < 8; i++)
 	{
 		REG_FP(m68k)[i].high = 0x7fff;
-		REG_FP(m68k)[i].low = U64(0xffffffffffffffff);
+		REG_FP(m68k)[i].low = 0xffffffffffffffffU;
 	}
 
 	// Mac IIci at 408458e6 wants an FSAVE of a just-restored nullptr frame to also be nullptr

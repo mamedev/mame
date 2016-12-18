@@ -674,7 +674,7 @@ void konamigx_state::gx_draw_basic_tilemaps(screen_device &screen, bitmap_rgb32 
 		/* blend layer only when:
 		    1) m_vinmix != 0xff
 		    2) its internal mix code is set
-		    3) all mix code bits are internal(overriden until tile blending has been implemented)
+		    3) all mix code bits are internal(overridden until tile blending has been implemented)
 		    4) 0 > alpha < 255;
 		*/
 		if (temp1!=0xff && temp2 /*&& temp3==3*/)

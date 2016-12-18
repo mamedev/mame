@@ -63,7 +63,7 @@ TILE_GET_INFO_MEMBER(darkmist_state::get_txttile_info)
 
 PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 {
-//	palette.set_indirect_color(0x100, rgb_t::black());
+//  palette.set_indirect_color(0x100, rgb_t::black());
 
 	for (int i = 0; i < 0x400; i++)
 	{
@@ -78,9 +78,9 @@ PALETTE_INIT_MEMBER(darkmist_state, darkmist)
 			case 0x300:  clut = m_tx_clut[i&0xff]; break;
 		}
 
-//		if (clut & 0x40) // 0x40 indicates transparent pen
-//			ctabentry = 0x100;
-//		else
+//      if (clut & 0x40) // 0x40 indicates transparent pen
+//          ctabentry = 0x100;
+//      else
 		{
 			ctabentry = (clut & 0x3f);
 
@@ -103,8 +103,8 @@ void darkmist_state::video_start()
 	m_bgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_bgtile_info),this),TILEMAP_SCAN_ROWS,16,16,512,64 );
 	m_fgtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_fgtile_info),this),TILEMAP_SCAN_ROWS,16,16,64,256 );
 	m_txtilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkmist_state::get_txttile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32 );
-//	m_fgtilemap->set_transparent_pen(0);
-//	m_txtilemap->set_transparent_pen(0);
+//  m_fgtilemap->set_transparent_pen(0);
+//  m_txtilemap->set_transparent_pen(0);
 
 	save_item(NAME(m_hw));
 	m_screen->register_screen_bitmap(m_temp_bitmap);
@@ -164,7 +164,7 @@ void darkmist_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 		palette,
 		fx,fy,
 		m_spriteram[i+3],m_spriteram[i+2],0 );
-	}	
+	}
 }
 
 uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
@@ -178,19 +178,19 @@ uint32_t darkmist_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	m_temp_bitmap.fill(0,cliprect);
 	bitmap.fill(m_palette->black_pen(), cliprect);
-	
+
 	if(m_hw & DISPLAY_BG)
 	{
 		m_bgtilemap->draw(screen, m_temp_bitmap, cliprect, 0,0);
 		mix_layer(screen, bitmap, cliprect, m_bg_clut);
 	}
-	
+
 	if(m_hw & DISPLAY_FG)
 	{
 		m_fgtilemap->draw(screen, m_temp_bitmap, cliprect, 0,0);
 		mix_layer(screen, bitmap, cliprect, m_fg_clut);
 	}
-	
+
 	if(m_hw & DISPLAY_SPR)
 	{
 		draw_sprites(m_temp_bitmap,cliprect);

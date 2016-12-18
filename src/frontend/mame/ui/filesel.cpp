@@ -89,8 +89,8 @@ void menu_file_selector::custom_render(void *selectedref, float top, float botto
 	y1 += UI_BOX_TB_BORDER;
 
 	size_t hit_start = 0, hit_span = 0;
-	if (mouse_hit
-		&& layout.hit_test(mouse_x - x1, mouse_y - y1, hit_start, hit_span)
+	if (is_mouse_hit()
+		&& layout.hit_test(get_mouse_x() - x1, get_mouse_y() - y1, hit_start, hit_span)
 		&& m_current_directory.substr(hit_start, hit_span) != PATH_SEPARATOR)
 	{
 		// we're hovering over a directory!  highlight it
@@ -288,7 +288,7 @@ void menu_file_selector::append_entry_menu_item(const file_selector_entry *entry
 //  populate
 //-------------------------------------------------
 
-void menu_file_selector::populate()
+void menu_file_selector::populate(float &customtop, float &custombottom)
 {
 	util::zippath_directory *directory = nullptr;
 	osd_file::error err;
@@ -507,7 +507,7 @@ menu_select_rw::~menu_select_rw()
 //  populate
 //-------------------------------------------------
 
-void menu_select_rw::populate()
+void menu_select_rw::populate(float &customtop, float &custombottom)
 {
 	item_append(_("Select access mode"), "", FLAG_DISABLE, nullptr);
 	item_append(_("Read-only"), "", 0, itemref_from_result(result::READONLY));

@@ -423,3 +423,38 @@ TEST_CASE("containers/is-container", "make sure the is_container trait behaves p
 	}
 	REQUIRE(options::livingcount == 0);
 }
+
+TEST_CASE("containers/readonly", "make sure readonly members are stored appropriately") {
+	sol::state lua;
+	lua.open_libraries();
+
+	struct bar {
+		int x = 24;
+	};
+
+	struct foo {
+		std::list<bar> seq;
+	};
+
+	lua.new_usertype<foo>(
+		"foo",
+		"seq", &foo::seq,  // this one works
+		"readonly_seq", sol::readonly(&foo::seq)  // this one does not work
+		);
+	lua["value"] = std::list<bar>{ {},{},{} };
+		
+	lua.script(R"(
+a = foo.new()
+x = a.seq
+a.seq = value
+y = a.readonly_seq
+)");
+	std::list<bar>& seqrefx = lua["x"];
+	std::list<bar>& seqrefy = lua["y"];
+	REQUIRE(&seqrefx == &seqrefy);
+	REQUIRE(seqrefx.size() == 3);
+	auto result = lua.do_string(R"(
+a.readonly_seq = value;
+)");
+	REQUIRE_FALSE(result.valid());
+}

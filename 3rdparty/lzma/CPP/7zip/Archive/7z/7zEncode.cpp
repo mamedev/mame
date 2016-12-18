@@ -148,9 +148,9 @@ HRESULT CEncoder::CreateMixerCoder(
 
   RINOK(_mixer->SetBindInfo(_bindInfo));
 
-  FOR_VECTOR (i, _options.Methods)
+  FOR_VECTOR (m, _options.Methods)
   {
-    const CMethodFull &methodFull = _options.Methods[i];
+    const CMethodFull &methodFull = _options.Methods[m];
 
     CCreatedCoder cod;
     
@@ -410,9 +410,9 @@ HRESULT CEncoder::Encode(
     mtOutStreamNotifySpec->_stream = outStream;
     mtOutStreamNotifySpec->_mtProgresSpec = mtProgressSpec;
     
-    FOR_VECTOR(i, tempBufferSpecs)
+    FOR_VECTOR(t, tempBufferSpecs)
     {
-      tempBufferSpecs[i]->_mtProgresSpec = mtProgressSpec;
+      tempBufferSpecs[t]->_mtProgresSpec = mtProgressSpec;
     }
   }
   
@@ -591,9 +591,9 @@ HRESULT CEncoder::EncoderConstr()
         continue;
       }
       
-      int i = _bindInfo.FindStream_in_PackStreams(outIndex);
-      if (i >= 0)
-        _bindInfo.PackStreams.MoveToFront(i);
+      int si = _bindInfo.FindStream_in_PackStreams(outIndex);
+      if (si >= 0)
+        _bindInfo.PackStreams.MoveToFront(si);
       break;
     }
   }

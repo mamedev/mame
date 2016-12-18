@@ -8,10 +8,10 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_MISCMENU_H
 #define MAME_FRONTEND_UI_MISCMENU_H
+
+#pragma once
 
 #include "crsshair.h"
 #include "emuopts.h"
@@ -28,7 +28,7 @@ public:
 	virtual ~menu_keyboard_mode();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -39,7 +39,7 @@ public:
 	virtual ~menu_network_devices();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -50,7 +50,7 @@ public:
 	virtual ~menu_bookkeeping();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	attotime prevtime;
@@ -84,7 +84,7 @@ private:
 		char    next_name[CROSSHAIR_PIC_NAME_LENGTH + 1];
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -95,7 +95,7 @@ public:
 	virtual ~menu_quit_game();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -106,7 +106,7 @@ public:
 	virtual ~menu_bios_selection();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -122,7 +122,7 @@ public:
 	virtual ~menu_export();
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	std::vector<const game_driver*> m_list;
@@ -156,7 +156,7 @@ private:
 		LAST = ADVANCED
 	};
 
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	const game_driver *m_drv;
@@ -179,7 +179,7 @@ public:
 	virtual ~menu_plugins_configure();
 
 protected:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 
 	virtual void custom_render(void *selectedref, float top, float bottom, float x, float y, float x2, float y2) override;

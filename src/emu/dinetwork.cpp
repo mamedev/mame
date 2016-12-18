@@ -16,13 +16,13 @@ device_network_interface::~device_network_interface()
 {
 }
 
-int device_network_interface::send(uint8_t *buf, int len) const
+int device_network_interface::send(u8 *buf, int len) const
 {
 	if(!m_dev) return 0;
 	return m_dev->send(buf, len);
 }
 
-void device_network_interface::recv_cb(uint8_t *buf, int len)
+void device_network_interface::recv_cb(u8 *buf, int len)
 {
 }
 

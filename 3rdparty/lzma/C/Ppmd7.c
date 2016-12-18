@@ -1,5 +1,5 @@
 /* Ppmd7.c -- PPMdH codec
-2015-09-28 : Igor Pavlov : Public domain
+2016-05-21 : Igor Pavlov : Public domain
 This code is based on PPMd var.H (2001): Dmitry Shkarin : Public domain */
 
 #include "Precomp.h"
@@ -639,10 +639,10 @@ CPpmd_See *Ppmd7_MakeEscFreq(CPpmd7 *p, unsigned numMasked, UInt32 *escFreq)
   unsigned nonMasked = p->MinContext->NumStats - numMasked;
   if (p->MinContext->NumStats != 256)
   {
-    see = p->See[p->NS2Indx[nonMasked - 1]] +
+    see = p->See[(unsigned)p->NS2Indx[nonMasked - 1]] +
         (nonMasked < (unsigned)SUFFIX(p->MinContext)->NumStats - p->MinContext->NumStats) +
-        2 * (p->MinContext->SummFreq < 11 * p->MinContext->NumStats) +
-        4 * (numMasked > nonMasked) +
+        2 * (unsigned)(p->MinContext->SummFreq < 11 * p->MinContext->NumStats) +
+        4 * (unsigned)(numMasked > nonMasked) +
         p->HiBitsFlag;
     {
       unsigned r = (see->Summ >> see->Shift);

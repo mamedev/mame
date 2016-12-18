@@ -365,6 +365,30 @@ public:
 };
 
 
+// ======================> sega8_seojin_device
+
+class sega8_seojin_device : public sega8_rom_device
+{
+public:
+	// construction/destruction
+	sega8_seojin_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void device_reset() override;
+
+	// reading and writing
+	virtual DECLARE_READ8_MEMBER(read_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_cart) override;
+	virtual DECLARE_WRITE8_MEMBER(write_mapper) override;
+	virtual DECLARE_READ8_MEMBER(read_ram) override;
+	virtual DECLARE_WRITE8_MEMBER(write_ram) override;
+
+protected:
+	uint8_t m_gamesel;
+	uint8_t m_readxor;
+};
+
 
 // device type definition
 extern const device_type SEGA8_ROM_STD;
@@ -384,5 +408,6 @@ extern const device_type SEGA8_ROM_JANGGUN;
 extern const device_type SEGA8_ROM_HICOM;
 extern const device_type SEGA8_ROM_KOREAN;
 extern const device_type SEGA8_ROM_KOREAN_NB;
+extern const device_type SEGA8_ROM_SEOJIN;
 
 #endif

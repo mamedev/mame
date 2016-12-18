@@ -636,7 +636,7 @@ namespace sol {
 #ifdef SOL_NO_EXCEPTIONS
 				// we can abort here
 				// but the others are constexpr, so we can't...
-				: (std::abort(), *(T*)nullptr)
+				: (std::abort(), *(T*)nullptr);
 #else
 				: (throw bad_optional_access("bad optional access"), contained_val());
 #endif

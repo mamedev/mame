@@ -731,6 +731,10 @@
 		end
 
 		-- adjust the kind as required by the target system
+		if cfg.kind == "Bundle" and not _ACTION:match("xcode[0-9]") then
+			cfg.kind = "SharedLib"
+		end
+
 		if cfg.kind == "SharedLib" and platform.nosharedlibs then
 			cfg.kind = "StaticLib"
 		end

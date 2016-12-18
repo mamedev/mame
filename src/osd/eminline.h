@@ -4,7 +4,7 @@
 
     eminline.h
 
-    Definitions for inline functions that can be overriden by OSD-
+    Definitions for inline functions that can be overridden by OSD-
     specific code.
 
 ***************************************************************************/

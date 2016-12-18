@@ -10,9 +10,9 @@ h8h_device::h8h_device(const machine_config &mconfig, device_type type, const ch
 	mode_advanced = true;
 }
 
-offs_t h8h_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t h8h_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return disassemble_generic(buffer, pc, oprom, opram, options, disasm_entries);
+	return disassemble_generic(stream, pc, oprom, opram, options, disasm_entries);
 }
 
 #include "cpu/h8/h8h.hxx"

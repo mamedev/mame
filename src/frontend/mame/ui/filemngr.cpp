@@ -103,7 +103,7 @@ void menu_file_manager::fill_image_line(device_image_interface *img, std::string
 //  populate
 //-------------------------------------------------
 
-void menu_file_manager::populate()
+void menu_file_manager::populate(float &customtop, float &custombottom)
 {
 	std::string tmp_inst, tmp_name;
 	bool first_entry = true;

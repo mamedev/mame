@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DISPATCH_H__
-#define __DISPATCH_H__
+#ifndef MAME_EMU_DISPATCH_H
+#define MAME_EMU_DISPATCH_H
 
 #define MCFG_LINE_DISPATCH_ADD(_tag, _count) \
 	MCFG_DEVICE_ADD(_tag, DEVCB_LINE_DISPATCH_ ## _count, 0)
@@ -31,7 +31,7 @@ extern const device_type DEVCB_LINE_DISPATCH_6;
 
 template<int N> class devcb_line_dispatch_device : public device_t {
 public:
-	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	devcb_line_dispatch_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
 		device_t(mconfig, DEVCB_LINE_DISPATCH_2, "DEVCB_LINE_DISPATCH_2", tag, owner, clock, "devcb_line_dispatch_2", __FILE__) { }
 
 	void init_fwd() {
@@ -61,4 +61,4 @@ private:
 	devcb_write_line *fwd_cb[N];
 };
 
-#endif
+#endif // MAME_EMU_DISPATCH_H

@@ -86,7 +86,7 @@ private:
 
 	uint8_t m_keyboard_data;                  // last code pressed on keyboard
 	bool m_keyboard_data_ready;             // true if there is a new code in keyboard_data
-	bool m_keyboard_interrupt_enable;       // true when keybord interrupts are enabled
+	bool m_keyboard_interrupt_enable;       // true when keyboard interrupts are enabled
 
 	bool m_display_enable;                  // screen is black when false
 	bool m_dual_intensity_enable;           // if true, MSBit of ASCII codes controls character highlight

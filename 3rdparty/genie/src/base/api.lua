@@ -337,7 +337,8 @@
 				"ConsoleApp",
 				"WindowedApp",
 				"StaticLib",
-				"SharedLib"
+				"SharedLib",
+				"Bundle",
 			}
 		},
 

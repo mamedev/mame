@@ -2,14 +2,14 @@
 // copyright-holders:Sven Gothel
 /***
  *
- * GL Shader Tool - Convinient Basic Shader functionality
+ * GL Shader Tool - Convenient Basic Shader functionality
  *
  * Copyright (c) 2007, Sven Gothel
  * Copyright (c) 2007, MAME Team
  *
  * GPL version 2
  *
- * OpenGL GLSL ARB extentions:
+ * OpenGL GLSL ARB extensions:
  *
  *  GL_ARB_shader_objects
  *  GL_ARB_shading_language_100
@@ -28,7 +28,7 @@ extern "C" {
 
 /***
  *
- * OpenGL GLSL extentions:
+ * OpenGL GLSL extensions:
          GL_ARB_shader_objects
          GL_ARB_shading_language_100
          GL_ARB_vertex_shader
@@ -100,7 +100,7 @@ int gl_round_to_pow2(int v);
 /**
  * @param obj_query Can be either GL_OBJECT_TYPE_ARB, GL_OBJECT_DELETE_STATUS_ARB, GL_OBJECT_COMPILE_STATUS_ARB,
  *                                GL_OBJECT_LINK_STATUS_ARB, GL_OBJECT_VALIDATE_STATUS_ARB
- *                  Should be used after the refering action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a
+ *                  Should be used after the referring action, i.e. GL_OBJECT_DELETE_STATUS_ARB after a
  *              glDeleteObjectARB call, etc.
  */
 int gl_shader_check_error(GLhandleARB obj, GLenum obj_query, GLSLCheckMode m, const char *file, const int line);

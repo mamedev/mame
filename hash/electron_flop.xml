@@ -8,7 +8,8 @@
 	<software name="9cardbd1">
 		<description>9 Classic Card and Board Games No.1</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="9classiccardandboardgamesno1-adfs_e.adf" size="327680" crc="a4b8779c" sha1="316e9bc8aa4e7f9ac2f2c6794ad1e7999cd454f8" offset="0"/>
@@ -19,7 +20,8 @@
 	<software name="9cardbd2">
 		<description>9 Classic Card and Board Games No.2</description>
 		<year>1986</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="9classiccardandboardgamesno2-adfs_e.adf" size="327680" crc="425037ce" sha1="3ac5a733434fa79bcb5cf7bb264dc3c5fea8518d" offset="0"/>
@@ -27,13 +29,158 @@
 		</part>
 	</software>
 
+	<software name="acheton">
+		<description>Acheton</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="137728">
+				<rom name="acheton-dfs_e.ssd" size="137728" crc="c85395a7" sha1="41893ebff3ecdbf7efbfaa5df2b5b5596ce5aa3f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="alps">
+		<description>ALPS - Adventure Language Programming System</description>
+		<year>1988</year>
+		<publisher>Alpine Software</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="alps-adfs_e.adm" size="327680" crc="d87d98ed" sha1="3fdfc69ca366bc4c2d6f1cde17ae5d3a1290b5ee" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="amxart">
+		<description>AMX Art</description>
+		<year>1987</year>
+		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="amxart-dfs_e.ssd" size="204800" crc="7316b694" sha1="5cd0f6799ea1c8e6ce6640453ecde6c457aef768" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="abgensnr" cloneof="argcreat">
+		<description>Answer Back - General Knowledge Senior Quiz</description>
+		<year>1984</year>
+		<publisher>Kosmos</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="86784">
+				<rom name="answerbackseniorquiz-adfs_e.adf" size="86784" crc="4689b1e1" sha1="e9aa60e57410eae2750001bf6ae44458cb45b78a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argcreat">
+		<description>Arcade Game Creator (5.25")</description>
+		<year>198?</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="arcadegamecreator-dfs_e.adf" size="204800" crc="93d1e6a9" sha1="18c5b93ecf8f9a3268e8212ef583e5039c7033c5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="argcreat35" cloneof="argcreat">
+		<description>Arcade Game Creator (3.5")</description>
+		<year>198?</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="arcadegamecreator-adfs_e.adf" size="327680" crc="730ee540" sha1="36689d570099b639e7d4df2794829cf34e50a629" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reptonwo">
+		<description>Around the World in 40 Screens</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="aroundtheworld-dfs_e.ssd" size="204800" crc="dfffba33" sha1="0e9bbdf127120c8f8ddb4dccaae081bb63fc1649" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="avon">
+		<description>Avon</description>
+		<year>1989</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76288">
+				<rom name="avon-dfs_e.ssd" size="76288" crc="2685ee25" sha1="6192bd912ad793243429cf05142ca14147c3a237" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="baron">
+		<description>Baron</description>
+		<year>1989</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="38400">
+				<rom name="baron-dfs_e.ssd" size="38400" crc="d86f7a6f" sha1="09a95c36a3d06e1fcbc900452603145912e15ff5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="bonecrun">
+		<description>Bone Cruncher</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="bonecruncher-dfs_e.ssd" size="102400" crc="a6a7399e" sha1="d9ec7642c9fb62855fa63d2c1bc3797afe25bc75" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="classarc">
 		<description>Classic Arcade Games</description>
 		<year>198?</year>
-		<publisher>Database</publisher>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="classicarcadegames-adfs_e.adf" size="327680" crc="6dd95661" sha1="6e3c7b5ff078bc5b41902265686a98d606d4a5b2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="classcomp1">
+		<description>Classroom Computing Vol.1</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="classroomcomputing_vol1-adfs_e.adf" size="327680" crc="f96d21e3" sha1="11474868d63206b0bf8515b30180b302d9db4b4c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="classcomp2">
+		<description>Classroom Computing Vol.2</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="163840">
+				<rom name="classroomcomputing_vol2-adfs_e.adf" size="163840" crc="042f5765" sha1="63e85184e7623b93e3b52c2e280d91bb77c5be6a" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -42,9 +189,22 @@
 		<description>Codename: Droid</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="codenamedroid-adfs_e.adf" size="327680" crc="667f5482" sha1="e02c5d1be060c4d7bf5593469cdb71b04db3a05e" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ctodoomt">
+		<description>Countdown to Doom</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="66816">
+				<rom name="countdowntodoom-dfs_e.ssd" size="66816" crc="80b89eb0" sha1="2dc872802a275759b015ddcda256d30aae61ccfe" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -53,6 +213,7 @@
 		<description>Crazee Rider</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="crazeerider-adfs_e.adf" size="327680" crc="11c1c183" sha1="04f7d28aeeef8504c83d8035a8f77e3ed8f9fab9" offset="0"/>
@@ -65,6 +226,7 @@
 		<year>1984</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SDB06" />
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="database-adfs_e.adf" size="327680" crc="14e529e6" sha1="a90fb1710599fea119c233500c56c327afb7940e" offset="0"/>
@@ -76,6 +238,7 @@
 		<description>Dreamtime</description>
 		<year>1988</year>
 		<publisher>Heyley Software</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="dreamtime-adfs_e.adf" size="327680" crc="67e5449d" sha1="4e9827611eba0cb2447b27c9ec49868991846763" offset="0"/>
@@ -87,9 +250,22 @@
 		<description>Elixir</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="elixir-adfs_e.adf" size="327680" crc="a6f407e5" sha1="57bdce7e091ccb1e415d42d463dace5662d570d3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="enthar7">
+		<description>Enthar Seven</description>
+		<year>1986</year>
+		<publisher>Robico</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="enthar7-dfs_e.ssd" size="204800" crc="cbbbfc7d" sha1="671c969e10f8e27b704359dd3b38576f36eb323b" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -99,9 +275,22 @@
 		<year>2011</year>
 		<publisher>Retro Software</publisher>
 		<info name="author" value="Tom Walker" />
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="15616">
 				<rom name="hardhatharry-adfs_e.adf" size="15616" crc="c24c95ba" sha1="74d952747c4b64cb3b50599c546f0e7033af4835" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="hezarin">
+		<description>Hezarin</description>
+		<year>1990</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="179200">
+				<rom name="hezarin-dfs_e.ssd" size="179200" crc="d8b06553" sha1="11e4cf452b47ea7a2f441090aec7534d9c306708" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -111,6 +300,7 @@
 		<year>2011</year>
 		<publisher>Retro Software</publisher>
 		<info name="author" value="Kenton Price" />
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="12032">
 				<rom name="hyperviper-adfs_e.adf" size="12032" crc="54f29687" sha1="36f7e68536e72b3776bab7c29b4e525cf62fc0bd" offset="0" />
@@ -123,9 +313,118 @@
 		<year>2012</year>
 		<publisher>Retro Software</publisher>
 		<info name="author" value="David Boddie" />
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="junglejourney-adfs_e.adf" size="327680" crc="8951a01b" sha1="6496dde226380c068aed78f2289d01c918c781e5" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keyword">
+		<description>Keyword</description>
+		<year>1989</year>
+		<publisher>Swift</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="194304">
+				<rom name="keyword-dfs_e.ssd" size="194304" crc="af20ee8e" sha1="3dfc0ef39d7d005d91e4070a3730df6e88563d14" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kohamilt">
+		<description>Kingdom of Hamil</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="57856">
+				<rom name="kingdomofhamil-dfs_e.ssd" size="57856" crc="d797007b" sha1="b10aa31f6d6f2adc86410dd1ea6fbdada2f38b7c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="knitwear">
+		<description>Knitwear Designer</description>
+		<year>1987</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="knitweardesigner-dfs_e.adf" size="204800" crc="101c0a1b" sha1="4a89840f0a4121b65f29add4bcb90e63aa9f8985" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ldaydoom">
+		<description>Last Days of Doom</description>
+		<year>1990</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="129024">
+				<rom name="lastdaysofdoom-dfs_e.ssd" size="129024" crc="daa7d5aa" sha1="afc6f6ac24bad877dd80e28845114ecd9bac1dfc" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="liferept">
+		<description>The Life of Repton</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="102400">
+				<rom name="lifeofrepton-dfs_e.ssd" size="102400" crc="3fe50391" sha1="5c2d9606bfcc146cc1a5198fef7987e39344574a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magsword">
+		<description>The Magic Sword (5.25")</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="magicsword-dfs_e.adf" size="204800" crc="c5c5f112" sha1="8e4eea8352df8411c772fb52d76f5df011b28681" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="magsword35" cloneof="magsword">
+		<description>The Magic Sword (3.5")</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="magicsword-adfs_e.adf" size="327680" crc="0b7f1517" sha1="49fe3ff8c50f635a1b20e3f9b66e6d6574430154" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mathorv1">
+		<description>Maths 'O' Level Revision Part One</description>
+		<year>1984</year>
+		<publisher>Ampalsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="mathsolevelr1-dfs_e.adf" size="204800" crc="0b09763a" sha1="b269e68ac3eb82be97371b171cc9b33500f29ce5" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="nursery">
+		<description>Nursery Rhymes</description>
+		<year>198?</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="nurseryrhymes-adfs_e.adf" size="327680" crc="4556e25b" sha1="2b7a4c307582fd3d3a308585613a1b31edc48c7f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -134,9 +433,21 @@
 		<description>Palace of Magic</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="palaceofmagic-adfs_e.adf" size="327680" crc="84e7094c" sha1="4117dec4761a39d5a1de0cd46392df7e24a55e5b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="phquestt">
+		<description>Philosopher's Quest</description>
+		<year>1987</year>
+		<publisher>Topologika</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="76032">
+				<rom name="philosophersquest-dfs_e.ssd" size="76032" crc="7f1f5cf5" sha1="9ed436eedf8ddb98125fcb4e0147a20688e8d717" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -145,6 +456,7 @@
 		<description>Pirate's Peril</description>
 		<year>1988</year>
 		<publisher>Heyley Software</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="piratesperil-adfs_e.adf" size="327680" crc="73812f98" sha1="8b7b6ec81181107717bc68c410b572a5ffd5872a" offset="0"/>
@@ -153,9 +465,22 @@
 	</software>
 
 	<software name="pias">
-		<description>Play It Again Sam</description>
+		<description>Play It Again Sam (5.25")</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="pias-dfs_e.adf" size="204800" crc="a45acc09" sha1="3c7413811a03c087bd7f88ca5cc93807a092ffb6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pias35">
+		<description>Play It Again Sam (3.5")</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="pias-adfs_e.adf" size="327680" crc="4d42df73" sha1="b88c5661be20ea908277df4871c29a9eab8cbc60" offset="0"/>
@@ -168,6 +493,7 @@
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
 		<info name="release" value="SDG90" />
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="163840">
 				<rom name="plus3gamesdisc-adfs_e.adf" size="163840" crc="a091ac3f" sha1="2b479c73d9395bd11f894d06286afc95d4d42ac2" offset="0"/>
@@ -179,6 +505,7 @@
 		<description>Plus 3 Games (New Zealand)</description>
 		<year>198?</year>
 		<publisher>Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="nzacorngames-adfs_e.adf" size="327680" crc="60844635" sha1="ed6b76d93b57bdcdadc1ab7859b5430d05ac4987" offset="0"/>
@@ -190,6 +517,7 @@
 		<description>P.R.E.S. Games Disc 1</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk1-adfs_e.adf" size="327680" crc="68fd2a77" sha1="50463ee825711b32871439cad9a06bc1a1ef722e" offset="0"/>
@@ -201,6 +529,7 @@
 		<description>P.R.E.S. Games Disc 2</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk2-adfs_e.adf" size="327680" crc="4be7b2b7" sha1="5090e60cb37279c8c02749ebe6289d9675ece446" offset="0"/>
@@ -212,6 +541,7 @@
 		<description>P.R.E.S. Games Disc 3</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk3-adfs_e.adf" size="327680" crc="c8483e26" sha1="ac66c579e668af70e4ee80cff339851b2b191be1" offset="0"/>
@@ -223,6 +553,7 @@
 		<description>P.R.E.S. Games Disc 4</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk4-adfs_e.adf" size="327680" crc="1258c985" sha1="29f56326c2ff6da2385b429a0c1f14ffc8d639c6" offset="0"/>
@@ -234,6 +565,7 @@
 		<description>P.R.E.S. Games Disc 5</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk5-adfs_e.adf" size="327680" crc="942d4944" sha1="174062bc4c51daccbf86685da4e5846ab582249b" offset="0"/>
@@ -245,9 +577,70 @@
 		<description>P.R.E.S. Games Disc 6</description>
 		<year>1984</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="presgamesdisk6-adfs_e.adf" size="327680" crc="6d5b538e" sha1="f4e33261a15a616368ac0968afc7ed298d86c99c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="repton3">
+		<description>Repton 3</description>
+		<year>1986</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="repton3-dfs_e.ssd" size="204800" crc="8c5da04d" sha1="f47cbd07bdda2ad889076e7ed5229cb77bb33be6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="reptonti">
+		<description>Repton Thru Time</description>
+		<year>1988</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="96256">
+				<rom name="reptonthrutime-dfs_e.ssd" size="96256" crc="1ce22dbf" sha1="698f3348034de64d4a53a7f41fe4f2666bf498c2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="retdoom">
+		<description>Return to Doom</description>
+		<year>1988</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="returntodoom-dfs_e.ssd" size="204800" crc="6fae1dee" sha1="ae6852f3d0b9f135ba06221ac25c24a272eed74f" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spellbin">
+		<description>Spellbinder</description>
+		<year>1987</year>
+		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="204800">
+				<rom name="spellbinder-dfs_e.adf" size="204800" crc="dada2fca" sha1="9b3f7ba15aea5e68745242214f3bd4a7be6f79a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spysnatc">
+		<description>Spy Snatcher</description>
+		<year>1989</year>
+		<publisher>Topologika</publisher>
+		<info name="format" value="DFS" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="94976">
+				<rom name="spysnatcher-dfs_e.ssd" size="94976" crc="d9145f5f" sha1="859199a51617b454c85f94dd19ef2dcd9c3d864e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -256,6 +649,7 @@
 		<description>The Superior Collection Vol.3</description>
 		<year>1987</year>
 		<publisher>Superior Software/Acornsoft</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="superiorcollection3-adfs_e.adf" size="327680" crc="8340abfa" sha1="3e572eb5524b4312c07e326cfd2d19aac64958e6" offset="0"/>
@@ -267,6 +661,7 @@
 		<description>Stranded!</description>
 		<year>1988</year>
 		<publisher>Heyley Software</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="stranded-adfs_e.adf" size="327680" crc="1d24c2c1" sha1="50efe51dccfbb10f11cb7a85ff5f28ac7c680e9a" offset="0"/>
@@ -278,9 +673,58 @@
 		<description>The Taroda Scheme</description>
 		<year>1988</year>
 		<publisher>Heyley Software</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="tarodascheme-adfs_e.adf" size="327680" crc="ddaf4fdd" sha1="f554985f1f63aa31fab9ebe59e8f4aa384ac51e4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenbest1">
+		<description>Ten of the Best! Vol.1</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="10ofthebest_vol1-adfs_e.adf" size="327680" crc="1fecefe6" sha1="5742a587cd9ca2695277b0078e15edb1999dce40" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenbest2">
+		<description>Ten of the Best! Vol.2</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="10ofthebest_vol2-adfs_e.adf" size="327680" crc="6f506dec" sha1="d1a7f10a17151cbbddbb1ee2abd6993e39e51bd6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenbest3">
+		<description>Ten of the Best! Vol.3</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="10ofthebest_vol3-adfs_e.adf" size="327680" crc="777a2cb2" sha1="63e1a14fd63eb0b023fe7d66fba88b24a61d78a2" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tenbest4">
+		<description>Ten of the Best! Vol.4</description>
+		<year>1984</year>
+		<publisher>Database Publications</publisher>
+		<info name="format" value="ADFS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="327680">
+				<rom name="10ofthebest_vol4-adfs_e.adf" size="327680" crc="0a4ea2dc" sha1="352ce6255bb9f8dabbbe787173e28bddd92b082e" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -289,6 +733,7 @@
 		<description>The Ultimate Prize</description>
 		<year>1988</year>
 		<publisher>Heyley Software</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="ultimateprize-adfs_e.adf" size="327680" crc="ac946335" sha1="21e97c87752366e213e4fe9e9341f38b36a8d409" offset="0"/>
@@ -300,6 +745,7 @@
 		<description>Welcome</description>
 		<year>198?</year>
 		<publisher>Acorn</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="327680">
 				<rom name="welcomedisc-adfs_e.adf" size="327680" crc="a6733fa6" sha1="70b5d940c9c7da85e82e29b1b4e3ad29a44c51bd" offset="0"/>
@@ -313,6 +759,7 @@
 		<description>Electron User Vol.4 No.1 October 1986</description>
 		<year>1986</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
 				<rom name="eup401-adfs_e.adf" size="163840" crc="877cb96a" sha1="ef8120efcecbd188be7f7c8d0f4ad7d37dd055bd" offset="0"/>
@@ -324,6 +771,7 @@
 		<description>Electron User Vol.4 No.2 November 1986</description>
 		<year>1986</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
 				<rom name="eup402-adfs_e.adf" size="163840" crc="b9be7a87" sha1="e5b388acdb543b704928bf0da3a25212c36ff3b8" offset="0"/>
@@ -335,6 +783,7 @@
 		<description>Electron User Vol.4 No.8 May 1987</description>
 		<year>1987</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "143360">
 				<rom name="eup408-adfs_e.adf" size="143360" crc="b53e5255" sha1="0a8075adaf1a4be5d8ada3f49d855a8b6caf30d5" offset="0"/>
@@ -346,6 +795,7 @@
 		<description>Electron User Vol.4 No.11 August 1987</description>
 		<year>1987</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eup411-adfs_e.adf" size="327680" crc="37fe65b8" sha1="d87df67bafa2f6680a53c9b74007df6ba056c52b" offset="0"/>
@@ -357,6 +807,7 @@
 		<description>Electron User Vol.5 No.1 October 1987</description>
 		<year>1987</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eup501-adfs_e.adf" size="327680" crc="e0236dec" sha1="b02577cadb34522267f5b57b215725cdb0cb695a" offset="0"/>
@@ -368,6 +819,7 @@
 		<description>Electron User Vol.5 No.3 December 1987</description>
 		<year>1987</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
 				<rom name="eup503-adfs_e.adf" size="163840" crc="120862d9" sha1="b4181c5416fe7b8805a719214f3f755798c54888" offset="0"/>
@@ -379,6 +831,7 @@
 		<description>Electron User Vol.5 No.6 March 1988</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eup506-adfs_e.adf" size="327680" crc="ab8e73a2" sha1="94d39072552cd39b863d4bc8262d698811e608ae" offset="0"/>
@@ -390,6 +843,7 @@
 		<description>Electron User Vol.5 No.12 September 1988</description>
 		<year>1988</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "163840">
 				<rom name="eup512-adfs_e.adf" size="163840" crc="df8498ad" sha1="0b92f865b054e19395fd66a1448c4ab1998116bb" offset="0"/>
@@ -401,6 +855,7 @@
 		<description>Electron User Vol.6 No.9 June 1989</description>
 		<year>1989</year>
 		<publisher>P.R.E.S.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eup609-adfs_e.adf" size="327680" crc="87677d8b" sha1="411a85d374b00d56f90bacb436477dad62354ca0" offset="0"/>
@@ -412,6 +867,7 @@
 		<description>Electron User Group #00</description>
 		<year>1991</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug00-adfs_e.adm" size="327680" crc="4740034e" sha1="f490213581c04d7dcf71ba67202060edeb3c8df5" offset="0"/>
@@ -423,6 +879,7 @@
 		<description>Electron User Group #01</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug01-adfs_e.adm" size="327680" crc="c88aa2cc" sha1="e0241b8efb8db79aa1b2198dc8cb0da7ce1f1636" offset="0"/>
@@ -434,6 +891,7 @@
 		<description>Electron User Group #02</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug02-adfs_e.adm" size="327680" crc="7183e0aa" sha1="a14ef8e51dd657aa68e91239f5ac1a28630001af" offset="0"/>
@@ -445,6 +903,7 @@
 		<description>Electron User Group #03</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug03-adfs_e.adm" size="327680" crc="23dcd1ee" sha1="f56dd7eeea3d6cc909cf74ce4460de96474d2432" offset="0"/>
@@ -456,6 +915,7 @@
 		<description>Electron User Group #04</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug04-adfs_e.adm" size="327680" crc="582e6244" sha1="7bda20012b374bad4c5616cc59ecc6308a8a47e8" offset="0"/>
@@ -467,6 +927,7 @@
 		<description>Electron User Group #05</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug05-adfs_e.adm" size="327680" crc="75b230f4" sha1="7c576854b68e6ff9dd3342fc222b26cf869b4c98" offset="0"/>
@@ -478,6 +939,7 @@
 		<description>Electron User Group #06</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug06-adfs_e.adm" size="327680" crc="0f93e2f4" sha1="53d97babb475dcd11ff418a998a21a49e6afb398" offset="0"/>
@@ -489,6 +951,7 @@
 		<description>Electron User Group #07</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug07-adfs_e.adm" size="327680" crc="0893a33c" sha1="25410596e4d2c79b09e3ef0ff2b9cbec373b0c45" offset="0"/>
@@ -500,6 +963,7 @@
 		<description>Electron User Group #08</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug08-adfs_e.adm" size="327680" crc="975081c0" sha1="5df40bbce6ad50df548ac2c18f304c1b64b0a5b2" offset="0"/>
@@ -511,6 +975,7 @@
 		<description>Electron User Group #09</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug09-adfs_e.adm" size="327680" crc="c692fd87" sha1="ec3264586f02d779b9599b966724805fc66790fb" offset="0"/>
@@ -522,6 +987,7 @@
 		<description>Electron User Group #10</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug10-adfs_e.adf" size="327680" crc="81aece86" sha1="af32dd473f9dddb1d4bbeeb14531ffe89dec7527" offset="0"/>
@@ -533,6 +999,7 @@
 		<description>Electron User Group #11</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug11-adfs_e.adm" size="327680" crc="48bc3d92" sha1="07c7af3781474ee070b6de5df58b11b5328b3dba" offset="0"/>
@@ -544,6 +1011,7 @@
 		<description>Electron User Group #12</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug12-adfs_e.adm" size="327680" crc="23b0a6e2" sha1="398a4e27c5e56fdde5dcc516a8e99a84eff99afa" offset="0"/>
@@ -555,6 +1023,7 @@
 		<description>Electron User Group #13</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug13-adfs_e.adm" size="327680" crc="f563737e" sha1="a503691cd455ba0039b1bd7be5319823cf8af0f3" offset="0"/>
@@ -566,6 +1035,7 @@
 		<description>Electron User Group #14</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug14-adfs_e.adm" size="327680" crc="f779d137" sha1="c761cfc7af876c2a8d927a5167de822cf4948bda" offset="0"/>
@@ -577,6 +1047,7 @@
 		<description>Electron User Group #15</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug15-adfs_e.adm" size="327680" crc="c88bb350" sha1="9cfbd3da8717c0c420bad302da4f95e6e3b0fbbb" offset="0"/>
@@ -588,6 +1059,7 @@
 		<description>Electron User Group #16</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug16-adfs_e.adm" size="327680" crc="79f77d2a" sha1="4a6733504baf7eb7220b5bc5b8ce399474a801eb" offset="0"/>
@@ -599,6 +1071,7 @@
 		<description>Electron User Group #17</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug17-adfs_e.adm" size="327680" crc="b3d12948" sha1="bc6fd15c12569ece9c3ee8326e3ce852c958bccf" offset="0"/>
@@ -610,6 +1083,7 @@
 		<description>Electron User Group #18</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug18-adfs_e.adm" size="327680" crc="5836ed85" sha1="cb1724ede0b0a49c059f3090dfdb022e3534d46f" offset="0"/>
@@ -621,6 +1095,7 @@
 		<description>Electron User Group #19</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug19-adfs_e.adm" size="327680" crc="35e99e94" sha1="70d40fb376abf398b084aeab9e5f53707905cdbf" offset="0"/>
@@ -632,6 +1107,7 @@
 		<description>Electron User Group #20</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug20-adfs_e.adm" size="327680" crc="8e49a4e0" sha1="3e45590a628b7ba2dc663c900fe6d12f46d0276a" offset="0"/>
@@ -643,6 +1119,7 @@
 		<description>Electron User Group #21</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disc A"/>
 			<dataarea name="flop" size = "327680">
@@ -667,6 +1144,7 @@
 		<description>Electron User Group #22</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug22-adfs_e.adm" size="327680" crc="489bc91c" sha1="ed35a3d364d7931cc9bec21dbf33a8cf5ef9f8d5" offset="0"/>
@@ -678,6 +1156,7 @@
 		<description>Electron User Group #23</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug23-adfs_e.adm" size="327680" crc="e0891b3d" sha1="029b2f6a796101f111bb8d9b0644345f0200d73d" offset="0"/>
@@ -689,6 +1168,7 @@
 		<description>Electron User Group #24</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug24-adfs_e.adm" size="327680" crc="8e598e9c" sha1="2dbf77c95a7013ec345eaf57ac698a45f4daa4aa" offset="0"/>
@@ -700,6 +1180,7 @@
 		<description>Electron User Group #25</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug25-adfs_e.adm" size="327680" crc="60eb9705" sha1="fd5c5f9a30456a12eb1518b01096ebf6ea41fc0d" offset="0"/>
@@ -711,6 +1192,7 @@
 		<description>Electron User Group #26</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug26-adfs_e.adm" size="327680" crc="b3e71512" sha1="9f2dcfa9ab34e3bc7355225a25938384e69e9f61" offset="0"/>
@@ -722,6 +1204,7 @@
 		<description>Electron User Group #27</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug27-adfs_e.adm" size="327680" crc="031f778e" sha1="c6cb8c8baa3fe6fdf452d1e248e8cc6103c5d184" offset="0"/>
@@ -733,6 +1216,7 @@
 		<description>Electron User Group #28</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug28-adfs_e.adm" size="327680" crc="262049db" sha1="68c40fa3e6729bd0106b939b46ebf717c97ae945" offset="0"/>
@@ -744,6 +1228,7 @@
 		<description>Electron User Group #29</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug29-adfs_e.adf" size="327680" crc="b79dfb85" sha1="5d78e0b086c17337fb71dc6bff965e078478d9d4" offset="0"/>
@@ -755,6 +1240,7 @@
 		<description>Electron User Group #30</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug30-adfs_e.adm" size="327680" crc="52dba14a" sha1="406c7623410a79455121d6b9bcb26e8b6bc66843" offset="0"/>
@@ -766,6 +1252,7 @@
 		<description>Electron User Group #31</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug31-adfs_e.adm" size="327680" crc="2bf82f9a" sha1="df9d4ec4838932c249870b6bb4357bfc926dc740" offset="0"/>
@@ -777,6 +1264,7 @@
 		<description>Electron User Group #32</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug32-adfs_e.adm" size="327680" crc="a94ab4a3" sha1="081103e7db38e37060c54dfc65a1f75daf833eff" offset="0"/>
@@ -788,6 +1276,7 @@
 		<description>Electron User Group #33</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug33-adfs_e.adf" size="327680" crc="f59e6869" sha1="621e303427d9af758148d25f9bc07c2204ea05d4" offset="0"/>
@@ -799,6 +1288,7 @@
 		<description>Electron User Group #34</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug34-adfs_e.adf" size="327680" crc="6f6e5dce" sha1="3083b46f4981baabe6226e6bfdb6316105abbed1" offset="0"/>
@@ -810,6 +1300,7 @@
 		<description>Electron User Group #35</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug35-adfs_e.adm" size="327680" crc="c3128438" sha1="a429eee99e4897335c3803f403ef83668abc7014" offset="0"/>
@@ -821,6 +1312,7 @@
 		<description>Electron User Group #36</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug36-adfs_e.adm" size="327680" crc="ee1d86c0" sha1="e752e9ef6941c70b60f755088fb20d287e9839ca" offset="0"/>
@@ -832,6 +1324,7 @@
 		<description>Electron User Group #37</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug37-adfs_e.adf" size="327680" crc="ea443e37" sha1="fd738688da3eb774db367f9f3f1291ccea447ba6" offset="0"/>
@@ -843,6 +1336,7 @@
 		<description>Electron User Group #38</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug38-adfs_e.adm" size="327680" crc="2834da9b" sha1="c2e63b880af59994563fe1deb873d59edc65d0fb" offset="0"/>
@@ -854,6 +1348,7 @@
 		<description>Electron User Group #39</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug39-adfs_e.adm" size="327680" crc="5610df83" sha1="635f9ac634d8f5ec7c44efeca6b876d9f9adc9f2" offset="0"/>
@@ -865,6 +1360,7 @@
 		<description>Electron User Group #40</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug40-adfs_e.adm" size="327680" crc="2d434783" sha1="6468062b255070c088faedc183da1441996a5d7d" offset="0"/>
@@ -876,6 +1372,7 @@
 		<description>Electron User Group #41</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug41-adfs_e.adf" size="327680" crc="67529ec8" sha1="390b5e990aa2a7620101fc86fcbcba4df61cacef" offset="0"/>
@@ -887,6 +1384,7 @@
 		<description>Electron User Group #42</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug42-adfs_e.adm" size="327680" crc="1e62f7f9" sha1="aa7be72517733346210a6426d0273aff206da65f" offset="0"/>
@@ -898,6 +1396,7 @@
 		<description>Electron User Group #43/#44</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug43a44-adfs_e.adm" size="327680" crc="1ba16ac2" sha1="4bc42e457c72c821fda5ef9a63d48c39b0693fcb" offset="0"/>
@@ -909,6 +1408,7 @@
 		<description>Electron User Group #45</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug45-adfs_e.adf" size="327680" crc="da5d1965" sha1="d12be02c36dc83214431570c97c91da226783433" offset="0"/>
@@ -920,6 +1420,7 @@
 		<description>Electron User Group #46</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug46-adfs_e.adf" size="327680" crc="0b2b8091" sha1="91c478b242b6770f5e4a079200badceecdf39c66" offset="0"/>
@@ -931,6 +1432,7 @@
 		<description>Electron User Group #47</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug47-adfs_e.adf" size="327680" crc="c0d85427" sha1="6d83d56b71b5745328ba1b238f742a0107ee7849" offset="0"/>
@@ -942,6 +1444,7 @@
 		<description>Electron User Group #48</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug48-adfs_e.adf" size="327680" crc="305509f0" sha1="456397bc0a42d01d7ef32fefbb1e18a87d342253" offset="0"/>
@@ -953,6 +1456,7 @@
 		<description>Electron User Group #49</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug49-adfs_e.adf" size="327680" crc="e1ac5b94" sha1="abfe757fa476c76f23c2a5ecbfb85766ec431ab3" offset="0"/>
@@ -964,6 +1468,7 @@
 		<description>Electron User Group #50</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug50-adfs_e.adf" size="327680" crc="e0356521" sha1="a63a769abd8ccfc99292d53ea63a4664c780425d" offset="0"/>
@@ -975,6 +1480,7 @@
 		<description>Electron User Group #51</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug51-adfs_e.adf" size="327680" crc="fdca6ecc" sha1="a51eab375275cb8a83e839fb6ad81c9a272ed703" offset="0"/>
@@ -986,6 +1492,7 @@
 		<description>Electron User Group #52</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug52-adfs_e.adf" size="327680" crc="0f5edcc1" sha1="d791b0c10c5a7429b49aaa78f1f3d71a56cf174a" offset="0"/>
@@ -997,6 +1504,7 @@
 		<description>Electron User Group #53</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug53-adfs_e.adf" size="327680" crc="a475842f" sha1="40625793a26410de1e11e9a8fa7d109df555cbdd" offset="0"/>
@@ -1008,6 +1516,7 @@
 		<description>Electron User Group #54</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug54-adfs_e.adf" size="327680" crc="edf5e56e" sha1="404cd6816031a64469389ede117f0b8c30e515d4" offset="0"/>
@@ -1019,6 +1528,7 @@
 		<description>Electron User Group #55</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug55-adfs_e.adf" size="327680" crc="ce6f0c16" sha1="d1be66c7a50921a880a38dc92046fbf906b3b4d1" offset="0"/>
@@ -1030,6 +1540,7 @@
 		<description>Electron User Group #56</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug56-adfs_e.adf" size="327680" crc="f2c49d81" sha1="c14e47e9586d262dbf5208fcf4d51742ba7ae17b" offset="0"/>
@@ -1041,6 +1552,7 @@
 		<description>Electron User Group #57</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug57-adfs_e.adf" size="327680" crc="d1affeb3" sha1="27a55185d7d803013d5b5f19b1707ec2bc6d8ec0" offset="0"/>
@@ -1052,6 +1564,7 @@
 		<description>Electron User Group #58</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug58-adfs_e.adf" size="327680" crc="7d9bfb12" sha1="e9166bc7f2dd6975e46284fe8ac64e03cf8649b8" offset="0"/>
@@ -1063,6 +1576,7 @@
 		<description>Electron User Group #59</description>
 		<year>19??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug59-adfs_e.adf" size="327680" crc="4bde890a" sha1="0a16ddd6e7fb2f449a74cc6d6e6c4d69acf4e9bc" offset="0"/>
@@ -1074,6 +1588,7 @@
 		<description>Electron User Group #60</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug60-adfs_e.adf" size="327680" crc="d284acb3" sha1="8436e13c9115538f8a0b76621599b8e999a55f97" offset="0"/>
@@ -1085,6 +1600,7 @@
 		<description>Electron User Group #61</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug61-adfs_e.adf" size="327680" crc="5fd813c5" sha1="283f35e0f59afc936084cfe13033f759d2df38dc" offset="0"/>
@@ -1096,6 +1612,7 @@
 		<description>Electron User Group #62</description>
 		<year>2002</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug62-adfs_e.adf" size="327680" crc="7eb2d4c0" sha1="af149ecb6a1925e691310cfa45a7931076cc01b7" offset="0"/>
@@ -1107,6 +1624,7 @@
 		<description>Electron User Group #63</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug63-adfs_e.adf" size="327680" crc="3af73966" sha1="dd705c947e5b8643626a93e458293036a6e95758" offset="0"/>
@@ -1118,6 +1636,7 @@
 		<description>Electron User Group #64</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug64-adfs_e.adf" size="327680" crc="25e82d8c" sha1="02fc1710bcb6c7a4cd8996c9a29733d460b8a2c6" offset="0"/>
@@ -1129,6 +1648,7 @@
 		<description>Electron User Group #65</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug65-adfs_e.adf" size="327680" crc="1bfe96a4" sha1="e3142d3d37044cca97911a25e93fbc6796d7318b" offset="0"/>
@@ -1140,6 +1660,7 @@
 		<description>Electron User Group #66</description>
 		<year>20??</year>
 		<publisher>E.U.G.</publisher>
+		<info name="format" value="ADFS" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "327680">
 				<rom name="eug66-adfs_e.adf" size="327680" crc="c7ce4f99" sha1="35bedcbb14806525a4a37bb35c24ade254183f05" offset="0"/>

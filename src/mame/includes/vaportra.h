@@ -44,6 +44,8 @@ public:
 	uint16_t    m_priority[2];
 
 	DECLARE_WRITE16_MEMBER(vaportra_sound_w);
+	DECLARE_READ16_MEMBER(irq6_ack_r);
+	DECLARE_WRITE16_MEMBER(irq6_ack_w);
 	DECLARE_READ16_MEMBER(vaportra_control_r);
 	DECLARE_READ8_MEMBER(vaportra_soundlatch_r);
 	DECLARE_WRITE16_MEMBER(vaportra_priority_w);

@@ -73,7 +73,7 @@ atari_136094_0072_device::atari_136094_0072_device(const machine_config &mconfig
 void atari_136094_0072_device::device_start()
 {
 	m_ram = std::make_unique<uint16_t[]>(RAM_WORDS);
-	
+
 	save_pointer(NAME(m_ram.get()), RAM_WORDS * sizeof(uint16_t));
 	save_item(NAME(m_address));
 	save_item(NAME(m_ciphertext));
@@ -296,7 +296,7 @@ void atari_136095_0072_device::device_start()
 	save_pointer(NAME(m_ram.get()), RAM_WORDS * sizeof(uint16_t));
 
 	save_item(NAME(m_update.addr));
-	save_item(NAME(m_update.data));	
+	save_item(NAME(m_update.data));
 	save_item(NAME(m_poly_lsb));
 	save_item(NAME(m_reply));
 }
@@ -323,7 +323,7 @@ uint16_t atari_136095_0072_device::powers2(uint8_t k, uint16_t x)
 {
 	size_t i, n;
 	uint16_t t = 1 << (x % 16);
-	
+
 	if ((x == 15) || (x == 16))
 		n = k + 13;
 	else
@@ -338,7 +338,7 @@ uint16_t atari_136095_0072_device::powers2(uint8_t k, uint16_t x)
 uint16_t atari_136095_0072_device::decipher(uint8_t k, uint16_t c)
 {
 	uint16_t i, p = 0;
-	
+
 	/* key 0x00 is special, it has 15 "identical twins". */
 	static const uint8_t kmap[128] =
 	{
@@ -359,27 +359,27 @@ uint16_t atari_136095_0072_device::decipher(uint8_t k, uint16_t c)
 		0x5D,0x05,0x00,0x08,0x25,0x29,0x30,0x69,
 		0x00,0x4E,0x35,0x3B,0x00,0x0C,0x0A,0x2B,
 	};
-	
+
 	/* Only 128 keys internally, if high bit set,
   then find the 7-bit "twin" by xor 0xA8. */
 	if (k & 0x80) k ^= 0xA8;
-	
+
 	k = kmap[k];
-	
+
 	if ((c & (c - 1)) == 0) {
 		return powers2(k, ctz(c));
 	}
-	
+
 	for (i = 0; i < 15; ++i) {
 		if (1 & (c >> i)) {
 			p ^= powers2(k, i);
 		}
 	}
-	
+
 	if (c & 0x8000) {
 		p ^= powers2(k, 16);
 	}
-	
+
 	uint16_t x = 0xC000;
 	for (i = 0; i < k + 13; ++i)
 	{
@@ -388,7 +388,7 @@ uint16_t atari_136095_0072_device::decipher(uint8_t k, uint16_t c)
 
 		x = lfsr2(x);
 	}
-	
+
 	return p;
 }
 
@@ -418,7 +418,7 @@ READ32_MEMBER(atari_136095_0072_device::polylsb_read)
 WRITE32_MEMBER(atari_136095_0072_device::write)
 {
 	uint16_t address, value = 0;
-	
+
 	address = offset << 2;
 	if (ACCESSING_BITS_16_31)
 	{
@@ -429,7 +429,7 @@ WRITE32_MEMBER(atari_136095_0072_device::write)
 		address += 2;
 		value = uint16_t (data & 0xFFFF);
 	}
-	
+
 	switch (m_mode)
 	{
 		case FPGA_SETKEY:
@@ -443,11 +443,11 @@ WRITE32_MEMBER(atari_136095_0072_device::write)
 				m_ram[(offset << 1) + 1] = value;
 			}
 			break;
-			
+
 			/* Send Ciphertext to FPGA for decryption. */
 		case FPGA_DECIPHER:
 			uint16_t key_offset, key_byte;
-			
+
 			/* Algorithm to select key byte based on offset. */
 			key_offset = ((((address >>  8) & 1) ^ 1) <<  0)
 			| ((((address >>  2) & 1) ^ 1) <<  1)
@@ -464,7 +464,7 @@ WRITE32_MEMBER(atari_136095_0072_device::write)
 			key_byte = m_ram[key_offset];
 			m_reply = decipher(key_byte, value);
 			break;
-			
+
 		case FPGA_PROCESS:
 		case FPGA_RESULT:
 		default:
@@ -478,12 +478,12 @@ READ32_MEMBER(atari_136095_0072_device::read)
 {
 	uint16_t address;
 	uint32_t reply = 0;
-	
+
 	address = offset << 2;
 
 	if (ACCESSING_BITS_0_15)
 		address += 2;
-	
+
 	switch (address)
 	{
 		case 0x0020:
@@ -503,6 +503,6 @@ READ32_MEMBER(atari_136095_0072_device::read)
 		default:
 			break;
 	}
-	
+
 	return reply;
 }

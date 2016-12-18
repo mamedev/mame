@@ -28,7 +28,7 @@ public:
 	// single bit registers (74LS74)
 	DECLARE_READ8_MEMBER(zfg_r);
 	DECLARE_WRITE8_MEMBER(zfg_w);
-	// shared memory 2k
+	// shared memory 16k (these are actually 2x 16k bank switched)
 	DECLARE_READ8_MEMBER(share_r);
 	DECLARE_WRITE8_MEMBER(share_w);
 
@@ -47,9 +47,6 @@ public:
 
 	// IRQ logic - 5 = VINT, 7 = DLC
 	void check_vint_irq();
-#ifdef __M2COMM_SIMULATION__
-	void set_linktype(uint16_t linktype);
-#endif
 
 protected:
 	// device-level overrides
@@ -58,12 +55,12 @@ protected:
 
 private:
 	uint8_t m_shared[0x4000]; // 16k shared memory
-	uint8_t   m_zfg;                      // z80 flip gate? purpose unknown, bit0 is stored
-	uint8_t   m_cn;                           // bit0 is used to enable/disable the comm board
-	uint8_t   m_fg;                           // flip gate? purpose unknown, bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t	m_zfg;            // z80 flip gate - bit 0 switches memory banks, bit7 is connected to FG bit 0
+	uint8_t	m_cn;             // bit0 is used to enable/disable the comm board
+	uint8_t	m_fg;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
 
-	emu_file m_line_rx;    // rx line - can be either differential, simple serial or toslink
-	emu_file m_line_tx;    // tx line - is differential, simple serial and toslink
+	emu_file m_line_rx;       // rx line - can be either differential, simple serial or toslink
+	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink
 	char m_localhost[256];
 	char m_remotehost[256];
 	uint8_t m_buffer[0x4000];
@@ -75,9 +72,6 @@ private:
 	uint8_t m_linkid;
 	uint8_t m_linkcount;
 
-	uint16_t m_linktype;
-
-	void comm_init();
 	void comm_tick();
 #endif
 };

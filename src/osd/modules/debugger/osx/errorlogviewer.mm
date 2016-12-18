@@ -14,8 +14,8 @@
 @implementation MAMEErrorLogViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*logScroll;
-	NSString		*title;
+	NSScrollView    *logScroll;
+	NSString        *title;
 
 	title = [NSString stringWithFormat:@"Error Log: %@ [%@]",
 									   [NSString stringWithUTF8String:m.system().description],
@@ -38,7 +38,7 @@
 
 	// calculate the optimal size for everything
 	{
-		NSSize	desired = [NSScrollView frameSizeForContentSize:[logView maximumFrameSize]
+		NSSize  desired = [NSScrollView frameSizeForContentSize:[logView maximumFrameSize]
 										  hasHorizontalScroller:YES
 											hasVerticalScroller:YES
 													 borderType:[logScroll borderType]];

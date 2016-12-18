@@ -9,7 +9,7 @@ TLCS-900/H instruction set
 
 enum e_operand
 {
-	_A=1,       /* currect register set register A */
+	_A=1,       /* current register set register A */
 	_C8,        /* current register set byte */
 	_C16,       /* current register set word */
 	_C32,       /* current register set long word */

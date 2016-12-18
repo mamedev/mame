@@ -185,23 +185,13 @@ static uint32_t disassemble(device_t *device, std::ostream &stream, offs_t pc, c
 }
 
 
-static uint32_t disassemble(device_t *device, char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t variant)
-{
-	std::ostringstream stream;
-	uint32_t result = disassemble(device, stream, pc, oprom, opram, variant);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 CPU_DISASSEMBLE( cdp1801 )
 {
-	return disassemble(device, buffer, pc, oprom, opram, TYPE_1801);
+	return disassemble(device, stream, pc, oprom, opram, TYPE_1801);
 }
 
 
 CPU_DISASSEMBLE( cdp1802 )
 {
-	return disassemble(device, buffer, pc, oprom, opram, TYPE_1802);
+	return disassemble(device, stream, pc, oprom, opram, TYPE_1802);
 }

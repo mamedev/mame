@@ -47,8 +47,6 @@
     SD Gundam
     - stage 3 mid-boss still has the sprite garbage bug;
     - stage 4: has sprite stuck on bottom-left of screen;
-    - palette dims too much on attract / continue screen.
-      It's known that the DMA data arrangement gives same results on a real Legionnaire board, so shrug?
     Seibu Cup Soccer
     - Handles collision detection via the 130e/3bb0 macros
       130e version in this makes a sub instead of an add as last opcode, which in turn reflects with

@@ -190,7 +190,7 @@ static const lr35902dasm mnemonic_main[256]= {
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
 
-static offs_t internal_disasm_lr35902(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(lr35902)
 {
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
@@ -272,14 +272,4 @@ static offs_t internal_disasm_lr35902(cpu_device *device, std::ostream &stream, 
 	}
 
 	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(lr35902)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_lr35902(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

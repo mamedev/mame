@@ -60,7 +60,7 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -289,7 +289,7 @@ end
 			"-include stdint.h"
 		}
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -377,7 +377,7 @@ if _OPTIONS["vs"]=="intel-15" then
 			"/Qwd869",              -- remark #869: parameter "xxx" was never referenced
 		}
 end
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 			"/wd4457", -- warning C4457: declaration of 'xxx' hides function parameter
@@ -413,6 +413,7 @@ end
 			MAME_DIR .. "3rdparty/lzma/C/BraIA64.c",
 			MAME_DIR .. "3rdparty/lzma/C/CpuArch.c",
 			MAME_DIR .. "3rdparty/lzma/C/Delta.c",
+			-- MAME_DIR .. "3rdparty/lzma/C/DllSecur.c",
 			MAME_DIR .. "3rdparty/lzma/C/LzFind.c",
 			-- MAME_DIR .. "3rdparty/lzma/C/LzFindMt.c",
 			MAME_DIR .. "3rdparty/lzma/C/Lzma2Dec.c",
@@ -586,7 +587,7 @@ end
 		forcedincludes {
 			MAME_DIR .. "src/osd/uwp/uwpcompat.h"
 		}
-	
+
 	configuration {}
 
 	files {
@@ -672,7 +673,7 @@ if _OPTIONS["vs"]=="intel-15" then
 		}
 end
 
-	configuration { "vs2015*" }
+	configuration { "vs201*" }
 		buildoptions {
 			"/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 		}
@@ -924,7 +925,7 @@ end
 --          "/Qwd1879",             -- warning #1879: unimplemented pragma ignored
 --      }
 --end
---  configuration { "vs2015*" }
+--  configuration { "vs201*" }
 --      buildoptions {
 --          "/wd4456", -- warning C4456: declaration of 'xxx' hides previous local declaration
 --      }
@@ -1182,7 +1183,6 @@ end
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiocvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiodev_c.h",
-		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiomem.h",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_audiotypecvt.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_mixer.c",
 		MAME_DIR .. "3rdparty/SDL2/src/audio/SDL_sysaudio.h",
@@ -1382,7 +1382,7 @@ end
 
 	if _OPTIONS["targetos"]=="macosx" then
 		files {
-			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.c",
+			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.m",
 			MAME_DIR .. "3rdparty/SDL2/src/audio/coreaudio/SDL_coreaudio.h",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.m",
 			MAME_DIR .. "3rdparty/SDL2/src/file/cocoa/SDL_rwopsbundlesupport.h",
@@ -1513,10 +1513,18 @@ end
 		}
 		buildoptions_c {
 			"-Wno-undef",
+			"-Wno-format",
+			"-Wno-format-security",
 			"-Wno-strict-prototypes",
 			"-Wno-bad-function-cast",
+			"-Wno-pointer-to-int-cast",
 			"-Wno-discarded-qualifiers",
 			"-Wno-unused-but-set-variable",
+		}
+
+	configuration { "mingw-clang"}
+		buildoptions_c {
+			"-Wno-incompatible-pointer-types-discards-qualifiers"
 		}
 
 	configuration { "osx*"}

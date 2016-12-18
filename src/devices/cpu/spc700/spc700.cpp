@@ -175,7 +175,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ============================ GENERAL MACROS ============================ */
 /* ======================================================================== */
 
-/* Codition code tests */
+/* Condition code tests */
 #define COND_CC()   (!(FLAG_C&0x100))   /* Carry Clear */
 #define COND_CS()   (FLAG_C&0x100)      /* Carry Set */
 #define COND_EQ()   (!FLAG_Z)           /* Equal */
@@ -1344,9 +1344,9 @@ void spc700_device::execute_set_input( int inptnum, int state )
 
 #include "spc700ds.h"
 
-offs_t spc700_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t spc700_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return CPU_DISASSEMBLE_NAME(spc700)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(spc700)(this, stream, pc, oprom, opram, options);
 }
 
 //int dump_flag = 0;

@@ -866,10 +866,9 @@ HRESULT CEncoderInfo::Init(
 
 
   outStreamSpec = new CBenchmarkOutStream;
+  outStream = outStreamSpec;
   if (!outStreamSpec->Alloc(kCompressedBufferSize))
     return E_OUTOFMEMORY;
-
-  outStream = outStreamSpec;
 
   propStreamSpec = 0;
   if (!propStream)
@@ -917,15 +916,8 @@ HRESULT CEncoderInfo::Init(
 
         // we must call encoding one time to calculate password key for key cache.
         // it must be after WriteCoderProperties!
-        CBenchmarkInStream *inStreamSpec = new CBenchmarkInStream;
-        CMyComPtr<ISequentialInStream> inStream = inStreamSpec;
         Byte temp[16];
         memset(temp, 0, sizeof(temp));
-        inStreamSpec->Init(temp, sizeof(temp));
-        
-        CCrcOutStream *outStreamSpec = new CCrcOutStream;
-        CMyComPtr<ISequentialOutStream> outStream = outStreamSpec;
-        outStreamSpec->Init();
         
         if (_encoderFilter)
         {
@@ -934,7 +926,15 @@ HRESULT CEncoderInfo::Init(
         }
         else
         {
-          RINOK(_encoder->Code(inStream, outStream, 0, 0, NULL));
+          CBenchmarkInStream *inStreamSpec = new CBenchmarkInStream;
+          CMyComPtr<ISequentialInStream> inStream = inStreamSpec;
+          inStreamSpec->Init(temp, sizeof(temp));
+          
+          CCrcOutStream *crcStreamSpec = new CCrcOutStream;
+          CMyComPtr<ISequentialOutStream> crcStream = crcStreamSpec;
+          crcStreamSpec->Init();
+
+          RINOK(_encoder->Code(inStream, crcStream, 0, 0, NULL));
         }
       }
     }
@@ -1740,10 +1740,10 @@ struct CTotalBenchRes
   }
 };
 
-static void PrintNumber(IBenchPrintCallback &f, UInt64 value, int size)
+static void PrintNumber(IBenchPrintCallback &f, UInt64 value, unsigned size)
 {
   char s[128];
-  int startPos = (int)sizeof(s) - 32;
+  unsigned startPos = (unsigned)sizeof(s) - 32;
   memset(s, ' ', startPos);
   ConvertUInt64ToString(value, s + startPos);
   // if (withSpace)
@@ -1751,7 +1751,7 @@ static void PrintNumber(IBenchPrintCallback &f, UInt64 value, int size)
     startPos--;
     size++;
   }
-  int len = (int)strlen(s + startPos);
+  unsigned len = (unsigned)strlen(s + startPos);
   if (size > len)
   {
     startPos -= (size - len);
@@ -1761,26 +1761,26 @@ static void PrintNumber(IBenchPrintCallback &f, UInt64 value, int size)
   f.Print(s + startPos);
 }
 
-static const int kFieldSize_Name = 12;
-static const int kFieldSize_SmallName = 4;
-static const int kFieldSize_Speed = 9;
-static const int kFieldSize_Usage = 5;
-static const int kFieldSize_RU = 6;
-static const int kFieldSize_Rating = 6;
-static const int kFieldSize_EU = 5;
-static const int kFieldSize_Effec = 5;
+static const unsigned kFieldSize_Name = 12;
+static const unsigned kFieldSize_SmallName = 4;
+static const unsigned kFieldSize_Speed = 9;
+static const unsigned kFieldSize_Usage = 5;
+static const unsigned kFieldSize_RU = 6;
+static const unsigned kFieldSize_Rating = 6;
+static const unsigned kFieldSize_EU = 5;
+static const unsigned kFieldSize_Effec = 5;
 
-static const int kFieldSize_TotalSize = 4 + kFieldSize_Speed + kFieldSize_Usage + kFieldSize_RU + kFieldSize_Rating;
-static const int kFieldSize_EUAndEffec = 2 + kFieldSize_EU + kFieldSize_Effec;
+static const unsigned kFieldSize_TotalSize = 4 + kFieldSize_Speed + kFieldSize_Usage + kFieldSize_RU + kFieldSize_Rating;
+static const unsigned kFieldSize_EUAndEffec = 2 + kFieldSize_EU + kFieldSize_Effec;
 
 
-static void PrintRating(IBenchPrintCallback &f, UInt64 rating, int size)
+static void PrintRating(IBenchPrintCallback &f, UInt64 rating, unsigned size)
 {
   PrintNumber(f, (rating + 500000) / 1000000, size);
 }
 
 
-static void PrintPercents(IBenchPrintCallback &f, UInt64 val, UInt64 divider, int size)
+static void PrintPercents(IBenchPrintCallback &f, UInt64 val, UInt64 divider, unsigned size)
 {
   PrintNumber(f, (val * 100 + divider / 2) / divider, size);
 }
@@ -1882,7 +1882,7 @@ struct CBenchCallbackToPrint: public IBenchCallback
   UInt32 DictSize;
 
   bool Use2Columns;
-  int NameFieldSize;
+  unsigned NameFieldSize;
 
   bool ShowFreq;
   UInt64 CpuFreq;
@@ -2390,10 +2390,10 @@ static void x86cpuid_to_String(const Cx86cpuid &c, AString &s)
   {
     for (int i = 0; i < 3; i++)
     {
-      UInt32 c[4] = { 0 };
-      MyCPUID(0x80000002 + i, &c[0], &c[1], &c[2], &c[3]);
+      UInt32 d[4] = { 0 };
+      MyCPUID(0x80000002 + i, &d[0], &d[1], &d[2], &d[3]);
       for (int j = 0; j < 4; j++)
-        PrintCpuChars(s, c[j]);
+        PrintCpuChars(s, d[j]);
     }
   }
 
@@ -2469,10 +2469,11 @@ HRESULT Bench(
   bool multiThreadTests = false;
 
   COneMethodInfo method;
-  unsigned i;
 
   CBenchBuffer fileDataBuffer;
-  
+
+  {
+  unsigned i;
   for (i = 0; i < props.Size(); i++)
   {
     const CProperty &property = props[i];
@@ -2567,6 +2568,7 @@ HRESULT Bench(
     }
     
     RINOK(method.ParseMethodFromPROPVARIANT(name, propVariant));
+  }
   }
 
   if (printCallback)
@@ -2710,7 +2712,7 @@ HRESULT Bench(
 
     f.NewLine();
     f.Print("Size");
-    const int kFieldSize_CrcSpeed = 6;
+    const unsigned kFieldSize_CrcSpeed = 6;
     unsigned numThreadsTests = 0;
     for (;;)
     {
@@ -2873,7 +2875,7 @@ HRESULT Bench(
     showFreq = true;
   }
 
-  int fileldSize = kFieldSize_TotalSize;
+  unsigned fileldSize = kFieldSize_TotalSize;
   if (showFreq)
     fileldSize += kFieldSize_EUAndEffec;
 
@@ -2941,9 +2943,8 @@ HRESULT Bench(
         printCallback->NewLine();
       HRESULT res;
 
-      int freqTest;
-      const int kNumCpuTests = 3;
-      for (freqTest = 0; freqTest < kNumCpuTests; freqTest++)
+      const unsigned kNumCpuTests = 3;
+      for (unsigned freqTest = 0; freqTest < kNumCpuTests; freqTest++)
       {
         PrintLeft(f, "CPU", kFieldSize_Name);
         UInt32 resVal;
@@ -3013,7 +3014,7 @@ HRESULT Bench(
     if (needSetComplexity)
       callback.BenchProps.SetLzmaCompexity();
 
-  for (i = 0; i < numIterations; i++)
+  for (unsigned i = 0; i < numIterations; i++)
   {
     const unsigned kStartDicLog = 22;
     unsigned pow = (dict < ((UInt32)1 << kStartDicLog)) ? kBenchMinDicLogSize : kStartDicLog;

@@ -69,7 +69,7 @@ public:
 	//plgDavid please change this to a MESS friendly handshake
 	void set_shared_memory(const uint8_t*m){ m_ram = m;};
 
-	// Global constants (non mesured figures)
+	// Global constants (non measured figures)
 	static const int START_ACTIVE_SCAN = 10;
 	static const int BORDER_SIZE       = GIC_CHAR_W*3;
 	static const int END_ACTIVE_SCAN   = 10 + GIC_CHAR_W*2 + 150 + GIC_CHAR_W*2;

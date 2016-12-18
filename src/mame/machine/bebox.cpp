@@ -804,10 +804,10 @@ DRIVER_INIT_MEMBER(bebox_state,bebox)
 		{
 			/* li r0, 0x0700 */
 			/* mtspr ctr, r0 */
-			U64(0x380007007C0903A6),
+			0x380007007C0903A6U,
 
 			/* bcctr 0x14, 0 */
-			U64(0x4E80042000000000)
+			0x4E80042000000000U
 		};
 		space_1.install_read_bank(0x9421FFF0, 0x9421FFFF, "bank1");
 		membank("bank1")->set_base(ops);

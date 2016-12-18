@@ -7,7 +7,7 @@
     unbuffered 32 KiB. Yet it was a very popular card since it was
     required for any kind of advanced programming beyond the console BASIC.
 
-    As a peripheral box card, it is connected via the 8-bit mutiplexed data bus.
+    As a peripheral box card, it is connected via the 8-bit multiplexed data bus.
     Later, modifications of the console became increasingly popular which
     avoided the bus multiplex so that the full 16bit access was possible.
     This helped to noticeably speed up the system.

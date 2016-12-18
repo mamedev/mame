@@ -932,7 +932,7 @@ explain why there is this mismatch in revision numbers, it seems Atari released 
 they needed to change default settings becasue of earnings potential in their default
 first set (revision 1), not once, but twice! then they changed the romset altogether. The documents
 in question are CO-174-02 (2 pages, 3 sides). this document shows what i think was the final revision
-of roms to be produced, they consist of a wholly -02 romset, with the expection being a -03 rom at
+of roms to be produced, they consist of a wholly -02 romset, with the exception being a -03 rom at
 location J1.
 
 So, anyhow, find in this file, the FIRST revision of rom -01 in J1. This pcb contained the following

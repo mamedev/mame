@@ -43,10 +43,10 @@ project ("osd_" .. _OPTIONS["osd"])
 	removeflags {
 		"SingleOutputDir",
 	}
-	
+
 	dofile("uwp_cfg.lua")
 	osdmodulesbuild()
-	
+
 	includedirs {
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/devices", -- accessing imagedev from debugger
@@ -80,17 +80,17 @@ project ("osd_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/osd/uwp/uwpcompat.h",
 		MAME_DIR .. "src/osd/osdepend.h",
 	}
-	
+
 project ("ocore_" .. _OPTIONS["osd"])
 	uuid (os.uuid("ocore_" .. _OPTIONS["osd"]))
 	kind (LIBTYPE)
 
 	removeflags {
-		"SingleOutputDir",	
+		"SingleOutputDir",
 	}
 
 	dofile("uwp_cfg.lua")
-	
+
 	includedirs {
 		MAME_DIR .. "3rdparty",
 		MAME_DIR .. "src/emu",
@@ -99,7 +99,7 @@ project ("ocore_" .. _OPTIONS["osd"])
 		MAME_DIR .. "src/lib",
 		MAME_DIR .. "src/lib/util",
 	}
-	
+
 	files {
 		MAME_DIR .. "src/osd/osdcomm.h",
 		MAME_DIR .. "src/osd/osdcore.cpp",

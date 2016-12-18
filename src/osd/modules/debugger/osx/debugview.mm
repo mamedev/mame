@@ -117,8 +117,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	else
 	{
 		data += ((position.y - view->visible_position().y) * view->visible_size().x);
-		int			attr = -1;
-		NSUInteger	start = 0, length = 0;
+		int         attr = -1;
+		NSUInteger  start = 0, length = 0;
 		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
@@ -355,8 +355,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	for (uint32_t row = 0; row < size.y; row++, data += size.x)
 	{
 		// add content for the line and set colours
-		int			attr = -1;
-		NSUInteger	start = [text length], length = start;
+		int         attr = -1;
+		NSUInteger  start = [text length], length = start;
 		for (uint32_t col = 0; col < size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col].byte];
@@ -469,7 +469,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)addContextMenuItemsToMenu:(NSMenu *)menu {
-	NSMenuItem	*item;
+	NSMenuItem  *item;
 
 	item = [menu addItemWithTitle:@"Copy Visible"
 						   action:@selector(copyVisible:)
@@ -622,8 +622,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 	// render entire lines to get character alignment right
 	for ( ; row < clip; row++, data += size.x)
 	{
-		int			attr = -1;
-		NSUInteger	start = 0, length = 0;
+		int         attr = -1;
+		NSUInteger  start = 0, length = 0;
 		for (uint32_t col = origin.x; col < origin.x + size.x; col++)
 		{
 			[[text mutableString] appendFormat:@"%c", data[col - origin.x].byte];
@@ -729,8 +729,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)keyDown:(NSEvent *)event {
-	NSUInteger	modifiers = [event modifierFlags];
-	NSString	*str = [event charactersIgnoringModifiers];
+	NSUInteger  modifiers = [event modifierFlags];
+	NSString    *str = [event charactersIgnoringModifiers];
 
 	if ([str length] == 1)
 	{
@@ -816,8 +816,8 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (void)insertText:(id)string {
-	NSUInteger	len;
-	NSRange		found;
+	NSUInteger  len;
+	NSRange     found;
 	if ([string isKindOfClass:[NSAttributedString class]])
 		string = [string string];
 	for (len = [string length], found = NSMakeRange(0, 0);
@@ -834,7 +834,7 @@ static void debugwin_view_update(debug_view &view, void *osdprivate)
 
 
 - (BOOL)validateMenuItem:(NSMenuItem *)item {
-	SEL	action = [item action];
+	SEL action = [item action];
 
 	if (action == @selector(paste:))
 	{

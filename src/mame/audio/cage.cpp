@@ -501,12 +501,11 @@ READ32_MEMBER( atari_cage_device::cage_io_status_r )
 
 uint16_t atari_cage_device::main_r()
 {
-	driver_device *drvstate = machine().driver_data<driver_device>();
 	if (LOG_COMM)
-		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(drvstate->generic_space(), 0, 0));
+		logerror("%s:main read data = %04X\n", machine().describe_context(), m_soundlatch->read(machine().dummy_space(), 0, 0));
 	m_cage_to_cpu_ready = 0;
 	update_control_lines();
-	return m_soundlatch->read(drvstate->generic_space(), 0, 0xffff);
+	return m_soundlatch->read(machine().dummy_space(), 0, 0xffff);
 }
 
 

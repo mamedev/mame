@@ -519,7 +519,7 @@ MACHINE_CONFIG_END
 
 ROM_START( vendetta )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081t01", 0x00000, 0x40000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
+	ROM_LOAD( "081t01.17c", 0x00000, 0x40000, CRC(e76267f5) SHA1(efef6c2edb4c181374661f358dad09123741b63d) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -543,7 +543,7 @@ ROM_END
 
 ROM_START( vendettar )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081r01", 0x00000, 0x40000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
+	ROM_LOAD( "081r01.17c", 0x00000, 0x40000, CRC(84796281) SHA1(e4330c6eaa17adda5b4bd3eb824388c89fb07918) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -567,7 +567,7 @@ ROM_END
 
 ROM_START( vendettaz )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081z01.bin", 0x00000, 0x40000, CRC(4d225a8d) SHA1(fe8f6e63d033cf04c9a287d870db244fddb81f03) )
+	ROM_LOAD( "081z01.17c", 0x00000, 0x40000, CRC(4d225a8d) SHA1(fe8f6e63d033cf04c9a287d870db244fddb81f03) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -591,7 +591,7 @@ ROM_END
 
 ROM_START( vendetta2p )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081w01", 0x00000, 0x40000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
+	ROM_LOAD( "081w01.17c", 0x00000, 0x40000, CRC(cee57132) SHA1(8b6413877e127511daa76278910c2ee3247d613a) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -637,9 +637,33 @@ ROM_START( vendetta2peba )
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
+ROM_START( vendetta2pun )
+	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
+	ROM_LOAD( "1.17c", 0x00000, 0x40000, CRC(b4edde48) SHA1(bf6342cfeb0560cdf9c943f6d112fd89ee5a4f6b) ) /* World 2 player, program rom found labeled simply as "1" */
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
+
+	ROM_REGION( 0x100000, "k052109", 0 )    /* tiles */
+	ROM_LOAD32_WORD( "081a09", 0x000000, 0x080000, CRC(b4c777a9) SHA1(cc2b1dff4404ecd72b604e25d00fffdf7f0f8b52) )
+	ROM_LOAD32_WORD( "081a08", 0x000002, 0x080000, CRC(272ac8d9) SHA1(2da12fe4c13921bf0d4ebffec326f8d207ec4fad) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them ) */
+	ROM_LOAD64_WORD( "081a04", 0x000000, 0x100000, CRC(464b9aa4) SHA1(28066ff0a07c3e56e7192918a882778c1b316b37) ) /* sprites */
+	ROM_LOAD64_WORD( "081a05", 0x000002, 0x100000, CRC(4e173759) SHA1(ce803f2aca7d7dedad00ab30e112443848747bd2) ) /* sprites */
+	ROM_LOAD64_WORD( "081a06", 0x000004, 0x100000, CRC(e9fe6d80) SHA1(2b7fc9d7fe43cd85dc8b975fe639c273cb0d9256) ) /* sprites */
+	ROM_LOAD64_WORD( "081a07", 0x000006, 0x100000, CRC(8a22b29a) SHA1(be539f21518e13038ab1d4cc2b2a901dd3e621f4) ) /* sprites */
+
+	ROM_REGION( 0x100000, "k053260", 0 ) /* 053260 samples */
+	ROM_LOAD( "081a03", 0x000000, 0x100000, CRC(14b6baea) SHA1(fe15ee57f19f5acaad6c1642d51f390046a7468a) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
+	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
+ROM_END
+
 ROM_START( vendetta2pu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081u01", 0x00000, 0x40000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
+	ROM_LOAD( "081u01.17c", 0x00000, 0x40000, CRC(b4d9ade5) SHA1(fbd543738cb0b68c80ff05eed7849b608de03395) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -663,7 +687,7 @@ ROM_END
 
 ROM_START( vendetta2pd )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081d01", 0x00000, 0x40000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
+	ROM_LOAD( "081d01.17c", 0x00000, 0x40000, CRC(335da495) SHA1(ea74680eb898aeecf9f1eec95f151bcf66e6b6cb) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -685,12 +709,9 @@ ROM_START( vendetta2pd )
 	ROM_LOAD( "vendetta.nv", 0x0000, 0x080, CRC(fbac4e30) SHA1(d3ff3a392550d9b06400b9292a44bdac7ba5c801) )
 ROM_END
 
-
-
-
 ROM_START( vendettaj )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* code + banked roms + banked ram */
-	ROM_LOAD( "081p01", 0x00000, 0x40000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
+	ROM_LOAD( "081p01.17c", 0x00000, 0x40000, CRC(5fe30242) SHA1(2ea98e66637fa2ad60044b1a2b0dd158a82403a2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
 	ROM_LOAD( "081b02", 0x000000, 0x10000, CRC(4c604d9b) SHA1(22d979f5dbde7912dd927bf5538fdbfc5b82905e) )
@@ -711,6 +732,7 @@ ROM_START( vendettaj )
 	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom to prevent game booting upside down with error
 	ROM_LOAD( "vendettaj.nv", 0x0000, 0x080, CRC(3550a54e) SHA1(370cd40a12c471b3b6690ecbdde9c7979bc2a652) )
 ROM_END
+
 
 ROM_START( esckids )
 	ROM_REGION( 0x020000, "maincpu", 0 )        // Main CPU (053248) Code & Banked (1M x 1)
@@ -774,6 +796,7 @@ GAME( 1991, vendettar,   vendetta, vendetta, vendet4p, driver_device, 0, ROT0, "
 GAME( 1991, vendettaz,   vendetta, vendetta, vendet4p, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 4 Players, ver. Z)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2p,  vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. W)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2peba,vendetta,vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. EB-A?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, vendetta2pun,vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (World, 2 Players, ver. ?)", MACHINE_SUPPORTS_SAVE ) /* program rom labeled as 1 */
 GAME( 1991, vendetta2pu, vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. U)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendetta2pd, vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Vendetta (Asia, 2 Players, ver. D)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, vendettaj,   vendetta, vendetta, vendetta, driver_device, 0, ROT0, "Konami", "Crime Fighters 2 (Japan, 2 Players, ver. P)", MACHINE_SUPPORTS_SAVE )

@@ -111,35 +111,35 @@ class software_list_device;
 
 
 /* ----- specialized loading macros ----- */
-#define ROM_LOAD_NIB_HIGH(name,offset,length,hash)  ROMX_LOAD(name, offset, length, hash, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
-#define ROM_LOAD_NIB_LOW(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
-#define ROM_LOAD16_BYTE(name,offset,length,hash)    ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1))
-#define ROM_LOAD16_WORD(name,offset,length,hash)    ROM_LOAD(name, offset, length, hash)
-#define ROM_LOAD16_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE)
-#define ROM_LOAD32_BYTE(name,offset,length,hash)    ROMX_LOAD(name, offset, length, hash, ROM_SKIP(3))
-#define ROM_LOAD32_WORD(name,offset,length,hash)    ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2))
-#define ROM_LOAD32_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
-#define ROM_LOAD32_DWORD(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD)
-#define ROM_LOAD64_WORD(name,offset,length,hash)    ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
-#define ROM_LOAD64_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6))
-#define ROM_LOAD64_DWORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD | ROM_REVERSE | ROM_SKIP(4))
+#define ROM_LOAD_NIB_HIGH(name,offset,length,hash)      ROMX_LOAD(name, offset, length, hash, ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI)
+#define ROM_LOAD_NIB_LOW(name,offset,length,hash)       ROMX_LOAD(name, offset, length, hash, ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO)
+#define ROM_LOAD16_BYTE(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_SKIP(1))
+#define ROM_LOAD16_WORD(name,offset,length,hash)        ROM_LOAD(name, offset, length, hash)
+#define ROM_LOAD16_WORD_SWAP(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE)
+#define ROM_LOAD32_BYTE(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_SKIP(3))
+#define ROM_LOAD32_WORD(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(2))
+#define ROM_LOAD32_WORD_SWAP(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
+#define ROM_LOAD32_DWORD(name,offset,length,hash)       ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD)
+#define ROM_LOAD64_WORD(name,offset,length,hash)        ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_SKIP(6))
+#define ROM_LOAD64_WORD_SWAP(name,offset,length,hash)   ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(6))
+#define ROM_LOAD64_DWORD_SWAP(name,offset,length,hash)  ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD | ROM_REVERSE | ROM_SKIP(4))
 
 
 /* ----- ROM_RELOAD related macros ----- */
 #define ROM_RELOAD(offset,length)                   { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
-#define ROM_RELOAD_PLAIN(offset,length)                 { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD },
+#define ROM_RELOAD_PLAIN(offset,length)             { nullptr, nullptr, offset, length, ROMENTRYTYPE_RELOAD },
 
 /* ----- additional ROM-related macros ----- */
-#define ROM_CONTINUE(offset,length)                 { nullptr, nullptr, (offset), (length), ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
-#define ROM_IGNORE(length)                          { nullptr, nullptr, 0,      (length), ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
-#define ROM_FILL(offset,length,value)               { nullptr, (const char *)(value), (offset), (length), ROMENTRYTYPE_FILL },
-#define ROMX_FILL(offset,length,value,flags)        { nullptr, (const char *)(value), (offset), (length), ROMENTRYTYPE_FILL | flags },
+#define ROM_CONTINUE(offset,length)                 { nullptr,  nullptr,                 (offset), (length), ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
+#define ROM_IGNORE(length)                          { nullptr,  nullptr,                 0,        (length), ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
+#define ROM_FILL(offset,length,value)               { nullptr,  (const char *)(value),   (offset), (length), ROMENTRYTYPE_FILL },
+#define ROMX_FILL(offset,length,value,flags)        { nullptr,  (const char *)(value),   (offset), (length), ROMENTRYTYPE_FILL | flags },
 #define ROM_COPY(srctag,srcoffs,offset,length)      { (srctag), (const char *)(srcoffs), (offset), (length), ROMENTRYTYPE_COPY },
 
 
 /* ----- system BIOS macros ----- */
 #define ROM_SYSTEM_BIOS(value,name,description)     { name, description, 0, 0, ROMENTRYTYPE_SYSTEM_BIOS | ROM_BIOS(value+1) },
-#define ROM_DEFAULT_BIOS(name)                      { name, nullptr, 0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
+#define ROM_DEFAULT_BIOS(name)                      { name, nullptr,     0, 0, ROMENTRYTYPE_DEFAULT_BIOS },
 
 
 /* ----- game parameter macro ----- */
@@ -163,8 +163,7 @@ class rom_load_manager
 	class open_chd
 	{
 	public:
-		open_chd(const char *region)
-			: m_region(region) { }
+		open_chd(const char *region) : m_region(region) { }
 
 		const char *region() const { return m_region.c_str(); }
 		chd_file &chd() { return m_diffchd.opened() ? m_diffchd : m_origchd; }
@@ -205,50 +204,50 @@ public:
 private:
 	void determine_bios_rom(device_t &device, const char *specbios);
 	void count_roms();
-	void fill_random(uint8_t *base, uint32_t length);
+	void fill_random(u8 *base, u32 length);
 	void handle_missing_file(const rom_entry *romp, std::string tried_file_names, chd_error chderr);
 	void dump_wrong_and_correct_checksums(const util::hash_collection &hashes, const util::hash_collection &acthashes);
-	void verify_length_and_hash(const char *name, uint32_t explength, const util::hash_collection &hashes);
+	void verify_length_and_hash(const char *name, u32 explength, const util::hash_collection &hashes);
 	void display_loading_rom_message(const char *name, bool from_list);
 	void display_rom_load_results(bool from_list);
 	void region_post_process(const char *rgntag, bool invert);
 	int open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list);
-	int rom_fread(uint8_t *buffer, int length, const rom_entry *parent_region);
+	int rom_fread(u8 *buffer, int length, const rom_entry *parent_region);
 	int read_rom_data(const rom_entry *parent_region, const rom_entry *romp);
 	void fill_rom_data(const rom_entry *romp);
 	void copy_rom_data(const rom_entry *romp);
 	void process_rom_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device, bool from_list);
 	chd_error open_disk_diff(emu_options &options, const rom_entry *romp, chd_file &source, chd_file &diff_chd);
 	void process_disk_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, const char *locationtag);
-	void normalize_flags_for_device(running_machine &machine, const char *rgntag, uint8_t &width, endianness_t &endian);
+	void normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian);
 	void process_region_list();
 
 
 	// internal state
-	running_machine &   m_machine;                  // reference to our machine
+	running_machine &   m_machine;            // reference to our machine
 
-	int             m_warnings;           /* warning count during processing */
-	int             m_knownbad;           /* BAD_DUMP/NO_DUMP count during processing */
-	int             m_errors;             /* error count during processing */
+	int                 m_warnings;           // warning count during processing
+	int                 m_knownbad;           // BAD_DUMP/NO_DUMP count during processing
+	int                 m_errors;             // error count during processing
 
-	int             m_romsloaded;         /* current ROMs loaded count */
-	int             m_romstotal;          /* total number of ROMs to read */
-	uint32_t          m_romsloadedsize;     /* total size of ROMs loaded so far */
-	uint32_t          m_romstotalsize;      /* total size of ROMs to read */
+	int                 m_romsloaded;         // current ROMs loaded count
+	int                 m_romstotal;          // total number of ROMs to read
+	u32                 m_romsloadedsize;     // total size of ROMs loaded so far
+	u32                 m_romstotalsize;      // total size of ROMs to read
 
 	std::unique_ptr<emu_file>  m_file;               /* current file */
 	std::vector<std::unique_ptr<open_chd>> m_chd_list;     /* disks */
 
-	memory_region * m_region;             /* info about current region */
+	memory_region *     m_region;             // info about current region
 
-	std::string     m_errorstring;        /* error string */
-	std::string     m_softwarningstring;  /* software warning string */
+	std::string         m_errorstring;        // error string
+	std::string         m_softwarningstring;  // software warning string
 };
 
 
 /* ----- Helpers ----- */
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, uint32_t crc, const rom_entry *romp, osd_file::error &filerr);
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr);
 
 /* return pointer to the first ROM region within a source */
 const rom_entry *rom_first_region(const device_t &device);
@@ -263,7 +262,7 @@ const rom_entry *rom_first_file(const rom_entry *romp);
 const rom_entry *rom_next_file(const rom_entry *romp);
 
 /* return the expected size of a file given the ROM description */
-uint32_t rom_file_size(const rom_entry *romp);
+u32 rom_file_size(const rom_entry *romp);
 
 /* return the appropriate name for a rom region */
 std::string rom_region_name(const device_t &device, const rom_entry *romp);
