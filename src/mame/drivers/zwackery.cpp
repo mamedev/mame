@@ -22,7 +22,7 @@
 #include "machine/6821pia.h"
 #include "machine/6840ptm.h"
 #include "machine/watchdog.h"
-#include "audio/midway.h"
+#include "audio/csd.h"
 
 
 //**************************************************************************
@@ -43,7 +43,7 @@ public:
 		m_screen(*this, "screen"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_videoram(*this, "videoram"),
-		m_chip_squeak_deluxe(*this, "csd"),
+		m_cheap_squeak_deluxe(*this, "csd"),
 		m_bg_tilemap(nullptr),
 		m_fg_tilemap(nullptr),
 		m_sound_data(0)
@@ -82,7 +82,7 @@ private:
 	required_device<screen_device> m_screen;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_shared_ptr<uint16_t> m_videoram;
-	required_device<midway_chip_squeak_deluxe_device> m_chip_squeak_deluxe;
+	required_device<midway_cheap_squeak_deluxe_device> m_cheap_squeak_deluxe;
 
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
@@ -411,7 +411,7 @@ WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 
 WRITE_LINE_MEMBER( zwackery_state::pia1_ca2_w )
 {
-	m_chip_squeak_deluxe->write(machine().dummy_space(), 0, (state << 4) | m_sound_data);
+	m_cheap_squeak_deluxe->write(machine().dummy_space(), 0, (state << 4) | m_sound_data);
 }
 
 
@@ -539,7 +539,7 @@ static MACHINE_CONFIG_START( zwackery, zwackery_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("csd", MIDWAY_CHIP_SQUEAK_DELUXE, 0)
+	MCFG_SOUND_ADD("csd", MIDWAY_CHEAP_SQUEAK_DELUXE, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 

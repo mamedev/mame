@@ -2556,6 +2556,8 @@ files {
 	MAME_DIR .. "src/mame/machine/midwayic.h",
 	MAME_DIR .. "src/mame/audio/midway.cpp",
 	MAME_DIR .. "src/mame/audio/midway.h",
+	MAME_DIR .. "src/mame/audio/csd.cpp",
+	MAME_DIR .. "src/mame/audio/csd.h",
 }
 
 createMAMEProjects(_target, _subtarget, "namco")
