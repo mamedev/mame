@@ -1242,17 +1242,19 @@ WRITE8_MEMBER( inder_state::sndbank_w )
 void inder_state::update_mus()
 {
 	if ((m_sound_addr < 0x40000) && (m_sndbank != 0xff))
-		m_13->ab_w(m_p_speech[m_sound_addr]);
+		m_13->ba_w(m_p_speech[m_sound_addr]);
 	else
-		m_13->ab_w(0);
+		m_13->ba_w(0);
 }
 
 WRITE_LINE_MEMBER( inder_state::vck_w )
 {
-	m_9a->clock_w(0);
+	// The order of these writes is sensitive, though the schematic (not to scale)
+	// makes it seem that both 74HCT74 clock inputs should be raised simultaneously
 	m_9b->clock_w(0);
-	m_9a->clock_w(1);
+	m_9a->clock_w(0);
 	m_9b->clock_w(1);
+	m_9a->clock_w(1);
 }
 
 WRITE_LINE_MEMBER( inder_state::qc7a_w )
