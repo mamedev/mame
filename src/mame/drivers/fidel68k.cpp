@@ -546,7 +546,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( fexcel68k, fidel68k_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz) // HD68HC000P12
 	MCFG_CPU_PROGRAM_MAP(fexcel68k_map)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_on", fidel68k_state, irq_on, attotime::from_hz(618)) // theoretical frequency from 556 timer (22nf, 91K + 20K POT @ 14.8K, 0.1K), measurement was 580Hz
 	MCFG_TIMER_START_DELAY(attotime::from_hz(618) - attotime::from_nsec(1525)) // active for 1.525us

@@ -78,13 +78,8 @@ WRITE16_MEMBER(powerbal_state::tile_banking_w)
 
 WRITE16_MEMBER(powerbal_state::oki_banking)
 {
-	if (data & 3)
-	{
-		int addr = (data & 3) - 1;
-
-		if (addr * 0x40000 < memregion("oki")->bytes())
-			m_oki->set_rom_bank(addr);
-	}
+	int bank = data & 3;
+	m_okibank->set_entry(bank & (m_oki_numbanks - 1));
 }
 
 static ADDRESS_MAP_START( magicstk_main_map, AS_PROGRAM, 16, powerbal_state )
@@ -128,6 +123,10 @@ static ADDRESS_MAP_START( powerbal_main_map, AS_PROGRAM, 16, powerbal_state )
 	AM_RANGE(0x103000, 0x103fff) AM_RAM
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( oki_map, AS_0, 8, powerbal_state )
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
 
 static INPUT_PORTS_START( powerbal )
 	PORT_START("IN0")
@@ -484,6 +483,7 @@ MACHINE_START_MEMBER(powerbal_state,powerbal)
 MACHINE_RESET_MEMBER(powerbal_state,powerbal)
 {
 	m_tilebank = 0;
+	configure_oki_banks();
 }
 
 static MACHINE_CONFIG_START( powerbal, powerbal_state )
@@ -516,6 +516,7 @@ static MACHINE_CONFIG_START( powerbal, powerbal_state )
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( magicstk, powerbal_state )
@@ -551,6 +552,7 @@ static MACHINE_CONFIG_START( magicstk, powerbal_state )
 
 	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 MACHINE_CONFIG_END
 
 
@@ -622,12 +624,8 @@ ROM_START( powerbal )
 
 	/* $00000-$20000 stays the same in all sound banks, */
 	/* the second half of the bank is the area that gets switched */
-	ROM_REGION( 0xc0000, "oki", 0 ) /* OKI Samples */
-	ROM_LOAD( "1.u16",        0x00000, 0x40000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
-	ROM_CONTINUE(             0x60000, 0x20000 )
-	ROM_CONTINUE(             0xa0000, 0x20000 )
-	ROM_COPY( "oki",  0x000000, 0x40000, 0x20000)
-	ROM_COPY( "oki",  0x000000, 0x80000, 0x20000)
+	ROM_REGION( 0x80000, "oki", 0 ) /* OKI Samples */
+	ROM_LOAD( "1.u16",        0x00000, 0x80000, CRC(12776dbc) SHA1(9ab9930fd581296642834d2cb4ba65264a588af3) )
 
 	ROM_REGION( 0x1200, "plds", 0 )
 	ROM_LOAD( "palce16v8h.u102",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */

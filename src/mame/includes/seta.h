@@ -55,7 +55,6 @@ public:
 		m_dsw2_3(*this, "DSW2_3"),
 		m_bet(*this, {"BET0", "BET1", "BET2", "BET3", "BET4"}),
 		m_sharedram(*this,"sharedram"),
-		m_workram(*this,"workram"),
 		m_vregs(*this,"vregs"),
 		m_vram_0(*this,"vram_0"),
 		m_vctrl_0(*this,"vctrl_0"),
@@ -92,7 +91,6 @@ public:
 	optional_ioport_array<5> m_bet;
 
 	optional_shared_ptr<uint8_t> m_sharedram;
-	optional_shared_ptr<uint16_t> m_workram;
 	optional_shared_ptr<uint16_t> m_vregs;
 	optional_shared_ptr<uint16_t> m_vram_0;
 	optional_shared_ptr<uint16_t> m_vctrl_0;

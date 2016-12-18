@@ -2,11 +2,11 @@
 // copyright-holders:Ryan Holtz
 /*****************************************************************************
 
-	7400 Quad 2-Input NAND Gate
+    7400 Quad 2-Input NAND Gate
 
 ***********************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
               ___ ___
        1A  1 |*  u   | 14  Vcc
        1B  2 |       | 13  4B
@@ -16,15 +16,15 @@
        2Y  6 |       | 9   3A
       GND  7 |_______| 8   3Y
 
-	Truth Table:
-	    ___________
-	   | A | B | Y |
-	   |---|---|---|
-	   | 0 | 0 | 0 |
-	   | 0 | 1 | 0 |
-	   | 1 | 0 | 0 |
-	   | 1 | 1 | 1 |
-	   |___|___|___|
+    Truth Table:
+        ___________
+       | A | B | Y |
+       |---|---|---|
+       | 0 | 0 | 0 |
+       | 0 | 1 | 0 |
+       | 1 | 0 | 0 |
+       | 1 | 1 | 1 |
+       |___|___|___|
 
 **********************************************************************/
 
@@ -97,11 +97,11 @@ private:
 	devcb_write_line m_y4_func;
 
 	// inputs
-	uint8_t m_a;		// pins 1,4,9,12
-	uint8_t m_b;		// pins 2,5,10,13
+	uint8_t m_a;        // pins 1,4,9,12
+	uint8_t m_b;        // pins 2,5,10,13
 
 	// outputs
-	uint8_t m_y;		// pins 3,6,8,11
+	uint8_t m_y;        // pins 3,6,8,11
 };
 
 // device type definition

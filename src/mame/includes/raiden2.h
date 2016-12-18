@@ -4,6 +4,9 @@
 #include "machine/seibucop/seibucop.h"
 #include "video/seibu_crtc.h"
 
+ADDRESS_MAP_EXTERN(raiden2_sound_map, 8);
+ADDRESS_MAP_EXTERN(zeroteam_sound_map, 8);
+
 class raiden2_state : public driver_device
 {
 public:

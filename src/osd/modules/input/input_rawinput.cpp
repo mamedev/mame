@@ -529,7 +529,7 @@ public:
 		registration.usUsagePage = usagepage();
 		registration.usUsage = usage();
 		registration.dwFlags = m_global_inputs_enabled ? 0x00000100 : 0;
-		registration.hwndTarget = osd_common_t::s_window_list.front()->platform_window<HWND>();
+		registration.hwndTarget = std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window();
 
 		// register the device
 		(*register_rawinput_devices)(&registration, 1, sizeof(registration));

@@ -294,9 +294,9 @@ void hh_hmcs40_state::display_matrix(int maxx, int maxy, uint64_t setx, uint32_t
 	set_display_size(maxx, maxy);
 
 	// update current state
-	uint64_t mask = (U64(1) << maxx) - 1;
+	uint64_t mask = (u64(1) << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
-		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (U64(1) << maxx)) : 0;
+		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (u64(1) << maxx)) : 0;
 
 	if (update)
 		display_update();

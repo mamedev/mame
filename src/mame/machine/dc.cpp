@@ -241,13 +241,13 @@ int dc_state::decode_reg32_64(uint32_t offset, uint64_t mem_mask, uint64_t *shif
 	*shift = 0;
 
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
+	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
 		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 		//machine().debug_break();
 	}
 
-	if (mem_mask == U64(0xffffffff00000000))
+	if (mem_mask == 0xffffffff00000000U)
 	{
 		reg++;
 		*shift = 32;
@@ -264,8 +264,8 @@ int dc_state::decode_reg3216_64(uint32_t offset, uint64_t mem_mask, uint64_t *sh
 	*shift = 0;
 
 	// non 16&32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0x0000ffff00000000)) && (mem_mask != U64(0x000000000000ffff)) &&
-		(mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
+	if ((mem_mask != 0x0000ffff00000000U) && (mem_mask != 0x000000000000ffffU) &&
+		(mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
 		osd_printf_verbose("%s:Wrong mask!\n", machine().describe_context());
 		//machine().debug_break();
@@ -591,13 +591,13 @@ int dc_state::decode_reg_64(uint32_t offset, uint64_t mem_mask, uint64_t *shift)
 	*shift = 0;
 
 	// non 32-bit accesses have not yet been seen here, we need to know when they are
-	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
+	if ((mem_mask != 0xffffffff00000000U) && (mem_mask != 0x00000000ffffffffU))
 	{
 		/*assume to return the lower 32-bits ONLY*/
 		return reg & 0xffffffff;
 	}
 
-	if (mem_mask == U64(0xffffffff00000000))
+	if (mem_mask == 0xffffffff00000000U)
 	{
 		reg++;
 		*shift = 32;
@@ -617,7 +617,7 @@ READ64_MEMBER(dc_state::dc_modem_r )
 	// our PVR emulation is apparently not good enough for that to work yet though.
 	if (reg == 0x280/4)
 	{
-		return U64(0xffffffffffffffff);
+		return 0xffffffffffffffffU;
 	}
 
 	osd_printf_verbose("MODEM:  Unmapped read %08x\n", 0x600000+reg*4);

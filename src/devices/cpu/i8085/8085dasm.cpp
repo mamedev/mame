@@ -18,7 +18,7 @@
 #define ARG(A)  opram[(A) - PC]
 #define ARGW(A) (opram[(A) - PC] | (opram[(A) + 1 - PC] << 8))
 
-static offs_t internal_disasm_i8085(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(i8085)
 {
 	uint32_t flags = 0;
 	uint8_t op;
@@ -542,14 +542,4 @@ static offs_t internal_disasm_i8085(cpu_device *device, std::ostream &stream, of
 #endif
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(i8085)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_i8085(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

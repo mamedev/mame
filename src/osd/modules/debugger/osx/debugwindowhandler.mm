@@ -444,7 +444,7 @@ NSString *const MAMEAuxiliaryDebugWindowWillCloseNotification = @"MAMEAuxiliaryD
 			}
 			return YES;
 		}
-    }
+	}
 	return NO;
 }
 

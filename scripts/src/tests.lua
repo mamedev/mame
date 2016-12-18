@@ -8,37 +8,6 @@
 --   Rules for building tests
 --
 ---------------------------------------------------------------------------
---------------------------------------------------
--- GoogleTest library objects
---------------------------------------------------
-
-project "gtest"
-	uuid "fa306a8d-fb10-4d4a-9d2e-fdb9076407b4"
-	kind "StaticLib"
-
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-undef",
-			"-Wno-unused-variable",
-		}
-
-	configuration { "vs*" }
-if _OPTIONS["vs"]=="intel-15" then
-		buildoptions {
-			"/Qwd1195",             -- error #1195: conversion from integer to smaller pointer
-		}
-end
-
-	configuration { }
-
-	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
-		MAME_DIR .. "3rdparty/googletest/googletest",
-	}
-	files {
-		MAME_DIR .. "3rdparty/googletest/googletest/src/gtest-all.cc",
-	}
-
 
 project("mametests")
 	uuid ("66d4c639-196b-4065-a411-7ee9266564f5")
@@ -52,15 +21,52 @@ project("mametests")
 		targetdir(MAME_DIR)
 	end
 
-	configuration { "gmake or ninja" }
-		buildoptions {
-			"-Wno-undef",
-		}
+	configuration { "x64", "Release" }
+		targetsuffix "64"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64p"
+		end
+
+	configuration { "x64", "Debug" }
+		targetsuffix "64d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "64dp"
+		end
+
+	configuration { "x32", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "x32", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
+
+	configuration { "Native", "Release" }
+		targetsuffix ""
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "p"
+		end
+
+	configuration { "Native", "Debug" }
+		targetsuffix "d"
+		if _OPTIONS["PROFILE"] then
+			targetsuffix "dp"
+		end
+
+	configuration { "mingw*" or "vs*" }
+		targetextension ".exe"
+
+	configuration { "rpi" }
+		targetextension ""
+
 
 	configuration { }
 
 	links {
-		"gtest",
 		"utils",
 		ext_lib("expat"),
 		ext_lib("zlib"),
@@ -68,7 +74,7 @@ project("mametests")
 	}
 
 	includedirs {
-		MAME_DIR .. "3rdparty/googletest/googletest/include",
+		MAME_DIR .. "3rdparty/catch/single_include",
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",
 		MAME_DIR .. "src/lib/util",
@@ -79,6 +85,7 @@ project("mametests")
 	files {
 		MAME_DIR .. "tests/main.cpp",
 		MAME_DIR .. "tests/lib/util/corestr.cpp",
+		MAME_DIR .. "tests/lib/util/options.cpp",
 		MAME_DIR .. "tests/emu/attotime.cpp",
 	}
 

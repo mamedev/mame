@@ -39,7 +39,7 @@ public:
 	sparse_dirty_bitmap(int granularity = 3);
 	sparse_dirty_bitmap(int width, int height, int granularity = 3);
 
-	// dirtying operations - partially interecting tiles are dirtied
+	// dirtying operations - partially intersecting tiles are dirtied
 	void dirty(const rectangle &rect) { dirty(rect.left(), rect.right(), rect.top(), rect.bottom()); }
 	void dirty(int32_t left, int32_t right, int32_t top, int32_t bottom);
 	void dirty_all() { dirty(0, m_width - 1, 0, m_height - 1); }

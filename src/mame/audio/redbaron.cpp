@@ -115,7 +115,7 @@ void redbaron_sound_device::sound_stream_update(sound_stream &stream, stream_sam
 	{
 		int sum = 0;
 
-		/* polynome shifter E5 and F4 (LS164) clocked with 12kHz */
+		/* polynomial shifter E5 and F4 (LS164) clocked with 12kHz */
 		m_poly_counter -= 12000;
 		while( m_poly_counter <= 0 )
 		{

@@ -313,13 +313,13 @@ void submenu::handle()
 //  populate
 //-------------------------------------------------
 
-void submenu::populate()
+void submenu::populate(float &customtop, float &custombottom)
 {
-	uint32_t arrow_flags;
-
 	// add options
 	for (auto sm_option = m_options.begin(); sm_option < m_options.end(); ++sm_option)
 	{
+		uint32_t arrow_flags;
+
 		// skip first heading (is menu title)
 		if (sm_option == m_options.begin() && sm_option->type == option_type::HEAD) continue;
 

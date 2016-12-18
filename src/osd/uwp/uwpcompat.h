@@ -72,7 +72,7 @@ LoadLibraryExA(
 	_In_ LPCSTR lpLibFileName,
 	_Reserved_ HANDLE hFile,
 	_In_ DWORD dwFlags
-	);
+);
 
 _Ret_maybenull_
 HMODULE
@@ -81,7 +81,7 @@ LoadLibraryExW(
 	_In_ LPCWSTR lpLibFileName,
 	_Reserved_ HANDLE hFile,
 	_In_ DWORD dwFlags
-	);
+);
 
 DWORD
 WINAPI

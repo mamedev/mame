@@ -1607,7 +1607,7 @@ void f8_cpu_device::device_reset()
 	ROMC_00(cS);
 
 	/* initialize the timer shift register
-	 * this is an 8 bit polynome counter which can be loaded parallel
+	 * this is an 8 bit polynomial counter which can be loaded parallel
 	 * with 0xff the outputs never change and thus the timer is disabled.
 	 * with 0xfe the shifter starts cycling through 255 states until it
 	 * reaches 0xfe again (and then issues an interrupt).
@@ -2062,10 +2062,10 @@ void f8_cpu_device::state_string_export(const device_state_entry &entry, std::st
 }
 
 
-offs_t f8_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t f8_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( f8 );
-	return CPU_DISASSEMBLE_NAME(f8)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(f8)(this, stream, pc, oprom, opram, options);
 }
 
 

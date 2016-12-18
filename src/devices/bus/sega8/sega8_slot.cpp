@@ -183,7 +183,8 @@ static const sega8_slot slot_list[] =
 	{ SEGA8_BASIC_L3, "level3" },
 	{ SEGA8_MUSIC_EDITOR, "music_editor" },
 	{ SEGA8_DAHJEE_TYPEA, "dahjee_typea" },
-	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" }
+	{ SEGA8_DAHJEE_TYPEB, "dahjee_typeb" },
+	{ SEGA8_SEOJIN, "seojin" }
 };
 
 static int sega8_get_pcb_id(const char *slot)
@@ -831,6 +832,7 @@ SLOT_INTERFACE_START(sg1000mk3_cart)
 	SLOT_INTERFACE_INTERNAL("hicom",  SEGA8_ROM_HICOM)
 	SLOT_INTERFACE_INTERNAL("korean",  SEGA8_ROM_KOREAN)
 	SLOT_INTERFACE_INTERNAL("korean_nb",  SEGA8_ROM_KOREAN_NB)
+	SLOT_INTERFACE_INTERNAL("seojin",  SEGA8_ROM_SEOJIN)
 	SLOT_INTERFACE_INTERNAL("othello",  SEGA8_ROM_OTHELLO)
 	SLOT_INTERFACE_INTERNAL("castle",  SEGA8_ROM_CASTLE)
 	SLOT_INTERFACE_INTERNAL("dahjee_typea",  SEGA8_ROM_DAHJEE_TYPEA)

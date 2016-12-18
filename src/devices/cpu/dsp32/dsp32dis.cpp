@@ -313,13 +313,13 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 				util::stream_format(stream, "a%d = %s(%s)",
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f));				// Y
+						dasm_XYZ((op >> 7) & 0x7f));                // Y
 			else
 				util::stream_format(stream, "%s = a%d = %s(%s)",
-						dasm_XYZ((op >> 0) & 0x7f),					// Z
+						dasm_XYZ((op >> 0) & 0x7f),                 // Z
 						(op >> 21) & 3,                             // aN
 						functable[(op >> 23) & 15],                 // G
-						dasm_XYZ((op >> 7) & 0x7f));			    // Y
+						dasm_XYZ((op >> 7) & 0x7f));                // Y
 			break;
 
 		/* CA formats 0/1 */
@@ -694,21 +694,11 @@ static unsigned dasm_dsp32(std::ostream &stream, unsigned pc, uint32_t op)
 }
 
 
-static unsigned dasm_dsp32(char *buffer, unsigned pc, uint32_t op)
-{
-	std::ostringstream stream;
-	unsigned result = dasm_dsp32(stream, pc, op);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-
 /***************************************************************************
     DISASSEMBLY HOOK
 ***************************************************************************/
 
 CPU_DISASSEMBLE( dsp32c )
 {
-	return dasm_dsp32(buffer, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
+	return dasm_dsp32(stream, pc, oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24));
 }

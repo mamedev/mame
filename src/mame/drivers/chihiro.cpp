@@ -56,13 +56,13 @@ Games on this system include....
 | | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
 |*| 2005     | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
 | | 2005     | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
-|*| 2005     | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  |              |
+|*| 2005     | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  | ?            |
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
-|*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  |              |
+|*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | ?            |
 | | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
 |*| 2009     | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
-|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C |              |
+|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
 |*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
 |*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
 |*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
@@ -385,7 +385,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
 #include "machine/jvshost.h"
@@ -562,7 +562,6 @@ public:
 private:
 	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
 	void jamtable_disasm_command(int ref, int params, const char **param);
-	void threadlist_command(int ref, int params, const char **param);
 	void chihiro_help_command(int ref, int params, const char **param);
 	void debug_commands(int ref, int params, const char **param);
 };
@@ -694,43 +693,12 @@ void chihiro_state::jamtable_disasm_command(int ref, int params, const char **pa
 	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-void chihiro_state::threadlist_command(int ref, int params, const char **param)
-{
-	const uint32_t thlists = 0x8003aae0; // magic address
-	address_space &space = m_maincpu->space();
-	debugger_cpu &cpu = machine().debugger().cpu();
-	debugger_console &con = machine().debugger().console();
-
-	con.printf("Pri. _KTHREAD   Stack  Function\n");
-	con.printf("-------------------------------\n");
-	for (int pri=0;pri < 16;pri++)
-	{
-		uint32_t curr = thlists + pri * 8;
-		uint32_t next = cpu.read_dword(space, curr, true);
-
-		while (next != curr)
-		{
-			uint32_t kthrd = next - 0x5c;
-			uint32_t topstack = cpu.read_dword(space, kthrd + 0x1c, true);
-			uint32_t tlsdata = cpu.read_dword(space, kthrd + 0x28, true);
-			uint32_t function;
-			if (tlsdata == 0)
-				function = cpu.read_dword(space, topstack - 0x210 - 8, true);
-			else
-				function = cpu.read_dword(space, tlsdata - 8, true);
-			con.printf(" %02d  %08x %08x %08x\n", pri, kthrd, topstack, function);
-			next = cpu.read_dword(space, next, true);
-		}
-	}
-}
-
 void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
 {
 	debugger_console &con = machine().debugger().console();
 
 	con.printf("Available Chihiro commands:\n");
 	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
-	con.printf("  chihiro threadlist -- list of currently active threads\n");
 	con.printf("  chihiro help -- this list\n");
 }
 
@@ -740,8 +708,6 @@ void chihiro_state::debug_commands(int ref, int params, const char **param)
 		return;
 	if (strcmp("jamdis", param[0]) == 0)
 		jamtable_disasm_command(ref, params - 1, param + 1);
-	else if (strcmp("threadlist", param[0]) == 0)
-		threadlist_command(ref, params - 1, param + 1);
 	else
 		chihiro_help_command(ref, params - 1, param + 1);
 }
@@ -756,7 +722,8 @@ void chihiro_state::hack_eeprom()
 }
 
 #define HACK_ITEMS 5
-static const struct {
+static const struct
+{
 	const char *game_name;
 	const bool disable_usb;
 	struct {
@@ -2060,8 +2027,8 @@ ROM_START( questofd )
 	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC16C621A brute-forced key, label is unknown
-	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
+	//PIC16C621A (317-0376-JPN)
+	ROM_LOAD("317-0376-jpn.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
 ROM_END
 
 ROM_START( gundcb79 )

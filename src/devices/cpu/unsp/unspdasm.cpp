@@ -46,7 +46,7 @@ static const char *alu[] =
 
 #define UNSP_DASM_OK ((OP2X ? 2 : 1) | DASMFLAG_SUPPORTED)
 
-static offs_t internal_disasm_unsp(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(unsp)
 {
 	uint16_t op = *(uint16_t *)oprom;
 	uint16_t imm16 = *(uint16_t *)(oprom + 2);
@@ -257,14 +257,4 @@ static offs_t internal_disasm_unsp(cpu_device *device, std::ostream &stream, off
 	}
 	util::stream_format(stream, "<inv>");
 	return UNSP_DASM_OK;
-}
-
-
-CPU_DISASSEMBLE(unsp)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_unsp(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

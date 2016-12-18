@@ -771,7 +771,7 @@ uint16_t fd1094_device::decrypt_one(offs_t address, uint16_t val, const uint8_t 
 	else                    key_F = BIT(mainkey,6);
 
 	// the CPU has been verified to produce different results when fetching opcodes
-	// from 0000-0006 than when fetching the inital SP and PC on reset.
+	// from 0000-0006 than when fetching the initial SP and PC on reset.
 	if (vector_fetch)
 	{
 		if (address <= 3) gkey3 = 0x00; // supposed to always be the case

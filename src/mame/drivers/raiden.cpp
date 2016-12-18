@@ -10,13 +10,6 @@
     Raiden (Korean license)         (c) 1990 Seibu Kaihatsu
     Raiden (Taiwanese license)      (c) 1990 Seibu Kaihatsu
 
-    The alternate hardware version is probably newer than the main sets.
-    It looks closer to the newer 68000 games, while the main set looks
-    closer to Dynamite Duke (1989 game) in terms of graphics registers used, etc.
-
-    As well as different graphics registers the alternate set has a
-    different memory map, and different fix char layer memory layout!
-
     To access test mode, reset with both start buttons held.
 
     The country byte is stored at 0xffffd in the main cpu region,
@@ -37,14 +30,42 @@
     Sound: YM3812, OKI M6295
     Custom ICs:
     - SEI0160 QFP60 (2 on main PCB, 3 on OBJ1 PCB)
-    - S1S6091 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
+    - S1S6091 or SEI0181 QFP80 (4 on main PCB, 4 on OBJ1 PCB)
     - Altera EP910PC-40 EPLD, one next to each V30
     - SEI0050BU DIP40
-    - SEI80BU DIP42
+    - SEI80BU DIP42 (next to encrypted Z80 ROM)
     - SEI0100BU "YM3931"
-    - many CMOS Gate Arrays
+    - SEI0010BU TC17G008AN-0025 (2 near mask ROMs, 1 near CHR ROMs)
+    - SEI0021BU TC17G008AN-0022 (4 between mask ROMs)
+    - SG0140 TC110G05AN-0012 (2)
 
-    One of the sets is SEI8904 with SEI9008 subboard.
+    The following alternate main PCB types have been observed:
+
+    1. "SEI8904 MAIN"; custom chips are similar to the common dedicated
+       hardware, but PCB layout is vastly different, resembling Dynamite
+       Duke (Seibu's previous game); the format of CHR RAM is transposed
+       here. One (undumped) set, perhaps the earliest revision of the game,
+       has a half-empty SEI8904-ROM subboard which has the BG and sprite
+       tiles in ROMs with even numbers starting at 20, 30, 40; another set
+       instead has a SEI9008 subboard that replaces these 12 ROMs with the
+       SEI420, SEI430 and SEI440 mask ROMs found on later non-bootleg sets.
+
+    2. Newer Seibu hardware, lacking the encryption PLDs and many of the
+       older-generation custom ICs listed above, though the mask ROMs and
+       OBJ1 subboard remain the same. The graphics registers here are very
+       different from previous licensed sets, having the CRTC-style format
+       of all subsequent Seibu arcade games.
+
+    3. Korean bootleg hardware, with no custom ICs and an enormous subboard
+       with four ROMs amidst over 100 TTL chips. (This is almost certainly
+       different from the dumped raidenk set, despite displaying the IBL
+       license on the title screen.)
+
+    On some boards (both the common dedicated hardware and the older
+    SEI8904), the SEI0050BU has been replaced with a small daughterboard
+    with six TTL chips and two PLDs labeled S50P01 and S50P02. A bootleg
+    set has been observed with a (larger) daughterboard likewise standing
+    in for a Xilinx PLD.
 
 ***************************************************************************/
 
@@ -128,6 +149,35 @@ static ADDRESS_MAP_START( raidenb_main_map, AS_PROGRAM, 16, raiden_state )
 	AM_RANGE(0x0d000, 0x0d00d) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x0d040, 0x0d08f) AM_DEVREADWRITE("crtc", seibu_crtc_device, read, write)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+
+/*****************************************************************************/
+
+static ADDRESS_MAP_START( raiden_sound_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( raiden_sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, raiden_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sei80bu_encrypted_full_map, AS_PROGRAM, 8, raiden_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 
@@ -276,7 +326,8 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_CPU_PROGRAM_MAP(sub_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", raiden_state, raiden_interrupt)
 
-	SEIBU_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
@@ -297,11 +348,29 @@ static MACHINE_CONFIG_START( raiden, raiden_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_14_31818MHz/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) // frequency and pin 7 verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( raidene, raiden )
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()
+	MCFG_DEVICE_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(raiden_sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(raiden_sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( raidenu, raidene )
@@ -513,6 +582,49 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
+ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
+	ROM_LOAD16_BYTE( "2.u0252", 0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
+	ROM_LOAD16_BYTE( "3.u022",  0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
+	ROM_LOAD16_BYTE( "4k.u023", 0x0c0001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) /* 0x1fffd == 0x02, 0x1fffe == 0xA4 */
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
+	ROM_LOAD16_BYTE( "5.u042", 0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
+	ROM_LOAD16_BYTE( "6.u043", 0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) /* Not encrypted */
+	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
+	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
+	ROM_LOAD( "10", 0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "rkb15bg.bin", 0x00000, 0x20000, CRC(13a69064) SHA1(a9fcd785e3bac7c0d39be532b3755e6dd45fc314) )
+	ROM_LOAD16_BYTE( "rkb17bg.bin", 0x00001, 0x20000, CRC(d7a6c649) SHA1(01d6f18af0385466e3956c3f3afc82393acee6bc) )
+	ROM_LOAD16_BYTE( "rkb16bg.bin", 0x40000, 0x20000, CRC(66ea8484) SHA1(f4452e1b0991bf81a60b580ba822fc43b1a443e6) )
+	ROM_LOAD16_BYTE( "rkb18bg.bin", 0x40001, 0x20000, CRC(42362d56) SHA1(1cad19fa3f66e34865383d9a94e9058114910365) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "rkb7bg.bin",  0x00000, 0x20000, CRC(25239711) SHA1(978cfc6487ed711cc1b513824741c347ec92889d) )
+	ROM_LOAD16_BYTE( "rkb9bg.bin",  0x00001, 0x20000, CRC(6ca0d7b3) SHA1(ef63657a01b07aaa0ded7b0d405b872b4d3a56a8) )
+	ROM_LOAD16_BYTE( "rkb8bg.bin",  0x40000, 0x20000, CRC(3cad38fc) SHA1(de2257f70c3e71905bc959f80be183c6d95fd06d) )
+	ROM_LOAD16_BYTE( "rkb10bg.bin", 0x40001, 0x20000, CRC(6fce95a3) SHA1(1d3beda3a4dd0a2a3afbb7b5b16d87bf3257bcb4) )
+
+
+	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "rkb19obj.bin", 0x00000, 0x20000, CRC(34fa4485) SHA1(d9893c484ee4f80e364824500c6c048f58f49752) )
+	ROM_LOAD16_BYTE( "rkb21obj.bin", 0x00001, 0x20000, CRC(d806395b) SHA1(7c6fc848aa40a49590e00d0b02ce21ad5414e387) )
+	ROM_LOAD16_BYTE( "rkb20obj.bin", 0x40000, 0x20000, CRC(8b7ca3c6) SHA1(81c3e98cbd81a39e04b5e7fb3683aba50545f774) )
+	ROM_LOAD16_BYTE( "rkb22obj.bin", 0x40001, 0x20000, CRC(82ee78a0) SHA1(4af0593f9c7d8db59f17d75d6f9020ecd4bdcb98) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+ROM_END
+
 ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
@@ -621,15 +733,6 @@ DRIVER_INIT_MEMBER(raiden_state,raiden)
 	common_decrypt();
 }
 
-DRIVER_INIT_MEMBER(raiden_state,raidenk)
-{
-	common_decrypt();
-}
-
-DRIVER_INIT_MEMBER(raiden_state,raidenu)
-{
-}
-
 
 /***************************************************************************/
 
@@ -640,10 +743,13 @@ GAME( 1990, raidenu,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "
 GAME( 1990, raident,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", MACHINE_SUPPORTS_SAVE )
 
 /* Same as above, but the sound CPU code is not encrypted */
-GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
+
+/* Bootleg of the Korean release */
+GAME( 1990, raidenkb, raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
-GAME( 1990, raidenua, raiden, raidenu, raiden, raiden_state,  raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, raidenua, raiden, raidenu, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )
 
-/* Alternate hardware. Main, Sub & Sound CPU code not encrypted - could possibly be a bootleg?? It also sports Seibu custom CRTC. */
+/* Alternate hardware. Main, Sub & Sound CPU code not encrypted. It also sports Seibu custom CRTC. */
 GAME( 1990, raidenb,  raiden, raidenb, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu", "Raiden (set 3)", MACHINE_SUPPORTS_SAVE )

@@ -2,43 +2,43 @@
 // copyright-holders:Ryan Holtz
 /**********************************************************************
 
-	5/74174/5 Hex/Quad D Flip-Flops with Clear
+    5/74174/5 Hex/Quad D Flip-Flops with Clear
 
 ***********************************************************************
 
-	Connection Diagram:
-	          ___ ___           	          ___ ___
-	CLEAR  1 |*  u   | 16  Vcc		CLEAR  1 |*  u   | 16  Vcc
-	   Q1  2 |       | 15  Q6		   Q1  2 |       | 15  Q4
-	   D1  3 |       | 14  D6		  /Q1  3 |       | 14  /Q4
-	   D2  4 |       | 13  D5		   D1  4 |       | 13  D4
-	   Q2  5 |       | 12  Q5		   D2  5 |       | 12  D3
-	   D3  6 |       | 11  D4		  /Q2  6 |       | 11  /Q3
-	   Q3  7 |       | 10  Q4		   Q2  7 |       | 10  Q3
-	  GND  8 |_______| 9   CLOCK	  GND  8 |_______| 9   CLOCK
+    Connection Diagram:
+              ___ ___                         ___ ___
+    CLEAR  1 |*  u   | 16  Vcc      CLEAR  1 |*  u   | 16  Vcc
+       Q1  2 |       | 15  Q6          Q1  2 |       | 15  Q4
+       D1  3 |       | 14  D6         /Q1  3 |       | 14  /Q4
+       D2  4 |       | 13  D5          D1  4 |       | 13  D4
+       Q2  5 |       | 12  Q5          D2  5 |       | 12  D3
+       D3  6 |       | 11  D4         /Q2  6 |       | 11  /Q3
+       Q3  7 |       | 10  Q4          Q2  7 |       | 10  Q3
+      GND  8 |_______| 9   CLOCK      GND  8 |_______| 9   CLOCK
 
-			  5/74174                         5/74175
+              5/74174                         5/74175
 
 ***********************************************************************
 
-	Function Table:
-	 _________________________________
-	|       Inputs        |  Outputs* |
-	|---------------------|-----------|
-	| Clear | Clock |  D  |  Q  | /Q  |
-	|-------|-------|-----|-----|-----|
-	|   L   |   X   |  X  |  L  |  H  |
-	|   H   |   ^   |  H  |  H  |  L  |
-	|   H   |   ^   |  L  |  L  |  H  |
-	|   H   |   L   |  X  |  Q0 |  Q0 |
-	|_______|_______|_____|_____|_____|
+    Function Table:
+     _________________________________
+    |       Inputs        |  Outputs* |
+    |---------------------|-----------|
+    | Clear | Clock |  D  |  Q  | /Q  |
+    |-------|-------|-----|-----|-----|
+    |   L   |   X   |  X  |  L  |  H  |
+    |   H   |   ^   |  H  |  H  |  L  |
+    |   H   |   ^   |  L  |  L  |  H  |
+    |   H   |   L   |  X  |  Q0 |  Q0 |
+    |_______|_______|_____|_____|_____|
 
-	H = High Level (steady state)
-	L = Low Level (steady state)
-	X = Don't Care
-	^ = Transition from low to high level
-	Q0 = The level of Q before the indicated steady-state input conditions were established.
-	* = 175 only
+    H = High Level (steady state)
+    L = Low Level (steady state)
+    X = Don't Care
+    ^ = Transition from low to high level
+    Q0 = The level of Q before the indicated steady-state input conditions were established.
+    * = 175 only
 
 **********************************************************************/
 

@@ -30,7 +30,7 @@ general :
   - Unlike tms9900, CRU address range is full 0x0000-0xFFFE (A0 is not used as address).
     This is possible because tms9995 uses d0-d2 instead of the address MSBits to support external
     opcodes.
-  - quite more efficient than tms9900, and a few additionnal instructions and features
+  - quite more efficient than tms9900, and a few additional instructions and features
 * 24 or 32kb ROM (16kb plain (1kb of which used by vdp), 16kb split into 2 8kb pages)
 * 4kb 8-bit RAM, 256 bytes 16-bit RAM
 * custom vdp shares CPU RAM/ROM.  The display is quite alike to tms9928 graphics mode, except

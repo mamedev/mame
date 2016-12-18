@@ -89,8 +89,8 @@ bool mcd_isa_device::read_sector(bool first)
 	if(m_mode & 0x40)
 	{
 		//correct the header
-		m_buf[12] = dec_2_bcd(m_readmsf >> 16);
-		m_buf[13] = dec_2_bcd(m_readmsf >> 8);
+		m_buf[12] = dec_2_bcd((m_readmsf >> 16) & 0xff);
+		m_buf[13] = dec_2_bcd((m_readmsf >> 8) & 0xff);
 	}
 	m_readmsf = lba_to_msf_alt(lba + 1);
 	m_buf_count = m_dmalen + 1;

@@ -40,14 +40,14 @@ public:
 
 	virtual DECLARE_WRITE32_MEMBER(write) override;
 	virtual DECLARE_READ32_MEMBER(read) override;
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
 private:
 	static const size_t RAM_WORDS = 2048;
-	
+
 	uint16_t powers2(uint8_t k, uint16_t x);
 	uint16_t lfsr2(uint16_t x);
 	uint16_t lfsr1(uint16_t x);
@@ -59,10 +59,10 @@ private:
 		FPGA_SETKEY,
 		FPGA_DECIPHER
 	};
-	
+
 	fpga_mode m_mode;
 	uint16_t m_address;    // last written address
-	uint16_t m_ciphertext; // last written ciphertext	
+	uint16_t m_ciphertext; // last written ciphertext
 };
 
 class atari_136095_0072_device : public atari_xga_device
@@ -72,17 +72,17 @@ public:
 
 	DECLARE_WRITE32_MEMBER(polylsb_write);
 	DECLARE_READ32_MEMBER(polylsb_read);
-	
+
 	virtual DECLARE_WRITE32_MEMBER(write) override;
 	virtual DECLARE_READ32_MEMBER(read) override;
-	
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	
+
 private:
 	static const size_t RAM_WORDS = 4096;
-	
+
 	uint16_t powers2(uint8_t k, uint16_t x);
 	uint16_t lfsr2(uint16_t x);
 	uint16_t lfsr1(uint16_t x);

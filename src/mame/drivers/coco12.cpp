@@ -24,6 +24,7 @@
 ***************************************************************************/
 
 #include "includes/coco12.h"
+#include "bus/coco/coco_t4426.h"
 #include "bus/coco/coco_232.h"
 #include "bus/coco/coco_orch90.h"
 #include "bus/coco/coco_pak.h"
@@ -264,7 +265,13 @@ SLOT_INTERFACE_START( coco_cart )
 	SLOT_INTERFACE("multi", COCO_MULTIPAK)
 SLOT_INTERFACE_END
 
+//-------------------------------------------------
+//  SLOT_INTERFACE_START(t4426_cart)
+//-------------------------------------------------
 
+SLOT_INTERFACE_START( t4426_cart )
+	SLOT_INTERFACE("t4426", COCO_T4426)
+SLOT_INTERFACE_END
 
 //-------------------------------------------------
 //  MACHINE_CONFIG_FRAGMENT( coco_sound )
@@ -392,6 +399,14 @@ static MACHINE_CONFIG_DERIVED( cp400, coco )
 	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( t4426, coco2 )
+	MCFG_COCO_CARTRIDGE_REMOVE(CARTRIDGE_TAG)
+	MCFG_COCO_CARTRIDGE_ADD(CARTRIDGE_TAG, t4426_cart, "t4426")
+	MCFG_COCO_CARTRIDGE_CART_CB(WRITELINE(coco_state, cart_w))
+	MCFG_COCO_CARTRIDGE_NMI_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_NMI))
+	MCFG_COCO_CARTRIDGE_HALT_CB(INPUTLINE(MAINCPU_TAG, INPUT_LINE_HALT))
+	MCFG_SLOT_FIXED(true) // This cart is fixed so no way to change it
+MACHINE_CONFIG_END
 
 //**************************************************************************
 //  ROMS
@@ -431,6 +446,12 @@ ROM_START(mx1600 )
 	ROM_LOAD("mx1600extbas.rom", 0x0000, 0x2000, CRC(322a3d58) SHA1(9079a477c3f22e46cebb1e68b61df5bd607c71a4))
 ROM_END
 
+ROM_START( t4426 )
+	ROM_REGION(0x8000,MAINCPU_TAG,0)
+	ROM_LOAD("SOFT4426-U13-1.2.bin", 0x2000, 0x2000, CRC(3c1af94a) SHA1(1dc57b3e4a6ef6a743ca21d8f111a74b1ea9d54e))
+	ROM_LOAD("SOFT4426-U14-1.2.bin", 0x0000, 0x2000, CRC(e031d076) SHA1(7275f1e3f165ff6a4657e4e5e24cb8b817239f54))
+ROM_END
+
 ROM_START(lzcolor64 )
 	ROM_REGION(0x8000,MAINCPU_TAG,0)
 	ROM_LOAD("color64bas.rom",    0x2000, 0x2000, CRC(b0717d71) SHA1(ad1beef9d6f095ada69f91d0b8ad75985172d86f))
@@ -444,8 +465,9 @@ ROM_END
 /*     YEAR     NAME        PARENT  COMPAT  MACHINE    INPUT      INIT    COMPANY                 FULLNAME */
 COMP(  1980,    coco,       0,      0,      coco,      coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer", 0)
 COMP(  1981,    cocoe,      coco,   0,      cocoe,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer (Extended BASIC 1.0)", 0)
-COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2", 0)
-COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",     "Color Computer 2B", 0)
+COMP(  1983,    coco2,      coco,   0,      coco2,     coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer 2", 0)
+COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,      0,      "Tandy Radio Shack",    "Color Computer 2B", 0)
 COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)
 COMP(  1984,    lzcolor64,  coco,   0,      coco,      coco, driver_device,      0,      "Digiponto",            "LZ Color64", 0)
 COMP(  1984,    mx1600,     coco,   0,      coco,      coco, driver_device,      0,      "Dynacom",              "MX-1600", 0)
+COMP(  1986,    t4426,	    coco,   0,      t4426,     coco, driver_device,      0,      "Terco AB",             "Terco 4426 CNC Programming station", MACHINE_NOT_WORKING)

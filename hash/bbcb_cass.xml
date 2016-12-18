@@ -451,7 +451,7 @@
 	<software name="advxanad">
 		<description>Adventurescape - Lost in Xanadu</description>
 		<year>1985</year>
-		<publisher>AB</publisher>
+		<publisher>A&amp;B Computing</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="11679">
 				<rom name="adventurescape-lostinxanadu(ab).uef" size="11679" crc="de5f5c72" sha1="61a27f624965a5ac8f3496d06b5eea4c0a474e9e" offset="0" />
@@ -493,8 +493,8 @@
 		</part>
 	</software>
 
-	<software name="airline">
-		<description>Airline</description>
+	<software name="airlineb">
+		<description>Airline (Model B)</description>
 		<year>1983</year>
 		<publisher>CCS</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -1008,7 +1008,7 @@
 	</software>
 
 	<software name="axeofkol">
-		<description>The Axe of Kolt</description>
+		<description>Axe of Kolt</description>
 		<year>1987</year>
 		<publisher>Elk Adventure Club</publisher>
 		<part name="cass1" interface="bbc_cass">
@@ -1599,7 +1599,7 @@
 
 	<software name="bombbaro">
 		<description>Bomber Baron</description>
-		<year>198?</year>
+		<year>1986</year>
 		<publisher>Optyx</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4997">
@@ -1791,8 +1791,8 @@
 
 	<software name="bridgema">
 		<description>Bridge Master</description>
-		<year>19??</year>
-		<publisher>J Keyne</publisher>
+		<year>1983</year>
+		<publisher>J.Keyne</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Tape A"/>
 			<dataarea name="cass" size="5041">
@@ -4958,7 +4958,7 @@
 	<software name="froggy">
 		<description>Froggy</description>
 		<year>198?</year>
-		<publisher>JSD</publisher>
+		<publisher>JSD Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="5050">
 				<rom name="froggy(jsd).uef" size="5050" crc="11aa8f36" sha1="5e6d666481369cad82f942485d3a45f4ad1ee444" offset="0" />
@@ -6939,8 +6939,8 @@
 
 	<software name="keyjoyc">
 		<description>Keyboard to Joystick Convertor</description>
-		<year>198?</year>
-		<publisher>Bud</publisher>
+		<year>1984</year>
+		<publisher>Bud Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="1897">
 				<rom name="keyboardtojoystickconvertor(bud).uef" size="1897" crc="7be6da58" sha1="e673bb5a20f9a4f7d945ce50b1ae29e01fb48f50" offset="0" />
@@ -7073,7 +7073,7 @@
 	</software>
 
 	<software name="knowpsiq">
-		<description>Know Your Own Personality</description>
+		<description>Know Your Own PSI-Q</description>
 		<year>1984</year>
 		<publisher>Mirrorsoft</publisher>
 		<part name="cass" interface="bbc_cass">
@@ -8389,7 +8389,7 @@
 	<software name="multibas">
 		<description>Multi Base</description>
 		<year>198?</year>
-		<publisher>GSoft</publisher>
+		<publisher>G.Soft Micro Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6083">
 				<rom name="multibase(gsoft).uef" size="6083" crc="2bb6b216" sha1="98a41974fef1a627b9074511d6776ea5f8eb9604" offset="0" />
@@ -8802,7 +8802,7 @@
 
 	<software name="osprey">
 		<description>Osprey!</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Bourne Educational Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7916">
@@ -9168,8 +9168,8 @@
 
 	<software name="pilgrims">
 		<description>Pilgrims Progress</description>
-		<year>198?</year>
-		<publisher>Su</publisher>
+		<year>1984</year>
+		<publisher>Scripture Union</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="16608">
 				<rom name="pilgrimsprogress(su).uef" size="16608" crc="e398ab12" sha1="2e3e44a37425eefbf8dcfcd5498d9d6bf5b096bd" offset="0" />
@@ -9627,7 +9627,7 @@
 
 	<software name="plinkjoy">
 		<description>ProLink Joystick Software</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Aztec</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="1204">
@@ -10696,7 +10696,7 @@
 
 	<software name="scrabble">
 		<description>Scrabble</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Leisure Genius</publisher>
 		<info name="usage" value="Load with *RUN" />
 		<part name="cass" interface="bbc_cass">
@@ -12605,7 +12605,7 @@
 
 	<software name="sys15000">
 		<description>System 15000 2nd Edition</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>AVS</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="14846">
@@ -12840,8 +12840,8 @@
 
 	<software name="textedit">
 		<description>Text Editor</description>
-		<year>198?</year>
-		<publisher>GSoft</publisher>
+		<year>1983</year>
+		<publisher>G.Soft Micro Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="3704">
 				<rom name="texteditor(gsoft).uef" size="3704" crc="d53b31be" sha1="bc78da4c6f8ee3aee94fad0d72520a826d4a6625" offset="0" />
@@ -13057,7 +13057,7 @@
 
 	<software name="intercit">
 		<description>The Inter-City</description>
-		<year>198?</year>
+		<year>1988</year>
 		<publisher>SRS</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="13173">
@@ -13350,7 +13350,7 @@
 		<year>1983</year>
 		<publisher>Gemini</publisher>
 		<part name="cass1" interface="bbc_cass">
-			<feature name="part_id" value="Accordian"/>
+			<feature name="part_id" value="Accordion"/>
 			<dataarea name="cass" size="2672">
 				<rom name="tg-accordian_be(1983)(gemini).uef" size="2672" crc="3a620f75" sha1="5c1fda51b7d6211cf87a6f8f3a1ca0878bb7ad61" offset="0" />
 			</dataarea>
@@ -14255,7 +14255,7 @@
 
 	<software name="willconq">
 		<description>William the Conqueror</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Molimerx</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="12863">
@@ -14809,8 +14809,8 @@
 
 	<software name="spreadsh">
 		<description>The Spreadsheet</description>
-		<year>198?</year>
-		<publisher>Microl</publisher>
+		<year>1983</year>
+		<publisher>MiCROL</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="7944">
 				<rom name="thespreadsheet(microl).uef" size="7944" crc="1e5fa9ee" sha1="63dba2668ad469d1b97e127053b6701d090a15ca" offset="0" />
@@ -15302,7 +15302,7 @@
 
 	<software name="happynum">
 		<description>Happy Numbers</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Bourne Educational Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="4676">
@@ -15414,7 +15414,7 @@
 
 	<software name="maprally">
 		<description>Map Rally</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Bourne Educational Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6957">
@@ -15656,7 +15656,7 @@
 
 	<software name="timeman2">
 		<description>Timeman Two</description>
-		<year>198?</year>
+		<year>1983</year>
 		<publisher>Bourne Educational Software</publisher>
 		<part name="cass" interface="bbc_cass">
 			<dataarea name="cass" size="6802">
@@ -15920,7 +15920,7 @@
 
 	<software name="amxart">
 		<description>AMX Art</description>
-		<year>198?</year>
+		<year>1984</year>
 		<publisher>Advanced Memory Systems</publisher>
 		<part name="cass1" interface="bbc_cass">
 			<feature name="part_id" value="Side 1"/>
@@ -16171,6 +16171,42 @@
 			<feature name="part_id" value="Side 2"/>
 			<dataarea name="cass" size="23660">
 				<rom name="linkwordspanish-side2(1984)(acornsoft)(x15).uef" size="23660" crc="f9c3f2fa" sha1="f07f2ebb9e6c9542ae748a5cdb1eac8dab48796d" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmspack1">
+		<description>The Music System: Cassette Pack 1</description>
+		<year>1984</year>
+		<publisher>Island Logic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Synthesiser - Keyboard"/>
+			<dataarea name="cass" size="39518">
+				<rom name="The Music System (Island Logic) (B) (Tape) [Tape1-Side1].hq.uef" size="39518" crc="4a8c5c3e" sha1="5ea92f5e6b5756afad55227cf3d387214ed91feb" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Song &amp; Sound Library"/>
+			<dataarea name="cass" size="1734">
+				<rom name="The Music System (Island Logic) (B) (Tape) [Tape1-Side2].hq.uef" size="1734" crc="8c6a404d" sha1="df1373a2b4f9ba08d1f59f28b4771142fb5a4594" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tmspack2">
+		<description>The Music System: Cassette Pack 2</description>
+		<year>1984</year>
+		<publisher>Island Logic</publisher>
+		<part name="cass1" interface="bbc_cass">
+			<feature name="part_id" value="Editor - Printout"/>
+			<dataarea name="cass" size="37616">
+				<rom name="The Music System (Island Logic) (B) (Tape) [Tape2-Side1].hq.uef" size="37616" crc="7ce07153" sha1="6e34072305d0b1ab7811290d04c227389420f653" offset="0" />
+			</dataarea>
+		</part>
+		<part name="cass2" interface="bbc_cass">
+			<feature name="part_id" value="Song &amp; Sound Library"/>
+			<dataarea name="cass" size="14602">
+				<rom name="The Music System (Island Logic) (B) (Tape) [Tape2-Side2].hq.uef" size="14602" crc="948c8cfe" sha1="bdf21dfa6f38df426d8d6d816fb8c1229ff49dc5" offset="0" />
 			</dataarea>
 		</part>
 	</software>

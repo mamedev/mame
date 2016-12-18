@@ -184,7 +184,7 @@ void menu_select_game::handle()
 	// if i have to reselect a software, force software list submenu
 	if (reselect_last::get())
 	{
-		const game_driver *driver = (const game_driver *)item[selected].ref;
+		const game_driver *const driver = reinterpret_cast<const game_driver *>(get_selection_ref());
 		menu::stack_push<menu_select_software>(ui(), container(), driver);
 		return;
 	}
@@ -493,7 +493,7 @@ void menu_select_game::handle()
 //  populate
 //-------------------------------------------------
 
-void menu_select_game::populate()
+void menu_select_game::populate(float &customtop, float &custombottom)
 {
 	ui_globals::redraw_icon = true;
 	ui_globals::switch_image = true;
@@ -1559,12 +1559,12 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 			rgb_t bgcolor = UI_TEXT_BG_COLOR;
 			rgb_t fgcolor = UI_TEXT_COLOR;
 
-			if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y1 + line_height_max > mouse_y)
+			if (mouse_in_rect(x1, y1, x2, y1 + line_height_max))
 			{
 				bgcolor = UI_MOUSEOVER_BG_COLOR;
 				fgcolor = UI_MOUSEOVER_COLOR;
 				hover = phover + filter;
-				menu::highlight(x1, y1, x2, y1+ line_height_max, bgcolor);
+				menu::highlight(x1, y1, x2, y1 + line_height_max, bgcolor);
 			}
 
 			if (highlight == filter && get_focus() == focused_menu::left)
@@ -1626,7 +1626,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;
@@ -1649,7 +1649,7 @@ float menu_select_game::draw_left_panel(float x1, float y1, float x2, float y2)
 
 		ui().draw_outlined_box(container(), x1, y1, x2, y2, rgb_t(0xEF, 0x12, 0x47, 0x7B));
 
-		if (mouse_hit && x1 <= mouse_x && x2 > mouse_x && y1 <= mouse_y && y2 > mouse_y)
+		if (mouse_in_rect(x1, y1, x2, y2))
 		{
 			fgcolor = UI_MOUSEOVER_COLOR;
 			hover = HOVER_LPANEL_ARROW;

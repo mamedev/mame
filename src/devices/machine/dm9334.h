@@ -2,11 +2,11 @@
 // copyright-holders:Ryan Holtz
 /*****************************************************************************
 
-	(DM)9334 8-Bit Addressable Latch
+    (DM)9334 8-Bit Addressable Latch
 
 ******************************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
               ___ ___
        A0  1 |*  u   | 16  Vcc
        A1  2 |       | 15  /C
@@ -19,49 +19,49 @@
 
 ***********************************************************************
 
-	Function Tables:
+    Function Tables:
 
-	/E	/C	Mode
-	L	H	Addressable Latch
-	H	H	Memory
-	L	L	Active High Eight
-			Channel Demultiplexer
-	H	L	Clear
+    /E  /C  Mode
+    L   H   Addressable Latch
+    H   H   Memory
+    L   L   Active High Eight
+            Channel Demultiplexer
+    H   L   Clear
 
-	 ___________________________________________________________________________________________
-	|       Inputs              |              Present Output States              |             |
-	|---------------------------|-------------------------------------------------|     Mode    |
-	| /C  /E  | D | A0  A1  A2  | Q0    Q1    Q2    Q3    Q4    Q5    Q6    Q7    |             |
-	|---------|---|-------------|-------------------------------------------------|-------------|
-	|  L   H  | X |  X   X   X  |  L     L     L     L     L     L     L     L    |    Clear    |
-	|---------|---|-------------|-------------------------------------------------|-------------|
-	|  L   L  | L |  L   L   L  |  L     L     L     L     L     L     L     L    |             |
-	|  L   L  | H |  L   L   L  |  H     L     L     L     L     L     L     L    |             |
-	|  L   L  | L |  H   L   L  |  L     L     L     L     L     L     L     L    |             |
-	|  L   L  | H |  H   L   L  |  L     H     L     L     L     L     L     L    |             |
-	|  *   *  | * |      *      |                    *                            | Demultiplex |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  L   L  | H |  H   H   H  |  L     L     L     L     L     L     L     H    |             |
-	|---------|---|-------------|-------------------------------------------------|-------------|
-	|  H   H  | X |  X   X   X  |  Qn-1                                           |    Memory   |
-	|---------|---|-------------|-------------------------------------------------|-------------|
-	|  H   L  | L |  L   L   L  |  L     Qn-1  Qn-1  Qn-1                         |             |
-	|  H   L  | H |  L   L   L  |  H     Qn-1  Qn-1                               |             |
-	|  H   L  | L |  H   L   L  |  Qn-1  L     Qn-1                               |             |
-	|  H   L  | H |  H   L   L  |  Qn-1  H     Qn-1                               |             |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  *   *  | * |      *      |                    *                            |             |
-	|  H   L  | L |  H   H   H  |  Qn-1                                Qn-1  L    |             |
-	|  H   L  | H |  H   H   H  |  Qn-1                                Qn-1  H    |             |
-	|---------|---|-------------|-------------------------------------------------|-------------|
+     ___________________________________________________________________________________________
+    |       Inputs              |              Present Output States              |             |
+    |---------------------------|-------------------------------------------------|     Mode    |
+    | /C  /E  | D | A0  A1  A2  | Q0    Q1    Q2    Q3    Q4    Q5    Q6    Q7    |             |
+    |---------|---|-------------|-------------------------------------------------|-------------|
+    |  L   H  | X |  X   X   X  |  L     L     L     L     L     L     L     L    |    Clear    |
+    |---------|---|-------------|-------------------------------------------------|-------------|
+    |  L   L  | L |  L   L   L  |  L     L     L     L     L     L     L     L    |             |
+    |  L   L  | H |  L   L   L  |  H     L     L     L     L     L     L     L    |             |
+    |  L   L  | L |  H   L   L  |  L     L     L     L     L     L     L     L    |             |
+    |  L   L  | H |  H   L   L  |  L     H     L     L     L     L     L     L    |             |
+    |  *   *  | * |      *      |                    *                            | Demultiplex |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  L   L  | H |  H   H   H  |  L     L     L     L     L     L     L     H    |             |
+    |---------|---|-------------|-------------------------------------------------|-------------|
+    |  H   H  | X |  X   X   X  |  Qn-1                                           |    Memory   |
+    |---------|---|-------------|-------------------------------------------------|-------------|
+    |  H   L  | L |  L   L   L  |  L     Qn-1  Qn-1  Qn-1                         |             |
+    |  H   L  | H |  L   L   L  |  H     Qn-1  Qn-1                               |             |
+    |  H   L  | L |  H   L   L  |  Qn-1  L     Qn-1                               |             |
+    |  H   L  | H |  H   L   L  |  Qn-1  H     Qn-1                               |             |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  *   *  | * |      *      |                    *                            |             |
+    |  H   L  | L |  H   H   H  |  Qn-1                                Qn-1  L    |             |
+    |  H   L  | H |  H   H   H  |  Qn-1                                Qn-1  H    |             |
+    |---------|---|-------------|-------------------------------------------------|-------------|
 
-	X = Don't Care Condition
-	L = Low Voltage Level
-	H = High Voltage Level
-	Qn-1 = Previous Output State
+    X = Don't Care Condition
+    L = Low Voltage Level
+    H = High Voltage Level
+    Qn-1 = Previous Output State
 
 **********************************************************************/
 
@@ -168,13 +168,13 @@ private:
 	devcb_write_line m_q7_func;
 
 	// inputs
-	uint8_t m_e;		// pin 14
-	uint8_t m_c;		// pin 15
-	uint8_t m_d;		// pin 13
-	uint8_t m_a;		// pins 1-3 from LSB to MSB
+	uint8_t m_e;        // pin 14
+	uint8_t m_c;        // pin 15
+	uint8_t m_d;        // pin 13
+	uint8_t m_a;        // pins 1-3 from LSB to MSB
 
 	// outputs
-	uint8_t m_out;		// pins 4-7 and 9-12 from LSB to MSB
+	uint8_t m_out;      // pins 4-7 and 9-12 from LSB to MSB
 };
 
 // device type definition

@@ -18,8 +18,8 @@
 
     The second set of macros represents the core gfx/bitmap walking
     and rendering code. These macros generally take the target pixel
-    type (uint8_t, uint16_t, uint32_t), one of the PIXEL_OP* macros,
-    and a priority bitmap pixel type (uint8_t, uint16_t, uint32_t, or the
+    type (u8, u16, u32), one of the PIXEL_OP* macros,
+    and a priority bitmap pixel type (u8, u16, u32, or the
     special type NO_PRIORITY).
 
     Although the code may look inefficient at first, the compiler is
@@ -88,7 +88,7 @@ while (0)
 #define PIXEL_OP_COPY_TRANSPEN(DEST, PRIORITY, SOURCE)                              \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 		(DEST) = SOURCE;                                                            \
 }                                                                                   \
@@ -145,7 +145,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSPEN(DEST, PRIORITY, SOURCE)                             \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
@@ -153,7 +153,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)                    \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
@@ -172,7 +172,7 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSPEN(DEST, PRIORITY, SOURCE)                            \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 		(DEST) = color + srcdata;                                                   \
 }                                                                                   \
@@ -180,7 +180,7 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSPEN_PRIORITY(DEST, PRIORITY, SOURCE)                   \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
@@ -199,7 +199,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSMASK(DEST, PRIORITY, SOURCE)                            \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 		(DEST) = paldata[srcdata];                                                  \
 }                                                                                   \
@@ -207,7 +207,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE)                   \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
@@ -226,7 +226,7 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSMASK(DEST, PRIORITY, SOURCE)                           \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 		(DEST) = color + srcdata;                                                   \
 }                                                                                   \
@@ -234,7 +234,7 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSMASK_PRIORITY(DEST, PRIORITY, SOURCE)                  \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (((trans_mask >> srcdata) & 1) == 0)                                         \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
@@ -263,8 +263,8 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSTABLE16(DEST, PRIORITY, SOURCE)                        \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
-	uint32_t entry = pentable[srcdata];                                               \
+	u32 srcdata = (SOURCE);                                                         \
+	u32 entry = pentable[srcdata];                                                  \
 	if (entry != DRAWMODE_NONE)                                                     \
 	{                                                                               \
 		if (entry == DRAWMODE_SOURCE)                                               \
@@ -277,8 +277,8 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSTABLE32(DEST, PRIORITY, SOURCE)                         \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
-	uint32_t entry = pentable[srcdata];                                               \
+	u32 srcdata = (SOURCE);                                                         \
+	u32 entry = pentable[srcdata];                                                  \
 	if (entry != DRAWMODE_NONE)                                                     \
 	{                                                                               \
 		if (entry == DRAWMODE_SOURCE)                                               \
@@ -291,11 +291,11 @@ while (0)
 #define PIXEL_OP_REBASE_TRANSTABLE16_PRIORITY(DEST, PRIORITY, SOURCE)               \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
-	uint32_t entry = pentable[srcdata];                                               \
+	u32 srcdata = (SOURCE);                                                         \
+	u32 entry = pentable[srcdata];                                                  \
 	if (entry != DRAWMODE_NONE)                                                     \
 	{                                                                               \
-		uint8_t pridata = (PRIORITY);                                                 \
+		u8 pridata = (PRIORITY);                                                    \
 		if (entry == DRAWMODE_SOURCE)                                               \
 		{                                                                           \
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)                             \
@@ -313,11 +313,11 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSTABLE32_PRIORITY(DEST, PRIORITY, SOURCE)                \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
-	uint32_t entry = pentable[srcdata];                                               \
+	u32 srcdata = (SOURCE);                                                         \
+	u32 entry = pentable[srcdata];                                                  \
 	if (entry != DRAWMODE_NONE)                                                     \
 	{                                                                               \
-		uint8_t pridata = (PRIORITY);                                                 \
+		u8 pridata = (PRIORITY);                                                    \
 		if (entry == DRAWMODE_SOURCE)                                               \
 		{                                                                           \
 			if (((1 << (pridata & 0x1f)) & pmask) == 0)                             \
@@ -344,7 +344,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_ALPHA32(DEST, PRIORITY, SOURCE)                     \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 		(DEST) = alpha_blend_r32((DEST), paldata[srcdata], alpha_val);              \
 }                                                                                   \
@@ -352,7 +352,7 @@ while (0)
 #define PIXEL_OP_REMAP_TRANSPEN_ALPHA32_PRIORITY(DEST, PRIORITY, SOURCE)            \
 do                                                                                  \
 {                                                                                   \
-	uint32_t srcdata = (SOURCE);                                                      \
+	u32 srcdata = (SOURCE);                                                         \
 	if (srcdata != trans_pen)                                                       \
 	{                                                                               \
 		if (((1 << ((PRIORITY) & 0x1f)) & pmask) == 0)                              \
@@ -373,90 +373,90 @@ while (0)
         bitmap_t &dest - the bitmap to render to
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
         gfx_element *gfx - pointer to the gfx_element to render
-        uint32_t code - index of the entry within gfx_element
-        uint32_t color - index of the color within gfx_element
+        u32 code - index of the entry within gfx_element
+        u32 color - index of the color within gfx_element
         int flipx - non-zero means render right-to-left instead of left-to-right
         int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-        int32_t destx - the top-left X coordinate to render to
-        int32_t desty - the top-left Y coordinate to render to
+        s32 destx - the top-left X coordinate to render to
+        s32 desty - the top-left Y coordinate to render to
         bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 
-#define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                               \
-do {                                                                                    \
-	g_profiler.start(PROFILER_DRAWGFX);                                                 \
-	do {                                                                                \
-		const uint8_t *srcdata;                                                           \
-		int32_t destendx, destendy;                                                       \
-		int32_t srcx, srcy;                                                               \
-		int32_t curx, cury;                                                               \
-		int32_t dy;                                                                       \
-																						\
-		assert(dest.valid());                                                           \
-		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
-		assert(dest.cliprect().contains(cliprect));                                     \
-		assert(code < elements());                                             \
-																						\
-		/* ignore empty/invalid cliprects */                                            \
-		if (cliprect.empty())                                                           \
-			break;                                                                      \
-																						\
-		/* compute final pixel in X and exit if we are entirely clipped */              \
-		destendx = destx + width() - 1;                                                \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
-			break;                                                                      \
-																						\
-		/* apply left clip */                                                           \
-		srcx = 0;                                                                       \
-		if (destx < cliprect.min_x)                                                     \
-		{                                                                               \
-			srcx = cliprect.min_x - destx;                                              \
-			destx = cliprect.min_x;                                                     \
-		}                                                                               \
-																						\
-		/* apply right clip */                                                          \
-		if (destendx > cliprect.max_x)                                                  \
-			destendx = cliprect.max_x;                                                  \
-																						\
-		/* compute final pixel in Y and exit if we are entirely clipped */              \
-		destendy = desty + height() - 1;                                               \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
-			break;                                                                      \
-																						\
-		/* apply top clip */                                                            \
-		srcy = 0;                                                                       \
-		if (desty < cliprect.min_y)                                                     \
-		{                                                                               \
-			srcy = cliprect.min_y - desty;                                              \
-			desty = cliprect.min_y;                                                     \
-		}                                                                               \
-																						\
-		/* apply bottom clip */                                                         \
-		if (destendy > cliprect.max_y)                                                  \
-			destendy = cliprect.max_y;                                                  \
-																						\
-		/* apply X flipping */                                                          \
-		if (flipx)                                                                      \
-			srcx = width() - 1 - srcx;                                             \
-																						\
-		/* apply Y flipping */                                                          \
-		dy = rowbytes();                                                           \
-		if (flipy)                                                                      \
-		{                                                                               \
-			srcy = height() - 1 - srcy;                                                \
-			dy = -dy;                                                                   \
-		}                                                                               \
-																						\
-		/* fetch the source data */                                                     \
-		srcdata = get_data(code);                                      \
-																						\
+#define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                           \
+do {                                                                                \
+	g_profiler.start(PROFILER_DRAWGFX);                                             \
+	do {                                                                            \
+		const u8 *srcdata;                                                          \
+		s32 destendx, destendy;                                                     \
+		s32 srcx, srcy;                                                             \
+		s32 curx, cury;                                                             \
+		s32 dy;                                                                     \
+																					\
+		assert(dest.valid());                                                       \
+		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                 \
+		assert(dest.cliprect().contains(cliprect));                                 \
+		assert(code < elements());                                                  \
+																					\
+		/* ignore empty/invalid cliprects */                                        \
+		if (cliprect.empty())                                                       \
+			break;                                                                  \
+																					\
+		/* compute final pixel in X and exit if we are entirely clipped */          \
+		destendx = destx + width() - 1;                                             \
+		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+			break;                                                                  \
+																					\
+		/* apply left clip */                                                       \
+		srcx = 0;                                                                   \
+		if (destx < cliprect.min_x)                                                 \
+		{                                                                           \
+			srcx = cliprect.min_x - destx;                                          \
+			destx = cliprect.min_x;                                                 \
+		}                                                                           \
+																					\
+		/* apply right clip */                                                      \
+		if (destendx > cliprect.max_x)                                              \
+			destendx = cliprect.max_x;                                              \
+																					\
+		/* compute final pixel in Y and exit if we are entirely clipped */          \
+		destendy = desty + height() - 1;                                            \
+		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+			break;                                                                  \
+																					\
+		/* apply top clip */                                                        \
+		srcy = 0;                                                                   \
+		if (desty < cliprect.min_y)                                                 \
+		{                                                                           \
+			srcy = cliprect.min_y - desty;                                          \
+			desty = cliprect.min_y;                                                 \
+		}                                                                           \
+																					\
+		/* apply bottom clip */                                                     \
+		if (destendy > cliprect.max_y)                                              \
+			destendy = cliprect.max_y;                                              \
+																					\
+		/* apply X flipping */                                                      \
+		if (flipx)                                                                  \
+			srcx = width() - 1 - srcx;                                              \
+																					\
+		/* apply Y flipping */                                                      \
+		dy = rowbytes();                                                            \
+		if (flipy)                                                                  \
+		{                                                                           \
+			srcy = height() - 1 - srcy;                                             \
+			dy = -dy;                                                               \
+		}                                                                           \
+																					\
+		/* fetch the source data */                                                 \
+		srcdata = get_data(code);                                                   \
+																					\
 		/* compute how many blocks of 4 pixels we have */                           \
-		uint32_t numblocks = (destendx + 1 - destx) / 4;                              \
-		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
+		u32 numblocks = (destendx + 1 - destx) / 4;                                 \
+		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;                     \
 																					\
 		/* adjust srcdata to point to the first source pixel of the row */          \
-		srcdata += srcy * rowbytes() + srcx;                                   \
+		srcdata += srcy * rowbytes() + srcx;                                        \
 																					\
 		/* non-flipped 8bpp case */                                                 \
 		if (!flipx)                                                                 \
@@ -466,7 +466,7 @@ do {                                                                            
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				const u8 *srcptr = srcdata;                                         \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -501,7 +501,7 @@ do {                                                                            
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
-				const uint8_t *srcptr = srcdata;                                      \
+				const u8 *srcptr = srcdata;                                         \
 				srcdata += dy;                                                      \
 																					\
 				/* iterate over unrolled blocks of 4 */                             \
@@ -527,8 +527,8 @@ do {                                                                            
 				}                                                                   \
 			}                                                                       \
 		}                                                                           \
-	} while (0);                                                                        \
-	g_profiler.stop();                                                                  \
+	} while (0);                                                                    \
+	g_profiler.stop();                                                              \
 } while (0)
 
 
@@ -543,112 +543,112 @@ do {                                                                            
         bitmap_t &dest - the bitmap to render to
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
         gfx_element *gfx - pointer to the gfx_element to render
-        uint32_t code - index of the entry within gfx_element
-        uint32_t color - index of the color within gfx_element
+        u32 code - index of the entry within gfx_element
+        u32 color - index of the color within gfx_element
         int flipx - non-zero means render right-to-left instead of left-to-right
         int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-        int32_t destx - the top-left X coordinate to render to
-        int32_t desty - the top-left Y coordinate to render to
-        uint32_t scalex - the 16.16 scale factor in the X dimension
-        uint32_t scaley - the 16.16 scale factor in the Y dimension
+        s32 destx - the top-left X coordinate to render to
+        s32 desty - the top-left Y coordinate to render to
+        u32 scalex - the 16.16 scale factor in the X dimension
+        u32 scaley - the 16.16 scale factor in the Y dimension
         bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 
-#define DRAWGFXZOOM_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                           \
-do {                                                                                    \
-	g_profiler.start(PROFILER_DRAWGFX);                                                 \
-	do {                                                                                \
-		const uint8_t *srcdata;                                                           \
-		uint32_t dstwidth, dstheight;                                                     \
-		int32_t destendx, destendy;                                                       \
-		int32_t srcx, srcy;                                                               \
-		int32_t curx, cury;                                                               \
-		int32_t dx, dy;                                                                   \
-																						\
-		assert(dest.valid());                                                           \
-		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
-		assert(dest.cliprect().contains(cliprect));                                     \
-																						\
-		/* ignore empty/invalid cliprects */                                            \
-		if (cliprect.empty())                                                           \
-			break;                                                                      \
-																						\
-		/* compute scaled size */                                                       \
-		dstwidth = (scalex * width() + 0x8000) >> 16;                              \
-		dstheight = (scaley * height() + 0x8000) >> 16;                                \
-		if (dstwidth < 1 || dstheight < 1)                                              \
-			break;                                                                      \
-																						\
-		/* compute 16.16 source steps in dx and dy */                                   \
-		dx = (width() << 16) / dstwidth;                                               \
-		dy = (height() << 16) / dstheight;                                         \
-																						\
-		/* compute final pixel in X and exit if we are entirely clipped */              \
-		destendx = destx + dstwidth - 1;                                                \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
-			break;                                                                      \
-																						\
-		/* apply left clip */                                                           \
-		srcx = 0;                                                                       \
+#define DRAWGFXZOOM_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                       \
+do {                                                                                \
+	g_profiler.start(PROFILER_DRAWGFX);                                             \
+	do {                                                                            \
+		const u8 *srcdata;                                                          \
+		u32 dstwidth, dstheight;                                                    \
+		s32 destendx, destendy;                                                     \
+		s32 srcx, srcy;                                                             \
+		s32 curx, cury;                                                             \
+		s32 dx, dy;                                                                 \
+																					\
+		assert(dest.valid());                                                       \
+		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                 \
+		assert(dest.cliprect().contains(cliprect));                                 \
+																					\
+		/* ignore empty/invalid cliprects */                                        \
+		if (cliprect.empty())                                                       \
+			break;                                                                  \
+																					\
+		/* compute scaled size */                                                   \
+		dstwidth = (scalex * width() + 0x8000) >> 16;                               \
+		dstheight = (scaley * height() + 0x8000) >> 16;                             \
+		if (dstwidth < 1 || dstheight < 1)                                          \
+			break;                                                                  \
+																					\
+		/* compute 16.16 source steps in dx and dy */                               \
+		dx = (width() << 16) / dstwidth;                                            \
+		dy = (height() << 16) / dstheight;                                          \
+																					\
+		/* compute final pixel in X and exit if we are entirely clipped */          \
+		destendx = destx + dstwidth - 1;                                            \
+		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+			break;                                                                  \
+																					\
+		/* apply left clip */                                                       \
+		srcx = 0;                                                                   \
 		if (destx < cliprect.min_x)                                                 \
-		{                                                                               \
-			srcx = (cliprect.min_x - destx) * dx;                                       \
+		{                                                                           \
+			srcx = (cliprect.min_x - destx) * dx;                                   \
 			destx = cliprect.min_x;                                                 \
-		}                                                                               \
-																						\
-		/* apply right clip */                                                          \
-		if (destendx > cliprect.max_x)                                                  \
-			destendx = cliprect.max_x;                                                  \
-																						\
-		/* compute final pixel in Y and exit if we are entirely clipped */              \
-		destendy = desty + dstheight - 1;                                               \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
-		{                                                                               \
-			g_profiler.stop();                                                  \
-			return;                                                                     \
-		}                                                                               \
-																						\
-		/* apply top clip */                                                            \
-		srcy = 0;                                                                       \
+		}                                                                           \
+																					\
+		/* apply right clip */                                                      \
+		if (destendx > cliprect.max_x)                                              \
+			destendx = cliprect.max_x;                                              \
+																					\
+		/* compute final pixel in Y and exit if we are entirely clipped */          \
+		destendy = desty + dstheight - 1;                                           \
+		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+		{                                                                           \
+			g_profiler.stop();                                                      \
+			return;                                                                 \
+		}                                                                           \
+																					\
+		/* apply top clip */                                                        \
+		srcy = 0;                                                                   \
 		if (desty < cliprect.min_y)                                                 \
-		{                                                                               \
-			srcy = (cliprect.min_y - desty) * dy;                                       \
+		{                                                                           \
+			srcy = (cliprect.min_y - desty) * dy;                                   \
 			desty = cliprect.min_y;                                                 \
-		}                                                                               \
-																						\
-		/* apply bottom clip */                                                         \
-		if (destendy > cliprect.max_y)                                                  \
-			destendy = cliprect.max_y;                                                  \
-																						\
-		/* apply X flipping */                                                          \
-		if (flipx)                                                                      \
-		{                                                                               \
-			srcx = (dstwidth - 1) * dx - srcx;                                          \
-			dx = -dx;                                                                   \
-		}                                                                               \
-																						\
-		/* apply Y flipping */                                                          \
-		if (flipy)                                                                      \
-		{                                                                               \
-			srcy = (dstheight - 1) * dy - srcy;                                         \
-			dy = -dy;                                                                   \
-		}                                                                               \
-																						\
-		/* fetch the source data */                                                     \
-		srcdata = get_data(code);                                      \
-																						\
+		}                                                                           \
+																					\
+		/* apply bottom clip */                                                     \
+		if (destendy > cliprect.max_y)                                              \
+			destendy = cliprect.max_y;                                              \
+																					\
+		/* apply X flipping */                                                      \
+		if (flipx)                                                                  \
+		{                                                                           \
+			srcx = (dstwidth - 1) * dx - srcx;                                      \
+			dx = -dx;                                                               \
+		}                                                                           \
+																					\
+		/* apply Y flipping */                                                      \
+		if (flipy)                                                                  \
+		{                                                                           \
+			srcy = (dstheight - 1) * dy - srcy;                                     \
+			dy = -dy;                                                               \
+		}                                                                           \
+																					\
+		/* fetch the source data */                                                 \
+		srcdata = get_data(code);                                                   \
+																					\
 		/* compute how many blocks of 4 pixels we have */                           \
-		uint32_t numblocks = (destendx + 1 - destx) / 4;                              \
-		uint32_t leftovers = (destendx + 1 - destx) - 4 * numblocks;                  \
+		u32 numblocks = (destendx + 1 - destx) / 4;                                 \
+		u32 leftovers = (destendx + 1 - destx) - 4 * numblocks;                     \
 																					\
 		/* iterate over pixels in Y */                                              \
 		for (cury = desty; cury <= destendy; cury++)                                \
 		{                                                                           \
 			PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
 			PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);              \
-			const uint8_t *srcptr = srcdata + (srcy >> 16) * rowbytes();     \
-			int32_t cursrcx = srcx;                                                   \
+			const u8 *srcptr = srcdata + (srcy >> 16) * rowbytes();                 \
+			s32 cursrcx = srcx;                                                     \
 			srcy += dy;                                                             \
 																					\
 			/* iterate over unrolled blocks of 4 */                                 \
@@ -676,8 +676,8 @@ do {                                                                            
 				PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);                         \
 			}                                                                       \
 		}                                                                           \
-	} while (0);                                                                        \
-	g_profiler.stop();                                                      \
+	} while (0);                                                                    \
+	g_profiler.stop();                                                              \
 } while (0)
 
 
@@ -694,161 +694,161 @@ do {                                                                            
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
         int flipx - non-zero means render right-to-left instead of left-to-right
         int flipy - non-zero means render bottom-to-top instead of top-to-bottom
-        int32_t destx - the top-left X coordinate to copy to
-        int32_t desty - the top-left Y coordinate to copy to
+        s32 destx - the top-left X coordinate to copy to
+        s32 desty - the top-left Y coordinate to copy to
         bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
-#define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                            \
-do {                                                                                    \
-	g_profiler.start(PROFILER_COPYBITMAP);                                                  \
-	do {                                                                                \
-		const PIXEL_TYPE *srcdata;                                                      \
-		uint32_t numblocks, leftovers;                                                    \
-		int32_t destendx, destendy;                                                       \
-		int32_t srcx, srcy;                                                               \
-		int32_t curx, cury;                                                               \
-		int32_t dx, dy;                                                                   \
-																						\
-		assert(dest.valid());                                                           \
-		assert(src.valid());                                                            \
-		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
-		assert(dest.cliprect().contains(cliprect));                                     \
-																						\
-		/* ignore empty/invalid cliprects */                                            \
-		if (cliprect.empty())                                                           \
-			break;                                                                      \
-																						\
-		/* standard setup; dx counts bytes in X, dy counts pixels in Y */               \
-		dx = 1;                                                                         \
-		dy = src.rowpixels();                                                           \
-																						\
-		/* compute final pixel in X and exit if we are entirely clipped */              \
+#define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                        \
+do {                                                                                \
+	g_profiler.start(PROFILER_COPYBITMAP);                                          \
+	do {                                                                            \
+		const PIXEL_TYPE *srcdata;                                                  \
+		u32 numblocks, leftovers;                                                   \
+		s32 destendx, destendy;                                                     \
+		s32 srcx, srcy;                                                             \
+		s32 curx, cury;                                                             \
+		s32 dx, dy;                                                                 \
+																					\
+		assert(dest.valid());                                                       \
+		assert(src.valid());                                                        \
+		assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                 \
+		assert(dest.cliprect().contains(cliprect));                                 \
+																					\
+		/* ignore empty/invalid cliprects */                                        \
+		if (cliprect.empty())                                                       \
+			break;                                                                  \
+																					\
+		/* standard setup; dx counts bytes in X, dy counts pixels in Y */           \
+		dx = 1;                                                                     \
+		dy = src.rowpixels();                                                       \
+																					\
+		/* compute final pixel in X and exit if we are entirely clipped */          \
 		destendx = destx + src.width() - 1;                                         \
-		if (destx > cliprect.max_x || destendx < cliprect.min_x)                        \
-			break;                                                                      \
-																						\
-		/* apply left clip */                                                           \
-		srcx = 0;                                                                       \
+		if (destx > cliprect.max_x || destendx < cliprect.min_x)                    \
+			break;                                                                  \
+																					\
+		/* apply left clip */                                                       \
+		srcx = 0;                                                                   \
 		if (destx < cliprect.min_x)                                                 \
-		{                                                                               \
-			srcx = cliprect.min_x - destx;                                              \
+		{                                                                           \
+			srcx = cliprect.min_x - destx;                                          \
 			destx = cliprect.min_x;                                                 \
-		}                                                                               \
-																						\
-		/* apply right clip */                                                          \
-		if (destendx > cliprect.max_x)                                                  \
-			destendx = cliprect.max_x;                                                  \
-																						\
-		/* compute final pixel in Y and exit if we are entirely clipped */              \
-		destendy = desty + src.height() - 1;                                            \
-		if (desty > cliprect.max_y || destendy < cliprect.min_y)                        \
-			break;                                                                      \
-																						\
-		/* apply top clip */                                                            \
-		srcy = 0;                                                                       \
+		}                                                                           \
+																					\
+		/* apply right clip */                                                      \
+		if (destendx > cliprect.max_x)                                              \
+			destendx = cliprect.max_x;                                              \
+																					\
+		/* compute final pixel in Y and exit if we are entirely clipped */          \
+		destendy = desty + src.height() - 1;                                        \
+		if (desty > cliprect.max_y || destendy < cliprect.min_y)                    \
+			break;                                                                  \
+																					\
+		/* apply top clip */                                                        \
+		srcy = 0;                                                                   \
 		if (desty < cliprect.min_y)                                                 \
-		{                                                                               \
-			srcy = cliprect.min_y - desty;                                              \
+		{                                                                           \
+			srcy = cliprect.min_y - desty;                                          \
 			desty = cliprect.min_y;                                                 \
-		}                                                                               \
-																						\
-		/* apply bottom clip */                                                         \
-		if (destendy > cliprect.max_y)                                                  \
-			destendy = cliprect.max_y;                                                  \
-																						\
-		/* apply X flipping */                                                          \
-		if (flipx)                                                                      \
-		{                                                                               \
-			srcx = src.width() - 1 - srcx;                                              \
-			dx = -dx;                                                                   \
-		}                                                                               \
-																						\
-		/* apply Y flipping */                                                          \
-		if (flipy)                                                                      \
-		{                                                                               \
-			srcy = src.height() - 1 - srcy;                                             \
-			dy = -dy;                                                                   \
-		}                                                                               \
-																						\
-		/* compute how many blocks of 4 pixels we have */                               \
-		numblocks = (destendx + 1 - destx) / 4;                                         \
-		leftovers = (destendx + 1 - destx) - 4 * numblocks;                             \
-																						\
-		/* compute the address of the first source pixel of the first row */            \
-		srcdata = &src.pixt<PIXEL_TYPE>(srcy, srcx);                                    \
-																						\
-		/* non-flipped case */                                                          \
-		if (!flipx)                                                                     \
-		{                                                                               \
-			/* iterate over pixels in Y */                                              \
-			for (cury = desty; cury <= destendy; cury++)                                \
-			{                                                                           \
+		}                                                                           \
+																					\
+		/* apply bottom clip */                                                     \
+		if (destendy > cliprect.max_y)                                              \
+			destendy = cliprect.max_y;                                              \
+																					\
+		/* apply X flipping */                                                      \
+		if (flipx)                                                                  \
+		{                                                                           \
+			srcx = src.width() - 1 - srcx;                                          \
+			dx = -dx;                                                               \
+		}                                                                           \
+																					\
+		/* apply Y flipping */                                                      \
+		if (flipy)                                                                  \
+		{                                                                           \
+			srcy = src.height() - 1 - srcy;                                         \
+			dy = -dy;                                                               \
+		}                                                                           \
+																					\
+		/* compute how many blocks of 4 pixels we have */                           \
+		numblocks = (destendx + 1 - destx) / 4;                                     \
+		leftovers = (destendx + 1 - destx) - 4 * numblocks;                         \
+																					\
+		/* compute the address of the first source pixel of the first row */        \
+		srcdata = &src.pixt<PIXEL_TYPE>(srcy, srcx);                                \
+																					\
+		/* non-flipped case */                                                      \
+		if (!flipx)                                                                 \
+		{                                                                           \
+			/* iterate over pixels in Y */                                          \
+			for (cury = desty; cury <= destendy; cury++)                            \
+			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);              \
-				const PIXEL_TYPE *srcptr = srcdata;                                     \
-				srcdata += dy;                                                          \
-																						\
-				/* iterate over unrolled blocks of 4 */                                 \
-				for (curx = 0; curx < numblocks; curx++)                                \
-				{                                                                       \
-					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                         \
-					PIXEL_OP(destptr[1], priptr[1], srcptr[1]);                         \
-					PIXEL_OP(destptr[2], priptr[2], srcptr[2]);                         \
-					PIXEL_OP(destptr[3], priptr[3], srcptr[3]);                         \
-																						\
-					srcptr += 4;                                                        \
-					destptr += 4;                                                       \
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);                         \
-				}                                                                       \
-																						\
-				/* iterate over leftover pixels */                                      \
-				for (curx = 0; curx < leftovers; curx++)                                \
-				{                                                                       \
-					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                         \
-					srcptr++;                                                           \
-					destptr++;                                                          \
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);                         \
-				}                                                                       \
-			}                                                                           \
-		}                                                                               \
-																						\
-		/* flipped case */                                                              \
-		else                                                                            \
-		{                                                                               \
-			/* iterate over pixels in Y */                                              \
-			for (cury = desty; cury <= destendy; cury++)                                \
-			{                                                                           \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
+				const PIXEL_TYPE *srcptr = srcdata;                                 \
+				srcdata += dy;                                                      \
+																					\
+				/* iterate over unrolled blocks of 4 */                             \
+				for (curx = 0; curx < numblocks; curx++)                            \
+				{                                                                   \
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                     \
+					PIXEL_OP(destptr[1], priptr[1], srcptr[1]);                     \
+					PIXEL_OP(destptr[2], priptr[2], srcptr[2]);                     \
+					PIXEL_OP(destptr[3], priptr[3], srcptr[3]);                     \
+																					\
+					srcptr += 4;                                                    \
+					destptr += 4;                                                   \
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);                     \
+				}                                                                   \
+																					\
+				/* iterate over leftover pixels */                                  \
+				for (curx = 0; curx < leftovers; curx++)                            \
+				{                                                                   \
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                     \
+					srcptr++;                                                       \
+					destptr++;                                                      \
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);                     \
+				}                                                                   \
+			}                                                                       \
+		}                                                                           \
+																					\
+		/* flipped case */                                                          \
+		else                                                                        \
+		{                                                                           \
+			/* iterate over pixels in Y */                                          \
+			for (cury = desty; cury <= destendy; cury++)                            \
+			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, destx); \
-				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);              \
-				const PIXEL_TYPE *srcptr = srcdata;                                     \
-				srcdata += dy;                                                          \
-																						\
-				/* iterate over unrolled blocks of 4 */                                 \
-				for (curx = 0; curx < numblocks; curx++)                                \
-				{                                                                       \
-					PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);                        \
-					PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);                        \
-					PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);                        \
-					PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);                        \
-																						\
-					srcptr -= 4;                                                        \
-					destptr += 4;                                                       \
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);                         \
-				}                                                                       \
-																						\
-				/* iterate over leftover pixels */                                      \
-				for (curx = 0; curx < leftovers; curx++)                                \
-				{                                                                       \
-					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                         \
-					srcptr--;                                                           \
-					destptr++;                                                          \
-					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);                         \
-				}                                                                       \
-			}                                                                           \
-		}                                                                               \
-	} while (0);                                                                        \
-	g_profiler.stop();                                                      \
+				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, destx);          \
+				const PIXEL_TYPE *srcptr = srcdata;                                 \
+				srcdata += dy;                                                      \
+																					\
+				/* iterate over unrolled blocks of 4 */                             \
+				for (curx = 0; curx < numblocks; curx++)                            \
+				{                                                                   \
+					PIXEL_OP(destptr[0], priptr[0], srcptr[ 0]);                    \
+					PIXEL_OP(destptr[1], priptr[1], srcptr[-1]);                    \
+					PIXEL_OP(destptr[2], priptr[2], srcptr[-2]);                    \
+					PIXEL_OP(destptr[3], priptr[3], srcptr[-3]);                    \
+																					\
+					srcptr -= 4;                                                    \
+					destptr += 4;                                                   \
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 4);                     \
+				}                                                                   \
+																					\
+				/* iterate over leftover pixels */                                  \
+				for (curx = 0; curx < leftovers; curx++)                            \
+				{                                                                   \
+					PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                     \
+					srcptr--;                                                       \
+					destptr++;                                                      \
+					PRIORITY_ADVANCE(PRIORITY_TYPE, priptr, 1);                     \
+				}                                                                   \
+			}                                                                       \
+		}                                                                           \
+	} while (0);                                                                    \
+	g_profiler.stop();                                                              \
 } while (0)
 
 
@@ -863,21 +863,21 @@ do {                                                                            
         bitmap_t &dest - the bitmap to copy to
         bitmap_t &src - the bitmap to copy from (must be same bpp as dest)
         const rectangle &cliprect - a clipping rectangle (assumed to be clipped to the size of 'dest')
-        int32_t destx - the 16.16 source X position at destination pixel (0,0)
-        int32_t desty - the 16.16 source Y position at destination pixel (0,0)
-        int32_t incxx - the 16.16 amount to increment in source X for each destination X pixel
-        int32_t incyx - the 16.16 amount to increment in source Y for each destination X pixel
-        int32_t incxy - the 16.16 amount to increment in source X for each destination Y pixel
-        int32_t incyy - the 16.16 amount to increment in source Y for each destination Y pixel
+        s32 destx - the 16.16 source X position at destination pixel (0,0)
+        s32 desty - the 16.16 source Y position at destination pixel (0,0)
+        s32 incxx - the 16.16 amount to increment in source X for each destination X pixel
+        s32 incyx - the 16.16 amount to increment in source Y for each destination X pixel
+        s32 incxy - the 16.16 amount to increment in source X for each destination Y pixel
+        s32 incyy - the 16.16 amount to increment in source Y for each destination Y pixel
         int wraparound - non-zero means wrap when hitting the edges of the source
         bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
 
 #define COPYROZBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)                     \
 do {                                                                                \
-	uint32_t srcfixwidth, srcfixheight;                                               \
-	uint32_t numblocks, leftovers;                                                    \
-	int32_t curx, cury;                                                               \
+	u32 srcfixwidth, srcfixheight;                                                  \
+	u32 numblocks, leftovers;                                                       \
+	s32 curx, cury;                                                                 \
 																					\
 	g_profiler.start(PROFILER_COPYBITMAP);                                          \
 																					\
@@ -911,37 +911,37 @@ do {                                                                            
 		if (!wraparound)                                                            \
 		{                                                                           \
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)         \
+			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;                                           \
-				int32_t srcx = startx;                                                \
-				int32_t srcy = starty;                                                \
+				s32 srcx = startx;                                                  \
+				s32 srcy = starty;                                                  \
 																					\
 				starty += incyy;                                                    \
 																					\
 				/* check srcy for the whole row at once */                          \
-				if ((uint32_t)srcy < srcfixheight)                                    \
+				if ((u32)srcy < srcfixheight)                                       \
 				{                                                                   \
 					srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16);                     \
 																					\
 					/* iterate over unrolled blocks of 4 */                         \
 					for (curx = 0; curx < numblocks; curx++)                        \
 					{                                                               \
-						if ((uint32_t)srcx < srcfixwidth)                             \
+						if (u32(srcx) < srcfixwidth)                                \
 							PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]);    \
 						srcx += incxx;                                              \
 																					\
-						if ((uint32_t)srcx < srcfixwidth)                             \
+						if (u32(srcx) < srcfixwidth)                                \
 							PIXEL_OP(destptr[1], priptr[1], srcptr[srcx >> 16]);    \
 						srcx += incxx;                                              \
 																					\
-						if ((uint32_t)srcx < srcfixwidth)                             \
+						if (u32(srcx) < srcfixwidth)                                \
 							PIXEL_OP(destptr[2], priptr[2], srcptr[srcx >> 16]);    \
 						srcx += incxx;                                              \
 																					\
-						if ((uint32_t)srcx < srcfixwidth)                             \
+						if (u32(srcx) < srcfixwidth)                                \
 							PIXEL_OP(destptr[3], priptr[3], srcptr[srcx >> 16]);    \
 						srcx += incxx;                                              \
 																					\
@@ -952,7 +952,7 @@ do {                                                                            
 					/* iterate over leftover pixels */                              \
 					for (curx = 0; curx < leftovers; curx++)                        \
 					{                                                               \
-						if ((uint32_t)srcx < srcfixwidth)                             \
+						if (u32(srcx) < srcfixwidth)                                \
 							PIXEL_OP(destptr[0], priptr[0], srcptr[srcx >> 16]);    \
 						srcx += incxx;                                              \
 						destptr++;                                                  \
@@ -972,12 +972,12 @@ do {                                                                            
 			starty &= srcfixheight;                                                 \
 																					\
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)         \
+			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr = &src.pixt<PIXEL_TYPE>(starty >> 16);     \
-				int32_t srcx = startx;                                                \
+				s32 srcx = startx;                                                  \
 																					\
 				starty = (starty + incyy) & srcfixheight;                           \
 																					\
@@ -1019,13 +1019,13 @@ do {                                                                            
 		if (!wraparound)                                                            \
 		{                                                                           \
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)         \
+			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;                                           \
-				int32_t srcx = startx;                                                \
-				int32_t srcy = starty;                                                \
+				s32 srcx = startx;                                                  \
+				s32 srcy = starty;                                                  \
 																					\
 				startx += incyx;                                                    \
 				starty += incyy;                                                    \
@@ -1033,7 +1033,7 @@ do {                                                                            
 				/* iterate over unrolled blocks of 4 */                             \
 				for (curx = 0; curx < numblocks; curx++)                            \
 				{                                                                   \
-					if ((uint32_t)srcx < srcfixwidth && (uint32_t)srcy < srcfixheight)  \
+					if (u32(srcx) < srcfixwidth && (u32)srcy < srcfixheight)        \
 					{                                                               \
 						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);     \
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                 \
@@ -1041,7 +1041,7 @@ do {                                                                            
 					srcx += incxx;                                                  \
 					srcy += incxy;                                                  \
 																					\
-					if ((uint32_t)srcx < srcfixwidth && (uint32_t)srcy < srcfixheight)  \
+					if (u32(srcx) < srcfixwidth && u32(srcy) < srcfixheight)        \
 					{                                                               \
 						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);     \
 						PIXEL_OP(destptr[1], priptr[1], srcptr[0]);                 \
@@ -1049,7 +1049,7 @@ do {                                                                            
 					srcx += incxx;                                                  \
 					srcy += incxy;                                                  \
 																					\
-					if ((uint32_t)srcx < srcfixwidth && (uint32_t)srcy < srcfixheight)  \
+					if (u32(srcx) < srcfixwidth && u32(srcy) < srcfixheight)        \
 					{                                                               \
 						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);     \
 						PIXEL_OP(destptr[2], priptr[2], srcptr[0]);                 \
@@ -1057,7 +1057,7 @@ do {                                                                            
 					srcx += incxx;                                                  \
 					srcy += incxy;                                                  \
 																					\
-					if ((uint32_t)srcx < srcfixwidth && (uint32_t)srcy < srcfixheight)  \
+					if (u32(srcx) < srcfixwidth && u32(srcy) < srcfixheight)        \
 					{                                                               \
 						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);     \
 						PIXEL_OP(destptr[3], priptr[3], srcptr[0]);                 \
@@ -1072,7 +1072,7 @@ do {                                                                            
 				/* iterate over leftover pixels */                                  \
 				for (curx = 0; curx < leftovers; curx++)                            \
 				{                                                                   \
-					if ((uint32_t)srcx < srcfixwidth && (uint32_t)srcy < srcfixheight)  \
+					if (u32(srcx) < srcfixwidth && u32(srcy) < srcfixheight)        \
 					{                                                               \
 						srcptr = &src.pixt<PIXEL_TYPE>(srcy >> 16, srcx >> 16);     \
 						PIXEL_OP(destptr[0], priptr[0], srcptr[0]);                 \
@@ -1095,13 +1095,13 @@ do {                                                                            
 			starty &= srcfixheight;                                                 \
 																					\
 			/* iterate over pixels in Y */                                          \
-			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)         \
+			for (cury = cliprect.min_y; cury <= cliprect.max_y; cury++)             \
 			{                                                                       \
 				PRIORITY_TYPE *priptr = PRIORITY_ADDR(priority, PRIORITY_TYPE, cury, cliprect.min_x); \
 				PIXEL_TYPE *destptr = &dest.pixt<PIXEL_TYPE>(cury, cliprect.min_x); \
 				const PIXEL_TYPE *srcptr;                                           \
-				int32_t srcx = startx;                                                \
-				int32_t srcy = starty;                                                \
+				s32 srcx = startx;                                                  \
+				s32 srcy = starty;                                                  \
 																					\
 				startx = (startx + incyx) & srcfixwidth;                            \
 				starty = (starty + incyy) & srcfixheight;                           \
@@ -1146,7 +1146,7 @@ do {                                                                            
 			}                                                                       \
 		}                                                                           \
 	}                                                                               \
-	g_profiler.stop();                                                          \
+	g_profiler.stop();                                                              \
 } while (0)
 
 
@@ -1159,9 +1159,9 @@ do {                                                                            
     Assumed input parameters or local variables:
 
         bitmap_t &bitmap - the bitmap to copy to
-        int32_t destx - the X coordinate to copy to
-        int32_t desty - the Y coordinate to copy to
-        int32_t length - the total number of pixels to copy
+        s32 destx - the X coordinate to copy to
+        s32 desty - the Y coordinate to copy to
+        s32 length - the total number of pixels to copy
         const UINTx *srcptr - pointer to memory containing the source pixels
         bitmap_t &priority - the priority bitmap (even if PRIORITY_TYPE is NO_PRIORITY, at least needs a dummy)
 */
@@ -1172,8 +1172,8 @@ do {                                                                            
 	assert(destx >= 0);                                                             \
 	assert(destx + length <= bitmap.width());                                       \
 	assert(desty >= 0);                                                             \
-	assert(desty < bitmap.height());                                                    \
-	assert(srcptr != nullptr);                                                         \
+	assert(desty < bitmap.height());                                                \
+	assert(srcptr != nullptr);                                                      \
 	assert(!PRIORITY_VALID(PRIORITY_TYPE) || priority.valid());                     \
 																					\
 	{                                                                               \
@@ -1215,9 +1215,9 @@ do {                                                                            
     Assumed input parameters:
 
         bitmap_t &bitmap - the bitmap to extract from
-        int32_t srcx - the X coordinate to begin extraction
-        int32_t srcy - the Y coordinate to begin extraction
-        int32_t length - the total number of pixels to extract
+        s32 srcx - the X coordinate to begin extraction
+        s32 srcy - the Y coordinate to begin extraction
+        s32 length - the total number of pixels to extract
         UINTx *destptr - pointer to memory to receive the extracted pixels
 */
 
@@ -1227,8 +1227,8 @@ do {                                                                            
 	assert(srcx >= 0);                                                              \
 	assert(srcx + length <= bitmap.width());                                        \
 	assert(srcy >= 0);                                                              \
-	assert(srcy < bitmap.height());                                             \
-	assert(destptr != nullptr);                                                        \
+	assert(srcy < bitmap.height());                                                 \
+	assert(destptr != nullptr);                                                     \
 																					\
 	{                                                                               \
 		const PIXEL_TYPE *srcptr = &bitmap.pixt<PIXEL_TYPE>(srcy, srcx);            \

@@ -103,7 +103,6 @@ static const uint8_t m58846_opmap[0xc0] =
 CPU_DISASSEMBLE(m58846)
 {
 	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x1ff;
-	char *dst = buffer;
 
 	// get opcode
 	uint8_t instr;
@@ -116,7 +115,7 @@ CPU_DISASSEMBLE(m58846)
 	else
 		instr = m58846_opmap[op];
 
-	dst += sprintf(dst, "%-6s", em_name[instr]);
+	util::stream_format(stream, "%-6s", em_name[instr]);
 
 	// get immediate param
 	uint8_t bits = em_bits[instr];
@@ -126,15 +125,15 @@ CPU_DISASSEMBLE(m58846)
 	{
 		uint8_t x = op >> 4 & 3;
 		uint8_t y = op & 0xf;
-		dst += sprintf(dst, " %d,%d", x, y);
+		util::stream_format(stream, " %d,%d", x, y);
 	}
 	else if (bits > 0)
 	{
 		uint8_t param = op & ((1 << bits) - 1);
 		if (bits > 4)
-			dst += sprintf(dst, " $%02X", param);
+			util::stream_format(stream, " $%02X", param);
 		else
-			dst += sprintf(dst, " %d", param);
+			util::stream_format(stream, " %d", param);
 	}
 
 	return 1 | em_flags[instr] | DASMFLAG_SUPPORTED;

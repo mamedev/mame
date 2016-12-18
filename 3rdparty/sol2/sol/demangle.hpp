@@ -142,13 +142,13 @@ namespace sol {
 		}
 
 		template <typename T>
-		inline std::string demangle() {
+		inline const std::string& demangle() {
 			static const std::string d = demangle_once<T>();
 			return d;
 		}
 
 		template <typename T>
-		inline std::string short_demangle() {
+		inline const std::string& short_demangle() {
 			static const std::string d = short_demangle_once<T>();
 			return d;
 		}

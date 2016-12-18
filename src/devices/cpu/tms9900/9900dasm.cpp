@@ -306,34 +306,36 @@ static inline uint16_t readop_arg(const uint8_t *opram, unsigned pc)
 	return result | opram[PC++ - pc];
 }
 
-static int print_arg (char *dest, int mode, int arg, const uint8_t *opram, unsigned pc)
+static void print_arg (std::ostream &stream, int mode, int arg, const uint8_t *opram, unsigned pc)
 {
 	int base;
 
 	switch (mode)
 	{
 		case 0x0:   /* workspace register */
-			return sprintf (dest, "R%d", arg);
+			util::stream_format(stream, "R%d", arg);
+			break;
 		case 0x1:   /* workspace register indirect */
-			return sprintf (dest, "*R%d", arg);
+			util::stream_format(stream, "*R%d", arg);
+			break;
 		case 0x2:   /* symbolic|indexed */
 			base = readop_arg(opram, pc);
 			if (arg)    /* indexed */
-				return sprintf (dest, "@>%04x(R%d)", base, arg);
+				util::stream_format(stream, "@>%04x(R%d)", base, arg);
 			else        /* symbolic (direct) */
-				return sprintf (dest, "@>%04x", base);
+				util::stream_format(stream, "@>%04x", base);
+			break;
 		case 0x3:   /* workspace register indirect auto increment */
-			return sprintf (dest, "*R%d+", arg);
+			util::stream_format(stream, "*R%d+", arg);
+			break;
 	}
-
-	return 0;
 }
 
 
 /*****************************************************************************
  *  Disassemble a single command and return the number of bytes it uses.
  *****************************************************************************/
-unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom, const uint8_t *opram)
+static unsigned Dasm9900 (std::ostream &stream, unsigned pc, int model_id, const uint8_t *oprom, const uint8_t *opram)
 {
 	int OP, OP2, opc;
 	int sarg, darg, smode, dmode;
@@ -485,20 +487,20 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		dmode = BITS(OP,4,5);
 		darg = BITS(OP,6,9);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
 		break;
 
 	case format_2a:     /* jump instructions */
 		displacement = (signed char)BITS(OP,8,15);
-		sprintf (buffer, "%-4s >%04x", mnemonic, 0xffff & (PC + displacement * 2));
+		util::stream_format(stream, "%-4s >%04x", mnemonic, 0xffff & (PC + displacement * 2));
 		break;
 
 	case format_2b:     /* bit I/O instructions */
 		displacement = (signed char)BITS(OP,8,15);
-		sprintf (buffer, "%-4s >%04x", mnemonic, 0xffff & displacement);
+		util::stream_format(stream, "%-4s >%04x", mnemonic, 0xffff & displacement);
 		break;
 
 	case format_3_9:    /* logical, multiply, and divide instructions */
@@ -513,15 +515,15 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 
 		if (format == format_3_9)
 		{
-			buffer += sprintf (buffer, "%-4s ", mnemonic);
-			buffer += print_arg (buffer, smode, sarg, opram, pc);
-			buffer += sprintf (buffer, ",R%d", darg);
+			util::stream_format(stream, "%-4s ", mnemonic);
+			print_arg(stream, smode, sarg, opram, pc);
+			util::stream_format(stream, ",R%d", darg);
 		}
 		else
 		{
-			buffer += sprintf (buffer, "%-4s ", mnemonic);
-			buffer += print_arg (buffer, smode, sarg, opram, pc);
-			buffer += sprintf (buffer, ",%d", darg);
+			util::stream_format(stream, "%-4s ", mnemonic);
+			print_arg(stream, smode, sarg, opram, pc);
+			util::stream_format(stream, ",%d", darg);
 		}
 		break;
 
@@ -529,39 +531,39 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		sarg = BITS(OP,12,15);
 		darg = BITS(OP,8,11);
 
-		sprintf (buffer, darg ? "%-4s R%d,%d" : "%-4s R%d,R%d", mnemonic, sarg, darg);
+		util::stream_format(stream, darg ? "%-4s R%d,%d" : "%-4s R%d,R%d", mnemonic, sarg, darg);
 		break;
 
 	case format_6:      /* single address instructions */
 		smode = BITS(OP,10,11);
 		sarg = BITS(OP,12,15);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
 		break;
 
 	case format_7:      /* instructions without operands */
-		sprintf (buffer, "%s", mnemonic);
+		util::stream_format(stream, "%s", mnemonic);
 		break;
 
 	case format_8a:     /* immediate instructions (destination register) */
 		darg = BITS(OP,12,15);
 		sarg = readop_arg(opram, pc);
 
-		sprintf (buffer, "%-4s R%d,>%04x", mnemonic, darg, sarg);
+		util::stream_format(stream, "%-4s R%d,>%04x", mnemonic, darg, sarg);
 		break;
 
 	case format_8b:     /* immediate instructions (no destination register) */
 		sarg = readop_arg(opram, pc);
 
-		sprintf (buffer, "%-4s >%04x", mnemonic, sarg);
+		util::stream_format(stream, "%-4s >%04x", mnemonic, sarg);
 		break;
 
 	case format_10:     /* memory map file instruction */
 		sarg = BITS(OP,12,15);
 		darg = BITS(OP,11,11);
 
-		sprintf (buffer, "%-4s R%d,%d", mnemonic, sarg, darg);
+		util::stream_format(stream, "%-4s R%d,%d", mnemonic, sarg, darg);
 		break;
 
 	case format_11:     /* multiple precision instructions */
@@ -573,11 +575,11 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		darg = BITS(OP2,6,9);
 		byte_count = BITS(OP2,0,3);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
-		buffer += sprintf (buffer, byte_count ? ",%d" : ",R%d", byte_count);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
+		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
 		break;
 
 	case format_12:     /* string instructions */
@@ -590,11 +592,11 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		byte_count = BITS(OP2,0,3);
 		checkpoint = BITS(OP,12,15);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
-		buffer += sprintf (buffer, byte_count ? ",%d,R%d" : ",R%d,R%d", byte_count, checkpoint);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
+		util::stream_format(stream, byte_count ? ",%d,R%d" : ",R%d,R%d", byte_count, checkpoint);
 		break;
 
 	case format_13:     /* multiple precision shift instructions */
@@ -605,10 +607,10 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		darg = BITS(OP2,6,9);
 		byte_count = BITS(OP2,0,3);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, byte_count ? ",%d" : ",R%d", byte_count);
-		buffer += sprintf (buffer, darg ? ",%d" : ",R%d", darg);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
+		util::stream_format(stream, darg ? ",%d" : ",R%d", darg);
 		break;
 
 	case format_14:     /* bit testing instructions */
@@ -618,12 +620,12 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		sarg = BITS(OP2,12,15);
 		darg = BITS(OP2,0,9);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
 		if (darg == 0x3ff)
-			buffer += sprintf (buffer, ",R0");
+			util::stream_format(stream, ",R0");
 		else
-			buffer += sprintf (buffer, ",%d", darg);
+			util::stream_format(stream, ",%d", darg);
 		break;
 
 	case format_15:     /* invert order of field instruction */
@@ -634,10 +636,10 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		bit_position = BITS(OP2,0,3);
 		bit_width = BITS(OP,12,15);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, bit_position ? ",(%d," : ",(R%d,", bit_position);
-		buffer += sprintf (buffer, bit_width ? "%d)" : "R%d)", bit_width);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, bit_position ? ",(%d," : ",(R%d,", bit_position);
+		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_16:     /* field instructions */
@@ -650,12 +652,12 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		bit_position = BITS(OP2,0,3);
 		bit_width = BITS(OP,12,15);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
-		buffer += sprintf (buffer, bit_position ? ",(%d," : ",(%d,", bit_position);
-		buffer += sprintf (buffer, bit_width ? "%d)" : "R%d)", bit_width);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
+		util::stream_format(stream, bit_position ? ",(%d," : ",(%d,", bit_position);
+		util::stream_format(stream, bit_width ? "%d)" : "R%d)", bit_width);
 		break;
 
 	case format_17:     /* alter register and jump instructions */
@@ -665,20 +667,20 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		sarg = BITS(OP2,4,7);
 		darg = BITS(OP2,0,3);
 		if (darg)
-		sprintf (buffer, darg ? "%-4s >%04x,%d,R%d" : "%-4s >%04x,R%d,R%d",
+		util::stream_format(stream, darg ? "%-4s >%04x,%d,R%d" : "%-4s >%04x,R%d,R%d",
 							mnemonic, 0xffff & (PC + displacement * 2), sarg, darg);
 		break;
 
 	case format_18:     /* single register operand instructions */
 		sarg = BITS(OP,12,15);
 
-		sprintf (buffer, "%-4s R%d", mnemonic, sarg);
+		util::stream_format(stream, "%-4s R%d", mnemonic, sarg);
 				break;
 
 	case format_liim:   /* liim instruction */
 		sarg = BITS(OP,14,15);
 
-		sprintf (buffer, "%-4s %d", mnemonic, sarg);
+		util::stream_format(stream, "%-4s %d", mnemonic, sarg);
 		break;
 
 	case format_19:     /* move address instruction */
@@ -689,10 +691,10 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		dmode = BITS(OP2,4,5);
 		darg = BITS(OP2,6,9);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
 				break;
 
 	case format_20:     /* list search instructions */
@@ -743,10 +745,10 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 				break;
 			}
 
-			buffer += sprintf (buffer, "%-4s %s,", mnemonic, condition_code);
-			buffer += print_arg (buffer, smode, sarg, opram, pc);
-			buffer += sprintf (buffer, ",");
-			buffer += print_arg (buffer, dmode, darg, opram, pc);
+			util::stream_format(stream, "%-4s %s,", mnemonic, condition_code);
+			print_arg(stream, smode, sarg, opram, pc);
+			util::stream_format(stream, ",");
+			print_arg(stream, dmode, darg, opram, pc);
 			break;
 	}
 
@@ -763,19 +765,19 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 		byte_count = BITS(OP2,0,3);
 		dest_byte_count = BITS(OP,12,15);
 
-		buffer += sprintf (buffer, "%-4s ", mnemonic);
-		buffer += print_arg (buffer, smode, sarg, opram, pc);
-		buffer += sprintf (buffer, ",");
-		buffer += print_arg (buffer, dmode, darg, opram, pc);
-		buffer += sprintf (buffer, byte_count ? ",%d" : ",R%d", byte_count);
-		buffer += sprintf (buffer, dest_byte_count ? ",%d" : ",R%d", dest_byte_count);
+		util::stream_format(stream, "%-4s ", mnemonic);
+		print_arg(stream, smode, sarg, opram, pc);
+		util::stream_format(stream, ",");
+		print_arg(stream, dmode, darg, opram, pc);
+		util::stream_format(stream, byte_count ? ",%d" : ",R%d", byte_count);
+		util::stream_format(stream, dest_byte_count ? ",%d" : ",R%d", dest_byte_count);
 		break;
 	}
 
 	default:
 		osd_printf_error("debbugger internal error, file %s, line %d\n", __FILE__, __LINE__);
 	case illegal:
-		sprintf (buffer, "data >%04x", OP);
+		util::stream_format(stream, "data >%04x", OP);
 		break;
 	}
 
@@ -784,15 +786,15 @@ unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const uint8_t *oprom
 
 CPU_DISASSEMBLE( tms9900 )
 {
-	return Dasm9900(buffer, pc, TMS9900_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9900_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9980 )
 {
-	return Dasm9900(buffer, pc, TMS9980_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9980_ID, oprom, opram);
 }
 
 CPU_DISASSEMBLE( tms9995 )
 {
-	return Dasm9900(buffer, pc, TMS9995_ID, oprom, opram);
+	return Dasm9900(stream, pc, TMS9995_ID, oprom, opram);
 }

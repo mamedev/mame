@@ -357,6 +357,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/74157.h,MACHINES["TTL74157"] = true
+---------------------------------------------------
+
+if (MACHINES["TTL74157"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/74157.cpp",
+		MAME_DIR .. "src/devices/machine/74157.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/74161.h,MACHINES["TTL74161"] = true
 ---------------------------------------------------
 
@@ -656,6 +668,19 @@ if (MACHINES["CDP1871"]~=null) then
 		MAME_DIR .. "src/devices/machine/cdp1871.h",
 	}
 end
+
+---------------------------------------------------
+--
+--@src/devices/machine/cdp1879.h,MACHINES["CDP1879"] = true
+---------------------------------------------------
+
+if (MACHINES["CDP1879"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/cdp1879.cpp",
+		MAME_DIR .. "src/devices/machine/cdp1879.h",
+	}
+end
+
 
 ---------------------------------------------------
 --

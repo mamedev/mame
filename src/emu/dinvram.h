@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DINVRAM_H__
-#define __DINVRAM_H__
+#ifndef MAME_EMU_DINVRAM
+#define MAME_EMU_DINVRAM
 
 
 //**************************************************************************
@@ -49,4 +49,4 @@ protected:
 typedef device_interface_iterator<device_nvram_interface> nvram_interface_iterator;
 
 
-#endif  /* __DINVRAM_H__ */
+#endif  /* MAME_EMU_DINVRAM */

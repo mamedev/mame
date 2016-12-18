@@ -643,7 +643,7 @@ struct FM_OPN
 	uint32_t  eg_cnt;         /* global envelope generator counter */
 	uint32_t  eg_timer;       /* global envelope generator counter works at frequency = chipclock/64/3 */
 	uint32_t  eg_timer_add;   /* step of eg_timer */
-	uint32_t  eg_timer_overflow;/* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t  eg_timer_overflow;/* envelope generator timer overflows every 3 samples (on real chip) */
 
 
 	/* there are 2048 FNUMs that can be generated using FNUM/BLK registers
@@ -1678,7 +1678,7 @@ static inline void CSMKeyControll(uint8_t type, FM_CH *CH)
 	}
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 /* FM channel save , internal state only */
 static void FMsave_state_channel(device_t *device,FM_CH *CH,int num_ch)
 {
@@ -1717,7 +1717,7 @@ static void FMsave_state_st(device_t *device,FM_ST *ST)
 	device->save_item(NAME(ST->TB)  );
 	device->save_item(NAME(ST->TBC)  );
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 #if BUILD_OPN
 
@@ -2207,7 +2207,7 @@ void ym2203_reset_chip(void *chip)
 	for(i = 0x26 ; i >= 0x20 ; i-- ) OPNWriteReg(OPN,i,0);
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 void ym2203_postload(void *chip)
 {
 	if (chip)
@@ -2250,7 +2250,7 @@ static void YM2203_save_state(YM2203 *F2203, device_t *device)
 	device->save_item  (NAME(F2203->OPN.SL3.fn_h));
 	device->save_item  (NAME(F2203->OPN.SL3.kcode));
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 /* ----------  Initialize YM2203 emulator(s) ----------
    'num' is the number of virtual YM2203s to allocate
@@ -2282,7 +2282,7 @@ void * ym2203_init(void *param, device_t *device, int clock, int rate,
 	F2203->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2203->OPN.ST.SSG           = ssg;
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 	YM2203_save_state(F2203, device);
 #endif
 	return F2203;
@@ -2659,7 +2659,7 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 	}
 }
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 /* FM channel save , internal state only */
 static void FMsave_state_adpcma(device_t *device,ADPCM_CH *adpcm)
 {
@@ -2676,7 +2676,7 @@ static void FMsave_state_adpcma(device_t *device,ADPCM_CH *adpcm)
 		device->save_item(NAME(adpcm->adpcm_out), ch);
 	}
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 #endif /* (BUILD_YM2608||BUILD_YM2610||BUILD_YM2610B) */
 
@@ -2867,7 +2867,7 @@ void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 	FM_STATUS_SET(&OPN->ST, 0);
 
 }
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 void ym2608_postload(void *chip)
 {
 	if (chip)
@@ -2929,7 +2929,7 @@ static void YM2608_save_state(YM2608 *F2608, device_t *device)
 	/* Delta-T ADPCM unit */
 	YM_DELTAT_savestate(device,&F2608->deltaT);
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 static void YM2608_deltat_status_set(void *chip, uint8_t changebits)
 {
@@ -2982,7 +2982,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 	F2608->deltaT.status_change_which_chip = F2608;
 	F2608->deltaT.status_change_EOS_bit = 0x04; /* status flag: set bit2 on End Of Sample */
 	F2608->deltaT.status_change_BRDY_bit = 0x08;    /* status flag: set bit3 on BRDY */
-	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 miliseconds while recording the ADPCM */
+	F2608->deltaT.status_change_ZERO_bit = 0x10;    /* status flag: set bit4 if silence continues for more than 290 milliseconds while recording the ADPCM */
 
 	/* ADPCM Rhythm */
 	F2608->pcmbuf = device->memregion("ym2608")->base();
@@ -2990,7 +2990,7 @@ void * ym2608_init(void *param, device_t *device, int clock, int rate,
 
 	Init_ADPCMATable();
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 	YM2608_save_state(F2608, device);
 #endif
 	return F2608;
@@ -3544,7 +3544,7 @@ void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 #endif /* BUILD_YM2610B */
 
 
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 void ym2610_postload(void *chip)
 {
 	if (chip)
@@ -3610,7 +3610,7 @@ static void YM2610_save_state(YM2610 *F2610, device_t *device)
 	/* Delta-T ADPCM unit */
 	YM_DELTAT_savestate(device,&F2610->deltaT);
 }
-#endif /* _STATE_H */
+#endif /* MAME_EMU_SAVE_H */
 
 static void YM2610_deltat_status_set(void *chip, uint8_t changebits)
 {
@@ -3664,7 +3664,7 @@ void *ym2610_init(void *param, device_t *device, int clock, int rate,
 	F2610->deltaT.status_change_EOS_bit = 0x80; /* status flag: set bit7 on End Of Sample */
 
 	Init_ADPCMATable();
-#ifdef __SAVE_H__
+#ifdef MAME_EMU_SAVE_H
 	YM2610_save_state(F2610, device);
 #endif
 	return F2610;

@@ -76,7 +76,7 @@ public:
 	void update_cart_rom(void);
 
 	/* updates the screen -- this will call begin_update(),
-	   followed by update_row() reapeatedly and after all row
+	   followed by update_row() repeatedly and after all row
 	   updating is complete, end_update() */
 	bool update_composite(bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	bool update_rgb(bitmap_rgb32 &bitmap, const rectangle &cliprect);

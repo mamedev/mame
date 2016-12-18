@@ -319,13 +319,15 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
         curUnpacked += _db.Files[k].Size;
     }
 
-    HRESULT result = folderOutStream->Init(fileIndex,
-        allFilesMode ? NULL : indices + i,
-        numSolidFiles);
+    {
+      HRESULT result = folderOutStream->Init(fileIndex,
+          allFilesMode ? NULL : indices + i,
+          numSolidFiles);
 
-    i += numSolidFiles;
+      i += numSolidFiles;
 
-    RINOK(result);
+      RINOK(result);
+    }
 
     // to test solid block with zero unpacked size we disable that code
     if (folderOutStream->WasWritingFinished())

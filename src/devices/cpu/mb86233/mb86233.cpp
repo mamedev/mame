@@ -37,10 +37,10 @@ mb86233_cpu_device::mb86233_cpu_device(const machine_config &mconfig, const char
 }
 
 
-offs_t mb86233_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t mb86233_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( mb86233 );
-	return CPU_DISASSEMBLE_NAME(mb86233)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(mb86233)(this, stream, pc, oprom, opram, options);
 }
 
 

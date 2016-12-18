@@ -37,7 +37,7 @@
     - TM: Time
 
     Peripherals, compatible with various boards:
-    - Fidelity Challenger Printer - thermal printer, MCU=?
+    - Fidelity Challenger Printer - thermal printer, MCU=D8048C243
 
     Program/data cartridges, for various boards, some cross-compatible:
     - CG6: Greatest Chess Games 1

@@ -8,6 +8,8 @@ bgfx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
 bx - [The BSD 2-Clause License](http://opensource.org/licenses/BSD-2-Clause)
 
+catch - [Boost Software License](http://www.boost.org/LICENSE_1_0.txt)
+
 compat - Wine headers missing in MinGW [The GNU Lesser General Public License, version 2.1 (LGPL-2.1)](http://opensource.org/licenses/LGPL-2.1)
 
 **note that this one contain headers only and that real library/dll is dynamically loaded so use in commercial project is allowed, will be removed when becomes part of MinGW distribution**
@@ -19,8 +21,6 @@ expat - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
 genie - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 glm - [The MIT License (MIT)](http://opensource.org/licenses/MIT)
-
-googletest - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 
 libflac - [The BSD 3-Clause License](http://opensource.org/licenses/BSD-3-Clause)
 

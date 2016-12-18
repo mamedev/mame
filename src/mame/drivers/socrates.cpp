@@ -787,7 +787,7 @@ int iqunlim_state::get_color(int index, int y)
 	if (index < 8)
 		return m_colors[index];
 	else
-		return m_vram_reg->u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
+		return m_vram_reg->as_u8(0xf000 + ((index & 0x0f) << 8) + ((m_scroll_offset + y + 1) & 0xff));
 }
 
 uint32_t iqunlim_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)

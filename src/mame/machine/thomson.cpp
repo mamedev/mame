@@ -2114,7 +2114,7 @@ void thomson_state::to9_update_ram_bank_postload()
 /* normal mode: polling interval */
 #define TO9_KBD_POLL_PERIOD  attotime::from_msec( 10 )
 
-/* peripherial mode: time between two bytes, and after last byte */
+/* peripheral mode: time between two bytes, and after last byte */
 #define TO9_KBD_BYTE_SPACE   attotime::from_usec( 300 )
 #define TO9_KBD_END_SPACE    attotime::from_usec( 9100 )
 
@@ -2446,7 +2446,7 @@ TIMER_CALLBACK_MEMBER(thomson_state::to9_kbd_timer_cb)
 {
 	if ( m_to9_kbd_periph )
 	{
-		/* peripherial mode: every 10 ms we send 4 bytes */
+		/* peripheral mode: every 10 ms we send 4 bytes */
 
 		switch ( m_to9_kbd_byte_count )
 		{

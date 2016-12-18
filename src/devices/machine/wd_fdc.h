@@ -239,11 +239,11 @@ private:
 	//
 	//  In the first case, it must first switch to a waiting
 	//  sub-state, then return.  The waiting sub-state must just
-	//  return immediatly when *_continue is called.  Eventually the
+	//  return immediately when *_continue is called.  Eventually the
 	//  event handler function will advance the state machine to
 	//  another sub-state, and things will continue synchronously.
 	//
-	//  On command end it's also supposed to return immediatly.
+	//  On command end it's also supposed to return immediately.
 	//
 	//  The last option is to switch to the next sub-state, start a
 	//  live state with live_start() then return.  The next sub-state

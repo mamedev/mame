@@ -85,11 +85,7 @@ VIDEO_START_MEMBER(gaiden_state,gaiden)
 
 	m_background->set_scrolldy(0, 33);
 	m_foreground->set_scrolldy(0, 33);
-	m_text_layer->set_scrolldy(0, 31);
-
-	m_background->set_scrolldx(0, -1);
-	m_foreground->set_scrolldx(0, -1);
-	m_text_layer->set_scrolldx(0, -1);
+	m_text_layer->set_scrolldy(0, 33);
 
 	/* set up sprites */
 	m_screen->register_screen_bitmap(m_sprite_bitmap);
@@ -309,7 +305,7 @@ uint32_t gaiden_state::screen_update_raiga(screen_device &screen, bitmap_rgb32 &
 	m_sprite_bitmap.fill(0, cliprect);
 	bitmap.fill(0, cliprect);
 
-	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, m_spr_offset_y, flip_screen(),  m_sprite_bitmap);
+	m_sprgen->gaiden_draw_sprites(screen, m_gfxdecode, cliprect, m_spriteram, m_sprite_sizey, flip_screen() ? -m_spr_offset_y : m_spr_offset_y, flip_screen(),  m_sprite_bitmap);
 	m_background->draw(screen, m_tile_bitmap_bg, cliprect, 0, 0);
 	m_foreground->draw(screen, m_tile_bitmap_fg, cliprect, 0, 0);
 

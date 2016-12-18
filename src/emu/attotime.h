@@ -44,8 +44,8 @@
 //**************************************************************************
 
 // core components of the attotime structure
-typedef int64_t attoseconds_t;
-typedef int32_t seconds_t;
+typedef s64 attoseconds_t;
+typedef s32 seconds_t;
 
 // core definitions
 const attoseconds_t ATTOSECONDS_PER_SECOND_SQRT = 1'000'000'000;
@@ -110,7 +110,7 @@ public:
 	// conversion to other forms
 	constexpr double as_double() const { return double(m_seconds) + ATTOSECONDS_TO_DOUBLE(m_attoseconds); }
 	constexpr attoseconds_t as_attoseconds() const;
-	uint64_t as_ticks(uint32_t frequency) const;
+	u64 as_ticks(u32 frequency) const;
 	/** Convert to string using at @p precision */
 	const char *as_string(int precision = 9) const;
 
@@ -120,23 +120,23 @@ public:
 	constexpr seconds_t seconds() const { return m_seconds; }
 
 	static attotime from_double(double _time);
-	static attotime from_ticks(uint64_t ticks, uint32_t frequency);
+	static attotime from_ticks(u64 ticks, u32 frequency);
 	/** Create an attotime from a integer count of seconds @seconds */
-	static constexpr attotime from_seconds(int32_t seconds) { return attotime(seconds, 0); }
+	static constexpr attotime from_seconds(s32 seconds) { return attotime(seconds, 0); }
 	/** Create an attotime from a integer count of milliseconds @msec */
-	static constexpr attotime from_msec(int64_t msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
+	static constexpr attotime from_msec(s64 msec) { return attotime(msec / 1000, (msec % 1000) * (ATTOSECONDS_PER_SECOND / 1000)); }
 	/** Create an attotime from a integer count of microseconds @usec */
-	static constexpr attotime from_usec(int64_t usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
+	static constexpr attotime from_usec(s64 usec) { return attotime(usec / 1000000, (usec % 1000000) * (ATTOSECONDS_PER_SECOND / 1000000)); }
 	/** Create an attotime from a integer count of nanoseconds @nsec */
-	static constexpr attotime from_nsec(int64_t nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
+	static constexpr attotime from_nsec(s64 nsec) { return attotime(nsec / 1000000000, (nsec % 1000000000) * (ATTOSECONDS_PER_SECOND / 1000000000)); }
 	/** Create an attotime from at the given frequency @frequency */
 	static attotime from_hz(double frequency) { assert(frequency > 0); double d = 1 / frequency; return attotime(floor(d), modf(d, &d) * ATTOSECONDS_PER_SECOND); }
 
 	// math
 	attotime &operator+=(const attotime &right);
 	attotime &operator-=(const attotime &right);
-	attotime &operator*=(uint32_t factor);
-	attotime &operator/=(uint32_t factor);
+	attotime &operator*=(u32 factor);
+	attotime &operator/=(u32 factor);
 
 	// members
 	seconds_t       m_seconds;
@@ -246,14 +246,14 @@ inline attotime &attotime::operator-=(const attotime &right)
 
 
 /** handle multiplication by an integral factor; defined in terms of the assignment operators */
-inline attotime operator*(const attotime &left, uint32_t factor)
+inline attotime operator*(const attotime &left, u32 factor)
 {
 	attotime result = left;
 	result *= factor;
 	return result;
 }
 
-inline attotime operator*(uint32_t factor, const attotime &right)
+inline attotime operator*(u32 factor, const attotime &right)
 {
 	attotime result = right;
 	result *= factor;
@@ -261,7 +261,7 @@ inline attotime operator*(uint32_t factor, const attotime &right)
 }
 
 /** handle division by an integral factor; defined in terms of the assignment operators */
-inline attotime operator/(const attotime &left, uint32_t factor)
+inline attotime operator/(const attotime &left, u32 factor)
 {
 	attotime result = left;
 	result /= factor;
@@ -332,24 +332,24 @@ inline constexpr attoseconds_t attotime::as_attoseconds() const
 
 
 /** as_ticks - convert to ticks at @p frequency */
-inline uint64_t attotime::as_ticks(uint32_t frequency) const
+inline u64 attotime::as_ticks(u32 frequency) const
 {
-	uint32_t fracticks = (attotime(0, m_attoseconds) * frequency).m_seconds;
+	u32 fracticks = (attotime(0, m_attoseconds) * frequency).m_seconds;
 	return mulu_32x32(m_seconds, frequency) + fracticks;
 }
 
 
 /** Create an attotime from a tick count @ticks at the given frequency @frequency  */
-inline attotime attotime::from_ticks(uint64_t ticks, uint32_t frequency)
+inline attotime attotime::from_ticks(u64 ticks, u32 frequency)
 {
 	attoseconds_t attos_per_tick = HZ_TO_ATTOSECONDS(frequency);
 
 	if (ticks < frequency)
 		return attotime(0, ticks * attos_per_tick);
 
-	uint32_t remainder;
-	int32_t secs = divu_64x32_rem(ticks, frequency, &remainder);
-	return attotime(secs, (uint64_t)remainder * attos_per_tick);
+	u32 remainder;
+	s32 secs = divu_64x32_rem(ticks, frequency, &remainder);
+	return attotime(secs, u64(remainder) * attos_per_tick);
 }
 
 /** Create an attotime from floating point count of seconds @p _time */

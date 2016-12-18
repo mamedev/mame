@@ -67,7 +67,7 @@
 ***************************************************************************/
 
 /* CMDERR is an error code for command evaluation */
-typedef uint32_t CMDERR;
+typedef u32 CMDERR;
 
 class debugger_console
 {
@@ -77,7 +77,7 @@ public:
 	/* command handling */
 	CMDERR          execute_command(const char *command, bool echo);
 	CMDERR          validate_command(const char *command);
-	void            register_command(const char *command, uint32_t flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler);
+	void            register_command(const char *command, u32 flags, int ref, int minparams, int maxparams, std::function<void(int, int, const char **)> handler);
 
 	/* console management */
 	void            vprintf(util::format_argument_pack<std::ostream> const &args);
@@ -118,7 +118,7 @@ private:
 		const char *    params;
 		const char *    help;
 		std::function<void(int, int, const char **)> handler;
-		uint32_t          flags;
+		u32             flags;
 		int             ref;
 		int             minparams;
 		int             maxparams;

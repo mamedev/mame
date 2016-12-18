@@ -501,7 +501,7 @@ READ8_MEMBER( msx_state::msx_kanji_r )
 	if (offset && m_region_kanji)
 	{
 		int latch = m_kanji_latch;
-		result = m_region_kanji->u8(latch++);
+		result = m_region_kanji->as_u8(latch++);
 
 		m_kanji_latch &= ~0x1f;
 		m_kanji_latch |= latch & 0x1f;

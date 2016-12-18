@@ -228,7 +228,7 @@ struct OPL3
 	uint32_t  eg_cnt;                 /* global envelope generator counter    */
 	uint32_t  eg_timer;               /* global envelope generator counter works at frequency = chipclock/288 (288=8*36) */
 	uint32_t  eg_timer_add;           /* step of eg_timer                     */
-	uint32_t  eg_timer_overflow;      /* envelope generator timer overlfows every 1 sample (on real chip) */
+	uint32_t  eg_timer_overflow;      /* envelope generator timer overflows every 1 sample (on real chip) */
 
 	uint32_t  fn_tab[1024];           /* fnumber->increment counter   */
 

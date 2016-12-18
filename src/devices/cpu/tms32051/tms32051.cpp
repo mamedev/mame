@@ -112,10 +112,10 @@ tms32053_device::tms32053_device(const machine_config &mconfig, const char *tag,
 }
 
 
-offs_t tms32051_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t tms32051_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( tms32051 );
-	return CPU_DISASSEMBLE_NAME(tms32051)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(tms32051)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -629,26 +629,6 @@ WRITE16_MEMBER( tms32051_device::cpuregs_w )
 				fatalerror("32051: cpuregs_w: unimplemented memory-mapped register %02X, data %04X at %04X\n", offset, data, m_pc-1);
 	}
 }
-
-
-bool tms32051_device::memory_read(address_spacenum spacenum, offs_t offset, int size, uint64_t &value)
-{
-	/* TODO: alignment if offset is odd */
-	if (spacenum == AS_PROGRAM)
-	{
-		value = (PM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_DATA)
-	{
-		value = (DM_READ16(offset>>1));
-	}
-	else if (spacenum == AS_IO)
-	{
-		value = m_io->read_word(offset);
-	}
-	return 1;
-}
-
 
 
 void tms32053_device::device_reset()

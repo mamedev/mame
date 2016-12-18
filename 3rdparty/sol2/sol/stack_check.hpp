@@ -366,13 +366,17 @@ namespace sol {
 		template<typename T, typename C>
 		struct checker<optional<T>, type::poly, C> {
 			template <typename Handler>
-			static bool check(lua_State* L, int index, Handler&& handler, record& tracking) {
+			static bool check(lua_State* L, int index, Handler&&, record& tracking) {
 				type t = type_of(L, index);
 				if (t == type::none) {
 					tracking.use(0);
 					return true;
 				}
-				return t == type::nil || stack::check<T>(L, index, std::forward<Handler>(handler), tracking);
+				if (t == type::nil) {
+					tracking.use(1);
+					return true;
+				}
+				return stack::check<T>(L, index, no_panic, tracking);
 			}
 		};
 	} // stack

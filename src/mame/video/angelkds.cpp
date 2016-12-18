@@ -236,7 +236,7 @@ uint32_t angelkds_state::screen_update_angelkds(screen_device &screen, bitmap_in
 	const rectangle &visarea = screen.visible_area();
 	rectangle clip;
 
-	bitmap.fill(0x3f, cliprect); /* is there a register controling the colour?, we currently use the last colour of the tx palette */
+	bitmap.fill(0x3f, cliprect); /* is there a register controlling the colour?, we currently use the last colour of the tx palette */
 
 	/* draw top of screen */
 	clip.set(8*0, 8*16-1, visarea.min_y, visarea.max_y);

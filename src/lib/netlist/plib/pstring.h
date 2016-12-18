@@ -20,27 +20,27 @@
 // It uses reference counts and only uses new memory when a string changes.
 // ----------------------------------------------------------------------------------------
 
-	struct pstr_t
+struct pstr_t
+{
+	//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
+	pstr_t(const std::size_t alen)
 	{
-		//str_t() : m_ref_count(1), m_len(0) { m_str[0] = 0; }
-		pstr_t(const std::size_t alen)
-		{
-			init(alen);
-		}
-		void init(const std::size_t alen)
-		{
-				m_ref_count = 1;
-				m_len = alen;
-				m_str[0] = 0;
-		}
-		char *str() { return &m_str[0]; }
-		unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
-		std::size_t len() const  { return m_len; }
-		int m_ref_count;
-	private:
-		std::size_t m_len;
-		char m_str[1];
-	};
+		init(alen);
+	}
+	void init(const std::size_t alen)
+	{
+			m_ref_count = 1;
+			m_len = alen;
+			m_str[0] = 0;
+	}
+	char *str() { return &m_str[0]; }
+	unsigned char *ustr() { return reinterpret_cast<unsigned char *>(&m_str[0]); }
+	std::size_t len() const  { return m_len; }
+	int m_ref_count;
+private:
+	std::size_t m_len;
+	char m_str[1];
+};
 
 
 template <typename F>
@@ -61,9 +61,9 @@ public:
 	~pstring_t();
 
 	// construction with copy
-	pstring_t(const mem_t *string) {init(); if (string != nullptr && *string != 0) pcopy(string); }
-	pstring_t(const pstring_t &string) {init(); pcopy(string); }
-	pstring_t(pstring_t &&string) : m_ptr(string.m_ptr) {string.m_ptr = nullptr; }
+	pstring_t(const mem_t *string) { init(); if (string != nullptr && *string != 0) pcopy(string); }
+	pstring_t(const pstring_t &string) { init(); pcopy(string); }
+	pstring_t(pstring_t &&string) : m_ptr(string.m_ptr) { string.m_ptr = nullptr; }
 
 	// assignment operators
 	pstring_t &operator=(const mem_t *string) { pcopy(string); return *this; }
@@ -77,11 +77,11 @@ public:
 		iterator(const iterator &rhs) noexcept = default;
 		iterator(iterator &&rhs) noexcept { p = rhs.p; }
 		iterator &operator=(const iterator &it) { p = it.p; return *this; }
-		iterator& operator++() noexcept {p += traits::codelen(p); return *this;}
-		iterator operator++(int) noexcept {iterator tmp(*this); operator++(); return tmp;}
-		bool operator==(const iterator& rhs) noexcept {return p==rhs.p;}
-		bool operator!=(const iterator& rhs) noexcept {return p!=rhs.p;}
-		const code_t operator*() noexcept {return traits::code(p);}
+		iterator& operator++() noexcept { p += traits::codelen(p); return *this; }
+		iterator operator++(int) noexcept { iterator tmp(*this); operator++(); return tmp; }
+		bool operator==(const iterator& rhs) noexcept { return p==rhs.p; }
+		bool operator!=(const iterator& rhs) noexcept { return p!=rhs.p; }
+		const code_t operator*() noexcept { return traits::code(p); }
 		iterator& operator+=(size_type count) { while (count>0) { --count; ++(*this); } return *this; }
 		friend iterator operator+(iterator lhs, const size_type &rhs) { return (lhs += rhs); }
 	};
@@ -154,7 +154,7 @@ public:
 
 	const pstring_t substr(const iterator start, const iterator end) const ;
 	const pstring_t substr(const iterator start) const { return substr(start, end()); }
-	const pstring_t substr(size_type start) const { if (start>=len()) return pstring_t(""); else return substr(begin() + start, end()); }
+	const pstring_t substr(size_type start) const { return (start >= len()) ? pstring_t("") : substr(begin() + start, end()); }
 
 	const pstring_t left(iterator leftof) const { return substr(begin(), leftof); }
 	const pstring_t right(iterator pos) const  { return substr(pos, end()); }
@@ -175,7 +175,6 @@ public:
 	static void resetmem();
 
 protected:
-
 	pstr_t *m_ptr;
 
 private:
@@ -208,6 +207,8 @@ private:
 
 	static pstr_t m_zero;
 };
+
+template <typename F> pstr_t pstring_t<F>::m_zero(0);
 
 struct pu8_traits
 {
@@ -317,21 +318,10 @@ struct putf8_traits
 	}
 };
 
-// FIXME: "using pstring = pstring_t<putf8_traits>" is not understood by eclipse
+extern template struct pstring_t<pu8_traits>;
+extern template struct pstring_t<putf8_traits>;
 
-struct pstring : public pstring_t<putf8_traits>
-{
-public:
-
-	typedef pstring_t<putf8_traits> type_t;
-
-	// simple construction/destruction
-	pstring() : type_t() { }
-
-	// construction with copy
-	pstring(const mem_t *string) : type_t(string) { }
-	pstring(const type_t &string) : type_t(string) { }
-};
+typedef pstring_t<putf8_traits> pstring;
 
 // ----------------------------------------------------------------------------------------
 // pstringbuffer: a string buffer implementation

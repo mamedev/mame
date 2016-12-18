@@ -61,7 +61,7 @@ struct saa1099_noise
 	/* vars to simulate the noise generator output */
 	double counter;
 	double freq;
-	int level;                      /* noise polynomal shifter */
+	int level;                      /* noise polynomial shifter */
 };
 
 

@@ -26,6 +26,7 @@
 
 #include "SDL_uikitvideo.h"
 #include "SDL_uikitevents.h"
+#include "SDL_uikitopengles.h"
 
 #import <Foundation/Foundation.h>
 
@@ -62,6 +63,9 @@ UIKit_PumpEvents(_THIS)
     do {
         result = CFRunLoopRunInMode((CFStringRef)UITrackingRunLoopMode, seconds, TRUE);
     } while(result == kCFRunLoopRunHandledSource);
+
+    /* See the comment in the function definition. */
+    UIKit_GL_RestoreCurrentContext();
 }
 
 #endif /* SDL_VIDEO_DRIVER_UIKIT */

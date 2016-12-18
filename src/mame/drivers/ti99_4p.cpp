@@ -563,7 +563,7 @@ WRITE16_MEMBER( ti99_4p_state::memwrite )
 		if (space.debugger_access()) { debugger_write(space, offset, data); return; }
 
 		// Writing the even address now (addr)
-		// The databus multplexer puts the even value into the latch and outputs the odd value now.
+		// The databus multiplexer puts the even value into the latch and outputs the odd value now.
 		m_latch = (data >> 8) & 0xff;
 
 		// write odd byte

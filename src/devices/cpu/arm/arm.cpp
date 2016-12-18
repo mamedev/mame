@@ -675,7 +675,7 @@ void arm_cpu_device::HandleMemSingle( uint32_t insn )
 		{
 			if (rd == eR15)
 			{
-				R15 = (cpu_read32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
+				R15 = (cpu_read32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15 & MODE_MASK);
 
 				/*
 				The docs are explicit in that the bottom bits should be masked off
@@ -1182,7 +1182,7 @@ void arm_cpu_device::HandleMemBlock( uint32_t insn )
 			}
 			else
 				result = loadDec( insn&0xffff, rbp, insn&INSN_BDT_S, &deferredR15, &defer );
-		
+
 			if (insn & INSN_BDT_W)
 			{
 				if (rb==0xf)
@@ -1364,7 +1364,7 @@ uint32_t arm_cpu_device::decodeShift(uint32_t insn, uint32_t *pCarry)
 		if (k)
 		{
 			while (k > 32) k -= 32;
-			if (pCarry) *pCarry = rm & SIGN_BIT;
+			if (pCarry) *pCarry = rm & (1 << (k - 1));
 			return ROR(rm, k);
 		}
 		else
@@ -1553,15 +1553,15 @@ void arm_cpu_device::HandleCoPro( uint32_t insn )
 }
 
 
-offs_t arm_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm );
-	return CPU_DISASSEMBLE_NAME(arm)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arm)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t arm_be_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t arm_be_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arm_be );
-	return CPU_DISASSEMBLE_NAME(arm_be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arm_be)(this, stream, pc, oprom, opram, options);
 }

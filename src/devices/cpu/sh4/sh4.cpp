@@ -75,13 +75,17 @@ static ADDRESS_MAP_START( sh4_internal_map, AS_PROGRAM, 64, sh4_base_device )
 	AM_RANGE(0x1C000000, 0x1C000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0x1E000000, 0x1E000FFF) AM_RAM AM_MIRROR(0x01FFF000)
 	AM_RANGE(0xE0000000, 0xE000003F) AM_RAM AM_MIRROR(0x03FFFFC0) // todo: store queues should be write only on DC's SH4, executing PREFM shouldn't cause an actual memory read access!
-	AM_RANGE(0xF6000000, 0xF7FFFFFF) AM_READWRITE(sh4_tlb_r,sh4_tlb_w)
-	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, U64(0xffffffffffffffff))
+
+	AM_RANGE(0xF6000000, 0xF6FFFFFF) AM_READWRITE(sh4_utlb_address_array_r,sh4_utlb_address_array_w)
+	AM_RANGE(0xF7000000, 0xF77FFFFF) AM_READWRITE(sh4_utlb_data_array1_r,sh4_utlb_data_array1_w)
+	AM_RANGE(0xF7800000, 0xF7FFFFFF) AM_READWRITE(sh4_utlb_data_array2_r,sh4_utlb_data_array2_w)
+
+	AM_RANGE(0xFE000000, 0xFFFFFFFF) AM_READWRITE32(sh4_internal_r, sh4_internal_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh3_internal_map, AS_PROGRAM, 64, sh3_base_device )
-	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, U64(0xffffffffffffffff))
-	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, U64(0xffffffffffffffff))
+	AM_RANGE(SH3_LOWER_REGBASE, SH3_LOWER_REGEND) AM_READWRITE32(sh3_internal_r, sh3_internal_w, 0xffffffffffffffffU)
+	AM_RANGE(SH3_UPPER_REGBASE, SH3_UPPER_REGEND) AM_READWRITE32(sh3_internal_high_r, sh3_internal_high_w, 0xffffffffffffffffU)
 ADDRESS_MAP_END
 
 
@@ -99,6 +103,7 @@ sh34_base_device::sh34_base_device(const machine_config &mconfig, device_type ty
 	, c_md7(0)
 	, c_md8(0)
 	, c_clock(0)
+	, m_mmuhack(1)
 #if SH4_USE_FASTRAM_OPTIMIZATION
 	, m_bigendian(endianness == ENDIANNESS_BIG)
 	, m_byte_xor(m_bigendian ? BYTE8_XOR_BE(0) : BYTE8_XOR_LE(0))
@@ -151,33 +156,64 @@ sh4be_device::sh4be_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-offs_t sh34_base_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh34_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4 );
 
-	return CPU_DISASSEMBLE_NAME(sh4)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh3be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh3be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 
-offs_t sh4be_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t sh4be_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sh4be );
 
-	return CPU_DISASSEMBLE_NAME(sh4be)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sh4be)(this, stream, pc, oprom, opram, options);
 }
 
 
 /* Called for unimplemented opcodes */
 void sh34_base_device::TODO(const uint16_t opcode)
 {
+}
+
+void sh34_base_device::LDTLB(const uint16_t opcode)
+{
+	logerror("unhandled LDTLB for this CPU type\n");
+}
+
+void sh4_base_device::LDTLB(const uint16_t opcode)
+{
+	int replace = (m_m[MMUCR] & 0x0000fc00) >> 10;
+
+	logerror("using LDTLB to replace UTLB entry %02x\n", replace);
+
+	// these come from PTEH
+	m_utlb[replace].VPN =  (m_m[PTEH] & 0xfffffc00) >> 10;
+//  m_utlb[replace].D =    (m_m[PTEH] & 0x00000200) >> 9; // from PTEL
+//  m_utlb[replace].V =    (m_m[PTEH] & 0x00000100) >> 8; // from PTEL
+	m_utlb[replace].ASID = (m_m[PTEH] & 0x000000ff) >> 0;
+	// these come from PTEL
+	m_utlb[replace].PPN = (m_m[PTEL] & 0x1ffffc00) >> 10;
+	m_utlb[replace].V =   (m_m[PTEL] & 0x00000100) >> 8;
+	m_utlb[replace].PSZ = (m_m[PTEL] & 0x00000080) >> 6;
+	m_utlb[replace].PSZ |=(m_m[PTEL] & 0x00000010) >> 4;
+	m_utlb[replace].PPR=  (m_m[PTEL] & 0x00000060) >> 5;
+	m_utlb[replace].C =   (m_m[PTEL] & 0x00000008) >> 3;
+	m_utlb[replace].D =   (m_m[PTEL] & 0x00000004) >> 2;
+	m_utlb[replace].SH =  (m_m[PTEL] & 0x00000002) >> 1;
+	m_utlb[replace].WT =  (m_m[PTEL] & 0x00000001) >> 0;
+	// these come from PTEA
+	m_utlb[replace].TC = (m_m[PTEA] & 0x00000008) >> 3;
+	m_utlb[replace].SA = (m_m[PTEA] & 0x00000007) >> 0;
 }
 
 #if 0
@@ -263,21 +299,36 @@ inline uint8_t sh34_base_device::RB(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_byte(A);
 
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			return fastbase[_A ^ m_byte_xor];
 		}
-		uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		return fastbase[_A ^ m_byte_xor];
-	}
-	return m_program->read_byte(_A);
+		return m_program->read_byte(_A);
 #else
-	return m_program->read_byte(A & AM);
+		return m_program->read_byte(A & AM);
 #endif
+	}
+	else // P0 region
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			return m_program->read_byte(A & AM);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			return m_program->read_byte(A);
+		}
+	}
 
 }
 
@@ -286,21 +337,36 @@ inline uint16_t sh34_base_device::RW(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_word(A);
 
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			return ((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1];
 		}
-		uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		return ((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1];
-	}
-	return m_program->read_word(_A);
+		return m_program->read_word(_A);
 #else
-	return m_program->read_word(A & AM);
+		return m_program->read_word(A & AM);
 #endif
+	}
+	else
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			return m_program->read_word(A & AM);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			return m_program->read_word(A);
+		}
+	}
 
 }
 
@@ -309,21 +375,36 @@ inline uint32_t sh34_base_device::RL(offs_t A)
 	if (A >= 0xe0000000)
 		return m_program->read_dword(A);
 
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (_A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			return ((uint32_t*)fastbase)[(_A^m_dword_xor) >> 2];
 		}
-		uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		return ((uint32_t*)fastbase)[(_A^m_dword_xor) >> 2];
-	}
-	return m_program->read_dword(_A);
+		return m_program->read_dword(_A);
 #else
-	return m_program->read_dword(A & AM);
+		return m_program->read_dword(A & AM);
 #endif
+	}
+	else
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			return m_program->read_dword(A & AM);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			return m_program->read_dword(A);
+		}
+	}
 
 }
 
@@ -334,22 +415,38 @@ inline void sh34_base_device::WB(offs_t A, uint8_t V)
 		m_program->write_byte(A,V);
 		return;
 	}
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			fastbase[_A ^ m_byte_xor] = V;
+			return;
 		}
-		uint8_t *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		fastbase[_A ^ m_byte_xor] = V;
-		return;
-	}
-	m_program->write_byte(_A,V);
+		m_program->write_byte(_A, V);
 #else
-	m_program->write_byte(A & AM,V);
+		m_program->write_byte(A & AM, V);
 #endif
+	}
+	else
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			m_program->write_byte(A & AM, V);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			m_program->write_byte(A, V);
+		}
+	}
 
 }
 
@@ -360,22 +457,38 @@ inline void sh34_base_device::WW(offs_t A, uint16_t V)
 		m_program->write_word(A,V);
 		return;
 	}
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1] = V;
+			return;
 		}
-		void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		((uint16_t*)fastbase)[(_A ^ m_word_xor) >> 1] = V;
-		return;
-	}
-	m_program->write_word(_A,V);
+		m_program->write_word(_A, V);
 #else
-	m_program->write_word(A & AM,V);
+		m_program->write_word(A & AM, V);
 #endif
+	}
+	else
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			m_program->write_word(A & AM, V);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			m_program->write_word(A, V);
+		}
+	}
 
 }
 
@@ -386,22 +499,39 @@ inline void sh34_base_device::WL(offs_t A, uint32_t V)
 		m_program->write_dword(A,V);
 		return;
 	}
-#if SH4_USE_FASTRAM_OPTIMIZATION
-	const offs_t _A = A & AM;
-	for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
+
+	if (A >= 0x80000000) // P1/P2/P3 region
 	{
-		if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+#if SH4_USE_FASTRAM_OPTIMIZATION
+		const offs_t _A = A & AM;
+		for (int ramnum = 0; ramnum < m_fastram_select; ramnum++)
 		{
-			continue;
+			if (m_fastram[ramnum].readonly == true || _A < m_fastram[ramnum].start || _A > m_fastram[ramnum].end)
+			{
+				continue;
+			}
+			void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
+			((uint32_t*)fastbase)[(_A ^ m_dword_xor) >> 2] = V;
+			return;
 		}
-		void *fastbase = (uint8_t*)m_fastram[ramnum].base - m_fastram[ramnum].start;
-		((uint32_t*)fastbase)[(_A ^ m_dword_xor) >> 2] = V;
-		return;
-	}
-	m_program->write_dword(_A,V);
+		m_program->write_dword(_A, V);
 #else
-	m_program->write_dword(A & AM,V);
+		m_program->write_dword(A & AM, V);
 #endif
+	}
+	else
+	{
+		if (!m_sh4_mmu_enabled)
+		{
+			m_program->write_dword(A & AM, V);
+		}
+		else
+		{
+			A = get_remap(A & AM);
+			m_program->write_dword(A, V);
+		}
+	}
+
 }
 
 /*  code                 cycles  t-bit
@@ -3331,7 +3461,7 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0x08:  CLRT(opcode); break;
 		case 0x18:  SETT(opcode); break;
 		case 0x28:  CLRMAC(opcode); break;
-		case 0x38:  TODO(opcode); break;
+		case 0x38:  LDTLB(opcode); break;
 		case 0x48:  CLRS(opcode); break;
 		case 0x58:  SETS(opcode); break;
 		case 0x68:  NOP(opcode); break;
@@ -3339,7 +3469,7 @@ inline void sh34_base_device::execute_one_0000(const uint16_t opcode)
 		case 0x88:  CLRT(opcode); break;
 		case 0x98:  SETT(opcode); break;
 		case 0xa8:  CLRMAC(opcode); break;
-		case 0xb8:  TODO(opcode); break;
+		case 0xb8:  LDTLB(opcode); break;
 		case 0xc8:  CLRS(opcode); break;
 		case 0xd8:  SETS(opcode); break;
 		case 0xe8:  NOP(opcode); break;
@@ -3939,7 +4069,10 @@ void sh34_base_device::execute_run()
 		m_ppc = m_pc & AM;
 		debugger_instruction_hook(this, m_pc & AM);
 
-		const uint16_t opcode = m_direct->read_word(m_pc & AM, WORD2_XOR_LE(0));
+		uint16_t opcode;
+
+		if (!m_sh4_mmu_enabled) opcode = m_direct->read_word(m_pc & AM, WORD2_XOR_LE(0));
+		else opcode = RW(m_pc); // should probably use a different function as this needs to go through the ITLB
 
 		if (m_delay)
 		{
@@ -4027,6 +4160,47 @@ void sh4be_device::execute_run()
 		m_sh4_icount--;
 	} while( m_sh4_icount > 0 );
 }
+
+void sh4_base_device::device_start()
+{
+	sh34_base_device::device_start();
+
+	int i;
+	for (i=0;i<64;i++)
+	{
+		m_utlb[i].ASID = 0;
+		m_utlb[i].VPN = 0;
+		m_utlb[i].V = 0;
+		m_utlb[i].PPN = 0;
+		m_utlb[i].PSZ = 0;
+		m_utlb[i].SH = 0;
+		m_utlb[i].C = 0;
+		m_utlb[i].PPR = 0;
+		m_utlb[i].D = 0;
+		m_utlb[i].WT = 0;
+		m_utlb[i].SA = 0;
+		m_utlb[i].TC = 0;
+	}
+
+	for (i=0;i<64;i++)
+	{
+		save_item(NAME(m_utlb[i].ASID), i);
+		save_item(NAME(m_utlb[i].VPN), i);
+		save_item(NAME(m_utlb[i].V), i);
+		save_item(NAME(m_utlb[i].PPN), i);
+		save_item(NAME(m_utlb[i].PSZ), i);
+		save_item(NAME(m_utlb[i].SH), i);
+		save_item(NAME(m_utlb[i].C), i);
+		save_item(NAME(m_utlb[i].PPR), i);
+		save_item(NAME(m_utlb[i].D), i);
+		save_item(NAME(m_utlb[i].WT), i);
+		save_item(NAME(m_utlb[i].SA), i);
+		save_item(NAME(m_utlb[i].TC), i);
+	}
+
+}
+
+
 
 void sh34_base_device::device_start()
 {
@@ -4134,8 +4308,6 @@ void sh34_base_device::device_start()
 	save_item(NAME( m_ioport16_direction));
 	save_item(NAME(m_ioport4_pullup));
 	save_item(NAME(m_ioport4_direction));
-	save_item(NAME(m_sh4_tlb_address));
-	save_item(NAME(m_sh4_tlb_data));
 	save_item(NAME(m_sh4_mmu_enabled));
 	save_item(NAME(m_sh3internal_upper));
 	save_item(NAME(m_sh3internal_lower));

@@ -187,7 +187,7 @@ private:
 	uint32_t      eg_cnt;                 /* global envelope generator counter */
 	uint32_t      eg_timer;               /* global envelope generator counter works at frequency = chipclock/64/3 */
 	uint32_t      eg_timer_add;           /* step of eg_timer */
-	uint32_t      eg_timer_overflow;      /* envelope generator timer overlfows every 3 samples (on real chip) */
+	uint32_t      eg_timer_overflow;      /* envelope generator timer overflows every 3 samples (on real chip) */
 
 	uint32_t      lfo_phase;              /* accumulated LFO phase (0 to 255) */
 	uint32_t      lfo_timer;              /* LFO timer                        */

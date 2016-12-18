@@ -2,11 +2,11 @@
 // copyright-holders:Sven Gothel
 /***
  *
- * GL Shader Tool - Convinient Basic Shader functionality
+ * GL Shader Tool - Convenient Basic Shader functionality
  *
  * Copyright (c) 2007, Sven Gothel
  *
- * OpenGL GLSL ARB extentions:
+ * OpenGL GLSL ARB extensions:
  *
  *  GL_ARB_shader_objects
  *  GL_ARB_shading_language_100

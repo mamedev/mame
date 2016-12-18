@@ -18,6 +18,8 @@ public:
 
 	uint8_t *memory(uint32_t &size) { size = dimm_data_size; return dimm_data; }
 
+	virtual const tiny_rom_entry *device_rom_region() const override;
+
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;

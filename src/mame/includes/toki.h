@@ -13,6 +13,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_audiocpu_rom(*this, "audiocpu"),
 		m_seibu_sound(*this, "seibu_sound"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -27,6 +28,7 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_region_ptr<u8> m_audiocpu_rom;
 	optional_device<seibu_sound_device> m_seibu_sound;
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -56,6 +58,8 @@ public:
 	DECLARE_WRITE8_MEMBER(tokib_adpcm_control_w);
 	DECLARE_WRITE8_MEMBER(tokib_adpcm_data_w);
 	DECLARE_WRITE_LINE_MEMBER(tokib_adpcm_int);
+
+	DECLARE_READ8_MEMBER(jujuba_z80_data_decrypt);
 
 	DECLARE_DRIVER_INIT(tokib);
 	DECLARE_DRIVER_INIT(jujuba);

@@ -2,7 +2,7 @@
 // copyright-holders:Bryan McPhail, Nicola Salmoria
 /*******************************************************************************
 
-    Input port macros used by many games in mutiple IREM drivers
+    Input port macros used by many games in multiple IREM drivers
 
 *******************************************************************************/
 
@@ -89,7 +89,7 @@
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )  \
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* Actually vblank, handled above */
 
-/**************************** Coinage Dip Swicthes ****************************/
+/**************************** Coinage Dip Switches ****************************/
 
 /* Mode 2 Coinage */
 

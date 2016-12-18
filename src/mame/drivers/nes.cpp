@@ -208,6 +208,10 @@ static MACHINE_CONFIG_DERIVED( fds, famicom )
 
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_DEVICE_REMOVE("cass_list")
+	MCFG_DEVICE_REMOVE("ade_list")
+	MCFG_DEVICE_REMOVE("ntb_list")
+	MCFG_DEVICE_REMOVE("kstudio_list")
+	MCFG_DEVICE_REMOVE("datach_list")
 MACHINE_CONFIG_END
 
 

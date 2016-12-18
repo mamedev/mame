@@ -18,7 +18,7 @@
 ***************************************************************************/
 
 // notes based on test programs results, verified on PCB:
-// - bonkadv_mcu_4_30 is the only cmd that ouputs an odd (655) number of bytes
+// - bonkadv_mcu_4_30 is the only cmd that outputs an odd (655) number of bytes
 // - bonkadv_mcu_4_33: the 32 'zeroed' bytes every 64 bytes are effectively written by the MCU
 
 // MCU executed command: 4300 0100 - factory settings

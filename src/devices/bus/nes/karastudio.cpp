@@ -22,7 +22,7 @@
    * expansion carts do not contain the required game data => main PRG must be in the main cart
      so to remain connected even when an expansion is inserted (differently from Datach, where
      the base unit contains no PRG)
-   * bankswicth writes with bit3=0 (to access expansion) when no expansion is present should do
+   * bankswitch writes with bit3=0 (to access expansion) when no expansion is present should do
      nothing
 
  ***********************************************************************************************************/

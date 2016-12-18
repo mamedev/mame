@@ -140,7 +140,7 @@ Notes:
 
  Standard 6 pin Trackball connector
 
-  Pin  Wire  Funtion
+  Pin  Wire  Function
 ------------------------------
    1 | BLK | Ground
    2 | RED | +5 Volts DC

@@ -210,7 +210,7 @@ protected:
 	// device_disasm_interface overrides
 	ATTR_COLD virtual uint32_t disasm_min_opcode_bytes() const override { return 1; }
 	ATTR_COLD virtual uint32_t disasm_max_opcode_bytes() const override { return 1; }
-	ATTR_COLD virtual offs_t disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	ATTR_COLD virtual offs_t disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	// device_memory_interface overrides
 

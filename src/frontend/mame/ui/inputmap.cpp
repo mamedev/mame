@@ -45,7 +45,7 @@ menu_input_groups::menu_input_groups(mame_ui_manager &mui, render_container &con
 {
 }
 
-void menu_input_groups::populate()
+void menu_input_groups::populate(float &customtop, float &custombottom)
 {
 	int player;
 
@@ -88,7 +88,7 @@ menu_input_general::menu_input_general(mame_ui_manager &mui, render_container &c
 	group = _group;
 }
 
-void menu_input_general::populate()
+void menu_input_general::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -151,7 +151,7 @@ menu_input_specific::menu_input_specific(mame_ui_manager &mui, render_container 
 {
 }
 
-void menu_input_specific::populate()
+void menu_input_specific::populate(float &customtop, float &custombottom)
 {
 	input_item_data *itemlist = nullptr;
 	int suborder[SEQ_TYPE_TOTAL];
@@ -538,7 +538,7 @@ menu_settings::menu_settings(mame_ui_manager &mui, render_container &container, 
 	type = _type;
 }
 
-void menu_settings::populate()
+void menu_settings::populate(float &customtop, float &custombottom)
 {
 	dip_descriptor **diplist_tailptr;
 	std::string prev_owner;
@@ -812,7 +812,7 @@ menu_analog::menu_analog(mame_ui_manager &mui, render_container &container) : me
 {
 }
 
-void menu_analog::populate()
+void menu_analog::populate(float &customtop, float &custombottom)
 {
 	std::string prev_owner;
 	bool first_entry = true;

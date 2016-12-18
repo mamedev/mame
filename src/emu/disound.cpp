@@ -42,7 +42,7 @@ device_sound_interface::~device_sound_interface()
 //  a new route to the device
 //-------------------------------------------------
 
-void device_sound_interface::static_add_route(device_t &device, uint32_t output, const char *target, double gain, uint32_t input, uint32_t mixoutput)
+void device_sound_interface::static_add_route(device_t &device, u32 output, const char *target, double gain, u32 input, u32 mixoutput)
 {
 	// find our sound interface
 	device_sound_interface *sound;
@@ -357,7 +357,7 @@ void device_sound_interface::interface_pre_reset()
 //  sound_route - constructor
 //-------------------------------------------------
 
-device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target, uint32_t mixoutput)
+device_sound_interface::sound_route::sound_route(int output, int input, float gain, const char *target, u32 mixoutput)
 	:   m_output(output),
 		m_input(input),
 		m_mixoutput(mixoutput),
@@ -461,7 +461,7 @@ void device_mixer_interface::sound_stream_update(sound_stream &stream, stream_sa
 		memset(outputs[output], 0, samples * sizeof(outputs[0][0]));
 
 	// loop over samples
-	const uint8_t *outmap = &m_outputmap[0];
+	const u8 *outmap = &m_outputmap[0];
 	for (int pos = 0; pos < samples; pos++)
 	{
 		// for each input, add it to the appropriate output

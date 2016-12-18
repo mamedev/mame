@@ -22,7 +22,7 @@
   ---------------
 
   This board is used in each bet station of Coinmaster's Roulette and Keno games.
-  Both systems have a phisical electromechanical unit with their own controller
+  Both systems have a physical electromechanical unit with their own controller
   plus sound. The central units (wheel controller) are routed to the bet stations
   (10 for default) through 2 different kind of networks, depending the wheel system.
 
@@ -47,7 +47,7 @@
 
 
   Colorama is a standalone roulette system, driven by one VGA board. It has a big lamps
-  loom, and a vertical positioned roulette painted on the marquee with one phisical arm
+  loom, and a vertical positioned roulette painted on the marquee with one physical arm
   pointing to the numbers.
 
 
@@ -669,7 +669,7 @@ MACHINE_CONFIG_END
    Colorama.
    p521 (unknown version), English.
 
-   Standalone. Phisical arm on marquee + bet station.
+   Standalone. Physical arm on marquee + bet station.
 */
 
 ROM_START( colorama )
@@ -702,7 +702,7 @@ ROM_START( coloramas )
    Colorama.
    p521 v13, Spanish.
 
-   Standalone. Phisical arm on marquee + bet station.
+   Standalone. Physical arm on marquee + bet station.
 */
 
 	ROM_REGION( 0x100000, "maincpu", 0 )
@@ -731,7 +731,7 @@ ROM_END
 
 /*
    Coinmaster Roulette V75 (y2k, spanish)
-   Phisical Unit + 10-15 bet stations.
+   Physical Unit + 10-15 bet stations.
 */
 
 ROM_START( cmrltv75 )
@@ -777,7 +777,7 @@ ROM_END
 
 /*
    Coinmaster Keno (y2k, spanish, 2000-12-14)
-   Phisical Unit + 10 bet stations.
+   Physical Unit + 10 bet stations.
 */
 
 ROM_START( cmkenosp )
@@ -821,7 +821,7 @@ ROM_END
 
 /*
    Coinmaster Keno (y2k, spanish, 2000-12-02)
-   Phisical Unit + 10 bet stations.
+   Physical Unit + 10 bet stations.
 */
 
 ROM_START( cmkenospa )

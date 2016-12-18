@@ -122,7 +122,7 @@
   - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
   You can see the following table, where 'Normal tile #' is the tile number called
-  to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+  to be drawn, and 'Scrambled tile #' is the physical tile position in the matrix:
 
   Normal | Scrambled
   tile # |  tile #
@@ -258,7 +258,7 @@
   - Tile matrix and color data (video & color RAM) are totally encrypted/scrambled.
 
   You can see the following table, where 'Normal tile #' is the tile number called
-  to be drawn, and 'Scrambled tile #' is the phisical tile position in the matrix:
+  to be drawn, and 'Scrambled tile #' is the physical tile position in the matrix:
 
   Normal | Scrambled
   tile # |  tile #

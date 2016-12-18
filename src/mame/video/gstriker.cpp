@@ -36,9 +36,9 @@ uint32_t gstriker_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 void gstriker_state::video_start()
 {
-	// Initalize the chip for the score plane
+	// Initialize the chip for the score plane
 	m_tx->get_tilemap()->set_transparent_pen(0xf);
 
-	// Initalize the chip for the screen plane
+	// Initialize the chip for the screen plane
 	m_bg->get_tilemap()->set_transparent_pen(0xf);
 }

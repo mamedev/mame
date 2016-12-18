@@ -19,7 +19,7 @@
     There is a country code byte in the program to select between
     Seibu Kaihatsu/Fabtek/Taito licenses.
 
-    The Double Dynamites is an updated co-op version sporting different 
+    The Double Dynamites is an updated co-op version sporting different
     enemy patterns and drops.
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
@@ -115,6 +115,32 @@ static ADDRESS_MAP_START( masterj_map, AS_PROGRAM, 16, dynduke_state )
 	AM_RANGE(0x0f004, 0x0f005) AM_WRITENOP
 	AM_RANGE(0x0f006, 0x0f007) AM_WRITE(control_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, dynduke_state )
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, data_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_decrypted_opcodes_map, AS_DECRYPTED_OPCODES, 8, dynduke_state )
+	AM_RANGE(0x0000, 0xffff) AM_DEVREAD("sei80bu", sei80bu_device, opcode_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sei80bu_encrypted_full_map, AS_PROGRAM, 8, dynduke_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_REGION("audiocpu", 0)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -285,8 +311,12 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_CPU_PROGRAM_MAP(slave_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dynduke_state, interrupt)
 
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
-	SEIBU_SOUND_SYSTEM_ENCRYPTED_FULL()
+	MCFG_CPU_ADD("audiocpu", Z80, 14318180/4)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(sound_decrypted_opcodes_map)
+
+	MCFG_DEVICE_ADD("sei80bu", SEI80BU, 0)
+	MCFG_DEVICE_PROGRAM_MAP(sei80bu_encrypted_full_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(3600))
 
@@ -308,7 +338,20 @@ static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	// sound hardware
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 14318180/4)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dbldyn, dynduke )
@@ -321,10 +364,10 @@ MACHINE_CONFIG_END
 
 ROM_START( dynduke )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
-	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
-	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) )
+	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
+	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
+	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) )
+	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) )
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
@@ -369,10 +412,10 @@ ROM_END
 
 ROM_START( dyndukea )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
-	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
-	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) )
-	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) )
+	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
+	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
+	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
+	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) )
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
@@ -610,9 +653,9 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US 13NOV89)", MACHINE_SUPPORTS_SAVE )

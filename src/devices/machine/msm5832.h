@@ -80,7 +80,9 @@ private:
 	uint8_t m_reg[13];            // registers
 
 	int m_hold;                 // counter hold
-	int m_address;              // address
+
+	uint8_t m_address;              // address
+	uint8_t m_data;                 // latched data
 
 	int m_read;
 	int m_write;

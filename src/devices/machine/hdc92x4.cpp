@@ -4664,7 +4664,7 @@ void hdc92x4_device::dma_address_out(uint8_t addrub, uint8_t addrhb, uint8_t add
 /*
     Set/clear INT
 
-    Interupts are generated in the following occasions:
+    Interrupts are generated in the following occasions:
     - when the DONE bit is set to 1 in the ISR and ST_DONE is set to 1
     - when the READY_CHANGE bit is set to 1 in the ISR and ST_RDYCHNG is set to 1
     (ready change: 1->0 or 0->1)

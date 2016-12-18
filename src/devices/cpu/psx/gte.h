@@ -43,8 +43,8 @@ protected:
 	public:
 		int44( int64_t value ) :
 			m_value( value ),
-			m_positive_overflow( value > S64( 0x7ffffffffff ) ),
-			m_negative_overflow( value < S64( -0x80000000000 ) )
+			m_positive_overflow( value > 0x7ffffffffff ),
+			m_negative_overflow( value < -0x80000000000 )
 		{
 		}
 

@@ -52,13 +52,17 @@ public:
 
 	// reset signal should keep for 2cycle of VCLK
 	void reset_w(int reset);
+
 	// adpcmata is latched after vclk_interrupt callback
 	void data_w(int data);
+	DECLARE_WRITE8_MEMBER(data_w);
+
 	// VCLK slave mode option
 	// if VCLK and reset or data is changed at the same time,
 	// call vclk_w after data_w and reset_w.
 	void vclk_w(int vclk);
-	// option , selected pin seletor
+
+	// option , selected pin selector
 	void playmode_w(int select);
 
 	void change_clock_w(int32_t clock);

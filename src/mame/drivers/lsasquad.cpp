@@ -735,7 +735,7 @@ ROM_START( lsasquad )
 
 	ROM_REGION( 0x0400, "prio_prom", 0 )
 	ROM_LOAD( "a64-06.9",     0x0000, 0x0400, CRC(7ced30ba) SHA1(f22de13d4fd49b7b2ffd06032eb5e14fbdeec91c) )    /* priority */
-	
+
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "pal16l8a.14", 0x0000, 0x0104, CRC(a7cc157d) SHA1(f06f750636d59a610e0b0eda8cb791780ebc57a5) )
 ROM_END

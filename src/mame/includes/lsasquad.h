@@ -21,7 +21,7 @@ public:
 	required_shared_ptr<uint8_t> m_scrollram;
 	required_shared_ptr<uint8_t> m_spriteram;
 	required_region_ptr<uint8_t> m_priority_prom;
-	
+
 	/* misc */
 	int m_sound_pending;
 	int m_sound_nmi_enable;

@@ -222,9 +222,9 @@ static int get_variable_value(running_machine &machine, const char *string, char
 //  substitution
 //-------------------------------------------------
 
-static const char *xml_get_attribute_string_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, const char *defvalue)
+static const char *xml_get_attribute_string_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, const char *defvalue)
 {
-	const char *str = xml_get_attribute_string(&node, attribute, nullptr);
+	const char *str = node.get_attribute_string(attribute, nullptr);
 	static char buffer[1000];
 
 	// if nothing, just return the default
@@ -259,7 +259,7 @@ static const char *xml_get_attribute_string_with_subst(running_machine &machine,
 //  substitution
 //-------------------------------------------------
 
-static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, int defvalue)
+static int xml_get_attribute_int_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, int defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	int value;
@@ -283,7 +283,7 @@ static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_n
 //  substitution
 //-------------------------------------------------
 
-static float xml_get_attribute_float_with_subst(running_machine &machine, xml_data_node &node, const char *attribute, float defvalue)
+static float xml_get_attribute_float_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, float defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	float value;
@@ -298,7 +298,7 @@ static float xml_get_attribute_float_with_subst(running_machine &machine, xml_da
 //  parse_bounds - parse a bounds XML node
 //-------------------------------------------------
 
-void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bounds &bounds)
+void parse_bounds(running_machine &machine, util::xml::data_node const *boundsnode, render_bounds &bounds)
 {
 	// skip if nothing
 	if (boundsnode == nullptr)
@@ -309,7 +309,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 	}
 
 	// parse out the data
-	if (xml_get_attribute(boundsnode, "left") != nullptr)
+	if (boundsnode->has_attribute("left"))
 	{
 		// left/right/top/bottom format
 		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "left", 0.0f);
@@ -317,7 +317,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 		bounds.y0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "top", 0.0f);
 		bounds.y1 = xml_get_attribute_float_with_subst(machine, *boundsnode, "bottom", 1.0f);
 	}
-	else if (xml_get_attribute(boundsnode, "x") != nullptr)
+	else if (boundsnode->has_attribute("x"))
 	{
 		// x/y/width/height format
 		bounds.x0 = xml_get_attribute_float_with_subst(machine, *boundsnode, "x", 0.0f);
@@ -339,7 +339,7 @@ void parse_bounds(running_machine &machine, xml_data_node *boundsnode, render_bo
 //  parse_color - parse a color XML node
 //-------------------------------------------------
 
-void parse_color(running_machine &machine, xml_data_node *colornode, render_color &color)
+void parse_color(running_machine &machine, util::xml::data_node const *colornode, render_color &color)
 {
 	// skip if nothing
 	if (colornode == nullptr)
@@ -367,7 +367,7 @@ void parse_color(running_machine &machine, xml_data_node *colornode, render_colo
 //  node
 //-------------------------------------------------
 
-static void parse_orientation(running_machine &machine, xml_data_node *orientnode, int &orientation)
+static void parse_orientation(running_machine &machine, util::xml::data_node const *orientnode, int &orientation)
 {
 	// skip if nothing
 	if (orientnode == nullptr)
@@ -422,7 +422,7 @@ layout_element::make_component_map const layout_element::s_make_component{
 //  layout_element - constructor
 //-------------------------------------------------
 
-layout_element::layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname)
+layout_element::layout_element(running_machine &machine, util::xml::data_node const &elemnode, const char *dirname)
 	: m_next(nullptr),
 		m_machine(machine),
 		m_defstate(0),
@@ -440,11 +440,11 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (xml_data_node *compnode = elemnode.child; compnode; compnode = compnode->next)
+	for (util::xml::data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
 	{
-		make_component_map::const_iterator const make_func(s_make_component.find(compnode->name));
+		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
 		if (make_func == s_make_component.end())
-			throw emu_fatalerror("Unknown element component: %s", compnode->name);
+			throw emu_fatalerror("Unknown element component: %s", compnode->get_name());
 
 		// insert the new component into the list
 		component const &newcomp(**m_complist.emplace(m_complist.end(), make_func->second(machine, *compnode, dirname)));
@@ -539,7 +539,7 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 //-------------------------------------------------
 
 template <typename T>
-layout_element::component::ptr layout_element::make_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 {
 	return std::make_unique<T>(machine, compnode, dirname);
 }
@@ -551,7 +551,7 @@ layout_element::component::ptr layout_element::make_component(running_machine &m
 //-------------------------------------------------
 
 template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_dotmatrix_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 {
 	return std::make_unique<dotmatrix_component>(D, machine, compnode, dirname);
 }
@@ -614,13 +614,13 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //  component - constructor
 //-------------------------------------------------
 
-layout_element::component::component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::component::component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: m_state(0)
 {
 	// fetch common data
 	m_state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
-	parse_bounds(machine, xml_get_sibling(compnode.child, "bounds"), m_bounds);
-	parse_color(machine, xml_get_sibling(compnode.child, "color"), m_color);
+	parse_bounds(machine, compnode.get_child("bounds"), m_bounds);
+	parse_color(machine, compnode.get_child("color"), m_color);
 }
 
 
@@ -641,9 +641,9 @@ void layout_element::component::normalize_bounds(float xoffs, float yoffs, float
 //  image_component - constructor
 //-------------------------------------------------
 
-layout_element::image_component::image_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
-	: component(machine, compnode, dirname),
-		m_hasalpha(false)
+layout_element::image_component::image_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
+	: component(machine, compnode, dirname)
+	, m_hasalpha(false)
 {
 	if (dirname != nullptr)
 		m_dirname = dirname;
@@ -709,7 +709,7 @@ void layout_element::image_component::load_bitmap()
 //  text_component - constructor
 //-------------------------------------------------
 
-layout_element::text_component::text_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::text_component::text_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	m_string = xml_get_attribute_string_with_subst(machine, compnode, "string", "");
@@ -733,7 +733,7 @@ void layout_element::text_component::draw(running_machine &machine, bitmap_argb3
 //  dotmatrix_component - constructor
 //-------------------------------------------------
 
-layout_element::dotmatrix_component::dotmatrix_component(int dots, running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::dotmatrix_component::dotmatrix_component(int dots, running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname),
 		m_dots(dots)
 {
@@ -769,7 +769,7 @@ void layout_element::dotmatrix_component::draw(running_machine &machine, bitmap_
 //  simplecounter_component - constructor
 //-------------------------------------------------
 
-layout_element::simplecounter_component::simplecounter_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::simplecounter_component::simplecounter_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	m_digits = xml_get_attribute_int_with_subst(machine, compnode, "digits", 2);
@@ -795,7 +795,7 @@ void layout_element::simplecounter_component::draw(running_machine &machine, bit
 //  reel_component - constructor
 //-------------------------------------------------
 
-layout_element::reel_component::reel_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::reel_component::reel_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	for (auto & elem : m_hasalpha)
@@ -867,15 +867,15 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 
 	int curry = 0;
 	int num_shown = m_numsymbolsvisible;
@@ -914,7 +914,7 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 				aspect *= 0.9f;
 			}
 
-			int32_t curx;
+			s32 curx;
 			curx = bounds.min_x + (bounds.width() - width) / 2;
 
 			if (m_file[fruit])
@@ -935,14 +935,14 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap2.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap2.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < dest.width(); x++)
 							{
 								int effx = x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										d[effx] = src[x];
@@ -982,21 +982,21 @@ void layout_element::reel_component::draw(running_machine &machine, bitmap_argb3
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < chbounds.width(); x++)
 							{
 								int effx = curx + x + chbounds.min_x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
-										uint32_t ta = (a * (spix + 1)) >> 8;
-										uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-										uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-										uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+										u32 ta = (a * (spix + 1)) >> 8;
+										u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+										u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+										u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 										d[effx] = rgb_t(tr, tg, tb);
 									}
 								}
@@ -1027,15 +1027,15 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 	int use_state = (state + m_stateoffset) % max_state_used;
 
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 	int currx = 0;
 	int num_shown = m_numsymbolsvisible;
 
@@ -1072,7 +1072,7 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 				aspect *= 0.9f;
 			}
 
-			int32_t curx;
+			s32 curx;
 			curx = bounds.min_x;
 
 			if (m_file[fruit])
@@ -1093,14 +1093,14 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap2.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap2.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < ourwidth/num_shown; x++)
 							{
 								int effx = basex + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										d[effx] = src[x];
@@ -1142,21 +1142,21 @@ void layout_element::reel_component::draw_beltreel(running_machine &machine, bit
 
 						if (effy >= bounds.min_y && effy <= bounds.max_y)
 						{
-							uint32_t *src = &tempbitmap.pix32(y);
-							uint32_t *d = &dest.pix32(effy);
+							u32 *src = &tempbitmap.pix32(y);
+							u32 *d = &dest.pix32(effy);
 							for (int x = 0; x < chbounds.width(); x++)
 							{
 								int effx = basex + curx + x;
 								if (effx >= bounds.min_x && effx <= bounds.max_x)
 								{
-									uint32_t spix = rgb_t(src[x]).a();
+									u32 spix = rgb_t(src[x]).a();
 									if (spix != 0)
 									{
 										rgb_t dpix = d[effx];
-										uint32_t ta = (a * (spix + 1)) >> 8;
-										uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-										uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-										uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+										u32 ta = (a * (spix + 1)) >> 8;
+										u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+										u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+										u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 										d[effx] = rgb_t(tr, tg, tb);
 									}
 								}
@@ -1203,7 +1203,7 @@ void layout_element::reel_component::load_reel_bitmap(int number)
 //  led7seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led7seg_component::led7seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led7seg_component::led7seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1264,7 +1264,7 @@ void layout_element::led7seg_component::draw(running_machine &machine, bitmap_ar
 //  led8seg_gts1_component - constructor
 //-------------------------------------------------
 
-layout_element::led8seg_gts1_component::led8seg_gts1_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led8seg_gts1_component::led8seg_gts1_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1331,7 +1331,7 @@ void layout_element::led8seg_gts1_component::draw(running_machine &machine, bitm
 //  led14seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led14seg_component::led14seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led14seg_component::led14seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1442,7 +1442,7 @@ void layout_element::led14seg_component::draw(running_machine &machine, bitmap_a
 //  led14segsc_component - constructor
 //-------------------------------------------------
 
-layout_element::led14segsc_component::led14segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led14segsc_component::led14segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1562,7 +1562,7 @@ void layout_element::led14segsc_component::draw(running_machine &machine, bitmap
 //  led16seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led16seg_component::led16seg_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led16seg_component::led16seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1683,7 +1683,7 @@ void layout_element::led16seg_component::draw(running_machine &machine, bitmap_a
 //  led16segsc_component - constructor
 //-------------------------------------------------
 
-layout_element::led16segsc_component::led16segsc_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::led16segsc_component::led16segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1813,7 +1813,7 @@ void layout_element::led16segsc_component::draw(running_machine &machine, bitmap
 //  rect_component - constructor
 //-------------------------------------------------
 
-layout_element::rect_component::rect_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::rect_component::rect_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1825,19 +1825,19 @@ layout_element::rect_component::rect_component(running_machine &machine, xml_dat
 void layout_element::rect_component::draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * color().a * 255.0f;
-	uint32_t g = color().g * color().a * 255.0f;
-	uint32_t b = color().b * color().a * 255.0f;
-	uint32_t inva = (1.0f - color().a) * 255.0f;
+	u32 r = color().r * color().a * 255.0f;
+	u32 g = color().g * color().a * 255.0f;
+	u32 b = color().b * color().a * 255.0f;
+	u32 inva = (1.0f - color().a) * 255.0f;
 
 	// iterate over X and Y
-	for (uint32_t y = bounds.min_y; y <= bounds.max_y; y++)
+	for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
-		for (uint32_t x = bounds.min_x; x <= bounds.max_x; x++)
+		for (u32 x = bounds.min_x; x <= bounds.max_x; x++)
 		{
-			uint32_t finalr = r;
-			uint32_t finalg = g;
-			uint32_t finalb = b;
+			u32 finalr = r;
+			u32 finalg = g;
+			u32 finalb = b;
 
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
@@ -1859,7 +1859,7 @@ void layout_element::rect_component::draw(running_machine &machine, bitmap_argb3
 //  disk_component - constructor
 //-------------------------------------------------
 
-layout_element::disk_component::disk_component(running_machine &machine, xml_data_node &compnode, const char *dirname)
+layout_element::disk_component::disk_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1872,10 +1872,10 @@ layout_element::disk_component::disk_component(running_machine &machine, xml_dat
 void layout_element::disk_component::draw(running_machine &machine, bitmap_argb32 &dest, const rectangle &bounds, int state)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * color().a * 255.0f;
-	uint32_t g = color().g * color().a * 255.0f;
-	uint32_t b = color().b * color().a * 255.0f;
-	uint32_t inva = (1.0f - color().a) * 255.0f;
+	u32 r = color().r * color().a * 255.0f;
+	u32 g = color().g * color().a * 255.0f;
+	u32 b = color().b * color().a * 255.0f;
+	u32 inva = (1.0f - color().a) * 255.0f;
 
 	// find the center
 	float xcenter = float(bounds.xcenter());
@@ -1885,21 +1885,21 @@ void layout_element::disk_component::draw(running_machine &machine, bitmap_argb3
 	float ooyradius2 = 1.0f / (yradius * yradius);
 
 	// iterate over y
-	for (uint32_t y = bounds.min_y; y <= bounds.max_y; y++)
+	for (u32 y = bounds.min_y; y <= bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
 		float xval = xradius * sqrtf(1.0f - (ycoord * ycoord) * ooyradius2);
 
 		// compute left/right coordinates
-		int32_t left = (int32_t)(xcenter - xval + 0.5f);
-		int32_t right = (int32_t)(xcenter + xval + 0.5f);
+		s32 left = s32(xcenter - xval + 0.5f);
+		s32 right = s32(xcenter + xval + 0.5f);
 
 		// draw this scanline
-		for (uint32_t x = left; x < right; x++)
+		for (u32 x = left; x < right; x++)
 		{
-			uint32_t finalr = r;
-			uint32_t finalg = g;
-			uint32_t finalb = b;
+			u32 finalr = r;
+			u32 finalg = g;
+			u32 finalb = b;
 
 			// if we're translucent, add in the destination pixel contribution
 			if (inva > 0)
@@ -1924,14 +1924,14 @@ void layout_element::disk_component::draw(running_machine &machine, bitmap_argb3
 void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest, const rectangle &bounds, const char *str, int align)
 {
 	// compute premultiplied colors
-	uint32_t r = color().r * 255.0f;
-	uint32_t g = color().g * 255.0f;
-	uint32_t b = color().b * 255.0f;
-	uint32_t a = color().a * 255.0f;
+	u32 r = color().r * 255.0f;
+	u32 g = color().g * 255.0f;
+	u32 b = color().b * 255.0f;
+	u32 a = color().a * 255.0f;
 
 	// get the width of the string
 	float aspect = 1.0f;
-	int32_t width;
+	s32 width;
 
 	while (1)
 	{
@@ -1942,7 +1942,7 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 	}
 
 	// get alignment
-	int32_t curx;
+	s32 curx;
 	switch (align)
 	{
 		// left
@@ -1988,21 +1988,21 @@ void layout_element::component::draw_text(render_font &font, bitmap_argb32 &dest
 			int effy = bounds.min_y + y;
 			if (effy >= bounds.min_y && effy <= bounds.max_y)
 			{
-				uint32_t *src = &tempbitmap.pix32(y);
-				uint32_t *d = &dest.pix32(effy);
+				u32 *src = &tempbitmap.pix32(y);
+				u32 *d = &dest.pix32(effy);
 				for (int x = 0; x < chbounds.width(); x++)
 				{
 					int effx = curx + x + chbounds.min_x;
 					if (effx >= bounds.min_x && effx <= bounds.max_x)
 					{
-						uint32_t spix = rgb_t(src[x]).a();
+						u32 spix = rgb_t(src[x]).a();
 						if (spix != 0)
 						{
 							rgb_t dpix = d[effx];
-							uint32_t ta = (a * (spix + 1)) >> 8;
-							uint32_t tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
-							uint32_t tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
-							uint32_t tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
+							u32 ta = (a * (spix + 1)) >> 8;
+							u32 tr = (r * ta + dpix.r() * (0x100 - ta)) >> 8;
+							u32 tg = (g * ta + dpix.g() * (0x100 - ta)) >> 8;
+							u32 tb = (b * ta + dpix.b() * (0x100 - ta)) >> 8;
 							d[effx] = rgb_t(tr, tg, tb);
 						}
 					}
@@ -2028,8 +2028,8 @@ void layout_element::component::draw_segment_horizontal_caps(bitmap_argb32 &dest
 	// loop over the width of the segment
 	for (int y = 0; y < width / 2; y++)
 	{
-		uint32_t *d0 = &dest.pix32(midy - y);
-		uint32_t *d1 = &dest.pix32(midy + y);
+		u32 *d0 = &dest.pix32(midy - y);
+		u32 *d1 = &dest.pix32(midy + y);
 		int ty = (y < width / 8) ? width / 8 : y;
 
 		// loop over the length of the segment
@@ -2061,8 +2061,8 @@ void layout_element::component::draw_segment_vertical_caps(bitmap_argb32 &dest, 
 	// loop over the width of the segment
 	for (int x = 0; x < width / 2; x++)
 	{
-		uint32_t *d0 = &dest.pix32(0, midx - x);
-		uint32_t *d1 = &dest.pix32(0, midx + x);
+		u32 *d0 = &dest.pix32(0, midx - x);
+		u32 *d1 = &dest.pix32(0, midx + x);
 		int tx = (x < width / 8) ? width / 8 : x;
 
 		// loop over the length of the segment
@@ -2098,7 +2098,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			uint32_t *d = &dest.pix32(0, x);
+			u32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = maxy - width - step; y < maxy - step; y++)
@@ -2123,7 +2123,7 @@ void layout_element::component::draw_segment_diagonal_2(bitmap_argb32 &dest, int
 	for (int x = minx; x < maxx; x++)
 		if (x >= 0 && x < dest.width())
 		{
-			uint32_t *d = &dest.pix32(0, x);
+			u32 *d = &dest.pix32(0, x);
 			int step = (x - minx) * ratio;
 
 			for (int y = miny + step; y < miny + step + width; y++)
@@ -2144,19 +2144,19 @@ void layout_element::component::draw_segment_decimal(bitmap_argb32 &dest, int mi
 	float ooradius2 = 1.0f / (float)(width * width);
 
 	// iterate over y
-	for (uint32_t y = 0; y <= width; y++)
+	for (u32 y = 0; y <= width; y++)
 	{
-		uint32_t *d0 = &dest.pix32(midy - y);
-		uint32_t *d1 = &dest.pix32(midy + y);
+		u32 *d0 = &dest.pix32(midy - y);
+		u32 *d1 = &dest.pix32(midy + y);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
-		int32_t left, right;
+		s32 left, right;
 
 		// compute left/right coordinates
-		left = midx - (int32_t)(xval + 0.5f);
-		right = midx + (int32_t)(xval + 0.5f);
+		left = midx - s32(xval + 0.5f);
+		right = midx + s32(xval + 0.5f);
 
 		// draw this scanline
-		for (uint32_t x = left; x < right; x++)
+		for (u32 x = left; x < right; x++)
 			d0[x] = d1[x] = color;
 	}
 }
@@ -2175,7 +2175,7 @@ void layout_element::component::draw_segment_comma(bitmap_argb32 &dest, int minx
 	// draw line
 	for (int x = minx; x < maxx; x++)
 	{
-		uint32_t *d = &dest.pix32(0, x);
+		u32 *d = &dest.pix32(0, x);
 		int step = (x - minx) * ratio;
 
 		for (int y = maxy; y < maxy  - width - step; y--)
@@ -2192,7 +2192,7 @@ void layout_element::component::apply_skew(bitmap_argb32 &dest, int skewwidth)
 {
 	for (int y = 0; y < dest.height(); y++)
 	{
-		uint32_t *destrow = &dest.pix32(y);
+		u32 *destrow = &dest.pix32(y);
 		int offs = skewwidth * (dest.height() - y) / dest.height();
 		for (int x = dest.width() - skewwidth - 1; x >= 0; x--)
 			destrow[x + offs] = destrow[x];
@@ -2213,42 +2213,42 @@ const simple_list<layout_view::item> layout_view::s_null_list;
 //  layout_view - constructor
 //-------------------------------------------------
 
-layout_view::layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist)
-	: m_next(nullptr),
-		m_aspect(1.0f),
-		m_scraspect(1.0f)
+layout_view::layout_view(running_machine &machine, util::xml::data_node const &viewnode, simple_list<layout_element> &elemlist)
+	: m_next(nullptr)
+	, m_aspect(1.0f)
+	, m_scraspect(1.0f)
 {
 	// allocate a copy of the name
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
 
 	// if we have a bounds item, load it
-	xml_data_node *boundsnode = xml_get_sibling(viewnode.child, "bounds");
+	util::xml::data_node const *const boundsnode = viewnode.get_child("bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	if (boundsnode != nullptr)
-		parse_bounds(machine, xml_get_sibling(boundsnode, "bounds"), m_expbounds);
+		parse_bounds(machine, boundsnode, m_expbounds);
 
 	// load backdrop items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "backdrop"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "backdrop"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("backdrop"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("backdrop"))
 		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load screen items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "screen"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "screen"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("screen"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("screen"))
 		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load overlay items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "overlay"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "overlay"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("overlay"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("overlay"))
 		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load bezel items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "bezel"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "bezel"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("bezel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("bezel"))
 		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load cpanel items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "cpanel"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "cpanel"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("cpanel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("cpanel"))
 		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load marquee items
-	for (xml_data_node *itemnode = xml_get_sibling(viewnode.child, "marquee"); itemnode != nullptr; itemnode = xml_get_sibling(itemnode->next, "marquee"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("marquee"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("marquee"))
 		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// recompute the data for the view based on a default layer config
@@ -2410,13 +2410,13 @@ void layout_view::resolve_tags()
 //  item - constructor
 //-------------------------------------------------
 
-layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simple_list<layout_element> &elemlist)
-	: m_next(nullptr),
-		m_element(nullptr),
-		m_input_port(nullptr),
-		m_input_mask(0),
-		m_screen(nullptr),
-		m_orientation(ROT0)
+layout_view::item::item(running_machine &machine, util::xml::data_node const &itemnode, simple_list<layout_element> &elemlist)
+	: m_next(nullptr)
+	, m_element(nullptr)
+	, m_input_port(nullptr)
+	, m_input_mask(0)
+	, m_screen(nullptr)
+	, m_orientation(ROT0)
 {
 	// allocate a copy of the output name
 	m_output_name = xml_get_attribute_string_with_subst(machine, itemnode, "name", "");
@@ -2448,12 +2448,12 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	m_input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (m_output_name[0] != 0 && m_element != nullptr)
 		machine.output().set_value(m_output_name.c_str(), m_element->default_state());
-	parse_bounds(machine, xml_get_sibling(itemnode.child, "bounds"), m_rawbounds);
-	parse_color(machine, xml_get_sibling(itemnode.child, "color"), m_color);
-	parse_orientation(machine, xml_get_sibling(itemnode.child, "orientation"), m_orientation);
+	parse_bounds(machine, itemnode.get_child("bounds"), m_rawbounds);
+	parse_color(machine, itemnode.get_child("color"), m_color);
+	parse_orientation(machine, itemnode.get_child("orientation"), m_orientation);
 
 	// sanity checks
-	if (strcmp(itemnode.name, "screen") == 0)
+	if (strcmp(itemnode.get_name(), "screen") == 0)
 	{
 		if (m_screen == nullptr)
 			throw emu_fatalerror("Layout references invalid screen index %d", index);
@@ -2461,7 +2461,7 @@ layout_view::item::item(running_machine &machine, xml_data_node &itemnode, simpl
 	else
 	{
 		if (m_element == nullptr)
-			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.name);
+			throw emu_fatalerror("Layout item of type %s require an element tag", itemnode.get_name());
 	}
 
 	if (has_input())
@@ -2542,25 +2542,25 @@ void layout_view::item::resolve_tags()
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname)
+layout_file::layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname)
 	: m_next(nullptr)
 {
 	// find the layout node
-	xml_data_node *mamelayoutnode = xml_get_sibling(rootnode.child, "mamelayout");
+	util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
 	if (mamelayoutnode == nullptr)
 		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
 
 	// validate the config data version
-	int version = xml_get_attribute_int(mamelayoutnode, "version", 0);
+	int const version = mamelayoutnode->get_attribute_int("version", 0);
 	if (version != LAYOUT_VERSION)
 		throw emu_fatalerror("Invalid XML file: unsupported version");
 
 	// parse all the elements
-	for (xml_data_node *elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode != nullptr; elemnode = xml_get_sibling(elemnode->next, "element"))
+	for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode != nullptr; elemnode = elemnode->get_next_sibling("element"))
 		m_elemlist.append(*global_alloc(layout_element(machine, *elemnode, dirname)));
 
 	// parse all the views
-	for (xml_data_node *viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode != nullptr; viewnode = xml_get_sibling(viewnode->next, "view"))
+	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
 		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
 }
 

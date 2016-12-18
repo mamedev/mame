@@ -8,7 +8,7 @@
     After that, it uploads 4 ranges of code to checksum, followed by the 4 checksums.
     The 68K does the checksumming, and returns the results to the protection device.
 
-    Apart from inital protection calls and code upload, the vblank in both games writes
+    Apart from initial protection calls and code upload, the vblank in both games writes
     info to the protection but they seem to ignore the returned data.
     Maybe the protection is tied to something else, or maybe it was preliminary work on
     further security.

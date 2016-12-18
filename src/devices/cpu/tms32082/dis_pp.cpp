@@ -435,10 +435,10 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 		case 0xe:
 		case 0xf:
 		{
-			if ((op & U64(0xfaa8100000000000)) == U64(0x8800000000000000))
+			if ((op & 0xfaa8100000000000U) == 0x8800000000000000U)
 			{
 				int operation = (op >> 39) & 0x1f;
-				uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
+				uint64_t parallel_xfer = (op & 0x0000007fffffffffU);
 
 				switch (operation)
 				{
@@ -462,7 +462,7 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 					case 0:
 					case 1:     // Base set ALU (5-bit immediate)
 					{
-						uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
+						uint64_t parallel_xfer = (op & 0x0000007fffffffffU);
 
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;
@@ -541,7 +541,7 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 
 					case 2:     // Base set ALU (reg src2)
 					{
-						uint64_t parallel_xfer = (op & U64(0x0000007fffffffff));
+						uint64_t parallel_xfer = (op & 0x0000007fffffffffU);
 
 						int dst = (op >> 48) & 7;
 						int src1 = (op >> 45) & 7;
@@ -698,16 +698,7 @@ static offs_t tms32082_disasm_pp(std::ostream &stream, offs_t pc, const uint8_t 
 	return 8 | flags | DASMFLAG_SUPPORTED;
 }
 
-static offs_t tms32082_disasm_pp(char *buffer, offs_t pc, const uint8_t *oprom)
-{
-	std::ostringstream stream;
-	offs_t result = tms32082_disasm_pp(stream, pc, oprom);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE(tms32082_pp)
 {
-	return tms32082_disasm_pp(buffer, pc, oprom);
+	return tms32082_disasm_pp(stream, pc, oprom);
 }

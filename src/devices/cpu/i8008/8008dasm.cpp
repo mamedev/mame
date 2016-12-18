@@ -16,7 +16,7 @@
 static const char reg[] = { 'a', 'b', 'c', 'd', 'e', 'h', 'l', 'm' };
 static const char flag_names[] = { 'c', 'z', 's', 'p' };
 
-static offs_t internal_disasm_i8008(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(i8008)
 {
 	uint32_t flags = 0;
 	unsigned PC = pc;
@@ -112,14 +112,4 @@ static offs_t internal_disasm_i8008(cpu_device *device, std::ostream &stream, of
 					break;
 	}
 	return (pc - PC) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(i8008)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_i8008(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

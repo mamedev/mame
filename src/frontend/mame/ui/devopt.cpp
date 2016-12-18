@@ -26,7 +26,7 @@ menu_device_config::menu_device_config(mame_ui_manager &mui, render_container &c
 	m_mounted = slot->device().subdevice(option->name()) != nullptr;
 }
 
-void menu_device_config::populate()
+void menu_device_config::populate(float &customtop, float &custombottom)
 {
 	std::ostringstream str;
 	device_t *dev;

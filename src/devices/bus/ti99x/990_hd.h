@@ -9,7 +9,7 @@
 #include "imagedev/harddriv.h"
 
 /* max disk units per controller: 4 is the protocol limit, but it may be
-overriden if more than one controller is used */
+overridden if more than one controller is used */
 #define MAX_DISK_UNIT 4
 
 class ti990_hdc_device : public device_t

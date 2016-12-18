@@ -83,7 +83,7 @@ static const instr_desc instructions[16] =
 	{ "A",      store },        { "S",      swap }
 };
 
-static offs_t internal_disasm_apexc(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(apexc)
 {
 	uint32_t instruction;         /* 32-bit machine instruction */
 	int x, y, function, c6, vector; /* instruction fields */
@@ -179,16 +179,5 @@ static offs_t internal_disasm_apexc(cpu_device *device, std::ostream &stream, of
 
 	/* print Y address */
 	util::stream_format(stream, "%03X(%02d/%02d)", y<<2, (y >> 5) & 0x1f, y & 0x1f);  /* 7 chars */
-
 	return 4;
-}
-
-
-CPU_DISASSEMBLE(apexc)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_apexc(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

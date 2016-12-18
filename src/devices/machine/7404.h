@@ -2,16 +2,16 @@
 // copyright-holders:Ryan Holtz
 /*****************************************************************************
 
-	5/7404 Hex Inverters
+    5/7404 Hex Inverters
 
 ***********************************************************************
 
-	Connection Diagram:
+    Connection Diagram:
 
-	        SN5404 J Package
-	        SN54LS04, SN54S04 J or W Package
-	        SN7404 D, DB, N or NS Package
-	        SN74S04 D or N Package
+            SN5404 J Package
+            SN54LS04, SN54S04 J or W Package
+            SN7404 D, DB, N or NS Package
+            SN74S04 D or N Package
               ___ ___
        1A  1 |*  u   | 14  Vcc
        1Y  2 |       | 13  6A
@@ -22,7 +22,7 @@
       GND  7 |_______| 8   4Y
 
 
-	        SN5404 W Package
+            SN5404 W Package
               ___ ___
        1A  1 |*  u   | 14  1Y
        2Y  2 |       | 13  6A
@@ -33,25 +33,25 @@
        4A  7 |_______| 8   4Y
 
 
-	    SN54LS04, SN54S04 FK Package
+        SN54LS04, SN54S04 FK Package
 
           1Y  1A  NC  Vcc 6A
-	     _______________________
-	    /  |_| |_| |_| |_| |_|  |
-	    |_  3   2   1  20  19  _|
-	2A  |_|                 18|_|  6Y
-	    |_                     _|
-	NC  |_|                 17|_|  NC
-	    |_                     _|
-	2Y  |_|                 16|_|  5A
-	    |_                     _|
-	NC  |_|                 15|_|  NC
-	    |_                     _|
-	3A  |_|                 14|_|  5Y
-	    |   9  10  11  12  13   |
-	    |__|=|_|=|_|=|_|=|_|=|__|
+         _______________________
+        /  |_| |_| |_| |_| |_|  |
+        |_  3   2   1  20  19  _|
+    2A  |_|                 18|_|  6Y
+        |_                     _|
+    NC  |_|                 17|_|  NC
+        |_                     _|
+    2Y  |_|                 16|_|  5A
+        |_                     _|
+    NC  |_|                 15|_|  NC
+        |_                     _|
+    3A  |_|                 14|_|  5Y
+        |   9  10  11  12  13   |
+        |__|=|_|=|_|=|_|=|_|=|__|
 
-	        3Y  GND NC  4Y  4A
+            3Y  GND NC  4Y  4A
 
 **********************************************************************/
 
@@ -133,10 +133,10 @@ private:
 	devcb_write_line m_y6_func;
 
 	// inputs
-	uint8_t m_a;		// pins 1,3,5,9,11,13
+	uint8_t m_a;        // pins 1,3,5,9,11,13
 
 	// outputs
-	uint8_t m_y;		// pins 2,4,6,8,10,12
+	uint8_t m_y;        // pins 2,4,6,8,10,12
 };
 
 // device type definition

@@ -8,6 +8,7 @@
 #include "machine/eepromser.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
+#include "machine/msm6242.h"
 
 typedef float MATRIX[4][4];
 typedef float VECTOR[4];
@@ -60,6 +61,7 @@ public:
 		m_scsp1(*this, "scsp1"),
 		m_eeprom(*this, "eeprom"),
 		m_screen(*this, "screen"),
+		m_rtc(*this, "rtc"),
 		m_adc_ports(*this, {"AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7"}),
 		m_work_ram(*this, "work_ram"),
 		m_paletteram64(*this, "paletteram64"),
@@ -79,6 +81,7 @@ public:
 	required_device<scsp_device> m_scsp1;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
+	required_device<rtc72421_device> m_rtc;
 
 	optional_ioport_array<8> m_adc_ports;
 

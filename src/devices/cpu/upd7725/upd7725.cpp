@@ -308,10 +308,10 @@ uint32_t necdsp_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t necdsp_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t necdsp_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( upd7725 );
-	return CPU_DISASSEMBLE_NAME(upd7725)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(upd7725)(this, stream, pc, oprom, opram, options);
 }
 
 void necdsp_device::execute_run()

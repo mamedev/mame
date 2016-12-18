@@ -94,7 +94,7 @@ protected:
 	// device_disasm_interface overrides
 	virtual uint32_t      disasm_min_opcode_bytes() const override;
 	virtual uint32_t      disasm_max_opcode_bytes() const override;
-	virtual offs_t      disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
+	virtual offs_t      disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options) override;
 
 	const address_space_config* memory_space_config(address_spacenum spacenum) const override;
 
@@ -411,7 +411,7 @@ private:
 	// 1  1  1   LREX
 	//
 	// We could realize this via the CRU access as well, but the data bus access
-	// is not that simple to emulate. For the sake of homogenity between the
+	// is not that simple to emulate. For the sake of homogeneity between the
 	// chip emulations we use a dedicated callback.
 	devcb_write8   m_external_operation;
 

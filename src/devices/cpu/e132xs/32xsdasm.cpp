@@ -2136,16 +2136,7 @@ unsigned dasm_hyperstone(std::ostream &stream, unsigned pc, const uint8_t *oprom
 	return size | flags | DASMFLAG_SUPPORTED;
 }
 
-static unsigned dasm_hyperstone(char *buffer, unsigned pc, const uint8_t *oprom, unsigned h_flag, int private_fp)
-{
-	std::ostringstream stream;
-	unsigned result = dasm_hyperstone(stream, pc, oprom, h_flag, private_fp);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
 CPU_DISASSEMBLE( hyperstone_generic )
 {
-	return dasm_hyperstone( buffer, pc, oprom, 0, 0 );
+	return dasm_hyperstone( stream, pc, oprom, 0, 0 );
 }

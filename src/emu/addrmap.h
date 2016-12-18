@@ -58,11 +58,11 @@ public:
 			m_name(nullptr),
 			m_tag(nullptr) { }
 
-	map_handler_type        m_type;             // type of the handler
-	uint8_t                   m_bits;             // width of the handler in bits, or 0 for default
-	uint64_t                  m_mask;             // mask for which lanes apply
-	const char *            m_name;             // name of the handler
-	const char *            m_tag;              // tag for I/O ports and banks
+	map_handler_type    m_type;             // type of the handler
+	u8                  m_bits;             // width of the handler in bits, or 0 for default
+	u64                 m_mask;             // mask for which lanes apply
+	const char *        m_name;             // name of the handler
+	const char *        m_tag;              // tag for I/O ports and banks
 };
 
 
@@ -120,7 +120,7 @@ public:
 	address_map_entry &set_write_type(map_handler_type _type) { m_write.m_type = _type; return *this; }
 
 	// submap referencing
-	address_map_entry &set_submap(const char *tag, address_map_delegate func, int bits, uint64_t mask);
+	address_map_entry &set_submap(const char *tag, address_map_delegate func, int bits, u64 mask);
 
 	// public state
 	address_map_entry *     m_next;                 // pointer to the next entry
@@ -162,28 +162,28 @@ public:
 	offs_t                  m_bytemask;             // byte-adjusted mask bits
 
 	// handler setters for 8-bit functions
-	address_map_entry &set_handler(read8_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(write8_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(read8_delegate rfunc, write8_delegate wfunc, uint64_t mask = 0);
+	address_map_entry &set_handler(read8_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(write8_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(read8_delegate rfunc, write8_delegate wfunc, u64 mask = 0);
 
 	// handler setters for 16-bit functions
-	address_map_entry &set_handler(read16_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(write16_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(read16_delegate rfunc, write16_delegate wfunc, uint64_t mask = 0);
+	address_map_entry &set_handler(read16_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(write16_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(read16_delegate rfunc, write16_delegate wfunc, u64 mask = 0);
 
 	// handler setters for 32-bit functions
-	address_map_entry &set_handler(read32_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(write32_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(read32_delegate rfunc, write32_delegate wfunc, uint64_t mask = 0);
+	address_map_entry &set_handler(read32_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(write32_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(read32_delegate rfunc, write32_delegate wfunc, u64 mask = 0);
 
 	// handler setters for 64-bit functions
-	address_map_entry &set_handler(read64_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(write64_delegate func, uint64_t mask = 0);
-	address_map_entry &set_handler(read64_delegate rfunc, write64_delegate wfunc, uint64_t mask = 0);
+	address_map_entry &set_handler(read64_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(write64_delegate func, u64 mask = 0);
+	address_map_entry &set_handler(read64_delegate rfunc, write64_delegate wfunc, u64 mask = 0);
 
 private:
 	// helper functions
-	bool unitmask_is_appropriate(uint8_t width, uint64_t unitmask, const char *string);
+	bool unitmask_is_appropriate(u8 width, u64 unitmask, const char *string);
 };
 
 // ======================> address_map
@@ -195,28 +195,28 @@ public:
 	// construction/destruction
 	address_map(device_t &device, address_spacenum spacenum);
 	address_map(device_t &device, address_map_entry *entry);
-	address_map(const address_space &space, offs_t start, offs_t end, int bits, uint64_t unitmask, device_t &device, address_map_delegate submap_delegate);
+	address_map(const address_space &space, offs_t start, offs_t end, int bits, u64 unitmask, device_t &device, address_map_delegate submap_delegate);
 	~address_map();
 
 	// configuration
-	void configure(address_spacenum _spacenum, uint8_t _databits);
+	void configure(address_spacenum _spacenum, u8 _databits);
 
 	// setters
 	void global_mask(offs_t mask);
 	void unmap_value_low() { m_unmapval = 0; }
 	void unmap_value_high() { m_unmapval = ~0; }
-	void unmap_value(uint8_t value) { m_unmapval = value; }
+	void unmap_value(u8 value) { m_unmapval = value; }
 
 	// add a new entry of the given type
 	address_map_entry &range(offs_t start, offs_t end);
 
 	// public data
-	address_spacenum        m_spacenum;         // space number of the map
-	device_t *              m_device;           // associated device
-	uint8_t                   m_databits;         // data bits represented by the map
-	uint8_t                   m_unmapval;         // unmapped memory value
-	offs_t                  m_globalmask;       // global mask
-	simple_list<address_map_entry> m_entrylist; // list of entries
+	address_spacenum                m_spacenum;     // space number of the map
+	device_t *                      m_device;       // associated device
+	u8                              m_databits;     // data bits represented by the map
+	u8                              m_unmapval;     // unmapped memory value
+	offs_t                          m_globalmask;   // global mask
+	simple_list<address_map_entry>  m_entrylist;    // list of entries
 
 	void uplift_submaps(running_machine &machine, device_t &owner, endianness_t endian);
 	void map_validity_check(validity_checker &valid, address_spacenum spacenum) const;

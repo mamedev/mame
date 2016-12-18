@@ -850,6 +850,7 @@ peplus.cpp
 peyper.cpp
 pgm.cpp
 pgm2.cpp
+pgm3.cpp
 phoenix.cpp
 photon.cpp
 photon2.cpp
@@ -1329,6 +1330,7 @@ zerozone.cpp
 zn.cpp
 zodiack.cpp
 zr107.cpp
+zwackery.cpp
 //exceptions + to add - to remove from imported list
 //3do.cpp
 -3do

@@ -20,6 +20,9 @@
     Known bugs:
         * WWF has an unimplemented and not Y2K compatible real-time clock
 
+    NOTE: There is known to exist (currently not dumped) a Wrestlemania PCB with the following labels:
+          Wrestlemania 1.0 U63 #8549    &    Wrestlemania 1.0 U54 #40C7
+
 ***************************************************************************
 
 MK3/ Ultimate Mortal Kombat 3 / Williams-Midway Wolf hardware

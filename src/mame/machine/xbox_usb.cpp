@@ -6,7 +6,7 @@
 #include "machine/idectrl.h"
 #include "video/poly.h"
 #include "bitmap.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
 

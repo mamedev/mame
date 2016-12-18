@@ -337,6 +337,12 @@ public:
 		// allocate the device object
 		auto devinfo = std::make_unique<TActual>(machine, name, id, module, std::forward<TArgs>(args)...);
 
+		return add_device(machine, std::move(devinfo));
+	}
+
+	template <typename TActual>
+	TActual* add_device(running_machine &machine, std::unique_ptr<TActual> devinfo)
+	{
 		// Add the device to the machine
 		devinfo->m_device = machine.input().device_class(devinfo->deviceclass()).add_device(devinfo->name(), devinfo->id(), devinfo.get());
 
@@ -359,6 +365,7 @@ struct key_trans_entry {
 	int             scan_code;
 	unsigned char   virtual_key;
 #elif defined(OSD_UWP)
+	int             scan_code;
 	Windows::System::VirtualKey virtual_key;
 #endif
 
@@ -394,7 +401,8 @@ public:
 	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
 	int vkey_for_mame_code(input_code code) const;
 #elif defined(OSD_UWP)
-	input_item_id map_vkey_to_itemid(Windows::System::VirtualKey vkey) const;
+	input_item_id map_di_scancode_to_itemid(int di_scancode) const;
+	const char* ui_label_for_mame_key(input_item_id code) const;
 #endif
 
 	static keyboard_trans_table& instance()
@@ -564,26 +572,26 @@ const char *const default_axis_name[] =
 	"RY", "RZ", "SL1", "SL2"
 };
 
-inline static int32_t normalize_absolute_axis(int32_t raw, int32_t rawmin, int32_t rawmax)
+inline static int32_t normalize_absolute_axis(double raw, double rawmin, double rawmax)
 {
-	int32_t center = (rawmax + rawmin) / 2;
+	double center = (rawmax + rawmin) / 2.0;
 
 	// make sure we have valid data
 	if (rawmin >= rawmax)
-		return raw;
+		return int32_t(raw);
 
 	// above center
 	if (raw >= center)
 	{
-		int32_t result = (int64_t)(raw - center) * (int64_t)INPUT_ABSOLUTE_MAX / (int64_t)(rawmax - center);
-		return std::min(result, INPUT_ABSOLUTE_MAX);
+		double result = (raw - center) * INPUT_ABSOLUTE_MAX / (rawmax - center);
+		return std::min(result, (double)INPUT_ABSOLUTE_MAX);
 	}
 
 	// below center
 	else
 	{
-		int32_t result = -((int64_t)(center - raw) * (int64_t)-INPUT_ABSOLUTE_MIN / (int64_t)(center - rawmin));
-		return std::max(result, INPUT_ABSOLUTE_MIN);
+		double result = -((center - raw) * (double)-INPUT_ABSOLUTE_MIN / (center - rawmin));
+		return std::max(result, (double)INPUT_ABSOLUTE_MIN);
 	}
 }
 

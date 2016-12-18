@@ -21,14 +21,14 @@
 //  account tilemap flip states
 //-------------------------------------------------
 
-inline int32_t tilemap_t::effective_rowscroll(int index, uint32_t screen_width)
+inline s32 tilemap_t::effective_rowscroll(int index, u32 screen_width)
 {
 	// if we're flipping vertically, adjust the row number
 	if (m_attributes & TILEMAP_FLIPY)
 		index = m_scrollrows - 1 - index;
 
 	// adjust final result based on the horizontal flip and dx values
-	int32_t value;
+	s32 value;
 	if (!(m_attributes & TILEMAP_FLIPX))
 		value = m_dx - m_rowscroll[index];
 	else
@@ -49,14 +49,14 @@ inline int32_t tilemap_t::effective_rowscroll(int index, uint32_t screen_width)
 //  account tilemap flip states
 //-------------------------------------------------
 
-inline int32_t tilemap_t::effective_colscroll(int index, uint32_t screen_height)
+inline s32 tilemap_t::effective_colscroll(int index, u32 screen_height)
 {
 	// if we're flipping horizontally, adjust the column number
 	if (m_attributes & TILEMAP_FLIPX)
 		index = m_scrollcols - 1 - index;
 
 	// adjust final result based on the vertical flip and dx values
-	int32_t value;
+	s32 value;
 	if (!(m_attributes & TILEMAP_FLIPY))
 		value = m_dy - m_colscroll[index];
 	else
@@ -79,7 +79,7 @@ inline int32_t tilemap_t::effective_colscroll(int index, uint32_t screen_height)
 
 inline bool tilemap_t::gfx_elements_changed()
 {
-	uint32_t usedmask = m_gfx_used;
+	u32 usedmask = m_gfx_used;
 	bool isdirty = false;
 
 	// iterate over all used gfx types and set the dirty flag if any of them have changed
@@ -104,7 +104,7 @@ inline bool tilemap_t::gfx_elements_changed()
 //  bitmap, setting priority only
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_null(int count, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_opaque_null(int count, u8 *pri, u32 pcode)
 {
 	// skip entirely if not changing priority
 	if (pcode == 0xff00)
@@ -121,7 +121,7 @@ inline void tilemap_t::scanline_draw_opaque_null(int count, uint8_t *pri, uint32
 //  bitmap using a mask, setting priority only
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_null(const uint8_t *maskptr, int mask, int value, int count, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_masked_null(const u8 *maskptr, int mask, int value, int count, u8 *pri, u32 pcode)
 {
 	// skip entirely if not changing priority
 	if (pcode == 0xff00)
@@ -140,7 +140,7 @@ inline void tilemap_t::scanline_draw_masked_null(const uint8_t *maskptr, int mas
 //  indexed bitmap
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_ind16(uint16_t *dest, const uint16_t *source, int count, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_opaque_ind16(u16 *dest, const u16 *source, int count, u8 *pri, u32 pcode)
 {
 	// special case for no palette offset
 	int pal = pcode >> 16;
@@ -182,7 +182,7 @@ inline void tilemap_t::scanline_draw_opaque_ind16(uint16_t *dest, const uint16_t
 //  indexed bitmap using a mask
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_ind16(uint16_t *dest, const uint16_t *source, const uint8_t *maskptr, int mask, int value, int count, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_masked_ind16(u16 *dest, const u16 *source, const u8 *maskptr, int mask, int value, int count, u8 *pri, u32 pcode)
 {
 	int pal = pcode >> 16;
 
@@ -213,7 +213,7 @@ inline void tilemap_t::scanline_draw_masked_ind16(uint16_t *dest, const uint16_t
 //  RGB bitmap
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_rgb32(uint32_t *dest, const uint16_t *source, int count, const rgb_t *pens, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_opaque_rgb32(u32 *dest, const u16 *source, int count, const rgb_t *pens, u8 *pri, u32 pcode)
 {
 	const rgb_t *clut = &pens[pcode >> 16];
 
@@ -241,7 +241,7 @@ inline void tilemap_t::scanline_draw_opaque_rgb32(uint32_t *dest, const uint16_t
 //  RGB bitmap using a mask
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_rgb32(uint32_t *dest, const uint16_t *source, const uint8_t *maskptr, int mask, int value, int count, const rgb_t *pens, uint8_t *pri, uint32_t pcode)
+inline void tilemap_t::scanline_draw_masked_rgb32(u32 *dest, const u16 *source, const u8 *maskptr, int mask, int value, int count, const rgb_t *pens, u8 *pri, u32 pcode)
 {
 	const rgb_t *clut = &pens[pcode >> 16];
 
@@ -271,7 +271,7 @@ inline void tilemap_t::scanline_draw_masked_rgb32(uint32_t *dest, const uint16_t
 //  32bpp RGB bitmap with alpha blending
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(uint32_t *dest, const uint16_t *source, int count, const rgb_t *pens, uint8_t *pri, uint32_t pcode, uint8_t alpha)
+inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(u32 *dest, const u16 *source, int count, const rgb_t *pens, u8 *pri, u32 pcode, u8 alpha)
 {
 	const rgb_t *clut = &pens[pcode >> 16];
 
@@ -300,7 +300,7 @@ inline void tilemap_t::scanline_draw_opaque_rgb32_alpha(uint32_t *dest, const ui
 //  blending
 //-------------------------------------------------
 
-inline void tilemap_t::scanline_draw_masked_rgb32_alpha(uint32_t *dest, const uint16_t *source, const uint8_t *maskptr, int mask, int value, int count, const rgb_t *pens, uint8_t *pri, uint32_t pcode, uint8_t alpha)
+inline void tilemap_t::scanline_draw_masked_rgb32_alpha(u32 *dest, const u16 *source, const u8 *maskptr, int mask, int value, int count, const rgb_t *pens, u8 *pri, u32 pcode, u8 alpha)
 {
 	const rgb_t *clut = &pens[pcode >> 16];
 
@@ -343,7 +343,7 @@ tilemap_t::tilemap_t()
 //  init - initialize the tilemap
 //-------------------------------------------------
 
-tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, uint16_t tilewidth, uint16_t tileheight, uint32_t cols, uint32_t rows)
+tilemap_t &tilemap_t::init(tilemap_manager &manager, device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows)
 {
 	// populate managers and devices
 	m_manager = &manager;
@@ -463,7 +463,7 @@ void tilemap_t::mark_tile_dirty(tilemap_memory_index memindex)
 //  a layer
 //-------------------------------------------------
 
-void tilemap_t::map_pens_to_layer(int group, pen_t pen, pen_t mask, uint8_t layermask)
+void tilemap_t::map_pens_to_layer(int group, pen_t pen, pen_t mask, u8 layermask)
 {
 	assert(group < TILEMAP_NUM_GROUPS);
 	assert((layermask & TILEMAP_PIXEL_CATEGORY_MASK) == 0);
@@ -478,7 +478,7 @@ void tilemap_t::map_pens_to_layer(int group, pen_t pen, pen_t mask, uint8_t laye
 	stop = std::min(stop, MAX_PEN_TO_FLAGS - 1);
 
 	// iterate and set
-	uint8_t *array = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
+	u8 *array = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
 	bool changed = false;
 	for (pen_t cur = start; cur <= stop; cur++)
 		if ((cur & mask) == pen && array[cur] != layermask)
@@ -515,13 +515,13 @@ void tilemap_t::set_transparent_pen(pen_t pen)
 //  background mask (mapping to layer 1)
 //-------------------------------------------------
 
-void tilemap_t::set_transmask(int group, uint32_t fgmask, uint32_t bgmask)
+void tilemap_t::set_transmask(int group, u32 fgmask, u32 bgmask)
 {
 	// iterate over all 32 pens specified
 	for (pen_t pen = 0; pen < 32; pen++)
 	{
-		uint8_t fgbits = ((fgmask >> pen) & 1) ? TILEMAP_PIXEL_TRANSPARENT : TILEMAP_PIXEL_LAYER0;
-		uint8_t bgbits = ((bgmask >> pen) & 1) ? TILEMAP_PIXEL_TRANSPARENT : TILEMAP_PIXEL_LAYER1;
+		u8 fgbits = ((fgmask >> pen) & 1) ? TILEMAP_PIXEL_TRANSPARENT : TILEMAP_PIXEL_LAYER0;
+		u8 bgbits = ((bgmask >> pen) & 1) ? TILEMAP_PIXEL_TRANSPARENT : TILEMAP_PIXEL_LAYER1;
 		map_pen_to_layer(group, pen, fgbits | bgbits);
 	}
 }
@@ -538,7 +538,7 @@ void tilemap_t::configure_groups(gfx_element &gfx, indirect_pen_t transcolor)
 	assert(gfx.colors() <= TILEMAP_NUM_GROUPS);
 
 	// iterate over all colors in the tilemap
-	for (uint32_t color = 0; color < gfx.colors(); color++)
+	for (u32 color = 0; color < gfx.colors(); color++)
 		set_transmask(color, m_palette->transpen_mask(gfx, color, transcolor), 0);
 }
 
@@ -556,22 +556,22 @@ void tilemap_t::configure_groups(gfx_element &gfx, indirect_pen_t transcolor)
 //  order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_rows(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_rows(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return row * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_x(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_x(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return row * num_cols + (num_cols - 1 - col);
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_y(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_y(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + col;
 }
 
-tilemap_memory_index tilemap_t::scan_rows_flip_xy(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_rows_flip_xy(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return (num_rows - 1 - row) * num_cols + (num_cols - 1 - col);
 }
@@ -585,22 +585,22 @@ tilemap_memory_index tilemap_t::scan_rows_flip_xy(uint32_t col, uint32_t row, ui
 //  major order with optional flipping
 //-------------------------------------------------
 
-tilemap_memory_index tilemap_t::scan_cols(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_cols(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return col * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_x(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_x(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + row;
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_y(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_y(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return col * num_rows + (num_rows - 1 - row);
 }
 
-tilemap_memory_index tilemap_t::scan_cols_flip_xy(uint32_t col, uint32_t row, uint32_t num_cols, uint32_t num_rows)
+tilemap_memory_index tilemap_t::scan_cols_flip_xy(u32 col, u32 row, u32 num_cols, u32 num_rows)
 {
 	return (num_cols - 1 - col) * num_rows + (num_rows - 1 - row);
 }
@@ -634,8 +634,8 @@ void tilemap_t::mappings_create()
 
 	// compute the maximum memory index
 	tilemap_memory_index max_memory_index = 0;
-	for (uint32_t row = 0; row < m_rows; row++)
-		for (uint32_t col = 0; col < m_cols; col++)
+	for (u32 row = 0; row < m_rows; row++)
+		for (u32 col = 0; col < m_cols; col++)
 		{
 			tilemap_memory_index memindex = memory_index(col, row);
 			max_memory_index = std::max(max_memory_index, memindex);
@@ -665,8 +665,8 @@ void tilemap_t::mappings_update()
 	// now iterate over all logical indexes and populate the memory index
 	for (logical_index logindex = 0; logindex < m_logical_to_memory.size(); logindex++)
 	{
-		uint32_t logical_col = logindex % m_cols;
-		uint32_t logical_row = logindex / m_cols;
+		u32 logical_col = logindex % m_cols;
+		u32 logical_row = logindex / m_cols;
 		tilemap_memory_index memindex = memory_index(logical_col, logical_row);
 
 		// apply tilemap flip to get the final location to store
@@ -674,7 +674,7 @@ void tilemap_t::mappings_update()
 			logical_col = (m_cols - 1) - logical_col;
 		if (m_attributes & TILEMAP_FLIPY)
 			logical_row = (m_rows - 1) - logical_row;
-		uint32_t flipped_logindex = logical_row * m_cols + logical_col;
+		u32 flipped_logindex = logical_row * m_cols + logical_col;
 
 		// fill in entries in both arrays
 		m_memory_to_logical[memindex] = flipped_logindex;
@@ -724,8 +724,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// iterate over rows and columns
 	logical_index logindex = 0;
-	for (uint32_t row = 0; row < m_rows; row++)
-		for (uint32_t col = 0; col < m_cols; col++, logindex++)
+	for (u32 row = 0; row < m_rows; row++)
+		for (u32 col = 0; col < m_cols; col++, logindex++)
 			if (m_tileflags[logindex] == TILE_FLAG_DIRTY)
 				tile_update(logindex, col, row);
 
@@ -740,7 +740,7 @@ g_profiler.stop();
 //  tile_update - update a single dirty tile
 //-------------------------------------------------
 
-void tilemap_t::tile_update(logical_index logindex, uint32_t col, uint32_t row)
+void tilemap_t::tile_update(logical_index logindex, u32 col, u32 row)
 {
 g_profiler.start(PROFILER_TILEMAP_UPDATE);
 
@@ -749,11 +749,11 @@ g_profiler.start(PROFILER_TILEMAP_UPDATE);
 	m_tile_get_info(*this, m_tileinfo, memindex);
 
 	// apply the global tilemap flip to the returned flip flags
-	uint32_t flags = m_tileinfo.flags ^ (m_attributes & 0x03);
+	u32 flags = m_tileinfo.flags ^ (m_attributes & 0x03);
 
 	// draw the tile, using either direct or transparent
-	uint32_t x0 = m_tilewidth * col;
-	uint32_t y0 = m_tileheight * row;
+	u32 x0 = m_tilewidth * col;
+	u32 y0 = m_tileheight * row;
 	m_tileflags[logindex] = tile_draw(m_tileinfo.pen_data, x0, y0,
 		m_tileinfo.palette_base, m_tileinfo.category, m_tileinfo.group, flags, m_tileinfo.pen_mask);
 
@@ -779,7 +779,7 @@ g_profiler.stop();
 //  the palette_base
 //-------------------------------------------------
 
-uint8_t tilemap_t::tile_draw(const uint8_t *pendata, uint32_t x0, uint32_t y0, uint32_t palette_base, uint8_t category, uint8_t group, uint8_t flags, uint8_t pen_mask)
+u8 tilemap_t::tile_draw(const u8 *pendata, u32 x0, u32 y0, u32 palette_base, u8 category, u8 group, u8 flags, u8 pen_mask)
 {
 	// OR in the force layer flags
 	category |= flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2);
@@ -801,22 +801,22 @@ uint8_t tilemap_t::tile_draw(const uint8_t *pendata, uint32_t x0, uint32_t y0, u
 	}
 
 	// iterate over rows
-	const uint8_t *penmap = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
-	uint8_t andmask = ~0, ormask = 0;
-	for (uint16_t ty = 0; ty < m_tileheight; ty++)
+	const u8 *penmap = m_pen_to_flags + group * MAX_PEN_TO_FLAGS;
+	u8 andmask = ~0, ormask = 0;
+	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
-		uint16_t *pixptr = &m_pixmap.pix16(y0, x0);
-		uint8_t *flagsptr = &m_flagsmap.pix8(y0, x0);
+		u16 *pixptr = &m_pixmap.pix16(y0, x0);
+		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
 
 		// pre-advance to the next row
 		y0 += dy0;
 
 		// 8bpp data
 		int xoffs = 0;
-		for (uint16_t tx = 0; tx < m_tilewidth; tx++)
+		for (u16 tx = 0; tx < m_tilewidth; tx++)
 		{
-			uint8_t pen = (*pendata++) & pen_mask;
-			uint8_t map = penmap[pen];
+			u8 pen = (*pendata++) & pen_mask;
+			u8 map = penmap[pen];
 			pixptr[xoffs] = palette_base + pen;
 			flagsptr[xoffs] = map | category;
 			andmask &= map;
@@ -834,7 +834,7 @@ uint8_t tilemap_t::tile_draw(const uint8_t *pendata, uint32_t x0, uint32_t y0, u
 //  flagsmap appropriately
 //-------------------------------------------------
 
-uint8_t tilemap_t::tile_apply_bitmask(const uint8_t *maskdata, uint32_t x0, uint32_t y0, uint8_t category, uint8_t flags)
+u8 tilemap_t::tile_apply_bitmask(const u8 *maskdata, u32 x0, u32 y0, u8 category, u8 flags)
 {
 	// if we're vertically flipped, point to the bottom row and work backwards
 	int dy0 = 1;
@@ -853,19 +853,19 @@ uint8_t tilemap_t::tile_apply_bitmask(const uint8_t *maskdata, uint32_t x0, uint
 	}
 
 	// iterate over rows
-	uint8_t andmask = ~0, ormask = 0;
+	u8 andmask = ~0, ormask = 0;
 	int bitoffs = 0;
-	for (uint16_t ty = 0; ty < m_tileheight; ty++)
+	for (u16 ty = 0; ty < m_tileheight; ty++)
 	{
 		// pre-advance to the next row
-		uint8_t *flagsptr = &m_flagsmap.pix8(y0, x0);
+		u8 *flagsptr = &m_flagsmap.pix8(y0, x0);
 		y0 += dy0;
 
 		// anywhere the bitmask is 0 should be transparent
 		int xoffs = 0;
-		for (uint16_t tx = 0; tx < m_tilewidth; tx++)
+		for (u16 tx = 0; tx < m_tilewidth; tx++)
 		{
-			uint8_t map = flagsptr[xoffs];
+			u8 map = flagsptr[xoffs];
 
 			if ((maskdata[bitoffs / 8] & (0x80 >> (bitoffs & 7))) == 0)
 				map = flagsptr[xoffs] = TILEMAP_PIXEL_TRANSPARENT | category;
@@ -891,7 +891,7 @@ uint8_t tilemap_t::tile_apply_bitmask(const uint8_t *maskdata, uint32_t x0, uint
 //  and indexed drawing code
 //-------------------------------------------------
 
-void tilemap_t::configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void tilemap_t::configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &priority_bitmap, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 {
 	// set the target bitmap
 	blit.priority = &priority_bitmap;
@@ -936,7 +936,7 @@ void tilemap_t::configure_blit_parameters(blit_parameters &blit, bitmap_ind8 &pr
 //-------------------------------------------------
 
 template<class _BitmapClass>
-void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void tilemap_t::draw_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 {
 	// skip if disabled
 	if (!m_enable)
@@ -952,8 +952,8 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 
 	// flip the tilemap around the center of the visible area
 	rectangle visarea = screen.visible_area();
-	uint32_t width = visarea.min_x + visarea.max_x + 1;
-	uint32_t height = visarea.min_y + visarea.max_y + 1;
+	u32 width = visarea.min_x + visarea.max_x + 1;
+	u32 height = visarea.min_y + visarea.max_y + 1;
 
 	// XY scrolling playfield
 	if (m_scrollrows == 1 && m_scrollcols == 1)
@@ -977,7 +977,7 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 		for (int ypos = scrolly - m_height; ypos <= original_cliprect.max_y; ypos += m_height)
 		{
 			int const firstrow = std::max((original_cliprect.min_y - ypos) / rowheight, 0);
-			int const lastrow = std::min((original_cliprect.max_y - ypos) / rowheight, int32_t(m_scrollrows) - 1);
+			int const lastrow = std::min((original_cliprect.max_y - ypos) / rowheight, s32(m_scrollrows) - 1);
 
 			// iterate over rows in the tilemap
 			int nextrow;
@@ -1043,10 +1043,10 @@ g_profiler.start(PROFILER_TILEMAP_DRAW);
 g_profiler.stop();
 }
 
-void tilemap_t::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void tilemap_t::draw(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 { draw_common(screen, dest, cliprect, flags, priority, priority_mask); }
 
-void tilemap_t::draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+void tilemap_t::draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect, u32 flags, u8 priority, u8 priority_mask)
 { draw_common(screen, dest, cliprect, flags, priority, priority_mask); }
 
 
@@ -1059,11 +1059,11 @@ void tilemap_t::draw(screen_device &screen, bitmap_rgb32 &dest, const rectangle 
 
 template<class _BitmapClass>
 void tilemap_t::draw_roz_common(screen_device &screen, _BitmapClass &dest, const rectangle &cliprect,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		bool wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+		u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy,
+		bool wraparound, u32 flags, u8 priority, u8 priority_mask)
 {
 // notes:
-// - startx and starty MUST be uint32_t for calculations to work correctly
+// - startx and starty MUST be u32 for calculations to work correctly
 // - srcbim_width and height are assumed to be a power of 2 to speed up wraparound
 
 	// skip if disabled
@@ -1093,13 +1093,13 @@ g_profiler.stop();
 }
 
 void tilemap_t::draw_roz(screen_device &screen, bitmap_ind16 &dest, const rectangle &cliprect,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		bool wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+		u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy,
+		bool wraparound, u32 flags, u8 priority, u8 priority_mask)
 { draw_roz_common(screen, dest, cliprect, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, priority_mask); }
 
 void tilemap_t::draw_roz(screen_device &screen, bitmap_rgb32 &dest, const rectangle &cliprect,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy,
-		bool wraparound, uint32_t flags, uint8_t priority, uint8_t priority_mask)
+		u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy,
+		bool wraparound, u32 flags, u8 priority, u8 priority_mask)
 { draw_roz_common(screen, dest, cliprect, startx, starty, incxx, incxy, incyx, incyy, wraparound, flags, priority, priority_mask); }
 
 
@@ -1125,7 +1125,7 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 
 	// look up priority and destination base addresses for y1
 	bitmap_ind8 &priority_bitmap = *blit.priority;
-	uint8_t *priority_baseaddr = &priority_bitmap.pix8(y1, xpos);
+	u8 *priority_baseaddr = &priority_bitmap.pix8(y1, xpos);
 	typename _BitmapClass::pixel_t *dest_baseaddr = nullptr;
 	int dest_rowpixels = 0;
 	if (dest.valid())
@@ -1141,8 +1141,8 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 	y2 -= ypos;
 
 	// get tilemap pixels
-	const uint16_t *source_baseaddr = &m_pixmap.pix16(y1);
-	const uint8_t *mask_baseaddr = &m_flagsmap.pix8(y1);
+	const u16 *source_baseaddr = &m_pixmap.pix16(y1);
+	const u8 *mask_baseaddr = &m_flagsmap.pix8(y1);
 
 	// get start/stop columns, rounding outward
 	int mincol = x1 / m_tilewidth;
@@ -1201,9 +1201,9 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 			const rgb_t *clut = m_palette->palette()->entry_list_adjusted();
 			if (prev_trans != WHOLLY_TRANSPARENT)
 			{
-				const uint16_t *source0 = source_baseaddr + x_start;
+				const u16 *source0 = source_baseaddr + x_start;
 				typename _BitmapClass::pixel_t *dest0 = dest_baseaddr + x_start;
-				uint8_t *pmap0 = priority_baseaddr + x_start;
+				u8 *pmap0 = priority_baseaddr + x_start;
 
 				// if we were opaque, use the opaque renderer
 				if (prev_trans == WHOLLY_OPAQUE)
@@ -1213,11 +1213,11 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 						if (dest_baseaddr == nullptr)
 							scanline_draw_opaque_null(x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
-							scanline_draw_opaque_ind16(reinterpret_cast<uint16_t *>(dest0), source0, x_end - x_start, pmap0, blit.tilemap_priority_code);
+							scanline_draw_opaque_ind16(reinterpret_cast<u16 *>(dest0), source0, x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 4 && blit.alpha >= 0xff)
-							scanline_draw_opaque_rgb32(reinterpret_cast<uint32_t *>(dest0), source0, x_end - x_start, clut, pmap0, blit.tilemap_priority_code);
+							scanline_draw_opaque_rgb32(reinterpret_cast<u32 *>(dest0), source0, x_end - x_start, clut, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 4)
-							scanline_draw_opaque_rgb32_alpha(reinterpret_cast<uint32_t *>(dest0), source0, x_end - x_start, clut, pmap0, blit.tilemap_priority_code, blit.alpha);
+							scanline_draw_opaque_rgb32_alpha(reinterpret_cast<u32 *>(dest0), source0, x_end - x_start, clut, pmap0, blit.tilemap_priority_code, blit.alpha);
 
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
@@ -1228,17 +1228,17 @@ void tilemap_t::draw_instance(screen_device &screen, _BitmapClass &dest, const b
 				// otherwise use the masked renderer
 				else
 				{
-					const uint8_t *mask0 = mask_baseaddr + x_start;
+					const u8 *mask0 = mask_baseaddr + x_start;
 					for (int cury = y; cury < nexty; cury++)
 					{
 						if (dest_baseaddr == nullptr)
 							scanline_draw_masked_null(mask0, blit.mask, blit.value, x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 2)
-							scanline_draw_masked_ind16(reinterpret_cast<uint16_t *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, pmap0, blit.tilemap_priority_code);
+							scanline_draw_masked_ind16(reinterpret_cast<u16 *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 4 && blit.alpha >= 0xff)
-							scanline_draw_masked_rgb32(reinterpret_cast<uint32_t *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, clut, pmap0, blit.tilemap_priority_code);
+							scanline_draw_masked_rgb32(reinterpret_cast<u32 *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, clut, pmap0, blit.tilemap_priority_code);
 						else if (sizeof(*dest0) == 4)
-							scanline_draw_masked_rgb32_alpha(reinterpret_cast<uint32_t *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, clut, pmap0, blit.tilemap_priority_code, blit.alpha);
+							scanline_draw_masked_rgb32_alpha(reinterpret_cast<u32 *>(dest0), source0, mask0, blit.mask, blit.value, x_end - x_start, clut, pmap0, blit.tilemap_priority_code, blit.alpha);
 
 						dest0 += dest_rowpixels;
 						source0 += m_pixmap.rowpixels();
@@ -1289,7 +1289,7 @@ do {                                                                        \
 
 template<class _BitmapClass>
 void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, const blit_parameters &blit,
-		uint32_t startx, uint32_t starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
+		u32 startx, u32 starty, int incxx, int incxy, int incyx, int incyy, bool wraparound)
 {
 	// pre-cache all the inner loop values
 	const rgb_t *clut = m_palette->palette()->entry_list_adjusted() + (blit.tilemap_priority_code >> 16);
@@ -1298,10 +1298,10 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 	const int ymask = m_pixmap.height() - 1;
 	const int widthshifted = m_pixmap.width() << 16;
 	const int heightshifted = m_pixmap.height() << 16;
-	uint32_t priority = blit.tilemap_priority_code;
-	uint8_t mask = blit.mask;
-	uint8_t value = blit.value;
-	uint8_t alpha = blit.alpha;
+	u32 priority = blit.tilemap_priority_code;
+	u8 mask = blit.mask;
+	u8 value = blit.value;
+	u8 alpha = blit.alpha;
 
 	// pre-advance based on the cliprect
 	startx += blit.cliprect.min_x * incxx + blit.cliprect.min_y * incyx;
@@ -1335,13 +1335,13 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 			{
 				// initialize X counters
 				int x = sx;
-				uint32_t cx = startx;
-				uint32_t cy = starty >> 16;
+				u32 cx = startx;
+				u32 cy = starty >> 16;
 
 				// get source and priority pointers
-				uint8_t *pri = &priority_bitmap.pix8(sy, sx);
-				const uint16_t *src = &m_pixmap.pix16(cy);
-				const uint8_t *maskptr = &m_flagsmap.pix8(cy);
+				u8 *pri = &priority_bitmap.pix8(sy, sx);
+				const u16 *src = &m_pixmap.pix16(cy);
+				const u8 *maskptr = &m_flagsmap.pix8(cy);
 				typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
 
 				// loop over columns
@@ -1376,12 +1376,12 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 		{
 			// initialize X counters
 			int x = sx;
-			uint32_t cx = startx;
-			uint32_t cy = starty;
+			u32 cx = startx;
+			u32 cy = starty;
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			uint8_t *pri = &priority_bitmap.pix8(sy, sx);
+			u8 *pri = &priority_bitmap.pix8(sy, sx);
 
 			// loop over columns
 			while (x <= ex)
@@ -1416,12 +1416,12 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 		{
 			// initialize X counters
 			int x = sx;
-			uint32_t cx = startx;
-			uint32_t cy = starty;
+			u32 cx = startx;
+			u32 cy = starty;
 
 			// get dest and priority pointers
 			typename _BitmapClass::pixel_t *dest = &destbitmap.pix(sy, sx);
-			uint8_t *pri = &priority_bitmap.pix8(sy, sx);
+			u8 *pri = &priority_bitmap.pix8(sy, sx);
 
 			// loop over columns
 			while (x <= ex)
@@ -1456,7 +1456,7 @@ void tilemap_t::draw_roz_core(screen_device &screen, _BitmapClass &destbitmap, c
 //  rowscroll and with fixed parameters
 //-------------------------------------------------
 
-void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, uint32_t scrollx, uint32_t scrolly)
+void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, u32 scrollx, u32 scrolly)
 {
 	// set up for the blit, using hard-coded parameters (no priority, etc)
 	blit_parameters blit;
@@ -1481,7 +1481,7 @@ void tilemap_t::draw_debug(screen_device &screen, bitmap_rgb32 &dest, uint32_t s
 //  get_info_debug - extract info for one tile
 //-------------------------------------------------
 
-void tilemap_t::get_info_debug(uint32_t col, uint32_t row, uint8_t &gfxnum, uint32_t &code, uint32_t &color)
+void tilemap_t::get_info_debug(u32 col, u32 row, u8 &gfxnum, u32 &code, u32 &color)
 {
 	// first map to the memory index
 	tilemap_memory_index memindex = memory_index(col, row);
@@ -1542,14 +1542,14 @@ tilemap_manager::~tilemap_manager()
 //  tilemaps
 //-------------------------------------------------
 
-tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, uint16_t tilewidth, uint16_t tileheight, uint32_t cols, uint32_t rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_mapper_delegate mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
 	return m_tilemap_list.append(allocated->init(*this, decoder, tile_get_info, mapper, tilewidth, tileheight, cols, rows));
 }
 
-tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, uint16_t tilewidth, uint16_t tileheight, uint32_t cols, uint32_t rows, tilemap_t *allocated)
+tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_info_delegate tile_get_info, tilemap_standard_mapper mapper, u16 tilewidth, u16 tileheight, u32 cols, u32 rows, tilemap_t *allocated)
 {
 	if (allocated == nullptr)
 		allocated = global_alloc(tilemap_t);
@@ -1574,7 +1574,7 @@ tilemap_t &tilemap_manager::create(device_gfx_interface &decoder, tilemap_get_in
 //  tilemaps
 //-------------------------------------------------
 
-void tilemap_manager::set_flip_all(uint32_t attributes)
+void tilemap_manager::set_flip_all(u32 attributes)
 {
 	for (tilemap_t &tmap : m_tilemap_list)
 		tmap.set_flip(attributes);
@@ -1605,7 +1605,7 @@ const device_type TILEMAP = &device_creator<tilemap_device>;
 //  tilemap_device - constructor
 //-------------------------------------------------
 
-tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+tilemap_device::tilemap_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, TILEMAP, "Tilemap", tag, owner, clock, "tilemap", __FILE__),
 		m_gfxdecode(*this, finder_base::DUMMY_TAG),
 		m_standard_mapper(TILEMAP_STANDARD_COUNT),
@@ -1658,7 +1658,7 @@ void tilemap_device::static_set_info_callback(device_t &device, tilemap_get_info
 //  layout
 //-------------------------------------------------
 
-void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, uint32_t columns, uint32_t rows)
+void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper mapper, u32 columns, u32 rows)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_standard_mapper = mapper;
@@ -1666,7 +1666,7 @@ void tilemap_device::static_set_layout(device_t &device, tilemap_standard_mapper
 	target.m_num_rows = rows;
 }
 
-void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate mapper, uint32_t columns, uint32_t rows)
+void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate mapper, u32 columns, u32 rows)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_standard_mapper = TILEMAP_STANDARD_COUNT;
@@ -1680,7 +1680,7 @@ void tilemap_device::static_set_layout(device_t &device, tilemap_mapper_delegate
 //  static_set_tile_size: Set the tile size
 //-------------------------------------------------
 
-void tilemap_device::static_set_tile_size(device_t &device, uint16_t width, uint16_t height)
+void tilemap_device::static_set_tile_size(device_t &device, u16 width, u16 height)
 {
 	tilemap_device &target = downcast<tilemap_device &>(device);
 	target.m_tile_width = width;

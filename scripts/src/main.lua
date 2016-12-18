@@ -101,7 +101,7 @@ end
 		}
 		configuration "**/scripts/resources/uwp/assets/*.png"
 			flags { "DeploymentContent" }
-	
+
 	-- Effects and Shaders
 	configuration { "winstore*" }
 		files {
@@ -312,8 +312,7 @@ end
 -- RETRO HACK END
 if (STANDALONE~=true) then
 	links {
-		"frontend",	
-		"http",
+		"frontend",
 	}
 end
 if (MACHINES["NETLIST"]~=null) then
@@ -356,8 +355,12 @@ end
 	links {
 		ext_lib("zlib"),
 		ext_lib("flac"),
+	}
+if (STANDALONE~=true) then
+	links {
 		ext_lib("sqlite3"),
 	}
+end
 
 	if _OPTIONS["NO_USE_MIDI"]~="1" then
 		links {

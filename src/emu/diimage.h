@@ -14,8 +14,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DIIMAGE_H__
-#define __DIIMAGE_H__
+#ifndef MAME_EMU_DIIMAGE_H
+#define MAME_EMU_DIIMAGE_H
 
 #include <memory>
 #include <string>
@@ -179,16 +179,16 @@ public:
 	bool is_filetype(const std::string &candidate_filetype) { return !core_stricmp(filetype().c_str(), candidate_filetype.c_str()); }
 	bool is_open() const { return bool(m_file); }
 	util::core_file &image_core_file() const { return *m_file; }
-	uint64_t length() { check_for_file(); return m_file->size(); }
+	u64 length() { check_for_file(); return m_file->size(); }
 	bool is_readonly() const { return m_readonly; }
-	uint32_t fread(void *buffer, uint32_t length) { check_for_file(); return m_file->read(buffer, length); }
-	uint32_t fread(optional_shared_ptr<uint8_t> &ptr, uint32_t length) { ptr.allocate(length); return fread(ptr.target(), length); }
-	uint32_t fread(optional_shared_ptr<uint8_t> &ptr, uint32_t length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
-	uint32_t fwrite(const void *buffer, uint32_t length) { check_for_file(); return m_file->write(buffer, length); }
-	int fseek(int64_t offset, int whence) { check_for_file(); return m_file->seek(offset, whence); }
-	uint64_t ftell() { check_for_file(); return m_file->tell(); }
+	u32 fread(void *buffer, u32 length) { check_for_file(); return m_file->read(buffer, length); }
+	u32 fread(optional_shared_ptr<u8> &ptr, u32 length) { ptr.allocate(length); return fread(ptr.target(), length); }
+	u32 fread(optional_shared_ptr<u8> &ptr, u32 length, offs_t offset) { ptr.allocate(length); return fread(ptr + offset, length - offset); }
+	u32 fwrite(const void *buffer, u32 length) { check_for_file(); return m_file->write(buffer, length); }
+	int fseek(s64 offset, int whence) { check_for_file(); return m_file->seek(offset, whence); }
+	u64 ftell() { check_for_file(); return m_file->tell(); }
 	int fgetc() { char ch; if (fread(&ch, 1) != 1) ch = '\0'; return ch; }
-	char *fgets(char *buffer, uint32_t length) { check_for_file(); return m_file->gets(buffer, length); }
+	char *fgets(char *buffer, u32 length) { check_for_file(); return m_file->gets(buffer, length); }
 	int image_feof() { check_for_file(); return m_file->eof(); }
 	void *ptr() {check_for_file(); return const_cast<void *>(m_file->buffer()); }
 	// configuration access
@@ -197,7 +197,7 @@ public:
 	const std::string &longname() const { return m_longname; }
 	const std::string &manufacturer() const { return m_manufacturer; }
 	const std::string &year() const { return m_year; }
-	uint32_t supported() const { return m_supported; }
+	u32 supported() const { return m_supported; }
 
 	const software_info *software_entry() const { return m_software_info_ptr; }
 	const software_part *part_entry() const { return m_software_part_ptr; }
@@ -207,12 +207,12 @@ public:
 	void set_working_directory(const char *working_directory) { m_working_directory = working_directory; }
 	const std::string &working_directory();
 
-	uint8_t *get_software_region(const char *tag);
-	uint32_t get_software_region_length(const char *tag);
+	u8 *get_software_region(const char *tag);
+	u32 get_software_region_length(const char *tag);
 	const char *get_feature(const char *feature_name);
-	bool load_software_region(const char *tag, optional_shared_ptr<uint8_t> &ptr);
+	bool load_software_region(const char *tag, optional_shared_ptr<u8> &ptr);
 
-	uint32_t crc();
+	u32 crc();
 	util::hash_collection& hash() { return m_hash; }
 
 	void battery_load(void *buffer, int length, int fill);
@@ -255,7 +255,7 @@ protected:
 	virtual const bool use_software_list_file_extension_for_filetype() const { return false; }
 
 	image_init_result load_internal(const std::string &path, bool is_create, int create_format, util::option_resolution *create_args, bool just_load);
-	image_error_t load_image_by_path(uint32_t open_flags, const std::string &path);
+	image_error_t load_image_by_path(u32 open_flags, const std::string &path);
 	void clear();
 	bool is_loaded();
 
@@ -308,7 +308,7 @@ protected:
 private:
 	static image_error_t image_error_from_file_error(osd_file::error filerr);
 	bool schedule_postload_hard_reset_if_needed();
-	std::vector<uint32_t> determine_open_plan(bool is_create);
+	std::vector<u32> determine_open_plan(bool is_create);
 
 	// creation info
 	formatlist_type m_formatlist;
@@ -320,7 +320,7 @@ private:
 	std::string m_longname;
 	std::string m_manufacturer;
 	std::string m_year;
-	uint32_t  m_supported;
+	u32 m_supported;
 
 	// flags
 	bool m_readonly;
@@ -346,4 +346,4 @@ private:
 // iterator
 typedef device_interface_iterator<device_image_interface> image_interface_iterator;
 
-#endif  /* __DIIMAGE_H__ */
+#endif  /* MAME_EMU_DIIMAGE_H */

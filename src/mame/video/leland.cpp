@@ -63,6 +63,18 @@ VIDEO_START_MEMBER(leland_state,leland)
 	/* scanline timer */
 	m_scanline_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(leland_state::scanline_callback),this));
 	m_scanline_timer->adjust(m_screen->time_until_pos(0));
+
+	save_item(NAME(m_gfx_control));
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	save_item(NAME(m_gfxbank));
+	save_item(NAME(m_last_scanline));
+	for (uint8_t i = 0; i < 2; i++)
+	{	
+		save_item(NAME(m_vram_state[i].m_addr), i);
+		save_item(NAME(m_vram_state[i].m_latch), i);
+	}
 }
 
 VIDEO_START_MEMBER(leland_state,ataxx)
@@ -72,6 +84,16 @@ VIDEO_START_MEMBER(leland_state,ataxx)
 
 	/* allocate memory */
 	m_ataxx_qram = make_unique_clear<uint8_t[]>(QRAM_SIZE);
+
+	save_pointer(NAME(m_video_ram.get()), VRAM_SIZE);
+	save_pointer(NAME(m_ataxx_qram.get()), QRAM_SIZE);
+	save_item(NAME(m_xscroll));
+	save_item(NAME(m_yscroll));
+	for (uint8_t i = 0; i < 2; i++)
+	{	
+		save_item(NAME(m_vram_state[i].m_addr), i);
+		save_item(NAME(m_vram_state[i].m_latch), i);
+	}
 }
 
 

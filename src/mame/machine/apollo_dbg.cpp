@@ -1033,7 +1033,7 @@ static const char* get_svc_call(m68000_base_device *m68k, int trap_no,
 	return sb;
 }
 
-static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
+static const std::string &disassemble(m68000_base_device *m68k, offs_t pc, std::string& sb)
 {
 	uint8_t oprom[10];
 	uint8_t opram[10];
@@ -1052,7 +1052,7 @@ static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
 		oprom[i] = opram[i] = m68k->read8(pc + i);
 		if (m68k->mmu_tmp_buserror_occurred)
 		{
-			sprintf(sb, "- (apollo_disassemble failed at %08x)", pc + i);
+			sb = string_format("- (apollo_disassemble failed at %08x)", pc + i);
 
 			// restore previous bus error state
 			m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
@@ -1061,7 +1061,10 @@ static const char * disassemble(m68000_base_device *m68k, offs_t pc, char* sb)
 			return sb;
 		}
 	}
-	m68k->disassemble(sb, pc, oprom, opram, options);
+
+	std::ostringstream stream;
+	m68k->disassemble(stream, pc, oprom, opram, options);
+	sb = stream.str();
 
 	// restore previous bus error state
 	m68k->mmu_tmp_buserror_occurred = tmp_buserror_occurred;
@@ -1130,7 +1133,7 @@ int apollo_debug_instruction_hook(m68000_base_device *device, offs_t curpc)
 		}
 		else if ((ir & 0xff00) == 0xf200 && (apollo_config( APOLLO_CONF_FPU_TRACE)))
 		{
-			char sb[256];
+			std::string sb;
 			DLOG(("%s sp=%08x FPU: %x %s", apollo_cpu_context(device->machine().firstcpu),
 					REG_A(m68k)[7], ir, disassemble(m68k, REG_PC(m68k), sb)));
 		}

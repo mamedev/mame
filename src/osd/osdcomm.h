@@ -59,30 +59,23 @@
     FUNDAMENTAL TYPES
 ***************************************************************************/
 
+namespace osd {
 
-/* 8-bit values */
-using std::uint8_t;
-using std::int8_t;
+using u8 = std::uint8_t;
+using u16 = std::uint16_t;
+using u32 = std::uint32_t;
+using u64 = std::uint64_t;
 
-/* 16-bit values */
-using std::uint16_t;
-using std::int16_t;
+using s8 = std::int8_t;
+using s16 = std::int16_t;
+using s32 = std::int32_t;
+using s64 = std::int64_t;
 
-/* 32-bit values */
-using std::uint32_t;
-using std::int32_t;
-
-/* 64-bit values */
-using std::uint64_t;
-using std::int64_t;
+} // namespace OSD
 
 /***************************************************************************
     FUNDAMENTAL MACROS
 ***************************************************************************/
-
-/* U64 and S64 are used to wrap long integer constants. */
-#define U64(val) val##ULL
-#define S64(val) val##LL
 
 /* Concatenate/extract 32-bit halves of 64-bit values */
 constexpr uint64_t concat_64(uint32_t hi, uint32_t lo) { return (uint64_t(hi) << 32) | uint32_t(lo); }
@@ -107,8 +100,8 @@ constexpr uint16_t flipendian_int16(uint16_t val) { return (val << 8) | (val >> 
 constexpr uint32_t flipendian_int32_partial16(uint32_t val) { return ((val << 8) & 0xFF00FF00U) | ((val >> 8) & 0x00FF00FFU); }
 constexpr uint32_t flipendian_int32(uint32_t val) { return (flipendian_int32_partial16(val) << 16) | (flipendian_int32_partial16(val) >> 16); }
 
-constexpr uint64_t flipendian_int64_partial16(uint64_t val) { return ((val << 8) & U64(0xFF00FF00FF00FF00)) | ((val >> 8) & U64(0x00FF00FF00FF00FF)); }
-constexpr uint64_t flipendian_int64_partial32(uint64_t val) { return ((flipendian_int64_partial16(val) << 16) & U64(0xFFFF0000FFFF0000)) | ((flipendian_int64_partial16(val) >> 16) & U64(0x0000FFFF0000FFFF)); }
+constexpr uint64_t flipendian_int64_partial16(uint64_t val) { return ((val << 8) & 0xFF00FF00FF00FF00U) | ((val >> 8) & 0x00FF00FF00FF00FFU); }
+constexpr uint64_t flipendian_int64_partial32(uint64_t val) { return ((flipendian_int64_partial16(val) << 16) & 0xFFFF0000FFFF0000U) | ((flipendian_int64_partial16(val) >> 16) & 0x0000FFFF0000FFFFU); }
 constexpr uint64_t flipendian_int64(uint64_t val) { return (flipendian_int64_partial32(val) << 32) | (flipendian_int64_partial32(val) >> 32); }
 
 #ifdef LSB_FIRST

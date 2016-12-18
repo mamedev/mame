@@ -188,6 +188,7 @@ ieee488_device::daisy_entry::daisy_entry(device_t *device)
 void ieee488_device::set_signal(device_t *device, int signal, int state)
 {
 	bool changed = false;
+	int old_state = get_signal(signal);
 
 	if (device == this)
 	{
@@ -218,8 +219,13 @@ void ieee488_device::set_signal(device_t *device, int signal, int state)
 		}
 	}
 
-	if (changed)
-	{
+	if (!changed) {
+		return;
+	}
+
+	state = get_signal(signal);
+
+	if (old_state != state) {
 		switch (signal)
 		{
 		case EOI:   m_write_eoi(state);  break;
@@ -289,21 +295,18 @@ int ieee488_device::get_signal(int signal)
 {
 	int state = m_line[signal];
 
-	if (state)
-	{
-		daisy_entry *entry = m_device_list.first();
+	daisy_entry *entry = m_device_list.first();
 
-		while (entry)
+	while (state && entry)
 		{
 			if (!entry->m_line[signal])
-			{
-				state = 0;
-				break;
-			}
+				{
+					state = 0;
+					break;
+				}
 
 			entry = entry->next();
 		}
-	}
 
 	return state;
 }
@@ -352,7 +355,7 @@ uint8_t ieee488_device::get_data()
 
 	daisy_entry *entry = m_device_list.first();
 
-	while (entry)
+	while (data && entry)
 	{
 		data &= entry->m_dio;
 

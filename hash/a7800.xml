@@ -1806,7 +1806,7 @@ almost nothing like the prototype.
 		<info name="serial" value="CX7816"/>
 		<sharedfeat name="compatibility" value="NTSC"/>
 		<part name="cart" interface="a7800_cart">
-			<feature name="slot" value="a78_sg_ram" />
+			<feature name="slot" value="a78_mram" />
 			<dataarea name="rom" size="32768">
 				<rom name="rescuefr.bin" size="32768" crc="9a74fbf2" sha1="6653022f38e553d475896a918850158eaf8f77ff" offset="0" />
 			</dataarea>

@@ -120,7 +120,7 @@ static const unsigned char dgnbeta_palette[] =
     the memory as described above.
 
     At reset time the Paging would of course be disabled, as the boot rom needs to be
-    mapped in at $C000, the initalisation code would set up the mappings above and then
+    mapped in at $C000, the initialisation code would set up the mappings above and then
     enable the paging hardware.
 
     It appears to be more complicated than this, whilst the above is true, there appear to

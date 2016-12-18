@@ -731,7 +731,7 @@ static INPUT_PORTS_START( magicfly )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -794,7 +794,7 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -869,7 +869,7 @@ static INPUT_PORTS_START( bchance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-/*  Only 4 phisical DIP switches
+/*  Only 4 physical DIP switches
     (valid bits = 4, 6, 7)
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )

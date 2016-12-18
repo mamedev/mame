@@ -363,13 +363,18 @@ static ADDRESS_MAP_START( spangbl_map, AS_PROGRAM, 8, mitchell_state )
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("ram")     /* Work RAM */
 ADDRESS_MAP_END
 
+WRITE8_MEMBER(mitchell_state::sound_command_w)
+{
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(0, HOLD_LINE);
+}
+
 static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pangbl_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_DEVWRITE("ymsnd", ym2413_device, data_port_w)
-	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ymsnd", ym2413_device, register_port_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(sound_command_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("SYS0")
 	AM_RANGE(0x06, 0x06) AM_WRITENOP    /* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
@@ -378,22 +383,37 @@ static ADDRESS_MAP_START( spangbl_io_map, AS_IO, 8, mitchell_state )
 	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
 
-
-#ifdef UNUSED_FUNCTION
-WRITE8_MEMBER(mitchell_state::spangbl_msm5205_data_w)
+READ8_MEMBER(mitchell_state::sound_command_r)
 {
-	m_sample_buffer = data;
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch->read(space, 0);
 }
-#endif
+
+WRITE8_MEMBER(mitchell_state::sound_bankswitch_w)
+{
+	m_msm->reset_w(BIT(data, 3));
+
+	m_soundbank->set_entry(data & 7);
+}
 
 static ADDRESS_MAP_START( spangbl_sound_map, AS_PROGRAM, 8, mitchell_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-//  AM_RANGE(0xec00, 0xec00) AM_WRITE(spangbl_msm5205_data_w )
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym2413_device, write)
+	AM_RANGE(0xf000, 0xf4ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spangbl_sound_io_map, AS_IO, 8, mitchell_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+static ADDRESS_MAP_START( pangba_sound_map, AS_PROGRAM, 8, mitchell_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
+	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0xf000, 0xf4ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r)
 ADDRESS_MAP_END
 
 
@@ -1101,20 +1121,25 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(mitchell_state,mitchell)
 {
-	save_item(NAME(m_sample_buffer));
-	save_item(NAME(m_sample_select));
 	save_item(NAME(m_dial_selected));
 	save_item(NAME(m_keymatrix));
 	save_item(NAME(m_dir));
 	save_item(NAME(m_dial));
 	save_item(NAME(m_irq_source));
 //  save_item(NAME(init_eeprom_count));
+
+	if (m_soundbank.found())
+	{
+		m_soundbank->configure_entries(0, 8, memregion("audiocpu")->base(), 0x4000);
+		m_soundbank->set_entry(0);
+
+		save_item(NAME(m_sample_select));
+	}
 }
 
 MACHINE_RESET_MEMBER(mitchell_state,mitchell)
 {
-	m_sample_buffer = 0;
-	m_sample_select = 0;
+	m_sample_select = false;
 	m_dial_selected = 0;
 	m_dial[0] = 0;
 	m_dial[1] = 0;
@@ -1241,11 +1266,12 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(mitchell_state::spangbl_adpcm_int)
 {
-	m_msm->data_w(m_sample_buffer & 0x0f);
-	m_sample_buffer >>= 4;
-	m_sample_select ^= 1;
-	if(m_sample_select == 0)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	if (!state)
+		return;
+
+	m_sample_select = !m_sample_select;
+	m_adpcm_select->select_w(m_sample_select);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_sample_select);
 }
 
 
@@ -1261,17 +1287,27 @@ static MACHINE_CONFIG_DERIVED( spangbl, pangnv )
 
 	MCFG_CPU_ADD("audiocpu", Z80, 8000000)
 	MCFG_CPU_PROGRAM_MAP(spangbl_sound_map)
-	MCFG_CPU_IO_MAP(spangbl_sound_io_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  irq0_line_hold)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mitchell_state,  nmi_line_pulse)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", spangbl)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_DEVICE_REMOVE("oki")
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(mitchell_state, spangbl_adpcm_int))  /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 4KHz 4-bit */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pangba, spangbl )
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(pangba_sound_map)
+
+	MCFG_DEVICE_REPLACE("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mstworld, mitchell_state )
@@ -2365,14 +2401,14 @@ GAME( 1989, bbros,     pang,     pang,      pang,     mitchell_state, pang,     
 GAME( 1989, pompingw,  pang,     pang,      pang,     mitchell_state, pang,      ROT0,   "Mitchell",                  "Pomping World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb,     pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangbold,  pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, pangba,    pang,     spangbl,   pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, pangba,    pang,     pangba,    pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, pangb2,    pang,     pang,      pang,     mitchell_state, pangb,     ROT0,   "bootleg",                   "Pang (bootleg, set 4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, cworld,    0,        pang,      qtono1,   mitchell_state, cworld,    ROT0,   "Capcom",                    "Capcom World (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hatena,    0,        pang,      qtono1,   mitchell_state, hatena,    ROT0,   "Capcom",                    "Adventure Quiz 2 - Hatena? no Daibouken (Japan 900228)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spang,     0,        pangnv,    pang,     mitchell_state, spang,     ROT0,   "Mitchell",                  "Super Pang (World 900914)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, sbbros,    spang,    pangnv,    pang,     mitchell_state, sbbros,    ROT0,   "Mitchell (Capcom license)", "Super Buster Bros. (USA 901001)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, spangj,    spang,    pangnv,    pang,     mitchell_state, spangj,    ROT0,   "Mitchell",                  "Super Pang (Japan 901023)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, spangbl,   spang,    spangbl,   spangbl,  mitchell_state, spangbl,   ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // different sound hardware
+GAME( 1990, spangbl,   spang,    spangbl,   spangbl,  mitchell_state, spangbl,   ROT0,   "bootleg",                   "Super Pang (World 900914, bootleg)", MACHINE_SUPPORTS_SAVE ) // different sound hardware
 GAME( 1994, mstworld,  0,        mstworld,  mstworld, mitchell_state, mstworld,  ROT0,   "bootleg (TCH)",             "Monsters World (bootleg of Super Pang)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, marukin,   0,        marukin,   marukin,  mitchell_state, marukin,   ROT0,   "Yuga",                      "Super Marukin-Ban (Japan 901017)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, qtono1,    0,        pang,      qtono1,   mitchell_state, qtono1,    ROT0,   "Capcom",                    "Quiz Tonosama no Yabou (Japan)", MACHINE_SUPPORTS_SAVE )

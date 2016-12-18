@@ -10,8 +10,9 @@
 		valid_kinds = {
 			"ConsoleApp",
 			"WindowedApp",
+			"StaticLib",
 			"SharedLib",
-			"StaticLib"
+			"Bundle",
 		},
 
 		valid_languages = {

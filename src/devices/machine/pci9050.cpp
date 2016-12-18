@@ -50,32 +50,22 @@ pci9050_device::pci9050_device(const machine_config &mconfig, const char *tag, d
 	}
 }
 
-void pci9050_device::set_map(int id, address_map_constructor map, const char *name, device_t *device)
+void pci9050_device::set_map(int id, const address_map_delegate &map, device_t *device)
 {
 	m_maps[id] = map;
-	m_names[id] = name;
 	m_devices[id] = device;
 }
 
 void pci9050_device::device_start()
 {
-	typedef void (pci9050_device::*tramp_t)(address_map &);
-	static const tramp_t trampolines[4] = {
-		&pci9050_device::map_trampoline<0>,
-		&pci9050_device::map_trampoline<1>,
-		&pci9050_device::map_trampoline<2>,
-		&pci9050_device::map_trampoline<3>
-	};
-
 	pci_device::device_start();
 
 	add_map(0x80, M_MEM, FUNC(pci9050_device::map));           // map 0 is our config registers, mem space
 	add_map(0x80, M_IO,  FUNC(pci9050_device::map));           // map 1 is our config registers, i/o space
 
 	for(int i=0; i<4; i++)
-		if(m_names[i])
-			//          add_map(0, M_MEM | M_DISABLED, m_maps[i], m_names[i], m_devices[i]);
-			add_map(0, M_MEM | M_DISABLED, trampolines[i], m_names[i]);
+		if(!m_maps[i].isnull())
+			add_map(0, M_MEM | M_DISABLED, m_maps[i], m_devices[i]);
 		else
 			add_map(0, M_MEM | M_DISABLED, FUNC(pci9050_device::empty));
 

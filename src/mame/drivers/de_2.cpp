@@ -725,6 +725,17 @@ ROM_END
 /*-----------------------------------------------------------------------------------
 / Monday Night Football - CPU Rev 2 /Alpha Type 3 16/32K Roms - 32/64K Sound Roms
 /----------------------------------------------------------------------------------*/
+ROM_START(mnfb_c29)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mnfb2-9.b5", 0x4000, 0x4000, BAD_DUMP CRC(2d6805d1) SHA1(f222cbf30d07975279eea210738f7d4f73b3fcf4)) // patched by PINMAME dev
+	ROM_LOAD("mnfb2-9.c5", 0x8000, 0x8000, CRC(98d50cf5) SHA1(59d3b16f8195ab95cece71a12dab3349dfeb2c2b))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("mnf-f7.256", 0x8000, 0x8000, CRC(fbc2d6f6) SHA1(33173c081de776d32e926481e94b265ec48d770b))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("mnf-f5-6.512", 0x00000, 0x10000, CRC(0c6ea963) SHA1(8c88fa588222ef8a6c872b8c5b49639b108384d4))
+	ROM_LOAD("mnf-f4-5.512", 0x10000, 0x10000, CRC(efca5d80) SHA1(9655c885dd64aa170205170b6a0c052bd9367379))
+ROM_END
+
 ROM_START(mnfb_c27)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mnfb2-7.b5", 0x4000, 0x4000, CRC(995eb9b8) SHA1(d05d74393fda59ffd8d7b5546313779cdb10d23e))
@@ -932,7 +943,8 @@ GAME(1990,  kiko_a10,       0,          de_type3,   de_2, de_2_state,   de_2,   
 GAME(1987,  lwar_a83,       0,          de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a81,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.1)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_e90,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  mnfb_c27,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  mnfb_c29,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.9, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  mnfb_c27,       mnfb_c29,   de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a32,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a29,       poto_a32,   de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (2.9)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  play_a24,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Playboy 35th Anniversary (2.4)",           MACHINE_IS_SKELETON_MECHANICAL)

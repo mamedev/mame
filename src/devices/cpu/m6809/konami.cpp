@@ -109,10 +109,10 @@ void konami_cpu_device::device_start()
 //  helper function
 //-------------------------------------------------
 
-offs_t konami_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
+offs_t konami_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( konami );
-	return CPU_DISASSEMBLE_NAME(konami)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(konami)(this, stream, pc, oprom, opram, options);
 }
 
 

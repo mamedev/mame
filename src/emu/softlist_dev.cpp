@@ -78,7 +78,7 @@ bool image_software_list_loader::load_software(device_image_interface &device, s
 //  software_list_device - constructor
 //-------------------------------------------------
 
-software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+software_list_device::software_list_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, SOFTWARE_LIST, "Software list", tag, owner, clock, "software_list", __FILE__),
 	m_list_type(SOFTWARE_LIST_ORIGINAL_SYSTEM),
 	m_filter(nullptr),
@@ -505,7 +505,7 @@ void software_list_device::internal_validity_check(validity_checker &valid)
 
 		// make sure the year is only digits, '?' or '+'
 		for (char ch : swinfo.year())
-			if (!isdigit(uint8_t(ch)) && (ch != '?') && (ch != '+'))
+			if (!isdigit(u8(ch)) && (ch != '?') && (ch != '+'))
 			{
 				osd_printf_error("%s: %s has an invalid year '%s'\n", filename(), shortname.c_str(), swinfo.year().c_str());
 				break;

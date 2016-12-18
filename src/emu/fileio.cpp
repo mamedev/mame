@@ -13,7 +13,7 @@
 #include "fileio.h"
 
 
-const uint32_t OPEN_FLAG_HAS_CRC  = 0x10000;
+const u32 OPEN_FLAG_HAS_CRC  = 0x10000;
 
 
 
@@ -164,7 +164,7 @@ const osd::directory::entry *file_enumerator::next()
 //  emu_file - constructor
 //-------------------------------------------------
 
-emu_file::emu_file(uint32_t openflags)
+emu_file::emu_file(u32 openflags)
 	: m_file()
 	, m_iterator(std::string())
 	, m_mediapaths(std::string())
@@ -180,7 +180,7 @@ emu_file::emu_file(uint32_t openflags)
 		throw emu_fatalerror("Attempted to open a file for write with OPEN_FLAG_HAS_CRC");
 }
 
-emu_file::emu_file(std::string &&searchpath, uint32_t openflags)
+emu_file::emu_file(std::string &&searchpath, u32 openflags)
 	: m_file()
 	, m_iterator(searchpath)
 	, m_mediapaths(std::move(searchpath))
@@ -257,7 +257,7 @@ util::hash_collection &emu_file::hashes(const char *types)
 	}
 
 	// read the data if we can
-	const uint8_t *filedata = (const uint8_t *)m_file->buffer();
+	const u8 *filedata = (const u8 *)m_file->buffer();
 	if (filedata == nullptr)
 		return m_hashes;
 
@@ -301,7 +301,7 @@ osd_file::error emu_file::open(const std::string &name1, const std::string &name
 	return open(name1 + name2 + name3 + name4);
 }
 
-osd_file::error emu_file::open(const std::string &name, uint32_t crc)
+osd_file::error emu_file::open(const std::string &name, u32 crc)
 {
 	// remember the filename and CRC info
 	m_filename = name;
@@ -313,19 +313,19 @@ osd_file::error emu_file::open(const std::string &name, uint32_t crc)
 	return open_next();
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, uint32_t crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2, crc);
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, uint32_t crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2 + name3, crc);
 }
 
-osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, uint32_t crc)
+osd_file::error emu_file::open(const std::string &name1, const std::string &name2, const std::string &name3, const std::string &name4, u32 crc)
 {
 	// concatenate the strings and do a standard open
 	return open(name1 + name2 + name3 + name4, crc);
@@ -369,7 +369,7 @@ osd_file::error emu_file::open_next()
 //  just an array of data in RAM
 //-------------------------------------------------
 
-osd_file::error emu_file::open_ram(const void *data, uint32_t length)
+osd_file::error emu_file::open_ram(const void *data, u32 length)
 {
 	// set a fake filename and CRC
 	m_filename = "RAM";
@@ -433,7 +433,7 @@ bool emu_file::compressed_file_ready(void)
 //  seek - seek within a file
 //-------------------------------------------------
 
-int emu_file::seek(int64_t offset, int whence)
+int emu_file::seek(s64 offset, int whence)
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -451,7 +451,7 @@ int emu_file::seek(int64_t offset, int whence)
 //  tell - return the current file position
 //-------------------------------------------------
 
-uint64_t emu_file::tell()
+u64 emu_file::tell()
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -487,7 +487,7 @@ bool emu_file::eof()
 //  size - returns the size of a file
 //-------------------------------------------------
 
-uint64_t emu_file::size()
+u64 emu_file::size()
 {
 	// use the ZIP length if present
 	if (m_zipfile != nullptr)
@@ -505,7 +505,7 @@ uint64_t emu_file::size()
 //  read - read from a file
 //-------------------------------------------------
 
-uint32_t emu_file::read(void *buffer, uint32_t length)
+u32 emu_file::read(void *buffer, u32 length)
 {
 	// load the ZIP file now if we haven't yet
 	if (compressed_file_ready())
@@ -577,7 +577,7 @@ char *emu_file::gets(char *s, int n)
 //  write - write to a file
 //-------------------------------------------------
 
-uint32_t emu_file::write(const void *buffer, uint32_t length)
+u32 emu_file::write(const void *buffer, u32 length)
 {
 	// write the data if we can
 	if (m_file)

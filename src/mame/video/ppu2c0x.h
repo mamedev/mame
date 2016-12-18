@@ -214,7 +214,7 @@ public:
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
-	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visibile tiles */
+	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
 	ppu2c0x_latch_delegate      m_latch;
 

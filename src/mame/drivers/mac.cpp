@@ -516,7 +516,7 @@ WRITE8_MEMBER(mac_state::hmc_w)
 	}
 	else
 	{
-		uint64_t temp = (data & 1) ? U64(0x400000000) : U64(0x0);
+		uint64_t temp = (data & 1) ? 0x400000000U : 0x0U;
 		m_hmc_reg >>= 1;
 		m_hmc_reg |= temp;
 	}
@@ -827,23 +827,23 @@ static ADDRESS_MAP_START(pwrmac_map, AS_PROGRAM, 64, mac_state )
 
 	AM_RANGE(0x40000000, 0x403fffff) AM_ROM AM_REGION("bootrom", 0) AM_MIRROR(0x0fc00000)
 
-	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50000000, 0x50001fff) AM_READWRITE16(mac_via_r, mac_via_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50004000, 0x50005fff) AM_READWRITE16(mac_scc_r, mac_scc_2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 50008000 = ethernet ID PROM
 	// 5000a000 = MACE ethernet controller
-	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50010000, 0x50011fff) AM_READWRITE16(macplus_scsi_r, macii_scsi_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 50014000 = sound registers (AWACS)
-	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, U64(0xffffffffffffffff)) AM_MIRROR(0x01f00000)
-	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, U64(0xffffffffffffffff) ) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50014000, 0x50015fff) AM_DEVREADWRITE8("awacs", awacs_device, read, write, 0xffffffffffffffffU) AM_MIRROR(0x01f00000)
+	AM_RANGE(0x50016000, 0x50017fff) AM_READWRITE16(mac_iwm_r, mac_iwm_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50024000, 0x50025fff) AM_WRITE32( ariel_ramdac_w, 0xffffffffffffffffU ) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50026000, 0x50027fff) AM_READWRITE16(mac_via2_r, mac_via2_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50028000, 0x50028007) AM_READWRITE8(mac_sonora_vctl_r, mac_sonora_vctl_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
 	// 5002a000 = interrupt controller
 	// 5002c000 = diagnostic registers
-	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, U64(0xffffffffffffffff)) AM_MIRROR(0x00f00000)
-	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, U64(0xffffffffffffffff))
+	AM_RANGE(0x5002c000, 0x5002dfff) AM_READ8(pmac_diag_r, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50031000, 0x50032fff) AM_READWRITE8(amic_dma_r, amic_dma_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x50040000, 0x5004000f) AM_READWRITE8(hmc_r, hmc_w, 0xffffffffffffffffU) AM_MIRROR(0x00f00000)
+	AM_RANGE(0x5ffffff8, 0x5fffffff) AM_READ32(mac_read_id, 0xffffffffffffffffU)
 
 	AM_RANGE(0xffc00000, 0xffffffff) AM_ROM AM_REGION("bootrom", 0)
 ADDRESS_MAP_END

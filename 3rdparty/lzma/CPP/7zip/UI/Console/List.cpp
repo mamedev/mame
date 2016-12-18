@@ -900,10 +900,10 @@ HRESULT Print_OpenArchive_Props(CStdOutStream &so, const CCodecs *codecs, const 
     RINOK(PrintArcProp(so, archive, kpidPhySize, NULL));
     if (er.TailSize != 0)
       PrintPropNameAndNumber(so, kpidTailSize, er.TailSize);
-    UInt32 numProps;
-    RINOK(archive->GetNumberOfArchiveProperties(&numProps));
-    
     {
+      UInt32 numProps;
+      RINOK(archive->GetNumberOfArchiveProperties(&numProps));
+      
       for (UInt32 j = 0; j < numProps; j++)
       {
         CMyComBSTR name;
@@ -1068,7 +1068,7 @@ HRESULT ListArchives(CCodecs *codecs,
       g_StdOut << endl << kListing << arcPath << endl << endl;
     }
     
-    HRESULT result = arcLink.Open3(options, &openCallback);
+    HRESULT result = arcLink.Open_Strict(options, &openCallback);
 
     if (result != S_OK)
     {
@@ -1095,9 +1095,6 @@ HRESULT ListArchives(CCodecs *codecs,
     }
     
     {
-      if (arcLink.NonOpen_ErrorInfo.ErrorFormatIndex >= 0)
-        numErrors++;
-      
       FOR_VECTOR (r, arcLink.Arcs)
       {
         const CArcErrorInfo &arc = arcLink.Arcs[r].ErrorInfo;

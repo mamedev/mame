@@ -5,7 +5,7 @@ Imgtool - *A generic image manipulation tool for MAME*
 
 Imgtool is a tool for the maintenance and manipulation of disk and other types of images that MAME users need to deal with.  Functions include retrieving and storing files and CRC checking/validation.
 
-Imgtool is part of the MAME project.  It shares large portions of code with MAME, and its existence would not be if it were not for MAME.  As such, the distribution terms are the same as MAME.  Please read the MAME license thoroughly. 
+Imgtool is part of the MAME project.  It shares large portions of code with MAME, and its existence would not be if it were not for MAME.  As such, the distribution terms are the same as MAME.  Please read the MAME license thoroughly.
 
 **Some portions of Imgtool are Copyright (c) 1989, 1993 The Regents of the University of California.  All rights reserved.**
 
@@ -22,9 +22,9 @@ Imgtool is a command line program that contains several "subcommands" that actua
 
 Example usage:
 	imgtool dir coco_jvc_rsdos myimageinazip.zip
-	
+
 	imgtool get coco_jvc_rsdos myimage.dsk myfile.bin mynewfile.txt
-	
+
 	imgtool getall coco_jvc_rsdos myimage.dsk
 
 
@@ -41,7 +41,7 @@ Imgtool Subcommands
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
 
-	
+
 	Creates an image
 
 **dir**
@@ -59,7 +59,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Gets a single file from an image
 
 **put**
@@ -68,7 +68,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Puts a single file on an image (wildcards supported)
 
 **getall**
@@ -77,7 +77,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Gets all files off an image
 
 **del**
@@ -86,7 +86,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Deletes a file on an image
 
 **mkdir**
@@ -95,7 +95,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Creates a subdirectory on an image
 
 **rmdir**
@@ -104,7 +104,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Deletes a subdirectory on an image
 
 **readsector**
@@ -113,11 +113,11 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	Read a sector on an image and output it to specified <filename>
 
 **writesector**
-	
+
 	**imgtool writesector <format> <imagename> <track> <head> <sector> <filename>**
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
@@ -129,7 +129,7 @@ Imgtool Subcommands
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
 	* <imagename> is the image filename; can specify a ZIP file for image name
-	
+
 	**imgtool identify <imagename>**
 
 **listformats**
@@ -145,7 +145,7 @@ Imgtool Subcommands
 	**imgtool listdriveroptions <format>**
 
 	* <format> is the image format, e.g. coco_jvc_rsdos
-	
+
 	Lists all format-specific options for the 'put' and 'create' commands
 
 
@@ -170,7 +170,7 @@ Filters are a means to process data being written into or read out of an image i
 **macbinary**
 
 	Processes Apple MacBinary-formatted (merged forks) files
-	
+
 **vzsnapshot**
 
 	[todo: VZ Snapshot? Find out what this is....]
@@ -198,7 +198,7 @@ Filters are a means to process data being written into or read out of an image i
 **bm13bas**
 
 	Basic Master Level 3 Tokenized Basic Files
-	
+
 Imgtool Format Info
 ===================
 
@@ -1672,5 +1672,5 @@ Option           Allowed values                 Description
 
 
 
-  
+
 [todo: fill out the command structures, describe commands better. These descriptions came from the imgtool.txt file and are barebones]

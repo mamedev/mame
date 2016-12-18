@@ -65,7 +65,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 3b) 'chelnovu'
 
   - DSW2 bit 6 freezes the game (code at 0x000654), but when you turn
-    the Dip Swicth back to "Off", it adds credits as if COIN1 was pressed.
+    the Dip Switch back to "Off", it adds credits as if COIN1 was pressed.
     Is that the correct behaviour ?
   - Even if there is a "andi.w  #$ffff, D5" instruction at 0x000ef0,
     DSW2 bit 7 isn't tested in this set.

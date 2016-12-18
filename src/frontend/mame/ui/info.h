@@ -8,14 +8,15 @@
 
 ***************************************************************************/
 
-#pragma once
-
 #ifndef MAME_FRONTEND_UI_INFO_H
 #define MAME_FRONTEND_UI_INFO_H
+
+#pragma once
 
 #include "ui/menu.h"
 
 namespace ui {
+
 class machine_info
 {
 public:
@@ -54,7 +55,7 @@ public:
 	virtual ~menu_game_info() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 };
 
@@ -66,7 +67,7 @@ public:
 	virtual ~menu_image_info() override;
 
 private:
-	virtual void populate() override;
+	virtual void populate(float &customtop, float &custombottom) override;
 	virtual void handle() override;
 	void image_info(device_image_interface *image);
 };

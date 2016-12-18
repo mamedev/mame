@@ -24,7 +24,13 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/volt_reg.h"
 
 
-WRITE8_MEMBER(hyperspt_state::hyperspt_coin_counter_w)
+void hyperspt_state::machine_start()
+{
+	save_item(NAME(m_irq_mask));
+	save_item(NAME(m_SN76496_latch));
+}
+
+WRITE8_MEMBER(hyperspt_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w(offset, data);
 }
@@ -34,82 +40,63 @@ WRITE8_MEMBER(hyperspt_state::irq_mask_w)
 	m_irq_mask = data & 1;
 }
 
-static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
+static ADDRESS_MAP_START( common_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
+	AM_RANGE(0x1480, 0x1480) AM_WRITE(flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
+	AM_RANGE(0x1483, 0x1484) AM_WRITE(coin_counter_w)
 	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
 	AM_RANGE(0x1500, 0x1500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hyperspt_map, AS_PROGRAM, 8, hyperspt_state )
+	AM_IMPORT_FROM(common_map)
+	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roadf_map, AS_PROGRAM, 8, hyperspt_state )
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_SHARE("scroll")  /* Scroll amount */
-	AM_RANGE(0x1400, 0x1400) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
-	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
-	AM_RANGE(0x1481, 0x1481) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
-	AM_RANGE(0x1483, 0x1484) AM_WRITE(hyperspt_coin_counter_w)
-	AM_RANGE(0x1487, 0x1487) AM_WRITE(irq_mask_w)  /* Interrupt enable */
-	AM_RANGE(0x1500, 0x1500) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
-	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
-	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
+	AM_IMPORT_FROM(common_map)
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
-	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, hyperspt_state )
+static ADDRESS_MAP_START( common_sound_map, AS_PROGRAM, 8, hyperspt_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4fff) AM_RAM
 	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
-	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hyperspt_sound_map, AS_PROGRAM, 8, hyperspt_state )
+	AM_IMPORT_FROM(common_sound_map)
+	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)      /* speech and output control */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roadf_sound_map, AS_PROGRAM, 8, hyperspt_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
+	AM_IMPORT_FROM(common_sound_map)
 	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_NOP // No VLM
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundb_map, AS_PROGRAM, 8, hyperspt_state )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x4fff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
-	AM_RANGE(0xa000, 0xa000) AM_NOP
+	AM_IMPORT_FROM(common_sound_map)
+	AM_RANGE(0xa000, 0xa000) AM_NOP // No VLM
 	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_device, write)   /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)  /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hyperspt )
@@ -300,7 +287,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", hyperspt_state,  vblank_irq)
 
 	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PROGRAM_MAP(hyperspt_sound_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -312,7 +299,7 @@ static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_SIZE(32*8, 32*8)
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update_hyperspt)
+	MCFG_SCREEN_UPDATE_DRIVER(hyperspt_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hyperspt)
@@ -498,9 +485,9 @@ ROM_START( roadf )
 	ROM_LOAD( "g05_g01.bin",  0x4000, 0x2000, CRC(e2492a06) SHA1(e03895b83f1529dd7bb20e1380cb60c7606db3e4) )
 	ROM_LOAD( "g07_f02.bin",  0x6000, 0x2000, CRC(0bf75165) SHA1(d3d16d63ca15c8f6b05c37b4e37e41785334ffff) )
 	ROM_LOAD( "g09_g03.bin",  0x8000, 0x2000, CRC(dde401f8) SHA1(aa1810290c14d15d14e2f82a6780fc82d06d437b) )
-	ROM_LOAD( "g11_f04.bin",  0xA000, 0x2000, CRC(b1283c77) SHA1(3fdd8d97cdd8a0b7c12db6797ed17f730425f337) )
-	ROM_LOAD( "g13_f05.bin",  0xC000, 0x2000, CRC(0ad4d796) SHA1(44335c769341b3e10bb92556c0718884fd4b5d20) )
-	ROM_LOAD( "g15_f06.bin",  0xE000, 0x2000, CRC(fa42e0ed) SHA1(408d365183fd95e54695a17abbba87d729546d7c) )
+	ROM_LOAD( "g11_f04.bin",  0xa000, 0x2000, CRC(b1283c77) SHA1(3fdd8d97cdd8a0b7c12db6797ed17f730425f337) )
+	ROM_LOAD( "g13_f05.bin",  0xc000, 0x2000, CRC(0ad4d796) SHA1(44335c769341b3e10bb92556c0718884fd4b5d20) )
+	ROM_LOAD( "g15_f06.bin",  0xe000, 0x2000, CRC(fa42e0ed) SHA1(408d365183fd95e54695a17abbba87d729546d7c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a17_d10.bin",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) )
@@ -526,9 +513,9 @@ ROM_START( roadf2 )
 	ROM_LOAD( "5g",           0x4000, 0x2000, CRC(d8070d30) SHA1(334e4586686c29d33c3281cc446c13d2d96301dd) )
 	ROM_LOAD( "6g",           0x6000, 0x2000, CRC(8b661672) SHA1(bdc983d1ad88372ea1fc8263d4c254d26079ece7) )
 	ROM_LOAD( "8g",           0x8000, 0x2000, CRC(714929e8) SHA1(0176e4199a091485af30e00777678e51664dee23) )
-	ROM_LOAD( "11g",          0xA000, 0x2000, CRC(0f2c6b94) SHA1(a18fe9021e464374de524454403eccc0aaf3eeb7) )
-	ROM_LOAD( "g13_f05.bin",  0xC000, 0x2000, CRC(0ad4d796) SHA1(44335c769341b3e10bb92556c0718884fd4b5d20) )
-	ROM_LOAD( "g15_f06.bin",  0xE000, 0x2000, CRC(fa42e0ed) SHA1(408d365183fd95e54695a17abbba87d729546d7c) )
+	ROM_LOAD( "11g",          0xa000, 0x2000, CRC(0f2c6b94) SHA1(a18fe9021e464374de524454403eccc0aaf3eeb7) )
+	ROM_LOAD( "g13_f05.bin",  0xc000, 0x2000, CRC(0ad4d796) SHA1(44335c769341b3e10bb92556c0718884fd4b5d20) )
+	ROM_LOAD( "g15_f06.bin",  0xe000, 0x2000, CRC(fa42e0ed) SHA1(408d365183fd95e54695a17abbba87d729546d7c) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a17_d10.bin",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) )
@@ -549,14 +536,38 @@ ROM_START( roadf2 )
 	ROM_LOAD( "a09_c29.bin",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) )
 ROM_END
 
+ROM_START( roadf3 ) // This hack was found on an original GX330 (Hyper Sports) PCB. If has some ROMs of different sizes, with small changes.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1-2.g7",  0x4000, 0x4000, CRC(93b168f2) SHA1(da1fa5c171ded4add188b2a146ebcbc73336a1e7) ) // identical to g05_g01.bin + g07_f02.bin
+	ROM_LOAD( "3-4.g11", 0x8000, 0x4000, CRC(b9ba77f0) SHA1(7f4f7d2c9e0f946a36e2979b966bd5ba1578eefd) ) // almost identical to g09_g03.bin + g11_f04.bin
+	ROM_LOAD( "5-6.g15", 0xc000, 0x4000, CRC(91c1788b) SHA1(2ccb084cd751a605d551e0c83b223ff3c887dc9d) ) // almost identical to g13_f05.bin + g15_f06.bin
 
-DRIVER_INIT_MEMBER(hyperspt_state,hyperspt)
-{
-}
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sound7.a9",  0x0000, 0x2000, CRC(c33c927e) SHA1(f1a8522e3bfc3a07bb42408d2937a4129e4c3fee) ) // identical to a17_d10.bin
 
+	ROM_REGION( 0x08000, "gfx1", 0 )
+	ROM_LOAD( "j19.bin",  0x00000, 0x2000, CRC(5eeb0283) SHA1(67e3a079e091a41e10be7c8584d7069455780a24) ) // j19.bin + j18.bin identical to j19_e14.bin
+	ROM_LOAD( "j18.bin",  0x02000, 0x2000, CRC(43c1590d) SHA1(db6904aefb93d5b64aeca4d8d07209ad73bbfa02) )
+	ROM_LOAD( "g19.bin",  0x04000, 0x2000, CRC(f2819ef3) SHA1(3766d94a4cc2bbbee9af855d1d53814806f61a1e) ) // g19.bin + g18.bin almost identical to g19_e18.bin
+	ROM_LOAD( "g18.bin",  0x06000, 0x2000, CRC(dbd1d844) SHA1(aab5c009035cb8b1e163ac304865e3df8cea33ad) )
 
-GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, hyperspt_state, hyperspt, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
-GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, hyperspt_state, hyperspt, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf,     0,        roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, roadf2,    roadf,    roadf,     roadf, hyperspt_state,    hyperspt, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
+	ROM_REGION( 0x0c000, "gfx2", 0 )
+	ROM_LOAD( "a14.bin",  0x00000, 0x2000, CRC(0b595c1e) SHA1(b1a852a29d90eb274716693a3648f4f61068ee95) ) // a14.bin + a13.bin almost identical to a14_e26.bin
+	ROM_LOAD( "a13.bin",  0x02000, 0x2000, CRC(4f0acc76) SHA1(b913530c9168f2ad37e2ed019c882620c80bcabf) )
+	ROM_LOAD( "a12.bin",  0x04000, 0x2000, CRC(2d82c930) SHA1(fea26c00ad3acb1f44a5fdc79a7dd8ddce17d317) ) // identical to a12_d24.bin
+	ROM_LOAD( "c14.bin",  0x06000, 0x2000, CRC(412a9dda) SHA1(d0d487d70132549e42e0168d441a458e0f84a862) ) // c14.bin + c13.bin almost identical to c14_e22.bin
+	ROM_LOAD( "c13.bin",  0x08000, 0x2000, CRC(0c2d50ae) SHA1(ad8c95bb95d229608f95d66079b0d902dc3eae58) )
+	ROM_LOAD( "c12.bin",  0x0a000, 0x2000, CRC(5e0cf994) SHA1(c81274d809c685ccf24108f56a4fa54146d4f493) ) // identical to c12_d20.bin
+
+	ROM_REGION( 0x0220, "proms", 0 )
+	ROM_LOAD( "6331.c3",    0x0000, 0x0020, CRC(45d5e352) SHA1(0f4d358aaffcb68193247090e82f093752730518) ) // identical to c03_c27.bin
+	ROM_LOAD( "82s129.j12", 0x0020, 0x0100, CRC(2955e01f) SHA1(b0652d177a45571edc5978143d4023e7b173b383) ) // identical to j12_c28.bin
+	ROM_LOAD( "82s129.a9",  0x0120, 0x0100, CRC(5b3b5f2a) SHA1(e83556fba6d50ad20dff6e19bd300ba0c30cc6e2) ) // identical to a09_c29.bin
+ROM_END
+
+GAME( 1984, hyperspt,  0,        hyperspt,  hyperspt, driver_device, 0, ROT0,  "Konami (Centuri license)", "Hyper Sports", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, hypersptb, hyperspt, hypersptb, hyperspt, driver_device, 0, ROT0,  "bootleg", "Hyper Sports (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // has ADPCM vis MSM5205 instead of VLM
+GAME( 1984, hpolym84,  hyperspt, hyperspt,  hyperspt, driver_device, 0, ROT0,  "Konami",  "Hyper Olympic '84", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf,     0,        roadf,     roadf, driver_device, 0, ROT90, "Konami",  "Road Fighter (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf2,    roadf,    roadf,     roadf, driver_device, 0, ROT90, "Konami",  "Road Fighter (set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, roadf3,    roadf,    roadf,     roadf, driver_device, 0, ROT90, "hack",  "Road Fighter (set 3, conversion hack on Hyper Sports PCB)", MACHINE_SUPPORTS_SAVE )

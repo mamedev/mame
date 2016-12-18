@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: MAME 0.176\n"
+"Project-Id-Version: MAME 0.180\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-08-29 01:56+1000\n"
-"PO-Revision-Date: 2016-07-29 10:13+0200\n"
+"PO-Revision-Date: 2016-12-14 14:01+0100\n"
 "Last-Translator: Jordi Mallach <jordi@debian.org>\n"
 "Language-Team: Catalan <ca@dodds.net>\n"
 "Language: ca\n"
@@ -638,29 +638,29 @@ msgstr "No es pot desar damunt d'un directori"
 msgid ""
 "The software selected is missing one or more required ROM or CHD images. "
 "Please select a different one."
-msgstr ""
+msgstr "El programari seleccionat manca una o més imatges ROM o CHD. Seleccioneu-ne un diferent."
 
 #: src/frontend/mame/ui/info.cpp:87
 msgid ""
 "One or more ROMs/CHDs for this machine are incorrect. The machine may not "
 "run correctly.\n"
-msgstr ""
+msgstr "Una o més ROM/CHD per a aquesta màquina són incorrectes. La màquina podria no executar-se correctament.\n"
 
 #: src/frontend/mame/ui/info.cpp:100
 msgid ""
 "There are known problems with this machine\n"
 "\n"
-msgstr ""
+msgstr "Hi ha problemes coneguts amb aquesta màquina\n\n"
 
 #: src/frontend/mame/ui/info.cpp:104
 msgid ""
 "One or more ROMs/CHDs for this machine have not been correctly dumped.\n"
-msgstr ""
+msgstr "Una o més ROM/CHD per a aquesta màquina no han estat bolcats correctament.\n"
 
 #: src/frontend/mame/ui/info.cpp:108
 #, c-format
 msgid "The keyboard emulation may not be 100% accurate.\n"
-msgstr ""
+msgstr "L'emulació del teclat pot no ser 100% acurada.\n"
 
 #: src/frontend/mame/ui/info.cpp:110
 #, c-format
@@ -669,17 +669,17 @@ msgstr "Els colors no són 100% acurats.\n"
 
 #: src/frontend/mame/ui/info.cpp:112
 msgid "The colors are completely wrong.\n"
-msgstr ""
+msgstr "Els colors estan completament malament.\n"
 
 #: src/frontend/mame/ui/info.cpp:114
 #, c-format
 msgid "The video emulation isn't 100% accurate.\n"
-msgstr ""
+msgstr "L'emulació de vídeo no és 100% acurada.\n"
 
 #: src/frontend/mame/ui/info.cpp:116
 #, c-format
 msgid "The sound emulation isn't 100% accurate.\n"
-msgstr ""
+msgstr "L'emulació de so no és 100% acurada.\n"
 
 #: src/frontend/mame/ui/info.cpp:118
 msgid "The machine lacks sound.\n"
@@ -691,7 +691,7 @@ msgstr ""
 
 #: src/frontend/mame/ui/info.cpp:125
 msgid "The machine requires external artwork files\n"
-msgstr ""
+msgstr "La màquina requereix fitxer d'art externs\n"
 
 #: src/frontend/mame/ui/info.cpp:130
 msgid ""
@@ -715,7 +715,7 @@ msgid ""
 "THIS MACHINE DOESN'T WORK. The emulation for this machine is not yet "
 "complete. There is nothing you can do to fix this problem except wait for "
 "the developers to improve the emulation.\n"
-msgstr ""
+msgstr "\nAQUESTA MÀQUINA NO FUNCIONA. L'emulació per a aquesta màquina no és completa. No podeu fer res al respecte, tret d'esperar a que els desenvolupadors milloren l'emulació.\n"
 
 #: src/frontend/mame/ui/info.cpp:150
 msgid ""
@@ -730,14 +730,14 @@ msgid ""
 "\n"
 "\n"
 "There are working clones of this machine: "
-msgstr ""
+msgstr "\n\nHi ha clons funcionals d'aquesta màquina: "
 
 #: src/frontend/mame/ui/info.cpp:183
 msgid ""
 "\n"
 "\n"
 "Press any key to continue"
-msgstr ""
+msgstr "\n\nPremeu qualsevol tecla per continuar"
 
 #: src/frontend/mame/ui/info.cpp:197
 #, c-format
@@ -748,6 +748,11 @@ msgid ""
 "\n"
 "CPU:\n"
 msgstr ""
+"%1$s\n"
+"%2$s %3$s\n"
+"Controlador: %4$s\n"
+"\n"
+"CPU:\n"
 
 #: src/frontend/mame/ui/info.cpp:232 src/frontend/mame/ui/info.cpp:270
 msgid "MHz"
@@ -1014,22 +1019,22 @@ msgstr "S'ha desat %s.txt sota la carpeta ui."
 
 #: src/frontend/mame/ui/miscmenu.cpp:667
 msgid "Export list in XML format (like -listxml)"
-msgstr ""
+msgstr "Exporta la llista en format XML (like -listxml)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:668
 msgid "Export list in XML format (like -listxml, but exclude devices)"
-msgstr ""
+msgstr "Exporta la llista en format XML (com -listxml, però excloent dispositius)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:669
 msgid "Export list in TXT format (like -listfull)"
-msgstr ""
+msgstr "Exporta la llista en format TXT (com -listfull)"
 
 #: src/frontend/mame/ui/miscmenu.cpp:719 src/frontend/mame/ui/ui.cpp:2315
 msgid ""
 "\n"
 "    Configuration saved    \n"
 "\n"
-msgstr ""
+msgstr "\n    S'ha desat la configuració    \n"
 
 #: src/frontend/mame/ui/miscmenu.cpp:766
 msgid "Bios"
@@ -1140,6 +1145,9 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"La màquina seleccionada manca una o més imatges ROM o CHD. Seleccioneu una altra màquina.\n"
+"\n"
+"Premeu una tecla per continuar."
 
 #: src/frontend/mame/ui/selgame.cpp:610
 #: src/frontend/mame/ui/simpleselgame.cpp:270
@@ -1301,7 +1309,7 @@ msgstr "No hi ha infos disponibles"
 #: src/frontend/mame/ui/selgame.cpp:1994
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d machines (%5$d BIOS) )"
-msgstr ""
+msgstr "%1$s %2$s (%3$d / %4$d màquines (%5$d BIOS))"
 
 #: src/frontend/mame/ui/selgame.cpp:2004
 #, c-format
@@ -1448,6 +1456,9 @@ msgid ""
 "\n"
 "Press any key to continue."
 msgstr ""
+"El programari seleccionat manca un o més fitxers requerits. Seleccioneu un programari diferent.\n"
+"\n"
+"Premeu una tecla per continuar."
 
 #: src/frontend/mame/ui/selsoft.cpp:1478 src/frontend/mame/ui/selsoft.cpp:1498
 msgid "Software part selection:"
@@ -1460,7 +1471,7 @@ msgstr "Selecció de BIOS:"
 #: src/frontend/mame/ui/selsoft.cpp:1659
 #, c-format
 msgid "%1$s %2$s ( %3$d / %4$d software packages )"
-msgstr ""
+msgstr "%1$s %2$s (%3$d / %4$d paquets de programari)"
 
 #: src/frontend/mame/ui/selsoft.cpp:1660
 #, c-format

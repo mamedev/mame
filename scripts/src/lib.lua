@@ -100,35 +100,3 @@ project "utils"
 		MAME_DIR .. "src/lib/util/zippath.cpp",
 		MAME_DIR .. "src/lib/util/zippath.h",
 	}
-
-	
-project "http"
-	uuid "d7930d44-21d1-4c5d-b6af-582c141cd23a"
-	kind (LIBTYPE)
-
-	addprojectflags()
-
-	includedirs {
-		MAME_DIR .. "3rdparty",
-		MAME_DIR .. "3rdparty/asio/include",
-		MAME_DIR .. "src/osd",
-	}
-	
-	files {
-		MAME_DIR .. "src/lib/http/connection.cpp",
-		MAME_DIR .. "src/lib/http/connection.hpp",
-		MAME_DIR .. "src/lib/http/connection_manager.cpp",
-		MAME_DIR .. "src/lib/http/connection_manager.hpp",
-		MAME_DIR .. "src/lib/http/header.hpp",
-		MAME_DIR .. "src/lib/http/mime_types.cpp",
-		MAME_DIR .. "src/lib/http/mime_types.hpp",
-		MAME_DIR .. "src/lib/http/reply.cpp",
-		MAME_DIR .. "src/lib/http/reply.hpp",
-		MAME_DIR .. "src/lib/http/request.hpp",
-		MAME_DIR .. "src/lib/http/request_handler.cpp",
-		MAME_DIR .. "src/lib/http/request_handler.hpp",
-		MAME_DIR .. "src/lib/http/request_parser.cpp",
-		MAME_DIR .. "src/lib/http/request_parser.hpp",
-		MAME_DIR .. "src/lib/http/server.cpp",
-		MAME_DIR .. "src/lib/http/server.hpp",
-	}

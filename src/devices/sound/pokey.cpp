@@ -7,14 +7,14 @@
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller,
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
- *  Polynome algorithms according to info supplied by Perry McFarlane.
+ *  Polynomial algorithms according to info supplied by Perry McFarlane.
  *
  *  4.6:
  *    [1] http://ploguechipsounds.blogspot.de/2009/10/how-i-recorded-and-decoded-pokeys.html
  *  - changed audio emulation to emulate borrow 3 clock delay and
  *    proper channel reset. New frequency only becomes effective
  *    after the counter hits 0. Emulation also treats counters
- *    as 8 bit counters which are linked now instead of monolytic
+ *    as 8 bit counters which are linked now instead of monolithic
  *    16 bit counters.
  *
  *  4.51:
@@ -28,7 +28,7 @@
  *    new RNG give this expected result now, bits #0-7 of the 9 bit poly.
  *  - reading the RNG returns the shift register contents ^ 0xff.
  *    That way resetting the Pokey with SKCTL (which resets the
- *    polynome shifters to 0) returns the expected 0xff value.
+ *    polynomial shifters to 0) returns the expected 0xff value.
  *  4.4:
  *  - reversed sample values to make OFF channels produce a zero signal.
  *    actually de-reversed them; don't remember that I reversed them ;-/

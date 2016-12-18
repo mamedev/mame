@@ -8,14 +8,14 @@
  *    * there are two HBLANK/HSYNC periods as the horizontal
  *      chain is drawn, which would give an alternating long
  *      line followed by a much shorter one.  This cannot be right
- *    * the carry-out/load circuit on LS161@J8 is superflous
+ *    * the carry-out/load circuit on LS161@J8 is superfluous
  *
  *  These values also give a frame rate of about 45Hz, which is
  *  probably too low.  I suspect that screen is not really
  *  512 pixels wide -- most likely 384, which would give 60Hz
  *
  *  Some of the graphics, like the starfield, is clocked with the
- *  12MHz signal, effecitvely doubling the horizontal resolution
+ *  12MHz signal, effectively doubling the horizontal resolution
  */
 
 #include "sound/discrete.h"

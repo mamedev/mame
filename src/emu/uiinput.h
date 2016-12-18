@@ -7,10 +7,10 @@
     Internal MAME user interface input state.
 ***************************************************************************/
 
-#pragma once
+#ifndef MAME_EMU_UIINPUT_H
+#define MAME_EMU_UIINPUT_H
 
-#ifndef __UIINPUT_H__
-#define __UIINPUT_H__
+#pragma once
 
 
 /***************************************************************************
@@ -43,10 +43,10 @@ struct ui_event
 {
 	ui_event_type       event_type;
 	render_target *     target;
-	int32_t               mouse_x;
-	int32_t               mouse_y;
+	s32                 mouse_x;
+	s32                 mouse_y;
 	input_item_id       key;
-	char32_t        ch;
+	char32_t            ch;
 	short               zdelta;
 	int                 num_lines;
 };
@@ -71,7 +71,7 @@ public:
 	void reset();
 
 	/* retrieves the current location of the mouse */
-	render_target *find_mouse(int32_t *x, int32_t *y, bool *button) const;
+	render_target *find_mouse(s32 *x, s32 *y, bool *button) const;
 	ioport_field *find_mouse_field() const;
 
 	/* return true if a key down for the given user interface sequence is detected */
@@ -85,15 +85,15 @@ public:
 	running_machine &machine() const { return m_machine; }
 
 
-	void push_mouse_move_event(render_target* target, int32_t x, int32_t y);
+	void push_mouse_move_event(render_target* target, s32 x, s32 y);
 	void push_mouse_leave_event(render_target* target);
-	void push_mouse_down_event(render_target* target, int32_t x, int32_t y);
-	void push_mouse_up_event(render_target* target, int32_t x, int32_t y);
-	void push_mouse_rdown_event(render_target* target, int32_t x, int32_t y);
-	void push_mouse_rup_event(render_target* target, int32_t x, int32_t y);
-	void push_mouse_double_click_event(render_target* target, int32_t x, int32_t y);
+	void push_mouse_down_event(render_target* target, s32 x, s32 y);
+	void push_mouse_up_event(render_target* target, s32 x, s32 y);
+	void push_mouse_rdown_event(render_target* target, s32 x, s32 y);
+	void push_mouse_rup_event(render_target* target, s32 x, s32 y);
+	void push_mouse_double_click_event(render_target* target, s32 x, s32 y);
 	void push_char_event(render_target* target, char32_t ch);
-	void push_mouse_wheel_event(render_target *target, int32_t x, int32_t y, short delta, int ucNumLines);
+	void push_mouse_wheel_event(render_target *target, s32 x, s32 y, short delta, int ucNumLines);
 
 	void mark_all_as_pressed();
 
@@ -104,12 +104,12 @@ private:
 
 	/* pressed states; retrieved with ui_input_pressed() */
 	osd_ticks_t                 m_next_repeat[IPT_COUNT];
-	uint8_t                       m_seqpressed[IPT_COUNT];
+	u8                          m_seqpressed[IPT_COUNT];
 
 	/* mouse position/info */
 	render_target *             m_current_mouse_target;
-	int32_t                       m_current_mouse_x;
-	int32_t                       m_current_mouse_y;
+	s32                         m_current_mouse_x;
+	s32                         m_current_mouse_y;
 	bool                        m_current_mouse_down;
 	ioport_field *              m_current_mouse_field;
 
@@ -119,4 +119,4 @@ private:
 	int                         m_events_end;
 };
 
-#endif  /* __UIINPUT_H__ */
+#endif  /* MAME_EMU_UIINPUT_H */

@@ -3,7 +3,7 @@
 #include "emu.h"
 #include "cpu/pdp1/tx0.h"
 
-static offs_t internal_disasm_tx0_64kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tx0_64kw)
 {
 	int md;
 	int x;
@@ -29,16 +29,7 @@ static offs_t internal_disasm_tx0_64kw(cpu_device *device, std::ostream &stream,
 	return 1;
 }
 
-CPU_DISASSEMBLE(tx0_64kw)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tx0_64kw(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
-}
-
-static offs_t internal_disasm_tx0_8kw(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(tx0_8kw)
 {
 	int md;
 	int x;
@@ -129,13 +120,4 @@ static offs_t internal_disasm_tx0_8kw(cpu_device *device, std::ostream &stream, 
 		break;
 	}
 	return 1;
-}
-
-CPU_DISASSEMBLE(tx0_8kw)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_tx0_8kw(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

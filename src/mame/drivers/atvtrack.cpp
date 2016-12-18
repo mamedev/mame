@@ -215,7 +215,7 @@ READ64_MEMBER(atvtrack_state::area2_r)
 		for (c = 3;c >= 0;c--) {
 			if (m_nandcommand[c] <= 0x50) {
 				addr = m_nandaddress[c]+m_nandoffset[c];
-				dat = (dat << 8) | m_nandregion->u8(addr+c);
+				dat = (dat << 8) | m_nandregion->as_u8(addr+c);
 				m_nandoffset[c] += 4;
 			} else
 				dat = (dat << 8) | 0xc0;

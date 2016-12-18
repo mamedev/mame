@@ -10,8 +10,9 @@ Catch and CRASH!
 
 By default, Sol will add a ``default_at_panic`` handler. If exceptions are not turned off, this handler will throw to allow the user a chance to recover. However, in almost all cases, when Lua calls ``lua_atpanic`` and hits this function, it means that something *irreversibly wrong* occured in your code or the Lua code and the VM is in an unpredictable or dead state. Catching an error thrown from the default handler and then proceeding as if things are cleaned up or okay is NOT the best idea. Unexpected bugs in optimized and release mode builds can result, among other serious issues.
 
+It is preferred if you catch an error that you log what happened, terminate the Lua VM as soon as possible, and then crash if your application cannot handle spinning up a new Lua state. Catching can be done, but you should understand the risks of what you're doing when you do it. For more information about catching exceptions, the potentials, not turning off exceptions and other tricks and caveats, read about :doc:`exceptions in Sol here<exceptions>`.
 
-It is preferred if you catch an error that you log what happened, terminate the Lua VM as soon as possible, and then crash if your application cannot handle spinning up a new Lua state. Catching can be done, but you should understand the risks of what you're doing when you do it.
+Lua is a C API first and foremost: exceptions bubbling out of it is essentially last-ditch, terminal behavior that the VM does not expect. You can see an example of handling a panic on the exceptions page :ref:`here<typical-panic-function>`.
 
 
 Destructors and Safety
@@ -24,6 +25,11 @@ Protected Functions and Access
 ------------------------------
 
 By default, :doc:`sol::function<api/function>` assumes the code ran just fine and there are no problems. :ref:`sol::state(_view)::script(_file)<state-script-function>` also assumes that code ran just fine. Use :doc:`sol::protected_function<api/protected_function>` to have function access where you can check if things worked out. Use :doc:`sol::optional<api/optional>` to get a value safely from Lua. Use :ref:`sol::state(_view)::do_string/do_file/load/load_file<state-do-code>` to safely load and get results from a script. The defaults are provided to be simple and fast with thrown exceptions to violently crash the VM in case things go wrong.
+
+Protected Functions Are Not Catch All
+-------------------------------------
+
+Sometimes, some scripts load poorly. Even if you protect the function call, the actual file loading or file execution will be bad, in which case :doc:`sol::protected_function<api/protected_function>` will not save you. Make sure you register your own panic handler so you can catch errors, or follow the advice of the catch + crash behavior above.
 
 Raw Functions
 -------------

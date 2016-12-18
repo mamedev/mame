@@ -16,7 +16,7 @@
 #include "emu.h"
 
 extern "C" {
-	
+
 	BOOL WINAPI GetVersionEx(
 		_Inout_ LPOSVERSIONINFO lpVersionInfo
 	)
@@ -66,16 +66,14 @@ extern "C" {
 		return osd_ticks();
 	}
 
+	// This is only in here so callers get an error
 	HMODULE WINAPI LoadLibraryExA(
 		_In_ LPCSTR lpLibFileName,
 		_Reserved_ HANDLE hFile,
 		_In_ DWORD dwFlags
-		)
+	)
 	{
-		wchar_t libfile_wide[MAX_PATH + 1];
-		if (MultiByteToWideChar(CP_ACP, 0, lpLibFileName, strlen(lpLibFileName), libfile_wide, MAX_PATH))
-			return LoadPackagedLibrary(libfile_wide, 0);
-
+		SetLastError(ERROR_FILE_NOT_FOUND);
 		return nullptr;
 	}
 
@@ -83,9 +81,10 @@ extern "C" {
 		_In_ LPCWSTR lpLibFileName,
 		_Reserved_ HANDLE hFile,
 		_In_ DWORD dwFlags
-		)
+	)
 	{
-		return LoadPackagedLibrary(lpLibFileName, 0);
+		SetLastError(ERROR_FILE_NOT_FOUND);
+		return nullptr;
 	}
 
 	DWORD WINAPI GetFileSize(

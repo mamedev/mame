@@ -8,7 +8,12 @@
     Skeleton by R. Belmont
 
     TODO:
-    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)
+    - currently asserts by selecting a s3 video bank above 1M (register 0x6a)z
+    
+    - The version is labeled "SQ05" in the filesystem but has the 1999 release year.
+      Other components are labeled "v0.5", but the game doesn't boot far enough to see if
+      any graphics have version information. There appears to also be a "Savage Quest 2.1" which
+      is undumped.
 
     PCI list:
     Bus no. Device No. Func No. Vendor ID Device ID Device Class          IRQ

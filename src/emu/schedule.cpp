@@ -174,7 +174,7 @@ bool emu_timer::enable(bool enable)
 //  firings
 //-------------------------------------------------
 
-void emu_timer::adjust(attotime start_delay, int32_t param, const attotime &period)
+void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period)
 {
 	// if this is the callback timer, mark it modified
 	device_scheduler &scheduler = machine().scheduler();
@@ -393,7 +393,7 @@ bool device_scheduler::can_save() const
 
 inline void device_scheduler::apply_suspend_changes()
 {
-	uint32_t suspendchanged = 0;
+	u32 suspendchanged = 0;
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 	{
 		suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
@@ -461,7 +461,7 @@ void device_scheduler::timeslice()
 				if (delta >= exec->m_attoseconds_per_cycle)
 				{
 					// compute how many cycles we want to execute
-					int ran = exec->m_cycles_running = divu_64x32((uint64_t)delta >> exec->m_divshift, exec->m_divisor);
+					int ran = exec->m_cycles_running = divu_64x32(u64(delta) >> exec->m_divshift, exec->m_divisor);
 					LOG(("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
@@ -498,7 +498,7 @@ void device_scheduler::timeslice()
 					attotime deltatime(0, exec->m_attoseconds_per_cycle * ran);
 					assert(deltatime >= attotime::zero);
 					exec->m_localtime += deltatime;
-					LOG(("         %d ran, %d total, time = %s\n", ran, (int32_t)exec->m_totalcycles, exec->m_localtime.as_string(PRECISION)));
+					LOG(("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION)));
 
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
@@ -642,7 +642,7 @@ void device_scheduler::eat_all_cycles()
 //  given amount of time
 //-------------------------------------------------
 
-void device_scheduler::timed_trigger(void *ptr, int32_t param)
+void device_scheduler::timed_trigger(void *ptr, s32 param)
 {
 	trigger(param);
 }

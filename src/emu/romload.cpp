@@ -40,7 +40,7 @@ static osd_file::error common_process_file(emu_options &options, const char *loc
 	return filerr;
 }
 
-std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, uint32_t crc, const rom_entry *romp, osd_file::error &filerr)
+std::unique_ptr<emu_file> common_process_file(emu_options &options, const char *location, bool has_crc, u32 crc, const rom_entry *romp, osd_file::error &filerr)
 {
 	auto image_file = std::make_unique<emu_file>(options.media_path(), OPEN_FLAG_READ);
 
@@ -184,14 +184,14 @@ std::string rom_parameter_value(const rom_entry *romp)
     file given the ROM description
 -------------------------------------------------*/
 
-uint32_t rom_file_size(const rom_entry *romp)
+u32 rom_file_size(const rom_entry *romp)
 {
-	uint32_t maxlength = 0;
+	u32 maxlength = 0;
 
 	/* loop until we run out of reloads */
 	do
 	{
-		uint32_t curlength;
+		u32 curlength;
 
 		/* loop until we run out of continues/ignores */
 		curlength = ROM_GETLENGTH(romp++);
@@ -343,7 +343,7 @@ void rom_load_manager::count_roms()
     random data
 -------------------------------------------------*/
 
-void rom_load_manager::fill_random(uint8_t *base, uint32_t length)
+void rom_load_manager::fill_random(u8 *base, u32 length)
 {
 	while (length--)
 		*base++ = machine().rand();
@@ -414,14 +414,14 @@ void rom_load_manager::dump_wrong_and_correct_checksums(const util::hash_collect
     and hash signatures of a file
 -------------------------------------------------*/
 
-void rom_load_manager::verify_length_and_hash(const char *name, uint32_t explength, const util::hash_collection &hashes)
+void rom_load_manager::verify_length_and_hash(const char *name, u32 explength, const util::hash_collection &hashes)
 {
 	/* we've already complained if there is no file */
 	if (m_file == nullptr)
 		return;
 
 	/* verify length */
-	uint32_t actlength = m_file->size();
+	u32 actlength = m_file->size();
 	if (explength != actlength)
 	{
 		m_errorstring.append(string_format("%s WRONG LENGTH (expected: %08x found: %08x)\n", name, explength, actlength));
@@ -462,7 +462,7 @@ void rom_load_manager::display_loading_rom_message(const char *name, bool from_l
 	char buffer[200];
 
 	if (name != nullptr)
-		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", (uint32_t)(100 * (uint64_t)m_romsloadedsize / (uint64_t)m_romstotalsize));
+		sprintf(buffer, "%s (%d%%)", from_list ? "Loading Software" : "Loading Machine", u32(100 * u64(m_romsloadedsize) / u64(m_romstotalsize)));
 	else
 		sprintf(buffer, "Loading Complete");
 
@@ -506,7 +506,7 @@ void rom_load_manager::display_rom_load_results(bool from_list)
 void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 {
 	memory_region *region = machine().root_device().memregion(rgntag);
-	uint8_t *base;
+	u8 *base;
 	int i, j;
 
 	// do nothing if no region
@@ -531,7 +531,7 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 		int datawidth = region->bytewidth();
 		for (i = 0, base = region->base(); i < region->bytes(); i += datawidth)
 		{
-			uint8_t temp[8];
+			u8 temp[8];
 			memcpy(temp, base, datawidth);
 			for (j = datawidth - 1; j >= 0; j--)
 				*base++ = temp[j];
@@ -548,14 +548,14 @@ void rom_load_manager::region_post_process(const char *rgntag, bool invert)
 int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp, std::string &tried_file_names, bool from_list)
 {
 	osd_file::error filerr = osd_file::error::NOT_FOUND;
-	uint32_t romsize = rom_file_size(romp);
+	u32 romsize = rom_file_size(romp);
 	tried_file_names = "";
 
 	/* update status display */
 	display_loading_rom_message(ROM_GETNAME(romp), from_list);
 
 	/* extract CRC to use for searching */
-	uint32_t crc = 0;
+	u32 crc = 0;
 	bool has_crc = util::hash_collection(ROM_GETHASHDATA(romp)).crc(crc);
 
 	/* attempt reading up the chain through the parents. It automatically also
@@ -663,7 +663,7 @@ int rom_load_manager::open_rom_file(const char *regiontag, const rom_entry *romp
     random data for a nullptr file
 -------------------------------------------------*/
 
-int rom_load_manager::rom_fread(uint8_t *buffer, int length, const rom_entry *parent_region)
+int rom_load_manager::rom_fread(u8 *buffer, int length, const rom_entry *parent_region)
 {
 	/* files just pass through */
 	if (m_file != nullptr)
@@ -691,8 +691,8 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 	int skip = ROM_GETSKIPCOUNT(romp);
 	int reversed = ROM_ISREVERSED(romp);
 	int numgroups = (numbytes + groupsize - 1) / groupsize;
-	uint8_t *base = m_region->base() + ROM_GETOFFSET(romp);
-	uint32_t tempbufsize;
+	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
+	u32 tempbufsize;
 	int i;
 
 	LOG(("Loading ROM data: offs=%X len=%X mask=%02X group=%d skip=%d reverse=%d\n", ROM_GETOFFSET(romp), numbytes, datamask, groupsize, skip, reversed));
@@ -715,7 +715,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 	/* use a temporary buffer for complex loads */
 	tempbufsize = std::min(TEMPBUFFER_MAX_SIZE, numbytes);
-	std::vector<uint8_t> tempbuf(tempbufsize);
+	std::vector<u8> tempbuf(tempbufsize);
 
 	/* chunky reads for complex loads */
 	skip += groupsize;
@@ -723,7 +723,7 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 	{
 		int evengroupcount = (tempbufsize / groupsize) * groupsize;
 		int bytesleft = (numbytes > evengroupcount) ? evengroupcount : numbytes;
-		uint8_t *bufptr = &tempbuf[0];
+		u8 *bufptr = &tempbuf[0];
 
 		/* read as much as we can */
 		LOG(("  Reading %X bytes into buffer\n", bytesleft));
@@ -799,9 +799,9 @@ int rom_load_manager::read_rom_data(const rom_entry *parent_region, const rom_en
 
 void rom_load_manager::fill_rom_data(const rom_entry *romp)
 {
-	uint32_t numbytes = ROM_GETLENGTH(romp);
+	u32 numbytes = ROM_GETLENGTH(romp);
 	int skip = ROM_GETSKIPCOUNT(romp);
-	uint8_t *base = m_region->base() + ROM_GETOFFSET(romp);
+	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
 
 	// make sure we fill within the region space
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
@@ -812,7 +812,7 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 		fatalerror("Error in RomModule definition: FILL has an invalid length\n");
 
 	// for fill bytes, the byte that gets filled is the first byte of the hashdata string
-	uint8_t fill_byte = (uint8_t)strtol(ROM_GETHASHDATA(romp), nullptr, 0);
+	u8 fill_byte = u8(strtol(ROM_GETHASHDATA(romp), nullptr, 0));
 
 	// fill the data (filling value is stored in place of the hashdata)
 	if(skip != 0)
@@ -831,10 +831,10 @@ void rom_load_manager::fill_rom_data(const rom_entry *romp)
 
 void rom_load_manager::copy_rom_data(const rom_entry *romp)
 {
-	uint8_t *base = m_region->base() + ROM_GETOFFSET(romp);
+	u8 *base = m_region->base() + ROM_GETOFFSET(romp);
 	const char *srcrgntag = ROM_GETNAME(romp);
-	uint32_t numbytes = ROM_GETLENGTH(romp);
-	uint32_t srcoffs = (uint32_t) strtol(ROM_GETHASHDATA(romp), nullptr, 0);  /* srcoffset in place of hashdata */
+	u32 numbytes = ROM_GETLENGTH(romp);
+	u32 srcoffs = u32(strtol(ROM_GETHASHDATA(romp), nullptr, 0));  /* srcoffset in place of hashdata */
 
 	/* make sure we copy within the region space */
 	if (ROM_GETOFFSET(romp) + numbytes > m_region->bytes())
@@ -865,7 +865,7 @@ void rom_load_manager::copy_rom_data(const rom_entry *romp)
 
 void rom_load_manager::process_rom_entries(const char *regiontag, const rom_entry *parent_region, const rom_entry *romp, device_t *device, bool from_list)
 {
-	uint32_t lastflags = 0;
+	u32 lastflags = 0;
 
 	/* loop until we hit the end of this region */
 	while (!ROMENTRY_ISREGIONEND(romp))
@@ -1223,7 +1223,7 @@ void rom_load_manager::process_disk_entries(const char *regiontag, const rom_ent
     flags for the given device
 -------------------------------------------------*/
 
-void rom_load_manager::normalize_flags_for_device(running_machine &machine, const char *rgntag, uint8_t &width, endianness_t &endian)
+void rom_load_manager::normalize_flags_for_device(running_machine &machine, const char *rgntag, u8 &width, endianness_t &endian)
 {
 	device_t *device = machine.device(rgntag);
 	device_memory_interface *memory;
@@ -1280,7 +1280,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	const software_info *swinfo = swlist.find(swname);
 	if (swinfo != nullptr)
 	{
-		uint32_t supported = swinfo->supported();
+		u32 supported = swinfo->supported();
 		if (supported == SOFTWARE_SUPPORTED_PARTIAL)
 		{
 			m_errorstring.append(string_format("WARNING: support for software %s (in list %s) is only partial\n", swname, swlist.list_name()));
@@ -1311,7 +1311,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 	/* loop until we hit the end */
 	for (region = start_region; region != nullptr; region = rom_next_region(region))
 	{
-		uint32_t regionlength = ROMREGION_GETLENGTH(region);
+		u32 regionlength = ROMREGION_GETLENGTH(region);
 
 		regiontag = device.subtag(ROMREGION_GETTAG(region));
 		LOG(("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength));
@@ -1321,7 +1321,7 @@ void rom_load_manager::load_software_part_region(device_t &device, software_list
 
 		/* if this is a device region, override with the device width and endianness */
 		endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
-		uint8_t width = ROMREGION_GETWIDTH(region) / 8;
+		u8 width = ROMREGION_GETWIDTH(region) / 8;
 		memory_region *memregion = machine().root_device().memregion(regiontag.c_str());
 		if (memregion != nullptr)
 		{
@@ -1389,7 +1389,7 @@ void rom_load_manager::process_region_list()
 	for (device_t &device : deviter)
 		for (const rom_entry *region = rom_first_region(device); region != nullptr; region = rom_next_region(region))
 		{
-			uint32_t regionlength = ROMREGION_GETLENGTH(region);
+			u32 regionlength = ROMREGION_GETLENGTH(region);
 
 			regiontag = rom_region_name(device, region);
 			LOG(("Processing region \"%s\" (length=%X)\n", regiontag.c_str(), regionlength));
@@ -1400,7 +1400,7 @@ void rom_load_manager::process_region_list()
 			if (ROMREGION_ISROMDATA(region))
 			{
 				/* if this is a device region, override with the device width and endianness */
-				uint8_t width = ROMREGION_GETWIDTH(region) / 8;
+				u8 width = ROMREGION_GETWIDTH(region) / 8;
 				endianness_t endianness = ROMREGION_ISBIGENDIAN(region) ? ENDIANNESS_BIG : ENDIANNESS_LITTLE;
 				if (machine().device(regiontag.c_str()) != nullptr)
 					normalize_flags_for_device(machine(), regiontag.c_str(), width, endianness);

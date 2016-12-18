@@ -82,7 +82,7 @@ static const char *const CONDITION_CODE[16] =
     DISASSEMBLER
 ***************************************************************************/
 
-static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options)
+CPU_DISASSEMBLE(z8)
 {
 	const uint8_t *startrom = oprom;
 	uint32_t flags = 0;
@@ -376,14 +376,4 @@ static offs_t internal_disasm_z8(cpu_device *device, std::ostream &stream, offs_
 	}
 
 	return (oprom - startrom) | flags | DASMFLAG_SUPPORTED;
-}
-
-
-CPU_DISASSEMBLE(z8)
-{
-	std::ostringstream stream;
-	offs_t result = internal_disasm_z8(device, stream, pc, oprom, opram, options);
-	std::string stream_str = stream.str();
-	strcpy(buffer, stream_str.c_str());
-	return result;
 }

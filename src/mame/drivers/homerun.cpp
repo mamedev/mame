@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco

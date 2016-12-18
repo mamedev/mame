@@ -51,7 +51,7 @@
     The boot-program performs a simple task: Load sector 0, track 0 to &f000 in ram, and execute
     &f010.
 
-    From here CP/M is booted, and the appropiate programs can be run.
+    From here CP/M is booted, and the appropriate programs can be run.
 
     The hardware:
        - Z80 CPU running at 3.4 MHz
@@ -612,7 +612,7 @@ READ8_MEMBER(pcw_state::pcw_expansion_r)
 
 	}
 
-	/* result from floating bus/no peripherial at this port */
+	/* result from floating bus/no peripheral at this port */
 	return 0x0ff;
 }
 

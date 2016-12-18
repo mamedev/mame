@@ -13,9 +13,9 @@
 
 @interface MAMEDeviceWrapper : NSObject
 {
-	running_machine	*machine;
-	device_t		*device;
-	NSArray			*children;
+	running_machine *machine;
+	device_t        *device;
+	NSArray         *children;
 }
 
 - (id)initWithMachine:(running_machine &)m device:(device_t &)d;
@@ -36,7 +36,7 @@
 	NSMutableArray *const tmp = [[NSMutableArray alloc] init];
 	for (device_t *child = device->subdevices().first(); child != nullptr; child = child->next())
 	{
-		MAMEDeviceWrapper *const wrap = [[MAMEDeviceWrapper alloc] initWithMachine:*machine 
+		MAMEDeviceWrapper *const wrap = [[MAMEDeviceWrapper alloc] initWithMachine:*machine
 																			device:*child];
 		[tmp addObject:wrap];
 		[wrap release];
@@ -103,8 +103,8 @@
 @implementation MAMEDevicesViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	NSScrollView	*devicesScroll;
-	NSTableColumn	*tagColumn, *nameColumn;
+	NSScrollView    *devicesScroll;
+	NSTableColumn   *tagColumn, *nameColumn;
 
 	if (!(self = [super initWithMachine:m title:@"All Devices" console:c]))
 		return nil;

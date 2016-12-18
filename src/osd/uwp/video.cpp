@@ -71,7 +71,7 @@ bool windows_osd_interface::video_init()
 	if (video_config.mode != VIDEO_MODE_NONE)
 	{
 		auto win = std::static_pointer_cast<uwp_window_info>(osd_common_t::s_window_list.front());
-		win->uwp_window()->Activate();
+		win->platform_window()->Activate();
 	}
 
 	return true;

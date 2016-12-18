@@ -900,3 +900,15 @@ if (VIDEOS["GBA_LCD"]~=null) then
 		MAME_DIR .. "src/devices/video/gba_lcd.h",
 	}
 end
+
+--------------------------------------------------
+--
+--@src/devices/video/ef9369.h,VIDEOS["EF9369"] = true
+--------------------------------------------------
+
+if (VIDEOS["EF9369"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/video/ef9369.cpp",
+		MAME_DIR .. "src/devices/video/ef9369.h",
+	}
+end

@@ -1982,6 +1982,9 @@ static INPUT_PORTS_START( warfa )
 	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Boot ROM Test v1.3" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc000, 0x4000, "Resolution" )
 	PORT_DIPSETTING(      0xc000, "Standard Res 512x256" )
 	PORT_DIPSETTING(      0x4000, "Medium Res 512x384" )
@@ -2593,6 +2596,20 @@ ROM_START( warfaa )
 	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
+ROM_START( warfab )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  // test: EPROM 1.3 Apr 7 1999
+	// label: WAR 42CE / BOOT V1.9 / PROG V1.6
+	ROM_LOAD( "war42ce.bin", 0x000000, 0x80000, CRC(1a6e7f59) SHA1(0d8b4ce1e4b1132689796c4374aa54447b9a3369) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+	DISK_REGION( "ide:0:hdd:image" )    // test: Guts 1.3 Apr7 1999 Game 1.3 Apr7 1999
+	// V1.5
+	DISK_IMAGE( "warfa15", 0, SHA1(bd538bf2f6a245545dae4ea97c433bb3f7d4394e) )
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
+	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+ROM_END
 
 ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
@@ -2846,6 +2863,7 @@ GAME( 1999, gauntdl,  0,        gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT
 GAME( 1999, gauntdl24,gauntdl,  gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, warfa,    0,        warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, warfaa,   warfa,    warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfab,   warfa,    warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
 
 
 /* Durango + DSIO + Voodoo 2 */

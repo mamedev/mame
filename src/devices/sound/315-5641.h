@@ -3,7 +3,7 @@
 /* Sega 315-5641 / D77591 / 9442CA010 */
 
 // this is the PICO sound chip, we are not sure if it's the same as a 7759 or not, it requires FIFO logic
-// which the 7759 does _not_ have but it is possible that is handled somewhere else on the PICO hardawre.
+// which the 7759 does _not_ have but it is possible that is handled somewhere else on the PICO hardware.
 
 #include "upd7759.h"
 
