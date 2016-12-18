@@ -374,7 +374,9 @@ public:
 		objectdata->data = this;
 		combiner.used = 0;
 		enabled_vertex_attributes = 0;
+		primitives_total_count = 0;
 		indexesleft_count = 0;
+		triangles_bfculled = 0;
 		vertex_pipeline = 4;
 		color_mask = 0xffffffff;
 		backface_culling_enabled = false;
@@ -490,6 +492,7 @@ public:
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
 	void assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans);
+	int clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo);
 	uint32_t render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	uint32_t render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	void clear_render_target(int what, uint32_t value);
@@ -563,8 +566,10 @@ public:
 		int rectheight;
 		int rectwidth;
 	} texture[4];
+	uint32_t triangles_bfculled;
 	NV2A_BEGIN_END primitive_type;
 	uint32_t primitives_count;
+	uint32_t primitives_total_count;
 	int indexesleft_count;
 	int indexesleft_first;
 	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator

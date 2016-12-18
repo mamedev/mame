@@ -2627,7 +2627,10 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 	if (backface_culling_enabled == false)
 		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
+	{
+		triangles_bfculled++;
 		return 0;
+	}
 	areax2 = _v1.x*(_v2.y - _v3.y) + _v2.x*(_v3.y - _v1.y) + _v3.x*(_v1.y - _v2.y);
 	if (backface_culling_winding == NV2A_GL_FRONT_FACE::CCW)
 	{
@@ -2648,53 +2651,18 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 	if (face == NV2A_GL_CULL_FACE::BACK)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT)
 			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	triangles_bfculled++;
 	return 0;
 }
 
-uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+int nv2a_renderer::clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo)
 {
-	nv2avertex_t *vi[3];
-	nv2avertex_t vo[16];
 	int idx_prev, idx_curr;
 	int neg_prev, neg_curr;
 	double tfactor;
 	int idx;
-	const double wthreshold = 0.00000001;
+	const double wthreshold = 0.000001;
 
-	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
-		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
-	// assign the elements of the array
-	vi[0] = &_v1;
-	vi[1] = &_v2;
-	vi[2] = &_v3;
-	// go back to the state before perpective divide
-	if (vertex_pipeline == 4)
-	{
-		for (int n = 0; n < 3; n++)
-		{
-			vi[n]->x = (vi[n]->x / (double)supersample_factor_x)*vi[n]->w;
-			vi[n]->y = (vi[n]->y / (double)supersample_factor_y)*vi[n]->w;
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
-		}
-	} else
-	{
-		for (int n = 0; n < 3; n++)
-		{
-			// remove translate
-			vi[n]->x = vi[n]->x - matrix.translate[0];
-			vi[n]->y = vi[n]->y - matrix.translate[1];
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - matrix.translate[2];
-			// remove scale
-			vi[n]->x = vi[n]->x / matrix.translate[0];
-			vi[n]->y = vi[n]->y / matrix.translate[1];
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] / matrix.translate[2];
-			// remove perspective divide
-			vi[n]->x = vi[n]->x * vi[n]->w;
-			vi[n]->y = vi[n]->y * vi[n]->w;
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
-		}
-	}
-	// do the clipping
 	idx_prev = 2;
 	idx_curr = 0;
 	idx = 0;
@@ -2726,10 +2694,53 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		idx_prev = idx_curr;
 		idx_curr++;
 	}
+	return idx;
+}
+
+uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+{
+#if 0
+	nv2avertex_t *vi[3];
+	nv2avertex_t vo[16];
+	int nv;
+#endif
+
+	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
+		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
+#if 0
+	// assign the elements of the array
+	vi[0] = &_v1;
+	vi[1] = &_v2;
+	vi[2] = &_v3;
+	// go back to the state before perpective divide
+	if (vertex_pipeline == 4)
+	{
+		for (int n = 0; n < 3; n++)
+		{
+			vi[n]->x = (vi[n]->x / (double)supersample_factor_x)*vi[n]->w;
+			vi[n]->y = (vi[n]->y / (double)supersample_factor_y)*vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
+	} else
+	{
+		for (int n = 0; n < 3; n++)
+		{
+			// remove translate
+			vi[n]->x = vi[n]->x - matrix.translate[0];
+			vi[n]->y = vi[n]->y - matrix.translate[1];
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - matrix.translate[2];
+			// remove perspective divide
+			vi[n]->x = vi[n]->x * vi[n]->w;
+			vi[n]->y = vi[n]->y * vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
+	}
+	// do the clipping
+	nv = clip_triangle_w(vi, vo);
 	// screen coordinates for the new points
 	if (vertex_pipeline == 4)
 	{
-		for (int n = 0; n < idx; n++)
+		for (int n = 0; n < nv; n++)
 		{
 			vo[n].x = vo[n].x*(double)supersample_factor_x / vo[n].w;
 			vo[n].y = vo[n].y*(double)supersample_factor_y / vo[n].w;
@@ -2737,34 +2748,28 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		}
 	} else
 	{
-		for (int n = 0; n < idx; n++)
+		for (int n = 0; n < nv; n++)
 		{
 			// apply perspective divide
 			vo[n].x = vo[n].x / vo[n].w;
 			vo[n].y = vo[n].y / vo[n].w;
 			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
-			// apply scale
-			vo[n].x = vo[n].x * matrix.scale[0];
-			vo[n].y = vo[n].y * matrix.scale[1];
-			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * matrix.scale[2];
 			// apply translate
 			vo[n].x = vo[n].x + matrix.translate[0];
 			vo[n].y = vo[n].y + matrix.translate[1];
 			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + matrix.translate[2];
 		}
 	}
-	for (int n = 0; n < (idx - 2); n++)
-	{
-		if ((n & 1) == 0)
-			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 1], vo[n + 2]);
-		else
-			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 2], vo[n + 1]);
-	}
+	for (int n = 1; n <= (nv - 2); n++)
+		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[n], vo[n + 1]);
+#endif
 	return 0;
 }
 
 void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans)
 {
+	uint32_t pc = primitives_count;
+
 	for (; count > 0; count--) {
 		if (primitive_type == NV2A_BEGIN_END::QUADS) {
 			convert_vertices_poly(source, vertex_xy + vertex_count + vertex_accumulated, 1);
@@ -2872,6 +2877,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			vertex_count++;
 		}
 	}
+	primitives_total_count += primitives_count - pc;
 }
 
 void nv2a_renderer::compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel)
