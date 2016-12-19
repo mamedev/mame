@@ -948,6 +948,10 @@ INSTRUCTION( lei )
 	{
 		OUT_L(Q);
 	}
+	else
+	{
+		OUT_L(0);
+	}
 }
 
 /*
