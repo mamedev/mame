@@ -1152,6 +1152,8 @@ MACHINE_CONFIG_END
 
   National Semiconductor QuizKid Racer (COP420 version)
   * COP420 MCU label COP420-NPG/N
+  
+  This is the COP420 version, the first release was on a MM5799 MCU.
 
 ***************************************************************************/
 
@@ -1174,9 +1176,10 @@ public:
 
 void qkracer_state::prepare_display()
 {
-	set_display_segmask(0xff, 0x7f);
+	set_display_segmask(0xdf, 0x7f);
+	set_display_segmask(0x20, 0x41); // equals sign
 
-	display_matrix(7, 9, m_l, (m_d | m_g << 4 | m_sk << 8) ^ 0xff);
+	display_matrix(7, 9, m_l, ~(m_d | m_g << 4 | m_sk << 8));
 }
 
 WRITE8_MEMBER(qkracer_state::write_d)
@@ -1184,7 +1187,6 @@ WRITE8_MEMBER(qkracer_state::write_d)
 	// D: select digit, D3: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 1 & 0x10);
 	m_d = data;
-	prepare_display();
 }
 
 WRITE8_MEMBER(qkracer_state::write_g)
@@ -1192,13 +1194,15 @@ WRITE8_MEMBER(qkracer_state::write_g)
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
 	m_g = data;
-	prepare_display();
 }
 
 WRITE8_MEMBER(qkracer_state::write_l)
 {
 	// L0-L6: digit segment data
-	m_l = data & 0x7f;
+	// strobe display
+	m_l = data;
+	prepare_display();
+	m_l = 0;
 	prepare_display();
 }
 
@@ -1254,7 +1258,7 @@ static MACHINE_CONFIG_START( qkracer, qkracer_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP420, 1000000) // approximation - RC osc. R=47K, C=100pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_32, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(qkracer_state, write_d))
 	MCFG_COP400_WRITE_G_CB(WRITE8(qkracer_state, write_g))
 	MCFG_COP400_WRITE_L_CB(WRITE8(qkracer_state, write_l))
@@ -1346,7 +1350,7 @@ CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Mil
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1982, bship82,   bship,    0, bship82,   bship82,   driver_device, 0, "Milton Bradley", "Electronic Battleship (1982 version)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // ***
 
-CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   driver_device, 0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW | MACHINE_NOT_WORKING )
+CONS( 1978, qkracer,   0,        0, qkracer,   qkracer,   driver_device, 0, "National Semiconductor", "QuizKid Racer (COP420 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 // ***: As far as MAME is concerned, the game is emulated fine. But for it to be playable, it requires interaction
 // with other, unemulatable, things eg. game board/pieces, playing cards, pen & paper, etc.
