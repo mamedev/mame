@@ -4,7 +4,7 @@
 
     ACT Apricot PC/Xi
 
-    - Error 29 (timer failed)
+    - Error 31 (diagnostic keyboard failure)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
@@ -311,7 +311,7 @@ MC6845_UPDATE_ROW( apricot_state::crtc_update_row )
 			for (int x = 0; x <= 10; x++)
 			{
 				int color = fill ? 1 : BIT(data, x);
-				if (BIT(code, 15)) color = !color; // reverse?
+				color ^= BIT(code, 15); // reverse?
 				bitmap.pix32(y, x + i*10) = pen[color ? 1 + BIT(code, 14) : 0];
 			}
 		}
