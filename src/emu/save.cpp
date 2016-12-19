@@ -291,6 +291,8 @@ save_error save_manager::write_file(emu_file &file)
 	if (m_illegal_regs > 0)
 		return STATERR_ILLEGAL_REGISTRATIONS;
 
+    dump_registry();
+
 	// generate the header
 	u8 header[HEADER_SIZE];
 	memcpy(&header[0], STATE_MAGIC_NUM, 8);
@@ -353,7 +355,7 @@ u32 save_manager::signature() const
 void save_manager::dump_registry() const
 {
 	for (auto &entry : m_entry_list)
-		LOG(("%s: %d x %d\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount));
+		osd_printf_verbose("%s: %d x %d\n", entry->m_name.c_str(), entry->m_typesize, entry->m_typecount);
 }
 
 
