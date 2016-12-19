@@ -28,8 +28,6 @@
       halfs of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
 
-    - Find out how Beastie Feastie's 2nd player inputs work.
-
     - Fix flip screen support for The Dealer and Beastie Feastie.
 
 ***************************************************************************/
@@ -101,6 +99,18 @@ static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
+READ8_MEMBER(epos_state::read_prta)
+{
+	uint8_t data = 0xff;
+
+	if (!BIT(m_input_multiplex, 0))
+		data &= m_inputs[0]->read();
+
+	if (!BIT(m_input_multiplex, 1))
+		data &= m_inputs[1]->read();
+
+	return data;
+}
 
 /*
    ROMs U01-U03 are checked with the same code in a loop.
@@ -110,6 +120,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(epos_state::write_prtc)
 {
 	membank("bank2")->set_entry(data & 0x01);
+	m_input_multiplex = (data >> 5) & 3;
 }
 
 /*************************************
@@ -343,13 +354,23 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) //cancel
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) //draw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) //stand
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) //play
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) //coin in
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME( "Draw" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME( "Play" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
@@ -363,7 +384,16 @@ static INPUT_PORTS_START( beastf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_MODIFY("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 /*************************************
@@ -376,12 +406,14 @@ MACHINE_START_MEMBER(epos_state,epos)
 {
 	save_item(NAME(m_palette));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_input_multiplex));
 }
 
 void epos_state::machine_reset()
 {
 	m_palette = 0;
 	m_counter = 0;
+	m_input_multiplex = 3;
 }
 
 
@@ -431,7 +463,7 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, read_prta))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
