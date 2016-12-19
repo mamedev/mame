@@ -297,7 +297,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	const file_selector_entry *selected_entry = nullptr;
 	int i;
 	const char *volume_name;
-	uint8_t first = 0;
 
 	// open the directory
 	err = util::zippath_opendir(m_current_directory, &directory);
@@ -333,9 +332,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 		i++;
 	}
 
-	// store where the file list starts
-	first = m_entrylist.size();
-
 	// build the menu for each item
 	if (err == osd_file::error::NONE)
 	{
@@ -356,9 +352,6 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 			}
 		}
 	}
-
-	// sort the menu entries
-	std::sort(m_entrylist.begin()+first, m_entrylist.end(), [](file_selector_entry x, file_selector_entry y) { return x.basename < y.basename; } );
 
 	// append all of the menu entries
 	for (auto &entry : m_entrylist)
