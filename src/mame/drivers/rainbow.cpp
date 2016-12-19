@@ -457,7 +457,8 @@ public:
 		m_hdc(*this, "hdc"),
 
 		m_mpsc(*this, "upd7201"),
-		m_dbrg(*this, "com8116"),
+		m_dbrg_A(*this, "com8116_a"),
+		m_dbrg_B(*this, "com8116_b"),
 
 		m_kbd8251(*this, "kbdser"),
 		m_lk201(*this, LK201_TAG),
@@ -545,6 +546,8 @@ public:
 	DECLARE_WRITE8_MEMBER(printer_bitrate_w);
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_fr_w );
 	DECLARE_WRITE_LINE_MEMBER( com8116_a_ft_w );
+	DECLARE_WRITE_LINE_MEMBER( com8116_b_fr_w );
+	DECLARE_WRITE_LINE_MEMBER( com8116_b_ft_w );
 
 	DECLARE_WRITE8_MEMBER(GDC_EXTRA_REGISTER_w);
 	DECLARE_READ8_MEMBER(GDC_EXTRA_REGISTER_r);
@@ -604,7 +607,8 @@ private:
 	optional_device<wd2010_device> m_hdc;
 
 	required_device<upd7201_device> m_mpsc;
-	required_device<com8116_device> m_dbrg;
+	required_device<com8116_device> m_dbrg_A;
+	required_device<com8116_device> m_dbrg_B;
 	required_device<i8251_device> m_kbd8251;
 	required_device<lk201_device> m_lk201;
 	required_shared_ptr<uint8_t> m_p_ram;
@@ -835,6 +839,10 @@ void rainbow_state::machine_start()
 		rom[0xf4000 + 0x135e] = 0x00; // Floppy / RX-50 workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
+		
+		rom[0xf4000 + 0x315D] = 0x00; // AND DL,0 (make sure DL is zero before ROM_Initialize7201)
+		rom[0xf4000 + 0x315E] = 0xe2;
+		rom[0xf4000 + 0x315F] = 0x02;
 	}
 #endif
 }
@@ -1148,7 +1156,7 @@ void rainbow_state::machine_reset()
 				output().set_value("led1", 1);
 
 				uint32_t max_sector = (info->cylinders) * (info->heads) * (info->sectors);
-				printf("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
+				popmessage("\n%u (%3.2f) MB HARD DISK MOUNTED. GEOMETRY: %d HEADS (1..%d ARE OK).\n%d CYLINDERS (151 to %d ARE OK).\n%d SECTORS / TRACK (up to %d ARE OK). \n%d BYTES / SECTOR (128 to 1024 ARE OK).\n",
 					max_sector * info->sectorbytes / 1000000,
 					(float)max_sector * (float)info->sectorbytes / 1048576.0f,
 					info->heads, RD51_MAX_HEAD,
@@ -1301,7 +1309,6 @@ void rainbow_state::update_8088_irqs()
 void rainbow_state::raise_8088_irq(int ref)
 {
 	m_irq_mask |= (1 << ref);
-
 	update_8088_irqs();
 }
 
@@ -1315,12 +1322,10 @@ void rainbow_state::lower_8088_irq(int ref)
 // IRQ service for 7201 (commm / printer)
 void rainbow_state::update_mpsc_irq()
 {
-	if (m_mpsc_irq == 0) {
+	if (m_mpsc_irq == 0) 
 		lower_8088_irq(IRQ_COMM_PTR_INTR_L);
-		m_mpsc->m1_r();  // interrupt acknowledge
-	} else
+	else
 		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
-
 }
 
 WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
@@ -1329,23 +1334,25 @@ WRITE_LINE_MEMBER(rainbow_state::mpsc_irq)
 	update_mpsc_irq();
 }
 
-// PORT 0x0e : Printer bit rates
-WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
-{
-	printf("\nPRINTER bitrate = %02x HEX\n",data & 7);
-
-	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
-	printf(" - CLOCK BIT: %02x", data & 8);
-}
-
 // PORT 0x06 : Communication bit rates (see page 21 of PC 100 SPEC)
 WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 {
-	m_dbrg->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
+	m_dbrg_A->str_w(data & 0x0f);  // PDF is wrong, low nibble is RECEIVE clock (verified in SETUP).
 	printf("\nRECEIVE bitrate = %02x HEX\n",data & 0x0f);
 
-	m_dbrg->stt_w( ((data & 0xf0) >> 4) );
+	m_dbrg_A->stt_w( ((data & 0xf0) >> 4) );
 	printf("\nTRANSMIT bitrate = %02x HEX\n",(data & 0xf0) >> 4);
+}
+
+// PORT 0x0e : Printer bit rates
+WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
+{
+	m_dbrg_B->str_w(data & 7); // bits 0 - 2 
+	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
+	printf("\n(PRINTER) RECEIVE / TRANSMIT bitrate = %02x HEX\n",data & 7);
+
+	// "bit 3 controls the communications port clock (RxC,TxC). External clock when 1, internal when 0"
+	printf(" - CLOCK (0 = internal): %02x", data & 8);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_a_fr_w)
@@ -1358,6 +1365,15 @@ WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
 	m_mpsc->txca_w(state);
 }
 
+WRITE_LINE_MEMBER(rainbow_state::com8116_b_fr_w)
+{
+	m_mpsc->rxcb_w(state); 
+}
+
+WRITE_LINE_MEMBER(rainbow_state::com8116_b_ft_w)
+{
+	m_mpsc->txcb_w(state);
+}
 
 // Only Z80 * private SRAM * is wait state free
 // (= fast enough to allow proper I/O to the floppy)
@@ -2388,6 +2404,9 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
 					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
+				if (i == IRQ_COMM_PTR_INTR_L) 
+					m_mpsc->m1_r();  // serial interrupt acknowledge
+
 				intnum = vectors[i] | m_irq_high;
 				break;
 			}
@@ -2503,10 +2522,10 @@ INTERRUPT_GEN_MEMBER(rainbow_state::vblank_irq)
 
 	if (m_POWER_GOOD && m_crtc->MHFU(MHFU_IS_ENABLED)) // If enabled...
 	{
-		if (m_crtc->MHFU(MHFU_VALUE) > 7) // + more than (7 * 16.666) msecs gone (108 ms would be by the book)
+		if (m_crtc->MHFU(MHFU_VALUE) > 10) // + more than (10 * 16.666) msecs gone (108 ms would be by the book)
 		{
 			m_crtc->MHFU(MHFU_RESET_and_DISABLE);
-			printf("\n**** WATCHDOG TRIPPED:nVBL IRQ not acknowledged within (at least) 108 milliseconds. ****\n");
+			popmessage("\n**** WATCHDOG TRIPPED:nVBL IRQ not acknowledged within (at least) 108 milliseconds. ****\n");
 
 			if (m_inp12->read() == 0x01) // (DIP) for watchdog active?
 				cmd_timer->adjust(attotime::from_msec(RESET_DURATION_MS));
@@ -3149,9 +3168,13 @@ MCFG_HARDDISK_ADD("harddisk1")
 
 MCFG_DS1315_ADD("rtc") // DS1315 (ClikClok for DEC-100 B)   * OPTIONAL *
 
-MCFG_DEVICE_ADD("com8116", COM8116, XTAL_5_0688MHz)     // Baud rate generator
+MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL_5_0688MHz)     // Baud rate generator A
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
+
+MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL_5_0688MHz) // Baud rate generator B 
+MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
+MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 
 MCFG_UPD7201_ADD("upd7201", XTAL_2_5MHz, 0, 0, 0, 0)    // 2.5 Mhz from schematics
 MCFG_Z80DART_OUT_INT_CB(WRITELINE(rainbow_state, mpsc_irq))

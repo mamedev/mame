@@ -582,6 +582,49 @@ ROM_START( raidenk ) /* Same board as above. Not sure why the sound CPU would be
 	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
 ROM_END
 
+ROM_START( raidenkb ) /* Korean bootleg board. ROMs for main, sub, audiocpu, chars and oki match raidenk, while object and tile ROMs are differently split */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
+	ROM_LOAD16_BYTE( "2.u0252", 0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
+	ROM_LOAD16_BYTE( "3.u022",  0x0c0000, 0x20000, CRC(f6af09d0) SHA1(ecd49f3351359ea2d5cbd140c9962d45c5544ecd) )
+	ROM_LOAD16_BYTE( "4k.u023", 0x0c0001, 0x20000, CRC(fddf24da) SHA1(ececed0b0b96d070d85bfb6174029142bc96d5f0) ) /* 0x1fffd == 0x02, 0x1fffe == 0xA4 */
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
+	ROM_LOAD16_BYTE( "5.u042", 0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
+	ROM_LOAD16_BYTE( "6.u043", 0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "8b.u212",     0x000000, 0x08000, CRC(99ee7505) SHA1(b97c8ee5e26e8554b5de506fba3b32cc2fde53c9) ) /* Not encrypted */
+	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x010000, "gfx1", 0 ) /* Chars */
+	ROM_LOAD( "9",  0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* On some PCBs there is no explicit */
+	ROM_LOAD( "10", 0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) ) /* U location for these two roms     */
+
+	ROM_REGION( 0x080000, "gfx2", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "rkb15bg.bin", 0x00000, 0x20000, CRC(13a69064) SHA1(a9fcd785e3bac7c0d39be532b3755e6dd45fc314) )
+	ROM_LOAD16_BYTE( "rkb17bg.bin", 0x00001, 0x20000, CRC(d7a6c649) SHA1(01d6f18af0385466e3956c3f3afc82393acee6bc) )
+	ROM_LOAD16_BYTE( "rkb16bg.bin", 0x40000, 0x20000, CRC(66ea8484) SHA1(f4452e1b0991bf81a60b580ba822fc43b1a443e6) )
+	ROM_LOAD16_BYTE( "rkb18bg.bin", 0x40001, 0x20000, CRC(42362d56) SHA1(1cad19fa3f66e34865383d9a94e9058114910365) )
+
+	ROM_REGION( 0x080000, "gfx3", 0 ) /* tiles */
+	ROM_LOAD16_BYTE( "rkb7bg.bin",  0x00000, 0x20000, CRC(25239711) SHA1(978cfc6487ed711cc1b513824741c347ec92889d) )
+	ROM_LOAD16_BYTE( "rkb9bg.bin",  0x00001, 0x20000, CRC(6ca0d7b3) SHA1(ef63657a01b07aaa0ded7b0d405b872b4d3a56a8) )
+	ROM_LOAD16_BYTE( "rkb8bg.bin",  0x40000, 0x20000, CRC(3cad38fc) SHA1(de2257f70c3e71905bc959f80be183c6d95fd06d) )
+	ROM_LOAD16_BYTE( "rkb10bg.bin", 0x40001, 0x20000, CRC(6fce95a3) SHA1(1d3beda3a4dd0a2a3afbb7b5b16d87bf3257bcb4) )
+
+
+	ROM_REGION( 0x090000, "gfx4", 0 ) /* sprites */
+	ROM_LOAD16_BYTE( "rkb19obj.bin", 0x00000, 0x20000, CRC(34fa4485) SHA1(d9893c484ee4f80e364824500c6c048f58f49752) )
+	ROM_LOAD16_BYTE( "rkb21obj.bin", 0x00001, 0x20000, CRC(d806395b) SHA1(7c6fc848aa40a49590e00d0b02ce21ad5414e387) )
+	ROM_LOAD16_BYTE( "rkb20obj.bin", 0x40000, 0x20000, CRC(8b7ca3c6) SHA1(81c3e98cbd81a39e04b5e7fb3683aba50545f774) )
+	ROM_LOAD16_BYTE( "rkb22obj.bin", 0x40001, 0x20000, CRC(82ee78a0) SHA1(4af0593f9c7d8db59f17d75d6f9020ecd4bdcb98) )
+
+	ROM_REGION( 0x40000, "oki", 0 )  /* ADPCM samples */
+	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+ROM_END
+
 ROM_START( raidenb )/* Different hardware, Main & Sub CPU code not encrypted. */
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.u0253", 0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
@@ -701,6 +744,9 @@ GAME( 1990, raident,  raiden, raidene, raiden, raiden_state,  raiden,  ROT270, "
 
 /* Same as above, but the sound CPU code is not encrypted */
 GAME( 1990, raidenk,  raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", MACHINE_SUPPORTS_SAVE )
+
+/* Bootleg of the Korean release */
+GAME( 1990, raidenkb, raiden, raiden,  raiden, raiden_state,  raiden,  ROT270, "bootleg", "Raiden (Korea, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* Alternate hardware; SEI8904 + SEI9008 PCBs. Main & Sub CPU code not encrypted */
 GAME( 1990, raidenua, raiden, raidenu, raiden, driver_device, 0,       ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US set 2)", MACHINE_SUPPORTS_SAVE )

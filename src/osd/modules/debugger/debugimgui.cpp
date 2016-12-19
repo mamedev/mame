@@ -1000,6 +1000,7 @@ void debug_imgui::refresh_filelist()
 	util::zippath_directory* dir = nullptr;
 	const char *volume_name;
 	const osd::directory::entry *dirent;
+	uint8_t first = 0;
 
 	// todo
 	m_filelist.clear();
@@ -1019,6 +1020,7 @@ void debug_imgui::refresh_filelist()
 			m_filelist.emplace_back(std::move(temp));
 			x++;
 		}
+		first = m_filelist.size();
 		while((dirent = util::zippath_readdir(dir)) != nullptr)
 		{
 			file_entry temp;
@@ -1040,6 +1042,9 @@ void debug_imgui::refresh_filelist()
 	}
 	if (dir != nullptr)
 		util::zippath_closedir(dir);
+
+	// sort file list, as it is not guaranteed to be in any particular order
+	std::sort(m_filelist.begin()+first,m_filelist.end(),[](file_entry x, file_entry y) { return x.basename < y.basename; } );
 }
 
 void debug_imgui::refresh_typelist()

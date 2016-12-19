@@ -30,7 +30,7 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MCFG_74LS157_OUT_CB(_devcb) \
+#define MCFG_74157_OUT_CB(_devcb) \
 	devcb = &ls157_device::set_out_callback(*device, DEVCB_##_devcb);
 
 
@@ -44,7 +44,8 @@ class ls157_device : public device_t
 {
 public:
 	// construction/destruction
-	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ls157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	ls157_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source);
 
 	// static configuration
 	template<class _Object> static devcb_base &set_out_callback(device_t &device, _Object object) { return downcast<ls157_device &>(device).m_out_cb.set_callback(object); }
@@ -83,6 +84,13 @@ private:
 	bool            m_strobe;
 };
 
+class hct157_device : public ls157_device
+{
+public:
+	// construction/destruction
+	hct157_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+};
+
 
 //**************************************************************************
 //  GLOBAL VARIABLES
@@ -90,6 +98,7 @@ private:
 
 // device type definition
 extern const device_type LS157;
+extern const device_type HCT157;
 
 
 #endif
