@@ -833,9 +833,24 @@ function toolchain(_buildDir, _subDir)
 
 	configuration { "android-*" }
 		objdir (_buildDir .. "android/obj/" .. _OPTIONS["PLATFORM"])
+-- LIBRETRO HACK BEGIN support ndk-r13b structure
+--		includedirs {
+--			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
+--			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+--			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
+--			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
+--		}
+		if (os.isfile("$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include/list")) then
+			includedirs {
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
+			}
+		else
+			includedirs {
+				"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/include",
+			}
+		end
 		includedirs {
 			MAME_DIR .. "3rdparty/bgfx/3rdparty/khronos",
-			"$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/support/include",
 			"$(ANDROID_NDK_ROOT)/sources/android/native_app_glue",
 		}
@@ -845,15 +860,38 @@ function toolchain(_buildDir, _subDir)
 		flags {
 			"NoImportLib",
 		}
+--		links {
+--			"c",
+--			"dl",
+--			"m",
+--			"android",
+--			"log",
+--			"c++_static",
+--			"gcc",
+--		}
 		links {
 			"c",
 			"dl",
 			"m",
 			"android",
 			"log",
-			"c++_static",
+		}
+		if (os.isfile("$(ANDROID_NDK_ROOT)/sources/cxx-stl/llvm-libc++/libcxx/include/list")) then
+			links {
+				"c++_static",
+			}
+		else
+			links {
+				"c++_static",
+				"c++abi",
+				"unwind",
+				"android_support",
+			}
+		end
+		links {
 			"gcc",
 		}
+-- LIBRETRO HACK END support ndk-r13b structure
 		buildoptions {
 			"-fpic",
 			"-ffunction-sections",
