@@ -3860,7 +3860,7 @@ ROM_START( vs299 )  /* Step 2.0 */
 	ROM_PARAMETER( ":315_5881:key", "29222ac8" )
 ROM_END
 
-ROM_START( vs29915 )  /* Step 1.5 */
+ROM_START( vs29915 )  /* Step 1.5, Sega game ID# is 833-13686-01 VS2 VER98 STEP 1.5 JPN */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-21531.17",  0x600006, 0x080000, CRC(ec45015c) SHA1(b3496da10111dfa505686c0bc8f0a30042d8a8e3) )
