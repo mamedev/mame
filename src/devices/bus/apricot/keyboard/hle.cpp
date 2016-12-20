@@ -4,6 +4,11 @@
 
     ACT Apricot Keyboard (HLE)
 
+    TODO:
+	- MicroScreen emulation
+	- Mouse emulation
+	- LEDs
+
     Keyboard to System:
     - 01-60: Key make codes
     - 70-7f: Mouse codes
@@ -306,6 +311,11 @@ void apricot_keyboard_hle_device::received_byte(uint8_t byte)
 			// make rtc chip ready
 			m_rtc->cs_w(1);
 
+			break;
+
+		case CMD_KEYBOARD_RESET:
+			logerror("System requests keyboard reset\n");
+			transmit_byte(ACK_DIAGNOSTICS);
 			break;
 
 		default:

@@ -4,7 +4,8 @@
 
     ACT Apricot PC/Xi
 
-    - Error 31 (diagnostic keyboard failure)
+    TODO:
+    - ASYNC (the terminal program) hangs after loading
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
