@@ -2,6 +2,7 @@
 // copyright-holders:Nicola Salmoria, Phil Stroffolino, Mirko Buffoni
 
 #include "video/sega16sp.h"
+#include "machine/74157.h"
 #include "machine/gen_latch.h"
 #include "machine/segaic16.h"
 #include "sound/msm5205.h"
@@ -18,6 +19,7 @@ public:
 		m_tileram(*this, "tileram"),
 		m_goldnaxeb2_bgpage(*this, "gab2_bgpage"),
 		m_goldnaxeb2_fgpage(*this, "gab2_fgpage"),
+		m_soundbank(*this, "soundbank"),
 		m_sprites(*this, "sprites"),
 		m_maincpu(*this, "maincpu"),
 		m_soundcpu(*this, "soundcpu"),
@@ -25,6 +27,7 @@ public:
 		m_upd7759(*this, "7759"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_soundlatch(*this, "soundlatch"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_decrypted_opcodes(*this, "decrypted_opcodes") { }
 
 	required_shared_ptr<uint16_t> m_textram;
@@ -33,6 +36,8 @@ public:
 	optional_shared_ptr<uint16_t> m_tileram;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_bgpage;
 	optional_shared_ptr<uint16_t> m_goldnaxeb2_fgpage;
+
+	optional_memory_bank m_soundbank;
 
 	required_device<sega_16bit_sprite_device> m_sprites;
 
@@ -123,10 +128,13 @@ public:
 	optional_device<upd7759_device> m_upd7759;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<ls157_device> m_adpcm_select;
 	optional_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE16_MEMBER(sound_command_nmi_w);
 	DECLARE_WRITE16_MEMBER(sound_command_irq_w);
+	DECLARE_READ8_MEMBER(sound_command_irq_r);
+	DECLARE_WRITE8_MEMBER(soundbank_msm_w);
 	DECLARE_WRITE16_MEMBER(sys16_coinctrl_w);
 	DECLARE_READ16_MEMBER(passht4b_service_r);
 	DECLARE_READ16_MEMBER(passht4b_io1_r);
@@ -218,6 +226,7 @@ public:
 	void set_bg_page( int data );
 	void datsu_set_pages(  );
 	DECLARE_WRITE_LINE_MEMBER(tturfbl_msm5205_callback);
+	DECLARE_WRITE_LINE_MEMBER(datsu_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(shdancbl_msm5205_callback);
 	DECLARE_WRITE_LINE_MEMBER(sound_cause_nmi);
 };
