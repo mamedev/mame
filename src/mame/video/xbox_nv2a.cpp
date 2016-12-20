@@ -5,8 +5,10 @@
 #include "bitmap.h"
 #include "machine/pic8259.h"
 #include "includes/xbox_nv2a.h"
+#include <bitset>
 
 //#define LOG_NV2A
+#define DEBUG_CHECKS // enable for debugging
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -1267,6 +1269,13 @@ inline uint8_t *nv2a_renderer::read_pixel(int x, int y, int32_t c[4])
 		offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
 	else // type_rendertarget == LINEAR
 		offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
+#ifdef DEBUG_CHECKS
+	if (offset >= size_rendertarget)
+	{
+		machine().logerror("Bad offset computed in read_pixel !\n");
+		offset = 0;
+	}
+#endif
 	switch (colorformat_rendertarget) {
 	case NV2A_COLOR_FORMAT::R5G6B5:
 		addr16 = (uint16_t *)((uint8_t *)rendertarget + offset);
@@ -1324,6 +1333,13 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 	if (color_mask != 0)
 		addr = read_pixel(x, y, fb);
 	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
+#ifdef DEBUG_CHECKS
+		if (((pitch_depthbuffer / 4) * y + x) >= size_depthbuffer)
+		{
+			machine().logerror("Bad depthbuffer offset computed in write_pixel !\n");
+			return;
+		}
+#endif
 		daddr32 = depthbuffer + (pitch_depthbuffer / 4) * y + x;
 		deptsten = *daddr32;
 		dep = deptsten >> 8;
@@ -1331,6 +1347,13 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 		daddr16 = nullptr;
 	}
 	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
+#ifdef DEBUG_CHECKS
+		if (((pitch_depthbuffer / 2) * y + x) >= size_depthbuffer)
+		{
+			machine().logerror("Bad depthbuffer offset computed in write_pixel !\n");
+			return;
+		}
+#endif
 		daddr16 = (uint16_t *)depthbuffer + (pitch_depthbuffer / 2) * y + x;
 		deptsten = *daddr16;
 		dep = (deptsten << 8) | 0xff;
@@ -2900,6 +2923,12 @@ void nv2a_renderer::compute_limits_rendertarget(uint32_t chanel, uint32_t subcha
 	limits_rendertarget.sety(y, y + h - 1);
 }
 
+void nv2a_renderer::compute_size_rendertarget(uint32_t chanel, uint32_t subchannel)
+{
+	size_rendertarget = pitch_rendertarget*(limits_rendertarget.bottom() + 1);
+	size_depthbuffer = pitch_depthbuffer*(limits_rendertarget.bottom() + 1);
+}
+
 int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, int &countlen)
 {
 	uint32_t maddress;
@@ -3068,7 +3097,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	}
 	if ((maddress >= 0x1980) && (maddress < 0x1a00))
 	{
-		int v = maddress - 0x1980; // 16 couples,4 values per couple
+		int v = maddress - 0x1980; // 16 couples,4 values per couple,16*2*4=128
 		int attr = v >> 3;
 		int comp = (v >> 1) & 2;
 		uint16_t d1 = data & 0xffff;
@@ -3223,9 +3252,11 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	}
 	if (maddress == 0x0200) {
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 	}
 	if (maddress == 0x0204) {
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 	}
 	if (maddress == 0x0208) {
 		log2height_rendertarget = (data >> 24) & 255;
@@ -3236,6 +3267,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		colorformat_rendertarget = (NV2A_COLOR_FORMAT)((data >> 0) & 15);
 		compute_supersample_factors(supersample_factor_x, supersample_factor_y);
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 		switch (colorformat_rendertarget) {
 		case NV2A_COLOR_FORMAT::R5G6B5:
 			bytespixel_rendertarget = 2;
@@ -3258,6 +3290,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	if (maddress == 0x020c) {
 		pitch_rendertarget=data & 0xffff;
 		pitch_depthbuffer=(data >> 16) & 0xffff;
+		compute_size_rendertarget(chanel, subchannel);
 #ifdef LOG_NV2A
 		printf("Pitch color %04X zbuffer %04X\n\r", pitch_rendertarget, pitch_depthbuffer);
 #endif

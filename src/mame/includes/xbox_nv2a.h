@@ -407,6 +407,8 @@ public:
 		limits_rendertarget.set(0, 0, 640, 480);
 		pitch_rendertarget = 0;
 		pitch_depthbuffer = 0;
+		size_rendertarget = 0;
+		size_depthbuffer = 0;
 		log2height_rendertarget = 0;
 		log2width_rendertarget = 0;
 		dilate_rendertarget = 0;
@@ -485,6 +487,7 @@ public:
 	void savestate_items();
 	void compute_supersample_factors(float &horizontal, float &vertical);
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
+	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
 	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
@@ -523,6 +526,8 @@ public:
 	rectangle limits_rendertarget;
 	uint32_t pitch_rendertarget;
 	uint32_t pitch_depthbuffer;
+	uint32_t size_rendertarget;
+	uint32_t size_depthbuffer;
 	int log2height_rendertarget;
 	int log2width_rendertarget;
 	int dilate_rendertarget;
