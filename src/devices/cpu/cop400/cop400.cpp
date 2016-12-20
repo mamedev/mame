@@ -150,7 +150,10 @@ static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, cop400_cpu_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_32b, AS_DATA, 8, cop400_cpu_device )
-	AM_RANGE(0x00, 0x1f) AM_RAM
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x10, 0x17) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x30, 0x37) AM_MIRROR(0x08) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_64b, AS_DATA, 8, cop400_cpu_device )
@@ -231,17 +234,17 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 }
 
 cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
 {
 }
 
 cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 
 cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 5, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 6, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 

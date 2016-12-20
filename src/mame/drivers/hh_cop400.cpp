@@ -612,7 +612,7 @@ WRITE8_MEMBER(funjacks_state::write_d)
 {
 	// D: led grid + input mux
 	m_inp_mux = data;
-	m_d = data ^ 0xf;
+	m_d = ~data & 0xf;
 	display_matrix(2, 4, m_l, m_d);
 }
 
@@ -671,8 +671,8 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=47K, C=56pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funjacks_state, write_g))
@@ -727,7 +727,7 @@ public:
 WRITE8_MEMBER(funrlgl_state::write_d)
 {
 	// D: led grid
-	m_d = data ^ 0xf;
+	m_d = ~data & 0xf;
 	display_matrix(4, 4, m_l, m_d);
 }
 
@@ -771,8 +771,8 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=51K, C=91pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
