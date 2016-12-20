@@ -321,7 +321,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 #ifdef      ASSUME_MODEL_A_HARDWARE
 	#define RTC_BASE 0xED000   
 
-// Define standard and maximum RAM sizes (A model):
+	// Define standard and maximum RAM sizes (A model):
 	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
 	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
 
@@ -331,7 +331,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 	#define RTC_BASE 0xFC000 // (default configuration, also covers FE000+)
 //	#define RTC_BASE 0xF4000 // (alternate configuration) - ClikClok V1.0 / CLIKF4.COM  
 
-// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
+	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
 	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
 	#define MOTHERBOARD_RAM 0x1ffff  // 128 K base RAM (100-B)
 	#define END_OF_RAM 0xdffff // very last byte (100-B theoretical max.) DO NOT CHANGE.
