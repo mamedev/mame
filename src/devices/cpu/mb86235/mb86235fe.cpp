@@ -646,12 +646,61 @@ void mb86235_frontend::describe_ea(opcode_desc &desc, int md, int arx, int ary, 
 void mb86235_frontend::describe_xfer1(opcode_desc &desc)
 {
 	uint64_t opcode = desc.opptr.q[0];
-	fatalerror("mb86235_frontend: describe_xfer1 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
+
+	int dr = (opcode >> 12) & 0x7f;
+	int sr = (opcode >> 19) & 0x7f;
+	int md = opcode & 0xf;
+	int ary = (opcode >> 4) & 7;
+	int disp5 = (opcode >> 7) & 0x1f;
+	int trm = (opcode >> 26) & 1;
+	int dir = (opcode >> 25) & 1;
+
+	if (trm == 0)
+	{
+		if ((sr & 0x40) == 0)
+		{
+			describe_reg_read(desc, sr & 0x3f);
+		}
+		else if (sr == 0x58)
+		{
+			// MOV1 #imm12, DR
+		}
+		else
+		{
+			describe_ea(desc, md, sr & 7, ary, disp5);
+			desc.flags |= OPFLAG_READS_MEMORY;
+		}
+
+		if ((dr & 0x40) == 0)
+		{
+			describe_reg_write(desc, dr & 0x3f);
+		}
+		else
+		{
+			describe_ea(desc, md, dr & 7, ary, disp5);
+			desc.flags |= OPFLAG_WRITES_MEMORY;
+		}
+	}
+	else
+	{
+		// external transfer
+		if (dir == 0)
+		{
+			describe_reg_read(desc, dr & 0x3f);
+			desc.flags |= OPFLAG_WRITES_MEMORY;
+		}
+		else
+		{
+			describe_reg_write(desc, dr & 0x3f);
+			desc.flags |= OPFLAG_READS_MEMORY;
+		}
+	}
 }
 
 void mb86235_frontend::describe_double_xfer1(opcode_desc &desc)
 {
 	uint64_t opcode = desc.opptr.q[0];
+
 	fatalerror("mb86235_frontend: describe_double_xfer1 at %08X (%08X%08X)", desc.pc, (uint32_t)(opcode >> 32), (uint32_t)(opcode));
 }
 
@@ -733,7 +782,7 @@ void mb86235_frontend::describe_xfer3(opcode_desc &desc)
 	int ary = (opcode >> 4) & 7;
 	int md = opcode & 0xf;
 
-	switch (dr >> 4)
+	switch (dr >> 5)
 	{
 		case 0:
 		case 1:		// reg

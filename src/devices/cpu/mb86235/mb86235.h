@@ -45,7 +45,6 @@ public:
 	void unimplemented_op();
 	void unimplemented_alu();
 	void unimplemented_control();
-	void unimplemented_xfer1();
 	void unimplemented_double_xfer1();
 	void unimplemented_double_xfer2();
 	void pcs_overflow();

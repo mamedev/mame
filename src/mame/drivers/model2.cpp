@@ -831,10 +831,18 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 		else if (m_dsp_type == DSP_TYPE_TGPX4)
 		{
 			if (m_tgpx4->is_fifoin_full())
-				printf("trying to push to full fifo!\n");
-
-//			printf("push %08X at %08X\n", data, space.device().safe_pc());
-			m_tgpx4->fifoin_w(data);
+			{
+				/* Writing to full FIFO causes the i960 to enter wait state */
+				downcast<i960_cpu_device &>(space.device()).i960_stall();
+				/* spin the main cpu and let the TGP catch up */
+				space.device().execute().spin_until_time(attotime::from_usec(100));
+				printf("write stalled\n");
+			}
+			else
+			{
+//				printf("push %08X at %08X\n", data, space.device().safe_pc());
+				m_tgpx4->fifoin_w(data);
+			}
 		}
 	}
 }
