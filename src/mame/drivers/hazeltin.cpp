@@ -7,8 +7,16 @@
 
     perliminary driver by Ryan Holtz
 
-TODO:
-    - pretty much everything
+TODO (roughly in order of importance):
+    - Figure out the correct keyboard decoding.
+    - Proper RS232 hookup.
+    - Iron out proper horizontal and vertical start/end values.
+    - Hook up /FGBIT, REV FLD FRAME, and REV VIDEO SELECT lines on video
+      board.
+    - Reimplement logic probe (since removed) as a netlist device so other
+      devs can use it.
+    - Implement /BRESET line in netlist to possibly smooth out some sync
+      issues.
 
 References:
     [1]: Hazeltine_1500_Series_Maintenance_Manual_Dec77.pdf, on Bitsavers
@@ -17,64 +25,35 @@ References:
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
-#include "machine/7400.h"
-#include "machine/7404.h"
-#include "machine/7474.h"
-#include "machine/74161.h"
-#include "machine/74175.h"
-#include "machine/82s129.h"
-#include "machine/am2847.h"
 #include "machine/ay31015.h"
 #include "machine/clock.h"
 #include "machine/com8116.h"
-#include "machine/dm9334.h"
 #include "machine/kb3600.h"
+#include "machine/netlist.h"
+#include "machine/nl_hazelvid.h"
+#include "netlist/devices/net_lib.h"
 
 #define CPU_TAG         "maincpu"
+#define NETLIST_TAG		"videobrd"
 #define UART_TAG        "uart"
 #define BAUDGEN_TAG     "baudgen"
 #define KBDC_TAG        "ay53600"
-#define CHARRAM_TAG     "chrram"
 #define CHARROM_TAG     "chargen"
 #define BAUDPORT_TAG    "baud"
 #define MISCPORT_TAG    "misc"
 #define MISCKEYS_TAG    "misc_keys"
 #define SCREEN_TAG      "screen"
-#define TMS3409A_TAG    "u67"
-#define TMS3409B_TAG    "u57"
-#define DOTCLK_TAG      "dotclk"
-#define DOTCLK_DISP_TAG "dotclk_dispatch"
-#define CHAR_CTR_CLK_TAG "ch_bucket_ctr_clk"
-#define U58_TAG         "u58"
-#define U59_TAG         "u59"
-#define VID_PROM_ADDR_RESET_TAG "u59_y5"
-#define U61_TAG         "u61"
-#define U68_TAG         "u68"
-#define U69_PROMMSB_TAG "u69"
-#define U70_PROMLSB_TAG "u70"
-#define U70_TC_LINE_TAG "u70_tc"
-#define U71_PROM_TAG    "u71"
-#define U72_PROMDEC_TAG "u72"
-#define U81_TAG         "u81"
-#define U83_TAG         "u83"
-#define U84_DIV11_TAG   "u84"
-#define U85_VERT_DR_UB_TAG "u85"
-#define U87_TAG         "u87"
-#define U88_DIV9_TAG    "u88"
-#define U90_DIV14_TAG   "u90"
 #define BAUD_PROM_TAG   "u39"
+#define NL_PROM_TAG		"videobrd:u71"
+#define NL_EPROM_TAG	"videobrd:u78"
+#define VIDEO_PROM_TAG	"u71"
+#define CHAR_EPROM_TAG	"u78"
+#define VIDEO_OUT_TAG	"videobrd:video_out"
+#define VBLANK_OUT_TAG	"videobrd:vblank"
+#define TVINTERQ_OUT_TAG "videobrd:tvinterq"
 
-// Number of cycles to burn when fetching the next row of characters into the line buffer:
-// CPU clock is 18MHz / 9
-// Dot clock is 33.264MHz / 2
-// 9 dots per character
-// 80 visible characters per line
-// Total duration of fetch: 1440 33.264MHz clock cycles
-//
-//     2*9*80                    1         1440 * XTAL_2MHz
-// -------------- divided by ---------  =  ----------------  =  86.5 main CPU cycles per line fetch
-// XTAL_33_264MHz            XTAL_2MHz      XTAL_33_264MHz
-#define LINE_FETCH_CYCLES   (87)
+#define VIDEO_CLOCK		(XTAL_33_264MHz/2)
+#define VIDEOBRD_CLOCK	(XTAL_33_264MHz*30)
 
 #define SR2_FULL_DUPLEX (0x01)
 #define SR2_UPPER_ONLY  (0x08)
@@ -91,9 +70,7 @@ References:
 
 #define SCREEN_VTOTAL   (28*11)
 #define SCREEN_VDISP    (24*11)
-#define SCREEN_VSTART   (0)
-
-#define VERT_UB_LINE    (24*11+8)
+#define SCREEN_VSTART   (3*11)
 
 class hazl1500_state : public driver_device
 {
@@ -101,52 +78,69 @@ public:
 	hazl1500_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, CPU_TAG)
-		, m_uart(*this, UART_TAG)
+		, m_video_board(*this, NETLIST_TAG)
+		, m_u71(*this, NL_PROM_TAG)
+		, m_u78(*this, NL_EPROM_TAG)
+		, m_u9(*this, "videobrd:u9")
+		, m_u10(*this, "videobrd:u10")
+		, m_u11(*this, "videobrd:u11")
+		, m_u12(*this, "videobrd:u12")
+		, m_u13(*this, "videobrd:u13")
+		, m_u14(*this, "videobrd:u14")
+		, m_u15(*this, "videobrd:u15")
+		, m_u16(*this, "videobrd:u16")
+		, m_u22(*this, "videobrd:u22")
+		, m_u23(*this, "videobrd:u23")
+		, m_u24(*this, "videobrd:u24")
+		, m_u25(*this, "videobrd:u25")
+		, m_u26(*this, "videobrd:u26")
+		, m_u27(*this, "videobrd:u27")
+		, m_u28(*this, "videobrd:u28")
+		, m_u29(*this, "videobrd:u29")
+        , m_cpu_db0(*this, "videobrd:cpu_db0")
+        , m_cpu_db1(*this, "videobrd:cpu_db1")
+        , m_cpu_db2(*this, "videobrd:cpu_db2")
+        , m_cpu_db3(*this, "videobrd:cpu_db3")
+        , m_cpu_db4(*this, "videobrd:cpu_db4")
+        , m_cpu_db5(*this, "videobrd:cpu_db5")
+        , m_cpu_db6(*this, "videobrd:cpu_db6")
+        , m_cpu_db7(*this, "videobrd:cpu_db7")
+        , m_cpu_ba4(*this, "videobrd:cpu_ba4")
+        , m_cpu_iowq(*this, "videobrd:cpu_iowq")
+        , m_video_out(*this, VIDEO_OUT_TAG)
+        , m_vblank_out(*this, VBLANK_OUT_TAG)
+        , m_tvinterq_out(*this, TVINTERQ_OUT_TAG)
+        , m_uart(*this, UART_TAG)
 		, m_kbdc(*this, KBDC_TAG)
 		, m_baud_dips(*this, BAUDPORT_TAG)
 		, m_baud_prom(*this, BAUD_PROM_TAG)
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
-		, m_char_ram(*this, CHARRAM_TAG)
-		, m_char_rom(*this, CHARROM_TAG)
-		, m_line_buffer_lsb(*this, TMS3409A_TAG)
-		, m_line_buffer_msb(*this, TMS3409B_TAG)
-		, m_dotclk(*this, DOTCLK_TAG)
-		, m_vid_prom_msb(*this, U69_PROMMSB_TAG)
-		, m_vid_prom_lsb(*this, U70_PROMLSB_TAG)
-		, m_vid_prom(*this, U71_PROM_TAG)
-		, m_u59(*this, U59_TAG)
-		, m_u83(*this, U83_TAG)
-		, m_char_y(*this, U84_DIV11_TAG)
-		, m_char_x(*this, U88_DIV9_TAG)
-		, m_vid_div14(*this, U90_DIV14_TAG)
-		, m_vid_decode(*this, U72_PROMDEC_TAG)
-		, m_u58(*this, U58_TAG)
-		, m_u68(*this, U68_TAG)
-		, m_u81(*this, U81_TAG)
-		, m_u87(*this, U87_TAG)
-		, m_u61(*this, U61_TAG)
 		, m_screen(*this, SCREEN_TAG)
-		, m_hblank_timer(nullptr)
-		, m_scanline_timer(nullptr)
-		, m_status_reg_3(0)
+        , m_iowq_timer(nullptr)
+        , m_status_reg_3(0)
 		, m_kbd_status_latch(0)
 		, m_refresh_address(0)
-		, m_vpos(0)
-		, m_hblank(false)
-		, m_vblank(false)
-		, m_delayed_vblank(false)
-	{
+		, m_screen_buf(nullptr)
+		, m_last_beam(0.0)
+		, m_last_hpos(0)
+		, m_last_vpos(0)
+		, m_last_fraction(0.0)
+    {
 	}
-
-	//m_maincpu->adjust_icount(-14);
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
+    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+    static const device_timer_id TIMER_IOWQ = 0;
+
+    uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
+
+	DECLARE_READ8_MEMBER(ram_r);
+	DECLARE_WRITE8_MEMBER(ram_w);
 
 	DECLARE_READ8_MEMBER(system_test_r); // noted as "for use with auto test equip" in flowchart on pg. 30, ref[1], jumps to 0x8000 if bit 0 is unset
 	DECLARE_READ8_MEMBER(status_reg_2_r);
@@ -162,101 +156,96 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ay3600_data_ready_w);
 
 	DECLARE_WRITE8_MEMBER(refresh_address_w);
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-	static const device_timer_id TIMER_HBLANK = 0;
-	static const device_timer_id TIMER_SCANLINE = 1;
+    NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
+    NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
+    NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
 private:
-	void check_tv_interrupt();
-	void update_tv_unblank();
-	void scanline_tick();
-	void draw_scanline(uint32_t *pix);
-
 	required_device<cpu_device> m_maincpu;
-	required_device<ay31015_device> m_uart;
+	required_device<netlist_mame_device_t> m_video_board;
+	required_device<netlist_mame_rom_t> m_u71;
+	required_device<netlist_mame_rom_t> m_u78;
+	required_device<netlist_ram_pointer_t> m_u9;
+	required_device<netlist_ram_pointer_t> m_u10;
+	required_device<netlist_ram_pointer_t> m_u11;
+	required_device<netlist_ram_pointer_t> m_u12;
+	required_device<netlist_ram_pointer_t> m_u13;
+	required_device<netlist_ram_pointer_t> m_u14;
+	required_device<netlist_ram_pointer_t> m_u15;
+	required_device<netlist_ram_pointer_t> m_u16;
+	required_device<netlist_ram_pointer_t> m_u22;
+	required_device<netlist_ram_pointer_t> m_u23;
+	required_device<netlist_ram_pointer_t> m_u24;
+	required_device<netlist_ram_pointer_t> m_u25;
+	required_device<netlist_ram_pointer_t> m_u26;
+	required_device<netlist_ram_pointer_t> m_u27;
+	required_device<netlist_ram_pointer_t> m_u28;
+	required_device<netlist_ram_pointer_t> m_u29;
+    required_device<netlist_mame_logic_input_t> m_cpu_db0;
+    required_device<netlist_mame_logic_input_t> m_cpu_db1;
+    required_device<netlist_mame_logic_input_t> m_cpu_db2;
+    required_device<netlist_mame_logic_input_t> m_cpu_db3;
+    required_device<netlist_mame_logic_input_t> m_cpu_db4;
+    required_device<netlist_mame_logic_input_t> m_cpu_db5;
+    required_device<netlist_mame_logic_input_t> m_cpu_db6;
+    required_device<netlist_mame_logic_input_t> m_cpu_db7;
+    required_device<netlist_mame_logic_input_t> m_cpu_ba4;
+    required_device<netlist_mame_logic_input_t> m_cpu_iowq;
+    required_device<netlist_mame_analog_output_t> m_video_out;
+    required_device<netlist_mame_analog_output_t> m_vblank_out;
+    required_device<netlist_mame_analog_output_t> m_tvinterq_out;
+    required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
 	required_ioport m_baud_dips;
 	required_region_ptr<uint8_t> m_baud_prom;
 	required_ioport m_misc_dips;
 	required_ioport m_kbd_misc_keys;
 
-	required_shared_ptr<uint8_t> m_char_ram;
-	required_region_ptr<uint8_t> m_char_rom;
-	required_device<tms3409_device> m_line_buffer_lsb;
-	required_device<tms3409_device> m_line_buffer_msb;
-	required_device<clock_device> m_dotclk;
-	required_device<ttl74161_device> m_vid_prom_msb;
-	required_device<ttl74161_device> m_vid_prom_lsb;
-	required_device<prom82s129_device> m_vid_prom;
-	required_device<ttl7404_device> m_u59;
-	required_device<ttl7400_device> m_u83;
-	required_device<ttl74161_device> m_char_y;
-	required_device<ttl74161_device> m_char_x;
-	required_device<ttl74161_device> m_vid_div14;
-	required_device<dm9334_device> m_vid_decode;
-	required_device<ttl74175_device> m_u58;
-	required_device<ttl74175_device> m_u68;
-	required_device<ttl74175_device> m_u81;
-	required_device<ttl7404_device> m_u87;
-	required_device<ttl7404_device> m_u61;
-
 	required_device<screen_device> m_screen;
 
-	std::unique_ptr<uint32_t[]> m_screen_pixbuf;
+    emu_timer* m_iowq_timer;
 
-	emu_timer *m_hblank_timer;
-	emu_timer *m_scanline_timer;
-
-	uint8_t m_status_reg_3;
+    uint8_t m_status_reg_3;
 	uint8_t m_kbd_status_latch;
 
 	uint8_t m_refresh_address;
-	uint16_t m_vpos;
-	bool m_hblank;
-	bool m_vblank;
-	bool m_delayed_vblank;
+
+	std::unique_ptr<float[]> m_screen_buf;
+
+    double m_last_beam;
+	int m_last_hpos;
+	int m_last_vpos;
+	double m_last_fraction;
 };
 
 void hazl1500_state::machine_start()
 {
-	m_hblank_timer = timer_alloc(TIMER_HBLANK);
-	m_hblank_timer->adjust(attotime::never);
+	m_screen_buf = std::make_unique<float[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
 
-	m_scanline_timer = timer_alloc(TIMER_SCANLINE);
-	m_scanline_timer->adjust(attotime::never);
+    m_iowq_timer = timer_alloc(TIMER_IOWQ);
+    m_iowq_timer->adjust(attotime::never);
 
-	m_screen_pixbuf = std::make_unique<uint32_t[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
-
-	save_item(NAME(m_status_reg_3));
+    save_item(NAME(m_status_reg_3));
 	save_item(NAME(m_kbd_status_latch));
 	save_item(NAME(m_refresh_address));
-	save_item(NAME(m_vpos));
-	save_item(NAME(m_hblank));
-	save_item(NAME(m_vblank));
-	save_item(NAME(m_delayed_vblank));
+	save_item(NAME(m_last_beam));
+	save_item(NAME(m_last_hpos));
+	save_item(NAME(m_last_vpos));
+	save_item(NAME(m_last_fraction));
 }
 
 void hazl1500_state::machine_reset()
 {
 	m_status_reg_3 = 0;
 	m_kbd_status_latch = 0;
-
-	m_refresh_address = 0;
-	m_screen->reset_origin(0, 0);
-	m_vpos = m_screen->vpos();
-	m_vblank = (m_vpos >= SCREEN_VDISP);
-	m_delayed_vblank = m_vpos < VERT_UB_LINE;
-	if (!m_vblank)
-		m_kbd_status_latch |= KBD_STATUS_TV_UB;
-	m_hblank = true;
-	m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, SCREEN_HSTART));
-	m_scanline_timer->adjust(m_screen->time_until_pos(m_vpos + 1, 0));
-
-	m_vid_prom_lsb->p_w(generic_space(), 0, 0);
-	m_vid_prom_msb->p_w(generic_space(), 0, 0);
 }
 
+void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+    m_cpu_iowq->write(1);
+    m_cpu_ba4->write(1);
+}
 
 WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
 {
@@ -266,8 +255,63 @@ WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
 
 uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	memcpy(&bitmap.pix32(0), &m_screen_pixbuf[0], sizeof(uint32_t) * SCREEN_HTOTAL * SCREEN_VTOTAL);
+	int last_index = m_last_vpos * SCREEN_HTOTAL + m_last_hpos;
+	while (last_index < SCREEN_HTOTAL * SCREEN_VTOTAL)
+	{
+		m_screen_buf[last_index++] = m_last_beam;
+	}
+	m_last_hpos = 0;
+	m_last_vpos = 0;
+
+	uint32_t pixindex = 0;
+	for (int y = 0; y < SCREEN_VTOTAL; y++)
+	{
+		uint32_t *scanline = &bitmap.pix32(y);
+		pixindex = y * SCREEN_HTOTAL;
+		for (int x = 0; x < SCREEN_HTOTAL; x++)
+            //*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 0.5) * 0x010101);
+            *scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);
+    }
+
 	return 0;
+}
+
+READ8_MEMBER( hazl1500_state::ram_r )
+{
+	const uint8_t* chips[2][8] =
+	{
+		{ m_u29->ptr(), m_u28->ptr(), m_u27->ptr(), m_u26->ptr(), m_u25->ptr(), m_u24->ptr(), m_u23->ptr(), m_u22->ptr() },
+		{ m_u16->ptr(), m_u15->ptr(), m_u14->ptr(), m_u13->ptr(), m_u12->ptr(), m_u11->ptr(), m_u10->ptr(), m_u9->ptr() }
+	};
+
+	int bank = ((offset & 0x400) != 0 ? 1 : 0);
+	const int byte_pos = (offset >> 3) & 0x7f;
+	const int bit_pos = offset & 7;
+
+	uint8_t ret = 0;
+	for (std::size_t bit = 0; bit < 8; bit++)
+		ret |= ((chips[bank][bit][byte_pos] >> bit_pos) & 1) << bit;
+
+	return ret;
+}
+
+WRITE8_MEMBER( hazl1500_state::ram_w )
+{
+    uint8_t* chips[2][8] =
+    {
+        { m_u29->ptr(), m_u28->ptr(), m_u27->ptr(), m_u26->ptr(), m_u25->ptr(), m_u24->ptr(), m_u23->ptr(), m_u22->ptr() },
+        { m_u16->ptr(), m_u15->ptr(), m_u14->ptr(), m_u13->ptr(), m_u12->ptr(), m_u11->ptr(), m_u10->ptr(), m_u9->ptr() }
+    };
+
+	int bank = ((offset & 0x400) != 0 ? 1 : 0);
+	const int byte_pos = (offset >> 3) & 0x7f;
+	const int bit_pos = offset & 7;
+
+	for (std::size_t bit = 0; bit < 8; bit++)
+	{
+		chips[bank][bit][byte_pos] &= ~(1 << bit_pos);
+		chips[bank][bit][byte_pos] |= ((data >> bit) & 1) << bit_pos;
+	}
 }
 
 READ8_MEMBER( hazl1500_state::system_test_r )
@@ -305,7 +349,6 @@ WRITE8_MEMBER( hazl1500_state::uart_w )
 
 READ8_MEMBER( hazl1500_state::kbd_status_latch_r )
 {
-	//printf("m_kbd_status_latch r: %02x\n", m_kbd_status_latch);
 	return m_kbd_status_latch;
 }
 
@@ -343,124 +386,94 @@ WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
 		m_kbd_status_latch &= ~KBD_STATUS_KBDR;
 }
 
-void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 {
-	switch(id)
-	{
-		case TIMER_HBLANK:
-			if (m_hblank)
-			{
-				m_hblank_timer->adjust(m_screen->time_until_pos(m_vpos, SCREEN_HSTART + SCREEN_HDISP));
-			}
-			else
-			{
-				m_hblank_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % SCREEN_VTOTAL, SCREEN_HSTART));
-			}
-			m_hblank ^= 1;
-			break;
+    synchronize();
+    if (int(data) > 1)
+    {
+        m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
+    }
+    else
+    {
+        m_kbd_status_latch |= KBD_STATUS_TV_UB;
+    }
+}
 
-		case TIMER_SCANLINE:
-		{
-			scanline_tick();
-			break;
-		}
+NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
+{
+    synchronize();
+    if (int(data) > 1)
+    {
+        m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
+        m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+    }
+    else
+    {
+        m_kbd_status_latch |= KBD_STATUS_TV_INT;
+        m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+    }
+}
+
+NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
+{
+	synchronize();
+	attotime second_fraction(0, time.attoseconds());
+	attotime frame_fraction(0, (second_fraction * 60).attoseconds());
+	attotime pixel_time = frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL);
+	int32_t pixel_index = (frame_fraction * (SCREEN_HTOTAL * SCREEN_VTOTAL)).seconds();
+	double pixel_fraction = ATTOSECONDS_TO_DOUBLE(pixel_time.attoseconds());
+
+	pixel_index -= 16; // take back 16 clock cycles to honor the circuitry god whose ark this is
+	if (pixel_index < 0)
+	{
+        m_last_beam = float(data);
+        m_last_hpos = 0;
+		m_last_vpos = 0;
+		m_last_fraction = 0.0;
+		return;
 	}
+
+	const int hpos = pixel_index % SCREEN_HTOTAL;//m_screen->hpos();
+	const int vpos = pixel_index / SCREEN_HTOTAL;//m_screen->vpos();
+	const int curr_index = vpos * SCREEN_HTOTAL + hpos;
+
+	int last_index = m_last_vpos * SCREEN_HTOTAL + m_last_hpos;
+	if (last_index != curr_index)
+	{
+		m_screen_buf[last_index] *= m_last_fraction;
+		m_screen_buf[last_index] += float(m_last_beam * (1.0 - m_last_fraction));
+		last_index++;
+		while (last_index <= curr_index)
+			m_screen_buf[last_index++] = float(m_last_beam);
+	}
+
+    m_last_beam = float(data);
+    m_last_hpos = hpos;
+	m_last_vpos = vpos;
+	m_last_fraction = pixel_fraction;
 }
 
 WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
-	m_refresh_address = data;
-	//printf("m_refresh_address %x, vpos %d, screen vpos %d\n", m_refresh_address, m_vpos, m_screen->vpos());
-}
-
-void hazl1500_state::check_tv_interrupt()
-{
-	uint8_t char_row = m_vpos % 11;
-	bool bit_match = char_row == 2 || char_row == 3;
-	bool tv_interrupt = bit_match && !m_delayed_vblank;
-	//printf("interrupt for line %d (%d): %s\n", m_vpos, char_row, tv_interrupt ? "yes" : "no");
-
-	m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
-	m_kbd_status_latch |= tv_interrupt ? KBD_STATUS_TV_INT : 0;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, tv_interrupt ? ASSERT_LINE : CLEAR_LINE);
-}
-
-void hazl1500_state::update_tv_unblank()
-{
-	if (!m_vblank)
-	{
-		m_kbd_status_latch |= KBD_STATUS_TV_UB;
-	}
-	else
-	{
-		m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
-	}
-}
-
-void hazl1500_state::scanline_tick()
-{
-	uint16_t old_vpos = m_vpos;
-	m_vpos = (m_vpos + 1) % SCREEN_VTOTAL;
-	m_vblank = (m_vpos >= SCREEN_VDISP);
-	m_delayed_vblank = m_vpos >= VERT_UB_LINE;
-
-	check_tv_interrupt();
-	update_tv_unblank();
-
-	draw_scanline(&m_screen_pixbuf[old_vpos * SCREEN_HTOTAL + SCREEN_HSTART]);
-
-	m_scanline_timer->adjust(m_screen->time_until_pos((m_vpos + 1) % SCREEN_VTOTAL, 0));
-}
-
-void hazl1500_state::draw_scanline(uint32_t *pix)
-{
-	static const uint32_t palette[4] = { 0xff000000, 0xff006000, 0xff000000, 0xff00c000 };
-
-	uint16_t ram_offset = m_refresh_address << 4;
-	uint8_t char_row = m_vpos % 11;
-	uint8_t recycle = (char_row != 10 ? 0xff : 0x00);
-	m_line_buffer_lsb->rc_w(recycle & 0xf);
-	m_line_buffer_msb->rc_w(recycle >> 4);
-
-	if (recycle == 0)
-		m_maincpu->adjust_icount(-LINE_FETCH_CYCLES);
-
-	for (uint16_t x = 0; x < 80; x++)
-	{
-		uint8_t in = 0;
-		if (!m_vblank)
-			in = m_char_ram[ram_offset + x];
-
-		m_line_buffer_lsb->in_w(in & 0xf);
-		m_line_buffer_lsb->cp_w(1);
-		m_line_buffer_lsb->cp_w(0);
-
-		m_line_buffer_msb->in_w(in >> 4);
-		m_line_buffer_msb->cp_w(1);
-		m_line_buffer_msb->cp_w(0);
-
-		const uint8_t chr = (m_line_buffer_msb->out_r() << 4) | m_line_buffer_lsb->out_r();
-		const uint16_t chr_addr = (chr & 0x7f) << 4;
-		const uint8_t gfx = m_char_rom[chr_addr | char_row];
-		const uint8_t bright = (chr & 0x80) >> 6;
-
-		*pix++ = palette[0];
-		*pix++ = palette[BIT(gfx, 6) | bright];
-		*pix++ = palette[BIT(gfx, 5) | bright];
-		*pix++ = palette[BIT(gfx, 4) | bright];
-		*pix++ = palette[BIT(gfx, 3) | bright];
-		*pix++ = palette[BIT(gfx, 2) | bright];
-		*pix++ = palette[BIT(gfx, 1) | bright];
-		*pix++ = palette[BIT(gfx, 0) | bright];
-		*pix++ = palette[0];
-	}
+    synchronize();
+    //printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
+    m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
+    m_cpu_iowq->write(0);
+    m_cpu_ba4->write(0);
+    m_cpu_db0->write((data >> 0) & 1);
+    m_cpu_db1->write((data >> 1) & 1);
+    m_cpu_db2->write((data >> 2) & 1);
+    m_cpu_db3->write((data >> 3) & 1);
+    m_cpu_db4->write((data >> 4) & 1);
+    m_cpu_db5->write((data >> 5) & 1);
+    m_cpu_db6->write((data >> 6) & 1);
+    m_cpu_db7->write((data >> 7) & 1);
 }
 
 static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x3000, 0x377f) AM_RAM AM_SHARE(CHARRAM_TAG)
+	AM_RANGE(0x3000, 0x377f) AM_READWRITE(ram_r, ram_w)
 	AM_RANGE(0x3780, 0x37ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -668,7 +681,7 @@ static const gfx_layout hazl1500_charlayout =
 };
 
 static GFXDECODE_START( hazl1500 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, hazl1500_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( CHAR_EPROM_TAG, 0x0000, hazl1500_charlayout, 0, 1 )
 GFXDECODE_END
 
 static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
@@ -679,11 +692,14 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_QUANTUM_PERFECT_CPU(CPU_TAG)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
+	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz/2,
-		SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
-		SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP);
+    //MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+    //    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
+    //    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
+    MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+        SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
+        SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
@@ -693,74 +709,46 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 
 	MCFG_DEVICE_ADD(UART_TAG, AY51013, 0)
 
-	MCFG_TMS3409_ADD(TMS3409A_TAG)
-	MCFG_TMS3409_ADD(TMS3409B_TAG)
+	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
+	MCFG_NETLIST_SETUP(hazelvid)
 
-	MCFG_CLOCK_ADD(DOTCLK_TAG, XTAL_33_264MHz/2)
-	MCFG_CLOCK_SIGNAL_HANDLER(DEVWRITELINE(DOTCLK_DISP_TAG, devcb_line_dispatch_device<2>, in_w))
+	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG)
+	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG)
 
-	MCFG_LINE_DISPATCH_ADD(DOTCLK_DISP_TAG, 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U81_TAG, ttl74175_device, clock_w))
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U88_DIV9_TAG, ttl74161_device, clock_w))
+	// First 1K
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u22", "u22")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u23", "u23")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u24", "u24")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u25", "u25")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u26", "u26")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u27", "u27")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u28", "u28")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u29", "u29")
 
-	MCFG_74161_ADD(U70_PROMLSB_TAG)
-	MCFG_7416x_QA_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a0_w))
-	MCFG_7416x_QB_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a1_w))
-	MCFG_7416x_QC_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a2_w))
-	MCFG_7416x_QD_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a3_w))
-	MCFG_7416x_TC_CB(DEVWRITELINE(U70_TC_LINE_TAG, devcb_line_dispatch_device<2>, in_w))
+	// Second 1K
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u9",  "u9")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u10", "u10")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u11", "u11")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u12", "u12")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u13", "u13")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u14", "u14")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u15", "u15")
+	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u16", "u16")
 
-	MCFG_LINE_DISPATCH_ADD(U70_TC_LINE_TAG, 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, cet_w))
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, cep_w))
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_iowq", "cpu_iowq.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_ba4", "cpu_ba4.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db0", "cpu_db0.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db1", "cpu_db1.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db2", "cpu_db2.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db3", "cpu_db3.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db4", "cpu_db4.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db5", "cpu_db5.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db6", "cpu_db6.IN", 0)
+    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db7", "cpu_db7.IN", 0)
 
-	MCFG_74161_ADD(U69_PROMMSB_TAG)
-	MCFG_7416x_QA_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a4_w))
-	MCFG_7416x_QB_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a5_w))
-	MCFG_7416x_QC_CB(DEVWRITELINE(U71_PROM_TAG, prom82s129_device, a6_w))
-
-	//MCFG_LINE_DISPATCH_ADD(CHAR_LINE_CNT_CLK_TAG, 3)
-	//MCFG_LINE_DISPATCH_FWD_CB(0, 3, DEVWRITELINE(U85_VERT_DR_UB_TAG, ttl7473_device, clk1_w))
-	//MCFG_LINE_DISPATCH_FWD_CB(1, 3, DEVWRITELINE(U85_VERT_DR_UB_TAG, ttl7473_device, clk2_w))
-	//MCFG_LINE_DISPATCH_FWD_CB(2, 3, DEVWRITELINE(U84_DIV11_TAG, ttl74161_device, clock_w))
-
-	MCFG_7400_ADD(U83_TAG)
-	//MCFG_7400_Y1_CB(DEVWRITELINE(CHAR_LINE_CNT_CLK_TAG, devcb_line_dispatch_device<4>, in_w))
-
-	MCFG_74161_ADD(U84_DIV11_TAG)
-	MCFG_74161_ADD(U90_DIV14_TAG)
-
-	MCFG_74161_ADD(U88_DIV9_TAG)
-	MCFG_7416x_QC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d4_w))
-	MCFG_7416x_TC_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d1_w))
-
-	MCFG_LINE_DISPATCH_ADD(CHAR_CTR_CLK_TAG, 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U70_PROMLSB_TAG, ttl74161_device, clock_w))
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, clock_w))
-
-	MCFG_74175_ADD(U58_TAG)
-	MCFG_74175_ADD(U68_TAG)
-	MCFG_74175_ADD(U81_TAG)
-	MCFG_74175_Q1_CB(DEVWRITELINE(U81_TAG, ttl74175_device, d2_w))
-	MCFG_74175_NOT_Q2_CB(DEVWRITELINE(CHAR_CTR_CLK_TAG, devcb_line_dispatch_device<2>, in_w))
-
-	MCFG_DM9334_ADD(U72_PROMDEC_TAG)
-	MCFG_DM9334_Q4_CB(DEVWRITELINE(U83_TAG, ttl7400_device, b1_w))
-
-	MCFG_82S129_ADD(U71_PROM_TAG)
-	MCFG_82S129_O1_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a0_w))
-	MCFG_82S129_O2_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a1_w))
-	MCFG_82S129_O3_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, a2_w))
-	MCFG_82S129_O4_CB(DEVWRITELINE(U72_PROMDEC_TAG, dm9334_device, d_w))
-
-	MCFG_7404_ADD(U61_TAG)
-	MCFG_7404_ADD(U87_TAG)
-	MCFG_7404_ADD(U59_TAG)
-	MCFG_7404_Y5_CB(DEVWRITELINE(VID_PROM_ADDR_RESET_TAG, devcb_line_dispatch_device<2>, in_w))
-
-	MCFG_LINE_DISPATCH_ADD(VID_PROM_ADDR_RESET_TAG, 2)
-	MCFG_LINE_DISPATCH_FWD_CB(0, 2, DEVWRITELINE(U70_PROMLSB_TAG, ttl74161_device, pe_w))
-	MCFG_LINE_DISPATCH_FWD_CB(1, 2, DEVWRITELINE(U69_PROMMSB_TAG, ttl74161_device, pe_w))
+    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "video_out", "video_out", hazl1500_state, video_out_cb, "")
+    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "vblank", "vblank", hazl1500_state, vblank_cb, "")
+    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)
@@ -780,16 +768,18 @@ MACHINE_CONFIG_END
 
 
 ROM_START( hazl1500 )
+	ROM_REGION( 0x10000, NETLIST_TAG, ROMREGION_ERASE00 )
+
 	ROM_REGION( 0x10000, CPU_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "h15s-00I-10-3.bin", 0x0000, 0x0800, CRC(a2015f72) SHA1(357cde517c3dcf693de580881add058c7b26dfaa))
 
-	ROM_REGION( 0x800, CHARROM_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x800, CHAR_EPROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u83_chr.bin", 0x0000, 0x0800, CRC(e0c6b734) SHA1(7c42947235c66c41059fd4384e09f4f3a17c9857))
 
 	ROM_REGION( 0x100, BAUD_PROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u43_702129_82s129.bin", 0x0000, 0x0100, CRC(b35aea2b) SHA1(4702620cdef72b32a397580c22b75df36e24ac74))
 
-	ROM_REGION( 0x100, U71_PROM_TAG, ROMREGION_ERASEFF )
+	ROM_REGION( 0x100, VIDEO_PROM_TAG, ROMREGION_ERASEFF )
 	ROM_LOAD( "u90_702128_82s129.bin", 0x0000, 0x0100, CRC(277bc424) SHA1(528a0de3b54d159bc14411961961706bf9ec41bf))
 ROM_END
 
