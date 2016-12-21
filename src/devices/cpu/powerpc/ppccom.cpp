@@ -1498,6 +1498,27 @@ void ppc_device::ppccom_tlb_flush()
 ***************************************************************************/
 
 /*-------------------------------------------------
+    ppccom_get_dsisr - gets the DSISR value for a
+    failing TLB lookup's data access exception.
+-------------------------------------------------*/
+
+void ppc_device::ppccom_get_dsisr()
+{
+	int intent = 0;
+	
+	if (m_core->param1 & 1)
+	{
+		intent = TRANSLATE_WRITE;
+	}
+	else
+	{
+		intent = TRANSLATE_READ;
+	}
+	
+	m_core->param1 = ppccom_translate_address_internal(intent, m_core->param0);
+}
+
+/*-------------------------------------------------
     ppccom_execute_tlbie - execute a TLBIE
     instruction
 -------------------------------------------------*/

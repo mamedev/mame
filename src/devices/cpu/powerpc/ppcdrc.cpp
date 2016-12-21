@@ -642,6 +642,11 @@ static void cfunc_ppccom_execute_mtdcr(void *param)
 	ppc->ppccom_execute_mtdcr();
 }
 
+static void cfunc_ppccom_get_dsisr(void *param)
+{
+	ppc_device *ppc = (ppc_device *)param;
+	ppc->ppccom_get_dsisr();
+}
 
 /***************************************************************************
     STATIC CODEGEN
@@ -784,7 +789,11 @@ void ppc_device::static_generate_tlb_mismatch()
 	UML_LABEL(block, isi);                                                              // isi:
 	if (!(m_cap & PPCCAP_603_MMU))
 	{
-		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param0));                             // mov     [dsisr],[param0]
+		// DAR gets the address, DSISR gets the 'reason' flags
+		UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));             // mov     [dar],[param0]
+		m_core->param1 = 0;	// always a read here
+		UML_CALLC(block, (c_function)cfunc_ppccom_get_dsisr, this);			// get DSISR to param1
+		UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));			// move [dsisr], [param1]
 		UML_EXH(block, *m_exception[EXCEPTION_ISI], I0);                   // exh     isi,i0
 	}
 	else
@@ -1389,8 +1398,19 @@ void ppc_device::static_generate_memory_accessor(int mode, int size, int iswrite
 		/* general case: DSI exception */
 		else
 		{
-			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param0));                         // mov     [dsisr],[param0]
-			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               // exh     dsi,i0
+			UML_MOV(block, SPR32(SPROEA_DAR), mem(&m_core->param0));            // mov [dar],[param0]
+			// signal read or write to cfunc to get proper reason back
+			if (iswrite)
+			{
+				m_core->param1 = 1;
+			}
+			else
+			{
+				m_core->param1 = 0;
+			}
+			UML_CALLC(block, (c_function)cfunc_ppccom_get_dsisr, this);			// get DSISR to param1
+			UML_MOV(block, SPR32(SPROEA_DSISR), mem(&m_core->param1));			// move [dsisr], [param1]
+			UML_EXH(block, *m_exception[EXCEPTION_DSI], I0);               		// exh dsi,i0
 		}
 	}
 
