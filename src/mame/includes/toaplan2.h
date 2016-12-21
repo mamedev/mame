@@ -147,6 +147,14 @@ public:
 	DECLARE_VIDEO_START(bgaregga);
 	DECLARE_VIDEO_START(bgareggabl);
 	DECLARE_VIDEO_START(batrider);
+
+	// Teki Paki sound
+	uint8_t m_cmdavailable;
+
+	DECLARE_WRITE16_MEMBER(tekipaki_mcu_w);
+	DECLARE_READ8_MEMBER(tekipaki_soundlatch_r);
+	DECLARE_READ8_MEMBER(tekipaki_cmdavailable_r);
+
 	uint32_t screen_update_toaplan2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_dogyuun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_batsugun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
