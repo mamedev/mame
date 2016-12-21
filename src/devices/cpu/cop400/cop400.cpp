@@ -176,6 +176,7 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
 	, m_read_l(*this)
+	, m_read_l_tristate(*this)
 	, m_write_l(*this)
 	, m_read_g(*this)
 	, m_write_g(*this)
@@ -904,6 +905,7 @@ void cop400_cpu_device::device_start()
 	/* find i/o handlers */
 
 	m_read_l.resolve_safe(0);
+	m_read_l_tristate.resolve_safe(0);
 	m_write_l.resolve_safe();
 	m_read_g.resolve_safe(0);
 	m_write_g.resolve_safe();

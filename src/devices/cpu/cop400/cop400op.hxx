@@ -950,7 +950,8 @@ INSTRUCTION( lei )
 	}
 	else
 	{
-		OUT_L(0);
+		// tri-state(floating) pins
+		OUT_L(m_read_l_tristate(0, 0xff));
 	}
 }
 
