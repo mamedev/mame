@@ -6,8 +6,7 @@
 
     Driver by Nicola Salmoria
 
-
-    press F1+F3 to see ROM/RAM tests and the final animation
+    keep pressed F1 during POST to see ROM/RAM/GFX tests.
 
 ***************************************************************************/
 
@@ -18,13 +17,21 @@
 #include "includes/tail2nos.h"
 
 
-WRITE16_MEMBER(tail2nos_state::sound_command_w)
+WRITE8_MEMBER(tail2nos_state::sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_pending_command = 1;
+	m_soundlatch->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+}
+
+WRITE8_MEMBER(tail2nos_state::sound_semaphore_w)
+{
+	m_pending_command = 0; 
+}
+
+READ8_MEMBER(tail2nos_state::sound_semaphore_r)
+{
+	return m_pending_command;
 }
 
 WRITE8_MEMBER(tail2nos_state::sound_bankswitch_w)
@@ -44,9 +51,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xffc300, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM_WRITE(tail2nos_txvideoram_w) AM_SHARE("txvideoram")
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("INPUTS") AM_WRITE(tail2nos_gfxbank_w)
+	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0") AM_WRITE(tail2nos_gfxbank_w)
+	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(sound_semaphore_r,sound_command_w,0x00ff)
+//	AM_RANGE(0xfff020, 0xfff023) V-System CRTC
+//	AM_RANGE(0xfff030, 0xfff031) link comms
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
@@ -57,23 +67,31 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port_map, AS_IO, 8, tail2nos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x07, 0x07) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP /* the write is a clear pending command */
+	AM_RANGE(0x07, 0x07) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_semaphore_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVWRITE("ymsnd", ym2608_device, write)
 #if 0
 	AM_RANGE(0x18, 0x1b) AM_DEVREAD("ymsnd", ym2608_device, read)
 #endif
 ADDRESS_MAP_END
 
+CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
+{
+	int num = (uintptr_t)param;
+	int delta = ioport(num ? "AN1" : "AN0")->read();
+	
+	return delta >> 5;
+}
 
 static INPUT_PORTS_START( tail2nos )
-	PORT_START("INPUTS")
+	PORT_START("IN0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Brake (standard BD)")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) PORT_NAME("Accelerate (standard BD)")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)0) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -84,8 +102,21 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN1")
+	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)1) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) 
+	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	
+	PORT_START("AN0")
+	PORT_BIT( 0xff, 0, IPT_AD_STICK_Z ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_NAME("Brake (original BD)") PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
+
+	PORT_START("AN1")
+	PORT_BIT( 0xff, 0, IPT_AD_STICK_Z ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_NAME("Accelerate (original BD)")  PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
+	
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(      0x0009, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 3C_1C ) )
@@ -102,7 +133,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x00f0, 0x0000, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x00f0, 0x0000, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPSETTING(      0x0090, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0070, DEF_STR( 3C_1C ) )
@@ -119,25 +150,26 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0800, IP_ACTIVE_HIGH )
-	PORT_DIPNAME( 0x1000, 0x1000, "Game Mode" )
+	PORT_SERVICE_DIPLOC( 0x0800, IP_ACTIVE_HIGH, "SW2:4" )
+	PORT_DIPNAME( 0x1000, 0x1000, "Game Mode" ) PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Single ) )
 	PORT_DIPSETTING(      0x0000, "Multiple" )
-	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x2000, 0x0000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Control Panel" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Control Panel" ) PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, DEF_STR( Standard ) )
 	PORT_DIPSETTING(      0x0000, "Original" )
-	PORT_DIPNAME( 0x8000, 0x0000, "Country" )
+	// TODO: what's this for?
+	PORT_DIPNAME( 0x8000, 0x0000, "Country" ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x0000, "Domestic" )
 	PORT_DIPSETTING(      0x8000, "Overseas" )
 INPUT_PORTS_END
@@ -186,6 +218,7 @@ void tail2nos_state::machine_start()
 	save_item(NAME(m_txbank));
 	save_item(NAME(m_txpalette));
 	save_item(NAME(m_video_enable));
+	save_item(NAME(m_pending_command));
 }
 
 void tail2nos_state::machine_reset()
