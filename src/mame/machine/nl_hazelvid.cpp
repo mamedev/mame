@@ -1,5 +1,4 @@
 // license:BSD-3-Clause
-// license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 
 /***************************************************************************
@@ -9,8 +8,6 @@
 ***************************************************************************/
 
 #include "netlist/devices/net_lib.h"
-
-#define FAST_CLOCK  (1)
 
 #ifndef __PLIB_PREPROCESSOR__
 #endif
