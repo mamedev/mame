@@ -582,7 +582,7 @@ ROM_START( zwackery )
 	ROM_LOAD16_BYTE("385a-42aae-5xrd.1f", 0x0000, 0x4000, CRC(a0dfcd7e) SHA1(0fc6723eddef2a96de9bf1f48006dd067c148540))
 	ROM_LOAD16_BYTE("385a-42aae-4xrd.1e", 0x0001, 0x4000, CRC(ab504dc8) SHA1(4ebdcd42624e94c29ccdb8247bfff2d8e936ddd7))
 
-	ROM_REGION( 0x000D, "plds", 0 )
+	ROM_REGION( 0x000c, "plds", 0 )
 	// located on the "Venus CPU" board
 	ROM_LOAD( "pal.d5",    0x0000, 0x00001, NO_DUMP ) // H-T
 	ROM_LOAD( "pal.d2",    0x0001, 0x00001, NO_DUMP ) // V-T
@@ -598,8 +598,6 @@ ROM_START( zwackery )
 	ROM_LOAD( "pal.1c",    0x0009, 0x00001, NO_DUMP ) // BGBPE PAL
 	ROM_LOAD( "pal.5c",    0x000a, 0x00001, NO_DUMP ) // HCT PAL
 	ROM_LOAD( "pal.5j",    0x000b, 0x00001, NO_DUMP ) // BGBDCD PAL
-	// located on the "Artificial Artist" board
-	ROM_LOAD( "pal20.u15", 0x000c, 0x00001, NO_DUMP ) // CSD002R0, pal type not specified */
 ROM_END
 
 
