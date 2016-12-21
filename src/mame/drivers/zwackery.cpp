@@ -45,8 +45,7 @@ public:
 		m_videoram(*this, "videoram"),
 		m_cheap_squeak_deluxe(*this, "csd"),
 		m_bg_tilemap(nullptr),
-		m_fg_tilemap(nullptr),
-		m_sound_data(0)
+		m_fg_tilemap(nullptr)
 	{ }
 
 	DECLARE_VIDEO_START(zwackery);
@@ -64,7 +63,6 @@ public:
 	DECLARE_READ8_MEMBER(pia1_porta_r);
 	DECLARE_WRITE8_MEMBER(pia1_porta_w);
 	DECLARE_READ8_MEMBER(pia1_portb_r);
-	DECLARE_WRITE_LINE_MEMBER(pia1_ca2_w);
 	DECLARE_READ8_MEMBER(pia2_porta_r);
 
 	DECLARE_READ8_MEMBER(ptm_r);
@@ -88,10 +86,9 @@ private:
 	tilemap_t *m_fg_tilemap;
 
 	std::unique_ptr<uint8_t[]> m_spriteram;
+
 	std::unique_ptr<uint8_t[]> m_srcdata0;
 	std::unique_ptr<uint8_t[]> m_srcdata2;
-
-	uint8_t m_sound_data;
 };
 
 
@@ -406,12 +403,7 @@ GFXDECODE_END
 
 WRITE8_MEMBER( zwackery_state::pia1_porta_w )
 {
-	m_sound_data = (data >> 4) & 0x0f;
-}
-
-WRITE_LINE_MEMBER( zwackery_state::pia1_ca2_w )
-{
-	m_cheap_squeak_deluxe->write(machine().dummy_space(), 0, (state << 4) | m_sound_data);
+	m_cheap_squeak_deluxe->sr_w(space, 0, data >> 4);
 }
 
 
@@ -486,7 +478,6 @@ void zwackery_state::machine_start()
 
 	// register for save states
 	save_pointer(NAME(m_spriteram.get()), 0x800);
-	save_item(NAME(m_sound_data));
 }
 
 
@@ -498,6 +489,8 @@ static MACHINE_CONFIG_START( zwackery, zwackery_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
+
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
@@ -514,7 +507,7 @@ static MACHINE_CONFIG_START( zwackery, zwackery_state )
 	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia1_porta_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(zwackery_state, pia1_porta_w))
 	MCFG_PIA_READPB_HANDLER(READ8(zwackery_state, pia1_portb_r))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(zwackery_state, pia1_ca2_w))
+	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("csd", midway_cheap_squeak_deluxe_device, sirq_w))
 
 	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(zwackery_state, pia2_porta_r))

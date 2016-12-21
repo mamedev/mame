@@ -23,30 +23,28 @@
 
 // ======================> midway_cheap_squeak_deluxe_device
 
-class midway_cheap_squeak_deluxe_device :    public device_t,
-											public device_mixer_interface
+class midway_cheap_squeak_deluxe_device : public device_t, public device_mixer_interface
 {
 public:
 	// construction/destruction
 	midway_cheap_squeak_deluxe_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
-	DECLARE_WRITE_LINE_MEMBER(reset_write);
+	DECLARE_READ8_MEMBER(stat_r);
+	DECLARE_WRITE8_MEMBER(sr_w);
+	DECLARE_WRITE_LINE_MEMBER(sirq_w);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
 
 	// internal communications
 	DECLARE_WRITE8_MEMBER(porta_w);
 	DECLARE_WRITE8_MEMBER(portb_w);
 	DECLARE_WRITE_LINE_MEMBER(irq_w);
-	DECLARE_READ16_MEMBER(pia_r);
-	DECLARE_WRITE16_MEMBER(pia_w);
 
 protected:
 	// device-level overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
