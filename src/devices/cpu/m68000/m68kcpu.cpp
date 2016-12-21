@@ -995,6 +995,7 @@ void m68000_base_device::init_cpu_common(void)
 	m_icountptr = &remaining_cycles;
 	remaining_cycles = 0;
 
+	m_fc_cb.resolve_safe();
 }
 
 void m68000_base_device::reset_cpu(void)
@@ -2280,7 +2281,8 @@ const device_type M68K = &device_creator<m68000_base_device>;
 m68000_base_device::m68000_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, M68K, "M68K", tag, owner, clock, "m68k", __FILE__),
 		m_program_config("program", ENDIANNESS_BIG, 16, 24),
-		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 16, 24)
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, 16, 24),
+		m_fc_cb(*this)
 {
 	clear_all();
 }
@@ -2292,7 +2294,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 										const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, address_map_constructor internal_map, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
-		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map)
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits, 0, internal_map),
+		m_fc_cb(*this)
 {
 	clear_all();
 }
@@ -2302,7 +2305,8 @@ m68000_base_device::m68000_base_device(const machine_config &mconfig, const char
 										const device_type type, uint32_t prg_data_width, uint32_t prg_address_bits, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
-		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits)
+		m_oprogram_config("decrypted_opcodes", ENDIANNESS_BIG, prg_data_width, prg_address_bits),
+		m_fc_cb(*this)
 {
 	clear_all();
 }
