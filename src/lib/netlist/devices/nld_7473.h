@@ -53,7 +53,7 @@
  *  Naming conventions follow Texas instruments datasheet
  *
  *  FIXME: Currently, only the 73 is implemented.
- *         The 73 uses the same model.
+ *         The 73A uses the same model.
  *
  */
 

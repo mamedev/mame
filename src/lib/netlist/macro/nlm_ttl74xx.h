@@ -187,7 +187,7 @@
 
 
 #define TTL_74260_GATE(name)                                                   \
-		NET_REGISTER_DEV(TTL_7486_GATE, name)
+		NET_REGISTER_DEV(TTL_74260_GATE, name)
 
 #define TTL_74260_NOR(name, cA, cB, cC, cD, cE)	\
 		NET_REGISTER_DEV(TTL_74260_NOR, name)	\

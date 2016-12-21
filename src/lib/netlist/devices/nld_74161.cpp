@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 /*
- * nld_74161.c
+ * nld_74161.cpp
  *
  */
 
@@ -20,8 +20,8 @@ namespace netlist
 		, m_B(*this, "B")
 		, m_C(*this, "C")
 		, m_D(*this, "D")
-		, m_CLEAR(*this, "CLEAR")
-		, m_LOAD(*this, "LOAD")
+		, m_CLRQ(*this, "CLRQ")
+		, m_LOADQ(*this, "LOADQ")
 		, m_CLK(*this, "CLK")
 		, m_ENABLEP(*this, "ENABLEP")
 		, m_ENABLET(*this, "ENABLET")
@@ -40,8 +40,8 @@ namespace netlist
 		logic_input_t m_B;
 		logic_input_t m_C;
 		logic_input_t m_D;
-		logic_input_t m_CLEAR;
-		logic_input_t m_LOAD;
+		logic_input_t m_CLRQ;
+		logic_input_t m_LOADQ;
 		logic_input_t m_CLK;
 		logic_input_t m_ENABLEP;
 		logic_input_t m_ENABLET;
@@ -57,7 +57,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(74161_dip, 74161)
 		{
-			register_subalias("1", m_CLEAR);
+			register_subalias("1", m_CLRQ);
 			register_subalias("2", m_CLK);
 			register_subalias("3", m_A);
 			register_subalias("4", m_B);
@@ -65,7 +65,7 @@ namespace netlist
 			register_subalias("6", m_D);
 			register_subalias("7", m_ENABLEP);
 
-			register_subalias("9", m_LOAD);
+			register_subalias("9", m_LOADQ);
 			register_subalias("10", m_ENABLET);
 			register_subalias("11", m_Q[3]);
 			register_subalias("12", m_Q[2]);
@@ -94,31 +94,33 @@ namespace netlist
 	NETLIB_UPDATE(74161)
 	{
 		netlist_sig_t tRippleCarryOut = 0;
-		if (m_CLEAR())
+		if (!m_CLRQ())
 		{
-			m_cnt = 0;
+            m_cnt = 0;
 		}
 		else if (m_CLK() && !m_last_CLK)
 		{
-			if (m_LOAD())
+			if (!m_LOADQ())
 			{
-				m_cnt = (m_D() << 3) | (m_C() << 2)
+                m_cnt = (m_D() << 3) | (m_C() << 2)
 						| (m_B() << 1) | (m_A() << 0);
-			}
+            }
 			else if (m_ENABLET() && m_ENABLEP())
 			{
 				m_cnt++;
 				if (m_cnt > MAXCNT)
 					m_cnt = 0;
-			}
+            }
 		}
 
 		if (m_ENABLET() && (m_cnt == MAXCNT))
-			tRippleCarryOut = 1;
+        {
+            tRippleCarryOut = 1;
+        }
 
 		m_last_CLK = m_CLK();
 
-		for (std::size_t i=0; i<4; i++)
+        for (std::size_t i=0; i<4; i++)
 			m_Q[i].push((m_cnt >> i) & 1, delay[i]);
 
 		m_RCO.push(tRippleCarryOut, NLTIME_FROM_NS(20)); //FIXME
