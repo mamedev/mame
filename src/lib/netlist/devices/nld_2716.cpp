@@ -17,7 +17,7 @@ namespace netlist
 		, m_A(*this, {{ "A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9", "A10" }})
 		, m_GQ(*this, "GQ")
 		, m_EPQ(*this, "EPQ")
-		, m_Q(*this, {{ "Q0", "Q1", "Q2", "Q3", "Q4", "Q5", "Q6", "Q7" }})
+		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
 		, m_last_EPQ(*this, "m_last_EPQ", 1)
 		, m_ROM(*this, "m_ROM", nullptr)
 		{
@@ -29,11 +29,11 @@ namespace netlist
 		object_array_t<logic_input_t, 11> m_A;
 		logic_input_t m_GQ;
 		logic_input_t m_EPQ;
-		object_array_t<logic_output_t, 8> m_Q;
+		object_array_t<logic_output_t, 8> m_D;
 
 		state_var<unsigned> m_last_EPQ;
 
-		param_rom_t m_ROM; // 16 Kbits, used as 2 Kbit x 8
+		param_ptr_t m_ROM; // 16 Kbits, used as 2 Kbit x 8
 	};
 
 	NETLIB_OBJECT_DERIVED(2716_dip, 2716)
@@ -55,21 +55,21 @@ namespace netlist
 			register_subalias("20",    m_GQ);
 			register_subalias("18",    m_EPQ);
 
-			register_subalias("9",     m_Q[0]);
-			register_subalias("10",    m_Q[1]);
-			register_subalias("11",    m_Q[2]);
-			register_subalias("13",    m_Q[3]);
-			register_subalias("14",    m_Q[4]);
-			register_subalias("15",    m_Q[5]);
-			register_subalias("16",    m_Q[6]);
-			register_subalias("17",    m_Q[7]);
+			register_subalias("9",     m_D[0]);
+			register_subalias("10",    m_D[1]);
+			register_subalias("11",    m_D[2]);
+			register_subalias("13",    m_D[3]);
+			register_subalias("14",    m_D[4]);
+			register_subalias("15",    m_D[5]);
+			register_subalias("16",    m_D[6]);
+			register_subalias("17",    m_D[7]);
 		}
 	};
 
 	// FIXME: timing!
 	NETLIB_UPDATE(2716)
 	{
-		unsigned q = 0xff;
+		unsigned d = 0xff;
 
 		netlist_time delay = NLTIME_FROM_NS(450);
 		if (!m_GQ() && !m_EPQ())
@@ -78,7 +78,10 @@ namespace netlist
 			for (std::size_t i=0; i<11; i++)
 			a |= (m_A[i]() << i);
 
-			q = m_ROM()[a];
+            if (m_ROM() != nullptr)
+            {
+			    d = ((std::uint_fast8_t*)(m_ROM()))[a];
+            }
 
 			if (m_last_EPQ)
 				delay = NLTIME_FROM_NS(120);
@@ -88,7 +91,7 @@ namespace netlist
 
 		// FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<8; i++)
-			m_Q[i].push((q >> i) & 1, delay);
+			m_D[i].push((d >> i) & 1, delay);
 	}
 
 	NETLIB_DEVICE_IMPL(2716)

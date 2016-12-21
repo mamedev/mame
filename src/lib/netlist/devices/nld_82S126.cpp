@@ -30,7 +30,7 @@ namespace netlist
 		logic_input_t m_CE2Q;
 		object_array_t<logic_output_t, 4> m_O;
 
-		param_rom_t m_ROM; // 1024 bits, 32x32, used as 256x4
+		param_ptr_t m_ROM; // 1024 bits, 32x32, used as 256x4
 	};
 
 	NETLIB_OBJECT_DERIVED(82S126_dip, 82S126)
@@ -68,12 +68,26 @@ namespace netlist
 			for (std::size_t i=0; i<8; i++)
 			a |= (m_A[i]() << i);
 
-			o = m_ROM()[a];
+            if (m_ROM() != nullptr)
+			    o = ((std::uint_fast8_t*)(m_ROM()))[a];
 
 			delay = NLTIME_FROM_NS(50);
 		}
-
-		// FIXME: Outputs are tristate. This needs to be properly implemented
+#if 0
+        printf("CE1Q%d CE2Q%d %d%d%d%d%d%d%d%d %x\n",
+            m_CE1Q() ? 1 : 0,
+            m_CE2Q() ? 1 : 0,
+            m_A[0]() ? 1 : 0,
+            m_A[1]() ? 1 : 0,
+            m_A[2]() ? 1 : 0,
+            m_A[3]() ? 1 : 0,
+            m_A[4]() ? 1 : 0,
+            m_A[5]() ? 1 : 0,
+            m_A[6]() ? 1 : 0,
+            m_A[7]() ? 1 : 0,
+            o);
+#endif
+        // FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<4; i++)
 			m_O[i].push((o >> i) & 1, delay);
 	}

@@ -66,6 +66,7 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nld_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
+	$(NLOBJ)/devices/nld_2102A.o \
 	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
@@ -86,6 +87,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74192.o \
 	$(NLOBJ)/devices/nld_74193.o \
 	$(NLOBJ)/devices/nld_74279.o \
+	$(NLOBJ)/devices/nld_74365.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
 	$(NLOBJ)/devices/nld_82S126.o \
@@ -97,6 +99,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
+	$(NLOBJ)/devices/nld_tristate.o \
 	$(NLOBJ)/devices/nld_legacy.o \
 	$(NLOBJ)/devices/net_lib.o \
 	$(NLOBJ)/devices/nld_log.o \

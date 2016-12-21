@@ -217,8 +217,8 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
 			}
 			break;
-			case param_t::ROM:
-				static_cast<param_rom_t &>(param).initial(nullptr);
+			case param_t::POINTER:
+				static_cast<param_ptr_t &>(param).initial(nullptr);
 			break;
 			case param_t::STRING:
 			case param_t::MODEL:

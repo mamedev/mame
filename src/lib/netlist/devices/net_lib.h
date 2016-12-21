@@ -14,6 +14,7 @@
 #include "nl_base.h"
 #include "nld_system.h"
 
+#include "nld_2102A.h"
 #include "nld_2716.h"
 #include "nld_4020.h"
 #include "nld_4066.h"
@@ -34,6 +35,7 @@
 #include "nld_74192.h"
 #include "nld_74193.h"
 #include "nld_74279.h"
+#include "nld_74365.h"
 #include "nld_74ls629.h"
 #include "nld_82S16.h"
 #include "nld_82S126.h"
@@ -48,6 +50,8 @@
 #include "nld_mm5837.h"
 
 #include "nld_r2r_dac.h"
+
+#include "nld_tristate.h"
 
 #include "nld_log.h"
 
