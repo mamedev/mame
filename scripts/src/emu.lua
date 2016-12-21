@@ -93,8 +93,6 @@ files {
 	MAME_DIR .. "src/emu/dislot.h",
 	MAME_DIR .. "src/emu/disound.cpp",
 	MAME_DIR .. "src/emu/disound.h",
-	MAME_DIR .. "src/emu/dispatch.cpp",
-	MAME_DIR .. "src/emu/dispatch.h",
 	MAME_DIR .. "src/emu/distate.cpp",
 	MAME_DIR .. "src/emu/distate.h",
 	MAME_DIR .. "src/emu/divideo.cpp",
