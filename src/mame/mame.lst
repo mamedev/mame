@@ -904,6 +904,7 @@ spinlbrkj                       // (c) 1990 V-System Co. (Japan)
 spinlbrku                       // (c) 1990 V-System Co. (US)
 svolly91                        // (c) 1991 Video System Co. (Japan)
 turbofrc                        // (c) 1991 Video System Co.
+turbofrcn                       // (c) 1991 Video System Co.
 wbbc97                          // (c) 1997 Comad
 
 @source:age_candy.cpp
