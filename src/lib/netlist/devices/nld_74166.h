@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan 161
+// copyright-holders:Ryan Holtz
 /*
  * nld_74166.h
  *
