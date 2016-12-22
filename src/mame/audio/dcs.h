@@ -11,6 +11,7 @@
 
 #include "cpu/adsp2100/adsp2100.h"
 #include "sound/dmadac.h"
+#include "machine/bankdev.h"
 
 #define MCFG_DCS2_AUDIO_DRAM_IN_MB(_dram_in_mb) \
 	dcs_audio_device::static_set_dram_in_mb(*device, _dram_in_mb);
@@ -167,6 +168,7 @@ protected:
 	uint32_t      m_sounddata_banks;
 	uint16_t      m_sounddata_bank;
 
+	optional_device<address_map_bank_device> m_ram_map;
 	optional_memory_bank    m_data_bank;
 	memory_bank *           m_rom_page;
 	memory_bank *           m_dram_page;
@@ -203,6 +205,7 @@ protected:
 	uint16_t *m_polling_base;
 	uint32_t *m_internal_program_ram;
 	uint32_t *m_external_program_ram;
+	uint32_t *m_internal_data_ram;
 
 	int m_dmovlay_val;
 
