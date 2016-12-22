@@ -3707,6 +3707,9 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_intck));
+
 	save_item(NAME(m_gx_wrport1_0));
 	save_item(NAME(m_gx_wrport1_1));
 	save_item(NAME(m_gx_wrport2));
