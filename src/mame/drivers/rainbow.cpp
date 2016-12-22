@@ -121,14 +121,14 @@ Some BUGS remain: BIOS autoboot doesnt work at all. It is not possible to boot f
 CTRL-SETUP (soft reboot) always triggers ERROR 19 (64 K RAM err.). One explanation is that ZFLIP/ZRESET is
 handled wrongly, so shared mem. just below $8000 is tainted by Z80 stack data. A reentrance problem?
 
-Occassionally, ERROR 13 for keyboard stuck or ERROR 27 for RAM BOARD error appear (for reasons yet unknown).
+Occassionally, ERROR 13 -keyboard stuck- appears (for reasons yet unknown).
 
 CURRENTY UNEMULATED
 -------------------
-(a) the serial port does work one way only (incomplete null modem or wiring?), no reception yet.
- The printer interface does not work, so a non fatal ERROR 40 (serial printer interface) will appear.
+(a) the serial printer on port B prints garbage. It is worth to mention that port B relies on XON/XOFF,
+    while DTR_L (CTS B) means 'printer ready'. There is also a ROM patch in place (WORKAROUND macro)...
 
-(b1) LOOPBACK circuit not emulated ( used in startup tests ).
+(b1) LOOPBACK circuit not emulated (used in startup tests).
 
 (b2) system interaction tests HALT Z80 CPU at location $0211 (forever). Boot the RX50 diag.disk
  to see what happens (key 3 - individual tests, then 12 - system interaction). Uses LOOPBACK too?
@@ -305,11 +305,22 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
-#define RD51_SECTORS_PER_TRACK 17 // OLD: #define RD51_SECTORS_PER_TRACK 16
+#define RD51_SECTORS_PER_TRACK 17 
 
-#define RTC_BASE 0xFC000
+#define RTC_ENABLED
+// Tested drivers (from Suitable Solutions distribution disk and Latrobe archive), preferred first -
+// File.........Version / author ------------------- YY/YYYY ----- Read only RTC_BASE ---- Platform
+// RBCLIK21.COM Author: Vincent Esser. With source.. 4 digits (Y2K)..Y.......$fc000/fe000..100-B (default cfg.)
+// CLIKA.COM .. V1.03A (C) 1987 Suitable Solutions.. 2 digits........N (*)...$ed000........100-A 
+// CLIKCLOK.COM V1.01 (C) 1986,87 Suitable Solutions 2 digits........N (*)...$fc000/fe000..100-B (default   " )
+// CLIKF4.COM . V1.0  (C) 1986 Suitable Solutions... 2 digits........N (*)...$f4000........100-B (alternate " ) 
+// (*)   Time or date changes are not persistent in emulation. To prove the setter works, changes are logged. 
 
+// (Y2K) DS1315 unit only holds 2 digits, so Vincent Esser's freeware employs a windowing technique. 
+//       While Suitable's DOS 3.10 accepts dates > 2000, don't take that for granted with software from the 80s.                             
 #ifdef      ASSUME_MODEL_A_HARDWARE
+	#define RTC_BASE 0xED000   
+
 	// Define standard and maximum RAM sizes (A model):
 	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
 	#define END_OF_RAM 0xcffff // Very last byte (theretical; on 100-A) DO NOT CHANGE.
@@ -317,15 +328,16 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 	// Pretend to emulate older RAM board (no NMI, also affects presence bit in 'system_parameter_r'):
 	#define OLD_RAM_BOARD_PRESENT
 #else
+	#define RTC_BASE 0xFC000 // (default configuration, also covers FE000+)
+//	#define RTC_BASE 0xF4000 // (alternate configuration) - ClikClok V1.0 / CLIKF4.COM  
+
 	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
 	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
 	#define MOTHERBOARD_RAM 0x1ffff  // 128 K base RAM (100-B)
 	#define END_OF_RAM 0xdffff // very last byte (100-B theoretical max.) DO NOT CHANGE.
 
 	#define WORKAROUND_RAINBOW_B // work around DRIVE ERROR (tested on 100-B ROM only)
-
-	#define RTC_ENABLED
-#endif
+ #endif
 
 // ----------------------------------------------------------------------------------------------
 // * MHFU disabled by writing a _sensible_ value to port 0x10C (instead of port 0x0c)
@@ -538,6 +550,7 @@ public:
 	DECLARE_READ8_MEMBER(rtc_reset);
 	DECLARE_READ8_MEMBER(rtc_enable);
 	DECLARE_READ8_MEMBER(rtc_r);
+	DECLARE_WRITE8_MEMBER(rtc_w);
 
 	DECLARE_WRITE8_MEMBER(ext_ram_w);
 
@@ -1098,8 +1111,16 @@ void rainbow_state::machine_reset()
 		printf("\nWARNING: 896 K is not a valid memory configuration on Rainbow 100 A!\n");
 	}
 
-//  check = (unmap_start >> 16)-1;  // guess.
-//  NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
+	check = (unmap_start >> 16)-1;  // guess.
+	NVRAM_LOCATION = nv[0xed084];   // location not verified yet. DMT RAM check tests offset $84 !
+
+	#ifdef RTC_ENABLED
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
+	program.install_read_handler(RTC_BASE, RTC_BASE, read8_delegate(FUNC(rainbow_state::rtc_r), this));
+	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));	
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
+	#endif
+
 #else
 	printf("\n*** RAINBOW B MODEL ASSUMED (128 - 896 K RAM)\n");
 	if (unmap_start < 0x20000)
@@ -1110,6 +1131,13 @@ void rainbow_state::machine_reset()
 
 	check = (unmap_start >> 16) - 2;
 	NVRAM_LOCATION = nv[0xed0db];
+
+	#ifdef RTC_ENABLED
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
+	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).	
+	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
+	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
+	#endif
 #endif
 	if (check != NVRAM_LOCATION)
 		printf("\nNOTE: RAM configuration does not match NVRAM.\nUNMAP_START = %05x   NVRAM VALUE = %02x   SHOULD BE: %02x\n", unmap_start, NVRAM_LOCATION, check);
@@ -1121,13 +1149,6 @@ void rainbow_state::machine_reset()
 	}
 
 	m_crtc->MHFU(MHFU_RESET_and_DISABLE);
-
-#ifdef RTC_ENABLED
-// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
-// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
-	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
-#endif
 
 	m_rtc->chip_reset();     // * Reset RTC to a defined state *
 
@@ -1246,15 +1267,6 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 {
 	static int old_palette, old_monitor;
 
-#ifdef BOOST_DEBUG_PERFORMANCE
-	uint8_t *ram = memregion("maincpu")->base();
-	if( !(m_p_vol_ram[0x84] == 0x00) )
-	{
-		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
-			return 0;
-	}
-#endif
-
 	int monitor_selected = m_inp13->read();
 	if(monitor_selected != old_monitor)
 	{
@@ -1273,6 +1285,15 @@ uint32_t rainbow_state::screen_update_rainbow(screen_device &screen, bitmap_ind1
 		old_palette = palette_selected;
 		m_color_map_changed = true;
 	}
+
+#ifdef BOOST_DEBUG_PERFORMANCE
+	uint8_t *ram = memregion("maincpu")->base();
+	if( !(m_p_vol_ram[0x84] == 0x00) )
+	{
+		if( (MOTOR_DISABLE_counter) || (ram[0xEFFFE] & 16) ) // if HDD/FDD ACTIVITY -OR- SMOOTH SCROLL IN PROGRESS
+			return 0;
+	}
+#endif
 
 	m_crtc->palette_select(palette_selected);
 
@@ -1445,21 +1466,51 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 #endif
 }
 
-// ------------------------ClikClok (for model B; DS1315)  ---------------------------------
-// DESCRIPTION: version for 100-A plugs into NVRAM chip socket (unemulated yet)
-//   On a 100-B, it occupies one of the EPROM sockets. There is a socket on the ClikClok for the NVRAM / EPROM.
+// ------------------------ClikClok (for 100-A; DS1315) ------------------------------------------
+// Version for 100-A plugs into NVRAM chip socket. There is a socket on the ClikClok for the NVRAM
 
-// DRIVERS: (a) DOS and CP/M binaries plus source from DEC employee (rbclik); Reads & displays times. Y2K READY!
-// (b) Suitable Solutions ClikClok distribution disk; Uses $FE000 and up. 2 digit year. Needed to set time & date.
-//
-// TODO: obtain hardware / check address decoders.
-// RTC accesses here were derived from Vincent Esser's published source.
+// Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM) 
+// - also needed to set time/date (*).		             Reads $ed000, writes ed0fe/ed0ff.         
+WRITE8_MEMBER(rainbow_state::rtc_w)
+{
+	if((m_inp11->read() == 0x01)) // if enabled...
+	{
+		switch (offset)
+		{
+			case 0x00: // Write to 0xED0FE
+				if (m_rtc->chip_enable())
+					m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				else
+					m_rtc->read_0(space, 0); // (RTC ACTIVATION) read magic pattern 0
+				break;
+
+			case 0x01: // Write to 0xED0FF
+				if (m_rtc->chip_enable())
+					m_rtc->write_data(space, offset & 0x01); // Transfer data to DS1315 (data = offset):
+				else
+					m_rtc->read_1(space, 0); // (RTC ACTIVATION) read magic pattern 1
+				break;
+		}
+	}
+	m_p_vol_ram[offset] = data;  // Poke value into VOL_RAM.
+}
+ 
+// ------------------------ClikClok (for 100-B; DS1315)  ------------------------------------------------
+// Add-on hardware, occupies one of the EPROM sockets of the 100-B. TODO: check address decoders on board 
+// Requires CLIKCLOK.COM or RBCLIK21.COM (freeware from Latrobe).                       Uses FC000/FE000.
 READ8_MEMBER(rainbow_state::rtc_r)
 {
 	if((m_inp11->read() == 0x01)) // if enabled...
 	{
 		switch (offset)
 		{
+#ifdef ASSUME_RAINBOW_A_HARDWARE
+			case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)   
+				if (m_rtc->chip_enable())
+					return m_rtc->read_data(space, 0) & 0x01;
+				 else 
+					m_rtc->chip_reset();
+#else
 			// Transfer data to DS1315 (data = offset):
 			case 0x0000:  // RTC_WRITE_DATA_0 0xFC000
 			case 0x2000:  // RTC_WRITE_DATA_0 0xFE000 (MIRROR)
@@ -1475,13 +1526,13 @@ READ8_MEMBER(rainbow_state::rtc_r)
 				if (m_rtc->chip_enable())
 					return (m_rtc->read_data(space, 0) & 0x01);
 
-			// (RTC ACTIVATION) READ MAGIC PATTERN 0
+			// (RTC ACTIVATION) read magic pattern 0
 			case 0x0100:  // 0xFC100
 			case 0x2100:  // 0xFE100 (MIRROR)
 				m_rtc->read_0(space, 0);
 				break;
 
-			// (RTC ACTIVATION) READ MAGIC PATTERN 1
+			// (RTC ACTIVATION) read magic pattern 1
 			case 0x0101:  // 0xFC101
 			case 0x2101:  // 0xFE101 (MIRROR)
 				m_rtc->read_1(space, 0);
@@ -1492,11 +1543,16 @@ READ8_MEMBER(rainbow_state::rtc_r)
 			case 0x2104:  // 0xFE104 (MIRROR)
 				m_rtc->chip_reset();
 				break;
+#endif
 		}
 	}
 
+#ifdef ASSUME_RAINBOW_A_HARDWARE
+	return m_p_vol_ram[offset];  // return volatile RAM 
+#else
 	uint8_t *rom = memregion("maincpu")->base();
-	return rom[RTC_BASE + offset];  // Return ROM to prevent crashes
+	return rom[RTC_BASE + offset];  // return ROM
+#endif
 }
 // ------------------------/ ClikClok (for model B; DS1315)  ---------------------------------
 
@@ -2871,7 +2927,7 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 		{
 			if(last_message != 1)
 			{
-				printf("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN RESTART.\n");
+				popmessage("\nCOLOR GRAPHICS ADAPTER INVOKED.  PLEASE TURN ON THE APPROPRIATE DIP SWITCH, THEN REBOOT.\n");
 				printf("OFFSET: %x (PC=%x)\n", 0x50 +offset , machine().device("maincpu")->safe_pc());
 				last_message = 1;
 			}
