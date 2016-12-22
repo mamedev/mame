@@ -372,7 +372,7 @@ class m68705_new_device : public m68705_device
 public:
 	// construction/destruction
 	m68705_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-		: m68705_device(mconfig, tag, owner, clock, M68705, "M68705 (NEW)", 11, ADDRESS_MAP_NAME( m68705_internal_map ), "m68705_new", __FILE__),
+		: m68705_device(mconfig, tag, owner, clock, M68705_NEW, "M68705 (NEW)", 11, ADDRESS_MAP_NAME( m68705_internal_map ), "m68705_new", __FILE__),
 			m_portA_in(0),
 			m_portB_in(0),
 			m_portC_in(0),
