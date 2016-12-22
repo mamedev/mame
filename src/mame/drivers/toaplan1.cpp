@@ -967,7 +967,7 @@ READ8_MEMBER(toaplan1_state::vimana_dswb_invert_r)
 
 READ8_MEMBER(toaplan1_state::vimana_tjump_invert_r)
 {
-	return (ioport("TJUMP")->read() ^ 0xFF)|0xC; // high 2 bits of port G always read as 1
+	return (ioport("TJUMP")->read() ^ 0xFF)|0xC0; // high 2 bits of port G always read as 1
 }
 
 WRITE16_MEMBER(toaplan1_state::samesame_mcu_w)
