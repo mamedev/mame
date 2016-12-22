@@ -18,6 +18,7 @@
  *
  * SH/LDQ: Shift / !Load
  * CLKINH: Clock Inhibit
+ * SER: Serial In
  *
  *  Naming convention attempts to follow Texas Instruments datasheet
  *

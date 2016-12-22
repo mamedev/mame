@@ -125,6 +125,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
 
 #define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
+#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 

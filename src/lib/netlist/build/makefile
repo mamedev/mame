@@ -74,18 +74,22 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_7450.o \
 	$(NLOBJ)/devices/nld_7473.o \
 	$(NLOBJ)/devices/nld_7474.o \
+	$(NLOBJ)/devices/nld_7475.o \
 	$(NLOBJ)/devices/nld_7483.o \
+	$(NLOBJ)/devices/nld_7485.o \
 	$(NLOBJ)/devices/nld_7490.o \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_74107.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
 	$(NLOBJ)/devices/nld_74161.o \
+	$(NLOBJ)/devices/nld_74165.o \
 	$(NLOBJ)/devices/nld_74166.o \
 	$(NLOBJ)/devices/nld_74174.o \
 	$(NLOBJ)/devices/nld_74175.o \
 	$(NLOBJ)/devices/nld_74192.o \
 	$(NLOBJ)/devices/nld_74193.o \
+	$(NLOBJ)/devices/nld_74194.o \
 	$(NLOBJ)/devices/nld_74279.o \
 	$(NLOBJ)/devices/nld_74365.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
@@ -94,6 +98,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9312.o \
 	$(NLOBJ)/devices/nld_9316.o \
+	$(NLOBJ)/devices/nld_9322.o \
 	$(NLOBJ)/devices/nld_am2847.o \
 	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
