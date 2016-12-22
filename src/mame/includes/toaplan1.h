@@ -120,6 +120,8 @@ public:
 	uint8_t m_to_mcu;
 	uint8_t m_cmdavailable;
 
+	DECLARE_READ8_MEMBER(vimana_dswb_invert_r);
+	DECLARE_READ8_MEMBER(vimana_tjump_invert_r);
 	DECLARE_WRITE16_MEMBER(samesame_mcu_w);
 	DECLARE_READ8_MEMBER(samesame_soundlatch_r);
 	DECLARE_WRITE8_MEMBER(samesame_sound_done_w);

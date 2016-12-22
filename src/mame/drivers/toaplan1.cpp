@@ -924,13 +924,13 @@ ADDRESS_MAP_END
 
 /***************************** HD647180 Memory Map **************************/
 
-static ADDRESS_MAP_START( hd647180_mem_map, AS_PROGRAM, 8, toaplan1_state )
+static ADDRESS_MAP_START( vimana_hd647180_mem_map, AS_PROGRAM, 8, toaplan1_state )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
 	AM_RANGE(0x08000, 0x087ff) AM_RAM AM_SHARE("sharedram") /* 2048 bytes of shared ram w/maincpu */
 	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan1_state )
+static ADDRESS_MAP_START( vimana_hd647180_io_map, AS_IO, 8, toaplan1_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	// lots of low level 647180 peripherals are not emulated yet, ddr regs, timer regs etc, see comments below
 	// also see http://bitsavers.trailing-edge.com/pdf/hitachi/_dataBooks/U94_HD647180X_8-Bit_Microcontroller_Hardware_Manual_Jan88.pdf particularly page 38 (pdf page 56)
@@ -938,13 +938,13 @@ static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x33, 0x33) AM_WRITENOP // IL (int vector low) register
 	AM_RANGE(0x36, 0x36) AM_WRITENOP // refresh control register for RFSH pin
 	// 53: disable reg for port A
-	AM_RANGE(0x60, 0x60) AM_READ_PORT("DSWB") // read/write port A
+	AM_RANGE(0x60, 0x60) AM_READ(vimana_dswb_invert_r) // read/write port A; note these inputs seem to be inverted, unlike the DSWA ones.
 	// 61: read/write port B
 	// 62: read/write port C
 	// 63: read/write port D
 	// 64: read/write port E
 	// 65: read/write port F
-	AM_RANGE(0x66, 0x66) AM_READ_PORT("TJUMP") // read/write port G, bits 7 and 6 ALWAYS read as 1 due to port G being just 6 bits
+	AM_RANGE(0x66, 0x66) AM_READ(vimana_tjump_invert_r) // read/write port G, bits 7 and 6 ALWAYS read as 1 due to port G being just 6 bits; note these inputs seem to be inverted, unlike the DSWA ones.
 	// 70: ddr for port A
 	AM_RANGE(0x71, 0x71) AM_WRITENOP // ddr for port B
 	AM_RANGE(0x72, 0x72) AM_WRITENOP // ddr for port C
@@ -960,7 +960,15 @@ static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan1_state )
 	AM_RANGE(0x8f, 0x8f) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
 ADDRESS_MAP_END
 
+READ8_MEMBER(toaplan1_state::vimana_dswb_invert_r)
+{
+	return ioport("DSWB")->read() ^ 0xFF;
+}
 
+READ8_MEMBER(toaplan1_state::vimana_tjump_invert_r)
+{
+	return (ioport("TJUMP")->read() ^ 0xFF)|0xC; // high 2 bits of port G always read as 1
+}
 
 WRITE16_MEMBER(toaplan1_state::samesame_mcu_w)
 {
@@ -1708,10 +1716,16 @@ static INPUT_PORTS_START( vimana )
 	/* 0x440007.b */
 	PORT_START("DSWA")
 	TOAPLAN_MACHINE_NO_COCKTAIL
-	TOAPLAN_COINAGE_DUAL(TJUMP, 0x0f, 0x0d)                 /* see notes */
+	TOAPLAN_COINAGE_DUAL(TJUMP, 0x0f, 0x02)                 /* see notes */
 
 	/* 0x44000f.b */
 	PORT_START("DSWB")
+	/* this dipswitch array is inverted either by circuitry on the pcb, or by
+	   being between portA of the 647180 and GND, relying on 647180 portA
+	   internal pin pullups?
+	   Not sure, needs tracing, but for now rather than make a new inverted
+	   TOAPLAN_DIFFICULTY macro, I've (LN) wrapped this in a function to invert
+	   it on read. See vimana_dswb_invert_r */
 	TOAPLAN_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* table at 0x000998 */
 	PORT_DIPSETTING(    0x00, "70k 270k 200k+" )
@@ -1723,32 +1737,33 @@ static INPUT_PORTS_START( vimana )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
-	PORT_DIPNAME( 0x40, 0x40, "Invulnerability" )           /* see notes */
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x40, 0x00, "Invulnerability" )           /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	/* 0x440011.b */
+	/* same as above, this is inverted, handled by vimana_tjump_invert_r */
 	PORT_START("TJUMP")       /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Region ) )
-//	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
-//	PORT_DIPSETTING(    0x01, "01" )
-//	PORT_DIPSETTING(    0x02, "02" )
-//	PORT_DIPSETTING(    0x03, "03" )
-//	PORT_DIPSETTING(    0x04, "04" )
-//	PORT_DIPSETTING(    0x05, "05" )
-//	PORT_DIPSETTING(    0x06, "06" )
-	PORT_DIPSETTING(    0x07, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x08, "USA (Romstar license)" )
-	PORT_DIPSETTING(    0x09, "Taiwan (Spacy license)" )
-	PORT_DIPSETTING(    0x0a, DEF_STR( Taiwan )  )
-	PORT_DIPSETTING(    0x0b, DEF_STR( Korea ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(    0x0d, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */
@@ -1768,24 +1783,25 @@ static INPUT_PORTS_START( vimanan )
 	/* DSWB : 0x44000f.b */
 
 	/* 0x440011.b */
+	/* same as above, this is inverted, handled by vimana_tjump_invert_r */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x0d, DEF_STR( Region ) )
- //	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" ) /* "ending" text in English */
-//	PORT_DIPSETTING(    0x01, "01" )
-//	PORT_DIPSETTING(    0x02, "02" )
-//	PORT_DIPSETTING(    0x03, "03" )
-//	PORT_DIPSETTING(    0x04, "04" )
-//	PORT_DIPSETTING(    0x05, "05" )
-//	PORT_DIPSETTING(    0x06, "06" )
-	PORT_DIPSETTING(    0x07, "Hong Kong (Honest Trading license)" )
-	PORT_DIPSETTING(    0x08, "USA (Romstar license)" )
-	PORT_DIPSETTING(    0x09, "Taiwan (Spacy license)" )
-	PORT_DIPSETTING(    0x0a, DEF_STR( Taiwan )  )
-	PORT_DIPSETTING(    0x0b, DEF_STR( Korea ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Hong_Kong ) )
-	PORT_DIPSETTING(    0x0d, "Europe (Nova Apparate license)" )
-	PORT_DIPSETTING(    0x0e, DEF_STR( USA ) )
-//	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" ) /* "ending" text in English */
+	PORT_DIPNAME( 0x0f, 0x02, DEF_STR( Region ) )
+	PORT_DIPSETTING(    0x02, "Europe (Nova Apparate license)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+//  PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )        /* "ending" text in English */
+	PORT_DIPSETTING(    0x04, DEF_STR( Korea ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hong_Kong ) )
+	PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+	PORT_DIPSETTING(    0x05, DEF_STR( Taiwan ) )
+	PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */
@@ -1802,24 +1818,25 @@ static INPUT_PORTS_START( vimanaj )
 	/* DSWB : 0x44000f.b */
 
 	/* 0x440011.b */
+	/* same as above, this is inverted, handled by vimana_tjump_invert_r */
 	PORT_MODIFY("TJUMP")      /* Territory Jumper Block - see notes */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Region ) )
-//	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
-//	PORT_DIPSETTING(    0x01, "01" )
-//	PORT_DIPSETTING(    0x02, "02" )
-//	PORT_DIPSETTING(    0x03, "03" )
-//	PORT_DIPSETTING(    0x04, "04" )
-//	PORT_DIPSETTING(    0x05, "05" )
-//	PORT_DIPSETTING(    0x06, "06" )
-//	PORT_DIPSETTING(    0x07, "Hong Kong (Honest Trading license)" )
-//	PORT_DIPSETTING(    0x08, "USA (Romstar license)" )
-//	PORT_DIPSETTING(    0x09, "Taiwan (Spacy license)" )
-//	PORT_DIPSETTING(    0x0a, DEF_STR( Taiwan )  )
-//	PORT_DIPSETTING(    0x0b, DEF_STR( Korea ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( Hong_Kong ) )
-//	PORT_DIPSETTING(    0x0d, DEF_STR( Europe ) )
-//	PORT_DIPSETTING(    0x0e, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Region ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( USA ) )
+//  PORT_DIPSETTING(    0x07, "USA (Romstar license)" )
+	PORT_DIPSETTING(    0x00, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x0f, "Japan (distributed by Tecmo)" )
+//  PORT_DIPSETTING(    0x04, "Korea" )
+//  PORT_DIPSETTING(    0x03, "Hong Kong" )
+//  PORT_DIPSETTING(    0x08, "Hong Kong (Honest Trading license)" )
+//  PORT_DIPSETTING(    0x05, "Taiwan" )
+//  PORT_DIPSETTING(    0x06, "Taiwan (Spacy license)" )
+//  PORT_DIPSETTING(    0x09, "???" )
+//  PORT_DIPSETTING(    0x0a, "???" )
+//  PORT_DIPSETTING(    0x0b, "???" )
+//  PORT_DIPSETTING(    0x0c, "???" )
+//  PORT_DIPSETTING(    0x0d, "???" )
+//  PORT_DIPSETTING(    0x0e, "???" )
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* P1 : 0x44000b.b */
@@ -2186,8 +2203,8 @@ static MACHINE_CONFIG_START( vimana, toaplan1_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan1_state,  toaplan1_interrupt)
 
 	MCFG_CPU_ADD("audiocpu", Z180, XTAL_28MHz/8)    /* HD647180XOFS6 CPU */
-	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
-	MCFG_CPU_IO_MAP(hd647180_io_map)
+	MCFG_CPU_PROGRAM_MAP(vimana_hd647180_mem_map)
+	MCFG_CPU_IO_MAP(vimana_hd647180_io_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
 
