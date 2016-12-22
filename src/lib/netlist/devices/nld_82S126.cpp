@@ -5,7 +5,7 @@
  *
  */
 
-#include "nld_82s126.h"
+#include "nld_82S126.h"
 
 namespace netlist
 {

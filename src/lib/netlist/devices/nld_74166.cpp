@@ -74,6 +74,7 @@ namespace netlist
 		m_last_CLK = 0;
 	}
 
+#if 0
 	// FIXME: Timing
 	static const netlist_time delay[4] =
 	{
@@ -82,6 +83,7 @@ namespace netlist
 			NLTIME_FROM_NS(40),
 			NLTIME_FROM_NS(40)
 	};
+#endif
 
 	NETLIB_UPDATE(74166)
 	{
