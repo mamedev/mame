@@ -53,6 +53,30 @@
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
  TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
 
+ - Information (current as of 21 Dec. 2016) on what logic chips (and some analog parts) are still needed to be emulated in the
+   netlist system per-game:
+
+ TM-057 (Stunt Cycle)
+ 	7485  4-bit Magnitude Counters
+ 	74165 8-bit Parallel-In/Serial-Out Shift Register
+ 	74194 4-bit Bidirectional Universal Shift Register
+ 	9312  One-of-Eight Line Data Selectors/Multiplexers
+ 	9316  Synchronous 4-bit Counters
+ 	9322  Quad 2-Line to 1-Line Data Selectors/Multiplexers
+ 	9602  Dual Retriggerable, Resettable One Shots
+
+ TM-055 (Indy 4)
+ 	7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
+ 	7414  Hex Schmitt-Trigger Inverters
+ 	7417  Hex Buffers/Drivers
+ 	7475  4-bit Bistable Latches
+ 	7485  4-bit Magnitude Comparators
+ 	74164 8-bit Serial-In, Parallel-Out Shift Register
+ 	9301  1-of-10 Decoder
+ 	9312  One-of-Eight Line Data Selectors/Multiplexers
+ 	9316  Synchronous 4-Bit Counters
+ 	9322  Quad 2-Line to 1-Line Data Selectors/Multiplexers
+ 	LM339 Quad Comparator
 
 ***************************************************************************/
 

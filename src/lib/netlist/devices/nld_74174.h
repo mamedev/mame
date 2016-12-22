@@ -3,7 +3,7 @@
 /*
  * nld_74174.h
  *
- *  DM74174: hEX D Flip-Flops with Clear
+ *  DM74174: Hex D Flip-Flops with Clear
  *
  *          +--------------+
  *      CLR |1     ++    16| VCC
