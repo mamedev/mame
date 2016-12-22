@@ -66,6 +66,9 @@
  	9602  Dual Retriggerable, Resettable One Shots
 
  TM-055 (Indy 4)
+ 	4001  Quad 2-Input NOR Gates
+ 	4016  Quad Bilateral Switch
+ 	4136  Quad General-Purpose Operational Amplifiers
  	7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
  	7414  Hex Schmitt-Trigger Inverters
  	7417  Hex Buffers/Drivers
