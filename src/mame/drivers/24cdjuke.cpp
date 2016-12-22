@@ -293,7 +293,7 @@ static MACHINE_CONFIG_START( midcoin24cdjuke, midcoin24cdjuke_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(midcoin24cdjuke_state, kb_col_w))
 
 	MCFG_DEVICE_ADD("ic31", I8255A, 0)
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("MD4"))
 MACHINE_CONFIG_END
 
