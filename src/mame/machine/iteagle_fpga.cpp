@@ -189,7 +189,10 @@ void iteagle_fpga_device::device_timer(emu_timer &timer, device_timer_id tid, in
 
 WRITE_LINE_MEMBER(iteagle_fpga_device::serial_interrupt)
 {
-	osd_printf_info("serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
+	if (LOG_SERIAL) {
+		osd_printf_info("iteagle_fpga_device::serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
+		logerror("serial_interrupt: intr(%i) = %i\n", m_serial_irq_num, state);
+	}
 	m_cpu->set_input_line(m_serial_irq_num, state);
 }
 
