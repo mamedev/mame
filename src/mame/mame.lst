@@ -13347,6 +13347,8 @@ pcega                           // 1987 PC with EGA
 pcherc                          // 1987 PC with Hercules (for testing hercules)
 pcmda                           // 1987 PC with MDA
 pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
+laser_turbo_xt					// 1988 VTech Laser Turbo XT
+laser_xt3						// 1989 VTech Laser XT/3
 
 @source:ggconnie.cpp
 ggconnie                        // (c) ???? Capcom
