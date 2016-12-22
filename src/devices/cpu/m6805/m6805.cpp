@@ -415,6 +415,14 @@ m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *
 {
 }
 
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_constructor internal_map, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_program_config("program", ENDIANNESS_BIG, 8, addr_width, 0, internal_map)
+{
+}
+
+ 
+
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -446,6 +454,7 @@ void m6805_base_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_state));
 }
+
 
 
 void m6805_base_device::device_reset()
@@ -954,6 +963,159 @@ void m68705_device::execute_set_input(int inputnum, int state)
 	}
 }
 
+/* ddr - direction registers */
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrA_w)
+{
+	m_ddrA = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrB_w)
+{
+	m_ddrB = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrC_w)
+{
+	m_ddrC = data;
+}
+
+/* read ports */
+
+READ8_MEMBER(m68705_new_device::mc68705_portA_r)
+{
+	m_portA_in = m_portA_cb_r(0, ~m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pulled
+	uint8_t res = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+	return res;
+
+}
+
+READ8_MEMBER(m68705_new_device::mc68705_portB_r)
+{
+	m_portB_in = m_portB_cb_r(0, ~m_ddrB);
+	uint8_t res = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	return res;
+}
+
+READ8_MEMBER(m68705_new_device::mc68705_portC_r)
+{
+	m_portC_in = m_portC_cb_r(0, ~m_ddrC);
+	uint8_t res = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+	return res;
+}
+
+/* write ports */
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portA_w)
+{
+	m_portA_cb_w(0, data, m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pushed
+	m_portA_out = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portB_w)
+{
+	m_portB_cb_w(0, data, m_ddrB);
+	m_portB_out = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portC_w)
+{
+	m_portC_cb_w(0, data, m_ddrC);
+	m_portC_out = data;
+}
+
+/*
+
+The 68(7)05 peripheral memory map:
+Common for Px, Rx, Ux parts:
+0x00: Port A data (RW)
+0x01: Port B data (RW)
+0x02: Port C data (RW) [top 4 bits do nothing (read as 1s) on Px parts, work as expected on Rx, Ux parts]
+0x03: [Port D data (RW), only on Rx, Ux parts]
+0x04: Port A DDR (Write only, reads as 0xFF)
+0x05: Port B DDR (Write only, reads as 0xFF)
+0x06: Port C DDR (Write only, reads as 0xFF) [top 4 bits do nothing on Px parts, work as expected on Rx, Ux parts]
+0x07: Unused (reads as 0xFF?)
+0x08: Timer Data Register (RW; acts as ram when timer isn't counting, otherwise decrements once per prescaler expiry)
+0x09: Timer Control Register (RW; on certain mask part and when MOR bit 6 is not set, all bits are RW except bit 3 which
+always reads as zero. when MOR bit 6 is set and on all mask parts except one listed in errata in the 6805 daatsheet,
+the top two bits are RW, bottom 6 always read as 1 and writes do nothing; on the errata chip, bit 3 is writable and
+clears the prescaler, reads as zero)
+0x0A: [Miscellaneous Register, only on Rx, Sx, Ux parts]
+0x0B: [Eprom parts: Programming Control Register (write only?, low 3 bits; reads as 0xFF?); Unused (reads as 0xFF?) on
+Mask parts]
+0x0C: Unused (reads as 0xFF?)
+0x0D: Unused (reads as 0xFF?)
+0x0E: [A/D control register, only on Rx, Ux, Sx parts]
+0x0F: [A/D result register, only on Rx, Ux, Sx parts]
+0x10-0x7f: internal ram; SP can only point to 0x60-0x7F. Rx parts have an unused hole from 0x10-0x3F (reads as 0xFF?)
+0x80-0xFF: Page 0 user rom
+The remainder of the memory map differs here between parts, see appropriate datasheet for each part.
+The four vectors are always stored in big endian form as the last 8 bytes of the address space.
+
+Sx specific differences:
+0x02: Port C data (RW) [top 6 bits do nothing (read as 1s) on Sx parts]
+0x06: Port C DDR (Write only, reads as 0xFF) [top 6 bits do nothing on Sx parts]
+0x0B: Timer 2 Data Register MSB
+0x0C: Timer 2 Data Register LSB
+0x0D: Timer 2 Control Register
+0x10: SPI Data Register
+0x11: SPI Control Register
+0x12-0x3F: Unused (reads as 0xFF?)
+
+MOR ADDRESS: Mask Option Register; does not exist on R2 and several other but not all mask parts, located at 0x784 on Px parts
+
+Rx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x10-0x3f and and 0x100-0x7BF; has A/D converter, Ports A-D;
+eprom parts have MOR at 0xF38; mask parts have selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+Px Parts: 28 pins; address space is 0x000-0x7ff; eprom parts have MOR at 0x784 and bootstrap rom at 0x785-0x7f7; mask parts have a
+selftest rom at similar area; port c is just 4 bits.
+
+Sx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x12-0x3f and and 0x100-0x9BF; has A/D converter; has SPI
+serial; port C is just two bits; has an extra 16-bit timer compared to Ux/Rx; selftest rom at 0xF00-0xFF7
+
+Ux Parts: 40 pins; address space is 0x000-0xfff; has A/D converter, Ports A-D; eprom parts have MOR at 0xF38; mask parts have
+selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+*/
+
+ADDRESS_MAP_START( m68705_internal_map, AS_PROGRAM, 8, m68705_new_device )
+	AM_RANGE(0x000, 0x000) AM_READWRITE(mc68705_portA_r, mc68705_portA_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(mc68705_portB_r, mc68705_portB_w)
+	AM_RANGE(0x002, 0x002) AM_READWRITE(mc68705_portC_r, mc68705_portC_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE(mc68705_ddrA_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE(mc68705_ddrB_w)
+	AM_RANGE(0x006, 0x006) AM_WRITE(mc68705_ddrC_w)
+
+	AM_RANGE(0x010, 0x07f) AM_RAM
+	AM_RANGE(0x080, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+void m68705_new_device::device_start()
+{
+	m68705_device::device_start();
+
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portB_in));
+	save_item(NAME(m_portC_in));
+
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portC_out));
+
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_ddrC));
+
+	m_portA_cb_w.resolve_safe();
+	m_portB_cb_w.resolve_safe();
+	m_portC_cb_w.resolve_safe();
+	
+	m_portA_cb_r.resolve_safe(0xff);
+	m_portB_cb_r.resolve_safe(0xff);
+	m_portC_cb_r.resolve_safe(0xff);
+
+}
 
 /****************************************************************************
  * HD63705 section
@@ -1000,4 +1162,5 @@ void hd63705_device::execute_set_input(int inputnum, int state)
 const device_type M6805 = &device_creator<m6805_device>;
 const device_type M68HC05EG = &device_creator<m68hc05eg_device>;
 const device_type M68705 = &device_creator<m68705_device>;
+const device_type M68705_NEW = &device_creator<m68705_new_device>;
 const device_type HD63705 = &device_creator<hd63705_device>;

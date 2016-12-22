@@ -48,158 +48,107 @@ READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 }
 
 
-/**************************************************************************/
+/***************************************************************************
 
-READ8_MEMBER(slapfght_state::tigerh_68705_portA_r)
+    MCU port handlers (general)
+
+***************************************************************************/
+
+
+READ8_MEMBER(slapfght_state::tigerh_mcu_porta_r)
 {
-	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+	return m_to_mcu_latch;
 }
 
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portA_w)
+WRITE8_MEMBER(slapfght_state::tigerh_mcu_porta_w)
 {
-	m_portA_out = data;
+	m_from_mcu_latch = data;
 }
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrA_w)
-{
-	m_ddrA = data;
-}
-
-READ8_MEMBER(slapfght_state::tigerh_68705_portB_r)
-{
-	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portB_w)
-{
-	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
-	{
-		if (m_main_sent)
-			m_mcu->set_input_line(0, CLEAR_LINE);
-
-		m_portA_in = m_from_main;
-		m_main_sent = false;
-	}
-	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
-	{
-		m_from_mcu = m_portA_out;
-		m_mcu_sent = true;
-	}
-
-	m_portB_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrB_w)
-{
-	m_ddrB = data;
-}
-
-
-READ8_MEMBER(slapfght_state::tigerh_68705_portC_r)
-{
-	m_portC_in = 0;
-
-	if (!m_main_sent)
-		m_portC_in |= 0x01;
-	if (m_mcu_sent)
-		m_portC_in |= 0x02;
-
-	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_portC_w)
-{
-	m_portC_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_68705_ddrC_w)
-{
-	m_ddrC = data;
-}
-
 
 
 /***************************************************************************
 
-    Slap Fight MCU
+    MCU port handlers (Tiger Heli)
 
 ***************************************************************************/
 
-READ8_MEMBER(slapfght_state::slapfight_68705_portA_r)
+WRITE8_MEMBER(slapfght_state::tigerh_mcu_portb_w)
 {
-	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portA_w)
-{
-	m_portA_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrA_w)
-{
-	m_ddrA = data;
-}
-
-READ8_MEMBER(slapfght_state::slapfight_68705_portB_r)
-{
-	return (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portB_w)
-{
-	if ((m_ddrB & 0x02) && (~data & 0x02) && (m_portB_out & 0x02))
+	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
 	{
 		if (m_main_sent)
 			m_mcu->set_input_line(0, CLEAR_LINE);
 
-		m_portA_in = m_from_main;
+		m_to_mcu_latch = m_from_main;
 		m_main_sent = false;
 	}
-	if ((m_ddrB & 0x04) && (data & 0x04) && (~m_portB_out & 0x04))
+	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04))
 	{
-		m_from_mcu = m_portA_out;
+		m_from_mcu = m_from_mcu_latch;
 		m_mcu_sent = true;
 	}
-	if ((m_ddrB & 0x08) && (~data & 0x08) && (m_portB_out & 0x08))
+
+	m_old_portB = data;
+}
+
+READ8_MEMBER(slapfght_state::tigerh_mcu_portc_r)
+{
+	uint8_t ret = 0;
+
+	if (!m_main_sent)
+		ret |= 0x01;
+	if (m_mcu_sent)
+		ret |= 0x02;
+
+	return ret;
+}
+
+/***************************************************************************
+
+    MCU port handlers (Slap Fight)
+
+***************************************************************************/
+
+WRITE8_MEMBER(slapfght_state::slapfght_mcu_portb_w)
+{
+	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
 	{
-		m_scrollx_lo = m_portA_out;
+		if (m_main_sent)
+			m_mcu->set_input_line(0, CLEAR_LINE);
+
+		m_to_mcu_latch = m_from_main;
+		m_main_sent = false;
 	}
-	if ((m_ddrB & 0x10) && (~data & 0x10) && (m_portB_out & 0x10))
+	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04))
 	{
-		m_scrollx_hi = m_portA_out;
+		m_from_mcu = m_from_mcu_latch;
+		m_mcu_sent = true;
+	}
+	if ((mem_mask & 0x08) && (~data & 0x08) && (m_old_portB & 0x08))
+	{
+		m_scrollx_lo = m_from_mcu_latch;
+	}
+	if ((mem_mask & 0x10) && (~data & 0x10) && (m_old_portB & 0x10))
+	{
+		m_scrollx_hi = m_from_mcu_latch;
 	}
 
-	m_portB_out = data;
+	m_old_portB = data;
 }
 
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrB_w)
+READ8_MEMBER(slapfght_state::slapfght_mcu_portc_r)
 {
-	m_ddrB = data;
+	uint8_t ret = 0;
+
+	if (!m_main_sent)
+		ret |= 0x01;
+	if (m_mcu_sent)
+		ret |= 0x02;
+
+	ret ^= 0x3; // inverted logic compared to tigerh
+
+	return ret;
 }
-
-READ8_MEMBER(slapfght_state::slapfight_68705_portC_r)
-{
-	m_portC_in = 0;
-
-	if (m_main_sent)
-		m_portC_in |= 0x01;
-	if (!m_mcu_sent)
-		m_portC_in |= 0x02;
-
-	return (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_68705_portC_w)
-{
-	m_portC_out = data;
-}
-
-WRITE8_MEMBER(slapfght_state::slapfight_68705_ddrC_w)
-{
-	m_ddrC = data;
-}
-
-
 
 /***************************************************************************
 
