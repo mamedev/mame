@@ -481,39 +481,6 @@ ADDRESS_MAP_END
 
 
 
-/***************************************************************************
-
-  MCU Memory Maps
-
-  NOTE: handlers and simulation are in the src/mame/machine folder
-
-***************************************************************************/
-
-static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r, tigerh_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r, tigerh_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tigerh_68705_portC_r, tigerh_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(tigerh_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(tigerh_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(tigerh_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-
 
 /***************************************************************************
 
@@ -770,15 +737,9 @@ void slapfght_state::machine_start()
 	m_main_sent = false;
 	m_from_main = 0;
 	m_from_mcu = 0;
-	m_portA_in = 0;
-	m_portA_out = 0;
-	m_ddrA = 0;
-	m_portB_in = 0;
-	m_portB_out = 0;
-	m_ddrB = 0;
-	m_portC_in = 0;
-	m_portC_out = 0;
-	m_ddrC = 0;
+	m_from_mcu_latch = 0;
+	m_to_mcu_latch = 0;
+	m_old_portB = 0;
 
 	m_getstar_status = 0;
 	m_getstar_sequence_index = 0;
@@ -801,15 +762,10 @@ void slapfght_state::machine_start()
 	save_item(NAME(m_main_sent));
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
-	save_item(NAME(m_portA_in));
-	save_item(NAME(m_portA_out));
-	save_item(NAME(m_ddrA));
-	save_item(NAME(m_portB_in));
-	save_item(NAME(m_portB_out));
-	save_item(NAME(m_ddrB));
-	save_item(NAME(m_portC_in));
-	save_item(NAME(m_portC_out));
-	save_item(NAME(m_ddrC));
+
+	save_item(NAME(m_from_mcu_latch));
+	save_item(NAME(m_to_mcu_latch));
+	save_item(NAME(m_old_portB));
 
 	save_item(NAME(m_getstar_status));
 	save_item(NAME(m_getstar_sequence_index));
@@ -1030,8 +986,13 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
+	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, tigerh_mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, tigerh_mcu_portc_r))
+	
+
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1095,8 +1056,11 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
+	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, slapfght_mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, slapfght_mcu_portc_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 

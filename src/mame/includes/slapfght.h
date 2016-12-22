@@ -65,15 +65,10 @@ public:
 	bool m_main_sent;
 	uint8_t m_from_main;
 	uint8_t m_from_mcu;
-	uint8_t m_portA_in;
-	uint8_t m_portA_out;
-	uint8_t m_ddrA;
-	uint8_t m_portB_in;
-	uint8_t m_portB_out;
-	uint8_t m_ddrB;
-	uint8_t m_portC_in;
-	uint8_t m_portC_out;
-	uint8_t m_ddrC;
+
+	uint8_t m_from_mcu_latch;
+	uint8_t m_to_mcu_latch;
+	uint8_t m_old_portB;
 
 	int m_getstar_status;
 	int m_getstar_sequence_index;
@@ -102,25 +97,16 @@ public:
 	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
 	DECLARE_READ8_MEMBER(tigerh_mcu_r);
 	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-	DECLARE_READ8_MEMBER(tigerh_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrA_w);
-	DECLARE_READ8_MEMBER(tigerh_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrB_w);
-	DECLARE_READ8_MEMBER(tigerh_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(tigerh_68705_ddrC_w);
 
-	DECLARE_READ8_MEMBER(slapfight_68705_portA_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portA_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrA_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portB_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portB_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrB_w);
-	DECLARE_READ8_MEMBER(slapfight_68705_portC_r);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_portC_w);
-	DECLARE_WRITE8_MEMBER(slapfight_68705_ddrC_w);
+	DECLARE_READ8_MEMBER(tigerh_mcu_porta_r);
+	DECLARE_WRITE8_MEMBER(tigerh_mcu_porta_w);
+	
+	DECLARE_WRITE8_MEMBER(tigerh_mcu_portb_w);
+	DECLARE_WRITE8_MEMBER(slapfght_mcu_portb_w);
+
+	DECLARE_READ8_MEMBER(tigerh_mcu_portc_r);
+	DECLARE_READ8_MEMBER(slapfght_mcu_portc_r);
+
 
 	DECLARE_READ8_MEMBER(getstar_mcusim_r);
 	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);

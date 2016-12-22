@@ -17,6 +17,7 @@ class m6805_device;
 extern const device_type M6805;
 extern const device_type M68HC05EG;
 extern const device_type M68705;
+extern const device_type M68705_NEW;
 extern const device_type HD63705;
 
 // ======================> m6805_base_device
@@ -27,6 +28,7 @@ class m6805_base_device : public cpu_device
 public:
 	// construction/destruction
 	m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, const char *shortname, const char *source);
+	m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_constructor internal_map, const char *shortname, const char *source);
 
 protected:
 	// device-level overrides
@@ -328,6 +330,10 @@ public:
 	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: m6805_base_device(mconfig, tag, owner, clock, M68705, "M68705", 12, "m68705", __FILE__) { }
 
+	m68705_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_constructor internal_map, const char *shortname, const char *source)
+		: m6805_base_device(mconfig, tag, owner, clock, type, name, addr_width, internal_map, shortname, source) { }
+
+
 protected:
 	// device-level overrides
 	virtual void device_reset() override;
@@ -335,6 +341,106 @@ protected:
 	virtual void execute_set_input(int inputnum, int state) override;
 
 	virtual void interrupt() override;
+};
+
+// ======================> m68705_new_device
+
+ADDRESS_MAP_EXTERN(m68705_internal_map, 8);
+
+
+#define MCFG_M68705_PORTA_W_CB(_devcb) \
+	m68705_new_device::set_portA_cb_w(*device, DEVCB_##_devcb);
+
+#define MCFG_M68705_PORTB_W_CB(_devcb) \
+	m68705_new_device::set_portB_cb_w(*device, DEVCB_##_devcb);
+
+#define MCFG_M68705_PORTC_W_CB(_devcb) \
+	m68705_new_device::set_portC_cb_w(*device, DEVCB_##_devcb);
+
+#define MCFG_M68705_PORTA_R_CB(_devcb) \
+	m68705_new_device::set_portA_cb_r(*device, DEVCB_##_devcb);
+
+#define MCFG_M68705_PORTB_R_CB(_devcb) \
+	m68705_new_device::set_portB_cb_r(*device, DEVCB_##_devcb);
+
+#define MCFG_M68705_PORTC_R_CB(_devcb) \
+	m68705_new_device::set_portC_cb_r(*device, DEVCB_##_devcb);
+
+
+class m68705_new_device : public m68705_device
+{
+public:
+	// construction/destruction
+	m68705_new_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: m68705_device(mconfig, tag, owner, clock, M68705_NEW, "M68705 (NEW)", 11, ADDRESS_MAP_NAME( m68705_internal_map ), "m68705_new", __FILE__),
+			m_portA_in(0),
+			m_portB_in(0),
+			m_portC_in(0),
+			m_portA_out(0),
+			m_portB_out(0),
+			m_portC_out(0),
+			m_ddrA(0),
+			m_ddrB(0),
+			m_ddrC(0),
+			m_portA_cb_w(*this),
+			m_portB_cb_w(*this),
+			m_portC_cb_w(*this),
+			m_portA_cb_r(*this),
+			m_portB_cb_r(*this),
+			m_portC_cb_r(*this)
+		{ }
+
+	// static configuration helpers
+	template<class _Object> static devcb_base &set_portA_cb_w(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portA_cb_w.set_callback(object); }
+	template<class _Object> static devcb_base &set_portB_cb_w(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portB_cb_w.set_callback(object); }
+	template<class _Object> static devcb_base &set_portC_cb_w(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portC_cb_w.set_callback(object); }
+
+	template<class _Object> static devcb_base &set_portA_cb_r(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portA_cb_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_portB_cb_r(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portB_cb_r.set_callback(object); }
+	template<class _Object> static devcb_base &set_portC_cb_r(device_t &device, _Object object) { return downcast<m68705_new_device &>(device).m_portC_cb_r.set_callback(object); }
+
+	DECLARE_READ8_MEMBER(mc68705_portA_r);
+	DECLARE_READ8_MEMBER(mc68705_portB_r);
+	DECLARE_READ8_MEMBER(mc68705_portC_r);
+
+	DECLARE_WRITE8_MEMBER(mc68705_portA_w);
+	DECLARE_WRITE8_MEMBER(mc68705_portB_w);
+	DECLARE_WRITE8_MEMBER(mc68705_portC_w);
+
+	DECLARE_WRITE8_MEMBER(mc68705_ddrA_w);
+	DECLARE_WRITE8_MEMBER(mc68705_ddrB_w);
+	DECLARE_WRITE8_MEMBER(mc68705_ddrC_w);
+
+protected:
+
+	uint8_t m_portA_in;
+	uint8_t m_portB_in;
+	uint8_t m_portC_in;
+
+	uint8_t m_portA_out;
+	uint8_t m_portB_out;
+	uint8_t m_portC_out;
+
+	uint8_t m_ddrA;
+	uint8_t m_ddrB;
+	uint8_t m_ddrC;
+
+	/* Callbacks */
+	devcb_write8 m_portA_cb_w;
+	devcb_write8 m_portB_cb_w;
+	devcb_write8 m_portC_cb_w;
+
+	devcb_read8 m_portA_cb_r;
+	devcb_read8 m_portB_cb_r;
+	devcb_read8 m_portC_cb_r;
+
+
+	// device-level overrides
+	virtual void device_start() override;
+
+//	virtual void execute_set_input(int inputnum, int state) override;
+
+//	virtual void interrupt() override;
 };
 
 // ======================> hd63705_device
