@@ -1023,10 +1023,10 @@ void k055673_device::device_start()
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	machine().save().save_pointer(NAME(m_ram.get()), 0x800);
-	machine().save().save_item(NAME(m_kx46_regs));
-	machine().save().save_item(NAME(m_kx47_regs));
-	machine().save().save_item(NAME(m_objcha_line));
+	save_pointer(NAME(m_ram.get()), 0x800);
+	save_item(NAME(m_kx46_regs));
+	save_item(NAME(m_kx47_regs));
+	save_item(NAME(m_objcha_line));
 }
 
 //-------------------------------------------------
