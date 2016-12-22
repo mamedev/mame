@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods
 /***************************************************************************
 
-    charconv.c
+    charconv.cpp
 
     Imgtool character set conversion routines.
 
@@ -10,153 +10,83 @@
 
 #include "corestr.h"
 #include "charconv.h"
+#include "unicode.h"
+#include "coretmpl.h"
 
-
-/*-------------------------------------------------
-    utf8_from_latin1 - convert an ISO-8859-1
-    character sequence to an UTF-8 string
--------------------------------------------------*/
-
-static char *utf8_from_latin1(const char *src)
+static const char32_t iso_8859_1_code_page[128] =
 {
-	char *buffer, *bufptr;
+	// 0x80 - 0x8F
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	// 0x90 - 0x9F
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+	// 0xA0 - 0xAF
+	0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,
+	// 0xB0 - 0xBF
+	0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,
+	// 0xC0 - 0xCF
+	0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,
+	// 0xD0 - 0xDF
+	0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,
+	// 0xE0 - 0xEF
+	0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
+	// 0xF0 - 0xFF
+	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
+};
 
-	/* validate input */
-	if (!src)
+imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(iso_8859_1_code_page);
+
+
+//-------------------------------------------------
+//  from_utf8
+//-------------------------------------------------
+
+void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const std::string &src) const
+{
+	const util::contiguous_sequence_wrapper<const char32_t> lookup(m_highpage, 0x80);
+
+	auto iter = src.begin();
+	while(iter != src.end())
 	{
-		return nullptr;
-	}
+		char32_t ch;
+		iter += uchar_from_utf8(&ch, &*iter, src.end() - iter);
 
-	/* allocate space for result, twice the source len to be safe */
-	buffer = (char *) malloc(strlen(src) * 2 + 1);
-
-	/* point to the start */
-	bufptr = buffer;
-
-	do
-	{
-		unsigned char c = *src;
-
-		if (c < 0x80)
+		if (ch <= 0x7F)
 		{
-			*bufptr++ = c;
-		}
-		else if (c < 0xc0)
-		{
-			*bufptr++ = '\xc2';
-			*bufptr++ = c;
+			dest << (char)ch;
 		}
 		else
 		{
-			*bufptr++ = '\xc3';
-			*bufptr++ = c - 0x40;
-		}
-	} while (*src++);
+			auto lookup_iter = std::find(lookup.begin(), lookup.end(), ch);
+			if (lookup_iter == lookup.end())
+				throw charconverter_exception();
 
-	return buffer;
+			dest << (char)(0x80 + (lookup_iter - lookup.begin()));
+		}
+	}
 }
 
 
-/*-------------------------------------------------
-    latin1_from_utf8 - convert an UTF-8
-    character sequence to an ISO-8859-1 string
--------------------------------------------------*/
+//-------------------------------------------------
+//  to_utf8
+//-------------------------------------------------
 
-static char *latin1_from_utf8(const char *src)
+void imgtool::simple_charconverter::to_utf8(std::ostream &dest, const std::string &src) const
 {
-	char *buffer, *bufptr;
-
-	/* validate input */
-	if (!src)
+	for (auto iter = src.begin(); iter != src.end(); iter++)
 	{
-		return nullptr;
-	}
-
-	/* allocate space for result */
-	buffer = (char *) malloc(strlen(src) + 1);
-
-	/* point to the start */
-	bufptr = buffer;
-
-	do
-	{
-		unsigned char c = *src;
-
-		if (c < 0x80)
+		if ((*iter & 0x80) == 0)
 		{
-			*bufptr++ = c;
-		}
-		else if (c == 0xc2)
-		{
-			c = *++src;
-			*bufptr++ = c;
-		}
-		else if (c == 0xc3)
-		{
-			c = *++src;
-			*bufptr++ = c + 0x40;
+			// low page (0x00 - 0x7F) - pass it on
+			dest << *iter;
 		}
 		else
 		{
-			/* conversion failed */
-			*bufptr++ = '\0';
-			break;
+			// high page (0x80 - 0xFF) - we need to do a lookup
+			char32_t ch = m_highpage[((unsigned char)(*iter)) - 0x80];
+			if (ch == 0)
+				throw charconverter_exception();
+
+			dest << utf8_from_uchar(ch);
 		}
-	} while(*src++);
-
-	return buffer;
-}
-
-
-/*-------------------------------------------------
-    utf8_from_native - convert specified character
-    sequence to an UTF-8 string
--------------------------------------------------*/
-
-char *utf8_from_native(imgtool_charset charset, const char *src)
-{
-	char *result;
-
-	switch (charset)
-	{
-		case IMGTOOL_CHARSET_UTF8:
-			result = core_strdup(src);
-			break;
-
-		case IMGTOOL_CHARSET_ISO_8859_1:
-			result = utf8_from_latin1(src);
-			break;
-
-		default:
-			result = nullptr;
-			break;
 	}
-	return result;
-}
-
-
-/*-------------------------------------------------
-    native_from_utf8 - convert an UTF-8 string
-    to specified character set
--------------------------------------------------*/
-
-char *native_from_utf8(imgtool_charset charset, const char *src)
-{
-	char *result;
-
-	switch (charset)
-	{
-		case IMGTOOL_CHARSET_UTF8:
-			result = core_strdup(src);
-			break;
-
-		case IMGTOOL_CHARSET_ISO_8859_1:
-			result = latin1_from_utf8(src);
-			break;
-
-		default:
-			result = nullptr;
-			break;
-	}
-	return result;
 }

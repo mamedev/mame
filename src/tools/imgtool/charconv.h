@@ -9,23 +9,63 @@
 ***************************************************************************/
 
 
-#ifndef __CHARCONV_H__
-#define __CHARCONV_H__
+#ifndef IMGTOOL_CHARCONV_H
+#define IMGTOOL_CHARCONV_H
 
-
-/* Supported character sets */
-enum imgtool_charset
+namespace imgtool
 {
-	IMGTOOL_CHARSET_UTF8,
-	IMGTOOL_CHARSET_ISO_8859_1,
+	// ======================> charconverter
+
+	// abstract base class for character conversions
+	class charconverter
+	{
+	public:
+		virtual void from_utf8(std::ostream &dest, const std::string &src) const = 0;
+		virtual void to_utf8(std::ostream &dest, const std::string &src) const = 0;
+		
+		std::string from_utf8(const std::string &src) const
+		{
+			// inlining so that the return value can potentially be removed by return value optimization
+			std::ostringstream stream;
+			from_utf8(stream, src);
+			return stream.str();
+		}
+
+		std::string to_utf8(const std::string &src) const
+		{
+			// inlining so that the return value can potentially be removed by return value optimization
+			std::ostringstream stream;
+			to_utf8(stream, src);
+			return stream.str();
+		}
+
+	};
+
+	// ======================> simple_charconverter
+
+	// a simple implementation of charconverter that simply defines a code page for 0x80-0xFF
+	class simple_charconverter : public charconverter
+	{
+	public:
+		constexpr simple_charconverter(const char32_t highpage[0x80])
+			: m_highpage(highpage)
+		{
+		}
+
+		virtual void from_utf8(std::ostream &dest, const std::string &src) const override;
+		virtual void to_utf8(std::ostream &dest, const std::string &src) const override;
+
+	private:
+		const char32_t *m_highpage;
+	};
+
+	// exception that can be thrown from charconverter::from_utf8() if a character is illegal (charconverter::to_utf8() should never throw this)
+	class charconverter_exception
+	{
+	};
+
+	extern simple_charconverter charconverter_iso_8859_1;
 };
 
 
-/* Convert specified charset to UTF-8 */
-char *utf8_from_native(imgtool_charset charset, const char *src);
-
-/* Convert UTF-8 string to specified charset */
-char *native_from_utf8(imgtool_charset charset, const char *src);
-
-
-#endif /* __CHARCONV_H__ */
+#endif // IMGTOOL_CHARCONV_H

@@ -113,13 +113,11 @@ static void internal_error(const imgtool_module *module, const char *message)
 
 char *imgtool::partition::normalize_filename(const char *src)
 {
-	imgtool_charset charset;
+	// get charconverter from module
+	imgtool::charconverter *charconverter = (imgtool::charconverter *) get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
 
-	// get charset from module
-	charset = (imgtool_charset) (int) get_info_int(IMGTOOLINFO_INT_CHARSET);
-
-	// and dupe it
-	return native_from_utf8(charset, src);
+	// and convert
+	return core_strdup(charconverter ? charconverter->from_utf8(src).c_str() : src);
 }
 
 
@@ -1919,8 +1917,7 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 {
 	imgtoolerr_t err;
 	imgtool::stream::ptr f;
-	imgtool_charset charset;
-	char *alloc_newfname = nullptr;
+	std::string alloc_newfname;
 	std::string basename;
 
 	if (!newfname)
@@ -1929,18 +1926,19 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 		newfname = basename.c_str();
 	}
 
-	charset = (imgtool_charset) (int) get_info_int(IMGTOOLINFO_INT_CHARSET);
-	if (charset != IMGTOOL_CHARSET_UTF8)
+	imgtool::charconverter *charconverter = (imgtool::charconverter *) get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
+	if (charconverter)
 	{
-		/* convert to native format */
-		alloc_newfname = native_from_utf8(charset, newfname);
-		if (alloc_newfname == nullptr)
+		// convert to native format
+		try
 		{
-			err = (imgtoolerr_t)(IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_NATIVEFILE);
-			goto done;
+			alloc_newfname = charconverter->from_utf8(newfname);
 		}
-
-		newfname = alloc_newfname;
+		catch (charconverter_exception)
+		{
+			return (imgtoolerr_t)(IMGTOOLERR_BADFILENAME | IMGTOOLERR_SRC_NATIVEFILE);
+		}
+		newfname = alloc_newfname.c_str();
 	}
 
 	f = imgtool::stream::open(source, OSD_FOPEN_READ);
@@ -1949,10 +1947,6 @@ imgtoolerr_t imgtool::partition::put_file(const char *newfname, const char *fork
 	else
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_NATIVEFILE);
 
-done:
-	/* clean up */
-	if (alloc_newfname != nullptr)
-		free(alloc_newfname);
 	return err;
 }
 
@@ -2484,17 +2478,19 @@ imgtoolerr_t imgtool::directory::get_next(imgtool_dirent &ent)
 	if (err)
 		return markerrorsource(err);
 
-	int charset = m_partition.get_info_int(IMGTOOLINFO_INT_CHARSET);
-
-	if (charset)
+	imgtool::charconverter *charconverter = (imgtool::charconverter *) m_partition.get_info_ptr(IMGTOOLINFO_PTR_CHARCONVERTER);
+	if (charconverter)
 	{
-		char *new_fname = utf8_from_native((imgtool_charset)charset, ent.filename);
-
-		if (!new_fname)
-			return IMGTOOLERR_BADFILENAME;
-
-		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname);
-		free(new_fname);
+		std::string new_fname;
+		try
+		{
+			new_fname = charconverter->to_utf8(ent.filename);
+		}
+		catch (charconverter_exception)
+		{
+			return (imgtoolerr_t)(IMGTOOLERR_BADFILENAME);
+		}
+		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", new_fname.c_str());
 	}
 
 	// don't trust the module!
