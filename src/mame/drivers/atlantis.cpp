@@ -38,6 +38,8 @@
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
 #include "machine/ins8250.h"
+#include "bus/rs232/rs232.h"
+#include "machine/terminal.h"
 #include "audio/dcs.h"
 #include "machine/pci.h"
 #include "machine/vrc4373.h"
@@ -64,8 +66,8 @@
 #define GALILEO_IRQ_SHIFT   1
 #define ZEUS_IRQ_SHIFT      2
 #define PARALLEL_IRQ_SHIFT  3
-#define UART0_SHIFT         4
-#define UART1_SHIFT         5
+#define UART1_SHIFT         4
+#define UART2_SHIFT         5
 #define VBLANK_IRQ_SHIFT    7
 
 /* static interrupts */
@@ -73,6 +75,7 @@
 #define VBLANK_IRQ_NUM          MIPS3_IRQ3
 #define IDE_IRQ_NUM             MIPS3_IRQ4
 
+#define DEBUG_CONSOLE   (0)
 #define LOG_RTC         (0)
 #define LOG_PORT        (0)
 #define LOG_IRQ         (0)
@@ -90,6 +93,7 @@ public:
 		m_ioasic(*this, "ioasic"),
 		m_uart0(*this, "uart0"),
 		m_uart1(*this, "uart1"),
+		m_uart2(*this, "uart2"),
 		m_rtc(*this, "rtc")
 	{ }
 	DECLARE_DRIVER_INIT(mwskins);
@@ -102,8 +106,9 @@ public:
 	required_device<zeus2_device> m_zeus;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
-	required_device<ns16550_device> m_uart0;
+	optional_device<generic_terminal_device> m_uart0;
 	required_device<ns16550_device> m_uart1;
+	required_device<ns16550_device> m_uart2;
 	required_device<nvram_device> m_rtc;
 	uint8_t m_rtc_data[0x8000];
 
@@ -142,8 +147,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ide_irq);
 	DECLARE_WRITE_LINE_MEMBER(ioasic_irq);
 
-	DECLARE_WRITE_LINE_MEMBER(uart0_irq_callback);
 	DECLARE_WRITE_LINE_MEMBER(uart1_irq_callback);
+	DECLARE_WRITE_LINE_MEMBER(uart2_irq_callback);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(port_mod_r);
 	DECLARE_READ32_MEMBER(port_ctrl_r);
@@ -186,7 +191,7 @@ READ32_MEMBER(atlantis_state::board_ctrl_r)
 	switch (newOffset) {
 	case CTRL_STATUS:
 		if (1 && m_screen->vblank())
-			data |= 0x80;
+			data |= 1 << VBLANK_IRQ_SHIFT;
 		if (m_last_offset != (newOffset | 0x40000))
 			if (LOG_IRQ)
 				logerror("%s:board_ctrl_r read from CTRL_STATUS offset %04X = %08X & %08X bus offset = %08X\n", machine().describe_context(), newOffset, data, mem_mask, offset);
@@ -414,24 +419,6 @@ READ32_MEMBER(atlantis_state::user_io_input)
 }
 
 /*************************************
-*  UART0 interrupt handler
-*************************************/
-WRITE_LINE_MEMBER(atlantis_state::uart0_irq_callback)
-{
-	uint32_t status_bit = (1 << UART0_SHIFT);
-	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
-		board_ctrl[CTRL_STATUS] |= status_bit;
-		update_asic_irq();
-	}
-	else if (!state && (board_ctrl[CTRL_STATUS] & status_bit)) {
-		board_ctrl[CTRL_STATUS] &= ~status_bit;
-		board_ctrl[CTRL_CAUSE] &= ~status_bit;
-		update_asic_irq();
-	}
-	logerror("atlantis_state::uart0_irq_callback state = %1x\n", state);
-}
-
-/*************************************
 *  UART1 interrupt handler
 *************************************/
 WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
@@ -447,6 +434,24 @@ WRITE_LINE_MEMBER(atlantis_state::uart1_irq_callback)
 		update_asic_irq();
 	}
 	logerror("atlantis_state::uart1_irq_callback state = %1x\n", state);
+}
+
+/*************************************
+*  UART2 interrupt handler
+*************************************/
+WRITE_LINE_MEMBER(atlantis_state::uart2_irq_callback)
+{
+	uint32_t status_bit = (1 << UART2_SHIFT);
+	if (state && !(board_ctrl[CTRL_STATUS] & status_bit)) {
+		board_ctrl[CTRL_STATUS] |= status_bit;
+		update_asic_irq();
+	}
+	else if (!state && (board_ctrl[CTRL_STATUS] & status_bit)) {
+		board_ctrl[CTRL_STATUS] &= ~status_bit;
+		board_ctrl[CTRL_CAUSE] &= ~status_bit;
+		update_asic_irq();
+	}
+	logerror("atlantis_state::uart2_irq_callback state = %1x\n", state);
 }
 
 /*************************************
@@ -639,8 +644,8 @@ void atlantis_state::machine_reset()
  *************************************/
 static ADDRESS_MAP_START( map0, AS_PROGRAM, 32, atlantis_state )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE8(cmos_r, cmos_w, 0xff)
-	AM_RANGE(0x00100000, 0x0010001f) AM_DEVREADWRITE8("uart0", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART0 (TL16C552 CS0)
-	AM_RANGE(0x00180000, 0x0018001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS1)
+	AM_RANGE(0x00100000, 0x0010001f) AM_DEVREADWRITE8("uart1", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART1 (TL16C552 CS0)
+	AM_RANGE(0x00180000, 0x0018001f) AM_DEVREADWRITE8("uart2", ns16550_device, ins8250_r, ins8250_w, 0xff) // Serial UART2 (TL16C552 CS1)
 	//AM_RANGE(0x00200000, 0x0020001f) // Parallel UART (TL16C552 CS2)
 	AM_RANGE(0x00400000, 0x004000bf) AM_READWRITE8(blue_r, blue_w, 0xff)
 	AM_RANGE(0x00880000, 0x00c80003) AM_READWRITE(board_ctrl_r, board_ctrl_w)
@@ -799,6 +804,15 @@ static INPUT_PORTS_START( mwskins )
 
 INPUT_PORTS_END
 
+static DEVICE_INPUT_DEFAULTS_START(mwskins_comm)
+	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_14400)
+	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_14400)
+	DEVICE_INPUT_DEFAULTS("RS232_STARTBITS", 0xff, RS232_STARTBITS_1)
+	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
+	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
+	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_1)
+DEVICE_INPUT_DEFAULTS_END
+
 /*************************************
  *
  *  Machine driver
@@ -843,8 +857,8 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	/* sound hardware */
 	//MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DSIO, 0)
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_DENVER, 0)
-	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
+	MCFG_DCS2_AUDIO_DRAM_IN_MB(8)
+	//MCFG_DCS2_AUDIO_POLLING_OFFSET(0) /* no place to hook :-( */
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_STANDARD)
@@ -852,15 +866,40 @@ static MACHINE_CONFIG_START( mwskins, atlantis_state )
 	MCFG_MIDWAY_IOASIC_UPPER(325)
 	MCFG_MIDWAY_IOASIC_IRQ_CALLBACK(WRITELINE(atlantis_state, ioasic_irq))
 	MCFG_MIDWAY_IOASIC_AUTO_ACK(1)
+	if DEBUG_CONSOLE {
+		MCFG_MIDWAY_IOASIC_OUT_TX_CB(DEVWRITE8("uart0", generic_terminal_device, write))
+		MCFG_DEVICE_ADD("uart0", GENERIC_TERMINAL, 0)
+		MCFG_GENERIC_TERMINAL_KEYBOARD_CB(DEVWRITE8("ioasic", midway_ioasic_device, serial_rx_w))
+	}
 
 	// TL16C552 UART
-	MCFG_DEVICE_ADD("uart0", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart0_irq_callback))
 	MCFG_DEVICE_ADD("uart1", NS16550, XTAL_24MHz)
-	MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart1_irq_callback))
+	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com1", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com1", rs232_port_device, write_dtr))
+	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com1", rs232_port_device, write_rts))
+	//MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart1_irq_callback))
 
+	MCFG_DEVICE_ADD("uart2", NS16550, XTAL_24MHz)
+	//MCFG_INS8250_OUT_TX_CB(DEVWRITELINE("com2", rs232_port_device, write_txd))
+	//MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE("com2", rs232_port_device, write_dtr))
+	//MCFG_INS8250_OUT_RTS_CB(DEVWRITELINE("com2", rs232_port_device, write_rts))
+	//MCFG_INS8250_OUT_INT_CB(DEVWRITELINE(":", atlantis_state, uart2_irq_callback))
+
+	//MCFG_RS232_PORT_ADD("com1", default_rs232_devices, nullptr)
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, rx_w))
+	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, dcd_w))
+	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, dsr_w))
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart1", ins8250_uart_device, cts_w))
+	//MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("com1", mwskins_comm)
+
+	//MCFG_RS232_PORT_ADD("com2", default_rs232_devices, nullptr)
+	//MCFG_RS232_RXD_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, rx_w))
+	//MCFG_RS232_DCD_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, dcd_w))
+	//MCFG_RS232_DSR_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, dsr_w))
+	//MCFG_RS232_RI_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, ri_w))
+	//MCFG_RS232_CTS_HANDLER(DEVWRITELINE("uart2", ins8250_uart_device, cts_w))
 MACHINE_CONFIG_END
-
 
 
 /*************************************

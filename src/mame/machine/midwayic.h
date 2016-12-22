@@ -125,6 +125,7 @@ public:
 	static void static_set_shuffle_default(device_t &device, uint8_t shuffle) { downcast<midway_ioasic_device &>(device).m_shuffle_default = shuffle; }
 	static void static_set_auto_ack(device_t &device, uint8_t auto_ack) { downcast<midway_ioasic_device &>(device).m_auto_ack = auto_ack; }
 	template<class _Object> static devcb_base &set_irqhandler_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_irq_callback.set_callback(object); }
+	template<class _Object> static devcb_base &set_serial_tx_callback(device_t &device, _Object object) { return downcast<midway_ioasic_device &>(device).m_serial_tx_cb.set_callback(object); }
 
 	void set_shuffle_state(int state);
 	void fifo_w(uint16_t data);
@@ -145,6 +146,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(cage_irq_handler);
 
+	DECLARE_WRITE8_MEMBER(serial_rx_w);
+
 	void ioasic_reset();
 
 protected:
@@ -155,6 +158,7 @@ private:
 	void ioasic_register_state();
 	void update_ioasic_irq();
 
+	devcb_write8    m_serial_tx_cb;
 
 	uint32_t  m_reg[16];
 	uint8_t   m_has_dcs;
@@ -199,6 +203,9 @@ extern const device_type MIDWAY_IOASIC;
 
 #define MCFG_MIDWAY_IOASIC_AUTO_ACK(_ack) \
 	midway_ioasic_device::static_set_auto_ack(*device, _ack);
+
+#define MCFG_MIDWAY_IOASIC_OUT_TX_CB(_devcb) \
+	devcb = &midway_ioasic_device::set_serial_tx_callback(*device, DEVCB_##_devcb);
 
 
 enum

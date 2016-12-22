@@ -593,6 +593,7 @@ const device_type MIDWAY_IOASIC = &device_creator<midway_ioasic_device>;
 
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
+	m_serial_tx_cb(*this),
 	m_has_dcs(0),
 	m_has_cage(0),
 	m_dcs_cpu(nullptr),
@@ -657,6 +658,7 @@ void midway_ioasic_device::device_start()
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
+	m_serial_tx_cb.resolve_safe();
 
 	/* initialize the PIC */
 	midway_serial_pic2_device::device_start();
@@ -1028,6 +1030,12 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 		write(space, offset*2+1, data >> 16, 0x0000ffff);
 }
 
+WRITE8_MEMBER(midway_ioasic_device::serial_rx_w)
+{
+	m_reg[IOASIC_UARTIN] = data | 0x1000;
+	update_ioasic_irq();
+
+}
 
 WRITE32_MEMBER( midway_ioasic_device::write )
 {
@@ -1068,8 +1076,13 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
 				update_ioasic_irq();
 			}
-			else if (PRINTF_DEBUG)
-				osd_printf_debug("%c", data & 0xff);
+			else {
+				m_serial_tx_cb(data & 0xff);
+				if (PRINTF_DEBUG) {
+					osd_printf_info("%c", data & 0xff);
+					logerror("%c", data & 0xff);
+				}
+			}
 			break;
 
 		case IOASIC_SOUNDCTL:
