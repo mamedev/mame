@@ -13345,7 +13345,7 @@ pc                              // 1987 PC with CGA
 pcega                           // 1987 PC with EGA
 pcherc                          // 1987 PC with Hercules (for testing hercules)
 pcmda                           // 1987 PC with MDA
-xtvga                           // 198? PC-XT (VGA, MF2 Keyboard)
+pcvga                           // 198? PC-XT (VGA, MF2 Keyboard)
 
 @source:ggconnie.cpp
 ggconnie                        // (c) ???? Capcom

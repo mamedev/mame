@@ -112,13 +112,13 @@ static MACHINE_CONFIG_DERIVED( pcega, pccga )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_DERIVED( xtvga, pcega )
+static MACHINE_CONFIG_DERIVED( pcvga, pcega )
 	MCFG_DEVICE_MODIFY("isa1")
 	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "svga_et4k", false)
 MACHINE_CONFIG_END
 
 
-ROM_START( pcmda )
+ROM_START( pc )
 	ROM_REGION(0x10000,"bios", 0)
 	ROM_SYSTEM_BIOS(0, "anon", "XT Anonymous Generic Turbo BIOS")
 	ROMX_LOAD("pcxt.rom",    0xe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f),ROM_BIOS(1))
@@ -140,36 +140,13 @@ ROM_START( pcmda )
 	ROMX_LOAD( "turbo3.10.bin", 0xe000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(9))
 ROM_END
 
-#define rom_pcherc    rom_pcmda
+#define rom_pcmda    rom_pc
 
-#define rom_pcega    rom_pcmda
+#define rom_pcherc   rom_pc
 
-ROM_START( pc )
-	ROM_REGION(0x10000,"bios", 0)
-	ROM_SYSTEM_BIOS(0, "anon", "XT Anonymous Generic Turbo BIOS")
-	ROMX_LOAD("pcxt.rom",    0xe000, 0x02000, CRC(031aafad) SHA1(a641b505bbac97b8775f91fe9b83d9afdf4d038f),ROM_BIOS(1))
-	ROM_SYSTEM_BIOS(1, "anon2007", "XT Anonymous Generic Turbo BIOS 2007")
-	ROMX_LOAD( "pcxt2007.bin", 0xe000, 0x2000, CRC(1d7bd86c) SHA1(33a500f599b4dad2fe6d7a5c3e89b13bd5dd2987),ROM_BIOS(2))
-	ROM_SYSTEM_BIOS(2, "ami", "XT AMI")
-	ROMX_LOAD( "ami.bin", 0xe000, 0x2000, CRC(b381eb22) SHA1(9735193de119270c946a17ed58c3ab9554e0852e),ROM_BIOS(3))
-	ROM_SYSTEM_BIOS(3, "award", "XT Award 2.05")
-	ROMX_LOAD( "award2.05.bin", 0xe000, 0x2000, CRC(5b3953e5) SHA1(4a36171aa8d993008187f39f732b9296401b7b6c),ROM_BIOS(4))
-	ROM_SYSTEM_BIOS(4, "dtk", "XT DTK Erso bios 2.42")
-	ROMX_LOAD( "dtk2.42.bin", 0xe000, 0x2000, CRC(3f2d2a76) SHA1(02fa057f2c22ab199a8d9795ab1ae570f2b13a36),ROM_BIOS(5))
-	ROM_SYSTEM_BIOS(5, "peter", "XT Peter Kohlman 3.75")
-	ROMX_LOAD( "peterv203.75.bin", 0xe000, 0x2000, CRC(b053a6a4) SHA1(f53218ad3d725f12d9149b22d8afcf6a8869a3bd),ROM_BIOS(6))
-	ROM_SYSTEM_BIOS(6, "pho227", "XT Phoenix Bios 2.27")
-	ROMX_LOAD( "phoenix2.27.bin", 0xe000, 0x2000, CRC(168ffef0) SHA1(69465db2f9246a614044d1f433d374506a13a07f),ROM_BIOS(7))
-	ROM_SYSTEM_BIOS(7, "pho251", "XT Phoenix Bios 2.51")
-	ROMX_LOAD( "phoenix2.51.bin", 0xe000, 0x2000, CRC(9b7e9c40) SHA1(c948a8d3d715e469105c6e2acd8b46ec274b25a8),ROM_BIOS(8))
-	ROM_SYSTEM_BIOS(8, "turbo", "XT Turbo Bios 3.10")
-	ROMX_LOAD( "turbo3.10.bin", 0xe000, 0x2000, CRC(8aaca1e3) SHA1(9c03da16713e08c0112a04c8bdfa394e7341c1fc),ROM_BIOS(9))
-	/* IBM 1501981(CGA) and 1501985(MDA) Character rom */
-	ROM_REGION(0x2000,"gfx1", 0)
-	ROM_LOAD("5788005.u33", 0x00000, 0x2000, CRC(0bf56d70) SHA1(c2a8b10808bf51a3c123ba3eb1e9dd608231916f)) /* "AMI 8412PI // 5788005 // (C) IBM CORP. 1981 // KOREA" */
-ROM_END
+#define rom_pcega    rom_pc
 
-#define rom_xtvga    rom_pcmda
+#define rom_pcvga    rom_pc
 
 /***************************************************************************
 
@@ -182,4 +159,4 @@ COMP(  1987,    pc,         ibm5150,    0,      pccga,      0,     driver_device
 COMP(  1987,    pcega,      ibm5150,    0,      pcega,      0,     driver_device,       0,          "<generic>",  "PC (EGA)" , 0)
 COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      0,     driver_device,       0,          "<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     0,     driver_device,       0,          "<generic>",  "PC (Hercules)" , 0)
-COMP ( 1987,    xtvga,      ibm5150,    0,      xtvga,      0,     driver_device,       0,          "<generic>",  "PC (VGA)" , MACHINE_NOT_WORKING)
+COMP ( 1987,    pcvga,      ibm5150,    0,      pcvga,      0,     driver_device,       0,          "<generic>",  "PC (VGA)" , MACHINE_NOT_WORKING)
