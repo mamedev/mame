@@ -567,6 +567,8 @@ MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["Z80DART"] = true
+--MACHINES["Z80SIO"] = true
+MACHINES["Z80SCC"] = true
 MACHINES["Z80DMA"] = true
 MACHINES["Z80PIO"] = true
 MACHINES["Z80STI"] = true
@@ -1094,8 +1096,6 @@ files {
 	MAME_DIR .. "src/mame/machine/nl_pongd.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
-	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
-	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 	MAME_DIR .. "src/mame/drivers/poolshrk.cpp",
 	MAME_DIR .. "src/mame/includes/poolshrk.h",
 	MAME_DIR .. "src/mame/audio/poolshrk.cpp",

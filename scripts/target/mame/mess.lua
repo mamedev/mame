@@ -3342,6 +3342,8 @@ files {
 	MAME_DIR .. "src/mame/drivers/mx2178.cpp",
 	MAME_DIR .. "src/mame/drivers/mycom.cpp",
 	MAME_DIR .. "src/mame/drivers/myvision.cpp",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 	MAME_DIR .. "src/mame/drivers/notetaker.cpp",
 	MAME_DIR .. "src/mame/drivers/ngen.cpp",
 	MAME_DIR .. "src/mame/machine/ngen_kb.cpp",
