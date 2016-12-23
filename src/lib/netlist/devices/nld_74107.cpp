@@ -64,75 +64,15 @@ namespace netlist
 
 	};
 
-	NETLIB_OBJECT(74107)
+	NETLIB_OBJECT_DERIVED(74107, 74107A)
 	{
-		NETLIB_CONSTRUCTOR(74107)
-		, m_CLK(*this, "CLK")
-		, m_J(*this, "J")
-		, m_K(*this, "K")
-		, m_CLRQ(*this, "CLRQ")
-        , m_last_CLK(*this, "m_last_CLK", 0)
-        , m_q(*this, "m_q", 0)
-        , m_latched_JK(*this, "m_latched_JK", 0)
-		, m_Q(*this, "Q")
-		, m_QQ(*this, "QQ")
-		{
-		}
-
-        NETLIB_RESETI();
-		NETLIB_UPDATEI();
-
 	public:
-		logic_input_t m_CLK;
-		logic_input_t m_J;
-		logic_input_t m_K;
-		logic_input_t m_CLRQ;
-
-        state_var<unsigned> m_last_CLK;
-        state_var<unsigned> m_q;
-        state_var<unsigned> m_latched_JK;
-
-        logic_output_t m_Q;
-		logic_output_t m_QQ;
+		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A) { }
 	};
-
-    NETLIB_RESET(74107)
-    {
-        m_last_CLK = 0;
-        m_latched_JK = 0;
-    }
 
 	NETLIB_OBJECT(74107_dip)
 	{
 		NETLIB_CONSTRUCTOR(74107_dip)
-		, m_1(*this, "1")
-		, m_2(*this, "2")
-		{
-			register_subalias("1", m_1.m_CLK);
-			register_subalias("2", m_1.m_CLRQ);
-			register_subalias("3", m_1.m_K);
-			//register_subalias("4", ); ==> VCC
-			register_subalias("5", m_2.m_CLK);
-			register_subalias("6", m_2.m_CLRQ);
-			register_subalias("7", m_2.m_J);
-
-			register_subalias("8", m_2.m_QQ);
-			register_subalias("9", m_2.m_Q);
-			register_subalias("10", m_2.m_K);
-			//register_subalias("11", ); ==> VCC
-			register_subalias("12", m_2.m_Q);
-			register_subalias("13", m_1.m_QQ);
-			register_subalias("14", m_1.m_J);
-		}
-
-	private:
-		NETLIB_SUB(74107) m_1;
-		NETLIB_SUB(74107) m_2;
-	};
-
-	NETLIB_OBJECT(74107A_dip)
-	{
-		NETLIB_CONSTRUCTOR(74107A_dip)
 		, m_1(*this, "1")
 		, m_2(*this, "2")
 		{
@@ -161,8 +101,8 @@ namespace netlist
 		//NETLIB_UPDATEI();
 
 	private:
-		NETLIB_SUB(74107A) m_1;
-		NETLIB_SUB(74107A) m_2;
+		NETLIB_SUB(74107) m_1;
+		NETLIB_SUB(74107) m_2;
 	};
 
 	NETLIB_RESET(74107Asub)
@@ -232,44 +172,9 @@ namespace netlist
 			m_sub.m_clk.activate_hl();
 	}
 
-    NETLIB_UPDATE(74107)
-	{
-		if (m_CLRQ())
-		{
-			if (m_CLK() && !m_last_CLK)
-			{
-				m_latched_JK = (m_J() << 1) | m_K();
-			}
-            else if (!m_CLK() && m_last_CLK)
-            {
-			    switch (m_latched_JK)
-			    {
-				    case 1:             // (!m_J) & m_K))
-                        m_q = 0;
-					    break;
-				    case 2:             // (m_J) & !m_K))
-                        m_q = 1;
-					    break;
-				    case 3:             // (m_J) & m_K))
-                        m_q ^= 1;
-					    break;
-				    default:
-				    case 0:
-					    break;
-			    }
-            }
-		}
-
-        m_last_CLK = m_CLK();
-
-		m_Q.push(m_q, NLTIME_FROM_NS(20)); // FIXME: timing
-		m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing
-	}
-
 	NETLIB_DEVICE_IMPL(74107)
 	NETLIB_DEVICE_IMPL(74107A)
 	NETLIB_DEVICE_IMPL(74107_dip)
-	NETLIB_DEVICE_IMPL(74107A_dip)
 
 	} //namespace devices
 } // namespace netlist
