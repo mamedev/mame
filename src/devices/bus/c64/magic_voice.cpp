@@ -49,7 +49,7 @@ http://www.stefan-uhlmann.de/cbm/MVM/index.html
 
 #define T6721A_TAG      "u5"
 #define MOS6525_TAG     "u2"
-#define CMOS40105_TAG   "u1"
+#define CD40105_TAG     "u1"
 
 #define A12 BIT(offset, 12)
 #define A13 BIT(offset, 13)
@@ -226,7 +226,9 @@ static MACHINE_CONFIG_FRAGMENT( c64_magic_voice )
 	MCFG_TPI6525_OUT_PB_CB(WRITE8(c64_magic_voice_cartridge_device, tpi_pb_w))
 	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_ca_w))
 	MCFG_TPI6525_OUT_CA_CB(WRITELINE(c64_magic_voice_cartridge_device, tpi_cb_w))
-	MCFG_40105_ADD(CMOS40105_TAG, DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w), NOOP)
+
+	MCFG_DEVICE_ADD(CD40105_TAG, CD40105, 0)
+	MCFG_40105_DATA_IN_READY_CB(DEVWRITELINE(MOS6525_TAG, tpi6525_device, i3_w))
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD(T6721A_TAG, T6721A, XTAL_640kHz)
@@ -265,7 +267,7 @@ c64_magic_voice_cartridge_device::c64_magic_voice_cartridge_device(const machine
 	device_c64_expansion_card_interface(mconfig, *this),
 	m_vslsi(*this, T6721A_TAG),
 	m_tpi(*this, MOS6525_TAG),
-	m_fifo(*this, CMOS40105_TAG),
+	m_fifo(*this, CD40105_TAG),
 	m_exp(*this, C64_EXPANSION_SLOT_TAG), m_ca(0),
 	m_tpi_pb(0x60),
 	m_tpi_pc6(1),

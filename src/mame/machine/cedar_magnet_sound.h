@@ -9,6 +9,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
+#include "machine/40105.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "machine/cedar_magnet_board.h"
@@ -27,12 +28,13 @@ public:
 
 	required_device<z80ctc_device> m_ctc0;
 	required_device<z80ctc_device> m_ctc1;
+	required_device<cmos_40105_device> m_fifo;
+	required_device<msm5205_device> m_adpcm;
 
 	DECLARE_READ8_MEMBER(soundlatch_r);
-	DECLARE_WRITE8_MEMBER(adpcm_latch_w);
+	DECLARE_WRITE8_MEMBER(adpcm_fifo_w);
+	DECLARE_WRITE8_MEMBER(ay0_porta_w);
 	DECLARE_WRITE8_MEMBER(ay1_porta_w);
-
-	uint8_t m_adpcm_data;
 
 	void write_command(uint8_t data);
 	uint8_t m_command;
@@ -43,8 +45,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z0_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z1_w);
 	DECLARE_WRITE_LINE_MEMBER(ctc0_z2_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc0_int_w);
-	DECLARE_WRITE_LINE_MEMBER(ctc1_int_w);
+	DECLARE_WRITE_LINE_MEMBER(fifo_dor_w);
 
 	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
