@@ -2603,6 +2603,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="jingdisk">
+		<description>Jingle Disk</description>
+		<year>1986</year>
+		<publisher>ThoughtWare</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "184320">
+				<rom name="Disk01.img" size="184320" crc="55dd837c" sha1="fab48e2f3153d8529406e1c0e0428dd32e069618" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="visicalc">
 		<description>VisiCalc</description>
 		<year>1982</year>
@@ -2979,6 +2990,90 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 			<feature name="part_id" value="Skrivare 2" />
 			<dataarea name="flop" size = "368640">
 				<rom name="Skrivare 2.img" size="368640" crc="cc1b0806" sha1="3f0626794d6607bb3572e749849e8825c3ab50c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msword5">
+		<description>Word 5.0</description>
+		<year>1989</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Program 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk01 - Program 1.img" size="368640" crc="5634fb79" sha1="4c6c734710940c08a6464bb82afb067a9d632ae7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Program 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk02 - Program 2.img" size="368640" crc="721e91c5" sha1="c940aa0c841f5569ca9947ced77bd3149eea2533" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities-Printer" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk03 - Utilities-Printer.img" size="368640" crc="869653fe" sha1="6a6470ca0e55c2983e9ef7f5fd815f00a2fd7ca7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk04 - Utilities 1.img" size="368640" crc="64b00c49" sha1="d95a01cbd4c699a832d4e444ce5fd79c32ea680c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk05 - Utilities 2.img" size="368640" crc="187d951f" sha1="dfc03a031cd177d1d9cdb74f0431367f85eabfd2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Utilities 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk06 - Utilities 3.img" size="368640" crc="3f1fae7b" sha1="6a07b95892008edcef67f879c8defd0f8979b8c1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Spell" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk07 - Spell.img" size="368640" crc="53d0d240" sha1="e9a0d259e8326f8d17700c9e9067d8e9e6f16b09" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Thesaurus" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk08 - Thesaurus.img" size="368640" crc="44c0450b" sha1="1981e687df571c8fa9ddbd9951325fa54c0cecf7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_5_25">
+			<feature name="part_id" value="Printers 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk09 - Printers 1.img" size="368640" crc="1a035e60" sha1="0613f2ebaf5cfa77400ddd90e8cc1b0c3aa0c6a8" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_5_25">
+			<feature name="part_id" value="Printers 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk10 - Printers 2.img" size="368640" crc="65b305c4" sha1="261df5f3d5ec7c471e8c4a88d2d6c9574811d4cc" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop11" interface="floppy_5_25">
+			<feature name="part_id" value="Learning Word 1" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk11 - Learning Word 1.img" size="368640" crc="8dcda759" sha1="5e65899af8c481481b46b8505c2a0b96464ca9fb" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop12" interface="floppy_5_25">
+			<feature name="part_id" value="Learning Word 2" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk12 - Learning Word 2.img" size="368640" crc="1df31b12" sha1="a1a3bb8bfeff3d0fde2724c6610c88f27f7056f9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop13" interface="floppy_5_25">
+			<feature name="part_id" value="Learning Word 3" />
+			<dataarea name="flop" size = "368640">
+				<rom name="disk13 - Learning Word 3.img" size="368640" crc="6a4c88ed" sha1="84a03417c60d56c665abbd96847f23eef1933b44" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3612,6 +3707,17 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="688atsub">
+		<description>688 Attack Sub</description>
+		<year>1989</year>
+		<publisher>Electronic Arts</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="688 Attack Sub [1989] [Electronic Arts] [3.5] [1 of 1].img" size="737280" crc="a6ab2fdd" sha1="b36511db1302202ee1056bbabafe78cfdbfb7c29" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="academy" supported="no">
 		<description>Academy - Tau Ceti 2</description>
 		<year>1987</year>
@@ -3803,6 +3909,50 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
+	<software name="caveugh">
+		<description>Caveman Ugh-Lympics</description>
+		<year>1988</year>
+		<publisher>Electronic Arts, Inc.</publisher>
+		<info name="developer" value="Dynamix, Inc." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Caveman Ugh-Lympics [1988] [5.25] [1 of 4].img" size="368640" crc="e2b6a566" sha1="92be8b5883718a2df46eee48f30b8db1088ab39c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Caveman Ugh-Lympics [1988] [5.25] [2 of 4].img" size="368640" crc="d83db289" sha1="fb7e5838b8fbbc504e79093c57b4fb9533dc0baf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Caveman Ugh-Lympics [1988] [5.25] [3 of 4].img" size="368640" crc="e5164e7f" sha1="b42ddf8089fa2a2eb1f0a2a7103a54a7c528a790" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Caveman Ugh-Lympics [1988] [5.25] [4 of 4].img" size="368640" crc="0091cb19" sha1="aeaf3725bbdf49a4ace38c7430183492a5da4384" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="dmnstomb">
+		<description>Demon's Tomb - The Awakening</description>
+		<year>1989</year>
+		<publisher>Virgin Mastertronic</publisher>
+		<info name="developer" value="Silhouette Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Demon's Tomb - The Awakening [1989] [Virgin Mastertronic] [5.25] [1 of 2].img" size="368640" crc="c63d8ff1" sha1="8282a157ec5a5c6020d5e5a9912dd2fd06212a85" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Demon's Tomb - The Awakening [1989] [Virgin Mastertronic] [5.25] [2 of 2].img" size="368640" crc="5bce4b3f" sha1="c4b3c19fc60e4cf99bbf1a0ec2f52830f55d1536" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="goldrush">
 		<description>Gold Rush (Version 2.01, 5.25")</description>
 		<year>1988</year>
@@ -3810,27 +3960,27 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="2.01" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [1 of 5].ima" size="368640" crc="1120e384" sha1="8b80213593f8d76f7903380e5003904a0232beea" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [1 of 5].img" size="368640" crc="1120e384" sha1="8b80213593f8d76f7903380e5003904a0232beea" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [2 of 5].ima" size="368640" crc="ae812659" sha1="af0a62d6ab8882bf1c517756394395c8304653f3" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [2 of 5].img" size="368640" crc="ae812659" sha1="af0a62d6ab8882bf1c517756394395c8304653f3" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [3 of 5].ima" size="368640" crc="6c6d7d41" sha1="e379988de70cf4d6be9d151b70927ff21e560189" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [3 of 5].img" size="368640" crc="6c6d7d41" sha1="e379988de70cf4d6be9d151b70927ff21e560189" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [4 of 5].ima" size="368640" crc="eb1ca8f0" sha1="d6b916f003e01af904c57ddd9ee0f76cd00200b7" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [4 of 5].img" size="368640" crc="eb1ca8f0" sha1="d6b916f003e01af904c57ddd9ee0f76cd00200b7" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop5" interface="floppy_5_25">
 			<dataarea name="flop" size = "368640">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [5 of 5].ima" size="368640" crc="ad940acf" sha1="592edc5c1da10fcfb689bc89660cf120a7e15102" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [5.25] [5 of 5].img" size="368640" crc="ad940acf" sha1="592edc5c1da10fcfb689bc89660cf120a7e15102" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3842,12 +3992,12 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		<info name="version" value="2.01" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [3.5] [1 of 2].ima" size="737280" crc="5d6de39c" sha1="3b230cc9456ff93cd08123606a2e05630ff73556" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [3.5] [1 of 2].img" size="737280" crc="5d6de39c" sha1="3b230cc9456ff93cd08123606a2e05630ff73556" offset="0"/>
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size = "737280">
-				<rom name="Gold Rush [1988] [Sierra On-Line] [3.5] [2 of 2].ima" size="737280" crc="db6bcf7e" sha1="bafeaca31872785f4b7b22496beac2dc12816c72" offset="0"/>
+				<rom name="Gold Rush [1988] [Sierra On-Line] [3.5] [2 of 2].img" size="737280" crc="db6bcf7e" sha1="bafeaca31872785f4b7b22496beac2dc12816c72" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4193,7 +4343,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 
 	<!-- Demoscene -->
 
-	<software name="8088mph">
+	<software name="8088mph" supported="partial">
 		<description>8088 MPH (Final Version)</description>
 		<year>2015</year>
 		<publisher>Hornet + CRTC + DESiRE</publisher>
@@ -4204,7 +4354,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<software name="8088mphp" cloneof="8088mph">
+	<software name="8088mphp" cloneof="8088mph" supported="partial">
 		<description>8088 MPH (Revision 2015 Party version)</description>
 		<year>2015</year>
 		<publisher>Hornet + CRTC + DESiRE</publisher>

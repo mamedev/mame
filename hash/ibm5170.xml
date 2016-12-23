@@ -1303,6 +1303,27 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="msdos6u" cloneof="msdos6">
+		<description>MS-DOS (Version 6.00, Upgrade)</description>
+		<year>1992</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1u.img" size="1474560" crc="1b8997a9" sha1="ef275b681314d99e4dccda51b75a60bd1b3f5de2" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk2u.img" size="1474560" crc="879aa93e" sha1="89d9365b0cbfd3490178c22ad0088aed410716b9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk3u.img" size="1474560" crc="edb823d0" sha1="127d28b3d016b771c190f875876c6f1ab67fb4cf" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="msdos62">
 		<description>MS-DOS (Version 6.20)</description>
 		<year>1993</year>
@@ -3103,6 +3124,94 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="msbob">
+		<description>Bob (1.00a)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<info name="version" value="1.00a" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk01.img" size="1474560" crc="da78fa7d" sha1="6b45dc9310d534b9fb10fb5efcfaa5b5793a13e1" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk02.img" size="1720320" crc="833277a5" sha1="6966562977957fd28acdb98a53a4c6236be9aa20" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk03.img" size="1720320" crc="60a7dda2" sha1="4b9e33275c6da0ee9b8a923e55a05d9281d335bf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk04.img" size="1720320" crc="b9c1ddc7" sha1="41a84750793826bc7033dc77ade621872f9101e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk05.img" size="1720320" crc="ad765681" sha1="58df2e2602ff60d0da196d425c4e93bce4e6814f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk06.img" size="1720320" crc="e8be449d" sha1="f62f03bf86ee51937eaa05b528fdc96f71871c73" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk07.img" size="1720320" crc="724f9922" sha1="89023ef479d843908ecd2d111ecd213b2d7bf420" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk08.img" size="1720320" crc="25a88b00" sha1="f457a5ec85704a2d396e2d079a8f83977cf8bb04" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="msboba" cloneof="msbob">
+		<description>Bob (1.00)</description>
+		<year>1995</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="disk1.img" size="1474560" crc="98474db4" sha1="a16cd99600589a926ff62ea29bd8b4def25db439" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk2.img" size="1720320" crc="3b0b1462" sha1="e77be0b10daafa67bc48a3801b418e438794b158" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk3.img" size="1720320" crc="c802bb17" sha1="a1356fc392d33e8f59c7ac8242801a6392fe2e75" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk4.img" size="1720320" crc="2d735e4a" sha1="1726e95359440b00658ce9e2ab975da225127035" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk5.img" size="1720320" crc="cb1a20ac" sha1="1581a17050c22a5267a007af6321b3e17b95302f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk6.img" size="1720320" crc="94bf0f1d" sha1="e49a8a155c51354675cdc0272a409657fed3e251" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<dataarea name="flop" size = "1720320">
+				<rom name="disk7.img" size="1720320" crc="afb0e89c" sha1="cd456a4304f4dafa27d869350d3f713cc934beb4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="buttons" supported="no">
 		<!-- from Acer CPR 1.2 recovery CD-ROM -->
 		<description>Buttons for DOS (Shareware)</description>
@@ -3112,6 +3221,19 @@ Missing files come here
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1474560">
 				<rom name="buttons disk1.img" size="1474560" crc="a58d2c51" sha1="edc4e6885f455f9427b6f4a7531532dc89cad954" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas4win">
+		<description>Christmas For Windows</description>
+		<year>1995</year>
+		<publisher>TDA Help!</publisher>
+		<info name="developer" value="Sygenex" />
+		<info name="version" value="3.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Xmas4Windows.img" size="1474560" crc="617a3326" sha1="72c78772e988f2c4cc9d0a0498ecfa847594c3b9" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -3169,6 +3291,19 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="vrplyhse">
+		<!-- Dumped via Kryoflux, shows as good and unmodified -->
+		<description>Virtual Reality Playhouse (Cover disk)</description>
+		<year>1992</year>
+		<publisher>The Waite Group</publisher>
+		<info name="isbn" value="1878739190" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="virtual reality playhouse.img" size="1228800" crc="f72fbdf9" sha1="bdf98003350b40f887f594de653a18fb391b6e98" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wdel3">
 		<description>WinDelete 3.0</description>
 		<year>1996</year>
@@ -3178,6 +3313,72 @@ Missing files come here
 			<feature name="disk_serial" value="03WDXW3001" />
 			<dataarea name="flop" size="1474560">
 				<rom name="wdel3.img" size="1474560" crc="9c2e76b9" sha1="b6b6f18726ce0f4ae1aeb2c33b8e4793ca15f87a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="winword1">
+		<description>Word for Windows 1.0</description>
+		<year>1989</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Setup" />
+			<dataarea name="flop" size = "737280">
+				<rom name="setup.img" size="737280" crc="553cb9fa" sha1="c618d0a7714007b9b971bc63c4d2deaea56fdb07" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Program" />
+			<dataarea name="flop" size = "737280">
+				<rom name="progrm.img" size="737280" crc="daa346c4" sha1="8fe7bced3d817788614d55747d7452154d3b37e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="conver.img" size="737280" crc="85875a14" sha1="45f5f33caa485c76b671ba72a34a49fa9c52ee2e" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_3_5">
+			<feature name="part_id" value="Conversions 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="convr2.img" size="737280" crc="416fc793" sha1="30d46e6a6568c6aefca33d5223a1afd2b4055932" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="util1.img" size="737280" crc="64e30b02" sha1="06c0886543e4289474fc5549ecd0d8d986c08339" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_3_5">
+			<feature name="part_id" value="Utilities 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="util2.img" size="737280" crc="27e4a32f" sha1="c2fb011041e7c1f06ea2be3746593413c44bbbdf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_3_5">
+			<feature name="part_id" value="Tutorial 1" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tutrl1.img" size="737280" crc="808ccc36" sha1="87b8261827cfc0950f2d60a353ba73162cf5fd31" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_3_5">
+			<feature name="part_id" value="Tutorial 2" />
+			<dataarea name="flop" size = "737280">
+				<rom name="tutrl2.img" size="737280" crc="426fc4b7" sha1="8e5295bcc11f63c0186ca7a0012550aaa751f632" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop9" interface="floppy_3_5">
+			<feature name="part_id" value="Help" />
+			<dataarea name="flop" size = "737280">
+				<rom name="help.img" size="737280" crc="d50900f3" sha1="9cd98aa432e38a6028fc1105e6ba5f24fe118d52" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop10" interface="floppy_3_5">
+			<feature name="part_id" value="Proofing Tools" />
+			<dataarea name="flop" size = "737280">
+				<rom name="prftls.img" size="737280" crc="4610c528" sha1="2b64e4906e7ff2b7b8268c8f97e91ddd580f15c4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
