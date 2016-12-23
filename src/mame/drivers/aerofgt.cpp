@@ -2581,28 +2581,28 @@ ROM_START( turbofrc ) // New revision: most notable thing in there is the points
 	ROM_RELOAD(         0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
-	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
+	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, BAD_DUMP CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom, taken from old rev set
 	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
 
 	ROM_REGION( 0x0a0000, "gfx2", 0 )
-	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom
+	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, BAD_DUMP CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom, taken from old rev set
 	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
 
 	ROM_REGION( 0x200000, "spritegfx", 0 )
-	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
+	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, BAD_DUMP CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom, taken from old rev set
 	ROM_LOAD( "5.u118",        0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
-	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
+	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, BAD_DUMP CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom, taken from old rev set
 	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom
-	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom
+	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, BAD_DUMP CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom, taken from old rev set, overdump? should be 0x40000
+	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, BAD_DUMP CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom, taken from old rev set, overdump? should be 0x40000
 
 	ROM_REGION( 0x20000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom
+	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, BAD_DUMP CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom, taken from old rev set, incomplete? should be 0x40000
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
-	ROM_LOAD( "lh538o7h.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
+	ROM_LOAD( "lh538o7h.u179", 0x000000, 0x100000, BAD_DUMP CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom, taken from old rev set
 ROM_END
 
 ROM_START( turbofrco )
@@ -2630,11 +2630,11 @@ ROM_START( turbofrco )
 	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom
-	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom
+	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom, overdump? should be 0x40000
+	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom, overdump? should be 0x40000
 
 	ROM_REGION( 0x20000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom
+	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom, incomplete? should be 0x40000
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
 	ROM_LOAD( "lh538o7h.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
