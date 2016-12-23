@@ -260,6 +260,10 @@ void archimedes_state::ioc_timer(int param)
 	// all timers always run
 	a310_set_timer(param);
 
+	// keep FIQ line ASSERTED if there are active requests
+	if (m_ioc_regs[FIQ_STATUS] & m_ioc_regs[FIQ_MASK])
+		archimedes_request_fiq(0);
+
 	// but only timers 0 and 1 generate IRQs
 	switch (param)
 	{
@@ -494,7 +498,7 @@ bool archimedes_state::check_floppy_ready()
 	}
 
 	if(floppy)
-		return floppy->ready_r();
+		return !floppy->ready_r();
 
 	return false;
 }
@@ -842,7 +846,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_ioc_w)
 								---- x--- floppy controller reset
 								*/
 								m_fdc->dden_w(BIT(data, 1));
-								if(data & 8)
+								if (!(data & 8))
 									m_fdc->soft_reset();
 								if(data & ~0xa)
 									printf("%02x Latch B\n",data);

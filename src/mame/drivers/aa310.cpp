@@ -124,7 +124,6 @@ protected:
 
 WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_intrq_w)
 {
-	printf("%d IRQ\n",state);
 	if (state)
 	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY);
@@ -135,7 +134,6 @@ WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_intrq_w)
 
 WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_drq_w)
 {
-	printf("%d DRQ\n",state);
 	if (state)
 	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
@@ -415,6 +413,7 @@ static MACHINE_CONFIG_START( aa310, aa310_state )
 	MCFG_RAM_DEFAULT_SIZE("1M")
 
 	MCFG_WD1772_ADD("fdc", 8000000 / 1) // TODO: frequency
+	MCFG_WD_FDC_DISABLE_MOTOR_CONTROL
 	MCFG_WD_FDC_INTRQ_CALLBACK(WRITELINE(aa310_state, aa310_wd177x_intrq_w))
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aa310_state, aa310_wd177x_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)

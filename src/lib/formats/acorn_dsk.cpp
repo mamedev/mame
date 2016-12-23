@@ -412,8 +412,8 @@ int acorn_adfs_new_format::find_size(io_generic *io, uint32_t form_factor)
 		if (form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		// valid images will have map identifier Nick
-		if ((size == (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (memcmp(dform, "Nick", 4) == 0 || memcmp(eform, "Nick", 4) == 0)) {
+		// valid images will have map identifier Nick, Arthur D format still use Hugo
+		if ((size <= (uint64_t)compute_track_size(f) * f.track_count * f.head_count) && (memcmp(dform, "Nick", 4) == 0 || memcmp(eform, "Nick", 4) == 0 || memcmp(dform, "Hugo", 4) == 0)) {
 			return i;
 		}
 	}
