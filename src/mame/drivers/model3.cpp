@@ -3935,7 +3935,7 @@ ROM_START( vs29915 )  /* Step 1.5, Sega game ID# is 833-13686-01 VS2 VER99 STEP 
 	ROM_FILL( 0x000000, 0x80000, 0x0000 )
 ROM_END
 
-ROM_START( von2 )   /* Step 2.0 */
+ROM_START( von2 )   /* Step 2.0, Sega game ID# is 833-13346, ROM board ID# 834-13347 VOT, Security board ID# 837-13379-COM */
 	ROM_REGION64_BE( 0x8800000, "user1", 0 ) /* program + data ROMs */
 	// CROM
 	ROM_LOAD64_WORD_SWAP( "epr-20683b.17", 0x000006, 0x200000, CRC(59d9c974) SHA1(c45594ed474a9e8fd074e0d9d5fa6662bc88dee6) )
