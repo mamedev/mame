@@ -527,6 +527,7 @@ READ16_MEMBER(bigfghtr_state::latch_r)
 
 WRITE16_MEMBER(bigfghtr_state::sharedram_w)
 {
+	data &= mem_mask;
 	COMBINE_DATA(&m_sharedram[offset]);
 
 	switch(offset)
