@@ -115,6 +115,10 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 
+	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
+
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
 	MAME_DIR .. "src/mame/video/1942.cpp",
