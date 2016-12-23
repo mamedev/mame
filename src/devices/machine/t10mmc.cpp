@@ -392,10 +392,10 @@ void t10mmc::ExecCommand()
 //
 // Read data from the device resulting from the execution of a command
 
-void t10mmc::ReadData( UINT8 *data, int dataLength )
+void t10mmc::ReadData( uint8_t *data, int dataLength )
 {
-	UINT32 temp;
-	UINT8 tmp_buffer[2048];
+	uint32_t temp;
+	uint8_t tmp_buffer[2048];
 
 	switch ( command[0] )
 	{
@@ -515,7 +515,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 					data[6] = cdrom_get_track(m_cdrom, m_last_lba) + 1; // track
 					data[7] = 0;    // index
 
-					UINT32 frame = m_last_lba;
+					uint32_t frame = m_last_lba;
 
 					if (msf)
 					{
@@ -603,7 +603,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 						data[dptr++] = track;
 						data[dptr++] = 0;
 
-						UINT32 tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
+						uint32_t tstart = cdrom_get_track_start(m_cdrom, cdrom_track);
 
 						if (msf)
 						{
@@ -633,7 +633,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 					data[dptr++] = 1;
 					data[dptr++] = 0;
 
-					UINT32 tstart = cdrom_get_track_start(m_cdrom, 0);
+					uint32_t tstart = cdrom_get_track_start(m_cdrom, 0);
 
 					if (msf)
 					{
@@ -714,7 +714,7 @@ void t10mmc::ReadData( UINT8 *data, int dataLength )
 //
 // Write data to the CD-ROM device as part of the execution of a command
 
-void t10mmc::WriteData( UINT8 *data, int dataLength )
+void t10mmc::WriteData( uint8_t *data, int dataLength )
 {
 	switch (command[ 0 ])
 	{

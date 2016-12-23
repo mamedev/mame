@@ -162,7 +162,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 	}
 	else
 	{
-		UINT8 const data = m_adpcmrom[m_adpcm_pos / 2];
+		uint8_t const data = m_adpcmrom[m_adpcm_pos / 2];
 		m_msm->data_w(m_adpcm_pos & 1 ? data & 0xf : data >> 4);
 		m_adpcm_pos++;
 	}
@@ -170,7 +170,7 @@ WRITE_LINE_MEMBER(renegade_state::adpcm_int)
 
 WRITE8_MEMBER(renegade_state::sound_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -183,7 +183,7 @@ WRITE8_MEMBER(renegade_state::sound_w)
 */
 
 
-static const UINT8 kuniokun_xor_table[0x2a] =
+static const uint8_t kuniokun_xor_table[0x2a] =
 {
 	0x48, 0x8a, 0x48, 0xa5, 0x01, 0x48, 0xa9, 0x00,
 	0x85, 0x01, 0xa2, 0x10, 0x26, 0x10, 0x26, 0x11,
@@ -204,7 +204,7 @@ void renegade_state::machine_start()
 
 DRIVER_INIT_MEMBER(renegade_state,renegade)
 {
-	m_mcu_sim = FALSE;
+	m_mcu_sim = false;
 
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
@@ -223,7 +223,7 @@ DRIVER_INIT_MEMBER(renegade_state,renegade)
 
 DRIVER_INIT_MEMBER(renegade_state,kuniokun)
 {
-	m_mcu_sim = TRUE;
+	m_mcu_sim = true;
 	m_mcu_checksum = 0x85;
 	m_mcu_encrypt_table = kuniokun_xor_table;
 	m_mcu_encrypt_table_len = 0x2a;
@@ -328,7 +328,7 @@ WRITE8_MEMBER(renegade_state::_68705_ddr_c_w)
 
 READ8_MEMBER(renegade_state::mcu_reset_r)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		m_mcu_key = -1;
 		m_mcu_input_size = 0;
@@ -343,7 +343,7 @@ READ8_MEMBER(renegade_state::mcu_reset_r)
 
 WRITE8_MEMBER(renegade_state::mcu_w)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		m_mcu_output_byte = 0;
 
@@ -386,7 +386,7 @@ void renegade_state::mcu_process_command()
 	case 0x26: /* sound code -> sound command */
 		{
 			int sound_code = m_mcu_buffer[1];
-			static const UINT8 sound_command_table[256] =
+			static const uint8_t sound_command_table[256] =
 			{
 				0xa0, 0xa1, 0xa2, 0x80, 0x81, 0x82, 0x83, 0x84,
 				0x85, 0x86, 0x87, 0x88, 0x89, 0x8a, 0x8b, 0x8c,
@@ -429,7 +429,7 @@ void renegade_state::mcu_process_command()
 	case 0x33: /* joy bits -> joy dir */
 		{
 			int joy_bits = m_mcu_buffer[2];
-			static const UINT8 joy_table[0x10] =
+			static const uint8_t joy_table[0x10] =
 			{
 				0, 3, 7, 0, 1, 2, 8, 0, 5, 4, 6, 0, 0, 0, 0, 0
 			};
@@ -442,7 +442,7 @@ void renegade_state::mcu_process_command()
 		{
 			int difficulty = m_mcu_buffer[2] & 0x3;
 			int stage = m_mcu_buffer[3];
-			static const UINT8 difficulty_table[4] = { 5, 3, 1, 2 };
+			static const uint8_t difficulty_table[4] = { 5, 3, 1, 2 };
 			int result = difficulty_table[difficulty];
 
 			if (stage == 0)
@@ -459,7 +459,7 @@ void renegade_state::mcu_process_command()
 	case 0x55: /* 0x55, 0x00, 0x00, 0x00, DSW2 -> timer */
 		{
 			int difficulty = m_mcu_buffer[4] & 0x3;
-			static const UINT16 table[4] =
+			static const uint16_t table[4] =
 			{
 				0x4001, 0x5001, 0x1502, 0x0002
 			};
@@ -537,7 +537,7 @@ void renegade_state::mcu_process_command()
 
 READ8_MEMBER(renegade_state::mcu_r)
 {
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		int result = 1;
 
@@ -558,9 +558,9 @@ READ8_MEMBER(renegade_state::mcu_r)
 
 CUSTOM_INPUT_MEMBER(renegade_state::mcu_status_r)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
-	if (m_mcu_sim == TRUE)
+	if (m_mcu_sim == true)
 	{
 		res = 1;
 	}
@@ -621,7 +621,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renegade_sound_map, AS_PROGRAM, 8, renegade_state )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x1000, 0x1000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(adpcm_start_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(adpcm_addr_w)
 	AM_RANGE(0x2800, 0x2801) AM_DEVREADWRITE("ymsnd", ym3526_device, read, write)
@@ -674,7 +674,7 @@ static INPUT_PORTS_START( renegade )
 
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) /* attack right */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) /* attack right */
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, renegade_state,mcu_status_r, NULL)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL) PORT_CUSTOM_MEMBER(DEVICE_SELF, renegade_state,mcu_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_CUSTOM ) PORT_VBLANK("screen")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -872,8 +872,10 @@ static MACHINE_CONFIG_START( renegade, renegade_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3526, 12000000/4)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6809_device, firq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6809_FIRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 12000000/32)

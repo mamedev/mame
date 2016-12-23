@@ -15,6 +15,8 @@
 #include "emu.h"
 #include "cpu/m6809/hd6309.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/3812intf.h"
 #include "includes/konamipt.h"
 #include "includes/battlnts.h"
@@ -69,8 +71,8 @@ static ADDRESS_MAP_START( battlnts_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x2e04, 0x2e04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e08, 0x2e08) AM_WRITE(battlnts_bankswitch_w)    /* bankswitch control */
 	AM_RANGE(0x2e0c, 0x2e0c) AM_WRITE(battlnts_spritebank_w)    /* sprite bank select */
-	AM_RANGE(0x2e10, 0x2e10) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
-	AM_RANGE(0x2e14, 0x2e14) AM_WRITE(soundlatch_byte_w)                /* sound code # */
+	AM_RANGE(0x2e10, 0x2e10) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x2e14, 0x2e14) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* sound code # */
 	AM_RANGE(0x2e18, 0x2e18) AM_WRITE(battlnts_sh_irqtrigger_w) /* cause interrupt on audio CPU */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("rombank")              /* banked ROM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                             /* ROM 777e02.bin */
@@ -81,7 +83,7 @@ static ADDRESS_MAP_START( battlnts_sound_map, AS_PROGRAM, 8, battlnts_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM                         /* RAM */
 	AM_RANGE(0xa000, 0xa001) AM_DEVREADWRITE("ym1", ym3812_device, read, write)      /* YM3812 (chip 1) */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ym2", ym3812_device, read, write)      /* YM3812 (chip 2) */
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)         /* soundlatch_byte_r */
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 /*************************************
@@ -212,7 +214,7 @@ GFXDECODE_END
 
 void battlnts_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 
@@ -234,6 +236,7 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz / 6 /* 3579545? */)
 	MCFG_CPU_PROGRAM_MAP(battlnts_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -260,6 +263,8 @@ static MACHINE_CONFIG_START( battlnts, battlnts_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3812, XTAL_24MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

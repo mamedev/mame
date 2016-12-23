@@ -32,7 +32,7 @@
  *
  *  Q0 The output logic level of Q before the indicated input conditions were established
  *
- *  R:  0 --> 1
+ *  R:  0 -. 1
  *
  *  Naming conventions follow National Semiconductor datasheet
  *
@@ -42,45 +42,16 @@
 #ifndef NLD_7474_H_
 #define NLD_7474_H_
 
-#include "nld_signal.h"
+#include "nl_setup.h"
 
-#define TTL_7474(_name, _CLK, _D, _CLRQ, _PREQ)                                     \
-		NET_REGISTER_DEV(TTL_7474, _name)                                               \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, D,  _D)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)                                            \
-		NET_CONNECT(_name, PREQ,  _PREQ)
+#define TTL_7474(name, cCLK, cD, cCLRQ, cPREQ)                                  \
+		NET_REGISTER_DEV(TTL_7474, name)                                        \
+		NET_CONNECT(name, CLK, cCLK)                                            \
+		NET_CONNECT(name, D,  cD)                                               \
+		NET_CONNECT(name, CLRQ,  cCLRQ)                                         \
+		NET_CONNECT(name, PREQ,  cPREQ)
 
-#define TTL_7474_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7474_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_SUBDEVICE(7474sub,
-	logic_input_t m_CLK;
-
-	INT8 m_nextD;
-	logic_output_t m_Q;
-	logic_output_t m_QQ;
-
-	ATTR_HOT inline void newstate(const UINT8 stateQ, const UINT8 stateQQ);
-);
-
-NETLIB_DEVICE(7474,
-public:
-	NETLIB_NAME(7474sub) sub;
-
-	logic_input_t m_D;
-	logic_input_t m_CLRQ;
-	logic_input_t m_PREQ;
-);
-
-NETLIB_DEVICE(7474_dip,
-
-	NETLIB_NAME(7474) m_1;
-	NETLIB_NAME(7474) m_2;
-);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_7474_DIP(name)                                                      \
+		NET_REGISTER_DEV(TTL_7474_DIP, name)
 
 #endif /* NLD_7474_H_ */

@@ -120,7 +120,7 @@ static const unsigned char dgnbeta_palette[] =
     the memory as described above.
 
     At reset time the Paging would of course be disabled, as the boot rom needs to be
-    mapped in at $C000, the initalisation code would set up the mappings above and then
+    mapped in at $C000, the initialisation code would set up the mappings above and then
     enable the paging hardware.
 
     It appears to be more complicated than this, whilst the above is true, there appear to
@@ -320,6 +320,7 @@ static MACHINE_CONFIG_START( dgnbeta, dgn_beta_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(MAINCPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(dgnbeta_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(dgn_beta_state, dgnbeta_dasm_override)
 
 	/* both cpus in the beta share the same address/data busses */
 	MCFG_CPU_ADD(DMACPU_TAG, M6809E, DGNBETA_CPU_SPEED_HZ)        /* 2 MHz */

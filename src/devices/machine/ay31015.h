@@ -23,8 +23,8 @@ enum ay31015_input_pin_t
 	AY31015_CS = 34,          /*  CS   - Pin 34 - Control strobe */
 	AY31015_NP = 35,          /*  NP   - Pin 35 - No parity */
 	AY31015_TSB = 36,         /*  TSB  - Pin 36 - Number of stop bits */
-	AY31015_NB1 = 37,         /*  NB1  - Pin 37 - Number of bits #1 */
-	AY31015_NB2 = 38,         /*  NB2  - Pin 38 - Number of bits #2 */
+	AY31015_NB2 = 37,         /*  NB2  - Pin 37 - Number of bits #2 */
+	AY31015_NB1 = 38,         /*  NB1  - Pin 38 - Number of bits #1 */
 	AY31015_EPS = 39          /*  EPS  - Pin 39 - Odd/Even parity select */
 };
 
@@ -61,8 +61,8 @@ ALLOW_SAVE_TYPE(state_t);
 class ay31015_device : public device_t
 {
 public:
-	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ay31015_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	ay31015_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~ay31015_device() {}
 
 	static void set_tx_clock(device_t &device, double tx_clock) { downcast<ay31015_device &>(device).m_tx_clock = tx_clock; }
@@ -74,68 +74,68 @@ public:
 	/* Set an input pin */
 	void set_input_pin( ay31015_input_pin_t pin, int data );
 
-
 	/* Get an output pin */
 	int get_output_pin( ay31015_output_pin_t pin );
-
 
 	/* Set a new transmitter clock (new_clock is in Hz) */
 	void set_transmitter_clock( double new_clock );
 
-
 	/* Set a new receiver clock (new_clock is in Hz) */
 	void set_receiver_clock( double new_clock );
 
-
 	/* Reead the received data */
 	/* The received data is available on RD8-RD1 (pins 5-12) */
-	UINT8 get_received_data();
-
+	uint8_t get_received_data();
 
 	/* Set the transmitter buffer */
 	/* The data to transmit is set on DB1-DB8 (pins 26-33) */
-	void set_transmit_data( UINT8 data );
+	void set_transmit_data( uint8_t data );
+
+	void rx_process();
+	void tx_process();
 
 protected:
+	static const device_timer_id TIMER_RX = 0;
+	static const device_timer_id TIMER_TX = 1;
+
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	virtual void internal_reset();
 
 	// internal state
-	inline UINT8 get_si();
+	inline uint8_t get_si();
 	inline void set_so(int data);
-	inline int update_status_pin(UINT8 reg_bit, ay31015_output_pin_t pin);
+	inline int update_status_pin(uint8_t reg_bit, ay31015_output_pin_t pin);
 	void update_status_pins();
 	void transfer_control_pins();
 	inline void update_rx_timer();
 	inline void update_tx_timer();
-	TIMER_CALLBACK_MEMBER(rx_process);
-	TIMER_CALLBACK_MEMBER(tx_process);
 
 	int m_pins[41];
 
-	UINT8 m_control_reg;
-	UINT8 m_status_reg;
-	UINT16 m_second_stop_bit; // 0, 8, 16
-	UINT16 m_total_pulses;    // bits * 16
-	UINT8 m_internal_sample;
+	uint8_t m_control_reg;
+	uint8_t m_status_reg;
+	uint16_t m_second_stop_bit; // 0, 8, 16
+	uint16_t m_total_pulses;    // bits * 16
+	uint8_t m_internal_sample;
 
 	state_t m_rx_state;
-	UINT8 m_rx_data;      // byte being received
-	UINT8 m_rx_buffer;    // received byte waiting to be accepted by computer
-	UINT8 m_rx_bit_count;
-	UINT8 m_rx_parity;
-	UINT16 m_rx_pulses;   // total pulses left
+	uint8_t m_rx_data;      // byte being received
+	uint8_t m_rx_buffer;    // received byte waiting to be accepted by computer
+	uint8_t m_rx_bit_count;
+	uint8_t m_rx_parity;
+	uint16_t m_rx_pulses;   // total pulses left
 	double m_rx_clock;    /* RCP - pin 17 */
 	emu_timer *m_rx_timer;
 
 	state_t m_tx_state;
-	UINT8 m_tx_data;      // byte being sent
-	UINT8 m_tx_buffer;    // next byte to send
-	UINT8 m_tx_parity;
-	UINT16 m_tx_pulses;   // total pulses left
+	uint8_t m_tx_data;      // byte being sent
+	uint8_t m_tx_buffer;    // next byte to send
+	uint8_t m_tx_parity;
+	uint16_t m_tx_pulses;   // total pulses left
 	double m_tx_clock;    /* TCP - pin 40 */
 	emu_timer *m_tx_timer;
 
@@ -147,7 +147,7 @@ protected:
 class ay51013_device : public ay31015_device
 {
 public:
-	ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ay51013_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual void internal_reset() override;

@@ -43,7 +43,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *abc_hdc_device::device_rom_region() const
+const tiny_rom_entry *abc_hdc_device::device_rom_region() const
 {
 	return ROM_NAME( abc_hdc );
 }
@@ -84,7 +84,7 @@ static MACHINE_CONFIG_FRAGMENT( abc_hdc )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(abc_hdc_mem)
 	MCFG_CPU_IO_MAP(abc_hdc_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	MCFG_DEVICE_ADD(SASIBUS_TAG, SCSI_PORT, 0)
 	MCFG_SCSIDEV_ADD(SASIBUS_TAG ":" SCSI_PORT_DEVICE1, "harddisk", SCSIHD, SCSI_ID_0)
@@ -111,7 +111,7 @@ machine_config_constructor abc_hdc_device::device_mconfig_additions() const
 //  abc_hdc_device - constructor
 //-------------------------------------------------
 
-abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+abc_hdc_device::abc_hdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ABC_HDC, "ABC HDC", tag, owner, clock, "abc_hdc", __FILE__),
 		device_abcbus_card_interface(mconfig, *this),
 		m_maincpu(*this, Z80_TAG)
@@ -146,6 +146,6 @@ void abc_hdc_device::device_reset()
 //  abcbus_cs -
 //-------------------------------------------------
 
-void abc_hdc_device::abcbus_cs(UINT8 data)
+void abc_hdc_device::abcbus_cs(uint8_t data)
 {
 }

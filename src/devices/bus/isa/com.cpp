@@ -95,13 +95,13 @@ machine_config_constructor isa8_com_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_COM, "Communications Adapter PC/XT", tag, owner, clock, "isa_com", __FILE__),
 		device_isa8_card_interface(mconfig, *this)
 {
 }
 
-isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_isa8_card_interface(mconfig, *this)
 {
@@ -115,10 +115,10 @@ isa8_com_device::isa8_com_device(const machine_config &mconfig, device_type type
 void isa8_com_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x03f8, 0x03ff, 0, 0, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_0")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_0")) );
-	m_isa->install_device(0x02f8, 0x02ff, 0, 0, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_1")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_1")) );
-//  m_isa->install_device(0x03e8, 0x03ef, 0, 0, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_2")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_2")) );
-//  m_isa->install_device(0x02e8, 0x02ef, 0, 0, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_3")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_3")) );
+	m_isa->install_device(0x03f8, 0x03ff, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_0")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_0")) );
+	m_isa->install_device(0x02f8, 0x02ff, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_1")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_1")) );
+//  m_isa->install_device(0x03e8, 0x03ef, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_2")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_2")) );
+//  m_isa->install_device(0x02e8, 0x02ef, read8_delegate(FUNC(ins8250_device::ins8250_r), subdevice<ins8250_uart_device>("uart_3")), write8_delegate(FUNC(ins8250_device::ins8250_w), subdevice<ins8250_uart_device>("uart_3")) );
 }
 
 //-------------------------------------------------
@@ -188,7 +188,7 @@ machine_config_constructor isa8_com_at_device::device_mconfig_additions() const
 //  isa8_com_device - constructor
 //-------------------------------------------------
 
-isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_com_at_device::isa8_com_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		isa8_com_device(mconfig, ISA8_COM_AT, "Communications Adapter", tag, owner, clock, "isa_com_at", __FILE__)
 {
 }

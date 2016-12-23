@@ -40,7 +40,7 @@ class debug_qt : public osd_module, public debug_module
 public:
 	debug_qt()
 	: osd_module(OSD_DEBUG_PROVIDER, "qt"), debug_module(),
-		m_machine(NULL)
+		m_machine(nullptr)
 	{
 	}
 
@@ -64,10 +64,10 @@ private:
 //============================================================
 
 int qtArgc = 0;
-char** qtArgv = NULL;
+char** qtArgv = nullptr;
 
 bool oneShot = true;
-static MainWindow* mainQtWindow = NULL;
+static MainWindow* mainQtWindow = nullptr;
 
 //============================================================
 //  XML configuration save/load
@@ -77,14 +77,14 @@ static MainWindow* mainQtWindow = NULL;
 std::vector<WindowQtConfig*> xmlConfigurations;
 
 
-static void xml_configuration_load(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
+static void xml_configuration_load(running_machine &machine, config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// We only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// Might not have any data
-	if (parentnode == NULL)
+	if (parentnode == nullptr)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -92,10 +92,10 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 	xmlConfigurations.clear();
 
 	// Configuration load
-	xml_data_node* wnode = NULL;
-	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
+	util::xml::data_node const * wnode = nullptr;
+	for (wnode = parentnode->get_child("window"); wnode != nullptr; wnode = wnode->get_next_sibling("window"))
 	{
-		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)xml_get_attribute_int(wnode, "type", WindowQtConfig::WIN_TYPE_UNKNOWN);
+		WindowQtConfig::WindowType type = (WindowQtConfig::WindowType)wnode->get_attribute_int("type", WindowQtConfig::WIN_TYPE_UNKNOWN);
 		switch (type)
 		{
 			case WindowQtConfig::WIN_TYPE_MAIN:               xmlConfigurations.push_back(new MainWindowQtConfig()); break;
@@ -107,15 +107,15 @@ static void xml_configuration_load(running_machine &machine, config_type cfg_typ
 			case WindowQtConfig::WIN_TYPE_DEVICE_INFORMATION: xmlConfigurations.push_back(new DeviceInformationWindowQtConfig()); break;
 			default: continue;
 		}
-		xmlConfigurations.back()->recoverFromXmlNode(wnode);
+		xmlConfigurations.back()->recoverFromXmlNode(*wnode);
 	}
 }
 
 
-static void xml_configuration_save(running_machine &machine, config_type cfg_type, xml_data_node *parentnode)
+static void xml_configuration_save(running_machine &machine, config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// We only write to game configurations
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	for (int i = 0; i < xmlConfigurations.size(); i++)
@@ -123,13 +123,12 @@ static void xml_configuration_save(running_machine &machine, config_type cfg_typ
 		WindowQtConfig* config = xmlConfigurations[i];
 
 		// Create an xml node
-		xml_data_node *debugger_node;
-		debugger_node = xml_add_child(parentnode, "window", NULL);
-		if (debugger_node == NULL)
+		util::xml::data_node *const debugger_node = parentnode->add_child("window", nullptr);
+		if (debugger_node == nullptr)
 			continue;
 
 		// Insert the appropriate information
-		config->addToXmlDataNode(debugger_node);
+		config->addToXmlDataNode(*debugger_node);
 	}
 }
 
@@ -195,7 +194,7 @@ static void setup_additional_startup_windows(running_machine& machine, std::vect
 	{
 		WindowQtConfig* config = configList[i];
 
-		WindowQt* foo = NULL;
+		WindowQt* foo = nullptr;
 		switch (config->m_type)
 		{
 			case WindowQtConfig::WIN_TYPE_MEMORY:
@@ -246,7 +245,7 @@ bool debug_qt::nativeEventFilter(const QByteArray &eventType, void *message, lon
 
 void debug_qt::init_debugger(running_machine &machine)
 {
-	if (qApp == NULL)
+	if (qApp == nullptr)
 	{
 		// If you're starting from scratch, create a new qApp
 		new QApplication(qtArgc, qtArgv);
@@ -269,8 +268,8 @@ void debug_qt::init_debugger(running_machine &machine)
 	m_machine = &machine;
 	// Setup the configuration XML saving and loading
 	machine.configuration().config_register("debugger",
-					config_saveload_delegate(FUNC(xml_configuration_load), &machine),
-					config_saveload_delegate(FUNC(xml_configuration_save), &machine));
+					config_load_delegate(&xml_configuration_load, &machine),
+					config_save_delegate(&xml_configuration_save, &machine));
 }
 
 
@@ -317,7 +316,7 @@ void debug_qt::wait_for_debugger(device_t &device, bool firststop)
 	mainQtWindow->setProcessor(&device);
 
 	// Run our own QT event loop
-	osd_sleep(50000);
+	osd_sleep(osd_ticks_per_second() / 1000 * 50);
 	qApp->processEvents(QEventLoop::AllEvents, 1);
 
 	// Refresh everyone if requested

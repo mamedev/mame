@@ -10,12 +10,14 @@
 #include "breakpointswindow.h"
 #include "deviceswindow.h"
 
+#include "debug/debugcpu.h"
+
 bool WindowQt::s_refreshAll = false;
 bool WindowQt::s_hideAll = false;
 
 
 // Since all debug windows are intended to be top-level, this inherited
-// constructor is always called with a NULL parent.  The passed-in parent widget,
+// constructor is always called with a nullptr parent.  The passed-in parent widget,
 // however, is often used to place each child window & the code to do this can
 // be found in most of the inherited classes.
 
@@ -176,49 +178,49 @@ void WindowQt::debugActOpenDevices()
 
 void WindowQt::debugActRun()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 void WindowQt::debugActRunAndHide()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 	hideAll();
 }
 
 void WindowQt::debugActRunToNextCpu()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go_next_device();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_next_device();
 }
 
 void WindowQt::debugActRunNextInt()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go_interrupt();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_interrupt();
 }
 
 void WindowQt::debugActRunNextVBlank()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go_vblank();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go_vblank();
 }
 
 void WindowQt::debugActStepInto()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 }
 
 void WindowQt::debugActStepOver()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_over();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_over();
 }
 
 void WindowQt::debugActStepOut()
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step_out();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step_out();
 }
 
 void WindowQt::debugActSoftReset()
 {
 	m_machine->schedule_soft_reset();
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->single_step();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->single_step();
 }
 
 void WindowQt::debugActHardReset()
@@ -255,21 +257,21 @@ void WindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void WindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void WindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
-	xml_set_attribute_int(node, "type", m_type);
-	xml_set_attribute_int(node, "position_x", m_position.x());
-	xml_set_attribute_int(node, "position_y", m_position.y());
-	xml_set_attribute_int(node, "size_x", m_size.x());
-	xml_set_attribute_int(node, "size_y", m_size.y());
+	node.set_attribute_int("type", m_type);
+	node.set_attribute_int("position_x", m_position.x());
+	node.set_attribute_int("position_y", m_position.y());
+	node.set_attribute_int("size_x", m_size.x());
+	node.set_attribute_int("size_y", m_size.y());
 }
 
 
-void WindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void WindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
-	m_size.setX(xml_get_attribute_int(node, "size_x", m_size.x()));
-	m_size.setY(xml_get_attribute_int(node, "size_y", m_size.y()));
-	m_position.setX(xml_get_attribute_int(node, "position_x", m_position.x()));
-	m_position.setY(xml_get_attribute_int(node, "position_y", m_position.y()));
-	m_type = (WindowQtConfig::WindowType)xml_get_attribute_int(node, "type", m_type);
+	m_size.setX(node.get_attribute_int("size_x", m_size.x()));
+	m_size.setY(node.get_attribute_int("size_y", m_size.y()));
+	m_position.setX(node.get_attribute_int("position_x", m_position.x()));
+	m_position.setY(node.get_attribute_int("position_y", m_position.y()));
+	m_type = (WindowQtConfig::WindowType)node.get_attribute_int("type", m_type);
 }

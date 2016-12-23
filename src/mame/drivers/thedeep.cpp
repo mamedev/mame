@@ -47,7 +47,7 @@ WRITE8_MEMBER(thedeep_state::nmi_w)
 
 WRITE8_MEMBER(thedeep_state::sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, thedeep_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ymsnd", ym2203_device, write)  //
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) // From Main CPU
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From Main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -197,7 +197,7 @@ WRITE8_MEMBER(thedeep_state::p1_w)
 
 READ8_MEMBER(thedeep_state::from_main_r)
 {
-	static UINT8 res;
+	static uint8_t res;
 
 	res = 0x11;
 
@@ -230,7 +230,7 @@ WRITE8_MEMBER(thedeep_state::p3_w)
 
 READ8_MEMBER(thedeep_state::p0_r)
 {
-	UINT8 coin_mux;
+	uint8_t coin_mux;
 
 	coin_mux = ((ioport("COINS")->read() & 0x0e) == 0x0e); // bit 0 is hard-wired to ALL three coin latches
 
@@ -439,13 +439,14 @@ static MACHINE_CONFIG_START( thedeep, thedeep_state )
 	MCFG_PALETTE_INIT_OWNER(thedeep_state, thedeep)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_MXC06, 0)
-	deco_mxc06_device::set_gfx_region(*device, 0);
+	MCFG_DECO_MXC06_GFX_REGION(0)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-	MCFG_DECO_MXC06_PALETTE("palette")
 	MCFG_DECO_MXC06_RAMSIZE(0x400)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

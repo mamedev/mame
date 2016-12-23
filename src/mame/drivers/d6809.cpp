@@ -103,13 +103,13 @@ public:
 	DECLARE_WRITE8_MEMBER( kbd_put );
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( term_w );
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 };
 
 READ8_MEMBER( d6809_state::term_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -164,4 +164,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY     FULLNAME       FLAGS */
-COMP( 1983, d6809,  0,      0,       d6809,     d6809, driver_device,   0,     "Dunfield", "6809 Portable", MACHINE_IS_SKELETON | MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1983, d6809,  0,      0,       d6809,     d6809, driver_device,   0,     "Dunfield", "6809 Portable", MACHINE_IS_SKELETON | MACHINE_NO_SOUND_HW)

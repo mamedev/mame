@@ -51,7 +51,7 @@ DRIVER_INIT_MEMBER(sprint2_state,dominos4)
 
 int sprint2_state::service_mode()
 {
-	UINT8 v = ioport("INB")->read();
+	uint8_t v = ioport("INB")->read();
 
 	if (MACHINE_IS_SPRINT1)
 	{
@@ -112,7 +112,7 @@ INTERRUPT_GEN_MEMBER(sprint2_state::sprint2)
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	machine().watchdog_enable(!service_mode());
+	m_watchdog->watchdog_enable(!service_mode());
 
 	if (!service_mode())
 		device.execute().set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -133,7 +133,7 @@ READ8_MEMBER(sprint2_state::sprint2_dip_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 {
-	UINT8 val = ioport("INA")->read();
+	uint8_t val = ioport("INA")->read();
 
 	if (m_game == 2)// (MACHINE_IS_SPRINT2)
 	{
@@ -151,7 +151,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_A_r)
 
 READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 {
-	UINT8 val = ioport("INB")->read();
+	uint8_t val = ioport("INB")->read();
 
 	if (m_game == 1) // (MACHINE_IS_SPRINT1)
 	{
@@ -166,7 +166,7 @@ READ8_MEMBER(sprint2_state::sprint2_input_B_r)
 
 READ8_MEMBER(sprint2_state::sprint2_sync_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if (m_attract != 0)
 		val |= 0x10;
@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( sprint2_map, AS_PROGRAM, 8, sprint2_state )
 	AM_RANGE(0x0c30, 0x0c3f) AM_WRITE(sprint2_lamp1_w)
 	AM_RANGE(0x0c40, 0x0c4f) AM_WRITE(sprint2_lamp2_w)
 	AM_RANGE(0x0c60, 0x0c6f) AM_WRITENOP /* SPARE */
-	AM_RANGE(0x0c80, 0x0cff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0c80, 0x0cff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0d00, 0x0d7f) AM_WRITE(sprint2_collision_reset1_w)
 	AM_RANGE(0x0d80, 0x0dff) AM_WRITE(sprint2_collision_reset2_w)
 	AM_RANGE(0x0e00, 0x0e7f) AM_WRITE(sprint2_steering_reset1_w)
@@ -533,7 +533,9 @@ static MACHINE_CONFIG_START( sprint2, sprint2_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
 	MCFG_CPU_PROGRAM_MAP(sprint2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sprint2_state,  sprint2)
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -31,6 +31,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/konamipt.h"
 #include "includes/bladestl.h"
@@ -84,7 +85,7 @@ WRITE8_MEMBER(bladestl_state::bladestl_bankswitch_w)
 
 WRITE8_MEMBER(bladestl_state::bladestl_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
@@ -133,7 +134,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")               /* DISPW #2 */
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")               /* DIPSW #1 */
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(bladestl_sh_irqtrigger_w) /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)         /* watchdog reset */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2f00, 0x2f03) AM_READ(trackball_r)               /* Trackballs */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(bladestl_bankswitch_w)    /* bankswitch control */
 	AM_RANGE(0x2f80, 0x2f9f) AM_DEVREADWRITE("k051733", k051733_device, read, write)    /* Protection: 051733 */
@@ -149,7 +150,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, bladestl_state )
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)   /* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_READ(bladestl_speech_busy_r)    /* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)                     /* soundlatch_byte_r */
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -307,6 +308,7 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -339,6 +341,8 @@ static MACHINE_CONFIG_START( bladestl, bladestl_state )
 	/* the initialization order is important, the port callbacks being
 	   called at initialization time */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

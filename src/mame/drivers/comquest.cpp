@@ -48,7 +48,7 @@ icq3250a-d
 #ifdef UNUSED_FUNCTION
 READ8_MEMBER(comquest_state::comquest_read)
 {
-	UINT8 data=0;
+	uint8_t data=0;
 	logerror("comquest read %.4x %.2x\n",offset,data);
 	return data;
 }
@@ -61,9 +61,7 @@ WRITE8_MEMBER(comquest_state::comquest_write)
 
 static ADDRESS_MAP_START( comquest_mem , AS_PROGRAM, 8, comquest_state )
 //  { 0x0000, 0x7fff, SMH_BANK(1) },
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xffff) AM_READONLY AM_WRITENOP
-//  { 0x8000, 0xffff, SMH_RAM }, // batterie buffered
+	AM_RANGE(0x0000, 0xfff) AM_ROM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( comquest )
@@ -206,11 +204,9 @@ GFXDECODE_END
 
 void comquest_state::machine_reset()
 {
-//  UINT8 *mem=memregion("user1")->base();
+//  uint8_t *mem=memregion("user1")->base();
 //  membank(1)->set_base(mem+0x00000);
 }
-
-static const UINT32 amask= 0xffff;
 
 
 static MACHINE_CONFIG_START( comquest, comquest_state )
@@ -244,7 +240,6 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 */
 
 	MCFG_CPU_PROGRAM_MAP(comquest_mem)
-	MCFG_CPU_CONFIG( amask )
 
 
 	/* video hardware */
@@ -257,7 +252,7 @@ static MACHINE_CONFIG_START( comquest, comquest_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", comquest )
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* sound hardware */

@@ -8,6 +8,8 @@
 
     Known bugs:
         * lghost sprites seem to be slightly out of sync
+        * lghost gun offset correction is not perfect yet - we should be able
+          to get an exact conversion from the disasm
         * vdp gfx on 2nd attract level of lghost are corrupt at top of stairs
           after attract mode loops
         * pauses in lghost where all sprites vanish
@@ -30,7 +32,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/segaic16.h"
 #include "machine/nvram.h"
 #include "includes/segas18.h"
 #include "sound/2612intf.h"
@@ -43,9 +44,9 @@
  *
  *************************************/
 
-void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index)
+void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index)
 {
-	UINT32 romsize = m_maincpu->region()->bytes();
+	uint32_t romsize = m_maincpu_region->bytes();
 	switch (index)
 	{
 		case 7:
@@ -122,14 +123,14 @@ void segas18_state::memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 ind
  *
  *************************************/
 
-UINT8 segas18_state::mapper_sound_r()
+uint8_t segas18_state::mapper_sound_r()
 {
 	return m_mcu_data;
 }
 
-void segas18_state::mapper_sound_w(UINT8 data)
+void segas18_state::mapper_sound_w(uint8_t data)
 {
-	soundlatch_write(data & 0xff);
+	m_soundlatch->write(m_soundcpu->space(AS_PROGRAM), 0, data & 0xff);
 	m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -143,7 +144,7 @@ void segas18_state::init_generic(segas18_rom_board rom_board)
 
 	// configure VDP
 	m_vdp->set_use_cram(1);
-	m_vdp->set_vdp_pal(FALSE);
+	m_vdp->set_vdp_pal(false);
 	m_vdp->set_framerate(60);
 	m_vdp->set_total_scanlines(262);
 	m_vdp->stop_timers(); // 315-5124 timers
@@ -379,7 +380,7 @@ READ16_MEMBER( segas18_state::ddcrew_custom_io_r )
 
 READ16_MEMBER( segas18_state::lghost_custom_io_r )
 {
-	UINT16 result;
+	uint16_t result;
 	switch (offset)
 	{
 		case 0x3010/2:
@@ -395,22 +396,175 @@ READ16_MEMBER( segas18_state::lghost_custom_io_r )
 
 WRITE16_MEMBER( segas18_state::lghost_custom_io_w )
 {
+	uint8_t pos_value_x, pos_value_y;
+
 	switch (offset)
 	{
+		// Player 1, Y axis
 		case 0x3010/2:
-			m_lghost_value = 255 - ioport("GUNY1")->read();
+
+			pos_value_x = ioport("GUNX1")->read();
+			pos_value_y = 255 - ioport("GUNY1")->read();
+
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_y;
+
+			// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+			else if (pos_value_x >= 50 && pos_value_x <= 99)
+			{
+				// Linear function (decreasing)
+				if (pos_value_y >= 130 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 0.94 + 0.80);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			else if (pos_value_x >= 100 && pos_value_x <= 199)
+			{
+				// Linear function (decreasing)
+				if (pos_value_y >= 100 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 0.89 + 6.00);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			else if (pos_value_x >= 200 && pos_value_x <= 249)
+			{
+				// Linear function (decreasing) #1
+				if (pos_value_y >= 30 && pos_value_y <= 55)
+					m_lghost_value = round(pos_value_y * 0.78 + 18.28);
+
+				// Linear function (decreasing) #2
+				else if (pos_value_y >= 100 && pos_value_y <= 205)
+					m_lghost_value = round(pos_value_y * 0.70 + 28.00);
+				// Linear function (decreasing) #2
+				else if (pos_value_y >= 206 && pos_value_y <= 225)
+					m_lghost_value = round(pos_value_y * 1.58 - 151.48);
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			// if crosshair is near the left edge, keep real value as no offset is needed
+			else
+				m_lghost_value = pos_value_y;
 			break;
 
+		// Player 1, X axis
 		case 0x3012/2:
-			m_lghost_value = ioport("GUNX1")->read();
+
+			pos_value_x = ioport("GUNX1")->read();
+
+			// Offset adjustment is disabled?
+			if (!ioport("FAKE")->read())
+				m_lghost_value = pos_value_x;
+
+			// Here, linear functions (increasing) are used
+			// The line is divided in two parts to get more precise results
+
+			// Linear function (increasing) #1
+			else if (pos_value_x >= 26 && pos_value_x <= 85)
+				m_lghost_value = round(pos_value_x * 1.13 + 0.95);
+
+			// Linear function (increasing) #2
+			else if (pos_value_x >= 86 && pos_value_x <= 140)
+				m_lghost_value = round(pos_value_x * 1.10 + 4.00);
+
+			// Here, linear functions (decreasing) are used
+			// The line is divided in two parts to get more precise results
+
+			// Linear function (decreasing) #1
+			else if (pos_value_x >= 141 && pos_value_x <= 190)
+				m_lghost_value = round(pos_value_x * 1.02 + 11.20);
+
+			// Linear function (decreasing) #2
+			else if (pos_value_x >= 191 && pos_value_x <= 240)
+				m_lghost_value = round(pos_value_x * 0.76 + 62.60);
+
+			// if crosshair is near the edges, keep real value as no offset is needed
+			else
+				m_lghost_value = pos_value_x;
 			break;
 
+		// Player 2 and 3, Y axis
 		case 0x3014/2:
-			m_lghost_value = 255 - ioport(m_lghost_select ? "GUNY3" : "GUNY2")->read();
+
+			// Player 3, Y axis
+			if (m_lghost_select)
+			{
+				pos_value_x = ioport("GUNX3")->read();
+				pos_value_y = 255 - ioport("GUNY3")->read();
+
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_y;
+
+				// Depending of the position on the X axis, we need to calculate the Y offset accordingly
+				else if (pos_value_x >= 128 && pos_value_x <= 255)
+				{
+					// Linear function (increasing)
+					if (pos_value_y >= 30 && pos_value_y <= 125)
+						m_lghost_value = round(pos_value_y * 1.01 + 11.82);
+					// Linear function (decreasing)
+					else if (pos_value_y >= 126 && pos_value_y <= 235)
+						m_lghost_value = round(pos_value_y * 0.94 + 21.90);
+					// Keep real value as no offset is needed
+					else
+						m_lghost_value = pos_value_y;
+				}
+				else if (pos_value_x >= 17 && pos_value_x <= 127)
+				{
+					// Linear function (increasing)
+					if (pos_value_y >= 40 && pos_value_y <= 145)
+						m_lghost_value = round(pos_value_y * 0.82 + 31.80);
+					// Linear function (decreasing)
+					else if (pos_value_y >= 200 && pos_value_y <= 225)
+						m_lghost_value = round(pos_value_y * 0.83 + 29.95);
+					// Keep real value as no offset is needed
+					else
+						m_lghost_value = pos_value_y;
+				}
+				// Keep real value as no offset is needed
+				else
+					m_lghost_value = pos_value_y;
+			}
+			// Player 2, Y axis. It doesn't need any offset adjustement.
+			else
+				m_lghost_value = 255 - ioport("GUNY2")->read();
 			break;
 
+		// Player 2 and 3, X axis
 		case 0x3016/2:
-			m_lghost_value = ioport(m_lghost_select ? "GUNX3" : "GUNX2")->read();
+
+			// Player 3, X axis
+			if (m_lghost_select)
+			{
+				pos_value_x = ioport("GUNX3")->read();
+
+				// Offset adjustment is disabled?
+				if (!ioport("FAKE")->read())
+					m_lghost_value = pos_value_x;
+
+				// Right edge of screen, constant value
+				else if (pos_value_x >= 17 && pos_value_x <= 34)
+					m_lghost_value = pos_value_x - 17;
+
+				// Linear function (increasing)
+				else if (pos_value_x >= 35 && pos_value_x <= 110)
+					m_lghost_value = round(pos_value_x * 0.94 - 14.08);
+
+				// Linear function (decreasing) #1
+				else if (pos_value_x >= 111 && pos_value_x <= 225)
+					m_lghost_value = round(pos_value_x * 1.15 - 35.65);
+
+				// if crosshair is near the edges, keep real value as no offset is needed*/
+				else
+					m_lghost_value = pos_value_x;
+				break;
+			}
+			// Player 2, X axis. It doesn't need any offset adjustement.
+			else
+				m_lghost_value = ioport("GUNX2")->read();
 			break;
 
 		case 0x3020/2:
@@ -551,7 +705,7 @@ static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, segas18_state )
 	AM_RANGE(0x80, 0x83) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym1", ym3438_device, read, write)
 	AM_RANGE(0x90, 0x93) AM_MIRROR(0x0c) AM_DEVREADWRITE("ym2", ym3438_device, read, write)
 	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0x1f) AM_WRITE(soundbank_w)
-	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_READ(soundlatch_byte_r) AM_WRITE(mcu_data_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x1f) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(mcu_data_w)
 ADDRESS_MAP_END
 
 
@@ -1005,6 +1159,11 @@ static INPUT_PORTS_START( lghost )
 
 	PORT_START("GUNY3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(5) PORT_PLAYER(3)
+
+	PORT_START("FAKE")
+	PORT_CONFNAME( 0x01, 0x01, "Correct P1/P3 Gun Offsets")
+	PORT_CONFSETTING(    0x00, DEF_STR( No ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -1250,6 +1409,8 @@ static MACHINE_CONFIG_START( system18, segas18_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3438, 8000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

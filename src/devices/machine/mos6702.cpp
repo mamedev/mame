@@ -34,7 +34,7 @@ const device_type MOS6702 = &device_creator<mos6702_device>;
 //  mos6702_device - constructor
 //-------------------------------------------------
 
-mos6702_device::mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mos6702_device::mos6702_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MOS6702, "MOS6702", tag, owner, clock, "mos6702", __FILE__)
 {
 }

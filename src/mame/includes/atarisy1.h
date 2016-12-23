@@ -30,23 +30,23 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<atari_sound_comm_device> m_soundcomm;
 
-	required_shared_ptr<UINT16> m_bankselect;
+	required_shared_ptr<uint16_t> m_bankselect;
 	required_device<atari_motion_objects_device> m_mob;
 
-	UINT8           m_joystick_type;
-	UINT8           m_trackball_type;
+	uint8_t           m_joystick_type;
+	uint8_t           m_trackball_type;
 
 	required_device<timer_device> m_joystick_timer;
-	UINT8           m_joystick_int;
-	UINT8           m_joystick_int_enable;
-	UINT8           m_joystick_value;
+	uint8_t           m_joystick_int;
+	uint8_t           m_joystick_int_enable;
+	uint8_t           m_joystick_value;
 
 	/* playfield parameters */
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
-	UINT16          m_playfield_lookup[256];
-	UINT8           m_playfield_tile_bank;
-	UINT16          m_playfield_priority_pens;
+	uint16_t          m_playfield_lookup[256];
+	uint8_t           m_playfield_tile_bank;
+	uint16_t          m_playfield_priority_pens;
 	required_device<timer_device> m_yscroll_reset_timer;
 
 	/* INT3 tracking */
@@ -58,10 +58,10 @@ public:
 	required_device<tms5220_device> m_tms;
 
 	/* graphics bank tracking */
-	UINT8           m_bank_gfx[3][8];
-	UINT8           m_bank_color_shift[MAX_GFX_ELEMENTS];
+	uint8_t           m_bank_gfx[3][8];
+	uint8_t           m_bank_color_shift[MAX_GFX_ELEMENTS];
 
-	UINT8           m_cur[2][2];
+	uint8_t           m_cur[2][2];
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(joystick_r);
 	DECLARE_WRITE16_MEMBER(joystick_w);
@@ -82,14 +82,14 @@ public:
 	DECLARE_MACHINE_START(atarisy1);
 	DECLARE_MACHINE_RESET(atarisy1);
 	DECLARE_VIDEO_START(atarisy1);
-	UINT32 screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_atarisy1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(delayed_joystick_int);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_reset_yscroll_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3off_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(atarisy1_int3_callback);
 	void update_timers(int scanline);
-	void decode_gfx(UINT16 *pflookup, UINT16 *molookup);
-	int get_bank(UINT8 prom1, UINT8 prom2, int bpp);
+	void decode_gfx(uint16_t *pflookup, uint16_t *molookup);
+	int get_bank(uint8_t prom1, uint8_t prom2, int bpp);
 	DECLARE_READ16_MEMBER( atarisy1_int3state_r );
 	DECLARE_WRITE16_MEMBER( atarisy1_spriteram_w );
 	DECLARE_WRITE16_MEMBER( atarisy1_bankselect_w );

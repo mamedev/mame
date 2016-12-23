@@ -4,10 +4,11 @@
 
 const device_type K053250 = &device_creator<k053250_device>;
 
-k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053250_device::k053250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053250, "K053250 LVC", tag, owner, clock, "k053250", __FILE__),
 		device_gfx_interface(mconfig, *this),
-		device_video_interface(mconfig, *this)
+		device_video_interface(mconfig, *this),
+		m_rom(*this, DEVICE_SELF)
 {
 }
 
@@ -20,18 +21,12 @@ void k053250_device::static_set_offsets(device_t &device, int offx, int offy)
 
 void k053250_device::unpack_nibbles()
 {
-	if(!m_region)
-		throw emu_fatalerror("k053250 %s: no associated region found\n", tag());
+	m_unpacked_rom.resize(m_rom.length()*2);
 
-	const UINT8 *base = m_region->base();
-	int size = m_region->bytes();
-
-	m_unpacked_rom.resize(size*2);
-
-	for(int i=0; i<size; i++)
+	for (int i = 0; i < m_rom.length(); i++)
 	{
-		m_unpacked_rom[2*i] = base[i] >> 4;
-		m_unpacked_rom[2*i+1] = base[i] & 0xf;
+		m_unpacked_rom[2*i] = m_rom[i] >> 4;
+		m_unpacked_rom[2*i+1] = m_rom[i] & 0xf;
 	}
 }
 
@@ -57,9 +52,9 @@ void k053250_device::device_reset()
 }
 
 // utility function to render a clipped scanline vertically or horizontally
-inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, UINT8 *source,
+inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *pal_base, uint8_t *source,
 										const rectangle &cliprect, int linepos, int scroll, int zoom,
-										UINT32 clipmask, UINT32 wrapmask, UINT32 orientation, bitmap_ind8 &priority, UINT8 pri)
+										uint32_t clipmask, uint32_t wrapmask, uint32_t orientation, bitmap_ind8 &priority, uint8_t pri)
 {
 // a sixteen-bit fixed point resolution should be adequate to our application
 #define FIXPOINT_PRECISION      16
@@ -67,12 +62,12 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 
 	int end_pixel, flip, dst_min, dst_max, dst_start, dst_length;
 
-	UINT32 src_wrapmask;
-	UINT8  *src_base;
+	uint32_t src_wrapmask;
+	uint8_t  *src_base;
 	int src_fx, src_fdx;
 	int pix_data, dst_offset;
-	UINT8  *pri_base;
-	UINT32 *dst_base;
+	uint8_t  *pri_base;
+	uint32_t *dst_base;
 	int dst_adv;
 
 	// flip X and flip Y also switch role when the X Y coordinates are swapped
@@ -220,17 +215,17 @@ inline void k053250_device::pdraw_scanline32(bitmap_rgb32 &bitmap, const pen_t *
 
 void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int colorbase, int flags, bitmap_ind8 &priority_bitmap, int priority )
 {
-	UINT8 *pix_ptr;
+	uint8_t *pix_ptr;
 	const pen_t *pal_base, *pal_ptr;
-	UINT32 src_clipmask, src_wrapmask, dst_wrapmask;
+	uint32_t src_clipmask, src_wrapmask, dst_wrapmask;
 	int linedata_offs, line_pos, line_start, line_end, scroll_corr;
 	int color, offset, zoom, scroll, passes, i;
 	bool wrap500 = false;
 
-	UINT16 *line_ram = m_buffer[m_page];                // pointer to physical line RAM
+	uint16_t *line_ram = m_buffer[m_page];                // pointer to physical line RAM
 	int map_scrollx = short(m_regs[0] << 8 | m_regs[1]) - m_offx; // signed horizontal scroll value
 	int map_scrolly = short(m_regs[2] << 8 | m_regs[3]) - m_offy; // signed vertical scroll value
-	UINT8 ctrl = m_regs[4];                                   // register four is the main control register
+	uint8_t ctrl = m_regs[4];                                   // register four is the main control register
 
 	// copy visible boundary values to more accessible locations
 	int dst_minx  = cliprect.min_x;
@@ -411,7 +406,7 @@ void k053250_device::draw( bitmap_rgb32 &bitmap, const rectangle &cliprect, int 
 			    priority     : value to be written to the priority bitmap, no effect when equals 0
 			*/
 			pdraw_scanline32(bitmap, pal_ptr, pix_ptr, cliprect,
-				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, priority_bitmap, (UINT8)priority);
+				line_pos, scroll, zoom, src_clipmask, src_wrapmask, orientation, priority_bitmap, (uint8_t)priority);
 
 			// shift scanline position one virtual screen upward to render the wrapped end if necessary
 			scroll -= dst_height;
@@ -461,5 +456,5 @@ WRITE16_MEMBER(k053250_device::ram_w)
 
 READ16_MEMBER(k053250_device::rom_r)
 {
-	return m_region->base()[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
+	return m_rom[0x80000 * m_regs[6] + 0x800 * m_regs[7] + offset/2];
 }

@@ -18,11 +18,11 @@
 class upd4701_device : public device_t
 {
 public:
-	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	void x_add( INT16 data );
-	void y_add( INT16 data );
-	void switches_set( UINT8 data );
+	void x_add( int16_t data );
+	void y_add( int16_t data );
+	void switches_set( uint8_t data );
 
 	DECLARE_WRITE_LINE_MEMBER( cs_w );
 	DECLARE_WRITE_LINE_MEMBER( xy_w );

@@ -73,8 +73,8 @@ TILE_GET_INFO_MEMBER(dbz_state::get_dbz_bg1_tile_info)
 
 void dbz_state::video_start()
 {
-	m_bg1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
-	m_bg2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg1_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
+	m_bg2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dbz_state::get_dbz_bg2_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 32);
 
 	m_bg1_tilemap->set_transparent_pen(0);
 	m_bg2_tilemap->set_transparent_pen(0);
@@ -88,7 +88,7 @@ void dbz_state::video_start()
 	m_k056832->set_layer_offs(3, -31, -16); //?
 }
 
-UINT32 dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dbz_state::screen_update_dbz(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[6] = { K053251_CI3, K053251_CI4, K053251_CI4, K053251_CI4, K053251_CI2, K053251_CI1 };
 	int layer[5], plane, new_colorbase;

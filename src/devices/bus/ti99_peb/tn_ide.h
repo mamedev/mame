@@ -17,13 +17,14 @@
 #include "emu.h"
 #include "machine/ataintf.h"
 #include "machine/rtc65271.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_IDE;
 
 class nouspikel_ide_interface_device : public ti_expansion_card_device
 {
 public:
-	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nouspikel_ide_interface_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -40,7 +41,6 @@ public:
 protected:
 	virtual void device_start(void) override;
 	virtual void device_reset(void) override;
-	virtual const rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -55,10 +55,10 @@ private:
 
 	bool    m_tms9995_mode;
 
-	UINT16  m_input_latch;
-	UINT16  m_output_latch;
+	uint16_t  m_input_latch;
+	uint16_t  m_output_latch;
 
-	UINT8   *m_ram;
+	required_device<ram_device> m_ram;
 };
 
 #endif

@@ -24,7 +24,7 @@
 // device type definition
 const device_type TC8830F = &device_creator<tc8830f_device>;
 
-tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TC8830F, "TC8830F", tag, owner, clock, "tc8830f", __FILE__),
 		device_sound_interface(mconfig, *this), m_stream(nullptr),
 		m_playing(false),
@@ -37,7 +37,8 @@ tc8830f_device::tc8830f_device(const machine_config &mconfig, const char *tag, d
 		m_output(0),
 		m_command(0),
 		m_cmd_rw(0),
-		m_phrase(0), m_mem_base(nullptr), m_mem_mask(0)
+		m_phrase(0),
+		m_mem(*this, DEVICE_SELF)
 {
 }
 
@@ -46,9 +47,6 @@ void tc8830f_device::device_start()
 {
 	// create the stream
 	m_stream = stream_alloc(0, 1, clock() / 0x10);
-
-	m_mem_base = region()->base();
-	m_mem_mask = region()->bytes() - 1;
 
 	// register for savestates
 	save_item(NAME(m_playing));
@@ -83,18 +81,18 @@ void tc8830f_device::device_clock_changed()
 
 void tc8830f_device::sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples)
 {
-	INT32 mix = 0;
+	int32_t mix = 0;
 
 	for (int i = 0; i < samples; i++)
 	{
 		if (m_playing)
 		{
 			// get bit
-			int bit = m_mem_base[m_address] >> m_bitcount & 1;
+			int bit = m_mem[m_address] >> m_bitcount & 1;
 			m_bitcount = (m_bitcount + 1) & 7;
 			if (m_bitcount == 0)
 			{
-				m_address = (m_address + 1) & m_mem_mask;
+				m_address = (m_address + 1) & m_mem.mask();
 				if (m_address == m_stop_address)
 					m_playing = false;
 			}
@@ -151,7 +149,7 @@ void tc8830f_device::reset()
 }
 
 
-void tc8830f_device::write_p(UINT8 data)
+void tc8830f_device::write_p(uint8_t data)
 {
 	m_stream->update();
 	data &= 0xf;
@@ -199,7 +197,7 @@ void tc8830f_device::write_p(UINT8 data)
 				m_address = (m_address & ~(0xf << (m_cmd_rw*4))) | (data << (m_cmd_rw*4));
 				if (m_cmd_rw == 5)
 				{
-					m_address &= m_mem_mask;
+					m_address &= m_mem.mask();
 					m_bitcount = 0;
 					m_cmd_rw = -1;
 				}
@@ -210,7 +208,7 @@ void tc8830f_device::write_p(UINT8 data)
 				m_stop_address = (m_stop_address & ~(0xf << (m_cmd_rw*4))) | (data << (m_cmd_rw*4));
 				if (m_cmd_rw == 5)
 				{
-					m_stop_address &= m_mem_mask;
+					m_stop_address &= m_mem.mask();
 					m_cmd_rw = -1;
 				}
 				break;
@@ -233,10 +231,10 @@ void tc8830f_device::write_p(UINT8 data)
 					m_phrase = (m_phrase & 0x0f) | (data << 4 & 0x30);
 
 					// update addresses and start
-					UINT8 offs = m_phrase * 4;
-					m_address = (m_mem_base[offs] | m_mem_base[offs|1]<<8 | m_mem_base[offs|2]<<16) & m_mem_mask;
+					uint8_t offs = m_phrase * 4;
+					m_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();
 					offs += 4;
-					m_stop_address = (m_mem_base[offs] | m_mem_base[offs|1]<<8 | m_mem_base[offs|2]<<16) & m_mem_mask;
+					m_stop_address = (m_mem[offs] | m_mem[offs|1]<<8 | m_mem[offs|2]<<16) & m_mem.mask();
 
 					m_bitcount = 0;
 					m_prevbits = 0;

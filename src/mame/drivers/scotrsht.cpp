@@ -37,6 +37,7 @@ Stephh's notes (based on the game M6502 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "includes/konamipt.h"
 #include "includes/scotrsht.h"
@@ -55,7 +56,7 @@ INTERRUPT_GEN_MEMBER(scotrsht_state::interrupt)
 
 WRITE8_MEMBER(scotrsht_state::soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -79,14 +80,14 @@ static ADDRESS_MAP_START( scotrsht_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x3301, 0x3301) AM_READ_PORT("P1")
 	AM_RANGE(0x3302, 0x3302) AM_READ_PORT("P2")
 	AM_RANGE(0x3303, 0x3303) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3300, 0x3300) AM_WRITE(watchdog_reset_w) /* watchdog */
+	AM_RANGE(0x3300, 0x3300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_map, AS_PROGRAM, 8, scotrsht_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scotrsht_sound_port, AS_IO, 8, scotrsht_state )
@@ -190,6 +191,8 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 	MCFG_CPU_PROGRAM_MAP(scotrsht_sound_map)
 	MCFG_CPU_IO_MAP(scotrsht_sound_port)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -206,6 +209,8 @@ static MACHINE_CONFIG_START( scotrsht, scotrsht_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)

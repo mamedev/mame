@@ -46,14 +46,14 @@ To Do:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/realbrk.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/ymz280b.h"
 
 
 /* Read 4 ten bit dip switches */
 READ16_MEMBER(realbrk_state::realbrk_dsw_r)
 {
-	UINT16 sel = ~m_dsw_select[0];
+	uint16_t sel = ~m_dsw_select[0];
 	if (sel & 0x01) return  (ioport("SW1")->read() & 0x00ff) << 8;      // DSW1 low bits
 	if (sel & 0x02) return  (ioport("SW2")->read() & 0x00ff) << 8;      // DSW2 low bits
 	if (sel & 0x04) return  (ioport("SW3")->read() & 0x00ff) << 8;      // DSW3 low bits
@@ -88,7 +88,7 @@ READ16_MEMBER(realbrk_state::pkgnsh_input_r)
 
 READ16_MEMBER(realbrk_state::pkgnshdx_input_r)
 {
-	UINT16 sel = ~m_dsw_select[0];
+	uint16_t sel = ~m_dsw_select[0];
 
 	switch(offset)
 	{
@@ -793,7 +793,7 @@ static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MCFG_CPU_PROGRAM_MAP(pkgnsh_mem)
 
 	MCFG_DEVICE_MODIFY("tmp68301")
-	MCFG_TMP68301_OUT_PARALLEL_CB(NULL)
+	MCFG_TMP68301_OUT_PARALLEL_CB(NOOP)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pkgnshdx, pkgnsh )

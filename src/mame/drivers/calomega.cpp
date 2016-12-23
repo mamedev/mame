@@ -661,7 +661,7 @@
 
 WRITE_LINE_MEMBER(calomega_state::update_aciabaud_scale)
 {
-	UINT8 dsw2 = m_sw2->read();
+	uint8_t dsw2 = m_sw2->read();
 
 	m_aciabaud->set_clock_scale((double)dsw2 / 128);
 }
@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( s903mod_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x08c8, 0x08cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x1800, 0xffff) AM_ROM
+	AM_RANGE(0x1800, 0x3fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
@@ -856,7 +856,7 @@ static ADDRESS_MAP_START( sys905_map, AS_PROGRAM, 8, calomega_state )
 	AM_RANGE(0x10c8, 0x10cb) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0x2800, 0xffff) AM_ROM
+	AM_RANGE(0x2800, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys906_map, AS_PROGRAM, 8, calomega_state )
@@ -2622,7 +2622,7 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NULL)
+	MCFG_AY8910_PORT_A_READ_CB(NOOP)
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -2646,7 +2646,7 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ay8912")
-	MCFG_AY8910_PORT_A_READ_CB(NULL)
+	MCFG_AY8910_PORT_A_READ_CB(NOOP)
 
 	MCFG_DEVICE_REMOVE("acia6850_0")
 
@@ -3665,7 +3665,7 @@ DRIVER_INIT_MEMBER(calomega_state,comg080)
 	   Start = $2042;  NMI = $26f8;
 	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
 	*/
-	UINT8 *PRGROM = memregion( "maincpu" )->base();
+	uint8_t *PRGROM = memregion( "maincpu" )->base();
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */
 	PRGROM[0x3ff9] = 0x97; /* checked by code */

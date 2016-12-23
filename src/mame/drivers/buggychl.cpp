@@ -80,6 +80,7 @@ Dip locations and factory settings verified from dip listing
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/buggychl.h"
 
@@ -101,7 +102,7 @@ TIMER_CALLBACK_MEMBER(buggychl_state::nmi_callback)
 
 WRITE8_MEMBER(buggychl_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(buggychl_state::nmi_callback),this), data);
 }
 
@@ -137,7 +138,7 @@ static ADDRESS_MAP_START( buggychl_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xd100, 0xd100) AM_WRITE(buggychl_ctrl_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
-	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd300, 0xd300) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
 	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_mcu_r, buggychl_mcu_w)
 	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", buggychl_mcu_device, buggychl_mcu_status_r)
@@ -167,7 +168,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, buggychl_state )
 	AM_RANGE(0x4810, 0x481d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0x4820, 0x4820) AM_RAM /* VOL/BAL   for the 7630 on the MSM5232 output */
 	AM_RANGE(0x4830, 0x4830) AM_RAM /* TRBL/BASS for the 7630 on the MSM5232 output  */
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0x5001, 0x5001) AM_READNOP /* is command pending? */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
@@ -329,7 +330,7 @@ WRITE8_MEMBER(buggychl_state::port_b_1_w)
 
 void buggychl_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x2000);
 
@@ -373,6 +374,7 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
 	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -391,6 +393,8 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(buggychl_state, port_a_0_w))

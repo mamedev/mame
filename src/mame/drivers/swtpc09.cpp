@@ -107,11 +107,10 @@ static MACHINE_CONFIG_START( swtpc09, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -148,11 +147,10 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -180,9 +178,9 @@ static MACHINE_CONFIG_START( swtpc09i, swtpc09_state )
 /* old start to adding ide support, needs major updating */
 /* this is to support an add on card driving IDE from a PIA */
 //  MCFG_HARDDISK_ADD("harddisk")
-//  MCFG_IDE_CONTROLLER_ADD("ide", NULL)
-//  MCFG_IDE_CONTROLLER_REGIONS("harddisk", NULL)
-//  MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", NULL, false )  /* FIXME */ bebox
+//  MCFG_IDE_CONTROLLER_ADD("ide", nullptr)
+//  MCFG_IDE_CONTROLLER_REGIONS("harddisk", nullptr)
+//  MCFG_IDE_CONTROLLER_ADD( "ide", ide_intf, "hdd", nullptr, false )  /* FIXME */ bebox
 MACHINE_CONFIG_END
 
 
@@ -197,11 +195,10 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("acia", acia6850_device, write_rxd))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("acia", acia6850_device, write_cts))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(2000000)
+	MCFG_DEVICE_ADD("ptm", PTM6840, 2000000)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(50, 0, 50)
-	MCFG_PTM6840_OUT0_CB(WRITE8(swtpc09_state, ptm_o1_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(swtpc09_state, ptm_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(swtpc09_state, ptm_o1_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(swtpc09_state, ptm_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(swtpc09_state, ptm_irq))
 
 	MCFG_DEVICE_ADD("pia", PIA6821, 0)
@@ -213,7 +210,7 @@ static MACHINE_CONFIG_START( swtpc09d3, swtpc09_state )
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_ACIA6850_IRQ_HANDLER(WRITELINE(swtpc09_state, acia_interrupt))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia_clock", CLOCK, 153600)
 	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(swtpc09_state, write_acia_clock))

@@ -10,7 +10,7 @@ const device_type H8S2394 = &device_creator<h8s2394_device>;
 const device_type H8S2392 = &device_creator<h8s2392_device>;
 const device_type H8S2390 = &device_creator<h8s2390_device>;
 
-h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	h8s2000_device(mconfig, type, name, tag, owner, clock, shortname, source, address_map_delegate(FUNC(h8s2357_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -38,11 +38,14 @@ h8s2357_device::h8s2357_device(const machine_config &mconfig, device_type type, 
 	timer16_5(*this, "timer16:5"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2"), ram_start(0), syscr(0)
+	sci2(*this, "sci2"),
+	watchdog(*this, "watchdog")
 {
+	ram_start = 0;
+	syscr = 0;
 }
 
-h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2000_device(mconfig, H8S2357, "H8S/2357", tag, owner, clock, "h8s2357", __FILE__, address_map_delegate(FUNC(h8s2357_device::map), this)),
 	intc(*this, "intc"),
 	adc(*this, "adc"),
@@ -70,36 +73,39 @@ h8s2357_device::h8s2357_device(const machine_config &mconfig, const char *tag, d
 	timer16_5(*this, "timer16:5"),
 	sci0(*this, "sci0"),
 	sci1(*this, "sci1"),
-	sci2(*this, "sci2")
+	sci2(*this, "sci2"),
+	watchdog(*this, "watchdog")
 {
+	ram_start = 0;
+	syscr = 0;
 	ram_start = 0xffdc00;
 }
 
-h8s2352_device::h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2352_device::h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2357_device(mconfig, H8S2352, "H8S/2352", tag, owner, clock, "h8s2352", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2398_device::h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2398_device::h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2357_device(mconfig, H8S2398, "H8S/2398", tag, owner, clock, "h8s2398", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2394_device::h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2394_device::h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2357_device(mconfig, H8S2394, "H8S/2394", tag, owner, clock, "h8s2394", __FILE__)
 {
 	ram_start = 0xff7c00;
 }
 
-h8s2392_device::h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2392_device::h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2357_device(mconfig, H8S2392, "H8S/2392", tag, owner, clock, "h8s2392", __FILE__)
 {
 	ram_start = 0xffdc00;
 }
 
-h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+h8s2390_device::h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	h8s2357_device(mconfig, H8S2390, "H8S/2390", tag, owner, clock, "h8s2390", __FILE__)
 {
 	ram_start = 0xffec00;
@@ -183,6 +189,7 @@ static MACHINE_CONFIG_FRAGMENT(h8s2357)
 	MCFG_H8_SCI_ADD("sci0", "intc", 80, 81, 82, 83)
 	MCFG_H8_SCI_ADD("sci1", "intc", 84, 85, 86, 87)
 	MCFG_H8_SCI_ADD("sci2", "intc", 88, 89, 90, 91)
+	MCFG_H8_WATCHDOG_ADD("watchdog", "intc", 25, h8_watchdog_device::S)
 MACHINE_CONFIG_END
 
 DEVICE_ADDRESS_MAP_START(map, 16, h8s2357_device)
@@ -292,6 +299,8 @@ DEVICE_ADDRESS_MAP_START(map, 16, h8s2357_device)
 	AM_RANGE(0xffffb4, 0xffffb7) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcor_r,  tcor_w,  0x00ff)
 	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_0",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0xff00)
 	AM_RANGE(0xffffb8, 0xffffb9) AM_DEVREADWRITE8("timer8_1",  h8_timer8_channel_device,  tcnt_r,  tcnt_w,  0x00ff)
+	AM_RANGE(0xffffbc, 0xffffbd) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        wd_r,    wd_w           )
+	AM_RANGE(0xffffbe, 0xffffbf) AM_DEVREADWRITE( "watchdog",  h8_watchdog_device,        rst_r,   rst_w          )
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tstr_r,  tstr_w,  0xff00)
 	AM_RANGE(0xffffc0, 0xffffc1) AM_DEVREADWRITE8("timer16",   h8_timer16_device,         tsyr_r,  tsyr_w,  0x00ff)
 	AM_RANGE(0xffffd0, 0xffffd1) AM_DEVREADWRITE8("timer16:0", h8_timer16_channel_device, tcr_r,   tcr_w,   0xff00)
@@ -383,9 +392,9 @@ void h8s2357_device::interrupt_taken()
 	standard_irq_callback(intc->interrupt_taken(taken_irq_vector));
 }
 
-void h8s2357_device::internal_update(UINT64 current_time)
+void h8s2357_device::internal_update(uint64_t current_time)
 {
-	UINT64 event_time = 0;
+	uint64_t event_time = 0;
 
 	add_event(event_time, adc->internal_update(current_time));
 	add_event(event_time, sci0->internal_update(current_time));
@@ -399,6 +408,7 @@ void h8s2357_device::internal_update(UINT64 current_time)
 	add_event(event_time, timer16_3->internal_update(current_time));
 	add_event(event_time, timer16_4->internal_update(current_time));
 	add_event(event_time, timer16_5->internal_update(current_time));
+	add_event(event_time, watchdog->internal_update(current_time));
 
 	recompute_bcount(event_time);
 }
@@ -423,5 +433,5 @@ WRITE8_MEMBER(h8s2357_device::syscr_w)
 {
 	syscr = data;
 	update_irq_filter();
-	logerror("%s: syscr = %02x\n", tag(), data);
+	logerror("syscr = %02x\n", data);
 }

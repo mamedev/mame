@@ -76,8 +76,8 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(nsmpoker_videoram_w);
 	DECLARE_WRITE8_MEMBER(nsmpoker_colorram_w);
@@ -86,7 +86,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(nsmpoker);
 	virtual void machine_reset() override;
-	UINT32 screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(nsmpoker_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -131,11 +131,11 @@ TILE_GET_INFO_MEMBER(nsmpoker_state::get_bg_tile_info)
 
 void nsmpoker_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(nsmpoker_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
-UINT32 nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nsmpoker_state::screen_update_nsmpoker(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -399,7 +399,7 @@ GFXDECODE_END
 void nsmpoker_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
 /*************************

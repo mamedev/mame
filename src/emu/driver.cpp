@@ -14,17 +14,6 @@
 
 
 //**************************************************************************
-//  ADDRESS_MAPS
-//**************************************************************************
-
-// default address map
-static ADDRESS_MAP_START( generic, AS_0, 8, driver_device )
-	AM_RANGE(0x00000000, 0xffffffff) AM_DEVREADWRITE(":", driver_device, fatal_generic_read, fatal_generic_write)
-ADDRESS_MAP_END
-
-
-
-//**************************************************************************
 //  DRIVER DEVICE
 //**************************************************************************
 
@@ -34,15 +23,10 @@ ADDRESS_MAP_END
 
 driver_device::driver_device(const machine_config &mconfig, device_type type, const char *tag)
 	: device_t(mconfig, type, "Driver Device", tag, nullptr, 0, "", __FILE__),
-		device_memory_interface(mconfig, *this),
-		m_space_config("generic", ENDIANNESS_LITTLE, 8, 32, 0, nullptr, *ADDRESS_MAP_NAME(generic)),
 		m_system(nullptr),
-		m_latch_clear_value(0),
 		m_flip_screen_x(0),
 		m_flip_screen_y(0)
 {
-	memset(m_latched_value, 0, sizeof(m_latched_value));
-	memset(m_latch_read, 0, sizeof(m_latch_read));
 }
 
 
@@ -176,7 +160,7 @@ void driver_device::video_reset()
 //  game's ROMs
 //-------------------------------------------------
 
-const rom_entry *driver_device::device_rom_region() const
+const tiny_rom_entry *driver_device::device_rom_region() const
 {
 	return m_system->rom;
 }
@@ -201,9 +185,8 @@ ioport_constructor driver_device::device_input_ports() const
 void driver_device::device_start()
 {
 	// reschedule ourselves to be last
-	device_iterator iter(*this);
-	for (device_t *test = iter.first(); test != nullptr; test = iter.next())
-		if (test != this && !test->started())
+	for (device_t &test : device_iterator(*this))
+		if (&test != this && !test.started())
 			throw device_missing_dependencies();
 
 	// call the game-specific init
@@ -232,8 +215,6 @@ void driver_device::device_start()
 		video_start();
 
 	// save generic states
-	save_item(NAME(m_latch_clear_value));
-	save_item(NAME(m_latched_value));
 	save_item(NAME(m_flip_screen_x));
 	save_item(NAME(m_flip_screen_y));
 }
@@ -267,17 +248,6 @@ void driver_device::device_reset_after_children()
 }
 
 
-//-------------------------------------------------
-//  memory_space_config - return a description of
-//  any address spaces owned by this device
-//-------------------------------------------------
-
-const address_space_config *driver_device::memory_space_config(address_spacenum spacenum) const
-{
-	return (spacenum == 0) ? &m_space_config : nullptr;
-}
-
-
 
 //**************************************************************************
 //  INTERRUPT ENABLE AND VECTOR HELPERS
@@ -287,7 +257,7 @@ const address_space_config *driver_device::memory_space_config(address_spacenum 
 //  irq_pulse_clear - clear a "pulsed" IRQ line
 //-------------------------------------------------
 
-void driver_device::irq_pulse_clear(void *ptr, INT32 param)
+void driver_device::irq_pulse_clear(void *ptr, s32 param)
 {
 	device_execute_interface *exec = reinterpret_cast<device_execute_interface *>(ptr);
 	int irqline = param;
@@ -377,105 +347,6 @@ INTERRUPT_GEN_MEMBER( driver_device::irq7_line_pulse )  { generic_pulse_irq_line
 INTERRUPT_GEN_MEMBER( driver_device::irq7_line_assert ) { device.execute().set_input_line(7, ASSERT_LINE); }
 
 
-
-//**************************************************************************
-//  WATCHDOG READ/WRITE HELPERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  8-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE8_MEMBER( driver_device::watchdog_reset_w ) { machine().watchdog_reset(); }
-READ8_MEMBER( driver_device::watchdog_reset_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-//-------------------------------------------------
-//  16-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE16_MEMBER( driver_device::watchdog_reset16_w ) { machine().watchdog_reset(); }
-READ16_MEMBER( driver_device::watchdog_reset16_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-//-------------------------------------------------
-//  32-bit reset read/write handlers
-//-------------------------------------------------
-
-WRITE32_MEMBER( driver_device::watchdog_reset32_w ) { machine().watchdog_reset(); }
-READ32_MEMBER( driver_device::watchdog_reset32_r ) { machine().watchdog_reset(); return space.unmap(); }
-
-
-
-//**************************************************************************
-//  GENERIC SOUND COMMAND LATCHING
-//**************************************************************************
-
-//-------------------------------------------------
-//  soundlatch_sync_callback - time-delayed
-//  callback to set a latch value
-//-------------------------------------------------
-
-void driver_device::soundlatch_sync_callback(void *ptr, INT32 param)
-{
-	UINT16 value = param >> 8;
-	int which = param & 0xff;
-
-	// if the latch hasn't been read and the value is changed, log a warning
-	if (!m_latch_read[which] && m_latched_value[which] != value)
-		logerror("Warning: sound latch %d written before being read. Previous: %02x, new: %02x\n", which, m_latched_value[which], value);
-
-	// store the new value and mark it not read
-	m_latched_value[which] = value;
-	m_latch_read[which] = 0;
-}
-
-
-//-------------------------------------------------
-//  soundlatch_byte_w - global write handlers for
-//  writing to sound latches
-//-------------------------------------------------
-
-void driver_device::soundlatch_write(UINT8 index, UINT32 data) { machine().scheduler().synchronize(timer_expired_delegate(FUNC(driver_device::soundlatch_sync_callback), this), index | (data << 8)); }
-WRITE8_MEMBER( driver_device::soundlatch_byte_w )   { soundlatch_write(0, data); }
-WRITE16_MEMBER( driver_device::soundlatch_word_w )  { soundlatch_write(0, data); }
-WRITE8_MEMBER( driver_device::soundlatch2_byte_w )  { soundlatch_write(1, data); }
-WRITE16_MEMBER( driver_device::soundlatch2_word_w ) { soundlatch_write(1, data); }
-WRITE8_MEMBER( driver_device::soundlatch3_byte_w )  { soundlatch_write(2, data); }
-WRITE16_MEMBER( driver_device::soundlatch3_word_w ) { soundlatch_write(2, data); }
-WRITE8_MEMBER( driver_device::soundlatch4_byte_w )  { soundlatch_write(3, data); }
-WRITE16_MEMBER( driver_device::soundlatch4_word_w ) { soundlatch_write(3, data); }
-
-
-//-------------------------------------------------
-//  soundlatch_byte_r - global read handlers for
-//  reading from sound latches
-//-------------------------------------------------
-
-UINT32 driver_device::soundlatch_read(UINT8 index) { m_latch_read[index] = 1; return m_latched_value[index]; }
-READ8_MEMBER( driver_device::soundlatch_byte_r )    { return soundlatch_read(0); }
-READ16_MEMBER( driver_device::soundlatch_word_r )   { return soundlatch_read(0); }
-READ8_MEMBER( driver_device::soundlatch2_byte_r )   { return soundlatch_read(1); }
-READ16_MEMBER( driver_device::soundlatch2_word_r )  { return soundlatch_read(1); }
-READ8_MEMBER( driver_device::soundlatch3_byte_r )   { return soundlatch_read(2); }
-READ16_MEMBER( driver_device::soundlatch3_word_r )  { return soundlatch_read(2); }
-READ8_MEMBER( driver_device::soundlatch4_byte_r )   { return soundlatch_read(3); }
-READ16_MEMBER( driver_device::soundlatch4_word_r )  { return soundlatch_read(3); }
-
-
-//-------------------------------------------------
-//  soundlatch_clear_byte_w - global write handlers
-//  for clearing sound latches
-//-------------------------------------------------
-
-void driver_device::soundlatch_clear(UINT8 index) { m_latched_value[index] = m_latch_clear_value; }
-WRITE8_MEMBER( driver_device::soundlatch_clear_byte_w )  { soundlatch_clear(0); }
-WRITE8_MEMBER( driver_device::soundlatch2_clear_byte_w ) { soundlatch_clear(1); }
-WRITE8_MEMBER( driver_device::soundlatch3_clear_byte_w ) { soundlatch_clear(2); }
-WRITE8_MEMBER( driver_device::soundlatch4_clear_byte_w ) { soundlatch_clear(3); }
-
-
-
 //**************************************************************************
 //  GENERIC FLIP SCREEN HANDLING
 //**************************************************************************
@@ -495,7 +366,7 @@ void driver_device::updateflip()
 //  flip_screen_set - set global flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_set(UINT32 on)
+void driver_device::flip_screen_set(u32 on)
 {
 	// normalize to all 1
 	if (on)
@@ -515,7 +386,7 @@ void driver_device::flip_screen_set(UINT32 on)
 //  do not call updateflip.
 //-------------------------------------------------
 
-void driver_device::flip_screen_set_no_update(UINT32 on)
+void driver_device::flip_screen_set_no_update(u32 on)
 {
 	// flip_screen_y is not updated on purpose
 	// this function is for drivers which
@@ -531,7 +402,7 @@ void driver_device::flip_screen_set_no_update(UINT32 on)
 //  flip_screen_x_set - set global horizontal flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_x_set(UINT32 on)
+void driver_device::flip_screen_x_set(u32 on)
 {
 	// normalize to all 1
 	if (on)
@@ -550,7 +421,7 @@ void driver_device::flip_screen_x_set(UINT32 on)
 //  flip_screen_y_set - set global vertical flip
 //-------------------------------------------------
 
-void driver_device::flip_screen_y_set(UINT32 on)
+void driver_device::flip_screen_y_set(u32 on)
 {
 	// normalize to all 1
 	if (on)
@@ -580,23 +451,4 @@ CUSTOM_INPUT_MEMBER(driver_device::custom_port_read)
 {
 	const char *tag = (const char *)param;
 	return ioport(tag)->read();
-}
-
-
-//**************************************************************************
-//  MISC READ/WRITE HANDLERS
-//**************************************************************************
-
-//-------------------------------------------------
-//  generic space fatal error handlers
-//-------------------------------------------------
-
-READ8_MEMBER( driver_device::fatal_generic_read )
-{
-	throw emu_fatalerror("Attempted to read from generic address space (offs %X)\n", offset);
-}
-
-WRITE8_MEMBER( driver_device::fatal_generic_write )
-{
-	throw emu_fatalerror("Attempted to write to generic address space (offs %X = %02X)\n", offset, data);
 }

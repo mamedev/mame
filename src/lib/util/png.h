@@ -89,24 +89,24 @@ struct png_text
 
 struct png_info
 {
-	UINT8 *         image;
-	UINT32          width, height;
-	UINT32          xres, yres;
+	uint8_t *         image;
+	uint32_t          width, height;
+	uint32_t          xres, yres;
 	rectangle       screen;
 	double          xscale, yscale;
 	double          source_gamma;
-	UINT32          resolution_unit;
-	UINT8           bit_depth;
-	UINT8           color_type;
-	UINT8           compression_method;
-	UINT8           filter_method;
-	UINT8           interlace_method;
+	uint32_t          resolution_unit;
+	uint8_t           bit_depth;
+	uint8_t           color_type;
+	uint8_t           compression_method;
+	uint8_t           filter_method;
+	uint8_t           interlace_method;
 
-	UINT8 *         palette;
-	UINT32          num_palette;
+	uint8_t *         palette;
+	uint32_t          num_palette;
 
-	UINT8 *         trans;
-	UINT32          num_trans;
+	uint8_t *         trans;
+	uint32_t          num_trans;
 
 	png_text *      textlist;
 };
@@ -119,15 +119,15 @@ struct png_info
 
 void png_free(png_info *pnginfo);
 
-png_error png_read_file(core_file *fp, png_info *pnginfo);
-png_error png_read_bitmap(core_file *fp, bitmap_argb32 &bitmap);
+png_error png_read_file(util::core_file &fp, png_info *pnginfo);
+png_error png_read_bitmap(util::core_file &fp, bitmap_argb32 &bitmap);
 png_error png_expand_buffer_8bit(png_info *p);
 
 png_error png_add_text(png_info *pnginfo, const char *keyword, const char *text);
-png_error png_write_bitmap(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
+png_error png_write_bitmap(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
 
-png_error mng_capture_start(core_file *fp, bitmap_t &bitmap, double rate);
-png_error mng_capture_frame(core_file *fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
-png_error mng_capture_stop(core_file *fp);
+png_error mng_capture_start(util::core_file &fp, bitmap_t &bitmap, double rate);
+png_error mng_capture_frame(util::core_file &fp, png_info *info, bitmap_t &bitmap, int palette_length, const rgb_t *palette);
+png_error mng_capture_stop(util::core_file &fp);
 
 #endif  /* __PNG_H__ */

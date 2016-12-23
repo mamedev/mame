@@ -125,65 +125,62 @@
 class force68k_state : public driver_device
 {
 public:
-force68k_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-		m_maincpu (*this, "maincpu"),
-		m_rtc (*this, "rtc"),
-		m_pit (*this, "pit"),
-		m_aciahost (*this, "aciahost"),
-		m_aciaterm (*this, "aciaterm"),
-		m_aciaremt (*this, "aciaremt"),
-		m_centronics (*this, "centronics")
-		, m_centronics_ack (0)
-		, m_centronics_busy (0)
-		, m_centronics_perror (0)
-		, m_centronics_select (0)
-		,m_cart(*this, "exp_rom1")
-{
-}
+	force68k_state(const machine_config &mconfig, device_type type, const char *tag)
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "rtc")
+		, m_pit(*this, "pit")
+		, m_aciahost(*this, "aciahost")
+		, m_aciaterm(*this, "aciaterm")
+		, m_aciaremt(*this, "aciaremt")
+		, m_centronics(*this, "centronics")
+		, m_centronics_ack(0)
+		, m_centronics_busy(0)
+		, m_centronics_perror(0)
+		, m_centronics_select(0)
+		, m_cart(*this, "exp_rom1")
+	{
+	}
 
-DECLARE_READ16_MEMBER (bootvect_r);
-DECLARE_READ16_MEMBER (vme_a24_r);
-DECLARE_WRITE16_MEMBER (vme_a24_w);
-DECLARE_READ16_MEMBER (vme_a16_r);
-DECLARE_WRITE16_MEMBER (vme_a16_w);
-virtual void machine_start () override;
-// clocks
-DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
-DECLARE_WRITE_LINE_MEMBER (write_aciaterm_clock);
-DECLARE_WRITE_LINE_MEMBER (write_aciaremt_clock);
-// centronics printer interface
-DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
-DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
-DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
-DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
-// User EPROM/SRAM slot(s)
-int force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
-DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
-DECLARE_READ16_MEMBER (read16_rom);
-
-protected:
+	DECLARE_READ16_MEMBER (bootvect_r);
+	DECLARE_READ16_MEMBER (vme_a24_r);
+	DECLARE_WRITE16_MEMBER (vme_a24_w);
+	DECLARE_READ16_MEMBER (vme_a16_r);
+	DECLARE_WRITE16_MEMBER (vme_a16_w);
+	virtual void machine_start () override;
+	// clocks
+	DECLARE_WRITE_LINE_MEMBER (write_aciahost_clock);
+	DECLARE_WRITE_LINE_MEMBER (write_aciaterm_clock);
+	DECLARE_WRITE_LINE_MEMBER (write_aciaremt_clock);
+	// centronics printer interface
+	DECLARE_WRITE_LINE_MEMBER (centronics_ack_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_busy_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_perror_w);
+	DECLARE_WRITE_LINE_MEMBER (centronics_select_w);
+	// User EPROM/SRAM slot(s)
+	image_init_result force68k_load_cart(device_image_interface &image, generic_slot_device *slot);
+	DECLARE_DEVICE_IMAGE_LOAD_MEMBER (exp1_load) { return force68k_load_cart(image, m_cart); }
+	DECLARE_READ16_MEMBER (read16_rom);
 
 private:
-required_device<cpu_device> m_maincpu;
-required_device<mm58167_device> m_rtc;
-required_device<pit68230_device> m_pit;
-required_device<acia6850_device> m_aciahost;
-required_device<acia6850_device> m_aciaterm;
-required_device<acia6850_device> m_aciaremt;
-optional_device<centronics_device> m_centronics;
+	required_device<cpu_device> m_maincpu;
+	required_device<mm58167_device> m_rtc;
+	required_device<pit68230_device> m_pit;
+	required_device<acia6850_device> m_aciahost;
+	required_device<acia6850_device> m_aciaterm;
+	required_device<acia6850_device> m_aciaremt;
+	optional_device<centronics_device> m_centronics;
 
-INT32 m_centronics_ack;
-INT32 m_centronics_busy;
-INT32 m_centronics_perror;
-INT32 m_centronics_select;
+	int32_t m_centronics_ack;
+	int32_t m_centronics_busy;
+	int32_t m_centronics_perror;
+	int32_t m_centronics_select;
 
-// Pointer to System ROMs needed by bootvect_r
-UINT16  *m_sysrom;
-UINT16  *m_usrrom;
+	// Pointer to System ROMs needed by bootvect_r
+	uint16_t  *m_sysrom;
+	uint16_t  *m_usrrom;
 
-required_device<generic_slot_device> m_cart;
-
+	required_device<generic_slot_device> m_cart;
 };
 
 static ADDRESS_MAP_START (force68k_mem, AS_PROGRAM, 16, force68k_state)
@@ -294,12 +291,12 @@ void force68k_state::machine_start ()
 		save_item (NAME (m_centronics_perror));
 
 		/* Setup pointer to bootvector in ROM for bootvector handler bootvect_r */
-		m_sysrom = (UINT16*)(memregion ("maincpu")->base () + 0x080000);
+		m_sysrom = (uint16_t*)(memregion ("maincpu")->base () + 0x080000);
 
 		/* Map user ROM/RAM socket(s) */
 		if (m_cart->exists())
 		{
-				m_usrrom = (UINT16*)m_cart->get_rom_base();
+				m_usrrom = (uint16_t*)m_cart->get_rom_base();
 #if 0 // This should be the correct way but produces odd and even bytes swapped
 				m_maincpu->space(AS_PROGRAM).install_read_handler(0xa0000, 0xbffff, read16_delegate(FUNC(generic_slot_device::read16_rom), (generic_slot_device*)m_cart));
 #else // So we installs a custom very ineffecient handler for now until we understand hwp to solve the problem better
@@ -340,7 +337,7 @@ READ16_MEMBER (force68k_state::bootvect_r){
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (force68k_state::vme_a24_r){
 		LOG (logerror ("vme_a24_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a24_w){
@@ -349,7 +346,7 @@ WRITE16_MEMBER (force68k_state::vme_a24_w){
 
 READ16_MEMBER (force68k_state::vme_a16_r){
 		LOG (logerror ("vme_16_r\n"));
-		return (UINT16) 0;
+		return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (force68k_state::vme_a16_w){
@@ -403,21 +400,21 @@ MACHINE_CONFIG_END
 /***************************
    Rom loading functions
 ****************************/
-int force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result force68k_state::force68k_load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-		UINT32 size = slot->common_get_size("rom");
+		uint32_t size = slot->common_get_size("rom");
 
 		if (size > 0x20000) // Max 128Kb
 		{
 				LOG( printf("Cartridge size exceeding max size (128Kb): %d\n", size) );
 				image.seterror(IMAGE_ERROR_UNSPECIFIED, "Cartridge size exceeding max size (128Kb)");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 
 		slot->rom_alloc(size, GENERIC_ROM16_WIDTH, ENDIANNESS_BIG);
 		slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 }
 
 /*
@@ -470,8 +467,8 @@ MCFG_DEVICE_ADD ("rtc", MM58167, XTAL_32_768kHz)
 
 /* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
 MCFG_DEVICE_ADD ("pit", PIT68230, XTAL_16MHz / 2)
-MCFG_PIT68230_PA_OUTPUT_CALLBACK (DEVWRITE8 ("cent_data_out", output_latch_device, write))
-MCFG_PIT68230_H2_CALLBACK (DEVWRITELINE ("centronics", centronics_device, write_strobe))
+MCFG_PIT68230_PA_OUTPUT_CB (DEVWRITE8 ("cent_data_out", output_latch_device, write))
+MCFG_PIT68230_H2_CB (DEVWRITELINE ("centronics", centronics_device, write_strobe))
 
 // centronics
 MCFG_CENTRONICS_ADD ("centronics", centronics_devices, "printer")

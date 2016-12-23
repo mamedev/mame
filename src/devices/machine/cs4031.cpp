@@ -125,7 +125,7 @@ static MACHINE_CONFIG_FRAGMENT( cs4031 )
 	MCFG_I8237_OUT_DACK_2_CB(WRITELINE(cs4031_device, dma2_dack2_w))
 	MCFG_I8237_OUT_DACK_3_CB(WRITELINE(cs4031_device, dma2_dack3_w))
 	MCFG_PIC8259_ADD("intc1", WRITELINE(cs4031_device, intc1_int_w), VCC, READ8(cs4031_device, intc1_slave_ack_r))
-	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NULL)
+	MCFG_PIC8259_ADD("intc2", DEVWRITELINE("intc1", pic8259_device, ir2_w), GND, NOOP)
 
 	MCFG_DEVICE_ADD("ctc", PIT8254, 0)
 	MCFG_PIT8253_CLK0(XTAL_14_31818MHz / 12)
@@ -154,7 +154,7 @@ machine_config_constructor cs4031_device::device_mconfig_additions() const
 //  cs4031_device - constructor
 //-------------------------------------------------
 
-cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cs4031_device::cs4031_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CS4031, "CS4031", tag, owner, clock, "cs4031", __FILE__),
 	m_read_ior(*this),
 	m_write_iow(*this),
@@ -263,7 +263,7 @@ void cs4031_device::device_start()
 	m_keybc = downcast<at_keyboard_controller_device *>(machine().device(m_keybctag));
 
 	m_ram = ram_dev->pointer();
-	UINT32 ram_size = ram_dev->size();
+	uint32_t ram_size = ram_dev->size();
 
 	// install base memory
 	m_space->install_ram(0x000000, 0x09ffff, m_ram);
@@ -272,7 +272,7 @@ void cs4031_device::device_start()
 	if (ram_size > 0x100000)
 		m_space->install_ram(0x100000, ram_size - 1, m_ram + 0x100000);
 
-	// install bios rom at cpu inital pc
+	// install bios rom at cpu initial pc
 	m_space->install_rom(0xffff0000, 0xffffffff, m_bios + 0xf0000);
 
 	// install i/o accesses
@@ -362,7 +362,7 @@ READ8_MEMBER( cs4031_device::dma_read_word )
 	if (m_dma_channel == -1)
 		return 0xff;
 
-	UINT16 result = m_space->read_word(page_offset() + (offset << 1));
+	uint16_t result = m_space->read_word((page_offset() & 0xfe0000) | (offset << 1));
 	m_dma_high_byte = result >> 8;
 
 	return result;
@@ -373,7 +373,7 @@ WRITE8_MEMBER( cs4031_device::dma_write_word )
 	if (m_dma_channel == -1)
 		return;
 
-	m_space->write_word(page_offset() + (offset << 1), (m_dma_high_byte << 8) | data);
+	m_space->write_word((page_offset() & 0xfe0000) | (offset << 1), (m_dma_high_byte << 8) | data);
 }
 
 WRITE_LINE_MEMBER( cs4031_device::dma2_dack0_w )
@@ -411,7 +411,7 @@ void cs4031_device::update_dma_clock()
 {
 	if (m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f] != 0)
 	{
-		UINT32 dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
+		uint32_t dma_clock = clock() / m_dma_clock_divider[m_registers[DMA_CLOCK] & 0x0f];
 
 		if (!BIT(m_registers[DMA_WAIT_STATE], 0))
 			dma_clock /= 2;
@@ -503,7 +503,7 @@ WRITE8_MEMBER( cs4031_device::config_address_w )
 
 READ8_MEMBER( cs4031_device::config_data_r )
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (m_address_valid)
 	{
@@ -891,7 +891,7 @@ WRITE8_MEMBER( cs4031_device::sysctrl_w )
 
 READ8_MEMBER( cs4031_device::sysctrl_r )
 {
-	UINT8 result = 0; // reserved bits read as 0?
+	uint8_t result = 0; // reserved bits read as 0?
 
 	result |= m_cpureset << 0;
 	result |= m_fast_gatea20 << 1;

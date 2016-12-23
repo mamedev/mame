@@ -63,9 +63,9 @@ public:
 	required_device<cpu_device> m_maincpu;
 
 	/* video-related */
-	required_shared_ptr<UINT8> m_scoreram;
-	required_shared_ptr<UINT8> m_ram2;
-	required_shared_ptr<UINT8> m_characterram;
+	required_shared_ptr<uint8_t> m_scoreram;
+	required_shared_ptr<uint8_t> m_ram2;
+	required_shared_ptr<uint8_t> m_characterram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
@@ -79,7 +79,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void ace_postload();
 };
 
@@ -97,7 +97,7 @@ void aceal_state::video_start()
 	m_gfxdecode->gfx(4)->set_source(m_scoreram);
 }
 
-UINT32 aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t aceal_state::screen_update_ace(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
@@ -331,7 +331,7 @@ static MACHINE_CONFIG_START( ace, aceal_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ace)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	/* ???? */

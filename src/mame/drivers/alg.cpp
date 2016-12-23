@@ -26,7 +26,7 @@
 #include "cpu/m68000/m68000.h"
 #include "render.h"
 #include "includes/amiga.h"
-#include "machine/ldstub.h"
+#include "machine/ldp1450.h"
 #include "machine/nvram.h"
 #include "machine/amigafdc.h"
 
@@ -59,7 +59,7 @@ public:
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 	int get_lightgun_pos(int player, int *x, int *y);
 
 private:
@@ -70,7 +70,7 @@ private:
 	optional_ioport m_gun2y;
 	optional_ioport m_triggers;
 
-	UINT16 m_input_select;
+	uint16_t m_input_select;
 };
 
 
@@ -87,15 +87,15 @@ int alg_state::get_lightgun_pos(int player, int *x, int *y)
 {
 	const rectangle &visarea = m_screen->visible_area();
 
-	int xpos = (player == 0) ? m_gun1x->read() : (m_gun2x ? m_gun2x->read() : 0xffffffff);
-	int ypos = (player == 0) ? m_gun1y->read() : (m_gun2y ? m_gun2y->read() : 0xffffffff);
+	int xpos = (player == 0) ? m_gun1x->read() : m_gun2x.read_safe(0xffffffff);
+	int ypos = (player == 0) ? m_gun1y->read() : m_gun2y.read_safe(0xffffffff);
 
 	if (xpos == -1 || ypos == -1)
-		return FALSE;
+		return false;
 
 	*x = visarea.min_x + xpos * visarea.width() / 255;
 	*y = visarea.min_y + ypos * visarea.height() / 255;
-	return TRUE;
+	return true;
 }
 
 
@@ -126,7 +126,7 @@ VIDEO_START_MEMBER(alg_state,alg)
  *
  *************************************/
 
-void alg_state::potgo_w(UINT16 data)
+void alg_state::potgo_w(uint16_t data)
 {
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( alg )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("HVPOS")     /* read by Amiga core */
-	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_pos_r, NULL)
+	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_pos_r, nullptr)
 
 	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -259,13 +259,13 @@ static INPUT_PORTS_START( alg_2p )
 
 	PORT_MODIFY("potgo")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_trigger_r, NULL)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_trigger_r, nullptr)
 
 	PORT_MODIFY("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("p2_joy")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, alg_state,lightgun_holster_r, nullptr)
 
 	PORT_START("GUN2X")     /* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
@@ -306,7 +306,7 @@ static MACHINE_CONFIG_START( alg_r1, alg_state )
 	/* video hardware */
 	MCFG_FRAGMENT_ADD(ntsc_video)
 
-	MCFG_LASERDISC_LDP1450_ADD("laserdisc")
+	MCFG_LASERDISC_LDP1450_ADD("laserdisc",9600)
 	MCFG_LASERDISC_SCREEN("screen")
 	MCFG_LASERDISC_OVERLAY_DRIVER(512*2, 262, amiga_state, screen_update_amiga)
 	MCFG_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
@@ -408,7 +408,7 @@ ROM_START( maddoga )
 	ROM_LOAD16_BYTE( "maddog_02.dat", 0x000001, 0x10000, CRC(f64014ec) SHA1(d343a2cb5d8992153b8c916f39b11d3db736543d))
 
 	DISK_REGION( "laserdisc" )
-	DISK_IMAGE_READONLY( "maddog", 0, NO_DUMP )
+	DISK_IMAGE_READONLY( "maddoga", 0, NO_DUMP )
 ROM_END
 
 
@@ -696,15 +696,15 @@ DRIVER_INIT_MEMBER(alg_state,palr1)
 {
 	DRIVER_INIT_CALL(ntsc);
 
-	UINT32 length = memregion("user2")->bytes();
-	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
-	UINT32 srcaddr;
+	uint32_t length = memregion("user2")->bytes();
+	uint8_t *rom = memregion("user2")->base();
+	std::vector<uint8_t> original(length);
+	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
-		UINT32 dstaddr = srcaddr;
+		uint32_t dstaddr = srcaddr;
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		if (srcaddr & 0x8000) dstaddr ^= 0x4000;
 		rom[dstaddr] = original[srcaddr];
@@ -715,15 +715,15 @@ DRIVER_INIT_MEMBER(alg_state,palr3)
 {
 	DRIVER_INIT_CALL(ntsc);
 
-	UINT32 length = memregion("user2")->bytes();
-	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
-	UINT32 srcaddr;
+	uint32_t length = memregion("user2")->bytes();
+	uint8_t *rom = memregion("user2")->base();
+	std::vector<uint8_t> original(length);
+	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
-		UINT32 dstaddr = srcaddr;
+		uint32_t dstaddr = srcaddr;
 		if (srcaddr & 0x2000) dstaddr ^= 0x1000;
 		rom[dstaddr] = original[srcaddr];
 	}
@@ -733,15 +733,15 @@ DRIVER_INIT_MEMBER(alg_state,palr6)
 {
 	DRIVER_INIT_CALL(ntsc);
 
-	UINT32 length = memregion("user2")->bytes();
-	UINT8 *rom = memregion("user2")->base();
-	dynamic_buffer original(length);
-	UINT32 srcaddr;
+	uint32_t length = memregion("user2")->bytes();
+	uint8_t *rom = memregion("user2")->base();
+	std::vector<uint8_t> original(length);
+	uint32_t srcaddr;
 
 	memcpy(&original[0], rom, length);
 	for (srcaddr = 0; srcaddr < length; srcaddr++)
 	{
-		UINT32 dstaddr = srcaddr;
+		uint32_t dstaddr = srcaddr;
 		if (~srcaddr & 0x2000) dstaddr ^= 0x1000;
 		if ( srcaddr & 0x8000) dstaddr ^= 0x4000;
 		dstaddr ^= 0x20000;
@@ -754,8 +754,8 @@ DRIVER_INIT_MEMBER(alg_state,aplatoon)
 	DRIVER_INIT_CALL(ntsc);
 
 	/* NOT DONE TODO FIGURE OUT THE RIGHT ORDER!!!! */
-	UINT8 *rom = memregion("user2")->base();
-	std::unique_ptr<UINT8[]> decrypted = std::make_unique<UINT8[]>(0x40000);
+	uint8_t *rom = memregion("user2")->base();
+	std::unique_ptr<uint8_t[]> decrypted = std::make_unique<uint8_t[]>(0x40000);
 	int i;
 
 	static const int shuffle[] =

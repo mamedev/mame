@@ -10,11 +10,13 @@
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "video/segaic16.h"
 #include "video/sega16sp.h"
 
@@ -35,7 +37,9 @@ public:
 			m_n7751(*this, "n7751"),
 			m_n7751_i8243(*this, "n7751_8243"),
 			m_nvram(*this, "nvram"),
+			m_watchdog(*this, "watchdog"),
 			m_segaic16vid(*this, "segaic16vid"),
+			m_soundlatch(*this, "soundlatch"),
 			m_sprites(*this, "sprites"),
 			m_workram(*this, "nvram"),
 			m_sound_decrypted_opcodes(*this, "sound_decrypted_opcodes"),
@@ -46,7 +50,8 @@ public:
 			m_last_buttons1(0),
 			m_last_buttons2(0),
 			m_read_port(0),
-			m_mj_input_num(0)
+			m_mj_input_num(0),
+			m_mj_inputs(*this, {"MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5"})
 	{ }
 
 	// PPI read/write callbacks
@@ -92,12 +97,12 @@ public:
 	DECLARE_DRIVER_INIT(sdi);
 
 	// video updates
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// internal types
 	typedef delegate<void ()> i8751_sim_delegate;
-	typedef delegate<void (UINT8, UINT8)> lamp_changed_delegate;
+	typedef delegate<void (uint8_t, uint8_t)> lamp_changed_delegate;
 
 	// timer IDs
 	enum
@@ -121,7 +126,7 @@ protected:
 	DECLARE_READ16_MEMBER( passsht16a_custom_io_r );
 	DECLARE_READ16_MEMBER( sdi_custom_io_r );
 	DECLARE_READ16_MEMBER( sjryuko_custom_io_r );
-	void sjryuko_lamp_changed_w(UINT8 changed, UINT8 newval);
+	void sjryuko_lamp_changed_w(uint8_t changed, uint8_t newval);
 
 	// devices
 	required_device<m68000_device> m_maincpu;
@@ -132,12 +137,14 @@ protected:
 	optional_device<n7751_device> m_n7751;
 	optional_device<i8243_device> m_n7751_i8243;
 	required_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<segaic16_video_device> m_segaic16vid;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_device<sega_sys16a_sprite_device> m_sprites;
 
 	// memory pointers
-	required_shared_ptr<UINT16> m_workram;
-	optional_shared_ptr<UINT8> m_sound_decrypted_opcodes;
+	required_shared_ptr<uint16_t> m_workram;
+	optional_shared_ptr<uint8_t> m_sound_decrypted_opcodes;
 
 	// configuration
 	read16_delegate         m_custom_io_r;
@@ -146,12 +153,13 @@ protected:
 	lamp_changed_delegate   m_lamp_changed_w;
 
 	// internal state
-	UINT8                   m_video_control;
-	UINT8                   m_mcu_control;
-	UINT8                   m_n7751_command;
-	UINT32                  m_n7751_rom_address;
-	UINT8                   m_last_buttons1;
-	UINT8                   m_last_buttons2;
-	UINT8                   m_read_port;
-	UINT8                   m_mj_input_num;
+	uint8_t                   m_video_control;
+	uint8_t                   m_mcu_control;
+	uint8_t                   m_n7751_command;
+	uint32_t                  m_n7751_rom_address;
+	uint8_t                   m_last_buttons1;
+	uint8_t                   m_last_buttons2;
+	uint8_t                   m_read_port;
+	uint8_t                   m_mj_input_num;
+	optional_ioport_array<6> m_mj_inputs;
 };

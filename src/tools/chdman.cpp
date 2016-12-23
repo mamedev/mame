@@ -5,7 +5,7 @@
     CHD compression frontend
 
 ****************************************************************************/
-
+#include <stdio.h> // must be here otherwise issues with I64FMT in MINGW
 #include <assert.h>
 
 #include "osdcore.h"
@@ -17,26 +17,39 @@
 #include "md5.h"
 #include "sha1.h"
 #include "vbiparse.h"
-#include "tagmap.h"
 #include <stdarg.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 #include <ctype.h>
-#include <unordered_map>
+
+#include <iostream>
+#include <cassert>
+#include <cstring>
+#include <limits>
+#include <memory>
 #include <new>
+#include <unordered_map>
 
 
 
 //**************************************************************************
 //  CONSTANTS & DEFINES
 //**************************************************************************
+/* MINGW has adopted the MSVC formatting for 64-bit ints as of gcc 4.4 */
+#if defined(WIN32)
+#define I64FMT   "I64"
+#elif !defined(__APPLE__) && defined(__LP64__)
+#define I64FMT   "l"
+#else
+#define I64FMT   "ll"
+#endif
 
 // default hard disk sector size
-const UINT32 IDE_SECTOR_SIZE = 512;
+const uint32_t IDE_SECTOR_SIZE = 512;
 
 // temporary input buffer size
-const UINT32 TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
+const uint32_t TEMP_BUFFER_SIZE = 32 * 1024 * 1024;
 
 // modes
 const int MODE_NORMAL = 0;
@@ -99,7 +112,7 @@ const int MODE_GDI = 2;
 
 typedef std::unordered_map<std::string,std::string *> parameters_t;
 
-static void report_error(int error, const char *format, ...) ATTR_PRINTF(2,3);
+template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args);
 static void do_info(parameters_t &params);
 static void do_verify(parameters_t &params);
 static void do_create_raw(parameters_t &params);
@@ -146,14 +159,14 @@ struct command_description
 
 struct avi_info
 {
-	UINT32 fps_times_1million;
-	UINT32 width;
-	UINT32 height;
+	uint32_t fps_times_1million;
+	uint32_t width;
+	uint32_t height;
 	bool interlaced;
-	UINT32 channels;
-	UINT32 rate;
-	UINT32 max_samples_per_frame;
-	UINT32 bytes_per_frame;
+	uint32_t channels;
+	uint32_t rate;
+	uint32_t max_samples_per_frame;
+	uint32_t bytes_per_frame;
 };
 
 
@@ -162,7 +175,7 @@ struct avi_info
 struct metadata_index_info
 {
 	chd_metadata_tag    tag;
-	UINT32              index;
+	uint32_t              index;
 };
 
 
@@ -181,34 +194,67 @@ private:
 };
 
 
-// ======================> chd_rawfile_compressor
+// ======================> chd_zero_compressor
 
-class chd_rawfile_compressor : public chd_file_compressor
+class chd_zero_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_rawfile_compressor(core_file *file, UINT64 offset = 0, UINT64 maxoffset = ~0)
-		: m_file(file),
-			m_offset(offset),
-			m_maxoffset(MIN(maxoffset, (file != nullptr) ? core_fsize(file) : 0)) { }
+	chd_zero_compressor(std::uint64_t offset = 0, std::uint64_t maxoffset = 0)
+		: m_offset(offset)
+		, m_maxoffset(maxoffset)
+	{
+	}
 
 	// read interface
-	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
+	virtual std::uint32_t read_data(void *dest, std::uint64_t offset, std::uint32_t length) override
 	{
 		offset += m_offset;
 		if (offset >= m_maxoffset)
 			return 0;
 		if (offset + length > m_maxoffset)
 			length = m_maxoffset - offset;
-		core_fseek(m_file, offset, SEEK_SET);
-		return core_fread(m_file, dest, length);
+		std::memset(dest, 0, length);
+		return length;
 	}
 
 private:
 	// internal state
-	core_file *     m_file;
-	UINT64          m_offset;
-	UINT64          m_maxoffset;
+	std::uint64_t   m_offset;
+	std::uint64_t   m_maxoffset;
+};
+
+
+// ======================> chd_rawfile_compressor
+
+class chd_rawfile_compressor : public chd_file_compressor
+{
+public:
+	// construction/destruction
+	chd_rawfile_compressor(util::core_file &file, std::uint64_t offset = 0, std::uint64_t maxoffset = std::numeric_limits<std::uint64_t>::max())
+		: m_file(file)
+		, m_offset(offset)
+		, m_maxoffset((std::min)(maxoffset, file.size()))
+	{
+	}
+
+	// read interface
+	virtual std::uint32_t read_data(void *dest, std::uint64_t offset, std::uint32_t length) override
+	{
+		offset += m_offset;
+		if (offset >= m_maxoffset)
+			return 0;
+		if (offset + length > m_maxoffset)
+			length = m_maxoffset - offset;
+		m_file.seek(offset, SEEK_SET);
+		return m_file.read(dest, length);
+	}
+
+private:
+	// internal state
+	util::core_file &   m_file;
+	std::uint64_t       m_offset;
+	std::uint64_t       m_maxoffset;
 };
 
 
@@ -218,14 +264,14 @@ class chd_chdfile_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_chdfile_compressor(chd_file &file, UINT64 offset = 0, UINT64 maxoffset = ~0)
+	chd_chdfile_compressor(chd_file &file, uint64_t offset = 0, uint64_t maxoffset = ~0)
 		: m_toc(nullptr),
 			m_file(file),
 			m_offset(offset),
-			m_maxoffset(MIN(maxoffset, file.logical_bytes())) { }
+			m_maxoffset(std::min(maxoffset, file.logical_bytes())) { }
 
 	// read interface
-	virtual UINT32 read_data(void *dest, UINT64 offset, UINT32 length)
+	virtual uint32_t read_data(void *dest, uint64_t offset, uint32_t length)
 	{
 		offset += m_offset;
 		if (offset >= m_maxoffset)
@@ -244,7 +290,7 @@ public:
 
 			int startlba = offset / CD_FRAME_SIZE;
 			int lenlba = length / CD_FRAME_SIZE;
-			UINT8 *_dest = reinterpret_cast<UINT8 *>(dest);
+			uint8_t *_dest = reinterpret_cast<uint8_t *>(dest);
 
 			for (int chdlba = 0; chdlba < lenlba; chdlba++)
 			{
@@ -261,9 +307,9 @@ public:
 					continue;
 				// byteswap if yes
 				int dataoffset = chdlba * CD_FRAME_SIZE;
-				for (UINT32 swapindex = dataoffset; swapindex < (dataoffset + CD_MAX_SECTOR_DATA); swapindex += 2)
+				for (uint32_t swapindex = dataoffset; swapindex < (dataoffset + CD_MAX_SECTOR_DATA); swapindex += 2)
 				{
-					UINT8 temp = _dest[swapindex];
+					uint8_t temp = _dest[swapindex];
 					_dest[swapindex] = _dest[swapindex + 1];
 					_dest[swapindex + 1] = temp;
 				}
@@ -278,8 +324,8 @@ const cdrom_toc *   m_toc;
 private:
 	// internal state
 	chd_file &      m_file;
-	UINT64          m_offset;
-	UINT64          m_maxoffset;
+	uint64_t          m_offset;
+	uint64_t          m_maxoffset;
 };
 
 
@@ -290,56 +336,53 @@ class chd_cd_compressor : public chd_file_compressor
 public:
 	// construction/destruction
 	chd_cd_compressor(cdrom_toc &toc, chdcd_track_input_info &info)
-		: m_file(nullptr),
+		: m_file(),
 			m_toc(toc),
 			m_info(info) { }
 
 	~chd_cd_compressor()
 	{
-		if (m_file != nullptr)
-			core_fclose(m_file);
 	}
 
 	// read interface
-	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
+	virtual uint32_t read_data(void *_dest, uint64_t offset, uint32_t length)
 	{
 		// verify assumptions made below
 		assert(offset % CD_FRAME_SIZE == 0);
 		assert(length % CD_FRAME_SIZE == 0);
 
 		// initialize destination to 0 so that unused areas are filled
-		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
+		uint8_t *dest = reinterpret_cast<uint8_t *>(_dest);
 		memset(dest, 0, length);
 
 		// find out which track we're starting in
-		UINT64 startoffs = 0;
-		UINT32 length_remaining = length;
+		uint64_t startoffs = 0;
+		uint32_t length_remaining = length;
 		for (int tracknum = 0; tracknum < m_toc.numtrks; tracknum++)
 		{
 			const cdrom_track_info &trackinfo = m_toc.tracks[tracknum];
-			UINT64 endoffs = startoffs + (trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
+			uint64_t endoffs = startoffs + (uint64_t)(trackinfo.frames + trackinfo.extraframes) * CD_FRAME_SIZE;
 			if (offset >= startoffs && offset < endoffs)
 			{
 				// if we don't already have this file open, open it now
-				if (m_file == nullptr || m_lastfile.compare(m_info.track[tracknum].fname)!=0)
+				if (!m_file || m_lastfile.compare(m_info.track[tracknum].fname)!=0)
 				{
-					if (m_file != nullptr)
-						core_fclose(m_file);
+					m_file.reset();
 					m_lastfile = m_info.track[tracknum].fname;
-					file_error filerr = core_fopen(m_lastfile.c_str(), OPEN_FLAG_READ, &m_file);
-					if (filerr != FILERR_NONE)
+					osd_file::error filerr = util::core_file::open(m_lastfile, OPEN_FLAG_READ, m_file);
+					if (filerr != osd_file::error::NONE)
 						report_error(1, "Error opening input file (%s)'", m_lastfile.c_str());
 				}
 
 				// iterate over frames
-				UINT32 bytesperframe = trackinfo.datasize + trackinfo.subsize;
-				UINT64 src_track_start = m_info.track[tracknum].offset;
-				UINT64 src_track_end = src_track_start + bytesperframe * trackinfo.frames;
-				UINT64 pad_track_start = src_track_end - (m_toc.tracks[tracknum].padframes * bytesperframe);
+				uint64_t bytesperframe = trackinfo.datasize + trackinfo.subsize;
+				uint64_t src_track_start = m_info.track[tracknum].offset;
+				uint64_t src_track_end = src_track_start + bytesperframe * (uint64_t)trackinfo.frames;
+				uint64_t pad_track_start = src_track_end - ((uint64_t)m_toc.tracks[tracknum].padframes * bytesperframe);
 				while (length_remaining != 0 && offset < endoffs)
 				{
 					// determine start of current frame
-					UINT64 src_frame_start = src_track_start + ((offset - startoffs) / CD_FRAME_SIZE) * bytesperframe;
+					uint64_t src_frame_start = src_track_start + ((offset - startoffs) / CD_FRAME_SIZE) * bytesperframe;
 					if (src_frame_start < src_track_end)
 					{
 						// read it in, or pad if we're into the padframes
@@ -349,17 +392,17 @@ public:
 						}
 						else
 						{
-							core_fseek(m_file, src_frame_start, SEEK_SET);
-							UINT32 count = core_fread(m_file, dest, bytesperframe);
+							m_file->seek(src_frame_start, SEEK_SET);
+							uint32_t count = m_file->read(dest, bytesperframe);
 							if (count != bytesperframe)
 								report_error(1, "Error reading input file (%s)'", m_lastfile.c_str());
 						}
 
 						// swap if appropriate
 						if (m_info.track[tracknum].swap)
-							for (UINT32 swapindex = 0; swapindex < 2352; swapindex += 2)
+							for (uint32_t swapindex = 0; swapindex < 2352; swapindex += 2)
 							{
-								UINT8 temp = dest[swapindex];
+								uint8_t temp = dest[swapindex];
 								dest[swapindex] = dest[swapindex + 1];
 								dest[swapindex + 1] = temp;
 							}
@@ -383,7 +426,7 @@ public:
 private:
 	// internal state
 	std::string                 m_lastfile;
-	core_file *                 m_file;
+	util::core_file::ptr        m_file;
 	cdrom_toc &                 m_toc;
 	chdcd_track_input_info &    m_info;
 };
@@ -395,7 +438,7 @@ class chd_avi_compressor : public chd_file_compressor
 {
 public:
 	// construction/destruction
-	chd_avi_compressor(avi_file &file, avi_info &info, UINT32 first_frame, UINT32 num_frames)
+	chd_avi_compressor(avi_file &file, avi_info &info, uint32_t first_frame, uint32_t num_frames)
 		: m_file(file),
 			m_info(info),
 			m_bitmap(info.width, info.height * (info.interlaced ? 2 : 1)),
@@ -405,43 +448,43 @@ public:
 			m_rawdata(info.bytes_per_frame) { }
 
 	// getters
-	const dynamic_buffer &ldframedata() const { return m_ldframedata; }
+	const std::vector<uint8_t> &ldframedata() const { return m_ldframedata; }
 
 	// read interface
-	virtual UINT32 read_data(void *_dest, UINT64 offset, UINT32 length)
+	virtual uint32_t read_data(void *_dest, uint64_t offset, uint32_t length)
 	{
-		UINT8 *dest = reinterpret_cast<UINT8 *>(_dest);
-		UINT8 interlace_factor = m_info.interlaced ? 2 : 1;
-		UINT32 length_remaining = length;
+		uint8_t *dest = reinterpret_cast<uint8_t *>(_dest);
+		uint8_t interlace_factor = m_info.interlaced ? 2 : 1;
+		uint32_t length_remaining = length;
 
 		// iterate over frames
-		INT32 start_frame = offset / m_info.bytes_per_frame;
-		INT32 end_frame = (offset + length - 1) / m_info.bytes_per_frame;
-		for (INT32 framenum = start_frame; framenum <= end_frame; framenum++)
+		int32_t start_frame = offset / m_info.bytes_per_frame;
+		int32_t end_frame = (offset + length - 1) / m_info.bytes_per_frame;
+		for (int32_t framenum = start_frame; framenum <= end_frame; framenum++)
 			if (framenum < m_frame_count)
 			{
 				// determine effective frame number and first/last samples
-				INT32 effframe = m_start_frame + framenum;
-				UINT32 first_sample = (UINT64(m_info.rate) * UINT64(effframe) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million);
-				UINT32 samples = (UINT64(m_info.rate) * UINT64(effframe + 1) * UINT64(1000000) + m_info.fps_times_1million - 1) / UINT64(m_info.fps_times_1million) - first_sample;
+				int32_t effframe = m_start_frame + framenum;
+				uint32_t first_sample = (uint64_t(m_info.rate) * uint64_t(effframe) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million);
+				uint32_t samples = (uint64_t(m_info.rate) * uint64_t(effframe + 1) * uint64_t(1000000) + m_info.fps_times_1million - 1) / uint64_t(m_info.fps_times_1million) - first_sample;
 
 				// loop over channels and read the samples
-				int channels = MIN(m_info.channels, ARRAY_LENGTH(m_audio));
-				INT16 *samplesptr[ARRAY_LENGTH(m_audio)];
+				int channels = unsigned((std::min<std::size_t>)(m_info.channels, ARRAY_LENGTH(m_audio)));
+				EQUIVALENT_ARRAY(m_audio, int16_t *) samplesptr;
 				for (int chnum = 0; chnum < channels; chnum++)
 				{
 					// read the sound samples
 					m_audio[chnum].resize(samples);
 					samplesptr[chnum] = &m_audio[chnum][0];
-					avi_error avierr = avi_read_sound_samples(&m_file, chnum, first_sample, samples, &m_audio[chnum][0]);
-					if (avierr != AVIERR_NONE)
-						report_error(1, "Error reading audio samples %d-%d from channel %d: %s", first_sample, samples, chnum, avi_error_string(avierr));
+					avi_file::error avierr = m_file.read_sound_samples(chnum, first_sample, samples, &m_audio[chnum][0]);
+					if (avierr != avi_file::error::NONE)
+						report_error(1, "Error reading audio samples %d-%d from channel %d: %s", first_sample, samples, chnum, avi_file::error_string(avierr));
 				}
 
 				// read the video data
-				avi_error avierr = avi_read_video_frame(&m_file, effframe / interlace_factor, m_bitmap);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error reading AVI frame %d: %s", effframe / interlace_factor, avi_error_string(avierr));
+				avi_file::error avierr = m_file.read_video_frame(effframe / interlace_factor, m_bitmap);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error reading AVI frame %d: %s", effframe / interlace_factor, avi_file::error_string(avierr));
 				bitmap_yuy16 subbitmap(&m_bitmap.pix(effframe % interlace_factor), m_bitmap.width(), m_bitmap.height() / interlace_factor, m_bitmap.rowpixels() * interlace_factor);
 
 				// update metadata for this frame
@@ -464,9 +507,9 @@ public:
 				}
 
 				// copy to the destination
-				UINT64 start_offset = UINT64(framenum) * UINT64(m_info.bytes_per_frame);
-				UINT64 end_offset = start_offset + m_info.bytes_per_frame;
-				UINT32 bytes_to_copy = MIN(length_remaining, end_offset - offset);
+				uint64_t start_offset = uint64_t(framenum) * uint64_t(m_info.bytes_per_frame);
+				uint64_t end_offset = start_offset + m_info.bytes_per_frame;
+				uint32_t bytes_to_copy = (std::min<uint64_t>)(length_remaining, end_offset - offset);
 				memcpy(dest, &m_rawdata[offset - start_offset], bytes_to_copy);
 
 				// advance
@@ -483,11 +526,11 @@ private:
 	avi_file &                  m_file;
 	avi_info &                  m_info;
 	bitmap_yuy16                m_bitmap;
-	UINT32                      m_start_frame;
-	UINT32                      m_frame_count;
-	std::vector<INT16>        m_audio[8];
-	dynamic_buffer              m_ldframedata;
-	dynamic_buffer              m_rawdata;
+	uint32_t                      m_start_frame;
+	uint32_t                      m_frame_count;
+	std::vector<int16_t>        m_audio[8];
+	std::vector<uint8_t>              m_ldframedata;
+	std::vector<uint8_t>              m_rawdata;
 };
 
 
@@ -724,15 +767,11 @@ static const command_description s_commands[] =
 //  report_error - report an error
 //-------------------------------------------------
 
-static void report_error(int error, const char *format, ...)
+template <typename Format, typename... Params> static void report_error(int error, Format &&fmt, Params &&...args)
 {
 	// output to stderr
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	fflush(stderr);
-	va_end(arg);
-	fprintf(stderr, "\n");
+	util::stream_format(std::cerr, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	std::cerr << std::endl;
 
 	// reset time for progress and return the error
 	lastprogress = 0;
@@ -744,7 +783,7 @@ static void report_error(int error, const char *format, ...)
 //  progress - generic progress callback
 //-------------------------------------------------
 
-static void ATTR_PRINTF(2,3) progress(bool forceit, const char *format, ...)
+template <typename Format, typename... Params> static void progress(bool forceit, Format &&fmt, Params &&...args)
 {
 	// skip if it hasn't been long enough
 	clock_t curtime = clock();
@@ -753,11 +792,8 @@ static void ATTR_PRINTF(2,3) progress(bool forceit, const char *format, ...)
 	lastprogress = curtime;
 
 	// standard vfprintf stuff here
-	va_list arg;
-	va_start(arg, format);
-	vfprintf(stderr, format, arg);
-	fflush(stderr);
-	va_end(arg);
+	util::stream_format(std::cerr, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	std::cerr << std::flush;
 }
 
 
@@ -826,7 +862,7 @@ static int print_help(const char *argv0, const command_description &desc, const 
 //  big_int_string - create a 64-bit string
 //-------------------------------------------------
 
-const char *big_int_string(std::string &str, UINT64 intvalue)
+const char *big_int_string(std::string &str, uint64_t intvalue)
 {
 	// 0 is a special case
 	if (intvalue == 0)
@@ -840,8 +876,7 @@ const char *big_int_string(std::string &str, UINT64 intvalue)
 		int chunk = intvalue % 1000;
 		intvalue /= 1000;
 
-		std::string insert;
-		strprintf(insert, (intvalue != 0) ? "%03d" : "%d", chunk);
+		std::string insert = string_format((intvalue != 0) ? "%03d" : "%d", chunk);
 
 		if (!first)
 			str.insert(0, ",").c_str();
@@ -857,9 +892,9 @@ const char *big_int_string(std::string &str, UINT64 intvalue)
 //  number of frames in M:S:F format
 //-------------------------------------------------
 
-const char *msf_string_from_frames(std::string &str, UINT32 frames)
+const char *msf_string_from_frames(std::string &str, uint32_t frames)
 {
-	strprintf(str, "%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
+	str = string_format("%02d:%02d:%02d", frames / (75 * 60), (frames / 75) % 60, frames % 75);
 	return str.c_str();
 }
 
@@ -869,7 +904,7 @@ const char *msf_string_from_frames(std::string &str, UINT32 frames)
 //  optional k/m/g suffix
 //-------------------------------------------------
 
-UINT64 parse_number(const char *string)
+uint64_t parse_number(const char *string)
 {
 	// 0-length string is 0
 	int length = strlen(string);
@@ -877,7 +912,7 @@ UINT64 parse_number(const char *string)
 		return 0;
 
 	// scan forward over digits
-	UINT64 result = 0;
+	uint64_t result = 0;
 	while (isdigit(*string))
 	{
 		result = (result * 10) + (*string - '0');
@@ -901,7 +936,7 @@ UINT64 parse_number(const char *string)
 //  compute a best guess CHS value set
 //-------------------------------------------------
 
-static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UINT32 &cylinders, UINT32 &heads, UINT32 &sectors, UINT32 &bps)
+static void guess_chs(std::string *filename, uint64_t filesize, int sectorsize, uint32_t &cylinders, uint32_t &heads, uint32_t &sectors, uint32_t &bps)
 {
 	// if this is a direct physical drive read, handle it specially
 	if (filename != nullptr && osd_get_physical_drive_geometry(filename->c_str(), &cylinders, &heads, &sectors, &bps))
@@ -912,12 +947,12 @@ static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UI
 		report_error(1, "Can't guess CHS values because there is no input file");
 
 	// now find a valid value
-	for (UINT32 totalsectors = filesize / sectorsize; ; totalsectors++)
-		for (UINT32 cursectors = 63; cursectors > 1; cursectors--)
+	for (uint32_t totalsectors = filesize / sectorsize; ; totalsectors++)
+		for (uint32_t cursectors = 63; cursectors > 1; cursectors--)
 			if (totalsectors % cursectors == 0)
 			{
-				UINT32 totalheads = totalsectors / cursectors;
-				for (UINT32 curheads = 16; curheads > 1; curheads--)
+				uint32_t totalheads = totalsectors / cursectors;
+				for (uint32_t curheads = 16; curheads > 1; curheads--)
 					if (totalheads % curheads == 0)
 					{
 						cylinders = totalheads / curheads;
@@ -926,9 +961,6 @@ static void guess_chs(std::string *filename, UINT64 filesize, int sectorsize, UI
 						return;
 					}
 			}
-
-	// ack, it didn't work!
-	report_error(1, "Can't guess CHS values because no logical combination works!");
 }
 
 
@@ -964,7 +996,7 @@ static void parse_input_chd_parameters(const parameters_t &params, chd_file &inp
 //  parameters in a standard way
 //-------------------------------------------------
 
-static void parse_input_start_end(const parameters_t &params, UINT64 logical_size, UINT32 hunkbytes, UINT32 framebytes, UINT64 &input_start, UINT64 &input_end)
+static void parse_input_start_end(const parameters_t &params, uint64_t logical_size, uint32_t hunkbytes, uint32_t framebytes, uint64_t &input_start, uint64_t &input_end)
 {
 	// process start/end if we were provided an input CHD
 	input_start = 0;
@@ -987,7 +1019,7 @@ static void parse_input_start_end(const parameters_t &params, UINT64 logical_siz
 	auto input_length_bytes_str = params.find(OPTION_INPUT_LENGTH_BYTES);
 	auto input_length_hunks_str = params.find(OPTION_INPUT_LENGTH_HUNKS);
 	auto input_length_frames_str = params.find(OPTION_INPUT_LENGTH_FRAMES);
-	UINT64 input_length = input_end;
+	uint64_t input_length = input_end;
 	if (input_length_bytes_str != params.end())
 		input_length = parse_number(input_length_bytes_str->second->c_str());
 	if (input_length_hunks_str != params.end())
@@ -1009,11 +1041,11 @@ static void check_existing_output_file(const parameters_t &params, const char *f
 {
 	if (params.find(OPTION_OUTPUT_FORCE) == params.end())
 	{
-		core_file *file;
-		file_error filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
-		if (filerr == FILERR_NONE)
+		util::core_file::ptr file;
+		osd_file::error filerr = util::core_file::open(filename, OPEN_FLAG_READ, file);
+		if (filerr == osd_file::error::NONE)
 		{
-			core_fclose(file);
+			file.reset();
 			report_error(1, "Error: file already exists (%s)\nUse --force (or -f) to force overwriting", filename);
 		}
 	}
@@ -1049,7 +1081,7 @@ static std::string *parse_output_chd_parameters(const parameters_t &params, chd_
 //  parameter in a standard way
 //-------------------------------------------------
 
-static void parse_hunk_size(const parameters_t &params, UINT32 required_granularity, UINT32 &hunk_size)
+static void parse_hunk_size(const parameters_t &params, uint32_t required_granularity, uint32_t &hunk_size)
 {
 	auto hunk_size_str = params.find(OPTION_HUNK_SIZE);
 	if (hunk_size_str != params.end())
@@ -1186,7 +1218,7 @@ static void compress_common(chd_file_compressor &chd)
 //  to a CUE file
 //-------------------------------------------------
 
-void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_track_info &info, const char *filename, UINT32 frameoffs, UINT64 discoffs)
+void output_track_metadata(int mode, util::core_file &file, int tracknum, const cdrom_track_info &info, const char *filename, uint32_t frameoffs, uint64_t discoffs)
 {
 	if (mode == MODE_GDI)
 	{
@@ -1235,13 +1267,13 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 				break;
 		}
 		bool needquote = strchr(filename, ' ') != nullptr;
-		core_fprintf(file, "%d %d %d %d %s%s%s %" I64FMT "d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
+		file.printf("%d %d %d %d %s%s%s %d\n", tracknum+1, frameoffs, mode, size, needquote?"\"":"", filename, needquote?"\"":"", discoffs);
 	}
 	else if (mode == MODE_CUEBIN)
 	{
 		// first track specifies the file
 		if (tracknum == 0)
-			core_fprintf(file, "FILE \"%s\" BINARY\n", filename);
+			file.printf("FILE \"%s\" BINARY\n", filename);
 
 		// determine submode
 		std::string tempstr;
@@ -1249,7 +1281,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		{
 			case CD_TRACK_MODE1:
 			case CD_TRACK_MODE1_RAW:
-				strprintf(tempstr,"MODE1/%04d", info.datasize);
+				tempstr = string_format("MODE1/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_MODE2:
@@ -1257,7 +1289,7 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 			case CD_TRACK_MODE2_FORM2:
 			case CD_TRACK_MODE2_FORM_MIX:
 			case CD_TRACK_MODE2_RAW:
-				strprintf(tempstr,"MODE2/%04d", info.datasize);
+				tempstr = string_format("MODE2/%04d", info.datasize);
 				break;
 
 			case CD_TRACK_AUDIO:
@@ -1266,70 +1298,70 @@ void output_track_metadata(int mode, core_file *file, int tracknum, const cdrom_
 		}
 
 		// output TRACK entry
-		core_fprintf(file, "  TRACK %02d %s\n", tracknum + 1, tempstr.c_str());
+		file.printf("  TRACK %02d %s\n", tracknum + 1, tempstr.c_str());
 
 		// output PREGAP tag if pregap sectors are not in the file
 		if ((info.pregap > 0) && (info.pgdatasize == 0))
 		{
-			core_fprintf(file, "    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
-			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			file.printf("    PREGAP %s\n", msf_string_from_frames(tempstr, info.pregap));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
 		}
 		else if ((info.pregap > 0) && (info.pgdatasize > 0))
 		{
-			core_fprintf(file, "    INDEX 00 %s\n", msf_string_from_frames(tempstr, frameoffs));
-			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs+info.pregap));
+			file.printf("    INDEX 00 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs+info.pregap));
 		}
 
 		// if no pregap at all, output index 01 only
 		if (info.pregap == 0)
 		{
-			core_fprintf(file, "    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
+			file.printf("    INDEX 01 %s\n", msf_string_from_frames(tempstr, frameoffs));
 		}
 
 		// output POSTGAP
 		if (info.postgap > 0)
-			core_fprintf(file, "    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
+			file.printf("    POSTGAP %s\n", msf_string_from_frames(tempstr, info.postgap));
 	}
 	// non-CUE mode
 	else if (mode == MODE_NORMAL)
 	{
 		// header on the first track
 		if (tracknum == 0)
-			core_fprintf(file, "CD_ROM\n\n\n");
-		core_fprintf(file, "// Track %d\n", tracknum + 1);
+			file.printf("CD_ROM\n\n\n");
+		file.printf("// Track %d\n", tracknum + 1);
 
 		// write out the track type
 		std::string modesubmode;
 		if (info.subtype != CD_SUB_NONE)
-			strprintf(modesubmode,"%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
+			modesubmode = string_format("%s %s", cdrom_get_type_string(info.trktype), cdrom_get_subtype_string(info.subtype));
 		else
-			strprintf(modesubmode,"%s", cdrom_get_type_string(info.trktype));
-		core_fprintf(file, "TRACK %s\n", modesubmode.c_str());
+			modesubmode = string_format("%s", cdrom_get_type_string(info.trktype));
+		file.printf("TRACK %s\n", modesubmode.c_str());
 
 		// write out the attributes
-		core_fprintf(file, "NO COPY\n");
+		file.printf("NO COPY\n");
 		if (info.trktype == CD_TRACK_AUDIO)
 		{
-			core_fprintf(file, "NO PRE_EMPHASIS\n");
-			core_fprintf(file, "TWO_CHANNEL_AUDIO\n");
+			file.printf("NO PRE_EMPHASIS\n");
+			file.printf("TWO_CHANNEL_AUDIO\n");
 		}
 
 		// output pregap
 		std::string tempstr;
 		if (info.pregap > 0)
-			core_fprintf(file, "ZERO %s %s\n", modesubmode.c_str(), msf_string_from_frames(tempstr, info.pregap));
+			file.printf("ZERO %s %s\n", modesubmode.c_str(), msf_string_from_frames(tempstr, info.pregap));
 
 		// all tracks but the first one have a file offset
 		if (tracknum > 0)
-			core_fprintf(file, "DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, UINT32(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" #%d %s // length in bytes: %d\n", filename, uint32_t(discoffs), msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
 		else
-			core_fprintf(file, "DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
+			file.printf("DATAFILE \"%s\" %s // length in bytes: %d\n", filename, msf_string_from_frames(tempstr, info.frames), info.frames * (info.datasize + info.subsize));
 
 		// tracks with pregaps get a START marker too
 		if (info.pregap > 0)
-			core_fprintf(file, "START %s\n", msf_string_from_frames(tempstr, info.pregap));
+			file.printf("START %s\n", msf_string_from_frames(tempstr, info.pregap));
 
-		core_fprintf(file, "\n\n");
+		file.printf("\n\n");
 	}
 }
 
@@ -1362,36 +1394,36 @@ static void do_info(parameters_t &params)
 	printf("Unit Size:    %s bytes\n", big_int_string(tempstr, input_chd.unit_bytes()));
 	printf("Total Units:  %s\n", big_int_string(tempstr, input_chd.unit_count()));
 	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("CHD size:     %s bytes\n", big_int_string(tempstr, core_fsize(input_chd)));
+	printf("CHD size:     %s bytes\n", big_int_string(tempstr, static_cast<util::core_file &>(input_chd).size()));
 	if (compression[0] != CHD_CODEC_NONE)
-		printf("Ratio:        %.1f%%\n", 100.0 * double(core_fsize(input_chd)) / double(input_chd.logical_bytes()));
+		printf("Ratio:        %.1f%%\n", 100.0 * double(static_cast<util::core_file &>(input_chd).size()) / double(input_chd.logical_bytes()));
 
 	// add SHA1 output
-	sha1_t overall = input_chd.sha1();
-	if (overall != sha1_t::null)
+	util::sha1_t overall = input_chd.sha1();
+	if (overall != util::sha1_t::null)
 	{
 		printf("SHA1:         %s\n", overall.as_string().c_str());
 		if (input_chd.version() >= 4)
 			printf("Data SHA1:    %s\n", input_chd.raw_sha1().as_string().c_str());
 	}
-	sha1_t parent = input_chd.parent_sha1();
-	if (parent != sha1_t::null)
+	util::sha1_t parent = input_chd.parent_sha1();
+	if (parent != util::sha1_t::null)
 		printf("Parent SHA1:  %s\n", parent.as_string().c_str());
 
 	// print out metadata
-	dynamic_buffer buffer;
+	std::vector<uint8_t> buffer;
 	std::vector<metadata_index_info> info;
 	for (int index = 0; ; index++)
 	{
 		// get the indexed metadata item; stop when we hit an error
 		chd_metadata_tag metatag;
-		UINT8 metaflags;
+		uint8_t metaflags;
 		chd_error err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index, buffer, metatag, metaflags);
 		if (err != CHDERR_NONE)
 			break;
 
 		// determine our index
-		UINT32 metaindex = ~0;
+		uint32_t metaindex = ~0;
 		for (auto & elem : info)
 			if (elem.tag == metatag)
 			{
@@ -1414,24 +1446,24 @@ static void do_info(parameters_t &params)
 			printf("Metadata:     Tag=%08x  Index=%d  Length=%d bytes\n", metatag, metaindex, int(buffer.size()));
 		printf("              ");
 
-		UINT32 count = buffer.size();
+		uint32_t count = buffer.size();
 		// limit output to 60 characters of metadata if not verbose
 		if (!verbose)
-			count = MIN(60, count);
+			count = std::min(60U, count);
 		for (int chnum = 0; chnum < count; chnum++)
-			printf("%c", isprint(UINT8(buffer[chnum])) ? buffer[chnum] : '.');
+			printf("%c", isprint(uint8_t(buffer[chnum])) ? buffer[chnum] : '.');
 		printf("\n");
 	}
 
 	// print compression stats if verbose
 	if (verbose)
 	{
-		UINT32 compression_types[10] = { 0 };
-		for (UINT32 hunknum = 0; hunknum < input_chd.hunk_count(); hunknum++)
+		uint32_t compression_types[10] = { 0 };
+		for (uint32_t hunknum = 0; hunknum < input_chd.hunk_count(); hunknum++)
 		{
 			// get info on this hunk
 			chd_codec_type codec;
-			UINT32 compbytes;
+			uint32_t compbytes;
 			chd_error err = input_chd.hunk_info(hunknum, codec, compbytes);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error getting info on hunk %d: %s", hunknum, chd_file::error_string(err));
@@ -1498,21 +1530,21 @@ static void do_verify(parameters_t &params)
 	// only makes sense for compressed CHDs with valid SHA1's
 	if (!input_chd.compressed())
 		report_error(0, "No verification to be done; CHD is uncompressed");
-	sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
-	if (raw_sha1 == sha1_t::null)
+	util::sha1_t raw_sha1 = (input_chd.version() <= 3) ? input_chd.sha1() : input_chd.raw_sha1();
+	if (raw_sha1 == util::sha1_t::null)
 		report_error(0, "No verification to be done; CHD has no checksum");
 
 	// create an array to read into
-	dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+	std::vector<uint8_t> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
 
 	// read all the data and build up an SHA-1
-	sha1_creator rawsha1;
-	for (UINT64 offset = 0; offset < input_chd.logical_bytes(); )
+	util::sha1_creator rawsha1;
+	for (uint64_t offset = 0; offset < input_chd.logical_bytes(); )
 	{
 		progress(false, "Verifying, %.1f%% complete... \r", 100.0 * double(offset) / double(input_chd.logical_bytes()));
 
 		// determine how much to read
-		UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_chd.logical_bytes() - offset);
+		uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_chd.logical_bytes() - offset);
 		chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
@@ -1521,7 +1553,7 @@ static void do_verify(parameters_t &params)
 		rawsha1.append(&buffer[0], bytes_to_read);
 		offset += bytes_to_read;
 	}
-	sha1_t computed_sha1 = rawsha1.finish();
+	util::sha1_t computed_sha1 = rawsha1.finish();
 
 	// finish up
 	if (raw_sha1 != computed_sha1)
@@ -1543,7 +1575,7 @@ static void do_verify(parameters_t &params)
 		// now include the metadata for >= v4
 		if (input_chd.version() >= 4)
 		{
-			sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
+			util::sha1_t computed_overall_sha1 = input_chd.compute_overall_sha1(computed_sha1);
 			if (input_chd.sha1() == computed_overall_sha1)
 				printf("Overall SHA1 verification successful!\n");
 			else
@@ -1571,12 +1603,12 @@ static void do_verify(parameters_t &params)
 static void do_create_raw(parameters_t &params)
 {
 	// process input file
-	core_file *input_file = nullptr;
+	util::core_file::ptr input_file;
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		file_error filerr = core_fopen(input_file_str->second->c_str(), OPEN_FLAG_READ, &input_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1585,11 +1617,11 @@ static void do_create_raw(parameters_t &params)
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
+	uint32_t hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : 0;
 	parse_hunk_size(params, 1, hunk_size);
 
 	// process unit size
-	UINT32 unit_size = output_parent.opened() ? output_parent.unit_bytes() : 0;
+	uint32_t unit_size = output_parent.opened() ? output_parent.unit_bytes() : 0;
 	auto unit_size_str = params.find(OPTION_UNIT_SIZE);
 	if (unit_size_str != params.end())
 	{
@@ -1599,9 +1631,9 @@ static void do_create_raw(parameters_t &params)
 	}
 
 	// process input start/end (needs to know hunk_size)
-	UINT64 input_start;
-	UINT64 input_end;
-	parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+	uint64_t input_start;
+	uint64_t input_end;
+	parse_input_start_end(params, input_file->size(), hunk_size, hunk_size, input_start, input_end);
 
 	// process compression
 	chd_codec_type compression[4];
@@ -1617,7 +1649,7 @@ static void do_create_raw(parameters_t &params)
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
-	if (input_start != 0 || input_end != core_fsize(input_file))
+	if (input_start != 0 || input_end != input_file->size())
 	{
 		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
 		printf("Input length: %s\n", big_int_string(tempstr, input_end - input_start));
@@ -1627,11 +1659,10 @@ static void do_create_raw(parameters_t &params)
 	printf("Logical size: %s\n", big_int_string(tempstr, input_end - input_start));
 
 	// catch errors so we can close & delete the output file
-	chd_rawfile_compressor *chd = nullptr;
 	try
 	{
 		// create the new CHD
-		chd = new chd_rawfile_compressor(input_file, input_start, input_end);
+		std::unique_ptr<chd_file_compressor> chd(new chd_rawfile_compressor(*input_file, input_start, input_end));
 		chd_error err;
 		if (output_parent.opened())
 			err = chd->create(output_chd_str->c_str(), input_end - input_start, hunk_size, compression, output_parent);
@@ -1646,15 +1677,13 @@ static void do_create_raw(parameters_t &params)
 
 		// compress it generically
 		compress_common(*chd);
-		delete chd;
 	}
 	catch (...)
 	{
-		delete chd;
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1668,12 +1697,12 @@ static void do_create_raw(parameters_t &params)
 static void do_create_hd(parameters_t &params)
 {
 	// process input file
-	core_file *input_file = nullptr;
+	util::core_file::ptr input_file;
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		file_error filerr = core_fopen(input_file_str->second->c_str(), OPEN_FLAG_READ, &input_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*input_file_str->second, OPEN_FLAG_READ, input_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", input_file_str->second->c_str());
 	}
 
@@ -1682,7 +1711,7 @@ static void do_create_hd(parameters_t &params)
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process sectorsize
-	UINT32 sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
+	uint32_t sector_size = output_parent.opened() ? output_parent.unit_bytes() : IDE_SECTOR_SIZE;
 	auto sectorsize_str = params.find(OPTION_SECTOR_SIZE);
 	if (sectorsize_str != params.end())
 	{
@@ -1692,16 +1721,16 @@ static void do_create_hd(parameters_t &params)
 	}
 
 	// process hunk size (needs to know sector_size)
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : MAX((4096 / sector_size) * sector_size, sector_size);
+	uint32_t hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : std::max((4096 / sector_size) * sector_size, sector_size);
 	parse_hunk_size(params, sector_size, hunk_size);
 
 	// process input start/end (needs to know hunk_size)
-	UINT64 filesize = 0;
-	UINT64 input_start = 0;
-	UINT64 input_end = 0;
-	if (input_file != nullptr)
+	uint64_t filesize = 0;
+	uint64_t input_start = 0;
+	uint64_t input_end = 0;
+	if (input_file)
 	{
-		parse_input_start_end(params, core_fsize(input_file), hunk_size, hunk_size, input_start, input_end);
+		parse_input_start_end(params, input_file->size(), hunk_size, hunk_size, input_start, input_end);
 		filesize = input_end - input_start;
 	}
 	else
@@ -1717,19 +1746,19 @@ static void do_create_hd(parameters_t &params)
 	// process compression
 	chd_codec_type compression[4];
 	memcpy(compression, s_default_hd_compression, sizeof(compression));
-	if (input_file == nullptr)
+	if (!input_file)
 		compression[0] = compression[1] = compression[2] = compression[3] = CHD_CODEC_NONE;
 	parse_compression(params, compression);
-	if (input_file == nullptr && compression[0] != CHD_CODEC_NONE)
+	if (!input_file && compression[0] != CHD_CODEC_NONE)
 		report_error(1, "Blank hard disks must be uncompressed");
 
 	// process numprocessors
 	parse_numprocessors(params);
 
 	// process chs
-	UINT32 cylinders = 0;
-	UINT32 heads = 0;
-	UINT32 sectors = 0;
+	uint32_t cylinders = 0;
+	uint32_t heads = 0;
+	uint32_t sectors = 0;
 	auto chs_str = params.find(OPTION_CHS);
 	if (chs_str != params.end())
 	{
@@ -1740,15 +1769,15 @@ static void do_create_hd(parameters_t &params)
 	}
 
 	// process ident
-	dynamic_buffer identdata;
+	std::vector<uint8_t> identdata;
 	if (output_parent.opened())
 		output_parent.read_metadata(HARD_DISK_IDENT_METADATA_TAG, 0, identdata);
 	auto ident_str = params.find(OPTION_IDENT);
 	if (ident_str != params.end())
 	{
 		// load the file
-		file_error filerr = core_fload(ident_str->second->c_str(), identdata);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::load(ident_str->second->c_str(), identdata);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Error reading ident file (%s)", ident_str->second->c_str());
 
 		// must be at least 14 bytes; extract CHS data from there
@@ -1757,6 +1786,10 @@ static void do_create_hd(parameters_t &params)
 		cylinders = (identdata[3] << 8) | identdata[2];
 		heads = (identdata[7] << 8) | identdata[6];
 		sectors = (identdata[13] << 8) | identdata[12];
+
+		// ignore CHS for > 8GB drives
+		if (cylinders * heads * sectors >= 16514064)
+			cylinders = 0;
 	}
 
 	// extract geometry from the parent if we have one
@@ -1776,21 +1809,21 @@ static void do_create_hd(parameters_t &params)
 	// if no CHS values, try to guess them
 	if (cylinders == 0)
 	{
-		if (input_file == nullptr && filesize == 0)
+		if (!input_file && filesize == 0)
 			report_error(1, "Blank hard drives must specify either a length or a set of CHS values");
 		guess_chs((input_file_str != params.end()) ? input_file_str->second : nullptr, filesize, sector_size, cylinders, heads, sectors, sector_size);
 	}
-	UINT32 totalsectors = cylinders * heads * sectors;
+	uint32_t totalsectors = cylinders * heads * sectors;
 
 	// print some info
 	std::string tempstr;
 	printf("Output CHD:   %s\n", output_chd_str->c_str());
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
-	if (input_file != nullptr)
+	if (input_file)
 	{
 		printf("Input file:   %s\n", input_file_str->second->c_str());
-		if (input_start != 0 || input_end != core_fsize(input_file))
+		if (input_start != 0 || input_end != input_file->size())
 		{
 			printf("Input start:  %s\n", big_int_string(tempstr, input_start));
 			printf("Input length: %s\n", big_int_string(tempstr, filesize));
@@ -1802,25 +1835,25 @@ static void do_create_hd(parameters_t &params)
 	printf("Sectors:      %d\n", sectors);
 	printf("Bytes/sector: %d\n", sector_size);
 	printf("Sectors/hunk: %d\n", hunk_size / sector_size);
-	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * UINT64(sector_size)));
+	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(totalsectors) * uint64_t(sector_size)));
 
 	// catch errors so we can close & delete the output file
-	chd_rawfile_compressor *chd = nullptr;
 	try
 	{
 		// create the new hard drive
-		chd = new chd_rawfile_compressor(input_file, input_start, input_end);
+		std::unique_ptr<chd_file_compressor> chd;
+		if (input_file) chd.reset(new chd_rawfile_compressor(*input_file, input_start, input_end));
+		else chd.reset(new chd_zero_compressor(input_start, input_end));
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(sector_size), hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(sector_size), hunk_size, compression, output_parent);
 		else
-			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(sector_size), hunk_size, sector_size, compression);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(sector_size), hunk_size, sector_size, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// add the standard hard disk metadata
-		std::string metadata;
-		strprintf(metadata, HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
+		std::string  metadata = string_format(HARD_DISK_METADATA_FORMAT, cylinders, heads, sectors, sector_size);
 		err = chd->write_metadata(HARD_DISK_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding hard disk metadata: %s", chd_file::error_string(err));
@@ -1834,17 +1867,15 @@ static void do_create_hd(parameters_t &params)
 		}
 
 		// compress it generically
-		if (input_file != nullptr)
+		if (input_file)
 			compress_common(*chd);
-		delete chd;
 	}
 	catch (...)
 	{
-		delete chd;
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1873,7 +1904,7 @@ static void do_create_cd(parameters_t &params)
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
+	uint32_t hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : CD_FRAMES_PER_HUNK * CD_FRAME_SIZE;
 	parse_hunk_size(params, CD_FRAME_SIZE, hunk_size);
 
 	// process compression
@@ -1884,9 +1915,9 @@ static void do_create_cd(parameters_t &params)
 	// process numprocessors
 	parse_numprocessors(params);
 
-	// pad each track to a 4-frame boundry. cdrom.c will deal with this on the read side
-	UINT32 origtotalsectors = 0;
-	UINT32 totalsectors = 0;
+	// pad each track to a 4-frame boundary. cdrom.c will deal with this on the read side
+	uint32_t origtotalsectors = 0;
+	uint32_t totalsectors = 0;
 	for (int tracknum = 0; tracknum < toc.numtrks; tracknum++)
 	{
 		cdrom_track_info &trackinfo = toc.tracks[tracknum];
@@ -1905,7 +1936,7 @@ static void do_create_cd(parameters_t &params)
 	printf("Input tracks: %d\n", toc.numtrks);
 	printf("Input length: %s\n", msf_string_from_frames(tempstr, origtotalsectors));
 	printf("Compression:  %s\n", compression_string(tempstr, compression));
-	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(totalsectors) * CD_FRAME_SIZE));
+	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(totalsectors) * CD_FRAME_SIZE));
 
 	// catch errors so we can close & delete the output file
 	chd_cd_compressor *chd = nullptr;
@@ -1915,9 +1946,9 @@ static void do_create_cd(parameters_t &params)
 		chd = new chd_cd_compressor(toc, track_info);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(CD_FRAME_SIZE), hunk_size, compression, output_parent);
 		else
-			err = chd->create(output_chd_str->c_str(), UINT64(totalsectors) * UINT64(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
+			err = chd->create(output_chd_str->c_str(), uint64_t(totalsectors) * uint64_t(CD_FRAME_SIZE), hunk_size, CD_FRAME_SIZE, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
@@ -1936,7 +1967,7 @@ static void do_create_cd(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -1950,33 +1981,33 @@ static void do_create_cd(parameters_t &params)
 static void do_create_ld(parameters_t &params)
 {
 	// process input file
-	avi_file *input_file = nullptr;
+	avi_file::ptr input_file;
 	auto input_file_str = params.find(OPTION_INPUT);
 	if (input_file_str != params.end())
 	{
-		avi_error avierr = avi_open(input_file_str->second->c_str(), &input_file);
-		if (avierr != AVIERR_NONE)
-			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->second->c_str(), avi_error_string(avierr));
+		avi_file::error avierr = avi_file::open(*input_file_str->second, input_file);
+		if (avierr != avi_file::error::NONE)
+			report_error(1, "Error opening AVI file (%s): %s\n", input_file_str->second->c_str(), avi_file::error_string(avierr));
 	}
-	const avi_movie_info *aviinfo = avi_get_movie_info(input_file);
+	const avi_file::movie_info &aviinfo = input_file->get_movie_info();
 
 	// process output CHD
 	chd_file output_parent;
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process input start/end
-	UINT64 input_start;
-	UINT64 input_end;
-	parse_input_start_end(params, aviinfo->video_numsamples, 0, 1, input_start, input_end);
+	uint64_t input_start;
+	uint64_t input_end;
+	parse_input_start_end(params, aviinfo.video_numsamples, 0, 1, input_start, input_end);
 
 	// determine parameters of the incoming video stream
 	avi_info info;
-	info.fps_times_1million = UINT64(aviinfo->video_timescale) * 1000000 / aviinfo->video_sampletime;
-	info.width = aviinfo->video_width;
-	info.height = aviinfo->video_height;
+	info.fps_times_1million = uint64_t(aviinfo.video_timescale) * 1000000 / aviinfo.video_sampletime;
+	info.width = aviinfo.video_width;
+	info.height = aviinfo.video_height;
 	info.interlaced = ((info.fps_times_1million / 1000000) <= 30) && (info.height % 2 == 0) && (info.height > 288);
-	info.channels = aviinfo->audio_channels;
-	info.rate = aviinfo->audio_samplerate;
+	info.channels = aviinfo.audio_channels;
+	info.rate = aviinfo.audio_samplerate;
 
 	// adjust for interlacing
 	if (info.interlaced)
@@ -1988,11 +2019,11 @@ static void do_create_ld(parameters_t &params)
 	}
 
 	// determine the number of bytes per frame
-	info.max_samples_per_frame = (UINT64(info.rate) * 1000000 + info.fps_times_1million - 1) / info.fps_times_1million;
+	info.max_samples_per_frame = (uint64_t(info.rate) * 1000000 + info.fps_times_1million - 1) / info.fps_times_1million;
 	info.bytes_per_frame = avhuff_encoder::raw_data_size(info.width, info.height, info.channels, info.max_samples_per_frame);
 
 	// process hunk size
-	UINT32 hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : info.bytes_per_frame;
+	uint32_t hunk_size = output_parent.opened() ? output_parent.hunk_bytes() : info.bytes_per_frame;
 	parse_hunk_size(params, info.bytes_per_frame, hunk_size);
 
 	// process compression
@@ -2012,18 +2043,18 @@ static void do_create_ld(parameters_t &params)
 	if (output_parent.opened())
 		printf("Parent CHD:   %s\n", params.find(OPTION_OUTPUT_PARENT)->second->c_str());
 	printf("Input file:   %s\n", input_file_str->second->c_str());
-	if (input_start != 0 && input_end != aviinfo->video_numsamples)
+	if (input_start != 0 && input_end != aviinfo.video_numsamples)
 		printf("Input start:  %s\n", big_int_string(tempstr, input_start));
 	printf("Input length: %s (%02d:%02d:%02d)\n", big_int_string(tempstr, input_end - input_start),
-			UINT32((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
-			UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million / 60) % 60)),
-			UINT32(((UINT64(input_end - input_start) * 1000000 / info.fps_times_1million) % 60)));
+			uint32_t((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million / 60 / 60)),
+			uint32_t(((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million / 60) % 60)),
+			uint32_t(((uint64_t(input_end - input_start) * 1000000 / info.fps_times_1million) % 60)));
 	printf("Frame rate:   %d.%06d\n", info.fps_times_1million / 1000000, info.fps_times_1million % 1000000);
 	printf("Frame size:   %d x %d %s\n", info.width, info.height * (info.interlaced ? 2 : 1), info.interlaced ? "interlaced" : "non-interlaced");
 	printf("Audio:        %d channels at %d Hz\n", info.channels, info.rate);
 	printf("Compression:  %s\n", compression_string(tempstr, compression));
 	printf("Hunk size:    %s\n", big_int_string(tempstr, hunk_size));
-	printf("Logical size: %s\n", big_int_string(tempstr, UINT64(input_end - input_start) * hunk_size));
+	printf("Logical size: %s\n", big_int_string(tempstr, uint64_t(input_end - input_start) * hunk_size));
 
 	// catch errors so we can close & delete the output file
 	chd_avi_compressor *chd = nullptr;
@@ -2033,15 +2064,14 @@ static void do_create_ld(parameters_t &params)
 		chd = new chd_avi_compressor(*input_file, info, input_start, input_end);
 		chd_error err;
 		if (output_parent.opened())
-			err = chd->create(output_chd_str->c_str(), UINT64(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
+			err = chd->create(output_chd_str->c_str(), uint64_t(input_end - input_start) * hunk_size, hunk_size, compression, output_parent);
 		else
-			err = chd->create(output_chd_str->c_str(), UINT64(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
+			err = chd->create(output_chd_str->c_str(), uint64_t(input_end - input_start) * hunk_size, hunk_size, info.bytes_per_frame, compression);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// write the core A/V metadata
-		std::string metadata;
-		strprintf(metadata, AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
+		std::string metadata = string_format(AV_METADATA_FORMAT, info.fps_times_1million / 1000000, info.fps_times_1million % 1000000, info.width, info.height, info.interlaced, info.channels, info.rate);
 		err = chd->write_metadata(AV_METADATA_TAG, 0, metadata);
 		if (err != CHDERR_NONE)
 			report_error(1, "Error adding AV metadata: %s\n", chd_file::error_string(err));
@@ -2064,7 +2094,7 @@ static void do_create_ld(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -2083,8 +2113,8 @@ static void do_copy(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// parse out input start/end
-	UINT64 input_start;
-	UINT64 input_end;
+	uint64_t input_start;
+	uint64_t input_end;
 	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
 
 	// process output CHD
@@ -2092,7 +2122,7 @@ static void do_copy(parameters_t &params)
 	std::string *output_chd_str = parse_output_chd_parameters(params, output_parent);
 
 	// process hunk size
-	UINT32 hunk_size = input_chd.hunk_bytes();
+	uint32_t hunk_size = input_chd.hunk_bytes();
 	parse_hunk_size(params, 1, hunk_size);
 	if (hunk_size % input_chd.hunk_bytes() != 0 && input_chd.hunk_bytes() % hunk_size != 0)
 		report_error(1, "Hunk size is not an even multiple or divisor of input hunk size");
@@ -2100,7 +2130,7 @@ static void do_copy(parameters_t &params)
 	// process compression; we default to our current preferences using metadata to pick the type
 	chd_codec_type compression[4];
 	{
-		dynamic_buffer metadata;
+		std::vector<uint8_t> metadata;
 		if (input_chd.read_metadata(HARD_DISK_METADATA_TAG, 0, metadata) == CHDERR_NONE)
 			memcpy(compression, s_default_hd_compression, sizeof(compression));
 		else if (input_chd.read_metadata(AV_METADATA_TAG, 0, metadata) == CHDERR_NONE)
@@ -2149,10 +2179,10 @@ static void do_copy(parameters_t &params)
 			report_error(1, "Error creating CHD file (%s): %s", output_chd_str->c_str(), chd_file::error_string(err));
 
 		// clone all the metadata, upgrading where appropriate
-		dynamic_buffer metadata;
+		std::vector<uint8_t> metadata;
 		chd_metadata_tag metatag;
-		UINT8 metaflags;
-		UINT32 index = 0;
+		uint8_t metaflags;
+		uint32_t index = 0;
 		bool redo_cd = false;
 		bool cdda_swap = false;
 		for (err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags); err == CHDERR_NONE; err = input_chd.read_metadata(CHDMETATAG_WILDCARD, index++, metadata, metatag, metaflags))
@@ -2200,7 +2230,7 @@ static void do_copy(parameters_t &params)
 		// delete the output file
 		auto output_chd_str = params.find(OPTION_OUTPUT);
 		if (output_chd_str != params.end())
-			osd_rmfile(output_chd_str->second->c_str());
+			osd_file::remove(*output_chd_str->second);
 		throw;
 	}
 }
@@ -2219,8 +2249,8 @@ static void do_extract_raw(parameters_t &params)
 	parse_input_chd_parameters(params, input_chd, input_parent_chd);
 
 	// parse out input start/end
-	UINT64 input_start;
-	UINT64 input_end;
+	uint64_t input_start;
+	uint64_t input_end;
 	parse_input_start_end(params, input_chd.logical_bytes(), input_chd.hunk_bytes(), input_chd.hunk_bytes(), input_start, input_end);
 
 	// verify output file doesn't exist
@@ -2239,28 +2269,28 @@ static void do_extract_raw(parameters_t &params)
 	}
 
 	// catch errors so we can close & delete the output file
-	core_file *output_file = nullptr;
+	util::core_file::ptr output_file;
 	try
 	{
 		// process output file
-		file_error filerr = core_fopen(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// copy all data
-		dynamic_buffer buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
-		for (UINT64 offset = input_start; offset < input_end; )
+		std::vector<uint8_t> buffer((TEMP_BUFFER_SIZE / input_chd.hunk_bytes()) * input_chd.hunk_bytes());
+		for (uint64_t offset = input_start; offset < input_end; )
 		{
 			progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(offset - input_start) / double(input_end - input_start));
 
 			// determine how much to read
-			UINT32 bytes_to_read = MIN((UINT32)buffer.size(), input_end - offset);
+			uint32_t bytes_to_read = (std::min<uint64_t>)(buffer.size(), input_end - offset);
 			chd_error err = input_chd.read_bytes(offset, &buffer[0], bytes_to_read);
 			if (err != CHDERR_NONE)
 				report_error(1, "Error reading CHD file (%s): %s", params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
 
 			// write to the output
-			UINT32 count = core_fwrite(output_file, &buffer[0], bytes_to_read);
+			uint32_t count = output_file->write(&buffer[0], bytes_to_read);
 			if (count != bytes_to_read)
 				report_error(1, "Error writing to file; check disk space (%s)", output_file_str->second->c_str());
 
@@ -2269,7 +2299,7 @@ static void do_extract_raw(parameters_t &params)
 		}
 
 		// finish up
-		core_fclose(output_file);
+		output_file.reset();
 		printf("Extraction complete                                    \n");
 	}
 	catch (...)
@@ -2277,8 +2307,8 @@ static void do_extract_raw(parameters_t &params)
 		// delete the output file
 		if (output_file != nullptr)
 		{
-			core_fclose(output_file);
-			osd_rmfile(output_file_str->second->c_str());
+			output_file.reset();
+			osd_file::remove(*output_file_str->second);
 		}
 		throw;
 	}
@@ -2313,7 +2343,7 @@ static void do_extract_cd(parameters_t &params)
 	std::string default_name(*output_file_str->second);
 	int chop = default_name.find_last_of('.');
 	if (chop != -1)
-		default_name.substr(0, chop);
+		default_name.erase(chop, default_name.size());
 	char basename[128];
 	strncpy(basename, default_name.c_str(), 127);
 	default_name.append(".bin");
@@ -2332,8 +2362,8 @@ static void do_extract_cd(parameters_t &params)
 	printf("Input CHD:    %s\n", params.find(OPTION_INPUT)->second->c_str());
 
 	// catch errors so we can close & delete the output file
-	core_file *output_bin_file = nullptr;
-	core_file *output_toc_file = nullptr;
+	util::core_file::ptr output_bin_file;
+	util::core_file::ptr output_toc_file;
 	try
 	{
 		int mode = MODE_NORMAL;
@@ -2348,33 +2378,33 @@ static void do_extract_cd(parameters_t &params)
 		}
 
 		// process output file
-		file_error filerr = core_fopen(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, &output_toc_file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_NO_BOM, output_toc_file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// process output BIN file
 		if (mode != MODE_GDI)
 		{
-			filerr = core_fopen(output_bin_file_str->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-			if (filerr != FILERR_NONE)
+			filerr = util::core_file::open(*output_bin_file_str, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_bin_file_str->c_str());
 		}
 
 		// determine total frames
-		UINT64 total_bytes = 0;
+		uint64_t total_bytes = 0;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 			total_bytes += toc->tracks[tracknum].frames * (toc->tracks[tracknum].datasize + toc->tracks[tracknum].subsize);
 
 		// GDI must start with the # of tracks
 		if (mode == MODE_GDI)
 		{
-			core_fprintf(output_toc_file, "%d\n", toc->numtrks);
+			output_toc_file->printf("%d\n", toc->numtrks);
 		}
 
 		// iterate over tracks and copy all data
-		UINT64 outputoffs = 0;
-		UINT32 discoffs = 0;
-		dynamic_buffer buffer;
+		uint64_t outputoffs = 0;
+		uint32_t discoffs = 0;
+		std::vector<uint8_t> buffer;
 		for (int tracknum = 0; tracknum < toc->numtrks; tracknum++)
 		{
 			std::string trackbin_name(basename);
@@ -2389,14 +2419,10 @@ static void do_extract_cd(parameters_t &params)
 				else
 					trackbin_name.append(".bin");
 
-				if (output_bin_file)
-				{
-					core_fclose(output_bin_file);
-					output_bin_file = nullptr;
-				}
+				output_bin_file.reset();
 
-				filerr = core_fopen(trackbin_name.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_bin_file);
-				if (filerr != FILERR_NONE)
+				filerr = util::core_file::open(trackbin_name, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_bin_file);
+				if (filerr != osd_file::error::NONE)
 					report_error(1, "Unable to open file (%s)", trackbin_name.c_str());
 
 				outputoffs = 0;
@@ -2406,16 +2432,16 @@ static void do_extract_cd(parameters_t &params)
 			const cdrom_track_info &trackinfo = toc->tracks[tracknum];
 			if (mode == MODE_GDI)
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name.c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(trackbin_name).c_str(), discoffs, outputoffs);
 			}
 			else
 			{
-				output_track_metadata(mode, output_toc_file, tracknum, trackinfo, core_filename_extract_base(output_bin_file_str->c_str()).c_str(), discoffs, outputoffs);
+				output_track_metadata(mode, *output_toc_file, tracknum, trackinfo, core_filename_extract_base(*output_bin_file_str).c_str(), discoffs, outputoffs);
 			}
 
 			// If this is bin/cue output and the CHD contains subdata, warn the user and don't include
 			// the subdata size in the buffer calculation.
-			UINT32 output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
+			uint32_t output_frame_size = trackinfo.datasize + ((trackinfo.subtype != CD_SUB_NONE) ? trackinfo.subsize : 0);
 			if (trackinfo.subtype != CD_SUB_NONE && ((mode == MODE_CUEBIN) || (mode == MODE_GDI)))
 			{
 				printf("Warning: Track %d has subcode data.  bin/cue and gdi formats cannot contain subcode data and it will be omitted.\n", tracknum+1);
@@ -2427,9 +2453,9 @@ static void do_extract_cd(parameters_t &params)
 			buffer.resize((TEMP_BUFFER_SIZE / output_frame_size) * output_frame_size);
 
 			// now read and output the actual data
-			UINT32 bufferoffs = 0;
-			UINT32 actualframes = trackinfo.frames - trackinfo.padframes;
-			for (UINT32 frame = 0; frame < actualframes; frame++)
+			uint32_t bufferoffs = 0;
+			uint32_t actualframes = trackinfo.frames - trackinfo.padframes;
+			for (uint32_t frame = 0; frame < actualframes; frame++)
 			{
 				progress(false, "Extracting, %.1f%% complete... \r", 100.0 * double(outputoffs) / double(total_bytes));
 
@@ -2441,7 +2467,7 @@ static void do_extract_cd(parameters_t &params)
 				if (((mode == MODE_GDI && input_chd.version() > 4) || (mode == MODE_CUEBIN)) && (trackinfo.trktype == CD_TRACK_AUDIO))
 					for (int swapindex = 0; swapindex < trackinfo.datasize; swapindex += 2)
 					{
-						UINT8 swaptemp = buffer[bufferoffs + swapindex];
+						uint8_t swaptemp = buffer[bufferoffs + swapindex];
 						buffer[bufferoffs + swapindex] = buffer[bufferoffs + swapindex + 1];
 						buffer[bufferoffs + swapindex + 1] = swaptemp;
 					}
@@ -2458,8 +2484,8 @@ static void do_extract_cd(parameters_t &params)
 				// write it out if we need to
 				if (bufferoffs == buffer.size() || frame == actualframes - 1)
 				{
-					core_fseek(output_bin_file, outputoffs, SEEK_SET);
-					UINT32 byteswritten = core_fwrite(output_bin_file, &buffer[0], bufferoffs);
+					output_bin_file->seek(outputoffs, SEEK_SET);
+					uint32_t byteswritten = output_bin_file->write(&buffer[0], bufferoffs);
 					if (byteswritten != bufferoffs)
 						report_error(1, "Error writing frame %d to file (%s): %s\n", frame, output_file_str->second->c_str(), chd_file::error_string(CHDERR_WRITE_ERROR));
 					outputoffs += bufferoffs;
@@ -2471,19 +2497,17 @@ static void do_extract_cd(parameters_t &params)
 		}
 
 		// finish up
-		core_fclose(output_bin_file);
-		core_fclose(output_toc_file);
+		output_bin_file.reset();
+		output_toc_file.reset();
 		printf("Extraction complete                                    \n");
 	}
 	catch (...)
 	{
 		// delete the output files
-		if (output_bin_file != nullptr)
-			core_fclose(output_bin_file);
-		if (output_toc_file != nullptr)
-			core_fclose(output_toc_file);
-		osd_rmfile(output_bin_file_str->c_str());
-		osd_rmfile(output_file_str->second->c_str());
+		output_bin_file.reset();
+		output_toc_file.reset();
+		osd_file::remove(*output_bin_file_str);
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }
@@ -2508,9 +2532,9 @@ static void do_extract_ld(parameters_t &params)
 		report_error(1, "Unable to find A/V metadata in the input CHD");
 
 	// parse the metadata
-	UINT32 fps_times_1million;
-	UINT32 max_samples_per_frame;
-	UINT32 frame_bytes;
+	uint32_t fps_times_1million;
+	uint32_t max_samples_per_frame;
+	uint32_t frame_bytes;
 	int width;
 	int height;
 	int interlaced;
@@ -2523,23 +2547,23 @@ static void do_extract_ld(parameters_t &params)
 			report_error(1, "Improperly formatted A/V metadata found");
 		fps_times_1million = fps * 1000000 + fpsfrac;
 	}
-	UINT8 interlace_factor = interlaced ? 2 : 1;
+	uint8_t interlace_factor = interlaced ? 2 : 1;
 
 	// determine key parameters and validate
-	max_samples_per_frame = (UINT64(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
+	max_samples_per_frame = (uint64_t(rate) * 1000000 + fps_times_1million - 1) / fps_times_1million;
 	frame_bytes = avhuff_encoder::raw_data_size(width, height, channels, max_samples_per_frame);
 	if (frame_bytes != input_chd.hunk_bytes())
 		report_error(1, "Frame size does not match hunk size for this CHD");
 
 	// parse out input start/end
-	UINT64 input_start;
-	UINT64 input_end;
+	uint64_t input_start;
+	uint64_t input_end;
 	parse_input_start_end(params, input_chd.hunk_count() / interlace_factor, 0, 1, input_start, input_end);
 	input_start *= interlace_factor;
 	input_end *= interlace_factor;
 
 	// build up the movie info
-	avi_movie_info info;
+	avi_file::movie_info info;
 	info.video_format = FORMAT_YUY2;
 	info.video_timescale = fps_times_1million / interlace_factor;
 	info.video_sampletime = 1000000;
@@ -2569,29 +2593,29 @@ static void do_extract_ld(parameters_t &params)
 	}
 
 	// catch errors so we can close & delete the output file
-	avi_file *output_file = nullptr;
+	avi_file::ptr output_file;
 	try
 	{
 		// process output file
-		avi_error avierr = avi_create(output_file_str->second->c_str(), &info, &output_file);
-		if (avierr != AVIERR_NONE)
+		avi_file::error avierr = avi_file::create(*output_file_str->second, info, output_file);
+		if (avierr != avi_file::error::NONE)
 			report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 		// create the codec configuration
 		avhuff_decompress_config avconfig;
-		std::vector<INT16> audio_data[16];
-		UINT32 actsamples;
+		std::vector<int16_t> audio_data[16];
+		uint32_t actsamples;
 		avconfig.maxsamples = max_samples_per_frame;
 		avconfig.actsamples = &actsamples;
 		for (int chnum = 0; chnum < ARRAY_LENGTH(audio_data); chnum++)
 		{
-			audio_data[chnum].resize(MAX(1,max_samples_per_frame));
+			audio_data[chnum].resize(std::max(1U,max_samples_per_frame));
 			avconfig.audio[chnum] = &audio_data[chnum][0];
 		}
 
 		// iterate over frames
 		bitmap_yuy16 fullbitmap(width, height * interlace_factor);
-		for (UINT64 framenum = input_start; framenum < input_end; framenum++)
+		for (uint64_t framenum = input_start; framenum < input_end; framenum++)
 		{
 			progress(framenum == input_start, "Extracting, %.1f%% complete...  \r", 100.0 * double(framenum - input_start) / double(input_end - input_start));
 
@@ -2603,37 +2627,36 @@ static void do_extract_ld(parameters_t &params)
 			chd_error err = input_chd.read_hunk(framenum, nullptr);
 			if (err != CHDERR_NONE)
 			{
-				UINT64 filepos = core_ftell(input_chd);
-				report_error(1, "Error reading hunk %" I64FMT "d at offset %" I64FMT "d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
+				uint64_t filepos = static_cast<util::core_file &>(input_chd).tell();
+				report_error(1, "Error reading hunk %d at offset %d from CHD file (%s): %s\n", framenum, filepos, params.find(OPTION_INPUT)->second->c_str(), chd_file::error_string(err));
 			}
 
 			// write audio
 			for (int chnum = 0; chnum < channels; chnum++)
 			{
-				avi_error avierr = avi_append_sound_samples(output_file, chnum, avconfig.audio[chnum], actsamples, 0);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing samples for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+				avi_file::error avierr = output_file->append_sound_samples(chnum, avconfig.audio[chnum], actsamples, 0);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error writing samples for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
 			}
 
 			// write video
 			if ((framenum + 1) % interlace_factor == 0)
 			{
-				avi_error avierr = avi_append_video_frame(output_file, fullbitmap);
-				if (avierr != AVIERR_NONE)
-					report_error(1, "Error writing video for hunk %" I64FMT "d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_error_string(avierr));
+				avi_file::error avierr = output_file->append_video_frame(fullbitmap);
+				if (avierr != avi_file::error::NONE)
+					report_error(1, "Error writing video for hunk %d to file (%s): %s\n", framenum, output_file_str->second->c_str(), avi_file::error_string(avierr));
 			}
 		}
 
 		// close and return
-		avi_close(output_file);
+		output_file.reset();
 		printf("Extraction complete                                    \n");
 	}
 	catch (...)
 	{
 		// delete the output file
-		if (output_file != nullptr)
-			avi_close(output_file);
-		osd_rmfile(output_file_str->second->c_str());
+		output_file.reset();
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }
@@ -2661,7 +2684,7 @@ static void do_add_metadata(parameters_t &params)
 	}
 
 	// process index
-	UINT32 index = 0;
+	uint32_t index = 0;
 	auto index_str = params.find(OPTION_INDEX);
 	if (index_str != params.end())
 		index = atoi(index_str->second->c_str());
@@ -2678,11 +2701,11 @@ static void do_add_metadata(parameters_t &params)
 
 	// process file input
 	auto file_str = params.find(OPTION_VALUE_FILE);
-	dynamic_buffer file;
+	std::vector<uint8_t> file;
 	if (file_str != params.end())
 	{
-		file_error filerr = core_fload(file_str->second->c_str(), file);
-		if (filerr != FILERR_NONE)
+		osd_file::error filerr = util::core_file::load(file_str->second->c_str(), file);
+		if (filerr != osd_file::error::NONE)
 			report_error(1, "Error reading metadata file (%s)", file_str->second->c_str());
 	}
 
@@ -2693,7 +2716,7 @@ static void do_add_metadata(parameters_t &params)
 		report_error(1, "Error: both --valuetext/-vt or --valuefile/-vf parameters specified; only one permitted");
 
 	// process no checksum
-	UINT8 flags = CHD_MDFLAGS_CHECKSUM;
+	uint8_t flags = CHD_MDFLAGS_CHECKSUM;
 	if (params.find(OPTION_NO_CHECKSUM) != params.end())
 		flags &= ~CHD_MDFLAGS_CHECKSUM;
 
@@ -2712,7 +2735,7 @@ static void do_add_metadata(parameters_t &params)
 	if (text_str != params.end())
 		err = input_chd.write_metadata(tag, index, text, flags);
 	else
-		err = input_chd.write_metadata(tag, index, &file[0], flags);
+		err = input_chd.write_metadata(tag, index, file, flags);
 	if (err != CHDERR_NONE)
 		report_error(1, "Error adding metadata: %s", chd_file::error_string(err));
 	else
@@ -2741,7 +2764,7 @@ static void do_del_metadata(parameters_t &params)
 	}
 
 	// process index
-	UINT32 index = 0;
+	uint32_t index = 0;
 	auto index_str = params.find(OPTION_INDEX);
 	if (index_str != params.end())
 		index = atoi(index_str->second->c_str());
@@ -2787,33 +2810,33 @@ static void do_dump_metadata(parameters_t &params)
 	}
 
 	// process index
-	UINT32 index = 0;
+	uint32_t index = 0;
 	auto index_str = params.find(OPTION_INDEX);
 	if (index_str != params.end())
 		index = atoi(index_str->second->c_str());
 
 	// write the metadata
-	dynamic_buffer buffer;
+	std::vector<uint8_t> buffer;
 	chd_error err = input_chd.read_metadata(tag, index, buffer);
 	if (err != CHDERR_NONE)
 		report_error(1, "Error reading metadata: %s", chd_file::error_string(err));
 
 	// catch errors so we can close & delete the output file
-	core_file *output_file = nullptr;
+	util::core_file::ptr output_file;
 	try
 	{
 		// create the file
 		if (output_file_str != params.end())
 		{
-			file_error filerr = core_fopen(output_file_str->second->c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &output_file);
-			if (filerr != FILERR_NONE)
+			osd_file::error filerr = util::core_file::open(*output_file_str->second, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, output_file);
+			if (filerr != osd_file::error::NONE)
 				report_error(1, "Unable to open file (%s)", output_file_str->second->c_str());
 
 			// output the metadata
-			UINT32 count = core_fwrite(output_file, &buffer[0], buffer.size());
+			uint32_t count = output_file->write(&buffer[0], buffer.size());
 			if (count != buffer.size())
 				report_error(1, "Error writing file (%s)", output_file_str->second->c_str());
-			core_fclose(output_file);
+			output_file.reset();
 
 			// provide some feedback
 			std::string tempstr;
@@ -2830,9 +2853,8 @@ static void do_dump_metadata(parameters_t &params)
 	catch (...)
 	{
 		// delete the output file
-		if (output_file != nullptr)
-			core_fclose(output_file);
-		osd_rmfile(output_file_str->second->c_str());
+		output_file.reset();
+		osd_file::remove(*output_file_str->second);
 		throw;
 	}
 }

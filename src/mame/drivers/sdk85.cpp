@@ -38,7 +38,7 @@ public:
 	DECLARE_WRITE8_MEMBER(scanlines_w);
 	DECLARE_WRITE8_MEMBER(digit_w);
 	DECLARE_READ8_MEMBER(kbd_r);
-	UINT8 m_digit;
+	uint8_t m_digit;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -103,7 +103,7 @@ WRITE8_MEMBER( sdk85_state::digit_w )
 
 READ8_MEMBER( sdk85_state::kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_digit < 3)
 	{

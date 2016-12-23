@@ -313,7 +313,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( isa8_ibm_mfc_device::ibm_mfc_r )
 {
-	UINT8 val;
+	uint8_t val;
 
 	switch (offset)
 	{
@@ -433,7 +433,7 @@ ioport_constructor isa8_ibm_mfc_device::device_input_ports() const
 //  internal ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_ibm_mfc_device::device_rom_region() const
+const tiny_rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 {
 	return ROM_NAME( ibm_mfc );
 }
@@ -447,7 +447,7 @@ const rom_entry *isa8_ibm_mfc_device::device_rom_region() const
 //  isa8_ibm_mfc_device - constructor
 //-------------------------------------------------
 
-isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_IBM_MFC, "IBM PC Music Feature Card", tag, owner, clock, "ibm_mfc", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_tcr(0), m_pc_ppi_c(0), m_z80_ppi_c(0), m_pc_irq_state(0), m_z80_irq_state(0),
 		m_cpu(*this, "ibm_mfc"),
@@ -467,7 +467,7 @@ isa8_ibm_mfc_device::isa8_ibm_mfc_device(const machine_config &mconfig, const ch
 void isa8_ibm_mfc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x2a20, 0x2a20 + 15, 0, 0, read8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_r), this), write8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_w), this));
+	m_isa->install_device(0x2a20, 0x2a20 + 15, read8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_r), this), write8_delegate(FUNC(isa8_ibm_mfc_device::ibm_mfc_w), this));
 }
 
 

@@ -147,7 +147,7 @@
 		<info name="serial" value="NUD-DRDJ-JPN" />
 		<part name="disk" interface="n64dd_disk">
 			<dataarea name="rom" size="70627520">
-				<rom name="randnet browser [nud-drdj-jpn].bin" size="70627520" crc="5e08cf47" sha1="516679e171e100fdbf95a1991ae8280c387bfdaf" offset="0" />
+				<rom name="randnet browser [nud-drdj-jpn].bin" size="70627520" crc="ae627b23" sha1="2d12312bf394ddba3cba81f604b71fae19e6f518" offset="0" />
 			</dataarea>
 		</part>
 	</software>

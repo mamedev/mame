@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "k033906.h"
-#include "video/voodoo.h"
 
 
 //**************************************************************************
@@ -22,8 +21,10 @@ const device_type K033906 = &device_creator<k033906_device>;
 //  k033906_device - constructor
 //-------------------------------------------------
 
-k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__), m_reg_set(0), m_voodoo_tag(nullptr), m_voodoo(nullptr)
+k033906_device::k033906_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, K033906, "K033906 PCI bridge", tag, owner, clock, "k033906", __FILE__)
+	, m_reg_set(0)
+	, m_voodoo(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -33,8 +34,6 @@ k033906_device::k033906_device(const machine_config &mconfig, const char *tag, d
 
 void k033906_device::device_start()
 {
-	m_voodoo = (voodoo_device*)machine().device(m_voodoo_tag);
-
 	m_reg_set = 0;
 
 	save_item(NAME(m_reg));
@@ -48,7 +47,7 @@ WRITE_LINE_MEMBER(k033906_device::set_reg)
 	m_reg_set = state & 1;
 }
 
-UINT32 k033906_device::reg_r(int reg)
+uint32_t k033906_device::reg_r(int reg)
 {
 	switch (reg)
 	{
@@ -64,7 +63,7 @@ UINT32 k033906_device::reg_r(int reg)
 	//return 0;
 }
 
-void k033906_device::reg_w(int reg, UINT32 data)
+void k033906_device::reg_w(int reg, uint32_t data)
 {
 	switch (reg)
 	{

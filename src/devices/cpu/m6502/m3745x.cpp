@@ -37,7 +37,7 @@ const device_type M37450 = &device_creator<m37450_device>;
 //-------------------------------------------------
 //  m3745x_device - constructor
 //-------------------------------------------------
-m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, address_map_constructor internal_map, const char *shortname, const char *source) :
+m3745x_device::m3745x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, address_map_constructor internal_map, const char *shortname, const char *source) :
 	m740_device(mconfig, type, name, tag, owner, clock, "m3745x", source),
 	m_program_config("program", ENDIANNESS_LITTLE, 8, 16, 0, internal_map),
 	read_p3(*this),
@@ -201,7 +201,7 @@ void m3745x_device::execute_set_input(int inputnum, int state)
 
 void m3745x_device::recalc_irqs()
 {
-	UINT16 all_ints;
+	uint16_t all_ints;
 	int static const irq_lines[16] =
 	{
 		-1, -1, -1, M740_INT11_LINE, M740_INT12_LINE, M740_INT13_LINE, -1, -1,
@@ -246,7 +246,7 @@ void m3745x_device::recalc_irqs()
 	m_last_all_ints = all_ints;
 }
 
-void m3745x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
+void m3745x_device::send_port(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -268,9 +268,9 @@ void m3745x_device::send_port(address_space &space, UINT8 offset, UINT8 data)
 	}
 }
 
-UINT8 m3745x_device::read_port(UINT8 offset)
+uint8_t m3745x_device::read_port(uint8_t offset)
 {
-	UINT8 incoming = 0;
+	uint8_t incoming = 0;
 
 	switch (offset)
 	{
@@ -417,7 +417,7 @@ WRITE8_MEMBER(m3745x_device::intregs_w)
 
 READ8_MEMBER(m3745x_device::adc_r)
 {
-	UINT8 rv = 0;
+	uint8_t rv = 0;
 
 	switch (offset)
 	{
@@ -498,12 +498,12 @@ static ADDRESS_MAP_START( m37450_map, AS_PROGRAM, 8, m37450_device )
 	AM_RANGE(0x0100, 0x01ff) AM_RAM
 ADDRESS_MAP_END
 
-m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+m37450_device::m37450_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m3745x_device(mconfig, M37450, "Mitsubishi M37450", tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), "m3745x", __FILE__)
 {
 }
 
-m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+m37450_device::m37450_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	m3745x_device(mconfig, type, name, tag, owner, clock, ADDRESS_MAP_NAME(m37450_map), shortname, source)
 {
 }

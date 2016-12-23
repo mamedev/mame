@@ -71,7 +71,7 @@ public:
 	int m_tile_bank;
 
 	/* memory */
-	UINT16 m_tileram[0x400];
+	uint16_t m_tileram[0x400];
 
 	DECLARE_WRITE8_MEMBER(mole_tileram_w);
 	DECLARE_WRITE8_MEMBER(mole_tilebank_w);
@@ -82,7 +82,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -94,7 +94,7 @@ public:
 
 TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 {
-	UINT16 code = m_tileram[tile_index];
+	uint16_t code = m_tileram[tile_index];
 
 	SET_TILE_INFO_MEMBER((code & 0x200) ? 1 : 0, code & 0x1ff, 0, 0);
 }
@@ -102,7 +102,7 @@ TILE_GET_INFO_MEMBER(mole_state::get_bg_tile_info)
 void mole_state::video_start()
 {
 	memset(m_tileram, 0, sizeof(m_tileram));
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(mole_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 
 	save_item(NAME(m_tileram));
 }
@@ -128,7 +128,7 @@ WRITE8_MEMBER(mole_state::mole_flipscreen_w)
 	flip_screen_set(data & 0x01);
 }
 
-UINT32 mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mole_state::screen_update_mole(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

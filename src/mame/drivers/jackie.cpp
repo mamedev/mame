@@ -47,7 +47,7 @@ Note
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 class jackie_state : public driver_device
@@ -72,13 +72,13 @@ public:
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg_scroll2;
-	required_shared_ptr<UINT8> m_bg_scroll;
-	required_shared_ptr<UINT8> m_reel1_ram;
-	required_shared_ptr<UINT8> m_reel2_ram;
-	required_shared_ptr<UINT8> m_reel3_ram;
-	required_shared_ptr<UINT8> m_fg_tile_ram;
-	required_shared_ptr<UINT8> m_fg_color_ram;
+	required_shared_ptr<uint8_t> m_bg_scroll2;
+	required_shared_ptr<uint8_t> m_bg_scroll;
+	required_shared_ptr<uint8_t> m_reel1_ram;
+	required_shared_ptr<uint8_t> m_reel2_ram;
+	required_shared_ptr<uint8_t> m_reel3_ram;
+	required_shared_ptr<uint8_t> m_fg_tile_ram;
+	required_shared_ptr<uint8_t> m_fg_color_ram;
 
 	int m_exp_bank;
 	tilemap_t *m_fg_tilemap;
@@ -89,8 +89,8 @@ public:
 	int m_nmi_enable;
 	int m_bg_enable;
 	int m_hopper;
-	UINT8 m_out[3];
-	UINT16 m_unk_reg[3][5];
+	uint8_t m_out[3];
+	uint16_t m_unk_reg[3][5];
 
 	DECLARE_WRITE8_MEMBER(fg_tile_w);
 	DECLARE_WRITE8_MEMBER(fg_color_w);
@@ -110,8 +110,8 @@ public:
 	DECLARE_WRITE8_MEMBER(igs_irqack_w);
 	DECLARE_READ8_MEMBER(expram_r);
 
-	void unk_reg_lo_w( int offset, UINT8 data, int reg );
-	void unk_reg_hi_w( int offset, UINT8 data, int reg );
+	void unk_reg_lo_w( int offset, uint8_t data, int reg );
+	void unk_reg_hi_w( int offset, uint8_t data, int reg );
 	void show_out();
 
 	DECLARE_CUSTOM_INPUT_MEMBER(hopper_r);
@@ -126,7 +126,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(irq);
 };
 
@@ -202,20 +202,20 @@ TILE_GET_INFO_MEMBER(jackie_state::get_reel3_tile_info)
 
 void jackie_state::video_start()
 {
-	m_reel1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
-	m_reel3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel1_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel2_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
+	m_reel3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_reel3_tile_info),this),TILEMAP_SCAN_ROWS,8,32, 64, 8);
 
 	m_reel1_tilemap->set_scroll_cols(64);
 	m_reel2_tilemap->set_scroll_cols(64);
 	m_reel3_tilemap->set_scroll_cols(64);
 
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jackie_state::get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8,  8,  64, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 }
 
 
-UINT32 jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jackie_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i,j;
 	int startclipmin = 0;
@@ -294,7 +294,7 @@ void jackie_state::show_out()
 #endif
 }
 
-void jackie_state::unk_reg_lo_w( int offset, UINT8 data, int reg )
+void jackie_state::unk_reg_lo_w( int offset, uint8_t data, int reg )
 {
 	m_unk_reg[reg][offset] &= 0xff00;
 	m_unk_reg[reg][offset] |= data;
@@ -305,7 +305,7 @@ WRITE8_MEMBER(jackie_state::unk_reg1_lo_w){ unk_reg_lo_w( offset, data, 0 ); }
 WRITE8_MEMBER(jackie_state::unk_reg2_lo_w){ unk_reg_lo_w( offset, data, 1 ); }
 WRITE8_MEMBER(jackie_state::unk_reg3_lo_w){ unk_reg_lo_w( offset, data, 2 ); }
 
-void jackie_state::unk_reg_hi_w( int offset, UINT8 data, int reg )
+void jackie_state::unk_reg_hi_w( int offset, uint8_t data, int reg )
 {
 	m_unk_reg[reg][offset] &= 0xff;
 	m_unk_reg[reg][offset] |= data << 8;
@@ -373,7 +373,7 @@ WRITE8_MEMBER(jackie_state::igs_irqack_w)
 
 READ8_MEMBER(jackie_state::expram_r)
 {
-	UINT8 *rom = memregion("gfx3")->base();
+	uint8_t *rom = memregion("gfx3")->base();
 
 	offset += m_exp_bank * 0x8000;
 //  logerror("PC %06X: %04x = %02x\n",space.device().safe_pc(),offset,rom[offset]);
@@ -497,7 +497,7 @@ static INPUT_PORTS_START( jackie )
 
 	PORT_START("SERVICE")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_CODE(KEYCODE_9) PORT_NAME("Attendent")
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, NULL) PORT_NAME("HPSW")    // hopper sensor
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF,jackie_state,hopper_r, nullptr) PORT_NAME("HPSW")    // hopper sensor
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_PAYOUT )
 	PORT_SERVICE_NO_TOGGLE( 0x20, IP_ACTIVE_LOW )   // test (press during boot)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK ) PORT_NAME("Statistics")
@@ -566,7 +566,7 @@ GFXDECODE_END
 DRIVER_INIT_MEMBER(jackie_state,jackie)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (A = 0;A < 0xf000;A++)
 	{

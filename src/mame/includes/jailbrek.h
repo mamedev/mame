@@ -27,11 +27,11 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scroll_x;
-	required_shared_ptr<UINT8> m_scroll_dir;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scroll_x;
+	required_shared_ptr<uint8_t> m_scroll_dir;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -43,21 +43,21 @@ public:
 	tilemap_t      *m_bg_tilemap;
 
 	/* misc */
-	UINT8        m_irq_enable;
-	UINT8        m_nmi_enable;
+	uint8_t        m_irq_enable;
+	uint8_t        m_nmi_enable;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
-	DECLARE_WRITE8_MEMBER(jailbrek_videoram_w);
-	DECLARE_WRITE8_MEMBER(jailbrek_colorram_w);
-	DECLARE_READ8_MEMBER(jailbrek_speech_r);
-	DECLARE_WRITE8_MEMBER(jailbrek_speech_w);
-	DECLARE_DRIVER_INIT(jailbrek);
+	DECLARE_WRITE8_MEMBER(coin_w);
+	DECLARE_WRITE8_MEMBER(videoram_w);
+	DECLARE_WRITE8_MEMBER(colorram_w);
+	DECLARE_READ8_MEMBER(speech_r);
+	DECLARE_WRITE8_MEMBER(speech_w);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(jailbrek);
-	UINT32 screen_update_jailbrek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	INTERRUPT_GEN_MEMBER(jb_interrupt);
-	INTERRUPT_GEN_MEMBER(jb_interrupt_nmi);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	INTERRUPT_GEN_MEMBER(interrupt);
+	INTERRUPT_GEN_MEMBER(interrupt_nmi);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 };

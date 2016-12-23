@@ -9,35 +9,19 @@ generates project from Lua script, making applying the same settings for
 multiple projects easy.
 
 Supported project generators:
- * Visual Studio 2008, 2010, 2012, 2013, 2015
+ * FASTBuild (experimental)
  * GNU Makefile
+ * Ninja (experimental)
+ * Qbs / QtCreator (experimental)
+ * Visual Studio 2008, 2010, 2012, 2013, 2015, 15
  * XCode
-
-Who is using it?
-----------------
-
-https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
-agnostic, "Bring Your Own Engine/Framework" style rendering library.
-
-https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
-
-https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
-
-https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
-
-http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
-portable c/c++ audio engine for games.
-
-https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
-loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
-derivative of the original Torque Engine.
 
 Download (stable)
 -----------------
 
-[![Build Status](https://travis-ci.org/bkaradzic/genie.svg?branch=master)](https://travis-ci.org/bkaradzic/genie)
+[![Build Status](https://travis-ci.org/bkaradzic/GENie.svg?branch=master)](https://travis-ci.org/bkaradzic/GENie)
 
-	version 366 (commit b887178737cd74cf60899899c4c65b9bf02efb26)
+	version 714 (commit 00a4c3ece0ebcda3c1cbb4c34324fb65bd6d7049)
 
 Linux:  
 https://github.com/bkaradzic/bx/raw/master/tools/bin/linux/genie
@@ -58,7 +42,8 @@ Building (dev)
 Documentation
 -------------
 
-[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)
+[Scripting Reference](https://github.com/bkaradzic/genie/blob/master/docs/scripting-reference.md#scripting-reference)  
+[Introduction to GENie - CppCon 2016](https://onedrive.live.com/view.aspx?cid=171ee76e679935c8&page=view&resid=171EE76E679935C8!139573&parId=171EE76E679935C8!18835&authkey=!AKv_SGrgJwxDGDg&app=PowerPoint)
 
 History
 -------
@@ -96,7 +81,8 @@ intention to keep it compatible with it.
  - Added `msgcompile`, `msgresource`, `msglinking` and `msgarchiving` as
    overrides for make messages.
  - Added `messageskip` list to disable some of compiler messages.
- - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc` for
+ - Added `buildoptions_c`, `buildoptions_cpp`, `buildoptions_objc`,
+   `buildoptions_objcpp`, `buildoptions_asm`, `buildoptions_swift` for
    configuring language specific build options.
  - Split functionality of `excludes` in `removefiles` and `excludes`. With VS
    `excludes` will exclude files from build but files will be added to project
@@ -106,39 +92,84 @@ intention to keep it compatible with it.
  - Added Green Hills Software compiler support.
  - Added edit & continue support for 64-bit builds in VS2013 upwards.
  - Added `windowstargetplatformversion` to specify VS Windows target version.
+ - Added vs15 support.
+ - Added `NoWinRT` flag to disable WinRT CX builds.
+ - Added `NoBufferSecurityCheck` flag to disable security checks in VS.
+ - Added `nopch` file list to exclude files from using PCH.
+ - Added `EnableAVX` and `EnableAVX2` flags to enable enhanced instruction set.
+ - Added FASTBuild (.bff) project generator.
+ - Added Vala language support.
+ - Added MASM support for Visual Studio projects.
+ - Added `userincludedirs` for include header with angle brackets and quotes
+   search path control.
+ - Detect when generated project files are not changing, and skip writing over
+   existing project files.
+ - Added Ninja project generator.
+ - Added ability to specify MSVC "Old Style" debug info format with
+   `C7DebugInfo`.
+ - Added some support for per-configuration `files` lists.
+ - Removed `clean` action.
+ - Added support for QtCreator via Qbs build tool.
+ - Added .natvis file type support for Visual Studio.
+ - Added Swift language support for make and ninja build generators.
+ - Removed CodeBlocks and CodeLite support.
 
-## Why fork?
+Debugging GENie scripts
+-----------------------
 
-At the time of writing this, September 2014, Premake project is on long hiatus.
-The last official release 4.3 is released in November 2010, 4.4 beta 5 was
-released in November 2013, and the main developer is focusing on Premake 5.
+It is possible to debug build scripts using [ZeroBrane Studio][zbs]. You must
+compile GENie in debug mode
 
-Multiple requests for releasing new version end up with this type of [answer](http://industriousone.com/topic/premake-release-neglect-becoming-critical):
+    $ make config=debug
 
-	Then help fix the bugs marked 4.4 in the SourceForge tracker so that we can
-	make a release. Or review and improve the patches so that I may get them
-	applied more quickly. Or pay me to do it so that I can spend more time on
-	it, instead of doing other work that you value less (but which actually, you
-	know, pays me).
+This ensures the core lua scripts are loaded from disk rather than compiled
+into the GENie binary. Create a file named `debug.lua` as a sibling to your
+main `genie.lua` script with the following content:
 
-So author has high expectations for release, but he is not working on it, but
-rather working on completely different... Pay me to finish this sentence...
-You get the point. :)
+    local zb_path = <path to ZeroBraneStudio>
+    local cpaths = {
+        string.format("%s/bin/lib?.dylib;%s/bin/clibs53/?.dylib;", zb_path, zb_path),
+        package.cpath,
+    }
+    package.cpath = table.concat(cpaths, ';')
 
-This long period between releases where multiple versions are in flight cause
-confusion for users who are not familiar with Premake, and they just need to
-use Premake to generate project files for project they are interested in.
+    local paths = {
+        string.format('%s/lualibs/?.lua;%s/lualibs/?/?.lua', zb_path, zb_path),
+        string.format('%s/lualibs/?/init.lua;%s/lualibs/?/?/?.lua', zb_path, zb_path),
+        string.format('%s/lualibs/?/?/init.lua', zb),
+        package.path,
+    }
+    package.path = table.concat(paths, ';')
 
-I've been using Premake for [a while](https://web.archive.org/web/20120119020903/http://carbongames.com/2011/08/Premake),
-I really like it's simplicity, and that it does one thing really well.
+    require('mobdebug').start()
 
-I was considering replacing Premake with other build systems that also could
-generate project files, but all these projects fail at being simple and doing
-only one thing. I don't need build system, or package manager, etc. just a
-simple project generator.
+**NOTE:** update `zb_path` to refer to the root of your ZeroBrane Studio
+install. For reference, you should find `lualibs` in you `zb_path` folder
 
-In conclusion, forking it and maintaining it is not much different from current
-state of Premake, it's just acknowledging the problem, and dealing with it.
+To debug, make sure ZBS is listening for debug connections and add
+`dofile("debug.lua")` to `genie.lua`
+
+Who is using it?
+----------------
+
+https://github.com/bkaradzic/bgfx bgfx - Cross-platform, graphics API
+agnostic, "Bring Your Own Engine/Framework" style rendering library.
+
+https://github.com/Psybrus/Psybrus Psybrus Engine & Toolchain
+
+https://github.com/dariomanesku/cmftstudio cmftStudio - cubemap filtering tool
+
+https://github.com/mamedev/mame MAME - Multiple Arcade Machine Emulator
+
+http://sol.gfxile.net/soloud SoLoud is an easy to use, free, 
+portable c/c++ audio engine for games.
+
+https://github.com/andr3wmac/Torque6 Torque 6 is an MIT licensed 3D engine
+loosely based on Torque2D. Being neither Torque2D or Torque3D it is the 6th
+derivative of the original Torque Engine.
+
+http://mtuner.net/ is a memory profiler and memory leak finder for Windows, PS4,
+PS3.
 
 [License](https://github.com/bkaradzic/genie/blob/master/LICENSE)
 -----------------------------------------------------------------
@@ -146,7 +177,9 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 	GENie
 	Copyright (c) 2014-2016 Branimir Karadžić, Neil Richardson, Mike Popoloski,
 	Drew Solomon, Ted de Munnik, Miodrag Milanović, Brett Vickers, Bill Freist,
-	Terry Hendrix II, Ryan Juckett, Andrew Johnson
+	Terry Hendrix II, Ryan Juckett, Andrew Johnson, Johan Sköld,
+	Alastair Murray, Patrick Munns, Jan-Eric Duden, Phil Stevens, Stuart Carnie,
+	Nikolay Aleksiev.
 	All rights reserved.
 
 	https://github.com/bkaradzic/genie
@@ -175,3 +208,5 @@ state of Premake, it's just acknowledging the problem, and dealing with it.
 	CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 	OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 	OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+  [zbs]: https://studio.zerobrane.com

@@ -97,7 +97,7 @@ const device_type G65816 = &device_creator<g65816_device>;
 const device_type _5A22 = &device_creator<_5a22_device>;
 
 
-g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+g65816_device::g65816_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, G65816, "G65C816", tag, owner, clock, "g65c816", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0)
 	, m_cpu_type(CPU_TYPE_G65816)
@@ -105,7 +105,7 @@ g65816_device::g65816_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
+g65816_device::g65816_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int cpu_type, address_map_constructor internal)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 24, 0, internal)
 	, m_cpu_type(cpu_type)
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START(_5a22_map, AS_PROGRAM, 8, _5a22_device)
 ADDRESS_MAP_END
 
 
-_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+_5a22_device::_5a22_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: g65816_device(mconfig, _5A22, "5A22", tag, owner, clock, "5a22", __FILE__, CPU_TYPE_5A22, ADDRESS_MAP_NAME(_5a22_map))
 {
 }
@@ -736,7 +736,7 @@ void g65816_device::g65816_set_sp(unsigned val)
 /* Get a register */
 unsigned g65816_device::g65816_get_reg(int regnum)
 {
-	/* Set the function tables to emulation mode if the FTABLE is NULL */
+	/* Set the function tables to emulation mode if the FTABLE is nullptr */
 	if( FTABLE_GET_REG == nullptr )
 		g65816i_set_execution_mode(EXECUTION_MODE_E);
 
@@ -759,14 +759,14 @@ void g65816_device::execute_set_input(int line, int state)
 #include "g65816ds.h"
 
 
-offs_t g65816_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t g65816_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
+	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
 
 CPU_DISASSEMBLE( g65816 )
 {
-	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0/*FLAG_M*/, 0/*FLAG_X*/);
+	return g65816_disassemble(stream, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, 0/*FLAG_M*/, 0/*FLAG_X*/);
 }
 
 void g65816_device::g65816_restore_state()
@@ -868,6 +868,7 @@ void g65816_device::device_start()
 	state_add( G65816_IRQ_STATE, "IRQ", m_line_irq).mask(0x01).callimport().formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENSP, "GENSP", m_debugger_temp).callimport().callexport().formatstr("%06X").noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 
@@ -879,6 +880,7 @@ void g65816_device::state_import(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 			g65816_set_pc(m_debugger_temp);
 			break;
 		case STATE_GENSP:
@@ -924,6 +926,7 @@ void g65816_device::state_export(const device_state_entry &entry)
 	switch (entry.index())
 	{
 		case STATE_GENPC:
+		case STATE_GENPCBASE:
 		case G65816_PC:
 			m_debugger_temp = g65816_get_pc();
 			break;
@@ -957,7 +960,7 @@ void g65816_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_flag_n & NFLAG_SET ? 'N':'.',
 				m_flag_v & VFLAG_SET ? 'V':'.',
 				m_flag_m & MFLAG_SET ? 'M':'.',
@@ -1077,7 +1080,7 @@ WRITE8_MEMBER( _5a22_device::wrdivh_w )
 
 WRITE8_MEMBER( _5a22_device::wrdvdd_w )
 {
-	UINT16 quotient, remainder;
+	uint16_t quotient, remainder;
 
 	m_dvdd = data;
 
@@ -1116,18 +1119,18 @@ READ8_MEMBER( _5a22_device::rdmpyh_r )
 
 void _5a22_device::set_5a22_map()
 {
-	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrmpya_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrmpyb_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdivl_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdivh_w),this));
-	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::wrdvdd_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4202, 0x4202, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpya_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4203, 0x4203, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrmpyb_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4204, 0x4204, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivl_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4205, 0x4205, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdivh_w),this));
+	space(AS_PROGRAM).install_write_handler(0x4206, 0x4206, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::wrdvdd_w),this));
 
-	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, write8_delegate(FUNC(_5a22_device::memsel_w),this));
+	space(AS_PROGRAM).install_write_handler(0x420d, 0x420d, 0, 0xbf0000, 0, write8_delegate(FUNC(_5a22_device::memsel_w),this));
 
-	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rddivl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rddivh_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rdmpyl_r),this));
-	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, read8_delegate(FUNC(_5a22_device::rdmpyh_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4214, 0x4214, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivl_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4215, 0x4215, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rddivh_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4216, 0x4216, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyl_r),this));
+	space(AS_PROGRAM).install_read_handler(0x4217, 0x4217, 0, 0xbf0000, 0, read8_delegate(FUNC(_5a22_device::rdmpyh_r),this));
 }
 
 

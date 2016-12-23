@@ -28,7 +28,7 @@ const device_type IE15 = &device_creator<ie15_device>;
 //-------------------------------------------------
 //  ie15_device - constructor
 //-------------------------------------------------
-ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ie15_device::ie15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, IE15, "ie15", tag, owner, clock, "ie15_cpu", __FILE__),
 		m_program_config("program", ENDIANNESS_LITTLE, 8, 14),
 		m_io_config("io", ENDIANNESS_LITTLE, 8, 8), m_A(0), m_CF(0), m_ZF(0), m_RF(0), m_flags(0),
@@ -61,11 +61,12 @@ void ie15_device::device_start()
 	// register our state for the debugger
 	state_add(IE15_PC,       "PC",       m_PC.w.l).mask(0x0fff);
 	state_add(STATE_GENPC,   "GENPC",    m_PC.w.l).mask(0x0fff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",  m_PC.w.l).mask(0x0fff).noshow();
 	state_add(STATE_GENFLAGS,"GENFLAGS", m_flags).mask(0x0f).callimport().callexport().noshow().formatstr("%4s");
 	state_add(IE15_A,        "A",        m_A);
 
 	for (int ireg = 0; ireg < 32; ireg++)
-		state_add(IE15_R0 + ireg, strformat("R%d", ireg).c_str(), m_REGS[ireg]);
+		state_add(IE15_R0 + ireg, string_format("R%d", ireg).c_str(), m_REGS[ireg]);
 }
 
 //-------------------------------------------------
@@ -82,7 +83,7 @@ void ie15_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -137,7 +138,7 @@ void ie15_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c",
+			str = string_format("%c%c%c",
 				m_CF ? 'C':'.',
 				m_ZF ? 'Z':'.',
 				m_RF ? 'R':'.');
@@ -150,7 +151,7 @@ void ie15_device::state_string_export(const device_state_entry &entry, std::stri
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 ie15_device::disasm_min_opcode_bytes() const
+uint32_t ie15_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -160,7 +161,7 @@ UINT32 ie15_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 ie15_device::disasm_max_opcode_bytes() const
+uint32_t ie15_device::disasm_max_opcode_bytes() const
 {
 	return 2;
 }
@@ -170,10 +171,10 @@ UINT32 ie15_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t ie15_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t ie15_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( ie15 );
-	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, buffer, pc, oprom, opram, 0);
+	return CPU_DISASSEMBLE_NAME(ie15)(nullptr, stream, pc, oprom, opram, 0);
 }
 
 //**************************************************************************
@@ -185,7 +186,7 @@ offs_t ie15_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 ie15_device::execute_min_cycles() const
+uint32_t ie15_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -195,7 +196,7 @@ UINT32 ie15_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 ie15_device::execute_max_cycles() const
+uint32_t ie15_device::execute_max_cycles() const
 {
 	return 1;
 }
@@ -206,14 +207,25 @@ UINT32 ie15_device::execute_max_cycles() const
 
 void ie15_device::execute_run()
 {
-	do
+	// Removing the hook entirely is considerably faster than calling it for every instruction if the debugger is disabled entirely
+	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
 	{
-		debugger_instruction_hook(this, m_PC.d);
-		execute_one(rop());
-	} while (m_icount > 0);
+		do
+		{
+			debugger_instruction_hook(this, m_PC.d);
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
+	else
+	{
+		do
+		{
+			execute_one(rop());
+		} while (m_icount > 0);
+	}
 }
 
-inline void ie15_device::illegal(UINT8 opcode)
+inline void ie15_device::illegal(uint8_t opcode)
 {
 	if ((machine().debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{
@@ -226,7 +238,7 @@ inline void ie15_device::illegal(UINT8 opcode)
 // XXX what if ldc was at 0x_ff?
 inline void ie15_device::execute_one(int opcode)
 {
-	UINT16 tmp;
+	uint16_t tmp;
 
 	m_icount -= 1;
 
@@ -411,45 +423,45 @@ inline void ie15_device::execute_one(int opcode)
     INLINE FUNCTIONS
 ***************************************************************************/
 
-inline UINT8 ie15_device::rop()
+inline uint8_t ie15_device::rop()
 {
-	UINT8 retVal = m_direct->read_byte(m_PC.w.l);
+	uint8_t retVal = m_direct->read_byte(m_PC.w.l);
 	m_PC.w.l = (m_PC.w.l + 1) & 0x0fff;
 	return retVal;
 }
 
-inline UINT8 ie15_device::arg()
+inline uint8_t ie15_device::arg()
 {
-	UINT8 retVal = m_direct->read_byte(m_PC.w.l);
+	uint8_t retVal = m_direct->read_byte(m_PC.w.l);
 	return retVal;
 }
 
-inline UINT8 ie15_device::get_reg_lo(UINT8 reg)
+inline uint8_t ie15_device::get_reg_lo(uint8_t reg)
 {
-	UINT16 tmp = m_RF ? m_REGS[16 + reg] : m_REGS[reg];
+	uint16_t tmp = m_RF ? m_REGS[16 + reg] : m_REGS[reg];
 	return tmp & 255;
 }
 
-inline UINT16 ie15_device::get_reg(UINT8 reg)
+inline uint16_t ie15_device::get_reg(uint8_t reg)
 {
 	return m_RF ? m_REGS[16 + reg] : m_REGS[reg];
 }
 
-inline void ie15_device::set_reg(UINT8 reg, UINT16 val)
+inline void ie15_device::set_reg(uint8_t reg, uint16_t val)
 {
 	(m_RF ? m_REGS[16 + reg] : m_REGS[reg]) = val;
 
 }
 
-inline void ie15_device::update_flags(UINT8 val)
+inline void ie15_device::update_flags(uint8_t val)
 {
 	m_ZF = (val == 0xff) ? 1 : 0;
 }
 
-inline UINT8 ie15_device::do_condition(UINT8 val)
+inline uint8_t ie15_device::do_condition(uint8_t val)
 {
-	UINT8 v = (val >> 5) & 1;
-	UINT8 cond = 0;
+	uint8_t v = (val >> 5) & 1;
+	uint8_t cond = 0;
 	switch((val>> 3) & 0x03) {
 		case 0 :
 				if (m_CF==v) cond = 1;
@@ -461,8 +473,8 @@ inline UINT8 ie15_device::do_condition(UINT8 val)
 	return cond;
 }
 
-inline UINT16 ie15_device::get_addr(UINT8 val)
+inline uint16_t ie15_device::get_addr(uint8_t val)
 {
-	UINT8 lo = arg();
+	uint8_t lo = arg();
 	return ((val & 0x0f) << 8) + lo + 1;
 }

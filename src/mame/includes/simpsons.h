@@ -26,7 +26,7 @@ public:
 		m_k053251(*this, "k053251") { }
 
 	/* memory pointers */
-	std::unique_ptr<UINT16[]>   m_spriteram;
+	std::unique_ptr<uint16_t[]>   m_spriteram;
 
 	/* video-related */
 	int        m_sprite_colorbase;
@@ -56,7 +56,7 @@ public:
 	DECLARE_WRITE8_MEMBER(simpsons_k053247_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_simpsons(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(simpsons_irq);
 	void simpsons_video_banking(int bank);
 	void simpsons_objdma();

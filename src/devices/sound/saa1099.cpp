@@ -78,7 +78,7 @@ static const int amplitude_lookup[16] = {
 	12*32767/16, 13*32767/16, 14*32767/16, 15*32767/16
 };
 
-static const UINT8 envelope[8][64] = {
+static const uint8_t envelope[8][64] = {
 	/* zero amplitude */
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -133,7 +133,7 @@ const device_type SAA1099 = &device_creator<saa1099_device>;
 //  saa1099_device - constructor
 //-------------------------------------------------
 
-saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saa1099_device::saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SAA1099, "SAA1099", tag, owner, clock, "saa1099", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),

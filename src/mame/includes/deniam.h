@@ -1,10 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
 /*************************************************************************
 
     Deniam games
 
 *************************************************************************/
+
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 
 class deniam_state : public driver_device
@@ -20,13 +23,14 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_oki(*this, "oki"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_textram;
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_textram;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	tilemap_t        *m_fg_tilemap;
@@ -45,7 +49,7 @@ public:
 	int            m_fg_page_reg;
 	int            m_bg_page[4];
 	int            m_fg_page[4];
-	UINT16         m_coinctrl;
+	uint16_t         m_coinctrl;
 
 	/* devices */
 	DECLARE_WRITE16_MEMBER(sound_command_w);
@@ -66,7 +70,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_deniam(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void deniam_common_init(  );
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void set_bg_page( int page, int value );
@@ -76,4 +80,5 @@ public:
 	required_device<okim6295_device> m_oki;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch;
 };

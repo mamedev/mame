@@ -50,7 +50,7 @@ public:
 	DECLARE_WRITE8_MEMBER(keyboard_w);
 	DECLARE_WRITE8_MEMBER(leds_w);
 private:
-	UINT8 m_keyrow;
+	uint8_t m_keyrow;
 	bool m_ledready;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
@@ -67,14 +67,14 @@ READ8_MEMBER( pmi80_state::keyboard_r)
 WRITE8_MEMBER( pmi80_state::keyboard_w )
 {
 	m_keyrow = data;
-	m_ledready = TRUE;
+	m_ledready = true;
 }
 
 WRITE8_MEMBER( pmi80_state::leds_w )
 {
 	if (m_ledready)
 	{
-		m_ledready = FALSE;
+		m_ledready = false;
 		output().set_digit_value(m_keyrow^0xff, data^0xff);
 	}
 }

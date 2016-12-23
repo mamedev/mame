@@ -59,7 +59,7 @@ ioport_constructor pet_userport_joystick_adapter_device::device_input_ports() co
 //  pet_userport_joystick_adapter_device - constructor
 //-------------------------------------------------
 
-pet_userport_joystick_adapter_device::pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pet_userport_joystick_adapter_device::pet_userport_joystick_adapter_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PET_USERPORT_JOYSTICK_ADAPTER, "PET Userport Joystick Adapter", tag, owner, clock, "petuja", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	m_up1(1),
@@ -87,7 +87,7 @@ void pet_userport_joystick_adapter_device::device_start()
 
 void pet_userport_joystick_adapter_device::update_port1()
 {
-	printf( "update port1\n" );
+	//printf( "update port1\n" );
 	output_c(m_up1 && m_fire1);
 	output_d(m_down1 && m_fire1);
 }
@@ -99,7 +99,7 @@ void pet_userport_joystick_adapter_device::update_port1()
 
 void pet_userport_joystick_adapter_device::update_port2()
 {
-	printf( "update port2\n" );
+	//printf( "update port2\n" );
 	output_h(m_up2 && m_fire2);
 	output_j(m_down2 && m_fire2);
 }

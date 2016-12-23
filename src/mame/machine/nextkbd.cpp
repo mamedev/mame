@@ -14,7 +14,7 @@ DEVICE_ADDRESS_MAP_START(amap, 32, nextkbd_device)
 	AM_RANGE(0x8, 0xb) AM_READWRITE(kmdata_r, kmdata_w)
 ADDRESS_MAP_END
 
-nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nextkbd_device::nextkbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NEXTKBD, "NEXTKBD", tag, owner, clock, "nextkbd", __FILE__),
 	int_change_cb(*this),
 	int_power_cb(*this),
@@ -85,15 +85,15 @@ void nextkbd_device::send()
 
 void nextkbd_device::update_mouse(bool force_update)
 {
-	UINT32 cur_mousex   = mousex->read();
-	UINT32 cur_mousey   = mousey->read();
-	UINT32 cur_mousebtn = mousebtn->read();
+	uint32_t cur_mousex   = mousex->read();
+	uint32_t cur_mousey   = mousey->read();
+	uint32_t cur_mousebtn = mousebtn->read();
 
 	if(!force_update && cur_mousex == prev_mousex && cur_mousey == prev_mousey && cur_mousebtn == prev_mousebtn)
 		return;
 
-	INT32 deltax = -(cur_mousex - prev_mousex);
-	INT32 deltay = -(cur_mousey - prev_mousey);
+	int32_t deltax = -(cur_mousex - prev_mousex);
+	int32_t deltay = -(cur_mousey - prev_mousey);
 
 	if(deltax >= 128)
 		deltax -= 256;
@@ -117,7 +117,7 @@ void nextkbd_device::update_mouse(bool force_update)
 	if(deltay > 0x3f)
 		deltay = 0x3f;
 
-	UINT32 base = ((deltax & 0x7f) << 1) | ((deltay & 0x7f) << 9) | cur_mousebtn;
+	uint32_t base = ((deltax & 0x7f) << 1) | ((deltay & 0x7f) << 9) | cur_mousebtn;
 	fifo_push(km_address | D_SECONDARY | base);
 	send();
 }
@@ -130,7 +130,7 @@ void nextkbd_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	update_mouse(false);
 }
 
-void nextkbd_device::fifo_push(UINT32 val)
+void nextkbd_device::fifo_push(uint32_t val)
 {
 	if(fifo_size == FIFO_SIZE)
 		return;
@@ -141,13 +141,13 @@ void nextkbd_device::fifo_push(UINT32 val)
 		fifo_iw = 0;
 }
 
-UINT32 nextkbd_device::fifo_pop()
+uint32_t nextkbd_device::fifo_pop()
 {
 	if(fifo_size == 0)
 		return 0;
 
 	fifo_size--;
-	UINT32 res = fifo[fifo_ir++];
+	uint32_t res = fifo[fifo_ir++];
 	if(fifo_ir == FIFO_SIZE)
 		fifo_ir = 0;
 
@@ -191,7 +191,7 @@ READ32_MEMBER( nextkbd_device::cdata_r )
 
 READ32_MEMBER( nextkbd_device::kmdata_r )
 {
-	UINT8 old = ctrl_kms;
+	uint8_t old = ctrl_kms;
 	ctrl_kms &= ~(C_KBD_INTERRUPT|C_KBD_DATA);
 	if(old & C_KBD_INTERRUPT)
 		int_change_cb(false);
@@ -201,27 +201,27 @@ READ32_MEMBER( nextkbd_device::kmdata_r )
 
 WRITE8_MEMBER( nextkbd_device::ctrl_snd_w )
 {
-	UINT8 old = ctrl_snd;
+	uint8_t old = ctrl_snd;
 	ctrl_snd = (ctrl_snd & ~C_SOUND_WMASK) | (data & C_SOUND_WMASK);
-	UINT8 diff = old ^ ctrl_snd;
+	uint8_t diff = old ^ ctrl_snd;
 
 	logerror("%s: ctrl_snd_w %02x | %02x (%08x)\n", tag(), ctrl_snd, diff, (unsigned int)space.device().safe_pc());
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_kms_w )
 {
-	UINT8 old = ctrl_kms;
+	uint8_t old = ctrl_kms;
 	ctrl_kms = (ctrl_kms & ~C_KMS_WMASK) | (data & C_KMS_WMASK);
-	UINT8 diff = old ^ ctrl_kms;
+	uint8_t diff = old ^ ctrl_kms;
 
 	logerror("%s: ctrl_kms_w %02x | %02x (%08x)\n", tag(), ctrl_kms, diff, (unsigned int)space.device().safe_pc());
 }
 
 WRITE8_MEMBER( nextkbd_device::ctrl_dma_w )
 {
-	UINT8 old = ctrl_dma;
+	uint8_t old = ctrl_dma;
 	ctrl_dma = (ctrl_dma & ~C_WMASK) | (data & C_WMASK);
-	UINT8 diff = old ^ ctrl_dma;
+	uint8_t diff = old ^ ctrl_dma;
 
 	logerror("%s: ctrl_dma_w %02x | %02x (%08x)\n", tag(), ctrl_dma, diff, (unsigned int)space.device().safe_pc());
 }
@@ -246,7 +246,7 @@ WRITE32_MEMBER( nextkbd_device::kmdata_w )
 
 INPUT_CHANGED_MEMBER( nextkbd_device::update )
 {
-	int bank = (int)(FPTR)param;
+	int bank = (int)(uintptr_t)param;
 	switch(bank) {
 	case 0: case 1: case 2: {
 		int index;
@@ -255,7 +255,7 @@ INPUT_CHANGED_MEMBER( nextkbd_device::update )
 				break;
 		assert(index != 32);
 		index += bank*32;
-		UINT16 val = index | modifiers_state | D_KBD_VALID;
+		uint16_t val = index | modifiers_state | D_KBD_VALID;
 		if(!newval)
 			val |= D_KBD_KEYDOWN;
 		if(val == 0x8826 || val == 0x884a) {

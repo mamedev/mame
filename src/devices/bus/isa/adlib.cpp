@@ -20,7 +20,7 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER( isa8_adlib_device::ym3812_16_r )
 {
-	UINT8 retVal = 0xff;
+	uint8_t retVal = 0xff;
 	switch(offset)
 	{
 		case 0 : retVal = m_ym3812->status_port_r( space, offset ); break;
@@ -61,7 +61,7 @@ machine_config_constructor isa8_adlib_device::device_mconfig_additions() const
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, ISA8_ADLIB, "Ad Lib Sound Card", tag, owner, clock, "isa_adlib", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_ym3812(*this, "ym3812")
@@ -75,7 +75,7 @@ isa8_adlib_device::isa8_adlib_device(const machine_config &mconfig, const char *
 void isa8_adlib_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0388, 0x0389, 0, 0, read8_delegate( FUNC(isa8_adlib_device::ym3812_16_r), this ), write8_delegate( FUNC(isa8_adlib_device::ym3812_16_w), this ) );
+	m_isa->install_device(0x0388, 0x0389, read8_delegate( FUNC(isa8_adlib_device::ym3812_16_r), this ), write8_delegate( FUNC(isa8_adlib_device::ym3812_16_w), this ) );
 }
 
 //-------------------------------------------------

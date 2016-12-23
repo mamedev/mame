@@ -77,6 +77,7 @@ PS / PD :  key matrix
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/speedatk.h"
 
@@ -90,7 +91,7 @@ void speedatk_state::machine_start()
 	save_item(NAME(m_coin_impulse));
 }
 
-UINT8 speedatk_state::iox_key_matrix_calc(UINT8 p_side)
+uint8_t speedatk_state::iox_key_matrix_calc(uint8_t p_side)
 {
 	static const char *const keynames[] = { "P1_ROW0", "P1_ROW1", "P2_ROW0", "P2_ROW1" };
 
@@ -133,8 +134,8 @@ READ8_MEMBER(speedatk_state::key_matrix_r)
 	/* both side checks */
 	if(m_mux_data == 1)
 	{
-		UINT8 p1_side = iox_key_matrix_calc(0);
-		UINT8 p2_side = iox_key_matrix_calc(2);
+		uint8_t p1_side = iox_key_matrix_calc(0);
+		uint8_t p2_side = iox_key_matrix_calc(2);
 
 		if(p1_side != 0)
 			return p1_side;
@@ -189,7 +190,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( speedatk_io, AS_IO, 8, speedatk_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(m6845_w) //h46505 address / data routing
-	AM_RANGE(0x24, 0x24) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x24, 0x24) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	//what's 60-6f for? Seems used only in attract mode and read back when a 2p play ends ...
@@ -306,7 +307,8 @@ static MACHINE_CONFIG_START( speedatk, speedatk_state )
 	MCFG_CPU_IO_MAP(speedatk_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", speedatk_state,  irq0_line_hold)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
@@ -27,17 +28,19 @@ public:
 	skydiver_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_videoram(*this, "videoram") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	int m_nmion;
 	tilemap_t *m_bg_tilemap;
@@ -65,7 +68,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(skydiver);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);

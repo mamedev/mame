@@ -14,67 +14,44 @@
 ***************************************************************************/
 
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-	, m_io_kbd0(*this, "TERM_LINE0")
-	, m_io_kbd1(*this, "TERM_LINE1")
-	, m_io_kbd2(*this, "TERM_LINE2")
-	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd(*this, "TERM_LINE%u", 0)
 	, m_io_kbdc(*this, "TERM_LINEC")
 	, m_keyboard_cb(*this)
 {
 }
 
-ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ie15_keyboard_device::ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IE15_KEYBOARD, "15WWW-97-006 Keyboard", tag, owner, clock, "ie15_keyboard", __FILE__)
-	, m_io_kbd0(*this, "TERM_LINE0")
-	, m_io_kbd1(*this, "TERM_LINE1")
-	, m_io_kbd2(*this, "TERM_LINE2")
-	, m_io_kbd3(*this, "TERM_LINE3")
+	, m_io_kbd(*this, "TERM_LINE%u", 0)
 	, m_io_kbdc(*this, "TERM_LINEC")
 	, m_keyboard_cb(*this)
 {
 }
 
-UINT8 ie15_keyboard_device::row_number(UINT32 code)
+uint8_t ie15_keyboard_device::row_number(uint32_t code)
 {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
-	if BIT(code,8) return 8;
-	if BIT(code,9) return 9;
-	if BIT(code,10) return 10;
-	if BIT(code,11) return 11;
-	if BIT(code,12) return 12;
-	if BIT(code,13) return 13;
-	if BIT(code,14) return 14;
-	if BIT(code,15) return 15;
-	return 0;
+	int row = 0;
+
+	while (code >>= 1) { ++row; }
+
+	return row;
 }
 
-UINT16 ie15_keyboard_device::keyboard_handler(UINT16 last_code, UINT8 *scan_line)
+uint16_t ie15_keyboard_device::keyboard_handler(uint16_t last_code, uint8_t *scan_line)
 {
 	int i;
-	UINT32 code = 0;
-	UINT16 key_code = 0;
-	UINT16 retVal = 0;
-	UINT8 ctrl  = BIT(m_io_kbdc->read(), 0);
-	UINT8 shift = BIT(m_io_kbdc->read(), 1);
+	uint32_t code = 0;
+	uint16_t key_code = 0;
+	uint16_t retVal = 0;
+	uint8_t ctrl  = BIT(m_io_kbdc->read(), 0);
+	uint8_t shift = BIT(m_io_kbdc->read(), 1);
 
 	i = *scan_line;
 	{
-		if (i == 0) code = m_io_kbd0->read();
-		else
-		if (i == 1) code = m_io_kbd1->read();
-		else
-		if (i == 2) code = m_io_kbd2->read();
-		else
-		if (i == 3) code = m_io_kbd3->read();
+		if (i<4)
+			code = m_io_kbd[i]->read();
 
 		if (code != 0)
 		{
@@ -125,7 +102,7 @@ UINT16 ie15_keyboard_device::keyboard_handler(UINT16 last_code, UINT8 *scan_line
 
 void ie15_keyboard_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	UINT16 new_code;
+	uint16_t new_code;
 	new_code = keyboard_handler(m_last_code, &m_scan_line);
 	if ((m_last_code != new_code) /* && (new_code) */)
 		send_key(new_code);
@@ -141,7 +118,7 @@ ROM_START( ie15_keyboard )
 	ROM_LOAD( "15bbb.rt5", 0x000, 0x200, CRC(e6a4226e) SHA1(0ee46f5be1b01fa917a6d483bb51463106ae441f) )
 ROM_END
 
-const rom_entry *ie15_keyboard_device::device_rom_region() const
+const tiny_rom_entry *ie15_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( ie15_keyboard );
 }
@@ -158,7 +135,7 @@ void ie15_keyboard_device::device_start()
 {
 	m_keyboard_cb.resolve_safe();
 	m_timer = timer_alloc();
-	m_rom = (UINT8*)memregion("ie15kbd")->base();
+	m_rom = (uint8_t*)memregion("ie15kbd")->base();
 }
 
 void ie15_keyboard_device::device_reset()

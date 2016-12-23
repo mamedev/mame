@@ -25,7 +25,7 @@ public:
 	DECLARE_WRITE64_MEMBER(sn_93c46a_w);
 	DECLARE_READ64_MEMBER(sp_bank_r);
 	DECLARE_WRITE64_MEMBER(sp_bank_w);
-	UINT16 m_sp_bank;
+	uint16_t m_sp_bank;
 
 protected:
 };

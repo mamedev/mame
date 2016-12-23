@@ -117,11 +117,11 @@ WRITE8_MEMBER(ccastles_state::ccastles_paletteram_w)
  *
  *************************************/
 
-inline void ccastles_state::ccastles_write_vram( UINT16 addr, UINT8 data, UINT8 bitmd, UINT8 pixba )
+inline void ccastles_state::ccastles_write_vram( uint16_t addr, uint8_t data, uint8_t bitmd, uint8_t pixba )
 {
-	UINT8 *dest = &m_videoram[addr & 0x7ffe];
-	UINT8 promaddr = 0;
-	UINT8 wpbits;
+	uint8_t *dest = &m_videoram[addr & 0x7ffe];
+	uint8_t promaddr = 0;
+	uint8_t wpbits;
 
 	/*
 	    Inputs to the write-protect PROM:
@@ -209,10 +209,10 @@ WRITE8_MEMBER(ccastles_state::ccastles_videoram_w)
 READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
+	uint16_t addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
 	/* the appropriate pixel is selected into the upper 4 bits */
-	UINT8 result = m_videoram[addr] << ((~m_bitmode_addr[0] & 1) * 4);
+	uint8_t result = m_videoram[addr] << ((~m_bitmode_addr[0] & 1) * 4);
 
 	/* autoincrement because /BITMD was selected */
 	bitmode_autoinc();
@@ -225,7 +225,7 @@ READ8_MEMBER(ccastles_state::ccastles_bitmode_r)
 WRITE8_MEMBER(ccastles_state::ccastles_bitmode_w)
 {
 	/* in bitmode, the address comes from the autoincrement latches */
-	UINT16 addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
+	uint16_t addr = (m_bitmode_addr[1] << 7) | (m_bitmode_addr[0] >> 1);
 
 	/* the upper 4 bits of data are replicated to the lower 4 bits */
 	data = (data & 0xf0) | (data >> 4);
@@ -253,9 +253,9 @@ WRITE8_MEMBER(ccastles_state::ccastles_bitmode_addr_w)
  *
  *************************************/
 
-UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *spriteaddr = &m_spriteram[m_video_control[7] * 0x100];   /* BUF1/BUF2 */
+	uint8_t *spriteaddr = &m_spriteram[m_video_control[7] * 0x100];   /* BUF1/BUF2 */
 	int flip = m_video_control[4] ? 0xff : 0x00;    /* PLAYER2 */
 	pen_t black = m_palette->black_pen();
 	int x, y, offs;
@@ -275,7 +275,7 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 	/* draw the bitmap to the screen, looping over Y */
 	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *dst = &bitmap.pix16(y);
 
 		/* if we're in the VBLANK region, just fill with black */
 		if (m_syncprom[y] & 1)
@@ -287,9 +287,9 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 		/* non-VBLANK region: merge the sprites and the bitmap */
 		else
 		{
-			UINT16 *mosrc = &m_spritebitmap.pix16(y);
+			uint16_t *mosrc = &m_spritebitmap.pix16(y);
 			int effy = (((y - m_vblank_end) + (flip ? 0 : m_vscroll)) ^ flip) & 0xff;
-			UINT8 *src;
+			uint8_t *src;
 
 			/* the "POTATO" chip does some magic here; this is just a guess */
 			if (effy < 24)
@@ -309,9 +309,9 @@ UINT32 ccastles_state::screen_update_ccastles(screen_device &screen, bitmap_ind1
 					int effx = (m_hscroll + (x ^ flip)) & 255;
 
 					/* low 4 bits = left pixel, high 4 bits = right pixel */
-					UINT8 pix = (src[effx / 2] >> ((effx & 1) * 4)) & 0x0f;
-					UINT8 mopix = mosrc[x];
-					UINT8 prindex, prvalue;
+					uint8_t pix = (src[effx / 2] >> ((effx & 1) * 4)) & 0x0f;
+					uint8_t mopix = mosrc[x];
+					uint8_t prindex, prvalue;
 
 					/* Inputs to the priority PROM:
 

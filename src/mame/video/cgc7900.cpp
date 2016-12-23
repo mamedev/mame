@@ -26,14 +26,14 @@
 
 PALETTE_INIT_MEMBER(cgc7900_state, cgc7900)
 {
-	palette.set_pen_color(0, rgb_t::black);
+	palette.set_pen_color(0, rgb_t::black());
 	palette.set_pen_color(1, rgb_t(0x00, 0x00, 0xff));
 	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00));
 	palette.set_pen_color(3, rgb_t(0x00, 0xff, 0xff));
 	palette.set_pen_color(4, rgb_t(0xff, 0x00, 0x00));
 	palette.set_pen_color(5, rgb_t(0xff, 0x00, 0xff));
 	palette.set_pen_color(6, rgb_t(0xff, 0xff, 0x00));
-	palette.set_pen_color(7, rgb_t::white);
+	palette.set_pen_color(7, rgb_t::white());
 }
 
 /***************************************************************************
@@ -109,11 +109,11 @@ void cgc7900_state::update_clut()
 {
 	for (int i = 0; i < 256; i++)
 	{
-		UINT16 addr = i * 2;
-		UINT32 data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
-		UINT8 b = data & 0xff;
-		UINT8 g = (data >> 8) & 0xff;
-		UINT8 r = (data >> 16) & 0xff;
+		uint16_t addr = i * 2;
+		uint32_t data = (m_clut_ram[addr + 1] << 16) | m_clut_ram[addr];
+		uint8_t b = data & 0xff;
+		uint8_t g = (data >> 8) & 0xff;
+		uint8_t r = (data >> 16) & 0xff;
 
 		m_clut[i] = rgb_t(r, g, b);
 	}
@@ -141,9 +141,9 @@ void cgc7900_state::draw_overlay(screen_device *screen, bitmap_rgb32 &bitmap)
 
 		for (int sx = 0; sx < 85; sx++)
 		{
-			UINT16 addr = (sy * 170) + (sx * 2);
-			UINT32 cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
-			UINT8 data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
+			uint16_t addr = (sy * 170) + (sx * 2);
+			uint32_t cell = (m_overlay_ram[addr] << 16) | m_overlay_ram[addr + 1];
+			uint8_t data = m_char_rom->base()[(OVERLAY_DATA << 3) | line];
 			int fg = (cell >> 8) & 0x07;
 			int bg = (cell >> 16) & 0x07;
 
@@ -181,7 +181,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(cgc7900_state::blink_tick)
 	m_blink = !m_blink;
 }
 
-UINT32 cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cgc7900_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	update_clut();
 	draw_bitmap(&screen, bitmap);

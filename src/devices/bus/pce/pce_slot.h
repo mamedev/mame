@@ -3,6 +3,9 @@
 #ifndef __PCE_SLOT_H
 #define __PCE_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -32,21 +35,21 @@ public:
 	virtual DECLARE_READ8_MEMBER(read_cart) { return 0xff; }
 	virtual DECLARE_WRITE8_MEMBER(write_cart) {};
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
 
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	dynamic_buffer m_ram;
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
 
-	void rom_map_setup(UINT32 size);
+	void rom_map_setup(uint32_t size);
 
-	UINT8 rom_bank_map[8];    // 128K chunks of rom
+	uint8_t rom_bank_map[8];    // 128K chunks of rom
 };
 
 
@@ -58,7 +61,7 @@ class pce_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~pce_cart_slot_device();
 
 	// device-level overrides
@@ -66,14 +69,14 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
-	int get_cart_type(UINT8 *ROM, UINT32 len);
+	int get_cart_type(uint8_t *ROM, uint32_t len);
 
-	void internal_header_logging(UINT8 *ROM, UINT32 len);
+	void internal_header_logging(uint8_t *ROM, uint32_t len);
 
 	void set_intf(const char * interface) { m_interface = interface; }
 
@@ -83,7 +86,6 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 1; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual const char *image_interface() const override { return m_interface; }
 	virtual const char *file_extensions() const override { return "pce,bin"; }
 

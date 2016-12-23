@@ -8,7 +8,7 @@
 
 #include "decocpu6.h"
 
-deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+deco_cpu6_device::deco_cpu6_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	m6502_device(mconfig, DECO_CPU6, "DECO CPU-6", tag, owner, clock, "decocpu6", __FILE__)
 {
 }
@@ -24,7 +24,7 @@ void deco_cpu6_device::device_reset()
 	m6502_device::device_reset();
 }
 
-UINT8 deco_cpu6_device::mi_decrypt::read_sync(UINT16 adr)
+uint8_t deco_cpu6_device::mi_decrypt::read_sync(uint16_t adr)
 {
 	if (adr&1)
 		return BITSWAP8(direct->read_byte(adr),6,4,7,5,3,2,1,0);

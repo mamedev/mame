@@ -65,7 +65,7 @@ void xor100_state::bankswitch()
 			program.unmap_write(0x0000, 0xffff);
 		}
 
-		program.install_read_bank(0x0000, 0xf7ff, 0x07ff, 0, "bank2");
+		program.install_read_bank(0x0000, 0x07ff, 0xf000, "bank2");
 		program.install_read_bank(0xf800, 0xffff, "bank3");
 		membank("bank2")->set_entry(0);
 		membank("bank3")->set_entry(0);
@@ -189,7 +189,7 @@ READ8_MEMBER( xor100_state::fdc_wait_r )
 		if (!m_fdc_irq && !m_fdc_drq)
 		{
 			fatalerror("Z80 WAIT not supported by MAME core\n");
-			m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+			m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 		}
 	}
 
@@ -403,7 +403,7 @@ READ8_MEMBER(xor100_state::i8255_pc_r)
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* on line */
 	data |= m_centronics_select << 4;
@@ -442,7 +442,7 @@ void xor100_state::fdc_intrq_w(bool state)
 	if (state)
 	{
 		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 }
 
@@ -453,7 +453,7 @@ void xor100_state::fdc_drq_w(bool state)
 	if (state)
 	{
 		fatalerror("Z80 WAIT not supported by MAME core\n");
-		m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+		m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 	}
 }
 
@@ -475,8 +475,8 @@ SLOT_INTERFACE_END
 void xor100_state::machine_start()
 {
 	int banks = m_ram->size() / 0x10000;
-	UINT8 *ram = m_ram->pointer();
-	UINT8 *rom = m_rom->base();
+	uint8_t *ram = m_ram->pointer();
+	uint8_t *rom = m_rom->base();
 
 	/* setup memory banking */
 	membank("bank1")->configure_entries(1, banks, ram, 0x10000);
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( xor100, xor100_state )
 
 	// S-100
 	MCFG_S100_BUS_ADD()
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD("s100_1", xor100_s100_cards, nullptr)
 	MCFG_S100_SLOT_ADD("s100_2", xor100_s100_cards, nullptr)
 	MCFG_S100_SLOT_ADD("s100_3", xor100_s100_cards, nullptr)

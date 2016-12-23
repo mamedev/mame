@@ -1,5 +1,5 @@
 ; 7zAsm.asm -- ASM macros
-; 2009-12-12 : Igor Pavlov : Public domain
+; 2012-12-30 : Igor Pavlov : Public domain
 
 MY_ASM_START macro
   ifdef x64
@@ -13,30 +13,34 @@ endm
 
 MY_PROC macro name:req, numParams:req
   align 16
-  proc_numParams equ numParams
+  proc_numParams = numParams
   ifdef x64
     proc_name equ name
-    name PROC
   else
-    proc_fastcall_name equ @CatStr(@,name,@, %numParams * 4)
-    public proc_fastcall_name
-    proc_fastcall_name:
+    proc_name equ @CatStr(@,name,@, %numParams * 4)
   endif
+  proc_name PROC
 endm
 
 MY_ENDP macro
   ifdef x64
     ret
-    proc_name ENDP
   else
-    ret (proc_numParams - 2) * 4
+    if proc_numParams LT 3
+      ret
+    else
+      ret (proc_numParams - 2) * 4
+    endif
   endif
+  proc_name ENDP
 endm
 
 ifdef x64
   REG_SIZE equ 8
+  REG_LOGAR_SIZE equ 3
 else
   REG_SIZE equ 4
+  REG_LOGAR_SIZE equ 2
 endif
 
   x0 equ EAX
@@ -67,6 +71,14 @@ ifdef x64
   r5 equ RBP
   r6 equ RSI
   r7 equ RDI
+  x8 equ r8d
+  x9 equ r9d
+  x10 equ r10d
+  x11 equ r11d
+  x12 equ r12d
+  x13 equ r13d
+  x14 equ r14d
+  x15 equ r15d
 else
   r0 equ x0
   r1 equ x1

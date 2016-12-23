@@ -187,7 +187,6 @@ TODO!
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/okim6295.h"
-#include "video/hd63484.h"
 #include "includes/taito_b.h"
 
 WRITE8_MEMBER(taitob_state::bankswitch_w)
@@ -233,7 +232,7 @@ void taitob_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_maincpu->set_input_line(3, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taitob_state::device_timer");
+		assert_always(false, "Unknown id in taitob_state::device_timer");
 	}
 }
 
@@ -691,6 +690,10 @@ static ADDRESS_MAP_START( realpunc_map, AS_PROGRAM, 16, taitob_state )
 	AM_RANGE(0x300002, 0x300003) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 //  AM_RANGE(0x320000, 0x320001) AM_NOP // ?
 	AM_RANGE(0x320002, 0x320003) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_comm_w, 0xff00)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( realpunc_hd63484_map, AS_0, 16, taitob_state )
+	AM_RANGE(0x00000, 0x7ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masterw_sound_map, AS_PROGRAM, 8, taitob_state )
@@ -1441,15 +1444,15 @@ static INPUT_PORTS_START( silentd ) /* World Version */
 
 	PORT_START("DSWB")
 	TAITO_DIFFICULTY_LOC(SW2)
-	PORT_DIPNAME( 0x04, 0x04, "Invulnerability (Cheat)" )   PORT_DIPLOCATION("SW2:3")
+	PORT_DIPNAME( 0x04, 0x04, "Friendly Fire" )   PORT_DIPLOCATION("SW2:3") // "hit of players" or "invincible player mode"
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Power-Up Bonus" )        PORT_DIPLOCATION("SW2:4") /* Manual States "Power-Up at Stage Clear" */
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Regain Power" )      PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Power-Up at Stage Clear" )   PORT_DIPLOCATION("SW2:4") // "clear stage power-up"
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "Regain Power buy-in" )      PORT_DIPLOCATION("SW2:5") // If enabled player can use a credit to refill his HP and get a "rage" mode for few seconds
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 
 /*  Manual Shows "1 Coin Slot (Shared)" and "4 Coin Slot (1 Per Player)"
 
@@ -1868,12 +1871,6 @@ static GFXDECODE_START( rambo3 )
 GFXDECODE_END
 
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitob_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*
     Games that use the mb87078 are: pbobble, spacedx and qzshowby
     schems are not available, but from the writes I guess that
@@ -1959,7 +1956,7 @@ static MACHINE_CONFIG_START( rastsag2, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2015,7 +2012,7 @@ static MACHINE_CONFIG_START( masterw, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -2090,7 +2087,7 @@ static MACHINE_CONFIG_START( ashura, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2146,7 +2143,7 @@ static MACHINE_CONFIG_START( crimec, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2204,7 +2201,7 @@ static MACHINE_CONFIG_START( hitice, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)  /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -2265,7 +2262,7 @@ static MACHINE_CONFIG_START( rambo3p, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
@@ -2322,7 +2319,7 @@ static MACHINE_CONFIG_START( rambo3, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2384,7 +2381,7 @@ static MACHINE_CONFIG_START( pbobble, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2446,7 +2443,7 @@ static MACHINE_CONFIG_START( spacedx, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2502,7 +2499,7 @@ static MACHINE_CONFIG_START( spacedxo, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2564,7 +2561,7 @@ static MACHINE_CONFIG_START( qzshowby, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2620,7 +2617,7 @@ static MACHINE_CONFIG_START( viofight, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz/8)   /* 3 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitob_state, bankswitch_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 0.25)
@@ -2681,7 +2678,7 @@ static MACHINE_CONFIG_START( silentd, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2737,7 +2734,7 @@ static MACHINE_CONFIG_START( selfeena, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2750,7 +2747,7 @@ MACHINE_CONFIG_END
 #if 0
 void taitob_state::ryujin_patch(void)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 	rom[ 0x62/2 ] = 1;
 	//0 (already in rom) - Taito Corporation 1993
 	//1 - Taito America corp with blue FBI logo
@@ -2802,7 +2799,7 @@ static MACHINE_CONFIG_START( ryujin, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)  /* 8 MHz */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2815,7 +2812,7 @@ MACHINE_CONFIG_END
 #if 0
 void taitob_state::sbm_patch(void)
 {
-	UINT16 *rom = (UINT16*)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t*)memregion("maincpu")->base();
 	rom[ 0x7ffff/2 ] = 2; //US version
 }
 #endif
@@ -2865,7 +2862,7 @@ static MACHINE_CONFIG_START( sbm, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2909,8 +2906,8 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 
 	MCFG_VIDEO_START_OVERRIDE(taitob_state,realpunc)
 
-	// TODO: convert to use H63484 and hook it up properly
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("hd63484", 0, realpunc_hd63484_map)
+	MCFG_HD63484_AUTO_CONFIGURE_SCREEN(false)
 
 	MCFG_DEVICE_ADD("tc0180vcu", TC0180VCU, 0)
 	MCFG_TC0180VCU_BG_COLORBASE(0xc0)
@@ -2922,7 +2919,7 @@ static MACHINE_CONFIG_START( realpunc, taitob_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610B, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitob_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -3181,6 +3178,36 @@ ROM_START( hitice ) /* 4 Player version */
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "c59-01.30",  0x00000, 0x20000, CRC(46ae291d) SHA1(d36ab48cfa393a6a1eae5caa2a397087eb098f7f) )
+
+	ROM_REGION( 0x800, "plds", 0 )
+	ROM_LOAD( "pal20l8b-c59-04.25", 0x000, 0x144, CRC(2ebcf07c) SHA1(b73396fff8cde51e8a429843cd6dc3386f777f3b) )
+	ROM_LOAD( "pal16l8b-c59-05.26", 0x200, 0x104, CRC(37b67c5c) SHA1(a4bf3532774bcd285a6e0e24a9e9a3b28684f724) )
+	ROM_LOAD( "pal20l8b-c59-06.53", 0x400, 0x144, CRC(bf176875) SHA1(d7073ff7bf8f905dc8a6d3cf51543a572fa87f2f) )
+	ROM_LOAD( "pal16r4b-c59-07.61", 0x600, 0x104, CRC(cf64bd95) SHA1(5acada8bd6da40b5342bdd7ec494ee0e615492f0) )
+ROM_END
+
+ROM_START( hiticerb ) /* 4 Player version */
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c59-10.42", 0x00000, 0x20000, CRC(e4ffad15) SHA1(87da85e1489fe57bd012177a70434152e5475009) )
+	ROM_LOAD16_BYTE( "c59-12.64", 0x00001, 0x20000, CRC(a080d7af) SHA1(9c68b78fbcc42a2f748d1b7f84f138be79f7c0c9) )
+	ROM_LOAD16_BYTE( "c59-09.41", 0x40000, 0x10000, CRC(e243e3b0) SHA1(a7daf96ef70e9a92bb3ee4a151ce674a187c15a2) )
+	ROM_LOAD16_BYTE( "c59-11.63", 0x40001, 0x10000, CRC(4d4dfa52) SHA1(8ecd62dc2a2f35850340469afa54862b46053ce0) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* 64k for Z80 code */
+	ROM_LOAD( "c59-08.50",  0x00000, 0x10000, CRC(d3cbc10b) SHA1(75305e264300e0ebd15ada45a6d222fee75bd8e4) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "IC5.bin",  0x00000, 0x20000, CRC(55698bbc) SHA1(ba0e0de12e3e52ef026d37d667060e8ba6925340) )
+	ROM_LOAD16_BYTE( "IC1.bin",  0x40000, 0x20000, CRC(fca01c22) SHA1(94d7d521ea6fdab752939c1f2087b16a2b2922a8) )
+	ROM_LOAD16_BYTE( "IC6.bin",  0x00001, 0x20000, CRC(a7cb863f) SHA1(f749d38c2164bb9833e653bc1253a336c0043daa) )
+	ROM_LOAD16_BYTE( "IC2.bin",  0x40001, 0x20000, CRC(f1c09244) SHA1(68d67db5398c92699022f86fa53a1cbda344c375) )
+	ROM_LOAD16_BYTE( "IC8.bin",  0x80000, 0x20000, CRC(7cd3aa29) SHA1(78279db96b4f913b60a866d4fcbde46e5608fe0d) )
+	ROM_LOAD16_BYTE( "IC4.bin",  0xc0000, 0x20000, CRC(d0f2fd35) SHA1(e705e6d889a01bca6a33efcb36ef13a5f43bcd17) )
+	ROM_LOAD16_BYTE( "IC7.bin",  0x80001, 0x20000, CRC(6b2979c7) SHA1(6154cee3796aea637114a771e4c773013b28b362) )
+	ROM_LOAD16_BYTE( "IC3.bin",  0xc0001, 0x20000, CRC(51621004) SHA1(86980acdba4380f8682ace0e0f0543312304d451) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "IC30.bin",  0x00000, 0x20000, CRC(46ae291d) SHA1(d36ab48cfa393a6a1eae5caa2a397087eb098f7f) )
 
 	ROM_REGION( 0x800, "plds", 0 )
 	ROM_LOAD( "pal20l8b-c59-04.25", 0x000, 0x144, CRC(2ebcf07c) SHA1(b73396fff8cde51e8a429843cd6dc3386f777f3b) )
@@ -3715,6 +3742,7 @@ GAME( 1990, ashuraj,  ashura,  ashura,   ashuraj,   taitob_state, taito_b, ROT27
 GAME( 1990, ashurau,  ashura,  ashura,   ashurau,   taitob_state, taito_b, ROT270, "Taito America Corporation", "Ashura Blaster (US)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, hitice,   0,       hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1990, hiticerb, hitice,  hitice,   hitice,    taitob_state, taito_b, ROT0,   "Taito Corporation (Williams license)", "Hit the Ice (US, with riser board)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 GAME( 1990, hiticej,  hitice,  hitice,   hiticej,   taitob_state, taito_b, ROT0,   "Taito Corporation (licensed from Midway)", "Hit the Ice (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, selfeena, 0,       selfeena, selfeena,  taitob_state, taito_b, ROT0,   "East Technology", "Sel Feena", MACHINE_SUPPORTS_SAVE )

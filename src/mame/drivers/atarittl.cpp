@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Fabio Priuli, Scott Stone
+// copyright-holders:Fabio Priuli, Scott Stone, Couriersud
 /***************************************************************************
 
  Atari / Kee Games Driver - Discrete Games made in the 1970's
@@ -53,6 +53,19 @@
  TM-018                   Dodgeball/Dodgem (Not Produced/Released) (1975)
  TM-024                   Qwakers (Not Produced/Released) (1974?) (Kee Games clone of Qwak!?)
 
+ - Information (current as of 21 Dec. 2016) on what logic chips (and some analog parts) are still needed to be emulated in the
+   netlist system per-game:
+
+ TM-057 (Stunt Cycle)
+ 	4136  Quad General-Purpose Operational Amplifiers
+
+ TM-055 (Indy 4)
+ 	7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
+ 	7414  Hex Schmitt-Trigger Inverters
+ 	7417  Hex Buffers/Drivers
+ 	74164 8-bit Serial-In, Parallel-Out Shift Register
+ 	9301  1-of-10 Decoder
+ 	LM339 Quad Comparator
 
 ***************************************************************************/
 
@@ -60,6 +73,7 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
+#include "machine/nl_stuntcyc.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
@@ -136,7 +150,6 @@ void atarikee_state::video_start()
 
 
 static MACHINE_CONFIG_START( atarikee, atarikee_state )
-
 	/* basic machine hardware */
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
 	MCFG_NETLIST_SETUP(atarikee)
@@ -149,6 +162,22 @@ static MACHINE_CONFIG_START( atarikee, atarikee_state )
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( stuntcyc, atarikee_state )
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_NETLIST_SETUP(stuntcyc)
+
+	/* video hardware */
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(1)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
+MACHINE_CONFIG_END
+
 
 
 /***************************************************************************
@@ -279,9 +308,10 @@ ROM_END
 ROM_START( steeplec )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
-	ROM_LOAD( "003773-a.4c",  0x0000, 0x0100, CRC(5ddc49b6) SHA1(58eba996703cbb7b3f66ff97357e191c9a3ab340) ) // Bugle
-	ROM_LOAD( "003773-b.4d",  0x0100, 0x0100, CRC(e6994cde) SHA1(504f92dba0c8640d55c7412697868582043f3817) ) // Graphics
+	ROM_REGION( 0x0220, "gfx", ROMREGION_ERASE00 )
+	ROM_LOAD( "003773-a.4c",  0x0000, 0x0100, CRC(5ddc49b6) SHA1(58eba996703cbb7b3f66ff97357e191c9a3ab340) ) // Horse Graphics
+	ROM_LOAD( "003773-b.4d",  0x0100, 0x0100, CRC(e6994cde) SHA1(504f92dba0c8640d55c7412697868582043f3817) ) // Horse Graphics
+	ROM_LOAD( "003774.8c",  0x0200, 0x0020, CRC(f3785f4a) SHA1(98f4015049279de5ba109e6dd87bb94071df5860) ) // Bugle
 ROM_END
 
 
@@ -438,7 +468,7 @@ GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
 GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,         stuntcyc,   0,  driver_device, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
 GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  tankii,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 

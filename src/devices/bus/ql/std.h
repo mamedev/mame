@@ -26,14 +26,14 @@ class ql_standard_rom_cartridge_t : public device_t,
 {
 public:
 	// construction/destruction
-	ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ql_standard_rom_cartridge_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_ql_rom_cartridge_card_interface overrides
-	virtual UINT8 read(address_space &space, offs_t offset, UINT8 data) override;
+	virtual uint8_t read(address_space &space, offs_t offset, uint8_t data) override;
 };
 
 

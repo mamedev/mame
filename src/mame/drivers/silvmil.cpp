@@ -26,9 +26,10 @@ Very likely to be 'whatever crystals we had on hand which were close enough for 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/decospr.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 
 class silvmil_state : public driver_device
@@ -39,6 +40,7 @@ public:
 			m_maincpu(*this, "maincpu"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_sprgen(*this, "spritegen"),
+			m_soundlatch(*this, "soundlatch"),
 			m_bg_videoram(*this, "bg_videoram"),
 			m_fg_videoram(*this, "fg_videoram"),
 			m_spriteram(*this, "spriteram") { }
@@ -48,11 +50,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<decospr_device> m_sprgen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_bg_videoram;
-	required_shared_ptr<UINT16> m_fg_videoram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_bg_videoram;
+	required_shared_ptr<uint16_t> m_fg_videoram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	tilemap_t   *m_bg_layer;
@@ -111,7 +114,7 @@ public:
 	{
 		if (ACCESSING_BITS_0_7)
 		{
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(20));
 
 		}
@@ -125,7 +128,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void tumblepb_gfx1_rearrange();
 };
 
@@ -158,13 +161,13 @@ TILEMAP_MAPPER_MEMBER(silvmil_state::deco16_scan_rows)
 
 void silvmil_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
-	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_bg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(silvmil_state::get_fg_tile_info),this), tilemap_mapper_delegate(FUNC(silvmil_state::deco16_scan_rows),this), 16, 16, 64, 32);
 
 	m_fg_layer->set_transparent_pen(0);
 }
 
-UINT32 silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t silvmil_state::screen_update_silvmil(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_layer->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_layer->draw(screen, bitmap, cliprect, 0, 0);
@@ -261,7 +264,7 @@ static INPUT_PORTS_START( silvmil )
 	PORT_DIPSETTING(      0x1000, DEF_STR( 3C_2C ) ) /* Works like 2C/1C then 1C/1C repeat */
 	PORT_DIPSETTING(      0x2000, DEF_STR( 2C_2C ) ) /* Works the same as 1C/1C */
 	PORT_DIPSETTING(      0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Funtionally reversed?? */
+	PORT_DIPNAME( 0x4000, 0x4000, "Coin Box" )          PORT_DIPLOCATION("SW2:7") /* Functionally reversed?? */
 	PORT_DIPSETTING(      0x4000, "1" ) /* Credits from Coin1 or Coin2 */
 	PORT_DIPSETTING(      0x0000, "2" ) /* Doesn't credit up from Coin2 */
 	PORT_SERVICE_DIPLOC(  0x8000, IP_ACTIVE_LOW, "SW2:8" ) /* Verified */
@@ -385,7 +388,7 @@ static ADDRESS_MAP_START( silvmil_sound_map, AS_PROGRAM, 8, silvmil_state )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xc002, 0xc002) AM_DEVREADWRITE("oki", okim6295_device, read, write) AM_MIRROR(1)
-	AM_RANGE(0xc006, 0xc006) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc006, 0xc006) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP // ??
 ADDRESS_MAP_END
 
@@ -420,9 +423,10 @@ static MACHINE_CONFIG_START( silvmil, silvmil_state )
 	MCFG_DECO_SPRITE_ISBOOTLEG(true)
 	MCFG_DECO_SPRITE_OFFSETS(5, 7)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_14_31818MHz/4) /* Verified */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -563,7 +567,7 @@ ROM_END
 
 void silvmil_state::tumblepb_gfx1_rearrange()
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i;
 

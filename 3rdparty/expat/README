@@ -1,5 +1,5 @@
 
-                        Expat, Release 2.1.0
+                        Expat, Release 2.1.1
 
 This is Expat, a C library for parsing XML, written by James Clark.
 Expat is a stream-oriented XML parser.  This means that you register

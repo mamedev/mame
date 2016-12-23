@@ -55,7 +55,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/dbz.h"
 
@@ -95,7 +95,7 @@ WRITE16_MEMBER(dbz_state::dbzcontrol_w)
 
 WRITE16_MEMBER(dbz_state::dbz_sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data >> 8);
+	m_soundlatch->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(dbz_state::dbz_sound_cause_nmi)
@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( dbz_sound_map, AS_PROGRAM, 8, dbz_state )
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd002) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dbz_sound_io_map, AS_IO, 8, dbz_state )
@@ -346,14 +346,12 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(dbz_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 2, K056832_BPP_4, 1, 1, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 1, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(dbz_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 3, NORMAL_PLANE_ORDER, -87, 32) // or -52, 16?
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -87, 32) // or -52, 16?
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
@@ -371,6 +369,8 @@ static MACHINE_CONFIG_START( dbz, dbz_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 4000000)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -493,9 +493,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(dbz_state,dbz)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x00076e after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0x76c/2] = 0x007f;    /* 0x00ff */
@@ -526,9 +526,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbz)
 
 DRIVER_INIT_MEMBER(dbz_state,dbza)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// nop out dbz1's mask rom test
 	// tile ROM test
@@ -549,9 +549,9 @@ DRIVER_INIT_MEMBER(dbz_state,dbza)
 
 DRIVER_INIT_MEMBER(dbz_state,dbz2)
 {
-	UINT16 *ROM;
+	uint16_t *ROM;
 
-	ROM = (UINT16 *)memregion("maincpu")->base();
+	ROM = (uint16_t *)memregion("maincpu")->base();
 
 	// to avoid crash during loop at 0x000a4a after D4 > 0x80 (reading tiles region out of bounds)
 	ROM[0xa48/2] = 0x007f;    /* 0x00ff */

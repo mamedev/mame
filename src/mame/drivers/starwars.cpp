@@ -26,6 +26,7 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/tms5220.h"
@@ -124,38 +125,6 @@ WRITE8_MEMBER(starwars_state::esb_slapstic_w)
 }
 
 
-
-/*************************************
- *
- *  ESB Opcode base handler
- *
- *************************************/
-
-DIRECT_UPDATE_MEMBER(starwars_state::esb_setdirect)
-{
-	/* if we are in the slapstic region, process it */
-	if ((address & 0xe000) == 0x8000)
-	{
-		offs_t pc = direct.space().device().safe_pc();
-
-		/* filter out duplicates; we get these because the handler gets called for
-		   multiple reasons:
-		    1. Because we have read/write handlers backing the current address
-		    2. Because the CPU core executed a jump to a new address
-		*/
-		if (pc != m_slapstic_last_pc || address != m_slapstic_last_address)
-		{
-			m_slapstic_last_pc = pc;
-			m_slapstic_last_address = address;
-			esb_slapstic_tweak(direct.space(), address & 0x1fff);
-		}
-		return ~0;
-	}
-	return address;
-}
-
-
-
 /*************************************
  *
  *  Main CPU memory handlers
@@ -175,7 +144,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, starwars_state )
 	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_device, read, write)
 	AM_RANGE(0x4600, 0x461f) AM_DEVWRITE("avg", avg_starwars_device, go_w)
 	AM_RANGE(0x4620, 0x463f) AM_DEVWRITE("avg", avg_starwars_device, reset_w)
-	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4640, 0x465f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
 	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
@@ -240,9 +209,9 @@ static INPUT_PORTS_START( starwars )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	/* Bit 6 is VG_HALT */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_starwars_device, done_r, nullptr)
 	/* Bit 7 is MATH_RUN - see machine/starwars.c */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, starwars_state,matrix_flag_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x02, "Starting Shields" )  PORT_DIPLOCATION("10D:1,2")
@@ -331,6 +300,8 @@ static MACHINE_CONFIG_START( starwars, starwars_state )
 	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(starwars_state, irq0_line_assert, CLOCK_3KHZ / 12)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_hz(CLOCK_3KHZ / 128))
 
 	MCFG_CPU_ADD("audiocpu", M6809, MASTER_CLOCK / 8)
@@ -558,16 +529,12 @@ DRIVER_INIT_MEMBER(starwars_state,starwars)
 
 DRIVER_INIT_MEMBER(starwars_state,esb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* init the slapstic */
 	m_slapstic_device->slapstic_init();
 	m_slapstic_source = &rom[0x14000];
 	m_slapstic_base = &rom[0x08000];
-
-	/* install an opcode base handler */
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.set_direct_update_handler(direct_update_delegate(FUNC(starwars_state::esb_setdirect), this));
 
 	/* install read/write handlers for it */
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0x9fff, read8_delegate(FUNC(starwars_state::esb_slapstic_r),this), write8_delegate(FUNC(starwars_state::esb_slapstic_w),this));
@@ -587,8 +554,6 @@ DRIVER_INIT_MEMBER(starwars_state,esb)
 
 	/* additional globals for state saving */
 	save_item(NAME(m_slapstic_current_bank));
-	save_item(NAME(m_slapstic_last_pc));
-	save_item(NAME(m_slapstic_last_address));
 }
 
 

@@ -26,7 +26,7 @@ Ports:
 20      R   DSW #2
 40      R   Input Ports Player 1
 60      R   Input Ports Player 2
-80       W  Sound Commnand
+80       W  Sound Command
 c0       W  Flip Screen
 c1       W  ???
 c2-c4    W  ???
@@ -81,7 +81,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Press START1 while in "test mode" to cycle through different screens
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
-    This setting (as well as others) must be defined before reseting the games.
+    This setting (as well as others) must be defined before resetting the games.
   - "Test mode" crashes when trying to display "Difficult" ("Hard") because the full string
     is 15 bytes long while other string are 14, so the 15th "char" is NOT 0x00 :
       * 0xd49f : mask (0x30)
@@ -95,7 +95,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Press START1 while in "test mode" to cycle through different screens
     (colors, Dip Switches, Inputs)
   - When "Freeze" Dip Switch is ON, press START1 to freeze and START2 to unfreeze.
-    This setting (as well as others) must be defined before reseting the games.
+    This setting (as well as others) must be defined before resetting the games.
 
 2a) 'trckydoc'
 
@@ -127,18 +127,19 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "sound/3812intf.h"
 #include "includes/sauro.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 WRITE8_MEMBER(sauro_state::sauro_sound_command_w)
 {
 	data |= 0x80;
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 }
 
 READ8_MEMBER(sauro_state::sauro_sound_command_r)
 {
-	int ret = soundlatch_byte_r(space, offset);
-	soundlatch_clear_byte_w(space, offset, 0);
+	int ret = m_soundlatch->read(space, offset);
+	m_soundlatch->clear_w(space, offset, 0);
 	return ret;
 }
 
@@ -196,7 +197,7 @@ static ADDRESS_MAP_START( sauro_io_map, AS_IO, 8, sauro_state )
 	AM_RANGE(0xcc, 0xcc) AM_WRITENOP        /* same as 0xca */
 	AM_RANGE(0xcd, 0xcd) AM_WRITENOP        /* same as 0xcb */
 	AM_RANGE(0xce, 0xce) AM_WRITENOP        /* only written at startup */
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xe0, 0xe0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
@@ -204,6 +205,17 @@ static ADDRESS_MAP_START( sauro_sound_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
+	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
+	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( saurob_sound_map, AS_PROGRAM, 8, sauro_state )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0xa000, 0xa000) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe000) AM_READ(sauro_sound_command_r)
 	AM_RANGE(0xe000, 0xe006) AM_WRITENOP    /* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITENOP
@@ -221,13 +233,13 @@ static ADDRESS_MAP_START( trckydoc_map, AS_PROGRAM, 8, sauro_state )
 	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("P1")
 	AM_RANGE(0xf818, 0xf818) AM_READ_PORT("P2")
 	AM_RANGE(0xf820, 0xf821) AM_DEVWRITE("ymsnd", ym3812_device, write)
-	AM_RANGE(0xf828, 0xf828) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf828, 0xf828) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITENOP                /* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)
 	AM_RANGE(0xf83a, 0xf83a) AM_WRITE(coin1_w)
 	AM_RANGE(0xf83b, 0xf83b) AM_WRITE(coin2_w)
-	AM_RANGE(0xf83c, 0xf83c) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xf83c, 0xf83c) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf83f, 0xf83f) AM_WRITENOP                /* only written at startup */
 ADDRESS_MAP_END
 
@@ -311,6 +323,71 @@ static INPUT_PORTS_START( trckydoca )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( saurob )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN )  PORT_8WAY
+
+	PORT_START("P2")                                                  /* see notes */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+
+	PORT_START("DSW1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )                       /* This crashes test mode in 'sauro' but not in other games !!! - see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x30, "5" )
+	PORT_DIPSETTING(    0x20, "4" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 chars */
@@ -370,6 +447,8 @@ static MACHINE_CONFIG_START( tecfri, sauro_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
@@ -417,9 +496,21 @@ static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(sauro_state, screen_update_sauro)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("speech", SP0256, 3120000)
 	MCFG_SP0256_DATA_REQUEST_CB(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( saurob, sauro )
+
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(saurob_sound_map)
+
+	/* sound hardware */
+	MCFG_DEVICE_REMOVE("speech")
+
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -525,6 +616,53 @@ ROM_START( saurorr ) // all roms have original Tecfri stickers
 ROM_END
 
 
+/*
+Sauro (bootleg)
+
+CPU  : Z80
+Sound: Z80, YM3526, YM3014
+RAM  : 2016 (x4), 6116 (x5)
+Xtal : 20.000MHz, 8.000MHz
+DIPs : 8 position (x2)
+Other: ULN2003
+       unpopulated position for SP0256-AL
+
+Only ROMs 01, 02 & 03 are different to existing archive.
+Color PROMs match existing archive. One extra PROM was found near ROMs 6 & 7 (sauropr4.16h)
+*/
+
+ROM_START( saurob )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sauro02.7c",      0x00000, 0x8000, CRC(72026b9a) SHA1(538f6bffab5cb0f7609a5afaab4d839baf26a1a7) )
+	ROM_LOAD( "sauro01.6c",      0x08000, 0x8000, CRC(4ff12c25) SHA1(e9f240d0476a821488006e7b28490e2e7c0c1819) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "sauro03.16e",     0x00000, 0x8000, CRC(a30b60fc) SHA1(48ea586a333e42852a6c9a5df48b2f2ccace6d36) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "sauro-6.bin",     0x00000, 0x8000, CRC(4b77cb0f) SHA1(7b9cb2dca561d81390106c1a5c0533dcecaf6f1a) ) // sauro06.16g
+	ROM_LOAD( "sauro-7.bin",     0x08000, 0x8000, CRC(187da060) SHA1(1df156e58379bb39acade02aabab6ff1cb7cc288) ) // sauro07.18g
+
+	ROM_REGION( 0x10000, "gfx2", 0 )
+	ROM_LOAD( "sauro-4.bin",     0x00000, 0x8000, CRC(9b617cda) SHA1(ce26b84ad5ecd6185ae218520e9972645bbf09ad) ) // sauro04.7g
+	ROM_LOAD( "sauro-5.bin",     0x08000, 0x8000, CRC(a6e2640d) SHA1(346ffcf62e27ce8134f4e5e0dbcf11f110e19e04) ) // sauro05.8g
+
+	ROM_REGION( 0x20000, "gfx3", 0 )
+	ROM_LOAD( "sauro-8.bin",     0x00000, 0x8000, CRC(e08b5d5e) SHA1(eaaeaa08b19c034ab2a2140f887edffca5f441b9) ) // sauro08.9j
+	ROM_LOAD( "sauro-9.bin",     0x08000, 0x8000, CRC(7c707195) SHA1(0529f6808b0cec3e12ca51bee189841d21577786) ) // sauro09.11j
+	ROM_LOAD( "sauro-10.bin",    0x10000, 0x8000, CRC(c93380d1) SHA1(fc9655cc94c2d2058f83eb341be7e7856a08194f) ) // sauro10.12j
+	ROM_LOAD( "sauro-11.bin",    0x18000, 0x8000, CRC(f47982a8) SHA1(cbaeac272c015d9439f151cfb3449082f11a57a1) ) // sauro11.14j
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "82s137-3.bin",    0x0000, 0x0400, CRC(d52c4cd0) SHA1(27d6126b46616c06b55d8018c97f6c3d7805ae9e) )  /* Red component */
+	ROM_LOAD( "82s137-2.bin",    0x0400, 0x0400, CRC(c3e96d5d) SHA1(3f6f21526a4357e4a9a9d56a6f4ef5911af2d120) )  /* Green component */
+	ROM_LOAD( "82s137-1.bin",    0x0800, 0x0400, CRC(bdfcf00c) SHA1(9faf4d7f8959b64faa535c9945eec59c774a3760) )  /* Blue component */
+
+		ROM_REGION( 0x0200, "user1", 0 ) // Unknown PROM was found near ROMs 6 & 7
+	ROM_LOAD( "sauropr4.16h",    0x0000, 0x0200, CRC(5261bc11) SHA1(1cc7a9a7376e65f4587b75ef9382049458656372) )
+ROM_END
+
+
 ROM_START( trckydoc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "trckydoc.d9",  0x0000,  0x8000, CRC(c6242fc3) SHA1(c8a6f6abe8b51061a113ed75fead0479df68ec40) )
@@ -578,7 +716,7 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 	/* This game doesn't like all memory to be initialized to zero, it won't
 	   initialize the high scores */
 
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	memset(&RAM[0xe000], 0, 0x100);
 	RAM[0xe000] = 1;
@@ -587,6 +725,7 @@ DRIVER_INIT_MEMBER(sauro_state,tecfri)
 GAME( 1987, sauro,    0,        sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri",                                "Sauro", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurop,   sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Philko license)",               "Sauro (Philko license)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, saurorr,  sauro,    sauro,    tecfri, sauro_state,    tecfri, ROT0, "Tecfri (Recreativos Real S.A. license)","Sauro (Recreativos Real S.A. license)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, saurob,   sauro,    saurob,   saurob, sauro_state,    tecfri, ROT0, "bootleg",                               "Sauro (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri, sauro_state,    tecfri, ROT0, "Tecfri", "Tricky Doc (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1987, trckydoca,trckydoc, trckydoc, trckydoca, sauro_state, tecfri, ROT0, "Tecfri", "Tricky Doc (set 2)", MACHINE_SUPPORTS_SAVE )

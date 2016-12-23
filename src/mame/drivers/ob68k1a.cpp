@@ -199,7 +199,7 @@ void ob68k1a_state::machine_reset()
 
 	// set reset vector
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
-	UINT8 *rom = memregion(MC68000L10_TAG)->base();
+	uint8_t *rom = memregion(MC68000L10_TAG)->base();
 
 	memcpy(ram, rom, 8);
 
@@ -224,8 +224,7 @@ static MACHINE_CONFIG_START( ob68k1a, ob68k1a_state )
 	// devices
 	MCFG_DEVICE_ADD(MC6821_0_TAG, PIA6821, 0)
 	MCFG_DEVICE_ADD(MC6821_1_TAG, PIA6821, 0)
-	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_10MHz/10)
+	MCFG_DEVICE_ADD(MC6840_TAG, PTM6840, XTAL_10MHz/10)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
 
 	MCFG_DEVICE_ADD(MC6850_0_TAG, ACIA6850, 0)

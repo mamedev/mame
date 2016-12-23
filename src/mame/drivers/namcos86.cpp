@@ -177,7 +177,7 @@ TODO:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/n63701x.h"
 #include "includes/namcos86.h"
 
@@ -256,7 +256,7 @@ WRITE8_MEMBER(namcos86_state::watchdog1_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 	}
 }
 
@@ -266,7 +266,7 @@ WRITE8_MEMBER(namcos86_state::watchdog2_w)
 	if (m_wdog == 3)
 	{
 		m_wdog = 0;
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 	}
 }
 
@@ -1061,6 +1061,7 @@ static MACHINE_CONFIG_START( hopmappy, namcos86_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(48000)) /* heavy interleaving needed to avoid hangs in rthunder */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1665,25 +1666,25 @@ ROM_END
 DRIVER_INIT_MEMBER(namcos86_state,namco86)
 {
 	int size;
-	UINT8 *gfx;
+	uint8_t *gfx;
 
 	/* shuffle tile ROMs so regular gfx unpack routines can be used */
 	gfx = memregion("gfx1")->base();
 	size = memregion("gfx1")->bytes() * 2 / 3;
 
 	{
-		dynamic_buffer buffer( size );
-		UINT8 *dest1 = gfx;
-		UINT8 *dest2 = gfx + ( size / 2 );
-		UINT8 *mono = gfx + size;
+		std::vector<uint8_t> buffer( size );
+		uint8_t *dest1 = gfx;
+		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *mono = gfx + size;
 		int i;
 
 		memcpy( &buffer[0], gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{
-			UINT8 data1 = buffer[i];
-			UINT8 data2 = buffer[i+1];
+			uint8_t data1 = buffer[i];
+			uint8_t data2 = buffer[i+1];
 			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
 			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
 
@@ -1695,18 +1696,18 @@ DRIVER_INIT_MEMBER(namcos86_state,namco86)
 	size = memregion("gfx2")->bytes() * 2 / 3;
 
 	{
-		dynamic_buffer buffer( size );
-		UINT8 *dest1 = gfx;
-		UINT8 *dest2 = gfx + ( size / 2 );
-		UINT8 *mono = gfx + size;
+		std::vector<uint8_t> buffer( size );
+		uint8_t *dest1 = gfx;
+		uint8_t *dest2 = gfx + ( size / 2 );
+		uint8_t *mono = gfx + size;
 		int i;
 
 		memcpy( &buffer[0], gfx, size );
 
 		for ( i = 0; i < size; i += 2 )
 		{
-			UINT8 data1 = buffer[i];
-			UINT8 data2 = buffer[i+1];
+			uint8_t data1 = buffer[i];
+			uint8_t data2 = buffer[i+1];
 			*dest1++ = ( data1 << 4 ) | ( data2 & 0xf );
 			*dest2++ = ( data1 & 0xf0 ) | ( data2 >> 4 );
 

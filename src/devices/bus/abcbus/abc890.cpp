@@ -186,39 +186,39 @@ machine_config_constructor abc856_t::device_mconfig_additions() const
 //  abc890_t - constructor
 //-------------------------------------------------
 
-abc890_t::abc890_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+abc890_t::abc890_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_abcbus_card_interface(mconfig, *this)
 {
 }
 
-abc890_t::abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc890_t::abc890_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ABC890, "ABC 890", tag, owner, clock, "abc890", __FILE__),
 	device_abcbus_card_interface(mconfig, *this)
 {
 }
 
-abc_expansion_unit_t::abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc_expansion_unit_t::abc_expansion_unit_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc890_t(mconfig, ABC_EXPANSION_UNIT, "ABC Expansion Unit", tag, owner, clock, "abcexp", __FILE__)
 {
 }
 
-abc894_t::abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc894_t::abc894_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc890_t(mconfig, ABC894, "ABC 894", tag, owner, clock, "abc894", __FILE__)
 {
 }
 
-abc850_t::abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc850_t::abc850_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc890_t(mconfig, ABC850, "ABC 850", tag, owner, clock, "abc850", __FILE__)
 {
 }
 
-abc852_t::abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc852_t::abc852_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc890_t(mconfig, ABC852, "ABC 852", tag, owner, clock, "abc852", __FILE__)
 {
 }
 
-abc856_t::abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+abc856_t::abc856_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	abc890_t(mconfig, ABC856, "ABC 856", tag, owner, clock, "abc856", __FILE__)
 {
 }
@@ -239,9 +239,9 @@ void abc890_t::device_start()
 
 void abc890_t::device_reset()
 {
-	for (device_t *device = first_subdevice(); device != nullptr; device = device->next())
+	for (device_t &device : subdevices())
 	{
-		device->reset();
+		device.reset();
 	}
 }
 
@@ -250,13 +250,11 @@ void abc890_t::device_reset()
 //  abcbus_cs - card select
 //-------------------------------------------------
 
-void abc890_t::abcbus_cs(UINT8 data)
+void abc890_t::abcbus_cs(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->cs_w(data);
+		slot.cs_w(data);
 	}
 }
 
@@ -265,15 +263,13 @@ void abc890_t::abcbus_cs(UINT8 data)
 //  abcbus_inp - input
 //-------------------------------------------------
 
-UINT8 abc890_t::abcbus_inp()
+uint8_t abc890_t::abcbus_inp()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->inp_r();
+		data &= slot.inp_r();
 	}
 
 	return data;
@@ -284,13 +280,11 @@ UINT8 abc890_t::abcbus_inp()
 //  abcbus_out - output
 //-------------------------------------------------
 
-void abc890_t::abcbus_out(UINT8 data)
+void abc890_t::abcbus_out(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->out_w(data);
+		slot.out_w(data);
 	}
 }
 
@@ -299,15 +293,13 @@ void abc890_t::abcbus_out(UINT8 data)
 //  abcbus_stat - status
 //-------------------------------------------------
 
-UINT8 abc890_t::abcbus_stat()
+uint8_t abc890_t::abcbus_stat()
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->stat_r();
+		data &= slot.stat_r();
 	}
 
 	return data;
@@ -318,13 +310,11 @@ UINT8 abc890_t::abcbus_stat()
 //  abcbus_c1 - command 1
 //-------------------------------------------------
 
-void abc890_t::abcbus_c1(UINT8 data)
+void abc890_t::abcbus_c1(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c1_w(data);
+		slot.c1_w(data);
 	}
 }
 
@@ -333,13 +323,11 @@ void abc890_t::abcbus_c1(UINT8 data)
 //  abcbus_c2 - command 2
 //-------------------------------------------------
 
-void abc890_t::abcbus_c2(UINT8 data)
+void abc890_t::abcbus_c2(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c2_w(data);
+		slot.c2_w(data);
 	}
 }
 
@@ -348,13 +336,11 @@ void abc890_t::abcbus_c2(UINT8 data)
 //  abcbus_c3 - command 3
 //-------------------------------------------------
 
-void abc890_t::abcbus_c3(UINT8 data)
+void abc890_t::abcbus_c3(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c3_w(data);
+		slot.c3_w(data);
 	}
 }
 
@@ -363,13 +349,11 @@ void abc890_t::abcbus_c3(UINT8 data)
 //  abcbus_c4 - command 4
 //-------------------------------------------------
 
-void abc890_t::abcbus_c4(UINT8 data)
+void abc890_t::abcbus_c4(uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->c4_w(data);
+		slot.c4_w(data);
 	}
 }
 
@@ -378,15 +362,13 @@ void abc890_t::abcbus_c4(UINT8 data)
 //  abcbus_xmemfl - extended memory read
 //-------------------------------------------------
 
-UINT8 abc890_t::abcbus_xmemfl(offs_t offset)
+uint8_t abc890_t::abcbus_xmemfl(offs_t offset)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		data &= slot->xmemfl_r(offset);
+		data &= slot.xmemfl_r(offset);
 	}
 
 	return data;
@@ -397,12 +379,10 @@ UINT8 abc890_t::abcbus_xmemfl(offs_t offset)
 //  abcbus_xmemw - extended memory write
 //-------------------------------------------------
 
-void abc890_t::abcbus_xmemw(offs_t offset, UINT8 data)
+void abc890_t::abcbus_xmemw(offs_t offset, uint8_t data)
 {
-	abcbus_slot_device_iterator iter(*this);
-
-	for (abcbus_slot_t *slot = iter.first(); slot != nullptr; slot = iter.next())
+	for (abcbus_slot_t &slot : abcbus_slot_device_iterator(*this))
 	{
-		slot->xmemw_w(offset, data);
+		slot.xmemw_w(offset, data);
 	}
 }

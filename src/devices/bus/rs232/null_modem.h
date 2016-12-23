@@ -11,10 +11,11 @@ class null_modem_device : public device_t,
 	public device_rs232_port_interface
 {
 public:
-	null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	null_modem_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual WRITE_LINE_MEMBER( input_txd ) override { device_serial_interface::rx_w(state); }
+	virtual WRITE_LINE_MEMBER( input_rts ) override { m_rts = state; }
 
 	DECLARE_WRITE_LINE_MEMBER(update_serial);
 
@@ -41,11 +42,13 @@ private:
 	required_ioport m_rs232_databits;
 	required_ioport m_rs232_parity;
 	required_ioport m_rs232_stopbits;
+	required_ioport m_flow;
 
-	UINT8 m_input_buffer[1000];
-	UINT32 m_input_count;
-	UINT32 m_input_index;
+	uint8_t m_input_buffer[1000];
+	uint32_t m_input_count;
+	uint32_t m_input_index;
 	emu_timer *m_timer_poll;
+	int m_rts;
 };
 
 extern const device_type NULL_MODEM;

@@ -23,7 +23,7 @@ public:
 	required_device<atari_vad_device> m_vad;
 	required_device<cpu_device> m_extra;
 
-	UINT8           m_alpha_tile_bank;
+	uint8_t           m_alpha_tile_bank;
 	virtual void update_interrupts() override;
 	DECLARE_READ16_MEMBER(special_port2_r);
 	DECLARE_WRITE16_MEMBER(latch_w);
@@ -34,7 +34,7 @@ public:
 	DECLARE_MACHINE_START(thunderj);
 	DECLARE_MACHINE_RESET(thunderj);
 	DECLARE_VIDEO_START(thunderj);
-	UINT32 screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_thunderj(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	static const atari_motion_objects_config s_mob_config;
 };

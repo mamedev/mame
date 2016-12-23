@@ -12,7 +12,7 @@
 #define __PLAPARSE_H__
 
 #include "osdcore.h"
-
+#include "jedparse.h"
 
 
 /***************************************************************************

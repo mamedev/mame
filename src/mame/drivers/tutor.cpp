@@ -261,7 +261,7 @@ void tutor_state::machine_reset()
 	m_centronics_busy = 0;
 
 	// Enable auto wait states by lowering READY during reset
-	m_maincpu->set_ready(CLEAR_LINE);
+	m_maincpu->ready_line(CLEAR_LINE);
 }
 
 /*
@@ -281,7 +281,7 @@ void tutor_state::machine_reset()
 READ8_MEMBER( tutor_state::key_r )
 {
 	char port[12];
-	UINT8 value;
+	uint8_t value;
 
 	snprintf(port, ARRAY_LENGTH(port), "LINE%d", offset);
 	value = ioport(port)->read();

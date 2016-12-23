@@ -20,7 +20,7 @@ class MemoryWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	MemoryWindow(running_machine* machine, QWidget* parent=NULL);
+	MemoryWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~MemoryWindow();
 
 
@@ -56,7 +56,7 @@ class DebuggerMemView : public DebuggerView
 public:
 	DebuggerMemView(const debug_view_type& type,
 					running_machine* machine,
-					QWidget* parent=NULL)
+					QWidget* parent=nullptr)
 		: DebuggerView(type, machine, parent)
 	{}
 	virtual ~DebuggerMemView() {}
@@ -91,8 +91,8 @@ public:
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
-	void addToXmlDataNode(xml_data_node* node) const;
-	void recoverFromXmlNode(xml_data_node* node);
+	void addToXmlDataNode(util::xml::data_node &node) const;
+	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 

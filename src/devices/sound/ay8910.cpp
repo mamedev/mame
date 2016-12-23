@@ -239,6 +239,7 @@ has twice the steps, happening twice as fast.
  *************************************/
 
 #define ENABLE_REGISTER_TEST        (0)     /* Enable preprogrammed registers */
+#define LOG_IGNORED_WRITES          (0)
 
 #define MAX_OUTPUT 0x7fff
 
@@ -431,7 +432,7 @@ static const ay8910_device::mosfet_param ay8910_mosfet_param =
  *
  *************************************/
 
-static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, INT32 *tab)
+static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *par, const ay8910_device::ay_ym_param *par_env, int normalize, double factor, int zero_is_off, int32_t *tab)
 {
 	double min = 10.0,  max = 0.0;
 
@@ -490,7 +491,7 @@ static inline void build_3D_table(double rl, const ay8910_device::ay_ym_param *p
 	/* for (e=0;e<16;e++) printf("%d %d\n",e<<10, tab[e<<10]); */
 }
 
-static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, INT32 *tab, int zero_is_off)
+static inline void build_single_table(double rl, const ay8910_device::ay_ym_param *par, int normalize, int32_t *tab, int zero_is_off)
 {
 	int j;
 	double rt;
@@ -529,7 +530,7 @@ static inline void build_single_table(double rl, const ay8910_device::ay_ym_para
 
 }
 
-static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, INT32 *tab)
+static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param &par, const double rd, int32_t *tab)
 {
 	int j;
 
@@ -553,7 +554,7 @@ static inline void build_mosfet_resistor_table(const ay8910_device::mosfet_param
 }
 
 
-UINT16 ay8910_device::mix_3D()
+uint16_t ay8910_device::mix_3D()
 {
 	int indx = 0, chan;
 
@@ -603,10 +604,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			/* No action required */
 			break;
 		case AY_ECOARSE:
-			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("ECoarse");
-			#endif
+				osd_printf_verbose("ECoarse\n");
 			/* No action required */
 			break;
 		case AY_ENABLE:
@@ -628,10 +627,8 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 			m_last_enable = m_regs[AY_ENABLE];
 			break;
 		case AY_ESHAPE:
-			#ifdef MAME_DEBUG
 			if ( (v & 0x0f) > 0)
-				popmessage("EShape");
-			#endif
+				osd_printf_verbose("EShape\n");
 			m_attack = (m_regs[AY_ESHAPE] & 0x04) ? m_env_step_mask : 0x00;
 			if ((m_regs[AY_ESHAPE] & 0x08) == 0)
 			{
@@ -654,11 +651,13 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_a_write_cb.isnull())
 					m_port_a_write_cb((offs_t)0, m_regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port A\n",m_regs[AY_PORTA],tag());
+					logerror("warning: unmapped write %02x to %s Port A\n", v, name());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",tag());
+#if LOG_IGNORED_WRITES
+				logerror("warning: write %02x to %s Port A set as input - ignored\n", v, name());
+#endif
 			}
 			break;
 		case AY_PORTB:
@@ -667,11 +666,13 @@ void ay8910_device::ay8910_write_reg(int r, int v)
 				if (!m_port_b_write_cb.isnull())
 					m_port_b_write_cb((offs_t)0, m_regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 '%s' Port B\n",m_regs[AY_PORTB],tag());
+					logerror("warning: unmapped write %02x to %s Port B\n", v, name());
 			}
 			else
 			{
-				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",tag());
+#if LOG_IGNORED_WRITES
+				logerror("warning: write %02x to %s Port B set as input - ignored\n", v, name());
+#endif
 			}
 			break;
 	}
@@ -816,7 +817,7 @@ void ay8910_device::build_mixer_table()
 
 	if ((m_flags & AY8910_LEGACY_OUTPUT) != 0)
 	{
-		logerror("AY-3-8910/YM2149 using legacy output levels!\n");
+		logerror("%s using legacy output levels!\n", name());
 		normalize = 1;
 	}
 
@@ -851,6 +852,7 @@ void ay8910_device::build_mixer_table()
 
 void ay8910_device::ay8910_statesave()
 {
+	save_item(NAME(m_active));
 	save_item(NAME(m_register_latch));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_last_enable));
@@ -893,7 +895,7 @@ void ay8910_device::device_start()
 
 	if ((m_flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
-		logerror("%s device '%s' using single output!\n", name(), tag());
+		logerror("%s device using single output!\n", name());
 		m_streams = 1;
 	}
 
@@ -919,6 +921,7 @@ void ay8910_device::ay8910_reset_ym()
 {
 	int i;
 
+	m_active = false;
 	m_register_latch = 0;
 	m_rng = 1;
 	m_output[0] = 0;
@@ -966,33 +969,43 @@ void ay8910_device::ay_set_clock(int clock)
 	m_channel->set_sample_rate( clock / 8 );
 }
 
-void ay8910_device::ay8910_write_ym(int addr, int data)
+void ay8910_device::ay8910_write_ym(int addr, uint8_t data)
 {
 	if (addr & 1)
-	{   /* Data port */
-		int r = m_register_latch;
-
-		if (r > 15) return;
-		if (r == AY_ESHAPE || m_regs[r] != data)
+	{
+		if (m_active)
 		{
-			/* update the output buffer before changing the register */
-			m_channel->update();
-		}
+			/* Data port */
+			if (m_register_latch == AY_ESHAPE || m_regs[m_register_latch] != data)
+			{
+				/* update the output buffer before changing the register */
+				m_channel->update();
+			}
 
-		ay8910_write_reg(r,data);
+			ay8910_write_reg(m_register_latch, data);
+		}
 	}
 	else
-	{   /* Register port */
-		m_register_latch = data & 0x0f;
+	{
+		m_active = (data >> 4) == 0; // mask programmed 4-bit code
+		if (m_active)
+		{
+			/* Register port */
+			m_register_latch = data & 0x0f;
+		}
+		else
+		{
+			logerror("%s: warning - %s upper address mismatch\n", machine().describe_context(), name());
+		}
 	}
 }
 
-int ay8910_device::ay8910_read_ym()
+uint8_t ay8910_device::ay8910_read_ym()
 {
 	device_type chip_type = type();
 	int r = m_register_latch;
 
-	if (r > 15) return 0;
+	if (!m_active) return 0xff; // high impedance
 
 	/* There are no state dependent register in the AY8910! */
 	/* m_channel->update(); */
@@ -1001,7 +1014,7 @@ int ay8910_device::ay8910_read_ym()
 	{
 	case AY_PORTA:
 		if ((m_regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 '%s' Port A set as output\n",tag());
+			logerror("%s: warning - read from %s Port A set as output\n", machine().describe_context(), name());
 		/*
 		   even if the port is set as output, we still need to return the external
 		   data. Some games, like kidniki, need this to work.
@@ -1015,15 +1028,15 @@ int ay8910_device::ay8910_read_ym()
 		if (!m_port_a_read_cb.isnull())
 			m_regs[AY_PORTA] = m_port_a_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port A\n",machine().describe_context(),tag());
+			logerror("%s: warning - read 8910 Port A\n", machine().describe_context());
 		break;
 	case AY_PORTB:
 		if ((m_regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 '%s' Port B set as output\n",tag());
+			logerror("%s: warning - read from 8910 Port B set as output\n", machine().describe_context());
 		if (!m_port_b_read_cb.isnull())
 			m_regs[AY_PORTB] = m_port_b_read_cb(0);
 		else
-			logerror("%s: warning - read 8910 '%s' Port B\n",machine().describe_context(),tag());
+			logerror("%s: warning - read 8910 Port B\n", machine().describe_context());
 		break;
 	}
 
@@ -1031,13 +1044,20 @@ int ay8910_device::ay8910_read_ym()
 	Untested chips are assumed to regard them as 'ram'
 	Tested and confirmed on hardware:
 	- AY-3-8910: inaccessible bits (see masks below) read back as 0
+	- AY-3-8914: same as 8910 except regs B,C,D (8,9,A below due to 8910->8914 remapping) are 0x3f
+	- AY-3-8916/8917 (used on ECS INTV expansion): inaccessible bits mirror one of the i/o ports, needs further testing
 	- YM2149: no anomaly
 	*/
 	if (chip_type == AY8910) {
-		const UINT8 mask[0x10]={
+		const uint8_t mask[0x10]={
 			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x1f,0x1f,0x1f,0xff,0xff,0x0f,0xff,0xff
 		};
-
+		return m_regs[r] & mask[r];
+	}
+	else if (chip_type == AY8914) {
+		const uint8_t mask[0x10]={
+			0xff,0x0f,0xff,0x0f,0xff,0x0f,0x1f,0xff,0x3f,0x3f,0x3f,0xff,0xff,0x0f,0xff,0xff
+		};
 		return m_regs[r] & mask[r];
 	}
 	else return m_regs[r];
@@ -1108,9 +1128,9 @@ static const int mapping8914to8910[16] = { 0, 2, 4, 11, 1, 3, 5, 12, 7, 6, 13, 8
 
 READ8_MEMBER( ay8914_device::read )
 {
-	UINT16 rv;
+	uint16_t rv;
 	address_w(space, 0, mapping8914to8910[offset & 0xf]);
-	rv = (UINT16) data_r(space, 0);
+	rv = (uint16_t) data_r(space, 0);
 	return rv;
 }
 
@@ -1124,7 +1144,7 @@ WRITE8_MEMBER( ay8914_device::write )
 
 const device_type AY8910 = &device_creator<ay8910_device>;
 
-ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AY8910, "AY-3-8910A", tag, owner, clock, "ay8910", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_type(PSG_TYPE_AY),
@@ -1132,6 +1152,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 		m_ioports(2),
 		m_ready(0),
 		m_channel(nullptr),
+		m_active(false),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1165,7 +1186,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, const char *tag, dev
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
 }
 
-ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock,
+ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock,
 								psg_type_t psg_type, int streams, int ioports, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_sound_interface(mconfig, *this),
@@ -1174,6 +1195,7 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 		m_ioports(ioports),
 		m_ready(0),
 		m_channel(nullptr),
+		m_active(false),
 		m_register_latch(0),
 		m_last_enable(0),
 		m_prescale_noise(0),
@@ -1205,11 +1227,34 @@ ay8910_device::ay8910_device(const machine_config &mconfig, device_type type, co
 	memset(&m_env_table,0,sizeof(m_env_table));
 	memset(&m_vol3d_table,0,sizeof(m_vol3d_table));
 	m_res_load[0] = m_res_load[1] = m_res_load[2] = 1000; //Default values for resistor loads
+
+	set_type(psg_type);
+}
+
+void ay8910_device::set_type(psg_type_t psg_type)
+{
+	m_type = psg_type;
+	if (psg_type == PSG_TYPE_AY)
+	{
+		m_env_step_mask = 0x0f;
+		m_step = 2;
+		m_zero_is_off = 1;
+		m_par = &ay8910_param;
+		m_par_env = &ay8910_param;
+	}
+	else
+	{
+		m_env_step_mask = 0x1f;
+		m_step = 1;
+		m_zero_is_off = 0;
+		m_par = &ym2149_param;
+		m_par_env = &ym2149_param_env;
+	}
 }
 
 const device_type AY8912 = &device_creator<ay8912_device>;
 
-ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8912, "AY-3-8912A", tag, owner, clock, PSG_TYPE_AY, 3, 1, "ay8912", __FILE__)
 {
 }
@@ -1217,7 +1262,7 @@ ay8912_device::ay8912_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type AY8913 = &device_creator<ay8913_device>;
 
-ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8913, "AY-3-8913A", tag, owner, clock, PSG_TYPE_AY, 3, 0, "ay8913", __FILE__)
 {
 }
@@ -1225,7 +1270,7 @@ ay8913_device::ay8913_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type AY8914 = &device_creator<ay8914_device>;
 
-ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8914, "AY-3-8914", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8914", __FILE__)
 {
 }
@@ -1233,7 +1278,7 @@ ay8914_device::ay8914_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type AY8930 = &device_creator<ay8930_device>;
 
-ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, AY8930, "AY8930", tag, owner, clock, PSG_TYPE_AY, 3, 2, "ay8930", __FILE__)
 {
 }
@@ -1241,7 +1286,7 @@ ay8930_device::ay8930_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type YM2149 = &device_creator<ym2149_device>;
 
-ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM2149, "YM2149", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym2149", __FILE__)
 {
 }
@@ -1249,7 +1294,7 @@ ym2149_device::ym2149_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type YM3439 = &device_creator<ym3439_device>;
 
-ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YM3439, "YM3439", tag, owner, clock, PSG_TYPE_YM, 3, 2, "ym3429", __FILE__)
 {
 }
@@ -1257,7 +1302,7 @@ ym3439_device::ym3439_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type YMZ284 = &device_creator<ymz284_device>;
 
-ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ284, "YMZ284", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz284", __FILE__)
 {
 }
@@ -1265,7 +1310,7 @@ ymz284_device::ymz284_device(const machine_config &mconfig, const char *tag, dev
 
 const device_type YMZ294 = &device_creator<ymz294_device>;
 
-ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ymz294_device::ymz294_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ay8910_device(mconfig, YMZ294, "YMZ294", tag, owner, clock, PSG_TYPE_YM, 1, 0, "ymz294", __FILE__)
 {
 }

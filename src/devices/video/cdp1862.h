@@ -70,7 +70,7 @@ class cdp1862_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1862_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_rd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_rd.set_callback(object); }
 	template<class _Object> static devcb_base &set_bd_rd_callback(device_t &device, _Object object) { return downcast<cdp1862_device &>(device).m_read_bd.set_callback(object); }
@@ -83,7 +83,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( bkg_w );
 	DECLARE_WRITE_LINE_MEMBER( con_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides

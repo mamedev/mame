@@ -48,7 +48,7 @@ int nc_state::card_calculate_mask(int size)
 // load pcmcia card data
 DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 {
-	UINT32 size = m_card->common_get_size("rom");
+	uint32_t size = m_card->common_get_size("rom");
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
@@ -56,7 +56,7 @@ DEVICE_IMAGE_LOAD_MEMBER( nc_state, nc_pcmcia_card )
 	set_card_present_state(1);
 	m_membank_card_ram_mask = card_calculate_mask(size);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 

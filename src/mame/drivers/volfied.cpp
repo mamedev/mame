@@ -201,17 +201,6 @@ static GFXDECODE_START( volfied )
 GFXDECODE_END
 
 
-/**************************************************************
-                YM2203 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-
-WRITE_LINE_MEMBER(volfied_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***********************************************************
                 MACHINE DRIVERS
 ***********************************************************/
@@ -260,7 +249,7 @@ static MACHINE_CONFIG_START( volfied, volfied_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(volfied_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWA"))
 	MCFG_AY8910_PORT_B_READ_CB(IOPORT("DSWB"))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)

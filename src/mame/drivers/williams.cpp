@@ -501,13 +501,10 @@ Reference video: https://www.youtube.com/watch?v=R5OeC6Wc_yI
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "cpu/m6800/m6800.h"
-#include "sound/dac.h"
-#include "sound/hc55516.h"
-#include "machine/ticket.h"
 #include "includes/williams.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 
 #define MASTER_CLOCK        (XTAL_12MHz)
@@ -1453,6 +1450,8 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams_state, williams_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("240_timer", williams_state, williams_count240_callback)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE | VIDEO_ALWAYS_UPDATE)
@@ -1462,10 +1461,10 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_VIDEO_START_OVERRIDE(williams_state,williams)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // mc1408.ic6
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1479,7 +1478,7 @@ static MACHINE_CONFIG_START( williams, williams_state )
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state, williams_main_irq))
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 MACHINE_CONFIG_END
@@ -1559,7 +1558,7 @@ static MACHINE_CONFIG_DERIVED( sinistar, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
@@ -1581,7 +1580,7 @@ static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* sound hardware */
 	MCFG_SOUND_ADD("cvsd", HC55516, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8)
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_1")
@@ -1627,20 +1626,25 @@ static MACHINE_CONFIG_DERIVED( blaster, blastkit )
 	MCFG_DEVICE_MODIFY("pia_1")
 	MCFG_PIA_WRITEPB_HANDLER(WRITE8(blaster_state, blaster_snd_cmd_w))
 
+	MCFG_DEVICE_MODIFY("pia_2")
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("ldac", dac_byte_interface, write))
+
 	MCFG_DEVICE_ADD("pia_2b", PIA6821, 0)
-	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("wmsdac_b", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("rdac", dac_byte_interface, write))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(blaster_state,williams_snd_irq_b))
 
 	/* sound hardware */
-	MCFG_DEVICE_REMOVE("wmsdac")
-	MCFG_DEVICE_REMOVE("mono")
+	MCFG_DEVICE_REMOVE("speaker")
+	MCFG_DEVICE_REMOVE("dac")
+	MCFG_DEVICE_REMOVE("vref")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_DAC_ADD("wmsdac_b")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ldac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("rdac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1667,6 +1671,8 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 	MCFG_TIMER_DRIVER_ADD("scan_timer", williams2_state, williams2_va11_callback)
 	MCFG_TIMER_DRIVER_ADD("254_timer", williams2_state, williams2_endscreen_callback)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_PALETTE_ADD("palette", 1024)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", williams2)
@@ -1679,10 +1685,10 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 	MCFG_VIDEO_START_OVERRIDE(williams2_state,williams2)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("wmsdac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", MC1408, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* pia */
 	MCFG_DEVICE_ADD("pia_0", PIA6821, 0)
@@ -1699,7 +1705,7 @@ static MACHINE_CONFIG_START( williams2, williams2_state )
 
 	MCFG_DEVICE_ADD("pia_2", PIA6821, 0)
 	MCFG_PIA_WRITEPA_HANDLER(DEVWRITE8("pia_1", pia6821_device, portb_w))
-	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("wmsdac", dac_device, write_unsigned8))
+	MCFG_PIA_WRITEPB_HANDLER(DEVWRITE8("dac", dac_byte_interface, write))
 	MCFG_PIA_CA2_HANDLER(DEVWRITELINE("pia_1", pia6821_device, cb1_w))
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_snd_irq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams_state,williams_snd_irq))
@@ -1712,7 +1718,7 @@ static MACHINE_CONFIG_DERIVED( mysticm, williams2 )
 
 	/* pia */
 	MCFG_DEVICE_MODIFY("pia_0")
-	MCFG_PIA_CA2_HANDLER(NULL)
+	MCFG_PIA_CA2_HANDLER(NOOP)
 	MCFG_PIA_IRQA_HANDLER(WRITELINE(williams_state,williams_main_firq))
 	MCFG_PIA_IRQB_HANDLER(WRITELINE(williams2_state,mysticm_main_irq))
 
@@ -1750,8 +1756,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( joust2, williams2, joust2_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(williams2_d000_rom_map)
 
-	MCFG_WILLIAMS_CVSD_SOUND_ADD("cvsd")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("cvsd", WILLIAMS_CVSD_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_MACHINE_START_OVERRIDE(joust2_state,joust2)
 	MCFG_MACHINE_RESET_OVERRIDE(joust2_state,joust2)
@@ -2163,6 +2169,79 @@ ROM_START( robotronyo )
 	ROM_LOAD( "robotron.yo6", 0x15000, 0x1000, CRC(028181a6) SHA1(41c4d9ece2ae8a103b7151fc4ff576796303318d) )
 	ROM_LOAD( "robotron.yo7", 0x16000, 0x1000, CRC(4dfcceae) SHA1(46fe1b1162d6054eb502852d065fc2e8c694b09d) )
 	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+ROM_END
+
+ROM_START( robotron87 )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "robotron.sba", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
+	ROM_LOAD( "fixrobo.sbb",  0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
+	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "robotron.sb3", 0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
+	ROM_LOAD( "robotron.sb4", 0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
+	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
+	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "robotron.sb7", 0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
+	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+
+//  ROM_REGION( 0x800, "patch", 0 ) // the bugfix was distributed as the following patches, we don't need them for emulation, but list them here for reference.
+//  ROM_LOAD( "fixrobo1.pat",   0x000, 0x6d1, CRC(38f81254) SHA1(7ea140c08bfd9947a7f3e769b24d5e8351525e4f) )
+//  ROM_LOAD( "fixrobo2.pat",   0x000, 0x6ae, CRC(61912101) SHA1(bb52db08301ac38268f6ae71e7002730022de1c8) )
+ROM_END
+
+ROM_START( robotron12 )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "robotron.sba", 0x0d000, 0x1000, CRC(13797024) SHA1(d426a50e75dabe936de643c83a548da5e399331c) )
+	ROM_LOAD( "fixrobo.sbb",  0x0e000, 0x1000, CRC(e83a2eda) SHA1(4a62fcd2f91dfb609c3d2c300bd9e6cb60edf52e) ) //
+	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "wave201.sb3",  0x12000, 0x1000, CRC(85eb583e) SHA1(b6c4280415515de6f56b358206dc3bd93a12bfce) ) // wave201 patch
+	ROM_LOAD( "robotron.sb4", 0x13000, 0x1000, CRC(afb1c561) SHA1(aaf89c19fd8f4e8750717169eb1af476aef38a5e) )
+	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
+	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "robotron.sb7", 0x16000, 0x1000, CRC(49ac400c) SHA1(06eae5138254723819a5e93cfd9e9f3285fcddf5) )
+	ROM_LOAD( "robotron.sb8", 0x17000, 0x1000, CRC(3a96e88c) SHA1(7ae38a609ed9a6f62ca003cab719740ed7651b7c) )
+	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "robotron.snd", 0xf000, 0x1000, CRC(c56c1d28) SHA1(15afefef11bfc3ab78f61ab046701db78d160ec3) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "decoder.4",   0x0000, 0x0200, CRC(e6631c23) SHA1(9988723269367fb44ef83f627186a1c88cf7877e) )
+	ROM_LOAD( "decoder.6",   0x0200, 0x0200, CRC(83faf25e) SHA1(30002643d08ed983a6701a7c4b5ee74a2f4a1adb) )
+ROM_END
+
+ROM_START( robotrontd )
+	ROM_REGION( 0x19000, "maincpu", 0 )
+	ROM_LOAD( "tiedie.sba",   0x0d000, 0x1000, CRC(952bea55) SHA1(80f51d8e7ec62518afad7e56a47e0756f83f813c) ) //
+	ROM_LOAD( "tiedie.sbb",   0x0e000, 0x1000, CRC(4c05fd3c) SHA1(0d727458454826fd8222e4022b755d686ccb065f) ) //
+	ROM_LOAD( "robotron.sbc", 0x0f000, 0x1000, CRC(645d543e) SHA1(fad7cea868ebf17347c4bc5193d647bbd8f9517b) )
+	ROM_LOAD( "robotron.sb1", 0x10000, 0x1000, CRC(66c7d3ef) SHA1(f6d60e26c209c1df2cc01ac07ad5559daa1b7118) )
+	ROM_LOAD( "robotron.sb2", 0x11000, 0x1000, CRC(5bc6c614) SHA1(4d6e82bc29f49100f7751ccfc6a9ff35695b84b3) )
+	ROM_LOAD( "robotron.sb3", 0x12000, 0x1000, CRC(e99a82be) SHA1(06a8c8dd0b4726eb7f0bb0e89c8533931d75fc1c) )
+	ROM_LOAD( "tiedie.sb4",   0x13000, 0x1000, CRC(e8238019) SHA1(0ce29f4bf6bdee677c8e80c2d5e66fc556ba349f) ) //
+	ROM_LOAD( "fixrobo.sb5",  0x14000, 0x1000, CRC(827cb5c9) SHA1(1732d16cd88e0662f1cffce1aeda5c8aa8c31338) ) //
+	ROM_LOAD( "robotron.sb6", 0x15000, 0x1000, CRC(bd2c853d) SHA1(f76ec5432a7939b33a27be1c6855e2dbe6d9fdc8) )
+	ROM_LOAD( "tiedie.sb7",   0x16000, 0x1000, CRC(3ecf4620) SHA1(3c670a1f8df35d18451c82f220a02448bf5ef5ac) ) //
+	ROM_LOAD( "tiedie.sb8",   0x17000, 0x1000, CRC(752d7a46) SHA1(85dd58d14d527ca75d6c546d6271bf8ee5a82c8c) ) //
 	ROM_LOAD( "robotron.sb9", 0x18000, 0x1000, CRC(b124367b) SHA1(fd9d75b866f0ebbb723f84889337e6814496a103) )
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -2657,6 +2736,11 @@ ROM_START( mysticm )
 	ROM_LOAD( "mm20_1.b57", 0x00000, 0x2000, CRC(5c0f4f46) SHA1(7dedbbeda2f34a2eac9fb14277874d9d66f468c7) ) /* IC57 */
 	ROM_LOAD( "mm21_1.b58", 0x02000, 0x2000, CRC(cb90b3c5) SHA1(f28cca2c3ff23d6c9e2952a1b08ab2875655ec70) ) /* IC58 */
 	ROM_LOAD( "mm19_1.b41", 0x04000, 0x2000, CRC(e274df86) SHA1(9876a487c5efa350ced31acbc39df22c8d414677) ) /* IC41 */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* not hooked up */
+	ROM_LOAD( "ic14.bpr",   0x00000,  0x020, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7) )
+	ROM_LOAD( "ic47.bpr",   0x00000,  0x100, CRC(efb03024) SHA1(4c3e3de374f7959a03dcfcb8a29a372685f3b273) )
+	ROM_LOAD( "ic60.bpr",   0x00000,  0x200, CRC(0ea3f7fb) SHA1(a8a2a7fbc1a3527a8e2cda71d737afaa717902f1) )
 ROM_END
 
 ROM_START( mysticmp )
@@ -2694,40 +2778,43 @@ ROM_START( mysticmp )
 ROM_END
 
 
-
-
 ROM_START( tshoot )
 	ROM_REGION( 0x50000, "maincpu", 0 )
-	ROM_LOAD( "rom18.cpu", 0x0d000, 0x1000, CRC(effc33f1) SHA1(cd1b16b4a4a46ce9d550d10b465b8cf1ab3c5273) )  /* IC55 */
-	ROM_LOAD( "rom2.cpu",  0x0e000, 0x1000, CRC(fd982687) SHA1(70be1ea57ea0a1e75b1bd988492a9c0244e8b91f) )  /* IC9  */
-	ROM_LOAD( "rom3.cpu",  0x0f000, 0x1000, CRC(9617054d) SHA1(8795b97a6391aa3804f68dc2d2b33866dc17f34c) )  /* IC10 */
+	ROM_LOAD( "rom18.ic55", 0x0d000, 0x1000, CRC(effc33f1) SHA1(cd1b16b4a4a46ce9d550d10b465b8cf1ab3c5273) )  /* IC55 */
+	ROM_LOAD( "rom2.ic9",   0x0e000, 0x1000, CRC(fd982687) SHA1(70be1ea57ea0a1e75b1bd988492a9c0244e8b91f) )  /* IC9  */
+	ROM_LOAD( "rom3.ic10",  0x0f000, 0x1000, CRC(9617054d) SHA1(8795b97a6391aa3804f68dc2d2b33866dc17f34c) )  /* IC10 */
 
-	ROM_LOAD( "rom11.cpu", 0x10000, 0x2000, CRC(60d5fab8) SHA1(fe75e46dedb7ca153470d6a39cea0a721e5b7b39) )  /* IC18 */
-	ROM_LOAD( "rom9.cpu",  0x12000, 0x2000, CRC(a4dd4a0e) SHA1(bb2f38c5ef2f3398b6ba605ffa0c30c89387bf14) )  /* IC16 */
-	ROM_LOAD( "rom7.cpu",  0x14000, 0x2000, CRC(f25505e6) SHA1(d075ff89b6379ad7a47d9723ed1c21468b9d1dae) )  /* IC14 */
-	ROM_LOAD( "rom5.cpu",  0x16000, 0x2000, CRC(94a7c0ed) SHA1(11f46e1ca7d79b4244ea0f60e0fba44186f1ebde) )  /* IC12 */
+	ROM_LOAD( "rom11.ic18", 0x10000, 0x2000, CRC(60d5fab8) SHA1(fe75e46dedb7ca153470d6a39cea0a721e5b7b39) )  /* IC18 */
+	ROM_LOAD( "rom9.ic16",  0x12000, 0x2000, CRC(a4dd4a0e) SHA1(bb2f38c5ef2f3398b6ba605ffa0c30c89387bf14) )  /* IC16 */
+	ROM_LOAD( "rom7.ic14",  0x14000, 0x2000, CRC(f25505e6) SHA1(d075ff89b6379ad7a47d9723ed1c21468b9d1dae) )  /* IC14 */
+	ROM_LOAD( "rom5.ic12",  0x16000, 0x2000, CRC(94a7c0ed) SHA1(11f46e1ca7d79b4244ea0f60e0fba44186f1ebde) )  /* IC12 */
 
-	ROM_LOAD( "rom17.cpu", 0x20000, 0x2000, CRC(b02d1ccd) SHA1(b08b6d9affb6f3e50a11fd9397fe4255927de3b6) )  /* IC26 */
-	ROM_LOAD( "rom15.cpu", 0x22000, 0x2000, CRC(11709935) SHA1(ae25bbadbbcab9f3cba2bb4bb92d5217705b38e3) )  /* IC24 */
+	ROM_LOAD( "rom17.ic26", 0x20000, 0x2000, CRC(b02d1ccd) SHA1(b08b6d9affb6f3e50a11fd9397fe4255927de3b6) )  /* IC26 */
+	ROM_LOAD( "rom15.ic24", 0x22000, 0x2000, CRC(11709935) SHA1(ae25bbadbbcab9f3cba2bb4bb92d5217705b38e3) )  /* IC24 */
 
-	ROM_LOAD( "rom10.cpu", 0x30000, 0x2000, CRC(0f32bad8) SHA1(7a2f559697d252ceec3a2f55fe51bc755e4bb65a) )  /* IC17 */
-	ROM_LOAD( "rom8.cpu",  0x32000, 0x2000, CRC(e9b6cbf7) SHA1(6cd6b1e1c5e8e253e779afff8ad1ff90d6116fc9) )  /* IC15 */
-	ROM_LOAD( "rom6.cpu",  0x34000, 0x2000, CRC(a49f617f) SHA1(759d25e33a09204664880329b86724805a1fe0e8) )  /* IC13 */
-	ROM_LOAD( "rom4.cpu",  0x36000, 0x2000, CRC(b026dc00) SHA1(8a068997aa19e152d64db47528893046d338389c) )  /* IC11 */
+	ROM_LOAD( "rom10.ic17", 0x30000, 0x2000, CRC(0f32bad8) SHA1(7a2f559697d252ceec3a2f55fe51bc755e4bb65a) )  /* IC17 */
+	ROM_LOAD( "rom8.ic15",  0x32000, 0x2000, CRC(e9b6cbf7) SHA1(6cd6b1e1c5e8e253e779afff8ad1ff90d6116fc9) )  /* IC15 */
+	ROM_LOAD( "rom6.ic13",  0x34000, 0x2000, CRC(a49f617f) SHA1(759d25e33a09204664880329b86724805a1fe0e8) )  /* IC13 */
+	ROM_LOAD( "rom4.ic11",  0x36000, 0x2000, CRC(b026dc00) SHA1(8a068997aa19e152d64db47528893046d338389c) )  /* IC11 */
 
-	ROM_LOAD( "rom16.cpu", 0x40000, 0x2000, CRC(69ce38f8) SHA1(a2cd678e71bfa5e6a3594d8699660c7fa8b52001) )  /* IC25 */
-	ROM_LOAD( "rom14.cpu", 0x42000, 0x2000, CRC(769a4ae5) SHA1(1cdfae2d889848d69f68f990714d027cfbca1853) )  /* IC23 */
-	ROM_LOAD( "rom13.cpu", 0x44000, 0x2000, CRC(ec016c9b) SHA1(f2e40abd14b8b4944b792dd453ebe92eb64355ae) )  /* IC21 */
-	ROM_LOAD( "rom12.cpu", 0x46000, 0x2000, CRC(98ae7afa) SHA1(6a904408419f576352bd2f895727fd17c0541ff8) )  /* IC19 */
+	ROM_LOAD( "rom16.ic25", 0x40000, 0x2000, CRC(69ce38f8) SHA1(a2cd678e71bfa5e6a3594d8699660c7fa8b52001) )  /* IC25 */
+	ROM_LOAD( "rom14.ic23", 0x42000, 0x2000, CRC(769a4ae5) SHA1(1cdfae2d889848d69f68f990714d027cfbca1853) )  /* IC23 */
+	ROM_LOAD( "rom13.ic21", 0x44000, 0x2000, CRC(ec016c9b) SHA1(f2e40abd14b8b4944b792dd453ebe92eb64355ae) )  /* IC21 */
+	ROM_LOAD( "rom12.ic19", 0x46000, 0x2000, CRC(98ae7afa) SHA1(6a904408419f576352bd2f895727fd17c0541ff8) )  /* IC19 */
 
 	/* sound CPU */
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rom1.cpu", 0xe000, 0x2000, CRC(011a94a7) SHA1(9f54a742a87ba56b9517e33e556f57dce6eb2eab) )    /* IC8  */
+	ROM_LOAD( "rom1.ic8",   0xe000, 0x2000, CRC(011a94a7) SHA1(9f54a742a87ba56b9517e33e556f57dce6eb2eab) )    /* IC8  */
 
 	ROM_REGION( 0x6000, "gfx1", 0 )
-	ROM_LOAD( "rom20.cpu", 0x00000, 0x2000, CRC(c6e1d253) SHA1(c408a29f75ba2958e229996f903400b3d95e3bd3) )  /* IC57 */
-	ROM_LOAD( "rom21.cpu", 0x02000, 0x2000, CRC(9874e90f) SHA1(85282823cc862341adf9642d2d5d05972da6dff0) )  /* IC58 */
-	ROM_LOAD( "rom19.cpu", 0x04000, 0x2000, CRC(b9ce4d2a) SHA1(af5332f340d3c3ae02e77923d6e8f0dd92547728) )  /* IC41 */
+	ROM_LOAD( "rom20.ic57", 0x00000, 0x2000, CRC(c6e1d253) SHA1(c408a29f75ba2958e229996f903400b3d95e3bd3) )  /* IC57 */
+	ROM_LOAD( "rom21.ic58", 0x02000, 0x2000, CRC(9874e90f) SHA1(85282823cc862341adf9642d2d5d05972da6dff0) )  /* IC58 */
+	ROM_LOAD( "rom19.ic41", 0x04000, 0x2000, CRC(b9ce4d2a) SHA1(af5332f340d3c3ae02e77923d6e8f0dd92547728) )  /* IC41 */
+
+	ROM_REGION( 0x200, "proms", 0 ) /* not hooked up */
+	ROM_LOAD( "82s123.ic14a", 0x00000, 0x020, CRC(27a6d555) SHA1(988d55092d7d0243a867986873dfd12be67280c7) )
+	ROM_LOAD( "82s129.ic47",  0x00000, 0x100, CRC(efb03024) SHA1(4c3e3de374f7959a03dcfcb8a29a372685f3b273) )
+	ROM_LOAD( "7649.ic60",    0x00000, 0x200, CRC(0ea3f7fb) SHA1(a8a2a7fbc1a3527a8e2cda71d737afaa717902f1) )
 ROM_END
 
 
@@ -2909,7 +2996,7 @@ DRIVER_INIT_MEMBER(williams_state,defender)
 
 DRIVER_INIT_MEMBER(williams_state,defndjeu)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
@@ -2925,7 +3012,8 @@ DRIVER_INIT_MEMBER(williams_state,mayday)
 	CONFIGURE_BLITTER(WILLIAMS_BLITTER_NONE, 0x0000);
 
 	/* install a handler to catch protection checks */
-	m_mayday_protection = m_maincpu->space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xa190, 0xa191, read8_delegate(FUNC(williams_state::mayday_protection_r),this));
+	m_mayday_protection = m_videoram + 0xa190;
 }
 
 
@@ -3079,41 +3167,65 @@ GAME( 1980, zero2,      defender, defender,       defender, williams_state, defn
 GAME( 1980, defcmnd,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Defense Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, defence,    defender, defender,       defender, williams_state, defender, ROT0,   "bootleg (Outer Limits)", "Defence Command (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, startrkd,   defender, defender,       defender, williams_state, defender, ROT0,   "bootleg", "Star Trek (Defender bootleg)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1980, mayday,     0,        defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 1)", MACHINE_SUPPORTS_SAVE ) // original by Hoei, which one of these 3 sets is bootleg/licensed/original is unknown
 GAME( 1980, maydaya,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, maydayb,    mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "Hoei", "Mayday (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, batlzone,   mayday,   defender,       mayday, williams_state,   mayday,   ROT0,   "bootleg (Video Game)", "Battle Zone (bootleg of Mayday)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1981, colony7,    0,        defender,       colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, colony7a,   colony7,  defender,       colony7, williams_state,  defender, ROT270, "Taito", "Colony 7 (set 2)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, jin,        0,        jin,            jin, williams_state,      defender, ROT90,  "Falcon", "Jin", MACHINE_SUPPORTS_SAVE )
+
+
 
 /* Standard Williams hardware */
 GAME( 1981, stargate,   0,        williams,       stargate, williams_state, stargate, ROT0,   "Williams / Vid Kidz", "Stargate", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, robotron,   0,        williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Solid Blue label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, robotronyo, robotron, williams,       robotron, williams_state, robotron, ROT0,   "Williams / Vid Kidz", "Robotron: 2084 (Yellow/Orange label)", MACHINE_SUPPORTS_SAVE )
+// the 3 below are all noteworthy hacks of the Solid BLue set
+GAME( 1987, robotron87, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (1987 'shot-in-the-corner' bugfix)", MACHINE_SUPPORTS_SAVE ) // fixes a reset bug.
+GAME( 2012, robotron12, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (2012 'wave 201 start' hack)", MACHINE_SUPPORTS_SAVE ) // includes sitc bug fix, used for competitive play.
+GAME( 2015, robotrontd, robotron, williams,       robotron, williams_state, robotron, ROT0,   "hack",                "Robotron: 2084 (2015 'tie-die V2' hack)", MACHINE_SUPPORTS_SAVE ) // inc. sitc fix, mods by some of the original developers, see backstory here http://www.robotron2084guidebook.com/gameplay/raceto100million/robo2k14_tie-die-romset/  (I guess there's a tie-die V1 before it was released to the public?)
+
 GAME( 1982, joust,      0,        williams_muxed, joust, williams_state,    joust,    ROT0,   "Williams", "Joust (White/Green label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustr,     joust,    williams_muxed, joust, williams_state,    joust,    ROT0,   "Williams", "Joust (Solid Red label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, joustwr,    joust,    williams_muxed, joust, williams_state,    joust,    ROT0,   "Williams", "Joust (White/Red label)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, bubbles,    0,        williams,       bubbles, williams_state,  bubbles,  ROT0,   "Williams", "Bubbles", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesr,   bubbles,  williams,       bubbles, williams_state,  bubbles,  ROT0,   "Williams", "Bubbles (Solid Red label)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, bubblesp,   bubbles,  williams,       bubbles, williams_state,  bubbles,  ROT0,   "Williams", "Bubbles (prototype version)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, splat,      0,        williams_muxed, splat, williams_state,    splat,    ROT0,   "Williams", "Splat!", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1982, sinistar,   0,        sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (revision 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistar1,  sinistar, sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (prototype version)", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, sinistar2,  sinistar, sinistar,       sinistar, williams_state, sinistar, ROT270, "Williams", "Sinistar (revision 2)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1983, playball,   0,        playball,       playball, williams_state, playball, ROT270, "Williams", "PlayBall! (prototype)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1983, blaster,    0,        blaster,        blaster, blaster_state,   blaster,  ROT0,   "Williams / Vid Kidz", "Blaster", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, blastero,   blaster,  blaster,        blaster, blaster_state,   blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (location test)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, blasterkit, blaster,  blastkit,       blastkit, blaster_state,  blaster,  ROT0,   "Williams / Vid Kidz", "Blaster (conversion kit)", MACHINE_SUPPORTS_SAVE ) // mono sound
+
 GAME( 1985, spdball,    0,        spdball,        spdball, williams_state,  spdball,  ROT0,   "Williams", "Speed Ball - Contest at Neonworld (prototype)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1985, alienar,    0,        williams_muxed, alienar, williams_state,  alienar,  ROT0,   "Duncan Brown", "Alien Arena", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, alienaru,   alienar,  williams_muxed, alienar, williams_state,  alienaru, ROT0,   "Duncan Brown", "Alien Arena (Stargate upgrade)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1987, lottofun,   0,        lottofun,       lottofun, williams_state, lottofun, ROT0,   "H.A.R. Management", "Lotto Fun", MACHINE_SUPPORTS_SAVE )
+
+
 
 /* 2nd Generation Williams hardware with tilemaps */
 GAME( 1983, mysticm,    0,        mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE)
 GAME( 1983, mysticmp,   mysticm,  mysticm,        mysticm, williams2_state, mysticm,  ROT0,   "Williams", "Mystic Marathon (prototype)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // newest roms are 'proto 6' ?
-GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1984, tshoot,     0,        tshoot,         tshoot, williams2_state,  tshoot,   ROT0,   "Williams", "Turkey Shoot (prototype)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1984, inferno,    0,        williams2,      inferno, williams2_state, inferno,  ROT0,   "Williams", "Inferno (Williams)", MACHINE_SUPPORTS_SAVE )
+
 GAME( 1986, joust2,     0,        joust2,         joust2, joust2_state,     joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, joust2r1,   joust2,   joust2,         joust2, joust2_state,     joust2,   ROT270, "Williams", "Joust 2 - Survival of the Fittest (revision 1)", MACHINE_SUPPORTS_SAVE )

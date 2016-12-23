@@ -87,11 +87,11 @@ protected:
 	virtual DECLARE_WRITE8_MEMBER( ff20_write ) override;
 
 private:
-	UINT8 m_just_reset;
+	uint8_t m_just_reset;
 
 	/* modem */
-	UINT8 modem_r(offs_t offset);
-	void modem_w(offs_t offset, UINT8 data);
+	uint8_t modem_r(offs_t offset);
+	void modem_w(offs_t offset, uint8_t data);
 };
 
 #endif /* __DGNALPHA__ */

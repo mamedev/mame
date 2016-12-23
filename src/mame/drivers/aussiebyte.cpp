@@ -17,7 +17,6 @@
     - Hard drive controllers and drives
     - Test Centronics printer
     - PIO connections
-    - RTC not working
 
     Note of MAME restrictions:
     - Votrax doesn't sound anything like the real thing
@@ -76,7 +75,7 @@ static ADDRESS_MAP_START( aussiebyte_io, AS_IO, 8, aussiebyte_state )
 	AM_RANGE(0x35, 0x35) AM_WRITE(port35_w) // data to vram and aram
 	AM_RANGE(0x36, 0x36) AM_READ(port36_r) // data from vram and aram
 	AM_RANGE(0x37, 0x37) AM_READ(port37_r) // read dispen flag
-	AM_RANGE(0x40, 0x4f) AM_DEVREADWRITE("rtc", msm5832_device, data_r, data_w)
+	AM_RANGE(0x40, 0x4f) AM_READWRITE(rtc_r, rtc_w)
 ADDRESS_MAP_END
 
 /***********************************************************
@@ -224,6 +223,32 @@ READ8_MEMBER( aussiebyte_state::port28_r )
 
 /***********************************************************
 
+    RTC
+
+************************************************************/
+READ8_MEMBER( aussiebyte_state::rtc_r )
+{
+	m_rtc->cs_w(1);
+	m_rtc->read_w(1);
+	m_rtc->address_w(offset);
+	uint8_t data = m_rtc->data_r(space,0);
+	m_rtc->read_w(0);
+	m_rtc->cs_w(0);
+	return data;
+}
+
+WRITE8_MEMBER( aussiebyte_state::rtc_w )
+{
+	m_rtc->cs_w(1);
+	m_rtc->address_w(offset);
+	m_rtc->data_w(space,0,data);
+	m_rtc->write_w(1);
+	m_rtc->write_w(0);
+	m_rtc->cs_w(0);
+}
+
+/***********************************************************
+
     DMA
 
 ************************************************************/
@@ -265,28 +290,28 @@ WRITE_LINE_MEMBER( aussiebyte_state::busreq_w )
 ************************************************************/
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfd) | (UINT8)(state << 1);
+	m_port17_rdy = (m_port17_rdy & 0xfd) | (uint8_t)(state << 1);
 	if (m_port17 == 1)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio1_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xfb) | (UINT8)(state << 2);
+	m_port17_rdy = (m_port17_rdy & 0xfb) | (uint8_t)(state << 2);
 	if (m_port17 == 2)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdya_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xef) | (UINT8)(state << 4);
+	m_port17_rdy = (m_port17_rdy & 0xef) | (uint8_t)(state << 4);
 	if (m_port17 == 4)
 		m_dma->rdy_w(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::sio2_rdyb_w )
 {
-	m_port17_rdy = (m_port17_rdy & 0xdf) | (UINT8)(state << 5);
+	m_port17_rdy = (m_port17_rdy & 0xdf) | (uint8_t)(state << 5);
 	if (m_port17 == 5)
 		m_dma->rdy_w(state);
 }
@@ -341,14 +366,11 @@ static const z80_daisy_config daisy_chain_intf[] =
 ************************************************************/
 
 // baud rate generator. All inputs are 1.2288MHz.
-TIMER_DEVICE_CALLBACK_MEMBER( aussiebyte_state::ctc_tick )
+WRITE_LINE_MEMBER( aussiebyte_state::clock_w )
 {
-	m_ctc->trg0(1);
-	m_ctc->trg0(0);
-	m_ctc->trg1(1);
-	m_ctc->trg1(0);
-	m_ctc->trg2(1);
-	m_ctc->trg2(0);
+	m_ctc->trg0(state);
+	m_ctc->trg1(state);
+	m_ctc->trg2(state);
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::ctc_z0_w )
@@ -400,16 +422,16 @@ WRITE_LINE_MEMBER( aussiebyte_state::votrax_w )
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_intrq_w )
 {
-	UINT8 data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
+	uint8_t data = (m_port19 & 0xbf) | (state ? 0x40 : 0);
 	m_port19 = data;
 }
 
 WRITE_LINE_MEMBER( aussiebyte_state::fdc_drq_w )
 {
-	UINT8 data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
+	uint8_t data = (m_port19 & 0x7f) | (state ? 0x80 : 0);
 	m_port19 = data;
 	state ^= 1; // inverter on pin38 of fdc
-	m_port17_rdy = (m_port17_rdy & 0xfe) | (UINT8)state;
+	m_port17_rdy = (m_port17_rdy & 0xfe) | (uint8_t)state;
 	if (m_port17 == 0)
 		m_dma->rdy_w(state);
 }
@@ -447,7 +469,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(aussiebyte_map)
 	MCFG_CPU_IO_MAP(aussiebyte_io)
-	MCFG_CPU_CONFIG(daisy_chain_intf)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	MCFG_MACHINE_RESET_OVERRIDE(aussiebyte_state, aussiebyte )
 
@@ -458,7 +480,7 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", crt8002)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -474,6 +496,9 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_CENTRONICS_BUSY_HANDLER(WRITELINE(aussiebyte_state, write_centronics_busy))
 	MCFG_DEVICE_ADD("cent_data_in", INPUT_BUFFER, 0)
 	MCFG_CENTRONICS_OUTPUT_LATCH_ADD("cent_data_out", "centronics")
+
+	MCFG_DEVICE_ADD("ctc_clock", CLOCK, XTAL_4_9152MHz / 4)
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(aussiebyte_state, clock_w))
 
 	MCFG_DEVICE_ADD("ctc", Z80CTC, XTAL_16MHz / 4)
 	MCFG_Z80CTC_INTR_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -532,7 +557,6 @@ static MACHINE_CONFIG_START( aussiebyte, aussiebyte_state )
 	MCFG_MC6845_ADDR_CHANGED_CB(aussiebyte_state, crtc_update_addr)
 
 	MCFG_MSM5832_ADD("rtc", XTAL_32_768kHz)
-	MCFG_TIMER_DRIVER_ADD_PERIODIC("ctc_tick", aussiebyte_state, ctc_tick, attotime::from_hz(XTAL_4_9152MHz / 4))
 MACHINE_CONFIG_END
 
 
@@ -540,8 +564,8 @@ DRIVER_INIT_MEMBER( aussiebyte_state, aussiebyte )
 {
 	// Main ram is divided into 16k blocks (0-15). The boot rom is block number 16.
 	// For convenience, bank 0 is permanently assigned to C000-FFFF
-	UINT8 *main = memregion("roms")->base();
-	UINT8 *ram = memregion("mram")->base();
+	uint8_t *main = memregion("roms")->base();
+	uint8_t *ram = memregion("mram")->base();
 
 	membank("bankr0")->configure_entries(0, 16, &ram[0x0000], 0x4000);
 	membank("bankw0")->configure_entries(0, 16, &ram[0x0000], 0x4000);

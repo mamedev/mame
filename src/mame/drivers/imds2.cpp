@@ -62,7 +62,7 @@
 //
 // NOTE:
 // Firmware running on PIO is NOT original because a dump is not available at the moment.
-// Emulator runs a version of PIO firmware that was specifically developped by me to implement
+// Emulator runs a version of PIO firmware that was specifically developed by me to implement
 // line printer output.
 //
 // TODO:
@@ -220,7 +220,7 @@ WRITE8_MEMBER(imds2_state::imds2_ipc_control_w)
 	// See A84, pg 28 of [1]
 	// b3 is ~(bit to be written)
 	// b2-b0 is ~(no. of bit to be written)
-	UINT8 mask = (1U << (~data & 0x07));
+	uint8_t mask = (1U << (~data & 0x07));
 
 	if (BIT(data , 3)) {
 		m_ipc_control &= ~mask;
@@ -276,7 +276,7 @@ WRITE8_MEMBER(imds2_state::imds2_miscout_w)
 
 READ8_MEMBER(imds2_state::imds2_miscin_r)
 {
-	UINT8 res = m_ioc_options->read();
+	uint8_t res = m_ioc_options->read();
 	return res | ((m_beeper_timer == 0) << 2);
 }
 
@@ -524,8 +524,8 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 {
 	unsigned i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
-	UINT16 pixels;
+	uint8_t chargen_byte = m_chargen[ (linecount & 7) | ((unsigned)charcode << 3) ];
+	uint16_t pixels;
 
 	if (lten) {
 		pixels = ~0;
@@ -534,10 +534,10 @@ I8275_DRAW_CHARACTER_MEMBER(imds2_state::crtc_display_pixels)
 	} else {
 		// See [2], pg 58 for the very peculiar way of generating character images
 		// Here each half-pixel is translated into a full pixel
-		UINT16 exp_pix_l;
-		UINT16 exp_pix_r;
+		uint16_t exp_pix_l;
+		uint16_t exp_pix_r;
 
-		exp_pix_l = (UINT16)chargen_byte;
+		exp_pix_l = (uint16_t)chargen_byte;
 		exp_pix_l = ((exp_pix_l & 0x80) << 5) |
 			((exp_pix_l & 0x40) << 4) |
 			((exp_pix_l & 0x20) << 3) |
@@ -633,7 +633,7 @@ void imds2_state::imds2_update_beeper(void)
 void imds2_state::imds2_update_printer(void)
 {
 	// Data to printer is ~P1 when STATUS ENABLE/==1, else 0xff (assuming pull-ups on printer)
-	UINT8 printer_data;
+	uint8_t printer_data;
 	if ((m_pio_port2 & 0x7f) == 0x6c) {
 		printer_data = 0xff;
 	} else {
@@ -769,8 +769,8 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("ipcsyspic" , pic8259_device , inta_cb)
 		MCFG_QUANTUM_TIME(attotime::from_hz(100))
 
-		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC , NULL)
-		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC  , NULL)
+		MCFG_PIC8259_ADD("ipcsyspic" , WRITELINE(imds2_state , imds2_ipc_intr) , VCC, NOOP)
+		MCFG_PIC8259_ADD("ipclocpic" , DEVWRITELINE("ipcsyspic" , pic8259_device , ir7_w) , VCC, NOOP)
 
 		MCFG_DEVICE_ADD("ipctimer" , PIT8253 , 0)
 		MCFG_PIT8253_CLK0(IPC_XTAL_Y1 / 16)
@@ -835,12 +835,13 @@ static MACHINE_CONFIG_START(imds2 , imds2_state)
 		MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(imds2_state , crtc_display_pixels)
 		MCFG_I8275_DRQ_CALLBACK(DEVWRITELINE("iocdma" , i8257_device , dreq2_w))
 		MCFG_I8275_IRQ_CALLBACK(INPUTLINE("ioccpu" , I8085_INTR_LINE))
+		MCFG_VIDEO_SET_SCREEN("screen")
 
 		MCFG_SCREEN_ADD("screen" , RASTER)
 		MCFG_SCREEN_UPDATE_DEVICE("ioccrtc" , i8275_device , screen_update)
 		MCFG_SCREEN_REFRESH_RATE(50)
 		MCFG_GFXDECODE_ADD("gfxdecode" , "palette" , imds2)
-		MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+		MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 		MCFG_SPEAKER_STANDARD_MONO("mono")
 		MCFG_SOUND_ADD("iocbeep" , BEEP , IOC_BEEP_FREQ)
@@ -881,7 +882,18 @@ MACHINE_CONFIG_END
 ROM_START(imds2)
 		// ROM definition of IPC cpu (8085A)
 		ROM_REGION(0x1000 , "ipcrom" , 0)
-		ROM_LOAD("ipc_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2))
+		ROM_DEFAULT_BIOS("mon13")
+		// 1x2732 Copyright 1979
+		ROM_SYSTEM_BIOS(0, "mon13", "Series II Monitor v1.3")
+		ROMX_LOAD("ipc13_a82.bin" , 0x0000 , 0x1000 , CRC(0889394f) SHA1(b7525baf1884a7d67402dea4b5566016a9861ef2), ROM_BIOS(1))
+		// 2x2716 Copyright 1978
+		ROM_SYSTEM_BIOS(1, "mon12", "Series II Monitor v1.2")
+		ROMX_LOAD("ipc12_a57.bin" , 0x0000 , 0x0800 , CRC(6496efaf) SHA1(1a9c0f1b19c1807803db3f1543f51349d7fd693a), ROM_BIOS(2))
+		ROMX_LOAD("ipc12_a48.bin" , 0x0800 , 0x0800 , CRC(258dc9a6) SHA1(3fde993aee06d9af5093d7a2d9a8cbd71fed0951), ROM_BIOS(2))
+		// 2x2716 Copyright 1977
+		ROM_SYSTEM_BIOS(2, "mon11", "Series II Monitor v1.1")
+		ROMX_LOAD("ipc11_a57.bin" , 0x0000 , 0x0800 , CRC(ffb7c036) SHA1(6f60cdfe20621c4b633c972adcb644a1c02eaa39), ROM_BIOS(3))
+		ROMX_LOAD("ipc11_a48.bin" , 0x0800 , 0x0800 , CRC(3696ff28) SHA1(38b435e10a81629430275aec051fb0a55ec1f6fd), ROM_BIOS(3))
 
 		// ROM definition of IOC cpu (8080A)
 		ROM_REGION(0x2000 , "ioccpu" , 0)
@@ -891,7 +903,7 @@ ROM_START(imds2)
 		ROM_LOAD("ioc_a53.bin" , 0x1800 , 0x0800 , CRC(c8df4bb9) SHA1(2dfb921e94ae7033a7182457b2f00657674d1b77))
 
 		// ROM definition of PIO controller (8041A)
-		// For the time being a specially developped PIO firmware is used until a dump of the original PIO is
+		// For the time being a specially developed PIO firmware is used until a dump of the original PIO is
 		// available.
 		ROM_REGION(0x400 , "iocpio" , 0)
 		ROM_LOAD("pio_a72.bin" , 0 , 0x400 , BAD_DUMP CRC(8c8e740b))

@@ -121,7 +121,7 @@ static SLOT_INTERFACE_START( rm380z_floppies )
 	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
 SLOT_INTERFACE_END
 
-UINT32 rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rm380z_state::screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	update_screen(bitmap);
 	return 0;
@@ -144,7 +144,7 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm380z)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* RAM configurations */
 	MCFG_RAM_ADD(RAM_TAG)

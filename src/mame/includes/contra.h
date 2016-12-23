@@ -29,15 +29,15 @@ public:
 		m_palette(*this, "palette") { }
 
 	/* memory pointers */
-	std::unique_ptr<UINT8[]>       m_buffered_spriteram;
-	std::unique_ptr<UINT8[]>       m_buffered_spriteram_2;
-	required_shared_ptr<UINT8> m_fg_cram;
-	required_shared_ptr<UINT8> m_fg_vram;
-	required_shared_ptr<UINT8> m_tx_cram;
-	required_shared_ptr<UINT8> m_tx_vram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_bg_cram;
-	required_shared_ptr<UINT8> m_bg_vram;
+	std::unique_ptr<uint8_t[]>       m_buffered_spriteram;
+	std::unique_ptr<uint8_t[]>       m_buffered_spriteram_2;
+	required_shared_ptr<uint8_t> m_fg_cram;
+	required_shared_ptr<uint8_t> m_fg_vram;
+	required_shared_ptr<uint8_t> m_tx_cram;
+	required_shared_ptr<uint8_t> m_tx_vram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_bg_cram;
+	required_shared_ptr<uint8_t> m_bg_vram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
@@ -54,7 +54,6 @@ public:
 	DECLARE_WRITE8_MEMBER(contra_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(contra_sh_irqtrigger_w);
 	DECLARE_WRITE8_MEMBER(contra_coin_counter_w);
-	DECLARE_WRITE8_MEMBER(cpu_sound_command_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_vram_w);
 	DECLARE_WRITE8_MEMBER(contra_fg_cram_w);
 	DECLARE_WRITE8_MEMBER(contra_bg_vram_w);
@@ -69,7 +68,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(contra);
-	UINT32 screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_contra(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(contra_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, bitmap_ind8 &priority_bitmap, int bank );
 	required_device<cpu_device> m_maincpu;

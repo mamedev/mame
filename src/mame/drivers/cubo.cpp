@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Stephh, Dirk Best
+// copyright-holders:Aaron Giles, Mariusz Wojcieszek, Ernesto Corvi, Dirk Best,Stephane Humbert
 /*
 
    Cubo CD32 (additional hardware and games by CD Express, Milan, Italy)
@@ -326,11 +326,13 @@ class cubo_state : public amiga_state
 public:
 	cubo_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_p1_port(*this, "P1"),
-	m_p2_port(*this, "P2"),
+	m_player_ports(*this, {"P1", "P2"}),
 	m_microtouch(*this, "microtouch"),
 	m_cdda(*this, "cdda")
 	{ }
+
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER(cubo_input);
 	DECLARE_CUSTOM_INPUT_MEMBER(cd32_sel_mirror_input);
@@ -347,16 +349,15 @@ public:
 	DECLARE_DRIVER_INIT(lasstixx);
 	DECLARE_DRIVER_INIT(lsrquiz);
 
-	optional_ioport m_p1_port;
-	optional_ioport m_p2_port;
+	optional_ioport_array<2> m_player_ports;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	UINT16 m_potgo_value;
+	uint16_t m_potgo_value;
 
 protected:
 	virtual void rs232_tx(int state) override;
-	virtual void potgo_w(UINT16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<microtouch_device> m_microtouch;
@@ -364,7 +365,7 @@ private:
 
 	typedef void (cubo_state::*input_hack_func)();
 	input_hack_func m_input_hack;
-	void chip_ram_w8_hack(offs_t byteoffs, UINT8 data);
+	void chip_ram_w8_hack(offs_t byteoffs, uint8_t data);
 	void cndypuzl_input_hack();
 	void haremchl_input_hack();
 	void lsrquiz_input_hack();
@@ -373,8 +374,6 @@ private:
 	void mgnumber_input_hack();
 	void mgprem11_input_hack();
 };
-
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra);
 
 
 /*************************************
@@ -401,7 +400,7 @@ WRITE8_MEMBER( cubo_state::akiko_cia_0_port_a_write )
 	/* bit 2 = Power Led on Amiga */
 	output().set_led_value(0, (data & 2) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
 
 
@@ -437,7 +436,7 @@ void cubo_state::rs232_tx(int state)
 	m_microtouch->rx_w(state);
 }
 
-void cubo_state::potgo_w(UINT16 data)
+void cubo_state::potgo_w(uint16_t data)
 {
 	int i;
 
@@ -449,75 +448,68 @@ void cubo_state::potgo_w(UINT16 data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		UINT16 dir = 0x0200 << i;
+		uint16_t dir = 0x0200 << i;
 		if (data & dir)
 		{
-			UINT16 d = 0x0100 << i;
+			uint16_t d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra)
+void cubo_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 {
-	cubo_state *state = machine.driver_data<cubo_state>();
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT8 but = 0x40 << i;
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint8_t but = 0x40 << i;
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
-		if (!(state->m_potgo_value & p5dir) || !(state->m_potgo_value & p5dat))
+		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != state->m_oldstate[i])
+			if ((dra & but) && (pra & but) != m_oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					state->m_cd32_shifter[i]--;
-					if (state->m_cd32_shifter[i] < 0)
-						state->m_cd32_shifter[i] = 0;
+					m_cd32_shifter[i]--;
+					if (m_cd32_shifter[i] < 0)
+						m_cd32_shifter[i] = 0;
 				}
 			}
 		}
-		state->m_oldstate[i] = pra & but;
+		m_oldstate[i] = pra & but;
 	}
 }
 
-static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
+uint16_t cubo_state::handle_joystick_potgor(uint16_t potgor)
 {
-	cubo_state *state = machine.driver_data<cubo_state>();
-	ioport_port * player_portname[] = { state->m_p2_port, state->m_p1_port };
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
-		potgor |= state->m_potgo_value & p5dat;
-		if (!(state->m_potgo_value & p9dir))
+		potgor |= m_potgo_value & p5dat;
+		if (!(m_potgo_value & p9dir))
 			potgor |= p9dat;
 		/* P5 output and 1 -> shift register is kept reset (Blue button) */
-		if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
-			state->m_cd32_shifter[i] = 8;
+		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
+			m_cd32_shifter[i] = 8;
 		/* shift at 1 == return one, >1 = return button states */
-		if (state->m_cd32_shifter[i] == 0)
+		if (m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && ((player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (m_cd32_shifter[i] >= 2 && ((m_player_ports[1 - i])->read() & (1 << (m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;
@@ -525,13 +517,12 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 CUSTOM_INPUT_MEMBER( cubo_state::cubo_input )
 {
-	return handle_joystick_potgor(machine(), m_potgo_value) >> 8;
+	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
 CUSTOM_INPUT_MEMBER( cubo_state::cd32_sel_mirror_input )
 {
-	ioport_port* ports[2]= { m_p1_port, m_p2_port };
-	UINT8 bits = ports[(int)(FPTR)param]->read();
+	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -556,7 +547,7 @@ static INPUT_PORTS_START( cubo )
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("potgo")
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, cubo_state,cubo_input, nullptr)
 	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 
@@ -1175,14 +1166,14 @@ ROM_END
  *
  *************************************/
 
-void cubo_state::chip_ram_w8_hack(offs_t byteoffs, UINT8 data)
+void cubo_state::chip_ram_w8_hack(offs_t byteoffs, uint8_t data)
 {
-	UINT16 word = chip_ram_r(byteoffs);
+	uint16_t word = chip_ram_r(byteoffs);
 
 	if (byteoffs & 1)
 		word = (word & 0xff00) | data;
 	else
-		word = (word & 0x00ff) | (((UINT16)data) << 8);
+		word = (word & 0x00ff) | (((uint16_t)data) << 8);
 
 	chip_ram_w(byteoffs, word);
 }
@@ -1191,7 +1182,7 @@ void cubo_state::cndypuzl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ebe, 0x0000);
 	}
 }
@@ -1206,8 +1197,8 @@ void cubo_state::haremchl_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7f00 + 0) << 16) | (chip_ram_r(r_A5 - 0x7f00 + 2));
 		chip_ram_w8_hack(r_A2 + 0x1f, 0x00);
 	}
 }
@@ -1222,8 +1213,8 @@ void cubo_state::lsrquiz_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fe0 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fe0 + 2));
 		chip_ram_w8_hack(r_A2 + 0x13, 0x00);
 	}
 }
@@ -1239,8 +1230,8 @@ void cubo_state::lsrquiz2_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fdc + 0) << 16) | (chip_ram_r(r_A5 - 0x7fdc + 2));
 		chip_ram_w8_hack(r_A2 + 0x17, 0x00);
 	}
 }
@@ -1255,8 +1246,8 @@ void cubo_state::lasstixx_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
-		UINT32 r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A2 = (chip_ram_r(r_A5 - 0x7fa2 + 0) << 16) | (chip_ram_r(r_A5 - 0x7fa2 + 2));
 		chip_ram_w8_hack(r_A2 + 0x24, 0x00);
 	}
 }
@@ -1271,7 +1262,7 @@ void cubo_state::mgnumber_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w(r_A5 - 0x7ed8, 0x0000);
 	}
 }
@@ -1286,7 +1277,7 @@ void cubo_state::mgprem11_input_hack()
 {
 	if (m_maincpu->pc < m_chip_ram.bytes())
 	{
-		UINT32 r_A5 = m_maincpu->state_int(M68K_A5);
+		uint32_t r_A5 = m_maincpu->state_int(M68K_A5);
 		chip_ram_w8_hack(r_A5 - 0x7eca, 0x00);
 	}
 }

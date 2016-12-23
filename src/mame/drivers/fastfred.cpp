@@ -13,6 +13,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/fastfred.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 
 
@@ -150,8 +152,8 @@ WRITE8_MEMBER(fastfred_state::imago_sprites_bank_w)
 
 WRITE8_MEMBER(fastfred_state::imago_sprites_dma_w)
 {
-	UINT8 *rom = (UINT8 *)memregion("gfx2")->base();
-	UINT8 sprites_data;
+	uint8_t *rom = (uint8_t *)memregion("gfx2")->base();
+	uint8_t sprites_data;
 
 	sprites_data = rom[m_imago_sprites_address + 0x2000*0 + m_imago_sprites_bank * 0x1000];
 	m_imago_sprites[offset + 0x800*0] = sprites_data;
@@ -200,7 +202,7 @@ static ADDRESS_MAP_START( fastfred_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(watchdog_reset_r, soundlatch_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -226,7 +228,7 @@ static ADDRESS_MAP_START( jumpcoas_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf116, 0xf116) AM_WRITE(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf117, 0xf117) AM_WRITE(fastfred_flip_screen_y_w)
-	//AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)  // Why doesn't this work???
+	//AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  // Why doesn't this work???
 	AM_RANGE(0xf800, 0xf801) AM_READNOP AM_DEVWRITE("ay8910.1", ay8910_device, address_data_w)
 ADDRESS_MAP_END
 
@@ -255,13 +257,13 @@ static ADDRESS_MAP_START( imago_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
 	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
-	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_READNOP AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, fastfred_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITEONLY  // Reset PSG's
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("ay8910.1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("ay8910.2", ay8910_device, address_data_w)
@@ -654,6 +656,8 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fastfred_state, sound_timer_irq, 4*60)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -672,6 +676,8 @@ static MACHINE_CONFIG_START( fastfred, fastfred_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay8910.1", AY8910, XTAL_12_432MHz/8) /* 1.554 MHz; xtal from pcb pics, divider not verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -692,6 +698,7 @@ static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 	MCFG_GFXDECODE_MODIFY("gfxdecode", jumpcoas)
 
 	/* sound hardware */
+	MCFG_DEVICE_REMOVE("soundlatch")
 	MCFG_DEVICE_REMOVE("ay8910.2")
 MACHINE_CONFIG_END
 

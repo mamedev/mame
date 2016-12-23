@@ -18,21 +18,29 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_store(*this, "store"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen")
+	{
+	}
 
-	required_device<ssem_device> m_maincpu;
-	required_shared_ptr<UINT8> m_store;
-	required_device<screen_device> m_screen;
-
-	UINT8 m_store_line;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_INPUT_CHANGED_MEMBER(panel_check);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(ssem_store);
-	inline UINT32 reverse(UINT32 v);
-	void glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...) ATTR_PRINTF(5,6);
+	inline uint32_t reverse(uint32_t v);
 	void strlower(char *buf);
+
+private:
+	template <typename Format, typename... Params>
+	void glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args);
+
+	required_device<ssem_device> m_maincpu;
+	required_shared_ptr<uint8_t> m_store;
+	required_device<screen_device> m_screen;
+
+	uint8_t m_store_line;
+
+	util::ovectorstream m_glyph_print_buf;
 };
 
 
@@ -45,7 +53,7 @@ public:
 // The de facto snapshot format for other SSEM simulators stores the data physically in that format as well.
 // Therefore, in MESS, every 32-bit word has its bits reversed, too, and as a result the values must be
 // un-reversed before being used.
-inline UINT32 ssem_state::reverse(UINT32 v)
+inline uint32_t ssem_state::reverse(uint32_t v)
 {
 	// Taken from http://www.graphics.stanford.edu/~seander/bithacks.html#ReverseParallel
 	// swap odd and even bits
@@ -94,13 +102,13 @@ enum
 
 INPUT_CHANGED_MEMBER(ssem_state::panel_check)
 {
-	UINT8 edit0_state = ioport("EDIT0")->read();
-	UINT8 edit1_state = ioport("EDIT1")->read();
-	UINT8 edit2_state = ioport("EDIT2")->read();
-	UINT8 edit3_state = ioport("EDIT3")->read();
-	UINT8 misc_state = ioport("MISC")->read();
+	uint8_t edit0_state = ioport("EDIT0")->read();
+	uint8_t edit1_state = ioport("EDIT1")->read();
+	uint8_t edit2_state = ioport("EDIT2")->read();
+	uint8_t edit3_state = ioport("EDIT3")->read();
+	uint8_t misc_state = ioport("MISC")->read();
 
-	switch( (int)(FPTR)param )
+	switch( (int)(uintptr_t)param )
 	{
 		case PANEL_BIT0:
 			if(edit0_state & 0x01) m_store[(m_store_line << 2) | 0] ^= 0x80;
@@ -271,7 +279,7 @@ INPUT_PORTS_END
 * Video hardware                                     *
 \****************************************************/
 
-static const UINT8 char_glyphs[0x80][8] =
+static const uint8_t char_glyphs[0x80][8] =
 {
 	{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 },
 	{ 0x00, 0x00, 0x10, 0x38, 0x10, 0x00, 0x00, 0x00 },
@@ -403,27 +411,26 @@ static const UINT8 char_glyphs[0x80][8] =
 	{ 0xff, 0x81, 0x81, 0x81, 0x81, 0x81, 0x81, 0xff },
 };
 
-void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char *msg, ...)
+template <typename Format, typename... Params>
+void ssem_state::glyph_print(bitmap_rgb32 &bitmap, int32_t x, int32_t y, Format &&fmt, Params &&...args)
 {
-	va_list arg_list;
-	char buf[32768];
-	INT32 index = 0;
 	const rectangle &visarea = m_screen->visible_area();
 
-	va_start( arg_list, msg );
-	vsprintf( buf, msg, arg_list );
-	va_end( arg_list );
+	m_glyph_print_buf.clear();
+	m_glyph_print_buf.seekp(0, util::ovectorstream::beg);
+	util::stream_format(m_glyph_print_buf, std::forward<Format>(fmt), std::forward<Params>(args)...);
+	m_glyph_print_buf.put('\0');
 
-	for(index = 0; index < strlen(buf) && index < 32768; index++)
+	for(char const *buf = &m_glyph_print_buf.vec()[0]; *buf; buf++)
 	{
-		UINT8 cur = (UINT8)buf[index];
+		uint8_t cur = uint8_t(*buf);
 		if(cur < 0x80)
 		{
-			INT32 line = 0;
+			int32_t line = 0;
 			for(line = 0; line < 8; line++)
 			{
-				UINT32 *d = &bitmap.pix32(y + line);
-				INT32 bit = 0;
+				uint32_t *d = &bitmap.pix32(y + line);
+				int32_t bit = 0;
 				for(bit = 0; bit < 8; bit++)
 				{
 					if(char_glyphs[cur][line] & (1 << (7 - bit)))
@@ -451,12 +458,12 @@ void ssem_state::glyph_print(bitmap_rgb32 &bitmap, INT32 x, INT32 y, const char 
 	}
 }
 
-UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 line = 0;
-	UINT32 accum = m_maincpu->state_int(SSEM_A);
-	UINT32 bit = 0;
-	UINT32 word = 0;
+	uint32_t line = 0;
+	uint32_t accum = m_maincpu->state_int(SSEM_A);
+	uint32_t bit = 0;
+	uint32_t word = 0;
 
 	for(line = 0; line < 32; line++)
 	{
@@ -493,7 +500,7 @@ UINT32 ssem_state::screen_update_ssem(screen_device &screen, bitmap_rgb32 &bitma
 					(m_store[(m_store_line << 2) | 1] << 16) |
 					(m_store[(m_store_line << 2) | 2] <<  8) |
 					(m_store[(m_store_line << 2) | 3] <<  0));
-	glyph_print(bitmap, 0, 272, "LINE:%02d  VALUE:%08x  HALT:%" I64FMT "d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
+	glyph_print(bitmap, 0, 272, "LINE:%02u  VALUE:%08x  HALT:%d", m_store_line, word, m_maincpu->state_int(SSEM_HALT));
 	return 0;
 }
 
@@ -534,7 +541,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 	{
 		for (int i = 0; i < num_lines; i++)
 		{
-			UINT32 line = 0;
+			uint32_t line = 0;
 			image.fgets(image_line, 99);
 
 			// Isolate and convert 4-digit decimal address
@@ -542,9 +549,9 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 			token_buf[4] = '\0';
 			sscanf(token_buf, "%04u", &line);
 
-			if (!core_stricmp(image.filetype(), "snp"))
+			if (image.is_filetype("snp"))
 			{
-				UINT32 word = 0;
+				uint32_t word = 0;
 
 				// Parse a line such as: 0000:00000110101001000100000100000100
 				for (int b = 0; b < 32; b++)
@@ -558,12 +565,12 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 				space.write_byte((line << 2) + 2, (word >>  8) & 0x000000ff);
 				space.write_byte((line << 2) + 3, (word >>  0) & 0x000000ff);
 			}
-			else if (!core_stricmp(image.filetype(), "asm"))
+			else if (image.is_filetype("asm"))
 			{
 				char op_buf[4] = { 0 };
-				INT32 value = 0;
-				UINT32 unsigned_value = 0;
-				UINT32 word = 0;
+				int32_t value = 0;
+				uint32_t unsigned_value = 0;
+				uint32_t word = 0;
 
 				// Isolate the opcode and convert to lower-case
 				memcpy(op_buf, image_line + 5, 3);
@@ -572,7 +579,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 
 				// Isolate the value
 				sscanf(image_line + 9, "%d", &value);
-				unsigned_value = reverse((UINT32)value);
+				unsigned_value = reverse((uint32_t)value);
 
 				if (!core_stricmp(op_buf, "num"))
 					word = unsigned_value;
@@ -599,7 +606,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /****************************************************\
@@ -609,6 +616,7 @@ QUICKLOAD_LOAD_MEMBER(ssem_state, ssem_store)
 void ssem_state::machine_start()
 {
 	save_item(NAME(m_store_line));
+	m_glyph_print_buf.reserve(1024);
 }
 
 void ssem_state::machine_reset()
@@ -628,7 +636,7 @@ static MACHINE_CONFIG_START( ssem, ssem_state )
 	MCFG_SCREEN_SIZE(256, 280)
 	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0, 279)
 	MCFG_SCREEN_UPDATE_DRIVER(ssem_state, screen_update_ssem)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* quickload */
 	MCFG_QUICKLOAD_ADD("quickload", ssem_state, ssem_store, "snp,asm", 1)

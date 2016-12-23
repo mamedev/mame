@@ -35,14 +35,14 @@ const device_type S3520CF = &device_creator<s3520cf_device>;
 //  s3520cf_device - constructor
 //-------------------------------------------------
 
-s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3520cf_device::s3520cf_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, S3520CF, "S-3520CF RTC", tag, owner, clock, "s3520cf", __FILE__), m_dir(0), m_latch(0), m_reset_line(0), m_read_latch(0), m_current_cmd(0), m_cmd_stream_pos(0), m_rtc_addr(0), m_mode(0), m_sysr(0), m_rtc_state()
 {
 }
 
-void s3520cf_device::timer_callback()
+TIMER_CALLBACK_MEMBER(s3520cf_device::timer_callback)
 {
-	static const UINT8 dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
+	static const uint8_t dpm[12] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 	int dpm_count;
 
 	m_rtc.sec++;
@@ -71,10 +71,6 @@ void s3520cf_device::timer_callback()
 	if((m_rtc.year & 0xf0) >= 0xa0)             { m_rtc.year = 0; } //1901-2000 possible timeframe
 }
 
-TIMER_CALLBACK( s3520cf_device::rtc_inc_callback )
-{
-	reinterpret_cast<s3520cf_device *>(ptr)->timer_callback();
-}
 
 //-------------------------------------------------
 //  device_validity_check - perform validity checks
@@ -93,7 +89,7 @@ void s3520cf_device::device_validity_check(validity_checker &valid) const
 void s3520cf_device::device_start()
 {
 	/* let's call the timer callback every second for now */
-	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), FUNC(rtc_inc_callback), 0, (void *)this);
+	machine().scheduler().timer_pulse(attotime::from_hz(clock() / XTAL_32_768kHz), timer_expired_delegate(FUNC(s3520cf_device::timer_callback), this));
 
 	system_time systime;
 	machine().base_datetime(systime);
@@ -121,9 +117,9 @@ void s3520cf_device::device_reset()
 //  rtc_read - used to route RTC reading registers
 //-------------------------------------------------
 
-inline UINT8 s3520cf_device::rtc_read(UINT8 offset)
+inline uint8_t s3520cf_device::rtc_read(uint8_t offset)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0;
 
@@ -160,7 +156,7 @@ inline UINT8 s3520cf_device::rtc_read(UINT8 offset)
 	return res;
 }
 
-inline void s3520cf_device::rtc_write(UINT8 offset,UINT8 data)
+inline void s3520cf_device::rtc_write(uint8_t offset,uint8_t data)
 {
 	if(offset == 0xf)
 	{

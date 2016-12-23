@@ -25,7 +25,7 @@ VIDEO_START_MEMBER(cninja_state,stoneage)
 /* The bootleg sprites are in a different format! */
 void cninja_state::cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *buffered_spriteram = m_spriteram->buffer();
+	uint16_t *buffered_spriteram = m_spriteram->buffer();
 	int offs;
 	int endoffs;
 
@@ -121,10 +121,10 @@ void cninja_state::cninjabl_draw_sprites( screen_device &screen, bitmap_ind16 &b
 
 /******************************************************************************/
 
-UINT32 cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -142,10 +142,21 @@ UINT32 cninja_state::screen_update_cninja(screen_device &screen, bitmap_ind16 &b
 	return 0;
 }
 
-UINT32 cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cninja_state::screen_update_cninjabl2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	/* force layers to be enabled */
+	m_deco_tilegen1->set_enable(0, 1 );
+	m_deco_tilegen1->set_enable(1, 1 );
+
+	screen_update_cninja(screen, bitmap, cliprect);
+
+	return 0;
+}
+
+uint32_t cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	/* force layers to be enabled */
 	m_deco_tilegen2->set_enable(0, 1 );
@@ -167,10 +178,10 @@ UINT32 cninja_state::screen_update_cninjabl(screen_device &screen, bitmap_ind16 
 	return 0;
 }
 
-UINT32 cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(m_pf1_rowscroll, m_pf2_rowscroll);
@@ -186,11 +197,11 @@ UINT32 cninja_state::screen_update_edrandy(screen_device &screen, bitmap_ind16 &
 	return 0;
 }
 
-UINT32 cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cninja_state::screen_update_robocop2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 	/* One of the tilemap chips can switch between 2 tilemaps at 4bpp, or 1 at 8bpp */
 	if (priority & 4)
@@ -243,11 +254,11 @@ VIDEO_START_MEMBER(cninja_state,mutantf)
 	m_sprgen2->alloc_sprite_bitmap();
 }
 
-UINT32 cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cninja_state::screen_update_mutantf(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	address_space &space = machine().driver_data()->generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
-	UINT16 priority = m_decocomn->priority_r(space, 0, 0xffff);
+	address_space &space = machine().dummy_space();
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t priority = m_decocomn->priority_r(space, 0, 0xffff);
 
 
 	flip_screen_set(BIT(flip, 7));

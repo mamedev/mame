@@ -64,7 +64,7 @@ VIDEO_START_MEMBER(moo_state,bucky)
 	m_k056832->set_layer_offs(3,  6, 0);
 }
 
-UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layers[3];
@@ -109,7 +109,7 @@ UINT32 moo_state::screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap,
 
 	konami_sortlayers3(layers, m_layerpri);
 
-	m_k054338->update_all_shadows(0, m_palette);
+	m_k054338->update_all_shadows(0, *m_palette);
 	m_k054338->fill_solid_bg(bitmap, cliprect);
 
 	screen.priority().fill(0, cliprect);

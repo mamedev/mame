@@ -56,6 +56,7 @@ stepstag:
 #include "stepstag.lh"
 #include "includes/tetrisp2.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 
 /***************************************************************************
@@ -119,7 +120,7 @@ READ16_MEMBER(tetrisp2_state::rockn_adpcmbank_r)
 
 WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 {
-	UINT8 *SNDROM = memregion("ymz")->base();
+	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	m_rockn_adpcmbank = data;
@@ -136,7 +137,7 @@ WRITE16_MEMBER(tetrisp2_state::rockn_adpcmbank_w)
 
 WRITE16_MEMBER(tetrisp2_state::rockn2_adpcmbank_w)
 {
-	UINT8 *SNDROM = memregion("ymz")->base();
+	uint8_t *SNDROM = memregion("ymz")->base();
 	int bank;
 
 	char banktable[9][3]=
@@ -182,7 +183,7 @@ WRITE16_MEMBER(tetrisp2_state::nndmseal_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memregion("okisource")->base();
+		uint8_t *rom = memregion("okisource")->base();
 
 		if (data & 0x04)
 		{
@@ -323,7 +324,7 @@ static ADDRESS_MAP_START( tetrisp2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ(tetrisp2_ip_1_word_r)                                  // Inputs & protection
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")                                            // Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)                                    // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
 
@@ -392,7 +393,7 @@ static ADDRESS_MAP_START( nndmseal_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0006, 0xbe0007) AM_READ_PORT("PRINT"           )   // ""
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW"             )   // ""
 
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r     )   // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 ADDRESS_MAP_END
 
 
@@ -426,7 +427,7 @@ static ADDRESS_MAP_START( rockn1_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")                                            // Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)                                    // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
 
@@ -460,7 +461,7 @@ static ADDRESS_MAP_START( rockn2_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")                                        // Inputs
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")                                            // Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)                                    // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
 
@@ -495,7 +496,7 @@ static ADDRESS_MAP_START( rocknms_main_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READ_PORT("PLAYERS")
 	AM_RANGE(0xbe0004, 0xbe0005) AM_READ_PORT("SYSTEM")                                         // Inputs
 	AM_RANGE(0xbe0008, 0xbe0009) AM_READ_PORT("DSW")                                            // Inputs
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r)                                    // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
 
@@ -527,7 +528,7 @@ static ADDRESS_MAP_START( rocknms_sub_map, AS_PROGRAM, 16, tetrisp2_state )
 	AM_RANGE(0xba001e, 0xba001f) AM_WRITENOP                                                    // Lev 2 irq ack
 //  AM_RANGE(0xbe0000, 0xbe0001) AM_READNOP                                                     // INT-level1 dummy read
 	AM_RANGE(0xbe0002, 0xbe0003) AM_READWRITE(rocknms_main2sub_r, rocknms_sub2main_w)           // MAIN <-> SUB Communication
-	AM_RANGE(0xbe000a, 0xbe000b) AM_READ(watchdog_reset16_r )                                   // Watchdog
+	AM_RANGE(0xbe000a, 0xbe000b) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)       // Watchdog
 ADDRESS_MAP_END
 
 
@@ -562,7 +563,7 @@ READ16_MEMBER(stepstag_state::unk_a42000_r)
 
 WRITE16_MEMBER(stepstag_state::stepstag_soundlatch_word_w)
 {
-	soundlatch_word_w(space, offset, data, mem_mask);
+	m_soundlatch->write(space, offset, data, mem_mask);
 
 	m_subcpu->set_input_line(M68K_IRQ_6, HOLD_LINE);
 
@@ -616,7 +617,7 @@ static ADDRESS_MAP_START( stepstag_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xa44000, 0xa44001) AM_READNOP     // watchdog
 //  AM_RANGE(0xa48000, 0xa48001) AM_WRITENOP    // PC?
 //  AM_RANGE(0xa4c000, 0xa4c001) AM_WRITENOP    // PC?
-	AM_RANGE(0xa50000, 0xa50001) AM_READWRITE( soundlatch_word_r, stepstag_soundlatch_word_w )
+	AM_RANGE(0xa50000, 0xa50001) AM_DEVREAD("soundlatch", generic_latch_16_device, read) AM_WRITE(stepstag_soundlatch_word_w)
 	AM_RANGE(0xa60000, 0xa60003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff)             // Sound
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITENOP                                                    // Coin Counter plus other things
@@ -672,7 +673,7 @@ static ADDRESS_MAP_START( stepstag_sub_map, AS_PROGRAM, 16, stepstag_state )
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITENOP // cleared after writing this sprite list
 //  AM_RANGE(0xac0000, 0xac0001) AM_WRITENOP // cleared at boot
 
-	AM_RANGE(0xb00000, 0xb00001) AM_READWRITE( soundlatch_word_r, soundlatch_word_w )
+	AM_RANGE(0xb00000, 0xb00001) AM_DEVREADWRITE("soundlatch", generic_latch_16_device, read, write)
 
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(unknown_read_0xc00000) AM_WRITENOP //??
 	AM_RANGE(0xd00000, 0xd00001) AM_READNOP // watchdog
@@ -1021,7 +1022,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( rocknms )
 	PORT_START("PLAYERS")   // IN0 - $be0002.w
-	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tetrisp2_state,rocknms_main2sub_status_r, NULL) // MAIN -> SUB Communication
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tetrisp2_state,rocknms_main2sub_status_r, nullptr) // MAIN -> SUB Communication
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1327,7 +1328,9 @@ static MACHINE_CONFIG_START( tetrisp2, tetrisp2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
-	MCFG_WATCHDOG_VBLANK_INIT(8)    /* guess */
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)    /* guess */
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1361,6 +1364,8 @@ static MACHINE_CONFIG_START( nndmseal, tetrisp2_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -1391,6 +1396,8 @@ static MACHINE_CONFIG_START( rockn, tetrisp2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1423,6 +1430,8 @@ static MACHINE_CONFIG_START( rockn2, tetrisp2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1459,6 +1468,8 @@ static MACHINE_CONFIG_START( rocknms, tetrisp2_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("lscreen", tetrisp2_state,  irq2_line_hold)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 
@@ -1540,6 +1551,8 @@ static MACHINE_CONFIG_START( stepstag, stepstag_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_16_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -1841,7 +1854,7 @@ Custom: SS91022-03
         SS91022-05
 
 Other:  Sigma XILINX XCS30
-        Sigma XILINX XC9536 (socketted and stamped SL4)
+        Sigma XILINX XC9536 (socketed and stamped SL4)
 
 
 PCB Layout for sound rom board (from Rock'n 3):

@@ -44,8 +44,8 @@ public:
 
 	address_map_bank_device *m_page[4];
 	memory_bank *m_bank[4];
-	UINT8 m_primary_slot_reg;
-	UINT8 m_kb_matrix_row;
+	uint8_t m_primary_slot_reg;
+	uint8_t m_kb_matrix_row;
 
 	DECLARE_READ8_MEMBER(mem_r);
 	DECLARE_WRITE8_MEMBER(mem_w);
@@ -57,7 +57,6 @@ public:
 	DECLARE_READ8_MEMBER(pengadvb_ppi_port_b_r);
 	DECLARE_WRITE8_MEMBER(pengadvb_ppi_port_c_w);
 
-	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(pengadvb);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -189,14 +188,6 @@ WRITE8_MEMBER(pengadvb_state::pengadvb_ppi_port_c_w)
 	m_kb_matrix_row = data & 0x0f;
 }
 
-/**************************************************************************/
-
-// TMS9928
-WRITE_LINE_MEMBER(pengadvb_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
-
 /***************************************************************************
 
   Machine config(s)
@@ -246,9 +237,9 @@ static MACHINE_CONFIG_START( pengadvb, pengadvb_state )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(pengadvb_state, pengadvb_ppi_port_c_w))
 
 	/* video hardware */
-	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL_10_738635MHz / 2)
+	MCFG_DEVICE_ADD("tms9128", TMS9128, XTAL_10_738635MHz/2)
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(pengadvb_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE("tms9128", tms9128_device, screen_update)
 
@@ -287,7 +278,7 @@ void pengadvb_state::machine_reset()
 
 void pengadvb_state::pengadvb_decrypt(const char* region)
 {
-	UINT8 *mem = memregion(region)->base();
+	uint8_t *mem = memregion(region)->base();
 	int memsize = memregion(region)->bytes();
 
 	// data lines swap
@@ -297,7 +288,7 @@ void pengadvb_state::pengadvb_decrypt(const char* region)
 	}
 
 	// address line swap
-	dynamic_buffer buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for (int i = 0; i < memsize; i++)
 	{

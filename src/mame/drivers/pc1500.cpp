@@ -23,23 +23,25 @@ class pc1500_state : public driver_device
 {
 public:
 	pc1500_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_rtc(*this, "upd1990a"),
-			m_lcd_data(*this, "lcd_data"),
-			m_keyboard(*this, "KEY"),
-			m_io_on(*this, "ON") { }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_rtc(*this, "upd1990a")
+		, m_lcd_data(*this, "lcd_data")
+		, m_keyboard(*this, "KEY.%u", 0)
+		, m_io_on(*this, "ON")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<upd1990a_device> m_rtc;
 
-	required_shared_ptr<UINT8> m_lcd_data;
+	required_shared_ptr<uint8_t> m_lcd_data;
 	required_ioport_array<8> m_keyboard;
 	required_ioport m_io_on;
 
-	UINT8 m_kb_matrix;
+	uint8_t m_kb_matrix;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
 
 	DECLARE_WRITE8_MEMBER( kb_matrix_w );
@@ -69,7 +71,7 @@ ADDRESS_MAP_END
 
 READ8_MEMBER( pc1500_state::pc1500_kb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!started()) return 0;
 
@@ -82,14 +84,14 @@ READ8_MEMBER( pc1500_state::pc1500_kb_r )
 	return data;
 }
 
-UINT32 pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pc1500_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 
 	for (int p=0; p<=1; p++)
 		for (int a=0; a<0x4e; a++)
 		{
-			UINT8 data = m_lcd_data[a + (p<<8)];
+			uint8_t data = m_lcd_data[a + (p<<8)];
 			for (int b=0; b<8; b++)
 			{
 				if(b<4)
@@ -236,7 +238,7 @@ READ8_MEMBER( pc1500_state::port_b_r )
 	---- -x-- cassette in
 	---- --xx connector
 	*/
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= 0x08;
 
@@ -283,7 +285,7 @@ static MACHINE_CONFIG_START( pc1500, pc1500_state )
 	MCFG_LH5810_PORTC_W_CB(WRITE8(pc1500_state, port_c_w))
 	MCFG_LH5810_OUT_INT_CB(INPUTLINE("maincpu", LH5801_LINE_MI))
 
-	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD("upd1990a", XTAL_32_768kHz, NOOP, NOOP)
 MACHINE_CONFIG_END
 
 

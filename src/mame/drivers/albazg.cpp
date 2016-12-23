@@ -37,9 +37,10 @@ PCB:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
+#include "machine/i8255.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-#include "machine/i8255.h"
 
 #define MASTER_CLOCK XTAL_12MHz
 
@@ -55,17 +56,17 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_cus_ram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_cus_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 
 	/* video-related */
 	tilemap_t  *m_bg_tilemap;
 
 	/* misc */
-	UINT8 m_mux_data;
+	uint8_t m_mux_data;
 	int m_bank;
-	UINT8 m_prot_lock;
+	uint8_t m_prot_lock;
 	DECLARE_WRITE8_MEMBER(yumefuda_vram_w);
 	DECLARE_WRITE8_MEMBER(yumefuda_cram_w);
 	DECLARE_READ8_MEMBER(custom_ram_r);
@@ -78,7 +79,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -97,10 +98,10 @@ TILE_GET_INFO_MEMBER(albazg_state::y_get_bg_tile_info)
 
 void albazg_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(albazg_state::y_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
-UINT32 albazg_state::screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t albazg_state::screen_update_yumefuda(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -222,7 +223,7 @@ static ADDRESS_MAP_START( port_map, AS_IO, 8, albazg_state )
 	AM_RANGE(0x40, 0x40) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0x80, 0x83) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -327,7 +328,7 @@ INPUT_PORTS_END
 
 void albazg_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x2000);
 
@@ -353,7 +354,8 @@ static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
 
-	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8) // timing is unknown
 
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(albazg_state, mux_w))

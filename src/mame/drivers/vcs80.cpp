@@ -140,7 +140,7 @@ READ8_MEMBER( vcs80_state::pio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* keyboard and led latch */
 	data |= m_keylatch;
@@ -173,7 +173,7 @@ WRITE8_MEMBER( vcs80_state::pio_pb_w )
 
 	*/
 
-	UINT8 led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
+	uint8_t led_data = BITSWAP8(data & 0x7f, 7, 5, 6, 4, 3, 2, 1, 0);
 	int digit = m_keylatch;
 
 	/* skip middle digit */
@@ -209,7 +209,7 @@ static MACHINE_CONFIG_START( vcs80, vcs80_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_5MHz/2) /* U880D */
 	MCFG_CPU_PROGRAM_MAP(vcs80_mem)
 	MCFG_CPU_IO_MAP(vcs80_io)
-	MCFG_CPU_CONFIG(vcs80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(vcs80_daisy_chain)
 
 	/* keyboard timer */
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", vcs80_state, vcs80_keyboard_tick, attotime::from_hz(1000))
@@ -247,8 +247,8 @@ DIRECT_UPDATE_MEMBER(vcs80_state::vcs80_direct_update_handler)
 
 DRIVER_INIT_MEMBER(vcs80_state,vcs80)
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));
-	m_maincpu->space(AS_IO).set_direct_update_handler(direct_update_delegate(FUNC(vcs80_state::vcs80_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&vcs80_state::vcs80_direct_update_handler, this));
+	m_maincpu->space(AS_IO).set_direct_update_handler(direct_update_delegate(&vcs80_state::vcs80_direct_update_handler, this));
 }
 
 /* System Drivers */

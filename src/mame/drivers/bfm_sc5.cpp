@@ -19,7 +19,7 @@
 #include "machine/mcf5206e.h"
 #include "bfm_sc5.lh"
 #include "video/awpvid.h"
-#include "bfm_sc45_helper.h"
+#include "machine/bfm_sc45_helper.h"
 
 
 
@@ -28,7 +28,7 @@ WRITE16_MEMBER( bfm_sc5_state::sc5_duart_w )
 	// clearly a duart of some kind, write patterns are the same as SC4 games
 //  printf("%s: duart_w %1x %04x %04x\n", machine().describe_context(), offset, data, mem_mask);
 
-	if (mem_mask &0xff00)
+	if (ACCESSING_BITS_8_15)
 	{
 		m_duart->write(space,offset,(data>>8)&0x00ff);
 	}
@@ -231,3 +231,5 @@ MACHINE_CONFIG_START( bfm_sc5, bfm_sc5_state )
 	MCFG_SOUND_ADD("ymz", YMZ280B, 16000000) // ?? Mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
+
+#include "bfm_sc5sw.hxx"

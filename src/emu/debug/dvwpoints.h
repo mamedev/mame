@@ -42,7 +42,7 @@ protected:
 private:
 	// internal helpers
 	void enumerate_sources();
-	void pad_astring_to_length(std::string& str, int len);
+	void pad_ostream_to_length(std::ostream& str, int len);
 	void gather_watchpoints();
 
 

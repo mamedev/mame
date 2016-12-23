@@ -21,7 +21,6 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eepromser.h"
 #include "sound/2610intf.h"
 #include "includes/fromanc2.h"
 #include "rendlay.h"
@@ -41,8 +40,8 @@ INTERRUPT_GEN_MEMBER(fromanc2_state::fromanc2_interrupt)
 
 WRITE16_MEMBER(fromanc2_state::fromanc2_sndcmd_w)
 {
-	soundlatch_byte_w(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
-	soundlatch2_byte_w(space, offset, data & 0xff);         // 2P (RIGHT)
+	m_soundlatch->write(space, offset, (data >> 8) & 0xff);   // 1P (LEFT)
+	m_soundlatch2->write(space, offset, data & 0xff);         // 2P (RIGHT)
 
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	m_sndcpu_nmi_flag = 0;
@@ -55,7 +54,7 @@ WRITE16_MEMBER(fromanc2_state::fromanc2_portselect_w)
 
 READ16_MEMBER(fromanc2_state::fromanc2_keymatrix_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 
 	switch (m_portselect)
 	{
@@ -283,8 +282,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_sound_io_map, AS_IO, 8, fromanc2_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) AM_WRITENOP     // snd cmd (1P) / ?
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_byte_r)                // snd cmd (2P)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITENOP     // snd cmd (1P) / ?
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)                // snd cmd (2P)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
@@ -302,9 +301,9 @@ static INPUT_PORTS_START( fromanc2 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_int_r, NULL) // SUBCPU INT FLAG
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, NULL) // SNDCPU NMI FLAG
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_nmi_r, NULL) // SUBCPU NMI FLAG
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_int_r, nullptr) // SUBCPU INT FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, nullptr) // SNDCPU NMI FLAG
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,subcpu_nmi_r, nullptr) // SUBCPU NMI FLAG
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (1P)" ) PORT_CODE(KEYCODE_F2) // TEST (1P)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service Mode (2P)" ) PORT_CODE(KEYCODE_F2) // TEST (2P)
@@ -403,7 +402,7 @@ static INPUT_PORTS_START( fromanc4 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, NULL) // SNDCPU NMI FLAG
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, fromanc2_state,sndcpu_nmi_r, nullptr) // SNDCPU NMI FLAG
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -461,18 +460,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  Sound interface
- *
- *************************************/
-
-WRITE_LINE_MEMBER(fromanc2_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -490,7 +477,7 @@ MACHINE_START_MEMBER(fromanc2_state,fromanc4)
 
 MACHINE_START_MEMBER(fromanc2_state,fromanc2)
 {
-	m_bankedram = std::make_unique<UINT8[]>(0x4000 * 3);
+	m_bankedram = std::make_unique<uint8_t[]>(0x4000 * 3);
 
 	membank("bank1")->configure_entries(0, 4, memregion("sub")->base(), 0x4000);
 	membank("bank2")->configure_entry(0, memregion("sub")->base() + 0x08000);
@@ -561,8 +548,11 @@ static MACHINE_CONFIG_START( fromanc2, fromanc2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
@@ -618,8 +608,11 @@ static MACHINE_CONFIG_START( fromancr, fromanc2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)
@@ -671,8 +664,11 @@ static MACHINE_CONFIG_START( fromanc4, fromanc2_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(fromanc2_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)

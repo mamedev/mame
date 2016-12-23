@@ -70,7 +70,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu") { }
 
-	UINT32 screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_DRIVER_INIT(igs_m036);
 
 	DECLARE_DRIVER_INIT(cjdh2);
@@ -86,7 +86,7 @@ public:
 
 
 
-UINT32 igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t igs_m036_state::screen_update_igs_m036(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -208,7 +208,7 @@ ROM_END
 
 void igs_m036_state::pgm_create_dummy_internal_arm_region(void)
 {
-	UINT16 *temp16 = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *temp16 = (uint16_t *)memregion("maincpu")->base();
 	int i;
 	for (i=0;i<0x4000/2;i+=2)
 	{

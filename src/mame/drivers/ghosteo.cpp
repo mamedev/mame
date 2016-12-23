@@ -59,6 +59,7 @@ ToDo: verify QS1000 hook-up
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/gen_latch.h"
 #include "machine/s3c2410.h"
 //#include "machine/smartmed.h"
 #include "machine/i2cmem.h"
@@ -86,18 +87,22 @@ class ghosteo_state : public driver_device
 public:
 	ghosteo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") ,
+		m_maincpu(*this, "maincpu"),
+		m_qs1000(*this, "qs1000"),
 		m_i2cmem(*this, "i2cmem"),
 		m_s3c2410(*this, "s3c2410"),
+		m_soundlatch(*this, "soundlatch"),
 		m_system_memory(*this, "systememory") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<qs1000_device> m_qs1000;
 	required_device<i2cmem_device> m_i2cmem;
 	required_device<s3c2410_device> m_s3c2410;
-	required_shared_ptr<UINT32> m_system_memory;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_shared_ptr<uint32_t> m_system_memory;
 
 	int m_security_count;
-	UINT32 m_bballoon_port[20];
+	uint32_t m_bballoon_port[20];
 	struct nand_t m_nand;
 	DECLARE_READ32_MEMBER(bballoon_speedup_r);
 	DECLARE_READ32_MEMBER(touryuu_port_10000000_r);
@@ -110,7 +115,7 @@ public:
 	DECLARE_WRITE8_MEMBER(qs1000_p3_w);
 
 	int m_rom_pagesize;
-	UINT8* m_flash;
+	uint8_t* m_flash;
 	DECLARE_DRIVER_INIT(touryuu);
 	DECLARE_DRIVER_INIT(bballoon);
 	virtual void machine_start() override;
@@ -154,7 +159,7 @@ NAND Flash Controller (4KB internal buffer)
 
 READ8_MEMBER( ghosteo_state::qs1000_p1_r )
 {
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER( ghosteo_state::qs1000_p1_w )
@@ -171,22 +176,20 @@ WRITE8_MEMBER( ghosteo_state::qs1000_p3_w )
 	// ...x .... - ?
 	// ..x. .... - /IRQ clear
 
-	qs1000_device *qs1000 = machine().device<qs1000_device>("qs1000");
-
 	membank("qs1000:bank")->set_entry(data & 0x07);
 
 	if (!BIT(data, 5))
-		qs1000->set_irq(CLEAR_LINE);
+		m_qs1000->set_irq(CLEAR_LINE);
 }
 
 
 // GPIO
 
-static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
+static const uint8_t security_data[] = { 0x01, 0xC4, 0xFF, 0x22, 0xFF, 0xFF, 0xFF, 0xFF };
 
 READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
 {
-	UINT32 data = m_bballoon_port[offset];
+	uint32_t data = m_bballoon_port[offset];
 	switch (offset)
 	{
 		case S3C2410_GPIO_PORT_F :
@@ -206,7 +209,7 @@ READ32_MEMBER(ghosteo_state::s3c2410_gpio_port_r)
 
 WRITE32_MEMBER(ghosteo_state::s3c2410_gpio_port_w)
 {
-	UINT32 old_value = m_bballoon_port[offset];
+	uint32_t old_value = m_bballoon_port[offset];
 	m_bballoon_port[offset] = data;
 	switch (offset)
 	{
@@ -327,7 +330,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 {
 	struct nand_t &nand = m_nand;
 //  device_t *nand = space.machine().device( "nand");
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch (nand.mode)
 	{
 		case NAND_M_INIT :
@@ -345,7 +348,7 @@ READ8_MEMBER(ghosteo_state::s3c2410_nand_data_r )
 			{
 				if ((nand.byte_addr >= 0x200) && (nand.byte_addr < 0x204))
 				{
-					UINT8 mecc[4];
+					uint8_t mecc[4];
 					m_s3c2410->s3c2410_nand_calculate_mecc( m_flash + nand.page_addr * 0x200, 0x200, mecc);
 					data = mecc[nand.byte_addr-0x200];
 				}
@@ -402,8 +405,8 @@ WRITE_LINE_MEMBER(ghosteo_state::s3c2410_i2c_sda_w )
 
 READ32_MEMBER( ghosteo_state::touryuu_port_10000000_r )
 {
-	UINT32 port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
-	UINT32 data = 0xFFFFFFFF;
+	uint32_t port_g = m_bballoon_port[S3C2410_GPIO_PORT_G];
+	uint32_t data = 0xFFFFFFFF;
 	switch (port_g)
 	{
 		case 0x8 : data = ioport( "10000000-08")->read(); break;
@@ -562,7 +565,7 @@ INPUT_PORTS_END
 
 READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 {
-	UINT32 ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
+	uint32_t ret = m_s3c2410->s3c24xx_lcd_r(space, offset+0x10/4, mem_mask);
 
 
 	int pc = space.device().safe_pc();
@@ -586,17 +589,15 @@ READ32_MEMBER(ghosteo_state::bballoon_speedup_r)
 
 WRITE32_MEMBER(ghosteo_state::soundlatch_w)
 {
-	qs1000_device *qs1000 = space.machine().device<qs1000_device>("qs1000");
-
-	soundlatch_byte_w(space, 0, data);
-	qs1000->set_irq(ASSERT_LINE);
+	m_soundlatch->write(space, 0, data);
+	m_qs1000->set_irq(ASSERT_LINE);
 
 	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(100));
 }
 
 void ghosteo_state::machine_start()
 {
-	m_flash = (UINT8 *)memregion( "user1")->base();
+	m_flash = (uint8_t *)memregion( "user1")->base();
 
 	// Set up the QS1000 program ROM banking, taking care not to overlap the internal RAM
 	machine().device("qs1000:cpu")->memory().space(AS_IO).install_read_bank(0x0100, 0xffff, "bank");
@@ -638,12 +639,14 @@ static MACHINE_CONFIG_START( ghosteo, ghosteo_state )
 
 //  MCFG_DEVICE_ADD("nand", NAND, 0)
 //  MCFG_NAND_TYPE(NAND_CHIP_K9F5608U0D)    // or another variant with ID 0xEC 0x75 ?
-//  MCFG_DEVICE_CONFIG(bballoon_nand_intf)
+//  MCFG_NAND_RNB_CALLBACK(DEVWRITELINE("s3c2410", s3c2410_device, s3c24xx_pin_frnb_w))
 
-//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
+//  MCFG_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, nullptr)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("qs1000", QS1000, XTAL_24MHz)
 	MCFG_QS1000_EXTERNAL_ROM(true)

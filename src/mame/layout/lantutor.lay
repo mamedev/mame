@@ -10,8 +10,8 @@
 	</element>
 
 	<element name="triangle_mark" defstate="0">
-		<text state="0" string="v"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
-		<text state="1" string="v"><color red="0.2" green="1.0" blue="0.85" /></text>
+		<text state="0" string="&#x25bc;"><color red="0.0235" green="0.1255" blue="0.1059" /></text>
+		<text state="1" string="&#x25bc;"><color red="0.2" green="1.0" blue="0.85" /></text>
 	</element>
 
 

@@ -82,58 +82,6 @@
 #include "includes/laserbat.h"
 
 
-PALETTE_INIT_MEMBER(laserbat_state_base, laserbat)
-{
-	/*
-	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
-	    for red and green.  LSB for blue is always effectively 1.  The
-	    middle group is the MSB.  Yet another crazy thing they did.
-
-	    Each colour channel has an emitter follower buffer amlpifier
-	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
-	    Output is adjusted by connecting additional resistors across the
-	    leg to ground using an open collector buffer - 270R, 820R and
-	    1k0 for unset MSB to LSB, respectively (blue has no LSB so it
-	    has no 1k0 resistor).
-
-	    Assuming 0.7V drop across the emitter follower and no drop
-	    across the open collector buffer, these are the approximate
-	    output voltages:
-
-	    0.0000, 0.1031, 0.1324, 0.2987 , 0.7194, 1.2821, 1.4711, 3.1372
-
-	    The game never sets the colour to any value above 4, effectively
-	    treating it as 5-level red and green, and 3-level blue, for a
-	    total of 75 usable colours.
-
-	    From the fact that there's no DC offset on red and green, and
-	    the highest value used is just over 0.7V, I'm guessing the game
-	    expects to drive a standard 0.7V RGB monitor, and higher colour
-	    values would simply saturate the input.  To make it not look
-	    like the inside of a coal mine, I've applied gamma decoding at
-	    2.2
-
-	    However there's that nasty DC offset on the blue caused by the
-	    fact that it has no LSB, but it's eliminated at the AC-coupling
-	    of the input and output of the buffer amplifier on the monitor
-	    interface board.  I'm treating it as though it has the same gain
-	    as the other channels.  After gamma adjustment, medium red and
-	    medium blue as used by the game have almost the same intensity.
-	*/
-
-	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
-	int const blue_weights[] = { 0, 0, 60, 121, 241, 255, 255, 255, 255 };
-	for (int entry = 0; palette.entries() > entry; entry++)
-	{
-		UINT8 const bits(entry & 0xff);
-		UINT8 const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
-		UINT8 const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
-		UINT8 const b(((bits & 0x04) >> 1) | ((bits & 0x20) >> 3) | 0x01);
-		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
-	}
-}
-
-
 WRITE8_MEMBER(laserbat_state_base::videoram_w)
 {
 	if (!m_mpx_bkeff)
@@ -220,7 +168,7 @@ void laserbat_state_base::video_start()
 }
 
 
-UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bool const flip_y = flip_screen_y(), flip_x = flip_screen_x();
 	int const offs_y = m_screen->visible_area().max_y + m_screen->visible_area().min_y;
@@ -228,11 +176,11 @@ UINT32 laserbat_state_base::screen_update_laserbat(screen_device &screen, bitmap
 
 	for (int y = cliprect.min_y; cliprect.max_y >= y; y++)
 	{
-		UINT16 const *const src = &m_bitmap.pix16(flip_y ? (offs_y - y) : y);
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t const *const src = &m_bitmap.pix16(flip_y ? (offs_y - y) : y);
+		uint16_t *dst = &bitmap.pix16(y);
 		for (int x = cliprect.min_x; cliprect.max_x >= x; x++)
 		{
-			dst[x] = UINT16(m_gfxmix->read(src[flip_x ? (offs_x - x) : x]));
+			dst[x] = uint16_t(m_gfxmix->read(src[flip_x ? (offs_x - x) : x]));
 		}
 	}
 
@@ -274,7 +222,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	int const max_x = m_screen->visible_area().max_x;
 	int const x_offset = min_x - (8 * 3);
 	int const y_offset = m_screen->visible_area().min_y - 8;
-	UINT16 *const row = &m_bitmap.pix16(y);
+	uint16_t *const row = &m_bitmap.pix16(y);
 
 	// wait for next scanline
 	m_scanline_timer->adjust(machine().first_screen()->time_until_pos(y + 1, 0));
@@ -292,9 +240,9 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		m_pvi2->render_next_line();
 		m_pvi3->render_next_line();
 	}
-	UINT16 const *const pvi1_row = &m_pvi1->bitmap().pix16(y);
-	UINT16 const *const pvi2_row = &m_pvi2->bitmap().pix16(y);
-	UINT16 const *const pvi3_row = &m_pvi3->bitmap().pix16(y);
+	uint16_t const *const pvi1_row = &m_pvi1->bitmap().pix16(y);
+	uint16_t const *const pvi2_row = &m_pvi2->bitmap().pix16(y);
+	uint16_t const *const pvi3_row = &m_pvi3->bitmap().pix16(y);
 
 	// don't draw outside the visible area
 	m_bitmap.plot_box(0, y, m_bitmap.width(), 1, 0);
@@ -302,21 +250,21 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		return;
 
 	// render static effect bits
-	UINT16 const static_bits = ((UINT16(m_coleff) << 14) & 0xc000) | ((UINT16(m_clr_lum) << 2) & 0x001c);
+	uint16_t const static_bits = ((uint16_t(m_coleff) << 14) & 0xc000) | ((uint16_t(m_clr_lum) << 2) & 0x001c);
 	m_bitmap.plot_box(min_x, y, max_x - min_x + 1, 1, static_bits);
 
 	// render the TTL-generated background tilemap
 	unsigned const bg_row = (y - y_offset) & 0x07;
-	UINT8 const *const bg_src = &m_bg_ram[((y - y_offset) << 2) & 0x3e0];
+	uint8_t const *const bg_src = &m_bg_ram[((y - y_offset) << 2) & 0x3e0];
 	for (unsigned byte = 0, px = x_offset + (9 * 3); max_x >= px; byte++)
 	{
-		UINT16 const tile = (UINT16(bg_src[byte & 0x1f]) << 3) & 0x7f8;
-		UINT8 red   = m_gfx1[0x0000 | tile | bg_row];
-		UINT8 green = m_gfx1[0x0800 | tile | bg_row];
-		UINT8 blue  = m_gfx1[0x1000 | tile | bg_row];
+		uint16_t const tile = (uint16_t(bg_src[byte & 0x1f]) << 3) & 0x7f8;
+		uint8_t red   = m_gfx1[0x0000 | tile | bg_row];
+		uint8_t green = m_gfx1[0x0800 | tile | bg_row];
+		uint8_t blue  = m_gfx1[0x1000 | tile | bg_row];
 		for (unsigned pixel = 0; 8 > pixel; pixel++, red <<= 1, green <<= 1, blue <<= 1)
 		{
-			UINT16 const bg = ((red & 0x80) ? 0x0100 : 0x0000) | ((green & 0x80) ? 0x0200 : 0x0000) | ((blue & 0x80) ? 0x0400 : 0x0000);
+			uint16_t const bg = ((red & 0x80) ? 0x0100 : 0x0000) | ((green & 0x80) ? 0x0200 : 0x0000) | ((blue & 0x80) ? 0x0400 : 0x0000);
 			if ((min_x <= px) && (max_x >= px)) row[px] |= bg;
 			px++;
 			if ((min_x <= px) && (max_x >= px)) row[px] |= bg;
@@ -327,25 +275,25 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 	}
 
 	// render shell/effect graphics
-	UINT8 const eff1_val = m_eff_ram[((y - y_offset) & 0xff) | 0x100];
-	UINT8 const eff2_val = m_eff_ram[((y - y_offset) & 0xff) | 0x000];
+	uint8_t const eff1_val = m_eff_ram[((y - y_offset) & 0xff) | 0x100];
+	uint8_t const eff2_val = m_eff_ram[((y - y_offset) & 0xff) | 0x000];
 	for (int x = 0, px = x_offset; max_x >= px; x++)
 	{
 		// calculate area effects
 		// I have no idea where the magical x offset comes from but it's necessary
 		bool const right_half = bool((x + 0) & 0x80);
-		bool const eff1_cmp = right_half ? (UINT8((x + 0) & 0x7f) < (eff1_val & 0x7f)) : (UINT8((x + 0) & 0x7f) > (~eff1_val & 0x7f));
-		bool const eff2_cmp = right_half ? (UINT8((x + 0) & 0x7f) < (eff2_val & 0x7f)) : (UINT8((x + 0) & 0x7f) > (~eff2_val & 0x7f));
+		bool const eff1_cmp = right_half ? (uint8_t((x + 0) & 0x7f) < (eff1_val & 0x7f)) : (uint8_t((x + 0) & 0x7f) > (~eff1_val & 0x7f));
+		bool const eff2_cmp = right_half ? (uint8_t((x + 0) & 0x7f) < (eff2_val & 0x7f)) : (uint8_t((x + 0) & 0x7f) > (~eff2_val & 0x7f));
 		bool const eff1 = m_abeff1 && (m_neg1 ? !eff1_cmp : eff1_cmp);
 		bool const eff2 = m_abeff2 && (m_neg2 ? !eff2_cmp : eff2_cmp) && m_mpx_eff2_sh;
 
 		// calculate shell point effect
 		// using the same magical offset as the area effects
-		bool const shell = m_abeff2 && (UINT8((x + 0) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
+		bool const shell = m_abeff2 && (uint8_t((x + 0) & 0xff) == (eff2_val & 0xff)) && !m_mpx_eff2_sh;
 
 		// set effect bits, and mix in PVI graphics while we're here
-		UINT16 const effect_bits = (shell ? 0x0800 : 0x0000) | (eff1 ? 0x1000 : 0x0000) | (eff2 ? 0x2000 : 0x0000);
-		UINT16 pvi_bits = ~(pvi1_row[px] | pvi2_row[px] | pvi3_row[px]);
+		uint16_t const effect_bits = (shell ? 0x0800 : 0x0000) | (eff1 ? 0x1000 : 0x0000) | (eff2 ? 0x2000 : 0x0000);
+		uint16_t pvi_bits = ~(pvi1_row[px] | pvi2_row[px] | pvi3_row[px]);
 		pvi_bits = ((pvi_bits & 0x01) << 7) | ((pvi_bits & 0x02) << 5) | ((pvi_bits & 0x04) << 3);
 		if ((min_x <= px) && (max_x >= px)) row[px] |= effect_bits | pvi_bits;
 		px++;
@@ -364,7 +312,7 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 		{
 			for (unsigned byte = 0, x = x_offset + (3 * ((256 - m_wcoh + 5) & 0x0ff)); 8 > byte; byte++)
 			{
-				UINT8 bits = m_gfx2[((m_shp << 8) & 0x700) | ((sprite_row << 3) & 0x0f8) | (byte & 0x07)];
+				uint8_t bits = m_gfx2[((m_shp << 8) & 0x700) | ((sprite_row << 3) & 0x0f8) | (byte & 0x07)];
 				for (unsigned pixel = 0; 4 > pixel; pixel++, bits <<= 2)
 				{
 					if (max_x >= x) row[x++] |= (bits >> 6) & 0x03;
@@ -373,5 +321,108 @@ TIMER_CALLBACK_MEMBER(laserbat_state_base::video_line)
 				}
 			}
 		}
+	}
+}
+
+
+PALETTE_INIT_MEMBER(laserbat_state, laserbat)
+{
+	/*
+	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
+	    for red and green.  LSB for blue is always effectively 1.  The
+	    middle group is the MSB.  Yet another crazy thing they did.
+
+	    Each colour channel has an emitter follower buffer amlpifier
+	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
+	    Output is adjusted by connecting additional resistors across the
+	    leg to ground using an open collector buffer - 270R, 820R and
+	    1k0 for unset MSB to LSB, respectively (blue has no LSB so it
+	    has no 1k0 resistor).
+
+	    Assuming 0.7V drop across the emitter follower and no drop
+	    across the open collector buffer, these are the approximate
+	    output voltages:
+
+	    0.0000, 0.1031, 0.1324, 0.2987, 0.7194, 1.2821, 1.4711, 3.1372
+
+	    The game never sets the colour to any value above 4, effectively
+	    treating it as 5-level red and green, and 3-level blue, for a
+	    total of 75 usable colours.
+
+	    From the fact that there's no DC offset on red and green, and
+	    the highest value used is just over 0.7V, I'm guessing the game
+	    expects to drive a standard 0.7V RGB monitor, and higher colour
+	    values would simply saturate the input.  To make it not look
+	    like the inside of a coal mine, I've applied gamma decoding at
+	    2.2
+
+	    However there's that nasty DC offset on the blue caused by the
+	    fact that it has no LSB, but it's eliminated at the AC-coupling
+	    of the input and output of the buffer amplifier on the monitor
+	    interface board.  I'm treating it as though it has the same gain
+	    as the other channels.  After gamma adjustment, medium red and
+	    medium blue as used by the game have almost the same intensity.
+	*/
+
+	int const weights[] = { 0, 107, 120, 173, 255, 255, 255, 255 };
+	int const blue_weights[] = { 0, 0, 60, 121, 241, 255, 255, 255 };
+	for (int entry = 0; palette.entries() > entry; entry++)
+	{
+		uint8_t const bits(entry & 0xff);
+		uint8_t const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
+		uint8_t const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
+		uint8_t const b(((bits & 0x04) >> 1) | ((bits & 0x20) >> 3) | 0x01);
+		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
+	}
+}
+
+
+PALETTE_INIT_MEMBER(catnmous_state, catnmous)
+{
+	/*
+	    Uses GRBGRBGR pixel format.  The two topmost bist are the LSBs
+	    for red and green.  The middle group is the MSB.  Yet another
+	    crazy thing they did.
+
+	    Each colour channel has an emitter follower buffer amlpifier
+	    biased with a 1k resistor to +5V and a 3k3 resistor to ground.
+	    Output is adjusted by connecting additional resistors across the
+	    leg to ground using an open collector buffer.  Red and green use
+	    560R, 820R and 1k0 for unset MSB to LSB, respectively.  Blue
+	    uses 47R and 820R on the PCB we have a photo of, although the
+	    47R resistor looks like it could be a bad repair (opposite
+	    orientation and burn marks on PCB).
+
+	    Assuming 0.7V drop across the emitter follower and no drop
+	    across the open collector buffer, these are the approximate
+	    output voltages for red and green:
+
+	    0.2419, 0.4606, 0.5229, 0.7194, 0.9188, 1.2821, 1.4711, 3.1372
+
+	    The game uses all colour values except 4.  The DC offset will be
+	    eliminated by the AC coupling on the monitor interface board.
+	    The differences steps aren't very linear, they vary from 0.06V
+	    to 0.36V with no particular order.  The input would be expected
+	    to saturate somewhere inside the big jump to the highest level.
+
+	    Let's assume the 47R resistor is a bad repair and it's supposed
+	    to be 470R.  That gives us these output voltages for blue:
+
+	    0.3752, 0.7574, 1.2821, 3.1372
+
+	    To make life easier, I'll assume the monitor is expected to have
+	    half the gain of a standard monitor and no gamma decoding is
+	    necessary.
+	*/
+
+	int const weights[] = { 0, 40, 51, 87, 123, 189, 224, 255 };
+	int const blue_weights[] = { 0, 70, 165, 255 };
+	for (int entry = 0; palette.entries() > entry; entry++)
+	{
+		uint8_t const bits(entry & 0xff);
+		uint8_t const r(((bits & 0x01) << 1) | ((bits & 0x08) >> 1) | ((bits & 0x40) >> 6));
+		uint8_t const g(((bits & 0x02) >> 0) | ((bits & 0x10) >> 2) | ((bits & 0x80) >> 7));
+		uint8_t const b(((bits & 0x04) >> 2) | ((bits & 0x20) >> 4));
+		palette.set_pen_color(entry, rgb_t(weights[r], weights[g], blue_weights[b]));
 	}
 }

@@ -103,7 +103,7 @@ namespace bx
 		static void readUnaligned(const void* _data, uint32_t& _out)
 		{
 			const uint8_t* data = (const uint8_t*)_data;
-			if (BX_ENABLED(BX_CPU_ENDIAN_LITTLE) )
+			if (BX_ENABLED(BX_CPU_ENDIAN_BIG) )
 			{
 				_out = 0
 					| data[0]<<24
@@ -162,6 +162,7 @@ namespace bx
 	template <typename Ty>
 	inline uint32_t hashMurmur2A(const Ty& _data)
 	{
+		BX_STATIC_ASSERT(BX_TYPE_IS_POD(Ty) );
 		return hashMurmur2A(&_data, sizeof(Ty) );
 	}
 

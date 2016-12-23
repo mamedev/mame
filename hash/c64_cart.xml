@@ -4772,7 +4772,7 @@
 	</software>
 
 	<software name="c64diag">
-		<description>C-64 Diagnostic r.586220</description>
+		<description>C-64 Diagnostic (Rev 586220)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="cart" interface="c64_cart">
@@ -4844,11 +4844,25 @@
 		<description>C64 Diagnostic</description>
 		<year>19??</year>
 		<publisher>Commodore</publisher>
+		<info name="serial" value="324528-02" />
 		<part name="cart" interface="c64_cart">
 			<feature name="exrom" value="0" />
 			<feature name="game" value="1" />
 			<dataarea name="roml" size="0x2000">
 				<rom name="c64 diagnostic (19xx)(commodore).80" size="0x2000" crc="5376a162" sha1="86f968606edca8edc2036462eb06f51ebc8f66f9" offset="0x0000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="c64dia41">
+		<description>C-64 Diagnostic (Rev 4.1.0)</description>
+		<year>19??</year>
+		<publisher>Commodore</publisher>
+		<part name="cart" interface="c64_cart">
+			<feature name="exrom" value="0" />
+			<feature name="game" value="1" />
+			<dataarea name="roml" size="0x2000">
+				<rom name="commodorediagrev410.bin" size="0x2000" crc="9d1a9181" sha1="5800219da86c00e583f7100e91febe528208ec46" offset="0x0000" />
 			</dataarea>
 		</part>
 	</software>

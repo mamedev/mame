@@ -115,7 +115,7 @@ READ8_MEMBER( aim65_state::aim65_riot_b_r )
 		"keyboard_4", "keyboard_5", "keyboard_6", "keyboard_7"
 	};
 
-	UINT8 row, data = 0xff;
+	uint8_t row, data = 0xff;
 
 	/* scan keyboard rows */
 	for (row = 0; row < 8; row++)
@@ -185,7 +185,7 @@ WRITE8_MEMBER( aim65_state::aim65_pb_w )
     d0/1 = printer data (not emulated)
 */
 
-	UINT8 bits = data ^ m_pb_save;
+	uint8_t bits = data ^ m_pb_save;
 	m_pb_save = data;
 
 	if (BIT(bits, 7))
@@ -220,7 +220,7 @@ READ8_MEMBER( aim65_state::aim65_pb_r )
     d3 = kb/tty switch
 */
 
-	UINT8 data = ioport("switches")->read();
+	uint8_t data = ioport("switches")->read();
 	data |= (m_cassette1->input() > +0.03) ? 0x80 : 0;
 	data |= 0x40; // TTY must be H if not used.
 	data |= m_pb_save & 0x37;
@@ -287,7 +287,7 @@ device - the output will be gibberish.
     bool m_flag_a;
     bool m_flag_b;
     bool m_printer_level;
-    UINT16 *m_printerRAM;
+    uint16_t *m_printerRAM;
 */
 
 
@@ -378,7 +378,7 @@ WRITE8_MEMBER( aim65_state::aim65_pa_w )
 VIDEO_START_MEMBER(aim65_state,aim65)
 {
 	m_print_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(aim65_state::aim65_printer_timer),this));
-	m_printerRAM = std::make_unique<UINT16[]>((600 * 10 * 2) / 2);
+	m_printerRAM = std::make_unique<uint16_t[]>((600 * 10 * 2) / 2);
 	memset(m_printerRAM, 0, videoram_size);
 	VIDEO_START_CALL_MEMBER(generic);
 	m_printer_x = 0;
@@ -394,8 +394,8 @@ SCREEN_UPDATE( aim65 )
 	aim65_state *state = screen.machine().driver_data<aim65_state>();
 	/* Display printer output */
 	bool dir = 1;
-	UINT8 b,x,pen;
-	UINT16 y;
+	uint8_t b,x,pen;
+	uint16_t y;
 
 	for (y = 0; y<500; y++)
 	{

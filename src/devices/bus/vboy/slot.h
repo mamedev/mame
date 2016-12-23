@@ -3,6 +3,9 @@
 #ifndef __VBOY_SLOT_H
 #define __VBOY_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -30,21 +33,21 @@ public:
 	virtual DECLARE_READ32_MEMBER(read_eeprom) { return 0xffffffff; }
 	virtual DECLARE_WRITE32_MEMBER(write_eeprom) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void eeprom_alloc(UINT32 size);
-	UINT32* get_rom_base() { return m_rom; }
-	UINT32* get_eeprom_base() { return &m_eeprom[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_eeprom_size() { return m_eeprom.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void eeprom_alloc(uint32_t size);
+	uint32_t* get_rom_base() { return m_rom; }
+	uint32_t* get_eeprom_base() { return &m_eeprom[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_eeprom_size() { return m_eeprom.size(); }
 
 	void save_eeprom()  { device().save_item(NAME(m_eeprom)); }
 
 protected:
 	// internal state
-	UINT32 *m_rom;
-	UINT32 m_rom_size;
-	UINT32 m_rom_mask;
-	std::vector<UINT32> m_eeprom;
+	uint32_t *m_rom;
+	uint32_t m_rom_size;
+	uint32_t m_rom_mask;
+	std::vector<uint32_t> m_eeprom;
 };
 
 
@@ -56,7 +59,7 @@ class vboy_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vboy_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vboy_cart_slot_device();
 
 	// device-level overrides
@@ -64,9 +67,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_type() { return m_type; }
 
@@ -78,7 +81,6 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 1; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual const char *image_interface() const override { return "vboy_cart"; }
 	virtual const char *file_extensions() const override { return "vb,bin"; }
 

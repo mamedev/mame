@@ -34,10 +34,10 @@ enum vdt911_model_t
 	vdt911_model_FrenchWP      // French word processing
 };
 
-class vdt911_device : public device_t
+class vdt911_device : public device_t, public device_gfx_interface
 {
 public:
-	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vdt911_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(cru_r);
 	DECLARE_WRITE8_MEMBER(cru_w);
@@ -54,11 +54,10 @@ public:
 		return downcast<vdt911_device &>(device).m_lineint_line.set_callback(object);
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
-	void device_config_complete() override;
 	void device_start() override;
 	void device_reset() override;
 
@@ -75,8 +74,8 @@ private:
 	vdt911_screen_size_t    m_screen_size;  // char_960 for 960-char, 12-line model; char_1920 for 1920-char, 24-line model
 	vdt911_model_t          m_model;        // country code
 
-	UINT8 m_data_reg;                       // dt911 write buffer
-	UINT8 m_display_RAM[2048];              // vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model)
+	uint8_t m_data_reg;                       // dt911 write buffer
+	uint8_t m_display_RAM[2048];              // vdt911 char buffer (1kbyte for 960-char model, 2kbytes for 1920-char model)
 
 	unsigned int m_cursor_address;          // current cursor address (controlled by the computer, affects both display and I/O protocol)
 	unsigned int m_cursor_address_mask; // 1023 for 960-char model, 2047 for 1920-char model
@@ -85,9 +84,9 @@ private:
 	emu_timer *m_blink_timer;               // cursor blink clock
 	emu_timer *m_line_timer;                // screen line timer
 
-	UINT8 m_keyboard_data;                  // last code pressed on keyboard
+	uint8_t m_keyboard_data;                  // last code pressed on keyboard
 	bool m_keyboard_data_ready;             // true if there is a new code in keyboard_data
-	bool m_keyboard_interrupt_enable;       // true when keybord interrupts are enabled
+	bool m_keyboard_interrupt_enable;       // true when keyboard interrupts are enabled
 
 	bool m_display_enable;                  // screen is black when false
 	bool m_dual_intensity_enable;           // if true, MSBit of ASCII codes controls character highlight
@@ -98,13 +97,11 @@ private:
 	bool m_word_select;                     // CRU interface mode
 	bool m_previous_word_select;            // value of word_select is saved here
 
-	UINT8 m_last_key_pressed;
+	uint8_t m_last_key_pressed;
 	int m_last_modifier_state;
 	char m_foreign_mode;
 
 	required_device<beep_device>        m_beeper;
-	required_device<gfxdecode_device>   m_gfxdecode;
-	required_device<palette_device>     m_palette;
 	devcb_write_line                   m_keyint_line;
 	devcb_write_line                   m_lineint_line;
 };

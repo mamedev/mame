@@ -34,7 +34,7 @@ READ8_MEMBER(starwars_state::r6532_porta_r)
 	/* d1 (out) TMS5220 Not Read        */
 	/* d0 (out) TMS5220 Not Write       */
 	/* Note: bit 4 is always set to avoid sound self test */
-	UINT8 olddata = m_riot->porta_in_get();
+	uint8_t olddata = m_riot->porta_in_get();
 
 	tms5220_device *tms5220 = machine().device<tms5220_device>("tms");
 	return (olddata & 0xc0) | 0x10 | (tms5220->readyq_r() << 2);

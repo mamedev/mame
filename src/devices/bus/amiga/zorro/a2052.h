@@ -28,7 +28,7 @@ class a2052_device : public device_t, public device_zorro2_card_interface, publi
 {
 public:
 	// construction/destruction
-	a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a2052_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	virtual ioport_constructor device_input_ports() const override;
@@ -42,7 +42,7 @@ protected:
 
 private:
 	required_ioport m_config;
-	std::vector<UINT16> m_ram;
+	std::vector<uint16_t> m_ram;
 };
 
 // device type definition

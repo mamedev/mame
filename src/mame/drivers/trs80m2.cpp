@@ -33,7 +33,7 @@
 
 READ8_MEMBER( trs80m2_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x800)
 	{
@@ -191,7 +191,7 @@ READ8_MEMBER( trs80m2_state::nmi_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// 80/40 character mode*/
 	data |= m_80_40_char_en << 4;
@@ -389,9 +389,9 @@ MC6845_UPDATE_ROW( trs80m2_state::crtc_update_row )
 
 	for (int column = 0; column < x_count; column++)
 	{
-		UINT8 code = m_video_ram[(ma + column) & 0x7ff];
+		uint8_t code = m_video_ram[(ma + column) & 0x7ff];
 		offs_t address = ((code & 0x7f) << 4) | (ra & 0x0f);
-		UINT8 data = m_char_rom->base()[address];
+		uint8_t data = m_char_rom->base()[address];
 
 		int dcursor = (column == cursor_x);
 		int drevid = BIT(code, 7);
@@ -433,11 +433,11 @@ void trs80m2_state::video_start()
 	m_video_ram.allocate(0x800);
 }
 
-UINT32 trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t trs80m2_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_blnkvid)
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 	else
 	{
@@ -548,7 +548,7 @@ READ8_MEMBER( trs80m2_state::pio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data |= (m_fdc->intrq_r() ? 0x01 : 0x00);
@@ -701,19 +701,19 @@ void trs80m2_state::machine_reset()
 static MACHINE_CONFIG_START( trs80m2, trs80m2_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(z80_io)
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -786,7 +786,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	// basic machine hardware
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
-	MCFG_CPU_CONFIG(trs80m2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(trs80m2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(z80_mem)
 	MCFG_CPU_IO_MAP(m16_z80_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(AM9519A_TAG, pic8259_device, inta_cb)
@@ -796,14 +796,14 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_DEVICE_DISABLE()
 
 	// video hardware
-	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME(SCREEN_TAG, RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MCFG_SCREEN_UPDATE_DRIVER(trs80m2_state, screen_update)
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD(MC6845_TAG, MC6845, SCREEN_TAG, XTAL_12_48MHz/8)
 	MCFG_MC6845_SHOW_BORDER_AREA(true)
@@ -847,7 +847,7 @@ static MACHINE_CONFIG_START( trs80m16, trs80m16_state )
 	MCFG_Z80SIO0_ADD(Z80SIO_TAG, XTAL_8MHz/2, 0, 0, 0, 0)
 	MCFG_Z80DART_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))
 
-	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NULL )
+	MCFG_PIC8259_ADD(AM9519A_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_5), VCC, NOOP)
 
 	MCFG_CENTRONICS_ADD(CENTRONICS_TAG, centronics_devices, "printer")
 	MCFG_CENTRONICS_ACK_HANDLER(DEVWRITELINE(Z80PIO_TAG, z80pio_device, strobe_b))

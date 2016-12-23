@@ -19,6 +19,7 @@ solarwar
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "includes/videopin.h"
 #include "videopin.lh"
 #include "sound/discrete.h"
@@ -26,7 +27,7 @@ solarwar
 
 void videopin_state::update_plunger()
 {
-	UINT8 val = ioport("IN2")->read();
+	uint8_t val = ioport("IN2")->read();
 
 	if (m_prev != val)
 	{
@@ -53,7 +54,7 @@ void videopin_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		interrupt_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in videopin_state::device_timer");
+		assert_always(false, "Unknown id in videopin_state::device_timer");
 	}
 }
 
@@ -92,8 +93,8 @@ void videopin_state::machine_reset()
 
 	/* both output latches are cleared on reset */
 
-	out1_w(machine().driver_data()->generic_space(), 0, 0);
-	out2_w(machine().driver_data()->generic_space(), 0, 0);
+	out1_w(machine().dummy_space(), 0, 0);
+	out2_w(machine().dummy_space(), 0, 0);
 }
 
 
@@ -116,7 +117,7 @@ READ8_MEMBER(videopin_state::misc_r)
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = ioport("IN1")->read();
+	uint8_t val = ioport("IN1")->read();
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -219,7 +220,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, videopin_state )
 	AM_RANGE(0x0200, 0x07ff) AM_RAM_WRITE(video_ram_w) AM_SHARE("video_ram")
 	AM_RANGE(0x0800, 0x0800) AM_READ(misc_r) AM_WRITE(note_dvsr_w)
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(led_w)
-	AM_RANGE(0x0802, 0x0802) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0802, 0x0802) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0804, 0x0804) AM_WRITE(ball_w)
 	AM_RANGE(0x0805, 0x0805) AM_WRITE(out1_w)
 	AM_RANGE(0x0806, 0x0806) AM_WRITE(out2_w)
@@ -360,6 +361,7 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -371,7 +373,7 @@ static MACHINE_CONFIG_START( videopin, videopin_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", videopin)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

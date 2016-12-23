@@ -58,7 +58,7 @@ const device_type NCR53C7XX = &device_creator<ncr53c7xx_device>;
 //  ncr53c7xx_device - constructor/destructor
 //-------------------------------------------------
 
-ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ncr53c7xx_device::ncr53c7xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   nscsi_device(mconfig, NCR53C7XX, "53C7xx SCSI", tag, owner, clock, "ncr537xx", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -187,7 +187,7 @@ READ32_MEMBER( ncr53c7xx_device::read )
 {
 	VERBOSE_LOG(machine(), 1, "REG R: [%x] (%08X)\n", offset, mem_mask);
 
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (offset)
 	{
@@ -700,7 +700,7 @@ void ncr53c7xx_device::send_byte()
 
 	set_scsi_state( (m_scsi_state & STATE_MASK) | (SEND_WAIT_SETTLE << SUB_SHIFT) );
 
-	UINT32 data = m_host_read(m_dnad & ~3, 0xffffffff);
+	uint32_t data = m_host_read(m_dnad & ~3, 0xffffffff);
 	data = data >> ((m_dnad & 3) * 8) & 0xff;
 
 	++m_dnad;
@@ -742,8 +742,8 @@ void ncr53c7xx_device::device_timer(emu_timer &timer, device_timer_id id, int pa
 
 void ncr53c7xx_device::step(bool timeout)
 {
-	UINT32 ctrl = scsi_bus->ctrl_r();
-	UINT32 data = scsi_bus->data_r();
+	uint32_t ctrl = scsi_bus->ctrl_r();
+	uint32_t data = scsi_bus->data_r();
 
 	VERBOSE_LOG(machine(), 2, "Step: CTRL:%x DATA:%x (%d.%d) Timeout:%d\n", ctrl, data, m_scsi_state & STATE_MASK, m_scsi_state >> SUB_SHIFT, timeout);
 
@@ -1058,8 +1058,8 @@ void ncr53c7xx_device::step(bool timeout)
 			{
 				m_last_data = scsi_bus->data_r();
 
-				UINT32 shift = (8 * (m_dnad & 3));
-				UINT32 mem_mask = 0xff << shift;
+				uint32_t shift = (8 * (m_dnad & 3));
+				uint32_t mem_mask = 0xff << shift;
 				m_host_write(m_dnad & ~3, data << shift, mem_mask);
 
 				++m_dnad;
@@ -1138,7 +1138,7 @@ void ncr53c7xx_device::execute_run()
 				m_finished = false;
 
 				// Fetch the instruction
-				UINT32 inst = m_host_read(m_dsp, 0xffffffff);
+				uint32_t inst = m_host_read(m_dsp, 0xffffffff);
 
 				m_dcmd = inst >> 24;
 				m_dbc = inst & 0xffffff;
@@ -1534,7 +1534,7 @@ void ncr53c7xx_device::io_i_waitreselect()
 
 void ncr53c7xx_device::io_i_set()
 {
-	UINT32 mask = 0;
+	uint32_t mask = 0;
 
 	if (m_dbc & (1 << 3))
 		mask |= S_ATN;
@@ -1554,7 +1554,7 @@ void ncr53c7xx_device::io_i_set()
 
 void ncr53c7xx_device::io_i_clear()
 {
-	UINT32 mask = 0;
+	uint32_t mask = 0;
 
 	if (m_dbc & (1 << 3))
 		mask |= S_ATN;

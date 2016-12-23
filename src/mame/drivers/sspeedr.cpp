@@ -8,6 +8,7 @@ Taito Super Speed Race driver
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sspeedr.lh"
 #include "includes/sspeedr.h"
 
@@ -50,7 +51,7 @@ WRITE8_MEMBER(sspeedr_state::sspeedr_lamp_w)
 
 
 /* uses a 7447A, which is equivalent to an LS47/48 */
-static const UINT8 ls48_map[16] =
+static const uint8_t ls48_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 WRITE8_MEMBER(sspeedr_state::sspeedr_time_w)
@@ -93,7 +94,7 @@ static ADDRESS_MAP_START( sspeedr_io_map, AS_IO, 8, sspeedr_state )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
 	AM_RANGE(0x04, 0x05) AM_WRITE(sspeedr_time_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(sspeedr_driver_horz_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(sspeedr_driver_pic_w)
 	AM_RANGE(0x12, 0x12) AM_WRITE(sspeedr_driver_horz_2_w)
@@ -193,6 +194,8 @@ static MACHINE_CONFIG_START( sspeedr, sspeedr_state )
 	MCFG_CPU_PROGRAM_MAP(sspeedr_map)
 	MCFG_CPU_IO_MAP(sspeedr_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sspeedr_state,  irq0_line_assert)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

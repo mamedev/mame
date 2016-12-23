@@ -54,7 +54,7 @@
 void xerox820_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -73,7 +73,7 @@ void xerox820_state::bankswitch(int bank)
 void xerox820ii_state::bankswitch(int bank)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	if (bank)
 	{
@@ -171,7 +171,7 @@ static ADDRESS_MAP_START( xerox820_io, AS_IO, 8, xerox820_state )
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_GP_TAG, z80pio_device, read_alt, write_alt)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff03) AM_DEVWRITE(COM8116_TAG, com8116_device, stt_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xff00) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0x14, 0x14) AM_MIRROR(0xff03) AM_MASK(0xff00) AM_WRITE(scroll_w)
+	AM_RANGE(0x14, 0x14) AM_MIRROR(0x0003) AM_SELECT(0xff00) AM_WRITE(scroll_w)
 	AM_RANGE(0x18, 0x1b) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80CTC_TAG, z80ctc_device, read, write)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xff00) AM_DEVREADWRITE(Z80PIO_KB_TAG, z80pio_device, read_alt, write_alt)
 ADDRESS_MAP_END
@@ -234,7 +234,7 @@ READ8_MEMBER( xerox820_state::kbpio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= m_kbpio->rdy_b() << 3;
@@ -415,10 +415,10 @@ WRITE_LINE_MEMBER( xerox820_state::fr_w )
 
 /* Video */
 
-UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=(m_scroll + 1) * 0x80,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=(m_scroll + 1) * 0x80,x;
 	const pen_t *pen=m_palette->pens();
 
 	m_framecnt++;
@@ -429,7 +429,7 @@ UINT32 xerox820_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT32 *p = &bitmap.pix32(sy++);
+			uint32_t *p = &bitmap.pix32(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -544,7 +544,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_20MHz/8)
 	MCFG_CPU_PROGRAM_MAP(xerox820_mem)
 	MCFG_CPU_IO_MAP(xerox820_io)
-	MCFG_CPU_CONFIG(xerox820_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -552,7 +552,7 @@ static MACHINE_CONFIG_START( xerox820, xerox820_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_KB_TAG, Z80PIO, XTAL_20MHz/8)
@@ -618,7 +618,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(xerox820ii_mem)
 	MCFG_CPU_IO_MAP(xerox820ii_io)
-	MCFG_CPU_CONFIG(xerox820_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(xerox820_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
@@ -626,7 +626,7 @@ static MACHINE_CONFIG_START( xerox820ii, xerox820ii_state )
 	MCFG_SCREEN_RAW_PARAMS(XTAL_10_69425MHz, 700, 0, 560, 260, 0, 240)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", xerox820ii)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

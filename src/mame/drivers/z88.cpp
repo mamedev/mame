@@ -109,16 +109,16 @@ UPD65031_MEMORY_UPDATE(z88_state::bankswitch_update)
 			switch (bank)
 			{
 				case 0:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, 0, 0, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0000, 0x3fff, read8_delegate(FUNC(z88_state::bank0_cart_r), this), write8_delegate(FUNC(z88_state::bank0_cart_w), this));
 					break;
 				case 1:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x4000, 0x7fff, read8_delegate(FUNC(z88_state::bank1_cart_r), this), write8_delegate(FUNC(z88_state::bank1_cart_w), this));
 					break;
 				case 2:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x8000, 0xbfff, read8_delegate(FUNC(z88_state::bank2_cart_r), this), write8_delegate(FUNC(z88_state::bank2_cart_w), this));
 					break;
 				case 3:
-					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, 0, 0, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
+					m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xc000, 0xffff, read8_delegate(FUNC(z88_state::bank3_cart_r), this), write8_delegate(FUNC(z88_state::bank3_cart_w), this));
 					break;
 			}
 
@@ -549,8 +549,8 @@ INPUT_PORTS_END
 
 void z88_state::machine_start()
 {
-	m_bios = (UINT8*)memregion("bios")->base();
-	m_ram_base = (UINT8*)m_ram->pointer();
+	m_bios = (uint8_t*)memregion("bios")->base();
+	m_ram_base = (uint8_t*)m_ram->pointer();
 
 	// configure the memory banks
 	membank("bank1")->configure_entry(0, m_bios);
@@ -576,7 +576,7 @@ void z88_state::machine_reset()
 
 READ8_MEMBER(z88_state::kb_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (!(offset & 0x80))
 		data &= ioport("LINE7")->read();

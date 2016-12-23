@@ -84,11 +84,16 @@
     Modern implementation
 */
 
-snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__), m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0), m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false), m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false), m_rtc_enabled(false), m_MOTOR_ON(), m_lastval(0), m_address(0), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr), m_dsrrom(nullptr), m_buffer_ram(nullptr), m_current_floppy(nullptr),
-				m_wd1773(*this, FDC_TAG),
-				m_clock(*this, CLOCK_TAG), m_debug_dataout(false)
-		{ }
+snug_bwg_device::snug_bwg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: ti_expansion_card_device(mconfig, TI99_BWG, "SNUG BwG Floppy Controller", tag, owner, clock, "ti99_bwg", __FILE__),
+	  m_DRQ(), m_IRQ(), m_dip1(0), m_dip2(0), m_dip34(0), m_ram_page(0),
+	  m_rom_page(0), m_WAITena(false), m_inDsrArea(false), m_WDsel(false),
+	  m_WDsel0(false), m_RTCsel(false), m_lastK(false), m_dataregLB(false),
+	  m_rtc_enabled(false), m_MOTOR_ON(), m_lastval(0), m_address(0),
+	  m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr), m_dsrrom(nullptr),
+	  m_buffer_ram(*this, BUFFER), m_current_floppy(nullptr),
+	  m_wd1773(*this, FDC_TAG),
+	  m_clock(*this, CLOCK_TAG) { }
 
 /*
     Operate the wait state logic.
@@ -182,26 +187,26 @@ SETADDRESS_DBIN_MEMBER( snug_bwg_device::setaddress_dbin )
     Access for debugger. This is a stripped-down version of the
     main methods below. We only allow ROM and RAM access.
 */
-void snug_bwg_device::debug_read(offs_t offset, UINT8* value)
+void snug_bwg_device::debug_read(offs_t offset, uint8_t* value)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if ((offset & 0x1c00)==0x1c00)
 		{
 			if ((offset & 0x1fe0)!=0x1fe0)
-				*value = m_buffer_ram[(m_ram_page<<10) | (offset & 0x03ff)];
+				*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (offset & 0x03ff)];
 		}
 		else
 			*value = m_dsrrom[(m_rom_page<<13) | (offset & 0x1fff)];
 	}
 }
 
-void snug_bwg_device::debug_write(offs_t offset, UINT8 data)
+void snug_bwg_device::debug_write(offs_t offset, uint8_t data)
 {
 	if (((offset & m_select_mask)==m_select_value) && m_selected)
 	{
 		if (((offset & 0x1c00)==0x1c00) && ((offset & 0x1fe0)!=0x1fe0))
-				m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+			m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
 	}
 }
 
@@ -233,7 +238,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				}
 				else
 				{
-					*value = m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)];
+					*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)];
 					if (TRACE_RW) logerror("bwg: read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
 				}
 			}
@@ -254,7 +259,7 @@ READ8Z_MEMBER(snug_bwg_device::readz)
 				}
 				else
 				{
-					*value = m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)];
+					*value = m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)];
 					if (TRACE_RW) logerror("bwg: read ram: %04x (page %d)-> %02x\n", m_address & 0xffff, m_ram_page, *value);
 				}
 			}
@@ -302,7 +307,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 				else
 				{
 					if (TRACE_RW) logerror("bwg: write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
-					m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+					m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
 				}
 			}
 			else
@@ -318,7 +323,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 				else
 				{
 					if (TRACE_RW) logerror("bwg: write ram: %04x (page %d) <- %02x\n", m_address & 0xffff, m_ram_page, data);
-					m_buffer_ram[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
+					m_buffer_ram->pointer()[(m_ram_page<<10) | (m_address & 0x03ff)] = data;
 				}
 			}
 		}
@@ -338,7 +343,7 @@ WRITE8_MEMBER(snug_bwg_device::write)
 */
 READ8Z_MEMBER(snug_bwg_device::crureadz)
 {
-	UINT8 reply;
+	uint8_t reply;
 
 	if ((offset & 0xff00)==m_cru_base)
 	{
@@ -558,9 +563,29 @@ void snug_bwg_device::device_start(void)
 {
 	logerror("bwg: BWG start\n");
 	m_dsrrom = memregion(DSRROM)->base();
-	m_buffer_ram = memregion(BUFFER)->base();
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
+
+	save_item(NAME(m_DRQ));
+	save_item(NAME(m_IRQ));
+	save_item(NAME(m_dip1));
+	save_item(NAME(m_dip2));
+	save_item(NAME(m_dip34));
+	save_item(NAME(m_ram_page));
+	save_item(NAME(m_rom_page));
+	save_item(NAME(m_WAITena));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_WDsel));
+	save_item(NAME(m_WDsel0));
+	save_item(NAME(m_RTCsel));
+	save_item(NAME(m_lastK));
+	save_item(NAME(m_dataregLB));
+	save_item(NAME(m_rtc_enabled));
+	save_item(NAME(m_MOTOR_ON));
+	save_item(NAME(m_lastval));
+	save_item(NAME(m_address));
+	save_item(NAME(m_DSEL));
+	save_item(NAME(m_SIDSEL));
 }
 
 void snug_bwg_device::device_reset()
@@ -591,7 +616,6 @@ void snug_bwg_device::device_reset()
 	m_DSEL = 0;
 	m_WAITena = false;
 	m_selected = false;
-	m_debug_dataout = false;
 	m_rtc_enabled = false;
 	m_dataregLB = false;
 	m_lastK = false;
@@ -625,10 +649,10 @@ void snug_bwg_device::device_config_complete()
 		elem = nullptr;
 
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
-	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->first_subdevice());
+	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
+	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
+	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
+	if (subdevice("3")!=nullptr) m_floppy[3] = static_cast<floppy_image_device*>(subdevice("3")->subdevices().first());
 }
 
 INPUT_PORTS_START( bwg_fdc )
@@ -678,13 +702,15 @@ MACHINE_CONFIG_FRAGMENT( bwg_fdc )
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("3", bwg_floppies, nullptr, snug_bwg_device::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
+
+	MCFG_RAM_ADD(BUFFER)
+	MCFG_RAM_DEFAULT_SIZE("2K")
+	MCFG_RAM_DEFAULT_VALUE(0)
 MACHINE_CONFIG_END
 
 ROM_START( bwg_fdc )
 	ROM_REGION(0x8000, DSRROM, 0)
-	ROM_LOAD("bwg.bin", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
-	ROM_REGION(0x0800, BUFFER, 0)  /* BwG RAM buffer */
-	ROM_FILL(0x0000, 0x0400, 0x00)
+	ROM_LOAD("bwg_dsr.u15", 0x0000, 0x8000, CRC(06f1ec89) SHA1(6ad77033ed268f986d9a5439e65f7d391c4b7651)) /* BwG disk DSR ROM */
 ROM_END
 
 machine_config_constructor snug_bwg_device::device_mconfig_additions() const
@@ -697,7 +723,7 @@ ioport_constructor snug_bwg_device::device_input_ports() const
 	return INPUT_PORTS_NAME( bwg_fdc );
 }
 
-const rom_entry *snug_bwg_device::device_rom_region() const
+const tiny_rom_entry *snug_bwg_device::device_rom_region() const
 {
 	return ROM_NAME( bwg_fdc );
 }

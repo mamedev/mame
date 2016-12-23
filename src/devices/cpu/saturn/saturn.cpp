@@ -42,7 +42,7 @@
 const device_type SATURN = &device_creator<saturn_device>;
 
 
-saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+saturn_device::saturn_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SATURN, "HP Saturn", tag, owner, clock, "saturn_cpu", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, 20, 0)
 	, m_out_func(*this)
@@ -58,10 +58,10 @@ saturn_device::saturn_device(const machine_config &mconfig, const char *tag, dev
 }
 
 
-offs_t saturn_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t saturn_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( saturn );
-	return CPU_DISASSEMBLE_NAME(saturn)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(saturn)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -69,8 +69,8 @@ offs_t saturn_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *o
  * include the opcode macros, functions and tables
  ***************************************************************/
 
-#include "satops.inc"
-#include "sattable.inc"
+#include "satops.hxx"
+#include "sattable.hxx"
 
 /*****************************************************************************
  *
@@ -164,6 +164,7 @@ void saturn_device::device_start()
 	state_add( SATURN_SLEEPING, "sleep", m_sleeping).formatstr("%1X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%2s").noshow();
 
 	m_icountptr = &m_icount;
@@ -177,47 +178,47 @@ void saturn_device::state_string_export(const device_state_entry &entry, std::st
 	switch (entry.index())
 	{
 		case SATURN_A:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[A]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[A]) );
 			break;
 
 		case SATURN_B:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[B]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[B]) );
 			break;
 
 		case SATURN_C:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[C]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[C]) );
 			break;
 
 		case SATURN_D:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[D]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[D]) );
 			break;
 
 		case SATURN_R0:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R0]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R0]) );
 			break;
 
 		case SATURN_R1:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R1]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R1]) );
 			break;
 
 		case SATURN_R2:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R2]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R2]) );
 			break;
 
 		case SATURN_R3:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R3]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R3]) );
 			break;
 
 		case SATURN_R4:
-			strprintf(str,  Reg64Format, Reg64Data(m_reg[R4]) );
+			str = string_format( Reg64Format, Reg64Data(m_reg[R4]) );
 			break;
 
 		case SATURN_IRQ_STATE:
-			strprintf(str,  "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
+			str = string_format( "%c%c%c%i", m_in_irq?'S':'.', m_irq_enable?'e':'.', m_pending_irq?'p':'.', m_irq_state );
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str,  "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
+			str = string_format( "%c%c", m_decimal?'D':'.', m_carry ? 'C':'.' );
 			break;
 	}
 }
@@ -393,7 +394,7 @@ void saturn_device::execute_set_input(int inputnum, int state)
 }
 
 
-void saturn_device::IntReg64(Saturn64 r, INT64 d)
+void saturn_device::IntReg64(Saturn64 r, int64_t d)
 {
 	int i;
 	for (i=0; i<16; i++)
@@ -401,11 +402,11 @@ void saturn_device::IntReg64(Saturn64 r, INT64 d)
 }
 
 
-INT64 saturn_device::Reg64Int(Saturn64 r)
+int64_t saturn_device::Reg64Int(Saturn64 r)
 {
-	INT64 x = 0;
+	int64_t x = 0;
 	int i;
 	for (i=0; i<16; i++)
-		x |= (INT64) r[i] << (4*i);
+		x |= (int64_t) r[i] << (4*i);
 	return x;
 }

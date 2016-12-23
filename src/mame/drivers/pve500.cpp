@@ -87,7 +87,7 @@ private:
 	required_device<tmpz84c015_device> m_subcpu;
 	required_device<eeprom_serial_er5911_device> m_eeprom;
 	required_device<beep_device> m_buzzer;
-	UINT8 io_SEL, io_LD, io_LE, io_SC, io_KY;
+	uint8_t io_SEL, io_LD, io_LE, io_SC, io_KY;
 };
 
 WRITE_LINE_MEMBER( pve500_state::GPI_w )
@@ -102,7 +102,6 @@ WRITE_LINE_MEMBER( pve500_state::external_monitor_w )
 
 static const z80_daisy_config maincpu_daisy_chain[] =
 {
-	TMPZ84C015_DAISY_INTERNAL,
 	{ "external_ctc" },
 	{ "external_sio" },
 	{ nullptr }
@@ -110,9 +109,8 @@ static const z80_daisy_config maincpu_daisy_chain[] =
 
 
 static ADDRESS_MAP_START(maincpu_io, AS_IO, 8, pve500_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
-	AM_RANGE(0x08, 0x0B) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_sio", z80sio0_device, cd_ba_r, cd_ba_w)
+	AM_RANGE(0x08, 0x0B) AM_MIRROR(0xff00) AM_DEVREADWRITE("external_ctc", z80ctc_device, read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
@@ -122,12 +120,11 @@ static ADDRESS_MAP_START(maincpu_prg, AS_PROGRAM, 8, pve500_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subcpu_io, AS_IO, 8, pve500_state)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(subcpu_prg, AS_PROGRAM, 8, pve500_state)
 	AM_RANGE (0x0000, 0x7FFF) AM_ROM // ICG5: 32kbytes EPROM
-	AM_RANGE (0x8000, 0xBFFF) AM_MIRROR(0x3FF8) AM_READWRITE(io_expander_r, io_expander_w) // ICG3: I/O Expander
+	AM_RANGE (0x8000, 0x8007) AM_MIRROR(0x3FF8) AM_READWRITE(io_expander_r, io_expander_w) // ICG3: I/O Expander
 	AM_RANGE (0xC000, 0xC7FF) AM_MIRROR(0x3800) AM_DEVREADWRITE("mb8421", mb8421_device, right_r, right_w)
 ADDRESS_MAP_END
 
@@ -351,7 +348,7 @@ static MACHINE_CONFIG_START( pve500, pve500_state )
 	MCFG_CPU_ADD("maincpu", TMPZ84C015, XTAL_12MHz / 2) /* TMPZ84C015BF-6 */
 	MCFG_CPU_PROGRAM_MAP(maincpu_prg)
 	MCFG_CPU_IO_MAP(maincpu_io)
-	MCFG_CPU_CONFIG(maincpu_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(maincpu_daisy_chain)
 	MCFG_TMPZ84C015_OUT_DTRA_CB(WRITELINE(pve500_state, GPI_w))
 	MCFG_TMPZ84C015_OUT_DTRB_CB(DEVWRITELINE("buzzer", beep_device, set_state))
 	MCFG_TMPZ84C015_OUT_TXDA_CB(DEVWRITELINE("recorder", rs232_port_device, write_txd))

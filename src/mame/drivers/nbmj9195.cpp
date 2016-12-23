@@ -12,7 +12,7 @@
 
 Notes:
 
-- Screen position sometimes be strange while frame skip != 0.
+- Screen position sometimes is strange while frame skip != 0.
 
 - Some games display "GFXROM BANK OVER!!" or "GFXROM ADDRESS OVER!!"
   in Debug build.
@@ -22,11 +22,13 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "machine/nvram.h"
+#include "includes/nbmj9195.h"
 #include "includes/nb1413m3.h"      // needed for mahjong input controller
+#include "machine/gen_latch.h"
+#include "machine/nvram.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
-#include "includes/nbmj9195.h"
+#include "sound/volt_reg.h"
 
 
 void nbmj9195_state::machine_start()
@@ -86,7 +88,7 @@ WRITE8_MEMBER(nbmj9195_state::dipswbitsel_w)
 
 WRITE8_MEMBER(nbmj9195_state::mscoutm_inputportsel_w)
 {
-	m_mscoutm_inputport = (data ^ 0xff);
+	m_mscoutm_inputport = (data ^ 0x1f);
 }
 
 READ8_MEMBER(nbmj9195_state::mscoutm_dipsw_0_r)
@@ -202,7 +204,7 @@ READ8_MEMBER(nbmj9195_state::others_cpu_portc_r)
 
 WRITE8_MEMBER(nbmj9195_state::soundcpu_porte_w)
 {
-	if (!(data & 0x01)) soundlatch_clear_byte_w(space, 0, 0);
+	if (!(data & 0x01)) m_soundlatch->clear_w(space, 0, 0);
 }
 
 
@@ -221,7 +223,7 @@ void nbmj9195_state::machine_reset()
 
 DRIVER_INIT_MEMBER(nbmj9195_state,nbmj9195)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	// sound program patch
 	ROM[0x0213] = 0x00;         // DI -> NOP
@@ -269,407 +271,357 @@ static ADDRESS_MAP_START( mjegolf_map, AS_PROGRAM, 8, nbmj9195_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjuraden_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xb2, 0xb2) AM_WRITENOP
-	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
-	AM_RANGE(0xb6, 0xb6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xb2, 0xb2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb6, 0xb6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( koinomp_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITENOP
-	AM_RANGE(0xc4, 0xc4) AM_WRITENOP
-	AM_RANGE(0xc6, 0xc6) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xcf, 0xcf) AM_WRITENOP
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xc2, 0xc2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc4, 0xc4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xc6, 0xc6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xcf, 0xcf) AM_MIRROR(0xff00) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( patimono_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb8) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mmehyou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gal10ren_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xc8, 0xc8) AM_WRITENOP
-	AM_RANGE(0xd0, 0xd0) AM_WRITENOP
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xc8, 0xc8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xd0, 0xd0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( renaiclb_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x28, 0x28) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x2c, 0x2c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x20, 0x20) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x28, 0x28) AM_WRITENOP
-	AM_RANGE(0x2c, 0x2c) AM_WRITE(inputportsel_w)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjlaman_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x20, 0x20) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x22, 0x22) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x24, 0x24) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x26, 0x26) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x20, 0x20) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x22, 0x22) AM_WRITENOP
-	AM_RANGE(0x24, 0x24) AM_WRITENOP
-	AM_RANGE(0x26, 0x26) AM_WRITE(inputportsel_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkeibaou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xd8, 0xd8) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xda, 0xda) AM_WRITENOP
-	AM_RANGE(0xdc, 0xdc) AM_WRITENOP
-	AM_RANGE(0xde, 0xde) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xd8, 0xd8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xda, 0xda) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xdc, 0xdc) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xde, 0xde) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pachiten_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe6, 0xe6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorwr_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xfa, 0xfa) AM_WRITENOP
-	AM_RANGE(0xfc, 0xfc) AM_WRITENOP
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xfa, 0xfa) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xfe, 0xfe) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor1_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf2, 0xf2) AM_WRITENOP
-	AM_RANGE(0xf4, 0xf4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf2, 0xf2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( psailor2_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_1_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xe2, 0xe2) AM_WRITENOP
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP
-	AM_RANGE(0xf6, 0xf6) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf6, 0xf6) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( otatidai_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITENOP
-	AM_RANGE(0xb8, 0xb8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb8, 0xb8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimoto_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x90, 0x90) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x94, 0x94) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x98, 0x98) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0x9c, 0x9c) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0x90, 0x90) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x94, 0x94) AM_WRITENOP
-	AM_RANGE(0x98, 0x98) AM_WRITENOP
-	AM_RANGE(0x9c, 0x9c) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yosimotm_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_1_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_1_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xfc, 0xfc) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xf4, 0xf4) AM_NOP
-	AM_RANGE(0xf8, 0xf8) AM_NOP
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xfc, 0xfc) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xf4, 0xf4) AM_MIRROR(0xff00) AM_NOP
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jituroku_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x60, 0x61) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x60, 0x6f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x70, 0x7f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
-	AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xe8, 0xe8) AM_WRITENOP
-	AM_RANGE(0xf0, 0xf0) AM_WRITENOP
-	AM_RANGE(0xf8, 0xf8) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xe8, 0xe8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf0, 0xf0) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xf8, 0xf8) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ngpgal_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjgottsu_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cmehyou_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xb4, 0xb4) AM_MIRROR(0xff00) AM_WRITENOP
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-	AM_RANGE(0xb4, 0xb4) AM_WRITENOP
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjkoiura_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0x80, 0x8f) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0x90, 0x9f) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0x80, 0x81) AM_READ(blitter_0_r)
-	AM_RANGE(0x80, 0x8f) AM_WRITE(blitter_0_w)
-	AM_RANGE(0x90, 0x9f) AM_WRITE(clut_0_w)
-
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mkoiuraa_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0xa0, 0xa0) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0xa4, 0xa4) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xa8, 0xa8) AM_MIRROR(0xff00) AM_WRITENOP
+	AM_RANGE(0xb0, 0xb0) AM_MIRROR(0xff00) AM_WRITE(inputportsel_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0xa4, 0xa4) AM_WRITENOP
-	AM_RANGE(0xa8, 0xa8) AM_WRITENOP
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(inputportsel_w)
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mscoutm_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
-	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xa0, 0xa6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xa0, 0xa6) AM_WRITENOP            // nb22090 param ?
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imekura_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0x84, 0x84) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 
-	AM_RANGE(0x80, 0x80) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0x82, 0x82) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0x84, 0x84) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb0, 0xb6) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0xb0, 0xb6) AM_WRITENOP            // nb22090 param ?
-
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_0_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
 
 	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xe0, 0xe1) AM_READ(blitter_1_r)
-	AM_RANGE(0xe0, 0xef) AM_WRITE(blitter_1_w)
-	AM_RANGE(0xf0, 0xff) AM_WRITE(clut_1_w)
+	AM_RANGE(0xe0, 0xe1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xe0, 0xef) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xf0, 0xff) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjegolf_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x86) AM_MIRROR(0xff00) AM_WRITENOP            // nb22090 param ?
 
-	AM_RANGE(0x80, 0x86) AM_WRITENOP            // nb22090 param ?
+	AM_RANGE(0xa0, 0xa1) AM_MIRROR(0xff00) AM_READ(blitter_0_r)
+	AM_RANGE(0xa0, 0xaf) AM_MIRROR(0xff00) AM_WRITE(blitter_0_w)
+	AM_RANGE(0xb0, 0xbf) AM_MIRROR(0xff00) AM_WRITE(clut_0_w)
 
-	AM_RANGE(0xa0, 0xa1) AM_READ(blitter_0_r)
-	AM_RANGE(0xa0, 0xaf) AM_WRITE(blitter_0_w)
-	AM_RANGE(0xb0, 0xbf) AM_WRITE(clut_0_w)
+	AM_RANGE(0xc0, 0xc1) AM_MIRROR(0xff00) AM_READ(blitter_1_r)
+	AM_RANGE(0xc0, 0xcf) AM_MIRROR(0xff00) AM_WRITE(blitter_1_w)
 
-	AM_RANGE(0xc0, 0xc1) AM_READ(blitter_1_r)
-	AM_RANGE(0xc0, 0xcf) AM_WRITE(blitter_1_w)
+	AM_RANGE(0xd0, 0xdf) AM_MIRROR(0xff00) AM_WRITE(clut_1_w)
 
-	AM_RANGE(0xd0, 0xdf) AM_WRITE(clut_1_w)
-
-	AM_RANGE(0xe0, 0xe0) AM_READ(mscoutm_dipsw_1_r)
-	AM_RANGE(0xe2, 0xe2) AM_READ(mscoutm_dipsw_0_r)
-	AM_RANGE(0xe4, 0xe4) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xe0, 0xe0) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_1_r)
+	AM_RANGE(0xe2, 0xe2) AM_MIRROR(0xff00) AM_READ(mscoutm_dipsw_0_r)
+	AM_RANGE(0xe4, 0xe4) AM_MIRROR(0xff00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 
@@ -681,8 +633,7 @@ static ADDRESS_MAP_START( sailorws_sound_map, AS_PROGRAM, 8, nbmj9195_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailorws_sound_io_map, AS_IO, 8, nbmj9195_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x81) AM_DEVWRITE("ymsnd", ym3812_device, write)
+	AM_RANGE(0x80, 0x81) AM_MIRROR(0xff00) AM_DEVWRITE("ymsnd", ym3812_device, write)
 ADDRESS_MAP_END
 
 
@@ -701,8 +652,6 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( shabdama_io_map, AS_IO, 8, nbmj9195_state )
 //  ADDRESS_MAP_UNMAP_HIGH
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
 //  AM_RANGE(0x60, 0x61) AM_READ(blitter_0_r)
 //  AM_RANGE(0x60, 0x6f) AM_WRITE(blitter_0_w)
 //  AM_RANGE(0x70, 0x7f) AM_WRITE(clut_0_w)
@@ -784,7 +733,7 @@ static INPUT_PORTS_START( mjuraden )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -853,7 +802,7 @@ static INPUT_PORTS_START( koinomp )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -866,63 +815,62 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( patimono )
 
-	// I don't have manual for this game.
+	// Interesting note - manual states switch A:8 is always off/unused
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
+		PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("DSWA:1,2")
+		PORT_DIPSETTING(    0x03, "1" )
+		PORT_DIPSETTING(    0x02, "2" )
+		PORT_DIPSETTING(    0x01, "3" )
+		PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )      PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Music" )
+	PORT_DIPNAME( 0x10, 0x10, "Music" )         PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )    PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )      PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )       PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -991,7 +939,7 @@ static INPUT_PORTS_START( janbari )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1060,7 +1008,7 @@ static INPUT_PORTS_START( mjanbari )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1129,7 +1077,7 @@ static INPUT_PORTS_START( mmehyou )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1198,7 +1146,7 @@ static INPUT_PORTS_START( ultramhm )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1214,60 +1162,59 @@ static INPUT_PORTS_START( gal10ren )
 	// I don't have manual for this game.
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (Easy)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )                 PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )                 PORT_DIPLOCATION("DSWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )                 PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )                 PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )                 PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )                 PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )    PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )          PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1283,60 +1230,59 @@ static INPUT_PORTS_START( renaiclb )
 	// I don't have manual for this game.
 
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 1-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:1,2,3")
+	PORT_DIPSETTING(    0x07, "1 (Easy)" )
+	PORT_DIPSETTING(    0x06, "2" )
+	PORT_DIPSETTING(    0x05, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPSETTING(    0x02, "6" )
+	PORT_DIPSETTING(    0x01, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_3C ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWA:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x00, "Voices" )                    PORT_DIPLOCATION("DSWA:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWA:8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
+	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )                 PORT_DIPLOCATION("DSWB:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
+	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )                 PORT_DIPLOCATION("DSWB:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )                 PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )                 PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )                 PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )                 PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )    PORT_DIPLOCATION("DSWB:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )          PORT_DIPLOCATION("DSWB:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1401,74 +1347,9 @@ static INPUT_PORTS_START( mjlaman )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )         // CREDIT CLEAR
-	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )       // SERVICE
-
-	PORT_INCLUDE( nbmjcontrols )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( mkeibaou )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, "1" )
-	PORT_DIPSETTING(    0x02, "2" )
-	PORT_DIPSETTING(    0x01, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "Game Sounds" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x01, 0x01, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "DIPSW 2-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )          // COIN1
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )          // COIN2
@@ -1530,7 +1411,7 @@ static INPUT_PORTS_START( pachiten )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1595,7 +1476,7 @@ static INPUT_PORTS_START( sailorws )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1659,7 +1540,7 @@ static INPUT_PORTS_START( sailorwr )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1672,21 +1553,21 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( psailor1 )
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSWA:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION("DSWA:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Game Sounds" )
+	PORT_DIPNAME( 0x08, 0x00, "Game Sounds" )               PORT_DIPLOCATION("DSWA:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSWA:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Difficulty ) )       PORT_DIPLOCATION("DSWA:6,7,8")
 	PORT_DIPSETTING(    0xe0, "1 (Easy)" )
 	PORT_DIPSETTING(    0xc0, "2" )
 	PORT_DIPSETTING(    0xa0, "3" )
@@ -1697,33 +1578,33 @@ static INPUT_PORTS_START( psailor1 )
 	PORT_DIPSETTING(    0x00, "8 (Hard)" )
 
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, "Start Score" )
+	PORT_DIPNAME( 0x03, 0x03, "Start Score" )               PORT_DIPLOCATION("DSWB:1,2")
 	PORT_DIPSETTING(    0x00, "5000" )
 	PORT_DIPSETTING(    0x01, "3000" )
 	PORT_DIPSETTING(    0x02, "2000" )
 	PORT_DIPSETTING(    0x03, "1000" )
-	PORT_DIPNAME( 0x04, 0x04, "DIPSW 2-3" )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSWB:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "DIPSW 2-4" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSWB:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, "DIPSW 2-5" )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSWB:5")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "DIPSW 2-6" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )           PORT_DIPLOCATION("DSWB:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )
+	PORT_DIPNAME( 0x40, 0x40, "Character Display Test" )    PORT_DIPLOCATION("DSWB:7") // marked as unused in manual
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )
+	PORT_DIPNAME( 0x80, 0x80, "Graphic ROM Test" )          PORT_DIPLOCATION("DSWB:8") // marked as unused in manual
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1787,7 +1668,7 @@ static INPUT_PORTS_START( psailor2 )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1854,7 +1735,7 @@ static INPUT_PORTS_START( otatidai )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1922,7 +1803,7 @@ static INPUT_PORTS_START( wcatcher )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -1989,7 +1870,7 @@ static INPUT_PORTS_START( yosimoto )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2058,7 +1939,7 @@ static INPUT_PORTS_START( yosimotm )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2127,7 +2008,7 @@ static INPUT_PORTS_START( jituroku )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2193,7 +2074,7 @@ static INPUT_PORTS_START( ngpgal )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2258,7 +2139,7 @@ static INPUT_PORTS_START( mjgottsu )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2323,7 +2204,7 @@ static INPUT_PORTS_START( bakuhatu )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2389,7 +2270,7 @@ static INPUT_PORTS_START( cmehyou )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2455,7 +2336,7 @@ static INPUT_PORTS_START( mjkoiura )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )         // COIN OUT
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )                 // TEST
@@ -2525,7 +2406,7 @@ static INPUT_PORTS_START( mscoutm )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
@@ -2590,7 +2471,7 @@ static INPUT_PORTS_START( imekura )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
@@ -2655,7 +2536,7 @@ static INPUT_PORTS_START( mjegolf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Credit Clear") PORT_CODE(KEYCODE_4) // CREDIT CLEAR
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 
 	PORT_INCLUDE( nbmjtype2 )
@@ -2673,22 +2554,6 @@ static const z80_daisy_config daisy_chain_sound[] =
 	TMPZ84C011_DAISY_INTERNAL,
 	{ nullptr }
 };
-
-
-// the only difference between these 2 setups is the DAC is swapped, is that intentional?
-#define OTHERS_TMZ84C011_SOUND_PORTS \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8)) \
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundlatch_byte_r)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
-#define MSCOUTM_TMZ84C011_SOUND_PORTS \
-	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
-	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac2", dac_device, write_unsigned8)) \
-	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac1", dac_device, write_unsigned8)) \
-	MCFG_TMPZ84C011_PORTD_READ_CB(READ8(nbmj9195_state, soundlatch_byte_r)) \
-	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
-
 
 #define MSCOUTM_TMZ84C011_MAIN_PORTS \
 	MCFG_TMPZ84C011_PORTA_READ_CB(IOPORT("SYSTEM")) \
@@ -2710,16 +2575,21 @@ static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMPZ84C011, 12000000/2) /* TMPZ84C011, 6.00 MHz */
-	MCFG_CPU_CONFIG(daisy_chain_main)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_main)
 	MCFG_CPU_PROGRAM_MAP(sailorws_map)
 	MCFG_CPU_IO_MAP(sailorws_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nbmj9195_state, ctc0_trg1) /* vblank is connect to ctc trigger */
 
 	MCFG_CPU_ADD("audiocpu", TMPZ84C011, 8000000) /* TMPZ84C011, 8.00 MHz */
-	MCFG_CPU_CONFIG(daisy_chain_sound)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_sound)
 	MCFG_CPU_PROGRAM_MAP(sailorws_sound_map)
 	MCFG_CPU_IO_MAP(sailorws_sound_io_map)
 	MCFG_TMPZ84C011_ZC0_CB(DEVWRITELINE("audiocpu", tmpz84c011_device, trg3))
+	MCFG_TMPZ84C011_PORTA_WRITE_CB(WRITE8(nbmj9195_state, soundbank_w)) \
+	MCFG_TMPZ84C011_PORTB_WRITE_CB(DEVWRITE8("dac1", dac_byte_interface, write)) \
+	MCFG_TMPZ84C011_PORTC_WRITE_CB(DEVWRITE8("dac2", dac_byte_interface, write)) \
+	MCFG_TMPZ84C011_PORTD_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read)) \
+	MCFG_TMPZ84C011_PORTE_WRITE_CB(WRITE8(nbmj9195_state, soundcpu_porte_w))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2733,16 +2603,18 @@ static MACHINE_CONFIG_START( NBMJDRV1_base, nbmj9195_state )
 	MCFG_PALETTE_ADD("palette", 256)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.7)
 
-	MCFG_DAC_ADD("dac1")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
-	MCFG_DAC_ADD("dac2")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_SOUND_ADD("dac2", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( NBMJDRV1, NBMJDRV1_base )
@@ -2750,9 +2622,6 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV1, NBMJDRV1_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	OTHERS_TMZ84C011_MAIN_PORTS
-
-	MCFG_CPU_MODIFY("audiocpu")
-	OTHERS_TMZ84C011_SOUND_PORTS
 MACHINE_CONFIG_END
 
 
@@ -2761,9 +2630,6 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV2, NBMJDRV1_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	OTHERS_TMZ84C011_MAIN_PORTS
-
-	MCFG_CPU_MODIFY("audiocpu")
-	OTHERS_TMZ84C011_SOUND_PORTS
 
 	/* video hardware */
 	MCFG_VIDEO_START_OVERRIDE(nbmj9195_state,_1layer)
@@ -2775,9 +2641,6 @@ static MACHINE_CONFIG_DERIVED( NBMJDRV3, NBMJDRV1_base )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MSCOUTM_TMZ84C011_MAIN_PORTS
-
-	MCFG_CPU_MODIFY("audiocpu")
-	MSCOUTM_TMZ84C011_SOUND_PORTS
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")
@@ -3648,7 +3511,7 @@ GAME( 1993, ultramhm, 0,        ultramhm, ultramhm, nbmj9195_state, nbmj9195, RO
 GAME( 1993, gal10ren, 0,        gal10ren, gal10ren, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Gal 10-renpatsu (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, renaiclb, 0,        renaiclb, renaiclb, nbmj9195_state, nbmj9195, ROT0,   "Fujic", "Mahjong Ren-ai Club (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, mjlaman,  0,        mjlaman,  mjlaman, nbmj9195_state,  nbmj9195, ROT0,   "Nichibutsu / AV Japan", "Mahjong La Man (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1993, mkeibaou, 0,        mkeibaou, mkeibaou, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1993, mkeibaou, 0,        mkeibaou, patimono, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Keibaou (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, pachiten, 0,        pachiten, pachiten, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu / AV Japan / Miki Syouji", "Medal Mahjong Pachi-Slot Tengoku [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sailorws, 0,        sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sailorwa, sailorws, sailorws, sailorws, nbmj9195_state, nbmj9195, ROT0,   "Nichibutsu", "Mahjong Sailor Wars (Japan set 2)", MACHINE_SUPPORTS_SAVE )

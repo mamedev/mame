@@ -73,12 +73,13 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/tms7000/tms7000.h"
-#include "video/hd44780.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
 #include "bus/generic/slot.h"
 #include "bus/generic/carts.h"
+#include "cpu/tms7000/tms7000.h"
+#include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/hd44780.h"
 #include "softlist.h"
 
 #include "cc40.lh"
@@ -90,9 +91,8 @@ public:
 	cc40_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_dac(*this, "dac"),
 		m_cart(*this, "cartslot"),
-		m_key_matrix(*this, "IN"),
+		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY")
 	{
 		m_sysram[0] = nullptr;
@@ -100,7 +100,6 @@ public:
 	}
 
 	required_device<tms70c20_device> m_maincpu;
-	required_device<dac_device> m_dac;
 	required_device<generic_slot_device> m_cart;
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
@@ -109,21 +108,21 @@ public:
 
 	memory_region *m_cart_rom;
 
-	UINT8 m_bus_control;
-	UINT8 m_power;
-	UINT8 m_banks;
-	UINT8 m_clock_control;
-	UINT8 m_clock_divider;
-	UINT8 m_key_select;
+	uint8_t m_bus_control;
+	uint8_t m_power;
+	uint8_t m_banks;
+	uint8_t m_clock_control;
+	uint8_t m_clock_divider;
+	uint8_t m_key_select;
 
-	std::unique_ptr<UINT8[]> m_sysram[2];
-	UINT16 m_sysram_size[2];
-	UINT16 m_sysram_end[2];
-	UINT16 m_sysram_mask[2];
+	std::unique_ptr<uint8_t[]> m_sysram[2];
+	uint16_t m_sysram_size[2];
+	uint16_t m_sysram_end[2];
+	uint16_t m_sysram_mask[2];
 
 	void postload();
-	void init_sysram(int chip, UINT16 size);
-	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
+	void init_sysram(int chip, uint16_t size);
+	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
 	void update_clock_divider();
 
 	DECLARE_READ8_MEMBER(sysram_r);
@@ -131,7 +130,6 @@ public:
 	DECLARE_READ8_MEMBER(bus_control_r);
 	DECLARE_WRITE8_MEMBER(bus_control_w);
 	DECLARE_WRITE8_MEMBER(power_w);
-	DECLARE_WRITE8_MEMBER(sound_w);
 	DECLARE_READ8_MEMBER(battery_r);
 	DECLARE_READ8_MEMBER(bankswitch_r);
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
@@ -145,6 +143,7 @@ public:
 	DECLARE_PALETTE_INIT(cc40);
 	DECLARE_INPUT_CHANGED_MEMBER(sysram_size_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(cc40_cartridge);
+	HD44780_PIXEL_UPDATE(cc40_pixel_update);
 };
 
 
@@ -157,19 +156,19 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(cc40_state, cc40_cartridge)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	// max size is 4*32KB
 	if (size > 0x20000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(0x20000, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);  // allocate a larger ROM region to have 4x32K banks
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -187,7 +186,7 @@ PALETTE_INIT_MEMBER(cc40_state, cc40)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
+void cc40_state::update_lcd_indicator(uint8_t y, uint8_t x, int state)
 {
 	// reference _________________...
 	// output#  |10  11     12     13     14      0      1      2      3   4
@@ -198,7 +197,7 @@ void cc40_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	output().set_lamp_value(y * 10 + x, state);
 }
 
-static HD44780_PIXEL_UPDATE(cc40_pixel_update)
+HD44780_PIXEL_UPDATE(cc40_state::cc40_pixel_update)
 {
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
@@ -207,8 +206,7 @@ static HD44780_PIXEL_UPDATE(cc40_pixel_update)
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 18 lcd indicators
-		cc40_state *driver_state = device.machine().driver_data<cc40_state>();
-		driver_state->update_lcd_indicator(y, x, state);
+		update_lcd_indicator(y, x, state);
 	}
 	else if (line < 2 && pos < 16)
 	{
@@ -289,12 +287,6 @@ WRITE8_MEMBER(cc40_state::power_w)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-WRITE8_MEMBER(cc40_state::sound_w)
-{
-	// d0: piezo control
-	m_dac->write_signed8((data & 1) ? 0x7f : 0);
-}
-
 READ8_MEMBER(cc40_state::battery_r)
 {
 	// d0: low battery sense line (0 = low power)
@@ -344,7 +336,7 @@ WRITE8_MEMBER(cc40_state::clock_control_w)
 
 READ8_MEMBER(cc40_state::keyboard_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -370,7 +362,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, cc40_state )
 	AM_RANGE(0x0112, 0x0112) AM_NOP // d0-d3: Hexbus data
 	AM_RANGE(0x0113, 0x0113) AM_NOP // d0: Hexbus available
 	AM_RANGE(0x0114, 0x0114) AM_NOP // d0,d1: Hexbus handshake
-	AM_RANGE(0x0115, 0x0115) AM_WRITE(sound_w)
+	AM_RANGE(0x0115, 0x0115) AM_DEVWRITE("dac", dac_bit_interface, write) // d0: piezo control
 	AM_RANGE(0x0116, 0x0116) AM_READ(battery_r)
 	AM_RANGE(0x0119, 0x0119) AM_READWRITE(bankswitch_r, bankswitch_w)
 	AM_RANGE(0x011a, 0x011a) AM_READWRITE(clock_control_r, clock_control_w)
@@ -397,7 +389,7 @@ ADDRESS_MAP_END
 
 INPUT_CHANGED_MEMBER(cc40_state::sysram_size_changed)
 {
-	init_sysram((int)(FPTR)param, newval << 11);
+	init_sysram((int)(uintptr_t)param, newval << 11);
 }
 
 static INPUT_PORTS_START( cc40 )
@@ -518,12 +510,12 @@ void cc40_state::machine_reset()
 	bankswitch_w(space, 0, 0);
 }
 
-void cc40_state::init_sysram(int chip, UINT16 size)
+void cc40_state::init_sysram(int chip, uint16_t size)
 {
 	if (m_sysram[chip] == nullptr)
 	{
 		// init to largest possible
-		m_sysram[chip] = std::make_unique<UINT8[]>(0x2000);
+		m_sysram[chip] = std::make_unique<uint8_t[]>(0x2000);
 		save_pointer(NAME(m_sysram[chip].get()), 0x2000, chip);
 
 		save_item(NAME(m_sysram_size[chip]), chip);
@@ -606,13 +598,13 @@ static MACHINE_CONFIG_START( cc40, cc40_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(cc40_state, cc40_pixel_update)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "cc40_cart")

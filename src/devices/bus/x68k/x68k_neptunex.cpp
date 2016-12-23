@@ -28,7 +28,7 @@ machine_config_constructor x68k_neptune_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( x68k_neptunex );
 }
 
-x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+x68k_neptune_device::x68k_neptune_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, X68K_NEPTUNEX, "Neptune-X", tag, owner, clock, "x68k_neptunex", __FILE__),
 		device_x68k_expansion_card_interface(mconfig, *this),
 	m_slot(nullptr),
@@ -44,7 +44,7 @@ void x68k_neptune_device::device_start()
 {
 	device_t* cpu = machine().device("maincpu");
 	char mac[7];
-	UINT32 num = rand();
+	uint32_t num = rand();
 	address_space& space = cpu->memory().space(AS_PROGRAM);
 	m_slot = dynamic_cast<x68k_expansion_slot_device *>(owner());
 	memset(m_prom, 0x57, 16);
@@ -61,7 +61,7 @@ void x68k_neptune_device::device_reset() {
 
 READ16_MEMBER(x68k_neptune_device::x68k_neptune_port_r)
 {
-	UINT16 data;
+	uint16_t data;
 
 	if(offset >= 0x100+32 || offset < 0x100)
 		return 0xffff;

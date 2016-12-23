@@ -51,19 +51,19 @@ public:
 	required_device<buffered_spriteram16_device> m_spriteram;
 	required_device<buffered_spriteram16_device> m_spriteram2;
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	required_shared_ptr<UINT16> m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf3_rowscroll;
-	required_shared_ptr<UINT16> m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	required_shared_ptr<uint16_t> m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf3_rowscroll;
+	required_shared_ptr<uint16_t> m_pf4_rowscroll;
 	required_device<decospr_device> m_sprgen1;
 	required_device<decospr_device> m_sprgen2;
 	required_device<palette_device> m_palette;
-	required_shared_ptr<UINT16> m_decrypted_opcodes;
+	required_shared_ptr<uint16_t> m_decrypted_opcodes;
 
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(boogwing);
 	virtual void video_start() override;
-	UINT32 screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void mix_boogwing(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_READ16_MEMBER( boogwing_protection_region_0_104_r );
 	DECLARE_WRITE16_MEMBER( boogwing_protection_region_0_104_w );

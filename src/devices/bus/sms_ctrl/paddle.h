@@ -2,7 +2,7 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Paddle Control" emulation
+    Sega Mark III "Paddle Control" emulation
 
 **********************************************************************/
 
@@ -28,26 +28,26 @@ class sms_paddle_device : public device_t,
 {
 public:
 	// construction/destruction
-	sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sms_paddle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
 	virtual ioport_constructor device_input_ports() const override;
 
-	DECLARE_CUSTOM_INPUT_MEMBER( dir_pins_r );
-	DECLARE_CUSTOM_INPUT_MEMBER( tr_pin_r );
+	DECLARE_CUSTOM_INPUT_MEMBER( rldu_pins_r ); // Right, Left, Down and Up lines.
+	DECLARE_READ_LINE_MEMBER( tr_pin_r );
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 
 	// device_sms_control_port_interface overrides
-	virtual UINT8 peripheral_r() override;
+	virtual uint8_t peripheral_r() override;
 
 private:
 	required_ioport m_paddle_pins;
 	required_ioport m_paddle_x;
 
-	UINT8 m_read_state;
+	uint8_t m_read_state;
 	attotime m_start_time;
 	const attotime m_interval;
 };

@@ -106,7 +106,7 @@
 
 const device_type TPI6525 = &device_creator<tpi6525_device>;
 
-tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tpi6525_device::tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TPI6525, "6525 TPI", tag, owner, clock, "tpi6525", __FILE__),
 	m_out_irq_cb(*this),
 	m_in_pa_cb(*this),
@@ -296,7 +296,7 @@ WRITE_LINE_MEMBER( tpi6525_device::i4_w )
 
 READ8_MEMBER( tpi6525_device::pa_r )
 {
-	UINT8 data = m_in_a;
+	uint8_t data = m_in_a;
 
 	if (!m_in_pa_cb.isnull())
 		data = m_in_pa_cb(offset);
@@ -315,7 +315,7 @@ WRITE8_MEMBER( tpi6525_device::pa_w )
 
 READ8_MEMBER( tpi6525_device::pb_r )
 {
-	UINT8 data = m_in_b;
+	uint8_t data = m_in_b;
 
 	if (!m_in_pb_cb.isnull())
 		data = m_in_pb_cb(offset);
@@ -334,7 +334,7 @@ WRITE8_MEMBER( tpi6525_device::pb_w )
 
 READ8_MEMBER( tpi6525_device::pc_r )
 {
-	UINT8 data = m_in_c;
+	uint8_t data = m_in_c;
 
 	if (!m_in_pc_cb.isnull())
 		data &= m_in_pc_cb(offset);
@@ -353,7 +353,7 @@ WRITE8_MEMBER( tpi6525_device::pc_w )
 
 READ8_MEMBER( tpi6525_device::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset & 7)
 	{
@@ -537,7 +537,7 @@ WRITE8_MEMBER( tpi6525_device::write )
 	}
 }
 
-void tpi6525_device::port_line_w(UINT8 &port, int line, int state)
+void tpi6525_device::port_line_w(uint8_t &port, int line, int state)
 {
 	port &= ~(1 << line);
 	port |= state << line;
@@ -545,17 +545,17 @@ void tpi6525_device::port_line_w(UINT8 &port, int line, int state)
 
 /* this should probably be done better, needed for amigacd.c */
 
-UINT8 tpi6525_device::get_ddr_a()
+uint8_t tpi6525_device::get_ddr_a()
 {
 	return m_ddr_a;
 }
 
-UINT8 tpi6525_device::get_ddr_b()
+uint8_t tpi6525_device::get_ddr_b()
 {
 	return m_ddr_b;
 }
 
-UINT8 tpi6525_device::get_ddr_c()
+uint8_t tpi6525_device::get_ddr_c()
 {
 	return m_ddr_c;
 }

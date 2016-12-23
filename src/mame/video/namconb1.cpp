@@ -10,8 +10,8 @@
 /* nth_word32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of 16 bit words.
  */
-static inline UINT16
-nth_word32( const UINT32 *source, int which )
+static inline uint16_t
+nth_word32( const uint32_t *source, int which )
 {
 	source += which/2;
 	if( which&1 )
@@ -27,10 +27,10 @@ nth_word32( const UINT32 *source, int which )
 /* nth_byte32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
-static inline UINT8
-nth_byte32( const UINT32 *pSource, int which )
+static inline uint8_t
+nth_byte32( const uint32_t *pSource, int which )
 {
-	UINT32 data = pSource[which/4];
+	uint32_t data = pSource[which/4];
 	switch( which&3 )
 	{
 	case 0: return data>>24;
@@ -41,14 +41,14 @@ nth_byte32( const UINT32 *pSource, int which )
 } /* nth_byte32 */
 
 static void
-NB1TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
+NB1TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
 {
 	*tile = code;
 	*mask = code;
 } /* NB1TilemapCB */
 
 static void
-NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
+NB2TilemapCB(running_machine &machine, uint16_t code, int *tile, int *mask )
 {
 	namconb1_state *state = machine.driver_data<namconb1_state>();
 	int mangle;
@@ -73,22 +73,20 @@ NB2TilemapCB(running_machine &machine, UINT16 code, int *tile, int *mask )
 	}
 } /* NB2TilemapCB */
 
-static void
-video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
+void namconb1_state::video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bROZ )
 {
-	namconb1_state *state = screen.machine().driver_data<namconb1_state>();
 	int pri;
 
 	if( bROZ )
 	{
 		for( pri=0; pri<16; pri++ )
 		{
-			state->c169_roz_draw(screen, bitmap, cliprect, pri);
+			c169_roz_draw(screen, bitmap, cliprect, pri);
 			if( (pri&1)==0 )
 			{
 				namco_tilemap_draw( screen, bitmap, cliprect, pri/2 );
 			}
-			state->c355_obj_draw(screen, bitmap, cliprect, pri );
+			c355_obj_draw(screen, bitmap, cliprect, pri );
 		}
 	}
 	else
@@ -96,14 +94,14 @@ video_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle
 		for( pri=0; pri<8; pri++ )
 		{
 			namco_tilemap_draw( screen, bitmap, cliprect, pri );
-			state->c355_obj_draw(screen, bitmap, cliprect, pri );
+			c355_obj_draw(screen, bitmap, cliprect, pri );
 		}
 	}
 } /* video_update_common */
 
 /************************************************************************************************/
 
-UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -122,23 +120,23 @@ UINT32 namconb1_state::screen_update_namconb1(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static int
-NB1objcode2tile( running_machine &machine, int code )
+int namconb1_state::NB1objcode2tile( int code )
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int bank = nth_word32( state->m_spritebank32, code>>11 );
+	int bank = nth_word32( m_spritebank32, code>>11 );
 	return (code&0x7ff) + bank*0x800;
 }
 
 VIDEO_START_MEMBER(namconb1_state,namconb1)
 {
 	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB1TilemapCB );
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB1objcode2tile), &machine()));
+	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB1objcode2tile, this));
+
+	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb1 */
 
 /****************************************************************************************************/
 
-UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* compute window for custom screen blanking */
 	rectangle clip;
@@ -161,13 +159,11 @@ UINT32 namconb1_state::screen_update_namconb2(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-static int
-NB2objcode2tile( running_machine &machine, int code )
+int namconb1_state::NB2objcode2tile( int code )
 {
-	namconb1_state *state = machine.driver_data<namconb1_state>();
-	int bank = nth_byte32( state->m_spritebank32, (code>>11)&0xf );
+	int bank = nth_byte32( m_spritebank32, (code>>11)&0xf );
 	code &= 0x7ff;
-	if( state->m_gametype == NAMCONB2_MACH_BREAKERS )
+	if( m_gametype == NAMCONB2_MACH_BREAKERS )
 	{
 		if( bank&0x01 ) code |= 0x01*0x800;
 		if( bank&0x02 ) code |= 0x02*0x800;
@@ -191,6 +187,8 @@ NB2objcode2tile( running_machine &machine, int code )
 VIDEO_START_MEMBER(namconb1_state,namconb2)
 {
 	namco_tilemap_init(NAMCONB1_TILEGFX, memregion(NAMCONB1_TILEMASKREGION)->base(), NB2TilemapCB );
-	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(FUNC(NB2objcode2tile), &machine()));
+	c355_obj_init(NAMCONB1_SPRITEGFX,0x0,namcos2_shared_state::c355_obj_code2tile_delegate(&namconb1_state::NB2objcode2tile, this));
 	c169_roz_init(NAMCONB1_ROTGFX,NAMCONB1_ROTMASKREGION);
+
+	save_item(NAME(m_tilemap_tile_bank));
 } /* namconb2_vh_start */

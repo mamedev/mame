@@ -18,7 +18,7 @@ typedef device_delegate<void (double left, double right)> k054539_cb_delegate;
 	k054539_device::set_analog_callback(*device, k054539_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
 
 #define MCFG_K054539_REGION_OVERRRIDE(_region) \
-	k054539_device::set_override(*device, _region);
+	k054539_device::set_override(*device, "^" _region);
 
 #define MCFG_K054539_TIMER_HANDLER(_devcb) \
 	devcb = &k054539_device::set_timer_handler(*device, DEVCB_##_devcb);
@@ -42,11 +42,11 @@ public:
 	};
 
 	// construction/destruction
-	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k054539_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	static void set_analog_callback(device_t &device, k054539_cb_delegate callback) { downcast<k054539_device &>(device).m_apan_cb = callback; }
-	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rgnoverride = rgnoverride; }
+	static void set_override(device_t &device, const char *rgnoverride) { downcast<k054539_device &>(device).m_rom.set_tag(rgnoverride); }
 	template<class _Object> static devcb_base &set_timer_handler(device_t &device, _Object object) { return downcast<k054539_device &>(device).m_timer_handler.set_callback(object); }
 
 
@@ -59,7 +59,7 @@ public:
 	  Note that the eight PCM channels of a K054539 do not have separate
 	  volume controls. Considering the global attenuation equation may not
 	  be entirely accurate, k054539_set_gain() provides means to control
-	  channel gain. It can be called anywhere but preferrably from
+	  channel gain. It can be called anywhere but preferably from
 	  DRIVER_INIT().
 
 	  Parameters:
@@ -80,37 +80,35 @@ protected:
 
 private:
 	struct channel {
-		UINT32 pos;
-		UINT32 pfrac;
-		INT32 val;
-		INT32 pval;
+		uint32_t pos;
+		uint32_t pfrac;
+		int32_t val;
+		int32_t pval;
 	};
 
 	double voltab[256];
 	double pantab[0xf];
 
 	double gain[8];
-	UINT8 posreg_latch[8][3];
+	uint8_t posreg_latch[8][3];
 	int flags;
 
 	unsigned char regs[0x230];
-	std::unique_ptr<UINT8[]> ram;
+	std::unique_ptr<uint8_t[]> ram;
 	int reverb_pos;
 
-	INT32 cur_ptr;
+	int32_t cur_ptr;
 	int cur_limit;
 	unsigned char *cur_zone;
-	unsigned char *rom;
-	UINT32 rom_size;
-	UINT32 rom_mask;
+	required_region_ptr<uint8_t> m_rom;
+	uint32_t rom_mask;
 
 	channel channels[8];
 	sound_stream *stream;
 
 	emu_timer          *m_timer;
-	UINT32             m_timer_state;
+	uint32_t             m_timer_state;
 	devcb_write_line   m_timer_handler;
-	const char         *m_rgnoverride;
 	k054539_cb_delegate m_apan_cb;
 
 	bool regupdate();

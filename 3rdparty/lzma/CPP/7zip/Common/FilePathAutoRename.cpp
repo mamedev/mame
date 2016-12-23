@@ -2,54 +2,50 @@
 
 #include "StdAfx.h"
 
-#include "Common/Defs.h"
-#include "Common/IntToString.h"
+#include "../../Common/Defs.h"
+#include "../../Common/IntToString.h"
 
-#include "Windows/FileFind.h"
+#include "../../Windows/FileFind.h"
 
 #include "FilePathAutoRename.h"
 
 using namespace NWindows;
 
 static bool MakeAutoName(const FString &name,
-    const FString &extension, unsigned value, FString &path)
+    const FString &extension, UInt32 value, FString &path)
 {
-  FChar number[16];
-  ConvertUInt32ToString(value, number);
+  char temp[16];
+  ConvertUInt32ToString(value, temp);
   path = name;
-  path += number;
+  path.AddAscii(temp);
   path += extension;
   return NFile::NFind::DoesFileOrDirExist(path);
 }
 
-bool AutoRenamePath(FString &fullProcessedPath)
+bool AutoRenamePath(FString &path)
 {
-  FString path;
-  int dotPos = fullProcessedPath.ReverseFind(FTEXT('.'));
+  int dotPos = path.ReverseFind_Dot();
+  int slashPos = path.ReverseFind_PathSepar();
 
-  int slashPos = fullProcessedPath.ReverseFind(FTEXT('/'));
-  #ifdef _WIN32
-  int slash1Pos = fullProcessedPath.ReverseFind(FTEXT('\\'));
-  slashPos = MyMax(slashPos, slash1Pos);
-  #endif
-
-  FString name, extension;
-  if (dotPos > slashPos && dotPos > 0)
+  FString name = path;
+  FString extension;
+  if (dotPos > slashPos + 1)
   {
-    name = fullProcessedPath.Left(dotPos);
-    extension = fullProcessedPath.Mid(dotPos);
+    name.DeleteFrom(dotPos);
+    extension = path.Ptr(dotPos);
   }
-  else
-    name = fullProcessedPath;
-  name += L'_';
-  unsigned left = 1, right = (1 << 30);
+  name += FTEXT('_');
+  
+  FString temp;
+
+  UInt32 left = 1, right = ((UInt32)1 << 30);
   while (left != right)
   {
-    unsigned mid = (left + right) / 2;
-    if (MakeAutoName(name, extension, mid, path))
+    UInt32 mid = (left + right) / 2;
+    if (MakeAutoName(name, extension, mid, temp))
       left = mid + 1;
     else
       right = mid;
   }
-  return !MakeAutoName(name, extension, right, fullProcessedPath);
+  return !MakeAutoName(name, extension, right, path);
 }

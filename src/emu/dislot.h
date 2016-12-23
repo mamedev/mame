@@ -6,8 +6,8 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DISLOT_H__
-#define __DISLOT_H__
+#ifndef MAME_EMU_DISLOT_H
+#define MAME_EMU_DISLOT_H
 
 //**************************************************************************
 //  LEGACY MACROS
@@ -67,30 +67,27 @@
 class device_slot_option
 {
 	friend class device_slot_interface;
-	friend class simple_list<device_slot_option>;
 
 public:
 	device_slot_option(const char *name, const device_type &devtype);
 
-	device_slot_option *next() const { return m_next; }
 	const char *name() const { return m_name; }
 	const device_type &devtype() const { return m_devtype; }
 	bool selectable() const { return m_selectable; }
 	const char *default_bios() const { return m_default_bios; }
 	machine_config_constructor machine_config() const { return m_machine_config; }
 	const input_device_default *input_device_defaults() const { return m_input_device_defaults; }
-	UINT32 clock() const { return m_clock; }
+	u32 clock() const { return m_clock; }
 
 private:
 	// internal state
-	device_slot_option *m_next;
 	const char *m_name;
 	const device_type &m_devtype;
 	bool m_selectable;
 	const char *m_default_bios;
 	machine_config_constructor m_machine_config;
 	const input_device_default *m_input_device_defaults;
-	UINT32 m_clock;
+	u32 m_clock;
 };
 
 
@@ -111,18 +108,18 @@ public:
 	static void static_set_option_default_bios(device_t &device, const char *option, const char *default_bios) { static_option(device, option)->m_default_bios = default_bios; }
 	static void static_set_option_machine_config(device_t &device, const char *option, const machine_config_constructor machine_config) { static_option(device, option)->m_machine_config = machine_config; }
 	static void static_set_option_device_input_defaults(device_t &device, const char *option, const input_device_default *default_input) { static_option(device, option)->m_input_device_defaults = default_input; }
-	static void static_set_option_clock(device_t &device, const char *option, UINT32 default_clock) { static_option(device, option)->m_clock = default_clock; }
+	static void static_set_option_clock(device_t &device, const char *option, u32 default_clock) { static_option(device, option)->m_clock = default_clock; }
 	bool fixed() const { return m_fixed; }
 	const char *default_option() const { return m_default_option; }
-	device_slot_option *first_option() const { return m_options.first(); }
-	device_slot_option *option(const char *name) const { if (name) return m_options.find(name); return nullptr; }
+	const std::unordered_map<std::string, std::unique_ptr<device_slot_option>> &option_list() const { return m_options; }
+	device_slot_option *option(const char *name) const { if (name) { auto search = m_options.find(name); if (search != m_options.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	virtual std::string get_default_card_software() { return std::string(); }
 	device_t *get_card_device();
 
 private:
 	// internal state
 	static device_slot_option *static_option(device_t &device, const char *option);
-	tagged_list<device_slot_option> m_options;
+	std::unordered_map<std::string,std::unique_ptr<device_slot_option>> m_options;
 	const char *m_default_option;
 	bool m_fixed;
 };
@@ -140,4 +137,4 @@ public:
 	virtual ~device_slot_card_interface();
 };
 
-#endif  /* __DISLOT_H__ */
+#endif  /* MAME_EMU_DISLOT_H */

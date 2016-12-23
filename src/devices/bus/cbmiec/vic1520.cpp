@@ -71,7 +71,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *vic1520_t::device_rom_region() const
+const tiny_rom_entry *vic1520_t::device_rom_region() const
 {
 	return ROM_NAME( vic1520 );
 }
@@ -136,7 +136,7 @@ ioport_constructor vic1520_t::device_input_ports() const
 //  vic1520_t - constructor
 //-------------------------------------------------
 
-vic1520_t::vic1520_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vic1520_t::vic1520_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, VIC1520, "VIC-1520", tag, owner, clock, "vic1520", __FILE__),
 	device_cbm_iec_interface(mconfig, *this)
 {

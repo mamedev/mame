@@ -7,9 +7,9 @@ A couple of comments about the 6k/8k images:
 - game code occupies 6k, but there can be different chips inside the actual carts:
   1x8k eprom, 2x4k eproms or 1x2k + 1x4k eproms. In the 1x8k case, the console
   actually accesses only the first 2k and the final 4k.
-There have been found carts where the remaining part is empty, and carts where the lower
-2k are repeated (see the Alt dumps below), but the dumps are basically the same and
-a Creativision would not see the difference between them.
+Carts were found where the remaining part is empty, and carts were found where the
+lower 2k are repeated (see the Alt dumps below), but the dumps are basically the
+same and a Creativision would not see the difference between them.
 
 -->
 
@@ -475,7 +475,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 <!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
 	<software name="tennisa" cloneof="tennis">
 		<description>Tennis (Wimbledon, 8k Cart)</description>
-		<year>1981</year>
+		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
 		<part name="cart" interface="crvision_cart">
@@ -488,7 +488,7 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 
 	<software name="tennisb" cloneof="tennis">
 		<description>Tennis (Wimbledon, 8k Cart, Alt ROM config)</description>
-		<year>1981</year>
+		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="8004" />
 		<part name="cart" interface="crvision_cart">
@@ -513,9 +513,23 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 		</part>
 	</software>
 
-	<software name="tennisd" cloneof="tennis">
-		<description>Tennis (Dick Smith, 6k Cart)</description>
-		<year>1981</year>
+	<software name="tennisd1" cloneof="tennis">
+		<description>Tennis (Dick Smith, earlier, 6k Cart)</description>
+		<year>1982</year>
+		<publisher>Video Technology Ltd.</publisher>
+		<info name="serial" value="Y-1620" />
+		<part name="cart" interface="crvision_cart">
+			<feature name="slot" value="crv_rom6k" />
+			<dataarea name="rom" size="6144">
+				<rom name="tnb.bin" size="4096" crc="709adc2b" sha1="f196fcfb1f2debafb46e2f93bc2ab481614d8a3f" offset="0x0000" />
+				<rom name="tea.bin" size="2048" crc="d669020b" sha1="523bf43e6c237d04e9649bf7beb1da278a346752" offset="0x1000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="tennisd2" cloneof="tennis">
+		<description>Tennis (Dick Smith, later, 6k Cart)</description>
+		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
 		<part name="cart" interface="crvision_cart">
@@ -528,9 +542,9 @@ time! Hence, this is not a situation of usage of "Alt PCB" for these carts.
 	</software>
 
 <!-- Reminder: Tennis 8k got found both in PCB with 2 chips (4k+4k) and in PCB with 1 chip (8k)... split accordingly! -->
-	<software name="tennisda" cloneof="tennis">
+	<software name="tennisd2a" cloneof="tennis">
 		<description>Tennis (Dick Smith, 8k Cart)</description>
-		<year>1981</year>
+		<year>1982</year>
 		<publisher>Video Technology Ltd.</publisher>
 		<info name="serial" value="Y-1620" />
 		<part name="cart" interface="crvision_cart">

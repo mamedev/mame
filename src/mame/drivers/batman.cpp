@@ -21,6 +21,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "video/atarimo.h"
 #include "includes/batman.h"
 
@@ -105,17 +106,17 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, batman_state )
 	AM_RANGE(0x260040, 0x260041) AM_MIRROR(0x11ff8e) AM_DEVWRITE8("jsa", atari_jsa_iii_device, main_command_w, 0x00ff)
 	AM_RANGE(0x260050, 0x260051) AM_MIRROR(0x11ff8e) AM_WRITE(latch_w)
 	AM_RANGE(0x260060, 0x260061) AM_MIRROR(0x11ff8e) AM_DEVWRITE("eeprom", atari_eeprom_device, unlock_write)
-	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_MIRROR(0x100000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x3effc0, 0x3effff) AM_MIRROR(0x100000) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
-	AM_RANGE(0x3f0000, 0x3f1fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
-	AM_RANGE(0x3f2000, 0x3f3fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
-	AM_RANGE(0x3f4000, 0x3f5fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
-	AM_RANGE(0x3f6000, 0x3f7fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob")
-	AM_RANGE(0x3f8000, 0x3f8eff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
-	AM_RANGE(0x3f8f00, 0x3f8f7f) AM_MIRROR(0x100000) AM_SHARE("vad:eof")
-	AM_RANGE(0x3f8f80, 0x3f8fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob:slip")
-	AM_RANGE(0x3f0000, 0x3fffff) AM_MIRROR(0x100000) AM_RAM
+	AM_RANGE(0x2a0000, 0x2a0001) AM_MIRROR(0x11fffe) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
+	AM_RANGE(0x2e0000, 0x2e0fff) AM_MIRROR(0x100000) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x2effc0, 0x2effff) AM_MIRROR(0x100000) AM_DEVREADWRITE("vad", atari_vad_device, control_read, control_write)
+	AM_RANGE(0x2f0000, 0x2f1fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield2_latched_msb_w) AM_SHARE("vad:playfield2")
+	AM_RANGE(0x2f2000, 0x2f3fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_latched_lsb_w) AM_SHARE("vad:playfield")
+	AM_RANGE(0x2f4000, 0x2f5fff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, playfield_upper_w) AM_SHARE("vad:playfield_ext")
+	AM_RANGE(0x2f6000, 0x2f7fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob")
+	AM_RANGE(0x2f8000, 0x2f8eff) AM_MIRROR(0x100000) AM_DEVWRITE("vad", atari_vad_device, alpha_w) AM_SHARE("vad:alpha")
+	AM_RANGE(0x2f8f00, 0x2f8f7f) AM_MIRROR(0x100000) AM_SHARE("vad:eof")
+	AM_RANGE(0x2f8f80, 0x2f8fff) AM_MIRROR(0x100000) AM_RAM AM_SHARE("vad:mob:slip")
+	AM_RANGE(0x2f0000, 0x2fffff) AM_MIRROR(0x100000) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -205,6 +206,8 @@ static MACHINE_CONFIG_START( batman, batman_state )
 
 	MCFG_ATARI_EEPROM_2816_ADD("eeprom")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", batman)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -251,9 +254,8 @@ ROM_START( batman )
 	ROM_LOAD16_BYTE( "136085-2034.9r",   0x80000, 0x20000, CRC(05388c62) SHA1(de037203d94e72e2922c89256da080ae023ca0e7) )
 	ROM_LOAD16_BYTE( "136085-2035.5r",   0x80001, 0x20000, CRC(e77c92dd) SHA1(6d475092f7628114960d26b8ec1c5eae5e61ce25) )
 
-	ROM_REGION( 0x14000, "jsa:cpu", 0 ) /* 64k + 16k for 6502 code */
-	ROM_LOAD( "136085-1040.12c",  0x10000, 0x4000, CRC(080db83c) SHA1(ec084b7c1dc5878acd6d081e2e8b8d1e8b3d8a45) )
-	ROM_CONTINUE(                 0x04000, 0xc000 )
+	ROM_REGION( 0x10000, "jsa:cpu", 0 ) /* 64k for 6502 code */
+	ROM_LOAD( "136085-1040.12c",  0x00000, 0x10000, CRC(080db83c) SHA1(ec084b7c1dc5878acd6d081e2e8b8d1e8b3d8a45) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "136085-2009.10m",  0x00000, 0x20000, CRC(a82d4923) SHA1(38e03eebd95347a383f3d7357462252961bd3c7f) )  /* alphanumerics */

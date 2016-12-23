@@ -16,7 +16,7 @@
 #include "machine/mc68328.h"
 #include "machine/ram.h"
 #include "sound/dac.h"
-#include "debugger.h"
+#include "sound/volt_reg.h"
 #include "rendlay.h"
 
 #define MC68328_TAG "dragonball"
@@ -28,7 +28,6 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_lsi(*this, MC68328_TAG),
-		m_dac(*this, "dac"),
 		m_ram(*this, RAM_TAG),
 		m_io_penx(*this, "PENX"),
 		m_io_peny(*this, "PENY"),
@@ -37,16 +36,9 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mc68328_device> m_lsi;
-	required_device<dac_device> m_dac;
 	required_device<ram_device> m_ram;
-	//DECLARE_WRITE8_MEMBER(palm_dac_transition);
-	//DECLARE_WRITE8_MEMBER(palm_port_f_out);
-	//DECLARE_READ8_MEMBER(palm_port_c_in);
-	//DECLARE_READ8_MEMBER(palm_port_f_in);
-	//DECLARE_WRITE16_MEMBER(palm_spim_out);
-	//DECLARE_READ16_MEMBER(palm_spim_in);
-	UINT8 m_port_f_latch;
-	UINT16 m_spim_data;
+	uint8_t m_port_f_latch;
+	uint16_t m_spim_data;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_INPUT_CHANGED_MEMBER(pen_check);
@@ -56,7 +48,6 @@ public:
 	DECLARE_READ8_MEMBER(palm_port_f_in);
 	DECLARE_WRITE16_MEMBER(palm_spim_out);
 	DECLARE_READ16_MEMBER(palm_spim_in);
-	DECLARE_WRITE8_MEMBER(palm_dac_transition);
 	DECLARE_WRITE_LINE_MEMBER(palm_spim_exchange);
 	DECLARE_PALETTE_INIT(palm);
 
@@ -64,9 +55,9 @@ public:
 	required_ioport m_io_peny;
 	required_ioport m_io_penb;
 	required_ioport m_io_portd;
-};
 
-static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, int options);
+	offs_t palm_dasm_override(device_t &device, std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, int options);
+};
 
 
 /***************************************************************************
@@ -75,7 +66,7 @@ static offs_t palm_dasm_override(device_t &device, char *buffer, offs_t pc, cons
 
 INPUT_CHANGED_MEMBER(palm_state::pen_check)
 {
-	UINT8 button = m_io_penb->read();
+	uint8_t button = m_io_penb->read();
 
 	if(button)
 		m_lsi->set_penirq_line(1);
@@ -85,8 +76,8 @@ INPUT_CHANGED_MEMBER(palm_state::pen_check)
 
 INPUT_CHANGED_MEMBER(palm_state::button_check)
 {
-	UINT8 button_state = m_io_portd->read();
-	m_lsi->set_port_d_lines(button_state, (int)(FPTR)param);
+	uint8_t button_state = m_io_portd->read();
+	m_lsi->set_port_d_lines(button_state, (int)(uintptr_t)param);
 }
 
 WRITE8_MEMBER(palm_state::palm_port_f_out)
@@ -116,8 +107,8 @@ READ16_MEMBER(palm_state::palm_spim_in)
 
 WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 {
-	UINT8 x = m_io_penx->read();
-	UINT8 y = m_io_peny->read();
+	uint8_t x = m_io_penx->read();
+	uint8_t y = m_io_peny->read();
 
 	switch (m_port_f_latch & 0x0f)
 	{
@@ -134,21 +125,18 @@ WRITE_LINE_MEMBER(palm_state::palm_spim_exchange)
 void palm_state::machine_start()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank (0x000000, m_ram->size() - 1, m_ram->size() - 1, 0, "bank1");
-	space.install_write_bank(0x000000, m_ram->size() - 1, m_ram->size() - 1, 0, "bank1");
+	space.install_read_bank (0x000000, m_ram->size() - 1, "bank1");
+	space.install_write_bank(0x000000, m_ram->size() - 1, "bank1");
 	membank("bank1")->set_base(m_ram->pointer());
 
 	save_item(NAME(m_port_f_latch));
 	save_item(NAME(m_spim_data));
-
-	if (m_maincpu->debug())
-		m_maincpu->debug()->set_dasm_override(palm_dasm_override);
 }
 
 void palm_state::machine_reset()
 {
 	// Copy boot ROM
-	UINT8* bios = memregion("bios")->base();
+	uint8_t* bios = memregion("bios")->base();
 	memset(m_ram->pointer(), 0, m_ram->size());
 	memcpy(m_ram->pointer(), bios, 0x20000);
 
@@ -174,16 +162,6 @@ ADDRESS_MAP_END
 
 
 /***************************************************************************
-    AUDIO HARDWARE
-***************************************************************************/
-
-WRITE8_MEMBER(palm_state::palm_dac_transition)
-{
-	m_dac->write_unsigned8(0x7f * data );
-}
-
-
-/***************************************************************************
     MACHINE DRIVERS
 ***************************************************************************/
 
@@ -191,6 +169,7 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD( "maincpu", M68000, 32768*506 )        /* 16.580608 MHz */
 	MCFG_CPU_PROGRAM_MAP( palm_map)
+	MCFG_CPU_DISASSEMBLE_OVERRIDE(palm_state, palm_dasm_override)
 
 	MCFG_QUANTUM_TIME( attotime::from_hz(60) )
 
@@ -209,16 +188,17 @@ static MACHINE_CONFIG_START( palm, palm_state )
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	/* audio hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 
 	MCFG_DEVICE_ADD( MC68328_TAG, MC68328, 0 ) // lsi device
 	MCFG_MC68328_CPU("maincpu")
 	MCFG_MC68328_OUT_PORT_F_CB(WRITE8(palm_state, palm_port_f_out)) // Port F Output
 	MCFG_MC68328_IN_PORT_C_CB(READ8(palm_state, palm_port_c_in)) // Port C Input
 	MCFG_MC68328_IN_PORT_F_CB(READ8(palm_state, palm_port_f_in)) // Port F Input
-	MCFG_MC68328_OUT_PWM_CB(WRITE8(palm_state, palm_dac_transition))
+	MCFG_MC68328_OUT_PWM_CB(DEVWRITELINE("dac", dac_bit_interface, write))
 	MCFG_MC68328_OUT_SPIM_CB(WRITE16(palm_state, palm_spim_out))
 	MCFG_MC68328_IN_SPIM_CB(READ16(palm_state, palm_spim_in))
 	MCFG_MC68328_SPIM_XCH_TRIGGER_CB(WRITELINE(palm_state, palm_spim_exchange))
@@ -232,7 +212,7 @@ static INPUT_PORTS_START( palm )
 	PORT_BIT( 0xff, 0x50, IPT_LIGHTGUN_Y ) PORT_NAME("Pen Y") PORT_MINMAX(0, 0xa0) PORT_SENSITIVITY(50) PORT_CROSSHAIR(Y, 1.0, 0.0, 0)
 
 	PORT_START( "PENB" )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, pen_check, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Pen Button") PORT_CODE(MOUSECODE_BUTTON1) PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, pen_check, nullptr)
 
 	PORT_START( "PORTD" )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Power") PORT_CODE(KEYCODE_D)   PORT_CHANGED_MEMBER(DEVICE_SELF, palm_state, button_check, (void*)0)
@@ -501,4 +481,4 @@ COMP( 19??, spt1500,  pilot1k,  0,       palmvx,      palm, driver_device,     0
 COMP( 19??, spt1700,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1700", MACHINE_NOT_WORKING )
 COMP( 19??, spt1740,  pilot1k,  0,       palmvx,      palm, driver_device,     0,     "Symbol", "SPT 1740", MACHINE_NOT_WORKING )
 
-#include "palm_dbg.inc"
+#include "palm_dbg.hxx"

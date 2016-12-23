@@ -48,14 +48,14 @@ machine_config_constructor a2bus_echoii_device::device_mconfig_additions() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
 {
 }
 
-a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a2bus_echoii_device::a2bus_echoii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, A2BUS_ECHOII, "Street Electronics Echo II", tag, owner, clock, "a2echoii", __FILE__),
 	device_a2bus_card_interface(mconfig, *this),
 	m_tms(*this, TMS_TAG)
@@ -76,7 +76,7 @@ void a2bus_echoii_device::device_reset()
 {
 }
 
-UINT8 a2bus_echoii_device::read_c0nx(address_space &space, UINT8 offset)
+uint8_t a2bus_echoii_device::read_c0nx(address_space &space, uint8_t offset)
 {
 	switch (offset)
 	{
@@ -87,7 +87,7 @@ UINT8 a2bus_echoii_device::read_c0nx(address_space &space, UINT8 offset)
 	return 0;
 }
 
-void a2bus_echoii_device::write_c0nx(address_space &space, UINT8 offset, UINT8 data)
+void a2bus_echoii_device::write_c0nx(address_space &space, uint8_t offset, uint8_t data)
 {
 	switch (offset)
 	{

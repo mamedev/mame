@@ -10,6 +10,7 @@ Ping Pong (c) 1985 Konami
 #include "cpu/z80/z80.h"
 #include "sound/sn76496.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/pingpong.h"
 
 
@@ -38,7 +39,7 @@ WRITE8_MEMBER(pingpong_state::cashquiz_question_bank_low_w)
 		static const char * const bankname[] = { "bank1", "bank2", "bank3", "bank4", "bank5", "bank6", "bank7", "bank8" };
 		const char *bank = bankname[data & 7];
 		int bankaddr = m_question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memregion("user1")->base() + bankaddr;
+		uint8_t *questions = memregion("user1")->base() + bankaddr;
 		membank(bank)->set_base(questions);
 
 	}
@@ -99,7 +100,7 @@ static ADDRESS_MAP_START( pingpong_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)   /* coin counters + irq enables */
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP        /* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)    /* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa600, 0xa600) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
@@ -120,7 +121,7 @@ static ADDRESS_MAP_START( merlinmm_map, AS_PROGRAM, 8, pingpong_state )
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("IN3")
 	AM_RANGE(0xa200, 0xa200) AM_WRITENOP        /* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_DEVWRITE("snsnd", sn76496_device, write)    /* trigger read */
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa600, 0xa600) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -448,6 +449,7 @@ static MACHINE_CONFIG_START( pingpong, pingpong_state )
 	MCFG_CPU_ADD("maincpu",Z80,18432000/6)      /* 3.072 MHz (probably) */
 	MCFG_CPU_PROGRAM_MAP(pingpong_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", pingpong_state, pingpong_interrupt, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -558,7 +560,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt program code */
@@ -568,7 +570,7 @@ DRIVER_INIT_MEMBER(pingpong_state,merlinmm)
 
 DRIVER_INIT_MEMBER(pingpong_state,cashquiz)
 {
-	UINT8 *ROM;
+	uint8_t *ROM;
 	int i;
 
 	/* decrypt program code */

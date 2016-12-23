@@ -8,7 +8,7 @@
 	</element>
 
 <!-- add our own for DP(display point) and the CT(comma tail) segments -->
-<!-- MAME led16segsc won't do, since Speak & Math has them on the left side -->
+<!-- MAME led16segsc won't do, since this one has them on the left side -->
 
 	<element name="lamp_dp" defstate="0">
 		<disk state="0"><color red="0.0235" green="0.1255" blue="0.1059" /></disk>

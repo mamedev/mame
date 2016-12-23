@@ -18,24 +18,14 @@
 namespace NArchive {
 namespace N7z {
 
-const UInt32 k_Copy = 0x0;
-const UInt32 k_Delta = 3;
-const UInt32 k_LZMA2 = 0x21;
-const UInt32 k_LZMA  = 0x030101;
-const UInt32 k_PPMD  = 0x030401;
-const UInt32 k_BCJ  = 0x03030103;
-const UInt32 k_BCJ2 = 0x0303011B;
-const UInt32 k_Deflate = 0x040108;
-const UInt32 k_BZip2   = 0x040202;
-
 #ifndef __7Z_SET_PROPERTIES
 
 #ifdef EXTRACT_ONLY
-#if !defined(_7ZIP_ST) && !defined(_SFX)
-#define __7Z_SET_PROPERTIES
-#endif
+  #if !defined(_7ZIP_ST) && !defined(_SFX)
+    #define __7Z_SET_PROPERTIES
+  #endif
 #else
-#define __7Z_SET_PROPERTIES
+  #define __7Z_SET_PROPERTIES
 #endif
 
 #endif
@@ -54,16 +44,20 @@ public:
   UInt64 _numSolidBytes;
   bool _numSolidBytesDefined;
   bool _solidExtension;
+  bool _useTypeSorting;
 
   bool _compressHeaders;
   bool _encryptHeadersSpecified;
   bool _encryptHeaders;
+  // bool _useParents; 9.26
 
-  bool WriteCTime;
-  bool WriteATime;
-  bool WriteMTime;
+  CBoolPair Write_CTime;
+  CBoolPair Write_ATime;
+  CBoolPair Write_MTime;
 
-  bool _volumeMode;
+  bool _useMultiThreadMixer;
+
+  // bool _volumeMode;
 
   void InitSolidFiles() { _numSolidFiles = (UInt64)(Int64)(-1); }
   void InitSolidSize()  { _numSolidBytes = (UInt64)(Int64)(-1); }
@@ -85,10 +79,8 @@ public:
 #endif
 
 class CHandler:
-  #ifndef EXTRACT_ONLY
-  public COutHandler,
-  #endif
   public IInArchive,
+  public IArchiveGetRawProps,
   #ifdef __7Z_SET_PROPERTIES
   public ISetProperties,
   #endif
@@ -97,9 +89,13 @@ class CHandler:
   #endif
   PUBLIC_ISetCompressCodecsInfo
   public CMyUnknownImp
+  #ifndef EXTRACT_ONLY
+  , public COutHandler
+  #endif
 {
 public:
   MY_QUERYINTERFACE_BEGIN2(IInArchive)
+  MY_QUERYINTERFACE_ENTRY(IArchiveGetRawProps)
   #ifdef __7Z_SET_PROPERTIES
   MY_QUERYINTERFACE_ENTRY(ISetProperties)
   #endif
@@ -111,9 +107,10 @@ public:
   MY_ADDREF_RELEASE
 
   INTERFACE_IInArchive(;)
+  INTERFACE_IArchiveGetRawProps(;)
 
   #ifdef __7Z_SET_PROPERTIES
-  STDMETHOD(SetProperties)(const wchar_t **names, const PROPVARIANT *values, Int32 numProperties);
+  STDMETHOD(SetProperties)(const wchar_t * const *names, const PROPVARIANT *values, UInt32 numProps);
   #endif
 
   #ifndef EXTRACT_ONLY
@@ -126,28 +123,30 @@ public:
 
 private:
   CMyComPtr<IInStream> _inStream;
-  NArchive::N7z::CArchiveDatabaseEx _db;
+  NArchive::N7z::CDbEx _db;
+  
   #ifndef _NO_CRYPTO
+  bool _isEncrypted;
   bool _passwordIsDefined;
+  UString _password;
   #endif
 
   #ifdef EXTRACT_ONLY
   
   #ifdef __7Z_SET_PROPERTIES
   UInt32 _numThreads;
+  bool _useMultiThreadMixer;
   #endif
 
   UInt32 _crcSize;
 
   #else
   
-  CRecordVector<CBind> _binds;
+  CRecordVector<CBond2> _bonds;
 
   HRESULT PropsMethod_To_FullMethod(CMethodFull &dest, const COneMethodInfo &m);
   HRESULT SetHeaderMethod(CCompressionMethodMode &headerMethod);
-  void AddDefaultMethod();
-  HRESULT SetMainMethod(CCompressionMethodMode &method,
-      CObjectVector<COneMethodInfo> &methodsInfo
+  HRESULT SetMainMethod(CCompressionMethodMode &method
       #ifndef _7ZIP_ST
       , UInt32 numThreads
       #endif
@@ -156,11 +155,13 @@ private:
 
   #endif
 
-  bool IsEncrypted(UInt32 index2) const;
+  bool IsFolderEncrypted(CNum folderIndex) const;
   #ifndef _SFX
 
   CRecordVector<UInt64> _fileInfoPopIDs;
   void FillPopIDs();
+  void AddMethodName(AString &s, UInt64 id);
+  HRESULT SetMethodToProp(CNum folderIndex, PROPVARIANT *prop) const;
 
   #endif
 

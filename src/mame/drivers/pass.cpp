@@ -92,7 +92,7 @@
  --- Game Notes ---
 
  Graphical Glitches caused when 2 sprites are close together are NOT bugs, the Sprites are
- infact contructed from a tilemap made of 4x4 tiles.
+ infact constructed from a tilemap made of 4x4 tiles.
 
  I imagine flicker on the main character at times is also correct.
 
@@ -104,6 +104,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
 #include "includes/pass.h"
@@ -116,7 +117,7 @@ static ADDRESS_MAP_START( pass_map, AS_PROGRAM, 16, pass_state )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(pass_bg_videoram_w) AM_SHARE("bg_videoram") // Background
 	AM_RANGE(0x210000, 0x213fff) AM_RAM_WRITE(pass_fg_videoram_w) AM_SHARE("fg_videoram") // Foreground
 	AM_RANGE(0x220000, 0x2203ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x230000, 0x230001) AM_WRITE(soundlatch_word_w)
+	AM_RANGE(0x230000, 0x230001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x230100, 0x230101) AM_READ_PORT("DSW")
 	AM_RANGE(0x230200, 0x230201) AM_READ_PORT("INPUTS")
 ADDRESS_MAP_END
@@ -129,10 +130,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pass_sound_io_map, AS_IO, 8, pass_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x70, 0x71) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki", okim6295_device, write)
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0xc0, 0xc0) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 ADDRESS_MAP_END
 
 /* todo : work out function of unknown but used dsw */
@@ -261,6 +262,8 @@ static MACHINE_CONFIG_START( pass, pass_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 14318180/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)

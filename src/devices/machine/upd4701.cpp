@@ -18,7 +18,7 @@
 
 const device_type UPD4701 = &device_creator<upd4701_device>;
 
-upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd4701_device::upd4701_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD4701, "uPD4701 Encoder", tag, owner, clock, "upd4701", __FILE__), m_cs(0), m_xy(0), m_ul(0), m_resetx(0), m_resety(0), m_latchx(0), m_latchy(0),
 	m_startx(0), m_starty(0), m_x(0), m_y(0), m_switches(0), m_latchswitches(0), m_cf(0)
 {
@@ -163,7 +163,7 @@ WRITE_LINE_MEMBER( upd4701_device::resety_w )
     x_add
 -------------------------------------------------*/
 
-void upd4701_device::x_add( INT16 data )
+void upd4701_device::x_add( int16_t data )
 {
 	if (!m_resetx && data != 0)
 	{
@@ -180,7 +180,7 @@ void upd4701_device::x_add( INT16 data )
     y_add
 -------------------------------------------------*/
 
-void upd4701_device::y_add( INT16 data )
+void upd4701_device::y_add( int16_t data )
 {
 	if (!m_resety && data != 0)
 	{
@@ -197,7 +197,7 @@ void upd4701_device::y_add( INT16 data )
     switches_set
 -------------------------------------------------*/
 
-void upd4701_device::switches_set( UINT8 data )
+void upd4701_device::switches_set( uint8_t data )
 {
 	m_switches = data;
 }

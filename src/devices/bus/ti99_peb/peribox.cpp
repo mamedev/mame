@@ -216,11 +216,13 @@ CRUCLK*  51||52  DBIN
 #define PEBSLOT7 "slot7"
 #define PEBSLOT8 "slot8"
 
-peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_device::peribox_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : bus8z_device(mconfig, PERIBOX, "Peripheral expansion box", tag, owner, clock, "peribox", __FILE__),
 	m_console_inta(*this),
 	m_console_intb(*this),
-	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0)
+	m_sgcpu_lcp(*this),
+	m_datamux_ready(*this),
+	m_inta_flag(0), m_intb_flag(0), m_lcp_flag(0), m_ready_flag(0)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 	// The address prefix is actually created by the "Flex cable interface"
@@ -231,11 +233,12 @@ peribox_device::peribox_device(const machine_config &mconfig, const char *tag, d
 /*
     Constructor called from subclasses.
 */
-peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+peribox_device::peribox_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 : bus8z_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_console_inta(*this),
 	m_console_intb(*this),
-	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0), m_address_prefix(0)
+	m_sgcpu_lcp(*this),
+	m_datamux_ready(*this), m_inta_flag(0), m_intb_flag(0), m_ready_flag(0), m_address_prefix(0), m_msast(false), m_memen(false)
 {
 	for (int i=2; i <= 8; i++) m_slot[i] = nullptr;
 }
@@ -258,6 +261,9 @@ WRITE8_MEMBER(peribox_device::write)
 
 SETADDRESS_DBIN_MEMBER(peribox_device::setaddress_dbin)
 {
+	// Ignore the address when the TI-99/8 transmits the high-order 8 bits
+	if (!m_memen) return;
+
 	for (int i=2; i <= 8; i++)
 	{
 		if (m_slot[i]!=nullptr) m_slot[i]->setaddress_dbin(space, offset | m_address_prefix, state);
@@ -297,6 +303,34 @@ WRITE_LINE_MEMBER(peribox_device::senilb)
 	for (int i=2; i <= 8; i++)
 	{
 		if (m_slot[i]!=nullptr) m_slot[i]->senilb(state);
+	}
+}
+
+/*
+    MEMEN input. Used to start the external memory access cycle.
+*/
+WRITE_LINE_MEMBER(peribox_device::memen_in)
+{
+	m_memen = (state==ASSERT_LINE);
+}
+
+/*
+    MSAST input. Defined by TI-99/8; we ignore this part in the PEB.
+*/
+WRITE_LINE_MEMBER(peribox_device::msast_in)
+{
+	m_msast = (state==ASSERT_LINE);
+}
+
+/*
+    CLKOUT line
+*/
+
+WRITE_LINE_MEMBER(peribox_device::clock_in)
+{
+	for (int i=2; i <= 8; i++)
+	{
+		if (m_slot[i]!=nullptr) m_slot[i]->clock_in(state);
 	}
 }
 
@@ -347,6 +381,17 @@ void peribox_device::intb_join(int slot, int state)
 	m_console_intb((m_intb_flag != 0)? ASSERT_LINE : CLEAR_LINE);
 }
 
+void peribox_device::lcp_join(int slot, int state)
+{
+	if (TRACE_INT) logerror("%s: propagating LCP from slot %d to SGCPU: %d\n", tag(), slot, state);
+	if (state==ASSERT_LINE)
+		m_lcp_flag |= (1 << slot);
+	else
+		m_lcp_flag &= ~(1 << slot);
+
+	m_sgcpu_lcp((m_lcp_flag != 0)? ASSERT_LINE : CLEAR_LINE);
+}
+
 /*
     When any device pulls down READY, READY goes down.
 */
@@ -374,6 +419,7 @@ void peribox_device::device_start(void)
 	// Resolve the callback lines to the console
 	m_console_inta.resolve();
 	m_console_intb.resolve();
+	m_sgcpu_lcp.resolve();
 	m_datamux_ready.resolve();
 
 	if (TRACE_EMU)
@@ -384,12 +430,20 @@ void peribox_device::device_start(void)
 			logerror("%s: Slot %d = %s\n", tag(), i, (m_slot[i] != nullptr)? m_slot[i]->m_card->tag() : "EMPTY");
 		}
 	}
+
+	save_item(NAME(m_inta_flag));
+	save_item(NAME(m_intb_flag));
+	save_item(NAME(m_lcp_flag));
+	save_item(NAME(m_ready_flag));
+	save_item(NAME(m_msast));
+	save_item(NAME(m_memen));
 }
 
 void peribox_device::device_config_complete()
 {
 	m_inta_flag = 0;
 	m_intb_flag = 0;
+	m_lcp_flag = 0;
 	m_ready_flag = 0;
 }
 
@@ -402,26 +456,11 @@ SLOT_INTERFACE_START( peribox_slot )
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
 	SLOT_INTERFACE("horizon", TI99_HORIZON)
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START( peribox_slot6 )
-	SLOT_INTERFACE("ide", TI99_IDE)
-	SLOT_INTERFACE("usbsm", TI99_USBSM)
-	SLOT_INTERFACE("tirs232", TI99_RS232)
-	SLOT_INTERFACE("speech", TI99_SPEECH)
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START( peribox_slot7 )
 	SLOT_INTERFACE("ide", TI99_IDE)
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
 	SLOT_INTERFACE("bwg", TI99_BWG)
 	SLOT_INTERFACE("hfdc", TI99_HFDC)
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START( peribox_slot8 )
 	SLOT_INTERFACE("tifdc", TI99_FDC)
-	SLOT_INTERFACE("bwg", TI99_BWG)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_device )
@@ -429,9 +468,9 @@ MACHINE_CONFIG_FRAGMENT( peribox_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_device::device_mconfig_additions() const
@@ -443,7 +482,7 @@ machine_config_constructor peribox_device::device_mconfig_additions() const
     A variant of the box used for the Geneve.
 *****************************************************************************/
 
-peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_GEN, "Peripheral expansion box Geneve", tag, owner, clock, "peribox_gen", __FILE__)
 {
 	// The Geneve sits in slot 1; there is no prefix here - it can control
@@ -453,29 +492,17 @@ peribox_gen_device::peribox_gen_device(const machine_config &mconfig, const char
 }
 
 // The BwG controller will not run with the Geneve due to its wait state
-// logic; it assumes that before reading 5FF6 (data register), address 5FF7
-// is also read (by means of the datamux). Unlike the 9900, the 9995 can read
-// single bytes, so it will never trigger a read operation on 5FF7.
-
-SLOT_INTERFACE_START( peribox_slot7nobwg )
-	SLOT_INTERFACE("ide", TI99_IDE)
-	SLOT_INTERFACE("usbsm", TI99_USBSM)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
-SLOT_INTERFACE_END
-
-SLOT_INTERFACE_START( peribox_slot8nobwg )
-	SLOT_INTERFACE("tifdc", TI99_FDC)
-	SLOT_INTERFACE("hfdc", TI99_HFDC)
-SLOT_INTERFACE_END
+// logic (see bwg.c)
 
 SLOT_INTERFACE_START( peribox_slotg )
 	SLOT_INTERFACE("memex", TI99_MEMEX)
-	SLOT_INTERFACE("myarcmem", TI99_MYARCMEM)
-	SLOT_INTERFACE("samsmem", TI99_SAMSMEM)
-	SLOT_INTERFACE("pcode", TI99_P_CODE)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
 	SLOT_INTERFACE("horizon", TI99_HORIZON)
+	SLOT_INTERFACE("ide", TI99_IDE)
+	SLOT_INTERFACE("usbsm", TI99_USBSM)
+	SLOT_INTERFACE("tifdc", TI99_FDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
@@ -483,9 +510,9 @@ MACHINE_CONFIG_FRAGMENT( peribox_gen_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotg )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7nobwg )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotg )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_gen_device::device_mconfig_additions() const
@@ -497,7 +524,7 @@ machine_config_constructor peribox_gen_device::device_mconfig_additions() const
     A variant of the box used for the TI-99/8
 *****************************************************************************/
 
-peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_998_device::peribox_998_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_998, "Peripheral expansion box 99/8", tag, owner, clock, "peribox_998", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -509,12 +536,11 @@ peribox_998_device::peribox_998_device(const machine_config &mconfig, const char
 // the 99/8; it was intended to use the Hexbus interface. None of the memory
 // expansions are really supposed to work here.
 SLOT_INTERFACE_START( peribox_slot998 )
-	SLOT_INTERFACE("myarcmem", TI99_MYARCMEM)
-	SLOT_INTERFACE("samsmem", TI99_SAMSMEM)
-	SLOT_INTERFACE("horizon", TI99_HORIZON)
 	SLOT_INTERFACE("ide", TI99_IDE)
 	SLOT_INTERFACE("usbsm", TI99_USBSM)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
+	SLOT_INTERFACE("tifdc", TI99_FDC)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
 SLOT_INTERFACE_END
 
 MACHINE_CONFIG_FRAGMENT( peribox_998_device )
@@ -524,7 +550,7 @@ MACHINE_CONFIG_FRAGMENT( peribox_998_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot998 )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot998 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8nobwg )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot998 )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_998_device::device_mconfig_additions() const
@@ -536,7 +562,7 @@ machine_config_constructor peribox_998_device::device_mconfig_additions() const
     A variant of the box used for the SGCPU (aka TI-99/4P).
 *****************************************************************************/
 
-peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_sg_device::peribox_sg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_SG, "Peripheral expansion box SGCPU", tag, owner, clock, "peribox_sg", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -546,7 +572,14 @@ SLOT_INTERFACE_START( peribox_slotp )
 	SLOT_INTERFACE("pcode", TI99_P_CODE)
 	SLOT_INTERFACE("tirs232", TI99_RS232)
 	SLOT_INTERFACE("speech", TI99_SPEECH)
+	SLOT_INTERFACE("myarcmem", TI99_MYARCMEM)
+	SLOT_INTERFACE("samsmem", TI99_SAMSMEM)
 	SLOT_INTERFACE("horizon", TI99_HORIZON)
+	SLOT_INTERFACE("ide", TI99_IDE)
+	SLOT_INTERFACE("usbsm", TI99_USBSM)
+	SLOT_INTERFACE("bwg", TI99_BWG)
+	SLOT_INTERFACE("hfdc", TI99_HFDC)
+	SLOT_INTERFACE("tifdc", TI99_FDC)
 SLOT_INTERFACE_END
 
 SLOT_INTERFACE_START( peribox_ev_slot )
@@ -562,9 +595,9 @@ MACHINE_CONFIG_FRAGMENT( peribox_sg_device )
 	MCFG_PERIBOX_SLOT_ADD_DEF( PEBSLOT3, peribox_hs_slot, "hsgpl" )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slotp )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slotp )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slotp )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slotp )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slotp )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_sg_device::device_mconfig_additions() const
@@ -577,7 +610,7 @@ machine_config_constructor peribox_sg_device::device_mconfig_additions() const
     obviously required.
 *****************************************************************************/
 
-peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_ev_device::peribox_ev_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : peribox_device(mconfig, PERIBOX_EV, "Peripheral expansion box EVPC", tag, owner, clock, "peribox_ev", __FILE__)
 {
 	m_address_prefix = 0x70000;
@@ -588,9 +621,9 @@ MACHINE_CONFIG_FRAGMENT( peribox_ev_device )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT3, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT4, peribox_slot )
 	MCFG_PERIBOX_SLOT_ADD( PEBSLOT5, peribox_slot )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot6 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot7 )
-	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot8 )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT6, peribox_slot )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT7, peribox_slot )
+	MCFG_PERIBOX_SLOT_ADD( PEBSLOT8, peribox_slot )
 MACHINE_CONFIG_END
 
 machine_config_constructor peribox_ev_device::device_mconfig_additions() const
@@ -613,7 +646,7 @@ int peribox_slot_device::get_index_from_tagname()
 	return atoi(mytag+i+1);
 }
 
-peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+peribox_slot_device::peribox_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : bus8z_device(mconfig, PERIBOX_SLOT, "TI P-Box slot", tag, owner, clock, "peribox_slot", __FILE__), device_slot_interface(mconfig, *this), m_card(nullptr), m_slotnumber(0)
 {
 }
@@ -653,6 +686,11 @@ WRITE_LINE_MEMBER( peribox_slot_device::senilb )
 	m_card->set_senilb(state);
 }
 
+WRITE_LINE_MEMBER( peribox_slot_device::clock_in )
+{
+	m_card->clock_in(state);
+}
+
 /*
     Genmod support
 */
@@ -668,7 +706,7 @@ void peribox_slot_device::device_start(void)
 void peribox_slot_device::device_config_complete()
 {
 	m_slotnumber = get_index_from_tagname();
-	device_t *carddev = first_subdevice();
+	device_t *carddev = subdevices().first();
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	if (carddev != nullptr)
 	{
@@ -704,6 +742,12 @@ WRITE_LINE_MEMBER( peribox_slot_device::set_intb )
 {
 	peribox_device *peb = static_cast<peribox_device*>(owner());
 	peb->intb_join(m_slotnumber, state);
+}
+
+WRITE_LINE_MEMBER( peribox_slot_device::lcp_line )
+{
+	peribox_device *peb = static_cast<peribox_device*>(owner());
+	peb->lcp_join(m_slotnumber, state);
 }
 
 WRITE_LINE_MEMBER( peribox_slot_device::set_ready )

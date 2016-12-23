@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <!-- pmi80.lay -->
 
 <!-- 2011-06-20: Initial version.  [Robbbert] -->
@@ -55,7 +56,7 @@
 		<bezel name="digitx" element="digit">
 			<bounds left="406" top="10" right="440" bottom="59" />
 		</bezel><!-- This digit shows something but it does not exist on real unit.
-						Change to 'digit9' to see it in action. -->
+		                Change to 'digit9' to see it in action. -->
 
 	</view>
 

@@ -68,7 +68,7 @@ static const char * const bankname[] = { "bank2", "bank3", "bank4", "bank5" };
 static const struct
 {
 	void (taitol_state::*notifier)(int);
-	UINT32 offset;
+	uint32_t offset;
 } rambank_modify_notifiers[12] =
 {
 	{ &taitol_state::taitol_chardef14_m, 0x0000 }, // 14
@@ -90,9 +90,9 @@ static const struct
 
 void taitol_state::palette_notifier(int addr)
 {
-	UINT8 *p = m_palette_ram + (addr & ~1);
-	UINT8 byte0 = *p++;
-	UINT8 byte1 = *p;
+	uint8_t *p = m_palette_ram + (addr & ~1);
+	uint8_t byte0 = *p++;
+	uint8_t byte1 = *p;
 
 	//  addr &= 0x1ff;
 
@@ -107,7 +107,7 @@ void taitol_state::palette_notifier(int addr)
 	}
 }
 
-static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
+static const uint8_t puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
 
 void taitol_state::state_register(  )
 {
@@ -421,7 +421,7 @@ READ8_MEMBER(taitol_state::rambankswitch_r)
 	return m_cur_rambank[offset];
 }
 
-void taitol_state::bank_w(address_space &space, offs_t offset, UINT8 data, int banknum )
+void taitol_state::bank_w(address_space &space, offs_t offset, uint8_t data, int banknum )
 {
 	if (m_current_base[banknum][offset] != data)
 	{
@@ -702,7 +702,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(taitol_state::sound_bankswitch_w)
 {
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 	int banknum = data & 0x03;
 
 	membank ("bank7")->set_base (&RAM [(banknum * 0x4000)]);
@@ -1213,6 +1213,12 @@ static INPUT_PORTS_START( plotting )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( plottingu )
+	PORT_INCLUDE(plotting)
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_LOC(SW1)
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( palamed )
 	PORT_START("DSWA")
 	TAITO_MACHINE_NO_COCKTAIL_LOC(SW1)
@@ -1704,18 +1710,12 @@ static GFXDECODE_START( taito_l )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(taitol_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 WRITE8_MEMBER(taitol_state::portA_w)
 {
 	if (m_cur_bank != (data & 0x03))
 	{
 		int bankaddress;
-		UINT8 *RAM = memregion("audiocpu")->base();
+		uint8_t *RAM = memregion("audiocpu")->base();
 
 		m_cur_bank = data & 0x03;
 		bankaddress = m_cur_bank * 0x4000;
@@ -1765,7 +1765,7 @@ static MACHINE_CONFIG_START( fhawk, taitol_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)       /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -1794,7 +1794,7 @@ static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* sound hardware */
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitol_state,irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitol_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(taitol_state, champwr_msm5205_volume_w))
 
@@ -1822,7 +1822,7 @@ static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* sound hardware */
 	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)      /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitol_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -2561,8 +2561,8 @@ ROM_END
 // bits 7..0 => bits 0..7
 DRIVER_INIT_MEMBER(taitol_state,plottinga)
 {
-	UINT8 tab[256];
-	UINT8 *p;
+	uint8_t tab[256];
+	uint8_t *p;
 	int i;
 
 	for (i = 0; i < 256; i++)
@@ -2601,7 +2601,7 @@ GAME( 1988, kurikinta, kurikint, kurikint,  kurikinta, driver_device, 0,        
 GAME( 1989, plotting,  0,        plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 1)", 0 )
 GAME( 1989, plottinga, plotting, plotting,  plotting,  taitol_state,  plottinga, ROT0,   "Taito Corporation Japan", "Plotting (World set 2, protected)", 0 )
 GAME( 1989, plottingb, plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation Japan", "Plotting (World set 3, earliest version)", 0 )
-GAME( 1989, plottingu, plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
+GAME( 1989, plottingu, plotting, plotting,  plottingu, driver_device, 0,         ROT0,   "Taito America Corporation", "Plotting (US)", 0 )
 GAME( 1989, flipull,   plotting, plotting,  plotting,  driver_device, 0,         ROT0,   "Taito Corporation", "Flipull (Japan)", 0 )
 
 GAME( 1989, puzznic,   0,        puzznic,   puzznic,   driver_device, 0,         ROT0,   "Taito Corporation Japan", "Puzznic (World)", 0 )

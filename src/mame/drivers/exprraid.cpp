@@ -263,12 +263,12 @@ WRITE8_MEMBER(exprraid_state::exprraid_prot_data_w)
 READ8_MEMBER(exprraid_state::sound_cpu_command_r)
 {
 	m_slave->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 WRITE8_MEMBER(exprraid_state::sound_cpu_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_slave->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
@@ -524,6 +524,8 @@ static MACHINE_CONFIG_START( exprraid, exprraid_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz / 8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -816,7 +818,7 @@ void exprraid_state::exprraid_gfx_expand()
 {
 	/* Expand the background rom so we can use regular decode routines */
 
-	UINT8   *gfx = memregion("gfx3")->base();
+	uint8_t   *gfx = memregion("gfx3")->base();
 	int offs = 0x10000 - 0x1000;
 	int i;
 
@@ -835,7 +837,7 @@ void exprraid_state::exprraid_gfx_expand()
 
 DRIVER_INIT_MEMBER(exprraid_state,wexpressb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* HACK: this set uses M6502 irq vectors but DECO CPU-16 opcodes??? */
 	rom[0xfff7] = rom[0xfffa];

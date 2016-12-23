@@ -50,7 +50,7 @@ class gayle_device : public device_t
 {
 public:
 	// construction/destruction
-	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gayle_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_int2_handler(device_t &device, _Object object)
@@ -77,7 +77,7 @@ public:
 	DECLARE_WRITE16_MEMBER( gayle_id_w );
 
 	// inline configuration
-	static void set_id(device_t &device, UINT8 id);
+	static void set_id(device_t &device, uint8_t id);
 
 protected:
 	virtual void device_start() override;
@@ -99,9 +99,9 @@ private:
 	devcb_read16 m_cs1_read;
 	devcb_write16 m_cs1_write;
 
-	UINT8 m_gayle_id;
+	uint8_t m_gayle_id;
 	int m_gayle_id_count;
-	UINT8 m_gayle_reg[4];
+	uint8_t m_gayle_reg[4];
 };
 
 // device type definition

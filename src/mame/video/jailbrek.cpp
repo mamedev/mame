@@ -5,7 +5,7 @@
 
 PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	/* create a lookup table for the palette */
@@ -23,24 +23,24 @@ PALETTE_INIT_MEMBER(jailbrek_state, jailbrek)
 
 	for (i = 0; i < 0x100; i++)
 	{
-		UINT8 ctabentry = (color_prom[i] & 0x0f) | 0x10;
+		uint8_t ctabentry = (color_prom[i] & 0x0f) | 0x10;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
 	for (i = 0x100; i < 0x200; i++)
 	{
-		UINT8 ctabentry = color_prom[i] & 0x0f;
+		uint8_t ctabentry = color_prom[i] & 0x0f;
 		palette.set_pen_indirect(i, ctabentry);
 	}
 }
 
-WRITE8_MEMBER(jailbrek_state::jailbrek_videoram_w)
+WRITE8_MEMBER(jailbrek_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(jailbrek_state::jailbrek_colorram_w)
+WRITE8_MEMBER(jailbrek_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
@@ -57,13 +57,12 @@ TILE_GET_INFO_MEMBER(jailbrek_state::get_bg_tile_info)
 
 void jailbrek_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(jailbrek_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_bg_tilemap->set_scrolldx(0, 396 - 256);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(jailbrek_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 }
 
 void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int i;
 
 	for (i = 0; i < m_spriteram.bytes(); i += 4)
@@ -90,7 +89,7 @@ void jailbrek_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 jailbrek_state::screen_update_jailbrek(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jailbrek_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

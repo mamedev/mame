@@ -11,23 +11,35 @@ namespace NCompress {
 
 class CCopyCoder:
   public ICompressCoder,
+  public ICompressSetInStream,
+  public ISequentialInStream,
   public ICompressGetInStreamProcessedSize,
   public CMyUnknownImp
 {
-  Byte *_buffer;
+  Byte *_buf;
+  CMyComPtr<ISequentialInStream> _inStream;
 public:
   UInt64 TotalSize;
-  CCopyCoder(): TotalSize(0), _buffer(0) {};
+  
+  CCopyCoder(): _buf(0), TotalSize(0) {};
   ~CCopyCoder();
 
-  MY_UNKNOWN_IMP1(ICompressGetInStreamProcessedSize)
+  MY_UNKNOWN_IMP4(
+      ICompressCoder,
+      ICompressSetInStream,
+      ISequentialInStream,
+      ICompressGetInStreamProcessedSize)
 
   STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
       const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
+  STDMETHOD(SetInStream)(ISequentialInStream *inStream);
+  STDMETHOD(ReleaseInStream)();
+  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
   STDMETHOD(GetInStreamProcessedSize)(UInt64 *value);
 };
 
 HRESULT CopyStream(ISequentialInStream *inStream, ISequentialOutStream *outStream, ICompressProgressInfo *progress);
+HRESULT CopyStream_ExactSize(ISequentialInStream *inStream, ISequentialOutStream *outStream, UInt64 size, ICompressProgressInfo *progress);
 
 }
 

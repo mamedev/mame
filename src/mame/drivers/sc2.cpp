@@ -32,11 +32,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_WRITE8_MEMBER(pio_port_b_w);
 	DECLARE_READ8_MEMBER(sc2_beep);
-	UINT8 m_kp_matrix;
-	UINT8 m_led_7seg_data[4];
-	UINT8 m_led_selected;
-	UINT8 m_digit_data;
-	UINT8 m_beep_state;
+	uint8_t m_kp_matrix;
+	uint8_t m_led_7seg_data[4];
+	uint8_t m_led_selected;
+	uint8_t m_digit_data;
+	uint8_t m_beep_state;
 	void sc2_update_display();
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -72,7 +72,7 @@ ADDRESS_MAP_END
 /* Input ports */
 static INPUT_PORTS_START( sc2 )
 	PORT_START("LINE1")
-		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED) PORT_UNUSED
+		PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_UNUSED)
 		PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("T") PORT_CODE(KEYCODE_T)
 		PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("L") PORT_CODE(KEYCODE_L)
 		PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
@@ -116,7 +116,7 @@ void sc2_state::machine_reset()
 
 void sc2_state::sc2_update_display()
 {
-	UINT8 digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
+	uint8_t digit_data = BITSWAP8( m_digit_data,7,0,1,2,3,4,5,6 ) & 0x7f;
 
 	if (!BIT(m_led_selected, 0))
 	{
@@ -154,7 +154,7 @@ READ8_MEMBER( sc2_state::pio_port_a_r )
 
 READ8_MEMBER( sc2_state::pio_port_b_r )
 {
-	UINT8 data = m_led_selected & 0x0f;
+	uint8_t data = m_led_selected & 0x0f;
 
 	if (BIT(m_kp_matrix, 0))
 	{

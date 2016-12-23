@@ -16,10 +16,10 @@
 #include "machine/mc68681.h"
 
 
-typedef device_delegate<UINT8 (address_space &space, bool dedicated, UINT8 line_mask)> m68307_porta_read_delegate;
-typedef device_delegate<void (address_space &space, bool dedicated, UINT8 data, UINT8 line_mask)> m68307_porta_write_delegate;
-typedef device_delegate<UINT16 (address_space &space, bool dedicated, UINT16 line_mask)> m68307_portb_read_delegate;
-typedef device_delegate<void (address_space &space, bool dedicated, UINT16 data, UINT16 line_mask)> m68307_portb_write_delegate;
+typedef device_delegate<uint8_t (address_space &space, bool dedicated, uint8_t line_mask)> m68307_porta_read_delegate;
+typedef device_delegate<void (address_space &space, bool dedicated, uint8_t data, uint8_t line_mask)> m68307_porta_write_delegate;
+typedef device_delegate<uint16_t (address_space &space, bool dedicated, uint16_t line_mask)> m68307_portb_read_delegate;
+typedef device_delegate<void (address_space &space, bool dedicated, uint16_t data, uint16_t line_mask)> m68307_portb_write_delegate;
 
 
 /* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
@@ -39,7 +39,7 @@ typedef device_delegate<void (address_space &space, bool dedicated, UINT16 data,
 
 class m68307cpu_device : public m68000_device {
 public:
-	m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	m68307cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	/* trampolines so we can specify the 68681 serial configuration when adding the CPU  */
 	template<class _Object> static devcb_base &set_irq_cb(device_t &device, _Object object) { return downcast<m68307cpu_device &>(device).write_irq.set_callback(object); }
@@ -57,15 +57,15 @@ public:
 	devcb_read8 read_inport;
 	devcb_write8 write_outport;
 
-	UINT16 simple_read_immediate_16_m68307(offs_t address);
+	uint16_t simple_read_immediate_16_m68307(offs_t address);
 
 
-	UINT8 read_byte_m68307(offs_t address);
-	UINT16 read_word_m68307(offs_t address);
-	UINT32 read_dword_m68307(offs_t address);
-	void write_byte_m68307(offs_t address, UINT8 data);
-	void write_word_m68307(offs_t address, UINT16 data);
-	void write_dword_m68307(offs_t address, UINT32 data);
+	uint8_t read_byte_m68307(offs_t address);
+	uint16_t read_word_m68307(offs_t address);
+	uint32_t read_dword_m68307(offs_t address);
+	void write_byte_m68307(offs_t address, uint8_t data);
+	void write_word_m68307(offs_t address, uint16_t data);
+	void write_dword_m68307(offs_t address, uint32_t data);
 
 
 	/* 68307 peripheral modules */
@@ -74,9 +74,9 @@ public:
 //  m68307_serial* m68307SERIAL;
 	m68307_timer*  m68307TIMER;
 
-	UINT16 m68307_base;
-	UINT16 m68307_scrhigh;
-	UINT16 m68307_scrlow;
+	uint16_t m68307_base;
+	uint16_t m68307_scrhigh;
+	uint16_t m68307_scrlow;
 
 	int m68307_currentcs;
 
@@ -96,7 +96,7 @@ public:
 	/* callbacks for internal ports */
 	void set_port_callbacks(m68307_porta_read_delegate porta_r, m68307_porta_write_delegate porta_w, m68307_portb_read_delegate portb_r, m68307_portb_write_delegate portb_w);
 	void set_interrupt(int level, int vector);
-	UINT16 get_cs(offs_t address);
+	uint16_t get_cs(offs_t address);
 	void timer0_interrupt();
 	void timer1_interrupt();
 	void serial_interrupt(int vector);
@@ -110,11 +110,11 @@ public:
 
 	void init16_m68307(address_space &space);
 
-	virtual UINT32 disasm_min_opcode_bytes() const override { return 2; };
-	virtual UINT32 disasm_max_opcode_bytes() const override { return 10; };
+	virtual uint32_t disasm_min_opcode_bytes() const override { return 2; };
+	virtual uint32_t disasm_max_opcode_bytes() const override { return 10; };
 
-	virtual UINT32 execute_min_cycles() const override { return 4; };
-	virtual UINT32 execute_max_cycles() const override { return 158; };
+	virtual uint32_t execute_min_cycles() const override { return 4; };
+	virtual uint32_t execute_max_cycles() const override { return 158; };
 
 	required_device<mc68681_device> m_duart;
 protected:

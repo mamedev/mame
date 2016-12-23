@@ -86,7 +86,7 @@ WRITE_LINE_MEMBER( s100_wunderbus_device::rtc_tp_w )
 //-------------------------------------------------
 
 static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
-	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259A_TAG, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, pic_int_w), VCC, NOOP)
 	MCFG_DEVICE_ADD(INS8250_1_TAG, INS8250, XTAL_18_432MHz/10)
 	MCFG_INS8250_OUT_TX_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_INS8250_OUT_DTR_CB(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
@@ -125,7 +125,7 @@ static MACHINE_CONFIG_FRAGMENT( s100_wunderbus )
 	MCFG_RS232_RI_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, ri_w))
 	MCFG_RS232_CTS_HANDLER(DEVWRITELINE(INS8250_3_TAG, ins8250_uart_device, cts_w))
 
-	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, NULL, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
+	MCFG_UPD1990A_ADD(UPD1990C_TAG, XTAL_32_768kHz, NOOP, DEVWRITELINE(DEVICE_SELF, s100_wunderbus_device, rtc_tp_w))
 MACHINE_CONFIG_END
 
 
@@ -236,7 +236,7 @@ ioport_constructor s100_wunderbus_device::device_input_ports() const
 //  s100_wunderbus_device - constructor
 //-------------------------------------------------
 
-s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_wunderbus_device::s100_wunderbus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_WUNDERBUS, "Wunderbus I/O", tag, owner, clock, "s100_wunderbus", __FILE__),
 	device_s100_card_interface(mconfig, *this),
 	m_pic(*this, I8259A_TAG),
@@ -302,12 +302,12 @@ void s100_wunderbus_device::s100_vi2_w(int state)
 //  s100_sinp_r - I/O read
 //-------------------------------------------------
 
-UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
+uint8_t s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 {
-	UINT8 address = (m_7c->read() & 0x3e) << 2;
+	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return 0;
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ((offset & 0x07) < 7)
 	{
@@ -411,9 +411,9 @@ UINT8 s100_wunderbus_device::s100_sinp_r(address_space &space, offs_t offset)
 //  s100_sout_w - I/O write
 //-------------------------------------------------
 
-void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, UINT8 data)
+void s100_wunderbus_device::s100_sout_w(address_space &space, offs_t offset, uint8_t data)
 {
-	UINT8 address = (m_7c->read() & 0x3e) << 2;
+	uint8_t address = (m_7c->read() & 0x3e) << 2;
 	if ((offset & 0xf8) != address) return;
 
 	if ((offset & 0x07) == 7)

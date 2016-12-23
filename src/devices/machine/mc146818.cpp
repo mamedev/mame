@@ -30,9 +30,10 @@ const device_type MC146818 = &device_creator<mc146818_device>;
 //  mc146818_device - constructor
 //-------------------------------------------------
 
-mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MC146818, "MC146818 RTC", tag, owner, clock, "mc146818", __FILE__),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_index(0),
 		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
 		m_write_irq(*this),
@@ -45,9 +46,10 @@ mc146818_device::mc146818_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mc146818_device::mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nvram_interface(mconfig, *this),
+		m_region(*this, DEVICE_SELF),
 		m_index(0),
 		m_last_refresh(attotime::zero), m_clock_timer(nullptr), m_periodic_timer(nullptr),
 		m_write_irq(*this),
@@ -193,14 +195,15 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 void mc146818_device::nvram_default()
 {
 	// populate from a memory region if present
-	if (m_region != nullptr)
+	memory_region *region = memregion(DEVICE_SELF);
+	if (region != nullptr)
 	{
-		UINT32 bytes = m_region->bytes();
+		uint32_t bytes = region->bytes();
 
 		if (bytes > data_size())
 			bytes = data_size();
 
-		memcpy(&m_data[0], m_region->base(), bytes);
+		memcpy(&m_data[0], region->base(), bytes);
 	}
 	else
 	{
@@ -513,7 +516,7 @@ void mc146818_device::update_irq()
 
 READ8_MEMBER( mc146818_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 	switch (offset)
 	{
 	case 0:

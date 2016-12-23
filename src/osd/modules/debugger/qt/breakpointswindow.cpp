@@ -15,11 +15,11 @@
 
 
 BreakpointsWindow::BreakpointsWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: All Breakpoints");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -75,7 +75,7 @@ void BreakpointsWindow::typeChanged(QAction* changedTo)
 {
 	// Clean
 	delete m_breakpointsView;
-	m_breakpointsView = NULL;
+	m_breakpointsView = nullptr;
 
 	// Create
 	if (changedTo->text() == "Breakpoints")
@@ -122,15 +122,15 @@ void BreakpointsWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void BreakpointsWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void BreakpointsWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "bwtype", m_bwType);
+	node.set_attribute_int("bwtype", m_bwType);
 }
 
 
-void BreakpointsWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void BreakpointsWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_bwType = xml_get_attribute_int(node, "bwtype", m_bwType);
+	m_bwType = node.get_attribute_int("bwtype", m_bwType);
 }

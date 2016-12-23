@@ -26,12 +26,9 @@ void alto2_cpu_device::activate_mrt()
 	}
 }
 
-	//! memory refresh task slots initialization
+//! memory refresh task slots initialization
 void alto2_cpu_device::init_mrt(int task)
 {
-	set_f1(task, f1_block,      &alto2_cpu_device::f1_early_mrt_block, nullptr);
-	/* auto block */
-	m_active_callback[task] = &alto2_cpu_device::activate_mrt;
 }
 
 void alto2_cpu_device::exit_mrt()

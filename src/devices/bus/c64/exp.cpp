@@ -56,7 +56,7 @@ device_c64_expansion_card_interface::~device_c64_expansion_card_interface()
 //  c64_expansion_slot_device - constructor
 //-------------------------------------------------
 
-c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_expansion_slot_device::c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, C64_EXPANSION_SLOT, "C64 expansion port", tag, owner, clock, "c64_expansion_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -113,7 +113,7 @@ void c64_expansion_slot_device::device_reset()
 //  call_load -
 //-------------------------------------------------
 
-bool c64_expansion_slot_device::call_load()
+image_init_result c64_expansion_slot_device::call_load()
 {
 	if (m_card)
 	{
@@ -123,7 +123,7 @@ bool c64_expansion_slot_device::call_load()
 		{
 			size = length();
 
-			if (!core_stricmp(filetype(), "80"))
+			if (is_filetype("80"))
 			{
 				fread(m_card->m_roml, size);
 				m_card->m_exrom = (0);
@@ -133,30 +133,30 @@ bool c64_expansion_slot_device::call_load()
 					m_card->m_game = 0;
 				}
 			}
-			else if (!core_stricmp(filetype(), "a0"))
+			else if (is_filetype("a0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_exrom = 0;
 				m_card->m_game = 0;
 			}
-			else if (!core_stricmp(filetype(), "e0"))
+			else if (is_filetype("e0"))
 			{
 				fread(m_card->m_romh, 0x2000);
 
 				m_card->m_game = 0;
 			}
-			else if (!core_stricmp(filetype(), "crt"))
+			else if (is_filetype("crt"))
 			{
 				size_t roml_size = 0;
 				size_t romh_size = 0;
 				int exrom = 1;
 				int game = 1;
 
-				if (cbm_crt_read_header(m_file, &roml_size, &romh_size, &exrom, &game))
+				if (cbm_crt_read_header(*m_file, &roml_size, &romh_size, &exrom, &game))
 				{
-					UINT8 *roml = nullptr;
-					UINT8 *romh = nullptr;
+					uint8_t *roml = nullptr;
+					uint8_t *romh = nullptr;
 
 					m_card->m_roml.allocate(roml_size);
 					m_card->m_romh.allocate(romh_size);
@@ -164,7 +164,7 @@ bool c64_expansion_slot_device::call_load()
 					if (roml_size) roml = m_card->m_roml;
 					if (romh_size) romh = m_card->m_roml;
 
-					cbm_crt_read_data(m_file, roml, romh);
+					cbm_crt_read_data(*m_file, roml, romh);
 				}
 
 				m_card->m_exrom = exrom;
@@ -197,19 +197,7 @@ bool c64_expansion_slot_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-//-------------------------------------------------
-//  call_softlist_load -
-//-------------------------------------------------
-
-bool c64_expansion_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-
-	return true;
+	return image_init_result::PASS;
 }
 
 
@@ -221,8 +209,8 @@ std::string c64_expansion_slot_device::get_default_card_software()
 {
 	if (open_image_file(mconfig().options()))
 	{
-		if (!core_stricmp(filetype(), "crt"))
-			return cbm_crt_get_card(m_file);
+		if (is_filetype("crt"))
+			return cbm_crt_get_card(*m_file);
 
 		clear();
 	}
@@ -235,7 +223,7 @@ std::string c64_expansion_slot_device::get_default_card_software()
 //  cd_r - cartridge data read
 //-------------------------------------------------
 
-UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+uint8_t c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{
@@ -250,7 +238,7 @@ UINT8 c64_expansion_slot_device::cd_r(address_space &space, offs_t offset, UINT8
 //  cd_w - cartridge data write
 //-------------------------------------------------
 
-void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2)
+void c64_expansion_slot_device::cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2)
 {
 	if (m_card != nullptr)
 	{

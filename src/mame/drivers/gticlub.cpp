@@ -264,7 +264,10 @@ public:
 		m_analog1(*this, "AN1"),
 		m_analog2(*this, "AN2"),
 		m_analog3(*this, "AN3"),
-		m_ports(*this, ports) { }
+		m_ports(*this, "IN%u", 0)
+	{
+	}
+
 
 	// TODO: Needs verification on real hardware
 	static const int m_sound_timer_usec = 2400;
@@ -272,7 +275,7 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<adsp21062_device> m_dsp;
-	optional_device<cpu_device> m_dsp2;
+	optional_device<adsp21062_device> m_dsp2;
 	required_device<k056800_device> m_k056800;
 	required_device<adc1038_device> m_adc1038;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -284,14 +287,12 @@ public:
 	optional_device<k001604_device> m_k001604_1;
 	optional_device<k001604_device> m_k001604_2;
 
-	required_shared_ptr<UINT32> m_work_ram;
-	required_shared_ptr<UINT32> m_generic_paletteram_32;
+	required_shared_ptr<uint32_t> m_work_ram;
+	required_shared_ptr<uint32_t> m_generic_paletteram_32;
 
 	optional_ioport m_analog0, m_analog1, m_analog2, m_analog3;
 
 	required_ioport_array<4> m_ports;
-
-	DECLARE_IOPORT_ARRAY(ports);
 
 	DECLARE_WRITE32_MEMBER(paletteram32_w);
 	DECLARE_READ32_MEMBER(gticlub_k001604_tile_r);
@@ -324,16 +325,16 @@ public:
 
 	ADC1038_INPUT_CB(adc1038_input_callback);
 
-	UINT32 screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 private:
-	void gticlub_led_setreg(int offset, UINT8 data);
+	void gticlub_led_setreg(int offset, uint8_t data);
 
-	UINT8 m_gticlub_led_reg[2];
+	uint8_t m_gticlub_led_reg[2];
 	emu_timer *m_sound_irq_timer;
-	std::unique_ptr<UINT32[]> m_sharc_dataram_0;
-	std::unique_ptr<UINT32[]> m_sharc_dataram_1;
+	std::unique_ptr<uint32_t[]> m_sharc_dataram_0;
+	std::unique_ptr<uint32_t[]> m_sharc_dataram_1;
 };
 
 
@@ -394,8 +395,6 @@ WRITE32_MEMBER(gticlub_state::gticlub_k001604_reg_w)
 
 /******************************************************************/
 
-IOPORT_ARRAY_MEMBER(gticlub_state::ports) { "IN0", "IN1", "IN2", "IN3" };
-
 READ8_MEMBER(gticlub_state::sysreg_r)
 {
 	switch (offset)
@@ -416,8 +415,8 @@ READ8_MEMBER(gticlub_state::sysreg_r)
 			// a = ADC readout
 			// e = EEPROM data out
 
-			UINT32 eeprom_bit = (m_eeprom->do_read() << 1);
-			UINT32 adc_bit = (m_adc1038->do_read() << 2);
+			uint32_t eeprom_bit = (m_eeprom->do_read() << 1);
+			uint32_t adc_bit = (m_adc1038->do_read() << 2);
 			return (eeprom_bit | adc_bit);
 		}
 
@@ -496,7 +495,7 @@ MACHINE_START_MEMBER(gticlub_state,gticlub)
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, FALSE, m_work_ram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x000fffff, false, m_work_ram);
 
 	m_sound_irq_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(gticlub_state::sound_irq), this));
 }
@@ -822,7 +821,7 @@ MACHINE_RESET_MEMBER(gticlub_state,gticlub)
 	m_dsp->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-void gticlub_state::gticlub_led_setreg(int offset, UINT8 data)
+void gticlub_state::gticlub_led_setreg(int offset, uint8_t data)
 {
 	m_gticlub_led_reg[offset] = data;
 }
@@ -838,7 +837,7 @@ VIDEO_START_MEMBER(gticlub_state,gticlub)
 	*/
 }
 
-UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	m_k001604_1->draw_back_layer(bitmap, cliprect);
 
@@ -880,13 +879,13 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 		int index = (debug_tex_page - 1) * 0x40000;
 		int pal = debug_tex_palette & 7;
 		int tp = (debug_tex_palette >> 3) & 1;
-		UINT8 *rom = machine.root_device().memregion("gfx1")->base();
+		uint8_t *rom = machine.root_device().memregion("gfx1")->base();
 
 		for (y=0; y < 384; y++)
 		{
 			for (x=0; x < 512; x++)
 			{
-				UINT8 pixel = rom[index + (y*512) + x];
+				uint8_t pixel = rom[index + (y*512) + x];
 				bitmap.pix32(y, x) = K001006_palette[tp][(pal * 256) + pixel];
 			}
 		}
@@ -904,7 +903,7 @@ UINT32 gticlub_state::screen_update_gticlub(screen_device &screen, bitmap_rgb32 
 	return 0;
 }
 
-UINT32 gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t gticlub_state::screen_update_hangplt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0), cliprect);
 
@@ -973,15 +972,11 @@ static MACHINE_CONFIG_START( gticlub, gticlub_state )
 
 	MCFG_VIDEO_START_OVERRIDE(gticlub_state,gticlub)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_GFX_INDEX1(1)
-	MCFG_K001604_GFX_INDEX2(2)
 	MCFG_K001604_LAYER_SIZE(1)
 	MCFG_K001604_ROZ_SIZE(1)
 	MCFG_K001604_TXT_OFFSET(0)
 	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k001005", K001005, 0)
@@ -1031,13 +1026,10 @@ static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 
 	MCFG_DEVICE_REMOVE("k001604_1")
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_GFX_INDEX1(1)
-	MCFG_K001604_GFX_INDEX2(2)
 	MCFG_K001604_LAYER_SIZE(0)
 	MCFG_K001604_ROZ_SIZE(0)
 	MCFG_K001604_TXT_OFFSET(16384)
 	MCFG_K001604_ROZ_OFFSET(0)
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 MACHINE_CONFIG_END
 
@@ -1113,26 +1105,18 @@ static MACHINE_CONFIG_START( hangplt, gticlub_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 0, 383)
 	MCFG_SCREEN_UPDATE_DRIVER(gticlub_state, screen_update_hangplt)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k001604_1", K001604, 0)
-	MCFG_K001604_GFX_INDEX1(1)
-	MCFG_K001604_GFX_INDEX2(2)
 	MCFG_K001604_LAYER_SIZE(0)
 	MCFG_K001604_ROZ_SIZE(1)
 	MCFG_K001604_TXT_OFFSET(0)
 	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k001604_2", K001604, 0)
-	MCFG_K001604_GFX_INDEX1(3)
-	MCFG_K001604_GFX_INDEX2(4)
 	MCFG_K001604_LAYER_SIZE(0)
 	MCFG_K001604_ROZ_SIZE(1)
 	MCFG_K001604_TXT_OFFSET(0)
 	MCFG_K001604_ROZ_OFFSET(16384)
-	MCFG_K001604_GFXDECODE("gfxdecode")
 	MCFG_K001604_PALETTE("palette")
 
 	MCFG_K056800_ADD("k056800", XTAL_33_8688MHz/2)
@@ -1416,15 +1400,17 @@ ROM_END
 
 DRIVER_INIT_MEMBER(gticlub_state,gticlub)
 {
-	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
+
+	m_dsp->enable_recompiler();
 }
 
 void gticlub_state::init_hangplt_common()
 {
 	m_konppc->set_cgboard_texture_bank(0, "bank5", memregion("user5")->base());
 	m_konppc->set_cgboard_texture_bank(1, "bank6", memregion("user5")->base());
-	m_sharc_dataram_0 = std::make_unique<UINT32[]>(0x100000/4);
-	m_sharc_dataram_1 = std::make_unique<UINT32[]>(0x100000/4);
+	m_sharc_dataram_0 = std::make_unique<uint32_t[]>(0x100000/4);
+	m_sharc_dataram_1 = std::make_unique<uint32_t[]>(0x100000/4);
 }
 
 DRIVER_INIT_MEMBER(gticlub_state,hangplt)
@@ -1432,7 +1418,7 @@ DRIVER_INIT_MEMBER(gticlub_state,hangplt)
 	init_hangplt_common();
 
 	// workaround for lock/unlock errors
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x153ac^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }
@@ -1442,7 +1428,7 @@ DRIVER_INIT_MEMBER(gticlub_state,hangpltu)
 	init_hangplt_common();
 
 	// workaround for lock/unlock errors
-	UINT32 *rom = (UINT32*)memregion("user1")->base();
+	uint32_t *rom = (uint32_t*)memregion("user1")->base();
 	rom[(0x153d0^4) / 4] = 0x4e800020;
 	rom[(0x15428^4) / 4] = 0x4e800020;
 }

@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina, Pierpaolo Prazzoli
 /****************************************************
    Pit&Run - Taito 1984
@@ -10,7 +10,7 @@ TODO:
 
  - analog sound
    writes to $a8xx triggering analog sound :
-    $a800 - drivers are gettin into the cars
+    $a800 - drivers are getting into the cars
     $a801 - collisions
     $a802 - same as above
     $a803 - slide on water
@@ -68,6 +68,8 @@ K1000233A
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/pitnrun.h"
 
@@ -106,16 +108,16 @@ static ADDRESS_MAP_START( pitnrun_map, AS_PROGRAM, 8, pitnrun_state )
 	AM_RANGE(0xb005, 0xb005) AM_WRITE(char_bank_select)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(hflip_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(vflip_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xb800, 0xb800) AM_READ_PORT("INPUTS") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc800, 0xc801) AM_WRITE(scroll_w)
 	AM_RANGE(0xc802, 0xc802) AM_WRITENOP/* VP(VF?)MCV - not used ?*/
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(mcu_data_w)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(h_heed_w)
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(v_heed_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(ha_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(mcu_data_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ(mcu_status_r)
+	AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_map, AS_PROGRAM, 8, pitnrun_state )
@@ -125,7 +127,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pitnrun_sound_io_map, AS_IO, 8, pitnrun_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x8c, 0x8d) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 	AM_RANGE(0x8e, 0x8f) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0x8f, 0x8f) AM_DEVREAD("ay1", ay8910_device, data_r)
@@ -232,6 +234,7 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	MCFG_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)        /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(pitnrun_mcu_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
@@ -251,14 +254,16 @@ static MACHINE_CONFIG_START( pitnrun, pitnrun_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MCFG_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)    /* verified on pcb */
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 

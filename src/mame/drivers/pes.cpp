@@ -94,7 +94,7 @@ WRITE8_MEMBER(pes_state::pes_kbd_input)
 /* Helper Functions */
 READ8_MEMBER( pes_state::data_to_i8031)
 {
-	UINT8 data;
+	uint8_t data;
 	data = m_infifo[m_infifo_tail_ptr];
 	// if fifo is empty (tail ptr == head ptr), do not increment the tail ptr, otherwise do.
 	if (m_infifo_tail_ptr != m_infifo_head_ptr) m_infifo_tail_ptr++;
@@ -136,7 +136,7 @@ WRITE8_MEMBER( pes_state::port1_w )
 
 READ8_MEMBER( pes_state::port1_r )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 	data = m_speech->status_r(space, 0);
 #ifdef DEBUG_PORTS
 	logerror("port1 read: tms5220 data read: 0x%02X\n", data);
@@ -172,7 +172,7 @@ WRITE8_MEMBER( pes_state::port3_w )
 
 READ8_MEMBER( pes_state::port3_r )
 {
-	UINT8 data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
+	uint8_t data = m_port3_state & 0xE3; // return last written state with rts, /rdy and /int masked out
 	// check rts state; if virtual fifo is nonzero, rts is set, otherwise it is cleared
 	if (m_infifo_tail_ptr != m_infifo_head_ptr)
 	{
@@ -218,12 +218,6 @@ void pes_state::machine_reset()
     timer_set(attotime::from_hz(10000), TIMER_OUTFIFO_READ);
 }*/
 
-DRIVER_INIT_MEMBER(pes_state,pes)
-{
-	m_maincpu->i8051_set_serial_tx_callback(write8_delegate(FUNC(pes_state::data_from_i8031),this));
-	m_maincpu->i8051_set_serial_rx_callback(read8_delegate(FUNC(pes_state::data_to_i8031),this));
-}
-
 /******************************************************************************
  Address Maps
 ******************************************************************************/
@@ -255,6 +249,8 @@ static MACHINE_CONFIG_START( pes, pes_state )
 	MCFG_CPU_ADD("maincpu", I80C31, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(i80c31_mem)
 	MCFG_CPU_IO_MAP(i80c31_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pes_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(pes_state, data_to_i8031))
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -282,4 +278,4 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME    PARENT  COMPAT  MACHINE     INPUT   INIT    COMPANY                        FULLNAME            FLAGS */
-COMP( 1987, pes,    0,      0,      pes,        pes, pes_state,    pes, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )
+COMP( 1987, pes,    0,      0,      pes,        pes, driver_device,    0, "Pacific Educational Systems", "VPU-01 Speech box", MACHINE_NOT_WORKING )

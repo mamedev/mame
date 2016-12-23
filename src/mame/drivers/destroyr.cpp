@@ -14,6 +14,7 @@ TODO:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/watchdog.h"
 
 #include "destroyr.lh"
 
@@ -30,6 +31,7 @@ public:
 	destroyr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -39,14 +41,15 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_alpha_num_ram;
-	required_shared_ptr<UINT8> m_major_obj_ram;
-	required_shared_ptr<UINT8> m_minor_obj_ram;
+	required_shared_ptr<uint8_t> m_alpha_num_ram;
+	required_shared_ptr<uint8_t> m_major_obj_ram;
+	required_shared_ptr<uint8_t> m_minor_obj_ram;
 
 	/* video-related */
 	int            m_cursor;
@@ -72,7 +75,7 @@ public:
 	virtual void machine_reset() override;
 	DECLARE_PALETTE_INIT(destroyr);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_CALLBACK_MEMBER(dial_callback);
 	TIMER_CALLBACK_MEMBER(frame_callback);
@@ -82,7 +85,7 @@ protected:
 };
 
 
-UINT32 destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t destroyr_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i, j;
 
@@ -160,7 +163,7 @@ void destroyr_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		frame_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in destroyr_state::device_timer");
+		assert_always(false, "Unknown id in destroyr_state::device_timer");
 	}
 }
 
@@ -230,7 +233,7 @@ WRITE8_MEMBER(destroyr_state::misc_w)
 WRITE8_MEMBER(destroyr_state::cursor_load_w)
 {
 	m_cursor = data;
-	watchdog_reset_w(space, offset, data);
+	m_watchdog->reset_w(space, offset, data);
 }
 
 
@@ -283,7 +286,7 @@ READ8_MEMBER(destroyr_state::input_r)
 
 	else
 	{
-		UINT8 ret = ioport("IN0")->read();
+		uint8_t ret = ioport("IN0")->read();
 
 		if (m_potsense[0] && m_potmask[0])
 			ret |= 4;
@@ -397,7 +400,7 @@ static const gfx_layout destroyr_minor_object_layout =
 	0x200     /* increment */
 };
 
-static const UINT32 destroyr_major_object_layout_xoffset[64] =
+static const uint32_t destroyr_major_object_layout_xoffset[64] =
 {
 	0x00, 0x02, 0x04, 0x06, 0x08, 0x0A, 0x0C, 0x0E,
 	0x10, 0x12, 0x14, 0x16, 0x18, 0x1A, 0x1C, 0x1E,
@@ -425,7 +428,7 @@ static const gfx_layout destroyr_major_object_layout =
 	nullptr
 };
 
-static const UINT32 destroyr_waves_layout_xoffset[64] =
+static const uint32_t destroyr_waves_layout_xoffset[64] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x08, 0x09, 0x0A, 0x0B,
 	0x10, 0x11, 0x12, 0x13, 0x18, 0x19, 0x1A, 0x1B,
@@ -493,6 +496,7 @@ static MACHINE_CONFIG_START( destroyr, destroyr_state )
 	MCFG_CPU_PROGRAM_MAP(destroyr_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(destroyr_state, irq0_line_assert,  4*60)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

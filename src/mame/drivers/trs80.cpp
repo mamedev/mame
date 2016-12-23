@@ -149,6 +149,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trs80_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
@@ -171,11 +172,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xff, 0xff) AM_READWRITE(trs80_ff_r, trs80_ff_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sys80_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xf8, 0xf8) AM_READWRITE(trs80m4_eb_r, sys80_f8_w)
 	AM_RANGE(0xf9, 0xf9) AM_READWRITE(sys80_f9_r, trs80m4_eb_w)
 	AM_RANGE(0xfd, 0xfd) AM_READWRITE(trs80_printer_r, trs80_printer_w)
@@ -189,6 +192,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lnw80_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
 	AM_RANGE(0xe9, 0xe9) AM_READ_PORT("E9")
 	AM_RANGE(0xea, 0xea) AM_READWRITE(trs80m4_ea_r, trs80m4_ea_w)
@@ -202,6 +206,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model3_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0xe0, 0xe3) AM_READWRITE(trs80m4_e0_r, trs80m4_e0_w)
 	AM_RANGE(0xe4, 0xe4) AM_READWRITE(trs80m4_e4_r, trs80m4_e4_w)
 	AM_RANGE(0xe8, 0xe8) AM_READWRITE(trs80m4_e8_r, trs80m4_e8_w)
@@ -221,6 +226,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model4_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
 	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
 	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
@@ -243,6 +249,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model4p_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x84, 0x87) AM_WRITE(trs80m4_84_w)
 	AM_RANGE(0x88, 0x89) AM_WRITE(trs80m4_88_w)
 	AM_RANGE(0x90, 0x93) AM_WRITE(trs80m4_90_w)
@@ -273,6 +280,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritum_io, AS_IO, 8, trs80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	ADDRESS_MAP_UNMAP_HIGH
 	// There are specific writes to ports 03, F3, F7, F8, FA, FB, FD
 	// so perhaps this system uses devices at these locations.
 	// The disk input expects values that are different to the usual,
@@ -553,7 +561,7 @@ FLOPPY_FORMATS_MEMBER( trs80_state::floppy_formats )
 FLOPPY_FORMATS_END
 
 static SLOT_INTERFACE_START( trs80_floppies )
-	SLOT_INTERFACE("sssd", FLOPPY_525_SSSD)
+	SLOT_INTERFACE("sssd", FLOPPY_525_QD)
 SLOT_INTERFACE_END
 
 
@@ -574,14 +582,14 @@ static MACHINE_CONFIG_START( trs80, trs80_state )       // the original model I,
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", trs80)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 	/* devices */
 	MCFG_CASSETTE_ADD( "cassette" )

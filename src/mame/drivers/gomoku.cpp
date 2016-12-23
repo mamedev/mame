@@ -32,11 +32,10 @@ todo:
 READ8_MEMBER(gomoku_state::input_port_r)
 {
 	int i, res;
-	static const char *const portnames[] = { "IN0", "IN1", "DSW", "UNUSED0", "UNUSED1", "UNUSED2", "UNUSED3", "UNUSED4" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((read_safe(ioport(portnames[i]), 0xff) >> offset) & 1) << i;
+		res |= ((m_inputs[i].read_safe(0xff) >> offset) & 1) << i;
 
 	return res;
 }

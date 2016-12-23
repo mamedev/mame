@@ -148,6 +148,7 @@ Fax                  1982  6502   FXL, FLA
 #include "machine/6821pia.h"
 #include "audio/exidy.h"
 #include "includes/exidy.h"
+#include "audio/targ.h"
 
 
 /*************************************
@@ -158,7 +159,7 @@ Fax                  1982  6502   FXL, FLA
 
 CUSTOM_INPUT_MEMBER(exidy_state::teetert_input_r)
 {
-	UINT8 dial = ioport("DIAL")->read();
+	uint8_t dial = ioport("DIAL")->read();
 	int result = 0;
 
 	result = (dial != m_last_dial) << 4;
@@ -602,7 +603,7 @@ static INPUT_PORTS_START( teetert )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, NULL)
+	PORT_BIT( 0x44, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, exidy_state,teetert_input_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1455,7 +1456,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0xf8;
@@ -1466,7 +1467,7 @@ DRIVER_INIT_MEMBER(exidy_state,sidetrac)
 
 DRIVER_INIT_MEMBER(exidy_state,targ)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x5c;
@@ -1477,7 +1478,7 @@ DRIVER_INIT_MEMBER(exidy_state,targ)
 
 DRIVER_INIT_MEMBER(exidy_state,spectar)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1487,7 +1488,7 @@ DRIVER_INIT_MEMBER(exidy_state,spectar)
 
 DRIVER_INIT_MEMBER(exidy_state,rallys)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1497,7 +1498,7 @@ DRIVER_INIT_MEMBER(exidy_state,rallys)
 
 DRIVER_INIT_MEMBER(exidy_state,phantoma)
 {
-	exidy_video_config(0x00, 0x00, FALSE);
+	exidy_video_config(0x00, 0x00, false);
 
 	/* hard-coded palette controlled via 8x3 DIP switches on the board */
 	m_color_latch[2] = 0x58;
@@ -1512,25 +1513,25 @@ DRIVER_INIT_MEMBER(exidy_state,phantoma)
 
 DRIVER_INIT_MEMBER(exidy_state,mtrap)
 {
-	exidy_video_config(0x14, 0x00, FALSE);
+	exidy_video_config(0x14, 0x00, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,venture)
 {
-	exidy_video_config(0x04, 0x04, FALSE);
+	exidy_video_config(0x04, 0x04, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,teetert)
 {
-	exidy_video_config(0x0c, 0x0c, FALSE);
+	exidy_video_config(0x0c, 0x0c, false);
 }
 
 
 DRIVER_INIT_MEMBER(exidy_state,pepper2)
 {
-	exidy_video_config(0x14, 0x04, TRUE);
+	exidy_video_config(0x14, 0x04, true);
 }
 
 
@@ -1538,7 +1539,7 @@ DRIVER_INIT_MEMBER(exidy_state,fax)
 {
 	//address_space &space = m_maincpu->space(AS_PROGRAM);
 
-	exidy_video_config(0x04, 0x04, TRUE);
+	exidy_video_config(0x04, 0x04, true);
 
 	membank("bank1")->configure_entries(0, 32, memregion("maincpu")->base() + 0x10000, 0x2000);
 }

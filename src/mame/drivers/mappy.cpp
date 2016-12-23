@@ -549,9 +549,10 @@ TODO:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/dac.h"
 #include "includes/mappy.h"
+#include "cpu/m6809/m6809.h"
+#include "machine/watchdog.h"
+#include "sound/volt_reg.h"
 
 /*************************************
  *
@@ -576,7 +577,7 @@ TODO:
 
 /***************************************************************************/
 
-void mappy_state::common_latch_w(UINT32 offset)
+void mappy_state::common_latch_w(uint32_t offset)
 {
 	int bit = offset & 1;
 
@@ -761,7 +762,7 @@ void mappy_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 			motos_io_run(ptr, param);
 			break;
 		default:
-			assert_always(FALSE, "Unknown id in mappy_state::device_timer");
+			assert_always(false, "Unknown id in mappy_state::device_timer");
 	}
 }
 
@@ -960,7 +961,7 @@ static ADDRESS_MAP_START( superpac_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(superpac_latch_w)             /* various control bits */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -971,7 +972,7 @@ static ADDRESS_MAP_START( phozon_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(phozon_latch_w)               /* various control bits */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(watchdog_reset_w)             /* watchdog reset */
+	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM */
 ADDRESS_MAP_END
 
@@ -983,7 +984,7 @@ static ADDRESS_MAP_START( mappy_cpu1_map, AS_PROGRAM, 8, mappy_state )
 	AM_RANGE(0x4800, 0x480f) AM_DEVREADWRITE("namcoio_1", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x4810, 0x481f) AM_DEVREADWRITE("namcoio_2", namcoio_device, read, write)      /* custom I/O chips interface */
 	AM_RANGE(0x5000, 0x500f) AM_WRITE(mappy_latch_w)                /* various control bits */
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)             /* watchdog reset */
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                 /* ROM code (only a000-ffff in Mappy) */
 ADDRESS_MAP_END
 
@@ -1673,7 +1674,8 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_CPU_PROGRAM_MAP(superpac_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
 
@@ -1694,11 +1696,11 @@ static MACHINE_CONFIG_FRAGMENT( superpac_common )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,superpac)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1764,8 +1766,9 @@ static MACHINE_CONFIG_START( grobda, mappy_state )
 	MCFG_NAMCO56XX_OUT_0_CB(WRITE8(mappy_state, out_mux))
 
 	/* sound hardware */
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.275) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -1784,7 +1787,8 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_CPU_PROGRAM_MAP(phozon_cpu3_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub2_vblank_irq)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
@@ -1817,11 +1821,11 @@ static MACHINE_CONFIG_START( phozon, mappy_state )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,phozon)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1836,7 +1840,8 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_CPU_PROGRAM_MAP(mappy_cpu2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  sub_vblank_irq)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 													/* synchronization of the CPUs */
 	MCFG_MACHINE_START_OVERRIDE(mappy_state,mappy)
@@ -1856,11 +1861,11 @@ static MACHINE_CONFIG_FRAGMENT( mappy_common )
 	MCFG_VIDEO_START_OVERRIDE(mappy_state,mappy)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MCFG_NAMCO_AUDIO_VOICES(8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mappy, mappy_state )
@@ -1888,7 +1893,8 @@ static MACHINE_CONFIG_START( digdug2, mappy_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", mappy_state,  digdug2_main_vblank_irq)  // also update the custom I/O chips
 
-	MCFG_WATCHDOG_VBLANK_INIT(0)
+	MCFG_WATCHDOG_MODIFY("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0)
 
 	MCFG_DEVICE_ADD("namcoio_1", NAMCO58XX, 0)
 	MCFG_NAMCO58XX_IN_0_CB(IOPORT("COINS"))
@@ -2392,11 +2398,6 @@ ROM_END
 
 
 
-WRITE8_MEMBER(mappy_state::grobda_DAC_w)
-{
-	m_dac->write_unsigned8((data << 4) | data);
-}
-
 DRIVER_INIT_MEMBER(mappy_state,superpac)
 {
 	m_type = GAME_SUPERPAC;
@@ -2419,7 +2420,7 @@ DRIVER_INIT_MEMBER(mappy_state,grobda)
 	   However, removing the 15XX from the board causes sound to disappear completely, so
 	   the DAC might be built-in after all.
 	  */
-	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(mappy_state::grobda_DAC_w),this));
+	m_subcpu->space(AS_PROGRAM).install_write_handler(0x0002, 0x0002, write8_delegate(FUNC(dac_byte_interface::write), (dac_byte_interface *)m_dac));
 }
 
 DRIVER_INIT_MEMBER(mappy_state,phozon)

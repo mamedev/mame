@@ -37,13 +37,13 @@ class cmos_40105_device :  public device_t
 {
 public:
 	// construction/destruction
-	cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cmos_40105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _dir> void set_dir_callback(_dir dir) { m_write_dir.set_callback(dir); }
 	template<class _dor> void set_dor_callback(_dor dor) { m_write_dor.set_callback(dor); }
 
-	UINT8 read();
-	void write(UINT8 data);
+	uint8_t read();
+	void write(uint8_t data);
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_WRITE_LINE_MEMBER( so_w );
@@ -60,10 +60,10 @@ private:
 	devcb_write_line m_write_dir;
 	devcb_write_line m_write_dor;
 
-	std::queue<UINT8> m_fifo;
+	std::queue<uint8_t> m_fifo;
 
-	UINT8 m_d;
-	UINT8 m_q;
+	uint8_t m_d;
+	uint8_t m_q;
 
 	int m_dir;
 	int m_dor;

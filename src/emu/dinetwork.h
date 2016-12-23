@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Carl, Miodrag Milanovic
-#ifndef __DINETWORK_H__
-#define __DINETWORK_H__
+#ifndef MAME_EMU_DINETWORK_H
+#define MAME_EMU_DINETWORK_H
 
 class osd_netdev;
 
@@ -15,12 +15,12 @@ public:
 	void set_promisc(bool promisc);
 	void set_mac(const char *mac);
 
-	const char *get_mac() { return m_mac; }
-	bool get_promisc() { return m_promisc; }
-	int get_interface() { return m_intf; }
+	const char *get_mac() const { return m_mac; }
+	bool get_promisc() const { return m_promisc; }
+	int get_interface() const { return m_intf; }
 
-	int send(UINT8 *buf, int len) const;
-	virtual void recv_cb(UINT8 *buf, int len);
+	int send(u8 *buf, int len) const;
+	virtual void recv_cb(u8 *buf, int len);
 
 protected:
 	bool m_promisc;
@@ -34,4 +34,4 @@ protected:
 // iterator
 typedef device_interface_iterator<device_network_interface> network_interface_iterator;
 
-#endif
+#endif // MAME_EMU_DINETWORK_H

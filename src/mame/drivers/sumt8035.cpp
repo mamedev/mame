@@ -32,8 +32,7 @@ protected:
 
 
 static ADDRESS_MAP_START( sumt_map, AS_PROGRAM, 8, sumt8035_state )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x23ff) AM_RAM//poss wrong
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 

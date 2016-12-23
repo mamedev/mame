@@ -26,7 +26,7 @@ void radio86_state::radio86_init_keyboard()
 DRIVER_INIT_MEMBER(radio86_state,radio86)
 {
 	/* set initialy ROM to be visible on first bank */
-	UINT8 *RAM = m_region_maincpu->base();
+	uint8_t *RAM = m_region_maincpu->base();
 	memset(RAM,0x0000,0x1000); // make frist page empty by default
 	m_bank1->configure_entries(1, 2, RAM, 0x0000);
 	m_bank1->configure_entries(0, 2, RAM, 0xf800);
@@ -36,12 +36,12 @@ DRIVER_INIT_MEMBER(radio86_state,radio86)
 DRIVER_INIT_MEMBER(radio86_state,radioram)
 {
 	DRIVER_INIT_CALL(radio86);
-	m_radio_ram_disk = std::make_unique<UINT8[]>(0x20000);
+	m_radio_ram_disk = std::make_unique<uint8_t[]>(0x20000);
 	memset(m_radio_ram_disk.get(),0,0x20000);
 }
 READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 {
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_line0->read(); }
 	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_line1->read(); }
 	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_line2->read(); }
@@ -56,7 +56,7 @@ READ8_MEMBER(radio86_state::radio86_8255_portb_r2)
 READ8_MEMBER(radio86_state::radio86_8255_portc_r2)
 {
 	double level = m_cassette->input();
-	UINT8 dat = m_io_line8->read();
+	uint8_t dat = m_io_line8->read();
 	if (level <  0) {
 		dat ^= m_tape_value;
 	}
@@ -77,7 +77,7 @@ WRITE8_MEMBER(radio86_state::radio86_8255_portc_w2)
 READ8_MEMBER(radio86_state::rk7007_8255_portc_r)
 {
 	double level = m_cassette->input();
-	UINT8 key = 0xff;
+	uint8_t key = 0xff;
 	if ((m_keyboard_mask & 0x01)!=0) { key &= m_io_cline0->read(); }
 	if ((m_keyboard_mask & 0x02)!=0) { key &= m_io_cline1->read(); }
 	if ((m_keyboard_mask & 0x04)!=0) { key &= m_io_cline2->read(); }
@@ -122,7 +122,7 @@ void radio86_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_bank1->set_entry(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in radio86_state::device_timer");
+		assert_always(false, "Unknown id in radio86_state::device_timer");
 	}
 }
 
@@ -159,7 +159,7 @@ WRITE8_MEMBER(radio86_state::radio86_pagesel)
 
 READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
 {
-	UINT16 addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
+	uint16_t addr = (m_romdisk_msb << 8) | m_romdisk_lsb;
 	if (m_cart->exists() && addr < m_cart->get_rom_size())
 		return m_cart->read_rom(space, addr);
 	else
@@ -168,7 +168,7 @@ READ8_MEMBER(radio86_state::radio86rom_romdisk_porta_r)
 
 READ8_MEMBER(radio86_state::radio86ram_romdisk_porta_r)
 {
-	UINT8 *romdisk = m_region_maincpu->base() + 0x10000;
+	uint8_t *romdisk = m_region_maincpu->base() + 0x10000;
 	if ((m_disk_sel & 0x0f) ==0) {
 		return romdisk[m_romdisk_msb*256+m_romdisk_lsb];
 	} else {
@@ -199,8 +199,8 @@ I8275_DRAW_CHARACTER_MEMBER(radio86_state::display_pixels)
 {
 	int i;
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	const UINT8 *charmap = m_charmap;
-	UINT8 pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
+	const uint8_t *charmap = m_charmap;
+	uint8_t pixels = charmap[(linecount & 7) + (charcode << 3)] ^ 0xff;
 	if(linecount == 8)
 		pixels = 0;
 	if (vsp) {

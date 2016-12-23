@@ -110,9 +110,9 @@
     INLINE FUNCTIONS
 ***************************************************************************/
 
-UINT16 via6522_device::get_counter1_value()
+uint16_t via6522_device::get_counter1_value()
 {
-	UINT16 val;
+	uint16_t val;
 
 	if(m_t1_active)
 	{
@@ -142,7 +142,7 @@ ADDRESS_MAP_END
 //  via6522_device - constructor
 //-------------------------------------------------
 
-via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+via6522_device::via6522_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VIA6522, "6522 VIA", tag, owner, clock, "via6522", __FILE__),
 		m_in_a_handler(*this),
 		m_in_b_handler(*this),
@@ -442,7 +442,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-UINT8 via6522_device::input_pa()
+uint8_t via6522_device::input_pa()
 {
 	/// TODO: REMOVE THIS
 	if (!m_in_a_handler.isnull())
@@ -458,11 +458,11 @@ UINT8 via6522_device::input_pa()
 
 void via6522_device::output_pa()
 {
-	UINT8 pa = (m_out_a & m_ddr_a) | ~m_ddr_a;
+	uint8_t pa = (m_out_a & m_ddr_a) | ~m_ddr_a;
 	m_out_a_handler(pa);
 }
 
-UINT8 via6522_device::input_pb()
+uint8_t via6522_device::input_pb()
 {
 	/// TODO: REMOVE THIS
 	if (m_ddr_b != 0xff && !m_in_b_handler.isnull())
@@ -470,7 +470,7 @@ UINT8 via6522_device::input_pb()
 		m_in_b = m_in_b_handler(0);
 	}
 
-	UINT8 pb = (m_out_b & m_ddr_b) + (m_in_b & ~m_ddr_b);
+	uint8_t pb = (m_out_b & m_ddr_b) + (m_in_b & ~m_ddr_b);
 
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
@@ -480,7 +480,7 @@ UINT8 via6522_device::input_pb()
 
 void via6522_device::output_pb()
 {
-	UINT8 pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
+	uint8_t pb = (m_out_b & m_ddr_b) | ~m_ddr_b;
 
 	if (T1_SET_PB7(m_acr))
 		pb = (pb & 0x7f) | (m_t1_pb7 << 7);
@@ -811,7 +811,7 @@ WRITE8_MEMBER( via6522_device::write )
 
 	case VIA_ACR:
 		{
-			UINT16 counter1 = get_counter1_value();
+			uint16_t counter1 = get_counter1_value();
 			m_acr = data;
 
 			output_pb();

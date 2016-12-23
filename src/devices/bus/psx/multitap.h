@@ -11,7 +11,7 @@ class psx_multitap_device : public device_t,
 							public device_psx_controller_interface
 {
 public:
-	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	psx_multitap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
@@ -22,7 +22,7 @@ protected:
 	virtual void interface_pre_reset() override;
 
 private:
-	virtual bool get_pad(int count, UINT8 *odata, UINT8 idata) override;
+	virtual bool get_pad(int count, uint8_t *odata, uint8_t idata) override;
 	virtual void do_pad() override;
 	void ack();
 	void set_tx_line(bool tx, int port);
@@ -31,7 +31,7 @@ private:
 	int m_activeport;
 	bool m_cack[4];
 	bool m_singlemode, m_nextmode, m_tapmc;
-	UINT8 m_data[3][8]; // port a is passed though
+	uint8_t m_data[3][8]; // port a is passed though
 	required_device<psx_controller_port_device> m_porta;
 	required_device<psx_controller_port_device> m_portb;
 	required_device<psx_controller_port_device> m_portc;

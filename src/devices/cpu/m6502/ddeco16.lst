@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # deco16 - deco variant
 brk_16_imp  ora_idx     ill_non     ill_non     ill_non     ora_zpg     asl_zpg     ill_non     php_imp     ora_imm     asl_acc     u0B_zpg     ill_non     ora_aba     asl_aba     ill_non
 bpl_rel     ora_idy     ill_non     u13_zpg     ill_non     ora_zpx     asl_zpx     ill_non     clc_imp     ora_aby     ill_non     ill_non     ill_non     ora_abx     asl_abx     ill_non

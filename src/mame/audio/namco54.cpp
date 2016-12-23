@@ -69,7 +69,7 @@ READ8_MEMBER( namco_54xx_device::R0_r )
 
 WRITE8_MEMBER( namco_54xx_device::O_w )
 {
-	UINT8 out = (data & 0x0f);
+	uint8_t out = (data & 0x0f);
 	if (data & 0x10)
 		m_discrete->write(space, NAMCO_54XX_1_DATA(m_basenode), out);
 	else
@@ -78,7 +78,7 @@ WRITE8_MEMBER( namco_54xx_device::O_w )
 
 WRITE8_MEMBER( namco_54xx_device::R1_w )
 {
-	UINT8 out = (data & 0x0f);
+	uint8_t out = (data & 0x0f);
 
 	m_discrete->write(space, NAMCO_54XX_2_DATA(m_basenode), out);
 }
@@ -130,10 +130,10 @@ ROM_END
 
 const device_type NAMCO_54XX = &device_creator<namco_54xx_device>;
 
-namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+namco_54xx_device::namco_54xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_54XX, "Namco 54xx", tag, owner, clock, "namco54", __FILE__),
 	m_cpu(*this, "mcu"),
-	m_discrete(*this),
+	m_discrete(*this, finder_base::DUMMY_TAG),
 	m_basenode(0),
 	m_latched_cmd(0)
 {
@@ -161,7 +161,7 @@ machine_config_constructor namco_54xx_device::device_mconfig_additions() const
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *namco_54xx_device::device_rom_region() const
+const tiny_rom_entry *namco_54xx_device::device_rom_region() const
 {
 	return ROM_NAME(namco_54xx );
 }

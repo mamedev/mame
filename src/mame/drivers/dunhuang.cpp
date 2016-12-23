@@ -53,9 +53,10 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 #define DUNHUANG_DEBUG  0
 
@@ -75,30 +76,30 @@ public:
 	tilemap_t       *m_tmap2;
 	int             m_written;
 	int             m_written2;
-	UINT8           m_pos_x;
-	UINT8           m_pos_y;
-	UINT8           m_clear_y;
-	UINT8           m_block_x;
-	UINT8           m_block_y;
-	UINT8           m_block_w;
-	UINT8           m_block_h;
-	UINT8           m_block_addr_hi;
-	UINT8           m_block_addr_lo;
-	UINT8           m_block_dest;
-	UINT8           m_block_c;
-	UINT8           m_layers;
+	uint8_t           m_pos_x;
+	uint8_t           m_pos_y;
+	uint8_t           m_clear_y;
+	uint8_t           m_block_x;
+	uint8_t           m_block_y;
+	uint8_t           m_block_w;
+	uint8_t           m_block_h;
+	uint8_t           m_block_addr_hi;
+	uint8_t           m_block_addr_lo;
+	uint8_t           m_block_dest;
+	uint8_t           m_block_c;
+	uint8_t           m_layers;
 	int             m_paloffs;
 
 	/* input-related */
-	UINT8           m_input;
-	UINT8           m_hopper;
+	uint8_t           m_input;
+	uint8_t           m_hopper;
 
 	/* memory */
-	UINT16         m_videoram[0x40 * 0x20];
-	UINT16         m_videoram2[0x40 * 0x8];
-	UINT8          m_colorram[0x40 * 0x20];
-	UINT8          m_colorram2[0x40 * 0x8];
-	UINT8          m_paldata[3 * 256];
+	uint16_t         m_videoram[0x40 * 0x20];
+	uint16_t         m_videoram2[0x40 * 0x8];
+	uint8_t          m_colorram[0x40 * 0x20];
+	uint8_t          m_colorram2[0x40 * 0x8];
+	uint8_t          m_paldata[3 * 256];
 	DECLARE_WRITE8_MEMBER(dunhuang_pos_x_w);
 	DECLARE_WRITE8_MEMBER(dunhuang_pos_y_w);
 	DECLARE_WRITE8_MEMBER(dunhuang_tile_w);
@@ -127,7 +128,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_dunhuang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dunhuang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
@@ -142,21 +143,21 @@ public:
 
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info)
 {
-	UINT16 code = m_videoram[tile_index];
-	UINT8 color = m_colorram[tile_index] & 0x0f;
+	uint16_t code = m_videoram[tile_index];
+	uint8_t color = m_colorram[tile_index] & 0x0f;
 	SET_TILE_INFO_MEMBER(0, code, color, 0);
 }
 TILE_GET_INFO_MEMBER(dunhuang_state::get_tile_info2)
 {
-	UINT16 code = m_videoram2[tile_index];
-	UINT8 color = m_colorram2[tile_index] & 0x0f;
+	uint16_t code = m_videoram2[tile_index];
+	uint8_t color = m_colorram2[tile_index] & 0x0f;
 	SET_TILE_INFO_MEMBER(1, code, color, 0);
 }
 
 void dunhuang_state::video_start()
 {
-	m_tmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
-	m_tmap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 0x40,0x20);
+	m_tmap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dunhuang_state::get_tile_info2),this), TILEMAP_SCAN_ROWS, 8,32, 0x40,0x8);
 
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
@@ -168,7 +169,7 @@ void dunhuang_state::video_start()
 	save_item(NAME(m_paldata));
 }
 
-UINT32 dunhuang_state::screen_update_dunhuang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dunhuang_state::screen_update_dunhuang(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -352,7 +353,7 @@ WRITE8_MEMBER(dunhuang_state::dunhuang_block_addr_hi_w)
 WRITE8_MEMBER(dunhuang_state::dunhuang_block_h_w)
 {
 	int i,j, addr;
-	UINT8 *tile_addr;
+	uint8_t *tile_addr;
 
 //  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", space.device().safe_pc(), m_block_dest, (m_block_addr_hi << 8) + m_block_addr_lo, m_block_x,m_block_y,m_block_w+1,m_block_h+1,m_block_c);
 
@@ -499,7 +500,7 @@ static ADDRESS_MAP_START( dunhuang_io_map, AS_IO, 8, dunhuang_state )
 
 	AM_RANGE( 0x0008, 0x0008 ) AM_WRITE(dunhuang_vert_clear_w )
 
-	AM_RANGE( 0x000c, 0x000c ) AM_READ(watchdog_reset_r )
+	AM_RANGE( 0x000c, 0x000c ) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 
 	AM_RANGE( 0x000f, 0x000f ) AM_WRITE(dunhuang_block_addr_lo_w )
 	AM_RANGE( 0x0010, 0x0010 ) AM_WRITE(dunhuang_block_addr_hi_w )
@@ -764,7 +765,7 @@ GFXDECODE_END
 
 void dunhuang_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x8000);
 
@@ -817,7 +818,7 @@ static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 	MCFG_CPU_IO_MAP(dunhuang_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", dunhuang_state,  irq0_line_hold)
 
-
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_seconds(5))
 
 	/* video hardware */

@@ -43,11 +43,11 @@ public:
 	optional_device<ay8910_device> m_aysnd; // only faceoffh
 
 	// vars
-	UINT8  m_port_a, m_port_b;
-	UINT8  m_bank;
-	UINT32 m_shift;
-	UINT8  m_lamp;
-	UINT8  m_ay_cmd, m_ay_data;
+	uint8_t  m_port_a, m_port_b;
+	uint8_t  m_bank;
+	uint32_t m_shift;
+	uint8_t  m_lamp;
+	uint8_t  m_ay_cmd, m_ay_data;
 
 	// callbacks
 	TIMER_DEVICE_CALLBACK_MEMBER(update);
@@ -70,7 +70,7 @@ public:
 	DECLARE_WRITE8_MEMBER(lamp_w);
 
 	// digitalker
-	void digitalker_set_bank(UINT8 bank);
+	void digitalker_set_bank(uint8_t bank);
 
 	// driver_device overrides
 	virtual void machine_start() override;
@@ -82,13 +82,13 @@ public:
 
 READ8_MEMBER(chexx_state::via_a_in)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	logerror("%s: VIA read A: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
 READ8_MEMBER(chexx_state::via_b_in)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 	logerror("%s: VIA read B: %02X\n", machine().describe_context(), ret);
 	return ret;
 }
@@ -131,7 +131,7 @@ WRITE_LINE_MEMBER(chexx_state::via_cb2_out)
 	m_shift = ((m_shift << 1) & 0xffffff) | state;
 
 	// 7segs (score)
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // 4511
 
 	output().set_digit_value(0, patterns[(m_shift >> (16+4)) & 0xf]);
 	output().set_digit_value(1, patterns[(m_shift >> (16+0)) & 0xf]);
@@ -154,8 +154,8 @@ WRITE_LINE_MEMBER(chexx_state::via_irq_out)
 
 READ8_MEMBER(chexx_state::input_r)
 {
-	UINT8 ret = ioport("DSW")->read();          // bits 0-3
-	UINT8 inp = ioport("INPUT")->read();        // bit 7 (multiplexed)
+	uint8_t ret = ioport("DSW")->read();          // bits 0-3
+	uint8_t inp = ioport("INPUT")->read();        // bit 7 (multiplexed)
 
 	for (int i = 0; i < 8; ++i)
 		if ( ((~m_port_a) & (1 << i)) && ((~inp) & (1 << i)) )
@@ -250,12 +250,12 @@ void chexx_state::machine_start()
 {
 }
 
-void chexx_state::digitalker_set_bank(UINT8 bank)
+void chexx_state::digitalker_set_bank(uint8_t bank)
 {
 	if (m_bank != bank)
 	{
-		UINT8 *src = memregion("samples")->base();
-		UINT8 *dst = memregion("digitalker")->base();
+		uint8_t *src = memregion("samples")->base();
+		uint8_t *dst = memregion("digitalker")->base();
 
 		memcpy(dst, src + bank * 0x4000, 0x4000);
 
@@ -272,7 +272,7 @@ void chexx_state::machine_reset()
 TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 {
 	// NMI on coin-in
-	UINT8 coin = (~ioport("COIN")->read()) & 0x03;
+	uint8_t coin = (~ioport("COIN")->read()) & 0x03;
 	m_maincpu->set_input_line(INPUT_LINE_NMI, coin ? ASSERT_LINE : CLEAR_LINE);
 
 	// VIA CA1 connected to Digitalker INTR line
@@ -280,7 +280,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(chexx_state::update)
 
 #if 0
 	// Play the digitalker samples (it's not hooked up correctly yet)
-	static UINT8 sample = 0, bank = 0;
+	static uint8_t sample = 0, bank = 0;
 
 	if (machine().input().code_pressed_once(KEYCODE_Q))
 		--bank;

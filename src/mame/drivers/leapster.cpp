@@ -225,7 +225,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(leapster_cart);
 	DECLARE_DRIVER_INIT(leapster);
 
@@ -254,19 +254,19 @@ INPUT_PORTS_END
 
 
 
-UINT32 leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t leapster_state::screen_update_leapster(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
 
 DEVICE_IMAGE_LOAD_MEMBER( leapster_state, leapster_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	m_cart->rom_alloc(size, GENERIC_ROM32_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void leapster_state::machine_start()
@@ -329,7 +329,7 @@ ROM_END
 
 ROM_START(leapstertv)
 	ROM_REGION(0x200000, "maincpu", ROMREGION_ERASE00)
-	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, BAD_DUMP CRC(dc281f1f) SHA1(17588de54ab3bb82801bd5062f3e6aa687412178) )
+	ROM_LOAD( "am29pl160cb-90sf.bin", 0x00000, 0x200000, CRC(194cc724) SHA1(000a79d75c19f2e43532ce0b31f0dca0bed49eab) )
 ROM_END
 
 DRIVER_INIT_MEMBER(leapster_state,leapster)

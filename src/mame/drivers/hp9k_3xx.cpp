@@ -67,12 +67,12 @@ public:
 	required_device<cpu_device> m_maincpu;
 	virtual void machine_reset() override;
 
-	optional_shared_ptr<UINT16> m_vram16;
-	optional_shared_ptr<UINT32> m_vram;
+	optional_shared_ptr<uint16_t> m_vram16;
+	optional_shared_ptr<uint32_t> m_vram;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 hp98544_16_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t hp98544_16_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(buserror16_r);
 	DECLARE_WRITE16_MEMBER(buserror16_w);
@@ -81,15 +81,15 @@ public:
 
 private:
 	bool m_in_buserr;
-	UINT32 m_last_buserr_pc;
+	uint32_t m_last_buserr_pc;
 };
 
-UINT32 hp9k3xx_state::hp98544_16_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp9k3xx_state::hp98544_16_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT16 pixels;
-	UINT32 m_palette[2] = { 0x00000000, 0xffffffff };
+	uint16_t pixels;
+	uint32_t m_palette[2] = { 0x00000000, 0xffffffff };
 
 	for (y = 0; y < 768; y++)
 	{
@@ -106,12 +106,12 @@ UINT32 hp9k3xx_state::hp98544_16_update(screen_device &screen, bitmap_rgb32 &bit
 	return 0;
 }
 
-UINT32 hp9k3xx_state::hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp9k3xx_state::hp98544_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT32 pixels;
-	UINT32 m_palette[2] = { 0x00000000, 0xffffffff };
+	uint32_t pixels;
+	uint32_t m_palette[2] = { 0x00000000, 0xffffffff };
 
 	for (y = 0; y < 768; y++)
 	{
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START(hp9k382_map, AS_PROGRAM, 32, hp9k3xx_state)
 	AM_IMPORT_FROM(hp9k3xx_common)
 ADDRESS_MAP_END
 
-UINT32 hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t hp9k3xx_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -291,8 +291,7 @@ static MACHINE_CONFIG_START( hp9k310, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68010, 10000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k310_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -307,8 +306,7 @@ static MACHINE_CONFIG_START( hp9k320, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020FPU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k320_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -323,8 +321,7 @@ static MACHINE_CONFIG_START( hp9k330, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68020PMMU, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -339,8 +336,7 @@ static MACHINE_CONFIG_START( hp9k340, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68030, 16670000)
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -355,8 +351,7 @@ static MACHINE_CONFIG_START( hp9k370, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68030, 33000000)
 	MCFG_CPU_PROGRAM_MAP(hp9k370_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -371,8 +366,7 @@ static MACHINE_CONFIG_START( hp9k380, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68040, 25000000) // 25 MHz?  33?
 	MCFG_CPU_PROGRAM_MAP(hp9k330_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)
@@ -387,8 +381,7 @@ static MACHINE_CONFIG_START( hp9k382, hp9k3xx_state )
 	MCFG_CPU_ADD(MAINCPU_TAG, M68040, 25000000) // 25 MHz?  33?
 	MCFG_CPU_PROGRAM_MAP(hp9k382_map)
 
-	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(250000.0f)  // from oscillator module next to the 6840
+	MCFG_DEVICE_ADD(PTM6840_TAG, PTM6840, 250000) // from oscillator module next to the 6840
 	MCFG_PTM6840_EXTERNAL_CLOCKS(250000.0f, 250000.0f, 250000.0f)
 
 	MCFG_SCREEN_ADD( "screen", RASTER)

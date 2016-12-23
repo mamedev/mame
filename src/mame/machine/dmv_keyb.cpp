@@ -207,10 +207,10 @@ ioport_constructor dmv_keyboard_device::device_input_ports() const
 //  dmv_keyboard_device - constructor
 //-------------------------------------------------
 
-dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, DMV_KEYBOARD, "Decision Mate V Keyboard", tag, owner, clock, "dmv_keyboard", __FILE__),
-		m_maincpu(*this, "mcu"),
-		m_keyboard(*this, "COL")
+dmv_keyboard_device::dmv_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, DMV_KEYBOARD, "Decision Mate V Keyboard", tag, owner, clock, "dmv_keyboard", __FILE__)
+	, m_maincpu(*this, "mcu")
+	, m_keyboard(*this, "COL.%u", 0)
 {
 }
 
@@ -249,7 +249,7 @@ machine_config_constructor dmv_keyboard_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *dmv_keyboard_device::device_rom_region() const
+const tiny_rom_entry *dmv_keyboard_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_keyboard );
 }

@@ -1,4 +1,5 @@
-
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 /* € */ // ABC
 
 #include "netlist/devices/net_lib.h"

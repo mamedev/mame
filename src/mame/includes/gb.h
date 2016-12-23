@@ -9,38 +9,11 @@
 #ifndef GB_H_
 #define GB_H_
 
-#include "audio/gb.h"
+#include "sound/gb.h"
 #include "cpu/lr35902/lr35902.h"
 #include "bus/gameboy/gb_slot.h"
 #include "machine/ram.h"
 #include "video/gb_lcd.h"
-
-/* Interrupts */
-#define VBL_INT               0       /* V-Blank    */
-#define LCD_INT               1       /* LCD Status */
-#define TIM_INT               2       /* Timer      */
-#define SIO_INT               3       /* Serial I/O */
-#define EXT_INT               4       /* Joypad     */
-
-#ifdef TIMER
-#undef TIMER
-#endif
-
-/* Cartridge types */
-#define CART_RAM    0x01    /* Cartridge has RAM                             */
-#define BATTERY     0x02    /* Cartridge has a battery to save RAM           */
-#define TIMER       0x04    /* Cartridge has a real-time-clock (MBC3 only)   */
-#define RUMBLE      0x08    /* Cartridge has a rumble motor (MBC5 only)      */
-#define SRAM        0x10    /* Cartridge has SRAM                            */
-#define UNKNOWN     0x80    /* Cartridge is of an unknown type               */
-
-#define DMG_FRAMES_PER_SECOND   59.732155
-#define SGB_FRAMES_PER_SECOND   61.17
-
-
-#define MAX_ROMBANK 512
-#define MAX_RAMBANK 256
-
 
 
 class gb_state : public driver_device
@@ -50,43 +23,43 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_cartslot(*this, "gbslot"),
 		m_maincpu(*this, "maincpu"),
-		m_custom(*this, "custom"),
+		m_apu(*this, "apu"),
 		m_region_maincpu(*this, "maincpu"),
 		m_rambank(*this, "cgb_ram"),
 		m_inputs(*this, "INPUTS"),
 		m_bios_hack(*this, "SKIP_CHECK"),
 		m_ram(*this, RAM_TAG),
-		m_lcd(*this, "lcd") { }
+		m_ppu(*this, "ppu") { }
 
-	//gb_state driver_data;
-	UINT8       m_gb_io[0x10];
+	uint8_t       m_gb_io[0x10];
 
 	/* Timer related */
-	UINT16      m_divcount;
-	UINT8       m_shift;
-	UINT16      m_shift_cycles;
-	UINT8       m_triggering_irq;
-	UINT8       m_reloading;
+	uint16_t      m_divcount;
+	uint8_t       m_shift;
+	uint16_t      m_shift_cycles;
+	uint8_t       m_triggering_irq;
+	uint8_t       m_reloading;
 
 	/* Serial I/O related */
-	UINT32      m_sio_count;             /* Serial I/O counter */
-	emu_timer   *m_gb_serial_timer;
+	uint16_t      m_internal_serial_clock;
+	uint16_t      m_internal_serial_frequency;
+	uint32_t      m_sio_count;             /* Serial I/O counter */
 
 	/* SGB variables */
-	INT8 m_sgb_packets;
-	UINT8 m_sgb_bitcount;
-	UINT8 m_sgb_bytecount;
-	UINT8 m_sgb_start;
-	UINT8 m_sgb_rest;
-	UINT8 m_sgb_controller_no;
-	UINT8 m_sgb_controller_mode;
-	UINT8 m_sgb_data[0x100];
+	int8_t m_sgb_packets;
+	uint8_t m_sgb_bitcount;
+	uint8_t m_sgb_bytecount;
+	uint8_t m_sgb_start;
+	uint8_t m_sgb_rest;
+	uint8_t m_sgb_controller_no;
+	uint8_t m_sgb_controller_mode;
+	uint8_t m_sgb_data[0x100];
 
 	/* CGB variables */
-	UINT8       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
-	UINT8       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
+	uint8_t       *m_gbc_rammap[8];           /* (CGB) Addresses of internal RAM banks */
+	uint8_t       m_gbc_rambank;          /* (CGB) Current CGB RAM bank */
 
-	int m_bios_disable;
+	bool m_bios_disable;
 
 	DECLARE_WRITE8_MEMBER(gb_io_w);
 	DECLARE_WRITE8_MEMBER(gb_io2_w);
@@ -94,6 +67,7 @@ public:
 	DECLARE_READ8_MEMBER(gb_ie_r);
 	DECLARE_WRITE8_MEMBER(gb_ie_w);
 	DECLARE_READ8_MEMBER(gb_io_r);
+	DECLARE_WRITE8_MEMBER(gbc_io_w);
 	DECLARE_WRITE8_MEMBER(gbc_io2_w);
 	DECLARE_READ8_MEMBER(gbc_io2_r);
 	DECLARE_PALETTE_INIT(gb);
@@ -104,7 +78,6 @@ public:
 	DECLARE_MACHINE_START(gbc);
 	DECLARE_MACHINE_RESET(gbc);
 	DECLARE_PALETTE_INIT(gbc);
-	TIMER_CALLBACK_MEMBER(gb_serial_timer_proc);
 	DECLARE_WRITE8_MEMBER(gb_timer_callback);
 
 	DECLARE_READ8_MEMBER(gb_cart_r);
@@ -117,19 +90,26 @@ public:
 	optional_device<gb_cart_slot_device> m_cartslot;
 
 protected:
+	enum {
+		SIO_ENABLED = 0x80,
+		SIO_FAST_CLOCK = 0x02,
+		SIO_INTERNAL_CLOCK = 0x01
+	};
+
 	required_device<lr35902_cpu_device> m_maincpu;
-	required_device<gameboy_sound_device> m_custom;
+	required_device<gameboy_sound_device> m_apu;
 	required_memory_region m_region_maincpu;
 	optional_memory_bank m_rambank;   // cgb
 	required_ioport m_inputs;
 	required_ioport m_bios_hack;
 	optional_device<ram_device> m_ram;
-	required_device<gb_lcd_device> m_lcd;
+	required_device<dmg_ppu_device> m_ppu;
 
 	void gb_timer_increment();
 	void gb_timer_check_irq();
 	void gb_init();
 	void gb_init_regs();
+	void gb_serial_timer_tick();
 
 	void save_gb_base();
 	void save_gbc_only();

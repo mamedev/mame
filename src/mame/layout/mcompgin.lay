@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.046" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="100" top="0" bottom="100" />
+
+		<bezel name="0.0" element="led"><bounds x="1" y="1" width="1" height="1" /></bezel>
+
+	</view>
+</mamelayout>

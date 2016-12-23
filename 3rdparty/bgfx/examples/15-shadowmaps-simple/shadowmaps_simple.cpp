@@ -91,6 +91,13 @@ int _main_(int _argc, char** _argv)
 	bgfx::UniformHandle u_shadowMap = bgfx::createUniform("u_shadowMap", bgfx::UniformType::Int1);
 	bgfx::UniformHandle u_lightPos  = bgfx::createUniform("u_lightPos",  bgfx::UniformType::Vec4);
 	bgfx::UniformHandle u_lightMtx  = bgfx::createUniform("u_lightMtx",  bgfx::UniformType::Mat4);
+	// When using GL clip space depth range [-1, 1] and packing depth into color buffer, we need to
+	// adjust the depth range to be [0, 1] for writing to the color buffer
+	bgfx::UniformHandle u_depthScaleOffset = bgfx::createUniform("u_depthScaleOffset",  bgfx::UniformType::Vec4);
+	const float depthScale = flipV ? 0.5f : 1.0f;
+	const float depthOffset = flipV ? 0.5f : 0.0f;
+	float depthScaleOffset[4] = {depthScale, depthOffset, 0.0f, 0.0f};
+	bgfx::setUniform(u_depthScaleOffset, depthScaleOffset);
 
 	// Vertex declarations.
 	bgfx::VertexDecl PosNormalDecl;
@@ -133,7 +140,7 @@ int _main_(int _argc, char** _argv)
 		progShadow = loadProgram("vs_sms_shadow", "fs_sms_shadow");
 		progMesh   = loadProgram("vs_sms_mesh",   "fs_sms_mesh");
 
-		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
+		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT | BGFX_TEXTURE_COMPARE_LEQUAL);
 		bgfx::TextureHandle fbtextures[] = { shadowMapTexture };
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -144,11 +151,11 @@ int _main_(int _argc, char** _argv)
 		progShadow = loadProgram("vs_sms_shadow_pd", "fs_sms_shadow_pd");
 		progMesh   = loadProgram("vs_sms_mesh",      "fs_sms_mesh_pd");
 
-		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
+		shadowMapTexture = bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT);
 		bgfx::TextureHandle fbtextures[] =
 		{
 			shadowMapTexture,
-			bgfx::createTexture2D(shadowMapSize, shadowMapSize, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_BUFFER_ONLY),
+			bgfx::createTexture2D(shadowMapSize, shadowMapSize, false, 1, bgfx::TextureFormat::D16, BGFX_TEXTURE_RT_WRITE_ONLY),
 		};
 		shadowMapFB = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -274,7 +281,7 @@ int _main_(int _argc, char** _argv)
 		bx::mtxLookAt(lightView, eye, at);
 
 		const float area = 30.0f;
-		bx::mtxOrtho(lightProj, -area, area, -area, area, -100.0f, 100.0f);
+		bx::mtxOrtho(lightProj, -area, area, -area, area, -100.0f, 100.0f, 0.0f, flipV);
 
 		bgfx::setViewRect(RENDER_SHADOW_PASS_ID, 0, 0, shadowMapSize, shadowMapSize);
 		bgfx::setViewFrameBuffer(RENDER_SHADOW_PASS_ID, shadowMapFB);
@@ -303,8 +310,8 @@ int _main_(int _argc, char** _argv)
 		{
 			0.5f, 0.0f, 0.0f, 0.0f,
 			0.0f,   sy, 0.0f, 0.0f,
-			0.0f, 0.0f, 0.5f, 0.0f,
-			0.5f, 0.5f, 0.5f, 1.0f,
+			0.0f, 0.0f, depthScale, 0.0f,
+			0.5f, 0.5f, depthOffset, 1.0f,
 		};
 
 		float mtxTmp[16];
@@ -378,6 +385,7 @@ int _main_(int _argc, char** _argv)
 	bgfx::destroyUniform(u_shadowMap);
 	bgfx::destroyUniform(u_lightPos);
 	bgfx::destroyUniform(u_lightMtx);
+	bgfx::destroyUniform(u_depthScaleOffset);
 
 	// Shutdown bgfx.
 	bgfx::shutdown();

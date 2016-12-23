@@ -114,7 +114,7 @@ enum
 	ppu2c0x_device::set_color_base(*device, _color);
 
 #define MCFG_PPU2C0X_SET_NMI(_class, _method) \
-	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, NULL, (_class *)0));
+	ppu2c0x_device::set_nmi_delegate(*device, ppu2c0x_nmi_delegate(&_class::_method, #_class "::" #_method, nullptr, (_class *)nullptr));
 
 #define MCFG_PPU2C0X_IGNORE_SPRITE_WRITE_LIMIT \
 	ppu2c0x_device::use_sprite_write_limitation_disable(*device);
@@ -137,7 +137,7 @@ class ppu2c0x_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	ppu2c0x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
@@ -160,12 +160,12 @@ public:
 	void init_palette( palette_device &palette, int first_entry );
 	void init_palette_rgb( palette_device &palette, int first_entry );
 
-	void draw_background( UINT8 *line_priority );
-	void draw_sprites( UINT8 *line_priority );
+	void draw_background( uint8_t *line_priority );
+	void draw_sprites( uint8_t *line_priority );
 	void render_scanline();
 	void update_scanline();
 
-	void spriteram_dma(address_space &space, const UINT8 page );
+	void spriteram_dma(address_space &space, const uint8_t page );
 	void render( bitmap_ind16 &bitmap, int flipx, int flipy, int sx, int sy );
 	int get_pixel( int x, int y );
 
@@ -189,7 +189,7 @@ public:
 	required_device<cpu_device> m_cpu;
 
 	std::unique_ptr<bitmap_ind16>                m_bitmap;          /* target bitmap */
-	std::unique_ptr<UINT8[]>    m_spriteram;           /* sprite ram */
+	std::unique_ptr<uint8_t[]>    m_spriteram;           /* sprite ram */
 	std::unique_ptr<pen_t[]>    m_colortable;          /* color table modified at run time */
 	std::unique_ptr<pen_t[]>    m_colortable_mono;     /* monochromatic color table modified at run time */
 	int                         m_scanline;         /* scanline count */
@@ -210,11 +210,11 @@ public:
 	int                         m_sprite_page;          /* current sprite page */
 	int                         m_back_color;           /* background color */
 	int                         m_color_base;
-	UINT8                       m_palette_ram[0x20];        /* shouldn't be in main memory! */
+	uint8_t                       m_palette_ram[0x20];        /* shouldn't be in main memory! */
 	int                         m_scan_scale;           /* scan scale */
 	int                         m_scanlines_per_frame;  /* number of scanlines per frame */
 	int                         m_security_value;       /* 2C05 protection */
-	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visibile tiles */
+	int                         m_tilecount;            /* MMC5 can change attributes to subsets of the 34 visible tiles */
 	int                         m_draw_phase;           /* MMC5 uses different regs for BG and OAM */
 	ppu2c0x_latch_delegate      m_latch;
 
@@ -236,49 +236,49 @@ private:
 	static const device_timer_id TIMER_NMI = 1;
 	static const device_timer_id TIMER_SCANLINE = 2;
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 
 };
 
 class ppu2c02_device : public ppu2c0x_device {
 public:
-	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c03b_device : public ppu2c0x_device {
 public:
-	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c03b_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c04_device : public ppu2c0x_device {
 public:
-	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c07_device : public ppu2c0x_device {
 public:
-	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c07_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_01_device : public ppu2c0x_device {
 public:
-	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_02_device : public ppu2c0x_device {
 public:
-	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_02_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_03_device : public ppu2c0x_device {
 public:
-	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_03_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class ppu2c05_04_device : public ppu2c0x_device {
 public:
-	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ppu2c05_04_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

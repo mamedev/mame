@@ -1,0 +1,187 @@
+<?xml version="1.0"?>
+
+<mamelayout version="2">
+	<element name="bluelamp" defstate="0">
+		<rect state="1">
+			<color red="0.2" green="0.2" blue="1.0" />
+		</rect>
+		<rect state="0">
+			<color red="0.04" green="0.04" blue="0.20" />
+		</rect>
+	</element>
+
+  <element name="stop1" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="HOLD 1">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+
+	<text string="STOP 1">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.35" width="1" height="0.25" />
+	</text>
+
+	<text string="TAKE">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.65" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <element name="stop2" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="HOLD 2">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+
+	<text string="STOP 2">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.35" width="1" height="0.25" />
+	</text>
+
+	<text string="BIG">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.65" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <element name="stop3" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="HOLD 3">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+
+	<text string="STOP 3">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.35" width="1" height="0.25" />
+	</text>
+
+	<text string="SMALL">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.65" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <element name="hold4" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="HOLD 4">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+
+	<text string="DOUBLE">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.65" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <element name="hold5" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="HOLD 5">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+
+	<text string="BET">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.65" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <element name="start1" defstate="0">
+	<rect state="1">
+	  <color red="0.2" green="0.2" blue="1.0" />
+	</rect>
+	<rect state="0">
+	  <color red="0.04" green="0.04" blue="0.20" />
+	</rect>
+
+	<text string="START">
+	  <color red="1.0" green="0.0" blue="0.0" />
+	  <bounds x="0" y="0.05" width="1" height="0.25" />
+	</text>
+  </element>
+
+  <view name="Simple Artwork">
+		<bounds left="0" right="400" top="0" bottom="330" />
+		<screen index="0">
+			<bounds left="0" right="400" top="0" bottom="300" />
+		</screen>
+
+	<!-- PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) (port IN1) -->
+	<bezel name="lamp1" element="start1" inputtag="IN1" inputmask="0x40">
+			<bounds x="10" y="312" width="16" height="16" />
+		</bezel>
+
+	<!-- PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1, Take, Odds, Stop 1") -->
+	<bezel name="lamp5" element="stop1" inputtag="IN0" inputmask="0x10">
+	  <bounds x="30" y="312" width="16" height="16" />
+	</bezel>
+
+	<!-- PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2, Big, Stop 2") -->
+	<bezel name="lamp3" element="stop2" inputtag="IN0" inputmask="0x80">
+	  <bounds x="50" y="312" width="16" height="16" />
+	</bezel>
+
+	<!-- PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3, Small, Stop 3") -->
+	<bezel name="lamp2" element="stop3" inputtag="IN0" inputmask="0x40">
+	  <bounds x="70" y="312" width="16" height="16" />
+	</bezel>
+
+	<!-- PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4, Double") -->
+	<bezel name="lamp4" element="hold4" inputtag="IN0" inputmask="0x20">
+	  <bounds x="90" y="312" width="16" height="16" />
+	</bezel>
+
+	<!-- PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5, Bet") -->
+	<bezel name="lamp0" element="hold5" inputtag="IN0" inputmask="0x01" >
+	  <bounds x="110" y="312" width="16" height="16" />
+	</bezel>
+
+	<!-- gets set when displaying a hand in poker, doesn't seem button related -->
+		<!--
+	<bezel name="lamp6" element="bluelamp">
+		    <bounds x="130" y="312" width="16" height="16" />
+		</bezel>
+	-->
+
+	<!-- always set, maybe cabinet marquee or just global enable? -->
+		<!--
+	<bezel name="lamp7" element="bluelamp">
+		    <bounds x="150" y="312" width="16" height="16" />
+		</bezel>
+	-->
+	</view>
+</mamelayout>

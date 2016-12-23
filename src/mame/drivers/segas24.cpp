@@ -336,15 +336,14 @@ Notes:
 */
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "sound/ym2151.h"
-#include "sound/dac.h"
-#include "sound/2151intf.h"
-#include "machine/fd1094.h"
-#include "machine/nvram.h"
-#include "video/segaic24.h"
 #include "includes/segas24.h"
 #include "includes/segaipt.h"
+#include "cpu/m68000/m68000.h"
+#include "machine/fd1094.h"
+#include "machine/nvram.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2151.h"
+#include "video/segaic24.h"
 
 #define MASTER_CLOCK        XTAL_20MHz
 #define VIDEO_CLOCK         XTAL_32MHz
@@ -353,6 +352,9 @@ Notes:
 /* TODO: understand why divisors doesn't match at all with the reference */
 #define FRC_CLOCK_MODE0     (MASTER_CLOCK/2)/24 // /16 according to Charles
 #define FRC_CLOCK_MODE1     (MASTER_CLOCK/2)/1536 // /1024 according to Charles, but /1536 sounds better
+
+#define FDC_LEGACY_LOG      0
+#define FDC_LOG(x) do { if (FDC_LEGACY_LOG) logerror x; } while (0)
 
 enum {
 	IRQ_YM2151 = 1,
@@ -394,18 +396,18 @@ READ16_MEMBER( segas24_state::fdc_r )
 		int res = fdc_data;
 		if(fdc_drq) {
 			fdc_span--;
-			// logerror("Read %02x (%d)\n", res, fdc_span);
+			// FDC_LOG(("Read %02x (%d)\n", res, fdc_span));
 			if(fdc_span) {
 				fdc_pt++;
 				fdc_data = *fdc_pt;
 			} else {
-				logerror("FDC: transfert complete\n");
+				FDC_LOG(("FDC: transfert complete\n"));
 				fdc_drq = 0;
 				fdc_status = 0;
 				fdc_irq = 1;
 			}
 		} else
-			logerror("FDC: data read with drq down\n");
+			FDC_LOG(("FDC: data read with drq down\n"));
 		return res;
 	}
 	}
@@ -423,19 +425,19 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 			fdc_irq = 0;
 			switch(data >> 4) {
 			case 0x0:
-				logerror("FDC: Restore\n");
+				FDC_LOG(("FDC: Restore\n"));
 				fdc_phys_track = fdc_track = 0;
 				fdc_irq = 1;
 				fdc_status = 4;
 				break;
 			case 0x1:
-				logerror("FDC: Seek %d\n", fdc_data);
+				FDC_LOG(("FDC: Seek %d\n", fdc_data));
 				fdc_phys_track = fdc_track = fdc_data;
 				fdc_irq = 1;
 				fdc_status = fdc_track ? 0 : 4;
 				break;
 			case 0x9:
-				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
+				FDC_LOG(("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
 				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
@@ -443,14 +445,14 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				fdc_data = *fdc_pt;
 				break;
 			case 0xb:
-				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
+				FDC_LOG(("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track));
 				fdc_pt = memregion("floppy")->base() + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
 				break;
 			case 0xd:
-				logerror("FDC: Forced interrupt\n");
+				FDC_LOG(("FDC: Forced interrupt\n"));
 				fdc_span = 0;
 				fdc_drq = 0;
 				fdc_irq = data & 1;
@@ -458,38 +460,38 @@ WRITE16_MEMBER( segas24_state::fdc_w )
 				break;
 			case 0xf:
 				if(data == 0xfe)
-					logerror("FDC: Assign mode %02x\n", fdc_data);
+					FDC_LOG(("FDC: Assign mode %02x\n", fdc_data));
 				else if(data == 0xfd)
-					logerror("FDC: Assign parameter %02x\n", fdc_data);
+					FDC_LOG(("FDC: Assign parameter %02x\n", fdc_data));
 				else
-					logerror("FDC: Unknown command %02x\n", data);
+					FDC_LOG(("FDC: Unknown command %02x\n", data));
 				break;
 			default:
-				logerror("FDC: Unknown command %02x\n", data);
+				FDC_LOG(("FDC: Unknown command %02x\n", data));
 				break;
 			}
 			break;
 		case 1:
-			logerror("FDC: Track register %02x\n", data);
+			FDC_LOG(("FDC: Track register %02x\n", data));
 			fdc_track = data;
 			break;
 		case 2:
-			logerror("FDC: Sector register %02x\n", data);
+			FDC_LOG(("FDC: Sector register %02x\n", data));
 			fdc_sector = data;
 			break;
 		case 3:
 			if(fdc_drq) {
-				//              logerror("Write %02x (%d)\n", data, fdc_span);
+				//              FDC_LOG("Write %02x (%d)\n", data, fdc_span);
 				*fdc_pt++ = data;
 				fdc_span--;
 				if(!fdc_span) {
-					logerror("FDC: transfert complete\n");
+					FDC_LOG(("FDC: transfert complete\n"));
 					fdc_drq = 0;
 					fdc_status = 0;
 					fdc_irq = 1;
 				}
 			} else
-				logerror("FDC: Data register %02x\n", data);
+				FDC_LOG(("FDC: Data register %02x\n", data));
 			fdc_data = data;
 			break;
 		}
@@ -507,57 +509,60 @@ READ16_MEMBER( segas24_state::fdc_status_r )
 WRITE16_MEMBER( segas24_state::fdc_ctrl_w )
 {
 	if(ACCESSING_BITS_0_7)
-		logerror("FDC control %02x\n", data & 0xff);
+		FDC_LOG(("FDC control %02x\n", data & 0xff));
 }
 
 
 // I/O Mappers
 
-UINT8 segas24_state::hotrod_io_r(UINT8 port)
+uint8_t segas24_state::hotrod_io_r(uint8_t port)
 {
 	switch(port)
 	{
 	case 0:
-		return ioport("P1")->read();
+		return m_p1->read();
 	case 1:
-		return ioport("P2")->read();
+		return m_p2->read();
 	case 2:
-		return read_safe(ioport("P3"), 0xff);
+		return m_p3.read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
 	return 0x00;
 }
 
-UINT8 segas24_state::dcclub_io_r(UINT8 port)
+uint8_t segas24_state::dcclub_io_r(uint8_t port)
 {
 	switch(port)
 	{
 	case 0:
 	{
-		static const UINT8 pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9 };
-		return (ioport("P1")->read() & 0xf) | ((~pos[ioport("PADDLE")->read()>>4]<<4) & 0xf0);
+		static const uint8_t pos[16] = { 0, 1, 3, 2, 6, 4, 12, 8, 9, 0, 0, 0 };
+		return (m_p1->read() & 0xf) | ((~pos[m_paddle->read()>>4]<<4) & 0xf0);
 	}
 	case 1:
-		return ioport("P2")->read();
+		return m_p2->read();
 	case 2:
-		return 0xff;
+	{
+		static const uint8_t pos[16] = { 0, 0, 0, 0, 0, 0,  0, 0, 0, 1, 3, 2 };
+		return(~pos[m_paddle->read()>>4] & 0x03) | 0xfc;
+	}
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
@@ -565,10 +570,8 @@ UINT8 segas24_state::dcclub_io_r(UINT8 port)
 }
 
 
-UINT8 segas24_state::mahmajn_io_r(UINT8 port)
+uint8_t segas24_state::mahmajn_io_r(uint8_t port)
 {
-	static const char *const keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
-
 	switch(port)
 	{
 	case 0:
@@ -576,22 +579,22 @@ UINT8 segas24_state::mahmajn_io_r(UINT8 port)
 	case 1:
 		return 0xff;
 	case 2:
-		return ioport(keynames[cur_input_line])->read();
+		return m_mj_inputs[cur_input_line].read_safe(0xff);
 	case 3:
 		return 0xff;
 	case 4:
-		return ioport("SERVICE")->read();
+		return m_service->read();
 	case 5: // Dip switches
-		return ioport("COINAGE")->read();
+		return m_coinage->read();
 	case 6:
-		return ioport("DSW")->read();
+		return m_dsw->read();
 	case 7: // DAC
 		return 0xff;
 	}
 	return 0x00;
 }
 
-void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
+void segas24_state::mahmajn_io_w(uint8_t port, uint8_t data)
 {
 	switch(port)
 	{
@@ -600,21 +603,21 @@ void segas24_state::mahmajn_io_w(UINT8 port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
 	}
 }
 
-void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
+void segas24_state::hotrod_io_w(uint8_t port, uint8_t data)
 {
 	switch(port)
 	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		m_dac->write_signed8(data);
+		m_dac->write(data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -624,12 +627,10 @@ void segas24_state::hotrod_io_w(UINT8 port, UINT8 data)
 
 WRITE16_MEMBER( segas24_state::hotrod3_ctrl_w )
 {
-	static const char *const portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
-
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = read_safe(ioport(portnames[data]), 0);
+		hotrod_ctrl_cur = m_pedals[data].read_safe(0);
 	}
 }
 
@@ -641,21 +642,21 @@ READ16_MEMBER( segas24_state::hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return read_safe(ioport("DIAL1"), 0) & 0xff;
+				return m_dials[0].read_safe(0) & 0xff;
 			case 1:
-				return read_safe(ioport("DIAL1"), 0) >> 8;
+				return m_dials[0].read_safe(0) >> 8;
 			case 2:
-				return read_safe(ioport("DIAL2"), 0) & 0xff;
+				return m_dials[1].read_safe(0) & 0xff;
 			case 3:
-				return read_safe(ioport("DIAL2"), 0) >> 8;
+				return m_dials[1].read_safe(0) >> 8;
 			case 4:
-				return read_safe(ioport("DIAL3"), 0) & 0xff;
+				return m_dials[2].read_safe(0) & 0xff;
 			case 5:
-				return read_safe(ioport("DIAL3"), 0) >> 8;
+				return m_dials[2].read_safe(0) >> 8;
 			case 6:
-				return read_safe(ioport("DIAL4"), 0) & 0xff;
+				return m_dials[3].read_safe(0) & 0xff;
 			case 7:
-				return read_safe(ioport("DIAL4"), 0) >> 8;
+				return m_dials[3].read_safe(0) >> 8;
 
 			case 8:
 			{
@@ -680,6 +681,64 @@ WRITE16_MEMBER( segas24_state::iod_w )
 	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
+/* HACK for Gain Ground to avoid 'forced free play' issue
+
+Notes from Olivier
+
+The encrypted CPU does:
+
+849c:  moveq #-1, d1
+849e:  move.w 0xa00000, d0
+84a4:  cmp.w 0xa00000, d0
+84aa:  beq.s 84a4
+84ac:  add.w #0x200, d0
+84b0:  andi.w #0xfff, d0
+84b4:  cmp.w 0xa00000, d0 // 16 cycles
+84ba:  dbeq d1, 84b4      // 10 cycles
+84be:  addi.w #0x1b5f, d1
+84c2:  bpl 84c8
+84c4:  st 0x404           // Force freeplay
+84c8:  ...
+
+
+a00000 is the timer 12bit counter.  It is configured to be clocked by
+the hsync pulse.  That code counts how many loops it takes for the
+counter to count 512 times.  The force freeplay happens if the count
+is more than 7007.
+
+Pixel clock is 16MHz, hsync is every 656 pixels, cpu clock is 10MHz.
+So that's 656*10/16=410 cpu clocks per hsync, or 410*512=209902 total.
+With 26 cycles per loop, that's 8073 loops.  Freeplay it is.
+
+--- Update from Charles MacDonald ---
+
+I ran some tests. For the two CPUs, A (68000) and B (FD1094), normally
+there are no wait states when CPU A accesses $A00000. As that address
+is on CPU A's bus, CPU B's accesses to it take twice as long (eight 10 MHz
+clocks instead of four) due to contention. The only exception is when
+CPU A is completely idle from a STOP instruction, at which point CPU B
+can access that memory at full speed (four clocks per access).
+
+Assuming Gain Ground has CPU A running code out of BIOS ROM or work RAM,
+and CPU B is running out of work RAM, then each one of those $A00000
+accesses will eat up double the time.
+
+The other factor is DRAM refresh for the work RAM, both CPUs have some
+memory access stretched out by four cycles every 19 to 20 ms. It looks
+like both DRAM banks are refreshed in parallel which seems to explain
+why refresh on CPU A's bus doesn't count as contention for CPU B and
+vice-versa. So there's only refresh event that eats up time for both
+CPUs to worry about.
+
+
+
+*/
+
+TIMER_CALLBACK_MEMBER(segas24_state::gground_hack_timer_callback)
+{
+	m_subcpu->set_clock_scale(1.0f);
+}
+
 
 // Cpu #1 reset control
 
@@ -691,8 +750,13 @@ void segas24_state::reset_reset()
 		if(resetcontrol & 2) {
 			m_subcpu->set_input_line(INPUT_LINE_HALT, CLEAR_LINE);
 			m_subcpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
-//          osd_printf_debug("enable 2nd cpu!\n");
-//          debugger_break(machine);
+			//osd_printf_debug("enable 2nd cpu!\n");
+			//machine().debug_break();
+			if (m_gground_hack_timer)
+			{
+				m_subcpu->set_clock_scale(0.7f); // reduce clock speed temporarily so a check passes, see notes above
+				m_gground_hack_timer->adjust(attotime::from_seconds(2));
+			}
 
 		} else
 			m_subcpu->set_input_line(INPUT_LINE_HALT, ASSERT_LINE);
@@ -702,7 +766,7 @@ void segas24_state::reset_reset()
 	prev_resetcontrol = resetcontrol;
 }
 
-void segas24_state::reset_control_w(UINT8 data)
+void segas24_state::reset_control_w(uint8_t data)
 {
 	resetcontrol = data;
 	reset_reset();
@@ -714,7 +778,7 @@ void segas24_state::reset_control_w(UINT8 data)
 
 void segas24_state::reset_bank()
 {
-	if (m_romboard != NULL)
+	if (m_romboard != nullptr)
 	{
 		membank("bank1")->set_entry(curbank & 15);
 		membank("bank2")->set_entry(curbank & 15);
@@ -748,7 +812,7 @@ WRITE8_MEMBER( segas24_state::frc_mode_w )
 
 READ8_MEMBER( segas24_state::frc_r )
 {
-	INT32 result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
+	int32_t result = (frc_cnt_timer->time_elapsed() * (frc_mode ? FRC_CLOCK_MODE1 : FRC_CLOCK_MODE0)).as_double();
 
 	result %= ((frc_mode) ? 0x67 : 0x100);
 
@@ -765,13 +829,13 @@ WRITE8_MEMBER( segas24_state::frc_w )
 
 // Protection magic latch
 
-const UINT8  segas24_state::mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
-const UINT8 segas24_state::mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
-const UINT8      segas24_state::qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
-const UINT8 segas24_state::bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
-const UINT8   segas24_state::qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
-const UINT8 segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
-const UINT8   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
+const uint8_t  segas24_state::mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
+const uint8_t segas24_state::mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
+const uint8_t      segas24_state::qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
+const uint8_t segas24_state::bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
+const uint8_t   segas24_state::qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
+const uint8_t segas24_state::quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
+const uint8_t   segas24_state::dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 
 READ16_MEMBER( segas24_state::mlatch_r )
@@ -783,7 +847,7 @@ WRITE16_MEMBER( segas24_state::mlatch_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		int i;
-		UINT8 mxor = 0;
+		uint8_t mxor = 0;
 		if(!mlatch_table) {
 			logerror("Protection: magic latch accessed but no table loaded (%s:%x)\n", space.device().tag(), space.device().safe_pc());
 			return;
@@ -932,7 +996,7 @@ WRITE16_MEMBER(segas24_state::irq_w)
 	}
 	case 1:
 		if(ACCESSING_BITS_0_7) {
-			UINT8 old_tmode = irq_tmode;
+			uint8_t old_tmode = irq_tmode;
 			irq_timer_sync();
 			irq_tmode = data & 3;
 			irq_timer_start(old_tmode);
@@ -1263,9 +1327,9 @@ void segas24_state::machine_start()
 	if (track_size)
 		machine().device<nvram_device>("floppy_nvram")->set_base(memregion("floppy")->base(), 2*track_size);
 
-	if (m_romboard != NULL)
+	if (m_romboard != nullptr)
 	{
-		UINT8 *usr1 = m_romboard->base();
+		uint8_t *usr1 = m_romboard->base();
 		membank("bank1")->configure_entries(0, 16, usr1, 0x40000);
 		membank("bank2")->configure_entries(0, 16, usr1, 0x40000);
 	}
@@ -1602,6 +1666,30 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_DIPNAME( 0x0100, 0x0100, "DSWA" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Start Credit" ) PORT_DIPLOCATION("SW2:1")
@@ -1629,7 +1717,7 @@ static INPUT_PORTS_START( dcclub ) /* In the Japan set missing angle input */
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
 	PORT_START("PADDLE")
-	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0x8f) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
+	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0x00,0xbf) PORT_SENSITIVITY(64) PORT_KEYDELTA(64) PORT_PLAYER(1)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sgmast )
@@ -1934,9 +2022,7 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_TIMER_ADD_NONE("frc_timer")
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("irq_frc", segas24_state, irq_frc_cb, attotime::from_hz(FRC_CLOCK_MODE1))
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_S24TILE_DEVICE_ADD("tile", 0xfff)
-	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
 	MCFG_S24SPRITE_DEVICE_ADD("sprite")
 	MCFG_S24MIXER_DEVICE_ADD("mixer")
@@ -1956,9 +2042,9 @@ static MACHINE_CONFIG_START( system24, segas24_state )
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.5) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
@@ -2452,6 +2538,8 @@ DRIVER_INIT_MEMBER(segas24_state,gground)
 	io_w = &segas24_state::hotrod_io_w;
 	mlatch_table = nullptr;
 	track_size = 0x2d00;
+
+	m_gground_hack_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(segas24_state::gground_hack_timer_callback), this));
 }
 
 DRIVER_INIT_MEMBER(segas24_state,crkdown)

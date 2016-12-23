@@ -16,7 +16,7 @@
 
 static FLOPPY_IDENTIFY(vz_identify)
 {
-	UINT64 size = floppy_image_size(floppy);
+	uint64_t size = floppy_image_size(floppy);
 	*vote = ((size == 98560) || (size == 99200) || (size == 99184)) ? 100 : 0;
 	return FLOPPY_ERROR_SUCCESS;
 }
@@ -28,11 +28,11 @@ static FLOPPY_CONSTRUCT(vz_construct)
 
 	if (params)
 	{
-		geometry.heads           = option_resolution_lookup_int(params, PARAM_HEADS);
-		geometry.tracks          = option_resolution_lookup_int(params, PARAM_TRACKS);
-		geometry.sectors         = option_resolution_lookup_int(params, PARAM_SECTORS);
-		geometry.first_sector_id = option_resolution_lookup_int(params, PARAM_FIRST_SECTOR_ID);
-		geometry.sector_length   = option_resolution_lookup_int(params, PARAM_SECTOR_LENGTH);
+		geometry.heads           = params->lookup_int(PARAM_HEADS);
+		geometry.tracks          = params->lookup_int(PARAM_TRACKS);
+		geometry.sectors         = params->lookup_int(PARAM_SECTORS);
+		geometry.first_sector_id = params->lookup_int(PARAM_FIRST_SECTOR_ID);
+		geometry.sector_length   = params->lookup_int(PARAM_SECTOR_LENGTH);
 	}
 	else
 	{

@@ -5,16 +5,11 @@ defines {
 	"OSD_WINDOWS",
 }
 
-configuration { "mingw*-gcc or vs*" }
+configuration { "mingw* or vs*" }
 	defines {
 		"UNICODE",
 		"_UNICODE",
 		"main=utf8_main",
-	}
-
-configuration { "Debug" }
-	defines {
-		"MALLOC_DEBUG",
 	}
 
 configuration { "vs*" }
@@ -50,7 +45,7 @@ end
 
 if _OPTIONS["USE_SDL"]=="1" then
 	defines {
-		"SDLMAME_SDL2=0",
+		"SDLMAME_SDL2=1",
 		"USE_XINPUT=0",
 		"USE_SDL=1",
 		"USE_SDL_SOUND",

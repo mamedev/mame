@@ -83,6 +83,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/samples.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/gridlee.h"
 
 
@@ -168,7 +169,7 @@ void gridlee_state::machine_reset()
 READ8_MEMBER(gridlee_state::analog_port_r)
 {
 	int delta, sign, magnitude;
-	UINT8 newval;
+	uint8_t newval;
 	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
@@ -219,11 +220,11 @@ READ8_MEMBER(gridlee_state::analog_port_r)
 
 void gridlee_state::poly17_init()
 {
-	UINT32 i, x = 0;
-	UINT8 *p, *r;
+	uint32_t i, x = 0;
+	uint8_t *p, *r;
 
 	/* allocate memory */
-	m_poly17 = std::make_unique<UINT8[]>(2 * (POLY17_SIZE + 1));
+	m_poly17 = std::make_unique<uint8_t[]>(2 * (POLY17_SIZE + 1));
 	p = m_poly17.get();
 	r = m_rand17 = m_poly17.get() + POLY17_SIZE + 1;
 
@@ -249,7 +250,7 @@ void gridlee_state::poly17_init()
 
 READ8_MEMBER(gridlee_state::random_num_r)
 {
-	UINT32 cc;
+	uint32_t cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
 	cc = m_maincpu->total_cycles();
@@ -305,7 +306,7 @@ static ADDRESS_MAP_START( cpu1_map, AS_PROGRAM, 8, gridlee_state )
 /*  { 0x9060, 0x9060, unknown - only written to at startup */
 	AM_RANGE(0x9070, 0x9070) AM_WRITE(gridlee_cocktail_flip_w)
 	AM_RANGE(0x9200, 0x9200) AM_WRITE(gridlee_palette_select_w)
-	AM_RANGE(0x9380, 0x9380) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x9380, 0x9380) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x9500, 0x9501) AM_READ(analog_port_r)
 	AM_RANGE(0x9502, 0x9502) AM_READ_PORT("IN0")
 	AM_RANGE(0x9503, 0x9503) AM_READ_PORT("IN1")
@@ -414,6 +415,8 @@ static MACHINE_CONFIG_START( gridlee, gridlee_state )
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

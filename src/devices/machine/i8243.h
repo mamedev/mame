@@ -41,7 +41,7 @@ class i8243_device :  public device_t
 {
 public:
 	// construction/destruction
-	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8243_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_handler(device_t &device, _Object object) { return downcast<i8243_device &>(device).m_readhandler.set_callback(object); }
@@ -61,11 +61,11 @@ protected:
 
 private:
 
-	UINT8       m_p[4];             /* 4 ports' worth of data */
-	UINT8       m_p2out;            /* port 2 bits that will be returned */
-	UINT8       m_p2;               /* most recent port 2 value */
-	UINT8       m_opcode;           /* latched opcode */
-	UINT8       m_prog;             /* previous PROG state */
+	uint8_t       m_p[4];             /* 4 ports' worth of data */
+	uint8_t       m_p2out;            /* port 2 bits that will be returned */
+	uint8_t       m_p2;               /* most recent port 2 value */
+	uint8_t       m_opcode;           /* latched opcode */
+	uint8_t       m_prog;             /* previous PROG state */
 
 	devcb_read8    m_readhandler;
 	devcb_write8   m_writehandler;

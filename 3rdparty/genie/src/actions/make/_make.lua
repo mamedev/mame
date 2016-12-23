@@ -132,13 +132,15 @@
 		shortname       = "GNU Make",
 		description     = "Generate GNU makefiles for POSIX, MinGW, and Cygwin",
 
-		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib" },
+		valid_kinds     = { "ConsoleApp", "WindowedApp", "StaticLib", "SharedLib", "Bundle" },
 
-		valid_languages = { "C", "C++", "C#" },
+		valid_languages = { "C", "C++", "C#", "Vala", "Swift" },
 
 		valid_tools     = {
 			cc     = { "gcc", "ghs" },
 			dotnet = { "mono", "msnet", "pnet" },
+			valac  = { "valac" },
+			swift  = { "swift" },
 		},
 
 		onsolution = function(sln)
@@ -149,8 +151,12 @@
 			local makefile = _MAKE.getmakefilename(prj, true)
 			if premake.isdotnetproject(prj) then
 				premake.generate(prj, makefile, premake.make_csharp)
-			else
+			elseif premake.iscppproject(prj) then
 				premake.generate(prj, makefile, premake.make_cpp)
+			elseif premake.isswiftproject(prj) then
+				premake.generate(prj, makefile, premake.make_swift)
+			else
+				premake.generate(prj, makefile, premake.make_vala)
 			end
 		end,
 

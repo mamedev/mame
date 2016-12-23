@@ -44,26 +44,26 @@ class fmscsi_device : public legacy_scsi_host_adapter
 {
 public:
 	// construction/destruction
-	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	fmscsi_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_irq_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_drq_handler(device_t &device, _Object object) { return downcast<fmscsi_device &>(device).m_drq_handler.set_callback(object); }
 
 	// any publically accessible interfaces needed for runtime
-	UINT8 fmscsi_data_r(void);
-	void fmscsi_data_w(UINT8 data);
-	UINT8 fmscsi_status_r(void);
-	void fmscsi_control_w(UINT8 data);
+	uint8_t fmscsi_data_r(void);
+	void fmscsi_data_w(uint8_t data);
+	uint8_t fmscsi_status_r(void);
+	void fmscsi_control_w(uint8_t data);
 	DECLARE_READ8_MEMBER( fmscsi_r );
 	DECLARE_WRITE8_MEMBER( fmscsi_w );
 
 	void set_phase(int phase);
 	int get_phase(void);
-	void set_input_line(UINT8 line, UINT8 state);
-	UINT8 get_input_line(UINT8 line);
-	void set_output_line(UINT8 line, UINT8 state);
-	UINT8 get_output_line(UINT8 line);
+	void set_input_line(uint8_t line, uint8_t state);
+	uint8_t get_input_line(uint8_t line);
+	void set_output_line(uint8_t line, uint8_t state);
+	uint8_t get_output_line(uint8_t line);
 
 protected:
 	// device-level overrides (none are required, but these are common)
@@ -76,24 +76,24 @@ private:
 	static const device_timer_id TIMER_TRANSFER = 0;
 	static const device_timer_id TIMER_PHASE = 1;
 
-	int get_scsi_cmd_len(UINT8 cbyte);
+	int get_scsi_cmd_len(uint8_t cbyte);
 	void stop_transfer();
 
 	devcb_write_line m_irq_handler;
 	devcb_write_line m_drq_handler;
 
-	UINT8 m_command[32];
-	//UINT8 m_result[32];
-	UINT8 m_command_index;
+	uint8_t m_command[32];
+	//uint8_t m_result[32];
+	uint8_t m_command_index;
 	int m_result_length;
-	UINT32 m_result_index;
-	UINT8 m_input_lines;
-	UINT8 m_output_lines;
-	UINT8 m_data;
-	UINT8 m_last_id;
-	UINT8 m_phase;
-	UINT8 m_target;
-	UINT8 m_buffer[512];
+	uint32_t m_result_index;
+	uint8_t m_input_lines;
+	uint8_t m_output_lines;
+	uint8_t m_data;
+	uint8_t m_last_id;
+	uint8_t m_phase;
+	uint8_t m_target;
+	uint8_t m_buffer[512];
 	emu_timer* m_transfer_timer;
 	emu_timer* m_phase_timer;
 };

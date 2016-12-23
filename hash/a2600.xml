@@ -6,6 +6,58 @@ Info from Atariage and Atarimania
 
 <softwarelist name="a2600" description="Atari 2600 cartridges">
 
+	<software name="adventp">
+		<description>Adventure +</description>
+		<year>2003</year>
+		<publisher>Homebrew</publisher>
+		<info name="programmer" value="Steve Engelhardt" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Adventure Plus.a26" size="4096" crc="0a25900b" sha1="cf0efc58ffc8ae2ac49d96177cc8b3e299e95160" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="elfadven">
+		<description>Elf Adventure (Prototype)</description>
+		<year>1983</year>
+		<publisher>Atari</publisher>
+		<info name="programmer" value="Warren Robinett" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="Elf Adventure.bin" size="4096" crc="91647218" sha1="93cf13c16d995c69c78085effb555f17105f8b01" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="ret2hh">
+		<description>Return to Haunted House (Flashback 2)</description>
+		<year>2005</year>
+		<publisher>Syzygy Company</publisher>
+		<info name="programmer" value="Curt Vensel" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="4096">
+				<rom name="ret2hh.bin" size="4096" crc="95d29756" sha1="70a5f2a6a21b970a60d531ca23ef20336a0058ff" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="advent2" supported="no">
+		<description>Adventure II (Flashback 2)</description>
+		<year>2005</year>
+		<publisher>Syzygy Company</publisher>
+		<info name="programmer" value="Curt Vensel" />
+		<sharedfeat name="compatibility" value="NTSC" />
+		<part name="cart" interface="a2600_cart">
+			<dataarea name="rom" size="8192">
+				<rom name="Adventure 2.a26" size="8192" crc="bfd846c5" sha1="48d3b94e41371dd7f41d96e1195c324913c228bd" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="2pakblac">
 		<description>2 Pak Special: Challenge + Surfing (PAL)</description>
 		<year>1990</year>

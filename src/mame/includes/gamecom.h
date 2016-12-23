@@ -175,12 +175,12 @@ struct GAMECOM_DMA
 	int state_count;
 	int state_pixel;
 	int state_limit;
-	UINT8 palette[4];
-	UINT8 *source_bank;
+	uint8_t palette[4];
+	uint8_t *source_bank;
 	unsigned int source_current;
 	unsigned int source_line;
 	unsigned int source_mask;
-	UINT8 *dest_bank;
+	uint8_t *dest_bank;
 	unsigned int dest_current;
 	unsigned int dest_line;
 	unsigned int dest_mask;
@@ -196,16 +196,16 @@ struct GAMECOM_TIMER
 
 struct gamecom_sound_t
 {
-	UINT8 sgc;
-	UINT8 sg0l;
-	UINT8 sg1l;
-	UINT8 sg2l;
-	UINT16 sg0t;
-	UINT16 sg1t;
-	UINT16 sg2t;
-	UINT8 sgda;
-	UINT8 sg0w[16];
-	UINT8 sg1w[16];
+	uint8_t sgc;
+	uint8_t sg0l;
+	uint8_t sg1l;
+	uint8_t sg2l;
+	uint16_t sg0t;
+	uint16_t sg1t;
+	uint16_t sg2t;
+	uint8_t sgda;
+	uint8_t sg0w[16];
+	uint8_t sg1w[16];
 };
 
 
@@ -218,6 +218,8 @@ public:
 		, m_p_nvram(*this,"nvram")
 		, m_maincpu(*this, "maincpu")
 		, m_dac(*this, "dac")
+		, m_dac0(*this, "dac0")
+		, m_dac1(*this, "dac1")
 		, m_cart1(*this, "cartslot1")
 		, m_cart2(*this, "cartslot2")
 		, m_bank1(*this, "bank1")
@@ -229,8 +231,9 @@ public:
 		, m_io_in0(*this, "IN0")
 		, m_io_in1(*this, "IN1")
 		, m_io_in2(*this, "IN2")
-		, m_io_grid(*this, "GRID")
-		{ }
+		, m_io_grid(*this, "GRID.%u", 0)
+	{
+	}
 
 	DECLARE_READ8_MEMBER( gamecom_internal_r );
 	DECLARE_READ8_MEMBER( gamecom_pio_r );
@@ -240,39 +243,47 @@ public:
 	DECLARE_PALETTE_INIT(gamecom);
 	INTERRUPT_GEN_MEMBER(gamecom_interrupt);
 	TIMER_CALLBACK_MEMBER(gamecom_clock_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_sound0_timer_callback);
+	TIMER_CALLBACK_MEMBER(gamecom_sound1_timer_callback);
 	TIMER_CALLBACK_MEMBER(gamecom_scanline);
 	DECLARE_WRITE8_MEMBER( gamecom_handle_dma );
 	DECLARE_WRITE8_MEMBER( gamecom_update_timers );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart1 );
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER( gamecom_cart2 );
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 private:
-	UINT8 *m_p_ram;
-	UINT8 *m_cart_ptr;
-	UINT8 m_lcdc_reg;
-	UINT8 m_lch_reg;
-	UINT8 m_lcv_reg;
-	UINT16 m_scanline;
-	UINT16 m_base_address;
+	uint8_t *m_p_ram;
+	uint8_t *m_cart_ptr;
+	uint8_t m_lcdc_reg;
+	uint8_t m_lch_reg;
+	uint8_t m_lcv_reg;
+	uint8_t m_sound0_cnt;
+	uint8_t m_sound1_cnt;
+	uint16_t m_scanline;
+	uint16_t m_base_address;
 	memory_region *m_cart1_rom;
 	memory_region *m_cart2_rom;
 	emu_timer *m_clock_timer;
+	emu_timer *m_sound0_timer;
+	emu_timer *m_sound1_timer;
 	emu_timer *m_scanline_timer;
 	GAMECOM_DMA m_dma;
 	GAMECOM_TIMER m_timer[2];
 	gamecom_sound_t m_sound;
 	bitmap_ind16 m_bitmap;
-	void gamecom_set_mmu(UINT8 mmu, UINT8 data);
+	void gamecom_set_mmu(uint8_t mmu, uint8_t data);
 	void handle_stylus_press(int column);
 	void recompute_lcd_params();
-	void handle_input_press(UINT16 mux_data);
-	int common_load(device_image_interface &image, generic_slot_device *slot);
+	void handle_input_press(uint16_t mux_data);
+	image_init_result common_load(device_image_interface &image, generic_slot_device *slot);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_nvram;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_nvram;
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_byte_interface> m_dac;
+	required_device<dac_byte_interface> m_dac0;
+	required_device<dac_byte_interface> m_dac1;
 	required_device<generic_slot_device> m_cart1;
 	required_device<generic_slot_device> m_cart2;
 	required_memory_bank m_bank1;

@@ -260,9 +260,9 @@ static INPUT_PORTS_START( btoads )
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, sound_to_main_r, NULL)
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, sound_to_main_r, nullptr)
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, main_to_sound_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, btoads_state, main_to_sound_r, nullptr)
 	PORT_BIT( 0xff7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SW1")
@@ -302,7 +302,7 @@ static MACHINE_CONFIG_START( btoads, btoads_state )
 
 	MCFG_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(VIDEO_CLOCK/2) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(1) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_RGB32_CB(btoads_state, scanline_update)     /* scanline updater (RGB32) */

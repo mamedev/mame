@@ -81,12 +81,12 @@ GFXDECODE_MEMBER( k05324x_device::gfxinfo_6bpp )
 GFXDECODE_END
 
 
-k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k05324x_device::k05324x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053244, "K053244 & 053245 Sprite Generator", tag, owner, clock, "k05324x", __FILE__),
 	device_gfx_interface(mconfig, *this, gfxinfo),
 	m_ram(nullptr),
 	m_buffer(nullptr),
-	m_sprite_rom(nullptr),
+	m_sprite_rom(*this, DEVICE_SELF),
 	m_dx(0),
 	m_dy(0),
 	m_rombank(0),
@@ -118,9 +118,6 @@ void k05324x_device::set_bpp(device_t &device, int bpp)
 
 void k05324x_device::device_start()
 {
-	m_sprite_rom = region()->base();
-	m_sprite_size = region()->bytes();
-
 	/* decode the graphics */
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
@@ -131,8 +128,8 @@ void k05324x_device::device_start()
 	m_ramsize = 0x800;
 
 	m_z_rejection = -1;
-	m_ram = make_unique_clear<UINT16[]>(m_ramsize / 2);
-	m_buffer = make_unique_clear<UINT16[]>(m_ramsize / 2);
+	m_ram = make_unique_clear<uint16_t[]>(m_ramsize / 2);
+	m_buffer = make_unique_clear<uint16_t[]>(m_ramsize / 2);
 
 	// bind callbacks
 	m_k05324x_cb.bind_relative_to(*owner());
@@ -209,7 +206,7 @@ READ8_MEMBER( k05324x_device::k053244_r )
 		addr = (m_rombank << 19) | ((m_regs[11] & 0x7) << 18)
 			| (m_regs[8] << 10) | (m_regs[9] << 2)
 			| ((offset & 3) ^ 1);
-		addr &= m_sprite_size - 1;
+		addr &= m_sprite_rom.mask();
 
 		//  popmessage("%s: offset %02x addr %06x", machine().describe_context(), offset & 3, addr);
 
@@ -316,7 +313,7 @@ void k05324x_device::sprites_draw( bitmap_ind16 &bitmap, const rectangle &clipre
 	int offs, pri_code, i;
 	int sortedlist[NUM_SPRITES];
 	int flipscreenX, flipscreenY, spriteoffsX, spriteoffsY;
-	UINT8 drawmode_table[256];
+	uint8_t drawmode_table[256];
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
 	drawmode_table[0] = DRAWMODE_NONE;

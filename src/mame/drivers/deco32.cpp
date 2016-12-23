@@ -368,9 +368,10 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "cpu/h6280/h6280.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco156.h"
 #include "includes/deco32.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 /**********************************************************************************/
 
@@ -392,15 +393,15 @@ READ32_MEMBER(deco32_state::irq_controller_r)
 
 	case 3: /* Irq controller
 
-        Bit 0:  1 = Vblank active
-        Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
-        Bit 2:
-        Bit 3:
-        Bit 4:  VBL Irq
-        Bit 5:  Raster IRQ
-        Bit 6:  Lightgun IRQ (on Lock N Load only)
-        Bit 7:
-        */
+	    Bit 0:  1 = Vblank active
+	    Bit 1:  ? (Hblank active?  Captain America raster IRQ waits for this to go low)
+	    Bit 2:
+	    Bit 3:
+	    Bit 4:  VBL Irq
+	    Bit 5:  Raster IRQ
+	    Bit 6:  Lightgun IRQ (on Lock N Load only)
+	    Bit 7:
+	    */
 
 		/* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
 		   that this bit is NOT set in rows 0-7. */
@@ -442,13 +443,13 @@ WRITE32_MEMBER(deco32_state::irq_controller_w)
 
 WRITE32_MEMBER(deco32_state::sound_w)
 {
-	soundlatch_byte_w(space,0,data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
-void deco32_state::deco32_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::deco32_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
-	soundlatch_byte_w(space,0,data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -553,8 +554,6 @@ WRITE32_MEMBER(dragngun_state::eeprom_w)
 
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
-	address_space &eeprom_space = m_eeprom->space();
-
 	/* Eprom in low byte */
 	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
 		/*
@@ -603,7 +602,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 				int d=m_readBitCount/8;
 				int m=7-(m_readBitCount%8);
 				int a=(m_byteAddr+d)%1024;
-				int b=eeprom_space.read_byte(a);
+				int b=m_eeprom->internal_read(a);
 
 				m_tattass_eprom_bit=(b>>m)&1;
 
@@ -620,7 +619,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 					int b=(m_buffer[24]<<7)|(m_buffer[25]<<6)|(m_buffer[26]<<5)|(m_buffer[27]<<4)
 						|(m_buffer[28]<<3)|(m_buffer[29]<<2)|(m_buffer[30]<<1)|(m_buffer[31]<<0);
 
-					eeprom_space.write_byte(m_byteAddr, b);
+					m_eeprom->internal_write(m_byteAddr, b);
 				}
 				m_lastClock=data&0x20;
 				return;
@@ -635,7 +634,7 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 
 				/* Check for read command */
 				if (m_buffer[0] && m_buffer[1]) {
-					m_tattass_eprom_bit=(eeprom_space.read_byte(m_byteAddr)>>7)&1;
+					m_tattass_eprom_bit=(m_eeprom->internal_read(m_byteAddr)>>7)&1;
 					m_readBitCount=1;
 					m_pendingCommand=1;
 				}
@@ -685,25 +684,25 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 /**********************************************************************************/
 
 
-UINT16 deco32_state::port_b_nslasher(int unused)
+uint16_t deco32_state::port_b_nslasher(int unused)
 {
 	return (m_eeprom->do_read());
 }
 
-void deco32_state::nslasher_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
-	soundlatch_byte_w(space,0,(data)&0xff);
+	m_soundlatch->write(space,0,(data)&0xff);
 	m_nslasher_sound_irq |= 0x02;
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT16 deco32_state::port_b_tattass(int unused)
+uint16_t deco32_state::port_b_tattass(int unused)
 {
 	return m_tattass_eprom_bit;
 }
 
-void deco32_state::tattass_sound_cb( address_space &space, UINT16 data, UINT16 mem_mask )
+void deco32_state::tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask )
 {
 	/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 	int soundcommand = (data)&0xff;
@@ -807,16 +806,16 @@ ADDRESS_MAP_END
 
 READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 {
-	UINT32 retdata = 0x0000ffff;
+	uint32_t retdata = 0x0000ffff;
 
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		mem_mask >>=16;
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,   10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
-		UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+		uint8_t cs = 0;
+		uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 
 
 
@@ -827,14 +826,14 @@ READ32_MEMBER( deco32_state::fghthist_protection_region_0_146_r )
 
 WRITE32_MEMBER( deco32_state::fghthist_protection_region_0_146_w )
 {
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		data >>=16;
 		mem_mask >>=16;
 
 		int real_address = 0 + (offset *2);
 		int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8,7,6,5,4,3,2,1,   0) & 0x7fff;
-		UINT8 cs = 0;
+		uint8_t cs = 0;
 		m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 	}
 }
@@ -909,8 +908,8 @@ READ16_MEMBER( deco32_state::dg_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -918,7 +917,7 @@ WRITE16_MEMBER( deco32_state::dg_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1089,8 +1088,8 @@ READ16_MEMBER( deco32_state::nslasher_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -1098,7 +1097,7 @@ WRITE16_MEMBER( deco32_state::nslasher_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -1157,7 +1156,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, deco32_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -1168,7 +1167,7 @@ READ8_MEMBER(deco32_state::latch_r)
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	m_nslasher_sound_irq &= ~0x02;
 	m_audiocpu->set_input_line(0, (m_nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return soundlatch_byte_r(space,0);
+	return m_soundlatch->read(space,0);
 }
 
 static ADDRESS_MAP_START( nslasher_sound, AS_PROGRAM, 8, deco32_state )
@@ -1760,8 +1759,8 @@ WRITE_LINE_MEMBER(deco32_state::sound_irq_nslasher)
 
 WRITE8_MEMBER(deco32_state::sound_bankswitch_w)
 {
-	m_oki1->set_bank_base(((data >> 0)& 1) * 0x40000);
-	m_oki2->set_bank_base(((data >> 1)& 1) * 0x40000);
+	m_oki1->set_rom_bank((data >> 0) & 1);
+	m_oki2->set_rom_bank((data >> 1) & 1);
 }
 
 /**********************************************************************************/
@@ -1840,7 +1839,6 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)    // pf3 is in 8bpp mode, pf4 is not used
 	MCFG_DECO16IC_SPLIT(0)
@@ -1856,13 +1854,11 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_PRIORITY_CB(deco32_state, captaven_pri_callback)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
@@ -1871,6 +1867,8 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32_22MHz/9) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -1888,17 +1886,17 @@ static MACHINE_CONFIG_START( captaven, deco32_state )
 MACHINE_CONFIG_END
 
 
-UINT16 deco32_state::port_a_fghthist(int unused)
+uint16_t deco32_state::port_a_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN0")->read();
 }
 
-UINT16 deco32_state::port_b_fghthist(int unused)
+uint16_t deco32_state::port_b_fghthist(int unused)
 {
 	return machine().device<eeprom_serial_93cxx_device>(":eeprom")->do_read();
 }
 
-UINT16 deco32_state::port_c_fghthist(int unused)
+uint16_t deco32_state::port_c_fghthist(int unused)
 {
 	return machine().root_device().ioport(":IN1")->read();
 }
@@ -1946,7 +1944,6 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -1962,12 +1959,10 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
@@ -1981,6 +1976,8 @@ static MACHINE_CONFIG_START( fghthist, deco32_state ) /* DE-0380-2 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2032,7 +2029,6 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2048,12 +2044,10 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_PORTA_CALLBACK( deco32_state, port_a_fghthist )
@@ -2066,6 +2060,8 @@ static MACHINE_CONFIG_START( fghthsta, deco32_state ) /* DE-0395-1 PCB */
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2160,7 +2156,6 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2176,11 +2171,9 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
-	MCFG_DECO_ZOOMSPR_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", dragngun)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2193,6 +2186,8 @@ static MACHINE_CONFIG_START( dragngun, dragngun_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1))
@@ -2278,7 +2273,6 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2294,11 +2288,9 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen_zoom", DECO_ZOOMSPR, 0)
 	MCFG_DECO_ZOOMSPR_GFXDECODE("gfxdecode")
-	MCFG_DECO_ZOOMSPR_PALETTE("palette")
 
 	MCFG_DECO146_ADD("ioprot")
 	MCFG_DECO146_SET_SOUNDLATCH_CALLBACK(deco32_state, deco32_sound_cb)
@@ -2306,6 +2298,8 @@ static MACHINE_CONFIG_START( lockload, dragngun_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(deco32_state,sound_irq_nslasher))
@@ -2367,7 +2361,6 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2383,17 +2376,14 @@ static MACHINE_CONFIG_START( tattass, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tattass)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2444,7 +2434,6 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -2460,17 +2449,14 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nslasher)
 	MCFG_PALETTE_ADD("palette", 2048)
@@ -2484,6 +2470,8 @@ static MACHINE_CONFIG_START( nslasher, deco32_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(deco32_state,sound_irq_nslasher))
@@ -3966,12 +3954,12 @@ DRIVER_INIT_MEMBER(deco32_state,captaven)
 	save_item(NAME(m_irq_source));
 }
 
-extern void process_dvi_data(device_t *device,UINT8* dvi_data, int offset, int regionsize);
+extern void process_dvi_data(device_t *device,uint8_t* dvi_data, int offset, int regionsize);
 
 void dragngun_state::dragngun_init_common()
 {
-	const UINT8 *SRC_RAM = memregion("gfx1")->base();
-	UINT8 *DST_RAM = memregion("gfx2")->base();
+	const uint8_t *SRC_RAM = memregion("gfx1")->base();
+	uint8_t *DST_RAM = memregion("gfx2")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -3982,7 +3970,7 @@ void dragngun_state::dragngun_init_common()
 
 #if 0
 	{
-		UINT8 *ROM = memregion("dvi")->base();
+		uint8_t *ROM = memregion("dvi")->base();
 
 		FILE *fp;
 		char filename[256];
@@ -4012,7 +4000,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngun)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1b32c/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4020,7 +4008,7 @@ DRIVER_INIT_MEMBER(dragngun_state,dragngunj)
 {
 	dragngun_init_common();
 
-	UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 	ROM[0x1a1b4/4]=0xe1a00000; // bl $ee000: NOP test switch lock
 }
 
@@ -4032,8 +4020,8 @@ DRIVER_INIT_MEMBER(deco32_state,fghthist)
 
 DRIVER_INIT_MEMBER(dragngun_state,lockload)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-//  UINT32 *ROM = (UINT32 *)memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
+//  uint32_t *ROM = (uint32_t *)memregion("maincpu")->base();
 
 	deco74_decrypt_gfx(machine(), "gfx1");
 	deco74_decrypt_gfx(machine(), "gfx2");
@@ -4053,8 +4041,8 @@ DRIVER_INIT_MEMBER(dragngun_state,lockload)
 
 DRIVER_INIT_MEMBER(deco32_state,tattass)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);
@@ -4080,8 +4068,8 @@ DRIVER_INIT_MEMBER(deco32_state,tattass)
 
 DRIVER_INIT_MEMBER(deco32_state,nslasher)
 {
-	UINT8 *RAM = memregion("gfx1")->base();
-	dynamic_buffer tmp(0x80000);
+	uint8_t *RAM = memregion("gfx1")->base();
+	std::vector<uint8_t> tmp(0x80000);
 
 	/* Reorder bitplanes to make decoding easier */
 	memcpy(&tmp[0],RAM+0x80000,0x80000);
@@ -4098,7 +4086,7 @@ DRIVER_INIT_MEMBER(deco32_state,nslasher)
 
 	deco156_decrypt(machine());
 
-	soundlatch_setclearedvalue(0xff);
+	m_soundlatch->preset_w(0xff);
 
 	save_item(NAME(m_nslasher_sound_irq));
 

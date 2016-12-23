@@ -54,14 +54,13 @@
 
 const device_type KANEKO_PANDORA = &device_creator<kaneko_pandora_device>;
 
-kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__),
-		device_video_interface(mconfig, *this),
-		m_gfx_region(0),
-		m_xoffset(0),
-		m_yoffset(0),
-		m_gfxdecode(*this),
-		m_palette(*this)
+kaneko_pandora_device::kaneko_pandora_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, KANEKO_PANDORA, "Kaneko PANDORA GFX", tag, owner, clock, "kaneko_pandora", __FILE__)
+	, device_video_interface(mconfig, *this)
+	, m_gfx_region(0)
+	, m_xoffset(0)
+	, m_yoffset(0)
+	, m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -76,16 +75,6 @@ void kaneko_pandora_device::static_set_gfxdecode_tag(device_t &device, const cha
 }
 
 //-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void kaneko_pandora_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<kaneko_pandora_device &>(device).m_palette.set_tag(tag);
-}
-
-//-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
 
@@ -93,7 +82,7 @@ void kaneko_pandora_device::device_start()
 {
 	m_bg_pen = 0;
 
-	m_spriteram = std::make_unique<UINT8[]>(0x1000);
+	m_spriteram = std::make_unique<uint8_t[]>(0x1000);
 
 	m_sprites_bitmap = std::make_unique<bitmap_ind16>(m_screen->width(), m_screen->height());
 

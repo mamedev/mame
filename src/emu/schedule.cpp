@@ -174,7 +174,7 @@ bool emu_timer::enable(bool enable)
 //  firings
 //-------------------------------------------------
 
-void emu_timer::adjust(attotime start_delay, INT32 param, const attotime &period)
+void emu_timer::adjust(attotime start_delay, s32 param, const attotime &period)
 {
 	// if this is the callback timer, mark it modified
 	device_scheduler &scheduler = machine().scheduler();
@@ -243,16 +243,21 @@ void emu_timer::register_save()
 	// for non-device timers, it is an index based on the callback function name
 	if (m_device == nullptr)
 	{
-		name = m_callback.name();
+		name = m_callback.name() ? m_callback.name() : "unnamed";
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
-			if (!curtimer->m_temporary && curtimer->m_device == nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
-				index++;
+			if (!curtimer->m_temporary && curtimer->m_device == nullptr)
+			{
+				if (curtimer->m_callback.name() != nullptr && m_callback.name() != nullptr && strcmp(curtimer->m_callback.name(), m_callback.name()) == 0)
+					index++;
+				else if (curtimer->m_callback.name() == nullptr && m_callback.name() == nullptr)
+					index++;
+			}
 	}
 
 	// for device timers, it is an index based on the device and timer ID
 	else
 	{
-		strprintf(name,"%s/%d", m_device->tag(), m_id);
+		name = string_format("%s/%d", m_device->tag(), m_id);
 		for (emu_timer *curtimer = machine().scheduler().first_timer(); curtimer != nullptr; curtimer = curtimer->next())
 			if (!curtimer->m_temporary && curtimer->m_device != nullptr && curtimer->m_device == m_device && curtimer->m_id == m_id)
 				index++;
@@ -388,7 +393,7 @@ bool device_scheduler::can_save() const
 
 inline void device_scheduler::apply_suspend_changes()
 {
-	UINT32 suspendchanged = 0;
+	u32 suspendchanged = 0;
 	for (device_execute_interface *exec = m_execute_list; exec != nullptr; exec = exec->m_nextexec)
 	{
 		suspendchanged |= exec->m_suspend ^ exec->m_nextsuspend;
@@ -456,8 +461,8 @@ void device_scheduler::timeslice()
 				if (delta >= exec->m_attoseconds_per_cycle)
 				{
 					// compute how many cycles we want to execute
-					int ran = exec->m_cycles_running = divu_64x32((UINT64)delta >> exec->m_divshift, exec->m_divisor);
-					LOG(("  cpu '%s': %" I64FMT"d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
+					int ran = exec->m_cycles_running = divu_64x32(u64(delta) >> exec->m_divshift, exec->m_divisor);
+					LOG(("  cpu '%s': %d (%d cycles)\n", exec->device().tag(), delta, exec->m_cycles_running));
 
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
@@ -493,7 +498,7 @@ void device_scheduler::timeslice()
 					attotime deltatime(0, exec->m_attoseconds_per_cycle * ran);
 					assert(deltatime >= attotime::zero);
 					exec->m_localtime += deltatime;
-					LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)exec->m_totalcycles, exec->m_localtime.as_string(PRECISION)));
+					LOG(("         %d ran, %d total, time = %s\n", ran, s32(exec->m_totalcycles), exec->m_localtime.as_string(PRECISION)));
 
 					// if the new local CPU time is less than our target, move the target up, but not before the base
 					if (exec->m_localtime < target)
@@ -637,7 +642,7 @@ void device_scheduler::eat_all_cycles()
 //  given amount of time
 //-------------------------------------------------
 
-void device_scheduler::timed_trigger(void *ptr, INT32 param)
+void device_scheduler::timed_trigger(void *ptr, s32 param)
 {
 	trigger(param);
 }
@@ -726,8 +731,8 @@ void device_scheduler::compute_perfect_interleave()
 		{
 			// adjust all the actuals; this doesn't affect the current
 			m_quantum_minimum = perfect;
-			for (quantum_slot *quant = m_quantum_list.first(); quant != nullptr; quant = quant->next())
-				quant->m_actual = MAX(quant->m_requested, m_quantum_minimum);
+			for (quantum_slot &quant : m_quantum_list)
+				quant.m_actual = std::max(quant.m_requested, m_quantum_minimum);
 		}
 	}
 }
@@ -742,7 +747,7 @@ void device_scheduler::compute_perfect_interleave()
 void device_scheduler::rebuild_execute_list()
 {
 	// if we haven't yet set a scheduling quantum, do it now
-	if (m_quantum_list.first() == nullptr)
+	if (m_quantum_list.empty())
 	{
 		// set the core scheduling quantum
 		attotime min_quantum = machine().config().m_minimum_quantum;
@@ -781,20 +786,19 @@ void device_scheduler::rebuild_execute_list()
 	device_execute_interface **suspend_tailptr = &suspend_list;
 
 	// iterate over all devices
-	execute_interface_iterator iter(machine().root_device());
-	for (device_execute_interface *exec = iter.first(); exec != nullptr; exec = iter.next())
+	for (device_execute_interface &exec : execute_interface_iterator(machine().root_device()))
 	{
 		// append to the appropriate list
-		exec->m_nextexec = nullptr;
-		if (exec->m_suspend == 0)
+		exec.m_nextexec = nullptr;
+		if (exec.m_suspend == 0)
 		{
-			*active_tailptr = exec;
-			active_tailptr = &exec->m_nextexec;
+			*active_tailptr = &exec;
+			active_tailptr = &exec.m_nextexec;
 		}
 		else
 		{
-			*suspend_tailptr = exec;
-			suspend_tailptr = &exec->m_nextexec;
+			*suspend_tailptr = &exec;
+			suspend_tailptr = &exec.m_nextexec;
 		}
 	}
 
@@ -963,7 +967,7 @@ void device_scheduler::add_scheduling_quantum(const attotime &quantum, const att
 	{
 		quantum_slot &quant = *m_quantum_allocator.alloc();
 		quant.m_requested = quantum_attos;
-		quant.m_actual = MAX(quantum_attos, m_quantum_minimum);
+		quant.m_actual = std::max(quantum_attos, m_quantum_minimum);
 		quant.m_expire = expire;
 		m_quantum_list.insert_after(quant, insert_after);
 	}

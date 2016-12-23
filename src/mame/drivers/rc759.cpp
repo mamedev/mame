@@ -119,10 +119,10 @@ private:
 	required_device<wd2797_t> m_fdc;
 	required_device<floppy_connector> m_floppy0;
 	required_device<floppy_connector> m_floppy1;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 	required_ioport m_config;
 
-	std::vector<UINT8> m_nvram_mem;
+	std::vector<uint8_t> m_nvram_mem;
 
 	int m_cas_enabled;
 	int m_cas_data;
@@ -130,7 +130,7 @@ private:
 	int m_nvram_bank;
 	int m_gfx_mode;
 	int m_keyboard_enable;
-	UINT8 m_keyboard_key;
+	uint8_t m_keyboard_key;
 
 	int m_centronics_strobe;
 	int m_centronics_init;
@@ -140,7 +140,7 @@ private:
 	int m_centronics_fault;
 	int m_centronics_perror;
 	int m_centronics_select;
-	UINT8 m_centronics_data;
+	uint8_t m_centronics_data;
 };
 
 
@@ -168,7 +168,7 @@ READ8_MEMBER( rc759_state::keyboard_r )
 
 READ8_MEMBER( rc759_state::ppi_porta_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_cas_enabled ? m_cas_data : (m_cas->input() > 0 ? 1 : 0);
 	data |= m_isbx->mpst_r() << 1;
@@ -184,7 +184,7 @@ READ8_MEMBER( rc759_state::ppi_porta_r )
 
 READ8_MEMBER( rc759_state::ppi_portb_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= 1 << 0; // 0 = micronet controller installed
 	data |= 1 << 1; // rtc type, mm58167/cdp1879
@@ -257,7 +257,7 @@ WRITE8_MEMBER( rc759_state::centronics_data_w )
 
 READ8_MEMBER( rc759_state::centronics_control_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_centronics_busy << 0;
 	data |= m_centronics_ack << 1;
@@ -331,7 +331,7 @@ I82730_UPDATE_ROW( rc759_state::txt_update_row )
 {
 	for (int i = 0; i < x_count; i++)
 	{
-		UINT16 gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
+		uint16_t gfx = m_vram[(data[i] & 0x3ff) << 4 | lc];
 
 		// pretty crude detection if char sizes have been initialized, need something better
 		if ((gfx & 0xff) == 0)
@@ -346,7 +346,7 @@ I82730_UPDATE_ROW( rc759_state::txt_update_row )
 		width = 15 - width;
 
 		for (int p = 0; p < width; p++)
-			bitmap.pix32(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white : rgb_t::black;
+			bitmap.pix32(y, i * width + p) = BIT(gfx, 15 - p) ? rgb_t::white() : rgb_t::black();
 	}
 }
 
@@ -461,8 +461,8 @@ void rc759_state::machine_reset()
 
 static ADDRESS_MAP_START( rc759_map, AS_PROGRAM, 16, rc759_state )
 	AM_RANGE(0x00000, 0x3ffff) AM_RAM
-	AM_RANGE(0xd8000, 0xdffff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
-	AM_RANGE(0xf8000, 0xfffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
+	AM_RANGE(0xd0000, 0xd7fff) AM_MIRROR(0x08000) AM_RAM AM_SHARE("vram")
+	AM_RANGE(0xe8000, 0xeffff) AM_MIRROR(0x10000) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rc759_io, AS_IO, 16, rc759_state )
@@ -528,7 +528,7 @@ static MACHINE_CONFIG_START( rc759, rc759_state )
 	MCFG_80186_TMROUT1_HANDLER(WRITELINE(rc759_state, i186_timer1_w))
 
 	// interrupt controller
-	MCFG_PIC8259_ADD("pic", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NULL)
+	MCFG_PIC8259_ADD("pic", DEVWRITELINE("maincpu", i80186_cpu_device, int0_w), VCC, NOOP)
 
 	// nvram
 	MCFG_NVRAM_ADD_CUSTOM_DRIVER("nvram", rc759_state, nvram_init)

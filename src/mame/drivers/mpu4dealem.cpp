@@ -29,10 +29,10 @@ public:
 	{
 	}
 
-	optional_shared_ptr<UINT8> m_dealem_videoram;
+	optional_shared_ptr<uint8_t> m_dealem_videoram;
 	DECLARE_MACHINE_RESET(dealem_vid);
 	DECLARE_PALETTE_INIT(dealem);
-	UINT32 screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE_LINE_MEMBER(dealem_vsync_changed);
 	required_device<gfxdecode_device> m_gfxdecode;
 };
@@ -80,7 +80,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i, len;
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	static const int resistances_b [2] = { 470, 220 };
@@ -117,7 +117,7 @@ PALETTE_INIT_MEMBER(mpu4dealem_state,dealem)
 }
 
 
-UINT32 mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mpu4dealem_state::screen_update_dealem(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int count = 0;

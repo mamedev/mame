@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="static_white"><rect><color red="0.9" green="0.89" blue="0.8" /></rect></element>
+	<element name="static_red"><rect><color red="0.9" green="0.3" blue="0.3" /></rect></element>
+	<element name="static_green"><rect><color red="0.3" green="0.9" blue="0.3" /></rect></element>
+	<element name="static_yellow"><rect><color red="0.9" green="0.9" blue="0.3" /></rect></element>
+	<element name="static_orange"><rect><color red="0.9" green="0.6" blue="0.3" /></rect></element>
+
+	<element name="text_b1"><text string="REPLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
+	<element name="text_b2"><text string="PLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
+	<element name="text_b3"><text string="BEST PLAY"><color red="0.9" green="0.89" blue="0.8" /></text></element>
+
+	<element name="hlh" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="2.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="1">
+			<bounds x="0.57" y="0.07" width="0.86" height="0.86" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="hlv" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="2.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<disk state="1">
+			<bounds x="0.07" y="0.57" width="0.86" height="0.86" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</disk>
+	</element>
+	<element name="hlb" defstate="0">
+		<text string=" ">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</text>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.0" blue="0.0" />
+		</rect>
+	</element>
+
+	<element name="ledr" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.2" /></disk>
+	</element>
+	<element name="ledg" defstate="0">
+		<disk state="0"><color red="0.04" green="0.2" blue="0.04" /></disk>
+		<disk state="1"><color red="0.2" green="1.0" blue="0.2" /></disk>
+	</element>
+	<element name="ledy" defstate="0">
+		<disk state="0"><color red="0.2" green="0.2" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="1.0" blue="0.2" /></disk>
+	</element>
+	<element name="ledo" defstate="0">
+		<disk state="0"><color red="0.2" green="0.12" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.6" blue="0.2" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="0" right="12" top="0" bottom="12" />
+		<bezel element="static_white">
+			<bounds left="-1" right="13" top="-1" bottom="13" />
+		</bezel>
+
+	<!-- middle part -->
+
+		<bezel element="static_black"><bounds x="4" y="4" width="4" height="4" /></bezel>
+
+		<bezel element="static_yellow"><bounds x="4.5625" y="6" width="0.5" height="0.5" /></bezel>
+		<bezel element="static_green"><bounds x="5.625" y="5.875" width="0.75" height="0.75" /></bezel>
+		<bezel element="static_yellow"><bounds x="6.9375" y="6" width="0.5" height="0.5" /></bezel>
+
+		<bezel element="hlb" inputtag="IN.3" inputmask="0x04"><bounds x="4.5625" y="6" width="0.5" height="0.5" /><color alpha="0.25" /></bezel>
+		<bezel element="hlb" inputtag="IN.3" inputmask="0x02"><bounds x="5.625" y="5.875" width="0.75" height="0.75" /><color alpha="0.25" /></bezel>
+		<bezel element="hlb" inputtag="IN.3" inputmask="0x01"><bounds x="6.9375" y="6" width="0.5" height="0.5" /><color alpha="0.25" /></bezel>
+
+		<bezel element="text_b1"><bounds x="4.0625" y="6.75" width="1.5" height="0.25" /></bezel>
+		<bezel element="text_b2"><bounds x="5.125" y="6.75" width="1.75" height="0.25" /></bezel>
+		<bezel element="text_b3"><bounds x="6.2375" y="6.75" width="1.9" height="0.25" /></bezel>
+
+	<!-- main buttons and leds -->
+
+		<bezel element="static_red"><bounds x="1" y="4" width="2" height="4" /></bezel>
+		<bezel element="static_yellow"><bounds x="4" y="1" width="4" height="2" /></bezel>
+		<bezel element="static_orange"><bounds x="9" y="4" width="2" height="4" /></bezel>
+		<bezel element="static_green"><bounds x="4" y="9" width="4" height="2" /></bezel>
+
+		<bezel element="hlv" inputtag="IN.0" inputmask="0x02"><bounds x="1" y="4" width="2" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hlh" inputtag="IN.0" inputmask="0x08"><bounds x="4" y="1" width="4" height="2" /><color alpha="0.15" /></bezel>
+		<bezel element="hlv" inputtag="IN.0" inputmask="0x04"><bounds x="9" y="4" width="2" height="4" /><color alpha="0.15" /></bezel>
+		<bezel element="hlh" inputtag="IN.0" inputmask="0x01"><bounds x="4" y="9" width="4" height="2" /><color alpha="0.15" /></bezel>
+
+		<bezel name="0.0" element="ledg"><bounds x="5.75" y="8.25" width="0.5" height="0.5" /></bezel>
+		<bezel name="0.1" element="ledr"><bounds x="3.25" y="5.75" width="0.5" height="0.5" /></bezel>
+		<bezel name="0.2" element="ledo"><bounds x="8.25" y="5.75" width="0.5" height="0.5" /></bezel>
+		<bezel name="0.3" element="ledy"><bounds x="5.75" y="3.25" width="0.5" height="0.5" /></bezel>
+
+	</view>
+</mamelayout>

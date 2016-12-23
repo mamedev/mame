@@ -48,11 +48,11 @@ public:
 	DECLARE_WRITE8_MEMBER(cfx9850_koh_w);
 	DECLARE_READ8_MEMBER(cfx9850_ki_r);
 	DECLARE_READ8_MEMBER(cfx9850_battery_level_r);
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_display_ram;
-	UINT16 m_ko;                /* KO lines KO1 - KO14 */
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_display_ram;
+	uint16_t m_ko;                /* KO lines KO1 - KO14 */
 	DECLARE_PALETTE_INIT(cfx9850);
-	UINT32 screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	required_ioport m_ko1;
@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( cfx9850, AS_PROGRAM, 8, cfx9850_state )
 //  AM_RANGE( 0x110000, 0x11ffff ) /* some memory mapped i/o? */
 	AM_RANGE( 0x200000, 0x27ffff ) AM_ROM AM_REGION( "bios", 0 )
 	AM_RANGE( 0x400000, 0x40ffff ) AM_RAM
-	AM_RANGE( 0x600000, 0x601fff ) AM_MIRROR(0xf800) AM_RAM AM_SHARE("display_ram")
+	AM_RANGE( 0x600000, 0x6007ff ) AM_MIRROR(0xf800) AM_RAM AM_SHARE("display_ram")
 //  AM_RANGE( 0xe10000, 0xe1ffff ) /* some memory mapped i/o? */
 ADDRESS_MAP_END
 
@@ -96,7 +96,7 @@ WRITE8_MEMBER( cfx9850_state::cfx9850_koh_w )
 
 READ8_MEMBER( cfx9850_state::cfx9850_ki_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if ( m_ko & ( 1 << 0 ) ) data |= m_ko1->read();
 	if ( m_ko & ( 1 << 1 ) ) data |= m_ko2->read();
@@ -229,9 +229,9 @@ PALETTE_INIT_MEMBER(cfx9850_state, cfx9850)
 }
 
 
-UINT32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 offset = 0;
+	uint16_t offset = 0;
 
 	for ( int i = 0; i < 16; i++ )
 	{
@@ -239,8 +239,8 @@ UINT32 cfx9850_state::screen_update_cfx9850(screen_device &screen, bitmap_ind16 
 
 		for ( int j = 0; j < 64; j++ )
 		{
-			UINT8 data1 = m_display_ram[ offset ];
-			UINT8 data2 = m_display_ram[ offset + 0x400 ];
+			uint8_t data1 = m_display_ram[ offset ];
+			uint8_t data2 = m_display_ram[ offset + 0x400 ];
 
 			for ( int b = 0; b < 8; b++ )
 			{

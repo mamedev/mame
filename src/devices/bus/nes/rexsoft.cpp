@@ -39,13 +39,13 @@ const device_type NES_REX_DBZ5 = &device_creator<nes_rex_dbz5_device>;
 const device_type NES_REX_SL1632 = &device_creator<nes_rex_sl1632_device>;
 
 
-nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_rex_dbz5_device::nes_rex_dbz5_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_txrom_device(mconfig, NES_REX_DBZ5, "NES Cart Rex Soft DragonBall Z V PCB", tag, owner, clock, "nes_rex_dbz5", __FILE__),
 	m_extra(0)
 				{
 }
 
-nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nes_rex_sl1632_device::nes_rex_sl1632_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: nes_txrom_device(mconfig, NES_REX_SL1632, "NES Cart Rex Soft SL-1632 PCB", tag, owner, clock, "nes_rex_sl1632", __FILE__), m_mode(0), m_mirror(0)
 				{
 }
@@ -154,7 +154,7 @@ void nes_rex_sl1632_device::set_prg(int prg_base, int prg_mask)
 	if (m_mode & 0x02)
 	{
 		// here standard MMC3 bankswitch
-		UINT8 prg_flip = (m_latch & 0x40) ? 2 : 0;
+		uint8_t prg_flip = (m_latch & 0x40) ? 2 : 0;
 
 		prg_cb(0, prg_base | (m_mmc_prg_bank[0 ^ prg_flip] & prg_mask));
 		prg_cb(1, prg_base | (m_mmc_prg_bank[1] & prg_mask));
@@ -170,12 +170,12 @@ void nes_rex_sl1632_device::set_prg(int prg_base, int prg_mask)
 	}
 }
 
-void nes_rex_sl1632_device::set_chr(UINT8 chr, int chr_base, int chr_mask)
+void nes_rex_sl1632_device::set_chr(uint8_t chr, int chr_base, int chr_mask)
 {
-	static const UINT8 conv_table[8] = {5, 5, 5, 5, 3, 3, 1, 1};
-	UINT8 chr_page = (m_latch & 0x80) >> 5;
-	UINT8 bank[8];
-	UINT8 chr_base2[8];
+	static const uint8_t conv_table[8] = {5, 5, 5, 5, 3, 3, 1, 1};
+	uint8_t chr_page = (m_latch & 0x80) >> 5;
+	uint8_t bank[8];
+	uint8_t chr_base2[8];
 
 	if (m_mode & 0x02)
 	{
@@ -210,7 +210,7 @@ void nes_rex_sl1632_device::set_chr(UINT8 chr, int chr_base, int chr_mask)
 
 WRITE8_MEMBER(nes_rex_sl1632_device::write_h)
 {
-	UINT8 helper1, helper2;
+	uint8_t helper1, helper2;
 	LOG_MMC(("rex_sl1632 write_h, offset: %04x, data: %02x\n", offset, data));
 
 	if (offset == 0x2131)

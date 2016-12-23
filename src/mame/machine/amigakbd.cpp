@@ -75,7 +75,7 @@ ROM_START( mos6570_036 )
 	ROM_LOAD("328191-02.ic1", 0x000, 0x800, CRC(4a3fc332) SHA1(83b21d0c8b93fc9b9b3b287fde4ec8f3badac5a2))
 ROM_END
 
-const rom_entry *amigakbd_device::device_rom_region() const
+const tiny_rom_entry *amigakbd_device::device_rom_region() const
 {
 	return ROM_NAME( mos6570_036 );
 }
@@ -87,11 +87,11 @@ const rom_entry *amigakbd_device::device_rom_region() const
 static INPUT_PORTS_START( a500_us_keyboard )
 	PORT_START("special")
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNUSED)
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)      PORT_CHAR(UCHAR_MAMEKEY(LWIN))      PORT_NAME("Left Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LWIN)      PORT_CHAR(UCHAR_MAMEKEY(LWIN))      PORT_NAME("Left Amiga")  PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, nullptr)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LALT)      PORT_CHAR(UCHAR_MAMEKEY(LALT))
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_SHIFT_2)            PORT_NAME("Ctrl")        PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)      PORT_CHAR(UCHAR_MAMEKEY(RWIN))      PORT_NAME("Right Amiga") PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, NULL)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL)  PORT_CHAR(UCHAR_SHIFT_2)            PORT_NAME("Ctrl")        PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, nullptr)
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RWIN)      PORT_CHAR(UCHAR_MAMEKEY(RWIN))      PORT_NAME("Right Amiga") PORT_CHANGED_MEMBER(DEVICE_SELF, amigakbd_device, check_reset, nullptr)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RALT)      PORT_CHAR(UCHAR_MAMEKEY(RALT))
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_RSHIFT)    PORT_CHAR(UCHAR_SHIFT_1)
 
@@ -260,7 +260,7 @@ ioport_constructor amigakbd_device::device_input_ports() const
 //  amigakbd_device - constructor
 //-------------------------------------------------
 
-amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+amigakbd_device::amigakbd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, AMIGAKBD, "Amiga 500 Keyboard with 6570-036 MPU", tag, owner, clock, "amigakbd", __FILE__),
 	m_write_kclk(*this),
 	m_write_kdat(*this),
@@ -394,7 +394,7 @@ void amigakbd_device::device_timer(emu_timer &timer, device_timer_id tid, int pa
 
 INPUT_CHANGED_MEMBER( amigakbd_device::check_reset )
 {
-	UINT8 keys = m_special->read();
+	uint8_t keys = m_special->read();
 
 	// ctrl-amiga-amiga pressed?
 	if (!BIT(keys, 6) && !BIT(keys, 3) && !BIT(keys, 2))
@@ -421,7 +421,7 @@ void amigakbd_device::update_irqs()
 
 READ8_MEMBER( amigakbd_device::port_a_r )
 {
-	UINT8 data = 0xfc;
+	uint8_t data = 0xfc;
 
 	// kdat & kclk
 	data |= m_kdat << 0;

@@ -6,6 +6,8 @@
 
         04/12/2009 Initial driver by Miodrag Milanovic
 
+        Supposedly introduced October 1977.
+
         Commands:
         All commands must be in uppercase. Address and data is
         specified in Octal format (not hex).
@@ -15,6 +17,9 @@
         D - Memory Dump
         J - Jump to address
         M - Modify memory
+
+        Reference:
+        http://www.computercloset.org/MITSAltair8800bt.htm
 
 ****************************************************************************/
 
@@ -45,7 +50,7 @@ protected:
 private:
 	required_device<cpu_device> m_maincpu;
 	required_device<acia6850_device> m_mc6850;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 };
 
 
@@ -76,12 +81,12 @@ QUICKLOAD_LOAD_MEMBER( altair_state,altair)
 	int read_;
 	quick_length = image.length();
 	if (quick_length >= 0xfd00)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	read_ = image.fread(m_ram, quick_length);
 	if (read_ != quick_length)
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 WRITE_LINE_MEMBER(altair_state::write_acia_clock)
@@ -92,7 +97,7 @@ WRITE_LINE_MEMBER(altair_state::write_acia_clock)
 
 void altair_state::machine_reset()
 {
-	// Set startup addess done by turn-key
+	// Set startup address done by turn-key
 	m_maincpu->set_state_int(I8085_PC, 0xFD00);
 }
 
@@ -129,4 +134,4 @@ ROM_END
 /* Driver */
 
 /*    YEAR  NAME    PARENT  COMPAT   MACHINE    INPUT    INIT     COMPANY   FULLNAME       FLAGS */
-COMP( 1975, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
+COMP( 1977, al8800bt,  0,       0,  altair,     altair, driver_device,   0,   "MITS",   "Altair 8800bt", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)

@@ -4,7 +4,7 @@
 
 const device_type RS232_PORT = &device_creator<rs232_port_device>;
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, RS232_PORT, "RS232 Port", tag, owner, clock, "rs232", __FILE__),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
@@ -21,7 +21,7 @@ rs232_port_device::rs232_port_device(const machine_config &mconfig, const char *
 {
 }
 
-rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+rs232_port_device::rs232_port_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_slot_interface(mconfig, *this),
 	m_rxd(0),
@@ -112,8 +112,9 @@ device_rs232_port_interface::~device_rs232_port_interface()
 #include "loopback.h"
 #include "null_modem.h"
 #include "printer.h"
-#include "terminal.h"
 #include "pty.h"
+#include "sun_kbd.h"
+#include "terminal.h"
 
 SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("keyboard", SERIAL_KEYBOARD)
@@ -121,5 +122,6 @@ SLOT_INTERFACE_START( default_rs232_devices )
 	SLOT_INTERFACE("null_modem", NULL_MODEM)
 	SLOT_INTERFACE("printer", SERIAL_PRINTER)
 	SLOT_INTERFACE("terminal", SERIAL_TERMINAL)
-		SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("pty", PSEUDO_TERMINAL)
+	SLOT_INTERFACE("sunkbd", SUN_KBD_ADAPTOR)
 SLOT_INTERFACE_END

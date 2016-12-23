@@ -23,13 +23,13 @@ Sega PCB 834-5137
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 #include "sound/sn76496.h"
 #include "includes/suprloco.h"
 
 WRITE8_MEMBER(suprloco_state::soundport_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
 	space.device().execute().spin_until_time(attotime::from_usec(50));
@@ -61,7 +61,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, suprloco_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xc000, 0xc003) AM_DEVWRITE("sn2", sn76496_device, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -167,10 +167,11 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( suprloco, suprloco_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 4000000)   /* 4 MHz (?) */
+	MCFG_CPU_ADD("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz (?) */
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", suprloco_state,  irq0_line_hold)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 
 	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -191,6 +192,8 @@ static MACHINE_CONFIG_START( suprloco, suprloco_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 4000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -269,7 +272,7 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 	/* convert graphics to 4bpp from 3bpp */
 
 	int i, j, k, color_source, color_dest;
-	UINT8 *source, *dest, *lookup;
+	uint8_t *source, *dest, *lookup;
 
 	source = memregion("gfx1")->base();
 	dest   = source + 0x6000;
@@ -297,30 +300,6 @@ DRIVER_INIT_MEMBER(suprloco_state,suprloco)
 		}
 	}
 
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...1...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...1...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...0...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...1...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...1...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...0...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...1...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...1...0...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 }    /* ...1...1...1...1 */
-	};
-
-	/* decrypt program ROMs */
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
 }
 
 

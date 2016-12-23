@@ -47,7 +47,7 @@ void runaway_state::machine_reset()
 
 READ8_MEMBER(runaway_state::runaway_input_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	if (ioport("3000D7")->read() & (1 << offset))
 	{

@@ -3,10 +3,10 @@
 /*
        Disco Boy
 
-Similar to mitchell.c / egghunt.c .. clearly derived from that hardware
+Similar to mitchell.cpp / egghunt.cpp .. clearly derived from that hardware
 
 TODO:
-- move sound HW into proper file (it's 99% IDENTICAL to yunsung8.c)
+- move sound HW into proper file (it's 99% IDENTICAL to yunsung8.cpp)
 - ADPCM has sound volume issues, it's either too loud or too quiet;
 
 PCB Layout
@@ -43,6 +43,8 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/74157.h"
 #include "sound/msm5205.h"
 #include "sound/3812intf.h"
 
@@ -53,28 +55,36 @@ class discoboy_state : public driver_device
 public:
 	discoboy_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_audiocpu(*this, "audiocpu") ,
 		m_maincpu(*this, "maincpu"),
+		m_audiocpu(*this, "audiocpu"),
 		m_msm(*this, "msm"),
+		m_adpcm_select(*this, "adpcm_select"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")  { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* video-related */
-	UINT8    m_ram_bank;
-	UINT8    m_gfxbank;
-	UINT8    m_port_00;
-	int      m_adpcm;
-	UINT8    m_toggle;
+	uint8_t    m_ram_bank;
+	uint8_t    m_gfxbank;
+	uint8_t    m_port_00;
+
+	bool       m_toggle;
 
 	/* devices */
+	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<msm5205_device> m_msm;
+	required_device<ls157_device> m_adpcm_select;
+	required_device<gfxdecode_device> m_gfxdecode;
+	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory */
-	UINT8    m_ram_1[0x800];
-	UINT8    m_ram_2[0x800];
-	UINT8    m_ram_3[0x1000];
-	UINT8    m_ram_4[0x1000];
-	UINT8    m_ram_att[0x800];
+	uint8_t    m_ram_1[0x800];
+	uint8_t    m_ram_2[0x800];
+	uint8_t    m_ram_3[0x1000];
+	uint8_t    m_ram_4[0x1000];
+	uint8_t    m_ram_att[0x800];
 	DECLARE_WRITE8_MEMBER(rambank_select_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_00_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_01_w);
@@ -87,19 +97,14 @@ public:
 	DECLARE_READ8_MEMBER(discoboy_ram_att_r);
 	DECLARE_WRITE8_MEMBER(discoboy_ram_att_w);
 	DECLARE_READ8_MEMBER(discoboy_port_06_r);
-	DECLARE_WRITE8_MEMBER(yunsung8_adpcm_w);
 	DECLARE_WRITE8_MEMBER(yunsung8_sound_bankswitch_w);
 	DECLARE_DRIVER_INIT(discoboy);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	DECLARE_WRITE_LINE_MEMBER(yunsung8_adpcm_int);
-	required_device<cpu_device> m_maincpu;
-	required_device<msm5205_device> m_msm;
-	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 
@@ -155,15 +160,15 @@ void discoboy_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 }
 
 
-UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 x, y;
+	uint16_t x, y;
 	int i;
 	int count = 0;
 
 	for (i = 0; i < 0x800; i += 2)
 	{
-		UINT16 pal;
+		uint16_t pal;
 		int r, g, b;
 		pal = m_ram_1[i] | (m_ram_1[i + 1] << 8);
 
@@ -176,7 +181,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 
 	for (i = 0; i < 0x800; i += 2)
 	{
-		UINT16 pal;
+		uint16_t pal;
 		int r,g,b;
 		pal = m_ram_2[i] | (m_ram_2[i + 1] << 8);
 
@@ -193,7 +198,7 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 	{
 		for (x = 0; x < 64; x++)
 		{
-			UINT16 tileno = m_ram_3[count] | (m_ram_3[count + 1] << 8);
+			uint16_t tileno = m_ram_3[count] | (m_ram_3[count + 1] << 8);
 
 			if (tileno > 0x2000)
 			{
@@ -214,9 +219,9 @@ UINT32 discoboy_state::screen_update_discoboy(screen_device &screen, bitmap_ind1
 }
 
 #ifdef UNUSED_FUNCTION
-void discoboy_state::discoboy_setrombank( UINT8 data )
+void discoboy_state::discoboy_setrombank( uint8_t data )
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	data &= 0x2f;
 	space.membank("bank1")->set_base(&ROM[0x6000 + (data * 0x1000)] );
 }
@@ -248,7 +253,7 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
 {
 	//  printf("unk discoboy_port_03_w %02x\n", data);
 	//  m_audiocpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -347,20 +352,14 @@ WRITE8_MEMBER(discoboy_state::yunsung8_sound_bankswitch_w)
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(discoboy_state::yunsung8_adpcm_w)
-{
-	/* Swap the nibbles */
-	m_adpcm = ((data & 0xf) << 4) | ((data >> 4) & 0xf);
-}
-
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, discoboy_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("sndbank")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(yunsung8_sound_bankswitch_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(yunsung8_adpcm_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -464,7 +463,6 @@ void discoboy_state::machine_start()
 	save_item(NAME(m_ram_bank));
 	save_item(NAME(m_port_00));
 	save_item(NAME(m_gfxbank));
-	save_item(NAME(m_adpcm));
 	save_item(NAME(m_toggle));
 }
 
@@ -473,16 +471,17 @@ void discoboy_state::machine_reset()
 	m_ram_bank = 0;
 	m_port_00 = 0;
 	m_gfxbank = 0;
-	m_adpcm = 0x80;
-	m_toggle = 0;
+	m_toggle = false;
 }
 
 WRITE_LINE_MEMBER(discoboy_state::yunsung8_adpcm_int)
 {
-	m_msm->data_w(m_adpcm >> 4);
-	m_adpcm <<= 4;
+	if (!state)
+		return;
 
-	m_toggle ^= 1;
+	m_toggle = !m_toggle;
+	m_adpcm_select->select_w(m_toggle);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
@@ -495,8 +494,6 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_10MHz/2) /* 5 MHz? */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(discoboy_state, nmi_line_pulse, 32*60)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -514,9 +511,14 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(discoboy_state, yunsung8_adpcm_int)) /* interrupt function */
@@ -581,8 +583,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(discoboy_state,discoboy)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *AUDIO = memregion("audiocpu")->base();
 
 	memset(m_ram_1, 0, sizeof(m_ram_1));
 	memset(m_ram_2, 0, sizeof(m_ram_2));

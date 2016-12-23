@@ -46,7 +46,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ay_bout_w);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	DECLARE_WRITE_LINE_MEMBER(tonton_vdp0_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_hopper;
 };
@@ -57,16 +56,6 @@ public:
 
 #define HOPPER_PULSE    50          // time between hopper pulses in milliseconds
 #define VDP_MEM         0x30000
-
-
-/*************************************************
-*                Video Hardware                  *
-*************************************************/
-
-WRITE_LINE_MEMBER(tonton_state::tonton_vdp0_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 
 /*************************************************
@@ -232,7 +221,7 @@ static MACHINE_CONFIG_START( tonton, tonton_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MAIN_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(tonton_state,tonton_vdp0_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MAIN_CLOCK)
 
 	MCFG_TICKET_DISPENSER_ADD("hopper", attotime::from_msec(HOPPER_PULSE), TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )

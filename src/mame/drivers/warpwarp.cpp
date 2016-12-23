@@ -150,15 +150,13 @@ INTERRUPT_GEN_MEMBER(warpwarp_state::vblank_irq)
 		device.execute().set_input_line(0, ASSERT_LINE);
 }
 
-IOPORT_ARRAY_MEMBER(warpwarp_state::portnames) { "SW0", "SW1", "DSW2", "PLACEHOLDER" }; // "IN1" & "IN2" are read separately when offset==3
-
 /* B&W Games I/O */
 READ8_MEMBER(warpwarp_state::geebee_in_r)
 {
 	int res;
 
 	offset &= 3;
-	res = m_ports[offset] ? m_ports[offset]->read() : 0;
+	res = m_ports[offset].read_safe(0);
 	if (offset == 3)
 	{
 		res = (flip_screen() & 1) ? m_in2->read() : m_in1->read();  // read player 2 input in cocktail mode
@@ -274,7 +272,7 @@ WRITE8_MEMBER(warpwarp_state::warpwarp_out0_w)
 			m_warpwarp_sound->sound_w(space,0,data);
 			break;
 		case 3:
-			watchdog_reset_w(space,0,data);
+			m_watchdog->reset_w(space,0,data);
 			break;
 	}
 }
@@ -773,6 +771,8 @@ static MACHINE_CONFIG_START( bombbee, warpwarp_state )
 	MCFG_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)
 	MCFG_CPU_PROGRAM_MAP(bombbee_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", warpwarp_state, vblank_irq)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

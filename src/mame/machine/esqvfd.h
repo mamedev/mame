@@ -25,21 +25,21 @@
 
 class esqvfd_t : public device_t {
 public:
-	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	esqvfd_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	DECLARE_WRITE8_MEMBER( write ) { write_char(data); }
 
 	virtual void write_char(int data) = 0;
 	virtual void update_display();
 
-	UINT32 conv_segments(UINT16 segin);
+	uint32_t conv_segments(uint16_t segin);
 
 protected:
-	static const UINT8 AT_NORMAL      = 0x00;
-	static const UINT8 AT_BOLD        = 0x01;
-	static const UINT8 AT_UNDERLINE   = 0x02;
-	static const UINT8 AT_BLINK       = 0x04;
-	static const UINT8 AT_BLINKED     = 0x80;   // set when character should be blinked off
+	static const uint8_t AT_NORMAL      = 0x00;
+	static const uint8_t AT_BOLD        = 0x01;
+	static const uint8_t AT_UNDERLINE   = 0x02;
+	static const uint8_t AT_BLINK       = 0x04;
+	static const uint8_t AT_BLINKED     = 0x80;   // set when character should be blinked off
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -48,16 +48,16 @@ protected:
 	int m_cursx, m_cursy;
 	int m_savedx, m_savedy;
 	int m_rows, m_cols;
-	UINT8 m_curattr;
-	UINT8 m_lastchar;
-	UINT8 m_chars[2][40];
-	UINT8 m_attrs[2][40];
-	UINT8 m_dirty[2][40];
+	uint8_t m_curattr;
+	uint8_t m_lastchar;
+	uint8_t m_chars[2][40];
+	uint8_t m_attrs[2][40];
+	uint8_t m_dirty[2][40];
 };
 
 class esq1x22_t : public esqvfd_t {
 public:
-	esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq1x22_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
 
@@ -69,7 +69,7 @@ private:
 
 class esq2x40_t : public esqvfd_t {
 public:
-	esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq2x40_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
 
@@ -81,7 +81,7 @@ private:
 
 class esq2x40_sq1_t : public esqvfd_t {
 public:
-	esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	esq2x40_sq1_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual void write_char(int data) override;
 

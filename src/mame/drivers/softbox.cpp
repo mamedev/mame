@@ -208,7 +208,7 @@ READ8_MEMBER( softbox_state::ppi1_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= !m_ieee->atn_r();
 	data |= !m_ieee->dav_r() << 1;
@@ -266,8 +266,8 @@ READ8_MEMBER( softbox_state::ppi1_pc_r )
 
 	*/
 
-	UINT8 status = m_hdc->status_r(space, 0);
-	UINT8 data = 0;
+	uint8_t status = m_hdc->status_r(space, 0);
+	uint8_t data = 0;
 
 	data |= (status & CONTROLLER_BUSY) ? 0 : 0x10;
 	data |= (status & CONTROLLER_DIRECTION) ? 0 : 0x20;

@@ -22,7 +22,7 @@ class diskonchip_g3_device : public device_t,
 {
 public:
 	// construction/destruction
-	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	diskonchip_g3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void set_size(int _size) { m_size = _size; }
 protected:
@@ -42,59 +42,59 @@ public:
 	DECLARE_READ16_MEMBER( sec_3_r );
 	DECLARE_WRITE16_MEMBER( sec_3_w );
 private:
-	UINT32 g3_offset_data_1();
-	UINT32 g3_offset_data_2();
-	UINT32 g3_offset_data_3();
-	UINT8 g3_read_data();
-	void g3_write_data(UINT8 data);
-	UINT16 sec_2_read_1000();
-	UINT16 sec_2_read_1074();
-	UINT8 sec_2_read_1042();
-	UINT8 sec_2_read_1046();
-	UINT8 sec_2_read_1048();
-	UINT8 sec_2_read_1049();
-	UINT8 sec_2_read_104A();
-	UINT8 sec_2_read_104B();
-	UINT8 sec_2_read_104C();
-	UINT8 sec_2_read_104D();
-	UINT8 sec_2_read_104E();
-	UINT8 sec_2_read_104F();
-	UINT8 sec_2_read_100E();
-	UINT8 sec_2_read_1014();
-	UINT8 sec_2_read_1022();
-	UINT8 sec_2_read_1038();
-	UINT16 sec_2_read16(UINT32 offset);
-	UINT8 sec_2_read8(UINT32 offset);
-	void sec_2_write_100C(UINT8 data);
-	void sec_2_write_1032(UINT8 data);
+	uint32_t g3_offset_data_1();
+	uint32_t g3_offset_data_2();
+	uint32_t g3_offset_data_3();
+	uint8_t g3_read_data();
+	void g3_write_data(uint8_t data);
+	uint16_t sec_2_read_1000();
+	uint16_t sec_2_read_1074();
+	uint8_t sec_2_read_1042();
+	uint8_t sec_2_read_1046();
+	uint8_t sec_2_read_1048();
+	uint8_t sec_2_read_1049();
+	uint8_t sec_2_read_104A();
+	uint8_t sec_2_read_104B();
+	uint8_t sec_2_read_104C();
+	uint8_t sec_2_read_104D();
+	uint8_t sec_2_read_104E();
+	uint8_t sec_2_read_104F();
+	uint8_t sec_2_read_100E();
+	uint8_t sec_2_read_1014();
+	uint8_t sec_2_read_1022();
+	uint8_t sec_2_read_1038();
+	uint16_t sec_2_read16(uint32_t offset);
+	uint8_t sec_2_read8(uint32_t offset);
+	void sec_2_write_100C(uint8_t data);
+	void sec_2_write_1032(uint8_t data);
 	void g3_erase_block();
-	void sec_2_write_1034(UINT8 data);
-	void sec_2_write_1036(UINT8 data);
-	void sec_2_write_1040(UINT16 data);
-	void sec_2_write_100A(UINT8 data);
-	void sec_2_write16(UINT32 offset, UINT16 data);
-	void sec_2_write8(UINT32 offset, UINT8 data);
+	void sec_2_write_1034(uint8_t data);
+	void sec_2_write_1036(uint8_t data);
+	void sec_2_write_1040(uint16_t data);
+	void sec_2_write_100A(uint8_t data);
+	void sec_2_write16(uint32_t offset, uint16_t data);
+	void sec_2_write8(uint32_t offset, uint8_t data);
 
 	int m_size;
 
-	UINT32 m_planes;
-	UINT32 m_blocks;
-	UINT32 m_pages;
-	UINT32 m_user_data_size;
-	UINT32 m_extra_area_size;
-	std::unique_ptr<UINT8[]> m_data[3];
-	UINT32 m_data_size[3];
-	UINT8  m_sec_2[0x800];
-	UINT32 m_data_1036;
-	UINT32 m_data_1036_count;
-	UINT32 m_transfer_offset;
-	UINT8  m_device;
-	UINT32 m_block;
-	UINT32 m_page;
-	UINT32 m_plane;
-	UINT32 m_transfersize;
-	UINT8  m_test;
-	UINT32 m_address_count;
+	uint32_t m_planes;
+	uint32_t m_blocks;
+	uint32_t m_pages;
+	uint32_t m_user_data_size;
+	uint32_t m_extra_area_size;
+	std::unique_ptr<uint8_t[]> m_data[3];
+	uint32_t m_data_size[3];
+	uint8_t  m_sec_2[0x800];
+	uint32_t m_data_1036;
+	uint32_t m_data_1036_count;
+	uint32_t m_transfer_offset;
+	uint8_t  m_device;
+	uint32_t m_block;
+	uint32_t m_page;
+	uint32_t m_plane;
+	uint32_t m_transfersize;
+	uint8_t  m_test;
+	uint32_t m_address_count;
 };
 
 // device type definition

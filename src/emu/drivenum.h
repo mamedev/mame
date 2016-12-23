@@ -15,6 +15,13 @@
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+GAME_EXTERN(___empty);
+
+
+//**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
 
@@ -84,9 +91,9 @@ public:
 	// current item
 	const game_driver &driver() const { return driver_list::driver(m_current); }
 	machine_config &config() const { return config(m_current, m_options); }
-	int clone() { return driver_list::clone(m_current); }
-	int non_bios_clone() { return driver_list::non_bios_clone(m_current); }
-	int compatible_with() { return driver_list::compatible_with(m_current); }
+	int clone() const { return driver_list::clone(m_current); }
+	int non_bios_clone() const { return driver_list::non_bios_clone(m_current); }
+	int compatible_with() const { return driver_list::compatible_with(m_current); }
 	void include() { include(m_current); }
 	void exclude() { exclude(m_current); }
 
@@ -106,7 +113,7 @@ public:
 	int filter(const char *string = nullptr);
 	int filter(const game_driver &driver);
 	void include_all();
-	void exclude_all() { memset(&m_included[0], 0, sizeof(m_included[0]) * s_driver_count); m_filtered_count = 0; }
+	void exclude_all() { std::fill(m_included.begin(), m_included.end(), false); m_filtered_count = 0; }
 	void reset() { m_current = -1; }
 	bool next();
 	bool next_excluded();
@@ -125,7 +132,7 @@ private:
 	int                 m_current;
 	int                 m_filtered_count;
 	emu_options &       m_options;
-	std::vector<UINT8> m_included;
+	std::vector<bool> m_included;
 	mutable std::vector<std::unique_ptr<machine_config>> m_config;
 	mutable std::vector<int> m_config_cache;
 };

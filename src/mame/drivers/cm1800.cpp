@@ -52,7 +52,7 @@ public:
 	DECLARE_READ8_MEMBER( term_status_r );
 	DECLARE_READ8_MEMBER( term_r );
 	DECLARE_WRITE8_MEMBER( kbd_put );
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 
 	required_device<generic_terminal_device> m_terminal;
 	virtual void machine_reset() override;
@@ -66,7 +66,7 @@ READ8_MEMBER( cm1800_state::term_status_r )
 
 READ8_MEMBER( cm1800_state::term_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

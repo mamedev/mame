@@ -28,7 +28,7 @@ Year + Game         PCB             Notes
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "includes/unico.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 
@@ -49,7 +49,7 @@ WRITE16_MEMBER(unico_state::burglarx_sound_bank_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
-		m_oki->set_bank_base(0x40000 * bank );
+		m_oki->set_rom_bank(bank);
 	}
 }
 
@@ -87,8 +87,8 @@ WRITE16_MEMBER(unico_state::zeropnt_sound_bank_w)
 		   contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		UINT8 *dst  = memregion("oki")->base();
-		UINT8 *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
+		uint8_t *dst  = memregion("oki")->base();
+		uint8_t *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
 		machine().bookkeeping().coin_counter_w(0,data & 0x1000);
@@ -176,8 +176,8 @@ WRITE32_MEMBER(unico_state::zeropnt2_sound_bank_w)
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		UINT8 *dst  = memregion("oki1")->base();
-		UINT8 *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
+		uint8_t *dst  = memregion("oki1")->base();
+		uint8_t *src  = dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
 }

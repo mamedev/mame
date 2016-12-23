@@ -44,21 +44,36 @@ The Grid         v1.2   10/18/2000
 #define BEAM_DX         3
 #define BEAM_XOFFS      40      /* table in the code indicates an offset of 20 with a beam height of 7 */
 
-static UINT32           gun_control;
-static UINT8            gun_irq_state;
+static uint32_t           gun_control;
+static uint8_t            gun_irq_state;
 static emu_timer *      gun_timer[2];
-static INT32            gun_x[2], gun_y[2];
+static int32_t            gun_x[2], gun_y[2];
 
-static UINT8            crusnexo_leds_select;
-static UINT8            keypad_select;
-static UINT8            bitlatch[10];
+static uint8_t            crusnexo_leds_select;
+static uint8_t            keypad_select;
+static uint8_t            bitlatch[10];
 
-static UINT8 cmos_protected;
+static uint8_t cmos_protected;
 
 
 static emu_timer *timer[2];
 
 
+/*************************************************************************
+Driver for Midway Zeus2 games
+**************************************************************************/
+#include "video/zeus2.h"
+
+class midzeus2_state : public midzeus_state
+{
+public:
+	midzeus2_state(const machine_config &mconfig, device_type type, const char *tag)
+		: midzeus_state(mconfig, type, tag), m_zeus(*this, "zeus2") { }
+	required_device<zeus2_device> m_zeus;
+
+	DECLARE_WRITE_LINE_MEMBER(zeus_irq);
+private:
+};
 
 
 
@@ -70,8 +85,8 @@ static emu_timer *timer[2];
 
 MACHINE_START_MEMBER(midzeus_state,midzeus)
 {
-	timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 
 	gun_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
 	gun_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(midzeus_state::invasn_gun_callback),this));
@@ -91,7 +106,7 @@ MACHINE_RESET_MEMBER(midzeus_state,midzeus)
 	*m_ram_base <<= 1;
 	m_maincpu->reset();
 
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -113,6 +128,10 @@ INTERRUPT_GEN_MEMBER(midzeus_state::display_irq)
 	machine().scheduler().timer_set(attotime::from_hz(30000000), timer_expired_delegate(FUNC(midzeus_state::display_irq_off),this));
 }
 
+WRITE_LINE_MEMBER(midzeus2_state::zeus_irq)
+{
+	m_maincpu->set_input_line(2, ASSERT_LINE);
+}
 
 
 /*************************************
@@ -127,7 +146,7 @@ WRITE32_MEMBER(midzeus_state::cmos_w)
 		COMBINE_DATA(&m_nvram[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", space.device().safe_pc(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -139,7 +158,7 @@ READ32_MEMBER(midzeus_state::cmos_r)
 
 WRITE32_MEMBER(midzeus_state::cmos_protect_w)
 {
-	cmos_protected = FALSE;
+	cmos_protected = false;
 }
 
 
@@ -162,7 +181,7 @@ WRITE32_MEMBER(midzeus_state::zeus2_timekeeper_w)
 		m_m48t35->write(space, offset, data, 0xff);
 	else
 		logerror("%s:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", machine().describe_context(), bitlatch[2], cmos_protected);
-	cmos_protected = TRUE;
+	cmos_protected = true;
 }
 
 
@@ -227,7 +246,7 @@ READ32_MEMBER(midzeus_state::bitlatches_r)
 
 WRITE32_MEMBER(midzeus_state::bitlatches_w)
 {
-	UINT32 oldval = bitlatch[offset];
+	uint32_t oldval = bitlatch[offset];
 	bitlatch[offset] = data;
 
 	switch (offset)
@@ -351,6 +370,12 @@ READ32_MEMBER(midzeus_state::linkram_r)
 		return 0x30313042;
 	else if (offset == 0x3c)
 		return 0xffffffff;
+	else if (offset == 0x30)
+		// ???
+		return 0xffffffff;
+	else if (offset == 0xc)
+		// ???
+		return 0xffffffff;
 	return m_linkram[offset];
 }
 
@@ -375,7 +400,7 @@ READ32_MEMBER(midzeus_state::tms32031_control_r)
 	{
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
-		INT32 result = (timer[which]->elapsed() * 10000000).as_double();
+		int32_t result = (timer[which]->elapsed() * 10000000).as_double();
 		return result;
 	}
 
@@ -416,7 +441,7 @@ WRITE32_MEMBER(midzeus_state::tms32031_control_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::custom_49way_r)
 {
-	static const UINT8 translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
+	static const uint8_t translate49[7] = { 0x8, 0xc, 0xe, 0xf, 0x3, 0x1, 0x0 };
 	const char *namex = (const char *)param;
 	const char *namey = namex + strlen(namex) + 1;
 	return (translate49[ioport(namey)->read() >> 4] << 4) | translate49[ioport(namex)->read() >> 4];
@@ -432,8 +457,8 @@ WRITE32_MEMBER(midzeus_state::keypad_select_w)
 
 CUSTOM_INPUT_MEMBER(midzeus_state::keypad_r)
 {
-	UINT32 bits = ioport((const char *)param)->read();
-	UINT8 select = keypad_select;
+	uint32_t bits = ioport((const char *)param)->read();
+	uint8_t select = keypad_select;
 	while ((select & 1) != 0)
 	{
 		select >>= 1;
@@ -494,13 +519,13 @@ TIMER_CALLBACK_MEMBER(midzeus_state::invasn_gun_callback)
 	/* generate another interrupt on the next scanline while we are within the BEAM_DY */
 	beamy++;
 	if (beamy <= m_screen->visible_area().max_y && beamy <= gun_y[player] + BEAM_DY)
-		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, MAX(0, gun_x[player] - BEAM_DX)), player);
+		gun_timer[player]->adjust(m_screen->time_until_pos(beamy, std::max(0, gun_x[player] - BEAM_DX)), player);
 }
 
 
 WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 {
-	UINT32 old_control = gun_control;
+	uint32_t old_control = gun_control;
 	int player;
 
 	COMBINE_DATA(&gun_control);
@@ -512,7 +537,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 
 	for (player = 0; player < 2; player++)
 	{
-		UINT8 pmask = 0x04 << player;
+		uint8_t pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
 			const rectangle &visarea = m_screen->visible_area();
@@ -523,7 +548,7 @@ WRITE32_MEMBER(midzeus_state::invasn_gun_w)
 			};
 			gun_x[player] = ioport(names[player][0])->read() * visarea.width() / 255 + visarea.min_x + BEAM_XOFFS;
 			gun_y[player] = ioport(names[player][1])->read() * visarea.height() / 255 + visarea.min_y;
-			gun_timer[player]->adjust(m_screen->time_until_pos(MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_timer[player]->adjust(m_screen->time_until_pos(std::max(0, gun_y[player] - BEAM_DY), std::max(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -533,7 +558,7 @@ READ32_MEMBER(midzeus_state::invasn_gun_r)
 {
 	int beamx = m_screen->hpos();
 	int beamy = m_screen->vpos();
-	UINT32 result = 0xffff;
+	uint32_t result = 0xffff;
 	int player;
 
 	for (player = 0; player < 2; player++)
@@ -574,7 +599,7 @@ static ADDRESS_MAP_START( zeus2_map, AS_PROGRAM, 32, midzeus2_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE("ram_base")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM
 	AM_RANGE(0x808000, 0x80807f) AM_READWRITE(tms32031_control_r, tms32031_control_w) AM_SHARE("tms32031_ctl")
-	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_SHARE("zeusbase")
+	AM_RANGE(0x880000, 0x88007f) AM_DEVREADWRITE("zeus2", zeus2_device, zeus2_r, zeus2_w)
 	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_SHARE("linkram")
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
@@ -709,27 +734,27 @@ static INPUT_PORTS_START( mk4 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1) PORT_8WAY
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 High Punch")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Block")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 High Kick")
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2) PORT_8WAY
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2) PORT_8WAY
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 High Punch")
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("P2 Block")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 High Kick")
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME("P1 Low Punch")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("P1 Low Kick")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME("P1 Run")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_NAME("P2 Low Punch")
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("P2 Low Kick")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_NAME("P2 Run")
 	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1133,7 +1158,7 @@ static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(zeus2_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state,  display_irq)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", midzeus2_state, display_irq)
 
 	MCFG_MACHINE_START_OVERRIDE(midzeus2_state,midzeus)
 	MCFG_MACHINE_RESET_OVERRIDE(midzeus2_state,midzeus)
@@ -1142,9 +1167,10 @@ static MACHINE_CONFIG_START( midzeus2, midzeus2_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(MIDZEUS_VIDEO_CLOCK/4, 666, 0, 512, 438, 0, 400)
-	MCFG_SCREEN_UPDATE_DRIVER(midzeus2_state, screen_update_midzeus2)
+	MCFG_SCREEN_UPDATE_DEVICE("zeus2", zeus2_device, screen_update)
 
-	MCFG_VIDEO_START_OVERRIDE(midzeus2_state,midzeus2)
+	MCFG_DEVICE_ADD("zeus2", ZEUS2, ZEUS2_VIDEO_CLOCK)
+	MCFG_ZEUS2_IRQ_CB(WRITELINE(midzeus2_state, zeus_irq))
 
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)

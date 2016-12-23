@@ -1029,7 +1029,7 @@ void taitoz_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_subcpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taitoz_state::device_timer");
+		assert_always(false, "Unknown id in taitoz_state::device_timer");
 	}
 }
 
@@ -1055,7 +1055,7 @@ INTERRUPT_GEN_MEMBER(taitoz_state::sci_interrupt)
                               EEPROM
 ******************************************************************/
 
-static const UINT16 spacegun_default_eeprom[64]=
+static const uint16_t spacegun_default_eeprom[64]=
 {
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
 	0x0000,0x00ff,0x0001,0x4141,0x0000,0x00ff,0x0000,0xf0f0,
@@ -1103,9 +1103,9 @@ WRITE16_MEMBER(taitoz_state::spacegun_output_bypass_w)
 
 CUSTOM_INPUT_MEMBER(taitoz_state::taitoz_pedal_r)
 {
-	static const UINT8 retval[8] = { 0,1,3,2,6,7,5,4 };
-	const char *tag = (const char *)param;
-	return retval[read_safe(ioport(tag), 0) & 7];
+	static const uint8_t retval[8] = { 0,1,3,2,6,7,5,4 };
+	ioport_port *port = ioport((const char *)param);
+	return retval[port != nullptr ? port->read() & 7 : 0];
 }
 
 
@@ -1113,8 +1113,8 @@ READ8_MEMBER(taitoz_state::contcirc_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0x80);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1134,8 +1134,8 @@ READ8_MEMBER(taitoz_state::chasehq_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for extra inputs */
 
-	UINT8 port = m_tc0220ioc->port_r(space, 0);   /* read port number */
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0x80);
+	uint8_t port = m_tc0220ioc->port_r(space, 0);   /* read port number */
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (port)
 	{
@@ -1222,7 +1222,7 @@ WRITE16_MEMBER(taitoz_state::bshark_stick_w)
 
 READ16_MEMBER(taitoz_state::sci_steer_input_r)
 {
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0x80);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{
@@ -1293,7 +1293,7 @@ WRITE16_MEMBER(taitoz_state::spacegun_gun_output_w)
 
 READ16_MEMBER(taitoz_state::dblaxle_steer_input_r)
 {
-	UINT16 steer = 0xff80 + read_safe(ioport("STEER"), 0x80);
+	uint16_t steer = 0xff80 + m_steer.read_safe(0x80);
 
 	switch (offset)
 	{
@@ -2892,28 +2892,6 @@ static GFXDECODE_START( dblaxle )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                         YM2610 (SOUND)
-
-The first interface is for game boards with twin 68000 and Z80.
-Interface B is for games which lack a Z80 (Spacegun, Bshark).
-**************************************************************/
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoz_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoz_state::irqhandlerb)
-{
-	// DG: this is probably specific to Z80 and wrong?
-//  m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***********************************************************
                       MACHINE DRIVERS
 
@@ -3033,7 +3011,7 @@ static MACHINE_CONFIG_START( contcirc, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3111,7 +3089,7 @@ static MACHINE_CONFIG_START( chasehq, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 1.0)
@@ -3189,7 +3167,7 @@ static MACHINE_CONFIG_START( enforce, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 20.0)
@@ -3262,7 +3240,7 @@ static MACHINE_CONFIG_START( bshark, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
+	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 28.0)
@@ -3343,7 +3321,7 @@ static MACHINE_CONFIG_START( sci, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3424,7 +3402,7 @@ static MACHINE_CONFIG_START( nightstr, taitoz_state )
 	MCFG_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MCFG_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3502,7 +3480,7 @@ static MACHINE_CONFIG_START( aquajack, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3576,7 +3554,7 @@ static MACHINE_CONFIG_START( spacegun, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 16000000/2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandlerb))
+	//MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) // DG: this is probably specific to Z80 and wrong?
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3641,7 +3619,6 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_TC0480SCP_TX_REGION(2)
 	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
@@ -3649,7 +3626,7 @@ static MACHINE_CONFIG_START( dblaxle, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3717,7 +3694,6 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_TC0480SCP_TX_REGION(2)
 	MCFG_TC0480SCP_OFFSETS(0x1f, 0x08)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tc0150rod", TC0150ROD, 0)
 
@@ -3725,7 +3701,7 @@ static MACHINE_CONFIG_START( racingb, taitoz_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoz_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "2610.1.l", 8.0)

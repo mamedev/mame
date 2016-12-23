@@ -6,12 +6,10 @@ Shanghai
 
 driver by Nicola Salmoria
 
-The end of round animation in Shanghai is wrong; change the opcode at 0xfb1f2
-to a NOP to jump to it immediately at the beginning of a round.
-
-I'm not sure about the refresh rate, 60Hz makes time match the dip switch
-settings, but music runs too fast.
-
+TODO:
+- games are currently too fast (especially noticeable with kothello screen transitions), either irqs actually
+  fires every two frames or a HD63484 SR bit isn't behaving correctly;
+- minor glitch with gfx copy on shanghai stage info panel (garbage on right);
 
 * kothello
 
@@ -23,6 +21,7 @@ displayed.
 
 #include "emu.h"
 #include "cpu/nec/nec.h"
+#include "sound/2203intf.h"
 #include "audio/seibu.h"
 #include "video/hd63484.h"
 
@@ -32,19 +31,13 @@ class shanghai_state : public driver_device
 public:
 	shanghai_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_hd63484(*this, "hd63484") { }
+		m_maincpu(*this, "maincpu") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_device<hd63484_device> m_hd63484;
 
 	DECLARE_WRITE16_MEMBER(shanghai_coin_w);
-	DECLARE_READ16_MEMBER(kothello_hd63484_status_r);
 
-	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(shanghai);
-
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(interrupt);
 };
@@ -78,57 +71,6 @@ PALETTE_INIT_MEMBER(shanghai_state,shanghai)
 
 		palette.set_pen_color(i,rgb_t(r,g,b));
 	}
-}
-
-void shanghai_state::video_start()
-{
-}
-
-UINT32 shanghai_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	int x, y, b, src;
-
-	address_space &space = machine().driver_data()->generic_space();
-	b = ((m_hd63484->regs_r(space, 0xcc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xce/2, 0xffff);
-	for (y = 0; y < 280; y++)
-	{
-		for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
-		{
-			b &= (HD63484_RAM_SIZE - 1);
-			src = m_hd63484->ram_r(space, b, 0xffff);
-			bitmap.pix16(y, x)     = src & 0x00ff;
-			bitmap.pix16(y, x + 1) = (src & 0xff00) >> 8;
-			b++;
-		}
-	}
-
-	if ((m_hd63484->regs_r(space, 0x06/2, 0xffff) & 0x0300) == 0x0300)
-	{
-		int sy = (m_hd63484->regs_r(space, 0x94/2, 0xffff) & 0x0fff) - (m_hd63484->regs_r(space, 0x88/2, 0xffff) >> 8);
-		int h = m_hd63484->regs_r(space, 0x96/2, 0xffff) & 0x0fff;
-		int sx = ((m_hd63484->regs_r(space, 0x92/2, 0xffff) >> 8) - (m_hd63484->regs_r(space, 0x84/2, 0xffff) >> 8)) * 4;
-		int w = (m_hd63484->regs_r(space, 0x92/2, 0xffff) & 0xff) * 4;
-		if (sx < 0) sx = 0; // not sure about this (shangha2 title screen)
-
-		b = (((m_hd63484->regs_r(space, 0xdc/2, 0xffff) & 0x000f) << 16) + m_hd63484->regs_r(space, 0xde/2, 0xffff));
-
-		for (y = sy ; y <= sy + h && y < 280 ; y++)
-		{
-			for (x = 0 ; x < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2 ; x += 2)
-			{
-				b &= (HD63484_RAM_SIZE - 1);
-				src = m_hd63484->ram_r(space, b, 0xffff);
-				if (x <= w && x + sx >= 0 && x + sx < (m_hd63484->regs_r(space, 0xca/2, 0xffff) & 0x0fff) * 2)
-				{
-					bitmap.pix16(y, x + sx)     = src & 0x00ff;
-					bitmap.pix16(y, x + sx + 1) = (src & 0xff00) >> 8;
-				}
-				b++;
-			}
-		}
-	}
-
-	return 0;
 }
 
 INTERRUPT_GEN_MEMBER(shanghai_state::interrupt)
@@ -179,14 +121,9 @@ static ADDRESS_MAP_START( shangha2_portmap, AS_IO, 16, shanghai_state )
 	AM_RANGE(0x50, 0x51) AM_WRITE(shanghai_coin_w)
 ADDRESS_MAP_END
 
-READ16_MEMBER(shanghai_state::kothello_hd63484_status_r)
-{
-	return 0xff22;  /* write FIFO ready + command end + read FIFO ready */
-}
-
 static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08010, 0x08011) AM_READ(kothello_hd63484_status_r) AM_DEVWRITE("hd63484", hd63484_device, address_w)
+	AM_RANGE(0x08010, 0x08011) AM_DEVREADWRITE("hd63484", hd63484_device, status_r, address_w)
 	AM_RANGE(0x08012, 0x08013) AM_DEVREADWRITE("hd63484", hd63484_device, data_r, data_w)
 	AM_RANGE(0x09010, 0x09011) AM_READ_PORT("P1")
 	AM_RANGE(0x09012, 0x09013) AM_READ_PORT("P2")
@@ -195,6 +132,25 @@ static ADDRESS_MAP_START( kothello_map, AS_PROGRAM, 16, shanghai_state )
 	AM_RANGE(0x0a000, 0x0a1ff) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x0b010, 0x0b01f) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, main_word_r, main_word_w)
 	AM_RANGE(0x80000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( kothello_sound_map, AS_PROGRAM, 8, shanghai_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("seibu_sound", seibu_sound_device, pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_DEVWRITE("seibu_sound", seibu_sound_device, irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_DEVWRITE("seibu_sound", seibu_sound_device, rst18_ack_w)
+	AM_RANGE(0x4005, 0x4006) AM_DEVWRITE("adpcm", seibu_adpcm_device, adr_w)
+	AM_RANGE(0x4007, 0x4007) AM_DEVWRITE("seibu_sound", seibu_sound_device, bank_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("seibu_sound", seibu_sound_device, ym_r, ym_w)
+	AM_RANGE(0x4010, 0x4011) AM_DEVREAD("seibu_sound", seibu_sound_device, soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_DEVREAD("seibu_sound", seibu_sound_device, main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_DEVWRITE("seibu_sound", seibu_sound_device, main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_DEVWRITE("adpcm", seibu_adpcm_device, ctl_w)
+	AM_RANGE(0x401b, 0x401b) AM_DEVWRITE("seibu_sound", seibu_sound_device, coin_w)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("seibu_bank1")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( kothello )
@@ -418,6 +374,9 @@ static INPUT_PORTS_START( shangha2 )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
+static ADDRESS_MAP_START( hd63484_map, AS_0, 16, shanghai_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_RAM
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
@@ -429,18 +388,18 @@ static MACHINE_CONFIG_START( shanghai, shanghai_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 	MCFG_PALETTE_INIT_OWNER(shanghai_state,shanghai)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -465,17 +424,17 @@ static MACHINE_CONFIG_START( shangha2, shanghai_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -497,37 +456,42 @@ static MACHINE_CONFIG_START( kothello, shanghai_state )
 	MCFG_CPU_PROGRAM_MAP(kothello_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", shanghai_state,  interrupt)
 
-	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_16MHz/4)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)
+	MCFG_CPU_PROGRAM_MAP(kothello_sound_map)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(12000))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30) /* Should be 57Hz, but plays too fast */
+	MCFG_SCREEN_REFRESH_RATE(57)
+	//MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 	MCFG_SCREEN_SIZE(384, 280)
-	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
-	MCFG_SCREEN_UPDATE_DRIVER(shanghai_state, screen_update)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MCFG_SCREEN_UPDATE_DEVICE("hd63484", hd63484_device, update_screen)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
-	// TODO: convert to use H63484
-	MCFG_DEVICE_ADD("hd63484", HD63484, 0)
+	MCFG_HD63484_ADD("hd63484", 0, hd63484_map)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
-	MCFG_SOUND_ADD("ym1", YM2203, XTAL_16MHz/4)
+	/* same as standard seibu ym2203, but also reads "DSW" */
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_16MHz/4)
 	MCFG_YM2203_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW"))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MCFG_SOUND_ADD("ym2", YM2203, XTAL_16MHz/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym2203_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym2203_device, write))
 
-	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
+	MCFG_SOUND_ADD("adpcm", SEIBU_ADPCM, 8000) // actually MSM5205
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -682,10 +646,8 @@ ROM_START( kothello )
 	ROM_LOAD( "rom5.5l",   0x00000, 0x02000, CRC(7eb6e697) SHA1(4476e13f9a9e04472581f2c069760f53b33d5672))
 	ROM_CONTINUE(          0x10000, 0x0e000 )
 
-	ROM_REGION( 0x10000, "adpcm1", 0 )
+	ROM_REGION( 0x10000, "adpcm", 0 )
 	ROM_LOAD( "rom6.7m",   0x00000, 0x10000, CRC(4ab1335d) SHA1(3a803e8a7e9b0c2a26ee23e7ac9c89c70cf2504b))
-
-	ROM_REGION( 0x10000, "adpcm2", ROMREGION_ERASE00 )
 ROM_END
 
 

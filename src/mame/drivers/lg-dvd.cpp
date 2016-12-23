@@ -1,3 +1,5 @@
+// license:BSD-3-Clause
+// copyright-holders:Olivier Galibert
 /*
   Rather skeleton driver for a LG GP40NW10 usb dvd writer.
 
@@ -5,7 +7,6 @@
 */
 
 #include "emu.h"
-#include "debugger.h"
 #include "cpu/mcs51/mcs51.h"
 
 class lg_dvd_state : public driver_device {

@@ -158,6 +158,7 @@
 #include "emu.h"
 #include "cpu/mb88xx/mb88xx.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "includes/kangaroo.h"
 
@@ -256,7 +257,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, kangaroo_state )
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 	AM_RANGE(0xe400, 0xe400) AM_MIRROR(0x03ff) AM_READ_PORT("DSW0")
 	AM_RANGE(0xe800, 0xe80a) AM_MIRROR(0x03f0) AM_WRITE(kangaroo_video_control_w) AM_SHARE("video_control")
-	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xec00, 0xec00) AM_MIRROR(0x00ff) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xed00, 0xed00) AM_MIRROR(0x00ff) AM_READ_PORT("IN1") AM_WRITE(kangaroo_coin_counter_w)
 	AM_RANGE(0xee00, 0xee00) AM_MIRROR(0x00ff) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
@@ -272,7 +273,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, kangaroo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
@@ -282,7 +283,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, kangaroo_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x0fff) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 ADDRESS_MAP_END
@@ -447,6 +448,9 @@ static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

@@ -9,11 +9,10 @@
 **********************************************************************/
 
 #include "emu.h"
-#include "cpu/saturn/saturn.h"
-#include "sound/dac.h"
-#include "machine/nvram.h"
-
 #include "includes/hp48.h"
+#include "cpu/saturn/saturn.h"
+#include "machine/nvram.h"
+#include "sound/volt_reg.h"
 
 /* TODO:
    - IR I/O port
@@ -1251,16 +1250,6 @@ ADDRESS_MAP_END
 
 
 
-/*************************** layout ********************************/
-
-static const char layout_hp48gx[] = "hp48gx";
-static const char layout_hp48g [] = "hp48g";
-static const char layout_hp48gp[] = "hp48gp";
-static const char layout_hp48sx[] = "hp48sx";
-static const char layout_hp48s [] = "hp48s";
-static const char layout_hp49g [] = "hp49g";
-
-
 /*************************** driver ********************************/
 
 
@@ -1290,14 +1279,14 @@ static MACHINE_CONFIG_START( hp48_common, hp48_state )
 	MCFG_PALETTE_INIT_OWNER(hp48_state, hp48)
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO( "mono" )
-	MCFG_SOUND_ADD( "dac",  DAC, 0 )
-	MCFG_SOUND_ROUTE( ALL_OUTPUTS, "mono", 1.) /* 1-bit beeper */
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48gx, hp48_common )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gx )
-	MCFG_DEFAULT_LAYOUT ( layout_hp48gx )
 
 	/* expansion ports */
 	MCFG_HP48_PORT_ADD ( "port1", 0, HP48_CE2,     128*1024 )
@@ -1310,7 +1299,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48g, hp48_common )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48g )
-	MCFG_DEFAULT_LAYOUT ( layout_hp48g )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1320,7 +1308,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hp48gp, hp48_common )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48gp )
-	MCFG_DEFAULT_LAYOUT ( layout_hp48gp )
 
 	/* serial I/O */
 	//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )
@@ -1332,7 +1319,6 @@ static MACHINE_CONFIG_DERIVED( hp48sx, hp48_common )
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48sx )
-	MCFG_DEFAULT_LAYOUT ( layout_hp48sx )
 
 	/* expansion ports */
 	MCFG_HP48_PORT_ADD  ( "port1", 0, HP48_CE1, 128*1024)
@@ -1346,7 +1332,6 @@ static MACHINE_CONFIG_DERIVED( hp48s, hp48_common )
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_CPU_CLOCK      ( 2000000 )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp48s )
-	MCFG_DEFAULT_LAYOUT ( layout_hp48s )
 
 	/* serial I/O */
 	//MCFG_KERMIT_ADD( "rs232_k", hp48_kermit_rs232_conf )
@@ -1355,7 +1340,6 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hp49g, hp48_common )
 	MCFG_CPU_MODIFY     ( "maincpu" )
 	MCFG_MACHINE_START_OVERRIDE  (hp48_state, hp49g )
-	MCFG_DEFAULT_LAYOUT ( layout_hp49g )
 
 	/* serial I/O */
 		//MCFG_XMODEM_ADD( "rs232_x", hp48_xmodem_rs232_conf )

@@ -72,7 +72,7 @@ static MACHINE_CONFIG_FRAGMENT( cfg_superio )
 MACHINE_CONFIG_END
 
 
-isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+isa8_fdc_device::isa8_fdc_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	device_isa8_card_interface(mconfig, *this),
 	fdc(*this, "fdc")
@@ -83,7 +83,7 @@ void isa8_fdc_device::device_start()
 {
 	set_isa_device();
 	m_isa->install_device(0x03f0, 0x03f7, *fdc, &pc_fdc_interface::map);
-	m_isa->set_dma_channel(2, this, TRUE);
+	m_isa->set_dma_channel(2, this, true);
 }
 
 void isa8_fdc_device::device_reset()
@@ -100,12 +100,12 @@ WRITE_LINE_MEMBER( isa8_fdc_device::drq_w )
 	m_isa->drq2_w(state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-UINT8 isa8_fdc_device::dack_r(int line)
+uint8_t isa8_fdc_device::dack_r(int line)
 {
 	return fdc->dma_r();
 }
 
-void isa8_fdc_device::dack_w(int line, UINT8 data)
+void isa8_fdc_device::dack_w(int line, uint8_t data)
 {
 	return fdc->dma_w(data);
 }
@@ -115,7 +115,7 @@ void isa8_fdc_device::eop_w(int state)
 	fdc->tc_w(state == ASSERT_LINE);
 }
 
-isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits XT FDC hookup", tag, owner, clock, "isa8_fdc_xt", __FILE__)
+isa8_fdc_xt_device::isa8_fdc_xt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits XT FDC hookup", tag, owner, clock, "isa8_fdc_xt", __FILE__)
 {
 }
 
@@ -124,7 +124,7 @@ machine_config_constructor isa8_fdc_xt_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_xt);
 }
 
-isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_AT, "ISA 8bits AT FDC hookup", tag, owner, clock, "isa8_fdc_at", __FILE__)
+isa8_fdc_at_device::isa8_fdc_at_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_AT, "ISA 8bits AT FDC hookup", tag, owner, clock, "isa8_fdc_at", __FILE__)
 {
 }
 
@@ -133,7 +133,7 @@ machine_config_constructor isa8_fdc_at_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_at);
 }
 
-isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits SMC FDC hookup", tag, owner, clock, "isa8_fdc_smc", __FILE__)
+isa8_fdc_smc_device::isa8_fdc_smc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_XT, "ISA 8bits SMC FDC hookup", tag, owner, clock, "isa8_fdc_smc", __FILE__)
 {
 }
 
@@ -142,7 +142,7 @@ machine_config_constructor isa8_fdc_smc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_smc);
 }
 
-isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, "ISA 8bits PS/2 FDC hookup", tag, owner, clock, "isa8_fdc_ps2", __FILE__)
+isa8_fdc_ps2_device::isa8_fdc_ps2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_PS2, "ISA 8bits PS/2 FDC hookup", tag, owner, clock, "isa8_fdc_ps2", __FILE__)
 {
 }
 
@@ -151,7 +151,7 @@ machine_config_constructor isa8_fdc_ps2_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME(cfg_ps2);
 }
 
-isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, "ISA 8bits SUPERIO FDC hookup", tag, owner, clock, "isa8_fdc_superio", __FILE__)
+isa8_fdc_superio_device::isa8_fdc_superio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) : isa8_fdc_device(mconfig, ISA8_FDC_SUPERIO, "ISA 8bits SUPERIO FDC hookup", tag, owner, clock, "isa8_fdc_superio", __FILE__)
 {
 }
 

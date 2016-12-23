@@ -287,7 +287,7 @@ static MACHINE_CONFIG_START( mtx512, mtx_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(mtx_mem)
 	MCFG_CPU_IO_MAP(mtx_io)
-	MCFG_CPU_CONFIG(mtx_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mtx_daisy_chain)
 
 	MCFG_MACHINE_START_OVERRIDE(mtx_state,mtx512)
 	MCFG_MACHINE_RESET_OVERRIDE(mtx_state,mtx512)
@@ -356,7 +356,7 @@ static MACHINE_CONFIG_DERIVED( rs128, mtx512 )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY(Z80_TAG)
 	MCFG_CPU_IO_MAP(rs128_io)
-	MCFG_CPU_CONFIG(rs128_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(rs128_daisy_chain)
 
 	/* devices */
 	MCFG_Z80DART_ADD(Z80DART_TAG,  XTAL_4MHz, 0, 0, 0, 0 )

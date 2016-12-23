@@ -43,7 +43,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_uart_clock);
 
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_terminal_device> m_terminal;
@@ -80,7 +80,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER( imsai_state::keyin_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }

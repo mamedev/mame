@@ -37,7 +37,7 @@
 #define __VIC20_EXPANSION_SLOT__
 
 #include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -57,7 +57,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_VIC20_PASSTHRU_EXPANSION_SLOT_ADD(_tag) \
-	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, NULL) \
+	MCFG_VIC20_EXPANSION_SLOT_ADD(_tag, 0, vic20_expansion_cards, nullptr) \
 	MCFG_VIC20_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, irq_w)) \
 	MCFG_VIC20_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, nmi_w)) \
 	MCFG_VIC20_EXPANSION_SLOT_RES_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, vic20_expansion_slot_device, res_w))
@@ -88,15 +88,15 @@ class vic20_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vic20_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
 	template<class _Object> static devcb_base &set_res_wr_callback(device_t &device, _Object object) { return downcast<vic20_expansion_slot_device &>(device).m_write_res.set_callback(object); }
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
-	void cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
+	void cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3);
 
 	// cartridge interface
 	DECLARE_WRITE_LINE_MEMBER( irq_w ) { m_write_irq(state); }
@@ -110,8 +110,8 @@ protected:
 	virtual void device_reset() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
@@ -122,7 +122,6 @@ protected:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "vic1001_cart"; }
 	virtual const char *file_extensions() const override { return "20,40,60,70,a0,b0,crt"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
@@ -147,15 +146,15 @@ public:
 	device_vic20_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vic20_expansion_card_interface();
 
-	virtual UINT8 vic20_cd_r(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; };
-	virtual void vic20_cd_w(address_space &space, offs_t offset, UINT8 data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
+	virtual uint8_t vic20_cd_r(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { return data; };
+	virtual void vic20_cd_w(address_space &space, offs_t offset, uint8_t data, int ram1, int ram2, int ram3, int blk1, int blk2, int blk3, int blk5, int io2, int io3) { };
 
 protected:
-	optional_shared_ptr<UINT8> m_blk1;
-	optional_shared_ptr<UINT8> m_blk2;
-	optional_shared_ptr<UINT8> m_blk3;
-	optional_shared_ptr<UINT8> m_blk5;
-	optional_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_blk1;
+	optional_shared_ptr<uint8_t> m_blk2;
+	optional_shared_ptr<uint8_t> m_blk3;
+	optional_shared_ptr<uint8_t> m_blk5;
+	optional_shared_ptr<uint8_t> m_nvram;
 
 	vic20_expansion_slot_device *m_slot;
 };

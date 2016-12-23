@@ -40,6 +40,7 @@ RAM = 4116 (x11)
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 
 
@@ -58,13 +59,15 @@ public:
 		m_colorram(*this, "colorram"),
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette"),
-		m_audiocpu(*this, "audiocpu") { }
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	UINT8 m_flipscreen;
-	UINT32 m_ttl74123_output;
-	UINT8 m_AY8910_selected;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	uint8_t m_flipscreen;
+	uint32_t m_ttl74123_output;
+	uint8_t m_AY8910_selected;
 
 	DECLARE_READ8_MEMBER(audio_command_r);
 	DECLARE_WRITE8_MEMBER(audio_command_w);
@@ -86,6 +89,8 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<palette_device> m_palette;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 };
 
 
@@ -126,7 +131,7 @@ WRITE_LINE_MEMBER(r2dtank_state::main_cpu_irq)
 
 READ8_MEMBER(r2dtank_state::audio_command_r)
 {
-	UINT8 ret = soundlatch_byte_r(space, 0);
+	uint8_t ret = m_soundlatch->read(space, 0);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.device().safe_pc(), ret);
 
@@ -136,8 +141,8 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", space.devi
 
 WRITE8_MEMBER(r2dtank_state::audio_command_w)
 {
-	soundlatch_byte_w(space, 0, ~data);
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, HOLD_LINE);
+	m_soundlatch->write(space, 0, ~data);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.device().safe_pc(), data^0xff);
 }
@@ -145,7 +150,7 @@ if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", space.de
 
 READ8_MEMBER(r2dtank_state::audio_answer_r)
 {
-	UINT8 ret = soundlatch2_byte_r(space, 0);
+	uint8_t ret = m_soundlatch2->read(space, 0);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#0  Audio Answer Read: %x\n", space.device().safe_pc(), ret);
 
 	return ret;
@@ -158,7 +163,7 @@ WRITE8_MEMBER(r2dtank_state::audio_answer_w)
 	if (space.device().safe_pc() == 0xfb12)
 		data = 0x00;
 
-	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2->write(space, 0, data);
 	m_maincpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", space.device().safe_pc(), data);
@@ -182,7 +187,7 @@ if (LOG_AUDIO_COMM) logerror("%s:  CPU#1  AY8910_select_w: %x\n", machine().desc
 
 READ8_MEMBER(r2dtank_state::AY8910_port_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	if (m_AY8910_selected & 0x08)
 		ret = machine().device<ay8910_device>("ay1")->data_r(space, 0);
@@ -260,11 +265,11 @@ WRITE_LINE_MEMBER(r2dtank_state::flipscreen_w)
 
 MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 {
-	UINT8 x = 0;
+	uint8_t x = 0;
 
-	for (UINT8 cx = 0; cx < x_count; cx++)
+	for (uint8_t cx = 0; cx < x_count; cx++)
 	{
-		UINT8 data, fore_color;
+		uint8_t data, fore_color;
 
 		/* the memory is hooked up to the MA, RA lines this way */
 		offs_t offs = ((ma << 3) & 0x1f00) |
@@ -279,7 +284,7 @@ MC6845_UPDATE_ROW( r2dtank_state::crtc_update_row )
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 bit, color;
+			uint8_t bit, color;
 
 			if (m_flipscreen)
 			{
@@ -318,7 +323,7 @@ WRITE_LINE_MEMBER(r2dtank_state::display_enable_changed)
 WRITE8_MEMBER(r2dtank_state::pia_comp_w)
 {
 	device_t *device = machine().device("pia_main");
-	downcast<pia6821_device *>(device)->write(machine().driver_data()->generic_space(), offset, ~data);
+	downcast<pia6821_device *>(device)->write(machine().dummy_space(), offset, ~data);
 }
 
 
@@ -361,7 +366,7 @@ static INPUT_PORTS_START( r2dtank )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, r2dtank_state,get_ttl74123_output, nullptr)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -483,6 +488,9 @@ static MACHINE_CONFIG_START( r2dtank, r2dtank_state )
 
 	/* audio hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, (4000000 / 4))
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSWB"))

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria,Stephane Humbert
 /***************************************************************************
 
  Galaxian/Moon Cresta hardware
@@ -102,9 +102,9 @@ Stephh's notes (based on the games Z80 code and some tests) for other games :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/s2650/s2650.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "sound/dac.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
 
@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( galaxold_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7fff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7fff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0xfffc, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( mooncrst_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
@@ -215,7 +215,7 @@ static ADDRESS_MAP_START( hustlerb3_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0")
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 
 	AM_RANGE(0xa004, 0xa007) AM_DEVWRITE("cust", galaxian_sound_device, lfo_freq_w)
 	AM_RANGE(0xa800, 0xa802) AM_DEVWRITE("cust", galaxian_sound_device, background_enable_w)
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( rockclim_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW0") AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xb800, 0xb800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( ckongg_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xc804, 0xc804) AM_WRITENOP // link cut
 	AM_RANGE(0xc806, 0xc806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
 /* Memory map based on mooncrst_map according to Z80 code - seems to be good but needs further checking */
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( ckongmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITENOP                                                            /* AM_WRITE(galaxold_stars_enable_w) */
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)                                     /* GUESS */
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)                                     /* GUESS */
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)     /* GUESS */
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)     /* GUESS */
 ADDRESS_MAP_END
 
 
@@ -336,7 +336,7 @@ static ADDRESS_MAP_START( scramblb_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
 	AM_RANGE(0x8202, 0x8202) AM_READ(scramblb_protection_2_r)
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( scramb2_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x6804, 0x6804) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x6806, 0x6806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x6807, 0x6807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7000, 0x7007) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7000, 0x7007) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x7006, 0x7006) AM_WRITENOP
 	AM_RANGE(0x7007, 0x7007) AM_WRITENOP
 	AM_RANGE(0x7800, 0x7807) AM_READ(scramb2_port2_r) // reads from 8 addresses, 1 bit per address
@@ -406,7 +406,7 @@ static ADDRESS_MAP_START( scrambler_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x7800, 0x7800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 //  AM_RANGE(0x8102, 0x8102) AM_READ(scramblb_protection_1_r)
 	AM_RANGE(0x8202, 0x8202) AM_READ(scrambler_protection_2_r)
@@ -417,12 +417,12 @@ WRITE8_MEMBER( galaxold_state::guttang_rombank_w )
 //  printf("rombank %02x\n",data);
 	if (data&1)
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 		membank("cpubank")->set_base(rom + 0x4000);
 	}
 	else
 	{
-		UINT8 *rom = memregion("maincpu")->base();
+		uint8_t *rom = memregion("maincpu")->base();
 		membank("cpubank")->set_base(rom + 0x2000);
 	}
 }
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( guttang_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN2")
 	AM_RANGE(0x7001, 0x7001) AM_WRITE(galaxold_nmi_enable_w)
 
-	AM_RANGE(0x7800, 0x7800) AM_READ(watchdog_reset_r)  AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x7800, 0x7800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)  AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 
 ADDRESS_MAP_END
 
@@ -480,7 +480,7 @@ static ADDRESS_MAP_START( _4in1_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x7004, 0x7004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x7006, 0x7006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x7007, 0x7007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x7800, 0x78ff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x7800, 0x78ff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x7800, 0x78ff) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(_4in1_bank_w)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM     /* fixed menu code */
@@ -505,7 +505,7 @@ static ADDRESS_MAP_START( bagmanmc_map, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
 
@@ -531,7 +531,7 @@ static ADDRESS_MAP_START( dkongjrm_map, AS_PROGRAM, 8, galaxold_state )
 	//AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
 
@@ -544,7 +544,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x8860, 0x887f) AM_RAM AM_SHARE("bulletsram")
 	AM_RANGE(0x8880, 0x8bff) AM_WRITENOP
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa7ff, 0xa7ff) AM_READ_PORT("IN0") /* mirror */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1") AM_DEVWRITE("cust", galaxian_sound_device, background_enable_w)
@@ -556,7 +556,7 @@ static ADDRESS_MAP_START( tazzmang, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 ADDRESS_MAP_END
 
 
@@ -576,7 +576,7 @@ static ADDRESS_MAP_START( bongo, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0xb004, 0xb004) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xb006, 0xb006) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xb007, 0xb007) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r) AM_WRITENOP
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bongo_io, AS_IO, 8, galaxold_state )
@@ -629,7 +629,7 @@ static ADDRESS_MAP_START( hunchbkg, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1604, 0x1604) AM_MIRROR(0x6000) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0x1606, 0x1606) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0x1607, 0x1607) AM_MIRROR(0x6000) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
@@ -653,7 +653,7 @@ static ADDRESS_MAP_START( spcwarp, AS_PROGRAM, 8, galaxold_state )
 	AM_RANGE(0x1585, 0x1585) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, fire_enable_w)
 	AM_RANGE(0x1586, 0x1587) AM_MIRROR(0x6000) AM_DEVWRITE("cust", galaxian_sound_device, vol_w)
 	// everything else in the $16xx range is moved to $17xx
-	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_READ(watchdog_reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
+	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x6000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
 	AM_RANGE(0x1700, 0x1700) AM_MIRROR(0x6000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x1701, 0x1701) AM_MIRROR(0x6000) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0x1704, 0x1704) AM_MIRROR(0x6000) AM_WRITE(galaxold_stars_enable_w)
@@ -781,7 +781,7 @@ ADDRESS_MAP_END
 /* Lives Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::vpool_lives_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1024,7 +1024,7 @@ INPUT_PORTS_END
 /* Coinage Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::ckongg_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1536,7 +1536,7 @@ INPUT_PORTS_END
 /* Coinage Dips are spread across two input ports */
 CUSTOM_INPUT_MEMBER(galaxold_state::dkongjrm_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -2223,6 +2223,8 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", galaxold_state, galaxold_interrupt_timer)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", galaxian)
 	MCFG_PALETTE_ADD("palette", 32+2+64)        /* 32 for the characters, 2 for the bullets, 64 for the stars */
@@ -2236,7 +2238,7 @@ static MACHINE_CONFIG_START( galaxold_base, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,galaxold)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 
@@ -2425,7 +2427,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,ozon1)
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2454,7 +2456,7 @@ static MACHINE_CONFIG_START( drivfrcg, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,drivfrcg)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
@@ -2475,7 +2477,7 @@ static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
 	/* sound hardware */
 	MCFG_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MCFG_AY8910_PORT_A_READ_CB(IOPORT("DSW1"))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 MACHINE_CONFIG_END
 
 
@@ -2490,7 +2492,7 @@ static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 
 	MCFG_DEVICE_MODIFY("7474_9m_1")
 	/* the nmi line seems to be inverted on the cpu plugin board */
-	MCFG_7474_COMP_OUTPUT_CB(DEVWRITELINE("maincpu", s2650_device, write_sense))
+	MCFG_7474_COMP_OUTPUT_CB(INPUTLINE("maincpu", S2650_SENSE_LINE))
 
 	MCFG_MACHINE_RESET_OVERRIDE(galaxold_state,hunchbkg)
 
@@ -2535,9 +2537,9 @@ static MACHINE_CONFIG_START( racknrol, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("snsnd", SN76489A, PIXEL_CLOCK/2) // SN76489AN
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2561,9 +2563,9 @@ static MACHINE_CONFIG_START( hexpoola, galaxold_state )
 	MCFG_VIDEO_START_OVERRIDE(galaxold_state,racknrol)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2779,7 +2781,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 {
-	UINT16 ckonggx_remap[88] = {
+	uint16_t ckonggx_remap[88] = {
 		0x5000, 0x0d00, 0x0e00, 0x0f00, 0x0c00, 0x0100, 0x0200, 0x0300, 0x0400, 0x0500, 0x0600, 0x0700, 0x0800, 0x0900, 0x0a00, 0x0b00,
 		0x1400, 0x1500, 0x1600, 0x1700, 0x1800, 0x1900, 0x1a00, 0x1b00, 0x1c00, 0x1d00, 0x1e00, 0x1f00, 0x1000, 0x1100, 0x1200, 0x1300,
 		0x2400, 0x2500, 0x2600, 0x2700, 0x2800, 0x2900, 0x2a00, 0x2b00, 0x2c00, 0x2d00, 0x2e00, 0x2f00, 0x2000, 0x2100, 0x2200, 0x2300,
@@ -2789,8 +2791,8 @@ DRIVER_INIT_MEMBER(galaxold_state,ckonggx)
 		/*^ at 0x0000 there is alt startup code? does it get banked in? */
 	};
 
-	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x5800);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x5800);
 
 	for (int i=0;i<88;i++)
 	{
@@ -3482,8 +3484,8 @@ ROM_END
 DRIVER_INIT_MEMBER(galaxold_state,guttangt)
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_read_bank( 0x2000, 0x27ff, 0, 0, "cpubank" );
-	UINT8 *rom = memregion("maincpu")->base();
+	space.install_read_bank( 0x2000, 0x27ff, "cpubank" );
+	uint8_t *rom = memregion("maincpu")->base();
 	membank("cpubank")->set_base(rom + 0x2000);
 }
 

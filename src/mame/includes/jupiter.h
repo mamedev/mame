@@ -43,15 +43,15 @@ public:
 	DECLARE_READ8_MEMBER(status_r);
 	DECLARE_READ8_MEMBER(key_r);
 	DECLARE_READ8_MEMBER(ff_r);
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 
-	required_shared_ptr<UINT8> m_p_videoram;
-	required_shared_ptr<UINT8> m_p_ram;
-	const UINT8 *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_ram;
+	const uint8_t *m_p_chargen;
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_DRIVER_INIT(jupiter3);
 };

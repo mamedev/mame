@@ -22,9 +22,6 @@
     * Support for FPU exceptions
 
     * New instructions?
-        - FCOPYI, ICOPYF
-            copy raw between float and integer registers
-
         - VALID opcode_desc,handle,param
             checksum/compare code referenced by opcode_desc; if not
             matching, generate exception with handle,param
@@ -58,6 +55,7 @@ using namespace uml;
 // opcode validation condition/flag valid bitmasks
 #define OPFLAGS_NONE    0x00
 #define OPFLAGS_C       FLAG_C
+#define OPFLAGS_Z       FLAG_Z
 #define OPFLAGS_SZ      (FLAG_S | FLAG_Z)
 #define OPFLAGS_SZC     (FLAG_S | FLAG_Z | FLAG_C)
 #define OPFLAGS_SZV     (FLAG_S | FLAG_Z | FLAG_V)
@@ -185,6 +183,7 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO3(OR,      "!or",      4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(XOR,     "!xor",     4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO2(LZCNT,   "!lzcnt",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
+	OPINFO2(TZCNT,   "!tzcnt",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO2(BSWAP,   "!bswap",   4|8, false, NONE, SZ,   ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY))
 	OPINFO3(SHL,     "!shl",     4|8, false, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
 	OPINFO3(SHR,     "!shr",     4|8, false, NONE, SZC,  ALL,  PINFO(OUT, OP, IRM), PINFO(IN, OP, IANY), PINFO(IN, OP, IANY))
@@ -214,6 +213,8 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 	OPINFO2(FSQRT,   "f#sqrt",   4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRECIP,  "f#recip",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
 	OPINFO2(FRSQRT,  "f#rsqrt",  4|8, false, NONE, NONE, ALL,  PINFO(OUT, OP, FRM), PINFO(IN, OP, FANY))
+	OPINFO2(FCOPYI,  "f#copyi",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, FRM), PINFO(IN, OP, IRM))
+	OPINFO2(ICOPYF,  "icopyf#",  4|8, false, NONE, NONE, NONE, PINFO(OUT, OP, IRM), PINFO(IN, OP, FRM))
 };
 
 
@@ -226,7 +227,7 @@ const opcode_info instruction::s_opcode_info_table[OP_MAX] =
 //  rol32 - perform a 32-bit left rotate
 //-------------------------------------------------
 
-inline UINT32 rol32(UINT32 source, UINT8 count)
+inline uint32_t rol32(uint32_t source, uint8_t count)
 {
 	count &= 31;
 	return (source << count) | (source >> (32 - count));
@@ -237,7 +238,7 @@ inline UINT32 rol32(UINT32 source, UINT8 count)
 //  rol64 - perform a 64-bit left rotate
 //-------------------------------------------------
 
-inline UINT64 rol64(UINT64 source, UINT8 count)
+inline uint64_t rol64(uint64_t source, uint8_t count)
 {
 	count &= 63;
 	return (source << count) | (source >> (64 - count));
@@ -301,10 +302,10 @@ uml::instruction::instruction()
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -320,10 +321,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, condition_t condition)
 //  parameter
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -340,10 +341,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, conditio
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -361,10 +362,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, paramete
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, parameter p2, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -383,10 +384,10 @@ void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, paramete
 //  parameters
 //-------------------------------------------------
 
-void uml::instruction::configure(opcode_t op, UINT8 size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
+void uml::instruction::configure(opcode_t op, uint8_t size, parameter p0, parameter p1, parameter p2, parameter p3, condition_t condition)
 {
 	// fill in the instruction
-	m_opcode = (opcode_t)(UINT8)op;
+	m_opcode = (opcode_t)(uint8_t)op;
 	m_size = size;
 	m_condition = condition;
 	m_flags = 0;
@@ -413,8 +414,8 @@ void uml::instruction::simplify()
 	if (m_flags != 0)
 		return;
 
-	static const UINT64 instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
-	static const UINT64 paramsizemask[] = { 0xff, 0xffff, 0xffffffff, U64(0xffffffffffffffff) };
+	static const uint64_t instsizemask[] = { 0, 0, 0, 0, 0xffffffff, 0, 0, 0, 0xffffffffffffffffU };
+	static const uint64_t paramsizemask[] = { 0xff, 0xffff, 0xffffffff, 0xffffffffffffffffU };
 
 	// loop until we've simplified all we can
 	opcode_t origop;
@@ -461,10 +462,10 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate())
 					switch (m_param[2].size())
 					{
-						case SIZE_BYTE:     convert_to_mov_immediate((INT8)m_param[1].immediate());     break;
-						case SIZE_WORD:     convert_to_mov_immediate((INT16)m_param[1].immediate());    break;
-						case SIZE_DWORD:    convert_to_mov_immediate((INT32)m_param[1].immediate());    break;
-						case SIZE_QWORD:    convert_to_mov_immediate((INT64)m_param[1].immediate());    break;
+						case SIZE_BYTE:     convert_to_mov_immediate((int8_t)m_param[1].immediate());     break;
+						case SIZE_WORD:     convert_to_mov_immediate((int16_t)m_param[1].immediate());    break;
+						case SIZE_DWORD:    convert_to_mov_immediate((int32_t)m_param[1].immediate());    break;
+						case SIZE_QWORD:    convert_to_mov_immediate((int64_t)m_param[1].immediate());    break;
 						case SIZE_DQWORD:   fatalerror("Invalid SEXT target size\n");
 					}
 				break;
@@ -490,7 +491,7 @@ void uml::instruction::simplify()
 					m_opcode = OP_ROL;
 					m_numparams = 3;
 				}
-				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((U64(0xffffffffffffffff) << m_param[2].immediate()) & instsizemask[m_size]))
+				else if (m_param[2].is_immediate() && m_param[3].is_immediate_value((0xffffffffffffffffU << m_param[2].immediate()) & instsizemask[m_size]))
 				{
 					m_opcode = OP_SHL;
 					m_numparams = 3;
@@ -544,9 +545,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((UINT32)((UINT32)m_param[1].immediate() * (UINT32)m_param[2].immediate()));
+							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() * (uint32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((UINT64)((UINT64)m_param[1].immediate() * (UINT64)m_param[2].immediate()));
+							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() * (uint64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -560,9 +561,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((INT32)((INT32)m_param[1].immediate() * (INT32)m_param[2].immediate()));
+							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() * (int32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((INT64)((INT64)m_param[1].immediate() * (INT64)m_param[2].immediate()));
+							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() * (int64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -576,9 +577,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((UINT32)((UINT32)m_param[1].immediate() / (UINT32)m_param[2].immediate()));
+							convert_to_mov_immediate((uint32_t)((uint32_t)m_param[1].immediate() / (uint32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((UINT64)((UINT64)m_param[1].immediate() / (UINT64)m_param[2].immediate()));
+							convert_to_mov_immediate((uint64_t)((uint64_t)m_param[1].immediate() / (uint64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -592,9 +593,9 @@ void uml::instruction::simplify()
 					else if (m_param[2].is_immediate() && m_param[3].is_immediate())
 					{
 						if (m_size == 4)
-							convert_to_mov_immediate((INT32)((INT32)m_param[1].immediate() / (INT32)m_param[2].immediate()));
+							convert_to_mov_immediate((int32_t)((int32_t)m_param[1].immediate() / (int32_t)m_param[2].immediate()));
 						else if (m_size == 8)
-							convert_to_mov_immediate((INT64)((INT64)m_param[1].immediate() / (INT64)m_param[2].immediate()));
+							convert_to_mov_immediate((int64_t)((int64_t)m_param[1].immediate() / (int64_t)m_param[2].immediate()));
 					}
 				}
 				break;
@@ -660,9 +661,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate(FLIPENDIAN_INT32(m_param[1].immediate()));
+						convert_to_mov_immediate(flipendian_int32(m_param[1].immediate()));
 					else if (m_size == 8)
-						convert_to_mov_immediate(FLIPENDIAN_INT64(m_param[1].immediate()));
+						convert_to_mov_immediate(flipendian_int64(m_param[1].immediate()));
 				}
 				break;
 
@@ -679,9 +680,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate() && m_param[2].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((UINT32)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((uint32_t)m_param[1].immediate() >> m_param[2].immediate());
 					else if (m_size == 8)
-						convert_to_mov_immediate((UINT64)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((uint64_t)m_param[1].immediate() >> m_param[2].immediate());
 				}
 				else if (m_param[2].is_immediate_value(0))
 					convert_to_mov_param(1);
@@ -692,9 +693,9 @@ void uml::instruction::simplify()
 				if (m_param[1].is_immediate() && m_param[2].is_immediate())
 				{
 					if (m_size == 4)
-						convert_to_mov_immediate((INT32)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((int32_t)m_param[1].immediate() >> m_param[2].immediate());
 					else if (m_size == 8)
-						convert_to_mov_immediate((INT64)m_param[1].immediate() >> m_param[2].immediate());
+						convert_to_mov_immediate((int64_t)m_param[1].immediate() >> m_param[2].immediate());
 				}
 				else if (m_param[2].is_immediate_value(0))
 					convert_to_mov_param(1);
@@ -790,9 +791,9 @@ void uml::instruction::validate()
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::input_flags() const
+uint8_t uml::instruction::input_flags() const
 {
-	static const UINT8 flags_for_condition[] =
+	static const uint8_t flags_for_condition[] =
 	{
 		FLAG_Z,                     // COND_Z
 		FLAG_Z,                     // COND_NZ
@@ -812,7 +813,7 @@ UINT8 uml::instruction::input_flags() const
 		FLAG_S | FLAG_V             // COND_GE
 	};
 
-	UINT8 flags = s_opcode_info_table[m_opcode].inflags;
+	uint8_t flags = s_opcode_info_table[m_opcode].inflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	if (m_condition != COND_ALWAYS)
@@ -827,9 +828,9 @@ UINT8 uml::instruction::input_flags() const
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::output_flags() const
+uint8_t uml::instruction::output_flags() const
 {
-	UINT8 flags = s_opcode_info_table[m_opcode].outflags;
+	uint8_t flags = s_opcode_info_table[m_opcode].outflags;
 	if (flags & 0x80)
 		flags = m_param[flags - OPFLAGS_P1].immediate() & OPFLAGS_ALL;
 	return flags;
@@ -842,7 +843,7 @@ UINT8 uml::instruction::output_flags() const
 //  instruction
 //-------------------------------------------------
 
-UINT8 uml::instruction::modified_flags() const
+uint8_t uml::instruction::modified_flags() const
 {
 	return s_opcode_info_table[m_opcode].modflags;
 }
@@ -867,19 +868,22 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 	assert(m_opcode != OP_INVALID && m_opcode < OP_MAX);
 
 	// start with the raw mnemonic and substitute sizes
-	std::string buffer;
+	std::ostringstream buffer;
 	for (const char *opsrc = opinfo.mnemonic; *opsrc != 0; opsrc++)
 		if (*opsrc == '!')
-			strcatprintf(buffer, "%s", bang_size[m_size]);
+			util::stream_format(buffer, "%s", bang_size[m_size]);
 		else if (*opsrc == '#')
-			strcatprintf(buffer, "%s", pound_size[m_size]);
+			util::stream_format(buffer, "%s", pound_size[m_size]);
 		else
-			buffer.push_back(*opsrc);
+			util::stream_format(buffer, "%c", *opsrc);
 
 	// pad to 8 spaces
-	int pad = 8 - buffer.length();
-	for (int ch = 0; ch < pad; ch++)
-		buffer.push_back(' ');
+	int pad = 8 - buffer.tellp();
+	while (pad > 0)
+	{
+		buffer.put(' ');
+		pad--;
+	}
 
 	// iterate through parameters
 	for (int pnum = 0; pnum < m_numparams; pnum++)
@@ -888,7 +892,7 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 
 		// start with a comma for all except the first parameter
 		if (pnum != 0)
-			buffer.push_back(',');
+			buffer.put(',');
 
 		// ouput based on type
 		switch (param.type())
@@ -911,25 +915,25 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					}
 
 					// truncate to size
-					UINT64 value = param.immediate();
-					if (size == 1) value = (UINT8)value;
-					if (size == 2) value = (UINT16)value;
-					if (size == 4) value = (UINT32)value;
-					if ((UINT32)value == value)
-						strcatprintf(buffer, "$%X", (UINT32)value);
+					uint64_t value = param.immediate();
+					if (size == 1) value = (uint8_t)value;
+					if (size == 2) value = (uint16_t)value;
+					if (size == 4) value = (uint32_t)value;
+					if ((uint32_t)value == value)
+						util::stream_format(buffer, "$%X", (uint32_t)value);
 					else
-						strcatprintf(buffer, "$%X%08X", (UINT32)(value >> 32), (UINT32)value);
+						util::stream_format(buffer, "$%X%08X", (uint32_t)(value >> 32), (uint32_t)value);
 				}
 				break;
 
 			// immediates have several special cases
 			case parameter::PTYPE_SIZE:
-				strcatprintf(buffer, "%s", sizes[param.size()]);
+				util::stream_format(buffer, "%s", sizes[param.size()]);
 				break;
 
 			// size + address space immediate
 			case parameter::PTYPE_SIZE_SPACE:
-				strcatprintf(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
+				util::stream_format(buffer, "%s_%s", spaces[param.space()], sizes[param.size()]);
 				break;
 
 			// size + scale immediate
@@ -938,91 +942,91 @@ std::string uml::instruction::disasm(drcuml_state *drcuml) const
 					int scale = param.scale();
 					int size  = param.size();
 					if (scale == size)
-						strcatprintf(buffer, "%s", sizes[size]);
+						util::stream_format(buffer, "%s", sizes[size]);
 					else
-						strcatprintf(buffer, "%s_x%d", sizes[size], 1 << scale);
+						util::stream_format(buffer, "%s_x%d", sizes[size], 1 << scale);
 				}
 				break;
 
 			// fmod immediate
 			case parameter::PTYPE_ROUNDING:
-				strcatprintf(buffer, "%s", fmods[param.rounding()]);
+				util::stream_format(buffer, "%s", fmods[param.rounding()]);
 				break;
 
 			// integer registers
 			case parameter::PTYPE_INT_REGISTER:
-				strcatprintf(buffer, "i%d", param.ireg() - REG_I0);
+				util::stream_format(buffer, "i%d", param.ireg() - REG_I0);
 				break;
 
 			// floating point registers
 			case parameter::PTYPE_FLOAT_REGISTER:
-				strcatprintf(buffer, "f%d", param.freg() - REG_F0);
+				util::stream_format(buffer, "f%d", param.freg() - REG_F0);
 				break;
 
 			// map variables
 			case parameter::PTYPE_MAPVAR:
-				strcatprintf(buffer, "m%d", param.mapvar() - MAPVAR_M0);
+				util::stream_format(buffer, "m%d", param.mapvar() - MAPVAR_M0);
 				break;
 
 			// memory
 			case parameter::PTYPE_MEMORY:
 			{
 				const char *symbol;
-				UINT32 symoffset;
+				uint32_t symoffset;
 
 				// symbol
 				if (drcuml != nullptr && (symbol = drcuml->symbol_find(param.memory(), &symoffset)) != nullptr)
 				{
 					if (symoffset == 0)
-						strcatprintf(buffer, "[%s]", symbol);
+						util::stream_format(buffer, "[%s]", symbol);
 					else
-						strcatprintf(buffer, "[%s+$%X]", symbol, symoffset);
+						util::stream_format(buffer, "[%s+$%X]", symbol, symoffset);
 				}
 
 				// cache memory
 				else if (drcuml != nullptr && drcuml->cache().contains_pointer(param.memory()))
-					strcatprintf(buffer, "[+$%X]", (UINT32)(FPTR)((drccodeptr)param.memory() - drcuml->cache().near()));
+					util::stream_format(buffer, "[+$%X]", (uint32_t)(uintptr_t)((drccodeptr)param.memory() - drcuml->cache().near()));
 
 				// general memory
 				else
-					strcatprintf(buffer, "[[$%p]]", param.memory());
+					util::stream_format(buffer, "[[$%p]]", param.memory());
 				break;
 			}
 
 			// string pointer
 			case parameter::PTYPE_STRING:
-				strcatprintf(buffer, "%s", (const char *)(FPTR)param.string());
+				util::stream_format(buffer, "%s", (const char *)(uintptr_t)param.string());
 				break;
 
 			// handle pointer
 			case parameter::PTYPE_CODE_HANDLE:
-				strcatprintf(buffer, "%s", param.handle().string());
+				util::stream_format(buffer, "%s", param.handle().string());
 				break;
 
 			default:
-				strcatprintf(buffer, "???");
+				util::stream_format(buffer, "???");
 				break;
 		}
 	}
 
 	// if there's a condition, append it
 	if (m_condition != COND_ALWAYS)
-		strcatprintf(buffer, ",%s", conditions[m_condition & 0x0f]);
+		util::stream_format(buffer, ",%s", conditions[m_condition & 0x0f]);
 
 	// if there are flags, append them
 	if (m_flags != 0)
 	{
-		buffer.push_back(',');
+		buffer.put(',');
 		if (m_flags & FLAG_U)
-			buffer.push_back('U');
+			buffer.put('U');
 		if (m_flags & FLAG_S)
-			buffer.push_back('S');
+			buffer.put('S');
 		if (m_flags & FLAG_Z)
-			buffer.push_back('Z');
+			buffer.put('Z');
 		if (m_flags & FLAG_V)
-			buffer.push_back('V');
+			buffer.put('V');
 		if (m_flags & FLAG_C)
-			buffer.push_back('C');
+			buffer.put('C');
 	}
-	return buffer;
+	return buffer.str();
 }

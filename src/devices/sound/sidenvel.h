@@ -10,12 +10,12 @@
 #define __SIDENVEL_H__
 
 
-extern void enveEmuInit(UINT32 updateFreq, int measuredValues);
+extern void enveEmuInit(uint32_t updateFreq, int measuredValues);
 void enveEmuResetOperator(sidOperator* pVoice);
 
 
 extern const ptr2sidUwordFunc enveModeTable[];   // -> envelope.cpp
-extern const UINT8 masterVolumeLevels[16];  // -> envelope.cpp
+extern const uint8_t masterVolumeLevels[16];  // -> envelope.cpp
 
 enum
 {

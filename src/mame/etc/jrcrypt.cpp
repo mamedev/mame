@@ -20,16 +20,16 @@
 
 static int irq_mask;
 
-typedef UINT16 word;
-typedef UINT8 byte;
+typedef uint16_t word;
+typedef uint8_t byte;
 
 #define PreDecryptedRoms
 
 #ifndef PreDecryptedRoms
 static int s0,s1,s2,s3; /* 1 bit registers inside decoder PAL */
-static UINT8 shadowROM[0xffff];
-static UINT8 used[0xFFFF];
-UINT32 numberUsed = 0;
+static uint8_t shadowROM[0xffff];
+static uint8_t used[0xFFFF];
+uint32_t numberUsed = 0;
 #else
 struct {
 	int count;
@@ -457,7 +457,7 @@ the top of this file. It is included here for completeness.
 
 #include <stdio.h>
 
-typedef UINT8 byte;
+typedef uint8_t byte;
 
 void CreateJrDecodeTable(byte *x, int length);
 void Load(char *name,byte *buffer,int from, int length);
@@ -489,9 +489,9 @@ void main()
 void Load(char *name,byte *buffer,int from, int length)
 {
 /*
-    emu_file file(options, NULL, OPEN_FLAG_READ);
-    file_error filerr = file.open(name);
-    if (filerr != FILERR_NONE)
+    emu_file file(options, nullptr, OPEN_FLAG_READ);
+    osd_file::error filerr = file.open(name);
+    if (filerr != osd_file::error::NONE)
         return;
     while (length--)
         buffer[from++]=file->getc();

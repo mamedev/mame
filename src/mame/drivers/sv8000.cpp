@@ -72,23 +72,23 @@ private:
 	required_device<cpu_device> m_maincpu;
 	required_device<s68047_device> m_s68047p;
 	required_device<generic_slot_device> m_cart;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_ioport m_io_row0;
 	required_ioport m_io_row1;
 	required_ioport m_io_row2;
 	required_ioport m_io_joy;
 
-	UINT8 m_column;
+	uint8_t m_column;
 
 	// graphics signals
-	UINT8 m_ag;
-	UINT8 m_gm2;
-	UINT8 m_gm1;
-	UINT8 m_gm0;
-	UINT8 m_as;
-	UINT8 m_css;
-	UINT8 m_intext;
-	UINT8 m_inv;
+	uint8_t m_ag;
+	uint8_t m_gm2;
+	uint8_t m_gm1;
+	uint8_t m_gm0;
+	uint8_t m_as;
+	uint8_t m_css;
+	uint8_t m_intext;
+	uint8_t m_inv;
 };
 
 
@@ -121,40 +121,40 @@ ADDRESS_MAP_END
 //
 static INPUT_PORTS_START( sv8000 )
 	PORT_START("ROW0")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1) PORT_NAME("Left 1")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 4") // Guess
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_A) PORT_NAME("Left 7") // Guess
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_Z) PORT_NAME("Left *") // Guess
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Right 1")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Right 4") // Guess
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Right 7") // Guess
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Right *") // Guess
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("Left 1")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Left 4") // Guess
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("Left 7") // Guess
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("Left *") // Guess
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Right 1")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Right 4") // Guess
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("Right 7") // Guess
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME("Right *") // Guess
 
 	PORT_START("ROW1")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2) PORT_NAME("Left 2")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_W) PORT_NAME("Left 5") // Guess
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_S) PORT_NAME("Left 8") // Guess
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_X) PORT_NAME("Left 0")
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right 2")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Right 5") // Guess
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Right 8") // Guess
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Right 0")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("Left 2")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_W) PORT_NAME("Left 5") // Guess
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("Left 8") // Guess
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("Left 0")
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Right 2")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Right 5") // Guess
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("Right 8") // Guess
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("Right 0")
 
 	PORT_START("ROW2")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3) PORT_NAME("Left 3")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_E) PORT_NAME("Left 6") // Guess
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_D) PORT_NAME("Left 9") // Guess
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_C) PORT_NAME("Left #") // Guess
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Right 3")
-	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Right 6") // Guess
-	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Right 9") // Guess
-	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Right #") // Guess
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("Left 3")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("Left 6") // Guess
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("Left 9") // Guess
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("Left #") // Guess
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Right 3")
+	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("Right 6") // Guess
+	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("Right 9") // Guess
+	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("Right #") // Guess
 
 	PORT_START("JOY")
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Left Right")
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left Left")
-	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_K) PORT_NAME("Left Down")
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_CODE(KEYCODE_I) PORT_NAME("Left Up")
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_STOP) PORT_NAME("Left Right")
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_COMMA) PORT_NAME("Left Left")
+	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("Left Down")
+	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYPAD) PORT_CODE(KEYCODE_I) PORT_NAME("Left Up")
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Right Right")
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT) PORT_NAME("Right Left")
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_NAME("Right Down")
@@ -196,18 +196,18 @@ void sv8000_state::machine_reset()
 
 DEVICE_IMAGE_LOAD_MEMBER( sv8000_state, cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if (size != 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Incorrect or not support cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -226,19 +226,19 @@ WRITE8_MEMBER( sv8000_state::i8255_porta_w )
 
 READ8_MEMBER( sv8000_state::i8255_portb_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("i8255_portb_r\n");
 
-	if ( ! ( m_column & 0x01 ) )
+	if (!(m_column & 0x01))
 	{
 		data &= m_io_row0->read();
 	}
-	if ( ! ( m_column & 0x02 ) )
+	if (!(m_column & 0x02))
 	{
 		data &= m_io_row1->read();
 	}
-	if ( ! ( m_column & 0x04 ) )
+	if (!(m_column & 0x04))
 	{
 		data &= m_io_row2->read();
 	}
@@ -268,7 +268,7 @@ WRITE8_MEMBER( sv8000_state::i8255_portc_w )
 
 READ8_MEMBER( sv8000_state::ay_port_a_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("ay_port_a_r\n");
 	return data;
@@ -277,7 +277,7 @@ READ8_MEMBER( sv8000_state::ay_port_a_r )
 
 READ8_MEMBER( sv8000_state::ay_port_b_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	//logerror("ay_port_b_r\n");
 	return data;
@@ -342,12 +342,12 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 {
 	if (offset == ~0) return 0xff;
 
-	if ( m_ag )
+	if (m_ag)
 	{
-		if ( m_gm2 )
+		if (m_gm2)
 		{
 			// 256 x 192 / 6KB
-			offset = ( ( offset & 0x1fc0 ) >> 1 ) | ( offset & 0x1f );
+			offset = ((offset & 0x1fc0) >> 1) | (offset & 0x1f);
 			return m_videoram[offset % 0xc00];
 		}
 		else
@@ -358,10 +358,10 @@ READ8_MEMBER( sv8000_state::mc6847_videoram_r )
 	}
 
 	// Standard text
-	UINT8 data = m_videoram[offset % 0xc00];
+	uint8_t data = m_videoram[offset % 0xc00];
 	if (!data) data = 0x20; //bodge
 
-	m_s68047p->inv_w( ( data & 0x80 ) ? ASSERT_LINE : CLEAR_LINE );
+	m_s68047p->inv_w((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	return data;
 }

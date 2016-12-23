@@ -150,7 +150,7 @@ void y8950_device::device_start()
 	assert_always(m_chip != nullptr, "Error creating Y8950 chip");
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(m_chip, region()->base(), region()->bytes());
+	y8950_set_delta_t_memory(m_chip, m_region->base(), m_region->bytes());
 
 	m_stream = machine().sound().stream_alloc(*this,0,1,rate);
 	/* port and keyboard handler */
@@ -203,7 +203,7 @@ WRITE8_MEMBER( y8950_device::write_port_w ) { write(space, 1, data); }
 
 const device_type Y8950 = &device_creator<y8950_device>;
 
-y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+y8950_device::y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, Y8950, "Y8950", tag, owner, clock, "y8950", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -212,7 +212,8 @@ y8950_device::y8950_device(const machine_config &mconfig, const char *tag, devic
 		m_keyboard_read_handler(*this),
 		m_keyboard_write_handler(*this),
 		m_io_read_handler(*this),
-		m_io_write_handler(*this)
+		m_io_write_handler(*this),
+		m_region(*this, DEVICE_SELF)
 {
 }
 

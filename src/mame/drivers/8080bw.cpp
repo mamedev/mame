@@ -196,12 +196,14 @@
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/i8085/i8085.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "includes/8080bw.h"
 
 #include "attackfc.lh"
 #include "cosmicm.lh"
+#include "escmars.lh"
 #include "galactic.lh"
 #include "gunchamp.lh"
 #include "shuttlei.lh"
@@ -243,7 +245,7 @@ static INPUT_PORTS_START( sicv )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -258,7 +260,7 @@ static INPUT_PORTS_START( sicv )
 	PORT_DIPSETTING(    0x00, "1500" )
 	/* SW1:5,6,7: In OFF, PL2 can have no control of joystick, going auto left/right and other problems like no laser gun.
 	Be sure these are always ON */
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, nullptr) PORT_DIPLOCATION("SW1:5,6,7") /* Labeled as "FACTORY" */
 	PORT_DIPNAME( 0x80, 0x00, "Coin Info" )             PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -316,7 +318,7 @@ static INPUT_PORTS_START( alieninv )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -328,7 +330,7 @@ static INPUT_PORTS_START( alieninv )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )     PORT_DIPLOCATION("SW1:3") /* Pence Coin */
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:4" )   /* Not bonus */
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL) PORT_DIPLOCATION("SW1:5,6,7")
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, nullptr) PORT_DIPLOCATION("SW1:5,6,7")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Coinage ) )                  PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x00, "2C/1C 50p/3C (+ Bonus Life)" )
 	PORT_DIPSETTING(    0x80, "1C/1C 50p/5C" )
@@ -375,7 +377,7 @@ static ADDRESS_MAP_START( invadpt2_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -413,7 +415,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( invadpt2, mw8080bw_root, _8080bw_state )
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
 	/* reset circuit, if LS161 not cleared before.      */
-	MCFG_WATCHDOG_VBLANK_INIT(255)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -443,7 +446,7 @@ static ADDRESS_MAP_START( spacerng_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(spacerng_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( spacerng, invadpt2, _8080bw_state )
@@ -525,7 +528,7 @@ static ADDRESS_MAP_START( astropal_io_map, AS_IO, 8, _8080bw_state )
 
 	AM_RANGE(0x03, 0x03) AM_WRITE(invaders_audio_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invaders_audio_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( astropal )
@@ -569,6 +572,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( astropal, invaders, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(astropal_io_map)
+
 MACHINE_CONFIG_END
 
 
@@ -593,7 +597,7 @@ static ADDRESS_MAP_START( cosmo_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0x03, 0x03) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(cosmo_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -620,6 +624,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cosmo, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(cosmo_map)
 	MCFG_CPU_IO_MAP(cosmo_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* video hardware */
@@ -789,7 +794,7 @@ MACHINE_CONFIG_START( spacecom, _8080bw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_spacecom)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_audio)
@@ -797,7 +802,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	// bad byte: should be push a at RST 10h
 	ROM[0x10] = 0xf5;
@@ -813,7 +818,7 @@ DRIVER_INIT_MEMBER(_8080bw_state, spacecom)
 
 READ8_MEMBER(_8080bw_state::invrvnge_02_r)
 {
-	UINT8 data = ioport("IN2")->read();
+	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
 	return (data & 0x8f) | (ioport("IN1")->read() & 0x70);
 }
@@ -825,7 +830,7 @@ static ADDRESS_MAP_START( invrvnge_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(invrvnge_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invrvnge_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( invrvnge_sound_map, AS_PROGRAM, 8, _8080bw_state )
@@ -887,6 +892,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( invrvnge, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(invrvnge_io_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_CPU_ADD("audiocpu", M6808, XTAL_4MHz/2) // MC6808P
 	MCFG_CPU_PROGRAM_MAP(invrvnge_sound_map)
@@ -1014,7 +1021,7 @@ static ADDRESS_MAP_START( starw1_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_WRITENOP    /* writes 9B at boot */
 	AM_RANGE(0x04, 0x04) AM_WRITE(invadpt2_sh_port_1_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(invadpt2_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP    /* writes 89 at boot */
 ADDRESS_MAP_END
 
@@ -1028,6 +1035,12 @@ MACHINE_CONFIG_END
 /* Taito "Lunar Rescue"                                */
 /*                                                     */
 /*******************************************************/
+
+static ADDRESS_MAP_START( escmars_map, AS_PROGRAM, 8, _8080bw_state )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
+	AM_RANGE(0x4000, 0x4fff) AM_ROM
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lrescue_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
@@ -1066,6 +1079,39 @@ static MACHINE_CONFIG_DERIVED_CLASS( lrescue, mw8080bw_root, _8080bw_state )
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_invadpt2)
 
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(4)
+	MCFG_SAMPLES_NAMES(lrescue_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* extra audio channel */
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_START( escmars, _8080bw_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", I8080, XTAL_18MHz / 10) // divider guessed
+	MCFG_CPU_PROGRAM_MAP(escmars_map)
+	MCFG_CPU_IO_MAP(lrescue_io_map)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, extra_8080bw)
+	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state, mw8080bw)
+
+	/* add shifter */
+	MCFG_MB14241_ADD("mb14241")
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
+	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_mw8080bw)
+
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -1142,7 +1188,7 @@ static ADDRESS_MAP_START( cosmicmo_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_WRITE(invaders_audio_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(cosmicmo_05_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( cosmicmo, mw8080bw_root, _8080bw_state )
@@ -1154,7 +1200,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( cosmicmo, mw8080bw_root, _8080bw_state )
 
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
-	MCFG_WATCHDOG_VBLANK_INIT(255)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1230,12 +1277,32 @@ INPUT_PORTS_END
 /*                                                     */
 /*******************************************************/
 
+READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram_r)
+{
+	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
+}
+
+WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram_w)
+{
+	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
+}
+
+READ8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_r)
+{
+	return m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)];
+}
+
+WRITE8_MEMBER(_8080bw_state::rollingc_scattered_colorram2_w)
+{
+	m_scattered_colorram2[(offset & 0x1f) | ((offset & 0x1f00) >> 3)] = data;
+}
+
 static ADDRESS_MAP_START( rollingc_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x00e0) AM_RAM AM_SHARE("colorram")
-	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x00e0) AM_RAM AM_SHARE("colorram2")
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(rollingc_scattered_colorram_r, rollingc_scattered_colorram_w)
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(rollingc_scattered_colorram2_r, rollingc_scattered_colorram2_w)
 ADDRESS_MAP_END
 
 
@@ -1264,6 +1331,16 @@ static INPUT_PORTS_START( rollingc )
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
 INPUT_PORTS_END
 
+MACHINE_START_MEMBER(_8080bw_state,rollingc)
+{
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x400);
+	m_scattered_colorram2 = std::make_unique<uint8_t []>(0x400);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x400);
+	save_pointer(&m_scattered_colorram2[0], "m_scattered_colorram2", 0x400);
+
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
 static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
@@ -1283,6 +1360,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( rollingc, mw8080bw_root, _8080bw_state )
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
+
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,rollingc)
 MACHINE_CONFIG_END
 
 
@@ -1293,11 +1372,22 @@ MACHINE_CONFIG_END
 /*                                                     */
 /*******************************************************/
 
+
+READ8_MEMBER(_8080bw_state::schaser_scattered_colorram_r)
+{
+	return m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)];
+}
+
+WRITE8_MEMBER(_8080bw_state::schaser_scattered_colorram_w)
+{
+	m_scattered_colorram[(offset & 0x1f) | ((offset & 0x1f80) >> 2)] = data;
+}
+
 static ADDRESS_MAP_START( schaser_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("main_ram")
 	AM_RANGE(0x4000, 0x5fff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x0060) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(schaser_scattered_colorram_r, schaser_scattered_colorram_w)
 ADDRESS_MAP_END
 
 
@@ -1308,7 +1398,7 @@ static ADDRESS_MAP_START( schaser_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(schaser_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(schaser_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -1378,6 +1468,8 @@ INPUT_PORTS_END
 
 MACHINE_START_MEMBER(_8080bw_state,schaser)
 {
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	MACHINE_START_CALL_MEMBER(schaser_sh);
 	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
 	MACHINE_START_CALL_MEMBER(mw8080bw);
@@ -1395,7 +1487,9 @@ static MACHINE_CONFIG_DERIVED_CLASS( schaser, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(schaser_io_map)
-	MCFG_WATCHDOG_VBLANK_INIT(255)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,schaser)
 	MCFG_MACHINE_RESET_OVERRIDE(_8080bw_state,schaser)
 
@@ -1445,9 +1539,9 @@ MACHINE_CONFIG_END
 
 READ8_MEMBER(_8080bw_state::schasercv_02_r)
 {
-	UINT8 data = ioport("IN2")->read();
+	uint8_t data = ioport("IN2")->read();
 	if (m_flip_screen) return data;
-	UINT8 in1 = ioport("IN1")->read();
+	uint8_t in1 = ioport("IN1")->read();
 	return (data & 0x89) | (in1 & 0x70) | (BIT(in1, 3) << 1) | (BIT(in1, 7) << 2);
 }
 
@@ -1500,13 +1594,23 @@ static INPUT_PORTS_START( schasercv )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
+MACHINE_START_MEMBER(_8080bw_state,schasercv)
+{
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
+
+	MACHINE_START_CALL_MEMBER(extra_8080bw_sh);
+	MACHINE_START_CALL_MEMBER(extra_8080bw_vh);
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
+
 static MACHINE_CONFIG_DERIVED_CLASS( schasercv, mw8080bw_root, _8080bw_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(schasercv_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state, schasercv)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1549,7 +1653,7 @@ static ADDRESS_MAP_START( sflush_map, AS_PROGRAM, 8, _8080bw_state )
 	AM_RANGE(0x801a, 0x801a) AM_WRITENOP
 	AM_RANGE(0x801c, 0x801c) AM_WRITENOP
 	AM_RANGE(0x801d, 0x801d) AM_WRITENOP
-	AM_RANGE(0xa000, 0xbfff) AM_MIRROR(0x0060) AM_RAM AM_SHARE("colorram")
+	AM_RANGE(0xa000, 0xbfff) AM_READWRITE(schaser_scattered_colorram_r, schaser_scattered_colorram_w)
 	AM_RANGE(0xd800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1576,12 +1680,20 @@ static INPUT_PORTS_START( sflush )
 	PORT_DIPNAME( 0x40, 0x00, "Coinage Display" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, _8080bw_state,sflush_80_r, NULL) // 128V?
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, _8080bw_state,sflush_80_r, nullptr) // 128V?
 
 	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x6a, IPT_PADDLE ) PORT_MINMAX(0x16,0xbf) PORT_SENSITIVITY(30) PORT_KEYDELTA(30) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
+
+MACHINE_START_MEMBER(_8080bw_state,sflush)
+{
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
+
+	MACHINE_START_CALL_MEMBER(mw8080bw);
+}
 
 static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 
@@ -1589,7 +1701,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( sflush, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_REPLACE("maincpu",M6800,1500000) // ?
 	MCFG_CPU_PROGRAM_MAP(sflush_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state, irq0_line_hold)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,mw8080bw)
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 
 	/* add shifter */
 	MCFG_MB14241_ADD("mb14241")
@@ -1628,7 +1740,7 @@ static ADDRESS_MAP_START( lupin3_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(lupin3_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(lupin3_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -1691,6 +1803,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(lupin3_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -1731,50 +1844,15 @@ static MACHINE_CONFIG_DERIVED_CLASS( lupin3, mw8080bw_root, _8080bw_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED_CLASS( lupin3a, mw8080bw_root, _8080bw_state )
-
-	/* basic machine hardware */
+static MACHINE_CONFIG_DERIVED( lupin3a, lupin3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
-	MCFG_CPU_IO_MAP(lupin3_io_map)
-	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
-
-	/* add shifter */
-	MCFG_MB14241_ADD("mb14241")
-
+	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,sflush)
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_lupin3)
-
+	MCFG_DEVICE_REMOVE("palette")
 	MCFG_PALETTE_ADD_3BIT_RBG("palette")
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-
-	MCFG_SOUND_ADD("snsnd", SN76477, 0)
-	MCFG_SN76477_NOISE_PARAMS(0, 0, 0)                  // noise + filter: N/C
-	MCFG_SN76477_DECAY_RES(0)                           // decay_res: N/C
-	MCFG_SN76477_ATTACK_PARAMS(0, RES_K(100))           // attack_decay_cap + attack_res
-	MCFG_SN76477_AMP_RES(RES_K(56))                     // amplitude_res
-	MCFG_SN76477_FEEDBACK_RES(RES_K(10))                // feedback_res
-	MCFG_SN76477_VCO_PARAMS(0, CAP_U(0.1), RES_K(8.2))  // VCO volt + cap + res
-	MCFG_SN76477_PITCH_VOLTAGE(5.0)                     // pitch_voltage
-	MCFG_SN76477_SLF_PARAMS(CAP_U(1.0), RES_K(120))     // slf caps + res
-	MCFG_SN76477_ONESHOT_PARAMS(0, 0)                   // oneshot caps + res: N/C
-	MCFG_SN76477_VCO_MODE(1)                            // VCO mode
-	MCFG_SN76477_MIXER_PARAMS(0, 0, 0)                  // mixer A, B, C
-	MCFG_SN76477_ENVELOPE_PARAMS(1, 0)                  // envelope 1, 2
-	MCFG_SN76477_ENABLE(1)                              // enable
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(4)
-	MCFG_SAMPLES_NAMES(lupin3_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
-	MCFG_DISCRETE_INTF(indianbt)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1798,6 +1876,8 @@ INTERRUPT_GEN_MEMBER(_8080bw_state::polaris_interrupt)
 
 MACHINE_START_MEMBER(_8080bw_state,polaris)
 {
+	m_scattered_colorram = std::make_unique<uint8_t []>(0x800);
+	save_pointer(&m_scattered_colorram[0], "m_scattered_colorram", 0x800);
 	save_item(NAME(m_polaris_cloud_speed));
 	save_item(NAME(m_polaris_cloud_pos));
 
@@ -1806,7 +1886,7 @@ MACHINE_START_MEMBER(_8080bw_state,polaris)
 
 READ8_MEMBER(_8080bw_state::polaris_port00_r)
 {
-	UINT8 data = ioport("IN0")->read();
+	uint8_t data = ioport("IN0")->read();
 	if (m_flip_screen) return data;
 	return (data & 7) | (ioport("IN1")->read() & 0xf8);
 }
@@ -1823,7 +1903,7 @@ static ADDRESS_MAP_START( polaris_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(polaris_sh_port_1_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREADWRITE("mb14241", mb14241_device, shift_result_r, shift_data_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(polaris_sh_port_2_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(polaris_sh_port_3_w)
 ADDRESS_MAP_END
 
@@ -1888,8 +1968,11 @@ static MACHINE_CONFIG_DERIVED_CLASS( polaris, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_REPLACE("maincpu",I8080,1996800)       /* 19.968MHz / 10 */
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(polaris_io_map)
-	MCFG_WATCHDOG_VBLANK_INIT(255)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", _8080bw_state,  polaris_interrupt)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 255)
+
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,polaris)
 
 	/* add shifter */
@@ -2064,7 +2147,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -2079,7 +2162,7 @@ static INPUT_PORTS_START( yosakdon )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* Dummy controls port, P1 */
@@ -2226,7 +2309,7 @@ READ8_MEMBER(_8080bw_state::indianbt_r)
 
 READ8_MEMBER(_8080bw_state::indianbtbr_01_r)
 {
-	UINT8 data = ioport("IN1")->read();
+	uint8_t data = ioport("IN1")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x8f) | (ioport("IN2")->read() & 0x70);
 }
@@ -2238,7 +2321,7 @@ static ADDRESS_MAP_START( indianbt_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(indianbt_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(indianbt_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(indianbt_sh_port_3_w)
 ADDRESS_MAP_END
 
@@ -2249,7 +2332,7 @@ static ADDRESS_MAP_START( indianbtbr_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) AM_WRITE(indianbtbr_sh_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(indianbtbr_sh_port_2_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -2259,6 +2342,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( indianbt, mw8080bw_root, _8080bw_state )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(indianbt_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2284,6 +2368,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( indianbtbr, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(schaser_map)
 	MCFG_CPU_IO_MAP(indianbtbr_io_map)
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
 
 	/* add shifter */
@@ -2493,7 +2578,7 @@ INPUT_PORTS_END
 
 READ8_MEMBER(_8080bw_state::shuttlei_ff_r)
 {
-	UINT8 data = ioport("INPUTS")->read();
+	uint8_t data = ioport("INPUTS")->read();
 	if (!m_flip_screen) return data;
 	return (data & 0x3b) | ioport("P2")->read();
 }
@@ -2543,7 +2628,7 @@ MACHINE_CONFIG_START( shuttlei, _8080bw_state )
 	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
 	MCFG_SCREEN_UPDATE_DRIVER(_8080bw_state, screen_update_shuttlei)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(invaders_samples_audio)
@@ -2588,7 +2673,7 @@ MACHINE_RESET_MEMBER(_8080bw_state,darthvdr)
 
 READ8_MEMBER(_8080bw_state::darthvdr_01_r)
 {
-	UINT8 data = ioport("P2")->read();
+	uint8_t data = ioport("P2")->read();
 	if (m_flip_screen) return data;
 	return (data & 0xe1) | (ioport("P1")->read() & 0x0e);
 }
@@ -2693,7 +2778,7 @@ static ADDRESS_MAP_START( vortex_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(invaders_audio_1_w)
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(invaders_audio_2_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 
@@ -2727,6 +2812,8 @@ MACHINE_CONFIG_DERIVED_CLASS( vortex, mw8080bw_root, _8080bw_state )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(vortex_io_map)
 	MCFG_MACHINE_START_OVERRIDE(_8080bw_state,extra_8080bw)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_TIME_INIT(attotime::from_usec(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
@@ -2744,13 +2831,13 @@ MACHINE_CONFIG_END
 /* decrypt function for vortex */
 DRIVER_INIT_MEMBER(_8080bw_state,vortex)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int length = memregion("maincpu")->bytes();
-	dynamic_buffer buf1(length);
-	UINT32 x;
+	std::vector<uint8_t> buf1(length);
+	uint32_t x;
 	for (x = 0; x < length; x++)
 	{
-		UINT32 addr = x;
+		uint32_t addr = x;
 		/*
 		A15 A14 A13     A0  A3  A9
 		0   0   0       I   I   I
@@ -2949,8 +3036,8 @@ INPUT_CHANGED_MEMBER(_8080bw_state::claybust_gun_trigger)
 		    ana  a
 		    rz
 		*/
-		UINT8 const gunx = read_safe(ioport("GUNX"), 0x00);
-		UINT8 const guny = read_safe(ioport("GUNY"), 0x20);
+		uint8_t const gunx = m_gunx.read_safe(0x00);
+		uint8_t const guny = m_guny.read_safe(0x20);
 		m_claybust_gun_pos = ((gunx >> 3) | (guny << 5)) + 2;
 		m_claybust_gun_on->adjust(attotime::from_msec(250)); // timing is a guess
 	}
@@ -2971,7 +3058,7 @@ static ADDRESS_MAP_START( claybust_io_map, AS_IO, 8, _8080bw_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_DEVWRITE("mb14241", mb14241_device, shift_count_w)
 	AM_RANGE(0x02, 0x02) AM_READ(claybust_gun_lo_r) AM_DEVWRITE("mb14241", mb14241_device, shift_data_w)
 	AM_RANGE(0x03, 0x03) AM_DEVREAD("mb14241", mb14241_device, shift_result_r) //AM_WRITENOP // port3 write looks sound-related
-	AM_RANGE(0x04, 0x04) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x04, 0x04) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	//AM_RANGE(0x05, 0x05) AM_WRITENOP // ?
 	AM_RANGE(0x06, 0x06) AM_READ(claybust_gun_hi_r)
 ADDRESS_MAP_END
@@ -2979,8 +3066,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( claybust )
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_on_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(2) PORT_CHANGED_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_trigger, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_on_r, nullptr)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_IMPULSE(2) PORT_CHANGED_MEMBER(DEVICE_SELF, _8080bw_state, claybust_gun_trigger, nullptr)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 
@@ -3070,7 +3157,7 @@ static INPUT_PORTS_START( galactic )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN2")
@@ -3085,7 +3172,7 @@ static INPUT_PORTS_START( galactic )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x08, "6" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	/* Dummy controls port, P1 */
@@ -3158,9 +3245,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,attackfc)
 {
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT32 len = memregion("maincpu")->bytes();
-	dynamic_buffer buffer(len);
+	uint8_t *rom = memregion("maincpu")->base();
+	uint32_t len = memregion("maincpu")->bytes();
+	std::vector<uint8_t> buffer(len);
 
 	// swap a8/a9
 	for (int i = 0; i < len; i++)
@@ -3191,17 +3278,17 @@ static INPUT_PORTS_START( invmulti )
 	/* same as Midway Space Invaders, except that SW is unused */
 	PORT_START("IN0")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW:8" )
-	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw6_sw7_r, NULL)
+	PORT_BIT( 0x06, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw6_sw7_r, nullptr)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in0_control_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw5_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in0_control_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_sw5_r, nullptr)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_coin_input_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_coin_input_r, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNUSED )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in1_control_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("IN2")
@@ -3209,7 +3296,7 @@ static INPUT_PORTS_START( invmulti )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW:4" )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW:2" )
-	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, NULL)
+	PORT_BIT( 0x70, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, mw8080bw_state,invaders_in2_control_r, nullptr)
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW:1" )
 
 	/* fake port for reading the coin input */
@@ -3293,9 +3380,9 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(_8080bw_state,invmulti)
 {
-	UINT8 *src = memregion("user1")->base();
+	uint8_t *src = memregion("user1")->base();
 	int len = memregion("user1")->bytes();
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 
 	// decrypt rom
 	for (int i = 0; i < len; i++)
@@ -3417,6 +3504,14 @@ ROM_START( spaceat2 )
 	ROM_LOAD( "spaceatt.e",   0x1800, 0x0800, CRC(7cf6f604) SHA1(469557de15178c4b2d686e5724e1006f7c20d7a4) )
 ROM_END
 
+ROM_START( cosmicin )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "CN7472N-7921.bin",     0x0000, 0x0800, CRC(734f5ad8) SHA1(ff6200af4c9110d8181249cbcef1a8a40fa40b7f) )
+	ROM_LOAD( "CN7471N-7918.bin",     0x0800, 0x0800, CRC(6bfaca4a) SHA1(16f48649b531bdef8c2d1446c429b5f414524350) )
+	ROM_LOAD( "CN7470N-7918.bin",     0x1000, 0x0800, CRC(0ccead96) SHA1(537aef03468f63c5b9e11dd61e253f7ae17d9743) )
+	ROM_LOAD( "CN7469N-7921.bin",     0x1800, 0x0800, CRC(5733048c) SHA1(e9197925396b723f5dda4653238e6e1ea287fdae) )
+ROM_END
+
 ROM_START( galmonst )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "h.5m",            0x0000, 0x0400, CRC(8a0395e9) SHA1(f456aaa0301a1d0f3f9f45cbe39c5ff14909ecd3) )
@@ -3507,6 +3602,22 @@ ROM_START( sicv ) // likely not the first sicv version...
 	ROM_LOAD( "cv18.35",     0x0800, 0x0800, CRC(bc3c82bf) SHA1(33e39fc97bd46699be1f9b9741a86f433efdc911) )
 	ROM_LOAD( "cv19.34",     0x1000, 0x0800, CRC(d202b41c) SHA1(868fe938ef768655c894ec95b7d9a81bf21f69ca) )
 	ROM_LOAD( "cv20.33",     0x1800, 0x0800, CRC(c74ee7b6) SHA1(4f52db274a2d4433ab67c099ee805e8eb8516c0f) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
+	ROM_LOAD( "cv01.1",      0x0000, 0x0400, CRC(037e16ac) SHA1(d585030aaff428330c91ae94d7cd5c96ebdd67dd) )
+	ROM_LOAD( "cv02.2",      0x0400, 0x0400, CRC(8263da38) SHA1(2e7c769d129e6f8a1a31eba1e02777bb94ac32b2) )
+ROM_END
+
+ROM_START( sicv1 ) // Original Taito board AA017742B - data match for sicv, just smaller program roms (2708s vs. 2716s)
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cv11.s1",     0x0000, 0x0400, CRC(309d4582) SHA1(e60a1a696111502c115ee00d84cd418c85aba9af) )
+	ROM_LOAD( "cv12.r1",     0x0400, 0x0400, CRC(70153e09) SHA1(b75068b7738aa232f75272c539fca04b3d0c2c4a) )
+	ROM_LOAD( "cv13.np1",    0x0800, 0x0400, CRC(2ca24fee) SHA1(4b516ebd5a777b001443159233d89fc0a331f756) )
+	ROM_FILL(                0x0c00, 0x0400, 0xff ) /* rom socket at M1 is unpopulated */
+	ROM_FILL(                0x1000, 0x0400, 0xff ) /* rom socket at L1 is unpopulated */
+	ROM_LOAD( "cv14.jk1",    0x1400, 0x0400, CRC(556d9a97) SHA1(fb792e981658d79d1c801b01f06345c237e9e803) )
+	ROM_LOAD( "cv15.i1",     0x1800, 0x0400, CRC(ac520cf5) SHA1(47281256083d64a2754b2045c252e74fe5b71153) )
+	ROM_LOAD( "cv16.g1",     0x1c00, 0x0400, CRC(285cfb59) SHA1(53eab8ed07dc9ca107e2e91b4556b9424a073530) )
 
 	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
 	ROM_LOAD( "cv01.1",      0x0000, 0x0400, CRC(037e16ac) SHA1(d585030aaff428330c91ae94d7cd5c96ebdd67dd) )
@@ -3704,8 +3815,8 @@ ROM_START( moonbase )
 	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
 
 	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
-	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
-	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv02.h7",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv01.g7",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
 
 ROM_START( moonbasea )
@@ -3722,8 +3833,8 @@ ROM_START( moonbasea )
 	ROM_LOAD( "ze3-10.f5",    0x4400, 0x0400, CRC(1e7c22a4) SHA1(b34173375494ffbf5400dd4014a683a9807f4f08) )
 
 	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
-	ROM_LOAD( "cv02.h7",      0x0000, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
-	ROM_LOAD( "cv01.g7",      0x0400, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv02.h7",      0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) ) /* NEC B406 or compatible BPROM, like the 82S137 */
+	ROM_LOAD( "cv01.g7",      0x0000, 0x0400, CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) ) /* NEC B406 or compatible BPROM, like the 82S137 */
 ROM_END
 
 
@@ -4052,6 +4163,18 @@ ROM_START( desterth )
 	ROM_REGION( 0x0800, "proms", 0 )        /* color map */
 	ROM_LOAD( "7643-1.cpu",   0x0000, 0x0400, CRC(8b2e38de) SHA1(d6a757be31c3a179d31bd3709e71f9e38ec632e9) )
 	ROM_RELOAD(               0x0400, 0x0400 )
+ROM_END
+
+ROM_START( escmars )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2516_em.m5",        0x0000, 0x0800, CRC(6580f1c3) SHA1(fd44d4bab799e02b2d7c20fe6bf14ade9c8d4f1d) )
+	ROM_LOAD( "2716_em.n5",        0x0800, 0x0800, CRC(49e79706) SHA1(bed675bb97d59ae0132c007ccead0d096ed2ddf1) )
+	ROM_LOAD( "2516_em.p5",        0x1000, 0x0800, CRC(1ac969be) SHA1(67ac47f45b9fa5c530bf6047bb7d5776b52847be) )
+	ROM_LOAD( "2516_em.r5",        0x1800, 0x0800, CRC(c1bd5949) SHA1(df390dd159766ed6489abfae8bb258115dc643e6) )
+	ROM_LOAD( "2716_em.s5",        0x4000, 0x0800, CRC(1ec21a31) SHA1(5db61f00d8987662ccae1132fb25da318ac177dd) )
+	ROM_LOAD( "2716_em.t5",        0x4800, 0x0800, CRC(bfb0f65d) SHA1(ea0943d764a16094b6e2289f62ef117c9f838c98) )
+
+	/* No proms, only colour overlay */
 ROM_END
 
 ROM_START( lrescuem )
@@ -4527,19 +4650,79 @@ ROM_START( ozmawars )
 	ROM_LOAD( "mw04",         0x1800, 0x0800, CRC(e190ce6c) SHA1(120898e9a683f5ce874c6fde761570a26de2fa8c) )
 	ROM_LOAD( "mw05",         0x4000, 0x0800, CRC(3bc7d4c7) SHA1(b084f8cd2ce0f502c2e915da3eceffcbb448e9c0) )
 	ROM_LOAD( "mw06",         0x4800, 0x0800, CRC(99ca2eae) SHA1(8d0f220f68043eff0c85d2de7bee7fd4365fb51c) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv/intruder */
+	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
+
+/*
+
+------------------------------
+Ozma Wars by SHIN NIHON KIKAKU
+------------------------------
+
+Location       Type      File ID      Checksum
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+ROM IC36       2708        OZ1         8707
+ROM IC35       2708        OZ2         60A7
+ROM IC34       2708        OZ3         7504
+ROM IC33       2708        OZ4         55A1
+ROM IC32       2708        OZ5         6BC3
+ROM IC31       2708        OZ6         2808
+ROM IC42       2708        OZ7         FE8A
+ROM IC41       2708        OZ8         C03B
+ROM IC40       2708        OZ9         7515
+ROM IC39       2708        OZ10        4BD4
+ROM IC38       2708        OZ11        50BA
+ROM IC37       2708        OZ12        3411
+
+
+Note: CPU - CPU board           (AA017757)
+      AUD - Audio/IO board      (CV070005)
+      ROM - ROM board           (AA017756A)
+
+          - Uses Taito's three board colour version
+            of Space Invaders PCB
+
+*/
 
 ROM_START( ozmawars2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "mw01",         0x0000, 0x0800, CRC(31f4397d) SHA1(bba9765aadd608d19e2515a5edf8e0eceb70916a) )
-	ROM_LOAD( "mw02",         0x0800, 0x0800, CRC(d8e77c62) SHA1(84fc81cf9a924ecbb13a008cd7435b7d465bddf6) )
+	ROM_LOAD( "oz1",          0x0000, 0x0400, CRC(9300830e) SHA1(7ed349f7ad01b30aefb41dcaf97e209d00f5af6c) )
+	ROM_LOAD( "oz2",          0x0400, 0x0400, CRC(957fc661) SHA1(ac0edc901d8033619f62967f8eaf53a02947e109) )
+	ROM_LOAD( "oz3",          0x0800, 0x0400, CRC(cf8f4d6c) SHA1(effb4dc48594e1b7164b37f683a5a78b1a9bdd4f) )
+	ROM_LOAD( "oz4",          0x0c00, 0x0400, CRC(f51544a5) SHA1(368411a2dadaebcbb4d5b6cf6c2beec036ce817f) )
 	ROM_LOAD( "oz5",          0x1000, 0x0400, CRC(5597bf52) SHA1(626c7348365ed974d416485d94d057745b5d9b96) )
 	ROM_LOAD( "oz6",          0x1400, 0x0400, CRC(19b43578) SHA1(3609b7c77f5ee6f10f302892f56fcc8375577f20) )
 	ROM_LOAD( "oz7",          0x1800, 0x0400, CRC(a285bfde) SHA1(ed7a9fce4d887d3b5d596645893ea87c0bafda02) )
 	ROM_LOAD( "oz8",          0x1c00, 0x0400, CRC(ae59a629) SHA1(0c9ea67dc35f93ec65ec91e1dab2e4b6212428bf) )
-	ROM_LOAD( "mw05",         0x4000, 0x0800, CRC(3bc7d4c7) SHA1(b084f8cd2ce0f502c2e915da3eceffcbb448e9c0) )
+	ROM_LOAD( "oz9",          0x4000, 0x0400, CRC(df0cc633) SHA1(3725af2e5a6e9ab08dd9ada345630de19c88ce73) )
+	ROM_LOAD( "oz10",         0x4400, 0x0400, CRC(31b7692e) SHA1(043880750d134d04311eab55e30ee223977d3d17) )
 	ROM_LOAD( "oz11",         0x4800, 0x0400, CRC(660e934c) SHA1(1d50ae3a9de041b908e256892203ce1738d588f6) )
 	ROM_LOAD( "oz12",         0x4c00, 0x0400, CRC(8b969f61) SHA1(6d12cacc73c31a897812ccd8de24725ee56dd975) )
+
+	ROM_REGION( 0x0800, "proms", 0 )        /* color maps player 1/player 2 */
+	/* !! not dumped yet, these were taken from sisv/intruder */
+	ROM_LOAD( "01.1",         0x0000, 0x0400, BAD_DUMP CRC(aac24f34) SHA1(ad110e776547fb48baac568bb50d61854537ca34) )
+	ROM_LOAD( "02.2",         0x0400, 0x0400, BAD_DUMP CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
+ROM_END
+
+ROM_START( ozmawarsmr ) // single PCB marked CS 210. No PROMS.
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "73.1s",        0x0000, 0x0400, CRC(9300830e) SHA1(7ed349f7ad01b30aefb41dcaf97e209d00f5af6c) )
+	ROM_LOAD( "74.1pr",       0x0400, 0x0400, CRC(957fc661) SHA1(ac0edc901d8033619f62967f8eaf53a02947e109) )
+	ROM_LOAD( "75.1n",        0x0800, 0x0400, CRC(cf8f4d6c) SHA1(effb4dc48594e1b7164b37f683a5a78b1a9bdd4f) )
+	ROM_LOAD( "76.1m",        0x0c00, 0x0400, CRC(f51544a5) SHA1(368411a2dadaebcbb4d5b6cf6c2beec036ce817f) )
+	ROM_LOAD( "77.1l",        0x1000, 0x0400, CRC(4a653fe6) SHA1(22aee4c6cc3bd474d7159a552c4fb666b78fc4fb) )
+	ROM_LOAD( "78.1kj",       0x1400, 0x0400, CRC(fb3db187) SHA1(bbf3e316215cefe2237115d766332ce185c8ca01) )
+	ROM_LOAD( "79.1h",        0x1800, 0x0400, CRC(ed2d7c34) SHA1(f468b422e9f06522b034d213cebc914afb21dda1) )
+	ROM_LOAD( "80.1g",        0x1c00, 0x0400, CRC(85728971) SHA1(400968f5c99b50416cdeefb4405989aa8012a3d1) )
+	ROM_LOAD( "81.1ef",       0x4000, 0x0400, CRC(df0cc633) SHA1(3725af2e5a6e9ab08dd9ada345630de19c88ce73) )
+	ROM_LOAD( "82.1d",        0x4400, 0x0400, CRC(31b7692e) SHA1(043880750d134d04311eab55e30ee223977d3d17) )
+	ROM_LOAD( "83.1c",        0x4800, 0x0400, CRC(50257351) SHA1(5c3eb29f36f04b7fb8f0351ccf9c8cfc7587f927) )
+	ROM_LOAD( "84.1b",        0x4c00, 0x0400, CRC(293303c9) SHA1(bd3770ff7cf6fa38b17cdfd0e0633d84c015dea7) )
 ROM_END
 
 ROM_START( solfight )
@@ -4748,7 +4931,8 @@ GAME( 1978, sisv3,      invaders, invaders,  sitv,      driver_device, 0, ROT270
 GAME( 1978, sisv,       invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (SV Version rev 4)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1978, sitv1,      invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version rev 1)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, sitv,       invaders, invaders,  sitv,      driver_device, 0, ROT270, "Taito", "Space Invaders (TV Version rev 2)", MACHINE_SUPPORTS_SAVE, layout_invaders )
-GAME( 1979, sicv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (CV Version)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sicv,       invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (CV Version, larger roms)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1979, sicv1,      invaders, invadpt2,  sicv,      driver_device, 0, ROT270, "Taito", "Space Invaders (CV Version, smaller roms)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAMEL(1978, invadrmr,   invaders, invaders,  invadrmr,  driver_device, 0, ROT270, "Taito / Model Racing", "Space Invaders (Model Racing)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, invaderl,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "Taito / Logitec", "Space Invaders (Logitec)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
 GAMEL(1978, spcewars,   invaders, spcewars,  spcewars,  driver_device, 0, ROT270, "Taito / Sanritsu", "Space War (Sanritsu)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_invaders ) // unclassified, licensed or bootleg?
@@ -4760,6 +4944,7 @@ GAMEL(1980, ultrainv,   invaders, invaders,  sicv,      driver_device, 0, ROT270
 GAMEL(1978, spaceatt,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spaceattbp, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (bproms)(bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, spaceatt2k, invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Video Games GmbH)", "Space Attack (2k roms)(bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
+GAMEL(1978, cosmicin,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg", "Cosmic Invaders (bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1978, galmonst,   invaders, invaders,  sicv,      driver_device, 0, ROT270, "bootleg (Laguna S.A.)", "Galaxy Monsters (Laguna S.A. Spanish bootleg of Space Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders )
 GAMEL(1980, spaceat2,   invaders, invaders,  spaceat2,  driver_device, 0, ROT270, "bootleg (Video Games UK)", "Space Attack II (bootleg of Super Invaders)", MACHINE_SUPPORTS_SAVE, layout_invaders ) // bootleg of Zenitone-Microsec Super Invaders
 GAMEL(1979, spacecom,   invaders, spacecom,  spacecom,  _8080bw_state, spacecom, ROT270, "bootleg", "Space Combat (bootleg of Space Invaders)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE, layout_spacecom )
@@ -4793,7 +4978,7 @@ GAME( 1979, moonbasea,  invadpt2, invadpt2,  invadpt2,  driver_device, 0, ROT270
 
 GAME( 1980, spclaser,   0,        invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito", "Space Laser", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1980, intruder,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Taito (Game Plan license)", "Intruder", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
-GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics Inc.)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
+GAME( 1980, laser,      spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "bootleg (Leisure Time Electronics)", "Astro Laser (bootleg of Space Laser)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spcewarl,   spclaser, invadpt2,  spclaser,  driver_device, 0, ROT270, "Leijac Corporation", "Space War (Leijac Corporation)", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE ) // Taito's version is actually a spin-off of this?
 
 GAME( 1979, lrescue,    0,        lrescue,   lrescue,   driver_device, 0, ROT270, "Taito", "Lunar Rescue", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
@@ -4802,6 +4987,7 @@ GAME( 1980, mlander,    lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270
 GAME( 1979, lrescuem,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, lrescuem2,  lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg (Model Racing)", "Lunar Rescue (Model Racing bootleg, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
 GAME( 1979, desterth,   lrescue,  lrescue,   lrescue,   driver_device, 0, ROT270, "bootleg", "Destination Earth (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )
+GAMEL( 1980,escmars,    lrescue,  escmars,   lrescue,   driver_device, 0, ROT270, "bootleg", "Escape from Mars (bootleg of Lunar Rescue)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND, layout_escmars )
 
 GAME( 1979, schaser,    0,        schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, schasera,   schaser,  schaser,   schaser,   driver_device, 0, ROT270, "Taito", "Space Chaser (set 2)", MACHINE_SUPPORTS_SAVE )
@@ -4849,8 +5035,9 @@ GAME( 1980, vortex,     0,        vortex,    vortex,    _8080bw_state, vortex, R
 
 GAME( 1979, rollingc,   0,        rollingc,  rollingc,  driver_device, 0, ROT270, "Nichibutsu", "Rolling Crash / Moon Base", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_COLORS | MACHINE_SUPPORTS_SAVE )
 
-GAME( 1979, ozmawars,   0,        invaders,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1979, ozmawars2,  ozmawars, invaders,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 2)", MACHINE_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */
+GAME( 1979, ozmawars,   0,        invadpt2,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1979, ozmawars2,  ozmawars, invadpt2,  ozmawars,  driver_device, 0, ROT270, "SNK", "Ozma Wars (set 2)", MACHINE_SUPPORTS_SAVE ) /* Uses Taito's three board color version of Space Invaders PCB */
+GAME( 1979, ozmawarsmr, ozmawars, invaders,  ozmawars,  driver_device, 0, ROT270, "bootleg (Model Racing)", "Ozma Wars (Model Racing bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, spaceph,    ozmawars, invaders,  spaceph,   driver_device, 0, ROT270, "bootleg? (Zilec Games)", "Space Phantoms (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 GAME( 1979, solfight,   ozmawars, invaders,  ozmawars,  driver_device, 0, ROT270, "bootleg", "Solar Fight (bootleg of Ozma Wars)", MACHINE_SUPPORTS_SAVE )
 

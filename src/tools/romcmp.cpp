@@ -393,11 +393,11 @@ static float filecompare(const fileinfo *file1,const fileinfo *file2,int mode1,i
 
 static void readfile(const char *path,fileinfo *file)
 {
-	file_error filerr;
-	UINT64 filesize;
-	UINT32 actual;
+	osd_file::error filerr;
+	uint64_t filesize;
+	uint32_t actual;
 	char fullname[256];
-	osd_file *f = nullptr;
+	osd_file::ptr f;
 
 	if (path)
 	{
@@ -414,22 +414,19 @@ static void readfile(const char *path,fileinfo *file)
 		return;
 	}
 
-	filerr = osd_open(fullname, OPEN_FLAG_READ, &f, &filesize);
-	if (filerr != FILERR_NONE)
+	filerr = osd_file::open(fullname, OPEN_FLAG_READ, f, filesize);
+	if (filerr != osd_file::error::NONE)
 	{
-		printf("%s: error %d\n", fullname, filerr);
+		printf("%s: error %d\n", fullname, int(filerr));
 		return;
 	}
 
-	filerr = osd_read(f, file->buf, 0, file->size, &actual);
-	if (filerr != FILERR_NONE)
+	filerr = f->read(file->buf, 0, file->size, actual);
+	if (filerr != osd_file::error::NONE)
 	{
-		printf("%s: error %d\n", fullname, filerr);
-		osd_close(f);
+		printf("%s: error %d\n", fullname, int(filerr));
 		return;
 	}
-
-	osd_close(f);
 }
 
 
@@ -451,24 +448,22 @@ static void printname(const fileinfo *file1,const fileinfo *file2,float score,in
 
 static int load_files(int i, int *found, const char *path)
 {
-	osd_directory *dir;
-
 	/* attempt to open as a directory first */
-	dir = osd_opendir(path);
-	if (dir != nullptr)
+	auto dir = osd::directory::open(path);
+	if (dir)
 	{
-		const osd_directory_entry *d;
+		const osd::directory::entry *d;
 
 		/* load all files in directory */
-		while ((d = osd_readdir(dir)) != nullptr)
+		while ((d = dir->read()) != nullptr)
 		{
 			const char *d_name = d->name;
 			char buf[255+1];
 
 			sprintf(buf, "%s%c%s", path, PATH_DELIM, d_name);
-			if (d->type == ENTTYPE_FILE)
+			if (d->type == osd::directory::entry::entry_type::FILE)
 			{
-				UINT64 size = d->size;
+				uint64_t size = d->size;
 				while (size && (size & 1) == 0) size >>= 1;
 				//if (size & ~1)
 				//  printf("%-23s %-23s ignored (not a ROM)\n",i ? "" : d_name,i ? d_name : "");
@@ -487,49 +482,51 @@ static int load_files(int i, int *found, const char *path)
 				}
 			}
 		}
-		osd_closedir(dir);
+		dir.reset();
 	}
 
 	/* if not, try to open as a ZIP file */
 	else
 	{
-		zip_file *zip;
-		const zip_file_header* zipent;
-		zip_error ziperr;
+		util::archive_file::ptr zip;
 
 		/* wasn't a directory, so try to open it as a zip file */
-		ziperr = zip_file_open(path, &zip);
-		if (ziperr != ZIPERR_NONE)
+		if ((util::archive_file::open_zip(path, zip) != util::archive_file::error::NONE) &&
+			(util::archive_file::open_7z(path, zip) != util::archive_file::error::NONE))
 		{
 			printf("Error, cannot open zip file '%s' !\n", path);
 			return 1;
 		}
 
 		/* load all files in zip file */
-		for (zipent = zip_file_first_file(zip); zipent != nullptr; zipent = zip_file_next_file(zip))
+		for (int zipent = zip->first_file(); zipent >= 0; zipent = zip->next_file())
 		{
+			if (zip->current_is_directory()) continue;
+
 			int size;
 
-			size = zipent->uncompressed_length;
+			size = zip->current_uncompressed_length();
 			while (size && (size & 1) == 0) size >>= 1;
-			if (zipent->uncompressed_length == 0) // || (size & ~1))
+			if (zip->current_uncompressed_length() == 0) // || (size & ~1))
+			{
 				printf("%-23s %-23s ignored (not a ROM)\n",
-					i ? "" : zipent->filename, i ? zipent->filename : "");
+					i ? "" : zip->current_name().c_str(), i ? zip->current_name().c_str() : "");
+			}
 			else
 			{
 				fileinfo *file = &files[i][found[i]];
-				const char *delim = strrchr(zipent->filename,'/');
+				const char *delim = strrchr(zip->current_name().c_str(), '/');
 
 				if (delim)
 					strcpy (file->name,delim+1);
 				else
-					strcpy(file->name,zipent->filename);
-				file->size = zipent->uncompressed_length;
+					strcpy(file->name,zip->current_name().c_str());
+				file->size = zip->current_uncompressed_length();
 				if ((file->buf = (unsigned char *)malloc(file->size)) == nullptr)
 					printf("%s: out of memory!\n",file->name);
 				else
 				{
-					if (zip_file_decompress(zip, (char *)file->buf, file->size) != ZIPERR_NONE)
+					if (zip->decompress(file->buf, file->size) != util::archive_file::error::NONE)
 					{
 						free(file->buf);
 						file->buf = nullptr;
@@ -545,7 +542,6 @@ static int load_files(int i, int *found, const char *path)
 				found[i]++;
 			}
 		}
-		zip_file_close(zip);
 	}
 	return 0;
 }
@@ -747,6 +743,6 @@ int CLIB_DECL main(int argc,char *argv[])
 		}
 	}
 
-	zip_file_cache_clear();
+	util::archive_file::cache_clear();
 	return 0;
 }

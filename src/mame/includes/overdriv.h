@@ -33,7 +33,7 @@ public:
 	int       m_sprite_colorbase;
 
 	/* misc */
-	UINT16     m_cpuB_ctrl;
+	uint16_t     m_cpuB_ctrl;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -58,11 +58,11 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_overdriv(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	//INTERRUPT_GEN_MEMBER(cpuB_interrupt);
 	TIMER_DEVICE_CALLBACK_MEMBER(overdriv_cpuA_scanline);
 	int m_fake_timer;
-	
+
 	K051316_CB_MEMBER(zoom_callback_1);
 	K051316_CB_MEMBER(zoom_callback_2);
 	K053246_CB_MEMBER(sprite_callback);

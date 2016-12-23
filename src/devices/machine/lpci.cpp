@@ -89,7 +89,7 @@ const device_type PCI_BUS_LEGACY = &device_creator<pci_bus_legacy_device>;
 //-------------------------------------------------
 //  pci_bus_legacy_device - constructor
 //-------------------------------------------------
-pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, PCI_BUS_LEGACY, "PCI Bus Legacy", tag, owner, clock, "pci_bus_legacy", __FILE__),
 		m_father(nullptr)
 {
@@ -107,7 +107,7 @@ pci_bus_legacy_device::pci_bus_legacy_device(const machine_config &mconfig, cons
 
 READ32_MEMBER( pci_bus_legacy_device::read )
 {
-	UINT32 result = 0xffffffff;
+	uint32_t result = 0xffffffff;
 	int function, reg;
 
 	offset %= 2;
@@ -211,19 +211,19 @@ WRITE32_MEMBER( pci_bus_legacy_device::write )
 
 READ64_MEMBER(pci_bus_legacy_device::read_64be)
 {
-	UINT64 result = 0;
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	uint64_t result = 0;
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)read(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return FLIPENDIAN_INT64(result);
+		result |= (uint64_t)read(space, offset * 2 + 1, mem_mask >> 32) << 32;
+	return flipendian_int64(result);
 }
 
 WRITE64_MEMBER(pci_bus_legacy_device::write_64be)
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	data = flipendian_int64(data);
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		write(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
 	if (ACCESSING_BITS_32_63)

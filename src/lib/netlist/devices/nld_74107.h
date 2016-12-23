@@ -59,61 +59,19 @@
 #ifndef NLD_74107_H_
 #define NLD_74107_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_74107A(_name, _CLK, _J, _K, _CLRQ)                                      \
-		NET_REGISTER_DEV(TTL_74107A, _name)                                             \
-		NET_CONNECT(_name, CLK, _CLK)                                               \
-		NET_CONNECT(_name, J,  _J)                                                  \
-		NET_CONNECT(_name, K,  _K)                                                  \
-		NET_CONNECT(_name, CLRQ,  _CLRQ)
+#define TTL_74107A(name, cCLK, cJ, cK, cCLRQ)                                   \
+		NET_REGISTER_DEV(TTL_74107A, name)                                      \
+		NET_CONNECT(name, CLK, cCLK)                                            \
+		NET_CONNECT(name, J, cJ)                                                \
+		NET_CONNECT(name, K, cK)                                                \
+		NET_CONNECT(name, CLRQ, cCLRQ)
 
-#define TTL_74107(_name, _CLK, _J, _K, _CLRQ)                                       \
-		TTL_74107A(_name, _CLK, _J, _K, _CLRQ)
+#define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                    \
+		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
 
-#define TTL_74107_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74107_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_SUBDEVICE(74107Asub,
-	logic_input_t m_clk;
-
-	logic_output_t m_Q;
-	logic_output_t m_QQ;
-
-	netlist_sig_t m_Q1;
-	netlist_sig_t m_Q2;
-	netlist_sig_t m_F;
-
-	ATTR_HOT void newstate(const netlist_sig_t state);
-
-);
-
-NETLIB_DEVICE(74107A,
-public:
-	NETLIB_NAME(74107Asub) sub;
-
-	logic_input_t m_J;
-	logic_input_t m_K;
-	logic_input_t m_clrQ;
-
-);
-
-class NETLIB_NAME(74107) : public NETLIB_NAME(74107A)
-{
-public:
-	NETLIB_NAME(74107) ()
-	:   NETLIB_NAME(74107A) () {}
-
-};
-
-NETLIB_DEVICE(74107_dip,
-
-	NETLIB_NAME(74107) m_1;
-	NETLIB_NAME(74107) m_2;
-);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_74107_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
 #endif /* NLD_74107_H_ */

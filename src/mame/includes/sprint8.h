@@ -22,12 +22,12 @@ public:
 	int m_steer_flag[8];
 	int m_collision_reset;
 	int m_collision_index;
-	UINT8 m_dial[8];
-	required_shared_ptr<UINT8> m_video_ram;
-	required_shared_ptr<UINT8> m_pos_h_ram;
-	required_shared_ptr<UINT8> m_pos_v_ram;
-	required_shared_ptr<UINT8> m_pos_d_ram;
-	required_shared_ptr<UINT8> m_team;
+	uint8_t m_dial[8];
+	required_shared_ptr<uint8_t> m_video_ram;
+	required_shared_ptr<uint8_t> m_pos_h_ram;
+	required_shared_ptr<uint8_t> m_pos_v_ram;
+	required_shared_ptr<uint8_t> m_pos_d_ram;
+	required_shared_ptr<uint8_t> m_team;
 	required_device<discrete_device> m_discrete;
 	tilemap_t* m_tilemap1;
 	tilemap_t* m_tilemap2;
@@ -43,7 +43,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint8);
-	UINT32 screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sprint8(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint8(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(sprint8_collision_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(input_callback);

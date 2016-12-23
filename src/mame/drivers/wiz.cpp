@@ -178,6 +178,8 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/wiz.h"
 
@@ -324,7 +326,7 @@ static ADDRESS_MAP_START( kungfut_main_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0xf008, 0xf008) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf010, 0xf010) AM_READ_PORT("IN0")
 	AM_RANGE(0xf018, 0xf018) AM_READ_PORT("IN1")
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xf818, 0xf818) AM_WRITE(wiz_bgcolor_w)
 ADDRESS_MAP_END
 
@@ -341,7 +343,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_main_map, AS_PROGRAM, 8, wiz_state )
 //  AM_RANGE(0xf008, 0xf00f) AM_WRITENOP // ?
-	AM_RANGE(0xf800, 0xf800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(stinger_explosion_w)
 	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(stinger_shot_w)
 	AM_IMPORT_FROM( kungfut_main_map )
@@ -363,14 +365,14 @@ static ADDRESS_MAP_START( kungfut_sound_map, AS_PROGRAM, 8, wiz_state )
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("8910.3", ay8910_device, address_data_w)
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
-	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_byte_r, wiz_sound_nmi_mask_w)
+	AM_RANGE(0x7000, 0x7000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(wiz_sound_nmi_mask_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stinger_sound_map, AS_PROGRAM, 8, wiz_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_byte_r, wiz_sound_nmi_mask_w)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(wiz_sound_nmi_mask_w)
 	AM_RANGE(0x4000, 0x4000) AM_WRITENOP // ?
 	AM_RANGE(0x5000, 0x5001) AM_DEVWRITE("8910.1", ay8910_device, address_data_w)
 	AM_RANGE(0x6000, 0x6001) AM_DEVWRITE("8910.2", ay8910_device, address_data_w)
@@ -806,6 +808,8 @@ static MACHINE_CONFIG_START( kungfut, wiz_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("8910.1", AY8910, 18432000/12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
@@ -839,6 +843,8 @@ static MACHINE_CONFIG_DERIVED( stinger, kungfut )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("audiocpu")
 	MCFG_CPU_PROGRAM_MAP(stinger_sound_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -1116,7 +1122,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wiz_state,stinger)
 {
-	static const UINT8 swap_xor_table[4][4] =
+	static const uint8_t swap_xor_table[4][4] =
 	{
 		{ 7,3,5, 0xa0 },
 		{ 3,7,5, 0x88 },
@@ -1124,13 +1130,13 @@ DRIVER_INIT_MEMBER(wiz_state,stinger)
 		{ 5,7,3, 0x28 }
 	};
 
-	UINT8 *rom = memregion("maincpu")->base();
-	const UINT8 *tbl;
+	uint8_t *rom = memregion("maincpu")->base();
+	const uint8_t *tbl;
 
 	for (int a = 0x0000; a < 0xc000; a++)
 	{
 		int row;
-		UINT8 src;
+		uint8_t src;
 
 		if (a & 0x2040)
 		{

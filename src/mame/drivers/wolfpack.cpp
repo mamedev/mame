@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/watchdog.h"
 #include "includes/wolfpack.h"
 
 
@@ -19,7 +20,7 @@ void wolfpack_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		periodic_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in wolfpack_state::device_timer");
+		assert_always(false, "Unknown id in wolfpack_state::device_timer");
 	}
 }
 
@@ -47,14 +48,14 @@ void wolfpack_state::machine_reset()
 
 CUSTOM_INPUT_MEMBER(wolfpack_state::wolfpack_dial_r)
 {
-	int bit = (FPTR)param;
+	int bit = (uintptr_t)param;
 	return ((ioport("DIAL")->read() + bit) / 2) & 0x01;
 }
 
 
 READ8_MEMBER(wolfpack_state::wolfpack_misc_r)
 {
-	UINT8 val = 0;
+	uint8_t val = 0;
 
 	/* BIT0 => SPEECH BUSY */
 	/* BIT1 => COMP SIREN  */
@@ -153,7 +154,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, wolfpack_state )
 	AM_RANGE(0x4004, 0x4004) AM_WRITE(wolfpack_ship_pic_w)
 	AM_RANGE(0x4005, 0x4005) AM_WRITE(wolfpack_torpedo_h_w)
 	AM_RANGE(0x4006, 0x4006) AM_WRITE(wolfpack_torpedo_v_w)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x7000, 0x7fff) AM_ROM
 	AM_RANGE(0x9000, 0x9000) AM_READNOP /* debugger ROM location? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -215,7 +216,7 @@ static const gfx_layout tile_layout =
 	0x80
 };
 
-static const UINT32 ship_layout_xoffset[64] =
+static const uint32_t ship_layout_xoffset[64] =
 {
 		0x04, 0x05, 0x06, 0x07, 0x0c, 0x0d, 0x0e, 0x0f,
 		0x14, 0x15, 0x16, 0x17, 0x1c, 0x1d, 0x1e, 0x1f,
@@ -243,7 +244,7 @@ static const gfx_layout ship_layout =
 	nullptr
 };
 
-static const UINT32 pt_layout_xoffset[64] =
+static const uint32_t pt_layout_xoffset[64] =
 	{
 		0x3f, 0x3f, 0x3e, 0x3e, 0x3d, 0x3d, 0x3c, 0x3c,
 		0x37, 0x37, 0x36, 0x36, 0x35, 0x35, 0x34, 0x34,
@@ -302,6 +303,8 @@ static MACHINE_CONFIG_START( wolfpack, wolfpack_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
 	MCFG_CPU_PROGRAM_MAP(main_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

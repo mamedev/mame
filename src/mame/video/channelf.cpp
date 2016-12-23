@@ -23,7 +23,7 @@ static const rgb_t channelf_palette[] =
 #define LTGREEN 6
 #define LTBLUE  7
 
-static const UINT16 colormap[] = {
+static const uint16_t colormap[] = {
 	BLACK,   WHITE, WHITE, WHITE,
 	LTBLUE,  BLUE,  RED,   GREEN,
 	LTGRAY,  BLUE,  RED,   GREEN,
@@ -49,15 +49,15 @@ int channelf_state::recalc_palette_offset(int reg1, int reg2)
 	return ((reg2&0x2)|(reg1>>1)) << 2;
 }
 
-UINT32 channelf_state::screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t channelf_state::screen_update_channelf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,col;
-	UINT16 ma=0,x;
+	uint8_t y,col;
+	uint16_t ma=0,x;
 	int palette_offset;
 
 	for(y = 0; y < 64; y++ )
 	{
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 		palette_offset = recalc_palette_offset(m_p_videoram[y*128+125]&3, m_p_videoram[y*128+126]&3);
 
 		for (x = ma; x < ma + 128; x++)

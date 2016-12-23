@@ -102,7 +102,7 @@ ioport_constructor qimi_t::device_input_ports() const
 //  qimi_t - constructor
 //-------------------------------------------------
 
-qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+qimi_t::qimi_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, QIMI, "QL Internal Mouse Interface", tag, owner, clock, "qimi", __FILE__),
 	m_write_extint(*this),
 	m_buttons(*this, "mouse_buttons"),
@@ -138,7 +138,7 @@ void qimi_t::device_reset()
 //  read -
 //-------------------------------------------------
 
-UINT8 qimi_t::read(address_space &space, offs_t offset, UINT8 data)
+uint8_t qimi_t::read(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{

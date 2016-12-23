@@ -73,7 +73,7 @@ class mos8722_device :  public device_t
 {
 public:
 	// construction/destruction
-	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mos8722_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_z80en_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_z80en.set_callback(object); }
 	template<class _Object> static devcb_base &set_fsdir_wr_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_write_fsdir.set_callback(object); }
@@ -82,7 +82,7 @@ public:
 	template<class _Object> static devcb_base &set_sense40_rd_callback(device_t &device, _Object object) { return downcast<mos8722_device &>(device).m_read_sense40.set_callback(object); }
 
 
-	UINT8 read(offs_t offset, UINT8 data);
+	uint8_t read(offs_t offset, uint8_t data);
 	DECLARE_WRITE8_MEMBER( write );
 
 	DECLARE_READ_LINE_MEMBER( fsdir_r );
@@ -139,10 +139,10 @@ private:
 	devcb_read_line    m_read_exrom;
 	devcb_read_line    m_read_sense40;
 
-	UINT8 m_reg[16];
+	uint8_t m_reg[16];
 
-	UINT8 m_p0h_latch;
-	UINT8 m_p1h_latch;
+	uint8_t m_p0h_latch;
+	uint8_t m_p1h_latch;
 };
 
 

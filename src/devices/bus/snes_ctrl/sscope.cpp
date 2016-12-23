@@ -53,7 +53,7 @@ ioport_constructor snes_sscope_device::device_input_ports() const
 //  snes_sscope_device - constructor
 //-------------------------------------------------
 
-snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_sscope_device::snes_sscope_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SNES_SUPERSCOPE, "Nintendo SNES / SFC SuperScope", tag, owner, clock, "snes_sscope", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_buttons(*this, "BUTTONS"),
@@ -103,7 +103,7 @@ void snes_sscope_device::device_reset()
 void snes_sscope_device::port_poll()
 {
 	// first read input bits
-	UINT8 input = m_buttons->read();
+	uint8_t input = m_buttons->read();
 	m_x = m_xaxis->read();
 	m_y = m_yaxis->read();
 	m_idx = 0;
@@ -159,9 +159,9 @@ void snes_sscope_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_sscope_device::read_pin4()
+uint8_t snes_sscope_device::read_pin4()
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	if (m_idx >= 8) // bits 8-15 = ID = all 1s; bits >= 16 all 1s
 		res |= 0x01;
@@ -175,7 +175,7 @@ UINT8 snes_sscope_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_sscope_device::write_strobe(UINT8 data)
+void snes_sscope_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

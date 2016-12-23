@@ -27,7 +27,7 @@ class msm6255_device :  public device_t,
 {
 public:
 	// construction/destruction
-	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm6255_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -37,7 +37,7 @@ public:
 	DECLARE_READ8_MEMBER( dr_r );
 	DECLARE_WRITE8_MEMBER( dr_w );
 
-	UINT32 screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &device, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -62,25 +62,25 @@ private:
 		REGISTER_CUR
 	};
 
-	UINT8 read_byte(UINT16 ma, UINT8 ra);
+	uint8_t read_byte(uint16_t ma, uint8_t ra);
 
 	void update_cursor();
-	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, UINT16 ma, UINT8 ra = 0);
+	void draw_scanline(bitmap_ind16 &bitmap, const rectangle &cliprect, int y, uint16_t ma, uint8_t ra = 0);
 	void update_graphics(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_text(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	const address_space_config m_space_config;
 
-	UINT8 m_ir;                     // instruction register
-	UINT8 m_mor;                    // mode control register
-	UINT8 m_pr;                     // character pitch register
-	UINT8 m_hnr;                    // horizontal character number register
-	UINT8 m_dvr;                    // duty number register
-	UINT8 m_cpr;                    // cursor form register
-	UINT8 m_slr;                    // start address (lower) register
-	UINT8 m_sur;                    // start address (upper) register
-	UINT8 m_clr;                    // cursor address (lower) register
-	UINT8 m_cur;                    // cursor address (upper) register
+	uint8_t m_ir;                     // instruction register
+	uint8_t m_mor;                    // mode control register
+	uint8_t m_pr;                     // character pitch register
+	uint8_t m_hnr;                    // horizontal character number register
+	uint8_t m_dvr;                    // duty number register
+	uint8_t m_cpr;                    // cursor form register
+	uint8_t m_slr;                    // start address (lower) register
+	uint8_t m_sur;                    // start address (upper) register
+	uint8_t m_clr;                    // cursor address (lower) register
+	uint8_t m_cur;                    // cursor address (upper) register
 
 	int m_cursor;                   // is cursor displayed
 	int m_frame;                    // frame counter

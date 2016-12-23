@@ -34,7 +34,7 @@ class ym2148_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ym2148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<ym2148_device &>(device).m_txd_handler.set_callback(object); }
@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER(write_rxd);
-	UINT8 get_irq_vector();
+	uint8_t get_irq_vector();
 
 protected:
 	virtual void device_start() override;
@@ -59,13 +59,13 @@ private:
 	devcb_write8 m_port_write_handler;  // write ST0-ST7
 	devcb_read8 m_port_read_handler;    // read SD0-SD7
 	int m_irq_state;
-	UINT8 m_irq_vector;
-	UINT8 m_external_irq_vector;
+	uint8_t m_irq_vector;
+	uint8_t m_external_irq_vector;
 	// Does this chip have 1 or 2 data registers?
-	UINT8 m_data_out;
-	UINT8 m_data_in;
-	UINT8 m_control;
-	UINT8 m_status;
+	uint8_t m_data_out;
+	uint8_t m_data_in;
+	uint8_t m_control;
+	uint8_t m_status;
 	emu_timer *m_timer;
 	int m_rxd;
 	bool m_tx_busy;

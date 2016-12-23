@@ -17,6 +17,7 @@
 #include <android/looper.h>
 #include <android/window.h>
 #include <android_native_app_glue.h>
+#include <android/native_window.h>
 
 extern "C"
 {
@@ -28,6 +29,18 @@ extern "C"
 
 namespace entry
 {
+	///
+	inline void androidSetWindow(::ANativeWindow* _window)
+	{
+		bgfx::PlatformData pd;
+		pd.ndt          = NULL;
+		pd.nwh          = _window;
+		pd.context      = NULL;
+		pd.backBuffer   = NULL;
+		pd.backBufferDS = NULL;
+		bgfx::setPlatformData(pd);
+	}
+
 	struct GamepadRemap
 	{
 		uint16_t  m_keyCode;
@@ -82,7 +95,6 @@ namespace entry
 	{
 		Context()
 			: m_window(NULL)
-			, m_count(0)
 		{
 			memset(m_value, 0, sizeof(m_value) );
 
@@ -110,7 +122,7 @@ namespace entry
 			const char* argv[1] = { "android.so" };
 			m_mte.m_argc = 1;
 			m_mte.m_argv = const_cast<char**>(argv);
-			
+
 			while (0 == m_app->destroyRequested)
 			{
 				int32_t num;
@@ -140,10 +152,10 @@ namespace entry
 					// Command from main thread: a new ANativeWindow is ready for use.  Upon
 					// receiving this command, android_app->window will contain the new window
 					// surface.
-					if (m_window == NULL)
+					if (m_window != m_app->window)
 					{
 						m_window = m_app->window;
-						bgfx::androidSetWindow(m_window);
+						androidSetWindow(m_window);
 
 						int32_t width  = ANativeWindow_getWidth(m_window);
 						int32_t height = ANativeWindow_getHeight(m_window);
@@ -152,7 +164,10 @@ namespace entry
 						WindowHandle defaultWindow = { 0 };
 						m_eventQueue.postSizeEvent(defaultWindow, width, height);
 
-						m_thread.init(MainThreadEntry::threadFunc, &m_mte);
+						if (!m_thread.isRunning() )
+						{
+							m_thread.init(MainThreadEntry::threadFunc, &m_mte);
+						}
 					}
 					break;
 
@@ -294,43 +309,35 @@ namespace entry
 						int32_t action = (actionBits & AMOTION_EVENT_ACTION_MASK);
 						int32_t index  = (actionBits & AMOTION_EVENT_ACTION_POINTER_INDEX_MASK) >> AMOTION_EVENT_ACTION_POINTER_INDEX_SHIFT;
 
-						count = m_count;
-
-						switch (action)
+						// Simulate left mouse click with 1st touch and right mouse click with 2nd touch. ignore other touchs
+						if (count < 2)
 						{
-						case AMOTION_EVENT_ACTION_DOWN:
-						case AMOTION_EVENT_ACTION_POINTER_DOWN:
-							m_count++;
-							break;
-
-						case AMOTION_EVENT_ACTION_UP:
-						case AMOTION_EVENT_ACTION_POINTER_UP:
-							m_count--;
-							break;
-
-						default:
-							break;
-						}
-
-						if (count != m_count)
-						{
-							m_eventQueue.postMouseEvent(defaultWindow
-								, (int32_t)mx
-								, (int32_t)my
-								, 0
-								, 1 == count ? MouseButton::Left : MouseButton::Right
-								, false
-								);
-
-							if (0 != m_count)
+							switch (action)
 							{
+							case AMOTION_EVENT_ACTION_DOWN:
+							case AMOTION_EVENT_ACTION_POINTER_DOWN:
 								m_eventQueue.postMouseEvent(defaultWindow
 									, (int32_t)mx
 									, (int32_t)my
 									, 0
-									, 1 == m_count ? MouseButton::Left : MouseButton::Right
+									, action == AMOTION_EVENT_ACTION_DOWN ? MouseButton::Left : MouseButton::Right
 									, true
 									);
+								break;
+
+							case AMOTION_EVENT_ACTION_UP:
+							case AMOTION_EVENT_ACTION_POINTER_UP:
+								m_eventQueue.postMouseEvent(defaultWindow
+									, (int32_t)mx
+									, (int32_t)my
+									, 0
+									, action == AMOTION_EVENT_ACTION_UP ? MouseButton::Left : MouseButton::Right
+									, false
+									);
+								break;
+
+							default:
+								break;
 							}
 						}
 
@@ -402,7 +409,6 @@ namespace entry
 		ANativeWindow* m_window;
 		android_app* m_app;
 
-		int32_t m_count;
 		int32_t m_value[GamepadAxis::Count];
 		int32_t m_deadzone[GamepadAxis::Count];
 	};

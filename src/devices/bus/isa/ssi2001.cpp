@@ -18,7 +18,7 @@ machine_config_constructor ssi2001_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ssi2001 );
 }
 
-ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, ISA8_SSI2001, "Innovation SSI-2001 Audio Adapter", tag, owner, clock, "ssi2001", __FILE__),
 	device_isa8_card_interface(mconfig, *this),
 	m_joy(*this, "pc_joy"),
@@ -29,8 +29,8 @@ ssi2001_device::ssi2001_device(const machine_config &mconfig, const char *tag, d
 void ssi2001_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0200, 0x0207, 0, 0, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
-	m_isa->install_device(0x0280, 0x029F, 0, 0, read8_delegate(FUNC(mos6581_device::read), subdevice<mos6581_device>("sid6581")), write8_delegate(FUNC(mos6581_device::write), subdevice<mos6581_device>("sid6581")));
+	m_isa->install_device(0x0200, 0x0207, read8_delegate(FUNC(pc_joy_device::joy_port_r), subdevice<pc_joy_device>("pc_joy")), write8_delegate(FUNC(pc_joy_device::joy_port_w), subdevice<pc_joy_device>("pc_joy")));
+	m_isa->install_device(0x0280, 0x029F, read8_delegate(FUNC(mos6581_device::read), subdevice<mos6581_device>("sid6581")), write8_delegate(FUNC(mos6581_device::write), subdevice<mos6581_device>("sid6581")));
 }
 
 

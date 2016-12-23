@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "audio/timeplt.h"
 #include "includes/konamipt.h"
 #include "includes/rocnrope.h"
@@ -27,7 +29,7 @@
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
 WRITE8_MEMBER(rocnrope_state::rocnrope_interrupt_vector_w)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 
 	RAM[0xfff2 + offset] = data;
 }
@@ -58,14 +60,14 @@ static ADDRESS_MAP_START( rocnrope_map, AS_PROGRAM, 8, rocnrope_state )
 	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_SHARE("colorram")
 	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
 	AM_RANGE(0x8081, 0x8081) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)  /* cause interrupt on audio CPU */
 	AM_RANGE(0x8082, 0x8082) AM_WRITENOP    /* ??? */
 	AM_RANGE(0x8083, 0x8083) AM_WRITENOP    /* Coin counter 1 */
 	AM_RANGE(0x8084, 0x8084) AM_WRITENOP    /* Coin counter 2 */
 	AM_RANGE(0x8087, 0x8087) AM_WRITE(irq_mask_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8100, 0x8100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8182, 0x818d) AM_WRITE(rocnrope_interrupt_vector_w)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -203,6 +205,8 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rocnrope_state,  vblank_irq)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -218,6 +222,9 @@ static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 	MCFG_PALETTE_INIT_OWNER(rocnrope_state, rocnrope)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 

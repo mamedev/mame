@@ -46,7 +46,7 @@ machine_config_constructor isa16_svga_cirrus_device::device_mconfig_additions() 
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 {
 	return ROM_NAME( dm_clgd5430 );
 }
@@ -59,7 +59,7 @@ const rom_entry *isa16_svga_cirrus_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_svga_cirrus_device::isa16_svga_cirrus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_CIRRUS, "Diamond Speedstar Pro SE ISA Graphics Card (BIOS v1.00)", tag, owner, clock, "dm_clgd5430", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -76,13 +76,13 @@ void isa16_svga_cirrus_device::device_start()
 
 	m_vga = subdevice<cirrus_gd5430_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "dm_clgd5430");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "dm_clgd5430");
 
-	m_isa->install_device(0x03b0, 0x03bf, 0, 0, read8_delegate(FUNC(cirrus_gd5430_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x03c0, 0x03cf, 0, 0, read8_delegate(FUNC(cirrus_gd5430_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x03d0, 0x03df, 0, 0, read8_delegate(FUNC(cirrus_gd5430_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(FUNC(cirrus_gd5430_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(FUNC(cirrus_gd5430_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x03d0, 0x03df, read8_delegate(FUNC(cirrus_gd5430_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::port_03d0_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(cirrus_gd5430_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(cirrus_gd5430_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5430_device::mem_w),m_vga));
 }
 
 //-------------------------------------------------
@@ -132,7 +132,7 @@ machine_config_constructor isa16_svga_cirrus_gd542x_device::device_mconfig_addit
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
+const tiny_rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 {
 	return ROM_NAME( clgd542x );
 }
@@ -145,7 +145,7 @@ const rom_entry *isa16_svga_cirrus_gd542x_device::device_rom_region() const
 //  isa16_vga_device - constructor
 //-------------------------------------------------
 
-isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa16_svga_cirrus_gd542x_device::isa16_svga_cirrus_gd542x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA16_SVGA_CIRRUS_GD542X, "Generic Cirrus Logic GD542x Graphics Card (BIOS v1.20)", tag, owner, clock, "clgd542x", __FILE__),
 		device_isa16_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -162,13 +162,13 @@ void isa16_svga_cirrus_gd542x_device::device_start()
 
 	m_vga = subdevice<cirrus_gd5428_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "svga", "clgd542x");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "svga", "clgd542x");
 
-	m_isa->install_device(0x03b0, 0x03bf, 0, 0, read8_delegate(FUNC(cirrus_gd5428_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x03c0, 0x03cf, 0, 0, read8_delegate(FUNC(cirrus_gd5428_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x03d0, 0x03df, 0, 0, read8_delegate(FUNC(cirrus_gd5428_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x03b0, 0x03bf, read8_delegate(FUNC(cirrus_gd5428_device::port_03b0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x03c0, 0x03cf, read8_delegate(FUNC(cirrus_gd5428_device::port_03c0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x03d0, 0x03df, read8_delegate(FUNC(cirrus_gd5428_device::port_03d0_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::port_03d0_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(cirrus_gd5428_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(cirrus_gd5428_device::mem_r),m_vga), write8_delegate(FUNC(cirrus_gd5428_device::mem_w),m_vga));
 }
 
 //-------------------------------------------------

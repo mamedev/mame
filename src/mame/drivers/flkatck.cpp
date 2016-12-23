@@ -15,7 +15,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/hd6309.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/konamipt.h"
 #include "includes/flkatck.h"
 
@@ -66,13 +66,13 @@ WRITE8_MEMBER(flkatck_state::flkatck_ls138_w)
 			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:  /* sound code number */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			break;
 		case 0x06:  /* Cause interrupt on audio CPU */
 			m_audiocpu->set_input_line(0, HOLD_LINE);
 			break;
 		case 0x07:  /* watchdog reset */
-			watchdog_reset_w(space, 0, data);
+			m_watchdog->reset_w(space, 0, data);
 			break;
 	}
 }
@@ -107,7 +107,7 @@ static ADDRESS_MAP_START( flkatck_sound_map, AS_PROGRAM, 8, flkatck_state )
 //  AM_RANGE(0x9001, 0x9001) AM_RAM                                             /* ??? */
 	AM_RANGE(0x9004, 0x9004) AM_READNOP                                         /* ??? */
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP                                        /* ??? */
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r */
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) /* 007232 registers */
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)           /* YM2151 */
 ADDRESS_MAP_END
@@ -185,7 +185,7 @@ WRITE8_MEMBER(flkatck_state::volume_callback)
 
 void flkatck_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 3, &ROM[0x10000], 0x2000);
 
@@ -216,6 +216,7 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -236,6 +237,8 @@ static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

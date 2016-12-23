@@ -1,153 +1,20 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
 
-<!-- dumps are not yet verified as good, although most have been confirmed to run on a flash cart
-     the 3-in-1 internal ROM of the system is not yet dumped -->
+<!--
+
+     Dumps are not yet verified as good, although most have been confirmed to run on a flash cart
+
+     the 3-in-1 internal ROM of the system is not yet dumped: it contains the games
+
+    * 2003
+    * Drifter
+    * Miner
+-->
 
 <softwarelist name="gameking" description="TimeTop GameKing cartridges">
 
-	<software name="4in1_01" supported="no">
-		<description>4in1 - AirWar, DeadShot, Challenge, Speedboat</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_airwar_deadshot_challenge_speedboat.gk" size="524288" crc="b366be5d" sha1="66e565640eb86a50c5a0fc8b8c62deea3e99b3a7" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_02" supported="no">
-		<description>4in1 - Chaser, Blaster, StarWars, Nagual</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_chaser_blaster_starwars_nagual.gk" size="524288" crc="8a49e7ca" sha1="5c40c158564932184b14a5f481f7053aa00811e0" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_03" supported="no">
-		<description>4in1 - DraculaZone, Hero, PocketTank, StarChazi</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_draculazone_hero_pockettank_starchazi.gk" size="524288" crc="5e0dac04" sha1="87fc1a06f00a313e8a49e06170d741e57df991f4" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_04" supported="no">
-		<description>4in1 -  Farer, Sortie, PhantomFighter, Seabedwar</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_farer_sortie_phantomfighter_seabedwar.gk" size="524288" crc="bcbfb7d3" sha1="2f37e0e9cca23bb9e06f339030eaa6e357ed17eb" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_05" supported="no">
-		<description>4in1 - SeaGuard, Whirlybird, Spectask, Captain</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_seaguard_whirlybird_spectask_captain.gk" size="524288" crc="465ad7c1" sha1="fde6bf47e1b88c8a73755ef98eee74b964e7fed5" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_06" supported="no">
-		<description>4in1 - ThreeBattles, Lightswort, MetalDefor IV</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_threebattles_lightswort_metaldefor iv.gk" size="524288" crc="eb9399df" sha1="2f698fc716b3006f968d2b89a28424ca75ad2741" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1_07" supported="no">
-		<description>4in1 - TrojanLegend, HappyBall, Supermotor, Lanneret</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_trojanlegend_happyball_supermotor_lanneret.gk" size="524288" crc="cbd8df6a" sha1="63fbda84375a748721c41492610ae5e2f8910f08" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1no08" supported="no">
-		<description>4 in 1 Vol. 8</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="4in1_vol8.bin" size="524288" crc="6741847e" sha1="b561ca1b52e3492f86e7558722c8c8956e845bc5" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1no09" supported="no">
-		<description>4 in 1 Vol. 9</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_vol9.gk" size="524288" crc="02fbc6ef" sha1="84bea568b4c9a50184f15709066e73f3ce09e184" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1no10" supported="no">
-		<description>4 in 1 Vol. 10</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="4in1no10.bin" size="524288" crc="b25b1080" sha1="24bc65a9e49ba6f0ffc19b3b858d6c576a3196f7" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1no11" supported="no">
-		<description>4 in 1 Vol. 11</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_vol11.gk" size="524288" crc="1bd50766" sha1="628b3b9b4f37f881f0aa19f30debb1bca06e0879" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="4in1no12" supported="no">
-		<description>4 in 1 Vol. 12</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_vol12.gk" size="524288" crc="504eea37" sha1="06a45e4aaf8b225d9863a112c910a864c4edf116" offset="0x00000" />
-			</dataarea>
-		</part>
-
-	</software>
-	<software name="4in1no13" supported="no">
-		<description>4 in 1 Vol. 13</description>
-		<year>200?</year>
-		<publisher>TimeTop</publisher>
-		<part name="cart" interface="gameking_cart">
-			<dataarea name="rom" size="524288">
-				<rom name="gk_4in1_vol13.gk" size="524288" crc="1dfb2741" sha1="334a54ebc22f70bacfc87b2f5228f0649970d599" offset="0x00000" />
-			</dataarea>
-		</part>
-	</software>
+<!-- Single-game carts -->
 
 	<software name="2004" supported="no">
 		<description>2004</description>
@@ -188,7 +55,7 @@
 		<publisher>TimeTop</publisher>
 		<part name="cart" interface="gameking_cart">
 			<dataarea name="rom" size="131072">
-				<rom name="dino adventure legend.bin" size="131072" crc="2df0c1e6" sha1="df4b5dc80a758d9e3c9b00384e3099ad8331faad" offset="0x00000" />
+				<rom name="dino adventure legend.bin" size="131072" status="baddump" crc="2df0c1e6" sha1="df4b5dc80a758d9e3c9b00384e3099ad8331faad" offset="0x00000" />
 			</dataarea>
 		</part>
 	</software>
@@ -347,19 +214,217 @@
 		</part>
 	</software>
 
-<!-- Same hashes as trojanl, why is there a new entry?
-    <software name="trojanla" cloneof="trojanl" supported="no">
-        <description>Trojan Legend (Alt Revision)</description>
-        <year>200?</year>
-        <publisher>TimeTop</publisher>
-        <part name="cart" interface="gameking_cart">
-            <dataarea name="rom" size="131072">
-                <rom name="trojan legend (alt).bin" size="131072" crc="b832db4f" sha1="5a152bfb2ba2150cff9dc66729ceadc0b47d4f17" offset="0x00000" />
-            </dataarea>
-        </part>
-    </software>
--->
+
+<!-- Multi-game carts -->
+
+	<software name="mc_4v01" supported="no">
+		<description>4 in 1 - AirWar + DeadShot + Challenge + Speedboat</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_airwar_deadshot_challenge_speedboat.bin" size="524288" status="baddump" crc="b366be5d" sha1="66e565640eb86a50c5a0fc8b8c62deea3e99b3a7" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v02" supported="no">
+		<description>4 in 1 - Chaser + Blaster + StarWars + Nagual</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_chaser_blaster_starwars_nagual.bin" size="524288" crc="8a49e7ca" sha1="5c40c158564932184b14a5f481f7053aa00811e0" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v03" supported="no">
+		<description>4 in 1 - DraculaZone + Hero + PocketTank + StarChazi</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_draculazone_hero_pockettank_starchazi.bin" size="524288" crc="5e0dac04" sha1="87fc1a06f00a313e8a49e06170d741e57df991f4" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v04" supported="no">
+		<description>4 in 1 - Farer + Sortie + PhantomFighter + Seabedwar</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_farer_sortie_phantomfighter_seabedwar.bin" size="524288" status="baddump" crc="bcbfb7d3" sha1="2f37e0e9cca23bb9e06f339030eaa6e357ed17eb" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v05" supported="no">
+		<description>4 in 1 - SeaGuard + Whirlybird + Spectask + Captain</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_seaguard_whirlybird_spectask_captain.bin" size="524288" crc="465ad7c1" sha1="fde6bf47e1b88c8a73755ef98eee74b964e7fed5" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v06" supported="no">
+		<description>4 in 1 - ThreeBattles + Lightswort + MetalDefor IV</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_threebattles_lightswort_metaldefor iv.bin" size="524288" crc="eb9399df" sha1="2f698fc716b3006f968d2b89a28424ca75ad2741" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v07" supported="no">
+		<description>4 in 1 - TrojanLegend + HappyBall + Supermotor + Lanneret</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_trojanlegend_happyball_supermotor_lanneret.bin" size="524288" status="baddump" crc="cbd8df6a" sha1="63fbda84375a748721c41492610ae5e2f8910f08" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v08" supported="no">
+		<description>4 in 1 Vol. 8</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1_vol8.bin" size="524288" status="baddump" crc="6741847e" sha1="b561ca1b52e3492f86e7558722c8c8956e845bc5" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v09" supported="no">
+		<description>4 in 1 Vol. 9</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_vol9.bin" size="524288" status="baddump" crc="02fbc6ef" sha1="84bea568b4c9a50184f15709066e73f3ce09e184" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v10" supported="no">
+		<description>4 in 1 Vol. 10</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1no10.bin" size="524288" crc="b25b1080" sha1="24bc65a9e49ba6f0ffc19b3b858d6c576a3196f7" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v11" supported="no">
+		<description>4 in 1 Vol. 11</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_vol11.bin" size="524288" crc="1bd50766" sha1="628b3b9b4f37f881f0aa19f30debb1bca06e0879" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v12" supported="no">
+		<description>4 in 1 Vol. 12</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_vol12.bin" size="524288" crc="504eea37" sha1="06a45e4aaf8b225d9863a112c910a864c4edf116" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v13" supported="no">
+		<description>4 in 1 Vol. 13</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="gk_4in1_vol13.bin" size="524288" crc="1dfb2741" sha1="334a54ebc22f70bacfc87b2f5228f0649970d599" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
 
 
+	<software name="mc_4v14" supported="no">
+		<description>4 in 1 - CS-I + Soldier + Sea War + Thunderbird</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - cs-i, soldier, sea war, thunderbird.bin" size="524288" crc="8ec18345" sha1="35b53171d6d1fbfd0dfe0879ce0af15b7f3cde84" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v15" supported="no">
+		<description>4 in 1 - Elfin + Chariot + Searcher + Peace Havass</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - elfin, chariot, searcher, peace havass.bin" size="524288" crc="de570f79" sha1="77d6c19f00cbcea5b661b689cff7fac3790032aa" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v16" supported="no">
+		<description>4 in 1 - Manhunt + Bobby + Tantivy + Racing Car</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - manhunt, bobby, tantivy, racing car.bin" size="524288" crc="890d9270" sha1="5e4c90885d243d526418a76ee2525a8c2af4e0ae" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v17" supported="no">
+		<description>4 in 1 - Nagual + Revenger + Terminator + Black Jack</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - nagual, revenger, terminator, black jack.bin" size="524288" crc="3e1c0eeb" sha1="319057078315d982cef9c55eaac5d4c8609a57cc" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v18" supported="no">
+		<description>4 in 1 - Nobody + Bad Boy + Air Wrestle + MotherLove</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - nobody, bad boy, air wrestle, motherlove.bin" size="524288" crc="13557220" sha1="a6a1aeddac8e95337d1e25051f7730fba28d43e4" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="mc_4v19" supported="no">
+		<description>4 in 1 - Warrior + Cleverhawk + Valiant + MetalDeform</description>
+		<year>200?</year>
+		<publisher>TimeTop</publisher>
+		<part name="cart" interface="gameking_cart">
+			<dataarea name="rom" size="524288">
+				<rom name="4in1 - warrior, cleverhawk, valiant, metaldeform.bin" size="524288" crc="18fe216b" sha1="f9c0215b031120d1868d7e825e3774898e452ba9" offset="0x00000" />
+			</dataarea>
+		</part>
+	</software>
 
 </softwarelist>

@@ -96,9 +96,9 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 	int quick_addr = 0x440;
 	int exec_addr;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	if (quick_length < 0x0444)
@@ -145,7 +145,7 @@ QUICKLOAD_LOAD_MEMBER( pipbug_state, pipbug )
 				// Start the quickload
 				m_maincpu->set_state_int(S2650_PC, exec_addr);
 
-				result = IMAGE_INIT_PASS;
+				result = image_init_result::PASS;
 			}
 		}
 	}
@@ -162,7 +162,7 @@ static MACHINE_CONFIG_START( pipbug, pipbug_state )
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "terminal")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", s2650_device, write_sense))
+	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", S2650_SENSE_LINE))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("terminal", terminal)
 
 	/* quickload */

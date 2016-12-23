@@ -31,7 +31,7 @@
 #include "includes/prof180x.h"
 #include "softlist.h"
 
-UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -39,7 +39,7 @@ UINT32 prof180x_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 READ8_MEMBER( prof180x_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset < 0x40000)
 	{
@@ -186,12 +186,12 @@ READ8_MEMBER( prof180x_state::status_r )
 /* Address Maps */
 
 static ADDRESS_MAP_START( prof180x_mem, AS_PROGRAM, 8, prof180x_state )
-	AM_RANGE(0x00000, 0x7ffff) AM_READWRITE(read, write)
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(read, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( prof180x_io , AS_IO, 8, prof180x_state )
 	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) AM_WRITE(flr_w)
-	AM_RANGE(0x09, 0x09) AM_MASK(0xff00) AM_READ(status_r)
+	AM_RANGE(0x09, 0x09) AM_SELECT(0xff00) AM_READ(status_r)
 	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xff00) AM_DEVREADWRITE(FDC9268_TAG, upd765a_device, mdma_r, mdma_w)
 	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xff00) AM_DEVWRITE("cent_data_out", output_latch_device, write)
 	AM_RANGE(0x0c, 0x0d) AM_MIRROR(0xff00) AM_DEVICE(FDC9268_TAG, upd765a_device, map)

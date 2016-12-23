@@ -144,7 +144,7 @@
   TODO:
 
   - Proper handling of the 68070 (68k with 32 address lines instead of 24)
-    & handle the extra features properly (UART,DMA,Timers etc.)
+    & handle the extra features properly (UART, DMA, timers, etc.)
 
   - Proper emulation of the 66470 Video Chip (still many unhandled features)
 
@@ -167,7 +167,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "video/ramdac.h"
 
 
@@ -191,17 +191,17 @@ public:
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_magicram;
-	required_shared_ptr<UINT16> m_magicramb;
-	required_shared_ptr<UINT16> m_pcab_vregs;
-	required_shared_ptr<UINT16> m_scc68070_ext_irqc_regs;
-	required_shared_ptr<UINT16> m_scc68070_iic_regs;
-	required_shared_ptr<UINT16> m_scc68070_uart_regs;
-	required_shared_ptr<UINT16> m_scc68070_timer_regs;
-	required_shared_ptr<UINT16> m_scc68070_int_irqc_regs;
-	required_shared_ptr<UINT16> m_scc68070_dma_ch1_regs;
-	required_shared_ptr<UINT16> m_scc68070_dma_ch2_regs;
-	required_shared_ptr<UINT16> m_scc68070_mmu_regs;
+	required_shared_ptr<uint16_t> m_magicram;
+	required_shared_ptr<uint16_t> m_magicramb;
+	required_shared_ptr<uint16_t> m_pcab_vregs;
+	required_shared_ptr<uint16_t> m_scc68070_ext_irqc_regs;
+	required_shared_ptr<uint16_t> m_scc68070_iic_regs;
+	required_shared_ptr<uint16_t> m_scc68070_uart_regs;
+	required_shared_ptr<uint16_t> m_scc68070_timer_regs;
+	required_shared_ptr<uint16_t> m_scc68070_int_irqc_regs;
+	required_shared_ptr<uint16_t> m_scc68070_dma_ch1_regs;
+	required_shared_ptr<uint16_t> m_scc68070_dma_ch2_regs;
+	required_shared_ptr<uint16_t> m_scc68070_mmu_regs;
 	DECLARE_READ16_MEMBER(test_r);
 	DECLARE_READ16_MEMBER(philips_66470_r);
 	DECLARE_WRITE16_MEMBER(philips_66470_w);
@@ -224,7 +224,7 @@ public:
 	DECLARE_DRIVER_INIT(magicard);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(magicard_irq);
 	required_device<cpu_device> m_maincpu;
 	required_device<screen_device> m_screen;
@@ -423,45 +423,45 @@ void magicard_state::video_start()
 {
 }
 
-UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int x,y;
-	UINT32 count;
+	int x, y;
+	uint32_t count;
 
 	bitmap.fill(m_palette->black_pen(), cliprect); //TODO
 
 	if(!(SCC_DE_VREG)) //display enable
 		return 0;
 
-	count = ((SCC_VSR_VREG)/2);
+	count = ((SCC_VSR_VREG) / 2);
 
 	if(SCC_FG_VREG) //4bpp gfx
 	{
-		for(y=0;y<300;y++)
+		for(y = 0; y < 300; y++)
 		{
-			for(x=0;x<84;x++)
+			for(x = 0; x < 84; x++)
 			{
-				UINT32 color;
+				uint32_t color;
 
-				color = ((m_magicram[count]) & 0x000f)>>0;
+				color = ((m_magicram[count]) & 0x000f) >> 0;
 
-				if(cliprect.contains((x*4)+3, y))
-					bitmap.pix32(y, (x*4)+3) = m_palette->pen(color);
+				if(cliprect.contains((x * 4) + 3, y))
+					bitmap.pix32(y, (x * 4) + 3) = m_palette->pen(color);
 
-				color = ((m_magicram[count]) & 0x00f0)>>4;
+				color = ((m_magicram[count]) & 0x00f0) >> 4;
 
-				if(cliprect.contains((x*4)+2, y))
-					bitmap.pix32(y, (x*4)+2) = m_palette->pen(color);
+				if(cliprect.contains((x * 4) + 2, y))
+					bitmap.pix32(y, (x * 4) + 2) = m_palette->pen(color);
 
-				color = ((m_magicram[count]) & 0x0f00)>>8;
+				color = ((m_magicram[count]) & 0x0f00) >> 8;
 
-				if(cliprect.contains((x*4)+1, y))
-					bitmap.pix32(y, (x*4)+1) = m_palette->pen(color);
+				if(cliprect.contains((x * 4) + 1, y))
+					bitmap.pix32(y, (x * 4) + 1) = m_palette->pen(color);
 
-				color = ((m_magicram[count]) & 0xf000)>>12;
+				color = ((m_magicram[count]) & 0xf000) >> 12;
 
-				if(cliprect.contains((x*4)+0, y))
-					bitmap.pix32(y, (x*4)+0) = m_palette->pen(color);
+				if(cliprect.contains((x * 4) + 0, y))
+					bitmap.pix32(y, (x * 4) + 0) = m_palette->pen(color);
 
 				count++;
 			}
@@ -469,21 +469,21 @@ UINT32 magicard_state::screen_update_magicard(screen_device &screen, bitmap_rgb3
 	}
 	else //8bpp gfx
 	{
-		for(y=0;y<300;y++)
+		for(y = 0; y < 300; y++)
 		{
-			for(x=0;x<168;x++)
+			for(x = 0; x < 168; x++)
 			{
-				UINT32 color;
+				uint32_t color;
 
-				color = ((m_magicram[count]) & 0x00ff)>>0;
+				color = ((m_magicram[count]) & 0x00ff) >> 0;
 
-				if(cliprect.contains((x*2)+1, y))
-					bitmap.pix32(y, (x*2)+1) = m_palette->pen(color);
+				if(cliprect.contains((x * 2) + 1, y))
+					bitmap.pix32(y, (x * 2) + 1) = m_palette->pen(color);
 
-				color = ((m_magicram[count]) & 0xff00)>>8;
+				color = ((m_magicram[count]) & 0xff00) >> 8;
 
-				if(cliprect.contains((x*2)+0, y))
-					bitmap.pix32(y, (x*2)+0) = m_palette->pen(color);
+				if(cliprect.contains((x * 2) + 0, y))
+					bitmap.pix32(y, (x * 2) + 0) = m_palette->pen(color);
 
 				count++;
 			}
@@ -509,10 +509,10 @@ READ16_MEMBER(magicard_state::philips_66470_r)
 	{
 		case 0/2:
 		{
-			UINT8 vdisp;
+			uint8_t vdisp;
 			vdisp = m_screen->vpos() < 256;
 
-			return (m_pcab_vregs[offset] & 0xff7f) | vdisp<<7; //TODO
+			return (m_pcab_vregs[offset] & 0xff7f) | vdisp << 7; //TODO
 		}
 	}
 
@@ -716,17 +716,17 @@ INPUT_PORTS_END
 
 void magicard_state::machine_reset()
 {
-	UINT16 *src    = (UINT16*)memregion("maincpu" )->base();
-	UINT16 *dst    = m_magicram;
+	uint16_t *src    = (uint16_t*)memregion("maincpu" )->base();
+	uint16_t *dst    = m_magicram;
 	memcpy (dst, src, 0x80000);
-	memcpy (dst+0x40000*1, src, 0x80000);
-	memcpy (dst+0x40000*2, src, 0x80000);
-	memcpy (dst+0x40000*3, src, 0x80000);
+	memcpy (dst + 0x40000 * 1, src, 0x80000);
+	memcpy (dst + 0x40000 * 2, src, 0x80000);
+	memcpy (dst + 0x40000 * 3, src, 0x80000);
 	dst = m_magicramb;
 	memcpy (dst, src, 0x80000);
-	memcpy (dst+0x40000*1, src, 0x80000);
-	memcpy (dst+0x40000*2, src, 0x80000);
-	memcpy (dst+0x40000*3, src, 0x80000);
+	memcpy (dst + 0x40000 * 1, src, 0x80000);
+	memcpy (dst + 0x40000 * 2, src, 0x80000);
+	memcpy (dst + 0x40000 * 3, src, 0x80000);
 	m_maincpu->reset();
 }
 
@@ -739,20 +739,20 @@ void magicard_state::machine_reset()
 INTERRUPT_GEN_MEMBER(magicard_state::magicard_irq)
 {
 	if(machine().input().code_pressed(KEYCODE_Z)) //vblank?
-		device.execute().set_input_line_and_vector(1, HOLD_LINE,0xe4/4);
+		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xe4 / 4);
 	if(machine().input().code_pressed(KEYCODE_X)) //uart irq
-		device.execute().set_input_line_and_vector(1, HOLD_LINE,0xf0/4);
+		device.execute().set_input_line_and_vector(1, HOLD_LINE, 0xf0 / 4);
 }
 
 static ADDRESS_MAP_START( ramdac_map, AS_0, 8, magicard_state )
-	AM_RANGE(0x000, 0x3ff) AM_DEVREADWRITE("ramdac",ramdac_device,ramdac_pal_r,ramdac_rgb666_w)
+	AM_RANGE(0x0000, 0x03ff) AM_DEVREADWRITE("ramdac", ramdac_device, ramdac_pal_r, ramdac_rgb666_w)
 ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_START( magicard, magicard_state )
-	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)    /* SCC-68070 CCA84 datasheet */
+	MCFG_CPU_ADD("maincpu", SCC68070, CLOCK_A / 2)    /* SCC-68070 CCA84 datasheet */
 	MCFG_CPU_PROGRAM_MAP(magicard_mem)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state,  magicard_irq) /* no interrupts? (it erases the vectors..) */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicard_state, magicard_irq) /* no interrupts? (it erases the vectors..) */
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -765,7 +765,7 @@ static MACHINE_CONFIG_START( magicard, magicard_state )
 	MCFG_RAMDAC_ADD("ramdac", ramdac_map, "palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A/12)
+	MCFG_SOUND_ADD("ymsnd", YM2413, CLOCK_A / 12)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -803,7 +803,7 @@ ROM_START( magicardb )
 
 	/*bigger than the other sets?*/
 	ROM_REGION( 0x20000, "other", 0 ) /* unknown */
-	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000,    0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
+	ROM_LOAD16_WORD_SWAP("mg_u3.bin",   0x00000, 0x20000, CRC(2116de31) SHA1(fb9c21ca936532e7c342db4bcaaac31c478b1a35) )
 ROM_END
 
 ROM_START( magicardj )
@@ -890,7 +890,7 @@ ROM_END
 *      Driver Init       *
 *************************/
 
-DRIVER_INIT_MEMBER(magicard_state,magicard)
+DRIVER_INIT_MEMBER(magicard_state, magicard)
 {
 	//...
 }

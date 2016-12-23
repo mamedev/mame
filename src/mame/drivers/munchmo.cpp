@@ -58,7 +58,7 @@ INTERRUPT_GEN_MEMBER(munchmo_state::mnchmobl_sound_irq)
 
 WRITE8_MEMBER(munchmo_state::mnchmobl_soundlatch_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE );
 }
 
@@ -114,7 +114,7 @@ ADDRESS_MAP_END
 /* memory map provided thru schematics */
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, munchmo_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2000, 0x3fff) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x2000, 0x3fff) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4fff) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x5000, 0x5fff) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6fff) AM_DEVWRITE("ay2", ay8910_device, data_w)
@@ -345,7 +345,9 @@ static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-		/* AY clock speeds confirmed to match known recording */
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
+	/* AY clock speeds confirmed to match known recording */
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_15MHz/4/2)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

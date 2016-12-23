@@ -21,8 +21,6 @@
 #include "e0c6200.h"
 #include "debugger.h"
 
-#include "e0c6200op.inc"
-
 
 // disasm
 void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -30,7 +28,7 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c",
+			str = string_format("%c%c%c%c",
 				(m_f & I_FLAG) ? 'I':'i',
 				(m_f & D_FLAG) ? 'D':'d',
 				(m_f & Z_FLAG) ? 'Z':'z',
@@ -42,10 +40,10 @@ void e0c6200_cpu_device::state_string_export(const device_state_entry &entry, st
 	}
 }
 
-offs_t e0c6200_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t e0c6200_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(e0c6200);
-	return CPU_DISASSEMBLE_NAME(e0c6200)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(e0c6200)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -121,7 +119,8 @@ void e0c6200_cpu_device::device_start()
 	state_add(E0C6200_YL, "YL", m_yl).formatstr("%01X");
 	state_add(E0C6200_SP, "SP", m_sp).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_f).formatstr("%4s").noshow();
 
 	m_icountptr = &m_icount;

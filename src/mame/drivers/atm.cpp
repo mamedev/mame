@@ -13,12 +13,15 @@ computer to boot up (with keyboard problems).
 
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "includes/spec128.h"
+#include "includes/specpls3.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
 #include "sound/speaker.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
+#include "machine/spec_snqk.h"
 
 
 class atm_state : public spectrum_state
@@ -45,14 +48,14 @@ protected:
 	required_device<beta_disk_device> m_beta;
 
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void atm_update_memory();
 };
 
 
 DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 {
-	UINT16 pc = m_maincpu->state_int(STATE_GENPCBASE);
+	uint16_t pc = m_maincpu->state_int(STATE_GENPCBASE);
 
 	if (m_beta->started() && m_beta->is_active())
 	{
@@ -89,7 +92,7 @@ DIRECT_UPDATE_MEMBER(atm_state::atm_direct)
 
 void atm_state::atm_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -124,7 +127,7 @@ static ADDRESS_MAP_START (atm_io, AS_IO, 8, atm_state )
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(atm_port_7ffd_w)  AM_MIRROR(0x3ffd)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
@@ -133,7 +136,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(atm_state,atm)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
@@ -144,7 +147,7 @@ MACHINE_RESET_MEMBER(atm_state,atm)
 	{
 		m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(atm_state::atm_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&atm_state::atm_direct, this));
 
 	memset(messram,0,128*1024);
 

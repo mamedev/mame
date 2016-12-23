@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Stephh, Pierpaolo Prazzoli, Roberto Fresca
+// copyright-holders:Angelo Salese, David Haywood, Ryan Holtz, Pierpaolo Prazzoli, Roberto Fresca,Stephane Humbert
 /*****************************************************************
 * Status Triv Two driver by David Haywood, Ryan Holtz, and Stephh*
 * Super Triv II driver by Ryan Holtz                             *
@@ -55,7 +55,7 @@
 CTR5037 is also labelled as a TMS9937NL
 DSW is a 4 position dipswitch
 
-U17 is a socketted 74s288 (compatible with 82s123)
+U17 is a socketed 74s288 (compatible with 82s123)
 U21 is a soldered in 74s288 (compatible with 82s123)
 U22 is a soldered in 74s287 (compatible with 82s129)
 
@@ -93,20 +93,18 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	required_device<tms9927_device> m_tms;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	tilemap_t *m_tilemap;
-	required_shared_ptr<UINT8> m_question_offset;
+	required_shared_ptr<uint8_t> m_question_offset;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
-	UINT8 m_question_offset_low;
-	UINT8 m_question_offset_mid;
-	UINT8 m_question_offset_high;
-	UINT8 m_latched_coin;
-	UINT8 m_last_coin;
+	uint8_t m_question_offset_low;
+	uint8_t m_question_offset_mid;
+	uint8_t m_question_offset_high;
+	uint8_t m_latched_coin;
+	uint8_t m_last_coin;
 	DECLARE_WRITE8_MEMBER(statriv2_videoram_w);
 	DECLARE_READ8_MEMBER(question_data_r);
-	DECLARE_READ8_MEMBER(laserdisc_io_r);
-	DECLARE_WRITE8_MEMBER(laserdisc_io_w);
 	DECLARE_CUSTOM_INPUT_MEMBER(latched_coin_r);
 	DECLARE_WRITE8_MEMBER(ppi_portc_hi_w);
 	DECLARE_DRIVER_INIT(addr_xlh);
@@ -120,7 +118,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(statriv2);
 	DECLARE_VIDEO_START(vertical);
-	UINT32 screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(statriv2_interrupt);
 };
 
@@ -136,7 +134,7 @@ public:
 
 TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -145,7 +143,7 @@ TILE_GET_INFO_MEMBER(statriv2_state::horizontal_tile_info)
 
 TILE_GET_INFO_MEMBER(statriv2_state::vertical_tile_info)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int code = videoram[0x400+tile_index];
 	int attr = videoram[tile_index] & 0x3f;
 
@@ -173,12 +171,12 @@ PALETTE_INIT_MEMBER(statriv2_state, statriv2)
 
 void statriv2_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::horizontal_tile_info),this) ,TILEMAP_SCAN_ROWS, 8,15, 64,16);
 }
 
 VIDEO_START_MEMBER(statriv2_state,vertical)
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(statriv2_state::vertical_tile_info),this), TILEMAP_SCAN_ROWS, 8,8, 32,32);
 }
 
 
@@ -191,7 +189,7 @@ VIDEO_START_MEMBER(statriv2_state,vertical)
 
 WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[offset] = data;
 	m_tilemap->mark_tile_dirty(offset & 0x3ff);
 }
@@ -204,7 +202,7 @@ WRITE8_MEMBER(statriv2_state::statriv2_videoram_w)
  *
  *************************************/
 
-UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_tms->screen_reset())
 		bitmap.fill(m_palette->black_pen(), cliprect);
@@ -223,7 +221,7 @@ UINT32 statriv2_state::screen_update_statriv2(screen_device &screen, bitmap_ind1
 
 INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 {
-	UINT8 new_coin = ioport("COIN")->read();
+	uint8_t new_coin = ioport("COIN")->read();
 
 	/* check the coin inputs once per frame */
 	m_latched_coin |= new_coin & (new_coin ^ m_last_coin);
@@ -243,9 +241,9 @@ INTERRUPT_GEN_MEMBER(statriv2_state::statriv2_interrupt)
 
 READ8_MEMBER(statriv2_state::question_data_r)
 {
-	const UINT8 *qrom = memregion("questions")->base();
-	UINT32 qromsize = memregion("questions")->bytes();
-	UINT32 address;
+	const uint8_t *qrom = memregion("questions")->base();
+	uint32_t qromsize = memregion("questions")->bytes();
+	uint32_t address;
 
 	if (m_question_offset_high == 0xff)
 		m_question_offset[m_question_offset_low]++;
@@ -659,7 +657,7 @@ ROM_START( statusbj )
 	ROM_LOAD( "statusbj.vid",   0x0000, 0x0800, CRC(99ade7a2) SHA1(98704ca3a9fcfc4590f850c8ae24445baaed6dfa) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
 	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 ROM_END
@@ -673,7 +671,7 @@ ROM_START( tripdraw )
 	ROM_LOAD( "u36_td0.bin", 0x0000, 0x0800, CRC(2faa1942) SHA1(0205bf9eb86ef1c32f1ae959d0e02001393db3af) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
 	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 ROM_END
@@ -706,9 +704,25 @@ ROM_START( funcsino )
 	ROM_LOAD( "u36", 0x0000, 0x1000, CRC(79eaf78b) SHA1(9df5f90344bbb9f1d196f35d910bb09fe6f74aa1) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
 	ROM_LOAD( "prom.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
+ROM_START( bigcsino )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "bc1k.u7", 0x0000, 0x1000, CRC(51f35f51) SHA1(3c1b9b613402e178d0d8752bf025e5d7fc9f1081) )
+	ROM_LOAD( "bc2k.u8", 0x1000, 0x1000, CRC(8102d1eb) SHA1(e2ffa04d705b82b19e978429851690426cb4b474) )
+	ROM_LOAD( "bc3k.u9", 0x2000, 0x1000, CRC(fdfb304e) SHA1(b000d7533c1613fb253b9f48143cc4add73aa23c) )
+	ROM_LOAD( "bc4k.u10", 0x3000, 0x1000, CRC(521347c3) SHA1(539ce6e93bf6db2ca2a8fa22d0aef9933f8cd825) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "bc0k.u36", 0x0000, 0x1000, CRC(baf66e19) SHA1(4b78571e9370453e96e64c08d69b92b4d64e1a41) )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "82s123.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
+	ROM_LOAD( "82s123.u21", 0x0020, 0x0020, CRC(e8f60d23) SHA1(2070b8201b75a13e416f597d6b2473d0027f420c) ) /* Soldered in (Color?) */
+	ROM_LOAD( "82s123.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
 
 ROM_START( hangman )
@@ -734,7 +748,7 @@ ROM_START( hangman )
 	ROM_LOAD( "hangman.nv", 0x0000, 0x0100, CRC(4cecee6f) SHA1(bd9fe7bea081c87033993f809ed0b2c727ab5e88) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -762,7 +776,7 @@ ROM_START( trivquiz )
 	ROM_LOAD( "trivquiz.nv", 0x0000, 0x0100, CRC(bd07a964) SHA1(a1fe68d95c79ac99cfca8a468073b5c838e1cd49) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -790,7 +804,7 @@ ROM_START( statriv2 )
 	ROM_LOAD( "statriv2.nv", 0x0000, 0x0100, CRC(3edb2bd1) SHA1(fdda1310f519054eb5e6ea498d27555f96b370eb) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -822,7 +836,7 @@ ROM_START( statriv2v )
 	ROM_LOAD( "statriv2v.nv", 0x0000, 0x0100, CRC(3a9c7db7) SHA1(3d5a78beed26a73320f1f0748944b7fd87794bc7) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -850,7 +864,7 @@ ROM_START( statriv4 )
 	ROM_LOAD( "statriv4.nv", 0x0000, 0x0100, CRC(ab449099) SHA1(80fe9e07068a1034f8c0b233a7d37f6b40644be5) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, verified */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -878,7 +892,7 @@ ROM_START( sextriv )
 	ROM_LOAD( "sextriv.nv", 0x0000, 0x0100, CRC(33fae98c) SHA1(11aaca7706460dbad750c11c794bbe20084a8ff6) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -907,7 +921,36 @@ ROM_START( quaquiz2 )
 	ROM_LOAD( "quaquiz2.nv", 0x0000, 0x0100, CRC(dad239cf) SHA1(c46380d7b673a1367f14364ae47cd46ebe080e1b) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
+	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
+	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
+ROM_END
+
+// Dumper's note: I got the pcb with Triv Quiz (trivquiz) question rom pcb, but I don't think that's the correct one.
+// If you use Triv Quiz question data the game will boot to playable state
+
+ROM_START( supertr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "u07.bin",  0x00000, 0x01000, CRC(6573d17c) SHA1(0ec4a572312393c9efbf580f015bcf418d867079) )
+	ROM_LOAD( "u08.bin",  0x01000, 0x01000, CRC(734f7e0a) SHA1(42b4ec0396a7150b78901e0279fc7904abd94d06) )
+	ROM_LOAD( "u09.bin",  0x02000, 0x01000, CRC(41b9bb46) SHA1(d440ec19c9962b3e35c50e2cc1ba0c218c05c0e1) )
+	ROM_LOAD( "u10.bin",  0x03000, 0x01000, CRC(2f7b2207) SHA1(2c58fde128824fb553a6ec5336cadbf194ec81b7) )
+
+	ROM_REGION( 0x1000,  "tiles", ROMREGION_INVERT )
+	ROM_LOAD( "u36.bin", 0x00000, 0x01000, CRC(01f30203) SHA1(b902845af0e4d96446550539596354d9962d78be) )
+
+	ROM_REGION( 0x40000, "questions", 0 )
+	ROM_LOAD( "q1.rom", 0x00000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q2.rom", 0x08000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q3.rom", 0x10000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q4.rom", 0x18000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q5.rom", 0x20000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q6.rom", 0x28000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q7.rom", 0x30000, 0x08000, NO_DUMP )
+	ROM_LOAD( "q8.rom", 0x38000, 0x08000, NO_DUMP )
+
+	ROM_REGION( 0x0140, "proms", 0 )
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -933,7 +976,7 @@ ROM_START( supertr2 )
 	ROM_LOAD( "astq2-8.rom", 0x38000, 0x08000, CRC(cd2674d5) SHA1(7fb6513172ffe8e3b9e0f4dc9ecdb42d954b1ff0) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, not verified the same! */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, BAD_DUMP CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, not verified the same! */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -959,7 +1002,7 @@ ROM_START( supertr3 )
 	ROM_LOAD( "triv3.u48",    0x38000, 0x08000, CRC(1a99b268) SHA1(6369c79f645962b4a2f85b18e9d93c3cc65defc1) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketted, verified */
+	ROM_LOAD( "dm74s288.u17", 0x0000, 0x0020, CRC(63b8a63e) SHA1(d59ad84edd583f7befce73b79e12dfb58a204c4f) ) /* Socketed, verified */
 	ROM_LOAD( "dm74s288.u21", 0x0020, 0x0020, CRC(853d6172) SHA1(4aaab0faeaa1a07ee883fbed021f8dcd7e0ba549) ) /* Soldered in (Color?) */
 	ROM_LOAD( "dm74s282.u22", 0x0040, 0x0100, CRC(0421b8e0) SHA1(8b786eed86397a1463ad37b9b011edf83d76dd63) ) /* Soldered in */
 ROM_END
@@ -974,7 +1017,7 @@ ROM_START( cstripxi )
 	ROM_LOAD( "csxirom0.bin", 0x0000, 0x1000, CRC(4c9d995e) SHA1(a262d2124f65aa86b0fecee6976b6591fd370d55) )
 
 	ROM_REGION( 0x0140, "proms", 0 )
-	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketted */
+	ROM_LOAD( "prom.u17", 0x0000, 0x0020, NO_DUMP ) /* Socketed */
 	ROM_LOAD( "prom.u21", 0x0020, 0x0020, NO_DUMP ) /* Soldered in (Color?) */
 	ROM_LOAD( "prom.u22", 0x0040, 0x0100, NO_DUMP ) /* Soldered in */
 
@@ -1086,9 +1129,9 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	*                                                   *
 	\***************************************************/
 
-	UINT8 *qrom = memregion("questions")->base();
-	UINT32 length = memregion("questions")->bytes();
-	UINT32 address;
+	uint8_t *qrom = memregion("questions")->base();
+	uint32_t length = memregion("questions")->bytes();
+	uint32_t address;
 
 	for (address = 0; address < length; address++)
 		qrom[address] ^= BITSWAP8(address, 4,3,3,2,2,1,1,0);
@@ -1096,25 +1139,23 @@ DRIVER_INIT_MEMBER(statriv2_state,addr_lmhe)
 	DRIVER_INIT_CALL(addr_lmh);
 }
 
-
-READ8_MEMBER(statriv2_state::laserdisc_io_r)
-{
-	UINT8 result = 0x00;
-	if (offset == 1)
-		result = 0x18;
-	osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
-	return result;
-}
-
-WRITE8_MEMBER(statriv2_state::laserdisc_io_w)
-{
-	osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
-}
-
 DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
 {
 	address_space &iospace = m_maincpu->space(AS_IO);
-	iospace.install_readwrite_handler(0x28, 0x2b, read8_delegate(FUNC(statriv2_state::laserdisc_io_r), this), write8_delegate(FUNC(statriv2_state::laserdisc_io_w), this));
+	iospace.install_readwrite_handler(0x28, 0x2b,
+		read8_delegate([this](address_space &space, offs_t offset, uint8_t mem_mask) -> uint8_t
+		{
+			uint8_t result = 0x00;
+			if (offset == 1)
+				result = 0x18;
+			osd_printf_debug("%s:ld read ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, result);
+			return result;
+		},"write_lambda"),
+		write8_delegate([this](address_space &space, offs_t offset, uint8_t data, uint8_t mem_mask)
+		{
+			osd_printf_debug("%s:ld write ($%02X) = %02X\n", machine().describe_context(), 0x28 + offset, data);
+		},"read_lambda")
+	);
 }
 
 
@@ -1125,9 +1166,10 @@ DRIVER_INIT_MEMBER(statriv2_state,laserdisc)
  *
  *************************************/
 
-GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,         ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,         ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,         ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1981, statusbj, 0,        statriv2,  statusbj, driver_device, 0,          ROT0, "Status Games", "Status Black Jack (V1.0c)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, funcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Status Fun Casino (V1.3s)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, tripdraw, 0,        statriv2,  funcsino, driver_device, 0,          ROT0, "Status Games", "Tripple Draw (V3.1 s)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1984, bigcsino, 0,        funcsino,  funcsino, driver_device, 0,          ROT0, "Status Games", "Big Casino", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) //needs correct inputs
 GAME( 1984, hangman,  0,        statriv2,  hangman, statriv2_state,  addr_lmh,  ROT0, "Status Games", "Hangman", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, trivquiz, 0,        statriv2,  statriv2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Triv Quiz", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, statriv2, 0,        statriv2,  statriv2, statriv2_state, addr_xlh,  ROT0, "Status Games", "Triv Two", MACHINE_SUPPORTS_SAVE )
@@ -1135,6 +1177,7 @@ GAME( 1985, statriv2v,statriv2, statriv2v, statriv2, statriv2_state, addr_xlh,  
 GAME( 1985, statriv4, 0,        statriv2,  statriv4, statriv2_state, addr_xhl,  ROT0, "Status Games", "Triv Four", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, sextriv,  0,        statriv2,  sextriv, statriv2_state,  addr_lhx,  ROT0, "Status Games", "Sex Triv", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, quaquiz2, 0,        statriv2,  quaquiz2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Quadro Quiz II", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+GAME( 1985, supertr,  0,        statriv2,  supertr2, statriv2_state, addr_lhx,  ROT0, "Status Games", "Super Triv Quiz I", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING) // missing questions' ROMs
 GAME( 1986, supertr2, 0,        statriv2,  supertr2, statriv2_state, addr_lmhe, ROT0, "Status Games", "Super Triv II", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, supertr3, 0,        statriv2,  supertr2, statriv2_state, addr_lmh,  ROT0, "Status Games", "Super Triv III", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, cstripxi, 0,        statriv2,  funcsino, statriv2_state, laserdisc, ROT0, "Status Games", "Casino Strip XI", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

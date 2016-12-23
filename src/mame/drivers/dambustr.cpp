@@ -53,6 +53,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "audio/galaxian.h"
 #include "includes/galaxold.h"
 
@@ -117,7 +118,7 @@ static ADDRESS_MAP_START( dambustr_map, AS_PROGRAM, 8, dambustr_state )
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(galaxold_flip_screen_y_w)
 
 	AM_RANGE(0xf800, 0xf800) AM_DEVWRITE("cust", galaxian_sound_device, pitch_w)
-	AM_RANGE(0xf800, 0xffff) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf800, 0xffff) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 
@@ -212,9 +213,9 @@ DRIVER_INIT_MEMBER(dambustr_state,dambustr)
 {
 	int i, j, tmp;
 	int tmpram[16];
-	UINT8 *rom = memregion("maincpu")->base();
-	UINT8 *usr = memregion("user1")->base();
-	UINT8 *gfx = memregion("gfx1")->base();
+	uint8_t *rom = memregion("maincpu")->base();
+	uint8_t *usr = memregion("user1")->base();
+	uint8_t *gfx = memregion("gfx1")->base();
 
 	// Bit swap addresses
 	for(i=0; i<4096*4; i++) {
@@ -264,6 +265,8 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", dambustr_state, galaxold_interrupt_timer)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
@@ -279,7 +282,7 @@ static MACHINE_CONFIG_START( dambustr, dambustr_state )
 	MCFG_VIDEO_START_OVERRIDE(dambustr_state,dambustr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END

@@ -20,7 +20,7 @@
 
 WRITE16_MEMBER(prehisle_state::soundcmd_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -55,7 +55,7 @@ WRITE8_MEMBER(prehisle_state::D7759_upd_reset_w)
 static ADDRESS_MAP_START( prehisle_sound_map, AS_PROGRAM, 8, prehisle_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITENOP    // ???
 ADDRESS_MAP_END
 
@@ -219,6 +219,8 @@ static MACHINE_CONFIG_START( prehisle, prehisle_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)  /* verified on pcb */
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

@@ -113,22 +113,22 @@ public:
 
 	int m_segac2_enable_display;
 
-	required_shared_ptr<UINT16> m_paletteram;
+	required_shared_ptr<uint16_t> m_paletteram;
 	optional_memory_region m_upd_region;
 
 	/* protection-related tracking */
 	segac2_prot_delegate m_prot_func;     /* emulation of protection chip */
-	UINT8       m_prot_write_buf;       /* remembers what was written */
-	UINT8       m_prot_read_buf;        /* remembers what was returned */
+	uint8_t       m_prot_write_buf;       /* remembers what was written */
+	uint8_t       m_prot_read_buf;        /* remembers what was returned */
 
 	/* palette-related variables */
-	UINT8       m_segac2_alt_palette_mode;
-	UINT8       m_palbank;
-	UINT8       m_bg_palbase;
-	UINT8       m_sp_palbase;
+	uint8_t       m_segac2_alt_palette_mode;
+	uint8_t       m_palbank;
+	uint8_t       m_bg_palbase;
+	uint8_t       m_sp_palbase;
 
 	/* sound-related variables */
-	UINT8       m_sound_banks;      /* number of sound banks */
+	uint8_t       m_sound_banks;      /* number of sound banks */
 
 	DECLARE_DRIVER_INIT(c2boot);
 	DECLARE_DRIVER_INIT(bloxeedc);
@@ -160,7 +160,7 @@ public:
 	DECLARE_MACHINE_START(segac2);
 	DECLARE_MACHINE_RESET(segac2);
 
-	UINT32 screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	int m_segac2_bg_pal_lookup[4];
 	int m_segac2_sp_pal_lookup[4];
 	void recompute_palette_tables();
@@ -249,7 +249,7 @@ MACHINE_RESET_MEMBER(segac2_state,segac2)
 
 	/* determine how many sound banks */
 	m_sound_banks = 0;
-	if (m_upd_region != NULL)
+	if (m_upd_region != nullptr)
 	{
 		m_sound_banks = m_upd_region->bytes() / 0x20000;
 	}
@@ -1421,7 +1421,7 @@ VIDEO_START_MEMBER(segac2_state,segac2_new)
 
 // C2 doesn't use the internal VDP CRAM, instead it uses the digital output of the chip
 //  and applies it's own external colour circuity
-UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	const pen_t *paldata = m_palette->pens();
 	if (!m_segac2_enable_display)
@@ -1433,14 +1433,14 @@ UINT32 segac2_state::screen_update_segac2_new(screen_device &screen, bitmap_rgb3
 	/* Copy our screen buffer here */
 	for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		UINT32* desty = &bitmap.pix32(y, 0);
-		UINT16* srcy;
+		uint32_t* desty = &bitmap.pix32(y, 0);
+		uint16_t* srcy;
 
 		srcy = m_vdp->m_render_line_raw.get();
 
 		for (int x = cliprect.min_x; x <= cliprect.max_x; x++)
 		{
-			UINT16 src = srcy[x];
+			uint16_t src = srcy[x];
 			switch (src & 0x1c0)
 			{
 				case 0x000:
@@ -1962,8 +1962,8 @@ ROM_END
 
 ROM_START( potopoto ) /* Poto Poto  (c)1994 Sega */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "epr-16662.ic32", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
-	ROM_LOAD16_BYTE( "epr-16661.ic31", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )
+	ROM_LOAD16_BYTE( "epr-16662a.ic32", 0x000000, 0x040000, CRC(bbd305d6) SHA1(1a4f4869fefac188c69bc67df0b625e43a0c3f1f) )
+	ROM_LOAD16_BYTE( "epr-16661a.ic31", 0x000001, 0x040000, CRC(5a7d14f4) SHA1(a615b5f481256366db7b1c6302a8dcb69708102b) )
 
 	ROM_REGION( 0x040000, "upd", 0 )
 	ROM_LOAD( "epr-16660.ic4", 0x000000, 0x040000, CRC(8251c61c) SHA1(03eef3aa0bdde2c1d93128648f54fd69278d85dd) )
@@ -2064,7 +2064,7 @@ void segac2_state::segac2_common_init(segac2_prot_delegate prot_func)
 	m_prot_func = prot_func;
 
 	if (m_upd7759 != nullptr)
-		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
+		m_maincpu->space(AS_PROGRAM).install_write_handler(0x880000, 0x880001, 0, 0x13fefe, 0, write16_delegate(FUNC(segac2_state::segac2_upd7759_w),this));
 }
 
 int segac2_state::prot_func_dummy(int in)
@@ -2506,7 +2506,7 @@ GAME( 1992, wwmarine,   0,       segac2, wwmarine, segac2_state, bloxeedc, ROT0,
 // not really sure how this should hook up, things like the 'sold out' flags could be mechanical sensors, or from another MCU / CPU board in the actual popcorn part of the machine?
 GAME( 1993, sonicpop,   0,       segac2, sonicpop, segac2_state, bloxeedc, ROT0,   "Sega", "SegaSonic Popcorn Shop (Rev B)", MACHINE_MECHANICAL ) // region DSW for USA / Export / Japan, still speaks Japanese tho.  'Mechanical' part isn't emulated
 
-GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan)", 0 )
+GAME( 1994, potopoto,  0,        segac2, potopoto, segac2_state, potopoto, ROT0,   "Sega", "Poto Poto (Japan, Rev A)", 0 )
 
 GAME( 1994, stkclmns,  0,        segac2, stkclmns, segac2_state, stkclmns, ROT0,   "Sega", "Stack Columns (World)", 0 )
 GAME( 1994, stkclmnsj, stkclmns, segac2, stkclmns, segac2_state, stkclmnj, ROT0,   "Sega", "Stack Columns (Japan)", 0 )
@@ -2521,7 +2521,7 @@ GAME( 1994, puyopuy2,  0,        segac2, puyopuy2, segac2_state, puyopuy2, ROT0,
 GAME( 1994, zunkyou,   0,        segac2, zunkyou, segac2_state,  zunkyou,  ROT0,   "Sega", "Zunzunkyou No Yabou (Japan)", 0 )
 
 /* Atlus Print Club 'Games' (C-2 Hardware, might not be possible to support them because they use camera + printer, really just put here for reference) */
-GAME( 1995, pclubj,    0,        segac2, pclub, segac2_state,    pclub,    ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING )
-GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv2, ROT0,   "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING )
-GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv4, ROT0,   "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING )
-GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv5, ROT0,   "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING )
+GAME( 1995, pclubj,    0,        segac2, pclub, segac2_state,    pclub,    ROT0,   "Atlus", "Print Club (Japan Vol.1)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
+GAME( 1995, pclubjv2,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv2, ROT0,   "Atlus", "Print Club (Japan Vol.2)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
+GAME( 1996, pclubjv4,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv4, ROT0,   "Atlus", "Print Club (Japan Vol.4)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )
+GAME( 1996, pclubjv5,  pclubj,   segac2, pclubjv2, segac2_state, pclubjv5, ROT0,   "Atlus", "Print Club (Japan Vol.5)", MACHINE_NOT_WORKING | MACHINE_NODEVICE_PRINTER | MACHINE_NODEVICE_CAMERA )

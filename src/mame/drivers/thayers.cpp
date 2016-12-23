@@ -17,20 +17,20 @@
 #include "machine/ldstub.h"
 #include "machine/ldv1000.h"
 #include "cpu/cop400/cop400.h"
-//#include "dlair.lh"
+#include "thayers.lh"
 
 
 struct ssi263_t
 {
-	UINT8 dr;
-	UINT8 p;
-	UINT16 i;
-	UINT8 r;
-	UINT8 t;
-	UINT8 c;
-	UINT8 a;
-	UINT8 f;
-	UINT8 mode;
+	uint8_t dr;
+	uint8_t p;
+	uint16_t i;
+	uint8_t r;
+	uint8_t t;
+	uint8_t c;
+	uint8_t a;
+	uint8_t f;
+	uint8_t mode;
 };
 
 class thayers_state : public driver_device
@@ -43,21 +43,23 @@ public:
 	};
 
 	thayers_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-		m_pr7820(*this, "laserdisc"),
-		m_ldv1000(*this, "ldv1000"),
-		m_maincpu(*this, "maincpu"),
-		m_row(*this, "ROW") { }
+		: driver_device(mconfig, type, tag)
+		, m_pr7820(*this, "laserdisc")
+		, m_ldv1000(*this, "ldv1000")
+		, m_maincpu(*this, "maincpu")
+		, m_row(*this, "ROW.%u", 0)
+	{
+	}
 
 	optional_device<pioneer_pr7820_device> m_pr7820;
 	optional_device<pioneer_ldv1000_device> m_ldv1000;
-	UINT8 m_laserdisc_data;
+	uint8_t m_laserdisc_data;
 	int m_rx_bit;
 	int m_keylatch;
-	UINT8 m_cop_data_latch;
+	uint8_t m_cop_data_latch;
 	int m_cop_data_latch_enable;
-	UINT8 m_cop_l;
-	UINT8 m_cop_cmd_latch;
+	uint8_t m_cop_l;
+	uint8_t m_cop_cmd_latch;
 	int m_timer_int;
 	int m_data_rdy_int;
 	int m_ssi_data_request;
@@ -99,12 +101,7 @@ protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };
 
-
-extern const char layout_dlair[];
-
-
-
-static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
+static const uint8_t led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
 /* Interrupts */
 
@@ -120,7 +117,7 @@ void thayers_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		check_interrupt();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in thayers_state::device_timer");
+		assert_always(false, "Unknown id in thayers_state::device_timer");
 	}
 }
 
@@ -676,8 +673,8 @@ static INPUT_PORTS_START( thayers )
 	PORT_START("COIN")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_enter_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, thayers_state,laserdisc_ready_r, nullptr)
 
 	PORT_START("ROW.0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER ) PORT_NAME( "2" ) PORT_CODE( KEYCODE_F2 )
@@ -780,7 +777,7 @@ static MACHINE_CONFIG_START( thayers, thayers_state )
 	MCFG_CPU_IO_MAP(thayers_io_map)
 
 	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_DISABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_4, COP400_CKO_OSCILLATOR_OUTPUT, false )
 	MCFG_COP400_READ_L_CB(READ8(thayers_state, cop_l_r))
 	MCFG_COP400_WRITE_L_CB(WRITE8(thayers_state, cop_l_w))
 	MCFG_COP400_READ_G_CB(READ8(thayers_state, cop_g_r))
@@ -834,5 +831,5 @@ ROM_END
 /* Game Drivers */
 
 /*     YEAR  NAME      PARENT   MACHINE  INPUT    INIT  MONITOR  COMPANY               FULLNAME                   FLAGS                             LAYOUT */
-GAMEL( 1984, thayers,  0,       thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dlair)
-GAMEL( 1984, thayersa, thayers, thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_dlair)
+GAMEL( 1984, thayers,  0,       thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 1)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)
+GAMEL( 1984, thayersa, thayers, thayers, thayers, driver_device, 0, ROT0,    "RDI Video Systems",  "Thayer's Quest (set 2)",  MACHINE_NOT_WORKING | MACHINE_NO_SOUND, layout_thayers)

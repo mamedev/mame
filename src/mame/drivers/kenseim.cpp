@@ -224,10 +224,10 @@ public:
 	WRITE8_MEMBER(mb8936_portb_w); // maybe molesb output? (6-bits?)
 	WRITE8_MEMBER(mb8936_portf_w); // maybe strobe output?
 
-	UINT8 m_to_68k_cmd_low;
-	UINT8 m_to_68k_cmd_d9;
-	UINT8 m_to_68k_cmd_req;
-	UINT8 m_to_68k_cmd_LVm;
+	uint8_t m_to_68k_cmd_low;
+	uint8_t m_to_68k_cmd_d9;
+	uint8_t m_to_68k_cmd_req;
+	uint8_t m_to_68k_cmd_LVm;
 
 
 	int m_from68k_ack;
@@ -242,7 +242,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_req_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(kenseim_cmd_LVm_r);
 
-	void set_leds(UINT32 ledstates);
+	void set_leds(uint32_t ledstates);
 	int m_led_latch;
 	int m_led_serial_data;
 	int m_led_clock;
@@ -257,7 +257,7 @@ public:
   Misc System Functions
  ******************************/
 
-void kenseim_state::set_leds(UINT32 ledstates)
+void kenseim_state::set_leds(uint32_t ledstates)
 {
 	for (int i=0; i<20; i++)
 		output().set_lamp_value(i+1, ((ledstates & (1 << i)) != 0));
@@ -459,8 +459,7 @@ static ADDRESS_MAP_START( kenseim_map, AS_PROGRAM, 8, kenseim_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kenseim_io_map, AS_IO, 8, kenseim_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x27) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0xff00) AM_DEVREADWRITE("mb89363b", mb89363b_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -475,7 +474,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( kenseim, cps1_12MHz, kenseim_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("gamecpu", TMPZ84C011, XTAL_16MHz/2) // tmpz84c011-8
-	MCFG_CPU_CONFIG(daisy_chain_gamecpu)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_gamecpu)
 	MCFG_CPU_PROGRAM_MAP(kenseim_map)
 	MCFG_CPU_IO_MAP(kenseim_io_map)
 	MCFG_TMPZ84C011_PORTC_WRITE_CB(WRITE8(kenseim_state, cpu_portc_w))
@@ -504,10 +503,10 @@ static INPUT_PORTS_START( kenseim )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN1*/ ) // n/c
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_COIN2*/ ) // n/c
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, NULL) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_9_r, nullptr) //   PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 ) // D9
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, NULL) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, NULL) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_req_r, nullptr) // PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 ) // REQ
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_LVm_r, nullptr) // PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 ) // LVm
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) // PORT_SERVICE( 0x40, IP_ACTIVE_LOW ) n/c
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) // n/c?
 
@@ -516,7 +515,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) // D6
 //  PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) // D7
 //  PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) // D8
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, NULL)
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_5678_r, nullptr)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON1*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON2*/ ) /*PORT_PLAYER(1)*/ // n/c
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED/*IPT_BUTTON3*/ ) /*PORT_PLAYER(1)*/ // n/c
@@ -526,7 +525,7 @@ static INPUT_PORTS_START( kenseim )
 //  PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) // D2
 //  PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) // D3
 //  PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) // D4
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, NULL)
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, kenseim_state, kenseim_cmd_1234_r, nullptr)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON1*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON2*/ ) /*PORT_PLAYER(2)*/ // n/c
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED /*IPT_BUTTON3*/ ) /*PORT_PLAYER(2)*/ // n/c

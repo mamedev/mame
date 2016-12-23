@@ -17,7 +17,7 @@ static ADDRESS_MAP_START( scn2674_vram, AS_0, 8, scn2674_device )
 	AM_RANGE(0x0000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
-scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+scn2674_device::scn2674_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SCN2674_VIDEO, "Signetics SCN2674 AVDC", tag, owner, clock, "scn2674_device", __FILE__),
 		device_video_interface(mconfig, *this),
 		device_memory_interface(mconfig, *this),
@@ -113,7 +113,7 @@ void scn2674_device::device_reset()
 }
 
 // 15 Initialization Registers (8-bit each)
-void scn2674_device::write_init_regs(UINT8 data)
+void scn2674_device::write_init_regs(uint8_t data)
 {
 	LOG2674(("scn2674_write_init_regs %02x %02x\n",m_IR_pointer,data));
 
@@ -182,7 +182,7 @@ void scn2674_device::write_init_regs(UINT8 data)
 
 		case 7:
 		{
-			const UINT8 vsync_table[4] = {3,1,5,7};
+			const uint8_t vsync_table[4] = {3,1,5,7};
 			m_IR7_cursor_underline_position = (data & 0x0f);
 			m_IR7_cursor_rate_divisor = ((data & 0x10)>>4 ? 64:32);
 			m_IR7_cursor_blink = (data & 0x20)>>5;
@@ -263,9 +263,9 @@ void scn2674_device::write_init_regs(UINT8 data)
 	if (m_IR_pointer>14)m_IR_pointer=14;
 }
 
-void scn2674_device::write_command(UINT8 data)
+void scn2674_device::write_command(uint8_t data)
 {
-	UINT8 operand;
+	uint8_t operand;
 	int i;
 
 
@@ -433,6 +433,12 @@ void scn2674_device::write_command(UINT8 data)
 			LOG2674(("DELAYED write at pointer address %02x\n",data));
 			break;
 
+		case 0xa6:  // used by the Octopus
+			/* write at pointer address */
+			space().write_byte((m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)), m_buffer);
+			LOG2674(("DELAYED write at display pointer address %02x\n",data));
+			break;
+
 		case 0xa9:
 			/* increment cursor address */
 			if(!(++m_cursor_l))
@@ -461,6 +467,7 @@ void scn2674_device::write_command(UINT8 data)
 			break;
 
 		case 0xab:
+		case 0xaf:  // LSI Octopus sends command 0xAF
 			/* write at cursor address + increment */
 			space().write_byte(m_cursor_l | (m_cursor_h << 8), m_buffer);
 			if(!(++m_cursor_l))
@@ -481,6 +488,16 @@ void scn2674_device::write_command(UINT8 data)
 		case 0xbd:
 			/* read from cursor address to pointer address */
 			LOG2674(("DELAYED read from cursor address to pointer address %02x\n",data));
+			break;
+
+		case 0xbf:
+			/* write from cursor address to pointer address TODO: transfer only during blank*/
+			for(i = m_cursor_l | (m_cursor_h << 8); i != (m_IR10_display_pointer_address_lower | (m_IR11_display_pointer_address_upper << 8)); i = ((i + 1) & 0xffff))
+				space().write_byte(i, m_buffer);
+			space().write_byte(i, m_buffer); // get the last
+			m_cursor_l = m_IR10_display_pointer_address_lower;
+			m_cursor_h = m_IR11_display_pointer_address_upper;
+			LOG2674(("DELAYED write from cursor address to pointer address %02x\n",data));
 			break;
 	}
 }
@@ -665,7 +682,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				}
 			}
 
-			if((m_linecounter == (m_IR12_split_register_1 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
+			if((m_linecounter == ((m_IR12_split_register_1+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 1 */
 			{
 				m_status_register |= 0x04;
 				if(m_irq_mask & 0x04)
@@ -681,7 +698,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					dw = m_IR14_double_1;
 			}
 
-			if((m_linecounter == (m_IR13_split_register_2 * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
+			if((m_linecounter == ((m_IR13_split_register_2+1) * m_IR0_scanline_per_char_row)) && m_linecounter) /* Split Screen 2 */
 			{
 				m_status_register |= 0x01;
 				if(m_irq_mask & 0x01)
@@ -706,8 +723,8 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 					dw = m_screen1_h >> 6;
 				if(!charrow)
 				{
-					UINT16 addr = (m_screen2_h << 8) | m_screen2_l;
-					UINT16 line = space().read_word(addr);
+					uint16_t addr = (m_screen2_h << 8) | m_screen2_l;
+					uint16_t line = space().read_word(addr);
 					m_screen1_h = (line >> 8);
 					m_screen1_l = line & 0xff;
 					if(m_IR0_double_ht_wd)
@@ -732,7 +749,7 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 			else if(dw == 3)
 				tilerow = (charrow + m_IR0_scanline_per_char_row) >> 1;
 
-			UINT16 address = m_address;
+			uint16_t address = m_address;
 
 			for(int i = 0; i < m_IR5_character_per_row; i++)
 			{
@@ -762,10 +779,10 @@ void scn2674_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	}
 }
 
-UINT32 scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t scn2674_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!m_display_enabled)
-		m_bitmap.fill(rgb_t::black);
+		m_bitmap.fill(rgb_t::black(), cliprect);
 	else
 		copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 

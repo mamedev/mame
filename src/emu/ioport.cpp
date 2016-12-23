@@ -95,14 +95,17 @@
 #include "config.h"
 #include "xmlfile.h"
 #include "profiler.h"
-#include "ui/ui.h"
-#include "uiinput.h"
+#include "ui/uimain.h"
+#include "inputdev.h"
+#include "natkeyboard.h"
 
 #include "osdepend.h"
 
 #include <ctype.h>
 #include <time.h>
 
+
+namespace {
 // temporary: set this to 1 to enable the originally defined behavior that
 // a field specified via PORT_MODIFY which intersects a previously-defined
 // field completely wipes out the previous definition
@@ -110,36 +113,10 @@
 
 
 //**************************************************************************
-//  DEBUGGING
-//**************************************************************************
-
-#define LOG_NATURAL_KEYBOARD    0
-
-
-
-//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
 const int SPACE_COUNT = 3;
-const int KEY_BUFFER_SIZE = 4096;
-const unicode_char INVALID_CHAR = '?';
-
-
-
-//**************************************************************************
-//  TYPE DEFINITIONS
-//**************************************************************************
-
-// character information
-struct char_info
-{
-	unicode_char ch;
-	const char *name;
-	const char *alternate;  // alternative string, in UTF-8
-
-	static const char_info *find(unicode_char target);
-};
 
 
 
@@ -152,9 +129,9 @@ struct char_info
 //  from a numerator and a denominator
 //-------------------------------------------------
 
-inline INT64 compute_scale(INT32 num, INT32 den)
+inline s64 compute_scale(s32 num, s32 den)
 {
-	return (INT64(num) << 24) / den;
+	return (s64(num) << 24) / den;
 }
 
 
@@ -163,9 +140,9 @@ inline INT64 compute_scale(INT32 num, INT32 den)
 //  an 8.24 scale value
 //-------------------------------------------------
 
-inline INT64 recip_scale(INT64 scale)
+inline s64 recip_scale(s64 scale)
 {
-	return (INT64(1) << 48) / scale;
+	return (s64(1) << 48) / scale;
 }
 
 
@@ -174,314 +151,10 @@ inline INT64 recip_scale(INT64 scale)
 //  a 32-bit value
 //-------------------------------------------------
 
-inline INT32 apply_scale(INT32 value, INT64 scale)
+inline s32 apply_scale(s32 value, s64 scale)
 {
-	return (INT64(value) * scale) >> 24;
+	return (s64(value) * scale) >> 24;
 }
-
-
-
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-// XML attributes for the different types
-static const char *const seqtypestrings[] = { "standard", "increment", "decrement" };
-
-// master character info table
-static const char_info charinfo[] =
-{
-	{ 0x0008,                   "Backspace",    nullptr },     // Backspace
-	{ 0x0009,                   "Tab",          "    " },   // Tab
-	{ 0x000c,                   "Clear",        nullptr },     // Clear
-	{ 0x000d,                   "Enter",        nullptr },     // Enter
-	{ 0x001a,                   "Esc",          nullptr },     // Esc
-	{ 0x0020,                   "Space",        " " },      // Space
-	{ 0x0061,                   nullptr,           "A" },      // a
-	{ 0x0062,                   nullptr,           "B" },      // b
-	{ 0x0063,                   nullptr,           "C" },      // c
-	{ 0x0064,                   nullptr,           "D" },      // d
-	{ 0x0065,                   nullptr,           "E" },      // e
-	{ 0x0066,                   nullptr,           "F" },      // f
-	{ 0x0067,                   nullptr,           "G" },      // g
-	{ 0x0068,                   nullptr,           "H" },      // h
-	{ 0x0069,                   nullptr,           "I" },      // i
-	{ 0x006a,                   nullptr,           "J" },      // j
-	{ 0x006b,                   nullptr,           "K" },      // k
-	{ 0x006c,                   nullptr,           "L" },      // l
-	{ 0x006d,                   nullptr,           "M" },      // m
-	{ 0x006e,                   nullptr,           "N" },      // n
-	{ 0x006f,                   nullptr,           "O" },      // o
-	{ 0x0070,                   nullptr,           "P" },      // p
-	{ 0x0071,                   nullptr,           "Q" },      // q
-	{ 0x0072,                   nullptr,           "R" },      // r
-	{ 0x0073,                   nullptr,           "S" },      // s
-	{ 0x0074,                   nullptr,           "T" },      // t
-	{ 0x0075,                   nullptr,           "U" },      // u
-	{ 0x0076,                   nullptr,           "V" },      // v
-	{ 0x0077,                   nullptr,           "W" },      // w
-	{ 0x0078,                   nullptr,           "X" },      // x
-	{ 0x0079,                   nullptr,           "Y" },      // y
-	{ 0x007a,                   nullptr,           "Z" },      // z
-	{ 0x00a0,                   nullptr,           " " },      // non breaking space
-	{ 0x00a1,                   nullptr,           "!" },      // inverted exclaimation mark
-	{ 0x00a6,                   nullptr,           "|" },      // broken bar
-	{ 0x00a9,                   nullptr,           "(c)" },    // copyright sign
-	{ 0x00ab,                   nullptr,           "<<" },     // left pointing double angle
-	{ 0x00ae,                   nullptr,           "(r)" },    // registered sign
-	{ 0x00bb,                   nullptr,           ">>" },     // right pointing double angle
-	{ 0x00bc,                   nullptr,           "1/4" },    // vulgar fraction one quarter
-	{ 0x00bd,                   nullptr,           "1/2" },    // vulgar fraction one half
-	{ 0x00be,                   nullptr,           "3/4" },    // vulgar fraction three quarters
-	{ 0x00bf,                   nullptr,           "?" },      // inverted question mark
-	{ 0x00c0,                   nullptr,           "A" },      // 'A' grave
-	{ 0x00c1,                   nullptr,           "A" },      // 'A' acute
-	{ 0x00c2,                   nullptr,           "A" },      // 'A' circumflex
-	{ 0x00c3,                   nullptr,           "A" },      // 'A' tilde
-	{ 0x00c4,                   nullptr,           "A" },      // 'A' diaeresis
-	{ 0x00c5,                   nullptr,           "A" },      // 'A' ring above
-	{ 0x00c6,                   nullptr,           "AE" },     // 'AE' ligature
-	{ 0x00c7,                   nullptr,           "C" },      // 'C' cedilla
-	{ 0x00c8,                   nullptr,           "E" },      // 'E' grave
-	{ 0x00c9,                   nullptr,           "E" },      // 'E' acute
-	{ 0x00ca,                   nullptr,           "E" },      // 'E' circumflex
-	{ 0x00cb,                   nullptr,           "E" },      // 'E' diaeresis
-	{ 0x00cc,                   nullptr,           "I" },      // 'I' grave
-	{ 0x00cd,                   nullptr,           "I" },      // 'I' acute
-	{ 0x00ce,                   nullptr,           "I" },      // 'I' circumflex
-	{ 0x00cf,                   nullptr,           "I" },      // 'I' diaeresis
-	{ 0x00d0,                   nullptr,           "D" },      // 'ETH'
-	{ 0x00d1,                   nullptr,           "N" },      // 'N' tilde
-	{ 0x00d2,                   nullptr,           "O" },      // 'O' grave
-	{ 0x00d3,                   nullptr,           "O" },      // 'O' acute
-	{ 0x00d4,                   nullptr,           "O" },      // 'O' circumflex
-	{ 0x00d5,                   nullptr,           "O" },      // 'O' tilde
-	{ 0x00d6,                   nullptr,           "O" },      // 'O' diaeresis
-	{ 0x00d7,                   nullptr,           "X" },      // multiplication sign
-	{ 0x00d8,                   nullptr,           "O" },      // 'O' stroke
-	{ 0x00d9,                   nullptr,           "U" },      // 'U' grave
-	{ 0x00da,                   nullptr,           "U" },      // 'U' acute
-	{ 0x00db,                   nullptr,           "U" },      // 'U' circumflex
-	{ 0x00dc,                   nullptr,           "U" },      // 'U' diaeresis
-	{ 0x00dd,                   nullptr,           "Y" },      // 'Y' acute
-	{ 0x00df,                   nullptr,           "SS" },     // sharp S
-	{ 0x00e0,                   nullptr,           "a" },      // 'a' grave
-	{ 0x00e1,                   nullptr,           "a" },      // 'a' acute
-	{ 0x00e2,                   nullptr,           "a" },      // 'a' circumflex
-	{ 0x00e3,                   nullptr,           "a" },      // 'a' tilde
-	{ 0x00e4,                   nullptr,           "a" },      // 'a' diaeresis
-	{ 0x00e5,                   nullptr,           "a" },      // 'a' ring above
-	{ 0x00e6,                   nullptr,           "ae" },     // 'ae' ligature
-	{ 0x00e7,                   nullptr,           "c" },      // 'c' cedilla
-	{ 0x00e8,                   nullptr,           "e" },      // 'e' grave
-	{ 0x00e9,                   nullptr,           "e" },      // 'e' acute
-	{ 0x00ea,                   nullptr,           "e" },      // 'e' circumflex
-	{ 0x00eb,                   nullptr,           "e" },      // 'e' diaeresis
-	{ 0x00ec,                   nullptr,           "i" },      // 'i' grave
-	{ 0x00ed,                   nullptr,           "i" },      // 'i' acute
-	{ 0x00ee,                   nullptr,           "i" },      // 'i' circumflex
-	{ 0x00ef,                   nullptr,           "i" },      // 'i' diaeresis
-	{ 0x00f0,                   nullptr,           "d" },      // 'eth'
-	{ 0x00f1,                   nullptr,           "n" },      // 'n' tilde
-	{ 0x00f2,                   nullptr,           "o" },      // 'o' grave
-	{ 0x00f3,                   nullptr,           "o" },      // 'o' acute
-	{ 0x00f4,                   nullptr,           "o" },      // 'o' circumflex
-	{ 0x00f5,                   nullptr,           "o" },      // 'o' tilde
-	{ 0x00f6,                   nullptr,           "o" },      // 'o' diaeresis
-	{ 0x00f8,                   nullptr,           "o" },      // 'o' stroke
-	{ 0x00f9,                   nullptr,           "u" },      // 'u' grave
-	{ 0x00fa,                   nullptr,           "u" },      // 'u' acute
-	{ 0x00fb,                   nullptr,           "u" },      // 'u' circumflex
-	{ 0x00fc,                   nullptr,           "u" },      // 'u' diaeresis
-	{ 0x00fd,                   nullptr,           "y" },      // 'y' acute
-	{ 0x00ff,                   nullptr,           "y" },      // 'y' diaeresis
-	{ 0x2010,                   nullptr,           "-" },      // hyphen
-	{ 0x2011,                   nullptr,           "-" },      // non-breaking hyphen
-	{ 0x2012,                   nullptr,           "-" },      // figure dash
-	{ 0x2013,                   nullptr,           "-" },      // en dash
-	{ 0x2014,                   nullptr,           "-" },      // em dash
-	{ 0x2015,                   nullptr,           "-" },      // horizontal dash
-	{ 0x2018,                   nullptr,           "\'" },     // left single quotation mark
-	{ 0x2019,                   nullptr,           "\'" },     // right single quotation mark
-	{ 0x201a,                   nullptr,           "\'" },     // single low quotation mark
-	{ 0x201b,                   nullptr,           "\'" },     // single high reversed quotation mark
-	{ 0x201c,                   nullptr,           "\"" },     // left double quotation mark
-	{ 0x201d,                   nullptr,           "\"" },     // right double quotation mark
-	{ 0x201e,                   nullptr,           "\"" },     // double low quotation mark
-	{ 0x201f,                   nullptr,           "\"" },     // double high reversed quotation mark
-	{ 0x2024,                   nullptr,           "." },      // one dot leader
-	{ 0x2025,                   nullptr,           ".." },     // two dot leader
-	{ 0x2026,                   nullptr,           "..." },    // horizontal ellipsis
-	{ 0x2047,                   nullptr,           "??" },     // double question mark
-	{ 0x2048,                   nullptr,           "?!" },     // question exclamation mark
-	{ 0x2049,                   nullptr,           "!?" },     // exclamation question mark
-	{ 0xff01,                   nullptr,           "!" },      // fullwidth exclamation point
-	{ 0xff02,                   nullptr,           "\"" },     // fullwidth quotation mark
-	{ 0xff03,                   nullptr,           "#" },      // fullwidth number sign
-	{ 0xff04,                   nullptr,           "$" },      // fullwidth dollar sign
-	{ 0xff05,                   nullptr,           "%" },      // fullwidth percent sign
-	{ 0xff06,                   nullptr,           "&" },      // fullwidth ampersand
-	{ 0xff07,                   nullptr,           "\'" },     // fullwidth apostrophe
-	{ 0xff08,                   nullptr,           "(" },      // fullwidth left parenthesis
-	{ 0xff09,                   nullptr,           ")" },      // fullwidth right parenthesis
-	{ 0xff0a,                   nullptr,           "*" },      // fullwidth asterisk
-	{ 0xff0b,                   nullptr,           "+" },      // fullwidth plus
-	{ 0xff0c,                   nullptr,           "," },      // fullwidth comma
-	{ 0xff0d,                   nullptr,           "-" },      // fullwidth minus
-	{ 0xff0e,                   nullptr,           "." },      // fullwidth period
-	{ 0xff0f,                   nullptr,           "/" },      // fullwidth slash
-	{ 0xff10,                   nullptr,           "0" },      // fullwidth zero
-	{ 0xff11,                   nullptr,           "1" },      // fullwidth one
-	{ 0xff12,                   nullptr,           "2" },      // fullwidth two
-	{ 0xff13,                   nullptr,           "3" },      // fullwidth three
-	{ 0xff14,                   nullptr,           "4" },      // fullwidth four
-	{ 0xff15,                   nullptr,           "5" },      // fullwidth five
-	{ 0xff16,                   nullptr,           "6" },      // fullwidth six
-	{ 0xff17,                   nullptr,           "7" },      // fullwidth seven
-	{ 0xff18,                   nullptr,           "8" },      // fullwidth eight
-	{ 0xff19,                   nullptr,           "9" },      // fullwidth nine
-	{ 0xff1a,                   nullptr,           ":" },      // fullwidth colon
-	{ 0xff1b,                   nullptr,           ";" },      // fullwidth semicolon
-	{ 0xff1c,                   nullptr,           "<" },      // fullwidth less than sign
-	{ 0xff1d,                   nullptr,           "=" },      // fullwidth equals sign
-	{ 0xff1e,                   nullptr,           ">" },      // fullwidth greater than sign
-	{ 0xff1f,                   nullptr,           "?" },      // fullwidth question mark
-	{ 0xff20,                   nullptr,           "@" },      // fullwidth at sign
-	{ 0xff21,                   nullptr,           "A" },      // fullwidth 'A'
-	{ 0xff22,                   nullptr,           "B" },      // fullwidth 'B'
-	{ 0xff23,                   nullptr,           "C" },      // fullwidth 'C'
-	{ 0xff24,                   nullptr,           "D" },      // fullwidth 'D'
-	{ 0xff25,                   nullptr,           "E" },      // fullwidth 'E'
-	{ 0xff26,                   nullptr,           "F" },      // fullwidth 'F'
-	{ 0xff27,                   nullptr,           "G" },      // fullwidth 'G'
-	{ 0xff28,                   nullptr,           "H" },      // fullwidth 'H'
-	{ 0xff29,                   nullptr,           "I" },      // fullwidth 'I'
-	{ 0xff2a,                   nullptr,           "J" },      // fullwidth 'J'
-	{ 0xff2b,                   nullptr,           "K" },      // fullwidth 'K'
-	{ 0xff2c,                   nullptr,           "L" },      // fullwidth 'L'
-	{ 0xff2d,                   nullptr,           "M" },      // fullwidth 'M'
-	{ 0xff2e,                   nullptr,           "N" },      // fullwidth 'N'
-	{ 0xff2f,                   nullptr,           "O" },      // fullwidth 'O'
-	{ 0xff30,                   nullptr,           "P" },      // fullwidth 'P'
-	{ 0xff31,                   nullptr,           "Q" },      // fullwidth 'Q'
-	{ 0xff32,                   nullptr,           "R" },      // fullwidth 'R'
-	{ 0xff33,                   nullptr,           "S" },      // fullwidth 'S'
-	{ 0xff34,                   nullptr,           "T" },      // fullwidth 'T'
-	{ 0xff35,                   nullptr,           "U" },      // fullwidth 'U'
-	{ 0xff36,                   nullptr,           "V" },      // fullwidth 'V'
-	{ 0xff37,                   nullptr,           "W" },      // fullwidth 'W'
-	{ 0xff38,                   nullptr,           "X" },      // fullwidth 'X'
-	{ 0xff39,                   nullptr,           "Y" },      // fullwidth 'Y'
-	{ 0xff3a,                   nullptr,           "Z" },      // fullwidth 'Z'
-	{ 0xff3b,                   nullptr,           "[" },      // fullwidth left bracket
-	{ 0xff3c,                   nullptr,           "\\" },     // fullwidth backslash
-	{ 0xff3d,                   nullptr,           "]" },      // fullwidth right bracket
-	{ 0xff3e,                   nullptr,           "^" },      // fullwidth caret
-	{ 0xff3f,                   nullptr,           "_" },      // fullwidth underscore
-	{ 0xff40,                   nullptr,           "`" },      // fullwidth backquote
-	{ 0xff41,                   nullptr,           "a" },      // fullwidth 'a'
-	{ 0xff42,                   nullptr,           "b" },      // fullwidth 'b'
-	{ 0xff43,                   nullptr,           "c" },      // fullwidth 'c'
-	{ 0xff44,                   nullptr,           "d" },      // fullwidth 'd'
-	{ 0xff45,                   nullptr,           "e" },      // fullwidth 'e'
-	{ 0xff46,                   nullptr,           "f" },      // fullwidth 'f'
-	{ 0xff47,                   nullptr,           "g" },      // fullwidth 'g'
-	{ 0xff48,                   nullptr,           "h" },      // fullwidth 'h'
-	{ 0xff49,                   nullptr,           "i" },      // fullwidth 'i'
-	{ 0xff4a,                   nullptr,           "j" },      // fullwidth 'j'
-	{ 0xff4b,                   nullptr,           "k" },      // fullwidth 'k'
-	{ 0xff4c,                   nullptr,           "l" },      // fullwidth 'l'
-	{ 0xff4d,                   nullptr,           "m" },      // fullwidth 'm'
-	{ 0xff4e,                   nullptr,           "n" },      // fullwidth 'n'
-	{ 0xff4f,                   nullptr,           "o" },      // fullwidth 'o'
-	{ 0xff50,                   nullptr,           "p" },      // fullwidth 'p'
-	{ 0xff51,                   nullptr,           "q" },      // fullwidth 'q'
-	{ 0xff52,                   nullptr,           "r" },      // fullwidth 'r'
-	{ 0xff53,                   nullptr,           "s" },      // fullwidth 's'
-	{ 0xff54,                   nullptr,           "t" },      // fullwidth 't'
-	{ 0xff55,                   nullptr,           "u" },      // fullwidth 'u'
-	{ 0xff56,                   nullptr,           "v" },      // fullwidth 'v'
-	{ 0xff57,                   nullptr,           "w" },      // fullwidth 'w'
-	{ 0xff58,                   nullptr,           "x" },      // fullwidth 'x'
-	{ 0xff59,                   nullptr,           "y" },      // fullwidth 'y'
-	{ 0xff5a,                   nullptr,           "z" },      // fullwidth 'z'
-	{ 0xff5b,                   nullptr,           "{" },      // fullwidth left brace
-	{ 0xff5c,                   nullptr,           "|" },      // fullwidth vertical bar
-	{ 0xff5d,                   nullptr,           "}" },      // fullwidth right brace
-	{ 0xff5e,                   nullptr,           "~" },      // fullwidth tilde
-	{ 0xff5f,                   nullptr,           "((" },     // fullwidth double left parenthesis
-	{ 0xff60,                   nullptr,           "))" },     // fullwidth double right parenthesis
-	{ 0xffe0,                   nullptr,           "\xC2\xA2" },       // fullwidth cent sign
-	{ 0xffe1,                   nullptr,           "\xC2\xA3" },       // fullwidth pound sign
-	{ 0xffe4,                   nullptr,           "\xC2\xA4" },       // fullwidth broken bar
-	{ 0xffe5,                   nullptr,           "\xC2\xA5" },       // fullwidth yen sign
-	{ 0xffe6,                   nullptr,           "\xE2\x82\xA9" },   // fullwidth won sign
-	{ 0xffe9,                   nullptr,           "\xE2\x86\x90" },   // fullwidth left arrow
-	{ 0xffea,                   nullptr,           "\xE2\x86\x91" },   // fullwidth up arrow
-	{ 0xffeb,                   nullptr,           "\xE2\x86\x92" },   // fullwidth right arrow
-	{ 0xffec,                   nullptr,           "\xE2\x86\x93" },   // fullwidth down arrow
-	{ 0xffed,                   nullptr,           "\xE2\x96\xAA" },   // fullwidth solid box
-	{ 0xffee,                   nullptr,           "\xE2\x97\xA6" },   // fullwidth open circle
-	{ UCHAR_SHIFT_1,            "Shift",        nullptr },     // Shift key
-	{ UCHAR_SHIFT_2,            "Ctrl",         nullptr },     // Ctrl key
-	{ UCHAR_MAMEKEY(F1),        "F1",           nullptr },     // F1 function key
-	{ UCHAR_MAMEKEY(F2),        "F2",           nullptr },     // F2 function key
-	{ UCHAR_MAMEKEY(F3),        "F3",           nullptr },     // F3 function key
-	{ UCHAR_MAMEKEY(F4),        "F4",           nullptr },     // F4 function key
-	{ UCHAR_MAMEKEY(F5),        "F5",           nullptr },     // F5 function key
-	{ UCHAR_MAMEKEY(F6),        "F6",           nullptr },     // F6 function key
-	{ UCHAR_MAMEKEY(F7),        "F7",           nullptr },     // F7 function key
-	{ UCHAR_MAMEKEY(F8),        "F8",           nullptr },     // F8 function key
-	{ UCHAR_MAMEKEY(F9),        "F9",           nullptr },     // F9 function key
-	{ UCHAR_MAMEKEY(F10),       "F10",          nullptr },     // F10 function key
-	{ UCHAR_MAMEKEY(F11),       "F11",          nullptr },     // F11 function key
-	{ UCHAR_MAMEKEY(F12),       "F12",          nullptr },     // F12 function key
-	{ UCHAR_MAMEKEY(F13),       "F13",          nullptr },     // F13 function key
-	{ UCHAR_MAMEKEY(F14),       "F14",          nullptr },     // F14 function key
-	{ UCHAR_MAMEKEY(F15),       "F15",          nullptr },     // F15 function key
-	{ UCHAR_MAMEKEY(ESC),       "Esc",          "\033" },   // Esc key
-	{ UCHAR_MAMEKEY(INSERT),    "Insert",       nullptr },     // Insert key
-	{ UCHAR_MAMEKEY(DEL),       "Delete",       "\010" },   // Delete key
-	{ UCHAR_MAMEKEY(HOME),      "Home",         "\014" },   // Home key
-	{ UCHAR_MAMEKEY(END),       "End",          nullptr },     // End key
-	{ UCHAR_MAMEKEY(PGUP),      "Page Up",      nullptr },     // Page Up key
-	{ UCHAR_MAMEKEY(PGDN),      "Page Down",    nullptr },     // Page Down key
-	{ UCHAR_MAMEKEY(LEFT),      "Cursor Left",  nullptr },     // Cursor Left
-	{ UCHAR_MAMEKEY(RIGHT),     "Cursor Right", nullptr },     // Cursor Right
-	{ UCHAR_MAMEKEY(UP),        "Cursor Up",    nullptr },     // Cursor Up
-	{ UCHAR_MAMEKEY(DOWN),      "Cursor Down",  nullptr },     // Cursor Down
-	{ UCHAR_MAMEKEY(0_PAD),     "Keypad 0",     nullptr },     // 0 on the numeric keypad
-	{ UCHAR_MAMEKEY(1_PAD),     "Keypad 1",     nullptr },     // 1 on the numeric keypad
-	{ UCHAR_MAMEKEY(2_PAD),     "Keypad 2",     nullptr },     // 2 on the numeric keypad
-	{ UCHAR_MAMEKEY(3_PAD),     "Keypad 3",     nullptr },     // 3 on the numeric keypad
-	{ UCHAR_MAMEKEY(4_PAD),     "Keypad 4",     nullptr },     // 4 on the numeric keypad
-	{ UCHAR_MAMEKEY(5_PAD),     "Keypad 5",     nullptr },     // 5 on the numeric keypad
-	{ UCHAR_MAMEKEY(6_PAD),     "Keypad 6",     nullptr },     // 6 on the numeric keypad
-	{ UCHAR_MAMEKEY(7_PAD),     "Keypad 7",     nullptr },     // 7 on the numeric keypad
-	{ UCHAR_MAMEKEY(8_PAD),     "Keypad 8",     nullptr },     // 8 on the numeric keypad
-	{ UCHAR_MAMEKEY(9_PAD),     "Keypad 9",     nullptr },     // 9 on the numeric keypad
-	{ UCHAR_MAMEKEY(SLASH_PAD), "Keypad /",     nullptr },     // / on the numeric keypad
-	{ UCHAR_MAMEKEY(ASTERISK),  "Keypad *",     nullptr },     // * on the numeric keypad
-	{ UCHAR_MAMEKEY(MINUS_PAD), "Keypad -",     nullptr },     // - on the numeric Keypad
-	{ UCHAR_MAMEKEY(PLUS_PAD),  "Keypad +",     nullptr },     // + on the numeric Keypad
-	{ UCHAR_MAMEKEY(DEL_PAD),   "Keypad .",     nullptr },     // . on the numeric keypad
-	{ UCHAR_MAMEKEY(ENTER_PAD), "Keypad Enter", nullptr },     // Enter on the numeric keypad
-	{ UCHAR_MAMEKEY(PRTSCR),    "Print Screen", nullptr },     // Print Screen key
-	{ UCHAR_MAMEKEY(PAUSE),     "Pause",        nullptr },     // Pause key
-	{ UCHAR_MAMEKEY(LSHIFT),    "Left Shift",   nullptr },     // Left Shift key
-	{ UCHAR_MAMEKEY(RSHIFT),    "Right Shift",  nullptr },     // Right Shift key
-	{ UCHAR_MAMEKEY(LCONTROL),  "Left Ctrl",    nullptr },     // Left Control key
-	{ UCHAR_MAMEKEY(RCONTROL),  "Right Ctrl",   nullptr },     // Right Control key
-	{ UCHAR_MAMEKEY(LALT),      "Left Alt",     nullptr },     // Left Alt key
-	{ UCHAR_MAMEKEY(RALT),      "Right Alt",    nullptr },     // Right Alt key
-	{ UCHAR_MAMEKEY(SCRLOCK),   "Scroll Lock",  nullptr },     // Scroll Lock key
-	{ UCHAR_MAMEKEY(NUMLOCK),   "Num Lock",     nullptr },     // Num Lock key
-	{ UCHAR_MAMEKEY(CAPSLOCK),  "Caps Lock",    nullptr },     // Caps Lock key
-	{ UCHAR_MAMEKEY(LWIN),      "Left Win",     nullptr },     // Left Win key
-	{ UCHAR_MAMEKEY(RWIN),      "Right Win",    nullptr },     // Right Win key
-	{ UCHAR_MAMEKEY(MENU),      "Menu",         nullptr },     // Menu key
-	{ UCHAR_MAMEKEY(CANCEL),    "Break",        nullptr }      // Break/Pause key
-};
 
 
 
@@ -489,9 +162,9 @@ static const char_info charinfo[] =
 //  COMMON SHARED STRINGS
 //**************************************************************************
 
-static const struct
+const struct
 {
-	UINT32 id;
+	u32 id;
 	const char *string;
 } input_port_default_strings[] =
 {
@@ -616,6 +289,15 @@ static const struct
 	{ INPUT_STRING_None, "None" },
 };
 
+} // TODO: anonymous namespace
+
+
+// XML attributes for the different types
+const char *const ioport_manager::seqtypestrings[] = { "standard", "increment", "decrement" };
+
+
+u8 const inp_header::MAGIC[inp_header::OFFS_BASETIME - inp_header::OFFS_MAGIC] = { 'M', 'A', 'M', 'E', 'I', 'N', 'P', 0 };
+
 
 
 //**************************************************************************
@@ -653,8 +335,8 @@ void ioport_list::append(device_t &device, std::string &errorbuf)
 	(*constructor)(device, *this, errorbuf);
 
 	// collapse fields and sort the list
-	for (ioport_port *port = first(); port != nullptr; port = port->next())
-		port->collapse_fields(errorbuf);
+	for (auto &port : *this)
+		port.second->collapse_fields(errorbuf);
 }
 
 
@@ -764,10 +446,10 @@ void digital_joystick::frame_update()
 	// read all the associated ports
 	running_machine *machine = nullptr;
 	for (direction_t direction = JOYDIR_UP; direction < JOYDIR_COUNT; ++direction)
-		for (const simple_list_wrapper<ioport_field> *i = m_field[direction].first(); i != nullptr; i = i->next())
+		for (const simple_list_wrapper<ioport_field> &i : m_field[direction])
 		{
-			machine = &i->object()->machine();
-			if (machine->input().seq_pressed(i->object()->seq(SEQ_TYPE_STANDARD)))
+			machine = &i.object()->machine();
+			if (machine->input().seq_pressed(i.object()->seq(SEQ_TYPE_STANDARD)))
 				m_current |= 1 << direction;
 		}
 
@@ -821,546 +503,6 @@ void digital_joystick::frame_update()
 	}
 }
 
-
-
-//**************************************************************************
-//  NATURAL KEYBOARD
-//**************************************************************************
-
-//-------------------------------------------------
-//  natural_keyboard - constructor
-//-------------------------------------------------
-
-natural_keyboard::natural_keyboard(running_machine &machine)
-	: m_machine(machine),
-		m_bufbegin(0),
-		m_bufend(0),
-		m_status_keydown(false),
-		m_last_cr(false),
-		m_timer(nullptr),
-		m_current_rate(attotime::zero)
-{
-	m_queue_chars = ioport_queue_chars_delegate();
-	m_accept_char = ioport_accept_char_delegate();
-	m_charqueue_empty = ioport_charqueue_empty_delegate();
-}
-
-//-------------------------------------------------
-//  initialize - initialize natural keyboard
-//  support
-//-------------------------------------------------
-
-void natural_keyboard::initialize()
-{
-	// posting keys directly only makes sense for a computer
-	if (machine().ioport().has_keyboard())
-	{
-		m_buffer.resize(KEY_BUFFER_SIZE);
-		m_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(natural_keyboard::timer), this));
-		build_codes(machine().ioport());
-	}
-}
-//-------------------------------------------------
-//  configure - configure callbacks for full-
-//  featured keyboard support
-//-------------------------------------------------
-
-void natural_keyboard::configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty)
-{
-	// set the callbacks
-	m_queue_chars = queue_chars;
-	m_accept_char = accept_char;
-	m_charqueue_empty = charqueue_empty;
-}
-
-
-//-------------------------------------------------
-//  post - post a single character
-//-------------------------------------------------
-
-void natural_keyboard::post(unicode_char ch)
-{
-	// ignore any \n that are preceded by \r
-	if (m_last_cr && ch == '\n')
-	{
-		m_last_cr = false;
-		return;
-	}
-
-	// change all eolns to '\r'
-	if (ch == '\n')
-		ch = '\r';
-	else
-		m_last_cr = (ch == '\r');
-
-	// logging
-	if (LOG_NATURAL_KEYBOARD)
-	{
-		const keycode_map_entry *code = find_code(ch);
-		machine().logerror("natural_keyboard::post(): code=%i (%s) field->name='%s'\n", int(ch), unicode_to_string(ch).c_str(), (code != nullptr && code->field[0] != nullptr) ? code->field[0]->name() : "<null>");
-	}
-
-	// can we post this key in the queue directly?
-	if (can_post_directly(ch))
-		internal_post(ch);
-
-	// can we post this key with an alternate representation?
-	else if (can_post_alternate(ch))
-	{
-		const char_info *info = char_info::find(ch);
-		assert(info != nullptr && info->alternate != nullptr);
-		const char *altstring = info->alternate;
-		while (*altstring != 0)
-		{
-			altstring += uchar_from_utf8(&ch, altstring, strlen(altstring));
-			internal_post(ch);
-		}
-	}
-}
-
-
-//-------------------------------------------------
-//  post - post a unicode encoded string
-//-------------------------------------------------
-
-void natural_keyboard::post(const unicode_char *text, size_t length, const attotime &rate)
-{
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0 length means strlen
-	if (length == 0)
-		for (const unicode_char *scan = text; *scan != 0; scan++)
-			length++;
-
-	// iterate over characters or until the buffer is full up
-	while (length > 0 && !full())
-	{
-		// fetch next character
-		post(*text++);
-		length--;
-	}
-}
-
-
-//-------------------------------------------------
-//  post_utf8 - post a UTF-8 encoded string
-//-------------------------------------------------
-
-void natural_keyboard::post_utf8(const char *text, size_t length, const attotime &rate)
-{
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
-	// iterate until out of characters
-	while (length > 0)
-	{
-		// decode the next character
-		unicode_char uc;
-		int count = uchar_from_utf8(&uc, text, length);
-		if (count < 0)
-		{
-			count = 1;
-			uc = INVALID_CHAR;
-		}
-
-		// append to the buffer
-		post(uc);
-		text += count;
-		length -= count;
-	}
-}
-
-
-//-------------------------------------------------
-//  post_coded - post a coded string
-//-------------------------------------------------
-
-void natural_keyboard::post_coded(const char *text, size_t length, const attotime &rate)
-{
-	static const struct
-	{
-		const char *key;
-		unicode_char code;
-	} codes[] =
-	{
-		{ "BACKSPACE",  8 },
-		{ "BS",         8 },
-		{ "BKSP",       8 },
-		{ "DEL",        UCHAR_MAMEKEY(DEL) },
-		{ "DELETE",     UCHAR_MAMEKEY(DEL) },
-		{ "END",        UCHAR_MAMEKEY(END) },
-		{ "ENTER",      13 },
-		{ "ESC",        '\033' },
-		{ "HOME",       UCHAR_MAMEKEY(HOME) },
-		{ "INS",        UCHAR_MAMEKEY(INSERT) },
-		{ "INSERT",     UCHAR_MAMEKEY(INSERT) },
-		{ "PGDN",       UCHAR_MAMEKEY(PGDN) },
-		{ "PGUP",       UCHAR_MAMEKEY(PGUP) },
-		{ "SPACE",      32 },
-		{ "TAB",        9 },
-		{ "F1",         UCHAR_MAMEKEY(F1) },
-		{ "F2",         UCHAR_MAMEKEY(F2) },
-		{ "F3",         UCHAR_MAMEKEY(F3) },
-		{ "F4",         UCHAR_MAMEKEY(F4) },
-		{ "F5",         UCHAR_MAMEKEY(F5) },
-		{ "F6",         UCHAR_MAMEKEY(F6) },
-		{ "F7",         UCHAR_MAMEKEY(F7) },
-		{ "F8",         UCHAR_MAMEKEY(F8) },
-		{ "F9",         UCHAR_MAMEKEY(F9) },
-		{ "F10",        UCHAR_MAMEKEY(F10) },
-		{ "F11",        UCHAR_MAMEKEY(F11) },
-		{ "F12",        UCHAR_MAMEKEY(F12) },
-		{ "QUOTE",      '\"' }
-	};
-
-	// set the fixed rate
-	m_current_rate = rate;
-
-	// 0-length means strlen
-	if (length == 0)
-		length = strlen(text);
-
-	// iterate through the source string
-	size_t curpos = 0;
-	while (curpos < length)
-	{
-		// extract next character
-		unicode_char ch = text[curpos];
-		size_t increment = 1;
-
-		// look for escape characters
-		if (ch == '{')
-			for (auto & code : codes)
-			{
-				size_t keylen = strlen(code.key);
-				if (curpos + keylen + 2 <= length)
-					if (core_strnicmp(code.key, &text[curpos + 1], keylen) == 0 && text[curpos + keylen + 1] == '}')
-					{
-						ch = code.code;
-						increment = keylen + 2;
-					}
-			}
-
-		// if we got a code, post it
-		if (ch != 0)
-			post(ch);
-		curpos += increment;
-	}
-}
-
-
-//-------------------------------------------------
-//  build_codes - given an input port table, create
-//  an input code table useful for mapping unicode
-//  chars
-//-------------------------------------------------
-
-void natural_keyboard::build_codes(ioport_manager &manager)
-{
-	// iterate over shift keys
-	ioport_field *shift[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN] = { nullptr };
-	for (int curshift = 0; curshift <= ARRAY_LENGTH(shift); curshift++)
-		if (curshift == 0 || shift[curshift - 1] != nullptr)
-
-			// iterate over ports and fields
-			for (ioport_port *port = manager.first_port(); port != nullptr; port = port->next())
-				for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-					if (field->type() == IPT_KEYBOARD)
-					{
-						// fetch the code, ignoring 0
-						unicode_char code = field->keyboard_code(curshift);
-						if (code == 0)
-							continue;
-
-						// is this a shifter key?
-						if (code >= UCHAR_SHIFT_BEGIN && code <= UCHAR_SHIFT_END)
-							shift[code - UCHAR_SHIFT_BEGIN] = field;
-
-						// not a shifter key; record normally
-						else
-						{
-							keycode_map_entry newcode;
-							if (curshift == 0)
-							{
-								newcode.field[0] = field;
-								newcode.field[1] = nullptr;
-							}
-							else
-							{
-								newcode.field[0] = shift[curshift - 1];
-								newcode.field[1] = field;
-							}
-							newcode.ch = code;
-							m_keycode_map.push_back(newcode);
-
-							if (LOG_NATURAL_KEYBOARD)
-							{
-								machine().logerror("natural_keyboard: code=%i (%s) port=%p field->name='%s'\n", int(code), unicode_to_string(code).c_str(), (void *)port, field->name());
-							}
-						}
-					}
-}
-
-
-//-------------------------------------------------
-//  can_post_directly - determine if the given
-//  unicode character can be directly posted
-//-------------------------------------------------
-
-bool natural_keyboard::can_post_directly(unicode_char ch)
-{
-	// if we have a queueing callback, then it depends on whether we can accept the character
-	if (!m_queue_chars.isnull())
-		return m_accept_char.isnull() ? true : m_accept_char(ch);
-
-	// otherwise, it depends on the input codes
-	const keycode_map_entry *code = find_code(ch);
-	return (code != nullptr && code->field[0] != nullptr);
-}
-
-
-//-------------------------------------------------
-//  can_post_alternate - determine if the given
-//  unicode character can be posted via translation
-//-------------------------------------------------
-
-bool natural_keyboard::can_post_alternate(unicode_char ch)
-{
-	const char_info *info = char_info::find(ch);
-	if (info == nullptr)
-		return false;
-
-	const char *altstring = info->alternate;
-	if (altstring == nullptr)
-		return false;
-
-	while (*altstring != 0)
-	{
-		unicode_char uchar;
-		int count = uchar_from_utf8(&uchar, altstring, strlen(altstring));
-		if (count <= 0)
-			return false;
-		if (!can_post_directly(uchar))
-			return false;
-		altstring += count;
-	}
-	return true;
-}
-
-
-//-------------------------------------------------
-//  choose_delay - determine the delay between
-//  posting keyboard events
-//-------------------------------------------------
-
-attotime natural_keyboard::choose_delay(unicode_char ch)
-{
-	// if we have a live rate, just use that
-	if (m_current_rate != attotime::zero)
-		return m_current_rate;
-
-	// systems with queue_chars can afford a much smaller delay
-	if (!m_queue_chars.isnull())
-		return attotime::from_msec(10);
-
-	// otherwise, default to constant delay with a longer delay on CR
-	return attotime::from_msec((ch == '\r') ? 200 : 50);
-}
-
-
-//-------------------------------------------------
-//  internal_post - post a keyboard event
-//-------------------------------------------------
-
-void natural_keyboard::internal_post(unicode_char ch)
-{
-	// need to start up the timer?
-	if (empty())
-	{
-		m_timer->adjust(choose_delay(ch));
-		m_status_keydown = 0;
-	}
-
-	// add to the buffer, resizing if necessary
-	m_buffer[m_bufend++] = ch;
-	if ((m_bufend + 1) % m_buffer.size() == m_bufbegin)
-		m_buffer.resize(m_buffer.size() + KEY_BUFFER_SIZE);
-	m_bufend %= m_buffer.size();
-}
-
-
-//-------------------------------------------------
-//  timer - timer callback to keep things flowing
-//  when posting a string of characters
-//-------------------------------------------------
-
-void natural_keyboard::timer(void *ptr, int param)
-{
-	// the driver has a queue_chars handler
-	if (!m_queue_chars.isnull())
-	{
-		while (!empty() && m_queue_chars(&m_buffer[m_bufbegin], 1))
-		{
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
-			if (m_current_rate != attotime::zero)
-				break;
-		}
-	}
-
-	// the driver does not have a queue_chars handler
-	else
-	{
-		if (m_status_keydown)
-			m_bufbegin = (m_bufbegin + 1) % m_buffer.size();
-		m_status_keydown = !m_status_keydown;
-	}
-
-	// need to make sure timerproc is called again if buffer not empty
-	if (!empty())
-		m_timer->adjust(choose_delay(m_buffer[m_bufbegin]));
-}
-
-
-//-------------------------------------------------
-//  unicode_to_string - obtain a string
-//  representation of a given code; used for
-//  logging and debugging
-//-------------------------------------------------
-
-std::string natural_keyboard::unicode_to_string(unicode_char ch)
-{
-	std::string buffer;
-	switch (ch)
-	{
-		// check some magic values
-		case '\0':  buffer.assign("\\0");      break;
-		case '\r':  buffer.assign("\\r");      break;
-		case '\n':  buffer.assign("\\n");      break;
-		case '\t':  buffer.assign("\\t");      break;
-
-		default:
-			// seven bit ASCII is easy
-			if (ch >= 32 && ch < 128)
-			{
-				char temp[2] = { char(ch), 0 };
-				buffer.assign(temp);
-			}
-			else if (ch >= UCHAR_MAMEKEY_BEGIN)
-			{
-				// try to obtain a codename with code_name(); this can result in an empty string
-				input_code code(DEVICE_CLASS_KEYBOARD, 0, ITEM_CLASS_SWITCH, ITEM_MODIFIER_NONE, input_item_id(ch - UCHAR_MAMEKEY_BEGIN));
-				buffer = machine().input().code_name(code);
-			}
-
-			// did we fail to resolve? if so, we have a last resort
-			if (buffer.empty())
-				strprintf(buffer,"U+%04X", unsigned(ch));
-			break;
-	}
-	return buffer;
-}
-
-
-//-------------------------------------------------
-//  find_code - find a code in our lookup table
-//-------------------------------------------------
-
-const natural_keyboard::keycode_map_entry *natural_keyboard::find_code(unicode_char ch) const
-{
-	for (auto & elem : m_keycode_map)
-	{
-		if (elem.ch == ch)
-			return &elem;
-	}
-	return nullptr;
-}
-
-
-//-------------------------------------------------
-//  frame_update - once per frame update of the
-//  natural keyboard state
-//-------------------------------------------------
-
-void natural_keyboard::frame_update(ioport_port &port, ioport_value &digital)
-{
-	// is there currently a key down?
-	if (m_status_keydown && !empty())
-	{
-		// loop through this character's component codes
-		const keycode_map_entry *code = find_code(m_buffer[m_bufbegin]);
-		if (code != nullptr)
-			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field) && code->field[fieldnum] != nullptr; fieldnum++)
-				if (&code->field[fieldnum]->port() == &port)
-					digital |= code->field[fieldnum]->mask();
-	}
-}
-
-
-//-------------------------------------------------
-//  key_name - returns the name of a specific key
-//-------------------------------------------------
-
-std::string natural_keyboard::key_name(unicode_char ch) const
-{
-	std::string str;
-
-	// attempt to get the string from the character info table
-	const char_info *ci = char_info::find(ch);
-	const char *result = (ci != nullptr) ? ci->name : nullptr;
-	if (result != nullptr)
-		str.assign(result);
-
-	// if that doesn't work, convert to UTF-8
-	else if (ch > 0x7F || isprint(ch))
-	{
-		char buf[10];
-		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
-		buf[count] = 0;
-		str.assign(buf);
-	}
-
-	// otherwise, opt for question marks
-	else
-		str.assign("???");
-	return str;
-}
-
-
-//-------------------------------------------------
-//  dump - dumps info to string
-//-------------------------------------------------
-
-std::string natural_keyboard::dump()
-{
-	std::string buffer;
-	const size_t left_column_width = 24;
-
-	// loop through all codes
-	for (auto & code : m_keycode_map)
-	{
-		// describe the character code
-
-		strcatprintf(buffer,"%08X (%s) ", code.ch, unicode_to_string(code.ch).c_str());
-
-		// pad with spaces
-		while (buffer.length() < left_column_width)
-			buffer.push_back(' ');
-
-		// identify the keys used
-		for (int field = 0; field < ARRAY_LENGTH(code.field) && code.field[field] != nullptr; field++)
-			strcatprintf(buffer, "%s'%s'", (field > 0) ? ", " : "", code.field[field]->name());
-
-		// carriage return
-		buffer.push_back('\n');
-	}
-
-	return buffer;
-}
 
 
 //**************************************************************************
@@ -1431,7 +573,7 @@ ioport_setting::ioport_setting(ioport_field &field, ioport_value _value, const c
 //  ioport_diplocation - constructor
 //-------------------------------------------------
 
-ioport_diplocation::ioport_diplocation(const char *name, UINT8 swnum, bool invert)
+ioport_diplocation::ioport_diplocation(const char *name, u8 swnum, bool invert)
 	: m_next(nullptr),
 		m_name(name),
 		m_number(swnum),
@@ -1479,7 +621,7 @@ ioport_field::ioport_field(ioport_port &port, ioport_type type, ioport_value def
 	// reset sequences and chars
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 		m_seq[seqtype].set_default();
-	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = unicode_char(0);
+	m_chars[0] = m_chars[1] = m_chars[2] = m_chars[3] = char32_t(0);
 
 	// for DIP switches and configs, look for a default value from the owner
 	if (type == IPT_DIPSWITCH || type == IPT_CONFIG)
@@ -1512,7 +654,7 @@ ioport_field::~ioport_field()
 
 //-------------------------------------------------
 //  name - return the field name for a given input
-//  field
+//  field (this must never return nullptr)
 //-------------------------------------------------
 
 const char *ioport_field::name() const
@@ -1539,10 +681,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 	if (m_live == nullptr)
 		return defseq(seqtype);
 
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_live->seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);
@@ -1559,10 +697,6 @@ const input_seq &ioport_field::seq(input_seq_type seqtype) const
 
 const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 {
-	// if the field is disabled, return no key
-	if (unused())
-		return input_seq::empty_seq;
-
 	// if the sequence is the special default code, return the expanded default value
 	if (m_seq[seqtype].is_default())
 		return manager().type_seq(m_type, m_player, seqtype);
@@ -1579,71 +713,29 @@ const input_seq &ioport_field::defseq(input_seq_type seqtype) const
 
 ioport_type_class ioport_field::type_class() const
 {
-	ioport_type_class result;
+	// inputs associated with specific players
+	ioport_group group = manager().type_group(m_type, m_player);
+	if (group >= IPG_PLAYER1 && group <= IPG_PLAYER10)
+		return INPUT_CLASS_CONTROLLER;
 
-	switch (m_type)
-	{
-		case IPT_JOYSTICK_UP:
-		case IPT_JOYSTICK_DOWN:
-		case IPT_JOYSTICK_LEFT:
-		case IPT_JOYSTICK_RIGHT:
-		case IPT_JOYSTICKLEFT_UP:
-		case IPT_JOYSTICKLEFT_DOWN:
-		case IPT_JOYSTICKLEFT_LEFT:
-		case IPT_JOYSTICKLEFT_RIGHT:
-		case IPT_JOYSTICKRIGHT_UP:
-		case IPT_JOYSTICKRIGHT_DOWN:
-		case IPT_JOYSTICKRIGHT_LEFT:
-		case IPT_JOYSTICKRIGHT_RIGHT:
-		case IPT_BUTTON1:
-		case IPT_BUTTON2:
-		case IPT_BUTTON3:
-		case IPT_BUTTON4:
-		case IPT_BUTTON5:
-		case IPT_BUTTON6:
-		case IPT_BUTTON7:
-		case IPT_BUTTON8:
-		case IPT_BUTTON9:
-		case IPT_BUTTON10:
-		case IPT_AD_STICK_X:
-		case IPT_AD_STICK_Y:
-		case IPT_AD_STICK_Z:
-		case IPT_TRACKBALL_X:
-		case IPT_TRACKBALL_Y:
-		case IPT_LIGHTGUN_X:
-		case IPT_LIGHTGUN_Y:
-		case IPT_MOUSE_X:
-		case IPT_MOUSE_Y:
-		case IPT_START:
-		case IPT_SELECT:
-			result = INPUT_CLASS_CONTROLLER;
-			break;
+	// keys (names derived from character codes)
+	if (m_type == IPT_KEYPAD || m_type == IPT_KEYBOARD)
+		return INPUT_CLASS_KEYBOARD;
 
-		case IPT_KEYPAD:
-		case IPT_KEYBOARD:
-			result = INPUT_CLASS_KEYBOARD;
-			break;
+	// configuration settings (specific names required)
+	if (m_type == IPT_CONFIG)
+		return INPUT_CLASS_CONFIG;
 
-		case IPT_CONFIG:
-			result = INPUT_CLASS_CONFIG;
-			break;
+	// DIP switches (specific names required)
+	if (m_type == IPT_DIPSWITCH)
+		return INPUT_CLASS_DIPSWITCH;
 
-		case IPT_DIPSWITCH:
-			result = INPUT_CLASS_DIPSWITCH;
-			break;
+	// miscellaneous non-player inputs (named and user-mappable)
+	if (group == IPG_OTHER || (group == IPG_INVALID && m_name != nullptr))
+		return INPUT_CLASS_MISC;
 
-		case 0:
-			if (m_name != nullptr && m_name != (const char *)-1)
-				result = INPUT_CLASS_MISC;
-			else
-				result = INPUT_CLASS_INTERNAL;
-			break;
-
-		default:
-			result = INPUT_CLASS_INTERNAL;
-			break;
-	}
-	return result;
+	// internal inputs (these may be anonymous)
+	return INPUT_CLASS_INTERNAL;
 }
 
 
@@ -1652,9 +744,9 @@ ioport_type_class ioport_field::type_class() const
 //  code
 //-------------------------------------------------
 
-unicode_char ioport_field::keyboard_code(int which) const
+char32_t ioport_field::keyboard_code(int which) const
 {
-	unicode_char ch;
+	char32_t ch;
 
 	if (which >= ARRAY_LENGTH(m_chars))
 		throw emu_fatalerror("Tried to access keyboard_code with out-of-range index %d\n", which);
@@ -1665,6 +757,86 @@ unicode_char ioport_field::keyboard_code(int which) const
 	if (ch >= 0xffffff80 && ch <= 0xffffffff)
 		ch &= 0xff;
 	return ch;
+}
+
+
+//-------------------------------------------------
+//  key_name - returns the name of a specific key
+//-------------------------------------------------
+
+std::string ioport_field::key_name(int which) const
+{
+	char32_t ch = keyboard_code(which);
+
+	// attempt to get the string from the character info table
+	switch (ch)
+	{
+		case 8: return "Backspace";
+		case 9: return "Tab";
+		case 12: return "Clear";
+		case 13: return "Enter";
+		case 27: return "Esc";
+		case 32: return "Space";
+		case UCHAR_SHIFT_1: return "Shift";
+		case UCHAR_SHIFT_2: return "Ctrl";
+		case UCHAR_MAMEKEY(ESC): return "Esc";
+		case UCHAR_MAMEKEY(INSERT): return "Insert";
+		case UCHAR_MAMEKEY(DEL): return "Delete";
+		case UCHAR_MAMEKEY(HOME): return "Home";
+		case UCHAR_MAMEKEY(END): return "End";
+		case UCHAR_MAMEKEY(PGUP): return "Page Up";
+		case UCHAR_MAMEKEY(PGDN): return "Page Down";
+		case UCHAR_MAMEKEY(LEFT): return "Cursor Left";
+		case UCHAR_MAMEKEY(RIGHT): return "Cursor Right";
+		case UCHAR_MAMEKEY(UP): return "Cursor Up";
+		case UCHAR_MAMEKEY(DOWN): return "Cursor Down";
+		case UCHAR_MAMEKEY(SLASH_PAD): return "Keypad /";
+		case UCHAR_MAMEKEY(ASTERISK): return "Keypad *";
+		case UCHAR_MAMEKEY(MINUS_PAD): return "Keypad -";
+		case UCHAR_MAMEKEY(PLUS_PAD): return "Keypad +";
+		case UCHAR_MAMEKEY(DEL_PAD): return "Keypad .";
+		case UCHAR_MAMEKEY(ENTER_PAD): return "Keypad Enter";
+		case UCHAR_MAMEKEY(BS_PAD): return "Keypad Backspace";
+		case UCHAR_MAMEKEY(TAB_PAD): return "Keypad Tab";
+		case UCHAR_MAMEKEY(00_PAD): return "Keypad 00";
+		case UCHAR_MAMEKEY(000_PAD): return "Keypad 000";
+		case UCHAR_MAMEKEY(PRTSCR): return "Print Screen";
+		case UCHAR_MAMEKEY(PAUSE): return "Pause";
+		case UCHAR_MAMEKEY(LSHIFT): return "Left Shift";
+		case UCHAR_MAMEKEY(RSHIFT): return "Right Shift";
+		case UCHAR_MAMEKEY(LCONTROL): return "Left Ctrl";
+		case UCHAR_MAMEKEY(RCONTROL): return "Right Ctrl";
+		case UCHAR_MAMEKEY(LALT): return "Left Alt";
+		case UCHAR_MAMEKEY(RALT): return "Right Alt";
+		case UCHAR_MAMEKEY(SCRLOCK): return "Scroll Lock";
+		case UCHAR_MAMEKEY(NUMLOCK): return "Num Lock";
+		case UCHAR_MAMEKEY(CAPSLOCK): return "Caps Lock";
+		case UCHAR_MAMEKEY(LWIN): return "Left Win";
+		case UCHAR_MAMEKEY(RWIN): return "Right Win";
+		case UCHAR_MAMEKEY(MENU): return "Menu";
+		case UCHAR_MAMEKEY(CANCEL): return "Break";
+		default: break;
+	}
+
+	// handle function keys
+	if (ch >= UCHAR_MAMEKEY(F1) && ch <= UCHAR_MAMEKEY(F20))
+		return util::string_format("F%d", ch - UCHAR_MAMEKEY(F1) + 1);
+
+	// handle 0-9 on numeric keypad
+	if (ch >= UCHAR_MAMEKEY(0_PAD) && ch <= UCHAR_MAMEKEY(9_PAD))
+		return util::string_format("Keypad %d", ch - UCHAR_MAMEKEY(0_PAD));
+
+	// if that doesn't work, convert to UTF-8
+	if (ch > 0x7F || isprint(ch))
+	{
+		char buf[10];
+		int count = utf8_from_uchar(buf, ARRAY_LENGTH(buf), ch);
+		buf[count] = 0;
+		return std::string(buf);
+	}
+
+	// otherwise, opt for question marks
+	return "???";
 }
 
 
@@ -1683,7 +855,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 		settings.seq[seqtype] = seq(seqtype);
 
 	// if there's a list of settings or we're an adjuster, copy the current value
-	if (first_setting() != nullptr || m_type == IPT_ADJUSTER)
+	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
 		settings.value = m_live->value;
 
 	// if there's analog data, extract the analog settings
@@ -1699,6 +871,7 @@ void ioport_field::get_user_settings(user_settings &settings)
 	else
 	{
 		settings.toggle = m_live->toggle;
+		settings.autofire = m_live->autofire;
 	}
 }
 
@@ -1721,7 +894,7 @@ void ioport_field::set_user_settings(const user_settings &settings)
 	}
 
 	// if there's a list of settings or we're an adjuster, copy the current value
-	if (first_setting() != nullptr || m_type == IPT_ADJUSTER)
+	if (!m_settinglist.empty() || m_type == IPT_ADJUSTER)
 		m_live->value = settings.value;
 
 	// if there's analog data, extract the analog settings
@@ -1737,6 +910,7 @@ void ioport_field::set_user_settings(const user_settings &settings)
 	else
 	{
 		m_live->toggle = settings.toggle;
+		m_live->autofire = settings.autofire;
 	}
 }
 
@@ -1749,13 +923,13 @@ void ioport_field::set_user_settings(const user_settings &settings)
 const char *ioport_field::setting_name() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != nullptr);
+	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
-		if (setting->enabled())
-			if (setting->value() == m_live->value)
-				return setting->name();
+	for (ioport_setting &setting : m_settinglist)
+		if (setting.enabled())
+			if (setting.value() == m_live->value)
+				return setting.name();
 
 	return "INVALID";
 }
@@ -1769,12 +943,12 @@ const char *ioport_field::setting_name() const
 bool ioport_field::has_previous_setting() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != nullptr);
+	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
-	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
-		if (setting->enabled())
-			return (setting->value() != m_live->value);
+	for (ioport_setting &setting : m_settinglist)
+		if (setting.enabled())
+			return (setting.value() != m_live->value);
 
 	return false;
 }
@@ -1788,27 +962,27 @@ bool ioport_field::has_previous_setting() const
 void ioport_field::select_previous_setting()
 {
 	// only makes sense if we have settings
-	assert(first_setting() != nullptr);
+	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
 	ioport_setting *prevsetting = nullptr;
 	bool found_match = false;
-	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
-		if (setting->enabled())
+	for (ioport_setting &setting : m_settinglist)
+		if (setting.enabled())
 		{
-			if (setting->value() == m_live->value)
+			if (setting.value() == m_live->value)
 			{
 				found_match = true;
 				if (prevsetting != nullptr)
 					break;
 			}
-			prevsetting = setting;
+			prevsetting = &setting;
 		}
 
 	// if we didn't find a matching value, select the first
 	if (!found_match)
 	{
-		for (prevsetting = first_setting(); prevsetting != nullptr; prevsetting = prevsetting->next())
+		for (prevsetting = m_settinglist.first(); prevsetting != nullptr; prevsetting = prevsetting->next())
 			if (prevsetting->enabled())
 				break;
 	}
@@ -1827,16 +1001,16 @@ void ioport_field::select_previous_setting()
 bool ioport_field::has_next_setting() const
 {
 	// only makes sense if we have settings
-	assert(first_setting() != nullptr);
+	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
 	bool found = false;
-	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
-		if (setting->enabled())
+	for (ioport_setting &setting : m_settinglist)
+		if (setting.enabled())
 		{
 			if (found)
 				return true;
-			if (setting->value() == m_live->value)
+			if (setting.value() == m_live->value)
 				found = true;
 		}
 
@@ -1852,12 +1026,12 @@ bool ioport_field::has_next_setting() const
 void ioport_field::select_next_setting()
 {
 	// only makes sense if we have settings
-	assert(first_setting() != nullptr);
+	assert(!m_settinglist.empty());
 
 	// scan the list of settings looking for a match on the current value
 	ioport_setting *nextsetting = nullptr;
 	ioport_setting *setting;
-	for (setting = first_setting(); setting != nullptr; setting = setting->next())
+	for (setting = m_settinglist.first(); setting != nullptr; setting = setting->next())
 		if (setting->enabled())
 			if (setting->value() == m_live->value)
 				break;
@@ -1870,7 +1044,7 @@ void ioport_field::select_next_setting()
 
 	// if we hit the end, search from the beginning
 	if (nextsetting == nullptr)
-		for (nextsetting = first_setting(); nextsetting != nullptr; nextsetting = nextsetting->next())
+		for (nextsetting = m_settinglist.first(); nextsetting != nullptr; nextsetting = nextsetting->next())
 			if (nextsetting->enabled())
 				break;
 
@@ -1885,7 +1059,7 @@ void ioport_field::select_next_setting()
 //  digital field
 //-------------------------------------------------
 
-void ioport_field::frame_update(ioport_value &result, bool mouse_down)
+void ioport_field::frame_update(ioport_value &result)
 {
 	// skip if not enabled
 	if (!enabled())
@@ -1902,18 +1076,36 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	if (machine().ui().is_menu_active())
 		return;
 
+	// if user input is locked out here, bail
+	if (m_live->lockout)
+	{
+		// use just the digital value
+		if (m_digital_value)
+			result |= m_mask;
+		return;
+	}
+
 	// if the state changed, look for switch down/switch up
-	bool curstate = mouse_down || machine().input().seq_pressed(seq()) || m_digital_value;
+	bool curstate = m_digital_value || machine().input().seq_pressed(seq());
+	if (m_live->autofire && !machine().ioport().get_autofire_toggle())
+	{
+		if (curstate)
+		{
+			if (m_live->autopressed > machine().ioport().get_autofire_delay())
+				m_live->autopressed = 0;
+			else if (m_live->autopressed > machine().ioport().get_autofire_delay() / 2)
+				curstate = false;
+			m_live->autopressed++;
+		}
+		else
+			m_live->autopressed = 0;
+	}
 	bool changed = false;
 	if (curstate != m_live->last)
 	{
 		m_live->last = curstate;
 		changed = true;
 	}
-
-	// if we're a keyboard type and using natural keyboard, bail
-	if (m_type == IPT_KEYBOARD && machine().ui().use_natural_keyboard())
-		return;
 
 	// coin impulse option
 	int effective_impulse = m_impulse;
@@ -1952,14 +1144,14 @@ void ioport_field::frame_update(ioport_value &result, bool mouse_down)
 	}
 
 	// for toggle switches, the current value is folded into the port's default value
-	// so we always return FALSE here
+	// so we always return false here
 	if (m_live->toggle)
 		curstate = false;
 
 	// additional logic to restrict digital joysticks
-	if (curstate && !m_digital_value && !mouse_down && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
+	if (curstate && !m_digital_value && m_live->joystick != nullptr && m_way != 16 && !machine().options().joystick_contradictory())
 	{
-		UINT8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
+		u8 mask = (m_way == 4) ? m_live->joystick->current4way() : m_live->joystick->current();
 		if (!(mask & (1 << m_live->joydir)))
 			curstate = false;
 	}
@@ -2080,7 +1272,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		{
 			if (lastname == nullptr)
 			{
-				strcatprintf(errorbuf, "Switch location '%s' missing switch name!\n", location);
+				errorbuf.append(string_format("Switch location '%s' missing switch name!\n", location));
 				lastname = (char *)"UNK";
 			}
 			name.assign(lastname);
@@ -2097,7 +1289,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 		// now scan the switch number
 		int swnum = -1;
 		if (sscanf(number, "%d", &swnum) != 1)
-			strcatprintf(errorbuf, "Switch location '%s' has invalid format!\n", location);
+			errorbuf.append(string_format("Switch location '%s' has invalid format!\n", location));
 
 		// allocate a new entry
 		m_diploclist.append(*global_alloc(ioport_diplocation(name.c_str(), swnum, invert)));
@@ -2115,7 +1307,7 @@ void ioport_field::expand_diplocation(const char *location, std::string &errorbu
 	for (bits = 0, temp = m_mask; temp != 0 && bits < 32; bits++)
 		temp &= temp - 1;
 	if (bits != entries)
-		strcatprintf(errorbuf, "Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask);
+		errorbuf.append(string_format("Switch location '%s' does not describe enough bits for mask %X\n", location, m_mask));
 }
 
 
@@ -2135,8 +1327,8 @@ void ioport_field::init_live_state(analog_field *analog)
 
 	m_condition.initialize(device());
 
-	for (ioport_setting *setting = first_setting(); setting != nullptr; setting = setting->next())
-		setting->condition().initialize(setting->device());
+	for (ioport_setting &setting : m_settinglist)
+		setting.condition().initialize(setting.device());
 }
 
 
@@ -2156,7 +1348,10 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		impulse(0),
 		last(0),
 		toggle(field.toggle()),
-		joydir(digital_joystick::JOYDIR_COUNT)
+		joydir(digital_joystick::JOYDIR_COUNT),
+		autofire(false),
+		autopressed(0),
+		lockout(false)
 {
 	// fill in the basic values
 	for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
@@ -2175,10 +1370,10 @@ ioport_field_live::ioport_field_live(ioport_field &field, analog_field *analog)
 		// loop through each character on the field
 		for (int which = 0; ; which++)
 		{
-			unicode_char ch = field.keyboard_code(which);
+			char32_t ch = field.keyboard_code(which);
 			if (ch == 0)
 				break;
-			strcatprintf(name, "%-*s ", MAX(SPACE_COUNT - 1, 0), field.manager().natkeyboard().key_name(ch).c_str());
+			name.append(string_format("%-*s ", std::max(SPACE_COUNT - 1, 0), field.key_name(which)));
 		}
 
 		// trim extra spaces
@@ -2246,12 +1441,12 @@ ioport_manager &ioport_port::manager() const
 //  that intersects the given mask
 //-------------------------------------------------
 
-ioport_field *ioport_port::field(ioport_value mask)
+ioport_field *ioport_port::field(ioport_value mask) const
 {
 	// if we got the port, look for the field
-	for (ioport_field *field = first_field(); field != nullptr; field = field->next())
-		if ((field->mask() & mask) != 0)
-			return field;
+	for (ioport_field &field : fields())
+		if ((field.mask() & mask) != 0)
+			return &field;
 	return nullptr;
 }
 
@@ -2268,15 +1463,15 @@ ioport_value ioport_port::read()
 	ioport_value result = m_live->digital;
 
 	// insert dynamic read values
-	for (dynamic_field *dynfield = m_live->readlist.first(); dynfield != nullptr; dynfield = dynfield->next())
-		dynfield->read(result);
+	for (dynamic_field &dynfield : m_live->readlist)
+		dynfield.read(result);
 
 	// apply active high/low state to digital and dynamic read inputs
 	result ^= m_live->defvalue;
 
 	// insert analog portions
-	for (analog_field *analog = m_live->analoglist.first(); analog != nullptr; analog = analog->next())
-		analog->read(result);
+	for (analog_field &analog : m_live->analoglist)
+		analog.read(result);
 
 	return result;
 }
@@ -2290,9 +1485,9 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 {
 	// call device line write handlers
 	COMBINE_DATA(&m_live->outputvalue);
-	for (dynamic_field *dynfield = m_live->writelist.first(); dynfield != nullptr; dynfield = dynfield->next())
-		if (dynfield->field().type() == IPT_OUTPUT)
-			dynfield->write(m_live->outputvalue ^ dynfield->field().defvalue());
+	for (dynamic_field &dynfield : m_live->writelist)
+		if (dynfield.field().type() == IPT_OUTPUT)
+			dynfield.write(m_live->outputvalue ^ dynfield.field().defvalue());
 }
 
 
@@ -2300,17 +1495,14 @@ void ioport_port::write(ioport_value data, ioport_value mem_mask)
 //  frame_update - once/frame update
 //-------------------------------------------------
 
-void ioport_port::frame_update(ioport_field *mouse_field)
+void ioport_port::frame_update()
 {
 	// start with 0 values for the digital bits
 	m_live->digital = 0;
 
 	// now loop back and modify based on the inputs
-	for (ioport_field *field = first_field(); field != nullptr; field = field->next())
-		field->frame_update(m_live->digital, field == mouse_field);
-
-	// hook for MESS's natural keyboard support
-	manager().natkeyboard().frame_update(*this, m_live->digital);
+	for (ioport_field &field : fields())
+		field.frame_update(m_live->digital);
 }
 
 
@@ -2354,13 +1546,13 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 	if (newfield.condition().none())
 	{
 		if ((newfield.mask() & disallowedbits) != 0)
-			strcatprintf(errorbuf, "INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask());
+			errorbuf.append(string_format("INPUT_TOKEN_FIELD specifies duplicate port bits (port=%s mask=%X)\n", tag(), newfield.mask()));
 		disallowedbits |= newfield.mask();
 	}
 
 	// first modify/nuke any entries that intersect our maskbits
 	ioport_field *nextfield;
-	for (ioport_field *field = first_field(); field != nullptr; field = nextfield)
+	for (ioport_field *field = m_fieldlist.first(); field != nullptr; field = nextfield)
 	{
 		nextfield = field->next();
 		if ((field->mask() & newfield.mask()) != 0 &&
@@ -2380,7 +1572,7 @@ void ioport_port::insert_field(ioport_field &newfield, ioport_value &disallowedb
 
 	// scan forward to find where to insert ourselves
 	ioport_field *field;
-	for (field = first_field(); field != nullptr; field = field->next())
+	for (field = m_fieldlist.first(); field != nullptr; field = field->next())
 		if (field->mask() > lowbit)
 			break;
 
@@ -2399,6 +1591,24 @@ void ioport_port::init_live_state()
 }
 
 
+//-------------------------------------------------
+//  update_defvalue - force an update to the input
+//  port values based on current conditions
+//-------------------------------------------------
+
+void ioport_port::update_defvalue(bool flush_defaults)
+{
+	// only clear on the first pass
+	if (flush_defaults)
+		m_live->defvalue = 0;
+
+	// recompute the default value for the entire port
+	for (ioport_field &field : m_fieldlist)
+		if (field.enabled())
+			m_live->defvalue = (m_live->defvalue & ~field.mask()) | (field.live().value & field.mask());
+}
+
+
 
 //**************************************************************************
 //  I/O PORT LIVE STATE
@@ -2414,23 +1624,23 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 		outputvalue(0)
 {
 	// iterate over fields
-	for (ioport_field *field = port.first_field(); field != nullptr; field = field->next())
+	for (ioport_field &field : port.fields())
 	{
 		// allocate analog state if it's analog
 		analog_field *analog = nullptr;
-		if (field->is_analog())
-			analog = &analoglist.append(*global_alloc(analog_field(*field)));
+		if (field.is_analog())
+			analog = &analoglist.append(*global_alloc(analog_field(field)));
 
 		// allocate a dynamic field for reading
-		if (field->has_dynamic_read())
-			readlist.append(*global_alloc(dynamic_field(*field)));
+		if (field.has_dynamic_read())
+			readlist.append(*global_alloc(dynamic_field(field)));
 
 		// allocate a dynamic field for writing
-		if (field->has_dynamic_write())
-			writelist.append(*global_alloc(dynamic_field(*field)));
+		if (field.has_dynamic_write())
+			writelist.append(*global_alloc(dynamic_field(field)));
 
 		// let the field initialize its live state
-		field->init_live_state(analog);
+		field.init_live_state(analog);
 	}
 }
 
@@ -2447,17 +1657,17 @@ ioport_port_live::ioport_port_live(ioport_port &port)
 ioport_manager::ioport_manager(running_machine &machine)
 	: m_machine(machine),
 		m_safe_to_read(false),
-		m_natkeyboard(machine),
 		m_last_frame_time(attotime::zero),
 		m_last_delta_nsec(0),
 		m_record_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
 		m_playback_file(machine.options().input_directory(), OPEN_FLAG_READ),
 		m_playback_accumulated_speed(0),
 		m_playback_accumulated_frames(0),
-		m_has_configs(false),
-		m_has_analog(false),
-		m_has_dips(false),
-		m_has_bioses(false)
+		m_timecode_file(machine.options().input_directory(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS),
+		m_timecode_count(0),
+		m_timecode_last_time(attotime::zero),
+		m_autofire_toggle(false),
+		m_autofire_delay(3)                 // 1 seems too fast for a bunch of games
 {
 	memset(m_type_to_entry, 0, sizeof(m_type_to_entry));
 }
@@ -2471,36 +1681,36 @@ ioport_manager::ioport_manager(running_machine &machine)
 time_t ioport_manager::initialize()
 {
 	// add an exit callback and a frame callback
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(ioport_manager::exit), this));
-	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(FUNC(ioport_manager::frame_update_callback), this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&ioport_manager::exit, this));
+	machine().add_notifier(MACHINE_NOTIFY_FRAME, machine_notify_delegate(&ioport_manager::frame_update_callback, this));
 
 	// initialize the default port info from the OSD
 	init_port_types();
 
 	// if we have a token list, proceed
 	device_iterator iter(machine().root_device());
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : iter)
 	{
 		std::string errors;
-		m_portlist.append(*device, errors);
+		m_portlist.append(device, errors);
 		if (!errors.empty())
 			osd_printf_error("Input port errors:\n%s", errors.c_str());
 	}
 
 	// renumber player numbers for controller ports
 	int player_offset = 0;
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : iter)
 	{
 		int players = 0;
-		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+		for (auto &port : m_portlist)
 		{
-			if (&port->device()==device)
+			if (&port.second->device() == &device)
 			{
-				for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-					if (field->type_class()==INPUT_CLASS_CONTROLLER)
+				for (ioport_field &field : port.second->fields())
+					if (field.type_class()==INPUT_CLASS_CONTROLLER)
 					{
-						if (players < field->player() + 1) players = field->player() + 1;
-						field->set_player(field->player() + player_offset);
+						if (players < field.player() + 1) players = field.player() + 1;
+						field.set_player(field.player() + player_offset);
 					}
 			}
 		}
@@ -2508,8 +1718,8 @@ time_t ioport_manager::initialize()
 	}
 
 	// allocate live structures to mirror the configuration
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		port->init_live_state();
+	for (auto &port : m_portlist)
+		port.second->init_live_state();
 
 	// handle autoselection of devices
 	init_autoselect_devices(IPT_AD_STICK_X,  IPT_AD_STICK_Y,   IPT_AD_STICK_Z, OPTION_ADSTICK_DEVICE,    "analog joystick");
@@ -2524,46 +1734,25 @@ time_t ioport_manager::initialize()
 	// look for 4-way diagonal joysticks and change the default map if we find any
 	const char *joystick_map_default = machine().options().joystick_map();
 	if (joystick_map_default[0] == 0 || strcmp(joystick_map_default, "auto") == 0)
-		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-				if (field->live().joystick != nullptr && field->rotated())
+		for (auto &port : m_portlist)
+			for (ioport_field &field : port.second->fields())
+				if (field.live().joystick != nullptr && field.rotated())
 				{
-					machine().input().set_global_joystick_map(joystick_map_4way_diagonal);
+					input_class_joystick &devclass = downcast<input_class_joystick &>(machine().input().device_class(DEVICE_CLASS_JOYSTICK));
+					devclass.set_global_joystick_map(input_class_joystick::map_4way_diagonal);
 					break;
 				}
 
-	m_natkeyboard.initialize();
+	// initialize natural keyboard
+	m_natkeyboard = std::make_unique<natural_keyboard>(machine());
+
 	// register callbacks for when we load configurations
-	machine().configuration().config_register("input", config_saveload_delegate(FUNC(ioport_manager::load_config), this), config_saveload_delegate(FUNC(ioport_manager::save_config), this));
-
-	// calculate "has..." values
-	{
-		m_has_configs = false;
-		m_has_analog = false;
-		m_has_dips = false;
-		m_has_bioses = false;
-
-		// scan the input port array to see what options we need to enable
-		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			{
-				if (field->type() == IPT_DIPSWITCH)
-					m_has_dips = true;
-				if (field->type() == IPT_CONFIG)
-					m_has_configs = true;
-				if (field->is_analog())
-					m_has_analog = true;
-			}
-		device_iterator deviter(machine().root_device());
-		for (device_t *device = deviter.first(); device != nullptr; device = deviter.next())
-			if (device->rom_region())
-				for (const rom_entry *rom = device->rom_region(); !ROMENTRY_ISEND(rom); rom++)
-					if (ROMENTRY_ISSYSTEM_BIOS(rom)) { m_has_bioses= true; break; }
-	}
+	machine().configuration().config_register("input", config_load_delegate(&ioport_manager::load_config, this), config_save_delegate(&ioport_manager::save_config, this));
 
 	// open playback and record files if specified
 	time_t basetime = playback_init();
 	record_init();
+	timecode_init();
 	return basetime;
 }
 
@@ -2582,13 +1771,13 @@ void ioport_manager::init_port_types()
 	machine().osd().customize_input_type_list(m_typelist);
 
 	// now iterate over the OSD-modified types
-	for (input_type_entry *curtype = first_type(); curtype != nullptr; curtype = curtype->next())
+	for (input_type_entry &curtype : m_typelist)
 	{
 		// first copy all the OSD-updated sequences into our current state
-		curtype->restore_default_seq();
+		curtype.restore_default_seq();
 
 		// also make a lookup table mapping type/player to the appropriate type list entry
-		m_type_to_entry[curtype->type()][curtype->player()] = curtype;
+		m_type_to_entry[curtype.type()][curtype.player()] = &curtype;
 	}
 }
 
@@ -2603,45 +1792,33 @@ void ioport_manager::init_autoselect_devices(int type1, int type2, int type3, co
 {
 	// if nothing specified, ignore the option
 	const char *stemp = machine().options().value(option);
-	if (stemp[0] == 0)
+	if (stemp[0] == 0 || strcmp(stemp, "none") == 0)
 		return;
 
 	// extract valid strings
-	const char *autostring = "keyboard";
-	input_device_class autoenable = DEVICE_CLASS_KEYBOARD;
-	if (strcmp(stemp, "mouse") == 0)
+	input_class *autoenable_class = nullptr;
+	for (input_device_class devclass = DEVICE_CLASS_FIRST_VALID; devclass <= DEVICE_CLASS_LAST_VALID; ++devclass)
+		if (strcmp(stemp, machine().input().device_class(devclass).name()) == 0)
+		{
+			autoenable_class = &machine().input().device_class(devclass);
+			break;
+		}
+	if (autoenable_class == nullptr)
 	{
-		autoenable = DEVICE_CLASS_MOUSE;
-		autostring = "mouse";
-	}
-	else if (strcmp(stemp, "joystick") == 0)
-	{
-		autoenable = DEVICE_CLASS_JOYSTICK;
-		autostring = "joystick";
-	}
-	else if (strcmp(stemp, "lightgun") == 0)
-	{
-		autoenable = DEVICE_CLASS_LIGHTGUN;
-		autostring = "lightgun";
-	}
-	else if (strcmp(stemp, "none") == 0)
-	{
-		// nothing specified
-		return;
-	}
-	else if (strcmp(stemp, "keyboard") != 0)
 		osd_printf_error("Invalid %s value %s; reverting to keyboard\n", option, stemp);
+		autoenable_class = &machine().input().device_class(DEVICE_CLASS_KEYBOARD);
+	}
 
 	// only scan the list if we haven't already enabled this class of control
-	if (first_port() != nullptr && !machine().input().device_class(autoenable).enabled())
-		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+	if (!autoenable_class->enabled())
+		for (auto &port : m_portlist)
+			for (ioport_field &field : port.second->fields())
 
 				// if this port type is in use, apply the autoselect criteria
-				if ((type1 != 0 && field->type() == type1) || (type2 != 0 && field->type() == type2) || (type3 != 0 && field->type() == type3))
+				if ((type1 != 0 && field.type() == type1) || (type2 != 0 && field.type() == type2) || (type3 != 0 && field.type() == type3))
 				{
-					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autostring, ananame);
-					machine().input().device_class(autoenable).enable();
+					osd_printf_verbose("Input: Autoenabling %s due to presence of a %s\n", autoenable_class->name(), ananame);
+					autoenable_class->enable();
 					break;
 				}
 }
@@ -2657,6 +1834,16 @@ void ioport_manager::exit()
 	// close any playback or recording files
 	playback_end();
 	record_end();
+	timecode_end();
+}
+
+
+//-------------------------------------------------
+//  ~ioport_manager - destructor
+//-------------------------------------------------
+
+ioport_manager::~ioport_manager()
+{
 }
 
 
@@ -2665,14 +1852,14 @@ void ioport_manager::exit()
 //  type/player
 //-------------------------------------------------
 
-const char *ioport_manager::type_name(ioport_type type, UINT8 player)
+const char *ioport_manager::type_name(ioport_type type, u8 player)
 {
 	// if we have a machine, use the live state and quick lookup
 	input_type_entry *entry = m_type_to_entry[type][player];
-	if (entry != nullptr)
+	if (entry != nullptr && entry->name() != nullptr)
 		return entry->name();
 
-	// if we find nothing, return an invalid group
+	// if we find nothing, return a default string (not a null pointer)
 	return "???";
 }
 
@@ -2744,36 +1931,13 @@ bool ioport_manager::type_pressed(ioport_type type, int player)
 
 bool ioport_manager::type_class_present(ioport_type_class inputclass)
 {
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			if (field->type_class() == inputclass)
+	for (auto &port : m_portlist)
+		for (ioport_field &field : port.second->fields())
+			if (field.type_class() == inputclass)
 				return true;
 	return false;
 }
 
-
-//-------------------------------------------------
-//  has_keyboard - determine if there is a
-//  keyboard present in the control list
-//-------------------------------------------------
-
-bool ioport_manager::has_keyboard() const
-{
-	// iterate over ports and fields
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-		{
-			// if we are at init, check IPT_KEYBOARD
-			if (!m_safe_to_read && field->type() == IPT_KEYBOARD)
-				return true;
-
-			// else, check if there is a keyboard and if such a keyboard is enabled
-			if (field->type() == IPT_KEYBOARD && field->enabled())
-				return true;
-		}
-
-	return false;
-}
 
 //-------------------------------------------------
 //  count_players - counts the number of active
@@ -2783,10 +1947,10 @@ bool ioport_manager::has_keyboard() const
 int ioport_manager::count_players() const
 {
 	int max_player = 0;
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			if (field->type_class() == INPUT_CLASS_CONTROLLER && max_player <= field->player() + 1)
-				max_player = field->player() + 1;
+	for (auto &port : m_portlist)
+		for (ioport_field &field : port.second->fields())
+			if (field.type_class() == INPUT_CLASS_CONTROLLER && max_player <= field.player() + 1)
+				max_player = field.player() + 1;
 
 	return max_player;
 }
@@ -2801,11 +1965,11 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 {
 	// read all the lightgun values
 	bool gotx = false, goty = false;
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			if (field->player() == player && field->crosshair_axis() != CROSSHAIR_AXIS_NONE && field->enabled())
+	for (auto &port : m_portlist)
+		for (ioport_field &field : port.second->fields())
+			if (field.player() == player && field.crosshair_axis() != CROSSHAIR_AXIS_NONE && field.enabled())
 			{
-				field->crosshair_position(x, y, gotx, goty);
+				field.crosshair_position(x, y, gotx, goty);
 
 				// if we got both, stop
 				if (gotx && goty)
@@ -2817,32 +1981,6 @@ bool ioport_manager::crosshair_position(int player, float &x, float &y)
 
 
 //-------------------------------------------------
-//  update_defaults - force an update to the input
-//  port values based on current conditions
-//-------------------------------------------------
-
-void ioport_manager::update_defaults()
-{
-	// two passes to catch conditionals properly
-	for (int loopnum = 0; loopnum < 2; loopnum++)
-	{
-		// loop over all input ports
-		for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		{
-			// only clear on the first pass
-			if (loopnum == 0)
-				port->live().defvalue = 0;
-
-			// first compute the default value for the entire port
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-				if (field->enabled())
-					port->live().defvalue = (port->live().defvalue & ~field->mask()) | (field->live().value & field->mask());
-		}
-	}
-}
-
-
-//-------------------------------------------------
 //  frame_update - core logic for per-frame input
 //  port updating
 //-------------------------------------------------
@@ -2850,9 +1988,9 @@ void ioport_manager::update_defaults()
 digital_joystick &ioport_manager::digjoystick(int player, int number)
 {
 	// find it in the list
-	for (digital_joystick *joystick = m_joystick_list.first(); joystick != nullptr; joystick = joystick->next())
-		if (joystick->player() == player && joystick->number() == number)
-			return *joystick;
+	for (digital_joystick &joystick : m_joystick_list)
+		if (joystick.player() == player && joystick.number() == number)
+			return joystick;
 
 	// create a new one
 	return m_joystick_list.append(*global_alloc(digital_joystick(player, number)));
@@ -2890,45 +2028,30 @@ g_profiler.start(PROFILER_INPUT);
 	m_last_frame_time = curtime;
 
 	// update the digital joysticks
-	for (digital_joystick *joystick = m_joystick_list.first(); joystick != nullptr; joystick = joystick->next())
-		joystick->frame_update();
+	for (digital_joystick &joystick : m_joystick_list)
+		joystick.frame_update();
 
 	// compute default values for all the ports
-	update_defaults();
-
-	// perform mouse hit testing
-	INT32 mouse_target_x, mouse_target_y;
-	bool mouse_button;
-	render_target *mouse_target = machine().ui_input().find_mouse(&mouse_target_x, &mouse_target_y, &mouse_button);
-
-	// if the button is pressed, map the point and determine what was hit
-	ioport_field *mouse_field = nullptr;
-	if (mouse_button && mouse_target != nullptr)
-	{
-		ioport_port *port = nullptr;
-		ioport_value mask;
-		float x, y;
-		if (mouse_target->map_point_input(mouse_target_x, mouse_target_y, port, mask, x, y))
-		{
-			if (port != nullptr)
-				mouse_field = port->field(mask);
-		}
-	}
+	// two passes to catch conditionals properly
+	for (auto &port : m_portlist)
+		port.second->update_defvalue(true);
+	for (auto &port : m_portlist)
+		port.second->update_defvalue(false);
 
 	// loop over all input ports
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
+	for (auto &port : m_portlist)
 	{
-		port->frame_update(mouse_field);
+		port.second->frame_update();
 
 		// handle playback/record
-		playback_port(*port);
-		record_port(*port);
+		playback_port(*port.second.get());
+		record_port(*port.second.get());
 
 		// call device line write handlers
-		ioport_value newvalue = port->read();
-		for (dynamic_field *dynfield = port->live().writelist.first(); dynfield != nullptr; dynfield = dynfield->next())
-			if (dynfield->field().type() != IPT_OUTPUT)
-				dynfield->write(newvalue);
+		ioport_value newvalue = port.second->read();
+		for (dynamic_field &dynfield : port.second->live().writelist)
+			if (dynfield.field().type() != IPT_OUTPUT)
+				dynfield.write(newvalue);
 	}
 
 g_profiler.stop();
@@ -2940,7 +2063,7 @@ g_profiler.stop();
 //  values based on the time between frames
 //-------------------------------------------------
 
-INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
+s32 ioport_manager::frame_interpolate(s32 oldval, s32 newval)
 {
 	// if no last delta, just use new value
 	if (m_last_delta_nsec == 0)
@@ -2948,7 +2071,7 @@ INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
 
 	// otherwise, interpolate
 	attoseconds_t nsec_since_last = (machine().time() - m_last_frame_time).as_attoseconds() / ATTOSECONDS_PER_NANOSECOND;
-	return oldval + (INT64(newval - oldval) * nsec_since_last / m_last_delta_nsec);
+	return oldval + (s64(newval - oldval) * nsec_since_last / m_last_delta_nsec);
 }
 
 
@@ -2957,10 +2080,10 @@ INT32 ioport_manager::frame_interpolate(INT32 oldval, INT32 newval)
 //  data from the XML nodes
 //-------------------------------------------------
 
-void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode)
+void ioport_manager::load_config(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// in the completion phase, we finish the initialization with the final ports
-	if (cfg_type == config_type::CONFIG_TYPE_FINAL)
+	if (cfg_type == config_type::FINAL)
 	{
 		m_safe_to_read = true;
 		frame_update();
@@ -2971,15 +2094,36 @@ void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode
 		return;
 
 	// iterate over all the remap nodes for controller configs only
-	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
+	if (cfg_type == config_type::CONTROLLER)
 		load_remap_table(parentnode);
 
+	// load device map table for controller configs only
+	if (cfg_type == config_type::CONTROLLER)
+	{
+		std::unique_ptr<devicemap_table_type> devicemap_table = std::make_unique<devicemap_table_type>();
+		for (util::xml::data_node const *mapdevice_node = parentnode->get_child("mapdevice"); mapdevice_node != nullptr; mapdevice_node = mapdevice_node->get_next_sibling("mapdevice"))
+		{
+			const char *devicename = mapdevice_node->get_attribute_string("device", nullptr);
+			const char *controllername = mapdevice_node->get_attribute_string("controller", nullptr);
+			if (devicename != nullptr && controllername != nullptr)
+			{
+				devicemap_table->insert(std::make_pair(std::string(devicename), std::string(controllername)));
+			}
+		}
+
+		// map device to controller if we have a device map
+		if (!devicemap_table->empty())
+		{
+			machine().input().map_device_to_controller(devicemap_table.get());
+		}
+	}
+
 	// iterate over all the port nodes
-	for (xml_data_node *portnode = xml_get_sibling(parentnode->child, "port"); portnode; portnode = xml_get_sibling(portnode->next, "port"))
+	for (util::xml::data_node const *portnode = parentnode->get_child("port"); portnode; portnode = portnode->get_next_sibling("port"))
 	{
 		// get the basic port info from the attributes
 		int player;
-		int type = token_to_input_type(xml_get_attribute_string(portnode, "type", ""), player);
+		int type = token_to_input_type(portnode->get_attribute_string("type", ""), player);
 
 		// initialize sequences to invalid defaults
 		input_seq newseq[SEQ_TYPE_TOTAL];
@@ -2987,21 +2131,21 @@ void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode
 			newseq[seqtype].set(INPUT_CODE_INVALID);
 
 		// loop over new sequences
-		for (xml_data_node *seqnode = xml_get_sibling(portnode->child, "newseq"); seqnode; seqnode = xml_get_sibling(seqnode->next, "newseq"))
+		for (util::xml::data_node const *seqnode = portnode->get_child("newseq"); seqnode; seqnode = seqnode->get_next_sibling("newseq"))
 		{
 			// with a valid type, parse out the new sequence
-			input_seq_type seqtype = token_to_seq_type(xml_get_attribute_string(seqnode, "type", ""));
-			if (seqtype != -1 && seqnode->value != nullptr)
+			input_seq_type seqtype = token_to_seq_type(seqnode->get_attribute_string("type", ""));
+			if (seqtype != -1 && seqnode->get_value() != nullptr)
 			{
-				if (strcmp(seqnode->value, "NONE") == 0)
+				if (strcmp(seqnode->get_value(), "NONE") == 0)
 					newseq[seqtype].set();
 				else
-					machine().input().seq_from_tokens(newseq[seqtype], seqnode->value);
+					machine().input().seq_from_tokens(newseq[seqtype], seqnode->get_value());
 			}
 		}
 
 		// if we're loading default ports, apply to the defaults
-		if (cfg_type != config_type::CONFIG_TYPE_GAME)
+		if (cfg_type != config_type::GAME)
 			load_default_config(portnode, type, player, newseq);
 		else
 			load_game_config(portnode, type, player, newseq);
@@ -3009,10 +2153,10 @@ void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode
 
 	// after applying the controller config, push that back into the backup, since that is
 	// what we will diff against
-	if (cfg_type == config_type::CONFIG_TYPE_CONTROLLER)
-		for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
+	if (cfg_type == config_type::CONTROLLER)
+		for (input_type_entry &entry : m_typelist)
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-				entry->defseq(seqtype) = entry->seq(seqtype);
+				entry.defseq(seqtype) = entry.seq(seqtype);
 }
 
 
@@ -3021,11 +2165,11 @@ void ioport_manager::load_config(config_type cfg_type, xml_data_node *parentnode
 //  global remapping table
 //-------------------------------------------------
 
-void ioport_manager::load_remap_table(xml_data_node *parentnode)
+void ioport_manager::load_remap_table(util::xml::data_node const *parentnode)
 {
 	// count items first so we can allocate
 	int count = 0;
-	for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != nullptr; remapnode = xml_get_sibling(remapnode->next, "remap"))
+	for (util::xml::data_node const *remapnode = parentnode->get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
 		count++;
 
 	// if we have some, deal with them
@@ -3037,10 +2181,10 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 
 		// build up the remap table
 		count = 0;
-		for (xml_data_node *remapnode = xml_get_sibling(parentnode->child, "remap"); remapnode != nullptr; remapnode = xml_get_sibling(remapnode->next, "remap"))
+		for (util::xml::data_node const *remapnode = parentnode->get_child("remap"); remapnode != nullptr; remapnode = remapnode->get_next_sibling("remap"))
 		{
-			input_code origcode = machine().input().code_from_token(xml_get_attribute_string(remapnode, "origcode", ""));
-			input_code newcode = machine().input().code_from_token(xml_get_attribute_string(remapnode, "newcode", ""));
+			input_code origcode = machine().input().code_from_token(remapnode->get_attribute_string("origcode", ""));
+			input_code newcode = machine().input().code_from_token(remapnode->get_attribute_string("newcode", ""));
 			if (origcode != INPUT_CODE_INVALID && newcode != INPUT_CODE_INVALID)
 			{
 				oldtable[count] = origcode;
@@ -3051,9 +2195,9 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 
 		// loop over the remapping table, then over default ports, replacing old with new
 		for (int remapnum = 0; remapnum < count; remapnum++)
-			for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
+			for (input_type_entry &entry : m_typelist)
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-					entry->m_seq[seqtype].replace(oldtable[remapnum], newtable[remapnum]);
+					entry.m_seq[seqtype].replace(oldtable[remapnum], newtable[remapnum]);
 	}
 }
 
@@ -3063,15 +2207,15 @@ void ioport_manager::load_remap_table(xml_data_node *parentnode)
 //  data to the default mappings
 //-------------------------------------------------
 
-bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq)
+bool ioport_manager::load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
 {
 	// find a matching port in the list
-	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
-		if (entry->type() == type && entry->player() == player)
+	for (input_type_entry &entry : m_typelist)
+		if (entry.type() == type && entry.player() == player)
 		{
 			for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 				if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-					entry->m_seq[seqtype] = newseq[seqtype];
+					entry.m_seq[seqtype] = newseq[seqtype];
 			return true;
 		}
 
@@ -3084,52 +2228,52 @@ bool ioport_manager::load_default_config(xml_data_node *portnode, int type, int 
 //  data to the current set of input ports
 //-------------------------------------------------
 
-bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq)
+bool ioport_manager::load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq)
 {
 	// read the mask, index, and defvalue attributes
-	const char *tag = xml_get_attribute_string(portnode, "tag", nullptr);
-	ioport_value mask = xml_get_attribute_int(portnode, "mask", 0);
-	ioport_value defvalue = xml_get_attribute_int(portnode, "defvalue", 0);
+	const char *tag = portnode->get_attribute_string("tag", nullptr);
+	ioport_value mask = portnode->get_attribute_int("mask", 0);
+	ioport_value defvalue = portnode->get_attribute_int("defvalue", 0);
 
 	// find the port we want; if no tag, search them all
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		if (tag == nullptr || strcmp(port->tag(), tag) == 0)
-			for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
+	for (auto &port : m_portlist)
+		if (tag == nullptr || strcmp(port.second->tag(), tag) == 0)
+			for (ioport_field &field : port.second->fields())
 
 				// find the matching mask and defvalue
-				if (field->type() == type && field->player() == player &&
-					field->mask() == mask && (field->defvalue() & mask) == (defvalue & mask))
+				if (field.type() == type && field.player() == player &&
+					field.mask() == mask && (field.defvalue() & mask) == (defvalue & mask))
 				{
 					// if a sequence was specified, copy it in
 					for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
 						if (newseq[seqtype][0] != INPUT_CODE_INVALID)
-							field->live().seq[seqtype] = newseq[seqtype];
+							field.live().seq[seqtype] = newseq[seqtype];
 
 					// fetch configurable attributes
 					// for non-analog fields
-					if (field->live().analog == nullptr)
+					if (field.live().analog == nullptr)
 					{
 						// fetch the value
-						field->live().value = xml_get_attribute_int(portnode, "value", field->defvalue());
+						field.live().value = portnode->get_attribute_int("value", field.defvalue());
 
 						// fetch yes/no for toggle setting
-						const char *togstring = xml_get_attribute_string(portnode, "toggle", nullptr);
+						const char *togstring = portnode->get_attribute_string("toggle", nullptr);
 						if (togstring != nullptr)
-							field->live().toggle = (strcmp(togstring, "yes") == 0);
+							field.live().toggle = (strcmp(togstring, "yes") == 0);
 					}
 
 					// for analog fields
 					else
 					{
 						// get base attributes
-						field->live().analog->m_delta = xml_get_attribute_int(portnode, "keydelta", field->delta());
-						field->live().analog->m_centerdelta = xml_get_attribute_int(portnode, "centerdelta", field->centerdelta());
-						field->live().analog->m_sensitivity = xml_get_attribute_int(portnode, "sensitivity", field->sensitivity());
+						field.live().analog->m_delta = portnode->get_attribute_int("keydelta", field.delta());
+						field.live().analog->m_centerdelta = portnode->get_attribute_int("centerdelta", field.centerdelta());
+						field.live().analog->m_sensitivity = portnode->get_attribute_int("sensitivity", field.sensitivity());
 
 						// fetch yes/no for reverse setting
-						const char *revstring = xml_get_attribute_string(portnode, "reverse", nullptr);
+						const char *revstring = portnode->get_attribute_string("reverse", nullptr);
 						if (revstring != nullptr)
-							field->live().analog->m_reverse = (strcmp(revstring, "yes") == 0);
+							field.live().analog->m_reverse = (strcmp(revstring, "yes") == 0);
 					}
 					return true;
 				}
@@ -3148,17 +2292,17 @@ bool ioport_manager::load_game_config(xml_data_node *portnode, int type, int pla
 //  port configuration
 //-------------------------------------------------
 
-void ioport_manager::save_config(config_type cfg_type, xml_data_node *parentnode)
+void ioport_manager::save_config(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// if no parentnode, ignore
 	if (parentnode == nullptr)
 		return;
 
 	// default ports save differently
-	if (cfg_type == config_type::CONFIG_TYPE_DEFAULT)
-		save_default_inputs(parentnode);
+	if (cfg_type == config_type::DEFAULT)
+		save_default_inputs(*parentnode);
 	else
-		save_game_inputs(parentnode);
+		save_game_inputs(*parentnode);
 }
 
 
@@ -3167,7 +2311,7 @@ void ioport_manager::save_config(config_type cfg_type, xml_data_node *parentnode
 //  sequence
 //-------------------------------------------------
 
-void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq)
+void ioport_manager::save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq)
 {
 	// get the string for the sequence
 	std::string seqstring;
@@ -3177,9 +2321,9 @@ void ioport_manager::save_sequence(xml_data_node *parentnode, input_seq_type typ
 		seqstring = machine().input().seq_to_tokens(seq);
 
 	// add the new node
-	xml_data_node *seqnode = xml_add_child(parentnode, "newseq", seqstring.c_str());
+	util::xml::data_node *const seqnode = parentnode.add_child("newseq", seqstring.c_str());
 	if (seqnode != nullptr)
-		xml_set_attribute(seqnode, "type", seqtypestrings[type]);
+		seqnode->set_attribute("type", seqtypestrings[type]);
 }
 
 
@@ -3210,34 +2354,34 @@ bool ioport_manager::save_this_input_field_type(ioport_type type)
 //  mappings that have changed
 //-------------------------------------------------
 
-void ioport_manager::save_default_inputs(xml_data_node *parentnode)
+void ioport_manager::save_default_inputs(util::xml::data_node &parentnode)
 {
 	// iterate over ports
-	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
+	for (input_type_entry &entry : m_typelist)
 	{
 		// only save if this port is a type we save
-		if (save_this_input_field_type(entry->type()))
+		if (save_this_input_field_type(entry.type()))
 		{
 			// see if any of the sequences have changed
 			input_seq_type seqtype;
 			for (seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-				if (entry->seq(seqtype) != entry->defseq(seqtype))
+				if (entry.seq(seqtype) != entry.defseq(seqtype))
 					break;
 
 			// if so, we need to add a node
 			if (seqtype < SEQ_TYPE_TOTAL)
 			{
 				// add a new port node
-				xml_data_node *portnode = xml_add_child(parentnode, "port", nullptr);
+				util::xml::data_node *const portnode = parentnode.add_child("port", nullptr);
 				if (portnode != nullptr)
 				{
 					// add the port information and attributes
-					xml_set_attribute(portnode, "type", input_type_to_token(entry->type(), entry->player()).c_str());
+					portnode->set_attribute("type", input_type_to_token(entry.type(), entry.player()).c_str());
 
 					// add only the sequences that have changed from the defaults
 					for (input_seq_type type = SEQ_TYPE_STANDARD; type < SEQ_TYPE_TOTAL; ++type)
-						if (entry->seq(type) != entry->defseq(type))
-							save_sequence(portnode, type, entry->type(), entry->seq(type));
+						if (entry.seq(type) != entry.defseq(type))
+							save_sequence(*portnode, type, entry.type(), entry.seq(type));
 				}
 			}
 		}
@@ -3250,72 +2394,72 @@ void ioport_manager::save_default_inputs(xml_data_node *parentnode)
 //  mappings that have changed
 //-------------------------------------------------
 
-void ioport_manager::save_game_inputs(xml_data_node *parentnode)
+void ioport_manager::save_game_inputs(util::xml::data_node &parentnode)
 {
 	// iterate over ports
-	for (ioport_port *port = first_port(); port != nullptr; port = port->next())
-		for (ioport_field *field = port->first_field(); field != nullptr; field = field->next())
-			if (save_this_input_field_type(field->type()))
+	for (auto &port : m_portlist)
+		for (ioport_field &field : port.second->fields())
+			if (save_this_input_field_type(field.type()))
 			{
 				// determine if we changed
 				bool changed = false;
 				for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-					changed |= (field->seq(seqtype) != field->defseq(seqtype));
+					changed |= (field.seq(seqtype) != field.defseq(seqtype));
 
 				// non-analog changes
-				if (!field->is_analog())
+				if (!field.is_analog())
 				{
-					changed |= ((field->live().value & field->mask()) != (field->defvalue() & field->mask()));
-					changed |= (field->live().toggle != field->toggle());
+					changed |= ((field.live().value & field.mask()) != (field.defvalue() & field.mask()));
+					changed |= (field.live().toggle != field.toggle());
 				}
 
 				// analog changes
 				else
 				{
-					changed |= (field->live().analog->m_delta != field->delta());
-					changed |= (field->live().analog->m_centerdelta != field->centerdelta());
-					changed |= (field->live().analog->m_sensitivity != field->sensitivity());
-					changed |= (field->live().analog->m_reverse != field->analog_reverse());
+					changed |= (field.live().analog->m_delta != field.delta());
+					changed |= (field.live().analog->m_centerdelta != field.centerdelta());
+					changed |= (field.live().analog->m_sensitivity != field.sensitivity());
+					changed |= (field.live().analog->m_reverse != field.analog_reverse());
 				}
 
 				// if we did change, add a new node
 				if (changed)
 				{
 					// add a new port node
-					xml_data_node *portnode = xml_add_child(parentnode, "port", nullptr);
+					util::xml::data_node *const portnode = parentnode.add_child("port", nullptr);
 					if (portnode != nullptr)
 					{
 						// add the identifying information and attributes
-						xml_set_attribute(portnode, "tag", port->tag());
-						xml_set_attribute(portnode, "type", input_type_to_token(field->type(), field->player()).c_str());
-						xml_set_attribute_int(portnode, "mask", field->mask());
-						xml_set_attribute_int(portnode, "defvalue", field->defvalue() & field->mask());
+						portnode->set_attribute("tag", port.second->tag());
+						portnode->set_attribute("type", input_type_to_token(field.type(), field.player()).c_str());
+						portnode->set_attribute_int("mask", field.mask());
+						portnode->set_attribute_int("defvalue", field.defvalue() & field.mask());
 
 						// add sequences if changed
 						for (input_seq_type seqtype = SEQ_TYPE_STANDARD; seqtype < SEQ_TYPE_TOTAL; ++seqtype)
-							if (field->seq(seqtype) != field->defseq(seqtype))
-								save_sequence(portnode, seqtype, field->type(), field->seq(seqtype));
+							if (field.seq(seqtype) != field.defseq(seqtype))
+								save_sequence(*portnode, seqtype, field.type(), field.seq(seqtype));
 
 						// write out non-analog changes
-						if (!field->is_analog())
+						if (!field.is_analog())
 						{
-							if ((field->live().value & field->mask()) != (field->defvalue() & field->mask()))
-								xml_set_attribute_int(portnode, "value", field->live().value & field->mask());
-							if (field->live().toggle != field->toggle())
-								xml_set_attribute(portnode, "toggle", field->live().toggle ? "yes" : "no");
+							if ((field.live().value & field.mask()) != (field.defvalue() & field.mask()))
+								portnode->set_attribute_int("value", field.live().value & field.mask());
+							if (field.live().toggle != field.toggle())
+								portnode->set_attribute("toggle", field.live().toggle ? "yes" : "no");
 						}
 
 						// write out analog changes
 						else
 						{
-							if (field->live().analog->m_delta != field->delta())
-								xml_set_attribute_int(portnode, "keydelta", field->live().analog->m_delta);
-							if (field->live().analog->m_centerdelta != field->centerdelta())
-								xml_set_attribute_int(portnode, "centerdelta", field->live().analog->m_centerdelta);
-							if (field->live().analog->m_sensitivity != field->sensitivity())
-								xml_set_attribute_int(portnode, "sensitivity", field->live().analog->m_sensitivity);
-							if (field->live().analog->m_reverse != field->analog_reverse())
-								xml_set_attribute(portnode, "reverse", field->live().analog->m_reverse ? "yes" : "no");
+							if (field.live().analog->m_delta != field.delta())
+								portnode->set_attribute_int("keydelta", field.live().analog->m_delta);
+							if (field.live().analog->m_centerdelta != field.centerdelta())
+								portnode->set_attribute_int("centerdelta", field.live().analog->m_centerdelta);
+							if (field.live().analog->m_sensitivity != field.sensitivity())
+								portnode->set_attribute_int("sensitivity", field.live().analog->m_sensitivity);
+							if (field.live().analog->m_reverse != field.analog_reverse())
+								portnode->set_attribute("reverse", field.live().analog->m_reverse ? "yes" : "no");
 						}
 					}
 				}
@@ -3336,7 +2480,7 @@ void ioport_manager::save_game_inputs(xml_data_node *parentnode)
 template<typename _Type>
 _Type ioport_manager::playback_read(_Type &result)
 {
-	// protect against NULL handles if previous reads fail
+	// protect against nullptr handles if previous reads fail
 	if (!m_playback_file.is_open())
 		result = 0;
 
@@ -3349,18 +2493,18 @@ _Type ioport_manager::playback_read(_Type &result)
 
 	// return the appropriate value
 	else if (sizeof(result) == 8)
-		result = LITTLE_ENDIANIZE_INT64(result);
+		result = little_endianize_int64(result);
 	else if (sizeof(result) == 4)
-		result = LITTLE_ENDIANIZE_INT32(result);
+		result = little_endianize_int32(result);
 	else if (sizeof(result) == 2)
-		result = LITTLE_ENDIANIZE_INT16(result);
+		result = little_endianize_int16(result);
 	return result;
 }
 
 template<>
 bool ioport_manager::playback_read<bool>(bool &result)
 {
-	UINT8 temp;
+	u8 temp;
 	playback_read(temp);
 	return result = bool(temp);
 }
@@ -3378,29 +2522,29 @@ time_t ioport_manager::playback_init()
 		return 0;
 
 	// open the playback file
-	file_error filerr = m_playback_file.open(filename);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for playback");
+	osd_file::error filerr = m_playback_file.open(filename);
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for playback");
 
 	// read the header and verify that it is a modern version; if not, print an error
-	UINT8 header[INP_HEADER_SIZE];
-	if (m_playback_file.read(header, sizeof(header)) != sizeof(header))
+	inp_header header;
+	if (!header.read(m_playback_file))
 		fatalerror("Input file is corrupt or invalid (missing header)\n");
-	if (memcmp(header, "MAMEINP\0", 8) != 0)
+	if (!header.check_magic())
 		fatalerror("Input file invalid or in an older, unsupported format\n");
-	if (header[0x10] != INP_HEADER_MAJVERSION)
+	if (header.get_majversion() != inp_header::MAJVERSION)
 		fatalerror("Input file format version mismatch\n");
 
 	// output info to console
 	osd_printf_info("Input file: %s\n", filename);
-	osd_printf_info("INP version %d.%d\n", header[0x10], header[0x11]);
-	time_t basetime = header[0x08] | (header[0x09] << 8) | (header[0x0a] << 16) | (header[0x0b] << 24) |
-						((UINT64)header[0x0c] << 32) | ((UINT64)header[0x0d] << 40) | ((UINT64)header[0x0e] << 48) | ((UINT64)header[0x0f] << 56);
+	osd_printf_info("INP version %u.%u\n", header.get_majversion(), header.get_minversion());
+	time_t basetime = header.get_basetime();
 	osd_printf_info("Created %s\n", ctime(&basetime));
-	osd_printf_info("Recorded using %s\n", header + 0x20);
+	osd_printf_info("Recorded using %s\n", header.get_appdesc().c_str());
 
 	// verify the header against the current game
-	if (memcmp(machine().system().name, header + 0x14, strlen(machine().system().name) + 1) != 0)
-		osd_printf_info("Input file is for %s '%s', not for current %s '%s'\n", emulator_info::get_gamenoun(), header + 0x14, emulator_info::get_gamenoun(), machine().system().name);
+	std::string const sysname = header.get_sysname();
+	if (sysname != machine().system().name)
+		osd_printf_info("Input file is for machine '%s', not for current machine '%s'\n", sysname.c_str(), machine().system().name);
 
 	// enable compression
 	m_playback_file.compress(FCOMPRESS_MEDIUM);
@@ -3425,9 +2569,16 @@ void ioport_manager::playback_end(const char *message)
 			machine().popmessage("Playback Ended\nReason: %s", message);
 
 		// display speed stats
-		m_playback_accumulated_speed /= m_playback_accumulated_frames;
-		osd_printf_info("Total playback frames: %d\n", UINT32(m_playback_accumulated_frames));
-		osd_printf_info("Average recorded speed: %d%%\n", UINT32((m_playback_accumulated_speed * 200 + 1) >> 21));
+		if (m_playback_accumulated_speed > 0)
+			m_playback_accumulated_speed /= m_playback_accumulated_frames;
+		osd_printf_info("Total playback frames: %d\n", u32(m_playback_accumulated_frames));
+		osd_printf_info("Average recorded speed: %d%%\n", u32((m_playback_accumulated_speed * 200 + 1) >> 21));
+
+		// close the program at the end of inp file playback
+		if (machine().options().exit_after_playback()) {
+			osd_printf_info("Exiting MAME now...\n");
+			machine().schedule_exit();
+		}
 	}
 }
 
@@ -3452,7 +2603,7 @@ void ioport_manager::playback_frame(const attotime &curtime)
 			playback_end("Out of sync");
 
 		// then the speed
-		UINT32 curspeed;
+		u32 curspeed;
 		m_playback_accumulated_speed += playback_read(curspeed);
 		m_playback_accumulated_frames++;
 	}
@@ -3473,15 +2624,15 @@ void ioport_manager::playback_port(ioport_port &port)
 		playback_read(port.live().digital);
 
 		// loop over analog ports and save their data
-		for (analog_field *analog = port.live().analoglist.first(); analog != nullptr; analog = analog->next())
+		for (analog_field &analog : port.live().analoglist)
 		{
 			// read current and previous values
-			playback_read(analog->m_accum);
-			playback_read(analog->m_previous);
+			playback_read(analog.m_accum);
+			playback_read(analog.m_previous);
 
 			// read configuration information
-			playback_read(analog->m_sensitivity);
-			playback_read(analog->m_reverse);
+			playback_read(analog.m_sensitivity);
+			playback_read(analog.m_reverse);
 		}
 	}
 }
@@ -3494,7 +2645,7 @@ void ioport_manager::playback_port(ioport_port &port)
 template<typename _Type>
 void ioport_manager::record_write(_Type value)
 {
-	// protect against NULL handles if previous reads fail
+	// protect against nullptr handles if previous reads fail
 	if (!m_record_file.is_open())
 		return;
 
@@ -3506,8 +2657,31 @@ void ioport_manager::record_write(_Type value)
 template<>
 void ioport_manager::record_write<bool>(bool value)
 {
-	UINT8 byte = UINT8(value);
+	u8 byte = u8(value);
 	record_write(byte);
+}
+
+template<typename _Type>
+void ioport_manager::timecode_write(_Type value)
+{
+	// protect against nullptr handles if previous reads fail
+	if (!m_timecode_file.is_open())
+		return;
+
+	// read the value; if we fail, end playback
+	if (m_timecode_file.write(&value, sizeof(value)) != sizeof(value))
+		timecode_end("Out of space");
+}
+
+/*template<>
+void ioport_manager::timecode_write<bool>(bool value)
+{
+    u8 byte = u8(value);
+    timecode_write(byte);
+}*/
+template<>
+void ioport_manager::timecode_write<std::string>(std::string value) {
+	timecode_write(value.c_str());
 }
 
 
@@ -3523,36 +2697,66 @@ void ioport_manager::record_init()
 		return;
 
 	// open the record file
-	file_error filerr = m_record_file.open(filename);
-	assert_always(filerr == FILERR_NONE, "Failed to open file for recording");
+	osd_file::error filerr = m_record_file.open(filename);
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for recording");
 
 	// get the base time
 	system_time systime;
 	machine().base_datetime(systime);
 
 	// fill in the header
-	UINT8 header[INP_HEADER_SIZE] = { 0 };
-	memcpy(header, "MAMEINP\0", 8);
-	header[0x08] = systime.time >> 0;
-	header[0x09] = systime.time >> 8;
-	header[0x0a] = systime.time >> 16;
-	header[0x0b] = systime.time >> 24;
-	header[0x0c] = systime.time >> 32;
-	header[0x0d] = systime.time >> 40;
-	header[0x0e] = systime.time >> 48;
-	header[0x0f] = systime.time >> 56;
-	header[0x10] = INP_HEADER_MAJVERSION;
-	header[0x11] = INP_HEADER_MINVERSION;
-	strcpy((char *)header + 0x14, machine().system().name);
-	sprintf((char *)header + 0x20, "%s %s", emulator_info::get_appname(), build_version);
+	inp_header header;
+	header.set_magic();
+	header.set_basetime(systime.time);
+	header.set_version();
+	header.set_sysname(machine().system().name);
+	header.set_appdesc(util::string_format("%s %s", emulator_info::get_appname(), emulator_info::get_build_version()));
 
 	// write it
-	m_record_file.write(header, sizeof(header));
+	header.write(m_record_file);
 
 	// enable compression
 	m_record_file.compress(FCOMPRESS_MEDIUM);
 }
 
+
+void ioport_manager::timecode_init() {
+	// check if option -record_timecode is enabled
+	if (!machine().options().record_timecode()) {
+		machine().video().set_timecode_enabled(false);
+		return;
+	}
+	// if no file, nothing to do
+	const char *record_filename = machine().options().record();
+	if (record_filename[0] == 0) {
+		machine().video().set_timecode_enabled(false);
+		return;
+	}
+
+	machine().video().set_timecode_enabled(true);
+
+	// open the record file
+	std::string filename;
+	filename.append(record_filename).append(".timecode");
+	osd_printf_info("Record input timecode file: %s\n", record_filename);
+
+	osd_file::error filerr = m_timecode_file.open(filename.c_str());
+	assert_always(filerr == osd_file::error::NONE, "Failed to open file for input timecode recording");
+
+	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
+	m_timecode_file.puts(std::string("# TIMECODE FILE FOR VIDEO PREVIEW GENERATION\n").c_str());
+	m_timecode_file.puts(std::string("# ==========================================\n").c_str());
+	m_timecode_file.puts(std::string("#\n").c_str());
+	m_timecode_file.puts(std::string("# VIDEO_PART:     code of video timecode\n").c_str());
+	m_timecode_file.puts(std::string("# START:          start time (hh:mm:ss.mmm)\n").c_str());
+	m_timecode_file.puts(std::string("# ELAPSED:        elapsed time (hh:mm:ss.mmm)\n").c_str());
+	m_timecode_file.puts(std::string("# MSEC_START:     start time (milliseconds)\n").c_str());
+	m_timecode_file.puts(std::string("# MSEC_ELAPSED:   elapsed time (milliseconds)\n").c_str());
+	m_timecode_file.puts(std::string("# FRAME_START:    start time (frames)\n").c_str());
+	m_timecode_file.puts(std::string("# FRAME_ELAPSED:  elapsed time (frames)\n").c_str());
+	m_timecode_file.puts(std::string("#\n").c_str());
+	m_timecode_file.puts(std::string("# VIDEO_PART======= START======= ELAPSED===== MSEC_START===== MSEC_ELAPSED=== FRAME_START==== FRAME_ELAPSED==\n").c_str());
+}
 
 //-------------------------------------------------
 //  record_end - end INP recording
@@ -3573,6 +2777,19 @@ void ioport_manager::record_end(const char *message)
 }
 
 
+void ioport_manager::timecode_end(const char *message)
+{
+	// only applies if we have a live file
+	if (m_timecode_file.is_open()) {
+		// close the file
+		m_timecode_file.close();
+
+		// pop a message
+		if (message != nullptr)
+			machine().popmessage("Recording Timecode Ended\nReason: %s", message);
+	}
+}
+
 //-------------------------------------------------
 //  record_frame - start of frame callback for
 //  recording
@@ -3588,7 +2805,98 @@ void ioport_manager::record_frame(const attotime &curtime)
 		record_write(curtime.attoseconds());
 
 		// then the current speed
-		record_write(UINT32(machine().video().speed_percent() * double(1 << 20)));
+		record_write(u32(machine().video().speed_percent() * double(1 << 20)));
+	}
+
+	if (m_timecode_file.is_open() && machine().video().get_timecode_write())
+	{
+		// Display the timecode
+		m_timecode_count++;
+		std::string const current_time_str = string_format("%02d:%02d:%02d.%03d",
+				(int)curtime.seconds() / (60 * 60),
+				(curtime.seconds() / 60) % 60,
+				curtime.seconds() % 60,
+				(int)(curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+
+		// Elapsed from previous timecode
+		attotime const elapsed_time = curtime - m_timecode_last_time;
+		m_timecode_last_time = curtime;
+		std::string const elapsed_time_str = string_format("%02d:%02d:%02d.%03d",
+				elapsed_time.seconds() / (60 * 60),
+				(elapsed_time.seconds() / 60) % 60,
+				elapsed_time.seconds() % 60,
+				int(elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND));
+
+		// Number of ms from beginning of playback
+		int const mseconds_start = curtime.seconds()*1000 + curtime.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
+		std::string const mseconds_start_str = string_format("%015d", mseconds_start);
+
+		// Number of ms from previous timecode
+		int mseconds_elapsed = elapsed_time.seconds()*1000 + elapsed_time.attoseconds()/ATTOSECONDS_PER_MILLISECOND;
+		std::string const mseconds_elapsed_str = string_format("%015d", mseconds_elapsed);
+
+		// Number of frames from beginning of playback
+		int const frame_start = mseconds_start * 60 / 1000;
+		std::string const frame_start_str = string_format("%015d", frame_start);
+
+		// Number of frames from previous timecode
+		int frame_elapsed = mseconds_elapsed * 60 / 1000;
+		std::string const frame_elapsed_str = string_format("%015d", frame_elapsed);
+
+		std::string message;
+		std::string timecode_text;
+		std::string timecode_key;
+		bool show_timecode_counter = false;
+		if (m_timecode_count==1) {
+			message = string_format("TIMECODE: Intro started at %s", current_time_str);
+			timecode_key = "INTRO_START";
+			timecode_text = "INTRO";
+			show_timecode_counter = true;
+		}
+		else if (m_timecode_count==2) {
+			machine().video().add_to_total_time(elapsed_time);
+			message = string_format("TIMECODE: Intro duration %s", elapsed_time_str);
+			timecode_key = "INTRO_STOP";
+			//timecode_text = "INTRO";
+		}
+		else if (m_timecode_count==3) {
+			message = string_format("TIMECODE: Gameplay started at %s", current_time_str);
+			timecode_key = "GAMEPLAY_START";
+			timecode_text = "GAMEPLAY";
+			show_timecode_counter = true;
+		}
+		else if (m_timecode_count==4) {
+			machine().video().add_to_total_time(elapsed_time);
+			message = string_format("TIMECODE: Gameplay duration %s", elapsed_time_str);
+			timecode_key = "GAMEPLAY_STOP";
+			//timecode_text = "GAMEPLAY";
+		}
+		else if (m_timecode_count % 2 == 1) {
+			message = string_format("TIMECODE: Extra %d started at %s", (m_timecode_count-3)/2, current_time_str);
+			timecode_key = string_format("EXTRA_START_%03d", (m_timecode_count-3)/2);
+			timecode_text = string_format("EXTRA %d", (m_timecode_count-3)/2);
+			show_timecode_counter = true;
+		}
+		else {
+			machine().video().add_to_total_time(elapsed_time);
+			message = string_format("TIMECODE: Extra %d duration %s", (m_timecode_count-4)/2, elapsed_time_str);
+			timecode_key = string_format("EXTRA_STOP_%03d", (m_timecode_count-4)/2);
+		}
+
+		osd_printf_info("%s \n", message.c_str());
+		machine().popmessage("%s \n", message.c_str());
+
+		m_timecode_file.printf(
+				"%-19s %s %s %s %s %s %s\n",
+				timecode_key.c_str(),
+				current_time_str.c_str(), elapsed_time_str.c_str(),
+				mseconds_start_str.c_str(), mseconds_elapsed_str.c_str(),
+				frame_start_str.c_str(), frame_elapsed_str.c_str());
+
+		machine().video().set_timecode_write(false);
+		machine().video().set_timecode_text(timecode_text);
+		machine().video().set_timecode_start(m_timecode_last_time);
+		machine().ui().set_show_timecode_counter(show_timecode_counter);
 	}
 }
 
@@ -3607,15 +2915,15 @@ void ioport_manager::record_port(ioport_port &port)
 		record_write(port.live().digital);
 
 		// loop over analog ports and save their data
-		for (analog_field *analog = port.live().analoglist.first(); analog != nullptr; analog = analog->next())
+		for (analog_field &analog : port.live().analoglist)
 		{
 			// store current and previous values
-			record_write(analog->m_accum);
-			record_write(analog->m_previous);
+			record_write(analog.m_accum);
+			record_write(analog.m_previous);
 
 			// store configuration information
-			record_write(analog->m_sensitivity);
-			record_write(analog->m_reverse);
+			record_write(analog.m_sensitivity);
+			record_write(analog.m_reverse);
 		}
 	}
 }
@@ -3653,23 +2961,23 @@ const char *ioport_configurer::string_from_token(const char *string)
 		return nullptr;
 
 	// if the index is greater than the count, assume it to be a pointer
-	if (FPTR(string) >= INPUT_STRING_COUNT)
+	if (uintptr_t(string) >= INPUT_STRING_COUNT)
 		return string;
 
-#if FALSE // Set TRUE, If you want to take care missing-token or wrong-sorting
+#if false // Set true, If you want to take care missing-token or wrong-sorting
 
 	// otherwise, scan the list for a matching string and return it
 	{
 	int index;
 	for (index = 0; index < ARRAY_LENGTH(input_port_default_strings); index++)
-		if (input_port_default_strings[index].id == FPTR(string))
+		if (input_port_default_strings[index].id == uintptr_t(string))
 			return input_port_default_strings[index].string;
 	}
 	return "(Unknown Default)";
 
 #else
 
-	return input_port_default_strings[FPTR(string)-1].string;
+	return input_port_default_strings[uintptr_t(string)-1].string;
 
 #endif
 }
@@ -3679,15 +2987,18 @@ const char *ioport_configurer::string_from_token(const char *string)
 //  port_alloc - allocate a new port
 //-------------------------------------------------
 
-void ioport_configurer::port_alloc(const char *tag)
+ioport_configurer& ioport_configurer::port_alloc(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
 
 	// add it to the list, and reset current field/setting
-	m_curport = &m_portlist.append(fulltag.c_str(), *global_alloc(ioport_port(m_owner, fulltag.c_str())));
+	if (m_portlist.count(fulltag) != 0) throw tag_add_exception(fulltag.c_str());
+	m_portlist.emplace(std::make_pair(fulltag, std::make_unique<ioport_port>(m_owner, fulltag.c_str())));
+	m_curport = m_portlist.find(fulltag)->second.get();
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3696,13 +3007,13 @@ void ioport_configurer::port_alloc(const char *tag)
 //  modify it
 //-------------------------------------------------
 
-void ioport_configurer::port_modify(const char *tag)
+ioport_configurer& ioport_configurer::port_modify(const char *tag)
 {
 	// create the full tag
 	std::string fulltag = m_owner.subtag(tag);
 
 	// find the existing port
-	m_curport = m_portlist.find(fulltag.c_str());
+	m_curport = m_portlist.find(fulltag.c_str())->second.get();
 	if (m_curport == nullptr)
 		throw emu_fatalerror("Requested to modify nonexistent port '%s'", fulltag.c_str());
 
@@ -3710,6 +3021,7 @@ void ioport_configurer::port_modify(const char *tag)
 	m_curport->m_modcount++;
 	m_curfield = nullptr;
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3717,7 +3029,7 @@ void ioport_configurer::port_modify(const char *tag)
 //  field_alloc - allocate a new field
 //-------------------------------------------------
 
-void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
+ioport_configurer& ioport_configurer::field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name)
 {
 	// make sure we have a port
 	if (m_curport == nullptr)
@@ -3729,6 +3041,7 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 
 	// reset the current setting
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3736,13 +3049,13 @@ void ioport_configurer::field_alloc(ioport_type type, ioport_value defval, iopor
 //  field_add_char - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_char(unicode_char ch)
+ioport_configurer& ioport_configurer::field_add_char(char32_t ch)
 {
 	for (int index = 0; index < ARRAY_LENGTH(m_curfield->m_chars); index++)
 		if (m_curfield->m_chars[index] == 0)
 		{
 			m_curfield->m_chars[index] = ch;
-			return;
+			return *this;
 		}
 
 	throw emu_fatalerror("PORT_CHAR(%d) could not be added - maximum amount exceeded\n", ch);
@@ -3753,9 +3066,10 @@ void ioport_configurer::field_add_char(unicode_char ch)
 //  field_add_code - add a character to a field
 //-------------------------------------------------
 
-void ioport_configurer::field_add_code(input_seq_type which, input_code code)
+ioport_configurer& ioport_configurer::field_add_code(input_seq_type which, input_code code)
 {
 	m_curfield->m_seq[which] |= code;
+	return *this;
 }
 
 
@@ -3763,7 +3077,7 @@ void ioport_configurer::field_add_code(input_seq_type which, input_code code)
 //  setting_alloc - allocate a new setting
 //-------------------------------------------------
 
-void ioport_configurer::setting_alloc(ioport_value value, const char *name)
+ioport_configurer& ioport_configurer::setting_alloc(ioport_value value, const char *name)
 {
 	// make sure we have a field
 	if (m_curfield == nullptr)
@@ -3772,6 +3086,7 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 	m_cursetting = global_alloc(ioport_setting(*m_curfield, value & m_curfield->mask(), string_from_token(name)));
 	// append a new setting
 	m_curfield->m_settinglist.append(*m_cursetting);
+	return *this;
 }
 
 
@@ -3780,10 +3095,11 @@ void ioport_configurer::setting_alloc(ioport_value value, const char *name)
 //  the current setting or field
 //-------------------------------------------------
 
-void ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
+ioport_configurer& ioport_configurer::set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value)
 {
 	ioport_condition &target = (m_cursetting != nullptr) ? m_cursetting->condition() : m_curfield->condition();
 	target.set(condition, tag, mask, value);
+	return *this;
 }
 
 
@@ -3791,7 +3107,7 @@ void ioport_configurer::set_condition(ioport_condition::condition_t condition, c
 //  onoff_alloc - allocate an on/off DIP switch
 //-------------------------------------------------
 
-void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
+ioport_configurer& ioport_configurer::onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation)
 {
 	// allocate a field normally
 	field_alloc(IPT_DIPSWITCH, defval, mask, name);
@@ -3812,6 +3128,7 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 	setting_alloc(~defval & mask, DEF_STR(On));
 	// clear cursettings set by setting_alloc
 	m_cursetting = nullptr;
+	return *this;
 }
 
 
@@ -3819,31 +3136,6 @@ void ioport_configurer::onoff_alloc(const char *name, ioport_value defval, iopor
 /***************************************************************************
     MISCELLANEOUS
 ***************************************************************************/
-
-//-------------------------------------------------
-//  find - look up information about a particular
-//  character
-//-------------------------------------------------
-
-const char_info *char_info::find(unicode_char target)
-{
-	// perform a simple binary search to find the proper alternate
-	int low = 0;
-	int high = ARRAY_LENGTH(charinfo);
-	while (high > low)
-	{
-		int middle = (high + low) / 2;
-		unicode_char ch = charinfo[middle].ch;
-		if (ch < target)
-			low = middle + 1;
-		else if (ch > target)
-			high = middle;
-		else
-			return &charinfo[middle];
-	}
-	return nullptr;
-}
-
 
 //-------------------------------------------------
 //  dynamic_field - constructor
@@ -4090,12 +3382,12 @@ analog_field::analog_field(ioport_field &field)
 //  the appropriate min/max for the analog control
 //-------------------------------------------------
 
-inline INT32 analog_field::apply_min_max(INT32 value) const
+inline s32 analog_field::apply_min_max(s32 value) const
 {
 	// take the analog minimum and maximum values and apply the inverse of the
 	// sensitivity so that we can clamp against them before applying sensitivity
-	INT32 adjmin = apply_inverse_sensitivity(m_minimum);
-	INT32 adjmax = apply_inverse_sensitivity(m_maximum);
+	s32 adjmin = apply_inverse_sensitivity(m_minimum);
+	s32 adjmax = apply_inverse_sensitivity(m_maximum);
 
 	// for absolute devices, clamp to the bounds absolutely
 	if (!m_wraps)
@@ -4109,7 +3401,7 @@ inline INT32 analog_field::apply_min_max(INT32 value) const
 	// for relative devices, wrap around when we go past the edge
 	else
 	{
-		INT32 range = adjmax - adjmin;
+		s32 range = adjmax - adjmin;
 		// rolls to other end when 1 position past end.
 		value = (value - adjmin) % range;
 		if (value < 0)
@@ -4126,9 +3418,9 @@ inline INT32 analog_field::apply_min_max(INT32 value) const
 //  adjustment for a current value
 //-------------------------------------------------
 
-inline INT32 analog_field::apply_sensitivity(INT32 value) const
+inline s32 analog_field::apply_sensitivity(s32 value) const
 {
-	return INT32((INT64(value) * m_sensitivity) / 100.0 + 0.5);
+	return s32((s64(value) * m_sensitivity) / 100.0 + 0.5);
 }
 
 
@@ -4137,9 +3429,9 @@ inline INT32 analog_field::apply_sensitivity(INT32 value) const
 //  sensitivity adjustment for a current value
 //-------------------------------------------------
 
-inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
+inline s32 analog_field::apply_inverse_sensitivity(s32 value) const
 {
-	return INT32((INT64(value) * 100) / m_sensitivity);
+	return s32((s64(value) * 100) / m_sensitivity);
 }
 
 
@@ -4148,7 +3440,7 @@ inline INT32 analog_field::apply_inverse_sensitivity(INT32 value) const
 //  analog input
 //-------------------------------------------------
 
-INT32 analog_field::apply_settings(INT32 value) const
+s32 analog_field::apply_settings(s32 value) const
 {
 	// apply the min/max and then the sensitivity
 	value = apply_min_max(value);
@@ -4185,7 +3477,7 @@ void analog_field::frame_update(running_machine &machine)
 
 	// get the new raw analog value and its type
 	input_item_class itemclass;
-	INT32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
+	s32 rawvalue = machine.input().seq_axis_value(m_field.seq(SEQ_TYPE_STANDARD), itemclass);
 
 	// if we got an absolute input, it overrides everything else
 	if (itemclass == ITEM_CLASS_ABSOLUTE)
@@ -4211,7 +3503,7 @@ void analog_field::frame_update(running_machine &machine)
 				rawvalue = apply_scale(rawvalue - INPUT_ABSOLUTE_MIN, m_positionalscale) * INPUT_RELATIVE_PER_PIXEL + m_minimum;
 
 				// clamp the high value so it does not roll over
-				rawvalue = MIN(rawvalue, m_maximum);
+				rawvalue = std::min(rawvalue, m_maximum);
 				m_accum = apply_inverse_sensitivity(rawvalue);
 			}
 			else
@@ -4233,14 +3525,14 @@ void analog_field::frame_update(running_machine &machine)
 
 	// if we got it from a relative device, use that as the starting delta
 	// also note that the last input was not a digital one
-	INT32 delta = 0;
+	s32 delta = 0;
 	if (itemclass == ITEM_CLASS_RELATIVE && rawvalue != 0)
 	{
 		delta = rawvalue;
 		m_lastdigital = false;
 	}
 
-	INT64 keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
+	s64 keyscale = (m_accum >= 0) ? m_keyscalepos : m_keyscaleneg;
 
 	// if the decrement code sequence is pressed, add the key delta to
 	// the accumulated delta; also note that the last input was a digital one
@@ -4283,7 +3575,7 @@ void analog_field::frame_update(running_machine &machine)
 	// was pressed, apply autocentering
 	if (m_autocenter)
 	{
-		INT32 center = apply_inverse_sensitivity(m_center);
+		s32 center = apply_inverse_sensitivity(m_center);
 		if (m_lastdigital && !keypressed)
 		{
 			// autocenter from positive values
@@ -4326,7 +3618,7 @@ void analog_field::read(ioport_value &result)
 		return;
 
 	// start with the raw value
-	INT32 value = m_accum;
+	s32 value = m_accum;
 
 	// interpolate if appropriate and if time has passed since the last update
 	if (m_interpolate)
@@ -4355,7 +3647,7 @@ void analog_field::read(ioport_value &result)
 
 float analog_field::crosshair_read()
 {
-	INT32 rawvalue = apply_settings(m_accum) & (m_field.mask() >> m_shift);
+	s32 rawvalue = apply_settings(m_accum) & (m_field.mask() >> m_shift);
 	return float(rawvalue - m_adjmin) / float(m_adjmax - m_adjmin);
 }
 
@@ -4378,11 +3670,11 @@ ioport_type ioport_manager::token_to_input_type(const char *string, int &player)
 		return ioport_type(ipnum);
 
 	// find the token in the list
-	for (input_type_entry *entry = m_typelist.first(); entry != nullptr; entry = entry->next())
-		if (entry->token() != nullptr && !strcmp(entry->token(), string))
+	for (input_type_entry &entry : m_typelist)
+		if (entry.token() != nullptr && !strcmp(entry.token(), string))
 		{
-			player = entry->player();
-			return entry->type();
+			player = entry.player();
+			return entry.type();
 		}
 
 	// if we fail, return IPT_UNKNOWN
@@ -4404,7 +3696,7 @@ std::string ioport_manager::input_type_to_token(ioport_type type, int player)
 		return std::string(entry->token());
 
 	// if that fails, carry on
-	return strformat("TYPE_OTHER(%d,%d)", type, player);
+	return string_format("TYPE_OTHER(%d,%d)", type, player);
 }
 
 
@@ -4421,43 +3713,3 @@ input_seq_type ioport_manager::token_to_seq_type(const char *string)
 			return input_seq_type(seqindex);
 	return SEQ_TYPE_INVALID;
 }
-
-
-
-//-------------------------------------------------
-//  validate_natural_keyboard_statics -
-//  validates natural keyboard static data
-//-------------------------------------------------
-
-/*
-int validate_natural_keyboard_statics(void)
-{
-    int i;
-    int error = FALSE;
-    unicode_char last_char = 0;
-    const char_info *ci;
-
-    // check to make sure that charinfo is in order
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-    {
-        if (last_char >= charinfo[i].ch)
-        {
-            osd_printf_error("inputx: charinfo is out of order; 0x%08x should be higher than 0x%08x\n", charinfo[i].ch, last_char);
-            error = TRUE;
-        }
-        last_char = charinfo[i].ch;
-    }
-
-    // check to make sure that I can look up everything on alternate_charmap
-    for (i = 0; i < ARRAY_LENGTH(charinfo); i++)
-    {
-        ci = char_info::find(charinfo[i].ch);
-        if (ci != &charinfo[i])
-        {
-            osd_printf_error("ioport: expected char_info::find(0x%08x) to work properly\n", charinfo[i].ch);
-            error = TRUE;
-        }
-    }
-    return error;
-}
-*/

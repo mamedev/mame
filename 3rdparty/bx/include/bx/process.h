@@ -9,16 +9,16 @@
 #include "string.h"
 #include "uint32_t.h"
 
-#if BX_PLATFORM_LINUX
+#if BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 #	include <unistd.h>
-#endif // BX_PLATFORM_LINUX
+#endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 
 namespace bx
 {
 	///
 	inline void* exec(const char* const* _argv)
 	{
-#if BX_PLATFORM_LINUX
+#if BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 		pid_t pid = fork();
 
 		if (0 == pid)
@@ -72,7 +72,7 @@ namespace bx
 		return NULL;
 #else
 		return NULL;
-#endif // BX_PLATFORM_LINUX
+#endif // BX_PLATFORM_LINUX || BX_PLATFORM_HURD
 	}
 
 } // namespace bx

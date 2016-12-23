@@ -1,0 +1,135 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0" green="0" blue="0" /></rect></element>
+	<element name="static_white"><rect><color red="0.75" green="0.76" blue="0.75" /></rect></element>
+	<element name="disk_white"><disk><color red="0.75" green="0.76" blue="0.75" /></disk></element>
+	<element name="static_green"><rect><color red="0.35" green="0.59" blue="0.32" /></rect></element>
+	<element name="disk_green"><disk><color red="0.35" green="0.59" blue="0.32" /></disk></element>
+	<element name="static_green2"><rect><color red="0.18" green="0.46" blue="0.37" /></rect></element>
+
+	<element name="text_score"><text string="SCORE"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.2" blue="0.23" /></led7seg>
+	</element>
+
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.2" green="0.04" blue="0.046" /></disk>
+		<disk state="1"><color red="1.0" green="0.2" blue="0.23" /></disk>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="2.5" right="33.5" top="5.7" bottom="40.3" />
+
+	<!-- bezel -->
+
+		<bezel element="static_green"><bounds x="5" y="5" width="25" height="35" /></bezel>
+
+		<!-- middle -->
+		<bezel element="static_white"><bounds x="5" y="22.85" width="25" height="0.3" /></bezel>
+		<bezel element="disk_white"><bounds x="15.5" y="20.5" width="5" height="5" /></bezel>
+		<bezel element="disk_green"><bounds x="15.8" y="20.8" width="4.4" height="4.4" /></bezel>
+
+		<!-- penalty area -->
+		<bezel element="disk_white"><bounds x="15.5" y="10.3" width="5" height="5" /></bezel>
+		<bezel element="disk_green"><bounds x="15.8" y="10.6" width="4.4" height="4.4" /></bezel>
+		<bezel element="disk_white"><bounds x="15.5" y="30.7" width="5" height="5" /></bezel>
+		<bezel element="disk_green"><bounds x="15.8" y="31.0" width="4.4" height="4.4" /></bezel>
+
+		<bezel element="static_white"><bounds x="12" y="7.5" width="12" height="6.8" /></bezel>
+		<bezel element="static_green"><bounds x="12.3" y="7.8" width="11.4" height="6.2" /></bezel>
+		<bezel element="static_white"><bounds x="12" y="31.7" width="12" height="6.8" /></bezel>
+		<bezel element="static_green"><bounds x="12.3" y="32.0" width="11.4" height="6.2" /></bezel>
+
+		<bezel element="static_white"><bounds x="14.2" y="8" width="7.6" height="3.8" /></bezel>
+		<bezel element="static_green"><bounds x="14.5" y="8.3" width="7" height="3.2" /></bezel>
+		<bezel element="static_white"><bounds x="14.2" y="34.2" width="7.6" height="3.8" /></bezel>
+		<bezel element="static_green"><bounds x="14.5" y="34.5" width="7" height="3.2" /></bezel>
+
+		<!-- corners -->
+		<bezel element="disk_white"><bounds x="6.7" y="6.7" width="4" height="4" /></bezel>
+		<bezel element="disk_white"><bounds x="25.3" y="6.7" width="4" height="4" /></bezel>
+		<bezel element="disk_white"><bounds x="6.7" y="35.3" width="4" height="4" /></bezel>
+		<bezel element="disk_white"><bounds x="25.3" y="35.3" width="4" height="4" /></bezel>
+		<bezel element="disk_green"><bounds x="7.0" y="7.0" width="3.4" height="3.4" /></bezel>
+		<bezel element="disk_green"><bounds x="25.6" y="7.0" width="3.4" height="3.4" /></bezel>
+		<bezel element="disk_green"><bounds x="7.0" y="35.6" width="3.4" height="3.4" /></bezel>
+		<bezel element="disk_green"><bounds x="25.6" y="35.6" width="3.4" height="3.4" /></bezel>
+
+		<!-- outer border -->
+		<bezel element="static_white"><bounds x="7.5" y="5" width="1.3" height="35" /></bezel>
+		<bezel element="static_white"><bounds x="27.2" y="5" width="1.3" height="35" /></bezel>
+		<bezel element="static_white"><bounds x="5" y="7.5" width="25" height="1.3" /></bezel>
+		<bezel element="static_white"><bounds x="5" y="37.2" width="25" height="1.3" /></bezel>
+
+		<bezel element="static_green2"><bounds x="3.5" y="5" width="5" height="35" /></bezel>
+		<bezel element="static_green2"><bounds x="27.5" y="5" width="5" height="35" /></bezel>
+		<bezel element="static_green2"><bounds x="5" y="3.5" width="25" height="5" /></bezel>
+		<bezel element="static_green2"><bounds x="5" y="37.5" width="25" height="5" /></bezel>
+
+		<!-- goals -->
+		<bezel element="static_white"><bounds x="14.7" y="6.7" width="6.6" height="2" /></bezel>
+		<bezel element="static_green"><bounds x="15" y="7" width="6" height="1.5" /></bezel>
+		<bezel element="static_white"><bounds x="14.7" y="37.3" width="6.6" height="2" /></bezel>
+		<bezel element="static_green"><bounds x="15" y="37.5" width="6" height="1.5" /></bezel>
+
+		<!-- clean edges -->
+		<bezel element="static_black"><bounds x="29.5" y="3" width="5" height="40" /></bezel>
+		<bezel element="static_black"><bounds x="1.5" y="3" width="5" height="40" /></bezel>
+		<bezel element="static_black"><bounds x="3" y="1.6" width="30" height="4" /></bezel>
+		<bezel element="static_black"><bounds x="3" y="40.4" width="30" height="4" /></bezel>
+
+	<!-- leds -->
+
+		<bezel name="0.0" element="led"><bounds x="15" y="7.5" width="1" height="1" /></bezel>
+		<bezel name="0.1" element="led"><bounds x="17.5" y="7.5" width="1" height="1" /></bezel>
+		<bezel name="0.2" element="led"><bounds x="20" y="7.5" width="1" height="1" /></bezel>
+
+		<bezel name="1.0" element="led"><bounds x="10" y="10" width="1" height="1" /></bezel>
+		<bezel name="1.1" element="led"><bounds x="15" y="10" width="1" height="1" /></bezel>
+		<bezel name="1.2" element="led"><bounds x="20" y="10" width="1" height="1" /></bezel>
+		<bezel name="1.3" element="led"><bounds x="25" y="10" width="1" height="1" /></bezel>
+
+		<bezel name="2.0" element="led"><bounds x="10" y="15" width="1" height="1" /></bezel>
+		<bezel name="2.1" element="led"><bounds x="15" y="15" width="1" height="1" /></bezel>
+		<bezel name="2.2" element="led"><bounds x="20" y="15" width="1" height="1" /></bezel>
+		<bezel name="2.3" element="led"><bounds x="25" y="15" width="1" height="1" /></bezel>
+
+		<bezel name="3.0" element="led"><bounds x="10" y="20" width="1" height="1" /></bezel>
+		<bezel name="3.1" element="led"><bounds x="15" y="20" width="1" height="1" /></bezel>
+		<bezel name="3.2" element="led"><bounds x="20" y="20" width="1" height="1" /></bezel>
+		<bezel name="3.3" element="led"><bounds x="25" y="20" width="1" height="1" /></bezel>
+
+		<bezel name="4.0" element="led"><bounds x="10" y="25" width="1" height="1" /></bezel>
+		<bezel name="4.1" element="led"><bounds x="15" y="25" width="1" height="1" /></bezel>
+		<bezel name="4.2" element="led"><bounds x="20" y="25" width="1" height="1" /></bezel>
+		<bezel name="4.3" element="led"><bounds x="25" y="25" width="1" height="1" /></bezel>
+
+		<bezel name="5.0" element="led"><bounds x="10" y="30" width="1" height="1" /></bezel>
+		<bezel name="5.1" element="led"><bounds x="15" y="30" width="1" height="1" /></bezel>
+		<bezel name="5.2" element="led"><bounds x="20" y="30" width="1" height="1" /></bezel>
+		<bezel name="5.3" element="led"><bounds x="25" y="30" width="1" height="1" /></bezel>
+
+		<bezel name="6.0" element="led"><bounds x="10" y="35" width="1" height="1" /></bezel>
+		<bezel name="6.1" element="led"><bounds x="15" y="35" width="1" height="1" /></bezel>
+		<bezel name="6.2" element="led"><bounds x="20" y="35" width="1" height="1" /></bezel>
+		<bezel name="6.3" element="led"><bounds x="25" y="35" width="1" height="1" /></bezel>
+
+		<bezel name="7.0" element="led"><bounds x="15" y="37.5" width="1" height="1" /></bezel>
+		<bezel name="7.1" element="led"><bounds x="17.5" y="37.5" width="1" height="1" /></bezel>
+		<bezel name="7.2" element="led"><bounds x="20" y="37.5" width="1" height="1" /></bezel>
+
+		<bezel name="digit8" element="digit"><bounds x="30.5" y="20" width="2" height="3" /></bezel>
+		<bezel element="text_score"><bounds x="30" y="23.2" width="3" height="0.8" /></bezel>
+
+		<bezel name="digit9" element="digit"><bounds x="3.5" y="23" width="2" height="3" /><orientation rotate="180" /></bezel>
+		<bezel element="text_score"><bounds x="3" y="22" width="3" height="0.8" /><orientation rotate="180" /></bezel>
+
+	</view>
+</mamelayout>

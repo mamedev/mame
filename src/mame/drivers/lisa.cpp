@@ -31,7 +31,6 @@ static ADDRESS_MAP_START(lisa_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0400, 0x07ff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0800, 0x0fff) AM_NOP
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")     /* ROM */
-	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)       /* handler for wrap-around */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
@@ -41,7 +40,6 @@ static ADDRESS_MAP_START(lisa210_fdc_map, AS_PROGRAM, 8, lisa_state )
 	AM_RANGE(0x0800, 0x0bff) AM_READWRITE(lisa_fdc_io_r, lisa_fdc_io_w) /* disk controller (IWM and TTL logic) */
 	AM_RANGE(0x0c00, 0x0fff) AM_NOP                                     /* nothing, or IO port wrap-around ??? */
 	AM_RANGE(0x1000, 0x1fff) AM_ROM AM_REGION("fdccpu", 0x1000) AM_SHARE("fdc_rom")         /* ROM */
-	AM_RANGE(0x2000, 0xffff) AM_READWRITE(lisa_fdc_r, lisa_fdc_w)       /* handler for wrap-around */
 ADDRESS_MAP_END
 
 
@@ -102,10 +100,10 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", lisa_state,  lisa_interrupt)
 
 	MCFG_CPU_ADD(COP421_TAG, COP421, 3900000)
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
 
 	MCFG_CPU_ADD(KB_COP421_TAG, COP421, 3900000) // ?
-	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, COP400_MICROBUS_ENABLED )
+	MCFG_COP400_CONFIG( COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true )
 
 	MCFG_CPU_ADD("fdccpu", M6504, 2000000)        /* 16.000 MHz / 8 in when DIS asserted, 16.000 MHz / 9 otherwise (?) */
 	MCFG_CPU_PROGRAM_MAP(lisa_fdc_map)
@@ -121,7 +119,7 @@ static MACHINE_CONFIG_START( lisa, lisa_state )
 	MCFG_SCREEN_UPDATE_DRIVER(lisa_state, screen_update_lisa)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* sound hardware */

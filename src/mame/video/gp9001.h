@@ -10,9 +10,9 @@ struct gp9001layeroffsets
 
 struct gp9001layer
 {
-	UINT16 flip;
-	UINT16 scrollx;
-	UINT16 scrolly;
+	uint16_t flip;
+	uint16_t scrollx;
+	uint16_t scrolly;
 
 	gp9001layeroffsets extra_xoffset;
 	gp9001layeroffsets extra_yoffset;
@@ -26,7 +26,7 @@ struct gp9001tilemaplayer : gp9001layer
 struct gp9001spritelayer : gp9001layer
 {
 	bool use_sprite_buffer;
-	std::unique_ptr<UINT16[]> vram16_buffer; // vram buffer for this layer
+	std::unique_ptr<uint16_t[]> vram16_buffer; // vram buffer for this layer
 };
 
 
@@ -39,10 +39,10 @@ class gp9001vdp_device : public device_t,
 	DECLARE_GFXDECODE_MEMBER(gfxinfo);
 
 public:
-	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gp9001vdp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	UINT16 gp9001_voffs;
-	UINT16 gp9001_scroll_reg;
+	uint16_t gp9001_voffs;
+	uint16_t gp9001_scroll_reg;
 
 	gp9001tilemaplayer bg, top, fg;
 	gp9001spritelayer sp;
@@ -52,11 +52,11 @@ public:
 	// time the bank was changed)
 	int gp9001_gfxrom_is_banked;
 	int gp9001_gfxrom_bank_dirty;       /* dirty flag of object bank (for Batrider) */
-	UINT16 gp9001_gfxrom_bank[8];       /* Batrider object bank */
+	uint16_t gp9001_gfxrom_bank[8];       /* Batrider object bank */
 
 
-	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8* primap );
-	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
+	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t* primap );
+	void gp9001_draw_custom_tilemap( bitmap_ind16 &bitmap, tilemap_t* tilemap, const uint8_t* priremap, const uint8_t* pri_enable );
 	void gp9001_render_vdp( bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void gp9001_screen_eof(void);
 	void create_tilemaps(void);
@@ -97,17 +97,17 @@ protected:
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 
 private:
-	required_shared_ptr<UINT16> m_vram_bg;
-	required_shared_ptr<UINT16> m_vram_fg;
-	required_shared_ptr<UINT16> m_vram_top;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram_bg;
+	required_shared_ptr<uint16_t> m_vram_fg;
+	required_shared_ptr<uint16_t> m_vram_top;
+	required_shared_ptr<uint16_t> m_spriteram;
 
-	void gp9001_voffs_w(UINT16 data, UINT16 mem_mask);
+	void gp9001_voffs_w(uint16_t data, uint16_t mem_mask);
 	int gp9001_videoram16_r(void);
-	void gp9001_videoram16_w(UINT16 data, UINT16 mem_mask);
-	UINT16 gp9001_vdpstatus_r(void);
-	void gp9001_scroll_reg_select_w(UINT16 data, UINT16 mem_mask);
-	void gp9001_scroll_reg_data_w(UINT16 data, UINT16 mem_mask);
+	void gp9001_videoram16_w(uint16_t data, uint16_t mem_mask);
+	uint16_t gp9001_vdpstatus_r(void);
+	void gp9001_scroll_reg_select_w(uint16_t data, uint16_t mem_mask);
+	void gp9001_scroll_reg_data_w(uint16_t data, uint16_t mem_mask);
 };
 
 extern const device_type GP9001_VDP;

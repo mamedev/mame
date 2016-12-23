@@ -577,8 +577,8 @@ ROM_END
 DRIVER_INIT_MEMBER(travrusa_state,motorace)
 {
 	int A, j;
-	UINT8 *rom = memregion("maincpu")->base();
-	dynamic_buffer buffer(0x2000);
+	uint8_t *rom = memregion("maincpu")->base();
+	std::vector<uint8_t> buffer(0x2000);
 
 	memcpy(&buffer[0], rom, 0x2000);
 
@@ -593,7 +593,7 @@ DRIVER_INIT_MEMBER(travrusa_state,motorace)
 DRIVER_INIT_MEMBER(travrusa_state,shtridra)
 {
 	int A;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* D3/D4  and  D5/D6 swapped */
 	for (A = 0; A < 0x2000; A++)
@@ -610,7 +610,7 @@ READ8_MEMBER(travrusa_state::shtridrb_port11_r)
 
 DRIVER_INIT_MEMBER(travrusa_state, shtridrb)
 {
-	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0x0000, 0xff00, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
+	m_maincpu->space(AS_IO).install_read_handler(0x11, 0x11, 0, 0xff00, 0, read8_delegate(FUNC(travrusa_state::shtridrb_port11_r),this));
 }
 
 

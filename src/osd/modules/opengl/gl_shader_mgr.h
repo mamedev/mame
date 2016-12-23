@@ -4,6 +4,8 @@
 #ifndef GL_SHADER_MGR_H
 #define GL_SHADER_MGR_H
 
+#include "osd_opengl.h"
+
 // #define GLSL_SOURCE_ON_DISK 1
 
 enum GLSL_SHADER_FEATURE {
@@ -24,7 +26,7 @@ struct glsl_shader_info
 
 
 /**
- * returns pointer if ok, otherwise NULL
+ * returns pointer if ok, otherwise nullptr
  */
 glsl_shader_info *glsl_shader_init(osd_gl_context *gl_ctx);
 

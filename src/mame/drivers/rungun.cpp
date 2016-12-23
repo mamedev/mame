@@ -50,7 +50,7 @@
 
 READ16_MEMBER(rungun_state::rng_sysregs_r)
 {
-	UINT16 data = 0;
+	uint16_t data = 0;
 
 	switch (offset)
 	{
@@ -68,7 +68,7 @@ READ16_MEMBER(rungun_state::rng_sysregs_r)
 			    bit9 : screen output select
 			*/
 			{
-				UINT8 field_bit = machine().first_screen()->frame_number() & 1;
+				uint8_t field_bit = machine().first_screen()->frame_number() & 1;
 				if(m_single_screen_mode == true)
 					field_bit = 1;
 				return (ioport("SYSTEM")->read() & 0xfdff) | (field_bit << 9);
@@ -134,13 +134,13 @@ WRITE16_MEMBER(rungun_state::rng_sysregs_w)
 WRITE16_MEMBER(rungun_state::sound_cmd1_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space, 0, data >> 8);
+		m_soundlatch->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(rungun_state::sound_cmd2_w)
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch2_byte_w(space, 0, data >> 8);
+		m_soundlatch2->write(space, 0, data >> 8);
 }
 
 WRITE16_MEMBER(rungun_state::sound_irq_w)
@@ -170,7 +170,7 @@ INTERRUPT_GEN_MEMBER(rungun_state::rng_interrupt)
 READ8_MEMBER(rungun_state::rng_53936_rom_r)
 {
 	// TODO: odd addresses returns ...?
-	UINT32 rom_addr = offset;
+	uint32_t rom_addr = offset;
 	rom_addr+= (m_roz_rombase)*0x20000;
 	return m_roz_rom[rom_addr];
 }
@@ -183,10 +183,10 @@ READ16_MEMBER(rungun_state::palette_read)
 WRITE16_MEMBER(rungun_state::palette_write)
 {
 	palette_device &cur_paldevice = m_video_mux_bank == 0 ? *m_palette : *m_palette2;
-	UINT32 addr = offset + m_video_mux_bank*0x800/2;
+	uint32_t addr = offset + m_video_mux_bank*0x800/2;
 	COMBINE_DATA(&m_pal_ram[addr]);
 
-	UINT8 r,g,b;
+	uint8_t r,g,b;
 
 	r = m_pal_ram[addr] & 0x1f;
 	g = (m_pal_ram[addr] & 0x3e0) >> 5;
@@ -269,8 +269,8 @@ static ADDRESS_MAP_START( rungun_sound_map, AS_PROGRAM, 8, rungun_state )
 	AM_RANGE(0xe400, 0xe62f) AM_DEVREADWRITE("k054539_2", k054539_device, read, write)
 	AM_RANGE(0xe630, 0xe7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_status_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_ctrl_w)
 	AM_RANGE(0xfff0, 0xfff3) AM_WRITENOP
 ADDRESS_MAP_END
@@ -383,13 +383,13 @@ GFXDECODE_END
 
 void rungun_state::machine_start()
 {
-	UINT8 *ROM = memregion("soundcpu")->base();
+	uint8_t *ROM = memregion("soundcpu")->base();
 
 	m_roz_rom = memregion("gfx1")->base();
 	membank("bank2")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 
-	m_banked_ram = make_unique_clear<UINT16[]>(0x2000);
-	m_pal_ram = make_unique_clear<UINT16[]>(0x800*2);
+	m_banked_ram = make_unique_clear<uint16_t[]>(0x2000);
+	m_pal_ram = make_unique_clear<uint16_t[]>(0x800*2);
 	membank("spriteram_bank")->configure_entries(0,2,&m_banked_ram[0],0x2000);
 
 
@@ -404,7 +404,7 @@ void rungun_state::machine_reset()
 	m_k054539_1->init_flags(k054539_device::REVERSE_STEREO);
 
 	memset(m_sysreg, 0, 0x20);
-	//memset(m_ttl_vram, 0, 0x1000 * sizeof(UINT16));
+	//memset(m_ttl_vram, 0, 0x1000 * sizeof(uint16_t));
 
 	m_sound_ctrl = 0;
 	m_sound_status = 0;
@@ -447,8 +447,7 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(rungun_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 1, K055673_LAYOUT_RNG, -8, 15)
-	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_RNG, -8, 15)
 	MCFG_K055673_PALETTE("palette")
 	MCFG_K055673_SET_SCREEN("screen")
 
@@ -463,6 +462,9 @@ static MACHINE_CONFIG_START( rng, rungun_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("k054539_1", K054539, XTAL_18_432MHz)
 	MCFG_K054539_REGION_OVERRRIDE("shared")

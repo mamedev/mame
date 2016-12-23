@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:FelipeSanches, Sandro Ronco
 //
 // Wacky Gator
@@ -21,7 +21,7 @@
 #include "machine/i8255.h"
 #include "machine/pit8253.h"
 #include "machine/ticket.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 
 #include "wackygtr.lh"
@@ -57,13 +57,13 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_rear_sensors_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(alligators_front_sensors_r);
 
-	void set_lamps(int p, UINT8 value);
+	void set_lamps(int p, uint8_t value);
 	DECLARE_WRITE8_MEMBER(status_lamps_w);
 	DECLARE_WRITE8_MEMBER(timing_lamps_0_w)     { set_lamps(8 , data); }
 	DECLARE_WRITE8_MEMBER(timing_lamps_1_w)     { set_lamps(16, data); }
 	DECLARE_WRITE8_MEMBER(timing_lamps_2_w)     { set_lamps(24, data); }
 
-	void set_digits(int p, UINT8 value);
+	void set_digits(int p, uint8_t value);
 	DECLARE_WRITE8_MEMBER(disp0_w)              { set_digits(0, data); }
 	DECLARE_WRITE8_MEMBER(disp1_w)              { set_digits(2, data); }
 	DECLARE_WRITE8_MEMBER(disp2_w)              { set_digits(4, data); }
@@ -83,10 +83,10 @@ public:
 
 private:
 	int     m_adpcm_sel;
-	UINT16  m_adpcm_pos;
-	UINT8   m_adpcm_ctrl;
+	uint16_t  m_adpcm_pos;
+	uint8_t   m_adpcm_ctrl;
 
-	UINT8   m_alligators_ctrl;
+	uint8_t   m_alligators_ctrl;
 	int     m_motors_pos[5];
 };
 
@@ -187,14 +187,14 @@ void wackygtr_state::machine_reset()
 	m_adpcm_ctrl = 0x80;
 }
 
-void wackygtr_state::set_digits(int p, UINT8 value)
+void wackygtr_state::set_digits(int p, uint8_t value)
 {
-	static UINT8 bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
+	static uint8_t bcd2hex[] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 };  // not accurate
 	output().set_digit_value(p + 0, bcd2hex[value & 0x0f]);
 	output().set_digit_value(p + 1, bcd2hex[(value >> 4) & 0x0f]);
 }
 
-void wackygtr_state::set_lamps(int p, UINT8 value)
+void wackygtr_state::set_lamps(int p, uint8_t value)
 {
 	for(int i=0; i<8; i++)
 		output().set_lamp_value(p + i, BIT(value, i));
@@ -202,13 +202,13 @@ void wackygtr_state::set_lamps(int p, UINT8 value)
 
 static INPUT_PORTS_START( wackygtr )
 	PORT_START("IN0")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, NULL)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_rear_sensors_r, nullptr)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_SERVICE)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_SERVICE1)
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_COIN1)
 
 	PORT_START("IN1")
-	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, NULL)
+	PORT_BIT(0x1f, IP_ACTIVE_LOW, IPT_SPECIAL)   PORT_CUSTOM_MEMBER(DEVICE_SELF, wackygtr_state, alligators_front_sensors_r, nullptr)
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_1C ) )
@@ -240,7 +240,7 @@ WRITE_LINE_MEMBER(wackygtr_state::adpcm_int)
 {
 	if (!(m_adpcm_ctrl & 0x80))
 	{
-		UINT8 data = m_samples->base()[m_adpcm_pos & 0xffff];
+		uint8_t data = m_samples->base()[m_adpcm_pos & 0xffff];
 		m_msm->data_w((m_adpcm_sel ? data : (data >> 4)) & 0x0f);
 		m_adpcm_pos += m_adpcm_sel;
 		m_adpcm_sel ^= 1;

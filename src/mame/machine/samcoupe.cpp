@@ -81,7 +81,7 @@ WRITE8_MEMBER(samcoupe_state::sam_bank4_w)
 		sam_bank_write_ptr[3][offset] = data;
 }
 
-void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, UINT8 *memory, int is_readonly)
+void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, uint8_t *memory, int is_readonly)
 {
 	sam_bank_read_ptr[bank_num-1] = memory;
 	if (!is_readonly)
@@ -111,7 +111,7 @@ void samcoupe_state::samcoupe_update_bank(address_space &space, int bank_num, UI
 
 void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 {
-	UINT8 *mem;
+	uint8_t *mem;
 
 	/* bank 3 */
 	if (m_lext >> 6 < m_ram->size() >> 20)
@@ -119,7 +119,7 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	else
 		mem = nullptr;
 
-	samcoupe_update_bank(space, 3, mem, FALSE);
+	samcoupe_update_bank(space, 3, mem, false);
 
 	/* bank 4 */
 	if (m_hext >> 6 < m_ram->size() >> 20)
@@ -127,40 +127,40 @@ void samcoupe_state::samcoupe_install_ext_mem(address_space &space)
 	else
 		mem = nullptr;
 
-	samcoupe_update_bank(space, 4, mem, FALSE);
+	samcoupe_update_bank(space, 4, mem, false);
 }
 
 
 void samcoupe_state::samcoupe_update_memory(address_space &space)
 {
-	const int PAGE_MASK = ((m_ram->size() & 0xfffff) / 0x4000) - 1;
-	UINT8 *rom = m_region_maincpu->base();
-	UINT8 *memory;
+	const int page_mask = ((m_ram->size() & 0xfffff) / 0x4000) - 1;
+	uint8_t *rom = m_region_maincpu->base();
+	uint8_t *memory;
 	int is_readonly;
 
 	/* BANK1 */
 	if (m_lmpr & LMPR_RAM0)   /* Is ram paged in at bank 1 */
 	{
-		if ((m_lmpr & 0x1F) <= PAGE_MASK)
-			memory = &m_ram->pointer()[(m_lmpr & PAGE_MASK) * 0x4000];
+		if ((m_lmpr & 0x1F) <= page_mask)
+			memory = &m_ram->pointer()[(m_lmpr & page_mask) * 0x4000];
 		else
 			memory = nullptr;  /* Attempt to page in non existant ram region */
-		is_readonly = FALSE;
+		is_readonly = false;
 	}
 	else
 	{
 		memory = rom;   /* Rom0 paged in */
-		is_readonly = TRUE;
+		is_readonly = true;
 	}
 	samcoupe_update_bank(space, 1, memory, is_readonly);
 
 
 	/* BANK2 */
-	if (((m_lmpr + 1) & 0x1f) <= PAGE_MASK)
-		memory = &m_ram->pointer()[((m_lmpr + 1) & PAGE_MASK) * 0x4000];
+	if (((m_lmpr + 1) & 0x1f) <= page_mask)
+		memory = &m_ram->pointer()[((m_lmpr + 1) & page_mask) * 0x4000];
 	else
 		memory = nullptr;  /* Attempt to page in non existant ram region */
-	samcoupe_update_bank(space, 2, memory, FALSE);
+	samcoupe_update_bank(space, 2, memory, false);
 
 	/* only update bank 3 and 4 when external memory is not enabled */
 	if (m_hmpr & HMPR_MCNTRL)
@@ -170,35 +170,35 @@ void samcoupe_state::samcoupe_update_memory(address_space &space)
 	else
 	{
 		/* BANK3 */
-		if ((m_hmpr & 0x1F) <= PAGE_MASK )
-			memory = &m_ram->pointer()[(m_hmpr & PAGE_MASK)*0x4000];
+		if ((m_hmpr & 0x1F) <= page_mask )
+			memory = &m_ram->pointer()[(m_hmpr & page_mask)*0x4000];
 		else
 			memory = nullptr;  /* Attempt to page in non existant ram region */
-		samcoupe_update_bank(space, 3, memory, FALSE);
+		samcoupe_update_bank(space, 3, memory, false);
 
 
 		/* BANK4 */
 		if (m_lmpr & LMPR_ROM1)  /* Is Rom1 paged in at bank 4 */
 		{
 			memory = rom + 0x4000;
-			is_readonly = TRUE;
+			is_readonly = true;
 		}
 		else
 		{
-			if (((m_hmpr + 1) & 0x1f) <= PAGE_MASK)
-				memory = &m_ram->pointer()[((m_hmpr + 1) & PAGE_MASK) * 0x4000];
+			if (((m_hmpr + 1) & 0x1f) <= page_mask)
+				memory = &m_ram->pointer()[((m_hmpr + 1) & page_mask) * 0x4000];
 			else
 				memory = nullptr;  /* Attempt to page in non existant ram region */
-			is_readonly = FALSE;
+			is_readonly = false;
 		}
-		samcoupe_update_bank(space, 4, memory, FALSE);
+		samcoupe_update_bank(space, 4, memory, false);
 	}
 
 	/* video memory location */
 	if (m_vmpr & 0x40)   /* if bit set in 2 bank screen mode */
-		m_videoram = &m_ram->pointer()[((m_vmpr & 0x1e) & PAGE_MASK) * 0x4000];
+		m_videoram = &m_ram->pointer()[((m_vmpr & 0x1e) & page_mask) * 0x4000];
 	else
-		m_videoram = &m_ram->pointer()[((m_vmpr & 0x1f) & PAGE_MASK) * 0x4000];
+		m_videoram = &m_ram->pointer()[((m_vmpr & 0x1f) & page_mask) * 0x4000];
 }
 
 
@@ -246,9 +246,9 @@ TIMER_CALLBACK_MEMBER(samcoupe_state::samcoupe_mouse_reset)
 	m_mouse_index = 0;
 }
 
-UINT8 samcoupe_state::samcoupe_mouse_r()
+uint8_t samcoupe_state::samcoupe_mouse_r()
 {
-	UINT8 result;
+	uint8_t result;
 
 	/* on a read, reset the timer */
 	m_mouse_reset->adjust(attotime::from_usec(50));
@@ -323,12 +323,12 @@ void samcoupe_state::machine_reset()
 	if (m_config->read() & 0x01)
 	{
 		/* install RTC */
-		spaceio.install_readwrite_handler(0xef, 0xef, 0xffff, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
+		spaceio.install_readwrite_handler(0xef, 0xef, 0, 0, 0xff00, read8_delegate(FUNC(samcoupe_state::samcoupe_rtc_r),this), write8_delegate(FUNC(samcoupe_state::samcoupe_rtc_w),this));
 	}
 	else
 	{
 		/* no RTC support */
-		spaceio.unmap_readwrite(0xef, 0xef, 0xffff, 0xff00);
+		spaceio.unmap_readwrite(0xef, 0xef, 0xff00);
 	}
 
 	/* initialize memory */

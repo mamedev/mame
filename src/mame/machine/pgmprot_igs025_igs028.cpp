@@ -22,10 +22,11 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+#include "machine/pgmprot_igs025_igs028.h"
 
 // tables are xored by table at $1998dc
 // tables are the same as drgw3 and drgw2
-static const UINT8 m_olds_source_data[8][0xec] = // table addresses $2951CA
+static const uint8_t m_olds_source_data[8][0xec] = // table addresses $2951CA
 {
 	{ // region 0, unused...
 		0,

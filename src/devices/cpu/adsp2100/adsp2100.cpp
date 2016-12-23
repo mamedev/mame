@@ -119,7 +119,7 @@ const device_type ADSP2181 = &device_creator<adsp2181_device>;
 //  adsp21xx_device - constructor
 //-------------------------------------------------
 
-adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
+adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_program_config("program", ENDIANNESS_LITTLE, 32, 14, -2),
 		m_data_config("data", ENDIANNESS_LITTLE, 16, 14, -1),
@@ -157,7 +157,8 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 					(m_chip_type >= CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f),
 		m_sport_rx_cb(*this),
 		m_sport_tx_cb(*this),
-		m_timer_fired_cb(*this)
+		m_timer_fired_cb(*this),
+		m_dmovlay_cb(*this)
 {
 	// initialize remaining state
 	memset(&m_core, 0, sizeof(m_core));
@@ -199,11 +200,11 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 	for (int index = 0; index < 4; index++)
 	{
 		m_read1_ptr[0x00 + index] = &m_i[0 + index];
-		m_read1_ptr[0x04 + index] = (UINT32 *)&m_m[0 + index];
+		m_read1_ptr[0x04 + index] = (uint32_t *)&m_m[0 + index];
 		m_read1_ptr[0x08 + index] = &m_l[0 + index];
 		m_read1_ptr[0x0c + index] = &m_l[0 + index];
 		m_read2_ptr[0x00 + index] = &m_i[4 + index];
-		m_read2_ptr[0x04 + index] = (UINT32 *)&m_m[4 + index];
+		m_read2_ptr[0x04 + index] = (uint32_t *)&m_m[4 + index];
 		m_read2_ptr[0x08 + index] = &m_l[4 + index];
 		m_read2_ptr[0x0c + index] = &m_l[4 + index];
 	}
@@ -247,25 +248,25 @@ adsp21xx_device::adsp21xx_device(const machine_config &mconfig, device_type type
 	m_shift_xregs[7] = &m_core.sr.srx.sr1;
 }
 
-adsp2100_device::adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2100_device::adsp2100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp21xx_device(mconfig, ADSP2100, "ADSP-2100", tag, owner, clock, CHIP_TYPE_ADSP2100, "adsp2100", __FILE__) { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp21xx_device(mconfig, ADSP2101, "ADSP-2101", tag, owner, clock, CHIP_TYPE_ADSP2101, "adsp2101", __FILE__) { }
 
-adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 chiptype, const char *shortname, const char *source)
+adsp2101_device::adsp2101_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t chiptype, const char *shortname, const char *source)
 	: adsp21xx_device(mconfig, type, name, tag, owner, clock, chiptype, shortname, source) { }
 
-adsp2104_device::adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2104_device::adsp2104_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp2101_device(mconfig, ADSP2104, "ADSP-2104", tag, owner, clock, CHIP_TYPE_ADSP2104, "adsp2104", __FILE__) { }
 
-adsp2105_device::adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2105_device::adsp2105_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp2101_device(mconfig, ADSP2105, "ADSP-2105", tag, owner, clock, CHIP_TYPE_ADSP2105, "adsp2105", __FILE__) { }
 
-adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2115_device::adsp2115_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp2101_device(mconfig, ADSP2115, "ADSP-2115", tag, owner, clock, CHIP_TYPE_ADSP2115, "adsp2115", __FILE__) { }
 
-adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+adsp2181_device::adsp2181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: adsp21xx_device(mconfig, ADSP2181, "ADSP-2181", tag, owner, clock, CHIP_TYPE_ADSP2181, "adsp2181", __FILE__),
 		m_io_config("I/O", ENDIANNESS_LITTLE, 16, 11, -1) { }
 
@@ -299,13 +300,13 @@ adsp21xx_device::~adsp21xx_device()
 //  8-bit ROM
 //-------------------------------------------------
 
-void adsp21xx_device::load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
+void adsp21xx_device::load_boot_data(uint8_t *srcdata, uint32_t *dstdata)
 {
 	// see how many words we need to copy
 	int pagelen = (srcdata[3] + 1) * 8;
 	for (int i = 0; i < pagelen; i++)
 	{
-		UINT32 opcode = (srcdata[i*4+0] << 16) | (srcdata[i*4+1] << 8) | srcdata[i*4+2];
+		uint32_t opcode = (srcdata[i*4+0] << 16) | (srcdata[i*4+1] << 8) | srcdata[i*4+2];
 		dstdata[i] = opcode;
 	}
 }
@@ -315,7 +316,7 @@ void adsp21xx_device::load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 //  idma_addr_w - write the IDMA address register
 //-------------------------------------------------
 
-void adsp2181_device::idma_addr_w(UINT16 data)
+void adsp2181_device::idma_addr_w(uint16_t data)
 {
 	m_idma_addr = data;
 	m_idma_offs = 0;
@@ -326,7 +327,7 @@ void adsp2181_device::idma_addr_w(UINT16 data)
 //  idma_addr_r - read the IDMA address register
 //-------------------------------------------------
 
-UINT16 adsp2181_device::idma_addr_r()
+uint16_t adsp2181_device::idma_addr_r()
 {
 	return m_idma_addr;
 }
@@ -336,7 +337,7 @@ UINT16 adsp2181_device::idma_addr_r()
 //  idma_data_w - write the IDMA data register
 //-------------------------------------------------
 
-void adsp2181_device::idma_data_w(UINT16 data)
+void adsp2181_device::idma_data_w(uint16_t data)
 {
 	// program memory?
 	if (!(m_idma_addr & 0x4000))
@@ -366,9 +367,9 @@ void adsp2181_device::idma_data_w(UINT16 data)
 //  idma_data_r - read the IDMA data register
 //-------------------------------------------------
 
-UINT16 adsp2181_device::idma_data_r()
+uint16_t adsp2181_device::idma_data_r()
 {
-	UINT16 result;
+	uint16_t result;
 
 	// program memory?
 	if (!(m_idma_addr & 0x4000))
@@ -405,6 +406,7 @@ void adsp21xx_device::device_start()
 	m_sport_rx_cb.resolve();
 	m_sport_tx_cb.resolve();
 	m_timer_fired_cb.resolve();
+	m_dmovlay_cb.resolve();
 
 	// get our address spaces
 	m_program = &space(AS_PROGRAM);
@@ -495,10 +497,9 @@ void adsp21xx_device::device_start()
 	save_item(NAME(m_irq_latch));
 
 	// register state with the debugger
-	state_add(ADSP2100_PC,      "PC",        m_pc);
-	state_add(STATE_GENPC,      "GENPC",     m_pc).noshow();
-	state_add(STATE_GENPCBASE,  "GENPCBASE", m_ppc).noshow();
-	state_add(STATE_GENFLAGS,   "GENFLAGS",  m_astat).mask(0xff).noshow().formatstr("%8s");
+	state_add(ADSP2100_PC,      "PC",        m_pc).callimport();
+	state_add(STATE_GENPCBASE,  "CURPC",     m_ppc).callimport().noshow();
+	state_add(STATE_GENFLAGS,   "CURFLAGS",  m_astat).mask(0xff).formatstr("%8s").noshow();
 
 	state_add(ADSP2100_AX0,     "AX0",       m_core.ax0.u);
 	state_add(ADSP2100_AX1,     "AX1",       m_core.ax1.u);
@@ -545,13 +546,13 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_SR1_SEC, "SR1_SEC",   m_alt.sr.srx.sr1.u);
 
 	for (int ireg = 0; ireg < 8; ireg++)
-		state_add(ADSP2100_I0 + ireg, strformat("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_I0 + ireg, string_format("I%d", ireg).c_str(), m_i[ireg]).mask(0x3fff).callimport();
 
 	for (int lreg = 0; lreg < 8; lreg++)
-		state_add(ADSP2100_L0 + lreg, strformat("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
+		state_add(ADSP2100_L0 + lreg, string_format("L%d", lreg).c_str(), m_l[lreg]).mask(0x3fff).callimport();
 
 	for (int mreg = 0; mreg < 8; mreg++)
-		state_add(ADSP2100_M0 + mreg, strformat("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
+		state_add(ADSP2100_M0 + mreg, string_format("M%d", mreg).c_str(), m_m[mreg]).signed_mask(0x3fff);
 
 	state_add(ADSP2100_PX,      "PX",        m_px);
 	state_add(ADSP2100_CNTR,    "CNTR",      m_cntr).mask(0x3fff);
@@ -560,7 +561,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_MSTAT,   "MSTAT",     m_mstat).mask((m_chip_type == CHIP_TYPE_ADSP2100) ? 0x0f : 0x7f).callimport();
 
 	state_add(ADSP2100_PCSP,    "PCSP",      m_pc_sp).mask(0xff);
-	state_add(STATE_GENSP,      "GENSP",     m_pc_sp).mask(0xff).noshow();
+	state_add(STATE_GENSP,      "CURSP",     m_pc_sp).mask(0xff).noshow();
 	state_add(ADSP2100_CNTRSP,  "CNTRSP",    m_cntr_sp).mask(0xf);
 	state_add(ADSP2100_STATSP,  "STATSP",    m_stat_sp).mask(0xf);
 	state_add(ADSP2100_LOOPSP,  "LOOPSP",    m_loop_sp).mask(0xf);
@@ -570,7 +571,7 @@ void adsp21xx_device::device_start()
 
 	for (int irqnum = 0; irqnum < 4; irqnum++)
 		if (irqnum < 4 || m_chip_type == CHIP_TYPE_ADSP2100)
-			state_add(ADSP2100_IRQSTATE0 + irqnum, strformat("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
+			state_add(ADSP2100_IRQSTATE0 + irqnum, string_format("IRQ%d", irqnum).c_str(), m_irq_state[irqnum]).mask(1).callimport();
 
 	state_add(ADSP2100_FLAGIN,  "FLAGIN",    m_flagin).mask(1);
 	state_add(ADSP2100_FLAGOUT, "FLAGOUT",   m_flagout).mask(1);
@@ -604,7 +605,7 @@ void adsp21xx_device::device_reset()
 
 	// reset PC and loops
 	m_pc = (m_chip_type >= CHIP_TYPE_ADSP2101) ? 0 : 4;
-	m_ppc = -1;
+	m_ppc = m_pc;
 	m_loop = 0xffff;
 	m_loop_condition = 0;
 
@@ -630,14 +631,14 @@ void adsp21xx_device::device_reset()
 
 	// reset interrupts
 	m_imask = 0;
-	for (int irq = 0; irq < 8; irq++)
+	for (int irq = 0; irq < 10; irq++)
 		m_irq_state[irq] = m_irq_latch[irq] = CLEAR_LINE;
 }
 
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -673,6 +674,14 @@ void adsp21xx_device::state_import(const device_state_entry &entry)
 {
 	switch (entry.index())
 	{
+		case ADSP2100_PC:
+			m_ppc = m_pc;
+			break;
+
+		case STATE_GENPCBASE:
+			m_pc = m_ppc;
+			break;
+
 		case ADSP2100_MSTAT:
 			update_mstat();
 			break;
@@ -724,7 +733,7 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				m_astat & 0x80 ? 'X':'.',
 				m_astat & 0x40 ? 'M':'.',
 				m_astat & 0x20 ? 'Q':'.',
@@ -743,7 +752,7 @@ void adsp21xx_device::state_string_export(const device_state_entry &entry, std::
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 adsp21xx_device::disasm_min_opcode_bytes() const
+uint32_t adsp21xx_device::disasm_min_opcode_bytes() const
 {
 	return 4;
 }
@@ -754,7 +763,7 @@ UINT32 adsp21xx_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 adsp21xx_device::disasm_max_opcode_bytes() const
+uint32_t adsp21xx_device::disasm_max_opcode_bytes() const
 {
 	return 4;
 }
@@ -765,10 +774,10 @@ UINT32 adsp21xx_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t adsp21xx_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t adsp21xx_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( adsp21xx );
-	return CPU_DISASSEMBLE_NAME(adsp21xx)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(adsp21xx)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -778,37 +787,37 @@ offs_t adsp21xx_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 
     MEMORY ACCESSORS
 ***************************************************************************/
 
-inline UINT16 adsp21xx_device::data_read(UINT32 addr)
+inline uint16_t adsp21xx_device::data_read(uint32_t addr)
 {
 	return m_data->read_word(addr << 1);
 }
 
-inline void adsp21xx_device::data_write(UINT32 addr, UINT16 data)
+inline void adsp21xx_device::data_write(uint32_t addr, uint16_t data)
 {
 	m_data->write_word(addr << 1, data);
 }
 
-inline UINT16 adsp21xx_device::io_read(UINT32 addr)
+inline uint16_t adsp21xx_device::io_read(uint32_t addr)
 {
 	return m_io->read_word(addr << 1);
 }
 
-inline void adsp21xx_device::io_write(UINT32 addr, UINT16 data)
+inline void adsp21xx_device::io_write(uint32_t addr, uint16_t data)
 {
 	m_io->write_word(addr << 1, data);
 }
 
-inline UINT32 adsp21xx_device::program_read(UINT32 addr)
+inline uint32_t adsp21xx_device::program_read(uint32_t addr)
 {
 	return m_program->read_dword(addr << 2);
 }
 
-inline void adsp21xx_device::program_write(UINT32 addr, UINT32 data)
+inline void adsp21xx_device::program_write(uint32_t addr, uint32_t data)
 {
 	m_program->write_dword(addr << 2, data & 0xffffff);
 }
 
-inline UINT32 adsp21xx_device::opcode_read()
+inline uint32_t adsp21xx_device::opcode_read()
 {
 	return m_direct->read_dword(m_pc << 2);
 }
@@ -818,7 +827,7 @@ inline UINT32 adsp21xx_device::opcode_read()
     IMPORT CORE UTILITIES
 ***************************************************************************/
 
-#include "2100ops.inc"
+#include "2100ops.hxx"
 
 
 
@@ -903,7 +912,7 @@ bool adsp2181_device::generate_irq(int which, int indx)
 
 void adsp2100_device::check_irqs()
 {
-	UINT8 check;
+	uint8_t check;
 
 	// check IRQ3
 	check = (m_icntl & 8) ? m_irq_latch[ADSP2100_IRQ3] : m_irq_state[ADSP2100_IRQ3];
@@ -929,7 +938,7 @@ void adsp2100_device::check_irqs()
 
 void adsp2101_device::check_irqs()
 {
-	UINT8 check;
+	uint8_t check;
 
 	// check IRQ2
 	check = (m_icntl & 4) ? m_irq_latch[ADSP2101_IRQ2] : m_irq_state[ADSP2101_IRQ2];
@@ -965,7 +974,7 @@ void adsp2101_device::check_irqs()
 
 void adsp2181_device::check_irqs()
 {
-	UINT8 check;
+	uint8_t check;
 
 	// check IRQ2
 	check = (m_icntl & 4) ? m_irq_latch[ADSP2181_IRQ2] : m_irq_state[ADSP2181_IRQ2];
@@ -977,9 +986,9 @@ void adsp2181_device::check_irqs()
 	if (check && generate_irq(ADSP2181_IRQL1, 1))
 		return;
 
-	// check IRQL2
-	check = m_irq_state[ADSP2181_IRQL2];
-	if (check && generate_irq(ADSP2181_IRQL2, 2))
+	// check IRQL0
+	check = m_irq_state[ADSP2181_IRQL0];
+	if (check && generate_irq(ADSP2181_IRQL0, 2))
 		return;
 
 	// check SPORT0 transmit
@@ -998,6 +1007,9 @@ void adsp2181_device::check_irqs()
 		return;
 
 	// check BDMA interrupt
+	check = m_irq_latch[ADSP2181_BDMA];
+	if (check && generate_irq(ADSP2181_BDMA, 6))
+		return;
 
 	// check IRQ1/SPORT1 transmit
 	check = (m_icntl & 2) ? m_irq_latch[ADSP2181_IRQ1] : m_irq_state[ADSP2181_IRQ1];
@@ -1026,7 +1038,7 @@ void adsp21xx_device::create_tables()
 	// initialize the bit reversing table
 	for (int i = 0; i < 0x4000; i++)
 	{
-		UINT16 data = 0;
+		uint16_t data = 0;
 
 		data |= (i >> 13) & 0x0001;
 		data |= (i >> 11) & 0x0002;
@@ -1105,7 +1117,7 @@ void adsp21xx_device::create_tables()
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 adsp21xx_device::execute_min_cycles() const
+uint32_t adsp21xx_device::execute_min_cycles() const
 {
 	return 1;
 }
@@ -1116,7 +1128,7 @@ UINT32 adsp21xx_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 adsp21xx_device::execute_max_cycles() const
+uint32_t adsp21xx_device::execute_max_cycles() const
 {
 	return 1;
 }
@@ -1127,17 +1139,17 @@ UINT32 adsp21xx_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 adsp2100_device::execute_input_lines() const
+uint32_t adsp2100_device::execute_input_lines() const
 {
 	return 4;
 }
 
-UINT32 adsp2101_device::execute_input_lines() const
+uint32_t adsp2101_device::execute_input_lines() const
 {
 	return 5;
 }
 
-UINT32 adsp2181_device::execute_input_lines() const
+uint32_t adsp2181_device::execute_input_lines() const
 {
 	return 9;
 }
@@ -1172,7 +1184,7 @@ void adsp21xx_device::execute_run()
 #endif
 
 		// instruction fetch
-		UINT32 op = opcode_read();
+		uint32_t op = opcode_read();
 
 		// advance to the next instruction
 		if (m_pc != m_loop)
@@ -1195,7 +1207,7 @@ void adsp21xx_device::execute_run()
 		}
 
 		// parse the instruction
-		UINT32 temp;
+		uint32_t temp;
 		switch ((op >> 16) & 0xff)
 		{
 			case 0x00:
@@ -1527,19 +1539,19 @@ void adsp21xx_device::execute_run()
 				break;
 			case 0x30: case 0x31: case 0x32: case 0x33:
 				// 001100xx xxxxxxxx xxxxxxxx  load non-data register immediate (group 0)
-				write_reg0(op & 15, (INT32)(op << 14) >> 18);
+				write_reg0(op & 15, (int32_t)(op << 14) >> 18);
 				break;
 			case 0x34: case 0x35: case 0x36: case 0x37:
 				// 001101xx xxxxxxxx xxxxxxxx  load non-data register immediate (group 1)
-				write_reg1(op & 15, (INT32)(op << 14) >> 18);
+				write_reg1(op & 15, (int32_t)(op << 14) >> 18);
 				break;
 			case 0x38: case 0x39: case 0x3a: case 0x3b:
 				// 001110xx xxxxxxxx xxxxxxxx  load non-data register immediate (group 2)
-				write_reg2(op & 15, (INT32)(op << 14) >> 18);
+				write_reg2(op & 15, (int32_t)(op << 14) >> 18);
 				break;
 			case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 				// 001111xx xxxxxxxx xxxxxxxx  load non-data register immediate (group 3)
-				write_reg3(op & 15, (INT32)(op << 14) >> 18);
+				write_reg3(op & 15, (int32_t)(op << 14) >> 18);
 				break;
 			case 0x40: case 0x41: case 0x42: case 0x43: case 0x44: case 0x45: case 0x46: case 0x47:
 			case 0x48: case 0x49: case 0x4a: case 0x4b: case 0x4c: case 0x4d: case 0x4e: case 0x4f:

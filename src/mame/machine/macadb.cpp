@@ -78,14 +78,13 @@ static const char *const adb_statenames[4] = { "NEW", "EVEN", "ODD", "IDLE" };
 int mac_state::adb_pollkbd(int update)
 {
 	int i, j, keybuf, report, codes[2], result;
-	ioport_port *ports[6] = { m_key0, m_key1,   m_key2, m_key3, m_key4, m_key5 };
 
 	codes[0] = codes[1] = 0xff; // key up
 	report = result = 0;
 
 	for (i = 0; i < 6; i++)
 	{
-		keybuf = ports[i]->read();
+		keybuf = m_keys[i]->read();
 
 		// any changes in this row?
 		if ((keybuf != m_key_matrix[i]) && (report < 2))
@@ -233,7 +232,7 @@ int mac_state::adb_pollmouse()
 	return 0;
 }
 
-void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
+void mac_state::adb_accummouse( uint8_t *MouseX, uint8_t *MouseY )
 {
 	int MouseCountX = 0, MouseCountY = 0;
 	int NewX, NewY;
@@ -273,8 +272,8 @@ void mac_state::adb_accummouse( UINT8 *MouseX, UINT8 *MouseY )
 
 	m_adb_lastbutton = m_mouse0->read() & 0x01;
 
-	*MouseX = (UINT8)MouseCountX;
-	*MouseY = (UINT8)MouseCountY;
+	*MouseX = (uint8_t)MouseCountX;
+	*MouseY = (uint8_t)MouseCountY;
 }
 
 void mac_state::adb_talk()
@@ -353,7 +352,7 @@ void mac_state::adb_talk()
 				m_adb_direction = 0;    // output to Mac
 				if (addr == m_adb_mouseaddr)
 				{
-					UINT8 mouseX, mouseY;
+					uint8_t mouseX, mouseY;
 
 					#if LOG_ADB || LOG_ADB_TALK_LISTEN
 					printf("Talking to mouse, register %x\n", reg);
@@ -528,35 +527,33 @@ void mac_state::adb_talk()
 	}
 }
 
-TIMER_CALLBACK(mac_adb_tick)
+TIMER_CALLBACK_MEMBER(mac_state::mac_adb_tick)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
-	if ((ADB_IS_EGRET_NONCLASS) || (ADB_IS_CUDA_NONCLASS))
+	if ((ADB_IS_EGRET) || (ADB_IS_CUDA))
 	{
-		switch (mac->m_adb_linestate)
+		switch (m_adb_linestate)
 		{
 			case LST_SRQNODATA:
-				mac->set_adb_line(ASSERT_LINE);
-				mac->m_adb_linestate = LST_IDLE;
+				set_adb_line(ASSERT_LINE);
+				m_adb_linestate = LST_IDLE;
 				break;
 
 			case LST_TSTOPSTART:
-				mac->set_adb_line(ASSERT_LINE);
-				mac->m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
-				mac->m_adb_linestate++;
+				set_adb_line(ASSERT_LINE);
+				m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+				m_adb_linestate++;
 				break;
 
 			case LST_TSTOPSTARTa:
-				mac->set_adb_line(CLEAR_LINE);
-				mac->m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
-				mac->m_adb_linestate++;
+				set_adb_line(CLEAR_LINE);
+				m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+				m_adb_linestate++;
 				break;
 
 			case LST_STARTBIT:
-				mac->set_adb_line(ASSERT_LINE);
-				mac->m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
-				mac->m_adb_linestate++;
+				set_adb_line(ASSERT_LINE);
+				m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+				m_adb_linestate++;
 				break;
 
 			case LST_SENDBIT0:
@@ -567,18 +564,18 @@ TIMER_CALLBACK(mac_adb_tick)
 			case LST_SENDBIT5:
 			case LST_SENDBIT6:
 			case LST_SENDBIT7:
-				mac->set_adb_line(CLEAR_LINE);
-				if (mac->m_adb_buffer[mac->m_adb_stream_ptr] & 0x80)
+				set_adb_line(CLEAR_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
 //                    printf("1 ");
-					mac->m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
 				}
 				else
 				{
 //                    printf("0 ");
-					mac->m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
 				}
-				mac->m_adb_linestate++;
+				m_adb_linestate++;
 				break;
 
 			case LST_SENDBIT0a:
@@ -588,92 +585,92 @@ TIMER_CALLBACK(mac_adb_tick)
 			case LST_SENDBIT4a:
 			case LST_SENDBIT5a:
 			case LST_SENDBIT6a:
-				mac->set_adb_line(ASSERT_LINE);
-				if (mac->m_adb_buffer[mac->m_adb_stream_ptr] & 0x80)
+				set_adb_line(ASSERT_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
-					mac->m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
 				}
 				else
 				{
-					mac->m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
 				}
-				mac->m_adb_buffer[mac->m_adb_stream_ptr] <<= 1;
-				mac->m_adb_linestate++;
+				m_adb_buffer[m_adb_stream_ptr] <<= 1;
+				m_adb_linestate++;
 				break;
 
 			case LST_SENDBIT7a:
-				mac->set_adb_line(ASSERT_LINE);
-				if (mac->m_adb_buffer[mac->m_adb_stream_ptr] & 0x80)
+				set_adb_line(ASSERT_LINE);
+				if (m_adb_buffer[m_adb_stream_ptr] & 0x80)
 				{
 //                    printf("  ");
-					mac->m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(105, 1000000));
 				}
 				else
 				{
 //                    printf("  ");
-					mac->m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
+					m_adb_timer->adjust(attotime::from_ticks(57, 1000000));
 				}
 
-				mac->m_adb_stream_ptr++;
-				if (mac->m_adb_stream_ptr == mac->m_adb_datasize)
+				m_adb_stream_ptr++;
+				if (m_adb_stream_ptr == m_adb_datasize)
 				{
-					mac->m_adb_linestate++;
+					m_adb_linestate++;
 				}
 				else
 				{
-					mac->m_adb_linestate = LST_SENDBIT0;
+					m_adb_linestate = LST_SENDBIT0;
 				}
 				break;
 
 			case LST_SENDSTOP:
-				mac->set_adb_line(CLEAR_LINE);
-				mac->m_adb_timer->adjust(attotime::from_ticks((57*2), 1000000));
-				mac->m_adb_linestate++;
+				set_adb_line(CLEAR_LINE);
+				m_adb_timer->adjust(attotime::from_ticks((57*2), 1000000));
+				m_adb_linestate++;
 				break;
 
 			case LST_SENDSTOPa:
-				mac->set_adb_line(ASSERT_LINE);
-				mac->m_adb_timer->adjust(attotime::never);
-				mac->m_adb_linestate = LST_IDLE;
+				set_adb_line(ASSERT_LINE);
+				m_adb_timer->adjust(attotime::never);
+				m_adb_linestate = LST_IDLE;
 				break;
 		}
 	}
 	else
 	{
 		// do one clock transition on CB1 to advance the VIA shifter
-		mac->m_adb_extclock ^= 1;
-		mac->m_via1->write_cb1(mac->m_adb_extclock);
+		m_adb_extclock ^= 1;
+		m_via1->write_cb1(m_adb_extclock);
 
-		if (mac->m_adb_direction)
+		if (m_adb_direction)
 		{
-			mac->m_adb_command <<= 1;
+			m_adb_command <<= 1;
 		}
 		else
 		{
-			mac->m_via1->write_cb2((mac->m_adb_send & 0x80)>>7);
-			mac->m_adb_send <<= 1;
+			m_via1->write_cb2((m_adb_send & 0x80)>>7);
+			m_adb_send <<= 1;
 		}
 
-		mac->m_adb_extclock ^= 1;
-		mac->m_via1->write_cb1(mac->m_adb_extclock);
+		m_adb_extclock ^= 1;
+		m_via1->write_cb1(m_adb_extclock);
 
-		mac->m_adb_timer_ticks--;
-		if (!mac->m_adb_timer_ticks)
+		m_adb_timer_ticks--;
+		if (!m_adb_timer_ticks)
 		{
-			mac->m_adb_timer->adjust(attotime::never);
+			m_adb_timer->adjust(attotime::never);
 
-			if ((mac->m_adb_direction) && (ADB_IS_BITBANG))
+			if ((m_adb_direction) && (ADB_IS_BITBANG_CLASS))
 			{
-				mac->adb_talk();
-				if((mac->m_adb_last_talk == 2) && mac->m_adb_datasize) {
-					mac->m_adb_timer_ticks = 8;
-					mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
+				adb_talk();
+				if((m_adb_last_talk == 2) && m_adb_datasize) {
+					m_adb_timer_ticks = 8;
+					m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(100)));
 				}
 			}
 		}
 		else
 		{
-			mac->m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
+			m_adb_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 		}
 	}
 }
@@ -736,34 +733,32 @@ void mac_state::mac_adb_newaction(int state)
 	}
 }
 
-TIMER_CALLBACK(mac_pmu_tick)
+TIMER_CALLBACK_MEMBER(mac_state::mac_pmu_tick)
 {
-	mac_state *mac = machine.driver_data<mac_state>();
-
 	// state 10 means this is in response to an ADB command
-	if (mac->m_pm_state == 10)
+	if (m_pm_state == 10)
 	{
 		#if LOG_ADB
 		printf("PM: was state 10, chunk-chunking CB1\n");
 		#endif
-		mac->m_pm_state = 0;
+		m_pm_state = 0;
 
 		// tick CB1, which should cause a PMU interrupt on PMU machines
-		mac->m_adb_extclock ^= 1;
-		mac->m_via1->write_cb1(mac->m_adb_extclock);
-		mac->m_adb_extclock ^= 1;
-		mac->m_via1->write_cb1(mac->m_adb_extclock);
+		m_adb_extclock ^= 1;
+		m_via1->write_cb1(m_adb_extclock);
+		m_adb_extclock ^= 1;
+		m_via1->write_cb1(m_adb_extclock);
 	}
 	else
 	{
 		#if LOG_ADB
 		printf("PM: timer tick, lowering ACK\n");
 		#endif
-		mac->m_pm_ack &= ~2;    // lower ACK to handshake next step
+		m_pm_ack &= ~2;    // lower ACK to handshake next step
 	}
 }
 
-void mac_state::pmu_one_byte_reply(UINT8 result)
+void mac_state::pmu_one_byte_reply(uint8_t result)
 {
 	m_pm_out[0] = m_pm_out[1] = 1;  // length
 	m_pm_out[2] = result;
@@ -771,7 +766,7 @@ void mac_state::pmu_one_byte_reply(UINT8 result)
 	m_pmu_send_timer->adjust(attotime(0, ATTOSECONDS_IN_USEC(200)));
 }
 
-void mac_state::pmu_three_byte_reply(UINT8 result1, UINT8 result2, UINT8 result3)
+void mac_state::pmu_three_byte_reply(uint8_t result1, uint8_t result2, uint8_t result3)
 {
 	m_pm_out[0] = m_pm_out[1] = 3;  // length
 	m_pm_out[2] = result1;

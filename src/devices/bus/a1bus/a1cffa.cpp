@@ -42,7 +42,7 @@ machine_config_constructor a1bus_cffa_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( cffa );
 }
 
-const rom_entry *a1bus_cffa_device::device_rom_region() const
+const tiny_rom_entry *a1bus_cffa_device::device_rom_region() const
 {
 	return ROM_NAME( cffa );
 }
@@ -51,14 +51,14 @@ const rom_entry *a1bus_cffa_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A1BUS_CFFA, "CFFA Compact Flash for Apple I", tag, owner, clock, "cffa1", __FILE__),
 		device_a1bus_card_interface(mconfig, *this),
 		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)
 {
 }
 
-a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a1bus_cffa_device::a1bus_cffa_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_a1bus_card_interface(mconfig, *this),
 		m_ata(*this, CFFA_ATA_TAG), m_rom(nullptr), m_lastdata(0), m_writeprotect(false)
@@ -76,7 +76,7 @@ void a1bus_cffa_device::device_start()
 	m_rom = device().machine().root_device().memregion(this->subtag(CFFA_ROM_REGION).c_str())->base();
 
 	install_device(0xafe0, 0xafff, read8_delegate(FUNC(a1bus_cffa_device::cffa_r), this), write8_delegate(FUNC(a1bus_cffa_device::cffa_w), this));
-	install_bank(0x9000, 0xafdf, 0, 0, (char *)"bank_cffa1", m_rom);
+	install_bank(0x9000, 0xafdf, (char *)"bank_cffa1", m_rom);
 
 	save_item(NAME(m_lastdata));
 	save_item(NAME(m_writeprotect));

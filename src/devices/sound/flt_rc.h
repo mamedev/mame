@@ -34,11 +34,11 @@
  * This filter may be setup just with
  *
  * MCFG_FILTER_RC_ADD("tag", 0)
- * MCFG_FILTER_RC_AC(&flt_rc_ac_default)
+ * MCFG_FILTER_RC_AC()
  *
  * Default behaviour:
  *
- * Without MCFG_SOUND_CONFIG, a disabled FLT_RC_LOWPASS is created
+ * Without MCFG_FILTER_RC_AC, a disabled FLT_RC_LOWPASS is created
  *
  */
 
@@ -70,7 +70,7 @@ class filter_rc_device : public device_t,
 							public device_sound_interface
 {
 public:
-	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	filter_rc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~filter_rc_device() { }
 
 	// static configuration

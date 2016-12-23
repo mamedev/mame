@@ -6,12 +6,11 @@
 class tc0480scp_device : public device_t
 {
 public:
-	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tc0480scp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tc0480scp_device() {}
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfx_region(device_t &device, int gfxregion) { downcast<tc0480scp_device &>(device).m_gfxnum = gfxregion; }
 	static void set_tx_region(device_t &device, int txregion) { downcast<tc0480scp_device &>(device).m_txnum = txregion; }
 	static void set_col_base(device_t &device, int col) { downcast<tc0480scp_device &>(device).m_col_base = col; }
@@ -50,7 +49,7 @@ public:
 	DECLARE_WRITE32_MEMBER( ctrl_long_w );
 
 	void tilemap_update();
-	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority);
+	void tilemap_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority);
 
 	/* Returns the priority order of the bg tilemaps set in the internal
 	register. The order in which the four layers should be drawn is
@@ -69,22 +68,22 @@ protected:
 
 private:
 	// internal state
-	UINT16           m_ctrl[0x18];
+	uint16_t           m_ctrl[0x18];
 
-	std::vector<UINT16>   m_ram;
-	UINT16 *         m_bg_ram[4];
-	UINT16 *         m_tx_ram;
-	UINT16 *         m_char_ram;
-	UINT16 *         m_bgscroll_ram[4];
-	UINT16 *         m_rowzoom_ram[4];
-	UINT16 *         m_bgcolumn_ram[4];
+	std::vector<uint16_t>   m_ram;
+	uint16_t *         m_bg_ram[4];
+	uint16_t *         m_tx_ram;
+	uint16_t *         m_char_ram;
+	uint16_t *         m_bgscroll_ram[4];
+	uint16_t *         m_rowzoom_ram[4];
+	uint16_t *         m_bgcolumn_ram[4];
 	int              m_bgscrollx[4];
 	int              m_bgscrolly[4];
 	int              m_pri_reg;
 
 	/* We keep two tilemaps for each of the 5 actual tilemaps: one at standard width, one double */
 	tilemap_t        *m_tilemap[5][2];
-	INT32            m_dblwidth;
+	int32_t            m_dblwidth;
 
 	int              m_gfxnum;
 	int              m_txnum;
@@ -95,10 +94,9 @@ private:
 	int              m_col_base;
 
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
-	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
-	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, UINT16 *ram, int gfxnum );
+	void common_get_tc0480bg_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
+	void common_get_tc0480tx_tile_info( tile_data &tileinfo, int tile_index, uint16_t *ram, int gfxnum );
 
 	TILE_GET_INFO_MEMBER(get_bg0_tile_info);
 	TILE_GET_INFO_MEMBER(get_bg1_tile_info);
@@ -108,8 +106,8 @@ private:
 
 	void dirty_tilemaps();
 	void set_layer_ptrs();
-	void bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
-	void bg23_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, UINT32 priority );
+	void bg01_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
+	void bg23_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int layer, int flags, uint32_t priority );
 };
 
 extern const device_type TC0480SCP;
@@ -135,8 +133,5 @@ extern const device_type TC0480SCP;
 
 #define MCFG_TC0480SCP_GFXDECODE(_gfxtag) \
 	tc0480scp_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_TC0480SCP_PALETTE(_palette_tag) \
-	tc0480scp_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 #endif

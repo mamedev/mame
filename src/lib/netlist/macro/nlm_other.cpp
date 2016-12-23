@@ -1,4 +1,5 @@
-
+// license:GPL-2.0+
+// copyright-holders:Couriersud
 #include "nlm_other.h"
 
 #include "devices/nld_truthtable.h"
@@ -20,7 +21,7 @@
  *
  */
 
-NETLIST_START(MC14584B_DIP)
+static NETLIST_START(MC14584B_DIP)
 	MC14584B_GATE(s1)
 	MC14584B_GATE(s2)
 	MC14584B_GATE(s3)
@@ -44,7 +45,7 @@ NETLIST_START(MC14584B_DIP)
 NETLIST_END()
 
 NETLIST_START(otheric_lib)
-	TRUTHTABLE_START(MC14584B_GATE, 1, 1, 0, "")
+	TRUTHTABLE_START(MC14584B_GATE, 1, 1, "")
 		TT_HEAD(" A | Q ")
 		TT_LINE(" 0 | 1 |100")
 		TT_LINE(" 1 | 0 |100")

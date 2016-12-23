@@ -43,6 +43,7 @@ SOUNDS["HC55516"] = true
 SOUNDS["YM3812"] = true
 SOUNDS["CEM3394"] = true
 SOUNDS["VOTRAX"] = true
+SOUNDS["VOLT_REG"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -61,6 +62,8 @@ MACHINES["PIT8253"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["68681"] = true
 MACHINES["BANKDEV"] = true
+MACHINES["GEN_LATCH"] = true
+MACHINES["WATCHDOG"] = true
 
 
 --------------------------------------------------
@@ -82,7 +85,7 @@ function createProjects_mame_tiny(_target, _subtarget)
 	uuid (os.uuid("drv-mame-tiny"))
 	addprojectflags()
 	precompiledheaders()
-	
+
 	includedirs {
 		MAME_DIR .. "src/osd",
 		MAME_DIR .. "src/emu",

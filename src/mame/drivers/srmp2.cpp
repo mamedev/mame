@@ -205,7 +205,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memregion("adpcm")->base();
+	uint8_t *ROM = memregion("adpcm")->base();
 
 	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -228,7 +228,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memregion("adpcm")->base();
+	uint8_t *ROM = memregion("adpcm")->base();
 
 	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -244,7 +244,7 @@ WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
 
 WRITE_LINE_MEMBER(srmp2_state::adpcm_int)
 {
-	UINT8 *ROM = memregion("adpcm")->base();
+	uint8_t *ROM = memregion("adpcm")->base();
 
 	if (m_adpcm_sptr)
 	{
@@ -282,7 +282,7 @@ READ8_MEMBER(srmp2_state::vox_status_r)
 }
 
 
-UINT8 srmp2_state::iox_key_matrix_calc(UINT8 p_side)
+uint8_t srmp2_state::iox_key_matrix_calc(uint8_t p_side)
 {
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7" };
 	int i, j, t;
@@ -330,8 +330,8 @@ READ8_MEMBER(srmp2_state::iox_mux_r)
 		/* both side checks */
 		if(m_iox.mux == 1)
 		{
-			UINT8 p1_side = iox_key_matrix_calc(0);
-			UINT8 p2_side = iox_key_matrix_calc(4);
+			uint8_t p1_side = iox_key_matrix_calc(0);
+			uint8_t p2_side = iox_key_matrix_calc(4);
 
 			if(p1_side != 0)
 				return p1_side;
@@ -1168,7 +1168,6 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1215,7 +1214,6 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */
@@ -1270,7 +1268,6 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 	MCFG_SETA001_SPRITE_GFXBANK_CB(srmp2_state, srmp3_gfxbank_callback)
 
 	/* video hardware */

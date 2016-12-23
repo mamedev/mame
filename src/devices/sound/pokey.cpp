@@ -7,14 +7,14 @@
  *  Based on original info found in Ron Fries' Pokey emulator,
  *  with additions by Brad Oliver, Eric Smith and Juergen Buchmueller,
  *  paddle (a/d conversion) details from the Atari 400/800 Hardware Manual.
- *  Polynome algorithms according to info supplied by Perry McFarlane.
+ *  Polynomial algorithms according to info supplied by Perry McFarlane.
  *
  *  4.6:
  *    [1] http://ploguechipsounds.blogspot.de/2009/10/how-i-recorded-and-decoded-pokeys.html
  *  - changed audio emulation to emulate borrow 3 clock delay and
  *    proper channel reset. New frequency only becomes effective
  *    after the counter hits 0. Emulation also treats counters
- *    as 8 bit counters which are linked now instead of monolytic
+ *    as 8 bit counters which are linked now instead of monolithic
  *    16 bit counters.
  *
  *  4.51:
@@ -28,7 +28,7 @@
  *    new RNG give this expected result now, bits #0-7 of the 9 bit poly.
  *  - reading the RNG returns the shift register contents ^ 0xff.
  *    That way resetting the Pokey with SKCTL (which resets the
- *    polynome shifters to 0) returns the expected 0xff value.
+ *    polynomial shifters to 0) returns the expected 0xff value.
  *  4.4:
  *  - reversed sample values to make OFF channels produce a zero signal.
  *    actually de-reversed them; don't remember that I reversed them ;-/
@@ -177,7 +177,7 @@ const device_type POKEY = &device_creator<pokey_device>;
 //  okim9810_device - constructor
 //-------------------------------------------------
 
-pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pokey_device::pokey_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, POKEY, "POKEY", tag, owner, clock, "pokey", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_execute_interface(mconfig, *this),
@@ -351,7 +351,6 @@ void pokey_device::device_start()
 
 }
 
-
 //-------------------------------------------------
 //  device_reset - device-specific reset
 //-------------------------------------------------
@@ -378,6 +377,12 @@ void pokey_device::device_post_load()
 
 void pokey_device::device_clock_changed()
 {
+	m_clock_period = attotime::from_hz(clock());
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(clock());
+	else
+		m_stream = stream_alloc(0, 1, clock());
 }
 
 //-------------------------------------------------
@@ -419,7 +424,7 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 	case SYNC_WRITE:
 		{
 			offs_t offset = (param >> 8) & 0xff;
-			UINT8 data = param & 0xff;
+			uint8_t data = param & 0xff;
 			write_internal(offset, data);
 		}
 		break;
@@ -434,7 +439,7 @@ void pokey_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		m_IRQST |=  (param & 0xff);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pokey_device::device_timer");
+		assert_always(false, "Unknown id in pokey_device::device_timer");
 	}
 }
 
@@ -450,9 +455,9 @@ void pokey_device::execute_run()
 			debugger_instruction_hook(this, 0); //m_pc);
 
 		// instruction fetch
-		//UINT16 op = opcode_read();
+		//uint16_t op = opcode_read();
 
-		UINT32 new_out = step_one_clock();
+		uint32_t new_out = step_one_clock();
 		if (m_output != new_out)
 		{
 			//printf("forced update %08d %08x\n", m_icount, m_output);
@@ -477,7 +482,7 @@ void pokey_device::step_keyboard()
 		m_kbd_cnt = 0;
 	if (!m_keyboard_r.isnull())
 	{
-		UINT8 ret = m_keyboard_r(m_kbd_cnt);
+		uint8_t ret = m_keyboard_r(m_kbd_cnt);
 
 		switch (m_kbd_cnt)
 		{
@@ -564,7 +569,7 @@ void pokey_device::step_keyboard()
 void pokey_device::step_pot()
 {
 	int pot;
-	UINT8 upd = 0;
+	uint8_t upd = 0;
 	m_pot_counter++;
 	for (pot = 0; pot < 8; pot++)
 	{
@@ -585,10 +590,10 @@ void pokey_device::step_pot()
  *
  */
 
-UINT32 pokey_device::step_one_clock(void)
+uint32_t pokey_device::step_one_clock(void)
 {
 	int ch, clk;
-	UINT32 sum = 0;
+	uint32_t sum = 0;
 	int clock_triggered[3] = {0,0,0};
 	int base_clock = (m_AUDCTL & CLK_15KHZ) ? CLK_114 : CLK_28;
 
@@ -713,7 +718,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 
 	if (m_output_type == LEGACY_LINEAR)
 	{
-		INT32 out = 0;
+		int32_t out = 0;
 		for (int i = 0; i < 4; i++)
 			out += ((m_output >> (4*i)) & 0x0f);
 		out *= POKEY_DEFAULT_GAIN;
@@ -782,7 +787,7 @@ void pokey_device::sound_stream_update(sound_stream &stream, stream_sample_t **i
 	}
 	else if (m_output_type == DISCRETE_VAR_R)
 	{
-		INT32 out = m_voltab[m_output];
+		int32_t out = m_voltab[m_output];
 		while( samples > 0 )
 		{
 			*buffer++ = out;
@@ -800,7 +805,7 @@ READ8_MEMBER( pokey_device::read )
 	return read(offset);
 }
 
-UINT8 pokey_device::read(offs_t offset)
+uint8_t pokey_device::read(offs_t offset)
 {
 	int data, pot;
 
@@ -897,7 +902,7 @@ UINT8 pokey_device::read(offs_t offset)
 //  write - memory interface for write
 //-------------------------------------------------
 
-void pokey_device::write(offs_t offset, UINT8 data)
+void pokey_device::write(offs_t offset, uint8_t data)
 {
 	synchronize(SYNC_WRITE, (offset<<8) | data);
 }
@@ -907,7 +912,7 @@ WRITE8_MEMBER( pokey_device::write )
 	write(offset, data);
 }
 
-void pokey_device::write_internal(offs_t offset, UINT8 data)
+void pokey_device::write_internal(offs_t offset, uint8_t data)
 {
 	/* determine which address was changed */
 	switch (offset & 15)
@@ -1333,11 +1338,11 @@ void pokey_device::vol_init()
 
 }
 
-void pokey_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
+void pokey_device::poly_init_4_5(uint32_t *poly, int size, int xorbit, int invert)
 {
 	int mask = (1 << size) - 1;
 	int i;
-	UINT32 lfsr = 0;
+	uint32_t lfsr = 0;
 
 	LOG_POLY(("poly %d\n", size));
 	for( i = 0; i < mask; i++ )
@@ -1352,11 +1357,11 @@ void pokey_device::poly_init_4_5(UINT32 *poly, int size, int xorbit, int invert)
 	}
 }
 
-void pokey_device::poly_init_9_17(UINT32 *poly, int size)
+void pokey_device::poly_init_9_17(uint32_t *poly, int size)
 {
 	int mask = (1 << size) - 1;
 	int i;
-	UINT32 lfsr =mask;
+	uint32_t lfsr =mask;
 
 	LOG_RAND(("rand %d\n", size));
 

@@ -123,9 +123,9 @@ INPUT_PORTS_END
 
 WRITE8_MEMBER( llc_state::kbd_put )
 {
-	static UINT8 s1[16]={0x40, 0x1e, 0x12, 0x1b, 0x19, 0x14, 0x15, 0x1d, 0x16, 0x17, 0x1c, 0x3c, 0x3f, 0x3d, 0x3e, 0x10}; // 0x20 to 0x2F
-	static UINT8 s2[7] ={0x1a, 0x11, 0x7c, 0x13, 0x7b, 0x1f, 0x00}; // 0x3A to 0x40
-	static UINT8 s3[6] ={0x5c, 0x00, 0x5b, 0x7e, 0x00, 0x5e}; // 0x5B to 0x60
+	static uint8_t s1[16]={0x40, 0x1e, 0x12, 0x1b, 0x19, 0x14, 0x15, 0x1d, 0x16, 0x17, 0x1c, 0x3c, 0x3f, 0x3d, 0x3e, 0x10}; // 0x20 to 0x2F
+	static uint8_t s2[7] ={0x1a, 0x11, 0x7c, 0x13, 0x7b, 0x1f, 0x00}; // 0x3A to 0x40
+	static uint8_t s3[6] ={0x5c, 0x00, 0x5b, 0x7e, 0x00, 0x5e}; // 0x5B to 0x60
 
 	m_term_data = data;
 
@@ -197,7 +197,7 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( llc1, llc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
-	MCFG_CPU_CONFIG(llc1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(llc1_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc1_mem)
 	MCFG_CPU_IO_MAP(llc1_io)
 
@@ -214,7 +214,7 @@ static MACHINE_CONFIG_START( llc1, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc1)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_DEFAULT_LAYOUT(layout_llc1)
 
 	MCFG_DEVICE_ADD("z80pio1", Z80PIO, XTAL_3MHz)
@@ -241,7 +241,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( llc2, llc_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3MHz)
-	MCFG_CPU_CONFIG(llc2_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(llc2_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(llc2_mem)
 	MCFG_CPU_IO_MAP(llc2_io)
 
@@ -257,7 +257,7 @@ static MACHINE_CONFIG_START( llc2, llc_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", llc2)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

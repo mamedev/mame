@@ -156,9 +156,10 @@ Note: The 'rastsagaa' set's rom numbers were named as RSxx_37 through RSxx_42
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "includes/rastan.h"
 
@@ -170,16 +171,16 @@ WRITE8_MEMBER(rastan_state::rastan_bankswitch_w)
 
 WRITE_LINE_MEMBER(rastan_state::rastan_msm5205_vck)
 {
-	if (m_adpcm_data != -1)
+	if (!state)
+		return;
+
+	m_adpcm_ff = !m_adpcm_ff;
+	m_adpcm_sel->select_w(m_adpcm_ff);
+
+	if (m_adpcm_ff)
 	{
-		m_msm->data_w(m_adpcm_data & 0x0f);
-		m_adpcm_data = -1;
-	}
-	else
-	{
-		m_adpcm_data = memregion("adpcm")->base()[m_adpcm_pos];
+		m_adpcm_sel->ba_w(m_adpcm_data[m_adpcm_pos]);
 		m_adpcm_pos = (m_adpcm_pos + 1) & 0xffff;
-		m_msm->data_w(m_adpcm_data >> 4);
 	}
 }
 
@@ -191,6 +192,7 @@ WRITE8_MEMBER(rastan_state::rastan_msm5205_address_w)
 WRITE8_MEMBER(rastan_state::rastan_msm5205_start_w)
 {
 	m_msm->reset_w(0);
+	m_adpcm_ff = false;
 }
 
 WRITE8_MEMBER(rastan_state::rastan_msm5205_stop_w)
@@ -213,7 +215,7 @@ static ADDRESS_MAP_START( rastan_map, AS_PROGRAM, 16, rastan_state )
 	AM_RANGE(0x390006, 0x390007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x390008, 0x390009) AM_READ_PORT("DSWA")
 	AM_RANGE(0x39000a, 0x39000b) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x3c0000, 0x3c0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x3e0000, 0x3e0001) AM_READNOP AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 	AM_RANGE(0xc00000, 0xc0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)
@@ -343,7 +345,7 @@ void rastan_state::machine_start()
 	save_item(NAME(m_sprites_flipscreen));
 
 	save_item(NAME(m_adpcm_pos));
-	save_item(NAME(m_adpcm_data));
+	save_item(NAME(m_adpcm_ff));
 }
 
 void rastan_state::machine_reset()
@@ -351,7 +353,7 @@ void rastan_state::machine_reset()
 	m_sprite_ctrl = 0;
 	m_sprites_flipscreen = 0;
 	m_adpcm_pos = 0;
-	m_adpcm_data = -1;
+	m_adpcm_ff = false;
 }
 
 
@@ -367,6 +369,7 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -383,7 +386,6 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFX_REGION(1)
@@ -403,6 +405,9 @@ static MACHINE_CONFIG_START( rastan, rastan_state )
 	MCFG_MSM5205_VCLK_CB(WRITELINE(rastan_state, rastan_msm5205_vck)) /* VCK function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8 kHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+
+	MCFG_DEVICE_ADD("adpcm_sel", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_DEVICE_ADD("tc0140syt", TC0140SYT, 0)
 	MCFG_TC0140SYT_MASTER_CPU("maincpu")

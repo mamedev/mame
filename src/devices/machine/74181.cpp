@@ -26,7 +26,7 @@ const device_type TTL74181 = &device_creator<ttl74181_device>;
 //  ttl74181_device - constructor
 //-------------------------------------------------
 
-ttl74181_device::ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+ttl74181_device::ttl74181_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, TTL74181, "74181 TTL", tag, owner, clock, "ttl74181", __FILE__),
 	m_a(0),
 	m_b(0),
@@ -98,7 +98,7 @@ void ttl74181_device::update()
 	m_cn = (!(m_c & bp0 & bp1 & bp2 & bp3)) | m_g;
 }
 
-void ttl74181_device::input_a_w(UINT8 data)
+void ttl74181_device::input_a_w(uint8_t data)
 {
 	data &= 0x0f;
 
@@ -109,7 +109,7 @@ void ttl74181_device::input_a_w(UINT8 data)
 	}
 }
 
-void ttl74181_device::input_b_w(UINT8 data)
+void ttl74181_device::input_b_w(uint8_t data)
 {
 	data &= 0x0f;
 
@@ -120,7 +120,7 @@ void ttl74181_device::input_b_w(UINT8 data)
 	}
 }
 
-void ttl74181_device::select_w(UINT8 data)
+void ttl74181_device::select_w(uint8_t data)
 {
 	data &= 0x0f;
 

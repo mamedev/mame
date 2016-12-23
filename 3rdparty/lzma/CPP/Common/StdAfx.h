@@ -3,7 +3,6 @@
 #ifndef __STDAFX_H
 #define __STDAFX_H
 
-// #include "MyWindows.h"
-#include "NewHandler.h"
+#include "Common.h"
 
 #endif

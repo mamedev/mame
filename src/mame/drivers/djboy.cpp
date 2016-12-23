@@ -230,7 +230,7 @@ WRITE8_MEMBER(djboy_state::coin_count_w)
 
 WRITE8_MEMBER(djboy_state::trigger_nmi_on_sound_cpu2)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_cpu2->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
@@ -291,7 +291,7 @@ static ADDRESS_MAP_START( cpu2_port_am, AS_IO, 8, djboy_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(cpu2_bankswitch_w)
 	AM_RANGE(0x02, 0x03) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x06, 0x06) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x07, 0x07) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
 ADDRESS_MAP_END
@@ -355,9 +355,9 @@ WRITE8_MEMBER(djboy_state::beast_p2_w)
 
 READ8_MEMBER(djboy_state::beast_p3_r)
 {
-	UINT8 dsw = 0;
-	UINT8 dsw1 = ~ioport("DSW1")->read();
-	UINT8 dsw2 = ~ioport("DSW2")->read();
+	uint8_t dsw = 0;
+	uint8_t dsw1 = ~ioport("DSW1")->read();
+	uint8_t dsw2 = ~ioport("DSW2")->read();
 
 	switch ((m_beast_p0 >> 5) & 3)
 	{
@@ -505,9 +505,9 @@ TIMER_DEVICE_CALLBACK_MEMBER(djboy_state::djboy_scanline)
 
 void djboy_state::machine_start()
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *CPU1 = memregion("cpu1")->base();
-	UINT8 *CPU2 = memregion("cpu2")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *CPU1 = memregion("cpu1")->base();
+	uint8_t *CPU2 = memregion("cpu2")->base();
 
 	membank("bank1")->configure_entries(0, 4,  &MAIN[0x00000], 0x2000);
 	membank("bank1")->configure_entries(4, 28, &MAIN[0x10000], 0x2000);
@@ -581,9 +581,10 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MCFG_DEVICE_ADD("pandora", KANEKO_PANDORA, 0)
 	MCFG_KANEKO_PANDORA_GFXDECODE("gfxdecode")
-	MCFG_KANEKO_PANDORA_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

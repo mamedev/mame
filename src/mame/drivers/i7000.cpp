@@ -68,10 +68,10 @@ public:
 	required_device<cpu_device> m_maincpu;
 	required_device<generic_slot_device> m_card;
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_shared_ptr<UINT8> m_videoram;
-	UINT32 screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT8 *m_char_rom;
-	UINT8 m_row;
+	required_shared_ptr<uint8_t> m_videoram;
+	uint32_t screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint8_t *m_char_rom;
+	uint8_t m_row;
 	tilemap_t *m_bg_tilemap;
 
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
@@ -91,7 +91,7 @@ WRITE8_MEMBER( i7000_state::i7000_scanlines_w )
 
 READ8_MEMBER( i7000_state::i7000_kbd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i=0; i<40*25; i++){
 		m_bg_tilemap->mark_tile_dirty(i);
@@ -262,8 +262,7 @@ static ADDRESS_MAP_START( i7000_io , AS_IO, 8, i7000_state)
 //  AM_RANGE(0x1f, 0x1f) AM_WRITE(i7000_io_printer_strobe_w) //self-test routine writes 0x08 and 0x09 (it seems that bit 0 is the strobe and bit 3 is an enable signal)
 //  AM_RANGE(0x20, 0x21) AM_READWRITE(i7000_io_keyboard_r, i7000_io_keyboard_w)
 
-	AM_RANGE( 0x20, 0x20 ) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-	AM_RANGE( 0x21, 0x21 ) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 
 //  AM_RANGE(0x24, 0x24) AM_READ(i7000_io_?_r)
 //  AM_RANGE(0x25, 0x25) AM_WRITE(i7000_io_?_w)
@@ -277,12 +276,12 @@ ADDRESS_MAP_END
 
 DEVICE_IMAGE_LOAD_MEMBER( i7000_state, i7000_card )
 {
-	UINT32 size = m_card->common_get_size("rom");
+	uint32_t size = m_card->common_get_size("rom");
 
 	m_card->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_BIG);
 	m_card->common_load_rom(m_card->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static const gfx_layout i7000_charlayout =
@@ -313,10 +312,10 @@ TILE_GET_INFO_MEMBER(i7000_state::get_bg_tile_info)
 
 void i7000_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(i7000_state::get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 40, 25);
 }
 
-UINT32 i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t i7000_state::screen_update_i7000(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;

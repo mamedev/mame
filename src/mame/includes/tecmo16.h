@@ -1,5 +1,7 @@
-// license:???
-// copyright-holders:Eisuke Watanabe, Nicola Salmoria
+// license:BSD-3-Clause
+// copyright-holders:Hau, Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "video/tecmo_spr.h"
 #include "video/tecmo_mix.h"
 
@@ -15,6 +17,7 @@ public:
 		m_palette(*this, "palette"),
 		m_sprgen(*this, "spritegen"),
 		m_mixer(*this, "mixer"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_videoram2(*this, "videoram2"),
@@ -30,13 +33,14 @@ public:
 	required_device<palette_device> m_palette;
 	required_device<tecmo_spr_device> m_sprgen;
 	required_device<tecmo_mix_device> m_mixer;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_colorram;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_colorram2;
-	required_shared_ptr<UINT16> m_charram;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_colorram;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_colorram2;
+	required_shared_ptr<uint16_t> m_charram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -46,12 +50,12 @@ public:
 	bitmap_ind16 m_tile_bitmap_fg;
 	int m_flipscreen;
 	int m_game_is_riot;
-	UINT16 m_scroll_x_w;
-	UINT16 m_scroll_y_w;
-	UINT16 m_scroll2_x_w;
-	UINT16 m_scroll2_y_w;
-	UINT16 m_scroll_char_x_w;
-	UINT16 m_scroll_char_y_w;
+	uint16_t m_scroll_x_w;
+	uint16_t m_scroll_y_w;
+	uint16_t m_scroll2_x_w;
+	uint16_t m_scroll2_y_w;
+	uint16_t m_scroll_char_x_w;
+	uint16_t m_scroll_char_y_w;
 
 	DECLARE_WRITE16_MEMBER(sound_command_w);
 	DECLARE_WRITE16_MEMBER(videoram_w);
@@ -75,7 +79,7 @@ public:
 	DECLARE_VIDEO_START(ginkun);
 	DECLARE_VIDEO_START(riot);
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	void save_state();
 };

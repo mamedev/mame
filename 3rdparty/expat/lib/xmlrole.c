@@ -4,7 +4,19 @@
 
 #include <stddef.h>
 
-#include "intconfig.h"
+#ifdef COMPILED_FROM_DSP
+#include "winconfig.h"
+#elif defined(MACOS_CLASSIC)
+#include "macconfig.h"
+#elif defined(__amigaos__)
+#include "amigaconfig.h"
+#elif defined(__WATCOMC__)
+#include "watcomconfig.h"
+#else
+#ifdef HAVE_EXPAT_CONFIG_H
+#include <expat_config.h>
+#endif
+#endif /* ndef COMPILED_FROM_DSP */
 
 #include "expat_external.h"
 #include "internal.h"

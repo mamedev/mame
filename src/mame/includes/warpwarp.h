@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Chris Hardy
+
+#include "machine/watchdog.h"
+#include "audio/geebee.h"
 #include "audio/warpwarp.h"
 
 class warpwarp_state : public driver_device
@@ -8,6 +11,7 @@ public:
 	warpwarp_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_warpwarp_sound(*this, "warpwarp_custom"),
 		m_geebee_sound(*this, "geebee_custom"),
@@ -19,22 +23,22 @@ public:
 		m_dsw1(*this, "DSW1"),
 		m_volin1(*this, "VOLIN1"),
 		m_volin2(*this, "VOLIN2"),
-		m_ports(*this, portnames)
+		m_ports(*this, { { "SW0", "SW1", "DSW2", "PLACEHOLDER" } }) // "IN1" & "IN2" are read separately when offset==3
 	{ }
 
 	required_device<cpu_device> m_maincpu;
+	optional_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	optional_device<warpwarp_sound_device> m_warpwarp_sound;
 	optional_device<geebee_sound_device> m_geebee_sound;
-	optional_shared_ptr<UINT8> m_geebee_videoram;
-	optional_shared_ptr<UINT8> m_videoram;
+	optional_shared_ptr<uint8_t> m_geebee_videoram;
+	optional_shared_ptr<uint8_t> m_videoram;
 	optional_ioport m_in0;
 	optional_ioport m_in1;
 	optional_ioport m_in2;
 	optional_ioport m_dsw1;
 	optional_ioport m_volin1;
 	optional_ioport m_volin2;
-	DECLARE_IOPORT_ARRAY(portnames);
 	optional_ioport_array<4> m_ports;
 
 	int m_geebee_bgw;
@@ -81,7 +85,7 @@ public:
 	TILE_GET_INFO_MEMBER(navarone_get_tile_info);
 	TILE_GET_INFO_MEMBER(warpwarp_get_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	inline void plot(bitmap_ind16 &bitmap, const rectangle &cliprect, int x, int y, pen_t pen);
 	void draw_ball(bitmap_ind16 &bitmap, const rectangle &cliprect,pen_t pen);
 

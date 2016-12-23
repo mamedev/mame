@@ -23,7 +23,7 @@ wow_sh_ update- Null
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "includes/astrocde.h"
-
+#include "audio/wow.h"
 
 /****************************************************************************
  * 64 Phonemes - currently 1 sample per phoneme, will be combined sometime!
@@ -103,7 +103,7 @@ const char *const wow_sample_names[] =
 
 READ8_MEMBER( astrocde_state::wow_speech_r )
 {
-	UINT8 data = offset >> 8;
+	uint8_t data = offset >> 8;
 #if USE_FAKE_VOTRAX
 	int Phoneme/*, Intonation*/;
 	int i = 0;

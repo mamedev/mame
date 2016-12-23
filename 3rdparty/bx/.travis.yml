@@ -1,0 +1,20 @@
+language: cpp
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+    - compiler: clang
+      os: osx
+
+script:
+  make test
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+
+osx_image:
+  xcode61

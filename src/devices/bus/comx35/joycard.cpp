@@ -66,7 +66,7 @@ ioport_constructor comx_joy_device::device_input_ports() const
 //  comx_joy_device - constructor
 //-------------------------------------------------
 
-comx_joy_device::comx_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+comx_joy_device::comx_joy_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, COMX_JOY, "COMX JoyCard", tag, owner, clock, "comx_joy", __FILE__),
 	device_comx_expansion_card_interface(mconfig, *this),
 	m_joy1(*this, "JOY1"),
@@ -97,9 +97,9 @@ void comx_joy_device::device_reset()
 //  comx_mrd_r - I/O read
 //-------------------------------------------------
 
-UINT8 comx_joy_device::comx_io_r(address_space &space, offs_t offset)
+uint8_t comx_joy_device::comx_io_r(address_space &space, offs_t offset)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (offset == 2)
 	{

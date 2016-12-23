@@ -28,10 +28,10 @@ class s100_mds_a_device : public device_t,
 {
 public:
 	// construction/destruction
-	s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s100_mds_a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 protected:
@@ -40,7 +40,7 @@ protected:
 	virtual void device_reset() override;
 
 	// device_s100_card_interface overrides
-	virtual UINT8 s100_smemr_r(address_space &space, offs_t offset) override;
+	virtual uint8_t s100_smemr_r(address_space &space, offs_t offset) override;
 
 private:
 	required_device<floppy_connector> m_floppy0;

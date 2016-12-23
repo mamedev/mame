@@ -58,9 +58,8 @@ Dip locations verified with manual for ddragon & ddragon2
 #include "cpu/m6805/m6805.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
 #include "includes/ddragon.h"
 
 
@@ -264,7 +263,7 @@ WRITE8_MEMBER(ddragon_state::darktowr_bankswitch_w)
  *
  *************************************/
 
-void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, UINT8 data)
+void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, uint8_t data)
 {
 	switch (offset)
 	{
@@ -281,7 +280,7 @@ void ddragon_state::ddragon_interrupt_ack(address_space &space, offs_t offset, U
 			break;
 
 		case 3: /* 380e - SND IRQ and latch */
-			soundlatch_byte_w(space, 0, data);
+			m_soundlatch->write(space, 0, data);
 			m_soundcpu->set_input_line(m_sound_irq, ASSERT_LINE);
 			break;
 
@@ -327,7 +326,7 @@ WRITE_LINE_MEMBER(ddragon_state::irq_handler)
 READ8_MEMBER(ddragon_state::soundlatch_ack_r)
 {
 	m_soundcpu->set_input_line(m_sound_irq, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 
@@ -464,7 +463,7 @@ void ddragon_state::dd_adpcm_int( msm5205_device *device, int chip )
 	}
 	else
 	{
-		UINT8 *ROM = memregion("adpcm")->base() + 0x10000 * chip;
+		uint8_t *ROM = memregion("adpcm")->base() + 0x10000 * chip;
 
 		m_adpcm_data[chip] = ROM[m_adpcm_pos[chip]++];
 		device->data_w(m_adpcm_data[chip] >> 4);
@@ -570,7 +569,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( ddragonba_sub_portmap, AS_IO, 8, ddragon_state )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(ddragonba_port_w)
+	AM_RANGE(0x0000, 0x01ff) AM_WRITE(ddragonba_port_w)
 ADDRESS_MAP_END
 
 
@@ -695,7 +694,7 @@ static INPUT_PORTS_START( ddragon )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_CUSTOM ) PORT_VBLANK("screen")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, ddragon_state, subcpu_bus_free, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -977,6 +976,8 @@ static MACHINE_CONFIG_START( ddragon, ddragon_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state, irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1044,6 +1045,8 @@ static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.60)
@@ -1093,6 +1096,8 @@ static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("fmsnd", SOUND_CLOCK)
 	MCFG_YM2151_IRQ_HANDLER(WRITELINE(ddragon_state,irq_handler))
@@ -2105,7 +2110,7 @@ DRIVER_INIT_MEMBER(ddragon_state,darktowr)
 DRIVER_INIT_MEMBER(ddragon_state,toffy)
 {
 	int i, length;
-	UINT8 *rom;
+	uint8_t *rom;
 
 	m_sound_irq = M6809_IRQ_LINE;
 	m_ym_irq = M6809_FIRQ_LINE;
@@ -2145,7 +2150,7 @@ DRIVER_INIT_MEMBER(ddragon_state,toffy)
 DRIVER_INIT_MEMBER(ddragon_state,ddragon6809)
 {
 	int i;
-	UINT8 *dst,*src;
+	uint8_t *dst,*src;
 
 	src = memregion("chars")->base();
 	dst = memregion("gfx1")->base();
@@ -2190,7 +2195,7 @@ GAME( 1987, ddragon6809a,ddragon,  ddragon6809, ddragon, ddragon_state,  ddragon
 GAME( 1988, ddragon2,    0,        ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2u,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, ddragon2j,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (Japan)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // bad dump
-GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "Technos Japan", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, ddragon2b,   ddragon2, ddragon2, ddragon2, ddragon_state, ddragon2, ROT0, "bootleg", "Double Dragon II - The Revenge (US, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* these were conversions of double dragon */
 GAME( 1991, tstrike,  0,        darktowr, tstrike, ddragon_state,  darktowr, ROT0, "East Coast Coin Company", "Thunder Strike (set 1)", MACHINE_SUPPORTS_SAVE ) // same manufacturer as The Game Room?

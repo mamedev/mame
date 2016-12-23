@@ -56,8 +56,8 @@ public:
 
 	DECLARE_READ8_MEMBER(mk1_f8_r);
 	DECLARE_WRITE8_MEMBER(mk1_f8_w);
-	UINT8 m_f8[2];
-	UINT8 m_led[4];
+	uint8_t m_f8[2];
+	uint8_t m_led[4];
 	virtual void machine_start() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(mk1_update_leds);
 	F3853_INTERRUPT_REQ_CB(mk1_interrupt);
@@ -70,7 +70,7 @@ public:
 
 READ8_MEMBER( mk1_state::mk1_f8_r )
 {
-	UINT8 i, data = m_f8[offset];
+	uint8_t i, data = m_f8[offset];
 
 	if ( offset == 0 )
 	{

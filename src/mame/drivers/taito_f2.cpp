@@ -268,6 +268,7 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/watchdog.h"
 #include "audio/taitosnd.h"
 #include "includes/taito_f2.h"
 #include "sound/2203intf.h"
@@ -581,7 +582,7 @@ void taitof2_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(6, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in taitof2_state::device_timer");
+		assert_always(false, "Unknown id in taitof2_state::device_timer");
 	}
 }
 
@@ -617,7 +618,7 @@ READ8_MEMBER(taitof2_state::driveout_sound_command_r)
 
 void taitof2_state::reset_driveout_sound_region()
 {
-	m_oki->set_bank_base(m_oki_bank * 0x40000);
+	m_oki->set_rom_bank(m_oki_bank);
 }
 
 WRITE8_MEMBER(taitof2_state::oki_bank_w)
@@ -795,7 +796,7 @@ static ADDRESS_MAP_START( quizhq_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x500004, 0x500005) AM_WRITE(growl_coin_word_w)
 	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSWB")
 	AM_RANGE(0x500002, 0x500003) AM_READ_PORT("IN0")
-	AM_RANGE(0x580000, 0x580001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x580000, 0x580001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x580006, 0x580007) AM_WRITENOP   /* ??? */
 	AM_RANGE(0x580000, 0x580001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x580002, 0x580003) AM_READ_PORT("IN1")
@@ -846,7 +847,7 @@ static ADDRESS_MAP_START( growl_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
 	AM_RANGE(0x320002, 0x320003) AM_READ_PORT("IN1")
 	AM_RANGE(0x320004, 0x320005) AM_READ_PORT("IN2")
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
@@ -894,7 +895,7 @@ static ADDRESS_MAP_START( footchmp_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
 	AM_RANGE(0x70000e, 0x70000f) AM_READ_PORT("IN3")
 	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("IN4")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
 ADDRESS_MAP_END
@@ -933,7 +934,7 @@ static ADDRESS_MAP_START( ninjak_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x200000, 0x201fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x300000, 0x30000f) AM_READ(ninjak_input_r)
 	AM_RANGE(0x30000e, 0x30000f) AM_WRITE(ninjak_coin_word_w)
-	AM_RANGE(0x380000, 0x380001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x380000, 0x380001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x600000, 0x60000f) AM_WRITE(taitof2_spritebank_w)
@@ -953,7 +954,7 @@ static ADDRESS_MAP_START( solfigtr_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x320000, 0x320001) AM_READ_PORT("IN0")
 	AM_RANGE(0x320002, 0x320003) AM_READ_PORT("IN1")
 	AM_RANGE(0x320004, 0x320005) AM_READ_PORT("IN2")
-	AM_RANGE(0x340000, 0x340001) AM_WRITE(watchdog_reset16_w)   /* NOT VERIFIED */
+	AM_RANGE(0x340000, 0x340001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* NOT VERIFIED */
 	AM_RANGE(0x400000, 0x400001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0x400002, 0x400003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 	AM_RANGE(0x500000, 0x50000f) AM_WRITE(taitof2_spritebank_w)
@@ -1055,7 +1056,7 @@ static ADDRESS_MAP_START( deadconx_map, AS_PROGRAM, 16, taitof2_state )
 	AM_RANGE(0x700006, 0x700007) AM_WRITE(taitof2_4p_coin_word_w)
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("IN0")
 	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("IN1")
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(watchdog_reset16_w)   /* ??? */
+	AM_RANGE(0x800000, 0x800001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)   /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0xff00)
 	AM_RANGE(0xa00002, 0xa00003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0xff00)
 ADDRESS_MAP_END
@@ -1182,7 +1183,7 @@ static ADDRESS_MAP_START( cameltrya_sound_map, AS_PROGRAM, 8, taitof2_state )
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_DEVREADWRITE("tc0140syt", tc0140syt_device, slave_comm_r, slave_comm_w)
 //  AM_RANGE(0xb000, 0xb000) AM_WRITE(unknown_w)    // probably controlling sample player?
-	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
+	AM_RANGE(0xb000, 0xb001) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 ADDRESS_MAP_END
 
 
@@ -1612,7 +1613,14 @@ static INPUT_PORTS_START( ssi )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( majest12 )
+static INPUT_PORTS_START( majest12u )
+	PORT_INCLUDE(ssi)
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_US_LOC(SW1)
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( majest12j )
 	PORT_INCLUDE(ssi)
 
 	PORT_MODIFY("DSWA")
@@ -2819,13 +2827,6 @@ static GFXDECODE_START( footchmpbl )
 GFXDECODE_END
 
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitof2_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 WRITE8_MEMBER(taitof2_state::cameltrya_porta_w)
 {
 	// Implement //
@@ -2857,6 +2858,8 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	MCFG_MACHINE_START_OVERRIDE(taitof2_state,f2)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -2877,7 +2880,7 @@ static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitof2_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -2891,7 +2894,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 
 	/* basic machine hardware */
-
+	MCFG_DEVICE_REMOVE("watchdog")
 	MCFG_DEVICE_ADD("tc0220ioc", TC0220IOC, 0)
 	MCFG_TC0220IOC_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0220IOC_READ_1_CB(IOPORT("DSWB"))
@@ -2903,7 +2906,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 
 	/* basic machine hardware */
-
+	MCFG_DEVICE_REMOVE("watchdog")
 	MCFG_DEVICE_ADD("tc0510nio", TC0510NIO, 0)
 	MCFG_TC0510NIO_READ_0_CB(IOPORT("DSWA"))
 	MCFG_TC0510NIO_READ_1_CB(IOPORT("DSWB"))
@@ -3232,7 +3235,6 @@ static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3266,7 +3268,6 @@ static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 MACHINE_CONFIG_END
 
 
@@ -3433,7 +3434,6 @@ static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_COL_BASE(4096)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3501,7 +3501,6 @@ static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3526,7 +3525,6 @@ static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 	MCFG_TC0480SCP_OFFSETS_TX(-1, 0)
 	MCFG_TC0480SCP_OFFSETS_FLIP(-1, 0)
 	MCFG_TC0480SCP_GFXDECODE("gfxdecode")
-	MCFG_TC0480SCP_PALETTE("palette")
 
 	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
@@ -3711,7 +3709,7 @@ static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 24000000/8) /* verified on pcb  */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(taitof2_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(taitof2_state, cameltrya_porta_w))   /* portA write - not implemented */
 	MCFG_SOUND_ROUTE(0, "mono", 0.20)
 	MCFG_SOUND_ROUTE(1, "mono", 0.20)
@@ -4268,7 +4266,7 @@ ROM_START( qtorimon )   /* Quiz Torimonochou */
 	ROM_LOAD16_BYTE( "c41-04.bin",  0x00000, 0x20000, CRC(0fbf5223) SHA1(2aa8b3dd20ae922a3ff880db7b46e2bbb708698d) )
 	ROM_LOAD16_BYTE( "c41-05.bin",  0x00001, 0x20000, CRC(174bd5db) SHA1(f7a4b2ac91b3bcd886e2a1e1d0415a95f14c9de7) )
 	ROM_LOAD16_BYTE( "mask-51.bin", 0x40000, 0x20000, CRC(12e14aca) SHA1(8f7dc54f68984c82420abf96436743c0654a71ea) ) /* char defs, read by cpu */
-	ROM_LOAD16_BYTE( "mask-52.bin", 0x40001, 0X20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
+	ROM_LOAD16_BYTE( "mask-52.bin", 0x40001, 0x20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
@@ -4364,7 +4362,7 @@ ROM_START( quizhq ) /* Quiz HQ */
 	ROM_LOAD16_BYTE( "c53-05.bin",  0x00000, 0x20000, CRC(c798fc20) SHA1(4467dde3620102f87cffb2f81f71d856c0df12f8) )
 	ROM_LOAD16_BYTE( "c53-01.bin",  0x00001, 0x20000, CRC(bf44c93e) SHA1(6fd871f50da4a668767b3096660689905663f697) )
 	ROM_LOAD16_BYTE( "c53-52.bin",  0x80000, 0x20000, CRC(12e14aca) SHA1(8f7dc54f68984c82420abf96436743c0654a71ea) ) /* char defs, read by cpu */
-	ROM_LOAD16_BYTE( "c53-51.bin",  0x80001, 0X20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
+	ROM_LOAD16_BYTE( "c53-51.bin",  0x80001, 0x20000, CRC(b3ef66f3) SHA1(4766a1ed9b4adcc2f0d2857633ce95194eb80694) ) /* char defs, read by cpu */
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty */
@@ -4427,7 +4425,28 @@ ROM_START( ssia )
 	/* no Delta-T samples */
 ROM_END
 
-ROM_START( majest12 )
+ROM_START( majest12u )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c64_12.ic9", 0x00000, 0x40000, CRC(d5716d7e) SHA1(3a18d8ef1d16380946714910245b00bbcec39e3d) )
+	ROM_LOAD16_BYTE( "c64_14.ic8", 0x00001, 0x40000, CRC(eee4ed8a) SHA1(ad50dc12ede0d327ef9ded5ffd9dbd6e865ebcfc) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )   /* OBJ */
+	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )        /* sound cpu */
+	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )    /* banked stuff */
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )   /* ADPCM samples */
+	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
+
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( majest12j )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
 	ROM_LOAD16_BYTE( "c64-07.10", 0x00000, 0x20000, CRC(f29ed5c9) SHA1(62283af1c08457db54057ee59a95fb7a3797b897) )
 	ROM_LOAD16_BYTE( "c64-06.4",  0x40000, 0x20000, CRC(18dc71ac) SHA1(cb9c0b330ae98e20269f18cdb543feb294647245) )
@@ -5485,9 +5504,9 @@ ROM_END
 DRIVER_INIT_MEMBER(taitof2_state,finalb)
 {
 	int i;
-	UINT8 data;
-	UINT32 offset;
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t data;
+	uint32_t offset;
+	uint8_t *gfx = memregion("gfx2")->base();
 
 	offset = 0x100000;
 	for (i = 0x180000; i < 0x200000; i++)
@@ -5521,7 +5540,7 @@ DRIVER_INIT_MEMBER(taitof2_state,cameltry)
 DRIVER_INIT_MEMBER(taitof2_state,mjnquest)
 {
 	int i, len = memregion("gfx2")->bytes();
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t *gfx = memregion("gfx2")->base();
 
 	/* the bytes in each longword are in reversed order, put them in the
 	   order used by the other games. */
@@ -5583,7 +5602,8 @@ GAME( 1990, quizhq,     0,        quizhq,    quizhq, driver_device,    0,       
 
 GAME( 1990, ssi,        0,        ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, ssia,       ssi,      ssi,       ssi, driver_device,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1990, majest12,   ssi,      ssi,       majest12, driver_device,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12u,  ssi,      ssi,       majest12u, driver_device, 0,        ROT270, "Taito America Corporation", "Majestic Twelve - The Space Invaders Part IV (US)", MACHINE_SUPPORTS_SAVE )
+GAME( 1990, majest12j,  ssi,      ssi,       majest12j, driver_device, 0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1990, gunfront,   0,        gunfront,  gunfront, driver_device,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, driver_device, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", MACHINE_SUPPORTS_SAVE )

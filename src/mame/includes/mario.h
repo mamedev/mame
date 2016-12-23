@@ -3,6 +3,7 @@
 #ifndef MARIO_H_
 #define MARIO_H_
 
+#include "machine/gen_latch.h"
 #include "machine/z80dma.h"
 
 #define OLD_SOUND   (1)
@@ -52,6 +53,10 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_z80dma(*this, "z80dma"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3"),
+		m_soundlatch4(*this, "soundlatch4"),
 #if OLD_SOUND
 		m_discrete(*this, "discrete"),
 #else
@@ -69,6 +74,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<z80dma_device> m_z80dma;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<generic_latch_8_device> m_soundlatch3;
+	optional_device<generic_latch_8_device> m_soundlatch4;
 #if OLD_SOUND
 	optional_device<discrete_device> m_discrete;
 #else
@@ -78,23 +87,23 @@ public:
 #endif
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* sound state */
-	UINT8   m_last;
-	UINT8   m_portT;
+	uint8_t   m_last;
+	uint8_t   m_portT;
 	const char *m_eabank;
 
 	/* video state */
-	UINT8   m_gfx_bank;
-	UINT8   m_palette_bank;
-	UINT16  m_gfx_scroll;
-	UINT8   m_flip;
+	uint8_t   m_gfx_bank;
+	uint8_t   m_palette_bank;
+	uint16_t  m_gfx_scroll;
+	uint8_t   m_flip;
 	tilemap_t *m_bg_tilemap;
 	int m_monitor;
 
-	UINT8   m_nmi_mask;
+	uint8_t   m_nmi_mask;
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
 	DECLARE_WRITE8_MEMBER(mario_videoram_w);
 	DECLARE_WRITE8_MEMBER(mario_gfxbank_w);
@@ -118,9 +127,9 @@ public:
 	virtual void sound_start() override;
 	virtual void sound_reset() override;
 	DECLARE_PALETTE_INIT(mario);
-	UINT32 screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_common(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mario(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mariobl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	DECLARE_WRITE8_MEMBER(mario_sh_sound_w);
 	DECLARE_WRITE8_MEMBER(mario_sh1_w);

@@ -52,7 +52,7 @@ ADDRESS_MAP_END
 //  dave_device - constructor
 //-------------------------------------------------
 
-dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dave_device::dave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DAVE, "DAVE", tag, owner, clock, "dave", __FILE__),
 		device_memory_interface(mconfig, *this),
 		device_sound_interface(mconfig, *this),
@@ -311,7 +311,7 @@ WRITE_LINE_MEMBER( dave_device::int2_w )
 
 READ8_MEMBER( dave_device::program_r )
 {
-	UINT8 segment = m_segment[offset >> 14];
+	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
 
 	return this->space(AS_PROGRAM).read_byte(offset);
@@ -324,7 +324,7 @@ READ8_MEMBER( dave_device::program_r )
 
 WRITE8_MEMBER( dave_device::program_w )
 {
-	UINT8 segment = m_segment[offset >> 14];
+	uint8_t segment = m_segment[offset >> 14];
 	offset = (segment << 14) | (offset & 0x3fff);
 
 	this->space(AS_PROGRAM).write_byte(offset, data);
@@ -337,7 +337,7 @@ WRITE8_MEMBER( dave_device::program_w )
 
 READ8_MEMBER( dave_device::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0xff)
 	{

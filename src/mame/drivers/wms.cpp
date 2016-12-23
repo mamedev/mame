@@ -95,7 +95,7 @@ public:
 
 	DECLARE_DRIVER_INIT(wms);
 	DECLARE_READ8_MEMBER(test_r);
-		UINT32 screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+		uint32_t screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -105,7 +105,7 @@ protected:
 private:
 };
 
-UINT32 wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wms_state::screen_update_wms(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }

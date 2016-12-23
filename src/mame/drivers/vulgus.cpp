@@ -45,6 +45,7 @@ All Clocks and Vsync verified by Corrado Tomaselli (August 2012)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "includes/vulgus.h"
 
@@ -61,7 +62,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc800, 0xc800) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc801, 0xc801) AM_WRITENOP // ?
 	AM_RANGE(0xc802, 0xc803) AM_RAM AM_SHARE("scroll_low")
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(c804_w)
@@ -76,7 +77,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, vulgus_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8001) AM_DEVWRITE("ay1", ay8910_device, address_data_w)
 	AM_RANGE(0xc000, 0xc001) AM_DEVWRITE("ay2", ay8910_device, address_data_w)
 ADDRESS_MAP_END
@@ -238,6 +239,8 @@ static MACHINE_CONFIG_START( vulgus, vulgus_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_12MHz/8) /* 1.5 MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

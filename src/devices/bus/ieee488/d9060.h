@@ -38,10 +38,10 @@ public:
 	};
 
 	// construction/destruction
-	d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source);
+	d9060_base_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -86,7 +86,7 @@ private:
 
 	// SASI bus
 	int m_enable;
-	UINT8 m_data;
+	uint8_t m_data;
 
 	int m_variant;
 };
@@ -98,7 +98,7 @@ class d9060_t :  public d9060_base_t
 {
 public:
 	// construction/destruction
-	d9060_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	d9060_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 
@@ -108,7 +108,7 @@ class d9090_t :  public d9060_base_t
 {
 public:
 	// construction/destruction
-	d9090_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	d9090_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 

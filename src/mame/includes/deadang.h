@@ -27,10 +27,10 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_spriteram;
-	required_shared_ptr<UINT16> m_videoram;
-	required_shared_ptr<UINT16> m_scroll_ram;
-	required_shared_ptr<UINT16> m_video_data;
+	required_shared_ptr<uint16_t> m_spriteram;
+	required_shared_ptr<uint16_t> m_videoram;
+	required_shared_ptr<uint16_t> m_scroll_ram;
+	required_shared_ptr<uint16_t> m_video_data;
 
 	tilemap_t *m_pf3_layer;
 	tilemap_t *m_pf2_layer;
@@ -55,7 +55,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(main_scanline);

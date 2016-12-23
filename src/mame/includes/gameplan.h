@@ -10,6 +10,7 @@ driver by Chris Moore
 
 #include "machine/6522via.h"
 #include "machine/6532riot.h"
+#include "machine/gen_latch.h"
 
 #define GAMEPLAN_MAIN_MASTER_CLOCK       (XTAL_3_579545MHz)
 #define GAMEPLAN_AUDIO_MASTER_CLOCK      (XTAL_3_579545MHz)
@@ -43,19 +44,20 @@ public:
 			m_via_0(*this, "via6522_0"),
 			m_via_1(*this, "via6522_1"),
 			m_via_2(*this, "via6522_2"),
-			m_screen(*this, "screen") { }
+			m_screen(*this, "screen"),
+			m_soundlatch(*this, "soundlatch") { }
 
 	/* machine state */
-	UINT8   m_current_port;
-	optional_shared_ptr<UINT8> m_trvquest_question;
+	uint8_t   m_current_port;
+	optional_shared_ptr<uint8_t> m_trvquest_question;
 
 	/* video state */
-	std::unique_ptr<UINT8[]>   m_videoram;
+	std::unique_ptr<uint8_t[]>   m_videoram;
 	size_t   m_videoram_size;
-	UINT8    m_video_x;
-	UINT8    m_video_y;
-	UINT8    m_video_command;
-	UINT8    m_video_data;
+	uint8_t    m_video_x;
+	uint8_t    m_video_y;
+	uint8_t    m_video_command;
+	uint8_t    m_video_data;
 	emu_timer *m_via_0_ca1_timer;
 
 	/* devices */
@@ -66,6 +68,9 @@ public:
 	required_device<via6522_device> m_via_1;
 	required_device<via6522_device> m_via_2;
 	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
+
+
 	DECLARE_WRITE8_MEMBER(io_select_w);
 	DECLARE_READ8_MEMBER(io_port_r);
 	DECLARE_WRITE_LINE_MEMBER(coin_w);
@@ -83,8 +88,8 @@ public:
 	DECLARE_VIDEO_START(leprechn);
 	DECLARE_VIDEO_START(trvquest);
 	DECLARE_VIDEO_START(common);
-	UINT32 screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gameplan(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_leprechn(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(trvquest_interrupt);
 	TIMER_CALLBACK_MEMBER(clear_screen_done_callback);
 	TIMER_CALLBACK_MEMBER(via_irq_delayed);

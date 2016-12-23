@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Bryan McPhail
+// copyright-holders:Bryan McPhail,Stephane Humbert
 /***************************************************************************
 
 Various Data East 8 bit games:
@@ -59,7 +59,7 @@ To do:
 
 WRITE8_MEMBER(dec8_state::dec8_mxc06_karn_buffer_spriteram_w)
 {
-	UINT8* spriteram = m_spriteram->live();
+	uint8_t* spriteram = m_spriteram->live();
 	// copy to a 16-bit region for the sprite chip
 	for (int i=0;i<0x800/2;i++)
 	{
@@ -141,7 +141,7 @@ void dec8_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 		m_mcu->set_input_line(MCS51_INT1_LINE, CLEAR_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in dec8_state::device_timer");
+		assert_always(false, "Unknown id in dec8_state::device_timer");
 	}
 }
 
@@ -480,7 +480,7 @@ WRITE8_MEMBER(dec8_state::csilver_control_w)
 
 WRITE8_MEMBER(dec8_state::dec8_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -853,7 +853,7 @@ static ADDRESS_MAP_START( dec8_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3812_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -862,7 +862,7 @@ static ADDRESS_MAP_START( oscar_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x4000, 0x4001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -871,7 +871,7 @@ static ADDRESS_MAP_START( ym3526_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
 	AM_RANGE(0x0800, 0x0801) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -882,7 +882,7 @@ static ADDRESS_MAP_START( csilver_s_map, AS_PROGRAM, 8, dec8_state )
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w) /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x3400, 0x3400) AM_READ(csilver_adpcm_reset_r) /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank3")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -2002,9 +2002,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2024,6 +2023,8 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2031,7 +2032,7 @@ static MACHINE_CONFIG_START( lastmisn, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2055,9 +2056,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2077,6 +2077,8 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2084,7 +2086,7 @@ static MACHINE_CONFIG_START( shackled, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2107,9 +2109,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2130,6 +2131,8 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2137,7 +2140,7 @@ static MACHINE_CONFIG_START( gondo, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2160,9 +2163,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2183,6 +2185,8 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2190,7 +2194,7 @@ static MACHINE_CONFIG_START( garyoret, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2213,13 +2217,12 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2240,6 +2243,8 @@ static MACHINE_CONFIG_START( ghostb, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
@@ -2277,9 +2282,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("spritegen_krn", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 1);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(1)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2299,6 +2303,8 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2306,7 +2312,7 @@ static MACHINE_CONFIG_START( csilver, dec8_state )
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
@@ -2335,13 +2341,12 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFX_REGION(1)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-	MCFG_DECO_MXC06_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 //  MCFG_SCREEN_REFRESH_RATE(58)
@@ -2367,8 +2372,10 @@ static MACHINE_CONFIG_START( oscar, dec8_state )
 	MCFG_SOUND_ROUTE(2, "mono", 0.23)
 	MCFG_SOUND_ROUTE(3, "mono", 0.20)
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_CONFIG_END
 
@@ -2405,6 +2412,8 @@ static MACHINE_CONFIG_START( srdarwin, dec8_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.23)
 	MCFG_SOUND_ROUTE(1, "mono", 0.23)
@@ -2432,16 +2441,15 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 	MCFG_BUFFERED_SPRITERAM8_ADD("spriteram")
 
 	MCFG_DEVICE_ADD("tilegen1", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,2,2,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(2, 2, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 	MCFG_DEVICE_ADD("tilegen2", DECO_BAC06, 0)
-	deco_bac06_device::set_gfx_region_wide(*device,3,3,0);
+	MCFG_DECO_BAC06_GFX_REGION_WIDE(3, 3, 0)
 	MCFG_DECO_BAC06_GFXDECODE("gfxdecode")
 
 	MCFG_DEVICE_ADD("spritegen_mxc", DECO_MXC06, 0)
-	deco_mxc06_device::set_gfx_region(*device, 1);
+	MCFG_DECO_MXC06_GFX_REGION(1)
 	MCFG_DECO_MXC06_GFXDECODE("gfxdecode")
-	MCFG_DECO_MXC06_PALETTE("palette")
 
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -2461,6 +2469,8 @@ static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.53)
@@ -2584,12 +2594,13 @@ ROM_START( lastmisnj )
 ROM_END
 
 ROM_START( shackled )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dk-02.13h", 0x08000, 0x08000, CRC(87f8fa85) SHA1(1cb93a60eefdb453a3cc6ec9c5cc2e367fb8aeb0) )
 	ROM_LOAD( "dk-06.7h",  0x10000, 0x10000, CRC(69ad62d1) SHA1(1aa23b12ab4f1908cddd25f091e1f9bd70a5113c) )
 	ROM_LOAD( "dk-05.8h",  0x20000, 0x10000, CRC(598dd128) SHA1(10843c5352eef03c8675df6abaf23c9c9c795aa3) )
 	ROM_LOAD( "dk-04.10h", 0x30000, 0x10000, CRC(36d305d4) SHA1(17586c316aff405cf20c1467d69c98fa2a3c2630) )
 	ROM_LOAD( "dk-03.11h", 0x40000, 0x08000, CRC(6fd90fd1) SHA1(2f8db17e5545c82d243a7e23e7bda2c2a9101360) )
+	ROM_RELOAD(            0x48000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
 	ROM_LOAD( "dk-01.18h", 0x00000, 0x10000, CRC(71fe3bda) SHA1(959cce01362b2c670c2e15b03a78a1ff9cea4ee9) )
@@ -2624,12 +2635,13 @@ ROM_START( shackled )
 ROM_END
 
 ROM_START( breywood )
-	ROM_REGION( 0x48000, "maincpu", 0 )
+	ROM_REGION( 0x50000, "maincpu", 0 )
 	ROM_LOAD( "dj02-2.13h", 0x08000, 0x08000, CRC(c19856b9) SHA1(766994703bb59879c311675353d7231ad27c7c16) )
 	ROM_LOAD( "dj06-2.7h",  0x10000, 0x10000, CRC(2860ea02) SHA1(7ac090c3ae9d71baa6227ec9555f1c9f2d25ea0d) )
 	ROM_LOAD( "dj05-2.8h",  0x20000, 0x10000, CRC(0fdd915e) SHA1(262df956dfc727c710ade28af7f33fddaafd7ee2) )
 	ROM_LOAD( "dj04-2.10h", 0x30000, 0x10000, CRC(71036579) SHA1(c58ff3222b5bcd75d58c5f282554e92103e80916) )
 	ROM_LOAD( "dj03-2.11h", 0x40000, 0x08000, CRC(308f4893) SHA1(539c138ff01c5718cc8a982482b989468d532699) )
+	ROM_RELOAD(             0x48000, 0x08000 )
 
 	ROM_REGION( 0x10000, "sub", 0 )    /* CPU 2, 1st 16k is empty */
 	ROM_LOAD( "dj1-2y.18h", 0x0000, 0x10000, CRC(3d9fb623) SHA1(6e5eaad9bb0a432e2da5da5b18a2ed36617bdde2) )
@@ -3198,7 +3210,8 @@ ROM_START( csilver )
 	ROM_CONTINUE(   0x08000, 0x08000 )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP ) // dx-8.19a ?
+	// 017F: B4 4C 0D : cjne  a,#$4C,$018F   (ID code 0x4c = World version)
+	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(ca663965) SHA1(a5fb7afdfd324761bde4bb90ba12efc9954627af) ) // dx-8.19a ?
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dx00.3d",  0x00000, 0x08000, CRC(f01ef985) SHA1(d5b823bd7c0efcf3137f8643c5d99a260bed5675) )
@@ -3398,7 +3411,8 @@ ROM_START( srdarwin )
 	ROM_LOAD( "dy04.d7", 0x8000, 0x8000, CRC(2ae3591c) SHA1(f21b06d84e2c3d3895be0812024641fd006e45cf) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )    /* ID8751H MCU */
-	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, NO_DUMP )
+	// 0160: B4 6B 0D : cjne  a,#$6B,$0170   (ID code 0x6b = World version)
+	ROM_LOAD( "id8751h.mcu", 0x0000, 0x1000, CRC(11cd6ca4) SHA1(ec70f84228e37f9fc1bda85fa52a009f61c500b2) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )    /* characters */
 	ROM_LOAD( "dy05.b6", 0x00000, 0x4000, CRC(8780e8a3) SHA1(03ea91fdc5aba8e139201604fb3bf9b69f71f056) )
@@ -3534,35 +3548,35 @@ DRIVER_INIT_MEMBER(dec8_state,dec8)
 /* Below, I set up the correct number of banks depending on the "maincpu" region size */
 DRIVER_INIT_MEMBER(dec8_state,lastmisn)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,shackled)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
+	uint8_t *ROM = memregion("maincpu")->base();
+	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,gondo)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,garyoret)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,ghostb)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
@@ -3570,7 +3584,7 @@ DRIVER_INIT_MEMBER(dec8_state,ghostb)
 
 DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 12, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
@@ -3578,8 +3592,8 @@ DRIVER_INIT_MEMBER(dec8_state,meikyuh)
 
 DRIVER_INIT_MEMBER(dec8_state,csilver)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 *RAM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 14, &ROM[0x10000], 0x4000);
 	membank("bank3")->configure_entries(0, 2, &RAM[0x10000], 0x4000);
@@ -3588,21 +3602,21 @@ DRIVER_INIT_MEMBER(dec8_state,csilver)
 
 DRIVER_INIT_MEMBER(dec8_state,oscar)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,srdarwin)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 6, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }
 
 DRIVER_INIT_MEMBER(dec8_state,cobracom)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x4000);
 	DRIVER_INIT_CALL(dec8);
 }

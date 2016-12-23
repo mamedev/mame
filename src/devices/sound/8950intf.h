@@ -26,7 +26,7 @@ class y8950_device : public device_t,
 						public device_sound_interface
 {
 public:
-	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	y8950_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<y8950_device &>(device).m_irq_handler.set_callback(object); }
@@ -73,6 +73,7 @@ private:
 	devcb_write8 m_keyboard_write_handler;
 	devcb_read8 m_io_read_handler;
 	devcb_write8 m_io_write_handler;
+	required_memory_region m_region;
 };
 
 extern const device_type Y8950;

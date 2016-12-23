@@ -14,14 +14,15 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/ultraman.h"
 
 WRITE16_MEMBER(ultraman_state::sound_cmd_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 }
 
 WRITE16_MEMBER(ultraman_state::sound_irq_trigger_w)
@@ -43,7 +44,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, ultraman_state )
 	AM_RANGE(0x1c0018, 0x1c0019) AM_WRITE(ultraman_gfxctrl_w)   /* counters + gfx ctrl */
 	AM_RANGE(0x1c0020, 0x1c0021) AM_WRITE(sound_cmd_w)
 	AM_RANGE(0x1c0028, 0x1c0029) AM_WRITE(sound_irq_trigger_w)
-	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x1c0030, 0x1c0031) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x204000, 0x204fff) AM_DEVREADWRITE8("k051316_1", k051316_device, read, write, 0x00ff) /* K051316 #0 RAM */
 	AM_RANGE(0x205000, 0x205fff) AM_DEVREADWRITE8("k051316_2", k051316_device, read, write, 0x00ff) /* K051316 #1 RAM */
 	AM_RANGE(0x206000, 0x206fff) AM_DEVREADWRITE8("k051316_3", k051316_device, read, write, 0x00ff) /* K051316 #2 RAM */
@@ -57,7 +58,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, ultraman_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) /* Sound latch read */
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 //  AM_RANGE(0xd000, 0xd000) AM_WRITENOP      /* ??? */
 	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("oki", okim6295_device, read, write)       /* M6295 */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)   /* YM2151 */
@@ -185,6 +186,8 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -220,6 +223,8 @@ static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 24000000/6)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

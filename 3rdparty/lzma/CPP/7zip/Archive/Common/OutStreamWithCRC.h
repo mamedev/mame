@@ -28,6 +28,7 @@ public:
     _calculate = calculate;
     _crc = CRC_INIT_VAL;
   }
+  void EnableCalc(bool calculate) { _calculate = calculate; }
   void InitCRC() { _crc = CRC_INIT_VAL; }
   UInt64 GetSize() const { return _size; }
   UInt32 GetCRC() const { return CRC_GET_DIGEST(_crc); }

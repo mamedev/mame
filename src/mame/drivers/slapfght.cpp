@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:K.Wilkins
+// copyright-holders:K.Wilkins,Stephane Humbert
 /***************************************************************************
 
   Toaplan Slap Fight hardware
@@ -463,7 +463,7 @@ static ADDRESS_MAP_START( perfrman_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
@@ -474,44 +474,11 @@ static ADDRESS_MAP_START( tigerh_sound_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xa090, 0xa090) AM_DEVWRITE("ay2", ay8910_device, address_w)
 	AM_RANGE(0xa091, 0xa091) AM_DEVREAD("ay2", ay8910_device, data_r)
 	AM_RANGE(0xa092, 0xa092) AM_DEVWRITE("ay2", ay8910_device, data_w)
-	AM_RANGE(0xa0e0, 0xa0e0) AM_MIRROR(0x0010) AM_MASK(0x0010) AM_WRITE(sound_nmi_enable_w)
+	AM_RANGE(0xa0e0, 0xa0e0) AM_SELECT(0x0010) AM_WRITE(sound_nmi_enable_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xd000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-
-
-/***************************************************************************
-
-  MCU Memory Maps
-
-  NOTE: handlers and simulation are in the src/mame/machine folder
-
-***************************************************************************/
-
-static ADDRESS_MAP_START( tigerh_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(tigerh_68705_portA_r, tigerh_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(tigerh_68705_portB_r, tigerh_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tigerh_68705_portC_r, tigerh_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(tigerh_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(tigerh_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(tigerh_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( slapfight_m68705_map, AS_PROGRAM, 8, slapfght_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(slapfight_68705_portA_r, slapfight_68705_portA_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(slapfight_68705_portB_r, slapfight_68705_portB_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(slapfight_68705_portC_r, slapfight_68705_portC_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(slapfight_68705_ddrA_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(slapfight_68705_ddrB_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(slapfight_68705_ddrC_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 
 
@@ -770,15 +737,9 @@ void slapfght_state::machine_start()
 	m_main_sent = false;
 	m_from_main = 0;
 	m_from_mcu = 0;
-	m_portA_in = 0;
-	m_portA_out = 0;
-	m_ddrA = 0;
-	m_portB_in = 0;
-	m_portB_out = 0;
-	m_ddrB = 0;
-	m_portC_in = 0;
-	m_portC_out = 0;
-	m_ddrC = 0;
+	m_from_mcu_latch = 0;
+	m_to_mcu_latch = 0;
+	m_old_portB = 0;
 
 	m_getstar_status = 0;
 	m_getstar_sequence_index = 0;
@@ -801,15 +762,10 @@ void slapfght_state::machine_start()
 	save_item(NAME(m_main_sent));
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
-	save_item(NAME(m_portA_in));
-	save_item(NAME(m_portA_out));
-	save_item(NAME(m_ddrA));
-	save_item(NAME(m_portB_in));
-	save_item(NAME(m_portB_out));
-	save_item(NAME(m_ddrB));
-	save_item(NAME(m_portC_in));
-	save_item(NAME(m_portC_out));
-	save_item(NAME(m_ddrC));
+
+	save_item(NAME(m_from_mcu_latch));
+	save_item(NAME(m_to_mcu_latch));
+	save_item(NAME(m_old_portB));
 
 	save_item(NAME(m_getstar_status));
 	save_item(NAME(m_getstar_sequence_index));
@@ -844,7 +800,7 @@ MACHINE_RESET_MEMBER(slapfght_state,getstar)
 
 void slapfght_state::init_banks()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
 	membank("bank1")->set_entry(0);
@@ -876,7 +832,7 @@ DRIVER_INIT_MEMBER(slapfght_state,getstarb1)
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
 	   that the bootleg simply shouldn't execute the code due to the modified roms */
 	/* TODO: find & fix the cause of the following happening. */
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x6d56] = 0xc3; // jp instead of jp z
 }
 
@@ -1030,8 +986,13 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
+	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, tigerh_mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, tigerh_mcu_portc_r))
+	
+
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1095,8 +1056,11 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) // 3MHz
-	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
+	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, slapfght_mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, slapfght_mcu_portc_r))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1832,72 +1796,166 @@ ROM_START( slapfighb3 )
 	ROM_LOAD( "sf_col19.bin", 0x0200,  0x0100, CRC(5cbf9fbf) SHA1(abfa58fa4e44ebc56f2e0fac9bcc36164c845fa3) )
 ROM_END
 
+/*
+
+Guardian
+1986 Taito Corporation
+
+The Guardian PCB is exactly the same PCB as Tiger Heli, including the
+edge connector pinout.
+
+PCB Layout
+----------
+
+Top Board
+
+Sticker - M6100151B  860010898
+GX-006-A MADE IN JAPAN
+|--------------------------------------------------|
+|VOL ROM21.12Q                 2148                |
+|MB3712                        2148                |
+|    ROM19.12P                 2148                |
+|                              2148                |
+|    ROM20.12M                         6264        |
+|                                                  |
+|                                      6264        |
+|                                                  |
+|2                 A68_13.8J A68_12.6J 6264        |
+|2    YM2149F                                      |
+|W                 A68_11.8H A68_10.6H 6264        |
+|A    DSW1  DSW2                                   |
+|Y                                       2148      |
+|     YM2149F                                      |
+|                                          ROM16.1E|
+|                                                  |
+|  A68_03.12D                              ROM17.1C|
+|                                                  |
+|                                     ROM18.2B     |
+|  Z80A   6116                                     |
+|                                                  |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      YM2149F - Clock 1.500MHz (36/24)
+         Z80A - Clock 3.000MHz (36/12)
+         6116 - 2kx8 SRAM
+         6264 - 8kx8 SRAM
+       MB3712 - Audio Power AMP
+         2148 - 1kx4 SRAM
+       DSW1/2 - 8-position DIP-switch
+        VSync - 56.91313Hz
+        HSync - 14.97090kHz
+       A68_03 - 2764 EPROM
+ A68_10 to 13 - 27256 EPROM
+        ROM18 - 82S123 PROM
+ROM16/17/19/20/21 - 82S129 PROM
+
+
+Bottom Board
+
+GX-006-B MADE IN JAPAN
+|--------------------------------------------------|
+|                        A68_14.6A                 |
+|                                                  |
+|    ROM14.2C                          ROM15.8B    |
+|                                                  |
+|                                                  |
+|              6116      A68_05.6F                 |
+|                                           36MHz  |
+|              6116      A68_04.6G                 |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                                  |
+|                                        6116      |
+|                                        A68_02.8K |
+|                                                  |
+|             A68_09.4M  A47_08.6M       X         |
+|     6116                                         |
+|             6116       A68_07.6N       A68_01.8N |
+|                                                  |
+|             6116       A68_06.6P       A68_00.8P |
+|                                           Z80B   |
+|-----|----------|--------------|----------|-------|
+      |----------|              |----------|
+Notes:
+      Z80B - Clock 6.000MHz (36/6)
+      6116 - 2kx8 SRAM
+  ROM14/15 - 82S129 PROM
+ A68_00/01 - 27128 EPROM
+A68_02 & 06 to 09 - 27256 EPROM
+ A68_04/05 - 2764 EPROM
+    A68_14 - Motorola MC68705P5 Micro-Controller (protected). Clock 3.000MHz [36/12]
+         X - Unpopulated socket
+
+*/
+
 ROM_START( grdian )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
-	ROM_LOAD( "a68_00-1",     0x00000, 0x4000, CRC(6a8bdc6c) SHA1(c923bca539bd2eb9a34cb9c7a67a199e28bc081a) )
-	ROM_LOAD( "a68_01-1",     0x04000, 0x4000, CRC(ebe8db3c) SHA1(9046d6e63c33fc9cbd48b90dcbcc0badf1d3b9ba) )
-	ROM_LOAD( "a68_02-1",     0x10000, 0x8000, CRC(343e8415) SHA1(00b98055277a0ddfb7d0bda6537df10a4049533e) )
+	ROM_LOAD( "a68_00-1.8p",     0x00000, 0x4000, CRC(6a8bdc6c) SHA1(c923bca539bd2eb9a34cb9c7a67a199e28bc081a) )
+	ROM_LOAD( "a68_01-1.8n",     0x04000, 0x4000, CRC(ebe8db3c) SHA1(9046d6e63c33fc9cbd48b90dcbcc0badf1d3b9ba) )
+	ROM_LOAD( "a68_02-1.8k",     0x10000, 0x8000, CRC(343e8415) SHA1(00b98055277a0ddfb7d0bda6537df10a4049533e) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
-	ROM_LOAD( "a68-03",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
+	ROM_LOAD( "a68-03.12d",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "a68_14",       0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "a68_14.6a",       0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_05-1",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
-	ROM_LOAD( "a68_04-1",     0x02000, 0x2000, CRC(1fc8f277) SHA1(59dc1a0fad23b1e98abca3d0b1685b9d2939b059) )
+	ROM_LOAD( "a68_05-1.6f",     0x00000, 0x2000, CRC(06f60107) SHA1(c5dcf0c7a5863ea960ee747d2d7ec7ac8bb7d3af) )  /* Chars */
+	ROM_LOAD( "a68_04-1.6g",     0x02000, 0x2000, CRC(1fc8f277) SHA1(59dc1a0fad23b1e98abca3d0b1685b9d2939b059) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
-	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
-	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
-	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
+	ROM_LOAD( "a68_09.4m",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
+	ROM_LOAD( "a68_08.6m",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
+	ROM_LOAD( "a68_07.6n",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
+	ROM_LOAD( "a68_06.6p",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
-	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
-	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
-	ROM_LOAD( "a68-10",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
+	ROM_LOAD( "a68-13.8j",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
+	ROM_LOAD( "a68-12.6j",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
+	ROM_LOAD( "a68-11.8h",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
+	ROM_LOAD( "a68-10.6h",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "rom21",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
-	ROM_LOAD( "rom20",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
-	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
+	ROM_LOAD( "rom21.12q",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
+	ROM_LOAD( "rom20.12m",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
+	ROM_LOAD( "rom19.12p",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
 ROM_END
 
 ROM_START( getstarj )
 	ROM_REGION( 0x18000, "maincpu", 0 )     /* Region 0 - main cpu code */
-	ROM_LOAD( "a68_00.bin",   0x00000, 0x4000, CRC(ad1a0143) SHA1(0d9adeb12bd4d5ad11e5bada0cd7498bc565c1db) )
-	ROM_LOAD( "a68_01.bin",   0x04000, 0x4000, CRC(3426eb7c) SHA1(e91db45a650a1bfefd7c12c7553b647bc916c7c8) )
-	ROM_LOAD( "a68_02.bin",   0x10000, 0x8000, CRC(3567da17) SHA1(29d698606d0bd30abfc3171d79bfad95b0de89fc) )
+	ROM_LOAD( "a68_00.8p",   0x00000, 0x4000, CRC(ad1a0143) SHA1(0d9adeb12bd4d5ad11e5bada0cd7498bc565c1db) )
+	ROM_LOAD( "a68_01.8n",   0x04000, 0x4000, CRC(3426eb7c) SHA1(e91db45a650a1bfefd7c12c7553b647bc916c7c8) )
+	ROM_LOAD( "a68_02.8k",   0x10000, 0x8000, CRC(3567da17) SHA1(29d698606d0bd30abfc3171d79bfad95b0de89fc) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
-	ROM_LOAD( "a68-03",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
+	ROM_LOAD( "a68-03.12d",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
 	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
-	ROM_LOAD( "68705.bin",    0x0000,  0x0800, NO_DUMP )
+	ROM_LOAD( "68705.6a",    0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_05.bin",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
-	ROM_LOAD( "a68_04.bin",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
+	ROM_LOAD( "a68_05.6f",   0x00000, 0x2000, CRC(e3d409e7) SHA1(0b6be4767f110729f4dd1a472ef8d9a0c718b684) )  /* Chars */
+	ROM_LOAD( "a68_04.6g",   0x02000, 0x2000, CRC(6e5ac9d4) SHA1(74f90b7a1ceb3b1c2fd92dff100d92dea0155530) )
 
 	ROM_REGION( 0x20000, "gfx2", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68_09",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
-	ROM_LOAD( "a68_08",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
-	ROM_LOAD( "a68_07",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
-	ROM_LOAD( "a68_06",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
+	ROM_LOAD( "a68_09.4m",       0x00000, 0x8000, CRC(a293cc2e) SHA1(a2c2598e92982d13b51cbb6efb4b963142233433) )  /* Tiles */
+	ROM_LOAD( "a68_08.6m",       0x08000, 0x8000, CRC(37662375) SHA1(46ba8a3f0b553d476ecf431d0d20556896b4ca43) )
+	ROM_LOAD( "a68_07.6n",       0x10000, 0x8000, CRC(cf1a964c) SHA1(e9223c8d4f3bdafed193a1ded63e377f16f45e17) )
+	ROM_LOAD( "a68_06.6p",       0x18000, 0x8000, CRC(05f9eb9a) SHA1(a71640a63b259799086d361ef293aa26cec46a0c) )
 
 	ROM_REGION( 0x20000, "gfx3", 0 )    /* Region 1 - temporary for gfx */
-	ROM_LOAD( "a68-13",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
-	ROM_LOAD( "a68-12",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
-	ROM_LOAD( "a68-11",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
-	ROM_LOAD( "a68-10",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
+	ROM_LOAD( "a68-13.8j",       0x00000, 0x8000, CRC(643fb282) SHA1(d904d3c27c2b56341929c5eed4ea97e948c53c34) )  /* Sprites */
+	ROM_LOAD( "a68-12.6j",       0x08000, 0x8000, CRC(11f74e32) SHA1(02d8b4cc679f45a02c4989f2b62cde91b7418235) )
+	ROM_LOAD( "a68-11.8h",       0x10000, 0x8000, CRC(f24158cf) SHA1(db4c6b68a488b0798ea5f793ac8ced283a8ecab2) )
+	ROM_LOAD( "a68-10.6h",       0x18000, 0x8000, CRC(83161ed0) SHA1(a6aa28f22f487dc3a2ec07935e6d42bcdd1eff81) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
-	ROM_LOAD( "rom21",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
-	ROM_LOAD( "rom20",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
-	ROM_LOAD( "rom19",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
+	ROM_LOAD( "rom21.12q",        0x0000,  0x0100, CRC(d6360b4d) SHA1(3e64548c82a3378fc091e104cdc2b0c7e592fc44) )
+	ROM_LOAD( "rom20.12m",        0x0100,  0x0100, CRC(4ca01887) SHA1(2892c89d5e60f1d10593adffff55c1a9654e8209) )
+	ROM_LOAD( "rom19.12p",        0x0200,  0x0100, CRC(513224f0) SHA1(15b34612206138f6fc5f7478925b1fff2ed56aa8) )
 ROM_END
 
 ROM_START( getstarb1 )

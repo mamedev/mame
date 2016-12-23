@@ -74,7 +74,7 @@ static MACHINE_CONFIG_FRAGMENT( dmv_k235 )
 	MCFG_CPU_IO_MAP(k235_io)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("pic8259", pic8259_device, inta_cb)
 
-	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD("pic8259", INPUTLINE("maincpu", 0), VCC, NOOP)
 MACHINE_CONFIG_END
 
 
@@ -106,7 +106,7 @@ const device_type DMV_K235 = &device_creator<dmv_k235_device>;
 //  dmv_k230_device - constructor
 //-------------------------------------------------
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, DMV_K230, "K230 8088 without interrupt controller", tag, owner, clock, "dmv_k230", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
@@ -114,7 +114,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, const char *tag,
 	{
 }
 
-dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_maincpu(*this, "maincpu"),
@@ -126,7 +126,7 @@ dmv_k230_device::dmv_k230_device(const machine_config &mconfig, device_type type
 //  dmv_k231_device - constructor
 //-------------------------------------------------
 
-dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k230_device(mconfig, DMV_K231, "K231 8088 without interrupt controller", tag, owner, clock, "dmv_k231", __FILE__)
 {
 }
@@ -135,7 +135,7 @@ dmv_k231_device::dmv_k231_device(const machine_config &mconfig, const char *tag,
 //  dmv_k234_device - constructor
 //-------------------------------------------------
 
-dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k230_device(mconfig, DMV_K234, "K234 68008", tag, owner, clock, "dmv_k234", __FILE__), m_snr(0)
 	{
 }
@@ -144,7 +144,7 @@ dmv_k234_device::dmv_k234_device(const machine_config &mconfig, const char *tag,
 //  dmv_k235_device - constructor
 //-------------------------------------------------
 
-dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k235_device::dmv_k235_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k230_device(mconfig, DMV_K235, "K235 8088 with interrupt controller", tag, owner, clock, "dmv_k235", __FILE__),
 		m_pic(*this, "pic8259"),
 		m_dsw(*this, "DSW")
@@ -165,7 +165,7 @@ void dmv_k230_device::device_start()
 void dmv_k234_device::device_start()
 {
 	dmv_k230_device::device_start();
-	m_io->install_readwrite_handler(0xd8, 0xdf, 0, 0, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
+	m_io->install_readwrite_handler(0xd8, 0xdf, read8_delegate(FUNC(dmv_k234_device::snr_r), this), write8_delegate(FUNC(dmv_k234_device::snr_w), this), 0);
 }
 
 //-------------------------------------------------
@@ -208,22 +208,22 @@ machine_config_constructor dmv_k235_device::device_mconfig_additions() const
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *dmv_k230_device::device_rom_region() const
+const tiny_rom_entry *dmv_k230_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k230 );
 }
 
-const rom_entry *dmv_k231_device::device_rom_region() const
+const tiny_rom_entry *dmv_k231_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k231 );
 }
 
-const rom_entry *dmv_k234_device::device_rom_region() const
+const tiny_rom_entry *dmv_k234_device::device_rom_region() const
 {
 	return nullptr;
 }
 
-const rom_entry *dmv_k235_device::device_rom_region() const
+const tiny_rom_entry *dmv_k235_device::device_rom_region() const
 {
 	return ROM_NAME( dmv_k235 );
 }

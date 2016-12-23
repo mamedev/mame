@@ -2,7 +2,7 @@
 // copyright-holders:Nathan Woods, Miodrag Milanovic
 /*********************************************************************
 
-    cassette.c
+    cassette.cpp
 
     Interface to the cassette image abstraction code
 
@@ -11,11 +11,7 @@
 #include "emu.h"
 #include "formats/imageutl.h"
 #include "cassette.h"
-#include "ui/ui.h"
-
-
-#define ANIMATION_FPS       1
-#define ANIMATION_FRAMES    4
+#include "ui/uimain.h"
 
 #define VERBOSE             0
 #define LOG(x) do { if (VERBOSE) logerror x; } while (0)
@@ -27,7 +23,7 @@ const device_type CASSETTE = &device_creator<cassette_image_device>;
 //  cassette_image_device - constructor
 //-------------------------------------------------
 
-cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cassette_image_device::cassette_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CASSETTE, "Cassette", tag, owner, clock, "cassette_image", __FILE__),
 	device_image_interface(mconfig, *this),
 	m_cassette(nullptr),
@@ -77,10 +73,11 @@ void cassette_image_device::device_config_complete()
 bool cassette_image_device::is_motor_on()
 {
 	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_STOPPED)
-		return FALSE;
+		return false;
 	if ((m_state & CASSETTE_MASK_MOTOR) != CASSETTE_MOTOR_ENABLED)
-		return FALSE;
-	return TRUE;
+		return false;
+	else
+		return true;
 }
 
 
@@ -141,7 +138,7 @@ void cassette_image_device::change_state(cassette_state state, cassette_state ma
 
 double cassette_image_device::input()
 {
-	INT32 sample;
+	int32_t sample;
 	double double_value;
 
 	update();
@@ -161,10 +158,10 @@ void cassette_image_device::output(double value)
 	{
 		update();
 
-		value = MIN(value, 1.0);
-		value = MAX(value, -1.0);
+		value = std::min(value, 1.0);
+		value = std::max(value, -1.0);
 
-		m_value = (INT32) (value * 0x7FFFFFFF);
+		m_value = (int32_t) (value * 0x7FFFFFFF);
 	}
 }
 
@@ -254,55 +251,54 @@ void cassette_image_device::device_start()
 	m_value = 0;
 }
 
-bool cassette_image_device::call_create(int format_type, option_resolution *format_options)
+image_init_result cassette_image_device::call_create(int format_type, util::option_resolution *format_options)
 {
-	return call_load();
+	return internal_load(true);
 }
 
-bool cassette_image_device::call_load()
+image_init_result cassette_image_device::call_load()
 {
-	casserr_t err;
-	int cassette_flags;
-	const char *extension;
-	int is_writable;
+	return internal_load(false);
+}
+
+image_init_result cassette_image_device::internal_load(bool is_create)
+{
+	cassette_image::error err;
 	device_image_interface *image = nullptr;
 	interface(image);
 
-	if ((has_been_created()) || (length() == 0))
+	if (is_create)
 	{
-		/* creating an image */
+		// creating an image
 		err = cassette_create((void *)image, &image_ioprocs, &wavfile_format, m_create_opts, CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT, &m_cassette);
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 	else
 	{
-		/* opening an image */
+		// opening an image
+		bool retry;
 		do
 		{
-			is_writable = !is_readonly();
-			cassette_flags = is_writable ? (CASSETTE_FLAG_READWRITE|CASSETTE_FLAG_SAVEONEXIT) : CASSETTE_FLAG_READONLY;
-			std::string fname;
-			if (software_entry()==nullptr) {
-				extension = filetype();
-			} else {
-				fname = m_mame_file->filename();
-				int loc = fname.find_last_of('.');
-				if (loc!=-1) {
-					extension = fname.substr(loc + 1,fname.length()-loc).c_str();
-				} else {
-					extension = "";
-				}
-			}
-			err = cassette_open_choices((void *)image, &image_ioprocs, extension, m_formats, cassette_flags, &m_cassette);
+			// we probably don't want to retry...
+			retry = false;
 
-			/* this is kind of a hack */
-			if (err && is_writable)
+			// try opening the cassette
+			int cassette_flags = is_readonly()
+				? CASSETTE_FLAG_READONLY
+				: (CASSETTE_FLAG_READWRITE | CASSETTE_FLAG_SAVEONEXIT);
+			err = cassette_open_choices((void *)image, &image_ioprocs, filetype(), m_formats, cassette_flags, &m_cassette);
+
+			// special case - if we failed due to readwrite not being supported, make the image be read only and retry
+			if (err == cassette_image::error::READ_WRITE_UNSUPPORTED)
+			{
 				make_readonly();
+				retry = true;
+			}
 		}
-		while(err && is_writable);
+		while(retry);
 
-		if (err)
+		if (err != cassette_image::error::SUCCESS)
 			goto error;
 	}
 
@@ -318,22 +314,22 @@ bool cassette_image_device::call_load()
 	m_speed = 1;
 	m_direction = 1;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 
 error:
 	image_error_t imgerr = IMAGE_ERROR_UNSPECIFIED;
 	switch(err)
 	{
-		case CASSETTE_ERROR_INTERNAL:
+		case cassette_image::error::INTERNAL:
 			imgerr = IMAGE_ERROR_INTERNAL;
 			break;
-		case CASSETTE_ERROR_UNSUPPORTED:
+		case cassette_image::error::UNSUPPORTED:
 			imgerr = IMAGE_ERROR_UNSUPPORTED;
 			break;
-		case CASSETTE_ERROR_OUTOFMEMORY:
+		case cassette_image::error::OUT_OF_MEMORY:
 			imgerr = IMAGE_ERROR_OUTOFMEMORY;
 			break;
-		case CASSETTE_ERROR_INVALIDIMAGE:
+		case cassette_image::error::INVALID_IMAGE:
 			imgerr = IMAGE_ERROR_INVALIDIMAGE;
 			break;
 		default:
@@ -341,7 +337,7 @@ error:
 			break;
 	}
 	image->seterror(imgerr, "" );
-	return IMAGE_INIT_FAIL;
+	return image_init_result::FAIL;
 }
 
 
@@ -361,75 +357,60 @@ void cassette_image_device::call_unload()
 }
 
 
+//-------------------------------------------------
+//  display a small tape animation, with the
+//  current position in the tape image
+//-------------------------------------------------
 
-/*
-    display a small tape icon, with the current position in the tape image
-*/
-void cassette_image_device::call_display()
+std::string cassette_image_device::call_display()
 {
-	char buf[65];
-	float x, y;
-	int n;
-	double position, length;
-	cassette_state uistate;
-	cassette_image_device *dev;
-	static const UINT8 shapes[8] = { 0x2d, 0x5c, 0x7c, 0x2f, 0x2d, 0x20, 0x20, 0x20 };
+	const int ANIMATION_FPS = 1;
 
-	/* abort if we should not be showing the image */
-	if (!exists())
-		return;
-	if (!is_motor_on())
-		return;
+	std::string result;
 
-	/* figure out where we are in the cassette */
-	position = get_position();
-	length = get_length();
-	uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
-
-	/* choose a location on the screen */
-	x = 0.2f;
-	y = 0.5f;
-
-	cassette_device_iterator iter(device().machine().root_device());
-	for (dev = iter.first(); dev != nullptr && strcmp( dev->tag(), device().tag() ); dev = iter.next())
-		y += 1;
-
-	y *= device().machine().ui().get_line_height() + 2.0f * UI_BOX_TB_BORDER;
-	/* choose which frame of the animation we are at */
-	n = ((int) position / ANIMATION_FPS) % ANIMATION_FRAMES;
-	/* Since you can have anything in a BDF file, we will use crude ascii characters instead */
-	snprintf(buf, ARRAY_LENGTH(buf), "%c%c %c %02d:%02d (%04d) [%02d:%02d (%04d)]",
-#if 0
-	/* THE ANIMATION HASN'T WORKED SINCE 0.114 - LEFT HERE FOR REFERENCE */
-	/* NEVER SEEN THE PLAY / RECORD ICONS */
-	/* character pairs 2-3, 4-5, 6-7, 8-9 form little tape cassette images */
-		n * 2 + 2,                              /* cassette icon left */
-		n * 2 + 3,                              /* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 16 : 14,   /* play or record icon */
-#else
-		shapes[n],                  /* cassette icon left */
-		shapes[n|4],                    /* cassette icon right */
-		(uistate == CASSETTE_PLAY) ? 0x50 : 0x52,   /* play (P) or record (R) */
-#endif
-		((int) position / 60),
-		((int) position % 60),
-		(int) position,
-		((int) length / 60),
-		((int) length % 60),
-		(int) length);
-
-	// draw the cassette
-	device().machine().ui().draw_text_box(&device().machine().render().ui_container(), buf, JUSTIFY_LEFT, x, y, UI_BACKGROUND_COLOR);
-
-	// make sure tape stops at end when playing
-	if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
+	// only show the image when a cassette is loaded and the motor is on
+	if (exists() && is_motor_on())
 	{
-		if ( m_cassette )
+		int n;
+		double position, length;
+		cassette_state uistate;
+		static const char *shapes[] = { u8"\u2500", u8"\u2572", u8"\u2502", u8"\u2571" };
+
+		// figure out where we are in the cassette
+		position = get_position();
+		length = get_length();
+		uistate = (cassette_state)(get_state() & CASSETTE_MASK_UISTATE);
+
+		// choose which frame of the animation we are at
+		n = ((int)position / ANIMATION_FPS) % ARRAY_LENGTH(shapes);
+
+		// play or record
+		const char *status_icon = (uistate == CASSETTE_PLAY)
+			? u8"\u25BA"
+			: u8"\u25CF";
+
+		// Since you can have anything in a BDF file, we will use crude ascii characters instead
+		result = string_format("%s %s %02d:%02d (%04d) [%02d:%02d (%04d)]",
+			shapes[n],                  // animation
+			status_icon,                // play or record
+			((int)position / 60),
+			((int)position % 60),
+			(int)position,
+			((int)length / 60),
+			((int)length % 60),
+			(int)length);
+
+		// make sure tape stops at end when playing
+		if ((m_state & CASSETTE_MASK_UISTATE) == CASSETTE_PLAY)
 		{
-			if (position > length)
+			if (m_cassette)
 			{
-				m_state = (cassette_state)(( m_state & ~CASSETTE_MASK_UISTATE ) | CASSETTE_STOPPED);
+				if (get_position() > get_length())
+				{
+					m_state = (cassette_state)((m_state & ~CASSETTE_MASK_UISTATE) | CASSETTE_STOPPED);
+				}
 			}
 		}
 	}
+	return result;
 }

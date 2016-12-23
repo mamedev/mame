@@ -102,6 +102,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 
@@ -114,6 +115,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_colorram(*this, "colorram")  { }
@@ -122,15 +124,16 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
 
-	UINT8 m_nAyCtrl;
-	UINT8 m_nmi_mask;
-	UINT8 m_flipscreen_x;
-	UINT8 m_flipscreen_y;
+	uint8_t m_nAyCtrl;
+	uint8_t m_nmi_mask;
+	uint8_t m_flipscreen_x;
+	uint8_t m_flipscreen_y;
 
 	DECLARE_WRITE8_MEMBER(audio_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -145,8 +148,8 @@ public:
 	DECLARE_PALETTE_INIT(mirax);
 	virtual void machine_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);
@@ -155,7 +158,7 @@ public:
 
 PALETTE_INIT_MEMBER(mirax_state, mirax)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 
 	for (i = 0;i < palette.entries();i++)
@@ -182,7 +185,7 @@ PALETTE_INIT_MEMBER(mirax_state, mirax)
 }
 
 
-void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT8 draw_flag)
+void mirax_state::draw_tilemap(bitmap_ind16 &bitmap, const rectangle &cliprect, uint8_t draw_flag)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int y,x;
@@ -235,7 +238,7 @@ void mirax_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT32 mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mirax_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	draw_tilemap(bitmap,cliprect,1);
 	draw_sprites(bitmap,cliprect);
@@ -282,7 +285,7 @@ WRITE8_MEMBER(mirax_state::nmi_mask_w)
 
 WRITE8_MEMBER(mirax_state::sound_cmd_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -329,7 +332,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mirax_sound_map, AS_PROGRAM, 8, mirax_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0xe000, 0xe000) AM_WRITENOP
 	AM_RANGE(0xe001, 0xe001) AM_WRITENOP
@@ -492,6 +495,9 @@ static MACHINE_CONFIG_START( mirax, mirax_state )
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mirax)
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 12000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -562,8 +568,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(mirax_state,mirax)
 {
-	UINT8 *DATA = memregion("data_code")->base();
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *DATA = memregion("data_code")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	int i;
 
 	for(i=0x0000;i<0x4000;i++)

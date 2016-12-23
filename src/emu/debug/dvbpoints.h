@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __DVBPOINTS_H__
-#define __DVBPOINTS_H__
+#ifndef MAME_EMU_DEBUG_DVBPOINTS_H
+#define MAME_EMU_DEBUG_DVBPOINTS_H
 
 #include "debugvw.h"
 #include "debugcpu.h"
@@ -42,7 +42,7 @@ protected:
 private:
 	// internal helpers
 	void enumerate_sources();
-	void pad_astring_to_length(std::string& str, int len);
+	void pad_ostream_to_length(std::ostream& str, int len);
 	void gather_breakpoints();
 
 
@@ -52,4 +52,4 @@ private:
 };
 
 
-#endif
+#endif // MAME_EMU_DEBUG_DVBPOINTS_H

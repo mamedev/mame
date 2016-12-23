@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "includes/silkroad.h"
 
@@ -141,7 +141,7 @@ WRITE32_MEMBER(silkroad_state::silk_6295_bank_w)
 	{
 		int bank = (data & 0x3000000) >> 24;
 		if(bank < 3)
-			m_oki1->set_bank_base(0x40000 * (bank));
+			m_oki1->set_rom_bank(bank);
 	}
 }
 

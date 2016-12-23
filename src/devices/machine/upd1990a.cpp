@@ -44,7 +44,7 @@ const device_type UPD4990A = &device_creator<upd4990a_device>;
 //  upd1990a_device - constructor
 //-------------------------------------------------
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT32 variant, const char *shortname, const char *source)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint32_t variant, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_rtc_interface(mconfig, *this),
 		m_write_data(*this),
@@ -53,7 +53,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, device_type type
 {
 }
 
-upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, UPD1990A, "uPD1990A", tag, owner, clock, "upd1990a", __FILE__),
 		device_rtc_interface(mconfig, *this),
 		m_write_data(*this),
@@ -62,7 +62,7 @@ upd1990a_device::upd1990a_device(const machine_config &mconfig, const char *tag,
 {
 }
 
-upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+upd4990a_device::upd4990a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: upd1990a_device(mconfig, UPD4990A, "uPD4990A RTC", tag, owner, clock, TYPE_4990A, "upd4990a", __FILE__) { }
 
 
@@ -82,9 +82,6 @@ void upd1990a_device::device_start()
 	// resolve callbacks
 	m_write_data.resolve_safe();
 	m_write_tp.resolve_safe();
-
-	// initialize
-	set_current_time(machine());
 
 	for (auto & elem : m_shift_reg)
 		elem = 0;

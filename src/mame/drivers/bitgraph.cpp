@@ -131,7 +131,7 @@ public:
 	DECLARE_WRITE8_MEMBER( misccr_write );
 	DECLARE_WRITE_LINE_MEMBER( system_clock_write );
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( ppu_read );
 	DECLARE_WRITE8_MEMBER( ppu_write );
@@ -155,11 +155,11 @@ private:
 	optional_device<centronics_device> m_centronics;
 	required_device<screen_device> m_screen;
 
-	UINT8 *m_videoram;
-	UINT8 m_misccr;
-	UINT8 m_pia_a;
-	UINT8 m_pia_b;
-	UINT8 m_ppu[4];
+	uint8_t *m_videoram;
+	uint8_t m_misccr;
+	uint8_t m_pia_a;
+	uint8_t m_pia_b;
+	uint8_t m_ppu[4];
 };
 
 static ADDRESS_MAP_START(bitgrapha_mem, AS_PROGRAM, 16, bitgraph_state)
@@ -224,7 +224,7 @@ WRITE_LINE_MEMBER(bitgraph_state::pia_cb2_w)
 
 READ8_MEMBER(bitgraph_state::pia_pa_r)
 {
-	UINT8 data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
+	uint8_t data = BIT(m_pia_b, 3) ? m_earom->data() : m_pia_a;
 	DBG_LOG(2,"PIA", ("A == %02X (%s)\n", data, BIT(m_pia_b, 3) ? "earom" : "pia"));
 	return data;
 }
@@ -346,14 +346,14 @@ WRITE8_MEMBER(bitgraph_state::adlc_w)
 	if (m_adlc) return m_adlc->write(space, 3-offset, data);
 }
 
-UINT32 bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 gfx=0;
+	uint8_t gfx=0;
 	int x,y;
 
 	for (y = 0; y < 768; y++)
 	{
-		UINT16 *p = &bitmap.pix16(y);
+		uint16_t *p = &bitmap.pix16(y);
 
 		for (x = 0; x < 1024/8; x+=2)
 		{
@@ -385,7 +385,7 @@ UINT32 bitgraph_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 READ8_MEMBER(bitgraph_state::ppu_read)
 {
-	UINT8 data = m_ppu[offset];
+	uint8_t data = m_ppu[offset];
 	DBG_LOG(1,"PPU", ("%d == %02X\n", offset, data));
 	return data;
 }
@@ -444,7 +444,7 @@ WRITE8_MEMBER(bitgraph_state::ppu_i8243_w)
 
 void bitgraph_state::machine_start()
 {
-	m_videoram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x3e0000);
+	m_videoram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x3e0000);
 }
 
 void bitgraph_state::machine_reset()
@@ -466,12 +466,12 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_SCREEN_UPDATE_DRIVER(bitgraph_state, screen_update)
 
 	MCFG_SCREEN_PALETTE("palette")
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_DEVICE_ADD(ACIA0_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_H_TAG, rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_H_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
 
 	MCFG_RS232_PORT_ADD(RS232_H_TAG, default_rs232_devices, "null_modem")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA0_TAG, acia6850_device, write_rxd))
@@ -481,7 +481,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_DEVICE_ADD(ACIA1_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_K_TAG, rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_K_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
 
 	MCFG_RS232_PORT_ADD(RS232_K_TAG, default_rs232_devices, "keyboard")
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA1_TAG, acia6850_device, write_rxd))
@@ -491,7 +491,7 @@ static MACHINE_CONFIG_FRAGMENT( bg_motherboard )
 	MCFG_DEVICE_ADD(ACIA2_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_D_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
 
 	MCFG_RS232_PORT_ADD(RS232_D_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA2_TAG, acia6850_device, write_rxd))
@@ -554,7 +554,7 @@ static MACHINE_CONFIG_START( bitgrpha, bitgraph_state )
 	MCFG_DEVICE_ADD(ACIA3_TAG, ACIA6850, 0)
 	MCFG_ACIA6850_TXD_HANDLER(DEVWRITELINE(RS232_M_TAG, rs232_port_device, write_txd))
 	MCFG_ACIA6850_RTS_HANDLER(DEVWRITELINE(RS232_M_TAG, rs232_port_device, write_rts))
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE(M68K_TAG, m68000_device, write_irq1))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE(M68K_TAG, M68K_IRQ_1))
 
 	MCFG_RS232_PORT_ADD(RS232_M_TAG, default_rs232_devices, nullptr)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE(ACIA3_TAG, acia6850_device, write_rxd))

@@ -52,7 +52,7 @@ class gg_ext_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gg_ext_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~gg_ext_port_device();
 
 	// static configuration helpers
@@ -76,11 +76,11 @@ public:
 	// bit 7 - pin 9 - TR (Button 2)
 	//         pin 10 - Not connected
 	//
-	UINT8 port_r();
-	void port_w( UINT8 data );
+	uint8_t port_r();
+	void port_w( uint8_t data );
 
 	void th_pin_w(int state);
-	UINT32 pixel_r();
+	uint32_t pixel_r();
 
 //protected:
 	// device-level overrides
@@ -104,8 +104,8 @@ public:
 	device_gg_ext_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_gg_ext_port_interface();
 
-	virtual UINT8 peripheral_r() { return 0xff; };
-	virtual void peripheral_w(UINT8 data) { };
+	virtual uint8_t peripheral_r() { return 0xff; };
+	virtual void peripheral_w(uint8_t data) { };
 
 protected:
 	gg_ext_port_device *m_port;

@@ -131,7 +131,7 @@ static MACHINE_CONFIG_START( ondra, ondra_state )
 	MCFG_SCREEN_UPDATE_DRIVER(ondra_state, screen_update_ondra)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	// sound hardware

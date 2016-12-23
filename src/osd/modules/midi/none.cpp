@@ -39,8 +39,8 @@ public:
 	virtual bool open_output(const char *devname) override;
 	virtual void close() override;
 	virtual bool poll() override;
-	virtual int read(UINT8 *pOut) override;
-	virtual void write(UINT8 data) override;
+	virtual int read(uint8_t *pOut) override;
+	virtual void write(uint8_t data) override;
 };
 
 osd_midi_device *none_module::create_midi_device()
@@ -82,12 +82,12 @@ bool osd_midi_device_none::poll()
 	return false;
 }
 
-int osd_midi_device_none::read(UINT8 *pOut)
+int osd_midi_device_none::read(uint8_t *pOut)
 {
 	return 0;
 }
 
-void osd_midi_device_none::write(UINT8 data)
+void osd_midi_device_none::write(uint8_t data)
 {
 }
 

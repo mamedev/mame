@@ -2,7 +2,20 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Rapid Fire Unit" emulation
+    Sega SG-1000/Mark-III/SMS "Rapid Fire Unit" emulation
+
+
+Release data from the Sega Retro project:
+
+  Year: 1985    Country/region: JP    Model code: RF-150
+  Year: 1987    Country/region: US    Model code: 3046
+  Year: 1988    Country/region: EU    Model code: MK-3046-50
+  Year: 1989    Country/region: BR    Model code: 011050
+
+Notes:
+
+  This emulated device is the version released by Sega. In Brazil, Tec Toy
+  released a version that does not have any switch to turn on/off auto-repeat.
 
 **********************************************************************/
 
@@ -16,7 +29,7 @@
 
 const device_type SMS_RAPID_FIRE = &device_creator<sms_rapid_fire_device>;
 
-
+// time interval not verified
 #define RAPID_FIRE_INTERVAL attotime::from_hz(10)
 
 
@@ -49,7 +62,7 @@ ioport_constructor sms_rapid_fire_device::device_input_ports() const
 //  sms_rapid_fire_device - constructor
 //-------------------------------------------------
 
-sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_rapid_fire_device::sms_rapid_fire_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_RAPID_FIRE, "Sega SMS Rapid Fire", tag, owner, clock, "sms_rapid_fire", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_rfire_sw(*this, "rfu_sw"),
@@ -79,9 +92,9 @@ void sms_rapid_fire_device::device_start()
 //  sms_peripheral_r - rapid fire read
 //-------------------------------------------------
 
-UINT8 sms_rapid_fire_device::peripheral_r()
+uint8_t sms_rapid_fire_device::peripheral_r()
 {
-	UINT8 data;
+	uint8_t data;
 
 	int num_intervals = (machine().time() - m_start_time).as_double() / m_interval.as_double();
 	m_read_state = num_intervals & 1;
@@ -104,7 +117,7 @@ UINT8 sms_rapid_fire_device::peripheral_r()
 //  sms_peripheral_w - rapid fire write
 //-------------------------------------------------
 
-void sms_rapid_fire_device::peripheral_w(UINT8 data)
+void sms_rapid_fire_device::peripheral_w(uint8_t data)
 {
 	m_subctrl_port->port_w(data);
 }

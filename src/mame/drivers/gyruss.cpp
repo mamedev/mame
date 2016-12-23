@@ -60,6 +60,7 @@ and 1 SFX channel controlled by an 8039:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
 #include "machine/konami1.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/ay8910.h"
@@ -182,7 +183,7 @@ static ADDRESS_MAP_START( main_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0xc0a0, 0xc0a0) AM_READ_PORT("P1")
 	AM_RANGE(0xc0c0, 0xc0c0) AM_READ_PORT("P2")
 	AM_RANGE(0xc0e0, 0xc0e0) AM_READ_PORT("DSW1")
-	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("DSW3") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc180, 0xc180) AM_WRITE(master_nmi_mask_w)
 	AM_RANGE(0xc185, 0xc185) AM_WRITEONLY AM_SHARE("flipscreen")
 ADDRESS_MAP_END
@@ -200,7 +201,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_cpu1_map, AS_PROGRAM, 8, gyruss_state )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
@@ -221,7 +222,7 @@ static ADDRESS_MAP_START( audio_cpu1_io_map, AS_IO, 8, gyruss_state )
 	AM_RANGE(0x11, 0x11) AM_DEVREAD("ay5", ay8910_device, data_r)
 	AM_RANGE(0x12, 0x12) AM_DEVWRITE("ay5", ay8910_device, data_w)
 	AM_RANGE(0x14, 0x14) AM_WRITE(gyruss_i8039_irq_w)
-	AM_RANGE(0x18, 0x18) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x18, 0x18) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
@@ -229,7 +230,7 @@ static ADDRESS_MAP_START( audio_cpu2_map, AS_PROGRAM, 8, gyruss_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, AS_IO, 8, gyruss_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(gyruss_dac_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
@@ -493,6 +494,9 @@ static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, SOUND_CLOCK/8)
 	MCFG_AY8910_OUTPUT_TYPE(AY8910_DISCRETE_OUTPUT)

@@ -54,7 +54,7 @@ WRITE16_MEMBER(splash_state::splash_sh_irqtrigger_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -63,7 +63,7 @@ WRITE16_MEMBER(splash_state::roldf_sh_irqtrigger_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 
@@ -121,7 +121,7 @@ static ADDRESS_MAP_START( splash_sound_map, AS_PROGRAM, 8, splash_state )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM                                     /* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)              /* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITENOP                                /* ??? */
-	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_byte_r)                     /* Sound latch */
+	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)  /* Sound latch */
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ymsnd", ym3812_device, read, write) /* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_RAM                                     /* RAM */
 ADDRESS_MAP_END
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( roldfrog_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x40, 0x40) AM_NOP
 	AM_RANGE(0x31, 0x31) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x37, 0x37) AM_WRITE(roldfrog_vblank_ack_w )
-	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x70, 0x70) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 
 	AM_RANGE(0x0, 0xff) AM_READ(roldfrog_unk_r)
 ADDRESS_MAP_END
@@ -217,12 +217,12 @@ WRITE16_MEMBER(splash_state::spr_write)
 
 WRITE16_MEMBER(splash_state::funystrp_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, 0, data>>8);
+	m_soundlatch->write(space, 0, data>>8);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
-	AM_RANGE(0x000000, 0x01ffff) AM_ROM                                                 /* ROM */
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM                                                 /* ROM */
 	AM_RANGE(0x100000, 0x1fffff) AM_RAM                                                 /* protection? RAM */
 	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_SHARE("pixelram")                        /* Pixel Layer */
 	AM_RANGE(0x84000a, 0x84000b) AM_WRITE(coin_w)                                /* Coin Counters + Coin Lockout */
@@ -237,7 +237,7 @@ static ADDRESS_MAP_START( funystrp_map, AS_PROGRAM, 16, splash_state )
 	AM_RANGE(0x881804, 0x881fff) AM_WRITENOP
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xd00000, 0xd01fff) AM_READWRITE(spr_read, spr_write) AM_SHARE("spriteram")        /* Sprite RAM */
-	AM_RANGE(0xfe0000, 0xffffff) AM_RAM  AM_MASK(0xffff) /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
+	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM AM_MIRROR(0x10000) /* there's fe0000 <-> ff0000 compare */                /* Work RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funystrp_sound_map, AS_PROGRAM, 8, splash_state )
@@ -280,7 +280,7 @@ static ADDRESS_MAP_START( funystrp_sound_io_map, AS_IO, 8, splash_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(msm1_data_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm2_data_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound_bank_w)
-	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x03, 0x03) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x04, 0x04) AM_READ(int_source_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(msm1_interrupt_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(msm2_interrupt_w)
@@ -514,6 +514,8 @@ static MACHINE_CONFIG_START( splash, splash_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_30MHz/8)       /* 3.75MHz (30/8) */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -567,6 +569,8 @@ static MACHINE_CONFIG_START( roldfrog, splash_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_24MHz / 8)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(splash_state, ym_irq))
@@ -650,6 +654,8 @@ static MACHINE_CONFIG_START( funystrp, splash_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_400kHz)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(splash_state, adpcm_int1))         /* interrupt function */
@@ -993,6 +999,34 @@ ROM_START( puckpepl )
 	ROM_LOAD( "pp34.u51", 0x060000, 0x020000, CRC(93f2d483) SHA1(eb6981b0228acb1ec92325924d0aa295f9e2cfe1) )
 ROM_END
 
+/*
+
+Ring & Ball (?)
+
+Came from a dead board, silkscreen ring&ball/a by microhard
+
+u87 & u111 program
+u51
+u53 empty socket might be missing
+u130 sound (z80)
+
+no idea on this one...
+
+*/
+
+ROM_START( ringball )
+	ROM_REGION( 0x080000, "maincpu", 0 )    /* 68000 code + gfx */
+	// TODO: encrypted, there's a device with scratched part between 68k and roms. u87 looks to have standard 68k vectors with scrambled bits.
+	ROM_LOAD( "u87.bin",      0x000000, 0x040000, CRC(f8f21cfd) SHA1(c258689fc79195945db21663d2df0a33a4412618) )
+	ROM_LOAD( "u111.bin",     0x040000, 0x040000, CRC(11e246b0) SHA1(b056bcaa52ab2898f470a29b0a5c2f3594e2522b) ) // actually "u101"?
+
+	ROM_REGION( 0x080000, "audiocpu", 0 )   /* Z80 code + sound data */
+	ROM_LOAD( "u130.bin",     0x000000, 0x080000, CRC(892202ea) SHA1(10b5933b136a6595f739510d380d12c4cefd9f09) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "u51.bin",      0x000000, 0x080000, CRC(32c01844) SHA1(ad461c47cd270414c442325751eca0d6c1ea9e2d) )
+	ROM_LOAD( "u53.bin",      0x080000, 0x080000, NO_DUMP ) // empty on this PCB, GFXs doesn't seem enough for a complete game?
+ROM_END
 
 /* DRIVER INITs */
 
@@ -1010,7 +1044,7 @@ DRIVER_INIT_MEMBER(splash_state,splash10)
 
 DRIVER_INIT_MEMBER(splash_state,roldfrog)
 {
-	UINT8 * ROM = (UINT8 *)memregion("audiocpu")->base();
+	uint8_t * ROM = (uint8_t *)memregion("audiocpu")->base();
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x10000], 0x8000);
 
 	m_bitmap_type = 1;
@@ -1019,7 +1053,7 @@ DRIVER_INIT_MEMBER(splash_state,roldfrog)
 
 DRIVER_INIT_MEMBER(splash_state,rebus)
 {
-	UINT16 *ROM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
 
 	m_bitmap_type = 1;
 	m_sprite_attr2_shift = 0;
@@ -1363,7 +1397,7 @@ DRIVER_INIT_MEMBER(splash_state,funystrp)
 	m_bitmap_type = 0;
 	m_sprite_attr2_shift = 0;
 
-	UINT16 *ROM = (UINT16 *)memregion("audiocpu")->base();
+	uint16_t *ROM = (uint16_t *)memregion("audiocpu")->base();
 
 	membank("sound_bank")->configure_entries(0, 16, &ROM[0x00000], 0x8000);
 
@@ -1380,3 +1414,4 @@ GAME( 1993, roldfroga,roldfrog, roldfrog, splash, splash_state,   roldfrog, ROT0
 GAME( 1995, rebus,    0,        roldfrog, splash, splash_state,   rebus,    ROT0, "Microhard", "Rebus", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, funystrp, 0,        funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard / MagicGames", "Funny Strip", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
 GAME( 199?, puckpepl, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Puck People", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 199?, ringball, funystrp, funystrp, funystrp, splash_state, funystrp, ROT0, "Microhard", "Ring & Ball (unknown title)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE ) // Wouldn't surprise me if in-game is actually called King & Bell ...

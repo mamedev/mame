@@ -14,11 +14,11 @@ class bitbanger_device : public device_t,
 {
 public:
 	// construction/destruction
-	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	bitbanger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual image_init_result call_load() override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 	virtual void call_unload() override;
 
 	// image device
@@ -29,10 +29,9 @@ public:
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
 	virtual const char *file_extensions() const override { return ""; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	void output(UINT8 data);
-	UINT32 input(void *buffer, UINT32 length);
+	void output(uint8_t data);
+	uint32_t input(void *buffer, uint32_t length);
 
 protected:
 	// device-level overrides

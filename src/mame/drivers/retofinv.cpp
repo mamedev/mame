@@ -33,6 +33,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "machine/watchdog.h"
 #include "sound/sn76496.h"
 #include "includes/retofinv.h"
 
@@ -90,7 +91,7 @@ READ8_MEMBER(retofinv_state::cpu0_mf800_r)
 
 WRITE8_MEMBER(retofinv_state::soundcommand_w)
 {
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -142,7 +143,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0xc803, 0xc803) AM_WRITE(mcu_reset_w)
 //  AM_RANGE(0xc804, 0xc804) AM_WRITE(irq1_ack_w)   // presumably (meaning memory map is shared with cpu 1)
 	AM_RANGE(0xc805, 0xc805) AM_WRITE(cpu1_reset_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(soundcommand_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(mcu_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(mcu_w)
@@ -160,7 +161,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, retofinv_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x27ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x4000, 0x4000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(cpu2_m6000_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("sn1", sn76496_device, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("sn2", sn76496_device, write)
@@ -386,6 +387,8 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))  /* 100 CPU slices per frame - enough for the sound CPU to read all commands */
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -402,6 +405,8 @@ static MACHINE_CONFIG_START( retofinv, retofinv_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 18432000/6)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

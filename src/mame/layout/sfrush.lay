@@ -1,0 +1,195 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="abort" defstate="0">
+		<rect state="0">
+			<bounds x="0" y="0" width="2.0" height="1.15" />
+			<color red="0.25" green="0.0145" blue="0.03425" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="2.0" height="1.15" />
+			<color red="1.0" green="0.058" blue="0.137" />
+		</rect>
+		<text string="ABORT">
+			<color red="0.1" green="0.0058" blue="0.0137" />
+			<bounds x="0.34" y="0.185" width="1.29" height="0.78" />
+		</text>
+	</element>
+
+	<element name="music" defstate="0">
+		<rect state="0">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.0375" green="0.25" blue="0.25" />
+		</rect>
+		<rect state="1">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.15" green="1.0" blue="1.0" />
+		</rect>
+		<rect>
+			<bounds x="0.1" y="0.1" width="1.8" height="1.8" />
+			<color red="0.015" green="0.1" blue="0.1" />
+		</rect>
+		<text string="MUSIC" state="0">
+			<color red="0.0375" green="0.25" blue="0.25" />
+			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
+		</text>
+		<text string="MUSIC" state="1">
+			<color red="0.15" green="1.0" blue="1.0" />
+			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
+		</text>
+	</element>
+
+	<element name="view1" defstate="0">
+		<rect state="0">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="0.25" green="0.16667" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="1.0" green="0.6667" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds x="0.1" y="0.1" width="1.8" height="1.8" />
+			<color red="0.1" green="0.06667" blue="0.0" />
+		</rect>
+		<text string="VIEW" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#1" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+		<text string="VIEW" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#1" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+	</element>
+
+	<element name="view2" defstate="0">
+		<rect state="0">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="0.25" green="0.16667" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="1.0" green="0.6667" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds x="0.1" y="0.1" width="1.8" height="1.8" />
+			<color red="0.1" green="0.06667" blue="0.0" />
+		</rect>
+		<text string="VIEW" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#2" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+		<text string="VIEW" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#2" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+	</element>
+
+	<element name="view3" defstate="0">
+		<rect state="0">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="0.25" green="0.16667" blue="0.0" />
+		</rect>
+		<rect state="1">
+			<bounds x="0.0" y="0.0" width="2.0" height="2.0" />
+			<color red="1.0" green="0.6667" blue="0.0" />
+		</rect>
+		<rect>
+			<bounds x="0.1" y="0.1" width="1.8" height="1.8" />
+			<color red="0.1" green="0.06667" blue="0.0" />
+		</rect>
+		<text string="VIEW" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#3" state="0">
+			<color red="0.25" green="0.16667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+		<text string="VIEW" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="0.1" width="1.6" height="0.8" />
+		</text>
+		<text string="#3" state="1">
+			<color red="1.0" green="0.6667" blue="0.0" />
+			<bounds x="0.2" y="1.0" width="1.6" height="0.8" />
+		</text>
+	</element>
+
+	<element name="leader" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="3.0" height="1.75" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+		<text string="LEADER" state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+			<bounds x="0.5" y="0.3" width="2.0" height="1.15" />
+		</text>
+		<text string="LEADER" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0.5" y="0.3" width="2.0" height="1.15" />
+		</text>
+	</element>
+
+	<element name="winner" defstate="0">
+		<rect>
+			<bounds x="0" y="0" width="3.0" height="1.4" />
+			<color red="0.05" green="0.05" blue="0.05" />
+		</rect>
+		<text string="WINNER" state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+			<bounds x="0.5" y="0.24" width="2.0" height="0.94" />
+		</text>
+		<text string="WINNER" state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0.5" y="0.24" width="2.0" height="0.94" />
+		</text>
+	</element>
+
+	<view name="Dashboard">
+		<bounds left="0" top="0" right="4" bottom="3.472" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp3" element="abort" inputtag="SYSTEM" inputmask="0x04">
+			<bounds x="3.63" y="3.248" width="0.346" height="0.2" />
+		</bezel>
+		<bezel name="lamp4" element="music" inputtag="IN1" inputmask="0x08">
+			<bounds x="0.248" y="3.024" width="0.2" height="0.2" />
+		</bezel>
+		<bezel name="lamp5" element="view3" inputtag="IN1" inputmask="0x04">
+			<bounds x="0.472" y="3.248" width="0.2" height="0.2" />
+		</bezel>
+		<bezel name="lamp6" element="view2" inputtag="IN1" inputmask="0x02">
+			<bounds x="0.248" y="3.248" width="0.2" height="0.2" />
+		</bezel>
+		<bezel name="lamp7" element="view1" inputtag="IN1" inputmask="0x01">
+			<bounds x="0.024" y="3.248" width="0.2" height="0.2" />
+		</bezel>
+
+		<bezel name="lamp8" element="leader">
+			<bounds x="1.45" y="3.1" width="0.5" height="0.23" />
+		</bezel>
+
+		<bezel name="lamp9" element="winner">
+			<bounds x="2.05" y="3.1" width="0.5" height="0.23" />
+		</bezel>
+	</view>
+</mamelayout>

@@ -1,4 +1,4 @@
-// license:GPL2+
+// license:GPL-2.0+
 // copyright-holders:Felipe Sanches
 /*************************************************************************
 
@@ -63,28 +63,28 @@ static INPUT_PORTS_START( marywu )
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYBOARD) PORT_CODE(KEYCODE_I)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, "Unknown bit #0" )    PORT_DIPLOCATION("DSW:0")
+	PORT_DIPNAME( 0x01, 0x01, "Unknown bit #0" )    PORT_DIPLOCATION("DSW:1")
 		PORT_DIPSETTING(0x01, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x02, 0x02, "Unknown bit #1" )    PORT_DIPLOCATION("DSW:1")
+	PORT_DIPNAME( 0x02, 0x02, "Unknown bit #1" )    PORT_DIPLOCATION("DSW:2")
 		PORT_DIPSETTING(0x02, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x04, 0x04, "Unknown bit #2" )    PORT_DIPLOCATION("DSW:2")
+	PORT_DIPNAME( 0x04, 0x04, "Unknown bit #2" )    PORT_DIPLOCATION("DSW:3")
 		PORT_DIPSETTING(0x04, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x08, 0x08, "Unknown bit #3" )    PORT_DIPLOCATION("DSW:3")
+	PORT_DIPNAME( 0x08, 0x08, "Unknown bit #3" )    PORT_DIPLOCATION("DSW:4")
 		PORT_DIPSETTING(0x08, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x10, 0x10, "Unknown bit #4" )    PORT_DIPLOCATION("DSW:4")
+	PORT_DIPNAME( 0x10, 0x10, "Unknown bit #4" )    PORT_DIPLOCATION("DSW:5")
 		PORT_DIPSETTING(0x10, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown bit #5" )    PORT_DIPLOCATION("DSW:5")
+	PORT_DIPNAME( 0x20, 0x20, "Unknown bit #5" )    PORT_DIPLOCATION("DSW:6")
 		PORT_DIPSETTING(0x20, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x40, 0x40, "Unknown bit #6" )    PORT_DIPLOCATION("DSW:6")
+	PORT_DIPNAME( 0x40, 0x40, "Unknown bit #6" )    PORT_DIPLOCATION("DSW:7")
 		PORT_DIPSETTING(0x40, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown bit #7" )    PORT_DIPLOCATION("DSW:7")
+	PORT_DIPNAME( 0x80, 0x80, "Unknown bit #7" )    PORT_DIPLOCATION("DSW:8")
 		PORT_DIPSETTING(0x80, DEF_STR( On ) )
 		PORT_DIPSETTING(0x00, DEF_STR( Off ) )
 
@@ -158,7 +158,7 @@ READ8_MEMBER( marywu_state::keyboard_r )
 
 WRITE8_MEMBER( marywu_state::display_7seg_data_w )
 {
-	static const UINT8 patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
+	static const uint8_t patterns[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0, 0, 0, 0, 0, 0 }; // HEF4511BP (7 seg display driver)
 
 	output().set_digit_value(2 * m_selected_7seg_module + 0, patterns[data & 0x0F]);
 	output().set_digit_value(2 * m_selected_7seg_module + 1, patterns[(data >> 4) & 0x0F]);
@@ -169,13 +169,12 @@ static ADDRESS_MAP_START( program_map, AS_PROGRAM, 8, marywu_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, marywu_state )
-	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0100) AM_RAM /* HM6116: 2kbytes of Static RAM */
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, data_r, data_w)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, status_r, cmd_w)
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x0800) AM_RAM /* HM6116: 2kbytes of Static RAM */
 	AM_RANGE(0x9000, 0x9000) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay1", ay8910_device, data_address_w)
 	AM_RANGE(0x9001, 0x9001) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay1", ay8910_device, data_r, data_w)
 	AM_RANGE(0x9002, 0x9002) AM_MIRROR(0x0ffc) AM_DEVWRITE("ay2", ay8910_device, data_address_w)
 	AM_RANGE(0x9003, 0x9003) AM_MIRROR(0x0ffc) AM_DEVREADWRITE("ay2", ay8910_device, data_r, data_w)
+	AM_RANGE(0xb000, 0xb001) AM_MIRROR(0x0ffe) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_NOP /* TODO: Investigate this. There's something going on at this address range. */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(port_r)
 ADDRESS_MAP_END

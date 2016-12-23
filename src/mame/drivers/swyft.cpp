@@ -9,7 +9,7 @@
 
     See cat.c for the machine which the swyft later became.
 
-    This driver is dedicated in memory of Jef Raskin and Dave Boulton
+    This driver is dedicated in memory of Jef Raskin, Dave Boulton, and John "Sandy" Bumgarner (1941-2016)
 
 IAI detailed credits:
 Scott Kim - responsible for fonts on swyft and cat
@@ -323,7 +323,7 @@ public:
 	required_device<via6522_device> m_via0; // only swyft uses this
 	required_device<via6522_device> m_via1; // only swyft uses this
 	optional_device<speaker_sound_device> m_speaker;
-	required_shared_ptr<UINT8> m_p_swyft_videoram;
+	required_shared_ptr<uint8_t> m_p_swyft_videoram;
 	/*optional_ioport m_y0;
 	optional_ioport m_y1;
 	optional_ioport m_y2;
@@ -337,7 +337,7 @@ public:
 	DECLARE_MACHINE_RESET(swyft);
 	DECLARE_VIDEO_START(swyft);
 
-	UINT32 screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER(swyft_d0000);
 
@@ -374,8 +374,8 @@ public:
 	   The watchdog counter and the 6ms counter are both incremented
 	   every time the KTOBF pulses.
 	 */
-	UINT8 m_keyboard_line;
-	UINT8 m_floppy_control;
+	uint8_t m_keyboard_line;
+	uint8_t m_floppy_control;
 
 //protected:
 	//virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
@@ -568,12 +568,13 @@ x   x   x   x   1   1  ?1? ?0?  ?   1   0   0   x   x   *   *   *   *   x   x   
 
 static ADDRESS_MAP_START(swyft_mem, AS_PROGRAM, 8, swyft_state)
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x00ffff) AM_ROM AM_MIRROR(0xF00000) // 64 KB ROM
-	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_MIRROR(0xF00000) AM_SHARE("p_swyft_vram") // 256 KB RAM
-	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) AM_MIRROR(0xF00000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
-	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) AM_MIRROR(0xF00000) // 6850 ACIA lives here
-	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) AM_MIRROR(0xF00000)// io area with selector on a9 a8 a7 a6?
-	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w) AM_MIRROR(0xF00000)
+	ADDRESS_MAP_GLOBAL_MASK(0xfffff)
+	AM_RANGE(0x000000, 0x00ffff) AM_ROM // 64 KB ROM
+	AM_RANGE(0x040000, 0x07ffff) AM_RAM AM_SHARE("p_swyft_vram") // 256 KB RAM
+	AM_RANGE(0x0d0000, 0x0d000f) AM_READ(swyft_d0000) // status of something? reads from d0000, d0004, d0008, d000a, d000e
+	AM_RANGE(0x0e1000, 0x0e1000) AM_DEVWRITE("acia6850", acia6850_device, control_w) // 6850 ACIA lives here
+	AM_RANGE(0x0e2000, 0x0e2fff) AM_READWRITE(swyft_via0_r, swyft_via0_w) // io area with selector on a9 a8 a7 a6?
+	AM_RANGE(0x0e4000, 0x0e4fff) AM_READWRITE(swyft_via1_r, swyft_via1_w)
 ADDRESS_MAP_END
 
 MACHINE_START_MEMBER(swyft_state,swyft)
@@ -597,9 +598,9 @@ VIDEO_START_MEMBER(swyft_state,swyft)
 {
 }
 
-UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 code;
+	uint16_t code;
 	int y, x, b;
 
 	int addr = 0;
@@ -621,7 +622,7 @@ UINT32 swyft_state::screen_update_swyft(screen_device &screen, bitmap_ind16 &bit
 READ8_MEMBER( swyft_state::swyft_d0000 )
 {
 	// wtf is this supposed to be?
-	UINT8 byte = 0xFF; // ?
+	uint8_t byte = 0xFF; // ?
 	logerror("mystery device: read from 0x%5X, returning %02X\n", offset+0xD0000, byte);
 	return byte;
 }
@@ -638,7 +639,7 @@ static const char *const swyft_via_regnames[] = { "0: ORB/IRB", "1: ORA/IRA", "2
 READ8_MEMBER( swyft_state::swyft_via0_r )
 {
 	if (offset&0x000C3F) fprintf(stderr,"VIA0: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via0->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via0->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA0
 	logerror("VIA0 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -657,7 +658,7 @@ WRITE8_MEMBER( swyft_state::swyft_via0_w )
 READ8_MEMBER( swyft_state::swyft_via1_r )
 {
 	if (offset&0x000C3F) fprintf(stderr," VIA1: read from invalid offset in 68k space: %06X!\n", offset);
-	UINT8 data = m_via1->read(space, (offset>>6)&0xF);
+	uint8_t data = m_via1->read(space, (offset>>6)&0xF);
 #ifdef DEBUG_SWYFT_VIA1
 	logerror(" VIA1 register %s read by cpu: returning %02x\n", swyft_via_regnames[(offset>>5)&0xF], data);
 #endif
@@ -783,7 +784,7 @@ static MACHINE_CONFIG_START( swyft, swyft_state )
 	MCFG_SCREEN_UPDATE_DRIVER(swyft_state, screen_update_swyft)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(swyft_state,swyft)
 

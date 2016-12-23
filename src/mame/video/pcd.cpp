@@ -8,18 +8,17 @@
 const device_type PCD_VIDEO = &device_creator<pcd_video_device>;
 const device_type PCX_VIDEO = &device_creator<pcx_video_device>;
 
-pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+pcdx_video_device::pcdx_video_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	device_gfx_interface(mconfig, *this, nullptr, "palette"),
 	m_maincpu(*this, ":maincpu"),
 	m_mcu(*this, "graphics"),
 	m_crtc(*this, "crtc"),
-	m_palette(*this, "palette"),
-	m_gfxdecode(*this, "gfxdecode"),
 	m_pic2(*this, ":pic2")
 {
 }
 
-pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCD_VIDEO, "Siemens PC-D Video", tag, owner, clock, "pcd_video", __FILE__),
 	m_mouse_btn(*this, "MOUSE"),
 	m_mouse_x(*this, "MOUSEX"),
@@ -29,7 +28,7 @@ pcd_video_device::pcd_video_device(const machine_config &mconfig, const char *ta
 {
 }
 
-pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pcx_video_device::pcx_video_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	pcdx_video_device(mconfig, PCX_VIDEO, "Siemens PC-X Video", tag, owner, clock, "pcx_video", __FILE__),
 	device_serial_interface(mconfig, *this),
 	m_vram(4*1024),
@@ -43,7 +42,7 @@ ROM_START( pcd_video )
 	ROM_LOAD("s36361-d321-v1.bin", 0x000, 0x400, CRC(69baeb2a) SHA1(98b9cd0f38c51b4988a3aed0efcf004bedd115ff))
 ROM_END
 
-const rom_entry *pcd_video_device::device_rom_region() const
+const tiny_rom_entry *pcd_video_device::device_rom_region() const
 {
 	return ROM_NAME( pcd_video );
 }
@@ -57,7 +56,7 @@ ROM_START( pcx_video )
 	ROM_LOAD("d39-graka.bin", 0x4000, 0x2000, CRC(02920e25) SHA1(145a6648d75c1dc4788f9bc7790281ef7e8f8426))
 ROM_END
 
-const rom_entry *pcx_video_device::device_rom_region() const
+const tiny_rom_entry *pcx_video_device::device_rom_region() const
 {
 	return ROM_NAME( pcx_video );
 }
@@ -76,7 +75,7 @@ static const gfx_layout pcd_charlayout =
 };
 
 static GFXDECODE_START( pcx )
-	GFXDECODE_ENTRY( "char", 0x0000, pcd_charlayout, 0, 1 )
+	GFXDECODE_DEVICE( "char", 0x0000, pcd_charlayout, 0, 1 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( pcd_mouse )
@@ -113,11 +112,10 @@ static MACHINE_CONFIG_FRAGMENT( pcd_video )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
 	MCFG_PALETTE_ADD("palette", 3)
 	MCFG_PALETTE_INIT_OWNER(pcdx_video_device, pcdx)
 
-	MCFG_SCN2674_VIDEO_ADD("crtc", 0, NULL);
+	MCFG_SCN2674_VIDEO_ADD("crtc", 0, NOOP);
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
 	MCFG_SCN2674_GFX_CHARACTER_WIDTH(16)
 	MCFG_SCN2674_DRAW_CHARACTER_CALLBACK_OWNER(pcd_video_device, display_pixels)
@@ -152,6 +150,9 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_CPU_PROGRAM_MAP(pcx_vid_map)
 	MCFG_CPU_IO_MAP(pcx_vid_io)
 
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(pcx_video_device, tx_callback))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(pcx_video_device, rx_callback))
+
 	// video hardware
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_SIZE(640, 350)
@@ -159,8 +160,7 @@ static MACHINE_CONFIG_FRAGMENT( pcx_video )
 	MCFG_SCREEN_REFRESH_RATE(50)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", scn2674_device, screen_update)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pcx)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_SCN2674_VIDEO_ADD("crtc", 0, INPUTLINE("graphics", MCS51_INT0_LINE));
 	MCFG_SCN2674_TEXT_CHARACTER_WIDTH(8)
@@ -180,15 +180,15 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 	address <<= 1;
 	if(lg)
 	{
-		UINT16 data = m_vram[address + 1] | (m_vram[address] << 8);
+		uint16_t data = m_vram[address + 1] | (m_vram[address] << 8);
 		if(m_p2 & 8)
 			data = ~data;
 		for(int i = 0; i < 16; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (15 - i))) ? 1 : 0);
+			bitmap.pix32(y, x + i) = palette().pen((data & (1 << (15 - i))) ? 1 : 0);
 	}
 	else
 	{
-		UINT8 data, attr;
+		uint8_t data, attr;
 		int bgnd = 0, fgnd = 1;
 		data = m_charram[m_vram[address] * 16 + linecount];
 		attr = m_vram[address + 1];
@@ -207,13 +207,13 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcd_video_device::display_pixels)
 		else if(attr & 8)
 			bgnd = 2;
 		for(int i = 0; i < 8; i++)
-			bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? fgnd : bgnd);
+			bitmap.pix32(y, x + i) = palette().pen((data & (1 << (7 - i))) ? fgnd : bgnd);
 	}
 }
 
 SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 {
-	UINT8 data;
+	uint8_t data;
 	address <<= 1;
 	data = m_charrom[m_vram[address] * 16 + linecount + (m_vram[address + 1] & 0x20 ? 4096 : 0)];
 	if(cursor && blink)
@@ -221,14 +221,14 @@ SCN2674_DRAW_CHARACTER_MEMBER(pcx_video_device::display_pixels)
 	if(m_p1 & 0x20)
 		data = ~data;
 	for(int i = 0; i < 8; i++)
-		bitmap.pix32(y, x + i) = m_palette->pen((data & (1 << (7 - i))) ? 1 : 0);
+		bitmap.pix32(y, x + i) = palette().pen((data & (1 << (7 - i))) ? 1 : 0);
 }
 
 PALETTE_INIT_MEMBER(pcdx_video_device, pcdx)
 {
-	palette.set_pen_color(0,rgb_t::black);
-	palette.set_pen_color(1,rgb_t::white);
-	palette.set_pen_color(2,rgb_t(128,128,128));
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
+	palette.set_pen_color(2, rgb_t(128, 128, 128));
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(pcd_video_device::mouse_timer)
@@ -276,7 +276,7 @@ WRITE8_MEMBER(pcd_video_device::vram_w)
 	{
 		offset >>= 1;
 		m_charram[offset & 0x1fff] = data;
-		m_gfxdecode->gfx(0)->mark_dirty(offset/16);
+		gfx(0)->mark_dirty(offset/16);
 	}
 }
 
@@ -297,7 +297,7 @@ READ8_MEMBER(pcd_video_device::t1_r)
 
 READ8_MEMBER(pcd_video_device::p1_r)
 {
-	UINT8 data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
+	uint8_t data = (m_mouse_btn->read() & 0x30) | 0x80; // char ram/rom jumper?
 	data |= (m_mouse.xa != CLEAR_LINE ? 0 : 1);
 	data |= (m_mouse.xb != CLEAR_LINE ? 0 : 2);
 	data |= (m_mouse.ya != CLEAR_LINE ? 0 : 4);
@@ -408,9 +408,9 @@ WRITE8_MEMBER(pcx_video_device::p1_w)
 
 void pcd_video_device::device_start()
 {
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, 0, 0, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, 0, 0, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
-	m_gfxdecode->set_gfx(0, std::make_unique<gfx_element>(m_palette, pcd_charlayout, &m_charram[0], 0, 1, 0));
+	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0xff00);
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xf0000, 0xf7fff, read8_delegate(FUNC(pcd_video_device::vram_r), this), write8_delegate(FUNC(pcd_video_device::vram_w), this), 0xffff);
+	set_gfx(0, std::make_unique<gfx_element>(palette(), pcd_charlayout, &m_charram[0], 0, 1, 0));
 }
 
 void pcd_video_device::device_reset()
@@ -433,15 +433,13 @@ ADDRESS_MAP_END
 
 void pcx_video_device::device_start()
 {
-	mcs51_cpu_device *mcu = downcast<mcs51_cpu_device *>(m_mcu.target());
-	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, 0, 0, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0x00ff);
+	m_maincpu->space(AS_IO).install_readwrite_handler(0xfb00, 0xfb01, read8_delegate(FUNC(pcdx_video_device::detect_r), this), write8_delegate(FUNC(pcdx_video_device::detect_w), this), 0x00ff);
 	m_txd_handler.resolve_safe();
 
-	// set serial callbacks
-	mcu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(pcx_video_device, tx_callback));
-	mcu->i8051_set_serial_rx_callback(READ8_DELEGATE(pcx_video_device, rx_callback));
 	set_data_frame(1, 8, PARITY_NONE, STOP_BITS_1);
 	set_rate(600*2);  // FIXME: fix the keyboard when the mc2661 baud rate calc is fixed
+
+	decode_gfx(GFXDECODE_NAME(pcx));
 }
 
 void pcx_video_device::device_reset()

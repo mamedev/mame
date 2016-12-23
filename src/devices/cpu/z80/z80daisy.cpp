@@ -21,7 +21,8 @@
 //-------------------------------------------------
 
 device_z80daisy_interface::device_z80daisy_interface(const machine_config &mconfig, device_t &device)
-	: device_interface(device, "z80daisy")
+	: device_interface(device, "z80daisy"),
+		m_daisy_next(nullptr)
 {
 }
 
@@ -41,31 +42,63 @@ device_z80daisy_interface::~device_z80daisy_interface()
 //**************************************************************************
 
 //-------------------------------------------------
-//  z80_daisy_chain - constructor
+//  z80_daisy_chain_interface - constructor
 //-------------------------------------------------
 
-z80_daisy_chain::z80_daisy_chain()
-	: m_daisy_list(nullptr)
+z80_daisy_chain_interface::z80_daisy_chain_interface(const machine_config &mconfig, device_t &device)
+	: device_interface(device, "z80daisychain"),
+		m_daisy_config(nullptr),
+		m_chain(nullptr)
 {
 }
 
 
 //-------------------------------------------------
-//  init - allocate the daisy chain based on the
-//  provided configuration
+//  z80_daisy_chain_interface - destructor
+//-------------------------------------------------
+z80_daisy_chain_interface::~z80_daisy_chain_interface()
+{
+}
+
+
+//-------------------------------------------------
+//  static_set_daisy_config - configuration helper
+//  to set up the daisy chain
+//-------------------------------------------------
+void z80_daisy_chain_interface::static_set_daisy_config(device_t &device, const z80_daisy_config *config)
+{
+	z80_daisy_chain_interface *daisyintf;
+	if (!device.interface(daisyintf))
+		throw emu_fatalerror("MCFG_Z80_DAISY_CHAIN called on device '%s' with no daisy chain interface", device.tag());
+	daisyintf->m_daisy_config = config;
+}
+
+
+//-------------------------------------------------
+//  interface_post_start - work to be done after
+//  actually starting a device
 //-------------------------------------------------
 
-void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
+void z80_daisy_chain_interface::interface_post_start()
 {
+	if (m_daisy_config != nullptr)
+		daisy_init(m_daisy_config);
+}
+
+void z80_daisy_chain_interface::daisy_init(const z80_daisy_config *daisy)
+{
+	assert(daisy != nullptr);
+
 	// create a linked list of devices
-	daisy_entry **tailptr = &m_daisy_list;
+	device_z80daisy_interface **tailptr = &m_chain;
 	for ( ; daisy->devname != nullptr; daisy++)
 	{
 		// find the device
-		device_t *target;
-		if ((target = cpudevice->subdevice(daisy->devname)) == nullptr)
+		device_t *target = device().subdevice(daisy->devname);
+		if (target == nullptr)
 		{
-			if ((target = cpudevice->siblingdevice(daisy->devname)) == nullptr)
+			target = device().siblingdevice(daisy->devname);
+			if (target == nullptr)
 				fatalerror("Unable to locate device '%s'\n", daisy->devname);
 		}
 
@@ -74,27 +107,36 @@ void z80_daisy_chain::init(device_t *cpudevice, const z80_daisy_config *daisy)
 		if (!target->interface(intf))
 			fatalerror("Device '%s' does not implement the z80daisy interface!\n", daisy->devname);
 
-		// append to the end, or overwrite existing entry
-		daisy_entry *next = (*tailptr) ? (*tailptr)->m_next : nullptr;
-		if (*tailptr != nullptr)
-			auto_free(cpudevice->machine(), *tailptr);
-		*tailptr = auto_alloc(cpudevice->machine(), daisy_entry(target));
-		(*tailptr)->m_next = next;
-		tailptr = &(*tailptr)->m_next;
+		// splice it out of the list if it was previously added
+		device_z80daisy_interface **oldtailptr = tailptr;
+		while (*oldtailptr != nullptr)
+		{
+			if (*oldtailptr == intf)
+				*oldtailptr = (*oldtailptr)->m_daisy_next;
+			else
+				oldtailptr = &(*oldtailptr)->m_daisy_next;
+		}
+
+		// add the interface to the list
+		intf->m_daisy_next = *tailptr;
+		*tailptr = intf;
+		tailptr = &(*tailptr)->m_daisy_next;
 	}
+
+	osd_printf_verbose("Daisy chain = %s\n", daisy_show_chain().c_str());
 }
 
 
 //-------------------------------------------------
-//  reset - send a reset signal to all chained
-//  devices
+//  interface_post_reset - work to be done after a
+//  device is reset
 //-------------------------------------------------
 
-void z80_daisy_chain::reset()
+void z80_daisy_chain_interface::interface_post_reset()
 {
-	// loop over all devices and call their reset function
-	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
-		daisy->m_device->reset();
+	// loop over all chained devices and call their reset function
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
+		intf->device().reset();
 }
 
 
@@ -103,13 +145,13 @@ void z80_daisy_chain::reset()
 //  return assert/clear based on the state
 //-------------------------------------------------
 
-int z80_daisy_chain::update_irq_state()
+int z80_daisy_chain_interface::daisy_update_irq_state()
 {
 	// loop over all devices; dev[0] is highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
-		int state = daisy->m_interface->z80daisy_irq_state();
+		int state = intf->z80daisy_irq_state();
 		if (state & Z80_DAISY_INT)
 			return ASSERT_LINE;
 
@@ -126,16 +168,16 @@ int z80_daisy_chain::update_irq_state()
 //  from a chained device and return the vector
 //-------------------------------------------------
 
-int z80_daisy_chain::call_ack_device()
+int z80_daisy_chain_interface::daisy_call_ack_device()
 {
 	int vector = 0;
 
 	// loop over all devices; dev[0] is the highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
-		int state = daisy->m_interface->z80daisy_irq_state();
-		vector = daisy->m_interface->z80daisy_irq_ack();
+		int state = intf->z80daisy_irq_state();
+		vector = intf->z80daisy_irq_ack();
 		if (state & Z80_DAISY_INT)
 			return vector;
 	}
@@ -149,16 +191,16 @@ int z80_daisy_chain::call_ack_device()
 //  the chain
 //-------------------------------------------------
 
-void z80_daisy_chain::call_reti_device()
+void z80_daisy_chain_interface::daisy_call_reti_device()
 {
 	// loop over all devices; dev[0] is the highest priority
-	for (daisy_entry *daisy = m_daisy_list; daisy != nullptr; daisy = daisy->m_next)
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
 	{
 		// if this device is asserting the IEO line, that's the one we want
-		int state = daisy->m_interface->z80daisy_irq_state();
+		int state = intf->z80daisy_irq_state();
 		if (state & Z80_DAISY_IEO)
 		{
-			daisy->m_interface->z80daisy_irq_reti();
+			intf->z80daisy_irq_reti();
 			return;
 		}
 	}
@@ -167,13 +209,21 @@ void z80_daisy_chain::call_reti_device()
 
 
 //-------------------------------------------------
-//  daisy_entry - constructor
+//  daisy_show_chain - list devices in the chain
+//  in string format (for debugging purposes)
 //-------------------------------------------------
 
-z80_daisy_chain::daisy_entry::daisy_entry(device_t *device)
-	: m_next(nullptr),
-		m_device(device),
-		m_interface(nullptr)
+std::string z80_daisy_chain_interface::daisy_show_chain() const
 {
-	device->interface(m_interface);
+	std::ostringstream result;
+
+	// loop over all devices
+	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
+	{
+		if (intf != m_chain)
+			result << " -> ";
+		result << intf->device().tag();
+	}
+
+	return result.str();
 }

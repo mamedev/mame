@@ -89,7 +89,7 @@ machine_config_constructor isa8_finalchs_device::device_mconfig_additions() cons
 //  isa8_finalchs_device - constructor
 //-------------------------------------------------
 
-isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_finalchs_device::isa8_finalchs_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, ISA8_FINALCHS, "Final Chess Card", tag, owner, clock, "finalchs", __FILE__),
 		device_isa8_card_interface( mconfig, *this ), m_FCH_latch_data(0)
 	{
@@ -104,8 +104,8 @@ void isa8_finalchs_device::device_start()
 	set_isa_device();
 	//the included setup program allows any port from 0x100 to 0x1F0 to be selected, at increments of 0x10
 	//picked the following at random until we get dips hooked up
-	m_isa->install_device(0x160, 0x0161, 0, 0, read8_delegate(FUNC(isa8_finalchs_device::finalchs_r), this), write8_delegate(FUNC(isa8_finalchs_device::finalchs_w), this));
-//  timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, cause_M6502_irq);
+	m_isa->install_device(0x160, 0x0161, read8_delegate(FUNC(isa8_finalchs_device::finalchs_r), this), write8_delegate(FUNC(isa8_finalchs_device::finalchs_w), this));
+//  timer_pulse(machine, ATTOTIME_IN_HZ(1), nullptr, 0, cause_M6502_irq);
 }
 
 //-------------------------------------------------
@@ -121,7 +121,7 @@ void isa8_finalchs_device::device_reset()
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_finalchs_device::device_rom_region() const
+const tiny_rom_entry *isa8_finalchs_device::device_rom_region() const
 {
 	return ROM_NAME( finalchs );
 }

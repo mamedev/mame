@@ -7,6 +7,7 @@
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
 #include "machine/timekpr.h"
+#include "machine/watchdog.h"
 
 #define igrosoft_gamble_ROM_SIZE 0x80000
 #define igrosoft_gamble_VIDRAM_SIZE (0x2000*0x04)
@@ -35,12 +36,12 @@ public:
 
 	/* Misc related */
 
-	UINT8 m_rambk;
+	uint8_t m_rambk;
 
-	UINT8 m_hopper_motor;
-	UINT8 m_hopper;
+	uint8_t m_hopper_motor;
+	uint8_t m_hopper;
 
-	UINT8 m_vid[igrosoft_gamble_VIDRAM_SIZE];
+	uint8_t m_vid[igrosoft_gamble_VIDRAM_SIZE];
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_vid_w);
 	DECLARE_WRITE8_MEMBER(igrosoft_gamble_bank_w);
 	DECLARE_READ8_MEMBER(bankedram_r);
@@ -85,7 +86,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_igrosoft_gamble(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<timekeeper_device> m_m48t35;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -93,24 +94,6 @@ public:
 	required_device<palette_device> m_palette;
 };
 
-#define mfish_parent mfish_13
-#define czmon_parent czmon_13
-#define fcockt_parent fcockt_8
-#define lhaunt_parent lhaunt_6
-#define rollfr_parent rollfr_4
-#define garage_parent garage_5
-#define rclimb_parent rclimb_3
-#define sweetl_parent sweetl
-#define resdnt_parent resdnt_6
-#define island_parent island
-#define pirate_parent pirate_3
-#define island2_parent island2
-#define pirate2_parent pirate2
-#define keks_parent keks_2
-#define gnome_parent gnome_9
-#define sweetl2_parent sweetl2
-#define fcockt2_parent fcockt2
-#define crzmon2_parent crzmon2
 
 MACHINE_CONFIG_EXTERN( igrosoft_gamble );
 MACHINE_CONFIG_EXTERN( rollfr );

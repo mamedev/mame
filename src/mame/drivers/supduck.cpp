@@ -24,6 +24,7 @@ All clock timing comes from crystal 1
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/gen_latch.h"
 #include "sound/okim6295.h"
 #include "video/bufsprite.h"
 #include "video/tigeroad_spr.h"
@@ -41,7 +42,8 @@ public:
 			m_back_videoram(*this, "backvideoram"),
 			m_gfxdecode(*this, "gfxdecode"),
 			m_palette(*this, "palette"),
-			m_spritegen(*this, "spritegen")
+			m_spritegen(*this, "spritegen"),
+			m_soundlatch(*this, "soundlatch")
 	{ }
 
 	// devices
@@ -50,19 +52,20 @@ public:
 
 	// shared pointers
 	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_text_videoram;
-	required_shared_ptr<UINT16> m_fore_videoram;
-	required_shared_ptr<UINT16> m_back_videoram;
+	required_shared_ptr<uint16_t> m_text_videoram;
+	required_shared_ptr<uint16_t> m_fore_videoram;
+	required_shared_ptr<uint16_t> m_back_videoram;
 
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<tigeroad_spr_device> m_spritegen;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	tilemap_t     *m_text_tilemap;
 	tilemap_t     *m_fore_tilemap;
 	tilemap_t     *m_back_tilemap;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER(text_videoram_w);
 	DECLARE_WRITE16_MEMBER(fore_videoram_w);
@@ -111,17 +114,17 @@ TILEMAP_MAPPER_MEMBER(supduck_state::supduk_tilemap_scan)
 
 void supduck_state::video_start()
 {
-	m_text_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_text_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
-	m_fore_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
-	m_back_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_fore_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_fore_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
+	m_back_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(supduck_state::get_back_tile_info),this), tilemap_mapper_delegate(FUNC(supduck_state::supduk_tilemap_scan),this), 32, 32, 128,64);
 
 	m_text_tilemap->set_transparent_pen(0x3);
 	m_fore_tilemap->set_transparent_pen(0xf);
 
 }
 
-UINT32 supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supduck_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -156,7 +159,7 @@ WRITE16_MEMBER(supduck_state::back_videoram_w)
 
 TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 {
-	UINT16 *videoram = m_text_videoram;
+	uint16_t *videoram = m_text_videoram;
 	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
@@ -168,7 +171,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_text_tile_info) // same as tigeroad.c
 
 TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 {
-	UINT16 *videoram = m_fore_videoram;
+	uint16_t *videoram = m_fore_videoram;
 	int data = videoram[tile_index];
 	int code = data & 0xff;
 	if (data & 0x4000) code |= 0x100;
@@ -184,7 +187,7 @@ TILE_GET_INFO_MEMBER(supduck_state::get_fore_tile_info)
 
 TILE_GET_INFO_MEMBER(supduck_state::get_back_tile_info)
 {
-	UINT16 *videoram = m_back_videoram;
+	uint16_t *videoram = m_back_videoram;
 	int data = videoram[tile_index];
 
 	int code = data & 0xff;
@@ -209,7 +212,7 @@ WRITE16_MEMBER(supduck_state::supduck_4002_w)
 {
 	data &= mem_mask;
 
-	soundlatch_byte_w(space, 0, (data>>8));
+	m_soundlatch->write(space, 0, (data>>8));
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 
 }
@@ -260,7 +263,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, supduck_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( oki_map, AS_0, 8, supduck_state )
@@ -459,6 +462,8 @@ static MACHINE_CONFIG_START( supduck, supduck_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_OKIM6295_ADD("oki", XTAL_8MHz/8, OKIM6295_PIN7_HIGH) // 1MHz - Verified on PCB, pin 7 not verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

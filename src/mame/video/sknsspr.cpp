@@ -21,7 +21,7 @@
 const device_type SKNS_SPRITE = &device_creator<sknsspr_device>;
 
 
-sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sknsspr_device::sknsspr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, SKNS_SPRITE, "SKNS Sprite", tag, owner, clock, "sknsspr", __FILE__),
 		device_video_interface(mconfig, *this)
 {
@@ -37,15 +37,15 @@ void sknsspr_device::device_reset()
 	//printf("sknsspr_device::device_reset()\n");
 }
 
-int sknsspr_device::skns_rle_decode ( int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
+int sknsspr_device::skns_rle_decode ( int romoffset, int size, uint8_t*gfx_source, size_t gfx_length )
 {
-	UINT8 *src = gfx_source;
+	uint8_t *src = gfx_source;
 	size_t srcsize = gfx_length;
-	UINT8 *dst = decodebuffer;
+	uint8_t *dst = decodebuffer;
 	int decodeoffset = 0;
 
 	while(size>0) {
-		UINT8 code = src[(romoffset++)%srcsize];
+		uint8_t code = src[(romoffset++)%srcsize];
 		size -= (code & 0x7f) + 1;
 		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
@@ -54,7 +54,7 @@ int sknsspr_device::skns_rle_decode ( int romoffset, int size, UINT8*gfx_source,
 				code--;
 			} while(code != 0xff);
 		} else {  /* repeat next value (code & 0x7f) times */
-			UINT8 val = src[(romoffset++)%srcsize];
+			uint8_t val = src[(romoffset++)%srcsize];
 			do {
 				dst[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;
 				code--;
@@ -74,10 +74,10 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 /* We are working in .6 fixed point if you hadn't guessed */
 
 #define z_decls(step)               \
-	UINT16 zxs = 0x40-(zx_m>>2);            \
-	UINT16 zxd = 0x40-(zx_s>>2);        \
-	UINT16 zys = 0x40-(zy_m>>2);            \
-	UINT16 zyd = 0x40-(zy_s>>2);        \
+	uint16_t zxs = 0x40-(zx_m>>2);            \
+	uint16_t zxd = 0x40-(zx_s>>2);        \
+	uint16_t zys = 0x40-(zy_m>>2);            \
+	uint16_t zyd = 0x40-(zy_s>>2);        \
 	int xs, ys, xd, yd, old, old2;      \
 	int step_spr = step;                \
 	int bxs = 0, bys = 0;               \
@@ -146,7 +146,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 	while(ys < sy && yd >= clip.min_y)
 
 #define z_draw_pixel()              \
-	UINT8 val = src[xs >> 6];           \
+	uint8_t val = src[xs >> 6];           \
 	if(val)                 \
 		bitmap.pix16(yd>>6, xd>>6) = val + colour;
 
@@ -169,7 +169,7 @@ void sknsspr_device::skns_sprite_kludge(int x, int y)
 		old2 += 0x40;               \
 	}
 
-static void blit_nf_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_nf_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *src, int x, int y, int sx, int sy, uint16_t zx_m, uint16_t zx_s, uint16_t zy_m, uint16_t zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -183,7 +183,7 @@ static void blit_nf_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UIN
 	}
 }
 
-static void blit_fy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *src, int x, int y, int sx, int sy, uint16_t zx_m, uint16_t zx_s, uint16_t zy_m, uint16_t zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_min();
@@ -197,7 +197,7 @@ static void blit_fy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UIN
 	}
 }
 
-static void blit_fx_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fx_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *src, int x, int y, int sx, int sy, uint16_t zx_m, uint16_t zx_s, uint16_t zy_m, uint16_t zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -211,7 +211,7 @@ static void blit_fx_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UIN
 	}
 }
 
-static void blit_fxy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour)
+static void blit_fxy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *src, int x, int y, int sx, int sy, uint16_t zx_m, uint16_t zx_s, uint16_t zy_m, uint16_t zy_s, int colour)
 {
 	z_decls(sx);
 	z_clamp_x_max();
@@ -225,14 +225,14 @@ static void blit_fxy_z(bitmap_ind16 &bitmap, const rectangle &cliprect, const UI
 	}
 }
 
-static void (*const blit_z[4])(bitmap_ind16 &bitmap, const rectangle &cliprect, const UINT8 *src, int x, int y, int sx, int sy, UINT16 zx_m, UINT16 zx_s, UINT16 zy_m, UINT16 zy_s, int colour) = {
+static void (*const blit_z[4])(bitmap_ind16 &bitmap, const rectangle &cliprect, const uint8_t *src, int x, int y, int sx, int sy, uint16_t zx_m, uint16_t zx_s, uint16_t zy_m, uint16_t zy_s, int colour) = {
 	blit_nf_z,
 	blit_fy_z,
 	blit_fx_z,
 	blit_fxy_z,
 };
 
-void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
+void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint32_t* spriteram_source, size_t spriteram_size, uint8_t* gfx_source, size_t gfx_length, uint32_t* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -271,8 +271,8 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 	//printf ("addr %08x\n", (sprite_regs[0x14/4]));
 
 
-	UINT32 *source = spriteram_source;
-	UINT32 *finish = source + spriteram_size/4;
+	uint32_t *source = spriteram_source;
+	uint32_t *finish = source + spriteram_size/4;
 
 	int group_x_offset[4];
 	int group_y_offset[4];
@@ -286,7 +286,7 @@ void sknsspr_device::skns_draw_sprites(bitmap_ind16 &bitmap, const rectangle &cl
 	int sx,sy;
 	int endromoffs=0, gfxlen;
 	int grow;
-	UINT16 zoomx_m, zoomx_s, zoomy_m, zoomy_s;
+	uint16_t zoomx_m, zoomx_s, zoomy_m, zoomy_s;
 
 
 	if ((!disabled)){

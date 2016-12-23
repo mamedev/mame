@@ -153,8 +153,8 @@ public:
 	DECLARE_READ16_MEMBER(tokimeki_serial_r);
 	DECLARE_WRITE16_MEMBER(tokimeki_serial_w);
 	DECLARE_DRIVER_INIT(simpbowl);
-	void scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
-	void scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size );
+	void scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
+	void scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size );
 
 protected:
 	virtual void driver_start() override;
@@ -162,16 +162,16 @@ protected:
 private:
 	required_device<am53cf96_device> m_am53cf96;
 
-	UINT32 m_flash_address;
+	uint32_t m_flash_address;
 
-	UINT16 m_trackball_prev[ 2 ];
-	UINT16 m_trackball_data[ 2 ];
-	UINT16 m_btc_trackball_prev[ 4 ];
-	UINT16 m_btc_trackball_data[ 4 ];
+	uint16_t m_trackball_prev[ 2 ];
+	uint16_t m_trackball_data[ 2 ];
+	uint16_t m_btc_trackball_prev[ 4 ];
+	uint16_t m_btc_trackball_data[ 4 ];
 
 	fujitsu_29f016a_device *m_flash8[4];
 
-	UINT8 m_sector_buffer[ 4096 ];
+	uint8_t m_sector_buffer[ 4096 ];
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -223,9 +223,9 @@ ADDRESS_MAP_END
 
 /* SCSI */
 
-void konamigv_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_read( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *sector_buffer = m_sector_buffer;
+	uint8_t *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
@@ -267,9 +267,9 @@ void konamigv_state::scsi_dma_read( UINT32 *p_n_psxram, UINT32 n_address, INT32 
 	}
 }
 
-void konamigv_state::scsi_dma_write( UINT32 *p_n_psxram, UINT32 n_address, INT32 n_size )
+void konamigv_state::scsi_dma_write( uint32_t *p_n_psxram, uint32_t n_address, int32_t n_size )
 {
-	UINT8 *sector_buffer = m_sector_buffer;
+	uint8_t *sector_buffer = m_sector_buffer;
 	int i;
 	int n_this;
 
@@ -325,8 +325,8 @@ static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	MCFG_RAM_MODIFY("maincpu:ram")
 	MCFG_RAM_DEFAULT_SIZE("2M")
 
-	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate( FUNC( konamigv_state::scsi_dma_read ), (konamigv_state *) owner ) )
-	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate( FUNC( konamigv_state::scsi_dma_write ), (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_READ( "maincpu", 5, psx_dma_read_delegate(&konamigv_state::scsi_dma_read, (konamigv_state *) owner ) )
+	MCFG_PSX_DMA_CHANNEL_WRITE( "maincpu", 5, psx_dma_write_delegate(&konamigv_state::scsi_dma_write, (konamigv_state *) owner ) )
 
 	MCFG_DEVICE_ADD("mb89371", MB89371, 0)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -476,7 +476,7 @@ READ16_MEMBER(konamigv_state::trackball_r)
 
 		for( int axis = 0; axis < 2; axis++ )
 		{
-			UINT16 value = ioport(axisnames[axis])->read();
+			uint16_t value = ioport(axisnames[axis])->read();
 			m_trackball_data[ axis ] = value - m_trackball_prev[ axis ];
 			m_trackball_prev[ axis ] = value;
 		}
@@ -536,7 +536,7 @@ READ16_MEMBER(konamigv_state::btc_trackball_r)
 
 		for( int axis = 0; axis < 4; axis++ )
 		{
-			UINT16 value = ioport(axisnames[axis])->read();
+			uint16_t value = ioport(axisnames[axis])->read();
 			m_btc_trackball_data[ axis ] = value - m_btc_trackball_prev[ axis ];
 			m_btc_trackball_prev[ axis ] = value;
 		}
@@ -667,6 +667,30 @@ static INPUT_PORTS_START( kdeadeye )
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+INPUT_PORTS_END
+
+/* Wedding Rhapsody */
+
+static INPUT_PORTS_START( weddingr )
+	PORT_INCLUDE( konamigv )
+
+	PORT_MODIFY("P1")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("Answer 3/Zoom In")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("Answer 4/Zoom Out")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("Answer 1/Pan Left")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("Answer 2/Pan Right")
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P2")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_NAME("Answer 3/Zoom In")
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_NAME("Answer 4/Zoom Out")
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("Answer 1/Pan Left")
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("Answer 2/Pan Right")
+	PORT_BIT( 0x00000070, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_MODIFY("P3_P4")
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 INPUT_PORTS_END
 
@@ -829,7 +853,7 @@ GAME( 1996, lacrazyc, konamigv, konamigv, konamigv, driver_device,  0,        RO
 GAME( 1996, susume,   lacrazyc, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Susume! Taisen Puzzle-Dama (GV027 Japan 1.20)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, btchamp,  konamigv, btchamp,  btchamp,  driver_device,  0,        ROT0, "Konami", "Beat the Champ (GV053 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1996, kdeadeye, konamigv, kdeadeye, kdeadeye, driver_device,  0,        ROT0, "Konami", "Dead Eye (GV054 UAA01)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1997, weddingr, konamigv, konamigv, konamigv, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1997, weddingr, konamigv, konamigv, weddingr, driver_device,  0,        ROT0, "Konami", "Wedding Rhapsody (GX624 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1997, tmosh,    konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart (GQ673 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, tmoshs,   konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version (GE755 JAA)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )
 GAME( 1997, tmoshsp,  konamigv, tmosh,    konamigv, driver_device,  0,        ROT0, "Konami", "Tokimeki Memorial Oshiete Your Heart Seal Version Plus (GE756 JAB)", MACHINE_IMPERFECT_SOUND | MACHINE_IMPERFECT_GRAPHICS | MACHINE_NOT_WORKING )

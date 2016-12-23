@@ -38,73 +38,33 @@ NETLIST_START(opamp_lm3900)
 
 NETLIST_END()
 
-NETLIB_NAMESPACE_DEVICES_START()
-
+namespace netlist
+{
+	namespace devices
+	{
 /*
  * Type = 0: Impedance changer
  *        1; Idealized opamp
  *        2; opamp with first pole
  *        3: opamp with first pole + output limit
  *        4: opamp with input stage, first pole + output limit
+ *
+ * Type 1 parameters:
+ *     FPF = frequency of first pole in Hz (ony used for open-loop gain)
+ *     UGF = unity gain frequency in Hz (only used for open-loop gain)
+ *     RI = input resistance in Ohms
+ *     RO = output resistance in Ohms
+ *
+ * Type 3 parameters:
+ *     VLH = high supply rail minus high output swing in V
+ *     VLL = low output swing minus low supply rail in V
+ *     FPF = frequency of first pole in Hz
+ *     UGF = unity gain frequency (transition frequency) in Hz
+ *     SLEW = unity gain slew rate in V/s
+ *     RI = input resistance in Ohms
+ *     RO = output resistance in Ohms
+ *     DAB = quiescent supply current in A
  */
-
-NETLIB_START(OPAMP)
-{
-	register_param("MODEL", m_model, "");
-
-	m_type = m_model.model_value("TYPE");
-
-	register_input("VCC", m_VCC);
-	register_input("GND", m_GND);
-
-	register_output("VL", m_VL);
-	register_output("VH", m_VH);
-	register_output("VREF", m_VREF);
-
-	register_sub("G1", m_G1);
-	register_sub("RP1", m_RP);
-
-	if (m_type == 1)
-	{
-		register_subalias("PLUS", "G1.IP");
-		register_subalias("MINUS", "G1.IN");
-		register_subalias("OUT", "G1.OP");
-
-		connect_late("G1.ON", "VREF");
-		connect_late("RP1.2", "VREF");
-		connect_late("RP1.1", "G1.OP");
-
-	}
-	else if (m_type == 3)
-	{
-		register_sub("CP1", m_CP);
-		register_sub("EBUF", m_EBUF);
-		register_sub("DN", m_DN);
-		register_sub("DP", m_DP);
-
-		register_subalias("PLUS", "G1.IP");
-		register_subalias("MINUS", "G1.IN");
-		register_subalias("OUT", "EBUF.OP");
-
-		connect_late("EBUF.ON", "VREF");
-
-		connect_late("G1.ON", "VREF");
-		connect_late("RP1.2", "VREF");
-		connect_late("CP1.2", "VREF");
-		connect_late("EBUF.IN", "VREF");
-
-		connect_late("RP1.1", "G1.OP");
-		connect_late("CP1.1", "RP1.1");
-
-		connect_late("DP.K", "VH");
-		connect_late("VL", "DN.A");
-		connect_late("DP.A", "DN.K");
-		connect_late("DN.K", "RP1.1");
-		connect_late("EBUF.IP", "RP1.1");
-	}
-	else
-		netlist().log().fatal("Unknown opamp type: {1}", m_type);
-}
 
 /* .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)
  *
@@ -115,10 +75,10 @@ NETLIB_UPDATE(OPAMP)
 {
 	const double cVt = 0.0258 * 1.0; // * m_n;
 	const double cId = m_model.model_value("DAB"); // 3 mA
-	const double cVd = cVt * nl_math::log(cId / 1e-15 + 1.0);
-	m_VH.set_Q(INPANALOG(m_VCC) - m_model.model_value("VLH") - cVd);
-	m_VL.set_Q(INPANALOG(m_GND) + m_model.model_value("VLL") + cVd);
-	m_VREF.set_Q((INPANALOG(m_VCC) + INPANALOG(m_GND)) / 2.0);
+	const double cVd = cVt * std::log(cId / 1e-15 + 1.0);
+	m_VH.push(m_VCC() - m_model.model_value("VLH") - cVd);
+	m_VL.push(m_GND() + m_model.model_value("VLL") + cVd);
+	m_VREF.push((m_VCC() + m_GND()) / 2.0);
 }
 
 NETLIB_RESET(OPAMP)
@@ -135,32 +95,26 @@ NETLIB_RESET(OPAMP)
 	}
 	else if (m_type == 3)
 	{
-		m_EBUF.do_reset();
-		m_DP.do_reset();
-		m_DN.do_reset();
-		m_CP.do_reset();
+		m_EBUF->do_reset();
+		m_DP->do_reset();
+		m_DN->do_reset();
+		m_CP->do_reset();
 		m_RP.do_reset();
 
-		m_EBUF.m_G.setTo(1.0);
-		m_EBUF.m_RO.setTo(m_model.model_value("RO"));
-		m_DP.m_model.setTo("D(IS=1e-15 N=1)");
-		m_DN.m_model.setTo("D(IS=1e-15 N=1)");
+		m_EBUF->m_G.setTo(1.0);
+		m_EBUF->m_RO.setTo(m_model.model_value("RO"));
+		m_DP->m_model.setTo("D(IS=1e-15 N=1)");
+		m_DN->m_model.setTo("D(IS=1e-15 N=1)");
 
 		double CP = m_model.model_value("DAB") / m_model.model_value("SLEW");
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
 
-		m_CP.m_C.setTo(CP);
+		m_CP->m_C.setTo(CP);
 		m_RP.set_R(RP);
 		m_G1.m_G.setTo(G);
 
 	}
-
-
-}
-
-NETLIB_UPDATE_PARAM(OPAMP)
-{
 }
 
 /*
@@ -177,4 +131,5 @@ NETLIB_DEVICE_WITH_PARAMS(OPAMPx,
 );
 */
 
-NETLIB_NAMESPACE_DEVICES_END()
+	} //namespace devices
+} // namespace netlist

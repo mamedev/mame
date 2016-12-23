@@ -30,7 +30,7 @@
 
 struct rtc_regs_t
 {
-	UINT8 sec, min, hour, day, wday, month, year;
+	uint8_t sec, min, hour, day, wday, month, year;
 };
 
 
@@ -40,12 +40,12 @@ class v3021_device :    public device_t
 {
 public:
 	// construction/destruction
-	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	v3021_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// I/O operations
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_READ8_MEMBER( read );
-	void timer_callback();
+	TIMER_CALLBACK_MEMBER(timer_callback);
 
 protected:
 	// device-level overrides
@@ -53,9 +53,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	static TIMER_CALLBACK( rtc_inc_callback );
-
-	UINT8 m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
+	uint8_t m_cal_mask,m_cal_com,m_cal_cnt,m_cal_val;
 
 	rtc_regs_t m_rtc;
 };

@@ -49,7 +49,7 @@ device_pce_cart_interface::~device_pce_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_pce_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_pce_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -63,7 +63,7 @@ void device_pce_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_pce_cart_interface::ram_alloc(UINT32 size)
+void device_pce_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 	device().save_item(NAME(m_ram));
@@ -74,7 +74,7 @@ void device_pce_cart_interface::ram_alloc(UINT32 size)
 //  blocks, so to simplify ROM access to mirror
 //-------------------------------------------------
 
-void device_pce_cart_interface::rom_map_setup(UINT32 size)
+void device_pce_cart_interface::rom_map_setup(uint32_t size)
 {
 	if (size == 0x60000)
 	{
@@ -135,7 +135,7 @@ void device_pce_cart_interface::rom_map_setup(UINT32 size)
 //-------------------------------------------------
 //  pce_cart_slot_device - constructor
 //-------------------------------------------------
-pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pce_cart_slot_device::pce_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, PCE_CART_SLOT, "PCE & TG16 Cartridge Slot", tag, owner, clock, "pce_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -222,13 +222,13 @@ static const char *pce_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool pce_cart_slot_device::call_load()
+image_init_result pce_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset;
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
+		uint32_t offset;
+		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
 
 		// From fullpath, check for presence of a header and skip it
 		if (software_entry() == nullptr && (len % 0x4000) == 512)
@@ -250,7 +250,7 @@ bool pce_cart_slot_device::call_load()
 		// check for encryption (US carts)
 		if (ROM[0x1fff] < 0xe0)
 		{
-			UINT8 decrypted[256];
+			uint8_t decrypted[256];
 
 			/* Initialize decryption table */
 			for (int i = 0; i < 256; i++)
@@ -278,10 +278,10 @@ bool pce_cart_slot_device::call_load()
 		if (m_type == PCE_CDSYS3J || m_type == PCE_CDSYS3U)
 			m_cart->ram_alloc(0x30000);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -295,23 +295,11 @@ void pce_cart_slot_device::call_unload()
 
 
 /*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool pce_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
-
-
-/*-------------------------------------------------
  get_cart_type - code to detect NVRAM type from
  fullpath
  -------------------------------------------------*/
 
-int pce_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int pce_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
 	int type = PCE_STD;
 
@@ -344,11 +332,11 @@ std::string pce_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file);
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = pce_get_slot(type);
@@ -389,6 +377,6 @@ WRITE8_MEMBER(pce_cart_slot_device::write_cart)
  Internal header logging
  -------------------------------------------------*/
 
-void pce_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void pce_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
 {
 }

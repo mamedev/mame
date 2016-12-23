@@ -60,7 +60,7 @@ device_c64_floppy_parallel_interface::~device_c64_floppy_parallel_interface()
 //  c64_bn1541_device - constructor
 //-------------------------------------------------
 
-c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, C64_BN1541, "C64 Burst Nibbler 1541/1571 Parallel Cable", tag, owner, clock, "c64_bn1541", __FILE__),
 	device_pet_user_port_interface(mconfig, *this),
 	device_c64_floppy_parallel_interface(mconfig, *this), m_parallel_output(0)
@@ -74,17 +74,13 @@ c64_bn1541_device::c64_bn1541_device(const machine_config &mconfig, const char *
 
 void c64_bn1541_device::device_start()
 {
-	device_iterator iter(machine().root_device());
-
-	for (device_t *device = iter.first(); device != nullptr; device = iter.next())
+	for (device_t &device : device_iterator(machine().root_device()))
 	{
-		device_iterator subiter(*device);
-
-		for (device_t *subdevice = subiter.first(); subdevice != nullptr; subdevice = iter.next())
+		for (device_t &subdevice : device_iterator(device))
 		{
-			if (subdevice->interface(m_other) && subdevice != this)
+			if (subdevice.interface(m_other) && &subdevice != this)
 			{
-				if (LOG) logerror("Parallel device %s\n", subdevice->tag());
+				if (LOG) logerror("Parallel device %s\n", subdevice.tag());
 
 				// grab the first 1541/1571 and run to the hills
 				m_other->m_other = this;
@@ -99,7 +95,7 @@ void c64_bn1541_device::device_start()
 //  parallel_data_w -
 //-------------------------------------------------
 
-void c64_bn1541_device::parallel_data_w(UINT8 data)
+void c64_bn1541_device::parallel_data_w(uint8_t data)
 {
 	if (LOG) logerror("1541 parallel data %02x\n", data);
 

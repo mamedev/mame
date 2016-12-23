@@ -14,8 +14,6 @@ Notes:
   necessarily mean anything.
 
 TODO:
-- Coin counters don't work correctly, because the register is overwritten by
-  other routines and the coin counter bits rapidly toggle between 0 and 1.
 - running the sound CPU at the nominal clock rate, music stops working at the
   beginning of the game. This is kludged by overclocking the sound CPU. This
   looks like a CPU communication timing issue however fiddling with the
@@ -73,7 +71,8 @@ Address          Dir Data     Description
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "includes/jackal.h"
 #include "includes/konamipt.h"
 
@@ -86,7 +85,7 @@ Address          Dir Data     Description
 
 READ8_MEMBER(jackal_state::jackalr_rotary_r)
 {
-	return (1 << read_safe(ioport(offset ? "DIAL1" : "DIAL0"), 0x00)) ^ 0xff;
+	return (1 << m_dials[offset].read_safe(0x00)) ^ 0xff;
 }
 
 WRITE8_MEMBER(jackal_state::jackal_flipscreen_w)
@@ -115,13 +114,18 @@ READ8_MEMBER(jackal_state::jackal_spriteram_r)
 
 WRITE8_MEMBER(jackal_state::jackal_rambank_w)
 {
-	UINT8 *rgn = memregion("master")->base();
+	uint8_t *rgn = memregion("master")->base();
 
 	if (data & 0x04)
 		popmessage("jackal_rambank_w %02x", data);
 
-	machine().bookkeeping().coin_counter_w(0, data & 0x01);
-	machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	// all revisions flips the coin counter bit between 1 -> 0 five times, causing the bookkeeping to report 5 coins inserted.
+	// most likely solution in HW is a f/f that disables coin counters when any of the other bits are enabled.
+	if((data & 0xfc) == 0)
+	{
+		machine().bookkeeping().coin_counter_w(0, data & 0x01);
+		machine().bookkeeping().coin_counter_w(1, data & 0x02);
+	}
 
 	m_spritebank = &rgn[((data & 0x08) << 13)];
 	m_rambank = &rgn[((data & 0x10) << 12)];
@@ -164,7 +168,7 @@ static ADDRESS_MAP_START( master_map, AS_PROGRAM, 8, jackal_state )
 	AM_RANGE(0x0013, 0x0013) AM_READ_PORT("IN0")
 	AM_RANGE(0x0014, 0x0015) AM_READ(jackalr_rotary_r)
 	AM_RANGE(0x0018, 0x0018) AM_READ_PORT("DSW2")
-	AM_RANGE(0x0019, 0x0019) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0019, 0x0019) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x001c, 0x001c) AM_WRITE(jackal_rambank_w)
 	AM_RANGE(0x0020, 0x005f) AM_READWRITE(jackal_zram_r, jackal_zram_w)             // MAIN   Z RAM,SUB    Z RAM
 	AM_RANGE(0x0060, 0x1fff) AM_RAM AM_SHARE("share1")                          // M COMMON RAM,S COMMON RAM
@@ -325,7 +329,7 @@ INTERRUPT_GEN_MEMBER(jackal_state::jackal_interrupt)
 
 void jackal_state::machine_start()
 {
-	UINT8 *ROM = memregion("master")->base();
+	uint8_t *ROM = memregion("master")->base();
 
 	membank("bank1")->configure_entry(0, &ROM[0x04000]);
 	membank("bank1")->configure_entry(1, &ROM[0x14000]);
@@ -336,7 +340,7 @@ void jackal_state::machine_start()
 
 void jackal_state::machine_reset()
 {
-	UINT8 *rgn = memregion("master")->base();
+	uint8_t *rgn = memregion("master")->base();
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
@@ -360,6 +364,7 @@ static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

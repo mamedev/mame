@@ -188,8 +188,8 @@ public:
 			m_maincpu(*this, "maincpu")
 	{ }
 
-	UINT32* m_cpuregion;
-	std::unique_ptr<UINT32[]> m_mainram;
+	uint32_t* m_cpuregion;
+	std::unique_ptr<uint32_t[]> m_mainram;
 
 	DECLARE_READ32_MEMBER(pluto5_mem_r);
 	DECLARE_WRITE32_MEMBER(pluto5_mem_w);
@@ -206,7 +206,7 @@ public:
 READ32_MEMBER(pluto5_state::pluto5_mem_r)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -224,7 +224,7 @@ READ32_MEMBER(pluto5_state::pluto5_mem_r)
 WRITE32_MEMBER(pluto5_state::pluto5_mem_w)
 {
 	int pc = space.device().safe_pc();
-	int cs = m68340_get_cs(m_maincpu, offset * 4);
+	int cs = m_maincpu->get_cs(offset * 4);
 
 	switch ( cs )
 	{
@@ -245,8 +245,8 @@ INPUT_PORTS_END
 
 void pluto5_state::machine_start()
 {
-	m_cpuregion = (UINT32*)memregion( "maincpu" )->base();
-	m_mainram = make_unique_clear<UINT32[]>(0x10000);
+	m_cpuregion = (uint32_t*)memregion( "maincpu" )->base();
+	m_mainram = make_unique_clear<uint32_t[]>(0x10000);
 
 }
 
@@ -831,17 +831,35 @@ ROM_END
 
 
 
-extern void astra_addresslines( UINT16* src, size_t srcsize, int small );
+static void astra_addresslines( uint16_t* src, size_t srcsize, int small )
+{
+	std::vector<uint16_t> dst(srcsize/2);
 
+	int blocksize;
+
+	if (small) blocksize= 0x100000/2;
+	else blocksize= 0x100000;
+
+	for (int block = 0; block < srcsize; block += blocksize)
+	{
+		for (int x = 0; x<blocksize/2;x+=2)
+		{
+			dst[((block/2)+(x/2))^1] = src[(block/2)+x+1];
+			dst[((block/2)+(x/2+blocksize/4))^1] = src[(block/2)+x];
+		}
+	}
+
+	memcpy(src,&dst[0], srcsize);
+}
 
 
 DRIVER_INIT_MEMBER(pluto5_state,hb)
 {
-	astra_addresslines( (UINT16*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
+	astra_addresslines( (uint16_t*)memregion( "maincpu" )->base(), memregion( "maincpu" )->bytes(), 0 );
 
 	#if 0
 	{
-		UINT8* ROM = memregion( "maincpu" )->base();
+		uint8_t* ROM = memregion( "maincpu" )->base();
 		FILE *fp;
 		char filename[256];
 		sprintf(filename,"%s", machine().system().name);

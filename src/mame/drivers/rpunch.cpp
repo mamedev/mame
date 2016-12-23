@@ -110,7 +110,7 @@
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/rpunch.h"
 
 
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER(rpunch_state::ym2151_irq_gen)
 
 void rpunch_state::machine_reset()
 {
-	UINT8 *snd = memregion("upd")->base();
+	uint8_t *snd = memregion("upd")->base();
 	memcpy(snd, snd + 0x20000, 0x20000);
 }
 
@@ -215,7 +215,7 @@ WRITE8_MEMBER(rpunch_state::upd_control_w)
 {
 	if ((data & 1) != m_upd_rom_bank)
 	{
-		UINT8 *snd = memregion("upd")->base();
+		uint8_t *snd = memregion("upd")->base();
 		m_upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (m_upd_rom_bank + 1), 0x20000);
 	}
@@ -292,7 +292,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
 
 	PORT_START("P2")    /* c001a lower 8 bits */
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
@@ -302,7 +302,7 @@ static INPUT_PORTS_START( rpunch )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, NULL)
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, rpunch_state,hi_bits_r, nullptr)
 
 	PORT_START("SERVICE")   /* c0018/c001a upper 8 bits */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )

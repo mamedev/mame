@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles,Couriersud,Miodrag Milanovic
 /***************************************************************************
 
     delegate.h
@@ -79,8 +79,10 @@
 #define __DELEGATE_H__
 
 // standard C++ includes
-#include <exception>
+#include <cstring>
 #include <typeinfo>
+#include <utility>
+#include <functional>
 
 
 //**************************************************************************
@@ -101,16 +103,12 @@
 		#define HAS_DIFFERENT_ABI 1
 	#elif defined(__clang__) && defined(__i386__) && defined(_WIN32)
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
-	#elif defined(EMSCRIPTEN)
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
-	#elif defined(__arm__) || defined(__ARMEL__)
-		#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 	#else
 		#define USE_DELEGATE_TYPE DELEGATE_TYPE_INTERNAL
 		#define MEMBER_ABI
 		#define HAS_DIFFERENT_ABI 0
 	#endif
-#elif defined(_MSC_VER) && defined (PTR64)
+#elif defined(_MSC_VER) && defined (_M_X64)
 #define MEMBER_ABI
 #define HAS_DIFFERENT_ABI 0
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_MSVC
@@ -118,7 +116,12 @@
 #define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
 #endif
 
-#define USE_STATIC_DELEGATE 1
+#if defined(FORCE_COMPATIBLE)
+	#undef USE_DELEGATE_TYPE
+	#undef MEMBER_ABI
+	#undef HAS_DIFFERENT_ABI
+	#define USE_DELEGATE_TYPE DELEGATE_TYPE_COMPATIBLE
+#endif
 
 #if (USE_DELEGATE_TYPE == DELEGATE_TYPE_COMPATIBLE)
 	#define MEMBER_ABI
@@ -129,7 +132,7 @@
 //**************************************************************************
 
 // generic function type
-typedef void (*delegate_generic_function)();
+using delegate_generic_function = void(*)();
 
 
 // ======================> generic_class
@@ -170,128 +173,15 @@ public:
 // ======================> delegate_traits
 
 // delegate_traits is a meta-template that is used to provide a static function pointer
-// and member function pointer of the appropriate type and number of parameters; we use
-// partial template specialization to support fewer parameters by defaulting the later
-// parameters to the special type _noparam
+// and member function pointer of the appropriate type and number of parameters
 
-// dummy class used to indicate a non-existant parameter
-class _noparam { };
-
-// specialization for 12 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type, typename _P12Type>
+template<typename _ClassType, typename _ReturnType, typename... Params>
 struct delegate_traits
 {
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type);
-};
-
-// specialization for 11 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type);
-};
-
-// specialization for 10 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type);
-};
-
-// specialization for 9 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type);
-};
-
-// specialization for 8 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type);
-};
-
-// specialization for 7 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type);
-};
-
-// specialization for 6 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type);
-};
-
-// specialization for 5 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type, _P5Type);
-};
-
-// specialization for 4 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type, _P4Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type, _P4Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type, _P4Type);
-};
-
-// specialization for 3 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _P3Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type, _P3Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type, _P3Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type, _P3Type);
-};
-
-// specialization for 2 parameters
-template<typename _ClassType, typename _ReturnType, typename _P1Type, typename _P2Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _P2Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type, _P2Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type, _P2Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type, _P2Type);
-};
-
-// specialization for 1 parameter
-template<typename _ClassType, typename _ReturnType, typename _P1Type>
-struct delegate_traits<_ClassType, _ReturnType, _P1Type, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *, _P1Type);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &, _P1Type);
-	typedef _ReturnType (_ClassType::*member_func_type)(_P1Type);
-};
-
-// specialization for no parameters
-template<typename _ClassType, typename _ReturnType>
-struct delegate_traits<_ClassType, _ReturnType, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam, _noparam>
-{
-	typedef _ReturnType (*static_func_type)(_ClassType *);
-	typedef _ReturnType (*static_ref_func_type)(_ClassType &);
-	typedef _ReturnType (_ClassType::*member_func_type)();
+	using static_func_type = _ReturnType(*)(_ClassType *, Params...);
+	using static_ref_func_type = _ReturnType(*)(_ClassType &, Params...);
+	using member_func_type = _ReturnType(_ClassType::*)(Params...);
+	using const_member_func_type = _ReturnType(_ClassType::*)(Params...) const;
 };
 
 
@@ -306,7 +196,7 @@ struct delegate_traits<_ClassType, _ReturnType, _noparam, _noparam, _noparam, _n
 
 // delegate_mfp is a class that wraps a generic member function pointer
 // in a static buffer, and can effectively recast itself back for later use;
-// it hides some of the gross details involved in copying artibtrary member
+// it hides some of the gross details involved in copying arbitrary member
 // function pointers around
 class delegate_mfp
 {
@@ -314,8 +204,8 @@ public:
 	// default constructor
 	delegate_mfp()
 		: m_rawdata(s_null_mfp),
-			m_realobject(NULL),
-			m_stubfunction(NULL) { }
+			m_realobject(nullptr),
+			m_stubfunction(nullptr) { }
 
 	// copy constructor
 	delegate_mfp(const delegate_mfp &src)
@@ -327,7 +217,7 @@ public:
 	template<typename _MemberFunctionType, class _MemberFunctionClass, typename _ReturnType, typename _StaticFunctionType>
 	delegate_mfp(_MemberFunctionType mfp, _MemberFunctionClass *, _ReturnType *, _StaticFunctionType)
 		: m_rawdata(s_null_mfp),
-			m_realobject(NULL),
+			m_realobject(nullptr),
 			m_stubfunction(make_generic<_StaticFunctionType>(&delegate_mfp::method_stub<_MemberFunctionClass, _ReturnType>))
 	{
 		assert(sizeof(mfp) <= sizeof(m_rawdata));
@@ -352,126 +242,20 @@ public:
 
 private:
 	// helper stubs for calling encased member function pointers
-	template<class _FunctionClass, typename _ReturnType>
-	static _ReturnType method_stub(delegate_generic_class *object)
+	template<class _FunctionClass, typename _ReturnType, typename... Params>
+	static _ReturnType method_stub(delegate_generic_class *object, Params ... args)
 	{
 		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)();
+		using mfptype = _ReturnType(_FunctionClass::*)(Params...);
 		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)();
+		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(std::forward<Params>(args)...);
 	}
 
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1);
-	}
 
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7, p8);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7, p8, p9);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11);
-	}
-
-	template<class _FunctionClass, typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type, typename _P12Type>
-	static _ReturnType method_stub(delegate_generic_class *object, _P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12)
-	{
-		delegate_mfp *_this = reinterpret_cast<delegate_mfp *>(object);
-		typedef _ReturnType (_FunctionClass::*mfptype)(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12);
-		mfptype &mfp = *reinterpret_cast<mfptype *>(&_this->m_rawdata);
-		return (reinterpret_cast<_FunctionClass *>(_this->m_realobject)->*mfp)(p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12);
-	}
 	// helper to convert a function of a given type to a generic function, forcing template
 	// instantiation to match the source type
 	template <typename _SourceType>
-	delegate_generic_function make_generic(_SourceType funcptr)
+	static delegate_generic_function make_generic(_SourceType funcptr)
 	{
 		return reinterpret_cast<delegate_generic_function>(funcptr);
 	}
@@ -479,7 +263,7 @@ private:
 
 	struct raw_mfp_data
 	{
-#if defined (__INTEL_COMPILER) && defined (PTR64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
+#if defined (__INTEL_COMPILER) && defined (_M_X64) // needed for "Intel(R) C++ Intel(R) 64 Compiler XE for applications running on Intel(R) 64, Version 14.0.2.176 Build 20140130" at least
 		int data[((sizeof(void *) + 4 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
 #else // all other cases - for MSVC maximum size is one pointer, plus 3 ints; all other implementations seem to be smaller
 		int data[((sizeof(void *) + 3 * sizeof(int)) + (sizeof(int) - 1)) / sizeof(int)];
@@ -491,7 +275,7 @@ private:
 	raw_mfp_data                m_rawdata;          // raw buffer to hold the copy of the function pointer
 	delegate_generic_class *    m_realobject;       // pointer to the object used for calling
 	delegate_generic_function   m_stubfunction;     // pointer to our matching stub function
-	static raw_mfp_data         s_null_mfp;         // NULL mfp
+	static raw_mfp_data         s_null_mfp;         // nullptr mfp
 };
 
 #elif (USE_DELEGATE_TYPE == DELEGATE_TYPE_INTERNAL)
@@ -522,10 +306,10 @@ public:
 
 	// comparison helpers
 	bool operator==(const delegate_mfp &rhs) const { return (m_function == rhs.m_function && m_this_delta == rhs.m_this_delta); }
-	bool isnull() const { return (m_function == 0); }
+	bool isnull() const { return (m_function == 0 && m_this_delta==0); }
 
 	// getters
-	delegate_generic_class *real_object(delegate_generic_class *original) const { return original; }
+	static delegate_generic_class *real_object(delegate_generic_class *original) { return original; }
 
 	// binding helper
 	template<typename _FunctionType>
@@ -539,7 +323,7 @@ private:
 	delegate_generic_function convert_to_generic(delegate_generic_class *&object) const;
 
 	// actual state
-	FPTR                    m_function;         // first item can be one of two things:
+	uintptr_t               m_function;         // first item can be one of two things:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
@@ -556,11 +340,15 @@ class delegate_mfp
 public:
 	// default constructor
 	delegate_mfp()
-		: m_function(0) { }
+		: m_function(0), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(0)
+	{
+	}
 
 	// copy constructor
 	delegate_mfp(const delegate_mfp &src)
-		: m_function(src.m_function) { }
+		: m_function(src.m_function), m_this_delta(0), m_dummy1(0), m_dummy2(0), m_size(0)
+	{
+	}
 
 	// construct from any member function pointer
 	template<typename _MemberFunctionType, class _MemberFunctionClass, typename _ReturnType, typename _StaticFunctionType>
@@ -576,7 +364,7 @@ public:
 	bool isnull() const { return (m_function == 0); }
 
 	// getters
-	delegate_generic_class *real_object(delegate_generic_class *original) const { return original; }
+	static delegate_generic_class *real_object(delegate_generic_class *original) { return original; }
 
 	// binding helper
 	template<typename _FunctionType>
@@ -584,7 +372,7 @@ public:
 	{
 		funcptr = reinterpret_cast<_FunctionType>(m_function);
 		if (m_size == SINGLE_MEMFUNCPTR_SIZE + sizeof(int))
-			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<UINT8 *>(object) + m_this_delta);
+			object = reinterpret_cast<delegate_generic_class *>(reinterpret_cast<std::uint8_t *>(object) + m_this_delta);
 	}
 
 private:
@@ -592,7 +380,7 @@ private:
 	delegate_generic_function convert_to_generic(delegate_generic_class *&object) const;
 
 	// actual state
-	FPTR                    m_function;         // first item can be one of two things:
+	uintptr_t               m_function;         // first item can be one of two things:
 												//    if even, it's a pointer to the function
 												//    if odd, it's the byte offset into the vtable
 	int                     m_this_delta;       // delta to apply to the 'this' pointer
@@ -614,7 +402,7 @@ private:
 // ======================> delegate_base
 
 // general delegate class template supporting up to 5 parameters
-template<typename _ReturnType, typename _P1Type = _noparam, typename _P2Type = _noparam, typename _P3Type = _noparam, typename _P4Type = _noparam, typename _P5Type = _noparam, typename _P6Type = _noparam, typename _P7Type = _noparam, typename _P8Type = _noparam, typename _P9Type = _noparam, typename _P10Type = _noparam, typename _P11Type = _noparam, typename _P12Type = _noparam>
+template<typename _ReturnType, typename... Params>
 class delegate_base
 {
 public:
@@ -622,28 +410,30 @@ public:
 	template<class _FunctionClass>
 	struct traits
 	{
-		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type>::member_func_type member_func_type;
-		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type>::static_func_type static_func_type;
-		typedef typename delegate_traits<_FunctionClass, _ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type>::static_ref_func_type static_ref_func_type;
+		using member_func_type = typename delegate_traits<_FunctionClass, _ReturnType, Params...>::member_func_type;
+		using const_member_func_type = typename delegate_traits<_FunctionClass, _ReturnType, Params...>::const_member_func_type;
+		using static_func_type = typename delegate_traits<_FunctionClass, _ReturnType, Params...>::static_func_type;
+		using static_ref_func_type = typename delegate_traits<_FunctionClass, _ReturnType, Params...>::static_ref_func_type;
 	};
-	typedef typename traits<delegate_generic_class>::static_func_type generic_static_func;
+	using functional_type = std::function<_ReturnType(Params...)>;
+	using generic_static_func = typename traits<delegate_generic_class>::static_func_type;
 	typedef MEMBER_ABI generic_static_func generic_member_func;
 	// generic constructor
 	delegate_base()
 		: m_function(nullptr),
 			m_object(nullptr),
-			m_name(nullptr),
 			m_latebinder(nullptr),
-			m_raw_function(nullptr) { }
+			m_raw_function(nullptr),
+			m_std_func(nullptr){ }
 
 	// copy constructor
 	delegate_base(const delegate_base &src)
 		: m_function(src.m_function),
 			m_object(nullptr),
-			m_name(src.m_name),
 			m_latebinder(src.m_latebinder),
 			m_raw_function(src.m_raw_function),
-			m_raw_mfp(src.m_raw_mfp)
+			m_raw_mfp(src.m_raw_mfp),
+			m_std_func(src.m_std_func)
 	{
 		bind(src.object());
 	}
@@ -652,49 +442,72 @@ public:
 	delegate_base(const delegate_base &src, delegate_late_bind &object)
 		: m_function(src.m_function),
 			m_object(nullptr),
-			m_name(src.m_name),
 			m_latebinder(src.m_latebinder),
 			m_raw_function(src.m_raw_function),
-			m_raw_mfp(src.m_raw_mfp)
+			m_raw_mfp(src.m_raw_mfp),
+			m_std_func(src.m_std_func)
 	{
 		late_bind(object);
 	}
 
 	// construct from member function with object pointer
 	template<class _FunctionClass>
-	delegate_base(typename traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object)
+	delegate_base(typename traits<_FunctionClass>::member_func_type funcptr, _FunctionClass *object)
 		: m_function(nullptr),
 			m_object(nullptr),
-			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
 			m_raw_function(nullptr),
-			m_raw_mfp(funcptr, object, (_ReturnType *)nullptr, (generic_static_func)nullptr)
+			m_raw_mfp(funcptr, object, static_cast<_ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr)),
+			m_std_func(nullptr)
+	{
+		bind(reinterpret_cast<delegate_generic_class *>(object));
+	}
+
+	template<class _FunctionClass>
+	delegate_base(typename traits<_FunctionClass>::const_member_func_type funcptr, _FunctionClass *object)
+		: m_function(nullptr),
+		m_object(nullptr),
+		m_latebinder(&late_bind_helper<_FunctionClass>),
+		m_raw_function(nullptr),
+		m_raw_mfp(funcptr, object, static_cast<_ReturnType *>(nullptr), static_cast<generic_static_func>(nullptr)),
+		m_std_func(nullptr)
 	{
 		bind(reinterpret_cast<delegate_generic_class *>(object));
 	}
 
 	// construct from static function with object pointer
 	template<class _FunctionClass>
-	delegate_base(typename traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object)
+	delegate_base(typename traits<_FunctionClass>::static_func_type funcptr, _FunctionClass *object)
 		: m_function(reinterpret_cast<generic_static_func>(funcptr)),
 			m_object(nullptr),
-			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
-			m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
+			m_raw_function(reinterpret_cast<generic_static_func>(funcptr)),
+			m_std_func(nullptr)
 	{
 		bind(reinterpret_cast<delegate_generic_class *>(object));
 	}
 
 	// construct from static reference function with object reference
 	template<class _FunctionClass>
-	delegate_base(typename traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object)
+	delegate_base(typename traits<_FunctionClass>::static_ref_func_type funcptr, _FunctionClass *object)
 		: m_function(reinterpret_cast<generic_static_func>(funcptr)),
 			m_object(nullptr),
-			m_name(name),
 			m_latebinder(&late_bind_helper<_FunctionClass>),
-			m_raw_function(reinterpret_cast<generic_static_func>(funcptr))
+			m_raw_function(reinterpret_cast<generic_static_func>(funcptr)),
+			m_std_func(nullptr)
 	{
 		bind(reinterpret_cast<delegate_generic_class *>(object));
+	}
+
+	// construct from static reference function with object reference
+	delegate_base(functional_type funcptr)
+		: m_function(nullptr),
+		m_object(nullptr),
+		m_latebinder(nullptr),
+		m_raw_function(nullptr),
+		m_std_func(funcptr)
+	{
+
 	}
 
 	// copy operator
@@ -704,10 +517,11 @@ public:
 		{
 			m_function = src.m_function;
 			m_object = nullptr;
-			m_name = src.m_name;
 			m_latebinder = src.m_latebinder;
 			m_raw_function = src.m_raw_function;
 			m_raw_mfp = src.m_raw_mfp;
+			m_std_func = src.m_std_func;
+
 			bind(src.object());
 		}
 		return *this;
@@ -716,49 +530,36 @@ public:
 	// comparison helper
 	bool operator==(const delegate_base &rhs) const
 	{
-		return (m_raw_function == rhs.m_raw_function && object() == rhs.object() && m_raw_mfp == rhs.m_raw_mfp);
+		return (m_raw_function == rhs.m_raw_function && object() == rhs.object() && m_raw_mfp == rhs.m_raw_mfp && m_std_func.target_type().name() == rhs.m_std_func.target_type().name());
 	}
 
-#define DELEGATE_CALL(x) \
-	if (is_mfp() && (HAS_DIFFERENT_ABI)) \
-		return (*reinterpret_cast<generic_member_func>(m_function)) x; \
-	else \
-		return (*m_function) x;
-	//return MEMBER_ABI (*reinpertret_cast<generic_member_func>(m_function)) x;
 
 	// call the function
-	_ReturnType operator()() const { DELEGATE_CALL((m_object)); }
-	//_ReturnType operator()() const { return (*m_function)(m_object); }
-	_ReturnType operator()(_P1Type p1) const { DELEGATE_CALL((m_object, p1)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2) const { DELEGATE_CALL((m_object, p1, p2)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { DELEGATE_CALL((m_object, p1, p2, p3)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { DELEGATE_CALL((m_object, p1, p2, p3, p4)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11)); }
-	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4, _P5Type p5, _P6Type p6, _P7Type p7, _P8Type p8, _P9Type p9, _P10Type p10, _P11Type p11, _P12Type p12) const { DELEGATE_CALL((m_object, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12)); }
+	_ReturnType operator()(Params... args) const {
+		if (is_mfp() && (HAS_DIFFERENT_ABI))
+			return (*reinterpret_cast<generic_member_func>(m_function)) (m_object, std::forward<Params>(args)...);
+		else if (m_std_func)
+			return m_std_func(std::forward<Params>(args)...);
+		else
+			return (*m_function) (m_object, std::forward<Params>(args)...);
+	}
 
 	// getters
-	bool has_object() const { return (object() != nullptr); }
-	const char *name() const { return m_name; }
+	bool has_object() const { return (object() != nullptr) || m_std_func; }
 
 	// helpers
-	bool isnull() const { return (m_raw_function == nullptr && m_raw_mfp.isnull()); }
+	bool isnull() const { return (m_raw_function == nullptr && m_raw_mfp.isnull() && !m_std_func); }
 	bool is_mfp() const { return !m_raw_mfp.isnull(); }
 
 	// late binding
-	void late_bind(delegate_late_bind &object) { bind((*m_latebinder)(object)); }
+	void late_bind(delegate_late_bind &object) { if(m_latebinder) bind((*m_latebinder)(object)); }
 
 protected:
 	// return the actual object (not the one we use for calling)
 	delegate_generic_class *object() const { return is_mfp() ? m_raw_mfp.real_object(m_object) : m_object; }
 
 	// late binding function
-	typedef delegate_generic_class *(*late_bind_func)(delegate_late_bind &object);
+	using late_bind_func = delegate_generic_class*(*)(delegate_late_bind &object);
 
 	// late binding helper
 	template<class _FunctionClass>
@@ -784,10 +585,10 @@ protected:
 	// internal state
 	generic_static_func         m_function;         // resolved static function pointer
 	delegate_generic_class *    m_object;           // resolved object to the post-cast object
-	const char *                m_name;             // name string
 	late_bind_func              m_latebinder;       // late binding helper
 	generic_static_func         m_raw_function;     // raw static function pointer
 	delegate_mfp                m_raw_mfp;          // raw member function pointer
+	functional_type             m_std_func;         // std::function pointer
 };
 
 
@@ -800,252 +601,23 @@ protected:
 template <typename Signature>
 class delegate;
 
-// specialize for 0 parameters; we derive from the base class and provide equivalent
-// pass-through constructors for each type, as well as an assignment operator
-template<typename _ReturnType>
-class delegate<_ReturnType ()> : public delegate_base<_ReturnType>
+template<typename _ReturnType, typename... Params>
+class delegate<_ReturnType (Params...)> : public delegate_base<_ReturnType, Params...>
 {
-	typedef delegate_base<_ReturnType> basetype;
+	using basetype = delegate_base<_ReturnType, Params...>;
 
 public:
 	// create a standard set of constructors
 	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
+	explicit delegate(const basetype &src) : basetype(src) { }
 	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
+	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, _FunctionClass *object) : basetype(funcptr, object) { }
+	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::const_member_func_type funcptr, _FunctionClass *object) : basetype(funcptr, object) { }
+	explicit delegate(std::function<_ReturnType(Params...)> funcptr) : basetype(funcptr) { }
+	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, _FunctionClass *object) : basetype(funcptr, object) { }
+	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr,_FunctionClass *object) : basetype(funcptr, object) { }
 	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
 };
 
-// specialize for 1 parameter
-template<typename _ReturnType, typename _P1Type>
-class delegate<_ReturnType (_P1Type)> : public delegate_base<_ReturnType, _P1Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 2 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type>
-class delegate<_ReturnType (_P1Type, _P2Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 3 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 4 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 5 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 6 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 7 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 8 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 9 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 10 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 11 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
-
-// specialize for 12 parameters
-template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3Type, typename _P4Type, typename _P5Type, typename _P6Type, typename _P7Type, typename _P8Type, typename _P9Type, typename _P10Type, typename _P11Type, typename _P12Type>
-class delegate<_ReturnType (_P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type)> : public delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type>
-{
-	typedef delegate_base<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type, _P5Type, _P6Type, _P7Type, _P8Type, _P9Type, _P10Type, _P11Type, _P12Type> basetype;
-
-public:
-	// create a standard set of constructors
-	delegate() : basetype() { }
-	delegate(const basetype &src) : basetype(src) { }
-	delegate(const basetype &src, delegate_late_bind &object) : basetype(src, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::member_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#ifdef USE_STATIC_DELEGATE
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-	template<class _FunctionClass> delegate(typename basetype::template traits<_FunctionClass>::static_ref_func_type funcptr, const char *name, _FunctionClass *object) : basetype(funcptr, name, object) { }
-#endif
-	delegate &operator=(const basetype &src) { *static_cast<basetype *>(this) = src; return *this; }
-};
 
 #endif  /* __DELEGATE_H__ */

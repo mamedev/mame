@@ -23,7 +23,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
 };
@@ -75,7 +75,7 @@ void vt320_state::video_start()
 {
 }
 
-UINT32 vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vt320_state::screen_update_vt320(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -97,7 +97,7 @@ static MACHINE_CONFIG_START( vt320, vt320_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vt320_state, screen_update_vt320)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

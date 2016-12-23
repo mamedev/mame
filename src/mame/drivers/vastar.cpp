@@ -65,16 +65,18 @@ write:
 
 /*
 
-Planet Probe -  unknown manufacture  -  Copyright 1985
-Game probably programmed by same people behind some Kyugo/Orca/Komax games (see hiscore table, Gyrodine pinout, clocks etc.)
+Planet Probe - TRY Corporation? - Copyright 1985
+Game probably programmed by same people behind some Kyugo/Orca/Komax/Crux games (see hiscore table, Gyrodine pinout, clocks etc.)
 
 Upper board marked DVL/A-V
 Bottom Bord DVL/B-V
 
-The pcb seems a bootleg/prototype:
+The PCB seems to be a bootleg/prototype:
 On the upper board there are some pads for jumpers , some empty spaces left unpopulated for additional TTLs and an XTAL.
 All 5 sockets for 2732 eproms were modified to accept 2764 eproms.
 The AY8910 pin 26 (TEST 2) is grounded with a flying wire
+Lack of manufacturer on title/copyright screen (there is room in the ROM - 15 characters - after the year string for a copyright message,
+  however it is filled with the 'string termination' character rather than a string.)
 
 Upper board chips:
 5x 2764 eproms
@@ -102,6 +104,7 @@ Vsync : 60.58hz
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/vastar.h"
 
@@ -148,7 +151,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, vastar_state )
 	AM_RANGE(0x9000, 0x9fff) AM_RAM_WRITE(bg1videoram_w) AM_SHARE("bg1videoram") AM_MIRROR(0x2000)
 	AM_RANGE(0xc000, 0xc000) AM_WRITEONLY AM_SHARE("sprite_priority")   /* sprite/BG priority */
 	AM_RANGE(0xc400, 0xcfff) AM_RAM_WRITE(fgvideoram_w) AM_SHARE("fgvideoram") // fg videoram + sprites
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(watchdog_reset_r, watchdog_reset_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset_r, reset_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("sharedram")
 ADDRESS_MAP_END
 
@@ -431,6 +434,8 @@ static MACHINE_CONFIG_START( vastar, vastar_state )
 	MCFG_CPU_PERIODIC_INT_DRIVER(vastar_state, irq0_line_hold, 242) /* 4 * vsync_freq(60.58) measured, it is not known yet how long it is asserted so we'll use HOLD_LINE for now */
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to ensure proper synchronization of the CPUs */
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

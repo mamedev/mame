@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "validity.h"
 
 
 //**************************************************************************
@@ -36,6 +35,7 @@ address_space_config::address_space_config()
 		m_addrbus_shift(0),
 		m_logaddr_width(0),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr)
 {
@@ -50,7 +50,7 @@ address_space_config::address_space_config()
  @param internal
  @param defmap
  */
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -58,12 +58,13 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(internal),
 		m_default_map(defmap)
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal, address_map_constructor defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_constructor internal, address_map_constructor defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -71,12 +72,13 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
+		m_is_octal(false),
 		m_internal_map(internal),
 		m_default_map(defmap)
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, address_map_delegate internal, address_map_delegate defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, address_map_delegate internal, address_map_delegate defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -84,6 +86,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(addrwidth),
 		m_page_shift(0),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr),
 		m_internal_map_delegate(std::move(internal)),
@@ -91,7 +94,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 {
 }
 
-address_space_config::address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_delegate internal, address_map_delegate defmap)
+address_space_config::address_space_config(const char *name, endianness_t endian, u8 datawidth, u8 addrwidth, s8 addrshift, u8 logwidth, u8 pageshift, address_map_delegate internal, address_map_delegate defmap)
 	: m_name(name),
 		m_endianness(endian),
 		m_databus_width(datawidth),
@@ -99,6 +102,7 @@ address_space_config::address_space_config(const char *name, endianness_t endian
 		m_addrbus_shift(addrshift),
 		m_logaddr_width(logwidth),
 		m_page_shift(pageshift),
+		m_is_octal(false),
 		m_internal_map(nullptr),
 		m_default_map(nullptr),
 		m_internal_map_delegate(std::move(internal)),
@@ -122,7 +126,7 @@ device_memory_interface::device_memory_interface(const machine_config &mconfig, 
 	memset(m_addrspace, 0, sizeof(m_addrspace));
 
 	// configure the fast accessor
-	device.m_memory = this;
+	device.interfaces().m_memory = this;
 }
 
 
@@ -178,52 +182,6 @@ bool device_memory_interface::memory_translate(address_spacenum spacenum, int in
 
 
 //-------------------------------------------------
-//  memory_read - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal read operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_read(address_spacenum spacenum, offs_t offset, int size, UINT64 &value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_write - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal write operations are
-//  handled by bypassing the memory system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_write(address_spacenum spacenum, offs_t offset, int size, UINT64 value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
-//  memory_readop - perform internal memory
-//  operations that bypass the memory system;
-//  designed to be overridden by the actual device
-//  implementation if internal opcode fetching
-//  operations are handled by bypassing the memory
-//  system
-//-------------------------------------------------
-
-bool device_memory_interface::memory_readop(offs_t offset, int size, UINT64 &value)
-{
-	// by default, we don't do anything
-	return false;
-}
-
-
-//-------------------------------------------------
 //  interface_validity_check - perform validity
 //  checks on the memory configuration
 //-------------------------------------------------
@@ -239,7 +197,7 @@ void device_memory_interface::interface_validity_check(validity_checker &valid) 
 			::address_map addrmap(const_cast<device_t &>(device()), spacenum);
 
 			// let the map check itself
-			addrmap.map_validity_check(valid, device(), spacenum);
+			addrmap.map_validity_check(valid, spacenum);
 		}
 	}
 }

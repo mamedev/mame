@@ -58,7 +58,7 @@ INTERRUPT_GEN_MEMBER(battlex_state::battlex_interrupt)
 
 CUSTOM_INPUT_MEMBER(battlex_state::battlex_in0_b4_r)
 {
-	UINT32 ret = m_in0_b4;
+	uint32_t ret = m_in0_b4;
 	if (m_in0_b4)
 	{
 		m_maincpu->set_input_line(0, CLEAR_LINE);
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( battlex )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, battlex_state,battlex_in0_b4_r, nullptr)
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
@@ -299,9 +299,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(battlex_state,battlex)
 {
-	UINT8 *colormask = memregion("user1")->base();
-	UINT8 *gfxdata = memregion("user2")->base();
-	UINT8 *dest = memregion("gfx1")->base();
+	uint8_t *colormask = memregion("user1")->base();
+	uint8_t *gfxdata = memregion("user2")->base();
+	uint8_t *dest = memregion("gfx1")->base();
 
 	int tile, line, bit;
 

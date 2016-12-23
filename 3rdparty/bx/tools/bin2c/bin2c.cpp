@@ -7,7 +7,7 @@
 #include <vector>
 
 #include <bx/commandline.h>
-#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 #include <bx/string.h>
 
 class Bin2cWriter : public bx::WriterI
@@ -23,7 +23,7 @@ public:
 	{
 	}
 
-	virtual int32_t write(const void* _data, int32_t _size) BX_OVERRIDE
+	virtual int32_t write(const void* _data, int32_t _size, bx::Error* /*_err*/ = NULL) BX_OVERRIDE
 	{
 		const char* data = (const char*)_data;
 		m_buffer.insert(m_buffer.end(), data, data+_size);
@@ -148,14 +148,14 @@ int main(int _argc, const char* _argv[])
 	size_t size = 0;
 
 	bx::CrtFileReader fr;
-	if (0 == bx::open(&fr, filePath) )
+	if (bx::open(&fr, filePath) )
 	{
 		size = (size_t)bx::getSize(&fr);
 		data = malloc(size);
 		bx::read(&fr, data, size);
 
 		bx::CrtFileWriter fw;
-		if (0 == bx::open(&fw, outFilePath) )
+		if (bx::open(&fw, outFilePath) )
 		{
 			Bin2cWriter writer(&fw, name);
 			bx::write(&writer, data, size);

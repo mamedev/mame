@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
+
+#include "machine/gen_latch.h"
+
 class tsamurai_state : public driver_device
 {
 public:
@@ -11,6 +14,7 @@ public:
 		m_audio3(*this, "audio3"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_colorram(*this, "colorram"),
 		m_bg_videoram(*this, "bg_videoram"),
@@ -22,11 +26,12 @@ public:
 	optional_device<cpu_device> m_audio3;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // vsgongf only
 
-	required_shared_ptr<UINT8> m_videoram;
-	optional_shared_ptr<UINT8> m_colorram;
-	optional_shared_ptr<UINT8> m_bg_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	optional_shared_ptr<uint8_t> m_colorram;
+	optional_shared_ptr<uint8_t> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	tilemap_t *m_background;
 	tilemap_t *m_foreground;
@@ -100,8 +105,8 @@ public:
 	DECLARE_VIDEO_START(tsamurai);
 	DECLARE_VIDEO_START(vsgongf);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vsgongf(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect );
 
 	INTERRUPT_GEN_MEMBER(interrupt);

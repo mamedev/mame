@@ -465,36 +465,36 @@ public:
 		m_rombase(*this, "rombase"),
 		m_dcs(*this, "dcs"),
 		m_ioasic(*this, "ioasic"),
-		m_io_analog(*this, "AN")
+		m_io_analog(*this, "AN.%u", 0)
 	{ }
 
 	required_device<mips3_device> m_maincpu;
 	required_device<m48t37_device> m_timekeeper;
 	required_device<bus_master_ide_controller_device> m_ide;
 	required_device<smc91c94_device> m_ethernet;
-	required_shared_ptr<UINT32> m_rambase;
-	required_shared_ptr<UINT32> m_nile_regs;
-	required_shared_ptr<UINT32> m_rombase;
+	required_shared_ptr<uint32_t> m_rambase;
+	required_shared_ptr<uint32_t> m_nile_regs;
+	required_shared_ptr<uint32_t> m_rombase;
 	required_device<dcs_audio_device> m_dcs;
 	required_device<midway_ioasic_device> m_ioasic;
 	optional_ioport_array<8> m_io_analog;
 
-	UINT16 m_nile_irq_state;
-	UINT16 m_ide_irq_state;
-	UINT32 m_pci_bridge_regs[0x40];
-	UINT32 m_pci_ide_regs[0x40];
-	UINT32 m_pci_3dfx_regs[0x40];
+	uint16_t m_nile_irq_state;
+	uint16_t m_ide_irq_state;
+	uint32_t m_pci_bridge_regs[0x40];
+	uint32_t m_pci_ide_regs[0x40];
+	uint32_t m_pci_3dfx_regs[0x40];
 	emu_timer *m_timer[4];
-	UINT8 m_vblank_state;
-	UINT8 m_sio_data[4];
-	UINT8 m_sio_irq_clear;
-	UINT8 m_sio_irq_enable;
-	UINT8 m_sio_irq_state;
-	UINT8 m_sio_led_state;
-	UINT8 m_pending_analog_read;
-	UINT8 m_cmos_unlocked;
+	uint8_t m_vblank_state;
+	uint8_t m_sio_data[4];
+	uint8_t m_sio_irq_clear;
+	uint8_t m_sio_irq_enable;
+	uint8_t m_sio_irq_state;
+	uint8_t m_sio_led_state;
+	uint8_t m_pending_analog_read;
+	uint8_t m_cmos_unlocked;
 	voodoo_device *m_voodoo;
-	UINT8 m_dcs_idma_cs;
+	uint8_t m_dcs_idma_cs;
 	int m_count;
 	int m_dynamic_count;
 	dynamic_address m_dynamic[MAX_DYNAMIC_ADDRESSES];
@@ -513,7 +513,7 @@ public:
 	DECLARE_DRIVER_INIT(sf2049se);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nile_timer_callback);
 	void remap_dynamic_addresses();
 	void update_nile_irqs();
@@ -565,7 +565,7 @@ public:
  *
  *************************************/
 
-UINT32 vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vegas_state::screen_update_vegas(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
@@ -582,25 +582,34 @@ void vegas_state::machine_start()
 	m_voodoo = (voodoo_device*)machine().device("voodoo");
 
 	/* allocate timers for the NILE */
-	m_timer[0] = machine().scheduler().timer_alloc(FUNC_NULL);
-	m_timer[1] = machine().scheduler().timer_alloc(FUNC_NULL);
+	m_timer[0] = machine().scheduler().timer_alloc(timer_expired_delegate());
+	m_timer[1] = machine().scheduler().timer_alloc(timer_expired_delegate());
 	m_timer[2] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 	m_timer[3] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(vegas_state::nile_timer_callback),this));
 
 	/* identify our sound board */
-	if (machine().device("dsio") != nullptr)
+	if (machine().device("dcs:dsio") != nullptr) {
 		m_dcs_idma_cs = 6;
-	else if (machine().device("denver") != nullptr)
+		if (LOG_SIO)
+			logerror("Found dsio\n");
+	}
+	else if (machine().device("dcs:denver") != nullptr) {
 		m_dcs_idma_cs = 7;
-	else
+		if (LOG_SIO)
+			logerror("Found denver\n");
+	}
+	else {
 		m_dcs_idma_cs = 0;
+		if (LOG_SIO)
+			logerror("Did not find dcs2 sound board\n");
+	}
 
 	/* set the fastest DRC options, but strict verification */
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY + MIPS3DRC_FLUSH_PC);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, FALSE, m_rambase);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	m_maincpu->add_fastram(0x00000000, m_rambase.bytes() - 1, false, m_rambase);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 
 	/* register for save states */
 	save_item(NAME(m_nile_irq_state));
@@ -657,13 +666,13 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 {
 	if (m_cmos_unlocked)
 	{
-		if ((mem_mask & 0x000000ff) != 0)
+		if (ACCESSING_BITS_0_7)
 			m_timekeeper->write(space, offset * 4 + 0, data >> 0, 0xff);
-		if ((mem_mask & 0x0000ff00) != 0)
+		if (ACCESSING_BITS_8_15)
 			m_timekeeper->write(space, offset * 4 + 1, data >> 8, 0xff);
-		if ((mem_mask & 0x00ff0000) != 0)
+		if (ACCESSING_BITS_16_23)
 			m_timekeeper->write(space, offset * 4 + 2, data >> 16, 0xff);
-		if ((mem_mask & 0xff000000) != 0)
+		if (ACCESSING_BITS_24_31)
 			m_timekeeper->write(space, offset * 4 + 3, data >> 24, 0xff);
 		if (offset*4 >= 0x7ff0)
 			if (LOG_TIMEKEEPER) logerror("timekeeper_w(%04X & %08X) = %08X\n", offset*4, mem_mask, data);
@@ -676,14 +685,14 @@ WRITE32_MEMBER( vegas_state::timekeeper_w )
 
 READ32_MEMBER( vegas_state::timekeeper_r )
 {
-	UINT32 result = 0xffffffff;
-	if ((mem_mask & 0x000000ff) != 0)
+	uint32_t result = 0xffffffff;
+	if (ACCESSING_BITS_0_7)
 		result = (result & ~0x000000ff) | (m_timekeeper->read(space, offset * 4 + 0, 0xff) << 0);
-	if ((mem_mask & 0x0000ff00) != 0)
+	if (ACCESSING_BITS_8_15)
 		result = (result & ~0x0000ff00) | (m_timekeeper->read(space, offset * 4 + 1, 0xff) << 8);
-	if ((mem_mask & 0x00ff0000) != 0)
+	if (ACCESSING_BITS_16_23)
 		result = (result & ~0x00ff0000) | (m_timekeeper->read(space, offset * 4 + 2, 0xff) << 16);
-	if ((mem_mask & 0xff000000) != 0)
+	if (ACCESSING_BITS_24_31)
 		result = (result & ~0xff000000) | (m_timekeeper->read(space, offset * 4 + 3, 0xff) << 24);
 	if (offset*4 >= 0x7ff0)
 		if (LOG_TIMEKEEPER) logerror("timekeeper_r(%04X & %08X) = %08X\n", offset*4, mem_mask, result);
@@ -700,7 +709,7 @@ READ32_MEMBER( vegas_state::timekeeper_r )
 
 READ32_MEMBER( vegas_state::pci_bridge_r )
 {
-	UINT32 result = m_pci_bridge_regs[offset];
+	uint32_t result = m_pci_bridge_regs[offset];
 
 	switch (offset)
 	{
@@ -736,7 +745,7 @@ WRITE32_MEMBER( vegas_state::pci_bridge_w )
 
 READ32_MEMBER( vegas_state::pci_ide_r )
 {
-	UINT32 result = m_pci_ide_regs[offset];
+	uint32_t result = m_pci_ide_regs[offset];
 
 	switch (offset)
 	{
@@ -798,7 +807,7 @@ WRITE32_MEMBER( vegas_state::pci_ide_w )
 READ32_MEMBER( vegas_state::pci_3dfx_r )
 {
 	int voodoo_type = m_voodoo->voodoo_get_type();
-	UINT32 result = m_pci_3dfx_regs[offset];
+	uint32_t result = m_pci_3dfx_regs[offset];
 
 	switch (offset)
 	{
@@ -887,9 +896,9 @@ WRITE32_MEMBER( vegas_state::pci_3dfx_w )
 
 void vegas_state::update_nile_irqs()
 {
-	UINT32 intctll = m_nile_regs[NREG_INTCTRL+0];
-	UINT32 intctlh = m_nile_regs[NREG_INTCTRL+1];
-	UINT8 irq[6];
+	uint32_t intctll = m_nile_regs[NREG_INTCTRL+0];
+	uint32_t intctlh = m_nile_regs[NREG_INTCTRL+1];
+	uint8_t irq[6];
 	int i;
 
 	/* check for UART transmit IRQ enable and synthsize one */
@@ -952,14 +961,19 @@ void vegas_state::update_nile_irqs()
 TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 {
 	int which = param;
-	UINT32 *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
+	uint32_t *regs = &m_nile_regs[NREG_T0CTRL + which * 4];
 	if (LOG_TIMERS) logerror("timer %d fired\n", which);
 
 	/* adjust the timer to fire again */
 	{
-		UINT32 scale = regs[0];
-		if (regs[1] & 2)
-			logerror("Unexpected value: timer %d is prescaled\n", which);
+		uint32_t scale = regs[0];
+		if (regs[1] & 2) {
+			uint32_t scaleSrc = (regs[1] >> 2) & 0x3;
+			uint32_t *scaleReg = &m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+			scale *= scaleReg[0];
+			//logerror("Unexpected value: timer %d is prescaled\n", which);
+			logerror("Timer Scaling value: timer %d is prescaled from %08X to %08X\n", which, regs[0], scale);
+		}
 		if (scale != 0)
 			m_timer[which]->adjust(TIMER_PERIOD * scale, which);
 	}
@@ -983,8 +997,9 @@ TIMER_CALLBACK_MEMBER(vegas_state::nile_timer_callback)
 
 READ32_MEMBER( vegas_state::nile_r )
 {
-	UINT32 result = m_nile_regs[offset];
-	int logit = 1, which;
+	uint32_t result = m_nile_regs[offset];
+	bool logit = true;
+	int which;
 
 	switch (offset)
 	{
@@ -1042,9 +1057,15 @@ READ32_MEMBER( vegas_state::nile_r )
 			which = (offset - NREG_T0CTRL) / 4;
 			if (m_nile_regs[offset - 1] & 1)
 			{
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				result = m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK;
+				//if (m_nile_regs[offset - 1] & 2)
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
+				uint32_t scale = 1;
+				if (m_nile_regs[offset - 1] & 2) {
+					uint32_t scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer value: timer %d is prescaled by \n", which, scale);
+				}
+				result = m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * (double)SYSTEM_CLOCK / scale;
 			}
 
 			if (LOG_TIMERS) logerror("%08X:NILE READ: timer %d counter(%03X) = %08X\n", safe_pc(), which, offset*4, result);
@@ -1095,8 +1116,9 @@ READ32_MEMBER( vegas_state::nile_r )
 
 WRITE32_MEMBER( vegas_state::nile_w )
 {
-	UINT32 olddata = m_nile_regs[offset];
-	int logit = 1, which;
+	uint32_t olddata = m_nile_regs[offset];
+	bool logit = true;
+	int which;
 
 	COMBINE_DATA(&m_nile_regs[offset]);
 
@@ -1170,20 +1192,31 @@ WRITE32_MEMBER( vegas_state::nile_w )
 			/* timer just enabled? */
 			if (!(olddata & 1) && (m_nile_regs[offset] & 1))
 			{
-				UINT32 scale = m_nile_regs[offset + 1];
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
+				uint32_t scale = m_nile_regs[offset - 1];
+				//if (m_nile_regs[offset] & 2)
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
+				if (m_nile_regs[offset] & 2) {
+					uint32_t scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					scale *= m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, m_nile_regs[NREG_T0CTRL + which * 4]);
+				}
 				if (scale != 0)
 					m_timer[which]->adjust(TIMER_PERIOD * scale, which);
-				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %d Hz\n", which, (int)ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds()));
+				if (LOG_TIMERS) logerror("Starting timer %d at a rate of %f Hz scale = %08X\n", which, ATTOSECONDS_TO_HZ((TIMER_PERIOD * (m_nile_regs[offset + 1] + 1)).attoseconds()), scale);
 			}
 
 			/* timer disabled? */
 			else if ((olddata & 1) && !(m_nile_regs[offset] & 1))
 			{
-				if (m_nile_regs[offset] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK;
+				//if (m_nile_regs[offset] & 2)
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
+				uint32_t scale = 1;
+				if (m_nile_regs[offset] & 2) {
+					uint32_t scaleSrc = (m_nile_regs[offset] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
+				}
+				m_nile_regs[offset + 1] = m_timer[which]->remaining().as_double() * SYSTEM_CLOCK / scale;
 				m_timer[which]->adjust(attotime::never, which);
 			}
 			break;
@@ -1198,14 +1231,20 @@ WRITE32_MEMBER( vegas_state::nile_w )
 
 			if (m_nile_regs[offset - 1] & 1)
 			{
-				if (m_nile_regs[offset - 1] & 2)
-					logerror("Unexpected value: timer %d is prescaled\n", which);
-				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset], which);
+				//if (m_nile_regs[offset - 1] & 2)
+				//  logerror("Unexpected value: timer %d is prescaled\n", which);
+				uint32_t scale = 1;
+				if (m_nile_regs[offset - 1] & 2) {
+					uint32_t scaleSrc = (m_nile_regs[offset - 1] >> 2) & 0x3;
+					scale = m_nile_regs[NREG_T0CTRL + scaleSrc * 4];
+					logerror("Timer scale: timer %d is scaled by %08X\n", which, scale);
+				}
+				m_timer[which]->adjust(TIMER_PERIOD * m_nile_regs[offset] * scale, which);
 			}
 			break;
 
 		case NREG_UARTTHR:      /* serial port output */
-			if (PRINTF_SERIAL) osd_printf_debug("%c", data & 0xff);
+			if (PRINTF_SERIAL) osd_printf_info("%c", data & 0xff);
 			logit = 0;
 			break;
 		case NREG_UARTIER:      /* serial interrupt enable */
@@ -1407,7 +1446,7 @@ WRITE32_MEMBER( vegas_state::sio_w )
 	if (ACCESSING_BITS_16_23) offset += 2;
 	if (ACCESSING_BITS_24_31) offset += 3;
 	if (LOG_SIO && offset != 0)
-		logerror("%08X:sio write to offset %X = %02X\n", safe_pc(), offset, data >> (offset*8));
+		logerror("%08X:sio write to offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, data >> (offset*8));
 	if (offset < 4)
 		m_sio_data[offset] = data >> (offset*8);
 	if (offset == 1)
@@ -1417,7 +1456,7 @@ WRITE32_MEMBER( vegas_state::sio_w )
 
 READ32_MEMBER( vegas_state::sio_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ACCESSING_BITS_0_7) offset += 0;
 	if (ACCESSING_BITS_8_15) offset += 1;
 	if (ACCESSING_BITS_16_23) offset += 2;
@@ -1425,7 +1464,7 @@ READ32_MEMBER( vegas_state::sio_r )
 	if (offset < 4)
 		result = m_sio_data[0] | (m_sio_data[1] << 8) | (m_sio_data[2] << 16) | (m_sio_data[3] << 24);
 	if (LOG_SIO && offset != 2)
-		logerror("%08X:sio read from offset %X = %02X\n", safe_pc(), offset, result >> (offset*8));
+		logerror("%08X:sio read from offset %X = %02X\n", machine().device("maincpu")->safe_pc(), offset, result >> (offset*8));
 	return result;
 }
 
@@ -1447,7 +1486,7 @@ WRITE32_MEMBER( vegas_state::analog_port_w )
 {
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", safe_pc(), data);
-	m_pending_analog_read = m_io_analog[data & 7] ? m_io_analog[data & 7]->read() : 0;
+	m_pending_analog_read = m_io_analog[data & 7].read_safe(0);
 }
 
 
@@ -1508,7 +1547,7 @@ WRITE32_MEMBER( vegas_state::ide_bus_master32_w )
 
 READ32_MEMBER( vegas_state::ethernet_r )
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	if (ACCESSING_BITS_0_15)
 		result |= m_ethernet->read(space, offset * 2 + 0, mem_mask);
 	if (ACCESSING_BITS_16_31)
@@ -1685,9 +1724,9 @@ void vegas_state::remap_dynamic_addresses()
 		if (dynamic[addr].read == NOP_HANDLER)
 			space.nop_read(dynamic[addr].start, dynamic[addr].end);
 		else if (!dynamic[addr].read.isnull())
-			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].read);
+			space.install_read_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].read);
 		if (!dynamic[addr].write.isnull())
-			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].write);
+			space.install_write_handler(dynamic[addr].start, dynamic[addr].end, dynamic[addr].write);
 	}
 
 	if (LOG_DYNAMIC)
@@ -1942,6 +1981,9 @@ static INPUT_PORTS_START( warfa )
 	PORT_DIPSETTING(      0x0000, "?" )
 	PORT_DIPNAME( 0x0040, 0x0040, "Boot ROM Test" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Boot ROM Test v1.3" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0xc000, 0x4000, "Resolution" )
 	PORT_DIPSETTING(      0xc000, "Standard Res 512x256" )
@@ -2313,7 +2355,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntleg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_CALSPEED)
@@ -2326,7 +2368,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gauntdl, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -2339,7 +2381,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( warfa, vegas250 )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0b5d) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_MACE)
@@ -2352,7 +2394,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( tenthdeg, vegas )
 	MCFG_DEVICE_ADD("dcs", DCS2_AUDIO_2104, 0)
 	MCFG_DCS2_AUDIO_DRAM_IN_MB(4)
-	MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb)
+//  MCFG_DCS2_AUDIO_POLLING_OFFSET(0x0afb) -- Not in ram???
 
 	MCFG_DEVICE_ADD("ioasic", MIDWAY_IOASIC, 0)
 	MCFG_MIDWAY_IOASIC_SHUFFLE(MIDWAY_IOASIC_GAUNTDL)
@@ -2554,6 +2596,20 @@ ROM_START( warfaa )
 	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
 ROM_END
 
+ROM_START( warfab )
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  // test: EPROM 1.3 Apr 7 1999
+	// label: WAR 42CE / BOOT V1.9 / PROG V1.6
+	ROM_LOAD( "war42ce.bin", 0x000000, 0x80000, CRC(1a6e7f59) SHA1(0d8b4ce1e4b1132689796c4374aa54447b9a3369) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+	DISK_REGION( "ide:0:hdd:image" )    // test: Guts 1.3 Apr7 1999 Game 1.3 Apr7 1999
+	// V1.5
+	DISK_IMAGE( "warfa15", 0, SHA1(bd538bf2f6a245545dae4ea97c433bb3f7d4394e) )
+
+	ROM_REGION16_LE( 0x10000, "dcs", 0 )    /* Vegas SIO boot ROM */
+	ROM_LOAD16_BYTE( "warsnd.106", 0x000000, 0x8000, CRC(d1470e23) SHA1(f6e8405cfa604528c0224401bc374a6df9caccef) )
+ROM_END
 
 ROM_START( tenthdeg )
 	ROM_REGION32_LE( 0x80000, "user1", 0 )
@@ -2570,7 +2626,18 @@ ROM_START( tenthdeg )
 ROM_END
 
 
-ROM_START( roadburn )
+ROM_START( roadburn ) /* version 1.04 - verified on hardware */
+	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
+	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
+
+	ROM_REGION32_LE( 0x100000, "update", ROMREGION_ERASEFF )
+
+
+	DISK_REGION( "ide:0:hdd:image" )    /* Guts 5/19/1999 Game 5/19/1999 */
+	DISK_IMAGE( "ROAD BURNERS V1.04", 0, SHA1(30567241c000ee572a9cfb1b080c02a51a2b12d2) )
+ROM_END
+
+ROM_START( roadburn1 ) /* version 1.0 - verified on hardware */
 	ROM_REGION32_LE( 0x80000, "user1", 0 )  /* EPROM 2.6 4/22/1999 */
 	ROM_LOAD( "rbmain.bin", 0x000000, 0x80000, CRC(060e1aa8) SHA1(2a1027d209f87249fe143500e721dfde7fb5f3bc) )
 
@@ -2796,10 +2863,12 @@ GAME( 1999, gauntdl,  0,        gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT
 GAME( 1999, gauntdl24,gauntdl,  gauntdl,    gauntdl, vegas_state,  gauntdl,  ROT0, "Midway Games", "Gauntlet Dark Legacy (version DL 2.4)", MACHINE_SUPPORTS_SAVE )
 GAME( 1999, warfa,    0,        warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.9 Mar 25 1999, GUTS 1.3 Apr 20 1999, GAME Apr 20 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1999, warfaa,   warfa,    warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.6 Jan 14 1999, GUTS 1.1 Mar 16 1999, GAME Mar 16 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, warfab,   warfa,    warfa, warfa, vegas_state,    warfa,    ROT0, "Atari Games",  "War: The Final Assault (EPROM 1.3 Apr 7 1999, GUTS 1.3 Apr 7 1999, GAME Apr 7 1999)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // version numbers comes from test mode, can be unreliable
 
 
 /* Durango + DSIO + Voodoo 2 */
-GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn, 0,        roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.04)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1999, roadburn1,roadburn, roadburn, roadburn, vegas_state, roadburn, ROT0, "Atari Games",  "Road Burners (ver 1.0)", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 
 /* Durango + DSIO? + Voodoo banshee */
 GAME( 1998, nbashowt, 0,        nbashowt, nbashowt, vegas_state, nbashowt, ROT0, "Midway Games", "NBA Showtime: NBA on NBC (ver 2.0)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )

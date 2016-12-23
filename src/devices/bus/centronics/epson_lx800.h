@@ -30,11 +30,11 @@ class epson_lx800_t :  public device_t,
 {
 public:
 	// construction/destruction
-	epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	epson_lx800_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	epson_lx800_t(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 

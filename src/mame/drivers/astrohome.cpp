@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( astrocade_io, AS_IO, 8, astrocde_mess_state )
-	AM_RANGE(0x00, 0x1f) AM_MIRROR(0xff00) AM_MASK(0xffff) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
+	AM_RANGE(0x00, 0x1f) AM_SELECT(0xff00) AM_READWRITE(astrocade_data_chip_register_r, astrocade_data_chip_register_w)
 ADDRESS_MAP_END
 
 /*************************************

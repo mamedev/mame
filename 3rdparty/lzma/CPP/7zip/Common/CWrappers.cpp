@@ -12,14 +12,14 @@
 
 #define CONVERT_PR_VAL(x) (x == PROGRESS_UNKNOWN_VALUE ? NULL : &x)
 
-static SRes CompressProgress(void *pp, UInt64 inSize, UInt64 outSize)
+static SRes CompressProgress(void *pp, UInt64 inSize, UInt64 outSize) throw()
 {
   CCompressProgressWrap *p = (CCompressProgressWrap *)pp;
   p->Res = p->Progress->SetRatioInfo(CONVERT_PR_VAL(inSize), CONVERT_PR_VAL(outSize));
   return (SRes)p->Res;
 }
 
-CCompressProgressWrap::CCompressProgressWrap(ICompressProgressInfo *progress)
+CCompressProgressWrap::CCompressProgressWrap(ICompressProgressInfo *progress) throw()
 {
   p.Progress = CompressProgress;
   Progress = progress;
@@ -30,7 +30,7 @@ static const UInt32 kStreamStepSize = (UInt32)1 << 31;
 
 SRes HRESULT_To_SRes(HRESULT res, SRes defaultRes)
 {
-  switch(res)
+  switch (res)
   {
     case S_OK: return SZ_OK;
     case E_OUTOFMEMORY: return SZ_ERROR_MEM;
@@ -42,18 +42,19 @@ SRes HRESULT_To_SRes(HRESULT res, SRes defaultRes)
   return defaultRes;
 }
 
-static SRes MyRead(void *object, void *data, size_t *size)
+static SRes MyRead(void *object, void *data, size_t *size) throw()
 {
   CSeqInStreamWrap *p = (CSeqInStreamWrap *)object;
   UInt32 curSize = ((*size < kStreamStepSize) ? (UInt32)*size : kStreamStepSize);
   p->Res = (p->Stream->Read(data, curSize, &curSize));
   *size = curSize;
+  p->Processed += curSize;
   if (p->Res == S_OK)
     return SZ_OK;
   return HRESULT_To_SRes(p->Res, SZ_ERROR_READ);
 }
 
-static size_t MyWrite(void *object, const void *data, size_t size)
+static size_t MyWrite(void *object, const void *data, size_t size) throw()
 {
   CSeqOutStreamWrap *p = (CSeqOutStreamWrap *)object;
   if (p->Stream)
@@ -68,13 +69,14 @@ static size_t MyWrite(void *object, const void *data, size_t size)
   return size;
 }
 
-CSeqInStreamWrap::CSeqInStreamWrap(ISequentialInStream *stream)
+CSeqInStreamWrap::CSeqInStreamWrap(ISequentialInStream *stream) throw()
 {
   p.Read = MyRead;
   Stream = stream;
+  Processed = 0;
 }
 
-CSeqOutStreamWrap::CSeqOutStreamWrap(ISequentialOutStream *stream)
+CSeqOutStreamWrap::CSeqOutStreamWrap(ISequentialOutStream *stream) throw()
 {
   p.Write = MyWrite;
   Stream = stream;
@@ -82,9 +84,9 @@ CSeqOutStreamWrap::CSeqOutStreamWrap(ISequentialOutStream *stream)
   Processed = 0;
 }
 
-HRESULT SResToHRESULT(SRes res)
+HRESULT SResToHRESULT(SRes res) throw()
 {
-  switch(res)
+  switch (res)
   {
     case SZ_OK: return S_OK;
     case SZ_ERROR_MEM: return E_OUTOFMEMORY;
@@ -96,7 +98,7 @@ HRESULT SResToHRESULT(SRes res)
   return E_FAIL;
 }
 
-static SRes InStreamWrap_Read(void *pp, void *data, size_t *size)
+static SRes InStreamWrap_Read(void *pp, void *data, size_t *size) throw()
 {
   CSeekInStreamWrap *p = (CSeekInStreamWrap *)pp;
   UInt32 curSize = ((*size < kStreamStepSize) ? (UInt32)*size : kStreamStepSize);
@@ -105,11 +107,11 @@ static SRes InStreamWrap_Read(void *pp, void *data, size_t *size)
   return (p->Res == S_OK) ? SZ_OK : SZ_ERROR_READ;
 }
 
-static SRes InStreamWrap_Seek(void *pp, Int64 *offset, ESzSeek origin)
+static SRes InStreamWrap_Seek(void *pp, Int64 *offset, ESzSeek origin) throw()
 {
   CSeekInStreamWrap *p = (CSeekInStreamWrap *)pp;
   UInt32 moveMethod;
-  switch(origin)
+  switch (origin)
   {
     case SZ_SEEK_SET: moveMethod = STREAM_SEEK_SET; break;
     case SZ_SEEK_CUR: moveMethod = STREAM_SEEK_CUR; break;
@@ -122,7 +124,7 @@ static SRes InStreamWrap_Seek(void *pp, Int64 *offset, ESzSeek origin)
   return (p->Res == S_OK) ? SZ_OK : SZ_ERROR_READ;
 }
 
-CSeekInStreamWrap::CSeekInStreamWrap(IInStream *stream)
+CSeekInStreamWrap::CSeekInStreamWrap(IInStream *stream) throw()
 {
   Stream = stream;
   p.Read = InStreamWrap_Read;
@@ -133,13 +135,13 @@ CSeekInStreamWrap::CSeekInStreamWrap(IInStream *stream)
 
 /* ---------- CByteInBufWrap ---------- */
 
-void CByteInBufWrap::Free()
+void CByteInBufWrap::Free() throw()
 {
   ::MidFree(Buf);
   Buf = 0;
 }
 
-bool CByteInBufWrap::Alloc(UInt32 size)
+bool CByteInBufWrap::Alloc(UInt32 size) throw()
 {
   if (Buf == 0 || size != Size)
   {
@@ -150,7 +152,7 @@ bool CByteInBufWrap::Alloc(UInt32 size)
   return (Buf != 0);
 }
 
-Byte CByteInBufWrap::ReadByteFromNewBlock()
+Byte CByteInBufWrap::ReadByteFromNewBlock() throw()
 {
   if (Res == S_OK)
   {
@@ -166,7 +168,7 @@ Byte CByteInBufWrap::ReadByteFromNewBlock()
   return 0;
 }
 
-static Byte Wrap_ReadByte(void *pp)
+static Byte Wrap_ReadByte(void *pp) throw()
 {
   CByteInBufWrap *p = (CByteInBufWrap *)pp;
   if (p->Cur != p->Lim)
@@ -182,13 +184,13 @@ CByteInBufWrap::CByteInBufWrap(): Buf(0)
 
 /* ---------- CByteOutBufWrap ---------- */
 
-void CByteOutBufWrap::Free()
+void CByteOutBufWrap::Free() throw()
 {
   ::MidFree(Buf);
   Buf = 0;
 }
 
-bool CByteOutBufWrap::Alloc(size_t size)
+bool CByteOutBufWrap::Alloc(size_t size) throw()
 {
   if (Buf == 0 || size != Size)
   {
@@ -199,7 +201,7 @@ bool CByteOutBufWrap::Alloc(size_t size)
   return (Buf != 0);
 }
 
-HRESULT CByteOutBufWrap::Flush()
+HRESULT CByteOutBufWrap::Flush() throw()
 {
   if (Res == S_OK)
   {
@@ -212,7 +214,7 @@ HRESULT CByteOutBufWrap::Flush()
   return Res;
 }
 
-static void Wrap_WriteByte(void *pp, Byte b)
+static void Wrap_WriteByte(void *pp, Byte b) throw()
 {
   CByteOutBufWrap *p = (CByteOutBufWrap *)pp;
   Byte *dest = p->Cur;
@@ -222,7 +224,7 @@ static void Wrap_WriteByte(void *pp, Byte b)
     p->Flush();
 }
 
-CByteOutBufWrap::CByteOutBufWrap(): Buf(0)
+CByteOutBufWrap::CByteOutBufWrap() throw(): Buf(0)
 {
   p.Write = Wrap_WriteByte;
 }

@@ -279,14 +279,14 @@ WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 
 WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
 {
-	soundlatch_byte_w(space,0,data);
+	m_soundlatch->write(space,0,data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 READ8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_r)
 {
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_byte_r(space,0);
+	return m_soundlatch->read(space,0);
 }
 
 WRITE8_MEMBER(gladiatr_state::gladiatr_flipscreen_w)
@@ -651,6 +651,8 @@ static MACHINE_CONFIG_START( ppking, gladiatr_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_AY8910_PORT_A_READ_CB(READ8(gladiatr_state, ppking_f1_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(gladiatr_state, ppking_f1_r))
@@ -705,6 +707,8 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(gladiatr_state, gladiator_ym_irq))
@@ -945,7 +949,7 @@ ROM_START( gcastle )
 ROM_END
 
 
-void gladiatr_state::swap_block(UINT8 *src1,UINT8 *src2,int len)
+void gladiatr_state::swap_block(uint8_t *src1,uint8_t *src2,int len)
 {
 	int i,t;
 
@@ -959,7 +963,7 @@ void gladiatr_state::swap_block(UINT8 *src1,UINT8 *src2,int len)
 
 DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i,j;
 
 	rom = memregion("gfx2")->base();
@@ -1010,7 +1014,7 @@ READ8_MEMBER(gladiatr_state::ppking_f6a3_r)
 
 DRIVER_INIT_MEMBER(gladiatr_state,ppking)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	int i,j;
 
 	rom = memregion("gfx2")->base();

@@ -109,6 +109,7 @@ www.multitech.com
 #include "video/voodoo_pci.h"
 #include "sound/es1373.h"
 #include "machine/iteagle_fpga.h"
+#include "machine/pci-ide.h"
 
 
 //*************************************
@@ -134,19 +135,20 @@ void iteagle_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, FALSE, m_rambase);
-	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, TRUE, m_rombase);
+	//m_maincpu->mips3drc_add_fastram(0x00000000, 16*1024*1024-1, false, m_rambase);
+	//m_maincpu->mips3drc_add_fastram(0x1fc00000, 0x1fc7ffff, true, m_rombase);
 }
 
 void iteagle_state::machine_reset()
 {
 }
 
-#define PCI_ID_IDE          ":pci:06.0"
-// Primary IDE Control  ":pci:06.1"
+#define PCI_ID_NILE     ":pci:00.0"
+#define PCI_ID_PERIPH   ":pci:06.0"
+#define PCI_ID_IDE      ":pci:06.1"
 // Seconday IDE Control ":pci:06.2"
 #define PCI_ID_SOUND    ":pci:07.0"
-#define PCI_ID_FPGA         ":pci:08.0"
+#define PCI_ID_FPGA     ":pci:08.0"
 #define PCI_ID_VIDEO    ":pci:09.0"
 #define PCI_ID_EEPROM   ":pci:0a.0"
 
@@ -158,10 +160,12 @@ static MACHINE_CONFIG_START( iteagle, iteagle_state )
 	MCFG_MIPS3_DCACHE_SIZE(8192)
 
 	MCFG_PCI_ROOT_ADD(                ":pci")
-	MCFG_VRC4373_ADD(                 ":pci:00.0", ":maincpu")
-	MCFG_ITEAGLE_IDE_ADD(             PCI_ID_IDE)
-	MCFG_ITEAGLE_IDE_IRQ_ADD(         ":maincpu", MIPS3_IRQ2)
-	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1)
+	MCFG_VRC4373_ADD(                 PCI_ID_NILE, ":maincpu")
+	MCFG_ITEAGLE_PERIPH_ADD(          PCI_ID_PERIPH)
+	MCFG_IDE_PCI_ADD(                 PCI_ID_IDE, 0x1080C693, 0x00, 0x0)
+	MCFG_IDE_PCI_IRQ_ADD(             ":maincpu", MIPS3_IRQ2)
+
+	MCFG_ITEAGLE_FPGA_ADD(            PCI_ID_FPGA, ":maincpu", MIPS3_IRQ1, MIPS3_IRQ4)
 	MCFG_ES1373_ADD(                  PCI_ID_SOUND)
 	MCFG_SOUND_ROUTE(0, PCI_ID_SOUND":lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(1, PCI_ID_SOUND":rspeaker", 1.0)
@@ -179,7 +183,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gtfore01, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x00000401, 0x0b0b0b)
+	MCFG_ITEAGLE_FPGA_INIT(0x01000401, 0x0b0b0b)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0401, 0x7)
 MACHINE_CONFIG_END
@@ -228,7 +232,15 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbhsc, iteagle )
 	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
-	MCFG_ITEAGLE_FPGA_INIT(0x02000600, 0x0c0a0a)
+	// 0xXX01XXXX = tournament board
+	MCFG_ITEAGLE_FPGA_INIT(0x02010600, 0x0c0a0a)
+	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
+	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( bbh2sp, iteagle )
+	MCFG_DEVICE_MODIFY(PCI_ID_FPGA)
+	MCFG_ITEAGLE_FPGA_INIT(0x02000602, 0x0d0a0a)
 	MCFG_DEVICE_MODIFY(PCI_ID_EEPROM)
 	MCFG_ITEAGLE_EEPROM_INIT(0x0000, 0x7)
 MACHINE_CONFIG_END
@@ -278,8 +290,8 @@ static INPUT_PORTS_START( iteagle )
 	PORT_BIT( 0xfe00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_TILT ) PORT_NAME( "Test" )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME( "Service" )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x000c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x0010, 0x00, "SW51-1" )
 	PORT_DIPSETTING(0x00, "Normal" )
@@ -358,7 +370,7 @@ INPUT_PORTS_END
  *
  *************************************/
 #define EAGLE_BIOS \
-	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */ \
+	ROM_REGION( 0x100000, PCI_ID_NILE":rom", 0 ) /* MIPS code */ \
 	ROM_SYSTEM_BIOS(  0, "209", "bootrom 2.09" ) \
 	ROMX_LOAD( "eagle209.u15", 0x000000, 0x100000, CRC(e0fc1a16) SHA1(c9524f7ee6b95bd484a3b75bcbe2243cb273f84c), ROM_BIOS(1) ) \
 	ROM_SYSTEM_BIOS(  1, "208", "bootrom 2.08" ) \
@@ -398,7 +410,7 @@ ROM_START( iteagle )
 ROM_END
 
 ROM_START( virtpool ) /* On earlier Eagle 1 PCB, possibly a prototype version - later boards are known as Eagle 2 */
-	ROM_REGION( 0x100000, ":pci:00.0", 0 ) /* MIPS code */
+	ROM_REGION( 0x100000, PCI_ID_NILE":rom", 0 ) /* MIPS code */
 	ROM_SYSTEM_BIOS( 0, "pool", "Virtual Pool bootrom" )
 	ROMX_LOAD( "eagle1_bootrom_v1p01", 0x000000, 0x080000, CRC(6c8c1593) SHA1(707d5633388f8dd4e9252f4d8d6f27c98c2cb35a), ROM_BIOS(1) )
 
@@ -538,6 +550,21 @@ ROM_START( bbhsc )
 	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
 	DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
 ROM_END
+	//DISK_IMAGE( "bbhsc_v1.50.07_cf", 0, SHA1(21dcf1f7e5ab901ac64e6afb099c35e273b3bf1f) ) /* Build 16:35:34, Feb 26 2002 - 4gb Compact Flash conversion */
+	//DISK_IMAGE( "bbhsc_v1.60.01", 0, SHA1(8554fdd7193ee27c0fe8ca921aa8db9c0378b313) )
+
+ROM_START( bbh2sp )
+	EAGLE_BIOS
+
+	ROM_REGION( 0x0880, "atmel", 0 ) /* Atmel 90S2313 AVR internal CPU code */
+	ROM_LOAD( "bbh2-us.u53", 0x0000, 0x0880, NO_DUMP )
+
+	DISK_REGION( PCI_ID_IDE":ide:0:hdd:image" )
+	DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) )
+ROM_END
+	//DISK_IMAGE( "bbh2sp_v2.02.08", 0, SHA1(13b9b4ea0465f55dd1c7bc6e2f962c3c9b9566bd) )
+	//DISK_IMAGE( "bbh2sp_v2.02.09", 0, SHA1(fac3963b6da35a8c8b00f6826bc10e9c7230b1d6) )
+	//DISK_IMAGE( "bbh2sp_v2.02.11", 0, SHA1(63e41cca534f4774bfba4b4dda9620fe805029b4) )
 
 ROM_START( bbhcotw ) /* This version is meant for 8meg GREEN board PCBs */
 	EAGLE_BIOS
@@ -570,4 +597,5 @@ GAME( 2004, gtfore05b,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "I
 GAME( 2004, gtfore05c,  gtfore05, gtfore05, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2005 Extra (v5.00.00)", 0 )
 GAME( 2005, gtfore06,   iteagle,  gtfore06, iteagle,  driver_device, 0, ROT0, "Incredible Technologies", "Golden Tee Fore! 2006 Complete (v6.00.01)", 0 )
 GAME( 2002, bbhsc,      iteagle,  bbhsc,    bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter - Shooter's Challenge (v1.50.07)", MACHINE_NOT_WORKING ) // doesn't boot
+GAME( 2002, bbh2sp,     iteagle,  bbh2sp,   bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter II - Sportsman's Paradise (v2.02.11)", MACHINE_NOT_WORKING ) // SW51-2 needs to be off
 GAME( 2006, bbhcotw,    iteagle,  bbhcotw,  bbh,  driver_device, 0, ROT0, "Incredible Technologies", "Big Buck Hunter Call of the Wild (v3.02.5)", MACHINE_NOT_WORKING ) // random lockups

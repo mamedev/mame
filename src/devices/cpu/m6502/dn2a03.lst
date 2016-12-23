@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # n2a03 - D flag is disabled but present in the P register
 brk_imp     ora_idx     kil_non     slo_idx     nop_zpg     ora_zpg     asl_zpg     slo_zpg     php_imp     ora_imm     asl_acc     anc_imm     nop_aba     ora_aba     asl_aba     slo_aba
 bpl_rel     ora_idy     kil_non     slo_idy     nop_zpx     ora_zpx     asl_zpx     slo_zpx     clc_imp     ora_aby     nop_imp     slo_aby     nop_abx     ora_abx     asl_abx     slo_abx

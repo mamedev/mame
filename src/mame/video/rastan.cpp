@@ -30,7 +30,7 @@ WRITE16_MEMBER(rastan_state::rastan_spritectrl_w)
 
 /***************************************************************************/
 
-UINT32 rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rastan_state::screen_update_rastan(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[2];
 

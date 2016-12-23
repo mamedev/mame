@@ -9,9 +9,8 @@
 **************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "render.h"
-#include "ui/selgame.h"
-
 
 //**************************************************************************
 //  DRIVER STATE
@@ -28,13 +27,12 @@ public:
 
 	virtual void machine_start() override
 	{
-		// force the UI to show the game select screen
-		ui_menu_select_game::force_game_select(machine(), &machine().render().ui_container());
+		emulator_info::display_ui_chooser(machine());
 	}
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+	u32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	{
-		bitmap.fill(rgb_t::black);
+		bitmap.fill(rgb_t::black(), cliprect);
 		return 0;
 	}
 };

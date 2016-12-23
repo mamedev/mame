@@ -79,9 +79,9 @@ enum
 class hdc92x4_device : public device_t
 {
 public:
-	hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	hdc92x4_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
-	// Accesors from the CPU side
+	// Accessors from the CPU side
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 	DECLARE_WRITE_LINE_MEMBER( reset );
@@ -98,7 +98,7 @@ public:
 	// auxbus_in is intended to read events from the drives
 	// In the real chip the status is polled; to avoid unnecessary load
 	// we implement it as a push call
-	void auxbus_in( UINT8 data );
+	void auxbus_in( uint8_t data );
 
 	// We pretend that the data separator is part of this controller. It is
 	// in fact a separate circuit. The clock divider must be properly set
@@ -131,8 +131,8 @@ protected:
 	int m_register_pointer;
 
 	// Read and write registers
-	UINT8 m_register_w[12];
-	UINT8 m_register_r[15];
+	uint8_t m_register_w[12];
+	uint8_t m_register_r[15];
 
 	// Interrupt management (outgoing INT pin)
 	void set_interrupt(line_state intr);
@@ -144,19 +144,19 @@ protected:
 	mfm_harddisk_device* m_harddisk;
 
 	// internal register OUTPUT1
-	UINT8 m_output1, m_output1_old;
+	uint8_t m_output1, m_output1_old;
 
 	// internal register OUTPUT2
-	UINT8 m_output2, m_output2_old;
+	uint8_t m_output2, m_output2_old;
 
 	// Write the output registers to the latches
 	void auxbus_out();
 
 	// Write the DMA address to the external latches
-	void dma_address_out(UINT8 addrub, UINT8 addrhb, UINT8 addrlb);
+	void dma_address_out(uint8_t addrub, uint8_t addrhb, uint8_t addrlb);
 
 	// Intermediate storage for register
-	UINT8 m_regvalue;
+	uint8_t m_regvalue;
 
 	// Drive type that has been selected in drive_select
 	int m_selected_drive_type;
@@ -198,7 +198,7 @@ protected:
 	std::string ttsn();
 
 	// Utility routine to set or reset bits
-	void set_bits(UINT8& byte, int mask, bool set);
+	void set_bits(uint8_t& byte, int mask, bool set);
 
 	// Event handling
 	line_state m_line_level;
@@ -213,16 +213,16 @@ protected:
 	struct live_info
 	{
 		attotime time;
-		UINT16 shift_reg;
-		UINT16 shift_reg_save;
-		UINT16 crc;
+		uint16_t shift_reg;
+		uint16_t shift_reg_save;
+		uint16_t crc;
 		int bit_counter;
 		int bit_count_total;    // used for timeout handling
 		int byte_counter;
 		bool data_separator_phase;
 		bool last_data_bit;
-		UINT8 clock_reg;
-		UINT8 data_reg;
+		uint8_t clock_reg;
+		uint8_t data_reg;
 		int state;
 		int next_state;
 		int repeat; // for formatting
@@ -231,6 +231,9 @@ protected:
 
 	live_info m_live_state, m_checkpoint_state;
 	int m_last_live_state;
+
+	// Presets CRC.
+	void preset_crc(live_info& live, int value);
 
 	// Starts the live run
 	void live_start(int state);
@@ -255,7 +258,7 @@ protected:
 	bool found_mark(int state);
 
 	// Delivers the data bits from the given encoding
-	UINT8 get_data_from_encoding(UINT16 raw);
+	uint8_t get_data_from_encoding(uint16_t raw);
 
 	// ==============================================
 	//    PLL functions and interface to floppy and harddisk
@@ -265,7 +268,7 @@ protected:
 	fdc_pll_t m_pll, m_checkpoint_pll;
 
 	// Clock divider value
-	UINT8 m_clock_divider;
+	uint8_t m_clock_divider;
 
 	// MFM HD encoding type
 	mfmhd_enc_t m_hd_encoding;
@@ -275,14 +278,14 @@ protected:
 
 	// Puts the word into the shift register directly. Changes the m_live_state members
 	// shift_reg, and last_data_bit
-	void encode_raw(UINT16 word);
+	void encode_raw(uint16_t word);
 
 	// Encodes a byte in FM or MFM. Called by encode_byte.
-	UINT16 encode(UINT8 byte);
+	uint16_t encode(uint8_t byte);
 
 	// Encodes a byte in FM or MFM. Called by encode_byte.
-	UINT16 encode_hd(UINT8 byte);
-	UINT16 encode_a1_hd();
+	uint16_t encode_hd(uint8_t byte);
+	uint16_t encode_a1_hd();
 
 	// Encode the latest byte again
 	void encode_again();
@@ -294,7 +297,7 @@ protected:
 	bool write_one_bit(const attotime &limit);
 
 	// Writes to the current position on the track
-	void write_on_track(UINT16 raw, int count, int next_state);
+	void write_on_track(uint16_t raw, int count, int next_state);
 
 	// Skips bytes on the track
 	void skip_on_track(int count, int next_state);
@@ -315,8 +318,8 @@ protected:
 
 	typedef struct
 	{
-		UINT8 baseval;
-		UINT8 mask;
+		uint8_t baseval;
+		uint8_t mask;
 		cmdfunc command;
 	} cmddef;
 
@@ -378,6 +381,9 @@ protected:
 	// Read/write logical or physical?
 	bool m_logical;
 
+	// Shall bad sectors be bypassed or shall the command be terminated in error?
+	bool m_bypass;
+
 	// Signals to abort writing
 	bool m_stopwrite;
 
@@ -430,19 +436,28 @@ protected:
 	int current_cylinder();
 
 	// Delivers the current command
-	UINT8 current_command();
+	uint8_t current_command();
 
 	// Step time (minus pulse width)
-	int step_time();
+	virtual int step_time() =0;
 
 	// Step pulse width
 	int pulse_width();
 
-	// Sector size as read from the track
-	int calc_sector_size();
+	// Sector size as read from the track or given by register A (PC-AT mode)
+	int sector_size();
+
+	// Returns the sector header length
+	virtual int header_length() =0;
+
+	// Returns the index of the register for the header field
+	int register_number(int slot);
 
 	// Is the currently selected drive a floppy drive?
 	bool using_floppy();
+
+	// Was the Bad Sector flag set for the recently read sector header?
+	bool bad_sector();
 
 	// Common subprograms READ ID, VERIFY, and DATA TRANSFER
 	void read_id(int& cont, bool implied_seek, bool wait_seek_complete);
@@ -475,13 +490,21 @@ protected:
 class hdc9224_device : public hdc92x4_device
 {
 public:
-	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdc9224_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	int step_time() override;
+	int header_length() override;
 };
 
 class hdc9234_device : public hdc92x4_device
 {
 public:
-	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	hdc9234_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+
+protected:
+	int step_time() override;
+	int header_length() override;
 };
 
 #endif

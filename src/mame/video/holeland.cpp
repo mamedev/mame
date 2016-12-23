@@ -2,7 +2,7 @@
 // copyright-holders:Mathis Rosenhauer
 /***************************************************************************
 
-  video.c
+  holeland.cpp
 
   Functions to emulate the video hardware of the machine.
 
@@ -57,30 +57,36 @@ TILE_GET_INFO_MEMBER(holeland_state::crzrally_get_tile_info)
 
 VIDEO_START_MEMBER(holeland_state,holeland)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::holeland_get_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
 
 	m_bg_tilemap->set_transmask(0, 0xff, 0x00); /* split type 0 is totally transparent in front half */
 	m_bg_tilemap->set_transmask(1, 0x01, 0xfe); /* split type 1 has pen 0? transparent in front half */
+
+	save_item(NAME(m_po));
+	save_item(NAME(m_palette_offset));
 }
 
 VIDEO_START_MEMBER(holeland_state,crzrally)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(holeland_state::crzrally_get_tile_info),this), TILEMAP_SCAN_COLS, 8, 8, 32, 32);
+
+	save_item(NAME(m_po));
+	save_item(NAME(m_palette_offset));
 }
 
-WRITE8_MEMBER(holeland_state::holeland_videoram_w)
+WRITE8_MEMBER(holeland_state::videoram_w)
 {
 	m_videoram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_colorram_w)
+WRITE8_MEMBER(holeland_state::colorram_w)
 {
 	m_colorram[offset] = data;
 	m_bg_tilemap->mark_tile_dirty(offset);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_pal_offs_w)
+WRITE8_MEMBER(holeland_state::pal_offs_w)
 {
 	if ((data & 1) != m_po[offset])
 	{
@@ -90,12 +96,12 @@ WRITE8_MEMBER(holeland_state::holeland_pal_offs_w)
 	}
 }
 
-WRITE8_MEMBER(holeland_state::holeland_scroll_w)
+WRITE8_MEMBER(holeland_state::scroll_w)
 {
 	m_bg_tilemap->set_scrollx(0, data);
 }
 
-WRITE8_MEMBER(holeland_state::holeland_flipscreen_w)
+WRITE8_MEMBER(holeland_state::flipscreen_w)
 {
 	if (offset)
 		flip_screen_y_set(data);
@@ -106,7 +112,7 @@ WRITE8_MEMBER(holeland_state::holeland_flipscreen_w)
 
 void holeland_state::holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
@@ -145,7 +151,7 @@ void holeland_state::holeland_draw_sprites( bitmap_ind16 &bitmap, const rectangl
 
 void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle &cliprect )
 {
-	UINT8 *spriteram = m_spriteram;
+	uint8_t *spriteram = m_spriteram;
 	int offs, code, sx, sy, color, flipx, flipy;
 
 	/* Weird, sprites entries don't start on DWORD boundary */
@@ -181,7 +187,7 @@ void holeland_state::crzrally_draw_sprites( bitmap_ind16 &bitmap,const rectangle
 	}
 }
 
-UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
 	holeland_draw_sprites(bitmap, cliprect);
@@ -189,7 +195,7 @@ UINT32 holeland_state::screen_update_holeland(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 holeland_state::screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t holeland_state::screen_update_crzrally(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	crzrally_draw_sprites(bitmap, cliprect);

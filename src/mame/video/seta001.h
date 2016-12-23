@@ -1,9 +1,9 @@
 // license:BSD-3-Clause
 // copyright-holders:Luca Elia, David Haywood
 
-typedef device_delegate<int (UINT16 code, UINT8 color)> gfxbank_cb_delegate;
+typedef device_delegate<int (uint16_t code, uint8_t color)> gfxbank_cb_delegate;
 
-#define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(UINT16 code, UINT8 color)
+#define SETA001_SPRITE_GFXBANK_CB_MEMBER(_name) int _name(uint16_t code, uint8_t color)
 
 #define MCFG_SETA001_SPRITE_GFXBANK_CB(_class, _method) \
 	seta001_device::set_gfxbank_callback(*device, gfxbank_cb_delegate(&_class::_method, #_class "::" #_method, downcast<_class *>(owner)));
@@ -11,11 +11,10 @@ typedef device_delegate<int (UINT16 code, UINT8 color)> gfxbank_cb_delegate;
 class seta001_device : public device_t
 {
 public:
-	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	seta001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void static_set_gfxdecode_tag(device_t &device, const char *tag);
-	static void static_set_palette_tag(device_t &device, const char *tag);
 	static void set_gfxbank_callback(device_t &device, gfxbank_cb_delegate callback) { downcast<seta001_device &>(device).m_gfxbank_cb = callback; }
 
 	DECLARE_WRITE8_MEMBER( spritebgflag_w8 );
@@ -63,7 +62,6 @@ private:
 	void draw_background( bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size, int setac_type);
 	void draw_foreground( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int bank_size);
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 
 	gfxbank_cb_delegate m_gfxbank_cb;
 
@@ -77,17 +75,14 @@ private:
 	int m_transpen;
 
 	// live state
-	UINT8 m_bgflag;
-	UINT8 m_spritectrl[4];
-	UINT8 m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
-	UINT8 m_spritecodelow[0x2000]; // tnzs.c stuff only uses half?
-	UINT8 m_spritecodehigh[0x2000]; // ^
+	uint8_t m_bgflag;
+	uint8_t m_spritectrl[4];
+	uint8_t m_spriteylow[0x300]; // 0x200 low y + 0x100 bg stuff
+	uint8_t m_spritecodelow[0x2000]; // tnzs.c stuff only uses half?
+	uint8_t m_spritecodehigh[0x2000]; // ^
 };
 
 extern const device_type SETA001_SPRITE;
 
 #define MCFG_SETA001_SPRITE_GFXDECODE(_gfxtag) \
 	seta001_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_SETA001_SPRITE_PALETTE(_palette_tag) \
-	seta001_device::static_set_palette_tag(*device, "^" _palette_tag);

@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Quench, Stephh
+// copyright-holders:Quench, Stephane Humbert
 /*******************************************************************************
 
     Input port macros used by many games in multiple Toaplan drivers

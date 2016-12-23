@@ -21,7 +21,7 @@
 
 READ8_MEMBER(b2m_state::b2m_keyboard_r)
 {
-	UINT8 key = 0x00;
+	uint8_t key = 0x00;
 	if (offset < 0x100) {
 		if ((offset & 0x01)!=0) { key |= ioport("LINE0")->read(); }
 		if ((offset & 0x02)!=0) { key |= ioport("LINE1")->read(); }
@@ -42,9 +42,9 @@ READ8_MEMBER(b2m_state::b2m_keyboard_r)
 
 void b2m_state::b2m_set_bank(int bank)
 {
-	UINT8 *rom;
+	uint8_t *rom;
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	space.install_write_bank(0x0000, 0x27ff, "bank1");
 	space.install_write_bank(0x2800, 0x2fff, "bank2");
@@ -179,8 +179,8 @@ WRITE_LINE_MEMBER( b2m_state::b2m_fdc_drq )
 
 WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 {
-	UINT8 drive = ((data >> 1) & 1) ^ 1;
-	UINT8 side  = (data  & 1) ^ 1;
+	uint8_t drive = ((data >> 1) & 1) ^ 1;
+	uint8_t side  = (data  & 1) ^ 1;
 
 	static const char *names[] = { "fd0", "fd1"};
 	floppy_image_device *floppy = nullptr;
@@ -210,7 +210,7 @@ WRITE8_MEMBER(b2m_state::b2m_ext_8255_portc_w)
 
 READ8_MEMBER(b2m_state::b2m_romdisk_porta_r)
 {
-	UINT8 *romdisk = memregion("maincpu")->base() + 0x12000;
+	uint8_t *romdisk = memregion("maincpu")->base() + 0x12000;
 	return romdisk[m_b2m_romdisk_msb*256+m_b2m_romdisk_lsb];
 }
 
@@ -232,11 +232,11 @@ DRIVER_INIT_MEMBER(b2m_state,b2m)
 
 WRITE8_MEMBER(b2m_state::b2m_palette_w)
 {
-	UINT8 b = (3 - ((data >> 6) & 3)) * 0x55;
-	UINT8 g = (3 - ((data >> 4) & 3)) * 0x55;
-	UINT8 r = (3 - ((data >> 2) & 3)) * 0x55;
+	uint8_t b = (3 - ((data >> 6) & 3)) * 0x55;
+	uint8_t g = (3 - ((data >> 4) & 3)) * 0x55;
+	uint8_t r = (3 - ((data >> 2) & 3)) * 0x55;
 
-	UINT8 bw = (3 - (data & 3)) * 0x55;
+	uint8_t bw = (3 - (data & 3)) * 0x55;
 
 	m_b2m_color[offset & 3] = data;
 

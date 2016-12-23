@@ -78,7 +78,7 @@ machine_config_constructor p1_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *p1_fdc_device::device_rom_region() const
+const tiny_rom_entry *p1_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( p1_fdc );
 }
@@ -88,14 +88,14 @@ const rom_entry *p1_fdc_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-UINT8 p1_fdc_device::p1_wd17xx_motor_r()
+uint8_t p1_fdc_device::p1_wd17xx_motor_r()
 {
 	DBG_LOG(1,"p1_fdc_motor_r",("R = $%02x\n", 0));
 	// XXX always on for now
 	return 0;
 }
 
-UINT8 p1_fdc_device::p1_wd17xx_aux_r()
+uint8_t p1_fdc_device::p1_wd17xx_aux_r()
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -148,7 +148,7 @@ WRITE_LINE_MEMBER( p1_fdc_device::p1_fdc_irq_drq )
 
 READ8_MEMBER( p1_fdc_device::p1_fdc_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch( offset )
 	{
@@ -171,7 +171,7 @@ WRITE8_MEMBER( p1_fdc_device::p1_fdc_w )
 //  p1_fdc_device - constructor
 //-------------------------------------------------
 
-p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, P1_FDC, "Poisk-1 floppy B504", tag, owner, clock, "p1_fdc", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_fdc(*this, "fdc")
@@ -186,11 +186,11 @@ p1_fdc_device::p1_fdc_device(const machine_config &mconfig, const char *tag, dev
 void p1_fdc_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_rom(this, 0xe0000, 0xe07ff, 0, 0, "XXX", "p1_fdc");
-	m_isa->install_device(0x00c0, 0x00c3, 0, 0,
+	m_isa->install_rom(this, 0xe0000, 0xe07ff, "XXX", "p1_fdc");
+	m_isa->install_device(0x00c0, 0x00c3,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(0x00c4, 0x00c7, 0, 0, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
+	m_isa->install_device(0x00c4, 0x00c7, read8_delegate( FUNC(p1_fdc_device::p1_fdc_r), this ), write8_delegate( FUNC(p1_fdc_device::p1_fdc_w), this ) );
 }
 
 

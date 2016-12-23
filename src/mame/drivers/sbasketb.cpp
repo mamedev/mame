@@ -41,14 +41,16 @@ CPU/Video Board Parts:
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6809/m6809.h"
-#include "sound/dac.h"
-#include "machine/konami1.h"
+#include "includes/sbasketb.h"
 #include "includes/konamipt.h"
 #include "audio/trackfld.h"
-#include "includes/sbasketb.h"
-
+#include "cpu/m6809/m6809.h"
+#include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/konami1.h"
+#include "machine/watchdog.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 
 WRITE8_MEMBER(sbasketb_state::sbasketb_sh_irqtrigger_w)
 {
@@ -71,14 +73,14 @@ static ADDRESS_MAP_START( sbasketb_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
-	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
 	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_SHARE("palettebank")
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(irq_mask_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
 	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_SHARE("spriteramsel")
-	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x3d00, 0x3d00) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x3e01, 0x3e01) AM_READ_PORT("P1")
@@ -93,11 +95,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sbasketb_sound_map, AS_PROGRAM, 8, sbasketb_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("trackfld_audio", trackfld_audio_device, hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("vlm", vlm5030_device, data_w) /* speech data */
-	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)     /* speech and output controll */
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("trackfld_audio", trackfld_audio_device, hyperspt_sound_w)     /* speech and output control */
+	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_w)      /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END
@@ -191,6 +193,8 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4) /* 3.5795 MHz */
 	MCFG_CPU_PROGRAM_MAP(sbasketb_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -206,18 +210,21 @@ static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 	MCFG_PALETTE_INIT_OWNER(sbasketb_state, sbasketb)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_SOUND_ADD("snsnd", SN76489, XTAL_14_31818MHz / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED(sbasketbu, sbasketb)

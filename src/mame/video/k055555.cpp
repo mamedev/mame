@@ -69,7 +69,7 @@ Lots of byte-wise registers.  A partial map:
 /* K055555 5-bit-per-pixel priority encoder */
 /* This device has 48 8-bit-wide registers */
 
-void k055555_device::K055555_write_reg(UINT8 regnum, UINT8 regdat)
+void k055555_device::K055555_write_reg(uint8_t regnum, uint8_t regdat)
 {
 	static const char *const rnames[46] =
 	{
@@ -91,7 +91,7 @@ void k055555_device::K055555_write_reg(UINT8 regnum, UINT8 regdat)
 
 WRITE32_MEMBER( k055555_device::K055555_long_w )
 {
-	UINT8 regnum, regdat;
+	uint8_t regnum, regdat;
 
 	// le2 accesses this area with a dword write ...
 	if (ACCESSING_BITS_24_31)
@@ -142,7 +142,7 @@ int k055555_device::K055555_get_palette_index(int idx)
 
 const device_type K055555 = &device_creator<k055555_device>;
 
-k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k055555_device::k055555_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K055555, "K055555 Priority Encoder", tag, owner, clock, "k055555", __FILE__)
 {
 }
@@ -173,5 +173,5 @@ void k055555_device::device_start()
 
 void k055555_device::device_reset()
 {
-	memset(m_regs, 0, 64 * sizeof(UINT8));
+	memset(m_regs, 0, 64 * sizeof(uint8_t));
 }

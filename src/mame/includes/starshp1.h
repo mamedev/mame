@@ -8,14 +8,14 @@
  *    * there are two HBLANK/HSYNC periods as the horizontal
  *      chain is drawn, which would give an alternating long
  *      line followed by a much shorter one.  This cannot be right
- *    * the carry-out/load circuit on LS161@J8 is superflous
+ *    * the carry-out/load circuit on LS161@J8 is superfluous
  *
  *  These values also give a frame rate of about 45Hz, which is
  *  probably too low.  I suspect that screen is not really
  *  512 pixels wide -- most likely 384, which would give 60Hz
  *
  *  Some of the graphics, like the starfield, is clocked with the
- *  12MHz signal, effecitvely doubling the horizontal resolution
+ *  12MHz signal, effectively doubling the horizontal resolution
  */
 
 #include "sound/discrete.h"
@@ -49,10 +49,10 @@ public:
 
 	int m_analog_in_select;
 	int m_attract;
-	required_shared_ptr<UINT8> m_playfield_ram;
-	required_shared_ptr<UINT8> m_hpos_ram;
-	required_shared_ptr<UINT8> m_vpos_ram;
-	required_shared_ptr<UINT8> m_obj_ram;
+	required_shared_ptr<uint8_t> m_playfield_ram;
+	required_shared_ptr<uint8_t> m_hpos_ram;
+	required_shared_ptr<uint8_t> m_vpos_ram;
+	required_shared_ptr<uint8_t> m_obj_ram;
 	int m_ship_explode;
 	int m_ship_picture;
 	int m_ship_hoffset;
@@ -68,7 +68,7 @@ public:
 	int m_starfield_kill;
 	int m_mux;
 	int m_inverse;
-	std::unique_ptr<UINT16[]> m_LSFR;
+	std::unique_ptr<uint16_t[]> m_LSFR;
 	bitmap_ind16 m_helper;
 	tilemap_t *m_bg_tilemap;
 	DECLARE_WRITE8_MEMBER(starshp1_collision_reset_w);
@@ -85,7 +85,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(starshp1);
-	UINT32 screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_starshp1(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_starshp1(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(starshp1_interrupt);
 	void set_pens();

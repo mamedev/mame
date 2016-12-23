@@ -286,192 +286,192 @@
 
 struct s3c44b0_memcon_regs_t
 {
-	UINT32 data[0x34/4];
+	uint32_t data[0x34/4];
 };
 
 struct s3c44b0_irq_regs_t
 {
-	UINT32 intcon;
-	UINT32 intpnd;
-	UINT32 intmod;
-	UINT32 intmsk;
-	UINT32 i_pslv;
-	UINT32 i_pmst;
-	UINT32 i_cslv;
-	UINT32 i_cmst;
-	UINT32 i_ispr;
-	UINT32 i_ispc;
-	UINT32 reserved[4];
-	UINT32 f_ispr;
-	UINT32 f_ispc;
+	uint32_t intcon;
+	uint32_t intpnd;
+	uint32_t intmod;
+	uint32_t intmsk;
+	uint32_t i_pslv;
+	uint32_t i_pmst;
+	uint32_t i_cslv;
+	uint32_t i_cmst;
+	uint32_t i_ispr;
+	uint32_t i_ispc;
+	uint32_t reserved[4];
+	uint32_t f_ispr;
+	uint32_t f_ispc;
 };
 
 struct s3c44b0_dma_regs_t
 {
-	UINT32 dcon;
-	UINT32 disrc;
-	UINT32 didst;
-	UINT32 dicnt;
-	UINT32 dcsrc;
-	UINT32 dcdst;
-	UINT32 dccnt;
+	uint32_t dcon;
+	uint32_t disrc;
+	uint32_t didst;
+	uint32_t dicnt;
+	uint32_t dcsrc;
+	uint32_t dcdst;
+	uint32_t dccnt;
 };
 
 struct s3c44b0_clkpow_regs_t
 {
-	UINT32 pllcon;
-	UINT32 clkcon;
-	UINT32 clkslow;
-	UINT32 locktime;
+	uint32_t pllcon;
+	uint32_t clkcon;
+	uint32_t clkslow;
+	uint32_t locktime;
 };
 
 struct s3c44b0_lcd_regs_t
 {
-	UINT32 lcdcon1;
-	UINT32 lcdcon2;
-	UINT32 lcdsaddr1;
-	UINT32 lcdsaddr2;
-	UINT32 lcdsaddr3;
-	UINT32 redlut;
-	UINT32 greenlut;
-	UINT32 bluelut;
-	UINT32 reserved[8];
-	UINT32 lcdcon3;
-	UINT32 dithmode;
+	uint32_t lcdcon1;
+	uint32_t lcdcon2;
+	uint32_t lcdsaddr1;
+	uint32_t lcdsaddr2;
+	uint32_t lcdsaddr3;
+	uint32_t redlut;
+	uint32_t greenlut;
+	uint32_t bluelut;
+	uint32_t reserved[8];
+	uint32_t lcdcon3;
+	uint32_t dithmode;
 };
 
 struct s3c44b0_uart_regs_t
 {
-	UINT32 ulcon;
-	UINT32 ucon;
-	UINT32 ufcon;
-	UINT32 umcon;
-	UINT32 utrstat;
-	UINT32 uerstat;
-	UINT32 ufstat;
-	UINT32 umstat;
-	UINT32 utxh;
-	UINT32 urxh;
-	UINT32 ubrdiv;
+	uint32_t ulcon;
+	uint32_t ucon;
+	uint32_t ufcon;
+	uint32_t umcon;
+	uint32_t utrstat;
+	uint32_t uerstat;
+	uint32_t ufstat;
+	uint32_t umstat;
+	uint32_t utxh;
+	uint32_t urxh;
+	uint32_t ubrdiv;
 };
 
 struct s3c44b0_sio_regs_t
 {
-	UINT32 siocon;
-	UINT32 siodat;
-	UINT32 sbrdr;
-	UINT32 itvcnt;
-	UINT32 dcntz;
+	uint32_t siocon;
+	uint32_t siodat;
+	uint32_t sbrdr;
+	uint32_t itvcnt;
+	uint32_t dcntz;
 };
 
 struct s3c44b0_pwm_regs_t
 {
-	UINT32 tcfg0;
-	UINT32 tcfg1;
-	UINT32 tcon;
-	UINT32 tcntb0;
-	UINT32 tcmpb0;
-	UINT32 tcnto0;
-	UINT32 tcntb1;
-	UINT32 tcmpb1;
-	UINT32 tcnto1;
-	UINT32 tcntb2;
-	UINT32 tcmpb2;
-	UINT32 tcnto2;
-	UINT32 tcntb3;
-	UINT32 tcmpb3;
-	UINT32 tcnto3;
-	UINT32 tcntb4;
-	UINT32 tcmpb4;
-	UINT32 tcnto4;
-	UINT32 tcntb5;
-	UINT32 tcnto5;
+	uint32_t tcfg0;
+	uint32_t tcfg1;
+	uint32_t tcon;
+	uint32_t tcntb0;
+	uint32_t tcmpb0;
+	uint32_t tcnto0;
+	uint32_t tcntb1;
+	uint32_t tcmpb1;
+	uint32_t tcnto1;
+	uint32_t tcntb2;
+	uint32_t tcmpb2;
+	uint32_t tcnto2;
+	uint32_t tcntb3;
+	uint32_t tcmpb3;
+	uint32_t tcnto3;
+	uint32_t tcntb4;
+	uint32_t tcmpb4;
+	uint32_t tcnto4;
+	uint32_t tcntb5;
+	uint32_t tcnto5;
 };
 
 struct s3c44b0_wdt_regs_t
 {
-	UINT32 wtcon;
-	UINT32 wtdat;
-	UINT32 wtcnt;
+	uint32_t wtcon;
+	uint32_t wtdat;
+	uint32_t wtcnt;
 };
 
 struct s3c44b0_iic_regs_t
 {
-	UINT32 iiccon;
-	UINT32 iicstat;
-	UINT32 iicadd;
-	UINT32 iicds;
+	uint32_t iiccon;
+	uint32_t iicstat;
+	uint32_t iicadd;
+	uint32_t iicds;
 };
 
 struct s3c44b0_iis_regs_t
 {
-	UINT32 iiscon;
-	UINT32 iismod;
-	UINT32 iispsr;
-	UINT32 iisfcon;
-	UINT32 iisfifo;
+	uint32_t iiscon;
+	uint32_t iismod;
+	uint32_t iispsr;
+	uint32_t iisfcon;
+	uint32_t iisfifo;
 };
 
 struct s3c44b0_gpio_regs_t
 {
-	UINT32 gpacon;
-	UINT32 gpadat;
-	UINT32 gpbcon;
-	UINT32 gpbdat;
-	UINT32 gpccon;
-	UINT32 gpcdat;
-	UINT32 gpcup;
-	UINT32 gpdcon;
-	UINT32 gpddat;
-	UINT32 gpdup;
-	UINT32 gpecon;
-	UINT32 gpedat;
-	UINT32 gpeup;
-	UINT32 gpfcon;
-	UINT32 gpfdat;
-	UINT32 gpfup;
-	UINT32 gpgcon;
-	UINT32 gpgdat;
-	UINT32 gpgup;
-	UINT32 spucr;
-	UINT32 extint;
-	UINT32 extintpnd;
+	uint32_t gpacon;
+	uint32_t gpadat;
+	uint32_t gpbcon;
+	uint32_t gpbdat;
+	uint32_t gpccon;
+	uint32_t gpcdat;
+	uint32_t gpcup;
+	uint32_t gpdcon;
+	uint32_t gpddat;
+	uint32_t gpdup;
+	uint32_t gpecon;
+	uint32_t gpedat;
+	uint32_t gpeup;
+	uint32_t gpfcon;
+	uint32_t gpfdat;
+	uint32_t gpfup;
+	uint32_t gpgcon;
+	uint32_t gpgdat;
+	uint32_t gpgup;
+	uint32_t spucr;
+	uint32_t extint;
+	uint32_t extintpnd;
 };
 
 struct s3c44b0_rtc_regs_t
 {
-	UINT32 rtccon;
-	UINT32 reserved[3];
-	UINT32 rtcalm;
-	UINT32 almsec;
-	UINT32 almmin;
-	UINT32 almhour;
-	UINT32 almday;
-	UINT32 almmon;
-	UINT32 almyear;
-	UINT32 rtcrst;
-	UINT32 bcdsec;
-	UINT32 bcdmin;
-	UINT32 bcdhour;
-	UINT32 bcdday;
-	UINT32 bcddow;
-	UINT32 bcdmon;
-	UINT32 bcdyear;
-	UINT32 ticnt;
+	uint32_t rtccon;
+	uint32_t reserved[3];
+	uint32_t rtcalm;
+	uint32_t almsec;
+	uint32_t almmin;
+	uint32_t almhour;
+	uint32_t almday;
+	uint32_t almmon;
+	uint32_t almyear;
+	uint32_t rtcrst;
+	uint32_t bcdsec;
+	uint32_t bcdmin;
+	uint32_t bcdhour;
+	uint32_t bcdday;
+	uint32_t bcddow;
+	uint32_t bcdmon;
+	uint32_t bcdyear;
+	uint32_t ticnt;
 };
 
 struct s3c44b0_adc_regs_t
 {
-	UINT32 adccon;
-	UINT32 adcpsr;
-	UINT32 adcdat;
+	uint32_t adccon;
+	uint32_t adcpsr;
+	uint32_t adcdat;
 };
 
 struct s3c44b0_cpuwrap_regs_t
 {
-	UINT32 syscfg;
-	UINT32 ncachbe0;
-	UINT32 ncachbe1;
+	uint32_t syscfg;
+	uint32_t ncachbe0;
+	uint32_t ncachbe1;
 };
 
 struct s3c44b0_memcon_t
@@ -505,17 +505,17 @@ struct s3c44b0_lcd_t
 {
 	s3c44b0_lcd_regs_t regs;
 	emu_timer *timer;
-	std::unique_ptr<UINT8[]> bitmap;
-	UINT32 vramaddr_cur;
-	UINT32 vramaddr_max;
-	UINT32 offsize;
-	UINT32 pagewidth_cur;
-	UINT32 pagewidth_max;
-	UINT32 modesel;
-	UINT32 bswp;
+	std::unique_ptr<uint8_t[]> bitmap;
+	uint32_t vramaddr_cur;
+	uint32_t vramaddr_max;
+	uint32_t offsize;
+	uint32_t pagewidth_cur;
+	uint32_t pagewidth_max;
+	uint32_t modesel;
+	uint32_t bswp;
 	int vpos, hpos;
 	double framerate;
-	UINT32 hpos_min, hpos_max, hpos_end, vpos_min, vpos_max, vpos_end;
+	uint32_t hpos_min, hpos_max, hpos_end, vpos_min, vpos_max, vpos_end;
 	attotime frame_time;
 	attoseconds_t frame_period, pixeltime, scantime;
 };
@@ -536,9 +536,9 @@ struct s3c44b0_pwm_t
 {
 	s3c44b0_pwm_regs_t regs;
 	emu_timer *timer[6];
-	UINT32 cnt[6];
-	UINT32 cmp[6];
-	UINT32 freq[6];
+	uint32_t cnt[6];
+	uint32_t cmp[6];
+	uint32_t freq[6];
 };
 
 struct s3c44b0_wdt_t
@@ -558,7 +558,7 @@ struct s3c44b0_iis_t
 {
 	s3c44b0_iis_regs_t regs;
 	emu_timer *timer;
-	UINT16 fifo[16/2];
+	uint16_t fifo[16/2];
 	int fifo_index;
 };
 
@@ -600,7 +600,7 @@ enum
 class s3c44b0_device : public device_t
 {
 public:
-	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s3c44b0_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s3c44b0_device() {}
 
 	template<class _Object> static devcb_base &set_gpio_port_r_callback(device_t &device, _Object object) { return downcast<s3c44b0_device &>(device).m_port_r_cb.set_callback(object); }
@@ -647,8 +647,8 @@ public:
 	DECLARE_WRITE32_MEMBER(bdma_0_w);
 	DECLARE_WRITE32_MEMBER(bdma_1_w);
 
-	void request_eint(UINT32 number);
-	UINT32 video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	void request_eint(uint32_t number);
+	uint32_t video_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -658,13 +658,13 @@ protected:
 private:
 	// internal state
 	// LCD Controller
-	rgb_t lcd_get_color_stn_04(UINT8 data);
-	UINT8 lcd_get_color_stn_08_r(UINT8 data);
-	UINT8 lcd_get_color_stn_08_g(UINT8 data);
-	UINT8 lcd_get_color_stn_08_b(UINT8 data);
+	rgb_t lcd_get_color_stn_04(uint8_t data);
+	uint8_t lcd_get_color_stn_08_r(uint8_t data);
+	uint8_t lcd_get_color_stn_08_g(uint8_t data);
+	uint8_t lcd_get_color_stn_08_b(uint8_t data);
 	void lcd_dma_reload();
 	void lcd_dma_init();
-	void lcd_dma_read(int count, UINT8 *data);
+	void lcd_dma_read(int count, uint8_t *data);
 	void lcd_render_stn_04();
 	void lcd_render_stn_08();
 	attotime time_until_pos(int vpos, int hpos);
@@ -678,15 +678,15 @@ private:
 	TIMER_CALLBACK_MEMBER(lcd_timer_exp);
 
 	// Clock & Power Management
-	UINT32 get_mclk();
+	uint32_t get_mclk();
 
 	// Interrupt Controller
 	void check_pending_irq();
-	void request_irq(UINT32 int_type);
+	void request_irq(uint32_t int_type);
 	void check_pending_eint();
 
 	// PWM Timer
-	UINT16 pwm_calc_observation(int ch);
+	uint16_t pwm_calc_observation(int ch);
 	void pwm_start(int timer);
 	void pwm_stop(int timer);
 	void pwm_recalc(int timer);
@@ -699,25 +699,25 @@ private:
 	inline int iface_i2c_sda_r();
 	void i2c_send_start();
 	void i2c_send_stop();
-	UINT8 i2c_receive_byte(int ack);
-	int i2c_send_byte(UINT8 data);
+	uint8_t i2c_receive_byte(int ack);
+	int i2c_send_byte(uint8_t data);
 	void iic_start();
 	void iic_stop();
 	void iic_resume();
 	TIMER_CALLBACK_MEMBER(iic_timer_exp);
 
 	// I/O Port
-	inline UINT32 iface_gpio_port_r(int port);
-	inline void iface_gpio_port_w(int port, UINT32 data);
+	inline uint32_t iface_gpio_port_r(int port);
+	inline void iface_gpio_port_w(int port, uint32_t data);
 
 	// UART
-	UINT32 uart_r(int ch, UINT32 offset);
-	void uart_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
-	void uart_fifo_w(int uart, UINT8 data);
+	uint32_t uart_r(int ch, uint32_t offset);
+	void uart_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
+	void uart_fifo_w(int uart, uint8_t data);
 	TIMER_CALLBACK_MEMBER(uart_timer_exp);
 
 	// Watchdog Timer
-	UINT16 wdt_calc_current_count();
+	uint16_t wdt_calc_current_count();
 	void wdt_start();
 	void wdt_stop();
 	void wdt_recalc();
@@ -736,7 +736,7 @@ private:
 	TIMER_CALLBACK_MEMBER(sio_timer_exp);
 
 	// IIS
-	inline void iface_i2s_data_w(address_space &space, int ch, UINT16 data);
+	inline void iface_i2s_data_w(address_space &space, int ch, uint16_t data);
 	void iis_start();
 	void iis_stop();
 	TIMER_CALLBACK_MEMBER(iis_timer_exp);
@@ -744,17 +744,17 @@ private:
 	// ZDMA
 	void zdma_trigger(int ch);
 	void zdma_start(int ch);
-	UINT32 zdma_r(int ch, UINT32 offset);
-	void zdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	uint32_t zdma_r(int ch, uint32_t offset);
+	void zdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	TIMER_CALLBACK_MEMBER(zdma_timer_exp);
 
 	// BDMA
 	void bdma_trigger(int ch);
 	void bdma_request_iis();
-	UINT32 bdma_r(int ch, UINT32 offset);
+	uint32_t bdma_r(int ch, uint32_t offset);
 	void bdma_start(int ch);
 	void bdma_stop(int ch);
-	void bdma_w(int ch, UINT32 offset, UINT32 data, UINT32 mem_mask);
+	void bdma_w(int ch, uint32_t offset, uint32_t data, uint32_t mem_mask);
 	TIMER_CALLBACK_MEMBER(bdma_timer_exp);
 
 	cpu_device *m_cpu;

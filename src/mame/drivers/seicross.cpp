@@ -45,16 +45,16 @@ This info came from http://www.ne.jp/asahi/cc-sakura/akkun/old/fryski.html
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "cpu/m6800/m6800.h"
-#include "sound/ay8910.h"
-#include "sound/dac.h"
 #include "includes/seicross.h"
-
+#include "cpu/m6800/m6800.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/ay8910.h"
+#include "sound/volt_reg.h"
 
 void seicross_state::nvram_init(nvram_device &nvram, void *data, size_t size)
 {
-	static const UINT8 init[32] = {
+	static const uint8_t init[32] = {
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1,
 		0, 1, 0, 1, 0, 1, 0, 3, 0, 1, 0, 0, 0, 0, 0, 0, };
 
@@ -78,7 +78,7 @@ void seicross_state::machine_reset()
 
 READ8_MEMBER(seicross_state::portB_r)
 {
-	return (m_portb & 0x9f) | (read_safe(ioport("DEBUG"), 0) & 0x60);
+	return (m_portb & 0x9f) | (m_debug_port.read_safe(0) & 0x60);
 }
 
 WRITE8_MEMBER(seicross_state::portB_w)
@@ -101,6 +101,10 @@ WRITE8_MEMBER(seicross_state::portB_w)
 	m_portb = data;
 }
 
+WRITE8_MEMBER(seicross_state::dac_w)
+{
+	m_dac->write(data >> 4);
+}
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x77ff) AM_ROM
@@ -113,7 +117,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")        /* IN0 */
 	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("IN1")        /* IN1 */
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("TEST")       /* test */
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, AS_IO, 8, seicross_state )
@@ -126,7 +130,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mcu_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x1000, 0x10ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -136,7 +140,7 @@ static ADDRESS_MAP_START( mcu_no_nvram_map, AS_PROGRAM, 8, seicross_state )
 	AM_RANGE(0x1003, 0x1003) AM_READ_PORT("DSW1")       /* DSW1 */
 	AM_RANGE(0x1005, 0x1005) AM_READ_PORT("DSW2")       /* DSW2 */
 	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("DSW3")       /* DSW3 */
-	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(dac_w)
 	AM_RANGE(0x8000, 0xf7ff) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
@@ -396,6 +400,8 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(1200))  /* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -410,15 +416,16 @@ static MACHINE_CONFIG_START( no_nvram, seicross_state )
 	MCFG_PALETTE_INIT_OWNER(seicross_state, seicross)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
 	MCFG_AY8910_PORT_B_READ_CB(READ8(seicross_state, portB_r))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(seicross_state, portB_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.12) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -587,7 +594,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(seicross_state,friskytb)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	// this code is in ROM 6.3h, maps to MCU at dxxx
 	for (int i = 0; i < 0x7800; i++)
 	{

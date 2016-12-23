@@ -56,7 +56,7 @@ const device_type CDP1864 = &device_creator<cdp1864_device>;
 //  cdp1864_device - constructor
 //-------------------------------------------------
 
-cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdp1864_device::cdp1864_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, CDP1864, "CDP1864", tag, owner, clock, "cdp1864", __FILE__),
 		device_sound_interface(mconfig, *this),
 		device_video_interface(mconfig, *this),
@@ -241,7 +241,7 @@ void cdp1864_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 	// reset the output stream
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 
-	INT16 signal = m_signal;
+	int16_t signal = m_signal;
 	stream_sample_t *buffer = outputs[0];
 
 	memset( buffer, 0, samples * sizeof(*buffer) );
@@ -405,7 +405,7 @@ WRITE_LINE_MEMBER( cdp1864_device::evs_w )
 //  update_screen -
 //-------------------------------------------------
 
-UINT32 cdp1864_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdp1864_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (m_disp)
 	{
@@ -414,7 +414,7 @@ UINT32 cdp1864_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 	}
 	else
 	{
-		bitmap.fill(rgb_t::black, cliprect);
+		bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	return 0;
@@ -447,7 +447,7 @@ void cdp1864_device::initialize_palette()
 	for (int i = 0; i < 8; i++)
 	{
 		// foreground colors
-		UINT8 r = 0, g = 0, b = 0;
+		uint8_t r = 0, g = 0, b = 0;
 
 		if (m_chr_r != RES_INF) r = combine_1_weights(color_weights_r, BIT(i, 0));
 		if (m_chr_b != RES_INF) b = combine_1_weights(color_weights_b, BIT(i, 1));

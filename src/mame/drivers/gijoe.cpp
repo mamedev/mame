@@ -142,7 +142,7 @@ WRITE16_MEMBER(gijoe_state::control2_w)
 
 void gijoe_state::gijoe_objdma(  )
 {
-	UINT16 *src_head, *src_tail, *dst_head, *dst_tail;
+	uint16_t *src_head, *src_tail, *dst_head, *dst_tail;
 
 	src_head = m_spriteram;
 	src_tail = m_spriteram + 255 * 8;
@@ -194,7 +194,7 @@ WRITE16_MEMBER(gijoe_state::sound_cmd_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 	}
 }
 
@@ -205,7 +205,7 @@ WRITE16_MEMBER(gijoe_state::sound_irq_w)
 
 READ16_MEMBER(gijoe_state::sound_status_r)
 {
-	return soundlatch2_byte_r(space, 0);
+	return m_soundlatch2->read(space, 0);
 }
 
 static ADDRESS_MAP_START( gijoe_map, AS_PROGRAM, 16, gijoe_state )
@@ -242,8 +242,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, gijoe_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xfa2f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_byte_w)
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+	AM_RANGE(0xfc02, 0xfc02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -273,21 +273,21 @@ static INPUT_PORTS_START( gijoe )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW,  IPT_SERVICE4 )
 
 	PORT_START("P1_P2")
-	KONAMI16_LSB_40(1, IPT_BUTTON3 )
+	KONAMI16_LSB_40(1, IPT_BUTTON3 ) PORT_OPTIONAL
 	PORT_DIPNAME( 0x0080, 0x0000, "Sound" )         PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x0080, DEF_STR( Mono ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Stereo ) )
-	KONAMI16_MSB_40(2, IPT_BUTTON3 )
+	KONAMI16_MSB_40(2, IPT_BUTTON3 ) PORT_OPTIONAL
 	PORT_DIPNAME( 0x8000, 0x8000, "Coin mechanism" )    PORT_DIPLOCATION("SW1:2")
 	PORT_DIPSETTING(      0x8000, "Common" )
 	PORT_DIPSETTING(      0x0000, "Independent" )
 
 	PORT_START("P3_P4")
-	KONAMI16_LSB_40(3, IPT_BUTTON3 )
+	KONAMI16_LSB_40(3, IPT_BUTTON3 ) PORT_OPTIONAL
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Players ) )  PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(      0x0080, "2" )
 	PORT_DIPSETTING(      0x0000, "4" )
-	KONAMI16_MSB_40(4, IPT_BUTTON3 )
+	KONAMI16_MSB_40(4, IPT_BUTTON3 ) PORT_OPTIONAL
 	PORT_DIPUNUSED_DIPLOC( 0x8000, 0x8000, "SW1:4" )    /* Listed as "Unused" */
 INPUT_PORTS_END
 
@@ -329,24 +329,23 @@ static MACHINE_CONFIG_START( gijoe, gijoe_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 	MCFG_PALETTE_ENABLE_SHADOWS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(gijoe_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(gijoe_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -37, 20)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -37, 20)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_DEVICE_ADD("k054539", K054539, XTAL_18_432MHz)
 	MCFG_K054539_TIMER_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

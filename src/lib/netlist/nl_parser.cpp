@@ -15,7 +15,7 @@ namespace netlist
 // A netlist parser
 // ----------------------------------------------------------------------------------------
 
-ATTR_COLD void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
+void parser_t::verror(const pstring &msg, int line_num, const pstring &line)
 {
 	m_setup.log().fatal("line {1}: error: {2}\n\t\t{3}\n", line_num,
 			msg, line);
@@ -45,6 +45,7 @@ bool parser_t::parse(const pstring nlname)
 	m_tok_NET_C = register_token("NET_C");
 	m_tok_FRONTIER = register_token("OPTIMIZE_FRONTIER");
 	m_tok_PARAM = register_token("PARAM");
+	m_tok_HINT = register_token("HINT");
 	m_tok_NET_MODEL = register_token("NET_MODEL");
 	m_tok_INCLUDE = register_token("INCLUDE");
 	m_tok_LOCAL_SOURCE = register_token("LOCAL_SOURCE");
@@ -120,6 +121,8 @@ void parser_t::parse_netlist(ATTR_UNUSED const pstring &nlname)
 			frontier();
 		else if (token.is(m_tok_PARAM))
 			netdev_param();
+		else if (token.is(m_tok_HINT))
+			netdev_hint();
 		else if (token.is(m_tok_NET_MODEL))
 			net_model();
 		else if (token.is(m_tok_SUBMODEL))
@@ -149,17 +152,20 @@ void parser_t::net_truthtable_start()
 {
 	pstring name = get_identifier();
 	require_token(m_tok_comma);
-	unsigned ni = get_number_long();
+	long ni = get_number_long();
 	require_token(m_tok_comma);
-	unsigned no = get_number_long();
-	require_token(m_tok_comma);
-	unsigned hs = get_number_long();
+	long no = get_number_long();
 	require_token(m_tok_comma);
 	pstring def_param = get_string();
 	require_token(m_tok_param_right);
 
-	netlist::devices::netlist_base_factory_truthtable_t *ttd = netlist::devices::nl_tt_factory_create(ni, no, hs,
-			name, name, "+" + def_param);
+	netlist::tt_desc desc;
+	desc.classname = name;
+	desc.name = name;
+	desc.ni = static_cast<unsigned long>(ni);
+	desc.no = static_cast<unsigned long>(no);
+	desc.def_param = "+" + def_param;
+	desc.family = "";
 
 	while (true)
 	{
@@ -168,19 +174,19 @@ void parser_t::net_truthtable_start()
 		if (token.is(m_tok_TT_HEAD))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.add(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_LINE))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_desc.add(get_string());
+			desc.desc.push_back(get_string());
 			require_token(m_tok_param_right);
 		}
 		else if (token.is(m_tok_TT_FAMILY))
 		{
 			require_token(m_tok_param_left);
-			ttd->m_family = m_setup.family_from_model(get_string());
+			desc.family = get_string();
 			require_token(m_tok_param_right);
 		}
 		else
@@ -188,7 +194,7 @@ void parser_t::net_truthtable_start()
 			require_token(token, m_tok_TRUTHTABLE_END);
 			require_token(m_tok_param_left);
 			require_token(m_tok_param_right);
-			m_setup.factory().register_device(ttd);
+			netlist::devices::tt_factory_create(m_setup, desc);
 			return;
 		}
 	}
@@ -287,35 +293,35 @@ void parser_t::net_c()
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 
 }
 
 void parser_t::dippins()
 {
-	pstring_list_t pins;
+	plib::pstring_vector_t pins;
 
-	pins.add(get_identifier());
+	pins.push_back(get_identifier());
 	require_token(m_tok_comma);
 
 	while (true)
 	{
 		pstring t1 = get_identifier();
-		pins.add(t1);
+		pins.push_back(t1);
 		token_t n = get_token();
 		if (n.is(m_tok_param_right))
 			break;
 		if (!n.is(m_tok_comma))
-			error(pfmt("expected a comma, found <{1}>")(n.str()) );
+			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 	if ((pins.size() % 2) == 1)
 		error("You must pass an equal number of pins to DIPPINS");
-	unsigned n = pins.size();
-	for (unsigned i = 0; i < n / 2; i++)
+	std::size_t n = pins.size();
+	for (std::size_t i = 0; i < n / 2; i++)
 	{
-		m_setup.register_alias(pfmt("{1}")(i+1), pins[i*2]);
-		m_setup.register_alias(pfmt("{1}")(n-i), pins[i*2 + 1]);
+		m_setup.register_alias(plib::pfmt("{1}")(i+1), pins[i*2]);
+		m_setup.register_alias(plib::pfmt("{1}")(n-i), pins[i*2 + 1]);
 	}
 }
 
@@ -339,6 +345,15 @@ void parser_t::netdev_param()
 	require_token(m_tok_param_right);
 }
 
+void parser_t::netdev_hint()
+{
+	pstring dev(get_identifier());
+	require_token(m_tok_comma);
+	pstring hint(get_identifier());
+	m_setup.register_param(dev + ".HINT_" + hint, 1);
+	require_token(m_tok_param_right);
+}
+
 void parser_t::device(const pstring &dev_type)
 {
 	if (m_setup.is_library_item(dev_type))
@@ -352,16 +367,14 @@ void parser_t::device(const pstring &dev_type)
 	else
 	{
 		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
-		device_t *dev;
-		pstring_list_t termlist = f->term_param_list();
-		pstring_list_t def_params = f->def_params();
+		plib::pstring_vector_t termlist = f->term_param_list();
+		plib::pstring_vector_t def_params = f->def_params();
 
 		std::size_t cnt;
 
 		pstring devname = get_identifier();
 
-		dev = f->Create();
-		m_setup.register_dev(dev, devname);
+		m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
 
 		m_setup.log().debug("Parser: IC: {1}\n", devname);
 
@@ -397,7 +410,7 @@ void parser_t::device(const pstring &dev_type)
 			tok = get_token();
 		}
 		if (cnt != termlist.size())
-			m_setup.log().fatal("netlist: input count mismatch for {1} - expected {2} found {3}\n", devname, termlist.size(), cnt);
+			error(plib::pfmt("Input count mismatch for {1} - expected {2} found {3}")(devname)(termlist.size())(cnt));
 		require_token(tok, m_tok_param_right);
 	}
 }
@@ -433,7 +446,7 @@ nl_double parser_t::eval_param(const token_t tok)
 		val = tok.str();
 		ret = val.as_double(&e);
 		if (e)
-			error("Error with parameter ...\n");
+			error(plib::pfmt("Parameter value <{1}> not double \n")(val));
 	}
 	return ret * facs[f];
 

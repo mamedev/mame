@@ -37,7 +37,7 @@
 
 READ8_MEMBER( sage2_state::read )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_reset || (offset >= 0xfe0000 && offset < 0xff4000))
 	{
@@ -296,7 +296,7 @@ READ8_MEMBER( sage2_state::ppi1_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// floppy interrupt
 	data = m_fdc->get_irq();
@@ -442,7 +442,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_CPU_PROGRAM_MAP(sage2_mem)
 
 	// devices
-	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NULL)
+	MCFG_PIC8259_ADD(I8259_TAG, INPUTLINE(M68000_TAG, M68K_IRQ_1), VCC, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_0_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("J7"))
@@ -474,7 +474,7 @@ static MACHINE_CONFIG_START( sage2, sage2_state )
 	MCFG_I8251_TXD_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_txd))
 	MCFG_I8251_DTR_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_dtr))
 	MCFG_I8251_RTS_HANDLER(DEVWRITELINE(RS232_A_TAG, rs232_port_device, write_rts))
-	MCFG_I8251_RXRDY_HANDLER(DEVWRITELINE(M68000_TAG, m68000_base_device, write_irq5))
+	MCFG_I8251_RXRDY_HANDLER(INPUTLINE(M68000_TAG, M68K_IRQ_5))
 	MCFG_I8251_TXRDY_HANDLER(DEVWRITELINE(I8259_TAG, pic8259_device, ir2_w))
 
 	MCFG_RS232_PORT_ADD(RS232_A_TAG, default_rs232_devices, "terminal")
@@ -557,7 +557,7 @@ DIRECT_UPDATE_MEMBER(sage2_state::sage2_direct_update_handler)
 DRIVER_INIT_MEMBER(sage2_state,sage2)
 {
 	address_space &program = machine().device<cpu_device>(M68000_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(FUNC(sage2_state::sage2_direct_update_handler), this));
+	program.set_direct_update_handler(direct_update_delegate(&sage2_state::sage2_direct_update_handler, this));
 }
 
 

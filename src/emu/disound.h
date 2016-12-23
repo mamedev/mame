@@ -14,16 +14,16 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __DISOUND_H__
-#define __DISOUND_H__
+#ifndef MAME_EMU_DISOUND_H
+#define MAME_EMU_DISOUND_H
 
 
 //**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
-const int ALL_OUTPUTS       = 65535;    // special value indicating all outputs for the current chip
-const int AUTO_ALLOC_INPUT  = 65535;
+constexpr int ALL_OUTPUTS       = 65535;    // special value indicating all outputs for the current chip
+constexpr int AUTO_ALLOC_INPUT  = 65535;
 
 
 
@@ -41,9 +41,6 @@ const int AUTO_ALLOC_INPUT  = 65535;
 
 #define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
 	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
-
-#define MCFG_SOUND_CONFIG(_config) \
-	MCFG_DEVICE_CONFIG(_config)
 
 #define MCFG_SOUND_ROUTE(_output, _target, _gain) \
 	device_sound_interface::static_add_route(*device, _output, _target, _gain);
@@ -71,27 +68,26 @@ public:
 	class sound_route
 	{
 	public:
-		sound_route(int output, int input, float gain, const char *target, UINT32 mixoutput);
+		sound_route(int output, int input, float gain, const char *target, u32 mixoutput);
 
-		const sound_route *next() const { return m_next; }
-
-		sound_route *       m_next;             // pointer to next route
-		UINT32              m_output;           // output index, or ALL_OUTPUTS
-		UINT32              m_input;            // target input index
-		UINT32              m_mixoutput;        // target mixer output
-		float               m_gain;             // gain
-		std::string         m_target;           // target tag
+		u32              m_output;           // output index, or ALL_OUTPUTS
+		u32              m_input;            // target input index
+		u32              m_mixoutput;        // target mixer output
+		float            m_gain;             // gain
+		std::string      m_target;           // target tag
 	};
 
 	// construction/destruction
 	device_sound_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_sound_interface();
 
+	virtual bool issound() { return true; } /// HACK: allow devices to hide from the ui
+
 	// configuration access
-	const sound_route *first_route() const { return m_route_list.first(); }
+	const std::vector<std::unique_ptr<sound_route>> &routes() const { return m_route_list; }
 
 	// static inline configuration helpers
-	static sound_route &static_add_route(device_t &device, UINT32 output, const char *target, double gain, UINT32 input = AUTO_ALLOC_INPUT, UINT32 mixoutput = 0);
+	static void static_add_route(device_t &device, u32 output, const char *target, double gain, u32 input = AUTO_ALLOC_INPUT, u32 mixoutput = 0);
 	static void static_reset_routes(device_t &device);
 
 	// sound stream update overrides
@@ -117,7 +113,7 @@ protected:
 	virtual void interface_pre_reset() override;
 
 	// internal state
-	simple_list<sound_route> m_route_list;      // list of sound routes
+	std::vector<std::unique_ptr<sound_route>> m_route_list;      // list of sound routes
 	int             m_outputs;                  // number of outputs from this instance
 	int             m_auto_allocated_inputs;    // number of auto-allocated inputs targeting us
 };
@@ -145,8 +141,8 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	// internal state
-	UINT8               m_outputs;              // number of outputs
-	std::vector<UINT8>       m_outputmap;            // map of inputs to outputs
+	u8                  m_outputs;              // number of outputs
+	std::vector<u8>     m_outputmap;            // map of inputs to outputs
 	sound_stream *      m_mixer_stream;         // mixing stream
 };
 
@@ -154,4 +150,4 @@ protected:
 typedef device_interface_iterator<device_mixer_interface> mixer_interface_iterator;
 
 
-#endif  /* __DISOUND_H__ */
+#endif  /* MAME_EMU_DISOUND_H */

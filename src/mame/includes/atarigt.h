@@ -27,8 +27,8 @@ public:
 			m_mo_command(*this, "mo_command"),
 			m_cage(*this, "cage") { }
 
-	UINT8           m_is_primrage;
-	required_shared_ptr<UINT16> m_colorram;
+	uint8_t           m_is_primrage;
+	required_shared_ptr<uint16_t> m_colorram;
 
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<tilemap_device> m_alpha_tilemap;
@@ -37,26 +37,26 @@ public:
 	bitmap_ind16    m_pf_bitmap;
 	bitmap_ind16    m_an_bitmap;
 
-	UINT8           m_playfield_tile_bank;
-	UINT8           m_playfield_color_bank;
-	UINT16          m_playfield_xscroll;
-	UINT16          m_playfield_yscroll;
+	uint8_t           m_playfield_tile_bank;
+	uint8_t           m_playfield_color_bank;
+	uint16_t          m_playfield_xscroll;
+	uint16_t          m_playfield_yscroll;
 
-	UINT32          m_tram_checksum;
+	uint32_t          m_tram_checksum;
 
-	UINT32          m_expanded_mram[MRAM_ENTRIES * 3];
+	uint32_t          m_expanded_mram[MRAM_ENTRIES * 3];
 
-	required_shared_ptr<UINT32> m_mo_command;
+	required_shared_ptr<uint32_t> m_mo_command;
 	optional_device<atari_cage_device> m_cage;
 
-	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, UINT16 data);
-	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, UINT16 *data);
+	void            (atarigt_state::*m_protection_w)(address_space &space, offs_t offset, uint16_t data);
+	void            (atarigt_state::*m_protection_r)(address_space &space, offs_t offset, uint16_t *data);
 
 	bool            m_ignore_writes;
 	offs_t          m_protaddr[ADDRSEQ_COUNT];
-	UINT8           m_protmode;
-	UINT16          m_protresult;
-	UINT8           m_protdata[0x800];
+	uint8_t           m_protmode;
+	uint16_t          m_protresult;
+	uint8_t           m_protdata[0x800];
 
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
@@ -75,8 +75,8 @@ public:
 
 	DECLARE_WRITE8_MEMBER(cage_irq_callback);
 
-	void atarigt_colorram_w(offs_t address, UINT16 data, UINT16 mem_mask);
-	UINT16 atarigt_colorram_r(offs_t address);
+	void atarigt_colorram_w(offs_t address, uint16_t data, uint16_t mem_mask);
+	uint16_t atarigt_colorram_r(offs_t address);
 	DECLARE_DRIVER_INIT(primrage);
 	DECLARE_DRIVER_INIT(tmek);
 	TILE_GET_INFO_MEMBER(get_alpha_tile_info);
@@ -85,13 +85,13 @@ public:
 	DECLARE_MACHINE_START(atarigt);
 	DECLARE_MACHINE_RESET(atarigt);
 	DECLARE_VIDEO_START(atarigt);
-	UINT32 screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_atarigt(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 private:
 	void tmek_update_mode(offs_t offset);
-	void tmek_protection_w(address_space &space, offs_t offset, UINT16 data);
-	void tmek_protection_r(address_space &space, offs_t offset, UINT16 *data);
+	void tmek_protection_w(address_space &space, offs_t offset, uint16_t data);
+	void tmek_protection_r(address_space &space, offs_t offset, uint16_t *data);
 	void primrage_update_mode(offs_t offset);
-	void primrage_protection_w(address_space &space, offs_t offset, UINT16 data);
-	void primrage_protection_r(address_space &space, offs_t offset, UINT16 *data);
+	void primrage_protection_w(address_space &space, offs_t offset, uint16_t data);
+	void primrage_protection_r(address_space &space, offs_t offset, uint16_t *data);
 	void compute_fake_pots(int *pots);
 };

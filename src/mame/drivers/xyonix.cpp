@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood, Stephh
+// copyright-holders:David Haywood
 /* Xyonix *********************************************************************
 
 driver by David Haywood and Stephh

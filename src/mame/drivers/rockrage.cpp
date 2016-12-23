@@ -52,7 +52,8 @@ Notes:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6809/hd6309.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "includes/rockrage.h"
 #include "includes/konamipt.h"
 
@@ -77,7 +78,7 @@ WRITE8_MEMBER(rockrage_state::rockrage_bankswitch_w)
 
 WRITE8_MEMBER(rockrage_state::rockrage_sh_irqtrigger_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(M6809_IRQ_LINE, HOLD_LINE);
 }
 
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( rockrage_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2e03, 0x2e03) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2e40, 0x2e40) AM_READ_PORT("DSW1")
 	AM_RANGE(0x2e80, 0x2e80) AM_WRITE(rockrage_sh_irqtrigger_w)                 /* cause interrupt on audio CPU */
-	AM_RANGE(0x2ec0, 0x2ec0) AM_WRITE(watchdog_reset_w)                         /* watchdog reset */
+	AM_RANGE(0x2ec0, 0x2ec0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2f00, 0x2f00) AM_WRITE(rockrage_vreg_w)                          /* ??? */
 	AM_RANGE(0x2f40, 0x2f40) AM_WRITE(rockrage_bankswitch_w)                    /* bankswitch control */
 	AM_RANGE(0x4000, 0x5fff) AM_RAM                                             /* RAM */
@@ -117,10 +118,15 @@ static ADDRESS_MAP_START( rockrage_sound_map, AS_PROGRAM, 8, rockrage_state )
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("vlm", vlm5030_device, data_w)              /* VLM5030 */
 	AM_RANGE(0x3000, 0x3000) AM_READ(rockrage_VLM5030_busy_r)           /* VLM5030 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(rockrage_speech_w)                /* VLM5030 */
-	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_byte_r)                             /* soundlatch_byte_r */
+	AM_RANGE(0x5000, 0x5000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x6000, 0x6001) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)         /* YM 2151 */
 	AM_RANGE(0x7000, 0x77ff) AM_RAM                                             /* RAM */
 	AM_RANGE(0x8000, 0xffff) AM_ROM                                             /* ROM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( rockrage_vlm_map, AS_0, 8, rockrage_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -224,7 +230,7 @@ GFXDECODE_END
 
 void rockrage_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	m_rombank->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
@@ -246,6 +252,7 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	MCFG_CPU_ADD("audiocpu", M6809, 1500000)        /* 24MHz/16 */
 	MCFG_CPU_PROGRAM_MAP(rockrage_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -276,11 +283,14 @@ static MACHINE_CONFIG_START( rockrage, rockrage_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
 	MCFG_SOUND_ADD("vlm", VLM5030, 3579545)
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, rockrage_vlm_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END

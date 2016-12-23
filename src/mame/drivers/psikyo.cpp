@@ -172,19 +172,19 @@ WRITE32_MEMBER(psikyo_state::s1945_soundlatch_w)
 		machine().scheduler().synchronize(timer_expired_delegate(FUNC(psikyo_state::psikyo_soundlatch_callback),this), (data >> 16) & 0xff);
 }
 
-static const UINT8 s1945_table[256] = {
+static const uint8_t s1945_table[256] = {
 	0x00, 0x00, 0x64, 0xae, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc5, 0x1e,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x5c, 0x00, 0x00, 0x2b, 0xc0
 };
 
-static const UINT8 s1945a_table[256] = {
+static const uint8_t s1945a_table[256] = {
 	0x00, 0x00, 0x64, 0xbe, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc7, 0x2a,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xad, 0x4c, 0x00, 0x00, 0x2b, 0xc0
 };
 
-static const UINT8 s1945j_table[256] = {
+static const uint8_t s1945j_table[256] = {
 	0x00, 0x00, 0x64, 0xb6, 0x00, 0x00, 0x26, 0x2c, 0x00, 0x00, 0x2c, 0xda, 0x00, 0x00, 0x2c, 0xbc,
 	0x00, 0x00, 0x2c, 0x9e, 0x00, 0x00, 0x2f, 0x0e, 0x00, 0x00, 0x31, 0x10, 0x00, 0x00, 0xc5, 0x92,
 	0x00, 0x00, 0x32, 0x90, 0x00, 0x00, 0xac, 0x64, 0x00, 0x00, 0x2b, 0xc0
@@ -266,7 +266,7 @@ READ32_MEMBER(psikyo_state::s1945_mcu_r)
 	{
 	case 0:
 		{
-		UINT32 res;
+		uint32_t res;
 		if (m_s1945_mcu_control & 16)
 		{
 			res = m_s1945_mcu_latching & 4 ? 0x0000ff00 : m_s1945_mcu_latch1 << 8;
@@ -322,7 +322,7 @@ ADDRESS_MAP_END
 
 READ32_MEMBER(psikyo_state::s1945bl_oki_r)
 {
-	UINT8 dat = m_oki->read(space, 0);
+	uint8_t dat = m_oki->read(space, 0);
 	return dat << 24;
 }
 
@@ -336,7 +336,7 @@ WRITE32_MEMBER(psikyo_state::s1945bl_oki_w)
 	if (ACCESSING_BITS_16_23)
 	{
 		// not at all sure about this, it seems to write 0 too often
-		UINT8 bank = (data & 0x00ff0000) >> 16;
+		uint8_t bank = (data & 0x00ff0000) >> 16;
 		if (bank < 4)
 			membank("okibank")->set_entry(bank);
 	}
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( samuraia )
 	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)   // From Sound CPU
+	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
 	PORT_BIT( 0xff000000, IP_ACTIVE_LOW, IPT_UNKNOWN )  // unused?
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -639,7 +639,7 @@ static INPUT_PORTS_START( btlkroad )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
 	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
@@ -718,7 +718,7 @@ static INPUT_PORTS_START( gunbird )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -779,12 +779,12 @@ static INPUT_PORTS_START( s1945 )
 	PORT_MODIFY("P1_P2")            /* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, NULL)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, nullptr)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -903,12 +903,12 @@ static INPUT_PORTS_START( tengai )
 	PORT_MODIFY("P1_P2")            /* c00000 -> c00003 */
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, NULL)
+	PORT_BIT( 0x00000004, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,mcu_status_r, nullptr)
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00000020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, NULL)   // From Sound CPU
+	PORT_BIT( 0x00000080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, psikyo_state,z80_nmi_r, nullptr)   // From Sound CPU
 	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("DSW")      /* c00004 -> c00007 */
@@ -1808,7 +1808,7 @@ ROM_END
 DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 {
 	{
-		UINT8 *RAM = memregion("ymsnd")->base();
+		uint8_t *RAM = memregion("ymsnd")->base();
 		int len = memregion("ymsnd")->bytes();
 		int i;
 
@@ -1835,7 +1835,7 @@ DRIVER_INIT_MEMBER(psikyo_state,sngkace)
 #if 0
 	if (!strcmp(machine().system().name,"sngkace"))
 	{
-		UINT8 *ROM  =   memregion("maincpu")->base();
+		uint8_t *ROM  =   memregion("maincpu")->base();
 		ROM[0x995] = 0x4e;
 		ROM[0x994] = 0x71;
 		ROM[0x997] = 0x4e;

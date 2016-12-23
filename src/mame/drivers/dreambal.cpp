@@ -23,7 +23,7 @@ lamps?
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 #include "video/decospr.h"
@@ -51,7 +51,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECO16IC_BANK_CB_MEMBER(bank_callback);
 
 	DECLARE_READ16_MEMBER( dreambal_protection_region_0_104_r );
@@ -64,7 +64,7 @@ public:
 			logerror("dreambal_eeprom_w unhandled data %04x %04x\n",data&0x0fff8, mem_mask);
 		}
 
-		if (mem_mask&0x00ff)
+		if (ACCESSING_BITS_0_7)
 		{
 			m_eeprom->clk_write(data &0x2 ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(data &0x1);
@@ -74,10 +74,10 @@ public:
 };
 
 
-UINT32 dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dreambal_state::screen_update_dreambal(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &space = generic_space();
-	UINT16 flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
+	uint16_t flip = m_deco_tilegen1->pf_control_r(space, 0, 0xffff);
 
 	flip_screen_set(BIT(flip, 7));
 	m_deco_tilegen1->pf_update(nullptr, nullptr);
@@ -95,8 +95,8 @@ READ16_MEMBER( dreambal_state::dreambal_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -104,7 +104,7 @@ WRITE16_MEMBER( dreambal_state::dreambal_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -340,7 +340,6 @@ static MACHINE_CONFIG_START( dreambal, dreambal_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

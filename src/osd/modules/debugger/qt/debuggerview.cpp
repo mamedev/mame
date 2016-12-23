@@ -15,7 +15,7 @@ DebuggerView::DebuggerView(const debug_view_type& type,
 							QWidget* parent) :
 	QAbstractScrollArea(parent),
 	m_preferBottom(false),
-	m_view(NULL),
+	m_view(nullptr),
 	m_machine(machine)
 {
 	// I like setting the font per-view since it doesn't override the menuing fonts.
@@ -49,7 +49,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 	// Tell the MAME debug view how much real estate is available
 	QFontMetrics actualFont = fontMetrics();
 	const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-	const int fontHeight = MAX(1, actualFont.lineSpacing());
+	const int fontHeight = std::max(1, actualFont.lineSpacing());
 	m_view->set_visible_size(debug_view_xy(width()/fontWidth, height()/fontHeight));
 
 
@@ -163,7 +163,7 @@ void DebuggerView::paintEvent(QPaintEvent* event)
 
 void DebuggerView::keyPressEvent(QKeyEvent* event)
 {
-	if (m_view == NULL)
+	if (m_view == nullptr)
 		return QWidget::keyPressEvent(event);
 
 	Qt::KeyboardModifiers keyMods = QApplication::keyboardModifiers();
@@ -233,14 +233,14 @@ void DebuggerView::keyPressEvent(QKeyEvent* event)
 
 void DebuggerView::mousePressEvent(QMouseEvent* event)
 {
-	if (m_view == NULL)
+	if (m_view == nullptr)
 		return;
 
 	if (event->button() == Qt::LeftButton)
 	{
 		QFontMetrics actualFont = fontMetrics();
 		const double fontWidth = actualFont.width(QString(100, '_')) / 100.;
-		const int fontHeight = MAX(1, actualFont.height());
+		const int fontHeight = std::max(1, actualFont.height());
 
 		debug_view_xy topLeft = m_view->visible_position();
 		debug_view_xy clickViewPosition;

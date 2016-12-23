@@ -8,10 +8,11 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/melps4/m58846.h"
 #include "sound/speaker.h"
 
-#include "hh_melps4_test.lh" // common test-layout - use external artwork
+#include "hh_melps4_test.lh" // common test-layout - no svg artwork(yet), use external artwork
 
 
 class hh_melps4_state : public driver_device
@@ -20,7 +21,7 @@ public:
 	hh_melps4_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_inp_matrix(*this, "IN"),
+		m_inp_matrix(*this, "IN.%u", 0),
 		m_speaker(*this, "speaker"),
 		m_display_wait(33),
 		m_display_maxy(1),
@@ -33,9 +34,9 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	UINT16 m_inp_mux;                   // multiplexed inputs mask
+	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
-	UINT8 read_inputs(int columns);
+	uint8_t read_inputs(int columns);
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
 	// display common
@@ -43,18 +44,18 @@ public:
 	int m_display_maxy;                 // display matrix number of rows
 	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
 
-	UINT32 m_grid;                      // VFD current row data
-	UINT32 m_plate;                     // VFD current column data
+	uint32_t m_grid;                      // VFD current row data
+	uint32_t m_plate;                     // VFD current column data
 
-	UINT32 m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
-	UINT16 m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
-	UINT32 m_display_cache[0x20];       // (internal use)
-	UINT8 m_display_decay[0x20][0x20];  // (internal use)
+	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
+	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments
+	uint32_t m_display_cache[0x20];       // (internal use)
+	uint8_t m_display_decay[0x20][0x20];  // (internal use)
 
 	TIMER_DEVICE_CALLBACK_MEMBER(display_decay_tick);
 	void display_update();
 	void set_display_size(int maxx, int maxy);
-	void display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety);
+	void display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update = true);
 
 protected:
 	virtual void machine_start() override;
@@ -108,7 +109,7 @@ void hh_melps4_state::machine_reset()
 
 void hh_melps4_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -121,7 +122,7 @@ void hh_melps4_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -176,24 +177,25 @@ void hh_melps4_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void hh_melps4_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void hh_melps4_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
 
 // generic input handlers
 
-UINT8 hh_melps4_state::read_inputs(int columns)
+uint8_t hh_melps4_state::read_inputs(int columns)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -224,8 +226,6 @@ INPUT_CHANGED_MEMBER(hh_melps4_state::reset_button)
   * Mitsubishi M58846-701P MCU
   * cyan/red/green VFD display Itron CP5090GLR R1B, with partial color overlay
 
-  NOTE!: MAME external artwork is required
-
 ***************************************************************************/
 
 class cfrogger_state : public hh_melps4_state
@@ -246,8 +246,8 @@ public:
 
 void cfrogger_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
-	UINT16 plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,0,1,2,3,4,5,6,7,8,9,10,11);
+	uint16_t plate = BITSWAP16(m_plate,12,4,13,5,14,6,15,7,3,11,2,10,1,9,0,8);
 	display_matrix(16, 12, plate, grid);
 }
 
@@ -303,7 +303,7 @@ static INPUT_PORTS_START( cfrogger )
 	PORT_CONFSETTING(    0x08, "2" )
 
 	PORT_START("IN.3") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
@@ -317,8 +317,13 @@ static MACHINE_CONFIG_START( cfrogger, cfrogger_state )
 	MCFG_MELPS4_WRITE_D_CB(WRITE16(cfrogger_state, grid_w))
 	MCFG_MELPS4_WRITE_T_CB(WRITELINE(cfrogger_state, speaker_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(500, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 500-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -336,8 +341,6 @@ MACHINE_CONFIG_END
   * PCB label Konami Gakken GR503
   * Mitsubishi M58846-702P MCU
   * cyan/red/green VFD display Itron CP5143GLR SGA, with light-yellow color overlay
-
-  NOTE!: MAME external artwork is required
 
 ***************************************************************************/
 
@@ -359,8 +362,8 @@ public:
 
 void gjungler_state::prepare_display()
 {
-	UINT16 grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
-	UINT32 plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,17,16,15,14,13,12,0,7,1,6,2,5,3,4) | 0x2000;
+	uint16_t grid = BITSWAP16(m_grid,15,14,13,12,11,10,9,8,7,6,5,4,3,2,0,1);
+	uint32_t plate = BITSWAP24(m_plate,23,22,21,20,19,18,8,9,10,11,13,16,15,14,13,12,7,0,6,1,5,2,4,3) | 0x2000;
 	display_matrix(18, 12, plate, grid);
 }
 
@@ -416,7 +419,7 @@ static INPUT_PORTS_START( gjungler )
 	PORT_CONFSETTING(    0x08, "B" )
 
 	PORT_START("IN.3") // fake
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START ) PORT_CHANGED_MEMBER(DEVICE_SELF, hh_melps4_state, reset_button, nullptr)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( gjungler, gjungler_state )
@@ -431,8 +434,13 @@ static MACHINE_CONFIG_START( gjungler, gjungler_state )
 	MCFG_MELPS4_WRITE_D_CB(WRITE16(gjungler_state, grid_w))
 	MCFG_MELPS4_WRITE_T_CB(WRITELINE(gjungler_state, speaker_w))
 
+	/* video hardware */
+	MCFG_SCREEN_SVG_ADD("screen", "svg")
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_SIZE(481, 1080)
+	MCFG_SCREEN_VISIBLE_AREA(0, 481-1, 0, 1080-1)
+	MCFG_DEFAULT_LAYOUT(layout_svg)
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_melps4_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_hh_melps4_test)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -453,17 +461,23 @@ MACHINE_CONFIG_END
 ROM_START( cfrogger )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m58846-701p", 0x0000, 0x1000, CRC(ba52a242) SHA1(7fa53b617f4bb54be32eb209e9b88131e11cb518) )
+
+	ROM_REGION( 786255, "svg", 0)
+	ROM_LOAD( "cfrogger.svg", 0, 786255, CRC(d8d6e2b6) SHA1(bc9a0260b211ed07021dfe1cc19a993569f4c544) ) // by kevtris, ver. 19 may 2015
 ROM_END
 
 
 ROM_START( gjungler )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD( "m58846-702p", 0x0000, 0x1000, CRC(94ab7060) SHA1(3389bc115d1df8d01a30611fa9e95a900d32b29b) )
+
+	ROM_REGION( 419696, "svg", 0)
+	ROM_LOAD( "gjungler.svg", 0, 419696, BAD_DUMP CRC(c5f6d1f2) SHA1(5032f35326ca689c8e329f760e380cdc9f5dff86) ) // by hap/kevtris, ver. 25 apr 2016 - BAD_DUMP: needs cleanup/redo
 ROM_END
 
 
 
 /*    YEAR  NAME      PARENT COMPAT MACHINE  INPUT     INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
+CONS( 1981, cfrogger, 0,        0, cfrogger, cfrogger, driver_device, 0, "Coleco", "Frogger (Coleco)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1982, gjungler, 0,        0, gjungler, gjungler, driver_device, 0, "Gakken / Konami", "Jungler (Gakken)", MACHINE_SUPPORTS_SAVE )

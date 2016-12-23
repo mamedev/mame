@@ -42,8 +42,8 @@ class i8251_device :  public device_t,
 {
 public:
 	// construction/destruction
-	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname);
-	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i8251_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname);
+	i8251_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_txd_handler(device_t &device, _Object object) { return downcast<i8251_device &>(device).m_txd_handler.set_callback(object); }
@@ -68,7 +68,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( write_rxc );
 
 	/// TODO: REMOVE THIS
-	void receive_character(UINT8 ch);
+	void receive_character(uint8_t ch);
 
 	/// TODO: this shouldn't be public
 	enum
@@ -114,18 +114,18 @@ private:
 	devcb_write_line m_syndet_handler;
 
 	/* flags controlling how i8251_control_w operates */
-	UINT8 m_flags;
+	uint8_t m_flags;
 	/* offset into sync_bytes used during sync byte transfer */
-	UINT8 m_sync_byte_offset;
+	uint8_t m_sync_byte_offset;
 	/* number of sync bytes written so far */
-	UINT8 m_sync_byte_count;
+	uint8_t m_sync_byte_count;
 	/* the sync bytes written */
-	UINT8 m_sync_bytes[2];
+	uint8_t m_sync_bytes[2];
 	/* status of i8251 */
-	UINT8 m_status;
-	UINT8 m_command;
+	uint8_t m_status;
+	uint8_t m_command;
 	/* mode byte - bit definitions depend on mode - e.g. synchronous, asynchronous */
-	UINT8 m_mode_byte;
+	uint8_t m_mode_byte;
 
 	int m_cts;
 	int m_dsr;
@@ -137,16 +137,16 @@ private:
 	int m_br_factor;
 
 	/* data being received */
-	UINT8 m_rx_data;
+	uint8_t m_rx_data;
 		/* tx buffer */
-	UINT8 m_tx_data;
+	uint8_t m_tx_data;
 };
 
 class v53_scu_device :  public i8251_device
 {
 public:
 	// construction/destruction
-	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, UINT32 clock);
+	v53_scu_device(const machine_config &mconfig,  const char *tag, device_t *owner, uint32_t clock);
 };
 
 

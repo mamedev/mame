@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Haywood
+// copyright-holders:David Haywood,Stephane Humbert
 /***************************************************************************
 
     Sega Mega Drive/Genesis-based bootlegs
@@ -258,7 +258,37 @@ connector, but of course, I can be wrong.
 
 #include "emu.h"
 #include "includes/megadriv.h"
+#include "includes/megadrvb.h"
 
+
+/************************************ Megadrive Bootlegs *************************************/
+
+// smaller ROM region because some bootlegs check for RAM there (used by topshoot and hshavoc)
+static ADDRESS_MAP_START( md_bootleg_map, AS_PROGRAM, 16, md_boot_state )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM /* Cartridge Program Rom */
+	AM_RANGE(0x200000, 0x2023ff) AM_RAM // tested
+
+	AM_RANGE(0xa00000, 0xa01fff) AM_READWRITE(megadriv_68k_read_z80_ram, megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa02000, 0xa03fff) AM_WRITE(megadriv_68k_write_z80_ram)
+	AM_RANGE(0xa04000, 0xa04003) AM_READWRITE8(megadriv_68k_YM2612_read, megadriv_68k_YM2612_write, 0xffff)
+	AM_RANGE(0xa06000, 0xa06001) AM_WRITE(megadriv_68k_z80_bank_write)
+
+	AM_RANGE(0xa10000, 0xa1001f) AM_READWRITE(megadriv_68k_io_read, megadriv_68k_io_write)
+	AM_RANGE(0xa11100, 0xa11101) AM_READWRITE(megadriv_68k_check_z80_bus, megadriv_68k_req_z80_bus)
+	AM_RANGE(0xa11200, 0xa11201) AM_WRITE(megadriv_68k_req_z80_reset)
+
+	AM_RANGE(0xc00000, 0xc0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+	AM_RANGE(0xd00000, 0xd0001f) AM_DEVREADWRITE("gen_vdp", sega315_5313_device, vdp_r, vdp_w)
+
+	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_SHARE("megadrive_ram")
+ADDRESS_MAP_END
+
+MACHINE_CONFIG_START( md_bootleg, md_boot_state )
+	MCFG_FRAGMENT_ADD( md_ntsc )
+
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -379,7 +409,7 @@ WRITE16_MEMBER(md_boot_state::bl_710000_w)
 
 READ16_MEMBER(md_boot_state::bl_710000_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	int pc = space.device().safe_pc();
 	logerror("%06x reading from bl_710000_r\n", pc);
 
@@ -664,7 +694,7 @@ MACHINE_START_MEMBER(md_boot_state, md_6button)
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 }
 
 static MACHINE_CONFIG_START( megadrvb_6b, md_boot_state )
@@ -760,7 +790,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 	 * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
 	 */
 	#if ENERGY_CONSOLE_MODE
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 	rom[0x1afc08/2] = 0x6600;
 	#endif
 
@@ -775,7 +805,7 @@ DRIVER_INIT_MEMBER(md_boot_state,aladmdb)
 // after this decode look like intentional changes
 DRIVER_INIT_MEMBER(md_boot_state,mk3mdb)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	for (int x = 0x000001; x < 0x100001; x += 2)
 	{
@@ -840,7 +870,7 @@ DRIVER_INIT_MEMBER(md_boot_state,ssf2mdb)
 
 DRIVER_INIT_MEMBER(md_boot_state,srmdb)
 {
-	UINT8* rom = memregion("maincpu")->base();
+	uint8_t* rom = memregion("maincpu")->base();
 
 	for (int x = 0x00001; x < 0x40000; x += 2)
 	{

@@ -8,27 +8,50 @@
 #include <algorithm>
 #include <cstdio>
 #include <cmath>
+#include <unordered_map>
 #include "nl_convert.h"
+#include "plib/palloc.h"
+#include "plib/putil.h"
 
+/* FIXME: temporarily defined here - should be in a file */
+/* FIXME: family logic in netlist is convoluted, create
+ *        define a model param on core device
+ */
+/* Format: external name,netlist device,model */
+static const char *s_lib_map =
+"SN74LS00D,   TTL_7400_DIP,  74LSXX\n"
+"SN74LS04D,   TTL_7404_DIP,  74LSXX\n"
+"SN74ALS08D,  TTL_7408_DIP,  74ALSXX\n"
+"SN74ALS10AD, TTL_7410_DIP,  74ALSXX\n"
+"SN74LS30N,   TTL_7430_DIP,  74LSXX\n"
+"SN74ALS74AD, TTL_7474_DIP,  74ALSXX\n"
+"SN74LS74AD,  TTL_7474_DIP,  74LSXX\n"
+"SN74LS86AD,  TTL_7486_DIP,  74LSXX\n"
+"SN74F153D,   TTL_74153_DIP, 74FXX\n"
+"SN74LS161AD, TTL_74161_DIP, 74LSXX\n"
+"SN74LS164D,  TTL_74164_DIP, 74LSXX\n"
+"DM74LS366AN, TTL_74366_DIP, 74LSXX\n"
+;
 
-template<typename Class>
-static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
+struct lib_map_entry
 {
-	plist_t<int> ret(sl.size());
-	for (unsigned i=0; i<sl.size(); i++)
-		ret[i] = i;
+	pstring dev;
+	pstring model;
+};
 
-	for(unsigned i=0; i < sl.size(); i++)
+using lib_map_t = std::unordered_map<pstring, lib_map_entry>;
+
+static lib_map_t read_lib_map(const pstring lm)
+{
+	plib::pistringstream istrm(lm);
+	lib_map_t m;
+	pstring line;
+	while (istrm.readline(line))
 	{
-		for(unsigned j=i+1; j < sl.size(); j++)
-		{
-			if(sl[ret[i]]->name() > sl[ret[j]]->name())
-			{
-				std::swap(ret[i], ret[j]);
-			}
-		}
+		plib::pstring_vector_t split(line, ",");
+		m[split[0].trim()] = { split[1].trim(), split[2].trim() };
 	}
-	return ret;
+	return m;
 }
 
 /*-------------------------------------------------
@@ -37,57 +60,79 @@ static plist_t<int> bubble(const pnamedlist_t<Class *> &sl)
 
 void nl_convert_base_t::add_pin_alias(const pstring &devname, const pstring &name, const pstring &alias)
 {
-	m_pins.add(palloc(pin_alias_t(devname + "." + name, devname + "." + alias)), false);
+	pstring pname = devname + "." + name;
+	m_pins.emplace(pname, plib::make_unique<pin_alias_t>(pname, devname + "." + alias));
 }
 
 void nl_convert_base_t::add_ext_alias(const pstring &alias)
 {
-	m_ext_alias.add(alias);
+	m_ext_alias.push_back(alias);
+}
+
+void nl_convert_base_t::add_device(std::unique_ptr<dev_t> dev)
+{
+	for (auto & d : m_devs)
+		if (d->name() == dev->name())
+		{
+			out("ERROR: Duplicate device {1} ignored.", dev->name());
+			return;
+		}
+	m_devs.push_back(std::move(dev));
 }
 
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, const pstring &amodel)
 {
-	m_devs.add(palloc(dev_t(atype, aname, amodel)), false);
+	add_device(plib::make_unique<dev_t>(atype, aname, amodel));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname, double aval)
 {
-	m_devs.add(palloc(dev_t(atype, aname, aval)), false);
+	add_device(plib::make_unique<dev_t>(atype, aname, aval));
 }
 void nl_convert_base_t::add_device(const pstring &atype, const pstring &aname)
 {
-	m_devs.add(palloc(dev_t(atype, aname)), false);
+	add_device(plib::make_unique<dev_t>(atype, aname));
 }
 
 void nl_convert_base_t::add_term(pstring netname, pstring termname)
 {
-	net_t * net = m_nets.find_by_name(netname);
-	if (net == NULL)
+	net_t * net = nullptr;
+	auto idx = m_nets.find(netname);
+	if (idx != m_nets.end())
+		net = m_nets[netname].get();
+	else
 	{
-		net = palloc(net_t(netname));
-		m_nets.add(net, false);
+		auto nets = plib::make_unique<net_t>(netname);
+		net = nets.get();
+		m_nets.emplace(netname, std::move(nets));
 	}
 
 	/* if there is a pin alias, translate ... */
-	pin_alias_t *alias = m_pins.find_by_name(termname);
+	pin_alias_t *alias = m_pins[termname].get();
 
-	if (alias != NULL)
-		net->terminals().add(alias->alias());
+	if (alias != nullptr)
+		net->terminals().push_back(alias->alias());
 	else
-		net->terminals().add(termname);
+		net->terminals().push_back(termname);
 }
 
 void nl_convert_base_t::dump_nl()
 {
 	for (std::size_t i=0; i<m_ext_alias.size(); i++)
 	{
-		net_t *net = m_nets.find_by_name(m_ext_alias[i]);
+		net_t *net = m_nets[m_ext_alias[i]].get();
 		// use the first terminal ...
 		out("ALIAS({}, {})\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
 	}
-	plist_t<int> sorted = bubble(m_devs);
+
+	std::vector<size_t> sorted;
+	for (size_t i=0; i < m_devs.size(); i++)
+		sorted.push_back(i);
+	std::sort(sorted.begin(), sorted.end(),
+			[&](size_t i1, size_t i2) { return m_devs[i1]->name() < m_devs[i2]->name(); });
+
 	for (std::size_t i=0; i<m_devs.size(); i++)
 	{
 		std::size_t j = sorted[i];
@@ -103,9 +148,9 @@ void nl_convert_base_t::dump_nl()
 					m_devs[j]->name().cstr());
 	}
 	// print nets
-	for (std::size_t i=0; i<m_nets.size(); i++)
+	for (auto & i : m_nets)
 	{
-		net_t * net = m_nets[i];
+		net_t * net = i.second.get();
 		if (!net->is_no_export())
 		{
 			//printf("Net {}\n", net->name().cstr());
@@ -117,9 +162,9 @@ void nl_convert_base_t::dump_nl()
 			out(")\n");
 		}
 	}
-	m_devs.clear_and_free();
-	m_nets.clear_and_free();
-	m_pins.clear_and_free();
+	m_devs.clear();
+	m_nets.clear();
+	m_pins.clear();
 	m_ext_alias.clear();
 }
 
@@ -133,7 +178,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
+		return plib::pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -151,12 +196,11 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 
 double nl_convert_base_t::get_sp_val(const pstring &sin)
 {
-	int p = sin.len() - 1;
-	while (p>=0 && (sin.substr(p,1) < "0" || sin.substr(p,1) > "9"))
-		p--;
-	pstring val = sin.substr(0,p + 1);
-	pstring unit = sin.substr(p + 1);
-
+	auto p = sin.begin();
+	while (p != sin.end() && (m_numberchars.find(*p) != m_numberchars.end()))
+		++p;
+	pstring val = sin.left(p);
+	pstring unit = sin.substr(p);
 	double ret = get_sp_unit(unit) * val.as_double();
 	return ret;
 }
@@ -171,8 +215,9 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 		{"M",   "CAP_M({1})", 1.0e-3 },
 		{"u",   "CAP_U({1})", 1.0e-6 }, /* eagle */
 		{"U",   "CAP_U({1})", 1.0e-6 },
-		{"??",   "CAP_U({1})", 1.0e-6    },
+		{"??",  "CAP_U({1})", 1.0e-6 }, /* FIXME */
 		{"N",   "CAP_N({1})", 1.0e-9 },
+		{"pF",  "CAP_P({1})", 1.0e-12},
 		{"P",   "CAP_P({1})", 1.0e-12},
 		{"F",   "{1}e-15",    1.0e-15},
 
@@ -184,7 +229,7 @@ nl_convert_base_t::unit_t nl_convert_base_t::m_units[] = {
 
 void nl_convert_spice_t::convert(const pstring &contents)
 {
-	pstring_list_t spnl(contents, "\n");
+	plib::pstring_vector_t spnl(contents, "\n");
 
 	// Add gnd net
 
@@ -216,12 +261,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 {
 	if (line != "")
 	{
-		pstring_list_t tt(line, " ", true);
+		plib::pstring_vector_t tt(line, " ", true);
 		double val = 0.0;
 		switch (tt[0].code_at(0))
 		{
 			case ';':
-				out("// {}\n", line.substr(1).cstr());
+				out("// {}\n", line.substr(1));
 				break;
 			case '*':
 				out("// {}\n", line.substr(1).cstr());
@@ -247,7 +292,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				/* check for fourth terminal ... should be numeric net
 				 * including "0" or start with "N" (ltspice)
 				 */
-				ATTR_UNUSED int nval =tt[4].as_long(&cerr);
+				ATTR_UNUSED long nval =tt[4].as_long(&cerr);
 				pstring model;
 				pstring pins ="CBE";
 
@@ -255,12 +300,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					model = tt[5];
 				else
 					model = tt[4];
-				pstring_list_t m(model,"{");
+				plib::pstring_vector_t m(model,"{");
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)
 						fprintf(stderr, "error with model desc %s\n", model.cstr());
-					pins = m[1].left(3);
+					pins = m[1].left(m[1].begin() + 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
 				add_term(tt[1], tt[0] + "." + pins.code_at(0));
@@ -328,7 +373,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				add_device(tname, xname);
 				for (std::size_t i=1; i < tt.size() - 1; i++)
 				{
-					pstring term = pfmt("{1}.{2}")(xname)(i);
+					pstring term = plib::pfmt("{1}.{2}")(xname)(i);
 					add_term(tt[i], term);
 				}
 				break;
@@ -342,7 +387,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 //FIXME: should accept a stream as well
 void nl_convert_eagle_t::convert(const pstring &contents)
 {
-	pistringstream istrm(contents);
+	plib::pistringstream istrm(contents);
 	eagle_tokenizer tok(*this, istrm);
 
 	out("NETLIST_START(dummy)\n");
@@ -441,6 +486,212 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		else
 		{
 			out("Unexpected {}\n", token.str().cstr());
+			return;
+		}
+	}
+
+}
+
+/*      token_id_t m_tok_HFA;
+        token_id_t m_tok_APP;
+        token_id_t m_tok_TIM;
+        token_id_t m_tok_TYP;
+        token_id_t m_tok_ADDC;
+        token_id_t m_tok_ATTC;
+        token_id_t m_tok_NET;
+        token_id_t m_tok_TER;
+ *
+ */
+void nl_convert_rinf_t::convert(const pstring &contents)
+{
+	plib::pistringstream istrm(contents);
+	tokenizer tok(*this, istrm);
+	auto lm = read_lib_map(s_lib_map);
+
+	out("NETLIST_START(dummy)\n");
+	add_term("GND", "GND");
+	add_term("VCC", "VCC");
+	tokenizer::token_t token = tok.get_token();
+	while (true)
+	{
+		if (token.is_type(tokenizer::ENDOFFILE) || token.is(tok.m_tok_END))
+		{
+			dump_nl();
+			// FIXME: Parameter
+			out("NETLIST_END()\n");
+			return;
+		}
+		else if (token.is(tok.m_tok_HEA))
+		{
+			/* seems to be start token - ignore */
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_APP))
+		{
+			/* version string */
+			pstring app = tok.get_string();
+			out("// APP: {}\n", app);
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_TIM))
+		{
+			/* time */
+			out("// TIM:");
+			for (int i=0; i<6; i++)
+			{
+				long x = tok.get_number_long();
+				out(" {}", x);
+			}
+			out("\n");
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_TYP))
+		{
+			pstring id(tok.get_identifier());
+			out("// TYP: {}\n", id);
+			token = tok.get_token();
+		}
+		else if (token.is(tok.m_tok_ADDC))
+		{
+			std::unordered_map<pstring, pstring> attr;
+			pstring id = tok.get_identifier();
+			pstring s1 = tok.get_string();
+			pstring s2 = tok.get_string();
+
+			token = tok.get_token();
+			while (token.is(tok.m_tok_ATTC))
+			{
+				pstring tid = tok.get_identifier();
+				if (tid != id)
+				{
+					out("Error: found {} expected {} in {}\n", tid, id, token.str());
+					return;
+				}
+				pstring at = tok.get_string();
+				pstring val = tok.get_string();
+				attr[at] = val;
+				token = tok.get_token();
+			}
+			pstring sim = attr["Simulation"];
+			pstring val = attr["Value"];
+			pstring com = attr["Comment"];
+			if (val == "")
+				val = com;
+
+			if (sim == "CAP")
+			{
+				add_device("CAP", id, get_sp_val(val));
+			}
+			else if (sim == "RESISTOR")
+			{
+				add_device("RES", id, get_sp_val(val));
+			}
+			else
+			{
+				pstring lib = attr["Library Reference"];
+				auto f = lm.find(lib);
+				if (f != lm.end())
+					add_device(f->second.dev, id);
+				else
+					add_device(lib, id);
+			}
+		}
+		else if (token.is(tok.m_tok_NET))
+		{
+			pstring dev = tok.get_identifier();
+			pstring pin = tok.get_identifier_or_number();
+			pstring net = tok.get_string();
+			add_term(net, dev + "." + pin);
+			token = tok.get_token();
+			if (token.is(tok.m_tok_TER))
+			{
+				token = tok.get_token();
+				while (token.is_type(plib::ptokenizer::IDENTIFIER))
+				{
+					pin = tok.get_identifier_or_number();
+					add_term(net, token.str() + "." + pin);
+					token = tok.get_token();
+				}
+			}
+		}
+#if 0
+			token = tok.get_token();
+			/* skip to semicolon */
+			do
+			{
+				token = tok.get_token();
+			} while (!token.is(tok.m_tok_SEMICOLON));
+			token = tok.get_token();
+			pstring sval = "";
+			if (token.is(tok.m_tok_VALUE))
+			{
+				pstring vname = tok.get_string();
+				sval = tok.get_string();
+				tok.require_token(tok.m_tok_SEMICOLON);
+				token = tok.get_token();
+			}
+			switch (name.code_at(0))
+			{
+				case 'Q':
+				{
+					add_device("QBJT", name, sval);
+				}
+					break;
+				case 'R':
+					{
+						double val = get_sp_val(sval);
+						add_device("RES", name, val);
+					}
+					break;
+				case 'C':
+					{
+						double val = get_sp_val(sval);
+						add_device("CAP", name, val);
+					}
+					break;
+				case 'P':
+					if (sval.ucase() == "HIGH")
+						add_device("TTL_INPUT", name, 1);
+					else if (sval.ucase() == "LOW")
+						add_device("TTL_INPUT", name, 0);
+					else
+						add_device("ANALOG_INPUT", name, sval.as_double());
+					add_pin_alias(name, "1", "Q");
+					break;
+				case 'D':
+					/* Pin 1 = Anode, Pin 2 = Cathode */
+					add_device("DIODE", name, sval);
+					add_pin_alias(name, "1", "A");
+					add_pin_alias(name, "2", "K");
+					break;
+				case 'U':
+				case 'X':
+				{
+					pstring tname = "TTL_" + sval + "_DIP";
+					add_device(tname, name);
+					break;
+				}
+				default:
+					tok.error("// IGNORED " + name);
+			}
+
+		}
+		else if (token.is(tok.m_tok_SIGNAL))
+		{
+			pstring netname = tok.get_string();
+			token = tok.get_token();
+			while (!token.is(tok.m_tok_SEMICOLON))
+			{
+				/* fixme: should check for string */
+				pstring devname = token.str();
+				pstring pin = tok.get_string();
+				add_term(netname, devname + "." + pin);
+				token = tok.get_token();                }
+		}
+#endif
+		else
+		{
+			out("Unexpected {}\n", token.str());
 			return;
 		}
 	}

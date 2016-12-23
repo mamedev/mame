@@ -18,7 +18,7 @@ class DasmWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DasmWindow(running_machine* machine, QWidget* parent=NULL);
+	DasmWindow(running_machine* machine, QWidget* parent=nullptr);
 	virtual ~DasmWindow();
 
 
@@ -71,8 +71,8 @@ public:
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
-	void addToXmlDataNode(xml_data_node* node) const;
-	void recoverFromXmlNode(xml_data_node* node);
+	void addToXmlDataNode(util::xml::data_node &node) const;
+	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 

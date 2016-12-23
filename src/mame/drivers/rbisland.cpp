@@ -325,7 +325,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/rbisland.h"
 
 
@@ -654,7 +654,6 @@ static MACHINE_CONFIG_START( rbisland, rbisland_state )
 	MCFG_DEVICE_ADD("pc080sn", PC080SN, 0)
 	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("pc090oj", PC090OJ, 0)
 	MCFG_PC090OJ_GFXDECODE("gfxdecode")
@@ -708,7 +707,6 @@ static MACHINE_CONFIG_START( jumping, rbisland_state )
 	MCFG_PC080SN_GFX_REGION(1)
 	MCFG_PC080SN_YINVERT(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -946,7 +944,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 
@@ -955,7 +953,7 @@ DRIVER_INIT_MEMBER(rbisland_state,rbisland)
 
 DRIVER_INIT_MEMBER(rbisland_state,rbislande)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0xc000], 0x4000);
 

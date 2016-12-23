@@ -35,7 +35,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/eepromser.h"
 #include "machine/ticket.h"
-#include "sound/bsmt2000.h"
+#include "machine/watchdog.h"
 #include "includes/dcheese.h"
 
 
@@ -91,8 +91,6 @@ INTERRUPT_GEN_MEMBER(dcheese_state::dcheese_vblank)
 
 void dcheese_state::machine_start()
 {
-	m_bsmt = machine().device("bsmt");
-
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_soundlatch_full));
 	save_item(NAME(m_sound_control));
@@ -132,7 +130,7 @@ WRITE16_MEMBER(dcheese_state::sound_command_w)
 		/* write the latch and set the IRQ */
 		m_soundlatch_full = 1;
 		m_audiocpu->set_input_line(0, ASSERT_LINE);
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
@@ -149,21 +147,20 @@ READ8_MEMBER(dcheese_state::sound_command_r)
 	/* read the latch and clear the IRQ */
 	m_soundlatch_full = 0;
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 
 READ8_MEMBER(dcheese_state::sound_status_r)
 {
 	/* seems to be ready signal on BSMT or latching hardware */
-	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
-	return bsmt->read_status() << 7;
+	return m_bsmt->read_status() << 7;
 }
 
 
 WRITE8_MEMBER(dcheese_state::sound_control_w)
 {
-	UINT8 diff = data ^ m_sound_control;
+	uint8_t diff = data ^ m_sound_control;
 	m_sound_control = data;
 
 	/* bit 0x20 = LED */
@@ -177,16 +174,14 @@ WRITE8_MEMBER(dcheese_state::sound_control_w)
 
 WRITE8_MEMBER(dcheese_state::bsmt_data_w)
 {
-	bsmt2000_device *bsmt = machine().device<bsmt2000_device>("bsmt");
-
 	/* writes come in pairs; even bytes latch, odd bytes write */
 	if (offset % 2 == 0)
 	{
-		bsmt->write_reg(offset / 2);
+		m_bsmt->write_reg(offset / 2);
 		m_sound_msb_latch = data;
 	}
 	else
-		bsmt->write_data((m_sound_msb_latch << 8) | data);
+		m_bsmt->write_data((m_sound_msb_latch << 8) | data);
 }
 
 
@@ -201,7 +196,7 @@ static ADDRESS_MAP_START( main_cpu_map, AS_PROGRAM, 16, dcheese_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("200000") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x220000, 0x220001) AM_READ_PORT("220000") AM_WRITE(madmax_blitter_color_w)
 	AM_RANGE(0x240000, 0x240001) AM_READ_PORT("240000") AM_WRITE(eeprom_control_w)
 	AM_RANGE(0x260000, 0x26001f) AM_WRITE(madmax_blitter_xparam_w)
@@ -260,7 +255,7 @@ static INPUT_PORTS_START( dcheese )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -309,7 +304,7 @@ static INPUT_PORTS_START( lottof2 )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -356,7 +351,7 @@ static INPUT_PORTS_START( fredmem )
 	PORT_BIT( 0x001f, IP_ACTIVE_LOW, IPT_UNKNOWN )      /* low 5 bits read as a unit */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("ticket", ticket_dispenser_device, line_r)
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL )     /* sound->main buffer status (0=empty) */
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, dcheese_state,sound_latch_state_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_VOLUME_DOWN )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -405,9 +400,11 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dcheese_state, irq1_line_hold,  480)   /* accurate for fredmem */
 
-
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
+
 	MCFG_TICKET_DISPENSER_ADD("ticket", attotime::from_msec(200), TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -422,6 +419,8 @@ static MACHINE_CONFIG_START( dcheese, dcheese_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_BSMT2000_ADD("bsmt", SOUND_OSC)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)

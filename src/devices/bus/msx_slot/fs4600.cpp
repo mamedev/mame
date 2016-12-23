@@ -11,11 +11,11 @@
 const device_type MSX_SLOT_FS4600 = &device_creator<msx_slot_fs4600_device>;
 
 
-msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_fs4600_device::msx_slot_fs4600_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_FS4600, "MSX Internal FS4600 Firmware", tag, owner, clock, "msx_slot_fs4600", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
-	, m_region(nullptr)
+	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
 	, m_rom(nullptr)
 	, m_sram_address(0)
@@ -41,29 +41,21 @@ machine_config_constructor msx_slot_fs4600_device::device_mconfig_additions() co
 }
 
 
-void msx_slot_fs4600_device::set_rom_start(device_t &device, const char *region, UINT32 offset)
+void msx_slot_fs4600_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
 {
 	msx_slot_fs4600_device &dev = downcast<msx_slot_fs4600_device &>(device);
 
-	dev.m_region = region;
+	dev.m_rom_region.set_tag(region);
 	dev.m_region_offset = offset;
 }
 
 
 void msx_slot_fs4600_device::device_start()
 {
-	assert(m_region != nullptr );
-
-	memory_region *m_rom_region = owner()->memregion(m_region);
-
 	// Sanity checks
-	if (m_rom_region == nullptr )
-	{
-		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag(), m_region);
-	}
 	if (m_rom_region->bytes() < m_region_offset + 0x100000)
 	{
-		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_region);
+		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_rom_region.finder_tag());
 	}
 
 	m_rom = m_rom_region->base() + m_region_offset;

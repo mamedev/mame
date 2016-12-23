@@ -118,7 +118,7 @@ Bucky:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
 #include "includes/konamipt.h"
@@ -157,7 +157,7 @@ WRITE16_MEMBER(moo_state::control2_w)
 void moo_state::moo_objdma()
 {
 	int num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 	int counter = m_k053246->k053247_get_dy();
 
 	m_k053246->k053247_get_ram( &dst);
@@ -224,14 +224,14 @@ WRITE16_MEMBER(moo_state::sound_cmd1_w)
 	if ((data & 0x00ff0000) == 0)
 	{
 		data &= 0xff;
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 	}
 }
 
 WRITE16_MEMBER(moo_state::sound_cmd2_w)
 {
 	if ((data & 0x00ff0000) == 0)
-		soundlatch2_byte_w(space, 0, data & 0xff);
+		m_soundlatch2->write(space, 0, data & 0xff);
 }
 
 WRITE16_MEMBER(moo_state::sound_irq_w)
@@ -241,7 +241,7 @@ WRITE16_MEMBER(moo_state::sound_irq_w)
 
 READ16_MEMBER(moo_state::sound_status_r)
 {
-	return soundlatch3_byte_r(space, 0);
+	return m_soundlatch3->read(space, 0);
 }
 
 WRITE8_MEMBER(moo_state::sound_bankswitch_w)
@@ -282,7 +282,7 @@ WRITE16_MEMBER(moo_state::k053247_scattered_word_w)
 
 WRITE16_MEMBER(moo_state::moo_prot_w)
 {
-	UINT32 src1, src2, dst, length, a, b, res;
+	uint32_t src1, src2, dst, length, a, b, res;
 
 	COMBINE_DATA(&m_protram[offset]);
 
@@ -314,7 +314,7 @@ WRITE16_MEMBER(moo_state::moobl_oki_bank_w)
 {
 	logerror("%x to OKI bank\n", data);
 
-	m_oki->set_bank_base((data & 0x0f) * 0x40000);
+	m_oki->set_rom_bank(data & 0x0f);
 }
 
 static ADDRESS_MAP_START( moo_map, AS_PROGRAM, 16, moo_state )
@@ -425,9 +425,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, moo_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_device,read,write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -550,18 +550,14 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
@@ -570,6 +566,10 @@ static MACHINE_CONFIG_START( moo, moo_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz verified
 	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
@@ -608,18 +608,14 @@ static MACHINE_CONFIG_START( moobl, moo_state )
 
 	MCFG_VIDEO_START_OVERRIDE(moo_state,moo)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(moo_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48+1, 23)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48+1, 23)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(moo_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_K053251_ADD("k053251")
@@ -642,7 +638,7 @@ static MACHINE_CONFIG_DERIVED( bucky, moo )
 	MCFG_K054000_ADD("k054000")
 
 	MCFG_DEVICE_MODIFY("k053246")
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48, 23)
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 23)
 
 	/* video hardware */
 	MCFG_PALETTE_MODIFY("palette")

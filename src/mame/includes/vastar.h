@@ -20,23 +20,23 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_bg1videoram;
-	required_shared_ptr<UINT8> m_bg2videoram;
-	required_shared_ptr<UINT8> m_fgvideoram;
-	required_shared_ptr<UINT8> m_sprite_priority;
-	required_shared_ptr<UINT8> m_sharedram;
+	required_shared_ptr<uint8_t> m_bg1videoram;
+	required_shared_ptr<uint8_t> m_bg2videoram;
+	required_shared_ptr<uint8_t> m_fgvideoram;
+	required_shared_ptr<uint8_t> m_sprite_priority;
+	required_shared_ptr<uint8_t> m_sharedram;
 
 	// these are pointers into m_fgvideoram
-	UINT8* m_bg1_scroll;
-	UINT8* m_bg2_scroll;
-	UINT8* m_spriteram1;
-	UINT8* m_spriteram2;
-	UINT8* m_spriteram3;
+	uint8_t* m_bg1_scroll;
+	uint8_t* m_bg2_scroll;
+	uint8_t* m_spriteram1;
+	uint8_t* m_spriteram2;
+	uint8_t* m_spriteram3;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg1_tilemap;
 	tilemap_t *m_bg2_tilemap;
-	UINT8 m_nmi_mask;
+	uint8_t m_nmi_mask;
 
 	DECLARE_WRITE8_MEMBER(hold_cpu2_w);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
@@ -53,7 +53,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);

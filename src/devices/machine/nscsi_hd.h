@@ -9,8 +9,8 @@
 class nscsi_harddisk_device : public nscsi_full_device
 {
 public:
-	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	nscsi_harddisk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	nscsi_harddisk_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
@@ -19,10 +19,10 @@ protected:
 	virtual void device_reset() override;
 
 	virtual void scsi_command() override;
-	virtual UINT8 scsi_get_data(int id, int pos) override;
-	virtual void scsi_put_data(int buf, int offset, UINT8 data) override;
+	virtual uint8_t scsi_get_data(int id, int pos) override;
+	virtual void scsi_put_data(int buf, int offset, uint8_t data) override;
 
-	UINT8 block[512];
+	uint8_t block[512];
 	hard_disk_file *harddisk;
 	int lba, cur_lba, blocks;
 	int bytes_per_sector;

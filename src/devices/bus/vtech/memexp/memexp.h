@@ -45,7 +45,7 @@
 
 #define MCFG_MEMEXP_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, MEMEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(memexp_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(memexp_slot_carts, nullptr, false)
 
 #define MCFG_MEMEXP_SLOT_INT_HANDLER(_devcb) \
 	devcb = &memexp_device::set_int_handler(*device, DEVCB_##_devcb);
@@ -67,7 +67,7 @@ class memexp_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	memexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~memexp_slot_device();
 
 	void set_program_space(address_space *program);

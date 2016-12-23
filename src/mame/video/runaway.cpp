@@ -53,7 +53,7 @@ WRITE8_MEMBER(runaway_state::runaway_tile_bank_w)
 
 TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, ((code & 0x3f) << 1) | ((code & 0x40) >> 6) | (m_tile_bank << 7), 0, (code & 0x80) ? TILE_FLIPY : 0);
 }
@@ -61,7 +61,7 @@ TILE_GET_INFO_MEMBER(runaway_state::runaway_get_tile_info)
 
 TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
 {
-	UINT8 code = m_video_ram[tile_index];
+	uint8_t code = m_video_ram[tile_index];
 
 	SET_TILE_INFO_MEMBER(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), 0, 0);
 }
@@ -70,7 +70,7 @@ TILE_GET_INFO_MEMBER(runaway_state::qwak_get_tile_info)
 
 void runaway_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::runaway_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::runaway_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
 
 	save_item(NAME(m_tile_bank));
 }
@@ -78,14 +78,14 @@ void runaway_state::video_start()
 
 VIDEO_START_MEMBER(runaway_state,qwak)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::qwak_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(runaway_state::qwak_get_tile_info),this), TILEMAP_SCAN_ROWS,  8, 8, 32, 30);
 
 	save_item(NAME(m_tile_bank));
 }
 
 
 
-UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 
@@ -119,7 +119,7 @@ UINT32 runaway_state::screen_update_runaway(screen_device &screen, bitmap_ind16 
 }
 
 
-UINT32 runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t runaway_state::screen_update_qwak(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int i;
 

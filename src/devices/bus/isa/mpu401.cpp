@@ -66,7 +66,7 @@ machine_config_constructor isa8_mpu401_device::device_mconfig_additions() const
 //  isa8_adlib_device - constructor
 //-------------------------------------------------
 
-isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_mpu401_device::isa8_mpu401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, ISA8_MPU401, "Roland MPU-401 MIDI Interface", tag, owner, clock, "isa_mpu401", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_mpu401(*this, MPU_CORE_TAG)
@@ -81,7 +81,7 @@ void isa8_mpu401_device::device_start()
 {
 	set_isa_device();
 
-	m_isa->install_device(0x330, 0x0331, 0, 0, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
+	m_isa->install_device(0x330, 0x0331, READ8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_r), WRITE8_DEVICE_DELEGATE(m_mpu401, mpu401_device, mpu_w));
 }
 
 //-------------------------------------------------

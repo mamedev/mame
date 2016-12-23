@@ -124,10 +124,10 @@
 static ADDRESS_MAP_START( bankp_map, AS_PROGRAM, 8, bankp_state )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(bankp_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(bankp_colorram_w) AM_SHARE("colorram")
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(bankp_videoram2_w) AM_SHARE("videoram2")
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(bankp_colorram2_w) AM_SHARE("colorram2")
+	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(videoram_w) AM_SHARE("videoram")
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(colorram_w) AM_SHARE("colorram")
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(videoram2_w) AM_SHARE("videoram2")
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(colorram2_w) AM_SHARE("colorram2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bankp_io_map, AS_IO, 8, bankp_state )
@@ -136,8 +136,8 @@ static ADDRESS_MAP_START( bankp_io_map, AS_IO, 8, bankp_state )
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_DEVWRITE("sn2", sn76489_device, write)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_DEVWRITE("sn3", sn76489_device, write)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
-	AM_RANGE(0x05, 0x05) AM_WRITE(bankp_scroll_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(bankp_out_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(scroll_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(out_w)
 ADDRESS_MAP_END
 
 
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( bankp )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 
 	PORT_START("IN1")
@@ -171,16 +171,16 @@ static INPUT_PORTS_START( bankp )
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x00, "Coin A/B" )                  PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x03, 0x00, "Coin Switch 1" )                  PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x04, 0x00, "Coin C" )                    PORT_DIPLOCATION("SW1:3")
+	PORT_DIPNAME( 0x04, 0x00, "Coin Switch 2" )                    PORT_DIPLOCATION("SW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW1:4")
@@ -279,6 +279,7 @@ void bankp_state::machine_reset()
 {
 	m_scroll_x = 0;
 	m_priority = 0;
+	m_nmi_mask = 0;
 }
 
 INTERRUPT_GEN_MEMBER(bankp_state::vblank_irq)
@@ -299,7 +300,7 @@ static MACHINE_CONFIG_START( bankp, bankp_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update_bankp)
+	MCFG_SCREEN_UPDATE_DRIVER(bankp_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", bankp)

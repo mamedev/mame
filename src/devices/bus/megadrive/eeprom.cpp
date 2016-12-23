@@ -60,46 +60,46 @@ const device_type MD_EEPROM_NHLPA = &device_creator<md_eeprom_nhlpa_device>;
 const device_type MD_EEPROM_BLARA = &device_creator<md_eeprom_blara_device>;
 
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 					: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 					device_md_cart_interface( mconfig, *this ),
 					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 				{
 }
 
-md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_std_eeprom_device::md_std_eeprom_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: device_t(mconfig, MD_STD_EEPROM, "MD Standard cart + EEPROM", tag, owner, clock, "md_std_eeprom", __FILE__),
 					device_md_cart_interface( mconfig, *this ),
 					m_i2cmem(*this, "i2cmem"), m_i2c_mem(0), m_i2c_clk(0)
 				{
 }
 
-md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_nbajam_device::md_eeprom_nbajam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM, "MD NBA Jam", tag, owner, clock, "md_eeprom_nbajam", __FILE__)
 {
 }
 
-md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_nbajamte_device::md_eeprom_nbajamte_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAMTE, "MD NBA Jam TE (and a few more)", tag, owner, clock, "md_eeprom_nbajamte", __FILE__)
 {
 }
 
-md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_cslam_device::md_eeprom_cslam_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_CSLAM, "MD College Slam", tag, owner, clock, "md_eeprom_cslam", __FILE__)
 {
 }
 
-md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_nflqb_device::md_eeprom_nflqb_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_NFLQB, "MD NFL Quarterback 96", tag, owner, clock, "md_eeprom_nflqb", __FILE__)
 {
 }
 
-md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_nhlpa_device::md_eeprom_nhlpa_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_NHLPA, "MD NHLPA 93", tag, owner, clock, "md_eeprom_nhlpa", __FILE__)
 {
 }
 
-md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+md_eeprom_blara_device::md_eeprom_blara_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 					: md_std_eeprom_device(mconfig, MD_EEPROM_BLARA, "MD Brian Lara", tag, owner, clock, "md_eeprom_blara", __FILE__)
 {
 }
@@ -372,5 +372,266 @@ WRITE16_MEMBER(md_eeprom_blara_device::write)
 		m_i2c_mem = BIT(data, 8);
 		m_i2cmem->write_scl(m_i2c_clk);
 		m_i2cmem->write_sda(m_i2c_mem);
+	}
+}
+
+// TEMPORARY ADDITION UNTIL WE FIND OUT WHAT IS MISSING IN THE CORE X24C02 CODE
+// THIS IS A CUSTOM I2C EEPROM EMULATION THAT ALLOWS NBA JAM TO WORK
+
+const device_type MD_EEPROM_NBAJAM_ALT = &device_creator<md_eeprom_nbajam_device_alt>;
+
+md_eeprom_nbajam_device_alt::md_eeprom_nbajam_device_alt(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+		: md_std_eeprom_device(mconfig, MD_EEPROM_NBAJAM_ALT, "MD NBA Jam (Alt)", tag, owner, clock, "md_eeprom_nbajama", __FILE__)
+{
+}
+
+void md_eeprom_nbajam_device_alt::device_start()
+{
+	eeprom_i2c_init();
+}
+
+
+void md_eeprom_nbajam_device_alt::eeprom_i2c_init()
+{
+	m_eeprom_cnt = 0;
+	m_eeprom_readwrite = 0;
+	m_eeprom_slave_mask = 0;
+	m_eeprom_word_address = 0;
+	m_eeprom_devsel = 0;
+	m_eeprom_byte = 0;
+
+	m_eeprom_sda = m_eeprom_prev_sda = 1;
+	m_eeprom_scl = m_eeprom_prev_scl = 1;
+	m_eeprom_cur_state = STATE_I2C_IDLE;
+
+	m_eeprom_mask = 0xff;
+	m_eeprom_pagewrite_mask = 0x03;
+}
+
+
+// this is analogous to i2cmem.cpp implementation of write_sda
+void md_eeprom_nbajam_device_alt::idle_devsel_check()
+{
+	if (m_eeprom_scl)
+	{
+		// All commands are preceded by the start condition, which is a HIGH to LOW
+		// transition of SDA when SCL is HIGH
+		if (m_eeprom_prev_sda && !m_eeprom_sda)
+		{
+			m_eeprom_cnt = 0;
+			m_eeprom_slave_mask = 0;
+			m_eeprom_cur_state = STATE_I2C_DEVSEL;
+		}
+		// All communications must be terminated by a stop condition, which is a LOW to HIGH
+		// transition of SDA when SCL is HIGH
+		else if (!m_eeprom_prev_sda && m_eeprom_sda)
+		{
+			m_eeprom_cur_state = STATE_I2C_IDLE;
+		}
+	}
+}
+
+void md_eeprom_nbajam_device_alt::eeprom_i2c_update(void)
+{
+	switch (m_eeprom_cur_state)
+	{
+		case STATE_I2C_IDLE:
+			idle_devsel_check();
+			break;
+
+		case STATE_I2C_WAIT_STOP:
+			if (!m_eeprom_prev_sda && m_eeprom_sda && m_eeprom_scl)
+				m_eeprom_cur_state = STATE_I2C_IDLE;
+			break;
+
+		// device select: there can be up to 8 EEPROM in series, so that we start with writing 3 bits
+		// to identify which device has to be accessed, followed by a Read/Write bit to specify the action
+		case STATE_I2C_DEVSEL:
+			idle_devsel_check();
+
+			// LOW to HIGH transition of SCL = prepare to transmit, by moving to cnt = 1
+			if (!m_eeprom_prev_scl && m_eeprom_scl)
+			{
+				if (m_eeprom_cnt <= 4)
+				{
+					// here we would transmit the Device Type Identifier which is 0101 for X24C02
+					// but apparently the game does not check it, so let's skip it
+				}
+				else if ((m_eeprom_cnt > 4) && (m_eeprom_cnt < 8))
+				{
+					// here store the 3 bits of DEVICE ADDRESS
+					m_eeprom_devsel = ((m_eeprom_devsel << 1) | m_eeprom_sda) & 0xff;
+				}
+				else if (m_eeprom_cnt == 8)
+					m_eeprom_readwrite = m_eeprom_sda;
+			}
+
+			// HIGH to LOW transition of SCL = a new bit has been put on SDA line and we can read it
+			// provided we already got the LOW to HIGH transition above
+			if (m_eeprom_prev_scl && !m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_cnt++;
+				else
+				{
+					// ACK
+					m_eeprom_cnt = 1;
+					m_eeprom_cur_state = m_eeprom_readwrite ? STATE_I2C_READ_DATA : STATE_I2C_GET_WORD_ADDR;
+				}
+			}
+			break;
+
+		// read operation = count 8 operations and at 9th check whether ACK has been issued
+		case STATE_I2C_READ_DATA:
+			idle_devsel_check();
+
+			// HIGH to LOW transition of SCL
+			if (m_eeprom_prev_scl && !m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_cnt++;
+				else
+					m_eeprom_cnt = 1;
+			}
+
+			// LOW to HIGH transition of SCL
+			if (!m_eeprom_prev_scl && m_eeprom_scl)
+			{
+				if (m_eeprom_cnt == 9)
+				{
+					// no ACK
+					if (m_eeprom_sda)
+						m_eeprom_cur_state = STATE_I2C_WAIT_STOP;
+				}
+			}
+
+			break;
+
+		// For a write operation, the x24c02 requires a second address field. This address field is the
+		// word address, comprised of eight bits, providing access to any one of the 256 words of memory.
+		case STATE_I2C_GET_WORD_ADDR:
+			idle_devsel_check();
+
+			// HIGH to LOW transition of SCL
+			if (m_eeprom_prev_scl && !m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_cnt++;
+				else
+				{
+					// ACK
+					m_eeprom_cnt = 1;
+					m_eeprom_cur_state = STATE_I2C_WRITE_DATA;
+					m_eeprom_byte = 0;
+					m_eeprom_word_address &= m_eeprom_mask;
+				}
+			}
+
+			// LOW to HIGH transition of SCL
+			if (!m_eeprom_prev_scl && m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_word_address = ((m_eeprom_word_address << 1) | m_eeprom_sda) & 0xff;
+			}
+			break;
+
+		// write operation
+		case STATE_I2C_WRITE_DATA:
+			idle_devsel_check();
+
+			// HIGH to LOW transition of SCL
+			if (m_eeprom_prev_scl && !m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_cnt++;
+				else
+					m_eeprom_cnt = 1;
+			}
+
+			// LOW to HIGH transition of SCL
+			if (!m_eeprom_prev_scl && m_eeprom_scl)
+			{
+				if (m_eeprom_cnt < 9)
+					m_eeprom_byte = ((m_eeprom_byte << 1) | m_eeprom_sda) & 0xff;
+				else
+				{
+					uint8_t *nvram = (uint8_t *)&m_nvram[0];
+					uint16_t sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
+					nvram[sram_address & 0xffff] = m_eeprom_byte;
+					m_eeprom_byte = 0;
+
+					//printf("Write EEPROM : status %d addr %x data %x (count 8)\n", m_eeprom_cur_state, sram_address, nvram[sram_address]);
+					// WORD ADDRESS++
+					m_eeprom_word_address = (m_eeprom_word_address & ~m_eeprom_pagewrite_mask) |
+											((m_eeprom_word_address + 1) & m_eeprom_pagewrite_mask);
+				}
+			}
+			break;
+	}
+
+	m_eeprom_prev_scl = m_eeprom_scl;
+	m_eeprom_prev_sda = m_eeprom_sda;
+	//printf("Write line : status %d SDA %x SCL %x (count %d)\n", m_eeprom_cur_state, m_eeprom_sda, m_eeprom_scl, m_eeprom_cnt);
+}
+
+uint8_t md_eeprom_nbajam_device_alt::eeprom_i2c_out()
+{
+	uint8_t res = m_eeprom_sda;
+
+	switch (m_eeprom_cur_state)
+	{
+		case STATE_I2C_READ_DATA:
+			if (m_eeprom_cnt < 9)
+			{
+				uint8_t *nvram = (uint8_t *)&m_nvram[0];
+				uint16_t sram_address = m_eeprom_slave_mask | (m_eeprom_devsel * 0x100) | m_eeprom_word_address;
+				sram_address &= 0xffff;
+
+				res = (nvram[sram_address] >> (8 - m_eeprom_cnt)) & 1;
+
+				if (m_eeprom_cnt == 8)
+				{
+					//printf("Read EEPROM : status %d addr %x data %x (count 8)\n", m_eeprom_cur_state, sram_address, nvram[sram_address]);
+					// WORD ADDRESS++
+					m_eeprom_word_address++;
+					m_eeprom_word_address &= m_eeprom_mask;
+				}
+			}
+			break;
+		case STATE_I2C_DEVSEL:
+		case STATE_I2C_GET_WORD_ADDR:
+		case STATE_I2C_WRITE_DATA:
+			if (m_eeprom_cnt == 9)
+				res = 0;
+			break;
+
+		default:
+			break;
+	}
+
+	//printf("Read line : status %d data %x (count %d)\n", m_eeprom_cur_state, res, m_eeprom_cnt);
+	return res;
+}
+
+
+READ16_MEMBER(md_eeprom_nbajam_device_alt::read)
+{
+	if (offset == 0x200000/2)
+	{
+		return eeprom_i2c_out() << 1;
+	}
+	if (offset < 0x400000/2)
+		return m_rom[MD_ADDR(offset)];
+	else
+		return 0xffff;
+}
+
+WRITE16_MEMBER(md_eeprom_nbajam_device_alt::write)
+{
+	if (offset == 0x200000/2)
+	{
+		m_eeprom_sda = BIT(data, 0);
+		m_eeprom_scl = BIT(data, 1);
+		eeprom_i2c_update();
 	}
 }

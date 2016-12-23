@@ -22,7 +22,7 @@ extern const device_type TI99_SPEECH;
 class ti_speech_synthesizer_device : public ti_expansion_card_device
 {
 public:
-	ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti_speech_synthesizer_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 	DECLARE_SETADDRESS_DBIN_MEMBER(setaddress_dbin) override;
@@ -35,13 +35,14 @@ public:
 protected:
 	virtual void            device_start() override;
 	virtual void            device_reset(void) override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual void            device_config_complete() override;
 
 private:
-	cd2501e_device *m_vsp;
-	bool            m_read_mode;
+	address_space*  m_space;
+	cd2501e_device* m_vsp;
+	bool            m_reading;
+	bool            m_sbe;          // Signal "Speech block enable"
 };
 
 #endif

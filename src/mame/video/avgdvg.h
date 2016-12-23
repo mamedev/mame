@@ -26,7 +26,7 @@ class avgdvg_device : public device_t
 {
 public:
 	// construction/destruction
-	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avgdvg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	static void static_set_vector_tag(device_t &device, const char *tag);
 
@@ -53,10 +53,10 @@ protected:
 
 	void register_state();
 
-	UINT8 *avgdvg_vectorram;
+	uint8_t *avgdvg_vectorram;
 	size_t avgdvg_vectorram_size;
 
-	UINT8 *avgdvg_colorram;
+	uint8_t *avgdvg_colorram;
 
 
 	int xmin, xmax, ymin, ymax;
@@ -69,43 +69,43 @@ protected:
 	vgvector vectbuf[MAXVECT];
 
 
-	UINT16 m_pc;
-	UINT8 m_sp;
-	UINT16 m_dvx;
-	UINT16 m_dvy;
-	UINT8 m_dvy12;
-	UINT16 m_timer;
-	UINT16 m_stack[4];
-	UINT16 m_data;
+	uint16_t m_pc;
+	uint8_t m_sp;
+	uint16_t m_dvx;
+	uint16_t m_dvy;
+	uint8_t m_dvy12;
+	uint16_t m_timer;
+	uint16_t m_stack[4];
+	uint16_t m_data;
 
-	UINT8 m_state_latch;
-	UINT8 m_int_latch;
-	UINT8 m_scale;
-	UINT8 m_bin_scale;
-	UINT8 m_intensity;
-	UINT8 m_color;
-	UINT8 m_enspkl;
-	UINT8 m_spkl_shift;
-	UINT8 m_map;
+	uint8_t m_state_latch;
+	uint8_t m_int_latch;
+	uint8_t m_scale;
+	uint8_t m_bin_scale;
+	uint8_t m_intensity;
+	uint8_t m_color;
+	uint8_t m_enspkl;
+	uint8_t m_spkl_shift;
+	uint8_t m_map;
 
-	UINT16 m_hst;
-	UINT16 m_lst;
-	UINT16 m_izblank;
+	uint16_t m_hst;
+	uint16_t m_lst;
+	uint16_t m_izblank;
 
-	UINT8 m_op;
-	UINT8 m_halt;
-	UINT8 m_sync_halt;
+	uint8_t m_op;
+	uint8_t m_halt;
+	uint8_t m_sync_halt;
 
-	UINT16 m_xdac_xor;
-	UINT16 m_ydac_xor;
+	uint16_t m_xdac_xor;
+	uint16_t m_ydac_xor;
 
-	INT32 m_xpos;
-	INT32 m_ypos;
+	int32_t m_xpos;
+	int32_t m_ypos;
 
-	INT32 m_clipx_min;
-	INT32 m_clipy_min;
-	INT32 m_clipx_max;
-	INT32 m_clipy_max;
+	int32_t m_clipx_min;
+	int32_t m_clipy_min;
+	int32_t m_clipx_max;
+	int32_t m_clipy_max;
 
 
 	virtual int handler_0() = 0;
@@ -116,7 +116,7 @@ protected:
 	virtual int handler_5() = 0;
 	virtual int handler_6() = 0;
 	virtual int handler_7() = 0;
-	virtual UINT8 state_addr() = 0;
+	virtual uint8_t state_addr() = 0;
 	virtual void update_databus() = 0;
 	virtual void vggo() = 0;
 	virtual void vgrst() = 0;
@@ -128,7 +128,7 @@ class dvg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dvg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	void dvg_draw_to(int x, int y, int intensity);
 
@@ -140,7 +140,7 @@ public:
 	virtual int handler_5() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
-	virtual UINT8 state_addr() override;
+	virtual uint8_t state_addr() override;
 	virtual void update_databus() override;
 	virtual void vggo() override;
 	virtual void vgrst() override;
@@ -155,8 +155,8 @@ class avg_device : public avgdvg_device
 {
 public:
 	// construction/destruction
-	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	avg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	avg_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	int avg_common_strobe1();
 	int avg_common_strobe2();
@@ -170,7 +170,7 @@ public:
 	virtual int handler_5() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
-	virtual UINT8 state_addr() override;
+	virtual uint8_t state_addr() override;
 	virtual void update_databus() override;
 	virtual void vggo() override;
 	virtual void vgrst() override;
@@ -185,7 +185,7 @@ class avg_tempest_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tempest_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual int handler_6() override;
 	virtual int handler_7() override;
@@ -199,7 +199,7 @@ class avg_mhavoc_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_mhavoc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual int handler_1() override;
 	virtual int handler_6() override;
@@ -215,7 +215,7 @@ class avg_starwars_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_starwars_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual int handler_6() override;
 	virtual int handler_7() override;
 	virtual void update_databus() override;
@@ -228,7 +228,7 @@ class avg_quantum_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_quantum_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual int handler_0() override;
 	virtual int handler_1() override;
 	virtual int handler_2() override;
@@ -248,7 +248,7 @@ class avg_bzone_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_bzone_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual int handler_1() override;
 	virtual int handler_6() override;
 	virtual int handler_7() override;
@@ -261,7 +261,7 @@ class avg_tomcat_device : public avg_device
 {
 public:
 	// construction/destruction
-	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	avg_tomcat_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual int handler_6() override;
 	virtual int handler_7() override;

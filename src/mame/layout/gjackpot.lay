@@ -30,20 +30,20 @@
 	</element>
 
 	<element name="sym_heart" defstate="0">
-		<text state="0" string="H"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="H"><color red="0.2" green="1.0" blue="0.9" /></text>
+		<text state="0" string="&#x2665;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="&#x2665;"><color red="0.2" green="1.0" blue="0.9" /></text>
 	</element>
 	<element name="sym_diamond" defstate="0">
-		<text state="0" string="D"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="D"><color red="0.2" green="1.0" blue="0.9" /></text>
+		<text state="0" string="&#x2666;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="&#x2666;"><color red="0.2" green="1.0" blue="0.9" /></text>
 	</element>
 	<element name="sym_club" defstate="0">
-		<text state="0" string="C"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="C"><color red="0.2" green="1.0" blue="0.9" /></text>
+		<text state="0" string="&#x2663;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="&#x2663;"><color red="0.2" green="1.0" blue="0.9" /></text>
 	</element>
 	<element name="sym_spade" defstate="0">
-		<text state="0" string="S"><color red="0.1" green="0.1" blue="0.1" /></text>
-		<text state="1" string="S"><color red="0.2" green="1.0" blue="0.9" /></text>
+		<text state="0" string="&#x2660;"><color red="0.1" green="0.1" blue="0.1" /></text>
+		<text state="1" string="&#x2660;"><color red="0.2" green="1.0" blue="0.9" /></text>
 	</element>
 
 
@@ -138,7 +138,6 @@
 		<bezel name="0.11" element="sym_spade"><bounds x="103" y="35" width="3" height="3" /></bezel>
 		<bezel name="0.9" element="sym_diamond"><bounds x="106.5" y="35" width="3" height="3" /></bezel>
 
-
 	<!-- bezel -->
 
 		<bezel element="static_yellow"><bounds x="0" y="13" width="114" height="0.5" /></bezel>
@@ -169,7 +168,6 @@
 		<bezel element="text_3"><bounds x="82" y="41" width="10" height="4" /></bezel>
 		<bezel element="text_2"><bounds x="92" y="41" width="10" height="4" /></bezel>
 		<bezel element="text_1"><bounds x="102" y="41" width="10" height="4" /></bezel>
-
 
 	</view>
 </mamelayout>

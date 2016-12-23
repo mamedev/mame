@@ -1,10 +1,10 @@
 /* Sha256.h -- SHA-256 Hash
-2010-06-11 : Igor Pavlov : Public domain */
+2013-01-18 : Igor Pavlov : Public domain */
 
 #ifndef __CRYPTO_SHA256_H
 #define __CRYPTO_SHA256_H
 
-#include "Types.h"
+#include "7zTypes.h"
 
 EXTERN_C_BEGIN
 

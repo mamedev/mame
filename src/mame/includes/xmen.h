@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "sound/k054539.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053251.h"
@@ -22,6 +24,8 @@ public:
 		m_k053246(*this, "k053246"),
 		m_k053251(*this, "k053251"),
 		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
 		m_z80bank(*this, "z80bank") { }
 
 	/* video-related */
@@ -32,14 +36,14 @@ public:
 	/* for xmen6p */
 	std::unique_ptr<bitmap_ind16> m_screen_right;
 	std::unique_ptr<bitmap_ind16> m_screen_left;
-	optional_shared_ptr<UINT16> m_xmen6p_spriteramleft;
-	optional_shared_ptr<UINT16> m_xmen6p_spriteramright;
-	optional_shared_ptr<UINT16> m_xmen6p_tilemapleft;
-	optional_shared_ptr<UINT16> m_xmen6p_tilemapright;
-	UINT16 *   m_k053247_ram;
+	optional_shared_ptr<uint16_t> m_xmen6p_spriteramleft;
+	optional_shared_ptr<uint16_t> m_xmen6p_spriteramright;
+	optional_shared_ptr<uint16_t> m_xmen6p_tilemapleft;
+	optional_shared_ptr<uint16_t> m_xmen6p_tilemapright;
+	uint16_t *   m_k053247_ram;
 
 	/* misc */
-	UINT8       m_vblank_irq_mask;
+	uint8_t       m_vblank_irq_mask;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -49,6 +53,8 @@ public:
 	required_device<k053247_device> m_k053246;
 	required_device<k053251_device> m_k053251;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
 
 	required_memory_bank m_z80bank;
 	DECLARE_WRITE16_MEMBER(eeprom_w);
@@ -61,9 +67,9 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_VIDEO_START(xmen6p);
-	UINT32 screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_xmen(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_xmen6p_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_xmen6p_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_xmen6p(screen_device &screen, bool state);
 	TIMER_DEVICE_CALLBACK_MEMBER(xmen_scanline);
 	K052109_CB_MEMBER(tile_callback);

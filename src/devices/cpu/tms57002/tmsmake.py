@@ -1,4 +1,6 @@
 #!/usr/bin/python
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 
 from __future__ import print_function
 
@@ -89,7 +91,7 @@ PDESC_EXPAND = {
     "wd1":   expand_wd1,
     "b1":    lambda v: "pc = ",
     "b2":    lambda v: "  sti |= S_BRANCH;",
-    "sfai1": lambda v: ["",  "((INT32)("][v["sfai"]],
+    "sfai1": lambda v: ["",  "((int32_t)("][v["sfai"]],
     "sfai2": lambda v: ["",  ")) >> 1"][v["sfai"]],
 }
 
@@ -204,7 +206,7 @@ class Instruction:
         opcode, args = self.GetDasmInfo()
         args = [", " + a for a in args]
         print("%scase 0x%02x:" % (prefix, self._id), file=f)
-        print("%s  sprintf(buf, \"%s\"%s);" % (prefix, opcode, "".join(args)), file=f)
+        print("%s  util::stream_format(stream, \"%s\"%s);" % (prefix, opcode, "".join(args)), file=f)
         print("%s  break;" % prefix, file=f)
 
 

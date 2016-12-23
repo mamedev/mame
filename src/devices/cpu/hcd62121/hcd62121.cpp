@@ -29,7 +29,7 @@ Martin Poupe's site can be found at http://martin.poupe.org/casio/
 const device_type HCD62121 = &device_creator<hcd62121_cpu_device>;
 
 
-hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, HCD62121, "Hitachi HCD62121", tag, owner, clock, "hcd62121", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 24, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 8, 0), m_prev_pc(0)
@@ -45,15 +45,15 @@ hcd62121_cpu_device::hcd62121_cpu_device(const machine_config &mconfig, const ch
 }
 
 
-UINT8 hcd62121_cpu_device::read_op()
+uint8_t hcd62121_cpu_device::read_op()
 {
-	UINT8 d = m_program->read_byte( ( m_cseg << 16 ) | m_ip );
+	uint8_t d = m_program->read_byte( ( m_cseg << 16 ) | m_ip );
 	m_ip++;
 	return d;
 }
 
 
-UINT8 hcd62121_cpu_device::datasize( UINT8 op )
+uint8_t hcd62121_cpu_device::datasize( uint8_t op )
 {
 	switch( op & 0x03 )
 	{
@@ -70,7 +70,7 @@ UINT8 hcd62121_cpu_device::datasize( UINT8 op )
 }
 
 
-void hcd62121_cpu_device::read_reg( int size, UINT8 op1 )
+void hcd62121_cpu_device::read_reg( int size, uint8_t op1 )
 {
 	int i;
 
@@ -87,7 +87,7 @@ void hcd62121_cpu_device::read_reg( int size, UINT8 op1 )
 }
 
 
-void hcd62121_cpu_device::write_reg( int size, UINT8 op1 )
+void hcd62121_cpu_device::write_reg( int size, uint8_t op1 )
 {
 	int i;
 
@@ -104,7 +104,7 @@ void hcd62121_cpu_device::write_reg( int size, UINT8 op1 )
 }
 
 
-void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_is_logical )
+void hcd62121_cpu_device::read_regreg( int size, uint8_t op1, uint8_t op2, bool op_is_logical )
 {
 	int i;
 
@@ -130,7 +130,7 @@ void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_i
 		/* We need to swap parameters */
 		for ( i = 0; i < size; i++ )
 		{
-			UINT8 v = m_temp1[i];
+			uint8_t v = m_temp1[i];
 			m_temp1[i] = m_temp2[i];
 			m_temp2[i] = v;
 		}
@@ -138,7 +138,7 @@ void hcd62121_cpu_device::read_regreg( int size, UINT8 op1, UINT8 op2, bool op_i
 }
 
 
-void hcd62121_cpu_device::write_regreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_regreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
@@ -157,10 +157,10 @@ void hcd62121_cpu_device::write_regreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::read_iregreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
-	UINT16 ad;
+	uint16_t ad;
 
 	ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
@@ -188,7 +188,7 @@ void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
 		/* We need to swap parameters */
 		for ( i = 0; i < size; i++ )
 		{
-			UINT8 v = m_temp1[i];
+			uint8_t v = m_temp1[i];
 			m_temp1[i] = m_temp2[i];
 			m_temp2[i] = v;
 		}
@@ -196,14 +196,14 @@ void hcd62121_cpu_device::read_iregreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::write_iregreg( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_iregreg( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
 	if ( ( op1 & 0x80 ) || ( op2 & 0x80 ) )
 	{
 		/* store in (reg1) */
-		UINT16 ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
+		uint16_t ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
 		for ( i = 0; i < size; i++ )
 		{
@@ -221,7 +221,7 @@ void hcd62121_cpu_device::write_iregreg( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
+void hcd62121_cpu_device::write_iregreg2( int size, uint8_t op1, uint8_t op2 )
 {
 	int i;
 
@@ -234,7 +234,7 @@ void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
 	else
 	{
 		/* store in (reg1) */
-		UINT16 ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
+		uint16_t ad = m_reg[ ( 0x40 | op1 ) & 0x7f ] | ( m_reg[ ( 0x40 | ( op1 + 1 ) ) & 0x7f ] << 8 );
 
 		for ( i = 0; i < size; i++ )
 		{
@@ -246,7 +246,7 @@ void hcd62121_cpu_device::write_iregreg2( int size, UINT8 op1, UINT8 op2 )
 }
 
 
-int hcd62121_cpu_device::check_cond( UINT8 op )
+int hcd62121_cpu_device::check_cond( uint8_t op )
 {
 	switch ( op & 0x07 )
 	{
@@ -314,7 +314,8 @@ void hcd62121_cpu_device::device_start()
 	save_item( NAME(m_temp2) );
 
 	// Register state for debugger
-	state_add( STATE_GENPC,    "curpc",    m_ip ).callimport().callexport().formatstr("%8s");
+	state_add( STATE_GENPC,    "GENPC",    m_ip ).callexport().formatstr("%8s");
+	state_add( STATE_GENPCBASE,"CURPC",    m_ip ).callexport().formatstr("%8s");
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_f  ).callimport().callexport().formatstr("%12s").noshow();
 
 	state_add( HCD62121_IP,    "IP",    m_ip    ).callimport().callexport().formatstr("%04X");
@@ -368,11 +369,12 @@ void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, s
 	switch (entry.index())
 	{
 		case STATE_GENPC:
-			strprintf(str, "%06X", (m_cseg << 16) | m_ip);
+		case STATE_GENPCBASE:
+			str = string_format("%06X", (m_cseg << 16) | m_ip);
 			break;
 
 		case STATE_GENFLAGS:
-			strprintf(str, "%s-%s-%s-%c-%c",
+			str = string_format("%s-%s-%s-%c-%c",
 				m_f & _FLAG_ZH ? "ZH":"__",
 				m_f & _FLAG_CL ? "CL":"__",
 				m_f & _FLAG_ZL ? "ZL":"__",
@@ -383,100 +385,100 @@ void hcd62121_cpu_device::state_string_export(const device_state_entry &entry, s
 			break;
 
 		case HCD62121_R00:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x00], m_reg[0x01], m_reg[0x02], m_reg[0x03]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x00], m_reg[0x01], m_reg[0x02], m_reg[0x03]);
 			break;
 		case HCD62121_R04:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x04], m_reg[0x05], m_reg[0x06], m_reg[0x07]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x04], m_reg[0x05], m_reg[0x06], m_reg[0x07]);
 			break;
 		case HCD62121_R08:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x08], m_reg[0x09], m_reg[0x0A], m_reg[0x0B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x08], m_reg[0x09], m_reg[0x0A], m_reg[0x0B]);
 			break;
 		case HCD62121_R0C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x0C], m_reg[0x0D], m_reg[0x0E], m_reg[0x0F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x0C], m_reg[0x0D], m_reg[0x0E], m_reg[0x0F]);
 			break;
 		case HCD62121_R10:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x10], m_reg[0x11], m_reg[0x12], m_reg[0x13]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x10], m_reg[0x11], m_reg[0x12], m_reg[0x13]);
 			break;
 		case HCD62121_R14:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x14], m_reg[0x15], m_reg[0x16], m_reg[0x17]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x14], m_reg[0x15], m_reg[0x16], m_reg[0x17]);
 			break;
 		case HCD62121_R18:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x18], m_reg[0x19], m_reg[0x1A], m_reg[0x1B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x18], m_reg[0x19], m_reg[0x1A], m_reg[0x1B]);
 			break;
 		case HCD62121_R1C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x1C], m_reg[0x1D], m_reg[0x1E], m_reg[0x1F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x1C], m_reg[0x1D], m_reg[0x1E], m_reg[0x1F]);
 			break;
 		case HCD62121_R20:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x20], m_reg[0x21], m_reg[0x22], m_reg[0x23]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x20], m_reg[0x21], m_reg[0x22], m_reg[0x23]);
 			break;
 		case HCD62121_R24:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x24], m_reg[0x25], m_reg[0x26], m_reg[0x27]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x24], m_reg[0x25], m_reg[0x26], m_reg[0x27]);
 			break;
 		case HCD62121_R28:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x28], m_reg[0x29], m_reg[0x2A], m_reg[0x2B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x28], m_reg[0x29], m_reg[0x2A], m_reg[0x2B]);
 			break;
 		case HCD62121_R2C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x2C], m_reg[0x2D], m_reg[0x2E], m_reg[0x2F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x2C], m_reg[0x2D], m_reg[0x2E], m_reg[0x2F]);
 			break;
 		case HCD62121_R30:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x30], m_reg[0x31], m_reg[0x32], m_reg[0x33]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x30], m_reg[0x31], m_reg[0x32], m_reg[0x33]);
 			break;
 		case HCD62121_R34:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x34], m_reg[0x35], m_reg[0x36], m_reg[0x37]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x34], m_reg[0x35], m_reg[0x36], m_reg[0x37]);
 			break;
 		case HCD62121_R38:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x38], m_reg[0x39], m_reg[0x3A], m_reg[0x3B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x38], m_reg[0x39], m_reg[0x3A], m_reg[0x3B]);
 			break;
 		case HCD62121_R3C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x3C], m_reg[0x3D], m_reg[0x3E], m_reg[0x3F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x3C], m_reg[0x3D], m_reg[0x3E], m_reg[0x3F]);
 			break;
 		case HCD62121_R40:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x40], m_reg[0x41], m_reg[0x42], m_reg[0x43]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x40], m_reg[0x41], m_reg[0x42], m_reg[0x43]);
 			break;
 		case HCD62121_R44:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x44], m_reg[0x45], m_reg[0x46], m_reg[0x47]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x44], m_reg[0x45], m_reg[0x46], m_reg[0x47]);
 			break;
 		case HCD62121_R48:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x48], m_reg[0x49], m_reg[0x4A], m_reg[0x4B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x48], m_reg[0x49], m_reg[0x4A], m_reg[0x4B]);
 			break;
 		case HCD62121_R4C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x4C], m_reg[0x4D], m_reg[0x4E], m_reg[0x4F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x4C], m_reg[0x4D], m_reg[0x4E], m_reg[0x4F]);
 			break;
 		case HCD62121_R50:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x50], m_reg[0x51], m_reg[0x52], m_reg[0x53]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x50], m_reg[0x51], m_reg[0x52], m_reg[0x53]);
 			break;
 		case HCD62121_R54:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x54], m_reg[0x55], m_reg[0x56], m_reg[0x57]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x54], m_reg[0x55], m_reg[0x56], m_reg[0x57]);
 			break;
 		case HCD62121_R58:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x58], m_reg[0x59], m_reg[0x5A], m_reg[0x5B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x58], m_reg[0x59], m_reg[0x5A], m_reg[0x5B]);
 			break;
 		case HCD62121_R5C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x5C], m_reg[0x5D], m_reg[0x5E], m_reg[0x5F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x5C], m_reg[0x5D], m_reg[0x5E], m_reg[0x5F]);
 			break;
 		case HCD62121_R60:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x60], m_reg[0x61], m_reg[0x62], m_reg[0x63]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x60], m_reg[0x61], m_reg[0x62], m_reg[0x63]);
 			break;
 		case HCD62121_R64:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x64], m_reg[0x65], m_reg[0x66], m_reg[0x67]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x64], m_reg[0x65], m_reg[0x66], m_reg[0x67]);
 			break;
 		case HCD62121_R68:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x68], m_reg[0x69], m_reg[0x6A], m_reg[0x6B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x68], m_reg[0x69], m_reg[0x6A], m_reg[0x6B]);
 			break;
 		case HCD62121_R6C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x6C], m_reg[0x6D], m_reg[0x6E], m_reg[0x6F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x6C], m_reg[0x6D], m_reg[0x6E], m_reg[0x6F]);
 			break;
 		case HCD62121_R70:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x70], m_reg[0x71], m_reg[0x72], m_reg[0x73]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x70], m_reg[0x71], m_reg[0x72], m_reg[0x73]);
 			break;
 		case HCD62121_R74:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x74], m_reg[0x75], m_reg[0x76], m_reg[0x77]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x74], m_reg[0x75], m_reg[0x76], m_reg[0x77]);
 			break;
 		case HCD62121_R78:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x78], m_reg[0x79], m_reg[0x7A], m_reg[0x7B]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x78], m_reg[0x79], m_reg[0x7A], m_reg[0x7B]);
 			break;
 		case HCD62121_R7C:
-			strprintf(str, "%02X%02X%02X%02X", m_reg[0x7C], m_reg[0x7D], m_reg[0x7E], m_reg[0x7F]);
+			str = string_format("%02X%02X%02X%02X", m_reg[0x7C], m_reg[0x7D], m_reg[0x7E], m_reg[0x7F]);
 			break;
 	}
 }
@@ -504,8 +506,8 @@ void hcd62121_cpu_device::execute_run()
 {
 	do
 	{
-		UINT32 pc = ( m_cseg << 16 ) | m_ip;
-		UINT8 op;
+		uint32_t pc = ( m_cseg << 16 ) | m_ip;
+		uint8_t op;
 
 		debugger_instruction_hook(this, pc);
 		m_prev_pc = pc;
@@ -523,8 +525,8 @@ void hcd62121_cpu_device::execute_run()
 }
 
 
-offs_t hcd62121_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t hcd62121_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( hcd62121 );
-	return CPU_DISASSEMBLE_NAME(hcd62121)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(hcd62121)(this, stream, pc, oprom, opram, options);
 }

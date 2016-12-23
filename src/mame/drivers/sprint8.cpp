@@ -32,7 +32,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(sprint8_state::input_callback)
 
 	for (i = 0; i < 8; i++)
 	{
-		UINT8 val = ioport(dialnames[i])->read() >> 4;
+		uint8_t val = ioport(dialnames[i])->read() >> 4;
 
 		signed char delta = (val - m_dial[i]) & 15;
 
@@ -68,7 +68,7 @@ READ8_MEMBER(sprint8_state::sprint8_collision_r)
 READ8_MEMBER(sprint8_state::sprint8_input_r)
 {
 	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
-	UINT8 val = ioport(portnames[offset])->read();
+	uint8_t val = ioport(portnames[offset])->read();
 
 	if (m_steer_dir[offset])
 	{

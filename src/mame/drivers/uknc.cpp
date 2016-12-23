@@ -21,7 +21,7 @@ public:
 
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -51,7 +51,7 @@ void uknc_state::video_start()
 {
 }
 
-UINT32 uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t uknc_state::screen_update_uknc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -76,7 +76,7 @@ static MACHINE_CONFIG_START( uknc, uknc_state )
 	MCFG_SCREEN_UPDATE_DRIVER(uknc_state, screen_update_uknc)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 MACHINE_CONFIG_END
 
 /* ROM definition */

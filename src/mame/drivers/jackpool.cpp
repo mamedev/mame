@@ -35,15 +35,15 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_vram;
-	UINT8 m_map_vreg;
-	required_shared_ptr<UINT16> m_io;
+	required_shared_ptr<uint16_t> m_vram;
+	uint8_t m_map_vreg;
+	required_shared_ptr<uint16_t> m_io;
 	DECLARE_READ16_MEMBER(jackpool_ff_r);
 	DECLARE_READ16_MEMBER(jackpool_io_r);
 	DECLARE_WRITE16_MEMBER(jackpool_io_w);
 	DECLARE_DRIVER_INIT(jackpool);
 	virtual void video_start() override;
-	UINT32 screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(jackpool_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -56,7 +56,7 @@ void jackpool_state::video_start()
 {
 }
 
-UINT32 jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jackpool_state::screen_update_jackpool(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	int count;// = 0x00000/2;
@@ -309,7 +309,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(jackpool_state,jackpool)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* patch NVRAM routine */
 	rom[0x9040/2] = 0x6602;

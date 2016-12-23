@@ -65,7 +65,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 3b) 'chelnovu'
 
   - DSW2 bit 6 freezes the game (code at 0x000654), but when you turn
-    the Dip Swicth back to "Off", it adds credits as if COIN1 was pressed.
+    the Dip Switch back to "Off", it adds credits as if COIN1 was pressed.
     Is that the correct behaviour ?
   - Even if there is a "andi.w  #$ffff, D5" instruction at 0x000ef0,
     DSW2 bit 7 isn't tested in this set.
@@ -361,7 +361,7 @@ WRITE16_MEMBER(karnov_state::karnov_control_w)
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
-			soundlatch_byte_w(space, 0, data & 0xff);
+			m_soundlatch->write(space, 0, data & 0xff);
 			m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
@@ -439,7 +439,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karnov_sound_map, AS_PROGRAM, 8, karnov_state )
 	AM_RANGE(0x0000, 0x05ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1000, 0x1001) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x1800, 0x1801) AM_DEVWRITE("ym2", ym3526_device, write)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -726,7 +726,7 @@ GFXDECODE_END
 
 INTERRUPT_GEN_MEMBER(karnov_state::karnov_interrupt)
 {
-	UINT8 port = ioport("FAKE")->read();
+	uint8_t port = ioport("FAKE")->read();
 
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == m_coin_mask)
@@ -816,20 +816,21 @@ static MACHINE_CONFIG_START( karnov, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,karnov)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -880,20 +881,21 @@ static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 	MCFG_PALETTE_INIT_OWNER(karnov_state, karnov)
 
 	MCFG_DEVICE_ADD("spritegen", DECO_KARNOVSPRITES, 0)
-	deco_karnovsprites_device::set_gfx_region(*device, 2);
+	MCFG_DECO_KARNOVSPRITES_GFX_REGION(2)
 	MCFG_DECO_KARNOVSPRITES_GFXDECODE("gfxdecode")
-	MCFG_DECO_KARNOVSPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(karnov_state,wndrplnt)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
-	MCFG_YM3526_IRQ_HANDLER(DEVWRITELINE("audiocpu", m6502_device, irq_line))
+	MCFG_YM3526_IRQ_HANDLER(INPUTLINE("audiocpu", M6502_IRQ_LINE))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1286,7 +1288,7 @@ DRIVER_INIT_MEMBER(karnov_state,wndrplnt)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnov)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOV;
 	m_coin_mask = 0xe0;
@@ -1295,7 +1297,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnov)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVU;
 	m_coin_mask = 0xe0;
@@ -1304,7 +1306,7 @@ DRIVER_INIT_MEMBER(karnov_state,chelnovu)
 
 DRIVER_INIT_MEMBER(karnov_state,chelnovj)
 {
-	UINT16 *RAM = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *RAM = (uint16_t *)memregion("maincpu")->base();
 
 	m_microcontroller_id = CHELNOVJ;
 	m_coin_mask = 0xe0;

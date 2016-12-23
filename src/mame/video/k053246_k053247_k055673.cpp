@@ -64,7 +64,7 @@ void k053247_device::clear_all()
 	m_memory_region = nullptr;
 }
 
-void k053247_device::k053247_get_ram( UINT16 **ram )
+void k053247_device::k053247_get_ram( uint16_t **ram )
 {
 	*ram = m_ram.get();
 }
@@ -133,8 +133,8 @@ WRITE8_MEMBER( k053247_device::k053247_w )
 // FIXME: rearrange ROM loading so this can be merged with the 4/6/8bpp version
 READ16_MEMBER( k053247_device::k055673_5bpp_rom_word_r ) // 5bpp
 {
-	UINT8 *ROM8 = (UINT8 *)space.machine().root_device().memregion(m_memory_region)->base();
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint8_t *ROM8 = (uint8_t *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
 	int size4 = (space.machine().root_device().memregion(m_memory_region)->bytes() / (1024 * 1024)) / 5;
 	int romofs;
 
@@ -174,7 +174,7 @@ READ16_MEMBER( k053247_device::k055673_rom_word_r )
 	if (m_bpp == 5)
 		return k055673_5bpp_rom_word_r(space, offset, mem_mask);
 
-	UINT16 *ROM = (UINT16 *)space.machine().root_device().memregion(m_memory_region)->base();
+	uint16_t *ROM = (uint16_t *)space.machine().root_device().memregion(m_memory_region)->base();
 	int romofs;
 
 	romofs = m_kx46_regs[6] << 16 | m_kx46_regs[7] << 8 | m_kx46_regs[4];
@@ -278,8 +278,8 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 
 
-	UINT8 drawmode_table[256];
-	UINT8 shadowmode_table[256];
+	uint8_t drawmode_table[256];
+	uint8_t shadowmode_table[256];
 
 
 	memset(drawmode_table, DRAWMODE_SOURCE, sizeof(drawmode_table));
@@ -292,9 +292,9 @@ void k053247_device::k053247_sprites_draw_common( _BitmapClass &bitmap, const re
 
 	    VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS
 	*/
-	if (m_palette->shadows_enabled())
+	if (palette().shadows_enabled())
 	{
-		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (m_palette->hilights_enabled()))
+		if (sizeof(typename _BitmapClass::pixel_t) == 4 && (palette().hilights_enabled()))
 			shdmask = 3; // enable all shadows and highlights
 		else
 			shdmask = 0; // enable default shadows
@@ -441,8 +441,8 @@ void k053247_device::k053247_sprites_draw( bitmap_rgb32 &bitmap, const rectangle
 
 void k053247_device::zdrawgfxzoom32GP(
 		bitmap_rgb32 &bitmap, const rectangle &cliprect,
-		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf)
+		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
 {
 #define FP     19
 #define FPONE  (1<<FP)
@@ -450,21 +450,21 @@ void k053247_device::zdrawgfxzoom32GP(
 #define FPENT  0
 
 	// inner loop
-	const UINT8  *src_ptr;
+	const uint8_t  *src_ptr;
 	int src_x;
 	int eax, ecx;
 	int src_fx, src_fdx;
 	int shdpen;
-	UINT8  z8 = 0, p8 = 0;
-	UINT8  *ozbuf_ptr;
-	UINT8  *szbuf_ptr;
+	uint8_t  z8 = 0, p8 = 0;
+	uint8_t  *ozbuf_ptr;
+	uint8_t  *szbuf_ptr;
 	const pen_t *pal_base;
 	const pen_t *shd_base;
-	UINT32 *dst_ptr;
+	uint32_t *dst_ptr;
 
 	// outter loop
 	int src_fby, src_fdy, src_fbx;
-	const UINT8 *src_base;
+	const uint8_t *src_base;
 	int dst_w, dst_h;
 
 	// one-time
@@ -505,8 +505,8 @@ void k053247_device::zdrawgfxzoom32GP(
 	src_fh    = 16;
 	src_base  = m_gfx->get_data(code % m_gfx->elements());
 
-	pal_base  = m_palette->pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
-	shd_base  = m_palette->shadow_table();
+	pal_base  = palette().pens() + m_gfx->colorbase() + (color % m_gfx->colors()) * granularity;
+	shd_base  = palette().shadow_table();
 
 	dst_ptr   = &bitmap.pix32(0);
 	dst_pitch = bitmap.rowpixels();
@@ -565,8 +565,8 @@ void k053247_device::zdrawgfxzoom32GP(
 
 	// adjust insertion points and pre-entry constants
 	eax = (dst_y - dst_miny) * GX_ZBUFW + (dst_x - dst_minx) + dst_w;
-	z8 = (UINT8)zcode;
-	p8 = (UINT8)pri;
+	z8 = (uint8_t)zcode;
+	p8 = (uint8_t)pri;
 	ozbuf_ptr += eax;
 	szbuf_ptr += eax << 1;
 	dst_ptr += dst_y * dst_pitch + dst_x + dst_w;
@@ -886,8 +886,8 @@ void k053247_device::zdrawgfxzoom32GP(
 
 void k053247_device::zdrawgfxzoom32GP(
 		bitmap_ind16 &bitmap, const rectangle &cliprect,
-		UINT32 code, UINT32 color, int flipx, int flipy, int sx, int sy,
-		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, UINT8* gx_objzbuf, UINT8* gx_shdzbuf)
+		uint32_t code, uint32_t color, int flipx, int flipy, int sx, int sy,
+		int scalex, int scaley, int alpha, int drawmode, int zcode, int pri, uint8_t* gx_objzbuf, uint8_t* gx_shdzbuf)
 {
 	fatalerror("no zdrawgfxzoom32GP for bitmap_ind16\n");
 }
@@ -902,7 +902,7 @@ void k053247_device::zdrawgfxzoom32GP(
 
 const device_type K055673 = &device_creator<k055673_device>;
 
-k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k055673_device::k055673_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: k053247_device(mconfig, K055673, "K053246 & K055673 Sprite Generator", tag, owner, clock, "k055673", __FILE__)
 {
 }
@@ -914,8 +914,8 @@ k055673_device::k055673_device(const machine_config &mconfig, const char *tag, d
 
 void k055673_device::device_start()
 {
-	int gfx_index;
-	UINT32 total;
+	int gfx_index = 0;
+	uint32_t total;
 
 	static const gfx_layout spritelayout =  /* System GX sprite layout */
 	{
@@ -960,18 +960,12 @@ void k055673_device::device_start()
 			12*8*9, 12*8*10, 12*8*11, 12*8*12, 12*8*13, 12*8*14, 12*8*15 },
 		16*16*6
 	};
-	UINT8 *s1, *s2, *d;
+	uint8_t *s1, *s2, *d;
 	long i;
-	UINT16 *alt_k055673_rom;
+	uint16_t *alt_k055673_rom;
 	int size4;
 
-	/* find first empty slot to decode gfx */
-	for (gfx_index = 0; gfx_index < MAX_GFX_ELEMENTS; gfx_index++)
-		if (m_gfxdecode->gfx(gfx_index) == nullptr)
-			break;
-	assert(gfx_index != MAX_GFX_ELEMENTS);
-
-	alt_k055673_rom = (UINT16 *)machine().root_device().memregion(m_memory_region)->base();
+	alt_k055673_rom = (uint16_t *)machine().root_device().memregion(m_memory_region)->base();
 
 	/* decode the graphics */
 	switch (m_bpp)
@@ -980,8 +974,8 @@ void k055673_device::device_start()
 			size4 = (machine().root_device().memregion(m_memory_region)->bytes()/(1024*1024))/5;
 			size4 *= 4*1024*1024;
 			/* set the # of tiles based on the 4bpp section */
-			alt_k055673_rom = auto_alloc_array(machine(), UINT16, size4 * 5 / 2);
-			d = (UINT8 *)alt_k055673_rom;
+			alt_k055673_rom = auto_alloc_array(machine(), uint16_t, size4 * 5 / 2);
+			d = (uint8_t *)alt_k055673_rom;
 			// now combine the graphics together to form 5bpp
 			s1 = machine().root_device().memregion(m_memory_region)->base(); // 4bpp area
 			s2 = s1 + (size4);   // 1bpp area
@@ -995,44 +989,44 @@ void k055673_device::device_start()
 			}
 
 			total = size4 / 128;
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout, 5);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout, 5);
 			break;
 
 		case K055673_LAYOUT_RNG:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16/2);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout2, 4);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout2, 4);
 			break;
 
 		case K055673_LAYOUT_LE2:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout3, 8);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout3, 8);
 			break;
 
 		case K055673_LAYOUT_GX6:
 			total = machine().root_device().memregion(m_memory_region)->bytes() / (16*16*6/8);
-			konami_decode_gfx(machine(), m_gfxdecode, m_palette, gfx_index, (UINT8 *)alt_k055673_rom, total, &spritelayout4, 6);
+			konami_decode_gfx(*this, gfx_index, (uint8_t *)alt_k055673_rom, total, &spritelayout4, 6);
 			break;
 
 		default:
 			fatalerror("Unsupported layout\n");
 	}
 
-	if (VERBOSE && !(m_palette->shadows_enabled()))
+	if (VERBOSE && !(palette().shadows_enabled()))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	m_z_rejection = -1;
-	m_gfx = m_gfxdecode->gfx(gfx_index);
+	m_gfx = gfx(gfx_index);
 	m_objcha_line = CLEAR_LINE;
-	m_ram = std::make_unique<UINT16[]>(0x1000/2);
+	m_ram = std::make_unique<uint16_t[]>(0x1000/2);
 
 	memset(m_ram.get(),  0, 0x1000);
 	memset(m_kx46_regs, 0, 8);
 	memset(m_kx47_regs, 0, 32);
 
-	machine().save().save_pointer(NAME(m_ram.get()), 0x800);
-	machine().save().save_item(NAME(m_kx46_regs));
-	machine().save().save_item(NAME(m_kx47_regs));
-	machine().save().save_item(NAME(m_objcha_line));
+	save_pointer(NAME(m_ram.get()), 0x800);
+	save_item(NAME(m_kx46_regs));
+	save_item(NAME(m_kx47_regs));
+	save_item(NAME(m_objcha_line));
 }
 
 //-------------------------------------------------
@@ -1043,42 +1037,22 @@ void k055673_device::device_start()
 
 const device_type K053246 = &device_creator<k053247_device>;
 
-k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k053247_device::k053247_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K053246, "K053246 & K053247 Sprite Generator", tag, owner, clock, "k053247", __FILE__),
 		device_video_interface(mconfig, *this),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		device_gfx_interface(mconfig, *this),
+		m_gfx_num(0)
 {
 	clear_all();
 }
 
-k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+k053247_device::k053247_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_video_interface(mconfig, *this),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		device_gfx_interface(mconfig, *this, nullptr),
+		m_gfx_num(0)
 {
 	clear_all();
-}
-
-//-------------------------------------------------
-//  static_set_gfxdecode_tag: Set the tag of the
-//  gfx decoder
-//-------------------------------------------------
-
-void k053247_device::static_set_gfxdecode_tag(device_t &device, const char *tag)
-{
-	downcast<k053247_device &>(device).m_gfxdecode.set_tag(tag);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<k053247_device &>(device).m_palette.set_tag(tag);
 }
 
 //-------------------------------------------------
@@ -1087,7 +1061,7 @@ void k053247_device::static_set_palette_tag(device_t &device, const char *tag)
 
 void k053247_device::device_start()
 {
-	UINT32 total;
+	uint32_t total;
 	static const gfx_layout spritelayout =
 	{
 		16,16,
@@ -1106,7 +1080,7 @@ void k053247_device::device_start()
 	{
 	case NORMAL_PLANE_ORDER:
 		total = machine().root_device().memregion(m_memory_region)->bytes() / 128;
-		konami_decode_gfx(machine(), m_gfxdecode, m_palette, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &spritelayout, 4);
+		konami_decode_gfx(*this, m_gfx_num, machine().root_device().memregion(m_memory_region)->base(), total, &spritelayout, 4);
 		break;
 
 	default:
@@ -1117,19 +1091,19 @@ void k053247_device::device_start()
 	{
 		if (m_screen->format() == BITMAP_FORMAT_RGB32)
 		{
-			if (!m_palette->shadows_enabled() || !m_palette->hilights_enabled())
+			if (!palette().shadows_enabled() || !palette().hilights_enabled())
 				popmessage("driver missing SHADOWS or HIGHLIGHTS flag");
 		}
 		else
 		{
-			if (!(m_palette->shadows_enabled()))
+			if (!(palette().shadows_enabled()))
 				popmessage("driver should use VIDEO_HAS_SHADOWS");
 		}
 	}
 
-	m_gfx = m_gfxdecode->gfx(m_gfx_num);
+	m_gfx = gfx(m_gfx_num);
 
-	m_ram = make_unique_clear<UINT16[]>(0x1000 / 2);
+	m_ram = make_unique_clear<uint16_t[]>(0x1000 / 2);
 
 	save_pointer(NAME(m_ram.get()), 0x1000 / 2);
 	save_item(NAME(m_kx46_regs));

@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Phil Stroffolino
 
+#include "machine/gen_latch.h"
+
 class lkage_state : public driver_device
 {
 public:
@@ -14,20 +16,21 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch") { }
 
-	required_shared_ptr<UINT8> m_vreg;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_vreg;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_tx_tilemap;
-	UINT8 m_bg_tile_bank;
-	UINT8 m_fg_tile_bank;
-	UINT8 m_tx_tile_bank;
+	uint8_t m_bg_tile_bank;
+	uint8_t m_fg_tile_bank;
+	uint8_t m_tx_tile_bank;
 
 	int m_sprite_dx;
 
@@ -36,22 +39,22 @@ public:
 	int m_pending_nmi;
 
 	/* mcu */
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
 	int m_mcu_sent;
 	int m_main_sent;
-	UINT8 m_port_a_in;
-	UINT8 m_port_a_out;
-	UINT8 m_ddr_a;
-	UINT8 m_port_b_in;
-	UINT8 m_port_b_out;
-	UINT8 m_ddr_b;
-	UINT8 m_port_c_in;
-	UINT8 m_port_c_out;
-	UINT8 m_ddr_c;
+	uint8_t m_port_a_in;
+	uint8_t m_port_a_out;
+	uint8_t m_ddr_a;
+	uint8_t m_port_b_in;
+	uint8_t m_port_b_out;
+	uint8_t m_ddr_b;
+	uint8_t m_port_c_in;
+	uint8_t m_port_c_out;
+	uint8_t m_ddr_c;
 
 	/* lkageb fake mcu */
-	UINT8 m_mcu_val;
+	uint8_t m_mcu_val;
 	int m_mcu_ready;    /* cpu data/mcu ready status */
 
 	/* devices */
@@ -60,6 +63,7 @@ public:
 	optional_device<cpu_device> m_mcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(lkage_sound_command_w);
 	DECLARE_WRITE8_MEMBER(lkage_sh_nmi_disable_w);
@@ -91,8 +95,7 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lkage(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

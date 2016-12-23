@@ -60,11 +60,11 @@ void advision_state::vh_write(int data)
 
 void advision_state::vh_update(int x)
 {
-	UINT8 *dst = &m_display[x];
+	uint8_t *dst = &m_display[x];
 
 	for (int y = 0; y < 8; y++)
 	{
-		UINT8 data = m_led_latch[7 - y];
+		uint8_t data = m_led_latch[7 - y];
 
 		for (int i = 0; i < 8; i++)
 		{
@@ -84,7 +84,7 @@ void advision_state::vh_update(int x)
 
 ***************************************************************************/
 
-UINT32 advision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t advision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if ((m_frame_count++ % 4) == 0)
 	{
@@ -94,7 +94,7 @@ UINT32 advision_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	for (int x = 0; x < 150; x++)
 	{
-		UINT8 *led = &m_display[x];
+		uint8_t *led = &m_display[x];
 
 		for (int y = 0; y < 128; y+=2)
 		{

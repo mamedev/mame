@@ -32,7 +32,7 @@ const device_type I8089 = &device_creator<i8089_device>;
 //  i8089_device - constructor
 //-------------------------------------------------
 
-i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8089_device::i8089_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	cpu_device(mconfig, I8089, "I8089", tag, owner, clock, "i8089", __FILE__),
 	m_icount(0),
 	m_ch1(*this, "1"),
@@ -91,6 +91,7 @@ void i8089_device::device_start()
 	state_add(CH2_PP, "CH2  PP", m_ch2->m_r[i8089_channel::PP].w).mask(0xfffff);
 	state_add(CH2_PSW, "CH2 PSW", m_ch2->m_r[i8089_channel::PSW].w).callimport().callexport().formatstr("%12s");
 	state_add(STATE_GENPC, "GENPC", m_current_tp).mask(0xfffff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_current_tp).mask(0xfffff).noshow();
 
 	// register for save states
 	save_item(NAME(m_sysbus));
@@ -147,10 +148,10 @@ const address_space_config *i8089_device::memory_space_config(address_spacenum s
 //  disasm_disassemble - disassembler
 //-------------------------------------------------
 
-offs_t i8089_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i8089_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE(i8089);
-	return CPU_DISASSEMBLE_NAME(i8089)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(i8089)(this, stream, pc, oprom, opram, options);
 }
 
 //-------------------------------------------------
@@ -168,30 +169,30 @@ void i8089_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 	case SYSBUS:
-		strprintf(str, "%c", sysbus_width() ? 'W' : '.');
+		str = string_format("%c", sysbus_width() ? 'W' : '.');
 		break;
 	case SOC:
-		strprintf(str, "%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
+		str = string_format("%c%c", remotebus_width() ? 'I' : '.', request_grant() ? 'R' : '.');
 		break;
 	case CH1_GA:
 	case CH2_GA:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GA].t & 1, ch->m_r[i8089_channel::GA].w);
 		break;
 	case CH1_GB:
 	case CH2_GB:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GB].t & 1, ch->m_r[i8089_channel::GB].w);
 		break;
 	case CH1_GC:
 	case CH2_GC:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::GC].t & 1, ch->m_r[i8089_channel::GC].w);
 		break;
 	case CH1_TP:
 	case CH2_TP:
-		strprintf(str, "%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
+		str = string_format("%d %05X", ch->m_r[i8089_channel::TP].t & 1, ch->m_r[i8089_channel::TP].w);
 		break;
 	case CH1_PSW:
 	case CH2_PSW:
-		strprintf(str, "%c%s%c%s%s%s%c%c",
+		str = string_format("%c%s%c%s%s%s%c%c",
 			BIT(ch->m_r[i8089_channel::PSW].w, 7) ? 'P':'.',
 			BIT(ch->m_r[i8089_channel::PSW].w, 6) ? "XF":"..",
 			BIT(ch->m_r[i8089_channel::PSW].w, 5) ? 'B':'.',
@@ -242,8 +243,8 @@ void i8089_device::initialize()
 	m_sysbus = m_mem->read_byte(0xffff6);
 
 	// get system configuration block address
-	UINT16 scb_offset = read_word(0, 0xffff8);
-	UINT16 scb_segment = read_word(0, 0xffffa);
+	uint16_t scb_offset = read_word(0, 0xffff8);
+	uint16_t scb_segment = read_word(0, 0xffffa);
 	m_scb = ((scb_segment << 4) + scb_offset) & 0x0fffff;
 
 	// get system operation command
@@ -251,8 +252,8 @@ void i8089_device::initialize()
 	m_master = !m_sel;
 
 	// get control block address
-	UINT16 cb_offset = read_word(0, m_scb + 2);
-	UINT16 cb_segment = read_word(0, m_scb + 4);
+	uint16_t cb_offset = read_word(0, m_scb + 2);
+	uint16_t cb_segment = read_word(0, m_scb + 4);
 	offs_t cb_address = ((cb_segment << 4) + cb_offset) & 0x0fffff;
 
 	// initialize channels
@@ -260,7 +261,7 @@ void i8089_device::initialize()
 	m_ch2->set_reg(i8089_channel::CP, cb_address + 8);
 
 	// clear busy
-	UINT16 ccw = read_word(0, cb_address);
+	uint16_t ccw = read_word(0, cb_address);
 	write_word(0, cb_address, ccw & 0x00ff);
 
 	// done
@@ -279,14 +280,14 @@ void i8089_device::initialize()
 	}
 }
 
-UINT8 i8089_device::read_byte(bool space, offs_t address)
+uint8_t i8089_device::read_byte(bool space, offs_t address)
 {
 	return (space ? m_io : m_mem)->read_byte(address);
 }
 
-UINT16 i8089_device::read_word(bool space, offs_t address)
+uint16_t i8089_device::read_word(bool space, offs_t address)
 {
-	UINT16 data;
+	uint16_t data;
 	address_space *aspace = (space ? m_io : m_mem);
 
 	if (sysbus_width() && WORD_ALIGNED(address))
@@ -302,12 +303,12 @@ UINT16 i8089_device::read_word(bool space, offs_t address)
 	return data;
 }
 
-void i8089_device::write_byte(bool space, offs_t address, UINT8 data)
+void i8089_device::write_byte(bool space, offs_t address, uint8_t data)
 {
 	(space ? m_io : m_mem)->write_byte(address, data);
 }
 
-void i8089_device::write_word(bool space, offs_t address, UINT16 data)
+void i8089_device::write_word(bool space, offs_t address, uint16_t data)
 {
 	address_space *aspace = (space ? m_io : m_mem);
 

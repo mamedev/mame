@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
  Moero!! Pro Yakyuu Homerun Kyousou - (c) 1988 Jaleco
@@ -83,7 +83,7 @@ WRITE8_MEMBER(homerun_state::homerun_control_w)
 
 		if (~data & 0x10 & m_control && !m_samples->playing(0))
 		{
-			samples_iterator iter(m_samples);
+			samples_iterator iter(*m_samples);
 			if (m_sample < iter.count())
 				m_samples->start(0, m_sample);
 		}
@@ -148,8 +148,8 @@ CUSTOM_INPUT_MEMBER(homerun_state::ganjaja_hopper_status_r)
 static INPUT_PORTS_START( homerun )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_d7756_busy_r, nullptr)
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -185,7 +185,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( dynashot )
 	PORT_START("IN0")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) // doesn't have d7756
 	PORT_BIT( 0x37, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -223,8 +223,8 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) // ?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, NULL)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, NULL)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, homerun_sprite0_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_d7756_busy_r, nullptr)
 	PORT_BIT( 0x36, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("IN1")
@@ -232,7 +232,7 @@ static INPUT_PORTS_START( ganjaja )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_NAME("P1 Down / Paper")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_NAME("P1 Right / Scissors")
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) // unused?
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, NULL)
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, homerun_state, ganjaja_hopper_status_r, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
@@ -322,7 +322,7 @@ GFXDECODE_END
 
 void homerun_state::machine_start()
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entry(0, &ROM[0x00000]);
 	membank("bank1")->configure_entries(1, 7, &ROM[0x10000], 0x4000);

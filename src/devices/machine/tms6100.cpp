@@ -27,7 +27,7 @@
 
 const device_type TMS6100 = &device_creator<tms6100_device>;
 
-tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_rom(*this, DEVICE_SELF),
 	m_reverse_bits(false),
@@ -35,7 +35,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, device_type type, 
 {
 }
 
-tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TMS6100, "TMS6100", tag, owner, clock, "tms6100", __FILE__),
 	m_rom(*this, DEVICE_SELF),
 	m_reverse_bits(false),
@@ -45,7 +45,7 @@ tms6100_device::tms6100_device(const machine_config &mconfig, const char *tag, d
 
 const device_type M58819 = &device_creator<m58819_device>;
 
-m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+m58819_device::m58819_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: tms6100_device(mconfig, M58819, "M58819S", tag, owner, clock, "m58819s", __FILE__)
 {
 }
@@ -144,7 +144,7 @@ WRITE_LINE_MEMBER(tms6100_device::clk_w)
 		if (m_cs)
 		{
 			// new command enabled on rising edge of m0/m1
-			UINT8 m = m_m1 << 1 | m_m0;
+			uint8_t m = m_m1 << 1 | m_m0;
 			if ((m & ~m_prev_m & 1) || (m & ~m_prev_m & 2))
 				handle_command(m);
 
@@ -158,7 +158,7 @@ WRITE_LINE_MEMBER(tms6100_device::clk_w)
 
 // m0/m1 commands
 
-void tms6100_device::handle_command(UINT8 cmd)
+void tms6100_device::handle_command(uint8_t cmd)
 {
 	enum
 	{
@@ -229,7 +229,7 @@ void tms6100_device::handle_command(UINT8 cmd)
 				// the 8-step counter PLA is shared between LA and TB
 				if (m_count < 4)
 				{
-					const UINT8 shift = 4 * (m_count+1);
+					const uint8_t shift = 4 * (m_count+1);
 					m_address = (m_address & ~(0xf << shift)) | (m_add << shift);
 				}
 
@@ -245,7 +245,7 @@ void tms6100_device::handle_command(UINT8 cmd)
 				m_count = 0;
 
 				// load new address bits (14 bits on TMS6100)
-				UINT16 rb = m_rom[m_address & m_rommask];
+				uint16_t rb = m_rom[m_address & m_rommask];
 				m_address++;
 				rb |= (m_rom[m_address & m_rommask] << 8);
 				m_address = (m_address & ~0x3fff) | (rb & 0x3fff);

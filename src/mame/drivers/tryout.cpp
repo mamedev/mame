@@ -7,9 +7,6 @@
 
  Driver by Pierpaolo Prazzoli and Bryan McPhail
 
- TODO:
- - Fix sprite position in cocktail mode
-
 =================================================================
 Debug cheats:
 
@@ -34,7 +31,7 @@ WRITE8_MEMBER(tryout_state::nmi_ack_w)
 
 WRITE8_MEMBER(tryout_state::sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -79,7 +76,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, tryout_state )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x4000, 0x4001) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -213,6 +210,8 @@ static MACHINE_CONFIG_START( tryout, tryout_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
@@ -244,4 +243,4 @@ ROM_START( tryout )
 	ROM_LOAD( "ch14.bpr",     0x00000, 0x0020, CRC(8ce19925) SHA1(12f8f6022f1148b6ba1d019a34247452637063a7) )
 ROM_END
 
-GAME( 1985, tryout, 0, tryout, tryout, driver_device, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, tryout, 0, tryout, tryout, driver_device, 0, ROT90, "Data East Corporation", "Pro Baseball Skill Tryout (Japan)", MACHINE_SUPPORTS_SAVE )

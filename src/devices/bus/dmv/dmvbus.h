@@ -22,14 +22,14 @@ public:
 	device_dmvslot_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_dmvslot_interface();
 
-	virtual bool read(offs_t offset, UINT8 &data) { return false; }
-	virtual bool write(offs_t offset, UINT8 data) { return false; }
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data) { }
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data) { }
+	virtual bool read(offs_t offset, uint8_t &data) { return false; }
+	virtual bool write(offs_t offset, uint8_t data) { return false; }
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data) { }
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data) { }
 
 	// slot 1
-	virtual void ram_read(UINT8 cas, offs_t offset, UINT8 &data) { }
-	virtual void ram_write(UINT8 cas, offs_t offset, UINT8 data) { }
+	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data) { }
+	virtual void ram_write(uint8_t cas, offs_t offset, uint8_t data) { }
 
 	// slot 7 and 7A
 	virtual bool av16bit() { return false; }
@@ -55,7 +55,7 @@ class dmvcart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	dmvcart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~dmvcart_slot_device();
 
 	template<class _Object> static devcb_base &set_prog_read_callback(device_t &device, _Object object) { return downcast<dmvcart_slot_device &>(device).m_prog_read_cb.set_callback(object); }
@@ -68,12 +68,12 @@ public:
 	virtual void device_start() override;
 
 	// reading and writing
-	virtual bool read(offs_t offset, UINT8 &data);
-	virtual bool write(offs_t offset, UINT8 data);
-	virtual void ram_read(UINT8 cas, offs_t offset, UINT8 &data);
-	virtual void ram_write(UINT8 cas, offs_t offset, UINT8 data);
-	virtual void io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data);
-	virtual void io_write(address_space &space, int ifsel, offs_t offset, UINT8 data);
+	virtual bool read(offs_t offset, uint8_t &data);
+	virtual bool write(offs_t offset, uint8_t data);
+	virtual void ram_read(uint8_t cas, offs_t offset, uint8_t &data);
+	virtual void ram_write(uint8_t cas, offs_t offset, uint8_t data);
+	virtual void io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data);
+	virtual void io_write(address_space &space, int ifsel, offs_t offset, uint8_t data);
 	virtual void hold_w(int state);
 	virtual void switch16_w(int state);
 	virtual void timint_w(int state);

@@ -27,48 +27,21 @@
 #ifndef NLD_7483_H_
 #define NLD_7483_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_7483(_name, _A1, _A2, _A3, _A4, _B1, _B2, _B3, _B4, _CI)                \
-		NET_REGISTER_DEV(TTL_7483, _name)                                               \
-		NET_CONNECT(_name, A1, _A1)                                                 \
-		NET_CONNECT(_name, A2, _A2)                                                 \
-		NET_CONNECT(_name, A3, _A3)                                                 \
-		NET_CONNECT(_name, A4, _A4)                                                 \
-		NET_CONNECT(_name, B1, _B1)                                                 \
-		NET_CONNECT(_name, B2, _B2)                                                 \
-		NET_CONNECT(_name, B3, _B3)                                                 \
-		NET_CONNECT(_name, B4, _B4)                                                 \
-		NET_CONNECT(_name, C0, _CI)
+#define TTL_7483(name, cA1, cA2, cA3, cA4, cB1, cB2, cB3, cB4, cCI)             \
+		NET_REGISTER_DEV(TTL_7483, name)                                        \
+		NET_CONNECT(name, A1, cA1)                                              \
+		NET_CONNECT(name, A2, cA2)                                              \
+		NET_CONNECT(name, A3, cA3)                                              \
+		NET_CONNECT(name, A4, cA4)                                              \
+		NET_CONNECT(name, B1, cB1)                                              \
+		NET_CONNECT(name, B2, cB2)                                              \
+		NET_CONNECT(name, B3, cB3)                                              \
+		NET_CONNECT(name, B4, cB4)                                              \
+		NET_CONNECT(name, C0, cCI)
 
-#define TTL_7483_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7483_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_DEVICE(7483,
-	logic_input_t m_C0;
-	logic_input_t m_A1;
-	logic_input_t m_A2;
-	logic_input_t m_A3;
-	logic_input_t m_A4;
-	logic_input_t m_B1;
-	logic_input_t m_B2;
-	logic_input_t m_B3;
-	logic_input_t m_B4;
-
-	UINT8 m_lastr;
-
-	logic_output_t m_S1;
-	logic_output_t m_S2;
-	logic_output_t m_S3;
-	logic_output_t m_S4;
-	logic_output_t m_C4;
-
-);
-
-NETLIB_DEVICE_DERIVED_PURE(7483_dip, 7483);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_7483_DIP(name)                                                      \
+		NET_REGISTER_DEV(TTL_7483_DIP, name)
 
 #endif /* NLD_7483_H_ */

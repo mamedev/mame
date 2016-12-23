@@ -7,6 +7,7 @@
 *************************************************************************/
 #include "sound/okim6295.h"
 #include "sound/k054539.h"
+#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k053251.h"
 #include "video/k054156_k054157_k056832.h"
@@ -32,22 +33,25 @@ public:
 		m_k056832(*this, "k056832"),
 		m_k054338(*this, "k054338"),
 		m_palette(*this, "palette"),
-		m_screen(*this, "screen") { }
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_soundlatch3(*this, "soundlatch3") { }
 
 	/* memory pointers */
-	optional_shared_ptr<UINT16> m_workram;
-	required_shared_ptr<UINT16> m_spriteram;
+	optional_shared_ptr<uint16_t> m_workram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	int         m_sprite_colorbase;
 	int         m_layer_colorbase[4];
 	int         m_layerpri[3];
 	int         m_alpha_enabled;
-	UINT16      m_zmask;
+	uint16_t      m_zmask;
 
 	/* misc */
-	UINT16      m_protram[16];
-	UINT16      m_cur_control2;
+	uint16_t      m_protram[16];
+	uint16_t      m_cur_control2;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -61,6 +65,9 @@ public:
 	required_device<k054338_device> m_k054338;
 	required_device<palette_device> m_palette;
 	required_device<screen_device> m_screen;
+	optional_device<generic_latch_8_device> m_soundlatch;
+	optional_device<generic_latch_8_device> m_soundlatch2;
+	optional_device<generic_latch_8_device> m_soundlatch3;
 
 	emu_timer *m_dmaend_timer;
 	DECLARE_READ16_MEMBER(control2_r);
@@ -76,7 +83,7 @@ public:
 	DECLARE_MACHINE_RESET(moo);
 	DECLARE_VIDEO_START(moo);
 	DECLARE_VIDEO_START(bucky);
-	UINT32 screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_moo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(moo_interrupt);
 	INTERRUPT_GEN_MEMBER(moobl_interrupt);
 	TIMER_CALLBACK_MEMBER(dmaend_callback);

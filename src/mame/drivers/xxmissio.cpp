@@ -23,7 +23,7 @@ WRITE8_MEMBER(xxmissio_state::bank_sel_w)
 
 CUSTOM_INPUT_MEMBER(xxmissio_state::status_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (m_status & bit_mask) ? 1 : 0;
 }
 

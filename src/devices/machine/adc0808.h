@@ -80,7 +80,7 @@ class adc0808_device :  public device_t
 {
 public:
 	// construction/destruction
-	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	adc0808_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_eoc_callback(device_t &device, _Object object) { return downcast<adc0808_device &>(device).m_out_eoc_cb.set_callback(object); }
 	static void set_in_vref_pos_callback(device_t &device, adc0808_analog_read_delegate callback) { downcast<adc0808_device &>(device).m_in_vref_pos_cb = callback; }
@@ -122,7 +122,7 @@ private:
 	int m_eoc;                          // end of conversion pin
 	int m_next_eoc;                     // next value end of conversion pin
 
-	UINT8 m_sar;                        // successive approximation register
+	uint8_t m_sar;                        // successive approximation register
 
 	int m_cycle;                        // clock cycle counter
 	int m_bit;                          // bit counter

@@ -67,14 +67,8 @@ static const char g_version[] = "4.90";
 
 #if defined(__GNUC__) && (__GNUC__ >= 3)
 #define ATTR_PRINTF(x,y)        __attribute__((format(printf, x, y)))
-#define ATTR_NORETURN           __attribute__((noreturn))
 #else
 #define ATTR_PRINTF(x,y)
-#if defined(_MSC_VER) && (_MSC_VER >= 1200)
-#define ATTR_NORETURN           __declspec(noreturn)
-#else
-#define ATTR_NORETURN
-#endif
 #endif
 
 #define M68K_MAX_PATH 1024
@@ -223,8 +217,8 @@ struct replace_struct
 
 
 /* Function Prototypes */
-static void ATTR_NORETURN error_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
-static void ATTR_NORETURN perror_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
+[[noreturn]] static void error_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
+[[noreturn]] static void perror_exit(const char* fmt, ...) ATTR_PRINTF(1,2);
 static int check_strsncpy(char* dst, char* src, int maxlength);
 static int check_atoi(char* str, int *result);
 static int skip_spaces(char* str);
@@ -687,12 +681,12 @@ opcode_struct* find_illegal_opcode(void)
 {
 	opcode_struct* op;
 
-	for(op = g_opcode_input_table;op->name != NULL;op++)
+	for(op = g_opcode_input_table;op->name != nullptr;op++)
 	{
 		if(strcmp(op->name, "illegal") == 0)
 			return op;
 	}
-	return NULL;
+	return nullptr;
 }
 #endif
 

@@ -152,51 +152,51 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ nullptr }, { nullptr }, { nullptr }, { nullptr },  { nullptr }, { nullptr }, { nullptr }, { nullptr },
 };
 
-CPU_DISASSEMBLE( sc61860 )
+CPU_DISASSEMBLE(sc61860)
 {
-	const UINT8 *base_oprom = oprom;
+	const uint8_t *base_oprom = oprom;
 	int oper=*(oprom++);
 	int t;
-	UINT16 adr;
+	uint16_t adr;
 
 	switch(oper&0xc0) {
 	case 0x80:
-		sprintf(buffer,"%-6s%.2x",table[oper&0x80].mnemonic, oper&0x3f);
+		util::stream_format(stream,"%-6s%02x",table[oper&0x80].mnemonic, oper&0x3f);
 		break;
 	default:
 		switch(oper&0xe0) {
 		case 0xe0:
-			sprintf(buffer,"%-6s%.4x",table[oper&0xe0].mnemonic,
+			util::stream_format(stream,"%-6s%04x",table[oper&0xe0].mnemonic,
 					*(oprom++)|((oper&0x1f)<<8));
 			break;
 		default:
 			switch (table[oper].adr) {
-			case Ill: sprintf(buffer,"?%.2x",oper);break;
-			case Imp: sprintf(buffer,"%s",table[oper].mnemonic); break;
-			case Imm: sprintf(buffer,"%-6s%.2x",table[oper].mnemonic, *(oprom++)); break;
+			case Ill: util::stream_format(stream,"?%02x",oper);break;
+			case Imp: util::stream_format(stream,"%s",table[oper].mnemonic); break;
+			case Imm: util::stream_format(stream,"%-6s%02x",table[oper].mnemonic, *(oprom++)); break;
 			case ImmW:
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr);
+				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr);
 				break;
 			case Abs:
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr);
+				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr);
 				break;
 			case RelM:
 				adr=pc-*(oprom++);
-				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
+				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case RelP:
 				adr=pc+*(oprom++);
-				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
+				util::stream_format(stream,"%-6s%04x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case Ptc:
 				t=*(oprom++);
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(buffer,"%-6s%.2x,%.4x",table[oper].mnemonic,t, adr);
+				util::stream_format(stream,"%-6s%02x,%04x",table[oper].mnemonic,t, adr);
 				break;
 			case Etc:
-				sprintf(buffer,"%-6s",table[oper].mnemonic);
+				util::stream_format(stream,"%-6s",table[oper].mnemonic);
 				/*H imm, abs */
 				/* abs */
 				break;

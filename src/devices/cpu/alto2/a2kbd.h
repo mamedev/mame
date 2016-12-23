@@ -81,7 +81,7 @@
 #define A2_KEY_FR2          MAKE_KEY(0,002)     //!< ADL right function key 2
 #define A2_KEY_FL2          MAKE_KEY(0,001)     //!< ADL left function key 1
 
-#define A2_KEY_FR4          MAKE_KEY(1,001)     //!< ADL right funtion key 4
+#define A2_KEY_FR4          MAKE_KEY(1,001)     //!< ADL right function key 4
 #define A2_KEY_BW           MAKE_KEY(1,000)     //!< ADL BW (?)
 
 #define A2_KEY_FR3          MAKE_KEY(2,002)     //!< ADL right function key 3
@@ -96,13 +96,13 @@
 #ifndef _A2KBD_H_
 #define _A2KBD_H_
 struct {
-	UINT16 bootkey;                         //!< boot key - key code pressed before power on
-	UINT16 matrix[4];                       //!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
+	uint16_t bootkey;                         //!< boot key - key code pressed before power on
+	uint16_t matrix[4];                       //!< a bit map of the keys pressed (ioports ROW0 ... ROW3)
 }   m_kbd;
 
 DECLARE_READ16_MEMBER( kbd_ad_r );          //!< read the keyboard matrix
 
-void init_kbd(UINT16 bootkey = 0177777);    //!< initialize the keyboard hardware, optinally set the boot key
+void init_kbd(uint16_t bootkey = 0177777);    //!< initialize the keyboard hardware, optionally set the boot key
 void exit_kbd();                            //!< deinitialize the keyboard hardware
 void reset_kbd();                           //!< reset the keyboard hardware
 #endif // _A2KBD_H_

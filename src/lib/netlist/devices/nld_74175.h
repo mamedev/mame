@@ -27,7 +27,7 @@
  *
  *   Q0 The output logic level of Q before the indicated input conditions were established
  *
- *  R:  0 --> 1
+ *  R:  0 -> 1
  *
  *  Naming conventions follow National Semiconductor datasheet
  *
@@ -36,34 +36,19 @@
 #ifndef NLD_74175_H_
 #define NLD_74175_H_
 
-#include "nld_signal.h"
+#include "nl_setup.h"
 
-#define TTL_74175(_name)                                     \
-		NET_REGISTER_DEV(TTL_74175, _name)
-#define TTL_74175_DIP(_name)                                 \
-		NET_REGISTER_DEV(TTL_74175_DIP, _name)
+#define TTL_74175(name, cCLK, cD1, cD2, cD3, cD4, cCLRQ)	\
+		NET_REGISTER_DEV(TTL_74175, name)	\
+		NET_CONNECT(name, CLK,  cCLK)	\
+		NET_CONNECT(name, D1,   cD1)	\
+		NET_CONNECT(name, D2,   cD2)	\
+		NET_CONNECT(name, D3,   cD3)	\
+		NET_CONNECT(name, D4,   cD4)	\
+		NET_CONNECT(name, CLRQ, cCLRQ)
 
-NETLIB_NAMESPACE_DEVICES_START()
+#define TTL_74175_DIP(name)                                 \
+		NET_REGISTER_DEV(TTL_74175_DIP, name)
 
-NETLIB_SUBDEVICE(74175_sub,
-
-	logic_input_t m_CLK;
-	logic_output_t m_Q[4];
-	logic_output_t m_QQ[4];
-
-	netlist_sig_t m_clrq;
-	UINT8 m_data;
-);
-
-NETLIB_DEVICE(74175,
-
-	NETLIB_NAME(74175_sub) m_sub;
-	logic_input_t m_D[4];
-	logic_input_t m_CLRQ;
-);
-
-NETLIB_DEVICE_DERIVED_PURE(74175_dip, 74175);
-
-NETLIB_NAMESPACE_DEVICES_END()
 
 #endif /* NLD_74175_H_ */

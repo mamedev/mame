@@ -43,8 +43,8 @@ protected:
 	// driver_device overrides
 	virtual void machine_reset() override;
 private:
-	UINT8 m_cru_data[9];
-	UINT8 m_cru_count;
+	uint8_t m_cru_data[9];
+	uint8_t m_cru_count;
 };
 
 static ADDRESS_MAP_START( nsm_map, AS_PROGRAM, 8, nsm_state )
@@ -90,7 +90,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 	}
 	m_cru_data[m_cru_count] |= (data << offset);
 
-	UINT8 i,j;
+	uint8_t i,j;
 	int segments;
 	if (!m_cru_count && (offset == 7))
 	{
@@ -113,7 +113,7 @@ WRITE8_MEMBER( nsm_state::cru_w )
 void nsm_state::machine_reset()
 {
 	// Disable auto wait state generation by raising the READY line on reset
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(ASSERT_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(ASSERT_LINE);
 }
 
 static MACHINE_CONFIG_START( nsm, nsm_state )

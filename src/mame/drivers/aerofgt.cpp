@@ -65,7 +65,6 @@ Verification still needed for the other PCBs.
 #include "cpu/z80/z80.h"
 #include "sound/2610intf.h"
 #include "sound/3812intf.h"
-#include "sound/okim6295.h"
 #include "includes/aerofgt.h"
 
 WRITE16_MEMBER(aerofgt_state::sound_command_w)
@@ -73,7 +72,7 @@ WRITE16_MEMBER(aerofgt_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -83,7 +82,7 @@ WRITE16_MEMBER(aerofgt_state::turbofrc_sound_command_w)
 	if (ACCESSING_BITS_8_15)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, (data >> 8) & 0xff);
+		m_soundlatch->write(space, offset, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -92,7 +91,7 @@ WRITE16_MEMBER(aerofgt_state::aerfboot_soundlatch_w)
 {
 	if(ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -115,7 +114,7 @@ WRITE8_MEMBER(aerofgt_state::aerofgt_sh_bankswitch_w)
 
 WRITE16_MEMBER(aerofgt_state::pspikesb_oki_banking_w)
 {
-	m_oki->set_bank_base(0x40000 * (data & 3));
+	m_oki->set_rom_bank(data & 3);
 }
 
 /*TODO: sound banking. */
@@ -129,10 +128,21 @@ WRITE16_MEMBER(aerofgt_state::aerfboo2_okim6295_banking_w)
 
 WRITE8_MEMBER(aerofgt_state::aerfboot_okim6295_banking_w)
 {
-	UINT8 *oki = memregion("oki")->base();
 	/*bit 2 (0x4) setted too?*/
 	if (data & 0x4)
-		memcpy(&oki[0x20000], &oki[((data & 0x3) * 0x20000) + 0x40000], 0x20000);
+		membank("okibank")->set_entry(data & 0x3);
+}
+
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_write_port_0_w)
+{
+	m_upd7759->port_w(space, 0, data);
+	m_upd7759->start_w(0);
+	m_upd7759->start_w(1);
+}
+
+WRITE8_MEMBER(aerofgt_state::karatblzbl_d7759_reset_w)
+{
+	m_upd7759->reset_w(data & 0x80);
 }
 
 static ADDRESS_MAP_START( pspikes_map, AS_PROGRAM, 16, aerofgt_state )
@@ -234,6 +244,8 @@ static ADDRESS_MAP_START( spinlbrk_map, AS_PROGRAM, 16, aerofgt_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(aerofgt_bg2scrollx_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITE(sound_command_w)
+//  AM_RANGE(0xfff008, 0xfff009) - read when analog inputs are enabled
+//  AM_RANGE(0xfff00a, 0xfff00b) /
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( turbofrc_map, AS_PROGRAM, 16, aerofgt_state )
@@ -384,7 +396,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( turbofrc_sound_portmap, AS_IO, 8, aerofgt_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(aerofgt_sh_bankswitch_w)
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -393,7 +405,7 @@ static ADDRESS_MAP_START( aerofgt_sound_portmap, AS_IO, 8, aerofgt_state )
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_WRITE(aerofgt_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(pending_command_clear_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x0c, 0x0c) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -401,7 +413,7 @@ static ADDRESS_MAP_START( aerfboot_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(aerfboot_okim6295_banking_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
@@ -410,12 +422,26 @@ static ADDRESS_MAP_START( wbbc97_sound_map, AS_PROGRAM, 8, aerofgt_state )
 	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
 	AM_RANGE(0xf810, 0xf811) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP
-	AM_RANGE(0xfc20, 0xfc20) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc20, 0xfc20) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblzbl_sound_map, AS_PROGRAM, 8, aerofgt_state )
-	AM_RANGE(0x0000, 0x77ff) AM_ROM
-	AM_RANGE(0x7800, 0x7fff) AM_RAM
+	AM_RANGE(0x0000, 0xefff) AM_ROM
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read) //AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( karatblzbl_sound_portmap, AS_IO, 8, aerofgt_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x20, 0x20) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(karatblzbl_d7759_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(karatblzbl_d7759_reset_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, aerofgt_state ) //only for aerfboot for now
+	AM_RANGE(0x00000, 0x1ffff) AM_ROM
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( pspikes )
@@ -757,7 +783,7 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x0000, "1-1C 1-2 HPs" )
 	/* According to Spinal Breakers manual, here DSW2 starts */
 	/* Default in US manual is DEF_STR( Hardest ) */
-	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
@@ -776,7 +802,7 @@ static INPUT_PORTS_START( spinlbrk )
 	PORT_DIPSETTING(      0x4000, "32 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "40 Hitpoints" )
 	/* Default in US manual is "5 points" */
-	PORT_DIPNAME( 0x8000, 0x0000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, "10 Points" )
 	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
@@ -785,9 +811,17 @@ static INPUT_PORTS_START( spinlbrku )
 	PORT_INCLUDE(spinlbrk)
 
 	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0300, 0x0000, DEF_STR( Difficulty ) )           PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x4000, 0x4000, "Health Pack" )                   PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x4000, "20 Hitpoints" )
 	PORT_DIPSETTING(      0x0000, "32 Hitpoints" )
+	PORT_DIPNAME( 0x8000, 0x0000, "Life Restoration" )              PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x8000, "10 Points" )
+	PORT_DIPSETTING(      0x0000, "5 Points" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( turbofrc )
@@ -1286,7 +1320,7 @@ MACHINE_START_MEMBER(aerofgt_state,common)
 
 MACHINE_START_MEMBER(aerofgt_state,aerofgt)
 {
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &rom[0x10000], 0x8000);
 
@@ -1337,12 +1371,13 @@ static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1416,7 +1451,7 @@ static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified, pin high causes sound pitch to be too high
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1447,7 +1482,6 @@ static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,pspikes)
 
@@ -1490,18 +1524,18 @@ static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz ) /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1520,9 +1554,10 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 
 	MCFG_CPU_ADD("audiocpu",Z80,8000000/2) /* 4 MHz ??? */
 	MCFG_CPU_PROGRAM_MAP(karatblzbl_sound_map)
+	MCFG_CPU_IO_MAP(karatblzbl_sound_portmap)
 
-//  MCFG_MACHINE_START_OVERRIDE(aerofgt_state,aerofgt)
-//  MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,aerofgt)
+	MCFG_MACHINE_START_OVERRIDE(aerofgt_state,common)
+	MCFG_MACHINE_RESET_OVERRIDE(aerofgt_state,common)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1541,20 +1576,27 @@ static MACHINE_CONFIG_START( karatblzbl, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,karatblz)
 
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
-	// NEC D7759c + YM????
+	/* sound hardware */
+
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
@@ -1562,7 +1604,7 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",M68000,XTAL_20MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(spinlbrk_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold)/* there are vectors for 3 and 4 too */
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", aerofgt_state,  irq1_line_hold) /* there are vectors for 3 and 4 too, analog related? */
 
 	MCFG_CPU_ADD("audiocpu",Z80,XTAL_20MHz/4)   /* 5mhz verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(sound_map)
@@ -1582,26 +1624,26 @@ static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", turbofrc)
-	MCFG_PALETTE_ADD("palette", 1024)
+	MCFG_PALETTE_ADD_INIT_BLACK("palette", 1024) // doesn't fully initialize palette at start-up ...
 	MCFG_PALETTE_FORMAT(xRRRRRGGGGGBBBBB)
 
 	MCFG_DEVICE_ADD("vsystem_spr_old", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback ) // rom lookup
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(1)
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,spinlbrk)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1643,18 +1685,18 @@ static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1697,18 +1739,18 @@ static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1751,12 +1793,13 @@ static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( aerofgt_state, aerofgt_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,turbofrc)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -1798,7 +1841,10 @@ static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -1864,12 +1910,13 @@ static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( aerofgt_state, aerofgt_old_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(aerofgt_state,wbbc97)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -2473,7 +2520,7 @@ ROM_END
 Karate Blazers (bootleg)
 
 CPU : MC68000
-SND : Z80 + NEC D7759c + YM???? (no number on chip)
+SND : Z80 + NEC D7759c + YM3812 (no number on chip, but ROM is the same as streetsm, which uses a YM3812)
 
 */
 
@@ -2485,7 +2532,7 @@ ROM_START( karatblzbl )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "2.u80",        0x00000, 0x10000, CRC(ca4b171e) SHA1(a05fd81f68759a09be3ec09f38d7c9364dfb6c14) )
 
-	ROM_REGION( 0x20000, "samples", 0 ) // D7759c data
+	ROM_REGION( 0x20000, "upd", 0 ) // D7759c data
 	ROM_LOAD( "1.u88",        0x00000, 0x20000, CRC(47db1605) SHA1(ae00e633eb98567f04ff97e3d63e04e049d955ec) )
 
 	ROM_REGION( 0x80000, "gfx1", 0 )
@@ -2523,40 +2570,74 @@ ROM_START( karatblzbl )
 	ROM_LOAD16_BYTE( "8.u65",        0x080001, 0x040000, CRC(b491201a) SHA1(c18cb1cc8a8bf031e00d8d89de62f7ed5548e767) )
 ROM_END
 
-
-ROM_START( turbofrc )
+ROM_START( turbofrc ) // New revision: most notable thing in there is the points value of the rocks in level 6 (5,000 versus 500).
 	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
-	ROM_LOAD16_WORD_SWAP( "tfrc2.bin",    0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) )
-	ROM_LOAD16_WORD_SWAP( "tfrc1.bin",    0x40000, 0x40000, CRC(6cd5312b) SHA1(57b109fe268fb963e981c91b6d288667a3c9a665) )
-	ROM_LOAD16_WORD_SWAP( "tfrc3.bin",    0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) )
+	ROM_LOAD16_WORD_SWAP( "8v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "8v1.subpcb.u1", 0x40000, 0x40000, CRC(cc324da6) SHA1(ed2eaff7351914e3ebaf925ddc01be9d44d89fa6) ) // 27c2048 - located on a OR-10 SUB BOARD - 8 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "8v3.u14",       0x80000, 0x40000, CRC(c0a15480) SHA1(1ec99382e0a00a8167773b1d454a63cc5cd6199c) ) // 27c2048 - 8 stamped on chip with VideoSystem logo V
 
 	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
-	ROM_LOAD( "tfrcu166.bin", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) )
-	ROM_RELOAD(               0x10000, 0x20000 )
+	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+	ROM_RELOAD(         0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
-	ROM_LOAD( "tfrcu94.bin",  0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) )
-	ROM_LOAD( "tfrcu95.bin",  0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) )
+	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, BAD_DUMP CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom, taken from old rev set
+	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
 
 	ROM_REGION( 0x0a0000, "gfx2", 0 )
-	ROM_LOAD( "tfrcu105.bin", 0x000000, 0x80000, CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) )
-	ROM_LOAD( "tfrcu106.bin", 0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) )
+	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, BAD_DUMP CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom, taken from old rev set
+	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
 
 	ROM_REGION( 0x200000, "spritegfx", 0 )
-	ROM_LOAD( "tfrcu116.bin", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) )
-	ROM_LOAD( "tfrcu118.bin", 0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) )
-	ROM_LOAD( "tfrcu117.bin", 0x100000, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) )
-	ROM_LOAD( "tfrcu119.bin", 0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) )
+	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, BAD_DUMP CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom, taken from old rev set
+	ROM_LOAD( "5.u118",        0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
+	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, BAD_DUMP CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom, taken from old rev set
+	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
 
 	ROM_REGION( 0x100000, "gfx4", 0 )
-	ROM_LOAD( "tfrcu134.bin", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) )
-	ROM_LOAD( "tfrcu135.bin", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) )
+	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, BAD_DUMP CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom, taken from old rev set, overdump? should be 0x40000
+	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, BAD_DUMP CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom, taken from old rev set, overdump? should be 0x40000
 
 	ROM_REGION( 0x20000, "ymsnd.deltat", 0 ) /* sound samples */
-	ROM_LOAD( "tfrcu180.bin",   0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) )
+	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, BAD_DUMP CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom, taken from old rev set, incomplete? should be 0x40000
 
 	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
-	ROM_LOAD( "tfrcu179.bin", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) )
+	ROM_LOAD( "lh538o7h.u179", 0x000000, 0x100000, BAD_DUMP CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom, taken from old rev set
+ROM_END
+
+ROM_START( turbofrco )
+	ROM_REGION( 0xc0000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "4v2.subpcb.u2", 0x00000, 0x40000, CRC(721300ee) SHA1(79ab32fdfd377592a0bdbd1c4794cfd529a3eb7b) ) // located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "4v1.subpcb.u1", 0x40000, 0x40000, CRC(6cd5312b) SHA1(57b109fe268fb963e981c91b6d288667a3c9a665) ) // located on a OR-10 SUB BOARD - 4 stamped on chip with VideoSystem logo V
+	ROM_LOAD16_WORD_SWAP( "4v3.u14",       0x80000, 0x40000, CRC(63f50557) SHA1(f8dba8c9ba412c9a67457ec31a804c57593ab20b) ) // 4 stamped on chip with VideoSystem logo V
+
+	ROM_REGION( 0x30000, "audiocpu", 0 )    /* 64k for the audio CPU + banks */
+	ROM_LOAD( "6.u166", 0x00000, 0x20000, CRC(2ca14a65) SHA1(95f6e7b4fa7ca26872ff472d7e6fb75fd4f281d5) ) // 27c1001
+	ROM_RELOAD(         0x10000, 0x20000 )
+
+	ROM_REGION( 0x0a0000, "gfx1", 0 )
+	ROM_LOAD( "lh535ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
+	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
+
+	ROM_REGION( 0x0a0000, "gfx2", 0 )
+	ROM_LOAD( "lh534ggy.u105", 0x000000, 0x80000, CRC(4de4e59e) SHA1(571396dadb8aac043319cabe24e629210e442d57) ) // mask rom
+	ROM_LOAD( "8.u106",        0x080000, 0x20000, CRC(c6479eb5) SHA1(47a58f082c73bc9dae3970e760ba46478ce6a190) ) // 27c1001a
+
+	ROM_REGION( 0x200000, "spritegfx", 0 )
+	ROM_LOAD( "lh534gh2.u116", 0x000000, 0x80000, CRC(df210f3b) SHA1(990ac43e4a46fee6b929c5b27d317cdadf179b8b) ) // mask rom
+	ROM_LOAD( "5.u118",        0x080000, 0x40000, CRC(f61d1d79) SHA1(2b8e33912c05c26170afd2fced0ff06cb7a097fa) ) // 27c2048
+	ROM_LOAD( "lh534gh1.u117", 0x100000, 0x80000, CRC(f70812fd) SHA1(1964e1134940825211cd4825fdd3f13b8242192d) ) // mask rom
+	ROM_LOAD( "4.u119",        0x180000, 0x40000, CRC(474ea716) SHA1(67753e96fa4fc8cd689a8bddeb60dbde259cacaa) ) // 27c2048
+
+	ROM_REGION( 0x100000, "gfx4", 0 )
+	ROM_LOAD( "lh532a52.u134", 0x000000, 0x80000, CRC(487330a2) SHA1(0bd36c1f5776ba2773f621e9bcb22f56ed1d84ec) ) // mask rom, overdump? should be 0x40000
+	ROM_LOAD( "lh532a51.u135", 0x080000, 0x80000, CRC(3a7e5b6d) SHA1(0079ffaa1bf93a5087c75615c78ec596b28c9a32) ) // mask rom, overdump? should be 0x40000
+
+	ROM_REGION( 0x20000, "ymsnd.deltat", 0 ) /* sound samples */
+	ROM_LOAD( "lh532h74.u180", 0x00000, 0x20000, CRC(39c7c7d5) SHA1(66ee9f7cbc18ffab2c70f77ab0edead6bb018ca9) ) // mask rom, incomplete? should be 0x40000
+
+	ROM_REGION( 0x100000, "ymsnd", 0 ) /* sound samples */
+	ROM_LOAD( "lh538o7h.u179", 0x000000, 0x100000, CRC(60ca0333) SHA1(28b94edc98d360386759780ccd1122d43ffa5279) ) // mask rom
 ROM_END
 
 ROM_START( aerofgt )
@@ -2696,9 +2777,9 @@ ROM_START( aerfboot )
 	ROM_LOAD( "afb_ep13.td",  0x000000, 0x40000, CRC(1830f70c) SHA1(1759de9b56e4999defc08b2423eff38ec98c4f17) )
 	ROM_LOAD( "afb_ep11.tb",  0x040000, 0x40000, CRC(6298c0eb) SHA1(ede63849973742c67637eac0ec9cda95ea2ecebc) )
 
-	ROM_REGION( 0xc0000, "oki", ROMREGION_ERASEFF ) /* sound samples */
+	ROM_REGION( 0xa0000, "oki", ROMREGION_ERASEFF ) /* sound samples */
 	ROM_LOAD( "afb_ep5.u29",  0x000000, 0x20000, CRC(3559609a) SHA1(6f0b633bf74f41487fc98dcdc43a83eb67f3d14c) )
-	ROM_LOAD( "afb_ep4.u30",  0x040000, 0x80000, CRC(f9652163) SHA1(d8c1fcf44b350cc65378869e4eb188ea232b4948) )
+	ROM_LOAD( "afb_ep4.u30",  0x020000, 0x80000, CRC(f9652163) SHA1(d8c1fcf44b350cc65378869e4eb188ea232b4948) )
 ROM_END
 
 ROM_START( aerfboo2 )
@@ -2756,6 +2837,12 @@ ROM_START( wbbc97 )
 ROM_END
 
 
+DRIVER_INIT_MEMBER(aerofgt_state, banked_oki)
+{
+	membank("okibank")->configure_entries(0, 4, memregion("oki")->base() + 0x20000, 0x20000);
+}
+
+
 GAME( 1990, spinlbrk, 0,        spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V-System Co.",     "Spinal Breakers (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrku,spinlbrk, spinlbrk, spinlbrku, driver_device,0, ROT0,   "V-System Co.",     "Spinal Breakers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1990, spinlbrkj,spinlbrk, spinlbrk, spinlbrk, driver_device, 0, ROT0,   "V-System Co.",     "Spinal Breakers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
@@ -2775,15 +2862,15 @@ GAME( 1991, karatblz, 0,        karatblz, karatblz, driver_device, 0, ROT0,   "V
 GAME( 1991, karatblza,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (World, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzu,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1991, karatblzj,karatblz, karatblz, karatblz, driver_device, 0, ROT0,   "Video System Co.", "Toushin Blazers (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_NO_SOUND )
+GAME( 1991, karatblzbl,karatblz,karatblzbl,karatblz,driver_device, 0, ROT0,   "bootleg",          "Karate Blazers (bootleg with Street Smart sound hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 
-GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (old revision)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-// there's also an undumped Turbo Force (new revision). Most notable thing in there is the points value of the rocks in level 6 (5.000 versus 500).
+GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (new revision)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
+GAME( 1991, turbofrco,turbofrc, turbofrc, turbofrc, driver_device, 0, ROT270, "Video System Co.", "Turbo Force (old revision)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 
 // the tiles on these also contain an alt title 'The Final War' for both the title screen and attract logo was it ever used?
 GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt, driver_device,  0, ROT270, "Video System Co.", "Aero Fighters (World / USA + Canada / Korea / Hong Kong / Taiwan) (newer hardware)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // this has the newer sprite chip etc. unlike all other games in this driver..
 GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL ) // probably intended for Taiwan because the Japanese name is Sonic Wings (below)
 GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Aero Fighters (Taiwan / Japan, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1992, sonicwi,  aerofgt,  aerofgtb, aerofgtb, driver_device, 0, ROT270, "Video System Co.", "Sonic Wings (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
-GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, driver_device, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
+GAME( 1992, aerfboot, aerofgt,  aerfboot, aerofgtb, aerofgt_state, banked_oki, ROT270, "bootleg", "Aero Fighters (bootleg set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )
 GAME( 1992, aerfboo2, aerofgt,  aerfboo2, aerofgtb, driver_device, 0, ROT270, "bootleg",          "Aero Fighters (bootleg set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL | MACHINE_IMPERFECT_SOUND )

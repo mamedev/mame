@@ -24,31 +24,11 @@
 #ifndef NLD_82S16_H_
 #define NLD_82S16_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_82S16(_name)                                     \
-		NET_REGISTER_DEV(TTL_82S16, _name)
-#define TTL_82S16_DIP(_name)                                 \
-		NET_REGISTER_DEV(TTL_82S16_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_DEVICE(82S16,
-
-	logic_input_t m_A[8];
-	logic_input_t m_CE1Q;
-	logic_input_t m_CE2Q;
-	logic_input_t m_CE3Q;
-	logic_input_t m_WEQ;
-	logic_input_t m_DIN;
-	logic_output_t m_DOUTQ;
-
-	//netlist_state_t<UINT8[256]> m_ram;
-	UINT8 m_ram[256];
-);
-
-NETLIB_DEVICE_DERIVED_PURE(82S16_dip, 82S16);
-
-NETLIB_NAMESPACE_DEVICES_END()
+#define TTL_82S16(name)                                     \
+		NET_REGISTER_DEV(TTL_82S16, name)
+#define TTL_82S16_DIP(name)                                 \
+		NET_REGISTER_DEV(TTL_82S16_DIP, name)
 
 #endif /* NLD_82S16_H_ */

@@ -45,11 +45,11 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_bgram;
-	required_shared_ptr<UINT16> m_fgram;
-	required_shared_ptr<UINT16> m_txram;
-	required_shared_ptr<UINT16> m_vregs;
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_bgram;
+	required_shared_ptr<uint16_t> m_fgram;
+	required_shared_ptr<uint16_t> m_txram;
+	required_shared_ptr<uint16_t> m_vregs;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
@@ -67,8 +67,8 @@ public:
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
@@ -119,9 +119,9 @@ TILEMAP_MAPPER_MEMBER(bestleag_state::bsb_bg_scan)
 
 void bestleag_state::video_start()
 {
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,256, 32);
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_tx_tile_info),this),TILEMAP_SCAN_COLS,8,8,256, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_bg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(bestleag_state::get_fg_tile_info),this),tilemap_mapper_delegate(FUNC(bestleag_state::bsb_bg_scan),this),16,16,128, 64);
 
 	m_tx_tilemap->set_transparent_pen(15);
 	m_fg_tilemap->set_transparent_pen(15);
@@ -134,7 +134,7 @@ Note: sprite chip is different than the other Big Striker sets and they
 */
 void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT16 *spriteram16 = m_spriteram;
+	uint16_t *spriteram16 = m_spriteram;
 
 	/*
 
@@ -187,7 +187,7 @@ void bestleag_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,(m_vregs[0x00/2] & 0xfff) + (m_vregs[0x08/2] & 0x7) - 3);
 	m_bg_tilemap->set_scrolly(0,m_vregs[0x02/2]);
@@ -203,7 +203,7 @@ UINT32 bestleag_state::screen_update_bestleag(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t bestleag_state::screen_update_bestleaw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0,m_vregs[0x08/2]);
 	m_bg_tilemap->set_scrolly(0,m_vregs[0x0a/2]);
@@ -239,7 +239,7 @@ WRITE16_MEMBER(bestleag_state::fgram_w)
 
 WRITE16_MEMBER(bestleag_state::oki_bank_w)
 {
-	m_oki->set_bank_base(0x40000 * ((data & 3) - 1));
+	m_oki->set_rom_bank((data - 1) & 3);
 }
 
 

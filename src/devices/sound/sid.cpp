@@ -27,15 +27,15 @@ static float filterResTable[16];
 #define maxLogicalVoices 4
 
 static const int mix16monoMiddleIndex = 256*maxLogicalVoices/2;
-static UINT16 mix16mono[256*maxLogicalVoices];
+static uint16_t mix16mono[256*maxLogicalVoices];
 
-static UINT16 zero16bit=0;  /* either signed or unsigned */
-//UINT32 splitBufferLen;
+static uint16_t zero16bit=0;  /* either signed or unsigned */
+//uint32_t splitBufferLen;
 
 static void MixerInit(int threeVoiceAmplify)
 {
 	long si;
-	UINT16 ui;
+	uint16_t ui;
 	long ampDiv = maxLogicalVoices;
 
 	if (threeVoiceAmplify)
@@ -46,9 +46,9 @@ static void MixerInit(int threeVoiceAmplify)
 	/* Mixing formulas are optimized by sample input value. */
 
 	si = (-128*maxLogicalVoices) * 256;
-	for (ui = 0; ui < sizeof(mix16mono)/sizeof(UINT16); ui++ )
+	for (ui = 0; ui < sizeof(mix16mono)/sizeof(uint16_t); ui++ )
 	{
-		mix16mono[ui] = (UINT16)(si/ampDiv) + zero16bit;
+		mix16mono[ui] = (uint16_t)(si/ampDiv) + zero16bit;
 		si+=256;
 	}
 
@@ -98,13 +98,13 @@ static inline void syncEm(SID6581_t *This)
 }
 
 
-void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, UINT32 bufferLen )
+void sidEmuFillBuffer(SID6581_t *This, stream_sample_t *buffer, uint32_t bufferLen )
 {
-//void* fill16bitMono( SID6581_t *This, void* buffer, UINT32 numberOfSamples )
+//void* fill16bitMono( SID6581_t *This, void* buffer, uint32_t numberOfSamples )
 
 	for ( ; bufferLen > 0; bufferLen-- )
 	{
-		*buffer++ = (INT16) mix16mono[(unsigned)(mix16monoMiddleIndex
+		*buffer++ = (int16_t) mix16mono[(unsigned)(mix16monoMiddleIndex
 								+(*This->optr1.outProc)(&This->optr1)
 								+(*This->optr2.outProc)(&This->optr2)
 								+(This->optr3.outProc(&This->optr3)&This->optr3_outputmask)
@@ -147,14 +147,14 @@ int sidEmuReset(SID6581_t *This)
 	sidEmuSet2( &This->optr2 );
 	sidEmuSet2( &This->optr3 );
 
-	return TRUE;
+	return true;
 }
 
 
 static void filterTableInit(running_machine &machine)
 {
 	int sample_rate = machine.sample_rate();
-	UINT16 uk;
+	uint16_t uk;
 	/* Parameter calculation has not been moved to a separate function */
 	/* by purpose. */
 	const float filterRefFreq = 44100.0f;
@@ -230,17 +230,17 @@ void sid6581_init (SID6581_t *This)
 
 
 
-	This->PCMsid = (UINT32)(This->PCMfreq * (16777216.0 / This->clock));
-	This->PCMsidNoise = (UINT32)((This->clock*256.0)/This->PCMfreq);
+	This->PCMsid = (uint32_t)(This->PCMfreq * (16777216.0 / This->clock));
+	This->PCMsidNoise = (uint32_t)((This->clock*256.0)/This->PCMfreq);
 
-	This->filter.Enabled = TRUE;
+	This->filter.Enabled = true;
 
 	sidInitMixerEngine(This->device->machine());
 	filterTableInit(This->device->machine());
 
 	sidInitWaveformTables(This->type);
 
-	enveEmuInit(This->PCMfreq, TRUE);
+	enveEmuInit(This->PCMfreq, true);
 
 	MixerInit(0);
 
@@ -281,7 +281,7 @@ void sid6581_port_w (SID6581_t *This, int offset, int data)
 			}
 			if ( This->filter.Enabled )
 			{
-				This->filter.Value = 0x7ff & ( (This->reg[0x15]&7) | ( (UINT16)This->reg[0x16] << 3 ));
+				This->filter.Value = 0x7ff & ( (This->reg[0x15]&7) | ( (uint16_t)This->reg[0x16] << 3 ));
 				if (This->filter.Type == 0x20)
 					This->filter.Dy = bandPassParam ? bandPassParam[This->filter.Value] : 0.0f;
 				else

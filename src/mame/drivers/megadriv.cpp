@@ -2,7 +2,7 @@
 // copyright-holders:David Haywood
 
 #include "emu.h"
-#include "includes/md_cons.h"
+#include "includes/megadriv.h"
 #include "sound/sn76496.h"
 
 #include "imagedev/chd_cd.h"
@@ -25,10 +25,10 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 {
 	int portnum = offset;
 
-	UINT8 retdata;
+	uint8_t retdata;
 	int controller;
-	UINT8 helper_6b = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
-	UINT8 helper_3b = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
+	uint8_t helper_6b = (m_megadrive_io_ctrl_regs[portnum] & 0x3f) | 0xc0; // bits 6 & 7 always come from megadrive_io_data_regs
+	uint8_t helper_3b = (m_megadrive_io_ctrl_regs[portnum] & 0x7f) | 0x80; // bit 7 always comes from megadrive_io_data_regs
 
 	switch (portnum)
 	{
@@ -94,7 +94,7 @@ READ8_MEMBER(md_cons_state::mess_md_io_read_data_port)
 	/* Otherwise it's a 3 buttons Joypad */
 	else
 	{
-		UINT8 svp_test = 0;
+		uint8_t svp_test = 0;
 		if (m_cart)
 			svp_test = m_cart->read_test();
 
@@ -266,7 +266,7 @@ MACHINE_START_MEMBER(md_cons_state, md_common)
 
 	// setup timers for 6 button pads
 	for (int i = 0; i < 3; i++)
-		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(FPTR)i);
+		m_io_timeout[i] = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(md_base_state::io_timeout_timer_callback),this), (void*)(uintptr_t)i);
 
 	m_vdp->stop_timers();
 
@@ -356,7 +356,7 @@ MACHINE_RESET_MEMBER(md_cons_state, ms_megadriv)
 // same as screen_eof_megadriv but with addition of 32x and SegaCD/MegaCD pieces
 void md_cons_state::screen_eof_console(screen_device &screen, bool state)
 {
-	if (m_io_reset && (m_io_reset->read() & 0x01))
+	if (m_io_reset.read_safe(0) & 0x01)
 		m_maincpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 
 	// rising edge
@@ -406,6 +406,9 @@ static MACHINE_CONFIG_START( ms_megadpal, md_cons_state )
 	MCFG_SOFTWARE_LIST_ADD("cart_list","megadriv")
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( genesis_tmss, ms_megadriv )
+	MCFG_SOFTWARE_LIST_FILTER("cart_list","TMSS")
+MACHINE_CONFIG_END
 
 
 
@@ -460,7 +463,7 @@ DRIVER_INIT_MEMBER(md_cons_state, genesis)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(FALSE);
+		m_32x->set_32x_pal(false);
 		m_32x->set_framerate(60);
 		m_32x->set_total_scanlines(262);
 	}
@@ -482,7 +485,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_eur)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(TRUE);
+		m_32x->set_32x_pal(true);
 		m_32x->set_framerate(50);
 		m_32x->set_total_scanlines(313);
 	}
@@ -504,7 +507,7 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 
 	if (m_32x)
 	{
-		m_32x->set_32x_pal(FALSE);
+		m_32x->set_32x_pal(false);
 		m_32x->set_framerate(60);
 		m_32x->set_total_scanlines(262);
 	}
@@ -523,10 +526,10 @@ DRIVER_INIT_MEMBER(md_cons_state, md_jpn)
 
 DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 {
-	UINT32 length;
-	dynamic_buffer temp_copy;
-	UINT16 *ROM16;
-	UINT32 *ROM32;
+	uint32_t length;
+	std::vector<uint8_t> temp_copy;
+	uint16_t *ROM16;
+	uint32_t *ROM32;
 	int i;
 
 	if (image.software_entry() == nullptr)
@@ -544,23 +547,23 @@ DEVICE_IMAGE_LOAD_MEMBER( md_cons_state, _32x_cart )
 
 	/* Copy the cart image in the locations the driver expects */
 	// Notice that, by using pick_integer, we are sure the code works on both LE and BE machines
-	ROM16 = (UINT16 *) memregion("gamecart")->base();
+	ROM16 = (uint16_t *) memregion("gamecart")->base();
 	for (i = 0; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
 
-	ROM32 = (UINT32 *) memregion("gamecart_sh2")->base();
+	ROM32 = (uint32_t *) memregion("gamecart_sh2")->base();
 	for (i = 0; i < length; i += 4)
 		ROM32[i / 4] = pick_integer_be(&temp_copy[0], i, 4);
 
-	ROM16 = (UINT16 *) memregion("maincpu")->base();
+	ROM16 = (uint16_t *) memregion("maincpu")->base();
 	for (i = 0x00; i < length; i += 2)
 		ROM16[i / 2] = pick_integer_be(&temp_copy[0], i, 2);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
-void md_cons_state::_32x_scanline_callback(int x, UINT32 priority, UINT16 &lineptr)
+void md_cons_state::_32x_scanline_callback(int x, uint32_t priority, uint16_t &lineptr)
 {
 	if (m_32x)
 		m_32x->_32x_render_videobuffer_to_screenbuffer(x, priority, lineptr);
@@ -1058,7 +1061,7 @@ CONS( 1990, megadriv,   genesis,   0,      ms_megadpal,     md, md_cons_state,  
 CONS( 1988, megadrij,   genesis,   0,      ms_megadriv,     md, md_cons_state,     md_jpn,    "Sega",   "Mega Drive (Japan, NTSC)", MACHINE_SUPPORTS_SAVE )
 
 // 1990+ models had the TMSS security chip, leave this as a clone, it reduces compatibility and nothing more.
-CONS( 1990, genesis_tmss, genesis, 0,      ms_megadriv,     md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
+CONS( 1990, genesis_tmss, genesis, 0,      genesis_tmss,    md, md_cons_state,     genesis,   "Sega",   "Genesis (USA, NTSC, with TMSS chip)",  MACHINE_SUPPORTS_SAVE )
 
 
 // the 32X plugged in the cart slot, games plugged into the 32x.  Maybe it should be handled as an expansion device?

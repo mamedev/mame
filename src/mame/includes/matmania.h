@@ -1,6 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Brad Oliver
 
+#include "machine/gen_latch.h"
+
 class matmania_state : public driver_device
 {
 public:
@@ -21,20 +23,21 @@ public:
 		m_mcu(*this, "mcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_videoram3;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_colorram2;
-	required_shared_ptr<UINT8> m_colorram3;
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_pageselect;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_paletteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_videoram3;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr<uint8_t> m_colorram3;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_pageselect;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -43,23 +46,24 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* video-related */
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap2;
 
 	/* maniach 68705 protection */
-	UINT8 m_port_a_in;
-	UINT8 m_port_a_out;
-	UINT8 m_ddr_a;
-	UINT8 m_port_b_in;
-	UINT8 m_port_b_out;
-	UINT8 m_ddr_b;
-	UINT8 m_port_c_in;
-	UINT8 m_port_c_out;
-	UINT8 m_ddr_c;
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
+	uint8_t m_port_a_in;
+	uint8_t m_port_a_out;
+	uint8_t m_ddr_a;
+	uint8_t m_port_b_in;
+	uint8_t m_port_b_out;
+	uint8_t m_ddr_b;
+	uint8_t m_port_c_in;
+	uint8_t m_port_c_out;
+	uint8_t m_ddr_c;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
 	int m_mcu_sent;
 	int m_main_sent;
 
@@ -83,6 +87,6 @@ public:
 	DECLARE_PALETTE_INIT(matmania);
 	DECLARE_MACHINE_START(maniach);
 	DECLARE_MACHINE_RESET(maniach);
-	UINT32 screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_matmania(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_maniach(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

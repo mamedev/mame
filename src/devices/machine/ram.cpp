@@ -1,5 +1,5 @@
-// license:GPL-2.0+
-// copyright-holders:Dirk Best
+// license:BSD-3-Clause
+// copyright-holders: Dirk Best
 /*************************************************************************
 
     RAM device
@@ -23,13 +23,11 @@
 // device type definition
 const device_type RAM = &device_creator<ram_device>;
 
-
-
 //-------------------------------------------------
 //  ram_device - constructor
 //-------------------------------------------------
 
-ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RAM, "RAM", tag, owner, clock, "ram", __FILE__)
 {
 	m_size = 0;
@@ -37,8 +35,6 @@ ram_device::ram_device(const machine_config &mconfig, const char *tag, device_t 
 	m_extra_options = nullptr;
 	m_default_value = 0xCD;
 }
-
-
 
 //-------------------------------------------------
 //  device_start - device-specific startup
@@ -68,7 +64,6 @@ void ram_device::device_start()
 	save_item(NAME(m_pointer));
 }
 
-
 //-------------------------------------------------
 //  device_validity_check - device-specific validity
 //  checks
@@ -77,8 +72,8 @@ void ram_device::device_start()
 void ram_device::device_validity_check(validity_checker &valid) const
 {
 	const char *ramsize_string = nullptr;
-	int is_valid = FALSE;
-	UINT32 specified_ram;
+	int is_valid = false;
+	uint32_t specified_ram;
 	const char *gamename_option;
 
 	/* verify default ram value */
@@ -103,7 +98,7 @@ void ram_device::device_validity_check(validity_checker &valid) const
 			{
 				/* compare command line option to default value */
 				if (default_size() == specified_ram)
-					is_valid = TRUE;
+					is_valid = true;
 
 				/* verify extra ram options */
 				if (m_extra_options != nullptr)
@@ -120,13 +115,13 @@ void ram_device::device_validity_check(validity_checker &valid) const
 					/* try to parse each option */
 					while(p <= e)
 					{
-						UINT32 option_ram_size = parse_string(p);
+						uint32_t option_ram_size = parse_string(p);
 
 						if (option_ram_size == 0)
 							osd_printf_error("Invalid RAM option: %s\n", p);
 
 						if (option_ram_size == specified_ram)
-							is_valid = TRUE;
+							is_valid = true;
 
 						p += strlen(p);
 						if (p == e)
@@ -134,35 +129,35 @@ void ram_device::device_validity_check(validity_checker &valid) const
 						p += 1;
 					}
 
-					osd_free(s);
+					free(s);
 				}
 
 			} else {
 				/* if not for this driver then return ok */
-				is_valid = TRUE;
+				is_valid = true;
 			}
 		}
 		else
 		{
 			/* not specifying the ramsize on the command line is valid as well */
-			is_valid = TRUE;
+			is_valid = true;
 		}
 	}
 	else
-		is_valid = TRUE;
+		is_valid = true;
 
 	if (!is_valid)
 	{
-		std::string output;
-		strcatprintf(output, "Cannot recognize the RAM option %s", ramsize_string);
-		strcatprintf(output, " (valid options are %s", m_default_size);
+		std::ostringstream output;
+		util::stream_format(output, "Cannot recognize the RAM option %s", ramsize_string);
+		util::stream_format(output, " (valid options are %s", m_default_size);
 
 		if (m_extra_options != nullptr)
-			strcatprintf(output, ",%s).\n", m_extra_options);
+			util::stream_format(output, ",%s).\n", m_extra_options);
 		else
-			strcatprintf(output, ").\n");
+			util::stream_format(output, ").\n");
 
-		osd_printf_error("%s", output.c_str());
+		osd_printf_error("%s", output.str().c_str());
 
 		osd_printf_warning("Setting value to default %s\n",m_default_size);
 		std::string error;
@@ -171,16 +166,14 @@ void ram_device::device_validity_check(validity_checker &valid) const
 	}
 }
 
-
-
 //-------------------------------------------------
 //  parse_string - convert a ram string to an
 //  integer value
 //-------------------------------------------------
 
-UINT32 ram_device::parse_string(const char *s)
+uint32_t ram_device::parse_string(const char *s)
 {
-	UINT32 ram;
+	uint32_t ram;
 	char suffix = '\0';
 
 	sscanf(s, "%u%c", &ram, &suffix);
@@ -210,13 +203,11 @@ UINT32 ram_device::parse_string(const char *s)
 	return ram;
 }
 
-
-
 //-------------------------------------------------
 //  default_size
 //-------------------------------------------------
 
-UINT32 ram_device::default_size(void) const
+uint32_t ram_device::default_size(void) const
 {
 	return parse_string(m_default_size);
 }

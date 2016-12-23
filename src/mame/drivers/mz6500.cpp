@@ -30,7 +30,7 @@ public:
 	DECLARE_WRITE8_MEMBER(mz6500_vram_w);
 	void fdc_irq(bool state);
 	void fdc_drq(bool state);
-	required_shared_ptr<UINT16> m_video_ram;
+	required_shared_ptr<uint16_t> m_video_ram;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -42,7 +42,7 @@ UPD7220_DISPLAY_PIXELS_MEMBER( mz6500_state::hgdc_display_pixels )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int gfx[3];
-	UINT8 i,pen;
+	uint8_t i,pen;
 
 	gfx[0] = m_video_ram[(address + 0x00000) >> 1];
 	gfx[1] = m_video_ram[(address + 0x10000) >> 1];

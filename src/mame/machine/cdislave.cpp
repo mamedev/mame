@@ -62,7 +62,7 @@ TIMER_CALLBACK_MEMBER( cdislave_device::trigger_readback_int )
 	m_interrupt_timer->adjust(attotime::never);
 }
 
-void cdislave_device::prepare_readback(const attotime &delay, UINT8 channel, UINT8 count, UINT8 data0, UINT8 data1, UINT8 data2, UINT8 data3, UINT8 cmd)
+void cdislave_device::prepare_readback(const attotime &delay, uint8_t channel, uint8_t count, uint8_t data0, uint8_t data1, uint8_t data2, uint8_t data3, uint8_t cmd)
 {
 	m_channel[channel].m_out_index = 0;
 	m_channel[channel].m_out_count = count;
@@ -79,12 +79,12 @@ void cdislave_device::perform_mouse_update()
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
 
-	UINT16 x = state->m_mousex->read();
-	UINT16 y = state->m_mousey->read();
-	UINT8 buttons = state->m_mousebtn->read();
+	uint16_t x = state->m_mousex->read();
+	uint16_t y = state->m_mousey->read();
+	uint8_t buttons = state->m_mousebtn->read();
 
-	UINT16 old_mouse_x = m_real_mouse_x;
-	UINT16 old_mouse_y = m_real_mouse_y;
+	uint16_t old_mouse_x = m_real_mouse_x;
+	uint16_t old_mouse_y = m_real_mouse_y;
 
 	if(m_real_mouse_x == 0xffff)
 	{
@@ -128,7 +128,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 
 	if(m_channel[offset].m_out_count)
 	{
-		UINT8 ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
+		uint8_t ret = m_channel[offset].m_out_buf[m_channel[offset].m_out_index];
 		verboselog(*this, 0, "slave_r: Channel %d: %d, %02x\n", offset, m_channel[offset].m_out_index, ret );
 		if(m_channel[offset].m_out_index == 0)
 		{
@@ -161,7 +161,7 @@ READ16_MEMBER( cdislave_device::slave_r )
 
 void cdislave_device::set_mouse_position()
 {
-//    UINT16 x, y;
+//    uint16_t x, y;
 
 	//printf( "Set mouse position: %02x %02x %02x\n", m_in_buf[0], m_in_buf[1], m_in_buf[2] );
 
@@ -418,7 +418,7 @@ WRITE16_MEMBER( cdislave_device::slave_w )
 //  cdislave_device - constructor
 //-------------------------------------------------
 
-cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cdislave_device::cdislave_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MACHINE_CDISLAVE, "CDISLAVE", tag, owner, clock, "cdislave", __FILE__)
 {
 }

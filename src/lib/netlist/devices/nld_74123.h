@@ -49,79 +49,26 @@
 #ifndef NLD_74123_H_
 #define NLD_74123_H_
 
-#include "nl_base.h"
-#include "nld_system.h"
-#include "analog/nld_twoterm.h"
+#include "nl_setup.h"
 
-#define TTL_74123(_name)                                                        \
-		NET_REGISTER_DEV(TTL_74123, _name)
+#define TTL_74123(name)                                                         \
+		NET_REGISTER_DEV(TTL_74123, name)
 
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_DEVICE(74123,
-public:
-	NETLIB_NAME(res_sw) m_RP;
-	NETLIB_NAME(res_sw) m_RN;
-
-	logic_output_t m_RP_Q;
-	logic_output_t m_RN_Q;
-
-	logic_input_t m_A;
-	logic_input_t m_B;
-	logic_input_t m_CLRQ;
-	logic_output_t m_Q;
-	logic_output_t m_QQ;
-
-	analog_input_t m_CV;
-
-	netlist_sig_t m_last_trig;
-	UINT8         m_state;
-	double        m_KP;
-
-	param_double_t m_K;
-	param_double_t m_RI;
-
-	int m_dev_type;
-);
-
-#define TTL_74123_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_74123_DIP, _name)
-
-NETLIB_DEVICE(74123_dip,
-
-	NETLIB_NAME(74123) m_1;
-	NETLIB_NAME(74123) m_2;
-
-);
+#define TTL_74123_DIP(name)                                                     \
+		NET_REGISTER_DEV(TTL_74123_DIP, name)
 
 /* The 9602 is very similar to the 123. Input triggering is slightly different
- * THe 9602 uses an OR gate instead of an AND gate.
+ * The 9602 uses an OR gate instead of an AND gate.
  */
 
-#define TTL_9602_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_9602_DIP, _name)
-
-NETLIB_DEVICE(9602_dip,
-
-	NETLIB_NAME(74123) m_1;
-	NETLIB_NAME(74123) m_2;
-
-);
+#define TTL_9602_DIP(name)                                                      \
+		NET_REGISTER_DEV(TTL_9602_DIP, name)
 
 /*
  * The CD4538 is pretty similar to the 9602
  */
 
-#define CD4538_DIP(_name)                                                         \
-		NET_REGISTER_DEV(CD4538_DIP, _name)
-
-NETLIB_DEVICE(4538_dip,
-	NETLIB_LOGIC_FAMILY(CD4XXX)
-	NETLIB_NAME(74123) m_1;
-	NETLIB_NAME(74123) m_2;
-);
-
-NETLIB_NAMESPACE_DEVICES_END()
-
+#define CD4538_DIP(name)                                                        \
+		NET_REGISTER_DEV(CD4538_DIP, name)
 
 #endif /* NLD_74123_H_ */

@@ -14,9 +14,9 @@
         6809 Microcomputer Programming & Interfacing with Experiments"
             by Andrew C. Staugaard, Jr.; Howard W. Sams & Co., Inc.
 
-    System dependencies:    UINT16 must be 16 bit unsigned int
-                            UINT8 must be 8 bit unsigned int
-                            UINT32 must be more than 16 bits
+    System dependencies:    uint16_t must be 16 bit unsigned int
+                            uint8_t must be 8 bit unsigned int
+                            uint32_t must be more than 16 bits
                             arrays up to 65536 bytes must be supported
                             machine must be twos complement
 
@@ -111,12 +111,12 @@
 
 /* macros for CC -- CC bits affected should be reset before calling */
 #define SET_Z(a)       if(!a)SEZ
-#define SET_Z8(a)      SET_Z((UINT8)a)
+#define SET_Z8(a)      SET_Z((uint8_t)a)
 #define SET_N8(a)      CC|=((a&0x80)>>5)
 #define SET_H(a,b,r)   CC|=((a^b^r)&0x10)
 #define SET_C8(a)      CC|=((a&0x100)>>8)
 
-const UINT8 m6805_base_device::m_flags8i[256]=   /* increment */
+const uint8_t m6805_base_device::m_flags8i[256]=   /* increment */
 {
 	0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -136,7 +136,7 @@ const UINT8 m6805_base_device::m_flags8i[256]=   /* increment */
 	0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04,0x04
 };
 
-const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
+const uint8_t m6805_base_device::m_flags8d[256]= /* decrement */
 {
 	0x02,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 	0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -162,8 +162,8 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 #define SET_NZ8(a)          {SET_N8(a); SET_Z(a);}
 #define SET_FLAGS8(a,b,r)   {SET_N8(r); SET_Z8(r); SET_C8(r);}
 
-/* for treating an unsigned UINT8 as a signed INT16 */
-#define SIGNED(b) ((INT16)(b & 0x80 ? b | 0xff00 : b))
+/* for treating an unsigned uint8_t as a signed int16_t */
+#define SIGNED(b) ((int16_t)(b & 0x80 ? b | 0xff00 : b))
 
 /* Macros for addressing modes */
 #define DIRECT EAD=0; IMMBYTE(m_ea.b.l)
@@ -195,10 +195,10 @@ const UINT8 m6805_base_device::m_flags8d[256]= /* decrement */
 #define IDX1BYTE(b) {INDEXED1; b = RM(EAD);}
 #define IDX2BYTE(b) {INDEXED2; b = RM(EAD);}
 /* Macros for branch instructions */
-#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
+#define BRANCH(f) { uint8_t t; IMMBYTE(t); if(f) { PC += SIGNED(t); } }
 
 /* what they say it is ... */
-const UINT8 m6805_base_device::m_cycles1[] =
+const uint8_t m6805_base_device::m_cycles1[] =
 {
 		/* 0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F */
 	/*0*/ 10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,10,
@@ -223,7 +223,7 @@ const UINT8 m6805_base_device::m_cycles1[] =
 /* pre-clear a PAIR union; clearing h2 and h3 only might be faster? */
 #define CLEAR_PAIR(p)   p->d = 0
 
-void m6805_base_device::rd_s_handler_b(UINT8 *b)
+void m6805_base_device::rd_s_handler_b(uint8_t *b)
 {
 	SP_INC;
 	*b = RM( S );
@@ -238,7 +238,7 @@ void m6805_base_device::rd_s_handler_w(PAIR *p)
 	p->b.l = RM( S );
 }
 
-void m6805_base_device::wr_s_handler_b(UINT8 *b)
+void m6805_base_device::wr_s_handler_b(uint8_t *b)
 {
 	WM( S, *b );
 	SP_DEC;
@@ -252,7 +252,7 @@ void m6805_base_device::wr_s_handler_w(PAIR *p)
 	SP_DEC;
 }
 
-void m6805_base_device::RM16(UINT32 addr, PAIR *p)
+void m6805_base_device::RM16(uint32_t addr, PAIR *p)
 {
 	CLEAR_PAIR(p);
 	p->b.h = RM(addr);
@@ -409,11 +409,19 @@ void m6805_base_device::interrupt()
 //  m6809_base_device - constructor
 //-------------------------------------------------
 
-m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock, const device_type type, const char *name, UINT32 addr_width, const char *shortname, const char *source)
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, addr_width)
 {
 }
+
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_constructor internal_map, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_program_config("program", ENDIANNESS_BIG, 8, addr_width, 0, internal_map)
+{
+}
+
+ 
 
 void m6805_base_device::device_start()
 {
@@ -425,6 +433,7 @@ void m6805_base_device::device_start()
 
 	// register our state for the debugger
 	state_add(STATE_GENPC,     "GENPC",     m_pc.w.l).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_pc.w.l).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_cc).callimport().callexport().formatstr("%8s").noshow();
 	state_add(M6805_A,         "A",         m_a).mask(0xff);
 	state_add(M6805_PC,        "PC",        m_pc.w.l).mask(0xffff);
@@ -445,6 +454,7 @@ void m6805_base_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_state));
 }
+
 
 
 void m6805_base_device::device_reset()
@@ -474,7 +484,7 @@ void m6805_base_device::device_reset()
 
 //-------------------------------------------------
 //  memory_space_config - return the configuration
-//  of the specified address space, or NULL if
+//  of the specified address space, or nullptr if
 //  the space doesn't exist
 //-------------------------------------------------
 
@@ -498,7 +508,7 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c",
 				(m_cc & 0x80) ? '?' : '.',
 				(m_cc & 0x40) ? '?' : '.',
 				(m_cc & 0x20) ? '?' : '.',
@@ -517,7 +527,7 @@ void m6805_base_device::state_string_export(const device_state_entry &entry, std
 //  of the shortest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6805_base_device::disasm_min_opcode_bytes() const
+uint32_t m6805_base_device::disasm_min_opcode_bytes() const
 {
 	return 1;
 }
@@ -528,7 +538,7 @@ UINT32 m6805_base_device::disasm_min_opcode_bytes() const
 //  of the longest instruction, in bytes
 //-------------------------------------------------
 
-UINT32 m6805_base_device::disasm_max_opcode_bytes() const
+uint32_t m6805_base_device::disasm_max_opcode_bytes() const
 {
 	return 3;
 }
@@ -539,10 +549,10 @@ UINT32 m6805_base_device::disasm_max_opcode_bytes() const
 //  helper function
 //-------------------------------------------------
 
-offs_t m6805_base_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t m6805_base_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( m6805 );
-	return CPU_DISASSEMBLE_NAME(m6805)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(m6805)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -561,14 +571,14 @@ void m6805_device::execute_set_input(int inputnum, int state)
 	}
 }
 
-#include "6805ops.inc"
+#include "6805ops.hxx"
 
 //-------------------------------------------------
 //  execute_clocks_to_cycles - convert the raw
 //  clock into cycles per second
 //-------------------------------------------------
 
-UINT64 m6805_base_device::execute_clocks_to_cycles(UINT64 clocks) const
+uint64_t m6805_base_device::execute_clocks_to_cycles(uint64_t clocks) const
 {
 	return (clocks + 3) / 4;
 }
@@ -579,7 +589,7 @@ UINT64 m6805_base_device::execute_clocks_to_cycles(UINT64 clocks) const
 //  count back to raw clocks
 //-------------------------------------------------
 
-UINT64 m6805_base_device::execute_cycles_to_clocks(UINT64 cycles) const
+uint64_t m6805_base_device::execute_cycles_to_clocks(uint64_t cycles) const
 {
 	return cycles * 4;
 }
@@ -590,7 +600,7 @@ UINT64 m6805_base_device::execute_cycles_to_clocks(UINT64 cycles) const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_min_cycles() const
+uint32_t m6805_base_device::execute_min_cycles() const
 {
 	return 2;
 }
@@ -601,7 +611,7 @@ UINT32 m6805_base_device::execute_min_cycles() const
 //  cycles it takes for one instruction to execute
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_max_cycles() const
+uint32_t m6805_base_device::execute_max_cycles() const
 {
 	return 10;
 }
@@ -612,7 +622,7 @@ UINT32 m6805_base_device::execute_max_cycles() const
 //  input/interrupt lines
 //-------------------------------------------------
 
-UINT32 m6805_base_device::execute_input_lines() const
+uint32_t m6805_base_device::execute_input_lines() const
 {
 	return 9;
 }
@@ -621,7 +631,7 @@ UINT32 m6805_base_device::execute_input_lines() const
 /* execute instructions on this CPU until icount expires */
 void m6805_base_device::execute_run()
 {
-	UINT8 ireg;
+	uint8_t ireg;
 
 	S = SP_ADJUST( S );     /* Taken from CPU_SET_CONTEXT when pointer'afying */
 
@@ -953,6 +963,159 @@ void m68705_device::execute_set_input(int inputnum, int state)
 	}
 }
 
+/* ddr - direction registers */
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrA_w)
+{
+	m_ddrA = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrB_w)
+{
+	m_ddrB = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_ddrC_w)
+{
+	m_ddrC = data;
+}
+
+/* read ports */
+
+READ8_MEMBER(m68705_new_device::mc68705_portA_r)
+{
+	m_portA_in = m_portA_cb_r(0, ~m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pulled
+	uint8_t res = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+	return res;
+
+}
+
+READ8_MEMBER(m68705_new_device::mc68705_portB_r)
+{
+	m_portB_in = m_portB_cb_r(0, ~m_ddrB);
+	uint8_t res = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	return res;
+}
+
+READ8_MEMBER(m68705_new_device::mc68705_portC_r)
+{
+	m_portC_in = m_portC_cb_r(0, ~m_ddrC);
+	uint8_t res = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+	return res;
+}
+
+/* write ports */
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portA_w)
+{
+	m_portA_cb_w(0, data, m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pushed
+	m_portA_out = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portB_w)
+{
+	m_portB_cb_w(0, data, m_ddrB);
+	m_portB_out = data;
+}
+
+WRITE8_MEMBER(m68705_new_device::mc68705_portC_w)
+{
+	m_portC_cb_w(0, data, m_ddrC);
+	m_portC_out = data;
+}
+
+/*
+
+The 68(7)05 peripheral memory map:
+Common for Px, Rx, Ux parts:
+0x00: Port A data (RW)
+0x01: Port B data (RW)
+0x02: Port C data (RW) [top 4 bits do nothing (read as 1s) on Px parts, work as expected on Rx, Ux parts]
+0x03: [Port D data (RW), only on Rx, Ux parts]
+0x04: Port A DDR (Write only, reads as 0xFF)
+0x05: Port B DDR (Write only, reads as 0xFF)
+0x06: Port C DDR (Write only, reads as 0xFF) [top 4 bits do nothing on Px parts, work as expected on Rx, Ux parts]
+0x07: Unused (reads as 0xFF?)
+0x08: Timer Data Register (RW; acts as ram when timer isn't counting, otherwise decrements once per prescaler expiry)
+0x09: Timer Control Register (RW; on certain mask part and when MOR bit 6 is not set, all bits are RW except bit 3 which
+always reads as zero. when MOR bit 6 is set and on all mask parts except one listed in errata in the 6805 daatsheet,
+the top two bits are RW, bottom 6 always read as 1 and writes do nothing; on the errata chip, bit 3 is writable and
+clears the prescaler, reads as zero)
+0x0A: [Miscellaneous Register, only on Rx, Sx, Ux parts]
+0x0B: [Eprom parts: Programming Control Register (write only?, low 3 bits; reads as 0xFF?); Unused (reads as 0xFF?) on
+Mask parts]
+0x0C: Unused (reads as 0xFF?)
+0x0D: Unused (reads as 0xFF?)
+0x0E: [A/D control register, only on Rx, Ux, Sx parts]
+0x0F: [A/D result register, only on Rx, Ux, Sx parts]
+0x10-0x7f: internal ram; SP can only point to 0x60-0x7F. Rx parts have an unused hole from 0x10-0x3F (reads as 0xFF?)
+0x80-0xFF: Page 0 user rom
+The remainder of the memory map differs here between parts, see appropriate datasheet for each part.
+The four vectors are always stored in big endian form as the last 8 bytes of the address space.
+
+Sx specific differences:
+0x02: Port C data (RW) [top 6 bits do nothing (read as 1s) on Sx parts]
+0x06: Port C DDR (Write only, reads as 0xFF) [top 6 bits do nothing on Sx parts]
+0x0B: Timer 2 Data Register MSB
+0x0C: Timer 2 Data Register LSB
+0x0D: Timer 2 Control Register
+0x10: SPI Data Register
+0x11: SPI Control Register
+0x12-0x3F: Unused (reads as 0xFF?)
+
+MOR ADDRESS: Mask Option Register; does not exist on R2 and several other but not all mask parts, located at 0x784 on Px parts
+
+Rx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x10-0x3f and and 0x100-0x7BF; has A/D converter, Ports A-D;
+eprom parts have MOR at 0xF38; mask parts have selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+Px Parts: 28 pins; address space is 0x000-0x7ff; eprom parts have MOR at 0x784 and bootstrap rom at 0x785-0x7f7; mask parts have a
+selftest rom at similar area; port c is just 4 bits.
+
+Sx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x12-0x3f and and 0x100-0x9BF; has A/D converter; has SPI
+serial; port C is just two bits; has an extra 16-bit timer compared to Ux/Rx; selftest rom at 0xF00-0xFF7
+
+Ux Parts: 40 pins; address space is 0x000-0xfff; has A/D converter, Ports A-D; eprom parts have MOR at 0xF38; mask parts have
+selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+*/
+
+ADDRESS_MAP_START( m68705_internal_map, AS_PROGRAM, 8, m68705_new_device )
+	AM_RANGE(0x000, 0x000) AM_READWRITE(mc68705_portA_r, mc68705_portA_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(mc68705_portB_r, mc68705_portB_w)
+	AM_RANGE(0x002, 0x002) AM_READWRITE(mc68705_portC_r, mc68705_portC_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE(mc68705_ddrA_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE(mc68705_ddrB_w)
+	AM_RANGE(0x006, 0x006) AM_WRITE(mc68705_ddrC_w)
+
+	AM_RANGE(0x010, 0x07f) AM_RAM
+	AM_RANGE(0x080, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+void m68705_new_device::device_start()
+{
+	m68705_device::device_start();
+
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portB_in));
+	save_item(NAME(m_portC_in));
+
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portC_out));
+
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_ddrC));
+
+	m_portA_cb_w.resolve_safe();
+	m_portB_cb_w.resolve_safe();
+	m_portC_cb_w.resolve_safe();
+	
+	m_portA_cb_r.resolve_safe(0xff);
+	m_portB_cb_r.resolve_safe(0xff);
+	m_portC_cb_r.resolve_safe(0xff);
+
+}
 
 /****************************************************************************
  * HD63705 section
@@ -999,4 +1162,5 @@ void hd63705_device::execute_set_input(int inputnum, int state)
 const device_type M6805 = &device_creator<m6805_device>;
 const device_type M68HC05EG = &device_creator<m68hc05eg_device>;
 const device_type M68705 = &device_creator<m68705_device>;
+const device_type M68705_NEW = &device_creator<m68705_new_device>;
 const device_type HD63705 = &device_creator<hd63705_device>;

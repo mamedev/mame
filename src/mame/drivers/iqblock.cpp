@@ -56,7 +56,7 @@ Grndtour:
 #include "cpu/z180/z180.h"
 #include "machine/i8255.h"
 #include "includes/iqblock.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 
 
 WRITE8_MEMBER(iqblock_state::iqblock_prot_w)
@@ -499,7 +499,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */
@@ -516,7 +516,7 @@ DRIVER_INIT_MEMBER(iqblock_state,iqblock)
 
 DRIVER_INIT_MEMBER(iqblock_state,grndtour)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int i;
 
 	/* decrypt the program ROM */

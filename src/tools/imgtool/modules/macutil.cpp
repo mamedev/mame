@@ -12,7 +12,7 @@
 #include "macutil.h"
 
 
-time_t mac_crack_time(UINT32 t)
+time_t mac_crack_time(uint32_t t)
 {
 	/* not sure if this is correct... */
 	return t - (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
@@ -20,7 +20,7 @@ time_t mac_crack_time(UINT32 t)
 
 
 
-UINT32 mac_setup_time(time_t t)
+uint32_t mac_setup_time(time_t t)
 {
 	/* not sure if this is correct... */
 	return t + (((1970 - 1904) * 365) + 17) * 24 * 60 * 60;
@@ -28,7 +28,7 @@ UINT32 mac_setup_time(time_t t)
 
 
 
-UINT32 mac_time_now(void)
+uint32_t mac_time_now(void)
 {
 	time_t now;
 	time(&now);
@@ -80,7 +80,7 @@ void pascal_from_c_string(unsigned char *pstring, size_t pstring_len, const char
 	size_t cstring_len, i;
 
 	cstring_len = strlen(cstring);
-	pstring[0] = MIN(cstring_len, pstring_len - 1);
+	pstring[0] = std::min(cstring_len, pstring_len - 1);
 
 	for (i = 0; i < pstring[0]; i++)
 		pstring[1 + i] = cstring[i];

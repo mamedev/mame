@@ -192,6 +192,8 @@ TODO:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/samples.h"
 #include "includes/rallyx.h"
 
@@ -317,7 +319,7 @@ static ADDRESS_MAP_START( rallyx_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
 	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_SHARE("radarattr")
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", namco_device, pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w)
@@ -340,8 +342,8 @@ static ADDRESS_MAP_START( jungler_map, AS_PROGRAM, 8, rallyx_state )
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_SHARE("radarattr")   // jungler writes to a03x
-	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xa080, 0xa080) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0xa100, 0xa100) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w) /* only jungler and tactcian */
 	AM_RANGE(0xa140, 0xa140) AM_WRITE(rallyx_scrolly_w) /* only jungler and tactcian */
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(locomotn_latch_w)
@@ -844,6 +846,8 @@ static MACHINE_CONFIG_START( rallyx, rallyx_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, rallyx_vblank_irq)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
@@ -885,6 +889,8 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_CPU_PROGRAM_MAP(jungler_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", rallyx_state, jungler_vblank_irq)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_MACHINE_START_OVERRIDE(rallyx_state,rallyx)
 	MCFG_MACHINE_RESET_OVERRIDE(rallyx_state,rallyx)
 
@@ -904,6 +910,8 @@ static MACHINE_CONFIG_START( jungler, rallyx_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_INIT_OWNER(rallyx_state,jungler)
 	MCFG_VIDEO_START_OVERRIDE(rallyx_state,jungler)
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* sound hardware */
 	MCFG_FRAGMENT_ADD(locomotn_sound)

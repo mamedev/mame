@@ -5,6 +5,7 @@
 */
 
 #include "machine/buggychl.h"
+#include "machine/gen_latch.h"
 #include "sound/msm5232.h"
 
 class buggychl_state : public driver_device
@@ -24,14 +25,15 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
-		m_palette(*this, "palette") { }
+		m_palette(*this, "palette") ,
+		m_soundlatch(*this, "soundlatch") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_charram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_scrollv;
-	required_shared_ptr<UINT8> m_scrollh;
+	required_shared_ptr<uint8_t> m_charram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_scrollv;
+	required_shared_ptr<uint8_t> m_scrollh;
 
 	/* video-related */
 	bitmap_ind16 m_tmp_bitmap1;
@@ -42,7 +44,7 @@ public:
 	int         m_sky_on;
 	int         m_sprite_color_base;
 	int         m_bg_scrollx;
-	UINT8       m_sprite_lookup[0x2000];
+	uint8_t       m_sprite_lookup[0x2000];
 
 	/* sound-related */
 	int         m_sound_nmi_enable;
@@ -57,7 +59,7 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
-
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(bankswitch_w);
 	DECLARE_WRITE8_MEMBER(sound_command_w);
@@ -77,7 +79,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(buggychl);
-	UINT32 screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_buggychl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	void draw_sky( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void draw_bg( bitmap_ind16 &bitmap, const rectangle &cliprect );

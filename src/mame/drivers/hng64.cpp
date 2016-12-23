@@ -441,6 +441,7 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "machine/nvram.h"
 #include "includes/hng64.h"
+#include "machine/hng64_net.h"
 
 /* TODO: NOT measured! */
 #define PIXEL_CLOCK         ((HNG64_MASTER_CLOCK*2)/4) // x 2 is due of the interlaced screen ...
@@ -504,7 +505,7 @@ READ8_MEMBER(hng64_state::hng64_com_share_r)
 
 READ32_MEMBER(hng64_state::hng64_sysregs_r)
 {
-	UINT16 rtc_addr;
+	uint16_t rtc_addr;
 
 #if 0
 	if((offset*4) != 0x1084)
@@ -548,7 +549,7 @@ void hng64_state::do_dma(address_space &space)
 
 	while (m_dma_len >= 0)
 	{
-		UINT32 dat;
+		uint32_t dat;
 
 		dat = space.read_dword(m_dma_start);
 		space.write_dword(m_dma_dst, dat);
@@ -685,7 +686,7 @@ READ32_MEMBER(hng64_state::shoot_io_r)
 		}
 		case 0x018:
 		{
-			UINT8 p1_x, p1_y, p2_x, p2_y;
+			uint8_t p1_x, p1_y, p2_x, p2_y;
 			p1_x = ioport("LIGHT_P1_X")->read() & 0xff;
 			p1_y = ioport("LIGHT_P1_Y")->read() & 0xff;
 			p2_x = ioport("LIGHT_P2_X")->read() & 0xff;
@@ -695,7 +696,7 @@ READ32_MEMBER(hng64_state::shoot_io_r)
 		}
 		case 0x01c:
 		{
-			UINT8 p3_x, p3_y;
+			uint8_t p3_x, p3_y;
 			p3_x = ioport("LIGHT_P3_X")->read() & 0xff;
 			p3_y = ioport("LIGHT_P3_Y")->read() & 0xff;
 
@@ -727,7 +728,7 @@ READ32_MEMBER(hng64_state::racing_io_r)
 		case 0x014: return ioport("VIEW")->read();
 		case 0x018:
 		{
-			UINT8 handle, acc, brake;
+			uint8_t handle, acc, brake;
 			handle = ioport("HANDLE")->read() & 0xff;
 			acc = ioport("ACCELERATOR")->read() & 0xff;
 			brake = ioport("BRAKE")->read() & 0xff;
@@ -789,13 +790,13 @@ WRITE32_MEMBER(hng64_state::hng64_dualport_w)
 // Transition Control memory.
 WRITE32_MEMBER(hng64_state::tcram_w)
 {
-	UINT32 *hng64_tcram = m_tcram;
+	uint32_t *hng64_tcram = m_tcram;
 
 	COMBINE_DATA (&hng64_tcram[offset]);
 
 	if(offset == 0x02)
 	{
-		UINT16 min_x, min_y, max_x, max_y;
+		uint16_t min_x, min_y, max_x, max_y;
 		rectangle visarea = m_screen->visible_area();
 
 		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
@@ -847,7 +848,7 @@ READ32_MEMBER(hng64_state::unk_vreg_r)
 /* The following is guesswork, needs confirmation with a test on the real board. */
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 {
-	UINT32 spr_offs;
+	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
@@ -869,7 +870,7 @@ WRITE32_MEMBER(hng64_state::hng64_sprite_clear_even_w)
 
 WRITE32_MEMBER(hng64_state::hng64_sprite_clear_odd_w)
 {
-	UINT32 spr_offs;
+	uint32_t spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
@@ -1129,10 +1130,10 @@ static INPUT_PORTS_START( roadedge )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 	PORT_BIT( 0x00000100, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Shift Up")
 	PORT_BIT( 0x00000200, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Shift Down")
-	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, NULL)
-	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, NULL)
-	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, NULL)
-	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, NULL)
+	PORT_BIT( 0x00000400, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, left_handle_r, nullptr)
+	PORT_BIT( 0x00000800, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, right_handle_r, nullptr)
+	PORT_BIT( 0x00001000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, acc_down_r, nullptr)
+	PORT_BIT( 0x00002000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, hng64_state, brake_down_r, nullptr)
 
 	PORT_DIPNAME( 0x4000, 0x0000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
@@ -1338,8 +1339,8 @@ static const gfx_layout hng64_16x16x8_spritelayout =
 	32*64
 };
 
-static const UINT32 texlayout_xoffset[1024] = { STEP1024(0,8) };
-static const UINT32 texlayout_yoffset[512] = { STEP512(0,8192) };
+static const uint32_t texlayout_xoffset[1024] = { STEP1024(0,8) };
+static const uint32_t texlayout_yoffset[512] = { STEP512(0,8192) };
 static const gfx_layout hng64_texlayout =
 {
 	1024, 512,
@@ -1367,13 +1368,13 @@ static GFXDECODE_START( hng64 )
 	GFXDECODE_ENTRY( "textures", 0, hng64_texlayout,     0x0, 0x10 )  /* textures */
 GFXDECODE_END
 
-static void hng64_reorder( UINT8* gfxregion, size_t gfxregionsize)
+static void hng64_reorder( uint8_t* gfxregion, size_t gfxregionsize)
 {
 	// by default 2 4bpp tiles are stored in each 8bpp tile, this makes decoding in MAME harder than it needs to be
 	// reorder them
-	UINT8 tilesize = 4*8; // 4 bytes per line, 8 lines
+	uint8_t tilesize = 4*8; // 4 bytes per line, 8 lines
 
-	dynamic_buffer buffer(gfxregionsize);
+	std::vector<uint8_t> buffer(gfxregionsize);
 
 	for (int i = 0; i < gfxregionsize/2; i += tilesize)
 	{
@@ -1392,11 +1393,11 @@ DRIVER_INIT_MEMBER(hng64_state,hng64_reorder_gfx)
 DRIVER_INIT_MEMBER(hng64_state,hng64)
 {
 	/* 1 meg of virtual address space for the com cpu */
-	m_com_virtual_mem = std::make_unique<UINT8[]>(0x100000);
-	m_com_op_base     = std::make_unique<UINT8[]>(0x10000);
+	m_com_virtual_mem = std::make_unique<uint8_t[]>(0x100000);
+	m_com_op_base     = std::make_unique<uint8_t[]>(0x10000);
 
-	m_soundram = std::make_unique<UINT16[]>(0x200000/2);
-	m_soundram2 = std::make_unique<UINT16[]>(0x200000/2);
+	m_soundram = std::make_unique<uint16_t[]>(0x200000/2);
+	m_soundram2 = std::make_unique<uint16_t[]>(0x200000/2);
 
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
@@ -1440,7 +1441,7 @@ DRIVER_INIT_MEMBER(hng64_state,hng64_shoot)
 	DRIVER_INIT_CALL(hng64);
 }
 
-void hng64_state::set_irq(UINT32 irq_vector)
+void hng64_state::set_irq(uint32_t irq_vector)
 {
 	/*
 	    TODO:
@@ -1503,12 +1504,12 @@ void hng64_state::machine_start()
 	m_maincpu->mips3drc_set_options(MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions */
-	m_maincpu->add_fastram(0x00000000, 0x00ffffff, FALSE, m_mainram);
-	m_maincpu->add_fastram(0x04000000, 0x05ffffff, TRUE,  m_cart);
-	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, TRUE,  m_rombase);
+	m_maincpu->add_fastram(0x00000000, 0x00ffffff, false, m_mainram);
+	m_maincpu->add_fastram(0x04000000, 0x05ffffff, true,  m_cart);
+	m_maincpu->add_fastram(0x1fc00000, 0x1fc7ffff, true,  m_rombase);
 
 	m_comm_rom = memregion("user2")->base();
-	m_comm_ram = std::make_unique<UINT8[]>(0x10000);
+	m_comm_ram = std::make_unique<uint8_t[]>(0x10000);
 
 	for (int i = 0; i < 0x38 / 4; i++)
 	{
@@ -1527,7 +1528,6 @@ void hng64_state::machine_reset()
 }
 
 MACHINE_CONFIG_EXTERN(hng64_audio);
-MACHINE_CONFIG_EXTERN(hng64_network);
 
 static MACHINE_CONFIG_START(hng64, hng64_state)
 	/* basic machine hardware */
@@ -1539,7 +1539,7 @@ static MACHINE_CONFIG_START(hng64, hng64_state)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_DEVICE_ADD("rtc", MSM6242, XTAL_32_768kHz)
+	MCFG_DEVICE_ADD("rtc", RTC62423, XTAL_32_768kHz)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hng64)
 

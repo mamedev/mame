@@ -11,8 +11,8 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6809/konami.h" /* for the callback and the firq irq definition */
-
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "sound/k053260.h"
 #include "includes/konamipt.h"
 #include "includes/parodius.h"
@@ -77,7 +77,7 @@ void parodius_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in parodius_state::device_timer");
+		assert_always(false, "Unknown id in parodius_state::device_timer");
 	}
 }
 
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( parodius_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0x3f90, 0x3f90) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3fa0, 0x3faf) AM_DEVREADWRITE("k053245", k05324x_device, k053244_r, k053244_w)
 	AM_RANGE(0x3fb0, 0x3fbf) AM_DEVWRITE("k053251", k053251_device, write)
-	AM_RANGE(0x3fc0, 0x3fc0) AM_READ(watchdog_reset_r) AM_WRITE(parodius_3fc0_w)
+	AM_RANGE(0x3fc0, 0x3fc0) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
 	AM_RANGE(0x3fcc, 0x3fcd) AM_DEVREADWRITE("k053260", k053260_device, main_read, main_write)
@@ -126,7 +126,6 @@ static ADDRESS_MAP_START( parodius_sound_map, AS_PROGRAM, 8, parodius_state )
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_DEVREADWRITE("k053260", k053260_device, read, write)
 ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -246,6 +245,8 @@ static MACHINE_CONFIG_START( parodius, parodius_state )
 	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
 	MCFG_ADDRESS_MAP_BANK_ADDRBUS_WIDTH(12)
 	MCFG_ADDRESS_MAP_BANK_STRIDE(0x0800)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -25,7 +25,7 @@ class deco16ic_device : public device_t,
 						public device_video_interface
 {
 public:
-	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~deco16ic_device() {}
 
 	// static configuration
@@ -67,20 +67,20 @@ public:
 
 	void print_debug_info(bitmap_ind16 &bitmap);
 
-	void pf_update(const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr);
+	void pf_update(const uint16_t *rowscroll_1_ptr, const uint16_t *rowscroll_2_ptr);
 
 	template<class _BitmapClass>
-	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+	void tilemap_1_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
 	template<class _BitmapClass>
-	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
-	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
-	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
-	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
-	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority);
+	void tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_1_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_1_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_2_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
+	void tilemap_2_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority);
 
 	/* used by boogwing, nitrobal */
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo = false);
-	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo = false);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
+	void tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo = false);
 
 	/* used by robocop2 */
 	void set_tilemap_colour_mask(int tmap, int mask);
@@ -104,16 +104,16 @@ public:
 	tilemap_t *tilemap0_16x16,
 	tilemap_t *tilemap1_8x8,
 	tilemap_t *tilemap1_16x16,
-	const UINT16 *rowscroll_ptr,
-	const UINT16 scrollx,
-	const UINT16 scrolly,
-	const UINT16 control0,
-	const UINT16 control1,
+	const uint16_t *rowscroll_ptr,
+	const uint16_t scrollx,
+	const uint16_t scrolly,
+	const uint16_t control0,
+	const uint16_t control1,
 	int combine_mask,
 	int combine_shift,
 	int trans_mask,
 	int flags,
-	UINT32 priority,
+	uint32_t priority,
 	int is_tattoo
 	);
 
@@ -124,11 +124,11 @@ protected:
 
 private:
 	// internal state
-	std::unique_ptr<UINT16[]> m_pf1_data;
-	std::unique_ptr<UINT16[]> m_pf2_data;
-	std::unique_ptr<UINT16[]> m_pf12_control;
+	std::unique_ptr<uint16_t[]> m_pf1_data;
+	std::unique_ptr<uint16_t[]> m_pf2_data;
+	std::unique_ptr<uint16_t[]> m_pf12_control;
 
-	const UINT16 *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
+	const uint16_t *m_pf1_rowscroll_ptr, *m_pf2_rowscroll_ptr;
 
 	tilemap_t *m_pf1_tilemap_16x16, *m_pf2_tilemap_16x16;
 	tilemap_t *m_pf1_tilemap_8x8, *m_pf2_tilemap_8x8;
@@ -154,7 +154,6 @@ private:
 	TILE_GET_INFO_MEMBER(get_pf2_tile_info_b);
 	TILE_GET_INFO_MEMBER(get_pf1_tile_info_b);
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
 };
 
 extern const device_type DECO16IC;
@@ -205,9 +204,6 @@ extern const device_type DECO16IC;
 
 #define MCFG_DECO16IC_GFXDECODE(_gfxtag) \
 	deco16ic_device::static_set_gfxdecode_tag(*device, "^" _gfxtag);
-
-#define MCFG_DECO16IC_PALETTE(_palette_tag) \
-	deco16ic_device::static_set_palette_tag(*device, "^" _palette_tag);
 
 // function definition for a callback
 #define DECO16IC_BANK_CB_MEMBER(_name)     int _name(int bank)

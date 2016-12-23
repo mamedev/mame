@@ -9,8 +9,10 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "machine/segaic16.h"
+#include "machine/watchdog.h"
 #include "video/segaic16.h"
 #include "video/segaic16_road.h"
 #include "video/sega16sp.h"
@@ -30,12 +32,14 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_i8255(*this, "i8255"),
 		m_nvram(*this, "nvram"),
+		m_watchdog(*this, "watchdog"),
 		m_sprites(*this, "sprites"),
 		m_segaic16vid(*this, "segaic16vid"),
 		m_segaic16road(*this, "segaic16road"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bankmotor_timer(*this, "bankmotor"),
-		m_digital_ports(*this, digital_ports),
-		m_adc_ports(*this, "ADC"),
+		m_digital_ports(*this, { { "SERVICE", "UNKNOWN", "COINAGE", "DSW" } }),
+		m_adc_ports(*this, "ADC.%u", 0),
 		m_workram(*this, "workram"),
 		m_custom_map(nullptr),
 		m_shangon_video(false),
@@ -58,9 +62,9 @@ public:
 	DECLARE_WRITE8_MEMBER( bankmotor_control_w );
 
 	// memory mapping
-	void memory_mapper(sega_315_5195_mapper_device &mapper, UINT8 index);
-	UINT8 mapper_sound_r();
-	void mapper_sound_w(UINT8 data);
+	void memory_mapper(sega_315_5195_mapper_device &mapper, uint8_t index);
+	uint8_t mapper_sound_r();
+	void mapper_sound_w(uint8_t data);
 
 	// main CPU read/write handlers
 	DECLARE_READ16_MEMBER( misc_io_r );
@@ -77,8 +81,8 @@ public:
 	DECLARE_DRIVER_INIT(shangon);
 
 	// video updates
-	UINT32 screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_outrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_shangon(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE16_MEMBER( tileram_w ) { m_segaic16vid->tileram_w(space,offset,data,mem_mask); };
 	DECLARE_WRITE16_MEMBER( textram_w ) { m_segaic16vid->textram_w(space,offset,data,mem_mask); };
@@ -119,30 +123,31 @@ protected:
 	required_device<z80_device> m_soundcpu;
 	required_device<i8255_device> m_i8255;
 	optional_device<nvram_device> m_nvram;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<sega_16bit_sprite_device> m_sprites;
 	required_device<segaic16_video_device> m_segaic16vid;
 	required_device<segaic16_road_device> m_segaic16road;
+	required_device<generic_latch_8_device> m_soundlatch;
 	optional_device<timer_device> m_bankmotor_timer;
 
 	// input ports
-	DECLARE_IOPORT_ARRAY(digital_ports);
 	required_ioport_array<4> m_digital_ports;
 	optional_ioport_array<8> m_adc_ports;
 
 	// memory
-	required_shared_ptr<UINT16> m_workram;
+	required_shared_ptr<uint16_t> m_workram;
 
 	// configuration
 	read16_delegate     m_custom_io_r;
 	write16_delegate    m_custom_io_w;
-	const UINT8 *       m_custom_map;
+	const uint8_t *       m_custom_map;
 	bool                m_shangon_video;
 
 	// internal state
 	emu_timer *         m_scanline_timer;
-	UINT8               m_irq2_state;
-	UINT8               m_adc_select;
-	UINT8               m_vblank_irq_state;
+	uint8_t               m_irq2_state;
+	uint8_t               m_adc_select;
+	uint8_t               m_vblank_irq_state;
 	int                 m_bankmotor_pos;
 	int                 m_bankmotor_delta;
 };

@@ -66,27 +66,27 @@ public:
 	DECLARE_WRITE8_MEMBER(pcjx_port_1ff_w);
 	void pcjx_set_bank(int unk1, int unk2, int unk3);
 
-	int load_cart(device_image_interface &image, generic_slot_device *slot);
+	image_init_result load_cart(device_image_interface &image, generic_slot_device *slot);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart1) { return load_cart(image, m_cart1); }
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(pcjr_cart2) { return load_cart(image, m_cart2); }
-	void pc_speaker_set_spkrdata(UINT8 data);
+	void pc_speaker_set_spkrdata(uint8_t data);
 
-	UINT8 m_pc_spkrdata;
-	UINT8 m_pit_out2;
-	UINT8 m_pcjr_dor;
-	UINT8 m_pcjx_1ff_count;
-	UINT8 m_pcjx_1ff_val;
-	UINT8 m_pcjx_1ff_bankval;
-	UINT8 m_pcjx_1ff_bank[20][2];
+	uint8_t m_pc_spkrdata;
+	uint8_t m_pit_out2;
+	uint8_t m_pcjr_dor;
+	uint8_t m_pcjx_1ff_count;
+	uint8_t m_pcjx_1ff_val;
+	uint8_t m_pcjx_1ff_bankval;
+	uint8_t m_pcjx_1ff_bank[20][2];
 	int m_ppi_portc_switch_high;
-	UINT8 m_ppi_portb;
+	uint8_t m_ppi_portb;
 
-	UINT8 m_pc_keyb_data;
-	UINT8 m_transferring;
-	UINT8 m_latch;
-	UINT32 m_raw_keyb_data;
+	uint8_t m_pc_keyb_data;
+	uint8_t m_transferring;
+	uint8_t m_latch;
+	uint32_t m_raw_keyb_data;
 	int m_signal_count;
-	UINT8 m_nmi_enabled;
+	uint8_t m_nmi_enabled;
 
 	void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 	emu_timer *m_pc_int_delay_timer;
@@ -118,7 +118,7 @@ DRIVER_INIT_MEMBER(pcjr_state, pcjr)
 	m_pc_int_delay_timer = timer_alloc(TIMER_IRQ_DELAY);
 	m_pcjr_watchdog = timer_alloc(TIMER_WATCHDOG);
 	m_keyb_signal_timer = timer_alloc(TIMER_KB_SIGNAL);
-	membank( "bank10" )->set_base( m_ram->pointer() );
+	m_maincpu->space(AS_PROGRAM).install_ram(0, m_ram->size() - 1, m_ram->pointer());
 }
 
 void pcjr_state::machine_reset()
@@ -186,7 +186,7 @@ void pcjr_state::device_timer(emu_timer &timer, device_timer_id id, int param, v
 
 WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
 {
-	UINT32 pc = m_maincpu->pc();
+	uint32_t pc = m_maincpu->pc();
 	if ( (pc == 0xF0453) || (pc == 0xFF196) )
 	{
 		m_pc_int_delay_timer->adjust( m_maincpu->cycles_to_attotime(20), state );
@@ -202,7 +202,7 @@ WRITE_LINE_MEMBER(pcjr_state::pic8259_set_int_line)
  *      PC Speaker related
  *
  *************************************************************************/
-void pcjr_state::pc_speaker_set_spkrdata(UINT8 data)
+void pcjr_state::pc_speaker_set_spkrdata(uint8_t data)
 {
 	m_pc_spkrdata = data ? 1 : 0;
 	m_speaker->level_w(m_pc_spkrdata & m_pit_out2);
@@ -256,9 +256,9 @@ WRITE_LINE_MEMBER(pcjr_state::keyb_interrupt)
 {
 	int data;
 
-	if(state && (data = m_keyboard->read(machine().driver_data()->generic_space(), 0)))
+	if(state && (data = m_keyboard->read(machine().dummy_space(), 0)))
 	{
-		UINT8   parity = 0;
+		uint8_t   parity = 0;
 		int     i;
 
 		m_latch = 1;
@@ -369,7 +369,7 @@ READ8_MEMBER(pcjr_state::pcjr_ppi_portc_r)
 WRITE8_MEMBER(pcjr_state::pcjr_fdc_dor_w)
 {
 	logerror("fdc: dor = %02x\n", data);
-	UINT8 pdor = m_pcjr_dor;
+	uint8_t pdor = m_pcjr_dor;
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = nullptr;
 
@@ -436,9 +436,9 @@ READ8_MEMBER(pcjr_state::pcjx_port_1ff_r)
 	return 0x60; // expansion?
 }
 
-int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result pcjr_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 	bool imagic_hack = false;
 
 	if (image.software_entry() == nullptr)
@@ -456,7 +456,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 				break;
 			default:
 				image.seterror(IMAGE_ERROR_UNSUPPORTED, "Invalid header size" );
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 		}
 		if (size - header_size == 0xa000)
 		{
@@ -478,7 +478,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 		// the first chunk is unique, the second is repeated 4 times up to 0xa000 size
 
 		// mirroring
-		UINT8 *ROM = slot->get_rom_base();
+		uint8_t *ROM = slot->get_rom_base();
 		memcpy(ROM + 0xe000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xc000, ROM + 0x2000, 0x2000);
 		memcpy(ROM + 0xa000, ROM + 0x2000, 0x2000);
@@ -487,7 +487,7 @@ int pcjr_state::load_cart(device_image_interface &image, generic_slot_device *sl
 		memcpy(ROM + 0x4000, ROM, 0x2000);
 		memcpy(ROM + 0x2000, ROM, 0x2000);
 	}
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -533,20 +533,16 @@ GFXDECODE_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_map, AS_PROGRAM, 8, pcjr_state)
-	AM_RANGE(0x00000, 0x9ffff) AM_RAMBANK("bank10")
-	AM_RANGE(0xa0000, 0xaffff) AM_RAM
-	AM_RANGE(0xb0000, 0xb7fff) AM_NOP
-	AM_RANGE(0xb8000, 0xbffff) AM_RAMBANK("bank14")
-	AM_RANGE(0xc0000, 0xc7fff) AM_NOP
-	AM_RANGE(0xc8000, 0xc9fff) AM_ROM
-	AM_RANGE(0xca000, 0xcffff) AM_NOP
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_pcjr:vram", address_map_bank_device, amap8)
 	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot2", generic_slot_device, read_rom)
 	AM_RANGE(0xe0000, 0xeffff) AM_DEVREAD("cartslot1", generic_slot_device, read_rom)
-	AM_RANGE(0xf0000, 0xfffff) AM_ROM
+	AM_RANGE(0xf0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0020, 0x0021) AM_DEVREADWRITE("pic8259", pic8259_device, read, write)
 	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE("pit8253", pit8253_device, read, write)
 	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
@@ -561,11 +557,16 @@ static ADDRESS_MAP_START(ibmpcjr_io, AS_IO, 8, pcjr_state)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_map, AS_PROGRAM, 8, pcjr_state )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x80000, 0xb7fff) AM_ROM AM_REGION("kanji",0)
-	AM_IMPORT_FROM( ibmpcjr_map )
+	AM_RANGE(0x80000, 0x9ffff) AM_RAM AM_SHARE("vram") // TODO: remove this part of vram hack
+	AM_RANGE(0xb8000, 0xbffff) AM_DEVICE("pcvideo_pcjr:vram", address_map_bank_device, amap8)
+	AM_RANGE(0xd0000, 0xdffff) AM_DEVREAD("cartslot1", generic_slot_device, read_rom)
+	AM_RANGE(0xe0000, 0xfffff) AM_ROM AM_REGION("bios", 0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(ibmpcjx_io, AS_IO, 8, pcjr_state)
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x01ff, 0x01ff) AM_READWRITE(pcjx_port_1ff_r, pcjx_port_1ff_w)
 	AM_IMPORT_FROM( ibmpcjr_io )
 ADDRESS_MAP_END
@@ -589,7 +590,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	MCFG_PIT8253_CLK2(XTAL_14_31818MHz/12)
 	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(pcjr_state, out2_changed))
 
-	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NULL )
+	MCFG_PIC8259_ADD( "pic8259", WRITELINE(pcjr_state, pic8259_set_int_line), VCC, NOOP)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(CONSTANT(0xff))
@@ -611,6 +612,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 
 	/* video hardware */
 	MCFG_PCVIDEO_PCJR_ADD("pcvideo_pcjr")
+	MCFG_VIDEO_SET_SCREEN("pcvideo_pcjr:screen")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "pcvideo_pcjr:palette", pcjr)
 
@@ -650,6 +652,7 @@ static MACHINE_CONFIG_START( ibmpcjr, pcjr_state)
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
 	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 256K, 512K")
 
 	/* Software lists */
 	MCFG_SOFTWARE_LIST_ADD("cart_list","ibmpcjr_cart")
@@ -673,26 +676,30 @@ static MACHINE_CONFIG_DERIVED( ibmpcjx, ibmpcjr )
 	MCFG_SLOT_FIXED(true)
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", ibmpcjx)
-MACHINE_CONFIG_END
+	/* internal ram */
+	MCFG_DEVICE_MODIFY(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("512K")
+	MCFG_RAM_EXTRA_OPTIONS("") // only boots with 512k currently
+	MACHINE_CONFIG_END
 
 
 
 ROM_START( ibmpcjr )
-	ROM_REGION(0x100000,"maincpu", 0)
-	ROM_LOAD("bios.rom", 0xf0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
+	ROM_REGION(0x10000,"bios", 0)
+	ROM_LOAD("bios.rom", 0x0000, 0x10000,CRC(31e3a7aa) SHA1(1f5f7013f18c08ff50d7942e76c4fbd782412414))
 
 	ROM_REGION(0x08100,"gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card
 ROM_END
 
 ROM_START( ibmpcjx )
-	ROM_REGION(0x100000,"maincpu", ROMREGION_ERASEFF)
+	ROM_REGION(0x20000,"bios", ROMREGION_ERASEFF)
 	ROM_DEFAULT_BIOS("unk")
 	ROM_SYSTEM_BIOS( 0, "5601jda", "5601jda" )
-	ROMX_LOAD("5601jda.bin", 0xf0000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
-	ROMX_LOAD("basicjx.rom",   0xe8000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
+	ROMX_LOAD("5601jda.bin", 0x10000, 0x10000, CRC(b1e12366) SHA1(751feb16b985aa4f1ec1437493ff77e2ebd5e6a6), ROM_BIOS(1))
+	ROMX_LOAD("basicjx.rom",   0x08000, 0x08000, NO_DUMP, ROM_BIOS(1)) // boot fails due of this.
 	ROM_SYSTEM_BIOS( 1, "unk", "unk" )
-	ROMX_LOAD("ipljx.rom", 0xe0000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
+	ROMX_LOAD("ipljx.rom", 0x00000, 0x20000, CRC(36a7b2de) SHA1(777db50c617725e149bca9b18cf51ce78f6dc548), ROM_BIOS(2))
 
 	ROM_REGION(0x08100,"gfx1", 0) //TODO: needs a different charset
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, BAD_DUMP CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd)) // from an unknown clone cga card

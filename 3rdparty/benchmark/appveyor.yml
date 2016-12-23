@@ -1,55 +1,54 @@
 version: '{build}'
 
 configuration:
-  - Static Debug
-  - Static Release
-#  - Shared Debug
-#  - Shared Release
-
-platform:
-  - x86
-  - x64
+  - Debug
+  - Release
 
 environment:
   matrix:
-    - compiler: gcc-4.9.2-posix
-#    - compiler: gcc-4.8.4-posix
-#    - compiler: msvc-12-seh
+    - compiler: msvc-12-seh
+      generator: "Visual Studio 12 2013"
 
-install:
-  # derive some extra information
-  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "linkage=%%a")
-  - for /f "tokens=1-2" %%a in ("%configuration%") do (@set "variant=%%b")
-  - if "%linkage%"=="Shared" (set shared=YES) else (set shared=NO)
-  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_name=%%a")
-  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_version=%%b")
-  - for /f "tokens=1-3 delims=-" %%a in ("%compiler%") do (@set "compiler_threading=%%c")
-  - if "%platform%"=="x64" (set arch=x86_64)
-  - if "%platform%"=="x86" (set arch=i686)
-  # download the specific version of MinGW
-  - if "%compiler_name%"=="gcc" (for /f %%a in ('python mingw.py --quiet --version "%compiler_version%" --arch "%arch%" --threading "%compiler_threading%" --location "C:\mingw-builds"') do @set "compiler_path=%%a")
+    - compiler: msvc-12-seh
+      generator: "Visual Studio 12 2013 Win64"
 
-before_build:
-  # Set up mingw commands
-  - if "%compiler_name%"=="gcc" (set "generator=MinGW Makefiles")
-  - if "%compiler_name%"=="gcc" (set "build=mingw32-make -j4")
-  - if "%compiler_name%"=="gcc" (set "test=mingw32-make CTEST_OUTPUT_ON_FAILURE=1 test")
-  # msvc specific commands
-  # TODO :)
-  # add the compiler path if needed
-  - if not "%compiler_path%"=="" (set "PATH=%PATH%;%compiler_path%")
-  # git bash conflicts with MinGW makefiles
-  - if "%generator%"=="MinGW Makefiles" (set "PATH=%PATH:C:\Program Files (x86)\Git\bin=%")
+    - compiler: msvc-14-seh
+      generator: "Visual Studio 14 2015"
 
-build_script:
-  - cmake -G "%generator%" "-DCMAKE_BUILD_TYPE=%variant%" "-DBUILD_SHARED_LIBS=%shared%"
-  - cmd /c "%build%"
+    - compiler: msvc-14-seh
+      generator: "Visual Studio 14 2015 Win64"
 
-test_script:
-  - cmd /c "%test%"
+    - compiler: gcc-5.3.0-posix
+      generator: "MinGW Makefiles"
+      cxx_path: 'C:\mingw-w64\i686-5.3.0-posix-dwarf-rt_v4-rev0\mingw32\bin'
 
 matrix:
   fast_finish: true
 
-cache:
-  - C:\mingw-builds
+install:
+  # git bash conflicts with MinGW makefiles
+  - if "%generator%"=="MinGW Makefiles" (set "PATH=%PATH:C:\Program Files\Git\usr\bin;=%")
+  - if not "%cxx_path%"=="" (set "PATH=%PATH%;%cxx_path%")
+
+# TODO Remove this. This is a hack to work around bogus warning messages
+# See http://goo.gl/euguBI for more information.
+before_build:
+  - del "C:\Program Files (x86)\MSBuild\14.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+  - del "C:\Program Files (x86)\MSBuild\12.0\Microsoft.Common.targets\ImportAfter\Xamarin.Common.targets"
+
+build_script:
+  - md _build -Force
+  - cd _build
+  - echo %configuration%
+  - cmake -G "%generator%" "-DCMAKE_BUILD_TYPE=%configuration%" ..
+  - cmake --build . --config %configuration%
+
+test_script:
+  - ctest -c %configuration% --timeout 300 --output-on-failure
+
+artifacts:
+  - path: '_build/CMakeFiles/*.log'
+    name: logs
+  - path: '_build/Testing/**/*.xml'
+    name: test_results
+

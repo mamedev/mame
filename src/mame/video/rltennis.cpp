@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /****************************************************************************************
  Reality Tennis - (c) 1993 TCH
@@ -40,14 +40,14 @@ Blitter registers description (reg/bit names selected arbitrary ) :
   fedcba98 76543210
   -------- -------x BLTFLAG_DST_X_DIR    x dst direction (step inc or dec)
   -------- ------x- BLTFLAG_DST_Y_DIR    y dst direction
-  -------- -----x-- BLTFLAG_DST_LR       LR and UD controlls the quarter of framebuffer to use
+  -------- -----x-- BLTFLAG_DST_LR       LR and UD controls the quarter of framebuffer to use
   -------- ----x--- BLTFLAG_DST_UD       /
   -------- ---?----                      unknown
   -------- --x----- BLTFLAG_DISPLAY_UD   display buffer select
   -------- ??------                      unknown
   -------x -------- BLTFLAG_SRC_X_DIR    x src direction
   ------x- -------- BLTFLAG_SRC_Y_DIR    y src direction
-  -----x-- -------- BLTFLAG_SRC_LR       LR and UD controlls the quarter of src buffer to use
+  -----x-- -------- BLTFLAG_SRC_LR       LR and UD controls the quarter of src buffer to use
   ----x--- -------- BLTFLAG_SRC_UD       /
   xxxx---- --------                      src ROM num
 
@@ -230,7 +230,7 @@ void rltennis_state::video_start()
 	save_item(NAME(m_blitter));
 }
 
-UINT32 rltennis_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t rltennis_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_tmp_bitmap[BITMAP_BG], 0, 0, 0, 0, cliprect);
 	copybitmap_trans(bitmap, *m_tmp_bitmap[BITMAP_FG_DISPLAY], 0, 0, 0, 0, cliprect, 0);

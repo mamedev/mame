@@ -41,7 +41,7 @@ const device_type COCO_232 = &device_creator<coco_232_device>;
 //  coco_232_device - constructor
 //-------------------------------------------------
 
-coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+coco_232_device::coco_232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, COCO_232, "CoCo RS-232 PAK", tag, owner, clock, "coco_232", __FILE__),
 		device_cococart_interface( mconfig, *this ),
 		m_uart(*this, UART_TAG)
@@ -72,7 +72,7 @@ machine_config_constructor coco_232_device::device_mconfig_additions() const
 
 READ8_MEMBER(coco_232_device::read)
 {
-	UINT8 result = 0x00;
+	uint8_t result = 0x00;
 
 	if ((offset >= 0x28) && (offset <= 0x2F))
 		result = m_uart->read(space, offset - 0x28);

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:David Haywood, Tomasz Slanina
+
+#include "machine/gen_latch.h"
+
 class mainsnk_state : public driver_device
 {
 public:
@@ -9,6 +12,7 @@ public:
 		m_audiocpu(*this, "audiocpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_bgram(*this, "bgram"),
 		m_spriteram(*this, "spriteram"),
 		m_fgram(*this, "fgram") { }
@@ -17,15 +21,16 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_fgram;
 
 	tilemap_t *m_tx_tilemap;
 	tilemap_t *m_bg_tilemap;
 	int m_sound_cpu_busy;
-	UINT32 m_bg_tile_offset;
+	uint32_t m_bg_tile_offset;
 
 	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_READ8_MEMBER(sound_ack_r);
@@ -43,6 +48,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(mainsnk);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, int scrollx, int scrolly );
 };

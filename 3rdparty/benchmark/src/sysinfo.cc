@@ -52,7 +52,6 @@ namespace {
 std::once_flag cpuinfo_init;
 double cpuinfo_cycles_per_second = 1.0;
 int cpuinfo_num_cpus = 1;  // Conservative guess
-std::mutex cputimens_mutex;
 
 #if !defined BENCHMARK_OS_MACOSX
 const int64_t estimate_time_ms = 1000;
@@ -174,12 +173,16 @@ void InitializeSystemInfo() {
         if (freqstr[1] != '\0' && *err == '\0' && bogo_clock > 0)
           saw_bogo = true;
       }
-    } else if (strncasecmp(line, "processor", sizeof("processor") - 1) == 0) {
+    } else if (strncmp(line, "processor", sizeof("processor") - 1) == 0) {
+      // The above comparison is case-sensitive because ARM kernels often
+      // include a "Processor" line that tells you about the CPU, distinct
+      // from the usual "processor" lines that give you CPU ids. No current
+      // Linux architecture is using "Processor" for CPU ids.
       num_cpus++;  // count up every time we see an "processor :" entry
-      const char* freqstr = strchr(line, ':');
-      if (freqstr) {
-        const long cpu_id = strtol(freqstr + 1, &err, 10);
-        if (freqstr[1] != '\0' && *err == '\0' && max_cpu_id < cpu_id)
+      const char* id_str = strchr(line, ':');
+      if (id_str) {
+        const long cpu_id = strtol(id_str + 1, &err, 10);
+        if (id_str[1] != '\0' && *err == '\0' && max_cpu_id < cpu_id)
           max_cpu_id = cpu_id;
       }
     }
@@ -201,7 +204,7 @@ void InitializeSystemInfo() {
   } else {
     if ((max_cpu_id + 1) != num_cpus) {
       fprintf(stderr,
-              "CPU ID assignments in /proc/cpuinfo seems messed up."
+              "CPU ID assignments in /proc/cpuinfo seem messed up."
               " This is usually caused by a bad BIOS.\n");
     }
     cpuinfo_num_cpus = num_cpus;
@@ -235,6 +238,7 @@ void InitializeSystemInfo() {
   }
 // TODO: also figure out cpuinfo_num_cpus
 
+
 #elif defined BENCHMARK_OS_WINDOWS
   // In NT, read MHz from the registry. If we fail to do so or we're in win9x
   // then make a crude estimate.
@@ -247,7 +251,12 @@ void InitializeSystemInfo() {
     cpuinfo_cycles_per_second = static_cast<double>((int64_t)data * (int64_t)(1000 * 1000));  // was mhz
   else
     cpuinfo_cycles_per_second = static_cast<double>(EstimateCyclesPerSecond());
-// TODO: also figure out cpuinfo_num_cpus
+
+  SYSTEM_INFO sysinfo;
+  // Use memset as opposed to = {} to avoid GCC missing initializer false positives.
+  std::memset(&sysinfo, 0, sizeof(SYSTEM_INFO));
+  GetSystemInfo(&sysinfo);
+  cpuinfo_num_cpus = sysinfo.dwNumberOfProcessors; // number of logical processors in the current group
 
 #elif defined BENCHMARK_OS_MACOSX
   // returning "mach time units" per second. the current number of elapsed
@@ -278,101 +287,8 @@ void InitializeSystemInfo() {
   cpuinfo_cycles_per_second = static_cast<double>(EstimateCyclesPerSecond());
 #endif
 }
+
 }  // end namespace
-
-// getrusage() based implementation of MyCPUUsage
-static double MyCPUUsageRUsage() {
-#ifndef BENCHMARK_OS_WINDOWS
-  struct rusage ru;
-  if (getrusage(RUSAGE_SELF, &ru) == 0) {
-    return (static_cast<double>(ru.ru_utime.tv_sec) +
-            static_cast<double>(ru.ru_utime.tv_usec) * 1e-6 +
-            static_cast<double>(ru.ru_stime.tv_sec) +
-            static_cast<double>(ru.ru_stime.tv_usec) * 1e-6);
-  } else {
-    return 0.0;
-  }
-#else
-  HANDLE proc = GetCurrentProcess();
-  FILETIME creation_time;
-  FILETIME exit_time;
-  FILETIME kernel_time;
-  FILETIME user_time;
-  ULARGE_INTEGER kernel;
-  ULARGE_INTEGER user;
-  GetProcessTimes(proc, &creation_time, &exit_time, &kernel_time, &user_time);
-  kernel.HighPart = kernel_time.dwHighDateTime;
-  kernel.LowPart = kernel_time.dwLowDateTime;
-  user.HighPart = user_time.dwHighDateTime;
-  user.LowPart = user_time.dwLowDateTime;
-  return (static_cast<double>(kernel.QuadPart) +
-          static_cast<double>(user.QuadPart)) * 1e-7;
-#endif  // OS_WINDOWS
-}
-
-#ifndef BENCHMARK_OS_WINDOWS
-static bool MyCPUUsageCPUTimeNsLocked(double* cputime) {
-  static int cputime_fd = -1;
-  if (cputime_fd == -1) {
-    cputime_fd = open("/proc/self/cputime_ns", O_RDONLY);
-    if (cputime_fd < 0) {
-      cputime_fd = -1;
-      return false;
-    }
-  }
-  char buff[64];
-  memset(buff, 0, sizeof(buff));
-  if (pread(cputime_fd, buff, sizeof(buff) - 1, 0) <= 0) {
-    close(cputime_fd);
-    cputime_fd = -1;
-    return false;
-  }
-  unsigned long long result = strtoull(buff, nullptr, 0);
-  if (result == (std::numeric_limits<unsigned long long>::max)()) {
-    close(cputime_fd);
-    cputime_fd = -1;
-    return false;
-  }
-  *cputime = static_cast<double>(result) / 1e9;
-  return true;
-}
-#endif  // OS_WINDOWS
-
-double MyCPUUsage() {
-#ifndef BENCHMARK_OS_WINDOWS
-  {
-    std::lock_guard<std::mutex> l(cputimens_mutex);
-    static bool use_cputime_ns = true;
-    if (use_cputime_ns) {
-      double value;
-      if (MyCPUUsageCPUTimeNsLocked(&value)) {
-        return value;
-      }
-      // Once MyCPUUsageCPUTimeNsLocked fails once fall back to getrusage().
-      VLOG(1) << "Reading /proc/self/cputime_ns failed. Using getrusage().\n";
-      use_cputime_ns = false;
-    }
-  }
-#endif  // OS_WINDOWS
-  return MyCPUUsageRUsage();
-}
-
-double ChildrenCPUUsage() {
-#ifndef BENCHMARK_OS_WINDOWS
-  struct rusage ru;
-  if (getrusage(RUSAGE_CHILDREN, &ru) == 0) {
-    return (static_cast<double>(ru.ru_utime.tv_sec) +
-            static_cast<double>(ru.ru_utime.tv_usec) * 1e-6 +
-            static_cast<double>(ru.ru_stime.tv_sec) +
-            static_cast<double>(ru.ru_stime.tv_usec) * 1e-6);
-  } else {
-    return 0.0;
-  }
-#else
-  // TODO: Not sure what this even means on Windows
-  return 0.0;
-#endif  // OS_WINDOWS
-}
 
 double CyclesPerSecond(void) {
   std::call_once(cpuinfo_init, InitializeSystemInfo);

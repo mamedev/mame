@@ -1053,7 +1053,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Memory Reset Switch") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1398,7 +1398,7 @@ void lucky74_state::sound_start()
 {
 	/* cleaning all 09R81P registers */
 
-	UINT8 i;
+	uint8_t i;
 
 	for (i = 0; i < 6; i++)
 	{

@@ -42,6 +42,7 @@ Unfortunately it's read protected.
 #include "sound/2612intf.h"
 #include "sound/sn76496.h"
 #include "includes/megadriv.h"
+#include "includes/megadrvb.h"
 
 static INPUT_PORTS_START( hshavoc )
 	PORT_START("IN0")   /* 16bit */
@@ -113,9 +114,9 @@ ROM_END
 DRIVER_INIT_MEMBER(md_boot_state,hshavoc)
 {
 	int x;
-	UINT16 *src = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *src = (uint16_t *)memregion("maincpu")->base();
 
-	static const UINT16 typedat[16] = {
+	static const uint16_t typedat[16] = {
 		1,1,1,1, 1,1,1,1,
 		1,0,0,1, 1,0,1,1  };
 

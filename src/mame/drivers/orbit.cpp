@@ -22,6 +22,7 @@ Atari Orbit Driver
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
 #include "includes/orbit.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 
@@ -61,7 +62,7 @@ INTERRUPT_GEN_MEMBER(orbit_state::orbit_interrupt)
  *
  *************************************/
 
-void orbit_state::update_misc_flags(address_space &space, UINT8 val)
+void orbit_state::update_misc_flags(address_space &space, uint8_t val)
 {
 	m_misc_flags = val;
 
@@ -86,7 +87,7 @@ void orbit_state::update_misc_flags(address_space &space, UINT8 val)
 
 WRITE8_MEMBER(orbit_state::orbit_misc_w)
 {
-	UINT8 bit = offset >> 1;
+	uint8_t bit = offset >> 1;
 
 	if (offset & 1)
 		update_misc_flags(space, m_misc_flags | (1 << bit));
@@ -117,7 +118,7 @@ static ADDRESS_MAP_START( orbit_map, AS_PROGRAM, 8, orbit_state )
 	AM_RANGE(0x3a00, 0x3a00) AM_MIRROR(0x00ff) AM_WRITE(orbit_note_amp_w)
 	AM_RANGE(0x3c00, 0x3c0f) AM_MIRROR(0x00f0) AM_WRITE(orbit_misc_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00ff) AM_WRITE(orbit_noise_rst_w)
-	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3f00, 0x3f00) AM_MIRROR(0x00ff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -297,6 +298,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("32v", orbit_state, nmi_32v, "screen", 0, 32)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -306,7 +308,7 @@ static MACHINE_CONFIG_START( orbit, orbit_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", orbit)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

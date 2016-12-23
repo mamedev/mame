@@ -108,11 +108,11 @@ data / ay8910-#0 read
 81 ay8910-#1 read port
 
 write:
-60 ay8910-#0 controll port
+60 ay8910-#0 control port
 61 ay8910-#0 data port
-80 ay8910-#1 controll port
+80 ay8910-#1 control port
 81 ay8910-#1 data port
-   ay8910-A  : NMI controll ?
+   ay8910-A  : NMI control ?
 a0 unknown
 e0 unknown (watch dog?)
 
@@ -146,7 +146,6 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/tait8741.h"
-#include "sound/msm5205.h"
 #include "includes/gsword.h"
 
 
@@ -172,7 +171,7 @@ int gsword_state::coins_in(void)
 /* (4004,4005) clear down counter , if (4004,4005)==0 then (402E)=0 */
 READ8_MEMBER(gsword_state::gsword_hack_r)
 {
-	UINT8 data = m_cpu2_ram[offset + 4];
+	uint8_t data = m_cpu2_ram[offset + 4];
 
 	/*if(offset==1)osd_printf_debug("CNT %02X%02X\n",m_cpu2_ram[5],m_cpu2_ram[4]); */
 
@@ -275,7 +274,7 @@ WRITE8_MEMBER(gsword_state::nmi_set_w)
 		break;
 	}
 	/* bit1= nmi disable , for ram check */
-	logerror("NMI controll %02x\n",data);
+	logerror("NMI control %02x\n",data);
 #endif
 }
 
@@ -308,7 +307,7 @@ WRITE8_MEMBER(gsword_state::gsword_adpcm_data_w)
 
 WRITE8_MEMBER(gsword_state::adpcm_soundcommand_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -364,7 +363,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cpu3_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(gsword_adpcm_data_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -669,6 +668,8 @@ static MACHINE_CONFIG_START( gsword, gsword_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -874,7 +875,7 @@ ROM_END
 DRIVER_INIT_MEMBER(gsword_state,gsword)
 {
 #if 0
-	UINT8 *ROM2 = memregion("sub")->base();
+	uint8_t *ROM2 = memregion("sub")->base();
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 
 	ROM2[0x71e] = 0;    /* patch for sound protection or time out function */
@@ -889,7 +890,7 @@ DRIVER_INIT_MEMBER(gsword_state,gsword)
 DRIVER_INIT_MEMBER(gsword_state,gsword2)
 {
 #if 0
-	UINT8 *ROM2 = memregion("sub")->base();
+	uint8_t *ROM2 = memregion("sub")->base();
 
 	ROM2[0x1da] = 0xc3; /* patch for rom self check */
 	ROM2[0x726] = 0;    /* patch for sound protection or time out function */

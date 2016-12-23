@@ -82,6 +82,7 @@ Side 2 = 0x8F7DDD (or 0x880000 | ( 0x77 << 12 ) | 0x0DDD)
 #include "video/tms9928a.h"
 #include "sound/discrete.h"
 #include "machine/nvram.h"
+#include "audio/cliffhgr.h"
 
 #define CLIFF_ENABLE_SND_1  NODE_01
 #define CLIFF_ENABLE_SND_2  NODE_02
@@ -101,7 +102,7 @@ public:
 	required_device<pioneer_pr8210_device> m_laserdisc;
 
 	int m_port_bank;
-	UINT32 m_phillips_code;
+	uint32_t m_phillips_code;
 
 	emu_timer *m_irq_timer;
 	DECLARE_WRITE8_MEMBER(cliff_test_led_w);
@@ -113,7 +114,6 @@ public:
 	DECLARE_READ8_MEMBER(cliff_irq_ack_r);
 	DECLARE_WRITE8_MEMBER(cliff_ldwire_w);
 	DECLARE_WRITE8_MEMBER(cliff_sound_overlay_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 	DECLARE_DRIVER_INIT(cliff);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -219,13 +219,6 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::cliff_irq_callback)
 
 	m_irq_timer->adjust(m_screen->time_until_pos(param * 2), param);
 }
-
-WRITE_LINE_MEMBER(cliffhgr_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 
 void cliffhgr_state::machine_start()
 {
@@ -672,17 +665,6 @@ static INPUT_PORTS_START( goaltogo )
 INPUT_PORTS_END
 
 
-
-/*************************************
- *
- *  Video/sound interfaces
- *
- *************************************/
-
-DISCRETE_SOUND_EXTERN( cliffhgr );
-
-
-
 /*************************************
  *
  *  Machine driver
@@ -705,7 +687,7 @@ static MACHINE_CONFIG_START( cliffhgr, cliffhgr_state )
 	/* start with the TMS9928a video configuration */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9128, XTAL_10_738635MHz / 2 )   /* TMS9128NL on the board */
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(cliffhgr_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", INPUT_LINE_NMI))
 
 	/* override video rendering and raw screen info */
 	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", "laserdisc")

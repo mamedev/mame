@@ -58,11 +58,11 @@ Device Control (out)        14              7
 
 READ8_MEMBER( xtide_device::read )
 {
-	UINT8 result;
+	uint8_t result;
 
 	if (offset == 0)
 	{
-		UINT16 data16 = m_ata->read_cs0(space, offset & 7, 0xffff);
+		uint16_t data16 = m_ata->read_cs0(space, offset & 7, 0xffff);
 		result = data16 & 0xff;
 		m_d8_d15_latch = data16 >> 8;
 	}
@@ -91,7 +91,7 @@ WRITE8_MEMBER( xtide_device::write )
 	if (offset == 0)
 	{
 		// Data register transfer low byte and latched high
-		UINT16 data16 = (m_d8_d15_latch << 8) | data;
+		uint16_t data16 = (m_d8_d15_latch << 8) | data;
 		m_ata->write_cs0(space, offset & 7, data16, 0xffff);
 	}
 	else if (offset < 8)
@@ -286,7 +286,7 @@ ioport_constructor xtide_device::device_input_ports() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *xtide_device::device_rom_region() const
+const tiny_rom_entry *xtide_device::device_rom_region() const
 {
 	return ROM_NAME( xtide );
 }
@@ -299,7 +299,7 @@ const rom_entry *xtide_device::device_rom_region() const
 //  xtide_device - constructor
 //-------------------------------------------------
 
-xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+xtide_device::xtide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, ISA8_XTIDE, "XT-IDE Fixed Drive Adapter", tag, owner, clock, "isa8_xtide", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_ata(*this, "ata"),
@@ -326,8 +326,8 @@ void xtide_device::device_reset()
 	int io_address      = ((ioport("IO_ADDRESS")->read() & 0x0F) * 0x20) + 0x200;
 	m_irq_number        = (ioport("IRQ")->read() & 0x07);
 
-	m_isa->install_memory(base_address, base_address + 0x1fff, 0, 0, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), &(*m_eeprom)), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), &(*m_eeprom)));
-	m_isa->install_device(io_address, io_address + 0xf, 0, 0, read8_delegate(FUNC(xtide_device::read), this), write8_delegate(FUNC(xtide_device::write), this));
+	m_isa->install_memory(base_address, base_address + 0x1fff, read8_delegate(FUNC(eeprom_parallel_28xx_device::read), &(*m_eeprom)), write8_delegate(FUNC(eeprom_parallel_28xx_device::write), &(*m_eeprom)));
+	m_isa->install_device(io_address, io_address + 0xf, read8_delegate(FUNC(xtide_device::read), this), write8_delegate(FUNC(xtide_device::write), this));
 
 	//logerror("xtide_device::device_reset(), bios_base=0x%5X to 0x%5X, I/O=0x%3X, IRQ=%d\n",base_address,base_address + (16*1024)  -1 ,io_address,irq);
 }

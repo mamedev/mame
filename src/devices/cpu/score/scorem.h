@@ -91,11 +91,11 @@
 #define     SET_T(f)    if (f) REG_CR |= FLAG_T; else  REG_CR &= ~FLAG_T;
 
 #define     CHECK_Z(r)          SET_Z((r)==0)
-#define     CHECK_N(r)          SET_N((INT32)(r) < 0)
+#define     CHECK_N(r)          SET_N((int32_t)(r) < 0)
 #define     CHECK_C_ADD(a,b)    SET_C((a) > (0xffffffffu - (b)))
 #define     CHECK_C_SUB(a,b)    SET_C((a) >= (b))
-#define     CHECK_V_ADD(a,b,d)  SET_V((INT32)(((a) ^ (d)) & ((b) ^ (d))) < 0)
-#define     CHECK_V_SUB(a,b,d)  SET_V((INT32)(((a) ^ (b)) & ((a) ^ (d))) < 0)
+#define     CHECK_V_ADD(a,b,d)  SET_V((int32_t)(((a) ^ (d)) & ((b) ^ (d))) < 0)
+#define     CHECK_V_SUB(a,b,d)  SET_V((int32_t)(((a) ^ (b)) & ((a) ^ (d))) < 0)
 
 
 // registers

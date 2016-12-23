@@ -1512,6 +1512,7 @@
 		</part>
 	</software>
 
+<!--
 	<software name="sirlance">
 		<description>Sir Lancelot (Spa)</description>
 		<year>1985</year>
@@ -1522,6 +1523,7 @@
 			</dataarea>
 		</part>
 	</software>
+-->
 
 	<software name="sirperce">
 		<description>Sir Perceval (Spa)</description>

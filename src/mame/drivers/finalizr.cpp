@@ -13,13 +13,16 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "machine/konami1.h"
+#include "includes/finalizr.h"
+#include "includes/konamipt.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/sn76496.h"
+#include "machine/gen_latch.h"
+#include "machine/konami1.h"
+#include "machine/watchdog.h"
 #include "sound/dac.h"
-#include "includes/konamipt.h"
-#include "includes/finalizr.h"
+#include "sound/sn76496.h"
+#include "sound/volt_reg.h"
 
 
 TIMER_DEVICE_CALLBACK_MEMBER(finalizr_state::finalizr_scanline)
@@ -108,12 +111,12 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, finalizr_state )
 	AM_RANGE(0x0811, 0x0811) AM_READ_PORT("P1")
 	AM_RANGE(0x0812, 0x0812) AM_READ_PORT("P2")
 	AM_RANGE(0x0813, 0x0813) AM_READ_PORT("DSW1")
-	AM_RANGE(0x0818, 0x0818) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0818, 0x0818) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x0819, 0x0819) AM_WRITE(finalizr_coin_w)
 	AM_RANGE(0x081a, 0x081a) AM_DEVWRITE("snsnd", sn76489a_device, write)   /* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0x081b, 0x081b) AM_WRITENOP        /* Loads the snd command into the snd latch */
 	AM_RANGE(0x081c, 0x081c) AM_WRITE(finalizr_i8039_irq_w) /* custom sound chip */
-	AM_RANGE(0x081d, 0x081d) AM_WRITE(soundlatch_byte_w)            /* custom sound chip */
+	AM_RANGE(0x081d, 0x081d) AM_DEVWRITE("soundlatch", generic_latch_8_device, write) /* custom sound chip */
 	AM_RANGE(0x2000, 0x23ff) AM_RAM AM_SHARE("colorram")
 	AM_RANGE(0x2400, 0x27ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x2800, 0x2bff) AM_RAM AM_SHARE("colorram2")
@@ -130,8 +133,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, finalizr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, finalizr_state )
-	AM_RANGE(0x00, 0xff)                   AM_READ(soundlatch_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x00, 0xff)                   AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
 	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
@@ -268,6 +271,8 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_io_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -283,13 +288,16 @@ static MACHINE_CONFIG_START( finalizr, finalizr_state )
 	MCFG_PALETTE_INIT_OWNER(finalizr_state, finalizr)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.325) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -350,10 +358,6 @@ ROM_START( finalizrb )
 ROM_END
 
 
-DRIVER_INIT_MEMBER(finalizr_state,finalizr)
-{
-}
 
-
-GAME( 1985, finalizr,  0,        finalizr, finalizr, finalizr_state,  finalizr, ROT90, "Konami",  "Finalizer - Super Transformation", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
-GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, finalizr_state, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizr,  0,        finalizr, finalizr,  driver_device, 0, ROT90, "Konami", "Finalizer - Super Transformation", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1985, finalizrb, finalizr, finalizr, finalizrb, driver_device, 0, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

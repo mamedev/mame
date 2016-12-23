@@ -96,7 +96,7 @@ machine_config_constructor isa8_gblaster_device::device_mconfig_additions() cons
 //  isa8_gblaster_device - constructor
 //-------------------------------------------------
 
-isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_GAME_BLASTER, "Game Blaster Sound Card", tag, owner, clock, "isa_gblaster", __FILE__),
 		device_isa8_card_interface(mconfig, *this),
 		m_saa1099_1(*this, "saa1099.1"),
@@ -112,9 +112,9 @@ isa8_gblaster_device::isa8_gblaster_device(const machine_config &mconfig, const 
 void isa8_gblaster_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0220, 0x0221, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_1_16_w), this ) );
-	m_isa->install_device(0x0222, 0x0223, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_2_16_w), this ) );
-	m_isa->install_device(0x0224, 0x022F, 0, 0, read8_delegate( FUNC(isa8_gblaster_device::detect_r), this ), write8_delegate( FUNC(isa8_gblaster_device::detect_w), this ) );
+	m_isa->install_device(0x0220, 0x0221, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_1_16_w), this ) );
+	m_isa->install_device(0x0222, 0x0223, read8_delegate( FUNC(isa8_gblaster_device::saa1099_16_r), this ), write8_delegate( FUNC(isa8_gblaster_device::saa1099_2_16_w), this ) );
+	m_isa->install_device(0x0224, 0x022F, read8_delegate( FUNC(isa8_gblaster_device::detect_r), this ), write8_delegate( FUNC(isa8_gblaster_device::detect_w), this ) );
 }
 
 //-------------------------------------------------

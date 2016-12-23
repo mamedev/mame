@@ -15,7 +15,7 @@
 
 #include "cpu/m6502/m6502.h"
 #include "sound/tms5220.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 #include "sound/pokey.h"
 #include "machine/atarigen.h"
@@ -80,7 +80,7 @@ class atari_jsa_base_device :   public device_t,
 {
 protected:
 	// construction/destruction
-	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
 
 public:
 	// static configuration
@@ -117,6 +117,9 @@ protected:
 	required_device<m6502_device> m_jsacpu;
 	required_device<ym2151_device> m_ym2151;
 
+	// memory regions
+	required_memory_region m_cpu_region;
+
 	// memory banks
 	required_memory_bank m_cpu_bank;
 
@@ -126,8 +129,8 @@ protected:
 
 	// internal state
 	double              m_ym2151_volume;
-	UINT8               m_ym2151_ct1;
-	UINT8               m_ym2151_ct2;
+	uint8_t               m_ym2151_ct1;
+	uint8_t               m_ym2151_ct2;
 };
 
 
@@ -137,7 +140,7 @@ class atari_jsa_oki_base_device : public atari_jsa_base_device
 {
 protected:
 	// derived construction/destruction
-	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_oki_base_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
 
 public:
 	// read/write handlers
@@ -159,6 +162,10 @@ protected:
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;    // JSA IIIs only
 
+	// memory regions
+	optional_memory_region m_oki1_region;
+	optional_memory_region m_oki2_region;
+
 	// memory banks
 	optional_memory_bank m_oki1_banklo;         // JSA III(s) only
 	optional_memory_bank m_oki1_bankhi;         // JSA III(s)
@@ -177,7 +184,7 @@ class atari_jsa_i_device : public atari_jsa_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_jsa_i_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( rdio_r );
@@ -214,7 +221,7 @@ class atari_jsa_ii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_jsa_ii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// read/write handlers
 	DECLARE_READ8_MEMBER( rdio_r );
@@ -234,11 +241,11 @@ class atari_jsa_iii_device : public atari_jsa_oki_base_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_jsa_iii_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// derived construction/destruction
-	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, int channels);
+	atari_jsa_iii_device(const machine_config &mconfig, device_type devtype, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, int channels);
 
 public:
 	// read/write handlers
@@ -259,7 +266,7 @@ class atari_jsa_iiis_device : public atari_jsa_iii_device
 {
 public:
 	// construction/destruction
-	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	atari_jsa_iiis_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
 	// device level overrides

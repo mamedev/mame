@@ -72,24 +72,24 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	bitmap_argb32 bitmap2;
 	bitmap_argb32 finalbitmap;
 	int width, height, maxwidth;
-	core_file *file = nullptr;
-	file_error filerr;
+	util::core_file::ptr file;
+	osd_file::error filerr;
 	png_error pngerr;
 	int error = 100;
 	bool bitmaps_differ;
 	int x, y;
 
 	/* open the source image */
-	filerr = core_fopen(imgfile1.c_str(), OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
+	filerr = util::core_file::open(imgfile1, OPEN_FLAG_READ, file);
+	if (filerr != osd_file::error::NONE)
 	{
-		printf("Could not open %s (%d)\n", imgfile1.c_str(), filerr);
+		printf("Could not open %s (%d)\n", imgfile1.c_str(), int(filerr));
 		goto error;
 	}
 
 	/* load the source image */
-	pngerr = png_read_bitmap(file, bitmap1);
-	core_fclose(file);
+	pngerr = png_read_bitmap(*file, bitmap1);
+	file.reset();
 	if (pngerr != PNGERR_NONE)
 	{
 		printf("Could not read %s (%d)\n", imgfile1.c_str(), pngerr);
@@ -97,16 +97,16 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	}
 
 	/* open the source image */
-	filerr = core_fopen(imgfile2.c_str(), OPEN_FLAG_READ, &file);
-	if (filerr != FILERR_NONE)
+	filerr = util::core_file::open(imgfile2, OPEN_FLAG_READ, file);
+	if (filerr != osd_file::error::NONE)
 	{
-		printf("Could not open %s (%d)\n", imgfile2.c_str(), filerr);
+		printf("Could not open %s (%d)\n", imgfile2.c_str(), int(filerr));
 		goto error;
 	}
 
 	/* load the source image */
-	pngerr = png_read_bitmap(file, bitmap2);
-	core_fclose(file);
+	pngerr = png_read_bitmap(*file, bitmap2);
+	file.reset();
 	if (pngerr != PNGERR_NONE)
 	{
 		printf("Could not read %s (%d)\n", imgfile2.c_str(), pngerr);
@@ -119,8 +119,8 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 	/* compare scanline by scanline */
 	for (y = 0; y < bitmap2.height() && !bitmaps_differ; y++)
 	{
-		UINT32 *base = &bitmap1.pix32(y);
-		UINT32 *curr = &bitmap2.pix32(y);
+		uint32_t *base = &bitmap1.pix32(y);
+		uint32_t *curr = &bitmap2.pix32(y);
 
 		/* scan the scanline */
 		for (x = 0; x < bitmap2.width(); x++)
@@ -135,26 +135,26 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		height = width = 0;
 		{
 			/* determine the maximal width */
-			maxwidth = MAX(bitmap1.width(), bitmap2.width());
+			maxwidth = std::max(bitmap1.width(), bitmap2.width());
 			width = bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE + maxwidth;
 
 			/* add to the height */
-			height += MAX(bitmap1.height(), bitmap2.height());
+			height += std::max(bitmap1.height(), bitmap2.height());
 		}
 
 		/* allocate the final bitmap */
 		finalbitmap.allocate(width, height);
 
 		/* now copy and compare each set of bitmaps */
-		int curheight = MAX(bitmap1.height(), bitmap2.height());
+		int curheight = std::max(bitmap1.height(), bitmap2.height());
 		/* iterate over rows in these bitmaps */
 		for (y = 0; y < curheight; y++)
 		{
-			UINT32 *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
-			UINT32 *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
-			UINT32 *dst1 = &finalbitmap.pix32(y);
-			UINT32 *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
-			UINT32 *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
+			uint32_t *src1 = (y < bitmap1.height()) ? &bitmap1.pix32(y) : nullptr;
+			uint32_t *src2 = (y < bitmap2.height()) ? &bitmap2.pix32(y) : nullptr;
+			uint32_t *dst1 = &finalbitmap.pix32(y);
+			uint32_t *dst2 = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE);
+			uint32_t *dstdiff = &finalbitmap.pix32(y, bitmap1.width() + BITMAP_SPACE + maxwidth + BITMAP_SPACE);
 
 			/* now iterate over columns */
 			for (x = 0; x < maxwidth; x++)
@@ -170,14 +170,14 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 		}
 
 		/* write the final PNG */
-		filerr = core_fopen(outfilename.c_str(), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
-		if (filerr != FILERR_NONE)
+		filerr = util::core_file::open(outfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, file);
+		if (filerr != osd_file::error::NONE)
 		{
-			printf("Could not open %s (%d)\n", outfilename.c_str(), filerr);
+			printf("Could not open %s (%d)\n", outfilename.c_str(), int(filerr));
 			goto error;
 		}
-		pngerr = png_write_bitmap(file, nullptr, finalbitmap, 0, nullptr);
-		core_fclose(file);
+		pngerr = png_write_bitmap(*file, nullptr, finalbitmap, 0, nullptr);
+		file.reset();
 		if (pngerr != PNGERR_NONE)
 		{
 			printf("Could not write %s (%d)\n", outfilename.c_str(), pngerr);
@@ -193,6 +193,6 @@ static int generate_png_diff(const std::string& imgfile1, const std::string& img
 
 error:
 	if (error == -1)
-		osd_rmfile(outfilename.c_str());
+		osd_file::remove(outfilename);
 	return error;
 }

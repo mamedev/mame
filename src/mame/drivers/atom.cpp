@@ -147,14 +147,14 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	*/
 
-	UINT8 header[0x16] = { 0 };
+	uint8_t header[0x16] = { 0 };
 	void *ptr;
 
 	image.fread(header, 0x16);
 
-	UINT16 start_address = pick_integer_le(header, 0x10, 2);
-	UINT16 run_address = pick_integer_le(header, 0x12, 2);
-	UINT16 size = pick_integer_le(header, 0x14, 2);
+	uint16_t start_address = pick_integer_le(header, 0x10, 2);
+	uint16_t run_address = pick_integer_le(header, 0x12, 2);
+	uint16_t size = pick_integer_le(header, 0x14, 2);
 
 	if (LOG)
 	{
@@ -170,7 +170,7 @@ QUICKLOAD_LOAD_MEMBER( atom_state, atom_atm )
 
 	m_maincpu->set_pc(run_address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 /***************************************************************************
@@ -492,7 +492,7 @@ READ8_MEMBER( atom_state::ppi_pb_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_keylatch)
 	{
@@ -530,7 +530,7 @@ READ8_MEMBER( atom_state::ppi_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	/* 2400 Hz input */
 	data |= m_hz2400 << 4;
@@ -602,8 +602,14 @@ WRITE_LINE_MEMBER( atom_state::atom_8271_interrupt_callback )
 
 WRITE_LINE_MEMBER( atom_state::motor_w )
 {
-	m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(!state);
-	m_fdc->subdevice<floppy_connector>("1")->get_device()->mon_w(!state);
+	for (int i=0; i != 2; i++) {
+		char devname[1];
+		sprintf(devname, "%d", i);
+		floppy_connector *con = m_fdc->subdevice<floppy_connector>(devname);
+		if (con) {
+			con->get_device()->mon_w(!state);
+		}
+	}
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(atom_state::cassette_output_tick)
@@ -645,7 +651,7 @@ void atom_state::machine_start()
 	generator. I don't know if this is hardware, or random data because the
 	ram chips are not cleared at start-up. So at this time, these numbers
 	are poked into the memory to simulate it. When I have more details I will fix it */
-	UINT8 *m_baseram = (UINT8 *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
+	uint8_t *m_baseram = (uint8_t *)m_maincpu->space(AS_PROGRAM).get_write_ptr(0x0000);
 
 	m_baseram[0x08] = machine().rand() & 0x0ff;
 	m_baseram[0x09] = machine().rand() & 0x0ff;
@@ -669,20 +675,20 @@ void atomeb_state::machine_start()
     MACHINE DRIVERS
 ***************************************************************************/
 
-int atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
+image_init_result atom_state::load_cart(device_image_interface &image, generic_slot_device *slot)
 {
-	UINT32 size = slot->common_get_size("rom");
+	uint32_t size = slot->common_get_size("rom");
 
 	if (size > 0x1000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	slot->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	slot->common_load_rom(slot->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 static SLOT_INTERFACE_START(atom_floppies)
@@ -719,7 +725,7 @@ static MACHINE_CONFIG_START( atom, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))
@@ -828,7 +834,7 @@ static MACHINE_CONFIG_START( atombb, atom_state )
 	MCFG_DEVICE_ADD(R6522_TAG, VIA6522, X2/4)
 	MCFG_VIA6522_WRITEPA_HANDLER(DEVWRITE8("cent_data_out", output_latch_device, write))
 	MCFG_VIA6522_CA2_HANDLER(DEVWRITELINE(CENTRONICS_TAG, centronics_device, write_strobe))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE(SY6502_TAG, m6502_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE(SY6502_TAG, M6502_IRQ_LINE))
 
 	MCFG_DEVICE_ADD(INS8255_TAG, I8255, 0)
 	MCFG_I8255_OUT_PORTA_CB(WRITE8(atom_state, ppi_pa_w))

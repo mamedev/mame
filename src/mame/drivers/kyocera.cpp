@@ -91,7 +91,7 @@ READ8_MEMBER( pc8201_state::bank_r )
 	return (m_iosel << 5) | m_bank;
 }
 
-void pc8201_state::bankswitch(UINT8 data)
+void pc8201_state::bankswitch(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -243,7 +243,7 @@ READ8_MEMBER( kc85_state::uart_status_r )
 
 	*/
 
-	UINT8 data = 0x40;
+	uint8_t data = 0x40;
 
 	// carrier detect
 	data |= m_rs232->dcd_r();
@@ -286,7 +286,7 @@ READ8_MEMBER( pc8201_state::uart_status_r )
 
 	*/
 
-	UINT8 data = 0x40;
+	uint8_t data = 0x40;
 
 	// data carrier detect / ring detect
 	data |= m_rs232->dcd_r();
@@ -378,7 +378,7 @@ WRITE8_MEMBER( pc8201_state::romam_w )
 
 READ8_MEMBER( pc8201_state::romrd_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (m_rom_sel)
 		data = m_cas_cart->read_rom(space, m_rom_addr & 0x1ffff);
@@ -438,22 +438,17 @@ WRITE8_MEMBER( kc85_state::ctrl_w )
 
 READ8_MEMBER( kc85_state::keyboard_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
-	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
-	if (!BIT(m_keylatch, 8)) data &= m_y8->read();
+	for (int i = 0; i < 9; i++)
+	{
+		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
+	}
 
 	return data;
 }
 
-void tandy200_state::bankswitch(UINT8 data)
+void tandy200_state::bankswitch(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -498,17 +493,12 @@ WRITE8_MEMBER( tandy200_state::bank_w )
 
 READ8_MEMBER( tandy200_state::stbk_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
-	if (!BIT(m_keylatch, 0)) data &= m_y0->read();
-	if (!BIT(m_keylatch, 1)) data &= m_y1->read();
-	if (!BIT(m_keylatch, 2)) data &= m_y2->read();
-	if (!BIT(m_keylatch, 3)) data &= m_y3->read();
-	if (!BIT(m_keylatch, 4)) data &= m_y4->read();
-	if (!BIT(m_keylatch, 5)) data &= m_y5->read();
-	if (!BIT(m_keylatch, 6)) data &= m_y6->read();
-	if (!BIT(m_keylatch, 7)) data &= m_y7->read();
-	if (!BIT(m_keylatch, 8)) data &= m_y8->read();
+	for (int i = 0; i < 9; i++)
+	{
+		if (!BIT(m_keylatch, i)) data &= m_y[i]->read();
+	}
 
 	return data;
 }
@@ -539,7 +529,7 @@ WRITE8_MEMBER( tandy200_state::stbk_w )
 
 READ8_MEMBER( kc85_state::lcd_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	data |= m_lcdc0->read(space, offset);
 	data |= m_lcdc1->read(space, offset);
@@ -1042,7 +1032,7 @@ READ8_MEMBER( kc85_state::i8155_pc_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// clock data input
 	data |= m_rtc->data_out_r();
@@ -1143,7 +1133,7 @@ READ8_MEMBER( tandy200_state::i8155_pc_r )
 
 	*/
 
-	UINT8 data = 0x01;
+	uint8_t data = 0x01;
 
 	// centronics
 	data |= m_centronics_select << 1;
@@ -1210,7 +1200,7 @@ void kc85_state::machine_start()
 
 void pc8201_state::machine_start()
 {
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	std::string region_tag;
 	m_opt_region = memregion(region_tag.assign(m_opt_cart->tag()).append(GENERIC_ROM_REGION_TAG).c_str());
@@ -1370,7 +1360,7 @@ static MACHINE_CONFIG_START( kc85, kc85_state )
 	MCFG_I8155_IN_PORTC_CB(READ8(kc85_state, i8155_pc_r))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(kc85_state, i8155_to_w))
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -1420,7 +1410,7 @@ static MACHINE_CONFIG_START( pc8201, pc8201_state )
 	MCFG_I8155_IN_PORTC_CB(READ8(kc85_state, i8155_pc_r))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(kc85_state, i8155_to_w))
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))
@@ -1480,7 +1470,7 @@ static MACHINE_CONFIG_START( trsm100, trsm100_state )
 	MCFG_I8155_IN_PORTC_CB(READ8(kc85_state, i8155_pc_r))
 	MCFG_I8155_OUT_TIMEROUT_CB(WRITELINE(kc85_state, i8155_to_w))
 
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, INPUTLINE(I8085_TAG, I8085_RST75_LINE))
 
 	MCFG_IM6402_ADD(IM6402_TAG, 0, 0)
 	MCFG_IM6402_TRO_CALLBACK(DEVWRITELINE(RS232_TAG, rs232_port_device, write_txd))

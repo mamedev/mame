@@ -192,8 +192,8 @@ WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 	/* input becomes the starting point for the trackball counters */
 	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = ioport("FAKE")->read();
-		UINT8 switches = ioport("IN0")->read();
+		uint8_t trackball = ioport("FAKE")->read();
+		uint8_t switches = ioport("IN0")->read();
 		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
 	m_ctrld = data & 0x10;
@@ -205,7 +205,7 @@ READ8_MEMBER( liberatr_state::port0_r )
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
 	if (m_ctrld)
 	{
-		UINT8 trackball = ioport("FAKE")->read();
+		uint8_t trackball = ioport("FAKE")->read();
 		return ((trackball & 0xf0) - (m_trackball_offset & 0xf0)) | ((trackball - m_trackball_offset) & 0x0f);
 	}
 
@@ -277,7 +277,7 @@ static ADDRESS_MAP_START( liberatr_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
 	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x6a00, 0x6a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(led_w)
 	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( liberat2_map, AS_PROGRAM, 8, liberatr_state )
 	AM_RANGE(0x4600, 0x4600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_SHARE("planet_frame")
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x4a00, 0x4a00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(led_w)
 	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(trackball_reset_w)
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
@@ -422,6 +422,8 @@ static MACHINE_CONFIG_START( liberatr, liberatr_state )
 	MCFG_DEVICE_PERIODIC_INT_DRIVER(driver_device,irq0_line_hold,4*60)
 
 	MCFG_ER2055_ADD("earom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

@@ -21,10 +21,11 @@
 
 /* ----- render utilities ----- */
 
-void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color);
-int render_clip_line(render_bounds *bounds, const render_bounds *clip);
-int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
-void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1);
+void render_resample_argb_bitmap_hq(bitmap_argb32 &dest, bitmap_argb32 &source, const render_color &color, bool force = false);
+bool render_clip_line(render_bounds *bounds, const render_bounds *clip);
+bool render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
+void render_line_to_quad(const render_bounds *bounds, float width, float length_extension, render_bounds *bounds0, render_bounds *bounds1);
+void render_load_jpeg(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename);
 bool render_load_png(bitmap_argb32 &bitmap, emu_file &file, const char *dirname, const char *filename, bool load_as_alpha_to_existing = false);
 
 
@@ -189,11 +190,11 @@ static inline float apply_brightness_contrast_gamma_fp(float srcval, float brigh
     a single RGB component
 -------------------------------------------------*/
 
-static inline UINT8 apply_brightness_contrast_gamma(UINT8 src, float brightness, float contrast, float gamma)
+static inline u8 apply_brightness_contrast_gamma(u8 src, float brightness, float contrast, float gamma)
 {
 	float srcval = (float)src * (1.0f / 255.0f);
 	float result = apply_brightness_contrast_gamma_fp(srcval, brightness, contrast, gamma);
-	return (UINT8)(result * 255.0f);
+	return u8(result * 255.0f);
 }
 
 

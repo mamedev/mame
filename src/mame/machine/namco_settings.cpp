@@ -5,7 +5,7 @@
 
 const device_type NAMCO_SETTINGS = &device_creator<namco_settings_device>;
 
-namco_settings_device::namco_settings_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+namco_settings_device::namco_settings_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, NAMCO_SETTINGS, "Namco Settings", tag, owner, clock, "namco_settings", __FILE__)
 {
 }

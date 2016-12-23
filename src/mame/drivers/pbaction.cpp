@@ -38,7 +38,7 @@ Stephh's notes (based on the game Z80 code and some tests) :
 
   - There is an ingame bug that prevents you to get a bonus life at 1000000 points
     when you set the "Bonus Life" Dip Switch to "200k 1000k" :
-      * Bonus life table index starts at 0x63c6 (8 * 2 butes, LSB first) :
+      * Bonus life table index starts at 0x63c6 (8 * 2 bites, LSB first) :
 
           63C6: D6 63   "70k 200k"          -> 04 07 03 02 01 10
           63C8: DC 63   "70k 200k 1000k"    -> 04 07 03 02 02 01 01 10
@@ -68,13 +68,13 @@ Stephh's notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "machine/segacrpt.h"
+#include "machine/segacrpt_device.h"
 #include "includes/pbaction.h"
 
 
 WRITE8_MEMBER(pbaction_state::pbaction_sh_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0x00);
 }
 
@@ -109,7 +109,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( pbaction_sound_map, AS_PROGRAM, 8, pbaction_state )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x8000, 0x8000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xffff, 0xffff) AM_WRITENOP    /* watchdog? */
 ADDRESS_MAP_END
 
@@ -262,11 +262,13 @@ INTERRUPT_GEN_MEMBER(pbaction_state::pbaction_interrupt)
 
 void pbaction_state::machine_start()
 {
+	save_item(NAME(m_nmi_mask));
 	save_item(NAME(m_scroll));
 }
 
 void pbaction_state::machine_reset()
 {
+	m_nmi_mask = 0;
 	m_scroll = 0;
 }
 
@@ -306,6 +308,8 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -317,8 +321,11 @@ static MACHINE_CONFIG_START( pbaction, pbaction_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pbactionx, pbaction )
-	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_REPLACE("maincpu", SEGA_CPU_PBACTIO4, 4000000)   /* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(pbaction_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", pbaction_state,  vblank_irq)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
 
@@ -479,7 +486,7 @@ READ8_MEMBER(pbaction_state::pbactio3_prot_kludge_r)
 DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 {
 	int i;
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 
 	/* first of all, do a simple bitswap */
 	for (i = 0; i < 0xc000; i++)
@@ -487,45 +494,15 @@ DRIVER_INIT_MEMBER(pbaction_state,pbactio3)
 		rom[i] = BITSWAP8(rom[i], 7,6,5,4,1,2,3,0);
 	}
 
-	/* then do the standard Sega decryption */
-	DRIVER_INIT_CALL(pbactio4);
-
 	/* install a protection (?) workaround */
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc000, 0xc000, read8_delegate(FUNC(pbaction_state::pbactio3_prot_kludge_r),this) );
 }
 
-DRIVER_INIT_MEMBER(pbaction_state,pbactio4)
-{
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...0...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0xa8,0x08,0x88 },   /* ...0...0...1...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...0...1...1 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...0 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...0...1...1...1 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...1 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
-		{ 0x28,0x08,0xa8,0x88 }, { 0x28,0x08,0xa8,0x88 },   /* ...1...0...1...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...0...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0xa8,0x28,0xa0,0x20 },   /* ...1...1...0...1 */
-		{ 0xa0,0x80,0xa8,0x88 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
-		{ 0xa8,0xa0,0x88,0x80 }, { 0xa8,0x28,0xa0,0x20 }    /* ...1...1...1...1 */
-	};
-
-	/* this one only has the Sega decryption */
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-}
 
 
 
 GAME( 1985, pbaction,  0,        pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction2, pbaction, pbaction,  pbaction, driver_device,  0,        ROT90, "Tehkan", "Pinball Action (set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, pbaction3, pbaction, pbactionx, pbaction, pbaction_state, pbactio3, ROT90, "Tehkan", "Pinball Action (set 3, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, pbaction_state, pbactio4, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction4, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 4, encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, pbaction5, pbaction, pbactionx, pbaction, driver_device,  0, ROT90, "Tehkan", "Pinball Action (set 5, encrypted)", MACHINE_SUPPORTS_SAVE )

@@ -2310,7 +2310,7 @@ kept for now until finding out what those bytes affect...
 		<publisher>Casio</publisher>
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="65536">
-				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x400x40000" />
+				<rom name="casio_basic.rom" size="32768" crc="2181a21d" sha1="c48a68db822d9bded56ee1df55d18b81fbe135b7" offset="0x4000" />
 			</dataarea>
 		</part>
 	</software>
@@ -4313,7 +4313,7 @@ kept for now until finding out what those bytes affect...
 		</part>
 	</software>
 
-	<software name="dngmster">
+	<software name="dmaster">
 		<description>Dungeon Master (Jpn)</description>
 		<year>1986</year>
 		<publisher>ASCII</publisher>
@@ -6752,19 +6752,6 @@ kept for now until finding out what those bytes affect...
 		<part name="cart" interface="msx_cart">
 			<dataarea name="rom" size="32768">
 				<rom name="kage no densetsu - legend of kage, the (japan).rom" size="32768" crc="69367e10" sha1="ffc8c57b26f2f495bd77efac5b815efe9c25336c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="legkagea" cloneof="legkage">
-		<description>Kage no Densetsu - The Legend of Kage (Jpn, Alt)</description>
-		<year>1986</year>
-		<publisher>Taito</publisher>
-		<info name="serial" value="MSX-9" />
-		<info name="alt_title" value="影の伝説" />
-		<part name="cart" interface="msx_cart">
-			<dataarea name="rom" size="32768">
-				<rom name="kage no densetsu - legend of kage, the (japan) (alt 1).rom" size="32768" crc="b581f746" sha1="666e82d8a8e5d2672a9b7159adcdc861a31c8fa1" offset="0" />
 			</dataarea>
 		</part>
 	</software>

@@ -142,7 +142,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
 	int combined_state = m_sndpia1->irq_a_state() | m_sndpia1->irq_b_state();
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	m_audiocpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_audiocpu->set_input_line(M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -153,7 +153,7 @@ WRITE_LINE_MEMBER(qix_state::qix_pia_sint)
  *
  *************************************/
 
-static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, driver_device )
+static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, qix_state )
 	AM_RANGE(0x0000, 0x007f) AM_RAM
 	AM_RANGE(0x2000, 0x2003) AM_MIRROR(0x5ffc) AM_DEVREADWRITE("sndpia2", pia6821_device, read, write)
 	AM_RANGE(0x4000, 0x4003) AM_MIRROR(0x3ffc) AM_DEVREADWRITE("sndpia1", pia6821_device, read, write)

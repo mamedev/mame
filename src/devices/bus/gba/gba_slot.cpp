@@ -46,12 +46,18 @@ device_gba_cart_interface::~device_gba_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gba_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
+		if (size < 0x4000000)
 		// we always alloc 32MB of rom region!
-		m_rom = (UINT32 *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		else
+		{
+			m_rom = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBASLOT_ROM_REGION_TAG).c_str(), 0x4000000, 4, ENDIANNESS_LITTLE)->base();
+			m_romhlp = (uint32_t *)device().machine().memory().region_alloc(std::string(tag).append(GBAHELP_ROM_REGION_TAG).c_str(), 0x2000000, 4, ENDIANNESS_LITTLE)->base();
+		}
 		m_rom_size = size;
 	}
 }
@@ -61,9 +67,9 @@ void device_gba_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  nvram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gba_cart_interface::nvram_alloc(UINT32 size)
+void device_gba_cart_interface::nvram_alloc(uint32_t size)
 {
-	m_nvram.resize(size/sizeof(UINT32));
+	m_nvram.resize(size/sizeof(uint32_t));
 }
 
 
@@ -74,7 +80,7 @@ void device_gba_cart_interface::nvram_alloc(UINT32 size)
 //-------------------------------------------------
 //  gba_cart_slot_device - constructor
 //-------------------------------------------------
-gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gba_cart_slot_device::gba_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, GBA_CART_SLOT, "Game Boy Advance Cartridge Slot", tag, owner, clock, "gba_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -128,12 +134,19 @@ static const gba_slot slot_list[] =
 {
 	{ GBA_STD, "gba_rom" },
 	{ GBA_SRAM, "gba_sram" },
+	{ GBA_DRILLDOZ, "gba_drilldoz" },
+	{ GBA_WARIOTWS, "gba_wariotws" },
 	{ GBA_EEPROM, "gba_eeprom" },
 	{ GBA_EEPROM4, "gba_eeprom_4k" },
+	{ GBA_YOSHIUG, "gba_yoshiug" },
 	{ GBA_EEPROM64, "gba_eeprom_64k" },
+	{ GBA_BOKTAI, "gba_boktai" },
 	{ GBA_FLASH, "gba_flash" },
+	{ GBA_FLASH_RTC, "gba_flash_rtc" },
 	{ GBA_FLASH512, "gba_flash_512" },
 	{ GBA_FLASH1M, "gba_flash_1m" },
+	{ GBA_FLASH1M_RTC, "gba_flash_1m_rtc" },
+	{ GBA_3DMATRIX, "gba_3dmatrix" },
 };
 
 static int gba_get_pcb_id(const char *slot)
@@ -163,20 +176,20 @@ static const char *gba_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool gba_cart_slot_device::call_load()
+image_init_result gba_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT8 *ROM;
-		UINT32 size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
-		if (size > 0x2000000)
+		uint8_t *ROM;
+		uint32_t size = (software_entry() != nullptr) ? get_software_region_length("rom") : length();
+		if (size > 0x4000000)
 		{
-			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 32MB");
-			return IMAGE_INIT_FAIL;
+			seterror(IMAGE_ERROR_UNSPECIFIED, "Attempted loading a cart larger than 64MB");
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc(size, tag());
-		ROM = (UINT8 *)m_cart->get_rom_base();
+		ROM = (uint8_t *)m_cart->get_rom_base();
 
 		if (software_entry() == nullptr)
 		{
@@ -197,7 +210,7 @@ bool gba_cart_slot_device::call_load()
 			osd_printf_info("GBA: Detected (XML) %s\n", pcb_name ? pcb_name : "NONE");
 		}
 
-		if (m_type == GBA_SRAM)
+		if (m_type == GBA_SRAM || m_type == GBA_DRILLDOZ || m_type == GBA_WARIOTWS)
 			m_cart->nvram_alloc(0x10000);
 
 		// mirror the ROM
@@ -216,14 +229,16 @@ bool gba_cart_slot_device::call_load()
 				memcpy(ROM + 0x1000000, ROM, 0x1000000);
 				break;
 		}
+		if (size == 0x4000000)
+			memcpy((uint8_t *)m_cart->get_romhlp_base(), ROM, 0x2000000);
 
 		if (m_cart->get_nvram_size())
 			battery_load(m_cart->get_nvram_base(), m_cart->get_nvram_size(), 0x00);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -240,23 +255,11 @@ void gba_cart_slot_device::call_unload()
 
 
 /*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool gba_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
-}
-
-
-
-/*-------------------------------------------------
  get_cart_type - code to detect NVRAM type from
  fullpath
  -------------------------------------------------*/
 
-static inline std::string gba_chip_string( UINT32 chip )
+static inline std::string gba_chip_string( uint32_t chip )
 {
 	std::string str;
 	if (chip == 0) str += "NONE ";
@@ -273,7 +276,7 @@ static inline std::string gba_chip_string( UINT32 chip )
 }
 
 
-static inline int gba_chip_has_conflict( UINT32 chip )
+static inline int gba_chip_has_conflict( uint32_t chip )
 {
 	int count1 = 0, count2 = 0;
 	if (chip & GBA_CHIP_EEPROM) count1++;
@@ -287,25 +290,27 @@ static inline int gba_chip_has_conflict( UINT32 chip )
 }
 
 
-int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int gba_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
-	UINT32 chip = 0;
+	uint32_t chip = 0;
 	int type = GBA_STD;
+	bool has_rtc = false;
+	bool has_rumble = false;
 
 	// first detect nvram type based on strings inside the file
 	for (int i = 0; i < len; i++)
 	{
-		if (!memcmp(&ROM[i], "EEPROM_V", 8))
+		if ((i<len-8) && !memcmp(&ROM[i], "EEPROM_V", 8))
 			chip |= GBA_CHIP_EEPROM; // should be either GBA_CHIP_EEPROM_4K or GBA_CHIP_EEPROM_64K, but it is not yet possible to automatically detect which one
-		else if ((!memcmp(&ROM[i], "SRAM_V", 6)) || (!memcmp(&ROM[i], "SRAM_F_V", 8))) // || (!memcmp(&data[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
+		else if (((i<len-6) && !memcmp(&ROM[i], "SRAM_V", 6)) || ((i<len-8) && !memcmp(&ROM[i], "SRAM_F_V", 8))) // || ((i<len-11) && !memcmp(&data[i], "ADVANCEWARS", 11))) //advance wars 1 & 2 has SRAM, but no "SRAM_" string can be found inside the ROM space
 			chip |= GBA_CHIP_SRAM;
-		else if (!memcmp(&ROM[i], "FLASH1M_V", 9))
+		else if ((i<len-9) && !memcmp(&ROM[i], "FLASH1M_V", 9))
 			chip |= GBA_CHIP_FLASH_1M;
-		else if (!memcmp(&ROM[i], "FLASH512_V", 10))
+		else if ((i<len-10) && !memcmp(&ROM[i], "FLASH512_V", 10))
 			chip |= GBA_CHIP_FLASH_512;
-		else if (!memcmp(&ROM[i], "FLASH_V", 7))
+		else if ((i<len-7) && !memcmp(&ROM[i], "FLASH_V", 7))
 			chip |= GBA_CHIP_FLASH;
-		else if (!memcmp(&ROM[i], "SIIRTC_V", 8))
+		else if ((i<len-8) && !memcmp(&ROM[i], "SIIRTC_V", 8))
 			chip |= GBA_CHIP_RTC;
 	}
 	osd_printf_info("GBA: Detected (ROM) %s\n", gba_chip_string(chip).c_str());
@@ -314,7 +319,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 	if (gba_chip_has_conflict(chip))
 	{
 		char game_code[5] = { 0 };
-		bool resolved = FALSE;
+		bool resolved = false;
 
 		if (len >= 0xac + 4)
 			memcpy(game_code, ROM + 0xac, 4);
@@ -330,7 +335,7 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip |= item->chip;
-				resolved = TRUE;
+				resolved = true;
 				break;
 			}
 		}
@@ -350,10 +355,20 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 		for (auto & elem : gba_chip_fix_eeprom_list)
 		{
-			const gba_chip_fix_eeprom_item *item = &elem;
+			const gba_chip_fix_item *item = &elem;
 			if (!strcmp(game_code, item->game_code))
 			{
 				chip = (chip & ~GBA_CHIP_EEPROM) | GBA_CHIP_EEPROM_64K;
+				break;
+			}
+		}
+
+		for (auto & elem : gba_chip_fix_rumble_list)
+		{
+			const gba_chip_fix_item *item = &elem;
+			if (!strcmp(game_code, item->game_code))
+			{
+				has_rumble = true;
 				break;
 			}
 		}
@@ -361,8 +376,9 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 
 	if (chip & GBA_CHIP_RTC)
 	{
-		osd_printf_info("game has RTC - not emulated at the moment\n");
+		//osd_printf_info("game has RTC - not emulated at the moment\n");
 		chip &= ~GBA_CHIP_RTC;
+		has_rtc = true;
 	}
 
 	osd_printf_info("GBA: Emulate %s\n", gba_chip_string(chip).c_str());
@@ -374,25 +390,36 @@ int gba_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 			break;
 		case GBA_CHIP_EEPROM:
 			type = GBA_EEPROM;
+			if (has_rumble)
+				type = GBA_YOSHIUG;
 			break;
 		case GBA_CHIP_EEPROM_4K:
 			type = GBA_EEPROM4;
 			break;
 		case GBA_CHIP_EEPROM_64K:
 			type = GBA_EEPROM64;
+			if (has_rtc)
+				type = GBA_BOKTAI;
 			break;
 		case GBA_CHIP_FLASH:
 			type = GBA_FLASH;
+			if (has_rtc)
+				type = GBA_FLASH_RTC;
 			break;
 		case GBA_CHIP_FLASH_512:
 			type = GBA_FLASH512;
 			break;
 		case GBA_CHIP_FLASH_1M:
 			type = GBA_FLASH1M;
+			if (has_rtc)
+				type = GBA_FLASH1M_RTC;
 			break;
 		default:
 			break;
 	}
+
+	if (len == 0x4000000)
+		type = GBA_3DMATRIX;
 
 	return type;
 }
@@ -405,11 +432,11 @@ std::string gba_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file);
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size();
+		std::vector<uint8_t> rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		type = get_cart_type(&rom[0], len);
 		slot_string = gba_get_slot(type);
@@ -443,6 +470,14 @@ READ32_MEMBER(gba_cart_slot_device::read_ram)
 		return 0xffffffff;
 }
 
+READ32_MEMBER(gba_cart_slot_device::read_gpio)
+{
+	if (m_cart)
+		return m_cart->read_gpio(space, offset, mem_mask);
+	else
+		return 0xffffffff;
+}
+
 
 /*-------------------------------------------------
  write
@@ -454,11 +489,17 @@ WRITE32_MEMBER(gba_cart_slot_device::write_ram)
 		m_cart->write_ram(space, offset, data, mem_mask);
 }
 
+WRITE32_MEMBER(gba_cart_slot_device::write_gpio)
+{
+	if (m_cart)
+		m_cart->write_gpio(space, offset, data, mem_mask);
+}
+
 
 /*-------------------------------------------------
  Internal header logging
  -------------------------------------------------*/
 
-void gba_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void gba_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
 {
 }

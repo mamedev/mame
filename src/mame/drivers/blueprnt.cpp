@@ -50,6 +50,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/blueprnt.h"
 
@@ -79,7 +80,7 @@ READ8_MEMBER(blueprnt_state::grasspin_sh_dipsw_r)
 
 WRITE8_MEMBER(blueprnt_state::blueprnt_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( blueprnt_map, AS_PROGRAM, 8, blueprnt_state )
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ(blueprnt_sh_dipsw_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(blueprnt_sound_command_w)
-	AM_RANGE(0xe000, 0xe000) AM_READ(watchdog_reset_r) AM_WRITE(blueprnt_flipscreen_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(blueprnt_flipscreen_w)
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(blueprnt_colorram_w) AM_MIRROR(0x400) AM_SHARE("colorram")
 ADDRESS_MAP_END
 
@@ -351,6 +352,8 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -368,8 +371,10 @@ static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 10000000/2/2/2)
-	MCFG_AY8910_PORT_B_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_B_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(blueprnt_state, dipsw_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 

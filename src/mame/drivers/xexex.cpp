@@ -137,7 +137,7 @@ Unresolved Issues:
 #include "machine/eepromser.h"
 #include "machine/k053252.h"
 #include "sound/k054539.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/flt_vol.h"
 #include "includes/xexex.h"
 #include "includes/konamipt.h"
@@ -179,7 +179,7 @@ WRITE16_MEMBER(xexex_state::k053247_scattered_word_w)
 void xexex_state::xexex_objdma( int limiter )
 {
 	int counter, num_inactive;
-	UINT16 *src, *dst;
+	uint16_t *src, *dst;
 
 	counter = m_frame;
 	m_frame = m_screen->frame_number();
@@ -266,17 +266,17 @@ WRITE16_MEMBER(xexex_state::sound_cmd1_w)
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
 		if (m_strip_0x1a)
-			if (soundlatch2_byte_r(space, 0) == 1 && data == 0x1a)
+			if (m_soundlatch2->read(space, 0) == 1 && data == 0x1a)
 				return;
 
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	}
 }
 
 WRITE16_MEMBER(xexex_state::sound_cmd2_w)
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch2_byte_w(space, 0, data & 0xff);
+		m_soundlatch2->write(space, 0, data & 0xff);
 }
 
 WRITE16_MEMBER(xexex_state::sound_irq_w)
@@ -286,7 +286,7 @@ WRITE16_MEMBER(xexex_state::sound_irq_w)
 
 READ16_MEMBER(xexex_state::sound_status_r)
 {
-	return soundlatch3_byte_r(space, 0);
+	return m_soundlatch3->read(space, 0);
 }
 
 WRITE8_MEMBER(xexex_state::sound_bankswitch_w)
@@ -409,9 +409,9 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, xexex_state )
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe22f) AM_DEVREADWRITE("k054539", k054539_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_byte_w)
-	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_byte_r)
+	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("soundlatch3", generic_latch_8_device, write)
+	AM_RANGE(0xf002, 0xf002) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xf003, 0xf003) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -521,18 +521,14 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 	MCFG_PALETTE_ENABLE_SHADOWS()
 	MCFG_PALETTE_ENABLE_HILIGHTS()
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(xexex_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_4, 1, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_4, 1, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053246", K053246, 0)
 	MCFG_K053246_CB(xexex_state, sprite_callback)
-	MCFG_K053246_CONFIG("gfx2", 1, NORMAL_PLANE_ORDER, -48, 32)
-	MCFG_K053246_GFXDECODE("gfxdecode")
+	MCFG_K053246_CONFIG("gfx2", NORMAL_PLANE_ORDER, -48, 32)
 	MCFG_K053246_PALETTE("palette")
 
 	MCFG_K053250_ADD("k053250", "palette", "screen", -5, -16)
@@ -545,6 +541,10 @@ static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch3")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_32MHz/8) // 4MHz
 	MCFG_SOUND_ROUTE(0, "filter1l", 0.50)
@@ -704,8 +704,8 @@ DRIVER_INIT_MEMBER(xexex_state,xexex)
 	if (!strcmp(machine().system().name, "xexex"))
 	{
 		// Invulnerability
-//      *(UINT16 *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
-//      *(UINT16 *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
+//      *(uint16_t *)(memregion("maincpu")->base() + 0x648d4) = 0x4a79;
+//      *(uint16_t *)(memregion("maincpu")->base() + 0x00008) = 0x5500;
 		m_strip_0x1a = 1;
 	}
 }

@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/gen_latch.h"
 #include "video/bufsprite.h"
 
 class lastduel_state : public driver_device
@@ -15,32 +16,34 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
+		m_gfxdecode(*this, "gfxdecode"),
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spriteram(*this, "spriteram"),
 		m_vram(*this, "vram"),
 		m_scroll1(*this, "scroll1"),
 		m_scroll2(*this, "scroll2"),
-		m_paletteram(*this, "paletteram"),
-		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette"){ }
+		m_paletteram(*this, "paletteram") { }
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	/* memory pointers */
-	required_device<buffered_spriteram16_device> m_spriteram;
-	required_shared_ptr<UINT16> m_vram;
-	required_shared_ptr<UINT16> m_scroll1;
-	required_shared_ptr<UINT16> m_scroll2;
-	required_shared_ptr<UINT16> m_paletteram;
-
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
+
+	/* memory pointers */
+	required_device<buffered_spriteram16_device> m_spriteram;
+	required_shared_ptr<uint16_t> m_vram;
+	required_shared_ptr<uint16_t> m_scroll1;
+	required_shared_ptr<uint16_t> m_scroll2;
+	required_shared_ptr<uint16_t> m_paletteram;
 
 	/* video-related */
 	tilemap_t     *m_bg_tilemap;
 	tilemap_t     *m_fg_tilemap;
 	tilemap_t     *m_tx_tilemap;
-	UINT16      m_scroll[8];
+	uint16_t      m_scroll[8];
 	int         m_sprite_flipy_mask;
 	int         m_sprite_pri_mask;
 	int         m_tilemap_priority;
@@ -65,10 +68,9 @@ public:
 	DECLARE_VIDEO_START(lastduel);
 	DECLARE_MACHINE_START(madgear);
 	DECLARE_VIDEO_START(madgear);
-	UINT32 screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(lastduel_timer_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(madgear_timer_cb);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };

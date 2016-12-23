@@ -172,12 +172,11 @@ Rowscroll style:
 
 #include "emu.h"
 #include "video/deco16ic.h"
-#include "ui/ui.h"
 #include "render.h"
 
 const device_type DECO16IC = &device_creator<deco16ic_device>;
 
-deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO16IC, "DECO 55 / 56 / 74 / 141 IC", tag, owner, clock, "deco16ic", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_pf1_data(nullptr),
@@ -202,8 +201,7 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 		m_pf2_colourmask(0xf),
 		m_pf12_8x8_gfx_bank(0),
 		m_pf12_16x16_gfx_bank(0),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 }
 
@@ -238,16 +236,16 @@ void deco16ic_device::device_start()
 	if (m_full_width12&1)
 		fullwidth = 1;
 
-	m_pf1_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_full_width12 ? 64 : 32, 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
+	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
+//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_full_width12 ? 64 : 32, 32);
+	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
 
 	if (m_split)
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+		m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 	else
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+		m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
-	m_pf2_tilemap_8x8 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
+	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
 	m_pf1_tilemap_8x8->set_transparent_pen(0);
 	m_pf2_tilemap_8x8->set_transparent_pen(0);
@@ -259,9 +257,9 @@ void deco16ic_device::device_start()
 
 	m_pf1_8bpp_mode = 0;
 
-	m_pf1_data = make_unique_clear<UINT16[]>(0x2000 / 2);
-	m_pf2_data = make_unique_clear<UINT16[]>(0x2000 / 2);
-	m_pf12_control = make_unique_clear<UINT16[]>(0x10 / 2);
+	m_pf1_data = make_unique_clear<uint16_t[]>(0x2000 / 2);
+	m_pf2_data = make_unique_clear<uint16_t[]>(0x2000 / 2);
+	m_pf12_control = make_unique_clear<uint16_t[]>(0x10 / 2);
 
 
 	save_item(NAME(m_use_custom_pf1));
@@ -303,9 +301,9 @@ TILEMAP_MAPPER_MEMBER(deco16ic_device::deco16_scan_rows)
 
 TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 {
-	UINT16 tile = m_pf2_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
+	uint16_t tile = m_pf2_data[tile_index];
+	uint8_t colour = (tile >> 12) & 0xf;
+	uint8_t flags = 0;
 
 	if (tile & 0x8000)
 	{
@@ -329,9 +327,9 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info)
 
 TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 {
-	UINT16 tile = m_pf1_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
+	uint16_t tile = m_pf1_data[tile_index];
+	uint8_t colour = (tile >> 12) & 0xf;
+	uint8_t flags = 0;
 
 	if (tile & 0x8000)
 	{
@@ -368,9 +366,9 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info)
 
 TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 {
-	UINT16 tile = m_pf2_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
+	uint16_t tile = m_pf2_data[tile_index];
+	uint8_t colour = (tile >> 12) & 0xf;
+	uint8_t flags = 0;
 
 	if (tile & 0x8000)
 	{
@@ -394,9 +392,9 @@ TILE_GET_INFO_MEMBER(deco16ic_device::get_pf2_tile_info_b)
 
 TILE_GET_INFO_MEMBER(deco16ic_device::get_pf1_tile_info_b)
 {
-	UINT16 tile = m_pf1_data[tile_index];
-	UINT8 colour = (tile >> 12) & 0xf;
-	UINT8 flags = 0;
+	uint16_t tile = m_pf1_data[tile_index];
+	uint8_t colour = (tile >> 12) & 0xf;
+	uint8_t flags = 0;
 
 	if (tile & 0x8000)
 	{
@@ -438,16 +436,16 @@ void deco16ic_device::custom_tilemap_draw(
 	tilemap_t *tilemap0_16x16,
 	tilemap_t *tilemap1_8x8,
 	tilemap_t *tilemap1_16x16,
-	const UINT16 *rowscroll_ptr,
-	const UINT16 scrollx,
-	const UINT16 scrolly,
-	const UINT16 control0,
-	const UINT16 control1,
+	const uint16_t *rowscroll_ptr,
+	const uint16_t scrollx,
+	const uint16_t scrolly,
+	const uint16_t control0,
+	const uint16_t control1,
 	int combine_mask,
 	int combine_shift,
 	int trans_mask,
 	int flags,
-	UINT32 priority,
+	uint32_t priority,
 	int is_tattoo
 	)
 {
@@ -503,7 +501,7 @@ void deco16ic_device::custom_tilemap_draw(
 				}
 				else
 				{
-					UINT16 p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
+					uint16_t p2 = src_bitmap1->pix16((src_y + column_offset) & height_mask, src_x);
 					p = 0x200+( ((p&0x30)<<4) | (p&0x0f) | ((p2 & 0x0f)<<4));
 				}
 			}
@@ -511,10 +509,10 @@ void deco16ic_device::custom_tilemap_draw(
 
 			if ((flags & TILEMAP_DRAW_OPAQUE) || (p & trans_mask))
 			{
-				bitmap.pix(y, x) = m_palette->pen(p);
+				bitmap.pix(y, x) = m_gfxdecode->palette().pen(p);
 				if (screen.priority().valid())
 				{
-					UINT8 *pri = &screen.priority().pix8(y);
+					uint8_t *pri = &screen.priority().pix8(y);
 					pri[x] |= priority;
 				}
 			}
@@ -676,11 +674,11 @@ WRITE32_MEMBER( deco16ic_device::pf2_data_dword_w )
 static int deco16_pf_update(
 	tilemap_t *tilemap_8x8,
 	tilemap_t *tilemap_16x16,
-	const UINT16 *rowscroll_ptr,
-	const UINT16 scrollx,
-	const UINT16 scrolly,
-	const UINT16 control0,
-	const UINT16 control1)
+	const uint16_t *rowscroll_ptr,
+	const uint16_t scrollx,
+	const uint16_t scrolly,
+	const uint16_t control0,
+	const uint16_t control1)
 {
 	int rows, cols, offs, use_custom = 0;
 
@@ -821,7 +819,7 @@ static int deco16_pf_update(
 	return use_custom;
 }
 
-void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *rowscroll_2_ptr )
+void deco16ic_device::pf_update( const uint16_t *rowscroll_1_ptr, const uint16_t *rowscroll_2_ptr )
 {
 	int bank1, bank2;
 
@@ -867,26 +865,26 @@ void deco16ic_device::pf_update( const UINT16 *rowscroll_1_ptr, const UINT16 *ro
 
 void deco16ic_device::print_debug_info(bitmap_ind16 &bitmap)
 {
-	char buf[64*5];
+/*  char buf[64*5];
 
-	if (machine().input().code_pressed(KEYCODE_O))
-		return;
+    if (machine().input().code_pressed(KEYCODE_O))
+        return;
 
-	if (m_pf12_control)
-	{
-		sprintf(buf,"%04X %04X %04X %04X\n", m_pf12_control[0], m_pf12_control[1], m_pf12_control[2], m_pf12_control[3]);
-		sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_pf12_control[4], m_pf12_control[5], m_pf12_control[6], m_pf12_control[7]);
-	}
-	else
-		sprintf(buf, "\n\n");
+    if (m_pf12_control)
+    {
+        sprintf(buf,"%04X %04X %04X %04X\n", m_pf12_control[0], m_pf12_control[1], m_pf12_control[2], m_pf12_control[3]);
+        sprintf(&buf[strlen(buf)],"%04X %04X %04X %04X\n", m_pf12_control[4], m_pf12_control[5], m_pf12_control[6], m_pf12_control[7]);
+    }
+    else
+        sprintf(buf, "\n\n");
 
-	machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);
+    machine().ui().draw_text(&machine().render().ui_container(), buf, 60, 40);*/
 }
 
 /*****************************************************************************************/
 
 template<class _BitmapClass>
-void deco16ic_device::tilemap_1_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void deco16ic_device::tilemap_1_draw_common( screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 {
 	if (m_use_custom_pf1)
 	{
@@ -901,15 +899,15 @@ void deco16ic_device::tilemap_1_draw_common( screen_device &screen, _BitmapClass
 	}
 }
 
-void deco16ic_device::tilemap_1_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void deco16ic_device::tilemap_1_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 { tilemap_1_draw_common(screen, bitmap, cliprect, flags, priority); }
 
-void deco16ic_device::tilemap_1_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void deco16ic_device::tilemap_1_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 { tilemap_1_draw_common(screen, bitmap, cliprect, flags, priority); }
 
 
 template<class _BitmapClass>
-void deco16ic_device::tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, UINT32 priority)
+void deco16ic_device::tilemap_2_draw_common(screen_device &screen, _BitmapClass &bitmap, const rectangle &cliprect, int flags, uint32_t priority)
 {
 	if (m_use_custom_pf2)
 	{
@@ -924,32 +922,22 @@ void deco16ic_device::tilemap_2_draw_common(screen_device &screen, _BitmapClass 
 	}
 }
 
-void deco16ic_device::tilemap_2_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void deco16ic_device::tilemap_2_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 { tilemap_2_draw_common(screen, bitmap, cliprect, flags, priority); }
 
-void deco16ic_device::tilemap_2_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void deco16ic_device::tilemap_2_draw( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 { tilemap_2_draw_common(screen, bitmap, cliprect, flags, priority); }
 
 
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
+void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo)
 {
 	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_pf1_tilemap_16x16, nullptr, m_pf2_tilemap_16x16, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
 }
 
-void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, UINT32 priority, int is_tattoo)
+void deco16ic_device::tilemap_12_combine_draw(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect, int flags, uint32_t priority, int is_tattoo)
 {
 	custom_tilemap_draw(screen, bitmap, cliprect, nullptr, m_pf1_tilemap_16x16, nullptr, m_pf2_tilemap_16x16, m_pf1_rowscroll_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, 0xf, 4, 0xff, flags, priority, is_tattoo);
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void deco16ic_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<deco16ic_device &>(device).m_palette.set_tag(tag);
 }

@@ -38,8 +38,8 @@ public:
 		m_fdc(*this, "mb8877"),
 		m_ram(*this, RAM_TAG),
 		m_ieee(*this, IEEE488_TAG),
-		m_floppy0(*this, "mb8877:0:525ssdd"),
-		m_floppy1(*this, "mb8877:1:525ssdd"),
+		m_floppy0(*this, "mb8877:0"),
+		m_floppy1(*this, "mb8877:1"),
 		m_keyb_row0(*this, "ROW0"),
 		m_keyb_row1(*this, "ROW1"),
 		m_keyb_row2(*this, "ROW2"),
@@ -84,7 +84,7 @@ public:
 	DECLARE_DRIVER_INIT(osborne1);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	required_device<cpu_device>             m_maincpu;
 	required_device<gfxdecode_device>       m_gfxdecode;
@@ -95,8 +95,8 @@ public:
 	required_device<mb8877_t>               m_fdc;
 	required_device<ram_device>             m_ram;
 	required_device<ieee488_device>         m_ieee;
-	required_device<floppy_image_device>    m_floppy0;
-	required_device<floppy_image_device>    m_floppy1;
+	required_device<floppy_connector>       m_floppy0;
+	required_device<floppy_connector>       m_floppy1;
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -104,8 +104,8 @@ protected:
 
 	TILE_GET_INFO_MEMBER(get_tile_info);
 
-	bool set_rom_mode(UINT8 value);
-	bool set_bit_9(UINT8 value);
+	bool set_rom_mode(uint8_t value);
+	bool set_bit_9(uint8_t value);
 	void update_irq();
 	void update_acia_rxc_txc();
 
@@ -130,33 +130,33 @@ protected:
 	required_memory_bank    m_bank_fxxx;
 
 	// configuration (reloaded on reset)
-	UINT8           m_screen_pac;
-	UINT8           m_acia_rxc_txc_div;
-	UINT8           m_acia_rxc_txc_p_low;
-	UINT8           m_acia_rxc_txc_p_high;
+	uint8_t           m_screen_pac;
+	uint8_t           m_acia_rxc_txc_div;
+	uint8_t           m_acia_rxc_txc_p_low;
+	uint8_t           m_acia_rxc_txc_p_high;
 
 	// bank switch control bits
-	UINT8           m_ub4a_q;
-	UINT8           m_ub6a_q;
-	UINT8           m_rom_mode;
-	UINT8           m_bit_9;
+	uint8_t           m_ub4a_q;
+	uint8_t           m_ub6a_q;
+	uint8_t           m_rom_mode;
+	uint8_t           m_bit_9;
 
 	// onboard video state
-	UINT8           m_scroll_x;
-	UINT8           m_scroll_y;
-	UINT8           m_beep_state;
+	uint8_t           m_scroll_x;
+	uint8_t           m_scroll_y;
+	uint8_t           m_beep_state;
 	emu_timer       *m_video_timer;
 	bitmap_ind16    m_bitmap;
-	UINT8           *m_p_chargen;
+	uint8_t           *m_p_chargen;
 	tilemap_t       *m_tilemap;
 
 	// SCREEN-PAC registers
-	UINT8           m_resolution;
-	UINT8           m_hc_left;
+	uint8_t           m_resolution;
+	uint8_t           m_hc_left;
 
 	// serial state
-	UINT8           m_acia_irq_state;
-	UINT8           m_acia_rxc_txc_state;
+	uint8_t           m_acia_irq_state;
+	uint8_t           m_acia_rxc_txc_state;
 	emu_timer       *m_acia_rxc_txc_timer;
 };
 

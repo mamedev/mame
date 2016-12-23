@@ -9,20 +9,20 @@
 
 	<element name="ind_left" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
-		<text string="&lt;" align="1" state="0">
+		<text string="&#x25c0;" align="1" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="&lt;" align="1" state="1">
+		<text string="&#x25c0;" align="1" state="1">
 			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
 
 	<element name="ind_right" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
-		<text string="&gt;" align="2" state="0">
+		<text string="&#x25b6;" align="2" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="&gt;" align="2" state="1">
+		<text string="&#x25b6;" align="2" state="1">
 			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
@@ -119,10 +119,10 @@
 
 	<element name="ind_user" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
-		<text string="v" state="0">
+		<text string="&#x25bc;" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="v" state="1">
+		<text string="&#x25bc;" state="1">
 			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
@@ -138,7 +138,7 @@
 
 
 	<view name="Internal Layout">
-		<bounds left="0" top="0" right="189" bottom="33" />
+		<bounds left="0" top="1" right="189" bottom="33" />
 
 		<screen index="0">
 			<bounds x="1" y="11" width="187" height="11" />
@@ -162,11 +162,11 @@
 <!-- draw top row of lcd indicators -->
 
 		<bezel name="lamp10" element="ind_left">
-			<bounds x="1.5" y="1" width="20" height="5" />
+			<bounds x="1.5" y="2" width="20" height="7" />
 		</bezel>
 
 		<bezel name="lamp4" element="ind_right">
-			<bounds x="167.5" y="1" width="20" height="5" />
+			<bounds x="167.5" y="2" width="20" height="7" />
 		</bezel>
 
 		<bezel name="lamp11" element="ind_shift">
@@ -201,22 +201,22 @@
 		</bezel>
 
 		<bezel name="lamp61" element="ind_user">
-			<bounds x="29" y="27" width="20" height="5" />
+			<bounds x="29" y="27" width="20" height="5.5" />
 		</bezel>
 		<bezel name="lamp62" element="ind_user">
-			<bounds x="51" y="27" width="20" height="5" />
+			<bounds x="51" y="27" width="20" height="5.5" />
 		</bezel>
 		<bezel name="lamp63" element="ind_user">
-			<bounds x="73" y="27" width="20" height="5" />
+			<bounds x="73" y="27" width="20" height="5.5" />
 		</bezel>
 		<bezel name="lamp50" element="ind_user">
-			<bounds x="95" y="27" width="20" height="5" />
+			<bounds x="95" y="27" width="20" height="5.5" />
 		</bezel>
 		<bezel name="lamp51" element="ind_user">
-			<bounds x="117" y="27" width="20" height="5" />
+			<bounds x="117" y="27" width="20" height="5.5" />
 		</bezel>
 		<bezel name="lamp52" element="ind_user">
-			<bounds x="139" y="27" width="20" height="5" />
+			<bounds x="139" y="27" width="20" height="5.5" />
 		</bezel>
 
 		<bezel name="lamp53" element="ind_low">

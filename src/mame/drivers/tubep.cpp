@@ -270,7 +270,7 @@ void tubep_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		rjammer_scanline_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tubep_state::device_timer");
+		assert_always(false, "Unknown id in tubep_state::device_timer");
 	}
 }
 
@@ -730,7 +730,7 @@ static INPUT_PORTS_START( tubep )
 	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x20, 0x20, "Serivce mode" ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPNAME( 0x20, 0x20, "Service mode" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )

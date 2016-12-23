@@ -22,12 +22,12 @@
 class lpc210x_device : public arm7_cpu_device
 {
 public:
-	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32);
+	lpc210x_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t);
 
 	// static configuration helpers
 
 	// todo, use an appropriate flash type instead
-	UINT8 m_flash[0x8000];
+	uint8_t m_flash[0x8000];
 
 
 	DECLARE_READ32_MEMBER(arm_E01FC088_r);
@@ -41,10 +41,10 @@ public:
 	DECLARE_READ32_MEMBER(timer1_r) { return read_timer(space, 1, offset, mem_mask); }
 	DECLARE_WRITE32_MEMBER(timer1_w) { write_timer(space, 1, offset, data, mem_mask); }
 
-	void write_timer(address_space &space, int timer, int offset, UINT32 data, UINT32 mem_mask);
-	UINT32 read_timer(address_space &space, int timer, int offset, UINT32 mem_mask);
+	void write_timer(address_space &space, int timer, int offset, uint32_t data, uint32_t mem_mask);
+	uint32_t read_timer(address_space &space, int timer, int offset, uint32_t mem_mask);
 
-	UINT32 m_TxPR[2];
+	uint32_t m_TxPR[2];
 
 	// VIC
 	DECLARE_READ32_MEMBER(vic_r);

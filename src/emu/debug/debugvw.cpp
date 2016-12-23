@@ -18,6 +18,7 @@
 #include "dvbpoints.h"
 #include "dvwpoints.h"
 #include "debugcpu.h"
+#include "debugger.h"
 #include <ctype.h>
 
 
@@ -33,13 +34,8 @@
 debug_view_source::debug_view_source(const char *name, device_t *device)
 	: m_next(nullptr),
 		m_name(name),
-		m_device(device),
-		m_is_octal(false)
+		m_device(device)
 {
-	device_execute_interface *intf;
-	if (device && device->interface(intf))
-		m_is_octal = intf->is_octal();
-
 }
 
 
@@ -236,9 +232,9 @@ void debug_view::set_source(const debug_view_source &source)
 
 const debug_view_source *debug_view::source_for_device(device_t *device) const
 {
-	for (debug_view_source *source = m_source_list.first(); source != nullptr; source = source->next())
-		if (device == source->device())
-			return source;
+	for (debug_view_source &source : m_source_list)
+		if (device == source.device())
+			return &source;
 	return m_source_list.first();
 }
 
@@ -359,12 +355,6 @@ debug_view *debug_view_manager::alloc_view(debug_view_type type, debug_view_osd_
 		case DVT_LOG:
 			return append(global_alloc(debug_view_log(machine(), osdupdate, osdprivate)));
 
-		case DVT_TIMERS:
-//          return append(global_alloc(debug_view_timers(machine(), osdupdate, osdprivate)));
-
-		case DVT_ALLOCS:
-//          return append(global_alloc(debug_view_allocs(machine(), osdupdate, osdprivate)));
-
 		case DVT_BREAK_POINTS:
 			return append(global_alloc(debug_view_breakpoints(machine(), osdupdate, osdprivate)));
 
@@ -457,11 +447,11 @@ debug_view *debug_view_manager::append(debug_view *view)
 //-------------------------------------------------
 
 debug_view_expression::debug_view_expression(running_machine &machine)
-	: m_machine(machine),
-		m_dirty(true),
-		m_result(0),
-		m_parsed(debug_cpu_get_global_symtable(machine)),
-		m_string("0")
+	: m_machine(machine)
+	, m_dirty(true)
+	, m_result(0)
+	, m_parsed(machine.debugger().cpu().get_global_symtable())
+	, m_string("0")
 {
 }
 
@@ -482,7 +472,7 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != nullptr) ? context : debug_cpu_get_global_symtable(machine()));
+	m_parsed.set_symbols((context != nullptr) ? context : m_machine.debugger().cpu().get_global_symtable());
 	m_dirty = true;
 }
 
@@ -516,7 +506,7 @@ bool debug_view_expression::recompute()
 		// recompute the value of the expression
 		try
 		{
-			UINT64 newresult = m_parsed.execute();
+			u64 newresult = m_parsed.execute();
 			if (newresult != m_result)
 			{
 				m_result = newresult;

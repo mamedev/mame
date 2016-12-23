@@ -15,11 +15,11 @@
 @implementation MAMEPointsViewer
 
 - (id)initWithMachine:(running_machine &)m console:(MAMEDebugConsole *)c {
-	MAMEDebugView	*breakView, *watchView;
-	NSScrollView	*breakScroll, *watchScroll;
-	NSTabViewItem	*breakTab, *watchTab;
-	NSPopUpButton	*actionButton, *subviewButton;
-	NSRect			subviewFrame;
+	MAMEDebugView   *breakView, *watchView;
+	NSScrollView    *breakScroll, *watchScroll;
+	NSTabViewItem   *breakTab, *watchTab;
+	NSPopUpButton   *actionButton, *subviewButton;
+	NSRect          subviewFrame;
 
 	if (!(self = [super initWithMachine:m title:@"(Break|Watch)points" console:c]))
 		return nil;
@@ -119,8 +119,8 @@
 												hasHorizontalScroller:YES
 												  hasVerticalScroller:YES
 														   borderType:[watchScroll borderType]];
-	NSSize const desired = NSMakeSize(MAX(breakDesired.width, watchDesired.width),
-									  MAX(breakDesired.height, watchDesired.height));
+	NSSize const desired = NSMakeSize(std::max(breakDesired.width, watchDesired.width),
+									  std::max(breakDesired.height, watchDesired.height));
 	[self cascadeWindowWithDesiredSize:desired forView:tabs];
 
 	// don't forget the result

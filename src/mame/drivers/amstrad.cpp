@@ -235,7 +235,7 @@ static INPUT_PORTS_START( amstrad_keyboard )
 	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Q)          PORT_CHAR('q') PORT_CHAR('Q')
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Tab")                   PORT_CODE(KEYCODE_TAB)        PORT_CHAR(9)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_A)          PORT_CHAR('a') PORT_CHAR('A')
-	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) PORT_TOGGLE
+	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("Caps Lock")             PORT_CODE(KEYCODE_CAPSLOCK)   PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK)) // No physical toggle
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)                                    PORT_CODE(KEYCODE_Z)          PORT_CHAR('z') PORT_CHAR('Z')
 
 	PORT_START("kbrow.9")
@@ -266,11 +266,11 @@ INPUT_CHANGED_MEMBER(amstrad_state::cpc_monitor_changed)
 {
 	if ( (m_io_green_display->read()) & 0x01 )
 	{
-		PALETTE_INIT_NAME( amstrad_cpc_green )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc_green )(*m_palette);
 	}
 	else
 	{
-		PALETTE_INIT_NAME( amstrad_cpc )(m_palette);
+		PALETTE_INIT_NAME( amstrad_cpc )(*m_palette);
 	}
 }
 
@@ -626,7 +626,9 @@ static INPUT_PORTS_START( gx4000 )
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.3")
-	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x07, IP_ACTIVE_LOW, IPT_UNUSED)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME(DEF_STR(Pause)) PORT_CODE(KEYCODE_1)
+	PORT_BIT(0xf0, IP_ACTIVE_LOW, IPT_UNUSED)
 
 	PORT_START("kbrow.4")
 	PORT_BIT(0xff, IP_ACTIVE_LOW, IPT_UNUSED)
@@ -726,7 +728,7 @@ static INPUT_PORTS_START( aleste )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("F5  F10")   PORT_CODE(KEYCODE_F5)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("HELP")      PORT_CODE(KEYCODE_PGDN)
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("INS")       PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("Funny looking Russian symbol")     PORT_CODE(KEYCODE_END)
+	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD)  PORT_NAME("\xD0\xAA  _") PORT_CODE(KEYCODE_HOME)
 
 	PORT_INCLUDE(crtc_links)
 	PORT_INCLUDE(amx_mouse)
@@ -1283,14 +1285,14 @@ ROM_END
  *
  *************************************/
 
-/*    YEAR  NAME      PARENT    COMPAT  MACHINE        INPUT     INIT     COMPANY                FULLNAME                                     FLAGS */
-COMP( 1984, cpc464,   0,        0,      cpc464,        cpc464, driver_device,   0,       "Amstrad plc",         "Amstrad CPC464",                            0 )
-COMP( 1985, cpc664,   cpc464,   0,      cpc664,       cpc664, driver_device,   0,       "Amstrad plc",         "Amstrad CPC664",                            0 )
-COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,       cpc6128, driver_device,  0,       "Amstrad plc",         "Amstrad CPC6128",                           0 )
-COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,       cpc6128f, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
-COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,       cpc6128s, driver_device, 0,       "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",            0 )
-COMP( 1990, cpc464p,  0,        0,      cpcplus,       plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC464+",                           0 )
-COMP( 1990, cpc6128p, 0,        0,      cpcplus,       plus, driver_device,     0,       "Amstrad plc",         "Amstrad CPC6128+",                          0 )
-CONS( 1990, gx4000,   0,        0,      gx4000,        gx4000, driver_device,   0,       "Amstrad plc",         "Amstrad GX4000",                            0 )
-COMP( 1989, kccomp,   cpc464,   0,      kccomp,        kccomp, driver_device,   0,       "VEB Mikroelektronik", "KC Compact",                                0 )
-COMP( 1993, al520ex,  cpc464,   0,      aleste,        aleste, driver_device,   0,       "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )
+/*    YEAR  NAME      PARENT    COMPAT  MACHINE   INPUT     INIT               COMPANY                FULLNAME                                     FLAGS */
+COMP( 1984, cpc464,   0,        0,      cpc464,   cpc464,   driver_device, 0,  "Amstrad plc",         "Amstrad CPC464",                            0 )
+COMP( 1985, cpc664,   cpc464,   0,      cpc664,   cpc664,   driver_device, 0,  "Amstrad plc",         "Amstrad CPC664",                            0 )
+COMP( 1985, cpc6128,  cpc464,   0,      cpc6128,  cpc6128,  driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128",                           0 )
+COMP( 1985, cpc6128f, cpc464,   0,      cpc6128,  cpc6128f, driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128 (France, AZERTY Keyboard)", 0 )
+COMP( 1985, cpc6128s, cpc464,   0,      cpc6128,  cpc6128s, driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128 (Sweden/Finland)",          0 )
+COMP( 1990, cpc464p,  0,        0,      cpcplus,  plus,     driver_device, 0,  "Amstrad plc",         "Amstrad CPC464+",                           0 )
+COMP( 1990, cpc6128p, 0,        0,      cpcplus,  plus,     driver_device, 0,  "Amstrad plc",         "Amstrad CPC6128+",                          0 )
+CONS( 1990, gx4000,   0,        0,      gx4000,   gx4000,   driver_device, 0,  "Amstrad plc",         "Amstrad GX4000",                            0 )
+COMP( 1989, kccomp,   cpc464,   0,      kccomp,   kccomp,   driver_device, 0,  "VEB Mikroelektronik", "KC Compact",                                0 )
+COMP( 1993, al520ex,  cpc464,   0,      aleste,   aleste,   driver_device, 0,  "Patisonic",           "Aleste 520EX",                              MACHINE_IMPERFECT_SOUND )

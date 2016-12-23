@@ -12,8 +12,6 @@
 #include <bx/debug.h>
 #include <bx/fpumath.h>
 
-static float s_texelHalf = 0.0f;
-static bool s_originBottomLeft = false;
 static uint32_t s_terrainSize = 256;
 
 struct PosTexCoord0Vertex
@@ -58,7 +56,7 @@ struct BrushData
 	float   m_power;
 };
 
-class Terrain : public entry::AppI
+class ExampleTerrain : public entry::AppI
 {
 	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
@@ -69,7 +67,7 @@ class Terrain : public entry::AppI
 		m_debug  = BGFX_DEBUG_TEXT;
 		m_reset  = BGFX_RESET_VSYNC;
 
-		bgfx::init(bgfx::RendererType::Direct3D11, args.m_pciId);
+		bgfx::init(args.m_type, args.m_pciId);
 		bgfx::reset(m_width, m_height, m_reset);
 
 		// Enable m_debug text.
@@ -94,9 +92,6 @@ class Terrain : public entry::AppI
 		imguiCreate();
 
 		m_timeOffset = bx::getHPCounter();
-		const bgfx::RendererType::Enum renderer = bgfx::getRendererType();
-		s_texelHalf = bgfx::RendererType::Direct3D9 == renderer ? 0.5f : 0.0f;
-		s_originBottomLeft = bgfx::RendererType::OpenGL == renderer || bgfx::RendererType::OpenGLES == renderer;
 
 		m_vbh.idx = bgfx::invalidHandle;
 		m_ibh.idx = bgfx::invalidHandle;
@@ -169,9 +164,14 @@ class Terrain : public entry::AppI
 		bgfx::destroyProgram(m_terrainProgram);
 		bgfx::destroyProgram(m_terrainHeightTextureProgram);
 
-		BX_FREE(entry::getAllocator(), m_terrain.m_vertices);
-		BX_FREE(entry::getAllocator(), m_terrain.m_indices);
-		BX_FREE(entry::getAllocator(), m_terrain.m_heightMap);
+		/// When data is passed to bgfx via makeRef we need to make
+		/// sure library is done with it before freeing memory blocks.
+		bgfx::frame();
+
+		bx::AllocatorI* allocator = entry::getAllocator();
+		BX_FREE(allocator, m_terrain.m_vertices);
+		BX_FREE(allocator, m_terrain.m_indices);
+		BX_FREE(allocator, m_terrain.m_heightMap);
 
 		// Shutdown bgfx.
 		bgfx::shutdown();
@@ -274,11 +274,11 @@ class Terrain : public entry::AppI
 
 			if (!bgfx::isValid(m_heightTexture) )
 			{
-				m_heightTexture = bgfx::createTexture2D(s_terrainSize, s_terrainSize, 1, bgfx::TextureFormat::R8);
+				m_heightTexture = bgfx::createTexture2D(s_terrainSize, s_terrainSize, false, 1, bgfx::TextureFormat::R8);
 			}
 
 			mem = bgfx::makeRef(&m_terrain.m_heightMap[0], sizeof(uint8_t) * s_terrainSize * s_terrainSize);
-			bgfx::updateTexture2D(m_heightTexture, 0, 0, 0, s_terrainSize, s_terrainSize, mem);
+			bgfx::updateTexture2D(m_heightTexture, 0, 0, 0, 0, s_terrainSize, s_terrainSize, mem);
 			break;
 		}
 	}
@@ -313,11 +313,11 @@ class Terrain : public entry::AppI
 
 				// Raise/Lower and scale by brush power.
 				height += (bx::fclamp(brushAttn * m_brush.m_power, 0.0, m_brush.m_power) * m_brush.m_raise)
-					?  1.0
-					: -1.0
+					?  1.0f
+					: -1.0f
 					;
 
-				m_terrain.m_heightMap[heightMapPos] = (uint8_t)bx::fclamp(height, 0.0, 255.0);
+				m_terrain.m_heightMap[heightMapPos] = (uint8_t)bx::fclamp(height, 0.0f, 255.0f);
 				m_terrain.m_dirty = true;
 			}
 		}
@@ -328,8 +328,8 @@ class Terrain : public entry::AppI
 		float ray_clip[4];
 		ray_clip[0] = ( (2.0f * m_mouseState.m_mx) / m_width - 1.0f) * -1.0f;
 		ray_clip[1] = ( (1.0f - (2.0f * m_mouseState.m_my) / m_height) ) * -1.0f;
-		ray_clip[2] = -1.0;
-		ray_clip[3] = 1.0;
+		ray_clip[2] = -1.0f;
+		ray_clip[3] =  1.0f;
 
 		float invProjMtx[16];
 		bx::mtxInverse(invProjMtx, m_projMtx);
@@ -436,13 +436,15 @@ class Terrain : public entry::AppI
 			imguiEndScrollArea();
 			imguiEndFrame();
 
-			// Update camera.
-			cameraUpdate(deltaTime, m_mouseState);
-
-			bool leftMouseButtonDown = !!m_mouseState.m_buttons[entry::MouseButton::Left];
-			if (leftMouseButtonDown)
+			if (!imguiMouseOverArea() )
 			{
-				mousePickTerrain();
+				// Update camera.
+				cameraUpdate(deltaTime, m_mouseState);
+
+				if (!!m_mouseState.m_buttons[entry::MouseButton::Left])
+				{
+					mousePickTerrain();
+				}
 			}
 
 			// Update terrain.
@@ -456,7 +458,7 @@ class Terrain : public entry::AppI
 			bgfx::setViewRect(0, 0, 0, m_width, m_height);
 
 			cameraGetViewMtx(m_viewMtx);
-			bx::mtxProj(m_projMtx, 60.0f, float(m_width) / float(m_height), 0.1f, 2000.0f, s_originBottomLeft);
+			bx::mtxProj(m_projMtx, 60.0f, float(m_width) / float(m_height), 0.1f, 2000.0f);
 
 			bgfx::setViewTransform(0, m_viewMtx, m_projMtx);
 			bgfx::setTransform(m_terrain.m_transform);
@@ -524,4 +526,4 @@ class Terrain : public entry::AppI
 	int64_t m_timeOffset;
 };
 
-ENTRY_IMPLEMENT_MAIN(Terrain);
+ENTRY_IMPLEMENT_MAIN(ExampleTerrain);

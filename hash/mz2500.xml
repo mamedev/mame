@@ -771,6 +771,34 @@
 		</part>
 	</software>
 
+
+<!-- This fails to be recognized by floppy loading code? it shall be 2DD plain disk -->
+	<software name="scobol" supported="no">
+		<description>Sharp COBOL</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="sharpcobol.hdm" size="655360" crc="898021bb" sha1="c30c5cb99acf6aadba2b7b431935d8446916c673" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- This fails to be recognized by floppy loading code? it shall be 2DD plain disk -->
+	<software name="scpmwm" supported="no">
+		<description>Personal CP/M + Wordmaster</description>
+		<year>198?</year>
+		<publisher>Sharp</publisher>
+
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="655360">
+				<rom name="sharpcpm.hdm" size="655360" crc="9b3f1d46" sha1="7b901031873437a8824e15ac2577f175b8bffdd4" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 <!-- Misc. dumps (non master disks) -->
 
 	<software name="unk1">

@@ -41,7 +41,7 @@ void xexex_state::video_start()
 	m_k056832->set_layer_offs(3,  6, 16);
 }
 
-UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static const int K053251_CI[4] = { K053251_CI1, K053251_CI2, K053251_CI3, K053251_CI4 };
 	int layer[4];
@@ -72,7 +72,7 @@ UINT32 xexex_state::screen_update_xexex(screen_device &screen, bitmap_rgb32 &bit
 
 	konami_sortlayers4(layer, m_layerpri);
 
-	m_k054338->update_all_shadows(0, m_palette);
+	m_k054338->update_all_shadows(0, *m_palette);
 	m_k054338->fill_solid_bg(bitmap, cliprect);
 
 	screen.priority().fill(0, cliprect);

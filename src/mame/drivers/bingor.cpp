@@ -454,9 +454,9 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_palette(*this, "palette")  { }
 
-	required_shared_ptr<UINT16> m_blit_ram;
+	required_shared_ptr<uint16_t> m_blit_ram;
 	virtual void video_start() override;
-	UINT32 screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_irq);
 	INTERRUPT_GEN_MEMBER(unk_irq);
 	required_device<cpu_device> m_maincpu;
@@ -468,7 +468,7 @@ void bingor_state::video_start()
 {
 }
 
-UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y,count;
 
@@ -480,7 +480,7 @@ UINT32 bingor_state::screen_update_bingor(screen_device &screen, bitmap_rgb32 &b
 	{
 		for(x=0;x<286;x+=4)
 		{
-			UINT32 color;
+			uint32_t color;
 
 			color = (m_blit_ram[count] & 0xf000)>>12;
 

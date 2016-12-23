@@ -24,6 +24,7 @@
 #define __RP5C15__
 
 #include "emu.h"
+#include "dirtc.h"
 
 
 
@@ -48,7 +49,7 @@ class rp5c15_device :   public device_t,
 {
 public:
 	// construction/destruction
-	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	rp5c15_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_out_alarm_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_alarm_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_clkout_callback(device_t &device, _Object object) { return downcast<rp5c15_device &>(device).m_out_clkout_cb.set_callback(object); }
@@ -59,11 +60,10 @@ public:
 protected:
 	// device-level overrides
 	virtual void device_start() override;
-	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device_rtc_interface overrides
-	virtual bool rtc_feature_leap_year() override { return true; }
+	virtual bool rtc_feature_leap_year() const override { return true; }
 	virtual void rtc_clock_updated(int year, int month, int day, int day_of_week, int hour, int minute, int second) override;
 
 private:
@@ -79,11 +79,11 @@ private:
 	devcb_write_line        m_out_alarm_cb;
 	devcb_write_line        m_out_clkout_cb;
 
-	UINT8 m_reg[2][13];         // clock registers
-	UINT8 m_ram[13];            // RAM
+	uint8_t m_reg[2][13];         // clock registers
+	uint8_t m_ram[13];            // RAM
 
-	UINT8 m_mode;               // mode register
-	UINT8 m_reset;              // reset register
+	uint8_t m_mode;               // mode register
+	uint8_t m_reset;              // reset register
 	int m_alarm;                // alarm output
 	int m_alarm_on;             // alarm condition
 	int m_1hz;                  // 1 Hz condition

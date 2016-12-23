@@ -16,30 +16,36 @@
 #include "winutil.h"
 
 
-// edit box styles
-#define EDIT_BOX_STYLE      WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL
-#define EDIT_BOX_STYLE_EX   0
+namespace {
+
+constexpr DWORD EDIT_BOX_STYLE      = WS_CHILD | WS_VISIBLE | ES_AUTOHSCROLL;
+constexpr DWORD EDIT_BOX_STYLE_EX   = 0;
+
+constexpr int   MAX_EDIT_STRING     = 256;
+constexpr int   HISTORY_LENGTH      = 20;
+
+} // anonymous namespace
 
 
 editwin_info::editwin_info(debugger_windows_interface &debugger, bool is_main_console, LPCSTR title, WNDPROC handler) :
 	debugwin_info(debugger, is_main_console, title, handler),
-	m_editwnd(NULL),
+	m_editwnd(nullptr),
 	m_edit_defstr(),
-	m_original_editproc(NULL),
-	m_history_count(0),
+	m_original_editproc(nullptr),
+	m_history(),
 	m_last_history(0)
 {
-	if (window() == NULL)
+	if (window() == nullptr)
 		return;
 
 	// create an edit box and override its key handling
-	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), NULL, EDIT_BOX_STYLE,
-			0, 0, 100, 100, window(), NULL, GetModuleHandleUni(), NULL);
-	m_original_editproc = (WNDPROC)(FPTR)GetWindowLongPtr(m_editwnd, GWLP_WNDPROC);
-	SetWindowLongPtr(m_editwnd, GWLP_USERDATA, (LONG_PTR)this);
-	SetWindowLongPtr(m_editwnd, GWLP_WNDPROC, (LONG_PTR)&editwin_info::static_edit_proc);
-	SendMessage(m_editwnd, WM_SETFONT, (WPARAM)metrics().debug_font(), (LPARAM)FALSE);
-	SendMessage(m_editwnd, EM_LIMITTEXT, (WPARAM)MAX_EDIT_STRING, (LPARAM)0);
+	m_editwnd = CreateWindowEx(EDIT_BOX_STYLE_EX, TEXT("EDIT"), nullptr, EDIT_BOX_STYLE,
+			0, 0, 100, 100, window(), nullptr, GetModuleHandleUni(), nullptr);
+	m_original_editproc = WNDPROC(uintptr_t(GetWindowLongPtr(m_editwnd, GWLP_WNDPROC)));
+	SetWindowLongPtr(m_editwnd, GWLP_USERDATA, LONG_PTR(this));
+	SetWindowLongPtr(m_editwnd, GWLP_WNDPROC, LONG_PTR(&editwin_info::static_edit_proc));
+	SendMessage(m_editwnd, WM_SETFONT, WPARAM(metrics().debug_font()), LPARAM(FALSE));
+	SendMessage(m_editwnd, EM_LIMITTEXT, WPARAM(MAX_EDIT_STRING), LPARAM(0));
 	set_editwnd_text("");
 }
 
@@ -79,18 +85,14 @@ void editwin_info::set_editwnd_bounds(RECT const &bounds)
 
 void editwin_info::set_editwnd_text(char const *text)
 {
-	TCHAR *tc_buffer = tstring_from_utf8(text);
-	if (tc_buffer != NULL)
-	{
-		SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)tc_buffer);
-		osd_free(tc_buffer);
-	}
+	auto tc_buffer = osd::text::to_tstring(text);
+	SendMessage(m_editwnd, WM_SETTEXT, WPARAM(0), LPARAM(tc_buffer.c_str()));
 }
 
 
 void editwin_info::editwnd_select_all()
 {
-	SendMessage(m_editwnd, EM_SETSEL, (WPARAM)0, (LPARAM)-1);
+	SendMessage(m_editwnd, EM_SETSEL, WPARAM(0), LPARAM(-1));
 }
 
 
@@ -104,8 +106,6 @@ void editwin_info::draw_contents(HDC dc)
 
 LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 {
-	TCHAR buffer[MAX_EDIT_STRING];
-
 	// handle a few messages
 	switch (message)
 	{
@@ -118,40 +118,45 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		switch (wparam)
 		{
 		case VK_UP:
-			if (m_last_history < (m_history_count - 1))
+			if (!m_history.empty())
+			{
 				m_last_history++;
-			else
-				m_last_history = 0;
-			SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)&m_history[m_last_history][0]);
-			SendMessage(m_editwnd, EM_SETSEL, (WPARAM)MAX_EDIT_STRING, (LPARAM)MAX_EDIT_STRING);
+				if (m_last_history >= m_history.size())
+					m_last_history = 0;
+				auto const &entry(m_history[m_last_history]);
+				SendMessage(m_editwnd, WM_SETTEXT, WPARAM(0), LPARAM(entry.c_str()));
+				SendMessage(m_editwnd, EM_SETSEL, WPARAM(entry.length()), LPARAM(entry.length()));
+			}
 			break;
 
 		case VK_DOWN:
-			if (m_last_history > 0)
-				m_last_history--;
-			else if (m_history_count > 0)
-				m_last_history = m_history_count - 1;
-			else
-				m_last_history = 0;
-			SendMessage(m_editwnd, WM_SETTEXT, (WPARAM)0, (LPARAM)&m_history[m_last_history][0]);
-			SendMessage(m_editwnd, EM_SETSEL, (WPARAM)MAX_EDIT_STRING, (LPARAM)MAX_EDIT_STRING);
+			if (!m_history.empty())
+			{
+				if (m_last_history > 0)
+					m_last_history--;
+				else
+					m_last_history = m_history.size() - 1;
+				auto const &entry(m_history[m_last_history]);
+				SendMessage(m_editwnd, WM_SETTEXT, WPARAM(0), LPARAM(entry.c_str()));
+				SendMessage(m_editwnd, EM_SETSEL, WPARAM(entry.length()), LPARAM(entry.length()));
+			}
 			break;
 
 		case VK_PRIOR:
-			if (m_views[0] != NULL)
+			if (m_views[0] != nullptr)
 				m_views[0]->send_pageup();
 			break;
 
 		case VK_NEXT:
-			if (m_views[0] != NULL)
+			if (m_views[0] != nullptr)
 				m_views[0]->send_pagedown();
 			break;
 
 		case VK_TAB:
 			if (GetAsyncKeyState(VK_SHIFT) & 0x8000)
-				prev_view(NULL);
+				prev_view(nullptr);
 			else
-				next_view(NULL);
+				next_view(nullptr);
 			set_ignore_char_lparam(lparam);
 			break;
 
@@ -172,37 +177,36 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 		{
 			if (waiting_for_debugger() || !seq_pressed())
 			{
+				TCHAR buffer[MAX_EDIT_STRING];
+
 				switch (wparam)
 				{
-				case 13:
+				case 13: // carriage return
 					{
 						// fetch the text
-						SendMessage(m_editwnd, WM_GETTEXT, (WPARAM)ARRAY_LENGTH(buffer), (LPARAM)buffer);
+						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(ARRAY_LENGTH(buffer)), LPARAM(buffer));
 
 						// add to the history if it's not a repeat of the last one
-						if (buffer[0] != 0 && _tcscmp(buffer, &m_history[0][0]))
+						if (buffer[0] && (m_history.empty() || _tcscmp(buffer, m_history[0].c_str())))
 						{
-							memmove(&m_history[1][0], &m_history[0][0], (HISTORY_LENGTH - 1) * MAX_EDIT_STRING * sizeof(TCHAR));
-							_tcscpy(&m_history[0][0], buffer);
-							if (m_history_count < HISTORY_LENGTH)
-								m_history_count++;
+							while (m_history.size() >= HISTORY_LENGTH)
+								m_history.pop_back();
+							m_history.emplace_front(buffer);
 						}
-						m_last_history = m_history_count - 1;
+						m_last_history = m_history.size() - 1;
 
 						// process
-						char *utf8_buffer = utf8_from_tstring(buffer);
-						if (utf8_buffer != NULL)
 						{
-							process_string(utf8_buffer);
-							osd_free(utf8_buffer);
+							auto utf8_buffer = osd::text::from_tstring(buffer);
+							process_string(utf8_buffer.c_str());
 						}
-						break;
 					}
+					break;
 
-				case 27:
+				case 27: // escape
 					{
 						// fetch the text
-						SendMessage(m_editwnd, WM_GETTEXT, (WPARAM)sizeof(buffer), (LPARAM)buffer);
+						SendMessage(m_editwnd, WM_GETTEXT, WPARAM(sizeof(buffer)), LPARAM(buffer));
 
 						// if it's not empty, clear the text
 						if (_tcslen(buffer) > 0)
@@ -211,8 +215,8 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 							set_editwnd_text(m_edit_defstr.c_str());
 							editwnd_select_all();
 						}
-						break;
 					}
+					break;
 
 				default:
 					return CallWindowProc(m_original_editproc, m_editwnd, message, wparam, lparam);
@@ -232,7 +236,7 @@ LRESULT editwin_info::edit_proc(UINT message, WPARAM wparam, LPARAM lparam)
 
 LRESULT CALLBACK editwin_info::static_edit_proc(HWND wnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
-	editwin_info *const info = (editwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	editwin_info *const info = (editwin_info *)uintptr_t(GetWindowLongPtr(wnd, GWLP_USERDATA));
 	assert(info->m_editwnd == wnd);
 	return info->edit_proc(message, wparam, lparam);
 }

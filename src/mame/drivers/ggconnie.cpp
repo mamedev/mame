@@ -58,7 +58,7 @@ WRITE8_MEMBER(ggconnie_state::output_w)
 /* TODO: banking not understood (is the ROM dumped correctly btw?) */
 WRITE8_MEMBER(ggconnie_state::oki_bank_w)
 {
-	m_oki->set_bank_base((data) ? 0x40000 : 0x00000);
+	m_oki->set_rom_bank(data != 0);
 }
 
 
@@ -194,10 +194,10 @@ static MACHINE_CONFIG_START( ggconnie, ggconnie_state )
 	MCFG_HUC6260_HSYNC_CHANGED_CB(DEVWRITELINE("huc6202", huc6202_device, hsync_changed))
 	MCFG_DEVICE_ADD( "huc6270_0", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6270_1", HUC6270, 0 )
 	MCFG_HUC6270_VRAM_SIZE(0x10000)
-	MCFG_HUC6270_IRQ_CHANGED_CB(WRITELINE(pce_common_state, pce_irq_changed))
+	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 	MCFG_DEVICE_ADD( "huc6202", HUC6202, 0 )
 	MCFG_HUC6202_NEXT_PIXEL_0_CB(DEVREAD16("huc6270_0", huc6270_device, next_pixel))
 	MCFG_HUC6202_TIME_TIL_NEXT_EVENT_0_CB(DEVREAD16("huc6270_0", huc6270_device, time_until_next_event))

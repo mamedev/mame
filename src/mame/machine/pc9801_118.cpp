@@ -104,7 +104,7 @@ ROM_START( pc9801_118 )
 	ROM_REGION( 0x100000, "opn3", ROMREGION_ERASE00 )
 ROM_END
 
-const rom_entry *pc9801_118_device::device_rom_region() const
+const tiny_rom_entry *pc9801_118_device::device_rom_region() const
 {
 	return ROM_NAME( pc9801_118 );
 }
@@ -117,9 +117,9 @@ const rom_entry *pc9801_118_device::device_rom_region() const
 //  pc9801_118_device - constructor
 //-------------------------------------------------
 
-pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pc9801_118_device::pc9801_118_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PC9801_118, "pc9801_118", tag, owner, clock, "pc9801_118", __FILE__),
-//      m_maincpu(*owner, "maincpu"),
+//      m_maincpu(*this, "^maincpu"),
 		m_opn3(*this, "opn3")
 {
 }
@@ -138,19 +138,19 @@ void pc9801_118_device::device_validity_check(validity_checker &valid) const
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void pc9801_118_device::install_device(offs_t start, offs_t end, offs_t mask, offs_t mirror, read8_delegate rhandler, write8_delegate whandler)
+void pc9801_118_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler)
 {
 	int buswidth = machine().firstcpu->space_config(AS_IO)->m_databus_width;
 	switch(buswidth)
 	{
 		case 8:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0);
 			break;
 		case 16:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffff);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffff);
 			break;
 		case 32:
-			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, mask, mirror, rhandler, whandler, 0xffffffff);
+			machine().firstcpu->space(AS_IO).install_readwrite_handler(start, end, rhandler, whandler, 0xffffffff);
 			break;
 		default:
 			fatalerror("PC-9801-118: Bus width %d not supported\n", buswidth);
@@ -169,9 +169,9 @@ void pc9801_118_device::device_start()
 
 void pc9801_118_device::device_reset()
 {
-	UINT16 port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
-	install_device(port_base + 0x0088, port_base + 0x008f, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
-	install_device(0xa460, 0xa463, 0, 0, read8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_w), this) );
+	uint16_t port_base = (ioport("OPN3_DSW")->read() & 1) << 8;
+	install_device(port_base + 0x0088, port_base + 0x008f, read8_delegate(FUNC(pc9801_118_device::pc9801_118_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_w), this) );
+	install_device(0xa460, 0xa463, read8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_r), this), write8_delegate(FUNC(pc9801_118_device::pc9801_118_ext_w), this) );
 	m_ext_reg = 1; // TODO: enabled or disabled?
 }
 

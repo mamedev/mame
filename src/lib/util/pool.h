@@ -37,7 +37,7 @@
 ***************************************************************************/
 
 /* pool types are UINT32s */
-typedef UINT32 object_type;
+typedef uint32_t object_type;
 
 /* opaque type representing a pool of objects */
 struct object_pool;
@@ -57,7 +57,7 @@ struct object_pool_iterator;
 /* allocate a new object pool */
 object_pool *pool_alloc_lib(void (*fail)(const char *message));
 
-/* register a new object type; returns TRUE if the type already existed and was overridden */
+/* register a new object type; returns true if the type already existed and was overridden */
 void pool_type_register(object_pool *pool, object_type type, const char *friendly, void (*destructor)(void *, size_t));
 
 /* free all allocated objects in a pool */
@@ -77,7 +77,7 @@ void *pool_object_add_file_line(object_pool *pool, object_type type, void *objec
 void *pool_object_remove(object_pool *pool, void *object, int destruct);
 
 /* does an object exist in the pool? */
-int pool_object_exists(object_pool *pool, object_type type, void *object);
+bool pool_object_exists(object_pool *pool, object_type type, void *object);
 
 
 
@@ -87,7 +87,7 @@ int pool_object_exists(object_pool *pool, object_type type, void *object);
 object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type);
 
 /* get the next object in the object pool */
-int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr);
+bool pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr);
 
 /* finish iterating over objects in an object pool */
 void pool_iterate_end(object_pool_iterator *iter);
@@ -110,7 +110,7 @@ char *pool_strdup_file_line(object_pool *pool, const char *str, const char *file
 /* ----- miscellaneous ----- */
 
 /* internal unit tests */
-int test_memory_pools(void);
+bool test_memory_pools(void);
 
 
 #endif /* __POOL_H__ */

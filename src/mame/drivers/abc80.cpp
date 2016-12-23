@@ -96,8 +96,8 @@ Notes:
 
 READ8_MEMBER( abc80_state::read )
 {
-	UINT8 data = 0xff;
-	UINT8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	uint8_t data = 0xff;
+	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
@@ -126,7 +126,7 @@ READ8_MEMBER( abc80_state::read )
 
 WRITE8_MEMBER( abc80_state::write )
 {
-	UINT8 mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
+	uint8_t mmu = m_mmu_rom->base()[0x40 | (offset >> 10)];
 
 	if (!(mmu & MMU_XM))
 	{
@@ -262,7 +262,7 @@ READ8_MEMBER( abc80_state::pio_pa_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	//data |= m_kb->data_r();
 	data |= m_key_data;
@@ -288,7 +288,7 @@ READ8_MEMBER( abc80_state::pio_pb_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// receive data
 	data |= m_rs232->rxd_r();
@@ -386,7 +386,7 @@ WRITE8_MEMBER( abc80_state::kbd_w )
 	m_key_data = data;
 	m_key_strobe = 1;
 
-	UINT8 pio_data = 0x80 | data;
+	uint8_t pio_data = 0x80 | data;
 	m_pio->port_a_write(pio_data);
 
 	timer_set(attotime::from_msec(50), TIMER_ID_FAKE_KEYBOARD_CLEAR);
@@ -490,7 +490,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 	offs_t address = space.read_byte(BOFA + 1) << 8 | space.read_byte(BOFA);
 	if (LOG) logerror("BOFA %04x\n",address);
 
-	dynamic_buffer data;
+	std::vector<uint8_t> data;
 	data.resize(quickload_size);
 	image.fread(&data[0], quickload_size);
 	for (int i = 1; i < quickload_size; i++)
@@ -506,7 +506,7 @@ QUICKLOAD_LOAD_MEMBER( abc80_state, bac )
 	space.write_byte(HEAD + 1, head >> 8);
 	if (LOG) logerror("HEAD %04x\n",address);
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( abc80, abc80_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_11_9808MHz/2/2) // 2.9952 MHz
 	MCFG_CPU_PROGRAM_MAP(abc80_mem)
 	MCFG_CPU_IO_MAP(abc80_io)
-	MCFG_CPU_CONFIG(abc80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(abc80_daisy_chain)
 
 	// video hardware
 	MCFG_FRAGMENT_ADD(abc80_video)

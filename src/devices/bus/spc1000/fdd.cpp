@@ -114,7 +114,7 @@ ROM_END
 //  device_rom_region
 //-------------------------------------------------
 
-const rom_entry *spc1000_fdd_exp_device::device_rom_region() const
+const tiny_rom_entry *spc1000_fdd_exp_device::device_rom_region() const
 {
 	return ROM_NAME( spc1000_fdd );
 }
@@ -134,7 +134,7 @@ const device_type SPC1000_FDD_EXP = &device_creator<spc1000_fdd_exp_device>;
 //  spc1000_fdd_exp_device - constructor
 //-------------------------------------------------
 
-spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+spc1000_fdd_exp_device::spc1000_fdd_exp_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, SPC1000_FDD_EXP, "SPC1000 FDD expansion", tag, owner, clock, "spc1000_fdd_exp", __FILE__),
 		device_spc1000_card_interface(mconfig, *this),
 		m_cpu(*this, "fdccpu"),
@@ -166,7 +166,7 @@ void spc1000_fdd_exp_device::device_reset()
 	m_cpu->set_input_line_vector(0, 0);
 
 	// enable rom (is this really needed? it does not seem necessary for FDD to work)
-	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0, 0x2000, device().machine().root_device().memregion("fdccpu")->base());
+	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x0fff, 0x2000, memregion("fdccpu")->base());
 }
 
 void spc1000_fdd_exp_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -190,7 +190,7 @@ READ8_MEMBER(spc1000_fdd_exp_device::read)
 		return 0xff;
 	else
 	{
-		UINT8 data = 0;
+		uint8_t data = 0;
 		switch (offset)
 		{
 			case 1:

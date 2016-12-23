@@ -70,10 +70,10 @@ public:
 		: hec2hrp_state(mconfig, type, tag),
 			m_videoram(*this, "videoram") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	DECLARE_MACHINE_START(interact);
 	DECLARE_MACHINE_RESET(interact);
-	UINT32 screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -110,9 +110,9 @@ MACHINE_START_MEMBER(interact_state,interact)
 	hector_init();
 }
 
-UINT32 interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t interact_state::screen_update_interact(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	screen.set_visible_area(0, 113, 0, 75);
 	hector_hr(bitmap, videoram,  77, 32);
 	return 0;

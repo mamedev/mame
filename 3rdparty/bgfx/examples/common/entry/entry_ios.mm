@@ -185,7 +185,7 @@ static	void* m_device = NULL;
 		}
 	}
 #endif
-	
+
 	return [CAEAGLLayer class];
 }
 
@@ -197,15 +197,15 @@ static	void* m_device = NULL;
 	{
 		return nil;
 	}
-	
+
 	bgfx::PlatformData pd;
 	pd.ndt          = NULL;
 	pd.nwh          = self.layer;
-	pd.context		= m_device;
+	pd.context      = m_device;
 	pd.backBuffer   = NULL;
 	pd.backBufferDS = NULL;
 	bgfx::setPlatformData(pd);
-	
+
 	return self;
 }
 
@@ -309,10 +309,10 @@ static	void* m_device = NULL;
 
 	[m_window setRootViewController:viewController];
 	[m_window makeKeyAndVisible];
-	
+
 	[m_window makeKeyAndVisible];
 
-	//float scaleFactor = [[UIScreen mainScreen] scale]; // should use this, but ui is too small on ipad retina
+	//float scaleFactor = [[UIScreen mainScreen] scale]; // should use this, but needs to further pass the value to the `nvgBeginFrame()` call's `devicePixelRatio` parameter in `ExampleNanoVG` class' `update()` method so it can actually work properly.
 	float scaleFactor = 1.0f;
 	[m_view setContentScaleFactor: scaleFactor ];
 

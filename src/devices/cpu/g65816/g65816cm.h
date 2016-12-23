@@ -186,7 +186,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define CLK_W_S         2
 #define CLK_W_SIY       5
 
-#define CLK(A)          CLOCKS -= (m_cpu_type == CPU_TYPE_G65816 ? A : A*6)
+#define CLK(A)          CLOCKS -= A
 #define CLK_BUS(A)      CLOCKS -= A
 #define USE_ALL_CLKS()  CLOCKS = 0
 
@@ -231,7 +231,7 @@ static inline int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define CFLAG_SET       0x100
 #define CFLAG_CLEAR     0
 
-/* Codition code tests */
+/* Condition code tests */
 #define COND_CC()       (!(FLAG_C&0x100))   /* Carry Clear */
 #define COND_CS()       (FLAG_C&0x100)      /* Carry Set */
 #define COND_EQ()       (!FLAG_Z)           /* Equal */

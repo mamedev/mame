@@ -181,7 +181,7 @@ inline void i8257_device::dma_write()
 	switch (MODE_TRANSFER_MASK)
 	{
 	case MODE_TRANSFER_VERIFY: {
-		UINT8 v1 = m_in_memr_cb(offset);
+		uint8_t v1 = m_in_memr_cb(offset);
 		if(0 && m_temp != v1)
 			logerror("%s: verify error %02x vs. %02x\n", tag(), m_temp, v1);
 		break;
@@ -257,7 +257,7 @@ inline void i8257_device::advance()
 //  i8257_device - constructor
 //-------------------------------------------------
 
-i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8257_device::i8257_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8257, "Intel 8257", tag, owner, clock, "i8257", __FILE__),
 		device_execute_interface(mconfig, *this),
 		m_icount(0),
@@ -491,7 +491,7 @@ void i8257_device::execute_run()
 
 READ8_MEMBER( i8257_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (!BIT(offset, 3))
 	{

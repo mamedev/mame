@@ -43,6 +43,11 @@ newoption {
 	description = "Enable building tools.",
 }
 
+newoption {
+	trigger = "with-examples",
+	description = "Enable building examples.",
+}
+
 solution "bgfx"
 	configurations {
 		"Debug",
@@ -65,10 +70,15 @@ solution "bgfx"
 	language "C++"
 	startproject "example-00-helloworld"
 
-BGFX_DIR = path.getabsolute("..")
+MODULE_DIR = path.getabsolute("../")
+BGFX_DIR   = path.getabsolute("..")
+BX_DIR     = os.getenv("BX_DIR")
+
 local BGFX_BUILD_DIR = path.join(BGFX_DIR, ".build")
 local BGFX_THIRD_PARTY_DIR = path.join(BGFX_DIR, "3rdparty")
-BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
+if not BX_DIR then
+	BX_DIR = path.getabsolute(path.join(BGFX_DIR, "../bx"))
+end
 
 if not os.isdir(BX_DIR) then
 	print("bx not found at " .. BX_DIR)
@@ -140,20 +150,15 @@ function exampleProject(_name)
 		defines { "ENTRY_CONFIG_USE_SDL=1" }
 		links   { "SDL2" }
 
-		configuration { "x32", "windows" }
-			libdirs { "$(SDL2_DIR)/lib/x86" }
-
-		configuration { "x64", "windows" }
-			libdirs { "$(SDL2_DIR)/lib/x64" }
+		configuration { "osx" }
+			libdirs { "$(SDL2_DIR)/lib" }
 
 		configuration {}
 	end
 
 	if _OPTIONS["with-glfw"] then
 		defines { "ENTRY_CONFIG_USE_GLFW=1" }
-		links   {
-			"glfw3"
-		}
+		links   { "glfw3" }
 
 		configuration { "linux or freebsd" }
 			links {
@@ -174,52 +179,19 @@ function exampleProject(_name)
 	end
 
 	if _OPTIONS["with-ovr"] then
-		links   {
-			"winmm",
-			"ws2_32",
-		}
+		configuration { "x32" }
+			libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Release", _ACTION) }
 
-		-- Check for LibOVR 5.0+
-		if os.isdir(path.join(os.getenv("OVR_DIR"), "LibOVR/Lib/Windows/Win32/Debug/VS2012")) then
+		configuration { "x64" }
+			libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Release", _ACTION) }
 
-			configuration { "x32", "Debug" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Debug", _ACTION) }
-
-			configuration { "x32", "Release" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/Win32/Release", _ACTION) }
-
-			configuration { "x64", "Debug" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Debug", _ACTION) }
-
-			configuration { "x64", "Release" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Windows/x64/Release", _ACTION) }
-
-			configuration { "x32 or x64" }
-				links { "libovr" }
-		else
-			configuration { "x32" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/Win32", _ACTION) }
-
-			configuration { "x64" }
-				libdirs { path.join("$(OVR_DIR)/LibOVR/Lib/x64", _ACTION) }
-
-			configuration { "x32", "Debug" }
-				links { "libovrd" }
-
-			configuration { "x32", "Release" }
-				links { "libovr" }
-
-			configuration { "x64", "Debug" }
-				links { "libovr64d" }
-
-			configuration { "x64", "Release" }
-				links { "libovr64" }
-		end
+		configuration { "x32 or x64" }
+			links { "libovr" }
 
 		configuration {}
 	end
 
-	configuration { "vs*" }
+	configuration { "vs*", "x32 or x64" }
 		linkoptions {
 			"/ignore:4199", -- LNK4199: /DELAYLOAD:*.dll ignored; no imports found from *.dll
 		}
@@ -227,7 +199,7 @@ function exampleProject(_name)
 			"DelayImp",
 		}
 
-	configuration { "vs201*" }
+	configuration { "vs201*", "x32 or x64" }
 		linkoptions { -- this is needed only for testing with GLES2/3 on Windows with VS201x
 			"/DELAYLOAD:\"libEGL.dll\"",
 			"/DELAYLOAD:\"libGLESv2.dll\"",
@@ -235,11 +207,23 @@ function exampleProject(_name)
 
 	configuration { "mingw*" }
 		targetextension ".exe"
-
-	configuration { "vs20* or mingw*" }
 		links {
 			"gdi32",
 			"psapi",
+		}
+
+	configuration { "vs20*", "x32 or x64" }
+		links {
+			"gdi32",
+			"psapi",
+		}
+
+	configuration { "durango" }
+		links {
+			"d3d11_x",
+			"d3d12_x",
+			"combase",
+			"kernelx",
 		}
 
 	configuration { "winphone8* or winstore8*" }
@@ -305,10 +289,18 @@ function exampleProject(_name)
 		kind "ConsoleApp"
 		targetextension ".bc"
 
-	configuration { "linux-* or freebsd" }
+	configuration { "linux-* or freebsd", "not linux-steamlink" }
 		links {
 			"X11",
 			"GL",
+			"pthread",
+		}
+
+	configuration { "linux-steamlink" }
+		links {
+			"EGL",
+			"GLESv2",
+			"SDL2",
 			"pthread",
 		}
 
@@ -368,44 +360,52 @@ end
 
 dofile "bgfx.lua"
 
-group "examples"
-dofile "example-common.lua"
-
 group "libs"
 bgfxProject("", "StaticLib", {})
 
-group "examples"
-exampleProject("00-helloworld")
-exampleProject("01-cubes")
-exampleProject("02-metaballs")
-exampleProject("03-raymarch")
-exampleProject("04-mesh")
-exampleProject("05-instancing")
-exampleProject("06-bump")
-exampleProject("07-callback")
-exampleProject("08-update")
-exampleProject("09-hdr")
-exampleProject("10-font")
-exampleProject("11-fontsdf")
-exampleProject("12-lod")
-exampleProject("13-stencil")
-exampleProject("14-shadowvolumes")
-exampleProject("15-shadowmaps-simple")
-exampleProject("16-shadowmaps")
-exampleProject("17-drawstress")
-exampleProject("18-ibl")
-exampleProject("19-oit")
-exampleProject("20-nanovg")
-exampleProject("21-deferred")
-exampleProject("22-windows")
-exampleProject("23-vectordisplay")
-exampleProject("24-nbody")
-exampleProject("26-occlusion")
-exampleProject("27-terrain")
+if _OPTIONS["with-examples"] or _OPTIONS["with-tools"] then
+	group "examples"
+	dofile "example-common.lua"
+end
 
--- C99 source doesn't compile under WinRT settings
-if not premake.vstudio.iswinrt() then
-	exampleProject("25-c99")
+if _OPTIONS["with-examples"] then
+	group "examples"
+	exampleProject("00-helloworld")
+	exampleProject("01-cubes")
+	exampleProject("02-metaballs")
+	exampleProject("03-raymarch")
+	exampleProject("04-mesh")
+	exampleProject("05-instancing")
+	exampleProject("06-bump")
+	exampleProject("07-callback")
+	exampleProject("08-update")
+	exampleProject("09-hdr")
+	exampleProject("10-font")
+	exampleProject("11-fontsdf")
+	exampleProject("12-lod")
+	exampleProject("13-stencil")
+	exampleProject("14-shadowvolumes")
+	exampleProject("15-shadowmaps-simple")
+	exampleProject("16-shadowmaps")
+	exampleProject("17-drawstress")
+	exampleProject("18-ibl")
+	exampleProject("19-oit")
+	exampleProject("20-nanovg")
+	exampleProject("21-deferred")
+	exampleProject("22-windows")
+	exampleProject("23-vectordisplay")
+	exampleProject("24-nbody")
+	exampleProject("26-occlusion")
+	exampleProject("27-terrain")
+	exampleProject("28-wireframe")
+	exampleProject("29-debugdraw")
+	exampleProject("30-picking")
+	exampleProject("31-rsm")
+
+	-- C99 source doesn't compile under WinRT settings
+	if not premake.vstudio.iswinrt() then
+		exampleProject("25-c99")
+	end
 end
 
 if _OPTIONS["with-shared-lib"] then
@@ -415,8 +415,8 @@ end
 
 if _OPTIONS["with-tools"] then
 	group "tools"
-	dofile "makedisttex.lua"
 	dofile "shaderc.lua"
 	dofile "texturec.lua"
+	dofile "texturev.lua"
 	dofile "geometryc.lua"
 end

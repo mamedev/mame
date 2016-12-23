@@ -246,7 +246,7 @@ xx-xx-2003 Acho A. Tang
 TODO:
 - check dust color on title screen(I don't think it should be black)
 - check brake light(LED) support
-- check occational off-pitch music and samples(sound interrupt related?)
+- check occasional off-pitch music and samples(sound interrupt related?)
 
 * Sprite, road and sky drawings do not support 32-bit color depth.
   Certain sprites with incorrect z-value still pop in front of closer
@@ -265,7 +265,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/m6809/m6809.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "wecleman.lh"
 #include "includes/wecleman.h"
 
@@ -594,11 +594,11 @@ WRITE16_MEMBER(wecleman_state::wecleman_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xFF);
+		m_soundlatch->write(space, 0, data & 0xFF);
 	}
 }
 
-/* Protection - an external multiplyer connected to the sound CPU */
+/* Protection - an external multiplier connected to the sound CPU */
 READ8_MEMBER(wecleman_state::multiply_r)
 {
 	return (m_multiply_reg[0] * m_multiply_reg[1]) & 0xFF;
@@ -643,7 +643,7 @@ static ADDRESS_MAP_START( wecleman_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x9000, 0x9000) AM_READ(multiply_r)    // Protection
 	AM_RANGE(0x9000, 0x9001) AM_WRITE(multiply_w)   // Protection
 	AM_RANGE(0x9006, 0x9006) AM_WRITENOP    // ?
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r) // From main CPU
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write) // K007232 (Reading offset 5/b triggers the sample)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(wecleman_K00723216_bank_w)    // Samples banking
@@ -659,7 +659,7 @@ WRITE16_MEMBER(wecleman_state::hotchase_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xFF);
+		m_soundlatch->write(space, 0, data & 0xFF);
 	}
 }
 
@@ -759,7 +759,7 @@ static ADDRESS_MAP_START( hotchase_sound_map, AS_PROGRAM, 8, wecleman_state )
 	AM_RANGE(0x3000, 0x300d) AM_READWRITE(hotchase_3_k007232_r, hotchase_3_k007232_w)
 	AM_RANGE(0x4000, 0x4007) AM_WRITE(hotchase_sound_control_w) // Sound volume, banking, etc.
 	AM_RANGE(0x5000, 0x5000) AM_WRITENOP   // 0 at start of IRQ service, 1 at end (irq mask?)
-	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_byte_r) // From main CPU (Read on IRQ)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // From main CPU (Read on IRQ)
 	AM_RANGE(0x7000, 0x7000) AM_WRITE(hotchase_sound_hs_w)    // ACK signal to main CPU
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -882,7 +882,7 @@ static INPUT_PORTS_START( hotchase )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 ) PORT_NAME("Left SW")  // left sw
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE4 ) PORT_NAME("Thermo SW")  // thermo
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) // from sound cpu
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, wecleman_state,hotchase_sound_status_r, nullptr)
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")  /* $140015.b */
@@ -969,7 +969,7 @@ static const gfx_layout wecleman_bg_layout =
 	8*8
 };
 
-static const UINT32 wecleman_road_layout_xoffset[64] =
+static const uint32_t wecleman_road_layout_xoffset[64] =
 {
 		0,7,6,5,4,3,2,1,
 		8,15,14,13,12,11,10,9,
@@ -1007,7 +1007,7 @@ GFXDECODE_END
                             Hot Chase Graphics Layout
 ***************************************************************************/
 
-static const UINT32 hotchase_road_layout_xoffset[64] =
+static const uint32_t hotchase_road_layout_xoffset[64] =
 {
 		0*4,0*4,1*4,1*4,2*4,2*4,3*4,3*4,4*4,4*4,5*4,5*4,6*4,6*4,7*4,7*4,
 		8*4,8*4,9*4,9*4,10*4,10*4,11*4,11*4,12*4,12*4,13*4,13*4,14*4,14*4,15*4,15*4,
@@ -1101,6 +1101,8 @@ static MACHINE_CONFIG_START( wecleman, wecleman_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_YM2151_ADD("ymsnd", 3579545)
 	MCFG_SOUND_ROUTE(0, "mono", 0.85)
 	MCFG_SOUND_ROUTE(1, "mono", 0.85)
@@ -1180,6 +1182,8 @@ static MACHINE_CONFIG_START( hotchase, wecleman_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("k007232_1", K007232, 3579545)
 	// SLEV not used, volume control is elsewhere
@@ -1357,22 +1361,22 @@ void wecleman_state::wecleman_unpack_sprites()
 {
 	const char *region       = "gfx1";  // sprites
 
-	const UINT32 len = memregion(region)->bytes();
-	UINT8 *src     = memregion(region)->base() + len / 2 - 1;
-	UINT8 *dst     = memregion(region)->base() + len - 1;
+	const uint32_t len = memregion(region)->bytes();
+	uint8_t *src     = memregion(region)->base() + len / 2 - 1;
+	uint8_t *dst     = memregion(region)->base() + len - 1;
 
 	while(dst > src)
 	{
-		UINT8 data = *src--;
+		uint8_t data = *src--;
 		if( (data&0xf0) == 0xf0 ) data &= 0x0f;
 		if( (data&0x0f) == 0x0f ) data &= 0xf0;
 		*dst-- = data & 0xF;    *dst-- = data >> 4;
 	}
 }
 
-void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
+void wecleman_state::bitswap(uint8_t *src,size_t len,int _14,int _13,int _12,int _11,int _10,int _f,int _e,int _d,int _c,int _b,int _a,int _9,int _8,int _7,int _6,int _5,int _4,int _3,int _2,int _1,int _0)
 {
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 	int i;
 
 	memcpy(&buffer[0],src,len);
@@ -1387,8 +1391,8 @@ void wecleman_state::bitswap(UINT8 *src,size_t len,int _14,int _13,int _12,int _
 DRIVER_INIT_MEMBER(wecleman_state,wecleman)
 {
 	int i, len;
-	UINT8 *RAM;
-//  UINT16 *RAM1 = (UINT16 *) memregion("maincpu")->base();   /* Main CPU patches */
+	uint8_t *RAM;
+//  uint16_t *RAM1 = (uint16_t *) memregion("maincpu")->base();   /* Main CPU patches */
 //  RAM1[0x08c2/2] = 0x601e;    // faster self test
 
 	/* Decode GFX Roms - Compensate for the address lines scrambling */
@@ -1647,20 +1651,20 @@ ROM_END
 
 void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 {
-	UINT8 *base;
+	uint8_t *base;
 	int i;
 
 	base = memregion("gfx1")->base(); // sprites
-	dynamic_buffer temp( bank_size );
+	std::vector<uint8_t> temp( bank_size );
 
 	for( i = num16_banks; i >0; i-- ){
-		UINT8 *finish   = base + 2*bank_size*i;
-		UINT8 *dest     = finish - 2*bank_size;
+		uint8_t *finish   = base + 2*bank_size*i;
+		uint8_t *dest     = finish - 2*bank_size;
 
-		UINT8 *p1 = &temp[0];
-		UINT8 *p2 = &temp[bank_size/2];
+		uint8_t *p1 = &temp[0];
+		uint8_t *p2 = &temp[bank_size/2];
 
-		UINT8 data;
+		uint8_t data;
 
 		memcpy (&temp[0], base+bank_size*(i-1), bank_size);
 
@@ -1694,7 +1698,7 @@ void wecleman_state::hotchase_sprite_decode( int num16_banks, int bank_size )
 /* Unpack sprites data and do some patching */
 DRIVER_INIT_MEMBER(wecleman_state,hotchase)
 {
-//  UINT16 *RAM1 = (UINT16) memregion("maincpu")->base(); /* Main CPU patches */
+//  uint16_t *RAM1 = (uint16_t) memregion("maincpu")->base(); /* Main CPU patches */
 //  RAM[0x1140/2] = 0x0015; RAM[0x195c/2] = 0x601A; // faster self test
 
 	/* Now we can unpack each nibble of the sprites into a pixel (one byte) */

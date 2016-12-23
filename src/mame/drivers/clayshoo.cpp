@@ -19,6 +19,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
 
 
 class clayshoo_state : public driver_device
@@ -30,21 +31,21 @@ public:
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* misc */
 	emu_timer *m_analog_timer_1, *m_analog_timer_2;
-	UINT8 m_input_port_select;
-	UINT8 m_analog_port_val;
+	uint8_t m_input_port_select;
+	uint8_t m_analog_port_val;
 	DECLARE_WRITE8_MEMBER(analog_reset_w);
 	DECLARE_READ8_MEMBER(analog_r);
 	DECLARE_WRITE8_MEMBER(input_port_select_w);
 	DECLARE_READ8_MEMBER(input_port_r);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(reset_analog_bit);
-	UINT8 difficulty_input_port_r( int bit );
+	uint8_t difficulty_input_port_r( int bit );
 	void create_analog_timers(  );
 	required_device<cpu_device> m_maincpu;
 };
@@ -62,12 +63,12 @@ WRITE8_MEMBER(clayshoo_state::input_port_select_w)
 }
 
 
-UINT8 clayshoo_state::difficulty_input_port_r( int bit )
+uint8_t clayshoo_state::difficulty_input_port_r( int bit )
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	/* read fake port and remap the buttons to 2 bits */
-	UINT8   raw = ioport("FAKE")->read();
+	uint8_t   raw = ioport("FAKE")->read();
 
 	if (raw & (1 << (bit + 1)))
 		ret = 0x03;     /* expert */
@@ -82,7 +83,7 @@ UINT8 clayshoo_state::difficulty_input_port_r( int bit )
 
 READ8_MEMBER(clayshoo_state::input_port_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	switch (m_input_port_select)
 	{
@@ -170,20 +171,20 @@ void clayshoo_state::machine_start()
  *
  *************************************/
 
-UINT32 clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t clayshoo_state::screen_update_clayshoo(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
 	for (offs = 0; offs < m_videoram.bytes(); offs++)
 	{
 		int i;
-		UINT8 x = offs << 3;
-		UINT8 y = ~(offs >> 5);
-		UINT8 data = m_videoram[offs];
+		uint8_t x = offs << 3;
+		uint8_t y = ~(offs >> 5);
+		uint8_t data = m_videoram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
-			pen_t pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+			pen_t pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 			bitmap.pix32(y, x) = pen;
 
 			data = data << 1;
@@ -221,7 +222,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_io_map, AS_IO, 8, clayshoo_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x20, 0x23) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0x30, 0x33) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 //  AM_RANGE(0x40, 0x43) AM_NOP // 8253 for sound?
@@ -316,6 +317,7 @@ static MACHINE_CONFIG_START( clayshoo, clayshoo_state )
 	MCFG_CPU_IO_MAP(main_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", clayshoo_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

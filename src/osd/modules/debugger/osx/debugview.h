@@ -21,7 +21,7 @@
 	debug_view      *view;
 	BOOL            wholeLineScroll;
 
-	INT32           totalWidth, totalHeight, originTop;
+	int32_t           totalWidth, totalHeight, originTop;
 
 	NSFont          *font;
 	CGFloat         fontWidth, fontHeight, fontAscent;

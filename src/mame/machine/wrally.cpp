@@ -14,6 +14,12 @@
 #include "includes/gaelcrpt.h"
 #include "includes/wrally.h"
 
+
+void wrally_state::machine_start()
+{
+	membank("okibank")->configure_entries(0, 16, memregion("oki")->base(), 0x10000);
+}
+
 /***************************************************************************
 
     World Rally memory handlers
@@ -35,19 +41,17 @@ WRITE16_MEMBER(wrally_state::flipscreen_w)
 
 WRITE16_MEMBER(wrally_state::okim6295_bankswitch_w)
 {
-	UINT8 *RAM = memregion("oki")->base();
-
 	if (ACCESSING_BITS_0_7){
-		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
+		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
-WRITE16_MEMBER(wrally_state::wrally_coin_counter_w)
+WRITE16_MEMBER(wrally_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }
 
-WRITE16_MEMBER(wrally_state::wrally_coin_lockout_w)
+WRITE16_MEMBER(wrally_state::coin_lockout_w)
 {
 	machine().bookkeeping().coin_lockout_w((offset >> 3) & 0x01, ~data & 0x01);
 }

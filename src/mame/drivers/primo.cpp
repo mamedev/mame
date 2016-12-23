@@ -255,7 +255,7 @@ static MACHINE_CONFIG_START( primoa32, primo_state )
 	MCFG_SCREEN_UPDATE_DRIVER(primo_state, screen_update_primo)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -358,7 +358,7 @@ ROM_END
 
 ROM_START( primob64 )
 	ROM_REGION( 0x14000, "maincpu", ROMREGION_ERASEFF )
-	ROM_SYSTEM_BIOS(0, "standart", "Standart")
+	ROM_SYSTEM_BIOS(0, "standard", "Standard")
 	ROMX_LOAD( "b64.rom",     0x10000, 0x4000, CRC(cea28188) SHA1(a77e42e97402e601b78ab3751eac1e85d0bbb4a0), ROM_BIOS(1) )
 	ROM_SYSTEM_BIOS(1, "cdos", "CDOS")
 	ROMX_LOAD( "b64cdos.rom", 0x10000, 0x4000, CRC(73305e4d) SHA1(c090c3430cdf19eed8363377b981e1c21a4ed169), ROM_BIOS(2) )

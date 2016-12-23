@@ -134,7 +134,7 @@ enum {
 };
 
 /* Pull in the ROM tables */
-#include "tms5110r.inc"
+#include "tms5110r.hxx"
 
 /*
   speed parameter
@@ -159,13 +159,12 @@ static const int vlm5030_speed_table[8] =
 
 const device_type VLM5030 = &device_creator<vlm5030_device>;
 
-vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vlm5030_device::vlm5030_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VLM5030, "VLM5030", tag, owner, clock, "vlm5030", __FILE__),
 		device_sound_interface(mconfig, *this),
+		device_rom_interface(mconfig, *this, 16),
 		m_channel(nullptr),
 		m_coeff(nullptr),
-		m_rom(nullptr),
-		m_address_mask(0),
 		m_address(0),
 		m_pin_BSY(0),
 		m_pin_ST(0),
@@ -215,12 +214,7 @@ void vlm5030_device::device_start()
 	device_reset();
 	m_phase = PH_IDLE;
 
-	m_rom = region()->base();
-	m_address_mask = (region()->bytes() - 1) & 0xffff;
-
 	m_channel = machine().sound().stream_alloc(*this, 0, 1, clock() / 440);
-
-	/* don't restore "UINT8 *m_rom" when use vlm5030_set_rom() */
 
 	save_item(NAME(m_address));
 	save_item(NAME(m_pin_BSY));
@@ -269,13 +263,17 @@ void vlm5030_device::device_reset()
 	setup_parameter( 0x00);
 }
 
+void vlm5030_device::rom_bank_updated()
+{
+	m_channel->update();
+}
+
 int vlm5030_device::get_bits(int sbit,int bits)
 {
 	int offset = m_address + (sbit>>3);
 	int data;
 
-	data = m_rom[offset&m_address_mask] +
-			(((int)m_rom[(offset+1)&m_address_mask])*256);
+	data = read_byte(offset) | (read_byte(offset+1)<<8);
 	data >>= (sbit&7);
 	data &= (0xff>>(8-bits));
 
@@ -295,7 +293,7 @@ int vlm5030_device::parse_frame()
 		m_old_k[i] = m_new_k[i];
 
 	/* command byte check */
-	cmd = m_rom[m_address&m_address_mask];
+	cmd = read_byte(m_address);
 	if( cmd & 0x01 )
 	{   /* extend frame */
 		m_new_energy = m_new_pitch = 0;
@@ -345,7 +343,7 @@ void vlm5030_device::update()
 }
 
 /* setup parameteroption when RST=H */
-void vlm5030_device::setup_parameter(UINT8 param)
+void vlm5030_device::setup_parameter(uint8_t param)
 {
 	/* latch parameter value */
 	m_parameter = param;
@@ -387,12 +385,6 @@ void vlm5030_device::restore_state()
 		m_current_k[i] = m_old_k[i] + (m_target_k[i] - m_old_k[i]) * interp_effect / FR_SIZE;
 }
 
-/* set speech rom address */
-void vlm5030_device::set_rom(void *speech_rom)
-{
-	m_rom = (UINT8 *)speech_rom;
-}
-
 /* get BSY pin level */
 READ_LINE_MEMBER( vlm5030_device::bsy )
 {
@@ -403,7 +395,7 @@ READ_LINE_MEMBER( vlm5030_device::bsy )
 /* latch contoll data */
 WRITE8_MEMBER( vlm5030_device::data_w )
 {
-	m_latch_data = (UINT8)data;
+	m_latch_data = (uint8_t)data;
 }
 
 /* set RST pin level : reset / set table address A8-A15 */
@@ -465,8 +457,7 @@ WRITE_LINE_MEMBER( vlm5030_device::st )
 				else
 				{   /* indirect accedd mode */
 					table = (m_latch_data&0xfe) + (((int)m_latch_data&1)<<8);
-					m_address = (((int)m_rom[table&m_address_mask])<<8)
-									|        m_rom[(table+1)&m_address_mask];
+					m_address = (read_byte(table)<<8) | read_byte(table+1);
 #if 0
 /* show unsupported parameter message */
 if( m_interp_step != 1)
@@ -600,7 +591,7 @@ void vlm5030_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			if (u[0] > 511)
 				buffer[buf_count] = 511<<6;
 			else if (u[0] < -511)
-				buffer[buf_count] = UINT32(-511)<<6;
+				buffer[buf_count] = uint32_t(-511)<<6;
 			else
 				buffer[buf_count] = (u[0] << 6);
 			buf_count++;

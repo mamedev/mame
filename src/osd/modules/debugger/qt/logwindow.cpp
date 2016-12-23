@@ -10,11 +10,11 @@
 
 
 LogWindow::LogWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Machine Log");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -60,13 +60,13 @@ void LogWindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void LogWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void LogWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
 }
 
 
-void LogWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void LogWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
 }

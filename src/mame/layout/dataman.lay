@@ -25,7 +25,6 @@
 	</element>
 
 
-
 <!-- build screen -->
 
 	<view name="Internal Layout">
@@ -72,7 +71,6 @@
 		<bezel name="lamp80" element="lamp_dash"><bounds x="99" y="1" width="4" height="1" /></bezel>
 		<bezel name="lamp83" element="lamp_dash"><bounds x="94" y="13" width="4" height="1" /></bezel>
 		<bezel name="lamp82" element="lamp_dash"><bounds x="99" y="13" width="4" height="1" /></bezel>
-
 
 	</view>
 </mamelayout>

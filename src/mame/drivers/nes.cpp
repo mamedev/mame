@@ -35,25 +35,10 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nes )
 	// input devices go through slot options
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Draw Top/Bottom 8 Lines")
-	PORT_CONFSETTING(    0x01, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-	PORT_CONFNAME( 0x02, 0x00, "Enforce 8 Sprites/line")
-	PORT_CONFSETTING(    0x02, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( famicom )
 	// input devices go through slot options
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x00, "Draw Top/Bottom 8 Lines")
-	PORT_CONFSETTING(    0x01, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-	PORT_CONFNAME( 0x02, 0x00, "Enforce 8 Sprites/line")
-	PORT_CONFSETTING(    0x02, DEF_STR(No) )
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes) )
-
 	PORT_START("FLIPDISK") /* fake key */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Change Disk Side") PORT_CODE(KEYCODE_SPACE)
 INPUT_PORTS_END
@@ -184,7 +169,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 		slot->vram_alloc(0x2000);
 		slot->prgram_alloc(0x8000);
 
-		slot->pcb_start(machine(), m_ciram.get(), FALSE);
+		slot->pcb_start(machine(), m_ciram.get(), false);
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0, 0x1fff, read8_delegate(FUNC(device_nes_cart_interface::chr_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::chr_w),(device_nes_cart_interface *)slot));
 		m_ppu->space(AS_PROGRAM).install_readwrite_handler(0x2000, 0x3eff, read8_delegate(FUNC(device_nes_cart_interface::nt_r),(device_nes_cart_interface *)slot), write8_delegate(FUNC(device_nes_cart_interface::nt_w),(device_nes_cart_interface *)slot));
 		m_ppu->set_scanline_callback(ppu2c0x_scanline_delegate(FUNC(device_nes_cart_interface::scanline_irq),(device_nes_cart_interface *)slot));
@@ -196,7 +181,7 @@ void nes_state::setup_disk(nes_disksys_device *slot)
 
 MACHINE_START_MEMBER( nes_state, fds )
 {
-	m_ciram = std::make_unique<UINT8[]>(0x800);
+	m_ciram = std::make_unique<uint8_t[]>(0x800);
 	m_io_disksel = ioport("FLIPDISK");
 	setup_disk(m_disk);
 
@@ -223,6 +208,10 @@ static MACHINE_CONFIG_DERIVED( fds, famicom )
 
 	MCFG_DEVICE_REMOVE("cart_list")
 	MCFG_DEVICE_REMOVE("cass_list")
+	MCFG_DEVICE_REMOVE("ade_list")
+	MCFG_DEVICE_REMOVE("ntb_list")
+	MCFG_DEVICE_REMOVE("kstudio_list")
+	MCFG_DEVICE_REMOVE("datach_list")
 MACHINE_CONFIG_END
 
 

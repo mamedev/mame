@@ -217,7 +217,7 @@ PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 
 PORT_START("RST")           /* RESET key */
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, NULL)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("LX.384 Reset")  PORT_CODE(KEYCODE_F3) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_reset, nullptr)
 
 /* Settings */
 PORT_START("LX.385")
@@ -238,7 +238,7 @@ PORT_INCLUDE( z80ne )
 
 /* LX.388 Keyboard BREAK key */
 PORT_START("LX388_BRK")
-PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_nmi, NULL)
+PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD ) PORT_NAME("Break") PORT_CODE(KEYCODE_INSERT) PORT_CHAR(UCHAR_MAMEKEY(INSERT)) PORT_CHANGED_MEMBER(DEVICE_SELF, z80ne_state, z80ne_nmi, nullptr)
 
 /* LX.388 Keyboard (Encoded by KR2376) */
 
@@ -378,7 +378,7 @@ INPUT_PORTS_END
  Machine Drivers
 ******************************************************************************/
 #if 0
-static const UINT32 lx388palette[] =
+static const uint32_t lx388palette[] =
 {
 	rgb_t(0x00, 0xff, 0x00), /* GREEN */
 	rgb_t(0x00, 0xff, 0x00), /* YELLOW in original, here GREEN */

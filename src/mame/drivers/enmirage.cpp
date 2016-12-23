@@ -76,13 +76,13 @@ public:
 
 	DECLARE_DRIVER_INIT(mirage);
 	virtual void video_start() override;
-	UINT32 screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_porta);
 	DECLARE_WRITE8_MEMBER(mirage_via_write_portb);
 	DECLARE_WRITE_LINE_MEMBER(mirage_doc_irq);
 	DECLARE_READ8_MEMBER(mirage_adc_read);
 
-	UINT8 m_l_segs, m_r_segs;
+	uint8_t m_l_segs, m_r_segs;
 	int   m_l_hi, m_r_hi;
 };
 
@@ -108,7 +108,7 @@ void mirage_state::video_start()
 {
 }
 
-UINT32 mirage_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t mirage_state::screen_update_mirage(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -138,7 +138,7 @@ ADDRESS_MAP_END
 // bits 5/6/7 keypad rows 0/1/2 return
 WRITE8_MEMBER(mirage_state::mirage_via_write_porta)
 {
-	UINT8 seg = data & 7;
+	uint8_t seg = data & 7;
 	static const int segconv[8] =
 	{
 		16, 8, 32, 2, 1, 64, 128, 4
@@ -224,10 +224,10 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MCFG_DEVICE_ADD("via6522", VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(mirage_state, mirage_via_write_porta))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(mirage_state, mirage_via_write_portb))
-	MCFG_VIA6522_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, irq_line))
+	MCFG_VIA6522_IRQ_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia6850", ACIA6850, 0)
-	MCFG_ACIA6850_IRQ_HANDLER(DEVWRITELINE("maincpu", m6809e_device, firq_line))
+	MCFG_ACIA6850_IRQ_HANDLER(INPUTLINE("maincpu", M6809_FIRQ_LINE))
 
 	MCFG_WD1772_ADD("wd1772", 8000000)
 	MCFG_WD_FDC_INTRQ_CALLBACK(INPUTLINE("maincpu", INPUT_LINE_NMI))

@@ -26,10 +26,10 @@
 void super6_state::bankswitch()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	// power on jump
-	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0, 0xf800, m_rom); return; }
+	if (!BIT(m_bank0, 6)) { program.install_rom(0x0000, 0x07ff, 0xf800, m_rom); return; }
 
 	// first 64KB of memory
 	program.install_ram(0x0000, 0xffff, ram);
@@ -82,7 +82,7 @@ void super6_state::bankswitch()
 	if (BIT(m_bank0, 3)) program.install_ram(0xc000, 0xffff, ram + 0xc000);
 
 	// PROM enabled
-	if (!BIT(m_bank0, 5)) program.install_rom(0xf000, 0xf7ff, 0, 0x800, m_rom);
+	if (!BIT(m_bank0, 5)) program.install_rom(0xf000, 0xf7ff, 0x800, m_rom);
 }
 
 
@@ -193,7 +193,7 @@ READ8_MEMBER( super6_state::fdc_r )
 
 	// don't crash please... but it's true, WAIT does nothing in our Z80
 	//fatalerror("Z80 WAIT not supported by MAME core\n");
-	m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, ASSERT_LINE);
+	m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, ASSERT_LINE);
 
 	return !m_fdc->intrq_r() << 7;
 }
@@ -409,14 +409,14 @@ SLOT_INTERFACE_END
 
 WRITE_LINE_MEMBER( super6_state::fdc_intrq_w )
 {
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 
 	m_ctc->trg3(!state);
 }
 
 WRITE_LINE_MEMBER( super6_state::fdc_drq_w )
 {
-	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_WAIT, CLEAR_LINE);
+	if (state) m_maincpu->set_input_line(Z80_INPUT_LINE_BOGUSWAIT, CLEAR_LINE);
 
 	m_dma->rdy_w(state);
 }
@@ -469,7 +469,7 @@ void super6_state::machine_reset()
 
 	bankswitch();
 
-	UINT8 baud = m_j7->read();
+	uint8_t baud = m_j7->read();
 
 	m_brg->str_w(baud & 0x0f);
 	m_brg->stt_w((baud >> 4) & 0x07);
@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( super6, super6_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_24MHz/4)
 	MCFG_CPU_PROGRAM_MAP(super6_mem)
 	MCFG_CPU_IO_MAP(super6_io)
-	MCFG_CPU_CONFIG(super6_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super6_daisy_chain)
 
 	// devices
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, XTAL_24MHz/4)

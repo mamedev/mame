@@ -35,12 +35,12 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	DECLARE_READ8_MEMBER( homez80_keyboard_r );
-	required_shared_ptr<UINT8> m_p_videoram;
-	UINT8* m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
+	uint8_t* m_p_chargen;
 	bool m_irq;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(homez80_interrupt);
 };
 
@@ -223,16 +223,16 @@ void homez80_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t homez80_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 	for (y = 0; y < 32; y++)
 	{
 		for (ra = 0; ra < 8; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++, 44);
+			uint16_t *p = &bitmap.pix16(sy++, 44);
 
 			for (x = ma; x < ma+32; x++)
 			{
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( homez80, homez80_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 344-1, 0, 32*8-1)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", homez80 )
 MACHINE_CONFIG_END
 

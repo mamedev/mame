@@ -1,10 +1,11 @@
 PROG = 7zra.dll
 DEF_FILE = ../../Archive/Archive2.def
-CFLAGS = $(CFLAGS) -I ../../../ \
+CFLAGS = $(CFLAGS) \
   -D_NO_CRYPTO
 
 COMMON_OBJS = \
   $O\CRC.obj \
+  $O\CrcReg.obj \
   $O\IntToString.obj \
   $O\NewHandler.obj \
   $O\MyString.obj \
@@ -17,6 +18,7 @@ WIN_OBJS = \
   $O\FileDir.obj \
   $O\FileFind.obj \
   $O\FileIO.obj \
+  $O\FileName.obj \
   $O\PropVariant.obj \
   $O\Synchronization.obj \
   $O\System.obj \
@@ -28,14 +30,15 @@ WIN_OBJS = \
   $O\InOutTempBuffer.obj \
   $O\FilterCoder.obj \
   $O\LimitedStreams.obj \
-  $O\LockedStream.obj \
   $O\MethodId.obj \
   $O\MethodProps.obj \
   $O\OutBuffer.obj \
   $O\ProgressUtils.obj \
+  $O\PropId.obj \
   $O\StreamBinder.obj \
   $O\StreamObjects.obj \
   $O\StreamUtils.obj \
+  $O\UniqBlocks.obj \
   $O\VirtThread.obj \
 
 AR_OBJS = \
@@ -44,8 +47,6 @@ AR_OBJS = \
 
 AR_COMMON_OBJS = \
   $O\CoderMixer2.obj \
-  $O\CoderMixer2MT.obj \
-  $O\CrossThreadProgress.obj \
   $O\HandlerOut.obj \
   $O\InStreamWithCRC.obj \
   $O\ItemNameUtils.obj \
@@ -59,7 +60,6 @@ AR_COMMON_OBJS = \
   $O\7zEncode.obj \
   $O\7zExtract.obj \
   $O\7zFolderInStream.obj \
-  $O\7zFolderOutStream.obj \
   $O\7zHandler.obj \
   $O\7zHandlerOut.obj \
   $O\7zHeader.obj \
@@ -77,7 +77,6 @@ COMPRESS_OBJS = \
   $O\Bcj2Register.obj \
   $O\BcjCoder.obj \
   $O\BcjRegister.obj \
-  $O\BranchCoder.obj \
   $O\BranchMisc.obj \
   $O\BranchRegister.obj \
   $O\ByteSwap.obj \
@@ -93,6 +92,8 @@ COMPRESS_OBJS = \
 
 C_OBJS = \
   $O\Alloc.obj \
+  $O\Bcj2.obj \
+  $O\Bcj2Enc.obj \
   $O\Bra.obj \
   $O\Bra86.obj \
   $O\BraIA64.obj \
@@ -109,41 +110,4 @@ C_OBJS = \
 
 !include "../../Crc.mak"
 
-OBJS = \
-  $O\StdAfx.obj \
-  $(CONSOLE_OBJS) \
-  $(COMMON_OBJS) \
-  $(WIN_OBJS) \
-  $(7ZIP_COMMON_OBJS) \
-  $(AR_OBJS) \
-  $(AR_COMMON_OBJS) \
-  $(7Z_OBJS) \
-  $(COMPRESS_OBJS) \
-  $(C_OBJS) \
-  $(ASM_OBJS) \
-  $O\resource.res
-
-
-!include "../../../Build.mak"
-
-$(COMMON_OBJS): ../../../Common/$(*B).cpp
-	$(COMPL)
-$(WIN_OBJS): ../../../Windows/$(*B).cpp
-	$(COMPL)
-$(7ZIP_COMMON_OBJS): ../../Common/$(*B).cpp
-	$(COMPL)
-$(AR_OBJS): ../../Archive/$(*B).cpp
-	$(COMPL)
-$(AR_COMMON_OBJS): ../../Archive/Common/$(*B).cpp
-	$(COMPL)
-
-$(7Z_OBJS): ../../Archive/7z/$(*B).cpp
-	$(COMPL)
-
-$(COMPRESS_OBJS): ../../Compress/$(*B).cpp
-	$(COMPL_O2)
-
-$(C_OBJS): ../../../../C/$(*B).c
-	$(COMPL_O2)
-
-!include "../../Asm.mak"
+!include "../../7zip.mak"

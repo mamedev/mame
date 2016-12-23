@@ -133,7 +133,7 @@ public:
 		m_vram(*this, "vram")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER(port3_r);
 	DECLARE_WRITE16_MEMBER(port3_w);
@@ -150,13 +150,13 @@ protected:
 	// devices
 	required_device<cpu_device> m_maincpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
-	required_shared_ptr<UINT16> m_vram;
+	required_shared_ptr<uint16_t> m_vram;
 
 	// driver_device overrides
 	virtual void video_start() override;
 
 private:
-	UINT16 m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
+	uint16_t m_vctl;      // 0000 for normal, 0001 for flip, 0100 when going to change (blank?)
 };
 
 
@@ -165,7 +165,7 @@ void invqix_state::video_start()
 	save_item(NAME(m_vctl));
 }
 
-UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 
@@ -181,7 +181,7 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			for(x=0;x<256;x++)
 			{
-				UINT8 r,g,b;
+				uint8_t r,g,b;
 				int pen_data;
 
 				pen_data = (m_vram[(x+y*256)]);
@@ -203,7 +203,7 @@ UINT32 invqix_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, 
 		{
 			for(x=0;x<256;x++)
 			{
-				UINT8 r,g,b;
+				uint8_t r,g,b;
 				int pen_data;
 
 				pen_data = (m_vram[(256-x)+((256-y)*256)]);
@@ -358,7 +358,7 @@ ROM_START( invqix )
 	ROM_REGION(0x1000000, "oki", 0)
 	ROM_LOAD( "f34-01.ic13",  0x000000, 0x200000, CRC(7b055722) SHA1(8152bf04a58de15aefc4244e40733275e21818e1) ) /* Can also be labeled F34-03 based on ROM chip type */
 
-	ROM_REGION(0x80, "eeprom", 0)
+	ROM_REGION16_BE(0x80, "eeprom", 0)
 	ROM_LOAD16_WORD_SWAP( "93c46.ic6", 0x000000, 0x000080, CRC(564b744e) SHA1(4d9ea7dc253797c513258d07a936dfb63d8ed18c) )
 ROM_END
 

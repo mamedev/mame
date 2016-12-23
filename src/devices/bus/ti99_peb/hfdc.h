@@ -21,6 +21,7 @@
 
 #include "machine/mm58274c.h"
 #include "machine/hdc92x4.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_HFDC;
 
@@ -30,7 +31,7 @@ extern const device_type TI99_HFDC;
 class myarc_hfdc_device : public ti_expansion_card_device
 {
 public:
-	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	myarc_hfdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
@@ -55,13 +56,13 @@ private:
 	void device_start() override;
 	void device_reset() override;
 
-	const rom_entry *device_rom_region() const override;
+	const tiny_rom_entry *device_rom_region() const override;
 	machine_config_constructor device_mconfig_additions() const override;
 	ioport_constructor device_input_ports() const override;
 
 	// Debug accessors
-	void debug_read(offs_t offset, UINT8* value);
-	void debug_write(offs_t offset, UINT8 data);
+	void debug_read(offs_t offset, uint8_t* value);
+	void debug_write(offs_t offset, uint8_t data);
 
 	// Callbacks for the index hole and seek complete
 	void floppy_index_callback(floppy_image_device *floppy, int state);
@@ -110,10 +111,10 @@ private:
 	bool    m_see_switches;
 
 	// IRQ state
-	line_state    m_irq;
+	int    m_irq;
 
 	// DMA in Progress state
-	line_state    m_dip;
+	int    m_dip;
 
 	// When true, motor monoflop is high
 	bool    m_motor_running;
@@ -143,40 +144,40 @@ private:
 	bool m_wait_for_hd1;
 
 	// Device Service Routine ROM (firmware)
-	UINT8*  m_dsrrom;
+	uint8_t*  m_dsrrom;
 
 	// ROM banks.
 	int     m_rom_page;
 
 	// HFDC on-board SRAM (8K or 32K)
-	UINT8*  m_buffer_ram;
+	required_device<ram_device> m_buffer_ram;
 
 	// RAM page registers
 	int     m_ram_page[4];
 
 	// Drive status latch (STB0)
-	UINT8   m_status_latch;
+	uint8_t   m_status_latch;
 
 	// DMA address latch (in Gate Array) (STB1)
-	UINT32  m_dma_address;
+	uint32_t  m_dma_address;
 
 	// Output 1 latch (STB2)
-	UINT8   m_output1_latch;
+	uint8_t   m_output1_latch;
 
 	// Output 2 latch (STB3)
-	UINT8   m_output2_latch;
+	uint8_t   m_output2_latch;
 
 	// Needed for triggering the motor monoflop
-	UINT8 m_lastval;
+	uint8_t m_lastval;
 
-	// Signal motor_on. When TRUE, makes all drives turning.
-	line_state m_MOTOR_ON;
+	// Signal motor_on. When true, makes all drives turning.
+	int m_MOTOR_ON;
 
 	// Calculates the index from the bit
 	int bit_to_index(int value);
 
 	// Utility function to set or unset bits in a byte
-	void set_bits(UINT8& byte, int mask, bool set);
+	void set_bits(uint8_t& byte, int mask, bool set);
 
 	// Joined ready line towards the controller
 	int  m_readyflags;

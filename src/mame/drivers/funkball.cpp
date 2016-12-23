@@ -78,33 +78,36 @@ Notes:
 #include "machine/pcshare.h"
 #include "machine/bankdev.h"
 #include "machine/intelfsh.h"
+#include "machine/terminal.h"
 
 
 class funkball_state : public pcat_base_state
 {
 public:
 	funkball_state(const machine_config &mconfig, device_type type, const char *tag)
-		: pcat_base_state(mconfig, type, tag),
-			m_voodoo(*this, "voodoo_0"),
-			m_unk_ram(*this, "unk_ram"),
-			m_flashbank(*this, "flashbank"),
-			m_inputs(*this, "IN")
+		: pcat_base_state(mconfig, type, tag)
+		, m_voodoo(*this, "voodoo_0")
+		, m_unk_ram(*this, "unk_ram")
+		, m_flashbank(*this, "flashbank")
+		, m_terminal(*this, "terminal")
+		, m_inputs(*this, "IN.%u", 0)
 	{ }
 
-	UINT8 m_funkball_config_reg_sel;
-	UINT8 m_funkball_config_regs[256];
-	UINT32 m_cx5510_regs[256/4];
-	std::unique_ptr<UINT8[]> m_bios_ram;
+	uint8_t m_funkball_config_reg_sel;
+	uint8_t m_funkball_config_regs[256];
+	uint32_t m_cx5510_regs[256/4];
+	std::unique_ptr<uint8_t[]> m_bios_ram;
 
-	UINT32 m_biu_ctrl_reg[256/4];
+	uint32_t m_biu_ctrl_reg[256/4];
 
-	UINT32 flashbank_addr;
+	uint32_t flashbank_addr;
 
 	// devices
 	required_device<voodoo_1_device> m_voodoo;
 
-	required_shared_ptr<UINT32> m_unk_ram;
+	required_shared_ptr<uint32_t> m_unk_ram;
 	required_device<address_map_bank_device> m_flashbank;
+	required_device<generic_terminal_device> m_terminal;
 	required_ioport_array<16> m_inputs;
 
 	DECLARE_WRITE32_MEMBER( flash_w );
@@ -113,19 +116,19 @@ public:
 	DECLARE_READ8_MEMBER( serial_r );
 	DECLARE_WRITE8_MEMBER( serial_w );
 
-	UINT8 funkball_config_reg_r();
-	void funkball_config_reg_w(UINT8 data);
+	uint8_t funkball_config_reg_r();
+	void funkball_config_reg_w(uint8_t data);
 
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	struct
 	{
 		/* PCI */
-		UINT32 command;
-		UINT32 base_addr;
+		uint32_t command;
+		uint32_t base_addr;
 
-		UINT32 init_enable;
+		uint32_t init_enable;
 	} m_voodoo_pci_regs;
 	DECLARE_READ32_MEMBER(biu_ctrl_r);
 	DECLARE_WRITE32_MEMBER(biu_ctrl_w);
@@ -140,15 +143,15 @@ void funkball_state::video_start()
 {
 }
 
-UINT32 funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t funkball_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	return m_voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo_0_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	funkball_state* state = device->machine().driver_data<funkball_state>();
-	UINT32 val = 0;
+	uint32_t val = 0;
 
 	printf("Voodoo PCI R: %x\n", reg);
 
@@ -167,7 +170,7 @@ static UINT32 voodoo_0_pci_r(device_t *busdevice, device_t *device, int function
 	return val;
 }
 
-static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	funkball_state* state = device->machine().driver_data<funkball_state>();
 
@@ -191,7 +194,7 @@ static void voodoo_0_pci_w(device_t *busdevice, device_t *device, int function, 
 	}
 }
 
-static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t cx5510_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
@@ -204,7 +207,7 @@ static UINT32 cx5510_pci_r(device_t *busdevice, device_t *device, int function, 
 	return state->m_cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	funkball_state *state = busdevice->machine().driver_data<funkball_state>();
 
@@ -225,20 +228,21 @@ WRITE8_MEMBER( funkball_state::serial_w )
 {
 	if(offset == 0)
 	{
+		// TODO: hack, main CPU sends a CR only here, actually expecting Windows-style newline.
 		if(data == 0x0d)
-			printf("\n");
+			m_terminal->write(space,0,0x0a);
 		else
-			printf("%c",data);
+			m_terminal->write(space,0,data);
 	}
 }
 
-UINT8 funkball_state::funkball_config_reg_r()
+uint8_t funkball_state::funkball_config_reg_r()
 {
 	//osd_printf_debug("funkball_config_reg_r %02X\n", funkball_config_reg_sel);
 	return m_funkball_config_regs[m_funkball_config_reg_sel];
 }
 
-void funkball_state::funkball_config_reg_w(UINT8 data)
+void funkball_state::funkball_config_reg_w(uint8_t data)
 {
 	//osd_printf_debug("funkball_config_reg_w %02X, %02X\n", funkball_config_reg_sel, data);
 	m_funkball_config_regs[m_funkball_config_reg_sel] = data;
@@ -246,7 +250,7 @@ void funkball_state::funkball_config_reg_w(UINT8 data)
 
 READ8_MEMBER(funkball_state::io20_r)
 {
-	UINT8 r = 0;
+	uint8_t r = 0;
 
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x00)
@@ -778,7 +782,7 @@ INPUT_PORTS_END
 
 void funkball_state::machine_start()
 {
-	m_bios_ram = std::make_unique<UINT8[]>(0x20000);
+	m_bios_ram = std::make_unique<uint8_t[]>(0x20000);
 
 	/* defaults, otherwise it won't boot */
 	m_unk_ram[0x010/4] = 0x2f8d85ff;
@@ -834,6 +838,8 @@ static MACHINE_CONFIG_START( funkball, funkball_state )
 	MCFG_SCREEN_SIZE(1024, 1024)
 	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 447)
 
+	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
+
 	MCFG_INTEL_28F320J5_ADD("u29")
 	MCFG_INTEL_28F320J5_ADD("u30")
 	MCFG_INTEL_28F320J5_ADD("u3")
@@ -843,13 +849,13 @@ ROM_START( funkball )
 	ROM_REGION32_LE(0x20000, "bios", ROMREGION_ERASEFF)
 	ROM_LOAD( "512k-epr.u62", 0x010000, 0x010000, CRC(cced894a) SHA1(298c81716e375da4b7215f3e588a45ca3ea7e35c) )
 
-	ROM_REGION(0x400000, "u3", ROMREGION_ERASE00) // Sound Program / Samples
+	ROM_REGION16_BE(0x400000, "u3", ROMREGION_ERASE00) // Sound Program / Samples
 	ROM_LOAD16_WORD_SWAP( "flash.u3", 0x000000, 0x400000, CRC(fb376abc) SHA1(ea4c48bb6cd2055431a33f5c426e52c7af6997eb) )
 
-	ROM_REGION(0x400000, "u29", ROMREGION_ERASE00) // Main Program
+	ROM_REGION16_BE(0x400000, "u29", ROMREGION_ERASE00) // Main Program
 	ROM_LOAD16_WORD_SWAP( "flash.u29",0x000000, 0x400000, CRC(7cf6ff4b) SHA1(4ccdd4864ad92cc218998f3923997119a1a9dd1d) )
 
-	ROM_REGION(0x400000, "u30", ROMREGION_ERASE00)
+	ROM_REGION16_BE(0x400000, "u30", ROMREGION_ERASE00)
 	ROM_LOAD16_WORD_SWAP( "flash.u30",0x000000, 0x400000, CRC(1d46717a) SHA1(acfbd0a2ccf4d717779733c4a9c639296c3bbe0e) )
 ROM_END
 

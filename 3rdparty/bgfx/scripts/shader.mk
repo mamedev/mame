@@ -1,23 +1,31 @@
 #
-# Copyright 2011-2015 Branimir Karadzic. All rights reserved.
+# Copyright 2011-2016 Branimir Karadzic. All rights reserved.
 # License: http://www.opensource.org/licenses/BSD-2-Clause
 #
 
 THISDIR:=$(dir $(lastword $(MAKEFILE_LIST)))
 include $(THISDIR)/tools.mk
 
+# Define SHADERS_DIR if your shader files are in a different dir than the makefile including this.
+# Notice: If defined, SHADERS_DIR should end with dir slash '/'.
+# Example:
+#     SHADERS_DIR=shader_files/
+
 ifndef TARGET
 .PHONY: all
 all:
 	@echo Usage: make TARGET=# [clean, all, rebuild]
-	@echo "  TARGET=0 (hlsl  - dx9)"
-	@echo "  TARGET=1 (hlsl  - dx11)"
-	@echo "  TARGET=2 (glsl  - nacl)"
-	@echo "  TARGET=3 (glsl  - android)"
-	@echo "  TARGET=4 (glsl  - linux)"
-	@echo "  TARGET=5 (metal - OSX/iOS)"
-	@echo "  VERBOSE=1 show build commands."
+	@echo "  TARGET=0 (hlsl  - d3d9)"
+	@echo "  TARGET=1 (hlsl  - d3d11)"
+	@echo "  TARGET=2 (essl  - nacl)"
+	@echo "  TARGET=3 (essl  - android)"
+	@echo "  TARGET=4 (glsl)"
+	@echo "  TARGET=5 (metal)"
+	@echo "  TARGET=6 (pssl)"
+	@echo "  TARGET=7 (spriv)"
 else
+
+ADDITIONAL_INCLUDES?=
 
 ifeq ($(TARGET), 0)
 VS_FLAGS=--platform windows -p vs_3_0 -O 3
@@ -33,13 +41,13 @@ else
 ifeq ($(TARGET), 2)
 VS_FLAGS=--platform nacl
 FS_FLAGS=--platform nacl
-SHADER_PATH=shaders/gles
+SHADER_PATH=shaders/essl
 else
 ifeq ($(TARGET), 3)
 VS_FLAGS=--platform android
 FS_FLAGS=--platform android
 CS_FLAGS=--platform android
-SHADER_PATH=shaders/gles
+SHADER_PATH=shaders/essl
 else
 ifeq ($(TARGET), 4)
 VS_FLAGS=--platform linux -p 120
@@ -52,6 +60,20 @@ VS_FLAGS=--platform osx -p metal
 FS_FLAGS=--platform osx -p metal
 CS_FLAGS=--platform osx -p metal
 SHADER_PATH=shaders/metal
+else
+ifeq ($(TARGET), 6)
+VS_FLAGS=--platform orbis -p pssl
+FS_FLAGS=--platform orbis -p pssl
+CS_FLAGS=--platform orbis -p pssl
+SHADER_PATH=shaders/pssl
+else
+ifeq ($(TARGET), 7)
+VS_FLAGS=--platform linux -p spirv
+FS_FLAGS=--platform linux -p spirv
+CS_FLAGS=--platform linux -p spirv
+SHADER_PATH=shaders/spirv
+endif
+endif
 endif
 endif
 endif
@@ -60,25 +82,25 @@ endif
 endif
 
 THISDIR := $(dir $(lastword $(MAKEFILE_LIST)))
-VS_FLAGS+=-i $(THISDIR)../src/
-FS_FLAGS+=-i $(THISDIR)../src/
-CS_FLAGS+=-i $(THISDIR)../src/
+VS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
+FS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
+CS_FLAGS+=-i $(THISDIR)../src/ $(ADDITIONAL_INCLUDES)
 
 BUILD_OUTPUT_DIR=$(addprefix ./, $(RUNTIME_DIR)/$(SHADER_PATH))
 BUILD_INTERMEDIATE_DIR=$(addprefix $(BUILD_DIR)/, $(SHADER_PATH))
 
-VS_SOURCES=$(wildcard vs_*.sc)
-VS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(VS_SOURCES))))
+VS_SOURCES=$(notdir $(wildcard $(addprefix $(SHADERS_DIR), vs_*.sc)))
+VS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(notdir $(VS_SOURCES)))))
 
-FS_SOURCES=$(wildcard fs_*.sc)
-FS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(FS_SOURCES))))
+FS_SOURCES=$(notdir $(wildcard $(addprefix $(SHADERS_DIR), fs_*.sc)))
+FS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(notdir $(FS_SOURCES)))))
 
-CS_SOURCES=$(wildcard cs_*.sc)
-CS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(CS_SOURCES))))
+CS_SOURCES=$(notdir $(wildcard $(addprefix $(SHADERS_DIR), cs_*.sc)))
+CS_DEPS=$(addprefix $(BUILD_INTERMEDIATE_DIR)/,$(addsuffix .bin.d, $(basename $(notdir $(CS_SOURCES)))))
 
-VS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(VS_SOURCES))))
-FS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(FS_SOURCES))))
-CS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(CS_SOURCES))))
+VS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(VS_SOURCES)))))
+FS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(FS_SOURCES)))))
+CS_BIN = $(addprefix $(BUILD_INTERMEDIATE_DIR)/, $(addsuffix .bin, $(basename $(notdir $(CS_SOURCES)))))
 
 BIN = $(VS_BIN) $(FS_BIN)
 ASM = $(VS_ASM) $(FS_ASM)
@@ -98,17 +120,17 @@ endif
 endif
 endif
 
-$(BUILD_INTERMEDIATE_DIR)/vs_%.bin : vs_%.sc
+$(BUILD_INTERMEDIATE_DIR)/vs_%.bin : $(SHADERS_DIR)vs_%.sc
 	@echo [$(<)]
 	$(SILENT) $(SHADERC) $(VS_FLAGS) --type vertex --depends -o $(@) -f $(<) --disasm
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)
 
-$(BUILD_INTERMEDIATE_DIR)/fs_%.bin : fs_%.sc
+$(BUILD_INTERMEDIATE_DIR)/fs_%.bin : $(SHADERS_DIR)fs_%.sc
 	@echo [$(<)]
 	$(SILENT) $(SHADERC) $(FS_FLAGS) --type fragment --depends -o $(@) -f $(<) --disasm
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)
 
-$(BUILD_INTERMEDIATE_DIR)/cs_%.bin : cs_%.sc
+$(BUILD_INTERMEDIATE_DIR)/cs_%.bin : $(SHADERS_DIR)cs_%.sc
 	@echo [$(<)]
 	$(SILENT) $(SHADERC) $(CS_FLAGS) --type compute --depends -o $(@) -f $(<) --disasm
 	$(SILENT) cp $(@) $(BUILD_OUTPUT_DIR)/$(@F)

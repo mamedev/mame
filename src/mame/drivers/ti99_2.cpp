@@ -30,7 +30,7 @@ general :
   - Unlike tms9900, CRU address range is full 0x0000-0xFFFE (A0 is not used as address).
     This is possible because tms9995 uses d0-d2 instead of the address MSBits to support external
     opcodes.
-  - quite more efficient than tms9900, and a few additionnal instructions and features
+  - quite more efficient than tms9900, and a few additional instructions and features
 * 24 or 32kb ROM (16kb plain (1kb of which used by vdp), 16kb split into 2 8kb pages)
 * 4kb 8-bit RAM, 256 bytes 16-bit RAM
 * custom vdp shares CPU RAM/ROM.  The display is quite alike to tms9928 graphics mode, except
@@ -93,7 +93,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	int m_ROM_paged;
 	int m_irq_state;
 	int m_KeyRow;
@@ -104,7 +104,7 @@ public:
 	DECLARE_DRIVER_INIT(ti99_2_24);
 	DECLARE_DRIVER_INIT(ti99_2_32);
 	virtual void machine_reset() override;
-	UINT32 screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(ti99_2_vblank_interrupt);
 	required_device<cpu_device> m_maincpu;
 	required_device<gfxdecode_device> m_gfxdecode;
@@ -139,7 +139,7 @@ void ti99_2_state::machine_reset()
 	// Configure CPU to insert 1 wait state for each external memory access
 	// by lowering the READY line on reset
 	// TODO: Check with specs
-	static_cast<tms9995_device*>(machine().device("maincpu"))->set_ready(CLEAR_LINE);
+	static_cast<tms9995_device*>(machine().device("maincpu"))->ready_line(CLEAR_LINE);
 }
 
 INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
@@ -163,9 +163,9 @@ INTERRUPT_GEN_MEMBER(ti99_2_state::ti99_2_vblank_interrupt)
 
 
 
-UINT32 ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ti99_2_state::screen_update_ti99_2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	int i, sx, sy;
 
 
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 
 	/* video hardware */
 	/*MCFG_TMS9928A( &tms9918_interface )*/
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::white())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(256, 192)
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( ti99_2, ti99_2_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", ti99_2)
-	MCFG_PALETTE_ADD_WHITE_AND_BLACK("palette")
+	MCFG_PALETTE_ADD_MONOCHROME_INVERTED("palette")
 MACHINE_CONFIG_END
 
 

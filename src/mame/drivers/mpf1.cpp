@@ -247,7 +247,7 @@ TIMER_CALLBACK_MEMBER(mpf1_state::led_refresh)
 
 READ8_MEMBER( mpf1_state::ppi_pa_r )
 {
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	/* bit 0 to 5, keyboard rows 0 to 5 */
 	if (!BIT(m_lednum, 0)) data &= m_pc0->read();
@@ -269,7 +269,7 @@ READ8_MEMBER( mpf1_state::ppi_pa_r )
 WRITE8_MEMBER( mpf1_state::ppi_pb_w )
 {
 	/* swap bits around for the mame 7-segment emulation */
-	UINT8 led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
+	uint8_t led_data = BITSWAP8(data, 6, 1, 2, 0, 7, 5, 4, 3);
 
 	/* timer to update segments */
 	m_led_refresh_timer->adjust(attotime::from_usec(70), led_data);
@@ -311,7 +311,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(mpf1_state::check_halt_callback)
 {
 	// halt-LED; the red one, is turned on when the processor is halted
 	// TODO: processor seems to halt, but restarts(?) at 0x0000 after a while -> fix
-	INT64 led_halt = m_maincpu->state_int(Z80_HALT);
+	int64_t led_halt = m_maincpu->state_int(Z80_HALT);
 	output().set_led_value(1, led_halt);
 }
 
@@ -338,7 +338,7 @@ static MACHINE_CONFIG_START( mpf1, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1_map)
 	MCFG_CPU_IO_MAP(mpf1_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_3_579545MHz/2)
@@ -371,7 +371,7 @@ static MACHINE_CONFIG_START( mpf1b, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_3_579545MHz/2)
 	MCFG_CPU_PROGRAM_MAP(mpf1b_map)
 	MCFG_CPU_IO_MAP(mpf1b_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* devices */
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_3_579545MHz/2)
@@ -407,7 +407,7 @@ static MACHINE_CONFIG_START( mpf1p, mpf1_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, 2500000)
 	MCFG_CPU_PROGRAM_MAP(mpf1p_map)
 	MCFG_CPU_IO_MAP(mpf1p_io_map)
-	MCFG_CPU_CONFIG(mpf1_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(mpf1_daisy_chain)
 
 	/* video hardware */
 	MCFG_DEFAULT_LAYOUT(layout_mpf1p)
@@ -475,7 +475,7 @@ DIRECT_UPDATE_MEMBER(mpf1_state::mpf1_direct_update_handler)
 
 DRIVER_INIT_MEMBER(mpf1_state,mpf1)
 {
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(FUNC(mpf1_state::mpf1_direct_update_handler), this));
+	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&mpf1_state::mpf1_direct_update_handler, this));
 }
 
 COMP( 1979, mpf1,  0,    0, mpf1, mpf1, mpf1_state,  mpf1, "Multitech", "Micro Professor 1", 0)

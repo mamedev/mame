@@ -25,12 +25,9 @@ public:
 	required_device<tilemap_device> m_playfield_tilemap;
 	required_device<atari_motion_objects_device> m_mob;
 
-	UINT8           m_pedal_value[2];
+	uint8_t           m_pedal_value[2];
+	uint8_t           m_playfield_tile_bank;
 
-	UINT8 *         m_bank_base;
-	UINT8 *         m_bank_source_data;
-
-	UINT8           m_playfield_tile_bank;
 	virtual void update_interrupts() override;
 	virtual void scanline_update(screen_device &screen, int scanline) override;
 	DECLARE_READ16_MEMBER(sound_busy_r);
@@ -45,7 +42,7 @@ public:
 	DECLARE_MACHINE_RESET(badlands);
 	DECLARE_VIDEO_START(badlands);
 	DECLARE_MACHINE_RESET(badlandsb);
-	UINT32 screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_badlands(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_int);
 	DECLARE_WRITE16_MEMBER( badlands_pf_bank_w );
 

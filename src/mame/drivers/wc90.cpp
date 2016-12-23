@@ -55,6 +55,7 @@ Press one of the start buttons to exit.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/2608intf.h"
 #include "includes/wc90.h"
 
@@ -71,7 +72,7 @@ WRITE8_MEMBER(wc90_state::bankswitch1_w)
 
 WRITE8_MEMBER(wc90_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -105,7 +106,7 @@ static ADDRESS_MAP_START( wc90_map_1, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xfc46, 0xfc46) AM_WRITEONLY AM_SHARE("scroll2xlo")
 	AM_RANGE(0xfc47, 0xfc47) AM_WRITEONLY AM_SHARE("scroll2xhi")
 	AM_RANGE(0xfcc0, 0xfcc0) AM_WRITE(sound_command_w)
-	AM_RANGE(0xfcd0, 0xfcd0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfcd0, 0xfcd0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xfce0, 0xfce0) AM_WRITE(bankswitch_w)
 ADDRESS_MAP_END
 
@@ -118,7 +119,7 @@ static ADDRESS_MAP_START( wc90_map_2, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK("subbank")
 	AM_RANGE(0xf800, 0xfbff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(bankswitch1_w)
-	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xfc01, 0xfc01) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
@@ -126,7 +127,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, wc90_state )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf803) AM_DEVREADWRITE("ymsnd", ym2608_device, read, write)
 	AM_RANGE(0xfc00, 0xfc00) AM_READNOP /* ??? adpcm ??? */
-	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xfc10, 0xfc10) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -360,6 +361,8 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(59.17)         /* verified on pcb */
@@ -378,6 +381,8 @@ static MACHINE_CONFIG_START( wc90, wc90_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)  /* verified on pcb */
 	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
@@ -560,9 +565,9 @@ ROM_START( pac90 )
 ROM_END
 
 
-GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90,  0,    wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (World)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90a, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90b, wc90, wc90, wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (Euro set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, wc90t, wc90, wc90t,wc90, driver_device, 0, ROT0, "Tecmo", "Tecmo World Cup '90 (trackball set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 
-GAME( 199?, pac90, puckman, pac90,pac90,driver_device, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.
+GAME( 199?, pac90, puckman, pac90,pac90,driver_device, 0, ROT90, "bootleg (Macro)", "Pac-Man (bootleg on World Cup '90 hardware)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // made by Mike Coates etc.

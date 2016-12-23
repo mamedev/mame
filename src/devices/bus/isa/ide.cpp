@@ -41,9 +41,22 @@ WRITE_LINE_MEMBER(isa16_ide_device::ide_interrupt)
 	}
 }
 
+static MACHINE_CONFIG_FRAGMENT(cdrom_headphones)
+	MCFG_DEVICE_MODIFY("cdda")
+	MCFG_SOUND_ROUTE(0, "lheadphone", 1.0)
+	MCFG_SOUND_ROUTE(1, "rheadphone", 1.0)
+
+	MCFG_SPEAKER_STANDARD_STEREO("lheadphone", "rheadphone")
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_FRAGMENT( ide )
 	MCFG_IDE_CONTROLLER_ADD("ide", ata_devices, "hdd", nullptr, false)
 	MCFG_ATA_INTERFACE_IRQ_HANDLER(WRITELINE(isa16_ide_device, ide_interrupt))
+
+	MCFG_DEVICE_MODIFY("ide:0")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
+	MCFG_DEVICE_MODIFY("ide:1")
+	MCFG_SLOT_OPTION_MACHINE_CONFIG("cdrom", cdrom_headphones)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( ide )
@@ -86,7 +99,7 @@ ioport_constructor isa16_ide_device::device_input_ports() const
 //  isa16_ide_device - constructor
 //-------------------------------------------------
 
-isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa16_ide_device::isa16_ide_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, ISA16_IDE, "IDE Fixed Drive Adapter", tag, owner, clock, "isa_ide", __FILE__),
 		device_isa16_card_interface( mconfig, *this ),
 		m_is_primary(true),

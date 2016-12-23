@@ -66,9 +66,9 @@ TILE_GET_INFO_MEMBER(dynduke_state::get_tx_tile_info)
 
 void dynduke_state::video_start()
 {
-	m_bg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,      16,16,32,32);
-	m_fg_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
-	m_tx_layer = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
+	m_bg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,      16,16,32,32);
+	m_fg_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,32,32);
+	m_tx_layer = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(dynduke_state::get_tx_tile_info),this),TILEMAP_SCAN_ROWS, 8, 8,32,32);
 
 	m_fg_layer->set_transparent_pen(15);
 	m_tx_layer->set_transparent_pen(15);
@@ -125,7 +125,7 @@ WRITE16_MEMBER(dynduke_state::control_w)
 
 void dynduke_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri)
 {
-	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
+	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
 	int offs,fx,fy,x,y,color,sprite;
 
 	if (!m_sprite_enable) return;
@@ -177,17 +177,23 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 	scrolly = ((m_scroll_ram[0x01]&0x30)<<4)+((m_scroll_ram[0x02]&0x7f)<<1)+((m_scroll_ram[0x02]&0x80)>>7);
 	scrollx = ((m_scroll_ram[0x09]&0x30)<<4)+((m_scroll_ram[0x0a]&0x7f)<<1)+((m_scroll_ram[0x0a]&0x80)>>7);
 
+	if (flip_screen())
+	{
+		scrolly = 256 - scrolly;
+		scrollx = 256 - scrollx;
+	}
+
 	for (y=0;y<256;y++)
 	{
 		int realy = (y + scrolly) & 0x1ff;
-		UINT16 *src = &bm.pix16(realy);
-		UINT16 *dst = &bitmap.pix16(y);
+		uint16_t *src = &bm.pix16(realy);
+		uint16_t *dst = &bitmap.pix16(y);
 
 
 		for (x=0;x<256;x++)
 		{
 			int realx = (x + scrollx) & 0x1ff;
-			UINT16 srcdat = src[realx];
+			uint16_t srcdat = src[realx];
 
 			/* 0x01 - data bits
 			   0x02
@@ -212,7 +218,7 @@ void dynduke_state::draw_background(bitmap_ind16 &bitmap, const rectangle &clipr
 	}
 }
 
-UINT32 dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t dynduke_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	/* Setup the tilemaps */
 	m_fg_layer->set_scrolly(0, ((m_scroll_ram[0x11]&0x30)<<4)+((m_scroll_ram[0x12]&0x7f)<<1)+((m_scroll_ram[0x12]&0x80)>>7) );

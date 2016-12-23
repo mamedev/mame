@@ -45,7 +45,7 @@ PALETTE_INIT_MEMBER(huc6260_device, huc6260)
 const device_type HUC6260 = &device_creator<huc6260_device>;
 
 
-huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+huc6260_device::huc6260_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	:   device_t(mconfig, HUC6260, "HuC6260 VCE", tag, owner, clock, "huc6260", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_next_pixel_data_cb(*this),
@@ -62,7 +62,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 	int hpos = m_screen->hpos();
 	int h = m_last_h;
 	int v = m_last_v;
-	UINT16 *bitmap_line = &m_bmp->pix16(v);
+	uint16_t *bitmap_line = &m_bmp->pix16(v);
 
 	while ( h != hpos || v != vpos )
 	{
@@ -146,7 +146,7 @@ void huc6260_device::device_timer(emu_timer &timer, device_timer_id id, int para
 
 	/* Ask our slave device for time until next possible event */
 	{
-		UINT16 next_event_clocks = m_time_til_next_event_cb( 0, 0xffff );
+		uint16_t next_event_clocks = m_time_til_next_event_cb( 0, 0xffff );
 		int event_hpos, event_vpos;
 
 		/* Adjust for pixel clocks per pixel */
@@ -198,7 +198,7 @@ WRITE8_MEMBER(huc6260_device::palette_direct_write)
 
 READ8_MEMBER( huc6260_device::read )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	switch ( offset & 7 )
 	{

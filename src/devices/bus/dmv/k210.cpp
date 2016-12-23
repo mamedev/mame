@@ -51,7 +51,7 @@ const device_type DMV_K210 = &device_creator<dmv_k210_device>;
 //  dmv_k210_device - constructor
 //-------------------------------------------------
 
-dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k210_device::dmv_k210_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, DMV_K210, "K210 Centronics", tag, owner, clock, "dmv_k210", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_ppi(*this, "ppi8255"),
@@ -101,13 +101,13 @@ machine_config_constructor dmv_k210_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( dmv_k210 );
 }
 
-void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_k210_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
 	if (ifsel == 0)
 		data = m_ppi->read(space, offset & 0x03);
 }
 
-void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k210_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
 	if (ifsel == 0)
 		m_ppi->write(space, offset & 0x03, data);

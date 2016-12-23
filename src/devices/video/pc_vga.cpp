@@ -125,71 +125,71 @@ const device_type ATI_VGA = &device_creator<ati_vga_device>;
 const device_type IBM8514A = &device_creator<ibm8514a_device>;
 const device_type MACH8 = &device_creator<mach8_device>;
 
-vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+vga_device::vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+vga_device::vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, VGA, "VGA", tag, owner, clock, "vga", __FILE__),
 		m_palette(*this, "^palette"),
 		m_screen(*this,"^screen")
 {
 }
 
-svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+svga_device::svga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tseng_vga_device::tseng_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, TSENG_VGA, "TSENG LABS VGA", tag, owner, clock, "tseng_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ati_vga_device(mconfig, S3_VGA, "S3 Graphics VGA", tag, owner, clock, "s3_vga", __FILE__)
 {
 }
 
-s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+s3_vga_device::s3_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: ati_vga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+gamtor_vga_device::gamtor_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, GAMTOR_VGA, "GAMTOR VGA", tag, owner, clock, "gamtor_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: svga_device(mconfig, ATI_VGA, "ATI VGA", tag, owner, clock, "ati_vga", __FILE__)
 {
 }
 
-ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ati_vga_device::ati_vga_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: svga_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, IBM8514A, "IBM8514A Video", tag, owner, clock, "ibm8514a", __FILE__)
 {
 }
 
-ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+ibm8514a_device::ibm8514a_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+mach8_device::mach8_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: ibm8514a_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mach8_device::mach8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ibm8514a_device(mconfig, MACH8, "MACH8", tag, owner, clock, "mach8", __FILE__)
 {
 }
@@ -220,6 +220,17 @@ void svga_device::zero()
 TIMER_CALLBACK_MEMBER(vga_device::vblank_timer_cb)
 {
 	vga.crtc.start_addr = vga.crtc.start_addr_latch;
+	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
+	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
+}
+
+TIMER_CALLBACK_MEMBER(s3_vga_device::vblank_timer_cb)
+{
+	// not sure if this is correct, but XF86_S3 seems to expect the viewport scrolling to be faster
+	if(s3.memory_config & 0x08)
+		vga.crtc.start_addr = vga.crtc.start_addr_latch << 2;
+	else
+		vga.crtc.start_addr = vga.crtc.start_addr_latch;
 	vga.attribute.pel_shift = vga.attribute.pel_shift_latch;
 	m_vblank_timer->adjust( machine().first_screen()->time_until_pos(vga.crtc.vert_blank_start + vga.crtc.vert_blank_end) );
 }
@@ -313,7 +324,7 @@ void mach8_device::device_start()
 	memset(&mach8, 0, sizeof(mach8));
 }
 
-UINT16 vga_device::offset()
+uint16_t vga_device::offset()
 {
 //  popmessage("Offset: %04x  %s %s **",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD");
 	if(vga.crtc.dw)
@@ -326,13 +337,13 @@ UINT16 vga_device::offset()
 
 void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 ch, attr;
-	UINT8 bits;
-	UINT32 font_base;
-	UINT32 *bitmapline;
+	uint8_t ch, attr;
+	uint8_t bits;
+	uint32_t font_base;
+	uint32_t *bitmapline;
 	int width=CHAR_WIDTH, height = (vga.crtc.maximum_scan_line) * (vga.crtc.scan_doubling + 1);
 	int pos, line, column, mask, w, h, addr;
-	UINT8 blink_en,fore_col,back_col;
+	uint8_t blink_en,fore_col,back_col;
 	pen_t pen;
 
 	if(vga.crtc.cursor_enable)
@@ -355,7 +366,7 @@ void vga_device::vga_vh_text(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 			back_col = (attr & 0x70) >> 4;
 			back_col |= (vga.attribute.data[0x10]&8) ? 0 : ((attr & 0x80) >> 4);
 
-			for (h = MAX(-line, 0); (h < height) && (line+h < MIN(TEXT_LINES, bitmap.height())); h++)
+			for (h = std::max(-line, 0); (h < height) && (line+h < std::min(TEXT_LINES, bitmap.height())); h++)
 			{
 				bitmapline = &bitmap.pix32(line+h);
 				bits = vga.memory[font_base+(h>>(vga.crtc.scan_doubling))];
@@ -404,7 +415,7 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, i, yi;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
-	UINT32 *bitmapline;
+	uint32_t *bitmapline;
 	pen_t pen;
 	int pel_shift = (vga.attribute.pel_shift & 7);
 
@@ -449,8 +460,8 @@ void vga_device::vga_vh_ega(bitmap_rgb32 &bitmap,  const rectangle &cliprect)
 void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, curr_addr;
-	UINT32 *bitmapline;
-	UINT16 mask_comp;
+	uint32_t *bitmapline;
+	uint16_t mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
 	int xi;
@@ -522,10 +533,10 @@ void vga_device::vga_vh_vga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *bitmapline;
+	uint32_t *bitmapline;
 	int height = (vga.crtc.scan_doubling + 1);
 	int x,xi,y,yi;
-	UINT32 addr;
+	uint32_t addr;
 	pen_t pen;
 	int width;
 
@@ -557,10 +568,10 @@ void vga_device::vga_vh_cga(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *bitmapline;
+	uint32_t *bitmapline;
 	int height = (vga.crtc.scan_doubling + 1);
 	int x,xi,y,yi;
-	UINT32 addr;
+	uint32_t addr;
 	pen_t pen;
 	int width;
 
@@ -593,13 +604,13 @@ void vga_device::vga_vh_mono(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 void svga_device::svga_vh_rgb8(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	int pos, line, column, c, addr, curr_addr;
-	UINT32 *bitmapline;
-	UINT16 mask_comp;
+	uint32_t *bitmapline;
+	uint16_t mask_comp;
 	int height = vga.crtc.maximum_scan_line * (vga.crtc.scan_doubling + 1);
 	int yi;
 	int xi;
-	UINT8 start_shift;
-//  UINT16 line_length;
+	uint8_t start_shift;
+//  uint16_t line_length;
 
 	/* line compare is screen sensitive */
 	mask_comp = 0x3ff;
@@ -650,8 +661,8 @@ void svga_device::svga_vh_rgb15(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xm;
 	int pos, line, column, c, addr, curr_addr;
 
-	UINT32 *bitmapline;
-//  UINT16 mask_comp;
+	uint32_t *bitmapline;
+//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
@@ -694,8 +705,8 @@ void svga_device::svga_vh_rgb16(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int xm;
 	int pos, line, column, c, addr, curr_addr;
 
-	UINT32 *bitmapline;
-//  UINT16 mask_comp;
+	uint32_t *bitmapline;
+//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
@@ -737,9 +748,9 @@ void svga_device::svga_vh_rgb24(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xm;
 	int pos, line, column, c, addr, curr_addr;
-	UINT32 *bitmapline;
+	uint32_t *bitmapline;
 
-//  UINT16 mask_comp;
+//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
@@ -778,9 +789,9 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	int yi;
 	int xm;
 	int pos, line, column, c, addr, curr_addr;
-	UINT32 *bitmapline;
+	uint32_t *bitmapline;
 
-//  UINT16 mask_comp;
+//  uint16_t mask_comp;
 
 	/* line compare is screen sensitive */
 //  mask_comp = 0xff | (TLINES & 0x300);
@@ -810,7 +821,7 @@ void svga_device::svga_vh_rgb32(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 	}
 }
 
-UINT8 vga_device::pc_vga_choosevideomode()
+uint8_t vga_device::pc_vga_choosevideomode()
 {
 	int i;
 
@@ -871,7 +882,7 @@ UINT8 vga_device::pc_vga_choosevideomode()
 }
 
 
-UINT8 svga_device::pc_vga_choosevideomode()
+uint8_t svga_device::pc_vga_choosevideomode()
 {
 	int i;
 
@@ -952,9 +963,9 @@ UINT8 svga_device::pc_vga_choosevideomode()
 }
 
 
-UINT32 vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode = pc_vga_choosevideomode();
+	uint8_t cur_mode = pc_vga_choosevideomode();
 	switch(cur_mode)
 	{
 		case SCREEN_OFF:   bitmap.fill  (m_palette->black_pen(), cliprect);break;
@@ -968,9 +979,9 @@ UINT32 vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, co
 	return 0;
 }
 
-UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode = pc_vga_choosevideomode();
+	uint8_t cur_mode = pc_vga_choosevideomode();
 
 	switch(cur_mode)
 	{
@@ -990,9 +1001,9 @@ UINT32 svga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, c
 	return 0;
 }
 
-UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 cur_mode;
+	uint8_t cur_mode;
 
 	svga_device::screen_update(screen, bitmap, cliprect);
 
@@ -1002,14 +1013,14 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 	// TODO: support 16 bit and greater video modes
 	if(s3.cursor_mode & 0x01)  // if cursor is enabled
 	{
-		UINT32 src;
-		UINT32* dst;
-		UINT8 val;
+		uint32_t src;
+		uint32_t* dst;
+		uint8_t val;
 		int x,y;
-		UINT16 cx = s3.cursor_x & 0x07ff;
-		UINT16 cy = s3.cursor_y & 0x07ff;
-		UINT32 bg_col;
-		UINT32 fg_col;
+		uint16_t cx = s3.cursor_x & 0x07ff;
+		uint16_t cy = s3.cursor_y & 0x07ff;
+		uint32_t bg_col;
+		uint32_t fg_col;
 
 		if(cur_mode == SCREEN_OFF || cur_mode == TEXT_MODE || cur_mode == MONO_MODE || cur_mode == CGA_MODE || cur_mode == EGA_MODE)
 			return 0;  // cursor only works in VGA or SVGA modes
@@ -1019,7 +1030,7 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 		if(cur_mode == RGB16_MODE)
 		{
 			int r,g,b;
-			UINT16 datax;
+			uint16_t datax;
 
 			datax = s3.cursor_bg[0]|s3.cursor_bg[1]<<8;
 			r = (datax&0xf800)>>11;
@@ -1051,50 +1062,53 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 //          printf("%08x: %02x %02x %02x %02x\n",src+x*4,vga.memory[src+x*4],vga.memory[src+x*4+1],vga.memory[src+x*4+2],vga.memory[src+x*4+3]);
 		for(y=0;y<64;y++)
 		{
-			dst = &bitmap.pix32(cy + y, cx);
-			for(x=0;x<64;x++)
+			if(cy + y < cliprect.max_y && cx < cliprect.max_x)
 			{
-				UINT16 bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				UINT16 bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
-				val = ((bita & 0x01) << 1) | (bitb & 0x01);
-				if(s3.extended_dac_ctrl & 0x10)
-				{  // X11 mode
-					switch(val)
-					{
-					case 0x00:
-						// no change
-						break;
-					case 0x01:
-						// no change
-						break;
-					case 0x02:
-						dst[x] = bg_col;
-						break;
-					case 0x03:
-						dst[x] = fg_col;
-						break;
+				dst = &bitmap.pix32(cy + y, cx);
+				for(x=0;x<64;x++)
+				{
+					uint16_t bita = (vga.memory[(src+1) % vga.svga_intf.vram_size] | ((vga.memory[(src+0) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					uint16_t bitb = (vga.memory[(src+3) % vga.svga_intf.vram_size] | ((vga.memory[(src+2) % vga.svga_intf.vram_size]) << 8)) >> (15-(x % 16));
+					val = ((bita & 0x01) << 1) | (bitb & 0x01);
+					if(s3.extended_dac_ctrl & 0x10)
+					{  // X11 mode
+						switch(val)
+						{
+						case 0x00:
+							// no change
+							break;
+						case 0x01:
+							// no change
+							break;
+						case 0x02:
+							dst[x] = bg_col;
+							break;
+						case 0x03:
+							dst[x] = fg_col;
+							break;
+						}
 					}
-				}
-				else
-				{  // Windows mode
-					switch(val)
-					{
-					case 0x00:
-						dst[x] = bg_col;
-						break;
-					case 0x01:
-						dst[x] = fg_col;
-						break;
-					case 0x02:  // screen data
-						// no change
-						break;
-					case 0x03:  // inverted screen data
-						dst[x] = ~(dst[x]);
-						break;
+					else
+					{  // Windows mode
+						switch(val)
+						{
+						case 0x00:
+							dst[x] = bg_col;
+							break;
+						case 0x01:
+							dst[x] = fg_col;
+							break;
+						case 0x02:  // screen data
+							// no change
+							break;
+						case 0x03:  // inverted screen data
+							dst[x] = ~(dst[x]);
+							break;
+						}
 					}
+					if(x % 16 == 15)
+						src+=4;
 				}
-				if(x % 16 == 15)
-					src+=4;
 			}
 		}
 	}
@@ -1104,9 +1118,9 @@ UINT32 s3_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap,
 
 /***************************************************************************/
 
-inline UINT8 vga_device::vga_latch_write(int offs, UINT8 data)
+inline uint8_t vga_device::vga_latch_write(int offs, uint8_t data)
 {
-	UINT8 res = 0;
+	uint8_t res = 0;
 
 	switch (vga.gc.write_mode & 3) {
 	case 0:
@@ -1131,9 +1145,9 @@ inline UINT8 vga_device::vga_latch_write(int offs, UINT8 data)
 	return res;
 }
 
-UINT8 vga_device::crtc_reg_read(UINT8 index)
+uint8_t vga_device::crtc_reg_read(uint8_t index)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0xff;
 
@@ -1250,7 +1264,7 @@ void vga_device::recompute_params_clock(int divisor, int xtal)
 {
 	int vblank_period,hblank_period;
 	attoseconds_t refresh;
-	UINT8 hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
+	uint8_t hclock_m = (!GRAPHIC_MODE) ? CHAR_WIDTH : 8;
 	int pixel_clock;
 
 	/* safety check */
@@ -1279,7 +1293,7 @@ void vga_device::recompute_params()
 		recompute_params_clock(1, (vga.miscellaneous_output & 0xc) ? XTAL_28_63636MHz : XTAL_25_1748MHz);
 }
 
-void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
+void vga_device::crtc_reg_write(uint8_t index, uint8_t data)
 {
 	/* Doom does this */
 //  if(vga.crtc.protect_enable && index <= 0x07)
@@ -1430,7 +1444,7 @@ void vga_device::crtc_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-void vga_device::seq_reg_write(UINT8 index, UINT8 data)
+void vga_device::seq_reg_write(uint8_t index, uint8_t data)
 {
 	switch(index)
 	{
@@ -1448,10 +1462,10 @@ void vga_device::seq_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-UINT8 vga_device::vga_vblank()
+uint8_t vga_device::vga_vblank()
 {
-	UINT8 res;
-	UINT16 vblank_start,vblank_end,vpos;
+	uint8_t res;
+	uint16_t vblank_start,vblank_end,vpos;
 
 	/* calculate vblank start / end positions */
 	res = 0;
@@ -1479,7 +1493,7 @@ UINT8 vga_device::vga_vblank()
 
 READ8_MEMBER(vga_device::vga_crtc_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset) {
 	case 4:
@@ -1489,7 +1503,7 @@ READ8_MEMBER(vga_device::vga_crtc_r)
 		data = crtc_reg_read(vga.crtc.index);
 		break;
 	case 0xa:
-		UINT8 hsync,vsync;
+		uint8_t hsync,vsync;
 		vga.attribute.state = 0;
 		data = 0;
 
@@ -1562,15 +1576,15 @@ WRITE8_MEMBER(vga_device::vga_crtc_w)
 
 READ8_MEMBER(vga_device::port_03b0_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR==0x3b0)
 		data=vga_crtc_r(space, offset, mem_mask);
 	return data;
 }
 
-UINT8 vga_device::gc_reg_read(UINT8 index)
+uint8_t vga_device::gc_reg_read(uint8_t index)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(index)
 	{
@@ -1618,7 +1632,7 @@ UINT8 vga_device::gc_reg_read(UINT8 index)
 
 READ8_MEMBER(vga_device::port_03c0_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (offset)
 	{
@@ -1735,7 +1749,7 @@ READ8_MEMBER(vga_device::port_03c0_r)
 
 READ8_MEMBER(vga_device::port_03d0_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (CRTC_PORT_ADDR == 0x3d0)
 		data = vga_crtc_r(space, offset, mem_mask);
 	if(offset == 8)
@@ -1756,7 +1770,7 @@ WRITE8_MEMBER(vga_device::port_03b0_w)
 		vga_crtc_w(space, offset, data, mem_mask);
 }
 
-void vga_device::attribute_reg_write(UINT8 index, UINT8 data)
+void vga_device::attribute_reg_write(uint8_t index, uint8_t data)
 {
 	if((index & 0x30) == 0)
 	{
@@ -1777,7 +1791,7 @@ void vga_device::attribute_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-void vga_device::gc_reg_write(UINT8 index,UINT8 data)
+void vga_device::gc_reg_write(uint8_t index,uint8_t data)
 {
 	switch(index)
 	{
@@ -1982,8 +1996,8 @@ READ8_MEMBER(vga_device::mem_r)
 
 		if (vga.gc.read_mode)
 		{
-			UINT8 byte,layer;
-			UINT8 fill_latch;
+			uint8_t byte,layer;
+			uint8_t fill_latch;
 			data=0;
 
 			for(byte=0;byte<8;byte++)
@@ -2007,7 +2021,7 @@ READ8_MEMBER(vga_device::mem_r)
 	else
 	{
 		// TODO: Guesswork, probably not right
-		UINT8 i,data;
+		uint8_t i,data;
 
 		data = 0;
 		//printf("%08x\n",offset);
@@ -2052,7 +2066,7 @@ WRITE8_MEMBER(vga_device::mem_w)
 	}
 
 	{
-		UINT8 i;
+		uint8_t i;
 
 		for(i=0;i<4;i++)
 		{
@@ -2198,9 +2212,9 @@ void tseng_vga_device::tseng_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-UINT8 tseng_vga_device::tseng_crtc_reg_read(UINT8 index)
+uint8_t tseng_vga_device::tseng_crtc_reg_read(uint8_t index)
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(index <= 0x18)
 		res = crtc_reg_read(index);
@@ -2224,7 +2238,7 @@ UINT8 tseng_vga_device::tseng_crtc_reg_read(UINT8 index)
 	return res;
 }
 
-void tseng_vga_device::tseng_crtc_reg_write(UINT8 index, UINT8 data)
+void tseng_vga_device::tseng_crtc_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x18)
 		crtc_reg_write(index,data);
@@ -2246,9 +2260,9 @@ void tseng_vga_device::tseng_crtc_reg_write(UINT8 index, UINT8 data)
 	}
 }
 
-UINT8 tseng_vga_device::tseng_seq_reg_read(UINT8 index)
+uint8_t tseng_vga_device::tseng_seq_reg_read(uint8_t index)
 {
-	UINT8 res;
+	uint8_t res;
 
 	res = 0xff;
 
@@ -2268,7 +2282,7 @@ UINT8 tseng_vga_device::tseng_seq_reg_read(UINT8 index)
 	return res;
 }
 
-void tseng_vga_device::tseng_seq_reg_write(UINT8 index, UINT8 data)
+void tseng_vga_device::tseng_seq_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x04)
 	{
@@ -2289,7 +2303,7 @@ void tseng_vga_device::tseng_seq_reg_write(UINT8 index, UINT8 data)
 
 READ8_MEMBER(tseng_vga_device::port_03b0_r)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -2335,7 +2349,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03b0_w)
 	tseng_define_video_mode();
 }
 
-void tseng_vga_device::tseng_attribute_reg_write(UINT8 index, UINT8 data)
+void tseng_vga_device::tseng_attribute_reg_write(uint8_t index, uint8_t data)
 {
 	switch(index)
 	{
@@ -2371,7 +2385,7 @@ void tseng_vga_device::tseng_attribute_reg_write(UINT8 index, UINT8 data)
 
 READ8_MEMBER(tseng_vga_device::port_03c0_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(offset)
 	{
@@ -2453,7 +2467,7 @@ WRITE8_MEMBER(tseng_vga_device::port_03c0_w)
 
 READ8_MEMBER(tseng_vga_device::port_03d0_r)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -2529,7 +2543,7 @@ S3 implementation
 
 ******************************************/
 
-UINT16 s3_vga_device::offset()
+uint16_t s3_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(s3.memory_config & 0x08)?"31":"--");
 	if(s3.memory_config & 0x08)
@@ -2537,9 +2551,9 @@ UINT16 s3_vga_device::offset()
 	return vga_device::offset();
 }
 
-UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
+uint8_t s3_vga_device::s3_crtc_reg_read(uint8_t index)
 {
-	UINT8 res;
+	uint8_t res;
 
 	if(index <= 0x18)
 		res = crtc_reg_read(index);
@@ -2650,7 +2664,7 @@ UINT8 s3_vga_device::s3_crtc_reg_read(UINT8 index)
 				break;
 			default:
 				res = vga.crtc.data[index];
-				//debugger_break(machine);
+				//machine().debug_break();
 				//printf("%02x\n",index);
 				break;
 		}
@@ -2697,7 +2711,7 @@ void s3_vga_device::s3_define_video_mode()
 	recompute_params_clock(divisor, xtal);
 }
 
-void s3_vga_device::s3_crtc_reg_write(UINT8 index, UINT8 data)
+void s3_vga_device::s3_crtc_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x18)
 		crtc_reg_write(index,data);
@@ -3000,9 +3014,9 @@ bit    0  Vertical Total bit 10. Bit 10 of the Vertical Total register (3d4h
 	}
 }
 
-UINT8 s3_vga_device::s3_seq_reg_read(UINT8 index)
+uint8_t s3_vga_device::s3_seq_reg_read(uint8_t index)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	if(index <= 0x0c)
 		res = vga.sequencer.data[index];
@@ -3035,7 +3049,7 @@ UINT8 s3_vga_device::s3_seq_reg_read(UINT8 index)
 	return res;
 }
 
-void s3_vga_device::s3_seq_reg_write(UINT8 index, UINT8 data)
+void s3_vga_device::s3_seq_reg_write(uint8_t index, uint8_t data)
 {
 	if(index <= 0x0c)
 	{
@@ -3084,7 +3098,7 @@ void s3_vga_device::s3_seq_reg_write(UINT8 index, UINT8 data)
 
 READ8_MEMBER(s3_vga_device::port_03b0_r)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	if (CRTC_PORT_ADDR == 0x3b0)
 	{
@@ -3121,7 +3135,7 @@ WRITE8_MEMBER(s3_vga_device::port_03b0_w)
 
 READ8_MEMBER(s3_vga_device::port_03c0_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(offset)
 	{
@@ -3151,7 +3165,7 @@ WRITE8_MEMBER(s3_vga_device::port_03c0_w)
 
 READ8_MEMBER(s3_vga_device::port_03d0_r)
 {
-	UINT8 res = 0xff;
+	uint8_t res = 0xff;
 
 	if (CRTC_PORT_ADDR == 0x3d0)
 	{
@@ -3188,7 +3202,7 @@ WRITE8_MEMBER(s3_vga_device::port_03d0_w)
 
 READ8_MEMBER(ati_vga_device::port_03c0_r)
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch(offset)
 	{
@@ -3206,12 +3220,12 @@ READ8_MEMBER(ati_vga_device::port_03c0_r)
 
 /* accelerated ports, TBD ... */
 
-void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
+void ibm8514a_device::ibm8514_write_fg(uint32_t offset)
 {
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	offset %= m_vga->vga.svga_intf.vram_size;
-	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
-	UINT8 src = 0;
+	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t src = 0;
 
 	// check clipping rectangle
 	if((ibm8514.current_cmd & 0xe000) == 0xc000)  // BitBLT writes to the destination X/Y, so check that instead
@@ -3295,12 +3309,12 @@ void ibm8514a_device::ibm8514_write_fg(UINT32 offset)
 	}
 }
 
-void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
+void ibm8514a_device::ibm8514_write_bg(uint32_t offset)
 {
 	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 	offset %= m_vga->vga.svga_intf.vram_size;
-	UINT8 dst = m_vga->mem_linear_r(space,offset,0xff);
-	UINT8 src = 0;
+	uint8_t dst = m_vga->mem_linear_r(space,offset,0xff);
+	uint8_t src = 0;
 
 	// check clipping rectangle
 	if((ibm8514.current_cmd & 0xe000) == 0xc000)  // BitBLT writes to the destination X/Y, so check that instead
@@ -3384,11 +3398,10 @@ void ibm8514a_device::ibm8514_write_bg(UINT32 offset)
 	}
 }
 
-void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
+void ibm8514a_device::ibm8514_write(uint32_t offset, uint32_t src)
 {
 	int data_size = 8;
-	UINT32 xfer;
-	address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
+	uint32_t xfer;
 
 	switch(ibm8514.pixel_control & 0x00c0)
 	{
@@ -3428,6 +3441,7 @@ void ibm8514a_device::ibm8514_write(UINT32 offset, UINT32 src)
 			ibm8514.src_x = 0;
 		break;
 	case 0x00c0:  // use source plane
+		address_space& space = machine().device("maincpu")->memory().space(AS_PROGRAM);
 		if(m_vga->mem_linear_r(space,src,0xff) != 0x00)
 			ibm8514_write_fg(offset);
 		else
@@ -3480,7 +3494,7 @@ bit   0-7  Queue State.
  */
 READ16_MEMBER(ibm8514a_device::ibm8514_gpstatus_r)
 {
-	UINT16 ret = 0x0000;
+	uint16_t ret = 0x0000;
 
 	//if(LOG_8514) logerror("S3: 9AE8 read\n");
 	if(ibm8514.gpbusy == true)
@@ -3490,9 +3504,9 @@ READ16_MEMBER(ibm8514a_device::ibm8514_gpstatus_r)
 	return ret;
 }
 
-void ibm8514a_device::ibm8514_draw_vector(UINT8 len, UINT8 dir, bool draw)
+void ibm8514a_device::ibm8514_draw_vector(uint8_t len, uint8_t dir, bool draw)
 {
-	UINT32 offset;
+	uint32_t offset;
 	int x = 0;
 
 	while(x <= len)
@@ -3622,8 +3636,8 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 {
 	int x,y;
 	int pattern_x,pattern_y;
-	UINT32 off,src;
-	UINT8 readmask;
+	uint32_t off,src;
+	uint8_t readmask;
 
 	ibm8514.current_cmd = data;
 	ibm8514.src_x = 0;
@@ -3656,13 +3670,13 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_cmd_w)
 		else
 		{
 			// Not perfect, but will do for now.
-			INT16 dx = ibm8514.rect_width;
-			INT16 dy = ibm8514.line_axial_step >> 1;
-			INT16 err = ibm8514.line_errorterm;
+			int16_t dx = ibm8514.rect_width;
+			int16_t dy = ibm8514.line_axial_step >> 1;
+			int16_t err = ibm8514.line_errorterm;
 			int sx = (data & 0x0020) ? 1 : -1;
 			int sy = (data & 0x0080) ? 1 : -1;
 			int count = 0;
-			INT16 temp;
+			int16_t temp;
 
 			if(LOG_8514) logerror("8514/A: Command (%04x) - Line (Bresenham) - %i,%i  Axial %i, Diagonal %i, Error %i, Major Axis %i, Minor Axis %i\n",ibm8514.current_cmd,
 				ibm8514.curr_x,ibm8514.curr_y,ibm8514.line_axial_step,ibm8514.line_diagonal_step,ibm8514.line_errorterm,ibm8514.rect_width,ibm8514.rect_height);
@@ -3974,11 +3988,11 @@ Note: The upper byte must be written for the SSV command to be executed.
  */
 void ibm8514a_device::ibm8514_wait_draw_ssv()
 {
-	UINT8 len = ibm8514.wait_vector_len;
-	UINT8 dir = ibm8514.wait_vector_dir;
+	uint8_t len = ibm8514.wait_vector_len;
+	uint8_t dir = ibm8514.wait_vector_dir;
 	bool draw = ibm8514.wait_vector_draw;
-	UINT8 count = ibm8514.wait_vector_count;
-	UINT32 offset;
+	uint8_t count = ibm8514.wait_vector_count;
+	uint32_t offset;
 	int x;
 	int data_size;
 
@@ -4060,10 +4074,10 @@ void ibm8514a_device::ibm8514_wait_draw_ssv()
 	}
 }
 
-void ibm8514a_device::ibm8514_draw_ssv(UINT8 data)
+void ibm8514a_device::ibm8514_draw_ssv(uint8_t data)
 {
-	UINT8 len = data & 0x0f;
-	UINT8 dir = (data & 0xe0) >> 5;
+	uint8_t len = data & 0x0f;
+	uint8_t dir = (data & 0xe0) >> 5;
 	bool draw = (data & 0x10) ? true : false;
 
 	ibm8514_draw_vector(len,dir,draw);
@@ -4104,12 +4118,12 @@ WRITE16_MEMBER(ibm8514a_device::ibm8514_ssv_w)
 
 void ibm8514a_device::ibm8514_wait_draw_vector()
 {
-	UINT8 len = ibm8514.wait_vector_len;
-	UINT8 dir = ibm8514.wait_vector_dir;
+	uint8_t len = ibm8514.wait_vector_len;
+	uint8_t dir = ibm8514.wait_vector_dir;
 	bool draw = ibm8514.wait_vector_draw;
-	UINT8 count = ibm8514.wait_vector_count;
-	UINT32 offset;
-	UINT8 data_size = 0;
+	uint8_t count = ibm8514.wait_vector_count;
+	uint32_t offset;
+	uint8_t data_size = 0;
 	int x;
 
 	if(ibm8514.bus_size == 0)  // 8-bit
@@ -4400,7 +4414,7 @@ bit   0-2  (911-928) READ-REG-SEL. Read Register Select. Selects the register
 void ibm8514a_device::ibm8514_wait_draw()
 {
 	int x, data_size = 8;
-	UINT32 off;
+	uint32_t off;
 
 	// the data in the pixel transfer register or written to VRAM masks the rectangle output
 	if(ibm8514.bus_size == 0)  // 8-bit
@@ -4951,7 +4965,7 @@ WRITE8_MEMBER(gamtor_vga_device::mem_w)
 
 READ8_MEMBER(gamtor_vga_device::port_03b0_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(offset)
 	{
@@ -4975,7 +4989,7 @@ WRITE8_MEMBER(gamtor_vga_device::port_03b0_w)
 
 READ8_MEMBER(gamtor_vga_device::port_03c0_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(offset)
 	{
@@ -4999,7 +5013,7 @@ WRITE8_MEMBER(gamtor_vga_device::port_03c0_w)
 
 READ8_MEMBER(gamtor_vga_device::port_03d0_r)
 {
-	UINT8 res;
+	uint8_t res;
 
 	switch(offset)
 	{
@@ -5021,7 +5035,7 @@ WRITE8_MEMBER(gamtor_vga_device::port_03d0_w)
 	}
 }
 
-UINT16 ati_vga_device::offset()
+uint16_t ati_vga_device::offset()
 {
 	//popmessage("Offset: %04x  %s %s %s %s",vga.crtc.offset,vga.crtc.dw?"DW":"--",vga.crtc.word_mode?"BYTE":"WORD",(ati.ext_reg[0x33] & 0x40) ? "PEL" : "---",(ati.ext_reg[0x30] & 0x20) ? "256" : "---");
 	if(ati.ext_reg[0x30] & 0x20)  // likely wrong, gets 640x400/480 SVGA and tweaked 256 colour modes displaying correctly in Fractint.
@@ -5035,7 +5049,7 @@ UINT16 ati_vga_device::offset()
 void ati_vga_device::ati_define_video_mode()
 {
 	int clock;
-	UINT8 clock_type;
+	uint8_t clock_type;
 	int div = ((ati.ext_reg[0x38] & 0xc0) >> 6) + 1;
 	int divisor = 1;
 
@@ -5147,7 +5161,7 @@ WRITE8_MEMBER(ati_vga_device::mem_w)
 
 READ8_MEMBER(ati_vga_device::ati_port_ext_r)
 {
-	UINT8 ret = 0xff;
+	uint8_t ret = 0xff;
 
 	switch(offset)
 	{

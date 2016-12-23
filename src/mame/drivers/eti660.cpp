@@ -42,14 +42,14 @@
 
 READ8_MEMBER( eti660_state::pia_r )
 {
-	UINT8 pia_offset = m_maincpu->get_memory_address() & 0x03;
+	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	return m_pia->read(space, pia_offset);
 }
 
 WRITE8_MEMBER( eti660_state::pia_w )
 {
-	UINT8 pia_offset = m_maincpu->get_memory_address() & 0x03;
+	uint8_t pia_offset = m_maincpu->get_memory_address() & 0x03;
 
 	// Some PIA hacks here, as mentioned in the ToDo.
 	if (pia_offset == 1)
@@ -69,7 +69,7 @@ WRITE8_MEMBER( eti660_state::colorram_w )
 {
 	offset = m_maincpu->get_memory_address() - 0xc80;
 
-	UINT8 colorram_offset = (((offset & 0x1f0) >> 1) | (offset & 0x07));
+	uint8_t colorram_offset = (((offset & 0x1f0) >> 1) | (offset & 0x07));
 
 	if (colorram_offset < 0xc0)
 		m_color_ram[colorram_offset] = data;
@@ -187,7 +187,7 @@ WRITE8_MEMBER( eti660_state::dma_w )
 
 	if (m_color_on)
 	{
-		UINT8 colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
+		uint8_t colorram_offset = ((offset & 0x1f0) >> 1) | (offset & 0x07);
 
 		if (colorram_offset < 0xc0)
 			m_color = m_color_ram[colorram_offset];
@@ -218,10 +218,10 @@ READ8_MEMBER( eti660_state::pia_pa_r )
 
 	*/
 
-	UINT8 i, data = 0xff;
+	uint8_t i, data = 0xff;
 
 	for (i = 0; i < 4; i++)
-		if BIT(m_keylatch, i)
+		if (BIT(m_keylatch, i))
 			return m_io_keyboard[i]->read();
 
 	return data;
@@ -267,9 +267,9 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 	int i;
 	int quick_addr = 0x600;
 	int quick_length;
-	dynamic_buffer quick_data;
+	std::vector<uint8_t> quick_data;
 	int read_;
-	int result = IMAGE_INIT_FAIL;
+	image_init_result result = image_init_result::FAIL;
 
 	quick_length = image.length();
 	quick_data.resize(quick_length);
@@ -286,12 +286,12 @@ QUICKLOAD_LOAD_MEMBER( eti660_state, eti660 )
 				space.write_byte(i + quick_addr, quick_data[i]);
 
 		/* display a message about the loaded quickload */
-		if (strcmp(image.filetype(), "bin") == 0)
+		if (image.is_filetype("bin"))
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 6 to start",quick_length,quick_addr,quick_addr+quick_length);
 		else
 			image.message(" Quickload: size=%04X : start=%04X : end=%04X : Press 8 to start",quick_length,quick_addr,quick_addr+quick_length);
 
-		result = IMAGE_INIT_PASS;
+		result = image_init_result::PASS;
 	}
 
 	return result;
@@ -317,7 +317,7 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL_8_867238MHz/5, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NULL, READLINE(eti660_state, rdata_r), READLINE(eti660_state, bdata_r), READLINE(eti660_state, gdata_r))
+	MCFG_CDP1864_ADD(CDP1864_TAG, SCREEN_TAG, XTAL_8_867238MHz/5, GND, INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_DMAOUT), INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1), NOOP, READLINE(eti660_state, rdata_r), READLINE(eti660_state, bdata_r), READLINE(eti660_state, gdata_r))
 	MCFG_CDP1864_CHROMINANCE(RES_K(2.2), RES_K(1), RES_K(4.7), RES_K(4.7)) // R7, R5, R6, R4
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
@@ -325,8 +325,8 @@ static MACHINE_CONFIG_START( eti660, eti660_state )
 	MCFG_DEVICE_ADD(MC6821_TAG, PIA6821, 0)
 	MCFG_PIA_READPA_HANDLER(READ8(eti660_state, pia_pa_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(eti660_state, pia_pa_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, int_w)) MCFG_DEVCB_INVERT
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE(CDP1802_TAG, cosmac_device, int_w)) MCFG_DEVCB_INVERT
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE(CDP1802_TAG, COSMAC_INPUT_LINE_INT)) MCFG_DEVCB_INVERT
 
 	MCFG_CASSETTE_ADD("cassette")
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_STOPPED | CASSETTE_MOTOR_ENABLED | CASSETTE_SPEAKER_MUTED)

@@ -7,12 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/m6800/m6800.h"
-#include "cpu/m6809/m6809.h"
-#include "machine/ticket.h"
 #include "includes/williams.h"
-#include "sound/dac.h"
-#include "sound/hc55516.h"
 
 
 /*************************************
@@ -83,7 +78,7 @@ WRITE_LINE_MEMBER(williams_state::williams_snd_irq)
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	m_soundcpu->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 /* Same as above, but for second sound board */
 WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
@@ -92,7 +87,7 @@ WRITE_LINE_MEMBER(blaster_state::williams_snd_irq_b)
 	int combined_state = pia_2->irq_a_state() | pia_2->irq_b_state();
 
 	/* IRQ to the sound CPU */
-	m_soundcpu_b->set_input_line(M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	m_soundcpu_b->set_input_line(M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -377,7 +372,7 @@ CUSTOM_INPUT_MEMBER(williams_state::williams_mux_r)
 
 READ8_MEMBER(williams_state::williams_49way_port_0_r)
 {
-	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
+	static const uint8_t translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
 	return (translate49[ioport("49WAYX")->read() >> 4] << 4) | translate49[ioport("49WAYY")->read() >> 4];
 }
 
@@ -423,7 +418,7 @@ WRITE8_MEMBER(williams_state::williams_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 }
 
 
@@ -431,7 +426,7 @@ WRITE8_MEMBER(williams2_state::williams2_watchdog_reset_w)
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		watchdog_reset_w(space,0,0);
+		m_watchdog->reset_w(space,0,0);
 }
 
 
@@ -605,8 +600,8 @@ TIMER_CALLBACK_MEMBER(blaster_state::blaster_deferred_snd_cmd_w)
 {
 	pia6821_device *pia_2l = machine().device<pia6821_device>("pia_2");
 	pia6821_device *pia_2r = machine().device<pia6821_device>("pia_2b");
-	UINT8 l_data = param | 0x80;
-	UINT8 r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
+	uint8_t l_data = param | 0x80;
+	uint8_t r_data = (param >> 1 & 0x40) | (param & 0x3f) | 0x80;
 
 	pia_2l->portb_w(l_data); pia_2l->cb1_w((l_data == 0xff) ? 0 : 1);
 	pia_2r->portb_w(r_data); pia_2r->cb1_w((r_data == 0xff) ? 0 : 1);
@@ -698,13 +693,13 @@ TIMER_CALLBACK_MEMBER(joust2_state::joust2_deferred_snd_cmd_w)
 WRITE_LINE_MEMBER(joust2_state::joust2_pia_3_cb1_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0x100) | ((state << 8) & 0x100);
-	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
 }
 
 
 WRITE8_MEMBER(joust2_state::joust2_snd_cmd_w)
 {
 	m_joust2_current_sound_data = (m_joust2_current_sound_data & ~0xff) | (data & 0xff);
-	m_cvsd_sound->write(machine().driver_data()->generic_space(), 0, m_joust2_current_sound_data);
+	m_cvsd_sound->write(machine().dummy_space(), 0, m_joust2_current_sound_data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(joust2_state::joust2_deferred_snd_cmd_w),this), m_joust2_current_sound_data);
 }

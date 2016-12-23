@@ -103,13 +103,13 @@ public:
 	required_device<timer_device> m_steer_pot_timer;
 	required_ioport m_steer_inp;
 
-	UINT8 m_videoram[2][0x4000]; // 2 layers of 16KB
-	UINT8 m_comms_latch[2];
-	UINT8 m_vcontrol;
-	UINT8 m_vreg[0x10];
-	UINT8 m_scroll;
-	UINT8 m_steerlatch;
-	UINT8 m_draw_mode;
+	uint8_t m_videoram[2][0x4000]; // 2 layers of 16KB
+	uint8_t m_comms_latch[2];
+	uint8_t m_vcontrol;
+	uint8_t m_vreg[0x10];
+	uint8_t m_scroll;
+	uint8_t m_steerlatch;
+	uint8_t m_draw_mode;
 
 	DECLARE_WRITE8_MEMBER(transmit_data_w);
 	DECLARE_READ8_MEMBER(trigger_slave_nmi_r);
@@ -128,7 +128,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(imolagp);
-	UINT32 screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -158,26 +158,26 @@ void imolagp_state::video_start()
 }
 
 
-UINT32 imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t imolagp_state::screen_update_imolagp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// draw solid background layer first, then sprites on top
 	for (int layer = 0; layer < 2; layer++)
 	{
 		for (int y = cliprect.min_y; y <= cliprect.max_y; y++)
 		{
-			const UINT8 *source = &m_videoram[layer][(y & 0xff) * 0x40];
-			UINT16 *dest = &bitmap.pix16(y & 0xff);
+			const uint8_t *source = &m_videoram[layer][(y & 0xff) * 0x40];
+			uint16_t *dest = &bitmap.pix16(y & 0xff);
 			for (int i = 0; i < 0x40; i++)
 			{
-				UINT8 data = source[i];
+				uint8_t data = source[i];
 				if (data || layer == 0)
 				{
 					// one color per each 4 pixels
-					UINT8 color = (data & 0xf0) >> 3;
-					UINT8 x = (i << 2) - (m_scroll ^ 3);
+					uint8_t color = (data & 0xf0) >> 3;
+					uint8_t x = (i << 2) - (m_scroll ^ 3);
 					for (int x2 = 0; x2 < 4; x2++)
 					{
-						UINT8 offset = x + x2;
+						uint8_t offset = x + x2;
 						if (offset >= cliprect.min_x && offset <= cliprect.max_x)
 							dest[offset] = color | (data >> x2 & 1);
 					}
@@ -259,7 +259,7 @@ READ8_MEMBER(imolagp_state::trigger_slave_nmi_r)
 WRITE8_MEMBER(imolagp_state::imola_led_board_w)
 {
 	// not sure what chip is used here, this is copied from turbo.c
-	static const UINT8 ls48_map[16] =
+	static const uint8_t ls48_map[16] =
 		{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0x00 };
 
 	output().set_digit_value(offset, ls48_map[data & 0x0f]);
@@ -422,7 +422,7 @@ static INPUT_PORTS_START( imolagp )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -453,7 +453,7 @@ static INPUT_PORTS_START( imolagpo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, NULL)
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, imolagp_state, imolagp_steerlatch_r, nullptr)
 INPUT_PORTS_END
 
 
@@ -501,8 +501,8 @@ static MACHINE_CONFIG_START( imolagp, imolagp_state )
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
 	// mode $91 - ports A & C-lower as input, ports B & C-upper as output
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
-	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B", 0))
-	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B", 0))
+	MCFG_I8255_IN_PORTB_CB(LOGGER("PPI8255 - unmapped read port B"))
+	MCFG_I8255_OUT_PORTB_CB(LOGGER("PPI8255 - unmapped write port B"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN1"))
 
 	/* video hardware */

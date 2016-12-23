@@ -6,7 +6,7 @@
 	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
 
 	<element name="plate" defstate="0">
-		<rect state="0"><color red="0.2" green="0.2" blue="0.2" /></rect>
+		<rect state="0"><color red="0.1" green="0.1" blue="0.1" /></rect>
 		<rect state="1"><color red="0.4" green="1.0" blue="0.95" /></rect>
 	</element>
 

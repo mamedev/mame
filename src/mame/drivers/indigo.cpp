@@ -54,24 +54,24 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	struct hpc_t
 	{
-		UINT8 m_misc_status;
-		UINT32 m_parbuf_ptr;
-		UINT32 m_local_ioreg0_mask;
-		UINT32 m_local_ioreg1_mask;
-		UINT32 m_vme_intmask0;
-		UINT32 m_vme_intmask1;
-		UINT32 m_scsi0_descriptor;
-		UINT32 m_scsi0_dma_ctrl;
+		uint8_t m_misc_status;
+		uint32_t m_parbuf_ptr;
+		uint32_t m_local_ioreg0_mask;
+		uint32_t m_local_ioreg1_mask;
+		uint32_t m_vme_intmask0;
+		uint32_t m_vme_intmask1;
+		uint32_t m_scsi0_descriptor;
+		uint32_t m_scsi0_dma_ctrl;
 	};
 
 	struct rtc_t
 	{
-		UINT8 nRAM[32];
+		uint8_t nRAM[32];
 	};
 
 	required_device<cpu_device> m_maincpu;
@@ -91,7 +91,7 @@ protected:
 };
 
 
-#define VERBOSE_LEVEL ( 2 )
+#define VERBOSE_LEVEL (0)
 
 inline void ATTR_PRINTF(3,4) indigo_state::verboselog(int n_level, const char *s_fmt, ... )
 {
@@ -110,7 +110,7 @@ void indigo_state::video_start()
 {
 }
 
-UINT32 indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t indigo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -276,7 +276,7 @@ WRITE32_MEMBER(indigo_state::hpc_w)
 		#if 0
 		if (data & 0x80)
 		{
-			UINT32 next;
+			uint32_t next;
 
 			osd_printf_info("DMA activated for SCSI0\n");
 			osd_printf_info("Descriptor block:\n");
@@ -468,31 +468,17 @@ static ADDRESS_MAP_START( indigo_map, AS_PROGRAM, 32, indigo_state )
 	AM_RANGE( 0x18000000, 0x187fffff ) AM_RAM AM_SHARE("share1")
 	AM_RANGE( 0x1fb80000, 0x1fb8ffff ) AM_READWRITE(hpc_r, hpc_w )
 	AM_RANGE( 0x1fbd9000, 0x1fbd903f ) AM_READWRITE(int_r, int_w )
-	AM_RANGE( 0x80000000, 0x801fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0x88000000, 0x88ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0xa0000000, 0xa01fffff ) AM_RAM AM_SHARE("share10")
-	AM_RANGE( 0xa8000000, 0xa8ffffff ) AM_RAM AM_SHARE("share5")
-	AM_RANGE( 0xa9000000, 0xa97fffff ) AM_RAM AM_SHARE("share6")
-	AM_RANGE( 0xaa000000, 0xaa7fffff ) AM_RAM AM_SHARE("share7")
-	AM_RANGE( 0xac000000, 0xac7fffff ) AM_RAM AM_SHARE("share8")
-	AM_RANGE( 0xb0000000, 0xb07fffff ) AM_RAM AM_SHARE("share9")
-	AM_RANGE( 0xb8000000, 0xb87fffff ) AM_RAM AM_SHARE("share1")
-	AM_RANGE( 0xbfb80000, 0xbfb8ffff ) AM_READWRITE(hpc_r, hpc_w )
-	AM_RANGE( 0xbfbd9000, 0xbfbd903f ) AM_READWRITE(int_r, int_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( indigo3k_map, AS_PROGRAM, 32, indigo_state )
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fc00000, 0x1fc3ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-	AM_RANGE( 0xbfc00000, 0xbfc3ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( indigo4k_map, AS_PROGRAM, 32, indigo_state )
 	AM_IMPORT_FROM( indigo_map )
 	AM_RANGE( 0x1fa00000, 0x1fa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
 	AM_RANGE( 0x1fc00000, 0x1fc7ffff ) AM_ROM AM_SHARE("share2") AM_REGION( "user1", 0 )
-	AM_RANGE( 0xbfa00000, 0xbfa1ffff ) AM_DEVREADWRITE("sgi_mc", sgi_mc_device, read, write )
-	AM_RANGE( 0xbfc00000, 0xbfc7ffff ) AM_ROM AM_SHARE("share2") /* BIOS Mirror */
 ADDRESS_MAP_END
 
 WRITE_LINE_MEMBER(indigo_state::scsi_irq)
@@ -507,7 +493,7 @@ void indigo_state::device_timer(emu_timer &timer, device_timer_id id, int param,
 		indigo_timer_rtc();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in indigo_state::device_timer");
+		assert_always(false, "Unknown id in indigo_state::device_timer");
 	}
 }
 

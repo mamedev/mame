@@ -92,7 +92,7 @@ Notes:
   a bug. The service mode functionality is very limited anyway. To get past the
   failed ROM test and see the service mode, use this ROM patch:
 
-    UINT8 *mem = machine.root_device().memregion("maincpu")->base();
+    uint8_t *mem = machine.root_device().memregion("maincpu")->base();
     mem[0x3a5d] = mem[0x3a5e] = mem[0x3a5f] = 0;
 
 - The "SNK Wave" custom sound circuitry is only actually used by marvins and
@@ -116,7 +116,7 @@ Notes:
   multiple times to select the spin. The flyer also says that the game "includes
   the unique feature of 2 distinct styles of game play, selectable by dipswitch
   setting. For the avid golfer, a more challenging style of swing.".
-  This feature only exists when "Language" Dip Swicth is set to "English"
+  This feature only exists when "Language" Dip Switch is set to "English"
 
 - fitegolfu:  An "SNK Fighting Golf Program Update" notice published in a trade
   journal outlines 3 improvements which is supposed to allow game players a bit
@@ -328,14 +328,14 @@ enum
 WRITE8_MEMBER(snk_state::marvins_soundlatch_w)
 {
 	m_marvins_sound_busy_flag = 1;
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
 READ8_MEMBER(snk_state::marvins_soundlatch_r)
 {
 	m_marvins_sound_busy_flag = 0;
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 CUSTOM_INPUT_MEMBER(snk_state::marvins_sound_busy)
@@ -374,14 +374,14 @@ TIMER_CALLBACK_MEMBER(snk_state::sgladiat_sndirq_update_callback)
 
 WRITE8_MEMBER(snk_state::sgladiat_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
 READ8_MEMBER(snk_state::sgladiat_soundlatch_r)
 {
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sgladiat_sndirq_update_callback),this), BUSY_CLEAR);
-	return soundlatch_byte_r(space,0);
+	return m_soundlatch->read(space,0);
 }
 
 READ8_MEMBER(snk_state::sgladiat_sound_nmi_ack_r)
@@ -474,7 +474,7 @@ WRITE_LINE_MEMBER(snk_state::ymirq_callback_2)
 
 WRITE8_MEMBER(snk_state::snk_soundlatch_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), CMDIRQ_BUSY_ASSERT);
 }
 
@@ -522,7 +522,7 @@ READ8_MEMBER(snk_state::tnk3_ymirq_ack_r)
 READ8_MEMBER(snk_state::tnk3_busy_clear_r)
 {
 	// it's uncertain whether the latch should be cleared here or when it's read
-	soundlatch_clear_byte_w(space, 0, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(snk_state::sndirq_update_callback),this), BUSY_CLEAR);
 	return 0xff;
 }
@@ -567,7 +567,7 @@ WRITE8_MEMBER(snk_state::hardflags_scroll_msb_w)
 
 int snk_state::hardflags_check(int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800 + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800 + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -659,7 +659,7 @@ WRITE8_MEMBER(snk_state::turbocheck_msb_w)
 
 int snk_state::turbofront_check(int small, int num)
 {
-	const UINT8 *sr = &m_spriteram[0x800*small + 4*num];
+	const uint8_t *sr = &m_spriteram[0x800*small + 4*num];
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
@@ -719,7 +719,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 CUSTOM_INPUT_MEMBER(snk_state::gwar_rotary)
 {
 	static const char *const ports[] = { "P1ROT", "P2ROT" };
-	int which = (int)(FPTR)param;
+	int which = (int)(uintptr_t)param;
 	int value = ioport(ports[which])->read();
 
 	if ((m_last_value[which] == 0x5 && value == 0x6) || (m_last_value[which] == 0x6 && value == 0x5))
@@ -795,7 +795,7 @@ CUSTOM_INPUT_MEMBER(snk_state::countryc_trackball_y)
 
 CUSTOM_INPUT_MEMBER(snk_state::snk_bonus_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -1410,7 +1410,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tnk3_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym3526_device, read, write)
 	AM_RANGE(0xe004, 0xe004) AM_READ(tnk3_cmdirq_ack_r)
@@ -1420,7 +1420,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( aso_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xd000, 0xd000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym3526_device, read, write)
 //  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
@@ -1431,7 +1431,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3526_YM3526_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3526_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3526_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", ym3526_device, status_port_r, control_port_w)
@@ -1442,7 +1442,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3812_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
@@ -1451,7 +1451,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3526_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3526_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3526_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
@@ -1462,7 +1462,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3812_Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ym1", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ym1", ym3812_device, write_port_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
@@ -1473,7 +1473,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( Y8950_sound_map, AS_PROGRAM, 8, snk_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xf000, 0xf000) AM_DEVREADWRITE("ym2", y8950_device, status_port_r, control_port_w)
 	AM_RANGE(0xf400, 0xf400) AM_DEVWRITE("ym2", y8950_device, write_port_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
@@ -1489,7 +1489,7 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, NULL) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )   // service switch according to schematics, see code at 0x0453. Goes to garbage.
 
 	PORT_START("IN1")
@@ -1571,7 +1571,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, NULL) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1655,8 +1655,8 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, NULL) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, NULL) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,marvins_sound_busy, nullptr) /* sound CPU status */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )
 
 	PORT_START("IN1")
@@ -1733,7 +1733,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1818,7 +1818,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SERVICE )            /* code at 0x054e */
 
@@ -1902,7 +1902,7 @@ static INPUT_PORTS_START( hal21 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -1985,7 +1985,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coinage" settings - code at 0x2e04 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2071,7 +2071,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x2e17 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2153,7 +2153,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
@@ -2236,7 +2236,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( athena )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )           /* uses "Coin A" settings - code at 0x09d4 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2321,7 +2321,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fitegolf )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x045b */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2417,7 +2417,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( countryc )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0450 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch */
@@ -2427,10 +2427,10 @@ static INPUT_PORTS_START( countryc )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_x, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_x, nullptr)
 
 	PORT_START("IN2")
-	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_y, NULL)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,countryc_trackball_y, nullptr)
 
 	PORT_START("IN3")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -2499,7 +2499,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ikari )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a15 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2594,7 +2594,7 @@ static INPUT_PORTS_START( ikaria )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a00 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 INPUT_PORTS_END
@@ -2631,7 +2631,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( victroad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x0a19 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2735,7 +2735,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0a0a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2864,7 +2864,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -2949,7 +2949,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x08c8 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -3058,7 +3058,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chopper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x0849 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )              /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_SERVICE )
@@ -3179,7 +3179,7 @@ static INPUT_PORTS_START( tdfever )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* also reset - code at 0x074a */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* adds 1 credit - code at 0x1065 */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3320,7 +3320,7 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_SERVICE )           /* same as the dip switch / also reset - code at 0x00cc */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_SERVICE1 )          /* uses "Coin A" settings - code at 0x677f */
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, snk_state,snk_sound_busy, nullptr)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 ) PORT_NAME("Start Game A")
@@ -3643,6 +3643,8 @@ static MACHINE_CONFIG_START( marvins, snk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* verified on schematics */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
@@ -3712,6 +3714,8 @@ static MACHINE_CONFIG_START( jcross, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)  /* NOT verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
@@ -3792,6 +3796,8 @@ static MACHINE_CONFIG_START( tnk3, snk_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
@@ -3841,6 +3847,11 @@ static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( fitegolf2, fitegolf )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_UPDATE_DRIVER(snk_state, screen_update_fitegolf2)
+MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_START( ikari, snk_state )
 
@@ -3875,6 +3886,8 @@ static MACHINE_CONFIG_START( ikari, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -3930,6 +3943,8 @@ static MACHINE_CONFIG_START( bermudat, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -4028,6 +4043,8 @@ static MACHINE_CONFIG_START( tdfever, snk_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM3526, 4000000)
 	MCFG_YM3526_IRQ_HANDLER(WRITELINE(snk_state, ymirq_callback_1))
@@ -4239,6 +4256,42 @@ ROM_START( jcross )
 	ROM_LOAD( "jcrossp2.j7",  0x000, 0x400, CRC(b72a96a5) SHA1(20d40e4b6a2652e61dc3ad0c4afaec04e3c7cf74) )
 	ROM_LOAD( "jcrossp1.j8",  0x400, 0x400, CRC(35650448) SHA1(17e4a661ff304c093bb0253efceaf4e9b2498924) )
 	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) )
+ROM_END
+
+ROM_START( jcrossa )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "snk9.bin",      0x0000, 0x2000, CRC(3c93485d) SHA1(37e319cccd77d21d3ba49a5975eb8075f0f96843) )
+	ROM_LOAD( "snk8.bin",      0x2000, 0x2000, CRC(15a55781) SHA1(03fd131c2df7ebcc6741067e5bc2539697fd5f2a) )
+	ROM_LOAD( "snk7.bin",      0x4000, 0x2000, CRC(ac89e49c) SHA1(9b9a0eec8ad341ce7af58bffe55f10bec696af62) )
+	ROM_LOAD( "snk6.bin",      0x6000, 0x2000, CRC(4fd7848d) SHA1(870aea0b8e027616814df87afd24418fd140f736) )
+	ROM_LOAD( "snk5.bin",      0x8000, 0x2000, CRC(8500575d) SHA1(b8751b86508de484f2eb8a6702c63a47ec882036) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "snk1.bin",      0x0000, 0x2000, CRC(77ed51e7) SHA1(56b457846f71f442da6f99889231d4b71d5fcb6c) )
+	ROM_LOAD( "snk2.bin",      0x2000, 0x2000, CRC(23cf0f70) SHA1(f258e899f332a026eeb0db92330fd60c478218af) )
+	ROM_LOAD( "snk3.bin",      0x4000, 0x2000, CRC(5bed3118) SHA1(f105ca55223a4bfbc8e2d61c365c76cf2153254c) )
+	ROM_LOAD( "snk4.bin",      0x6000, 0x2000, CRC(cd75dc95) SHA1(ef03d2b0f66f30fad5132e7b6aee9ec978650b53) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "jcrosss0.f1",   0x0000, 0x2000, CRC(9ae8ea93) SHA1(1d824302305a41bf5c354c36e2e11981d1aa5ea4) ) // not dumped, taken from parent
+	ROM_LOAD( "snk11.bin",     0x2000, 0x2000, CRC(83785601) SHA1(cd3d484ef5464090c4b543b1edbbedcc52b15071) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "jcrossb4.10a",  0x0000, 0x2000, CRC(08ad93fe) SHA1(04baf2d9735b0d794b114abeced5a6b899958ce7) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrosss.d2",    0x2000, 0x2000, CRC(3ebb5beb) SHA1(de0a1f0fdb5b08b76dab9fa64d9ae3047c4ff84b) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x2000, "bg_tiles", 0 )
+	ROM_LOAD( "jcrossb1.a2",   0x0000, 0x2000, CRC(ea3dfbc9) SHA1(eee56acd1c9dbc6c3ecdee4ffe860273e65cc09b) ) // not dumped, taken from parent
+
+	ROM_REGION( 0x6000, "sp16_tiles", 0 )
+	ROM_LOAD( "snk12.bin",     0x0000, 0x2000, CRC(4532509b) SHA1(c99f87e2b06b94d815e6099bccb2aee0edf8c98d) )
+	ROM_LOAD( "snk13.bin ",    0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
+	ROM_LOAD( "snk14.bin",     0x4000, 0x2000, CRC(42a12b9d) SHA1(9f2bdb1f84f444442282cf0fc1f7b3c7f9a9bf48) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "jcrossp2.j7",  0x000, 0x400, CRC(b72a96a5) SHA1(20d40e4b6a2652e61dc3ad0c4afaec04e3c7cf74) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrossp1.j8",  0x400, 0x400, CRC(35650448) SHA1(17e4a661ff304c093bb0253efceaf4e9b2498924) ) // not dumped, taken from parent
+	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) ) // not dumped, taken from parent
 ROM_END
 
 /***********************************************************************/
@@ -4636,6 +4689,47 @@ ROM_START( fitegolfu )  /*  Later US version containing enhancements to make the
 	ROM_LOAD( "gu9",   0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )  // P2.256
 	ROM_LOAD( "gu10",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )  // R2.256
 	ROM_LOAD( "gu11",  0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )  // S2.256
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
+	ROM_LOAD( "pal16l8a.3f", 0x0200, 0x0104, CRC(c5f1c1da) SHA1(e17293be0f77d302c59c1095fe1ec65e45557627) )
+	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
+ROM_END
+
+
+
+
+ROM_START( fitegolf2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "fg_ver2_6.4e", 0x0000, 0x4000, CRC(4cc9ef0c) SHA1(0ac6071725db3ec85659b170eecec91d22e76abd) )
+	ROM_LOAD( "fg_ver2_7.g4", 0x4000, 0x4000, CRC(144b0beb) SHA1(5b5e58ee93cabbdd560487b16d0cc7217d9cea7f) )
+	ROM_LOAD( "fg_ver2_8.4h", 0x8000, 0x4000, CRC(057888c9) SHA1(bd412bbd9939358fedf6cc7635b46f737a288e64) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "fg_ver2_3.2e",    0x0000, 0x4000, CRC(cf8c29d7) SHA1(2153ed43ddd1967e3aea7b40415b6cd70fc6ff34) )
+	ROM_LOAD( "fg_ver2_4.2g",    0x4000, 0x4000, CRC(90c1fb09) SHA1(13dcb6e9ffb3ed1588225df195c9f6af8a868970) )
+	ROM_LOAD( "fg_ver2_5.2h",    0x8000, 0x4000, CRC(0ffbdbb8) SHA1(09e58551a8caf06ba420b6b44f16003b50b2ebc4) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "fg_2.3e",    0x0000, 0x4000, CRC(811b87d7) SHA1(fb387f42085d6e0e5a88729ca0e50656411ce037) )
+	ROM_LOAD( "fg_1.2e",    0x4000, 0x8000, CRC(2d998e2b) SHA1(a471cfbb4dabc90fcc29c562620b9965eaff6861) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "gl1.5f",  0x00000, 0x00400, CRC(6e4c7836) SHA1(3ab3c498939fac992e2bf1c33983ee821a9b6a18) )
+	ROM_LOAD( "gl2.5g",  0x00400, 0x00400, CRC(29e7986f) SHA1(85ba8d3443458c27728f633745857a1315dd183f) )
+	ROM_LOAD( "gl3.5h",  0x00800, 0x00400, CRC(27ba9ff9) SHA1(f021d10460f40de4447560df5ac47fa53bb57ff9) )
+
+	ROM_REGION( 0x4000, "tx_tiles", 0 )
+	ROM_LOAD( "fg_12.1e",   0x0000, 0x4000, CRC(f1628dcf) SHA1(efea343d3a9dd45ef74947c297e166e34afbb680) )
+
+	ROM_REGION( 0x8000, "bg_tiles", 0 )
+	ROM_LOAD( "fg_14.3d",       0x0000, 0x4000, CRC(29393a19) SHA1(bae5a61c16832dc217c6fd0bd9d54db86cb9692f) )
+	ROM_LOAD( "fg_ver2_13.3c",  0x4000, 0x4000, CRC(5cd57c93) SHA1(7f5fb0d9e40b4894f3940373ad09fa4e984b108e) )
+
+	ROM_REGION( 0x18000, "sp16_tiles", 0 )
+	ROM_LOAD( "fg_ver2_11.7h",  0x00000, 0x8000, CRC(d4957ec5) SHA1(8ead7866ba5ac66ead6b707aa868bcae30c486e1) )
+	ROM_LOAD( "fg_ver2_10.7g",  0x08000, 0x8000, CRC(b3acdac2) SHA1(7377480d5e1b5ab2c49f5fee2927623ce8240e19) )
+	ROM_LOAD( "fg_ver2_9.7e",   0x10000, 0x8000, CRC(b99cf73b) SHA1(23989fc3914e77d364807a9eb96a4ddf75ad7cf1) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
 	ROM_LOAD( "pal16r6a.6c", 0x0000, 0x0104, CRC(de291f4e) SHA1(b50294d30cb8eacc7a9bb8b46695a7463ef45ff1) )
@@ -6304,7 +6398,8 @@ GAME( 1984, vangrd2,  0,        vangrd2,  vangrd2, driver_device,  0,        ROT
 GAME( 1984, madcrash, 0,        vangrd2,  madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crasher", 0 )
 GAME( 1984, madcrush, madcrash, madcrush, madcrash, driver_device, 0,        ROT0,   "SNK", "Mad Crusher (Japan)", 0 )
 
-GAME( 1984, jcross,   0,        jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross", 0 )
+GAME( 1984, jcross,   0,        jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross (set 1)", 0 )
+GAME( 1984, jcrossa,  jcross,   jcross,   jcross, driver_device,   0,        ROT270, "SNK", "Jumping Cross (set 2)", 0 )
 GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, driver_device, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
 GAME( 1985, hal21,    0,        hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21", 0 )
 GAME( 1985, hal21j,   hal21,    hal21,    hal21, driver_device,    0,        ROT270, "SNK", "HAL21 (Japan)", 0 )
@@ -6317,6 +6412,7 @@ GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3, driver_device,     0,        ROT
 GAME( 1986, athena,   0,        athena,   athena, driver_device,   0,        ROT0,   "SNK", "Athena", 0 )
 GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, driver_device, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
 GAME( 1988, fitegolfu,fitegolf, fitegolf, fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
+GAME( 1988, fitegolf2,fitegolf, fitegolf2,fitegolfu, driver_device,0,        ROT0,   "SNK", "Fighting Golf (US, Ver 2)", 0 )
 GAME( 1988, countryc, 0,        fitegolf, countryc, snk_state, countryc,     ROT0,   "SNK", "Country Club", 0 )
 
 GAME( 1986, ikari,    0,        ikari,    ikari, driver_device,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 ) // distributed by Tradewest(?)

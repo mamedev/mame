@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "emuopts.h"
 #include "a1bus.h"
 
 
@@ -24,7 +23,7 @@ const device_type A1BUS_SLOT = &device_creator<a1bus_slot_device>;
 //-------------------------------------------------
 //  a1bus_slot_device - constructor
 //-------------------------------------------------
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A1BUS_SLOT, "Apple I Slot", tag, owner, clock, "a1bus_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 	m_a1bus_tag(nullptr),
@@ -32,7 +31,7 @@ a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, const char *
 {
 }
 
-a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a1bus_slot_device::a1bus_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this), m_a1bus_tag(nullptr), m_a1bus_slottag(nullptr)
 {
@@ -76,14 +75,14 @@ void a1bus_device::static_set_cputag(device_t &device, const char *tag)
 //  a1bus_device - constructor
 //-------------------------------------------------
 
-a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+a1bus_device::a1bus_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, A1BUS, "Apple I Bus", tag, owner, clock, "a1bus", __FILE__), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
 {
 }
 
-a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+a1bus_device::a1bus_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source), m_maincpu(nullptr),
 		m_out_irq_cb(*this),
 		m_out_nmi_cb(*this), m_device(nullptr), m_cputag(nullptr)
@@ -140,13 +139,13 @@ void a1bus_device::install_device(offs_t start, offs_t end, read8_delegate rhand
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler);
 }
 
-void a1bus_device::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, const char *tag, UINT8 *data)
+void a1bus_device::install_bank(offs_t start, offs_t end, const char *tag, uint8_t *data)
 {
-//  printf("install_bank: %s @ %x->%x mask %x mirror %x\n", tag, start, end, mask, mirror);
+//  printf("install_bank: %s @ %x->%x\n", tag, start, end);
 	m_maincpu = machine().device<cpu_device>(m_cputag);
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	space.install_readwrite_bank(start, end, mask, mirror, tag );
-	machine().root_device().membank(tag)->set_base(data);
+	space.install_readwrite_bank(start, end, tag );
+	machine().root_device().membank(siblingtag(tag).c_str())->set_base(data);
 }
 
 // interrupt request from a1bus card
@@ -200,7 +199,7 @@ void device_a1bus_card_interface::install_device(offs_t start, offs_t end, read8
 	m_a1bus->install_device(start, end, rhandler, whandler);
 }
 
-void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, offs_t mask, offs_t mirror, char *tag, UINT8 *data)
+void device_a1bus_card_interface::install_bank(offs_t start, offs_t end, char *tag, uint8_t *data)
 {
-	m_a1bus->install_bank(start, end, mask, mirror, tag, data);
+	m_a1bus->install_bank(start, end, tag, data);
 }

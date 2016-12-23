@@ -103,6 +103,25 @@ static const rgb_t bbc_palette[8] =
 	rgb_t(0x000, 0x000, 0x000)
 };
 
+inline rgb_t bbc_state::out_rgb(rgb_t entry)
+{
+	float luma = float(entry.r()) * 0.299 + float(entry.g()) * 0.587 + float(entry.b()) * 0.114;
+	switch (m_monitortype)
+	{
+	case monitor_type_t::BLACKWHITE:
+		return rgb_t(luma, luma, luma);
+
+	case monitor_type_t::GREEN:
+		return rgb_t(0.2 * luma, 0.9 * luma, 0.1 * luma);
+
+	case monitor_type_t::AMBER:
+		return rgb_t(1.0 * luma, 0.8 * luma, 0.1 * luma);
+
+	default:
+		return entry;
+	}
+}
+
 PALETTE_INIT_MEMBER(bbc_state, bbc)
 {
 	palette.set_pen_colors(0, bbc_palette, ARRAY_LENGTH(bbc_palette));
@@ -221,9 +240,9 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 				int g = BIT(col, 1) * 0xff;
 				int b = BIT(col, 2) * 0xff;
 
-				rgb_t rgb = rgb_t(r, g, b);
+				rgb_t rgb = out_rgb(rgb_t(r, g, b));
 
-				bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = rgb;
+				bitmap.pix32(y, (x_pos*m_pixels_per_byte) + pixelno) = rgb;
 			}
 		}
 	}
@@ -242,7 +261,7 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 				for(int pixelno=0; pixelno<m_pixels_per_byte; pixelno++)
 				{
 					int col = m_videoULA_palette_lookup[m_pixel_bits[i]] ^ ((x_pos==cursor_x) ? 7 : 0);
-					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = palette[col];
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = out_rgb(palette[col]);
 					i = (i<<1) | 1;
 				}
 			}
@@ -253,18 +272,28 @@ MC6845_UPDATE_ROW( bbc_state::crtc_update_row )
 			{
 				for(int pixelno=0; pixelno<m_pixels_per_byte; pixelno++)
 				{
-					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = palette[7];
+					bitmap.pix32(y, (x_pos*m_pixels_per_byte)+pixelno) = out_rgb(palette[7]);
 				}
 			}
 		}
 	}
 }
 
-WRITE_LINE_MEMBER(bbc_state::bbc_vsync)
+WRITE_LINE_MEMBER(bbc_state::bbc_hsync_changed)
 {
+	m_hsync = state ? 1 : 0;
+}
+
+WRITE_LINE_MEMBER(bbc_state::bbc_vsync_changed)
+{
+	m_vsync = state ? 1 : 0;
 	m_trom->dew_w(state);
 }
 
+WRITE_LINE_MEMBER(bbc_state::bbc_de_changed)
+{
+	m_display_enable = state ? 1 : 0;
+}
 
 /**** BBC B+/Master Shadow Ram change ****/
 
@@ -284,33 +313,12 @@ void bbc_state::bbc_setvideoshadow(int vdusel)
  * Initialize the BBC video emulation
  ************************************************************************/
 
-void bbc_state::common_init(int memorySize)
+VIDEO_START_MEMBER(bbc_state, bbc)
 {
 	m_emulation_cursor_size = 1;
 
 	set_pixel_lookup();
 
 	m_BBC_Video_RAM = m_region_maincpu->base();
-	m_memorySize = memorySize;
-
-}
-
-VIDEO_START_MEMBER(bbc_state,bbca)
-{
-	common_init(m_ram->size()/1024);
-}
-
-VIDEO_START_MEMBER(bbc_state,bbcb)
-{
-	common_init(32);
-}
-
-VIDEO_START_MEMBER(bbc_state,bbcbp)
-{
-	common_init(32);
-}
-
-VIDEO_START_MEMBER(bbc_state,bbcm)
-{
-	common_init(32);
+	m_memorySize = m_ram->size() / 1024;
 }

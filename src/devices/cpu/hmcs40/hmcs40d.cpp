@@ -46,7 +46,7 @@ static const char *const s_mnemonics[] =
 };
 
 // number of bits per opcode parameter, 99 means (XY) parameter, negative means reversed bit-order
-static const INT8 s_bits[] =
+static const int8_t s_bits[] =
 {
 	0,
 	0, 0, 0, 0, 0, 4,
@@ -65,7 +65,7 @@ static const INT8 s_bits[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] =
+static const uint32_t s_flags[] =
 {
 	0,
 	0, 0, 0, 0, 0, 0,
@@ -82,7 +82,7 @@ static const UINT32 s_flags[] =
 };
 
 // next program counter in sequence (relative)
-static const INT8 s_next_pc[0x40] =
+static const int8_t s_next_pc[0x40] =
 {
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
 	16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 32+0x40 /* rollback */,
@@ -91,7 +91,7 @@ static const INT8 s_next_pc[0x40] =
 };
 
 
-static const UINT8 hmcs40_mnemonic[0x400] =
+static const uint8_t hmcs40_mnemonic[0x400] =
 {
 /*  0      1      2      3      4      5      6      7      8      9      A      B      C      D      E      F  */
 	/* 0x000 */
@@ -111,7 +111,7 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x0c0 */
 	mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  mLAR,  0,     0,     0,     0,     0,     0,     0,     0,
-	mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD, mSEDD,
+	mSEDD, mSEDD, mSEDD, mSEDD, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  mLBR,  0,     0,     0,     0,     0,     0,     0,     0,
 	mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR, mXAMR,
 
@@ -155,7 +155,7 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	/* 0x2c0 */
 	mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  mLRA,  0,     0,     0,     0,     0,     0,     0,     0,
-	mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD, mREDD,
+	mREDD, mREDD, mREDD, mREDD, 0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 	mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  mLRB,  0,     0,     0,     0,     0,     0,     0,     0,
 	0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
 
@@ -186,29 +186,28 @@ static const UINT8 hmcs40_mnemonic[0x400] =
 
 CPU_DISASSEMBLE(hmcs40)
 {
-	UINT16 op = (oprom[0] | oprom[1] << 8) & 0x3ff;
-	char *dst = buffer;
-	UINT8 instr = hmcs40_mnemonic[op];
-	INT8 bits = s_bits[instr];
+	uint16_t op = (oprom[0] | oprom[1] << 8) & 0x3ff;
+	uint8_t instr = hmcs40_mnemonic[op];
+	int8_t bits = s_bits[instr];
 
 	// special case for (XY) opcode
 	if (bits == 99)
 	{
-		dst += sprintf(dst, "%s", s_mnemonics[instr]);
+		util::stream_format(stream, "%s", s_mnemonics[instr]);
 
 		if (op & 1)
-			dst += sprintf(dst, "X");
+			stream << "X";
 		if (op & 2)
-			dst += sprintf(dst, "Y");
+			stream << "Y";
 	}
 	else
 	{
-		dst += sprintf(dst, "%-6s ", s_mnemonics[instr]);
+		util::stream_format(stream, "%-6s ", s_mnemonics[instr]);
 
 		// opcode parameter
 		if (bits != 0)
 		{
-			UINT8 param = op;
+			uint8_t param = op;
 
 			// reverse bits
 			if (bits < 0)
@@ -221,9 +220,9 @@ CPU_DISASSEMBLE(hmcs40)
 			param &= ((1 << bits) - 1);
 
 			if (bits > 5)
-				dst += sprintf(dst, "$%02X", param);
+				util::stream_format(stream, "$%02X", param);
 			else
-				dst += sprintf(dst, "%d", param);
+				util::stream_format(stream, "%d", param);
 		}
 	}
 

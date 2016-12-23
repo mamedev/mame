@@ -3,6 +3,9 @@
 #ifndef __SAT_SLOT_H
 #define __SAT_SLOT_H
 
+#include "softlist_dev.h"
+
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -31,28 +34,28 @@ public:
 	virtual int get_cart_type() { return m_cart_type; };
 
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void bram_alloc(UINT32 size);
-	void dram0_alloc(UINT32 size);
-	void dram1_alloc(UINT32 size);
-	UINT32* get_rom_base() { return m_rom; }
-	UINT32* get_ext_dram0_base() { return &m_ext_dram0[0]; }
-	UINT32* get_ext_dram1_base() { return &m_ext_dram1[0]; }
-	UINT8*  get_ext_bram_base() { return &m_ext_bram[0]; }
-	UINT32  get_rom_size() { return m_rom_size; }
-	UINT32  get_ext_dram0_size() { return m_ext_dram0.size()*sizeof(UINT32); }
-	UINT32  get_ext_dram1_size() { return m_ext_dram1.size()*sizeof(UINT32); }
-	UINT32  get_ext_bram_size() { return m_ext_bram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void bram_alloc(uint32_t size);
+	void dram0_alloc(uint32_t size);
+	void dram1_alloc(uint32_t size);
+	uint32_t* get_rom_base() { return m_rom; }
+	uint32_t* get_ext_dram0_base() { return &m_ext_dram0[0]; }
+	uint32_t* get_ext_dram1_base() { return &m_ext_dram1[0]; }
+	uint8_t*  get_ext_bram_base() { return &m_ext_bram[0]; }
+	uint32_t  get_rom_size() { return m_rom_size; }
+	uint32_t  get_ext_dram0_size() { return m_ext_dram0.size()*sizeof(uint32_t); }
+	uint32_t  get_ext_dram1_size() { return m_ext_dram1.size()*sizeof(uint32_t); }
+	uint32_t  get_ext_bram_size() { return m_ext_bram.size(); }
 
 protected:
 	int m_cart_type;
 
 	// internal state
-	UINT32 *m_rom;
-	UINT32 m_rom_size;
-	std::vector<UINT32> m_ext_dram0;
-	std::vector<UINT32> m_ext_dram1;
-	dynamic_buffer m_ext_bram;
+	uint32_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint32_t> m_ext_dram0;
+	std::vector<uint32_t> m_ext_dram1;
+	std::vector<uint8_t> m_ext_bram;
 };
 
 
@@ -64,7 +67,7 @@ class sat_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sat_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~sat_cart_slot_device();
 
 	// device-level overrides
@@ -72,9 +75,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type();
 
@@ -84,7 +87,6 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual const char *image_interface() const override { return "sat_cart"; }
 	virtual const char *file_extensions() const override { return "bin"; }
 

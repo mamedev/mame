@@ -316,7 +316,7 @@ void proconn_state::machine_reset()
 
 static MACHINE_CONFIG_START( proconn, proconn_state )
 	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* ?? Mhz */
-	MCFG_CPU_CONFIG(z80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(z80_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(proconn_map)
 	MCFG_CPU_IO_MAP(proconn_portmap)
 	MCFG_S16LF01_ADD("vfd",0)

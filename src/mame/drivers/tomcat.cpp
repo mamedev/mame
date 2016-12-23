@@ -32,10 +32,11 @@
 #include "video/avgdvg.h"
 #include "machine/timekpr.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 
 
@@ -51,8 +52,8 @@ public:
 
 	required_device<tms5220_device> m_tms;
 	int m_control_num;
-	required_shared_ptr<UINT16> m_shared_ram;
-	UINT8 m_nvram[0x800];
+	required_shared_ptr<uint16_t> m_shared_ram;
+	uint8_t m_nvram[0x800];
 	int m_dsp_BIO;
 	int m_dsp_idle;
 	DECLARE_WRITE16_MEMBER(tomcat_adcon_w);
@@ -77,11 +78,9 @@ public:
 	DECLARE_WRITE16_MEMBER(tomcat_irqclr_w);
 	DECLARE_READ16_MEMBER(tomcat_inputs2_r);
 	DECLARE_READ16_MEMBER(tomcat_320bio_r);
-	DECLARE_READ16_MEMBER(dsp_BIO_r);
-	DECLARE_READ16_MEMBER(tomcat_shared_ram_r);
-	DECLARE_WRITE16_MEMBER(tomcat_shared_ram_w);
 	DECLARE_READ8_MEMBER(tomcat_nvram_r);
 	DECLARE_WRITE8_MEMBER(tomcat_nvram_w);
+	DECLARE_READ_LINE_MEMBER(dsp_BIO_r);
 	DECLARE_WRITE8_MEMBER(soundlatches_w);
 	virtual void machine_start() override;
 	required_device<cpu_device> m_maincpu;
@@ -107,7 +106,7 @@ READ16_MEMBER(tomcat_state::tomcat_adcread_r)
 
 READ16_MEMBER(tomcat_state::tomcat_inputs_r)
 {
-	UINT16 result = 0;
+	uint16_t result = 0;
 	if (ACCESSING_BITS_8_15)
 		result |= ioport("IN0")->read() << 8;
 
@@ -231,9 +230,9 @@ READ16_MEMBER(tomcat_state::tomcat_320bio_r)
 	return 0;
 }
 
-READ16_MEMBER(tomcat_state::dsp_BIO_r)
+READ_LINE_MEMBER(tomcat_state::dsp_BIO_r)
 {
-	if ( space.device().safe_pc() == 0x0001 )
+	if ( m_dsp->pc() == 0x0001 )
 	{
 		if ( m_dsp_idle == 0 )
 		{
@@ -242,7 +241,7 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 		}
 		return !m_dsp_BIO;
 	}
-	else if ( space.device().safe_pc() == 0x0003 )
+	else if ( m_dsp->pc() == 0x0003 )
 	{
 		if ( m_dsp_BIO == 1 )
 		{
@@ -263,16 +262,6 @@ READ16_MEMBER(tomcat_state::dsp_BIO_r)
 	}
 }
 
-READ16_MEMBER(tomcat_state::tomcat_shared_ram_r)
-{
-	return m_shared_ram[offset];
-}
-
-WRITE16_MEMBER(tomcat_state::tomcat_shared_ram_w)
-{
-	COMBINE_DATA(&m_shared_ram[offset]);
-}
-
 READ8_MEMBER(tomcat_state::tomcat_nvram_r)
 {
 	return m_nvram[offset];
@@ -288,7 +277,7 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x402000, 0x402001) AM_READ(tomcat_adcread_r) AM_WRITE(tomcat_adcon_w)
 	AM_RANGE(0x404000, 0x404001) AM_READ(tomcat_inputs_r) AM_DEVWRITE("avg", avg_tomcat_device, go_word_w)
 	AM_RANGE(0x406000, 0x406001) AM_DEVWRITE("avg", avg_tomcat_device, reset_word_w)
-	AM_RANGE(0x408000, 0x408001) AM_READWRITE(tomcat_inputs2_r, watchdog_reset16_w)
+	AM_RANGE(0x408000, 0x408001) AM_READ(tomcat_inputs2_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x40a000, 0x40a001) AM_READWRITE(tomcat_320bio_r, tomcat_irqclr_w)
 	AM_RANGE(0x40e000, 0x40e001) AM_WRITE(tomcat_led1on_w)
 	AM_RANGE(0x40e002, 0x40e003) AM_WRITE(tomcat_led2on_w)
@@ -307,19 +296,16 @@ static ADDRESS_MAP_START( tomcat_map, AS_PROGRAM, 16, tomcat_state )
 	AM_RANGE(0x40e01c, 0x40e01d) AM_WRITE(tomcat_ackh_w)
 	AM_RANGE(0x40e01e, 0x40e01f) AM_WRITE(tomcat_txbuffh_w)
 	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_SHARE("vectorram")
-	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(tomcat_shared_ram_r, tomcat_shared_ram_w)
+	AM_RANGE(0xffa000, 0xffbfff) AM_RAM AM_SHARE("shared_ram")
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8("m48t02", timekeeper_device, read, write, 0xff00)
 	AM_RANGE(0xffd000, 0xffdfff) AM_READWRITE8(tomcat_nvram_r, tomcat_nvram_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_map, AS_PROGRAM, 16, tomcat_state )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("shared_ram")
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("shared_ram")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dsp_io_map, AS_IO, 16, tomcat_state )
-	AM_RANGE(TMS32010_BIO, TMS32010_BIO) AM_READ(dsp_BIO_r)
-ADDRESS_MAP_END
 
 WRITE8_MEMBER(tomcat_state::soundlatches_w)
 {
@@ -349,7 +335,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tomcat )
 	PORT_START("IN0")   /* INPUTS */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, NULL)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("avg", avg_tomcat_device, done_r, nullptr)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNUSED ) // SPARE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_BUTTON5 ) // DIAGNOSTIC
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
@@ -367,10 +353,10 @@ INPUT_PORTS_END
 
 void tomcat_state::machine_start()
 {
-	((UINT16*)m_shared_ram)[0x0000] = 0xf600;
-	((UINT16*)m_shared_ram)[0x0001] = 0x0000;
-	((UINT16*)m_shared_ram)[0x0002] = 0xf600;
-	((UINT16*)m_shared_ram)[0x0003] = 0x0000;
+	((uint16_t*)m_shared_ram)[0x0000] = 0xf600;
+	((uint16_t*)m_shared_ram)[0x0001] = 0x0000;
+	((uint16_t*)m_shared_ram)[0x0002] = 0xf600;
+	((uint16_t*)m_shared_ram)[0x0003] = 0x0000;
 
 	machine().device<nvram_device>("nvram")->set_base(m_nvram, 0x800);
 
@@ -390,7 +376,7 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 
 	MCFG_CPU_ADD("dsp", TMS32010, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP( dsp_map)
-	MCFG_CPU_IO_MAP( dsp_io_map)
+	MCFG_TMS32010_BIO_IN_CB(READLINE(tomcat_state, dsp_BIO_r))
 
 	MCFG_CPU_ADD("soundcpu", M6502, XTAL_14_31818MHz / 8 )
 	MCFG_DEVICE_DISABLE()
@@ -415,6 +401,8 @@ static MACHINE_CONFIG_START( tomcat, tomcat_state )
 	MCFG_QUANTUM_TIME(attotime::from_hz(4000))
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_M48T02_ADD( "m48t02" )
 

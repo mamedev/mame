@@ -1,76 +1,53 @@
+// license:GPL-2.0+
+// copyright-holders:Couriersud
+#include <plib/poptions.h>
 #include <cstdio>
 #include <cstring>
-#include "plib/poptions.h"
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/pstream.h"
 #include "nl_setup.h"
 
-class nlwav_options_t : public poptions
+class nlwav_options_t : public plib::options
 {
 public:
 	nlwav_options_t() :
-		poptions(),
-#if 0
-		opt_ttr ("t", "time_to_run", 1.0,     "time to run the emulation (seconds)", this),
-		opt_name("n", "name",        "",      "netlist in file to run; default is first one", this),
-		opt_logs("l", "logs",        "",      "colon separated list of terminals to log", this),
-		opt_file("f", "file",        "-",     "file to process (default is stdin)", this),
-		opt_type("y", "type",        "spice", "spice:eagle", "type of file to be converted: spice,eagle", this),
-		opt_cmd ("c", "cmd",         "run",   "run|convert|listdevices", this),
-		opt_inp( "i", "input",       "",      "input file to process (default is none)", this),
-#endif
-		opt_inp( "i", "input",       "",      "input file", this),
-		opt_out( "o", "output",      "",      "output file", this),
-		opt_amp( "a", "amp",    10000.0,      "amplification after mean correction", this),
-		opt_verb("v", "verbose",              "be verbose - this produces lots of output", this),
-		opt_quiet("q", "quiet",               "be quiet - no warnings", this),
-		opt_help("h", "help",                 "display help", this)
+		plib::options(),
+		opt_inp(*this,  "i", "input",       "",      "input file"),
+		opt_out(*this,  "o", "output",      "",      "output file"),
+		opt_amp(*this,  "a", "amp",    10000.0,      "amplification after mean correction"),
+		opt_verb(*this, "v", "verbose",              "be verbose - this produces lots of output"),
+		opt_quiet(*this,"q", "quiet",                "be quiet - no warnings"),
+		opt_version(*this,  "",  "version",          "display version and exit"),
+		opt_help(*this, "h", "help",                 "display help and exit")
 	{}
-#if 0
-	poption_double opt_ttr;
-	poption_str    opt_name;
-	poption_str    opt_logs;
-	poption_str    opt_file;
-	poption_str_limit opt_type;
-	poption_str    opt_cmd;
-#endif
-	poption_str    opt_inp;
-	poption_str    opt_out;
-	poption_double opt_amp;
-	poption_bool   opt_verb;
-	poption_bool   opt_quiet;
-	poption_bool   opt_help;
+	plib::option_str    opt_inp;
+	plib::option_str    opt_out;
+	plib::option_double opt_amp;
+	plib::option_bool   opt_verb;
+	plib::option_bool   opt_quiet;
+	plib::option_bool   opt_version;
+	plib::option_bool   opt_help;
 };
+
+plib::pstdout pout_strm;
+plib::pstderr perr_strm;
+
+plib::pstream_fmt_writer_t pout(pout_strm);
+plib::pstream_fmt_writer_t perr(perr_strm);
 
 /* http://de.wikipedia.org/wiki/RIFF_WAVE */
 class wav_t
 {
 public:
-	wav_t(postream &strm, unsigned sr) : m_f(strm)
+	wav_t(plib::postream &strm, unsigned sr) : m_f(strm)
 	{
-//      m_f = strm;
 		initialize(sr);
 		m_f.write(&m_fh, sizeof(m_fh));
 		m_f.write(&m_fmt, sizeof(m_fmt));
 		m_f.write(&m_data, sizeof(m_data));
 	}
 	~wav_t()
-	{
-		close();
-	}
-
-	unsigned channels() { return m_fmt.channels; }
-	unsigned sample_rate() { return m_fmt.sample_rate; }
-
-	void write_sample(int sample)
-	{
-		m_data.len += m_fmt.block_align;
-		short ps = sample; /* 16 bit sample, FIXME: powerpc? */
-		m_f.write(&ps, sizeof(ps));
-	}
-
-	void close()
 	{
 		m_f.seek(0);
 		m_f.write(&m_fh, sizeof(m_fh));
@@ -79,6 +56,17 @@ public:
 		//data.len = fmt.block_align * n;
 		m_f.write(&m_data, sizeof(m_data));
 	}
+
+	unsigned channels() { return m_fmt.channels; }
+	unsigned sample_rate() { return m_fmt.sample_rate; }
+
+	void write_sample(int sample)
+	{
+		m_data.len += m_fmt.block_align;
+		short ps = static_cast<short>(sample); /* 16 bit sample, FIXME: Endianess? */
+		m_f.write(&ps, sizeof(ps));
+	}
+
 private:
 	struct riff_chunk_t
 	{
@@ -89,14 +77,14 @@ private:
 
 	struct riff_format_t
 	{
-		char        signature[4];
-		unsigned    fmt_length;
-		short       format_tag;
-		short       channels;
-		unsigned    sample_rate;
-		unsigned    bytes_per_second;
-		short       block_align;
-		short       bits_sample;
+		char                signature[4];
+		unsigned            fmt_length;
+		short               format_tag;
+		unsigned short      channels;
+		unsigned            sample_rate;
+		unsigned            bytes_per_second;
+		unsigned short      block_align;
+		unsigned short      bits_sample;
 	};
 
 	struct riff_data_t
@@ -130,24 +118,18 @@ private:
 	riff_format_t m_fmt;
 	riff_data_t m_data;
 
-	postream &m_f;
+	plib::postream &m_f;
 
 };
 
-void convert(nlwav_options_t &opts)
+static void convert(nlwav_options_t &opts)
 {
-	pofilestream fo(opts.opt_out());
-	if (fo.bad())
-	{
-		throw netlist::fatalerror_e("Error opening output file: " + opts.opt_out());
-	}
+	plib::pofilestream fo(opts.opt_out());
 	wav_t wo(fo, 48000);
 
-	pifilestream fin(opts.opt_inp());
-	if (fin.bad())
-		throw netlist::fatalerror_e("Error opening input file: " + opts.opt_inp());
+	plib::pifilestream fin(opts.opt_inp());
 
-	double dt = 1.0 / (double) wo.sample_rate();
+	double dt = 1.0 / static_cast<double>(wo.sample_rate());
 	double ct = dt;
 	//double mean = 2.4;
 	double amp = opts.opt_amp();
@@ -165,8 +147,8 @@ void convert(nlwav_options_t &opts)
 	while(fin.readline(line))
 	{
 #if 1
-		float t = 0.0; float v = 0.0;
-		sscanf(line.cstr(), "%f %f", &t, &v);
+		double t = 0.0; double v = 0.0;
+		sscanf(line.cstr(), "%lf %lf", &t, &v);
 		while (t >= ct)
 		{
 			outsam += (ct - lt) * cursam;
@@ -178,12 +160,12 @@ void convert(nlwav_options_t &opts)
 				minsam = std::min(minsam, outsam);
 				n++;
 				//mean = means / (double) n;
-				mean += 5.0 / (double) wo.sample_rate() * (outsam - mean);
+				mean += 5.0 / static_cast<double>(wo.sample_rate()) * (outsam - mean);
 			}
 			outsam = (outsam - mean) * amp;
 			outsam = std::max(-32000.0, outsam);
 			outsam = std::min(32000.0, outsam);
-			wo.write_sample((int) outsam);
+			wo.write_sample(static_cast<int>(outsam));
 			outsam = 0.0;
 			lt = ct;
 			ct += dt;
@@ -212,26 +194,16 @@ void convert(nlwav_options_t &opts)
 		//printf("%f %f\n", t, v);
 #endif
 	}
-	printf("Mean (low freq filter): %f\n", mean);
-	printf("Mean (static):          %f\n", means / (double) n);
-	printf("Amp + %f\n", 32000.0 / (maxsam- mean));
-	printf("Amp - %f\n", -32000.0 / (minsam- mean));
-	wo.close();
-	fo.close();
-	fin.close();
-
+	pout("Mean (low freq filter): {}\n", mean);
+	pout("Mean (static):          {}\n", means / static_cast<double>(n));
+	pout("Amp + {}\n", 32000.0 / (maxsam- mean));
+	pout("Amp - {}\n", -32000.0 / (minsam- mean));
 }
 
-void usage(nlwav_options_t &opts)
+static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
 {
-	fprintf(stderr,
-		"Usage:\n"
-		"  nltool -help\n"
-		"  nltool [options]\n"
-		"\n"
-		"Where:\n"
-	);
-	fprintf(stderr, "%s\n", opts.help().cstr());
+	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
+			"nltool [options]").cstr());
 }
 
 
@@ -242,15 +214,27 @@ int main(int argc, char *argv[])
 
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
-		fprintf(stderr, "Error parsing %s\n", argv[ret]);
-		usage(opts);
+		perr("Error parsing {}\n", argv[ret]);
+		usage(perr, opts);
 		return 1;
 	}
 
 	if (opts.opt_help())
 	{
-		usage(opts);
-		return 1;
+		usage(pout, opts);
+		return 0;
+	}
+
+	if (opts.opt_version())
+	{
+		pout(
+			"nlwav (netlist) 0.1\n"
+			"Copyright (C) 2016 Couriersud\n"
+			"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
+			"This is free software: you are free to change and redistribute it.\n"
+			"There is NO WARRANTY, to the extent permitted by law.\n\n"
+			"Written by Couriersud.\n");
+		return 0;
 	}
 
 	convert(opts);

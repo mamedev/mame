@@ -1,0 +1,142 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_white"><rect><color red="0.7" green="0.7" blue="0.7" /></rect></element>
+	<element name="static_blue"><rect><color red="0.15" green="0.5" blue="0.8" /></rect></element>
+	<element name="static_yellow"><rect><color red="0.8" green="0.75" blue="0.15" /></rect></element>
+	<element name="static_red"><rect><color red="1.0" green="0.20" blue="0.22" /></rect></element>
+
+	<element name="text_l1"><text string="COMPUTER"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_l2"><text string="FX-SYSTEM"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.20" blue="0.22" /></led7seg>
+	</element>
+	<element name="led" defstate="0">
+		<disk state="0"><color red="0.15" green="0.03" blue="0.04" /></disk>
+		<disk state="1"><color red="1.0" green="0.20" blue="0.22" /></disk>
+	</element>
+
+	<element name="button" defstate="0">
+		<rect state="0"><color red="0.8" green="0.7" blue="0.1" /></rect>
+		<rect state="1"><color red="0.533" green="0.466" blue="0.066" /></rect>
+	</element>
+
+	<element name="text_0"><text string="0"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_1"><text string="1"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_2"><text string="2"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_3"><text string="3"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_4"><text string="4"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_5"><text string="5"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_6"><text string="6"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_7"><text string="7"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_8"><text string="8"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_9"><text string="9"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_a"><text string="A"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_b"><text string="B"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_c"><text string="C"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_d"><text string="D"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_e"><text string="E"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_f"><text string="F"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+	<element name="text_adr"><text string="ADR SET"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_inc"><text string="INCR"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_run"><text string="RUN"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+	<element name="text_res"><text string="RESET"><color red="0.7" green="0.7" blue="0.7" /></text></element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-2.5" right="31" top="0" bottom="20.5" />
+
+		<bezel element="text_l1"><bounds x="22.5" y="14.1" width="6" height="1.2" /></bezel>
+		<bezel element="text_l2"><bounds x="22.5" y="15.3" width="6" height="1.2" /></bezel>
+		<bezel element="static_white"><bounds x="22.5" y="15.25" width="6" height="0.1" /></bezel>
+		<bezel element="static_yellow"><bounds x="22.5" y="16.5" width="6" height="1.2" /></bezel>
+		<bezel element="static_blue"><bounds x="22.5" y="18" width="6" height="1.2" /></bezel>
+
+	<!-- leds -->
+
+		<bezel element="text_4"><bounds x="0.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_2"><bounds x="3.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_1"><bounds x="6.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_8"><bounds x="9.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_4"><bounds x="12.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_2"><bounds x="15.5" y="0.6" width="2" height="1" /></bezel>
+		<bezel element="text_1"><bounds x="18.5" y="0.6" width="2" height="1" /></bezel>
+
+		<bezel element="text_6"><bounds x="0.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_5"><bounds x="3.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_4"><bounds x="6.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_3"><bounds x="9.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_2"><bounds x="12.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_1"><bounds x="15.5" y="3.4" width="2" height="1" /></bezel>
+		<bezel element="text_0"><bounds x="18.5" y="3.4" width="2" height="1" /></bezel>
+
+		<bezel name="1.6" element="led"><bounds x="1" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.5" element="led"><bounds x="4" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.4" element="led"><bounds x="7" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.3" element="led"><bounds x="10" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.2" element="led"><bounds x="13" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.1" element="led"><bounds x="16" y="2" width="1" height="1" /></bezel>
+		<bezel name="1.0" element="led"><bounds x="19" y="2" width="1" height="1" /></bezel>
+		<bezel element="static_red"><bounds x="0.5" y="1.8" width="20" height="1.4" /><color alpha="0.2" /></bezel>
+
+		<bezel name="digit0" element="digit"><bounds x="23.5" y="2.2" width="4" height="5.7" /></bezel>
+		<bezel element="static_red"><bounds x="23" y="1.8" width="5" height="6.5" /><color alpha="0.2" /></bezel>
+
+	<!-- buttons -->
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x08"><bounds x="2" y="7.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x08"><bounds x="5.75" y="7.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x08"><bounds x="9.5" y="7.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x08"><bounds x="13.25" y="7.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x08"><bounds x="17" y="7.5" width="2" height="0.7" /></bezel>
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x04"><bounds x="2" y="11" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x04"><bounds x="5.75" y="11" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x04"><bounds x="9.5" y="11" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x04"><bounds x="13.25" y="11" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x04"><bounds x="17" y="11" width="2" height="0.7" /></bezel>
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x02"><bounds x="2" y="14.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x02"><bounds x="5.75" y="14.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x02"><bounds x="9.5" y="14.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x02"><bounds x="13.25" y="14.5" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x02"><bounds x="17" y="14.5" width="2" height="0.7" /></bezel>
+
+		<bezel element="button" inputtag="IN.0" inputmask="0x01"><bounds x="2" y="18" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.1" inputmask="0x01"><bounds x="5.75" y="18" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.2" inputmask="0x01"><bounds x="9.5" y="18" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.3" inputmask="0x01"><bounds x="13.25" y="18" width="2" height="0.7" /></bezel>
+		<bezel element="button" inputtag="IN.4" inputmask="0x01"><bounds x="17" y="18" width="2" height="0.7" /></bezel>
+
+		<bezel element="text_c"><bounds x="2.5" y="6.3" width="2" height="1" /></bezel>
+		<bezel element="text_d"><bounds x="6.25" y="6.3" width="2" height="1" /></bezel>
+		<bezel element="text_e"><bounds x="10" y="6.3" width="2" height="1" /></bezel>
+		<bezel element="text_f"><bounds x="13.75" y="6.3" width="2" height="1" /></bezel>
+		<bezel element="text_adr"><bounds x="16" y="6.3" width="4" height="1" /></bezel>
+
+		<bezel element="text_8"><bounds x="2.5" y="9.8" width="2" height="1" /></bezel>
+		<bezel element="text_9"><bounds x="6.25" y="9.8" width="2" height="1" /></bezel>
+		<bezel element="text_a"><bounds x="10" y="9.8" width="2" height="1" /></bezel>
+		<bezel element="text_b"><bounds x="13.75" y="9.8" width="2" height="1" /></bezel>
+		<bezel element="text_inc"><bounds x="16" y="9.8" width="4" height="1" /></bezel>
+
+		<bezel element="text_4"><bounds x="2.5" y="13.3" width="2" height="1" /></bezel>
+		<bezel element="text_5"><bounds x="6.25" y="13.3" width="2" height="1" /></bezel>
+		<bezel element="text_6"><bounds x="10" y="13.3" width="2" height="1" /></bezel>
+		<bezel element="text_7"><bounds x="13.75" y="13.3" width="2" height="1" /></bezel>
+		<bezel element="text_run"><bounds x="16" y="13.3" width="4" height="1" /></bezel>
+
+		<bezel element="text_0"><bounds x="2.5" y="16.8" width="2" height="1" /></bezel>
+		<bezel element="text_1"><bounds x="6.25" y="16.8" width="2" height="1" /></bezel>
+		<bezel element="text_2"><bounds x="10" y="16.8" width="2" height="1" /></bezel>
+		<bezel element="text_3"><bounds x="13.75" y="16.8" width="2" height="1" /></bezel>
+		<bezel element="text_res"><bounds x="16" y="16.8" width="4" height="1" /></bezel>
+
+	</view>
+</mamelayout>

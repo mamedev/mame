@@ -322,7 +322,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ojankohs )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -383,7 +383,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ojankoy )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -454,7 +454,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ccasino )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )       // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET )   // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE2 )       // ANALYZER
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)        // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -768,7 +768,7 @@ MACHINE_START_MEMBER(ojankohs_state,common)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x40, &ROM[0x10000], 0x4000);
 
@@ -777,7 +777,7 @@ MACHINE_START_MEMBER(ojankohs_state,ojankohs)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 0x20, &ROM[0x10000], 0x4000);
 
@@ -786,7 +786,7 @@ MACHINE_START_MEMBER(ojankohs_state,ojankoy)
 
 MACHINE_START_MEMBER(ojankohs_state,ojankoc)
 {
-	UINT8 *ROM = memregion("user1")->base();
+	uint8_t *ROM = memregion("user1")->base();
 
 	membank("bank1")->configure_entries(0, 0x10, &ROM[0x0000], 0x8000);
 

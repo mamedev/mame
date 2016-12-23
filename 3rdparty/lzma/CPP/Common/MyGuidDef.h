@@ -3,7 +3,7 @@
 #ifndef GUID_DEFINED
 #define GUID_DEFINED
 
-#include "Types.h"
+#include "MyTypes.h"
 
 typedef struct {
   UInt32 Data1;

@@ -147,9 +147,9 @@ inline void mpz80_state::check_interrupt()
 
 inline offs_t mpz80_state::get_address(offs_t offset)
 {
-	UINT16 map_addr = ((m_task & 0x0f) << 5) | ((offset & 0xf000) >> 11);
-	UINT8 map = m_map_ram[map_addr];
-	//UINT8 attr = m_map_ram[map_addr + 1];
+	uint16_t map_addr = ((m_task & 0x0f) << 5) | ((offset & 0xf000) >> 11);
+	uint8_t map = m_map_ram[map_addr];
+	//uint8_t attr = m_map_ram[map_addr + 1];
 
 	//logerror("task %02x map_addr %03x map %02x attr %02x address %06x\n", m_task, map_addr, map, attr, offset);
 
@@ -165,7 +165,7 @@ inline offs_t mpz80_state::get_address(offs_t offset)
 READ8_MEMBER( mpz80_state::mmu_r )
 {
 	m_addr = get_address(offset);
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	if (m_pretrap)
 	{
@@ -205,7 +205,7 @@ READ8_MEMBER( mpz80_state::mmu_r )
 		}
 		else if (offset < 0xc00)
 		{
-			UINT16 rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
+			uint16_t rom_addr = (m_trap_reset << 10) | (offset & 0x3ff);
 			data = m_rom->base()[rom_addr];
 		}
 		else
@@ -458,7 +458,7 @@ READ8_MEMBER( mpz80_state::switch_r )
 
 	*/
 
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// trap reset
 	data |= m_trap_reset;
@@ -716,7 +716,7 @@ static MACHINE_CONFIG_START( mpz80, mpz80_state )
 	MCFG_S100_BUS_ADD()
 	MCFG_S100_IRQ_CALLBACK(WRITELINE(mpz80_state, s100_pint_w))
 	MCFG_S100_NMI_CALLBACK(WRITELINE(mpz80_state, s100_nmi_w))
-	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_WAIT))
+	MCFG_S100_RDY_CALLBACK(INPUTLINE(Z80_TAG, Z80_INPUT_LINE_BOGUSWAIT))
 	MCFG_S100_SLOT_ADD("s100_1", mpz80_s100_cards, "mm65k16s")
 	MCFG_S100_SLOT_ADD("s100_2", mpz80_s100_cards, "wunderbus")
 	MCFG_S100_SLOT_ADD("s100_3", mpz80_s100_cards, "dj2db")
@@ -794,7 +794,7 @@ DIRECT_UPDATE_MEMBER(mpz80_state::mpz80_direct_update_handler)
 DRIVER_INIT_MEMBER(mpz80_state,mpz80)
 {
 	address_space &program = machine().device<cpu_device>(Z80_TAG)->space(AS_PROGRAM);
-	program.set_direct_update_handler(direct_update_delegate(FUNC(mpz80_state::mpz80_direct_update_handler), this));
+	program.set_direct_update_handler(direct_update_delegate(&mpz80_state::mpz80_direct_update_handler, this));
 }
 
 

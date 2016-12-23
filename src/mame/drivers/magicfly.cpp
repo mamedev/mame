@@ -1,6 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:Roberto Fresca
-// thanks-to:Iris Falbala,Rob Ragon
+// thanks-to:Iris Falbala, Rob Ragon
 /******************************************************************************
 
     MAGIC FLY
@@ -20,7 +20,7 @@
 
     This hardware was clearly designed for poker games.
     You can find a complete hardware & software analysis here:
-    http://www.robertofresca.com.ar/
+    http://www.robertofresca.com
 
 
     Special Thanks to...
@@ -66,103 +66,108 @@
 
 
     PCB Layout:
-     _________________________________________________________________
+    .-----------------------------------------------------------------.
     |                                                                 |
     |                                                                 |
-    |                                    _________   _________        |
-    |                                   | 74LS08N | | 74LS32  |       |
-    |                                   |_________| |_________|       |
-    |                                    _________   _________        |
+    |            POWER                  .---------. .---------.       |
+    |               SUPPLY              | 74LS08N | | 74LS32  |       |
+    |                                   '---------' '---------'       |
+    |                                   .---------. .---------.       |
     |                                   | 74LS138 | | 74HC00  |       |
-    |                                   |_________| |_________|       |
-    |    ______________                 ______________________        |
-    |   |              |               |                      |   ____|
-    |   | MK48Z02B-20  |               |       R6502P         |  |
-    |   |______________|               |______________________|  |
-    |  ________________   _________     ______________________   |
-    | |                | | 74LS157 |   |                      |  |____
-    | |    AM27128     | |_________|   |       MC6845P        |   ____|
-    | |________________|  _________    |______________________|   ____|
-    |                    | 74LS157 |      ________   _________    ____|
-    |                    |_________|     | 74LS14 | | 74LS374 |   ____|
-    |  ____________       _________      |________| |_________|   ____|
-    | | 74LS245    |     | 74LS157 |                 _________    ____|
-    | |____________|     |_________|                | 74HC244 |   ____|
-    |  ____________       _________                 |_________|   ____|
-    | | 74LS245    |     | 74LS32  |      _______                 ____|  30x2
-    | |____________|     |_________|     | | | | |                ____|  connector
-    |  ______________                    |4|3|2|1|                ____|
-    | | HM6116       |                   |_|_|_|_|                ____|
-    | | o MSM2128    |                                            ____|
-    | |______________|                   DIP SW x4                ____|
-    |  ______________                                             ____|
-    | | HM6116       |    ________       _________                ____|
-    | | o MSM2128    |   | 74LS08 |     | 74LS174 |               ____|
-    | |______________|   |________|     |_________|               ____|
-    |  ________________   __________           ______             ____|
-    | |                | | PAL16R4A |         | TDA  |-           ____|
-    | |     2764       | |__________|         | 2002 |-           ____|
-    | |________________|  __________          |______|-           ____|
-    |  ________________  | 74LS166  |                             ____|
-    | |                | |__________|      _                     |
-    | |     2764       |  __________     /   \                   |
-    | |________________| | 74LS166  |   | pot |                  |____
-    |  ________________  |__________|    \ _ /                      __|
-    | |                |  __________       _________         ______|  |
-    | |     2764       | | 74LS166  |     | 74LS05  |   _   |ss112d|8 |  10
-    | |________________| |__________|     |_________| /   \ |______|8 |  pins
-    |  ________  ______   __________       _________ | pot ||ss112d|8 |  male
-    | | 74LS04 || osc. | | 74LS193  |     | 74LS86  | \ _ / |______|8 |  connector
-    | |________||10 MHz| |__________|     |_________|       |ss112d|8 |
-    |           |______|                                    |______|__|
-    |_________________________________________________________________|
+    |                                   '---------' '---------'       |
+    |   .--------------.               .----------------------.       |
+    |   | MK48Z02B-20  |               |       R6502P         |  .----'
+    |   |              |               |                      |  |
+    |   '--------------'               '----------------------'  |
+    | .----------------. .---------.   .----------------------.  |
+    | |    AM27128     | | 74LS157 |   |       MC6845P        |  '----.
+    | |                | '---------'   |                      |   ----|
+    | '----------------' .---------.   '----------------------'   ----|
+    |                    | 74LS157 |     .--------. .---------.   ----|
+    |                    '---------'     | 74LS14 | | 74LS374 |   ----|
+    | .------------.     .---------.     '--------' '---------'   ----|
+    | | 74LS245    |     | 74LS157 |                .---------.   ----|
+    | '------------'     '---------'                | 74HC244 |   ----|
+    | .------------.     .---------.                '---------'   ----|
+    | | 74LS245    |     | 74LS32  |     .-------.                ----| 30x2
+    | '------------'     '---------'     | | | | |                ----| connector
+    | .--------------.                   |4|3|2|1|                ----|
+    | | HM6116       |                   | | | | |                ----|
+    | | o MSM2128    |                   '-------'                ----|
+    | '--------------'                   DIP SW x4                ----|
+    | .--------------.                                            ----|
+    | | HM6116       |   .--------.     .---------.               ----|
+    | | o MSM2128    |   | 74LS08 |     | 74LS174 |               ----|
+    | '--------------'   '--------'     '---------'               ----|
+    | .----------------. .----------.         .------.            ----|
+    | |      2764      | | PAL16R4A |         | TDA  |            ----|
+    | |                | '----------'         | 2002 |            ----|
+    | '----------------' .----------.         '------'            ----|
+    | .----------------. | 74LS166  |    .---.                   .----'
+    | |      2764      | '----------'   / POT \                  |
+    | |                | .----------.   \     /                  |
+    | '----------------' | 74LS166  |    '---'                   '----.
+    | .----------------. '----------'                              .--|
+    | |      2764      | .----------.    .---------.        .------|  |
+    | |                | | 74LS166  |    | 74LS05  |  .---. |SS112D|8 | 10
+    | '----------------' '----------'    '---------' / POT \|------|8 | pins
+    | .--------..------. .----------.    .---------. \     /|SS112D|8 | male
+    | | 74LS04 ||10 MHz| | 74LS193  |    | 74LS86  |  '---' |------|8 | connector
+    | '--------'| XTAL | '----------'    '---------'        |SS112D|8 |
+    |           '------'                                    '------|  |
+    |                                                              '--|
+    '-----------------------------------------------------------------'
 
 
-    Pinouts (from 7mezzo pinout sheet)
-    ----------------------------------
+    Pinouts (from almost unreadable 7mezzo pinout sheet + PCB trace)
+    ----------------------------------------------------------------
 
     *********** Edge connector ************
 
-    solder side    connector    parts side
+       Solder side  |Conn|  Components side
+    ----------------+----+---------------------
+               GND  | 30 |  GND
+          +10V. AC  | 29 |  +10V. AC
+          +10V. AC  | 28 |  +10V. AC
+            unused  | 27 |  unused
+            unused  | 26 |  unused
+               GND  | 25 |  GND
+          +12V. AC  | 24 |  +12V. AC
+          +12V. AC  | 23 |  +12V. AC
+            unused  | 22 |  unused
+      Common C (3)  | 21 |  Common A (1)
+      Common D (4)  | 20 |  Common B (2)
+              Deal  | 19 |  Double
+            Hold 1  | 18 |  Cancel
+            Hold 2  | 17 |  Hold 5
+            Hold 3  | 16 |  Hold 4
+            Meters  | 15 |  Bet
+            Coupon  | 14 |
+                    | 13 |  Coin 1
+      (unreadable)  | 12 |  Coin 2
+              Take  | 11 |  Payout
+     Small (play1)  | 10 |  Big (play3)
+            unused  | 09 |  unused
+            unused  | 08 |  unused
+            unused  | 07 |  unused
+             Green  | 06 |  Red
+              Sync  | 05 |  Blue
+               GND  | 04 |  GND
+          Speaker+  | 03 |  Speaker+
+    Speaker- (GND)  | 02 |  Speaker- (GND)
+              +5V.  | 01 |  +5V.
 
-    GND               30        GND
-    +10v.             29        +10v.
-    +10v.             28        +10v.
-    unused            27        unused
-    unused            26        unused
-    GND               25        GND
-    +12v.             24        +12v.
-    +12v.             23        +12v.
-    unused            22        unused
-    common C (3)      21        common A (1)
-    common D (4)      20        common B (2)
-    DEAL              19        DOUBLE
-    HOLD 1            18        (unreadable)
-    HOLD 2            17        HOLD 5
-    HOLD 3            16        HOLD 4
-    METER             15        BET
-    COUPON            14
-                      13        COIN 1
-    (unreadable)      12        COIN 2
-    TAKE              11        PAY
-    SMALL (play1)     10        BIG (play3)
-    unused            09        unused
-    unused            08        unused
-    unused            07        unused
-    (unreadable)      06        (unreadable)
-    sync              05        (unreadable)
-    GND               04        GND
-    speaker+          03        speaker+
-    speaker- (GND)    02        speaker- (GND)
-    +5v.              01        +5v.
+    (1) = Double, Deal, Cancel, Bet, Meters.
+    (2) = Take, Small, Big, Pay.
+    (3) = Hold 1, Hold 2, Hold 3, Hold 4, Hold 5.
+    (4) = Coin 1, Coin 2, Coupon.
 
-    (1) = DOUBLE, DEAL, (unreadable), BET, METER
-    (2) = TAKE, SMALL, BIG, PAY
-    (3) = HOLD 1, HOLD 2, HOLD 3, HOLD 4, HOLD 5
-    (4) = COIN 1, COIN 2, COUPON
+    Note: Each Common GND (A-B-C-D) are for their respective
+    multiplexed groups of inputs, since there are 4 groups
+    with 5 valid inputs each one.
 
 
-    **** Pins connector ****
+    **** 10-Pins connector ****
 
     pin 01: (soldered to pin 05)
     pin 02:
@@ -242,29 +247,29 @@
                          Counters.        ; Bits 4-5-6 are used for Coin1, Coin2, and Payout counters.
                          Sound DAC,       ; Bit 7 is used to transmit DAC data.
 
-    $C000 - $FFFF    ROM space       ; Program ROMs.
+    $C000 - $FFFF    ROM space       ; Program ROM.
 
 
 *******************************************************************************
 
 
-    After check the last bit of $1800, code jump into a loop ($DA30)...
+    After check the last bit of $1800, the code jumps into a loop ($DA30)...
 
     BEHAVIOUR OF BOOT CHECK (magicfly):
 
-    1) Fill the video RAM with spaces (0x20), and color RAM with 0x15.
-    2) Check bit 7 of $1800 (video RAM, 1st offset) if activated.
+    1) Fills the video RAM with spaces (0x20), and color RAM with 0x15.
+    2) Checks bit 7 of $1800 (video RAM, 1st offset) if it's active.
     3) If true, go to $DA30 (incremented fill infinite loop).
-    4) If not, fill the video RAM with spaces (0x20), and color RAM with 0x1F.
-    5) Check bit 7 of $1800 (video RAM, 1st offset) if activated.
+    4) If not, fills the video RAM with spaces (0x20), and color RAM with 0x1F.
+    5) Checks bit 7 of $1800 (video RAM, 1st offset) if it's active.
     6) If not, go to $DA30 (incremented fill infinite loop).
-    7) If true, returns and continue to NORMAL GAME.
+    7) If true, returns and continues to NORMAL GAME.
 
     Since bits 0-2 are for regular colors, seems that bit 3 in color RAM
     (bit 2 for 7mezzo) is mirrored to bit 7 through a kind of device.
 
     This is the only explanation I found to allow a normal boot, and seems to be
-    created as a protection method that don't allow owners to use a ROM-swap on
+    created as a protection method that doesn't allow owners to do a ROM-swap on
     their boards, converting from one game to another.
 
 
@@ -440,9 +445,10 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
-#include "video/mc6845.h"
-#include "sound/dac.h"
 #include "machine/nvram.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
+#include "video/mc6845.h"
 
 
 class magicfly_state : public driver_device
@@ -456,8 +462,8 @@ public:
 		m_dac(*this, "dac"),
 		m_gfxdecode(*this, "gfxdecode") { }
 
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
 	tilemap_t *m_bg_tilemap;
 	int m_input_selector;
 	DECLARE_WRITE8_MEMBER(magicfly_videoram_w);
@@ -470,9 +476,9 @@ public:
 	DECLARE_PALETTE_INIT(magicfly);
 	DECLARE_PALETTE_INIT(bchance);
 	DECLARE_VIDEO_START(7mezzo);
-	UINT32 screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
-	required_device<dac_device> m_dac;
+	required_device<dac_bit_interface> m_dac;
 	required_device<gfxdecode_device> m_gfxdecode;
 };
 
@@ -522,7 +528,7 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_magicfly_tile_info)
 
 void magicfly_state::video_start()
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_magicfly_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
@@ -551,13 +557,13 @@ TILE_GET_INFO_MEMBER(magicfly_state::get_7mezzo_tile_info)
 	SET_TILE_INFO_MEMBER(bank, code, color, 0);
 }
 
-VIDEO_START_MEMBER(magicfly_state,7mezzo)
+VIDEO_START_MEMBER(magicfly_state, 7mezzo)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(magicfly_state::get_7mezzo_tile_info), this), TILEMAP_SCAN_ROWS, 8, 8, 32, 29);
 }
 
 
-UINT32 magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t magicfly_state::screen_update_magicfly(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	return 0;
@@ -653,7 +659,7 @@ WRITE8_MEMBER(magicfly_state::mux_port_w)
 */
 	m_input_selector = data & 0x0f; /* Input Selector */
 
-	m_dac->write_unsigned8(data & 0x80);      /* Sound DAC */
+	m_dac->write(BIT(data, 7));      /* Sound DAC */
 
 	machine().bookkeeping().coin_counter_w(0, data & 0x40);  /* Coin1 */
 	machine().bookkeeping().coin_counter_w(1, data & 0x10);  /* Coin2 */
@@ -725,7 +731,7 @@ static INPUT_PORTS_START( magicfly )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -788,7 +794,7 @@ static INPUT_PORTS_START( 7mezzo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")    /* Only 4 phisical DIP switches (valid bits = 4, 6, 7) */
+	PORT_START("DSW0")    /* Only 4 physical DIP switches (valid bits = 4, 6, 7) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -863,7 +869,7 @@ static INPUT_PORTS_START( bchance )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW0")
-/*  Only 4 phisical DIP switches
+/*  Only 4 physical DIP switches
     (valid bits = 4, 6, 7)
 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -927,9 +933,9 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( magicfly, magicfly_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* guess */
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) /* guess */
 	MCFG_CPU_PROGRAM_MAP(magicfly_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicfly_state,  nmi_line_pulse)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", magicfly_state, nmi_line_pulse)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
@@ -946,15 +952,15 @@ static MACHINE_CONFIG_START( magicfly, magicfly_state )
 	MCFG_PALETTE_ADD("palette", 32)
 	MCFG_PALETTE_INIT_OWNER(magicfly_state, magicfly)
 
-	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK/16) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, "screen", MASTER_CLOCK / 16) /* guess */
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
 	MCFG_MC6845_CHAR_WIDTH(8)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 

@@ -21,16 +21,20 @@ Year + Game                 Board
 ---------------------------------------
 
 Notes:
-- In service mode, press "analyzer" (0) and "test" (F1) to see a gfx test
+- In service mode, press "analyzer" (0) and "test" (F2) to see a gfx test
 
 - hnfubuki doesn't have a service mode dip, press "analyzer" instead
 
 - untoucha doesn't have it either; press "test" during boot for one kind
   of service menu, "analyzer" at any other time for another menu (including
   dip switch settings)
+  Note: screen asking to press test during boot does not show if machine contains credits.
 
 TODO:
-- dips/inputs for all games
+- dips/inputs for some games
+- untoucha: player high scores are lost when resetting
+
+15-July 2016 - DIPs added to untoucha [theguru]
 
 ****************************************************************************/
 
@@ -265,7 +269,9 @@ static INPUT_PORTS_START( hnayayoi )
 
 	PORT_START("DSW3")  /* DSW3 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )   // blitter busy flag
-	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -288,9 +294,9 @@ static INPUT_PORTS_START( hnayayoi )
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Analizer (Statistics) */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) // there is also a dip switch
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN ) // "Non Use" in service mode
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 10 Credits */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -378,9 +384,9 @@ static INPUT_PORTS_START( hnfubuki )
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)   /* Test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Analizer (Statistics) */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 10 Credits */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -391,64 +397,61 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( untoucha )
 	PORT_START("DSW1")  /* DSW1 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Double-Up Difficulty" )     PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(    0x01, "Normal" )
+	PORT_DIPSETTING(    0x00, "Difficult" )
+	PORT_DIPNAME( 0x06, 0x06, "Stage-Up Difficulty" )      PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )      PORT_DIPLOCATION("SW1:4,5")
+	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x60, 0x60, "Score Limit" )              PORT_DIPLOCATION("SW1:2,3")
+	PORT_DIPSETTING(    0x60, "200, 1000, 10000, 70000" )
+	PORT_DIPSETTING(    0x40, "250, 2000, 10000, 70000" )
+	PORT_DIPSETTING(    0x20, "500, 5000, 10000, 70000" )
+	PORT_DIPSETTING(    0x00, "1000, 5000, 10000, 70000" )
+	PORT_DIPNAME( 0x80, 0x80, "Stages" )                   PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x00, "3" )          /* nudity only seems to show when Stages = 3? */
 
 	PORT_START("DSW2")  /* DSW2 */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )     PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Speech" )                   PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x20, 0x20, "Unknown (Aumit?)" )         PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )             /* DIPSW sheet says 'AUMIT CUT WHEN ON' */
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )              /* Maybe it is Audit, but where/what?   */
+	PORT_DIPNAME( 0x10, 0x10, "Auto Hold" )                PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x08, 0x08, "Coin 2 (Credits)" )         PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x08, "1 Coin/5 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin/8 Credits" )
+	PORT_DIPNAME( 0x07, 0x07, "Coin 1 (Score)" )           PORT_DIPLOCATION("SW2:6,7,8")
+	PORT_DIPSETTING(    0x01, "1 Coin/75 Score" )
+	PORT_DIPSETTING(    0x02, "1 Coin/50 Score" )
+	PORT_DIPSETTING(    0x03, "1 Coin/20 Score" )
+	PORT_DIPSETTING(    0x04, "1 Coin/15 Score" )
+	PORT_DIPSETTING(    0x07, "1 Coin/25 Score" )
+	PORT_DIPSETTING(    0x05, "1 Coin/10 Score" )
+	PORT_DIPSETTING(    0x06, "1 Coin/5 Score" )
+	PORT_DIPSETTING(    0x00, "1 Coin/100 Score" )
 
 	PORT_START("COIN")  /* COIN */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR(Test)) PORT_CODE(KEYCODE_F1) /* Test */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )   /* Analizer (Statistics) */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 10 Credits */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test ))
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 )  PORT_NAME("Analizer")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_MEMORY_RESET )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )  /* "Note" ("Paper Money") = 5 or 8 Credits */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
@@ -492,7 +495,7 @@ static INPUT_PORTS_START( untoucha )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Flip Flop") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Flip Flop") PORT_CODE(KEYCODE_F) /* what does this do? */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -648,7 +651,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 {
-	UINT8 *rom = memregion("gfx1")->base();
+	uint8_t *rom = memregion("gfx1")->base();
 	int len = memregion("gfx1")->bytes();
 	int i, j;
 
@@ -659,7 +662,7 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 	{
 		for (j = 0; j < 0x10; j++)
 		{
-			UINT8 t = rom[i + j + 0x10];
+			uint8_t t = rom[i + j + 0x10];
 			rom[i + j + 0x10] = rom[i + j + 0x20];
 			rom[i + j + 0x20] = t;
 		}
@@ -673,6 +676,6 @@ DRIVER_INIT_MEMBER(hnayayoi_state,hnfubuki)
 }
 
 
-GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device, 0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax", "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device, 0,        ROT0, "Dynax", "Untouchable (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnayayoi, 0,        hnayayoi, hnayayoi, driver_device,  0,        ROT0, "Dyna Electronics", "Hana Yayoi (Japan)",        MACHINE_SUPPORTS_SAVE )
+GAME( 1987, hnfubuki, hnayayoi, hnfubuki, hnfubuki, hnayayoi_state, hnfubuki, ROT0, "Dynax",            "Hana Fubuki [BET] (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1987, untoucha, 0,        untoucha, untoucha, driver_device,  0,        ROT0, "Dynax",            "Untouchable (Ver. 2.10)",   MACHINE_SUPPORTS_SAVE )

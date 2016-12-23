@@ -36,7 +36,7 @@
 #include "cpu/h6280/h6280.h"
 #include "includes/cbuster.h"
 #include "sound/2203intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 WRITE16_MEMBER(cbuster_state::twocrude_control_w)
@@ -53,27 +53,27 @@ WRITE16_MEMBER(cbuster_state::twocrude_control_w)
 		return;
 
 	case 2: /* Sound CPU write */
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 		return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
 
-            80046 is level number
-            stop at stage and enter.
-            see also 8216..
+	        80046 is level number
+	        stop at stage and enter.
+	        see also 8216..
 
-                9a 00 = pf4 over pf3 (normal) (level 0)
-                9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
-                9a 80 = pf3 over pf4 (Level 2 - copter)
-                9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
-                9a c0 = doesn't matter?
-                9a ff = pf 3 over pf4
+	            9a 00 = pf4 over pf3 (normal) (level 0)
+	            9a f1 =  (level 1 - water), pf3 over ALL sprites + pf4
+	            9a 80 = pf3 over pf4 (Level 2 - copter)
+	            9a 40 = pf3 over ALL sprites + pf4 (snow) level 3
+	            9a c0 = doesn't matter?
+	            9a ff = pf 3 over pf4
 
-            I can't find a priority register, I assume it's tied to the
-            protection?!
+	        I can't find a priority register, I assume it's tied to the
+	        protection?!
 
-        */
+	    */
 		if ((data & 0xffff) == 0x9a00) m_prot = 0;
 		if ((data & 0xffff) == 0xaa)   m_prot = 0x74;
 		if ((data & 0xffff) == 0x0200) m_prot = 0x63 << 8;
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, cbuster_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ym2", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -331,7 +331,6 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -347,15 +346,15 @@ static MACHINE_CONFIG_START( twocrude, cbuster_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_32_22MHz/24) /* 1.3425MHz Verified */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
@@ -576,8 +575,8 @@ ROM_END
 
 DRIVER_INIT_MEMBER(cbuster_state,twocrude)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
-	UINT8 *PTR;
+	uint8_t *RAM = memregion("maincpu")->base();
+	uint8_t *PTR;
 	int i, j;
 
 	/* Main cpu decrypt */

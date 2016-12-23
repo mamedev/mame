@@ -8,11 +8,19 @@ indent_size  = 4
 indent_style = space
 indent_size  = 2
 
+[iqa/*]
+indent_style = tab
+indent_size  = 4
+
 [libsquish/*]
 indent_style = tab
 indent_size  = 4
 
 [ocornut-imgui/*]
+indent_style = space
+indent_size  = 4
+
+[ocornut-imgui/*.inl]
 indent_style = space
 indent_size  = 4
 

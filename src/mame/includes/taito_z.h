@@ -40,20 +40,20 @@ public:
 		m_tc0510nio(*this, "tc0510nio"),
 		m_tc0140syt(*this, "tc0140syt"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette") { }
+		m_steer(*this, "STEER") { }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_spriteram;
+	required_shared_ptr<uint16_t> m_spriteram;
 
 	/* video-related */
 	int         m_sci_spriteframe;
 	int         m_road_palbank;
 
 	/* misc */
-	UINT16      m_cpua_ctrl;
-	INT32       m_sci_int6;
-	INT32       m_ioc220_port;
-	UINT16      m_eep_latch;
+	uint16_t      m_cpua_ctrl;
+	int32_t       m_sci_int6;
+	int32_t       m_ioc220_port;
+	uint16_t      m_eep_latch;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -68,9 +68,10 @@ public:
 	optional_device<tc0510nio_device> m_tc0510nio;
 	optional_device<tc0140syt_device> m_tc0140syt;  // bshark & spacegun miss the CPUs which shall use TC0140
 	required_device<gfxdecode_device> m_gfxdecode;
-	required_device<palette_device> m_palette;
+	optional_ioport m_steer;
 
 	DECLARE_WRITE16_MEMBER(cpua_ctrl_w);
+	DECLARE_WRITE16_MEMBER(bshark_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(chasehq_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(dblaxle_cpua_ctrl_w);
 	DECLARE_WRITE16_MEMBER(spacegun_output_bypass_w);
@@ -103,14 +104,14 @@ public:
 	DECLARE_MACHINE_RESET(taitoz);
 	DECLARE_VIDEO_START(taitoz);
 	DECLARE_MACHINE_START(bshark);
-	UINT32 screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_contcirc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_chasehq(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_bshark(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sci(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_aquajack(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_spacegun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_dblaxle(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_racingb(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sci_interrupt);
 	void contcirc_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void chasehq_draw_sprites_16x16( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
@@ -118,9 +119,7 @@ public:
 	void sci_draw_sprites_16x8( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int y_offs );
 	void aquajack_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
 	void spacegun_draw_sprites_16x8(screen_device &screen, bitmap_ind16 &bitmap,const rectangle &cliprect,int y_offs);
-	void parse_cpu_control(  );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
-	DECLARE_WRITE_LINE_MEMBER(irqhandlerb);
+	void parse_cpu_control();
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

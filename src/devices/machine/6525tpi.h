@@ -39,7 +39,7 @@
 class tpi6525_device : public device_t
 {
 public:
-	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tpi6525_device() {}
 
 	template<class _Object> static devcb_base &set_out_irq_callback(device_t &device, _Object object) { return downcast<tpi6525_device &>(device).m_out_irq_cb.set_callback(object); }
@@ -77,9 +77,9 @@ public:
 	WRITE_LINE_MEMBER( pb6_w ) { port_line_w(m_in_b, 6, state); }
 	WRITE_LINE_MEMBER( pb7_w ) { port_line_w(m_in_b, 7, state); }
 
-	UINT8 get_ddr_a();
-	UINT8 get_ddr_b();
-	UINT8 get_ddr_c();
+	uint8_t get_ddr_a();
+	uint8_t get_ddr_b();
+	uint8_t get_ddr_c();
 
 protected:
 	// device-level overrides
@@ -102,22 +102,22 @@ private:
 	devcb_write_line    m_out_ca_cb;
 	devcb_write_line    m_out_cb_cb;
 
-	UINT8 m_port_a, m_ddr_a, m_in_a;
-	UINT8 m_port_b, m_ddr_b, m_in_b;
-	UINT8 m_port_c, m_ddr_c, m_in_c;
+	uint8_t m_port_a, m_ddr_a, m_in_a;
+	uint8_t m_port_b, m_ddr_b, m_in_b;
+	uint8_t m_port_c, m_ddr_c, m_in_c;
 
-	UINT8 m_ca_level, m_cb_level, m_interrupt_level;
+	uint8_t m_ca_level, m_cb_level, m_interrupt_level;
 
-	UINT8 m_cr;
-	UINT8 m_air;
+	uint8_t m_cr;
+	uint8_t m_air;
 
-	UINT8 m_irq_level[5];
+	uint8_t m_irq_level[5];
 
 	void set_interrupt();
 	void clear_interrupt();
 
 	// helper function to write a single line
-	static void port_line_w(UINT8 &port, int line, int state);
+	static void port_line_w(uint8_t &port, int line, int state);
 };
 
 extern const device_type TPI6525;

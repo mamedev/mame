@@ -86,6 +86,8 @@ const device_type COP445 = &device_creator<cop445_cpu_device>;
     CONSTANTS
 ***************************************************************************/
 
+#define LOG_MICROBUS 0
+
 /* feature masks */
 #define COP410_FEATURE  0x01
 #define COP420_FEATURE  0x02
@@ -148,7 +150,10 @@ static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, cop400_cpu_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_32b, AS_DATA, 8, cop400_cpu_device )
-	AM_RANGE(0x00, 0x1f) AM_RAM
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x10, 0x17) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x30, 0x37) AM_MIRROR(0x08) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_64b, AS_DATA, 8, cop400_cpu_device )
@@ -166,11 +171,12 @@ ADDRESS_MAP_END
 #endif
 
 
-cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, UINT8 program_addr_bits, UINT8 data_addr_bits, UINT8 featuremask, UINT8 g_mask, UINT8 d_mask, UINT8 in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
+cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, uint8_t program_addr_bits, uint8_t data_addr_bits, uint8_t featuremask, uint8_t g_mask, uint8_t d_mask, uint8_t in_mask, bool has_counter, bool has_inil, address_map_constructor internal_map_program, address_map_constructor internal_map_data)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
 	, m_read_l(*this)
+	, m_read_l_tristate(*this)
 	, m_write_l(*this)
 	, m_read_g(*this)
 	, m_write_g(*this)
@@ -182,7 +188,7 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_read_cko(*this)
 	, m_cki(COP400_CKI_DIVISOR_16)
 	, m_cko(COP400_CKO_OSCILLATOR_OUTPUT)
-	, m_microbus(COP400_MICROBUS_DISABLED)
+	, m_has_microbus(false)
 	, m_has_counter(has_counter)
 	, m_has_inil(has_inil)
 	, m_featuremask(featuremask)
@@ -228,67 +234,67 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	}
 }
 
-cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
+cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
 {
 }
 
-cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 
-cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 5, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 6, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 
-cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop402_cpu_device::cop402_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP402, "COP402", tag, owner, clock, "cop402", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, nullptr, ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop420_cpu_device::cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop420_cpu_device::cop420_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP420, "COP420", tag, owner, clock, "cop420", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop421_cpu_device::cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop421_cpu_device::cop421_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP421, "COP421", tag, owner, clock, "cop421", __FILE__, 10, 6, COP420_FEATURE, 0xf, 0xf, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop422_cpu_device::cop422_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP422, "COP422", tag, owner, clock, "cop422", __FILE__, 10, 6, COP420_FEATURE, 0xe, 0xe, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop404_cpu_device::cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop404_cpu_device::cop404_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP404, "COP404", tag, owner, clock, "cop404", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, nullptr, ADDRESS_MAP_NAME(data_128b))
 {
 }
 
-cop424_cpu_device::cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop424_cpu_device::cop424_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP424, "COP424", tag, owner, clock, "cop424", __FILE__, 10, 6, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop425_cpu_device::cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop425_cpu_device::cop425_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP425, "COP425", tag, owner, clock, "cop425", __FILE__, 10, 6, COP444_FEATURE, 0xf, 0xf, 0, true, false, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop426_cpu_device::cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop426_cpu_device::cop426_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP426, "COP426", tag, owner, clock, "cop426", __FILE__, 10, 6, COP444_FEATURE, 0xe, 0xe, 0xf, true, true, ADDRESS_MAP_NAME(program_1kb), ADDRESS_MAP_NAME(data_64b))
 {
 }
 
-cop444_cpu_device::cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop444_cpu_device::cop444_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP444, "COP444", tag, owner, clock, "cop444", __FILE__, 11, 7, COP444_FEATURE, 0xf, 0xf, 0xf, true, true, ADDRESS_MAP_NAME(program_2kb), ADDRESS_MAP_NAME(data_128b))
 {
 }
 
-cop445_cpu_device::cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+cop445_cpu_device::cop445_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cop400_cpu_device(mconfig, COP445, "COP445", tag, owner, clock, "cop445", __FILE__, 11, 7, COP444_FEATURE, 0x7, 0x3, 0, true, false, ADDRESS_MAP_NAME(program_2kb), ADDRESS_MAP_NAME(data_128b))
 {
 }
@@ -298,7 +304,7 @@ cop445_cpu_device::cop445_cpu_device(const machine_config &mconfig, const char *
 ***************************************************************************/
 
 
-void cop400_cpu_device::PUSH(UINT16 data)
+void cop400_cpu_device::PUSH(uint16_t data)
 {
 	if (m_featuremask != COP410_FEATURE)
 	{
@@ -320,23 +326,18 @@ void cop400_cpu_device::POP()
 	}
 }
 
-void cop400_cpu_device::WRITE_Q(UINT8 data)
+void cop400_cpu_device::WRITE_Q(uint8_t data)
 {
 	Q = data;
 
-	if (BIT(EN, 2))
+	if (!m_has_microbus && BIT(EN, 2))
 	{
 		OUT_L(Q);
 	}
 }
 
-void cop400_cpu_device::WRITE_G(UINT8 data)
+void cop400_cpu_device::WRITE_G(uint8_t data)
 {
-	if (m_microbus == COP400_MICROBUS_ENABLED)
-	{
-		data = (data & 0x0e) | m_microbus_int;
-	}
-
 	G = data;
 
 	OUT_G(G);
@@ -346,7 +347,7 @@ void cop400_cpu_device::WRITE_G(UINT8 data)
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(UINT8 opcode)
+#define INSTRUCTION(mnemonic) void (cop400_cpu_device::mnemonic)(uint8_t opcode)
 #define INST(mnemonic) &cop400_cpu_device::mnemonic
 
 INSTRUCTION(illegal)
@@ -354,7 +355,7 @@ INSTRUCTION(illegal)
 	logerror("COP400: PC = %04x, Illegal opcode = %02x\n", PC-1, ROM(PC-1));
 }
 
-#include "cop400op.inc"
+#include "cop400op.hxx"
 
 /***************************************************************************
     OPCODE TABLES
@@ -399,9 +400,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_23_M
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-void cop400_cpu_device::cop410_op23(UINT8 opcode)
+void cop400_cpu_device::cop410_op23(uint8_t opcode)
 {
-	UINT8 opcode23 = ROM(PC++);
+	uint8_t opcode23 = ROM(PC++);
 
 	(this->*COP410_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
@@ -445,9 +446,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP410_OPCODE_33_M
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-void cop400_cpu_device::cop410_op33(UINT8 opcode)
+void cop400_cpu_device::cop410_op33(uint8_t opcode)
 {
-	UINT8 opcode33 = ROM(PC++);
+	uint8_t opcode33 = ROM(PC++);
 
 	(this->*COP410_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
@@ -530,9 +531,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_23_M
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-void cop400_cpu_device::cop420_op23(UINT8 opcode)
+void cop400_cpu_device::cop420_op23(uint8_t opcode)
 {
-	UINT8 opcode23 = ROM(PC++);
+	uint8_t opcode23 = ROM(PC++);
 
 	(this->*COP420_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
@@ -576,9 +577,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP420_OPCODE_33_M
 	{1, INST(illegal)     },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   },{1, INST(illegal)   }
 };
 
-void cop400_cpu_device::cop420_op33(UINT8 opcode)
+void cop400_cpu_device::cop420_op33(uint8_t opcode)
 {
-	UINT8 opcode33 = ROM(PC++);
+	uint8_t opcode33 = ROM(PC++);
 
 	(this->*COP420_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
@@ -661,9 +662,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_23_M
 	{1, INST(xad)         },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },{1, INST(xad)       },
 };
 
-void cop400_cpu_device::cop444_op23(UINT8 opcode)
+void cop400_cpu_device::cop444_op23(uint8_t opcode)
 {
-	UINT8 opcode23 = ROM(PC++);
+	uint8_t opcode23 = ROM(PC++);
 
 	(this->*COP444_OPCODE_23_MAP[opcode23].function)(opcode23);
 }
@@ -707,9 +708,9 @@ const cop400_cpu_device::cop400_opcode_map cop400_cpu_device::COP444_OPCODE_33_M
 	{1, INST(lbi)         },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },{1, INST(lbi)       },
 };
 
-void cop400_cpu_device::cop444_op33(UINT8 opcode)
+void cop400_cpu_device::cop444_op33(uint8_t opcode)
 {
-	UINT8 opcode33 = ROM(PC++);
+	uint8_t opcode33 = ROM(PC++);
 
 	(this->*COP444_OPCODE_33_MAP[opcode33].function)(opcode33);
 }
@@ -848,7 +849,7 @@ void cop400_cpu_device::counter_tick()
 
 void cop400_cpu_device::inil_tick()
 {
-	UINT8 in;
+	uint8_t in;
 	int i;
 
 	in = IN_IN();
@@ -864,35 +865,6 @@ void cop400_cpu_device::inil_tick()
 	}
 }
 
-void cop400_cpu_device::microbus_tick()
-{
-	UINT8 in;
-
-	in = IN_IN();
-
-	if (!BIT(in, 2))
-	{
-		// chip select
-
-		if (!BIT(in, 1))
-		{
-			// read strobe
-
-			OUT_L(Q);
-
-			m_microbus_int = 1;
-		}
-		else if (!BIT(in, 3))
-		{
-			// write strobe
-
-			Q = IN_L();
-
-			m_microbus_int = 0;
-		}
-	}
-}
-
 /***************************************************************************
     INITIALIZATION
 ***************************************************************************/
@@ -900,8 +872,7 @@ void cop400_cpu_device::microbus_tick()
 enum {
 	TIMER_SERIAL,
 	TIMER_COUNTER,
-	TIMER_INIL,
-	TIMER_MICROBUS
+	TIMER_INIL
 };
 
 void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -919,10 +890,6 @@ void cop400_cpu_device::device_timer(emu_timer &timer, device_timer_id id, int p
 		case TIMER_INIL:
 			inil_tick();
 			break;
-
-		case TIMER_MICROBUS:
-			microbus_tick();
-			break;
 	}
 }
 
@@ -938,6 +905,7 @@ void cop400_cpu_device::device_start()
 	/* find i/o handlers */
 
 	m_read_l.resolve_safe(0);
+	m_read_l_tristate.resolve_safe(0);
 	m_write_l.resolve_safe();
 	m_read_g.resolve_safe(0);
 	m_write_g.resolve_safe();
@@ -971,15 +939,6 @@ void cop400_cpu_device::device_start()
 		m_inil_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
 	}
 
-	/* allocate Microbus timer */
-
-	m_microbus_timer = nullptr;
-	if (m_microbus == COP400_MICROBUS_ENABLED)
-	{
-		m_microbus_timer = timer_alloc(TIMER_MICROBUS);
-		m_microbus_timer->adjust(attotime::zero, 0, attotime::from_ticks(16, clock()));
-	}
-
 	/* register for state saving */
 
 	save_item(NAME(m_pc));
@@ -1005,12 +964,11 @@ void cop400_cpu_device::device_start()
 	save_item(NAME(m_si));
 	save_item(NAME(m_last_skip));
 	save_item(NAME(m_in));
-	save_item(NAME(m_microbus_int));
 	save_item(NAME(m_halt));
 	save_item(NAME(m_idle));
 
 	state_add(STATE_GENPC,     "GENPC",     m_pc).mask(0xfff).noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_prevpc).mask(0xfff).noshow();
+	state_add(STATE_GENPCBASE, "CURPC",     m_prevpc).mask(0xfff).noshow();
 	state_add(STATE_GENSP,     "GENSP",     m_n).mask(0x3).noshow();
 	state_add(STATE_GENFLAGS,  "GENFLAGS",  m_flags).mask(0x3).callimport().callexport().noshow().formatstr("%3s");
 
@@ -1070,7 +1028,6 @@ void cop400_cpu_device::device_start()
 	m_si = 0;
 	m_skip_lbi = 0;
 	m_last_skip = 0;
-	m_microbus_int = 0;
 	m_skip = 0;
 }
 
@@ -1120,7 +1077,7 @@ void cop400_cpu_device::execute_run()
 			continue;
 		}
 
-		UINT8 opcode = ROM(PC);
+		uint8_t opcode = ROM(PC);
 		int inst_cycles = m_opcode_map[opcode].cycles;
 
 		PC++;
@@ -1210,16 +1167,16 @@ void cop400_cpu_device::state_string_export(const device_state_entry &entry, std
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c",
-							m_c ? 'C' : '.',
-							m_skl ? 'S' : '.',
-							m_skt_latch ? 'T' : '.');
+			str = string_format("%c%c%c",
+					m_c ? 'C' : '.',
+					m_skl ? 'S' : '.',
+					m_skt_latch ? 'T' : '.');
 			break;
 	}
 }
 
 
-offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t cop400_cpu_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( cop410 );
 	extern CPU_DISASSEMBLE( cop420 );
@@ -1227,13 +1184,29 @@ offs_t cop400_cpu_device::disasm_disassemble(char *buffer, offs_t pc, const UINT
 
 	if ( m_featuremask & COP444_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop444)(this, buffer, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(cop444)(this, stream, pc, oprom, opram, options);
 	}
 
 	if ( m_featuremask & COP420_FEATURE )
 	{
-		return CPU_DISASSEMBLE_NAME(cop420)(this, buffer, pc, oprom, opram, options);
+		return CPU_DISASSEMBLE_NAME(cop420)(this, stream, pc, oprom, opram, options);
 	}
 
-	return CPU_DISASSEMBLE_NAME(cop410)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(cop410)(this, stream, pc, oprom, opram, options);
+}
+
+READ8_MEMBER( cop400_cpu_device::microbus_rd )
+{
+	if (LOG_MICROBUS) logerror("%s %s MICROBUS RD %02x\n", machine().time().as_string(), machine().describe_context(), Q);
+
+	return Q;
+}
+
+WRITE8_MEMBER( cop400_cpu_device::microbus_wr )
+{
+	if (LOG_MICROBUS) logerror("%s %s MICROBUS WR %02x\n", machine().time().as_string(), machine().describe_context(), data);
+
+	WRITE_G(G & 0xe);
+
+	Q = data;
 }

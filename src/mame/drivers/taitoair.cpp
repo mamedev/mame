@@ -153,7 +153,7 @@ DIPs
 ----
 
 They're now correct (including locations) according to the
-manuals. Nevertherless, ainferno manual states that the coinage
+manuals. Nevertheless, ainferno manual states that the coinage
 DIPs are the same as topland, which is clearly wrong if you try
 them ("SWB:7,8" do not set Coin B to multiple credits for each
 coin!)
@@ -272,7 +272,7 @@ WRITE16_MEMBER(taitoair_state::airsys_paletteram16_w)/* xxBBBBxRRRRxGGGG */
 
 WRITE16_MEMBER(taitoair_state::airsys_gradram_w)
 {
-	UINT32 pen;
+	uint32_t pen;
 	int r,g,b;
 	//int pal_r,pal_g,pal_b;
 
@@ -436,7 +436,7 @@ WRITE16_MEMBER(taitoair_state::dsp_test_z_w)
 
 READ16_MEMBER(taitoair_state::dsp_test_point_r)
 {
-	UINT16 r = 0;
+	uint16_t r = 0;
 	if(m_dsp_test_x < -m_dsp_test_z)
 		r |= 1;
 	if(m_dsp_test_x >  m_dsp_test_z)
@@ -534,11 +534,6 @@ static ADDRESS_MAP_START( DSP_map_data, AS_DATA, 16, taitoair_state )
 
 	AM_RANGE(0x4000, 0x7fff) AM_READWRITE(lineram_r, lineram_w)
 	AM_RANGE(0x8000, 0xffff) AM_READWRITE(dspram_r, dspram_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( DSP_map_io, AS_IO, 16, taitoair_state )
-	AM_RANGE(TMS32025_HOLD, TMS32025_HOLD) AM_READ(dsp_HOLD_signal_r)
-	AM_RANGE(TMS32025_HOLDA, TMS32025_HOLDA) AM_WRITE(dsp_HOLDA_signal_w)
 ADDRESS_MAP_END
 
 
@@ -683,17 +678,6 @@ GFXDECODE_END
 
 
 /************************************************************
-                YM2610 (SOUND)
-************************************************************/
-
-/* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoair_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/************************************************************
                 MACHINE DRIVERS
 ************************************************************/
 
@@ -737,7 +721,8 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_CPU_ADD("dsp", TMS32025, XTAL_36MHz) // Unverified
 	MCFG_CPU_PROGRAM_MAP(DSP_map_program)
 	MCFG_CPU_DATA_MAP(DSP_map_data)
-	MCFG_CPU_IO_MAP(DSP_map_io)
+	MCFG_TMS32025_HOLD_IN_CB(READ16(taitoair_state, dsp_HOLD_signal_r))
+	MCFG_TMS32025_HOLD_ACK_OUT_CB(WRITE16(taitoair_state, dsp_HOLDA_signal_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -767,13 +752,12 @@ static MACHINE_CONFIG_START( airsys, taitoair_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz / 2)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoair_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.30)
 	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 	MCFG_SOUND_ROUTE(2, "mono", 0.60)

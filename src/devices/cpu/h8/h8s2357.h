@@ -24,17 +24,18 @@
 #define __H8S2357_H__
 
 #include "h8s2000.h"
+#include "h8_intc.h"
 #include "h8_adc.h"
 #include "h8_port.h"
-#include "h8_intc.h"
-#include "h8_sci.h"
 #include "h8_timer8.h"
 #include "h8_timer16.h"
+#include "h8_sci.h"
+#include "h8_watchdog.h"
 
 class h8s2357_device : public h8s2000_device {
 public:
-	h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2357_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	h8s2357_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_READ8_MEMBER(syscr_r);
 	DECLARE_WRITE8_MEMBER(syscr_w);
@@ -67,8 +68,9 @@ protected:
 	required_device<h8_sci_device> sci0;
 	required_device<h8_sci_device> sci1;
 	required_device<h8_sci_device> sci2;
+	required_device<h8_watchdog_device> watchdog;
 
-	UINT32 ram_start;
+	uint32_t ram_start;
 	unsigned char syscr;
 
 	virtual bool exr_in_stack() const override;
@@ -77,7 +79,7 @@ protected:
 	virtual int trace_setup() override;
 	virtual int trapa_setup() override;
 	virtual void irq_setup() override;
-	virtual void internal_update(UINT64 current_time) override;
+	virtual void internal_update(uint64_t current_time) override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	DECLARE_ADDRESS_MAP(map, 16);
 
@@ -88,27 +90,27 @@ protected:
 
 class h8s2352_device : public h8s2357_device {
 public:
-	h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class h8s2398_device : public h8s2357_device {
 public:
-	h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2398_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class h8s2394_device : public h8s2357_device {
 public:
-	h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2394_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class h8s2392_device : public h8s2357_device {
 public:
-	h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2392_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 class h8s2390_device : public h8s2357_device {
 public:
-	h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	h8s2390_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type H8S2357;

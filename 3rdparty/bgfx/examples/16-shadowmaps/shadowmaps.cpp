@@ -12,8 +12,8 @@
 
 #include <bgfx/bgfx.h>
 #include <bx/timer.h>
-#include <bx/readerwriter.h>
 #include <bx/fpumath.h>
+#include <bx/crtimpl.h>
 #include "entry/entry.h"
 #include "camera.h"
 #include "imgui/imgui.h"
@@ -771,14 +771,14 @@ static RenderState s_renderStates[RenderState::Count] =
 
 struct ViewState
 {
-	ViewState(uint32_t _width = 1280, uint32_t _height = 720)
+	ViewState(uint16_t _width = 1280, uint16_t _height = 720)
 		: m_width(_width)
 		, m_height(_height)
 	{
 	}
 
-	uint32_t m_width;
-	uint32_t m_height;
+	uint16_t m_width;
+	uint16_t m_height;
 
 	float m_view[16];
 	float m_proj[16];
@@ -856,7 +856,7 @@ struct Group
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh
@@ -891,7 +891,7 @@ struct Mesh
 #define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
 
 		bx::CrtFileReader reader;
-		reader.open(_filePath);
+		bx::open(&reader, _filePath);
 
 		Group group;
 
@@ -971,7 +971,7 @@ struct Mesh
 			}
 		}
 
-		reader.close();
+		bx::close(&reader);
 	}
 
 	void unload()
@@ -989,13 +989,13 @@ struct Mesh
 		m_groups.clear();
 	}
 
-	void submit(uint8_t _viewId, float* _mtx, bgfx::ProgramHandle _program, const RenderState& _renderState)
+	void submit(uint8_t _viewId, float* _mtx, bgfx::ProgramHandle _program, const RenderState& _renderState, bool _submitShadowMaps = false)
 	{
 		bgfx::TextureHandle texture = BGFX_INVALID_HANDLE;
-		submit(_viewId, _mtx, _program, _renderState, texture);
+		submit(_viewId, _mtx, _program, _renderState, texture, _submitShadowMaps);
 	}
 
-	void submit(uint8_t _viewId, float* _mtx, bgfx::ProgramHandle _program, const RenderState& _renderState, bgfx::TextureHandle _texture)
+	void submit(uint8_t _viewId, float* _mtx, bgfx::ProgramHandle _program, const RenderState& _renderState, bgfx::TextureHandle _texture, bool _submitShadowMaps = false)
 	{
 		for (GroupArray::const_iterator it = m_groups.begin(), itEnd = m_groups.end(); it != itEnd; ++it)
 		{
@@ -1015,9 +1015,12 @@ struct Mesh
 				bgfx::setTexture(0, s_texColor, _texture);
 			}
 
-			for (uint8_t ii = 0; ii < ShadowMapRenderTargets::Count; ++ii)
+			if (_submitShadowMaps)
 			{
-				bgfx::setTexture(4 + ii, s_shadowMap[ii], s_rtShadowMap[ii]);
+				for (uint8_t ii = 0; ii < ShadowMapRenderTargets::Count; ++ii)
+				{
+					bgfx::setTexture(4 + ii, s_shadowMap[ii], s_rtShadowMap[ii]);
+				}
 			}
 
 			// Apply render state.
@@ -1376,9 +1379,9 @@ int _main_(int _argc, char** _argv)
 	PosColorTexCoord0Vertex::init();
 
 	// Textures.
-	bgfx::TextureHandle texFigure     = loadTexture("figure-rgba.dds");
-	bgfx::TextureHandle texFlare      = loadTexture("flare.dds");
-	bgfx::TextureHandle texFieldstone = loadTexture("fieldstone-rgba.dds");
+	bgfx::TextureHandle texFigure     = loadTexture("textures/figure-rgba.dds");
+	bgfx::TextureHandle texFlare      = loadTexture("textures/flare.dds");
+	bgfx::TextureHandle texFieldstone = loadTexture("textures/fieldstone-rgba.dds");
 
 	// Meshes.
 	Mesh bunnyMesh;
@@ -1941,8 +1944,8 @@ int _main_(int _argc, char** _argv)
 	{
 		bgfx::TextureHandle fbtextures[] =
 		{
-			bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
-			bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
+			bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
+			bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
 		};
 		s_rtShadowMap[ii] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 	}
@@ -1968,8 +1971,13 @@ int _main_(int _argc, char** _argv)
 	float timeAccumulatorScene = 0.0f;
 
 	entry::MouseState mouseState;
-	while (!entry::processEvents(viewState.m_width, viewState.m_height, debug, reset, &mouseState) )
+	uint32_t width;
+	uint32_t height;
+	while (!entry::processEvents(width, height, debug, reset, &mouseState) )
 	{
+		viewState.m_width  = uint16_t(width);
+		viewState.m_height = uint16_t(height);
+
 		// Imgui.
 		imguiBeginFrame(mouseState.m_mx
 			, mouseState.m_my
@@ -2448,7 +2456,7 @@ int _main_(int _argc, char** _argv)
 
 		// Reset render targets.
 		const bgfx::FrameBufferHandle invalidRt = BGFX_INVALID_HANDLE;
-		for (uint32_t ii = 0; ii < RENDERVIEW_DRAWDEPTH_3_ID+1; ++ii)
+		for (uint8_t ii = 0; ii < RENDERVIEW_DRAWDEPTH_3_ID+1; ++ii)
 		{
 			bgfx::setViewFrameBuffer(ii, invalidRt);
 		}
@@ -2764,7 +2772,7 @@ int _main_(int _argc, char** _argv)
 				uint8_t renderStateIndex = RenderState::ShadowMap_PackDepth;
 				if(LightType::PointLight == settings.m_lightType && settings.m_stencilPack)
 				{
-					renderStateIndex = (ii < 2) ? RenderState::ShadowMap_PackDepthHoriz : RenderState::ShadowMap_PackDepthVert;
+					renderStateIndex = uint8_t( (ii < 2) ? RenderState::ShadowMap_PackDepthHoriz : RenderState::ShadowMap_PackDepthVert);
 				}
 
 				// Floor.
@@ -2977,6 +2985,7 @@ int _main_(int _argc, char** _argv)
 					, mtxFloor
 					, *currentSmSettings->m_progDraw
 					, s_renderStates[RenderState::Default]
+					, true
 					);
 
 			// Bunny.
@@ -2988,6 +2997,7 @@ int _main_(int _argc, char** _argv)
 					, mtxBunny
 					, *currentSmSettings->m_progDraw
 					, s_renderStates[RenderState::Default]
+					, true
 					);
 
 			// Hollow cube.
@@ -2999,6 +3009,7 @@ int _main_(int _argc, char** _argv)
 					, mtxHollowcube
 					, *currentSmSettings->m_progDraw
 					, s_renderStates[RenderState::Default]
+					, true
 					);
 
 			// Cube.
@@ -3010,6 +3021,7 @@ int _main_(int _argc, char** _argv)
 					, mtxCube
 					, *currentSmSettings->m_progDraw
 					, s_renderStates[RenderState::Default]
+					, true
 					);
 
 			// Trees.
@@ -3023,6 +3035,7 @@ int _main_(int _argc, char** _argv)
 						, mtxTrees[ii]
 						, *currentSmSettings->m_progDraw
 						, s_renderStates[RenderState::Default]
+						, true
 						);
 			}
 
@@ -3095,8 +3108,8 @@ int _main_(int _argc, char** _argv)
 
 				bgfx::TextureHandle fbtextures[] =
 				{
-					bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
-					bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
+					bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
+					bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
 				};
 				s_rtShadowMap[0] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 			}
@@ -3110,8 +3123,8 @@ int _main_(int _argc, char** _argv)
 
 						bgfx::TextureHandle fbtextures[] =
 						{
-							bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
-							bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
+							bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::BGRA8, BGFX_TEXTURE_RT),
+							bgfx::createTexture2D(currentShadowMapSize, currentShadowMapSize, false, 1, bgfx::TextureFormat::D24S8, BGFX_TEXTURE_RT),
 						};
 						s_rtShadowMap[ii] = bgfx::createFrameBuffer(BX_COUNTOF(fbtextures), fbtextures, true);
 					}

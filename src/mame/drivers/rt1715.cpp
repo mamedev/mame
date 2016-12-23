@@ -82,7 +82,7 @@ READ8_MEMBER(rt1715_state::k7658_led2_r)
 /* read key state */
 READ8_MEMBER(rt1715_state::k7658_data_r)
 {
-	UINT8 result = 0xff;
+	uint8_t result = 0xff;
 
 	if (BIT(offset,  0)) result &= ioport("row_00")->read();
 	if (BIT(offset,  1)) result &= ioport("row_10")->read();
@@ -270,7 +270,7 @@ static MACHINE_CONFIG_START( rt1715, rt1715_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_2_4576MHz)
 	MCFG_CPU_PROGRAM_MAP(rt1715_mem)
 	MCFG_CPU_IO_MAP(rt1715_io)
-	MCFG_CPU_CONFIG(rt1715_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(rt1715_daisy_chain)
 
 
 	/* keyboard */

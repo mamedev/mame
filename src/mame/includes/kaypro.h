@@ -62,29 +62,34 @@ public:
 	DECLARE_DRIVER_INIT(kaypro);
 	DECLARE_FLOPPY_FORMATS(kayproii_floppy_formats);
 	DECLARE_FLOPPY_FORMATS(kaypro2x_floppy_formats);
-	UINT32 screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kayproii(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kaypro2x(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_omni2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(kay_kbd_interrupt);
 	DECLARE_READ8_MEMBER(kaypro_sio_r);
 	DECLARE_WRITE8_MEMBER(kaypro_sio_w);
 	MC6845_UPDATE_ROW(kaypro2x_update_row);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(kaypro);
-	const UINT8 *m_p_chargen;
-	UINT8 m_mc6845_cursor[16];
-	UINT8 m_mc6845_reg[32];
-	UINT8 m_mc6845_ind;
-	UINT8 m_framecnt;
-	UINT8 *m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint8_t m_mc6845_cursor[16];
+	uint8_t m_mc6845_reg[32];
+	uint8_t m_mc6845_ind;
+	uint8_t m_framecnt;
+	uint8_t *m_p_videoram;
 	kay_kbd_t *m_kbd;
 	int m_centronics_busy;
 	required_device<palette_device> m_palette;
+	void kay_kbd_in(uint8_t data );
+	uint8_t kay_kbd_c_r();
+	uint8_t kay_kbd_d_r();
+	TIMER_CALLBACK_MEMBER( kay_kbd_beepoff );
+	void kay_kbd_d_w( uint8_t data );
 
 private:
 	bool m_is_motor_off;
-	UINT8 m_fdc_rq;
-	UINT8 m_system_port;
-	UINT16 m_mc6845_video_address;
+	uint8_t m_fdc_rq;
+	uint8_t m_system_port;
+	uint16_t m_mc6845_video_address;
 	floppy_image_device *m_floppy;
 	void mc6845_cursor_configure();
 	void mc6845_screen_configure();
@@ -101,12 +106,3 @@ private:
 	optional_device<mc6845_device> m_crtc;
 	required_device<beep_device> m_beep;
 };
-
-
-/*----------- defined in machine/kay_kbd.c -----------*/
-
-UINT8 kay_kbd_c_r( running_machine &machine );
-UINT8 kay_kbd_d_r( running_machine &machine );
-void kay_kbd_d_w( running_machine &machine, UINT8 data );
-
-INPUT_PORTS_EXTERN( kay_kbd );

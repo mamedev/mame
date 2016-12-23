@@ -79,6 +79,7 @@ PROM  : Type MB7051
 
 #include "emu.h"
 #include "machine/alpha8201.h"
+#include "machine/watchdog.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/resnet.h"
@@ -100,10 +101,10 @@ public:
 	required_device<cpu_device> m_subcpu;
 	required_device<alpha_8201_device> m_alpha_8201;
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
-	UINT8 m_control[8];
-	UINT8 m_nmi_enabled;
+	uint8_t m_control[8];
+	uint8_t m_nmi_enabled;
 	int m_r;
 
 	DECLARE_WRITE8_MEMBER(control_w);
@@ -111,7 +112,7 @@ public:
 
 	DECLARE_PALETTE_INIT(shougi);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(vblank_nmi);
 
 	virtual void machine_start() override;
@@ -164,7 +165,7 @@ void shougi_state::machine_reset()
 
 PALETTE_INIT_MEMBER(shougi_state, shougi)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	static const int resistances_b[2]  = { 470, 220 };
 	static const int resistances_rg[3] = { 1000, 470, 220 };
 	double weights_r[3], weights_g[3], weights_b[2];
@@ -200,7 +201,7 @@ PALETTE_INIT_MEMBER(shougi_state, shougi)
 }
 
 
-UINT32 shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t shougi_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int offs = 0; offs < 0x4000; offs++)
 	{
@@ -281,7 +282,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, shougi_state )
 	AM_RANGE(0x4800, 0x480f) AM_WRITE(control_w)
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW")
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
-	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(watchdog_reset_w) /* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) /* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x6800, 0x6800) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x7000, 0x73ff) AM_DEVREADWRITE("alpha_8201", alpha_8201_device, ext_ram_r, ext_ram_w)
@@ -409,7 +410,9 @@ static MACHINE_CONFIG_START( shougi, shougi_state )
 	MCFG_DEVICE_ADD("alpha_8201", ALPHA_8201, XTAL_10MHz/4/8)
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-	MCFG_WATCHDOG_VBLANK_INIT(0x10) // assuming it's the same as champbas
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 0x10) // assuming it's the same as champbas
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

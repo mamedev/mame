@@ -13,7 +13,7 @@
 #include "includes/busicom.h"
 
 
-UINT8 busicom_state::get_bit_selected(UINT32 val,int num)
+uint8_t busicom_state::get_bit_selected(uint32_t val,int num)
 {
 	int i;
 	for(i=0;i<num;i++) {
@@ -29,7 +29,7 @@ READ8_MEMBER(busicom_state::keyboard_r)
 
 READ8_MEMBER(busicom_state::printer_r)
 {
-	UINT8 retVal = 0;
+	uint8_t retVal = 0;
 	if (m_drum_index==0) retVal |= 1;
 	retVal |= ioport("PAPERADV")->read() & 1 ? 8 : 0;
 	return retVal;
@@ -86,9 +86,9 @@ WRITE8_MEMBER(busicom_state::printer_w)
 WRITE8_MEMBER(busicom_state::status_w)
 {
 #if 0
-	UINT8 mem_lamp = BIT(data,0);
-	UINT8 over_lamp = BIT(data,1);
-	UINT8 minus_lamp = BIT(data,2);
+	uint8_t mem_lamp = BIT(data,0);
+	uint8_t over_lamp = BIT(data,1);
+	uint8_t minus_lamp = BIT(data,2);
 #endif
 	//logerror("status %c %c %c\n",mem_lamp ? 'M':'x',over_lamp ? 'O':'x',minus_lamp ? '-':'x');
 }

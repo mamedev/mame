@@ -1,3 +1,115 @@
+2016-November-??
+
+Version "0.9.4"
+
+Since the "0.9.3-devel" release of this Lua library...
+
+Added second module 'lsqlite3complete' that statically links sqlite.c. Continue to use 
+'lsqlite3' for dynamic linking to 'sqlite3.so' or 'sqlite3.dll'.
+
+Added Online Backup API
+
+Added unit tests for NULs in BLOBs and TEXT columns. (Refute defect report.)
+
+Use lua_createtable() in lieu of lua_newtable() when number of table elements is known.
+This will improve performance.
+Thanks to Egil Hjelmeland for the suggestion.
+
+2015-January-06
+
+Version "0.9.3"
+
+Since the "0.9.2-devel" release of this Lua library...
+
+Added lversion() function to report library version, "0.9.3".
+
+Added db:load_extension() function to support SQLite extension libraries.
+
+Added some tests for new funcitons and Lua 5.3 64-bit integers in the database.
+
+Fixed longstanding bug: if db is no longer live, it is auto-closed by gc, but there may still
+be live prepared statements. Executing these statements would produce an error. Prepared 
+statements now hold a reference to the db to prevent it from being collected while the prepared 
+statement is live. Manually closing the db will continue to finalize the statements, as before.
+
+Fixed bug in PUSH_INT64 macro for Lua < 5.3 introduced in version 0.9.2-devel.
+
+2015-January-04
+
+Version "0.9.2-devel"
+
+Since the "0.9.1-devel" release of this Lua library...
+
+Lua 5.3 compatibility (backward compatible with Lua 5.2 and Lua 5.1.5).
+
+Finally uses sqlite3_prepare_v2() to preserve detailed error codes in statement stepping
+
+With Lua 5.3, 64-bit integer database values are supported for reading and writing columns; 
+all other values, e.g., status and counts, are now also returned as integers. The only use of
+doubles is for values of that type read from or written to columns.
+
+Added support for stmt:last_insert_rowid() as requested
+
+2013-April-08
+
+Version "0.9.1-devel"
+
+Since the "0.9-devel" release of this Lua library...
+
+Updated examples and tests from Dmitry Pashkevich.
+
+2013-March-30
+
+Version "0.9-devel"
+
+Since the "0.8-devel" release of this Lua library...
+
+Updates for Lua 5.2 (backward compatible with Lua 5.1.5).
+
+Uses lunitx-0.6-1.rockspec for Lua 5.2 compatible testing.
+
+Added sqlite3.update_hook(), sqlite3.commit_hook() and 
+sqlite3.rollback_hook() at the suggesiton of Dmitry Pashkevich, who 
+also contributed examples and some testing assistance on this release.
+
+Converted Makefile to depend on luarocks.
+
+2011-January-10
+
+Version "0.8-devel"
+
+Since the "0.7-devel" release of this Lua library...
+
+Added a missing lua_pop in dbvm_bind_names()
+Now dbvm_bind_index() binds a boolean as 1 or 0
+Thanks to Ronny Dierckx
+
+    Since the "0.6-devel" release of this Lua library...
+
+Made db_exec_callback thread safe.
+Thanks to Grant Robinson.
+
+Bug fix in dbvm_bind_index error message.
+Thanks to Dirk Feytons.
+
+Added a few casts and changed a few comments to ANSI C style.
+Thanks to Corey Stup.
+
+Note that Thomas Lauer has a patch referenced on LuaForge
+to make collations thread safe(r). This issue is still 
+under investigation: the patch has wide ranging affect
+and to me it appears unsafe wrt GC. The whole issue of 
+thread references in callbacks deserves thorough review.
+A new design that places referenced values in the upvalues
+of the callback function (rather than in the registry of 
+the function defining thread) would be preferable. It may
+also make sense to keep thread references in a shared 
+environment of the library's functions, and/or require
+all callbacks to be defined in the main lua state (so 
+they the state is guaranteed to outlive other threads).
+
+-=-
+
 2007-August-15 e
 
 Version "0.6-devel"

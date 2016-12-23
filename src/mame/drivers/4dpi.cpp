@@ -21,9 +21,9 @@
 
 struct ip6_regs_t
 {
-	UINT16 unknown_half_0;
-	UINT8 unknown_byte_0;
-	UINT8 unknown_byte_1;
+	uint16_t unknown_half_0;
+	uint8_t unknown_byte_0;
+	uint8_t unknown_byte_1;
 };
 
 class sgi_ip6_state : public driver_device
@@ -44,14 +44,14 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sgi_ip6_vbl);
 	inline void ATTR_PRINTF(3,4) verboselog( int n_level, const char *s_fmt, ... );
 	required_device<cpu_device> m_maincpu;
 };
 
 
-#define VERBOSE_LEVEL ( 0 )
+#define VERBOSE_LEVEL (0)
 
 #define ENABLE_VERBOSE_LOG (1)
 
@@ -78,7 +78,7 @@ void sgi_ip6_state::video_start()
 {
 }
 
-UINT32 sgi_ip6_state::screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sgi_ip6_state::screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -90,7 +90,7 @@ UINT32 sgi_ip6_state::screen_update_sgi_ip6(screen_device &screen, bitmap_rgb32 
 
 READ32_MEMBER(sgi_ip6_state::ip6_unk1_r)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 	switch(offset)
 	{
 		case 0x0000/4:
@@ -134,7 +134,7 @@ WRITE32_MEMBER(sgi_ip6_state::ip6_unk1_w)
 
 READ32_MEMBER(sgi_ip6_state::ip6_unk2_r)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 	switch(offset)
 	{
 		case 0x0000/4:
@@ -178,7 +178,7 @@ WRITE32_MEMBER(sgi_ip6_state::ip6_unk2_w)
 
 READ32_MEMBER(sgi_ip6_state::ip6_unk3_r)
 {
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 	if(ACCESSING_BITS_16_23)
 	{
 		verboselog(0, "ip6_unk3_r: Unknown Byte 1: %02x & %02x\n", m_ip6_regs.unknown_byte_1, (mem_mask >> 16) & 0x000000ff);
@@ -229,7 +229,6 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( sgi_ip6, sgi_ip6_state )
 	MCFG_CPU_ADD( "maincpu", R3041, 20000000 ) // FIXME: Should be R2000
 	MCFG_R3000_ENDIANNESS(ENDIANNESS_BIG)
-	MCFG_CPU_CONFIG( config )
 	MCFG_CPU_PROGRAM_MAP( sgi_ip6_map )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", sgi_ip6_state,  sgi_ip6_vbl)
 

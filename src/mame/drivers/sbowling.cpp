@@ -42,6 +42,7 @@ PROMs : NEC B406 (1kx4) x2
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/watchdog.h"
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
@@ -56,16 +57,16 @@ public:
 		m_gfxdecode(*this, "gfxdecode") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	required_device<gfxdecode_device> m_gfxdecode;
 
 	int m_bgmap;
 	int m_system;
 	tilemap_t *m_tilemap;
 	std::unique_ptr<bitmap_ind16> m_tmpbitmap;
-	UINT32 m_color_prom_address;
-	UINT8 m_pix_sh;
-	UINT8 m_pix[2];
+	uint32_t m_color_prom_address;
+	uint8_t m_pix_sh;
+	uint8_t m_pix[2];
 
 	DECLARE_WRITE8_MEMBER(videoram_w);
 	DECLARE_WRITE8_MEMBER(pix_shift_w);
@@ -81,13 +82,13 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sbowling);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void postload();
 };
 
 TILE_GET_INFO_MEMBER(sbowling_state::get_tile_info)
 {
-	UINT8 *rom = memregion("user1")->base();
+	uint8_t *rom = memregion("user1")->base();
 	int tileno = rom[tile_index + m_bgmap * 1024];
 
 	SET_TILE_INFO_MEMBER(0, tileno, 0, 0);
@@ -127,7 +128,7 @@ WRITE8_MEMBER(sbowling_state::videoram_w)
 	}
 }
 
-UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0x18, cliprect);
 	m_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -138,7 +139,7 @@ UINT32 sbowling_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 void sbowling_state::video_start()
 {
 	m_tmpbitmap = std::make_unique<bitmap_ind16>(32*8,32*8);
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(sbowling_state::get_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 
 	save_item(NAME(m_bgmap));
 	save_item(NAME(m_system));
@@ -166,7 +167,7 @@ WRITE8_MEMBER(sbowling_state::pix_data_w)
 }
 READ8_MEMBER(sbowling_state::pix_data_r)
 {
-	UINT32 p1, p0;
+	uint32_t p1, p0;
 	int res;
 	int sh = m_pix_sh & 7;
 
@@ -250,7 +251,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( port_map, AS_IO, 8, sbowling_state )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(controls_r, pix_data_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(pix_data_r, pix_shift_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1") AM_WRITENOP
@@ -361,7 +362,7 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sbowling_state, sbowling)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 
 	static const int resistances_rg[3] = { 470, 270, 100 };
 	static const int resistances_b[2]  = { 270, 100 };
@@ -403,6 +404,8 @@ static MACHINE_CONFIG_START( sbowling, sbowling_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_IO_MAP(port_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", sbowling_state, interrupt, "screen", 0, 1)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

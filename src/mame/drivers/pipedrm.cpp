@@ -188,7 +188,6 @@ public:
 	DECLARE_WRITE8_MEMBER( pending_command_clear_w );
 	DECLARE_READ8_MEMBER( pending_command_r );
 	DECLARE_READ8_MEMBER( sound_command_r );
-	DECLARE_WRITE_LINE_MEMBER(irqhandler);
 };
 
 
@@ -570,18 +569,6 @@ static GFXDECODE_START( hatris )
 GFXDECODE_END
 
 
-
-/*************************************
- *
- *  Sound definitions
- *
- *************************************/
-
-WRITE_LINE_MEMBER(pipedrm_state::irqhandler)
-{
-	m_subcpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /*************************************
  *
  *  Machine driver
@@ -662,7 +649,6 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_VSYSTEM_SPR2_SET_OFFSETS(-13, -6)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(3)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(pipedrm_state,pipedrm)
 
@@ -670,7 +656,7 @@ static MACHINE_CONFIG_START( pipedrm, pipedrm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -711,7 +697,7 @@ static MACHINE_CONFIG_START( hatris, pipedrm_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2608, 8000000)
-	MCFG_YM2608_IRQ_HANDLER(WRITELINE(pipedrm_state, irqhandler))
+	MCFG_YM2608_IRQ_HANDLER(INPUTLINE("sub", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -919,7 +905,7 @@ DRIVER_INIT_MEMBER(pipedrm_state,pipedrm)
 {
 	const memory_share *share = memshare("palette");
 	/* sprite RAM lives at the end of palette RAM */
-	m_spriteram.set_target((UINT8*)share->ptr() + 0xc00, 0x400);
+	m_spriteram.set_target((uint8_t*)share->ptr() + 0xc00, 0x400);
 	m_maincpu->space(AS_PROGRAM).install_ram(0xcc00, 0xcfff, m_spriteram);
 }
 

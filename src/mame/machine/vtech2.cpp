@@ -27,7 +27,7 @@
 
 #define TRKSIZE_VZ  0x9a0   /* arbitrary (actually from analyzing format) */
 
-static const UINT8 laser_fdc_wrprot[2] = {0x80, 0x80};
+static const uint8_t laser_fdc_wrprot[2] = {0x80, 0x80};
 
 /* wrappers for bank #1 to #4 */
 WRITE8_MEMBER(vtech2_state::mwa_bank1 ) { mwa_bank(0,offset,data); }
@@ -61,7 +61,7 @@ static const char *const mwa_bank_hard[4] =
 
 DRIVER_INIT_MEMBER(vtech2_state,laser)
 {
-	UINT8 *gfx = memregion("gfx2")->base();
+	uint8_t *gfx = memregion("gfx2")->base();
 	int i;
 
 	m_laser_track_x2[0] = m_laser_track_x2[1] = 80;
@@ -195,7 +195,7 @@ WRITE8_MEMBER(vtech2_state::laser_bank_select_w)
  ************************************************/
 int vtech2_state::mra_bank(int bank, int offs)
 {
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	/* Laser 500/700 only: keyboard rows A through D */
 	if( (offs & 0x00ff) == 0x00ff )
@@ -444,7 +444,7 @@ WRITE8_MEMBER(vtech2_state::laser_fdc_w)
 				{
 					if( --m_laser_fdc_bits == 0 )
 					{
-						UINT8 value = 0;
+						uint8_t value = 0;
 						m_laser_data &= 0xffff;
 						if( m_laser_data & 0x4000 ) value |= 0x80;
 						if( m_laser_data & 0x1000 ) value |= 0x40;

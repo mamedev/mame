@@ -88,7 +88,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_cart(*this, "cartslot"),
-		m_key_matrix(*this, "IN"),
+		m_key_matrix(*this, "IN.%u", 0),
 		m_battery_inp(*this, "BATTERY")
 	{ }
 
@@ -97,10 +97,10 @@ public:
 	required_ioport_array<8> m_key_matrix;
 	required_ioport m_battery_inp;
 
-	UINT8 m_key_select;
-	UINT8 m_power;
+	uint8_t m_key_select;
+	uint8_t m_power;
 
-	void update_lcd_indicator(UINT8 y, UINT8 x, int state);
+	void update_lcd_indicator(uint8_t y, uint8_t x, int state);
 	void update_battery_status(int state);
 
 	DECLARE_READ8_MEMBER(keyboard_r);
@@ -112,6 +112,8 @@ public:
 	DECLARE_PALETTE_INIT(ti74);
 	DECLARE_INPUT_CHANGED_MEMBER(battery_status_changed);
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(ti74_cartridge);
+	HD44780_PIXEL_UPDATE(ti74_pixel_update);
+	HD44780_PIXEL_UPDATE(ti95_pixel_update);
 };
 
 
@@ -124,19 +126,19 @@ public:
 
 DEVICE_IMAGE_LOAD_MEMBER(ti74_state, ti74_cartridge)
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	// max size is 32KB
 	if (size > 0x8000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -154,7 +156,7 @@ PALETTE_INIT_MEMBER(ti74_state, ti74)
 	palette.set_pen_color(2, rgb_t(131, 136, 139)); // lcd pixel off
 }
 
-void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
+void ti74_state::update_lcd_indicator(uint8_t y, uint8_t x, int state)
 {
 	// TI-74 ref._________________...
 	// output#  |10     11     12     13     14      2      3      4
@@ -171,7 +173,7 @@ void ti74_state::update_lcd_indicator(UINT8 y, UINT8 x, int state)
 	output().set_lamp_value(y * 10 + x, state);
 }
 
-static HD44780_PIXEL_UPDATE(ti74_pixel_update)
+HD44780_PIXEL_UPDATE(ti74_state::ti74_pixel_update)
 {
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
@@ -180,8 +182,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 14 lcd indicators
-		ti74_state *driver_state = device.machine().driver_data<ti74_state>();
-		driver_state->update_lcd_indicator(y, x, state);
+		update_lcd_indicator(y, x, state);
 	}
 	else if (line < 2 && pos < 16)
 	{
@@ -191,7 +192,7 @@ static HD44780_PIXEL_UPDATE(ti74_pixel_update)
 	}
 }
 
-static HD44780_PIXEL_UPDATE(ti95_pixel_update)
+HD44780_PIXEL_UPDATE(ti74_state::ti95_pixel_update)
 {
 	// char size is 5x7 + cursor
 	if (x > 4 || y > 7)
@@ -200,8 +201,7 @@ static HD44780_PIXEL_UPDATE(ti95_pixel_update)
 	if (line == 1 && pos == 15)
 	{
 		// the last char is used to control the 17 lcd indicators
-		ti74_state *driver_state = device.machine().driver_data<ti74_state>();
-		driver_state->update_lcd_indicator(y, x, state);
+		update_lcd_indicator(y, x, state);
 	}
 	else if (line == 0 && pos < 16)
 	{
@@ -229,7 +229,7 @@ static HD44780_PIXEL_UPDATE(ti95_pixel_update)
 
 READ8_MEMBER(ti74_state::keyboard_r)
 {
-	UINT8 ret = 0;
+	uint8_t ret = 0;
 
 	// read selected keyboard rows
 	for (int i = 0; i < 8; i++)
@@ -532,7 +532,7 @@ static MACHINE_CONFIG_START( ti74, ti74_state )
 
 	MCFG_HD44780_ADD("hd44780") // 270kHz
 	MCFG_HD44780_LCD_SIZE(2, 16) // 2*16 internal
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti74_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti74_cart")
@@ -566,7 +566,7 @@ static MACHINE_CONFIG_START( ti95, ti74_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(ti95_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(ti74_state,ti95_pixel_update)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot", generic_plain_slot, "ti95_cart")

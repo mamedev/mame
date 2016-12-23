@@ -16,11 +16,11 @@ Todo:
 const device_type MSX_SLOT_PANASONIC08 = &device_creator<msx_slot_panasonic08_device>;
 
 
-msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_slot_panasonic08_device::msx_slot_panasonic08_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_SLOT_PANASONIC08, "MSX Internal Panasonic08", tag, owner, clock, "msx_slot_panasonic08", __FILE__)
 	, msx_internal_slot_interface()
 	, m_nvram(*this, "nvram")
-	, m_region(nullptr)
+	, m_rom_region(*this, finder_base::DUMMY_TAG)
 	, m_region_offset(0)
 	, m_rom(nullptr)
 	, m_control(0)
@@ -44,29 +44,21 @@ machine_config_constructor msx_slot_panasonic08_device::device_mconfig_additions
 }
 
 
-void msx_slot_panasonic08_device::set_rom_start(device_t &device, const char *region, UINT32 offset)
+void msx_slot_panasonic08_device::set_rom_start(device_t &device, const char *region, uint32_t offset)
 {
 	msx_slot_panasonic08_device &dev = downcast<msx_slot_panasonic08_device &>(device);
 
-	dev.m_region = region;
+	dev.m_rom_region.set_tag(region);
 	dev.m_region_offset = offset;
 }
 
 
 void msx_slot_panasonic08_device::device_start()
 {
-	assert(m_region != nullptr );
-
-	memory_region *m_rom_region = owner()->memregion(m_region);
-
 	// Sanity checks
-	if (m_rom_region == nullptr )
-	{
-		fatalerror("Rom slot '%s': Unable to find memory region '%s'\n", tag(), m_region);
-	}
 	if (m_rom_region->bytes() < m_region_offset + 0x200000)
 	{
-		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_region);
+		fatalerror("Memory region '%s' is too small for the FS4600 firmware\n", m_rom_region.finder_tag());
 	}
 
 	m_sram.resize(0x4000);
@@ -130,7 +122,7 @@ WRITE8_MEMBER(msx_slot_panasonic08_device::write)
 {
 	if ((offset & 0xc000) == 0x8000 || (offset & 0xc000) == 0x0000)
 	{
-		UINT8 bank = m_selected_bank[offset >> 13];
+		uint8_t bank = m_selected_bank[offset >> 13];
 		if (bank >= 0x80 && bank < 0x84)   // Are these banks were sram is present? Mirroring?
 		{
 			logerror("msx_slot_panasonic08: writing %02x to sram %04x, bank = %02x\n", data, offset & 0x1fff, bank);

@@ -297,6 +297,7 @@ const i386_device::X86_OPCODE i386_device::s_x86_opcode_table[] =
 	{ 0x03,     OP_2BYTE|OP_I386,           &i386_device::i386_lsl_r16_rm16,           &i386_device::i386_lsl_r32_rm32,       false},
 	{ 0x06,     OP_2BYTE|OP_I386,           &i386_device::i386_clts,                   &i386_device::i386_clts,               false},
 	{ 0x07,     OP_2BYTE|OP_I386,           &i386_device::i386_loadall,                &i386_device::i386_loadall,            false},
+	{ 0x07,     OP_2BYTE|OP_I486,           &i386_device::i386_invalid,                &i386_device::i386_invalid,            false},
 	{ 0x08,     OP_2BYTE|OP_I486,           &i386_device::i486_invd,                   &i386_device::i486_invd,               false},
 	{ 0x09,     OP_2BYTE|OP_I486,           &i386_device::i486_wbinvd,                 &i386_device::i486_wbinvd,             false},
 	{ 0x0B,     OP_2BYTE|OP_PENTIUM,        &i386_device::pentium_ud2,                 &i386_device::pentium_ud2,             false},

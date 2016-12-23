@@ -15,12 +15,12 @@ WRITE16_MEMBER( intv_state::intvkbd_dualport16_w )
 
 	/* copy the LSB over to the 6502 OP RAM, in case they are opcodes */
 	RAM  = m_region_keyboard->base();
-	RAM[offset] = (UINT8) (data >> 0);
+	RAM[offset] = (uint8_t) (data >> 0);
 }
 
 READ8_MEMBER( intv_state::intvkbd_dualport8_lsb_r )
 {
-	return (UINT8) (m_intvkbd_dualport_ram[offset] >> 0);
+	return (uint8_t) (m_intvkbd_dualport_ram[offset] >> 0);
 }
 
 WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
@@ -28,7 +28,7 @@ WRITE8_MEMBER( intv_state::intvkbd_dualport8_lsb_w )
 	unsigned char *RAM;
 
 	m_intvkbd_dualport_ram[offset] &= ~0x00FF;
-	m_intvkbd_dualport_ram[offset] |= ((UINT16) data) << 0;
+	m_intvkbd_dualport_ram[offset] |= ((uint16_t) data) << 0;
 
 	/* copy over to the 6502 OP RAM, in case they are opcodes */
 	RAM = m_region_keyboard->base();
@@ -307,7 +307,7 @@ READ8_MEMBER( intv_state::intvkb_iocart_r )
 	else if (m_iocart2->exists())
 		return m_iocart2->read_rom(space, offset, mem_mask);
 	else
-		return m_region_keyboard->u8(offset + 0xe000);
+		return m_region_keyboard->as_u8(offset + 0xe000);
 }
 
 
@@ -326,28 +326,6 @@ void intv_state::machine_reset()
 
 void intv_state::machine_start()
 {
-	// TODO: split these for intvkbd & intvecs??
-	for (int i = 0; i < 4; i++)
-	{
-		char str[8];
-		sprintf(str, "KEYPAD%i", i + 1);
-		m_keypad[i] = ioport(str);
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		char str[6];
-		sprintf(str, "DISC%i", i + 1);
-		m_disc[i] = ioport(str);
-	}
-	for (int i = 0; i < 4; i++)
-	{
-		char str[7];
-		sprintf(str, "DISCX%i", i + 1);
-		m_discx[i] = ioport(str);
-		sprintf(str, "DISCY%i", i + 1);
-		m_discy[i] = ioport(str);
-	}
-
 	save_item(NAME(m_bus_copy_mode));
 	save_item(NAME(m_backtab_row));
 	save_item(NAME(m_ram16));
@@ -427,7 +405,7 @@ TIMER_CALLBACK_MEMBER(intv_state::intv_interrupt_complete)
 
 TIMER_CALLBACK_MEMBER(intv_state::intv_btb_fill)
 {
-	UINT8 row = m_backtab_row;
+	uint8_t row = m_backtab_row;
 	//m_maincpu->adjust_icount(-STIC_ROW_FETCH);
 
 	for (int column = 0; column < STIC_BACKTAB_WIDTH; column++)
@@ -457,76 +435,4 @@ INTERRUPT_GEN_MEMBER(intv_state::intv_interrupt)
 	}
 
 	m_stic->screenrefresh();
-}
-
-/* hand 0 == left, 1 == right, 2 == ECS hand controller 1, 3 == ECS hand controller 2 */
-UINT8 intv_state::intv_control_r(int hand)
-{
-	static const UINT8 keypad_table[] =
-	{
-		0xFF, 0x3F, 0x9F, 0x5F, 0xD7, 0xB7, 0x77, 0xDB,
-		0xBB, 0x7B, 0xDD, 0xBD, 0x7D, 0xDE, 0xBE, 0x7E
-	};
-
-	static const UINT8 disc_table[] =
-	{
-		0xF3, 0xE3, 0xE7, 0xF7, 0xF6, 0xE6, 0xEE, 0xFE,
-		0xFC, 0xEC, 0xED, 0xFD, 0xF9, 0xE9, 0xEB, 0xFB
-	};
-
-	static const UINT8 discyx_table[5][5] =
-	{
-		{ 0xE3, 0xF3, 0xFB, 0xEB, 0xE9 },
-		{ 0xE7, 0xE3, 0xFB, 0xE9, 0xF9 },
-		{ 0xF7, 0xF7, 0xFF, 0xFD, 0xFD },
-		{ 0xF6, 0xE6, 0xFE, 0xEC, 0xED },
-		{ 0xE6, 0xEE, 0xFE, 0xFC, 0xEC }
-	};
-
-	int x, y;
-	UINT8 rv = 0xFF;
-
-	/* keypad */
-	x = m_keypad[hand]->read();
-	for (y = 0; y < 16; y++)
-	{
-		if (x & (1 << y))
-		{
-			rv &= keypad_table[y];
-		}
-	}
-
-	switch ((m_io_options->read() >> hand) & 1)
-	{
-		case 0: /* disc == digital */
-		default:
-
-			x = m_disc[hand]->read();
-			for (y = 0; y < 16; y++)
-			{
-				if (x & (1 << y))
-				{
-					rv &= disc_table[y];
-				}
-			}
-			break;
-
-		case 1: /* disc == _fake_ analog */
-
-			x = m_discx[hand]->read();
-			y = m_discy[hand]->read();
-			rv &= discyx_table[y / 32][x / 32];
-	}
-
-	return rv;
-}
-
-READ8_MEMBER( intv_state::intv_left_control_r )
-{
-	return intv_control_r(0);
-}
-
-READ8_MEMBER( intv_state::intv_right_control_r )
-{
-	return intv_control_r(1);
 }

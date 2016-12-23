@@ -14,7 +14,7 @@ namespace bx
 #define BX_RADIXSORT_HISTOGRAM_SIZE (1<<BX_RADIXSORT_BITS)
 #define BX_RADIXSORT_BIT_MASK (BX_RADIXSORT_HISTOGRAM_SIZE-1)
 
-	inline void radixSort32(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, uint32_t _size)
+	inline void radixSort(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, uint32_t _size)
 	{
 		uint32_t* __restrict keys = _keys;
 		uint32_t* __restrict tempKeys = _tempKeys;
@@ -76,7 +76,7 @@ done:
 	}
 
 	template <typename Ty>
-	inline void radixSort32(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
+	inline void radixSort(uint32_t* __restrict _keys, uint32_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
 	{
 		uint32_t* __restrict keys = _keys;
 		uint32_t* __restrict tempKeys = _tempKeys;
@@ -148,7 +148,7 @@ done:
 		}
 	}
 
-	inline void radixSort64(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, uint32_t _size)
+	inline void radixSort(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, uint32_t _size)
 	{
 		uint64_t* __restrict keys = _keys;
 		uint64_t* __restrict tempKeys = _tempKeys;
@@ -210,7 +210,7 @@ done:
 	}
 
 	template <typename Ty>
-	inline void radixSort64(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
+	inline void radixSort(uint64_t* __restrict _keys, uint64_t* __restrict _tempKeys, Ty* __restrict _values, Ty* __restrict _tempValues, uint32_t _size)
 	{
 		uint64_t* __restrict keys = _keys;
 		uint64_t* __restrict tempKeys = _tempKeys;

@@ -42,7 +42,7 @@ public:
 //  DECLARE_WRITE8_MEMBER( dc_flash_w );
 
 private:
-	UINT64 PDTRA, PCTRA;
+	uint64_t PDTRA, PCTRA;
 	emu_timer *atapi_timer;
 	int atapi_xferlen, atapi_xferbase;
 };

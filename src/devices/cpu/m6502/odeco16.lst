@@ -1,3 +1,5 @@
+# license:BSD-3-Clause
+# copyright-holders:Olivier Galibert
 # deco 16 opcodes
 brk_16_imp
 	// The 6502 bug when a nmi occurs in a brk is reproduced (case !irq_taken && nmi_state)
@@ -89,8 +91,8 @@ uBB_zpg
 vbl_zpg
 	TMP2 = read_pc();
 	A = io->read_byte(0);
-	if(DECO16_VERBOSE)
-		logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
+	//if(DECO16_VERBOSE)
+	//  logerror("%s: VBL %02x (%04x)\n", tag(), NPC, TMP2);
 	prefetch();
 
 #   exceptions

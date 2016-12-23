@@ -80,15 +80,18 @@ Blitter source graphics
 
 
 #include "emu.h"
+#include "includes/konamipt.h"
+#include "includes/tutankhm.h"
 #include "cpu/m6809/m6809.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/konami1.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
-#include "machine/konami1.h"
-#include "includes/konamipt.h"
-#include "includes/tutankhm.h"
+#include "sound/volt_reg.h"
 
 
 class junofrst_state : public tutankhm_state
@@ -108,7 +111,7 @@ public:
 	required_device<filter_rc_device> m_filter_0_1;
 	required_device<filter_rc_device> m_filter_0_2;
 
-	UINT8    m_blitterdata[4];
+	uint8_t    m_blitterdata[4];
 	int      m_i8039_status;
 	int      m_last_irq;
 
@@ -157,7 +160,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 	if (offset == 3)
 	{
 		int i;
-		UINT8 *gfx_rom = memregion("gfx1")->base();
+		uint8_t *gfx_rom = memregion("gfx1")->base();
 
 		offs_t src = ((m_blitterdata[2] << 8) | m_blitterdata[3]) & 0xfffc;
 		offs_t dest = (m_blitterdata[0] << 8) | m_blitterdata[1];
@@ -171,7 +174,7 @@ WRITE8_MEMBER(junofrst_state::blitter_w)
 
 			for (j = 0; j < 16; j++)
 			{
-				UINT8 data;
+				uint8_t data;
 
 				if (src & 1)
 					data = gfx_rom[src >> 1] & 0x0f;
@@ -293,7 +296,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
-	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x801c, 0x801c) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x8024, 0x8024) AM_READ_PORT("P1")
 	AM_RANGE(0x8028, 0x8028) AM_READ_PORT("P2")
@@ -303,7 +306,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_SHARE("scroll")  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(sh_irqtrigger_w)
-	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8050, 0x8050) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(bankselect_w)
 	AM_RANGE(0x8070, 0x8073) AM_WRITE(blitter_w)
 	AM_RANGE(0x8100, 0x8fff) AM_RAM
@@ -315,11 +318,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, junofrst_state )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3000, 0x3000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x4001, 0x4001) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x4002, 0x4002) AM_DEVWRITE("aysnd", ay8910_device, data_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(soundlatch2_byte_w)
+	AM_RANGE(0x5000, 0x5000) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write)
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(i8039_irq_w)
 ADDRESS_MAP_END
 
@@ -330,8 +333,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, junofrst_state )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_byte_r)
-	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(0x00, 0xff) AM_DEVREAD("soundlatch2", generic_latch_8_device, read)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 
@@ -420,6 +423,8 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_CPU_PROGRAM_MAP(mcu_map)
 	MCFG_CPU_IO_MAP(mcu_io_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_MACHINE_START_OVERRIDE(junofrst_state,junofrst)
 	MCFG_MACHINE_RESET_OVERRIDE(junofrst_state,junofrst)
 
@@ -435,7 +440,10 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SCREEN_UPDATE_DRIVER(junofrst_state, screen_update_tutankhm)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(junofrst_state, portA_r))
@@ -444,15 +452,16 @@ static MACHINE_CONFIG_START( junofrst, junofrst_state )
 	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.30)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 
 	MCFG_FILTER_RC_ADD("filter.0.0", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_RC_ADD("filter.0.1", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 	MCFG_FILTER_RC_ADD("filter.0.2", 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 

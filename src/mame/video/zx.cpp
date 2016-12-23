@@ -32,7 +32,7 @@ void zx_state::device_timer(emu_timer &timer, device_timer_id id, int param, voi
 		zx_ula_hsync();
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in zx_state::device_timer");
+		assert_always(false, "Unknown id in zx_state::device_timer");
 	}
 }
 
@@ -55,10 +55,10 @@ WRITE16_MEMBER(zx_state::refresh_w)
 		m_maincpu->set_input_line(INPUT_LINE_IRQ0, data & 0x40 ? CLEAR_LINE : ASSERT_LINE);
 	m_prev_refresh = data;
 	if(m_ula_char_buffer != 0xffff) {
-		UINT64 time = m_maincpu->total_cycles();
+		uint64_t time = m_maincpu->total_cycles();
 		int x = 2*((time-m_base_vsync_clock) % 207);
 		int y = (time-m_base_vsync_clock) / 207;
-		UINT8 pixels;
+		uint8_t pixels;
 		if(m_region_gfx1)
 			pixels = m_region_gfx1->base()[((m_ula_char_buffer & 0x3f) << 3) | (m_ypos & 7)];
 		else
@@ -66,7 +66,7 @@ WRITE16_MEMBER(zx_state::refresh_w)
 		if(m_ula_char_buffer & 0x80)
 			pixels = ~pixels;
 		if(x < 384-8 && y < 311) {
-			UINT16 *dest = &m_bitmap_render->pix16(y, x);
+			uint16_t *dest = &m_bitmap_render->pix16(y, x);
 			for(int i=0; i<8; i++)
 				*dest++ |= pixels & (0x80 >> i) ? 1 : 0;
 		}
@@ -76,9 +76,9 @@ WRITE16_MEMBER(zx_state::refresh_w)
 
 void zx_state::recalc_hsync()
 {
-	UINT64 time = machine().time().as_ticks(m_maincpu->clock());
-	UINT32 step = (time - m_base_vsync_clock) % 207;
-	UINT32 delta;
+	uint64_t time = machine().time().as_ticks(m_maincpu->clock());
+	uint32_t step = (time - m_base_vsync_clock) % 207;
+	uint32_t delta;
 	if (m_hsync_active)
 		delta = 207 - step;
 	else {
@@ -93,7 +93,7 @@ void zx_state::recalc_hsync()
 
 READ8_MEMBER(zx_state::ula_low_r)
 {
-	UINT8 cdata = m_program->read_byte(offset);
+	uint8_t cdata = m_program->read_byte(offset);
 	if(space.debugger_access())
 		return cdata;
 
@@ -101,7 +101,7 @@ READ8_MEMBER(zx_state::ula_low_r)
 		return cdata;
 
 	if(m_nmi_on) {
-		UINT64 time = m_maincpu->total_cycles();
+		uint64_t time = m_maincpu->total_cycles();
 		int pos = (time-m_base_vsync_clock) % 207;
 		if(pos >= 192)
 			m_maincpu->adjust_icount(pos - 207);
@@ -111,7 +111,7 @@ READ8_MEMBER(zx_state::ula_low_r)
 
 READ8_MEMBER(zx_state::ula_high_r)
 {
-	UINT8 cdata = m_program->read_byte(offset);
+	uint8_t cdata = m_program->read_byte(offset);
 
 	if(space.debugger_access())
 		return cdata;
@@ -120,7 +120,7 @@ READ8_MEMBER(zx_state::ula_high_r)
 		return cdata;
 
 	if(m_nmi_on) {
-		UINT64 time = m_maincpu->total_cycles();
+		uint64_t time = m_maincpu->total_cycles();
 		int pos = (time-m_base_vsync_clock) % 207;
 		if(pos >= 192)
 			m_maincpu->adjust_icount(pos - 207);
@@ -142,7 +142,7 @@ void zx_state::video_start()
 	m_bitmap_buffer = std::make_unique<bitmap_ind16>(384, 311);
 }
 
-UINT32 zx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t zx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, *m_bitmap_buffer, 0, 0, 0, 0, cliprect);
 	return 0;

@@ -14,7 +14,7 @@ ToDo:
  Some sprite flickers on attract mode
  totmejan: Are the "dots" behind the girls in attract mode correct?
 
-PCB Layout
+Tottemo E Jong PCB Layout
 
 |---------------------------------------------------------------|
 |LA4460  YM3812  M6295  E-JAN.U0911 6116        Z80A 7.15909MHz |
@@ -31,7 +31,7 @@ PCB Layout
 |                           TC110G21AF                          |
 |           82S135.U083                 PAL   6264              |
 |                                                               |
-|  DSW     DSW                                                  |
+|  DSW     DSW     SEI0220BP                                    |
 |                                              62256     62256  |
 |  E-JAN.U078                PAL                                |
 |                                                               |
@@ -48,6 +48,8 @@ Notes:
       M6295 clock - 1.000MHz [16/16], Pin 7 HIGH
       VSync - 60Hz
       HSync - 15.38kHz
+
+Good E Jong has SEI0211 instead of SEI0210, but PCB layout is otherwise identical.
 
 
 Diagnostic Menu:
@@ -72,6 +74,7 @@ Secret menu hack [totmejan only] (I couldn't find official way to enter, so it's
 #include "cpu/nec/nec.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
+#include "sound/okim6295.h"
 #include "video/seibu_crtc.h"
 
 
@@ -93,21 +96,21 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT16> m_sc0_vram;
-	required_shared_ptr<UINT16> m_sc1_vram;
-	required_shared_ptr<UINT16> m_sc2_vram;
-	required_shared_ptr<UINT16> m_sc3_vram;
-	required_shared_ptr<UINT16> m_spriteram16;
+	required_shared_ptr<uint16_t> m_sc0_vram;
+	required_shared_ptr<uint16_t> m_sc1_vram;
+	required_shared_ptr<uint16_t> m_sc2_vram;
+	required_shared_ptr<uint16_t> m_sc3_vram;
+	required_shared_ptr<uint16_t> m_spriteram16;
 
 	tilemap_t *m_sc0_tilemap;
 	tilemap_t *m_sc1_tilemap;
 	tilemap_t *m_sc2_tilemap;
 	tilemap_t *m_sc3_tilemap;
 
-	UINT16 m_mux_data;
-	UINT16 m_seibucrtc_sc0bank;
-	UINT16 m_layer_en;
-	UINT16 m_scrollram[6];
+	uint16_t m_mux_data;
+	uint16_t m_seibucrtc_sc0bank;
+	uint16_t m_layer_en;
+	uint16_t m_scrollram[6];
 
 	DECLARE_WRITE16_MEMBER(gfxbank_w);
 	DECLARE_READ16_MEMBER(mahjong_panel_r);
@@ -126,10 +129,10 @@ public:
 
 	INTERRUPT_GEN_MEMBER(irq);
 
-	void seibucrtc_sc0bank_w(UINT16 data);
+	void seibucrtc_sc0bank_w(uint16_t data);
 	void draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect,int pri);
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 /*******************************
@@ -263,7 +266,7 @@ WRITE16_MEMBER( goodejan_state::seibucrtc_sc3vram_w )
 	m_sc3_tilemap->mark_tile_dirty(offset);
 }
 
-void goodejan_state::seibucrtc_sc0bank_w(UINT16 data)
+void goodejan_state::seibucrtc_sc0bank_w(uint16_t data)
 {
 	m_seibucrtc_sc0bank = data & 1;
 	m_sc0_tilemap->mark_all_dirty();
@@ -347,10 +350,10 @@ void goodejan_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect
 
 void goodejan_state::video_start()
 {
-	m_sc0_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc2_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc1_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
-	m_sc3_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
+	m_sc0_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc0_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc2_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc2_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc1_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc1_tile_info),this),TILEMAP_SCAN_ROWS,16,16,32,32);
+	m_sc3_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(goodejan_state::seibucrtc_sc3_tile_info),this),TILEMAP_SCAN_ROWS,8,8,32,32);
 
 	m_sc2_tilemap->set_transparent_pen(15);
 	m_sc1_tilemap->set_transparent_pen(15);
@@ -364,7 +367,7 @@ void goodejan_state::video_start()
 	save_item(NAME(m_scrollram));
 }
 
-UINT32 goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t goodejan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->pen(0x7ff), cliprect); //black pen
 
@@ -403,7 +406,7 @@ WRITE16_MEMBER(goodejan_state::gfxbank_w)
 /* Multiplexer device for the mahjong panel */
 READ16_MEMBER(goodejan_state::mahjong_panel_r)
 {
-	UINT16 ret;
+	uint16_t ret;
 	ret = 0xffff;
 
 	switch(m_mux_data)
@@ -632,7 +635,8 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_CPU_IO_MAP(goodejan_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", goodejan_state, irq)
 
-	SEIBU_SOUND_SYSTEM_CPU(GOODEJAN_MHZ1/2)
+	MCFG_CPU_ADD("audiocpu", Z80, GOODEJAN_MHZ1/2)
+	MCFG_CPU_PROGRAM_MAP(seibu_sound_map)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -652,7 +656,20 @@ static MACHINE_CONFIG_START( goodejan, goodejan_state )
 	MCFG_PALETTE_FORMAT(xxxxBBBBGGGGRRRR)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, GOODEJAN_MHZ1/2)
+	MCFG_YM3812_IRQ_HANDLER(DEVWRITELINE("seibu_sound", seibu_sound_device, fm_irqhandler))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MCFG_OKIM6295_ADD("oki", GOODEJAN_MHZ2/16, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+
+	MCFG_DEVICE_ADD("seibu_sound", SEIBU_SOUND, 0)
+	MCFG_SEIBU_SOUND_CPU("audiocpu")
+	MCFG_SEIBU_SOUND_ROMBANK("seibu_bank1")
+	MCFG_SEIBU_SOUND_YM_READ_CB(DEVREAD8("ymsnd", ym3812_device, read))
+	MCFG_SEIBU_SOUND_YM_WRITE_CB(DEVWRITE8("ymsnd", ym3812_device, write))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( totmejan, goodejan )

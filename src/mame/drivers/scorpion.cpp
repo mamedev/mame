@@ -3,6 +3,7 @@
 
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "includes/spec128.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
@@ -10,6 +11,8 @@
 #include "formats/tzx_cas.h"
 #include "machine/beta.h"
 #include "machine/ram.h"
+#include "machine/spec_snqk.h"
+
 
 class scorpion_state : public spectrum_state
 {
@@ -37,7 +40,7 @@ protected:
 	required_memory_bank m_bank4;
 	required_device<beta_disk_device> m_beta;
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void scorpion_update_memory();
 
 };
@@ -72,7 +75,7 @@ D6-D7 - not used. ( yet ? )
 
 void scorpion_state::scorpion_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -110,7 +113,7 @@ WRITE8_MEMBER(scorpion_state::scorpion_0000_w)
 
 DIRECT_UPDATE_MEMBER(scorpion_state::scorpion_direct)
 {
-	UINT16 pc = m_maincpu->device_t::safe_pcbase(); // works, but...
+	uint16_t pc = m_maincpu->device_t::safe_pcbase(); // works, but...
 
 	m_ram_disabled_by_beta = 0;
 	if (m_beta->is_active() && (pc >= 0x4000))
@@ -173,7 +176,7 @@ static ADDRESS_MAP_START (scorpion_io, AS_IO, 8, scorpion_state )
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x4021, 0x4021) AM_WRITE(scorpion_port_7ffd_w)  AM_MIRROR(0x3fdc)
 	AM_RANGE(0x8021, 0x8021) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3fdc)
@@ -184,7 +187,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
@@ -193,7 +196,7 @@ MACHINE_RESET_MEMBER(scorpion_state,scorpion)
 	space.install_write_handler(0x0000, 0x3fff, write8_delegate(FUNC(scorpion_state::scorpion_0000_w),this));
 
 	m_beta->disable();
-	space.set_direct_update_handler(direct_update_delegate(FUNC(scorpion_state::scorpion_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&scorpion_state::scorpion_direct, this));
 
 	memset(messram,0,256*1024);
 

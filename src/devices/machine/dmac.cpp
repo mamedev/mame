@@ -37,7 +37,7 @@ const device_type DMAC = &device_creator<dmac_device>;
 //  dmac_device - constructor
 //-------------------------------------------------
 
-dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+dmac_device::dmac_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DMAC, "DMAC DMA Controller", tag, owner, clock, "dmac", __FILE__),
 	amiga_autoconfig(),
 	m_cfgout_handler(*this),
@@ -145,6 +145,8 @@ void dmac_device::check_interrupts()
 		// any interrupts pending?
 		if (m_istr & ISTR_INT_MASK)
 			m_istr |= ISTR_INT_P;
+		else
+			m_istr &= ~ISTR_INT_P;
 	}
 	else
 		m_istr &= ~ISTR_INT_P;
@@ -172,7 +174,7 @@ void dmac_device::start_dma()
 
 READ16_MEMBER( dmac_device::register_read )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	// autoconfig handles this
 	if (offset < 0x20)
@@ -202,18 +204,19 @@ READ16_MEMBER( dmac_device::register_read )
 
 	case 0x48:
 	case 0x49:
-	case 0x50:
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5e:
-	case 0x5f:
 		data = m_scsi_read_handler(offset);
 
 		if (VERBOSE)
-			logerror("%s('%s'): read scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+			logerror("%s('%s'): read scsi register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+
+		break;
+
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+		if (VERBOSE)
+			logerror("%s('%s'): read xt register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		break;
 
@@ -272,7 +275,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 			logerror("%s('%s'): write wtc hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_wtc &= 0x0000ffff;
-		m_wtc |= ((UINT32) data) << 16;
+		m_wtc |= ((uint32_t) data) << 16;
 		break;
 
 	case 0x41:
@@ -288,7 +291,7 @@ WRITE16_MEMBER( dmac_device::register_write )
 			logerror("%s('%s'): write acr hi %04x [mask = %04x]\n", shortname(), basetag(), data, mem_mask);
 
 		m_acr &= 0x0000ffff;
-		m_acr |= ((UINT32) data) << 16;
+		m_acr |= ((uint32_t) data) << 16;
 		break;
 
 	case 0x43:
@@ -306,18 +309,18 @@ WRITE16_MEMBER( dmac_device::register_write )
 
 	case 0x48:
 	case 0x49:
-	case 0x50:
-	case 0x58:
-	case 0x59:
-	case 0x5a:
-	case 0x5b:
-	case 0x5c:
-	case 0x5e:
-	case 0x5f:
 		if (VERBOSE)
-			logerror("%s('%s'): write scsi data @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
+			logerror("%s('%s'): write scsi register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 
 		m_scsi_write_handler(offset, data, 0xff);
+		break;
+
+	case 0x50:
+	case 0x51:
+	case 0x52:
+	case 0x53:
+		if (VERBOSE)
+			logerror("%s('%s'): write xt register @ %02x %04x [mask = %04x]\n", shortname(), basetag(), offset, data, mem_mask);
 		break;
 
 	case 0x70:

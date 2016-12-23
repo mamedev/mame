@@ -81,7 +81,7 @@ READ8_MEMBER( decodmd_type1_device::dmd_port_r )
 
 WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
 {
-	UINT8 bit;
+	uint8_t bit;
 
 	switch(offset & 0x84)
 	{
@@ -140,8 +140,8 @@ WRITE8_MEMBER( decodmd_type1_device::dmd_port_w )
 
 void decodmd_type1_device::output_data()
 {
-	UINT8 ptr = 0;
-	UINT32 row = m_rowselect;
+	uint8_t ptr = 0;
+	uint32_t row = m_rowselect;
 
 	if(row == 0)
 		m_frameswap = !m_frameswap;
@@ -167,9 +167,9 @@ void decodmd_type1_device::output_data()
 	m_prevrow = m_rowselect;
 }
 
-void decodmd_type1_device::set_busy(UINT8 input, UINT8 val)
+void decodmd_type1_device::set_busy(uint8_t input, uint8_t val)
 {
-	UINT8 newval = (m_busy_lines & ~input) | (val ? input : 0);
+	uint8_t newval = (m_busy_lines & ~input) | (val ? input : 0);
 
 	if(~newval & m_busy_lines & B_CLR)
 		m_busy = 0;
@@ -230,7 +230,7 @@ machine_config_constructor decodmd_type1_device::device_mconfig_additions() cons
 	return MACHINE_CONFIG_NAME( decodmd1 );
 }
 
-decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decodmd_type1_device::decodmd_type1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECODMD1, "Data East Pinball Dot Matrix Display Type 1", tag, owner, clock, "decodmd1", __FILE__),
 		m_cpu(*this,"dmdcpu"),
 		m_rombank1(*this,"dmdbank1"),
@@ -245,8 +245,8 @@ void decodmd_type1_device::device_start()
 
 void decodmd_type1_device::device_reset()
 {
-	UINT8* ROM;
-	UINT8* RAM = m_ram->pointer();
+	uint8_t* ROM;
+	uint8_t* RAM = m_ram->pointer();
 	m_rom = memregion(m_gfxtag);
 
 	memset(RAM,0,0x2000);
@@ -272,12 +272,12 @@ void decodmd_type1_device::static_set_gfxregion(device_t &device, const char *ta
 	cpuboard.m_gfxtag = tag;
 }
 
-UINT32 decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
-	UINT8 ptr = 0;
-	UINT8 x,y,dot;
-	UINT32 data1,data2,data3,data4;
-	UINT32 col;
+	uint8_t ptr = 0;
+	uint8_t x,y,dot;
+	uint32_t data1,data2,data3,data4;
+	uint32_t col;
 
 	if(m_frameswap)
 		ptr = 0x80;
@@ -297,14 +297,14 @@ UINT32 decodmd_type1_device::screen_update( screen_device &screen, bitmap_rgb32 
 				else if (data1 & 0x01) // both are the same, so either high intensity or none at all
 					col = rgb_t(0xff,0xaa,0x00);
 				else
-					col = rgb_t::black;
+					col = rgb_t::black();
 				bitmap.pix32(y,x+dot) = col;
 				if((data2 & 0x01) != (data4 & 0x01))
 					col = rgb_t(0x7f,0x55,0x00);
 				else if (data2 & 0x01) // both are the same, so either high intensity or none at all
 					col = rgb_t(0xff,0xaa,0x00);
 				else
-					col = rgb_t::black;
+					col = rgb_t::black();
 				bitmap.pix32(y,x+dot+1) = col;
 				data1 >>= 1;
 				data2 >>= 1;

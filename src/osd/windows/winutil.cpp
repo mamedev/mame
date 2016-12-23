@@ -11,64 +11,39 @@
 #include <windows.h>
 #include <direct.h>
 
+// MAME headers
+#include "emu.h"
+
 // MAMEOS headers
 #include "winutil.h"
 #include "strconv.h"
-
-//============================================================
-//  win_error_to_file_error
-//============================================================
-
-file_error win_error_to_file_error(DWORD error)
-{
-	file_error filerr;
-
-	// convert a Windows error to a file_error
-	switch (error)
-	{
-		case ERROR_SUCCESS:
-			filerr = FILERR_NONE;
-			break;
-
-		case ERROR_OUTOFMEMORY:
-			filerr = FILERR_OUT_OF_MEMORY;
-			break;
-
-		case ERROR_FILE_NOT_FOUND:
-		case ERROR_FILENAME_EXCED_RANGE:
-		case ERROR_PATH_NOT_FOUND:
-			filerr = FILERR_NOT_FOUND;
-			break;
-
-		case ERROR_ACCESS_DENIED:
-			filerr = FILERR_ACCESS_DENIED;
-			break;
-
-		case ERROR_SHARING_VIOLATION:
-			filerr = FILERR_ALREADY_OPEN;
-			break;
-
-		default:
-			filerr = FILERR_FAILURE;
-			break;
-	}
-	return filerr;
-}
-
+#include "timeconv.h"
 
 
 //============================================================
 //  win_attributes_to_entry_type
 //============================================================
 
-osd_dir_entry_type win_attributes_to_entry_type(DWORD attributes)
+osd::directory::entry::entry_type win_attributes_to_entry_type(DWORD attributes)
 {
 	if (attributes == 0xFFFFFFFF)
-		return ENTTYPE_NONE;
+		return osd::directory::entry::entry_type::NONE;
 	else if (attributes & FILE_ATTRIBUTE_DIRECTORY)
-		return ENTTYPE_DIR;
+		return osd::directory::entry::entry_type::DIR;
 	else
-		return ENTTYPE_FILE;
+		return osd::directory::entry::entry_type::FILE;
+}
+
+
+
+//============================================================
+//  win_time_point_from_filetime
+//============================================================
+
+std::chrono::system_clock::time_point win_time_point_from_filetime(LPFILETIME file_time)
+{
+	auto converted_file_time = util::ntfs_duration_from_filetime(file_time->dwHighDateTime, file_time->dwLowDateTime);
+	return util::system_clock_time_point_from_ntfs_duration(converted_file_time);
 }
 
 
@@ -127,13 +102,17 @@ BOOL win_is_gui_application(void)
 //============================================================
 //  osd_subst_env
 //============================================================
-void osd_subst_env(char **dst, const char *src)
+void osd_subst_env(std::string &dst, const std::string &src)
 {
 	TCHAR buffer[MAX_PATH];
 
-	TCHAR *t_src = tstring_from_utf8(src);
-	ExpandEnvironmentStrings(t_src, buffer, ARRAY_LENGTH(buffer));
-	*dst = utf8_from_tstring(buffer);
+	osd::text::tstring t_src = osd::text::to_tstring(src);
+#if !defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP)
+	ExpandEnvironmentStrings(t_src.c_str(), buffer, ARRAY_LENGTH(buffer));
+#else
+	wcsncpy(buffer, t_src.c_str(), ARRAY_LENGTH(buffer));
+#endif
+	osd::text::from_tstring(dst, buffer);
 }
 
 //-------------------------------------------------

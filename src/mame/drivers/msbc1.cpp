@@ -70,7 +70,7 @@ INPUT_PORTS_END
 void msbc1_state::machine_reset()
 {
 	void *ram = m_maincpu->space(AS_PROGRAM).get_write_ptr(0);
-	UINT8 *rom = memregion(MC68000R12_TAG)->base();
+	uint8_t *rom = memregion(MC68000R12_TAG)->base();
 
 	memcpy(ram, rom, 8);
 

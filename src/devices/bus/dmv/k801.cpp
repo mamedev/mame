@@ -111,7 +111,7 @@ const device_type DMV_K213 = &device_creator<dmv_k213_device>;
 //  dmv_k801_device - constructor
 //-------------------------------------------------
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, DMV_K801, "K801 RS-232 Switchable Interface", tag, owner, clock, "dmv_k801", __FILE__),
 		device_dmvslot_interface( mconfig, *this ),
 		m_epci(*this, "epci"),
@@ -119,7 +119,7 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, const char *tag,
 	{
 }
 
-dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_dmvslot_interface( mconfig, *this ),
 		m_epci(*this, "epci"),
@@ -131,13 +131,13 @@ dmv_k801_device::dmv_k801_device(const machine_config &mconfig, device_type type
 //  dmv_k211_device - constructor
 //-------------------------------------------------
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k801_device(mconfig, DMV_K211, "K211 RS-232 Communications Interface", tag, owner, clock, "dmv_k211", __FILE__)
 {
 }
 
 
-dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 		: dmv_k801_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
@@ -146,7 +146,7 @@ dmv_k211_device::dmv_k211_device(const machine_config &mconfig, device_type type
 //  dmv_k212_device - constructor
 //-------------------------------------------------
 
-dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k211_device(mconfig, DMV_K212, "K212 RS-232 Printer Interface", tag, owner, clock, "dmv_k212", __FILE__)
 {
 }
@@ -155,7 +155,7 @@ dmv_k212_device::dmv_k212_device(const machine_config &mconfig, const char *tag,
 //  dmv_k213_device - constructor
 //-------------------------------------------------
 
-dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+dmv_k213_device::dmv_k213_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: dmv_k211_device(mconfig, DMV_K213, "K213 RS-232 Plotter Interface", tag, owner, clock, "dmv_k213", __FILE__)
 {
 }
@@ -231,9 +231,9 @@ WRITE_LINE_MEMBER(dmv_k801_device::epci_irq_w)
 	m_bus->m_out_irq_cb(state);
 }
 
-void dmv_k801_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_k801_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
-	UINT8 dsw = m_dsw->read() & 0x0f;
+	uint8_t dsw = m_dsw->read() & 0x0f;
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
@@ -243,9 +243,9 @@ void dmv_k801_device::io_read(address_space &space, int ifsel, offs_t offset, UI
 	}
 }
 
-void dmv_k801_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k801_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
-	UINT8 dsw = m_dsw->read() & 0x0f;
+	uint8_t dsw = m_dsw->read() & 0x0f;
 	if ((dsw >> 1) == ifsel && BIT(offset, 3) == BIT(dsw, 0))
 	{
 		if (offset & 0x04)
@@ -255,9 +255,9 @@ void dmv_k801_device::io_write(address_space &space, int ifsel, offs_t offset, U
 	}
 }
 
-void dmv_k211_device::io_read(address_space &space, int ifsel, offs_t offset, UINT8 &data)
+void dmv_k211_device::io_read(address_space &space, int ifsel, offs_t offset, uint8_t &data)
 {
-	UINT8 jumpers = m_dsw->read() & 0x03;
+	uint8_t jumpers = m_dsw->read() & 0x03;
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)
@@ -267,9 +267,9 @@ void dmv_k211_device::io_read(address_space &space, int ifsel, offs_t offset, UI
 	}
 }
 
-void dmv_k211_device::io_write(address_space &space, int ifsel, offs_t offset, UINT8 data)
+void dmv_k211_device::io_write(address_space &space, int ifsel, offs_t offset, uint8_t data)
 {
-	UINT8 jumpers = m_dsw->read() & 0x03;
+	uint8_t jumpers = m_dsw->read() & 0x03;
 	if ((BIT(jumpers, 0) && ifsel == 0) || (BIT(jumpers, 1) && ifsel == 1))
 	{
 		if (offset & 0x04)

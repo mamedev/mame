@@ -142,7 +142,8 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "sound/2151intf.h"
+#include "machine/watchdog.h"
+#include "sound/ym2151.h"
 #include "includes/shadfrce.h"
 
 
@@ -233,7 +234,7 @@ WRITE16_MEMBER(shadfrce_state::flip_screen)
 
 READ16_MEMBER(shadfrce_state::input_ports_r)
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	switch (offset)
 	{
@@ -259,7 +260,7 @@ WRITE16_MEMBER(shadfrce_state::sound_brt_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 1, data >> 8);
+		m_soundlatch->write(space, 1, data >> 8);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
@@ -378,7 +379,7 @@ static ADDRESS_MAP_START( shadfrce_map, AS_PROGRAM, 16, shadfrce_state )
 	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x1d0016, 0x1d0017) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(input_ports_r)
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
@@ -387,7 +388,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(shadfrce_state::oki_bankswitch_w)
 {
-	m_oki->set_bank_base((data & 1) * 0x40000);
+	m_oki->set_rom_bank(data & 1);
 }
 
 static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
@@ -395,7 +396,7 @@ static ADDRESS_MAP_START( shadfrce_sound_map, AS_PROGRAM, 8, shadfrce_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd800, 0xd800) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
@@ -546,6 +547,8 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)         /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(shadfrce_sound_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS(XTAL_28MHz / 4, 448, 0, 320, 272, 8, 248)   /* HTOTAL and VTOTAL are guessed */
 	MCFG_SCREEN_UPDATE_DRIVER(shadfrce_state, screen_update)
@@ -558,6 +561,8 @@ static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)      /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

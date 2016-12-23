@@ -119,17 +119,17 @@ const device_type PDC = &device_creator<pdc_device>;
 //-------------------------------------------------
 
 ROM_START( pdc )
-		ROM_REGION( 0x4000, "rom", 0 )
-		ROM_LOAD( "97d9988.27128.pdc.u17", 0x0000, 0x4000, CRC(d96ccaa6) SHA1(e1a465c2274a63e81dba7a71fc8b30f10c03baf0) ) // Label: "97D9988" 27128 @U17
+	ROM_REGION( 0x4000, "rom", 0 )
+	ROM_LOAD( "97d9988.27128.pdc.u17", 0x0000, 0x4000, CRC(d96ccaa6) SHA1(e1a465c2274a63e81dba7a71fc8b30f10c03baf0) ) // Label: "97D9988" 27128 @U17
 ROM_END
 
 //-------------------------------------------------
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *pdc_device::device_rom_region() const
+const tiny_rom_entry *pdc_device::device_rom_region() const
 {
-		return ROM_NAME( pdc );
+	return ROM_NAME( pdc );
 }
 
 //-------------------------------------------------
@@ -232,10 +232,10 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 static SLOT_INTERFACE_START( pdc_harddisks )
-		SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
-		SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
-		SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
-		SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
+	SLOT_INTERFACE( "generic", MFMHD_GENERIC )    // Generic hard disk (self-adapting to image)
+	SLOT_INTERFACE( "st213", MFMHD_ST213 )        // Seagate ST-213 (10 MB)
+	SLOT_INTERFACE( "st225", MFMHD_ST225 )        // Seagate ST-225 (20 MB)
+	SLOT_INTERFACE( "st251", MFMHD_ST251 )        // Seagate ST-251 (40 MB)
 SLOT_INTERFACE_END
 
 //-------------------------------------------------
@@ -243,7 +243,7 @@ SLOT_INTERFACE_END
 //-------------------------------------------------
 
 FLOPPY_FORMATS_MEMBER( pdc_device::floppy_formats )
-		FLOPPY_PC_FORMAT
+	FLOPPY_PC_FORMAT
 FLOPPY_FORMATS_END
 
 //-------------------------------------------------
@@ -252,8 +252,8 @@ FLOPPY_FORMATS_END
 
 static MACHINE_CONFIG_FRAGMENT( pdc )
 	/* CPU - Zilog Z0840006PSC */
-		MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
-		MCFG_CPU_PROGRAM_MAP(pdc_mem)
+	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_10MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(pdc_mem)
 	MCFG_CPU_IO_MAP(pdc_io)
 	//MCFG_QUANTUM_PERFECT_CPU(M6502_TAG)
 
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_FRAGMENT( pdc )
 
 	/* Hard Disk Controller - HDC9224 */
 	MCFG_DEVICE_ADD(HDC_TAG, HDC9224, 0)
-	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, NULL, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
+	MCFG_MFM_HARDDISK_CONN_ADD("h1", pdc_harddisks, nullptr, MFM_BYTE, 3000, 20, MFMHD_GEN_FORMAT)
 MACHINE_CONFIG_END
 
 //-------------------------------------------------
@@ -290,7 +290,7 @@ MACHINE_CONFIG_END
 
 machine_config_constructor pdc_device::device_mconfig_additions() const
 {
-		return MACHINE_CONFIG_NAME( pdc );
+	return MACHINE_CONFIG_NAME( pdc );
 }
 
 ioport_constructor pdc_device::device_input_ports() const
@@ -306,9 +306,9 @@ ioport_constructor pdc_device::device_input_ports() const
 //  pdc_device - constructor
 //-------------------------------------------------
 
-pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PDC, "ROLM PDC", tag, owner, clock, "pdc", __FILE__),
-		m_pdccpu(*this, Z80_TAG),
+	m_pdccpu(*this, Z80_TAG),
 	m_dma8237(*this, FDCDMA_TAG),
 	m_fdc(*this, FDC_TAG),
 	m_hdc9224(*this, HDC_TAG),
@@ -324,6 +324,18 @@ pdc_device::pdc_device(const machine_config &mconfig, const char *tag, device_t 
 
 void pdc_device::device_start()
 {
+	/* Save States */
+	save_item(NAME(reg_p0));
+	save_item(NAME(reg_p1));
+	save_item(NAME(reg_p2));
+	save_item(NAME(reg_p3));
+	save_item(NAME(reg_p4));
+	save_item(NAME(reg_p5));
+	save_item(NAME(reg_p6));
+	save_item(NAME(reg_p7));
+	save_item(NAME(reg_p21));
+	save_item(NAME(reg_p38));
+	save_item(NAME(fdd_68k_dma_address));
 }
 
 //-------------------------------------------------
@@ -338,7 +350,7 @@ void pdc_device::device_reset()
 	//reg_p38 |= 0x20; // no idea at all - bit 5 (32)
 
 	/* Reset CPU */
-		m_pdccpu->reset();
+	m_pdccpu->reset();
 
 	/* Resolve callbacks */
 	m_m68k_r_cb.resolve_safe(0);
@@ -376,7 +388,7 @@ WRITE8_MEMBER(pdc_device::i8237_dma_mem_w)
 
 READ8_MEMBER(pdc_device::i8237_fdc_dma_r)
 {
-	UINT8 ret = m_fdc->dma_r();
+	uint8_t ret = m_fdc->dma_r();
 	if(TRACE_PDC_DMA) logerror("PDC: 8237 DMA CHANNEL 0 READ ADDRESS: %08X, DATA: %02X\n", offset, ret );
 	return ret;
 }
@@ -389,8 +401,8 @@ WRITE8_MEMBER(pdc_device::i8237_fdc_dma_w)
 
 READ8_MEMBER(pdc_device::m68k_dma_r)
 {
-	UINT32 address;
-	UINT8 data;
+	uint32_t address;
+	uint8_t data;
 
 	address = fdd_68k_dma_address++;
 	data =  m_m68k_r_cb(address);
@@ -449,6 +461,8 @@ WRITE8_MEMBER(pdc_device::p0_7_w)
 		case 4: /* Port 4: FDD command completion status low byte [0x5FF030B0] */
 			if(TRACE_PDC_FDC) logerror("PDC: Port 0x04 WRITE: %02X\n", data);
 			reg_p4 = data;
+			if(TRACE_PDC_FDC) logerror("PDC: Resetting 0x38 bit 1.  This causes the PDC to stop looking for a command.\n");
+			reg_p38 &= ~2; // Clear bit 1
 			break;
 		case 5: /* Port 5: FDD command completion status high byte [0x5FF030B0] */
 			if(TRACE_PDC_FDC) logerror("PDC: Port 0x05 WRITE: %02X\n", data);
@@ -462,7 +476,7 @@ WRITE8_MEMBER(pdc_device::p0_7_w)
 
 READ8_MEMBER(pdc_device::fdd_68k_r)
 {
-	UINT8 address = offset + 0x21;
+	uint8_t address = offset + 0x21;
 	switch(address)
 	{
 		default:
@@ -472,13 +486,13 @@ READ8_MEMBER(pdc_device::fdd_68k_r)
 }
 WRITE8_MEMBER(pdc_device::fdd_68k_w)
 {
-	UINT8 address = offset + 0x21;
+	uint8_t address = offset + 0x21;
 	switch(address)
 	{
 		case 0x21: /* Port 21: ?? */
 			if(TRACE_PDC_FDC) logerror("PDC: Port 0x21 WRITE: %02X\n", data);
-			if(TRACE_PDC_FDC) logerror("PDC: Resetting 0x38 bit 1\n");
-			reg_p38 &= ~2; // Clear bit 1
+			//if(TRACE_PDC_FDC) logerror("PDC: Resetting 0x38 bit 1\n");
+			//reg_p38 &= ~2; // Clear bit 1
 			reg_p21 = data;
 			break;
 		case 0x23: /* Port 23: FDD 68k DMA high byte */
@@ -532,7 +546,7 @@ READ8_MEMBER(pdc_device::p38_r)
 
 READ8_MEMBER(pdc_device::p39_r)
 {
-	UINT8 data = 1;
+	uint8_t data = 1;
 	if(b_fdc_irq) data |= 8; // Set bit 3
 	if(TRACE_PDC_CMD) logerror("PDC: Port 0x39 READ: %02X, PC: %X\n", data, space.device().safe_pc());
 	return data;
@@ -540,22 +554,22 @@ READ8_MEMBER(pdc_device::p39_r)
 
 WRITE8_MEMBER(pdc_device::p50_5f_w)
 {
-	UINT8 address = 0x50 + offset;
+	uint8_t address = 0x50 + offset;
 	switch(address)
 	{
 		case 0x52:
 			switch(data)
 			{
 				case 0x00:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor off.\n");
+					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor off. PC: %X\n", space.device().safe_pc());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(1);
 					break;
 				case 0x80:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor on.\n");
+					if(TRACE_PDC_FDC) logerror("PDC: FDD (all) Motor on. PC: %X\n", space.device().safe_pc());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(0);
 					break;
 				default:
-					if(TRACE_PDC_FDC) logerror("PDC: Port 0x52 WRITE: %x\n", data);
+					if(TRACE_PDC_FDC) logerror("PDC: Port 0x52 WRITE: %x\n PC: %X\n", data, space.device().safe_pc());
 			}
 			break;
 		case 0x53: /* Probably set_rate here */
@@ -565,7 +579,7 @@ WRITE8_MEMBER(pdc_device::p50_5f_w)
 			switch(data)
 			{
 				case 0x00:
-					if(TRACE_PDC_FDC) logerror("PDC: FDD 1 Motor off.\n");
+					if(TRACE_PDC_FDC) logerror("PDC: FDD 1 Motor off. PC: %X\n", space.device().safe_pc());
 					m_fdc->subdevice<floppy_connector>("0")->get_device()->mon_w(1);
 					break;
 				case 0x80:

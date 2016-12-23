@@ -26,7 +26,7 @@ BUGS:
 
 const device_type BETA_DISK = &device_creator<beta_disk_device>;
 
-beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+beta_disk_device::beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, BETA_DISK, "Beta Disk Interface", tag, owner, clock, "betadisk", __FILE__)
 	, m_betadisk_active(0)
 	, m_wd179x(*this, "wd179x")
@@ -107,7 +107,7 @@ READ8_MEMBER(beta_disk_device::data_r)
 READ8_MEMBER(beta_disk_device::state_r)
 {
 	if (m_betadisk_active==1) {
-		UINT8 result = 0x3F;        // actually open bus
+		uint8_t result = 0x3F;        // actually open bus
 		result |= m_wd179x->drq_r() ? 0x40 : 0;
 		result |= m_wd179x->intrq_r() ? 0x80 : 0;
 		return result;
@@ -184,9 +184,13 @@ SLOT_INTERFACE_END
 static MACHINE_CONFIG_FRAGMENT( beta_disk )
 	MCFG_KR1818VG93_ADD("wd179x", XTAL_8MHz / 8)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:0", beta_disk_floppies, "drive0", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:1", beta_disk_floppies, "drive1", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:2", beta_disk_floppies, "drive2", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 	MCFG_FLOPPY_DRIVE_ADD("wd179x:3", beta_disk_floppies, "drive3", beta_disk_device::floppy_formats)
+	MCFG_FLOPPY_DRIVE_SOUND(true)
 MACHINE_CONFIG_END
 
 ROM_START( beta_disk )
@@ -286,7 +290,7 @@ machine_config_constructor beta_disk_device::device_mconfig_additions() const
 //  the device's ROM definitions
 //-------------------------------------------------
 
-const rom_entry *beta_disk_device::device_rom_region() const
+const tiny_rom_entry *beta_disk_device::device_rom_region() const
 {
 	return ROM_NAME(beta_disk );
 }

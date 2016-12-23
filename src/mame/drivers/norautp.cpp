@@ -95,7 +95,7 @@
   0v            15   Half Gamble switch
   0v            16   Change Card switch
   Refil         17   Coin count/sense from hopper
-  Low Switch    18   High swicth
+  Low Switch    18   High switch
   Hold 3 Switch 19   Hold 2 switch
   Hold 5 Switch 20   Hold 4 switch
   10p coin      21   Deflect
@@ -250,7 +250,7 @@
   7654 3210
   ---- ---x  * DEAL / DRAW Lamp.
   ---- --x-  * BET / COLLECT Lamp.
-  ---- -x--  + PANEL LIGHTS RESET (always activated after initalize).
+  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
   ---- x---  + PANEL LAMPS CLOCK
   xxxx ----  * Discrete Sound Lines.
 
@@ -381,7 +381,7 @@
   [2009-08-23/26]
 
   - Added a default NVRAM to Noraut Joker Poker to bypass the 'F U' screen.
-    This is due to the phisical keyboard limitation when needs to enter
+    This is due to the physical keyboard limitation when needs to enter
     4 simultaneous inputs.
   - Executed a trojan on 2 noraut systems to confirm the way 16x32 tiles are decoded.
   - Fixed the x-offset for 32x32 tiles lines.
@@ -481,7 +481,7 @@
   - Added Poker / Black Jack (Model 7521).
   - Added Kimble Joker Poker.
   - Added DRHL Poker (v.2.89).
-  - Renamed norautpn descripion to Noraut Deluxe Poker (bootleg).
+  - Renamed norautpn description to Noraut Deluxe Poker (bootleg).
   - Added a placeholder for tpoker2's undumped 68705 MCU.
   - Reorganized the driver, plus some clean-ups.
   - Renamed kimblejp to kimbldhl. Changed game description to Kimble Double HI-LO.
@@ -567,11 +567,11 @@
 
 void norautp_state::video_start()
 {
-	m_np_vram = make_unique_clear<UINT16[]>(0x1000/2);
+	m_np_vram = make_unique_clear<uint16_t[]>(0x1000/2);
 }
 
 
-UINT32 norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t norautp_state::screen_update_norautp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y, count;
 
@@ -665,7 +665,7 @@ WRITE8_MEMBER(norautp_state::soundlamps_w)
   7654 3210
   ---- ---x  * DEAL / DRAW Lamp.
   ---- --x-  * BET / COLLECT Lamp.
-  ---- -x--  + PANEL LIGHTS RESET (always activated after initalize).
+  ---- -x--  + PANEL LIGHTS RESET (always activated after initialize).
   ---- x---  + PANEL LAMPS CLOCK
   xxxx ----  * Discrete Sound Lines.
 */
@@ -2406,44 +2406,44 @@ ROM_END
   PCB Layout:                                                                           Edge Connector 36x2
    ________________________________________________________________________________________________________
   |              _________    _____      _____       _________   _________   _________    _________        |
-  |             |SN74LS12 |  | ??? |    |NE555|     |077B PROM| |SN74174N | |SN74LS???|  |ULN2003AN|       |
-  |    NO IC    |_________|  |_____|    |_____|     |_________| |_________| |_________|  |_________|       |
+  |             |SN74LS12 |  |LM393|    |NE555|     |077B PROM| |SN74174N | |SN74LS86 |  |ULN2003AN|       |
+  |    NO IC    |_________|  |_____|    |_____|     |_82S129__| |_________| |_________|  |_________|       |
   |     U64         U63        U62        U61           U51         U60         U59          U58           |
-  |                                                                                                        |
-  |  _________                                                                                             |
+  |                                    2N3906    2N2222                                                    |
+  |  _________                                    VR1                                                      |
   | | Dallas  |  _________   _________   _________   _________   _________   _________    _________        |
-  | | DS1220Y | |SN74LS00N| |TC4040BP | |ITT7402N | |SN74157N | | RESNET  | | RESNET  |  |ULN2003AN|       |
+  | | DS1220Y | |SN74LS00N| |TC4040BP | |ITT7402N | |SN74157N | |471RESNET| |472RESNET|  |ULN2003AN|       |
   | |_________| |_________| |_________| |_________| |_________| |_________| |_________|  |_________|       |
   |     U57         U56         U55         U54         U53         U52         U50          U49           | 36
   |                                                                                                        |___
   |  _________   _________   _________   _________   _________   _________   _________    _________         ___|
-  | |47F9 PAL?| |SN74LS32N| |   ???   | |   ???   | |SN74166N | |DIP SW x8| |DIP SW x8|  |ULN2003AN|        ___|
-  | |_________| |_________| |_________| |_________| |_________| |_________| |_________|  |_________|        ___|
+  | |   4F79  | |SN74LS32N| |SN74LS157| |  74161  | |SN74166N | |DIP SW x8| |DIP SW x8|  |ULN2003AN|        ___|
+  | |_PAL20L10| |_________| |_________| |_________| |_________| |_________| |_________|  |_________|        ___|
   |     U48         U47         U46         U45         U44         U43         U42          U41            ___|
   |                         _______________    ______________                            ________________   ___|
-  |              _______   |               |  |              |   _________   _________  |                |  ___|
-  |    NO IC    |  ???  |  |  CDM 6116     |  | CF7B U31 ROM |  |   ???   | |   ???   | |   AMD P8255A   |  ___|
+  |              _______   |               |  |  EPROM 2732  |   _________   _________  |                |  ___|
+  |    NO IC    |SN7474 |  |   CDM 6116    |  |   CF7B U31   |  | 74LS244 | | 74LS244 | |   AMD P8255A   |  ___|
   |     U26     |_______|  |_______________|  |______________|  |_________| |_________| |________________|  ___|
   |                U40            U39                U31            U38         U37            U36          ___|
   |  __________                          ____________________                            ________________   ___|
-  | |   ROM    |  _______   _________   |                    |   _________   _________  |                |  ___|
-  | |   U19    | |74161PC| |SN74157N |  |     AMD P8255A     |  | 74LS??? | |DIP SW x8| |   AMD P8255A   |  ___|
+  | |EPROM 2764|  _______   _________   |                    |   _________   _________  |                |  ___|
+  | |   U19    | |74161PC| |SN74157N |  |     AMD P8255A     |  | 74LS244 | |DIP SW x8| |   AMD P8255A   |  ___|
   | |__________| |_______| |_________|  |____________________|  |_________| |_________| |________________|  ___|
   |     U19         U35        U34               U33                U32         U30            U29          ___|
   |  __________                                                                                             ___|
-  | |   ROM    |  _________   ________   _________   _________   _________   ________   _________   ______  ___|
+  | |EPROM 2764|  _________   ________   _________   _________   _________   ________   _________   ______  ___|
   | |   U18    | |SN74LS32N| |DM7414N | |SN74157N | |SN74157N | |SN74LS32N| |DM7411N | |SN74LS00N| |RESNET| ___|
-  | |__________| |_________| |________| |_________| |_________| |_________| |________| |_________| |______| ___|
+  | |__________| |_________| |________| |_________| |_________| |_________| |________| |_________| |_471__| ___|
   |     U18          U28        U27         U25         U24         U23         U22        U21       U20    ___|
   |  __________                                                                                             ___|
-  | |   ROM    |  _________   ________   _________   _________   _________   _________   _______   _______  ___|
+  | |EPROM 2764|  _________   ________   _________   _________   _________   _________   _______   _______  ___|
   | |   U12    | |SN74LS155| | RESNET | | 74161PC | | 74161PC | | 74161PC | | 74161PC | |DM7414N| |SN7486N| ___|
-  | |__________| |_________| |________| |_________| |_________| |_________| |_________| |_______| |_______||
+  | |__________| |_________| |__472___| |_________| |_________| |_________| |_________| |_______| |_______||
   |     U12         U17         U16         U15         U14         U13         U11        U10        U9   | 01
   |                                                                                                        |
   |  ___________________                                                                                   |
   | |                   |  __________   ________   _______   _________   _________   _______   __________  |
-  | | SGS Z8400B1 (Z80) | |DM74LS245N| |SM7474N | |74S04N | |SN74LS161| |SN74LS32N| |DM7414N| |SN74LS123N| |
+  | | SGS Z8400B1 (Z80) | |DM74LS245N| |SN7474N | |74S04N | |SN74LS161| |SN74LS32N| |DM7414N| |SN74LS123N| |
   | |___________________| |__________| |________| |_______| |_________| |_________| |_______| |__________| |
   |          U8                U7          U6        U5         U4          U3         U2          U1      |
   |                                                 _____                                                  |
@@ -2463,7 +2463,6 @@ ROM_END
   |   U30    | OFF | OFF | OFF | ON  | OFF | OFF | OFF | OFF |
   +----------+-----+-----+-----+-----+-----+-----+-----+-----+
 
-
   Discrete audio circuitry: UNKNOWN.
 
 */
@@ -2478,10 +2477,10 @@ ROM_START( bjpoker )
 	ROM_LOAD( "cf7b.u31",  0x0000, 0x1000, CRC(fcfc4d25) SHA1(31455903244ec8ef9005748f265f561b7a082a9c) )
 
 	ROM_REGION( 0x0100,  "proms", 0 )
-	ROM_LOAD( "077b_bprom.u51", 0x0000, 0x0100, NO_DUMP )
+	ROM_LOAD( "82s129_077b.u51", 0x0000, 0x0100, CRC(920e8394) SHA1(309729db53b94f8ee5d3d32003288729757b140f) )
 
-	ROM_REGION( 0x0200,  "plds", 0 )
-	ROM_LOAD( "47f9_pld.u48",   0x0000, 0x0200, NO_DUMP )
+	ROM_REGION( 0x083f,  "plds", 0 )
+	ROM_LOAD( "pal20l10_4f79.u48",   0x0000, 0x083f, CRC(c7f4aa8f) SHA1(a15cc8f075035a70af42eb3873faa5ebedab5dc8) )
 
 ROM_END
 
@@ -3467,21 +3466,21 @@ ROM_END
 */
 //static DRIVER_INIT( norautrh )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x1110] = 0x00;
 //  ROM[0x1111] = 0x00;
 //}
 
 //static DRIVER_INIT( norautpn )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x0827] = 0x00;
 //  ROM[0x0828] = 0x00;
 //}
 
 //static DRIVER_INIT( norautu )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x083c] = 0x00;
 //  ROM[0x083d] = 0x00;
 //  ROM[0x083e] = 0x00;
@@ -3489,7 +3488,7 @@ ROM_END
 
 //static DRIVER_INIT( gtipoker )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x0cc6] = 0x00;
 //  ROM[0x0cc7] = 0x00;
 //  ROM[0x0cc8] = 0x00;
@@ -3500,7 +3499,7 @@ ROM_END
 
 //static DRIVER_INIT( dphl )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x1510] = 0x00;
 //  ROM[0x1511] = 0x00;
 //  ROM[0x1512] = 0x00;
@@ -3508,7 +3507,7 @@ ROM_END
 
 //static DRIVER_INIT( dphla )
 //{
-//  UINT8 *ROM = machine.root_device().memregion("maincpu")->base();
+//  uint8_t *ROM = machine.root_device().memregion("maincpu")->base();
 //  ROM[0x0b09] = 0x00;
 //  ROM[0x0b0a] = 0x00;
 //  ROM[0x0b0b] = 0x00;
@@ -3518,8 +3517,8 @@ DRIVER_INIT_MEMBER(norautp_state,enc)
 {
 /* Attempt to decrypt the program ROM */
 
-//  UINT8 *rom = memregion("maincpu")->base();
-//  UINT8 *buffer;
+//  uint8_t *rom = memregion("maincpu")->base();
+//  uint8_t *buffer;
 //  int size = 0x2000; //memregion("maincpu")->bytes();
 //  int start = 0;
 //  int i;
@@ -3547,7 +3546,7 @@ DRIVER_INIT_MEMBER(norautp_state,enc)
 //      i = i + 16;
 //  }
 
-//  buffer = alloc_array_or_die(UINT8, size);
+//  buffer = alloc_array_or_die(uint8_t, size);
 //  memcpy(buffer, rom, size);
 
 //  free(buffer);
@@ -3557,7 +3556,7 @@ DRIVER_INIT_MEMBER(norautp_state,deb)
 /* Just for debugging purposes */
 /*   Should be removed soon    */
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	ROM[0x02f7] = 0xca;
 	ROM[0x02f8] = 0x18;
 	ROM[0x206c] = 0xff;
@@ -3567,7 +3566,7 @@ DRIVER_INIT_MEMBER(norautp_state,ssa)
 /* Passing the video PPI handshaking lines */
 /* Just for debugging purposes */
 {
-//  UINT8 *ROM = memregion("maincpu")->base();
+//  uint8_t *ROM = memregion("maincpu")->base();
 
 //  ROM[0x073b] = 0x00;
 //  ROM[0x073c] = 0x00;

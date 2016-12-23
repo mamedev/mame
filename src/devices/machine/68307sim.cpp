@@ -140,18 +140,18 @@ WRITE16_MEMBER( m68307cpu_device::m68307_internal_sim_w )
 }
 
 
-void m68307_sim::write_pacnt(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pacnt(uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pacnt);
 }
 
-void m68307_sim::write_paddr(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_paddr(uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_paddr);
 }
 
 
-UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask)
+uint16_t m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -159,12 +159,12 @@ UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
 		// and anything configured as input is read from the port
-		UINT8 outputbits = m_paddr;
-		UINT8 inputbits = ~m_paddr;
-		UINT8 general_purpose_bits = ~m_pacnt;
-		UINT8 indat = m68k->m_m68307_porta_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
+		uint8_t outputbits = m_paddr;
+		uint8_t inputbits = ~m_paddr;
+		uint8_t general_purpose_bits = ~m_pacnt;
+		uint8_t indat = m68k->m_m68307_porta_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
 		indat |= m68k->m_m68307_porta_r(space, true, (inputbits & ~general_purpose_bits)&mem_mask) & ((inputbits & ~general_purpose_bits)& mem_mask); // read dedicated input lines
-		UINT8 outdat = (m_padat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
+		uint8_t outdat = (m_padat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
 
 		return (indat | outdat);
 
@@ -177,7 +177,7 @@ UINT16 m68307_sim::read_padat(m68307cpu_device* m68k, address_space &space, UINT
 }
 
 
-void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_padat);
@@ -192,17 +192,17 @@ void m68307_sim::write_padat(m68307cpu_device* m68k, address_space &space, UINT1
 	}
 }
 
-void m68307_sim::write_pbcnt(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pbcnt(uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pbcnt);
 }
 
-void m68307_sim::write_pbddr(UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pbddr(uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pbddr);
 }
 
-UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 mem_mask)
+uint16_t m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 
@@ -210,13 +210,13 @@ UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT
 	{
 		// for general purpose bits, if configured as 'output' then anything output gets latched
 		// and anything configured as input is read from the port
-		UINT16 outputbits = m_pbddr;
-		UINT16 inputbits = ~m_pbddr;
-		UINT16 general_purpose_bits = ~m_pbcnt;
+		uint16_t outputbits = m_pbddr;
+		uint16_t inputbits = ~m_pbddr;
+		uint16_t general_purpose_bits = ~m_pbcnt;
 
-		UINT16 indat = m68k->m_m68307_portb_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
+		uint16_t indat = m68k->m_m68307_portb_r(space, false, (inputbits & general_purpose_bits)&mem_mask) & ((inputbits & general_purpose_bits) & mem_mask); // read general purpose input lines
 		indat |= m68k->m_m68307_portb_r(space, true, (inputbits & ~general_purpose_bits)&mem_mask) & ((inputbits & ~general_purpose_bits)& mem_mask); // read dedicated input lines
-		UINT16 outdat = (m_pbdat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
+		uint16_t outdat = (m_pbdat & outputbits) & general_purpose_bits; // read general purpose output lines (reads latched data)
 
 		return (indat | outdat);
 	}
@@ -228,7 +228,7 @@ UINT16 m68307_sim::read_pbdat(m68307cpu_device* m68k, address_space &space, UINT
 }
 
 
-void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, uint16_t data, uint16_t mem_mask)
 {
 	int pc = space.device().safe_pc();
 	COMBINE_DATA(&m_pbdat);
@@ -243,7 +243,7 @@ void m68307_sim::write_pbdat(m68307cpu_device* m68k, address_space &space, UINT1
 	}
 }
 
-void m68307_sim::write_licr1(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_licr1(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_licr1);
 	data = m_licr1;
@@ -259,10 +259,10 @@ void m68307_sim::write_licr1(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mas
 	m68k->logerror("\n");
 }
 
-void m68307_sim::write_licr2(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_licr2(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_licr2);
-	UINT16 newdata = m_licr2;
+	uint16_t newdata = m_licr2;
 	m68k->logerror("m_licr2 value %04x : Details :\n", newdata);
 	m68k->logerror("int8ipl %01x\n", (newdata>>0)&7);
 	m68k->logerror("pir8    %01x\n", (newdata>>3)&1);
@@ -283,7 +283,7 @@ void m68307_sim::write_licr2(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mas
 }
 
 
-void m68307_sim::write_picr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_picr(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_picr);
 	data = m_picr;
@@ -295,7 +295,7 @@ void m68307_sim::write_picr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask
 	m68k->logerror("\n");
 }
 
-void m68307_sim::write_pivr(m68307cpu_device* m68k, UINT16 data, UINT16 mem_mask)
+void m68307_sim::write_pivr(m68307cpu_device* m68k, uint16_t data, uint16_t mem_mask)
 {
 	COMBINE_DATA(&m_pivr);
 	data = m_pivr;

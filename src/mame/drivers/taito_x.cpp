@@ -241,7 +241,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
       * 0x0002 (World) uses TAITO_COINAGE_WORLD
   - Notice screen only if region = 0x0001
   - I can't tell if it's an ingame bug or an emulation bug,
-    but boss are far much harder when "Difficulty" Dip Swicth
+    but boss are far much harder when "Difficulty" Dip Switch
     is set to "Easy" : put a watch on 0xf00a76.w for level 1 boss
     and you'll notice that MSB is set to 0x01 instead of 0x00
   - 'supermanu' has no Notice screen or FBI logo & statement
@@ -321,8 +321,9 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
 #include "includes/taito_x.h"
+#include "machine/cchip.h"
 #include "sound/2610intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 
 READ16_MEMBER(taitox_state::superman_dsw_input_r)
 {
@@ -768,11 +769,6 @@ GFXDECODE_END
 
 /**************************************************************************/
 
-/* handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitox_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 MACHINE_START_MEMBER(taitox_state,taitox)
 {
@@ -809,7 +805,6 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -830,7 +825,7 @@ static MACHINE_CONFIG_START( superman, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2)   /* verified on pcb */
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -857,7 +852,6 @@ static MACHINE_CONFIG_START( daisenpu, taitox_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -903,7 +897,6 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -924,7 +917,7 @@ static MACHINE_CONFIG_START( gigandes, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -951,7 +944,6 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 
 	MCFG_DEVICE_ADD("spritegen", SETA001_SPRITE, 0)
 	MCFG_SETA001_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_SETA001_SPRITE_PALETTE("palette")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -972,7 +964,7 @@ static MACHINE_CONFIG_START( ballbros, taitox_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitox_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

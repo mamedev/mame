@@ -16,7 +16,7 @@ To Do:
 
 Survival:
 
-- Check background visibile area.  When the background scrolls up, it
+- Check background visible area.  When the background scrolls up, it
   currently shows below the top and bottom of the border of the play area.
 
 
@@ -75,7 +75,7 @@ static INPUT_PORTS_START( phoenix )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, NULL)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( condor )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, NULL)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,player_input_r, nullptr)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )            PORT_DIPLOCATION( "SW1:1,2" )
@@ -288,7 +288,7 @@ static INPUT_PORTS_START( pleiads )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, NULL)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( pleiadbl )
 	PORT_INCLUDE( phoenix )
 
 	PORT_MODIFY("IN0")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, NULL)     /* Protection. See 0x0552 */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, phoenix_state,pleiads_protection_r, nullptr)     /* Protection. See 0x0552 */
 
 	PORT_MODIFY("DSW0")
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )      PORT_DIPLOCATION( "SW1:7" )
@@ -553,6 +553,30 @@ ROM_START( phoenix )
 	ROM_REGION( 0x1000, "fgtiles", 0 )
 	ROM_LOAD( "b1-ic39.3b",   0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
 	ROM_LOAD( "b2-ic40.4b",   0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
+ROM_START( phoenix2 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "ic45-pg1.1a",  0x0000, 0x0800, CRC(5b8c55a8) SHA1(839c1ca9766f730ec3accd48db70f6429a9c3362) )
+	ROM_LOAD( "ic46-pg2.2a",  0x0800, 0x0800, CRC(273a4a82) SHA1(6f3019a074e73ff50ceb92f655fcf15659f34919) )
+	ROM_LOAD( "ic47-pg3.3a",  0x1000, 0x0800, CRC(cbbb8839) SHA1(b7f449374cac111081559e39646f973e7e99fd64) )
+	ROM_LOAD( "ic48-pg4.4a",  0x1800, 0x0800, CRC(cb5d9915) SHA1(49bcf55a5721cfcc02c3b811a4b601e35ea576db) )
+	ROM_LOAD( "ic49-pg5.5a",  0x2000, 0x0800, CRC(73bcd2e1) SHA1(773acb7317531572cb2b81c7375e0fe52127fa0a) )
+	ROM_LOAD( "ic50-pg6.6a",  0x2800, 0x0800, CRC(ac5e9ec1) SHA1(0402e5241d99759d804291998efd43f37ce99917) )
+	ROM_LOAD( "ic51-pg7.7a",  0x3000, 0x0800, CRC(2eab35b4) SHA1(849bf8273317cc869bdd67e50c68399ee8ece81d) )
+	ROM_LOAD( "ic52-pg8.8a",  0x3800, 0x0800, CRC(aff8e9c5) SHA1(e4164f85ec12d4d9bcbffba27ab1f51b3599f6d0) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "ic23-cg1.3d",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "ic24-cg2.4d",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "ic39-cg3.3b",  0x0000, 0x0800, CRC(53413e8f) SHA1(d772358505b973b10da840d204afb210c0c746ec) )
+	ROM_LOAD( "ic40-cg4.4b",  0x0800, 0x0800, CRC(0be2ba91) SHA1(af9243ee23377b632b9b7d0b84d341d06bf22480) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
 	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
@@ -824,6 +848,30 @@ ROM_START( condor )
 	ROM_LOAD( "cond12c.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
 
 	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
+	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
+ROM_END
+
+ROM_START( condorn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",  0x0000, 0x0800, CRC(c0f73929) SHA1(3cecf8341a5674165d2cae9b22ea5db26a9597de) )
+	ROM_LOAD( "2.bin",  0x0800, 0x0800, CRC(440d56e8) SHA1(b3147d5416cec8c00c7df40b878b826434121737) )
+	ROM_LOAD( "3.bin",  0x1000, 0x0800, CRC(750b059b) SHA1(6fbaa2ef4c7eef6f731a73b2d33a02fff21b318a) )
+	ROM_LOAD( "4.bin",  0x1800, 0x0800, CRC(78416372) SHA1(8e66c253ddae4449af2f4119f1cefa992792c779) )
+	ROM_LOAD( "5.bin",  0x2000, 0x0800, CRC(1ff3a982) SHA1(66fb39e7abdf7a9c6e2eb01d41cfe9429781d6aa) )
+	ROM_LOAD( "6.bin",  0x2800, 0x0800, CRC(8c83bff7) SHA1(3dfb090d7e3a9ae8da882b06e166c48555eaf77c) )
+	ROM_LOAD( "7.bin",  0x3000, 0x0800, CRC(805ec2e8) SHA1(7e56fc9990eb99512078e2b1e2874fb33b0aa05c) )
+	ROM_LOAD( "8.bin",  0x3800, 0x0800, CRC(1edebb45) SHA1(2fdf061ee600e27a6ed512ea61a8d78307a7fb8a) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 )
+	ROM_LOAD( "c.bin",  0x0000, 0x0800, CRC(3c7e623f) SHA1(e7ff5fc371664af44785c079e92eeb2d8530187b) )
+	ROM_LOAD( "d.bin",  0x0800, 0x0800, CRC(59916d3b) SHA1(71aec70a8e096ed1f0c2297b3ae7dca1b8ecc38d) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "a.bin",  0x0000, 0x0800, CRC(cdd5ef12) SHA1(1eb4ff6a0d56640acf0de2d6e7b7070e5b2c90d4) )
+	ROM_LOAD( "b.bin",  0x0800, 0x0800, CRC(eba42f0f) SHA1(378282cb2c4e10c23179ae3c605ae7bf691150f6) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // not dumped for this set
 	ROM_LOAD( "mmi6301.ic40",   0x0000, 0x0100, CRC(79350b25) SHA1(57411be4c1d89677f7919ae295446da90612c8a8) )  /* palette low bits */
 	ROM_LOAD( "mmi6301.ic41",   0x0100, 0x0100, CRC(e176b768) SHA1(e2184dd495ed579f10b6da0b78379e02d7a6229f) )  /* palette high bits */
 ROM_END
@@ -1266,6 +1314,30 @@ ROM_START( pleiadsi )
 	ROM_LOAD( "7611-5.33",    0x0100, 0x0100, CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette high bits */
 ROM_END
 
+ROM_START( pleiadsn )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.bin",     0x0000, 0x0800, CRC(c013515f) SHA1(c44db1c615c11ace997c0065762020827bf9ef7e) )
+	ROM_LOAD( "2.bin",     0x0800, 0x0800, CRC(b254217c) SHA1(312a33cca09d5d2d18992f28eb051230a90db6e3) )
+	ROM_LOAD( "3.bin",     0x1000, 0x0800, CRC(3b29aec5) SHA1(b90b55fdc799db672558e2f7c6b05a958bf33a2c) )
+	ROM_LOAD( "4.bin",     0x1800, 0x0800, CRC(1fbde4d7) SHA1(b358649288108159a426dba3940c627c2d2aeb01) )
+	ROM_LOAD( "5.bin",     0x2000, 0x0800, BAD_DUMP CRC(9dc73e63) SHA1(8a2de6666fecead7071285125b16641b50249adc) )  // the best of 50 different dumps. the device is clearly damaged.
+	ROM_LOAD( "6.bin",     0x2800, 0x0800, CRC(f1a8a00d) SHA1(5c183e3a73fa882ffec3cb9219fb5619e625591a) )
+	ROM_LOAD( "7.bin",     0x3000, 0x0800, CRC(b5f07fbc) SHA1(2ae687c84732942e69ad4dfb7a4ac1b97b77487a) )
+	ROM_LOAD( "8.bin",     0x3800, 0x0800, CRC(b3db08c2) SHA1(d5b1b77dcf2d76498f30d5f880635f5acfac7dfd) )
+
+	ROM_REGION( 0x1000, "bgtiles", 0 ) // these are straight (colors match the real machine)
+	ROM_LOAD( "11.bin",    0x0000, 0x0800, CRC(4e30f9e7) SHA1(da023a94725dc40107cd97e4decfd4dc0f9f00ee) )
+	ROM_LOAD( "12.bin",    0x0800, 0x0800, CRC(72d511fc) SHA1(a12485698ad35ba3a8c72bb9401c0cf522ffc73c) )
+
+	ROM_REGION( 0x1000, "fgtiles", 0 )
+	ROM_LOAD( "9.bin",     0x0000, 0x0800, CRC(85866607) SHA1(cd240bd056f761b2f9e2142049434f02cae3e315) )
+	ROM_LOAD( "10.bin",    0x0800, 0x0800, CRC(a841d511) SHA1(8349008ab1d8ef08775b54170c37deb1d391fffc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) // proms borrowed from phoenix, reverse order.
+	ROM_LOAD( "hm3-7611.bin", 0x0000, 0x0100, BAD_DUMP CRC(e38eeb83) SHA1(252880d80425b2e697146e76efdc6cb9f3ba0378) )   /* palette low bits */
+	ROM_LOAD( "mb7052.ic41",  0x0100, 0x0100, BAD_DUMP CRC(7a1bcb1e) SHA1(bdfab316ea26e2063879e7aa78b6ae2b55eb95c8) )   /* palette high bits */
+ROM_END
+
 ROM_START( pleiadss )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "pl45.bin",     0x0000, 0x0800, CRC(e2528599) SHA1(4647c62a2c6047238ad2855cf71b9e079ac4b4c7) )
@@ -1348,7 +1420,7 @@ DRIVER_INIT_MEMBER(phoenix_state,condor)
 
 DRIVER_INIT_MEMBER(phoenix_state,vautourza)
 {
-	UINT8 *rgn          =   memregion("proms")->base();
+	uint8_t *rgn          =   memregion("proms")->base();
 
 	// expand the 8-bit PROM into the same layout as the 4-bit PROMs used by most versions of the game
 	for (int i = 0; i < 0x100; i++)
@@ -1359,7 +1431,8 @@ DRIVER_INIT_MEMBER(phoenix_state,vautourza)
 }
 
 /*** Phoenix (& clones) ***/
-GAME( 1980, phoenix,  0,        phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix,  0,        phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1980, phoenix2, phoenix,  phoenix,  phoenix, driver_device,  0,        ROT90, "Amstar",                            "Phoenix (Amstar, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixa, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixb, phoenix,  phoenix,  phoenixa, driver_device, 0,        ROT90, "Amstar (Centuri license)",          "Phoenix (Centuri, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, phoenixt, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "Amstar (Taito license)",            "Phoenix (Taito)", MACHINE_SUPPORTS_SAVE )
@@ -1370,7 +1443,8 @@ GAME( 1981, phoenixc, phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT
 GAME( 1981, phoenixc2,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc3,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, phoenixc4,phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg? (Irecsa / G.G.I Corp)",    "Phoenix (Irecsa / G.G.I Corp, set 4)", MACHINE_SUPPORTS_SAVE )
-GAME( 1981, condor,   phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg",                           "Condor (bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, condor,   phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (Sidam)",                   "Condor (Sidam bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, condorn,  phoenix,  condor,   condor, phoenix_state,   condor,   ROT90, "bootleg (S C Novar)",               "Condor (S C Novar bootleg of Phoenix)", MACHINE_SUPPORTS_SAVE )
 // the following 2 were common bootlegs in england & france respectively
 GAME( 1980, falcon,   phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg",                           "Falcon (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
 GAME( 1980, vautour,  phoenix,  phoenix,  phoenixt, driver_device, 0,        ROT90, "bootleg (Jeutel)",                  "Vautour (bootleg of Phoenix) (8085A CPU)", MACHINE_SUPPORTS_SAVE )
@@ -1396,6 +1470,7 @@ GAME( 1981, pleiadsb2,pleiads,  pleiads,  pleiads, driver_device,  0,        ROT
 GAME( 1981, pleiadbl, pleiads,  pleiads,  pleiadbl, driver_device, 0,        ROT90, "bootleg",                           "Pleiads (bootleg set 1)", MACHINE_IMPERFECT_COLORS )
 GAME( 1981, pleiadce, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "Tehkan (Centuri license)",          "Pleiads (Centuri)", MACHINE_IMPERFECT_COLORS )
 GAME( 1981, pleiadsi, pleiads,  pleiads,  pleiadce, driver_device, 0,        ROT90, "bootleg? (Irecsa)",                 "Pleiads (Irecsa)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
+GAME( 1981, pleiadsn, pleiads,  phoenix,  pleiadce, driver_device, 0,        ROT90, "Niemer S.A.",                       "Pleiads (Niemer S.A.)", MACHINE_IMPERFECT_COLORS ) // possibly licensed, but some of the roms match the bootlegs
 GAME( 1981, pleiadss, pleiads,  phoenix,  pleiadce, driver_device, 0,        ROT90, "bootleg",                           "Pleiads (Spanish bootleg)", MACHINE_SUPPORTS_SAVE ) // colours match PCB (but are ugly)
 GAME( 1981, capitol,  pleiads,  phoenix,  capitol, driver_device,  0,        ROT90, "bootleg? (Universal Video Spiel)",  "Capitol", MACHINE_IMPERFECT_COLORS )
 

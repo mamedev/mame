@@ -2,24 +2,35 @@
 // copyright-holders:hap
 /*
 
-  Sharp SM510 MCU family - known chips:
+  Known chips: (* means not emulated yet)
+
+  Sharp SM510 MCU family:
   - SM510: 2.7Kx8 ROM, 128x4 RAM(32x4 for LCD)
   - SM511: 4Kx8 ROM, 128x4 RAM(32x4 for LCD), melody controller
   - SM512: 4Kx8 ROM, 128x4 RAM(48x4 for LCD), melody controller
+  - *KB1013VK4-2: Soviet-era clone of SM510, minor differences
 
-  Other chips that may be in the same family, investigate more when one of
-  them needs to get emulated: SM500, SM530/31, SM4A, SM3903, ..
+  Sharp SM500 MCU family:
+  - *SM500: x
+  - *SM4A: x
+  - *SM530: x
+  - *SM531: x
+  - *KB1013VK1-2: Soviet-era clone of SM500, minor differences
 
   References:
   - 1990 Sharp Microcomputers Data Book
   - 1996 Sharp Microcomputer Databook
+  - KB1013VK1-2/KB1013VK4-2 manual
 
   TODO:
   - proper support for LFSR program counter in debugger
   - callback for lcd screen as MAME bitmap (when needed)
   - LCD bs pin blink mode via Y register (0.5s off, 0.5s on)
   - LB/SBM is correct?
-  - SM511 unknown opcodes
+  - SM511 undocumented/guessed opcodes:
+    * $01 is guessed as DIV to ACC transfer, unknown which bits
+    * $5d is certainly CEND
+    * $65 is certainly divider reset, but not sure if it behaves same as on SM510
 
 */
 
@@ -55,35 +66,6 @@ void sm510_base_device::device_start()
 	m_write_segb.resolve_safe();
 	m_write_segbs.resolve_safe();
 	m_write_segc.resolve_safe();
-
-	// zerofill
-	memset(m_stack, 0, sizeof(m_stack));
-	m_pc = 0;
-	m_prev_pc = 0;
-	m_op = 0;
-	m_prev_op = 0;
-	m_param = 0;
-	m_acc = 0;
-	m_bl = 0;
-	m_bm = 0;
-	m_c = 0;
-	m_skip = false;
-	m_w = 0;
-	m_r = 0;
-	m_div = 0;
-	m_1s = false;
-	m_k_active = false;
-	m_l = 0;
-	m_x = 0;
-	m_y = 0;
-	m_bp = false;
-	m_bc = false;
-	m_halt = false;
-	m_melody_rd = 0;
-	m_melody_step_count = 0;
-	m_melody_duty_count = 0;
-	m_melody_duty_index = 0;
-	m_melody_address = 0;
 
 	// register for savestates
 	save_item(NAME(m_stack));
@@ -122,7 +104,8 @@ void sm510_base_device::device_start()
 	state_add(SM510_C,   "C",   m_c).formatstr("%01X");
 	state_add(SM510_W,   "W",   m_w).formatstr("%02X");
 
-	state_add(STATE_GENPC, "curpc", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_pc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_c).formatstr("%1s").noshow();
 
 	m_icountptr = &m_icount;
@@ -141,8 +124,10 @@ void sm510_base_device::device_start()
 
 void sm510_base_device::device_reset()
 {
+	// ACL
 	m_skip = false;
 	m_halt = false;
+	m_sbm = false;
 	m_op = m_prev_op = 0;
 	do_branch(3, 7, 0);
 	m_prev_pc = m_pc;
@@ -163,13 +148,13 @@ void sm510_base_device::device_reset()
 //  lcd driver
 //-------------------------------------------------
 
-inline UINT16 sm510_base_device::get_lcd_row(int column, UINT8* ram)
+inline uint16_t sm510_base_device::get_lcd_row(int column, uint8_t* ram)
 {
 	// output 0 if lcd blackpate/bleeder is off, or in case row doesn't exist
 	if (ram == nullptr || m_bc || !m_bp)
 		return 0;
 
-	UINT16 rowdata = 0;
+	uint16_t rowdata = 0;
 	for (int i = 0; i < 0x10; i++)
 		rowdata |= (ram[i] >> column & 1) << i;
 
@@ -187,7 +172,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::lcd_timer_cb)
 		m_write_segc(h | SM510_PORT_SEGC, get_lcd_row(h, m_lcd_ram_c), 0xffff);
 
 		// bs output from L/X and Y regs
-		UINT8 bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
+		uint8_t bs = (m_l >> h & 1) | ((m_x*2) >> h & 2);
 		m_write_segbs(h | SM510_PORT_SEGBS, (m_bc || !m_bp) ? 0 : bs, 0xffff);
 	}
 
@@ -215,7 +200,7 @@ void sm510_base_device::clock_melody()
 
 	// tone cycle table (SM511/SM512 datasheet fig.5)
 	// cmd 0 = cmd, 1 = stop, > 13 = illegal(unknown)
-	static const UINT8 lut_tone_cycles[4*16] =
+	static const uint8_t lut_tone_cycles[4*16] =
 	{
 		0, 0, 7, 8, 8, 9, 9, 10,11,11,12,13,14,14, 7*2, 8*2,
 		0, 0, 8, 8, 9, 9, 10,11,11,12,13,13,14,15, 8*2, 8*2,
@@ -223,8 +208,8 @@ void sm510_base_device::clock_melody()
 		0, 0, 8, 9, 9, 10,10,11,11,12,13,14,14,15, 8*2, 9*2
 	};
 
-	UINT8 cmd = m_melody_rom[m_melody_address] & 0x3f;
-	UINT8 out = 0;
+	uint8_t cmd = m_melody_rom[m_melody_address] & 0x3f;
+	uint8_t out = 0;
 
 	// clock duty cycle if tone is active
 	if ((cmd & 0xf) > 1)
@@ -249,7 +234,7 @@ void sm510_base_device::clock_melody()
 	// clock time base on F8(d7)
 	if ((m_div & 0x7f) == 0)
 	{
-		UINT8 mask = (cmd & 0x20) ? 0x1f : 0x0f;
+		uint8_t mask = (cmd & 0x20) ? 0x1f : 0x0f;
 		m_melody_step_count = (m_melody_step_count + 1) & mask;
 
 		if (m_melody_step_count == 0)
@@ -272,7 +257,7 @@ void sm510_base_device::init_melody()
 	// verify melody rom
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 data = m_melody_rom[i];
+		uint8_t data = m_melody_rom[i];
 		if (data & 0xc0 || (data & 0x0f) > 13)
 			logerror("%s unknown melody ROM data $%02X at $%02X\n", tag(), data, i);
 	}
@@ -314,7 +299,7 @@ TIMER_CALLBACK_MEMBER(sm510_base_device::div_timer_cb)
 {
 	m_div = (m_div + 1) & 0x7fff;
 
-	// 1S signal on overflow(falling edge of f1)
+	// 1S signal on overflow(falling edge of F1)
 	if (m_div == 0)
 		m_1s = true;
 

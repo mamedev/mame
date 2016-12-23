@@ -19,11 +19,11 @@
 
 // on big-endian, these are NOPs.  (TODO: hey, where did WORDS_BIGENDIAN go since the GENie transition?!)
 #if defined(__ppc__) || defined (__PPC__) || defined(__ppc64__) || defined(__PPC64__)
-static UINT32 ni_htonl(UINT32 x) { return x; }
-static UINT32 ni_ntohl(UINT32 x) { return x; }
+static uint32_t ni_htonl(uint32_t x) { return x; }
+static uint32_t ni_ntohl(uint32_t x) { return x; }
 #else
-static UINT32 ni_htonl(UINT32 x) { return FLIPENDIAN_INT32(x); }
-static UINT32 ni_ntohl(UINT32 x) { return FLIPENDIAN_INT32(x); }
+static uint32_t ni_htonl(uint32_t x) { return flipendian_int32(x); }
+static uint32_t ni_ntohl(uint32_t x) { return flipendian_int32(x); }
 #endif
 
 
@@ -34,7 +34,7 @@ class messimg_disk_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_QUICKLOAD; }
@@ -44,11 +44,9 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "img"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 
 	protected:
@@ -57,8 +55,8 @@ public:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 public:
-	UINT32 m_size;
-	std::unique_ptr<UINT8[]> m_data;
+	uint32_t m_size;
+	std::unique_ptr<uint8_t[]> m_data;
 	bool m_ejected;
 };
 
@@ -68,7 +66,7 @@ extern const device_type MESSIMG_DISK;
 
 const device_type MESSIMG_DISK = &device_creator<messimg_disk_image_device>;
 
-messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+messimg_disk_image_device::messimg_disk_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MESSIMG_DISK, "Mac image", tag, owner, clock, "messimg_disk_image", __FILE__),
 		device_image_interface(mconfig, *this), m_size(0), m_data(nullptr), m_ejected(false)
 {
@@ -90,27 +88,27 @@ void messimg_disk_image_device::device_start()
 
 	if (exists() && fseek(0, SEEK_END) == 0)
 	{
-		m_size = (UINT32)ftell();
+		m_size = (uint32_t)ftell();
 	}
 }
 
-bool messimg_disk_image_device::call_load()
+image_init_result messimg_disk_image_device::call_load()
 {
 	fseek(0, SEEK_END);
-	m_size = (UINT32)ftell();
+	m_size = (uint32_t)ftell();
 	if (m_size > (256*1024*1024))
 	{
 		printf("Mac image too large: must be 256MB or less!\n");
 		m_size = 0;
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
-	m_data = make_unique_clear<UINT8[]>(m_size);
+	m_data = make_unique_clear<uint8_t[]>(m_size);
 	fseek(0, SEEK_SET);
 	fread(m_data.get(), m_size);
 	m_ejected = false;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void messimg_disk_image_device::call_unload()
@@ -160,7 +158,7 @@ machine_config_constructor nubus_image_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_image_device::device_rom_region() const
+const tiny_rom_entry *nubus_image_device::device_rom_region() const
 {
 	return ROM_NAME( image );
 }
@@ -173,13 +171,13 @@ const rom_entry *nubus_image_device::device_rom_region() const
 //  nubus_image_device - constructor
 //-------------------------------------------------
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, NUBUS_IMAGE, "Disk Image Pseudo-Card", tag, owner, clock, "nb_image", __FILE__),
 		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
 }
 
-nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_image_device::nubus_image_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this), m_image(nullptr)
 {
@@ -191,8 +189,8 @@ nubus_image_device::nubus_image_device(const machine_config &mconfig, device_typ
 
 void nubus_image_device::device_start()
 {
-	UINT32 slotspace;
-	UINT32 superslotspace;
+	uint32_t slotspace;
+	uint32_t superslotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -255,7 +253,7 @@ READ32_MEMBER( nubus_image_device::image_r )
 
 WRITE32_MEMBER( nubus_image_device::image_super_w )
 {
-	UINT32 *image = (UINT32*)m_image->m_data.get();
+	uint32_t *image = (uint32_t*)m_image->m_data.get();
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	mem_mask = ((mem_mask & 0xff) << 24) | ((mem_mask & 0xff00) << 8) | ((mem_mask & 0xff0000) >> 8) | ((mem_mask & 0xff000000) >> 24);
 
@@ -264,16 +262,16 @@ WRITE32_MEMBER( nubus_image_device::image_super_w )
 
 READ32_MEMBER( nubus_image_device::image_super_r )
 {
-	UINT32 *image = (UINT32*)m_image->m_data.get();
-	UINT32 data = image[offset];
+	uint32_t *image = (uint32_t*)m_image->m_data.get();
+	uint32_t data = image[offset];
 	return ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 }
 
 WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 {
-	const osd_directory_entry *dp;
+	const osd::directory::entry *dp;
 	char fullpath[1024];
-	UINT64 filesize;
+	uint64_t filesize;
 
 //  data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
 	filectx.curcmd = data;
@@ -290,11 +288,10 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		}
 		break;
 	case kFileCmdGetFirstListing:
-		if(filectx.dirp) osd_closedir(filectx.dirp);
-		filectx.dirp = osd_opendir((const char *)filectx.curdir);
+		filectx.dirp = osd::directory::open((const char *)filectx.curdir);
 	case kFileCmdGetNextListing:
 		if (filectx.dirp) {
-			dp = osd_readdir(filectx.dirp);
+			dp = filectx.dirp->read();
 			if(dp) {
 				strncpy((char*)filectx.filename, dp->name, sizeof(filectx.filename));
 			} else {
@@ -310,7 +307,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		strcpy(fullpath, (const char *)filectx.curdir);
 		strcat(fullpath, "/");
 		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_READ, &filectx.fd, &filectx.filelen) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		if(osd_file::open(std::string(fullpath), OPEN_FLAG_READ, filectx.fd, filectx.filelen) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	case kFileCmdPutFile:
@@ -318,7 +315,7 @@ WRITE32_MEMBER( nubus_image_device::file_cmd_w )
 		strcpy(fullpath, (const char *)filectx.curdir);
 		strcat(fullpath, "/");
 		strcat(fullpath, (const char*)filectx.filename);
-		if(osd_open((const char*)fullpath, OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, &filectx.fd, &filesize) != FILERR_NONE) printf("Error opening %s\n", fullpath);
+		if(osd_file::open(std::string(fullpath), OPEN_FLAG_WRITE|OPEN_FLAG_CREATE, filectx.fd, filesize) != osd_file::error::NONE) printf("Error opening %s\n", fullpath);
 		filectx.bytecount = 0;
 		break;
 	}
@@ -331,33 +328,31 @@ READ32_MEMBER( nubus_image_device::file_cmd_r )
 
 WRITE32_MEMBER( nubus_image_device::file_data_w )
 {
-	UINT32 count = 4;
-	UINT32 actualcount = 0;
+	std::uint32_t count = 4;
+	std::uint32_t actualcount = 0;
 
 	data = ((data & 0xff) << 24) | ((data & 0xff00) << 8) | ((data & 0xff0000) >> 8) | ((data & 0xff000000) >> 24);
-	if(filectx.fd != nullptr) {
+	if(filectx.fd) {
 		//data = ni_ntohl(data);
 		if((filectx.bytecount + count) > filectx.filelen) count = filectx.filelen - filectx.bytecount;
-		osd_write(filectx.fd, &data, filectx.bytecount, count, &actualcount);
+		filectx.fd->write(&data, filectx.bytecount, count, actualcount);
 		filectx.bytecount += actualcount;
 
 		if(filectx.bytecount >= filectx.filelen) {
-			osd_close(filectx.fd);
-			filectx.fd = nullptr;
+			filectx.fd.reset();
 		}
 	}
 }
 
 READ32_MEMBER( nubus_image_device::file_data_r )
 {
-	if(filectx.fd != nullptr) {
-		UINT32 ret;
-		UINT32 actual = 0;
-		osd_read(filectx.fd, &ret, filectx.bytecount, sizeof(ret), &actual);
+	if(filectx.fd) {
+		std::uint32_t ret;
+		std::uint32_t actual = 0;
+		filectx.fd->read(&ret, filectx.bytecount, sizeof(ret), actual);
 		filectx.bytecount += actual;
 		if(actual < sizeof(ret)) {
-			osd_close(filectx.fd);
-			filectx.fd = nullptr;
+			filectx.fd.reset();
 		}
 		return ni_htonl(ret);
 	}
@@ -377,12 +372,12 @@ READ32_MEMBER( nubus_image_device::file_len_r )
 
 WRITE32_MEMBER( nubus_image_device::file_name_w )
 {
-	((UINT32*)(filectx.filename))[offset] = ni_ntohl(data);
+	((uint32_t*)(filectx.filename))[offset] = ni_ntohl(data);
 }
 
 READ32_MEMBER( nubus_image_device::file_name_r )
 {
-	UINT32 ret;
-	ret = ni_htonl(((UINT32*)(filectx.filename))[offset]);
+	uint32_t ret;
+	ret = ni_htonl(((uint32_t*)(filectx.filename))[offset]);
 	return ret;
 }

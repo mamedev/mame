@@ -5,68 +5,78 @@ Chihiro is an Xbox-based arcade system from SEGA.
 
 Games on this system include....
 
-   Year   Game                                                 Manufacturer / Developer   Media    Number       Key Chip
-+-+------+----------------------------------------------------+--------------------------+--------+------------+--------------|
-|*| 2002 | The House of the Dead III                          | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
-| | 2003 | Crazy Taxi High Roller                             | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
-| | 2003 | Crazy Taxi High Roller (Rev A)                     | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
-|*| 2003 | Crazy Taxi High Roller (Rev B)                     | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
-| | 2003 | Virtua Cop 3                                       | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
-|*| 2003 | Virtua Cop 3 (Rev A)                               | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
-| | 2003 | OutRun 2                                           | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
-|*| 2003 | OutRun 2 (Rev A)                                   | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
-| | 2003 | OutRun 2 prototype (Rev P)                         | Sega                     | GDROM  | GDX-0004P  |              |
-| | 2004 | Sega Golf Club Network Pro Tour                    | Sega                     | GDROM  | GDX-0005   |              |
-| | 2004 | Sega Network Taisen Mahjong MJ 2                   | Sega                     | GDROM  | GDX-0006   |              |
-| | 2004 | Sega Network Taisen Mahjong MJ 2 (Rev A)           | Sega                     | GDROM  | GDX-0006A  |              |
-| | 2004 | Sega Network Taisen Mahjong MJ 2 (Rev B)           | Sega                     | GDROM  | GDX-0006B  |              |
-|*| 2004 | Sega Network Taisen Mahjong MJ 2 (Rev C)           | Sega                     | GDROM  | GDX-0006C  |              |
-| | 2004 | Sega Network Taisen Mahjong MJ 2 (Rev D)           | Sega                     | GDROM  | GDX-0006D  |              |
-| | 2005 | Sega Network Taisen Mahjong MJ 2 (Rev E)           | Sega                     | GDROM  | GDX-0006E  |              |
-|*| 2005 | Sega Network Taisen Mahjong MJ 2 (Rev F)           | Sega                     | GDROM  | GDX-0006F  |              |
-|*| 2005 | Sega Network Taisen Mahjong MJ 2 (Rev G)           | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
-|*| 2004 | Ollie King                                         | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
-| | 2004 | Wangan Midnight Maximum Tune (Japan)               | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
-| | 2004 | Wangan Midnight Maximum Tune (Japan) (Rev A)       | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
-|*| 2004 | Wangan Midnight Maximum Tune (Japan) (Rev B)       | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
-| | 2004 | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
-| | 2004 | Wangan Midnight Maximum Tune (Export) (Rev A)      | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
-|*| 2004 | Wangan Midnight Maximum Tune (Export) (Rev B)      | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
-| | 2004 | OutRun 2 SP (Japan)                                | Sega                     | GDROM  | GDX-0011   |              |
-|*| 2004 | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
-|*| 2004 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
-|*| 2005 | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
-| | 2004 | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0xxx-COM |
-|*| 2004 | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0xxx-COM |
-|*| 2005 | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
-| | 2005 | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
-|*| 2005 | Wangan Midnight Maximum Tune 2 (Export) (Rev A)    | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
-| | 2005 | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
-| | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
-| | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
-| | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
-|*| 2005 | Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
-| | 2005 | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
-|*| 2005 | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
-| | 2005 | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
-|*| 2005 | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  |              |
-| | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
-| | 2006 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
-|*| 2007 | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  |              |
-| | 2009 | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
-|*| 2009 | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
-|*| 2004 | Quest Of D (Ver.1.01C)                             | Sega                     | CDROM  | CDV-10005C |              |
-|*| 2005 | Sangokushi Taisen (Ver.1.002)                      | Sega                     | DVDROM | CDV-10009D |              |
-|*| 2006 | Sangokushi Taisen 2 (Ver.2.007)                    | Sega                     | DVDROM | CDV-10019A |              |
-|*| 2005 | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
-|*| 2006 | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
-|*| 2006 | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
-|*| 2007 | Mobile Suit Gundam 0083 Card Builder               | Dimps - Banpresto        | DVDROM | CDV-10030  |              |
-|*| 2008 | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
-|*| 2008 | Sangokushi Taisen 3 (Ver.J)                        | Sega                     | DVDROM | CDV-10036J |              |
-|*| 2008 | Sangokushi Taisen 3 War Begins (Ver.3.59)          | Sega                     | DVDROM | CDV-10041  |              |
-|*| 2008 | Sangokushi Taisen 3 War Begins                     | Sega                     | DVDROM | CDV-10042  |              |
-+-+------+----------------------------------------------------+--------------------------+--------+------------+--------------+
+   yyyymmdd   Game                                                 Manufacturer / Developer   Media    Number       Key Chip
++-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------|
+|*| 20021029 | The House of the Dead III                          | Sega / Wow Entertainment | GDROM  | GDX-0001   | 317-0348-COM |
+| | 2003     | Crazy Taxi High Roller                             | Sega / Hitmaker          | GDROM  | GDX-0002   | 317-0353-COM |
+| | 2003     | Crazy Taxi High Roller (Rev A)                     | Sega / Hitmaker          | GDROM  | GDX-0002A  | 317-0353-COM |
+|*| 20030224 | Crazy Taxi High Roller (Rev B)                     | Sega / Hitmaker          | GDROM  | GDX-0002B  | 317-0353-COM |
+| | 2003     | Virtua Cop 3                                       | Sega                     | GDROM  | GDX-0003   | 317-0354-COM |
+|*| 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | GDROM  | GDX-0003A  | 317-0354-COM |
+| | 20030226 | Virtua Cop 3 (Rev A)                               | Sega                     | CF     | MDA-G0010  | 317-0354-COM |
+|*| 20030521 | Virtua Cop 3 (Rev B)                               | Sega                     | GDROM  | GDX-0003B  | 317-0354-COM |
+| | 2003     | OutRun 2                                           | Sega                     | GDROM  | GDX-0004   | 317-0372-COM |
+|*| 200312   | OutRun 2 (Rev A)                                   | Sega                     | GDROM  | GDX-0004A  | 317-0372-COM |
+| | 200312   | OutRun 2 (Rev A)                                   | Sega                     | CF     | MDA-G0011  | 317-0372-COM |
+| | 2003     | OutRun 2 prototype (Rev P)                         | Sega                     | GDROM  | GDX-0004P  |              |
+| | 2004     | Sega Golf Club Network Pro Tour                    | Sega                     | GDROM  | GDX-0005   |              |
+| | 2004     | Sega Network Taisen Mahjong MJ 2                   | Sega                     | GDROM  | GDX-0006   | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev A)           | Sega                     | GDROM  | GDX-0006A  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev B)           | Sega                     | GDROM  | GDX-0006B  | 317-0374-JPN |
+|*| 200412   | Sega Network Taisen Mahjong MJ 2 (Rev C)           | Sega                     | GDROM  | GDX-0006C  | 317-0374-JPN |
+| | 2004     | Sega Network Taisen Mahjong MJ 2 (Rev D)           | Sega                     | GDROM  | GDX-0006D  | 317-0374-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 2 (Rev E)           | Sega                     | GDROM  | GDX-0006E  | 317-0374-JPN |
+|*| 200502   | Sega Network Taisen Mahjong MJ 2 (Rev F)           | Sega                     | GDROM  | GDX-0006F  | 317-0374-JPN |
+|*| 20050202 | Sega Network Taisen Mahjong MJ 2 (Rev G)           | Sega                     | GDROM  | GDX-0006G  | 317-0374-JPN |
+|*| 200403   | Ollie King                                         | Sega / Amusement Vision  | GDROM  | GDX-0007   | 317-0377-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Japan)               | Namco                    | GDROM  | GDX-0008   | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Japan) (Rev A)       | Namco                    | GDROM  | GDX-0008A  | 317-5101-JPN |
+|*| 2004     | Wangan Midnight Maximum Tune (Japan) (Rev B)       | Namco                    | GDROM  | GDX-0008B  | 317-5101-JPN |
+| | 2004     | Wangan Midnight Maximum Tune (Export)              | Namco                    | GDROM  | GDX-0009   | 317-5101-COM |
+| | 2004     | Wangan Midnight Maximum Tune (Export) (Rev A)      | Namco                    | GDROM  | GDX-0009A  | 317-5101-COM |
+|*| 2004     | Wangan Midnight Maximum Tune (Export) (Rev B)      | Namco                    | GDROM  | GDX-0009B  | 317-5101-COM |
+| | 2004     | OutRun 2 Special Tours (Japan)                     | Sega                     | GDROM  | GDX-0011   | 317-0396-COM |
+|*| 20041229 | OutRun 2 Special Tours (Japan) (Rev A)             | Sega                     | GDROM  | GDX-0011A  | 317-0396-COM |
+|*| 2004     | Ghost Squad                                        | Sega                     | GDROM  | GDX-0012   | 317-0398-COM |
+|*| 20041209 | Ghost Squad (Rev A)                                | Sega                     | GDROM  | GDX-0012A  | 317-0398-COM |
+| | 20041209 | Ghost Squad (Rev A)                                | Sega                     | CF     | MDA-G0013  | 317-0398-COM |
+|*| 2005     | Gundam Battle Operating Simulator                  | Banpresto                | GDROM  | GDX-0013   | 317-0400-JPN |
+| | 2004     | OutRun 2 Special Tours                             | Sega                     | GDROM  | GDX-0014   | 317-0396-COM |
+|*| 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | GDROM  | GDX-0014A  | 317-0396-COM |
+| | 2004     | OutRun 2 Special Tours (Rev A)                     | Sega                     | CF     | MDA-G0012  | 317-0396-COM |
+|*| 200504   | Wangan Midnight Maximum Tune 2 (Japan)             | Namco                    | GDROM  | GDX-0015   | 317-5106-JPN |
+|*| 20050908 | Wangan Midnight Maximum Tune 2 (Japan) (Rev A)     | Namco                    | GDROM  | GDX-0015A  | 317-5106-JPN |
+| | 2005     | Wangan Midnight Maximum Tune 2 (Export)            | Namco                    | GDROM  | GDX-0016   | 317-5106-COM |
+|*| 2005     | Wangan Midnight Maximum Tune 2 (Export) (Rev A)    | Namco                    | GDROM  | GDX-0016A  | 317-5106-COM |
+| | 2005     | Sega Network Taisen Mahjong MJ 3                   | Sega                     | GDROM  | GDX-0017   | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev A)           | Sega                     | GDROM  | GDX-0017A  | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev B)           | Sega                     | GDROM  | GDX-0017B  | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev C)           | Sega                     | GDROM  | GDX-0017C  | 317-0414-JPN |
+|*| 2005     | Sega Network Taisen Mahjong MJ 3 (Rev D)           | Sega                     | GDROM  | GDX-0017D  | 317-0414-JPN |
+| | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
+|*| 2005     | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
+| | 2005     | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
+|*| 2005     | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  | ?            |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
+| | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
+|*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | ?            |
+| | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
+|*| 2009     | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
+|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
+|*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
+|*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
+|*| 2005     | Sangokushi Taisen                                  | Sega                     | DVDROM | CDV-10022  |              |
+|*| 2006     | Sangokushi Taisen 2 Firmware Update                | Sega                     | DVDROM | CDV-10023  |              |
+|*| 2006     | Mobile Suit Gundam 0079 Card Builder Ver.2.02      | Banpresto                | DVDROM | CDV-10024B | 317-0415-JPN |
+|*| 2006     | Sangokushi Taisen 2                                | Sega                     | DVDROM | CDV-10029  |              |
+|*| 2007     | Mobile Suit Gundam 0083 Card Builder               | Banpresto                | DVDROM | CDV-10030  | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3                                | Sega                     | DVDROM | CDV-10036  |              |
+|*| 2008     | Sangokushi Taisen 3 Ver.J                          | Sega                     | DVDROM | CDV-10036J |              |
+|*| 2008     | Mobile Suit Gundam 0083 Card Builder Ver.2.10      | Bandai Namco - Banpresto | DVDROM | CDV-10037B | 317-0484-JPN |
+|*| 2008     | Sangokushi Taisen 3 War Begins Ver.3.59            | Sega                     | DVDROM | CDV-10041  |              |
+|*| 2008     | Sangokushi Taisen 3 War Begins                     | Sega                     | DVDROM | CDV-10042  |              |
++-+----------+----------------------------------------------------+--------------------------+--------+------------+--------------+
 * denotes these games are archived.
 
    Year   Game (Unknown media)                                Manufacturer
@@ -234,11 +244,11 @@ Sticker: 837-14280-92
 Notes:
       (* these parts on other side of the PCB)
       RV5C386A  - I2C Bus Serial Interface Real-Time Clock IC with Voltage Monitoring Function (SSOP10)
-      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8)
-      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8)
-      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32)
-      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80)
-      AN2131SC  /                                                             (QFP44)
+      24LC64    - Microchip 24LC64 64K I2C Serial EEPROM (SOIC8) contains firmware for AN2131 chips
+      24LC024   - Microchip 24LC024 2K I2C Serial EEPROM (SOIC8) contain system/game configuration data
+      M68AF127B - ST Microelectronics 1Mbit (128K x8), 5V Asynchronous SRAM (SOP32) work ram for AN2131QC
+      AN2131QC  - Cypress AN2131 EZ-USB-Family 8051-based High-Speed USB IC's (QFP80) firmware in IC10
+      AN2131SC  /                                                             (QFP44) firmware in IC32
       ADM3222   - Analog Devices ADM3222 High-Speed, +3.3V, 2-Channel RS232/V.28 Interface Device (SOIC20)
       SN65240   - Texas Instruments SN65240 USB Port Transient Suppressor (SOIC8)
       BA7623    - Rohm BA7623 75-Ohm driver IC with 3 internal circuits (SOIC8)
@@ -246,11 +256,11 @@ Notes:
       DS485     - National DS485 Low-Power RS-485/RS-422 Multipoint Transceiver (SOIC8)
       3771      - Fujitsu MB3771 System Reset IC (SOIC8)
       PC410     - Sharp PC410 Ultra-high Speed Response OPIC Photocoupler
-      CN1       - 22-pin multi-wire cable connector joining to XBox board
+      CN1       - 22-pin multi-wire cable connector joining to XBox board (JST B22B-PHTSS)
       CN5       - USB connector joining to JVS I/O board with standard USB cable
       CN8       - A/V input connector (from XBox board via short A/V cable)
       CN9       - VGA output connector
-      CN10      - 14 pin connector (purpose unknown but appears to be unused)
+      CN10      - 14 pin connector (purpose unknown, maybe another video connector)
       CN11      - 16-pin flat cable connector joining to LPC connector on XBox board
       CN12      - 40-pin IDE flat cable connector joining to IDE connector on XBox board
       CN14S     - 7-pin power output connector joining to XBox board
@@ -335,8 +345,8 @@ Notes:
       CN1   - 8-pin JVS power input connector
       CN2   - 6-pin JVS power input connector
       CN3   - Red/white RCA unamplified stereo audio output jacks
-      CN4   - 11-pin connector
-      CN5   - 8-pin connector
+      CN4   - 11-pin connector, has signals for 2 usb ports connected to the xbox board
+      CN5   - 8-pin connector, has signals for 2 rs232 ports
       CN6   - 7-pin connector
       SW1/2 - test/service buttons
       DIN1  - 96-pin connector joining to Base Board
@@ -363,6 +373,8 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 */
 
+#include <functional>
+
 #include "emu.h"
 #include "cpu/i386/i386.h"
 #include "machine/pic8259.h"
@@ -372,12 +384,150 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "video/poly.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcpu.h"
-#include "includes/chihiro.h"
+#include "debugger.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
+#include "includes/xbox_usb.h"
+#include "machine/jvshost.h"
+#include "machine/jvs13551.h"
 
 #define LOG_PCI
 //#define LOG_BASEBOARD
+//#define VERBOSE_MSG
+
+/////////////////////////
+extern const device_type JVS_MASTER;
+
+class jvs_master : public jvs_host
+{
+public:
+	//friend class mie_device;
+
+	// construction/destruction
+	jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	int get_sense_line();
+	void send_packet(int destination, int length, uint8_t *data);
+	int received_packet(uint8_t *buffer);
+};
+
+const device_type JVS_MASTER = &device_creator<jvs_master>;
+
+jvs_master::jvs_master(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: jvs_host(mconfig, JVS_MASTER, "JVS MASTER", tag, owner, clock, "jvs_master", __FILE__)
+{
+}
+
+int jvs_master::get_sense_line()
+{
+	if (get_presence_line() == false)
+		return 50;
+	if (get_address_set_line() == true)
+		return 0;
+	return 25;
+}
+
+void jvs_master::send_packet(int destination, int length, uint8_t *data)
+{
+	push((uint8_t)destination);
+	push((uint8_t)length);
+	length--;
+	while (length > 0)
+	{
+		push(*data);
+		data++;
+		length--;
+	}
+	commit_raw();
+}
+
+int jvs_master::received_packet(uint8_t *buffer)
+{
+	uint32_t length;
+	const uint8_t *data;
+
+	get_raw_reply(data, length);
+	if (length > 0)
+		memcpy(buffer, data, length);
+	return (int)length;
+}
+
+/////////////////////////
+
+extern const device_type OHCI_HLEAN2131QC;
+
+class ohci_hlean2131qc_device : public device_t, public ohci_function_device
+{
+public:
+	ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
+	void set_region_base(uint8_t *data);
+
+protected:
+	virtual void device_start() override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc04;
+	static const USBStandardEndpointDescriptor enddesc05;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const USBStandardEndpointDescriptor enddesc84;
+	static const USBStandardEndpointDescriptor enddesc85;
+	static const uint8_t strdesc0[];
+	static const uint8_t strdesc1[];
+	static const uint8_t strdesc2[];
+	int maximum_send;
+	uint8_t *region;
+	struct
+	{
+		uint8_t buffer_in[32768];
+		int buffer_in_expected;
+		uint8_t buffer_out[32768];
+		int buffer_out_used;
+		int buffer_out_packets;
+		jvs_master *master;
+	} jvs;
+};
+
+const device_type OHCI_HLEAN2131QC = &device_creator<ohci_hlean2131qc_device>;
+
+extern const device_type OHCI_HLEAN2131SC;
+
+class ohci_hlean2131sc_device : public device_t, public ohci_function_device
+{
+public:
+	ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	void initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager) override;
+	int handle_nonstandard_request(int endpoint, USBSetupPacket *setup) override;
+	int handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size) override;
+	void set_region_base(uint8_t *data);
+
+protected:
+	virtual void device_start() override;
+private:
+	static const USBStandardDeviceDescriptor devdesc;
+	static const USBStandardConfigurationDescriptor condesc;
+	static const USBStandardInterfaceDescriptor intdesc;
+	static const USBStandardEndpointDescriptor enddesc01;
+	static const USBStandardEndpointDescriptor enddesc02;
+	static const USBStandardEndpointDescriptor enddesc03;
+	static const USBStandardEndpointDescriptor enddesc81;
+	static const USBStandardEndpointDescriptor enddesc82;
+	static const USBStandardEndpointDescriptor enddesc83;
+	static const uint8_t strdesc0[];
+	static const uint8_t strdesc1[];
+	static const uint8_t strdesc2[];
+	uint8_t *region;
+};
+
+const device_type OHCI_HLEAN2131SC = &device_creator<ohci_hlean2131sc_device>;
 
 class chihiro_state : public xbox_base_state
 {
@@ -393,10 +543,10 @@ public:
 	DECLARE_WRITE32_MEMBER(mediaboard_w);
 
 	virtual void machine_start() override;
-	void baseboard_ide_event(int type, UINT8 *read, UINT8 *write);
-	UINT8 *baseboard_ide_dimmboard(UINT32 lba);
-	void dword_write_le(UINT8 *addr, UINT32 d);
-	void word_write_le(UINT8 *addr, UINT16 d);
+	void baseboard_ide_event(int type, uint8_t *read, uint8_t *write);
+	uint8_t *baseboard_ide_dimmboard(uint32_t lba);
+	void dword_write_le(uint8_t *addr, uint32_t d);
+	void word_write_le(uint8_t *addr, uint16_t d);
 	virtual void hack_eeprom() override;
 	virtual void hack_usb() override;
 
@@ -406,8 +556,14 @@ public:
 	} chihiro_devs;
 	int usbhack_index;
 	int usbhack_counter;
-	UINT8 *dimm_board_memory;
-	UINT32 dimm_board_memory_size;
+	uint8_t *dimm_board_memory;
+	uint32_t dimm_board_memory_size;
+
+private:
+	void jamtable_disasm(address_space &space, uint32_t address, uint32_t size);
+	void jamtable_disasm_command(int ref, int params, const char **param);
+	void chihiro_help_command(int ref, int params, const char **param);
+	void debug_commands(int ref, int params, const char **param);
 };
 
 /* jamtable instructions for Chihiro (different from Xbox console)
@@ -426,29 +582,30 @@ St.     Instr.       Comment
 */
 
 /* jamtable disassembler */
-static void jamtable_disasm(running_machine &machine, address_space &space, UINT32 address, UINT32 size) // 0xff000080 == fff00080
+void chihiro_state::jamtable_disasm(address_space &space, uint32_t address, uint32_t size) // 0xff000080 == fff00080
 {
-	offs_t base, addr;
-	UINT32 opcode, op1, op2;
-	char sop1[16];
-	char sop2[16];
-	char pcrel[16];
-
-	addr = (offs_t)address;
-	if (!debug_cpu_translate(space, TRANSLATE_READ_DEBUG, &addr))
+	debugger_cpu &cpu = machine().debugger().cpu();
+	debugger_console &con = machine().debugger().console();
+	offs_t addr = (offs_t)address;
+	if (!space.device().memory().translate(space.spacenum(), TRANSLATE_READ_DEBUG, addr))
 	{
-		debug_console_printf(machine, "Address is unmapped.\n");
+		con.printf("Address is unmapped.\n");
 		return;
 	}
 	while (1)
 	{
-		base = addr;
-		opcode = space.read_byte(addr);
+		offs_t base = addr;
+
+		uint32_t opcode = cpu.read_byte(space, address, true);
 		addr++;
-		op1 = space.read_dword_unaligned(addr);
+		uint32_t op1 = cpu.read_dword(space, address, true);
 		addr += 4;
-		op2 = space.read_dword_unaligned(addr);
+		uint32_t op2 = cpu.read_dword(space, address, true);
 		addr += 4;
+
+		char sop1[16];
+		char sop2[16];
+		char pcrel[16];
 		if (opcode == 0xe1)
 		{
 			opcode = op2 & 255;
@@ -464,7 +621,7 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 			sprintf(sop1, "%08X", op1);
 			sprintf(pcrel, "%08X", base + 9 + op1);
 		}
-		debug_console_printf(machine, "%08X ", base);
+		con.printf("%08X ", base);
 		// dl=instr ebx=par1 eax=par2
 		switch (opcode)
 		{
@@ -479,39 +636,39 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 			// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
 			// +-+----------+------------+---------------+-----------------+-----------------+-+-+
 			// 31 - Enable bit
-			debug_console_printf(machine, "POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
+			con.printf("POKEPCI PCICONF[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x02:
-			debug_console_printf(machine, "OUTB    PORT[%s]=%s\n", sop2, sop1);
+			con.printf("OUTB    PORT[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x03:
-			debug_console_printf(machine, "POKE    MEM[%s]=%s\n", sop2, sop1);
+			con.printf("POKE    MEM[%s]=%s\n", sop2, sop1);
 			break;
 		case 0x04:
-			debug_console_printf(machine, "BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
+			con.printf("BNE     IF ACC != %s THEN PC=%s\n", sop2, pcrel);
 			break;
 		case 0x05:
 			// out cf8,op2
 			// in acc,cfc
-			debug_console_printf(machine, "PEEKPCI ACC=PCICONF[%s]\n", sop2);
+			con.printf("PEEKPCI ACC=PCICONF[%s]\n", sop2);
 			break;
 		case 0x06:
-			debug_console_printf(machine, "AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
+			con.printf("AND/OR  ACC=(ACC & %s) | %s\n", sop2, sop1);
 			break;
 		case 0x07:
-			debug_console_printf(machine, "BRA     PC=%s\n", pcrel);
+			con.printf("BRA     PC=%s\n", pcrel);
 			break;
 		case 0x08:
-			debug_console_printf(machine, "INB     ACC=PORT[%s]\n", sop2);
+			con.printf("INB     ACC=PORT[%s]\n", sop2);
 			break;
 		case 0x09:
-			debug_console_printf(machine, "PEEK    ACC=MEM[%s]\n", sop2);
+			con.printf("PEEK    ACC=MEM[%s]\n", sop2);
 			break;
 		case 0xee:
-			debug_console_printf(machine, "END\n");
+			con.printf("END\n");
 			break;
 		default:
-			debug_console_printf(machine, "NOP     ????\n");
+			con.printf("NOP     ????\n");
 			break;
 		}
 		if (opcode == 0xee)
@@ -522,61 +679,69 @@ static void jamtable_disasm(running_machine &machine, address_space &space, UINT
 	}
 }
 
-static void jamtable_disasm_command(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::jamtable_disasm_command(int ref, int params, const char **param)
 {
-	chihiro_state *state = machine.driver_data<chihiro_state>();
-	address_space &space = state->m_maincpu->space();
-	UINT64  addr, size;
+	address_space &space = m_maincpu->space();
+	uint64_t  addr, size;
 
 	if (params < 2)
 		return;
-	if (!debug_command_parameter_number(machine, param[0], &addr))
+	if (!machine().debugger().commands().validate_number_parameter(param[0], &addr))
 		return;
-	if (!debug_command_parameter_number(machine, param[1], &size))
+	if (!machine().debugger().commands().validate_number_parameter(param[1], &size))
 		return;
-	jamtable_disasm(machine, space, (UINT32)addr, (UINT32)size);
+	jamtable_disasm(space, (uint32_t)addr, (uint32_t)size);
 }
 
-static void help_command(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::chihiro_help_command(int ref, int params, const char **param)
 {
-	debug_console_printf(machine, "Available Chihiro commands:\n");
-	debug_console_printf(machine, "  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
-	debug_console_printf(machine, "  chihiro help -- this list\n");
+	debugger_console &con = machine().debugger().console();
+
+	con.printf("Available Chihiro commands:\n");
+	con.printf("  chihiro jamdis,<start>,<size> -- Disassemble <size> bytes of JamTable instructions starting at <start>\n");
+	con.printf("  chihiro help -- this list\n");
 }
 
-static void chihiro_debug_commands(running_machine &machine, int ref, int params, const char **param)
+void chihiro_state::debug_commands(int ref, int params, const char **param)
 {
 	if (params < 1)
 		return;
 	if (strcmp("jamdis", param[0]) == 0)
-		jamtable_disasm_command(machine, ref, params - 1, param + 1);
+		jamtable_disasm_command(ref, params - 1, param + 1);
 	else
-		help_command(machine, ref, params - 1, param + 1);
+		chihiro_help_command(ref, params - 1, param + 1);
 }
 
 void chihiro_state::hack_eeprom()
 {
 	// 8003b744,3b744=0x90 0x90
-	m_maincpu->space(0).write_byte(0x3b744, 0x90);
-	m_maincpu->space(0).write_byte(0x3b745, 0x90);
-	m_maincpu->space(0).write_byte(0x3b766, 0xc9);
-	m_maincpu->space(0).write_byte(0x3b767, 0xc3);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b744, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b745, 0x90);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b766, 0xc9);
+	m_maincpu->space(AS_PROGRAM).write_byte(0x3b767, 0xc3);
 }
 
-static const struct {
+#define HACK_ITEMS 5
+static const struct
+{
 	const char *game_name;
+	const bool disable_usb;
 	struct {
-		UINT32 address;
-		UINT8 write_byte;
+		uint32_t address;
+		uint8_t write_byte;
 	} modify[16];
-} hacks[2] = { { "chihiro", { { 0x6a79f, 0x01 }, { 0x6a7a0, 0x00 }, { 0x6b575, 0x00 }, { 0x6b576, 0x00 }, { 0x6b5af, 0x75 }, { 0x6b78a, 0x75 }, { 0x6b7ca, 0x00 }, { 0x6b7b8, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e, 0x74 }, { 0x79b80, 0x74 }, { 0x79b97, 0x74 }, { 0, 0 } } },
-				{ "outr2", { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } } };
+} hacks[HACK_ITEMS] = { { "chihiro",  false, { { 0x6a79f/*3f79f*/, 0x01 }, { 0x6a7a0/*3f7a0*/, 0x00 }, { 0x6b575/*40575*/, 0x00 }, { 0x6b576/*40576*/, 0x00 }, { 0x6b5af/*405af*/, 0x75 }, { 0x6b78a/*4078a*/, 0x75 }, { 0x6b7ca/*407ca*/, 0x00 }, { 0x6b7b8/*407b8*/, 0x00 }, { 0x8f5b2, 0x75 }, { 0x79a9e/*2ea9e*/, 0x74 }, { 0x79b80/*2eb80*/, 0xeb }, { 0x79b97/*2eb97*/, 0x74 }, { 0, 0 } } },
+						{ "outr2",    true,  { { 0x12e4cf, 0x01 }, { 0x12e4d0, 0x00 }, { 0x4793e, 0x01 }, { 0x4793f, 0x00 }, { 0x47aa3, 0x01 }, { 0x47aa4, 0x00 }, { 0x14f2b6, 0x84 }, { 0x14f2d1, 0x75 }, { 0x8732f, 0x7d }, { 0x87384, 0x7d }, { 0x87388, 0xeb }, { 0, 0 } } },
+						{ "crtaxihr", false, { { 0x14ada5/*11fda5*/, 0x90 },{ 0x14ada6/*11fda6*/, 0x90 }, { 0, 0 } } },
+						{ "ghostsqu", false, { { 0x78833/*4d833*/, 0x90 },{ 0x78834/*4d834*/, 0x90 }, { 0, 0 } } },
+						{ "vcop3",    false, { { 0x61a23/*36a23*/, 0x90 },{ 0x61a24/*36a24*/, 0x90 }, { 0, 0 } } },
+};
 
 void chihiro_state::hack_usb()
 {
 	int p;
 
-	if (usbhack_counter == 0)
+	if ((usbhack_counter == 0) && (usb_hack_enabled))
 		p = 0;
 	else if (usbhack_counter == 1) // after game loaded
 		p = usbhack_index;
@@ -592,23 +757,528 @@ void chihiro_state::hack_usb()
 	usbhack_counter++;
 }
 
+//**************************************************************************
+//  BASE BOARD USB
+//**************************************************************************
+
+//ic10
+const USBStandardDeviceDescriptor ohci_hlean2131qc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x00,0x00,0x40,0x0CA3,0x0002,0x0108,0x01,0x02,0x00,0x01 };  // class 0x60 subclass 0x00
+const USBStandardConfigurationDescriptor ohci_hlean2131qc_device::condesc = { 0x09,0x02,0x0058,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131qc_device::intdesc = { 0x09,0x04,0x00,0x00,0x0A,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc04 = { 0x07,0x05,0x04,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc05 = { 0x07,0x05,0x05,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc84 = { 0x07,0x05,0x84,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131qc_device::enddesc85 = { 0x07,0x05,0x85,0x02,0x0040,0x00 };
+const uint8_t ohci_hlean2131qc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const uint8_t ohci_hlean2131qc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const uint8_t ohci_hlean2131qc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x03,0xFF,0x0B };
+
+ohci_hlean2131qc_device::ohci_hlean2131qc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OHCI_HLEAN2131QC, "OHCI Hlean2131qc", tag, owner, clock, "ohci_hlean2131qc", __FILE__),
+	ohci_function_device()
+{
+	maximum_send = 0;
+	region = nullptr;
+	jvs.buffer_in_expected = 0;
+	jvs.buffer_out_used = 0;
+	jvs.buffer_out_packets = 0;
+	jvs.master = nullptr;
+}
+
+void ohci_hlean2131qc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+{
+	ohci_function_device::initialize(machine, usb_bus_manager);
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	// it is important to add the endpoints in the same order they are found in the device firmware
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc04);
+	add_endpoint_descriptor(enddesc05);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_endpoint_descriptor(enddesc84);
+	add_endpoint_descriptor(enddesc85);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+	jvs.master = machine.device<jvs_master>("jvs_master");
+}
+
+void ohci_hlean2131qc_device::set_region_base(uint8_t *data)
+{
+	region = data;
+}
+
+int ohci_hlean2131qc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+	int sense;
+
+#ifdef VERBOSE_MSG
+	printf("Control request to an2131qc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+#endif
+	if (endpoint != 0)
+		return -1;
+	// default valuse for data stage
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0x50 ^ n;
+	sense = jvs.master->get_sense_line();
+	if (sense == 25)
+		sense = 3;
+	else
+		sense = 0; // need to check
+	// PINSA register, bits 0-2 connected do dip switches 1-3 on filter board, bit 4 to dip switch 4, bit 5 to dip switch 5, bits 6-7 to buttons 1-2 on filter board
+	// bits 4-1 value must be 10 xor 15, and bit 3 is ignored since its used as the CS pin of the chip
+	endpoints[endpoint].buffer[1] = 0x4b;
+	// PINSB register, bits 5-7 connected to 3 leds not mounted on pcb, bit 4 connected to re/de pins of max485, bits 2-3 used as uart pins, bit 0-1 give the status of the sense pin of the jvs connector
+	// if bits 0-1 are 11, the not all the connected jvs devices have been assigned an address yet
+	endpoints[endpoint].buffer[2] = 0x52 | sense;
+	// OUTB register
+	endpoints[endpoint].buffer[3] = 0x53;
+	// bRequest is a command value
+	if (setup->bRequest == 0x16)
+	{
+		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 1 (IN)
+		endpoints[1].remain = setup->wIndex & 255;
+		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x17)
+	{
+		// this command is used to read data from the second i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 2 (IN)
+		endpoints[2].remain = setup->wIndex & 255;
+		endpoints[2].position = region + 0x2000 + setup->wValue;
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x18)
+	{
+		// this command is used to read data from external memory (with respect to the internal 8051 cpu)
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 3 (IN)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x19)
+	{
+		// this command is used to retreive the jvs packets that have been received in response to the ones of 0x20
+		// data for the packets will be transferred to the host using endpoint 4 (IN)
+		// the nuber of bytes to transfer is returned at bytes 4 and 5 in the data stage of this control transfer
+		// data transferred starts with a byte with value 0, then a byte with value the number of packets received, then a block of bytes for each packet
+		// the bytes for a packet start with the jvs node address of the sender, then a dummy one (must be 0), then a 16 bit number in little endian format that specifies how many bytes follow
+		// the bytes that follow contain the body of the packet as received from the jvs bus, from the 0xa0 byte to the checksum
+		endpoints[endpoint].buffer[0] = 0; // 0 if not busy
+		endpoints[endpoint].buffer[5] = jvs.buffer_out_used >> 8; // amount to transfer with endpoint 4
+		endpoints[endpoint].buffer[4] = (jvs.buffer_out_used & 0xff);
+		// the data to be sent is prepared in command 0x20
+		endpoints[4].remain = jvs.buffer_out_used;
+		endpoints[4].position = jvs.buffer_out;
+		jvs.buffer_out_used = 0;
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1c)
+	{
+		// this command is used to read from the RV5C386A chip
+		// setup->wValue = what to read
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 5 (IN)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1d)
+	{
+		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// no more than 32 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 1 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1e)
+	{
+		// this command is used to write data to the second i2c serial eeprom connected to the chip
+		// no more than 8 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 2 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1f)
+	{
+		// this command is used to write data to external memory (with respect to the internal 8051 cpu)
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 3 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x20)
+	{
+		// this command is used to send a set of jvs packets, each to a different node
+		// for each packet sent, the respective answer will be stored, and can be retrieved with 0x19
+		// setup->wIndex = number of bytes to be sent by the host
+		// data for the packets will be transferred from the host using endpoint 4 (OUT)
+		// data sent by the host contains first a byte with value 0 that is ignored, then a byte specifying the number of packets that follow, then the data for each packet
+		// the data for each packet contains first a byte with value 0, then the sync byte (0xe0) then all the other bytes of the packet ending with the checksum byte
+		// broadcast packets must have a destination node address of value 0xff
+#ifdef VERBOSE_MSG
+		printf(" Jvs packets data of %d bytes\n\r", setup->wIndex);
+#endif
+		endpoints[endpoint].buffer[0] = 0;
+		if (jvs.buffer_out_used == 0)
+		{
+			jvs.buffer_out_packets = 0;
+			jvs.buffer_out[0] = 0;
+			jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
+			jvs.buffer_out_used = 2;
+		}
+		jvs.buffer_in_expected = setup->wIndex;
+		endpoints[4].remain = jvs.buffer_in_expected;
+		endpoints[4].position = jvs.buffer_in;
+	}
+	else if (setup->bRequest == 0x24)
+	{
+		// this command is used to write to the RV5C386A chip
+		// no more than 0x20 bytes can be written
+		// setup->wValue = what to read
+		// data will be transferred from the host using endpoint 5 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x30)
+	{
+		// this command first disables external interrupt 0 if the lower 8 bits of setup->wValue are 0
+		// or enables it if those bits, seen as a signed 8 bit value, represent a number greater than 0
+		// then it will return in byte 4 of the data stage the value 0 if external interrupt 0 has been disabled or value 1 if it has been enabled
+		// and in byte 5 the value of an 8 bit counter that is incremented at every external interrupt 0
+		endpoints[endpoint].buffer[0] = 0;
+		if ((setup->wValue & 255) == 0)
+			endpoints[endpoint].buffer[4] = 0;
+		else if ((setup->wValue & 255) < 128)
+			endpoints[endpoint].buffer[4] = 1;
+		endpoints[endpoint].buffer[5] = 0;
+	} else
+		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
+
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
+}
+
+int ohci_hlean2131qc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
+{
+#ifdef VERBOSE_MSG
+	printf("Bulk request to an2131qc: %x %d %x\n\r", endpoint, pid, size);
+#endif
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
+	{
+		if (size > endpoints[endpoint].remain)
+			size = endpoints[endpoint].remain;
+		memcpy(buffer, endpoints[endpoint].position, size);
+		endpoints[endpoint].position = endpoints[endpoint].position + size;
+		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+	}
+	if ((endpoint == 4) && (pid == InPid))
+	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
+		memcpy(buffer, endpoints[4].position, size);
+		endpoints[4].position = endpoints[4].position + size;
+		endpoints[4].remain = endpoints[4].remain - size;
+	}
+	if ((endpoint == 4) && (pid == OutPid))
+	{
+		if (size > endpoints[4].remain)
+			size = endpoints[4].remain;
+#ifdef VERBOSE_MSG
+		for (int n = 0; n < size; n++)
+			printf(" %02x", buffer[n]);
+#endif
+		if (size > 0) {
+			memcpy(endpoints[4].position, buffer, size);
+			endpoints[4].position = endpoints[4].position + size;
+			endpoints[4].remain = endpoints[4].remain - size;
+			if (endpoints[4].remain == 0)
+			{
+#ifdef VERBOSE_MSG
+				printf("\n\r");
+#endif
+				// extract packets
+				int numpk = jvs.buffer_in[1];
+				int p = 2;
+
+				for (int n = 0;n < numpk;n++)
+				{
+					p++;
+					if (jvs.buffer_in[p] != 0xe0)
+						break;
+					p++;
+					int dest = jvs.buffer_in[p];
+					p++;
+					int len = jvs.buffer_in[p];
+					p++;
+					if ((p + len) > jvs.buffer_in_expected)
+						break;
+					int chk = dest + len;
+					for (int m = len - 1; m > 0; m--)
+						chk = chk + (int)jvs.buffer_in[p + m - 1];
+					chk = chk & 255;
+					if (chk != (int)jvs.buffer_in[p + len - 1])
+					{
+						p = p + len;
+						continue;
+					}
+					// use data of this packet
+					jvs.master->send_packet(dest, len, jvs.buffer_in + p);
+					// generate response
+					if (dest == 0xff)
+						dest = 0;
+					int recv = jvs.master->received_packet(jvs.buffer_out + jvs.buffer_out_used + 5);
+					// update buffer_out
+					if (recv > 0)
+					{
+						chk = 0;
+						for (int m = 0; m < recv; m++)
+							chk = chk + jvs.buffer_out[jvs.buffer_out_used + 5 + m];
+						jvs.buffer_out[jvs.buffer_out_used + 5 + recv] = chk & 255;
+						jvs.buffer_out_packets++;
+						// jvs node address
+						jvs.buffer_out[jvs.buffer_out_used] = (uint8_t)dest;
+						// dummy
+						jvs.buffer_out[jvs.buffer_out_used + 1] = 0;
+						// length following
+						recv += 2;
+						jvs.buffer_out[jvs.buffer_out_used + 2] = recv & 255;
+						jvs.buffer_out[jvs.buffer_out_used + 3] = (recv >> 8) & 255;
+						// body
+						jvs.buffer_out[jvs.buffer_out_used + 4] = 0xe0;
+						jvs.buffer_out_used = jvs.buffer_out_used + recv + 5 - 1;
+						jvs.buffer_out[1] = (uint8_t)jvs.buffer_out_packets;
+					}
+					p = p + len;
+				}
+			}
+		}
+	}
+	return size;
+}
+
+void ohci_hlean2131qc_device::device_start()
+{
+}
+
+//pc20
+const USBStandardDeviceDescriptor ohci_hlean2131sc_device::devdesc = { 0x12,0x01,0x0100,0x60,0x01,0x00,0x40,0x0CA3,0x0003,0x0110,0x01,0x02,0x00,0x01 }; // class 0x60 subclass 0x01
+const USBStandardConfigurationDescriptor ohci_hlean2131sc_device::condesc = { 0x09,0x02,0x003C,0x01,0x01,0x00,0x80,0x96 };
+const USBStandardInterfaceDescriptor ohci_hlean2131sc_device::intdesc = { 0x09,0x04,0x00,0x00,0x06,0xFF,0x00,0x00,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc01 = { 0x07,0x05,0x01,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc02 = { 0x07,0x05,0x02,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc03 = { 0x07,0x05,0x03,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc81 = { 0x07,0x05,0x81,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc82 = { 0x07,0x05,0x82,0x02,0x0040,0x00 };
+const USBStandardEndpointDescriptor ohci_hlean2131sc_device::enddesc83 = { 0x07,0x05,0x83,0x02,0x0040,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc0[] = { 0x04,0x03,0x00,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc1[] = { 0x0A,0x03,0x53,0x00,0x45,0x00,0x47,0x00,0x41,0x00 };
+const uint8_t ohci_hlean2131sc_device::strdesc2[] = { 0x0E,0x03,0x42,0x00,0x41,0x00,0x53,0x00,0x45,0x00,0x42,0x00,0x44,0x00 };
+
+ohci_hlean2131sc_device::ohci_hlean2131sc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, OHCI_HLEAN2131SC, "OHCI Hlean2131sc", tag, owner, clock, "ohci_hlean2131sc", __FILE__),
+	ohci_function_device()
+{
+	region = nullptr;
+}
+
+void ohci_hlean2131sc_device::set_region_base(uint8_t *data)
+{
+	region = data;
+}
+
+void ohci_hlean2131sc_device::initialize(running_machine &machine, ohci_usb_controller *usb_bus_manager)
+{
+	ohci_function_device::initialize(machine, usb_bus_manager);
+	add_device_descriptor(devdesc);
+	add_configuration_descriptor(condesc);
+	add_interface_descriptor(intdesc);
+	// it is important to add the endpoints in the same order they are found in the device firmware
+	add_endpoint_descriptor(enddesc01);
+	add_endpoint_descriptor(enddesc02);
+	add_endpoint_descriptor(enddesc03);
+	add_endpoint_descriptor(enddesc81);
+	add_endpoint_descriptor(enddesc82);
+	add_endpoint_descriptor(enddesc83);
+	add_string_descriptor(strdesc0);
+	add_string_descriptor(strdesc1);
+	add_string_descriptor(strdesc2);
+}
+
+int ohci_hlean2131sc_device::handle_nonstandard_request(int endpoint, USBSetupPacket *setup)
+{
+//#ifdef VERBOSE_MSG
+	printf("Control request to an2131sc: %x %x %x %x %x %x %x\n\r", endpoint, endpoints[endpoint].controldirection, setup->bmRequestType, setup->bRequest, setup->wValue, setup->wIndex, setup->wLength);
+//#endif
+	if (endpoint != 0)
+		return -1;
+	for (int n = 0; n < setup->wLength; n++)
+		endpoints[endpoint].buffer[n] = 0x50 ^ n;
+	endpoints[endpoint].buffer[1] = 0;
+	endpoints[endpoint].buffer[2] = 0x52; // PINSB
+	endpoints[endpoint].buffer[3] = 0x53; // OUTB
+	endpoints[endpoint].buffer[4] = 0;
+	endpoints[endpoint].buffer[5] = 0;
+	endpoints[endpoint].buffer[6] = 0x56; // PINSC
+	endpoints[endpoint].buffer[7] = 0x57; // OUTC
+	// bRequest is a command value
+	if (setup->bRequest == 0x16)
+	{
+		// this command is used to read data from the first i2c serial eeprom connected to the chip
+		// setup->wValue = start address to read from
+		// setup->wIndex = number of bytes to read
+		// data will be transferred to the host using endpoint 1 (IN)
+		endpoints[1].remain = setup->wIndex & 255;
+		endpoints[1].position = region + setup->wValue; // usually wValue is 0x1f00
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x17)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x1a)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x1b)
+	{
+		endpoints[endpoint].buffer[0] = 0; //
+	}
+	else if (setup->bRequest == 0x1d)
+	{
+		// this command is used to write data to the first i2c serial eeprom connected to the chip
+		// no more than 32 bytes can be written at a time
+		// setup->wValue = start address to write to
+		// setup->wIndex = number of bytes to write
+		// data will be transferred from the host using endpoint 1 (OUT)
+		endpoints[endpoint].buffer[0] = 0;
+	}
+	else if (setup->bRequest == 0x1e)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x22)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x23)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x25) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x26) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x27) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x28)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x29)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2a)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2b)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2c)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2d)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2e) //
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x2f)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x30)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	}
+	else if (setup->bRequest == 0x31)
+	{
+		endpoints[endpoint].buffer[0] = 0x99;
+	} else
+		endpoints[endpoint].buffer[0] = 0x99; // usnupported command
+
+	endpoints[endpoint].position = endpoints[endpoint].buffer;
+	endpoints[endpoint].remain = setup->wLength;
+	return 0;
+}
+
+int ohci_hlean2131sc_device::handle_bulk_pid(int endpoint, int pid, uint8_t *buffer, int size)
+{
+//#ifdef VERBOSE_MSG
+	printf("Bulk request to an2131sc: %x %d %x\n\r", endpoint, pid, size);
+//#endif
+	if (((endpoint == 1) || (endpoint == 2)) && (pid == InPid))
+	{
+		if (size > endpoints[endpoint].remain)
+			size = endpoints[endpoint].remain;
+		memcpy(buffer, endpoints[endpoint].position, size);
+		endpoints[endpoint].position = endpoints[endpoint].position + size;
+		endpoints[endpoint].remain = endpoints[endpoint].remain - size;
+	}
+	return size;
+}
+
+void ohci_hlean2131sc_device::device_start()
+{
+}
+
 // ======================> ide_baseboard_device
 
 class ide_baseboard_device : public ata_mass_storage_device
 {
 public:
 	// construction/destruction
-	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	virtual int  read_sector(UINT32 lba, void *buffer) override;
-	virtual int  write_sector(UINT32 lba, const void *buffer) override;
+	virtual int  read_sector(uint32_t lba, void *buffer) override;
+	virtual int  write_sector(uint32_t lba, const void *buffer) override;
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	UINT8 read_buffer[0x20];
-	UINT8 write_buffer[0x20];
+	uint8_t read_buffer[0x20];
+	uint8_t write_buffer[0x20];
 	chihiro_state *chihirosystem;
+	static const int size_factor = 2;
 };
 
 //**************************************************************************
@@ -622,7 +1292,7 @@ const device_type IDE_BASEBOARD = &device_creator<ide_baseboard_device>;
 //  ide_baseboard_device - constructor
 //-------------------------------------------------
 
-ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ide_baseboard_device::ide_baseboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: ata_mass_storage_device(mconfig, IDE_BASEBOARD, "IDE Baseboard", tag, owner, clock, "ide_baseboard", __FILE__)
 {
 }
@@ -658,17 +1328,19 @@ void ide_baseboard_device::device_reset()
 	ata_mass_storage_device::device_reset();
 }
 
-int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
+int ide_baseboard_device::read_sector(uint32_t lba, void *buffer)
 {
 	int off;
-	UINT8 *data;
+	uint8_t *data;
 
 	/*
 	It assumes there are 4 "partitions", the size of the first one depends on bits 3-0 of io port 40f4:
-	Value    Size lba
-	0   0x40000-0x8000
-	...
-	4   0x400000-0x8000
+	Value Size lba
+	0     0x40000-0x8000
+	1     0x80000-0x8000
+	2     0x100000-0x8000
+	3     0x200000-0x8000
+	4     0x400000-0x8000
 	The size of the second one is always 0x8000 sectors, and is used as a special communication area
 	This is a list of the partitions in the minimum size case:
 	Name          Start lba  Size lba Size
@@ -686,13 +1358,13 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	logerror("baseboard: read sector lba %08x\n", lba);
 	if (lba >= 0x08000000) {
 		off = (lba & 0x7ff) * 512;
-		data = memregion(":others")->base();
+		data = memregion(":mediaboard")->base();
 		memcpy(buffer, data + off, 512);
 		return 1;
 	}
-	if (lba >= 0xf8000) {
+	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
 		memset(buffer, 0, 512);
-		lba = lba - 0xf8000;
+		lba = lba - ((0x40000 << size_factor) - 0x8000);
 		if (lba == 0x4800)
 			memcpy(buffer, read_buffer, 0x20);
 		else if (lba == 0x4801)
@@ -706,11 +1378,11 @@ int ide_baseboard_device::read_sector(UINT32 lba, void *buffer)
 	return 1;
 }
 
-int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
+int ide_baseboard_device::write_sector(uint32_t lba, const void *buffer)
 {
 	logerror("baseboard: write sector lba %08x\n", lba);
-	if (lba >= 0xf8000) {
-		lba = lba - 0xf8000;
+	if (lba >= ((0x40000 << size_factor) - 0x8000)) {
+		lba = lba - ((0x40000 << size_factor) - 0x8000);
 		if (lba == 0x4800)
 			memcpy(read_buffer, buffer, 0x20);
 		else if (lba == 0x4801) {
@@ -726,7 +1398,7 @@ int ide_baseboard_device::write_sector(UINT32 lba, const void *buffer)
  * Chihiro Type 1 baseboard
  */
 
-void chihiro_state::dword_write_le(UINT8 *addr, UINT32 d)
+void chihiro_state::dword_write_le(uint8_t *addr, uint32_t d)
 {
 	addr[0] = d & 255;
 	addr[1] = (d >> 8) & 255;
@@ -734,13 +1406,13 @@ void chihiro_state::dword_write_le(UINT8 *addr, UINT32 d)
 	addr[3] = (d >> 24) & 255;
 }
 
-void chihiro_state::word_write_le(UINT8 *addr, UINT16 d)
+void chihiro_state::word_write_le(uint8_t *addr, uint16_t d)
 {
 	addr[0] = d & 255;
 	addr[1] = (d >> 8) & 255;
 }
 
-void chihiro_state::baseboard_ide_event(int type, UINT8 *read_buffer, UINT8 *write_buffer)
+void chihiro_state::baseboard_ide_event(int type, uint8_t *read_buffer, uint8_t *write_buffer)
 {
 	int c;
 
@@ -790,7 +1462,7 @@ void chihiro_state::baseboard_ide_event(int type, UINT8 *read_buffer, UINT8 *wri
 	xbox_base_devs.pic8259_2->ir2_w(1);
 }
 
-UINT8 *chihiro_state::baseboard_ide_dimmboard(UINT32 lba)
+uint8_t *chihiro_state::baseboard_ide_dimmboard(uint32_t lba)
 {
 	// return pointer to memory containing decrypted gdrom data (contains an image of a fatx partition)
 	if (chihiro_devs.dimmboard != nullptr)
@@ -800,22 +1472,22 @@ UINT8 *chihiro_state::baseboard_ide_dimmboard(UINT32 lba)
 
 READ32_MEMBER(chihiro_state::mediaboard_r)
 {
-	UINT32 r;
+	uint32_t r;
 
 	logerror("I/O port read %04x mask %08X\n", offset * 4 + 0x4000, mem_mask);
 	r = 0;
-	if ((offset == 7) && ACCESSING_BITS_16_31)
+	if ((offset == 0x1c/4) && ACCESSING_BITS_16_31)
 		r = 0x10000000;
-	if ((offset == 8) && ACCESSING_BITS_0_15)
+	if ((offset == 0x20/4) && ACCESSING_BITS_0_15)
 		r = 0x000000a0;
-	if ((offset == 8) && ACCESSING_BITS_16_31)
+	if ((offset == 0x20/4) && ACCESSING_BITS_16_31)
 		r = 0x42580000;
-	if ((offset == 9) && ACCESSING_BITS_0_15)
+	if ((offset == 0x24/4) && ACCESSING_BITS_0_15)
 		r = 0x00004d41;
-	if ((offset == 0x3c) && ACCESSING_BITS_0_15)
+	if ((offset == 0xf0/4) && ACCESSING_BITS_0_15)
 		r = 0x00000000; // bits 15-0 0 if media board present
-	if ((offset == 0x3d) && ACCESSING_BITS_0_15)
-		r = 0x00000002; // bits 3-0 size of dimm board memory. Must be 2
+	if ((offset == 0xf4/4) && ACCESSING_BITS_0_15)
+		r = 2; // bits 3-0 size of dimm board memory. 0=128 1=256 2=512 3=1024 Must be 2
 	return r;
 }
 
@@ -823,12 +1495,13 @@ WRITE32_MEMBER(chihiro_state::mediaboard_w)
 {
 	logerror("I/O port write %04x mask %08X value %08X\n", offset * 4 + 0x4000, mem_mask, data);
 	// irq 10
-	if ((offset == 0x38) && ACCESSING_BITS_8_15)
+	if ((offset == 0xe0/4) && ACCESSING_BITS_8_15)
 		xbox_base_devs.pic8259_2->ir2_w(0);
 }
 
 static ADDRESS_MAP_START(chihiro_map, AS_PROGRAM, 32, chihiro_state)
 	AM_IMPORT_FROM(xbox_base_map)
+	AM_RANGE(0xff000000, 0xff07ffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
@@ -837,10 +1510,69 @@ static ADDRESS_MAP_START(chihiro_map_io, AS_IO, 32, chihiro_state)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START(chihiro)
+	PORT_START("TILT")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_TILT)
+	PORT_BIT(0x7f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P1")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START1)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	PORT_START("P2")
+	PORT_BIT(0x8000, IP_ACTIVE_HIGH, IPT_START2)
+	PORT_BIT(0x2000, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x1000, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT(0x0200, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_PLAYER(2)
+	PORT_BIT(0x0100, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_PLAYER(2)
+	PORT_BIT(0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_PLAYER(2)
+	PORT_BIT(0x0040, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_PLAYER(2)
+	PORT_BIT(0x0020, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_PLAYER(2)
+	PORT_BIT(0x0010, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_PLAYER(2)
+	PORT_BIT(0x400f, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+	/* Dummy so we can easily get the analog ch # */
+	PORT_START("A0")
+	PORT_BIT(0x00ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A1")
+	PORT_BIT(0x01ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A2")
+	PORT_BIT(0x02ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A3")
+	PORT_BIT(0x03ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A4")
+	PORT_BIT(0x04ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A5")
+	PORT_BIT(0x05ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A6")
+	PORT_BIT(0x06ff, IP_ACTIVE_LOW, IPT_UNUSED)
+
+	PORT_START("A7")
+	PORT_BIT(0x07ff, IP_ACTIVE_LOW, IPT_UNUSED)
 INPUT_PORTS_END
 
 void chihiro_state::machine_start()
 {
+	ohci_hlean2131qc_device *usb_device1;
+	ohci_hlean2131sc_device *usb_device2;
+
 	xbox_base_state::machine_start();
 	chihiro_devs.ide = machine().device<bus_master_ide_controller_device>("ide");
 	chihiro_devs.dimmboard = machine().device<naomi_gdrom_board>("rom_board");
@@ -848,14 +1580,27 @@ void chihiro_state::machine_start()
 		dimm_board_memory = chihiro_devs.dimmboard->memory(dimm_board_memory_size);
 	}
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine(), "chihiro", CMDFLAG_NONE, 0, 1, 4, chihiro_debug_commands);
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("chihiro", CMDFLAG_NONE, 0, 1, 4, std::bind(&chihiro_state::debug_commands, this, _1, _2, _3));
+	}
 	usbhack_index = -1;
-	for (int a = 1; a < 2; a++)
+	for (int a = 1; a < HACK_ITEMS; a++)
 		if (strcmp(machine().basename(), hacks[a].game_name) == 0) {
 			usbhack_index = a;
+			if (hacks[a].disable_usb == true)
+				usb_hack_enabled = true;
 			break;
 		}
 	usbhack_counter = 0;
+	usb_device1 = machine().device<ohci_hlean2131qc_device>("ohci_hlean2131qc");
+	usb_device1->initialize(machine(), ohci_usb);
+	usb_device1->set_region_base(memregion(":others")->base()); // temporary
+	ohci_usb->usb_ohci_plug(1, usb_device1); // connect
+	usb_device2 = machine().device<ohci_hlean2131sc_device>("ohci_hlean2131sc");
+	usb_device2->initialize(machine(), ohci_usb);
+	usb_device2->set_region_base(memregion(":others")->base() + 0x2080); // temporary
+	ohci_usb->usb_ohci_plug(2, usb_device2); // connect
 	// savestates
 	save_item(NAME(usbhack_counter));
 }
@@ -869,15 +1614,21 @@ static MACHINE_CONFIG_DERIVED_CLASS(chihiro_base, xbox_base, chihiro_state)
 	MCFG_CPU_PROGRAM_MAP(chihiro_map)
 	MCFG_CPU_IO_MAP(chihiro_map_io)
 
-	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, NULL, "bb", true)
+	//MCFG_BUS_MASTER_IDE_CONTROLLER_ADD("ide", ide_baseboard, nullptr, "bb", true)
 	MCFG_DEVICE_MODIFY("ide:0")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, nullptr, true)
 	MCFG_DEVICE_MODIFY("ide:1")
 	MCFG_DEVICE_SLOT_INTERFACE(ide_baseboard, "bb", true)
-MACHINE_CONFIG_END
+
+	// next lines are temporary
+	MCFG_DEVICE_ADD("ohci_hlean2131qc", OHCI_HLEAN2131QC, 0)
+	MCFG_DEVICE_ADD("ohci_hlean2131sc", OHCI_HLEAN2131SC, 0)
+	MCFG_DEVICE_ADD("jvs_master", JVS_MASTER, 0)
+	MCFG_SEGA_837_13551_DEVICE_ADD("837_13551", "jvs_master", ":TILT", ":P1", ":P2", ":A0", ":A1", ":A2", ":A3", ":A4", ":A5", ":A6", ":A7", ":OUTPUT")
+	MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED(chihirogd, chihiro_base)
-	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", ":pic", nullptr, NOOP)
+	MCFG_NAOMI_GDROM_BOARD_ADD("rom_board", ":gdrom", "^pic", nullptr, NOOP)
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -887,15 +1638,16 @@ MACHINE_CONFIG_END
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x100000, "bios", 0) \
+	ROM_REGION( 0x80000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
-	ROM_REGION( 0x404080, "others", 0) \
+	ROM_REGION( 0x200000, "mediaboard", 0) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "fpr21042_m29w160et.bin", 0x000000, 0x200000, CRC(a4fcab0b) SHA1(a13cf9c5cdfe8605d82150b7573652f419b30197) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x200000, 0x2000, CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x202000, 0x80, CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x202080, 0x2000, CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin", 0x204080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
+	ROM_REGION( 0x204080, "others", 0) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic10_g24lc64.bin", 0x0000, 0x2000,   CRC(cfc5e06f) SHA1(3ababd4334d8d57abb22dd98bd2d347df39648d9) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ic11_24lc024.bin", 0x2000, 0x80,     CRC(8dc8374e) SHA1(cc03a0650bfac4bf6cb66e414bbef121cba53efe) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "pc20_g24lc64.bin", 0x2080, 0x2000,   CRC(7742ab62) SHA1(82dad6e2a75bab4a4840dc6939462f1fb9b95101) ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 0,  "ver1305.bin",      0x4080, 0x200000, CRC(a738ea1c) SHA1(45d94d0c39be1cb3db9fab6610a88a550adda4e9) )
 
 ROM_START( chihiro )
 	CHIHIRO_BIOS
@@ -985,11 +1737,21 @@ PIC
 255-5508-354
 317-0354-COM
 */
-ROM_START( vcop3 )
+ROM_START( vcop3a )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0003a", 0, SHA1(04cd12bec50a9e9f1f05e7b7c2ef396800a385dd) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
+ROM_END
+
+ROM_START( vcop3 )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0003b", 0, SHA1(4268aadb83c880d4f3dab1d43ddd0a3a2f8befa2) )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-0354-com.data", 0x00, 0x50,  CRC(df7e3217) SHA1(9f0f4bf6b15f3b6eeea81eaa27b3d25bd94110da) )
@@ -1015,7 +1777,7 @@ ROM_START( mj2c )
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
 ROM_END
 
-ROM_START( mj2 )
+ROM_START( mj2f )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
@@ -1041,12 +1803,11 @@ track01.bin           150         599     1058400
 track02.raw 750 2101    3179904
 track03.bin 45150   549299  1185760800
 */
-ROM_START( mj2g )
+ROM_START( mj2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
-	// this is not CHDv4, but a really bad dump, only ~1/3 of disk content is dumped
-	DISK_IMAGE_READONLY( "gdx-0006g", 0, BAD_DUMP SHA1(e306837d5c093fdf1e9ff02239a8563535b1c181) )
+	DISK_IMAGE_READONLY( "gdx-0006g", 0, SHA1(b8c8b440d4cd2488be78e3a002058ea5b176a1f2) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD( "317-0374-jpn.pic", 0x000000, 0x004000, CRC(004f77a1) SHA1(bc5c6950293f3bff60bf7913d20a2046aa19ea69) )
@@ -1062,6 +1823,18 @@ ROM_START( ollie )
 	ROM_LOAD("317-0377-com.data", 0x00, 0x50, CRC(d2a8b31f) SHA1(e9ee2df30031826db6bc4bd91969e6680255dcf9) )
 ROM_END
 
+ROM_START( wangmidj )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0008b", 0, SHA1(ddf8bde014fee2f0a8a320e4ce19a1729b487e48) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	//PIC16C621A (317-5101-COM)
+	//(sticker 253-5509-5101)
+	ROM_LOAD("317-5101-com.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
+ROM_END
+
 ROM_START( wangmid )
 	CHIHIRO_BIOS
 
@@ -1070,6 +1843,24 @@ ROM_START( wangmid )
 
 	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
 	ROM_LOAD("317-5101-com.data", 0x00, 0x50, CRC(3af801f3) SHA1(e9a2558930f3f1f55d5b3c2cadad69329d931f26) )
+
+	// Sanwa CRP-1231LR-10NAB card reader-printer
+	ROM_REGION( 0x20000, "card_reader", ROMREGION_ERASE)
+	// CRP1231LR10     8B16
+	// Ver. 01.10      ???
+	// 01/10/12        NA
+	// ?? : ME163-5258Z01
+	ROM_LOAD("crp1231lr10_ver0110.ic2", 0, 0x20000, CRC(0d30707c) SHA1(425e25c6203d0b400d12391916db3f7cdad00f7a) ) // H8/3003 code
+ROM_END
+
+ROM_START( outr2stj )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0011a", 0, SHA1(097c0c746f3bd2b926a7a9a03f868d99b8f77b09) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
 ROM_END
 
 ROM_START( ghostsqo )
@@ -1124,11 +1915,11 @@ ROM_START( outr2st )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdx-0014a", 0, BAD_DUMP SHA1(4f9656634c47631f63eab554a13d19b15558217e) )
 
-	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)   // number was not readable on pic, please fix if known
-	ROM_LOAD( "317-0xxx-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0396-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
 ROM_END
 
-ROM_START( wangmid2 )
+ROM_START( wangmid2j )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
@@ -1138,7 +1929,17 @@ ROM_START( wangmid2 )
 	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
 ROM_END
 
-ROM_START( wangmd2b )
+ROM_START( wangmid2ja )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdx-0015a", 0, SHA1(0c8e5170e178fcc25acd93a4c2ae79c1e4688f85) )
+
+	ROM_REGION( 0x50, "pic", ROMREGION_ERASE)
+	ROM_LOAD("317-5106-jpn.data", 0x00, 0x50, CRC(75c716aa) SHA1(5c2bcf3d28a80b336c6882d5aeb010d04327f8c1) )
+ROM_END
+
+ROM_START( wangmid2 )
 	CHIHIRO_BIOS
 
 	DISK_REGION( "gdrom" )
@@ -1217,6 +2018,78 @@ ROM_START( ccfboxa )
 	ROM_LOAD("317-0567-exp.pic", 0x00, 0x4000, CRC(cd1d2b2d) SHA1(78203ee0339f76eb76da08d7de43e7e44e4b7d32) )
 ROM_END
 
+/* CDV-1xxxx (Sega network DVD-ROM games) */
+
+ROM_START( questofd )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0376-JPN)
+	ROM_LOAD("317-0376-jpn.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
+ROM_END
+
+ROM_START( gundcb79 )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10010", 0, SHA1(88b97408315515909e79d101b37f580fd1f079ce) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0415-JPN)
+	//(sticker 253-5508-0415J)
+	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
+ROM_END
+
+ROM_START( gundcb79a )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10024b", 0, SHA1(acc344d7583df191e7c60ff968dedcfe12600018) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0415-JPN)
+	//(sticker 253-5508-0415J)
+	ROM_LOAD("317-0415-jpn.pic", 0x00, 0x4000, CRC(e5490747) SHA1(91de42a562a265e4cfa1788e40985a5b9055a10a) )
+ROM_END
+
+ROM_START( gundcb83 )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10030", 0, SHA1(fc4afdd465e397a12a58714ed9c7a35863580869) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
+
+ROM_START( gundcb83a )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10031", 0, SHA1(ab165b0c8753c1ab5d9cce82af7ed720a2f83c45) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
+
+ROM_START( gundcb83b )
+	CHIHIRO_BIOS
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "cdv-10037b", 0, SHA1(f25cb967127d06bef24c64c731c087fc44c1face) )
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	//PIC16C621A (317-0484-JPN)
+	//(sticker 253-5508-0484J)
+	ROM_LOAD("317-0484-jpn.pic", 0x00, 0x4000, CRC(308995bb) SHA1(9459ca99bfb5c3cf227821739e7008ae9bd6e710) )
+ROM_END
 
 /* Main board */
 /*Chihiro*/ GAME( 2002, chihiro,  0,        chihiro_base, chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Bios", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_IS_BIOS_ROOT )
@@ -1227,7 +2100,8 @@ ROM_END
 // 0002A    GAME( 2003, crtaxhra, crtaxihr, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega / Hitmaker",          "Crazy Taxi High Roller (Rev A) (GDX-0002A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0002B */ GAME( 2003, crtaxihr, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega / Hitmaker",          "Crazy Taxi High Roller (Rev B) (GDX-0002B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0003     GAME( 2003, vcop3o,   vcop3,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (GDX-0003)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0003A */ GAME( 2003, vcop3,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (Rev A) (GDX-0003A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0003A */ GAME( 2003, vcop3a,   vcop3,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (Rev A) (GDX-0003A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0003B */ GAME( 2003, vcop3,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Virtua Cop 3 (Rev B) (GDX-0003B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0004     GAME( 2003, outr2o,   outr2,    chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 (GDX-0004)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0004A */ GAME( 2003, outr2,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 (Rev A) (GDX-0004A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 // 0005     GAME( 2004, sgolcnpt, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Golf Club Network Pro Tour (GDX-0005)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
@@ -1237,25 +2111,27 @@ ROM_END
 /* 0006C */ GAME( 2004, mj2c,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev C) (GDX-0006C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0006D    GAME( 2004, mj2d,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev D) (GDX-0006D)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0006E    GAME( 2004, mj2e,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev E) (GDX-0006E)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0006F */ GAME( 2004, mj2,      chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev F) (GDX-0006F)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0006G */ GAME( 2004, mj2g,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev G) (GDX-0006G)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0006F */ GAME( 2004, mj2f,     mj2,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev F) (GDX-0006F)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0006G */ GAME( 2004, mj2,      chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 2 (Rev G) (GDX-0006G)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0007  */ GAME( 2004, ollie,    chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega / Amusement Vision",  "Ollie King (GDX-0007)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0008     GAME( 2004, wangmdjo, wangmidj, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (GDX-0008)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0008A    GAME( 2004, wangmdja, wangmidj, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (Rev A) (GDX-0008A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0008B    GAME( 2004, wangmidj, wangmidj, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (Rev B) (GDX-0008B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+// 0008     GAME( 2004, wangmidjo,wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (GDX-0008)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+// 0008A    GAME( 2004, wangmidja,wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (Rev A) (GDX-0008A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0008B */ GAME( 2004, wangmidj, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Japan) (Rev B) (GDX-0008B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0009     GAME( 2004, wangmido, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (GDX-0009)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0009A    GAME( 2004, wangmida, wangmid,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev A) (GDX-0009A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0009B */ GAME( 2004, wangmid,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune (Export) (Rev B) (GDX-0009B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0010
-// 0011     GAME( 2004, outr2sp,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 SP (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+// 0011     GAME( 2004, outr2stjo,outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (GDX-0011)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
+/* 0011A */ GAME( 2004, outr2stj, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Japan) (Rev A) (GDX-0011A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING|MACHINE_SUPPORTS_SAVE )
 /* 0012  */ GAME( 2004, ghostsqo, ghostsqu, chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (GDX-0012)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0012A */ GAME( 2004, ghostsqu, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Ghost Squad (Rev A) (GDX-0012A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0013  */ GAME( 2005, gundamos, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Gundam Battle Operating Simulator (GDX-0013)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0014     GAME( 2004, outr2sto, outr2st,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (GDX-0014)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 /* 0014A */ GAME( 2004, outr2st,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "OutRun 2 Special Tours (Rev A) (GDX-0014A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0015  */ GAME( 2005, wangmid2, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-// 0016     GAME( 2005, wanmd2bo, wangmd2b, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0016A */ GAME( 2005, wangmd2b, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (Rev A) (GDX-0016A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0015  */ GAME( 2005, wangmid2j,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (GDX-0015)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0015A */ GAME( 2005, wangmid2ja,wangmid2,chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Japan) (Rev A) (GDX-0015A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+// 0016     GAME( 2005, wangmid2o,wangmid2, chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (GDX-0016)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0016A */ GAME( 2005, wangmid2, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Namco",                    "Wangan Midnight Maximum Tune 2 (Export) (Rev A) (GDX-0016A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0017     GAME( 2005, mj3o,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (GDX-0017)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0017A    GAME( 2005, mj3a,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev A) (GDX-0017A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
 // 0017B    GAME( 2005, mj3b,     mj3,      chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Sega Network Taisen Mahjong MJ 3 (Rev B) (GDX-0017B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
@@ -1273,4 +2149,12 @@ ROM_END
 // 0022
 // 0023
 // 0024     GAME( 2009, ccfboxo,  ccfboxa,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (GDX-0024)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
-/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (Rev A) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0024A */ GAME( 2009, ccfboxa,  chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Chihiro Firmware Update For Compact Flash Box (4.01) (GDX-0024A)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+
+/* CDV-1xxxx (Sega network DVD-ROM games) */
+/* 0005C */ GAME( 2004, questofd, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Sega",                     "Quest of D (CDV-10005C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0010  */ GAME( 2005, gundcb79, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder (CDV-10010)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0024B */ GAME( 2006, gundcb79a,gundcb79, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0079 Card Builder Ver.2.02 (CDV-10024B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0030  */ GAME( 2007, gundcb83, chihiro,  chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder (CDV-10030)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0031  */ GAME( 2007, gundcb83a,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Check Disk (CDV-10031)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )
+/* 0037B */ GAME( 2008, gundcb83b,gundcb83, chihirogd,    chihiro, driver_device, 0, ROT0, "Banpresto",                "Mobile Suit Gundam 0083 Card Builder Ver.2.10 (CDV-10037B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING )

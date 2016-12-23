@@ -46,9 +46,9 @@ public:
 
 private:
 	virtual void video_start() override;
-	UINT8 *m_char_rom;
-	UINT8 m_port40;
-	required_shared_ptr<UINT8> m_video_ram;
+	uint8_t *m_char_rom;
+	uint8_t m_port40;
+	required_shared_ptr<uint8_t> m_video_ram;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6847_base_device> m_vdg;
 	required_device<centronics_device> m_centronics;

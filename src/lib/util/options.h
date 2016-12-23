@@ -21,7 +21,7 @@
 //**************************************************************************
 
 // option types
-const UINT32 OPTION_TYPE_MASK       = 0x0007;       // up to 8 different types
+const uint32_t OPTION_TYPE_MASK       = 0x0007;       // up to 8 different types
 enum
 {
 	OPTION_INVALID,         // invalid
@@ -40,7 +40,7 @@ const int OPTION_PRIORITY_NORMAL    = 100;          // normal priority
 const int OPTION_PRIORITY_HIGH      = 150;          // high priority
 const int OPTION_PRIORITY_MAXIMUM   = 255;          // maximum priority
 
-const UINT32 OPTION_FLAG_INTERNAL = 0x40000000;
+const uint32_t OPTION_FLAG_INTERNAL = 0x40000000;
 
 
 //**************************************************************************
@@ -52,7 +52,7 @@ struct options_entry
 {
 	const char *        name;               // name on the command line
 	const char *        defvalue;           // default value of this argument
-	UINT32              flags;              // flags to describe the option
+	uint32_t              flags;              // flags to describe the option
 	const char *        description;        // description for -showusage
 };
 
@@ -70,7 +70,7 @@ public:
 		friend class simple_list<entry>;
 
 		// construction/destruction
-		entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr);
+		entry(const char *name, const char *description, uint32_t flags = 0, const char *defvalue = nullptr);
 
 	public:
 		// getters
@@ -81,27 +81,29 @@ public:
 		const char *default_value() const { return m_defdata.c_str(); }
 		const char *minimum() const { return m_minimum.c_str(); }
 		const char *maximum() const { return m_maximum.c_str(); }
-		UINT32 seqid() const { return m_seqid; }
+		uint32_t seqid() const { return m_seqid; }
 		int type() const { return (m_flags & OPTION_TYPE_MASK); }
-		UINT32 flags() const { return m_flags; }
+		uint32_t flags() const { return m_flags; }
 		bool is_header() const { return type() == OPTION_HEADER; }
 		bool is_command() const { return type() == OPTION_COMMAND; }
 		bool is_internal() const { return m_flags & OPTION_FLAG_INTERNAL; }
 		bool has_range() const { return (!m_minimum.empty() && !m_maximum.empty()); }
 		int priority() const { return m_priority; }
+		bool is_changed() const { return m_changed; }
 
 		// setters
 		void set_value(const char *newvalue, int priority);
 		void set_default_value(const char *defvalue);
 		void set_description(const char *description);
-		void set_flag(UINT32 mask, UINT32 flag);
-		void revert(int priority);
+		void set_flag(uint32_t mask, uint32_t flag);
+		void mark_changed() { m_changed = true; }
+		void revert(int priority_hi, int priority_lo);
 
 	private:
 		// internal state
 		entry *                 m_next;             // link to the next data
-		UINT32                  m_flags;            // flags from the entry
-		UINT32                  m_seqid;            // sequence ID; bumped on each change
+		uint32_t                  m_flags;            // flags from the entry
+		uint32_t                  m_seqid;            // sequence ID; bumped on each change
 		bool                    m_error_reported;   // have we reported an error on this option yet?
 		int                     m_priority;         // priority of the data set
 		const char *            m_description;      // description for this item
@@ -110,6 +112,7 @@ public:
 		std::string             m_defdata;          // default data for this item
 		std::string             m_minimum;          // minimum value
 		std::string             m_maximum;          // maximum value
+		bool                    m_changed;          // changed flag
 	};
 
 	// construction/destruction
@@ -128,9 +131,15 @@ public:
 	// getters
 	entry *first() const { return m_entrylist.first(); }
 	const char *command() const { return m_command.c_str(); }
+	entry *get_entry(const char *name) const;
+
+	// range iterators
+	using auto_iterator = simple_list<entry>::auto_iterator;
+	auto_iterator begin() const { return m_entrylist.begin(); }
+	auto_iterator end() const { return m_entrylist.end(); }
 
 	// configuration
-	void add_entry(const char *name, const char *description, UINT32 flags = 0, const char *defvalue = nullptr, bool override_existing = false);
+	void add_entry(const char *name, const char *description, uint32_t flags = 0, const char *defvalue = nullptr, bool override_existing = false);
 	void add_entry(const options_entry &data, bool override_existing = false) { add_entry(data.name, data.description, data.flags, data.defvalue, override_existing); }
 	void add_entries(const options_entry *entrylist, bool override_existing = false);
 	void set_default_value(const char *name, const char *defvalue);
@@ -139,10 +148,10 @@ public:
 
 	// parsing/input
 	bool parse_command_line(int argc, char **argv, int priority, std::string &error_string);
-	bool parse_ini_file(core_file &inifile, int priority, int ignore_priority, std::string &error_string);
+	bool parse_ini_file(util::core_file &inifile, int priority, int ignore_priority, std::string &error_string);
 
 	// reverting
-	void revert(int priority = OPTION_PRIORITY_MAXIMUM);
+	void revert(int priority_hi = OPTION_PRIORITY_MAXIMUM, int priority_lo = OPTION_PRIORITY_DEFAULT);
 
 	// output
 	std::string output_ini(const core_options *diff = nullptr) const;
@@ -155,18 +164,19 @@ public:
 	bool bool_value(const char *name) const { return (atoi(value(name)) != 0); }
 	int int_value(const char *name) const { return atoi(value(name)); }
 	float float_value(const char *name) const { return atof(value(name)); }
-	UINT32 seqid(const char *name) const;
+	uint32_t seqid(const char *name) const;
 	bool exists(const char *name) const;
+	bool is_changed(const char *name) const;
 
 	// setting
-	void set_command(const char *command);
 	bool set_value(const char *name, const char *value, int priority, std::string &error_string);
 	bool set_value(const char *name, int value, int priority, std::string &error_string);
 	bool set_value(const char *name, float value, int priority, std::string &error_string);
-	void set_flag(const char *name, UINT32 mask, UINT32 flags);
+	void set_flag(const char *name, uint32_t mask, uint32_t flags);
+	void mark_changed(const char *name);
 
 	// misc
-	static const char *unadorned(int x = 0) { return s_option_unadorned[MIN(x, MAX_UNADORNED_OPTIONS)]; }
+	static const char *unadorned(int x = 0) { return s_option_unadorned[std::min(x, MAX_UNADORNED_OPTIONS)]; }
 	int options_count() const { return m_entrylist.count(); }
 
 private:

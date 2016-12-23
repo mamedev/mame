@@ -66,6 +66,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 class supdrapo_state : public driver_device
 {
@@ -73,6 +74,7 @@ public:
 	supdrapo_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_col_line(*this, "col_line"),
@@ -80,14 +82,15 @@ public:
 		m_char_bank(*this, "char_bank") { }
 
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_col_line;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_char_bank;
+	required_shared_ptr<uint8_t> m_col_line;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_char_bank;
 
-	UINT8 m_wdog;
+	uint8_t m_wdog;
 
 	DECLARE_READ8_MEMBER(rng_r);
 	DECLARE_WRITE8_MEMBER(wdog8000_w);
@@ -103,7 +106,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(supdrapo);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -116,7 +119,7 @@ void supdrapo_state::video_start()
 }
 
 
-UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x, y;
 	int count;
@@ -145,7 +148,7 @@ UINT32 supdrapo_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 /*Maybe bit 2 & 3 of the second color prom are intensity bits? */
 PALETTE_INIT_MEMBER(supdrapo_state, supdrapo)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int bit0, bit1, bit2 , r, g, b;
 	int i;
 
@@ -212,7 +215,7 @@ WRITE8_MEMBER(supdrapo_state::wdog8000_w)
 
 	if (m_wdog == data)
 	{
-		watchdog_reset_w(space, 0, 0);  /* Reset */
+		m_watchdog->reset_w(space, 0, 0);  /* Reset */
 	}
 
 	m_wdog = data;
@@ -450,6 +453,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MCFG_CPU_PROGRAM_MAP(sdpoker_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", supdrapo_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 

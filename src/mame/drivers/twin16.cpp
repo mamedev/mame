@@ -48,8 +48,10 @@ Known Issues:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/twin16.h"
 #include "includes/konamipt.h"
 
@@ -132,7 +134,7 @@ WRITE16_MEMBER(fround_state::fround_CPU_register_w)
 	                X               0->1 trigger IRQ on sound CPU
 	                        x   x   coin counters
 	*/
-	UINT16 old = m_CPUA_register;
+	uint16_t old = m_CPUA_register;
 	COMBINE_DATA(&m_CPUA_register);
 	if (m_CPUA_register != old)
 	{
@@ -165,7 +167,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, twin16_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd_reset_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xb000, 0xb00d) AM_DEVREADWRITE("k007232", k007232_device, read, write)
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xd000, 0xd000) AM_DEVWRITE("upd", upd7759_device, port_w)
@@ -184,8 +186,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, twin16_state )
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P3")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
@@ -221,8 +223,8 @@ static ADDRESS_MAP_START( fround_map, AS_PROGRAM, 16, fround_state )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ_PORT("SYSTEM") AM_WRITE(fround_CPU_register_w)
 	AM_RANGE(0x0a0002, 0x0a0003) AM_READ_PORT("P1")
 	AM_RANGE(0x0a0004, 0x0a0005) AM_READ_PORT("P2")
-	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE8(soundlatch_byte_w, 0x00ff)
-	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x0a0008, 0x0a0009) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
+	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW2") AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(video_register_w)
@@ -673,6 +675,8 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	// video hardware
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -691,6 +695,8 @@ static MACHINE_CONFIG_START( twin16, twin16_state )
 
 	// sound hardware
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
@@ -723,6 +729,8 @@ static MACHINE_CONFIG_START( fround, fround_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_BUFFERED_SPRITERAM16_ADD("spriteram")
 
@@ -741,6 +749,8 @@ static MACHINE_CONFIG_START( fround, fround_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)

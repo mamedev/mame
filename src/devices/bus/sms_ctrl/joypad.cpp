@@ -2,7 +2,22 @@
 // copyright-holders:Fabio Priuli
 /**********************************************************************
 
-    Sega Master System "Control Pad"/generic joystick emulation
+    Sega Mark III "Joypad" / Master System "Control Pad" emulation
+
+
+Release data from the Sega Retro project:
+
+- Joypad:
+
+  Year: 1985    Country/region: JP    Model code: SJ-152
+
+- Control Pad:
+
+  Year: 1986    Country/region: US    Model code: 3020
+  Year: 1987    Country/region: JP    Model code: 3020
+  Year: 1987    Country/region: EU    Model code: ?
+  Year: 1989    Country/region: BR    Model code: 011770
+  Year: 1989    Country/region: KR    Model code: ?
 
 **********************************************************************/
 
@@ -49,7 +64,7 @@ ioport_constructor sms_joypad_device::device_input_ports() const
 //  sms_joypad_device - constructor
 //-------------------------------------------------
 
-sms_joypad_device::sms_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+sms_joypad_device::sms_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, SMS_JOYPAD, "Sega SMS Control Pad", tag, owner, clock, "sms_joypad", __FILE__),
 	device_sms_control_port_interface(mconfig, *this),
 	m_joypad(*this, "JOYPAD")
@@ -70,7 +85,7 @@ void sms_joypad_device::device_start()
 //  sms_peripheral_r - joypad read
 //-------------------------------------------------
 
-UINT8 sms_joypad_device::peripheral_r()
+uint8_t sms_joypad_device::peripheral_r()
 {
 	return m_joypad->read();
 }

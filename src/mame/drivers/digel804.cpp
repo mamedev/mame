@@ -116,20 +116,20 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( da_w );
 	DECLARE_INPUT_CHANGED_MEMBER(mode_change);
 	// current speaker state for port 45
-	UINT8 m_speaker_state;
+	uint8_t m_speaker_state;
 	// ram stuff for banking
-	UINT8 m_ram_bank;
+	uint8_t m_ram_bank;
 	// states
-	UINT8 m_acia_intq;
-	UINT8 m_overload_state;
-	UINT8 m_key_intq;
-	UINT8 m_remote_mode;
-	UINT8 m_key_mode;
-	UINT8 m_sim_mode;
-	UINT8 m_powerfail_state;
-	UINT8 m_chipinsert_state;
-	UINT8 m_keyen_state;
-	UINT8 m_op41;
+	uint8_t m_acia_intq;
+	uint8_t m_overload_state;
+	uint8_t m_key_intq;
+	uint8_t m_remote_mode;
+	uint8_t m_key_mode;
+	uint8_t m_sim_mode;
+	uint8_t m_powerfail_state;
+	uint8_t m_chipinsert_state;
+	uint8_t m_keyen_state;
+	uint8_t m_op41;
 };
 
 
@@ -308,7 +308,7 @@ READ8_MEMBER( digel804_state::ip46 ) // keypad read
 	 * this value auto-latches on a key press and remains through multiple reads
 	 * this is done by a 74C923 integrated circuit
 	*/
-	UINT8 kbd = m_kb->read();
+	uint8_t kbd = m_kb->read();
 #ifdef PORT46_R_VERBOSE
 	logerror("Digel804: returning %02X for port 46 keypad read\n", kbd);
 #endif
@@ -350,7 +350,7 @@ INPUT_CHANGED_MEMBER( digel804_state::mode_change )
 {
 	if (!newval && !m_keyen_state)
 	{
-		switch ((int)(FPTR)param)
+		switch ((int)(uintptr_t)param)
 		{
 			case MODE_OFF:
 				m_key_mode = m_remote_mode = m_sim_mode = 1;

@@ -46,7 +46,7 @@ static inline void ATTR_PRINTF(3,4) verboselog(device_t& device, int n_level, co
 #define verboselog(x,y,z, ...)
 #endif
 
-static const UINT16 cdi220_lcd_char[20*22] =
+static const uint16_t cdi220_lcd_char[20*22] =
 {
 	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
 	0x2000, 0x2000, 0x2000, 0x2000, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0100, 0x0200, 0x0200, 0x0200, 0x0200,
@@ -80,13 +80,13 @@ void mcd212_device::draw_lcd(int y)
 		return;
 	}
 	bitmap_rgb32 &bitmap = state->m_lcdbitmap;
-	UINT32 *scanline = &bitmap.pix32(y);
+	uint32_t *scanline = &bitmap.pix32(y);
 	int x = 0;
 	int lcd = 0;
 
 	for(lcd = 0; lcd < 8; lcd++)
 	{
-		UINT16 data = (state->m_slave_hle->get_lcd_state()[lcd*2] << 8) |
+		uint16_t data = (state->m_slave_hle->get_lcd_state()[lcd*2] << 8) |
 						state->m_slave_hle->get_lcd_state()[lcd*2 + 1];
 		for(x = 0; x < 20; x++)
 		{
@@ -329,14 +329,14 @@ void mcd212_device::update_region_arrays()
 	}
 }
 
-void mcd212_device::set_vsr(int channel, UINT32 value)
+void mcd212_device::set_vsr(int channel, uint32_t value)
 {
 	m_channel[channel].vsr = value & 0x0000ffff;
 	m_channel[channel].dcr &= 0xffc0;
 	m_channel[channel].dcr |= (value >> 16) & 0x003f;
 }
 
-void mcd212_device::set_register(int channel, UINT8 reg, UINT32 value)
+void mcd212_device::set_register(int channel, uint8_t reg, uint32_t value)
 {
 	switch(reg)
 	{
@@ -349,9 +349,9 @@ void mcd212_device::set_register(int channel, UINT8 reg, UINT32 value)
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3: case 0xb4: case 0xb5: case 0xb6: case 0xb7:
 		case 0xb8: case 0xb9: case 0xba: case 0xbb: case 0xbc: case 0xbd: case 0xbe: case 0xbf:
 			verboselog(*this, 11, "          %04xxxxx: %d: CLUT[%d] = %08x\n", channel * 0x20, channel, m_channel[channel].clut_bank * 0x40 + (reg - 0x80), value );
-			m_channel[0].clut_r[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >> 16) & 0xfc;
-			m_channel[0].clut_g[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  8) & 0xfc;
-			m_channel[0].clut_b[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (UINT8)(value >>  0) & 0xfc;
+			m_channel[0].clut_r[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >> 16) & 0xfc;
+			m_channel[0].clut_g[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >>  8) & 0xfc;
+			m_channel[0].clut_b[m_channel[channel].clut_bank * 0x40 + (reg - 0x80)] = (uint8_t)(value >>  0) & 0xfc;
 			break;
 		case 0xc0: // Image Coding Method
 			if(channel == 0)
@@ -493,24 +493,24 @@ void mcd212_device::set_register(int channel, UINT8 reg, UINT32 value)
 	}
 }
 
-UINT32 mcd212_device::get_vsr(int channel)
+uint32_t mcd212_device::get_vsr(int channel)
 {
 	return ((m_channel[channel].dcr & 0x3f) << 16) | m_channel[channel].vsr;
 }
 
-void mcd212_device::set_dcp(int channel, UINT32 value)
+void mcd212_device::set_dcp(int channel, uint32_t value)
 {
 	m_channel[channel].dcp = value & 0x0000ffff;
 	m_channel[channel].ddr &= 0xffc0;
 	m_channel[channel].ddr |= (value >> 16) & 0x003f;
 }
 
-UINT32 mcd212_device::get_dcp(int channel)
+uint32_t mcd212_device::get_dcp(int channel)
 {
 	return ((m_channel[channel].ddr & 0x3f) << 16) | m_channel[channel].dcp;
 }
 
-void mcd212_device::set_display_parameters(int channel, UINT8 value)
+void mcd212_device::set_display_parameters(int channel, uint8_t value)
 {
 	m_channel[channel].ddr &= 0xf0ff;
 	m_channel[channel].ddr |= (value & 0x0f) << 8;
@@ -542,7 +542,7 @@ void mcd212_device::update_visible_area()
 	m_screen->configure(width, 302, visarea1, period);
 }
 
-UINT32 mcd212_device::get_screen_width()
+uint32_t mcd212_device::get_screen_width()
 {
 	if((m_channel[0].dcr & (MCD212_DCR_CF | MCD212_DCR_FD)) && (m_channel[0].csrw & MCD212_CSR1W_ST))
 	{
@@ -554,12 +554,12 @@ UINT32 mcd212_device::get_screen_width()
 void mcd212_device::process_ica(int channel)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
-	UINT16 *ica = channel ? state->m_planeb : state->m_planea;
-	UINT32 addr = 0x000400/2;
-	UINT32 cmd = 0;
+	uint16_t *ica = channel ? state->m_planeb : state->m_planea;
+	uint32_t addr = 0x000400/2;
+	uint32_t cmd = 0;
 	while(1)
 	{
-		UINT8 stop = 0;
+		uint8_t stop = 0;
 		cmd = ica[addr++] << 16;
 		cmd |= ica[addr++];
 		switch((cmd & 0xff000000) >> 24)
@@ -601,7 +601,7 @@ void mcd212_device::process_ica(int channel)
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
-					UINT8 interrupt = (state->m_scc->get_lir() >> 4) & 7;
+					uint8_t interrupt = (state->m_scc->get_lir() >> 4) & 7;
 					if(interrupt)
 					{
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -611,7 +611,7 @@ void mcd212_device::process_ica(int channel)
 #if 0
 				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
 				{
-					UINT8 interrupt = state->m_scc68070_regs.lir & 7;
+					uint8_t interrupt = state->m_scc68070_regs.lir & 7;
 					if(interrupt)
 					{
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
@@ -638,16 +638,16 @@ void mcd212_device::process_ica(int channel)
 void mcd212_device::process_dca(int channel)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
-	UINT16 *dca = channel ? state->m_planeb : state->m_planea;
-	UINT32 addr = (m_channel[channel].dca & 0x0007ffff) / 2; //(get_dcp(mcd212, channel) & 0x0007ffff) / 2; // m_channel[channel].dca / 2;
-	UINT32 cmd = 0;
-	UINT32 count = 0;
-	UINT32 max = 64;
-	UINT8 addr_changed = 0;
+	uint16_t *dca = channel ? state->m_planeb : state->m_planea;
+	uint32_t addr = (m_channel[channel].dca & 0x0007ffff) / 2; //(get_dcp(mcd212, channel) & 0x0007ffff) / 2; // m_channel[channel].dca / 2;
+	uint32_t cmd = 0;
+	uint32_t count = 0;
+	uint32_t max = 64;
+	uint8_t addr_changed = 0;
 	//printf( "max = %d\n", max );
 	while(1)
 	{
-		UINT8 stop = 0;
+		uint8_t stop = 0;
 		cmd = dca[addr++] << 16;
 		cmd |= dca[addr++];
 		count += 4;
@@ -691,7 +691,7 @@ void mcd212_device::process_dca(int channel)
 				m_channel[1].csrr |= 1 << (2 - channel);
 				if(m_channel[1].csrr & (MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2))
 				{
-					UINT8 interrupt = (state->m_scc->get_lir() >> 4) & 7;
+					uint8_t interrupt = (state->m_scc->get_lir() >> 4) & 7;
 					if(interrupt)
 					{
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
@@ -701,7 +701,7 @@ void mcd212_device::process_dca(int channel)
 #if 0
 				if(m_channel[1].csrr & MCD212_CSR2R_IT2)
 				{
-					UINT8 interrupt = state->m_scc68070_regs.lir & 7;
+					uint8_t interrupt = state->m_scc68070_regs.lir & 7;
 					if(interrupt)
 					{
 						state->m_maincpu->set_input_line_vector(M68K_IRQ_1 + (interrupt - 1), 24 + interrupt);
@@ -733,7 +733,7 @@ void mcd212_device::process_dca(int channel)
 	m_channel[channel].dca = addr * 2;
 }
 
-static inline UINT8 MCD212_LIM(INT32 in)
+static inline uint8_t MCD212_LIM(int32_t in)
 {
 	if(in < 0)
 	{
@@ -743,10 +743,10 @@ static inline UINT8 MCD212_LIM(INT32 in)
 	{
 		return 255;
 	}
-	return (UINT8)in;
+	return (uint8_t)in;
 }
 
-static inline UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
+static inline uint8_t BYTE_TO_CLUT(int channel, int icm, uint8_t byte)
 {
 	switch(icm)
 	{
@@ -782,23 +782,23 @@ static inline UINT8 BYTE_TO_CLUT(int channel, int icm, UINT8 byte)
 	return 0;
 }
 
-void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, UINT8 *pixels_b)
+void mcd212_device::process_vsr(int channel, uint8_t *pixels_r, uint8_t *pixels_g, uint8_t *pixels_b)
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
-	UINT8 *data = reinterpret_cast<UINT8 *>(channel ? state->m_planeb.target() : state->m_planea.target());
-	UINT32 vsr = get_vsr(channel) & 0x0007ffff;
-	UINT8 done = 0;
-	UINT32 x = 0;
-	UINT32 icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
-	UINT32 icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
-	UINT8 icm = (m_channel[0].image_coding_method & icm_mask) >> icm_shift;
-	UINT8 *clut_r = m_channel[0].clut_r;
-	UINT8 *clut_g = m_channel[0].clut_g;
-	UINT8 *clut_b = m_channel[0].clut_b;
-	UINT8 mosaic_enable = ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
-	UINT8 mosaic_factor = 1 << (((m_channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
+	uint8_t *data = reinterpret_cast<uint8_t *>(channel ? state->m_planeb.target() : state->m_planea.target());
+	uint32_t vsr = get_vsr(channel) & 0x0007ffff;
+	uint8_t done = 0;
+	uint32_t x = 0;
+	uint32_t icm_mask = channel ? MCD212_ICM_MODE2 : MCD212_ICM_MODE1;
+	uint32_t icm_shift = channel ? MCD212_ICM_MODE2_SHIFT : MCD212_ICM_MODE1_SHIFT;
+	uint8_t icm = (m_channel[0].image_coding_method & icm_mask) >> icm_shift;
+	uint8_t *clut_r = m_channel[0].clut_r;
+	uint8_t *clut_g = m_channel[0].clut_g;
+	uint8_t *clut_b = m_channel[0].clut_b;
+	uint8_t mosaic_enable = ((m_channel[channel].ddr & MCD212_DDR_FT) == MCD212_DDR_FT_MOSAIC);
+	uint8_t mosaic_factor = 1 << (((m_channel[channel].ddr & MCD212_DDR_MT) >> MCD212_DDR_MT_SHIFT) + 1);
 	int mosaic_index = 0;
-	UINT32 width = get_screen_width();
+	uint32_t width = get_screen_width();
 
 	//printf( "vsr before: %08x: ", vsr );
 	//fflush(stdout);
@@ -813,7 +813,7 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 
 	while(!done)
 	{
-		UINT8 byte = data[(vsr & 0x0007ffff) ^ 1];
+		uint8_t byte = data[(vsr & 0x0007ffff) ^ 1];
 		vsr++;
 		switch(m_channel[channel].ddr & MCD212_DDR_FT)
 		{
@@ -928,7 +928,7 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 					{
 						for(; x < width; x += 2)
 						{
-							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							uint8_t clut_entry = BYTE_TO_CLUT(channel, icm, byte);
 							pixels_r[x + 0] = clut_r[clut_entry];
 							pixels_g[x + 0] = clut_g[clut_entry];
 							pixels_b[x + 0] = clut_b[clut_entry];
@@ -957,8 +957,8 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 					{
 						for(; x < width; x += 2)
 						{
-							UINT8 even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
-							UINT8 odd_entry = BYTE_TO_CLUT(channel, icm, byte);
+							uint8_t even_entry = BYTE_TO_CLUT(channel, icm, byte >> 4);
+							uint8_t odd_entry = BYTE_TO_CLUT(channel, icm, byte);
 							if(mosaic_enable)
 							{
 								for(mosaic_index = 0; mosaic_index < mosaic_factor; mosaic_index++)
@@ -1012,13 +1012,13 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 					if(byte & 0x80)
 					{
 						// Run length
-						UINT8 length = data[((vsr++) & 0x0007ffff) ^ 1];
+						uint8_t length = data[((vsr++) & 0x0007ffff) ^ 1];
 						if(!length)
 						{
-							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
-							UINT8 r = clut_r[clut_entry];
-							UINT8 g = clut_g[clut_entry];
-							UINT8 b = clut_b[clut_entry];
+							uint8_t clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							uint8_t r = clut_r[clut_entry];
+							uint8_t g = clut_g[clut_entry];
+							uint8_t b = clut_b[clut_entry];
 							// Go to the end of the line
 							for(; x < width; x++)
 							{
@@ -1036,10 +1036,10 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 						else
 						{
 							int end = x + (length * 2);
-							UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
-							UINT8 r = clut_r[clut_entry];
-							UINT8 g = clut_g[clut_entry];
-							UINT8 b = clut_b[clut_entry];
+							uint8_t clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+							uint8_t r = clut_r[clut_entry];
+							uint8_t g = clut_g[clut_entry];
+							uint8_t b = clut_b[clut_entry];
 							for(; x < end && x < width; x++)
 							{
 								pixels_r[x] = r;
@@ -1060,7 +1060,7 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 					else
 					{
 						// Single pixel
-						UINT8 clut_entry = BYTE_TO_CLUT(channel, icm, byte);
+						uint8_t clut_entry = BYTE_TO_CLUT(channel, icm, byte);
 						pixels_r[x] = clut_r[clut_entry];
 						pixels_g[x] = clut_g[clut_entry];
 						pixels_b[x] = clut_b[clut_entry];
@@ -1084,56 +1084,56 @@ void mcd212_device::process_vsr(int channel, UINT8 *pixels_r, UINT8 *pixels_g, U
 	//mcd212_set_vsr(&state->m_mcd212_regs, channel, vsr);
 }
 
-const UINT32 mcd212_device::s_4bpp_color[16] =
+const uint32_t mcd212_device::s_4bpp_color[16] =
 {
 	0x00101010, 0x0010107a, 0x00107a10, 0x00107a7a, 0x007a1010, 0x007a107a, 0x007a7a10, 0x007a7a7a,
 	0x00101010, 0x001010e6, 0x0010e610, 0x0010e6e6, 0x00e61010, 0x00e610e6, 0x00e6e610, 0x00e6e6e6
 };
 
-void mcd212_device::mix_lines(UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a_b, UINT8 *plane_b_r, UINT8 *plane_b_g, UINT8 *plane_b_b, UINT32 *out)
+void mcd212_device::mix_lines(uint8_t *plane_a_r, uint8_t *plane_a_g, uint8_t *plane_a_b, uint8_t *plane_b_r, uint8_t *plane_b_g, uint8_t *plane_b_b, uint32_t *out)
 {
-	UINT8 debug_mode = machine().root_device().ioport("DEBUG")->read();
-	UINT8 global_plane_a_disable = debug_mode & 1;
-	UINT8 global_plane_b_disable = debug_mode & 2;
-	UINT8 debug_backdrop_enable = debug_mode & 4;
-	UINT8 debug_backdrop_index = debug_mode >> 4;
-	UINT32 backdrop = debug_backdrop_enable ? s_4bpp_color[debug_backdrop_index] : s_4bpp_color[m_channel[0].backdrop_color];
-	UINT8 transparency_mode_a = (m_channel[0].transparency_control >> 0) & 0x0f;
-	UINT8 transparency_mode_b = (m_channel[0].transparency_control >> 8) & 0x0f;
-	UINT8 transparent_color_a_r = (UINT8)(m_channel[0].transparent_color_a >> 16);
-	UINT8 transparent_color_a_g = (UINT8)(m_channel[0].transparent_color_a >>  8);
-	UINT8 transparent_color_a_b = (UINT8)(m_channel[0].transparent_color_a >>  0);
-	UINT8 transparent_color_b_r = (UINT8)(m_channel[1].transparent_color_b >> 16);
-	UINT8 transparent_color_b_g = (UINT8)(m_channel[1].transparent_color_b >>  8);
-	UINT8 transparent_color_b_b = (UINT8)(m_channel[1].transparent_color_b >>  0);
-	UINT8 image_coding_method_a = m_channel[0].image_coding_method & 0x0000000f;
-	UINT8 image_coding_method_b = (m_channel[0].image_coding_method >> 8) & 0x0000000f;
+	uint8_t debug_mode = machine().root_device().ioport("DEBUG")->read();
+	uint8_t global_plane_a_disable = debug_mode & 1;
+	uint8_t global_plane_b_disable = debug_mode & 2;
+	uint8_t debug_backdrop_enable = debug_mode & 4;
+	uint8_t debug_backdrop_index = debug_mode >> 4;
+	uint32_t backdrop = debug_backdrop_enable ? s_4bpp_color[debug_backdrop_index] : s_4bpp_color[m_channel[0].backdrop_color];
+	uint8_t transparency_mode_a = (m_channel[0].transparency_control >> 0) & 0x0f;
+	uint8_t transparency_mode_b = (m_channel[0].transparency_control >> 8) & 0x0f;
+	uint8_t transparent_color_a_r = (uint8_t)(m_channel[0].transparent_color_a >> 16);
+	uint8_t transparent_color_a_g = (uint8_t)(m_channel[0].transparent_color_a >>  8);
+	uint8_t transparent_color_a_b = (uint8_t)(m_channel[0].transparent_color_a >>  0);
+	uint8_t transparent_color_b_r = (uint8_t)(m_channel[1].transparent_color_b >> 16);
+	uint8_t transparent_color_b_g = (uint8_t)(m_channel[1].transparent_color_b >>  8);
+	uint8_t transparent_color_b_b = (uint8_t)(m_channel[1].transparent_color_b >>  0);
+	uint8_t image_coding_method_a = m_channel[0].image_coding_method & 0x0000000f;
+	uint8_t image_coding_method_b = (m_channel[0].image_coding_method >> 8) & 0x0000000f;
 	bool dyuv_enable_a = (image_coding_method_a == 5);
 	bool dyuv_enable_b = (image_coding_method_b == 5);
-	UINT8 mosaic_enable_a = (m_channel[0].mosaic_hold_a & 0x800000) >> 23;
-	UINT8 mosaic_enable_b = (m_channel[1].mosaic_hold_b & 0x800000) >> 23;
-	UINT8 mosaic_count_a = (m_channel[0].mosaic_hold_a & 0x0000ff) << 1;
-	UINT8 mosaic_count_b = (m_channel[1].mosaic_hold_b & 0x0000ff) << 1;
+	uint8_t mosaic_enable_a = (m_channel[0].mosaic_hold_a & 0x800000) >> 23;
+	uint8_t mosaic_enable_b = (m_channel[1].mosaic_hold_b & 0x800000) >> 23;
+	uint8_t mosaic_count_a = (m_channel[0].mosaic_hold_a & 0x0000ff) << 1;
+	uint8_t mosaic_count_b = (m_channel[1].mosaic_hold_b & 0x0000ff) << 1;
 	for(int x = 0; x < 768; x++)
 	{
 		out[x] = backdrop;
 		if(!(m_channel[0].transparency_control & MCD212_TCR_DISABLE_MX))
 		{
-			UINT8 abr = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_r[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			UINT8 abg = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_g[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			UINT8 abb = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((INT32)plane_b_b[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			uint8_t abr = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_r[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_r[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			uint8_t abg = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_g[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_g[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			uint8_t abb = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_b[x] - 16) * m_channel[0].weight_factor_a[x]) >> 6) + ((MCD212_LIM((int32_t)plane_b_b[x] - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
 			out[x] = (abr << 16) | (abg << 8) | abb;
 		}
 		else
 		{
-			UINT8 plane_enable_a = 0;
-			UINT8 plane_enable_b = 0;
-			UINT8 plane_a_r_cur = mosaic_enable_a ? plane_a_r[x - (x % mosaic_count_a)] : plane_a_r[x];
-			UINT8 plane_a_g_cur = mosaic_enable_a ? plane_a_g[x - (x % mosaic_count_a)] : plane_a_g[x];
-			UINT8 plane_a_b_cur = mosaic_enable_a ? plane_a_b[x - (x % mosaic_count_a)] : plane_a_b[x];
-			UINT8 plane_b_r_cur = mosaic_enable_b ? plane_b_r[x - (x % mosaic_count_b)] : plane_b_r[x];
-			UINT8 plane_b_g_cur = mosaic_enable_b ? plane_b_g[x - (x % mosaic_count_b)] : plane_b_g[x];
-			UINT8 plane_b_b_cur = mosaic_enable_b ? plane_b_b[x - (x % mosaic_count_b)] : plane_b_b[x];
+			uint8_t plane_enable_a = 0;
+			uint8_t plane_enable_b = 0;
+			uint8_t plane_a_r_cur = mosaic_enable_a ? plane_a_r[x - (x % mosaic_count_a)] : plane_a_r[x];
+			uint8_t plane_a_g_cur = mosaic_enable_a ? plane_a_g[x - (x % mosaic_count_a)] : plane_a_g[x];
+			uint8_t plane_a_b_cur = mosaic_enable_a ? plane_a_b[x - (x % mosaic_count_a)] : plane_a_b[x];
+			uint8_t plane_b_r_cur = mosaic_enable_b ? plane_b_r[x - (x % mosaic_count_b)] : plane_b_r[x];
+			uint8_t plane_b_g_cur = mosaic_enable_b ? plane_b_g[x - (x % mosaic_count_b)] : plane_b_g[x];
+			uint8_t plane_b_b_cur = mosaic_enable_b ? plane_b_b[x - (x % mosaic_count_b)] : plane_b_b[x];
 			switch(transparency_mode_a)
 			{
 				case 0:
@@ -1228,12 +1228,12 @@ void mcd212_device::mix_lines(UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a
 			{
 				plane_enable_b = 0;
 			}
-			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_r_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_g_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_a_b_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
-			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_r_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_g_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
-			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((INT32)plane_b_b_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_a_r_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_r_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_g_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_g_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_a_b_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_a_b_cur - 16) * m_channel[0].weight_factor_a[x]) >> 6) + 16);
+			plane_b_r_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_r_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_g_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_g_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
+			plane_b_b_cur = MCD212_LIM(((MCD212_LIM((int32_t)plane_b_b_cur - 16) * m_channel[1].weight_factor_b[x]) >> 6) + 16);
 			switch(m_channel[0].plane_order)
 			{
 				case MCD212_POR_AB:
@@ -1261,15 +1261,15 @@ void mcd212_device::mix_lines(UINT8 *plane_a_r, UINT8 *plane_a_g, UINT8 *plane_a
 	}
 }
 
-void mcd212_device::draw_cursor(UINT32 *scanline, int y)
+void mcd212_device::draw_cursor(uint32_t *scanline, int y)
 {
 	if(m_channel[0].cursor_control & MCD212_CURCNT_EN)
 	{
-		UINT16 curx =  m_channel[0].cursor_position        & 0x3ff;
-		UINT16 cury = ((m_channel[0].cursor_position >> 12) & 0x3ff) + 22;
+		uint16_t curx =  m_channel[0].cursor_position        & 0x3ff;
+		uint16_t cury = ((m_channel[0].cursor_position >> 12) & 0x3ff) + 22;
 		if(y >= cury && y < (cury + 16))
 		{
-			UINT32 color = s_4bpp_color[m_channel[0].cursor_control & MCD212_CURCNT_COLOR];
+			uint32_t color = s_4bpp_color[m_channel[0].cursor_control & MCD212_CURCNT_COLOR];
 			y -= cury;
 			if(m_channel[0].cursor_control & MCD212_CURCNT_CUW)
 			{
@@ -1304,10 +1304,10 @@ void mcd212_device::draw_cursor(UINT32 *scanline, int y)
 
 void mcd212_device::draw_scanline(int y)
 {
-	UINT8 plane_a_r[768], plane_a_g[768], plane_a_b[768];
-	UINT8 plane_b_r[768], plane_b_g[768], plane_b_b[768];
-	UINT32 out[768];
-	UINT32 *scanline = &m_bitmap.pix32(y);
+	uint8_t plane_a_r[768], plane_a_g[768], plane_a_b[768];
+	uint8_t plane_b_r[768], plane_b_g[768], plane_b_b[768];
+	uint32_t out[768];
+	uint32_t *scanline = &m_bitmap.pix32(y);
 	int x;
 
 	process_vsr(0, plane_a_r, plane_a_g, plane_a_b);
@@ -1326,7 +1326,7 @@ void mcd212_device::draw_scanline(int y)
 READ16_MEMBER( mcd212_device::regs_r )
 {
 	cdi_state *state = machine().driver_data<cdi_state>();
-	UINT8 channel = 1 - (offset / 8);
+	uint8_t channel = 1 - (offset / 8);
 
 	switch(offset)
 	{
@@ -1341,9 +1341,9 @@ READ16_MEMBER( mcd212_device::regs_r )
 				}
 				else
 				{
-					UINT8 old_csr = m_channel[1].csrr;
-					UINT8 interrupt1 = (state->m_scc->get_lir() >> 4) & 7;
-					//UINT8 interrupt2 = state->m_scc68070_regs.lir & 7;
+					uint8_t old_csr = m_channel[1].csrr;
+					uint8_t interrupt1 = (state->m_scc->get_lir() >> 4) & 7;
+					//uint8_t interrupt2 = state->m_scc68070_regs.lir & 7;
 					m_channel[1].csrr &= ~(MCD212_CSR2R_IT1 | MCD212_CSR2R_IT2);
 					if(interrupt1)
 					{
@@ -1498,8 +1498,8 @@ void mcd212_device::device_reset()
 		elem.dyuv_abs_start_b = 0;
 		elem.cursor_position = 0;
 		elem.cursor_control = 0;
-		memset((UINT8*)&elem.cursor_pattern, 0, 16 * sizeof(UINT32));
-		memset((UINT8*)&elem.region_control, 0, 8 * sizeof(UINT32));
+		memset((uint8_t*)&elem.cursor_pattern, 0, 16 * sizeof(uint32_t));
+		memset((uint8_t*)&elem.region_control, 0, 8 * sizeof(uint32_t));
 		elem.backdrop_color = 0;
 		elem.mosaic_hold_a = 0;
 		elem.mosaic_hold_b = 0;
@@ -1514,7 +1514,7 @@ void mcd212_device::device_reset()
 //  mcd212_device - constructor
 //-------------------------------------------------
 
-mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mcd212_device::mcd212_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MACHINE_MCD212, "MCD212 Video", tag, owner, clock, "mcd212", __FILE__),
 		device_video_interface(mconfig, *this)
 {
@@ -1634,13 +1634,13 @@ void cdi_state::video_start()
 	screen->register_screen_bitmap(m_lcdbitmap);
 }
 
-UINT32 cdi_state::screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdi_state::screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_mcd212->get_bitmap(), 0, 0, 0, 0, cliprect);
 	return 0;
 }
 
-UINT32 cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t cdi_state::screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_lcdbitmap, 0, 0, 0, 0, cliprect);
 	return 0;

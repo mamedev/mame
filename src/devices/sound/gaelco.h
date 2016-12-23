@@ -14,7 +14,7 @@
 //**************************************************************************
 
 #define MCFG_GAELCO_SND_DATA(_tag) \
-	gaelco_gae1_device::set_snd_data_tag(*device, _tag);
+	gaelco_gae1_device::set_snd_data_tag(*device, "^" _tag);
 
 #define MCFG_GAELCO_BANKS(_offs1, _offs2, _offs3, _offs4) \
 	gaelco_gae1_device::set_bank_offsets(*device, _offs1, _offs2, _offs3, _offs4);
@@ -40,11 +40,11 @@ class gaelco_gae1_device : public device_t,
 							public device_sound_interface
 {
 public:
-	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	gaelco_gae1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	gaelco_gae1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	~gaelco_gae1_device() { }
 
-	static void set_snd_data_tag(device_t &device, const char *tag) { downcast<gaelco_gae1_device &>(device).m_data_tag = tag; }
+	static void set_snd_data_tag(device_t &device, const char *tag) { downcast<gaelco_gae1_device &>(device).m_snd_data.set_tag(tag); }
 	static void set_bank_offsets(device_t &device, int offs1, int offs2, int offs3, int offs4)
 	{
 		gaelco_gae1_device &dev = downcast<gaelco_gae1_device &>(device);
@@ -68,16 +68,14 @@ public:
 
 private:
 	sound_stream *m_stream;                                 /* our stream */
-	UINT8 *m_snd_data;                                      /* PCM data */
+	required_region_ptr<uint8_t> m_snd_data;                  /* PCM data */
 	int m_banks[4];                                         /* start of each ROM bank */
 	gaelco_sound_channel m_channel[GAELCO_NUM_CHANNELS];    /* 7 stereo channels */
 
-	const char *m_data_tag;
-
-	UINT16 m_sndregs[0x38];
+	uint16_t m_sndregs[0x38];
 
 	// Table for converting from 8 to 16 bits with volume control
-	INT16 m_volume_table[GAELCO_VOLUME_LEVELS][256];
+	int16_t m_volume_table[GAELCO_VOLUME_LEVELS][256];
 };
 
 extern const device_type GAELCO_GAE1;
@@ -89,7 +87,7 @@ extern const device_type GAELCO_GAE1;
 class gaelco_cg1v_device : public gaelco_gae1_device
 {
 public:
-	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gaelco_cg1v_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 };
 
 extern const device_type GAELCO_CG1V;

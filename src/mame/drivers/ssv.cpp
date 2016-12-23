@@ -165,6 +165,7 @@ Notes:
 #include "cpu/v810/v810.h"
 #include "cpu/v60/v60.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 #include "includes/ssv.h"
 
 /***************************************************************************
@@ -188,7 +189,7 @@ IRQ_CALLBACK_MEMBER(ssv_state::irq_callback)
 	{
 		if (m_requested_int & (1 << i))
 		{
-			UINT16 vector = m_irq_vectors[i * (16/2)] & 7;
+			uint16_t vector = m_irq_vectors[i * (16/2)] & 7;
 			return vector;
 		}
 	}
@@ -348,8 +349,8 @@ WRITE16_MEMBER(ssv_state::dsp_dr_w)
 
 READ16_MEMBER(ssv_state::dsp_r)
 {
-	UINT16 temp = m_dsp->dataram_r(offset/2);
-	UINT16 res;
+	uint16_t temp = m_dsp->dataram_r(offset/2);
+	uint16_t res;
 
 	if (offset & 1)
 	{
@@ -365,7 +366,7 @@ READ16_MEMBER(ssv_state::dsp_r)
 
 WRITE16_MEMBER(ssv_state::dsp_w)
 {
-	UINT16 temp = m_dsp->dataram_r(offset/2);
+	uint16_t temp = m_dsp->dataram_r(offset/2);
 
 	if (offset & 1)
 	{
@@ -443,9 +444,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::gdfs_eeprom_r)
 {
-	ioport_port *gun[] = { m_io_gunx1, m_io_guny1, m_io_gunx2, m_io_guny2 };
-
-	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->do_read() << 8);
+	return (((m_gdfs_lightgun_select & 1) ? 0 : 0xff) ^ m_io_gun[m_gdfs_lightgun_select]->read()) | (m_eeprom->do_read() << 8);
 }
 
 WRITE16_MEMBER(ssv_state::gdfs_eeprom_w)
@@ -503,7 +502,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::hypreact_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0001) return m_io_key0->read();
 	if (input_sel & 0x0002) return m_io_key1->read();
@@ -514,7 +513,7 @@ READ16_MEMBER(ssv_state::hypreact_input_r)
 }
 
 static ADDRESS_MAP_START( hypreact_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)            // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                      // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)            // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                       // ? read at the start, value not used
@@ -530,7 +529,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( hypreac2_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 5 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Inverted lockout lines
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                           // ? read at the start, value not used
@@ -576,7 +575,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( meosism_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r )                           // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
 //  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
@@ -614,7 +613,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( ryorioh_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)   // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 1 at the start
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
@@ -626,7 +625,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::srmp4_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0002) return m_io_key0->read();
 	if (input_sel & 0x0004) return m_io_key1->read();
@@ -637,7 +636,7 @@ READ16_MEMBER(ssv_state::srmp4_input_r)
 }
 
 static ADDRESS_MAP_START( srmp4_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 1,5 at the start
 	AM_RANGE(0xc0000a, 0xc0000b) AM_READ(srmp4_input_r)                     // Inputs
 	AM_RANGE(0xc0000e, 0xc0000f) AM_WRITEONLY AM_SHARE("input_sel") // Inputs
@@ -663,7 +662,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int bank = 0x400000/2 * (data & 1); // UINT16 address
+		int bank = 0x400000/2 * (data & 1); // uint16_t address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
 			m_ensoniq->voice_bank_w(voice, bank);
@@ -673,7 +672,7 @@ WRITE16_MEMBER(ssv_state::srmp7_sound_bank_w)
 
 READ16_MEMBER(ssv_state::srmp7_input_r)
 {
-	UINT16 input_sel = *m_input_sel;
+	uint16_t input_sel = *m_input_sel;
 
 	if (input_sel & 0x0002) return m_io_key0->read();
 	if (input_sel & 0x0004) return m_io_key1->read();
@@ -685,7 +684,7 @@ READ16_MEMBER(ssv_state::srmp7_input_r)
 
 static ADDRESS_MAP_START( srmp7_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x050faf) AM_RAM                                     // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                          // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                // Coin Counters / Lockouts
 	AM_RANGE(0x300076, 0x300077) AM_READ(srmp7_irqv_r)                      // Sound
@@ -702,7 +701,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static ADDRESS_MAP_START( survarts_map, AS_PROGRAM, 16, ssv_state )
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)    // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 0,4 at the start
 //  AM_RANGE(0x290000, 0x290001) AM_READNOP               // ?
 //  AM_RANGE(0x2a0000, 0x2a0001) AM_READNOP               // ?
@@ -721,11 +720,7 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(ssv_state::sxyreact_ballswitch_r)
 {
-	if ( m_io_service )
-	{
-		return m_io_service->read();
-	}
-	return 0;
+	return m_io_service.read_safe(0);
 }
 
 READ16_MEMBER(ssv_state::sxyreact_dial_r)
@@ -739,7 +734,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_dial_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 0x20)
-			m_sxyreact_serial = ( m_io_paddle ? m_io_paddle->read() : 0 ) & 0xff;
+			m_sxyreact_serial = m_io_paddle.read_safe(0) & 0xff;
 
 		if ( (m_sxyreact_dial & 0x40) && !(data & 0x40) )   // $40 -> $00
 			m_sxyreact_serial <<= 1;                        // shift 1 bit
@@ -755,7 +750,7 @@ WRITE16_MEMBER(ssv_state::sxyreact_motor_w)
 
 static ADDRESS_MAP_START( sxyreact_map, AS_PROGRAM, 16, ssv_state )
 //  AM_RANGE(0x020000, 0x03ffff) AM_READWRITE(mainram_r, mainram_w)             // sxyreac2 reads / writes here, why?
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)                            // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 1 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
 	AM_RANGE(0x500002, 0x500003) AM_READ(sxyreact_ballswitch_r)                         // ?
@@ -774,7 +769,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twineag2_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)    // Watchdog (also value is cmp.b with mem 8)
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with mem 8)
 	AM_RANGE(0x480000, 0x480001) AM_READWRITE(dsp_dr_r, dsp_dr_w)
 	AM_RANGE(0x482000, 0x482fff) AM_READWRITE(dsp_r, dsp_w)
 	SSV_MAP( 0xe00000 )
@@ -789,7 +784,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ultrax_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x010000, 0x03ffff) AM_RAM                         // More RAM
-	AM_RANGE(0x210000, 0x210001) AM_READ(watchdog_reset16_r)    // Watchdog (also value is cmp.b with memory address 8)
+	AM_RANGE(0x210000, 0x210001) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r) // Watchdog (also value is cmp.b with memory address 8)
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP              // ? 2,6 at the start
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
@@ -832,7 +827,7 @@ WRITE16_MEMBER(ssv_state::latch16_w)
 
 static ADDRESS_MAP_START( jsk_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x050000, 0x05ffff) AM_READWRITE(mainram_r, mainram_w) // RAM Mirror?
-	AM_RANGE(0x210000, 0x210001) AM_WRITE(watchdog_reset16_w)               // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x400000, 0x47ffff) AM_RAM                                     // RAM?
 	AM_RANGE(0x900000, 0x900007) AM_READWRITE(latch16_r, latch16_w)
 	SSV_MAP( 0xf00000 )
@@ -899,7 +894,7 @@ WRITE16_MEMBER(ssv_state::eaglshot_gfxram_w)
 
 static ADDRESS_MAP_START( eaglshot_map, AS_PROGRAM, 16, ssv_state )
 	AM_RANGE(0x180000, 0x1bffff) AM_READWRITE(eaglshot_gfxram_r, eaglshot_gfxram_w)
-	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_READ(watchdog_reset16_r)*/                 // Watchdog
+	AM_RANGE(0x210000, 0x210001) AM_READNOP /*AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)*/                 // Watchdog
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 0,4 at the start
 	AM_RANGE(0x21000e, 0x21000f) AM_WRITE(lockout_inv_w)                            // Inverted lockout lines
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_bank_w)
@@ -1483,12 +1478,12 @@ static INPUT_PORTS_START( hypreac2 )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Controls ) )         PORT_DIPLOCATION( "DSWB:5" )
 	PORT_DIPSETTING(      0x0010, "Keyboard" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Joystick ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Communication 1" )           PORT_DIPLOCATION( "DSWB:6" )
+	PORT_DIPNAME( 0x0020, 0x0020, "Communication" )           PORT_DIPLOCATION( "DSWB:6" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Communication 2" )           PORT_DIPLOCATION( "DSWB:7" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Communication Mode" )           PORT_DIPLOCATION( "DSWB:7" )
+	PORT_DIPSETTING(      0x0040, "SLAVE" )
+	PORT_DIPSETTING(      0x0000, "MASTER" )
 	PORT_SERVICE_DIPLOC( 0x0080, IP_ACTIVE_LOW, "DSWB:8" )
 
 	PORT_START("KEY0")  // IN5 - $500000(0)
@@ -2516,9 +2511,9 @@ void ssv_state::init_eaglshot_banking()
 // massages the data from the BPMicro-compatible dump to runnable form
 void ssv_state::init_st010()
 {
-	UINT8 *dspsrc = (UINT8 *)memregion("st010")->base();
-	UINT32 *dspprg = (UINT32 *)memregion("dspprg")->base();
-	UINT16 *dspdata = (UINT16 *)memregion("dspdata")->base();
+	uint8_t *dspsrc = (uint8_t *)memregion("st010")->base();
+	uint32_t *dspprg = (uint32_t *)memregion("dspprg")->base();
+	uint16_t *dspdata = (uint16_t *)memregion("dspdata")->base();
 
 	// copy DSP program
 	for (int i = 0; i < 0x10000; i+= 4)
@@ -2545,7 +2540,7 @@ DRIVER_INIT_MEMBER(ssv_state,meosism)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,mslider)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,ryorioh)       {   init(0); }
 DRIVER_INIT_MEMBER(ssv_state,srmp4)        {    init(0);
-//  ((UINT16 *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
+//  ((uint16_t *)memregion("maincpu")->base())[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
 DRIVER_INIT_MEMBER(ssv_state,srmp7)        {    init(0); }
 DRIVER_INIT_MEMBER(ssv_state,stmblade)     {    init(0); init_st010(); }
@@ -2637,7 +2632,6 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 	MCFG_SCREEN_UPDATE_DRIVER(ssv_state, screen_update_gdfs)
 
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
-	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", gdfs)
@@ -2651,6 +2645,8 @@ static MACHINE_CONFIG_DERIVED( hypreact, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hypreact_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2662,6 +2658,8 @@ static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(hypreac2_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2701,6 +2699,8 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0xfe - 0x12)-1)
@@ -2725,6 +2725,8 @@ static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2735,6 +2737,8 @@ static MACHINE_CONFIG_DERIVED( vasara, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ryorioh_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2747,6 +2751,8 @@ static MACHINE_CONFIG_DERIVED( srmp4, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(srmp4_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
@@ -2758,6 +2764,8 @@ static MACHINE_CONFIG_DERIVED( srmp7, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(srmp7_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2791,6 +2799,8 @@ static MACHINE_CONFIG_DERIVED( survarts, ssv )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(survarts_map)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
@@ -2814,6 +2824,8 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
@@ -2832,6 +2844,8 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2845,6 +2859,8 @@ static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2857,6 +2873,8 @@ static MACHINE_CONFIG_DERIVED( cairblad, ssv )
 	MCFG_CPU_PROGRAM_MAP(sxyreact_map)
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2875,6 +2893,8 @@ static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
@@ -2886,6 +2906,8 @@ static MACHINE_CONFIG_DERIVED( ultrax, ssv )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(ultrax_map)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")
@@ -2900,6 +2922,8 @@ static MACHINE_CONFIG_DERIVED( jsk, ssv )
 
 	MCFG_CPU_ADD("sub", V810,25000000)
 	MCFG_CPU_PROGRAM_MAP(jsk_v810_mem)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_MODIFY("screen")

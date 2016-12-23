@@ -159,6 +159,7 @@ JC-301-00  W11 9510K7059    23C16000        U85
 #include "sound/ymz280b.h"
 #include "video/sknsspr.h"
 #include "machine/eepromser.h"
+#include "machine/watchdog.h"
 #include "video/kaneko_tmap.h"
 #include "machine/kaneko_toybox.h"
 
@@ -188,19 +189,19 @@ public:
 	required_device<sknsspr_device> m_spritegen2;
 	required_device<kaneko_view2_tilemap_device> m_view2_0;
 
-	required_shared_ptr<UINT16> m_spriteram_1;
-	required_shared_ptr<UINT16> m_sprregs_1;
-	required_shared_ptr<UINT16> m_spriteram_2;
-	required_shared_ptr<UINT16> m_sprregs_2;
-	required_shared_ptr<UINT16> m_mainsub_shared_ram;
-	required_shared_ptr<UINT16> m_ctrl;
+	required_shared_ptr<uint16_t> m_spriteram_1;
+	required_shared_ptr<uint16_t> m_sprregs_1;
+	required_shared_ptr<uint16_t> m_spriteram_2;
+	required_shared_ptr<uint16_t> m_sprregs_2;
+	required_shared_ptr<uint16_t> m_mainsub_shared_ram;
+	required_shared_ptr<uint16_t> m_ctrl;
 
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_1;
 	std::unique_ptr<bitmap_ind16> m_sprite_bitmap_2;
-	std::unique_ptr<UINT32[]> m_sprite_ram32_1;
-	std::unique_ptr<UINT32[]> m_sprite_ram32_2;
-	std::unique_ptr<UINT32[]> m_sprite_regs32_1;
-	std::unique_ptr<UINT32[]> m_sprite_regs32_2;
+	std::unique_ptr<uint32_t[]> m_sprite_ram32_1;
+	std::unique_ptr<uint32_t[]> m_sprite_ram32_2;
+	std::unique_ptr<uint32_t[]> m_sprite_regs32_1;
+	std::unique_ptr<uint32_t[]> m_sprite_regs32_2;
 	int m_irq_sub_enable;
 
 	DECLARE_WRITE16_MEMBER(ctrl_w);
@@ -215,7 +216,7 @@ public:
 	DECLARE_DRIVER_INIT(jchan);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	TIMER_DEVICE_CALLBACK_MEMBER(vblank);
 };
@@ -265,11 +266,11 @@ TIMER_DEVICE_CALLBACK_MEMBER(jchan_state::vblank)
 void jchan_state::video_start()
 {
 	/* so we can use sknsspr.c */
-	m_sprite_ram32_1 = std::make_unique<UINT32[]>(0x4000/4);
-	m_sprite_ram32_2 = std::make_unique<UINT32[]>(0x4000/4);
+	m_sprite_ram32_1 = std::make_unique<uint32_t[]>(0x4000/4);
+	m_sprite_ram32_2 = std::make_unique<uint32_t[]>(0x4000/4);
 
-	m_sprite_regs32_1 = std::make_unique<UINT32[]>(0x40/4);
-	m_sprite_regs32_2 = std::make_unique<UINT32[]>(0x40/4);
+	m_sprite_regs32_1 = std::make_unique<uint32_t[]>(0x40/4);
+	m_sprite_regs32_2 = std::make_unique<uint32_t[]>(0x40/4);
 
 	m_sprite_bitmap_1 = std::make_unique<bitmap_ind16>(1024,1024);
 	m_sprite_bitmap_2 = std::make_unique<bitmap_ind16>(1024,1024);
@@ -290,14 +291,14 @@ void jchan_state::video_start()
 
 
 
-UINT32 jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t jchan_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
-	UINT16* src1;
-	UINT16* src2;
-	UINT16* dst;
-	UINT16 pixdata1;
-	UINT16 pixdata2;
+	uint16_t* src1;
+	uint16_t* src2;
+	uint16_t* dst;
+	uint16_t pixdata1;
+	uint16_t pixdata2;
 
 	bitmap.fill(m_palette->black_pen(), cliprect);
 
@@ -444,7 +445,7 @@ static ADDRESS_MAP_START( jchan_main, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(ctrl_r, ctrl_w) AM_SHARE("ctrl")
 
-	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -464,7 +465,7 @@ static ADDRESS_MAP_START( jchan_sub, AS_PROGRAM, 16, jchan_state )
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8("ymz", ymz280b_device, write, 0x00ff) // sound
 
-	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)   // watchdog
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE("watchdog", watchdog_timer_device, reset16_r, reset16_w)
 ADDRESS_MAP_END
 
 
@@ -581,6 +582,8 @@ static MACHINE_CONFIG_START( jchan, jchan_state )
 
 	MCFG_CPU_ADD("sub", M68000, 16000000)
 	MCFG_CPU_PROGRAM_MAP(jchan_sub)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", jchan)
 

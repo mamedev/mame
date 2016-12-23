@@ -61,7 +61,7 @@ struct saa1099_noise
 	/* vars to simulate the noise generator output */
 	double counter;
 	double freq;
-	int level;                      /* noise polynomal shifter */
+	int level;                      /* noise polynomial shifter */
 };
 
 
@@ -71,7 +71,7 @@ class saa1099_device : public device_t,
 						public device_sound_interface
 {
 public:
-	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	saa1099_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~saa1099_device() { }
 
 protected:

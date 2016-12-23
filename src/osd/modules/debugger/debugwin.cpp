@@ -20,12 +20,16 @@
 #include "win/memorywininfo.h"
 #include "win/pointswininfo.h"
 #include "win/uimetrics.h"
+#undef min
+#undef max
 
 #include "emu.h"
 #include "debugger.h"
+#include "debug/debugcpu.h"
 
 #include "window.h"
-#include "../../windows/input.h"
+#include "../input/input_common.h"
+#include "../input/input_windows.h"
 
 
 class debugger_windows : public osd_module, public debug_module, protected debugger_windows_interface
@@ -34,11 +38,11 @@ public:
 	debugger_windows() :
 		osd_module(OSD_DEBUG_PROVIDER, "windows"),
 		debug_module(),
-		m_machine(NULL),
+		m_machine(nullptr),
 		m_metrics(),
 		m_waiting_for_debugger(false),
 		m_window_list(),
-		m_main_console(NULL)
+		m_main_console(nullptr)
 	{
 	}
 
@@ -74,7 +78,7 @@ private:
 	running_machine             *m_machine;
 	std::unique_ptr<ui_metrics>    m_metrics;
 	bool                        m_waiting_for_debugger;
-	simple_list<debugwin_info>  m_window_list;
+	std::vector<std::unique_ptr<debugwin_info>>  m_window_list;
 	consolewin_info             *m_main_console;
 };
 
@@ -82,12 +86,12 @@ private:
 void debugger_windows::exit()
 {
 	// loop over windows and free them
-	while (m_window_list.first() != NULL)
-		m_window_list.first()->destroy();
+	while (!m_window_list.empty())
+		m_window_list.front()->destroy();
 
-	m_main_console = NULL;
+	m_main_console = nullptr;
 	m_metrics.reset();
-	m_machine = NULL;
+	m_machine = nullptr;
 }
 
 
@@ -101,15 +105,15 @@ void debugger_windows::init_debugger(running_machine &machine)
 void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 {
 	// create a console window
-	if (m_main_console == NULL)
+	if (m_main_console == nullptr)
 		m_main_console = create_window<consolewin_info>();
 
 	// update the views in the console to reflect the current CPU
-	if (m_main_console != NULL)
+	if (m_main_console != nullptr)
 		m_main_console->set_cpu(device);
 
 	// when we are first stopped, adjust focus to us
-	if (firststop && (m_main_console != NULL))
+	if (firststop && (m_main_console != nullptr))
 	{
 		m_main_console->set_foreground();
 		if (winwindow_has_focus())
@@ -121,11 +125,11 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 	show_all();
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(*m_machine);
+	downcast<windows_osd_interface&>(machine().osd()).poll_input(*m_machine);
 
 	// get and process messages
 	MSG message;
-	GetMessage(&message, NULL, 0, 0);
+	GetMessage(&message, nullptr, 0, 0);
 
 	switch (message.message)
 	{
@@ -152,17 +156,17 @@ void debugger_windows::wait_for_debugger(device_t &device, bool firststop)
 void debugger_windows::debugger_update()
 {
 	// if we're running live, do some checks
-	if (!winwindow_has_focus() && m_machine && !debug_cpu_is_stopped(*m_machine) && (m_machine->phase() == MACHINE_PHASE_RUNNING))
+	if (!winwindow_has_focus() && m_machine && !m_machine->debugger().cpu().is_stopped() && (m_machine->phase() == MACHINE_PHASE_RUNNING))
 	{
 		// see if the interrupt key is pressed and break if it is
 		if (seq_pressed())
 		{
 			HWND const focuswnd = GetFocus();
 
-			debug_cpu_get_visible_cpu(*m_machine)->debug()->halt_on_next_instruction("User-initiated break\n");
+			m_machine->debugger().cpu().get_visible_cpu()->debug()->halt_on_next_instruction("User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
-			for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
+			for (auto &info : m_window_list)
 				info->restore_field(focuswnd);
 		}
 	}
@@ -202,7 +206,7 @@ bool debugger_windows::seq_pressed() const
 		else
 		{
 			// handle everything else as a series of ANDs
-			int const vkey = wininput_vkey_for_mame_code(code);
+			int const vkey = keyboard_trans_table::instance().vkey_for_mame_code(code);
 			bool const pressed = (vkey != 0) && ((GetAsyncKeyState(vkey) & 0x8000) != 0);
 
 			if (first)          // if this is the first in the sequence, result is set equal
@@ -222,21 +226,25 @@ bool debugger_windows::seq_pressed() const
 
 void debugger_windows::remove_window(debugwin_info &info)
 {
-	m_window_list.remove(info);
+	for (auto it = m_window_list.begin(); it != m_window_list.end(); ++it)
+		if (it->get() == &info) {
+			m_window_list.erase(it);
+			return;
+		}
 }
 
 
 void debugger_windows::show_all()
 {
-	for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
+	for (auto &info : m_window_list)
 		info->show();
 }
 
 
 void debugger_windows::hide_all()
 {
-	SetForegroundWindow(win_window_list->m_hwnd);
-	for (debugwin_info *info = m_window_list.first(); info != NULL; info = info->next())
+	SetForegroundWindow(std::static_pointer_cast<win_window_info>(osd_common_t::s_window_list.front())->platform_window());
+	for (auto &info : m_window_list)
 		info->hide();
 }
 
@@ -244,17 +252,14 @@ void debugger_windows::hide_all()
 template <typename T> T *debugger_windows::create_window()
 {
 	// allocate memory
-	T *info = global_alloc(T(*this));
+	std::unique_ptr<T> info = std::make_unique<T>(static_cast<debugger_windows_interface &>(*this));
 	if (info->is_valid())
 	{
-		m_window_list.prepend(*info);
-		return info;
+		m_window_list.push_back(std::move(info));
+		T *ptr = dynamic_cast<T*>(m_window_list.back().get());
+		return ptr;
 	}
-	else
-	{
-		global_free(info);
-		return NULL;
-	}
+	return nullptr;
 }
 
 

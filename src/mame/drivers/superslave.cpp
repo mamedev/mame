@@ -34,15 +34,15 @@ Oxx,yy          = Out port
 
 READ8_MEMBER( superslave_state::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
-	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
+	offs_t boundary = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
 	if ((offset < 0x1000) && BIT(m_cmd, 0))
 	{
 		data = m_rom->base()[offset & 0x7ff];
 	}
-	else if (offset < boundry)
+	else if (offset < boundary)
 	{
 		if (BIT(m_memctrl, 0))
 		{
@@ -68,9 +68,9 @@ READ8_MEMBER( superslave_state::read )
 
 WRITE8_MEMBER( superslave_state::write )
 {
-	offs_t boundry = 0xc000 | ((m_memctrl & 0xf0) << 6);
+	offs_t boundary = 0xc000 | ((m_memctrl & 0xf0) << 6);
 
-	if (offset < boundry)
+	if (offset < boundary)
 	{
 		if (BIT(m_memctrl, 0))
 		{
@@ -145,7 +145,7 @@ READ8_MEMBER( superslave_state::status_r)
 
 	*/
 
-	UINT8 data = 1;
+	uint8_t data = 1;
 
 	// RS-232
 	data |= m_rs232d->dsr_r() << 4;
@@ -329,10 +329,10 @@ static MACHINE_CONFIG_START( superslave, superslave_state )
 	MCFG_CPU_ADD(Z80_TAG, Z80, XTAL_8MHz/2)
 	MCFG_CPU_PROGRAM_MAP(superslave_mem)
 	MCFG_CPU_IO_MAP(superslave_io)
-	MCFG_CPU_CONFIG(superslave_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(superslave_daisy_chain)
 
 	// devices
-	MCFG_PIC8259_ADD(AM9519_TAG, INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), VCC, NULL)
+	MCFG_PIC8259_ADD(AM9519_TAG, INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0), VCC, NOOP)
 
 	MCFG_DEVICE_ADD(Z80PIO_TAG, Z80PIO, XTAL_8MHz/2)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE(Z80_TAG, INPUT_LINE_IRQ0))

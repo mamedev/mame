@@ -24,7 +24,7 @@
 	MCFG_DEVICE_ADD(_tag, MC146818, _xtal)
 
 #define MCFG_MC146818_IRQ_HANDLER(_irq) \
-	downcast<mc146818_device *>(device)->set_irq_callback(DEVCB_##_irq);
+	devcb = &mc146818_device::set_irq_callback(*device, DEVCB_##_irq);
 
 // The MC146818 doesn't have century support, but when syncing the date & time at startup we can optionally store the century.
 #define MCFG_MC146818_CENTURY_INDEX(_century_index) \
@@ -57,11 +57,11 @@ class mc146818_device : public device_t,
 {
 public:
 	// construction/destruction
-	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	mc146818_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc146818_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 
 	// callbacks
-	template<class _irq> void set_irq_callback(_irq irq) { m_write_irq.set_callback(irq); }
+	template<class _Object> static devcb_base &set_irq_callback(device_t &device, _Object object) { return downcast<mc146818_device &>(device).m_write_irq.set_callback(object); }
 	void set_century_index(int century_index) { m_century_index = century_index; }
 	void set_use_utc(bool use_utc) { m_use_utc = use_utc; }
 	void set_binary(bool binary) { m_binary = binary; }
@@ -167,10 +167,12 @@ private:
 	int get_year();
 	void set_year(int year);
 
+	optional_memory_region m_region;
+
 	// internal state
 
-	UINT8           m_index;
-	dynamic_buffer  m_data;
+	uint8_t           m_index;
+	std::vector<uint8_t>  m_data;
 
 	attotime        m_last_refresh;
 

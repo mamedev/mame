@@ -14,9 +14,11 @@
 #error Dont include this file directly; include emu.h instead.
 #endif
 
-#ifndef __INPTPORT_H__
-#define __INPTPORT_H__
+#ifndef MAME_EMU_IOPORT_H
+#define MAME_EMU_IOPORT_H
 
+#include <cstdint>
+#include <cstring>
 #include <time.h>
 
 
@@ -25,27 +27,22 @@
 //**************************************************************************
 
 // input ports support up to 32 bits each
-typedef UINT32 ioport_value;
+typedef u32 ioport_value;
 
 // active high/low values for input ports
 const ioport_value IP_ACTIVE_HIGH = 0x00000000;
 const ioport_value IP_ACTIVE_LOW = 0xffffffff;
 
 // maximum number of players supported
-const int MAX_PLAYERS = 8;
-
-// INP file parameters
-const UINT32 INP_HEADER_SIZE = 64;
-const UINT32 INP_HEADER_MAJVERSION = 3;
-const UINT32 INP_HEADER_MINVERSION = 0;
+const int MAX_PLAYERS = 10;
 
 // unicode constants
-const unicode_char UCHAR_PRIVATE = 0x100000;
-const unicode_char UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
-const unicode_char UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
-const unicode_char UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
-const unicode_char UCHAR_SHIFT_END = UCHAR_SHIFT_2;
-const unicode_char UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
+const char32_t UCHAR_PRIVATE = 0x100000;
+const char32_t UCHAR_SHIFT_1 = UCHAR_PRIVATE + 0;
+const char32_t UCHAR_SHIFT_2 = UCHAR_PRIVATE + 1;
+const char32_t UCHAR_SHIFT_BEGIN = UCHAR_SHIFT_1;
+const char32_t UCHAR_SHIFT_END = UCHAR_SHIFT_2;
+const char32_t UCHAR_MAMEKEY_BEGIN = UCHAR_PRIVATE + 2;
 
 
 // sequence types for input_port_seq() call
@@ -81,6 +78,8 @@ enum ioport_group
 	IPG_PLAYER6,
 	IPG_PLAYER7,
 	IPG_PLAYER8,
+	IPG_PLAYER9,
+	IPG_PLAYER10,
 	IPG_OTHER,
 	IPG_TOTAL_GROUPS,
 	IPG_INVALID
@@ -108,6 +107,8 @@ enum ioport_type
 	IPT_START6,
 	IPT_START7,
 	IPT_START8,
+	IPT_START9,
+	IPT_START10,
 
 	// coin slots
 	IPT_COIN1,
@@ -137,15 +138,18 @@ enum ioport_type
 	IPT_TILT4,
 
 	// misc other digital inputs
+	IPT_POWER_ON,
+	IPT_POWER_OFF,
 	IPT_SERVICE,
 	IPT_TILT,
 	IPT_INTERLOCK,
+	IPT_MEMORY_RESET,
 	IPT_VOLUME_UP,
 	IPT_VOLUME_DOWN,
-	IPT_START,                  // MESS only
-	IPT_SELECT,                 // MESS only
-	IPT_KEYPAD,                 // MESS only
-	IPT_KEYBOARD,               // MESS only
+	IPT_START,              // use the numbered start button(s) for coin-ops
+	IPT_SELECT,
+	IPT_KEYPAD,
+	IPT_KEYBOARD,
 
 	// digital joystick inputs
 	IPT_DIGITAL_JOYSTICK_FIRST,
@@ -209,7 +213,7 @@ enum ioport_type
 		IPT_MAHJONG_KAN,
 		IPT_MAHJONG_PON,
 		IPT_MAHJONG_CHI,
-		IPT_MAHJONG_REACH,  //IPT_MAHJONG_RIICHI,   // REACH is Japanglish
+		IPT_MAHJONG_REACH,
 		IPT_MAHJONG_RON,
 		IPT_MAHJONG_BET,
 		IPT_MAHJONG_LAST_CHANCE,
@@ -259,22 +263,6 @@ enum ioport_type
 		IPT_GAMBLE_STAND,   // player
 		IPT_GAMBLE_BET,     // player
 		IPT_GAMBLE_PAYOUT,  // player
-	//  IPT_GAMBLE_BUTTON1, // player
-	//  IPT_GAMBLE_BUTTON2, // many many gambling games have multi-games and/or multi-function-buttons
-	//  IPT_GAMBLE_BUTTON3, // I suggest to eliminate specific names
-	//  IPT_GAMBLE_BUTTON4,
-	//  IPT_GAMBLE_BUTTON5,
-	//  IPT_GAMBLE_BUTTON6,
-	//  IPT_GAMBLE_BUTTON7,
-	//  IPT_GAMBLE_BUTTON8,
-	//  IPT_GAMBLE_BUTTON9,
-	//  IPT_GAMBLE_BUTTON10,
-	//  IPT_GAMBLE_BUTTON11,
-	//  IPT_GAMBLE_BUTTON12,
-	//  IPT_GAMBLE_BUTTON13,
-	//  IPT_GAMBLE_BUTTON14,
-	//  IPT_GAMBLE_BUTTON15,
-	//  IPT_GAMBLE_BUTTON16,
 
 		// poker-specific inputs
 		IPT_POKER_HOLD1,
@@ -333,6 +321,7 @@ enum ioport_type
 		IPT_UI_ON_SCREEN_DISPLAY,
 		IPT_UI_DEBUG_BREAK,
 		IPT_UI_PAUSE,
+		IPT_UI_PAUSE_SINGLE,
 		IPT_UI_RESET_MACHINE,
 		IPT_UI_SOFT_RESET,
 		IPT_UI_SHOW_GFX,
@@ -342,6 +331,7 @@ enum ioport_type
 		IPT_UI_FAST_FORWARD,
 		IPT_UI_SHOW_FPS,
 		IPT_UI_SNAPSHOT,
+		IPT_UI_TIMECODE,
 		IPT_UI_RECORD_MOVIE,
 		IPT_UI_TOGGLE_CHEAT,
 		IPT_UI_UP,
@@ -369,6 +359,18 @@ enum ioport_type
 		IPT_UI_LOAD_STATE,
 		IPT_UI_TAPE_START,
 		IPT_UI_TAPE_STOP,
+		IPT_UI_DATS,
+		IPT_UI_FAVORITES,
+		IPT_UI_UP_FILTER,
+		IPT_UI_DOWN_FILTER,
+		IPT_UI_LEFT_PANEL,
+		IPT_UI_RIGHT_PANEL,
+		IPT_UI_UP_PANEL,
+		IPT_UI_DOWN_PANEL,
+		IPT_UI_EXPORT,
+		IPT_UI_AUDIT_FAST,
+		IPT_UI_AUDIT_ALL,
+		IPT_UI_TOGGLE_AUTOFIRE,
 
 		// additional OSD-specified UI port types (up to 16)
 		IPT_OSD_1,
@@ -651,19 +653,15 @@ enum
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// opaque types pointing to live state
-struct input_port_state;
-struct input_field_state;
-
 // forward declarations
+namespace util { namespace xml { class data_node; } }
 class ioport_list;
 class ioport_port;
 struct ioport_port_live;
 class ioport_field;
 struct ioport_field_live;
 class ioport_manager;
-class emu_timer;
-struct xml_data_node;
+class natural_keyboard;
 class analog_field;
 
 // constructor function pointer
@@ -674,24 +672,114 @@ typedef device_delegate<ioport_value (ioport_field &, void *)> ioport_field_read
 typedef device_delegate<void (ioport_field &, void *, ioport_value, ioport_value)> ioport_field_write_delegate;
 typedef device_delegate<float (ioport_field &, float)> ioport_field_crossmap_delegate;
 
-// keyboard helper function delegates
-typedef delegate<int (const unicode_char *, size_t)> ioport_queue_chars_delegate;
-typedef delegate<bool (unicode_char)> ioport_accept_char_delegate;
-typedef delegate<bool ()> ioport_charqueue_empty_delegate;
-
 
 // ======================> inp_header
 
 // header at the front of INP files
-struct inp_header
+class inp_header
 {
-	char                        header[8];      // +00: 8 byte header - must be "MAMEINP\0"
-	UINT64                      basetime;       // +08: base time of recording
-	UINT8                       majversion;     // +10: major INP version
-	UINT8                       minversion;     // +11: minor INP version
-	UINT8                       reserved[2];    // +12: must be zero
-	char                        gamename[12];   // +14: game name string, NULL-terminated
-	char                        version[32];    // +20: system version string, NULL-terminated
+public:
+	// parameters
+	static constexpr unsigned MAJVERSION = 3;
+	static constexpr unsigned MINVERSION = 0;
+
+	bool read(emu_file &f)
+	{
+		return f.read(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+	bool write(emu_file &f) const
+	{
+		return f.write(m_data, sizeof(m_data)) == sizeof(m_data);
+	}
+
+	bool check_magic() const
+	{
+		return 0 == std::memcmp(MAGIC, m_data + OFFS_MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	u64 get_basetime() const
+	{
+		return
+				(u64(m_data[OFFS_BASETIME + 0]) << (0 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 1]) << (1 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 2]) << (2 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 3]) << (3 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 4]) << (4 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 5]) << (5 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 6]) << (6 * 8)) |
+				(u64(m_data[OFFS_BASETIME + 7]) << (7 * 8));
+	}
+	unsigned get_majversion() const
+	{
+		return m_data[OFFS_MAJVERSION];
+	}
+	unsigned get_minversion() const
+	{
+		return m_data[OFFS_MINVERSION];
+	}
+	std::string get_sysname() const
+	{
+		return get_string<OFFS_SYSNAME, OFFS_APPDESC>();
+	}
+	std::string get_appdesc() const
+	{
+		return get_string<OFFS_APPDESC, OFFS_END>();
+	}
+
+	void set_magic()
+	{
+		std::memcpy(m_data + OFFS_MAGIC, MAGIC, OFFS_BASETIME - OFFS_MAGIC);
+	}
+	void set_basetime(u64 time)
+	{
+		m_data[OFFS_BASETIME + 0] = u8((time >> (0 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 1] = u8((time >> (1 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 2] = u8((time >> (2 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 3] = u8((time >> (3 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 4] = u8((time >> (4 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 5] = u8((time >> (5 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 6] = u8((time >> (6 * 8)) & 0x00ff);
+		m_data[OFFS_BASETIME + 7] = u8((time >> (7 * 8)) & 0x00ff);
+	}
+	void set_version()
+	{
+		m_data[OFFS_MAJVERSION] = MAJVERSION;
+		m_data[OFFS_MINVERSION] = MINVERSION;
+	}
+	void set_sysname(std::string const &name)
+	{
+		set_string<OFFS_SYSNAME, OFFS_APPDESC>(name);
+	}
+	void set_appdesc(std::string const &desc)
+	{
+		set_string<OFFS_APPDESC, OFFS_END>(desc);
+	}
+
+private:
+	template <std::size_t BEGIN, std::size_t END> void set_string(std::string const &str)
+	{
+		std::size_t const used = (std::min<std::size_t>)(str.size() + 1, END - BEGIN);
+		std::memcpy(m_data + BEGIN, str.c_str(), used);
+		if ((END - BEGIN) > used)
+			std::memset(m_data + BEGIN + used, 0, (END - BEGIN) - used);
+	}
+	template <std::size_t BEGIN, std::size_t END> std::string get_string() const
+	{
+		char const *const begin = reinterpret_cast<char const *>(m_data + BEGIN);
+		return std::string(begin, std::find(begin, reinterpret_cast<char const *>(m_data + END), '\0'));
+	}
+
+	static constexpr std::size_t    OFFS_MAGIC       = 0x00;    // 0x08 bytes
+	static constexpr std::size_t    OFFS_BASETIME    = 0x08;    // 0x08 bytes (little-endian binary integer)
+	static constexpr std::size_t    OFFS_MAJVERSION  = 0x10;    // 0x01 bytes (binary integer)
+	static constexpr std::size_t    OFFS_MINVERSION  = 0x11;    // 0x01 bytes (binary integer)
+																// 0x02 bytes reserved
+	static constexpr std::size_t    OFFS_SYSNAME     = 0x14;    // 0x0c bytes (ASCII)
+	static constexpr std::size_t    OFFS_APPDESC     = 0x20;    // 0x20 bytes (ASCII)
+	static constexpr std::size_t    OFFS_END         = 0x40;
+
+	static u8 const                 MAGIC[OFFS_BASETIME - OFFS_MAGIC];
+
+	u8                              m_data[OFFS_END];
 };
 
 
@@ -723,7 +811,7 @@ public:
 	input_type_entry *next() const { return m_next; }
 	ioport_type type() const { return m_type; }
 	ioport_group group() const { return m_group; }
-	UINT8 player() const { return m_player; }
+	u8 player() const { return m_player; }
 	const char *token() const { return m_token; }
 	const char *name() const { return m_name; }
 	input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) { return m_defseq[seqtype]; }
@@ -738,7 +826,7 @@ private:
 	input_type_entry *  m_next;             // next description in the list
 	ioport_type         m_type;             // IPT_* for this entry
 	ioport_group        m_group;            // which group the port belongs to
-	UINT8               m_player;           // player number (0 is player 1)
+	u8               m_player;           // player number (0 is player 1)
 	const char *        m_token;            // token used to store settings
 	const char *        m_name;             // user-friendly name
 	input_seq           m_defseq[SEQ_TYPE_TOTAL];// default input sequence
@@ -766,10 +854,10 @@ public:
 	};
 
 	// bit constants
-	static const UINT8 UP_BIT = 1 << JOYDIR_UP;
-	static const UINT8 DOWN_BIT = 1 << JOYDIR_DOWN;
-	static const UINT8 LEFT_BIT = 1 << JOYDIR_LEFT;
-	static const UINT8 RIGHT_BIT = 1 << JOYDIR_RIGHT;
+	static constexpr u8 UP_BIT = 1 << JOYDIR_UP;
+	static constexpr u8 DOWN_BIT = 1 << JOYDIR_DOWN;
+	static constexpr u8 LEFT_BIT = 1 << JOYDIR_LEFT;
+	static constexpr u8 RIGHT_BIT = 1 << JOYDIR_RIGHT;
 
 	// construction/destruction
 	digital_joystick(int player, int number);
@@ -778,8 +866,8 @@ public:
 	digital_joystick *next() const { return m_next; }
 	int player() const { return m_player; }
 	int number() const { return m_number; }
-	UINT8 current() const { return m_current; }
-	UINT8 current4way() const { return m_current4way; }
+	u8 current() const { return m_current; }
+	u8 current4way() const { return m_current4way; }
 
 	// configuration
 	direction_t add_axis(ioport_field &field);
@@ -793,80 +881,11 @@ private:
 	int                         m_player;                                       // player number represented
 	int                         m_number;                                       // joystick number represented
 	simple_list<simple_list_wrapper<ioport_field> > m_field[JOYDIR_COUNT];  // potential input fields for each direction
-	UINT8                       m_current;                                      // current value
-	UINT8                       m_current4way;                                  // current 4-way value
-	UINT8                       m_previous;                                     // previous value
+	u8                          m_current;                                      // current value
+	u8                          m_current4way;                                  // current 4-way value
+	u8                          m_previous;                                     // previous value
 };
 DECLARE_ENUM_OPERATORS(digital_joystick::direction_t)
-
-
-// ======================> natural_keyboard
-
-// buffer to handle copy/paste/insert of keys
-class natural_keyboard
-{
-	DISABLE_COPYING(natural_keyboard);
-
-public:
-	// construction/destruction
-	natural_keyboard(running_machine &machine);
-
-	void initialize();
-
-	// getters and queries
-	running_machine &machine() const { return m_machine; }
-	bool empty() const { return (m_bufbegin == m_bufend); }
-	bool full() const { return ((m_bufend + 1) % m_buffer.size()) == m_bufbegin; }
-	bool can_post() const { return (!m_queue_chars.isnull() || !m_keycode_map.empty()); }
-	bool is_posting() const { return (!empty() || (!m_charqueue_empty.isnull() && !m_charqueue_empty())); }
-
-	// configuration
-	void configure(ioport_queue_chars_delegate queue_chars, ioport_accept_char_delegate accept_char, ioport_charqueue_empty_delegate charqueue_empty);
-
-	// posting
-	void post(unicode_char ch);
-	void post(const unicode_char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_utf8(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-	void post_coded(const char *text, size_t length = 0, const attotime &rate = attotime::zero);
-
-	void frame_update(ioport_port &port, ioport_value &digital);
-	std::string key_name(unicode_char ch) const;
-
-	// debugging
-	std::string dump();
-
-private:
-	// internal keyboard code information
-	struct keycode_map_entry
-	{
-		unicode_char    ch;
-		ioport_field *  field[UCHAR_SHIFT_END + 1 - UCHAR_SHIFT_BEGIN];
-	};
-
-	// internal helpers
-	void build_codes(ioport_manager &manager);
-	bool can_post_directly(unicode_char ch);
-	bool can_post_alternate(unicode_char ch);
-	attotime choose_delay(unicode_char ch);
-	void internal_post(unicode_char ch);
-	void timer(void *ptr, int param);
-	std::string unicode_to_string(unicode_char ch);
-	const keycode_map_entry *find_code(unicode_char ch) const;
-
-	// internal state
-	running_machine &       m_machine;              // reference to our machine
-	UINT32                  m_bufbegin;             // index of starting character
-	UINT32                  m_bufend;               // index of ending character
-	std::vector<unicode_char> m_buffer;           // actual buffer
-	bool                    m_status_keydown;       // current keydown status
-	bool                    m_last_cr;              // was the last char a CR?
-	emu_timer *             m_timer;                // timer for posting characters
-	attotime                m_current_rate;         // current rate for posting
-	ioport_queue_chars_delegate m_queue_chars;      // queue characters callback
-	ioport_accept_char_delegate m_accept_char;      // accept character callback
-	ioport_charqueue_empty_delegate m_charqueue_empty; // character queue empty callback
-	std::vector<keycode_map_entry> m_keycode_map; // keycode map
-};
 
 
 // ======================> ioport_condition
@@ -965,18 +984,18 @@ class ioport_diplocation
 
 public:
 	// construction/destruction
-	ioport_diplocation(const char *name, UINT8 swnum, bool invert);
+	ioport_diplocation(const char *name, u8 swnum, bool invert);
 
 	// getters
 	ioport_diplocation *next() const { return m_next; }
 	const char *name() const { return m_name.c_str(); }
-	UINT8 number() const { return m_number; }
+	u8 number() const { return m_number; }
 	bool inverted() const { return m_invert; }
 
 private:
 	ioport_diplocation *    m_next;         // pointer to the next bit
 	std::string             m_name;         // name of the physical DIP switch
-	UINT8                   m_number;       // physical switch number
+	u8                      m_number;       // physical switch number
 	bool                    m_invert;       // is this an active-high DIP?
 };
 
@@ -992,7 +1011,7 @@ class ioport_field
 	friend class dynamic_field;
 
 	// flags for ioport_fields
-	static const int FIELD_FLAG_UNUSED =   0x0001;    // set if this field is unused but relevant to other games on the same hw
+	static const int FIELD_FLAG_OPTIONAL = 0x0001;    // set if this field is not required but recognized by hw
 	static const int FIELD_FLAG_COCKTAIL = 0x0002;    // set if this field is relevant only for cocktail cabinets
 	static const int FIELD_FLAG_TOGGLE =   0x0004;    // set if this field should behave as a toggle
 	static const int FIELD_FLAG_ROTATED =  0x0008;    // set if this field represents a rotated control
@@ -1013,17 +1032,18 @@ public:
 	ioport_manager &manager() const;
 	running_machine &machine() const;
 	int modcount() const { return m_modcount; }
-	ioport_setting *first_setting() const { return m_settinglist.first(); }
-	ioport_diplocation *first_diplocation() const { return m_diploclist.first(); }
+	const simple_list<ioport_setting> &settings() const { return m_settinglist; }
+	const simple_list<ioport_diplocation> &diplocations() const { return m_diploclist; }
 
 	ioport_value mask() const { return m_mask; }
 	ioport_value defvalue() const { return m_defvalue; }
 	ioport_condition &condition() { return m_condition; }
 	ioport_type type() const { return m_type; }
-	UINT8 player() const { return m_player; }
+	u8 player() const { return m_player; }
+	bool digital_value() const { return m_digital_value; }
 	void set_value(ioport_value value);
 
-	bool unused() const { return ((m_flags & FIELD_FLAG_UNUSED) != 0); }
+	bool optional() const { return ((m_flags & FIELD_FLAG_OPTIONAL) != 0); }
 	bool cocktail() const { return ((m_flags & FIELD_FLAG_COCKTAIL) != 0); }
 	bool toggle() const { return ((m_flags & FIELD_FLAG_TOGGLE) != 0); }
 	bool rotated() const { return ((m_flags & FIELD_FLAG_ROTATED) != 0); }
@@ -1032,7 +1052,7 @@ public:
 	bool analog_wraps() const { return ((m_flags & ANALOG_FLAG_WRAPS) != 0); }
 	bool analog_invert() const { return ((m_flags & ANALOG_FLAG_INVERT) != 0); }
 
-	UINT8 impulse() const { return m_impulse; }
+	u8 impulse() const { return m_impulse; }
 	const char *name() const;
 	const char *specific_name() const { return m_name; }
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
@@ -1043,23 +1063,24 @@ public:
 
 	ioport_value minval() const { return m_min; }
 	ioport_value maxval() const { return m_max; }
-	INT32 sensitivity() const { return m_sensitivity; }
-	INT32 delta() const { return m_delta; }
-	INT32 centerdelta() const { return m_centerdelta; }
+	s32 sensitivity() const { return m_sensitivity; }
+	s32 delta() const { return m_delta; }
+	s32 centerdelta() const { return m_centerdelta; }
 	crosshair_axis_t crosshair_axis() const { return m_crosshair_axis; }
 	double crosshair_scale() const { return m_crosshair_scale; }
 	double crosshair_offset() const { return m_crosshair_offset; }
-	UINT16 full_turn_count() const { return m_full_turn_count; }
+	u16 full_turn_count() const { return m_full_turn_count; }
 	const ioport_value *remap_table() const { return m_remap_table; }
 
-	UINT8 way() const { return m_way; }
-	unicode_char keyboard_code(int which) const;
+	u8 way() const { return m_way; }
+	char32_t keyboard_code(int which) const;
+	std::string key_name(int which) const;
 	ioport_field_live &live() const { assert(m_live != nullptr); return *m_live; }
 
 	// setters
 	void set_crosshair_scale(double scale) { m_crosshair_scale = scale; }
 	void set_crosshair_offset(double offset) { m_crosshair_offset = offset; }
-	void set_player(UINT8 player) { m_player = player; }
+	void set_player(u8 player) { m_player = player; }
 
 	// derived getters
 	ioport_type_class type_class() const;
@@ -1075,17 +1096,18 @@ public:
 	void select_next_setting();
 	void crosshair_position(float &x, float &y, bool &gotx, bool &goty);
 	void init_live_state(analog_field *analog);
-	void frame_update(ioport_value &result, bool mouse_down);
+	void frame_update(ioport_value &result);
 	void reduce_mask(ioport_value bits_to_remove) { m_mask &= ~bits_to_remove; }
 
 	// user-controllable settings for a field
 	struct user_settings
 	{
 		ioport_value    value;                  // for DIP switches
+		bool            autofire;               // for autofire settings
 		input_seq       seq[SEQ_TYPE_TOTAL];    // sequences of all types
-		INT32           sensitivity;            // for analog controls
-		INT32           delta;                  // for analog controls
-		INT32           centerdelta;            // for analog controls
+		s32             sensitivity;            // for analog controls
+		s32             delta;                  // for analog controls
+		s32             centerdelta;            // for analog controls
 		bool            reverse;                // for analog controls
 		bool            toggle;                 // for non-analog controls
 	};
@@ -1098,7 +1120,7 @@ private:
 	// internal state
 	ioport_field *              m_next;             // pointer to next field in sequence
 	ioport_port &               m_port;             // reference to the port that owns us
-	std::unique_ptr<ioport_field_live> m_live;         // live state of field (NULL if not live)
+	std::unique_ptr<ioport_field_live> m_live;         // live state of field (nullptr if not live)
 	int                         m_modcount;         // modification count
 	simple_list<ioport_setting> m_settinglist;      // list of input_setting_configs
 	simple_list<ioport_diplocation> m_diploclist;   // list of locations for various bits
@@ -1108,9 +1130,9 @@ private:
 	ioport_value                m_defvalue;         // default value of these bits
 	ioport_condition            m_condition;        // condition under which this field is relevant
 	ioport_type                 m_type;             // IPT_* type for this port
-	UINT8                       m_player;           // player number (0-based)
-	UINT32                      m_flags;            // combination of FIELD_FLAG_* and ANALOG_FLAG_* above
-	UINT8                       m_impulse;          // number of frames before reverting to defvalue
+	u8                          m_player;           // player number (0-based)
+	u32                         m_flags;            // combination of FIELD_FLAG_* and ANALOG_FLAG_* above
+	u8                          m_impulse;          // number of frames before reverting to defvalue
 	const char *                m_name;             // user-friendly name to display
 	input_seq                   m_seq[SEQ_TYPE_TOTAL];// sequences of all types
 	ioport_field_read_delegate  m_read;             // read callback routine
@@ -1124,20 +1146,20 @@ private:
 	// data relevant to analog control types
 	ioport_value                m_min;              // minimum value for absolute axes
 	ioport_value                m_max;              // maximum value for absolute axes
-	INT32                       m_sensitivity;      // sensitivity (100=normal)
-	INT32                       m_delta;            // delta to apply each frame a digital inc/dec key is pressed
-	INT32                       m_centerdelta;      // delta to apply each frame no digital inputs are pressed
+	s32                         m_sensitivity;      // sensitivity (100=normal)
+	s32                         m_delta;            // delta to apply each frame a digital inc/dec key is pressed
+	s32                         m_centerdelta;      // delta to apply each frame no digital inputs are pressed
 	crosshair_axis_t            m_crosshair_axis;   // crosshair axis
 	double                      m_crosshair_scale;  // crosshair scale
 	double                      m_crosshair_offset; // crosshair offset
 	double                      m_crosshair_altaxis;// crosshair alternate axis value
 	ioport_field_crossmap_delegate m_crosshair_mapper; // crosshair mapping function
-	UINT16                      m_full_turn_count;  // number of optical counts for 1 full turn of the original control
+	u16                         m_full_turn_count;  // number of optical counts for 1 full turn of the original control
 	const ioport_value *        m_remap_table;      // pointer to an array that remaps the port value
 
 	// data relevant to other specific types
-	UINT8                       m_way;              // digital joystick 2/4/8-way descriptions
-	unicode_char                m_chars[4];         // unicode key data
+	u8                          m_way;              // digital joystick 2/4/8-way descriptions
+	char32_t                    m_chars[4];         // unicode key data
 };
 
 
@@ -1154,10 +1176,13 @@ struct ioport_field_live
 	digital_joystick *      joystick;           // pointer to digital joystick information
 	input_seq               seq[SEQ_TYPE_TOTAL];// currently configured input sequences
 	ioport_value            value;              // current value of this port
-	UINT8                   impulse;            // counter for impulse controls
+	u8                      impulse;            // counter for impulse controls
 	bool                    last;               // were we pressed last time?
 	bool                    toggle;             // current toggle setting
 	digital_joystick::direction_t joydir;       // digital joystick direction index
+	bool                    autofire;           // autofire
+	int                     autopressed;        // autofire status
+	bool                    lockout;            // user lockout
 	std::string             name;               // overridden name
 };
 
@@ -1165,14 +1190,13 @@ struct ioport_field_live
 // ======================> ioport_list
 
 // class that holds a list of I/O ports
-class ioport_list : public tagged_list<ioport_port>
+class ioport_list : public std::map<std::string, std::unique_ptr<ioport_port>>
 {
 	DISABLE_COPYING(ioport_list);
 
 public:
 	ioport_list() { }
 
-	using tagged_list<ioport_port>::append;
 	void append(device_t &device, std::string &errorbuf);
 };
 
@@ -1196,7 +1220,7 @@ public:
 	ioport_manager &manager() const;
 	device_t &device() const { return m_device; }
 	running_machine &machine() const;
-	ioport_field *first_field() const { return m_fieldlist.first(); }
+	const simple_list<ioport_field> &fields() const { return m_fieldlist; }
 	const char *tag() const { return m_tag.c_str(); }
 	int modcount() const { return m_modcount; }
 	ioport_value active() const { return m_active; }
@@ -1207,10 +1231,11 @@ public:
 	void write(ioport_value value, ioport_value mask = ~0);
 
 	// other operations
-	ioport_field *field(ioport_value mask);
+	ioport_field *field(ioport_value mask) const;
 	void collapse_fields(std::string &errorbuf);
-	void frame_update(ioport_field *mouse_field);
+	void frame_update();
 	void init_live_state();
+	void update_defvalue(bool flush_defaults);
 
 private:
 	void insert_field(ioport_field &newfield, ioport_value &disallowedbits, std::string &errorbuf);
@@ -1222,10 +1247,8 @@ private:
 	std::string                 m_tag;          // copy of this port's tag
 	int                         m_modcount;     // modification count
 	ioport_value                m_active;       // mask of active bits in the port
-	std::unique_ptr<ioport_port_live> m_live;      // live state of port (NULL if not live)
+	std::unique_ptr<ioport_port_live> m_live;      // live state of port (nullptr if not live)
 };
-
-inline ioport_value read_safe(ioport_port *port, ioport_value defval) { return (port == nullptr) ? defval : port->read(); }
 
 
 
@@ -1246,10 +1269,10 @@ public:
 	analog_field *next() const { return m_next; }
 	ioport_manager &manager() const { return m_field.manager(); }
 	ioport_field &field() const { return m_field; }
-	INT32 sensitivity() const { return m_sensitivity; }
+	s32 sensitivity() const { return m_sensitivity; }
 	bool reverse() const { return m_reverse; }
-	INT32 delta() const { return m_delta; }
-	INT32 centerdelta() const { return m_centerdelta; }
+	s32 delta() const { return m_delta; }
+	s32 centerdelta() const { return m_centerdelta; }
 
 	// readers
 	void read(ioport_value &value);
@@ -1258,44 +1281,44 @@ public:
 
 private:
 	// helpers
-	INT32 apply_min_max(INT32 value) const;
-	INT32 apply_settings(INT32 value) const;
-	INT32 apply_sensitivity(INT32 value) const;
-	INT32 apply_inverse_sensitivity(INT32 value) const;
+	s32 apply_min_max(s32 value) const;
+	s32 apply_settings(s32 value) const;
+	s32 apply_sensitivity(s32 value) const;
+	s32 apply_inverse_sensitivity(s32 value) const;
 
 	// internal state
 	analog_field *      m_next;                 // link to the next analog state for this port
 	ioport_field &      m_field;                // pointer to the input field referenced
 
 	// adjusted values (right-justified and tweaked)
-	UINT8               m_shift;                // shift to align final value in the port
-	INT32               m_adjdefvalue;          // adjusted default value from the config
-	INT32               m_adjmin;               // adjusted minimum value from the config
-	INT32               m_adjmax;               // adjusted maximum value from the config
+	u8                  m_shift;                // shift to align final value in the port
+	s32                 m_adjdefvalue;          // adjusted default value from the config
+	s32                 m_adjmin;               // adjusted minimum value from the config
+	s32                 m_adjmax;               // adjusted maximum value from the config
 
 	// live values of configurable parameters
-	INT32               m_sensitivity;          // current live sensitivity (100=normal)
+	s32                 m_sensitivity;          // current live sensitivity (100=normal)
 	bool                m_reverse;              // current live reverse flag
-	INT32               m_delta;                // current live delta to apply each frame a digital inc/dec key is pressed
-	INT32               m_centerdelta;          // current live delta to apply each frame no digital inputs are pressed
+	s32                 m_delta;                // current live delta to apply each frame a digital inc/dec key is pressed
+	s32                 m_centerdelta;          // current live delta to apply each frame no digital inputs are pressed
 
 	// live analog value tracking
-	INT32               m_accum;                // accumulated value (including relative adjustments)
-	INT32               m_previous;             // previous adjusted value
-	INT32               m_previousanalog;       // previous analog value
+	s32                 m_accum;                // accumulated value (including relative adjustments)
+	s32                 m_previous;             // previous adjusted value
+	s32                 m_previousanalog;       // previous analog value
 
 	// parameters for modifying live values
-	INT32               m_minimum;              // minimum adjusted value
-	INT32               m_maximum;              // maximum adjusted value
-	INT32               m_center;               // center adjusted value for autocentering
-	INT32               m_reverse_val;          // value where we subtract from to reverse directions
+	s32                 m_minimum;              // minimum adjusted value
+	s32                 m_maximum;              // maximum adjusted value
+	s32                 m_center;               // center adjusted value for autocentering
+	s32                 m_reverse_val;          // value where we subtract from to reverse directions
 
 	// scaling factors
-	INT64               m_scalepos;             // scale factor to apply to positive adjusted values
-	INT64               m_scaleneg;             // scale factor to apply to negative adjusted values
-	INT64               m_keyscalepos;          // scale factor to apply to the key delta field when pos
-	INT64               m_keyscaleneg;          // scale factor to apply to the key delta field when neg
-	INT64               m_positionalscale;      // scale factor to divide a joystick into positions
+	s64                 m_scalepos;             // scale factor to apply to positive adjusted values
+	s64                 m_scaleneg;             // scale factor to apply to negative adjusted values
+	s64                 m_keyscalepos;          // scale factor to apply to the key delta field when pos
+	s64                 m_keyscaleneg;          // scale factor to apply to the key delta field when neg
+	s64                 m_positionalscale;      // scale factor to divide a joystick into positions
 
 	// misc flags
 	bool                m_absolute;             // is this an absolute or relative input?
@@ -1330,7 +1353,7 @@ private:
 	// internal state
 	dynamic_field *         m_next;             // linked list of info for this port
 	ioport_field &          m_field;            // reference to the input field
-	UINT8                   m_shift;            // shift to apply to the final result
+	u8                      m_shift;            // shift to apply to the final result
 	ioport_value            m_oldval;           // last value
 };
 
@@ -1368,23 +1391,18 @@ public:
 	// construction/destruction
 	ioport_manager(running_machine &machine);
 	time_t initialize();
+	~ioport_manager();
 
 	// getters
 	running_machine &machine() const { return m_machine; }
-	ioport_port *first_port() const { return m_portlist.first(); }
+	const ioport_list &ports() const { return m_portlist; }
 	bool safe_to_read() const { return m_safe_to_read; }
-	natural_keyboard &natkeyboard() { return m_natkeyboard; }
-
-	// has... getters
-	bool has_configs() const { return m_has_configs; }
-	bool has_analog() const { return m_has_analog; }
-	bool has_dips() const { return m_has_dips; }
-	bool has_bioses() const { return m_has_bioses; }
+	natural_keyboard &natkeyboard() { assert(m_natkeyboard != nullptr); return *m_natkeyboard; }
 
 	// type helpers
-	input_type_entry *first_type() const { return m_typelist.first(); }
+	const simple_list<input_type_entry> &types() const { return m_typelist; }
 	bool type_pressed(ioport_type type, int player = 0);
-	const char *type_name(ioport_type type, UINT8 player);
+	const char *type_name(ioport_type type, u8 player);
 	ioport_group type_group(ioport_type type, int player);
 	const input_seq &type_seq(ioport_type type, int player = 0, input_seq_type seqtype = SEQ_TYPE_STANDARD);
 	void set_type_seq(ioport_type type, int player, input_seq_type seqtype, const input_seq &newseq);
@@ -1395,10 +1413,15 @@ public:
 	digital_joystick &digjoystick(int player, int joysticknum);
 	int count_players() const;
 	bool crosshair_position(int player, float &x, float &y);
-	bool has_keyboard() const;
-	INT32 frame_interpolate(INT32 oldval, INT32 newval);
+	s32 frame_interpolate(s32 oldval, s32 newval);
 	ioport_type token_to_input_type(const char *string, int &player) const;
 	std::string input_type_to_token(ioport_type type, int player);
+
+	// autofire
+	bool get_autofire_toggle() { return m_autofire_toggle; }
+	void set_autofire_toggle(bool toggle) { m_autofire_toggle = toggle; }
+	int get_autofire_delay() { return m_autofire_delay; }
+	void set_autofire_delay(int delay) { m_autofire_delay = delay; }
 
 private:
 	// internal helpers
@@ -1408,21 +1431,21 @@ private:
 	void frame_update_callback();
 	void frame_update();
 
-	ioport_port *port(const char *tag) const { return m_portlist.find(tag); }
+	ioport_port *port(const char *tag) const { if (tag) { auto search = m_portlist.find(tag); if (search != m_portlist.end()) return search->second.get(); else return nullptr; } else return nullptr; }
 	void exit();
 	input_seq_type token_to_seq_type(const char *string);
-	void update_defaults();
+	static const char *const seqtypestrings[];
 
-	void load_config(config_type cfg_type, xml_data_node *parentnode);
-	void load_remap_table(xml_data_node *parentnode);
-	bool load_default_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
-	bool load_game_config(xml_data_node *portnode, int type, int player, const input_seq *newseq);
+	void load_config(config_type cfg_type, util::xml::data_node const *parentnode);
+	void load_remap_table(util::xml::data_node const *parentnode);
+	bool load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
+	bool load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(config_type cfg_type, xml_data_node *parentnode);
-	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
+	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
+	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
-	void save_default_inputs(xml_data_node *parentnode);
-	void save_game_inputs(xml_data_node *parentnode);
+	void save_default_inputs(util::xml::data_node &parentnode);
+	void save_game_inputs(util::xml::data_node &parentnode);
 
 	template<typename _Type> _Type playback_read(_Type &result);
 	time_t playback_init();
@@ -1436,6 +1459,10 @@ private:
 	void record_frame(const attotime &curtime);
 	void record_port(ioport_port &port);
 
+	template<typename _Type> void timecode_write(_Type value);
+	void timecode_init();
+	void timecode_end(const char *message = nullptr);
+
 	// internal state
 	running_machine &       m_machine;              // reference to owning machine
 	bool                    m_safe_to_read;         // clear at start; set after state is loaded
@@ -1447,23 +1474,24 @@ private:
 
 	// specific special global input states
 	simple_list<digital_joystick> m_joystick_list;  // list of digital joysticks
-	natural_keyboard        m_natkeyboard;          // natural keyboard support
+	std::unique_ptr<natural_keyboard> m_natkeyboard; // natural keyboard support
 
 	// frame time tracking
 	attotime                m_last_frame_time;      // time of the last frame callback
 	attoseconds_t           m_last_delta_nsec;      // nanoseconds that passed since the previous callback
 
 	// playback/record information
-	emu_file                m_record_file;          // recording file (NULL if not recording)
-	emu_file                m_playback_file;        // playback file (NULL if not recording)
-	UINT64                  m_playback_accumulated_speed; // accumulated speed during playback
-	UINT32                  m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_record_file;          // recording file (nullptr if not recording)
+	emu_file                m_playback_file;        // playback file (nullptr if not recording)
+	u64                     m_playback_accumulated_speed; // accumulated speed during playback
+	u32                     m_playback_accumulated_frames; // accumulated frames during playback
+	emu_file                m_timecode_file;        // timecode/frames playback file (nullptr if not recording)
+	int                     m_timecode_count;
+	attotime                m_timecode_last_time;
 
-	// has...
-	bool                    m_has_configs;
-	bool                    m_has_analog;
-	bool                    m_has_dips;
-	bool                    m_has_bioses;
+	// autofire
+	bool                    m_autofire_toggle;      // autofire toggle
+	int                     m_autofire_delay;       // autofire delay
 };
 
 
@@ -1480,43 +1508,43 @@ public:
 	static const char *string_from_token(const char *string);
 
 	// port helpers
-	void port_alloc(const char *tag);
-	void port_modify(const char *tag);
+	ioport_configurer& port_alloc(const char *tag);
+	ioport_configurer& port_modify(const char *tag);
 
 	// field helpers
-	void field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
-	void field_add_char(unicode_char ch);
-	void field_add_code(input_seq_type which, input_code code);
-	void field_set_way(int way) const { m_curfield->m_way = way; }
-	void field_set_rotated() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; }
-	void field_set_name(const char *name) const { m_curfield->m_name = string_from_token(name); }
-	void field_set_player(int player) const { m_curfield->m_player = player - 1; }
-	void field_set_cocktail() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); }
-	void field_set_toggle() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; }
-	void field_set_impulse(UINT8 impulse) const { m_curfield->m_impulse = impulse; }
-	void field_set_analog_reverse() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; }
-	void field_set_analog_reset() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; }
-	void field_set_unused() const { m_curfield->m_flags |= ioport_field::FIELD_FLAG_UNUSED; }
-	void field_set_min_max(ioport_value minval, ioport_value maxval) const { m_curfield->m_min = minval; m_curfield->m_max = maxval; }
-	void field_set_sensitivity(INT32 sensitivity) const { m_curfield->m_sensitivity = sensitivity; }
-	void field_set_delta(INT32 delta) const { m_curfield->m_centerdelta = m_curfield->m_delta = delta; }
-	void field_set_centerdelta(INT32 delta) const { m_curfield->m_centerdelta = delta; }
-	void field_set_crosshair(crosshair_axis_t axis, double altaxis, double scale, double offset) const { m_curfield->m_crosshair_axis = axis; m_curfield->m_crosshair_altaxis = altaxis; m_curfield->m_crosshair_scale = scale; m_curfield->m_crosshair_offset = offset; }
-	void field_set_crossmapper(ioport_field_crossmap_delegate callback) const { m_curfield->m_crosshair_mapper = callback; }
-	void field_set_full_turn_count(UINT16 count) const { m_curfield->m_full_turn_count = count; }
-	void field_set_analog_wraps() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; }
-	void field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; }
-	void field_set_analog_invert() const { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; }
-	void field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) const { m_curfield->m_read = delegate; m_curfield->m_read_param = param; }
-	void field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) const { m_curfield->m_write = delegate; m_curfield->m_write_param = param; }
-	void field_set_diplocation(const char *location) const { m_curfield->expand_diplocation(location, m_errorbuf); }
+	ioport_configurer& field_alloc(ioport_type type, ioport_value defval, ioport_value mask, const char *name = nullptr);
+	ioport_configurer& field_add_char(char32_t ch);
+	ioport_configurer& field_add_code(input_seq_type which, input_code code);
+	ioport_configurer& field_set_way(int way) { m_curfield->m_way = way; return *this; }
+	ioport_configurer& field_set_rotated() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_ROTATED; return *this; }
+	ioport_configurer& field_set_name(const char *name) { m_curfield->m_name = string_from_token(name); return *this; }
+	ioport_configurer& field_set_player(int player) { m_curfield->m_player = player - 1; return *this; }
+	ioport_configurer& field_set_cocktail() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_COCKTAIL; field_set_player(2); return *this; }
+	ioport_configurer& field_set_toggle() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_TOGGLE; return *this; }
+	ioport_configurer& field_set_impulse(u8 impulse) { m_curfield->m_impulse = impulse; return *this; }
+	ioport_configurer& field_set_analog_reverse() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_REVERSE; return *this; }
+	ioport_configurer& field_set_analog_reset() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_RESET; return *this; }
+	ioport_configurer& field_set_optional() { m_curfield->m_flags |= ioport_field::FIELD_FLAG_OPTIONAL; return *this; }
+	ioport_configurer& field_set_min_max(ioport_value minval, ioport_value maxval) { m_curfield->m_min = minval; m_curfield->m_max = maxval; return *this; }
+	ioport_configurer& field_set_sensitivity(s32 sensitivity) { m_curfield->m_sensitivity = sensitivity; return *this; }
+	ioport_configurer& field_set_delta(s32 delta) { m_curfield->m_centerdelta = m_curfield->m_delta = delta; return *this; }
+	ioport_configurer& field_set_centerdelta(s32 delta) { m_curfield->m_centerdelta = delta; return *this; }
+	ioport_configurer& field_set_crosshair(crosshair_axis_t axis, double altaxis, double scale, double offset) { m_curfield->m_crosshair_axis = axis; m_curfield->m_crosshair_altaxis = altaxis; m_curfield->m_crosshair_scale = scale; m_curfield->m_crosshair_offset = offset; return *this; }
+	ioport_configurer& field_set_crossmapper(ioport_field_crossmap_delegate callback) { m_curfield->m_crosshair_mapper = callback; return *this; }
+	ioport_configurer& field_set_full_turn_count(u16 count) { m_curfield->m_full_turn_count = count; return *this; }
+	ioport_configurer& field_set_analog_wraps() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_WRAPS; return *this; }
+	ioport_configurer& field_set_remap_table(const ioport_value *table) { m_curfield->m_remap_table = table; return *this; }
+	ioport_configurer& field_set_analog_invert() { m_curfield->m_flags |= ioport_field::ANALOG_FLAG_INVERT; return *this; }
+	ioport_configurer& field_set_dynamic_read(ioport_field_read_delegate delegate, void *param = nullptr) { m_curfield->m_read = delegate; m_curfield->m_read_param = param; return *this; }
+	ioport_configurer& field_set_dynamic_write(ioport_field_write_delegate delegate, void *param = nullptr) { m_curfield->m_write = delegate; m_curfield->m_write_param = param; return *this; }
+	ioport_configurer& field_set_diplocation(const char *location) { m_curfield->expand_diplocation(location, m_errorbuf); return *this; }
 
 	// setting helpers
-	void setting_alloc(ioport_value value, const char *name);
+	ioport_configurer& setting_alloc(ioport_value value, const char *name);
 
 	// misc helpers
-	void set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
-	void onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
+	ioport_configurer& set_condition(ioport_condition::condition_t condition, const char *tag, ioport_value mask, ioport_value value);
+	ioport_configurer& onoff_alloc(const char *name, ioport_value defval, ioport_value mask, const char *diplocation);
 
 private:
 	// internal state
@@ -1546,7 +1574,6 @@ private:
 #define DECLARE_INPUT_CHANGED_MEMBER(name)  void name(ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
 
 // macro for port changed callback functions (PORT_CROSSHAIR_MAPPER)
-#define CROSSHAIR_MAPPER(name)  float name(device_t &device, ioport_field &field, float linear_value)
 #define CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 #define DECLARE_CROSSHAIR_MAPPER_MEMBER(name)   float name(ioport_field &field, float linear_value)
 
@@ -1560,7 +1587,7 @@ private:
 //**************************************************************************
 
 // so that "0" can be used for unneeded input ports
-#define construct_ioport_0 NULL
+#define construct_ioport_0 nullptr
 
 // name of table
 #define INPUT_PORTS_NAME(_name) construct_ioport_##_name
@@ -1591,7 +1618,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_BIT(_mask, _default, _type) \
 	configurer.field_alloc((_type), (_default), (_mask));
 #define PORT_SPECIAL_ONOFF(_mask, _default, _strindex) \
-	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, NULL)
+	PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, nullptr)
 
 #define PORT_SPECIAL_ONOFF_DIPLOC(_mask, _default, _strindex, _diploc) \
 	configurer.onoff_alloc(DEF_STR(_strindex), _default, _mask, _diploc);
@@ -1643,8 +1670,8 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_RESET \
 	configurer.field_set_analog_reset();
 
-#define PORT_UNUSED \
-	configurer.field_set_unused();
+#define PORT_OPTIONAL \
+	configurer.field_set_optional();
 
 // analog settings
 // if this macro is not used, the minimum defaults to 0 and maximum defaults to the mask value
@@ -1664,10 +1691,10 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_crosshair(CROSSHAIR_AXIS_##axis, altaxis, scale, offset);
 
 #define PORT_CROSSHAIR_MAPPER(_callback) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)nullptr));
 
 #define PORT_CROSSHAIR_MAPPER_MEMBER(_device, _class, _member) \
-	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_crossmapper(ioport_field_crossmap_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr));
 
 // how many optical counts for 1 full turn of the control
 #define PORT_FULL_TURN_COUNT(_count) \
@@ -1693,29 +1720,20 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	configurer.field_set_analog_invert();
 
 // read callbacks
-#define PORT_CUSTOM(_callback, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(_callback, #_callback, DEVICE_SELF, (device_t *)NULL), (void *)(_param));
-
 #define PORT_CUSTOM_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (void *)(_param));
 
 // write callbacks
 #define PORT_CHANGED_MEMBER(_device, _class, _member, _param) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)NULL), (void *)(_param));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate(&_class::_member, #_class "::" #_member, _device, (_class *)nullptr), (void *)(_param));
 
 // input device handler
-#define PORT_READ_LINE_DEVICE(_device, _read_line_device) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_read_line_device>, #_read_line_device, _device, (device_t *)NULL));
-
 #define PORT_READ_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_read(ioport_field_read_delegate(&ioport_read_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_read(ioport_field_read_delegate([](_class &device, ioport_field &field, void *param)->ioport_value { return (device._member() & 1) ? ~ioport_value(0) : 0; } , #_class "::" #_member, _device, (_class *)nullptr));
 
 // output device handler
-#define PORT_WRITE_LINE_DEVICE(_device, _write_line_device) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_write_line_device>, #_write_line_device, _device, (device_t *)NULL));
-
 #define PORT_WRITE_LINE_DEVICE_MEMBER(_device, _class, _member) \
-	configurer.field_set_dynamic_write(ioport_field_write_delegate(&ioport_write_line_wrapper<_class, &_class::_member>, #_class "::" #_member, _device, (_class *)NULL));
+	configurer.field_set_dynamic_write(ioport_field_write_delegate([](_class &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval) { device._member(newval); }, #_class "::" #_member, _device, (_class *)nullptr));
 
 // dip switch definition
 #define PORT_DIPNAME(_mask, _default, _name) \
@@ -1747,10 +1765,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 // name of table
 #define DEVICE_INPUT_DEFAULTS_NAME(_name) device_iptdef_##_name
 
-#define device_iptdef_0 NULL
-#define device_iptdef_0L NULL
-#define device_iptdef_0LL NULL
-#define device_iptdef___null NULL
+#define device_iptdef_NOOP nullptr
 
 // start of table
 #define DEVICE_INPUT_DEFAULTS_START(_name) \
@@ -1760,7 +1775,7 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 	{ _tag ,_mask, _defval },
 // end of table
 #define DEVICE_INPUT_DEFAULTS_END \
-	{NULL,0,0} };
+	{nullptr,0,0} };
 
 
 
@@ -1795,38 +1810,6 @@ ATTR_COLD void INPUT_PORTS_NAME(_name)(device_t &owner, ioport_list &portlist, s
 #define PORT_HBLANK(_screen) \
 	PORT_READ_LINE_DEVICE_MEMBER(_screen, screen_device, hblank)
 
-
-
-//**************************************************************************
-//  INLINE TEMPLATES
-//**************************************************************************
-
-template<int (*_FunctionPointer)(device_t *)>
-ioport_value ioport_read_line_wrapper(device_t &device, ioport_field &field, void *param)
-{
-	return ((*_FunctionPointer)(&device) & 1) ? ~ioport_value(0) : 0;
-}
-
-template<class _FunctionClass, int (_FunctionClass::*_FunctionPointer)()>
-ioport_value ioport_read_line_wrapper(_FunctionClass &device, ioport_field &field, void *param)
-{
-	return ((device.*_FunctionPointer)() & 1) ? ~ioport_value(0) : 0;
-}
-
-template<void (*_FunctionPointer)(device_t *, int)>
-void ioport_write_line_wrapper(device_t &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (*_FunctionPointer)(&device, newval);
-}
-
-template<class _FunctionClass, void (_FunctionClass::*_FunctionPointer)(int)>
-void ioport_write_line_wrapper(_FunctionClass &device, ioport_field &field, void *param, ioport_value oldval, ioport_value newval)
-{
-	return (device.*_FunctionPointer)(newval);
-}
-
-
-
 //**************************************************************************
 //  INLINE FUNCTIONS
 //**************************************************************************
@@ -1839,4 +1822,4 @@ inline device_t &ioport_setting::device() const { return m_field.device(); }
 inline running_machine &ioport_setting::machine() const { return m_field.machine(); }
 
 
-#endif  // __INPTPORT_H__ */
+#endif  // MAME_EMU_IOPORT_H */

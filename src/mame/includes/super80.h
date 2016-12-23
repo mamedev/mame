@@ -7,6 +7,7 @@
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/speaker.h"
+#include "sound/samples.h"
 #include "machine/buffer.h"
 #include "bus/centronics/ctronics.h"
 #include "video/mc6845.h"
@@ -31,12 +32,13 @@ public:
 		, m_pio(*this, "z80pio")
 		, m_cassette(*this, "cassette")
 		, m_wave(*this, WAVE_TAG)
+		, m_samples(*this, "samples")
 		, m_speaker(*this, "speaker")
 		, m_centronics(*this, "centronics")
 		, m_cent_data_out(*this, "cent_data_out")
 		, m_io_dsw(*this, "DSW")
 		, m_io_config(*this, "CONFIG")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_crtc(*this, "crtc")
 		, m_dma(*this, "dma")
 		, m_fdc (*this, "fdc")
@@ -66,48 +68,50 @@ public:
 	DECLARE_WRITE8_MEMBER(pio_port_a_w);
 	DECLARE_READ8_MEMBER(pio_port_b_r);
 	DECLARE_DRIVER_INIT(super80);
+	DECLARE_MACHINE_RESET(super80);
+	DECLARE_MACHINE_RESET(super80r);
 	DECLARE_VIDEO_START(super80);
 	DECLARE_VIDEO_START(super80v);
 	DECLARE_PALETTE_INIT(super80m);
 	DECLARE_QUICKLOAD_LOAD_MEMBER(super80);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	UINT32 screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_super80(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_super80v(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_super80d(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_super80e(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_super80m(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_super80m(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(super80_reset);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_h);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_k);
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_p);
-	UINT8 m_s_options;
-	UINT8 m_portf0;
-	UINT8 *m_p_videoram;
-	UINT8 *m_p_colorram;
-	UINT8 *m_p_pcgram;
-	UINT8 m_mc6845_cursor[16];
-	UINT8 m_palette_index;
+	uint8_t m_s_options;
+	uint8_t m_portf0;
+	uint8_t *m_p_videoram;
+	uint8_t *m_p_colorram;
+	uint8_t *m_p_pcgram;
+	uint8_t m_mc6845_cursor[16];
+	uint8_t m_palette_index;
 	required_device<palette_device> m_palette;
 private:
-	virtual void machine_reset() override;
-	UINT8 m_keylatch;
-	UINT8 m_cass_data[4];
-	UINT8 m_int_sw;
-	UINT8 m_last_data;
-	UINT8 m_key_pressed;
-	UINT16 m_vidpg;
-	UINT8 m_current_charset;
-	const UINT8 *m_p_chargen;
-	UINT8 m_mc6845_reg[32];
-	UINT8 m_mc6845_ind;
-	UINT8 *m_p_ram;
+	uint8_t m_keylatch;
+	uint8_t m_cass_data[4];
+	uint8_t m_int_sw;
+	uint8_t m_last_data;
+	uint8_t m_key_pressed;
+	uint16_t m_vidpg;
+	uint8_t m_current_charset;
+	const uint8_t *m_p_chargen;
+	uint8_t m_mc6845_reg[32];
+	uint8_t m_mc6845_ind;
+	uint8_t *m_p_ram;
 	void mc6845_cursor_configure();
-	void super80_cassette_motor(UINT8 data);
+	void super80_cassette_motor(bool data);
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio;
 	required_device<cassette_image_device> m_cassette;
 	required_device<wave_device> m_wave;
+	required_device<samples_device> m_samples;
 	required_device<speaker_sound_device> m_speaker;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;

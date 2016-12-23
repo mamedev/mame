@@ -44,7 +44,7 @@ void pc8401a_state::scan_keyboard()
 	/* scan keyboard */
 	for (int row = 0; row < 10; row++)
 	{
-		UINT8 data = m_io_y[row]->read();
+		uint8_t data = m_io_y[row]->read();
 
 		if (data != 0xff)
 		{
@@ -70,7 +70,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(pc8401a_state::pc8401a_keyboard_tick)
 
 /* Read/Write Handlers */
 
-void pc8401a_state::bankswitch(UINT8 data)
+void pc8401a_state::bankswitch(uint8_t data)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
@@ -497,7 +497,7 @@ void pc8401a_state::machine_start()
 	/* allocate CRT video RAM */
 	m_crt_ram.allocate(PC8401A_CRT_VIDEORAM_SIZE);
 
-	UINT8 *ram = m_ram->pointer();
+	uint8_t *ram = m_ram->pointer();
 
 	/* set up A0/A1 memory banking */
 	membank("bank1")->configure_entries(0, 4, m_rom->base(), 0x8000);
@@ -577,7 +577,7 @@ static MACHINE_CONFIG_START( pc8401a, pc8401a_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))
@@ -619,7 +619,7 @@ static MACHINE_CONFIG_START( pc8500, pc8500_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("keyboard", pc8401a_state, pc8401a_keyboard_tick, attotime::from_hz(64))
 
 	/* devices */
-	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NULL, NULL)
+	MCFG_UPD1990A_ADD(UPD1990A_TAG, XTAL_32_768kHz, NOOP, NOOP)
 
 	MCFG_DEVICE_ADD(I8255A_TAG, I8255A, 0)
 	MCFG_I8255_IN_PORTC_CB(READ8(pc8401a_state, ppi_pc_r))

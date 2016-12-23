@@ -52,7 +52,7 @@ machine_config_constructor nubus_vikbw_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *nubus_vikbw_device::device_rom_region() const
+const tiny_rom_entry *nubus_vikbw_device::device_rom_region() const
 {
 	return ROM_NAME( vikbw );
 }
@@ -65,13 +65,13 @@ const rom_entry *nubus_vikbw_device::device_rom_region() const
 //  nubus_vikbw_device - constructor
 //-------------------------------------------------
 
-nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, NUBUS_VIKBW, "Moniterm Viking video card", tag, owner, clock, "nb_vikbw", __FILE__),
 		device_nubus_card_interface(mconfig, *this), m_vbl_disable(0)
 {
 }
 
-nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_nubus_card_interface(mconfig, *this), m_vbl_disable(0)
 {
@@ -83,7 +83,7 @@ nubus_vikbw_device::nubus_vikbw_device(const machine_config &mconfig, device_typ
 
 void nubus_vikbw_device::device_start()
 {
-	UINT32 slotspace;
+	uint32_t slotspace;
 
 	// set_nubus_device makes m_slot valid
 	set_nubus_device();
@@ -94,8 +94,8 @@ void nubus_vikbw_device::device_start()
 //  printf("[vikbw %p] slotspace = %x\n", this, slotspace);
 
 	m_vram.resize(VRAM_SIZE);
-	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, 0, 0, "bank_vikbw", &m_vram[0]);
-	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, 0, 0, "bank_vikbw2", &m_vram[0]);
+	install_bank(slotspace+0x40000, slotspace+0x40000+VRAM_SIZE-1, "bank_vikbw", &m_vram[0]);
+	install_bank(slotspace+0x940000, slotspace+0x940000+VRAM_SIZE-1, "bank_vikbw2", &m_vram[0]);
 
 	m_nubus->install_device(slotspace, slotspace+3, read32_delegate(FUNC(nubus_vikbw_device::viking_enable_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_disable_w), this));
 	m_nubus->install_device(slotspace+0x80000, slotspace+0x80000+3, read32_delegate(FUNC(nubus_vikbw_device::viking_ack_r), this), write32_delegate(FUNC(nubus_vikbw_device::viking_ack_w), this));
@@ -120,11 +120,11 @@ void nubus_vikbw_device::device_reset()
 
 ***************************************************************************/
 
-UINT32 nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t nubus_vikbw_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *scanline;
+	uint32_t *scanline;
 	int x, y;
-	UINT8 pixels;
+	uint8_t pixels;
 
 	if (!m_vbl_disable)
 	{

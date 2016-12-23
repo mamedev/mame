@@ -31,7 +31,7 @@ static GFXDECODE_START( 0x080000 )
 GFXDECODE_END
 
 
-TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::targeth_interrupt)
+TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::interrupt)
 {
 	int scanline = param;
 
@@ -52,21 +52,19 @@ TIMER_DEVICE_CALLBACK_MEMBER(targeth_state::targeth_interrupt)
 
 WRITE16_MEMBER(targeth_state::OKIM6295_bankswitch_w)
 {
-	UINT8 *RAM = memregion("oki")->base();
-
 	if (ACCESSING_BITS_0_7){
-		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
+		membank("okibank")->set_entry(data & 0x0f);
 	}
 }
 
-WRITE16_MEMBER(targeth_state::targeth_coin_counter_w)
+WRITE16_MEMBER(targeth_state::coin_counter_w)
 {
 	machine().bookkeeping().coin_counter_w((offset >> 3) & 0x01, data & 0x01);
 }
 
 static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(targeth_vram_w) AM_SHARE("videoram")  /* Video RAM */
+	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(vram_w) AM_SHARE("videoram")  /* Video RAM */
 	AM_RANGE(0x108000, 0x108007) AM_WRITEONLY AM_SHARE("vregs") /* Video Registers */
 	AM_RANGE(0x108000, 0x108001) AM_READ_PORT("GUNX1")
 	AM_RANGE(0x108002, 0x108003) AM_READ_PORT("GUNY1")
@@ -83,9 +81,16 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, targeth_state )
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)    /* OKI6295 bankswitch */
 	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)  /* OKI6295 status register */
 	AM_RANGE(0x700010, 0x70001b) AM_WRITENOP                        /* ??? Guns reload related? */
-	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(targeth_coin_counter_w)   /* Coin counters */
+	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(coin_counter_w)   /* Coin counters */
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM                             /* Work RAM (partially shared with DS5002FP) */
 ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( oki_map, AS_0, 8, targeth_state )
+	AM_RANGE(0x00000, 0x2ffff) AM_ROM
+	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("okibank")
+ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( targeth )
 	PORT_START("GUNX1")
@@ -177,7 +182,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000,24000000/2)          /* 12 MHz */
 	MCFG_CPU_PROGRAM_MAP(main_map)
-	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, targeth_interrupt, "screen", 0, 1)
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", targeth_state, interrupt, "screen", 0, 1)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -185,7 +190,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(64*16, 32*16)              /* 1024x512 */
 	MCFG_SCREEN_VISIBLE_AREA(0, 24*16-1, 16, 16*16-1)   /* 400x240 */
-	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update_targeth)
+	MCFG_SCREEN_UPDATE_DRIVER(targeth_state, screen_update)
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", 0x080000)
@@ -196,6 +201,7 @@ static MACHINE_CONFIG_START( targeth, targeth_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, oki_map)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -213,11 +219,10 @@ ROM_START( targeth )
 	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
 	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(                 0x040000, 0x080000 )
-	ROM_LOAD( "targeth.c3",     0x0c0000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
 ROM_START( targetha )
@@ -234,11 +239,10 @@ ROM_START( targetha )
 	ROM_LOAD( "targeth.i9",     0x100000, 0x080000, CRC(0e922c1c) SHA1(6920e345c82e76f7e0af6101f39eb65ac1f112b9) )
 	ROM_LOAD( "targeth.i7",     0x180000, 0x080000, CRC(d8b41000) SHA1(cbe91eb91bdc7a60b2333c6bea37d08a57902669) )
 
-	ROM_REGION( 0x140000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
+	ROM_REGION( 0x100000, "oki", 0 )    /* ADPCM samples - sound chip is OKIM6295 */
 	ROM_LOAD( "targeth.c1",     0x000000, 0x080000, CRC(d6c9dfbc) SHA1(3ec70dea94fc89df933074012a52de6034571e87) )
 	/* 0x00000-0x2ffff is fixed, 0x30000-0x3ffff is bank switched from all the ROMs */
-	ROM_RELOAD(                 0x040000, 0x080000 )
-	ROM_LOAD( "targeth.c3",     0x0c0000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
+	ROM_LOAD( "targeth.c3",     0x080000, 0x080000, CRC(d4c771df) SHA1(7cc0a86ef6aa3d26ab8f19d198f62112bf012870) )
 ROM_END
 
 GAME( 1994, targeth,  0,       targeth, targeth, driver_device, 0, ROT0, "Gaelco", "Target Hits (ver 1.1)", MACHINE_UNEMULATED_PROTECTION )

@@ -30,13 +30,13 @@ The LCG is the same that was used to generate the FD1094 keys.
 Note that the algorithm skips the special value that would instruct the CPU to
 not decrypt at that address.
 
-void generate_key(UINT8 *key, int seed, int upper_bound)
+void generate_key(uint8_t *key, int seed, int upper_bound)
 {
     int i;
 
     for (i = 0; i < upper_bound; ++i)
     {
-        UINT8 byteval;
+        uint8_t byteval;
 
         do
         {
@@ -66,11 +66,11 @@ CPU #    Game                      Notes              Seed   Upper Limit
 317-0054 Shinobi (sound CPU)       NEC MC-8123B 652   088992  1800
 317-0057 Fantasy Zone 2                               ADFACE  1800
 317-0064 Ufo Senshi Yohko Chan                        880603  1C00
-317-0066 Altered Beast (sound CPU)                    ED8600  1800
-317-5002 Gigas                                        234567  1C00
+317-0066 Altered Beast (sound CPU) NEC MC-8123B 704   ED8600  1800
+317-5002 Gigas                     NEC MC-8123 638    234567  1C00
 317-5012 Ganbare Chinsan Ooshoubu  NEC MC-8123A       804B54  1C00
-317-5??? Ninja Kid II (sound CPU)                     27998D  1800
-317-???? Center Court (sound CPU)  NEC MC-8123B       640506  1800
+317-5??? Ninja Kid II (sound CPU)  NEC MC-8123A 646   27998D  1800
+317-???? Center Court (sound CPU)  NEC MC-8123B 703   640506  1800
 
 ***************************************************************************/
 
@@ -367,7 +367,7 @@ static int decrypt(int val, int key, int opcode)
 }
 
 
-static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
+static uint8_t mc8123_decrypt(offs_t addr,uint8_t val,const uint8_t *key,int opcode)
 {
 	int tbl_num;
 
@@ -377,12 +377,12 @@ static UINT8 mc8123_decrypt(offs_t addr,UINT8 val,const UINT8 *key,int opcode)
 	return decrypt(val,key[tbl_num + (opcode ? 0 : 0x1000)],opcode);
 }
 
-void mc8123_decode(UINT8 *rom, UINT8 *opcodes, const UINT8 *key, int length)
+void mc8123_decode(uint8_t *rom, uint8_t *opcodes, const uint8_t *key, int length)
 {
 	for (int A = 0x0000;A < length;A++)
 	{
 		int adr = A >= 0xc000 ? (A & 0x3fff) | 0x8000 : A;
-		UINT8 src = rom[A];
+		uint8_t src = rom[A];
 
 		/* decode the opcodes */
 		opcodes[A] = mc8123_decrypt(adr,src,key,1);

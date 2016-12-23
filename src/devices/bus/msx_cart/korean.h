@@ -15,7 +15,7 @@ class msx_cart_korean_80in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_80in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -29,11 +29,11 @@ public:
 	void restore_banks();
 
 private:
-	UINT8 m_bank_mask;
-	UINT8 m_selected_bank[4];
-	UINT8 *m_bank_base[4];
+	uint8_t m_bank_mask;
+	uint8_t m_selected_bank[4];
+	uint8_t *m_bank_base[4];
 
-	void setup_bank(UINT8 bank);
+	void setup_bank(uint8_t bank);
 };
 
 
@@ -41,7 +41,7 @@ class msx_cart_korean_90in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_90in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_90in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -56,9 +56,9 @@ public:
 	void restore_banks();
 
 private:
-	UINT8 m_bank_mask;
-	UINT8 m_selected_bank;
-	UINT8 *m_bank_base[4];
+	uint8_t m_bank_mask;
+	uint8_t m_selected_bank;
+	uint8_t *m_bank_base[4];
 };
 
 
@@ -66,7 +66,7 @@ class msx_cart_korean_126in1 : public device_t
 						, public msx_cart_interface
 {
 public:
-	msx_cart_korean_126in1(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msx_cart_korean_126in1(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -80,11 +80,11 @@ public:
 	void restore_banks();
 
 private:
-	UINT8 m_bank_mask;
-	UINT8 m_selected_bank[2];
-	UINT8 *m_bank_base[2];
+	uint8_t m_bank_mask;
+	uint8_t m_selected_bank[2];
+	uint8_t *m_bank_base[2];
 
-	void setup_bank(UINT8 bank);
+	void setup_bank(uint8_t bank);
 };
 
 

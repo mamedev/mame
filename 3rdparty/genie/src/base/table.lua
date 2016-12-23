@@ -25,6 +25,34 @@
 
 
 --
+-- Make a complete copy of a table, including any child tables it contains.
+--
+
+	function table.deepcopy(object)
+		-- keep track of already seen objects to avoid loops
+		local seen = {}
+
+		local function copy(object)
+			if type(object) ~= "table" then
+				return object
+			elseif seen[object] then
+				return seen[object]
+			end
+
+			local clone = {}
+			seen[object] = clone
+			for key, value in pairs(object) do
+				clone[key] = copy(value)
+			end
+
+			setmetatable(clone, getmetatable(object))
+			return clone
+		end
+
+		return copy(object)
+	end
+
+--
 -- Enumerates an array of objects and returns a new table containing
 -- only the value of one particular field.
 --
@@ -184,5 +212,31 @@
 		end
 		return result
 	end
+	
+	
+	--
+	-- reverse table order
+	--
+	
+	function table.reverse(arr)
+		for i=1, math.floor(#arr / 2) do
+			arr[i], arr[#arr - i + 1] = arr[#arr - i + 1], arr[i]
+		end
+		return arr
+	end
 
+	--
+	-- reverse table order
+	--
 
+	function table.arglist(arg, value)
+		if #value > 0 then
+			local args = {}
+			for _, val in ipairs(value) do
+				table.insert(args, string.format("%s %s", arg, val))
+			end
+			return table.concat(args, " ")
+		else
+			return ""
+		end
+	end

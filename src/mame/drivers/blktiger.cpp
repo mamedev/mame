@@ -17,6 +17,8 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "sound/2203intf.h"
 #include "cpu/mcs51/mcs51.h"
 #include "includes/blktiger.h"
@@ -82,13 +84,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktiger_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")    AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")    AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")   AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_READWRITE(blktiger_from_mcu_r,blktiger_to_mcu_w)     /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
@@ -99,13 +101,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blktigerbl_io_map, AS_IO, 8, blktiger_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")    AM_WRITE(soundlatch_byte_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")    AM_WRITE(blktiger_bankswitch_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(blktiger_bankswitch_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0")   AM_WRITE(blktiger_coinlockout_w)
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")   AM_WRITE(blktiger_video_control_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW0") AM_WRITE(blktiger_coinlockout_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(blktiger_video_control_w)
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("FREEZE")
-	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x07, 0x07) AM_NOP  /* Software protection (7) */
 	AM_RANGE(0x08, 0x09) AM_WRITE(blktiger_scrollx_w)
 	AM_RANGE(0x0a, 0x0b) AM_WRITE(blktiger_scrolly_w)
@@ -117,7 +119,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blktiger_sound_map, AS_PROGRAM, 8, blktiger_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc800, 0xc800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xe002, 0xe003) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 ADDRESS_MAP_END
@@ -259,13 +261,6 @@ static GFXDECODE_START( blktiger )
 GFXDECODE_END
 
 
-
-/* handler called by the 2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(blktiger_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 void blktiger_state::machine_start()
 {
 	/* configure bankswitching */
@@ -313,6 +308,7 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	MCFG_CPU_IO_MAP(blktiger_mcu_io_map)
 	//MCFG_CPU_VBLANK_INT_DRIVER("screen", blktiger_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -334,8 +330,10 @@ static MACHINE_CONFIG_START( blktiger, blktiger_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(blktiger_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
@@ -599,9 +597,9 @@ ROM_END
 
 DRIVER_INIT_MEMBER(blktiger_state,blktigerb3)
 {
-	UINT8 *src = memregion("audiocpu")->base();
+	uint8_t *src = memregion("audiocpu")->base();
 	int len = 0x8000;
-	dynamic_buffer buffer(len);
+	std::vector<uint8_t> buffer(len);
 
 	for (int i = 0; i < len; i++)
 	{

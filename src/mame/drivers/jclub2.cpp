@@ -121,15 +121,15 @@ public:
 
 	tilemap_t *m_tmap;
 	tilemap_t *m_tmap2;
-	optional_shared_ptr<UINT32> m_tmapram;
-	optional_shared_ptr<UINT32> m_tmapscroll;
-	optional_shared_ptr<UINT32> m_tmapram2;
-	optional_shared_ptr<UINT32> m_tmapscroll2;
-	UINT32 m_input_sel;
-	UINT32 m_input_sel_jc_1p;
-	UINT32 m_input_sel_jc_2p;
+	optional_shared_ptr<uint32_t> m_tmapram;
+	optional_shared_ptr<uint32_t> m_tmapscroll;
+	optional_shared_ptr<uint32_t> m_tmapram2;
+	optional_shared_ptr<uint32_t> m_tmapscroll2;
+	uint32_t m_input_sel;
+	uint32_t m_input_sel_jc_1p;
+	uint32_t m_input_sel_jc_2p;
 	int m_jclub2_gfx_index;
-	optional_shared_ptr<UINT32> m_spriteram;
+	optional_shared_ptr<uint32_t> m_spriteram;
 	optional_device<st0020_device> m_gdfs_st0020;
 	required_device<cpu_device> m_gamecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
@@ -151,12 +151,12 @@ public:
 	DECLARE_VIDEO_START(darkhors);
 	DECLARE_VIDEO_START(jclub2);
 	DECLARE_VIDEO_START(jclub2o);
-	UINT32 screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(darkhors_irq);
 	void draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<gfxdecode_device> m_gfxdecode;
+	optional_device<gfxdecode_device> m_gfxdecode;
 
 	WRITE8_MEMBER(st0016_rom_bank_w); // temp?
 };
@@ -178,15 +178,15 @@ public:
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_0)
 {
-	UINT16 tile     =   m_tmapram[tile_index] >> 16;
-	UINT16 color    =   m_tmapram[tile_index] & 0xffff;
+	uint16_t tile     =   m_tmapram[tile_index] >> 16;
+	uint16_t color    =   m_tmapram[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
 TILE_GET_INFO_MEMBER(darkhors_state::get_tile_info_1)
 {
-	UINT16 tile     =   m_tmapram2[tile_index] >> 16;
-	UINT16 color    =   m_tmapram2[tile_index] & 0xffff;
+	uint16_t tile     =   m_tmapram2[tile_index] >> 16;
+	uint16_t color    =   m_tmapram2[tile_index] & 0xffff;
 	SET_TILE_INFO_MEMBER(0, tile/2, (color & 0x200) ? (color & 0x1ff) : ((color & 0x0ff) * 4) , 0);
 }
 
@@ -203,8 +203,8 @@ WRITE32_MEMBER(darkhors_state::darkhors_tmapram2_w)
 
 void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT32 *s       =   m_spriteram;
-	UINT32 *end     =   m_spriteram + 0x02000/4;
+	uint32_t *s       =   m_spriteram;
+	uint32_t *end     =   m_spriteram + 0x02000/4;
 
 	for ( ; s < end; s += 8/4 )
 	{
@@ -237,15 +237,15 @@ void darkhors_state::draw_sprites_darkhors(bitmap_ind16 &bitmap, const rectangle
 
 VIDEO_START_MEMBER(darkhors_state,darkhors)
 {
-	m_tmap =    &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
-	m_tmap2= &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_0),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
+	m_tmap2= &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(darkhors_state::get_tile_info_1),this), TILEMAP_SCAN_ROWS,16,16, 0x40,0x40);
 	m_tmap->set_transparent_pen(0);
 	m_tmap2->set_transparent_pen(0);
 
 	m_gfxdecode->gfx(0)->set_granularity(64); /* 256 colour sprites with palette selectable on 64 colour boundaries */
 }
 
-UINT32 darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t darkhors_state::screen_update_darkhors(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -370,7 +370,7 @@ READ32_MEMBER(darkhors_state::darkhors_input_sel_r)
 
 READ32_MEMBER(darkhors_state::p_580004)
 {
-UINT32 ret = ioport("580004")->read()& 0x00ffffff;
+uint32_t ret = ioport("580004")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
 	case 0x01: return  ret | (ioport("580004-01")->read()<<24);
 	case 0x02: return  ret | (ioport("580004-02")->read()<<24);
@@ -388,7 +388,7 @@ switch (m_input_sel_jc_2p){
 
 READ32_MEMBER(darkhors_state::p_4e0000)
 {
-UINT32 ret = ioport("4E0000")->read()& 0x00ffffff;
+uint32_t ret = ioport("4E0000")->read()& 0x00ffffff;
 switch (m_input_sel_jc_2p){
 	case 0x01: return  ret | (ioport("4E0000-01")->read()<<24);
 	case 0x02: return  ret | (ioport("4E0000-02")->read()<<24);
@@ -996,7 +996,7 @@ VIDEO_START_MEMBER(darkhors_state,jclub2)
 {
 }
 
-UINT32 darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t darkhors_state::screen_update_jclub2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	// this isn't an st0020..
 	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
@@ -1021,13 +1021,10 @@ static MACHINE_CONFIG_START( jclub2, darkhors_state )
 	MCFG_SCREEN_UPDATE_DRIVER(darkhors_state, screen_update_jclub2)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	// NOT an ST0020 but instead ST0032, ram format isn't compatible at least
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_st0032(*device, 1);
 	st0020_device::set_is_jclub2o(*device, 1); // offsets
-	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_PALETTE_ADD("palette", 0x10000)
@@ -1070,7 +1067,7 @@ VIDEO_START_MEMBER(darkhors_state,jclub2o)
 {
 }
 
-UINT32 darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t darkhors_state::screen_update_jclub2o(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_gdfs_st0020->st0020_draw_all(bitmap, cliprect);
 	return 0;
@@ -1101,11 +1098,8 @@ static MACHINE_CONFIG_START( jclub2o, darkhors_state )
 	MCFG_PALETTE_ADD("palette", 0x10000)
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_DEVICE_ADD("st0020_spr", ST0020_SPRITES, 0)
 	st0020_device::set_is_jclub2o(*device, 1);
-	MCFG_ST0020_SPRITES_GFXDECODE("gfxdecode")
 	MCFG_ST0020_SPRITES_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(darkhors_state,jclub2o)
@@ -1268,7 +1262,7 @@ ROM_START( jclub2o )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 
-	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
+	ROM_REGION16_BE( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
 	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )   //jclub2ob ones
 ROM_END
 
@@ -1289,7 +1283,7 @@ ROM_START( jclub2ob )
 	ROM_REGION( 0x80000, "maincpu", 0 ) // z80 core (used for sound?)
 	ROM_LOAD( "sx006-04.u87", 0x00000, 0x80000, CRC(a87adedd) SHA1(1cd5af2d03738fff2230b46241659179467c828c) )
 
-	ROM_REGION( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
+	ROM_REGION16_BE( 0x100, "eeprom", 0 ) // eeprom 16 bit one!!!
 	ROM_LOAD( "eeprom-jclub2o.bin", 0x0000, 0x100, CRC(dd1c88ec) SHA1(acb67e41e832f203361e0f93afcd4eaf963fd13e) )
 ROM_END
 
@@ -1311,11 +1305,11 @@ DRIVER_INIT_MEMBER(darkhors_state,darkhors)
 	// the eeprom contains the game ID, which must be valid for it to boot
 	// is there a way (key sequence) to reprogram it??
 	// I bet the original sets need similar get further in their boot sequence
-	UINT8  *eeprom = (UINT8 *)  memregion("eeprom")->base();
+	uint8_t  *eeprom = (uint8_t *)  memregion("eeprom")->base();
 	if (eeprom != 0x00)
 	{
 		size_t len = memregion("eeprom")->bytes();
-		dynamic_buffer temp(len);
+		std::vector<uint8_t> temp(len);
 		int i;
 		for (i = 0; i < len; i++)
 			temp[i] = eeprom[BITSWAP8(i,7,5,4,3,2,1,0,6)];

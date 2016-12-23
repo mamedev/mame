@@ -19,7 +19,7 @@
 
 const device_type PALETTE = &device_creator<palette_device>;
 
-palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+palette_device::palette_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock)
 	: device_t(mconfig, PALETTE, "palette", tag, owner, clock, "palette", __FILE__),
 		m_entries(0),
 		m_indirect_entries(0),
@@ -122,7 +122,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 		m_indirect_colors[index] = rgb;
 
 		// update the palette for any colortable entries that reference it
-		for (UINT32 pen = 0; pen < m_indirect_pens.size(); pen++)
+		for (u32 pen = 0; pen < m_indirect_pens.size(); pen++)
 			if (m_indirect_pens[pen] == index)
 				m_palette->entry_set_color(pen, rgb);
 	}
@@ -133,7 +133,7 @@ void palette_device::set_indirect_color(int index, rgb_t rgb)
 //  set_pen_indirect - set an indirect pen index
 //-------------------------------------------------
 
-void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
+void palette_device::set_pen_indirect(pen_t pen, indirect_pen_t index)
 {
 	// make sure we are in range
 	assert(pen < m_entries && index < m_indirect_entries);
@@ -150,19 +150,19 @@ void palette_device::set_pen_indirect(pen_t pen, UINT16 index)
 //  transcolor
 //-------------------------------------------------
 
-UINT32 palette_device::transpen_mask(gfx_element &gfx, int color, int transcolor)
+u32 palette_device::transpen_mask(gfx_element &gfx, u32 color, indirect_pen_t transcolor)
 {
-	UINT32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
+	u32 entry = gfx.colorbase() + (color % gfx.colors()) * gfx.granularity();
 
 	// make sure we are in range
 	assert(entry < m_indirect_pens.size());
 	assert(gfx.depth() <= 32);
 
 	// either gfx->color_depth entries or as many as we can get up until the end
-	int count = MIN(gfx.depth(), m_indirect_pens.size() - entry);
+	int count = std::min(size_t(gfx.depth()), m_indirect_pens.size() - entry);
 
 	// set a bit anywhere the transcolor matches
-	UINT32 mask = 0;
+	u32 mask = 0;
 	for (int bit = 0; bit < count; bit++)
 		if (m_indirect_pens[entry++] == transcolor)
 			mask |= 1 << bit;
@@ -301,14 +301,10 @@ inline void palette_device::update_for_write(offs_t byte_offset, int bytes_modif
 	offs_t base = byte_offset / bpe;
 	for (int index = 0; index < count; index++)
 	{
-		UINT32 data = m_paletteram.read(base + index);
-		if (m_paletteram_ext.base() != nullptr)
-			data |= m_paletteram_ext.read(base + index) << (8 * bpe);
-
 		if (indirect)
-			set_indirect_color(base + index, m_raw_to_rgb(data));
+			set_indirect_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 		else
-			m_palette->entry_set_color(base + index, m_raw_to_rgb(data));
+			m_palette->entry_set_color(base + index, m_raw_to_rgb(read_entry(base + index)));
 	}
 }
 
@@ -466,7 +462,7 @@ void palette_device::device_start()
 			for (int color = 0; color < m_indirect_entries; color++)
 			{
 				// alpha = 0 ensures change is detected the first time set_indirect_color() is called
-				m_indirect_colors[color] = rgb_t(0, 0, 0, 0);
+				m_indirect_colors[color] = rgb_t::transparent();
 			}
 
 			m_indirect_pens.resize(m_entries);
@@ -598,8 +594,8 @@ void palette_device::allocate_palette()
 
 		// 32-bit direct case
 		case BITMAP_FORMAT_RGB32:
-			m_black_pen = rgb_t::black;
-			m_white_pen = rgb_t::white;
+			m_black_pen = rgb_t::black();
+			m_white_pen = rgb_t::white();
 			break;
 
 		// screenless case
@@ -719,9 +715,9 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 	int ifactor = int(factor * 256.0f);
 	for (int rgb555 = 0; rgb555 < 32768; rgb555++)
 	{
-		UINT8 r = rgb_t::clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
-		UINT8 g = rgb_t::clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
-		UINT8 b = rgb_t::clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
+		u8 const r = rgb_t::clamp((pal5bit(rgb555 >> 10) * ifactor) >> 8);
+		u8 const g = rgb_t::clamp((pal5bit(rgb555 >> 5) * ifactor) >> 8);
+		u8 const b = rgb_t::clamp((pal5bit(rgb555 >> 0) * ifactor) >> 8);
 
 		// store either 16 or 32 bit
 		rgb_t final = rgb_t(r, g, b);
@@ -744,79 +740,44 @@ void palette_device::configure_rgb_shadows(int mode, float factor)
 
 void palette_device::palette_init_all_black(palette_device &palette)
 {
-	int i;
-
-	for (i = 0; i < palette.entries(); i++)
+	for (int i = 0; i < palette.entries(); i++)
 	{
-		palette.set_pen_color(i,rgb_t::black); // black
+		palette.set_pen_color(i, rgb_t::black());
 	}
 }
 
 
 /*-------------------------------------------------
-    black_and_white - basic 2-color black & white
+    monochrome - 2-color black & white
 -------------------------------------------------*/
 
-void palette_device::palette_init_black_and_white(palette_device &palette)
+void palette_device::palette_init_monochrome(palette_device &palette)
 {
-	palette.set_pen_color(0,rgb_t::black); // black
-	palette.set_pen_color(1,rgb_t::white); // white
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t::white());
 }
 
 
 /*-------------------------------------------------
-    white_and_black - basic 2-color white & black
+    monochrome_inverted - 2-color white & black
 -------------------------------------------------*/
 
-void palette_device::palette_init_white_and_black(palette_device &palette)
+void palette_device::palette_init_monochrome_inverted(palette_device &palette)
 {
-	palette.set_pen_color(0,rgb_t::white); // white
-	palette.set_pen_color(1,rgb_t::black); // black
+	palette.set_pen_color(0, rgb_t::white());
+	palette.set_pen_color(1, rgb_t::black());
 }
 
 
 /*-------------------------------------------------
-    monochrome_amber - 2-color black & amber
+    monochrome_highlight - 3-color
 -------------------------------------------------*/
 
-void palette_device::palette_init_monochrome_amber(palette_device &palette)
+void palette_device::palette_init_monochrome_highlight(palette_device &palette)
 {
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0xf7, 0xaa, 0x00)); // amber
-}
-
-
-/*-------------------------------------------------
-    monochrome_green - 2-color black & green
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_green(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0x00, 0xff, 0x00)); // green
-}
-
-
-/*-------------------------------------------------
-    monochrome_green_highlight - 3-color black & green
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_green_highlight(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0x00, 0xc0, 0x00)); // green
-	palette.set_pen_color(2, rgb_t(0x00, 0xff, 0x00)); // green
-}
-
-
-/*-------------------------------------------------
-    monochrome_yellow - 2-color black & yellow
--------------------------------------------------*/
-
-void palette_device::palette_init_monochrome_yellow(palette_device &palette)
-{
-	palette.set_pen_color(0, rgb_t::black); // black
-	palette.set_pen_color(1, rgb_t(0xff, 0xff, 0x00)); // yellow
+	palette.set_pen_color(0, rgb_t::black());
+	palette.set_pen_color(1, rgb_t(0xc0, 0xc0, 0xc0));
+	palette.set_pen_color(2, rgb_t::white());
 }
 
 
@@ -898,7 +859,7 @@ void palette_device::palette_init_3bit_bgr(palette_device &palette)
 
 void palette_device::palette_init_RRRRGGGGBBBB_proms(palette_device &palette)
 {
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const u8 *color_prom = machine().root_device().memregion("proms")->base();
 	int i;
 
 	for (i = 0; i < palette.entries(); i++)
@@ -971,35 +932,35 @@ void palette_device::palette_init_RRRRRGGGGGGBBBBB(palette_device &palette)
 		palette.set_pen_color(i, rgbexpand<5,6,5>(i, 11, 5, 0));
 }
 
-rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(UINT32 raw)
+rgb_t raw_to_rgb_converter::IRRRRRGGGGGBBBBB_decoder(u32 raw)
 {
-	UINT8 i = (raw >> 15) & 1;
-	UINT8 r = pal6bit(((raw >> 9) & 0x3e) | i);
-	UINT8 g = pal6bit(((raw >> 4) & 0x3e) | i);
-	UINT8 b = pal6bit(((raw << 1) & 0x3e) | i);
+	u8 const i = (raw >> 15) & 1;
+	u8 const r = pal6bit(((raw >> 9) & 0x3e) | i);
+	u8 const g = pal6bit(((raw >> 4) & 0x3e) | i);
+	u8 const b = pal6bit(((raw << 1) & 0x3e) | i);
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(UINT32 raw)
+rgb_t raw_to_rgb_converter::RRRRGGGGBBBBRGBx_decoder(u32 raw)
 {
-	UINT8 r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
-	UINT8 g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
-	UINT8 b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
+	u8 const r = pal5bit(((raw >> 11) & 0x1e) | ((raw >> 3) & 0x01));
+	u8 const g = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 2) & 0x01));
+	u8 const b = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 1) & 0x01));
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder(UINT32 raw)
+rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit0_decoder(u32 raw)
 {
-	UINT8 r = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
-	UINT8 g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
-	UINT8 b = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
+	u8 const r = pal5bit(((raw >> 7) & 0x1e) | ((raw >> 14) & 0x01));
+	u8 const g = pal5bit(((raw >> 3) & 0x1e) | ((raw >> 13) & 0x01));
+	u8 const b = pal5bit(((raw << 1) & 0x1e) | ((raw >> 12) & 0x01));
 	return rgb_t(r, g, b);
 }
 
-rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(UINT32 raw)
+rgb_t raw_to_rgb_converter::xRGBRRRRGGGGBBBB_bit4_decoder(u32 raw)
 {
-	UINT8 r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
-	UINT8 g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
-	UINT8 b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
+	u8 const r = pal5bit(((raw >> 8) & 0x0f) | ((raw >> 10) & 0x10));
+	u8 const g = pal5bit(((raw >> 4) & 0x0f) | ((raw >> 9)  & 0x10));
+	u8 const b = pal5bit(((raw >> 0) & 0x0f) | ((raw >> 8)  & 0x10));
 	return rgb_t(r, g, b);
 }

@@ -26,7 +26,7 @@ class nes_zapper_device : public device_t,
 {
 public:
 	// construction/destruction
-	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nes_zapper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -35,8 +35,8 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual UINT8 read_bit34() override;
-	virtual UINT8 read_exp(offs_t offset) override;
+	virtual uint8_t read_bit34() override;
+	virtual uint8_t read_exp(offs_t offset) override;
 
 private:
 	required_ioport m_lightx;

@@ -55,8 +55,8 @@ public:
 
 private:
 	virtual void machine_reset() override;
-	UINT8 m_resetcnt;
-	UINT8 m_ram_data;
+	uint8_t m_resetcnt;
+	uint8_t m_ram_data;
 	required_device<cosmac_device> m_maincpu;
 	required_device<rs232_port_device> m_rs232;
 	required_device<generic_terminal_device> m_terminal;
@@ -123,7 +123,7 @@ static MACHINE_CONFIG_START( microkit, microkit_state )
 
 	/* video hardware */
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, "keyboard")
-	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("maincpu", cosmac_device, ef4_w))
+	MCFG_RS232_RXD_HANDLER(INPUTLINE("maincpu", COSMAC_INPUT_LINE_EF4))
 	MCFG_DEVICE_CARD_DEVICE_INPUT_DEFAULTS("keyboard", serial_keyb)
 	MCFG_DEVICE_ADD("terminal", GENERIC_TERMINAL, 0)
 MACHINE_CONFIG_END

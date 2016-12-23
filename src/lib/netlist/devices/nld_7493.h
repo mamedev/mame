@@ -57,41 +57,16 @@
 #ifndef NLD_7493_H_
 #define NLD_7493_H_
 
-#include "nl_base.h"
+#include "nl_setup.h"
 
-#define TTL_7493(_name, _CLKA, _CLKB, _R1, _R2)                                     \
-		NET_REGISTER_DEV(TTL_7493, _name)                                               \
-		NET_CONNECT(_name, CLKA, _CLKA)                                             \
-		NET_CONNECT(_name, CLKB, _CLKB)                                             \
-		NET_CONNECT(_name, R1,  _R1)                                                \
-		NET_CONNECT(_name, R2,  _R2)
+#define TTL_7493(name, cCLKA, cCLKB, cR1, cR2)                                  \
+		NET_REGISTER_DEV(TTL_7493, name)                                        \
+		NET_CONNECT(name, CLKA, cCLKA)                                          \
+		NET_CONNECT(name, CLKB, cCLKB)                                          \
+		NET_CONNECT(name, R1,  cR1)                                             \
+		NET_CONNECT(name, R2,  cR2)
 
-#define TTL_7493_DIP(_name)                                                         \
-		NET_REGISTER_DEV(TTL_7493_DIP, _name)
-
-NETLIB_NAMESPACE_DEVICES_START()
-
-NETLIB_SUBDEVICE(7493ff,
-	logic_input_t m_I;
-	logic_output_t m_Q;
-
-	UINT8 m_reset;
-	UINT8 m_state;
-);
-
-NETLIB_DEVICE(7493,
-	logic_input_t m_R1;
-	logic_input_t m_R2;
-
-	NETLIB_NAME(7493ff) A;
-	NETLIB_NAME(7493ff) B;
-	NETLIB_NAME(7493ff) C;
-	NETLIB_NAME(7493ff) D;
-);
-
-NETLIB_DEVICE_DERIVED_PURE(7493_dip, 7493);
-
-NETLIB_NAMESPACE_DEVICES_END()
-
+#define TTL_7493_DIP(name)                                                      \
+		NET_REGISTER_DEV(TTL_7493_DIP, name)
 
 #endif /* NLD_7493_H_ */

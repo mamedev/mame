@@ -56,6 +56,8 @@ public:
 	DECLARE_DRIVER_INIT(icatel);
 	DECLARE_PALETTE_INIT(icatel);
 
+	HD44780_PIXEL_UPDATE(icatel_pixel_update);
+
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -169,8 +171,8 @@ WRITE8_MEMBER(icatel_state::ci8_w)
 READ8_MEMBER(icatel_state::ci15_r)
 {
 	/* TODO: Implement-me! */
-//  debugger_break(machine());
-//  logerror("read: ci15\n");
+	//machine().debug_break();
+	//logerror("read: ci15\n");
 	return (1 << 3) | (1 << 0);
 }
 
@@ -220,7 +222,7 @@ static GFXDECODE_START( icatel )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, prot_charlayout, 0, 1 )
 GFXDECODE_END
 
-static HD44780_PIXEL_UPDATE(icatel_pixel_update)
+HD44780_PIXEL_UPDATE(icatel_state::icatel_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
@@ -256,7 +258,7 @@ static MACHINE_CONFIG_START( icatel, icatel_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(icatel_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(icatel_state, icatel_pixel_update)
 MACHINE_CONFIG_END
 
 ROM_START( icatel )

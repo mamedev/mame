@@ -51,10 +51,10 @@ enum
 /* display state structure */
 struct tms34061_display
 {
-	UINT8   blanked;        /* true if blanked */
-	UINT8   *vram;          /* base of VRAM */
-	UINT8   *latchram;      /* base of latch RAM */
-	UINT16  *regs;          /* pointer to array of registers */
+	uint8_t   blanked;        /* true if blanked */
+	uint8_t   *vram;          /* base of VRAM */
+	uint8_t   *latchram;      /* base of latch RAM */
+	uint16_t  *regs;          /* pointer to array of registers */
 	offs_t  dispstart;      /* display start */
 };
 
@@ -68,15 +68,15 @@ class tms34061_device :  public device_t,
 {
 public:
 	// construction/destruction
-	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms34061_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	static void set_rowshift(device_t &device, UINT8 rowshift) { downcast<tms34061_device &>(device).m_rowshift = rowshift; }
-	static void set_vram_size(device_t &device, UINT32 vramsize) { downcast<tms34061_device &>(device).m_vramsize = vramsize; }
+	static void set_rowshift(device_t &device, uint8_t rowshift) { downcast<tms34061_device &>(device).m_rowshift = rowshift; }
+	static void set_vram_size(device_t &device, uint32_t vramsize) { downcast<tms34061_device &>(device).m_vramsize = vramsize; }
 	template<class _Object> static devcb_base &set_interrupt_callback(device_t &device, _Object object) { return downcast<tms34061_device &>(device).m_interrupt_cb.set_callback(object); }
 
 	/* reads/writes to the 34061 */
-	UINT8 read(address_space &space, int col, int row, int func);
-	void write(address_space &space, int col, int row, int func, UINT8 data);
+	uint8_t read(address_space &space, int col, int row, int func);
+	void write(address_space &space, int col, int row, int func, uint8_t data);
 
 	/* latch settings */
 	DECLARE_READ8_MEMBER( latch_r );
@@ -93,27 +93,27 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8               m_rowshift;         /* VRAM address is (row << rowshift) | col */
-	UINT32              m_vramsize;         /* size of video RAM */
+	uint8_t               m_rowshift;         /* VRAM address is (row << rowshift) | col */
+	uint32_t              m_vramsize;         /* size of video RAM */
 	devcb_write_line   m_interrupt_cb;     /* interrupt gen callback */
 
-	UINT16              m_regs[TMS34061_REGCOUNT];
-	UINT16              m_xmask;
-	UINT8               m_yshift;
-	UINT32              m_vrammask;
-	UINT8 *             m_vram;
-	UINT8 *             m_latchram;
-	UINT8               m_latchdata;
-	UINT8 *             m_shiftreg;
+	uint16_t              m_regs[TMS34061_REGCOUNT];
+	uint16_t              m_xmask;
+	uint8_t               m_yshift;
+	uint32_t              m_vrammask;
+	uint8_t *             m_vram;
+	uint8_t *             m_latchram;
+	uint8_t               m_latchdata;
+	uint8_t *             m_shiftreg;
 	emu_timer *         m_timer;
 
 	void update_interrupts(void);
 	TIMER_CALLBACK_MEMBER( interrupt );
-	void register_w(address_space &space, offs_t offset, UINT8 data);
-	UINT8 register_r(address_space &space, offs_t offset);
+	void register_w(address_space &space, offs_t offset, uint8_t data);
+	uint8_t register_r(address_space &space, offs_t offset);
 	void adjust_xyaddress(int offset);
-	void xypixel_w(address_space &space, int offset, UINT8 data);
-	UINT8 xypixel_r(address_space &space, int offset);
+	void xypixel_w(address_space &space, int offset, uint8_t data);
+	uint8_t xypixel_r(address_space &space, int offset);
 };
 
 // device type definition

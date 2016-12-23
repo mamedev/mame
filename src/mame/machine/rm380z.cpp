@@ -74,7 +74,7 @@ WRITE8_MEMBER( rm380z_state::port_write )
 
 READ8_MEMBER( rm380z_state::port_read )
 {
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	switch ( offset )
 	{
@@ -261,8 +261,8 @@ void rm380z_state::machine_reset()
 void rm380z_state::config_memory_map()
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion(RM380Z_MAINCPU_TAG)->base();
-	UINT8* m_ram_p = m_messram->pointer();
+	uint8_t *rom = memregion(RM380Z_MAINCPU_TAG)->base();
+	uint8_t* m_ram_p = m_messram->pointer();
 
 	if ( RM380Z_PORTS_ENABLED_HIGH )
 	{

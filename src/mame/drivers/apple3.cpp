@@ -17,9 +17,10 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "bus/rs232/rs232.h"
 #include "includes/apple3.h"
 #include "includes/apple2.h"
+#include "bus/rs232/rs232.h"
+#include "sound/volt_reg.h"
 #include "formats/ap2_dsk.h"
 
 #include "bus/a2bus/a2cffa.h"
@@ -61,7 +62,7 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(280*2, 224)
+	MCFG_SCREEN_SIZE((280*2)+32, 224)
 	MCFG_SCREEN_VISIBLE_AREA(0, (280*2)-1,0,192-1)
 	MCFG_SCREEN_UPDATE_DRIVER(apple3_state, screen_update_apple3)
 	MCFG_SCREEN_PALETTE("palette")
@@ -130,22 +131,24 @@ static MACHINE_CONFIG_START( apple3, apple3_state )
 	MCFG_DEVICE_ADD("rtc", MM58167, XTAL_32_768kHz)
 
 	/* via */
-	MCFG_DEVICE_ADD("via6522_0", VIA6522, 2000000)
+	MCFG_DEVICE_ADD("via6522_0", VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_0_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_0_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_0_irq_func))
 
-	MCFG_DEVICE_ADD("via6522_1", VIA6522, 2000000)
+	MCFG_DEVICE_ADD("via6522_1", VIA6522, 1000000)
 	MCFG_VIA6522_WRITEPA_HANDLER(WRITE8(apple3_state, apple3_via_1_out_a))
 	MCFG_VIA6522_WRITEPB_HANDLER(WRITE8(apple3_state, apple3_via_1_out_b))
 	MCFG_VIA6522_IRQ_HANDLER(WRITELINE(apple3_state, apple3_via_1_irq_func))
 
 	/* sound */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD(SPEAKER_TAG, SPEAKER_SOUND, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-	MCFG_SOUND_ADD(DAC_TAG, DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("bell", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.99)
+	MCFG_SOUND_ADD("dac", DAC_6BIT_BINARY_WEIGHTED, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.125) // 6522.b5(pb0-pb5) + 320k,160k,80k,40k,20k,10k
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "bell", 1.0, DAC_VREF_POS_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("c040", apple3_state, apple3_c040_tick, attotime::from_hz(2000))
 
 	/* internal ram */

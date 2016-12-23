@@ -46,13 +46,13 @@ class tandy2k_keyboard_device :  public device_t
 {
 public:
 	// construction/destruction
-	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tandy2k_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_clock_wr_callback(device_t &device, _Object object) { return downcast<tandy2k_keyboard_device &>(device).m_write_clock.set_callback(object); }
 	template<class _Object> static devcb_base &set_data_wr_callback(device_t &device, _Object object) { return downcast<tandy2k_keyboard_device &>(device).m_write_data.set_callback(object); }
 
 	// optional information overrides
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -79,23 +79,12 @@ private:
 	};
 
 	required_device<cpu_device> m_maincpu;
-	required_ioport m_y0;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
+	required_ioport_array<12> m_y;
 
 	devcb_write_line   m_write_clock;
 	devcb_write_line   m_write_data;
 
-	UINT16 m_keylatch;
+	uint16_t m_keylatch;
 
 	int m_clock;
 	int m_data;

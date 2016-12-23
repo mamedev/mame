@@ -44,7 +44,7 @@ K05324X_CB_MEMBER(parodius_state::sprite_callback)
 
 ***************************************************************************/
 
-UINT32 parodius_state::screen_update_parodius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t parodius_state::screen_update_parodius(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layer[3], bg_colorbase;
 

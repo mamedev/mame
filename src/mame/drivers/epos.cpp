@@ -28,11 +28,14 @@
       halfs of the palette are identical, this is not an issue.  See $039c.
       The other games have a different color test, not using the busy loop.
 
+    - Fix flip screen support for The Dealer and Beastie Feastie.
+
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/epos.h"
 
@@ -79,8 +82,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, AS_IO, 8, epos_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(epos_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(port_1_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("aysnd", ay8910_device, address_w)
@@ -92,10 +95,22 @@ static ADDRESS_MAP_START( dealer_io_map, AS_IO, 8, epos_state )
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
 	AM_RANGE(0x34, 0x34) AM_DEVWRITE("aysnd", ay8910_device, data_w)
 	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
-	AM_RANGE(0x3C, 0x3C) AM_DEVWRITE("aysnd", ay8910_device, address_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x3c, 0x3c) AM_DEVWRITE("aysnd", ay8910_device, address_w)
+	AM_RANGE(0x40, 0x40) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 ADDRESS_MAP_END
 
+READ8_MEMBER(epos_state::read_prta)
+{
+	uint8_t data = 0xff;
+
+	if (!BIT(m_input_multiplex, 0))
+		data &= m_inputs[0]->read();
+
+	if (!BIT(m_input_multiplex, 1))
+		data &= m_inputs[1]->read();
+
+	return data;
+}
 
 /*
    ROMs U01-U03 are checked with the same code in a loop.
@@ -105,6 +120,7 @@ ADDRESS_MAP_END
 WRITE8_MEMBER(epos_state::write_prtc)
 {
 	membank("bank2")->set_entry(data & 0x01);
+	m_input_multiplex = (data >> 5) & 3;
 }
 
 /*************************************
@@ -338,16 +354,47 @@ static INPUT_PORTS_START( dealer )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) //cancel
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) //draw
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) //stand
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) //play
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 ) //coin in
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL ) PORT_NAME( "Draw" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_STAND )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_BET ) PORT_NAME( "Play" )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( beastf )
+	PORT_INCLUDE(dealer)
+
+	PORT_MODIFY("INPUTS")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_MODIFY("INPUTS2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -359,18 +406,20 @@ MACHINE_START_MEMBER(epos_state,epos)
 {
 	save_item(NAME(m_palette));
 	save_item(NAME(m_counter));
+	save_item(NAME(m_input_multiplex));
 }
 
 void epos_state::machine_reset()
 {
 	m_palette = 0;
 	m_counter = 0;
+	m_input_multiplex = 3;
 }
 
 
 MACHINE_START_MEMBER(epos_state,dealer)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 	membank("bank1")->configure_entries(0, 4, &ROM[0x0000], 0x10000);
 	membank("bank2")->configure_entries(0, 2, &ROM[0x6000], 0x1000);
 
@@ -388,6 +437,7 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -395,7 +445,7 @@ static MACHINE_CONFIG_START( epos, epos_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(272, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
-	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update_epos)
+	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -413,10 +463,12 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", epos_state,  irq0_line_hold)
 
 	MCFG_DEVICE_ADD("ppi8255", I8255A, 0)
-	MCFG_I8255_IN_PORTA_CB(IOPORT("INPUTS"))
+	MCFG_I8255_IN_PORTA_CB(READ8(epos_state, read_prta))
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(epos_state, write_prtc))
 
 	MCFG_MACHINE_START_OVERRIDE(epos_state,dealer)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -424,12 +476,14 @@ static MACHINE_CONFIG_START( dealer, epos_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MCFG_SCREEN_SIZE(272, 241)
 	MCFG_SCREEN_VISIBLE_AREA(0, 271, 0, 235)
-	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update_epos)
+	MCFG_SCREEN_UPDATE_DRIVER(epos_state, screen_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	// port a writes?
+	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(epos_state, flip_screen_w))
 MACHINE_CONFIG_END
 
 
@@ -593,9 +647,20 @@ ROM_START( revenger )
 	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, NO_DUMP )   /* missing */
 ROM_END
 
+ROM_START( beastf )
+	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_LOAD( "bf-b09084.u1",    0x0000, 0x2000, CRC(820d4019) SHA1(e953aaeeb626776dd86c521066b553d054ae4422) )
+	ROM_LOAD( "bf-b09084.u2",    0x2000, 0x2000, CRC(967405d8) SHA1(dd763be909e6966521b01ee878df9cef865c3b30) )
+	ROM_LOAD( "bf-b09084.u3",    0x4000, 0x2000, CRC(3edb5381) SHA1(14c236045e6df7a475c32222652860689d4f68ce) )
+	ROM_LOAD( "bf-b09084.u4",    0x6000, 0x2000, CRC(c8cd9640) SHA1(72da881b903ead873cc3f4df27646d1ffdd63c1c) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "82s123.u66",     0x0000, 0x0020, CRC(f4f6ddc5) BAD_DUMP SHA1(cab915acbefb5f451f538dd538bf9b3dd14bb1f5) ) // not dumped, taken from suprglob
+ROM_END
+
 DRIVER_INIT_MEMBER(epos_state,dealer)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int A;
 
 	/* Key 0 */
@@ -647,5 +712,6 @@ GAME( 1983, theglob,  suprglob, epos,   suprglob, driver_device, 0,       ROT270
 GAME( 1983, theglob2, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (earlier)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, theglob3, suprglob, epos,   suprglob, driver_device, 0,       ROT270, "Epos Corporation", "The Glob (set 3)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, igmo,     0,        epos,   igmo, driver_device,     0,       ROT270, "Epos Corporation", "IGMO", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_SUPPORTS_SAVE )
-GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, dealer,   0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "The Dealer", MACHINE_WRONG_COLORS | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, revenger, 0,        dealer, dealer, epos_state,   dealer,   ROT270, "Epos Corporation", "Revenger", MACHINE_NOT_WORKING | MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )
+GAME( 1984, beastf,   suprglob, dealer, beastf, epos_state,   dealer,   ROT270, "Epos Corporation", "Beaste Feastie", MACHINE_NO_COCKTAIL | MACHINE_SUPPORTS_SAVE )

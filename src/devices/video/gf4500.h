@@ -15,14 +15,14 @@
 class gf4500_device : public device_t
 {
 public:
-	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	gf4500_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~gf4500_device() {}
 
 
 	DECLARE_READ32_MEMBER( read );
 	DECLARE_WRITE32_MEMBER( write );
 
-	UINT32 screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &device, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -33,9 +33,9 @@ protected:
 private:
 	// internal state
 
-	void vram_write16(UINT16 data);
+	void vram_write16(uint16_t data);
 
-	std::unique_ptr<UINT32[]> m_data;
+	std::unique_ptr<uint32_t[]> m_data;
 	int m_screen_x;
 	int m_screen_y;
 	int m_screen_x_max;

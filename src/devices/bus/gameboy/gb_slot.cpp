@@ -59,7 +59,7 @@ device_gb_cart_interface::~device_gb_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_gb_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -73,7 +73,7 @@ void device_gb_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //  ram_alloc - alloc the space for the ram
 //-------------------------------------------------
 
-void device_gb_cart_interface::ram_alloc(UINT32 size)
+void device_gb_cart_interface::ram_alloc(uint32_t size)
 {
 	m_ram.resize(size);
 }
@@ -84,7 +84,7 @@ void device_gb_cart_interface::ram_alloc(UINT32 size)
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
-void device_gb_cart_interface::rom_map_setup(UINT32 size)
+void device_gb_cart_interface::rom_map_setup(uint32_t size)
 {
 	int i;
 	// setup the rom_bank_map array to faster ROM read
@@ -117,7 +117,7 @@ void device_gb_cart_interface::rom_map_setup(UINT32 size)
 //  blocks, so to simplify ROM access
 //-------------------------------------------------
 
-void device_gb_cart_interface::ram_map_setup(UINT8 banks)
+void device_gb_cart_interface::ram_map_setup(uint8_t banks)
 {
 	int mask = banks - 1;
 
@@ -137,7 +137,7 @@ void device_gb_cart_interface::ram_map_setup(UINT8 banks)
 //-------------------------------------------------
 //  base_gb_cart_slot_device - constructor
 //-------------------------------------------------
-base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source) :
+base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 						device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -146,12 +146,12 @@ base_gb_cart_slot_device::base_gb_cart_slot_device(const machine_config &mconfig
 {
 }
 
-gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+gb_cart_slot_device::gb_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						base_gb_cart_slot_device(mconfig, GB_CART_SLOT, "Game Boy Cartridge Slot", tag, owner, clock, "gb_cart_slot", __FILE__)
 {
 }
 
-megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+megaduck_cart_slot_device::megaduck_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						base_gb_cart_slot_device(mconfig, MEGADUCK_CART_SLOT, "Megaduck Cartridge Slot", tag, owner, clock, "megaduck_cart_slot", __FILE__)
 {
 }
@@ -209,7 +209,7 @@ static const gb_slot slot_list[] =
 	{ GB_MBC_MBC7, "rom_mbc7" },
 	{ GB_MBC_TAMA5, "rom_tama5" },
 	{ GB_MBC_MMM01, "rom_mmm01" },
-	{ GB_MBC_M161, "rom_m161_m12" },
+	{ GB_MBC_M161, "rom_m161" },
 	{ GB_MBC_MBC3, "rom_huc1" },    // for now treat this as alias for MBC3
 	{ GB_MBC_MBC3, "rom_huc3" },    // for now treat this as alias for MBC3
 	{ GB_MBC_SACHEN1, "rom_sachen1" },
@@ -258,13 +258,13 @@ static const char *gb_get_slot(int type)
  -------------------------------------------------*/
 
 
-bool base_gb_cart_slot_device::call_load()
+image_init_result base_gb_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 offset;
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
+		uint32_t offset;
+		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
 		int rambanks = 0;
 
 		// From fullpath, check for presence of a header and skip it + check filesize is valid
@@ -281,7 +281,7 @@ bool base_gb_cart_slot_device::call_load()
 			if ((len == 0) || ((len % 0x4000) != 0))
 			{
 				seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid rom file size\n");
-				return IMAGE_INIT_FAIL;
+				return image_init_result::FAIL;
 			}
 		}
 
@@ -403,17 +403,17 @@ bool base_gb_cart_slot_device::call_load()
 			strncmp((const char*)(ROM + 0x134), "DONKEYKONGLAND 3", 16) == 0)
 			m_sgb_hack = 1;
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
-bool megaduck_cart_slot_device::call_load()
+image_init_result megaduck_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint32_t len = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
 
 		m_cart->rom_alloc(len, tag());
 
@@ -425,10 +425,10 @@ bool megaduck_cart_slot_device::call_load()
 		// setup rom bank map based on real length, not header value
 		m_cart->rom_map_setup(len);
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 
@@ -442,7 +442,7 @@ void base_gb_cart_slot_device::call_unload()
 		battery_save(m_cart->get_ram_base(), m_cart->get_ram_size());
 }
 
-void base_gb_cart_slot_device::setup_ram(UINT8 banks)
+void base_gb_cart_slot_device::setup_ram(uint8_t banks)
 {
 	m_cart->ram_alloc(banks * 0x2000);
 	memset(m_cart->get_ram_base(), 0xff, m_cart->get_ram_size());
@@ -451,23 +451,13 @@ void base_gb_cart_slot_device::setup_ram(UINT8 banks)
 
 
 
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool base_gb_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return true;
-}
-
 // This fails to catch Mani 4-in-1 carts... even when they match this, then they have MBC1/3 in the internal header instead of MMM01...
-bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
+bool base_gb_cart_slot_device::get_mmm01_candidate(uint8_t *ROM, uint32_t len)
 {
 	if (len < 0x8147)
 		return false;
 
-	static const UINT8 nintendo_logo[0x18] = {
+	static const uint8_t nintendo_logo[0x18] = {
 		0xCE, 0xED, 0x66, 0x66, 0xCC, 0x0D, 0x00, 0x0B,
 		0x03, 0x73, 0x00, 0x83, 0x00, 0x0C, 0x00, 0x0D,
 		0x00, 0x08, 0x11, 0x1F, 0x88, 0x89, 0x00, 0x0E
@@ -485,7 +475,7 @@ bool base_gb_cart_slot_device::get_mmm01_candidate(UINT8 *ROM, UINT32 len)
 		return false;
 }
 
-int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
+int base_gb_cart_slot_device::get_cart_type(uint8_t *ROM, uint32_t len)
 {
 	int type = GB_MBC_NONE;
 
@@ -557,8 +547,9 @@ int base_gb_cart_slot_device::get_cart_type(UINT8 *ROM, UINT32 len)
 //          printf("Li Cheng %d\n", count);
 			type = GB_MBC_LICHENG;
 		}
-		if (count == 4138 || count == 4125)
+		if ((count == 4138 || count == 4125) && len >= 2097152)
 		{
+			// All known sintax (raw) dumps are at least 2097152 bytes in size
 			// Zhi Huan Wang uses 4138
 			// most sintax use 4125
 //          printf("Sintax %d!\n", count);
@@ -605,11 +596,11 @@ std::string base_gb_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 len = core_fsize(m_file), offset = 0;
-		dynamic_buffer rom(len);
+		uint32_t len = m_file->size(), offset = 0;
+		std::vector<uint8_t> rom(len);
 		int type;
 
-		core_fread(m_file, &rom[0], len);
+		m_file->read(&rom[0], len);
 
 		if ((len % 0x4000) == 512)
 			offset = 512;
@@ -682,7 +673,7 @@ WRITE8_MEMBER(base_gb_cart_slot_device::write_ram)
  Internal header logging
  -------------------------------------------------*/
 
-void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
+void base_gb_cart_slot_device::internal_header_logging(uint8_t *ROM, uint32_t len)
 {
 	static const char *const cart_types[] =
 	{
@@ -704,7 +695,7 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	// some company codes
 	static const struct
 	{
-		UINT16 code;
+		uint16_t code;
 		const char *name;
 	}
 	companies[] =
@@ -783,13 +774,12 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 		{0x5A01, "Bitmap Brothers/Mindscape"},
 		{0x5301, "American Sammy"},
 		{0x4701, "Spectrum Holobyte"},
-		{0x1801, "Hudson Soft"},
-		{0x0000, nullptr}
+		{0x1801, "Hudson Soft"}
 	};
 	static const int ramsize[8] = { 0, 2, 8, 32, 128, 64, 0, 0 };
 
 	char soft[17];
-	UINT32 tmp;
+	uint32_t tmp;
 	int csum = 0, i = 0;
 	int rom_banks;
 
@@ -817,24 +807,23 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	soft[16] = '\0';
 	logerror("Cart Information\n");
 	logerror("\tName:             %s\n", soft);
-	logerror("\tType:             %s [0x%2X]\n", (ROM[0x0147] <= 32) ? cart_types[ROM[0x0147]] : "", ROM[0x0147] );
+	logerror("\tType:             %s [0x%02X]\n", (ROM[0x0147] <= 32) ? cart_types[ROM[0x0147]] : "", ROM[0x0147] );
 	logerror("\tGame Boy:         %s\n", (ROM[0x0143] == 0xc0) ? "No" : "Yes" );
-	logerror("\tSuper GB:         %s [0x%2X]\n", (ROM[0x0146] == 0x03) ? "Yes" : "No", ROM[0x0146] );
-	logerror("\tColor GB:         %s [0x%2X]\n", (ROM[0x0143] == 0x80 || ROM[0x0143] == 0xc0) ? "Yes" : "No", ROM[0x0143] );
-	logerror("\tROM Size:         %d 16kB Banks [0x%2X]\n", rom_banks, ROM[0x0148]);
-	logerror("\tRAM Size:         %d kB [0x%2X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
-	logerror("\tLicense code:     0x%2X%2X\n", ROM[0x0145], ROM[0x0144] );
+	logerror("\tSuper GB:         %s [0x%02X]\n", (ROM[0x0146] == 0x03) ? "Yes" : "No", ROM[0x0146] );
+	logerror("\tColor GB:         %s [0x%02X]\n", (ROM[0x0143] == 0x80 || ROM[0x0143] == 0xc0) ? "Yes" : "No", ROM[0x0143] );
+	logerror("\tROM Size:         %d 16kB Banks [0x%02X]\n", rom_banks, ROM[0x0148]);
+	logerror("\tRAM Size:         %d kB [0x%02X]\n", ramsize[ROM[0x0149] & 0x07], ROM[0x0149]);
+	logerror("\tLicense code:     0x%02X%02X\n", ROM[0x0145], ROM[0x0144] );
 	tmp = (ROM[0x014b] << 8) + ROM[0x014a];
 	for (i = 0; i < ARRAY_LENGTH(companies); i++)
 		if (tmp == companies[i].code)
 			break;
-	logerror("\tManufacturer ID:  0x%2X", tmp);
-	logerror(" [%s]\n", (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
-	logerror("\tVersion Number:   0x%2X\n", ROM[0x014c]);
-	logerror("\tComplement Check: 0x%2X\n", ROM[0x014d]);
-	logerror("\tChecksum:         0x%2X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
+	logerror("\tManufacturer ID:  0x%02X [%s]\n", tmp, (i < ARRAY_LENGTH(companies)) ? companies[i].name : "?");
+	logerror("\tVersion Number:   0x%02X\n", ROM[0x014c]);
+	logerror("\tComplement Check: 0x%02X\n", ROM[0x014d]);
+	logerror("\tChecksum:         0x%04X\n", ((ROM[0x014e] << 8) + ROM[0x014f]));
 	tmp = (ROM[0x0103] << 8) + ROM[0x0102];
-	logerror("\tStart Address:    0x%2X\n", tmp);
+	logerror("\tStart Address:    0x%04X\n", tmp);
 
 	// Additional checks
 	if (rom_banks == 256)
@@ -851,6 +840,6 @@ void base_gb_cart_slot_device::internal_header_logging(UINT8 *ROM, UINT32 len)
 	csum &= 0xffff;
 
 	if (csum != tmp)
-		logerror("\nWarning loading cartridge: Checksum is wrong (Actual %X vs Internal %X)\n", csum, tmp);
+		logerror("\nWarning loading cartridge: Checksum is wrong (Actual 0x%04X vs Internal 0x%04X)\n", csum, tmp);
 
 }

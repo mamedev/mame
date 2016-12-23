@@ -14,14 +14,14 @@ class o2_voice_device : public o2_rom_device
 {
 public:
 	// construction/destruction
-	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	o2_voice_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override {}
 
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 	// reading and writing
 	virtual DECLARE_READ8_MEMBER(read_rom04) override { if (m_subslot->exists()) return m_subslot->read_rom04(space, offset); else return 0xff; }

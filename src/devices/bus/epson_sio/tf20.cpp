@@ -52,7 +52,7 @@ ROM_START( tf20 )
 	ROM_LOAD("tfx.15e", 0x0000, 0x0800, CRC(af34f084) SHA1(c9bdf393f757ba5d8f838108ceb2b079be1d616e))
 ROM_END
 
-const rom_entry *epson_tf20_device::device_rom_region() const
+const tiny_rom_entry *epson_tf20_device::device_rom_region() const
 {
 	return ROM_NAME( tf20 );
 }
@@ -126,7 +126,7 @@ machine_config_constructor epson_tf20_device::device_mconfig_additions() const
 //  epson_tf20_device - constructor
 //-------------------------------------------------
 
-epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+epson_tf20_device::epson_tf20_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, EPSON_TF20, "EPSON TF-20 Dual Floppy Disk Drive", tag, owner, clock, "epson_tf20", __FILE__),
 	device_epson_sio_interface(mconfig, *this),
 	m_cpu(*this, "19b"),
@@ -174,7 +174,7 @@ void epson_tf20_device::device_reset()
 	m_mpsc->rxb_w(1);
 
 	// enable rom
-	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, 0, 0x7800, memregion("rom")->base());
+	m_cpu->space(AS_PROGRAM).install_rom(0x0000, 0x07ff, 0x7800, memregion("rom")->base());
 }
 
 //-------------------------------------------------

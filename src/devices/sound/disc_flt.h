@@ -49,8 +49,8 @@ DISCRETE_CLASS_STEP_RESET(dst_crfilter, 1,
 	double          m_vCap;
 	double          m_rc;
 	double          m_exponent;
-	UINT8           m_has_rc_nodes;
-	//UINT8           m_is_fast;
+	uint8_t           m_has_rc_nodes;
+	//uint8_t           m_is_fast;
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_op_amp_filt, 1,
@@ -148,8 +148,8 @@ DISCRETE_CLASS_STEP_RESET(dst_rcfilter, 1,
 	double          m_vCap;
 	double          m_rc;
 	double          m_exponent;
-	UINT8           m_has_rc_nodes;
-	UINT8           m_is_fast;
+	uint8_t           m_has_rc_nodes;
+	uint8_t           m_is_fast;
 );
 
 DISCRETE_CLASS_STEP_RESET(dst_rcfilter_sw, 1,

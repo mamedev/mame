@@ -14,11 +14,11 @@
 
 
 DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
-	WindowQt(machine, NULL)
+	WindowQt(machine, nullptr)
 {
 	setWindowTitle("Debug: Disassembly View");
 
-	if (parent != NULL)
+	if (parent != nullptr)
 	{
 		QPoint parentPos = parent->pos();
 		setGeometry(parentPos.x()+100, parentPos.y()+100, 800, 400);
@@ -99,7 +99,7 @@ DasmWindow::DasmWindow(running_machine* machine, QWidget* parent) :
 	rightActComments->setActionGroup(rightBarGroup);
 	rightActRaw->setShortcut(QKeySequence("Ctrl+R"));
 	rightActEncrypted->setShortcut(QKeySequence("Ctrl+E"));
-	rightActComments->setShortcut(QKeySequence("Ctrl+C"));
+	rightActComments->setShortcut(QKeySequence("Ctrl+N"));
 	rightActRaw->setChecked(true);
 	connect(rightBarGroup, &QActionGroup::triggered, this, &DasmWindow::rightBarChanged);
 
@@ -142,9 +142,9 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		device_debug *const cpuinfo = device->debug();
 
 		// Find an existing breakpoint at this address
-		INT32 bpindex = -1;
+		int32_t bpindex = -1;
 		for (device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-				bp != NULL;
+				bp != nullptr;
 				bp = bp->next())
 		{
 			if (address == bp->address())
@@ -157,13 +157,13 @@ void DasmWindow::toggleBreakpointAtCursor(bool changedTo)
 		// If none exists, add a new one
 		if (bpindex == -1)
 		{
-			bpindex = cpuinfo->breakpoint_set(address, NULL, NULL);
-			debug_console_printf(*m_machine, "Breakpoint %X set\n", bpindex);
+			bpindex = cpuinfo->breakpoint_set(address, nullptr, nullptr);
+			m_machine->debugger().console().printf("Breakpoint %X set\n", bpindex);
 		}
 		else
 		{
 			cpuinfo->breakpoint_clear(bpindex);
-			debug_console_printf(*m_machine, "Breakpoint %X cleared\n", bpindex);
+			m_machine->debugger().console().printf("Breakpoint %X cleared\n", bpindex);
 		}
 		m_machine->debug_view().update_all();
 		m_machine->debugger().refresh_display();
@@ -183,13 +183,13 @@ void DasmWindow::enableBreakpointAtCursor(bool changedTo)
 
 		// Find an existing breakpoint at this address
 		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != NULL) && (bp->address() != address))
+		while ((bp != nullptr) && (bp->address() != address))
 			bp = bp->next();
 
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			cpuinfo->breakpoint_enable(bp->index(), !bp->enabled());
-			debug_console_printf(*m_machine, "Breakpoint %X %s\n", (UINT32)bp->index(), bp->enabled() ? "enabled" : "disabled");
+			m_machine->debugger().console().printf("Breakpoint %X %s\n", (uint32_t)bp->index(), bp->enabled() ? "enabled" : "disabled");
 			m_machine->debug_view().update_all();
 			m_machine->debugger().refresh_display();
 		}
@@ -241,10 +241,10 @@ void DasmWindow::dasmViewUpdated()
 
 		// Find an existing breakpoint at this address
 		device_debug::breakpoint* bp = cpuinfo->breakpoint_first();
-		while ((bp != NULL) && (bp->address() != address))
+		while ((bp != nullptr) && (bp->address() != address))
 			bp = bp->next();
 
-		if (bp != NULL)
+		if (bp != nullptr)
 		{
 			haveBreakpoint = true;
 			breakpointEnabled = bp->enabled();
@@ -261,15 +261,13 @@ void DasmWindow::dasmViewUpdated()
 
 void DasmWindow::populateComboBox()
 {
-	if (m_dasmView == NULL)
+	if (m_dasmView == nullptr)
 		return;
 
 	m_cpuComboBox->clear();
-	for (const debug_view_source* source = m_dasmView->view()->first_source();
-			source != NULL;
-			source = source->next())
+	for (const debug_view_source &source : m_dasmView->view()->source_list())
 	{
-		m_cpuComboBox->addItem(source->name());
+		m_cpuComboBox->addItem(source.name());
 	}
 }
 
@@ -304,16 +302,16 @@ void DasmWindowQtConfig::applyToQWidget(QWidget* widget)
 	rightBarGroup->actions()[m_rightBar]->trigger();
 }
 
-void DasmWindowQtConfig::addToXmlDataNode(xml_data_node* node) const
+void DasmWindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	WindowQtConfig::addToXmlDataNode(node);
-	xml_set_attribute_int(node, "cpu", m_cpu);
-	xml_set_attribute_int(node, "rightbar", m_rightBar);
+	node.set_attribute_int("cpu", m_cpu);
+	node.set_attribute_int("rightbar", m_rightBar);
 }
 
-void DasmWindowQtConfig::recoverFromXmlNode(xml_data_node* node)
+void DasmWindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	WindowQtConfig::recoverFromXmlNode(node);
-	m_cpu = xml_get_attribute_int(node, "cpu", m_cpu);
-	m_rightBar = xml_get_attribute_int(node, "rightbar", m_rightBar);
+	m_cpu = node.get_attribute_int("cpu", m_cpu);
+	m_rightBar = node.get_attribute_int("rightbar", m_rightBar);
 }

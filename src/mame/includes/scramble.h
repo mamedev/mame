@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Nicola Salmoria
+
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "includes/galaxold.h"
 #include "sound/tms5110.h"
@@ -15,7 +17,8 @@ public:
 		m_ppi8255_1(*this, "ppi8255_1"),
 		m_tmsprom(*this, "tmsprom"),
 		m_soundram(*this, "soundram"),
-		m_digitalker(*this, "digitalker")
+		m_digitalker(*this, "digitalker"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
@@ -23,18 +26,19 @@ public:
 	optional_device<i8255_device>  m_ppi8255_0;
 	optional_device<i8255_device>  m_ppi8255_1;
 	optional_device<tmsprom_device>  m_tmsprom;
-	optional_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<uint8_t> m_soundram;
 	optional_device<digitalker_device> m_digitalker;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	UINT8 m_cavelon_bank;
+	uint8_t m_cavelon_bank;
 
 	// harem
-	UINT8 m_harem_decrypt_mode;
-	UINT8 m_harem_decrypt_bit;
-	UINT8 m_harem_decrypt_clk;
-	UINT8 m_harem_decrypt_count;
-	std::unique_ptr<UINT8[]> m_harem_decrypted_data;
-	std::unique_ptr<UINT8[]> m_harem_decrypted_opcodes;
+	uint8_t m_harem_decrypt_mode;
+	uint8_t m_harem_decrypt_bit;
+	uint8_t m_harem_decrypt_clk;
+	uint8_t m_harem_decrypt_count;
+	std::unique_ptr<uint8_t[]> m_harem_decrypted_data;
+	std::unique_ptr<uint8_t[]> m_harem_decrypted_opcodes;
 
 	DECLARE_CUSTOM_INPUT_MEMBER(darkplnt_custom_r);
 	DECLARE_CUSTOM_INPUT_MEMBER(ckongs_coinage_r);

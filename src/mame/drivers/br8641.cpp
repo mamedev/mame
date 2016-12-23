@@ -39,7 +39,7 @@ public:
 		, m_pio2(*this, "pio2")
 		, m_pio3(*this, "pio3")
 		, m_ctc(*this, "ctc")
-		, m_io_keyboard(*this, "KEY")
+		, m_io_keyboard(*this, "KEY.%u", 0)
 		, m_beep(*this, "beeper")
 	{ }
 
@@ -48,8 +48,8 @@ public:
 	DECLARE_WRITE8_MEMBER(port09_w);
 
 private:
-	UINT8 m_port08;
-	UINT8 m_port09;
+	uint8_t m_port08;
+	uint8_t m_port09;
 	required_device<cpu_device> m_maincpu;
 	required_device<z80pio_device> m_pio1;
 	required_device<z80pio_device> m_pio2;
@@ -121,10 +121,10 @@ INPUT_PORTS_END
 
 READ8_MEMBER( brandt8641_state::port08_r )
 {
-	UINT8 i, data = 7;
+	uint8_t i, data = 7;
 
 	for (i = 0; i < 8; i++)
-		if BIT(m_port09, i)
+		if (BIT(m_port09, i))
 			data &= m_io_keyboard[i]->read();
 
 	return data | m_port08;
@@ -157,7 +157,7 @@ static MACHINE_CONFIG_START( brandt8641, brandt8641_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz) // U4 ,4MHz crystal on board
 	MCFG_CPU_PROGRAM_MAP(brandt8641_mem)
 	MCFG_CPU_IO_MAP(brandt8641_io)
-	MCFG_CPU_CONFIG(daisy_chain_intf)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain_intf)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -59,18 +59,7 @@ public:
 		m_rom(*this, Z80_TAG),
 		m_prom(*this, "u4"),
 		m_video_ram(*this, "video_ram"),
-		m_y1(*this, "Y1"),
-		m_y2(*this, "Y2"),
-		m_y3(*this, "Y3"),
-		m_y4(*this, "Y4"),
-		m_y5(*this, "Y5"),
-		m_y6(*this, "Y6"),
-		m_y7(*this, "Y7"),
-		m_y8(*this, "Y8"),
-		m_y9(*this, "Y9"),
-		m_y10(*this, "Y10"),
-		m_y11(*this, "Y11"),
-		m_y12(*this, "Y12"),
+		m_y(*this, "Y%u", 1),
 		m_st_io(*this, "ST"),
 		m_palette(*this, "palette"),
 		m_rome(1),
@@ -91,26 +80,15 @@ public:
 	required_device<tiki100_bus_t> m_exp;
 	required_memory_region m_rom;
 	required_memory_region m_prom;
-	optional_shared_ptr<UINT8> m_video_ram;
-	required_ioport m_y1;
-	required_ioport m_y2;
-	required_ioport m_y3;
-	required_ioport m_y4;
-	required_ioport m_y5;
-	required_ioport m_y6;
-	required_ioport m_y7;
-	required_ioport m_y8;
-	required_ioport m_y9;
-	required_ioport m_y10;
-	required_ioport m_y11;
-	required_ioport m_y12;
+	optional_shared_ptr<uint8_t> m_video_ram;
+	required_ioport_array<12> m_y;
 	required_ioport m_st_io;
 	required_device<palette_device> m_palette;
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ8_MEMBER( mrq_r );
 	DECLARE_WRITE8_MEMBER( mrq_w );
@@ -153,9 +131,9 @@ public:
 	bool m_vire;
 
 	// video state
-	UINT8 m_scroll;
-	UINT8 m_mode;
-	UINT8 m_palette_val;
+	uint8_t m_scroll;
+	uint8_t m_mode;
+	uint8_t m_palette_val;
 
 	// keyboard state
 	int m_keylatch;

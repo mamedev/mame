@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:smf
+// copyright-holders:smf,Stephane Humbert
 /***************************************************************************
 
 Ace Video Fruit Machine hardware
@@ -13,6 +13,7 @@ Inputs and Dip Switches by Stephh
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "sidewndr.lh"
 
@@ -31,9 +32,9 @@ public:
 		m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -49,7 +50,7 @@ public:
 	DECLARE_DRIVER_INIT(sidewndr);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(acefruit);
-	UINT32 screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(acefruit_vblank);
 	void acefruit_update_irq(int vpos);
 
@@ -100,7 +101,7 @@ void acefruit_state::device_timer(emu_timer &timer, device_timer_id id, int para
 			m_refresh_timer->adjust( m_screen->time_until_pos(vpos) );
 			break;
 	default:
-			assert_always(FALSE, "Unknown id in acefruit_state::device_timer");
+			assert_always(false, "Unknown id in acefruit_state::device_timer");
 	}
 }
 
@@ -115,7 +116,7 @@ INTERRUPT_GEN_MEMBER(acefruit_state::acefruit_vblank)
 	m_refresh_timer->adjust( attotime::zero );
 }
 
-UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int startrow = cliprect.min_y / 8;
 	int endrow = cliprect.max_y / 8;
@@ -149,11 +150,11 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 				for( x = 0; x < 16; x++ )
 				{
 					int sprite = ( m_spriteram[ ( spriteindex / 64 ) % 6 ] & 0xf ) ^ 0xf;
-					const UINT8 *gfxdata = gfx->get_data(sprite);
+					const uint8_t *gfxdata = gfx->get_data(sprite);
 
 					for( y = 0; y < 8; y++ )
 					{
-						UINT16 *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = *( gfxdata + ( ( spriterow + y ) * gfx->rowbytes() ) + ( ( spriteindex % 64 ) >> 1 ) );
 					}
 
@@ -169,7 +170,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 				{
 					for( y = 0; y < 8; y++ )
 					{
-						UINT16 *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
+						uint16_t *dst = &bitmap.pix16(y + ( row * 8 ), x + ( col * 16 ) );
 						*( dst ) = 0;
 					}
 				}
@@ -201,7 +202,7 @@ UINT32 acefruit_state::screen_update_acefruit(screen_device &screen, bitmap_ind1
 
 CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -217,7 +218,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::sidewndr_payout_r)
 
 CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -237,7 +238,7 @@ CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_coinage_r)
 
 CUSTOM_INPUT_MEMBER(acefruit_state::starspnr_payout_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 
 	switch (bit_mask)
 	{
@@ -329,7 +330,7 @@ static ADDRESS_MAP_START( acefruit_map, AS_PROGRAM, 8, acefruit_state )
 	AM_RANGE(0xa002, 0xa003) AM_WRITE(acefruit_coin_w)
 	AM_RANGE(0xa004, 0xa004) AM_WRITE(acefruit_solenoid_w)
 	AM_RANGE(0xa005, 0xa006) AM_WRITE(acefruit_sound_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -610,6 +611,8 @@ static MACHINE_CONFIG_START( acefruit, acefruit_state )
 	MCFG_CPU_IO_MAP(acefruit_io)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", acefruit_state,  acefruit_vblank)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", acefruit)
 
 	/* video hardware */
@@ -632,7 +635,7 @@ MACHINE_CONFIG_END
 
 DRIVER_INIT_MEMBER(acefruit_state,sidewndr)
 {
-	UINT8 *ROM = memregion( "maincpu" )->base();
+	uint8_t *ROM = memregion( "maincpu" )->base();
 	/* replace "ret nc" ( 0xd0 ) with "di" */
 	ROM[ 0 ] = 0xf3;
 	/* this is either a bad dump or the cpu core should set the carry flag on reset */

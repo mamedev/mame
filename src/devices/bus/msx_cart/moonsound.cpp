@@ -19,7 +19,7 @@ TODO:
 const device_type MSX_CART_MOONSOUND = &device_creator<msx_cart_moonsound>;
 
 
-msx_cart_moonsound::msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+msx_cart_moonsound::msx_cart_moonsound(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, MSX_CART_MOONSOUND, "MSX Cartridge - MoonSound", tag, owner, clock, "msx_moonsound", __FILE__)
 	, msx_cart_interface(mconfig, *this)
 	, m_ymf278b(*this, "ymf278b")
@@ -60,7 +60,7 @@ ROM_START( msx_cart_moonsound )
 ROM_END
 
 
-const rom_entry *msx_cart_moonsound::device_rom_region() const
+const tiny_rom_entry *msx_cart_moonsound::device_rom_region() const
 {
 	return ROM_NAME( msx_cart_moonsound );
 }

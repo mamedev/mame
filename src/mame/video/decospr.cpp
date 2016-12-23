@@ -125,7 +125,7 @@ tttttttt tttttttt
 
 t = sprite tile
 
-todo: the priotity callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
+todo: the priority callback for using pdrawgfx should really pack those 8 bits, and pass them instead of currently just
 passing offs+2 which lacks the extra priority bit
 
 */
@@ -147,7 +147,7 @@ void decospr_device::set_gfx_region(device_t &device, int gfxregion)
 
 const device_type DECO_SPRITE = &device_creator<decospr_device>;
 
-decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+decospr_device::decospr_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DECO_SPRITE, "DECO 52 Sprite", tag, owner, clock, "decospr", __FILE__),
 		device_video_interface(mconfig, *this),
 		m_gfxregion(0),
@@ -157,8 +157,7 @@ decospr_device::decospr_device(const machine_config &mconfig, const char *tag, d
 		m_y_offset(0),
 		m_flipallx(0),
 		m_transpen(0),
-		m_gfxdecode(*this),
-		m_palette(*this)
+		m_gfxdecode(*this, finder_base::DUMMY_TAG)
 {
 	// default color callback
 	m_col_cb =  decospr_col_cb_delegate(FUNC(decospr_device::default_col_cb), this);
@@ -195,7 +194,7 @@ void decospr_device::alloc_sprite_bitmap()
 }
 
 template<class _BitmapClass>
-void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
+void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
 {
 	//printf("cliprect %04x, %04x\n", cliprect.min_y, cliprect.max_y);
 
@@ -208,7 +207,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 
 	int offs, end, incr;
 
-	int flipscreen = machine().driver_data()->flip_screen();
+	bool flipscreen = (machine().driver_data()->flip_screen() != 0);
 
 	if (invert_flip)
 		flipscreen = !flipscreen;
@@ -333,7 +332,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 					else
 						mult = -16;
 
-					if (flipscreen || m_flipallx)
+					if (flipscreen ^ m_flipallx)
 					{
 						if (cliprect.max_x>256)
 							x = 304 - x;
@@ -381,14 +380,14 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
-												x-16,ypos,
+												!flipscreen ? x-16 : x+16,ypos,
 												m_screen->priority(),pri,m_transpen);
 									else
 										m_gfxdecode->gfx(m_gfxregion)->transpen(bitmap,cliprect,
 												(sprite - multi * inc)-mult2,
 												colour,
 												fx,fy,
-												x-16,ypos,
+												!flipscreen ? x-16 : x+16,ypos,
 												m_transpen);
 								}
 							}
@@ -407,7 +406,7 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 										(sprite - multi * inc)-mult2,
 										colour<<m_raw_shift,
 										fx,fy,
-										x-16,ypos,
+										!flipscreen ? x-16 : x+16,ypos,
 										m_transpen);
 								}
 
@@ -565,24 +564,24 @@ void decospr_device::draw_sprites_common(_BitmapClass &bitmap, const rectangle &
 	}
 }
 
-void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
+void decospr_device::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
 { draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
 
-void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16* spriteram, int sizewords, bool invert_flip )
+void decospr_device::draw_sprites(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t* spriteram, int sizewords, bool invert_flip )
 { draw_sprites_common(bitmap, cliprect, spriteram, sizewords, invert_flip); }
 
 
 // inefficient, we should be able to mix in a single pass by comparing the existing priority bitmap from the tilemaps
-void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, UINT16 pri, UINT16 priority_mask, UINT16 colbase, UINT16 palmask, UINT8 alpha)
+void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect, uint16_t pri, uint16_t priority_mask, uint16_t colbase, uint16_t palmask, uint8_t alpha)
 {
 	if (!m_sprite_bitmap.valid())
 		fatalerror("decospr_device::inefficient_copy_sprite_bitmap with no m_sprite_bitmap\n");
 
 	int y, x;
-	const pen_t *paldata = m_palette->pens();
+	const pen_t *paldata = m_gfxdecode->palette().pens();
 
-	UINT16* srcline;
-	UINT32* dstline;
+	uint16_t* srcline;
+	uint32_t* dstline;
 
 	for (y=cliprect.min_y;y<=cliprect.max_y;y++)
 	{
@@ -593,7 +592,7 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 		{
 			for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
-				UINT16 pix = srcline[x];
+				uint16_t pix = srcline[x];
 
 				if (pix&0xf)
 				{
@@ -608,28 +607,18 @@ void decospr_device::inefficient_copy_sprite_bitmap(bitmap_rgb32 &bitmap, const 
 		{
 			for (x=cliprect.min_x;x<=cliprect.max_x;x++)
 			{
-				UINT16 pix = srcline[x];
+				uint16_t pix = srcline[x];
 
 				if (pix&m_pixmask)
 				{
 					if ((pix & priority_mask) ==pri )
 					{
-						UINT32 pal1 = paldata[(pix&palmask) + colbase];
-						UINT32 pal2 = dstline[x];
+						uint32_t pal1 = paldata[(pix&palmask) + colbase];
+						uint32_t pal2 = dstline[x];
 						dstline[x] = alpha_blend_r32(pal2, pal1, alpha);
 					}
 				}
 			}
 		}
 	}
-}
-
-//-------------------------------------------------
-//  static_set_palette_tag: Set the tag of the
-//  palette device
-//-------------------------------------------------
-
-void decospr_device::static_set_palette_tag(device_t &device, const char *tag)
-{
-	downcast<decospr_device &>(device).m_palette.set_tag(tag);
 }

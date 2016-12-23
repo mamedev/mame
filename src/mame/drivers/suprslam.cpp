@@ -98,7 +98,7 @@ WRITE16_MEMBER(suprslam_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -153,7 +153,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, suprslam_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(suprslam_sh_bankswitch_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -272,12 +272,6 @@ static GFXDECODE_START( suprslam )
 	GFXDECODE_ENTRY( "gfx3", 0, suprslam_16x16x4_layout, 0x100, 16 )
 GFXDECODE_END
 
-/*** MORE SOUND **************************************************************/
-
-WRITE_LINE_MEMBER(suprslam_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
 
 /*** MACHINE DRIVER **********************************************************/
 
@@ -326,7 +320,6 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( suprslam_state, suprslam_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("k053936", K053936, 0)
 	MCFG_K053936_WRAP(1)
@@ -334,8 +327,10 @@ static MACHINE_CONFIG_START( suprslam, suprslam_state )
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(suprslam_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)

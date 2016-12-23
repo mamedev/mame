@@ -304,11 +304,11 @@
 		</part>
 	</software>
 
-	<software name="cur11" supported="partial">
+	<software name="cur11">
 		<description>Cursor 11</description>
 		<year>1979</year>
 
-		<!-- pet2001n Side A: COVER, DEMON!, HI CALC, WIPEOUT, PEG, STATES -->
+		<!-- pet2001n 2joysnd Side A: COVER, DEMON!, HI CALC, WIPEOUT, PEG, STATES -->
 		<publisher>The Code Works</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="52073122">
@@ -317,11 +317,11 @@
 		</part>
 	</software>
 
-	<software name="cur12" supported="partial">
+	<software name="cur12">
 		<description>Cursor 12</description>
 		<year>1979</year>
 
-		<!-- pet2001n Side A: COVER12, CANYON!, GAUSS!, PICKUP, PIEGRAM, FLIGHT! -->
+		<!-- pet2001n 2joysnd Side A: COVER12, CANYON!, GAUSS!, PICKUP, PIEGRAM, FLIGHT! -->
 		<publisher>The Code Works</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="60014980">
@@ -369,11 +369,11 @@
 		</part>
 	</software>
 
-	<software name="cur16" supported="partial">
+	<software name="cur16">
 		<description>Cursor 16</description>
 		<year>1980</year>
 
-		<!-- pet2001n Side A: COVER16, NAB!, FIRE!, ALIENS!, BONZO!, CATCH! -->
+		<!-- pet2001n 2joysnd Side A: COVER16, NAB!, FIRE!, ALIENS!, BONZO!, CATCH! -->
 		<publisher>The Code Works</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="45885486">
@@ -2775,11 +2775,11 @@
 		</part>
 	</software>
 
-	<software name="seawolf">
+	<software name="seawolf" supported="partial">
 		<description>Seawolf</description>
 		<year>1978</year>
 
-		<!-- pet2001b joystick Side A: seawolf -->
+		<!-- pet2001b Side A: seawolf -->
 		<publisher>Creative Software</publisher>
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="9137146">
@@ -2841,8 +2841,8 @@
 
 		<!-- pet2001 Side B: MONITOR -->
 		<part name="cass2" interface="cbm_cass">
-			<dataarea name="cass" size="2751568">
-				<rom name="monitor (1978)(commodore business machines).wav" size="2751568" crc="22c03872" sha1="b6dc48fcb9a82f10730dacb8da6978a419b008e0" offset="0" />
+			<dataarea name="cass" size="2751312">
+				<rom name="monitor (1978)(commodore business machines).wav" size="2751312" crc="47a31ba5" sha1="3801e52d49ee224246c6f7cbc0d9d79df181746a" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -2856,6 +2856,19 @@
 		<part name="cass" interface="cbm_cass">
 			<dataarea name="cass" size="9936838">
 				<rom name="soundware backgammon (1978)(cap electronics).wav" size="9936838" crc="215d487d" sha1="0c41408eac777844530886337e84eddb7286ba54" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="supermon">
+		<description>Supermon</description>
+		<year>1979</year>
+		<publisher>Toronto PET User Group</publisher>
+
+		<!-- pet20018 Side A: SUPERMON -->
+		<part name="cass" interface="cbm_cass">
+			<dataarea name="cass" size="6244772">
+				<rom name="supermon1 rel (1979)(tpug)).wav" size="6244772" crc="84cd7682" sha1="edca3f9e751439002aa5e555d3885999db7dd809" offset="0" />
 			</dataarea>
 		</part>
 	</software>

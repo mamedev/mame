@@ -74,6 +74,7 @@ public:
 	DECLARE_READ8_MEMBER(henry_io_r);
 	DECLARE_DRIVER_INIT(hprot1);
 	DECLARE_PALETTE_INIT(hprot1);
+	HD44780_PIXEL_UPDATE(hprot1_pixel_update);
 private:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
@@ -90,8 +91,8 @@ ADDRESS_MAP_END
 DRIVER_INIT_MEMBER( hprot1_state, hprot1 )
 {
 	int i;
-	UINT8 *ROM = memregion("maincpu")->base();
-	UINT8 bitswapped_ROM[0x10000];
+	uint8_t *ROM = memregion("maincpu")->base();
+	uint8_t bitswapped_ROM[0x10000];
 
 	for(i=0x0000;i<0x10000;i++)
 		bitswapped_ROM[i] = ROM[i];
@@ -194,7 +195,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 	{
 		case 0x01:
 		{
-			UINT8 value = ioport("inputs")->read();
+			uint8_t value = ioport("inputs")->read();
 #if LOG_IO_PORTS
 			printf("value:%02X\n", value);
 #endif
@@ -211,7 +212,7 @@ READ8_MEMBER(hprot1_state::henry_io_r)
 /*
 WRITE8_MEMBER(hprot1_state::henry_io_w)
 {
-    static UINT8 p0=0, p1=0, p2=0, p3=0;
+    static uint8_t p0=0, p1=0, p2=0, p3=0;
     switch (offset)
     {
         case 0x00:
@@ -284,7 +285,7 @@ static GFXDECODE_START( hprot1 )
 	GFXDECODE_ENTRY( "hd44780:cgrom", 0x0000, henry_prot_charlayout, 0, 1 )
 GFXDECODE_END
 
-static HD44780_PIXEL_UPDATE(hprot1_pixel_update)
+HD44780_PIXEL_UPDATE(hprot1_state::hprot1_pixel_update)
 {
 	if ( pos < 16 && line==0 )
 	{
@@ -319,7 +320,7 @@ static MACHINE_CONFIG_START( hprot1, hprot1_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(2, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(hprot1_state,hprot1_pixel_update)
 
 	/* TODO: figure out which RTC chip is in use. */
 

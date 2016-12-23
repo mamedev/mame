@@ -1,6 +1,3 @@
-// license:BSD-3-Clause
-// copyright-holders:Miodrag Milanovic
-
 #include "benchmark/benchmark_api.h"
 #include <time.h>
 #include "osdcore.h"
@@ -14,7 +11,7 @@ osd_ticks_t osd_ticks(void)
 #include "eminline.h"
 
 static void BM_count_leading_zeros_noasm(benchmark::State& state) {
-	UINT32 cnt = 0x332533;
+	uint32_t cnt = 0x332533;
 	while (state.KeepRunning()) {
 		(void)count_leading_zeros(cnt);
 		cnt++;

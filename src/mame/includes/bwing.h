@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "machine/bankdev.h"
+#include "machine/gen_latch.h"
 
 #define BW_DEBUG 0
 
@@ -21,6 +22,7 @@ public:
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_vrambank(*this, "vrambank"),
+		m_soundlatch(*this, "soundlatch"),
 		m_videoram(*this, "videoram"),
 		m_spriteram(*this, "spriteram"),
 		m_paletteram(*this, "paletteram"),
@@ -35,14 +37,15 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	required_device<address_map_bank_device> m_vrambank;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_paletteram;
-	required_shared_ptr<UINT8> m_fgscrollram;
-	required_shared_ptr<UINT8> m_bgscrollram;
-	required_shared_ptr<UINT8> m_gfxram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_paletteram;
+	required_shared_ptr<uint8_t> m_fgscrollram;
+	required_shared_ptr<uint8_t> m_bgscrollram;
+	required_shared_ptr<uint8_t> m_gfxram;
 
 	/* video-related */
 	tilemap_t *m_charmap;
@@ -82,8 +85,8 @@ public:
 	virtual void video_start() override;
 	void bwing_postload();
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, UINT8 *ram, int pri );
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	void draw_sprites( bitmap_ind16 &bmp, const rectangle &clip, uint8_t *ram, int pri );
 
 	INTERRUPT_GEN_MEMBER(bwp3_interrupt);
 };

@@ -58,7 +58,7 @@ public:
 	DECLARE_WRITE8_MEMBER(io_write_byte);
 	DECLARE_WRITE8_MEMBER( kbd_put );
 private:
-	UINT8 m_term_data;
+	uint8_t m_term_data;
 	address_space *m_mem;
 	address_space *m_io;
 	required_device<cpu_device> m_maincpu;
@@ -148,7 +148,7 @@ MACHINE_RESET_MEMBER( ts802_state, ts802 )
 
 READ8_MEMBER( ts802_state::port0d_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -166,7 +166,7 @@ static const z80_daisy_config daisy_chain_intf[] =
 	{ "z80dart2" },
 	{ "z80dma" },
 	{ "z80ctc" },
-	{ NULL }
+	{ nullptr }
 };
 #endif
 
@@ -175,7 +175,7 @@ DRIVER_INIT_MEMBER( ts802_state, ts802 )
 	m_mem = &m_maincpu->space(AS_PROGRAM);
 	m_io = &m_maincpu->space(AS_IO);
 
-	UINT8 *main = memregion("maincpu")->base();
+	uint8_t *main = memregion("maincpu")->base();
 
 	membank("bankr0")->configure_entry(1, &main[0x0000]);
 	membank("bankr0")->configure_entry(0, &main[0x10000]);
@@ -187,7 +187,7 @@ static MACHINE_CONFIG_START( ts802, ts802_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz / 4)
 	MCFG_CPU_PROGRAM_MAP(ts802_mem)
 	MCFG_CPU_IO_MAP(ts802_io)
-	//MCFG_CPU_CONFIG(daisy_chain_intf) // causes problems
+	//MCFG_Z80_DAISY_CHAIN(daisy_chain_intf) // causes problems
 	MCFG_MACHINE_RESET_OVERRIDE(ts802_state, ts802)
 
 	/* Devices */

@@ -42,35 +42,32 @@ class ie15_keyboard_device :
 	public device_t
 {
 public:
-	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
-	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ie15_keyboard_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
+	ie15_keyboard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_keyboard_callback(device_t &device, _Object object) { return downcast<ie15_keyboard_device &>(device).m_keyboard_cb.set_callback(object); }
 
 	virtual ioport_constructor device_input_ports() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 
 protected:
-	required_ioport m_io_kbd0;
-	required_ioport m_io_kbd1;
-	required_ioport m_io_kbd2;
-	required_ioport m_io_kbd3;
+	required_ioport_array<4> m_io_kbd;
 	required_ioport m_io_kbdc;
 
 	virtual void device_start() override;
 	virtual void device_reset() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-	virtual void send_key(UINT16 code) { m_keyboard_cb((offs_t)0, code); }
+	virtual void send_key(uint16_t code) { m_keyboard_cb((offs_t)0, code); }
 	emu_timer *m_timer;
 
 private:
-	virtual UINT16 keyboard_handler(UINT16 last_code, UINT8 *scan_line);
-	UINT8 row_number(UINT32 code);
-	UINT16 m_last_code;
-	UINT8 m_scan_line;
-	UINT8 m_ruslat;
-	UINT8 *m_rom;
+	virtual uint16_t keyboard_handler(uint16_t last_code, uint8_t *scan_line);
+	uint8_t row_number(uint32_t code);
+	uint16_t m_last_code;
+	uint8_t m_scan_line;
+	uint8_t m_ruslat;
+	uint8_t *m_rom;
 
 	devcb_write16 m_keyboard_cb;
 };

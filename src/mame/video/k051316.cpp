@@ -103,11 +103,10 @@ GFXDECODE_MEMBER( k051316_device::gfxinfo4_ram )
 GFXDECODE_END
 
 
-k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k051316_device::k051316_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051316, "K051316 PSAC", tag, owner, clock, "k051316", __FILE__),
 		device_gfx_interface(mconfig, *this, gfxinfo),
-		m_zoom_rom(nullptr),
-		m_zoom_size(0),
+		m_zoom_rom(*this, DEVICE_SELF),
 		m_dx(0),
 		m_dy(0),
 		m_wrap(0),
@@ -151,13 +150,6 @@ void k051316_device::set_bpp(device_t &device, int bpp)
 
 void k051316_device::device_start()
 {
-	memory_region *ROM = region();
-	if (ROM != nullptr)
-	{
-		m_zoom_rom = ROM->base();
-		m_zoom_size = ROM->bytes();
-	}
-
 	decode_gfx();
 	gfx(0)->set_colors(palette().entries() / gfx(0)->depth());
 
@@ -209,13 +201,13 @@ WRITE8_MEMBER( k051316_device::write )
 
 READ8_MEMBER( k051316_device::rom_r )
 {
-	assert (m_zoom_size != 0);
+	assert (m_zoom_rom.found());
 
 	if ((m_ctrlram[0x0e] & 0x01) == 0)
 	{
 		int addr = offset + (m_ctrlram[0x0c] << 11) + (m_ctrlram[0x0d] << 19);
 		addr /= m_pixels_per_byte;
-		addr &= m_zoom_size - 1;
+		addr &= m_zoom_rom.mask();
 
 		//  popmessage("%s: offset %04x addr %04x", space.machine().describe_context(), offset, addr);
 
@@ -261,17 +253,17 @@ TILE_GET_INFO_MEMBER(k051316_device::get_tile_info)
 }
 
 
-void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, UINT32 priority )
+void k051316_device::zoom_draw( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int flags, uint32_t priority )
 {
-	UINT32 startx, starty;
+	uint32_t startx, starty;
 	int incxx, incxy, incyx, incyy;
 
-	startx = 256 * ((INT16)(256 * m_ctrlram[0x00] + m_ctrlram[0x01]));
-	incxx  =        (INT16)(256 * m_ctrlram[0x02] + m_ctrlram[0x03]);
-	incyx  =        (INT16)(256 * m_ctrlram[0x04] + m_ctrlram[0x05]);
-	starty = 256 * ((INT16)(256 * m_ctrlram[0x06] + m_ctrlram[0x07]));
-	incxy  =        (INT16)(256 * m_ctrlram[0x08] + m_ctrlram[0x09]);
-	incyy  =        (INT16)(256 * m_ctrlram[0x0a] + m_ctrlram[0x0b]);
+	startx = 256 * ((int16_t)(256 * m_ctrlram[0x00] + m_ctrlram[0x01]));
+	incxx  =        (int16_t)(256 * m_ctrlram[0x02] + m_ctrlram[0x03]);
+	incyx  =        (int16_t)(256 * m_ctrlram[0x04] + m_ctrlram[0x05]);
+	starty = 256 * ((int16_t)(256 * m_ctrlram[0x06] + m_ctrlram[0x07]));
+	incxy  =        (int16_t)(256 * m_ctrlram[0x08] + m_ctrlram[0x09]);
+	incyy  =        (int16_t)(256 * m_ctrlram[0x0a] + m_ctrlram[0x0b]);
 
 	startx -= (16 + m_dy) * incyx;
 	starty -= (16 + m_dy) * incyy;

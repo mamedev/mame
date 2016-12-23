@@ -13,7 +13,7 @@ class DeviceInformationWindow : public WindowQt
 	Q_OBJECT
 
 public:
-	DeviceInformationWindow(running_machine* machine, device_t* device = NULL, QWidget* parent=NULL);
+	DeviceInformationWindow(running_machine* machine, device_t* device = nullptr, QWidget* parent=nullptr);
 	virtual ~DeviceInformationWindow();
 
 	void set_device(const char *tag);
@@ -45,8 +45,8 @@ public:
 
 	void buildFromQWidget(QWidget* widget);
 	void applyToQWidget(QWidget* widget);
-	void addToXmlDataNode(xml_data_node* node) const;
-	void recoverFromXmlNode(xml_data_node* node);
+	void addToXmlDataNode(util::xml::data_node &node) const;
+	void recoverFromXmlNode(util::xml::data_node const &node);
 };
 
 

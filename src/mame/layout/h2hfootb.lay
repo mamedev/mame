@@ -34,7 +34,7 @@
 
 	<element name="text_p1">
 		<rect><color red="0.24" green="0.4" blue="0.24" /></rect>
-		<text string="P1 SEL:">
+		<text string="PL SEL:">
 			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
 			<color red="0.7" green="0.7" blue="0.8" />
 		</text>
@@ -138,7 +138,6 @@
 		<bezel element="static_white"><bounds x="344" y="2" width="4" height="1" /></bezel>
 		<bezel element="static_white"><bounds x="344" y="29" width="4" height="1" /></bezel>
 		<bezel element="static_white"><bounds x="344" y="56" width="4" height="1" /></bezel>
-
 
 	<!-- leds -->
 

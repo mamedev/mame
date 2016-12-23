@@ -37,7 +37,6 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/okim6295.h"
 #include "sound/2612intf.h"
 #include "includes/shangha3.h"
 
@@ -85,7 +84,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_coinctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		m_oki->set_bank_base((data & 0x08) ? 0x40000 : 0x00000);
+		m_oki->set_rom_bank((data >> 3) & 1);
 
 		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
@@ -99,7 +98,7 @@ WRITE16_MEMBER(shangha3_state::blocken_coinctrl_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		/* the sound ROM bank is selected by the main CPU! */
-		m_oki->set_bank_base(((data >> 4) & 3) * 0x40000);
+		m_oki->set_rom_bank((data >> 4) & 3);
 
 		machine().bookkeeping().coin_lockout_w(0,~data & 0x04);
 		machine().bookkeeping().coin_lockout_w(1,~data & 0x04);
@@ -113,7 +112,7 @@ WRITE16_MEMBER(shangha3_state::heberpop_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line_and_vector(0, HOLD_LINE, 0xff);  /* RST 38h */
 	}
 }
@@ -183,7 +182,7 @@ static ADDRESS_MAP_START( heberpop_sound_io_map, AS_IO, 8, shangha3_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ymsnd", ym3438_device, read, write)
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki", okim6295_device, read, write)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc0, 0xc0) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -519,6 +518,8 @@ static MACHINE_CONFIG_START( heberpop, shangha3_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))
 	MCFG_SOUND_ROUTE(0, "mono", 0.40)
@@ -559,6 +560,8 @@ static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3438, XTAL_48MHz/6) /* 8 MHz? */
 	MCFG_YM2612_IRQ_HANDLER(INPUTLINE("audiocpu", INPUT_LINE_NMI))

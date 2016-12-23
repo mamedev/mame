@@ -50,7 +50,7 @@ ADDRESS_MAP_END
 //#define AUX_SPACE_ADDRESS_WIDTH 34  // IO space is 32 bits of dwords, so 34-bits
 #define AUX_SPACE_ADDRESS_WIDTH 64 // but the MAME core requires us to use power of 2 values for >32
 
-arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+arcompact_device::arcompact_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, ARCA5, "ARCtangent-A5", tag, owner, clock, "arca5", __FILE__)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0) // some docs describe these as 'middle endian'?!
 	, m_io_config( "io", ENDIANNESS_LITTLE, 32, AUX_SPACE_ADDRESS_WIDTH, 0, ADDRESS_MAP_NAME( arcompact_auxreg_map ) )
@@ -58,10 +58,10 @@ arcompact_device::arcompact_device(const machine_config &mconfig, const char *ta
 }
 
 
-offs_t arcompact_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t arcompact_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( arcompact );
-	return CPU_DISASSEMBLE_NAME(arcompact)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(arcompact)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -69,7 +69,7 @@ offs_t arcompact_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8
 
 /*****************************************************************************/
 
-void arcompact_device::unimplemented_opcode(UINT16 op)
+void arcompact_device::unimplemented_opcode(uint16_t op)
 {
 	fatalerror("ARCOMPACT: unknown opcode %04x at %04x\n", op, m_pc << 2);
 }
@@ -88,13 +88,13 @@ void arcompact_device::device_start()
 	m_program = &space(AS_PROGRAM);
 	m_io = &space(AS_IO);
 
-	state_add( 0,  "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_PC, "PC", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
-	state_add( 0x10,  "STATUS32", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add( 0x11,  "LP_START", m_debugger_temp).callimport().callexport().formatstr("%08X");
-	state_add( 0x12,  "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_STATUS32, "STATUS32", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_LP_START, "LP_START", m_debugger_temp).callimport().callexport().formatstr("%08X");
+	state_add( ARCOMPACT_LP_END, "LP_END", m_debugger_temp).callimport().callexport().formatstr("%08X");
 
-	state_add(STATE_GENPC, "GENPC", m_debugger_temp).callexport().noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_debugger_temp).callimport().callexport().noshow();
 
 	for (int i = 0x100; i < 0x140; i++)
 	{
@@ -105,28 +105,31 @@ void arcompact_device::device_start()
 	m_icountptr = &m_icount;
 }
 
+
+//-------------------------------------------------
+//  state_export - export state from the device,
+//  to a known location where it can be read
+//-------------------------------------------------
+
 void arcompact_device::state_export(const device_state_entry &entry)
 {
 	int index = entry.index();
 
 	switch (index)
 	{
-		case 0:
+		case ARCOMPACT_PC:
+		case STATE_GENPCBASE:
 			m_debugger_temp = m_pc;
 			break;
 
-		case 0x10:
+		case ARCOMPACT_STATUS32:
 			m_debugger_temp = m_status32;
 			break;
-		case 0x11:
+		case ARCOMPACT_LP_START:
 			m_debugger_temp = m_LP_START;
 			break;
-		case 0x12:
+		case ARCOMPACT_LP_END:
 			m_debugger_temp = m_LP_END;
-			break;
-
-		case STATE_GENPC:
-			m_debugger_temp = m_pc;
 			break;
 
 		default:
@@ -139,23 +142,30 @@ void arcompact_device::state_export(const device_state_entry &entry)
 	}
 }
 
+
+//-------------------------------------------------
+//  state_import - import state into the device,
+//  after it has been set
+//-------------------------------------------------
+
 void arcompact_device::state_import(const device_state_entry &entry)
 {
 	int index = entry.index();
 
 	switch (index)
 	{
-		case 0:
+		case ARCOMPACT_PC:
+		case STATE_GENPCBASE:
 			m_pc = (m_debugger_temp & 0xfffffffe);
 			break;
 
-		case 0x10:
+		case ARCOMPACT_STATUS32:
 			m_status32 = m_debugger_temp;
 			break;
-		case 0x11:
+		case ARCOMPACT_LP_START:
 			m_LP_START = m_debugger_temp;
 			break;
-		case 0x12:
+		case ARCOMPACT_LP_END:
 			m_LP_END = m_debugger_temp;
 			break;
 

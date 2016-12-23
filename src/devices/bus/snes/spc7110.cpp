@@ -24,7 +24,7 @@ const device_type SNS_HIROM_SPC7110 = &device_creator<sns_rom_spc7110_device>;
 const device_type SNS_HIROM_SPC7110_RTC = &device_creator<sns_rom_spc7110rtc_device>;
 
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 			: sns_rom21_device(mconfig, type, name, tag, owner, clock, shortname, source), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
 	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
 	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
@@ -33,7 +33,7 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, de
 		{
 }
 
-sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: sns_rom21_device(mconfig, SNS_HIROM_SPC7110, "SNES Cart + SPC-7110", tag, owner, clock, "sns_rom_spc7110", __FILE__), m_r4801(0), m_r4802(0), m_r4803(0), m_r4804(0), m_r4805(0), m_r4806(0), m_r4807(0),
 	m_r4808(0), m_r4809(0), m_r480a(0), m_r480b(0), m_r480c(0), m_decomp(nullptr), m_r4811(0), m_r4812(0), m_r4813(0), m_r4814(0), m_r4815(0), m_r4816(0), m_r4817(0), m_r4818(0),
 	m_r481x(0), m_r4814_latch(0), m_r4815_latch(0), m_r4820(0), m_r4821(0), m_r4822(0), m_r4823(0), m_r4824(0), m_r4825(0), m_r4826(0), m_r4827(0), m_r4828(0), m_r4829(0), m_r482a(0),
@@ -42,7 +42,7 @@ sns_rom_spc7110_device::sns_rom_spc7110_device(const machine_config &mconfig, co
 {
 }
 
-sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sns_rom_spc7110rtc_device::sns_rom_spc7110rtc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 			: sns_rom_spc7110_device(mconfig, SNS_HIROM_SPC7110_RTC, "SNES Cart + SPC-7110 + RTC", tag, owner, clock, "sns_rom_spc7110rtc", __FILE__)
 {
 }
@@ -196,7 +196,7 @@ void sns_rom_spc7110rtc_device::device_start()
 
 #define SPC7110_DECOMP_BUFFER_SIZE 64
 
-static const UINT8 spc7110_evolution_table[53][4] =
+static const uint8_t spc7110_evolution_table[53][4] =
 {
 	{ 0x5a,  1,  1, 1 },
 	{ 0x25,  6,  2, 0 },
@@ -257,7 +257,7 @@ static const UINT8 spc7110_evolution_table[53][4] =
 	{ 0x37, 51, 43, 0 },
 };
 
-static const UINT8 spc7110_mode2_context_table[32][2] =
+static const uint8_t spc7110_mode2_context_table[32][2] =
 {
 	{  1,  2 },
 
@@ -300,7 +300,7 @@ static const UINT8 spc7110_mode2_context_table[32][2] =
 SPC7110_Decomp::SPC7110_Decomp(running_machine &machine)
 				:  m_machine(machine)
 {
-	m_decomp_buffer = std::make_unique<UINT8[]>(SPC7110_DECOMP_BUFFER_SIZE);
+	m_decomp_buffer = std::make_unique<uint8_t[]>(SPC7110_DECOMP_BUFFER_SIZE);
 	reset();
 
 	for (int i = 0; i < 256; i++)
@@ -379,7 +379,7 @@ void SPC7110_Decomp::reset()
 	m_decomp_buffer_length   = 0;
 }
 
-void SPC7110_Decomp::init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT32 mode, UINT32 offset, UINT32 index)
+void SPC7110_Decomp::init(running_machine &machine, uint8_t *ROM, uint32_t len, uint32_t mode, uint32_t offset, uint32_t index)
 {
 	m_decomp_mode = mode;
 	m_decomp_offset = offset;
@@ -409,9 +409,9 @@ void SPC7110_Decomp::init(running_machine &machine, UINT8 *ROM, UINT32 len, UINT
 	}
 }
 
-UINT8 SPC7110_Decomp::read(UINT8 *ROM, UINT32 len)
+uint8_t SPC7110_Decomp::read(uint8_t *ROM, uint32_t len)
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (m_decomp_buffer_length == 0)
 	{
@@ -441,16 +441,16 @@ UINT8 SPC7110_Decomp::read(UINT8 *ROM, UINT32 len)
 	return data;
 }
 
-void SPC7110_Decomp::write(UINT8 data)
+void SPC7110_Decomp::write(uint8_t data)
 {
 	m_decomp_buffer[m_decomp_buffer_wroffset++] = data;
 	m_decomp_buffer_wroffset &= SPC7110_DECOMP_BUFFER_SIZE - 1;
 	m_decomp_buffer_length++;
 }
 
-UINT8 SPC7110_Decomp::dataread(UINT8 *ROM, UINT32 len)
+uint8_t SPC7110_Decomp::dataread(uint8_t *ROM, uint32_t len)
 {
-	UINT32 size = len - 0x100000;
+	uint32_t size = len - 0x100000;
 	while (m_decomp_offset >= size)
 	{
 		m_decomp_offset -= size;
@@ -458,7 +458,7 @@ UINT8 SPC7110_Decomp::dataread(UINT8 *ROM, UINT32 len)
 	return ROM[0x100000 + m_decomp_offset++];
 }
 
-void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
+void SPC7110_Decomp::mode0(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -475,10 +475,10 @@ void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
 		for (int bit = 0; bit < 8; bit++)
 		{
 			//get context
-			UINT8 mask = (1 << (bit & 3)) - 1;
-			UINT8 con = mask + ((m_m0_inverts & mask) ^ (m_m0_lps & mask));
-			UINT32 prob, mps, flag_lps;
-			UINT32 shift = 0;
+			uint8_t mask = (1 << (bit & 3)) - 1;
+			uint8_t con = mask + ((m_m0_inverts & mask) ^ (m_m0_lps & mask));
+			uint32_t prob, mps, flag_lps;
+			uint32_t shift = 0;
 			if (bit > 3)
 			{
 				con += 15;
@@ -543,7 +543,7 @@ void SPC7110_Decomp::mode0(UINT8 init, UINT8 *ROM, UINT32 len)
 	}
 }
 
-void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
+void SPC7110_Decomp::mode1(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -561,17 +561,17 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 
 	while (m_decomp_buffer_length < (SPC7110_DECOMP_BUFFER_SIZE >> 1))
 	{
-		UINT16 data;
+		uint16_t data;
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
 			//get first symbol context
-			UINT32 a = ((m_m1_out >> (1 * 2)) & 3);
-			UINT32 b = ((m_m1_out >> (7 * 2)) & 3);
-			UINT32 c = ((m_m1_out >> (8 * 2)) & 3);
-			UINT32 con = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
+			uint32_t a = ((m_m1_out >> (1 * 2)) & 3);
+			uint32_t b = ((m_m1_out >> (7 * 2)) & 3);
+			uint32_t c = ((m_m1_out >> (8 * 2)) & 3);
+			uint32_t con = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
 
 			//update pixel order
-			UINT32 m, n;
+			uint32_t m, n;
 			for (m = 0; m < 4; m++)
 			{
 				if (m_m1_pixelorder[m] == a)
@@ -637,11 +637,11 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 			for (int bit = 0; bit < 2; bit++)
 			{
 				//get prob
-				UINT32 prob = probability(con);
-				UINT32 shift = 0;
+				uint32_t prob = probability(con);
+				uint32_t shift = 0;
 
 				//get symbol
-				UINT32 flag_lps;
+				uint32_t flag_lps;
 				if (m_m1_val <= m_m1_span - prob) //mps
 				{
 					m_m1_span = m_m1_span - prob;
@@ -704,7 +704,7 @@ void SPC7110_Decomp::mode1(UINT8 init, UINT8 *ROM, UINT32 len)
 	}
 }
 
-void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
+void SPC7110_Decomp::mode2(uint8_t init, uint8_t *ROM, uint32_t len)
 {
 	if (init == 1)
 	{
@@ -723,18 +723,18 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 
 	while (m_decomp_buffer_length < (SPC7110_DECOMP_BUFFER_SIZE >> 1))
 	{
-		UINT32 data;
+		uint32_t data;
 		for (int pixel = 0; pixel < 8; pixel++)
 		{
 			//get first symbol context
-			UINT32 a = ((m_m2_out0 >> (0 * 4)) & 15);
-			UINT32 b = ((m_m2_out0 >> (7 * 4)) & 15);
-			UINT32 c = ((m_m2_out1 >> (0 * 4)) & 15);
-			UINT32 con = 0;
-			UINT32 refcon = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
+			uint32_t a = ((m_m2_out0 >> (0 * 4)) & 15);
+			uint32_t b = ((m_m2_out0 >> (7 * 4)) & 15);
+			uint32_t c = ((m_m2_out1 >> (0 * 4)) & 15);
+			uint32_t con = 0;
+			uint32_t refcon = (a == b) ? (b != c) : (b == c) ? 2 : 4 - (a == c);
 
 			//update pixel order
-			UINT32 m, n;
+			uint32_t m, n;
 			for (m = 0; m < 16; m++)
 			{
 				if (m_m2_pixelorder[m] == a)
@@ -799,13 +799,13 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 			//get 4 symbols
 			for (int bit = 0; bit < 4; bit++)
 			{
-				UINT32 invertbit, shift;
+				uint32_t invertbit, shift;
 
 				//get prob
-				UINT32 prob = probability(con);
+				uint32_t prob = probability(con);
 
 				//get symbol
-				UINT32 flag_lps;
+				uint32_t flag_lps;
 				if (m_m2_val <= m_m2_span - prob) //mps
 				{
 					m_m2_span = m_m2_span - prob;
@@ -882,27 +882,27 @@ void SPC7110_Decomp::mode2(UINT8 init, UINT8 *ROM, UINT32 len)
 	}
 }
 
-UINT8 SPC7110_Decomp::probability(UINT32 n)
+uint8_t SPC7110_Decomp::probability(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][0];
 }
 
-UINT8 SPC7110_Decomp::next_lps(UINT32 n)
+uint8_t SPC7110_Decomp::next_lps(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][1];
 }
 
-UINT8 SPC7110_Decomp::next_mps(UINT32 n)
+uint8_t SPC7110_Decomp::next_mps(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][2];
 }
 
-UINT8 SPC7110_Decomp::toggle_invert(UINT32 n)
+uint8_t SPC7110_Decomp::toggle_invert(uint32_t n)
 {
 	return spc7110_evolution_table[m_context[n].index][3];
 }
 
-UINT32 SPC7110_Decomp::morton_2x8(UINT32 data)
+uint32_t SPC7110_Decomp::morton_2x8(uint32_t data)
 {
 	//reverse morton lookup: de-interleave two 8-bit values
 	//15, 13, 11,  9,  7,  5,  3,  1 -> 15- 8
@@ -910,7 +910,7 @@ UINT32 SPC7110_Decomp::morton_2x8(UINT32 data)
 	return m_morton16[0][(data >>  0) & 255] + m_morton16[1][(data >>  8) & 255];
 }
 
-UINT32 SPC7110_Decomp::morton_4x8(UINT32 data)
+uint32_t SPC7110_Decomp::morton_4x8(uint32_t data)
 {
 	//reverse morton lookup: de-interleave four 8-bit values
 	//31, 27, 23, 19, 15, 11,  7,  3 -> 31-24
@@ -922,11 +922,11 @@ UINT32 SPC7110_Decomp::morton_4x8(UINT32 data)
 }
 
 
-static const UINT32 spc7110_months[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+static const uint32_t spc7110_months[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
-UINT32 sns_rom_spc7110_device::spc7110_datarom_addr(UINT32 addr, UINT32 rom_len)
+uint32_t sns_rom_spc7110_device::spc7110_datarom_addr(uint32_t addr, uint32_t rom_len)
 {
-	UINT32 size = rom_len - 0x100000;
+	uint32_t size = rom_len - 0x100000;
 	while (addr >= size)
 	{
 		addr -= size;
@@ -934,29 +934,29 @@ UINT32 sns_rom_spc7110_device::spc7110_datarom_addr(UINT32 addr, UINT32 rom_len)
 	return addr + 0x100000;
 }
 
-UINT32 sns_rom_spc7110_device::spc7110_data_pointer(void)
+uint32_t sns_rom_spc7110_device::spc7110_data_pointer(void)
 {
 	return m_r4811 + (m_r4812 << 8) + (m_r4813 << 16);
 }
 
-UINT32 sns_rom_spc7110_device::spc7110_data_adjust(void)
+uint32_t sns_rom_spc7110_device::spc7110_data_adjust(void)
 {
 	return m_r4814 + (m_r4815 << 8);
 }
 
-UINT32 sns_rom_spc7110_device::spc7110_data_increment(void)
+uint32_t sns_rom_spc7110_device::spc7110_data_increment(void)
 {
 	return m_r4816 + (m_r4817 << 8);
 }
 
-void sns_rom_spc7110_device::spc7110_set_data_pointer(UINT32 addr)
+void sns_rom_spc7110_device::spc7110_set_data_pointer(uint32_t addr)
 {
 	m_r4811 = addr;
 	m_r4812 = addr >> 8;
 	m_r4813 = addr >> 16;
 }
 
-void sns_rom_spc7110_device::spc7110_set_data_adjust(UINT32 addr)
+void sns_rom_spc7110_device::spc7110_set_data_adjust(uint32_t addr)
 {
 	m_r4814 = addr;
 	m_r4815 = addr >> 8;
@@ -966,36 +966,36 @@ void sns_rom_spc7110_device::spc7110_set_data_adjust(UINT32 addr)
 // we should probably keep track internally of the time rather than updating
 // to the system time at each call with a "offset" tracking as we do now...
 // (and indeed current code fails to pass Tengai Makyou Zero tests)
-void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
+void sns_rom_spc7110_device::spc7110_update_time(uint8_t offset)
 {
 	system_time curtime;
 	machine().current_datetime(curtime);
-	INT64 diff = curtime.time - m_rtc_basetime.time - offset;
+	int64_t diff = curtime.time - m_rtc_basetime.time - offset;
 //  printf("diff %llx\n", diff);
-	bool update = TRUE;
+	bool update = true;
 
 	// TEST: can we go beyond 24hrs of rounding?!? I doubt it will ever go beyond 3600, but I could be wrong...
 	assert(diff < 86400);
 
 	/* do not update if CR0 or CR2 timer disable flags are set */
 	if ((m_rtc_ram[13] & 0x01) || (m_rtc_ram[15] & 0x03))
-		update = FALSE;
+		update = false;
 
 	if (update && diff > 0)
 	{
 		/* update time with offset, assuming offset < 3600s */
-		UINT32 second = m_rtc_ram[0] + m_rtc_ram[1] * 10;
-		UINT8 minute = m_rtc_ram[2] + m_rtc_ram[3] * 10;
-		UINT8 hour = m_rtc_ram[4] + m_rtc_ram[5] * 10;
-		UINT8 day = m_rtc_ram[6] + m_rtc_ram[7] * 10;
-		UINT8 month = m_rtc_ram[8] + m_rtc_ram[9] * 10;
-		UINT8 year = m_rtc_ram[10] + m_rtc_ram[11] * 10;
-		UINT8 weekday = m_rtc_ram[12];
+		uint32_t second = m_rtc_ram[0] + m_rtc_ram[1] * 10;
+		uint8_t minute = m_rtc_ram[2] + m_rtc_ram[3] * 10;
+		uint8_t hour = m_rtc_ram[4] + m_rtc_ram[5] * 10;
+		uint8_t day = m_rtc_ram[6] + m_rtc_ram[7] * 10;
+		uint8_t month = m_rtc_ram[8] + m_rtc_ram[9] * 10;
+		uint8_t year = m_rtc_ram[10] + m_rtc_ram[11] * 10;
+		uint8_t weekday = m_rtc_ram[12];
 		day--;
 		month--;
 		year += (year >= 90) ? 1900 : 2000;
 
-		second += (UINT32)diff;
+		second += (uint32_t)diff;
 		while (second >= 60)
 		{
 			second -= 60;
@@ -1017,15 +1017,15 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 
 			weekday = (weekday + 1) % 7;
 
-			UINT8 days = spc7110_months[month % 12];
+			uint8_t days = spc7110_months[month % 12];
 			// check for feb 29th
 			if (days == 28)
 			{
-				bool leap = FALSE;
+				bool leap = false;
 				if ((year % 4) == 0)
 				{
 					if(year % 100 || !(year % 400))
-						leap = TRUE;
+						leap = true;
 				}
 				if (leap)
 					days++;
@@ -1069,9 +1069,9 @@ void sns_rom_spc7110_device::spc7110_update_time(UINT8 offset)
 
 READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 {
-	UINT8 *ROM = get_rom_base();
-	UINT32 len = get_rom_size();
-	UINT16 addr = offset & 0xffff;
+	uint8_t *ROM = get_rom_base();
+	uint32_t len = get_rom_size();
+	uint16_t addr = offset & 0xffff;
 
 	switch (addr)
 	{
@@ -1081,7 +1081,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 
 		case 0x4800:
 		{
-			UINT16 counter = (m_r4809 + (m_r480a << 8));
+			uint16_t counter = (m_r4809 + (m_r480a << 8));
 			counter--;
 			m_r4809 = counter;
 			m_r480a = counter >> 8;
@@ -1100,7 +1100,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x480b: return m_r480b;
 		case 0x480c:
 		{
-			UINT8 status = m_r480c;
+			uint8_t status = m_r480c;
 			m_r480c &= 0x7f;
 			return status;
 		}
@@ -1111,8 +1111,8 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 
 		case 0x4810:
 		{
-			UINT8 data;
-			UINT32 address, adjust, adjustaddr;
+			uint8_t data;
+			uint32_t address, adjust, adjustaddr;
 
 			if (m_r481x != 0x07) return 0x00;
 
@@ -1120,7 +1120,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 			adjust = spc7110_data_adjust();
 			if (m_r4818 & 8)
 			{
-				adjust = (INT16)adjust;  //16-bit sign extend
+				adjust = (int16_t)adjust;  //16-bit sign extend
 			}
 
 			adjustaddr = address;
@@ -1133,10 +1133,10 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 			data = ROM[spc7110_datarom_addr(adjustaddr, len)];
 			if (!(m_r4818 & 2))
 			{
-				UINT32 increment = (m_r4818 & 1) ? spc7110_data_increment() : 1;
+				uint32_t increment = (m_r4818 & 1) ? spc7110_data_increment() : 1;
 				if (m_r4818 & 4)
 				{
-					increment = (INT16)increment;  //16-bit sign extend
+					increment = (int16_t)increment;  //16-bit sign extend
 				}
 
 				if ((m_r4818 & 16) == 0)
@@ -1161,8 +1161,8 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x4818: return m_r4818;
 		case 0x481a:
 		{
-			UINT8 data;
-			UINT32 address, adjust;
+			uint8_t data;
+			uint32_t address, adjust;
 			if (m_r481x != 0x07)
 			{
 				return 0x00;
@@ -1172,7 +1172,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 			adjust = spc7110_data_adjust();
 			if (m_r4818 & 8)
 			{
-				adjust = (INT16)adjust;  //16-bit sign extend
+				adjust = (int16_t)adjust;  //16-bit sign extend
 			}
 
 			data = ROM[spc7110_datarom_addr(address + adjust, len)];
@@ -1212,7 +1212,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x482e: return m_r482e;
 		case 0x482f:
 		{
-			UINT8 status = m_r482f;
+			uint8_t status = m_r482f;
 			m_r482f &= 0x7f;
 			return status;
 		}
@@ -1233,7 +1233,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		case 0x4840: return m_r4840;
 		case 0x4841:
 		{
-			UINT8 data;
+			uint8_t data;
 			if (m_rtc_state == RTCS_Inactive || m_rtc_state == RTCS_ModeSelect)
 				return 0x00;
 
@@ -1244,7 +1244,7 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 		}
 		case 0x4842:
 		{
-			UINT8 status = m_r4842;
+			uint8_t status = m_r4842;
 			m_r4842 &= 0x7f;
 			return status;
 		}
@@ -1255,9 +1255,9 @@ READ8_MEMBER(sns_rom_spc7110_device::chip_read)
 
 WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 {
-	UINT8 *ROM = get_rom_base();
-	UINT32 len = get_rom_size();
-	UINT16 addr = offset & 0xffff;
+	uint8_t *ROM = get_rom_base();
+	uint32_t len = get_rom_size();
+	uint16_t addr = offset & 0xffff;
 
 	switch (addr)
 	{
@@ -1272,7 +1272,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 		case 0x4805: m_r4805 = data; break;
 		case 0x4806:
 		{
-			UINT32 table, index, address, mode, offset;
+			uint32_t table, index, address, mode, offset;
 			m_r4806 = data;
 
 			table   = (m_r4801 + (m_r4802 << 8) + (m_r4803 << 16));
@@ -1321,19 +1321,19 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 
 			if ((m_r4818 & 0x60) == 0x20)
 			{
-				UINT32 increment = spc7110_data_adjust() & 0xff;
+				uint32_t increment = spc7110_data_adjust() & 0xff;
 				if (m_r4818 & 8)
 				{
-					increment = (INT8)increment;  //8-bit sign extend
+					increment = (int8_t)increment;  //8-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
 			else if ((m_r4818 & 0x60) == 0x40)
 			{
-				UINT32 increment = spc7110_data_adjust();
+				uint32_t increment = spc7110_data_adjust();
 				if (m_r4818 & 8)
 				{
-					increment = (INT16)increment;  //16-bit sign extend
+					increment = (int16_t)increment;  //16-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1359,19 +1359,19 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 
 			if ((m_r4818 & 0x60) == 0x20)
 			{
-				UINT32 increment = spc7110_data_adjust() & 0xff;
+				uint32_t increment = spc7110_data_adjust() & 0xff;
 				if (m_r4818 & 8)
 				{
-					increment = (INT8)increment;  //8-bit sign extend
+					increment = (int8_t)increment;  //8-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
 			else if ((m_r4818 & 0x60) == 0x40)
 			{
-				UINT32 increment = spc7110_data_adjust();
+				uint32_t increment = spc7110_data_adjust();
 				if (m_r4818 & 8)
 				{
-					increment = (INT16)increment;  //16-bit sign extend
+					increment = (int16_t)increment;  //16-bit sign extend
 				}
 				spc7110_set_data_pointer(spc7110_data_pointer() + increment);
 			}
@@ -1406,10 +1406,10 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			if (m_r482e & 1)
 			{
 				//signed 16-bit x 16-bit multiplication
-				INT16 r0 = (INT16)(m_r4824 + (m_r4825 << 8));
-				INT16 r1 = (INT16)(m_r4820 + (m_r4821 << 8));
+				int16_t r0 = (int16_t)(m_r4824 + (m_r4825 << 8));
+				int16_t r1 = (int16_t)(m_r4820 + (m_r4821 << 8));
 
-				INT32 result = r0 * r1;
+				int32_t result = r0 * r1;
 				m_r4828 = result;
 				m_r4829 = result >> 8;
 				m_r482a = result >> 16;
@@ -1418,10 +1418,10 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			else
 			{
 				//unsigned 16-bit x 16-bit multiplication
-				UINT16 r0 = (UINT16)(m_r4824 + (m_r4825 << 8));
-				UINT16 r1 = (UINT16)(m_r4820 + (m_r4821 << 8));
+				uint16_t r0 = (uint16_t)(m_r4824 + (m_r4825 << 8));
+				uint16_t r1 = (uint16_t)(m_r4820 + (m_r4821 << 8));
 
-				UINT32 result = r0 * r1;
+				uint32_t result = r0 * r1;
 				m_r4828 = result;
 				m_r4829 = result >> 8;
 				m_r482a = result >> 16;
@@ -1440,16 +1440,16 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			if (m_r482e & 1)
 			{
 				//signed 32-bit x 16-bit division
-				INT32 dividend = (INT32)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
-				INT16 divisor  = (INT16)(m_r4826 + (m_r4827 << 8));
+				int32_t dividend = (int32_t)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
+				int16_t divisor  = (int16_t)(m_r4826 + (m_r4827 << 8));
 
-				INT32 quotient;
-				INT16 remainder;
+				int32_t quotient;
+				int16_t remainder;
 
 				if (divisor)
 				{
-					quotient  = (INT32)(dividend / divisor);
-					remainder = (INT32)(dividend % divisor);
+					quotient  = (int32_t)(dividend / divisor);
+					remainder = (int32_t)(dividend % divisor);
 				}
 				else
 				{
@@ -1469,16 +1469,16 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 			else
 			{
 				//unsigned 32-bit x 16-bit division
-				UINT32 dividend = (UINT32)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
-				UINT16 divisor  = (UINT16)(m_r4826 + (m_r4827 << 8));
+				uint32_t dividend = (uint32_t)(m_r4820 + (m_r4821 << 8) + (m_r4822 << 16) + (m_r4823 << 24));
+				uint16_t divisor  = (uint16_t)(m_r4826 + (m_r4827 << 8));
 
-				UINT32 quotient;
-				UINT16 remainder;
+				uint32_t quotient;
+				uint16_t remainder;
 
 				if (divisor)
 				{
-					quotient  = (UINT32)(dividend / divisor);
-					remainder = (UINT16)(dividend % divisor);
+					quotient  = (uint32_t)(dividend / divisor);
+					remainder = (uint16_t)(dividend % divisor);
 				}
 				else
 				{
@@ -1602,7 +1602,7 @@ WRITE8_MEMBER(sns_rom_spc7110_device::chip_write)
 						{
 							spc7110_update_time(0);
 
-							UINT8 second = m_rtc_ram[0] + m_rtc_ram[1] * 10;
+							uint8_t second = m_rtc_ram[0] + m_rtc_ram[1] * 10;
 							//clear seconds
 							m_rtc_ram[0] = 0;
 							m_rtc_ram[1] = 0;
@@ -1649,7 +1649,7 @@ READ8_MEMBER(sns_rom_spc7110_device::read_l)
 
 READ8_MEMBER(sns_rom_spc7110_device::read_h)
 {
-	UINT16 address = offset & 0xfffff;
+	uint16_t address = offset & 0xfffff;
 
 	if (offset < 0x400000)
 		return m_rom[rom_bank_map[offset / 0x8000] * 0x8000 + (offset & 0x7fff)];

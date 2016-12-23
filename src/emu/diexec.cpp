@@ -46,7 +46,6 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 		m_disabled(false),
 		m_vblank_interrupt_screen(nullptr),
 		m_timed_interrupt_period(attotime::zero),
-		m_is_octal(false),
 		m_nextexec(nullptr),
 		m_timedint_timer(nullptr),
 		m_profiler(PROFILER_IDLE),
@@ -68,7 +67,7 @@ device_execute_interface::device_execute_interface(const machine_config &mconfig
 	memset(&m_localtime, 0, sizeof(m_localtime));
 
 	// configure the fast accessor
-	device.m_execute = this;
+	device.interfaces().m_execute = this;
 }
 
 
@@ -155,7 +154,7 @@ bool device_execute_interface::executing() const
 //  remaining in this timeslice
 //-------------------------------------------------
 
-INT32 device_execute_interface::cycles_remaining() const
+s32 device_execute_interface::cycles_remaining() const
 {
 	return executing() ? *m_icountptr : 0;
 }
@@ -236,7 +235,7 @@ void device_execute_interface::suspend_resume_changed()
 //  suspend - set a suspend reason for this device
 //-------------------------------------------------
 
-void device_execute_interface::suspend(UINT32 reason, bool eatcycles)
+void device_execute_interface::suspend(u32 reason, bool eatcycles)
 {
 if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 	// set the suspend reason and eat cycles flag
@@ -251,7 +250,7 @@ if (TEMPLOG) printf("suspend %s (%X)\n", device().tag(), reason);
 //  device
 //-------------------------------------------------
 
-void device_execute_interface::resume(UINT32 reason)
+void device_execute_interface::resume(u32 reason)
 {
 if (TEMPLOG) printf("resume %s (%X)\n", device().tag(), reason);
 	// clear the suspend reason and eat cycles flag
@@ -273,7 +272,7 @@ void device_execute_interface::spin_until_time(const attotime &duration)
 	suspend_until_trigger(TRIGGER_SUSPENDTIME + timetrig, true);
 
 	// then set a timer for it
-	m_scheduler->timer_set(duration, FUNC(static_timed_trigger_callback), TRIGGER_SUSPENDTIME + timetrig, this);
+	m_scheduler->timer_set(duration, timer_expired_delegate(FUNC(device_execute_interface::timed_trigger_callback),this), TRIGGER_SUSPENDTIME + timetrig, this);
 	timetrig = (timetrig + 1) % 256;
 }
 
@@ -334,7 +333,7 @@ attotime device_execute_interface::local_time() const
 //  cycles executed on this device
 //-------------------------------------------------
 
-UINT64 device_execute_interface::total_cycles() const
+u64 device_execute_interface::total_cycles() const
 {
 	if (executing())
 	{
@@ -351,7 +350,7 @@ UINT64 device_execute_interface::total_cycles() const
 //  of clocks to cycles, rounding down if necessary
 //-------------------------------------------------
 
-UINT64 device_execute_interface::execute_clocks_to_cycles(UINT64 clocks) const
+u64 device_execute_interface::execute_clocks_to_cycles(u64 clocks) const
 {
 	return clocks;
 }
@@ -362,7 +361,7 @@ UINT64 device_execute_interface::execute_clocks_to_cycles(UINT64 clocks) const
 //  of cycles to clocks, rounding down if necessary
 //-------------------------------------------------
 
-UINT64 device_execute_interface::execute_cycles_to_clocks(UINT64 cycles) const
+u64 device_execute_interface::execute_cycles_to_clocks(u64 cycles) const
 {
 	return cycles;
 }
@@ -374,7 +373,7 @@ UINT64 device_execute_interface::execute_cycles_to_clocks(UINT64 cycles) const
 //  operation can take
 //-------------------------------------------------
 
-UINT32 device_execute_interface::execute_min_cycles() const
+u32 device_execute_interface::execute_min_cycles() const
 {
 	return 1;
 }
@@ -386,7 +385,7 @@ UINT32 device_execute_interface::execute_min_cycles() const
 //  operation can take
 //-------------------------------------------------
 
-UINT32 device_execute_interface::execute_max_cycles() const
+u32 device_execute_interface::execute_max_cycles() const
 {
 	return 1;
 }
@@ -397,7 +396,7 @@ UINT32 device_execute_interface::execute_max_cycles() const
 //  of input lines for the device
 //-------------------------------------------------
 
-UINT32 device_execute_interface::execute_input_lines() const
+u32 device_execute_interface::execute_input_lines() const
 {
 	return 0;
 }
@@ -408,7 +407,7 @@ UINT32 device_execute_interface::execute_input_lines() const
 //  IRQ vector when an acknowledge is processed
 //-------------------------------------------------
 
-UINT32 device_execute_interface::execute_default_irq_vector() const
+u32 device_execute_interface::execute_default_irq_vector() const
 {
 	return 0;
 }
@@ -420,7 +419,7 @@ UINT32 device_execute_interface::execute_default_irq_vector() const
 //  spinning devices for performance optimization)
 //-------------------------------------------------
 
-void device_execute_interface::execute_burn(INT32 cycles)
+void device_execute_interface::execute_burn(s32 cycles)
 {
 	// by default, do nothing
 }
@@ -477,15 +476,14 @@ void device_execute_interface::interface_pre_start()
 	m_driver_irq.bind_relative_to(*device().owner());
 
 	// fill in the initial states
-	device_iterator iter(device().machine().root_device());
-	int index = iter.indexof(*this);
+	int index = device_iterator(device().machine().root_device()).indexof(*this);
 	m_suspend = SUSPEND_REASON_RESET;
 	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
 	// allocate timers if we need them
 	if (m_timed_interrupt_period != attotime::zero)
-		m_timedint_timer = m_scheduler->timer_alloc(FUNC(static_trigger_periodic_interrupt), (void *)this);
+		m_timedint_timer = m_scheduler->timer_alloc(timer_expired_delegate(FUNC(device_execute_interface::trigger_periodic_interrupt), this));
 }
 
 
@@ -550,7 +548,7 @@ void device_execute_interface::interface_post_reset()
 		screen_device *screen = downcast<screen_device *>(device().machine().device(device().siblingtag(m_vblank_interrupt_screen).c_str()));
 
 		assert(screen != nullptr);
-		screen->register_vblank_callback(vblank_state_delegate(FUNC(device_execute_interface::on_vblank), this));
+		screen->register_vblank_callback(vblank_state_delegate(&device_execute_interface::on_vblank, this));
 	}
 
 	// reconfigure periodic interrupts
@@ -586,7 +584,7 @@ void device_execute_interface::interface_clock_changed()
 	m_attoseconds_per_cycle = HZ_TO_ATTOSECONDS(m_cycles_per_second);
 
 	// update the device's divisor
-	INT64 attos = m_attoseconds_per_cycle;
+	s64 attos = m_attoseconds_per_cycle;
 	m_divshift = 0;
 	while (attos >= (1UL << 31))
 	{
@@ -654,10 +652,9 @@ attoseconds_t device_execute_interface::minimum_quantum() const
 //  trigger
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::static_timed_trigger_callback )
+TIMER_CALLBACK_MEMBER( device_execute_interface::timed_trigger_callback )
 {
-	device_execute_interface *device = reinterpret_cast<device_execute_interface *>(ptr);
-	device->trigger(param);
+	trigger(param);
 }
 
 
@@ -682,16 +679,11 @@ void device_execute_interface::on_vblank(screen_device &screen, bool vblank_stat
 
 
 //-------------------------------------------------
-//  static_trigger_periodic_interrupt - timer
+//  trigger_periodic_interrupt - timer
 //  callback for timed interrupts
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::static_trigger_periodic_interrupt )
-{
-	reinterpret_cast<device_execute_interface *>(ptr)->trigger_periodic_interrupt();
-}
-
-void device_execute_interface::trigger_periodic_interrupt()
+TIMER_CALLBACK_MEMBER(device_execute_interface::trigger_periodic_interrupt)
 {
 	// bail if there is no routine
 	if (!suspended(SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE | SUSPEND_REASON_CLOCK))
@@ -782,7 +774,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 	if (event_index >= ARRAY_LENGTH(m_queue))
 	{
 		m_qindex--;
-		empty_event_queue();
+		empty_event_queue(nullptr,0);
 		event_index = m_qindex++;
 		m_execute->device().logerror("Exceeded pending input line event queue on device '%s'!\n", m_execute->device().tag());
 	}
@@ -796,7 +788,7 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 
 		// if this is the first one, set the timer
 		if (event_index == 0)
-			m_execute->scheduler().synchronize(FUNC(static_empty_event_queue), 0, (void *)this);
+			m_execute->scheduler().synchronize(timer_expired_delegate(FUNC(device_execute_interface::device_input::empty_event_queue),this), 0, this);
 	}
 }
 
@@ -805,18 +797,13 @@ if (TEMPLOG) printf("setline(%s,%d,%d,%d)\n", m_execute->device().tag(), m_linen
 //  empty_event_queue - empty our event queue
 //-------------------------------------------------
 
-TIMER_CALLBACK( device_execute_interface::device_input::static_empty_event_queue )
-{
-	reinterpret_cast<device_input *>(ptr)->empty_event_queue();
-}
-
-void device_execute_interface::device_input::empty_event_queue()
+TIMER_CALLBACK_MEMBER(device_execute_interface::device_input::empty_event_queue)
 {
 if (TEMPLOG) printf("empty_queue(%s,%d,%d)\n", m_execute->device().tag(), m_linenum, m_qindex);
 	// loop over all events
 	for (int curevent = 0; curevent < m_qindex; curevent++)
 	{
-		INT32 input_event = m_queue[curevent];
+		s32 input_event = m_queue[curevent];
 
 		// set the input line state and vector
 		m_curstate = input_event & 0xff;

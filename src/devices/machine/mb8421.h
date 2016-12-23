@@ -38,14 +38,14 @@
 class mb8421_device : public device_t
 {
 public:
-	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	mb8421_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_intl_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intl_handler.set_callback(object); }
 	template<class _Object> static devcb_base &set_intr_handler(device_t &device, _Object object) { return downcast<mb8421_device &>(device).m_intr_handler.set_callback(object); }
 
 	DECLARE_READ_LINE_MEMBER( busy_r ) { return 0; } // _BUSY pin - not emulated
-	UINT8 peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
+	uint8_t peek(offs_t offset) { return m_ram[offset & 0x7ff]; }
 
 	DECLARE_WRITE8_MEMBER( left_w );
 	DECLARE_READ8_MEMBER( left_r );
@@ -58,7 +58,7 @@ protected:
 	virtual void device_reset() override;
 
 private:
-	UINT8 m_ram[0x800];
+	uint8_t m_ram[0x800];
 
 	devcb_write_line m_intl_handler;
 	devcb_write_line m_intr_handler;

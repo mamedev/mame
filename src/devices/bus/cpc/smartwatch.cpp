@@ -36,7 +36,7 @@ ROM_START( cpc_smartwatch )
 	ROM_LOAD( "timerom+.rom",   0x0000, 0x4000, CRC(ed42a147) SHA1(61750d0535a1fbf2a4addad9def332cbcf8917c3) )
 ROM_END
 
-const rom_entry *cpc_smartwatch_device::device_rom_region() const
+const tiny_rom_entry *cpc_smartwatch_device::device_rom_region() const
 {
 	return ROM_NAME( cpc_smartwatch );
 }
@@ -45,7 +45,7 @@ const rom_entry *cpc_smartwatch_device::device_rom_region() const
 //  LIVE DEVICE
 //**************************************************************************
 
-cpc_smartwatch_device::cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+cpc_smartwatch_device::cpc_smartwatch_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, CPC_SMARTWATCH, "Dobbertin Smartwatch", tag, owner, clock, "cpc_smartwatch", __FILE__),
 	device_cpc_expansion_card_interface(mconfig, *this), m_slot(nullptr),
 	m_rtc(*this,"rtc"), m_bank(nullptr)
@@ -69,14 +69,14 @@ void cpc_smartwatch_device::device_reset()
 {
 	device_t* cpu = machine().device(":maincpu");
 	address_space& space = cpu->memory().space(AS_PROGRAM);
-	space.install_read_handler(0xc000,0xc001,0,0,read8_delegate(FUNC(cpc_smartwatch_device::rtc_w),this));
-	space.install_read_handler(0xc004,0xc004,0,0,read8_delegate(FUNC(cpc_smartwatch_device::rtc_r),this));
+	space.install_read_handler(0xc000,0xc001,read8_delegate(FUNC(cpc_smartwatch_device::rtc_w),this));
+	space.install_read_handler(0xc004,0xc004,read8_delegate(FUNC(cpc_smartwatch_device::rtc_r),this));
 	m_bank = membank(":bank7");
 }
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 {
-	UINT8* bank = (UINT8*)m_bank->base();
+	uint8_t* bank = (uint8_t*)m_bank->base();
 	if(offset & 1)
 		m_rtc->read_1(space,0);
 	else
@@ -86,6 +86,6 @@ READ8_MEMBER(cpc_smartwatch_device::rtc_w)
 
 READ8_MEMBER(cpc_smartwatch_device::rtc_r)
 {
-	UINT8* bank = (UINT8*)m_bank->base();
+	uint8_t* bank = (uint8_t*)m_bank->base();
 	return ((bank[(offset & 1)+4]) & 0xfe) | (m_rtc->read_data(space,0) & 0x01);
 }

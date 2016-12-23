@@ -183,35 +183,27 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/upd7759.h"
 #include "machine/steppers.h"
 #include "machine/roc10937.h"
 #include "machine/meters.h"
 #include "video/scn2674.h"
-
+#include "video/ef9369.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/6850acia.h"
 #include "sound/saa1099.h"
-#include "machine/nvram.h"
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
 #include "includes/mpu4.h"
-#include "cpu/m68000/m68000.h"
 
-
-struct ef9369_t
-{
-	UINT32 addr;
-	UINT16 clut[16];    /* 13-bits - a marking bit and a 444 color */
-};
 
 struct bt471_t
 {
-	UINT8 address;
-	UINT8 addr_cnt;
-	UINT8 pixmask;
-	UINT8 command;
+	uint8_t address;
+	uint8_t addr_cnt;
+	uint8_t pixmask;
+	uint8_t command;
 	rgb_t color;
 };
 
@@ -236,8 +228,8 @@ public:
 
 	required_device<m68000_base_device> m_videocpu;
 	optional_device<scn2674_device> m_scn2674;
-	optional_shared_ptr<UINT16> m_vid_vidram;
-	optional_shared_ptr<UINT16> m_vid_mainram;
+	optional_shared_ptr<uint16_t> m_vid_vidram;
+	optional_shared_ptr<uint16_t> m_vid_mainram;
 	required_device<acia6850_device> m_acia_0;
 	required_device<acia6850_device> m_acia_1;
 	required_device<ptm6840_device> m_ptm;
@@ -245,14 +237,13 @@ public:
 	optional_ioport m_tracky_port;
 	required_device<gfxdecode_device> m_gfxdecode;
 
-	struct ef9369_t m_pal;
 	struct bt471_t m_bt471;
 
 	//Video
-	UINT8 m_m6840_irq_state;
-	UINT8 m_m6850_irq_state;
+	uint8_t m_m6840_irq_state;
+	uint8_t m_m6850_irq_state;
 	int m_gfx_index;
-	INT8 m_cur[2];
+	int8_t m_cur[2];
 
 
 	DECLARE_DRIVER_INIT(crmazea);
@@ -283,16 +274,15 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(m6809_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(m68k_acia_irq);
 	DECLARE_WRITE_LINE_MEMBER(cpu1_ptm_irq);
-	DECLARE_WRITE8_MEMBER(vid_o1_callback);
-	DECLARE_WRITE8_MEMBER(vid_o2_callback);
-	DECLARE_WRITE8_MEMBER(vid_o3_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o1_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o2_callback);
+	DECLARE_WRITE_LINE_MEMBER(vid_o3_callback);
 	DECLARE_READ8_MEMBER(pia_ic5_porta_track_r);
 	void mpu4vid_char_cheat( int address);
 	DECLARE_WRITE_LINE_MEMBER(update_mpu68_interrupts);
 	DECLARE_READ16_MEMBER( mpu4_vid_vidram_r );
 	DECLARE_WRITE16_MEMBER( mpu4_vid_vidram_w );
-	DECLARE_WRITE8_MEMBER( ef9369_w );
-	DECLARE_READ8_MEMBER( ef9369_r );
+	EF9369_COLOR_UPDATE(ef9369_color_update);
 	DECLARE_WRITE8_MEMBER( bt471_w );
 	DECLARE_READ8_MEMBER( bt471_r );
 	DECLARE_WRITE8_MEMBER( vidcharacteriser_w );
@@ -352,26 +342,26 @@ WRITE_LINE_MEMBER(mpu4vid_state::cpu1_ptm_irq)
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o1_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o1_callback)
 {
-	m_ptm->set_c2(data); /* this output is the clock for timer2 */
+	m_ptm->set_c2(state); /* this output is the clock for timer2 */
 
-	m_acia_0->write_txc(data);
-	m_acia_0->write_rxc(data);
-	m_acia_1->write_txc(data);
-	m_acia_1->write_rxc(data);
+	m_acia_0->write_txc(state);
+	m_acia_0->write_rxc(state);
+	m_acia_1->write_txc(state);
+	m_acia_1->write_rxc(state);
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o2_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o2_callback)
 {
-	m_ptm->set_c3(data); /* this output is the clock for timer3 */
+	m_ptm->set_c3(state); /* this output is the clock for timer3 */
 }
 
 
-WRITE8_MEMBER(mpu4vid_state::vid_o3_callback)
+WRITE_LINE_MEMBER(mpu4vid_state::vid_o3_callback)
 {
-	m_ptm->set_c1(data); /* this output is the clock for timer1 */
+	m_ptm->set_c1(state); /* this output is the clock for timer1 */
 }
 
 
@@ -404,8 +394,8 @@ SCN2674_DRAW_CHARACTER_MEMBER(mpu4vid_state::display_pixels)
 {
 	if(!lg)
 	{
-		UINT16 tile = m_vid_mainram[address & 0x7fff];
-		const UINT8 *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
+		uint16_t tile = m_vid_mainram[address & 0x7fff];
+		const uint8_t *line = m_gfxdecode->gfx(m_gfx_index+0)->get_data(tile & 0xfff);
 		int offset = m_gfxdecode->gfx(m_gfx_index+0)->rowbytes() * linecount;
 		for(int i = 0; i < 8; i++)
 			bitmap.pix32(y, x + i) = (tile >> 12) ? m_palette->pen(line[offset + i]) : m_palette->black_pen();
@@ -441,79 +431,12 @@ VIDEO_START_MEMBER(mpu4vid_state,mpu4_vid)
 	assert(m_gfx_index != MAX_GFX_ELEMENTS);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
-	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<UINT8 *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
+	m_gfxdecode->set_gfx(m_gfx_index+0, std::make_unique<gfx_element>(*m_palette, mpu4_vid_char_8x8_layout, reinterpret_cast<uint8_t *>(m_vid_vidram.target()), NATIVE_ENDIAN_VALUE_LE_BE(8,0), m_palette->entries() / 16, 0));
 }
 
-
-
-
-/****************************
- *  EF9369 color palette IC
- *  (16 colors from 4096)
- ****************************/
-
-/* Non-multiplexed mode */
-
-WRITE8_MEMBER(mpu4vid_state::ef9369_w )
+EF9369_COLOR_UPDATE( mpu4vid_state::ef9369_color_update )
 {
-	struct ef9369_t &pal = m_pal;
-
-	/* Address register */
-	if (offset & 1)
-	{
-		pal.addr = data & 0x1f;
-	}
-	/* Data register */
-	else
-	{
-		UINT32 entry = pal.addr >> 1;
-
-		if ((pal.addr & 1) == 0)
-		{
-			pal.clut[entry] &= ~0x00ff;
-			pal.clut[entry] |= data;
-		}
-		else
-		{
-			UINT16 col;
-
-			pal.clut[entry] &= ~0x1f00;
-			pal.clut[entry] |= (data & 0x1f) << 8;
-
-			/* Remove the marking bit */
-			col = pal.clut[entry] & 0xfff;
-
-			/* Update the MAME palette */
-			m_palette->set_pen_color(entry, pal4bit(col >> 8), pal4bit(col >> 4), pal4bit(col >> 0));
-		}
-
-			/* Address register auto-increment */
-		if (++pal.addr == 32)
-			pal.addr = 0;
-	}
-}
-
-
-READ8_MEMBER(mpu4vid_state::ef9369_r )
-{
-	struct ef9369_t &pal = m_pal;
-	if ((offset & 1) == 0)
-	{
-		UINT16 col = pal.clut[pal.addr >> 1];
-
-/*      if ((pal.addr & 1) == 0)
-            return col & 0xff;
-        else
-            return col >> 8;
-            */
-
-	return col;
-	}
-	else
-	{
-		/* Address register is write only */
-		return 0xff;
-	}
+	m_palette->set_pen_color(entry, pal4bit(cc), pal4bit(cb), pal4bit(ca));
 }
 
 /******************************************
@@ -547,7 +470,7 @@ WRITE8_MEMBER(mpu4vid_state::bt471_w )
 		}
 		case 0x1:
 		{
-			UINT8 *addr_cnt = &bt471.addr_cnt;
+			uint8_t *addr_cnt = &bt471.addr_cnt;
 			rgb_t *color = &bt471.color;
 
 			color[*addr_cnt] = data;
@@ -601,15 +524,15 @@ READ8_MEMBER(mpu4vid_state::pia_ic5_porta_track_r)
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",machine().describe_context()));
 
 
-	UINT8 data = m_aux1_port->read();
+	uint8_t data = m_aux1_port->read();
 
-	INT8 dx = m_trackx_port->read();
-	INT8 dy = m_tracky_port->read();
+	int8_t dx = m_trackx_port->read();
+	int8_t dy = m_tracky_port->read();
 
 	m_cur[0] = dy + dx;
 	m_cur[1] = dy - dx;
 
-	UINT8 xa, xb, ya, yb;
+	uint8_t xa, xb, ya, yb;
 
 	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
 	xa = ((m_cur[0] + 1) & 3) <= 1;
@@ -1246,12 +1169,10 @@ static ADDRESS_MAP_START( mpu4_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 //  AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-
-
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
@@ -1266,10 +1187,9 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
-
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
-
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
 	AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE8("acia6850_1", acia6850_device, data_r, data_w, 0x00ff)
@@ -1281,17 +1201,16 @@ static ADDRESS_MAP_START( mpu4oki_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 //  AM_RANGE(0xfff000, 0xffffff) AM_NOP /* Possible bug, reads and writes here */
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( bwbvid_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x000000, 0x7fffff) AM_ROM
 	AM_RANGE(0x800000, 0x80ffff) AM_RAM AM_SHARE("vid_mainram")
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 //  AM_RANGE(0xa00000, 0xa0000f) AM_READWRITE(bt471_r,bt471_w) //Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
@@ -1306,10 +1225,10 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0x810000, 0x81ffff) AM_RAM /* ? */
 	AM_RANGE(0x900000, 0x900001) AM_DEVWRITE8("saa", saa1099_device, data_w, 0x00ff)
 	AM_RANGE(0x900002, 0x900003) AM_DEVWRITE8("saa", saa1099_device, control_w, 0x00ff)
-	AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(ef9369_r, ef9369_w,0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("ef9369", ef9369_device, data_r, data_w, 0x00ff)
+	AM_RANGE(0xa00002, 0xa00003) AM_DEVWRITE8("ef9369", ef9369_device, address_w, 0x00ff)
 	//AM_RANGE(0xa00000, 0xa00003) AM_READWRITE8(bt471_r,bt471_w,0x00ff) Some games use this
 /*  AM_RANGE(0xa00004, 0xa0000f) AM_READWRITE(mpu4_vid_unmap_r, mpu4_vid_unmap_w) */
-
 	AM_RANGE(0xb00000, 0xb0000f) AM_DEVREADWRITE8("scn2674_vid", scn2674_device, read, write,0x00ff)
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w) AM_SHARE("vid_vidram")
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVREADWRITE8("acia6850_1", acia6850_device, status_r, control_w, 0x00ff)
@@ -1320,8 +1239,6 @@ static ADDRESS_MAP_START( bwbvid5_68k_map, AS_PROGRAM, 16, mpu4vid_state )
 	AM_RANGE(0xe03000, 0xe0300f) AM_WRITE8(ic3ss_w,0xff00)  // 6840PTM on sampled sound board
 	AM_RANGE(0xe04000, 0xe0400f) AM_READWRITE8(bwb_characteriser_r, bwb_characteriser_w, 0x00ff)//AM_READWRITE(adpcm_r, adpcm_w)  CHR ?
 ADDRESS_MAP_END
-
-
 
 /* TODO: Fix up MPU4 map*/
 static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
@@ -1340,7 +1257,6 @@ static ADDRESS_MAP_START( mpu4_6809_map, AS_PROGRAM, 8, mpu4_state )
 	AM_RANGE(0xbe00, 0xbfff) AM_RAM
 	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION("maincpu",0)  /* 64k EPROM on board, only this region read */
 ADDRESS_MAP_END
-
 
 
 
@@ -1378,14 +1294,16 @@ static MACHINE_CONFIG_START( mpu4_vid, mpu4vid_state )
 	MCFG_MACHINE_RESET_OVERRIDE(mpu4vid_state,mpu4_vid)
 	MCFG_VIDEO_START_OVERRIDE (mpu4vid_state,mpu4_vid)
 
-	MCFG_PALETTE_ADD("palette", 16)
+	MCFG_PALETTE_ADD("palette", ef9369_device::NUMCOLORS)
 
-	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
+	MCFG_EF9369_ADD("ef9369")
+	MCFG_EF9369_COLOR_UPDATE_CB(mpu4vid_state, ef9369_color_update)
+
+	MCFG_DEVICE_ADD("6840ptm_68k", PTM6840, VIDEO_MASTER_CLOCK / 10) /* 68k E clock */
 	MCFG_PTM6840_EXTERNAL_CLOCKS(0, 0, 0)
-	MCFG_PTM6840_OUT0_CB(WRITE8(mpu4vid_state, vid_o1_callback))
-	MCFG_PTM6840_OUT1_CB(WRITE8(mpu4vid_state, vid_o2_callback))
-	MCFG_PTM6840_OUT2_CB(WRITE8(mpu4vid_state, vid_o3_callback))
+	MCFG_PTM6840_OUT0_CB(WRITELINE(mpu4vid_state, vid_o1_callback))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(mpu4vid_state, vid_o2_callback))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(mpu4vid_state, vid_o3_callback))
 	MCFG_PTM6840_IRQ_CB(WRITELINE(mpu4vid_state, cpu1_ptm_irq))
 	/* Present on all video cards */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1407,8 +1325,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
 	MCFG_DEVICE_MODIFY("pia_ic5")
 	MCFG_PIA_READPA_HANDLER(READ8(mpu4vid_state, pia_ic5_porta_track_r))
-	MCFG_PIA_WRITEPA_HANDLER(NULL)
-	MCFG_PIA_WRITEPB_HANDLER(NULL)
+	MCFG_PIA_WRITEPA_HANDLER(NOOP)
+	MCFG_PIA_WRITEPB_HANDLER(NOOP)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mating, crmaze )
@@ -1795,7 +1713,7 @@ DRIVER_INIT_MEMBER(mpu4vid_state,cybcas)
 
 void mpu4vid_state::mpu4vid_char_cheat( int address)
 {
-	UINT8* cheattable = memregion( "video" )->base()+address;
+	uint8_t* cheattable = memregion( "video" )->base()+address;
 	m_current_chr_table = blank_data;
 	for (int i=0;i<72;i++)
 	{

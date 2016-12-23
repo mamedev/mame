@@ -121,6 +121,7 @@ Known issues :
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/2203intf.h"
 #include "includes/argus.h"
 
@@ -185,7 +186,7 @@ static ADDRESS_MAP_START( argus_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc300, 0xc301) AM_RAM AM_SHARE("bg0_scrollx")
@@ -209,7 +210,7 @@ static ADDRESS_MAP_START( valtric_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc300, 0xc300) AM_WRITE(valtric_unknown_w)
@@ -234,7 +235,7 @@ static ADDRESS_MAP_START( butasan_map, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc100, 0xc100) AM_WRITE(butasan_unknown_w)
-	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0xc200, 0xc200) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(butasan_pageselect_w)
@@ -255,13 +256,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_a, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_b, AS_PROGRAM, 8, argus_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 #if 0
@@ -559,6 +560,8 @@ static MACHINE_CONFIG_START( argus, argus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -605,6 +608,8 @@ static MACHINE_CONFIG_START( valtric, argus_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.15)
@@ -650,6 +655,8 @@ static MACHINE_CONFIG_START( butasan, argus_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 6000000 / 4)
 	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0))

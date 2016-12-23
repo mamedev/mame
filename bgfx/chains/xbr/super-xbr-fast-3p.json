@@ -1,0 +1,76 @@
+// license:MIT
+// copyright-holders:Hyllian
+
+/*
+   
+  *******  Super XBR Shader  *******
+   
+  Copyright (c) 2016 Hyllian - sergiogdb@gmail.com
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+
+*/
+
+{
+	"name": "Super XBR (3 passes, faster)",
+	"author": "Hyllian",
+	"targets": [
+		{
+			"name": "all_passes",
+			"mode": "guest",
+			"scale": 2,
+			"bilinear": false,
+			"doublebuffer": true
+		}
+	],
+	"passes": [
+		{
+			"effect": "xbr/super-xbr/super-xbr-fast-pass0",
+			"name": "Pass 0",
+			"input": [
+				{ "sampler": "s0", "texture": "screen" }
+			],
+			"output": "all_passes"
+		},
+		{
+			"effect": "xbr/super-xbr/super-xbr-fast-pass1",
+			"name": "Pass 1",
+			"input": [
+				{ "sampler": "s0", "target": "all_passes" }
+			],
+			"output": "all_passes"
+		},
+		{
+			"effect": "xbr/super-xbr/super-xbr-fast-pass2",
+			"name": "Pass 5",
+			"input": [
+				{ "sampler": "s0", "target": "all_passes" }
+			],
+			"output": "all_passes"
+		},
+		{
+			"effect": "xbr/super-xbr/custom-jinc2-sharper",
+			"name": "Jinc2 Upscaler",
+			"input": [
+				{ "sampler": "s_p", "target": "all_passes" }
+			],
+			"output": "output"
+		}
+	]
+}

@@ -216,8 +216,10 @@ ToDo:
 
 ***********************************************************************************************************/
 
+#include "emu.h"
 #include "super80.lh"
 #include "includes/super80.h"
+#include "softlist.h"
 
 #define MASTER_CLOCK    (XTAL_12MHz)
 #define PIXEL_CLOCK (MASTER_CLOCK/2)
@@ -315,6 +317,26 @@ ADDRESS_MAP_END
 
 /**************************** DIPSWITCHES, KEYBOARD, HARDWARE CONFIGURATION ****************************************/
 
+	/* Enhanced options not available on real hardware */
+static INPUT_PORTS_START( super80_cfg )
+	PORT_START("CONFIG")
+	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
+	PORT_CONFSETTING(    0x00, DEF_STR(No))
+	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
+	PORT_CONFNAME( 0x02, 0x02, "2 MHz always")
+	PORT_CONFSETTING(    0x02, DEF_STR(No))
+	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
+	PORT_CONFNAME( 0x04, 0x04, "Screen on always")
+	PORT_CONFSETTING(    0x04, DEF_STR(No))
+	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
+	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
+	PORT_CONFSETTING(    0x08, DEF_STR(On))
+	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+	PORT_CONFNAME( 0x60, 0x40, "Colour")
+	PORT_CONFSETTING(    0x60, "White")
+	PORT_CONFSETTING(    0x40, "Green")
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( super80 )
 	PORT_START("DSW")
 	PORT_BIT( 0xf, 0xf, IPT_UNUSED )
@@ -403,21 +425,7 @@ static INPUT_PORTS_START( super80 )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(' ')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(0x80)               // port_char doesn't work, no equivalent key
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-
-	/* Enhanced options not available on real hardware */
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_CONFNAME( 0x02, 0x02, "2 MHz always")
-	PORT_CONFSETTING(    0x02, DEF_STR(No))
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
-	PORT_CONFNAME( 0x04, 0x04, "Screen on always")
-	PORT_CONFSETTING(    0x04, DEF_STR(No))
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
-	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
-	PORT_CONFSETTING(    0x08, DEF_STR(On))
-	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+	PORT_INCLUDE( super80_cfg )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( super80d )
@@ -508,21 +516,7 @@ static INPUT_PORTS_START( super80d )
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0') PORT_CHAR(' ')
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("LOCK") PORT_CODE(KEYCODE_CAPSLOCK) PORT_CHAR(0x80)               // port_char doesn't work, no equivalent key
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_KEYBOARD) PORT_NAME("(Up)") PORT_CODE(KEYCODE_UP) PORT_CHAR(UCHAR_MAMEKEY(UP))
-
-	/* Enhanced options not available on real hardware */
-	PORT_START("CONFIG")
-	PORT_CONFNAME( 0x01, 0x01, "Autorun on Quickload")
-	PORT_CONFSETTING(    0x00, DEF_STR(No))
-	PORT_CONFSETTING(    0x01, DEF_STR(Yes))
-	PORT_CONFNAME( 0x02, 0x02, "2 MHz always")
-	PORT_CONFSETTING(    0x02, DEF_STR(No))
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
-	PORT_CONFNAME( 0x04, 0x04, "Screen on always")
-	PORT_CONFSETTING(    0x04, DEF_STR(No))
-	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
-	PORT_CONFNAME( 0x08, 0x08, "Cassette Speaker")
-	PORT_CONFSETTING(    0x08, DEF_STR(On))
-	PORT_CONFSETTING(    0x00, DEF_STR(Off))
+	PORT_INCLUDE( super80_cfg )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( super80m )
@@ -535,7 +529,7 @@ static INPUT_PORTS_START( super80m )
 	PORT_CONFSETTING(    0x10, DEF_STR(No))
 	PORT_CONFSETTING(    0x00, DEF_STR(Yes))
 	PORT_CONFNAME( 0x60, 0x40, "Colour")
-	PORT_CONFSETTING(    0x60, "MonoChrome")
+	PORT_CONFSETTING(    0x60, "White")
 	PORT_CONFSETTING(    0x40, "Green")
 	PORT_CONFSETTING(    0x00, "Composite")
 	PORT_CONFSETTING(    0x20, "RGB")
@@ -549,13 +543,10 @@ static INPUT_PORTS_START( super80v )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( super80r )
-	PORT_INCLUDE( super80v )
+	PORT_INCLUDE( super80d )
 
 	PORT_MODIFY("CONFIG")
 	PORT_BIT( 0x16, 0x16, IPT_UNUSED )
-	PORT_CONFNAME( 0x60, 0x40, "Colour")
-	PORT_CONFSETTING(    0x60, "MonoChrome")
-	PORT_CONFSETTING(    0x40, "Green")
 INPUT_PORTS_END
 
 
@@ -614,25 +605,25 @@ static const gfx_layout super80v_charlayout =
 };
 
 static GFXDECODE_START( super80 )
-	GFXDECODE_ENTRY( "chargen", 0x0000, super80_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80_charlayout, 16, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80d )
-	GFXDECODE_ENTRY( "chargen", 0x0000, super80d_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80d_charlayout, 16, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80e )
-	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 16, 1 )
 GFXDECODE_END
 
 static GFXDECODE_START( super80m )
-	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 0, 8 )
-	GFXDECODE_ENTRY( "chargen", 0x1000, super80d_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "chargen", 0x0000, super80e_charlayout, 2, 6 )
+	GFXDECODE_ENTRY( "chargen", 0x1000, super80d_charlayout, 2, 6 )
 GFXDECODE_END
 
 /* This will show the 128 characters in the ROM + whatever happens to be in the PCG */
 static GFXDECODE_START( super80v )
-	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 0, 8 )
+	GFXDECODE_ENTRY( "maincpu", 0xf000, super80v_charlayout, 2, 6 )
 GFXDECODE_END
 
 
@@ -687,12 +678,22 @@ static SLOT_INTERFACE_START( super80_floppies )
 SLOT_INTERFACE_END
 
 
+static const char *const relay_sample_names[] =
+{
+	"*relay",
+	"relayoff",
+	"relayon",
+	nullptr
+};
+
+
 static MACHINE_CONFIG_START( super80, super80_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80_map)
 	MCFG_CPU_IO_MAP(super80_io)
-	MCFG_CPU_CONFIG(super80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -705,7 +706,8 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD("palette", 32)
+	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", super80)
 	MCFG_DEFAULT_LAYOUT( layout_super80 )
@@ -714,9 +716,13 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(relay_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")
@@ -732,10 +738,14 @@ static MACHINE_CONFIG_START( super80, super80_state )
 	/* cassette */
 	MCFG_CASSETTE_ADD( "cassette" )
 	MCFG_CASSETTE_DEFAULT_STATE(CASSETTE_PLAY | CASSETTE_MOTOR_DISABLED | CASSETTE_SPEAKER_ENABLED)
+	MCFG_CASSETTE_INTERFACE("super80_cass")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_p", super80_state, timer_p, attotime::from_hz(40000)) // cass read
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_k", super80_state, timer_k, attotime::from_hz(300)) // keyb scan
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("timer_h", super80_state, timer_h, attotime::from_hz(100)) // half-speed
+
+	// software list
+	MCFG_SOFTWARE_LIST_ADD("cass_list", "super80_cass")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( super80d, super80 )
@@ -758,10 +768,6 @@ static MACHINE_CONFIG_DERIVED( super80m, super80 )
 
 	MCFG_GFXDECODE_MODIFY("gfxdecode", super80m)
 
-	MCFG_PALETTE_MODIFY("palette")
-	MCFG_PALETTE_ENTRIES(32)
-	MCFG_PALETTE_INIT_OWNER(super80_state,super80m)
-
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(super80_state, screen_update_super80m)
 	MCFG_SCREEN_VBLANK_DRIVER(super80_state, screen_eof_super80m)
@@ -772,7 +778,8 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)        /* 2 MHz */
 	MCFG_CPU_PROGRAM_MAP(super80v_map)
 	MCFG_CPU_IO_MAP(super80v_io)
-	MCFG_CPU_CONFIG(super80_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(super80_daisy_chain)
+	MCFG_MACHINE_RESET_OVERRIDE(super80_state, super80r)
 
 	MCFG_DEVICE_ADD("z80pio", Z80PIO, MASTER_CLOCK/6)
 	MCFG_Z80PIO_OUT_INT_CB(INPUTLINE("maincpu", INPUT_LINE_IRQ0))
@@ -801,9 +808,13 @@ static MACHINE_CONFIG_START( super80v, super80_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 	MCFG_SOUND_WAVE_ADD(WAVE_TAG, "cassette")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SAMPLES_CHANNELS(1)
+	MCFG_SAMPLES_NAMES(relay_sample_names)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* printer */
 	MCFG_CENTRONICS_ADD("centronics", centronics_devices, "printer")

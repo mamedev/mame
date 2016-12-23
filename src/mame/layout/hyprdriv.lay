@@ -1,0 +1,184 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+	<element name="led" defstate="0">
+		<disk state="0">
+			<color red="0.1" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</disk>
+		<disk state="1">
+			<color red="1.0" green="0.0" blue="0.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</disk>
+	</element>
+
+	<element name="lamp" defstate="0">
+		<rect state="0">
+			<color red="0.1" green="0.1" blue="0.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</rect>
+		<rect state="1">
+			<color red="1.0" green="1.0" blue="0.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</rect>
+	</element>
+
+	<element name="start" defstate="0">
+		<disk state="0">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.0" green="0.1" blue="0.061" />
+		</disk>
+		<disk state="1">
+			<bounds x="0" y="0" width="2.0" height="2.0" />
+			<color red="0.0" green="1.0" blue="0.61" />
+		</disk>
+		<text string="START">
+			<color red="0.0" green="0.0" blue="0.0" />
+			<bounds x="0.25" y="0.5" width="1.5" height="1.0" />
+		</text>
+	</element>
+
+	<element name="view1" defstate="0">
+		<disk state="0">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.064" blue="0.1" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.64" blue="1.0" />
+		</disk>
+		<text string="1">
+			<color red="0.0" green="1.0" blue="1.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<element name="view2" defstate="0">
+		<disk state="0">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.064" blue="0.1" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.64" blue="1.0" />
+		</disk>
+		<text string="2">
+			<color red="0.0" green="1.0" blue="1.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<element name="view3" defstate="0">
+		<disk state="0">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.064" blue="0.1" />
+		</disk>
+		<disk state="1">
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+			<color red="0.0" green="0.64" blue="1.0" />
+		</disk>
+		<text string="3">
+			<color red="0.0" green="1.0" blue="1.0" />
+			<bounds x="0.0" y="0.0" width="1.0" height="1.0" />
+		</text>
+	</element>
+
+	<view name="Dashboard">
+		<bounds left="0" top="0" right="4" bottom="3.472" />
+
+		<screen index="0">
+			<bounds left="0" top="0" right="4" bottom="3" />
+		</screen>
+
+		<bezel name="lamp0" element="start" inputtag="SYSTEM" inputmask="0x04">
+			<bounds x="3.60" y="3.1" width="0.3" height="0.3" />
+		</bezel>
+		<bezel name="lamp2" element="view1" inputtag="IN1" inputmask="0x10">
+			<bounds x="0.025" y="3.025" width="0.125" height="0.125" />
+		</bezel>
+		<bezel name="lamp1" element="view2" inputtag="IN1" inputmask="0x20">
+			<bounds x="0.025" y="3.175" width="0.125" height="0.125" />
+		</bezel>
+		<bezel name="lamp3" element="view3" inputtag="IN1" inputmask="0x40">
+			<bounds x="0.025" y="3.325" width="0.125" height="0.125" />
+		</bezel>
+
+		<bezel name="lamp4" element="lamp">
+			<bounds x="1.785" y="3.2" width="0.1" height="0.1" />
+		</bezel>
+		<bezel name="lamp5" element="lamp">
+			<bounds x="1.895" y="3.2" width="0.1" height="0.1" />
+		</bezel>
+		<bezel name="lamp6" element="lamp">
+			<bounds x="2.005" y="3.2" width="0.1" height="0.1" />
+		</bezel>
+		<bezel name="lamp7" element="lamp">
+			<bounds x="2.115" y="3.2" width="0.1" height="0.1" />
+		</bezel>
+
+		<bezel name="led4" element="led">
+			<bounds x="3.43" y="3.025" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led3" element="led">
+			<bounds x="3.46" y="3.025" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led2" element="led">
+			<bounds x="3.49" y="3.025" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led1" element="led">
+			<bounds x="3.52" y="3.025" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led0" element="led">
+			<bounds x="3.55" y="3.025" width="0.025" height="0.025" />
+		</bezel>
+
+		<bezel name="led9" element="led">
+			<bounds x="3.43" y="3.055" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led8" element="led">
+			<bounds x="3.46" y="3.055" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led7" element="led">
+			<bounds x="3.49" y="3.055" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led6" element="led">
+			<bounds x="3.52" y="3.055" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led5" element="led">
+			<bounds x="3.55" y="3.055" width="0.025" height="0.025" />
+		</bezel>
+
+		<bezel name="led10" element="led">
+			<bounds x="3.325" y="3.085" width="0.025" height="0.025" />
+		</bezel>
+
+		<bezel name="led11" element="led">
+			<bounds x="3.295" y="3.115" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led12" element="led">
+			<bounds x="3.325" y="3.115" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led13" element="led">
+			<bounds x="3.355" y="3.115" width="0.025" height="0.025" />
+		</bezel>
+
+		<bezel name="led14" element="led">
+			<bounds x="3.295" y="3.145" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led15" element="led">
+			<bounds x="3.325" y="3.145" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led16" element="led">
+			<bounds x="3.355" y="3.145" width="0.025" height="0.025" />
+		</bezel>
+
+		<bezel name="led17" element="led">
+			<bounds x="3.295" y="3.175" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led18" element="led">
+			<bounds x="3.325" y="3.175" width="0.025" height="0.025" />
+		</bezel>
+		<bezel name="led19" element="led">
+			<bounds x="3.355" y="3.175" width="0.025" height="0.025" />
+		</bezel>
+	</view>
+</mamelayout>

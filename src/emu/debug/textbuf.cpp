@@ -27,16 +27,16 @@
 
 struct text_buffer
 {
-	char *                  buffer;
-	INT32 *                 lineoffs;
-	INT32                   bufsize;
-	INT32                   bufstart;
-	INT32                   bufend;
-	INT32                   linesize;
-	INT32                   linestart;
-	INT32                   lineend;
-	UINT32                  linestartseq;
-	INT32                   maxwidth;
+	char *      buffer;
+	s32 *       lineoffs;
+	s32         bufsize;
+	s32         bufstart;
+	s32         bufend;
+	s32         linesize;
+	s32         linestart;
+	s32         lineend;
+	u32         linestartseq;
+	s32         maxwidth;
 };
 
 
@@ -50,9 +50,9 @@ struct text_buffer
     currently held in the buffer
 -------------------------------------------------*/
 
-static inline INT32 buffer_used(text_buffer *text)
+static inline s32 buffer_used(text_buffer *text)
 {
-	INT32 used = text->bufend - text->bufstart;
+	s32 used = text->bufend - text->bufstart;
 	if (used < 0)
 		used += text->bufsize;
 	return used;
@@ -64,7 +64,7 @@ static inline INT32 buffer_used(text_buffer *text)
     available in the buffer
 -------------------------------------------------*/
 
-static inline INT32 buffer_space(text_buffer *text)
+static inline s32 buffer_space(text_buffer *text)
 {
 	return text->bufsize - buffer_used(text);
 }
@@ -81,7 +81,7 @@ static inline INT32 buffer_space(text_buffer *text)
     text_buffer_alloc - allocate a new text buffer
 -------------------------------------------------*/
 
-text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
+text_buffer *text_buffer_alloc(u32 bytes, u32 lines)
 {
 	text_buffer *text;
 
@@ -99,7 +99,7 @@ text_buffer *text_buffer_alloc(UINT32 bytes, UINT32 lines)
 	}
 
 	/* allocate memory for the lines array */
-	text->lineoffs = global_alloc_array_nothrow(INT32, lines);
+	text->lineoffs = global_alloc_array_nothrow(s32, lines);
 	if (!text->lineoffs)
 	{
 		global_free_array(text->buffer);
@@ -179,11 +179,11 @@ void text_buffer_print(text_buffer *text, const char *data)
 
 void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 {
-	INT32 stopcol = (wrapcol < MAX_LINE_LENGTH) ? wrapcol : MAX_LINE_LENGTH;
-	INT32 needed_space;
+	s32 stopcol = (wrapcol < MAX_LINE_LENGTH) ? wrapcol : MAX_LINE_LENGTH;
+	s32 needed_space;
 
 	/* we need to ensure there is enough space for this string plus enough for the max line length */
-	needed_space = (INT32)strlen(data) + MAX_LINE_LENGTH;
+	needed_space = s32(strlen(data)) + MAX_LINE_LENGTH;
 
 	/* make space in the buffer if we need to */
 	while (buffer_space(text) < needed_space && text->linestart != text->lineend)
@@ -261,7 +261,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
 		}
 	}
 
-	/* NULL terminate what we have on this line */
+	/* nullptr terminate what we have on this line */
 	text->buffer[text->bufend] = 0;
 }
 
@@ -278,7 +278,7 @@ void text_buffer_print_wrap(text_buffer *text, const char *data, int wrapcol)
     width of all lines seen so far
 -------------------------------------------------*/
 
-UINT32 text_buffer_max_width(text_buffer *text)
+u32 text_buffer_max_width(text_buffer *text)
 {
 	return text->maxwidth;
 }
@@ -289,9 +289,9 @@ UINT32 text_buffer_max_width(text_buffer *text)
     lines in the text buffer
 -------------------------------------------------*/
 
-UINT32 text_buffer_num_lines(text_buffer *text)
+u32 text_buffer_num_lines(text_buffer *text)
 {
-	INT32 lines = text->lineend + 1 - text->linestart;
+	s32 lines = text->lineend + 1 - text->linestart;
 	if (lines <= 0)
 		lines += text->linesize;
 	return lines;
@@ -303,7 +303,7 @@ UINT32 text_buffer_num_lines(text_buffer *text)
     line index into a sequence number
 -------------------------------------------------*/
 
-UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index)
+u32 text_buffer_line_index_to_seqnum(text_buffer *text, u32 index)
 {
 	return text->linestartseq + index;
 }
@@ -314,10 +314,10 @@ UINT32 text_buffer_line_index_to_seqnum(text_buffer *text, UINT32 index)
     an indexed line in the buffer
 -------------------------------------------------*/
 
-const char *text_buffer_get_seqnum_line(text_buffer *text, UINT32 seqnum)
+const char *text_buffer_get_seqnum_line(text_buffer *text, u32 seqnum)
 {
-	UINT32 numlines = text_buffer_num_lines(text);
-	UINT32 index = seqnum - text->linestartseq;
+	u32 numlines = text_buffer_num_lines(text);
+	u32 index = seqnum - text->linestartseq;
 	if (index >= numlines)
 		return nullptr;
 	return &text->buffer[text->lineoffs[(text->linestart + index) % text->linesize]];

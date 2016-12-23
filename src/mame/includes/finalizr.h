@@ -31,13 +31,13 @@ public:
 	required_device<palette_device> m_palette;
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_scroll;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram2;
-	required_shared_ptr<UINT8> m_videoram2;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram_2;
+	required_shared_ptr<uint8_t> m_scroll;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram2;
+	required_shared_ptr<uint8_t> m_videoram2;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram_2;
 
 	/* video-related */
 	tilemap_t *m_fg_tilemap;
@@ -47,8 +47,8 @@ public:
 
 	/* misc */
 	int m_T1_line;
-	UINT8 m_nmi_enable;
-	UINT8 m_irq_enable;
+	uint8_t m_nmi_enable;
+	uint8_t m_irq_enable;
 
 	DECLARE_WRITE8_MEMBER(finalizr_coin_w);
 	DECLARE_WRITE8_MEMBER(finalizr_flipscreen_w);
@@ -57,7 +57,6 @@ public:
 	DECLARE_READ8_MEMBER(i8039_T1_r);
 	DECLARE_WRITE8_MEMBER(i8039_T0_w);
 	DECLARE_WRITE8_MEMBER(finalizr_videoctrl_w);
-	DECLARE_DRIVER_INIT(finalizr);
 	TILE_GET_INFO_MEMBER(get_bg_tile_info);
 	TILE_GET_INFO_MEMBER(get_fg_tile_info);
 	virtual void machine_start() override;
@@ -65,6 +64,6 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(finalizr);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_finalizr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(finalizr_scanline);
 };

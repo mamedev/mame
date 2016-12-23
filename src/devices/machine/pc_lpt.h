@@ -21,7 +21,7 @@
 class pc_lpt_device : public device_t
 {
 public:
-	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pc_lpt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_irq_handler(device_t &device, _Object object) { return downcast<pc_lpt_device &>(device).m_irq_handler.set_callback(object); }
@@ -69,8 +69,8 @@ private:
 	// internal state
 
 	int m_irq;
-	UINT8 m_data;
-	UINT8 m_control;
+	uint8_t m_data;
+	uint8_t m_control;
 	int m_irq_enabled;
 	int m_centronics_ack;
 

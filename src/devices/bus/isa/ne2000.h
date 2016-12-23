@@ -11,7 +11,7 @@ class ne2000_device: public device_t,
 						public device_isa16_card_interface
 {
 public:
-	ne2000_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ne2000_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual ioport_constructor device_input_ports() const override;
 
@@ -25,9 +25,9 @@ protected:
 	virtual void device_reset() override;
 private:
 	required_device<dp8390d_device> m_dp8390;
-	UINT8 m_irq;
-	UINT8 m_board_ram[16*1024];
-	UINT8 m_prom[16];
+	uint8_t m_irq;
+	uint8_t m_board_ram[16*1024];
+	uint8_t m_prom[16];
 };
 
 extern const device_type NE2000;

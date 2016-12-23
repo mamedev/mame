@@ -110,6 +110,7 @@ PCB2  (Top board, CPU board)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 #define MASTER_CLOCK            XTAL_18_432MHz
@@ -123,6 +124,7 @@ public:
 		m_soundcpu(*this, "soundcpu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_attr(*this, "attr"),
 		m_vid(*this, "vid"),
 		m_spriteram(*this, "spriteram"),
@@ -133,14 +135,15 @@ public:
 	required_device<cpu_device> m_soundcpu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_attr;
-	required_shared_ptr<UINT8> m_vid;
-	required_shared_ptr<UINT8> m_spriteram;
-	required_shared_ptr<UINT8> m_spriteram2;
-	required_shared_ptr<UINT8> m_scrolly;
+	required_shared_ptr<uint8_t> m_attr;
+	required_shared_ptr<uint8_t> m_vid;
+	required_shared_ptr<uint8_t> m_spriteram;
+	required_shared_ptr<uint8_t> m_spriteram2;
+	required_shared_ptr<uint8_t> m_scrolly;
 
-	UINT8 m_nmi_en;
+	uint8_t m_nmi_en;
 
 	DECLARE_WRITE8_MEMBER(to_sound_w);
 	DECLARE_WRITE8_MEMBER(nmi_mask_w);
@@ -148,7 +151,7 @@ public:
 	virtual void machine_start() override;
 	DECLARE_PALETTE_INIT(sub);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(sound_irq);
 };
 
@@ -157,7 +160,7 @@ void sub_state::machine_start()
 	save_item(NAME(m_nmi_en));
 }
 
-UINT32 sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	gfx_element *gfx = m_gfxdecode->gfx(0);
 	gfx_element *gfx_1 = m_gfxdecode->gfx(1);
@@ -168,9 +171,9 @@ UINT32 sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = m_vid[count];
-			UINT8 col;
-			UINT8 y_offs = m_scrolly[x];
+			uint16_t tile = m_vid[count];
+			uint8_t col;
+			uint8_t y_offs = m_scrolly[x];
 
 			tile += (m_attr[count]&0xe0)<<3;
 			col = (m_attr[count]&0x1f);
@@ -194,9 +197,9 @@ UINT32 sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	1 --cc cccc color
 	*/
 	{
-		UINT8 *spriteram = m_spriteram;
-		UINT8 *spriteram_2 = m_spriteram2;
-		UINT8 x,y,spr_offs,i,col,fx,fy;
+		uint8_t *spriteram = m_spriteram;
+		uint8_t *spriteram_2 = m_spriteram2;
+		uint8_t x,y,spr_offs,i,col,fx,fy;
 
 		for(i=0;i<0x40;i+=2)
 		{
@@ -219,9 +222,9 @@ UINT32 sub_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, con
 	{
 		for (x=0;x<32;x++)
 		{
-			UINT16 tile = m_vid[count];
-			UINT8 col;
-			UINT8 y_offs = m_scrolly[x];
+			uint16_t tile = m_vid[count];
+			uint8_t col;
+			uint8_t y_offs = m_scrolly[x];
 
 			tile += (m_attr[count]&0xe0)<<3;
 			col = (m_attr[count]&0x1f);
@@ -263,7 +266,7 @@ ADDRESS_MAP_END
 
 WRITE8_MEMBER(sub_state::to_sound_w)
 {
-	soundlatch_byte_w(space, 0, data & 0xff);
+	m_soundlatch->write(space, 0, data & 0xff);
 	m_soundcpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -274,7 +277,7 @@ WRITE8_MEMBER(sub_state::nmi_mask_w)
 
 static ADDRESS_MAP_START( subm_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_byte_r) AM_WRITE(to_sound_w) // to/from sound CPU
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(to_sound_w) // to/from sound CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_map, AS_PROGRAM, 8, sub_state )
@@ -285,7 +288,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( subm_sound_io, AS_IO, 8, sub_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch2_byte_w) // to/from main CPU
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_DEVWRITE("soundlatch2", generic_latch_8_device, write) // to/from main CPU
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ay1", ay8910_device, data_r, address_data_w)
 	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("ay2", ay8910_device, data_r, address_data_w)
 ADDRESS_MAP_END
@@ -404,9 +407,9 @@ GFXDECODE_END
 
 PALETTE_INIT_MEMBER(sub_state, sub)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
-	UINT8* lookup = memregion("proms2")->base();
+	uint8_t* lookup = memregion("proms2")->base();
 
 	for (i = 0;i < 0x100;i++)
 	{
@@ -424,7 +427,7 @@ PALETTE_INIT_MEMBER(sub_state, sub)
 
 	for (i = 0;i < 0x400;i++)
 	{
-		UINT8 ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
+		uint8_t ctabentry = lookup[i+0x400] | (lookup[i+0x000] << 4);
 		palette.set_pen_indirect(i, ctabentry);
 	}
 
@@ -467,6 +470,9 @@ static MACHINE_CONFIG_START( sub, sub_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
 
 	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/6/2) /* ? Mhz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)

@@ -29,7 +29,7 @@ inline void ds2401_device::verboselog(int n_level, const char *s_fmt, ...)
 // device type definition
 const device_type DS2401 = &device_creator<ds2401_device>;
 
-ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ds2401_device::ds2401_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, DS2401, "DS2401", tag, owner, clock, "ds2401", __FILE__), m_state(0), m_bit(0), m_shift(0), m_byte(0), m_rx(false), m_tx(false), m_timer_main(nullptr), m_timer_reset(nullptr)
 {
 }
@@ -65,15 +65,16 @@ void ds2401_device::device_reset()
 	m_rx = true;
 	m_tx = true;
 
-	if(m_region)
+	memory_region *region = memregion(DEVICE_SELF);
+	if (region != nullptr)
 	{
-		if(m_region->bytes() == SIZE_DATA)
+		if (region->bytes() == SIZE_DATA)
 		{
-			memcpy(m_data, m_region->base(), SIZE_DATA);
+			memcpy(m_data, region->base(), SIZE_DATA);
 			return;
 		}
 
-		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, m_region->bytes());
+		logerror("ds2401 %s: Wrong region length for id data, expected 0x%x, got 0x%x\n", tag(), SIZE_DATA, region->bytes());
 	}
 	else
 	{
@@ -126,6 +127,7 @@ void ds2401_device::device_timer(emu_timer &timer, device_timer_id id, int param
 				switch(m_shift)
 				{
 				case COMMAND_READROM:
+				case COMMAND_READROM_COMPAT:
 					verboselog(1, "timer_main readrom\n");
 					m_bit = 0;
 					m_byte = 0;
@@ -226,7 +228,7 @@ READ_LINE_MEMBER( ds2401_device::read )
 	return m_tx && m_rx;
 }
 
-UINT8 ds2401_device::direct_read(int index)
+uint8_t ds2401_device::direct_read(int index)
 {
 	return m_data[index];
 }

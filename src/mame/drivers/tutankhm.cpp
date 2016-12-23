@@ -8,7 +8,7 @@
     based on original work by Rob Jarrett
 
     I include here the document based on Rob Jarrett's research because it's
-    really exaustive.
+    really exhaustive.
 
     Sound board: uses the same board as Pooyan.
 
@@ -52,6 +52,8 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/gen_latch.h"
+#include "machine/watchdog.h"
 #include "includes/konamipt.h"
 #include "audio/timeplt.h"
 #include "includes/tutankhm.h"
@@ -120,7 +122,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_SHARE("scroll")
-	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2") /* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")  /* IN0 I/O: Coin slots, service, 1P/2P buttons */
 	AM_RANGE(0x81a0, 0x81a0) AM_MIRROR(0x000f) AM_READ_PORT("IN1")  /* IN1: Player 1 I/O */
@@ -134,7 +136,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, tutankhm_state )
 	AM_RANGE(0x8207, 0x8207) AM_MIRROR(0x00f8) AM_WRITE(tutankhm_flip_screen_y_w)
 	AM_RANGE(0x8300, 0x8300) AM_MIRROR(0x00ff) AM_WRITE(tutankhm_bankselect_w)
 	AM_RANGE(0x8600, 0x8600) AM_MIRROR(0x00ff) AM_DEVWRITE("timeplt_audio", timeplt_audio_device, sh_irqtrigger_w)
-	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_WRITE(soundlatch_byte_w)
+	AM_RANGE(0x8700, 0x8700) AM_MIRROR(0x00ff) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9fff) AM_ROMBANK("bank1")
 	AM_RANGE(0xa000, 0xffff) AM_ROM
@@ -229,6 +231,8 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	MCFG_MACHINE_START_OVERRIDE(tutankhm_state,tutankhm)
 	MCFG_MACHINE_RESET_OVERRIDE(tutankhm_state,tutankhm)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -241,6 +245,9 @@ static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 	MCFG_PALETTE_FORMAT(BBGGGRRR)
 
 	/* sound hardware */
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 

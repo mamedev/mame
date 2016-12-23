@@ -26,17 +26,17 @@ public:
 		m_ticket(*this, "ticket")
 	{ }
 
-	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	DECLARE_WRITE8_MEMBER(ctrl_w);
 	DECLARE_WRITE8_MEMBER(mcs51_tx_callback);
 	DECLARE_INPUT_CHANGED_MEMBER(ball_sensor);
 	DECLARE_CUSTOM_INPUT_MEMBER(ticket_r);
+	HD44780_PIXEL_UPDATE(piggypas_pixel_update);
 
 	required_device<mcs51_cpu_device> m_maincpu;
 	required_device<ticket_dispenser_device> m_ticket;
-	UINT8   m_ctrl;
-	UINT8   m_digit_idx;
+	uint8_t   m_ctrl;
+	uint8_t   m_digit_idx;
 };
 
 
@@ -91,7 +91,7 @@ static INPUT_PORTS_START( piggypas )
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_COIN3)
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_START1)
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_COIN4)
-	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, piggypas_state, ticket_r, NULL)
+	PORT_BIT(0x08, IP_ACTIVE_LOW, IPT_SPECIAL)  PORT_CUSTOM_MEMBER(DEVICE_SELF, piggypas_state, ticket_r, nullptr)
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_COIN2)
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD)  PORT_NAME("Gate sensor")   PORT_CODE(KEYCODE_G)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_UNUSED)
@@ -112,18 +112,12 @@ static INPUT_PORTS_START( piggypas )
 INPUT_PORTS_END
 
 
-
-void piggypas_state::machine_start()
-{
-	m_maincpu->i8051_set_serial_tx_callback(WRITE8_DELEGATE(piggypas_state, mcs51_tx_callback));
-}
-
 void piggypas_state::machine_reset()
 {
 	m_digit_idx = 0;
 }
 
-static HD44780_PIXEL_UPDATE(piggypas_pixel_update)
+HD44780_PIXEL_UPDATE(piggypas_state::piggypas_pixel_update)
 {
 	if (pos < 8)
 		bitmap.pix16(y, (line * 8 + pos) * 6 + x) = state;
@@ -135,6 +129,7 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 	MCFG_CPU_ADD("maincpu", I8031, 8000000) // unknown variant
 	MCFG_CPU_PROGRAM_MAP(piggypas_map)
 	MCFG_CPU_IO_MAP(piggypas_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(piggypas_state, mcs51_tx_callback))
 //  MCFG_CPU_VBLANK_INT_DRIVER("screen", piggypas_state,  irq0_line_hold)
 
 	MCFG_SCREEN_ADD("screen", LCD)
@@ -149,7 +144,7 @@ static MACHINE_CONFIG_START( piggypas, piggypas_state )
 
 	MCFG_HD44780_ADD("hd44780")
 	MCFG_HD44780_LCD_SIZE(1, 16)
-	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_pixel_update)
+	MCFG_HD44780_PIXEL_UPDATE_CB(piggypas_state, piggypas_pixel_update)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

@@ -44,7 +44,7 @@ WRITE16_MEMBER(f1gp_state::sound_command_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		m_pending_command = 1;
-		soundlatch_byte_w(space, offset, data & 0xff);
+		m_soundlatch->write(space, offset, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -125,7 +125,7 @@ static ADDRESS_MAP_START( sound_io_map, AS_IO, 8, f1gp_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(f1gp_sh_bankswitch_w) // f1gp2
-	AM_RANGE(0x14, 0x14) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x14, 0x14) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x18, 0x1b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -139,8 +139,8 @@ WRITE16_MEMBER(f1gp_state::f1gpb_misc_w)
 	if(old_bank != new_bank && new_bank < 5)
 	{
 	    // oki banking
-	    UINT8 *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
-	    UINT8 *dst = memregion("oki")->base() + 0x30000;
+	    uint8_t *src = memregion("oki")->base() + 0x40000 + 0x10000 * new_bank;
+	    uint8_t *dst = memregion("oki")->base() + 0x30000;
 	    memcpy(dst, src, 0x10000);
 
 	    old_bank = new_bank;
@@ -363,12 +363,6 @@ static GFXDECODE_START( f1gp2 )
 GFXDECODE_END
 
 
-
-WRITE_LINE_MEMBER(f1gp_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 MACHINE_START_MEMBER(f1gp_state,f1gpb)
 {
 	save_item(NAME(m_pending_command));
@@ -432,14 +426,12 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("vsystem_spr_ol2", VSYSTEM_SPR2, 0)
 	MCFG_VSYSTEM_SPR2_SET_TILE_INDIRECT( f1gp_state, f1gp_ol2_tile_callback )
 	MCFG_VSYSTEM_SPR2_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR2_SET_PRITYPE(2)
 	MCFG_VSYSTEM_SPR2_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR2_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(f1gp_state,f1gp)
 
@@ -450,8 +442,10 @@ static MACHINE_CONFIG_START( f1gp, f1gp_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(f1gp_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
 	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
@@ -516,7 +510,6 @@ static MACHINE_CONFIG_DERIVED( f1gp2, f1gp )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( f1gp_state, f1gp2_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(1)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_DEVICE_MODIFY("k053936")
 	MCFG_K053936_OFFSETS(-48, -21)

@@ -124,7 +124,7 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
     d3 Parity Error ('1'=condition true)
     d2..d0 Not used */
 
-	UINT8 data=7;
+	uint8_t data=7;
 	m_ay31015->set_input_pin(AY31015_SWE, 0);
 	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0x40 : 0;
 	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x80 : 0;
@@ -139,7 +139,7 @@ READ8_MEMBER( trs80_state::trs80m4_ea_r )
 READ8_MEMBER( trs80_state::trs80m4_eb_r )
 {
 /* UART received data */
-	UINT8 data = m_ay31015->get_received_data();
+	uint8_t data = m_ay31015->get_received_data();
 	m_ay31015->set_input_pin(AY31015_RDAV, 0);
 	m_ay31015->set_input_pin(AY31015_RDAV, 1);
 	return data;
@@ -164,7 +164,7 @@ READ8_MEMBER( trs80_state::sys80_f9_r )
     d1 Overrun
     d0 Data Available */
 
-	UINT8 data = 70;
+	uint8_t data = 70;
 	m_ay31015->set_input_pin(AY31015_SWE, 0);
 	data |= m_ay31015->get_output_pin(AY31015_TBMT) ? 0 : 0x80;
 	data |= m_ay31015->get_output_pin(AY31015_DAV ) ? 0x01 : 0;
@@ -187,7 +187,7 @@ READ8_MEMBER( trs80_state::trs80_ff_r )
     d7 cassette data from tape
     d2 modesel setting */
 
-	UINT8 data = (~m_mode & 1) << 5;
+	uint8_t data = (~m_mode & 1) << 5;
 	return data | m_cassette_data;
 }
 
@@ -218,7 +218,7 @@ WRITE8_MEMBER( trs80_state::trs80m4_84_w )
 
 	/* get address space instead of io space */
 	address_space &mem = m_maincpu->space(AS_PROGRAM);
-	UINT8 *base = m_region_maincpu->base();
+	uint8_t *base = m_region_maincpu->base();
 
 	m_mode = (m_mode & 0x73) | (data & 0x8c);
 
@@ -420,7 +420,9 @@ WRITE8_MEMBER( trs80_state::trs80m4_e9_w )
     CCh    4800
     DDh    7200
     EEh    9600
-    FFh    19200 */
+    FFh    19200
+Note: this may be a COM5016 dual baud rate generator, or may be an equivalent circuit embedded in the gate array ASIC on the trs80 model 4
+    */
 
 	static const int baud_clock[]={ 800, 1200, 1760, 2152, 2400, 4800, 9600, 19200, 28800, 32000, 38400, 57600, 76800, 115200, 153600, 307200 };
 	m_ay31015->set_receiver_clock(baud_clock[data & 0x0f]);
@@ -568,7 +570,7 @@ WRITE8_MEMBER( trs80_state::lnw80_fe_w )
 		mem.install_readwrite_handler (0x37ed, 0x37ed, read8_delegate(FUNC(fd1793_t::track_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::track_w),(fd1793_t*)m_fdc));
 		mem.install_readwrite_handler (0x37ee, 0x37ee, read8_delegate(FUNC(fd1793_t::sector_r),(fd1793_t*)m_fdc), write8_delegate(FUNC(fd1793_t::sector_w),(fd1793_t*)m_fdc));
 		mem.install_readwrite_handler (0x37ef, 0x37ef, read8_delegate(FUNC(fd1793_t::data_r),(fd1793_t*)m_fdc),write8_delegate( FUNC(fd1793_t::data_w),(fd1793_t*)m_fdc));
-		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
+		mem.install_read_handler (0x3800, 0x38ff, 0, 0x0300, 0, read8_delegate(FUNC(trs80_state::trs80_keyboard_r), this));
 		mem.install_readwrite_handler (0x3c00, 0x3fff, read8_delegate(FUNC(trs80_state::trs80_videoram_r), this), write8_delegate(FUNC(trs80_state::trs80_videoram_w), this));
 	}
 }
@@ -592,7 +594,7 @@ WRITE8_MEMBER( trs80_state::trs80_ff_w )
 	if (!init)
 	{
 		init = 1;
-		static INT16 speaker_levels[4] = { 0, -32768, 0, 32767 };
+		static int16_t speaker_levels[4] = { 0, -32768, 0, 32767 };
 		m_speaker->static_set_levels(*m_speaker, 4, speaker_levels);
 
 	}
@@ -685,7 +687,7 @@ WRITE_LINE_MEMBER(trs80_state::trs80_fdc_intrq_w)
 
 READ8_MEMBER( trs80_state::trs80_wd179x_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 	if (BIT(m_io_config->read(), 7))
 		data = m_fdc->status_r(space, offset);
 
@@ -755,7 +757,7 @@ WRITE8_MEMBER( trs80_state::trs80_motor_w )
  *************************************/
 READ8_MEMBER( trs80_state::trs80_keyboard_r )
 {
-	UINT8 result = 0;
+	uint8_t result = 0;
 
 	if (offset & 1)
 		result |= m_io_line0->read();
@@ -879,9 +881,9 @@ QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 
-	UINT8 type, length;
-	UINT8 data[0x100];
-	UINT8 addr[2];
+	uint8_t type, length;
+	uint8_t data[0x100];
+	uint8_t addr[2];
 	void *ptr;
 
 	while (!image.image_feof())
@@ -897,7 +899,7 @@ QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 		case CMD_TYPE_OBJECT_CODE:
 			{
 			image.fread( &addr, 2);
-			UINT16 address = (addr[1] << 8) | addr[0];
+			uint16_t address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD object code block: address %04x length %u\n", address, block_length);
 			ptr = program.get_write_ptr(address);
 			image.fread( ptr, block_length);
@@ -907,7 +909,7 @@ QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 		case CMD_TYPE_TRANSFER_ADDRESS:
 			{
 			image.fread( &addr, 2);
-			UINT16 address = (addr[1] << 8) | addr[0];
+			uint16_t address = (addr[1] << 8) | addr[0];
 			if (LOG) logerror("/CMD transfer address %04x\n", address);
 			m_maincpu->set_state_int(Z80_PC, address);
 			}
@@ -929,5 +931,5 @@ QUICKLOAD_LOAD_MEMBER( trs80_state, trs80_cmd )
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }

@@ -35,9 +35,10 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 ***************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/dac.h"
 #include "includes/trucocl.h"
+#include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
+#include "sound/volt_reg.h"
 
 WRITE8_MEMBER(trucocl_state::irq_enable_w)
 {
@@ -53,14 +54,14 @@ void trucocl_state::device_timer(emu_timer &timer, device_timer_id id, int param
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in trucocl_state::device_timer");
+		assert_always(false, "Unknown id in trucocl_state::device_timer");
 	}
 }
 
 
 WRITE8_MEMBER(trucocl_state::audio_dac_w)
 {
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	int dac_address = ( data & 0xf0 ) << 8;
 	int sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 
@@ -82,7 +83,7 @@ WRITE8_MEMBER(trucocl_state::audio_dac_w)
 
 	dac_address += 0x10000;
 
-	m_dac->write_unsigned8( rom[dac_address+m_cur_dac_address_index] );
+	m_dac->write(rom[dac_address+m_cur_dac_address_index]);
 
 	timer_set( attotime::from_hz( 16000 ), TIMER_DAC_IRQ);
 }
@@ -95,7 +96,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 8, trucocl_state )
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(irq_enable_w)
 	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("IN0")
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(audio_dac_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x50c0, 0x50c0) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -143,6 +144,8 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	MCFG_CPU_PROGRAM_MAP(main_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", trucocl_state,  trucocl_interrupt)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -157,10 +160,11 @@ static MACHINE_CONFIG_START( trucocl, trucocl_state )
 	MCFG_PALETTE_INIT_OWNER(trucocl_state, trucocl)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 /***************************************************************************

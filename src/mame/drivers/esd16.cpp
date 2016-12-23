@@ -28,14 +28,15 @@ Year + Game            PCB             Notes
 00  Deluxe 5           ESD            (no date is marked on PCB)
 00  Tang Tang          ESD            (no date is marked on PCB)
 01  SWAT Police        ESD            (no date is marked on PCB)
-01  Jumping Pop        ESD 11-09-98   (also original version by Emag Soft)
+01  Jumping Pop        ESD 11-09-98   (version by Emag Soft)
+01  Jumping Pop        ESD 12-04-00   (ESD branded version)
 ---------------------------------------------------------------------------
 
 Other ESD games:
 
 3 Cushion Billiards (c) 2000 - Undumped
 Tang Tang           (c) 2000 - Undumped ESD 05-28-99 version
-Fire Hawk           (c) 2001 - see nmk16.c driver
+Fire Hawk           (c) 2001 - see nmk16.cpp driver
 
 Head Panic
 - Nude / Bikini pics don't show in-game, even when set in test mode?
@@ -69,7 +70,6 @@ ToDo:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
-#include "machine/eepromser.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
 #include "includes/esd16.h"
@@ -87,7 +87,7 @@ WRITE16_MEMBER(esd16_state::esd16_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(0, ASSERT_LINE);      // Generate an IRQ
 		space.device().execute().spin_until_time(attotime::from_usec(50));  // Allow the other CPU to reply
 	}
@@ -250,7 +250,7 @@ READ8_MEMBER(esd16_state::esd16_sound_command_r)
 {
 	/* Clear IRQ only after reading the command, or some get lost */
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(space, 0);
+	return m_soundlatch->read(space, 0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, AS_IO, 8, esd16_state )
@@ -582,7 +582,7 @@ GFXDECODE_END
 
 void esd16_state::machine_start()
 {
-	UINT8 *AUDIO = memregion("audiocpu")->base();
+	uint8_t *AUDIO = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 16, &AUDIO[0x0000], 0x4000);
 
@@ -632,7 +632,6 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 	MCFG_DECO_SPRITE_PRIORITY_CB(esd16_state, hedpanic_pri_callback)
 	MCFG_DECO_SPRITE_FLIPALLX(1)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", esd16)
 	MCFG_PALETTE_ADD("palette", 0x1000/2)
@@ -641,6 +640,8 @@ static MACHINE_CONFIG_START( esd16, esd16_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)   /* 4MHz */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -737,7 +738,7 @@ ESD 11-09-98
 (C) ESD 1998, 1999
 PCB No. ESD 11-09-98
 CPU: MC68HC000FN16 (68000, 68 pin PLCC socketed)
-SND: Z80 (Z0840006PSC), YM3812/YM3014 & OKI M6295 (rebaged as U6612/U6614 & AD-65)
+SND: Z80 (Z0840006PSC), YM3812/YM3014 & OKI M6295 (rebadged as U6612/U6614 & AD-65)
 OSC: 16.000MHz, 14.000MHz
 RAM: 4 x 62256, 9 x 6116
 DIPS: 2 x 8 position
@@ -1088,7 +1089,7 @@ ROM_START( hedpanic ) /* Story line & game instructions in English */
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
 
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
 ROM_END
 
@@ -1115,7 +1116,7 @@ ROM_START( hedpanicf ) /* Story line in Japanese, game instructions in English *
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x000000, 0x020000, CRC(3c11c590) SHA1(cb33845c3dc0501fff8055c2d66f412881089df1) ) /* AT27010 mask rom */
 
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
 ROM_END
 
@@ -1142,7 +1143,7 @@ ROM_START( hedpanico ) /* Story line & game instructions in English, copyright y
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.rom", 0x000000, 0x020000, CRC(d7ca6806) SHA1(8ad668bfb5b7561cc0f3e36dfc3c936b136a4274) ) /* SU10 */
 
-	ROM_REGION( 0x80, "eeprom", 0 )
+	ROM_REGION16_BE( 0x80, "eeprom", 0 )
 	ROM_LOAD( "hedpanic.nv", 0x0000, 0x0080, CRC(e91f4038) SHA1(f492de71170900f87912a272ab4f4a3a37ba31fe) )
 ROM_END
 
@@ -1266,6 +1267,31 @@ ROM_START( deluxe5b ) /* Deluxe 5 */
 	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
 ROM_END
+
+
+ROM_START( deluxe4u ) /* Deluxe 4 U - Removes Blackjack game, but otherwise same as Deluxe 5 */
+	ROM_REGION( 0x080000, "maincpu", 0 )        /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.cu02", 0x000000, 0x040000,  CRC(db213e1f) SHA1(bf9c49635f79b92a761715138528200106aa86ae) )
+	ROM_LOAD16_BYTE( "1.cu03", 0x000001, 0x040000,  CRC(fbf14d74) SHA1(5ff5bf4ff55609452d5b8a49d8658f878541ce60) )
+
+	ROM_REGION( 0x40000, "audiocpu", 0 )        /* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x40000, CRC(31de379a) SHA1(a0c9a9cec7207cc4ba33abb68bef62d7eb8e75e9) ) /* AM27C020 mask rom */
+
+	ROM_REGION( 0x180000, "spr", 0 )    /* Sprites, 16x16x5 */
+	ROM_LOAD16_BYTE( "am27c020.ju06", 0x000000, 0x040000, CRC(8b853bce) SHA1(fa6e654fc965d88bb426b76cdce3417f357b25f3) ) /* AM27C020 mask roms with no label */
+	ROM_LOAD16_BYTE( "am27c020.ju05", 0x000001, 0x040000, CRC(bbe81779) SHA1(750387fb4aaa04b7f4f1d3985896f5e11219e3ea) )
+	ROM_LOAD16_BYTE( "am27c020.ju04", 0x080000, 0x040000, CRC(40fa2c2f) SHA1(b9d9bfdc9343f00bad9749c76472f064c509cfce) )
+	ROM_LOAD16_BYTE( "am27c020.ju03", 0x080001, 0x040000, CRC(aa130fd3) SHA1(46a55d8ca59a52e610600fdba76d9729528d2871) )
+	ROM_LOAD16_BYTE( "am27c020.ju07", 0x100000, 0x040000, CRC(d414c3af) SHA1(9299b07a8c7a3e30a1bb6028204a049a7cb510f7) )
+
+	ROM_REGION( 0x400000, "bgs", 0 )    /* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "fu35", 0x000000, 0x200000, CRC(6df14570) SHA1(fa4fc64c984d6a94fe61ec809ec515e840388704) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
+	ROM_LOAD16_BYTE( "fu34", 0x000001, 0x200000, CRC(93175d6d) SHA1(691832134f43e17bb767dff080b2736288961414) ) /* Specific to Deluxe 4 U - No labels on the flash roms  */
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "esd4.su10", 0x00000, 0x20000, CRC(23f2b7d9) SHA1(328c951d14674760df68486841c933bad0d59fe3) ) /* AT27C010 mask rom */
+ROM_END
+
 
 /* Tang Tang
 
@@ -1425,6 +1451,7 @@ ESD, 2001
 PCB Layout
 ----------
 
+ESD 12-04-00
 |------------------------------------------------------|
 | TDA1519A                62256         PAL            |
 | SAMPLES.BIN YM3014      62256         BG0.BIN        |
@@ -1564,7 +1591,7 @@ GAME( 1999, multchmp, 0,        esd16,    multchmp, driver_device, 0, ROT0, "ESD
 GAME( 1998, multchmpk,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (Korea, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1998, multchmpa,multchmp, esd16,    multchmp, driver_device, 0, ROT0, "ESD",         "Multi Champ (World, older)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE ) /* Redesigned(?) ESD 11-09-98 with no ID# */
+GAME( 2001, jumppop,  0,        jumppop,  jumppop, driver_device,  0, ROT0, "ESD",         "Jumping Pop (set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, jumppope, jumppop,  jumppop,  jumppop, driver_device,  0, ROT0, "Emag Soft",   "Jumping Pop (set 2)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD 05-28-99 */
@@ -1578,9 +1605,10 @@ GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, driver_device, 0, ROT0, "ESD
 GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, driver_device, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", MACHINE_SUPPORTS_SAVE )
 
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
-GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 3 sets report the same version number?
+GAME( 2000, deluxe5,  0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 1)", MACHINE_SUPPORTS_SAVE ) // all 4 sets report the same version number?
 GAME( 2000, deluxe5a, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 2000, deluxe5b, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 5 (ver. 0107, 07/01/2000, set 3)", MACHINE_SUPPORTS_SAVE )
+GAME( 2000, deluxe4u, deluxe5,  tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Deluxe 4 U (ver. 0107, 07/01/2000)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, driver_device, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", MACHINE_SUPPORTS_SAVE )
 GAME( 2001, swatpolc, 0,        hedpanic, swatpolc, driver_device, 0, ROT0, "ESD",         "SWAT Police", MACHINE_SUPPORTS_SAVE )

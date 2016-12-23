@@ -6,9 +6,10 @@
 
 #include "CopyCoder.h"
 
-static void *CreateCodec() { return (void *)(ICompressCoder *)(new NCompress::CCopyCoder); }
+namespace NCompress {
 
-static CCodecInfo g_CodecInfo =
-{ CreateCodec, CreateCodec, 0x00, L"Copy", 1, false };
+REGISTER_CODEC_CREATE(CreateCodec, CCopyCoder())
 
-REGISTER_CODEC(Copy)
+REGISTER_CODEC_2(Copy, CreateCodec, CreateCodec, 0, "Copy")
+
+}

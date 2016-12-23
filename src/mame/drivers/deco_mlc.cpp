@@ -100,7 +100,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/decocrpt.h"
+#include "machine/deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
@@ -172,7 +172,7 @@ READ32_MEMBER(deco_mlc_state::mlc_scanline_r)
 WRITE32_MEMBER(deco_mlc_state::avengrs_eprom_w)
 {
 	if (ACCESSING_BITS_8_15) {
-		UINT8 ebyte=(data>>8)&0xff;
+		uint8_t ebyte=(data>>8)&0xff;
 //      if (ebyte&0x80) {
 			m_eeprom->clk_write((ebyte & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 			m_eeprom->di_write(ebyte & 0x1);
@@ -239,14 +239,14 @@ READ32_MEMBER(deco_mlc_state::mlc_vram_r)
 
 READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 {
-	UINT32 retdata = 0;
+	uint32_t retdata = 0;
 
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 		retdata |= 0xffff0000;
 	}
 
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		retdata |= m_mlc_spriteram[offset];
 	}
@@ -257,11 +257,11 @@ READ32_MEMBER( deco_mlc_state::mlc_spriteram_r )
 
 WRITE32_MEMBER( deco_mlc_state::mlc_spriteram_w )
 {
-	if (mem_mask & 0xffff0000)
+	if (ACCESSING_BITS_16_31)
 	{
 	}
 
-	if (mem_mask & 0x0000ffff)
+	if (ACCESSING_BITS_0_15)
 	{
 		data &=0x0000ffff;
 		COMBINE_DATA(&m_mlc_spriteram[offset]);
@@ -272,8 +272,8 @@ READ16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco146->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco146->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -281,14 +281,14 @@ WRITE16_MEMBER( deco_mlc_state::sh96_protection_region_0_146_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco146->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
 
 /******************************************************************************/
 
-static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
+static ADDRESS_MAP_START( avengrgs_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x0000000, 0x00fffff) AM_ROM AM_MIRROR(0xff000000)
 	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram") AM_MIRROR(0xff000000)
 	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r) AM_MIRROR(0xff000000)
@@ -308,7 +308,29 @@ static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
 	AM_RANGE(0x044001c, 0x044001f) AM_READWRITE(mlc_44001c_r, mlc_44001c_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w) AM_MIRROR(0xff000000)
 	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff000000) AM_MIRROR(0xff000000)
-	AM_RANGE(0x070f000, 0x070ffff) AM_READWRITE16(sh96_protection_region_0_146_r, sh96_protection_region_0_146_w, 0xffff0000) AM_MIRROR(0xff000000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( decomlc_map, AS_PROGRAM, 32, deco_mlc_state )
+	AM_RANGE(0x0000000, 0x00fffff) AM_ROM
+	AM_RANGE(0x0100000, 0x011ffff) AM_RAM AM_SHARE("mlc_ram")
+	AM_RANGE(0x0200000, 0x0200003) AM_READ(mlc_200000_r)
+	AM_RANGE(0x0200004, 0x0200007) AM_READ(mlc_200004_r)
+	AM_RANGE(0x0200070, 0x0200073) AM_READ(mlc_200070_r)
+	AM_RANGE(0x0200074, 0x0200077) AM_READ(mlc_scanline_r)
+	AM_RANGE(0x020007c, 0x020007f) AM_READ(mlc_20007c_r)
+	AM_RANGE(0x0200000, 0x020007f) AM_WRITE(mlc_irq_w) AM_SHARE("irq_ram")
+	AM_RANGE(0x0200080, 0x02000ff) AM_RAM AM_SHARE("mlc_clip_ram")
+	AM_RANGE(0x0204000, 0x0206fff) AM_READWRITE( mlc_spriteram_r, mlc_spriteram_w )
+	AM_RANGE(0x0280000, 0x029ffff) AM_RAM AM_SHARE("mlc_vram")
+	AM_RANGE(0x0300000, 0x0307fff) AM_RAM_WRITE(avengrs_palette_w) AM_SHARE("paletteram")
+	AM_RANGE(0x0400000, 0x0400003) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x0440000, 0x0440003) AM_READ_PORT("INPUTS2")
+	AM_RANGE(0x0440004, 0x0440007) AM_READ_PORT("INPUTS3")
+	AM_RANGE(0x0440008, 0x044000b) AM_READ(mlc_440008_r)
+	AM_RANGE(0x044001c, 0x044001f) AM_READWRITE(mlc_44001c_r, mlc_44001c_w)
+	AM_RANGE(0x0500000, 0x0500003) AM_WRITE(avengrs_eprom_w)
+	AM_RANGE(0x0600000, 0x0600007) AM_DEVREADWRITE8("ymz", ymz280b_device, read, write, 0xff000000)
+	AM_RANGE(0x070f000, 0x070ffff) AM_READWRITE16(sh96_protection_region_0_146_r, sh96_protection_region_0_146_w, 0xffff0000)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -482,7 +504,7 @@ static MACHINE_CONFIG_START( avengrgs, deco_mlc_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
-	MCFG_CPU_PROGRAM_MAP(decomlc_map)
+	MCFG_CPU_PROGRAM_MAP(avengrgs_map)
 
 	MCFG_MACHINE_RESET_OVERRIDE(deco_mlc_state,mlc)
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom") /* Actually 93c45 */
@@ -824,15 +846,15 @@ ROM_END
 void deco_mlc_state::descramble_sound(  )
 {
 	/* the same as simpl156 / heavy smash? */
-	UINT8 *rom = memregion("ymz")->base();
+	uint8_t *rom = memregion("ymz")->base();
 	int length = memregion("ymz")->bytes();
-	dynamic_buffer buf1(length);
+	std::vector<uint8_t> buf1(length);
 
-	UINT32 x;
+	uint32_t x;
 
 	for (x=0;x<length;x++)
 	{
-		UINT32 addr;
+		uint32_t addr;
 
 		addr = BITSWAP24 (x,23,22,21,0, 20,
 							19,18,17,16,
@@ -849,8 +871,8 @@ void deco_mlc_state::descramble_sound(  )
 
 READ32_MEMBER(deco_mlc_state::avengrgs_speedup_r)
 {
-	UINT32 a=m_mlc_ram[0x89a0/4];
-	UINT32 p=space.device().safe_pc();
+	uint32_t a=m_mlc_ram[0x89a0/4];
+	uint32_t p=space.device().safe_pc();
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) space.device().execute().spin_until_interrupt();
 

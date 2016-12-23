@@ -1,21 +1,28 @@
 // license:BSD-3-Clause
 // copyright-holders:Kevin Horton,Jonathan Gevaryahu,Sandro Ronco,hap
+// thanks-to:Berger
 /******************************************************************************
 
     Fidelity Electronics Z80 based board driver
-    for 6502 based boards, see drivers/fidel6502.cpp (documentation is in this driver)
+    for 6502 based boards, see drivers/fidel6502.cpp
+    for 68000 based boards, see drivers/fidel68k.cpp
+
+    NOTE: MAME doesn't include a generalized implementation for boardpieces yet,
+    greatly affecting user playability of emulated electronic board games.
+    As workaround for the chess games, use an external chess GUI on the side,
+    such as Arena(in editmode).
 
     TODO:
-    - Figure out why it says the first speech line twice; it shouldn't?
-      It sometimes does this on Voice Sensory Chess Challenger real hardware.
-      It can also be heard on Advanced Voice Chess Challenger real hardware, but not the whole line:
-      "I I am Fidelity's chess challenger", instead.
-    - correctly hook up VBRC speech so that the z80 is halted while words are being spoken
+    - Our i8255 device emulation writes $FF to ports A/B on reset, causing a bug
+      with speech at boot for VCC and UVC. The core problem is lack of tri-state
+      pins emulation(with pullup/pulldown), for now there's a workaround which
+      can be removed together with this note when we implement it across MAME.
+    - VBRC card scanner
+    - VBRC MCU T1 is unknown
+    - Z80 WAIT pin is not fully emulated, affecting VBRC speech busy state
 
-    Chess pieces are required, but theoretically blindfold chess is possible.
-    Chessboard artwork is provided for boards with pressure/magnet sensors.
     Read the official manual(s) on how to play.
-    
+
     Keypad legend:
     - RE: Reset
     - CL: Clear
@@ -28,21 +35,21 @@
     - RV: Reverse
     - ST: Set/Stop
     - TM: Time
-    
+
     Peripherals, compatible with various boards:
-    - Fidelity Challenger Printer - thermal printer, MCU=?
-    
+    - Fidelity Challenger Printer - thermal printer, MCU=D8048C243
+
     Program/data cartridges, for various boards, some cross-compatible:
     - CG6: Greatest Chess Games 1
     - CAC: Challenger Advanced Chess - 8KB 101-1038A01
-    - CB9: Challenger Book Openings 1 - 8KB?
+    - CB9: Challenger Book Openings 1 - 8KB (label not known)
     - CB16: Challenger Book Openings 2 - 8+8KB 101-1042A01,02
     - others are alt. titles of these?
-    
+
     Board hardware descriptions below.
     Detailed RE work done by Kevin 'kevtris' Horton, except where noted
 
-***********************************************************************
+******************************************************************************
 
 Voice Chess Challenger (VCC) (version A and B?)
 Advanced Voice Chess Challenger (UVC)
@@ -51,7 +58,6 @@ Decorator Challenger (FCC)
 
 (which share the same hardware)
 ----------------------
-
 The CPU is a Z80 running at 4MHz.  The TSI chip runs at around 25KHz, using a
 470K / 100pf RC network.  This system is very very basic, and is composed of just
 the Z80, 4 ROMs, the TSI chip, and an 8255.
@@ -79,14 +85,12 @@ Memory map (UVC):
 4000-5FFF: 1K RAM (2114 SRAM x2)
 6000-FFFF: empty
 
-I/O map:
---------
+Port map:
+---------
 00-03: 8255 port chip, mirrored over the 00-FF range; program accesses F4-F7
-
 
 8255 connections:
 -----------------
-
 PA.0 - segment G, TSI A0 (W)
 PA.1 - segment F, TSI A1 (W)
 PA.2 - segment E, TSI A2 (W)
@@ -115,19 +119,15 @@ PC.5 - button column B (W)
 PC.6 - button column C (W)
 PC.7 - button column D (W)
 
-
 language switches:
 ------------------
-
 When PB.6 is pulled low, the language switches can be read.  There are four.
 They connect to the button rows.  When enabled, the row(s) will read low if
 the jumper is present.  English only VCC's do not have the 367 or any pads stuffed.
 The jumpers are labelled: French, German, Spanish, and special.
 
-
 language latch:
 ---------------
-
 There's an unstuffed 7474 on the board that connects to PA.6 and PA.7.  It allows
 one to latch the state of A12 to the speech ROM.  The English version has the chip
 missing, and a jumper pulling "A12" to ground.  This line is really a negative
@@ -143,11 +143,10 @@ automatically select the correct ROM(s).  I have to test whether it will do auto
 determination and give you a language option on power up or something.
 
 
-***********************************************************************
+******************************************************************************
 
-Chess Challenger 10
+Chess Challenger 10 (CC10)
 -------------------
-
 4 versions are known to exist: A,B,C,D. Strangely, version C has an 8080
 instead of Z80. Chess Challenger 1,3 and 7 also run on very similar hardware.
 
@@ -158,7 +157,6 @@ the connections to ports A and B on the PPI:
 
 8255 connections:
 -----------------
-
 PA.0 - segment G (W)
 PA.1 - segment F (W)
 PA.2 - segment E (W)
@@ -193,6 +191,38 @@ PC.7 - button column D (W)
 
 ******************************************************************************
 
+Chess Challenger 7 (BCC)
+------------------------
+RE information from netlist by Berger
+
+Zilog Z80A, 3.579MHz from XTAL
+Z80 IRQ/NMI unused, no timer IC.
+This is a cost-reduced design from CC10, no special I/O chips.
+
+Memory map:
+-----------
+0000-0FFF: 4K 2332 ROM CN19103N BCC-REVB.
+2000-2FFF: ROM/RAM bus conflict!
+3000-3FFF: 256 bytes RAM (2111 SRAM x2)
+4000-FFFF: Z80 A14/A15 not connected
+
+Port map (Write):
+---------
+D0-D3: digit select and keypad mux
+D4: LOSE led
+D5: CHECK led
+A0-A2: NE591 A0-A2
+D7: NE591 D (_C not used)
+NE591 Q0-Q6: digit segments A-G
+NE591 Q7: buzzer
+
+Port map (Read):
+---------
+D0-D3: keypad row
+
+
+******************************************************************************
+
 Voice Bridge Challenger (Model VBRC, later reissued as Model 7002)
 and Bridge Challenger 3 (Model 7014)
 (which both share the same* hardware)
@@ -216,7 +246,6 @@ The 8041 runs at 5MHz.
 
 Memory Map:
 -----------
-
 0000-1FFF: 8K 101-64108 ROM
 2000-3FFF: 8K 101-64109 ROM
 4000-5FFF: 8K 101-64110 ROM
@@ -230,15 +259,12 @@ when the word is done being spoken.  This is because D0-D5 run to the TSI chip d
 The TSI chip's ROM is 4K, and is marked 101-32118.  The clock is the same as the Chess
 Challengers- 470K/100pf which gives a frequency around 25KHz or so.
 
-I/O Map:
---------
-
+Port Map:
+---------
 00-FF: 8041 I/O ports (A0 selects between the two)
-
 
 8041 pinout:
 ------------
-
 (note: columns are pulled up with 10K resistors)
 
 P10 - column H, RD LED, VFD grid 0
@@ -264,10 +290,8 @@ PROG - I/O expander
 T0 - optical card sensor (high = bright/reflective, low = dark/non reflective)
 T1 - connects to inverter, then nothing?
 
-
 D8243C I/O expander:
 --------------------
-
 P4.0 - segment M
 P4.1 - segment L
 P4.2 - segment N
@@ -288,10 +312,8 @@ P7.1 - goes through inverter, to pads that are not used
 P7.2 - segment C
 P7.3 - segment H
 
-
 button matrix:
 --------------
-
 the matrix is composed of 8 columns by 4 rows.
 
      A  B  C  D     E  F  G  H
@@ -332,159 +354,14 @@ A detailed description of the hardware can be found also in the patent 4,373,719
 
 ******************************************************************************
 
-Champion Sensory Chess Challenger (CSC)
----------------------------------------
-
-Memory map:
------------
-
-0000-07FF: 2K of RAM
-0800-0FFF: 1K of RAM (note: mirrored twice)
-1000-17FF: PIA 0 (display, TSI speech chip)
-1800-1FFF: PIA 1 (keypad, LEDs)
-2000-3FFF: 101-64019 ROM (also used on the regular sensory chess challenger)
-4000-7FFF: mirror of 0000-3FFF
-8000-9FFF: not used
-A000-BFFF: 101-1025A03 ROM
-C000-DFFF: 101-1025A02 ROM
-E000-FDFF: 101-1025A01 ROM
-FE00-FFFF: 512 byte 74S474 PROM
-
-CPU is a 6502 running at 1.95MHz (3.9MHz resonator, divided by 2)
-
-NMI is not used.
-IRQ is connected to a 600Hz oscillator (38.4KHz divided by 64).
-Reset is connected to a power-on reset circuit.
-
-
-PIA 0:
-------
-
-PA0 - 7seg segments E, TSI A0
-PA1 - 7seg segments D, TSI A1
-PA2 - 7seg segments C, TSI A2
-PA3 - 7seg segments H, TSI A3
-PA4 - 7seg segments G, TSI A4
-PA5 - 7seg segments F, TSI A5
-PA6 - 7seg segments B
-PA7 - 7seg segments A
-
-PB0 - A12 on speech ROM (if used... not used on this model, ROM is 4K)
-PB1 - START line on TSI
-PB2 - white wire
-PB3 - BUSY line from TSI
-PB4 - hi/lo TSI speaker volume
-PB5 - button row 9
-PB6 - selection jumper (resistor to 5V)
-PB7 - selection jumper (resistor to ground)
-
-CA1 - NC
-CA2 - violet wire
-
-CB1 - NC
-CB2 - NC (connects to pin 14 of soldered connector)
-
-
-PIA 1:
-------
-
-PA0 - button row 1
-PA1 - button row 2
-PA2 - button row 3
-PA3 - button row 4
-PA4 - button row 5
-PA5 - button row 6
-PA6 - 7442 selector bit 0
-PA7 - 7442 selector bit 1
-
-PB0 - LED row 1
-PB1 - LED row 2
-PB2 - LED row 3
-PB3 - LED row 4
-PB4 - LED row 5
-PB5 - LED row 6
-PB6 - LED row 7
-PB7 - LED row 8
-
-CA1 - button row 7
-CA2 - selector bit 3
-
-CB1 - button row 8
-CB2 - selector bit 2
-
-
-Selector: (attached to PIA 1, outputs 1 of 10 pins low.  7442)
----------
-
-output # (selected turns this column on, and all others off)
-0 - LED column A, button column A, 7seg digit 1
-1 - LED column B, button column B, 7seg digit 2
-2 - LED column C, button column C, 7seg digit 3
-3 - LED column D, button column D, 7seg digit 4
-4 - LED column E, button column E
-5 - LED column F, button column F
-6 - LED column G, button column G
-7 - LED column H, button column H
-8 - button column I
-9 - Tone line (toggle to make a tone in the buzzer)
-
-The rows/columns are indicated on the game board:
-
- ABCDEFGH   I
---------------
-|            | 8
-|            | 7
-|            | 6
-|            | 5
-|            | 4
-|            | 3
-|            | 2
-|            | 1
---------------
-
-The "lone LED" is above the control column.
-column I is the "control column" on the right for starting a new game, etc.
-
-The upper 6 buttons are connected as such:
-
-column A - speak
-column B - RV
-column C - TM
-column D - LV
-column E - DM
-column F - ST
-
-these 6 buttons use row 9 (connects to PIA 0)
-
-
-LED display:
-------------
-
-43 21 (digit number)
------
-88:88
-
-The LED display is four 7 segment digits.  normal ABCDEFG lettering is used for segments.
-
-The upper dot is connected to digit 3 common
-The lower dot is connected to digit 4 common
-The lone LED is connected to digit 1 common
-
-All three of the above are called "segment H".
-
-
-***********************************************************************
-
 Voice Sensory Chess Challenger (VSC)
 ------------------------------------
-
-The display/button/LED/speech technology is identical to the above product.
+The display/button/LED/speech technology is identical to Fidelity CSC.
 Only the CPU board was changed.  As such, it works the same but is interfaced
 to different port chips this time.
 
 Hardware:
 ---------
-
 On the board are 13 chips.
 
 The CPU is a Z80A running at 3.9MHz, with 20K of ROM and 1K of RAM mapped.
@@ -508,17 +385,15 @@ RST connects to a power-on reset circuit
 
 Memory map:
 -----------
-
 0000-1FFF: 8K ROM 101-64018
 2000-3FFF: 8K ROM 101-64019 (also used on the sensory champ. chess challenger)
 4000-5FFF: 4K ROM 101-32024
 6000-7FFF: 1K of RAM (2114 * 2)
 8000-FFFF: not used, maps to open bus
 
-I/O map:
---------
-
-There's only two chips in the I/O map, an 8255 triple port chip, and a Z80A PIO
+Port map:
+---------
+There's only two chips in the portmap, an 8255 triple port chip, and a Z80A PIO
 parallel input/output device.
 
 Decoding isn't performed using a selector, but instead address lines are used.
@@ -548,13 +423,11 @@ This sequence repeats every 16 addresses.  So to recap:
 
 10-FF: mirrors of 00-0F.
 
-Refer to the Sensory Champ. Chess Chall. above for explanations of the below
+Refer to the Sensory Champ. Chess Chall. for explanations of the below
 I/O names and labels.  It's the same.
-
 
 8255:
 -----
-
 PA.0 - segment D, TSI A0
 PA.1 - segment E, TSI A1
 PA.2 - segment F, TSI A2
@@ -582,10 +455,8 @@ PC.5 - LED column F, button column F
 PC.6 - LED column G, button column G
 PC.7 - LED column H, button column H
 
-
 Z80A PIO:
 ---------
-
 PA.0 - button row 1
 PA.1 - button row 2
 PA.2 - button row 3
@@ -604,10 +475,8 @@ PB.5 - selection jumper input (see below)
 PB.6 - TSI start line
 PB.7 - TSI ROM A12 line
 
-
 selection jumpers:
 ------------------
-
 These act like another row of buttons.  It is composed of two diode locations,
 so there's up to 4 possible configurations.  My board does not have either diode
 stuffed, so this most likely is "English".  I suspect it selects which language to use
@@ -618,102 +487,22 @@ Anyways, the two jumpers are connected to button columns A and B and the common
 connects to Z80A PIO PB.5, which basically makes a 10th button row.  I would
 expect that the software reads these once on startup only.
 
-
-******************************************************************************
-
-Sensory Chess Challenger (SC12-B)
-4 versions are known to exist: A,B,C, and X, with increasing CPU speed.
----------------------------------
-
-RE information from netlist by Berger
-
-8*(8+1) buttons, 8+8+2 red LEDs
-DIN 41524C printer port
-36-pin edge connector
-CPU is a R65C02P4, running at 4MHz
-
-NE556 dual-timer IC:
-- timer#1, one-shot at power-on, to CPU _RESET
-- timer#2: R1=82K, R2=1K, C=22nf, to CPU _IRQ: ~780Hz, active low=15.25us
-
-
-Memory map:
------------
-
-6000-0FFF: 4K of RAM (2016 * 2)
-2000-5FFF: cartridge
-6000-7FFF: control(W)
-8000-9FFF: 8K ROM SSS SCM23C65E4
-A000-BFFF: keypad(R)
-C000-DFFF: 4K ROM TI TMS2732AJL-45
-E000-FFFF: 8K ROM Toshiba TMM2764D-2
-
-control: (74LS377)
---------
-
-Q0-Q3: 7442 A0-A3
-Q4: enable printer port pin 1 input
-Q5: printer port pin 5 output
-Q6,Q7: LEDs common anode
-
-7442 0-8: input mux and LEDs cathode
-7442 9: buzzer
-
-The keypad is read through a 74HC251, where S0,1,2 is from CPU A0,1,2, Y is connected to CPU D7.
-If control Q4 is set, printer data can be read from I0.
-
-
-******************************************************************************
-
-Voice Excellence (FEV, model 6092)
-----------------------------------
-
-PCB 1: 510.1117A02, appears to be identical to other "Excellence" boards
-CPU: GTE G65SC102P-3, 32 KB PRG ROM: AMI 101-1080A01(IC5), 8192x8 SRAM SRM2264C10(IC6)
-2 rows of LEDs on the side: 1*8 green, 1*8 red
-
-PCB 2: 510.1117A01
-Speech: TSI S14001A, 32 KB ROM: AMI 101-1081A01(IC2)
-Dip Switches set ROM A13 and ROM A14, on the side of the tablet
-
-ROM A12 is tied to S14001A's A11 (yuck)
-ROM A11 is however tied to the CPU's XYZ
-
-0000_07FF - Spanish 1/4
-0800_0FFF - Spanish 3/4
-1000_17FF - Spanish 2/4
-1800_1FFF - Spanish 4/4
-
-2000_27FF - French 1/4
-2800_2FFF - French 3/4
-3000_3FFF - French 2/4
-3800_3FFF - French 4/4
-
-4000_47FF - German 1/4
-4800_4FFF - German 3/4
-5000_57FF - German 2/4
-5800_5FFF - German 4/4
-
-6000_67FF - English 1/2
-6800_6FFF - Bridge Challenger 1/2
-7000_77FF - English 2/2
-7800_7FFF - Bridge Challenger 2/2
-
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/fidelz80.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "machine/i8255.h"
 #include "machine/i8243.h"
 #include "machine/z80pio.h"
 #include "sound/beep.h"
-
-#include "includes/fidelz80.h"
+#include "sound/volt_reg.h"
 
 // internal artwork
-#include "fidel_cc.lh"
-#include "fidel_vcc.lh"
+#include "fidel_cc.lh" // clickable
+#include "fidel_bcc.lh" // clickable
+#include "fidel_vcc.lh" // clickable
 #include "fidel_vbrc.lh"
 #include "fidel_vsc.lh" // clickable
 
@@ -741,7 +530,7 @@ public:
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 
-	// model VCC/UVC/CC10
+	// CC10 and VCC/UVC
 	void vcc_prepare_display();
 	DECLARE_READ8_MEMBER(vcc_speech_r);
 	DECLARE_WRITE8_MEMBER(vcc_ppi_porta_w);
@@ -751,8 +540,13 @@ public:
 	DECLARE_WRITE8_MEMBER(vcc_ppi_portc_w);
 	DECLARE_WRITE8_MEMBER(cc10_ppi_porta_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(beeper_off_callback);
+	DECLARE_MACHINE_START(vcc);
 
-	// model VSC
+	// BCC
+	DECLARE_READ8_MEMBER(bcc_input_r);
+	DECLARE_WRITE8_MEMBER(bcc_control_w);
+
+	// VSC
 	void vsc_prepare_display();
 	DECLARE_READ8_MEMBER(vsc_io_trampoline_r);
 	DECLARE_WRITE8_MEMBER(vsc_io_trampoline_w);
@@ -763,11 +557,12 @@ public:
 	DECLARE_READ8_MEMBER(vsc_pio_portb_r);
 	DECLARE_WRITE8_MEMBER(vsc_pio_portb_w);
 
-	// model 7014 and VBC
+	// VBRC
 	void vbrc_prepare_display();
 	DECLARE_WRITE8_MEMBER(vbrc_speech_w);
 	DECLARE_WRITE8_MEMBER(vbrc_mcu_p1_w);
-	DECLARE_READ8_MEMBER(vbrc_mcu_t_r);
+	DECLARE_READ8_MEMBER(vbrc_mcu_t0_r);
+	DECLARE_READ8_MEMBER(vbrc_mcu_t1_r);
 	DECLARE_READ8_MEMBER(vbrc_mcu_p2_r);
 	DECLARE_WRITE8_MEMBER(vbrc_ioexp_port_w);
 };
@@ -787,6 +582,7 @@ void fidelz80base_state::machine_start()
 	m_led_select = 0;
 	m_led_data = 0;
 	m_7seg_data = 0;
+	m_speech_data = 0;
 	m_speech_bank = 0;
 
 	// register for savestates
@@ -803,6 +599,7 @@ void fidelz80base_state::machine_start()
 	save_item(NAME(m_led_select));
 	save_item(NAME(m_led_data));
 	save_item(NAME(m_7seg_data));
+	save_item(NAME(m_speech_data));
 	save_item(NAME(m_speech_bank));
 }
 
@@ -823,7 +620,7 @@ void fidelz80base_state::machine_reset()
 
 void fidelz80base_state::display_update()
 {
-	UINT32 active_state[0x20];
+	uint32_t active_state[0x20];
 
 	for (int y = 0; y < m_display_maxy; y++)
 	{
@@ -836,7 +633,7 @@ void fidelz80base_state::display_update()
 				m_display_decay[y][x] = m_display_wait;
 
 			// determine active state
-			UINT32 ds = (m_display_decay[y][x] != 0) ? 1 : 0;
+			uint32_t ds = (m_display_decay[y][x] != 0) ? 1 : 0;
 			active_state[y] |= (ds << x);
 		}
 	}
@@ -891,24 +688,36 @@ void fidelz80base_state::set_display_size(int maxx, int maxy)
 	m_display_maxy = maxy;
 }
 
-void fidelz80base_state::display_matrix(int maxx, int maxy, UINT32 setx, UINT32 sety)
+void fidelz80base_state::set_display_segmask(uint32_t digits, uint32_t mask)
+{
+	// set a segment mask per selected digit, but leave unselected ones alone
+	for (int i = 0; i < 0x20; i++)
+	{
+		if (digits & 1)
+			m_display_segmask[i] = mask;
+		digits >>= 1;
+	}
+}
+
+void fidelz80base_state::display_matrix(int maxx, int maxy, uint32_t setx, uint32_t sety, bool update)
 {
 	set_display_size(maxx, maxy);
 
 	// update current state
-	UINT32 mask = (1 << maxx) - 1;
+	uint32_t mask = (1 << maxx) - 1;
 	for (int y = 0; y < maxy; y++)
 		m_display_state[y] = (sety >> y & 1) ? ((setx & mask) | (1 << maxx)) : 0;
 
-	display_update();
+	if (update)
+		display_update();
 }
 
 
 // generic input handlers
 
-UINT16 fidelz80base_state::read_inputs(int columns)
+uint16_t fidelz80base_state::read_inputs(int columns)
 {
-	UINT16 ret = 0;
+	uint16_t ret = 0;
 
 	// read selected input rows
 	for (int i = 0; i < columns; i++)
@@ -928,6 +737,26 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 }
 
 
+// cartridge
+
+DEVICE_IMAGE_LOAD_MEMBER(fidelz80base_state, scc_cartridge)
+{
+	uint32_t size = m_cart->common_get_size("rom");
+
+	// max size is 16KB?
+	if (size > 0x4000)
+	{
+		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid file size");
+		return image_init_result::FAIL;
+	}
+
+	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
+	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
+
+	return image_init_result::PASS;
+}
+
+
 
 // Devices, I/O
 
@@ -939,12 +768,9 @@ INPUT_CHANGED_MEMBER(fidelz80_state::reset_button)
 
 void fidelz80_state::vcc_prepare_display()
 {
-	// 4 7seg leds
-	for (int i = 0; i < 4; i++)
-		m_display_segmask[i] = 0x7f;
-
-	// note: sel d0 for extra leds
-	UINT8 outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	// 4 7seg leds (note: sel d0 for extra leds)
+	uint8_t outdata = (m_7seg_data & 0x7f) | (m_led_select << 7 & 0x80);
+	set_display_segmask(0xf, 0x7f);
 	display_matrix(8, 4, outdata, m_led_select >> 2 & 0xf);
 }
 
@@ -953,11 +779,24 @@ READ8_MEMBER(fidelz80_state::vcc_speech_r)
 	return m_speech_rom[m_speech_bank << 12 | offset];
 }
 
+MACHINE_START_MEMBER(fidelz80_state,vcc)
+{
+	machine_start();
+
+	// game relies on RAM initialized filled with 1
+	for (int i = 0; i < 0x400; i++)
+		m_maincpu->space(AS_PROGRAM).write_byte(i + 0x4000, 0xff);
+}
+
 
 // I8255 PPI
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_porta_w)
 {
+	// pull output low during reset (see TODO)
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
 	// d0-d6: digit segment data, bits are xABCDEFG
 	m_7seg_data = BITSWAP8(data,7,0,1,2,3,4,5,6);
 	vcc_prepare_display();
@@ -984,6 +823,10 @@ READ8_MEMBER(fidelz80_state::vcc_ppi_portb_r)
 
 WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 {
+	// pull output low during reset (see TODO)
+	if (machine().phase() == MACHINE_PHASE_RESET)
+		data = 0;
+
 	// d0,d2-d5: digit/led select
 	// _d6: enable language switches
 	m_led_select = data;
@@ -993,7 +836,7 @@ WRITE8_MEMBER(fidelz80_state::vcc_ppi_portb_w)
 READ8_MEMBER(fidelz80_state::vcc_ppi_portc_r)
 {
 	// d0-d3: multiplexed inputs (active low), also language switches
-	UINT8 lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
+	uint8_t lan = (~m_led_select & 0x40) ? m_inp_matrix[4]->read() : 0;
 	return ~(lan | read_inputs(4)) & 0xf;
 }
 
@@ -1028,6 +871,34 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 
 
 /******************************************************************************
+    BCC
+******************************************************************************/
+
+// TTL
+
+WRITE8_MEMBER(fidelz80_state::bcc_control_w)
+{
+	// a0-a2,d7: digit segment data via NE591, Q7 is speaker out
+	uint8_t mask = 1 << (offset & 7);
+	m_7seg_data = (m_7seg_data & ~mask) | ((data & 0x80) ? mask : 0);
+	m_dac->write(BIT(m_7seg_data, 7));
+
+	// d0-d3: led select, input mux
+	// d4,d5: check,lose leds(direct)
+	set_display_segmask(0xf, 0x7f);
+	display_matrix(7, 6, m_7seg_data & 0x7f, data & 0x3f);
+	m_inp_mux = data & 0xf;
+}
+
+READ8_MEMBER(fidelz80_state::bcc_input_r)
+{
+	// d0-d3: multiplexed inputs
+	return read_inputs(4);
+}
+
+
+
+/******************************************************************************
     VSC
 ******************************************************************************/
 
@@ -1035,19 +906,9 @@ WRITE8_MEMBER(fidelz80_state::cc10_ppi_porta_w)
 
 void fidelz80_state::vsc_prepare_display()
 {
-	// 4 7seg leds + H
-	for (int i = 0; i < 4; i++)
-	{
-		m_display_segmask[i] = 0x7f;
-		m_display_state[i] = (m_led_select >> i & 1) ? m_7seg_data : 0;
-	}
-
-	// 8*8 chessboard leds
-	for (int i = 0; i < 8; i++)
-		m_display_state[i+4] = (m_led_select >> i & 1) ? m_led_data : 0;
-
-	set_display_size(8, 12);
-	display_update();
+	// 4 7seg leds+H, 8*8 chessboard leds
+	set_display_segmask(0xf, 0x7f);
+	display_matrix(16, 8, m_led_data << 8 | m_7seg_data, m_led_select);
 }
 
 
@@ -1090,11 +951,11 @@ READ8_MEMBER(fidelz80_state::vsc_pio_porta_r)
 
 READ8_MEMBER(fidelz80_state::vsc_pio_portb_r)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	// d4: TSI BUSY line
 	data |= (m_speech->busy_r()) ? 0 : 0x10;
-	
+
 	return data;
 }
 
@@ -1103,14 +964,14 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 	// d0,d1: input mux highest bits
 	// d5: enable language switch
 	m_inp_mux = (m_inp_mux & 0xff) | (data << 8 & 0x300) | (data << 5 & 0x400);
-	
+
 	// d7: TSI ROM A12
 	m_speech->force_update(); // update stream to now
 	m_speech_bank = data >> 7 & 1;
-	
+
 	// d6: TSI START line
 	m_speech->start_w(data >> 6 & 1);
-	
+
 	// d2: lower TSI volume
 	m_speech->set_output_gain(0, (data & 4) ? 0.5 : 1.0);
 }
@@ -1126,11 +987,16 @@ WRITE8_MEMBER(fidelz80_state::vsc_pio_portb_w)
 void fidelz80_state::vbrc_prepare_display()
 {
 	// 14seg led segments, d15 is extra led, d14 is unused (tone on prototype?)
-	UINT16 outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
-	for (int i = 0; i < 8; i++)
-		m_display_segmask[i] = 0x3fff;
-
+	uint16_t outdata = BITSWAP16(m_7seg_data,12,13,1,6,5,2,0,7,15,11,10,14,4,3,9,8);
+	set_display_segmask(0xff, 0x3fff);
 	display_matrix(16, 8, outdata, m_led_select);
+}
+
+WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
+{
+	m_speech->data_w(space, 0, data & 0x3f);
+	m_speech->start_w(1);
+	m_speech->start_w(0);
 }
 
 
@@ -1160,15 +1026,16 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_p2_r)
 	return (m_i8243->i8243_p2_r(space, offset) & 0x0f) | (read_inputs(8) << 4 ^ 0xf0);
 }
 
-READ8_MEMBER(fidelz80_state::vbrc_mcu_t_r)
+READ8_MEMBER(fidelz80_state::vbrc_mcu_t0_r)
 {
 	// T0: card scanner?
-	if (offset == 0)
-		return 0;
+	return 0;
+}
 
-	// T1: ?
-	else
-		return rand() & 1;
+READ8_MEMBER(fidelz80_state::vbrc_mcu_t1_r)
+{
+	// T1: ? (locks up on const 0 or 1)
+	return rand() & 1;
 }
 
 
@@ -1181,8 +1048,10 @@ READ8_MEMBER(fidelz80_state::vbrc_mcu_t_r)
 
 static ADDRESS_MAP_START( cc10_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-	AM_RANGE(0x3000, 0x31ff) AM_RAM
+	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x0f00) AM_RAM
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vcc_map, AS_PROGRAM, 8, fidelz80_state )
@@ -1194,6 +1063,21 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vcc_io, AS_IO, 8, fidelz80_state )
 	ADDRESS_MAP_GLOBAL_MASK(0x03)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE("ppi8255", i8255_device, read, write)
+ADDRESS_MAP_END
+
+
+// BCC
+
+static ADDRESS_MAP_START( bcc_map, AS_PROGRAM, 8, fidelz80_state )
+	ADDRESS_MAP_UNMAP_HIGH
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0f00) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bcc_io, AS_IO, 8, fidelz80_state )
+	ADDRESS_MAP_GLOBAL_MASK(0x07)
+	AM_RANGE(0x00, 0x07) AM_READWRITE(bcc_input_r, bcc_control_w)
 ADDRESS_MAP_END
 
 
@@ -1209,7 +1093,7 @@ ADDRESS_MAP_END
 // VSC io: A2 is 8255 _CE, A3 is Z80 PIO _CE - in theory, both chips can be accessed simultaneously
 READ8_MEMBER(fidelz80_state::vsc_io_trampoline_r)
 {
-	UINT8 data = 0xff; // open bus
+	uint8_t data = 0xff; // open bus
 	if (~offset & 4)
 		data &= m_ppi8255->read(space, offset & 3);
 	if (~offset & 8)
@@ -1234,23 +1118,11 @@ ADDRESS_MAP_END
 
 // VBRC
 
-WRITE8_MEMBER(fidelz80_state::vbrc_speech_w)
-{
-	//printf("%X ",data);
-
-	// todo: HALT THE z80 here, and set up a callback to poll the s14001a BUSY line to resume z80
-	m_speech->data_w(space, 0, data & 0x3f);
-	m_speech->start_w(1);
-	m_speech->start_w(0);
-
-	//m_speech->start_w(BIT(data, 7));
-}
-
 static ADDRESS_MAP_START( vbrc_main_map, AS_PROGRAM, 8, fidelz80_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0xe000, 0xffff) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1fff) AM_WRITE(vbrc_speech_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vbrc_main_io, AS_IO, 8, fidelz80_state )
@@ -1263,7 +1135,8 @@ static ADDRESS_MAP_START( vbrc_mcu_map, AS_IO, 8, fidelz80_state )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(vbrc_mcu_p1_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(vbrc_mcu_p2_r) AM_DEVWRITE("i8243", i8243_device, i8243_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("i8243", i8243_device, i8243_prog_w)
-	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T1) AM_READ(vbrc_mcu_t_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(vbrc_mcu_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(vbrc_mcu_t1_r)
 ADDRESS_MAP_END
 
 
@@ -1271,6 +1144,8 @@ ADDRESS_MAP_END
 /******************************************************************************
     Input Ports
 ******************************************************************************/
+
+// static or boardless games
 
 static INPUT_PORTS_START( vcc_base )
 	PORT_START("IN.0")
@@ -1280,7 +1155,7 @@ static INPUT_PORTS_START( vcc_base )
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speaker") PORT_CODE(KEYCODE_SPACE)
 	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
@@ -1293,7 +1168,7 @@ static INPUT_PORTS_START( vcc_base )
 
 	PORT_START("IN.3")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_O)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
 	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
 	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 
@@ -1317,13 +1192,13 @@ static INPUT_PORTS_START( vcc )
 	PORT_INCLUDE( vcc_base )
 
 	PORT_START("IN.4") // PCB jumpers, not consumer accessible
-	PORT_CONFNAME( 0x01, 0x00, "Language: French" )
+	PORT_CONFNAME( 0x01, 0x00, "Language: German" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
-	PORT_CONFNAME( 0x02, 0x00, "Language: Spanish" )
+	PORT_CONFNAME( 0x02, 0x00, "Language: French" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
-	PORT_CONFNAME( 0x04, 0x00, "Language: German" )
+	PORT_CONFNAME( 0x04, 0x00, "Language: Spanish" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
 	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 	PORT_CONFNAME( 0x08, 0x00, "Language: Special" )
@@ -1335,128 +1210,215 @@ static INPUT_PORTS_START( vccfr )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x01, 0x01, "Language: French" )
+	PORT_CONFNAME( 0x02, 0x02, "Language: French" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccsp )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x02, 0x02, "Language: Spanish" )
+	PORT_CONFNAME( 0x04, 0x04, "Language: Spanish" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vccg )
 	PORT_INCLUDE( vcc )
 
 	PORT_MODIFY("IN.4")
-	PORT_CONFNAME( 0x04, 0x04, "Language: German" )
+	PORT_CONFNAME( 0x01, 0x01, "Language: German" )
 	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
-	PORT_CONFSETTING(    0x04, DEF_STR( On ) )
+	PORT_CONFSETTING(    0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( vsc )
+static INPUT_PORTS_START( bcc )
 	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square a8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PV") PORT_CODE(KEYCODE_V)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("D4") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_D)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("H8") PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_H)
 
 	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square b8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_P)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("C3") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_C)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("G7") PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_G)
 
 	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square c8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CB") PORT_CODE(KEYCODE_SPACE)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("B2") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_B)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("F6") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_F)
 
 	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square d8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A1") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_A)
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("E5") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_E)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( vbrc )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_A) PORT_NAME("A")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_0) PORT_NAME("10")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_NAME("6")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_NAME("2")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_K) PORT_NAME("K")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_9) PORT_NAME("9")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_NAME("5")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_NAME("1")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Q) PORT_NAME("Q")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_8) PORT_NAME("8")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_NAME("4")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_Z) PORT_NAME("P")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_J) PORT_NAME("J")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_7) PORT_NAME("7")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_NAME("3")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_N) PORT_NAME("NT")
 
 	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square e8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_E) PORT_NAME("EN")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("SC")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_X) PORT_NAME("PL")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Spades")
 
 	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square f8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_C) PORT_NAME("CL")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_D) PORT_NAME("DB")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("VL")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Hearts")
 
 	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square g8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_B) PORT_NAME("PB")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_G) PORT_NAME("CV")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Diamonds")
 
 	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h1")
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h2")
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h3")
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h4")
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h5")
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h6")
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h7")
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Square h8")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("BR")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("DL")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Clubs")
+
+	PORT_START("RESET") // is not on matrix IN.7 d0
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0) PORT_NAME("RE")
+INPUT_PORTS_END
+
+
+// sensory board games
+
+static INPUT_PORTS_START( cb_buttons )
+	PORT_START("IN.0")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.1")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.2")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.3")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.4")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.5")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.6")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+
+	PORT_START("IN.7")
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Board Sensor")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( vsc )
+	PORT_INCLUDE( cb_buttons )
 
 	PORT_START("IN.8") // buttons on the right
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Pawn") PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Rook") PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Knight") PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Bishop") PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Queen") PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("King") PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD)
-	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_DEL)
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("Pawn")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("Rook")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("Knight")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("Bishop")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("Queen")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("King")
+	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_DEL) PORT_NAME("CL")
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_R) PORT_NAME("RE")
 
 	PORT_START("IN.9") // buttons beside the display
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("TM") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RV") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Speak") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("LV") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DM") PORT_CODE(KEYCODE_M)
-	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("ST") PORT_CODE(KEYCODE_S)
+	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_T) PORT_NAME("TM")
+	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_V) PORT_NAME("RV")
+	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_SPACE) PORT_NAME("Speaker")
+	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_L) PORT_NAME("LV")
+	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_M) PORT_NAME("DM")
+	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_CODE(KEYCODE_S) PORT_NAME("ST")
 	PORT_BIT(0xc0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
 	PORT_START("IN.10") // hardwired (2 diodes)
@@ -1478,79 +1440,26 @@ static INPUT_PORTS_START( vscg )
 INPUT_PORTS_END
 
 
-static INPUT_PORTS_START( vbrc )
-	PORT_START("IN.0")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("A") PORT_CODE(KEYCODE_A)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("10") PORT_CODE(KEYCODE_0)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("6") PORT_CODE(KEYCODE_6)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("2") PORT_CODE(KEYCODE_2)
-
-	PORT_START("IN.1")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("K") PORT_CODE(KEYCODE_K)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("9") PORT_CODE(KEYCODE_9)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("5") PORT_CODE(KEYCODE_5)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("1") PORT_CODE(KEYCODE_1)
-
-	PORT_START("IN.2")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Q") PORT_CODE(KEYCODE_Q)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("8") PORT_CODE(KEYCODE_8)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("4") PORT_CODE(KEYCODE_4)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("P") PORT_CODE(KEYCODE_Z)
-
-	PORT_START("IN.3")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("J") PORT_CODE(KEYCODE_J)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("7") PORT_CODE(KEYCODE_7)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("3") PORT_CODE(KEYCODE_3)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("NT") PORT_CODE(KEYCODE_N)
-
-	PORT_START("IN.4")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("EN") PORT_CODE(KEYCODE_E)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("SC") PORT_CODE(KEYCODE_S)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PL") PORT_CODE(KEYCODE_X)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Spades") PORT_CODE(KEYCODE_1_PAD)
-
-	PORT_START("IN.5")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CL") PORT_CODE(KEYCODE_C)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DB") PORT_CODE(KEYCODE_D)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("VL") PORT_CODE(KEYCODE_V)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Hearts") PORT_CODE(KEYCODE_2_PAD)
-
-	PORT_START("IN.6")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Beep on/off") PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("PB") PORT_CODE(KEYCODE_B)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("CV") PORT_CODE(KEYCODE_G)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Diamonds") PORT_CODE(KEYCODE_3_PAD)
-
-	PORT_START("IN.7")
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_UNUSED)
-	PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("BR") PORT_CODE(KEYCODE_T)
-	PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("DL") PORT_CODE(KEYCODE_L)
-	PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("Clubs") PORT_CODE(KEYCODE_4_PAD)
-
-	PORT_START("RESET") // is not on matrix IN.7 d0
-	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_KEYPAD) PORT_NAME("RE") PORT_CODE(KEYCODE_R) PORT_CHANGED_MEMBER(DEVICE_SELF, fidelz80_state, reset_button, 0)
-INPUT_PORTS_END
-
-
 
 /******************************************************************************
     Machine Drivers
 ******************************************************************************/
 
-static MACHINE_CONFIG_START( cc7, fidelz80_state )
+static MACHINE_CONFIG_START( bcc, fidelz80_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
-	MCFG_CPU_PROGRAM_MAP(cc10_map)
-	//MCFG_CPU_IO_MAP(vcc_io)
+	MCFG_CPU_PROGRAM_MAP(bcc_map)
+	MCFG_CPU_IO_MAP(bcc_io)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
-	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
+	MCFG_DEFAULT_LAYOUT(layout_fidel_bcc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
-	MCFG_SOUND_ADD("beeper", BEEP, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+	MCFG_SOUND_ADD("dac", DAC_1BIT, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cc10, fidelz80_state )
@@ -1571,9 +1480,9 @@ static MACHINE_CONFIG_START( cc10, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_cc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("beeper", BEEP, 1360) // approximation, from 556 timer ic
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.25)
 	MCFG_TIMER_DRIVER_ADD("beeper_off", fidelz80_state, beeper_off_callback)
 MACHINE_CONFIG_END
 
@@ -1594,17 +1503,19 @@ static MACHINE_CONFIG_START( vcc, fidelz80_state )
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vcc)
 
+	MCFG_MACHINE_START_OVERRIDE(fidelz80_state,vcc)
+
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vsc, fidelz80_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_ADD("maincpu", Z80, 3900000) // 3.9MHz resonator
 	MCFG_CPU_PROGRAM_MAP(vsc_map)
 	MCFG_CPU_IO_MAP(vsc_io)
 	MCFG_CPU_PERIODIC_INT_DRIVER(fidelz80base_state, nmi_line_pulse, 600) // 555 timer, approx 600hz
@@ -1623,10 +1534,10 @@ static MACHINE_CONFIG_START( vsc, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vsc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
 	MCFG_S14001A_EXT_READ_HANDLER(READ8(fidelz80_state, vcc_speech_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( vbrc, fidelz80_state )
@@ -1646,9 +1557,10 @@ static MACHINE_CONFIG_START( vbrc, fidelz80_state )
 	MCFG_DEFAULT_LAYOUT(layout_fidel_vbrc)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 	MCFG_SOUND_ADD("speech", S14001A, 25000) // R/C circuit, around 25khz
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_S14001A_BSY_HANDLER(INPUTLINE("maincpu", Z80_INPUT_LINE_WAIT))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -1657,14 +1569,14 @@ MACHINE_CONFIG_END
     ROM Definitions
 ******************************************************************************/
 
-ROM_START( cc7 )
-	ROM_REGION( 0x10000, "maincpu", 0 )
-	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
-ROM_END
-
 ROM_START( cc10 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "cc10b", 0x0000, 0x1000, CRC(afd3ca99) SHA1(870d09b2b52ccb8572d69642c59b5215d5fb26ab) ) // 2332
+ROM_END
+
+ROM_START( cc7 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "cn19103n_bcc-revb", 0x0000, 0x1000, CRC(a397d471) SHA1(9b12bc442fccee40f4d8500c792bc9d886c5e1a5) ) // 2332
 ROM_END
 
 
@@ -1825,23 +1737,23 @@ ROM_END
 ******************************************************************************/
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE  INPUT   INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, cc7,     0,      0,      cc7,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1978, cc10,     0,      0,      cc10,    cc10,   driver_device, 0, "Fidelity Electronics", "Chess Challenger 10 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, cc7,      0,      0,      bcc,     bcc,    driver_device, 0, "Fidelity Electronics", "Chess Challenger 7 (rev. B)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, vccg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE )
-COMP( 1979, vccfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE )
+CONS( 1979, vcc,      0,      0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, vccfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1980, uvc,      vcc,    0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, uvcsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, uvcg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE )
-COMP( 1980, uvcfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE )
+CONS( 1980, uvc,      vcc,    0,      vcc,     vcc,    driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcsp,    vcc,    0,      vcc,     vccsp,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcg,     vcc,    0,      vcc,     vccg,   driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, uvcfr,    vcc,    0,      vcc,     vccfr,  driver_device, 0, "Fidelity Electronics", "Advanced Voice Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1980, vsc,      0,      0,      vsc,     vsc,    driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1980, vscsp,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1980, vscg,     vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-COMP( 1980, vscfr,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, vsc,      0,      0,      vsc,     vsc,    driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (English)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, vscsp,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (Spanish)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, vscg,     vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (German)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1980, vscfr,    vsc,    0,      vsc,     vscg,   driver_device, 0, "Fidelity Electronics", "Voice Sensory Chess Challenger (French)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-COMP( 1979, vbrc,     0,      0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-COMP( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, vbrc,     0,      0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Voice Bridge Challenger", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1980, bridgec3, vbrc,   0,      vbrc,    vbrc,   driver_device, 0, "Fidelity Electronics", "Bridge Challenger III", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )

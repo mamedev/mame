@@ -34,7 +34,7 @@ class namco_c45_road_device : public device_t, public device_gfx_interface, publ
 
 public:
 	// construction/destruction
-	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_c45_road_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_ADDRESS_MAP(map, 16);
 
@@ -60,10 +60,10 @@ private:
 
 	// internal state
 	address_space_config        m_space_config;
-	required_shared_ptr<UINT16> m_tmapram;
-	required_shared_ptr<UINT16> m_tileram;
-	required_shared_ptr<UINT16> m_lineram;
-	UINT8 *                     m_clut;
+	required_shared_ptr<uint16_t> m_tmapram;
+	required_shared_ptr<uint16_t> m_tileram;
+	required_shared_ptr<uint16_t> m_lineram;
+	uint8_t *                     m_clut;
 	tilemap_t *                 m_tilemap;
 	pen_t                       m_transparent_color;
 };

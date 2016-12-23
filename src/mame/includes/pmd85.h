@@ -55,14 +55,14 @@ public:
 		m_io_dsw0(*this, "DSW0"),
 		m_palette(*this, "palette")  { }
 
-	UINT8 m_rom_module_present;
-	UINT8 m_ppi_port_outputs[4][3];
-	UINT8 m_startup_mem_map;
-	UINT8 m_pmd853_memory_mapping;
+	uint8_t m_rom_module_present;
+	uint8_t m_ppi_port_outputs[4][3];
+	uint8_t m_startup_mem_map;
+	uint8_t m_pmd853_memory_mapping;
 	int m_previous_level;
 	int m_clk_level;
 	int m_clk_level_tape;
-	UINT8 m_model;
+	uint8_t m_model;
 	emu_timer * m_cassette_timer;
 	void (pmd85_state::*update_memory)();
 	DECLARE_READ8_MEMBER(pmd85_io_r);
@@ -76,7 +76,7 @@ public:
 	DECLARE_DRIVER_INIT(alfa);
 	DECLARE_DRIVER_INIT(c2717);
 	virtual void machine_reset() override;
-	UINT32 screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_pmd85(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(pmd85_cassette_timer_callback);
 	DECLARE_WRITE_LINE_MEMBER(write_cas_tx);
 	DECLARE_READ8_MEMBER(pmd85_ppi_0_porta_r);

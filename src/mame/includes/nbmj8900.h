@@ -41,10 +41,10 @@ public:
 	int m_screen_width;
 	bitmap_ind16 m_tmpbitmap0;
 	bitmap_ind16 m_tmpbitmap1;
-	std::unique_ptr<UINT8[]> m_videoram0;
-	std::unique_ptr<UINT8[]> m_videoram1;
-	std::unique_ptr<UINT8[]> m_palette_ptr;
-	std::unique_ptr<UINT8[]> m_clut;
+	std::unique_ptr<uint8_t[]> m_videoram0;
+	std::unique_ptr<uint8_t[]> m_videoram1;
+	std::unique_ptr<uint8_t[]> m_palette_ptr;
+	std::unique_ptr<uint8_t[]> m_clut;
 	int m_flipscreen_old;
 	emu_timer *m_blitter_timer;
 
@@ -62,7 +62,7 @@ public:
 	DECLARE_DRIVER_INIT(ohpaipee);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void vramflip(int vram);
 	void update_pixel0(int x, int y);
 	void update_pixel1(int x, int y);

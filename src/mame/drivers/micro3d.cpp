@@ -29,7 +29,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "machine/mc68681.h"
 #include "machine/mc68901.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "machine/nvram.h"
 #include "includes/micro3d.h"
 
@@ -111,7 +111,7 @@ static INPUT_PORTS_START( botss )
 	PORT_INCLUDE( micro3d )
 
 	PORT_MODIFY("INPUTS_A_B")
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, micro3d_state, botss_hwchk_r, NULL)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, micro3d_state, botss_hwchk_r, nullptr)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Shield")
 	PORT_SERVICE( 0x0400, IP_ACTIVE_LOW )
@@ -296,7 +296,7 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MCFG_CPU_ADD("vgb", TMS34010, XTAL_40MHz)
 	MCFG_CPU_PROGRAM_MAP(vgbmem)
-	MCFG_TMS340X0_HALT_ON_RESET(FALSE) /* halt on reset */
+	MCFG_TMS340X0_HALT_ON_RESET(false) /* halt on reset */
 	MCFG_TMS340X0_PIXEL_CLOCK(XTAL_40MHz / 8) /* pixel clock */
 	MCFG_TMS340X0_PIXELS_PER_CLOCK(4) /* pixels per clock */
 	MCFG_TMS340X0_SCANLINE_IND16_CB(micro3d_state, scanline_update)        /* scanline updater (indexed16) */
@@ -309,6 +309,8 @@ static MACHINE_CONFIG_START( micro3d, micro3d_state )
 	MCFG_CPU_ADD("audiocpu", I8051, XTAL_11_0592MHz)
 	MCFG_CPU_PROGRAM_MAP(soundmem_prg)
 	MCFG_CPU_IO_MAP(soundmem_io)
+	MCFG_MCS51_SERIAL_TX_CB(WRITE8(micro3d_state, data_from_i8031))
+	MCFG_MCS51_SERIAL_RX_CB(READ8(micro3d_state, data_to_i8031))
 
 	MCFG_MC68681_ADD("duart68681", XTAL_3_6864MHz)
 	MCFG_MC68681_IRQ_CALLBACK(WRITELINE(micro3d_state, duart_irq_handler))

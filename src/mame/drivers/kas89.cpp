@@ -6,7 +6,7 @@
   /\/\<< Kasino '89 >>/\/\
 
   6-players electronic roulette.
-  Video field + phisical LEDs roulette.
+  Video field + physical LEDs roulette.
 
   Driver by Roberto Fresca.
 
@@ -34,7 +34,7 @@
   1x Z80 (audio) @ 3.578 MHz.
   AY-3-8910 @ 1789 kHz.
 
-  1x Unknown metallick brick (Yamaha MSX2 VDP inside).
+  1x Unknown metallic brick (Yamaha MSX2 VDP inside).
 
   1x 8 DIP switches bank.
 
@@ -197,6 +197,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
 #include "kas89.lh"
 
@@ -209,6 +210,7 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_v9938(*this, "v9938"),
+		m_soundlatch(*this, "soundlatch"),
 		m_pl1(*this, "PL1"),
 		m_pl2(*this, "PL2"),
 		m_pl3(*this, "PL3"),
@@ -220,16 +222,17 @@ public:
 		m_unk(*this, "UNK")
 	{ }
 
-	UINT8 m_mux_data;
-	UINT8 m_main_nmi_enable;
+	uint8_t m_mux_data;
+	uint8_t m_main_nmi_enable;
 
-	UINT8 m_leds_mux_selector;
-	UINT8 m_leds_mux_data;
-	UINT8 m_outdata;            /* Muxed with the sound latch. Output to a sign? */
+	uint8_t m_leds_mux_selector;
+	uint8_t m_leds_mux_data;
+	uint8_t m_outdata;            /* Muxed with the sound latch. Output to a sign? */
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<v9938_device> m_v9938;
+	required_device<generic_latch_8_device> m_soundlatch;
 	required_ioport m_pl1;
 	required_ioport m_pl2;
 	required_ioport m_pl3;
@@ -252,18 +255,7 @@ public:
 	virtual void machine_reset() override;
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_nmi_cb);
 	TIMER_DEVICE_CALLBACK_MEMBER(kas89_sound_nmi_cb);
-	DECLARE_WRITE_LINE_MEMBER(kas89_vdp_interrupt);
 };
-
-
-/***************************************
-*      Interrupt handling & Video      *
-***************************************/
-
-WRITE_LINE_MEMBER(kas89_state::kas89_vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, (state ? ASSERT_LINE : CLEAR_LINE));
-}
 
 
 /*************************************
@@ -372,7 +364,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 
 		if (m_outdata == 0x3f)
 		{
-			UINT8 i;
+			uint8_t i;
 			for ( i = 0; i < 37; i++ )
 			{
 				output().set_lamp_value(i, 0);    /* All roulette LEDs OFF */
@@ -384,7 +376,7 @@ WRITE8_MEMBER(kas89_state::sound_comm_w)
 
 	else
 	{
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, ASSERT_LINE );
 	}
 }
@@ -418,7 +410,7 @@ WRITE8_MEMBER(kas89_state::led_mux_select_w)
 
 	m_leds_mux_selector = data;
 
-	UINT8 i;
+	uint8_t i;
 	for ( i = 0; i < 37; i++ )
 	{
 		output().set_lamp_value(i, 0);    /* All LEDs OFF */
@@ -583,7 +575,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_io, AS_IO, 8, kas89_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(int_ack_w)    // comm out (1st Z80). seems to write here the value previously read through soundlatch (port 0x02).
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x02, 0x02) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x04, 0x04) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x04, 0x05) AM_DEVWRITE("aysnd", ay8910_device, data_address_w)
 ADDRESS_MAP_END
@@ -775,11 +767,14 @@ static MACHINE_CONFIG_START( kas89, kas89_state )
 
 	/* video hardware */
 	MCFG_V9938_ADD("v9938", "screen", VDP_MEM, MASTER_CLOCK)
-	MCFG_V99X8_INTERRUPT_CALLBACK(WRITELINE(kas89_state,kas89_vdp_interrupt))
+	MCFG_V99X8_INTERRUPT_CALLBACK(INPUTLINE("maincpu", 0))
 	MCFG_V99X8_SCREEN_ADD_NTSC("screen", "v9938", MASTER_CLOCK)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)    /* Confirmed */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
@@ -837,7 +832,7 @@ ROM_END
 DRIVER_INIT_MEMBER(kas89_state,kas89)
 {
 	int i;
-	UINT8 *mem = memregion("maincpu")->base();
+	uint8_t *mem = memregion("maincpu")->base();
 	int memsize = memregion("maincpu")->bytes();
 
 	/* Unscrambling data lines */
@@ -847,7 +842,7 @@ DRIVER_INIT_MEMBER(kas89_state,kas89)
 	}
 
 	/* Unscrambling address lines */
-	dynamic_buffer buf(memsize);
+	std::vector<uint8_t> buf(memsize);
 	memcpy(&buf[0], mem, memsize);
 	for ( i = 0; i < memsize; i++ )
 	{

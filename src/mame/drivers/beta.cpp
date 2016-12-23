@@ -83,14 +83,14 @@ public:
 	/* EPROM state */
 	int m_eprom_oe;
 	int m_eprom_ce;
-	UINT16 m_eprom_addr;
-	UINT8 m_eprom_data;
-	UINT8 m_old_data;
-	dynamic_buffer m_eprom_rom;
+	uint16_t m_eprom_addr;
+	uint8_t m_eprom_data;
+	uint8_t m_old_data;
+	std::vector<uint8_t> m_eprom_rom;
 
 	/* display state */
-	UINT8 m_ls145_p;
-	UINT8 m_segment;
+	uint8_t m_ls145_p;
+	uint8_t m_segment;
 
 	emu_timer *m_led_refresh_timer;
 	TIMER_CALLBACK_MEMBER(led_refresh);
@@ -176,7 +176,7 @@ READ8_MEMBER( beta_state::riot_pa_r )
 
 	*/
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch (m_ls145_p)
 	{
@@ -284,18 +284,18 @@ WRITE8_MEMBER( beta_state::riot_pb_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( beta_state, beta_eprom )
 {
-	UINT32 size = m_eprom->common_get_size("rom");
+	uint32_t size = m_eprom->common_get_size("rom");
 
 	if (size != 0x800)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_eprom->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_eprom->common_load_rom(m_eprom->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 DEVICE_IMAGE_UNLOAD_MEMBER( beta_state, beta_eprom )

@@ -14,6 +14,7 @@
 
 #include "emu.h"
 #include "includes/pgm.h"
+#include "machine/pgmprot_orlegend.h"
 
 void pgm_asic3_state::asic3_compute_hold(int y, int z)
 {

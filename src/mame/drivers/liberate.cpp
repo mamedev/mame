@@ -31,7 +31,7 @@
 
 READ8_MEMBER(liberate_state::deco16_bank_r)
 {
-	const UINT8 *ROM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -80,7 +80,7 @@ WRITE8_MEMBER(liberate_state::deco16_bank_w)
 
 READ8_MEMBER(liberate_state::prosoccr_bank_r)
 {
-	const UINT8 *ROM = memregion("user1")->base();
+	const uint8_t *ROM = memregion("user1")->base();
 
 	/* The tilemap bank can be swapped into main memory */
 	if (m_bank)
@@ -109,7 +109,7 @@ READ8_MEMBER(liberate_state::prosoccr_bank_r)
 
 READ8_MEMBER(liberate_state::prosoccr_charram_r)
 {
-	UINT8 *SRC_GFX = memregion("shared_gfx")->base();
+	uint8_t *SRC_GFX = memregion("shared_gfx")->base();
 
 	if (m_gfx_rom_readback)
 	{
@@ -184,7 +184,7 @@ WRITE8_MEMBER(liberate_state::prosoccr_io_bank_w)
 
 READ8_MEMBER(liberate_state::prosport_charram_r)
 {
-	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
+	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -204,7 +204,7 @@ READ8_MEMBER(liberate_state::prosport_charram_r)
 
 WRITE8_MEMBER(liberate_state::prosport_charram_w)
 {
-	UINT8 *FG_GFX = memregion("progolf_fg_gfx")->base();
+	uint8_t *FG_GFX = memregion("progolf_fg_gfx")->base();
 
 	switch (offset & 0x1800)
 	{
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( prosoccr_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xc000) AM_WRITENOP //irq ack
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -332,7 +332,7 @@ static ADDRESS_MAP_START( liberate_sound_map, AS_PROGRAM, 8, liberate_state )
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x7000, 0x7000) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -487,13 +487,14 @@ static INPUT_PORTS_START( prosport )
 	PORT_MODIFY("DSW1")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "DSW1:3")
 	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "DSW1:4")
-	PORT_DIPNAME( 0x10, 0x10, "Service" ) PORT_DIPLOCATION("DSW1:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Test Mode" ) PORT_DIPLOCATION("DSW1:6")
+	PORT_SERVICE( 0x10, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DSW1:5")
+	PORT_DIPNAME( 0x20, 0x20, "Test Mode" ) PORT_DIPLOCATION("DSW1:6") // TODO: needs next one to be on too?
 	PORT_DIPSETTING(    0x00, "ROM Test" )
 	PORT_DIPSETTING(    0x20, "Maping Test" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "DSW1:8")
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "DSW1:7")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:8")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "DSW2:1")
@@ -758,6 +759,8 @@ static MACHINE_CONFIG_START( liberate_base, liberate_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
@@ -842,6 +845,8 @@ static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
@@ -1260,7 +1265,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(liberate_state,prosport)
 {
-	UINT8 *RAM = memregion("maincpu")->base();
+	uint8_t *RAM = memregion("maincpu")->base();
 	int i;
 
 	/* Main cpu has the nibbles swapped */
@@ -1278,7 +1283,7 @@ DRIVER_INIT_MEMBER(liberate_state,yellowcb)
 
 DRIVER_INIT_MEMBER(liberate_state,liberate)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	/* Swap bits for opcodes only, not data */
 	for (int A = 0; A < 0x8000; A++) {

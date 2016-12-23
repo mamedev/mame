@@ -68,7 +68,7 @@ machine_config_constructor mc1502_fdc_device::device_mconfig_additions() const
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *mc1502_fdc_device::device_rom_region() const
+const tiny_rom_entry *mc1502_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( mc1502_fdc );
 }
@@ -85,16 +85,16 @@ TIMER_CALLBACK_MEMBER(mc1502_fdc_device::motor_callback)
 	motor_on = 0;
 }
 
-UINT8 mc1502_fdc_device::mc1502_wd17xx_aux_r()
+uint8_t mc1502_fdc_device::mc1502_wd17xx_aux_r()
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = 0;
 
 	return data;
 }
 
-void mc1502_fdc_device::mc1502_wd17xx_aux_w(UINT8 data)
+void mc1502_fdc_device::mc1502_wd17xx_aux_w(uint8_t data)
 {
 	floppy_image_device *floppy0 = m_fdc->subdevice<floppy_connector>("0")->get_device();
 	floppy_image_device *floppy1 = m_fdc->subdevice<floppy_connector>("1")->get_device();
@@ -123,7 +123,7 @@ void mc1502_fdc_device::mc1502_wd17xx_aux_w(UINT8 data)
 /*
  * Accesses to this port block (halt the CPU until DRQ, INTRQ or MOTOR ON)
  */
-UINT8 mc1502_fdc_device::mc1502_wd17xx_drq_r()
+uint8_t mc1502_fdc_device::mc1502_wd17xx_drq_r()
 {
 	cpu_device *maincpu = machine().device<cpu_device>("maincpu");
 
@@ -136,7 +136,7 @@ UINT8 mc1502_fdc_device::mc1502_wd17xx_drq_r()
 	return m_fdc->drq_r();
 }
 
-UINT8 mc1502_fdc_device::mc1502_wd17xx_motor_r()
+uint8_t mc1502_fdc_device::mc1502_wd17xx_motor_r()
 {
 	return motor_on;
 }
@@ -151,7 +151,7 @@ WRITE_LINE_MEMBER( mc1502_fdc_device::mc1502_fdc_irq_drq )
 
 READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch( offset )
 	{
@@ -165,7 +165,7 @@ READ8_MEMBER( mc1502_fdc_device::mc1502_fdc_r )
 
 READ8_MEMBER( mc1502_fdc_device::mc1502_fdcv2_r )
 {
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	switch( offset )
 	{
@@ -189,7 +189,7 @@ WRITE8_MEMBER( mc1502_fdc_device::mc1502_fdc_w )
 //  mc1502_fdc_device - constructor
 //-------------------------------------------------
 
-mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+mc1502_fdc_device::mc1502_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, MC1502_FDC, "MC-1502 floppy", tag, owner, clock, "mc1502_fdc", __FILE__),
 	device_isa8_card_interface( mconfig, *this ),
 	m_fdc(*this, "fdc"), motor_on(0), motor_timer(nullptr)
@@ -205,16 +205,16 @@ void mc1502_fdc_device::device_start()
 	set_isa_device();
 
 	// BIOS 5.0-5.2x
-	m_isa->install_device(0x010c, 0x010f, 0, 0,
+	m_isa->install_device(0x010c, 0x010f,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(0x0100, 0x010b, 0, 0, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
+	m_isa->install_device(0x0100, 0x010b, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	// BIOS 5.3x
-	m_isa->install_device(0x0048, 0x004b, 0, 0,
+	m_isa->install_device(0x0048, 0x004b,
 		READ8_DEVICE_DELEGATE(m_fdc, fd1793_t, read),
 		WRITE8_DEVICE_DELEGATE(m_fdc, fd1793_t, write) );
-	m_isa->install_device(0x004c, 0x004f, 0, 0, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdcv2_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
+	m_isa->install_device(0x004c, 0x004f, read8_delegate( FUNC(mc1502_fdc_device::mc1502_fdcv2_r), this ), write8_delegate( FUNC(mc1502_fdc_device::mc1502_fdc_w), this ) );
 
 	motor_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(mc1502_fdc_device::motor_callback),this));
 	motor_on = 0;

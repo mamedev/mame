@@ -84,16 +84,18 @@
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
 #include "includes/boogwing.h"
-#include "includes/decocrpt.h"
-#include "sound/2151intf.h"
+#include "machine/deco102.h"
+#include "machine/decocrpt.h"
+#include "machine/gen_latch.h"
+#include "sound/ym2151.h"
 #include "sound/okim6295.h"
 
 READ16_MEMBER( boogwing_state::boogwing_protection_region_0_104_r )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( deco146_addr, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( deco146_addr, mem_mask, cs );
 	return data;
 }
 
@@ -101,7 +103,7 @@ WRITE16_MEMBER( boogwing_state::boogwing_protection_region_0_104_w )
 {
 	int real_address = 0 + (offset *2);
 	int deco146_addr = BITSWAP32(real_address, /* NC */31,30,29,28,27,26,25,24,23,22,21,20,19,18, 13,12,11,/**/      17,16,15,14,    10,9,8, 7,6,5,4, 3,2,1,0) & 0x7fff;
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, deco146_addr, data, mem_mask, cs );
 }
 
@@ -153,7 +155,7 @@ static ADDRESS_MAP_START( audio_map, AS_PROGRAM, 8, boogwing_state )
 	AM_RANGE(0x110000, 0x110001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0x120000, 0x120001) AM_DEVREADWRITE("oki1", okim6295_device, read, write)
 	AM_RANGE(0x130000, 0x130001) AM_DEVREADWRITE("oki2", okim6295_device, read, write)
-	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x140000, 0x140001) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank8")
 	AM_RANGE(0x1fec00, 0x1fec01) AM_DEVWRITE("audiocpu", h6280_device, timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
@@ -296,8 +298,8 @@ GFXDECODE_END
 
 WRITE8_MEMBER(boogwing_state::sound_bankswitch_w)
 {
-	m_oki2->set_bank_base(((data & 2) >> 1) * 0x40000);
-	m_oki1->set_bank_base((data & 1) * 0x40000);
+	m_oki2->set_rom_bank((data & 2) >> 1);
+	m_oki1->set_rom_bank(data & 1);
 }
 
 
@@ -358,7 +360,6 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("tilegen2", DECO16IC, 0)
 	MCFG_DECO16IC_SPLIT(0)
@@ -374,17 +375,14 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(2)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen1", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(3)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen2", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(4)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE_REVERSE
@@ -392,6 +390,8 @@ static MACHINE_CONFIG_START( boogwing, boogwing_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 32220000/9)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("audiocpu", 1)) /* IRQ2 */
@@ -632,14 +632,14 @@ ROM_END
 
 DRIVER_INIT_MEMBER(boogwing_state,boogwing)
 {
-	const UINT8* src = memregion("gfx6")->base();
-	UINT8* dst = memregion("tiles2")->base() + 0x200000;
+	const uint8_t* src = memregion("gfx6")->base();
+	uint8_t* dst = memregion("tiles2")->base() + 0x200000;
 
 	deco56_decrypt_gfx(machine(), "tiles1");
 	deco56_decrypt_gfx(machine(), "tiles2");
 	deco56_decrypt_gfx(machine(), "tiles3");
 	deco56_remap_gfx(machine(), "gfx6");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x100000, 0x42ba, 0x00, 0x18);
 	memcpy(dst, src, 0x100000);
 }
 

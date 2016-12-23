@@ -22,21 +22,45 @@
 
 #include "emu.h"
 #include "video/konami_helper.h"
-#include "includes/konamigx.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/k053252.h"
+#include "video/k053246_k053247_k055673.h"
+#include "video/k054156_k054157_k056832.h"
+#include "video/k055555.h"
 #include "machine/eepromser.h"
 
 #define CUSTOM_DRAW 1
 
-class kongambl_state : public konamigx_state // with everything devicified there's probably not much point in inheriting the GX state.
+class kongambl_state : public driver_device
 {
 public:
 	kongambl_state(const machine_config &mconfig, device_type type, const char *tag)
-		: konamigx_state(mconfig, type, tag),
+		: driver_device(mconfig, type, tag),
+		m_maincpu(*this,"maincpu"),
+		m_k053252(*this, "k053252"),
+		m_k055673(*this, "k055673"),
+		m_k055555(*this, "k055555"),
+		m_k056832(*this, "k056832"),
+#if CUSTOM_DRAW
+		m_gfxdecode(*this, "gfxdecode"),
+#endif
+		m_screen(*this, "screen"),
+		m_palette(*this, "palette"),
 		m_vram(*this, "vram")
 		{ }
 
-	optional_shared_ptr<UINT32> m_vram;
+	required_device<cpu_device> m_maincpu;
+	required_device<k053252_device> m_k053252;
+	required_device<k055673_device> m_k055673;
+	required_device<k055555_device> m_k055555;
+	required_device<k056832_device> m_k056832;
+#if CUSTOM_DRAW
+	required_device<gfxdecode_device> m_gfxdecode;
+#endif
+	required_device<screen_device> m_screen;
+	required_device<palette_device> m_palette;
+
+	optional_shared_ptr<uint32_t> m_vram;
 	DECLARE_READ32_MEMBER(eeprom_r);
 	DECLARE_WRITE8_MEMBER(eeprom_w);
 	DECLARE_WRITE8_MEMBER(kongambl_ff_w);
@@ -44,10 +68,12 @@ public:
 	// DECLARE_READ32_MEMBER(rng_r);
 	DECLARE_DRIVER_INIT(kingtut);
 	DECLARE_VIDEO_START(kongambl);
-	UINT8 m_irq_mask;
+	uint8_t m_irq_mask;
 
 	virtual void machine_reset() override { m_irq_mask = 0; };
-	UINT32 screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	WRITE_LINE_MEMBER(vblank_irq_ack_w);
+	WRITE_LINE_MEMBER(hblank_irq_ack_w);
 	TIMER_DEVICE_CALLBACK_MEMBER(kongambl_vblank);
 	K056832_CB_MEMBER(tile_callback);
 	K053246_CB_MEMBER(sprite_callback);
@@ -67,11 +93,11 @@ VIDEO_START_MEMBER(kongambl_state,kongambl)
 	#endif
 }
 
-UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	#if CUSTOM_DRAW
 	gfx_element *gfx = m_gfxdecode->gfx(0);
-	UINT32 count;
+	uint32_t count;
 
 	count = 0;
 
@@ -79,7 +105,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = m_vram[count] & 0xffff;
+			uint32_t tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
 				gfx->opaque(bitmap,cliprect,tile,0,0,0,x*8,y*8);
@@ -94,7 +120,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 	{
 		for (int x=0;x<128;x++)
 		{
-			UINT32 tile = m_vram[count] & 0xffff;
+			uint32_t tile = m_vram[count] & 0xffff;
 
 			if(m_screen->visible_area().contains(x*8, y*8))
 				gfx->transpen(bitmap,cliprect,tile,0,0,0,x*8,y*8,0);
@@ -119,7 +145,7 @@ UINT32 kongambl_state::screen_update_kongambl(screen_device &screen, bitmap_ind1
 READ32_MEMBER(kongambl_state::eeprom_r)
 {
 	//return machine().rand();
-	UINT32 retval = 0;
+	uint32_t retval = 0;
 
 	if (ACCESSING_BITS_24_31)
 		retval |= ioport("IN0")->read() << 24; // bit 0 freezes the system if 1
@@ -576,6 +602,16 @@ static GFXDECODE_START( tasman )
 GFXDECODE_END
 
 
+WRITE_LINE_MEMBER(kongambl_state::vblank_irq_ack_w)
+{
+	m_maincpu->set_input_line(1, CLEAR_LINE);
+}
+
+WRITE_LINE_MEMBER(kongambl_state::hblank_irq_ack_w)
+{
+	m_maincpu->set_input_line(2, CLEAR_LINE);
+}
+
 TIMER_DEVICE_CALLBACK_MEMBER(kongambl_state::kongambl_vblank)
 {
 	int scanline = param;
@@ -606,8 +642,8 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_DEVICE_ADD("k053252", K053252, 25000000)
 	MCFG_K053252_OFFSETS(0, 16) // TBD
-	MCFG_K053252_INT1_ACK_CB(WRITELINE(konamigx_state, vblank_irq_ack_w))
-	MCFG_K053252_INT2_ACK_CB(WRITELINE(konamigx_state, hblank_irq_ack_w))
+	MCFG_K053252_INT1_ACK_CB(WRITELINE(kongambl_state, vblank_irq_ack_w))
+	MCFG_K053252_INT2_ACK_CB(WRITELINE(kongambl_state, hblank_irq_ack_w))
 	MCFG_VIDEO_SET_SCREEN("screen")
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")
@@ -626,16 +662,16 @@ static MACHINE_CONFIG_START( kongambl, kongambl_state )
 
 	MCFG_DEVICE_ADD("k055673", K055673, 0)
 	MCFG_K055673_CB(kongambl_state, sprite_callback)
-	MCFG_K055673_CONFIG("gfx2", 1, K055673_LAYOUT_LE2, -48+1, -23)
-	MCFG_K055673_GFXDECODE("gfxdecode")
+	MCFG_K055673_CONFIG("gfx2", K055673_LAYOUT_LE2, -48+1, -23)
 	MCFG_K055673_PALETTE("palette")
 
+#if CUSTOM_DRAW
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", tasman)
+#endif
 
 	MCFG_DEVICE_ADD("k056832", K056832, 0)
 	MCFG_K056832_CB(kongambl_state, tile_callback)
-	MCFG_K056832_CONFIG("gfx1", 0, K056832_BPP_8TASMAN, 0, 0, "none")
-	MCFG_K056832_GFXDECODE("gfxdecode")
+	MCFG_K056832_CONFIG("gfx1", K056832_BPP_8TASMAN, 0, 0, "none")
 	MCFG_K056832_PALETTE("palette")
 
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -770,7 +806,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(kongambl_state,kingtut)
 {
-	//UINT32 *rom = (UINT32*)memregion("maincpu")->base();
+	//uint32_t *rom = (uint32_t*)memregion("maincpu")->base();
 
 	//rom[0x3986c/4] = (rom[0x3986c/4] & 0xffff0000) | 0x600e; // patch ROM check
 	//rom[0x2bfc8/4] = (rom[0x2bfc8/4] & 0xffff0000) | 0x6612; // patch VRAM ROM checks

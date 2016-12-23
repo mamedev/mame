@@ -7203,7 +7203,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="madoumon">
+	<software name="madou123">
 		<description>Madou Monogatari 1-2-3 (Jpn)</description>
 		<year>1990</year>
 		<publisher>Compile</publisher>
@@ -7236,7 +7236,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="madoumo1">
+	<software name="madou123a" cloneof="madou123">
 		<description>Madou Monogatari 1-2-3 (Jpn, Alt)</description>
 		<year>1990</year>
 		<publisher>Compile</publisher>
@@ -8978,7 +8978,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="prinmakr">
+	<software name="prinmak">
 		<description>Princess Maker (Jpn)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
@@ -9019,7 +9019,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="prinmakra" cloneof="prinmakr">
+	<software name="prinmaka" cloneof="prinmak">
 		<description>Princess Maker (Jpn, v2?)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>
@@ -9060,7 +9060,7 @@ The following floppies came with the machines.
 		</part>
 	</software>
 
-	<software name="prinmakrb" cloneof="prinmakr">
+	<software name="prinmakb" cloneof="prinmak">
 		<description>Princess Maker (Jpn, v2?, Alt)</description>
 		<year>1992</year>
 		<publisher>Micro Cabin</publisher>

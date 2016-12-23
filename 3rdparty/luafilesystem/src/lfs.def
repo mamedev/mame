@@ -1,0 +1,4 @@
+LIBRARY lfs.dll
+VERSION 1.6
+EXPORTS
+luaopen_lfs

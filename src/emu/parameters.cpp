@@ -18,7 +18,7 @@ parameters_manager::parameters_manager(running_machine &machine)
 std::string parameters_manager::lookup(std::string tag) const
 {
 	auto search = m_parameters.find(tag);
-	return (search!=m_parameters.end()) ? search->second : nullptr;
+	return (search!=m_parameters.end()) ? search->second : "";
 }
 
 void parameters_manager::add(std::string tag, std::string value)

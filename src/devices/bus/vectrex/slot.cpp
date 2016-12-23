@@ -45,7 +45,7 @@ device_vectrex_cart_interface::~device_vectrex_cart_interface()
 //  rom_alloc - alloc the space for the cart
 //-------------------------------------------------
 
-void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
+void device_vectrex_cart_interface::rom_alloc(uint32_t size, const char *tag)
 {
 	if (m_rom == nullptr)
 	{
@@ -62,7 +62,7 @@ void device_vectrex_cart_interface::rom_alloc(UINT32 size, const char *tag)
 //-------------------------------------------------
 //  vectrex_cart_slot_device - constructor
 //-------------------------------------------------
-vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+vectrex_cart_slot_device::vectrex_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 						device_t(mconfig, VECTREX_CART_SLOT, "GCE Vectrex Cartridge Slot", tag, owner, clock, "vectrex_cart_slot", __FILE__),
 						device_image_interface(mconfig, *this),
 						device_slot_interface(mconfig, *this),
@@ -148,17 +148,17 @@ static const char *vectrex_get_slot(int type)
  call load
  -------------------------------------------------*/
 
-bool vectrex_cart_slot_device::call_load()
+image_init_result vectrex_cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
-		UINT32 size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
-		UINT8 *ROM;
+		uint32_t size = (software_entry() == nullptr) ? length() : get_software_region_length("rom");
+		uint8_t *ROM;
 
 		if (size > 0x10000)
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		m_cart->rom_alloc((size < 0x1000) ? 0x1000 : size, tag());
@@ -173,7 +173,7 @@ bool vectrex_cart_slot_device::call_load()
 		if (memcmp(ROM, "g GCE", 5))
 		{
 			seterror(IMAGE_ERROR_UNSPECIFIED, "Invalid image");
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 		}
 
 		// determine type
@@ -195,21 +195,10 @@ bool vectrex_cart_slot_device::call_load()
 		if (!memcmp(ROM + 0x11, "3D MINE STORM", 13))
 			m_vec3d = VEC3D_MINEST;
 
-		return IMAGE_INIT_PASS;
+		return image_init_result::PASS;
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-
-/*-------------------------------------------------
- call softlist load
- -------------------------------------------------*/
-
-bool vectrex_cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry);
-	return TRUE;
+	return image_init_result::PASS;
 }
 
 
@@ -222,11 +211,11 @@ std::string vectrex_cart_slot_device::get_default_card_software()
 	if (open_image_file(mconfig().options()))
 	{
 		const char *slot_string;
-		UINT32 size = core_fsize(m_file);
-		dynamic_buffer rom(size);
+		uint32_t size = m_file->size();
+		std::vector<uint8_t> rom(size);
 		int type = VECTREX_STD;
 
-		core_fread(m_file, &rom[0], size);
+		m_file->read(&rom[0], size);
 
 		if (!memcmp(&rom[0x06], "SRAM", 4))
 			type = VECTREX_SRAM;

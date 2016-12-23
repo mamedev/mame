@@ -39,7 +39,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "includes/exzisus.h"
 
 
@@ -80,7 +80,7 @@ WRITE8_MEMBER(exzisus_state::cpub_reset_w)
 // the RAM check to work
 DRIVER_INIT_MEMBER(exzisus_state,exzisus)
 {
-	UINT8 *RAM = memregion("cpua")->base();
+	uint8_t *RAM = memregion("cpua")->base();
 
 	/* Fix WORK RAM error */
 	RAM[0x67fd] = 0x18;

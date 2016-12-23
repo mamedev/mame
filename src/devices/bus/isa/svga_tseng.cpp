@@ -46,7 +46,7 @@ machine_config_constructor isa8_svga_et4k_device::device_mconfig_additions() con
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *isa8_svga_et4k_device::device_rom_region() const
+const tiny_rom_entry *isa8_svga_et4k_device::device_rom_region() const
 {
 	return ROM_NAME( et4000 );
 }
@@ -59,7 +59,7 @@ const rom_entry *isa8_svga_et4k_device::device_rom_region() const
 //  isa8_vga_device - constructor
 //-------------------------------------------------
 
-isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+isa8_svga_et4k_device::isa8_svga_et4k_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, ISA8_SVGA_ET4K, "SVGA Tseng ET4000 Graphics Card", tag, owner, clock, "et4000", __FILE__),
 		device_isa8_card_interface(mconfig, *this), m_vga(nullptr)
 {
@@ -76,13 +76,13 @@ void isa8_svga_et4k_device::device_start()
 
 	m_vga = subdevice<tseng_vga_device>("vga");
 
-	m_isa->install_rom(this, 0xc0000, 0xc7fff, 0, 0, "et4000", "et4000");
+	m_isa->install_rom(this, 0xc0000, 0xc7fff, "et4000", "et4000");
 
-	m_isa->install_device(0x3b0, 0x3bf, 0, 0, read8_delegate(FUNC(tseng_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w),m_vga));
-	m_isa->install_device(0x3c0, 0x3cf, 0, 0, read8_delegate(FUNC(tseng_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w),m_vga));
-	m_isa->install_device(0x3d0, 0x3df, 0, 0, read8_delegate(FUNC(tseng_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w),m_vga));
+	m_isa->install_device(0x3b0, 0x3bf, read8_delegate(FUNC(tseng_vga_device::port_03b0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03b0_w),m_vga));
+	m_isa->install_device(0x3c0, 0x3cf, read8_delegate(FUNC(tseng_vga_device::port_03c0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03c0_w),m_vga));
+	m_isa->install_device(0x3d0, 0x3df, read8_delegate(FUNC(tseng_vga_device::port_03d0_r),m_vga), write8_delegate(FUNC(tseng_vga_device::port_03d0_w),m_vga));
 
-	m_isa->install_memory(0xa0000, 0xbffff, 0, 0, read8_delegate(FUNC(tseng_vga_device::mem_r),m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w),m_vga));
+	m_isa->install_memory(0xa0000, 0xbffff, read8_delegate(FUNC(tseng_vga_device::mem_r),m_vga), write8_delegate(FUNC(tseng_vga_device::mem_w),m_vga));
 }
 
 //-------------------------------------------------

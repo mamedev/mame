@@ -421,9 +421,9 @@ READ8_MEMBER(atarisy2_state::leta_r)
 
 			case 2: /* Fake Spinner */
 			{
-				INT32  diff;
-				UINT32 temp;
-				UINT32 rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
+				int32_t  diff;
+				uint32_t temp;
+				uint32_t rotate_count = ioport("FAKE_SPINNER")->read() & 0xffff;
 				/* rotate_count behaves the same as the real LEAT1 Rotate encoder
 				 * we use it to generate the LETA0 Center encoder count
 				 */
@@ -522,7 +522,7 @@ READ8_MEMBER(atarisy2_state::leta_r)
     Also the CH1 output is referenced to 2.5V.  Anything
     above is positive, below is negative.  Then amplified
     by 6.556 and clipped to -15V and (15V-1.5V=13.5V).
-    This is usefull to work out the relative signal levels
+    This is useful to work out the relative signal levels
     of each effect.
 
     This then goes to the stage you were asking about.  We
@@ -763,7 +763,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, atarisy2_state )
 	AM_RANGE(0x1680, 0x1681) AM_MIRROR(0x007e) AM_DEVWRITE8("soundcomm", atari_sound_comm_device, main_command_w, 0x00ff)
 	AM_RANGE(0x1700, 0x1701) AM_MIRROR(0x007e) AM_WRITE(xscroll_w) AM_SHARE("xscroll")
 	AM_RANGE(0x1780, 0x1781) AM_MIRROR(0x007e) AM_WRITE(yscroll_w) AM_SHARE("yscroll")
-	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READ(switch_r) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x1800, 0x1801) AM_MIRROR(0x03fe) AM_READ(switch_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1c00, 0x1c01) AM_MIRROR(0x03fe) AM_READ(sound_r)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(videoram_r, videoram_w)
 	AM_RANGE(0x4000, 0x5fff) AM_ROMBANK("rombank1")
@@ -1198,6 +1198,8 @@ static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 	MCFG_MACHINE_RESET_OVERRIDE(atarisy2_state,atarisy2)
 
 	MCFG_EEPROM_2804_ADD("eeprom")
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", atarisy2)
@@ -3155,7 +3157,7 @@ ROM_END
 DRIVER_INIT_MEMBER(atarisy2_state,paperboy)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3184,7 +3186,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,720)
 DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 
@@ -3199,7 +3201,7 @@ DRIVER_INIT_MEMBER(atarisy2_state,ssprint)
 DRIVER_INIT_MEMBER(atarisy2_state,csprint)
 {
 	int i;
-	UINT8 *cpu1 = memregion("maincpu")->base();
+	uint8_t *cpu1 = memregion("maincpu")->base();
 
 	m_slapstic->slapstic_init();
 

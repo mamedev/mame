@@ -1,0 +1,94 @@
+<?xml version="1.0"?>
+<!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
+<!-- Thanks to DCMOTO (http://dcmoto.free.fr) for info! -->
+<softwarelist name="to8_qd" description="Thomson TO8 QD disks">
+
+<!-- Applications -->
+
+	<!-- Not working, but this same dump is available on dcmoto, so it is most likely not bad-->
+	<software name="initb512" supported="no">
+		<description>Initiation au BASIC 512</description>
+		<year>1986</year>
+		<publisher>Thomson</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<feature name="part_id" value="Disk 1 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="initb5121a.qd" size="51200" crc="f9410541" sha1="1557fa03336ef8b7c5916c06b0c61011ef72c02e" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="thom_flop">
+			<feature name="part_id" value="Disk 1 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="initb5121b.qd" size="51200" crc="00165db4" sha1="8eb93709b228ef42a52739434635117ba89532a8" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="thom_flop">
+			<feature name="part_id" value="Disk 2 Side A"/>
+			<dataarea name="flop" size="51200">
+				<rom name="initb5122a.qd" size="51200" crc="d443f87b" sha1="fdd9f0ffaf6b395199b5a18e13da35c3d1c19dd3" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="thom_flop">
+			<feature name="part_id" value="Disk 2 Side B"/>
+			<dataarea name="flop" size="51200">
+				<rom name="initb5122b.qd" size="51200" crc="b7a3cd64" sha1="f4727a10c2707e3ee5261996f66cf2b5223d869c" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!-- Games -->
+
+	<software name="vampire">
+		<description>Vampire</description>
+		<year>1986</year>
+		<publisher>Infogrames</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="vampire.qd" size="51200" crc="2cc62d02" sha1="379d225f6acff33bc2e1bf00e01b1a6713f88f31" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+    <software name="vampirea" cloneof="vampire" supported="no">
+        <description>Vampire (Bad)</description>
+        <year>1986</year>
+        <publisher>Infogrames</publisher>
+
+        <part name="flop1" interface="thom_flop">
+            <dataarea name="flop" size="51200">
+                <rom name="vampirea.qd" size="51200" crc="a02f3961" sha1="fcdedadd69375a350df8c336194c09a01d2bdaf6" offset="0" status="baddump" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+	<software name="volsolo">
+		<description>Vol Solo</description>
+		<year>1986</year>
+		<publisher>France Image Logiciel (FIL)</publisher>
+
+		<part name="flop1" interface="thom_flop">
+			<dataarea name="flop" size="51200">
+				<rom name="volsolo.qd" size="51200" crc="9fd0ac72" sha1="50b2d297d8ad428d9424ab95f9218a42c2549544" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+<!--
+    <software name="volsoloa" cloneof="volsolo" supported="no">
+        <description>Vol Solo (Bad)</description>
+        <year>1986</year>
+        <publisher>France Image Logiciel (FIL)</publisher>
+
+        <part name="flop1" interface="thom_flop">
+            <dataarea name="flop" size="51200">
+                <rom name="volsoloa.qd" size="51200" crc="3bfb6836" sha1="d73c7f61ade484742f290f810fa5f40b3321364d" offset="0" status="baddump" />
+            </dataarea>
+        </part>
+    </software>
+-->
+
+</softwarelist>

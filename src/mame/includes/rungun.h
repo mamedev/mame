@@ -5,7 +5,9 @@
     Run and Gun / Slam Dunk
 
 *************************************************************************/
+
 #include "sound/k054539.h"
+#include "machine/gen_latch.h"
 #include "machine/k053252.h"
 #include "video/k053246_k053247_k055673.h"
 #include "video/k053936.h"
@@ -23,11 +25,13 @@ public:
 		m_k053936(*this, "k053936"),
 		m_k055673(*this, "k055673"),
 		m_k053252(*this, "k053252"),
-		m_sysreg(*this, "sysreg"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
 		m_palette2(*this, "palette2"),
-		m_screen(*this, "screen")
+		m_screen(*this, "screen"),
+		m_soundlatch(*this, "soundlatch"),
+		m_soundlatch2(*this, "soundlatch2"),
+		m_sysreg(*this, "sysreg")
 	{ }
 
 	/* devices */
@@ -38,37 +42,38 @@ public:
 	required_device<k053936_device> m_k053936;
 	required_device<k055673_device> m_k055673;
 	required_device<k053252_device> m_k053252;
-
-	/* memory pointers */
-	required_shared_ptr<UINT16> m_sysreg;
-
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 	optional_device<palette_device> m_palette2;
 	required_device<screen_device> m_screen;
+	required_device<generic_latch_8_device> m_soundlatch;
+	required_device<generic_latch_8_device> m_soundlatch2;
+
+	/* memory pointers */
+	required_shared_ptr<uint16_t> m_sysreg;
 
 	/* video-related */
 	tilemap_t   *m_ttl_tilemap[2];
 	tilemap_t   *m_936_tilemap[2];
-	std::unique_ptr<UINT16[]> m_psac2_vram;
-	std::unique_ptr<UINT16[]>    m_ttl_vram;
-	std::unique_ptr<UINT16[]>   m_pal_ram;
-	UINT8       m_current_display_bank;
+	std::unique_ptr<uint16_t[]> m_psac2_vram;
+	std::unique_ptr<uint16_t[]>    m_ttl_vram;
+	std::unique_ptr<uint16_t[]>   m_pal_ram;
+	uint8_t       m_current_display_bank;
 	int         m_ttl_gfx_index;
 	int         m_sprite_colorbase;
 
-	UINT8       *m_roz_rom;
-	UINT8       m_roz_rombase;
+	uint8_t       *m_roz_rom;
+	uint8_t       m_roz_rombase;
 
 	/* sound */
-	UINT8       m_sound_ctrl;
-	UINT8       m_sound_status;
-	UINT8       m_sound_nmi_clk;
+	uint8_t       m_sound_ctrl;
+	uint8_t       m_sound_status;
+	uint8_t       m_sound_nmi_clk;
 
 	bool        m_video_priority_mode;
-	std::unique_ptr<UINT16[]> m_banked_ram;
+	std::unique_ptr<uint16_t[]> m_banked_ram;
 	bool        m_single_screen_mode;
-	UINT8       m_video_mux_bank;
+	uint8_t       m_video_mux_bank;
 
 	DECLARE_READ16_MEMBER(rng_sysregs_r);
 	DECLARE_WRITE16_MEMBER(rng_sysregs_w);
@@ -95,10 +100,10 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rng(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT32 screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rng_dual_left(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rng_dual_right(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	bitmap_ind16 m_rng_dual_demultiplex_left_temp;
 	bitmap_ind16 m_rng_dual_demultiplex_right_temp;
 	void   sprite_dma_trigger(void);

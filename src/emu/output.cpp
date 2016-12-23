@@ -9,6 +9,11 @@
 
 #include "emu.h"
 #include "coreutil.h"
+#include "modules/output/output_module.h"
+
+
+#define OUTPUT_VERBOSE  0
+
 
 //**************************************************************************
 //  OUTPUT MANAGER
@@ -23,8 +28,8 @@ output_manager::output_manager(running_machine &machine)
 		m_uniqueid(12345)
 {
 	/* add pause callback */
-	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(FUNC(output_manager::pause), this));
-	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(FUNC(output_manager::resume), this));
+	machine.add_notifier(MACHINE_NOTIFY_PAUSE, machine_notify_delegate(&output_manager::pause, this));
+	machine.add_notifier(MACHINE_NOTIFY_RESUME, machine_notify_delegate(&output_manager::resume, this));
 }
 
 /*-------------------------------------------------
@@ -33,10 +38,9 @@ output_manager::output_manager(running_machine &machine)
 
 output_manager::output_item* output_manager::find_item(const char *string)
 {
-	/* use the hash as a starting point and find an entry */
-	for (auto &item : m_itemtable)
-		if (strcmp(string, item.second.name.c_str()) == 0)
-			return &item.second;
+	auto item = m_itemtable.find(std::string(string));
+	if (item != m_itemtable.end())
+		return &item->second;
 
 	return nullptr;
 }
@@ -46,7 +50,7 @@ output_manager::output_item* output_manager::find_item(const char *string)
     create_new_item - create a new item
 -------------------------------------------------*/
 
-output_manager::output_item *output_manager::create_new_item(const char *outname, INT32 value)
+output_manager::output_item *output_manager::create_new_item(const char *outname, s32 value)
 {
 	output_item item;
 
@@ -79,10 +83,10 @@ void output_manager::resume()
     output_set_value - set the value of an output
 -------------------------------------------------*/
 
-void output_manager::set_value(const char *outname, INT32 value)
+void output_manager::set_value(const char *outname, s32 value)
 {
 	output_item *item = find_item(outname);
-	INT32 oldval;
+	s32 oldval;
 
 	/* if no item of that name, create a new one and send the item's state */
 	if (item == nullptr)
@@ -101,6 +105,9 @@ void output_manager::set_value(const char *outname, INT32 value)
 	/* if the value is different, signal the notifier */
 	if (oldval != value)
 	{
+		if (OUTPUT_VERBOSE)
+			machine().logerror("Output %s = %d (was %d)\n", outname, value, oldval);
+
 		/* call the local notifiers first */
 		for (auto notify : item->notifylist)
 			(*notify.m_notifier)(outname, value, notify.m_param);
@@ -143,7 +150,7 @@ void output_manager::set_indexed_value(const char *basename, int index, int valu
     output
 -------------------------------------------------*/
 
-INT32 output_manager::get_value(const char *outname)
+s32 output_manager::get_value(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -159,7 +166,7 @@ INT32 output_manager::get_value(const char *outname)
     indexed output
 -------------------------------------------------*/
 
-INT32 output_manager::get_indexed_value(const char *basename, int index)
+s32 output_manager::get_indexed_value(const char *basename, int index)
 {
 	char buffer[100];
 	char *dest = buffer;
@@ -183,7 +190,7 @@ INT32 output_manager::get_indexed_value(const char *basename, int index)
 /*-------------------------------------------------
     output_set_notifier - sets a notifier callback
     for a particular output, or for all outputs
-    if NULL is specified
+    if nullptr is specified
 -------------------------------------------------*/
 
 void output_manager::set_notifier(const char *outname, output_notifier_func callback, void *param)
@@ -210,10 +217,10 @@ void output_manager::set_notifier(const char *outname, output_notifier_func call
     notifier for all outputs
 -------------------------------------------------*/
 
-void output_manager::notify_all(output_notifier_func callback, void *param)
+void output_manager::notify_all(output_module *module)
 {
 	for (auto &item : m_itemtable)
-		(*callback)(item.second.name.c_str(), item.second.value, param);
+		module->notify(item.second.name.c_str(), item.second.value);
 }
 
 
@@ -222,7 +229,7 @@ void output_manager::notify_all(output_notifier_func callback, void *param)
     a given name
 -------------------------------------------------*/
 
-UINT32 output_manager::name_to_id(const char *outname)
+u32 output_manager::name_to_id(const char *outname)
 {
 	output_item *item = find_item(outname);
 
@@ -238,7 +245,7 @@ UINT32 output_manager::name_to_id(const char *outname)
     to a given unique ID
 -------------------------------------------------*/
 
-const char *output_manager::id_to_name(UINT32 id)
+const char *output_manager::id_to_name(u32 id)
 {
 	for (auto &item : m_itemtable)
 		if (item.second.id == id)

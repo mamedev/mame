@@ -39,10 +39,10 @@
 
 	<element name="ind_left" defstate="0">
 		<rect><color red="0.5412" green="0.57255" blue="0.5804" /></rect>
-		<text string="&lt;" align="1" state="0">
+		<text string="&#x25c0;" align="1" state="0">
 			<color red="0.515" green="0.537" blue="0.548" />
 		</text>
-		<text string="&lt;" align="1" state="1">
+		<text string="&#x25c0;" align="1" state="1">
 			<color red="0.361" green="0.326" blue="0.346" />
 		</text>
 	</element>
@@ -259,7 +259,7 @@
 			<bounds x="1" y="9" width="5" height="5" />
 		</bezel>
 		<bezel name="lamp71" element="ind_left">
-			<bounds x="8" y="9" width="5" height="5" />
+			<bounds x="8" y="8" width="5" height="7" />
 		</bezel>
 
 <!-- right: run, sys -->

@@ -1,5 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Jarek Parchanski, Andrea Mazzoleni
+
+#include "machine/gen_latch.h"
+
 class retofinv_state : public driver_device
 {
 public:
@@ -11,6 +14,7 @@ public:
 		m_68705(*this, "68705"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_fg_videoram(*this, "fg_videoram"),
 		m_sharedram(*this, "sharedram"),
 		m_bg_videoram(*this, "bg_videoram") { }
@@ -21,27 +25,28 @@ public:
 	optional_device<cpu_device> m_68705;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT8> m_fg_videoram;
-	required_shared_ptr<UINT8> m_sharedram;
-	required_shared_ptr<UINT8> m_bg_videoram;
+	required_shared_ptr<uint8_t> m_fg_videoram;
+	required_shared_ptr<uint8_t> m_sharedram;
+	required_shared_ptr<uint8_t> m_bg_videoram;
 
-	UINT8 m_main_irq_mask;
-	UINT8 m_sub_irq_mask;
-	UINT8 m_cpu2_m6000;
-	UINT8 m_from_main;
-	UINT8 m_from_mcu;
+	uint8_t m_main_irq_mask;
+	uint8_t m_sub_irq_mask;
+	uint8_t m_cpu2_m6000;
+	uint8_t m_from_main;
+	uint8_t m_from_mcu;
 	int m_mcu_sent;
 	int m_main_sent;
-	UINT8 m_portA_in;
-	UINT8 m_portA_out;
-	UINT8 m_ddrA;
-	UINT8 m_portB_in;
-	UINT8 m_portB_out;
-	UINT8 m_ddrB;
-	UINT8 m_portC_in;
-	UINT8 m_portC_out;
-	UINT8 m_ddrC;
+	uint8_t m_portA_in;
+	uint8_t m_portA_out;
+	uint8_t m_ddrA;
+	uint8_t m_portB_in;
+	uint8_t m_portB_out;
+	uint8_t m_ddrB;
+	uint8_t m_portC_in;
+	uint8_t m_portC_out;
+	uint8_t m_ddrC;
 	int m_fg_bank;
 	int m_bg_bank;
 	tilemap_t *m_bg_tilemap;
@@ -81,7 +86,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(retofinv);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap);
 
 	INTERRUPT_GEN_MEMBER(main_vblank_irq);

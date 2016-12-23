@@ -18,7 +18,7 @@
 TO DO:
   - sprites are probably banked differently (no way to be sure until MCU dump is available)
   - TA7630 emulation needs filter support (characteristics depend on the frequency)
-  - TA7630 volume table is hand tuned to match the sample, but still slighty off.
+  - TA7630 volume table is hand tuned to match the sample, but still slightly off.
 */
 
 
@@ -32,7 +32,7 @@ TIMER_CALLBACK_MEMBER(msisaac_state::nmi_callback)
 
 WRITE8_MEMBER(msisaac_state::sound_command_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(msisaac_state::nmi_callback),this), data);
 }
 
@@ -115,7 +115,7 @@ MCU simulation TODO:
 			//6-down
 			//7-leftdwn
 
-			UINT8 val= (ioport("IN1")->read() >> 2) & 0x0f;
+			uint8_t val= (ioport("IN1")->read() >> 2) & 0x0f;
 			/* bit0 = left
 			   bit1 = right
 			   bit2 = down
@@ -131,7 +131,7 @@ MCU simulation TODO:
 			/*       0000   0001   0010   0011      0100   0101   0110   0111     1000   1001   1010   1011   1100   1101   1110   1111 */
 			/*      nochange left  right nochange   down downlft dwnrght down     up     upleft uprgt  up    nochnge left   right  nochange */
 
-			static const INT8 table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
+			static const int8_t table[16] = { -1,    2,    6,     -1,       0,   1,      7,      0,       4,     3,     5,    4,     -1,     2,     6,    -1 };
 
 			if (table[val] >= 0)
 				m_direction = table[val];
@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( msisaac_sound_map, AS_PROGRAM, 8, msisaac_state )
 	AM_RANGE(0x8010, 0x801d) AM_DEVWRITE("msm", msm5232_device, write)
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
@@ -493,6 +493,8 @@ static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

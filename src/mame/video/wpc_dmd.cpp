@@ -30,7 +30,7 @@ static MACHINE_CONFIG_FRAGMENT( wpc_dmd )
 MACHINE_CONFIG_END
 
 
-wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+wpc_dmd_device::wpc_dmd_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, WPC_DMD, "Williams Pinball Controller Dot Matrix Display", tag, owner, clock, "wpc_dmd", __FILE__),
 	scanline_cb(*this),
 	dmd0(*this, ":dmd0"),
@@ -99,26 +99,26 @@ void wpc_dmd_device::device_reset()
 	cur_scanline = 0;
 }
 
-UINT32 wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	const UINT8 *src = &screen_buffer[0];
+	const uint8_t *src = &screen_buffer[0];
 	for(int y=0; y<32; y++) {
-		UINT32 *pix0 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4));
-		UINT32 *pix1 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4+1));
-		UINT32 *pix2 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4+2));
-		UINT32 *pix3 = reinterpret_cast<UINT32 *>(bitmap.raw_pixptr(y*4+3));
+		uint32_t *pix0 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y*4));
+		uint32_t *pix1 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y*4+1));
+		uint32_t *pix2 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y*4+2));
+		uint32_t *pix3 = reinterpret_cast<uint32_t *>(bitmap.raw_pixptr(y*4+3));
 		for(int x=0; x<128; x++) {
-			UINT8 v = bitcounts[*src++ & 0x3f];
-			UINT8 v0 = v < 2 ? 0 : v-2;
-			UINT8 v1 = v < 1 ? 0 : v-1;
-			UINT8 v2 = v > 5 ? 5 : v;
+			uint8_t v = bitcounts[*src++ & 0x3f];
+			uint8_t v0 = v < 2 ? 0 : v-2;
+			uint8_t v1 = v < 1 ? 0 : v-1;
+			uint8_t v2 = v > 5 ? 5 : v;
 			v0 = 255*v0/5;
 			v1 = 255*v1/5;
 			v2 = 255*v2/5;
 
-			UINT32 xv0 = (v0 << 16) | (v0 << 8);
-			UINT32 xv1 = (v1 << 16) | (v1 << 8);
-			UINT32 xv2 = (v2 << 16) | (v2 << 8);
+			uint32_t xv0 = (v0 << 16) | (v0 << 8);
+			uint32_t xv1 = (v1 << 16) | (v1 << 8);
+			uint32_t xv2 = (v2 << 16) | (v2 << 8);
 			*pix0++ = xv0;
 			*pix0++ = xv1;
 			*pix0++ = xv1;
@@ -146,11 +146,11 @@ UINT32 wpc_dmd_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 
 TIMER_DEVICE_CALLBACK_MEMBER(wpc_dmd_device::scanline_timer)
 {
-	const UINT8 *src = &ram[0x200*(visible_page & 0xf) + 16*cur_scanline];
-	UINT8 *base = &screen_buffer[128*cur_scanline];
+	const uint8_t *src = &ram[0x200*(visible_page & 0xf) + 16*cur_scanline];
+	uint8_t *base = &screen_buffer[128*cur_scanline];
 
 	for(int x1=0; x1<16; x1++) {
-		UINT8 v = *src++;
+		uint8_t v = *src++;
 		for(int x2=0; x2<8; x2++) {
 			*base = (*base << 1) | ((v & (0x01 << x2)) ? 1 : 0);
 			base++;

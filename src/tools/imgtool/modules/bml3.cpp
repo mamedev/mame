@@ -28,15 +28,15 @@
 
 struct bml3_diskinfo
 {
-	UINT16 sector_size;   /* 128 or 256 */
-	UINT8  heads;         /* 1 or 2 */
-	UINT8  fat_start_sector; /* in cylinder 20, start sector of FAT */
-	UINT8  fat_start_offset; /* start byte of FAT in sector */
-	UINT8  fat_sectors;   /* the number of sectors in the FAT */
-	UINT8  dirent_start_sector;  /* in cylinder 20, start sector of directory entries */
-	UINT8  granule_sectors;  /* how many sectors per granule */
-	UINT8  first_granule_cylinder; /* the number of the first cylinder with granule numbers assigned */
-	UINT8  variant;       /* 0 - older version, uses EOF to terminate files, 1 - newer version, stores file length */
+	uint16_t sector_size;   /* 128 or 256 */
+	uint8_t  heads;         /* 1 or 2 */
+	uint8_t  fat_start_sector; /* in cylinder 20, start sector of FAT */
+	uint8_t  fat_start_offset; /* start byte of FAT in sector */
+	uint8_t  fat_sectors;   /* the number of sectors in the FAT */
+	uint8_t  dirent_start_sector;  /* in cylinder 20, start sector of directory entries */
+	uint8_t  granule_sectors;  /* how many sectors per granule */
+	uint8_t  first_granule_cylinder; /* the number of the first cylinder with granule numbers assigned */
+	uint8_t  variant;       /* 0 - older version, uses EOF to terminate files, 1 - newer version, stores file length */
 };
 
 /* this structure mirrors the structure of a directory entry on disk */
@@ -44,10 +44,10 @@ struct bml3_dirent
 {
 	char fname[8];
 	char fext[3];
-	UINT8 ftype;
-	UINT8 asciiflag;
-	UINT8 first_granule;
-	UINT16 lastsectorbytes;
+	uint8_t ftype;
+	uint8_t asciiflag;
+	uint8_t first_granule;
+	uint16_t lastsectorbytes;
 	// TODO there are some 'unused' bytes here that are sometimes used to store a timestamp, maybe support this?
 };
 
@@ -60,15 +60,15 @@ struct bml3_direnum
 #define MAX_GRANULEMAP_SIZE 256
 
 struct granule_list_t {
-	UINT8 granules[MAX_GRANULEMAP_SIZE];
-	UINT8 granule_count;
-	UINT8 last_granule_sectors;
+	uint8_t granules[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t last_granule_sectors;
 };
 
 #define BML3_OPTIONS_FTYPE     'T'
 #define BML3_OPTIONS_ASCII     'M'
 
-static imgtoolerr_t bml3_diskimage_deletefile(imgtool_partition *partition, const char *fname);
+static imgtoolerr_t bml3_diskimage_deletefile(imgtool::partition &partition, const char *fname);
 
 
 
@@ -76,14 +76,14 @@ static imgtoolerr_t bml3_diskimage_deletefile(imgtool_partition *partition, cons
     Imgtool module code
 *********************************************************************/
 
-static bml3_diskinfo *bml3_get_diskinfo(imgtool_image *image)
+static bml3_diskinfo *bml3_get_diskinfo(imgtool::image &image)
 {
 	return (bml3_diskinfo *) imgtool_floppy_extrabytes(image);
 }
 
 
 
-static int max_dirents(imgtool_image *image)
+static int max_dirents(imgtool::image &image)
 {
 	bml3_diskinfo *info = bml3_get_diskinfo(image);
 	return (16 * info->heads + 1 - info->dirent_start_sector)*(info->sector_size/32);
@@ -91,7 +91,7 @@ static int max_dirents(imgtool_image *image)
 
 
 
-static void dirent_location(imgtool_image *image, int index_loc, UINT8 *head, UINT8 *track, UINT8 *sector, UINT8 *offset)
+static void dirent_location(imgtool::image &image, int index_loc, uint8_t *head, uint8_t *track, uint8_t *sector, uint8_t *offset)
 {
 	bml3_diskinfo *info = bml3_get_diskinfo(image);
 	*track = 20;
@@ -107,11 +107,11 @@ static void dirent_location(imgtool_image *image, int index_loc, UINT8 *head, UI
 
 
 
-static floperr_t get_bml3_dirent(imgtool_image *f, int index_loc, struct bml3_dirent *ent)
+static floperr_t get_bml3_dirent(imgtool::image &f, int index_loc, struct bml3_dirent *ent)
 {
 	floperr_t err;
-	UINT8 head, track, sector, offset;
-	UINT8 buf[32];
+	uint8_t head, track, sector, offset;
+	uint8_t buf[32];
 	bml3_diskinfo *info = bml3_get_diskinfo(f);
 	dirent_location(f, index_loc, &head, &track, &sector, &offset);
 	err = floppy_read_sector(imgtool_floppy(f), head, track, sector, offset, (void *) buf, sizeof(buf));
@@ -139,11 +139,11 @@ static floperr_t get_bml3_dirent(imgtool_image *f, int index_loc, struct bml3_di
 
 
 
-static floperr_t put_bml3_dirent(imgtool_image *f, int index_loc, const struct bml3_dirent *ent)
+static floperr_t put_bml3_dirent(imgtool::image &f, int index_loc, const struct bml3_dirent *ent)
 {
 	floperr_t err;
-	UINT8 head, track, sector, offset;
-	UINT8 buf[32];
+	uint8_t head, track, sector, offset;
+	uint8_t buf[32];
 	bml3_diskinfo *info = bml3_get_diskinfo(f);
 	if (index_loc >= max_dirents(f))
 		return (floperr_t)IMGTOOLERR_FILENOTFOUND;
@@ -194,7 +194,7 @@ static void get_dirent_fname(char *fnamebuf, const struct bml3_dirent *ent)
 
 
 
-static imgtoolerr_t lookup_bml3_file(imgtool_image *f, const char *fname, struct bml3_dirent *ent, int *position)
+static imgtoolerr_t lookup_bml3_file(imgtool::image &f, const char *fname, struct bml3_dirent *ent, int *position)
 {
 	int i;
 	floperr_t ferr;
@@ -229,10 +229,10 @@ static imgtoolerr_t lookup_bml3_file(imgtool_image *f, const char *fname, struct
 
 
 
-static UINT8 get_granule_count(imgtool_image *img)
+static uint8_t get_granule_count(imgtool::image &img)
 {
-	// UINT16 tracks;
-	UINT16 disk_granules;
+	// uint16_t tracks;
+	uint16_t disk_granules;
 	bml3_diskinfo *info = bml3_get_diskinfo(img);
 
 	// This always returns 82 for D88, so not quite right
@@ -241,14 +241,14 @@ static UINT8 get_granule_count(imgtool_image *img)
 	// The number of granules is primarily constrained by the disk capacity.
 	disk_granules = (40 - 1 - info->first_granule_cylinder) * info->heads * (16 / info->granule_sectors);
 	// Also, granule numbers from 0xC0 upwards are reserved for terminating a granule chain
-	return (UINT8)((disk_granules < 0xC0) ? disk_granules : 0xC0);
+	return (uint8_t)((disk_granules < 0xC0) ? disk_granules : 0xC0);
 }
 
 /* granule_map must be an array of MAX_GRANULEMAP_SIZE bytes */
-static floperr_t get_granule_map(imgtool_image *img, UINT8 *granule_map, UINT8 *granule_count)
+static floperr_t get_granule_map(imgtool::image &img, uint8_t *granule_map, uint8_t *granule_count)
 {
 	bml3_diskinfo *info = bml3_get_diskinfo(img);
-	UINT8 count;
+	uint8_t count;
 
 	count = get_granule_count(img);
 	if (granule_count)
@@ -260,7 +260,7 @@ static floperr_t get_granule_map(imgtool_image *img, UINT8 *granule_map, UINT8 *
 
 
 
-static floperr_t put_granule_map(imgtool_image *img, const UINT8 *granule_map, UINT8 granule_count)
+static floperr_t put_granule_map(imgtool::image &img, const uint8_t *granule_map, uint8_t granule_count)
 {
 	bml3_diskinfo *info = bml3_get_diskinfo(img);
 	return floppy_write_sector(imgtool_floppy(img), 0, 20, info->fat_start_sector, info->fat_start_offset, granule_map, granule_count, 0);    /* TODO: pass ddam argument from imgtool */
@@ -269,10 +269,10 @@ static floperr_t put_granule_map(imgtool_image *img, const UINT8 *granule_map, U
 
 
 
-static void granule_location(imgtool_image *image, UINT8 granule, UINT8 *head, UINT8 *track, UINT8 *sector)
+static void granule_location(imgtool::image &image, uint8_t granule, uint8_t *head, uint8_t *track, uint8_t *sector)
 {
 	bml3_diskinfo *info = bml3_get_diskinfo(image);
-	UINT16 abs_track = granule * info->granule_sectors / 16;
+	uint16_t abs_track = granule * info->granule_sectors / 16;
 	*head = abs_track % info->heads;
 	*track = abs_track / info->heads + info->first_granule_cylinder;
 	// skip filesystem cylinder
@@ -283,10 +283,10 @@ static void granule_location(imgtool_image *image, UINT8 granule, UINT8 *head, U
 
 
 
-static imgtoolerr_t transfer_granule(imgtool_image *img, UINT8 granule, int length, imgtool_stream *f, imgtoolerr_t (*proc)(imgtool_image *, int, int, int, int, size_t, imgtool_stream *))
+static imgtoolerr_t transfer_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &f, imgtoolerr_t (*proc)(imgtool::image &, int, int, int, int, size_t, imgtool::stream &))
 {
 	imgtoolerr_t err = IMGTOOLERR_SUCCESS;
-	UINT8 head, track, sector;
+	uint8_t head, track, sector;
 	granule_location(img, granule, &head, &track, &sector);
 	if (length > 0)
 		err = proc(img, head, track, sector, 0, length, f);
@@ -294,45 +294,45 @@ static imgtoolerr_t transfer_granule(imgtool_image *img, UINT8 granule, int leng
 }
 
 
-static imgtoolerr_t transfer_from_granule(imgtool_image *img, UINT8 granule, int length, imgtool_stream *destf)
+static imgtoolerr_t transfer_from_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &destf)
 {
 	return transfer_granule(img, granule, length, destf, imgtool_floppy_read_sector_to_stream);
 }
 
 
 
-static imgtoolerr_t transfer_to_granule(imgtool_image *img, UINT8 granule, int length, imgtool_stream *sourcef)
+static imgtoolerr_t transfer_to_granule(imgtool::image &img, uint8_t granule, int length, imgtool::stream &sourcef)
 {
 	return transfer_granule(img, granule, length, sourcef, imgtool_floppy_write_sector_from_stream);
 }
 
 
 
-static floperr_t read_granule(imgtool_image *img, UINT8 granule, int offset, int length, UINT8 *buf)
+static floperr_t read_granule(imgtool::image &img, uint8_t granule, int offset, int length, uint8_t *buf)
 {
-	UINT8 head, track, sector;
+	uint8_t head, track, sector;
 	granule_location(img, granule, &head, &track, &sector);
 	return floppy_read_sector(imgtool_floppy(img), head, track, sector, offset, buf, length);
 }
 
 
 
-static floperr_t write_granule(imgtool_image *img, UINT8 granule, int offset, int length, const UINT8 *buf)
+static floperr_t write_granule(imgtool::image &img, uint8_t granule, int offset, int length, const uint8_t *buf)
 {
-	UINT8 head, track, sector;
+	uint8_t head, track, sector;
 	granule_location(img, granule, &head, &track, &sector);
 	return floppy_write_sector(imgtool_floppy(img), head, track, sector, offset, buf, length, 0); /* TODO: pass ddam argument from imgtool */
 }
 
 
 
-static imgtoolerr_t list_granules(struct bml3_dirent *ent, imgtool_image *img, struct granule_list_t *granule_list)
+static imgtoolerr_t list_granules(struct bml3_dirent *ent, imgtool::image &img, struct granule_list_t *granule_list)
 {
 	floperr_t ferr;
-	UINT8 max_granules;
-	UINT8 granule;
-	UINT8 usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t max_granules;
+	uint8_t granule;
+	uint8_t usedmap[MAX_GRANULEMAP_SIZE]; /* Used to detect infinite loops */
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 	bml3_diskinfo *info = bml3_get_diskinfo(img);
 
 	ferr = get_granule_map(img, granule_map, &max_granules);
@@ -368,7 +368,7 @@ static imgtoolerr_t list_granules(struct bml3_dirent *ent, imgtool_image *img, s
 
 
 
-static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool_image *img, const struct granule_list_t *granule_list, size_t *size)
+static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool::image &img, const struct granule_list_t *granule_list, size_t *size)
 {
 	floperr_t ferr;
 	size_t last_sector_bytes = 0;
@@ -392,7 +392,7 @@ static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool_image *img, c
 	case 0:
 		// look for EOF (ASCII SUB) and trailing NULs in final sector
 		{
-			UINT8 buf[MAX_SECTOR_SIZE];
+			uint8_t buf[MAX_SECTOR_SIZE];
 			ferr = read_granule(img, granule_list->granules[granule_list->granule_count-1], info->sector_size * (granule_list->last_granule_sectors - 1), info->sector_size, buf);
 			if (ferr)
 				return imgtool_floppy_error(ferr);
@@ -422,7 +422,7 @@ static imgtoolerr_t get_file_size(struct bml3_dirent *ent, imgtool_image *img, c
 
 
 
-static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool_image *img, imgtool_stream *destf, size_t *size)
+static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool::image &img, imgtool::stream *destf, size_t *size)
 {
 	imgtoolerr_t err;
 	size_t remaining_size, granule_size;
@@ -444,7 +444,7 @@ static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool_image *im
 		for (int c = 0; c < granule_list.granule_count; c++) {
 			if (granule_size >= remaining_size)
 				granule_size = remaining_size;
-			transfer_from_granule(img, granule_list.granules[c], granule_size, destf);
+			transfer_from_granule(img, granule_list.granules[c], granule_size, *destf);
 			remaining_size -= granule_size;
 		}
 	}
@@ -454,7 +454,7 @@ static imgtoolerr_t process_bml3_file(struct bml3_dirent *ent, imgtool_image *im
 
 
 /* create a new directory entry with a specified name */
-static imgtoolerr_t prepare_dirent(UINT8 variant, struct bml3_dirent *ent, const char *fname)
+static imgtoolerr_t prepare_dirent(uint8_t variant, struct bml3_dirent *ent, const char *fname)
 {
 	const char *fname_end;
 	const char *fname_ext;
@@ -498,7 +498,7 @@ static imgtoolerr_t prepare_dirent(UINT8 variant, struct bml3_dirent *ent, const
 
 
 
-static imgtoolerr_t bml3_diskimage_open(imgtool_image *image, imgtool_stream *stream)
+static imgtoolerr_t bml3_diskimage_open(imgtool::image &image, imgtool::stream::ptr &&dummy)
 {
 	// imgtoolerr_t err;
 	floperr_t ferr;
@@ -508,7 +508,7 @@ static imgtoolerr_t bml3_diskimage_open(imgtool_image *image, imgtool_stream *st
 
 	// probe disk geometry to guess format
 	int heads_per_disk = callbacks->get_heads_per_disk(floppy);
-	UINT32 sector_length;
+	uint32_t sector_length;
 	ferr = callbacks->get_sector_length(floppy, 0, 20, 1, &sector_length);
 	if (ferr)
 		return imgtool_floppy_error(ferr);
@@ -548,7 +548,7 @@ static imgtoolerr_t bml3_diskimage_open(imgtool_image *image, imgtool_stream *st
 
 
 
-static imgtoolerr_t bml3_diskimage_nextenum(imgtool_directory *enumeration, imgtool_dirent *ent)
+static imgtoolerr_t bml3_diskimage_nextenum(imgtool::directory &enumeration, imgtool_dirent &ent)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
@@ -556,10 +556,9 @@ static imgtoolerr_t bml3_diskimage_nextenum(imgtool_directory *enumeration, imgt
 	struct bml3_direnum *rsenum;
 	struct bml3_dirent rsent;
 	char fname[13];
-	imgtool_image *image;
+	imgtool::image &image(enumeration.image());
 
-	image = imgtool_directory_image(enumeration);
-	rsenum = (struct bml3_direnum *) imgtool_directory_extrabytes(enumeration);
+	rsenum = (struct bml3_direnum *) enumeration.extra_bytes();
 
 	/* Did we hit the end of file before? */
 	if (rsenum->eof)
@@ -581,46 +580,46 @@ static imgtoolerr_t bml3_diskimage_nextenum(imgtool_directory *enumeration, imgt
 	{
 		rsenum->eof = 1;
 eof:
-		ent->eof = 1;
+		ent.eof = 1;
 	}
 	else
 	{
 		/* Not the end of file */
-		err = process_bml3_file(&rsent, image, NULL, &filesize);
+		err = process_bml3_file(&rsent, image, nullptr, &filesize);
 		if (err)
 			return err;
 
 		if (filesize == ((size_t) -1))
 		{
 			/* corrupt! */
-			ent->filesize = 0;
-			ent->corrupt = 1;
+			ent.filesize = 0;
+			ent.corrupt = 1;
 		}
 		else
 		{
-			ent->filesize = filesize;
-			ent->corrupt = 0;
+			ent.filesize = filesize;
+			ent.corrupt = 0;
 		}
-		ent->eof = 0;
+		ent.eof = 0;
 
 		get_dirent_fname(fname, &rsent);
 
-		snprintf(ent->filename, ARRAY_LENGTH(ent->filename), "%s", fname);
-		snprintf(ent->attr, ARRAY_LENGTH(ent->attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
+		snprintf(ent.filename, ARRAY_LENGTH(ent.filename), "%s", fname);
+		snprintf(ent.attr, ARRAY_LENGTH(ent.attr), "%d %c", (int) rsent.ftype, (char) (rsent.asciiflag + 'B'));
 	}
 	return IMGTOOLERR_SUCCESS;
 }
 
 
 
-static imgtoolerr_t bml3_diskimage_freespace(imgtool_partition *partition, UINT64 *size)
+static imgtoolerr_t bml3_diskimage_freespace(imgtool::partition &partition, uint64_t *size)
 {
 	floperr_t ferr;
-	UINT8 i;
+	uint8_t i;
 	size_t s = 0;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
-	imgtool_image *image = imgtool_partition_image(partition);
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
+	imgtool::image &image(partition.image());
 	bml3_diskinfo *info = bml3_get_diskinfo(image);
 
 	ferr = get_granule_map(image, granule_map, &granule_count);
@@ -638,12 +637,12 @@ static imgtoolerr_t bml3_diskimage_freespace(imgtool_partition *partition, UINT6
 
 
 
-static imgtoolerr_t delete_entry(imgtool_image *img, struct bml3_dirent *ent, int pos)
+static imgtoolerr_t delete_entry(imgtool::image &img, struct bml3_dirent *ent, int pos)
 {
 	floperr_t ferr;
 	unsigned char g, i;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
 
 	/* Write a NUL in the filename, marking it deleted */
 	ent->fname[0] = 0;
@@ -673,18 +672,18 @@ static imgtoolerr_t delete_entry(imgtool_image *img, struct bml3_dirent *ent, in
 
 
 
-static imgtoolerr_t bml3_diskimage_readfile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *destf)
+static imgtoolerr_t bml3_diskimage_readfile(imgtool::partition &partition, const char *fname, const char *fork, imgtool::stream &destf)
 {
 	imgtoolerr_t err;
 	struct bml3_dirent ent;
 	size_t size;
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image &img(partition.image());
 
-	err = lookup_bml3_file(img, fname, &ent, NULL);
+	err = lookup_bml3_file(img, fname, &ent, nullptr);
 	if (err)
 		return err;
 
-	err = process_bml3_file(&ent, img, destf, &size);
+	err = process_bml3_file(&ent, img, &destf, &size);
 	if (err)
 		return err;
 
@@ -696,20 +695,20 @@ static imgtoolerr_t bml3_diskimage_readfile(imgtool_partition *partition, const 
 
 
 
-static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const char *fname, const char *fork, imgtool_stream *sourcef, option_resolution *writeoptions)
+static imgtoolerr_t bml3_diskimage_writefile(imgtool::partition &partition, const char *fname, const char *fork, imgtool::stream &sourcef, util::option_resolution *writeoptions)
 {
 	floperr_t ferr;
 	imgtoolerr_t err;
-	imgtool_image *img = imgtool_partition_image(partition);
+	imgtool::image &img(partition.image());
 	bml3_diskinfo *info = bml3_get_diskinfo(img);
 	struct bml3_dirent ent, ent2;
 	size_t i;
-	UINT64 sz, read_sz;
-	UINT64 freespace = 0;
+	uint64_t sz, read_sz;
+	uint64_t freespace = 0;
 	unsigned char *gptr;
-	UINT8 granule_count;
-	UINT8 granule_map[MAX_GRANULEMAP_SIZE];
-	UINT8 eof_buf[MAX_SECTOR_SIZE];
+	uint8_t granule_count;
+	uint8_t granule_map[MAX_GRANULEMAP_SIZE];
+	uint8_t eof_buf[MAX_SECTOR_SIZE];
 
 	// one-time setup of eof_buf
 	memset(eof_buf, 0, sizeof(eof_buf));
@@ -724,7 +723,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 		return err;
 
 	/* is there enough space? */
-	sz = read_sz = stream_size(sourcef);
+	sz = read_sz = sourcef.size();
 	if (info->variant == 0) {
 		// also need to write EOF
 		sz++;
@@ -737,8 +736,8 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 	if (err)
 		return err;
 
-	ent.ftype = option_resolution_lookup_int(writeoptions, BML3_OPTIONS_FTYPE);
-	ent.asciiflag = ((UINT8) option_resolution_lookup_int(writeoptions, BML3_OPTIONS_ASCII)) - 1;
+	ent.ftype = writeoptions->lookup_int(BML3_OPTIONS_FTYPE);
+	ent.asciiflag = uint8_t(writeoptions->lookup_int(BML3_OPTIONS_ASCII)) - 1;
 	gptr = &ent.first_granule;
 
 	ferr = get_granule_map(img, granule_map, &granule_count);
@@ -746,7 +745,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 		return imgtool_floppy_error(ferr);
 
 	unsigned char g = 0x00;
-	UINT32 granule_bytes = info->granule_sectors * info->sector_size;
+	uint32_t granule_bytes = info->granule_sectors * info->sector_size;
 
 	do
 	{
@@ -760,7 +759,7 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 		gptr = &granule_map[g];
 
 
-		i = MIN(read_sz, granule_bytes);
+		i = std::min(read_sz, uint64_t(granule_bytes));
 		if (i > 0) {
 			err = transfer_to_granule(img, g, i, sourcef);
 			if (err)
@@ -817,10 +816,10 @@ static imgtoolerr_t bml3_diskimage_writefile(imgtool_partition *partition, const
 
 
 
-static imgtoolerr_t bml3_diskimage_deletefile(imgtool_partition *partition, const char *fname)
+static imgtoolerr_t bml3_diskimage_deletefile(imgtool::partition &partition, const char *fname)
 {
 	imgtoolerr_t err;
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image &image(partition.image());
 	int pos = 0;
 	struct bml3_dirent ent;
 
@@ -833,10 +832,10 @@ static imgtoolerr_t bml3_diskimage_deletefile(imgtool_partition *partition, cons
 
 
 
-static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool_partition *partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
+static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool::partition &partition, const char *fname, imgtool_transfer_suggestion *suggestions, size_t suggestions_length)
 {
 	imgtoolerr_t err;
-	imgtool_image *image = imgtool_partition_image(partition);
+	imgtool::image &image(partition.image());
 	struct bml3_dirent ent;
 	int pos;
 
@@ -882,7 +881,7 @@ static imgtoolerr_t bml3_diskimage_suggesttransfer(imgtool_partition *partition,
     Imgtool module declaration
 *********************************************************************/
 
-static OPTION_GUIDE_START( bml3_writefile_optionguide )
+OPTION_GUIDE_START( bml3_writefile_optionguide )
 	OPTION_ENUM_START(  BML3_OPTIONS_FTYPE, "ftype", "File type" )
 		OPTION_ENUM(    0,      "basic",        "Basic" )
 		OPTION_ENUM(    1,      "data",         "Data" )
@@ -897,7 +896,7 @@ OPTION_GUIDE_END
 
 
 
-void bml3_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinfo *info)
+void bml3_get_info(const imgtool_class *imgclass, uint32_t state, union imgtoolinfo *info)
 {
 	switch(state)
 	{
@@ -922,7 +921,7 @@ void bml3_get_info(const imgtool_class *imgclass, UINT32 state, union imgtoolinf
 		case IMGTOOLINFO_PTR_WRITE_FILE:                    info->write_file = bml3_diskimage_writefile; break;
 		case IMGTOOLINFO_PTR_DELETE_FILE:                   info->delete_file = bml3_diskimage_deletefile; break;
 		case IMGTOOLINFO_PTR_SUGGEST_TRANSFER:              info->suggest_transfer = bml3_diskimage_suggesttransfer; break;
-		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = bml3_writefile_optionguide; break;
+		case IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE:            info->writefile_optguide = &bml3_writefile_optionguide; break;
 		case IMGTOOLINFO_PTR_FLOPPY_FORMAT:                 info->p = (void *) floppyoptions_default; break;
 	}
 }

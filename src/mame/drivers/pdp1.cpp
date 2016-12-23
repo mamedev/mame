@@ -277,7 +277,7 @@ static const gfx_layout fontlayout =
     black.  Grey levels follow an exponential law, so that decrementing the
     color index periodically will simulate the remanence of a cathode ray tube.
 */
-static const UINT8 pdp1_colors[] =
+static const uint8_t pdp1_colors[] =
 {
 	0x00,0x00,0x00, /* black */
 	0xFF,0xFF,0xFF, /* white */
@@ -287,14 +287,14 @@ static const UINT8 pdp1_colors[] =
 	0x80,0x80,0x80  /* light gray */
 };
 
-static const UINT8 pdp1_palette[] =
+static const uint8_t pdp1_palette[] =
 {
 	pen_panel_bg, pen_panel_caption,
 	pen_typewriter_bg, pen_black,
 	pen_typewriter_bg, pen_red
 };
 
-static const UINT8 total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
+static const uint8_t total_colors_needed = pen_crt_num_levels + sizeof(pdp1_colors) / 3;
 
 static GFXDECODE_START( pdp1 )
 	GFXDECODE_ENTRY( "gfx1", 0, fontlayout, pen_crt_num_levels + sizeof(pdp1_colors) / 3, 3 )
@@ -311,7 +311,7 @@ PALETTE_INIT_MEMBER(pdp1_state, pdp1)
 	const double update_period = 1./refresh_rate;
 	double decay_1, decay_2;
 	double cur_level_1, cur_level_2;
-	UINT8 i, r, g, b;
+	uint8_t i, r, g, b;
 
 	/* initialize CRT palette */
 
@@ -452,7 +452,7 @@ enum
 static pdp1_reset_param_t pdp1_reset_param =
 {
 	{   /* external iot handlers.  NULL means that the iot is unimplemented, unless there are
-        parentheses around the iot name, in which case the iot is internal to the cpu core. */
+	    parentheses around the iot name, in which case the iot is internal to the cpu core. */
 		/* I put a ? when the source is the handbook, since a) I have used the maintenance manual
 		as the primary source (as it goes more into details) b) the handbook and the maintenance
 		manual occasionnally contradict each other. */
@@ -516,7 +516,7 @@ void pdp1_state::pdp1_machine_stop()
 */
 void pdp1_state::machine_start()
 {
-	UINT8 *dst;
+	uint8_t *dst;
 
 	static const unsigned char fontdata6x8[pdp1_fontdata_size] =
 	{   /* ASCII characters */
@@ -647,7 +647,7 @@ void pdp1_state::machine_start()
 	dst = memregion("gfx1")->base();
 	memcpy(dst, fontdata6x8, pdp1_fontdata_size);
 
-	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(FUNC(pdp1_state::pdp1_machine_stop),this));
+	machine().add_notifier(MACHINE_NOTIFY_EXIT, machine_notify_delegate(&pdp1_state::pdp1_machine_stop,this));
 
 	m_tape_reader.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::reader_callback),this));
 	m_tape_puncher.timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(pdp1_state::puncher_callback),this));
@@ -667,7 +667,7 @@ class pdp1_readtape_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -677,11 +677,9 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -691,7 +689,7 @@ protected:
 
 const device_type PDP1_READTAPE = &device_creator<pdp1_readtape_image_device>;
 
-pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_readtape_image_device::pdp1_readtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_READTAPE, "PDP1 Tape Reader", tag, owner, clock, "pdp1_readtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -702,7 +700,7 @@ class pdp1_punchtape_image_device : public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PUNCHTAPE; }
@@ -712,11 +710,9 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "tap,rim"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -726,7 +722,7 @@ protected:
 
 const device_type PDP1_PUNCHTAPE = &device_creator<pdp1_punchtape_image_device>;
 
-pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_punchtape_image_device::pdp1_punchtape_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_PUNCHTAPE, "PDP1 Tape Puncher", tag, owner, clock, "pdp1_punchtape_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -738,7 +734,7 @@ class pdp1_printer_image_device :   public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_PRINTER; }
@@ -748,11 +744,9 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "typ"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -762,7 +756,7 @@ protected:
 
 const device_type PDP1_PRINTER = &device_creator<pdp1_printer_image_device>;
 
-pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_printer_image_device::pdp1_printer_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_PRINTER, "PDP1 Typewriter", tag, owner, clock, "pdp1_printer_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -773,7 +767,7 @@ class pdp1_cylinder_image_device :  public device_t,
 {
 public:
 	// construction/destruction
-	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// image-level overrides
 	virtual iodevice_t image_type() const override { return IO_CYLINDER; }
@@ -783,11 +777,9 @@ public:
 	virtual bool is_creatable() const override { return 1; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 0; }
-	virtual const char *image_interface() const override { return nullptr; }
 	virtual const char *file_extensions() const override { return "drm"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
 protected:
 	// device-level overrides
@@ -797,7 +789,7 @@ protected:
 
 const device_type PDP1_CYLINDER = &device_creator<pdp1_cylinder_image_device>;
 
-pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, PDP1_CYLINDER, "PDP1 Cylinder", tag, owner, clock, "pdp1_cylinder_image", __FILE__),
 		device_image_interface(mconfig, *this)
 {
@@ -806,7 +798,7 @@ pdp1_cylinder_image_device::pdp1_cylinder_image_device(const machine_config &mco
 /*
     Open a perforated tape image
 */
-bool pdp1_readtape_image_device::call_load()
+image_init_result pdp1_readtape_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
@@ -819,7 +811,7 @@ bool pdp1_readtape_image_device::call_load()
 		/* restart reader IO when necessary */
 		/* note that this function may be called before pdp1_init_machine, therefore
 		before state->m_tape_reader.timer is allocated.  It does not matter, as the clutch is never
-		down at power-up, but we must not call timer_enable with a NULL parameter! */
+		down at power-up, but we must not call timer_enable with a nullptr parameter! */
 
 	if (state->m_tape_reader.timer)
 	{
@@ -833,7 +825,7 @@ bool pdp1_readtape_image_device::call_load()
 		}
 	}
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_readtape_image_device::call_unload()
@@ -853,7 +845,7 @@ void pdp1_readtape_image_device::call_unload()
 /*
     Read a byte from perforated tape
 */
-int pdp1_state::tape_read(UINT8 *reply)
+int pdp1_state::tape_read(uint8_t *reply)
 {
 	if (m_tape_reader.fd && (m_tape_reader.fd->fread(reply, 1) == 1))
 		return 0;   /* unit OK */
@@ -896,7 +888,7 @@ void pdp1_state::begin_tape_read( int binary, int nac)
 TIMER_CALLBACK_MEMBER(pdp1_state::reader_callback)
 {
 	int not_ready;
-	UINT8 data;
+	uint8_t data;
 
 	if (m_tape_reader.rc)
 	{
@@ -1040,14 +1032,14 @@ static void iot_rrb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 }
 
 
-bool pdp1_punchtape_image_device::call_load()
+image_init_result pdp1_punchtape_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 
 	/* punch unit */
 	state->m_tape_puncher.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_punchtape_image_device::call_unload()
@@ -1061,7 +1053,7 @@ void pdp1_punchtape_image_device::call_unload()
 /*
     Write a byte to perforated tape
 */
-void pdp1_state::tape_write(UINT8 data)
+void pdp1_state::tape_write(uint8_t data)
 {
 	if (m_tape_puncher.fd)
 		m_tape_puncher.fd->fwrite(& data, 1);
@@ -1151,7 +1143,7 @@ static void iot_ppb(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     Open a file for typewriter output
 */
-bool pdp1_printer_image_device::call_load()
+image_init_result pdp1_printer_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 	/* open file */
@@ -1159,7 +1151,7 @@ bool pdp1_printer_image_device::call_load()
 
 	state->m_io_status |= io_st_tyo;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_printer_image_device::call_unload()
@@ -1171,7 +1163,7 @@ void pdp1_printer_image_device::call_unload()
 /*
     Write a character to typewriter
 */
-void pdp1_state::typewriter_out(UINT8 data)
+void pdp1_state::typewriter_out(uint8_t data)
 {
 	if (LOG_IOT_EXTRA)
 		logerror("typewriter output %o\n", data);
@@ -1487,13 +1479,13 @@ void pdp1_state::parallel_drum_init(pdp1_state *state)
 /*
     Open a file for drum
 */
-bool pdp1_cylinder_image_device::call_load()
+image_init_result pdp1_cylinder_image_device::call_load()
 {
 	pdp1_state *state = machine().driver_data<pdp1_state>();
 	/* open file */
 	state->m_parallel_drum.fd = this;
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 void pdp1_cylinder_image_device::call_unload()
@@ -1523,10 +1515,10 @@ static void iot_dba(device_t *device, int op2, int nac, int mb, int *io, int ac)
 /*
     Read a word from drum
 */
-UINT32 pdp1_state::drum_read(int field, int position)
+uint32_t pdp1_state::drum_read(int field, int position)
 {
 	int offset = (field*4096+position)*3;
-	UINT8 buf[3];
+	uint8_t buf[3];
 
 	if (m_parallel_drum.fd && (!m_parallel_drum.fd->fseek(offset, SEEK_SET)) && (m_parallel_drum.fd->fread( buf, 3) == 3))
 		return ((buf[0] << 16) | (buf[1] << 8) | buf[2]) & 0777777;
@@ -1537,10 +1529,10 @@ UINT32 pdp1_state::drum_read(int field, int position)
 /*
     Write a word to drum
 */
-void pdp1_state::drum_write(int field, int position, UINT32 data)
+void pdp1_state::drum_write(int field, int position, uint32_t data)
 {
 	int offset = (field*4096+position)*3;
-	UINT8 buf[3];
+	uint8_t buf[3];
 
 	if (m_parallel_drum.fd)
 	{
@@ -1811,8 +1803,8 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 		{
 			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
-			m_maincpu->set_state_int(PDP1_SBM, (UINT64)0);
-			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);
+			m_maincpu->set_state_int(PDP1_SBM, (uint64_t)0);
+			m_maincpu->set_state_int(PDP1_OV, (uint64_t)0);
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_RUN, 1);
 		}
@@ -1821,16 +1813,16 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 			m_maincpu->pulse_start_clear();    /* pulse Start Clear line */
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
 			m_maincpu->set_state_int(PDP1_SBM, 1);
-			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);
+			m_maincpu->set_state_int(PDP1_OV, (uint64_t)0);
 			m_maincpu->set_state_int(PDP1_PC, m_maincpu->state_int(PDP1_TA));
 			m_maincpu->set_state_int(PDP1_RUN, 1);
 		}
 		if (control_transitions & pdp1_stop)
 		{
-			m_maincpu->set_state_int(PDP1_RUN, (UINT64)0);
-			m_maincpu->set_state_int(PDP1_RIM, (UINT64)0);  /* bug : we stop after reading an even-numbered word
-                                            (i.e. data), whereas a real pdp-1 stops after reading
-                                            an odd-numbered word (i.e. dio instruciton) */
+			m_maincpu->set_state_int(PDP1_RUN, (uint64_t)0);
+			m_maincpu->set_state_int(PDP1_RIM, (uint64_t)0);  /* bug : we stop after reading an even-numbered word
+			                                (i.e. data), whereas a real pdp-1 stops after reading
+			                                an odd-numbered word (i.e. dio instruciton) */
 		}
 		if (control_transitions & pdp1_continue)
 		{
@@ -1864,8 +1856,8 @@ INTERRUPT_GEN_MEMBER(pdp1_state::pdp1_interrupt)
 										|  (m_maincpu->state_int(PDP1_PC) & 0007777));  /* transfer ETA to EPC */
 			/*m_maincpu->set_state_int(PDP1_MA, m_maincpu->state_int(PDP1_PC));*/
 			m_maincpu->set_state_int(PDP1_EXD, m_maincpu->state_int(PDP1_EXTEND_SW));
-			m_maincpu->set_state_int(PDP1_OV, (UINT64)0);       /* right??? */
-			m_maincpu->set_state_int(PDP1_RUN, (UINT64)0);
+			m_maincpu->set_state_int(PDP1_OV, (uint64_t)0);       /* right??? */
+			m_maincpu->set_state_int(PDP1_RUN, (uint64_t)0);
 			m_maincpu->set_state_int(PDP1_RIM, 1);
 		}
 		if (control_transitions & pdp1_reader)
@@ -1931,7 +1923,7 @@ static MACHINE_CONFIG_START( pdp1, pdp1_state )
 	/* basic machine hardware */
 	/* PDP1 CPU @ 200 kHz (no master clock, but the instruction and memory rate is 200 kHz) */
 	MCFG_CPU_ADD("maincpu", PDP1, 1000000/*the CPU core uses microsecond counts*/)
-	MCFG_CPU_CONFIG(pdp1_reset_param)
+	MCFG_PDP1_RESET_PARAM(pdp1_reset_param)
 	MCFG_CPU_PROGRAM_MAP(pdp1_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", pdp1_state,  pdp1_interrupt)   /* dummy interrupt: handles input */
 

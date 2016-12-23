@@ -199,28 +199,29 @@ GFX check (these don't explicitly fails):
 */
 #include "emu.h"
 #include "machine/mega32x.h"
+#include "sound/volt_reg.h"
 
 
 const device_type SEGA_32X_NTSC = &device_creator<sega_32x_ntsc_device>;
 const device_type SEGA_32X_PAL = &device_creator<sega_32x_pal_device>;
 
-sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
-	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
-		m_master_cpu(*this, "32x_master_sh2"),
-		m_slave_cpu(*this, "32x_slave_sh2"),
-		m_lch_pwm(*this, "lch_pwm"),
-		m_rch_pwm(*this, "rch_pwm"),
-		m_sh2_shared(*this, "sh2_shared"),
-		m_palette(*this)
+sega_32x_device::sega_32x_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	, m_master_cpu(*this, "32x_master_sh2")
+	, m_slave_cpu(*this, "32x_slave_sh2")
+	, m_ldac(*this, "ldac")
+	, m_rdac(*this, "rdac")
+	, m_sh2_shared(*this, "sh2_shared")
+	, m_palette(*this, finder_base::DUMMY_TAG)
 {
 }
 
-sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_32x_ntsc_device::sega_32x_ntsc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_32x_device(mconfig, SEGA_32X_NTSC, "sega_32x_ntsc", tag, owner, clock, "sega_32x_ntsc", __FILE__)
 {
 }
 
-sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sega_32x_pal_device::sega_32x_pal_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: sega_32x_device(mconfig, SEGA_32X_PAL, "sega_32x_pal", tag, owner, clock, "sega_32x_pal", __FILE__)
 {
 }
@@ -234,9 +235,6 @@ void sega_32x_device::static_set_palette_tag(device_t &device, const char *tag)
 {
 	downcast<sega_32x_device &>(device).m_palette.set_tag(tag);
 }
-
-TIMER_CALLBACK( _32x_pwm_callback );
-
 
 
 READ16_MEMBER( sega_32x_device::_32x_68k_palette_r )
@@ -349,7 +347,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_dram_overwrite_w )
 
 READ16_MEMBER( sega_32x_device::_32x_68k_a15106_r )
 {
-	UINT16 retval;
+	uint16_t retval;
 
 	retval = m_a15106_reg;
 
@@ -431,7 +429,7 @@ READ16_MEMBER( sega_32x_device::_32x_dreq_common_r )
 				return 0xffff;
 			}
 
-			UINT16 retdat = m_current_fifo_readblock[m_current_fifo_read_pos];
+			uint16_t retdat = m_current_fifo_readblock[m_current_fifo_read_pos];
 
 			m_current_fifo_read_pos++;
 
@@ -817,15 +815,15 @@ void sega_32x_device::calculate_pwm_timer()
 }
 
 
-void sega_32x_device::handle_pwm_callback()
+TIMER_CALLBACK_MEMBER(sega_32x_device::handle_pwm_callback)
 {
 	if(m_lch_index_r < PWM_FIFO_SIZE)
 	{
 		switch(m_pwm_ctrl & 3)
 		{
 			case 0: m_lch_index_r++; /*Speaker OFF*/ break;
-			case 1: m_lch_pwm->write_signed16(m_cur_lch[m_lch_index_r++]); break;
-			case 2: m_rch_pwm->write_signed16(m_cur_lch[m_lch_index_r++]); break;
+			case 1: m_ldac->write(m_cur_lch[m_lch_index_r++]); break;
+			case 2: m_rdac->write(m_cur_lch[m_lch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
 		}
 
@@ -839,8 +837,8 @@ void sega_32x_device::handle_pwm_callback()
 		switch((m_pwm_ctrl & 0xc) >> 2)
 		{
 			case 0: m_rch_index_r++; /*Speaker OFF*/ break;
-			case 1: m_rch_pwm->write_signed16(m_cur_rch[m_rch_index_r++]); break;
-			case 2: m_lch_pwm->write_signed16(m_cur_rch[m_rch_index_r++]); break;
+			case 1: m_rdac->write(m_cur_rch[m_rch_index_r++]); break;
+			case 2: m_ldac->write(m_cur_rch[m_rch_index_r++]); break;
 			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
 		}
 
@@ -859,12 +857,6 @@ void sega_32x_device::handle_pwm_callback()
 	}
 
 	m_32x_pwm_timer->adjust(attotime::from_hz((PWM_CLOCK) / (m_pwm_cycle - 1)));
-}
-
-TIMER_CALLBACK( _32x_pwm_callback )
-{
-	sega_32x_device* _32xdev = (sega_32x_device*)ptr;
-	_32xdev->handle_pwm_callback();
 }
 
 READ16_MEMBER( sega_32x_device::_32x_pwm_r )
@@ -951,16 +943,16 @@ WRITE16_MEMBER( sega_32x_device::_32x_68k_pwm_w )
 // also accessed from the SH2 @ 4100
 /**********************************************************************************************/
 
-UINT16 sega_32x_device::get_hposition(void)
+uint16_t sega_32x_device::get_hposition(void)
 {
 	attotime time_elapsed_since_megadriv_scanline_timer;
-	UINT16 value4;
+	uint16_t value4;
 
 	time_elapsed_since_megadriv_scanline_timer = machine().device<timer_device>(":md_scan_timer")->time_elapsed();
 
 	if (time_elapsed_since_megadriv_scanline_timer.attoseconds() < (ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines))
 	{
-		value4 = (UINT16)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines)));
+		value4 = (uint16_t)(MAX_HPOSITION*((double)(time_elapsed_since_megadriv_scanline_timer.attoseconds()) / (double)(ATTOSECONDS_PER_SECOND/m_framerate /m_total_scanlines)));
 	}
 	else /* in some cases (probably due to rounding errors) we get some stupid results (the odd huge value where the time elapsed is much higher than the scanline time??!).. hopefully by clamping the result to the maximum we limit errors */
 	{
@@ -1004,8 +996,8 @@ READ16_MEMBER( sega_32x_device::_32x_common_vdp_regs_r )
 			return m_32x_autofill_data;
 
 		case 0x0a/2:
-			UINT16 retdata = m_32x_a1518a_reg;
-			UINT16 hpos = get_hposition();
+			uint16_t retdata = m_32x_a1518a_reg;
+			uint16_t hpos = get_hposition();
 			int megadrive_hblank_flag = 0;
 
 			if (m_32x_vblank_flag) retdata |= 0x8000;
@@ -1144,7 +1136,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_common_vdp_regs_w )
 			{
 				m_32x_fb_swap = data & 1;
 
-				_32x_check_framebuffer_swap(TRUE);
+				_32x_check_framebuffer_swap(true);
 			}
 
 			break;
@@ -1181,7 +1173,7 @@ P = PWM Interrupt Mask (0 masked, 1 allowed)
 /* MASTER */
 READ16_MEMBER( sega_32x_device::_32x_sh2_master_4000_r )
 {
-	UINT16 retvalue = 0x0200;
+	uint16_t retvalue = 0x0200;
 	retvalue |= m_32x_access_auth << 15;
 
 	retvalue |= m_sh2_hint_in_vbl;
@@ -1219,7 +1211,7 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_master_4000_w )
 
 READ16_MEMBER( sega_32x_device::_32x_sh2_slave_4000_r )
 {
-	UINT16 retvalue = 0x0200;
+	uint16_t retvalue = 0x0200;
 	retvalue |= m_32x_access_auth << 15;
 	retvalue |= m_sh2_hint_in_vbl;
 	retvalue |= m_sh2_slave_vint_enable;
@@ -1432,15 +1424,15 @@ WRITE16_MEMBER( sega_32x_device::_32x_sh2_slave_401e_w )
 #define _32X_MAP_READHANDLERS(NAMEA,NAMEB)                                          \
 READ32_MEMBER( sega_32x_device::_32x_sh2_##NAMEA##_##NAMEB##_r )                             \
 {                                                                                   \
-	UINT32 retvalue = 0x00000000;                                                   \
+	uint32_t retvalue = 0x00000000;                                                   \
 	if (ACCESSING_BITS_16_31)                                                       \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEA##_r(space,0,(mem_mask>>16)&0xffff);         \
+		uint16_t ret = _32x_sh2_##NAMEA##_r(space,0,(mem_mask>>16)&0xffff);         \
 		retvalue |= ret << 16;                                                      \
 	}                                                                               \
 	if (ACCESSING_BITS_0_15)                                                        \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEB##_r(space,0,(mem_mask>>0)&0xffff);          \
+		uint16_t ret = _32x_sh2_##NAMEB##_r(space,0,(mem_mask>>0)&0xffff);          \
 		retvalue |= ret << 0;                                                       \
 	}                                                                               \
 																					\
@@ -1616,7 +1608,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 	{
 		if (m_32x_displaymode==1)
 		{
-			UINT32 lineoffs;
+			uint32_t lineoffs;
 			int start;
 
 			lineoffs = m_32x_display_dram[scanline];
@@ -1626,7 +1618,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 
 			for (x=start;x<320;x++)
 			{
-				UINT16 coldata;
+				uint16_t coldata;
 				coldata = m_32x_display_dram[lineoffs];
 
 				{
@@ -1649,7 +1641,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 		}
 		else if (m_32x_displaymode==3) // mode 3 = RLE  (used by BRUTAL intro)
 		{
-			UINT32 lineoffs;
+			uint32_t lineoffs;
 			int start;
 
 			lineoffs = m_32x_display_dram[scanline];
@@ -1660,7 +1652,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 			x = start;
 			while (x<320)
 			{
-				UINT16 coldata, length, l;
+				uint16_t coldata, length, l;
 				coldata = m_32x_display_dram[lineoffs];
 				length = ((coldata & 0xff00)>>8)+1;
 				coldata = (coldata & 0x00ff)>>0;
@@ -1679,7 +1671,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 		}
 		else // MODE 2 - 15bpp mode, not used by any commercial games?
 		{
-			UINT32 lineoffs;
+			uint32_t lineoffs;
 			int start;
 
 			lineoffs = m_32x_display_dram[scanline];
@@ -1690,7 +1682,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 			x = start;
 			while (x<320)
 			{
-				UINT16 coldata;
+				uint16_t coldata;
 				coldata = m_32x_display_dram[lineoffs&0xffff];
 
 				// need to swap red and blue around for MAME
@@ -1714,7 +1706,7 @@ void sega_32x_device::_32x_render_videobuffer_to_screenbuffer_helper(int scanlin
 	}
 }
 
-void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, UINT32 priority, UINT16 &lineptr)
+void sega_32x_device::_32x_render_videobuffer_to_screenbuffer(int x, uint32_t priority, uint16_t &lineptr)
 {
 	if (m_32x_displaymode != 0)
 	{
@@ -1778,11 +1770,11 @@ static MACHINE_CONFIG_FRAGMENT( _32x_ntsc )
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
@@ -1808,11 +1800,11 @@ static MACHINE_CONFIG_FRAGMENT( _32x_pal )
 	MCFG_SH2_FIFO_DATA_AVAIL_CB(sega_32x_device, _32x_fifo_available_callback)
 #endif
 
-	MCFG_DAC_ADD("lch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.40)
-
-	MCFG_DAC_ADD("rch_pwm")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.40)
+	MCFG_SOUND_ADD("ldac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":lspeaker", 0.4) // unknown DAC
+	MCFG_SOUND_ADD("rdac", DAC_16BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, ":rspeaker", 0.4) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "ldac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "ldac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "rdac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "rdac", -1.0, DAC_VREF_NEG_INPUT)
 
 	_32X_INTERLEAVE_LEVEL
 MACHINE_CONFIG_END
@@ -1832,17 +1824,17 @@ machine_config_constructor sega_32x_pal_device::device_mconfig_additions() const
 
 void sega_32x_device::device_start()
 {
-	m_32x_pwm_timer = machine().scheduler().timer_alloc(FUNC(_32x_pwm_callback), (void*)this);
+	m_32x_pwm_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(sega_32x_device::handle_pwm_callback), this));
 	m_32x_pwm_timer->adjust(attotime::never);
 
-	m_32x_dram0 = std::make_unique<UINT16[]>(0x40000/2);
-	m_32x_dram1 = std::make_unique<UINT16[]>(0x40000/2);
+	m_32x_dram0 = std::make_unique<uint16_t[]>(0x40000/2);
+	m_32x_dram1 = std::make_unique<uint16_t[]>(0x40000/2);
 
 	memset(m_32x_dram0.get(), 0x00, 0x40000);
 	memset(m_32x_dram1.get(), 0x00, 0x40000);
 
-	m_32x_palette_lookup = std::make_unique<UINT16[]>(0x200/2);
-	m_32x_palette = std::make_unique<UINT16[]>(0x200/2);
+	m_32x_palette_lookup = std::make_unique<uint16_t[]>(0x200/2);
+	m_32x_palette = std::make_unique<uint16_t[]>(0x200/2);
 
 	memset(m_32x_palette_lookup.get(), 0x00, 0x200);
 	memset(m_32x_palette.get(), 0x00, 0x200);
@@ -1864,7 +1856,7 @@ void sega_32x_device::device_reset()
 	// start in a reset state
 	m_sh2_are_running = 0;
 
-	m_32x_a1518a_reg = 0x00; // inital value
+	m_32x_a1518a_reg = 0x00; // initial value
 	m_32x_68k_a15104_reg = 0x00;
 
 	m_32x_autofill_length = 0;
@@ -1928,7 +1920,7 @@ void sega_32x_device::device_reset()
 	m_master_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
 	m_slave_cpu->sh2drc_set_options(SH2DRC_COMPATIBLE_OPTIONS);
 
-	UINT32 *cart = (UINT32 *)memregion(":gamecart_sh2")->base();
+	uint32_t *cart = (uint32_t *)memregion(":gamecart_sh2")->base();
 
 	m_master_cpu->sh2drc_add_fastram(0x06000000, 0x0603ffff, 0, &m_sh2_shared[0]);
 	m_master_cpu->sh2drc_add_fastram(0x02000000, 0x023fffff, 0, cart);
@@ -1941,8 +1933,8 @@ void sega_32x_device::device_reset()
 // install these now, otherwise we'll get the following (incorrect) warnings on startup..
 //   SH-2 device ':sega32x:32x_slave_sh2': program space memory map entry 0-3FFF references non-existant region ':slave'
 //   SH-2 device ':sega32x:32x_master_sh2': program space memory map entry 0-3FFF references non-existant region ':master'
-	UINT8* masterbios = (UINT8*)machine().root_device().memregion(":master")->base();
-	UINT8* slavebios = (UINT8*)machine().root_device().memregion(":slave")->base();
+	uint8_t* masterbios = (uint8_t*)machine().root_device().memregion(":master")->base();
+	uint8_t* slavebios = (uint8_t*)machine().root_device().memregion(":slave")->base();
 	membank("masterbios")->configure_entries(0, 1, masterbios, 0x4000);
 	membank("slavebios")->configure_entries(0, 1, slavebios, 0x4000);
 	membank("masterbios")->set_entry(0);

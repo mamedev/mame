@@ -14,14 +14,13 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
-#include "sound/msm5205.h"
 #include "includes/goal92.h"
 
 WRITE16_MEMBER(goal92_state::goal92_sound_command_w)
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -89,7 +88,7 @@ static ADDRESS_MAP_START( sound_cpu, AS_PROGRAM, 8, goal92_state )
 	AM_RANGE(0xe800, 0xe801) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xec00, 0xec01) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goal92 )
@@ -274,7 +273,7 @@ GFXDECODE_END
 
 void goal92_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 2, &ROM[0x10000], 0x4000);
 
@@ -320,6 +319,8 @@ static MACHINE_CONFIG_START( goal92, goal92_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ym1", YM2203, 2500000/2)
 	MCFG_YM2203_IRQ_HANDLER(WRITELINE(goal92_state, irqhandler))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -335,7 +336,7 @@ MACHINE_CONFIG_END
 
 /*
 
-Goal '92 (bootleg of Seibu Cup Soccer)
+Goal '92 (bootleg of Olympic Soccer '92 on non-Seibu board)
 
 
 PCB Layout
@@ -373,7 +374,7 @@ Z80 clock: 2.51MHz
 */
 
 ROM_START( goal92 )
-	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code - first 0x20000 bytes are a heavily patched copy of olysoc92a */
 	ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x80000, CRC(db0a6c7c) SHA1(b609db7806b99bc921806d8b3e5e515b4651c375) )
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x80000, CRC(e4c45dee) SHA1(542749bd1ff51220a151fe66acdadac83df8f0ee) )
 

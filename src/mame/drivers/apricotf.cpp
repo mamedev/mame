@@ -34,6 +34,7 @@
 #include "machine/wd_fdc.h"
 #include "machine/z80ctc.h"
 #include "machine/z80dart.h"
+#include "machine/input_merger.h"
 #include "formats/apridisk.h"
 
 
@@ -68,8 +69,7 @@ public:
 			m_floppy1(*this, WD2797_TAG ":1"),
 			m_centronics(*this, CENTRONICS_TAG),
 			m_cent_data_out(*this, "cent_data_out"),
-			m_ctc_int(CLEAR_LINE),
-			m_sio_int(CLEAR_LINE),
+			m_irqs(*this, "irqs"),
 			m_p_scrollram(*this, "p_scrollram"),
 			m_p_paletteram(*this, "p_paletteram"),
 			m_palette(*this, "palette")
@@ -87,19 +87,16 @@ public:
 	required_device<floppy_connector> m_floppy1;
 	required_device<centronics_device> m_centronics;
 	required_device<output_latch_device> m_cent_data_out;
-	int m_ctc_int;
-	int m_sio_int;
-	required_shared_ptr<UINT16> m_p_scrollram;
-	required_shared_ptr<UINT16> m_p_paletteram;
+	required_device<input_merger_active_high_device> m_irqs;
+	required_shared_ptr<uint16_t> m_p_scrollram;
+	required_shared_ptr<uint16_t> m_p_paletteram;
 	required_device<palette_device> m_palette;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	DECLARE_READ16_MEMBER( palette_r );
 	DECLARE_WRITE16_MEMBER( palette_w );
 	DECLARE_WRITE8_MEMBER( system_w );
-	DECLARE_WRITE_LINE_MEMBER( sio_int_w );
-	DECLARE_WRITE_LINE_MEMBER( ctc_int_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z2_w );
 
@@ -112,7 +109,7 @@ public:
 //  VIDEO
 //**************************************************************************
 
-UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	address_space &program = m_maincpu->space(AS_PROGRAM);
 	int lines = m_200_256 ? 200 : 256;
@@ -123,7 +120,7 @@ UINT32 f1_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, cons
 
 		for (int sx = 0; sx < 80; sx++)
 		{
-			UINT16 data = program.read_word(addr);
+			uint16_t data = program.read_word(addr);
 
 			if (m_40_80)
 			{
@@ -163,7 +160,7 @@ READ16_MEMBER( f1_state::palette_r )
 
 WRITE16_MEMBER( f1_state::palette_w )
 {
-	UINT8 i,r,g,b;
+	uint8_t i,r,g,b;
 	COMBINE_DATA(&m_p_paletteram[offset]);
 
 	if(ACCESSING_BITS_0_7 && offset) //TODO: offset 0 looks bogus
@@ -294,26 +291,8 @@ INPUT_PORTS_END
 //**************************************************************************
 
 //-------------------------------------------------
-//  Z80SIO
-//-------------------------------------------------
-
-WRITE_LINE_MEMBER( f1_state::sio_int_w )
-{
-	m_sio_int = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int || m_sio_int);
-}
-
-//-------------------------------------------------
 //  Z80CTC
 //-------------------------------------------------
-
-WRITE_LINE_MEMBER( f1_state::ctc_int_w )
-{
-	m_ctc_int = state;
-
-	m_maincpu->set_input_line(INPUT_LINE_IRQ0, m_ctc_int | m_sio_int);
-}
 
 WRITE_LINE_MEMBER( f1_state::ctc_z1_w )
 {
@@ -355,6 +334,9 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_CPU_PROGRAM_MAP(act_f1_mem)
 	MCFG_CPU_IO_MAP(act_f1_io)
 
+	MCFG_INPUT_MERGER_ACTIVE_HIGH("irqs")
+	MCFG_INPUT_MERGER_OUTPUT_HANDLER(INPUTLINE(I8086_TAG, INPUT_LINE_IRQ0))
+
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_REFRESH_RATE(50)
@@ -371,10 +353,10 @@ static MACHINE_CONFIG_START( act_f1, f1_state )
 	MCFG_DEVICE_ADD(APRICOT_KEYBOARD_TAG, APRICOT_KEYBOARD, 0)
 
 	MCFG_Z80SIO2_ADD(Z80SIO2_TAG, 2500000, 0, 0, 0, 0)
-	MCFG_Z80DART_OUT_INT_CB(WRITELINE(f1_state, sio_int_w))
+	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("irqs", input_merger_active_high_device, in0_w))
 
 	MCFG_DEVICE_ADD(Z80CTC_TAG, Z80CTC, 2500000)
-	MCFG_Z80CTC_INTR_CB(WRITELINE(f1_state, ctc_int_w))
+	MCFG_Z80CTC_INTR_CB(DEVWRITELINE("irqs", input_merger_active_high_device, in1_w))
 	MCFG_Z80CTC_ZC1_CB(WRITELINE(f1_state, ctc_z1_w))
 	MCFG_Z80CTC_ZC2_CB(WRITELINE(f1_state, ctc_z2_w))
 

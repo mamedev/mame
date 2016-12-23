@@ -2,6 +2,7 @@
 // copyright-holders:Miodrag Milanovic, MetalliC
 #include "emu.h"
 #include "includes/spectrum.h"
+#include "includes/spec128.h"
 #include "imagedev/snapquik.h"
 #include "imagedev/cassette.h"
 #include "sound/ay8910.h"
@@ -10,6 +11,7 @@
 #include "machine/beta.h"
 #include "machine/ram.h"
 #include "softlist.h"
+#include "machine/spec_snqk.h"
 
 class pentagon_state : public spectrum_state
 {
@@ -44,13 +46,13 @@ protected:
 	required_device<beta_disk_device> m_beta;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 private:
-	UINT8 *m_p_ram;
+	uint8_t *m_p_ram;
 	void pentagon_update_memory();
 };
 
 DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 {
-	UINT16 pc = m_maincpu->pcbase();
+	uint16_t pc = m_maincpu->pcbase();
 
 	if (m_beta->started() && m_beta->is_active() && (pc >= 0x4000))
 	{
@@ -89,7 +91,7 @@ DIRECT_UPDATE_MEMBER(pentagon_state::pentagon_direct)
 
 void pentagon_state::pentagon_update_memory()
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 
 	m_screen_location = messram + ((m_port_7ffd_data & 8) ? (7<<14) : (5<<14));
 
@@ -139,7 +141,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr_w)
 {
 	spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank2->base() + offset) = data;
+	*((uint8_t*)m_bank2->base() + offset) = data;
 }
 
 WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
@@ -147,7 +149,7 @@ WRITE8_MEMBER(pentagon_state::pentagon_scr2_w)
 	if ((m_port_7ffd_data & 0x0f) == 0x0f || (m_port_7ffd_data & 0x0f) == 5)
 		spectrum_UpdateScreenBitmap();
 
-	*((UINT8*)m_bank4->base() + offset) = data;
+	*((uint8_t*)m_bank4->base() + offset) = data;
 }
 
 void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
@@ -161,7 +163,7 @@ void pentagon_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		irq_off(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in pentagon_state::device_timer");
+		assert_always(false, "Unknown id in pentagon_state::device_timer");
 	}
 }
 
@@ -187,7 +189,7 @@ static ADDRESS_MAP_START (pentagon_io, AS_IO, 8, pentagon_state )
 	AM_RANGE(0x003f, 0x003f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, track_r, track_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x005f, 0x005f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, sector_r, sector_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x007f, 0x007f) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, data_r, data_w) AM_MIRROR(0xff00)
-	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_MIRROR(0xff00) AM_MASK(0xffff)
+	AM_RANGE(0x00fe, 0x00fe) AM_READWRITE(spectrum_port_fe_r,spectrum_port_fe_w) AM_SELECT(0xff00)
 	AM_RANGE(0x00ff, 0x00ff) AM_DEVREADWRITE(BETA_DISK_TAG, beta_disk_device, state_r, param_w) AM_MIRROR(0xff00)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay8912", ay8910_device, data_w) AM_MIRROR(0x3ffd)
 	AM_RANGE(0xc000, 0xc000) AM_DEVREADWRITE("ay8912", ay8910_device, data_r, address_w) AM_MIRROR(0x3ffd)
@@ -195,7 +197,7 @@ ADDRESS_MAP_END
 
 MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 {
-	UINT8 *messram = m_ram->pointer();
+	uint8_t *messram = m_ram->pointer();
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	m_p_ram = memregion("maincpu")->base();
 
@@ -210,7 +212,7 @@ MACHINE_RESET_MEMBER(pentagon_state,pentagon)
 		if (strcmp(machine().system().name, "pent1024")==0)
 			m_beta->enable();
 	}
-	space.set_direct_update_handler(direct_update_delegate(FUNC(pentagon_state::pentagon_direct), this));
+	space.set_direct_update_handler(direct_update_delegate(&pentagon_state::pentagon_direct, this));
 
 	memset(messram,0,128*1024);
 

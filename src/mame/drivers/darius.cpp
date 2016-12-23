@@ -132,6 +132,7 @@ sounds.
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "audio/taitosnd.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
@@ -158,11 +159,6 @@ WRITE16_MEMBER(darius_state::cpua_ctrl_w)
 	parse_control();
 
 	logerror("CPU #0 PC %06x: write %04x to cpu control\n", space.device().safe_pc(), data);
-}
-
-WRITE16_MEMBER(darius_state::darius_watchdog_w)
-{
-	watchdog_reset_w(space, 0, data);
 }
 
 
@@ -240,7 +236,7 @@ static ADDRESS_MAP_START( darius_map, AS_PROGRAM, 16, darius_state )
 	AM_RANGE(0x000000, 0x05ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM                                             /* main RAM */
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(cpua_ctrl_w)
-	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(darius_watchdog_w)
+	AM_RANGE(0x0b0000, 0x0b0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0xc00000, 0xc0007f) AM_READWRITE(darius_ioc_r, darius_ioc_w)           /* inputs, sound */
 	AM_RANGE(0xd00000, 0xd0ffff) AM_DEVREADWRITE("pc080sn", pc080sn_device, word_r, word_w)  /* tilemaps */
 	AM_RANGE(0xd20000, 0xd20003) AM_DEVWRITE("pc080sn", pc080sn_device, yscroll_word_w)
@@ -685,16 +681,6 @@ static GFXDECODE_START( darius )
 GFXDECODE_END
 
 
-/**************************************************************
-                        YM2203 (SOUND)
-**************************************************************/
-
-/* handler called by the YM2203 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(darius_state::irqhandler) /* assumes Z80 sandwiched between 68Ks */
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 /***********************************************************
                        MACHINE DRIVERS
 ***********************************************************/
@@ -764,6 +750,7 @@ static MACHINE_CONFIG_START( darius, darius_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame ? */
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", darius)
@@ -801,13 +788,12 @@ static MACHINE_CONFIG_START( darius, darius_state )
 	MCFG_PC080SN_YINVERT(0)
 	MCFG_PC080SN_DBLWIDTH(1)
 	MCFG_PC080SN_GFXDECODE("gfxdecode")
-	MCFG_PC080SN_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_8MHz/2) /* 4 MHz */
-	MCFG_YM2203_IRQ_HANDLER(WRITELINE(darius_state, irqhandler))
+	MCFG_YM2203_IRQ_HANDLER(INPUTLINE("audiocpu", 0)) /* assumes Z80 sandwiched between 68Ks */
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(darius_state, darius_write_portA0))  /* portA write */
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(darius_state, darius_write_portB0))  /* portB write */
 	MCFG_SOUND_ROUTE(0, "filter0.0l", 0.08)

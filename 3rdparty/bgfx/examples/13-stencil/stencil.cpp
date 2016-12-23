@@ -9,7 +9,7 @@
 #include "common.h"
 #include "bgfx_utils.h"
 
-#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
 #include "camera.h"
 #include "imgui/imgui.h"
 
@@ -646,13 +646,12 @@ struct Group
 
 namespace bgfx
 {
-	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl);
+	int32_t read(bx::ReaderI* _reader, bgfx::VertexDecl& _decl, bx::Error* _err = NULL);
 }
 
 struct Mesh
 {
-	void load(const void* _vertices, uint32_t _numVertices, const bgfx::VertexDecl _decl
-		, const uint16_t* _indices, uint32_t _numIndices)
+	void load(const void* _vertices, uint32_t _numVertices, const bgfx::VertexDecl _decl, const uint16_t* _indices, uint32_t _numIndices)
 	{
 		Group group;
 		const bgfx::Memory* mem;
@@ -666,12 +665,6 @@ struct Mesh
 		mem = bgfx::makeRef(_indices, size);
 		group.m_ibh = bgfx::createIndexBuffer(mem);
 
-		//TODO:
-		// group.m_sphere = ...
-		// group.m_aabb = ...
-		// group.m_obb = ...
-		// group.m_prims = ...
-
 		m_groups.push_back(group);
 	}
 
@@ -682,7 +675,7 @@ struct Mesh
 #define BGFX_CHUNK_MAGIC_PRI BX_MAKEFOURCC('P', 'R', 'I', 0x0)
 
 		bx::CrtFileReader reader;
-		reader.open(_filePath);
+		bx::open(&reader, _filePath);
 
 		Group group;
 
@@ -763,7 +756,7 @@ struct Mesh
 			}
 		}
 
-		reader.close();
+		bx::close(&reader);
 	}
 
 	void unload()
@@ -880,9 +873,9 @@ int _main_(int _argc, char** _argv)
 	hplaneMesh.load(s_hplaneVertices, BX_COUNTOF(s_hplaneVertices), PosNormalTexcoordVertex::ms_decl, s_planeIndices, BX_COUNTOF(s_planeIndices) );
 	vplaneMesh.load(s_vplaneVertices, BX_COUNTOF(s_vplaneVertices), PosNormalTexcoordVertex::ms_decl, s_planeIndices, BX_COUNTOF(s_planeIndices) );
 
-	bgfx::TextureHandle figureTex     = loadTexture("figure-rgba.dds");
-	bgfx::TextureHandle flareTex      = loadTexture("flare.dds");
-	bgfx::TextureHandle fieldstoneTex = loadTexture("fieldstone-rgba.dds");
+	bgfx::TextureHandle figureTex     = loadTexture("textures/figure-rgba.dds");
+	bgfx::TextureHandle flareTex      = loadTexture("textures/flare.dds");
+	bgfx::TextureHandle fieldstoneTex = loadTexture("textures/fieldstone-rgba.dds");
 
 	// Setup lights.
 	const float rgbInnerR[][4] =

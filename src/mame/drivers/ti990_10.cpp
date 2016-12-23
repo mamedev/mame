@@ -104,7 +104,7 @@ public:
 	WRITE8_MEMBER( ti990_panel_write );
 
 	required_device<cpu_device> m_maincpu;
-	UINT16 m_intlines;
+	uint16_t m_intlines;
 	int m_ckon_state;
 };
 

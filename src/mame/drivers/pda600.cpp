@@ -74,9 +74,9 @@ public:
 
 	virtual void video_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
-	UINT8 *     m_video_ram;
+	uint8_t *     m_video_ram;
 };
 
 
@@ -114,12 +114,12 @@ void pda600_state::video_start()
 	m_video_ram = memregion("videoram")->base();
 }
 
-UINT32 pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t pda600_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int y=0; y<320; y++)
 		for (int x=0; x<30; x++)
 		{
-			UINT8 data = m_video_ram[y*30 + x];
+			uint8_t data = m_video_ram[y*30 + x];
 
 			for (int px=0; px<8; px++)
 			{
@@ -212,7 +212,7 @@ static MACHINE_CONFIG_START( pda600, pda600_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", pda600)
 	MCFG_DEFAULT_LAYOUT(layout_lcd)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// NVRAM needs to be filled with random data to fail the checksum and be initialized correctly
 	MCFG_NVRAM_ADD_RANDOM_FILL("nvram")

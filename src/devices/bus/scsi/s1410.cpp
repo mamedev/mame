@@ -122,7 +122,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s1410_device::device_rom_region() const
+const tiny_rom_entry *s1410_device::device_rom_region() const
 {
 	return ROM_NAME( s1410 );
 }
@@ -192,7 +192,7 @@ machine_config_constructor s1410_device::device_mconfig_additions() const
 //  s1410_device - constructor
 //-------------------------------------------------
 
-s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+s1410_device::s1410_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: scsihd_device(mconfig, S1410, "Xebec S1410", tag, owner, clock, "s1410", __FILE__)
 {
 }
@@ -205,7 +205,7 @@ s1410_device::s1410_device(const machine_config &mconfig, const char *tag, devic
 #define S1410_CMD_READ_SEC_BUFFER ( 0x10 )
 #define S1410_CMD_RAM_DIAGS ( 0xe0 )
 #define S1410_CMD_DRIVE_DIAGS ( 0xe3 )
-#define S1410_CMD_CONTROLER_DIAGS ( 0xe4 )
+#define S1410_CMD_CONTROLLER_DIAGS ( 0xe4 )
 
 #define S1410_STATUS_NOT_READY ( 0x04 )
 
@@ -256,7 +256,7 @@ void s1410_device::ExecCommand()
 
 		if ((m_disk) && (m_blocks))
 		{
-			dynamic_buffer data(m_sector_bytes);
+			std::vector<uint8_t> data(m_sector_bytes);
 			memset(&data[0], 0xc6, m_sector_bytes);
 
 			while (m_blocks > 0)
@@ -302,7 +302,7 @@ void s1410_device::ExecCommand()
 	case S1410_CMD_CHECK_TRACK_FORMAT:
 	case S1410_CMD_RAM_DIAGS:
 	case S1410_CMD_DRIVE_DIAGS:
-	case S1410_CMD_CONTROLER_DIAGS:
+	case S1410_CMD_CONTROLLER_DIAGS:
 		m_phase = SCSI_PHASE_STATUS;
 		m_status_code = SCSI_STATUS_CODE_GOOD;
 		m_transfer_length = 0;
@@ -314,7 +314,7 @@ void s1410_device::ExecCommand()
 	}
 }
 
-void s1410_device::WriteData( UINT8 *data, int dataLength )
+void s1410_device::WriteData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{
@@ -333,9 +333,9 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 				break;
 			}
 
-			UINT16 tracks = ((data[0]<<8)+data[1]);
-			UINT8 heads = data[2];
-			UINT32 capacity = tracks * heads * sectorsPerTrack * m_sector_bytes;
+			uint16_t tracks = ((data[0]<<8)+data[1]);
+			uint8_t heads = data[2];
+			uint32_t capacity = tracks * heads * sectorsPerTrack * m_sector_bytes;
 
 			logerror("S1410_CMD_INIT_DRIVE_PARAMS Tracks=%d, Heads=%d, Capacity=%d\n",tracks,heads,capacity);
 		}
@@ -347,7 +347,7 @@ void s1410_device::WriteData( UINT8 *data, int dataLength )
 	}
 }
 
-void s1410_device::ReadData( UINT8 *data, int dataLength )
+void s1410_device::ReadData( uint8_t *data, int dataLength )
 {
 	switch( command[ 0 ] )
 	{

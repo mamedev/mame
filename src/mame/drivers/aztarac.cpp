@@ -21,7 +21,7 @@
 #include "includes/aztarac.h"
 #include "sound/ay8910.h"
 #include "machine/nvram.h"
-
+#include "machine/watchdog.h"
 
 
 /*************************************
@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, aztarac_state )
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE(sound_r, sound_w)
 	AM_RANGE(0x02700c, 0x02700d) AM_READ_PORT("DIAL")
-	AM_RANGE(0x02700e, 0x02700f) AM_READ(watchdog_reset16_r)
+	AM_RANGE(0x02700e, 0x02700f) AM_DEVREAD("watchdog", watchdog_timer_device, reset16_r)
 	AM_RANGE(0xff8000, 0xffafff) AM_RAM AM_SHARE("vectorram")
 	AM_RANGE(0xffb000, 0xffb001) AM_WRITE(ubr_w)
 	AM_RANGE(0xffe000, 0xffffff) AM_RAM
@@ -159,6 +159,8 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -170,6 +172,8 @@ static MACHINE_CONFIG_START( aztarac, aztarac_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)

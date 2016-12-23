@@ -17,7 +17,7 @@
 class k573dio_device : public device_t
 {
 public:
-	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	k573dio_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _write> void set_output_cb(_write _output_cb)
 	{
@@ -66,18 +66,18 @@ public:
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 private:
 	devcb_write8 output_cb;
 
-	std::unique_ptr<UINT16[]> ram;
-	UINT32 ram_adr;
-	UINT8 output_data[8];
+	std::unique_ptr<uint16_t[]> ram;
+	uint32_t ram_adr;
+	uint8_t output_data[8];
 
-	void output(int offset, UINT16 data);
+	void output(int offset, uint16_t data);
 };
 
 extern const device_type KONAMI_573_DIGITAL_IO_BOARD;

@@ -1,0 +1,12 @@
+{	"name": "Default Nearest-Neighbor Filter",
+	"author": "Ryan Holtz",
+	"passes": [
+		{	"effect": "misc/blit",
+			"name": "Unfiltered Upscale",
+			"input": [
+				{ "sampler": "s_tex", "texture": "screen" }
+			],
+			"output": "output"
+		}
+	]
+}

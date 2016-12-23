@@ -31,7 +31,7 @@ class ng_memcard_device :  public device_t,
 {
 public:
 	// construction/destruction
-	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ng_memcard_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	virtual iodevice_t image_type() const override { return IO_MEMCARD; }
 
@@ -41,11 +41,10 @@ public:
 	virtual bool must_be_loaded() const override { return false; }
 	virtual bool is_reset_on_load() const override { return false; }
 	virtual const char *file_extensions() const override { return "neo"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_create(int format_type, option_resolution *format_options) override;
+	virtual image_init_result call_create(int format_type, util::option_resolution *format_options) override;
 
 	// device-level overrides
 	virtual void device_start() override;
@@ -57,7 +56,7 @@ public:
 	/* returns the index of the current memory card, or -1 if none */
 	int present() { return is_loaded() ? 0 : -1; }
 private:
-	UINT8 m_memcard_data[0x800];
+	uint8_t m_memcard_data[0x800];
 };
 
 

@@ -132,7 +132,7 @@ TIMER_CALLBACK_MEMBER(mhavoc_state::delayed_gamma_w)
 	m_gamma->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
-	machine().scheduler().timer_set(attotime::from_usec(250), FUNC_NULL);
+	machine().scheduler().timer_set(attotime::from_usec(250), timer_expired_delegate());
 }
 
 
@@ -264,6 +264,9 @@ WRITE8_MEMBER(mhavoc_state::mhavoc_out_0_w)
 		m_gamma_rcvd = 0;
 		m_gamma_xmtd = 0;
 	}
+
+	/* Bit 2 = Beta reset */
+	/* this is the unpopulated processor in the corner of the pcb farthest from the quad pokey, not used on shipping boards */
 
 	/* Bit 0 = Roller light (Blinks on fatal errors) */
 	output().set_led_value(0, data & 0x01);

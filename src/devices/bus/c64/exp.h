@@ -37,6 +37,7 @@
 #define __C64_EXPANSION_SLOT__
 
 #include "emu.h"
+#include "softlist_dev.h"
 #include "formats/cbm_crt.h"
 
 
@@ -58,7 +59,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_C64_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, NULL) \
+	MCFG_C64_EXPANSION_SLOT_ADD(C64_EXPANSION_SLOT_TAG, 0, c64_expansion_cards, nullptr) \
 	MCFG_C64_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, irq_w)) \
 	MCFG_C64_EXPANSION_SLOT_NMI_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, nmi_w)) \
 	MCFG_C64_EXPANSION_SLOT_RESET_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, c64_expansion_slot_device, reset_w)) \
@@ -101,7 +102,7 @@ class c64_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c64_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_nmi_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_nmi.set_callback(object); }
@@ -111,8 +112,8 @@ public:
 	template<class _Object> static devcb_base &set_dma_wr_callback(device_t &device, _Object object) { return downcast<c64_expansion_slot_device &>(device).m_write_dma.set_callback(object); }
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
-	void cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
+	void cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2);
 	int game_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 	int exrom_r(offs_t offset, int sphi2, int ba, int rw, int hiram);
 
@@ -134,8 +135,8 @@ protected:
 	virtual void device_reset() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
@@ -146,7 +147,6 @@ protected:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "c64_cart,vic10_cart"; }
 	virtual const char *file_extensions() const override { return "80,a0,e0,crt"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
@@ -175,15 +175,15 @@ public:
 	device_c64_expansion_card_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_c64_expansion_card_interface();
 
-	virtual UINT8 c64_cd_r(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
-	virtual void c64_cd_w(address_space &space, offs_t offset, UINT8 data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
+	virtual uint8_t c64_cd_r(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { return data; };
+	virtual void c64_cd_w(address_space &space, offs_t offset, uint8_t data, int sphi2, int ba, int roml, int romh, int io1, int io2) { };
 	virtual int c64_game_r(offs_t offset, int sphi2, int ba, int rw) { return m_game; }
 	virtual int c64_exrom_r(offs_t offset, int sphi2, int ba, int rw) { return m_exrom; }
 
 protected:
-	optional_shared_ptr<UINT8> m_roml;
-	optional_shared_ptr<UINT8> m_romh;
-	optional_shared_ptr<UINT8> m_nvram;
+	optional_shared_ptr<uint8_t> m_roml;
+	optional_shared_ptr<uint8_t> m_romh;
+	optional_shared_ptr<uint8_t> m_nvram;
 
 	int m_game;
 	int m_exrom;

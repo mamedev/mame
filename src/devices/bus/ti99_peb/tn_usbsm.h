@@ -3,7 +3,7 @@
 /****************************************************************************
 
     Nouspikel USB / SmartMedia interface card
-    See tn_usmsm.c for documentation
+    See tn_usbsm.c for documentation
 
     Michael Zapf
 
@@ -18,13 +18,14 @@
 #include "peribox.h"
 #include "machine/smartmed.h"
 #include "machine/strata.h"
+#include "machine/ram.h"
 
 extern const device_type TI99_USBSM;
 
 class nouspikel_usb_smartmedia_device : public ti_expansion_card_device
 {
 public:
-	nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	nouspikel_usb_smartmedia_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ8Z_MEMBER(readz) override;
 	DECLARE_WRITE8_MEMBER(write) override;
 
@@ -49,10 +50,11 @@ private:
 	bool        m_enable_sm;
 	bool        m_write_flash;
 
-	UINT16      m_input_latch;
-	UINT16      m_output_latch;
-	std::vector<UINT16> m_ram;
+	uint16_t      m_input_latch;
+	uint16_t      m_output_latch;
 
+	required_device<ram_device> m_ram_lb;
+	required_device<ram_device> m_ram_hb;
 	required_device<smartmedia_image_device> m_smartmedia;
 	required_device<strataflash_device> m_flash;
 };

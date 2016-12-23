@@ -38,7 +38,7 @@
 
 #define MCFG_IOEXP_SLOT_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, IOEXP_SLOT, 0) \
-	MCFG_DEVICE_SLOT_INTERFACE(ioexp_slot_carts, NULL, false)
+	MCFG_DEVICE_SLOT_INTERFACE(ioexp_slot_carts, nullptr, false)
 
 
 //**************************************************************************
@@ -51,7 +51,7 @@ class ioexp_slot_device : public device_t, public device_slot_interface
 {
 public:
 	// construction/destruction
-	ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ioexp_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~ioexp_slot_device();
 
 	void set_io_space(address_space *io);

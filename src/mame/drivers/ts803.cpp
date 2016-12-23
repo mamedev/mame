@@ -89,18 +89,18 @@ public:
 	DECLARE_DRIVER_INIT(ts803);
 	TIMER_DEVICE_CALLBACK_MEMBER(dart_tick);
 
-	UINT32 screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ts803(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<palette_device> m_palette;
 
 private:
 
-	std::unique_ptr<UINT8[]> m_videoram;
-	std::unique_ptr<UINT8[]> m_56kram;
-	UINT8 m_sioidxr=0;
-	UINT8 m_sioarr[256];
+	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_56kram;
+	uint8_t m_sioidxr=0;
+	uint8_t m_sioarr[256];
 	bool m_graphics_mode;
 	bool m_tick;
-	UINT8 *m_p_chargen;
+	uint8_t *m_p_chargen;
 
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
@@ -380,9 +380,9 @@ MC6845_ON_UPDATE_ADDR_CHANGED( ts803_state::crtc_update_addr )
 MC6845_UPDATE_ROW( ts803_state::crtc_update_row )
 {
 	const rgb_t *pens = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx,inv;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx,inv;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -459,11 +459,11 @@ void ts803_state::machine_reset()
 
 DRIVER_INIT_MEMBER( ts803_state, ts803 )
 {
-	m_videoram = std::make_unique<UINT8[]>(0x8000);
-	m_56kram = std::make_unique<UINT8[]>(0xc000);
+	m_videoram = std::make_unique<uint8_t[]>(0x8000);
+	m_56kram = std::make_unique<uint8_t[]>(0xc000);
 
 	m_p_chargen = memregion("chargen")->base();
-	UINT8 *rom = memregion("roms")->base();
+	uint8_t *rom = memregion("roms")->base();
 	membank("bankr0")->configure_entry(0, &rom[0]); // rom
 	membank("bankr0")->configure_entry(1, m_56kram.get()); // ram
 	membank("bankw0")->configure_entry(0, m_56kram.get()); // ram
@@ -493,15 +493,15 @@ static MACHINE_CONFIG_START( ts803, ts803_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(ts803_mem)
 	MCFG_CPU_IO_MAP(ts803_io)
-	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(daisy_chain)
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_SIZE(640,240)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* crtc */
 	MCFG_MC6845_ADD("crtc", SY6545_1, "screen", 13608000 / 8)

@@ -174,7 +174,6 @@ static MACHINE_CONFIG_START( ct486, ct486_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("pc_disk_list","ibm5150")
-	MCFG_SOFTWARE_LIST_ADD("xt_disk_list","ibm5160_flop")
 	MCFG_SOFTWARE_LIST_ADD("at_disk_list","ibm5170")
 	MCFG_SOFTWARE_LIST_ADD("at_cdrom_list","ibm5170_cdrom")
 MACHINE_CONFIG_END

@@ -62,7 +62,7 @@ class zx8301_device :   public device_t,
 {
 public:
 	// construction/destruction
-	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	zx8301_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_vsync_wr_callback(device_t &device, _Object object) { return downcast<zx8301_device &>(device).m_write_vsync.set_callback(object); }
 	static void static_set_cpu_tag(device_t &device, const char *tag) { downcast<zx8301_device &>(device).m_cpu.set_tag(tag); }
@@ -71,7 +71,7 @@ public:
 	DECLARE_READ8_MEMBER( data_r );
 	DECLARE_WRITE8_MEMBER( data_w );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -84,11 +84,11 @@ protected:
 	// address space configurations
 	const address_space_config      m_space_config;
 
-	inline UINT8 readbyte(offs_t address);
-	inline void writebyte(offs_t address, UINT8 data);
+	inline uint8_t readbyte(offs_t address);
+	inline void writebyte(offs_t address, uint8_t data);
 
-	void draw_line_mode4(bitmap_rgb32 &bitmap, int y, UINT16 da);
-	void draw_line_mode8(bitmap_rgb32 &bitmap, int y, UINT16 da);
+	void draw_line_mode4(bitmap_rgb32 &bitmap, int y, uint16_t da);
+	void draw_line_mode8(bitmap_rgb32 &bitmap, int y, uint16_t da);
 
 private:
 	enum

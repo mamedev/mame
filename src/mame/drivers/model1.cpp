@@ -638,11 +638,8 @@ Notes:
 
 READ16_MEMBER(model1_state::io_r)
 {
-	static const char *const analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
-
 	if(offset < 0x8)
-		return read_safe(ioport(analognames[offset]), 0x00);
+		return m_analog_ports[offset].read_safe(0x00);
 
 	if(offset == 0x0f)
 		return m_lamp_state;
@@ -651,7 +648,7 @@ READ16_MEMBER(model1_state::io_r)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return ioport(inputnames[offset])->read();
+			return m_digital_ports[offset]->read();
 		return 0xff;
 	}
 
@@ -662,7 +659,9 @@ READ16_MEMBER(model1_state::io_r)
 WRITE16_MEMBER(model1_state::io_w)
 {
 	if(offset == 0x0f){
-		// tested in vr, vf, swa, wingwar
+		// lamp and coinmeters
+		// 0x01 = COIN METER 1
+		// 0x02 = COIN METER 2
 		output().set_led_value(0, data & 0x4);   // START (1)
 		output().set_led_value(1, data & 0x8);   // VIEW1 (START2 - VF)
 		output().set_led_value(2, data & 0x10);  // VIEW2 (VIEW - SWA)
@@ -670,6 +669,11 @@ WRITE16_MEMBER(model1_state::io_w)
 		output().set_led_value(4, data & 0x40);  // VIEW4
 		output().set_led_value(5, data & 0x80);  // RACE LEADER
 		m_lamp_state = data;
+		output().set_digit_value(1, data);
+		return;
+	} else if (offset == 0x11) {
+		// drive board commands
+		output().set_digit_value(0, data);
 		return;
 	}
 	logerror("IOW: %02x %02x\n", offset, data);
@@ -682,10 +686,11 @@ READ16_MEMBER(model1_state::fifoin_status_r)
 
 WRITE16_MEMBER(model1_state::bank_w)
 {
+
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000 + 0x100000*((data >> 4) & 0x7)); // netmerc has bit 0x80 set when banking, probably not a bank bit.
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -752,8 +757,8 @@ MACHINE_RESET_MEMBER(model1_state,model1)
 {
 	membank("bank1")->set_base(memregion("maincpu")->base() + 0x1000000);
 	irq_init();
-	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj"));
-	if (!strcmp(machine().system().name, "swa"))
+	tgp_reset(!strcmp(machine().system().name, "swa") || !strcmp(machine().system().name, "wingwar") || !strcmp(machine().system().name, "wingwaru") || !strcmp(machine().system().name, "wingwarj")  || !strcmp(machine().system().name, "wingwar360")   || !strcmp(machine().system().name, "netmerc"));
+	if (!strcmp(machine().system().name, "swa") )
 	{
 		m_sound_irq = 0;
 	}
@@ -789,7 +794,7 @@ WRITE16_MEMBER(model1_state::md1_w)
 	// never executed
 	//if(0 && offset)
 	//  return;
-	if(1 && m_dump)
+	if(true && m_dump)
 		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
@@ -799,13 +804,13 @@ WRITE16_MEMBER(model1_state::md0_w)
 	// never executed
 	//if(0 && offset)
 	//  return;
-	if(1 && m_dump)
+	if(true && m_dump)
 		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
 }
 
 WRITE16_MEMBER(model1_state::p_w)
 {
-	UINT16 old = m_paletteram16[offset];
+	uint16_t old = m_paletteram16[offset];
 	m_palette->write(space, offset, data, mem_mask);
 	if(0 && m_paletteram16[offset] != old)
 		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, space.device().safe_pc());
@@ -927,7 +932,7 @@ static ADDRESS_MAP_START( model1_mem, AS_PROGRAM, 16, model1_state )
 	AM_RANGE(0xe00004, 0xe00005) AM_WRITE(bank_w)
 	AM_RANGE(0xe0000c, 0xe0000f) AM_WRITENOP
 
-	AM_RANGE(0xfc0000, 0xffffff) AM_ROM
+	AM_RANGE(0xf80000, 0xffffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( model1_io, AS_IO, 16, model1_state )
@@ -988,7 +993,7 @@ static ADDRESS_MAP_START( model1_vr_io, AS_IO, 16, model1_state )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( vf )
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
@@ -999,7 +1004,7 @@ static INPUT_PORTS_START( vf )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -1010,7 +1015,7 @@ static INPUT_PORTS_START( vf )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
@@ -1023,16 +1028,16 @@ static INPUT_PORTS_START( vf )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( vr )
-	PORT_START("AN0")   /* Steering */
+	PORT_START("AN.0")   /* Steering */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(100) PORT_KEYDELTA(3)
 
-	PORT_START("AN1")   /* Accel / Decel */
+	PORT_START("AN.1")   /* Accel / Decel */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("AN2")   /* Brake */
+	PORT_START("AN.2")   /* Brake */
 	PORT_BIT( 0xff, 0x30, IPT_PEDAL2 ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
@@ -1043,7 +1048,7 @@ static INPUT_PORTS_START( vr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("VR3 (Yellow)") PORT_PLAYER(1)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("VR4 (Green)") PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1054,22 +1059,22 @@ static INPUT_PORTS_START( vr )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")   /* 8Bit RX-line from drive board */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( wingwar )
-	PORT_START("AN0")   /* X */
+	PORT_START("AN.0")   /* X */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN1")   /* Y */
+	PORT_START("AN.1")   /* Y */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN2")   /* Throttle */
+	PORT_START("AN.2")   /* Throttle */
 	PORT_BIT( 0xff, 0x01, IPT_PEDAL ) PORT_MINMAX(1,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(16)
 
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
@@ -1080,7 +1085,7 @@ static INPUT_PORTS_START( wingwar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("View 3")
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME("View 4")
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1091,28 +1096,28 @@ static INPUT_PORTS_START( wingwar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")   /* 8Bit RX-line from r360 board */
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( swa )
-	PORT_START("AN0")   /* X */
+	PORT_START("AN.0")   /* X */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN1")   /* Y */
+	PORT_START("AN.1")   /* Y */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE
 
-	PORT_START("AN2")   /* Throttle */
+	PORT_START("AN.2")   /* Throttle */
 	PORT_BIT( 0xff, 228, IPT_PEDAL ) PORT_MINMAX(28,228) PORT_SENSITIVITY(100) PORT_KEYDELTA(16) PORT_REVERSE
 
-	PORT_START("AN4")   /* X */
+	PORT_START("AN.4")   /* X */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_X ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_REVERSE PORT_PLAYER(2)
 
-	PORT_START("AN5")   /* Y */
+	PORT_START("AN.5")   /* Y */
 	PORT_BIT( 0xff, 127, IPT_AD_STICK_Y ) PORT_MINMAX(27,227) PORT_SENSITIVITY(100) PORT_KEYDELTA(4) PORT_PLAYER(2)
 
-	PORT_START("IN0")
+	PORT_START("IN.0")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x0004, IP_ACTIVE_LOW)
@@ -1122,7 +1127,7 @@ static INPUT_PORTS_START( swa )
 	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("IN.1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -1131,7 +1136,7 @@ static INPUT_PORTS_START( swa )
 	PORT_BIT( 0x00e0, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("IN.2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1239,6 +1244,11 @@ ROM_START( vr )
 
 	ROM_REGION( 0x100, "nvram", 0 ) // default nvram
 	ROM_LOAD( "vr_defaults.nv", 0x000, 0x100, CRC(5ccdc835) SHA1(7e809de470f78fb897b938ca2aee2e12f1c8f3a4) )
+
+	ROM_REGION ( 0x10000, "io_board", 0)
+	ROM_LOAD("epr-14869.25",  0x00000, 0x10000, CRC(6187cd7a) SHA1(b65fdd0ad31794a565a0ca4dc67a3f16b329fd71) )
+	ROM_LOAD("epr-14869b.25", 0x00000, 0x10000, CRC(b410f22b) SHA1(75c5009ca4d21ebb53d54d4e3fb8aa55a4c74a07) )
+	// there is also epr-14869c in model2 daytona
 ROM_END
 
 ROM_START( vformula )
@@ -1483,10 +1493,71 @@ ROM_START( wingwarj )
 	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
 ROM_END
 
+// Dumper's note: As per other R360 games wingwar is just a slightly modified version with 4 roms different on the rom board.
+
+ROM_START( wingwar360 )
+	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
+	ROM_LOAD16_BYTE( "epr-16729.14", 0x200000, 0x80000, CRC(7edec2cc) SHA1(3e423a868ca7c8475fbb5bc1a10526e69d94d865) )
+	ROM_LOAD16_BYTE( "epr-16730.15", 0x200001, 0x80000, CRC(bab24dee) SHA1(26c95139c1aa7f34b6a5cce39e5bd1dd2ef0dd49) )
+
+	ROM_LOAD( "ic4_17052.bin", 0xfc0000, 0x20000, CRC(0f4743e7) SHA1(cc47fd1d25808728ed05d95d510733b8bd011b41) )
+	ROM_RELOAD(          0x000000, 0x20000 )
+	ROM_LOAD( "ic5_17053.bin", 0xfe0000, 0x20000, CRC(83af2415) SHA1(46dfee9db95171a3942cd32c851ec75c3d9e03da) )
+	ROM_RELOAD(          0x020000, 0x20000 )
+
+	ROM_LOAD16_BYTE( "ic6_17056.bin",  0x1000000, 0x80000, CRC(5216de4d) SHA1(1463311d3f96ca7c46b8f676ee3963caddeec9e2) )
+	ROM_LOAD16_BYTE( "ic7_17057.bin",  0x1000001, 0x80000, CRC(b21aa2db) SHA1(861e637b5ae9b2d7fe6d09a7e788a6a3ff09af6e) )
+	ROM_LOAD16_BYTE( "mpr-16736.8",  0x1100000, 0x80000, CRC(10b6a025) SHA1(7a4f624ceb7c0b92044a5db8ff55440562ef836b) )
+	ROM_LOAD16_BYTE( "mpr-16735.9",  0x1100001, 0x80000, CRC(c82fd198) SHA1(d9e53ae1e14dfc8e84a14c0026ef0b904863bb1b) )
+	ROM_LOAD16_BYTE( "mpr-16734.10", 0x1200000, 0x80000, CRC(f76371c1) SHA1(0ff082db3877383d0dd977dc60c932b725e3d164) )
+	ROM_LOAD16_BYTE( "mpr-16733.11", 0x1200001, 0x80000, CRC(e105847b) SHA1(8489a6c91fd6d1e9ba81e8eaf36c514da30dccbe) )
+
+	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
+	ROM_LOAD16_WORD_SWAP("epr-17126.7", 0x000000, 0x20000, CRC(50178e40) SHA1(fb01aecfbe4e90adc997de0d45a63c16ef353b37) )
+	ROM_LOAD16_WORD_SWAP("epr-16752.8", 0x020000, 0x20000, CRC(6541c48f) SHA1(9341eff160e31a8574b9545fafc1c4059323fa0c) )
+	ROM_RELOAD(0x80000, 0x20000)
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
+	ROM_LOAD("mpr-16753.32", 0x000000, 0x200000, CRC(324a8333) SHA1(960342e08db637c6f72615d49cffd9fb0889620b) )
+	ROM_LOAD("mpr-16754.33", 0x200000, 0x200000, CRC(144f3cf5) SHA1(d2f8cc9086affbbc5ef2195272200230f724e5d1) )
+
+	ROM_REGION( 0x400000, M1AUDIO_MPCM2_REGION, 0 ) /* Samples */
+	ROM_LOAD("mpr-16755.4", 0x000000, 0x200000, CRC(4baaf878) SHA1(661d4ea9be6a4952852d0ef94becee7ed42bf4a1) )
+	ROM_LOAD("mpr-16756.5", 0x200000, 0x200000, CRC(d9c40672) SHA1(83e6f1156b30888d3a00103f079dc74f4fca8446) )
+
+	ROM_REGION32_LE( 0x1000000, "user1", 0 ) /* TGP model roms */
+	ROM_LOAD32_WORD( "mpr-16743.26", 0x000000, 0x200000, CRC(a710d33c) SHA1(1d0184545b34789ed511caaa25d57db3cd9a8e2f) )
+	ROM_LOAD32_WORD( "mpr-16744.27", 0x000002, 0x200000, CRC(de796e1f) SHA1(397efb86a21b178770f29d2464bacf5f893619a0) )
+	ROM_LOAD32_WORD( "mpr-16745.28", 0x400000, 0x200000, CRC(905b689c) SHA1(685dec2a65d5b3a386bda0af1bb5ae7e2b73a01a) )
+	ROM_LOAD32_WORD( "mpr-16746.29", 0x400002, 0x200000, CRC(163b312e) SHA1(6b45007d6a9d17c8a0b46d81ec84ce9bfefb1695) )
+	ROM_LOAD32_WORD( "mpr-16747.30", 0x800000, 0x200000, CRC(7353bb12) SHA1(608c5d561e909b8ba31d53db18e6e199855eaaec) )
+	ROM_LOAD32_WORD( "mpr-16748.31", 0x800002, 0x200000, CRC(8ce98d3a) SHA1(1978776a0e2ea817508e30ba232d5f8d9c158f70) )
+	ROM_LOAD32_WORD( "mpr-16749.32", 0xc00000, 0x200000, CRC(0e36dc1a) SHA1(4939177a6ac51ca57d0acd118ff14af4f4e438bb) )
+	ROM_LOAD32_WORD( "mpr-16750.33", 0xc00002, 0x200000, CRC(e4f0b98d) SHA1(e69de2e5ccea2834fb8326bdd61fc6b517bc60b7) )
+
+	ROM_REGION32_LE( 0x200000, "user2", 0 ) /* TGP data roms */
+	ROM_LOAD32_BYTE( "mpr-16741.39", 0x000000, 0x80000, CRC(84b2ffd8) SHA1(0eba3855d20b88567c6fa08046e12429664d87cb) )
+	ROM_LOAD32_BYTE( "mpr-16742.40", 0x000001, 0x80000, CRC(e9cc12bb) SHA1(40c83c968be3b11fad193a00e7b760f074450683) )
+	ROM_LOAD32_BYTE( "mpr-16739.41", 0x000002, 0x80000, CRC(6c73e98f) SHA1(7b31e62922ab6d0df97c3ecc52b78e6d086c8635) )
+	ROM_LOAD32_BYTE( "mpr-16740.42", 0x000003, 0x80000, CRC(44b31007) SHA1(4bb265fea25a7bbcbb8ab080fdcf09849b18f1de) )
+
+	ROM_REGION( 0x10000, "ioboard", 0 )
+	ROM_LOAD("epr-16891.6", 0x00000, 0x10000, CRC(a33f84d1) SHA1(3079397c7241c1a6f494fa310faff0989dfa04a0) )
+
+	ROM_REGION( 0x20000, "commboard", 0 )
+	ROM_LOAD("epr-15112.17", 0x00000, 0x20000, CRC(4950e771) SHA1(99014124e0324dd114cb22f55159d18b597a155a) )
+
+	// Dumper's note: Video & Drive is the control board in the attendants' tower, same hardware as G-Loc R360 with the two program roms being the only difference.
+	ROM_REGION( 0x400000, "controlboard", 0 )
+	ROM_LOAD("ic22_18851.bin", 0x00000, 0x20000, CRC(85f75bd7) SHA1(43cc8f8c81631d71b661e55e15f3fe8803a8a7e9) )
+	ROM_LOAD("ic67_18850.bin", 0x20000, 0x08000, CRC(45a3e9fc) SHA1(bf2d1a7acc35b72a62551bfbb55e5058d6fd6d5c) )
+ROM_END
+
 ROM_START( netmerc )
 
 	ROM_REGION( 0x2000000, "maincpu", ROMREGION_ERASEFF ) /* v60 code */
 	ROM_LOAD( "epr-18120.ic5", 0xf80000, 0x80000, CRC(de489762) SHA1(4e935f11e844489c5b5dc06439dc7902c4fddc9f) ) /* Rom board with Sega ID# ??? */
+	ROM_RELOAD(          0x000000, 0x80000 )
 
 	ROM_LOAD16_BYTE( "epr-18122.ic6",  0x1000000, 0x80000, CRC(10581ab3) SHA1(e3f5ec4ce14a1e1a1134c8b516c371b7655f3544) )
 	ROM_LOAD16_BYTE( "epr-18123.ic7",  0x1000001, 0x80000, CRC(27e0d848) SHA1(117f99efd0643ba92b3340171d8952b6a1a568d4) )
@@ -1496,7 +1567,7 @@ ROM_START( netmerc )
 	ROM_LOAD16_BYTE( "epr-18127.ic11", 0x1200001, 0x80000, CRC(d307a4ca) SHA1(5555235f740c1b09f6e1587d0fceb35b23d4a8a8) )
 
 	ROM_REGION( 0xc0000, M1AUDIO_CPU_REGION, ROMREGION_BE|ROMREGION_16BIT )  /* 68K code */
-	ROM_LOAD( "epr-18121.ic7", 0x00000, 0x80000, CRC(113285b5) SHA1(5d060cee41e8d6a4a918f890c2d169d87dbcad79) )
+	ROM_LOAD16_WORD_SWAP( "epr-18121.ic7", 0x00000, 0x80000, CRC(113285b5) SHA1(5d060cee41e8d6a4a918f890c2d169d87dbcad79) )
 	ROM_RELOAD( 0x80000, 0x20000) // ?
 
 	ROM_REGION( 0x400000, M1AUDIO_MPCM1_REGION, 0 ) /* Samples */
@@ -1534,10 +1605,7 @@ static MACHINE_CONFIG_START( model1, model1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1581,10 +1649,7 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_MACHINE_RESET_OVERRIDE(model1_state,model1_vr)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", empty)
-
 	MCFG_S24TILE_DEVICE_ADD("tile", 0x3fff)
-	MCFG_S24TILE_DEVICE_GFXDECODE("gfxdecode")
 	MCFG_S24TILE_DEVICE_PALETTE("palette")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1603,11 +1668,76 @@ static MACHINE_CONFIG_START( model1_vr, model1_state )
 	MCFG_M1COMM_ADD("m1comm")
 MACHINE_CONFIG_END
 
-GAME( 1993, vf,       0,       model1,    vf, driver_device,       0, ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
-GAMEL(1992, vr,       0,       model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
-GAME( 1993, vformula, vr,      model1_vr, vr, driver_device,       0, ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1993, swa,      0,       swa,       swa, driver_device,      0, ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1994, wingwar,  0,       model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwaru, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
-GAME( 1994, wingwarj, wingwar, model1,    wingwar, driver_device,  0, ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
-GAME( 1993, netmerc,  0,       model1,    vf, driver_device,       0, ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )
+DRIVER_INIT_MEMBER(model1_state,wingwar360)
+{
+	// install r360 hack
+	m_maincpu->space(AS_PROGRAM).install_read_handler(0xc00014, 0xc00015, read16_delegate(FUNC(model1_state::r360_r),this));
+	m_maincpu->space(AS_PROGRAM).install_write_handler(0xc00022, 0xc00023, write16_delegate(FUNC(model1_state::r360_w),this));
+}
+
+READ16_MEMBER(model1_state::r360_r)
+{
+	return m_r360_state;
+}
+
+WRITE16_MEMBER(model1_state::r360_w)
+{
+	/*
+		this uses the feedback board protocol
+		command group B - these seem to be gamestates
+		
+		bf = init
+		be = attract
+		bd = setup #1 (lower safety bar etc.)
+		bc = setup #2 (push emergency button)
+		bb = ready to go
+		ba = ingame
+		b9 = game over
+
+		results:
+		40 = default status
+		41 = * (setup #1 ack)
+		42 = lowered safety bar
+		43 = closed belt
+		44 = lever up
+		45 = pushed button
+		46 = game start
+		47 = game over
+		48 = lever down
+		49 = released belt
+	*/
+	switch (data & 0xff)
+	{
+		case 0xbf:
+		case 0xbe:
+			m_r360_state = ~0x40;
+			break;
+
+		case 0xbd:
+			m_r360_state = ~0x44;
+			break;
+			
+		case 0xbc:
+			m_r360_state = ~0x45;
+			break;
+
+		case 0xbb:
+			m_r360_state = ~0x46;
+			break;
+
+		case 0xba:
+		case 0xb9:
+			m_r360_state = ~0x40;
+			break;
+	}
+}
+
+GAME( 1993, vf,         0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "Virtua Fighter", MACHINE_IMPERFECT_GRAPHICS )
+GAMEL(1992, vr,         0,       model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Racing", MACHINE_IMPERFECT_GRAPHICS, layout_vr )
+GAME( 1993, vformula,   vr,      model1_vr, vr, driver_device,      0,          ROT0, "Sega", "Virtua Formula", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1993, swa,        0,       swa,       swa, driver_device,     0,          ROT0, "Sega", "Star Wars Arcade", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
+GAME( 1994, wingwar,    0,       model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (World)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwaru,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (US)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwarj,   wingwar, model1,    wingwar, driver_device, 0,          ROT0, "Sega", "Wing War (Japan)", MACHINE_NOT_WORKING )
+GAME( 1994, wingwar360, wingwar, model1,    wingwar, model1_state,  wingwar360, ROT0, "Sega", "Wing War R360 (US)", MACHINE_NOT_WORKING )
+GAME( 1993, netmerc,    0,       model1,    vf, driver_device,      0,          ROT0, "Sega", "NetMerc?", MACHINE_NOT_WORKING )

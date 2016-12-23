@@ -23,7 +23,7 @@ public:
 	DECLARE_READ8_MEMBER(vt520_some_r);
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -58,7 +58,7 @@ INPUT_PORTS_END
 void vt520_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
-	UINT8 *rom = memregion("maincpu")->base();
+	uint8_t *rom = memregion("maincpu")->base();
 	space.unmap_write(0x0000, 0xffff);
 	membank("bank1")->set_base(rom + 0x70000);
 }
@@ -67,7 +67,7 @@ void vt520_state::video_start()
 {
 }
 
-UINT32 vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t vt520_state::screen_update_vt520(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -88,7 +88,7 @@ static MACHINE_CONFIG_START( vt520, vt520_state )
 	MCFG_SCREEN_UPDATE_DRIVER(vt520_state, screen_update_vt520)
 	MCFG_SCREEN_PALETTE("palette")
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	// On the board there are two M5M44256BJ-7 chips
 	// Which are DRAM 256K x 4bit

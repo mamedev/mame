@@ -56,7 +56,8 @@ bootleg todo:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "includes/decocrpt.h"
+#include "machine/decocrpt.h"
+#include "machine/deco102.h"
 #include "sound/okim6295.h"
 #include "includes/pktgaldx.h"
 
@@ -64,7 +65,7 @@ bootleg todo:
 
 WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 {
-	m_oki2->set_bank_base((data & 3) * 0x40000);
+	m_oki2->set_rom_bank(data & 3);
 }
 
 /**********************************************************************************/
@@ -72,15 +73,15 @@ WRITE16_MEMBER(pktgaldx_state::pktgaldx_oki_bank_w)
 READ16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_r )
 {
 	int real_address = 0 + (offset *2);
-	UINT8 cs = 0;
-	UINT16 data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
+	uint8_t cs = 0;
+	uint16_t data = m_deco104->read_data( real_address&0x7fff, mem_mask, cs );
 	return data;
 }
 
 WRITE16_MEMBER( pktgaldx_state::pktgaldx_protection_region_f_104_w )
 {
 	int real_address = 0 + (offset *2);
-	UINT8 cs = 0;
+	uint8_t cs = 0;
 	m_deco104->write_data( space, real_address&0x7fff, data, mem_mask, cs );
 }
 
@@ -359,12 +360,10 @@ static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 	MCFG_DECO16IC_PF12_8X8_BANK(0)
 	MCFG_DECO16IC_PF12_16X16_BANK(1)
 	MCFG_DECO16IC_GFXDECODE("gfxdecode")
-	MCFG_DECO16IC_PALETTE("palette")
 
 	MCFG_DEVICE_ADD("spritegen", DECO_SPRITE, 0)
 	MCFG_DECO_SPRITE_GFX_REGION(2)
 	MCFG_DECO_SPRITE_GFXDECODE("gfxdecode")
-	MCFG_DECO_SPRITE_PALETTE("palette")
 
 	MCFG_DECO104_ADD("ioprot104")
 	MCFG_DECO146_SET_INTERFACE_SCRAMBLE(8,9,  4,5,6,7    ,1,0,3,2) // hopefully this is correct, nothing else uses this arrangement!
@@ -479,7 +478,7 @@ ROM_END
 DRIVER_INIT_MEMBER(pktgaldx_state,pktgaldx)
 {
 	deco56_decrypt_gfx(machine(), "gfx1");
-	deco102_decrypt_cpu((UINT16 *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
+	deco102_decrypt_cpu((uint16_t *)memregion("maincpu")->base(), m_decrypted_opcodes, 0x80000, 0x42ba, 0x00, 0x00);
 }
 
 GAME( 1992, pktgaldx,  0,        pktgaldx, pktgaldx, pktgaldx_state, pktgaldx,  ROT0, "Data East Corporation", "Pocket Gal Deluxe (Euro v3.00)", MACHINE_SUPPORTS_SAVE )

@@ -121,7 +121,7 @@ WRITE8_MEMBER(scramble_state::hotshock_sh_irqtrigger_w)
 READ8_MEMBER( scramble_state::hotshock_soundlatch_r )
 {
 	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return soundlatch_byte_r(m_audiocpu->space(AS_PROGRAM),0);
+	return m_soundlatch->read(m_audiocpu->space(AS_PROGRAM),0);
 }
 
 static void filter_w(device_t *device, int data)
@@ -312,6 +312,9 @@ MACHINE_CONFIG_FRAGMENT( ad2083_audio )
 	MCFG_TMSPROM_CTL_CB(DEVWRITE8("tms", tms5110_device, ctl_w))      /* tms ctl func */
 
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

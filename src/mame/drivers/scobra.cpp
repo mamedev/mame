@@ -38,6 +38,7 @@ Notes/Tidbits:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/i8255.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "includes/scramble.h"
 
@@ -49,7 +50,7 @@ public:
 		: scramble_state(mconfig, type, tag),
 			m_soundram(*this, "soundram") { }
 
-	optional_shared_ptr<UINT8> m_soundram;
+	optional_shared_ptr<uint8_t> m_soundram;
 	DECLARE_READ8_MEMBER(scobra_soundram_r);
 	DECLARE_WRITE8_MEMBER(scobra_soundram_w);
 	DECLARE_READ8_MEMBER(scobra_type2_ppi8255_0_r);
@@ -122,7 +123,7 @@ static ADDRESS_MAP_START( type1_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_stars_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
@@ -134,7 +135,7 @@ static ADDRESS_MAP_START( type2_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0x8880, 0x88ff) AM_RAM
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(galaxold_videoram_w) AM_SHARE("videoram")
 	AM_RANGE(0x9400, 0x97ff) AM_READWRITE(galaxold_videoram_r, galaxold_videoram_w) /* mirror */
-	AM_RANGE(0x9800, 0x9800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x9800, 0x9800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xa000, 0xa00f) AM_READWRITE(scobra_type2_ppi8255_0_r, scobra_type2_ppi8255_0_w)
 	AM_RANGE(0xa800, 0xa80f) AM_READWRITE(scobra_type2_ppi8255_1_r, scobra_type2_ppi8255_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(galaxold_stars_enable_w)
@@ -157,7 +158,7 @@ static ADDRESS_MAP_START( hustler_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa804, 0xa804) AM_WRITE(galaxold_nmi_enable_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa80e, 0xa80e) AM_WRITENOP    /* coin counters */
-	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb800, 0xb800) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xd000, 0xd01f) AM_READWRITE(hustler_ppi8255_0_r, hustler_ppi8255_0_w)
 	AM_RANGE(0xe000, 0xe01f) AM_READWRITE(hustler_ppi8255_1_r, hustler_ppi8255_1_w)
 ADDRESS_MAP_END
@@ -174,7 +175,7 @@ static ADDRESS_MAP_START( hustlerb_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa802, 0xa802) AM_WRITENOP    /* coin counters */
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_y_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_x_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xc100, 0xc103) AM_DEVREADWRITE("ppi8255_0", i8255_device, read, write)
 	AM_RANGE(0xc200, 0xc203) AM_DEVREADWRITE("ppi8255_1", i8255_device, read, write)
 ADDRESS_MAP_END
@@ -195,7 +196,7 @@ static ADDRESS_MAP_START( mimonkey_map, AS_PROGRAM, 8, scobra_state )
 	AM_RANGE(0xa800, 0xa802) AM_WRITE(galaxold_gfxbank_w)
 	AM_RANGE(0xa806, 0xa806) AM_WRITE(galaxold_flip_screen_x_w)
 	AM_RANGE(0xa807, 0xa807) AM_WRITE(galaxold_flip_screen_y_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xb000, 0xb000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -232,7 +233,7 @@ static ADDRESS_MAP_START( rescuefe_map, AS_PROGRAM, 8, scobra_state )
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
 //  AM_RANGE(0xf802, 0xf802) AM_WRITE(galaxold_coin_counter_w)
-//  AM_RANGE(0xf000, 0xf000) AM_READ(watchdog_reset_r)
+//  AM_RANGE(0xf000, 0xf000) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
@@ -260,7 +261,7 @@ static ADDRESS_MAP_START( minefldfe_map, AS_PROGRAM, 8, scobra_state )
 
 
 
-	AM_RANGE(0x1D98, 0x1D98) AM_READ(watchdog_reset_r) // 0xb000
+	AM_RANGE(0x1D98, 0x1D98) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) // 0xb000
 
 
 	// addresses below are WRONG, just moved to keep things out the way while the rom mapping is figured out
@@ -323,7 +324,7 @@ ADDRESS_MAP_END
 /* stratgyx coinage DIPs are spread across two input ports */
 CUSTOM_INPUT_MEMBER(scobra_state::stratgyx_coinage_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("IN4")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -780,7 +781,7 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 
 	MCFG_DEVICE_ADD("7474_9m_1", TTL7474, 0)
@@ -790,6 +791,8 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 	MCFG_7474_COMP_OUTPUT_CB(WRITELINE(scobra_state,galaxold_7474_9m_2_q_callback))
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
+
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -808,11 +811,14 @@ static MACHINE_CONFIG_START( type1, scobra_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 14318000/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, scramble_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
@@ -890,7 +896,7 @@ static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 
 	MCFG_DEVICE_REMOVE("ppi8255_1")
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN3"))
 
@@ -940,13 +946,15 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 
 	MCFG_TIMER_DRIVER_ADD("int_timer", scobra_state, galaxold_interrupt_timer)
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	MCFG_DEVICE_ADD("ppi8255_0", I8255A, 0)
 	MCFG_I8255_IN_PORTA_CB(IOPORT("IN0"))
 	MCFG_I8255_IN_PORTB_CB(IOPORT("IN1"))
 	MCFG_I8255_IN_PORTC_CB(IOPORT("IN2"))
 
 	MCFG_DEVICE_ADD("ppi8255_1", I8255A, 0)
-	MCFG_I8255_OUT_PORTA_CB(WRITE8(driver_device, soundlatch_byte_w))
+	MCFG_I8255_OUT_PORTA_CB(DEVWRITE8("soundlatch", generic_latch_8_device, write))
 	MCFG_I8255_OUT_PORTB_CB(WRITE8(scramble_state, scramble_sh_irqtrigger_w))
 
 	/* video hardware */
@@ -966,8 +974,9 @@ static MACHINE_CONFIG_START( hustler, scobra_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 	MCFG_SOUND_ADD("aysnd", AY8910, 14318000/8)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(scramble_state, hustler_portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
@@ -1515,6 +1524,29 @@ ROM_START( hustlerb4 )
 	ROM_LOAD( "top.c5",  0x0000, 0x0800, CRC(88226086) SHA1(fe2da172313063e5b056fc8c8d8b2a5c64db5179) )
 ROM_END
 
+// the following romset came from a blister, so no PCB infos. It's a mix between hustlerb4's main CPU and GFX ROMs and hustlerb's audio CPU ROMs.
+
+ROM_START( hustlerb5 )
+	ROM_REGION( 0x10000, "maincpu", 0 ) // identical to hustlerb but in 6 roms instead of 3
+	ROM_LOAD( "b1.bin",   0x0000, 0x0800, CRC(f87d75c7) SHA1(48f0f5289366a3c4dec86f5bb48d16a33745844d) )
+	ROM_LOAD( "b2.bin",   0x0800, 0x0800, CRC(a639d4e1) SHA1(2130de635f41f915db26a5fcba9654ae140d0ecc) )
+	ROM_LOAD( "b3.bin",   0x1000, 0x0800, CRC(1b75520e) SHA1(b4ebb69c0f17fde7a527d54ec8406b1b80798e0c) )
+	ROM_LOAD( "b4.bin",   0x1800, 0x0800, CRC(fdea3165) SHA1(6120919445599ec9116d14d0baf4fb4e4720e473) )
+	ROM_LOAD( "b5.bin",   0x2000, 0x0800, CRC(730100e1) SHA1(81e44d768ca4e654981c14660e12e355fe720636) )
+	ROM_LOAD( "b6.bin",   0x2800, 0x0800, CRC(68dff552) SHA1(5dad38db45afbd79b5627a75b295fc920ad68856) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )
+	ROM_LOAD( "bs1.bin",  0x0000, 0x0800, CRC(b559bfde) SHA1(f7733fbc5cabb441ba039b9d7202aaf0cebb9a85) )
+	ROM_LOAD( "bs2.bin",  0x0800, 0x0800, CRC(6ef96cfb) SHA1(eba0bdc8bc1652ff2f62594371ded711dbfcce86) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "c1.bin",   0x0000, 0x0800, CRC(0bdfad0e) SHA1(8e6f1737604f3801c03fa2e9a5e6a2778b54bae8) )
+	ROM_LOAD( "c2.bin",   0x0800, 0x0800, CRC(8e062177) SHA1(7e52a1669804b6c2f694cfc64b04abc8246bb0c2) )
+
+	ROM_REGION( 0x0020, "proms", 0 ) // not dumped for this set, but the same in all other original and bootleg sets
+	ROM_LOAD( "mni6331.e6",  0x0000, 0x0020, CRC(aa1f7f5e) SHA1(311dd17aa11490a1173c76223e4ccccf8ea29850) )
+ROM_END
+
 ROM_START( mimonkey )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "mm1.2e",       0x0000, 0x1000, CRC(9019f1b1) SHA1(0c45f64e39b9a182f6162ab520ced6ef0686466c) )
@@ -1586,6 +1618,7 @@ GAME( 1981, billiard,  hustler,  hustler,   hustler,   scramble_state,  billiard
 GAME( 1981, hustlerb,  hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg (Digimatic)",                "Video Hustler (bootleg, set 1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb2, hustler,  hustler,   hustler,   scramble_state,  hustlerd,     ROT90,  "bootleg",                            "Fatsy Gambler (Video Hustler bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1981, hustlerb4, hustler,  hustlerb4, hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1981, hustlerb5, hustler,  hustlerb,  hustler,   driver_device,   0,            ROT90,  "bootleg",                            "Video Hustler (bootleg, set 3)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1982, mimonkey,  0,        mimonkey,  mimonkey,  scramble_state,  mimonkey,     ROT90,  "Universal Video Games",              "Mighty Monkey", MACHINE_SUPPORTS_SAVE )
 GAME( 1982, mimonsco,  mimonkey, mimonkey,  mimonsco,  scramble_state,  mimonsco,     ROT90,  "bootleg",                            "Mighty Monkey (bootleg on Super Cobra hardware)", MACHINE_SUPPORTS_SAVE )

@@ -37,6 +37,13 @@ Memo:
 
 - 2player's input is not supported.
 
+- Identify CRT Controller and fix layer misalignment in nekkyoku.
+
+- nekkyoku: soft reset enables flip screen without any real reason.
+
+- nekkyoku writes to a VRAM mirror for showing the OL gal, I guess ROM mirroring
+  is the same for all empty slots for this HW.
+
 - Communication between MAIN CPU and SUB CPU can be wrong.
 
 Notes:
@@ -73,7 +80,7 @@ with the following code:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "sound/2413intf.h"
+#include "sound/ym2413.h"
 #include "sound/msm5205.h"
 #include "includes/fromance.h"
 
@@ -476,7 +483,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( idolmj )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -553,7 +560,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( fromance )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -628,7 +635,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( nmsengen )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -703,7 +710,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( daiyogen )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -722,131 +729,49 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW1:!1")
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW1:!2,!3")
+	PORT_DIPSETTING(    0x00, "1,000" )
+		PORT_DIPSETTING(    0x04, "1,500" )
+	PORT_DIPSETTING(    0x02, "2,000" )
+	PORT_DIPSETTING(    0x06, "3,000" )
+	PORT_DIPNAME( 0x18, 0x00, "Computer Difficulty" )   PORT_DIPLOCATION("SW1:!4,!5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:!6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIPSW 1-8" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW1:!7" )
+	PORT_DIPNAME( 0x80, 0x00, "YAKUMAN STOP" )      PORT_DIPLOCATION("SW1:!8") // not sure what this is supposed to mean
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_INCLUDE( mahjong_panel )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( mfunclub )
-	PORT_START("SERVICE")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("COIN")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Voices" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 1-6" )
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:!1,!2,!3")
+	PORT_DIPSETTING(    0x00, "1" )
+		PORT_DIPSETTING(    0x04, "2" )
+	PORT_DIPSETTING(    0x02, "3" )
+		PORT_DIPSETTING(    0x06, "4" )
+		PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x05, "6" )
+		PORT_DIPSETTING(    0x03, "7" )
+	PORT_DIPSETTING(    0x07, "8" )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW2:!4,!5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
+	PORT_DIPNAME( 0x20, 0x00, "Ignore FURITEN" )        PORT_DIPLOCATION("SW2:!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 1-7" )
+	PORT_DIPNAME( 0x40, 0x00, "PINFU with TSUMO" )      PORT_DIPLOCATION("SW2:!7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIPSW 1-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:!8")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
@@ -857,7 +782,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( mjnatsu )
 	PORT_START("SERVICE")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE3 )   // MEMORY RESET
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MEMORY_RESET ) // MEMORY RESET
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW)    // TEST
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -875,57 +800,51 @@ static INPUT_PORTS_START( mjnatsu )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )      // COIN1
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "Voices" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 1-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIPSW 1-8" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+		PORT_START("DSW2")
+		PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:!1,!2,!3")
+		PORT_DIPSETTING(    0x00, "1" )
+		PORT_DIPSETTING(    0x04, "2" )
+		PORT_DIPSETTING(    0x02, "3" )
+		PORT_DIPSETTING(    0x06, "4" )
+		PORT_DIPSETTING(    0x01, "5" )
+		PORT_DIPSETTING(    0x05, "6" )
+		PORT_DIPSETTING(    0x03, "7" )
+		PORT_DIPSETTING(    0x07, "8" )
+		PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:!4,!5")
+		PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+		PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+		PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+		PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
+		PORT_DIPNAME( 0x20, 0x00, "Ignore FURITEN" )        PORT_DIPLOCATION("SW1:!6")
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+		PORT_DIPNAME( 0x40, 0x00, "PINFU with TSUMO" )      PORT_DIPLOCATION("SW1:!7")
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+		PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:!8")
+		PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+		PORT_START("DSW1")
+		PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("SW2:!1")
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+		PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+		PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW2:!2,!3")
+		PORT_DIPSETTING(    0x00, "1,000" )
+		PORT_DIPSETTING(    0x04, "2,000" )
+		PORT_DIPSETTING(    0x02, "3,000" )
+		PORT_DIPSETTING(    0x06, "5,000" )
+		PORT_DIPNAME( 0x08, 0x00, "Start GOLD" )        PORT_DIPLOCATION("SW2:!4")
+		PORT_DIPSETTING(    0x00, "1,000" )
+		PORT_DIPSETTING(    0x08, "6,000" )
+	PORT_DIPNAME( 0x10, 0x00, "Item Shop Voice" )       PORT_DIPLOCATION("SW2:!5")
+		PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+		PORT_DIPNAME( 0x20, 0x00, "Stop Button (N)" )       PORT_DIPLOCATION("SW2:!6")
+		PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+		PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+		PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW2:!7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW2:!8" )
 
 	PORT_INCLUDE( mahjong_panel )
 INPUT_PORTS_END
@@ -964,15 +883,14 @@ GFXDECODE_END
 
 MACHINE_START_MEMBER(fromance_state,fromance)
 {
-	UINT8 *ROM = memregion("sub")->base();
+	uint8_t *ROM = memregion("sub")->base();
 
 	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
-
 
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));
 	save_item(NAME(m_portselect));
-
+	
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_vclk_left));
@@ -1159,7 +1077,14 @@ ROM_START( nekkyoku )
 	ROM_LOAD( "ic8a.bin",    0x000000, 0x080000, CRC(599790d8) SHA1(4e4ade1a89d6cb93b0808867883d70c4c7ed78dd) )
 	ROM_LOAD( "ic9a.bin",    0x080000, 0x040000, CRC(78c1906f) SHA1(54459e0120ec58a962d3f4a1287e68d2fbb28be9) )
 	ROM_LOAD( "5-ic10a.bin", 0x0c0000, 0x008000, CRC(2e78515f) SHA1(397985c082ffc0df07cd44d54e4fef909c30a4f1) )
-	ROM_FILL(                0x0c8000, 0x038000, 0xff )
+	// 'D' OL girl is displayed via one of these mirrors
+	ROM_RELOAD(              0x0c8000, 0x008000 )
+	ROM_RELOAD(              0x0d0000, 0x008000 )
+	ROM_RELOAD(              0x0d8000, 0x008000 )
+	ROM_RELOAD(              0x0e0000, 0x008000 )
+	ROM_RELOAD(              0x0e8000, 0x008000 )
+	ROM_RELOAD(              0x0f0000, 0x008000 )
+	ROM_RELOAD(              0x0f8000, 0x008000 )
 	ROM_FILL(                0x100000, 0x100000, 0xff )
 ROM_END
 
@@ -1341,11 +1266,11 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, mfunclub,  0,       fromance, mfunclub, driver_device, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, mfunclub,  0,       fromance, mjnatsu, driver_device, 0, ROT0, "Video System Co.", "Mahjong Fun Club - Idol Saizensen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1990, daiyogen,  0,       fromance, daiyogen, driver_device, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, nmsengen,  0,       fromance, nmsengen, driver_device, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, fromance,  0,       fromance, fromance, driver_device, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", MACHINE_SUPPORTS_SAVE )

@@ -36,6 +36,9 @@ project "shaderc"
 			"/wd4996" -- warning C4996: 'strdup': The POSIX name for this item is deprecated. Instead, use the ISO C++ conformant name: _strdup.
 		}
 
+	configuration { "mingw-*" }
+		targetextension ".exe"
+
 	configuration { "mingw* or linux or osx" }
 		buildoptions {
 			"-fno-strict-aliasing", -- glsl-optimizer has bugs if strict aliasing is used.
@@ -55,11 +58,6 @@ project "shaderc"
 			path.join(GLSL_OPTIMIZER, "include/c99"),
 		}
 
-	configuration { "vs* or mingw*" }
-		links {
-			"d3dcompiler",
-		}
-
 	configuration {}
 
 	defines { -- fcpp
@@ -73,6 +71,7 @@ project "shaderc"
 		path.join(BX_DIR, "include"),
 		path.join(BGFX_DIR, "include"),
 
+		path.join(BGFX_DIR, "3rdparty/dxsdk/include"),
 		FCPP_DIR,
 
 		path.join(GLSL_OPTIMIZER, "include"),
@@ -114,5 +113,27 @@ project "shaderc"
 		path.join(GLSL_OPTIMIZER, "src/glsl/main.cpp"),
 		path.join(GLSL_OPTIMIZER, "src/glsl/builtin_stubs.cpp"),
 	}
+
+	if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
+		path.join(BGFX_DIR, "scripts/shaderc.lua"), }) then
+
+		if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
+			path.join(BGFX_DIR, "tools/shaderc/shaderc_pssl.cpp"), }) then
+
+			removefiles {
+				path.join(BGFX_DIR, "tools/shaderc/shaderc_pssl.cpp"),
+			}
+		end
+
+		if filesexist(BGFX_DIR, path.join(BGFX_DIR, "../bgfx-ext"), {
+			path.join(BGFX_DIR, "tools/shaderc/shaderc_spirv.cpp"), }) then
+
+			removefiles {
+				path.join(BGFX_DIR, "tools/shaderc/shaderc_spirv.cpp"),
+			}
+		end
+
+		dofile(path.join(BGFX_DIR, "../bgfx-ext/scripts/shaderc.lua") )
+	end
 
 	strip()

@@ -15,52 +15,14 @@
 #define __DMUX__
 
 #include "ti99defs.h"
+#include "machine/tmc0430.h"
+#include "gromport.h"
+#include "bus/ti99_peb/peribox.h"
+#include "sound/sn76496.h"
+#include "video/tms9928a.h"
+#include "machine/ram.h"
 
 extern const device_type DATAMUX;
-
-/*
-    Device that is attached to this datamux.
-    The configuration setting is used for certain configurations
-    where devices may only be used if others are turned off. In particular,
-    if the HGSPL expansion card is used, the GROMs in the console must be
-    removed.
-*/
-struct dmux_device_list_entry
-{
-	const char              *name;              // Name of the device (used for looking up the device)
-	UINT16                  select;             // State of the address line bits when addressing this device
-	UINT16                  address_mask;       // Bits of the address bus used to address this device
-	UINT16                  write_select;       // Bits set when doing write accesses to this device (ffff = write-only)
-	const char              *setting;           // configuration switch that may have an effect for the presence of this device
-	UINT8                   set;                // bits that must be set for this switch so that this device is present
-	UINT8                   unset;              // bits that must be reset for this switch so that this device is present
-};
-
-#define DMUX_CONFIG(name) \
-	const datamux_config(name) =
-
-struct datamux_config
-{
-	const dmux_device_list_entry    *devlist;
-};
-
-/*
-    Device list of this datamux.
-*/
-class attached_device
-{
-	friend class simple_list<attached_device>;
-	friend class ti99_datamux_device;
-
-public:
-	attached_device(device_t *busdevice, const dmux_device_list_entry &entry)
-	: m_next(nullptr), m_device(busdevice), m_config(&entry) { };
-
-private:
-	attached_device                 *m_next;
-	device_t                        *m_device;      // the actual device
-	const dmux_device_list_entry    *m_config;
-};
 
 /*
     Main class
@@ -68,7 +30,7 @@ private:
 class ti99_datamux_device : public device_t
 {
 public:
-	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ti99_datamux_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	DECLARE_READ16_MEMBER( read );
 	DECLARE_WRITE16_MEMBER( write );
 	DECLARE_SETOFFSET_MEMBER( setoffset );
@@ -76,6 +38,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( clock_in );
 	DECLARE_WRITE_LINE_MEMBER( dbin_in );
 	DECLARE_WRITE_LINE_MEMBER( ready_line );
+
+	DECLARE_WRITE_LINE_MEMBER( gromclk_in );
 
 	template<class _Object> static devcb_base &static_set_ready_callback(device_t &device, _Object object)
 	{
@@ -87,24 +51,49 @@ protected:
 	void device_start() override;
 	void device_stop() override;
 	void device_reset() override;
+	void device_config_complete() override;
 	ioport_constructor device_input_ports() const override;
 
 private:
+	// Link to the video processor
+	optional_device<tms9928a_device> m_video;
+
+	// Link to the sound processor
+	optional_device<sn76496_base_device> m_sound;
+
+	// Link to the peripheral expansion box
+	required_device<peribox_device> m_peb;
+
+	// Link to the cartridge port (aka GROM port)
+	required_device<gromport_device> m_gromport;
+
+	// Memory expansion (internal, 16 bit)
+	required_device<ram_device> m_ram16b;
+
+	// Console RAM
+	required_device<ram_device> m_padram;
+
 	// Keeps the address space pointer
 	address_space* m_spacep;
 
+	// Console ROM
+	uint16_t* m_consolerom;
+
+	// Console GROMs
+	tmc0430_device* m_grom[3];
+
 	// Common read routine
-	void read_all(address_space& space, UINT16 addr, UINT8 *target);
+	void read_all(address_space& space, uint16_t addr, uint8_t *target);
 
 	// Common write routine
-	void write_all(address_space& space, UINT16 addr, UINT8 value);
+	void write_all(address_space& space, uint16_t addr, uint8_t value);
 
 	// Common set address method
-	void setaddress_all(address_space& space, UINT16 addr);
+	void setaddress_all(address_space& space, uint16_t addr);
 
 	// Debugger access
-	UINT16 debugger_read(address_space& space, UINT16 addr);
-	void debugger_write(address_space& space, UINT16 addr, UINT16 data);
+	uint16_t debugger_read(address_space& space, uint16_t addr);
+	void debugger_write(address_space& space, uint16_t addr, uint16_t data);
 
 	// Join own READY and external READY
 	void ready_join();
@@ -112,46 +101,40 @@ private:
 	// Ready line to the CPU
 	devcb_write_line m_ready;
 
+	// Address latch (emu). In reality, the address bus remains constant.
+	uint16_t m_addr_buf;
+
+	// DBIN line
+	int m_dbin;
+
 	// Own ready state.
-	line_state  m_muxready;
+	int  m_muxready;
 
 	// Ready state. Needed to control wait state generation via inbound READY
-	line_state  m_sysready;
+	int  m_sysready;
 
-	/* Address latch (emu). In reality, the address bus remains constant. */
-	UINT16 m_addr_buf;
+	// Latch which stores the first (odd) byte
+	uint8_t m_latch;
 
-	/* Stores the state of the DBIN line. */
-	bool    m_read_mode;
-
-	/* All devices that are attached to the 8-bit bus. */
-	simple_list<attached_device> m_devices;
-
-	/* Latch which stores the first (odd) byte */
-	UINT8 m_latch;
-
-	/* Counter for the wait states. */
+	// Counter for the wait states.
 	int   m_waitcount;
 
-	/* Memory expansion (internal, 16 bit). */
-	std::unique_ptr<UINT16[]> m_ram16b;
-
-	/* Use the memory expansion? */
+	// Use the memory expansion?
 	bool m_use32k;
 
-	/* Memory base for piggy-back 32K expansion. If 0, expansion is not used. */
-	UINT16  m_base32k;
+	// Memory base for piggy-back 32K expansion. If 0, expansion is not used.
+	uint16_t  m_base32k;
 
-	/* Reference to the CPU; avoid lookups. */
-	device_t *m_cpu;
+	// Console GROMs are available (the HSGPL expects them to be removed)
+	bool m_console_groms_present;
+
+	// GROMs are idle, no need to propagate the clock
+	bool m_grom_idle;
 };
 
 /******************************************************************************/
 
-#define MCFG_DMUX_ADD(_tag, _devices)           \
-	MCFG_DEVICE_ADD(_tag, DATAMUX, 0) \
-	MCFG_DEVICE_CONFIG( _devices )
-#endif
-
 #define MCFG_DMUX_READY_HANDLER( _intcallb ) \
 	devcb = &ti99_datamux_device::static_set_ready_callback( *device, DEVCB_##_intcallb );
+
+#endif

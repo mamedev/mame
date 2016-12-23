@@ -15,7 +15,7 @@
 
 READ8_MEMBER(ac1_state::ac1_port_b_r)
 {
-	UINT8 data = 0x7f;
+	uint8_t data = 0x7f;
 
 	if (m_cassette->input() > 0.03)
 		data |= 0x80;
@@ -27,30 +27,30 @@ READ8_MEMBER(ac1_state::ac1_port_b_r)
 
 READ8_MEMBER(ac1_state::ac1_port_a_r)
 {
-	UINT8 line0 = m_io_line[0]->read();
-	UINT8 line1 = m_io_line[1]->read();
-	UINT8 line2 = m_io_line[2]->read();
-	UINT8 line3 = m_io_line[3]->read();
-	UINT8 line4 = m_io_line[4]->read();
-	UINT8 line5 = m_io_line[5]->read();
-	UINT8 line6 = m_io_line[6]->read();
+	uint8_t line0 = m_io_line[0]->read();
+	uint8_t line1 = m_io_line[1]->read();
+	uint8_t line2 = m_io_line[2]->read();
+	uint8_t line3 = m_io_line[3]->read();
+	uint8_t line4 = m_io_line[4]->read();
+	uint8_t line5 = m_io_line[5]->read();
+	uint8_t line6 = m_io_line[6]->read();
 
-	UINT8 SH    = BNOT(BIT(line6,0));
-	UINT8 CTRL  = BNOT(BIT(line6,1));
-	UINT8 SPACE = BIT(line6,2);
-	UINT8 ENTER = BIT(line6,3);
-	UINT8 BACK  = BIT(line6,4);
+	uint8_t SH    = BNOT(BIT(line6,0));
+	uint8_t CTRL  = BNOT(BIT(line6,1));
+	uint8_t SPACE = BIT(line6,2);
+	uint8_t ENTER = BIT(line6,3);
+	uint8_t BACK  = BIT(line6,4);
 
-	UINT8 all = line0 | line1 | line2 | line3 | line4 | line5;
-	UINT8 s1 = BNOT(BIT(all,0));UINT8 z1 = (line0 !=0) ? 0 : 1;
-	UINT8 s2 = BNOT(BIT(all,1));UINT8 z2 = (line1 !=0) ? 0 : 1;
-	UINT8 s3 = BNOT(BIT(all,2));UINT8 z3 = (line2 !=0) ? 0 : 1;
-	UINT8 s4 = BNOT(BIT(all,3));UINT8 z4 = (line3 !=0) ? 0 : 1;
-	UINT8 s5 = BNOT(BIT(all,4));UINT8 z5 = (line4 !=0) ? 0 : 1;
-	UINT8 s6 = BNOT(BIT(all,5));UINT8 z6 = (line5 !=0) ? 0 : 1;
-	UINT8 s7 = BNOT(BIT(all,6));
-	UINT8 s8 = BNOT(BIT(all,7));
-	UINT8 tast,td0,td1,td2,td3,td4,td5,td6,dg5;
+	uint8_t all = line0 | line1 | line2 | line3 | line4 | line5;
+	uint8_t s1 = BNOT(BIT(all,0));uint8_t z1 = (line0 !=0) ? 0 : 1;
+	uint8_t s2 = BNOT(BIT(all,1));uint8_t z2 = (line1 !=0) ? 0 : 1;
+	uint8_t s3 = BNOT(BIT(all,2));uint8_t z3 = (line2 !=0) ? 0 : 1;
+	uint8_t s4 = BNOT(BIT(all,3));uint8_t z4 = (line3 !=0) ? 0 : 1;
+	uint8_t s5 = BNOT(BIT(all,4));uint8_t z5 = (line4 !=0) ? 0 : 1;
+	uint8_t s6 = BNOT(BIT(all,5));uint8_t z6 = (line5 !=0) ? 0 : 1;
+	uint8_t s7 = BNOT(BIT(all,6));
+	uint8_t s8 = BNOT(BIT(all,7));
+	uint8_t tast,td0,td1,td2,td3,td4,td5,td6,dg5;
 
 	/* Additional double keys */
 	if (SPACE) {

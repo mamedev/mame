@@ -80,6 +80,7 @@ Notes:
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
@@ -134,7 +135,7 @@ static ADDRESS_MAP_START( hexion_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
 	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
@@ -160,7 +161,7 @@ static ADDRESS_MAP_START( hexionb_map, AS_PROGRAM, 8, hexion_state )
 	AM_RANGE(0xf480, 0xf480) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xf4c0, 0xf4c0) AM_WRITE(coincntr_w)
 	AM_RANGE(0xf500, 0xf500) AM_WRITE(gfxrom_select_w)
-	AM_RANGE(0xf540, 0xf540) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf540, 0xf540) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0xf5c0, 0xf5c0) AM_DEVWRITE("oki2", okim6295_device, write)
 ADDRESS_MAP_END
 
@@ -241,6 +242,7 @@ static MACHINE_CONFIG_START( hexion, hexion_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* Z80B 6 MHz @ 17F, xtal verified, divider not verified */
 	MCFG_CPU_PROGRAM_MAP(hexion_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", hexion_state, scanline, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("k053252", K053252, XTAL_24MHz/2) /* K053252, X0-010(?) @8D, xtal verified, divider not verified */
 	MCFG_K053252_INT1_ACK_CB(WRITELINE(hexion_state, irq_ack_w))

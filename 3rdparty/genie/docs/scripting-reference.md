@@ -43,6 +43,7 @@
     * [location](#locationpath)
     * [newaction](#newactiondescription)
     * [newoption](#newoptionsdescription)
+    * [nopch](#nopch)
     * [objdir](#objdirpath)
     * [os.chdir](#oschdirpath)
     * [os.copyfile](#oscopyfilesource-destination)
@@ -71,7 +72,7 @@
     * [path.getrelative](#pathgetrelativesrc-dest)
     * [path.isabsolute](#pathisabsolutepath)
     * [path.iscfile](#pathiscfilepath)
-    * [path.iscppfile](#pathiscppfilepath)
+    * [path.isSourceFile](#pathiscppfilepath)
     * [path.isresourcefile](#pathisresourcefilepath)
     * [path.join](#pathjoinleading-trailing)
     * [path.rebase](#pathrebasepath-oldbase-newbase)
@@ -100,6 +101,7 @@
     * [targetname](#targetnamename)
     * [targetprefix](#targetprefixprefix)
     * [targetsuffix](#targetsuffixsuffix)
+    * [userincludedirs](#userincludedirspaths)
     * [uuid](#uuidprojectuuid)
     * [vpaths](#vpathsgroup--pattern)
 * Additional Information
@@ -369,7 +371,7 @@ Specifies a list of arguments to pas to the application when run under the debug
 
 **Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
-**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user). Removing this file (`genie clean`) will restore the default settings.
+**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
 **Scope:** solutions, projects, configurations
 
@@ -389,7 +391,7 @@ Sets the working directory for the integrated debugger.
 
 **Note:** Not implemented for Xcode 3, where it must be configured in a per-user config file.
 
-**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user). Removing this file (`genie clean`) will restore the default settings.
+**Note:** In Visual Studio, this can be overridden by a per-user config file (e.g. ProjectName.vcxproj.MYDOMAIN-MYUSERNAME.user).
 
 **Scope:** solutions, projects, configurations
 
@@ -516,15 +518,17 @@ Specifies build flags to modify the compiling or linking process. Multiple calls
 #### Arguments
 _flags_ - List of flag names from list below. Names are case-insensitive and ignored if not supported on a platform.
 
-* _EnableSSE, EnableSSE2_ - Enable SSE instruction sets
+* _EnableSSE, EnableSSE2, EnableAVX, EnableAVX2_ - Enable SSE/AVX instruction sets
 * _ExtraWarnings_ - Sets compiler's max warning level.
 * _FatalWarnings_ - Treat warnings as errors.
 * _FloatFast_ - Enable floating point optimizations at the expense of accuracy.
 * _FloatStrict_ - Improve floating point consistency at the expense of performance.
 * _Managed_ - Enable Managed C++ (.NET).
+* _MinimumWarnings_ - - Sets compiler's minimum warning level (Visual Studio only).
 * _MFC_ - Enable support for Microsoft Foundation Classes.
 * _NativeWChar, NoNativeWChar_ - Toggle support for the wchar data type.
 * _No64BitChecks_ - Disable 64-bit portability warnings.
+* _NoBufferSecurityCheck_ - Turns off Visual Studio 'Security Check' option. Can give up to 10% performance improvement.
 * _NoEditAndContinue_ - Disable support for Visual Studio's Edit-and-Continue feature.
 * _NoExceptions_ - Disable C++ exception support.
 * _NoFramePointer_ - Disable the generation of stack frame pointers.
@@ -534,6 +538,8 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _NoMinimalRebuild_ - Disable Visual Studio's minimal rebuild feature.
 * _NoPCH_ - Disable precompiled headers.
 * _NoRTTI_ - Disable C++ runtime type information.
+* _NoWinMD_ - Disables Generation of Windows Metadata.
+* _NoWinRT_ - Disables Windows RunTime Extension for project.
 * _Optimize_ - Perform a balanced set of optimizations.
 * _OptimizeSize_ - Optimize for the smallest file size.
 * _OptimizeSpeed_ - Optimize for the best performance.
@@ -542,6 +548,7 @@ _flags_ - List of flag names from list below. Names are case-insensitive and ign
 * _Symbols_ - Generate debugging information.
 * _Unicode_ - Enable Unicode strings. If not specified, the default toolset behavior is used.
 * _Unsafe_ - Enable the use of unsafe code in .NET applications.
+* _UseFullPaths_ - Enable absolute paths for `__FILE__`. 
 * _WinMain_ - Use WinMain() as the entry point for Windows applications, rather than main().
 
 **Note:** When not set, options will default to the tool default.
@@ -751,8 +758,9 @@ _kind_ - project kind identifier. One of:
 
 * _ConsoleApp_ - console executable
 * _WindowedApp_ - application that runs in a desktop window. Does not apply on Linux.
-* _SharedLib_ - shared library or DLL
 * _StaticLib_ - static library
+* _SharedLib_ - shared library or DLL
+* _Bundle_ - Xcode: Cocoa Bundle, everywhere else: alias to _SharedLib_
 
 #### Examples
 ```lua
@@ -774,12 +782,12 @@ project "MyProject"
 
 ---
 ### language(_lang_)
-Sets the programming language used by a project. GENie currently supports C, C++, and C#. Not all languages are supported by all of the generators. For instance, SharpDevelop does not currently support C or C++ development, and Code::Blocks does not support the .NET languages (C#, managed C++).
+Sets the programming language used by a project. GENie currently supports C, C++, C# and Vala. Not all languages are supported by all of the generators. For instance, SharpDevelop does not currently support C or C++ development, and Code::Blocks does not support the .NET languages (C#, managed C++).
 
 **Scope:** solutions, projects
 
 #### Arguments
-_lang_ - language identifier string ("C", "C++", or "C#"). Case insensitive.
+_lang_ - language identifier string ("C", "C++", "C#" or "Vala"). Case insensitive.
 
 #### Examples
 ```lua
@@ -955,6 +963,31 @@ newoption {
         { "software", "Software Renderer" }
     }
 }
+```
+[Back to top](#table-of-contents)
+
+---
+### nopch({_files_...})
+Sets sources files added with the [`files`](#files) function, to not use the precompiled header. Multiple calls are concatenated.
+
+**Note:** May be set on the solution, project, or configuration, but only project-level file lists are currently supported.
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_files_ - List of files to not use the precompiled header. Paths should be relative to the currently-executing script file and may contain [wildcards](#wildcards).
+
+#### Examples
+Add all c files in a directory, then set a specific file to not use precompiled headers.
+```lua
+files { "*.c" }
+nopch { "a_file.c" }
+```
+
+Add an entire directory of C files, then set one directory to not use precompiled headers
+```lua
+files { "*.c" }
+nopch { "tests/*.c" }
 ```
 [Back to top](#table-of-contents)
 
@@ -1247,6 +1280,32 @@ Table of values:
 [Back to top](#table-of-contents)
 
 ---
+### userincludedirs({_paths_...})
+Specifies the user include file search paths. Multiple calls are concatenated.
+
+For XCode, it maps to setting the USER INCLUDE SEARCH PATH. 
+
+For clang/gcc, it maps to setting the include directory using the iquote option.
+
+On the other build systems, it behaves like [includedirs](#includedirspaths).
+
+**Scope:** solutions, projects, configurations
+
+#### Arguments
+_paths_ - list of user include file search directories, relative to the currently-executing script file.
+
+#### Examples
+Define two include file search paths
+```lua
+userincludedirs { "../lua/include", "../zlib" }
+```
+You can also use [wildcards](#wildcards) to match multiple directories.
+```lua
+userincludedirs { "../includes/**" }
+```
+[Back to top](#table-of-contents)
+
+---
 ### os.uuid()
 Returns a Universally Unique Identifier
 
@@ -1367,7 +1426,7 @@ _path_ - path to check
 [Back to top](#table-of-contents)
 
 ---
-### path.iscppfile(_path_)
+### path.isSourceFile(_path_)
 Determines whether a file is a C++ source code file, based on extension.
 
 #### Arguments

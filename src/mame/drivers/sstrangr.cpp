@@ -24,16 +24,16 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<palette_device> m_palette;
-	required_shared_ptr<UINT8> m_ram;
+	required_shared_ptr<uint8_t> m_ram;
 
-	UINT8 m_flip_screen;
+	uint8_t m_flip_screen;
 
 	DECLARE_WRITE8_MEMBER(port_w);
 
 	virtual void video_start() override;
 
-	UINT32 screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -49,7 +49,7 @@ void sstrangr_state::video_start()
 	save_item(NAME(m_flip_screen));
 }
 
-UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	offs_t offs;
 
@@ -57,9 +57,9 @@ UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb3
 	{
 		int i;
 
-		UINT8 x = offs << 3;
+		uint8_t x = offs << 3;
 		int y = offs >> 5;
-		UINT8 data = m_ram[offs];
+		uint8_t data = m_ram[offs];
 
 		for (i = 0; i < 8; i++)
 		{
@@ -67,12 +67,12 @@ UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb3
 
 			if (m_flip_screen)
 			{
-				pen = (data & 0x80) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x80) ? rgb_t::white() : rgb_t::black();
 				data = data << 1;
 			}
 			else
 			{
-				pen = (data & 0x01) ? rgb_t::white : rgb_t::black;
+				pen = (data & 0x01) ? rgb_t::white() : rgb_t::black();
 				data = data >> 1;
 			}
 
@@ -85,23 +85,23 @@ UINT32 sstrangr_state::screen_update_sstrangr(screen_device &screen, bitmap_rgb3
 	return 0;
 }
 
-UINT32 sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t sstrangr_state::screen_update_sstrngr2(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	UINT8 *color_map_base = &memregion("proms")->base()[m_flip_screen ? 0x0000 : 0x0200];
+	uint8_t *color_map_base = &memregion("proms")->base()[m_flip_screen ? 0x0000 : 0x0200];
 
 	for (offs_t offs = 0; offs < 0x2000; offs++)
 	{
-		UINT8 y = offs >> 5;
-		UINT8 x = offs << 3;
+		uint8_t y = offs >> 5;
+		uint8_t x = offs << 3;
 
 		offs_t color_address = (offs >> 9 << 5) | (offs & 0x1f);
 
-		UINT8 data = m_ram[offs];
-		UINT8 fore_color = color_map_base[color_address] & 0x07;
+		uint8_t data = m_ram[offs];
+		uint8_t fore_color = color_map_base[color_address] & 0x07;
 
 		for (int i = 0; i < 8; i++)
 		{
-			UINT8 color;
+			uint8_t color;
 
 			if (m_flip_screen)
 			{

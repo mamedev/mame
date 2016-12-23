@@ -26,7 +26,7 @@
   - 1x D8751H            ; 8751 MCU (3.6864 MHz?)
 
   Sound device:
-  - 1x AY8930            ; Sound IC, from Yamaha.
+  - 1x AY8930            ; Sound IC, from Microchip Technology.
 
   Video:
   - 1x HD63484CP8 @ 8MHz ; Advanced CRT Controller (ACRTC), from Hitachi Semiconductor.
@@ -158,6 +158,7 @@
 
 
 #define MAIN_CLOCK  XTAL_12MHz
+#define AY_CLOCK    MAIN_CLOCK / 8
 #define SEC_CLOCK   XTAL_3.6864MHz
 #define AUX1_CLOCK  XTAL_26MHz
 #define AUX2_CLOCK  XTAL_24MHz
@@ -166,6 +167,7 @@
 #include "cpu/m68000/m68000.h"
 //#include "video/hd63484.h"
 #include "video/ramdac.h"
+#include "sound/ay8910.h"
 
 
 class wildpkr_state : public driver_device
@@ -173,14 +175,16 @@ class wildpkr_state : public driver_device
 public:
 	wildpkr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu") { }
+		m_maincpu(*this, "maincpu")
+	{ }
+
+	required_device<cpu_device> m_maincpu;
 
 	DECLARE_DRIVER_INIT(wildpkr);
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(wildpkr);
-	UINT32 screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_device<cpu_device> m_maincpu;
+	uint32_t screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 
@@ -192,7 +196,7 @@ void wildpkr_state::video_start()
 {
 }
 
-UINT32 wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t wildpkr_state::screen_update_wildpkr(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -220,7 +224,8 @@ static ADDRESS_MAP_START( wildpkr_map, AS_PROGRAM, 16, wildpkr_state )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x103fff) AM_RAM
 //  AM_RANGE(0x800000, 0x800003) ACRTC?
-	AM_RANGE(0x800180, 0x800181) AM_READNOP // protection, puts m68k code snippets to RAM
+	AM_RANGE(0x800180, 0x800181) AM_DEVWRITE8("aysnd", ay8930_device, address_w, 0xff00)
+	AM_RANGE(0x800180, 0x800181) AM_DEVREADWRITE8("aysnd", ay8930_device, data_r, data_w, 0x00ff)
 	AM_RANGE(0x800200, 0x800201) AM_DEVWRITE8("ramdac", ramdac_device, index_w, 0xff00)
 	AM_RANGE(0x800202, 0x800203) AM_DEVWRITE8("ramdac", ramdac_device, pal_w, 0xff00)
 	AM_RANGE(0x800204, 0x800205) AM_DEVWRITE8("ramdac", ramdac_device, mask_w, 0xff00)
@@ -283,8 +288,7 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, MAIN_CLOCK)
 	MCFG_CPU_PROGRAM_MAP(wildpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state,  irq1_line_hold)   //guess
-
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // guess
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -300,6 +304,10 @@ static MACHINE_CONFIG_START( wildpkr, wildpkr_state )
 	MCFG_PALETTE_ADD("palette", 256)
 	MCFG_PALETTE_INIT_OWNER(wildpkr_state, wildpkr)
 
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8930, AY_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -308,8 +316,7 @@ static MACHINE_CONFIG_START( tabpkr, wildpkr_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(tabpkr_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state,  irq2_line_hold)   // 2 / 5 are valid
-
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", wildpkr_state, irq2_line_hold) // 2 / 5 are valid
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -360,7 +367,7 @@ hd63484cp8 advanced CRT controller
 
 */
 
-ROM_START( tabpkr )
+ROM_START( tabpkr ) // Royal Poker V 1.85 Oct 29 1996 12:20:07
 	ROM_REGION( 0x300000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "rop1851.bin", 0x000001, 0x80000, CRC(fbe13fa8) SHA1(7c19b6b4d9a9935b6feb70b6261bafc6d9afb59f) )
 	ROM_LOAD16_BYTE( "rop1853.bin", 0x000000, 0x80000, CRC(e0c312b4) SHA1(57c64c82f723067b7b2f9bf3fdaf5aedeb4f9dc3) )
@@ -377,7 +384,6 @@ ROM_END
 
 DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 {
-	//HD63484_start(machine());
 }
 
 
@@ -387,4 +393,4 @@ DRIVER_INIT_MEMBER(wildpkr_state,wildpkr)
 
 /*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT      ROT    COMPANY        FULLNAME                   FLAGS */
 GAME( 199?, wildpkr,   0,        wildpkr,  wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Wild Poker (ver. D 1.01)", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
-GAME( 199?, tabpkr,    0,        tabpkr,   wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Unknown Tab Austria Poker", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )
+GAME( 1996, tabpkr,    0,        tabpkr,   wildpkr, wildpkr_state,  wildpkr,  ROT0, "TAB Austria", "Royal Poker V 1.85", MACHINE_NO_SOUND | MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION )

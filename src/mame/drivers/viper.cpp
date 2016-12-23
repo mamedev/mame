@@ -327,21 +327,21 @@ some other components. It will be documented at a later date.
     Game status:
         ppp2nd              POST: "DIP SWITCH ERROR", "NO SECURITY ERROR"
         boxingm             Goes to attract mode when ran with memory card check. Coins up.
-        code1d,b            Inf loop on blue screen (writes to I2C before)
-        gticlub2            Inf loop on blue screen (writes to I2C before)
+        code1d,b            RTC self check bad
+        gticlub2            Attract mode works. Coins up. Hangs in car selection.
         gticlub2ea          Doesn't boot: bad CHD?
         jpark3              POST?: Shows "Now loading..." then black screen (sets global timer 1 on EPIC...)
-        mocapglf            Inf loop on blue screen (writes to I2C before)
-        mocapb,j            POST: U13 bad
-        p911,e,j,uc,kc      POST: U13 bad
-        p9112               POST: U13 bad
+        mocapglf            Security code error
+        mocapb,j            Crash after self checks
+        p911,e,j,uc,kc      "Distribution error"
+        p9112               RTC self check bad
         popn9               Doesn't boot: bad CHD?
-        sscopex/sogeki      Inf loop on blue screen
+        sscopex/sogeki      Security code error
         thrild2,a           Attract mode with partial graphics. Coins up. Hangs in car selection screen.
         thrild2c            Inf loop on blue screen
         tsurugi             Goes to attract mode when ran with memory card check. Coins up.
         tsurugij            No NVRAM
-        wcombat             Hangs on blue screen
+        wcombat             Stuck on network check
         xtrial              Attract mode. Hangs.
         mfightc,c           Passes POST. Waits for network connection from main unit? Spams writes to 0xffe08000 (8-bit)
 */
@@ -355,7 +355,7 @@ some other components. It will be documented at a later date.
 #include "video/voodoo.h"
 
 #define VIPER_DEBUG_LOG
-#define VIPER_DEBUG_EPIC_INTS       1
+#define VIPER_DEBUG_EPIC_INTS       0
 #define VIPER_DEBUG_EPIC_TIMERS     0
 #define VIPER_DEBUG_EPIC_REGS       0
 #define VIPER_DEBUG_EPIC_I2C        0
@@ -363,7 +363,6 @@ some other components. It will be documented at a later date.
 
 #define SDRAM_CLOCK         166666666       // Main SDRAMs run at 166MHz
 
-static UINT32 *workram;
 
 
 static emu_timer *ds2430_timer;
@@ -377,14 +376,20 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_ata(*this, "ata"),
-		m_voodoo(*this, "voodoo")
+		m_voodoo(*this, "voodoo"),
+		m_workram(*this, "workram")
 	{
 	}
 
-	UINT32 m_epic_iack;
+	uint32_t m_epic_iack;
 	int m_cf_card_ide;
 	int m_unk1_bit;
-	UINT32 m_voodoo3_pci_reg[0x100];
+	uint32_t m_voodoo3_pci_reg[0x100];
+	int m_unk_serial_bit_w;
+	uint16_t m_unk_serial_cmd;
+	uint16_t m_unk_serial_data;
+	uint16_t m_unk_serial_data_r;
+	uint8_t m_unk_serial_regs[0x80];
 
 	DECLARE_READ32_MEMBER(epic_r);
 	DECLARE_WRITE32_MEMBER(epic_w);
@@ -413,15 +418,21 @@ public:
 	DECLARE_WRITE64_MEMBER(cf_card_w);
 	DECLARE_READ64_MEMBER(ata_r);
 	DECLARE_WRITE64_MEMBER(ata_w);
+	DECLARE_READ64_MEMBER(unk_serial_r);
+	DECLARE_WRITE64_MEMBER(unk_serial_w);
 	DECLARE_WRITE_LINE_MEMBER(voodoo_vblank);
 	DECLARE_DRIVER_INIT(viper);
 	DECLARE_DRIVER_INIT(vipercf);
+	DECLARE_DRIVER_INIT(viperhd);
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(viper_vblank);
 	TIMER_CALLBACK_MEMBER(epic_global_timer_callback);
 	TIMER_CALLBACK_MEMBER(ds2430_timer_callback);
+#if VIPER_DEBUG_EPIC_REGS
+	const char* epic_get_register_name(uint32_t reg);
+#endif
 	void epic_update_interrupts();
 	void mpc8240_interrupt(int irq);
 	void mpc8240_epic_init();
@@ -431,29 +442,30 @@ public:
 	required_device<ppc_device> m_maincpu;
 	required_device<ata_interface_device> m_ata;
 	required_device<voodoo_3_device> m_voodoo;
+	required_shared_ptr<uint64_t> m_workram;
 };
 
-UINT32 viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t viper_state::screen_update_viper(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	voodoo_device *voodoo = (voodoo_device*)machine().device("voodoo");
 	return voodoo->voodoo_update(bitmap, cliprect) ? 0 : UPDATE_HAS_NOT_CHANGED;
 }
 
-UINT32 m_mpc8240_regs[256/4];
+uint32_t m_mpc8240_regs[256/4];
 
 #ifdef UNUSED_FUNCTION
-static inline UINT64 read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline uint64_t read64le_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	UINT64 result = 0;
+	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result |= (UINT64)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
+		result |= (uint64_t)(handler)(space, offset * 2 + 0, mem_mask >> 0) << 0;
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
 	return result;
 }
 
 
-static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64le_with_32le_device_handler(write32_delegate handler, address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -462,22 +474,22 @@ static inline void write64le_with_32le_device_handler(write32_delegate handler, 
 }
 #endif
 
-static inline UINT64 read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, UINT64 mem_mask)
+static inline uint64_t read64be_with_32le_device_handler(read32_delegate handler, address_space &space, offs_t offset, uint64_t mem_mask)
 {
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
-	UINT64 result = 0;
+	mem_mask = flipendian_int64(mem_mask);
+	uint64_t result = 0;
 	if (ACCESSING_BITS_0_31)
-		result = (UINT64)(handler)(space, offset * 2, mem_mask & 0xffffffff);
+		result = (uint64_t)(handler)(space, offset * 2, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
-		result |= (UINT64)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
-	return FLIPENDIAN_INT64(result);
+		result |= (uint64_t)(handler)(space, offset * 2 + 1, mem_mask >> 32) << 32;
+	return flipendian_int64(result);
 }
 
 
-static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, UINT64 data, UINT64 mem_mask)
+static inline void write64be_with_32le_device_handler(write32_delegate handler,  address_space &space, offs_t offset, uint64_t data, uint64_t mem_mask)
 {
-	data = FLIPENDIAN_INT64(data);
-	mem_mask = FLIPENDIAN_INT64(mem_mask);
+	data = flipendian_int64(data);
+	mem_mask = flipendian_int64(mem_mask);
 	if (ACCESSING_BITS_0_31)
 		handler(space, offset * 2, data & 0xffffffff, mem_mask & 0xffffffff);
 	if (ACCESSING_BITS_32_63)
@@ -486,7 +498,7 @@ static inline void write64be_with_32le_device_handler(write32_delegate handler, 
 
 /*****************************************************************************/
 
-static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t mpc8240_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 // device is null?
 //  viper_state *state = device->machine().driver_data<viper_state>();
@@ -501,7 +513,7 @@ static UINT32 mpc8240_pci_r(device_t *busdevice, device_t *device, int function,
 	//return state->m_mpc8240_regs[reg/4];
 }
 
-static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 // device is null?
 //  viper_state *state = device->machine().driver_data<viper_state>();
@@ -516,25 +528,25 @@ static void mpc8240_pci_w(device_t *busdevice, device_t *device, int function, i
 READ64_MEMBER(viper_state::pci_config_addr_r)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 0, U64(0xffffffff00000000));
+	return device->read_64be(space, 0, 0xffffffff00000000U);
 }
 
 WRITE64_MEMBER(viper_state::pci_config_addr_w)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 0, data, U64(0xffffffff00000000));
+	device->write_64be(space, 0, data, 0xffffffff00000000U);
 }
 
 READ64_MEMBER(viper_state::pci_config_data_r)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	return device->read_64be(space, 1, U64(0x00000000ffffffff)) << 32;
+	return device->read_64be(space, 1, 0x00000000ffffffffU) << 32;
 }
 
 WRITE64_MEMBER(viper_state::pci_config_data_w)
 {
 	pci_bus_legacy_device *device = machine().device<pci_bus_legacy_device>("pcibus");
-	device->write_64be(space, 1, data >> 32, U64(0x00000000ffffffff));
+	device->write_64be(space, 1, data >> 32, 0x00000000ffffffffU);
 }
 
 
@@ -575,7 +587,7 @@ WRITE64_MEMBER(viper_state::pci_config_data_w)
 
 struct MPC8240_IRQ
 {
-	UINT32 vector;
+	uint32_t vector;
 	int priority;
 	int destination;
 	int active;
@@ -585,7 +597,7 @@ struct MPC8240_IRQ
 
 struct MPC8240_GLOBAL_TIMER
 {
-	UINT32 base_count;
+	uint32_t base_count;
 	int enable;
 	emu_timer *timer;
 };
@@ -594,18 +606,18 @@ struct MPC8240_GLOBAL_TIMER
 
 struct MPC8240_EPIC
 {
-	UINT32 iack;
-	UINT32 eicr;
-	UINT32 svr;
+	uint32_t iack;
+	uint32_t eicr;
+	uint32_t svr;
 
 	int active_irq;
 
 	MPC8240_IRQ irq[MPC8240_NUM_INTERRUPTS];
 
-	UINT8 i2c_adr;
+	uint8_t i2c_adr;
 	int i2c_freq_div, i2c_freq_sample_rate;
-	UINT8 i2c_cr;
-	UINT8 i2c_sr;
+	uint8_t i2c_cr;
+	uint8_t i2c_sr;
 	int i2c_state;
 
 	MPC8240_GLOBAL_TIMER global_timer[4];
@@ -616,7 +628,7 @@ struct MPC8240_EPIC
 static MPC8240_EPIC epic;
 
 #if VIPER_DEBUG_EPIC_REGS
-const viper_state::char* epic_get_register_name(UINT32 reg)
+const char* viper_state::epic_get_register_name(uint32_t reg)
 {
 	switch (reg >> 16)
 	{
@@ -727,7 +739,7 @@ const viper_state::char* epic_get_register_name(UINT32 reg)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 #endif
 
@@ -823,7 +835,7 @@ READ32_MEMBER(viper_state::epic_r)
 	}
 #endif
 
-	UINT32 ret = 0;
+	uint32_t ret = 0;
 
 	switch (reg >> 16)
 	{
@@ -858,7 +870,9 @@ READ32_MEMBER(viper_state::epic_r)
 					{
 						if (epic.i2c_state == I2C_STATE_ADDRESS_CYCLE)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C address cycle read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_DATA_TRANSFER;
 
@@ -868,7 +882,9 @@ READ32_MEMBER(viper_state::epic_r)
 							// generate interrupt if interrupt are enabled
 							if (epic.i2c_cr & 0x40)
 							{
+#if VIPER_DEBUG_EPIC_I2C
 								printf("I2C interrupt\n");
+#endif
 								mpc8240_interrupt(MPC8240_I2C_IRQ);
 
 								// set interrupt flag in status register
@@ -877,7 +893,9 @@ READ32_MEMBER(viper_state::epic_r)
 						}
 						else if (epic.i2c_state == I2C_STATE_DATA_TRANSFER)
 						{
+#if VIPER_DEBUG_EPIC_I2C
 							printf("I2C data read\n");
+#endif
 
 							epic.i2c_state = I2C_STATE_ADDRESS_CYCLE;
 
@@ -959,7 +977,7 @@ READ32_MEMBER(viper_state::epic_r)
 					ret |= epic.irq[MPC8240_I2C_IRQ].priority << 16;
 					ret |= epic.irq[MPC8240_I2C_IRQ].vector;
 					ret |= epic.irq[MPC8240_I2C_IRQ].active ? 0x40000000 : 0;
-					return ret;
+					break;
 				}
 			}
 			break;
@@ -991,7 +1009,7 @@ READ32_MEMBER(viper_state::epic_r)
 		}
 	}
 
-	return FLIPENDIAN_INT32(ret);
+	return flipendian_int32(ret);
 }
 
 WRITE32_MEMBER(viper_state::epic_w)
@@ -999,7 +1017,7 @@ WRITE32_MEMBER(viper_state::epic_w)
 	int reg;
 	reg = offset * 4;
 
-	data = FLIPENDIAN_INT32(data);
+	data = flipendian_int32(data);
 
 #if VIPER_DEBUG_EPIC_REGS
 	if (reg != 0x600b0)     // interrupt clearing is spammy
@@ -1318,7 +1336,7 @@ void viper_state::mpc8240_epic_reset(void)
 /*****************************************************************************/
 
 
-static const UINT8 cf_card_tuples[] =
+static const uint8_t cf_card_tuples[] =
 {
 	0x01,       // Device Tuple
 	0x01,       // Tuple size
@@ -1333,7 +1351,7 @@ static const UINT8 cf_card_tuples[] =
 
 READ64_MEMBER(viper_state::cf_card_data_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1368,7 +1386,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 
 			default:
 			{
-				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context(), offset & 0xf, (UINT16)(data >> 16));
+				fatalerror("%s:cf_card_data_w: IDE reg %02X, %04X\n", machine().describe_context(), offset & 0xf, (uint16_t)(data >> 16));
 			}
 		}
 	}
@@ -1376,7 +1394,7 @@ WRITE64_MEMBER(viper_state::cf_card_data_w)
 
 READ64_MEMBER(viper_state::cf_card_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1440,7 +1458,7 @@ READ64_MEMBER(viper_state::cf_card_r)
 WRITE64_MEMBER(viper_state::cf_card_w)
 {
 	#ifdef VIPER_DEBUG_LOG
-	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (UINT32)(data>>32), (UINT32)(data), offset, (UINT32)(mem_mask >> 32), (UINT32)(mem_mask));
+	//printf("%s:compact_flash_w: %08X%08X, %08X, %08X%08X\n", machine().describe_context(), (uint32_t)(data>>32), (uint32_t)(data), offset, (uint32_t)(mem_mask >> 32), (uint32_t)(mem_mask));
 	#endif
 
 	if (ACCESSING_BITS_16_31)
@@ -1479,7 +1497,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 
 				default:
 				{
-					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context(), offset & 0xf, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: IDE reg %02X, data %04X\n", machine().describe_context(), offset & 0xf, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1499,7 +1517,7 @@ WRITE64_MEMBER(viper_state::cf_card_w)
 				}
 				default:
 				{
-					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context(), offset, (UINT16)((data >> 16) & 0xffff));
+					fatalerror("%s:compact_flash_w: reg %02X, data %04X\n", machine().describe_context(), offset, (uint16_t)((data >> 16) & 0xffff));
 				}
 			}
 		}
@@ -1519,7 +1537,7 @@ WRITE64_MEMBER(viper_state::unk2_w)
 
 READ64_MEMBER(viper_state::ata_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -1557,7 +1575,7 @@ WRITE64_MEMBER(viper_state::ata_w)
 	}
 }
 
-static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function, int reg, UINT32 mem_mask)
+static uint32_t voodoo3_pci_r(device_t *busdevice, device_t *device, int function, int reg, uint32_t mem_mask)
 {
 	viper_state *state = device->machine().driver_data<viper_state>();
 
@@ -1597,7 +1615,7 @@ static UINT32 voodoo3_pci_r(device_t *busdevice, device_t *device, int function,
 	}
 }
 
-static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo3_pci_w(device_t *busdevice, device_t *device, int function, int reg, uint32_t data, uint32_t mem_mask)
 {
 	viper_state *state = device->machine().driver_data<viper_state>();
 
@@ -1672,7 +1690,7 @@ READ64_MEMBER(viper_state::voodoo3_io_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_io_w)
 {
-//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_io_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_io_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1683,7 +1701,7 @@ READ64_MEMBER(viper_state::voodoo3_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_w)
 {
-//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1694,7 +1712,7 @@ READ64_MEMBER(viper_state::voodoo3_lfb_r)
 }
 WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 {
-//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data), offset, space.device().safe_pc());
+//  printf("voodoo3_lfb_w: %08X%08X, %08X at %08X\n", (uint32_t)(data >> 32), (uint32_t)(data), offset, space.device().safe_pc());
 
 	write64be_with_32le_device_handler(write32_delegate(FUNC(voodoo_3_device::banshee_fb_w), &(*m_voodoo)), space, offset, data, mem_mask);
 }
@@ -1709,13 +1727,13 @@ WRITE64_MEMBER(viper_state::voodoo3_lfb_w)
 #define DS2430_STATE_READ_MEM_ADDRESS       6
 
 static int unk1_bit = 1;
-static UINT8 ds2430_data;
+static uint8_t ds2430_data;
 static int ds2430_data_count = 0;
 static int ds2430_reset = 0;
 static int ds2430_state;
-static UINT8 ds2430_cmd;
-static UINT8 *ds2430_rom;
-static UINT8 ds2430_addr;
+static uint8_t ds2430_cmd;
+static uint8_t *ds2430_rom;
+static uint8_t ds2430_addr;
 
 
 TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
@@ -1737,40 +1755,40 @@ TIMER_CALLBACK_MEMBER(viper_state::ds2430_timer_callback)
 
 READ64_MEMBER(viper_state::unk1_r)
 {
-	UINT64 r = 0;
-	//return 0;//U64(0x0000400000000000);
+	uint64_t r = 0;
+	//return 0;//0x0000400000000000U;
 
-	r |= U64(0xffff00000000ffff);
+	r |= 0xffff00000000ffffU;
 
 	if (ACCESSING_BITS_40_47)
 	{
-		UINT64 reg = 0;
+		uint64_t reg = 0;
 		reg |= (unk1_bit << 5);
 		reg |= 0x40;        // if this bit is 0, loads a disk copier instead
 		//r |= 0x04;    // screen flip
-		//reg |= 0x08;      // memory card check (1 = enable)
+		reg |= 0x08;      // memory card check (1 = enable)
 
 		r |= reg << 40;
 
-		//r |= (UINT64)(unk1_bit << 5) << 40;
-		//r |= U64(0x0000400000000000);
+		//r |= (uint64_t)(unk1_bit << 5) << 40;
+		//r |= 0x0000400000000000U;
 
-		//r |= U64(0x0000040000000000); // screen flip
-		//r |= U64(0x0000080000000000); // memory card check (1 = enable)
+		//r |= 0x0000040000000000U; // screen flip
+		//r |= 0x0000080000000000U; // memory card check (1 = enable)
 	}
 	if (ACCESSING_BITS_32_39)
 	{
-		UINT64 reg = ioport("IN0")->read();
+		uint64_t reg = ioport("IN0")->read();
 		r |= reg << 32;
 	}
 	if (ACCESSING_BITS_24_31)
 	{
-		UINT64 reg = ioport("IN1")->read();
+		uint64_t reg = ioport("IN1")->read();
 		r |= reg << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT64 reg = 0;
+		uint64_t reg = 0;
 		//reg |= 0x80;                  // memory card check for boxingm
 		//reg |= 0x40;                  // memory card check for tsurugi
 		reg |= 0x3f;
@@ -1844,8 +1862,8 @@ void viper_state::DS2430_w(int bit)
 
 		case DS2430_STATE_READ_MEM:
 		{
+			unk1_bit = (ds2430_rom[(ds2430_data_count/8)] >> (ds2430_data_count%8)) & 1;
 			ds2430_data_count++;
-			unk1_bit = rand () & 1;
 			printf("DS2430_w: read mem %d, bit = %d\n", ds2430_data_count, unk1_bit);
 
 			if (ds2430_data_count >= 256)
@@ -1890,7 +1908,7 @@ READ64_MEMBER(viper_state::e70000_r)
 		ds2430_bit_timer->reset();
 		ds2430_bit_timer->start_time();
 
-//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+//      printf("e70000_r: %08X (mask %08X%08X) at %08X\n", offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 
 	return 0;
@@ -1905,7 +1923,7 @@ WRITE64_MEMBER(viper_state::e70000_w)
 			ds2430_timer->adjust(attotime::from_usec(40), 1);   // presence pulse for 240 microsecs
 
 			unk1_bit = 1;
-//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, space.device().safe_pc());
+//          printf("e70000_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, space.device().safe_pc());
 		}
 		else
 		{
@@ -1930,7 +1948,7 @@ WRITE64_MEMBER(viper_state::unk1a_w)
 {
 	if (ACCESSING_BITS_56_63)
 	{
-	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+	//  printf("unk1a_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 }
 
@@ -1939,15 +1957,15 @@ WRITE64_MEMBER(viper_state::unk1b_w)
 	if (ACCESSING_BITS_56_63)
 	{
 		unk1_bit = 0;
-	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (UINT32)(data >> 32), (UINT32)data, offset, (UINT32)(mem_mask >> 32), (UINT32)mem_mask, cpu->safe_pc());
+	//  printf("unk1b_w: %08X%08X, %08X (mask %08X%08X) at %08X\n", (uint32_t)(data >> 32), (uint32_t)data, offset, (uint32_t)(mem_mask >> 32), (uint32_t)mem_mask, cpu->safe_pc());
 	}
 }
 
-static UINT64 e00008_data;
+static uint64_t e00008_data;
 
 READ64_MEMBER(viper_state::e00008_r)
 {
-	UINT64 r = 0;
+	uint64_t r = 0;
 	if (ACCESSING_BITS_0_7)
 	{
 		r |= e00008_data;
@@ -1966,8 +1984,70 @@ WRITE64_MEMBER(viper_state::e00008_w)
 
 READ64_MEMBER(viper_state::e00000_r)
 {
-	UINT64 r = 0;//U64(0xffffffffffffffff);
+	uint64_t r = 0;//0xffffffffffffffffU;
 	return r;
+}
+
+READ64_MEMBER(viper_state::unk_serial_r)
+{
+	uint64_t r = 0;
+	if (ACCESSING_BITS_16_31)
+	{
+		int bit = m_unk_serial_data_r & 0x1;
+		m_unk_serial_data_r >>= 1;
+		r |= bit << 17;
+	}
+	return r;
+}
+
+WRITE64_MEMBER(viper_state::unk_serial_w)
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		if (data & 0x10000)
+		{
+			int bit = (data & 0x20000) ? 1 : 0;
+			if (m_unk_serial_bit_w < 8)
+			{
+				if (m_unk_serial_bit_w > 0)
+					m_unk_serial_cmd <<= 1;
+				m_unk_serial_cmd |= bit;
+			}
+			else
+			{
+				if (m_unk_serial_bit_w > 8)
+					m_unk_serial_data <<= 1;
+				m_unk_serial_data |= bit;
+			}
+			m_unk_serial_bit_w++;
+
+			if (m_unk_serial_bit_w == 8)
+			{
+				if ((m_unk_serial_cmd & 0x80) == 0)     // register read
+				{
+					int reg = m_unk_serial_cmd & 0x7f;
+					uint8_t data = m_unk_serial_regs[reg];
+
+					m_unk_serial_data_r = ((data & 0x1) << 7) | ((data & 0x2) << 5) | ((data & 0x4) << 3) | ((data & 0x8) << 1) | ((data & 0x10) >> 1) | ((data & 0x20) >> 3) | ((data & 0x40) >> 5) | ((data & 0x80) >> 7);
+
+					printf("unk_serial read reg %02X: %04X\n", reg, data);
+				}
+			}
+			if (m_unk_serial_bit_w == 16)
+			{
+				if (m_unk_serial_cmd & 0x80)                // register write
+				{
+					int reg = m_unk_serial_cmd & 0x7f;
+					m_unk_serial_regs[reg] = m_unk_serial_data;
+					printf("unk_serial write reg %02X: %04X\n", reg, m_unk_serial_data);
+				}
+
+				m_unk_serial_bit_w = 0;
+				m_unk_serial_cmd = 0;
+				m_unk_serial_data = 0;
+			}
+		}
+	}
 }
 
 
@@ -1975,8 +2055,8 @@ READ64_MEMBER(viper_state::e00000_r)
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
-	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM
-	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,U64(0xffffffffffffffff))
+	AM_RANGE(0x00000000, 0x00ffffff) AM_MIRROR(0x1000000) AM_RAM AM_SHARE("workram")
+	AM_RANGE(0x80000000, 0x800fffff) AM_READWRITE32(epic_r, epic_w,0xffffffffffffffffU)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_READWRITE(voodoo3_r, voodoo3_w)
 	AM_RANGE(0x84000000, 0x85ffffff) AM_READWRITE(voodoo3_lfb_r, voodoo3_lfb_w)
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_READWRITE(voodoo3_io_r, voodoo3_io_w)
@@ -1984,11 +2064,11 @@ static ADDRESS_MAP_START(viper_map, AS_PROGRAM, 64, viper_state )
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	// 0xff000000, 0xff000fff - cf_card_data_r/w (installed in DRIVER_INIT(vipercf))
 	// 0xff200000, 0xff200fff - cf_card_r/w (installed in DRIVER_INIT(vipercf))
-	AM_RANGE(0xff300000, 0xff300fff) AM_READWRITE(ata_r, ata_w)
+	// 0xff300000, 0xff300fff - ata_r/w (installed in DRIVER_INIT(viperhd))
 	AM_RANGE(0xffe00000, 0xffe00007) AM_READ(e00000_r)
 	AM_RANGE(0xffe00008, 0xffe0000f) AM_READWRITE(e00008_r, e00008_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, U64(0xffffffffffffffff))
+	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8("m48t58", timekeeper_device, read, write, 0xffffffffffffffffU)
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
 	AM_RANGE(0xffe70000, 0xffe7000f) AM_READWRITE(e70000_r, e70000_w)
@@ -2074,9 +2154,9 @@ void viper_state::machine_start()
 	m_maincpu->ppcdrc_set_options(PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, FALSE, workram);
+	m_maincpu->ppcdrc_add_fastram(0x00000000, 0x00ffffff, false, m_workram);
 
-	ds2430_rom = (UINT8*)memregion("ds2430")->base();
+	ds2430_rom = (uint8_t*)memregion("ds2430")->base();
 }
 
 void viper_state::machine_reset()
@@ -2084,7 +2164,7 @@ void viper_state::machine_reset()
 	mpc8240_epic_reset();
 
 	ide_hdd_device *hdd = m_ata->subdevice<ata_slot_device>("0")->subdevice<ide_hdd_device>("hdd");
-	UINT16 *identify_device = hdd->identify_device_buffer();
+	uint16_t *identify_device = hdd->identify_device_buffer();
 
 	// Viper expects these settings or the BIOS fails
 	identify_device[51] = 0x0200;           /* 51: PIO data transfer cycle timing mode */
@@ -2135,12 +2215,21 @@ DRIVER_INIT_MEMBER(viper_state,viper)
 //  m_maincpu->space(AS_PROGRAM).install_legacy_readwrite_handler( *ide, 0xff200000, 0xff207fff, FUNC(hdd_r), FUNC(hdd_w) ); //TODO
 }
 
+DRIVER_INIT_MEMBER(viper_state,viperhd)
+{
+	DRIVER_INIT_CALL(viper);
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::ata_r), this), write64_delegate(FUNC(viper_state::ata_w), this));
+}
+
 DRIVER_INIT_MEMBER(viper_state,vipercf)
 {
 	DRIVER_INIT_CALL(viper);
 
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff000000, 0xff000fff, read64_delegate(FUNC(viper_state::cf_card_data_r), this), write64_delegate(FUNC(viper_state::cf_card_data_w), this) );
 	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff200000, 0xff200fff, read64_delegate(FUNC(viper_state::cf_card_r), this), write64_delegate(FUNC(viper_state::cf_card_w), this) );
+
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0xff300000, 0xff300fff, read64_delegate(FUNC(viper_state::unk_serial_r), this), write64_delegate(FUNC(viper_state::unk_serial_w), this) );
 }
 
 
@@ -2245,6 +2334,7 @@ ROM_START(gticlub2ea) //*
 	DISK_IMAGE( "941a02", 0,  NO_DUMP )
 ROM_END
 
+/* This CF card has sticker B41C02 */
 ROM_START(jpark3) //*
 	VIPER_BIOS
 
@@ -2253,6 +2343,20 @@ ROM_START(jpark3) //*
 
 	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
 	ROM_LOAD("b41ebc_nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
+ROM_END
+
+/* This CF card has sticker B41C02 */
+ROM_START(jpark3u) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("b41 ua rtc.u39", 0x00000, 0x1ff8, CRC(75fdda39) SHA1(6292ce0d32afdf6bde33ac7f1f07655fa17282f6))
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "b41c02", 0, SHA1(fb6b0b43a6f818041d644bcd711f6a727348d3aa) )
@@ -2350,6 +2454,19 @@ ROM_START(p911e) //*
 	DISK_IMAGE( "a00eaa02", 0, SHA1(81565a2dce2e2b0a7927078a784354948af1f87c) )
 ROM_END
 
+ROM_START(p911ea)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a00eaa_nvram.u39", 0x000000, 0x2000,  CRC(4f3497b6) SHA1(3045c54f98dff92cdf3a1fc0cd4c76ba82d632d7) )
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a00eaa02_ea", 0, SHA1(fa057bf17f4c0fb9b9a09b820ff7a101e44fab7d) )
+ROM_END
+
 ROM_START(p911j) //*
 	VIPER_BIOS
 
@@ -2417,6 +2534,17 @@ ROM_START(sogeki) //*
 	DISK_IMAGE( "a13b02", 0, SHA1(c25a61b76d365794c2da4a9e7de88a5519e944ec) )
 ROM_END
 
+ROM_START(sscopefh)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "ccca02", 0, SHA1(ec0d9a1520f17c73750de71dba8b31bc8c9d0409) )
+ROM_END
+
 ROM_START(thrild2) //*
 	VIPER_BIOS
 
@@ -2442,6 +2570,32 @@ ROM_START(thrild2a) //*
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "a41a02", 0, SHA1(bbb71e23bddfa07dfa30b6565a35befd82b055b8) )
+ROM_END
+
+ROM_START(thrild2ab)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt", 0, SHA1(7a9cfdab7000765ffdd9198b209f7a74741248f2) )
+ROM_END
+
+ROM_START(thrild2ac)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("a41aaa_nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a41a02_alt2", 0, SHA1(c8bfbac4f5a1a2241df7417ad2f9eba7d9e9a9df) )
 ROM_END
 
 /* This CF card has sticker 941EAA02 */
@@ -2484,6 +2638,17 @@ ROM_START(tsurugij) //*
 	DISK_IMAGE( "a30c02", 0, SHA1(533b5669b00884a800df9ba29651777a76559862) )
 ROM_END
 
+ROM_START(tsurugie)
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "a30eab02", 0, SHA1(fcc5b69f89e246f26ca4b8546cc409d3488bbdd9) )
+ROM_END
+
 /* This CF card has sticker C22D02 */
 ROM_START(wcombat) //*
 	VIPER_BIOS
@@ -2496,6 +2661,19 @@ ROM_START(wcombat) //*
 
 	DISK_REGION( "ata:0:hdd:image" )
 	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
+ROM_END
+
+ROM_START(wcombatb) //*
+	VIPER_BIOS
+
+	ROM_REGION(0x28, "ds2430", ROMREGION_ERASE00)       /* DS2430 */
+	ROM_LOAD("ds2430.u3", 0x00, 0x28, CRC(f1511505) SHA1(ed7cd9b2763b3e377df9663943160f9871f65105))
+
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)     /* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("wcombat_nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
+
+	DISK_REGION( "ata:0:hdd:image" )
+	DISK_IMAGE( "c22d02_alt", 0, SHA1(772e3fe7910f5115ec8f2235bb48ba9fcac6950d) ) // chs 978,8,32
 ROM_END
 
 ROM_START(wcombatk) //*
@@ -2521,9 +2699,10 @@ ROM_START(wcombatu) //*
 	DISK_REGION( "ata:0:hdd:image" )
 	// CHD image provided had evidence of being altered by Windows, probably was put in a Windows machine without write protection hardware (bad idea)
 	// label was the same as this, so this should be a clean and correct version.
-	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,3
+	DISK_IMAGE( "c22d02", 0, SHA1(69a24c9e36b073021d55bec27d89fcc0254a60cc) ) // chs 978,8,32
 ROM_END
 
+/* This CF card has sticker C22A02 */
 ROM_START(wcombatj) //*
 	VIPER_BIOS
 
@@ -2534,7 +2713,7 @@ ROM_START(wcombatj) //*
 	ROM_LOAD("wcombatj_nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "ata:0:hdd:image" )
-	DISK_IMAGE( "c22a02", 0, BAD_DUMP SHA1(b607fb2ddfd0bd552b7a736cea4ac1aa3ea021bd) )
+	DISK_IMAGE( "c22a02", 0, SHA1(7200c7c436491fd8027d6d7139a80ee3b984697b) ) // chs 978,8,32
 ROM_END
 
 ROM_START(xtrial) //*
@@ -2555,7 +2734,7 @@ ROM_END
 /*
 Mahjong Fight Club (Konami Viper h/w)
 Konami, 2002
-
+78,8,3)
 PCB number - GM941-PWB(A)C Copyright 1999 Konami Made In Japan
 
 Mahjong Fight Club is a multi player Mahjong battle game for up to 8 players. A
@@ -2631,7 +2810,7 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,    0,         viper, viper, viper_state, viper,    ROT0,  "Konami", "Konami Viper BIOS", MACHINE_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,    kviper,    viper, viper, viper_state, viper,    ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, ppp2nd,    kviper,    viper, viper, viper_state, viperhd,  ROT0,  "Konami", "ParaParaParadise 2nd Mix", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 
 GAME(2001, boxingm,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Boxing Mania (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2000, code1d,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Code One Dispatch (ver D)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2639,6 +2818,7 @@ GAME(2000, code1db,   code1d,    viper, viper, viper_state, vipercf,  ROT0,  "Ko
 GAME(2001, gticlub2,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, gticlub2ea,gticlub2,  viper, viper, viper_state, vipercf,  ROT0,  "Konami", "GTI Club 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, jpark3,    kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver EBC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, jpark3u,   jpark3,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Jurassic Park 3 (ver UA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapglf,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Mocap Golf (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapb,    kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, mocapbj,   mocapb,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Mocap Boxing (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
@@ -2646,17 +2826,23 @@ GAME(2001, p911,      kviper,    viper, viper, viper_state, vipercf,  ROT90,  "K
 GAME(2001, p911uc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver UAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911kc,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 (ver KAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911e,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, p911ea,    p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 24/7 (ver EAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p911j,     p911,      viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Keisatsukan Shinjuku 24ji (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, p9112,     kviper,    viper, viper, viper_state, vipercf,  ROT90,  "Konami", "Police 911 2 (VER. UAA:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2003, popn9,     kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Pop'n Music 9 (ver JAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sscopex,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope EX (ver UAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, sogeki,    sscopex,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Sogeki (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, sscopefh,  kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Silent Scope Fortune Hunter", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EBB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2a,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ab, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2001, thrild2ac, thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver AAA, alt 2)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2001, thrild2c,  thrild2,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Thrill Drive 2 (ver EAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugi,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, tsurugie,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver EAB, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, tsurugij,  tsurugi,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "Tsurugi (ver JAC)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombat,   kviper,    viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
+GAME(2002, wcombatb,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver AAD:B, alt)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatk,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver KBC:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatu,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat / Warzaid (ver UCD:B)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)
 GAME(2002, wcombatj,  wcombat,   viper, viper, viper_state, vipercf,  ROT0,  "Konami", "World Combat (ver JAA)", MACHINE_NOT_WORKING|MACHINE_NO_SOUND)

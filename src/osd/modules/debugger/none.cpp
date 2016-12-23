@@ -10,6 +10,7 @@
 #include "modules/osdmodule.h"
 
 #include "debug/debugcpu.h"
+#include "debugger.h"
 
 class debug_none : public osd_module, public debug_module
 {
@@ -40,7 +41,7 @@ void debug_none::init_debugger(running_machine &machine)
 
 void debug_none::wait_for_debugger(device_t &device, bool firststop)
 {
-	debug_cpu_get_visible_cpu(*m_machine)->debug()->go();
+	m_machine->debugger().cpu().get_visible_cpu()->debug()->go();
 }
 
 void debug_none::debugger_update()

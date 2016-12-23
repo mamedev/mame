@@ -74,13 +74,13 @@ Mighty Guy board layout:
 
 WRITE8_MEMBER(cop01_state::cop01_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, ASSERT_LINE );
 }
 
 READ8_MEMBER(cop01_state::cop01_sound_command_r)
 {
-	int res = (soundlatch_byte_r(space, offset) & 0x7f) << 1;
+	int res = (m_soundlatch->read(space, offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
 	if ((m_audiocpu->total_cycles() / TIMER_RATE) & 1)
@@ -99,7 +99,7 @@ READ8_MEMBER(cop01_state::cop01_sound_command_r)
 
 CUSTOM_INPUT_MEMBER(cop01_state::mightguy_area_r)
 {
-	int bit_mask = (FPTR)param;
+	int bit_mask = (uintptr_t)param;
 	return (ioport("FAKE")->read() & bit_mask) ? 0x01 : 0x00;
 }
 
@@ -473,6 +473,8 @@ static MACHINE_CONFIG_START( cop01, cop01_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, 1250000) /* unknown clock / divider, hand-tuned to match audio reference */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
@@ -512,6 +514,8 @@ static MACHINE_CONFIG_START( mightguy, cop01_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, AUDIOCPU_CLOCK/2) /* unknown divider */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -643,7 +647,7 @@ DRIVER_INIT_MEMBER(cop01_state,mightguy)
 #if MIGHTGUY_HACK
 	/* This is a hack to fix the game code to get a fully working
 	   "Starting Area" fake Dip Switch */
-	UINT8 *RAM = (UINT8 *)memregion("maincpu")->base();
+	uint8_t *RAM = (uint8_t *)memregion("maincpu")->base();
 	RAM[0x00e4] = 0x07; // rlca
 	RAM[0x00e5] = 0x07; // rlca
 	RAM[0x00e6] = 0x07; // rlca

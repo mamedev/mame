@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Mariusz Wojcieszek, David Haywood, Stephh
+// copyright-holders:Mariusz Wojcieszek, David Haywood,Stephane Humbert
 /***************************************************************************
 
 3x3 Puzzle
@@ -61,13 +61,13 @@ public:
 	{ }
 
 	/* memory pointers */
-	required_shared_ptr<UINT16> m_videoram1;
-	required_shared_ptr<UINT16> m_videoram2;
-	required_shared_ptr<UINT16> m_videoram3;
+	required_shared_ptr<uint16_t> m_videoram1;
+	required_shared_ptr<uint16_t> m_videoram2;
+	required_shared_ptr<uint16_t> m_videoram3;
 
-	UINT16 m_videoram1_buffer[0x800/2];
-	UINT16 m_videoram2_buffer[0x1000/2];
-	UINT16 m_videoram3_buffer[0x1000/2];
+	uint16_t m_videoram1_buffer[0x800/2];
+	uint16_t m_videoram2_buffer[0x1000/2];
+	uint16_t m_videoram3_buffer[0x1000/2];
 
 	// devices
 	required_device<cpu_device> m_maincpu;
@@ -76,7 +76,7 @@ public:
 	required_device<screen_device> m_screen;
 
 	// screen updates
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	/* video-related */
 	tilemap_t   *m_tilemap1;
@@ -88,7 +88,7 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile3_info);
 
 	int       m_oki_bank;
-	UINT16  m_gfx_control;
+	uint16_t  m_gfx_control;
 
 	DECLARE_WRITE16_MEMBER(gfx_ctrl_w);
 	DECLARE_WRITE16_MEMBER(tilemap1_scrollx_w);
@@ -104,7 +104,7 @@ protected:
 
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 {
-	UINT16 code = m_videoram1_buffer[tile_index];
+	uint16_t code = m_videoram1_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(0,
 			code,
 			0,
@@ -113,7 +113,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile1_info)
 
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 {
-	UINT16 code = m_videoram2_buffer[tile_index];
+	uint16_t code = m_videoram2_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(1,
 			code,
 			1,
@@ -122,7 +122,7 @@ TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile2_info)
 
 TILE_GET_INFO_MEMBER(_3x3puzzle_state::get_tile3_info)
 {
-	UINT16 code = m_videoram3_buffer[tile_index];
+	uint16_t code = m_videoram3_buffer[tile_index];
 	SET_TILE_INFO_MEMBER(2,
 			code,
 			2,
@@ -155,7 +155,7 @@ WRITE16_MEMBER(_3x3puzzle_state::gfx_ctrl_w)
 	if ( (data&0x06) != m_oki_bank )
 	{
 		m_oki_bank = data &0x6;
-		m_oki->set_bank_base((m_oki_bank>>1) * 0x40000);
+		m_oki->set_rom_bank(m_oki_bank >> 1);
 	}
 }
 
@@ -171,14 +171,14 @@ WRITE16_MEMBER(_3x3puzzle_state::tilemap1_scrolly_w)
 
 void _3x3puzzle_state::video_start()
 {
-	m_tilemap1 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
-	m_tilemap2 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
-	m_tilemap3 = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap1 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile1_info),this), TILEMAP_SCAN_ROWS, 16, 16, 32, 32);
+	m_tilemap2 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile2_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_tilemap3 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(_3x3puzzle_state::get_tile3_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 	m_tilemap2->set_transparent_pen(0);
 	m_tilemap3->set_transparent_pen(0);
 }
 
-UINT32 _3x3puzzle_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
+uint32_t _3x3puzzle_state::screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect )
 {
 	m_tilemap1->draw(screen, bitmap, cliprect, 0, 1);
 	m_tilemap2->draw(screen, bitmap, cliprect, 0, 2);

@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Steve Ellenoff,Jarek Parchanski
+
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 
@@ -16,6 +18,7 @@ public:
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch"),
 		m_spritetile_ram(*this, "spritetile_ram"),
 		m_spritexy_ram(*this, "spritexy_ram"),
 		m_spriteattrib_ram(*this, "spriteattram"),
@@ -30,12 +33,13 @@ public:
 	optional_device<msm5205_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	optional_device<generic_latch_8_device> m_soundlatch; // not josvolly
 
-	required_shared_ptr<UINT8> m_spritetile_ram;
-	required_shared_ptr<UINT8> m_spritexy_ram;
-	required_shared_ptr<UINT8> m_spriteattrib_ram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_cpu2_ram;
+	required_shared_ptr<uint8_t> m_spritetile_ram;
+	required_shared_ptr<uint8_t> m_spritexy_ram;
+	required_shared_ptr<uint8_t> m_spriteattrib_ram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_cpu2_ram;
 
 	int m_coins; //currently initialized but not used
 	int m_fake8910_0;
@@ -75,7 +79,7 @@ public:
 	DECLARE_PALETTE_INIT(gsword);
 	DECLARE_PALETTE_INIT(josvolly);
 
-	UINT32 screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gsword(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(gsword_snd_interrupt);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 };

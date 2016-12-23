@@ -28,7 +28,7 @@ const device_type TTL74123 = &device_creator<ttl74123_device>;
 //  ttl74123_device - constructor
 //-------------------------------------------------
 
-ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+ttl74123_device::ttl74123_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TTL74123, "74123 TTL", tag, owner, clock, "ttl74123", __FILE__), m_timer(nullptr),
 		m_connection_type(TTL74123_NOT_GROUNDED_NO_DIODE),
 		m_res(1.0),
@@ -116,7 +116,7 @@ int ttl74123_device::timer_running()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( output_callback )
+    TIMER_CALLBACK_MEMBER( output_callback )
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::output_callback )
@@ -140,7 +140,7 @@ void ttl74123_device::set_output()
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( clear_callback )
+    TIMER_CALLBACK_MEMBER( clear_callback )
 -------------------------------------------------*/
 
 TIMER_CALLBACK_MEMBER( ttl74123_device::clear_callback )

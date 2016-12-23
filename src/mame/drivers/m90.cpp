@@ -19,14 +19,15 @@
 *****************************************************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
+#include "includes/m90.h"
+#include "includes/iremipt.h"
 #include "cpu/nec/nec.h"
 #include "cpu/nec/v25.h"
-#include "includes/iremipt.h"
+#include "cpu/z80/z80.h"
 #include "machine/irem_cpu.h"
 #include "sound/dac.h"
-#include "sound/2151intf.h"
-#include "includes/m90.h"
+#include "sound/ym2151.h"
+#include "sound/volt_reg.h"
 
 
 /***************************************************************************/
@@ -58,7 +59,7 @@ WRITE16_MEMBER(m90_state::dynablsb_sound_command_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, offset, data);
+		m_soundlatch->write(space, offset, data);
 		m_soundcpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -131,7 +132,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( m90_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x80, 0x81) AM_DEVWRITE("m72", m72_audio_device, rtype2_sample_addr_w)
 	AM_RANGE(0x82, 0x82) AM_DEVWRITE("m72", m72_audio_device, sample_w)
 	AM_RANGE(0x83, 0x83) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
@@ -141,15 +142,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynablsb_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x80, 0x80) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0x82, 0x82) AM_DEVWRITE("dac", dac_byte_interface, write)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m99_sound_cpu_io_map, AS_IO, 8, m90_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("m72", m72_audio_device, poundfor_sample_addr_w)
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
-	AM_RANGE(0x42, 0x42) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x42, 0x42) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x42, 0x42) AM_DEVWRITE("m72", m72_audio_device, sound_irq_ack_w)
 ADDRESS_MAP_END
 
@@ -742,17 +743,20 @@ static MACHINE_CONFIG_START( m90, m90_state )
 	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("m72", M72, 0)
 
 	MCFG_YM2151_ADD("ymsnd", XTAL_3_579545MHz) /* verified on pcb */
 	MCFG_YM2151_IRQ_HANDLER(DEVWRITELINE("m72", m72_audio_device, ym2151_irq_handler))
-	MCFG_SOUND_ROUTE(0, "mono", 0.15)
-	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(0, "speaker", 0.15)
+	MCFG_SOUND_ROUTE(1, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 
@@ -841,7 +845,7 @@ static MACHINE_CONFIG_DERIVED( dynablsb, m90 )
 	MCFG_DEVICE_REMOVE("m72")
 
 	MCFG_SOUND_MODIFY("ymsnd")
-	MCFG_YM2151_IRQ_HANDLER(NULL) /* this bootleg polls the YM2151 instead of taking interrupts from it */
+	MCFG_YM2151_IRQ_HANDLER(NOOP) /* this bootleg polls the YM2151 instead of taking interrupts from it */
 MACHINE_CONFIG_END
 
 
@@ -1122,8 +1126,8 @@ ROM_END
 
 ROM_START( riskchal )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "rc_h0.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
-	ROM_LOAD16_BYTE( "rc_l0.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
+	ROM_LOAD16_BYTE( "rc_h0.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) ) /* Need to verify rom label. Likely L4-A-H0-B */
+	ROM_LOAD16_BYTE( "rc_l0.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) ) /* Need to verify rom label. Likely L4-A-L0-B */
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )  /* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
@@ -1208,7 +1212,7 @@ DRIVER_INIT_MEMBER(m90_state,quizf1)
 
 DRIVER_INIT_MEMBER(m90_state,bomblord)
 {
-	UINT16 *ROM = (UINT16 *)(memregion("maincpu")->base());
+	uint16_t *ROM = (uint16_t *)(memregion("maincpu")->base());
 
 	for (int i = 0; i < 0x100000 / 2; i += 4)
 	{

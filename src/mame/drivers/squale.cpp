@@ -84,7 +84,7 @@ public:
 		, m_fdc(*this, "wd1770")
 		, m_floppy0(*this, "wd1770:0")
 		, m_floppy1(*this, "wd1770:1")
-		, m_floppy(NULL)
+		, m_floppy(nullptr)
 		, m_cart(*this, "cartslot")
 	{ }
 
@@ -118,13 +118,13 @@ public:
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
-	UINT8 keyboard_line;
-	UINT8 fdc_sel0;
-	UINT8 fdc_sel1;
+	uint8_t keyboard_line;
+	uint8_t fdc_sel0;
+	uint8_t fdc_sel1;
 
-	UINT8  cart_addr_counter_inc_ck;
-	UINT8  cart_addr_counter_reset;
-	UINT16 cart_addr_counter;
+	uint8_t  cart_addr_counter_inc_ck;
+	uint8_t  cart_addr_counter_reset;
+	uint16_t cart_addr_counter;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(squale_scanline);
 
@@ -161,7 +161,7 @@ WRITE8_MEMBER( squale_state::ctrl_w )
 
 READ8_MEMBER( squale_state::video_ram_read_reg1 )
 {
-	UINT8 data;
+	uint8_t data;
 	int p;
 
 	//D7             D0
@@ -196,7 +196,7 @@ READ8_MEMBER( squale_state::video_ram_read_reg1 )
 
 READ8_MEMBER( squale_state::video_ram_read_reg2 )
 {
-	UINT8 data;
+	uint8_t data;
 	int p;
 
 	//D7             D0
@@ -292,7 +292,7 @@ WRITE8_MEMBER( squale_state::fdc_sel1_w )
 
 READ8_MEMBER( squale_state::fdc_sel0_r )
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = fdc_sel0;
 
@@ -305,7 +305,7 @@ READ8_MEMBER( squale_state::fdc_sel0_r )
 
 READ8_MEMBER( squale_state::fdc_sel1_r )
 {
-	UINT8 data;
+	uint8_t data;
 
 	data = fdc_sel1;
 
@@ -333,7 +333,7 @@ WRITE8_MEMBER( squale_state::pia_u75_porta_w )
 READ8_MEMBER( squale_state::pia_u75_porta_r )
 {
 	// U75 PIA Port A : Keyboard rows output
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u75_porta_r\n",machine().describe_context());
@@ -348,7 +348,7 @@ READ8_MEMBER( squale_state::pia_u75_portb_r )
 	// U75 PIA Port B : Keyboard column input
 	char kbdrow[3];
 	unsigned char kbdrow_state;
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	kbdrow[0] = 'X';
 	kbdrow[1] = '0';
@@ -404,7 +404,7 @@ READ8_MEMBER( squale_state::ay_portb_r )
 	// B1 : Joystick 2 - Left
 	// B0 : Joystick 2 - Right
 
-	UINT8 data;
+	uint8_t data;
 
 	data =  ( ioport("ay_keys")->read() ) & 0x70;
 	data |= ( ioport("ay_joy_2")->read() ) & 0x8F;
@@ -428,7 +428,7 @@ READ8_MEMBER( squale_state::ay_porta_r )
 	// B1 : Joystick 1 - Left
 	// B0 : Joystick 1 - Right
 
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read ay_porta_r\n",machine().describe_context());
@@ -482,14 +482,14 @@ WRITE8_MEMBER( squale_state::ay_portb_w )
 READ8_MEMBER( squale_state::pia_u72_porta_r )
 {
 	// U72 PIA Port A : Cartridge data bus
-	UINT8 data;
+	uint8_t data;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u72_porta_r\n",machine().describe_context());
 	#endif
 
 	if( m_cart_rom && m_cart_rom->bytes() )
-		data = m_cart_rom->u8( cart_addr_counter % m_cart_rom->bytes() );
+		data = m_cart_rom->as_u8( cart_addr_counter % m_cart_rom->bytes() );
 	else
 		data = 0xFF;
 
@@ -559,7 +559,7 @@ READ8_MEMBER( squale_state::pia_u72_portb_r )
 {
 	// U72 PIA Port B : Printer data bus
 
-	UINT8 data = 0xFF;
+	uint8_t data = 0xFF;
 
 	#ifdef DBGMODE
 	printf("%s: read pia_u72_portb_r\n",machine().describe_context());
@@ -590,23 +590,23 @@ WRITE_LINE_MEMBER( squale_state::pia_u72_cb2_w )
 
 DEVICE_IMAGE_LOAD_MEMBER( squale_state, squale_cart )
 {
-	UINT32 size = m_cart->common_get_size("rom");
+	uint32_t size = m_cart->common_get_size("rom");
 
 	if ( ! size || size > 0x10000)
 	{
 		image.seterror(IMAGE_ERROR_UNSPECIFIED, "Unsupported cartridge size");
-		return IMAGE_INIT_FAIL;
+		return image_init_result::FAIL;
 	}
 
 	m_cart->rom_alloc(size, GENERIC_ROM8_WIDTH, ENDIANNESS_LITTLE);
 	m_cart->common_load_rom(m_cart->get_rom_base(), size, "rom");
 
-	return IMAGE_INIT_PASS;
+	return image_init_result::PASS;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER( squale_state::squale_scanline )
 {
-	m_ef9365->update_scanline((UINT16)param);
+	m_ef9365->update_scanline((uint16_t)param);
 }
 
 static ADDRESS_MAP_START(squale_mem, AS_PROGRAM, 8, squale_state)
@@ -747,7 +747,7 @@ void squale_state::machine_start()
 
 	fdc_sel0 = 0x00;
 	fdc_sel1 = 0x00;
-	m_floppy = NULL;
+	m_floppy = nullptr;
 
 	cart_addr_counter_reset = 0;
 	cart_addr_counter = 0x0000;
@@ -844,9 +844,6 @@ ROM_START( squale )
 	ROMX_LOAD( "sqmon_2r1.bin", 0x0000, 0x2000, CRC(ed57c707) SHA1(c8bd33a6fb07fe7f881f2605ad867b7e82366bfc), ROM_BIOS(1) )
 
 	// place ROM v1.2 signature here.
-
-	ROM_REGION( 0x1E0, "ef9365", 0 )
-	ROM_LOAD( "charset_ef9365.rom", 0x0000, 0x01E0, CRC(8d3053be) SHA1(0f9a64d217a0f7f04ee0720d49c5b680ad0ae359) )
 ROM_END
 
 /* Driver */

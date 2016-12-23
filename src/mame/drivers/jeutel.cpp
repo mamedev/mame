@@ -41,8 +41,8 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(timer_a);
 private:
 	bool m_timer_a;
-	UINT8 m_sndcmd;
-	UINT8 m_digit;
+	uint8_t m_sndcmd;
+	uint8_t m_digit;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_cpu2;
@@ -114,10 +114,10 @@ WRITE8_MEMBER( jeutel_state::porta_w )
 
 WRITE8_MEMBER( jeutel_state::ppi0a_w )
 {
-	UINT16 segment;
+	uint16_t segment;
 	bool blank = !BIT(data, 7);
 
-	if BIT(data, 6)
+	if (BIT(data, 6))
 	{
 		output().set_digit_value(40+m_digit, 0x3f); //patterns[data&15];
 		return;
@@ -142,12 +142,11 @@ WRITE8_MEMBER( jeutel_state::ppi0a_w )
 		default:
 			segment = 0x3f; //patterns[data & 0x0f];
 	}
-	if BIT(data, 4)
+	if (BIT(data, 4))
 	{
 		output().set_digit_value(m_digit, (blank) ? 0 : segment);
 	}
-	else
-	if BIT(data, 5)
+	else if (BIT(data, 5))
 	{
 		output().set_digit_value(20+m_digit, (blank) ? 0 : segment);
 	}

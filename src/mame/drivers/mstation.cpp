@@ -28,6 +28,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/bankdev.h"
 #include "machine/intelfsh.h"
 #include "machine/rp5c01.h"
 #include "machine/ram.h"
@@ -37,43 +38,41 @@ class mstation_state : public driver_device
 {
 public:
 	mstation_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
-			m_maincpu(*this, "maincpu"),
-			m_ram(*this, RAM_TAG)
-		{ }
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_ram(*this, RAM_TAG)
+		, m_bankdev1(*this, "bank0")
+		, m_bankdev2(*this, "bank1")
+		, m_keyboard(*this, "LINE.%u", 0)
+		, m_nvram(*this, "nvram")
+	{
+	}
 
 	required_device<cpu_device> m_maincpu;
 	required_device<ram_device> m_ram;
+	required_device<address_map_bank_device> m_bankdev1;
+	required_device<address_map_bank_device> m_bankdev2;
+	required_ioport_array<10> m_keyboard;
+	required_shared_ptr<uint8_t> m_nvram;
 
-	intelfsh8_device *m_flashes[2];
-	UINT8 m_bank1[2];
-	UINT8 m_bank2[2];
-	UINT8 *m_ram_base;
-	int m_flash_at_0x4000;
-	int m_flash_at_0x8000;
-	UINT8 *m_vram;
-	UINT8 m_screen_column;
-	UINT8 m_port2;
-	UINT8 m_irq;
-	UINT16 m_kb_matrix;
+	uint8_t m_bank1[2];
+	uint8_t m_bank2[2];
+	uint8_t *m_vram;
+	uint8_t m_screen_column;
+	uint8_t m_port2;
+	uint8_t m_irq;
+	uint16_t m_kb_matrix;
 
-	DECLARE_READ8_MEMBER( flash_0x0000_read_handler );
-	DECLARE_WRITE8_MEMBER( flash_0x0000_write_handler );
-	DECLARE_READ8_MEMBER( flash_0x4000_read_handler );
-	DECLARE_WRITE8_MEMBER( flash_0x4000_write_handler );
-	DECLARE_READ8_MEMBER( flash_0x8000_read_handler );
-	DECLARE_WRITE8_MEMBER( flash_0x8000_write_handler );
 	DECLARE_READ8_MEMBER( modem_r );
 	DECLARE_WRITE8_MEMBER( modem_w );
 
-	void lcd_w(UINT16 offset, int column, UINT8 data);
-	UINT8 lcd_r(UINT16 offset, int column);
+	void lcd_w(uint16_t offset, int column, uint8_t data);
+	uint8_t lcd_r(uint16_t offset, int column);
 	DECLARE_READ8_MEMBER( lcd_right_r );
 	DECLARE_WRITE8_MEMBER( lcd_right_w );
 	DECLARE_READ8_MEMBER( lcd_left_r );
 	DECLARE_WRITE8_MEMBER( lcd_left_w );
 
-	void refresh_memory(UINT8 bank, UINT8 chip_select);
 	DECLARE_READ8_MEMBER( bank1_r );
 	DECLARE_WRITE8_MEMBER( bank1_w );
 	DECLARE_READ8_MEMBER( bank2_r );
@@ -91,41 +90,12 @@ public:
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(mstation);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_1hz_timer);
 	TIMER_DEVICE_CALLBACK_MEMBER(mstation_kb_timer);
 };
 
-READ8_MEMBER( mstation_state::flash_0x0000_read_handler )
-{
-	return m_flashes[0]->read(offset);
-}
-
-WRITE8_MEMBER( mstation_state::flash_0x0000_write_handler )
-{
-	m_flashes[0]->write(offset, data);
-}
-
-READ8_MEMBER( mstation_state::flash_0x4000_read_handler )
-{
-	return m_flashes[m_flash_at_0x4000]->read(((m_bank1[0] & 0x3f)<<14) | offset);
-}
-
-WRITE8_MEMBER( mstation_state::flash_0x4000_write_handler )
-{
-	m_flashes[m_flash_at_0x4000]->write(((m_bank1[0] & 0x3f)<<14) | offset, data);
-}
-
-READ8_MEMBER( mstation_state::flash_0x8000_read_handler )
-{
-	return m_flashes[m_flash_at_0x8000]->read(((m_bank2[0] & 0x3f)<<14) | offset);
-}
-
-WRITE8_MEMBER( mstation_state::flash_0x8000_write_handler )
-{
-	m_flashes[m_flash_at_0x8000]->write(((m_bank2[0] & 0x3f)<<14) | offset, data);
-}
 
 READ8_MEMBER( mstation_state::modem_r )
 {
@@ -141,7 +111,7 @@ WRITE8_MEMBER( mstation_state::modem_w )
 //  video hardware emulation
 //***************************************************************************/
 
-void mstation_state::lcd_w(UINT16 offset, int column, UINT8 data)
+void mstation_state::lcd_w(uint16_t offset, int column, uint8_t data)
 {
 	if (m_port2 & 0x08)
 		m_vram[(column * 240) + (offset % 240)] = data;
@@ -149,7 +119,7 @@ void mstation_state::lcd_w(UINT16 offset, int column, UINT8 data)
 		m_screen_column = data % 20;
 }
 
-UINT8 mstation_state::lcd_r(UINT16 offset, int column)
+uint8_t mstation_state::lcd_r(uint16_t offset, int column)
 {
 	if (m_port2 & 0x08)
 		return m_vram[(column * 240) + (offset % 240)];
@@ -162,12 +132,12 @@ WRITE8_MEMBER( mstation_state::lcd_left_w )  {  lcd_w(offset, m_screen_column, d
 READ8_MEMBER ( mstation_state::lcd_right_r ) {  return lcd_r(offset, m_screen_column + 20); }
 WRITE8_MEMBER( mstation_state::lcd_right_w ) {  lcd_w(offset, m_screen_column + 20, data);  }
 
-UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	for (int x=0; x<40; x++)
 		for (int y=0; y<128; y++)
 		{
-			UINT8 data = m_vram[56 + y + x * 240];
+			uint8_t data = m_vram[56 + y + x * 240];
 
 			for (int b=0; b<8; b++)
 			{
@@ -185,53 +155,6 @@ UINT32 mstation_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 //  Bankswitch
 //***************************************************************************/
 
-void mstation_state::refresh_memory(UINT8 bank, UINT8 chip_select)
-{
-	address_space& program = m_maincpu->space(AS_PROGRAM);
-	int &active_flash = (bank == 1 ? m_flash_at_0x4000 : m_flash_at_0x8000);
-	char bank_tag[6];
-
-	switch (chip_select)
-	{
-		case 0: // flash 0
-		case 3: // flash 1
-			if (active_flash < 0)
-			{
-				if (bank == 1)
-					program.install_readwrite_handler(0x4000, 0x7fff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x4000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x4000_write_handler), this));
-				else
-					program.install_readwrite_handler(0x8000, 0xbfff, 0, 0, read8_delegate(FUNC(mstation_state::flash_0x8000_read_handler), this), write8_delegate(FUNC(mstation_state::flash_0x8000_write_handler), this));
-			}
-
-			active_flash = chip_select ? 1 : 0;
-			break;
-		case 1: // banked RAM
-			sprintf(bank_tag,"bank%d", bank);
-			membank(bank_tag)->set_base(m_ram_base + (((bank == 1 ? m_bank1[0] : m_bank2[0]) & 0x07)<<14));
-			program.install_readwrite_bank (bank * 0x4000, bank * 0x4000 + 0x3fff, bank_tag);
-			active_flash = -1;
-			break;
-		case 2: // left LCD panel
-			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_left_r), this), write8_delegate(FUNC(mstation_state::lcd_left_w), this));
-			active_flash = -1;
-			break;
-		case 4: // right LCD panel
-			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0, 0, read8_delegate(FUNC(mstation_state::lcd_right_r), this), write8_delegate(FUNC(mstation_state::lcd_right_w), this));
-			active_flash = -1;
-			break;
-		case 5: // modem
-			program.install_readwrite_handler(bank * 0x4000, bank * 0x4000 + 0x3fff, 0x07, 0, read8_delegate(FUNC(mstation_state::modem_r), this), write8_delegate(FUNC(mstation_state::modem_w), this));
-			active_flash = -1;
-			break;
-
-		default:
-			logerror("Unknown chip %02x mapped at %04x - %04x\n", chip_select, bank * 0x4000, bank * 0x4000 + 0x3fff);
-			program.unmap_readwrite(bank * 0x4000, bank * 0x4000 + 0x3fff);
-			active_flash = -1;
-			break;
-	}
-}
-
 READ8_MEMBER( mstation_state::bank1_r )
 {
 	return m_bank1[offset];
@@ -246,14 +169,14 @@ WRITE8_MEMBER( mstation_state::bank1_w )
 {
 	m_bank1[offset] = data;
 
-	refresh_memory(1, m_bank1[1] & 0x07);
+	m_bankdev1->set_bank(((m_bank1[1] & 0x07) << 8) | m_bank1[0]);
 }
 
 WRITE8_MEMBER( mstation_state::bank2_w )
 {
 	m_bank2[offset] = data;
 
-	refresh_memory(2, m_bank2[1] & 0x07);
+	m_bankdev2->set_bank(((m_bank2[1] & 0x07) << 8) | m_bank2[0]);
 }
 
 
@@ -314,25 +237,32 @@ WRITE8_MEMBER( mstation_state::kb_w )
 
 READ8_MEMBER( mstation_state::kb_r )
 {
-	static const char *const bitnames[] =   { "LINE0", "LINE1", "LINE2", "LINE3", "LINE4",
-												"LINE5", "LINE6", "LINE7", "LINE8", "LINE9" };
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	for (int i=0; i<10; i++)
 	{
 		if (!(m_kb_matrix & (1<<i)))
-			data &= ioport(bitnames[i])->read();
+			data &= m_keyboard[i]->read();
 	}
 
 	return data;
 }
 
 
+static ADDRESS_MAP_START(mstation_banked_map, AS_PROGRAM, 8, mstation_state)
+	AM_RANGE(0x0000000, 0x00fffff) AM_MIRROR(0x0300000) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+	AM_RANGE(0x0400000, 0x041ffff) AM_MIRROR(0x03e0000) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x0c00000, 0x0c7ffff) AM_MIRROR(0x0380000) AM_DEVREADWRITE("flash1", intelfsh8_device, read, write)
+	AM_RANGE(0x0800000, 0x0803fff) AM_MIRROR(0x03fc000) AM_READWRITE(lcd_left_r, lcd_left_w)
+	AM_RANGE(0x1000000, 0x1003fff) AM_MIRROR(0x03fc000) AM_READWRITE(lcd_right_r, lcd_right_w)
+	AM_RANGE(0x1400000, 0x1403fff) AM_MIRROR(0x03fc000) AM_READWRITE(modem_r, modem_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START(mstation_mem, AS_PROGRAM, 8, mstation_state)
-	AM_RANGE(0x0000, 0x3fff) AM_READWRITE(flash_0x0000_read_handler, flash_0x0000_write_handler)
-	AM_RANGE(0x4000, 0x7fff) AM_READWRITE_BANK("bank1")     // bank 1
-	AM_RANGE(0x8000, 0xbfff) AM_READWRITE_BANK("bank2")     // bank 2
-	AM_RANGE(0xc000, 0xffff) AM_READWRITE_BANK("sysram")    // system ram always first RAM bank
+	AM_RANGE(0x0000, 0x3fff) AM_DEVREADWRITE("flash0", intelfsh8_device, read, write)
+	AM_RANGE(0x4000, 0x7fff) AM_DEVREADWRITE("bank0", address_map_bank_device, read8, write8)
+	AM_RANGE(0x8000, 0xbfff) AM_DEVREADWRITE("bank1", address_map_bank_device, read8, write8)
+	AM_RANGE(0xc000, 0xffff) AM_RAMBANK("sysram")    // system ram always first RAM bank
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mstation_io , AS_IO, 8, mstation_state)
@@ -350,7 +280,7 @@ ADDRESS_MAP_END
 
 /* Input ports */
 static INPUT_PORTS_START( mstation )
-	PORT_START( "LINE0" )
+	PORT_START( "LINE.0" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Main Menu")  PORT_CODE( KEYCODE_HOME )   PORT_CHAR(UCHAR_MAMEKEY(HOME))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Back")   PORT_CODE( KEYCODE_DEL )    PORT_CHAR(UCHAR_MAMEKEY(END))
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Print")  PORT_CODE( KEYCODE_F6 )
@@ -360,7 +290,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("F4")     PORT_CODE( KEYCODE_F4 )     PORT_CHAR(UCHAR_MAMEKEY(F4))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("F5")     PORT_CODE( KEYCODE_F5 )     PORT_CHAR(UCHAR_MAMEKEY(F5))
 
-	PORT_START( "LINE1" )
+	PORT_START( "LINE.1" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -370,7 +300,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Get E-Mail")     PORT_CODE( KEYCODE_F9 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("PG Up")      PORT_CODE( KEYCODE_PGUP )   PORT_CHAR(UCHAR_MAMEKEY(PGUP))
 
-	PORT_START( "LINE2" )
+	PORT_START( "LINE.2" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("\xc2\xb4")       PORT_CODE( KEYCODE_0_PAD )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_1 )      PORT_CHAR('1')      PORT_CHAR('!')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_2 )      PORT_CHAR('2')      PORT_CHAR('@')
@@ -380,7 +310,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_6 )      PORT_CHAR('6')      PORT_CHAR('^')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_7 )      PORT_CHAR('7')      PORT_CHAR('&')
 
-	PORT_START( "LINE3" )
+	PORT_START( "LINE.3" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_8 )      PORT_CHAR('8')      PORT_CHAR('*')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_9 )      PORT_CHAR('9')      PORT_CHAR('(')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_0 )      PORT_CHAR('0')      PORT_CHAR(')')
@@ -390,7 +320,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_BACKSLASH )  PORT_CHAR('\\')     PORT_CHAR('|')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("PG Down")        PORT_CODE( KEYCODE_PGDN )       PORT_CHAR(UCHAR_MAMEKEY(PGDN))
 
-	PORT_START( "LINE4" )
+	PORT_START( "LINE.4" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Tab")    PORT_CODE( KEYCODE_TAB )        PORT_CHAR(9)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_Q )      PORT_CHAR('q')      PORT_CHAR('Q')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_W )      PORT_CHAR('w')      PORT_CHAR('W')
@@ -400,7 +330,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_Y )      PORT_CHAR('y')      PORT_CHAR('Y')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_U )      PORT_CHAR('u')      PORT_CHAR('U')
 
-	PORT_START( "LINE5" )
+	PORT_START( "LINE.5" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_I )      PORT_CHAR('i')      PORT_CHAR('I')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_O )      PORT_CHAR('o')      PORT_CHAR('O')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_P )      PORT_CHAR('p')      PORT_CHAR('P')
@@ -410,7 +340,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_QUOTE )      PORT_CHAR('\'')     PORT_CHAR('\"')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Enter")      PORT_CODE( KEYCODE_ENTER )  PORT_CHAR(UCHAR_MAMEKEY(ENTER))
 
-	PORT_START( "LINE6" )
+	PORT_START( "LINE.6" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("CapsLock")       PORT_CODE( KEYCODE_CAPSLOCK )       PORT_CHAR(UCHAR_MAMEKEY(CAPSLOCK))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_A )      PORT_CHAR('a')      PORT_CHAR('A')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_S )      PORT_CHAR('s')      PORT_CHAR('S')
@@ -420,7 +350,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_H )      PORT_CHAR('h')      PORT_CHAR('H')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_J )      PORT_CHAR('j')      PORT_CHAR('J')
 
-	PORT_START( "LINE7" )
+	PORT_START( "LINE.7" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_K )      PORT_CHAR('K')      PORT_CHAR('K')
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_L )      PORT_CHAR('l')      PORT_CHAR('L')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_COMMA )  PORT_CHAR(',')      PORT_CHAR('<')
@@ -430,7 +360,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Down")       PORT_CODE( KEYCODE_DOWN )   PORT_CHAR(UCHAR_MAMEKEY(DOWN))
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Right")      PORT_CODE( KEYCODE_RIGHT )  PORT_CHAR(UCHAR_MAMEKEY(RIGHT))
 
-	PORT_START( "LINE8" )
+	PORT_START( "LINE.8" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Left Shift")     PORT_CODE( KEYCODE_LSHIFT )         PORT_CHAR(UCHAR_MAMEKEY(LSHIFT))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_Z )      PORT_CHAR('z')      PORT_CHAR('Z')
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_X )      PORT_CHAR('x')      PORT_CHAR('X')
@@ -440,7 +370,7 @@ static INPUT_PORTS_START( mstation )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_N )      PORT_CHAR('n')      PORT_CHAR('N')
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_CODE( KEYCODE_M )      PORT_CHAR('m')      PORT_CHAR('M')
 
-	PORT_START( "LINE9" )
+	PORT_START( "LINE.9" )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_KEYBOARD )   PORT_NAME("Function")       PORT_CODE( KEYCODE_LCONTROL )   PORT_CHAR(UCHAR_MAMEKEY(LCONTROL))
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -453,29 +383,23 @@ INPUT_PORTS_END
 
 void mstation_state::machine_start()
 {
-	m_flashes[0] = machine().device<intelfsh8_device>("flash0");
-	m_flashes[1] = machine().device<intelfsh8_device>("flash1");
-
 	// allocate the videoram
-	m_vram = (UINT8*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
-	m_ram_base = (UINT8*)m_ram->pointer();
+	m_vram = (uint8_t*)machine().memory().region_alloc( "vram", 9600, 1, ENDIANNESS_LITTLE )->base();
 
 	// map firsh RAM bank at 0xc000-0xffff
-	membank("sysram")->set_base(m_ram_base);
+	membank("sysram")->set_base(m_nvram);
 }
 
 
 void mstation_state::machine_reset()
 {
-	m_flash_at_0x4000 = 0;
-	m_flash_at_0x8000 = 0;
 	m_bank1[0] =  m_bank1[1] = 0;
 	m_bank2[0] =  m_bank2[1] = 0;
 	memset(m_vram, 0, 9600);
 
 	// reset banks
-	refresh_memory(1, m_bank1[1]);
-	refresh_memory(2, m_bank2[1]);
+	m_bankdev1->set_bank(0);
+	m_bankdev2->set_bank(0);
 }
 
 WRITE_LINE_MEMBER( mstation_state::rtc_irq )
@@ -539,6 +463,18 @@ static MACHINE_CONFIG_START( mstation, mstation_state )
 
 	MCFG_DEVICE_ADD("rtc", RP5C01, XTAL_32_768kHz)
 	MCFG_RP5C01_OUT_ALARM_CB(WRITELINE(mstation_state, rtc_irq))
+
+	MCFG_DEVICE_ADD("bank0", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
+
+	MCFG_DEVICE_ADD("bank1", ADDRESS_MAP_BANK, 0)
+	MCFG_DEVICE_PROGRAM_MAP(mstation_banked_map)
+	MCFG_ADDRESS_MAP_BANK_ENDIANNESS(ENDIANNESS_LITTLE)
+	MCFG_ADDRESS_MAP_BANK_DATABUS_WIDTH(8)
+	MCFG_ADDRESS_MAP_BANK_STRIDE(0x4000)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)

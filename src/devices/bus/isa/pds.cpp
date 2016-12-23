@@ -20,7 +20,7 @@
 
 const device_type ISA8_PDS = &device_creator<isa8_pds_device>;
 
-isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+isa8_pds_device::isa8_pds_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, ISA8_PDS, "Programmers Development System", tag, owner, clock, "isa_pds", __FILE__),
 		device_isa8_card_interface( mconfig, *this ),
 		m_ppi(*this,"pds_ppi")
@@ -44,7 +44,7 @@ WRITE8_MEMBER(isa8_pds_device::ppi_w)
 void isa8_pds_device::device_start()
 {
 	set_isa_device();
-	m_isa->install_device(0x0300, 0x0307, 0, 0, read8_delegate(FUNC(isa8_pds_device::ppi_r),this), write8_delegate(FUNC(isa8_pds_device::ppi_w),this) );
+	m_isa->install_device(0x0300, 0x0307, read8_delegate(FUNC(isa8_pds_device::ppi_r),this), write8_delegate(FUNC(isa8_pds_device::ppi_w),this) );
 }
 
 void isa8_pds_device::device_reset()

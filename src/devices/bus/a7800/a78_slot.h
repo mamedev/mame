@@ -3,6 +3,8 @@
 #ifndef __A78_SLOT_H
 #define __A78_SLOT_H
 
+#include "softlist_dev.h"
+
 
 /***************************************************************************
  TYPE DEFINITIONS
@@ -17,7 +19,8 @@ enum
 	A78_TYPE2,          // Atari SuperGame pcb (8x16K banks with bankswitch)
 	A78_TYPE3,          // as TYPE1 + POKEY chip on the PCB
 	A78_TYPE6,          // as TYPE1 + RAM IC on the PCB
-	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
+	A78_TYPE8,          // Rescue on Fractalus, as TYPE0 + 2K Mirror RAM IC on the PCB
+ 	A78_TYPEA,          // Alien Brigade, Crossbow (9x16K banks with diff bankswitch)
 	A78_ABSOLUTE,       // F18 Hornet
 	A78_ACTIVISION,     // Double Dragon, Rampage
 	A78_HSC,            // Atari HighScore cart
@@ -53,29 +56,29 @@ public:
 	virtual DECLARE_WRITE8_MEMBER(write_30xx) {}
 	virtual DECLARE_WRITE8_MEMBER(write_40xx) {}
 
-	void rom_alloc(UINT32 size, const char *tag);
-	void ram_alloc(UINT32 size);
-	void nvram_alloc(UINT32 size);
-	UINT8* get_rom_base() { return m_rom; }
-	UINT8* get_ram_base() { return &m_ram[0]; }
-	UINT8* get_nvram_base() { return &m_nvram[0]; }
-	UINT32 get_rom_size() { return m_rom_size; }
-	UINT32 get_ram_size() { return m_ram.size(); }
-	UINT32 get_nvram_size() { return m_nvram.size(); }
+	void rom_alloc(uint32_t size, const char *tag);
+	void ram_alloc(uint32_t size);
+	void nvram_alloc(uint32_t size);
+	uint8_t* get_rom_base() { return m_rom; }
+	uint8_t* get_ram_base() { return &m_ram[0]; }
+	uint8_t* get_nvram_base() { return &m_nvram[0]; }
+	uint32_t get_rom_size() { return m_rom_size; }
+	uint32_t get_ram_size() { return m_ram.size(); }
+	uint32_t get_nvram_size() { return m_nvram.size(); }
 
 protected:
 	// internal state
-	UINT8 *m_rom;
-	UINT32 m_rom_size;
-	dynamic_buffer m_ram;
-	dynamic_buffer m_nvram; // HiScore cart can save scores!
+	uint8_t *m_rom;
+	uint32_t m_rom_size;
+	std::vector<uint8_t> m_ram;
+	std::vector<uint8_t> m_nvram; // HiScore cart can save scores!
 	// helpers
-	UINT32 m_base_rom;
+	uint32_t m_base_rom;
 	int m_bank_mask;
 };
 
 
-void a78_partialhash(hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
+void a78_partialhash(util::hash_collection &dest, const unsigned char *data, unsigned long length, const char *functions);
 
 
 // ======================> a78_cart_slot_device
@@ -86,7 +89,7 @@ class a78_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	a78_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~a78_cart_slot_device();
 
 	// device-level overrides
@@ -94,9 +97,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	int get_cart_type() { return m_type; };
 	bool has_cart() { return m_cart != nullptr; }
@@ -107,7 +110,6 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return 0; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 	virtual const char *image_interface() const override { return "a7800_cart"; }
 	virtual const char *file_extensions() const override { return "bin,a78"; }
 	virtual device_image_partialhash_func get_partial_hash() const override { return &a78_partialhash; }
@@ -129,9 +131,9 @@ private:
 	device_a78_cart_interface*       m_cart;
 	int m_type;
 
-	int verify_header(char *header);
+	image_verify_result verify_header(char *header);
 	int validate_header(int head, bool log);
-	void internal_header_logging(UINT8 *header, UINT32 len);
+	void internal_header_logging(uint8_t *header, uint32_t len);
 };
 
 

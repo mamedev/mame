@@ -39,13 +39,7 @@ public:
 	m_bank1(*this, "bank1"),
 	m_bank2(*this, "bank2"),
 	m_bank3(*this, "bank3"),
-	m_line0(*this, "LINE0"),
-	m_line1(*this, "LINE1"),
-	m_line2(*this, "LINE2"),
-	m_line3(*this, "LINE3"),
-	m_line4(*this, "LINE4"),
-	m_line5(*this, "LINE5"),
-	m_line6(*this, "LINE6"),
+	m_lines(*this, {"LINE0", "LINE1", "LINE2", "LINE3", "LINE4", "LINE5", "LINE6"}),
 	m_linec(*this, "LINEC")
 	{ }
 
@@ -60,10 +54,10 @@ public:
 	required_device<upd765a_device> m_fdc;
 	required_device<timer_device> m_key_t;
 	required_device<ram_device> m_ram;
-	const UINT8 *m_p_chargen;
-	UINT8 m_key_command;
-	UINT8 m_last_code;
-	UINT8 m_key_pressed;
+	const uint8_t *m_p_chargen;
+	uint8_t m_key_command;
+	uint8_t m_last_code;
+	uint8_t m_key_pressed;
 	DECLARE_WRITE8_MEMBER( nanos_tc_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z0_w );
 	DECLARE_WRITE_LINE_MEMBER( ctc_z1_w );
@@ -71,7 +65,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
 	virtual void video_start() override;
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(keyboard_callback);
 	DECLARE_WRITE_LINE_MEMBER(z80daisy_interrupt);
 	DECLARE_READ8_MEMBER(nanos_port_a_r);
@@ -84,15 +78,9 @@ protected:
 	required_memory_bank m_bank1;
 	required_memory_bank m_bank2;
 	required_memory_bank m_bank3;
-	required_ioport m_line0;
-	required_ioport m_line1;
-	required_ioport m_line2;
-	required_ioport m_line3;
-	required_ioport m_line4;
-	required_ioport m_line5;
-	required_ioport m_line6;
+	required_ioport_array<7> m_lines;
 	required_ioport m_linec;
-	UINT8 row_number(UINT8 code);
+	uint8_t row_number(uint8_t code);
 };
 
 
@@ -258,11 +246,11 @@ void nanos_state::video_start()
 	m_p_chargen = memregion("chargen")->base();
 }
 
-UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-//  static UINT8 framecnt=0;
-	UINT8 y,ra,chr,gfx;
-	UINT16 sy=0,ma=0,x;
+//  static uint8_t framecnt=0;
+	uint8_t y,ra,chr,gfx;
+	uint16_t sy=0,ma=0,x;
 
 //  framecnt++;
 
@@ -270,7 +258,7 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 	{
 		for (ra = 0; ra < 10; ra++)
 		{
-			UINT16 *p = &bitmap.pix16(sy++);
+			uint16_t *p = &bitmap.pix16(sy++);
 
 			for (x = ma; x < ma + 80; x++)
 			{
@@ -302,7 +290,7 @@ UINT32 nanos_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, c
 
 READ8_MEMBER(nanos_state::nanos_port_a_r)
 {
-	UINT8 retVal;
+	uint8_t retVal;
 	if (m_key_command==0)  {
 		return m_key_pressed;
 	} else {
@@ -328,32 +316,30 @@ WRITE8_MEMBER(nanos_state::nanos_port_b_w)
 	}
 }
 
-UINT8 nanos_state::row_number(UINT8 code)
+uint8_t nanos_state::row_number(uint8_t code)
 {
-	if BIT(code,0) return 0;
-	if BIT(code,1) return 1;
-	if BIT(code,2) return 2;
-	if BIT(code,3) return 3;
-	if BIT(code,4) return 4;
-	if BIT(code,5) return 5;
-	if BIT(code,6) return 6;
-	if BIT(code,7) return 7;
+	if (BIT(code, 0)) return 0;
+	if (BIT(code, 1)) return 1;
+	if (BIT(code, 2)) return 2;
+	if (BIT(code, 3)) return 3;
+	if (BIT(code, 4)) return 4;
+	if (BIT(code, 5)) return 5;
+	if (BIT(code, 6)) return 6;
+	if (BIT(code, 7)) return 7;
 	return 0;
 }
 
 TIMER_DEVICE_CALLBACK_MEMBER(nanos_state::keyboard_callback)
 {
-	ioport_port *io_ports[] = { m_line0, m_line1, m_line2, m_line3, m_line4, m_line5, m_line6 };
-
 	int i;
-	UINT8 code;
-	UINT8 key_code = 0;
-	UINT8 shift = m_linec->read() & 0x02 ? 1 : 0;
-	UINT8 ctrl =  m_linec->read() & 0x01 ? 1 : 0;
+	uint8_t code;
+	uint8_t key_code = 0;
+	uint8_t shift = m_linec->read() & 0x02 ? 1 : 0;
+	uint8_t ctrl =  m_linec->read() & 0x01 ? 1 : 0;
 	m_key_pressed = 0xff;
 	for(i = 0; i < 7; i++)
 	{
-		code = io_ports[i]->read();
+		code = m_lines[i]->read();
 		if (code != 0)
 		{
 			if (i==0 && shift==0) {
@@ -473,7 +459,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_4MHz)
 	MCFG_CPU_PROGRAM_MAP(nanos_mem)
 	MCFG_CPU_IO_MAP(nanos_io)
-	MCFG_CPU_CONFIG(nanos_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(nanos_daisy_chain)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -485,7 +471,7 @@ static MACHINE_CONFIG_START( nanos, nanos_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nanos)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_DEVICE_ADD("z80ctc_0", Z80CTC, XTAL_4MHz)

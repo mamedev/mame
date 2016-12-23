@@ -31,7 +31,7 @@ confirmed for m107 games as well.
 #include "includes/m107.h"
 #include "includes/iremipt.h"
 #include "machine/irem_cpu.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/iremga20.h"
 
 // this is the hacky code from m92.c, but better than per-game irq vector hacks.
@@ -126,8 +126,8 @@ WRITE16_MEMBER(m107_state::bankswitch_w)
 WRITE16_MEMBER(m107_state::soundlatch_w)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, ASSERT_LINE);
-	soundlatch_byte_w(space, 0, data & 0xff);
-//      logerror("soundlatch_byte_w %02x\n",data);
+	m_soundlatch->write(space, 0, data & 0xff);
+//      logerror("m_soundlatch->write %02x\n",data);
 }
 
 READ16_MEMBER(m107_state::sound_status_r)
@@ -138,7 +138,7 @@ READ16_MEMBER(m107_state::sound_status_r)
 READ16_MEMBER(m107_state::soundlatch_r)
 {
 	m_soundcpu->set_input_line(NEC_INPUT_LINE_INTP1, CLEAR_LINE);
-	return soundlatch_byte_r(space, offset) | 0xff00;
+	return m_soundlatch->read(space, offset) | 0xff00;
 }
 
 WRITE16_MEMBER(m107_state::sound_irq_ack_w)
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_V25_CONFIG(rtypeleo_decryption_table)
 
-	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NULL)
+	MCFG_PIC8259_ADD( "upd71059c", INPUTLINE("maincpu", 0), VCC, NOOP)
 
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", m107_state, scanline_interrupt, "screen", 0, 1)
 
@@ -823,6 +823,8 @@ static MACHINE_CONFIG_START( firebarr, m107_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_YM2151_ADD("ymsnd", 14318180/4)
 	MCFG_YM2151_IRQ_HANDLER(INPUTLINE("soundcpu", NEC_INPUT_LINE_INTP0))
@@ -1051,7 +1053,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(m107_state,firebarr)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->set_base(&ROM[0xa0000]);
 
@@ -1060,7 +1062,7 @@ DRIVER_INIT_MEMBER(m107_state,firebarr)
 
 DRIVER_INIT_MEMBER(m107_state,dsoccr94)
 {
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x80000], 0x20000);
 	m_maincpu->space(AS_IO).install_write_handler(0x06, 0x07, write16_delegate(FUNC(m107_state::bankswitch_w),this));

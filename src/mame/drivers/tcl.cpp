@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 Taiwan Chess Legend
@@ -8,7 +8,6 @@ Preliminary driver by Tomasz Slanina
 
 PCB Layout
 ----------
-
 
 |-----------------------------------------------|
 |  AY8930   DSW5  TCL.1E                        |
@@ -36,8 +35,7 @@ Notes:
           VSync: 60Hz
           HSync: 15.15kHz
 
- This appears to be based off a Blue
- Dyna Cherry Master board -- emualted goldstar.c
+ This appears to be based off a Blue Dyna Cherry Master board -- emulated in goldstar.cpp
  but with extra protection (the sub-board with CPU)
 
 */
@@ -57,7 +55,7 @@ public:
 
 	DECLARE_DRIVER_INIT(tcl);
 	virtual void video_start() override;
-	UINT32 screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -65,7 +63,7 @@ public:
 void tcl_state::video_start()
 {
 }
-UINT32 tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tcl_state::screen_update_tcl(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	return 0;
 }
@@ -173,9 +171,9 @@ DRIVER_INIT_MEMBER(tcl_state,tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	UINT8 *dest = memregion("maincpu")->base();
+	uint8_t *dest = memregion("maincpu")->base();
 	int len = memregion("maincpu")->bytes();
-	dynamic_buffer src(len);
+	std::vector<uint8_t> src(len);
 
 	int i,idx=0;
 	memcpy(&src[0], dest, len);

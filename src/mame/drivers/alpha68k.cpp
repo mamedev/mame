@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail
+// copyright-holders:Pierpaolo Prazzoli, Bryan McPhail,Stephane Humbert
 /***************************************************************************
 
     SNK/Alpha 68000 based games:
@@ -185,15 +185,16 @@ DIP locations verified from manuals for:
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/alpha68k.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "cpu/z80/z80.h"
+#include "sound/2203intf.h"
+#include "sound/3812intf.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "sound/3812intf.h"
-#include "sound/2413intf.h"
-#include "sound/2203intf.h"
-#include "includes/alpha68k.h"
+#include "sound/volt_reg.h"
+#include "sound/ym2413.h"
 
 
 
@@ -270,8 +271,8 @@ READ16_MEMBER(alpha68k_state::control_4_r)
 
 READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 {
-	UINT8 inp1 = ioport("IN3")->read();
-	UINT8 inp2 = ioport("IN4")->read();
+	uint8_t inp1 = ioport("IN3")->read();
+	uint8_t inp2 = ioport("IN4")->read();
 	inp1 = ((inp1 & 0x01) << 3) + ((inp1 & 0x02) << 1) + ((inp1 & 0x04) >> 1) + ((inp1 & 0x08) >> 3);
 	inp2 = ((inp2 & 0x01) << 3) + ((inp2 & 0x02) << 1) + ((inp2 & 0x04) >> 1) + ((inp2 & 0x08) >> 3);
 	return ioport("IN0")->read() | inp1 | inp2 << 4;
@@ -283,20 +284,20 @@ READ16_MEMBER(alpha68k_state::jongbou_inputs_r)
 WRITE16_MEMBER(alpha68k_state::kyros_sound_w)
 {
 	if(ACCESSING_BITS_8_15)
-		soundlatch_byte_w(space, 0, (data >> 8) & 0xff);
+		m_soundlatch->write(space, 0, (data >> 8) & 0xff);
 }
 
 WRITE16_MEMBER(alpha68k_state::alpha68k_II_sound_w)
 {
 	if(ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 }
 
 WRITE16_MEMBER(alpha68k_state::alpha68k_V_sound_w)
 {
 	/* Sound & fix bank select are in the same word */
 	if(ACCESSING_BITS_0_7)
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 	if(ACCESSING_BITS_8_15)
 		alpha68k_V_video_bank_w((data >> 8) & 0xff);
 }
@@ -305,7 +306,7 @@ WRITE16_MEMBER(alpha68k_state::paddlema_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -314,7 +315,7 @@ WRITE16_MEMBER(alpha68k_state::tnextspc_soundlatch_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_byte_w(space, 0, data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -327,8 +328,8 @@ READ16_MEMBER(alpha68k_state::kyros_alpha_trigger_r)
 	     - Kyros          : 0x22
 	     - Super Stingray : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
 	*/
-	static const UINT8 coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
-	static const UINT8 coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
+	static const uint8_t coinage1[8][2]={{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
+	static const uint8_t coinage2[8][2]={{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -408,8 +409,8 @@ READ16_MEMBER(alpha68k_state::alpha_II_trigger_r)
 	     - Sky Soldiers  : 0x21,0x22,0x23,0x24,0x34,0x37,0x3a,0x3d,0x40,0x43,0x46,0x49
 	     - Gold Medalist : 0x21,0x23,0x24,0x5b
 	*/
-	static const UINT8 coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
-	static const UINT8 coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
+	static const uint8_t coinage1[8][2] = {{1,1}, {1,2}, {1,3}, {1,4}, {1,5}, {1,6}, {2,3}, {3,2}};
+	static const uint8_t coinage2[8][2] = {{1,1}, {2,1}, {3,1}, {4,1}, {5,1}, {6,1}, {7,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -502,8 +503,8 @@ READ16_MEMBER(alpha68k_state::alpha_V_trigger_r)
 	     - Gang Wars               : 0x21,0x23,0x24,0x54
 	     - Super Champion Baseball : 0x21,0x23,0x24
 	*/
-	static const UINT8 coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
-	static const UINT8 coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
+	static const uint8_t coinage1[8][2] = {{1,1}, {1,5}, {1,3}, {2,3}, {1,2}, {1,6}, {1,4}, {3,2}};
+	static const uint8_t coinage2[8][2] = {{1,1}, {5,1}, {3,1}, {7,1}, {2,1}, {6,1}, {4,1}, {8,1}};
 	int source = m_shared_ram[offset];
 
 	switch (offset)
@@ -735,9 +736,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kyros_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
+	AM_RANGE(0xe004, 0xe004) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xe006, 0xe00e) AM_WRITENOP // soundboard I/O's, ignored
 /* reference only
     AM_RANGE(0xe006, 0xe006) AM_WRITENOP // NMI: diminishing saw-tooth
@@ -751,9 +752,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sstingry_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xc100, 0xc100) AM_READ(soundlatch_byte_r)
-	AM_RANGE(0xc102, 0xc102) AM_WRITE(soundlatch_clear_byte_w)
-	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0xc100, 0xc100) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
+	AM_RANGE(0xc102, 0xc102) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
+	AM_RANGE(0xc104, 0xc104) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
 ADDRESS_MAP_END
 
@@ -764,7 +765,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( alpha68k_I_s_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
+	AM_RANGE(0xe000, 0xe000) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 	AM_RANGE(0xe800, 0xe800) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
 	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("ymsnd", ym3812_device, write_port_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
@@ -775,13 +776,13 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tnextspc_sound_map, AS_PROGRAM, 8, alpha68k_state )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
+	AM_RANGE(0xf800, 0xf800) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_byte_r, soundlatch_clear_byte_w)
-	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("soundlatch", generic_latch_8_device, read, clear_w)
+	AM_RANGE(0x08, 0x08) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x0a, 0x0b) AM_DEVWRITE("ym2", ym2413_device, write)
 	AM_RANGE(0x0c, 0x0d) AM_DEVWRITE("ym1", ym2203_device, write)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
@@ -800,7 +801,7 @@ static ADDRESS_MAP_START( jongbou_sound_portmap, AS_IO, 8, alpha68k_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("aysnd", ay8910_device, address_w)
 	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("aysnd", ay8910_device, data_r, data_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_byte_w)
+	AM_RANGE(0x02, 0x02) AM_DEVWRITE("soundlatch", generic_latch_8_device, clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITENOP
 ADDRESS_MAP_END
 
@@ -1032,7 +1033,7 @@ static INPUT_PORTS_START( paddlema )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Game_Time ) )    PORT_DIPLOCATION("SW1:4,3") /* See notes for Game Time / Match Type combos */
-	PORT_DIPSETTING(    0x00, "Defualt Time" )
+	PORT_DIPSETTING(    0x00, "Default Time" )
 	PORT_DIPSETTING(    0x20, "+10 Seconds" )
 	PORT_DIPSETTING(    0x10, "+20 Seconds" )
 	PORT_DIPSETTING(    0x30, "+30 Seconds" )
@@ -1829,7 +1830,7 @@ MACHINE_START_MEMBER(alpha68k_state,common)
 	save_item(NAME(m_trigstate));
 	save_item(NAME(m_deposits1));
 	save_item(NAME(m_deposits2));
-		save_item(NAME(m_credits));
+	save_item(NAME(m_credits));
 	save_item(NAME(m_coinvalue));
 	save_item(NAME(m_microcontroller_data));
 	save_item(NAME(m_latch));
@@ -1850,7 +1851,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,common)
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_V)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 32, &ROM[0x10000], 0x4000);
 
@@ -1881,7 +1882,7 @@ MACHINE_RESET_MEMBER(alpha68k_state,alpha68k_II)
 
 MACHINE_START_MEMBER(alpha68k_state,alpha68k_II)
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank7")->configure_entries(0, 28, &ROM[0x10000], 0x4000);
 
@@ -1952,19 +1953,22 @@ static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM2203, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("ym3", YM2203, 3000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( kyros, alpha68k_state )
@@ -2001,19 +2005,22 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.35)
 
 	MCFG_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)    /* Verified on bootleg PCB */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.9)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( jongbou, alpha68k_state )
@@ -2049,11 +2056,13 @@ static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,kyros)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("aysnd", AY8910, 2000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
@@ -2086,11 +2095,13 @@ static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 INTERRUPT_GEN_MEMBER(alpha68k_state::alpha68k_sound_nmi)
@@ -2131,18 +2142,21 @@ static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
@@ -2184,18 +2198,21 @@ static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
@@ -2230,18 +2247,21 @@ static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
@@ -2276,18 +2296,21 @@ static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 	MCFG_VIDEO_START_OVERRIDE(alpha68k_state,alpha68k)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ym1", YM2203, 3000000)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(alpha68k_state, porta_w))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.65)
 
 	MCFG_SOUND_ADD("ym2", YM2413, 3579545)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.75) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
@@ -2321,11 +2344,13 @@ static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 	MCFG_PALETTE_INIT_OWNER(alpha68k_state,paddlem)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -2860,11 +2885,14 @@ ROM_END
 
 // it runs in an Alpha-68K96III system board
 ROM_START( goldmedla )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "gm3-7.bin", 0x00000, 0x10000, CRC(11a63f4c) SHA1(840a8f1f6d80d0395c65f8ad30cc6bfe5a9693f4) )
 	ROM_LOAD16_BYTE( "gm4-7.bin", 0x00001, 0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
-	ROM_LOAD16_BYTE( "gm1-7.bin", 0x20000, 0x10000, CRC(6d87b8a6) SHA1(6f47b42d6577691334784e961a991de2ad67f677) )
-	ROM_LOAD16_BYTE( "gm2-7.bin", 0x20001, 0x10000, CRC(8d579505) SHA1(81f225edbba1cac65275e2929336d076afbbd2bf) )
+
+	ROM_REGION16_BE( 0x40000, "data_bank", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "gm1-7.bin", 0x00000, 0x10000, CRC(6d87b8a6) SHA1(6f47b42d6577691334784e961a991de2ad67f677) )
+	ROM_LOAD16_BYTE( "gm2-7.bin", 0x00001, 0x10000, CRC(8d579505) SHA1(81f225edbba1cac65275e2929336d076afbbd2bf) )
+	ROM_COPY( "data_bank", 0, 0x20000, 0x20000 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 ) // banking is slightly different from other Alpha68kII games
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, BAD_DUMP CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) ) // we use the bootleg set instead
@@ -2892,11 +2920,14 @@ ROM_END
 
 //AT: the bootleg set has strong resemblance of "goldmed7" on an Alpha-68K96III system board
 ROM_START( goldmedlb )
-	ROM_REGION( 0x40000, "maincpu", 0 )
+	ROM_REGION( 0x40000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_BYTE( "l_3.bin",   0x00000,  0x10000, CRC(5e106bcf) SHA1(421ddfdd5ef1e9b5b7c45617fd690df982d63c4b) )
 	ROM_LOAD16_BYTE( "l_4.bin",   0x00001,  0x10000, CRC(e19966af) SHA1(a2523627fcc9f5e4a82b4ebec937880fc0e0e9f3) )
-	ROM_LOAD16_BYTE( "l_1.bin",   0x20000,  0x08000, CRC(7eec7ee5) SHA1(4fbb0832f50a83e5060c6891aacccc8f28a84086) )
-	ROM_LOAD16_BYTE( "l_2.bin",   0x20001,  0x08000, CRC(bf59e4f9) SHA1(76c276c54f0f1cc08db7f0169fb7a1357278a1fd) )
+
+	ROM_REGION16_BE( 0x40000, "data_bank", ROMREGION_ERASEFF )
+	ROM_LOAD16_BYTE( "l_1.bin",   0x00000,  0x08000, CRC(7eec7ee5) SHA1(4fbb0832f50a83e5060c6891aacccc8f28a84086) )
+	ROM_LOAD16_BYTE( "l_2.bin",   0x00001,  0x08000, CRC(bf59e4f9) SHA1(76c276c54f0f1cc08db7f0169fb7a1357278a1fd) )
+	ROM_COPY( "data_bank", 0, 0x20000, 0x20000 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 ) //AT: looks identical to goldsnd0.c47
 	ROM_LOAD( "38.bin",          0x00000,  0x08000, CRC(4bf251b8) SHA1(d69a6607e92dbe8081c7c66b6853f02d578ef73f) )
@@ -2908,6 +2939,7 @@ ROM_START( goldmedlb )
 	ROM_REGION( 0x010000, "gfx1", 0 )  /* chars */
 	ROM_LOAD16_BYTE( "gm.6",     0x00000, 0x08000, CRC(56020b13) SHA1(17e176a9c82ed0d6cb5c4014034ce4e16b8ef4fb) )
 	ROM_LOAD16_BYTE( "gm.5",     0x00001, 0x08000, CRC(667f33f1) SHA1(6d05603b49927f09c9bb34e787b003eceaaf7062) )
+	// TODO: recover this!
 	//  ROM_LOAD( "33.bin",          0x00000, 0x10000, CRC(05600b13) )
 
 	/* I haven't yet verified if these are the same as the bootleg */
@@ -3374,7 +3406,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,goldmedl)
 
 DRIVER_INIT_MEMBER(alpha68k_state,goldmedla)
 {
-	membank("bank8")->set_base(memregion("maincpu")->base() + 0x20000);
+	membank("bank8")->set_base(memregion("data_bank")->base());
 	m_invert_controls = 0;
 	m_microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	m_coin_id = 0x23 | (0x24 << 8);
@@ -3417,7 +3449,7 @@ DRIVER_INIT_MEMBER(alpha68k_state,gangwars)
 
 DRIVER_INIT_MEMBER(alpha68k_state,sbasebal)
 {
-	UINT16 *rom = (UINT16 *)memregion("maincpu")->base();
+	uint16_t *rom = (uint16_t *)memregion("maincpu")->base();
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
 	   calculate the ball speed when a strike is scored, notice that current emulation
@@ -3477,8 +3509,8 @@ GAME( 1988, skysoldrbl,skysoldr, alpha68k_II,    skysoldr, alpha68k_state, skyso
 
 
 GAME( 1988, goldmedl,  0,        alpha68k_II_gm, goldmedl, alpha68k_state, goldmedl, ROT0,  "SNK",                                               "Gold Medalist (set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_NOT_WORKING )
+GAME( 1988, goldmedla, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "SNK",                                               "Gold Medalist (set 2)", MACHINE_SUPPORTS_SAVE|MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // current handling never really accesses video banking other than boot time.
+GAME( 1988, goldmedlb, goldmedl, alpha68k_II_gm, goldmedl, alpha68k_state, goldmedla,ROT0,  "bootleg",                                           "Gold Medalist (bootleg)", MACHINE_UNEMULATED_PROTECTION|MACHINE_IMPERFECT_GRAPHICS ) // same as above
 
 GAME( 1989, skyadvnt,  0,        alpha68k_V,     skyadvnt, alpha68k_state, skyadvnt, ROT90, "Alpha Denshi Co.",                                  "Sky Adventure (World)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, skyadvntu, skyadvnt, alpha68k_V,     skyadvntu, alpha68k_state,skyadvntu,ROT90, "Alpha Denshi Co. (SNK of America license)",         "Sky Adventure (US)", MACHINE_SUPPORTS_SAVE )
@@ -3489,8 +3521,8 @@ GAME( 1989, gangwarsj, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangw
 GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu, alpha68k_state,gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, gangwarsb, gangwars, alpha68k_V,     gangwars, alpha68k_state, gangwars, ROT0,  "bootleg",                                           "Gang Wars (bootleg)", MACHINE_SUPPORTS_SAVE ) // has (undumped) 68705 MCU in place of Alpha MCU, otherwise the same as 'gangwars'
 
-GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION )
-GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj,alpha68k_state, sbasebalj,ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION | MACHINE_NOT_WORKING )
+GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, alpha68k_state, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // calculated pitcher launching speed
+GAME( 1989, sbasebalj, sbasebal, alpha68k_V_sb,  sbasebalj,alpha68k_state, sbasebalj,ROT0,  "Alpha Denshi Co.",                                  "Super Champion Baseball (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_UNEMULATED_PROTECTION ) // same as above
 
 GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )
 GAME( 1989, tnextspc2, tnextspc, tnextspc,       tnextspc, alpha68k_state, tnextspc, ROT90, "SNK",                                               "The Next Space (set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_COCKTAIL )

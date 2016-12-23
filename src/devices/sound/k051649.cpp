@@ -43,7 +43,7 @@ const device_type K051649 = &device_creator<k051649_device>;
 //  k051649_device - constructor
 //-------------------------------------------------
 
-k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k051649_device::k051649_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K051649, "K051649 SCC1", tag, owner, clock, "k051649", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_stream(nullptr),
@@ -121,7 +121,7 @@ void k051649_device::sound_stream_update(sound_stream &stream, stream_sample_t *
 			const signed char *w = voice[j].waveram;
 			int v=voice[j].volume * voice[j].key;
 			int c=voice[j].counter;
-			int step = ((INT64)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5f;
+			int step = ((int64_t)m_mclock * (1 << FREQ_BITS)) / (float)((voice[j].frequency + 1) * 16 * (m_rate / 32)) + 0.5f;
 
 			mix = m_mixer_buffer.get();
 
@@ -272,7 +272,7 @@ void k051649_device::make_mixer_table(int voices)
 	int i;
 
 	// allocate memory
-	m_mixer_table = std::make_unique<INT16[]>(512 * voices);
+	m_mixer_table = std::make_unique<int16_t[]>(512 * voices);
 
 	// find the middle of the table
 	m_mixer_lookup = m_mixer_table.get() + (256 * voices);

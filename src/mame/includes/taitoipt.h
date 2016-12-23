@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria
+// copyright-holders:David Graves, Bryan McPhail, Brad Oliver, Andrew Prime, Brian Troha, Nicola Salmoria,Stephane Humbert
 /*******************************************************************************
 
     Input port macros used by many games in multiple Taito drivers
@@ -57,7 +57,7 @@
 	TAITO_DSWA_BITS_1_TO_3
 
 
-/**************************** Coinage Dip Swicthes ****************************/
+/**************************** Coinage Dip Switches ****************************/
 
 /* with location */
 #define TAITO_COINAGE_JAPAN_OLD_COIN_A_LOC(DIPBANK) \

@@ -1,0 +1,22 @@
+language: cpp
+matrix:
+  include:
+    - compiler: gcc
+      os: linux
+    - compiler: clang
+      os: osx
+
+before_script:
+  git clone https://github.com/bkaradzic/bx ../bx
+
+script:
+  make build
+
+branches:
+  only:
+    - master
+
+notifications:
+  email: false
+
+osx_image: xcode7.3

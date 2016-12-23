@@ -25,7 +25,6 @@
 
 extern int z8k_segm;
 extern int z8k_segm_mode;
-extern void z8k_disass_mode(running_machine &machine, int ref, int params, const char *param[]);
 
 #include "z8000cpu.h"
 
@@ -33,8 +32,9 @@ const device_type Z8001 = &device_creator<z8001_device>;
 const device_type Z8002 = &device_creator<z8002_device>;
 
 
-z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z8002_device::z8002_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, Z8002, "Z8002", tag, owner, clock, "z8002", __FILE__)
+	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 16, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 8, 16, 0)
 	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
@@ -43,8 +43,9 @@ z8002_device::z8002_device(const machine_config &mconfig, const char *tag, devic
 }
 
 
-z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+z8002_device::z8002_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, z80_daisy_chain_interface(mconfig, *this)
 	, m_program_config("program", ENDIANNESS_BIG, 16, 20, 0)
 	, m_io_config("io", ENDIANNESS_BIG, 16, 16, 0)
 	, m_mo_out(*this), m_ppc(0), m_pc(0), m_psapseg(0), m_psapoff(0), m_fcw(0), m_refresh(0), m_nspseg(0), m_nspoff(0), m_irq_req(0), m_irq_vec(0), m_op_valid(0), m_nmi_state(0), m_mi(0), m_program(nullptr), m_data(nullptr), m_direct(nullptr), m_io(nullptr), m_icount(0)
@@ -53,17 +54,17 @@ z8002_device::z8002_device(const machine_config &mconfig, device_type type, cons
 }
 
 
-z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+z8001_device::z8001_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: z8002_device(mconfig, Z8001, "Zilog Z8001", tag, owner, clock, "z8001", __FILE__)
 	, m_data_config("data", ENDIANNESS_BIG, 16, 20, 0)
 {
 }
 
 
-offs_t z8002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t z8002_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( z8000 );
-	return CPU_DISASSEMBLE_NAME(z8000)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(z8000)(this, stream, pc, oprom, opram, options);
 }
 
 
@@ -71,7 +72,7 @@ offs_t z8002_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *op
 Z8000_exec *z8000_exec = nullptr;
 
 /* zero, sign and parity flags for logical byte operations */
-static UINT8 z8000_zsp[256];
+static uint8_t z8000_zsp[256];
 
 
 int z8002_device::segmented_mode()
@@ -84,12 +85,12 @@ int z8001_device::segmented_mode()
 	return (m_fcw & F_SEG) ? 1 : 0;
 }
 
-UINT32 z8002_device::addr_add(UINT32 addr, UINT32 addend)
+uint32_t z8002_device::addr_add(uint32_t addr, uint32_t addend)
 {
 	return (addr & 0xffff0000) | ((addr + addend) & 0xffff);
 }
 
-UINT32 z8002_device::addr_sub(UINT32 addr, UINT32 subtrahend)
+uint32_t z8002_device::addr_sub(uint32_t addr, uint32_t subtrahend)
 {
 	return (addr & 0xffff0000) | ((addr - subtrahend) & 0xffff);
 }
@@ -97,14 +98,14 @@ UINT32 z8002_device::addr_sub(UINT32 addr, UINT32 subtrahend)
 /* conversion table for Z8000 DAB opcode */
 #include "z8000dab.h"
 
-UINT16 z8002_device::RDOP()
+uint16_t z8002_device::RDOP()
 {
-	UINT16 res = m_program->read_word(m_pc);
+	uint16_t res = m_program->read_word(m_pc);
 	m_pc += 2;
 	return res;
 }
 
-UINT32 z8002_device::get_operand(int opnum)
+uint32_t z8002_device::get_operand(int opnum)
 {
 	int i;
 
@@ -122,7 +123,7 @@ UINT32 z8002_device::get_operand(int opnum)
 	return m_op[opnum];
 }
 
-UINT32 z8002_device::get_addr_operand(int opnum)
+uint32_t z8002_device::get_addr_operand(int opnum)
 {
 	int i;
 
@@ -133,7 +134,7 @@ UINT32 z8002_device::get_addr_operand(int opnum)
 
 	if (! (m_op_valid & (1 << opnum)))
 	{
-		UINT32 seg = m_program->read_word(m_pc);
+		uint32_t seg = m_program->read_word(m_pc);
 		m_pc += 2;
 		if (segmented_mode())
 		{
@@ -152,7 +153,7 @@ UINT32 z8002_device::get_addr_operand(int opnum)
 	return m_op[opnum];
 }
 
-UINT32 z8002_device::get_raw_addr_operand(int opnum)
+uint32_t z8002_device::get_raw_addr_operand(int opnum)
 {
 	int i;
 
@@ -163,7 +164,7 @@ UINT32 z8002_device::get_raw_addr_operand(int opnum)
 
 	if (! (m_op_valid & (1 << opnum)))
 	{
-		UINT32 seg = m_program->read_word(m_pc);
+		uint32_t seg = m_program->read_word(m_pc);
 		m_pc += 2;
 		if (segmented_mode())
 		{
@@ -182,12 +183,12 @@ UINT32 z8002_device::get_raw_addr_operand(int opnum)
 	return m_op[opnum];
 }
 
-UINT32 z8002_device::adjust_addr_for_nonseg_mode(UINT32 addr)
+uint32_t z8002_device::adjust_addr_for_nonseg_mode(uint32_t addr)
 {
 	return addr;
 }
 
-UINT32 z8001_device::adjust_addr_for_nonseg_mode(UINT32 addr)
+uint32_t z8001_device::adjust_addr_for_nonseg_mode(uint32_t addr)
 {
 	if (!(m_fcw & F_SEG))
 	{
@@ -199,7 +200,7 @@ UINT32 z8001_device::adjust_addr_for_nonseg_mode(UINT32 addr)
 	}
 }
 
-UINT8 z8002_device::RDMEM_B(address_spacenum spacenum, UINT32 addr)
+uint8_t z8002_device::RDMEM_B(address_spacenum spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -208,7 +209,7 @@ UINT8 z8002_device::RDMEM_B(address_spacenum spacenum, UINT32 addr)
 		return m_data->read_byte(addr);
 }
 
-UINT16 z8002_device::RDMEM_W(address_spacenum spacenum, UINT32 addr)
+uint16_t z8002_device::RDMEM_W(address_spacenum spacenum, uint32_t addr)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -223,9 +224,9 @@ UINT16 z8002_device::RDMEM_W(address_spacenum spacenum, UINT32 addr)
 		return m_data->read_word(addr);
 }
 
-UINT32 z8002_device::RDMEM_L(address_spacenum spacenum, UINT32 addr)
+uint32_t z8002_device::RDMEM_L(address_spacenum spacenum, uint32_t addr)
 {
-	UINT32 result;
+	uint32_t result;
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
 	if (spacenum == AS_PROGRAM)
@@ -240,7 +241,7 @@ UINT32 z8002_device::RDMEM_L(address_spacenum spacenum, UINT32 addr)
 	}
 }
 
-void z8002_device::WRMEM_B(address_spacenum spacenum, UINT32 addr, UINT8 value)
+void z8002_device::WRMEM_B(address_spacenum spacenum, uint32_t addr, uint8_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	if (spacenum == AS_PROGRAM)
@@ -249,7 +250,7 @@ void z8002_device::WRMEM_B(address_spacenum spacenum, UINT32 addr, UINT8 value)
 		m_data->write_byte(addr, value);
 }
 
-void z8002_device::WRMEM_W(address_spacenum spacenum, UINT32 addr, UINT16 value)
+void z8002_device::WRMEM_W(address_spacenum spacenum, uint32_t addr, uint16_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -259,7 +260,7 @@ void z8002_device::WRMEM_W(address_spacenum spacenum, UINT32 addr, UINT16 value)
 		m_data->write_word(addr, value);
 }
 
-void z8002_device::WRMEM_L(address_spacenum spacenum, UINT32 addr, UINT32 value)
+void z8002_device::WRMEM_L(address_spacenum spacenum, uint32_t addr, uint32_t value)
 {
 	addr = adjust_addr_for_nonseg_mode(addr);
 	addr &= ~1;
@@ -275,7 +276,7 @@ void z8002_device::WRMEM_L(address_spacenum spacenum, UINT32 addr, UINT32 value)
 	}
 }
 
-UINT8 z8002_device::RDPORT_B(int mode, UINT16 addr)
+uint8_t z8002_device::RDPORT_B(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
@@ -288,12 +289,12 @@ UINT8 z8002_device::RDPORT_B(int mode, UINT16 addr)
 	}
 }
 
-UINT16 z8002_device::RDPORT_W(int mode, UINT16 addr)
+uint16_t z8002_device::RDPORT_W(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
-		return m_io->read_byte((UINT16)(addr)) +
-			(m_io->read_byte((UINT16)(addr+1)) << 8);
+		return m_io->read_byte((uint16_t)(addr)) +
+			(m_io->read_byte((uint16_t)(addr+1)) << 8);
 	}
 	else
 	{
@@ -302,11 +303,11 @@ UINT16 z8002_device::RDPORT_W(int mode, UINT16 addr)
 	}
 }
 
-UINT16 z8001_device::RDPORT_W(int mode, UINT16 addr)
+uint16_t z8001_device::RDPORT_W(int mode, uint16_t addr)
 {
 	if(mode == 0)
 	{
-		return m_io->read_word_unaligned((UINT16)addr);
+		return m_io->read_word_unaligned((uint16_t)addr);
 	}
 	else
 	{
@@ -315,7 +316,7 @@ UINT16 z8001_device::RDPORT_W(int mode, UINT16 addr)
 	}
 }
 
-void z8002_device::WRPORT_B(int mode, UINT16 addr, UINT8 value)
+void z8002_device::WRPORT_B(int mode, uint16_t addr, uint8_t value)
 {
 	if(mode == 0)
 	{
@@ -328,12 +329,12 @@ void z8002_device::WRPORT_B(int mode, UINT16 addr, UINT8 value)
 	}
 }
 
-void z8002_device::WRPORT_W(int mode, UINT16 addr, UINT16 value)
+void z8002_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	if(mode == 0)
 	{
-		m_io->write_byte((UINT16)(addr),value & 0xff);
-		m_io->write_byte((UINT16)(addr+1),(value >> 8) & 0xff);
+		m_io->write_byte((uint16_t)(addr),value & 0xff);
+		m_io->write_byte((uint16_t)(addr+1),(value >> 8) & 0xff);
 	}
 	else
 	{
@@ -341,11 +342,11 @@ void z8002_device::WRPORT_W(int mode, UINT16 addr, UINT16 value)
 	}
 }
 
-void z8001_device::WRPORT_W(int mode, UINT16 addr, UINT16 value)
+void z8001_device::WRPORT_W(int mode, uint16_t addr, uint16_t value)
 {
 	if(mode == 0)
 	{
-		m_io->write_word_unaligned((UINT16)addr, value);
+		m_io->write_word_unaligned((uint16_t)addr, value);
 	}
 	else
 	{
@@ -358,8 +359,8 @@ void z8002_device::cycles(int cycles)
 	m_icount -= cycles;
 }
 
-#include "z8000ops.inc"
-#include "z8000tbl.inc"
+#include "z8000ops.hxx"
+#include "z8000tbl.hxx"
 
 void z8002_device::set_irq(int type)
 {
@@ -406,42 +407,42 @@ void z8001_device::PUSH_PC()
 }
 
 
-UINT32 z8002_device::GET_PC(UINT32 VEC)
+uint32_t z8002_device::GET_PC(uint32_t VEC)
 {
 	return RDMEM_W(AS_PROGRAM, VEC + 2);
 }
 
-UINT32 z8001_device::GET_PC(UINT32 VEC)
+uint32_t z8001_device::GET_PC(uint32_t VEC)
 {
 	return segmented_addr(RDMEM_L(AS_PROGRAM, VEC + 4));
 }
 
-UINT16 z8002_device::GET_FCW(UINT32 VEC)
+uint16_t z8002_device::GET_FCW(uint32_t VEC)
 {
 	return RDMEM_W(AS_PROGRAM, VEC);
 }
 
-UINT16 z8001_device::GET_FCW(UINT32 VEC)
+uint16_t z8001_device::GET_FCW(uint32_t VEC)
 {
 	return RDMEM_W(AS_PROGRAM, VEC + 2);
 }
 
-UINT32 z8002_device::F_SEG_Z8001()
+uint32_t z8002_device::F_SEG_Z8001()
 {
 	return 0;
 }
 
-UINT32 z8001_device::F_SEG_Z8001()
+uint32_t z8001_device::F_SEG_Z8001()
 {
 	return F_SEG;
 }
 
-UINT32 z8002_device::PSA_ADDR()
+uint32_t z8002_device::PSA_ADDR()
 {
 	return m_psapoff;
 }
 
-UINT32 z8001_device::PSA_ADDR()
+uint32_t z8001_device::PSA_ADDR()
 {
 	return segmented_addr((m_psapseg << 16) | m_psapoff);
 }
@@ -449,7 +450,7 @@ UINT32 z8001_device::PSA_ADDR()
 
 void z8002_device::Interrupt()
 {
-	UINT16 fcw = m_fcw;
+	uint16_t fcw = m_fcw;
 
 	if (m_irq_req & Z8000_NVI)
 	{
@@ -550,13 +551,13 @@ void z8002_device::Interrupt()
 	}
 }
 
-UINT32 z8002_device::read_irq_vector()
+uint32_t z8002_device::read_irq_vector()
 {
 	return RDMEM_W(AS_PROGRAM, VEC00 + 2 * (m_irq_req & 0xff));
 }
 
 
-UINT32 z8001_device::read_irq_vector()
+uint32_t z8001_device::read_irq_vector()
 {
 	return segmented_addr(RDMEM_L(AS_PROGRAM, VEC00 + 4 * (m_irq_req & 0xff)));
 }
@@ -583,7 +584,6 @@ void z8002_device::clear_internal_state()
 
 void z8002_device::register_debug_state()
 {
-	state_add( Z8000_PPC,     "prev PC", m_ppc     ).formatstr("%08X");
 	state_add( Z8000_PC,      "PC",      m_pc      ).formatstr("%08X");
 	state_add( Z8000_NSPOFF,  "NSPOFF",  m_nspoff  ).formatstr("%04X");
 	state_add( Z8000_NSPSEG,  "NSPSEG",  m_nspseg  ).formatstr("%04X");
@@ -611,7 +611,7 @@ void z8002_device::register_debug_state()
 	state_add( Z8000_R15,     "R15",     RW(15)    ).formatstr("%04X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc ).noshow();
-	state_add( STATE_GENPCBASE, "GENPCBASE", m_ppc ).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_ppc ).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_fcw ).formatstr("%16s").noshow();
 	state_add( STATE_GENSP, "GENSP", m_nspoff ).noshow();
 }
@@ -621,7 +621,7 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+			str = string_format("%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
 				m_fcw & 0x8000 ? 'S':'s',
 				m_fcw & 0x4000 ? 'n':'N',
 				m_fcw & 0x2000 ? 'E':'e',
@@ -640,7 +640,49 @@ void z8002_device::state_string_export(const device_state_entry &entry, std::str
 				m_fcw & 0x0001 ? '?':'.');
 			break;
 	}
+}
 
+void z8001_device::z8k_disass_mode(int ref, int params, const char *param[])
+{
+	size_t len;
+	if (params == 1)
+	{
+		len = strlen(param[0]);
+		if (!core_strnicmp(param[0], "segmented", len) || !core_stricmp(param[0], "z8001")) {
+			z8k_segm = true;
+			z8k_segm_mode = Z8K_SEGM_MODE_SEG;
+			machine().debugger().console().printf("Disassembler mode set to Z8001/segmented\n");
+		}
+		else if (!core_strnicmp(param[0], "non-segmented", len) || !core_stricmp(param[0], "z8002"))
+		{
+			z8k_segm = false;
+			z8k_segm_mode = Z8K_SEGM_MODE_NONSEG;
+			machine().debugger().console().printf("Disassembler mode set to Z8002/non-segmented\n");
+		}
+		else if (!core_strnicmp(param[0], "automatic", len))
+		{
+			z8k_segm_mode = Z8K_SEGM_MODE_AUTO;
+			machine().debugger().console().printf("Disassembler mode set to automatic\n");
+		}
+		else
+			goto usage;
+	}
+	else if (params > 1)
+	{
+	usage:
+		machine().debugger().console().printf("Usage: z8k_disass_mode <mode>\n");
+		machine().debugger().console().printf("       set disassembler mode\n");
+		machine().debugger().console().printf("       mode: \"segmented\" or \"z8001\"     - Z8001 mode\n");
+		machine().debugger().console().printf("             \"non-segmented\" or \"z8002\" - Z8002 mode\n");
+		machine().debugger().console().printf("             \"automatic\"                  - automatic mode\n");
+	}
+	else
+	{
+		machine().debugger().console().printf("Current disassembler mode: ");
+		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
+			machine().debugger().console().printf("automatic, currently ");
+		machine().debugger().console().printf("%s\n", z8k_segm ? "Z8001/segmented" : "Z8002/non-segmented");
+	}
 }
 
 void z8001_device::device_start()
@@ -662,7 +704,10 @@ void z8001_device::device_start()
 		z8000_init_tables();
 
 	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
-		debug_console_register_command(machine(), "z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, z8k_disass_mode);
+	{
+		using namespace std::placeholders;
+		machine().debugger().console().register_command("z8k_disass_mode", CMDFLAG_NONE, 0, 0, 1, std::bind(&z8001_device::z8k_disass_mode, this, _1, _2, _3));
+	}
 
 	z8k_segm = true;
 
@@ -737,6 +782,7 @@ void z8002_device::execute_run()
 		if (z8k_segm_mode == Z8K_SEGM_MODE_AUTO)
 			z8k_segm = (m_fcw & F_SEG_Z8001()) ? 1 : 0;
 
+		m_ppc = m_pc;
 		debugger_instruction_hook(this, m_pc);
 
 		if (m_irq_req & Z8000_HALT)
@@ -747,7 +793,6 @@ void z8002_device::execute_run()
 		{
 			Z8000_exec *exec;
 
-			m_ppc = m_pc;
 			m_op[0] = RDOP();
 			m_op_valid = 1;
 			exec = &z8000_exec[m_op[0]];

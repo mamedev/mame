@@ -28,10 +28,10 @@ public:
 	required_memory_bank bank_4000;
 	required_memory_bank nvram_bank;
 
-	std::unique_ptr<UINT8[]> nvram_data;
-	UINT8 control, led_latch_control;
-	UINT32 individual_leds;
-	UINT8 latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
+	std::unique_ptr<uint8_t[]> nvram_data;
+	uint8_t control, led_latch_control;
+	uint32_t individual_leds;
+	uint8_t latch_AH_red, latch_AH_green, latch_18_red, latch_18_green;
 
 	DECLARE_DRIVER_INIT(stratos);
 	DECLARE_WRITE8_MEMBER(p2000_w);
@@ -46,13 +46,13 @@ public:
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_timer);
 
 	void show_leds();
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void machine_reset() override;
 };
 
 DRIVER_INIT_MEMBER( stratos_state, stratos )
 {
-	nvram_data = std::make_unique<UINT8[]>(0x2000);
+	nvram_data = std::make_unique<uint8_t[]>(0x2000);
 	nvram->set_base(nvram_data.get(), 0x2000);
 
 	bank_8000 ->configure_entries(0, 4, memregion("roms_8000")->base(), 0x8000);
@@ -112,7 +112,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(stratos_state::irq_timer)
 	maincpu->set_input_line(M65C02_IRQ_LINE, HOLD_LINE);
 }
 
-UINT32 stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t stratos_state::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	static bool nmi=false;
 
@@ -306,7 +306,7 @@ WRITE8_MEMBER(stratos_state::lcd_w)
 	// 02 0d - 07
 	// 01 00 - 05
 
-	static UINT8 vals[18];
+	static uint8_t vals[18];
 	static int idx = 0;
 	if(data == 0)
 		idx = 0;

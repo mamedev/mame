@@ -35,6 +35,7 @@ Todo:
 #include "cpu/z80/z80.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "machine/gen_latch.h"
 #include "machine/i8255.h"
 #include "machine/nvram.h"
 
@@ -45,20 +46,21 @@ public:
 	kingpin_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
-		m_audiocpu(*this, "audiocpu")
+		m_audiocpu(*this, "audiocpu"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_WRITE8_MEMBER(sound_nmi_w);
-	DECLARE_WRITE_LINE_MEMBER(vdp_interrupt);
 };
 
 
 WRITE8_MEMBER(kingpin_state::sound_nmi_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -86,7 +88,7 @@ static ADDRESS_MAP_START( kingpin_sound_map, AS_PROGRAM, 8, kingpin_state )
 	//AM_RANGE(0x8400, 0x8400) AM_READNOP // ?
 	//AM_RANGE(0x8401, 0x8401) AM_WRITENOP // ?
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x9000, 0x9000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 ADDRESS_MAP_END
 
 
@@ -124,11 +126,6 @@ static INPUT_PORTS_START( kingpin )
 INPUT_PORTS_END
 
 
-WRITE_LINE_MEMBER(kingpin_state::vdp_interrupt)
-{
-	m_maincpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 static MACHINE_CONFIG_START( kingpin, kingpin_state )
 
 	/* basic machine hardware */
@@ -155,13 +152,16 @@ static MACHINE_CONFIG_START( kingpin, kingpin_state )
 	/* video hardware */
 	MCFG_DEVICE_ADD( "tms9928a", TMS9928A, XTAL_10_738635MHz / 2 )
 	MCFG_TMS9928A_VRAM_SIZE(0x4000)
-	MCFG_TMS9928A_OUT_INT_LINE_CB(WRITELINE(kingpin_state, vdp_interrupt))
+	MCFG_TMS9928A_OUT_INT_LINE_CB(INPUTLINE("maincpu", 0))
 
 	MCFG_TMS9928A_SCREEN_ADD_NTSC( "screen" )
 	MCFG_SCREEN_UPDATE_DEVICE( "tms9928a", tms9928a_device, screen_update )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("aysnd", AY8912, XTAL_3_579545MHz)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

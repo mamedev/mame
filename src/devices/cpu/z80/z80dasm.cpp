@@ -40,7 +40,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] =
+static const uint32_t s_flags[] =
 {
 	0    ,0    ,0    ,0    ,_OVER,0    ,0    ,0    ,
 	_OVER,0    ,_OVER,0    ,0    ,0    ,0    ,0    ,
@@ -55,7 +55,7 @@ static const UINT32 s_flags[] =
 
 struct z80dasm
 {
-	UINT8 mnemonic;
+	uint8_t mnemonic;
 	const char *arguments;
 };
 
@@ -399,12 +399,12 @@ static const z80dasm mnemonic_main[256] =
 	{zCALL,"m,A"},  {zDB,"fd"},     {zCP,"B"},      {zRST,"V"}
 };
 
-static char sign(INT8 offset)
+static char sign(int8_t offset)
 {
 	return (offset < 0)? '-':'+';
 }
 
-static int offs(INT8 offset)
+static int offs(int8_t offset)
 {
 	if (offset < 0) return -offset;
 	return offset;
@@ -413,18 +413,16 @@ static int offs(INT8 offset)
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
-CPU_DISASSEMBLE( z80 )
+CPU_DISASSEMBLE(z80)
 {
 	const z80dasm *d;
 	const char *src, *ixy;
-	char *dst;
-	INT8 offset = 0;
-	UINT8 op, op1 = 0;
-	UINT16 ea;
+	int8_t offset = 0;
+	uint8_t op, op1 = 0;
+	uint16_t ea;
 	int pos = 0;
 
 	ixy = "oops!!";
-	dst = buffer;
 
 	op = oprom[pos++];
 
@@ -443,7 +441,7 @@ CPU_DISASSEMBLE( z80 )
 		op1 = oprom[pos++];
 		if( op1 == 0xcb )
 		{
-			offset = (INT8) opram[pos++];
+			offset = (int8_t) opram[pos++];
 			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
@@ -454,7 +452,7 @@ CPU_DISASSEMBLE( z80 )
 		op1 = oprom[pos++];
 		if( op1 == 0xcb )
 		{
-			offset = (INT8) opram[pos++];
+			offset = (int8_t) opram[pos++];
 			op1 = opram[pos++]; /* fourth byte from opbase.ram! */
 			d = &mnemonic_xx_cb[op1];
 		}
@@ -467,65 +465,64 @@ CPU_DISASSEMBLE( z80 )
 
 	if( d->arguments )
 	{
-		dst += sprintf(dst, "%-4s ", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
 		src = d->arguments;
 		while( *src )
 		{
 			switch( *src )
 			{
 			case '?':   /* illegal opcode */
-				dst += sprintf( dst, "$%02x,$%02x", op, op1 );
+				util::stream_format(stream, "$%02x,$%02x", op, op1 );
 				break;
 			case 'A':
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'B':   /* Byte op arg */
 				ea = opram[pos++];
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'N':   /* Immediate 16 bit */
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (INT8) opram[pos++];
-				dst += sprintf( dst, "$%04X", (pc + offset + 2) & 0xffff );
+				offset = (int8_t) opram[pos++];
+				util::stream_format(stream, "$%04X", (pc + offset + 2) & 0xffff);
 				break;
 			case 'P':   /* Port number */
 				ea = opram[pos++];
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'V':   /* Restart vector */
 				ea = op & 0x38;
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea );
 				break;
 			case 'W':   /* Memory address word */
 				ea = opram[pos+0] + ( opram[pos+1] << 8 );
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea );
 				break;
 			case 'X':
-				offset = (INT8) opram[pos++];
+				offset = (int8_t) opram[pos++];
 				/* fall through */
 			case 'Y':
-				dst += sprintf( dst,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
+				util::stream_format(stream,"(%s%c$%02x)", ixy, sign(offset), offs(offset) );
 				break;
 			case 'I':
-				dst += sprintf( dst, "%s", ixy);
+				util::stream_format(stream, "%s", ixy);
 				break;
 			default:
-				*dst++ = *src;
+				stream << *src;
 			}
 			src++;
 		}
-		*dst = '\0';
 	}
 	else
 	{
-		dst += sprintf(dst, "%s", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
 	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;

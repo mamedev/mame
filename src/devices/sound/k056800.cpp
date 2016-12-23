@@ -20,7 +20,7 @@ const device_type K056800 = &device_creator<k056800_device>;
 //  k056800_device - constructor
 //-------------------------------------------------
 
-k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+k056800_device::k056800_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 				: device_t(mconfig, K056800, "K056800 MIRAC", tag, owner, clock, "k056800", __FILE__), m_int_pending(false), m_int_enabled(false),
 	m_int_handler(*this)
 {
@@ -36,6 +36,7 @@ void k056800_device::device_start()
 	m_int_handler.resolve_safe();
 
 	save_item(NAME(m_int_pending));
+	save_item(NAME(m_int_enabled));
 	save_item(NAME(m_host_to_snd_regs));
 	save_item(NAME(m_snd_to_host_regs));
 }
@@ -60,8 +61,8 @@ void k056800_device::device_reset()
 
 READ8_MEMBER( k056800_device::host_r )
 {
-	UINT32 r = offset & 7;
-	UINT8 data = 0;
+	uint32_t r = offset & 7;
+	uint8_t data = 0;
 
 	switch (r)
 	{
@@ -82,7 +83,7 @@ READ8_MEMBER( k056800_device::host_r )
 
 WRITE8_MEMBER( k056800_device::host_w )
 {
-	UINT32 r = offset & 7;
+	uint32_t r = offset & 7;
 
 	switch (r)
 	{
@@ -120,8 +121,8 @@ WRITE8_MEMBER( k056800_device::host_w )
 
 READ8_MEMBER( k056800_device::sound_r )
 {
-	UINT32 r = offset & 7;
-	UINT8 data = 0;
+	uint32_t r = offset & 7;
+	uint8_t data = 0;
 
 	switch (r)
 	{
@@ -139,7 +140,7 @@ READ8_MEMBER( k056800_device::sound_r )
 
 WRITE8_MEMBER( k056800_device::sound_w )
 {
-	UINT32 r = offset & 7;
+	uint32_t r = offset & 7;
 
 	switch (r)
 	{

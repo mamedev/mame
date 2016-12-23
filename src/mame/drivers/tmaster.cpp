@@ -111,6 +111,7 @@ To Do:
 #include "machine/mc68681.h"
 #include "machine/nvram.h"
 #include "machine/ds1204.h"
+#include "machine/watchdog.h"
 
 /***************************************************************************
 
@@ -134,25 +135,25 @@ public:
 
 	required_device<cpu_device> m_maincpu;
 	optional_device<microtouch_device> m_microtouch;
-	required_shared_ptr<UINT16> m_regs;
-	optional_shared_ptr<UINT16> m_galgames_ram;
+	required_shared_ptr<uint16_t> m_regs;
+	optional_shared_ptr<uint16_t> m_galgames_ram;
 	required_device<okim6295_device> m_oki;
 	optional_device<mc68681_device> m_duart;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	int m_okibank;
-	UINT8 m_rtc_ram[8];
+	uint8_t m_rtc_ram[8];
 	bitmap_ind16 m_bitmap[2][2];
-	UINT16 m_color;
-	UINT16 m_addr;
-	UINT32 m_gfx_offs;
-	UINT32 m_gfx_size;
-	int (tmaster_state::*m_compute_addr) (UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	UINT16 m_galgames_cart;
-	UINT32 m_palette_offset;
-	UINT8 m_palette_index;
-	UINT8 m_palette_data[3];
+	uint16_t m_color;
+	uint16_t m_addr;
+	uint32_t m_gfx_offs;
+	uint32_t m_gfx_size;
+	int (tmaster_state::*m_compute_addr) (uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
+	uint16_t m_galgames_cart;
+	uint32_t m_palette_offset;
+	uint8_t m_palette_index;
+	uint8_t m_palette_data[3];
 
 	DECLARE_WRITE_LINE_MEMBER(duart_irq_handler);
 	DECLARE_READ16_MEMBER(rtc_r);
@@ -182,13 +183,13 @@ public:
 	DECLARE_VIDEO_START(tmaster);
 	DECLARE_MACHINE_RESET(galgames);
 	DECLARE_VIDEO_START(galgames);
-	UINT32 screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_DEVICE_CALLBACK_MEMBER(tm3k_interrupt);
-	UINT8 binary_to_BCD(UINT8 data);
-	int tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
-	int galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high);
+	uint8_t binary_to_BCD(uint8_t data);
+	int tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
+	int galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high);
 	void tmaster_draw();
-	void galgames_update_rombank(UINT32 cart);
+	void galgames_update_rombank(uint32_t cart);
 };
 
 
@@ -205,7 +206,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank0)
 	else
 		m_okibank &= ~1;
 
-	m_oki->set_bank_base(m_okibank * 0x40000);
+	m_oki->set_rom_bank(m_okibank);
 }
 
 WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
@@ -215,7 +216,7 @@ WRITE_LINE_MEMBER(tmaster_state::write_oki_bank1)
 	else
 		m_okibank &= ~2;
 
-	m_oki->set_bank_base(m_okibank * 0x40000);
+	m_oki->set_rom_bank(m_okibank);
 }
 
 /***************************************************************************
@@ -236,7 +237,7 @@ WRITE_LINE_MEMBER(tmaster_state::duart_irq_handler)
 ***************************************************************************/
 
 
-UINT8 tmaster_state::binary_to_BCD(UINT8 data)
+uint8_t tmaster_state::binary_to_BCD(uint8_t data)
 {
 	data %= 100;
 
@@ -316,12 +317,12 @@ WRITE16_MEMBER(tmaster_state::rtc_w)
 
 ***************************************************************************/
 
-int tmaster_state::tmaster_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+int tmaster_state::tmaster_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 {
 	return (reg_low & 0xff) | ((reg_mid & 0x1ff) << 8) | (reg_high << 17);
 }
 
-int tmaster_state::galgames_compute_addr(UINT16 reg_low, UINT16 reg_mid, UINT16 reg_high)
+int tmaster_state::galgames_compute_addr(uint16_t reg_low, uint16_t reg_mid, uint16_t reg_high)
 {
 	return reg_low | (reg_mid << 16);
 }
@@ -347,7 +348,7 @@ VIDEO_START_MEMBER(tmaster_state,galgames)
 	m_compute_addr = &tmaster_state::galgames_compute_addr;
 }
 
-UINT32 tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t tmaster_state::screen_update_tmaster(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int layers_ctrl = -1;
 
@@ -384,9 +385,9 @@ void tmaster_state::tmaster_draw()
 {
 	int x,y,x0,x1,y0,y1,dx,dy,flipx,flipy,sx,sy,sw,sh, addr, mode, layer,buffer, color;
 
-	UINT8 *gfxdata  =   memregion( "blitter" )->base() + m_gfx_offs;
+	uint8_t *gfxdata  =   memregion( "blitter" )->base() + m_gfx_offs;
 
-	UINT16 pen;
+	uint16_t pen;
 
 	buffer  =   (m_regs[0x02/2] >> 8) & 3;   // 1 bit per layer, selects the currently displayed buffer
 	sw      =    m_regs[0x04/2];
@@ -439,8 +440,8 @@ void tmaster_state::tmaster_draw()
 			{
 				// copy from ROM, replacing occurrences of src pen with dst pen
 
-				UINT8 dst_pen = (m_color >> 8) & 0xff;
-				UINT8 src_pen = (m_color >> 0) & 0xff;
+				uint8_t dst_pen = (m_color >> 8) & 0xff;
+				uint8_t src_pen = (m_color >> 0) & 0xff;
 
 				for (y = y0; y != y1; y += dy)
 				{
@@ -643,7 +644,7 @@ WRITE16_MEMBER(tmaster_state::galgames_okiram_w)
 
 // Carts (preliminary, PIC communication is not implemented)
 
-void tmaster_state::galgames_update_rombank(UINT32 cart)
+void tmaster_state::galgames_update_rombank(uint32_t cart)
 {
 	m_galgames_cart = cart;
 
@@ -744,7 +745,7 @@ static ADDRESS_MAP_START( galgames_map, AS_PROGRAM, 16, tmaster_state )
 	AM_RANGE( 0x600000, 0x600001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x700000, 0x700001 ) AM_READ(dummy_read_01 ) AM_WRITENOP
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP   // ?
-	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE(watchdog_reset16_w )
+	AM_RANGE( 0x900000, 0x900001 ) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 
 	AM_RANGE( 0xa00000, 0xa00001 ) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff )
 	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE(galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
@@ -804,6 +805,8 @@ static INPUT_PORTS_START( tm2k )
 	PORT_INCLUDE( tm )
 
 	PORT_MODIFY("COIN")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )    // "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )    // "M. Coin 2 Input"
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_COIN3 )    // "E. Coin 1" (ECA mech) The rest of the tm games
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_COIN4 )    // "E. Coin 2" (ECA mech) Default to m. coin
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 )    // "E. Coin 3" (ECA mech) So these are coin3-coin6
@@ -955,6 +958,7 @@ static MACHINE_CONFIG_START( galgames, tmaster_state )
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MCFG_CPU_PROGRAM_MAP(galgames_map)
 	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", tmaster_state, tm3k_interrupt, "screen", 0, 1)
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	// 5 EEPROMs on the motherboard (for BIOS + 4 Carts)
 	MCFG_EEPROM_SERIAL_93C76_8BIT_ADD(GALGAMES_EEPROM_BIOS)
@@ -1783,7 +1787,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(tmaster_state,galgames)
 {
-	UINT8 *ROM  =   memregion("maincpu")->base();
+	uint8_t *ROM  =   memregion("maincpu")->base();
 	int cart;
 
 	// RAM bank at 0x000000-0x03ffff and 0x200000-0x23ffff
@@ -1805,7 +1809,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 
 	for (cart = 1; cart <= 4; cart++)
 	{
-		UINT8 *CART = memregion("maincpu")->base();
+		uint8_t *CART = memregion("maincpu")->base();
 
 		if  (0x200000 * (cart+1) <= memregion("maincpu")->bytes())
 			CART += 0x200000 * cart;
@@ -1817,7 +1821,7 @@ DRIVER_INIT_MEMBER(tmaster_state,galgames)
 
 DRIVER_INIT_MEMBER(tmaster_state,galgame2)
 {
-	UINT16 *ROM = (UINT16 *)memregion( "maincpu" )->base();
+	uint16_t *ROM = (uint16_t *)memregion( "maincpu" )->base();
 
 	// Patch BIOS to see the game code as first cartridge (until the PIC therein is emulated)
 	ROM[0x118da/2] = 0x4a06;

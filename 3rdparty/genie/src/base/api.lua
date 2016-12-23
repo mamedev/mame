@@ -42,6 +42,12 @@
 			scope = "config",
 		},
 
+		buildoptions_asm =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
 		buildoptions_c =
 		{
 			kind  = "list",
@@ -58,6 +64,18 @@
 		{
 			kind  = "list",
 			scope = "config",
+		},
+
+		buildoptions_objcpp =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
+		clrreferences =
+		{
+			kind = "list",
+			scope = "container",
 		},
 
 		configurations =
@@ -115,6 +133,18 @@
 			scope = "config",
 		},
 
+		forcenative =
+		{
+			kind = "filelist",
+			scope = "config",
+		},
+
+		nopch =
+		{
+			kind  = "filelist",
+			scope = "config",
+		},
+
 		files =
 		{
 			kind  = "filelist",
@@ -137,19 +167,25 @@
 
 				local allowed_flags = {
 					ATL = 1,
+					C7DebugInfo = 1,
 					DebugEnvsDontMerge = 1,
 					DebugEnvsInherit = 1,
+					DeploymentContent = 1,
 					EnableMinimalRebuild = 1,
 					EnableSSE = 1,
 					EnableSSE2 = 1,
+					EnableAVX = 1,
+					EnableAVX2 = 1,
 					ExtraWarnings = 1,
 					FatalWarnings = 1,
 					FloatFast = 1,
 					FloatStrict = 1,
 					Managed = 1,
+					MinimumWarnings = 1,
 					MFC = 1,
 					NativeWChar = 1,
 					No64BitChecks = 1,
+					NoBufferSecurityCheck = 1,
 					NoEditAndContinue = 1,
 					NoExceptions = 1,
 					NoFramePointer = 1,
@@ -160,6 +196,8 @@
 					NoNativeWChar = 1,
 					NoPCH = 1,
 					NoRTTI = 1,
+					NoWinMD = 1,    -- explicitly disables Windows Metadata
+					NoWinRT = 1,    -- explicitly disables Windows Runtime Extension
 					FastCall = 1,
 					StdCall = 1,
 					SingleOutputDir = 1,
@@ -175,6 +213,7 @@
 					Unicode = 1,
 					Unsafe = 1,
 					UnsignedChar = 1,
+					UseFullPaths = 1,
 					WinMain = 1,
 				}
 
@@ -208,6 +247,11 @@
 				"3.5",
 				"4.0",
 				"4.5",
+				"4.5.1",
+				"4.5.2",
+				"4.6",
+				"4.6.1",
+				"4.6.2",
 			}
 		},
 
@@ -217,9 +261,15 @@
 			scope = "project",
 		},
 
+		windowstargetplatformminversion =
+		{
+			kind = "string",
+			scope = "project",
+		},
+
 		forcedincludes =
 		{
-			kind  = "absolutefilelist",
+			kind  = "list",
 			scope = "config",
 		},
 
@@ -272,6 +322,13 @@
 			usagecopy = true,
 		},
 
+		userincludedirs =
+		{
+			kind  = "dirlist",
+			scope = "config",
+			usagecopy = true,
+		},
+
 		kind =
 		{
 			kind  = "string",
@@ -280,7 +337,8 @@
 				"ConsoleApp",
 				"WindowedApp",
 				"StaticLib",
-				"SharedLib"
+				"SharedLib",
+				"Bundle",
 			}
 		},
 
@@ -291,7 +349,9 @@
 			allowed = {
 				"C",
 				"C++",
-				"C#"
+				"C#",
+				"Vala",
+				"Swift",
 			}
 		},
 
@@ -567,6 +627,30 @@
 			scope = "container",
 		},
 
+		vsimportreferences =
+		{
+			kind = "filelist",
+			scope = "container",
+		},
+
+		-- swift options
+		swiftmodulemaps =
+		{
+			kind  = "filelist",
+			scope = "config",
+		},
+
+		buildoptions_swift =
+		{
+			kind  = "list",
+			scope = "config",
+		},
+
+		linkoptions_swift =
+		{
+			kind  = "list",
+			scope = "config",
+		},
 	}
 
 
@@ -620,10 +704,10 @@
 		end
 
 		if t == "solution" then
-			if type(container) == "project" then
+			if typex(container) == "project" then
 				container = container.solution
 			end
-			if type(container) ~= "solution" then
+			if typex(container) ~= "solution" then
 				container = nil
 			end
 		end
@@ -696,11 +780,13 @@
 	end
 --
 -- Adds values to an array-of-directories field of a solution/project/configuration.
--- `ctype` specifies the container type (see premake.getobject) for the field. All
+-- `fields` is an array of containers/fieldname pairs to add the results to. All
 -- values are converted to absolute paths before being stored.
 --
+-- Only the result of the first field given is returned.
+--
 
-	local function domatchedarray(ctype, fieldname, value, matchfunc)
+	local function domatchedarray(fields, value, matchfunc)
 		local result = { }
 
 		function makeabsolute(value, depth)
@@ -724,15 +810,28 @@
 		end
 
 		makeabsolute(value, 3)
-		return premake.setarray(ctype, fieldname, result)
+
+		local retval = {}
+
+		for index, field in ipairs(fields) do
+			local ctype = field[1]
+			local fieldname = field[2]
+			local array = premake.setarray(ctype, fieldname, result)
+
+			if index == 1 then
+				retval = array
+			end
+		end
+
+		return retval
 	end
 
-	function premake.setdirarray(ctype, fieldname, value)
-		return domatchedarray(ctype, fieldname, value, os.matchdirs)
+	function premake.setdirarray(fields, value)
+		return domatchedarray(fields, value, os.matchdirs)
 	end
 
-	function premake.setfilearray(ctype, fieldname, value)
-		return domatchedarray(ctype, fieldname, value, os.matchfiles)
+	function premake.setfilearray(fields, value)
+		return domatchedarray(fields, value, os.matchfiles)
 	end
 
 
@@ -834,9 +933,21 @@
 		elseif kind == "table" then
 			return premake.settable(container, name, value, allowed)
 		elseif kind == "dirlist" then
-			return premake.setdirarray(container, name, value)
+			return premake.setdirarray({{container, name}}, value)
 		elseif kind == "filelist" or kind == "absolutefilelist" then
-			return premake.setfilearray(container, name, value)
+			-- HACK: If we're adding files, we should also add them to the project's
+			-- `allfiles` field. This is to support files being added per config.
+			local fields = {{container, name}}
+			if name == "files" then
+				local prj, err = premake.getobject("container")
+				if (not prj) then
+					error(err, 2)
+				end
+				-- The first config block for the project is always the project's
+				-- global config. See the `project` function.
+				table.insert(fields, {prj.blocks[1], "allfiles"})
+			end
+			return premake.setfilearray(fields, value)
 		elseif kind == "keyvalue" or kind == "keypath" then
 			return premake.setkeyvalue(scope, name, value)
 		end
@@ -1022,19 +1133,19 @@
 	function usage(name)
 		if (not name) then
 			--Only return usage projects.
-			if(type(premake.CurrentContainer) ~= "project") then return nil end
+			if(typex(premake.CurrentContainer) ~= "project") then return nil end
 			if(not premake.CurrentContainer.usage) then return nil end
 			return premake.CurrentContainer
 		end
 
 		-- identify the parent solution
 		local sln
-		if (type(premake.CurrentContainer) == "project") then
+		if (typex(premake.CurrentContainer) == "project") then
 			sln = premake.CurrentContainer.solution
 		else
 			sln = premake.CurrentContainer
 		end
-		if (type(sln) ~= "solution") then
+		if (typex(sln) ~= "solution") then
 			error("no active solution", 2)
 		end
 
@@ -1056,19 +1167,19 @@
 	function project(name)
 		if (not name) then
 			--Only return non-usage projects
-			if(type(premake.CurrentContainer) ~= "project") then return nil end
+			if(typex(premake.CurrentContainer) ~= "project") then return nil end
 			if(premake.CurrentContainer.usage) then return nil end
 			return premake.CurrentContainer
 		end
 
 		-- identify the parent solution
 		local sln
-		if (type(premake.CurrentContainer) == "project") then
+		if (typex(premake.CurrentContainer) == "project") then
 			sln = premake.CurrentContainer.solution
 		else
 			sln = premake.CurrentContainer
 		end
-		if (type(sln) ~= "solution") then
+		if (typex(sln) ~= "solution") then
 			error("no active solution", 2)
 		end
 
@@ -1088,7 +1199,7 @@
 
 	function solution(name)
 		if not name then
-			if type(premake.CurrentContainer) == "project" then
+			if typex(premake.CurrentContainer) == "project" then
 				return premake.CurrentContainer.solution
 			else
 				return premake.CurrentContainer
@@ -1116,6 +1227,26 @@
 		return premake.CurrentGroup
 	end
 
+	function importvsproject(location)
+		if string.find(_ACTION, "vs") ~= 1 then
+			error("Only available for visual studio actions")
+		end
+
+		sln, err = premake.getobject("solution")
+		if not sln then
+			error(err)
+		end
+
+		local group = creategroupsfrompath(premake.CurrentGroup, sln)
+
+		local project = {}
+		project.location = location
+		project.group = group
+		project.flags = {}
+
+		table.insert(sln.importedprojects, project)
+    end
+
 
 --
 -- Define a new action.
@@ -1138,4 +1269,14 @@
 
 	function newoption(opt)
 		premake.option.add(opt)
+	end
+
+
+--
+-- Enable file level configuration
+-- this makes project generation slower for large projects
+--
+
+	function enablefilelevelconfig()
+		premake._filelevelconfig = true
 	end

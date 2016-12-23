@@ -47,7 +47,7 @@ extern const device_type TMS9902;
 class tms9902_device : public device_t
 {
 public:
-	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms9902_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_int_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_rcv_callback(device_t &device, _Object object) { return downcast<tms9902_device &>(device).m_rcv_cb.set_callback(object); }
@@ -58,7 +58,7 @@ public:
 
 	void    rcv_cts(line_state state);
 	void    rcv_dsr(line_state state);
-	void    rcv_data(UINT8 data);
+	void    rcv_data(uint8_t data);
 	void    rcv_break(bool value);
 	void    rcv_framing_error();
 	void    rcv_parity_error();
@@ -115,11 +115,11 @@ private:
 	bool    m_BRKON;            // BRK-on request
 	bool    m_BRKout;       // indicates the current BRK state
 
-	UINT8   m_XBR;          // transmit buffer register
-	UINT8   m_XSR;          // transmit shift register
+	uint8_t   m_XBR;          // transmit buffer register
+	uint8_t   m_XSR;          // transmit shift register
 
 	/* receiver registers */
-	UINT8   m_RBR;          // Receive buffer register
+	uint8_t   m_RBR;          // Receive buffer register
 
 	/* Interrupt enable flags */
 	bool    m_DSCENB;       // Data set change interrupt enable
@@ -134,9 +134,9 @@ private:
 
 	    where clock1 = clock_rate / (CLK4M? 4:3)
 	*/
-	UINT16  m_RDR;          // Receive data rate
+	uint16_t  m_RDR;          // Receive data rate
 	bool    m_RDV8;         // Receive data rate divider
-	UINT16  m_XDR;          // Transmit data rate
+	uint16_t  m_XDR;          // Transmit data rate
 	bool    m_XDV8;         // Transmit data rate divider
 
 	/* Status flags */
@@ -161,13 +161,13 @@ private:
 	bool    m_ROVER;            // Receiver overflow
 	bool    m_RPER;         // Receive parity error
 
-	UINT8   m_RCL;          // Character length
+	uint8_t   m_RCL;          // Character length
 	bool    m_ODDP;
 	bool    m_PENB;
-	UINT8   m_STOPB;
+	uint8_t   m_STOPB;
 	bool    m_CLK4M;        // /PHI input divide select
 
-	UINT8   m_TMR;      /* interval timer */
+	uint8_t   m_TMR;      /* interval timer */
 
 	/* clock registers */
 	emu_timer *m_dectimer;          /* MESS timer, used to emulate the decrementer register */

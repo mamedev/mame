@@ -4,9 +4,9 @@
 
   ** subclass of hh_tms1k_state (includes/hh_tms1k.h, drivers/hh_tms1k.cpp) **
 
-  Texas Instruments TMS1xxx family handheld calculators (mostly single-chip).
-  For a comprehensive list of MCU serials, see Joerg Woerner's datamath.org:
-  http://www.datamath.org/IC_List.htm
+  Texas Instruments or 1st-party TMS1xxx family handheld calculators (mostly
+  single-chip). For a comprehensive list of MCU serials, see Joerg Woerner's
+  datamath.org: http://www.datamath.org/IC_List.htm
 
   Refer to the calculators/toys official manuals on how to use them.
 
@@ -21,7 +21,9 @@
 #include "includes/hh_tms1k.h"
 
 // internal artwork
+#include "cmulti8.lh"
 #include "dataman.lh"
+#include "mathmarv.lh"
 #include "ti1250.lh"
 #include "ti1270.lh"
 #include "ti30.lh"
@@ -35,17 +37,7 @@ public:
 	ticalc1x_state(const machine_config &mconfig, device_type type, const char *tag)
 		: hh_tms1k_state(mconfig, type, tag)
 	{ }
-
-protected:
-	virtual void machine_start() override;
 };
-
-
-void ticalc1x_state::machine_start()
-{
-	hh_tms1k_state::machine_start();
-	memset(m_display_segmask, ~0, sizeof(m_display_segmask)); // !
-}
 
 
 
@@ -57,12 +49,163 @@ void ticalc1x_state::machine_start()
 
 /***************************************************************************
 
+  Canon Multi 8 (Palmtronic MD-8) / Canon Canola MD 810
+  * TMS1070 MCU label TMC1079 (die label 1070B, 1079A)
+  * 2-line cyan VFD display, each 9-digit 7seg + 1 custom (label 20-ST-22)
+  * PCB label Canon EHI-0115-03
+
+***************************************************************************/
+
+class cmulti8_state : public ticalc1x_state
+{
+public:
+	cmulti8_state(const machine_config &mconfig, device_type type, const char *tag)
+		: ticalc1x_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void cmulti8_state::prepare_display()
+{
+	set_display_segmask(0xfffff, 0xff);
+
+	// M-digit is on in memory mode, upper row is off in single mode
+	uint32_t m = (m_inp_matrix[10]->read() & 0x10) ? 0x100000 : 0;
+	uint32_t mask = (m_inp_matrix[10]->read() & 0x20) ? 0xfffff : 0xffc00;
+
+	// R10 selects display row
+	uint32_t sel = (m_r & 0x400) ? (m_r & 0x3ff) : (m_r << 10 & 0xffc00);
+	display_matrix(8, 21, m_o, (sel & mask) | m);
+}
+
+WRITE16_MEMBER(cmulti8_state::write_r)
+{
+	// R0-R10: input mux, select digit
+	m_r = m_inp_mux = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(cmulti8_state::write_o)
+{
+	// O0-O7: digit segments
+	m_o = BITSWAP8(data,0,4,5,6,7,1,2,3);
+	prepare_display();
+}
+
+READ8_MEMBER(cmulti8_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(11);
+}
+
+
+// config
+
+static INPUT_PORTS_START( cmulti8 )
+	PORT_START("IN.0") // R0
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH) PORT_NAME("% +/-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_STOP) PORT_CODE(KEYCODE_DEL_PAD) PORT_NAME(".")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_0) PORT_CODE(KEYCODE_0_PAD) PORT_NAME("0")
+
+	PORT_START("IN.1") // R1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ENTER) PORT_CODE(KEYCODE_ENTER_PAD) PORT_NAME("=")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_X) PORT_NAME("RM") // recall memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_1) PORT_CODE(KEYCODE_1_PAD) PORT_NAME("1")
+
+	PORT_START("IN.2") // R2
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_SLASH_PAD) PORT_NAME(UTF8_DIVIDE)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS) PORT_NAME("SC") // sign change
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_2) PORT_CODE(KEYCODE_2_PAD) PORT_NAME("2")
+
+	PORT_START("IN.3") // R3
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_ASTERISK) PORT_NAME(UTF8_MULTIPLY)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("CM") // clear memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_3) PORT_CODE(KEYCODE_3_PAD) PORT_NAME("3")
+
+	PORT_START("IN.4") // R4
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PLUS_PAD) PORT_NAME("+")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME(UTF8_SQUAREROOT)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_4) PORT_CODE(KEYCODE_4_PAD) PORT_NAME("4")
+
+	PORT_START("IN.5") // R5
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_MINUS_PAD) PORT_NAME("-")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("M+") // add to memory
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_5) PORT_CODE(KEYCODE_5_PAD) PORT_NAME("5")
+
+	PORT_START("IN.6") // R6
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_V) PORT_NAME("RV") // reverse
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_6) PORT_CODE(KEYCODE_6_PAD) PORT_NAME("6")
+
+	PORT_START("IN.7") // R7
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_7) PORT_CODE(KEYCODE_7_PAD) PORT_NAME("7")
+
+	PORT_START("IN.8") // R8
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_8) PORT_CODE(KEYCODE_8_PAD) PORT_NAME("8")
+
+	PORT_START("IN.9") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_DEL) PORT_CODE(KEYCODE_BACKSPACE) PORT_NAME("CI/C")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_9) PORT_CODE(KEYCODE_9_PAD) PORT_NAME("9")
+
+	PORT_START("IN.10") // R10
+	PORT_CONFNAME( 0x31, 0x20, "Mode" ) // bit 4 indicates M-digit on/off, bit 5 indicates upper row filament on/off
+	PORT_CONFSETTING(    0x31, "Memory" )
+	PORT_CONFSETTING(    0x01, "Single" )
+	PORT_CONFSETTING(    0x20, "Process" )
+	PORT_CONFNAME( 0x02, 0x00, "AM" ) // accumulate memory
+	PORT_CONFSETTING(    0x00, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x02, DEF_STR( On ) )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( cmulti8, cmulti8_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1070, 250000) // approximation - RC osc. R=56K, C=68pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(cmulti8_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cmulti8_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cmulti8_state, write_r))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cmulti8)
+
+	/* no sound! */
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   TI SR-16 (1974, first consumer product with TMS1000 series MCU)
-  * TMS1000 MCU labeled TMS1001NL (die labeled 1000, 1001A)
+  * TMS1000 MCU label TMS1001NL (die label 1000, 1001A)
   * 12-digit 7seg LED display
 
   TI SR-16 II (1975 version)
-  * TMS1000 MCU labeled TMS1016NL (die labeled 1000B, 1016A)
+  * TMS1000 MCU label TMS1016NL (die label 1000B, 1016A)
   * notes: cost-reduced 'sequel', [10^x] was removed, and [pi] was added.
 
 ***************************************************************************/
@@ -85,21 +228,18 @@ public:
 void tisr16_state::prepare_display()
 {
 	// update leds state
-	for (int y = 0; y < 11; y++)
-		m_display_state[y] = (m_r >> y & 1) ? m_o : 0;
+	set_display_segmask(0xfff, 0xff);
+	display_matrix(8, 12, m_o, m_r, false);
 
 	// exponent sign is from R10 O1, and R10 itself only uses segment G
 	m_display_state[11] = m_display_state[10] << 5 & 0x40;
 	m_display_state[10] &= 0x40;
-
-	set_display_size(8, 12);
 	display_update();
 }
 
 WRITE16_MEMBER(tisr16_state::write_r)
 {
-	// R0-R10: input mux
-	// R0-R10: select digit (right-to-left)
+	// R0-R10: input mux, select digit
 	m_r = m_inp_mux = data;
 	prepare_display();
 }
@@ -259,7 +399,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( tisr16, tisr16_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // RC osc. R=43K, C=68pf -> ~300kHz (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf -> also ~300kHz)
+	MCFG_CPU_ADD("maincpu", TMS1000, 300000) // approximation - RC osc. R=43K, C=68pf (note: tisr16ii MCU RC osc. is different: R=30K, C=100pf, same freq)
 	MCFG_TMS1XXX_READ_K_CB(READ8(tisr16_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(tisr16_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(tisr16_state, write_r))
@@ -277,11 +417,11 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1250/TI-1200 (1975 version), Spirit of '76
-  * TMS0950 MCU labeled TMC0952NL, K0952 (die labeled 0950A 0952)
+  * TMS0950 MCU label TMC0952NL, K0952 (die label 0950A 0952)
   * 9-digit 7seg LED display
 
   TI-1250/TI-1200 (1976 version), TI-1400, TI-1450, TI-1205, TI-1255, LADY 1200, ABLE
-  * TMS0970 MCU labeled TMS0972NL ZA0348, JP0972A (die labeled 0970D-72A)
+  * TMS0970 MCU label TMS0972NL ZA0348, JP0972A (die label 0970D-72A)
   * 8-digit 7seg LED display, or 9 digits with leftmost unused
 
   As seen listed above, the basic 4-function TMS0972 calculator MCU was used
@@ -293,7 +433,7 @@ MACHINE_CONFIG_END
   available buttons.
 
   TI-1270
-  * TMS0970 MCU labeled TMC0974NL ZA0355, DP0974A (die labeled 0970D-74A)
+  * TMS0970 MCU label TMC0974NL ZA0355, DP0974A (die label 0970D-74A)
   * 8-digit 7seg LED display
   * notes: almost same hardware as TMS0972 TI-1250, minor scientific functions
 
@@ -315,11 +455,10 @@ public:
 
 WRITE16_MEMBER(ti1250_state::write_r)
 {
-	// R8 only has segment G connected
-	m_display_segmask[8] = 0x40;
-
-	// R0-R7(,R8): select digit (right-to-left)
-	display_matrix_seg(8, 9, m_o, data, 0xff);
+	// R0-R8: select digit
+	set_display_segmask(0xff, 0xff);
+	set_display_segmask(0x100, 0x40); // R8 only has segment G connected
+	display_matrix(8, 9, m_o, data);
 }
 
 WRITE16_MEMBER(ti1250_state::write_o)
@@ -398,7 +537,7 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( ti1250, ti1250_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // RC osc. R=68K, C=68pf -> ~200kHz
+	MCFG_CPU_ADD("maincpu", TMS0950, 200000) // approximation - RC osc. R=68K, C=68pf
 	MCFG_TMS1XXX_READ_K_CB(READ8(ti1250_state, read_k))
 	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(ti1250_state, write_o))
 	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(ti1250_state, write_r))
@@ -427,11 +566,11 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI-1000 (1977 version)
-  * TMS1990 MCU labeled TMC1991NL (die labeled 1991-91A)
+  * TMS1990 MCU label TMC1991NL (die label 1991-91A)
   * 8-digit 7seg LED display
 
   TI-1000 (1978 version)
-  * TMS1990 MCU labeled TMC1992-4NL **not dumped yet
+  * TMS1990 MCU label TMC1992-4NL **not dumped yet
 
 ***************************************************************************/
 
@@ -451,9 +590,9 @@ public:
 
 WRITE16_MEMBER(ti1000_state::write_r)
 {
-	// R0-R7: select digit (right-to-left)
-	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5);
-	display_matrix_seg(8, 8, o, data, 0xff);
+	// R0-R7: select digit
+	set_display_segmask(0xff, 0xff);
+	display_matrix(8, 8, m_o, data);
 }
 
 WRITE16_MEMBER(ti1000_state::write_o)
@@ -461,7 +600,7 @@ WRITE16_MEMBER(ti1000_state::write_o)
 	// O0-O3,O5(?): input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 0xf) | (data >> 1 & 0x10);
-	m_o = data;
+	m_o = BITSWAP8(data,7,4,3,2,1,0,6,5);
 }
 
 READ8_MEMBER(ti1000_state::read_k)
@@ -527,7 +666,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI WIZ-A-TRON
-  * TMS0970 MCU labeled TMC0907NL ZA0379, DP0907BS (die labeled 0970F-07B)
+  * TMS0970 MCU label TMC0907NL ZA0379, DP0907BS (die label 0970F-07B)
   * 9-digit 7seg LED display(one custom digit)
 
 ***************************************************************************/
@@ -555,10 +694,11 @@ WRITE16_MEMBER(wizatron_state::write_r)
 
 	// 3rd digit only has A and G for =, though some newer hardware revisions
 	// (goes for both wizatron and lilprof) use a custom equals-sign digit here
-	m_display_segmask[3] = 0x41;
+	set_display_segmask(8, 0x41);
 
-	// R0-R8: select digit (right-to-left)
-	display_matrix_seg(7, 9, m_o, data, 0x7f);
+	// R0-R8: select digit
+	set_display_segmask(0x1ff^8, 0x7f);
+	display_matrix(7, 9, m_o, data);
 }
 
 WRITE16_MEMBER(wizatron_state::write_o)
@@ -626,7 +766,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1976 version)
-  * TMS0970 MCU labeled TMS0975NL ZA0356, GP0975CS (die labeled 0970D-75C)
+  * TMS0970 MCU label TMS0975NL ZA0356, GP0975CS (die label 0970D-75C)
   * 9-digit 7seg LED display(one custom digit)
 
   The hardware is nearly identical to Wiz-A-Tron (or vice versa, since this
@@ -700,7 +840,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI Little Professor (1978 version)
-  * TMS1990 MCU labeled TMC1993NL (die labeled 1990C-c3C)
+  * TMS1990 MCU label TMC1993NL (die label 1990C-c3C)
   * 9-digit 7seg LED display(one custom digit)
 
   1978 re-release, with on/off and level select on buttons instead of
@@ -725,19 +865,16 @@ public:
 WRITE16_MEMBER(lilprof78_state::write_r)
 {
 	// update leds state
-	UINT8 o = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
-	UINT16 r = (data & 7) | (data << 1 & 0x1f0);
-
-	for (int y = 0; y < 9; y++)
-		m_display_state[y] = (r >> y & 1) ? o : 0;
+	uint8_t seg = BITSWAP8(m_o,7,4,3,2,1,0,6,5) & 0x7f;
+	uint16_t r = (data & 7) | (data << 1 & 0x1f0);
+	set_display_segmask(0x1ff, 0x7f);
+	display_matrix(7, 9, seg, r, false);
 
 	// 3rd digit A/G(equals sign) is from O7
-	m_display_state[3] = (r && m_o & 0x80) ? 0x41 : 0;
+	m_display_state[3] = (r != 0 && m_o & 0x80) ? 0x41 : 0;
 
 	// 6th digit is a custom 7seg for math symbols (see wizatron_state write_r)
 	m_display_state[6] = BITSWAP8(m_display_state[6],7,6,1,4,2,3,5,0);
-
-	set_display_size(7, 9);
 	display_update();
 }
 
@@ -813,7 +950,7 @@ MACHINE_CONFIG_END
 /***************************************************************************
 
   TI DataMan
-  * TMS1980 MCU labeled TMC1982NL (die labeled 1980A 82B)
+  * TMS1980 MCU label TMC1982NL (die label 1980A 82B)
   * 10-digit cyan VFD display(3 digits are custom)
 
 ***************************************************************************/
@@ -825,10 +962,10 @@ public:
 		: ticalc1x_state(mconfig, type, tag)
 	{ }
 
-	void prepare_display();
-	DECLARE_WRITE16_MEMBER(write_o);
-	DECLARE_WRITE16_MEMBER(write_r);
-	DECLARE_READ8_MEMBER(read_k);
+	virtual void prepare_display();
+	virtual DECLARE_WRITE16_MEMBER(write_o);
+	virtual DECLARE_WRITE16_MEMBER(write_r);
+	virtual DECLARE_READ8_MEMBER(read_k);
 };
 
 // handlers
@@ -836,7 +973,8 @@ public:
 void dataman_state::prepare_display()
 {
 	// note the extra segment on R9
-	display_matrix_seg(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff, 0x7f);
+	set_display_segmask(0x1ff, 0x7f);
+	display_matrix(8, 9, m_o | (m_r >> 2 & 0x80), m_r & 0x1ff);
 }
 
 WRITE16_MEMBER(dataman_state::write_r)
@@ -924,10 +1062,80 @@ MACHINE_CONFIG_END
 
 /***************************************************************************
 
+  TI Math Marvel
+  * TMS1980 MCU label TMC1986A-NL (die label 1980A 86A)
+  * 9-digit cyan VFD display(2 digits are custom), 1-bit sound
+
+  This is the same hardware as DataMan, with R8 connected to a piezo.
+
+***************************************************************************/
+
+class mathmarv_state : public dataman_state
+{
+public:
+	mathmarv_state(const machine_config &mconfig, device_type type, const char *tag)
+		: dataman_state(mconfig, type, tag)
+	{ }
+
+	virtual DECLARE_WRITE16_MEMBER(write_r) override;
+};
+
+// handlers
+
+WRITE16_MEMBER(mathmarv_state::write_r)
+{
+	// R8: speaker out
+	m_speaker->level_w(data >> 8 & 1);
+
+	// rest is same as dataman
+	dataman_state::write_r(space, offset, data);
+}
+
+
+// config
+
+static INPUT_PORTS_START( mathmarv )
+	PORT_INCLUDE( dataman )
+
+	PORT_MODIFY("IN.4") // R4
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Q) PORT_NAME("Quest")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_C) PORT_NAME("Checker")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_R) PORT_NAME("Review")
+
+	PORT_MODIFY("IN.5") // Vss!
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_PGUP) PORT_CODE(KEYCODE_N) PORT_NAME("On/Numberific") PORT_CHANGED_MEMBER(DEVICE_SELF, hh_tms1k_state, power_button, (void *)true)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_Z) PORT_NAME("Zap")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_KEYPAD ) PORT_CODE(KEYCODE_F) PORT_NAME("Flash")
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( mathmarv, mathmarv_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1980, 300000) // assume same as dataman
+	MCFG_TMS1XXX_READ_K_CB(READ8(dataman_state, read_k))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(dataman_state, write_o))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(mathmarv_state, write_r))
+	MCFG_TMS1XXX_POWER_OFF_CB(WRITELINE(hh_tms1k_state, auto_power_off))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_mathmarv)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
   TMC098x series Majestic-line calculators
 
   TI-30, SR-40, TI-15(less buttons) and several by Koh-I-Noor
-  * TMS0980 MCU labeled TMC0981NL (die labeled 0980B-81F)
+  * TMS0980 MCU label TMC0981NL (die label 0980B-81F)
   * 9-digit 7seg LED display
 
   Of note is a peripheral by Schoenherr, called the Braillotron. It acts as
@@ -936,10 +1144,10 @@ MACHINE_CONFIG_END
   the original LED display to a 25-pin D-Sub connector.
 
   TI Business Analyst, TI Business Analyst-I, TI Money Manager, TI-31, TI-41
-  * TMS0980 MCU labeled TMC0982NL (die labeled 0980B-82F)
+  * TMS0980 MCU label TMC0982NL (die label 0980B-82F)
 
   TI Programmer
-  * TMS0980 MCU labeled ZA0675NL, JP0983AT (die labeled 0980B-83)
+  * TMS0980 MCU label ZA0675NL, JP0983AT (die label 0980B-83)
 
 ***************************************************************************/
 
@@ -959,12 +1167,10 @@ public:
 
 WRITE16_MEMBER(ti30_state::write_r)
 {
-	// 1st digit only has segments B,F,G,DP
-	m_display_segmask[0] = 0xe2;
-
 	// R0-R8: select digit
-	UINT8 o = BITSWAP8(m_o,7,5,2,1,4,0,6,3);
-	display_matrix_seg(8, 9, o, data, 0xff);
+	set_display_segmask(0x1fe, 0xff);
+	set_display_segmask(0x001, 0xe2); // 1st digit only has segments B,F,G,DP
+	display_matrix(8, 9, m_o, data);
 }
 
 WRITE16_MEMBER(ti30_state::write_o)
@@ -972,7 +1178,7 @@ WRITE16_MEMBER(ti30_state::write_o)
 	// O0-O2,O4-O7: input mux
 	// O0-O7: digit segments
 	m_inp_mux = (data & 7) | (data >> 1 & 0x78);
-	m_o = data;
+	m_o = BITSWAP8(data,7,5,2,1,4,0,6,3);
 }
 
 READ8_MEMBER(ti30_state::read_k)
@@ -1187,6 +1393,17 @@ MACHINE_CONFIG_END
 
 ***************************************************************************/
 
+ROM_START( cmulti8 )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "tmc1079nl", 0x0000, 0x0400, CRC(202c5ed8) SHA1(0143975cac20cb4a4e9f659ca0535e8a9056f5bb) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cmulti8_output.pla", 0, 365, CRC(e999cece) SHA1(c5012877cd030a4dc66228f109fa23eec1867873) )
+ROM_END
+
+
 ROM_START( tisr16 )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "tms1001nl", 0x0000, 0x0400, CRC(b7ce3c1d) SHA1(95cdb0c6be31043f4fe06314ed41c0ca1337bc46) )
@@ -1323,6 +1540,19 @@ ROM_START( dataman )
 ROM_END
 
 
+ROM_START( mathmarv )
+	ROM_REGION( 0x1000, "maincpu", 0 )
+	ROM_LOAD16_WORD( "tmc1986anl", 0x0000, 0x1000, CRC(79fda72d) SHA1(137852b29d9136459f78e29e7810195a956a5903) )
+
+	ROM_REGION( 1246, "maincpu:ipla", 0 )
+	ROM_LOAD( "tms0980_common1_instr.pla", 0, 1246, CRC(42db9a38) SHA1(2d127d98028ec8ec6ea10c179c25e447b14ba4d0) )
+	ROM_REGION( 2127, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms0270_common2_micro.pla", 0, 2127, CRC(86737ac1) SHA1(4aa0444f3ddf88738ea74aec404c684bf54eddba) )
+	ROM_REGION( 525, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1980_mathmarv_output.pla", 0, 525, CRC(5fc6f451) SHA1(11475c785c34eab5b13c5dc67f413c709cd4bd4d) )
+ROM_END
+
+
 ROM_START( ti30 )
 	ROM_REGION( 0x1000, "maincpu", 0 )
 	ROM_LOAD16_WORD( "tmc0981nl", 0x0000, 0x1000, CRC(41298a14) SHA1(06f654c70add4044a612d3a38b0c2831c188fd0c) )
@@ -1370,6 +1600,8 @@ ROM_END
 
 
 /*    YEAR  NAME       PARENT COMPAT MACHINE   INPUT      INIT              COMPANY, FULLNAME, FLAGS */
+COMP( 1977, cmulti8,   0,        0, cmulti8,   cmulti8,   driver_device, 0, "Canon", "Multi 8 (Canon)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+
 COMP( 1974, tisr16,    0,        0, tisr16,    tisr16,    driver_device, 0, "Texas Instruments", "SR-16", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 COMP( 1975, tisr16ii,  0,        0, tisr16,    tisr16ii,  driver_device, 0, "Texas Instruments", "SR-16 II", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
@@ -1383,7 +1615,8 @@ COMP( 1976, lilprof,   0,        0, lilprof,   lilprof,   driver_device, 0, "Tex
 COMP( 1978, lilprof78, lilprof,  0, lilprof78, lilprof78, driver_device, 0, "Texas Instruments", "Little Professor (1978 version)", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
 
 COMP( 1977, dataman,   0,        0, dataman,   dataman,   driver_device, 0, "Texas Instruments", "DataMan", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1980, mathmarv,  0,        0, mathmarv,  mathmarv,  driver_device, 0, "Texas Instruments", "Math Marvel", MACHINE_SUPPORTS_SAVE )
 
-COMP( 1976, ti30,      0,        0, ti30,     ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1976, tibusan,   0,        0, ti30,     tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
-COMP( 1977, tiprog,    0,        0, ti30,     tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, ti30,      0,        0, ti30,      ti30,      driver_device, 0, "Texas Instruments", "TI-30", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1976, tibusan,   0,        0, ti30,      tibusan,   driver_device, 0, "Texas Instruments", "TI Business Analyst", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )
+COMP( 1977, tiprog,    0,        0, ti30,      tiprog,    driver_device, 0, "Texas Instruments", "TI Programmer", MACHINE_SUPPORTS_SAVE | MACHINE_NO_SOUND_HW )

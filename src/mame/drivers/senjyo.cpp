@@ -65,9 +65,9 @@ f000 ? ( initialize only )
 
 I/O read/write
 00   z80pio-A data     ( from sound command )
-01   z80pio-A controll ( mode 1 input )
+01   z80pio-A control  ( mode 1 input )
 02   z80pio-B data     ( no use )
-03   z80pio-B controll ( mode 3 bit i/o )
+03   z80pio-B control  ( mode 3 bit i/o )
 08   z80ctc-ch1        ( timer mode cysclk/16, bas clock 15.625KHz )
 09   z80ctc-ch2        ( cascade from ctc-1  , tempo interrupt 88.778Hz )
 0a   z80ctc-ch3        ( timer mode , single sound freq. )
@@ -78,10 +78,11 @@ I/O read/write
 /* 26.February 2012 Tsuyoshi Hasegawa fixed palette intensity */
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "sound/sn76496.h"
-#include "machine/segacrpt.h"
 #include "includes/senjyo.h"
+#include "cpu/z80/z80.h"
+#include "machine/segacrpt_device.h"
+#include "sound/sn76496.h"
+#include "sound/volt_reg.h"
 
 void senjyo_state::machine_start()
 {
@@ -553,7 +554,7 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
 
 	MCFG_CPU_ADD("sub", Z80, 2000000)   /* 2 MHz? */
-	MCFG_CPU_CONFIG(senjyo_daisy_chain)
+	MCFG_Z80_DAISY_CHAIN(senjyo_daisy_chain)
 	MCFG_CPU_PROGRAM_MAP(senjyo_sound_map)
 	MCFG_CPU_IO_MAP(senjyo_sound_io_map)
 
@@ -583,27 +584,42 @@ static MACHINE_CONFIG_START( senjyo, senjyo_state )
 	MCFG_PALETTE_INIT_OWNER(senjyo_state, radar)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 
 	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+	MCFG_SOUND_ADD("dac", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( senjyox, senjyo )
-	MCFG_CPU_MODIFY("maincpu")
+
+
+static MACHINE_CONFIG_DERIVED( senjyox_e, senjyo )
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5015, 4000000)   /* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(senjyo_map)
 	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( starforb, senjyox )
+static MACHINE_CONFIG_DERIVED( senjyox_a, senjyo )
+	MCFG_CPU_REPLACE("maincpu", SEGA_315_5018, 4000000)   /* 4 MHz? */
+	MCFG_CPU_PROGRAM_MAP(senjyo_map)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(decrypted_opcodes_map)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", senjyo_state, irq0_line_assert)
+	MCFG_SEGACRPT_SET_DECRYPTED_TAG(":decrypted_opcodes")
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( starforb, senjyox_e )
 
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
@@ -903,60 +919,12 @@ DRIVER_INIT_MEMBER(senjyo_state,starforc)
 }
 DRIVER_INIT_MEMBER(senjyo_state,starfore)
 {
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...0...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...0...1...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...0...1...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...0...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...0...1...0...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...0...1...1...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...0...1...1...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...0...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...0...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...0...1...0 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...0...1...1 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 },   /* ...1...1...0...0 */
-		{ 0x28,0xa8,0x08,0x88 }, { 0x88,0x80,0x08,0x00 },   /* ...1...1...0...1 */
-		{ 0x20,0x00,0xa0,0x80 }, { 0xa8,0xa0,0x88,0x80 },   /* ...1...1...1...0 */
-		{ 0x88,0x08,0x80,0x00 }, { 0xa0,0x80,0xa8,0x88 }    /* ...1...1...1...1 */
-	};
-
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-
 	m_is_senjyo = 0;
 	m_scrollhack = 0;
 }
 
 DRIVER_INIT_MEMBER(senjyo_state,starfora)
 {
-	static const UINT8 convtable[32][4] =
-	{
-		/*       opcode                   data                     address      */
-		/*  A    B    C    D         A    B    C    D                           */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...0...1 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...0...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...0...1...1 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...0...1...0...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...0...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x20,0xa0,0x28,0xa8 },   /* ...0...1...1...0 */
-		{ 0x88,0xa8,0x80,0xa0 }, { 0x88,0xa8,0x80,0xa0 },   /* ...0...1...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...0...0...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x28,0x20,0xa8,0xa0 },   /* ...1...0...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...0 */
-		{ 0x28,0x20,0xa8,0xa0 }, { 0x20,0xa0,0x28,0xa8 },   /* ...1...0...1...1 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...0 */
-		{ 0x88,0xa8,0x08,0x28 }, { 0x88,0xa8,0x08,0x28 },   /* ...1...1...0...1 */
-		{ 0xa0,0x20,0x80,0x00 }, { 0x88,0x08,0x80,0x00 },   /* ...1...1...1...0 */
-		{ 0x20,0xa0,0x28,0xa8 }, { 0x00,0x08,0x20,0x28 }    /* ...1...1...1...1 */
-	};
-
-	sega_decode(memregion("maincpu")->base(), m_decrypted_opcodes, 0x8000, convtable);
-
 	m_is_senjyo = 0;
 	m_scrollhack = 1;
 }
@@ -968,10 +936,10 @@ DRIVER_INIT_MEMBER(senjyo_state,senjyo)
 }
 
 
-GAME( 1983, senjyo,   0,        senjyo,  senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforc, 0,        senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforce,starforc, senjyox, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforcb,starforc, starforb,starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, starforca,starforc, senjyox, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1985, megaforc, starforc, senjyo,  starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, baluba,   0,        senjyo,  baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1983, senjyo,   0,        senjyo,    senjyo, senjyo_state,   senjyo,   ROT90, "Tehkan", "Senjyo", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforc, 0,        senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan", "Star Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforce,starforc, senjyox_e, starforc, senjyo_state, starfore, ROT90, "Tehkan", "Star Force (encrypted, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforcb,starforc, starforb,  starforc, senjyo_state, starfore, ROT90, "bootleg", "Star Force (encrypted, bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, starforca,starforc, senjyox_a, starforc, senjyo_state, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1985, megaforc, starforc, senjyo,    starforc, senjyo_state, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, baluba,   0,        senjyo,    baluba, senjyo_state,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu (Japan)", MACHINE_SUPPORTS_SAVE )

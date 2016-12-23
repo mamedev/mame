@@ -6,6 +6,8 @@
 #ifndef __C117_H__
 #define __C117_H__
 
+#include "machine/watchdog.h"
+
 
 //**************************************************************************
 //  INTERFACE CONFIGURATION MACROS
@@ -28,7 +30,7 @@ class namco_c117_device :
 {
 public:
 	//construction/destruction
-	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	namco_c117_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// static configuration
 	static void set_cpu_tags(device_t &device, const char *maintag, const char *subtag);
@@ -48,19 +50,20 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	// device_memory_interface overrides
 	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override { return (spacenum == AS_PROGRAM) ? &m_program_config : nullptr; }
 
 private:
 	// internal helpers
-	void register_w(int whichcpu, offs_t offset, UINT8 data);
-	void bankswitch(int whichcpu, int whichbank, int a0, UINT8 data);
+	void register_w(int whichcpu, offs_t offset, uint8_t data);
+	void bankswitch(int whichcpu, int whichbank, int a0, uint8_t data);
 	void kick_watchdog(int whichcpu);
 
 	// internal state
-	UINT32 m_offsets[2][8];
-	UINT8 m_subres, m_wdog;
+	uint32_t m_offsets[2][8];
+	uint8_t m_subres, m_wdog;
 
 	// callbacks
 	devcb_write_line           m_subres_cb;
@@ -76,6 +79,8 @@ private:
 	// configuration
 	const char *               m_maincpu_tag;
 	const char *               m_subcpu_tag;
+
+	required_device<watchdog_timer_device> m_watchdog;
 };
 
 // device type definition

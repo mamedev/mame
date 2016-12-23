@@ -39,75 +39,95 @@ const device_type PENTIUM3 = &device_creator<pentium3_device>;
 const device_type PENTIUM4 = &device_creator<pentium4_device>;
 
 
-i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i386_device::i386_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, I386, "I386", tag, owner, clock, "i386", __FILE__)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, 32, 32, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, 32, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
 
-i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
+i386_device::i386_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source, int program_data_width, int program_addr_width, int io_data_width)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source)
+	, device_vtlb_interface(mconfig, *this, AS_PROGRAM)
 	, m_program_config("program", ENDIANNESS_LITTLE, program_data_width, program_addr_width, 0)
 	, m_io_config("io", ENDIANNESS_LITTLE, io_data_width, 16, 0)
 	, m_smiact(*this)
 {
 	m_program_config.m_logaddr_width = 32;
 	m_program_config.m_page_shift = 12;
+
+	// 32 unified
+	set_vtlb_dynamic_entries(32);
 }
 
-i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i386SX_device::i386SX_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I386SX, "I386SX", tag, owner, clock, "i386sx", __FILE__, 16, 24, 16)
 {
 }
 
-i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i486_device::i486_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, I486, "I486", tag, owner, clock, "i486", __FILE__)
 {
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium_device::pentium_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, PENTIUM, "PENTIUM", tag, owner, clock, "pentium", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source)
+pentium_device::pentium_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source)
 	: i386_device(mconfig, type, name, tag, owner, clock, shortname, source)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb
+	set_vtlb_dynamic_entries(96);
 }
 
-mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+mediagx_device::mediagx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: i386_device(mconfig, MEDIAGX, "MEDIAGX", tag, owner, clock, "mediagx", __FILE__)
 {
 }
 
-pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium_pro_device::pentium_pro_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM_PRO, "Pentium Pro", tag, owner, clock, "pentium_pro", __FILE__)
 {
 }
 
-pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium_mmx_device::pentium_mmx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM_MMX, "Pentium MMX", tag, owner, clock, "pentium_mmx", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium2_device::pentium2_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM2, "Pentium II", tag, owner, clock, "pentium2", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium3_device::pentium3_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM3, "Pentium III", tag, owner, clock, "pentium3", __FILE__)
 {
+	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
+	set_vtlb_dynamic_entries(96);
 }
 
-pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+pentium4_device::pentium4_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: pentium_device(mconfig, PENTIUM4, "Pentium 4", tag, owner, clock, "pentium4", __FILE__)
 {
+	// 128 dtlb, 64 itlb
+	set_vtlb_dynamic_entries(196);
 }
 
 
@@ -119,10 +139,10 @@ MODRM_TABLE i386_MODRM_table[256];
 
 /*************************************************************************/
 
-UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *desc )
+uint32_t i386_device::i386_load_protected_mode_segment(I386_SREG *seg, uint64_t *desc )
 {
-	UINT32 v1,v2;
-	UINT32 base, limit;
+	uint32_t v1,v2;
+	uint32_t base, limit;
 	int entry;
 
 	if(!seg->selector)
@@ -160,14 +180,14 @@ UINT32 i386_device::i386_load_protected_mode_segment(I386_SREG *seg, UINT64 *des
 	seg->valid = true;
 
 	if(desc)
-		*desc = ((UINT64)v2<<32)|v1;
+		*desc = ((uint64_t)v2<<32)|v1;
 	return 1;
 }
 
 void i386_device::i386_load_call_gate(I386_CALL_GATE *gate)
 {
-	UINT32 v1,v2;
-	UINT32 base,limit;
+	uint32_t v1,v2;
+	uint32_t base,limit;
 	int entry;
 
 	if ( gate->segment & 0x4 )
@@ -195,11 +215,11 @@ void i386_device::i386_load_call_gate(I386_CALL_GATE *gate)
 	gate->dpl = (gate->ar >> 5) & 0x03;
 }
 
-void i386_device::i386_set_descriptor_accessed(UINT16 selector)
+void i386_device::i386_set_descriptor_accessed(uint16_t selector)
 {
 	// assume the selector is valid, we don't need to check it again
-	UINT32 base, addr;
-	UINT8 rights;
+	uint32_t base, addr;
+	uint8_t rights;
 	if(!(selector & ~3))
 		return;
 
@@ -246,9 +266,9 @@ void i386_device::i386_load_segment_descriptor(int segment )
 }
 
 /* Retrieves the stack selector located in the current TSS */
-UINT32 i386_device::i386_get_stack_segment(UINT8 privilege)
+uint32_t i386_device::i386_get_stack_segment(uint8_t privilege)
 {
-	UINT32 ret;
+	uint32_t ret;
 	if(privilege >= 3)
 		return 0;
 
@@ -261,9 +281,9 @@ UINT32 i386_device::i386_get_stack_segment(UINT8 privilege)
 }
 
 /* Retrieves the stack pointer located in the current TSS */
-UINT32 i386_device::i386_get_stack_ptr(UINT8 privilege)
+uint32_t i386_device::i386_get_stack_ptr(uint8_t privilege)
 {
-	UINT32 ret;
+	uint32_t ret;
 	if(privilege >= 3)
 		return 0;
 
@@ -275,9 +295,9 @@ UINT32 i386_device::i386_get_stack_ptr(UINT8 privilege)
 	return ret;
 }
 
-UINT32 i386_device::get_flags() const
+uint32_t i386_device::get_flags() const
 {
-	UINT32 f = 0x2;
+	uint32_t f = 0x2;
 	f |= m_CF;
 	f |= m_PF << 2;
 	f |= m_AF << 4;
@@ -299,7 +319,7 @@ UINT32 i386_device::get_flags() const
 	return (m_eflags & ~m_eflags_mask) | (f & m_eflags_mask);
 }
 
-void i386_device::set_flags(UINT32 f )
+void i386_device::set_flags(uint32_t f )
 {
 	m_CF = (f & 0x1) ? 1 : 0;
 	m_PF = (f & 0x4) ? 1 : 0;
@@ -322,12 +342,12 @@ void i386_device::set_flags(UINT32 f )
 	m_eflags = f & m_eflags_mask;
 }
 
-void i386_device::sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment)
+void i386_device::sib_byte(uint8_t mod, uint32_t* out_ea, uint8_t* out_segment)
 {
-	UINT32 ea = 0;
-	UINT8 segment = 0;
-	UINT8 scale, i, base;
-	UINT8 sib = FETCH();
+	uint32_t ea = 0;
+	uint8_t segment = 0;
+	uint8_t scale, i, base;
+	uint8_t sib = FETCH();
 	scale = (sib >> 6) & 0x3;
 	i = (sib >> 3) & 0x7;
 	base = sib & 0x7;
@@ -369,15 +389,15 @@ void i386_device::sib_byte(UINT8 mod, UINT32* out_ea, UINT8* out_segment)
 	*out_segment = segment;
 }
 
-void i386_device::modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment)
+void i386_device::modrm_to_EA(uint8_t mod_rm, uint32_t* out_ea, uint8_t* out_segment)
 {
-	INT8 disp8;
-	INT16 disp16;
-	INT32 disp32;
-	UINT8 mod = (mod_rm >> 6) & 0x3;
-	UINT8 rm = mod_rm & 0x7;
-	UINT32 ea;
-	UINT8 segment;
+	int8_t disp8;
+	int16_t disp16;
+	int32_t disp32;
+	uint8_t mod = (mod_rm >> 6) & 0x3;
+	uint8_t rm = mod_rm & 0x7;
+	uint32_t ea;
+	uint8_t segment;
 
 	if( mod_rm >= 0xc0 )
 		fatalerror("i386: Called modrm_to_EA with modrm value %02X!\n",mod_rm);
@@ -404,7 +424,7 @@ void i386_device::modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment)
 		}
 		if( mod == 1 ) {
 			disp8 = FETCH();
-			ea += (INT32)disp8;
+			ea += (int32_t)disp8;
 		} else if( mod == 2 ) {
 			disp32 = FETCH32();
 			ea += disp32;
@@ -437,10 +457,10 @@ void i386_device::modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment)
 		}
 		if( mod == 1 ) {
 			disp8 = FETCH();
-			ea += (INT32)disp8;
+			ea += (int32_t)disp8;
 		} else if( mod == 2 ) {
 			disp16 = FETCH16();
-			ea += (INT32)disp16;
+			ea += (int32_t)disp16;
 		}
 
 		if( m_segment_prefix )
@@ -451,19 +471,19 @@ void i386_device::modrm_to_EA(UINT8 mod_rm, UINT32* out_ea, UINT8* out_segment)
 	}
 }
 
-UINT32 i386_device::GetNonTranslatedEA(UINT8 modrm,UINT8 *seg)
+uint32_t i386_device::GetNonTranslatedEA(uint8_t modrm,uint8_t *seg)
 {
-	UINT8 segment;
-	UINT32 ea;
+	uint8_t segment;
+	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment );
 	if(seg) *seg = segment;
 	return ea;
 }
 
-UINT32 i386_device::GetEA(UINT8 modrm, int rwn)
+uint32_t i386_device::GetEA(uint8_t modrm, int rwn)
 {
-	UINT8 segment;
-	UINT32 ea;
+	uint8_t segment;
+	uint32_t ea;
 	modrm_to_EA(modrm, &ea, &segment );
 	return i386_translate(segment, ea, rwn );
 }
@@ -471,9 +491,9 @@ UINT32 i386_device::GetEA(UINT8 modrm, int rwn)
 /* Check segment register for validity when changing privilege level after an RETF */
 void i386_device::i386_check_sreg_validity(int reg)
 {
-	UINT16 selector = m_sreg[reg].selector;
-	UINT8 CPL = m_CPL;
-	UINT8 DPL,RPL;
+	uint16_t selector = m_sreg[reg].selector;
+	uint8_t CPL = m_CPL;
+	uint8_t DPL,RPL;
 	I386_SREG desc;
 	int invalid;
 
@@ -516,7 +536,7 @@ void i386_device::i386_check_sreg_validity(int reg)
 	}
 }
 
-int i386_device::i386_limit_check(int seg, UINT32 offset)
+int i386_device::i386_limit_check(int seg, uint32_t offset)
 {
 	if(PROTECTED_MODE && !V8086_MODE)
 	{
@@ -541,10 +561,10 @@ int i386_device::i386_limit_check(int seg, UINT32 offset)
 	return 0;
 }
 
-void i386_device::i386_sreg_load(UINT16 selector, UINT8 reg, bool *fault)
+void i386_device::i386_sreg_load(uint16_t selector, uint8_t reg, bool *fault)
 {
 	// Checks done when MOV changes a segment register in protected mode
-	UINT8 CPL,RPL,DPL;
+	uint8_t CPL,RPL,DPL;
 
 	CPL = m_CPL;
 	RPL = selector & 0x0003;
@@ -693,9 +713,9 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	 *  0x0f    Reserved
 	 *  0x10    Coprocessor error
 	 */
-	UINT32 v1, v2;
-	UINT32 offset, oldflags = get_flags();
-	UINT16 segment;
+	uint32_t v1, v2;
+	uint32_t offset, oldflags = get_flags();
+	uint16_t segment;
 	int entry = irq * (PROTECTED_MODE ? 8 : 4);
 	int SetRPL;
 	m_lock = false;
@@ -719,9 +739,9 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 	else
 	{
 		int type;
-		UINT16 flags;
+		uint16_t flags;
 		I386_SREG desc;
-		UINT8 CPL = m_CPL, DPL; //, RPL = 0;
+		uint8_t CPL = m_CPL, DPL; //, RPL = 0;
 
 		/* 32-bit */
 		v1 = READ32PL0(m_idtr.base + entry );
@@ -862,7 +882,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			{
 				/* IRQ to inner privilege */
 				I386_SREG stack;
-				UINT32 newESP,oldSS,oldESP;
+				uint32_t newESP,oldSS,oldESP;
 
 				if(V8086_MODE && DPL)
 				{
@@ -956,10 +976,10 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 					//logerror("IRQ (%08x): Interrupt during V8086 task\n",m_pc);
 					if(type & 0x08)
 					{
-						PUSH32(m_sreg[GS].selector & 0xffff);
-						PUSH32(m_sreg[FS].selector & 0xffff);
-						PUSH32(m_sreg[DS].selector & 0xffff);
-						PUSH32(m_sreg[ES].selector & 0xffff);
+						PUSH32SEG(m_sreg[GS].selector & 0xffff);
+						PUSH32SEG(m_sreg[FS].selector & 0xffff);
+						PUSH32SEG(m_sreg[DS].selector & 0xffff);
+						PUSH32SEG(m_sreg[ES].selector & 0xffff);
 					}
 					else
 					{
@@ -981,7 +1001,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				if(type & 0x08)
 				{
 					// 32-bit gate
-					PUSH32(oldSS);
+					PUSH32SEG(oldSS);
 					PUSH32(oldESP);
 				}
 				else
@@ -1027,7 +1047,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 				}
 			}
 		}
-		UINT32 tempSP = REG32(ESP);
+		uint32_t tempSP = REG32(ESP);
 		try
 		{
 			// this is ugly but the alternative is worse
@@ -1043,14 +1063,14 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 			else
 			{
 				PUSH32(oldflags & 0x00ffffff );
-				PUSH32(m_sreg[CS].selector );
+				PUSH32SEG(m_sreg[CS].selector );
 				if(irq == 3 || irq == 4 || irq == 9 || irq_gate == 1)
 					PUSH32(m_eip );
 				else
 					PUSH32(m_prev_eip );
 			}
 		}
-		catch(UINT64 e)
+		catch(uint64_t e)
 		{
 			REG32(ESP) = tempSP;
 			throw e;
@@ -1071,7 +1091,7 @@ void i386_device::i386_trap(int irq, int irq_gate, int trap_level)
 
 }
 
-void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, UINT32 error)
+void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, uint32_t error)
 {
 	i386_trap(irq,irq_gate,trap_level);
 	if(irq == 8 || irq == 10 || irq == 11 || irq == 12 || irq == 13 || irq == 14)
@@ -1080,8 +1100,8 @@ void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, UI
 		// no error code is pushed for software interrupts, either.
 		if(PROTECTED_MODE)
 		{
-			UINT32 entry = irq * 8;
-			UINT32 v2,type;
+			uint32_t entry = irq * 8;
+			uint32_t v2,type;
 			v2 = READ32PL0(m_idtr.base + entry + 4 );
 			type = (v2>>8) & 0x1F;
 			if(type == 5)
@@ -1101,12 +1121,12 @@ void i386_device::i386_trap_with_error(int irq, int irq_gate, int trap_level, UI
 }
 
 
-void i386_device::i286_task_switch(UINT16 selector, UINT8 nested)
+void i386_device::i286_task_switch(uint16_t selector, uint8_t nested)
 {
-	UINT32 tss;
+	uint32_t tss;
 	I386_SREG seg;
-	UINT16 old_task;
-	UINT8 ar_byte;  // access rights byte
+	uint16_t old_task;
+	uint8_t ar_byte;  // access rights byte
 
 	/* TODO: Task State Segment privilege checks */
 
@@ -1208,13 +1228,13 @@ void i386_device::i286_task_switch(UINT16 selector, UINT8 nested)
 //  printf("286 Task Switch from selector %04x to %04x\n",old_task,selector);
 }
 
-void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
+void i386_device::i386_task_switch(uint16_t selector, uint8_t nested)
 {
-	UINT32 tss;
+	uint32_t tss;
 	I386_SREG seg;
-	UINT16 old_task;
-	UINT8 ar_byte;  // access rights byte
-	UINT32 oldcr3 = m_cr[3];
+	uint16_t old_task;
+	uint8_t ar_byte;  // access rights byte
+	uint32_t oldcr3 = m_cr[3];
 
 	/* TODO: Task State Segment privilege checks */
 
@@ -1306,7 +1326,7 @@ void i386_device::i386_task_switch(UINT16 selector, UINT8 nested)
 	}
 	m_cr[3] = READ32(tss+0x1c);  // CR3 (PDBR)
 	if(oldcr3 != m_cr[3])
-		vtlb_flush_dynamic(m_vtlb);
+		vtlb_flush_dynamic();
 
 	/* Set the busy bit in the new task's descriptor */
 	if(selector & 0x0004)
@@ -1342,14 +1362,14 @@ void i386_device::i386_check_irq_line()
 	}
 }
 
-void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect, int operand32)
+void i386_device::i386_protected_mode_jump(uint16_t seg, uint32_t off, int indirect, int operand32)
 {
 	I386_SREG desc;
 	I386_CALL_GATE call_gate;
-	UINT8 CPL,DPL,RPL;
-	UINT8 SetRPL;
-	UINT16 segment = seg;
-	UINT32 offset = off;
+	uint8_t CPL,DPL,RPL;
+	uint8_t SetRPL;
+	uint16_t segment = seg;
+	uint32_t offset = off;
 
 	/* Check selector is not null */
 	if((segment & ~0x03) == 0)
@@ -1614,14 +1634,14 @@ void i386_device::i386_protected_mode_jump(UINT16 seg, UINT32 off, int indirect,
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect, int operand32)
+void i386_device::i386_protected_mode_call(uint16_t seg, uint32_t off, int indirect, int operand32)
 {
 	I386_SREG desc;
 	I386_CALL_GATE gate;
-	UINT8 SetRPL;
-	UINT8 CPL, DPL, RPL;
-	UINT16 selector = seg;
-	UINT32 offset = off;
+	uint8_t SetRPL;
+	uint8_t CPL, DPL, RPL;
+	uint16_t selector = seg;
+	uint32_t offset = off;
 	int x;
 
 	if((selector & ~0x03) == 0)
@@ -1815,7 +1835,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 				{
 					I386_SREG stack;
 					I386_SREG temp;
-					UINT32 oldSS,oldESP;
+					uint32_t oldSS,oldESP;
 					/* more privilege */
 					/* Check new SS segment for privilege level from TSS */
 					memset(&stack, 0, sizeof(stack));
@@ -1862,7 +1882,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 						logerror("CALL: Call gate: Stack segment is not present\n");
 						FAULT(FAULT_SS,stack.selector)  // #SS(SS selector)
 					}
-					UINT32 newESP = i386_get_stack_ptr(DPL);
+					uint32_t newESP = i386_get_stack_ptr(DPL);
 					if(!stack.d)
 					{
 						newESP &= 0xffff;
@@ -1915,7 +1935,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 
 					if(operand32 != 0)
 					{
-						PUSH32(oldSS);
+						PUSH32SEG(oldSS);
 						PUSH32(oldESP);
 					}
 					else
@@ -1930,7 +1950,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 					/* copy parameters from old stack to new stack */
 					for(x=(gate.dword_count & 0x1f)-1;x>=0;x--)
 					{
-						UINT32 addr = oldESP + (operand32?(x*4):(x*2));
+						uint32_t addr = oldESP + (operand32?(x*4):(x*2));
 						addr = temp.base + (temp.d?addr:(addr&0xffff));
 						if(operand32)
 							PUSH32(READ32(addr));
@@ -2032,7 +2052,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 	if(SetRPL != 0)
 		selector = (selector & ~0x03) | m_CPL;
 
-	UINT32 tempSP = REG32(ESP);
+	uint32_t tempSP = REG32(ESP);
 	try
 	{
 		// this is ugly but the alternative is worse
@@ -2049,7 +2069,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 		else
 		{
 			/* 32-bit operand size */
-			PUSH32(m_sreg[CS].selector );
+			PUSH32SEG(m_sreg[CS].selector );
 			PUSH32(m_eip );
 			m_sreg[CS].selector = selector;
 			m_performed_intersegment_jump = 1;
@@ -2057,7 +2077,7 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 			i386_load_segment_descriptor(CS );
 		}
 	}
-	catch(UINT64 e)
+	catch(uint64_t e)
 	{
 		REG32(ESP) = tempSP;
 		throw e;
@@ -2066,13 +2086,13 @@ void i386_device::i386_protected_mode_call(UINT16 seg, UINT32 off, int indirect,
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
+void i386_device::i386_protected_mode_retf(uint8_t count, uint8_t operand32)
 {
-	UINT32 newCS, newEIP;
+	uint32_t newCS, newEIP;
 	I386_SREG desc;
-	UINT8 CPL, RPL, DPL;
+	uint8_t CPL, RPL, DPL;
 
-	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
+	uint32_t ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
 
 	if(operand32 == 0)
 	{
@@ -2155,7 +2175,7 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 		}
 		if(operand32 == 0)
 		{
-			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 			if(i386_limit_check(SS,offset+count+3) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",m_pc);
@@ -2164,7 +2184,7 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 		}
 		else
 		{
-			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 			if(i386_limit_check(SS,offset+count+7) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
@@ -2178,11 +2198,11 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 	}
 	else if(RPL > CPL)
 	{
-		UINT32 newSS, newESP;  // when changing privilege
+		uint32_t newSS, newESP;  // when changing privilege
 		/* outer privilege level */
 		if(operand32 == 0)
 		{
-			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 			if(i386_limit_check(SS,offset+count+7) != 0)
 			{
 				logerror("RETF (%08x): SP is past stack segment limit.\n",m_pc);
@@ -2191,7 +2211,7 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 		}
 		else
 		{
-			UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+			uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 			if(i386_limit_check(SS,offset+count+15) != 0)
 			{
 				logerror("RETF: ESP is past stack segment limit.\n");
@@ -2339,14 +2359,15 @@ void i386_device::i386_protected_mode_retf(UINT8 count, UINT8 operand32)
 
 void i386_device::i386_protected_mode_iret(int operand32)
 {
-	UINT32 newCS, newEIP;
-	UINT32 newSS, newESP;  // when changing privilege
+	uint32_t newCS, newEIP;
+	uint32_t newSS, newESP;  // when changing privilege
 	I386_SREG desc,stack;
-	UINT8 CPL, RPL, DPL;
-	UINT32 newflags;
+	uint8_t CPL, RPL, DPL;
+	uint32_t newflags;
+	uint8_t IOPL = m_IOP1 | (m_IOP2 << 1);
 
 	CPL = m_CPL;
-	UINT32 ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
+	uint32_t ea = i386_translate(SS, (STACK_32BIT)?REG32(ESP):REG16(SP), 0);
 	if(operand32 == 0)
 	{
 		newEIP = READ16(ea) & 0xffff;
@@ -2362,8 +2383,8 @@ void i386_device::i386_protected_mode_iret(int operand32)
 
 	if(V8086_MODE)
 	{
-		UINT32 oldflags = get_flags();
-		if(!m_IOP1 || !m_IOP2)
+		uint32_t oldflags = get_flags();
+		if(IOPL != 3)
 		{
 			logerror("IRET (%08x): Is in Virtual 8086 mode and IOPL != 3.\n",m_pc);
 			FAULT(FAULT_GP,0)
@@ -2389,7 +2410,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 	}
 	else if(NESTED_TASK)
 	{
-		UINT32 task = READ32(m_task.base);
+		uint32_t task = READ32(m_task.base);
 		/* Task Return */
 		logerror("IRET (%08x): Nested task return.\n",m_pc);
 		/* Check back-link selector in TSS */
@@ -2433,8 +2454,10 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			//logerror("IRET (%08x): Returning to Virtual 8086 mode.\n",m_pc);
 			if(CPL != 0)
 			{
-				UINT32 oldflags = get_flags();
+				uint32_t oldflags = get_flags();
 				newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+				if(CPL > IOPL)
+					newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 			}
 			set_flags(newflags);
 			m_eip = POP32() & 0xffff;  // high 16 bits are ignored
@@ -2459,7 +2482,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 		{
 			if(operand32 == 0)
 			{
-				UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+				uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 				if(i386_limit_check(SS,offset+3) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
@@ -2468,7 +2491,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 			}
 			else
 			{
-				UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+				uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 				if(i386_limit_check(SS,offset+7) != 0)
 				{
 					logerror("IRET: Data on stack is past SS limit.\n");
@@ -2486,7 +2509,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				/* return to same privilege level */
 				if(operand32 == 0)
 				{
-					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 					if(i386_limit_check(SS,offset+5) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",m_pc);
@@ -2495,7 +2518,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				else
 				{
-					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 					if(i386_limit_check(SS,offset+11) != 0)
 					{
 						logerror("IRET (%08x): Data on stack is past SS limit.\n",m_pc);
@@ -2551,7 +2574,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				if((desc.flags & 0x0080) == 0)
 				{
-					logerror("IRET: Return CS segment is not present.\n");
+					logerror("IRET: (%08x) Return CS segment is not present.\n", m_pc);
 					FAULT(FAULT_NP,newCS & ~0x03)
 				}
 				if(newEIP > desc.limit)
@@ -2562,8 +2585,10 @@ void i386_device::i386_protected_mode_iret(int operand32)
 
 				if(CPL != 0)
 				{
-					UINT32 oldflags = get_flags();
+					uint32_t oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2591,7 +2616,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				RPL = newCS & 0x03;
 				if(operand32 == 0)
 				{
-					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 					if(i386_limit_check(SS,offset+9) != 0)
 					{
 						logerror("IRET: SP is past SS limit.\n");
@@ -2600,7 +2625,7 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				}
 				else
 				{
-					UINT32 offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
+					uint32_t offset = (STACK_32BIT ? REG32(ESP) : REG16(SP));
 					if(i386_limit_check(SS,offset+19) != 0)
 					{
 						logerror("IRET: ESP is past SS limit.\n");
@@ -2731,8 +2756,10 @@ void i386_device::i386_protected_mode_iret(int operand32)
 				// IOPL can only change if CPL is zero
 				if(CPL != 0)
 				{
-					UINT32 oldflags = get_flags();
+					uint32_t oldflags = get_flags();
 					newflags = (newflags & ~0x00003000) | (oldflags & 0x00003000);
+					if(CPL > IOPL)
+						newflags = (newflags & ~0x200 ) | (oldflags & 0x200);
 				}
 
 				if(operand32 == 0)
@@ -2814,8 +2841,8 @@ void i386_device::build_cycle_table()
 	int i, j;
 	for (j=0; j < X86_NUM_CPUS; j++)
 	{
-		cycle_table_rm[j] = std::make_unique<UINT8[]>(CYCLES_NUM_OPCODES);
-		cycle_table_pm[j] = std::make_unique<UINT8[]>(CYCLES_NUM_OPCODES);
+		cycle_table_rm[j] = std::make_unique<uint8_t[]>(CYCLES_NUM_OPCODES);
+		cycle_table_pm[j] = std::make_unique<uint8_t[]>(CYCLES_NUM_OPCODES);
 
 		for (i=0; i < sizeof(x86_cycle_table)/sizeof(X86_CYCLE_TABLE); i++)
 		{
@@ -2838,7 +2865,7 @@ void i386_device::report_invalid_opcode()
 #endif
 }
 
-void i386_device::report_invalid_modrm(const char* opcode, UINT8 modrm)
+void i386_device::report_invalid_modrm(const char* opcode, uint8_t modrm)
 {
 #ifndef DEBUG_MISSING_OPCODE
 	logerror("i386: Invalid %s modrm %01X at %08X\n", opcode, modrm, m_pc - 2);
@@ -2852,12 +2879,12 @@ void i386_device::report_invalid_modrm(const char* opcode, UINT8 modrm)
 }
 
 
-#include "i386ops.inc"
-#include "i386op16.inc"
-#include "i386op32.inc"
-#include "i486ops.inc"
-#include "pentops.inc"
-#include "x87ops.inc"
+#include "i386ops.hxx"
+#include "i386op16.hxx"
+#include "i386op32.hxx"
+#include "i486ops.hxx"
+#include "pentops.hxx"
+#include "x87ops.hxx"
 #include "i386ops.h"
 
 void i386_device::i386_decode_opcode()
@@ -2992,9 +3019,9 @@ void i386_device::i386_decode_four_byte38f3()
 
 /*************************************************************************/
 
-UINT8 i386_device::read8_debug(UINT32 ea, UINT8 *data)
+uint8_t i386_device::read8_debug(uint32_t ea, uint8_t *data)
 {
-	UINT32 address = ea;
+	uint32_t address = ea;
 
 	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&address,nullptr))
 		return 0;
@@ -3004,11 +3031,11 @@ UINT8 i386_device::read8_debug(UINT32 ea, UINT8 *data)
 	return 1;
 }
 
-UINT32 i386_device::i386_get_debug_desc(I386_SREG *seg)
+uint32_t i386_device::i386_get_debug_desc(I386_SREG *seg)
 {
-	UINT32 base, limit, address;
-	union { UINT8 b[8]; UINT32 w[2]; } data;
-	UINT8 ret;
+	uint32_t base, limit, address;
+	union { uint8_t b[8]; uint32_t w[2]; } data;
+	uint8_t ret;
 	int entry;
 
 	if ( seg->selector & 0x4 )
@@ -3050,9 +3077,9 @@ UINT32 i386_device::i386_get_debug_desc(I386_SREG *seg)
 	return seg->valid;
 }
 
-UINT64 i386_device::debug_segbase(symbol_table &table, int params, const UINT64 *param)
+uint64_t i386_device::debug_segbase(symbol_table &table, int params, const uint64_t *param)
 {
-	UINT32 result;
+	uint32_t result;
 	I386_SREG seg;
 
 	if(param[0] > 65535)
@@ -3073,9 +3100,9 @@ UINT64 i386_device::debug_segbase(symbol_table &table, int params, const UINT64 
 	return result;
 }
 
-UINT64 i386_device::debug_seglimit(symbol_table &table, int params, const UINT64 *param)
+uint64_t i386_device::debug_seglimit(symbol_table &table, int params, const uint64_t *param)
 {
-	UINT32 result = 0;
+	uint32_t result = 0;
 	I386_SREG seg;
 
 	if (PROTECTED_MODE && !V8086_MODE)
@@ -3089,9 +3116,9 @@ UINT64 i386_device::debug_seglimit(symbol_table &table, int params, const UINT64
 	return result;
 }
 
-UINT64 i386_device::debug_segofftovirt(symbol_table &table, int params, const UINT64 *param)
+uint64_t i386_device::debug_segofftovirt(symbol_table &table, int params, const uint64_t *param)
 {
-	UINT32 result;
+	uint32_t result;
 	I386_SREG seg;
 
 	if(param[0] > 65535)
@@ -3127,34 +3154,34 @@ UINT64 i386_device::debug_segofftovirt(symbol_table &table, int params, const UI
 	return result;
 }
 
-UINT64 i386_device::debug_virttophys(symbol_table &table, int params, const UINT64 *param)
+uint64_t i386_device::debug_virttophys(symbol_table &table, int params, const uint64_t *param)
 {
-	UINT32 result = param[0];
+	uint32_t result = param[0];
 
 	if(!i386_translate_address(TRANSLATE_DEBUG_MASK,&result,nullptr))
 		return 0;
 	return result;
 }
 
-UINT64 i386_debug_segbase(symbol_table &table, void *ref, int params, const UINT64 *param)
+uint64_t i386_debug_segbase(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
 	i386_device *i386 = (i386_device *)(ref);
 	return i386->debug_segbase(table, params, param);
 }
 
-UINT64 i386_debug_seglimit(symbol_table &table, void *ref, int params, const UINT64 *param)
+uint64_t i386_debug_seglimit(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
 	i386_device *i386 = (i386_device *)(ref);
 	return i386->debug_seglimit(table, params, param);
 }
 
-UINT64 i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const UINT64 *param)
+uint64_t i386_debug_segofftovirt(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
 	i386_device *i386 = (i386_device *)(ref);
 	return i386->debug_segofftovirt(table, params, param);
 }
 
-static UINT64 i386_debug_virttophys(symbol_table &table, void *ref, int params, const UINT64 *param)
+static uint64_t i386_debug_virttophys(symbol_table &table, void *ref, int params, const uint64_t *param)
 {
 	i386_device *i386 = (i386_device *)(ref);
 	return i386->debug_virttophys(table, params, param);
@@ -3178,7 +3205,7 @@ void i386_device::i386_postload()
 	CHANGE_PC(m_eip);
 }
 
-void i386_device::i386_common_init(int tlbsize)
+void i386_device::i386_common_init()
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -3211,7 +3238,6 @@ void i386_device::i386_common_init(int tlbsize)
 	m_program = &space(AS_PROGRAM);
 	m_direct = &m_program->direct();
 	m_io = &space(AS_IO);
-	m_vtlb = vtlb_alloc(this, AS_PROGRAM, 0, tlbsize);
 	m_smi = false;
 	m_debugger_temp = 0;
 	m_lock = false;
@@ -3294,7 +3320,7 @@ void i386_device::i386_common_init(int tlbsize)
 
 void i386_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386);
 	m_cycle_table_rm = cycle_table_rm[CPU_CYCLES_I386].get();
@@ -3387,6 +3413,7 @@ void i386_device::register_state_i386()
 	state_add( I386_CPL,        "CPL", m_CPL).formatstr("%01X");
 
 	state_add( STATE_GENPC, "GENPC", m_pc).noshow();
+	state_add( STATE_GENPCBASE, "CURPC", m_pc).noshow();
 	state_add( STATE_GENFLAGS, "GENFLAGS", m_debugger_temp).formatstr("%8s").noshow();
 	state_add( STATE_GENSP, "GENSP", REG32(ESP)).noshow();
 }
@@ -3470,60 +3497,60 @@ void i386_device::state_string_export(const device_state_entry &entry, std::stri
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%08X", get_flags());
+			str = string_format("%08X", get_flags());
 			break;
 		case X87_ST0:
-			strprintf(str, "%f", fx80_to_double(ST(0)));
+			str = string_format("%f", fx80_to_double(ST(0)));
 			break;
 		case X87_ST1:
-			strprintf(str, "%f", fx80_to_double(ST(1)));
+			str = string_format("%f", fx80_to_double(ST(1)));
 			break;
 		case X87_ST2:
-			strprintf(str, "%f", fx80_to_double(ST(2)));
+			str = string_format("%f", fx80_to_double(ST(2)));
 			break;
 		case X87_ST3:
-			strprintf(str, "%f", fx80_to_double(ST(3)));
+			str = string_format("%f", fx80_to_double(ST(3)));
 			break;
 		case X87_ST4:
-			strprintf(str, "%f", fx80_to_double(ST(4)));
+			str = string_format("%f", fx80_to_double(ST(4)));
 			break;
 		case X87_ST5:
-			strprintf(str, "%f", fx80_to_double(ST(5)));
+			str = string_format("%f", fx80_to_double(ST(5)));
 			break;
 		case X87_ST6:
-			strprintf(str, "%f", fx80_to_double(ST(6)));
+			str = string_format("%f", fx80_to_double(ST(6)));
 			break;
 		case X87_ST7:
-			strprintf(str, "%f", fx80_to_double(ST(7)));
+			str = string_format("%f", fx80_to_double(ST(7)));
 			break;
 		case SSE_XMM0:
-			strprintf(str, "%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(0).d[3], XMM(0).d[2], XMM(0).d[1], XMM(0).d[0]);
 			break;
 		case SSE_XMM1:
-			strprintf(str, "%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(1).d[3], XMM(1).d[2], XMM(1).d[1], XMM(1).d[0]);
 			break;
 		case SSE_XMM2:
-			strprintf(str, "%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(2).d[3], XMM(2).d[2], XMM(2).d[1], XMM(2).d[0]);
 			break;
 		case SSE_XMM3:
-			strprintf(str, "%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(3).d[3], XMM(3).d[2], XMM(3).d[1], XMM(3).d[0]);
 			break;
 		case SSE_XMM4:
-			strprintf(str, "%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(4).d[3], XMM(4).d[2], XMM(4).d[1], XMM(4).d[0]);
 			break;
 		case SSE_XMM5:
-			strprintf(str, "%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(5).d[3], XMM(5).d[2], XMM(5).d[1], XMM(5).d[0]);
 			break;
 		case SSE_XMM6:
-			strprintf(str, "%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(6).d[3], XMM(6).d[2], XMM(6).d[1], XMM(6).d[0]);
 			break;
 		case SSE_XMM7:
-			strprintf(str, "%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
+			str = string_format("%08x%08x%08x%08x", XMM(7).d[3], XMM(7).d[2], XMM(7).d[1], XMM(7).d[0]);
 			break;
 	}
 }
 
-void i386_device::build_opcode_table(UINT32 features)
+void i386_device::build_opcode_table(uint32_t features)
 {
 	int i;
 	for (i=0; i < 256; i++)
@@ -3698,7 +3725,6 @@ void i386_device::zero_state()
 void i386_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -3731,6 +3757,7 @@ void i386_device::device_reset()
 	// Family 3 (386), Model 0 (DX), Stepping 8 (D1)
 	REG32(EAX) = 0;
 	REG32(EDX) = (3 << 8) | (0 << 4) | (8);
+	m_cpu_version = REG32(EDX);
 
 	m_CPL = 0;
 
@@ -3739,9 +3766,9 @@ void i386_device::device_reset()
 
 void i386_device::pentium_smi()
 {
-	UINT32 smram_state = m_smbase + 0xfe00;
-	UINT32 old_cr0 = m_cr[0];
-	UINT32 old_flags = get_flags();
+	uint32_t smram_state = m_smbase + 0xfe00;
+	uint32_t old_cr0 = m_cr[0];
+	uint32_t old_flags = get_flags();
 
 	if(m_smm)
 		return;
@@ -3804,7 +3831,7 @@ void i386_device::pentium_smi()
 	WRITE32(REG32(ESI), smram_state+SMRAM_ESI);
 	WRITE32(REG32(EDI), smram_state+SMRAM_EDI);
 	WRITE32(m_eip, smram_state+SMRAM_EIP);
-	WRITE32(old_flags, smram_state+SMRAM_EAX);
+	WRITE32(old_flags, smram_state+SMRAM_EFLAGS);
 	WRITE32(m_cr[3], smram_state+SMRAM_CR3);
 	WRITE32(old_cr0, smram_state+SMRAM_CR0);
 
@@ -3890,7 +3917,7 @@ void i386_device::i386_set_a20_line(int state)
 		m_a20_mask = ~(1 << 20);
 	}
 	// TODO: how does A20M and the tlb interact
-	vtlb_flush_dynamic(m_vtlb);
+	vtlb_flush_dynamic();
 }
 
 void i386_device::execute_run()
@@ -3944,7 +3971,7 @@ void i386_device::execute_run()
 			if(m_lock && (m_opcode != 0xf0))
 				m_lock = false;
 		}
-		catch(UINT64 e)
+		catch(uint64_t e)
 		{
 			m_ext = 1;
 			i386_trap_with_error(e&0xffffffff,0,0,e>>32);
@@ -3964,9 +3991,9 @@ bool i386_device::memory_translate(address_spacenum spacenum, int intention, off
 	return ret;
 }
 
-offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t i386_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
-	return i386_dasm_one(buffer, pc, oprom, m_sreg[CS].d ? 32 : 16);
+	return i386_dasm_one(stream, pc, oprom, m_sreg[CS].d ? 32 : 16);
 }
 
 
@@ -3976,7 +4003,7 @@ offs_t i386_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *opr
 
 void i486_device::device_start()
 {
-	i386_common_init(32);
+	i386_common_init();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486);
 	build_x87_opcode_table();
@@ -3989,7 +4016,6 @@ void i486_device::device_start()
 void i486_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4022,6 +4048,7 @@ void i486_device::device_reset()
 	// Family 4 (486), Model 0/1 (DX), Stepping 3
 	REG32(EAX) = 0;
 	REG32(EDX) = (4 << 8) | (0 << 4) | (3);
+	m_cpu_version = REG32(EDX);
 
 	CHANGE_PC(m_eip);
 }
@@ -4033,8 +4060,7 @@ void i486_device::device_reset()
 
 void pentium_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_opcode_table(OP_I386 | OP_FPU | OP_I486 | OP_PENTIUM);
@@ -4046,7 +4072,6 @@ void pentium_device::device_start()
 void pentium_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4107,8 +4132,7 @@ void pentium_device::device_reset()
 
 void mediagx_device::device_start()
 {
-	// probably 32 unified
-	i386_common_init(32);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4120,7 +4144,6 @@ void mediagx_device::device_start()
 void mediagx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4172,8 +4195,7 @@ void mediagx_device::device_reset()
 
 void pentium_pro_device::device_start()
 {
-	// 64 dtlb small, 32 itlb
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4185,7 +4207,6 @@ void pentium_pro_device::device_start()
 void pentium_pro_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4247,8 +4268,7 @@ void pentium_pro_device::device_reset()
 
 void pentium_mmx_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4260,7 +4280,6 @@ void pentium_mmx_device::device_start()
 void pentium_mmx_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4320,8 +4339,7 @@ void pentium_mmx_device::device_reset()
 
 void pentium2_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87();
 
 	build_x87_opcode_table();
@@ -4333,7 +4351,6 @@ void pentium2_device::device_start()
 void pentium2_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4387,8 +4404,7 @@ void pentium2_device::device_reset()
 
 void pentium3_device::device_start()
 {
-	// 64 dtlb small, 8 dtlb large, 32 itlb small, 2 itlb large
-	i386_common_init(96);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4400,7 +4416,6 @@ void pentium3_device::device_start()
 void pentium3_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;
@@ -4456,8 +4471,7 @@ void pentium3_device::device_reset()
 
 void pentium4_device::device_start()
 {
-	// 128 dtlb, 64 itlb
-	i386_common_init(196);
+	i386_common_init();
 	register_state_i386_x87_xmm();
 
 	build_x87_opcode_table();
@@ -4469,7 +4483,6 @@ void pentium4_device::device_start()
 void pentium4_device::device_reset()
 {
 	zero_state();
-	vtlb_flush_dynamic(m_vtlb);
 
 	m_sreg[CS].selector = 0xf000;
 	m_sreg[CS].base     = 0xffff0000;

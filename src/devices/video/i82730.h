@@ -35,10 +35,10 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<void (bitmap_rgb32 &bitmap, UINT16 *data, UINT8 lc, UINT16 y, int x_count)> i82730_update_row_delegate;
+typedef device_delegate<void (bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)> i82730_update_row_delegate;
 
 #define I82730_UPDATE_ROW(name) \
-	void name(bitmap_rgb32 &bitmap, UINT16 *data, UINT8 lc, UINT16 y, int x_count)
+	void name(bitmap_rgb32 &bitmap, uint16_t *data, uint8_t lc, uint16_t y, int x_count)
 
 
 // ======================> i82730_device
@@ -47,7 +47,7 @@ class i82730_device : public device_t, public device_video_interface
 {
 public:
 	// construction/destruction
-	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	i82730_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// callbacks
 	template<class _Object> static devcb_base &set_sint_handler(device_t &device, _Object object)
@@ -57,7 +57,7 @@ public:
 	static void set_cpu_tag(device_t &device, device_t *owner, const char *tag);
 	static void set_update_row_callback(device_t &device, i82730_update_row_delegate callback) { downcast<i82730_device &>(device).m_update_row_cb = callback; }
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(ca_w);
 	DECLARE_WRITE_LINE_MEMBER(irst_w);
@@ -85,10 +85,10 @@ private:
 
 	bool sysbus_16bit() { return BIT(m_sysbus, 0); }
 
-	UINT8 read_byte(offs_t address);
-	UINT16 read_word(offs_t address);
-	void write_byte(offs_t address, UINT8 data);
-	void write_word(offs_t address, UINT16 data);
+	uint8_t read_byte(offs_t address);
+	uint16_t read_word(offs_t address);
+	void write_byte(offs_t address, uint8_t data);
+	void write_word(offs_t address, uint16_t data);
 
 	void update_interrupts();
 	void mode_set();
@@ -113,18 +113,18 @@ private:
 	int m_ca;
 
 	// internal registers
-	UINT8 m_sysbus;
-	UINT32 m_ibp;
-	UINT32 m_cbp;
-	UINT16 m_intmask;
-	UINT16 m_status;
+	uint8_t m_sysbus;
+	uint32_t m_ibp;
+	uint32_t m_cbp;
+	uint16_t m_intmask;
+	uint16_t m_status;
 
 	int m_list_switch;
 	int m_auto_line_feed;
-	UINT8 m_max_dma_count;
+	uint8_t m_max_dma_count;
 
-	UINT32 m_lptr;
-	UINT32 m_sptr;
+	uint32_t m_lptr;
+	uint32_t m_sptr;
 
 	int m_dma_burst_space;
 	int m_dma_burst_length;
@@ -133,7 +133,7 @@ private:
 	int m_hfldstrt;
 	int m_margin;
 	int m_lpr;
-	UINT16 m_field_attribute_mask;
+	uint16_t m_field_attribute_mask;
 	int m_vsyncstp;
 	int m_vfldstrt;
 	int m_vfldstp;
@@ -143,7 +143,7 @@ private:
 	// row buffers
 	struct row_buffer
 	{
-		UINT16 data[200];
+		uint16_t data[200];
 		int count;
 	};
 

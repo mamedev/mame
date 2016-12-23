@@ -44,13 +44,27 @@
 // ----------------------------------
 #define FDC_TAG "fd1771"
 #define MOTOR_TIMER 1
+#define NONE -1
 
 #define TI_FDC_TAG "ti_dssd_controller"
 
-ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
-			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__), m_address(0), m_DRQ(), m_IRQ(),
-	m_lastval(0), m_DVENA(), m_inDsrArea(false), m_WAITena(false), m_WDsel(false), m_DSEL(0), m_SIDSEL(), m_motor_on_timer(nullptr),
-			m_fd1771(*this, FDC_TAG), m_dsrrom(nullptr), m_current_floppy(nullptr), m_debug_dataout(false)
+ti_fdc_device::ti_fdc_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+			: ti_expansion_card_device(mconfig, TI99_FDC, "TI-99 Standard DSSD Floppy Controller", tag, owner, clock, "ti99_fdc", __FILE__),
+			m_address(0),
+			m_DRQ(0),
+			m_IRQ(0),
+			m_lastval(0),
+			m_DVENA(0),
+			m_inDsrArea(false),
+			m_WAITena(false),
+			m_WDsel(false),
+			m_DSEL(0),
+			m_SIDSEL(0),
+			m_motor_on_timer(nullptr),
+			m_fd1771(*this, FDC_TAG),
+			m_dsrrom(nullptr),
+			m_current(NONE),
+			m_debug_dataout(false)
 		{ }
 
 /*
@@ -113,13 +127,32 @@ SETADDRESS_DBIN_MEMBER( ti_fdc_device::setaddress_dbin )
 	operate_ready_line();
 }
 
+/*
+    Access for debugger. This is a stripped-down version of the
+    main methods below. We only allow ROM access.
+*/
+void ti_fdc_device::debug_read(offs_t offset, uint8_t* value)
+{
+	if (((offset & m_select_mask)==m_select_value) && m_selected)
+	{
+		if ((offset & 0x1ff1)!=0x1ff0)
+			*value = m_dsrrom[offset & 0x1fff];
+	}
+}
+
 READ8Z_MEMBER(ti_fdc_device::readz)
 {
+	if (space.debugger_access())
+	{
+		debug_read(offset, value);
+		return;
+	}
+
 	if (m_inDsrArea && m_selected)
 	{
 		// Read ports of 1771 are mapped to 5FF0,2,4,6: 0101 1111 1111 0xx0
 		// Note that incoming/outgoing data are inverted for FD1771
-		UINT8 reply = 0;
+		uint8_t reply = 0;
 
 		if (m_WDsel && ((m_address & 9)==0))
 		{
@@ -150,6 +183,8 @@ READ8Z_MEMBER(ti_fdc_device::readz)
 
 WRITE8_MEMBER(ti_fdc_device::write)
 {
+	if (space.debugger_access()) return;
+
 	if (m_inDsrArea && m_selected)
 	{
 		// Write ports of 1771 are mapped to 5FF8,A,C,E: 0101 1111 1111 1xx0
@@ -186,7 +221,7 @@ READ8Z_MEMBER(ti_fdc_device::crureadz)
 {
 	if ((offset & 0xff00)==m_cru_base)
 	{
-		UINT8 reply = 0;
+		uint8_t reply = 0;
 		if ((offset & 0x07) == 0)
 		{
 			// Selected drive
@@ -258,7 +293,7 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 			// Select side of disk (bit 7)
 			m_SIDSEL = (data==1)? ASSERT_LINE : CLEAR_LINE;
 			if (TRACE_CRU) logerror("tifdc: set side (bit 7) = %d\n", data);
-			if (m_current_floppy != nullptr) m_current_floppy->ss_w(data);
+			if (m_current != NONE) m_floppy[m_current]->ss_w(data);
 			break;
 
 		default:
@@ -269,37 +304,35 @@ WRITE8_MEMBER(ti_fdc_device::cruwrite)
 
 void ti_fdc_device::set_drive()
 {
-	int i = -1;
 	switch (m_DSEL)
 	{
 	case 0:
-		m_current_floppy = nullptr;
+		m_current = NONE;
 		if (TRACE_CRU) logerror("tifdc: all drives deselected\n");
 		break;
 	case 1:
-		i = 0;
+		m_current = 0;
 		break;
 	case 2:
-		i = 1;
+		m_current = 1;
 		break;
 	case 3:
 		// The schematics do not reveal any countermeasures against multiple selection
 		// so we assume that the highest value wins.
-		i = 1;
+		m_current = 1;
 		logerror("tifdc: Warning - multiple drives selected\n");
 		break;
 	case 4:
-		i = 2;
+		m_current = 2;
 		break;
 	default:
-		i = 2;
+		m_current = 2;
 		logerror("tifdc: Warning - multiple drives selected\n");
 		break;
 	}
 	if (TRACE_CRU) logerror("tifdc: new DSEL = %d\n", m_DSEL);
-	if (i != -1) m_current_floppy = m_floppy[i];
 
-	m_fd1771->set_floppy(m_current_floppy);
+	m_fd1771->set_floppy((m_current == NONE)? nullptr : m_floppy[m_current]);
 }
 
 /*
@@ -347,7 +380,19 @@ void ti_fdc_device::device_start()
 	m_motor_on_timer = timer_alloc(MOTOR_TIMER);
 	m_cru_base = 0x1100;
 	// In case we implement a callback after all:
-	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(FUNC(ti_fdc_device::dvena_r), this));
+	// m_fd1771->setup_ready_cb(wd_fdc_t::rline_cb(&ti_fdc_device::dvena_r, this));
+
+	save_item(NAME(m_address));
+	save_item(NAME(m_DRQ));
+	save_item(NAME(m_IRQ));
+	save_item(NAME(m_lastval));
+	save_item(NAME(m_DVENA));
+	save_item(NAME(m_inDsrArea));
+	save_item(NAME(m_WAITena));
+	save_item(NAME(m_WDsel));
+	save_item(NAME(m_DSEL));
+	save_item(NAME(m_SIDSEL));
+	save_item(NAME(m_current));
 }
 
 void ti_fdc_device::device_reset()
@@ -384,15 +429,16 @@ void ti_fdc_device::device_reset()
 			logerror("tifdc: No floppy attached to connector %d\n", i);
 	}
 
-	m_fd1771->set_floppy(m_current_floppy = m_floppy[0]);
+	m_current = 0;
+	m_fd1771->set_floppy(m_floppy[m_current]);
 }
 
 void ti_fdc_device::device_config_complete()
 {
 	// Seems to be null when doing a "-listslots"
-	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->first_subdevice());
-	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->first_subdevice());
-	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->first_subdevice());
+	if (subdevice("0")!=nullptr) m_floppy[0] = static_cast<floppy_image_device*>(subdevice("0")->subdevices().first());
+	if (subdevice("1")!=nullptr) m_floppy[1] = static_cast<floppy_image_device*>(subdevice("1")->subdevices().first());
+	if (subdevice("2")!=nullptr) m_floppy[2] = static_cast<floppy_image_device*>(subdevice("2")->subdevices().first());
 }
 
 FLOPPY_FORMATS_MEMBER(ti_fdc_device::floppy_formats)
@@ -418,7 +464,8 @@ MACHINE_CONFIG_END
 
 ROM_START( ti_fdc )
 	ROM_REGION(0x2000, DSRROM, 0)
-	ROM_LOAD("disk.bin", 0x0000, 0x2000, CRC(8f7df93f) SHA1(ed91d48c1eaa8ca37d5055bcf67127ea51c4cad5)) /* TI disk DSR ROM */
+	ROM_LOAD("fdc_dsr.u26", 0x0000, 0x1000, CRC(693c6b6e) SHA1(0c24fb4944843ad3f08b0b139244a6bb05e1c6c2)) /* TI disk DSR ROM first 4K */
+	ROM_LOAD("fdc_dsr.u27", 0x1000, 0x1000, CRC(2c921087) SHA1(3646c3bcd2dce16b918ee01ea65312f36ae811d2)) /* TI disk DSR ROM second 4K */
 ROM_END
 
 machine_config_constructor ti_fdc_device::device_mconfig_additions() const
@@ -426,7 +473,7 @@ machine_config_constructor ti_fdc_device::device_mconfig_additions() const
 	return MACHINE_CONFIG_NAME( ti_fdc );
 }
 
-const rom_entry *ti_fdc_device::device_rom_region() const
+const tiny_rom_entry *ti_fdc_device::device_rom_region() const
 {
 	return ROM_NAME( ti_fdc );
 }

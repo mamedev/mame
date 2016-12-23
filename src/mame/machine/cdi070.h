@@ -140,16 +140,16 @@ class cdi68070_device : public device_t
 {
 public:
 	// construction/destruction
-	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdi68070_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// external callbacks
-	void uart_rx(UINT8 data);
-	void uart_tx(UINT8 data);
+	void uart_rx(uint8_t data);
+	void uart_tx(uint8_t data);
 
 	// UART Access for Quizard
-	void set_quizard_mcu_value(UINT16 value);
-	void set_quizard_mcu_ack(UINT8 ack);
-	void quizard_rx(UINT8 data);
+	void set_quizard_mcu_value(uint16_t value);
+	void set_quizard_mcu_ack(uint8_t ack);
+	void quizard_rx(uint8_t data);
 
 	void mcu_frame();
 
@@ -163,76 +163,76 @@ public:
 	// register structures
 	struct i2c_regs_t
 	{
-		UINT8 reserved0;
-		UINT8 data_register;
-		UINT8 reserved1;
-		UINT8 address_register;
-		UINT8 reserved2;
-		UINT8 status_register;
-		UINT8 reserved3;
-		UINT8 control_register;
-		UINT8 reserved;
-		UINT8 clock_control_register;
+		uint8_t reserved0;
+		uint8_t data_register;
+		uint8_t reserved1;
+		uint8_t address_register;
+		uint8_t reserved2;
+		uint8_t status_register;
+		uint8_t reserved3;
+		uint8_t control_register;
+		uint8_t reserved;
+		uint8_t clock_control_register;
 	};
 
 	struct uart_regs_t
 	{
-		UINT8 reserved0;
-		UINT8 mode_register;
-		UINT8 reserved1;
-		UINT8 status_register;
-		UINT8 reserved2;
-		UINT8 clock_select;
-		UINT8 reserved3;
-		UINT8 command_register;
-		UINT8 reserved4;
-		UINT8 transmit_holding_register;
-		UINT8 reserved5;
-		UINT8 receive_holding_register;
+		uint8_t reserved0;
+		uint8_t mode_register;
+		uint8_t reserved1;
+		uint8_t status_register;
+		uint8_t reserved2;
+		uint8_t clock_select;
+		uint8_t reserved3;
+		uint8_t command_register;
+		uint8_t reserved4;
+		uint8_t transmit_holding_register;
+		uint8_t reserved5;
+		uint8_t receive_holding_register;
 
-		INT16 receive_pointer;
-		UINT8 receive_buffer[32768];
+		int16_t receive_pointer;
+		uint8_t receive_buffer[32768];
 		emu_timer* rx_timer;
 
-		INT16 transmit_pointer;
-		UINT8 transmit_buffer[32768];
+		int16_t transmit_pointer;
+		uint8_t transmit_buffer[32768];
 		emu_timer* tx_timer;
 	};
 
 	struct timer_regs_t
 	{
-		UINT8 timer_status_register;
-		UINT8 timer_control_register;
-		UINT16 reload_register;
-		UINT16 timer0;
-		UINT16 timer1;
-		UINT16 timer2;
+		uint8_t timer_status_register;
+		uint8_t timer_control_register;
+		uint16_t reload_register;
+		uint16_t timer0;
+		uint16_t timer1;
+		uint16_t timer2;
 		emu_timer* timer0_timer;
 	};
 
 	struct dma_channel_t
 	{
-		UINT8 channel_status;
-		UINT8 channel_error;
+		uint8_t channel_status;
+		uint8_t channel_error;
 
-		UINT8 reserved0[2];
+		uint8_t reserved0[2];
 
-		UINT8 device_control;
-		UINT8 operation_control;
-		UINT8 sequence_control;
-		UINT8 channel_control;
+		uint8_t device_control;
+		uint8_t operation_control;
+		uint8_t sequence_control;
+		uint8_t channel_control;
 
-		UINT8 reserved1[3];
+		uint8_t reserved1[3];
 
-		UINT16 transfer_counter;
+		uint16_t transfer_counter;
 
-		UINT32 memory_address_counter;
+		uint32_t memory_address_counter;
 
-		UINT8 reserved2[4];
+		uint8_t reserved2[4];
 
-		UINT32 device_address_counter;
+		uint32_t device_address_counter;
 
-		UINT8 reserved3[40];
+		uint8_t reserved3[40];
 	};
 
 	struct dma_regs_t
@@ -242,26 +242,26 @@ public:
 
 	struct mmu_desc_t
 	{
-		UINT16 attr;
-		UINT16 length;
-		UINT8  undefined;
-		UINT8  segment;
-		UINT16 base;
+		uint16_t attr;
+		uint16_t length;
+		uint8_t  undefined;
+		uint8_t  segment;
+		uint16_t base;
 	};
 
 	struct mmu_regs_t
 	{
-		UINT8 status;
-		UINT8 control;
+		uint8_t status;
+		uint8_t control;
 
-		UINT8 reserved[0x3e];
+		uint8_t reserved[0x3e];
 
 		mmu_desc_t desc[8];
 	};
 
 	dma_regs_t& dma() { return m_dma; }
 
-	UINT16 get_lir() { return m_lir; }
+	uint16_t get_lir() { return m_lir; }
 
 protected:
 	// device-level overrides
@@ -275,15 +275,15 @@ private:
 	void set_timer_callback(int channel);
 
 	// internal state
-	UINT16 m_seeds[10];
-	UINT8 m_state[8];
+	uint16_t m_seeds[10];
+	uint8_t m_state[8];
 
-	UINT16 m_mcu_value;
-	UINT8 m_mcu_ack;
+	uint16_t m_mcu_value;
+	uint8_t m_mcu_ack;
 
-	UINT16 m_lir;
-	UINT8 m_picr1;
-	UINT8 m_picr2;
+	uint16_t m_lir;
+	uint8_t m_picr1;
+	uint8_t m_picr2;
 
 	i2c_regs_t m_i2c;
 	uart_regs_t m_uart;
@@ -293,7 +293,7 @@ private:
 
 	// non-static internal members
 	void quizard_calculate_state();
-	void quizard_set_seeds(UINT8 *rx);
+	void quizard_set_seeds(uint8_t *rx);
 	void quizard_handle_byte_tx();
 };
 

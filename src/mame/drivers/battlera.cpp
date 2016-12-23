@@ -112,7 +112,7 @@ WRITE8_MEMBER(battlera_state::sound_w)
 {
 	if (offset == 0)
 	{
-		soundlatch_byte_w(space,0,data);
+		m_soundlatch->write(space, 0, data);
 		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, battlera_state )
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(adpcm_data_w)
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_DEVWRITE("c6280", c6280_device, c6280_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK("bank7") /* Main ram */
-	AM_RANGE(0x1ff000, 0x1ff001) AM_READ(soundlatch_byte_r) AM_WRITE(adpcm_reset_w)
+	AM_RANGE(0x1ff000, 0x1ff001) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_DEVWRITE("audiocpu", h6280_device, irq_status_w)
 ADDRESS_MAP_END
 
@@ -260,7 +260,7 @@ INPUT_PORTS_END
 
 /******************************************************************************/
 
-UINT32 battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t battlera_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_huc6260->video_update( bitmap, cliprect );
 	return 0;
@@ -294,22 +294,21 @@ static MACHINE_CONFIG_START( battlera, battlera_state )
 	MCFG_HUC6270_IRQ_CHANGED_CB(INPUTLINE("maincpu", 0))
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MCFG_SOUND_ADD("msm", MSM5205, 384000)
 	MCFG_MSM5205_VCLK_CB(WRITELINE(battlera_state, adpcm_int)) /* interrupt function */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)      /* 8KHz            */
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.85)
 
 	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
 	MCFG_C6280_CPU("audiocpu")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

@@ -81,6 +81,7 @@ Bprom dump by f205v
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/gen_latch.h"
 #include "sound/ay8910.h"
 
 class stuntair_state : public driver_device
@@ -95,25 +96,27 @@ public:
 		m_bgattrram(*this, "bgattrram"),
 		m_sprram(*this, "sprram"),
 		m_gfxdecode(*this, "gfxdecode"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	required_shared_ptr<UINT8> m_fgram;
-	required_shared_ptr<UINT8> m_bgram;
-	required_shared_ptr<UINT8> m_bgattrram;
-	required_shared_ptr<UINT8> m_sprram;
+	required_shared_ptr<uint8_t> m_fgram;
+	required_shared_ptr<uint8_t> m_bgram;
+	required_shared_ptr<uint8_t> m_bgattrram;
+	required_shared_ptr<uint8_t> m_sprram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	tilemap_t *m_fg_tilemap;
 	tilemap_t *m_bg_tilemap;
 
-	UINT8 m_bg_xscroll;
-	UINT8 m_nmi_enable;
-	UINT8 m_spritebank0;
-	UINT8 m_spritebank1;
+	uint8_t m_bg_xscroll;
+	uint8_t m_nmi_enable;
+	uint8_t m_spritebank0;
+	uint8_t m_spritebank1;
 
 	TILE_GET_INFO_MEMBER(get_stuntair_fg_tile_info);
 	TILE_GET_INFO_MEMBER(get_stuntair_bg_tile_info);
@@ -132,7 +135,7 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
-	UINT32 screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	DECLARE_PALETTE_INIT(stuntair);
 };
 
@@ -147,11 +150,11 @@ public:
 PALETTE_INIT_MEMBER(stuntair_state, stuntair)
 {
 	/* need resistor weights etc. */
-	const UINT8 *color_prom = machine().root_device().memregion("proms")->base();
+	const uint8_t *color_prom = machine().root_device().memregion("proms")->base();
 
 	for (int i = 0; i < 0x100; i++)
 	{
-		UINT8 data = color_prom[i];
+		uint8_t data = color_prom[i];
 
 		int b = (data&0xc0)>>6;
 		int g = (data&0x38)>>3;
@@ -188,10 +191,10 @@ TILE_GET_INFO_MEMBER(stuntair_state::get_stuntair_bg_tile_info)
 
 void stuntair_state::video_start()
 {
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_fg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_fg_tilemap->set_transparent_pen(0);
 
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(stuntair_state::get_stuntair_bg_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 }
 
 
@@ -221,7 +224,7 @@ void stuntair_state::draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprec
 	}
 }
 
-UINT32 stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t stuntair_state::screen_update_stuntair(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->set_scrollx(0, m_bg_xscroll);
 
@@ -303,7 +306,7 @@ WRITE8_MEMBER(stuntair_state::stuntair_coin_w)
 
 WRITE8_MEMBER(stuntair_state::stuntair_sound_w)
 {
-	soundlatch_byte_w(space, 0, data);
+	m_soundlatch->write(space, 0, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -531,8 +534,10 @@ static MACHINE_CONFIG_START( stuntair, stuntair_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono") // stereo?
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18_432MHz/12)
-	MCFG_AY8910_PORT_A_READ_CB(READ8(driver_device, soundlatch_byte_r))
+	MCFG_AY8910_PORT_A_READ_CB(DEVREAD8("soundlatch", generic_latch_8_device, read))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(stuntair_state, ay8910_portb_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 

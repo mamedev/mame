@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 #include "emu.h"
 #include "includes/ksayakyu.h"
@@ -34,7 +34,7 @@ WRITE8_MEMBER(ksayakyu_state::ksayakyu_videoctrl_w)
 
 PALETTE_INIT_MEMBER(ksayakyu_state, ksayakyu)
 {
-	const UINT8 *prom = memregion("proms")->base();
+	const uint8_t *prom = memregion("proms")->base();
 	int r, g, b, i;
 
 	for (i = 0; i < 0x100; i++)
@@ -82,8 +82,8 @@ TILE_GET_INFO_MEMBER(ksayakyu_state::get_text_tile_info)
 
 void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	const UINT8 *source = m_spriteram + m_spriteram.bytes() - 4;
-	const UINT8 *finish = m_spriteram;
+	const uint8_t *source = m_spriteram + m_spriteram.bytes() - 4;
+	const uint8_t *finish = m_spriteram;
 
 	while (source>=finish) /* is order correct ? */
 	{
@@ -116,12 +116,12 @@ void ksayakyu_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 
 void ksayakyu_state::video_start()
 {
-	m_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
-	m_textmap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
+	m_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_ksayakyu_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32 * 8);
+	m_textmap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(ksayakyu_state::get_text_tile_info),this), TILEMAP_SCAN_ROWS, 8, 8, 32, 32);
 	m_textmap->set_transparent_pen(0);
 }
 
-UINT32 ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t ksayakyu_state::screen_update_ksayakyu(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(0, cliprect);
 

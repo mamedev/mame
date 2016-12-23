@@ -10,6 +10,7 @@
 
 #include "emu.h"
 #include "includes/galaga.h"
+#include "includes/xevious.h"
 
 /***************************************************************************
 
@@ -28,7 +29,7 @@
 ***************************************************************************/
 PALETTE_INIT_MEMBER(xevious_state,xevious)
 {
-	const UINT8 *color_prom = memregion("proms")->base();
+	const uint8_t *color_prom = memregion("proms")->base();
 	int i;
 	#define TOTAL_COLORS(gfxn) (m_gfxdecode->gfx(gfxn)->colors() *m_gfxdecode->gfx(gfxn)->granularity())
 
@@ -96,78 +97,6 @@ PALETTE_INIT_MEMBER(xevious_state,xevious)
 	}
 }
 
-
-
-PALETTE_INIT_MEMBER(xevious_state,battles)
-{
-	const UINT8 *color_prom = memregion("proms")->base();
-	int i;
-
-	for (i = 0;i < 128;i++)
-	{
-		int bit0,bit1,bit2,bit3,r,g,b;
-
-		/* red component */
-		bit0 = (color_prom[0] >> 0) & 0x01;
-		bit1 = (color_prom[0] >> 1) & 0x01;
-		bit2 = (color_prom[0] >> 2) & 0x01;
-		bit3 = (color_prom[0] >> 3) & 0x01;
-		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* green component */
-		bit0 = (color_prom[256] >> 0) & 0x01;
-		bit1 = (color_prom[256] >> 1) & 0x01;
-		bit2 = (color_prom[256] >> 2) & 0x01;
-		bit3 = (color_prom[256] >> 3) & 0x01;
-		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-		/* blue component */
-		bit0 = (color_prom[2*256] >> 0) & 0x01;
-		bit1 = (color_prom[2*256] >> 1) & 0x01;
-		bit2 = (color_prom[2*256] >> 2) & 0x01;
-		bit3 = (color_prom[2*256] >> 3) & 0x01;
-		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette.set_indirect_color(i,rgb_t(r,g,b));
-		color_prom++;
-	}
-
-	/* color 0x80 is used by sprites to mark transparency */
-	palette.set_indirect_color(0x80,rgb_t(0,0,0));
-
-	color_prom += 128;  /* the bottom part of the PROM is unused */
-	color_prom += 2*256;
-	/* color_prom now points to the beginning of the lookup table */
-
-	/* background tiles */
-	for (i = 0;i < TOTAL_COLORS(1);i++)
-	{
-		palette.set_pen_indirect(m_gfxdecode->gfx(1)->colorbase() + i,
-				(color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4));
-
-		color_prom++;
-	}
-	color_prom += 0x600;
-
-	/* sprites */
-	for (i = 0;i < TOTAL_COLORS(2);i++)
-	{
-		int c = (color_prom[0] & 0x0f) | ((color_prom[0x400] & 0x0f) << 4);
-
-		palette.set_pen_indirect(m_gfxdecode->gfx(2)->colorbase() + i,
-				(c & 0x80) ? (c & 0x7f) : 0x80);
-
-		color_prom++;
-	}
-
-	/* foreground characters */
-	for (i = 0;i < TOTAL_COLORS(0);i++)
-	{
-		palette.set_pen_indirect(m_gfxdecode->gfx(0)->colorbase() + i,
-				(i % 2 != 0) ? (i / 2) : 0x80);
-	}
-}
-
-
-
 /***************************************************************************
 
   Callbacks for the TileMap code
@@ -176,14 +105,14 @@ PALETTE_INIT_MEMBER(xevious_state,battles)
 
 TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 {
-	UINT8 attr = m_xevious_fg_colorram[tile_index];
+	uint8_t attr = m_xevious_fg_colorram[tile_index];
 
 	/* the hardware has two character sets, one normal and one x-flipped. When
 	   screen is flipped, character y flip is done by the hardware inverting the
 	   timing signals, while x flip is done by selecting the 2nd character set.
 	   We reproduce this here, but since the tilemap system automatically flips
 	   characters when screen is flipped, we have to flip them back. */
-	UINT8 color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
+	uint8_t color = ((attr & 0x03) << 4) | ((attr & 0x3c) >> 2);
 	SET_TILE_INFO_MEMBER(0,
 			m_xevious_fg_videoram[tile_index] | (flip_screen() ? 0x100 : 0),
 			color,
@@ -192,9 +121,9 @@ TILE_GET_INFO_MEMBER(xevious_state::get_fg_tile_info)
 
 TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 {
-	UINT8 code = m_xevious_bg_videoram[tile_index];
-	UINT8 attr = m_xevious_bg_colorram[tile_index];
-	UINT8 color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
+	uint8_t code = m_xevious_bg_videoram[tile_index];
+	uint8_t attr = m_xevious_bg_colorram[tile_index];
+	uint8_t color = ((attr & 0x3c) >> 2) | ((code & 0x80) >> 3) | ((attr & 0x03) << 5);
 	SET_TILE_INFO_MEMBER(1,
 			code + ((attr & 0x01) << 8),
 			color,
@@ -211,8 +140,8 @@ TILE_GET_INFO_MEMBER(xevious_state::get_bg_tile_info)
 
 VIDEO_START_MEMBER(xevious_state,xevious)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_bg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(xevious_state::get_fg_tile_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_bg_tilemap->set_scrolldx(-20,288+27);
 	m_bg_tilemap->set_scrolldy(-16,-16);
@@ -296,9 +225,9 @@ WRITE8_MEMBER( xevious_state::xevious_bs_w )
 
 READ8_MEMBER( xevious_state::xevious_bb_r )
 {
-	UINT8 *rom2a = memregion("gfx4")->base();
-	UINT8 *rom2b = rom2a+0x1000;
-	UINT8 *rom2c = rom2a+0x3000;
+	uint8_t *rom2a = memregion("gfx4")->base();
+	uint8_t *rom2b = rom2a+0x1000;
+	uint8_t *rom2c = rom2a+0x3000;
 	int adr_2b,adr_2c;
 	int dat1,dat2;
 
@@ -394,9 +323,9 @@ ROM 3M,3L color replace table for sprite
 
 void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 {
-	UINT8 *spriteram = m_xevious_sr3 + 0x780;
-	UINT8 *spriteram_2 = m_xevious_sr1 + 0x780;
-	UINT8 *spriteram_3 = m_xevious_sr2 + 0x780;
+	uint8_t *spriteram = m_xevious_sr3 + 0x780;
+	uint8_t *spriteram_2 = m_xevious_sr1 + 0x780;
+	uint8_t *spriteram_3 = m_xevious_sr2 + 0x780;
 	int offs,sx,sy;
 
 	for (offs = 0;offs < 0x80;offs += 2)
@@ -404,7 +333,7 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 		if ((spriteram[offs + 1] & 0x40) == 0)  /* I'm not sure about this one */
 		{
 			int bank,code,color,flipx,flipy;
-			UINT32 transmask;
+			uint32_t transmask;
 
 			if (spriteram_3[offs] & 0x80)
 			{
@@ -472,7 +401,7 @@ void xevious_state::draw_sprites(bitmap_ind16 &bitmap,const rectangle &cliprect)
 }
 
 
-UINT32 xevious_state::screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t xevious_state::screen_update_xevious(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0,0);
 	draw_sprites(bitmap,cliprect);

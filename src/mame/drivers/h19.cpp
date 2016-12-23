@@ -75,13 +75,12 @@ public:
 	DECLARE_WRITE8_MEMBER(h19_c0_w);
 	DECLARE_WRITE8_MEMBER(h19_kbd_put);
 	MC6845_UPDATE_ROW(crtc_update_row);
-	required_shared_ptr<UINT8> m_p_videoram;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<palette_device> m_palette;
-	UINT8 *m_p_chargen;
-	UINT8 m_term_data;
+	uint8_t *m_p_chargen;
+	uint8_t m_term_data;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	DECLARE_WRITE_LINE_MEMBER(h19_ace_irq);
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -96,14 +95,14 @@ void h19_state::device_timer(emu_timer &timer, device_timer_id id, int param, vo
 		m_beep->set_state(0);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in h19_state::device_timer");
+		assert_always(false, "Unknown id in h19_state::device_timer");
 	}
 }
 
 READ8_MEMBER( h19_state::h19_80_r )
 {
 // keyboard data
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -122,7 +121,7 @@ WRITE8_MEMBER( h19_state::h19_c0_w )
     offset 00-1F = keyclick
     offset 20-3F = terminal bell */
 
-	UINT8 length = (offset & 0x20) ? 200 : 4;
+	uint8_t length = (offset & 0x20) ? 200 : 4;
 	m_beep->set_state(1);
 	timer_set(attotime::from_msec(length), TIMER_BEEP_OFF);
 }
@@ -325,13 +324,13 @@ void h19_state::video_start()
 MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
-		UINT8 inv=0;
+		uint8_t inv=0;
 		if (x == cursor_x) inv=0xff;
 		mem = (ma + x) & 0x7ff;
 		chr = m_p_videoram[mem];
@@ -357,10 +356,6 @@ MC6845_UPDATE_ROW( h19_state::crtc_update_row )
 	}
 }
 
-WRITE_LINE_MEMBER(h19_state::h19_ace_irq)
-{
-	m_maincpu->set_input_line(0, (state ? HOLD_LINE : CLEAR_LINE));
-}
 
 /* F4 Character Displayer */
 static const gfx_layout h19_charlayout =
@@ -394,14 +389,14 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	//MCFG_DEVICE_PERIODIC_INT_DRIVER(h19_state, irq0_line_hold,  50) // for testing, causes a keyboard scan
 
 	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_ADD_MONOCHROME("screen", RASTER, rgb_t::green())
 	MCFG_SCREEN_REFRESH_RATE(60)
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", mc6845_device, screen_update)
 	MCFG_SCREEN_SIZE(640, 200)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640 - 1, 0, 200 - 1)
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", h19)
-	MCFG_PALETTE_ADD_MONOCHROME_GREEN("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	MCFG_MC6845_ADD("crtc", MC6845, "screen", XTAL_12_288MHz / 8) // clk taken from schematics
 	MCFG_MC6845_SHOW_BORDER_AREA(false)
@@ -410,7 +405,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_MC6845_OUT_VSYNC_CB(INPUTLINE("maincpu", INPUT_LINE_NMI)) // frame pulse
 
 	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
-	MCFG_INS8250_OUT_INT_CB(WRITELINE(h19_state, h19_ace_irq)) // interrupt
+	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
 
 	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(h19_state, h19_kbd_put))

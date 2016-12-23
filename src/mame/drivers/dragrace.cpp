@@ -33,7 +33,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(dragrace_state::dragrace_frame_callback)
 	output().set_value("P2gear", m_gear[1]);
 
 	/* watchdog is disabled during service mode */
-	machine().watchdog_enable(ioport("IN0")->read() & 0x20);
+	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x20);
 }
 
 
@@ -97,7 +97,7 @@ void dragrace_state::dragrace_update_misc_flags( address_space &space )
 WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 {
 	/* Set/clear individual bit */
-	UINT32 mask = 1 << offset;
+	uint32_t mask = 1 << offset;
 	if (data & 0x01)
 		m_misc_flags |= mask;
 	else
@@ -109,7 +109,7 @@ WRITE8_MEMBER(dragrace_state::dragrace_misc_w)
 WRITE8_MEMBER(dragrace_state::dragrace_misc_clear_w)
 {
 	/* Clear 8 bits */
-	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
+	uint32_t mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	m_misc_flags &= (~mask);
 	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920 + offset, mask, m_misc_flags, data & 0x01);
 	dragrace_update_misc_flags(space);
@@ -120,8 +120,8 @@ READ8_MEMBER(dragrace_state::dragrace_input_r)
 	int val = ioport("IN2")->read();
 	static const char *const portnames[] = { "IN0", "IN1" };
 
-	UINT8 maskA = 1 << (offset % 8);
-	UINT8 maskB = 1 << (offset / 8);
+	uint8_t maskA = 1 << (offset % 8);
+	uint8_t maskB = 1 << (offset / 8);
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( dragrace_map, AS_PROGRAM, 8, dragrace_state )
 	AM_RANGE(0x0b00, 0x0bff) AM_WRITEONLY AM_SHARE("position_ram")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ(dragrace_steering_r)
 	AM_RANGE(0x0d00, 0x0d00) AM_READ(dragrace_scanline_r)
-	AM_RANGE(0x0e00, 0x0eff) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0e00, 0x0eff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x1000, 0x1fff) AM_ROM /* program */
 	AM_RANGE(0xf800, 0xffff) AM_ROM /* program mirror */
 ADDRESS_MAP_END
@@ -330,7 +330,9 @@ static MACHINE_CONFIG_START( dragrace, dragrace_state )
 	MCFG_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 12)
 	MCFG_CPU_PROGRAM_MAP(dragrace_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(dragrace_state, irq0_line_hold,  4*60)
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("frame_timer", dragrace_state, dragrace_frame_callback, attotime::from_hz(60))
 

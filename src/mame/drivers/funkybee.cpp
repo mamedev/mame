@@ -81,7 +81,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 READ8_MEMBER(funkybee_state::funkybee_input_port_0_r)
 {
-	watchdog_reset_r(space, 0);
+	m_watchdog->reset_r(space, 0);
 	return ioport("IN0")->read();
 }
 
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( funkybee_map, AS_PROGRAM, 8, funkybee_state )
 	AM_RANGE(0xe802, 0xe803) AM_WRITE(funkybee_coin_counter_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(funkybee_gfx_bank_w)
 	AM_RANGE(0xf000, 0xf000) AM_READNOP /* IRQ Ack */
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(funkybee_input_port_0_r, watchdog_reset_w)
+	AM_RANGE(0xf800, 0xf800) AM_READ(funkybee_input_port_0_r) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")
 	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
@@ -287,6 +287,7 @@ static MACHINE_CONFIG_START( funkybee, funkybee_state )
 	MCFG_CPU_IO_MAP(io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", funkybee_state,  irq0_line_hold)
 
+	MCFG_WATCHDOG_ADD("watchdog")
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

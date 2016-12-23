@@ -58,7 +58,7 @@ static const uint16_t s_cubeIndices[36] =
 	6, 3, 7,
 };
 
-class Occlusion : public entry::AppI
+class ExampleOcclusion : public entry::AppI
 {
 	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
@@ -181,13 +181,10 @@ class Occlusion : public entry::AppI
 				float tmp[16];
 				bx::mtxMul(tmp, view, viewHead);
 
-				float proj[16];
-				bx::mtxProj(proj, hmd->eye[0].fov, 0.1f, 10000.0f);
-
-				bgfx::setViewTransform(0, tmp, proj);
+				bgfx::setViewTransform(0, tmp, hmd->eye[0].projection);
 				bgfx::setViewRect(0, 0, 0, hmd->width, hmd->height);
 
-				bgfx::setViewTransform(1, tmp, proj);
+				bgfx::setViewTransform(1, tmp, hmd->eye[1].projection);
 				bgfx::setViewRect(1, 0, 0, hmd->width, hmd->height);
 			}
 			else
@@ -282,4 +279,4 @@ class Occlusion : public entry::AppI
 	entry::WindowState m_state;
 };
 
-ENTRY_IMPLEMENT_MAIN(Occlusion);
+ENTRY_IMPLEMENT_MAIN(ExampleOcclusion);

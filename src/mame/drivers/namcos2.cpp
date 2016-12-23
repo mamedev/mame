@@ -43,7 +43,6 @@ known issues:
 
     Bubble Trouble (Golly Ghost II)
     - no artwork
-    - MCU not dumped
 
 The Namco System II board is a 5 ( only 4 are emulated ) CPU system. The
 complete system consists of two boards: CPU + GRAPHICS. It contains a large
@@ -453,7 +452,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "cpu/m6809/m6809.h"
 #include "includes/namcoic.h"
 #include "machine/nvram.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/c140.h"
 
 #include "finallap.lh"
@@ -1465,8 +1464,8 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( dirtfox )
 	PORT_START("MCUB")      /* 63B05Z0 - PORT B */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_NAME("Gear Shift Up")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Gear Shift Down")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )  PORT_NAME("Gear Shift Up")
 
 	NAMCOS2_MCU_PORT_C_DEFAULT
 
@@ -1483,9 +1482,9 @@ static INPUT_PORTS_START( dirtfox )
 	PORT_START("AN5")       /* Steering Wheel */
 	PORT_BIT( 0xff,  0x80, IPT_PADDLE ) PORT_SENSITIVITY(70) PORT_KEYDELTA(50)
 	PORT_START("AN6")       /* Brake pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(30) PORT_NAME("Brake")
 	PORT_START("AN7")       /* Accelerator pedal */
-	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15)
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0x7f) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_NAME("Accelerator")
 
 	PORT_START("MCUH")      /* 63B05Z0 - PORT H */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -1925,8 +1924,8 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_M3745X_ADC14_CALLBACKS(IOPORT("AN0"), IOPORT("AN1"), IOPORT("AN2"), IOPORT("AN3"))
 	MCFG_M3745X_ADC58_CALLBACKS(IOPORT("AN4"), IOPORT("AN5"), IOPORT("AN6"), IOPORT("AN7"))
 	MCFG_M3745X_PORT3_CALLBACKS(IOPORT("MCUH"), WRITE8(namcos2_state, c68_p3_w))    // coins/test/service
-	MCFG_M3745X_PORT5_CALLBACKS(READ8(namcos2_state, c68_p5_r), NULL) // muxed player 1/2
-	MCFG_M3745X_PORT6_CALLBACKS(IOPORT("MCUC"), NULL) // unused in sgunner2
+	MCFG_M3745X_PORT5_CALLBACKS(READ8(namcos2_state, c68_p5_r), NOOP) // muxed player 1/2
+	MCFG_M3745X_PORT6_CALLBACKS(IOPORT("MCUC"), NOOP) // unused in sgunner2
 	MCFG_CPU_PROGRAM_MAP(c68_default_am)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos2_shared_state, irq0_line_assert)    // 37450 maps INT1 to irq0 as it's the first external interrupt on that chip
 
@@ -2521,32 +2520,32 @@ ROM_END
 /* DRAGON SABER */
 ROM_START( dsaber )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "mpr0.bin",  0x000000, 0x020000, CRC(45309ddc) SHA1(53b63046b0e5178695c998a0956667f4cf4204f2) )
-	ROM_LOAD16_BYTE( "mpr1.bin",  0x000001, 0x020000, CRC(cbfc4cba) SHA1(2037119f28af2b6a4af9e2019506ad7fccfa3113) )
+	ROM_LOAD16_BYTE( "do2 mpr0.mpr0",  0x000000, 0x020000, CRC(a4c9ff34) SHA1(bf9310f1ab2f45ec01d6fa19e7d2e1d2a802dd2a) )
+	ROM_LOAD16_BYTE( "do2 mpr1.mpr1",  0x000001, 0x020000, CRC(2a89e794) SHA1(d9548e14a915b7bfab87292f03bdfd884438b49b) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0.bin",  0x000000, 0x010000, CRC(013faf80) SHA1(2cb086e9bb6a551e9fc185c40b976989f758cc57) )
-	ROM_LOAD16_BYTE( "spr1.bin",  0x000001, 0x010000, CRC(c36242bb) SHA1(776f0ab4b2798bc7fc293e27a455675c01ff3132) )
+	ROM_LOAD16_BYTE( "do1 spr0.spr0",  0x000000, 0x010000, CRC(013faf80) SHA1(2cb086e9bb6a551e9fc185c40b976989f758cc57) )
+	ROM_LOAD16_BYTE( "do1 spr1.spr1",  0x000001, 0x010000, CRC(c36242bb) SHA1(776f0ab4b2798bc7fc293e27a455675c01ff3132) )
 
 	ROM_REGION( 0x050000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x00c000, 0x004000, CRC(af5b1ff8) SHA1(fc2a104788f081e4d2ddd22c586e541d6c5b5d69) )
+	ROM_LOAD( "do1 snd0.snd0",  0x00c000, 0x004000, CRC(af5b1ff8) SHA1(fc2a104788f081e4d2ddd22c586e541d6c5b5d69) )
 	ROM_CONTINUE(          0x010000, 0x01c000 )
 	ROM_RELOAD(            0x010000, 0x020000 )
-	ROM_LOAD( "snd1.bin",  0x030000, 0x020000, CRC(c4ca6f3f) SHA1(829a053451be07b296fb4d97818d59eb1e68c807) )
+	ROM_LOAD( "do1 snd1.snd1",  0x030000, 0x020000, CRC(c4ca6f3f) SHA1(829a053451be07b296fb4d97818d59eb1e68c807) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "obj0.bin",  0x000000, 0x80000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
-	ROM_LOAD( "obj1.bin",  0x080000, 0x80000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
-	ROM_LOAD( "obj2.bin",  0x100000, 0x80000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
-	ROM_LOAD( "obj3.bin",  0x180000, 0x80000, CRC(2a60a4b8) SHA1(5923e08121ad27629bd917d890e037e888e6d356) )
+	ROM_LOAD( "do obj-0a.obj0",  0x000000, 0x80000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
+	ROM_LOAD( "do obj-1a.obj1",  0x080000, 0x80000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
+	ROM_LOAD( "do obj-2a.obj2",  0x100000, 0x80000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
+	ROM_LOAD( "do obj-3a.obj3",  0x180000, 0x80000, CRC(2a60a4b8) SHA1(5923e08121ad27629bd917d890e037e888e6d356) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	ROM_LOAD( "co1chr0.bin",  0x000000, 0x80000, CRC(c6058df6) SHA1(13bacad6d593aa5533161e410e22f351c77f29c4) )
-	ROM_LOAD( "co1chr1.bin",  0x080000, 0x80000, CRC(67aaab36) SHA1(3abb7e226badcfe016325d42c40f06ee020124e3) )
+	ROM_LOAD( "do chr-0a.chr0",  0x000000, 0x80000, CRC(c6058df6) SHA1(13bacad6d593aa5533161e410e22f351c77f29c4) )
+	ROM_LOAD( "do chr-1a.chr1",  0x080000, 0x80000, CRC(67aaab36) SHA1(3abb7e226badcfe016325d42c40f06ee020124e3) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* ROZ Tiles */
 	ROM_LOAD( "roz0.bin",  0x000000, 0x80000, CRC(32aab758) SHA1(a3220c2a02b9d8bdd95004d36d2aa5ddf57adfbb) )
@@ -2555,12 +2554,63 @@ ROM_START( dsaber )
 	ROM_LOAD( "shape.bin",  0x000000, 0x80000, CRC(698e7a3e) SHA1(4d41bf0242626ca1448d1f650c84b5987a7f6597) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(3e53331f) SHA1(3dd4c133f587361f30ab1b890f5b05749d5838e3) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(d5427f11) SHA1(af8d8153dc60044616a6b0571831c53c09fefda1) )
+	NAMCOS2_DATA_LOAD_E_128K( "do1 dat0.data0",  0x000000, CRC(3e53331f) SHA1(3dd4c133f587361f30ab1b890f5b05749d5838e3) )
+	NAMCOS2_DATA_LOAD_O_128K( "do1 dat1.data1",  0x000000, CRC(d5427f11) SHA1(af8d8153dc60044616a6b0571831c53c09fefda1) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(dadf6a57) SHA1(caba21fc6b62d140f6d8231411ce82ae0ad2837a) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(81078e01) SHA1(adc70506b21b9a12eadd2f3fd1e920c2eb27c36e) )
+	ROM_LOAD( "do voi-1a.voice1",  0x000000, 0x080000, CRC(dadf6a57) SHA1(caba21fc6b62d140f6d8231411ce82ae0ad2837a) )
+	ROM_LOAD( "do voi-2a.voice2",  0x080000, 0x080000, CRC(81078e01) SHA1(adc70506b21b9a12eadd2f3fd1e920c2eb27c36e) )
+
+	ROM_REGION( 0x0500, "plds", 0 )
+	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
+	ROM_LOAD( "pal16l8a.5f", 0x0200, 0x0104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) )
+	ROM_LOAD( "pal12l10.8d", 0x0400, 0x0040, CRC(e2379249) SHA1(ad4cdf2e0fd1304a135022eeafa2f61c5f5789cd) )
+ROM_END
+
+
+/* DRAGON SABER */
+ROM_START( dsabera )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "mpr0.bin",  0x000000, 0x020000, CRC(45309ddc) SHA1(53b63046b0e5178695c998a0956667f4cf4204f2) )
+	ROM_LOAD16_BYTE( "mpr1.bin",  0x000001, 0x020000, CRC(cbfc4cba) SHA1(2037119f28af2b6a4af9e2019506ad7fccfa3113) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "do1 spr0.spr0",  0x000000, 0x010000, CRC(013faf80) SHA1(2cb086e9bb6a551e9fc185c40b976989f758cc57) )
+	ROM_LOAD16_BYTE( "do1 spr1.spr1",  0x000001, 0x010000, CRC(c36242bb) SHA1(776f0ab4b2798bc7fc293e27a455675c01ff3132) )
+
+	ROM_REGION( 0x050000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "do1 snd0.snd0",  0x00c000, 0x004000, CRC(af5b1ff8) SHA1(fc2a104788f081e4d2ddd22c586e541d6c5b5d69) )
+	ROM_CONTINUE(          0x010000, 0x01c000 )
+	ROM_RELOAD(            0x010000, 0x020000 )
+	ROM_LOAD( "do1 snd1.snd1",  0x030000, 0x020000, CRC(c4ca6f3f) SHA1(829a053451be07b296fb4d97818d59eb1e68c807) )
+
+	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
+	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
+	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "do obj-0a.obj0",  0x000000, 0x80000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
+	ROM_LOAD( "do obj-1a.obj1",  0x080000, 0x80000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
+	ROM_LOAD( "do obj-2a.obj2",  0x100000, 0x80000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
+	ROM_LOAD( "do obj-3a.obj3",  0x180000, 0x80000, CRC(2a60a4b8) SHA1(5923e08121ad27629bd917d890e037e888e6d356) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
+	ROM_LOAD( "do chr-0a.chr0",  0x000000, 0x80000, CRC(c6058df6) SHA1(13bacad6d593aa5533161e410e22f351c77f29c4) )
+	ROM_LOAD( "do chr-1a.chr1",  0x080000, 0x80000, CRC(67aaab36) SHA1(3abb7e226badcfe016325d42c40f06ee020124e3) )
+
+	ROM_REGION( 0x400000, "gfx3", 0 ) /* ROZ Tiles */
+	ROM_LOAD( "roz0.bin",  0x000000, 0x80000, CRC(32aab758) SHA1(a3220c2a02b9d8bdd95004d36d2aa5ddf57adfbb) )
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
+	ROM_LOAD( "shape.bin",  0x000000, 0x80000, CRC(698e7a3e) SHA1(4d41bf0242626ca1448d1f650c84b5987a7f6597) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_128K( "do1 dat0.data0",  0x000000, CRC(3e53331f) SHA1(3dd4c133f587361f30ab1b890f5b05749d5838e3) )
+	NAMCOS2_DATA_LOAD_O_128K( "do1 dat1.data1",  0x000000, CRC(d5427f11) SHA1(af8d8153dc60044616a6b0571831c53c09fefda1) )
+
+	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
+	ROM_LOAD( "do voi-1a.voice1",  0x000000, 0x080000, CRC(dadf6a57) SHA1(caba21fc6b62d140f6d8231411ce82ae0ad2837a) )
+	ROM_LOAD( "do voi-2a.voice2",  0x080000, 0x080000, CRC(81078e01) SHA1(adc70506b21b9a12eadd2f3fd1e920c2eb27c36e) )
 
 	ROM_REGION( 0x0500, "plds", 0 )
 	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
@@ -2571,32 +2621,32 @@ ROM_END
 /* DRAGON SABER (JAPAN) */
 ROM_START( dsaberj )
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "do1mpr0b.bin",  0x000000, 0x020000, CRC(2898e791) SHA1(9f4fd4899897cfb7c8f918abc2070e1ac4169f5d) )
-	ROM_LOAD16_BYTE( "do1mpr1b.bin",  0x000001, 0x020000, CRC(5fa9778e) SHA1(3beeb73a42e6afdf866a88618aa03fe8934ec2aa) )
+	ROM_LOAD16_BYTE( "do1 mpr0b.mor0",  0x000000, 0x020000, CRC(2898e791) SHA1(9f4fd4899897cfb7c8f918abc2070e1ac4169f5d) )
+	ROM_LOAD16_BYTE( "do1 mpr1b.mpr1",  0x000001, 0x020000, CRC(5fa9778e) SHA1(3beeb73a42e6afdf866a88618aa03fe8934ec2aa) )
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "spr0.bin",  0x000000, 0x010000, CRC(013faf80) SHA1(2cb086e9bb6a551e9fc185c40b976989f758cc57) )
-	ROM_LOAD16_BYTE( "spr1.bin",  0x000001, 0x010000, CRC(c36242bb) SHA1(776f0ab4b2798bc7fc293e27a455675c01ff3132) )
+	ROM_LOAD16_BYTE( "do1 spr0.spr0",  0x000000, 0x010000, CRC(013faf80) SHA1(2cb086e9bb6a551e9fc185c40b976989f758cc57) )
+	ROM_LOAD16_BYTE( "do1 spr1.spr1",  0x000001, 0x010000, CRC(c36242bb) SHA1(776f0ab4b2798bc7fc293e27a455675c01ff3132) )
 
 	ROM_REGION( 0x050000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "snd0.bin",  0x00c000, 0x004000, CRC(af5b1ff8) SHA1(fc2a104788f081e4d2ddd22c586e541d6c5b5d69) )
+	ROM_LOAD( "do1 snd0.snd0",  0x00c000, 0x004000, CRC(af5b1ff8) SHA1(fc2a104788f081e4d2ddd22c586e541d6c5b5d69) )
 	ROM_CONTINUE(          0x010000, 0x01c000 )
 	ROM_RELOAD(            0x010000, 0x020000 )
-	ROM_LOAD( "snd1.bin",  0x030000, 0x020000, CRC(c4ca6f3f) SHA1(829a053451be07b296fb4d97818d59eb1e68c807) )
+	ROM_LOAD( "do1 snd1.snd1",  0x030000, 0x020000, CRC(c4ca6f3f) SHA1(829a053451be07b296fb4d97818d59eb1e68c807) )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2c65c.bin",  0x008000, 0x008000, CRC(a5b2a4ff) SHA1(068bdfcc71a5e83706e8b23330691973c1c214dc) )
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "obj0.bin",  0x000000, 0x80000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
-	ROM_LOAD( "obj1.bin",  0x080000, 0x80000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
-	ROM_LOAD( "obj2.bin",  0x100000, 0x80000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
-	ROM_LOAD( "obj3.bin",  0x180000, 0x80000, CRC(2a60a4b8) SHA1(5923e08121ad27629bd917d890e037e888e6d356) )
+	ROM_LOAD( "do obj-0a.obj0",  0x000000, 0x80000, CRC(f08c6648) SHA1(ac5221ba159f2390060cbbb7d9cd8148c7bb4a02) )
+	ROM_LOAD( "do obj-1a.obj1",  0x080000, 0x80000, CRC(34e0810d) SHA1(679d9b82879cff5197a5098e5dc724c85373b9dc) )
+	ROM_LOAD( "do obj-2a.obj2",  0x100000, 0x80000, CRC(bccdabf3) SHA1(d079d89083ac6e71ac8926792d0d7cdcebc848a9) )
+	ROM_LOAD( "do obj-3a.obj3",  0x180000, 0x80000, CRC(2a60a4b8) SHA1(5923e08121ad27629bd917d890e037e888e6d356) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* Tiles */
-	ROM_LOAD( "co1chr0.bin",  0x000000, 0x80000, CRC(c6058df6) SHA1(13bacad6d593aa5533161e410e22f351c77f29c4) )
-	ROM_LOAD( "co1chr1.bin",  0x080000, 0x80000, CRC(67aaab36) SHA1(3abb7e226badcfe016325d42c40f06ee020124e3) )
+	ROM_LOAD( "do chr-0a.chr0",  0x000000, 0x80000, CRC(c6058df6) SHA1(13bacad6d593aa5533161e410e22f351c77f29c4) )
+	ROM_LOAD( "do chr-1a.chr1",  0x080000, 0x80000, CRC(67aaab36) SHA1(3abb7e226badcfe016325d42c40f06ee020124e3) )
 
 	ROM_REGION( 0x400000, "gfx3", 0 ) /* ROZ Tiles */
 	ROM_LOAD( "roz0.bin",  0x000000, 0x80000, CRC(32aab758) SHA1(a3220c2a02b9d8bdd95004d36d2aa5ddf57adfbb) )
@@ -2605,12 +2655,17 @@ ROM_START( dsaberj )
 	ROM_LOAD( "shape.bin",  0x000000, 0x80000, CRC(698e7a3e) SHA1(4d41bf0242626ca1448d1f650c84b5987a7f6597) )
 
 	ROM_REGION16_BE( 0x200000, "data_rom", 0 ) /* Shared data roms */
-	NAMCOS2_DATA_LOAD_E_128K( "data0.bin",  0x000000, CRC(3e53331f) SHA1(3dd4c133f587361f30ab1b890f5b05749d5838e3) )
-	NAMCOS2_DATA_LOAD_O_128K( "data1.bin",  0x000000, CRC(d5427f11) SHA1(af8d8153dc60044616a6b0571831c53c09fefda1) )
+	NAMCOS2_DATA_LOAD_E_128K( "do1 dat0.data0",  0x000000, CRC(3e53331f) SHA1(3dd4c133f587361f30ab1b890f5b05749d5838e3) )
+	NAMCOS2_DATA_LOAD_O_128K( "do1 dat1.data1",  0x000000, CRC(d5427f11) SHA1(af8d8153dc60044616a6b0571831c53c09fefda1) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "voi1.bin",  0x000000, 0x080000, CRC(dadf6a57) SHA1(caba21fc6b62d140f6d8231411ce82ae0ad2837a) )
-	ROM_LOAD( "voi2.bin",  0x080000, 0x080000, CRC(81078e01) SHA1(adc70506b21b9a12eadd2f3fd1e920c2eb27c36e) )
+	ROM_LOAD( "do voi-1a.voice1",  0x000000, 0x080000, CRC(dadf6a57) SHA1(caba21fc6b62d140f6d8231411ce82ae0ad2837a) )
+	ROM_LOAD( "do voi-2a.voice2",  0x080000, 0x080000, CRC(81078e01) SHA1(adc70506b21b9a12eadd2f3fd1e920c2eb27c36e) )
+
+	ROM_REGION( 0x0500, "plds", 0 )
+	ROM_LOAD( "pal16l8a.4g", 0x0000, 0x0104, CRC(660e1655) SHA1(ffb43238c5ffa3fa831975bc3cde72334c4c2540) )
+	ROM_LOAD( "pal16l8a.5f", 0x0200, 0x0104, CRC(18f43c22) SHA1(72849c5b842678bb9037541d26d4c99cdf879982) )
+	ROM_LOAD( "pal12l10.8d", 0x0400, 0x0040, CRC(e2379249) SHA1(ad4cdf2e0fd1304a135022eeafa2f61c5f5789cd) )
 ROM_END
 
 /* FINAL LAP (REV E) */
@@ -3598,8 +3653,9 @@ ROM_START( marvland )
 	ROM_LOAD16_BYTE( "mv2_spr0",  0x000000, 0x010000, CRC(aa418f29) SHA1(413798d9c1d98cfcadb045a5436aaee61ce6718f) )
 	ROM_LOAD16_BYTE( "mv2_spr1",  0x000001, 0x010000, CRC(dbd94def) SHA1(56a8d7acd483bc4d12c8bc5b7e90ffdb132be670) )
 
+	// This needs re-dumping, sound is very poor in this version and doesn't match Japanese version or any of the ports.  High res photos of PCB required too.
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
+	ROM_LOAD( "mv2_snd0",  0x00c000, 0x004000, BAD_DUMP CRC(a5b99162) SHA1(cafe8d1dae1e981c7ff9b70076b3e1d52cd806f7) )
 	ROM_CONTINUE(          0x010000, 0x01c000 )
 	ROM_RELOAD(            0x010000, 0x020000 )
 
@@ -5035,50 +5091,99 @@ ROM_START( gollygho )
 	ROM_LOAD( "gollygho.nv",  0x000000, 0x2000, CRC(b7e67b9d) SHA1(bb6e2d2cac1a2f3c26fa1327db0eb53b521005a3) )
 ROM_END
 
-/* BUBBLE TROUBLE */
-ROM_START( bubbletr )
+/* BUBBLE TROUBLE (World) */
+ROM_START( bubbletr ) /* All labels were hand written and included the rom size, checksum & date. All roms had the rev "A" added */
 	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
-	ROM_LOAD16_BYTE( "bt1-mpr0c.bin",   0x000000, 0x020000, CRC(64eb3496) SHA1(30cdc116e350270f0303e5d9dddf6c3c8bccbc04) )
-	ROM_LOAD16_BYTE( "bt1-mpr1c.bin",   0x000001, 0x020000, CRC(26785bce) SHA1(ce83a3f2a8adc1a9c3fd9e677565a649a8168801) )
+	ROM_LOAD16_BYTE( "bt2-mpr0b.bin",   0x000000, 0x020000, CRC(26fbfce3) SHA1(532a8bc7f961ddb0ba2af5a6912a4898f84b144d) ) /* dated 6/9 */
+	ROM_LOAD16_BYTE( "bt2-mpr1b.bin",   0x000001, 0x020000, CRC(21f42ab2) SHA1(c563ff6b81d036c9044125c45b1cf4da0f5495d9) ) /* dated 6/9 */
 
 	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
-	ROM_LOAD16_BYTE( "bt1-spr0.bin",    0x000000, 0x010000, CRC(b507b00a) SHA1(e7dcb36accf91e8b5b5321e65e6fd6bca7c6dce2) )
-	ROM_LOAD16_BYTE( "bt1-spr1.bin",    0x000001, 0x010000, CRC(4f35540f) SHA1(519510de81e566ed74b80987860778201f6ac785) )
+	ROM_LOAD16_BYTE( "bt1-spr0.11k",    0x000000, 0x010000, CRC(b507b00a) SHA1(e7dcb36accf91e8b5b5321e65e6fd6bca7c6dce2) ) /* dated 6/8 */
+	ROM_LOAD16_BYTE( "bt1-spr1.13k",    0x000001, 0x010000, CRC(4f35540f) SHA1(519510de81e566ed74b80987860778201f6ac785) ) /* dated 6/8 */
 
 	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
-	ROM_LOAD( "bt1-snd0.bin",  0x00c000, 0x004000, CRC(46a5c625) SHA1(ccc7098f76a0bc39c9fe578d575e6002eca172b5) )
-	ROM_CONTINUE(              0x010000, 0x01c000 )
-	ROM_RELOAD(                0x010000, 0x020000 )
+	ROM_LOAD( "bt1-snd0.7j",  0x00c000, 0x004000, CRC(46a5c625) SHA1(ccc7098f76a0bc39c9fe578d575e6002eca172b5) ) /* dated 6/8 */
+	ROM_CONTINUE(             0x010000, 0x01c000 )
+	ROM_RELOAD(               0x010000, 0x020000 )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
-	/* note, these weren't present in this set, taken from golly ghost and may be wrong for bubble trouble */
 	ROM_LOAD( "sys2mcpu.bin", 0x0000, 0x2000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
-	ROM_LOAD( "gl1edr0c.ic7", 0x8000, 0x8000, BAD_DUMP CRC(db60886f) SHA1(a1183c058c0470a4ef8b0f69a3637b1640c5b5a4) )
+	ROM_LOAD( "bt1edr0a.ic7", 0x8000, 0x8000, CRC(155b02fc) SHA1(191683c19f756ac150b8e037f46a6daca1a082fa) ) /* dated 4/24 */
 
 	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "bt1-obj0.bin",  0x000000, 0x80000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) )
-	ROM_LOAD( "bt1-obj1.bin",  0x080000, 0x80000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) )
-	ROM_LOAD( "bt1-obj2.bin",  0x100000, 0x80000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) )
-	ROM_LOAD( "bt1-obj3.bin",  0x180000, 0x80000, CRC(7fb23c05) SHA1(da97c595a3338021c1bc46f9668e1ec6c7985cea) )
+	ROM_LOAD( "bt1-obj0.5b",  0x000000, 0x80000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) ) /* dated 4/24 */
+	ROM_LOAD( "bt1-obj1.4b",  0x080000, 0x80000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) ) /* dated 4/24 */
+	ROM_LOAD( "bt1-obj2.5d",  0x100000, 0x80000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) ) /* dated 4/24 */
+	ROM_LOAD( "bt1-obj3.4d",  0x180000, 0x80000, CRC(7fb23c05) SHA1(da97c595a3338021c1bc46f9668e1ec6c7985cea) ) /* dated 4/24 */
 
 	ROM_REGION( 0x200000, "gfx2", 0 ) /* Tiles */
-	ROM_LOAD( "bt1-chr0.bin",  0x00000, 0x80000,  CRC(11574c30) SHA1(6e85dd1448961b89a13e8cf905b24a69d182edd8) )
+	ROM_LOAD( "bt1-chr0.11n",  0x00000, 0x80000,  CRC(11574c30) SHA1(6e85dd1448961b89a13e8cf905b24a69d182edd8) ) /* dated 4/24 */
 	/* no chr1, chr2 missing or just not needed? probably just not needed as I see no tile glitches */
 
 	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASEFF ) /* ROZ Tiles */
 	/* All ROZ ROM sockets unpopulated on PCB */
 
 	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
-	ROM_LOAD( "bt1-sha0.bin",   0x000000, 0x80000, CRC(dc4664df) SHA1(59818b14e74ee9b15a66e850658e4697d78b28d9) )
+	ROM_LOAD( "bt1-sha0.7n",   0x000000, 0x80000, CRC(dc4664df) SHA1(59818b14e74ee9b15a66e850658e4697d78b28d9) ) /* dated 4/24 */
 
 	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
-	/* All DAT ROM sockets unpopulated on PCB */
+	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) ) /* dated 4/24 */
+	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) ) /* dated 4/24 */
 
 	ROM_REGION16_BE( 0x2000, "user2", 0 ) /* sprite zoom */
-	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) ) // not in this set..
+	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
 
 	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
-	ROM_LOAD( "bt1-voi1.bin",  0x000000, 0x080000,  CRC(08b3a089) SHA1(5023c2c0d0a94f0a2f98605d9b93d2d6ce626aa8) )
+	ROM_LOAD( "bt1-voi1.3m",  0x000000, 0x080000,  CRC(08b3a089) SHA1(5023c2c0d0a94f0a2f98605d9b93d2d6ce626aa8) ) /* dated 6/8 */
+
+	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
+	ROM_LOAD( "bubbletr.nv",  0x000000, 0x2000, CRC(75ace624) SHA1(1acd2af0c825e50c542db975e1fbda8cbb009f1d) )
+ROM_END
+
+/* BUBBLE TROUBLE (Japan) */
+ROM_START( bubbletrj )
+	ROM_REGION( 0x040000, "maincpu", 0 ) /* Master CPU */
+	ROM_LOAD16_BYTE( "bt1-mpr0c.11d",   0x000000, 0x020000, CRC(64eb3496) SHA1(30cdc116e350270f0303e5d9dddf6c3c8bccbc04) )
+	ROM_LOAD16_BYTE( "bt1-mpr1c.13d",   0x000001, 0x020000, CRC(26785bce) SHA1(ce83a3f2a8adc1a9c3fd9e677565a649a8168801) )
+
+	ROM_REGION( 0x040000, "slave", 0 ) /* Slave CPU */
+	ROM_LOAD16_BYTE( "bt1-spr0.11k",    0x000000, 0x010000, CRC(b507b00a) SHA1(e7dcb36accf91e8b5b5321e65e6fd6bca7c6dce2) )
+	ROM_LOAD16_BYTE( "bt1-spr1.13k",    0x000001, 0x010000, CRC(4f35540f) SHA1(519510de81e566ed74b80987860778201f6ac785) )
+
+	ROM_REGION( 0x030000, "audiocpu", 0 ) /* Sound CPU (Banked) */
+	ROM_LOAD( "bt1-snd0.7j",  0x00c000, 0x004000, CRC(46a5c625) SHA1(ccc7098f76a0bc39c9fe578d575e6002eca172b5) )
+	ROM_CONTINUE(             0x010000, 0x01c000 )
+	ROM_RELOAD(               0x010000, 0x020000 )
+
+	ROM_REGION( 0x010000, "mcu", 0 ) /* I/O MCU */
+	ROM_LOAD( "sys2mcpu.bin", 0x0000, 0x2000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
+	ROM_LOAD( "bt1edr0a.ic7", 0x8000, 0x8000, CRC(155b02fc) SHA1(191683c19f756ac150b8e037f46a6daca1a082fa) )
+
+	ROM_REGION( 0x400000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "bt1-obj0.5b",  0x000000, 0x80000, CRC(16b5dc04) SHA1(57cc4b7907442f922102fbd61e470c149f0379ac) )
+	ROM_LOAD( "bt1-obj1.4b",  0x080000, 0x80000, CRC(ae37a969) SHA1(524a8ef68a62f9168d356e6cd37a72a888ced202) )
+	ROM_LOAD( "bt1-obj2.5d",  0x100000, 0x80000, CRC(75f74871) SHA1(75c47a2132e21a2d82000bca137929bffecc96ef) )
+	ROM_LOAD( "bt1-obj3.4d",  0x180000, 0x80000, CRC(7fb23c05) SHA1(da97c595a3338021c1bc46f9668e1ec6c7985cea) )
+
+	ROM_REGION( 0x200000, "gfx2", 0 ) /* Tiles */
+	ROM_LOAD( "bt1-chr0.11n",  0x00000, 0x80000,  CRC(11574c30) SHA1(6e85dd1448961b89a13e8cf905b24a69d182edd8) )
+	/* no chr1, chr2 missing or just not needed? probably just not needed as I see no tile glitches */
+
+	ROM_REGION( 0x400000, "gfx3", ROMREGION_ERASEFF ) /* ROZ Tiles */
+	/* All ROZ ROM sockets unpopulated on PCB */
+
+	ROM_REGION( 0x080000, "gfx4", 0 ) /* Mask shape */
+	ROM_LOAD( "bt1-sha0.7n",   0x000000, 0x80000, CRC(dc4664df) SHA1(59818b14e74ee9b15a66e850658e4697d78b28d9) )
+
+	ROM_REGION16_BE( 0x200000, "data_rom", ROMREGION_ERASEFF ) /* Shared data roms */
+	NAMCOS2_DATA_LOAD_E_128K( "bt1_dat0.13s",   0x000000, CRC(1001a14e) SHA1(7017a33f0447fb6013d4e246dcdfcd064af87812) )
+	NAMCOS2_DATA_LOAD_O_128K( "bt1_dat1.13p",   0x000000, CRC(7de6a839) SHA1(e6a3fd5b789dc061ec504570984cf61a6af7818f) )
+
+	ROM_REGION16_BE( 0x2000, "user2", 0 ) /* sprite zoom */
+	ROM_LOAD( "04544191.6n",  0x000000, 0x002000, CRC(90db1bf6) SHA1(dbb9e50a8efc3b4012fcf587cc87da9ef42a1b80) )
+
+	ROM_REGION( 0x100000, "c140", 0 ) /* Sound voices */
+	ROM_LOAD( "bt1-voi1.3m",  0x000000, 0x080000,  CRC(08b3a089) SHA1(5023c2c0d0a94f0a2f98605d9b93d2d6ce626aa8) )
 
 	ROM_REGION( 0x2000, "nvram", 0 ) /* default settings, including calibration */
 	ROM_LOAD( "bubbletr.nv",  0x000000, 0x2000, CRC(75ace624) SHA1(1acd2af0c825e50c542db975e1fbda8cbb009f1d) )
@@ -5422,14 +5527,14 @@ DRIVER_INIT_MEMBER(namcos2_state,marvland)
 DRIVER_INIT_MEMBER(namcos2_state,metlhawk)
 {
 	/* unscramble sprites */
-	UINT8 *data = memregion("gfx1")->base();
+	uint8_t *data = memregion("gfx1")->base();
 	for (int i=0; i<0x200000; i+=32*32)
 	{
 		for (int j=0; j<32*32; j+=32*4)
 		{
 			for (int k=0; k<32; k+=4)
 			{
-				UINT8 v;
+				uint8_t v;
 				int a;
 
 				a = i+j+k+32;
@@ -5558,7 +5663,7 @@ DRIVER_INIT_MEMBER(namcos2_state,bubbletr)
 
 DRIVER_INIT_MEMBER(namcos2_state,luckywld)
 {
-	UINT8 *pData = (UINT8 *)memregion( "gfx5" )->base();
+	uint8_t *pData = (uint8_t *)memregion( "gfx5" )->base();
 	int i;
 	for( i=0; i<32*0x4000; i++ )
 	{ /* unscramble gfx mask */
@@ -5614,13 +5719,14 @@ GAME( 1989, finehour,   0,        default2, default,  namcos2_state, finehour, R
 GAME( 1989, burnforc,   0,        default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, new version (Rev C))", 0 )
 GAME( 1989, burnforco,  burnforc, default3, default,  namcos2_state, burnforc, ROT0,   "Namco", "Burning Force (Japan, old version)", 0 )
 
-GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", 0 )
+GAME( 1989, marvland,   0,        default,  default,  namcos2_state, marvland, ROT0,   "Namco", "Marvel Land (US)", MACHINE_IMPERFECT_SOUND )
 GAME( 1989, marvlandj,  marvland, default,  default,  namcos2_state, marvlanj, ROT0,   "Namco", "Marvel Land (Japan)", 0 )
 
 GAME( 1990, kyukaidk,   0,        default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, new version (Rev B))", 0 )
 GAME( 1990, kyukaidko,  kyukaidk, default,  kyukaidk, namcos2_state, kyukaidk, ROT0,   "Namco", "Kyuukai Douchuuki (Japan, old version)", 0 )
 
-GAME( 1990, dsaber,     0,        default3, default,  namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber", 0 )
+GAME( 1990, dsaber,     0,        default3, default,  namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, DO2)", 0 )
+GAME( 1990, dsabera,    dsaber,   default3, default,  namcos2_state, dsaber,   ROT90,  "Namco", "Dragon Saber (World, older?)", 0 )
 GAME( 1990, dsaberj,    dsaber,   default3, default,  namcos2_state, dsaberj,  ROT90,  "Namco", "Dragon Saber (Japan, Rev B)", 0 )
 
 GAMEL(1990, finalap2,   0,        finallap, finallap, namcos2_state, finalap2, ROT0,   "Namco", "Final Lap 2", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_finallap )
@@ -5640,7 +5746,8 @@ GAME( 1991, sgunner2j,  sgunner2, sgunner2, sgunner2, namcos2_state, sgunner2, R
 GAME( 1991, cosmogng,   0,        default,  default,  namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (US)", 0 )
 GAME( 1991, cosmogngj,  cosmogng, default,  default,  namcos2_state, cosmogng, ROT90,  "Namco", "Cosmo Gang the Video (Japan)", 0 )
 
-GAME( 1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
+GAME( 1992, bubbletr,   0,        gollygho, bubbletr, namcos2_state, bubbletr, ROT180, "Namco", "Bubble Trouble (World, Rev B)", MACHINE_REQUIRES_ARTWORK )
+GAME( 1992, bubbletrj,  bubbletr, gollygho, bubbletr, namcos2_state, bubbletr, ROT180, "Namco", "Bubble Trouble (Japan, Rev C)", MACHINE_REQUIRES_ARTWORK )
 
 GAMEL(1992, finalap3,   0,        finallap, finalap3, namcos2_state, finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 1)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_finallap )
 GAMEL(1992, finalap3a,  finalap3, finallap, finalap3, namcos2_state, finalap3, ROT0,   "Namco", "Final Lap 3 (World, set 2)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND, layout_finallap )

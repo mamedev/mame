@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:R. Belmont
+// copyright-holders:R. Belmont, superctr
 #pragma once
 
 #ifndef __C352_H__
@@ -24,11 +24,11 @@
 
 class c352_device : public device_t,
 					public device_sound_interface,
-					public device_memory_interface
+					public device_rom_interface
 {
 public:
 	// construction/destruction
-	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	c352_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	// inline configuration helpers
 	static void static_set_divider(device_t &device, int setting);
@@ -42,14 +42,13 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
+	virtual void device_clock_changed() override;
 
 	// device_sound_interface overrides
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config(address_spacenum spacenum = AS_0) const override;
-
-	const address_space_config  m_space_config;
+	// device_rom_interface overrides
+	virtual void rom_bank_updated() override;
 
 private:
 	enum {
@@ -72,44 +71,37 @@ private:
 		C352_FLG_REVERSE    = 0x0001    // play sample backwards
 	};
 
-	struct c352_ch_t
-	{
-		UINT8   vol_l;
-		UINT8   vol_r;
-		UINT8   vol_l2;
-		UINT8   vol_r2;
-		UINT8   bank;
-		INT16   noise;
-		INT16   noisebuf;
-		UINT16  noisecnt;
-		UINT16  pitch;
-		UINT16  start_addr;
-		UINT16  end_addr;
-		UINT16  repeat_addr;
-		UINT32  flag;
+	struct c352_voice_t {
 
-		UINT16  start;
-		UINT16  repeat;
-		UINT32  current_addr;
-		UINT32  pos;
+		uint32_t pos;
+		uint32_t counter;
+
+		int16_t sample;
+		int16_t last_sample;
+
+		uint16_t vol_f;
+		uint16_t vol_r;
+		uint16_t freq;
+		uint16_t flags;
+
+		uint16_t  wave_bank;
+		uint16_t wave_start;
+		uint16_t wave_end;
+		uint16_t wave_loop;
+
 	};
 
-	c352_ch_t m_c352_ch[32];
 	int m_sample_rate_base;
 	int m_divider;
 
-	long m_channel_l[2048*2];
-	long m_channel_r[2048*2];
-	long m_channel_l2[2048*2];
-	long m_channel_r2[2048*2];
+	c352_voice_t m_c352_v[32];
+	int16_t m_mulaw_table[256];
 
-	short m_mulaw_table[256];
-	unsigned int m_mseq_reg;
-	direct_read_data *m_direct;
+	uint16_t m_random;
+	uint16_t m_control; // control flags, purpose unknown.
 
-	// private functions
-	int get_mseq_bit(void);
-	void mix_one_channel(unsigned long ch, long sample_count);
+	void fetch_sample(c352_voice_t* v);
+
 	unsigned short read_reg16(unsigned long address);
 	void write_reg16(unsigned long address, unsigned short val);
 };

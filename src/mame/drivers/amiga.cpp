@@ -50,7 +50,7 @@ protected:
 private:
 	required_device<address_map_bank_device> m_bootrom;
 	required_memory_bank m_wom;
-	std::vector<UINT16> m_wom_ram;
+	std::vector<uint16_t> m_wom_ram;
 };
 
 class a2000_state : public amiga_state
@@ -102,6 +102,9 @@ public:
 
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
+
+	DECLARE_WRITE_LINE_MEMBER( side_int2_w );
+	DECLARE_WRITE_LINE_MEMBER( side_int6_w );
 
 protected:
 	virtual void machine_reset() override;
@@ -234,7 +237,7 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
-	static const UINT8 GAYLE_ID = 0xd0;
+	static const uint8_t GAYLE_ID = 0xd0;
 
 protected:
 	virtual bool int2_pending() override;
@@ -256,7 +259,7 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
-	static const UINT8 GAYLE_ID = 0xd1;
+	static const uint8_t GAYLE_ID = 0xd1;
 
 protected:
 	virtual bool int2_pending() override;
@@ -306,12 +309,14 @@ class cd32_state : public amiga_state
 public:
 	cd32_state(const machine_config &mconfig, device_type type, const char *tag) :
 	amiga_state(mconfig, type, tag),
-	m_p1_port(*this, "p1_cd32_buttons"),
-	m_p2_port(*this, "p2_cd32_buttons"),
+	m_player_ports(*this, {"p1_cd32_buttons", "p2_cd32_buttons"}),
 	m_cdda(*this, "cdda")
 	{ }
 
 	DECLARE_WRITE8_MEMBER( akiko_cia_0_port_a_write );
+
+	void handle_joystick_cia(uint8_t pra, uint8_t dra);
+	uint16_t handle_joystick_potgor(uint16_t potgor);
 
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_input );
 	DECLARE_CUSTOM_INPUT_MEMBER( cd32_sel_mirror_input );
@@ -319,16 +324,15 @@ public:
 	DECLARE_DRIVER_INIT( pal );
 	DECLARE_DRIVER_INIT( ntsc );
 
-	required_ioport m_p1_port;
-	required_ioport m_p2_port;
+	required_ioport_array<2> m_player_ports;
 
 	int m_oldstate[2];
 	int m_cd32_shifter[2];
-	UINT16 m_potgo_value;
+	uint16_t m_potgo_value;
 
 protected:
 	// amiga_state overrides
-	virtual void potgo_w(UINT16 data) override;
+	virtual void potgo_w(uint16_t data) override;
 
 private:
 	required_device<cdda_device> m_cdda;
@@ -616,6 +620,18 @@ void a500_state::machine_reset()
 	m_side->reset();
 }
 
+WRITE_LINE_MEMBER( a500_state::side_int2_w )
+{
+	m_side_int2 = state;
+	update_int2();
+}
+
+WRITE_LINE_MEMBER( a500_state::side_int6_w )
+{
+	m_side_int6 = state;
+	update_int6();
+}
+
 bool a500_state::int2_pending()
 {
 	return m_cia_0_irq || m_side_int2;
@@ -648,7 +664,7 @@ bool cdtv_state::int6_pending()
 
 READ32_MEMBER( a3000_state::scsi_r )
 {
-	UINT32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -660,7 +676,7 @@ WRITE32_MEMBER( a3000_state::scsi_w )
 
 READ32_MEMBER( a3000_state::motherboard_r )
 {
-	UINT32 data = 0xffffffff;
+	uint32_t data = 0xffffffff;
 	logerror("motherboard_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -713,7 +729,7 @@ WRITE_LINE_MEMBER( a1200_state::gayle_int2_w )
 
 READ32_MEMBER( a4000_state::scsi_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 	logerror("scsi_r(%06x): %08x & %08x\n", offset, data, mem_mask);
 	return data;
 }
@@ -725,7 +741,7 @@ WRITE32_MEMBER( a4000_state::scsi_w )
 
 READ16_MEMBER( a4000_state::ide_r )
 {
-	UINT16 data = 0xffff;
+	uint16_t data = 0xffff;
 
 	// ide interrupt register
 	if (offset == 0x1010)
@@ -770,7 +786,7 @@ WRITE_LINE_MEMBER( a4000_state::ide_interrupt_w )
 
 READ32_MEMBER( a4000_state::motherboard_r )
 {
-	UINT32 data = 0;
+	uint32_t data = 0;
 
 	if (offset == 0)
 	{
@@ -808,7 +824,7 @@ WRITE32_MEMBER( a4000_state::motherboard_w )
 	logerror("motherboard_w(%06x): %08x & %08x\n", offset, data, mem_mask);
 }
 
-void cd32_state::potgo_w(UINT16 data)
+void cd32_state::potgo_w(uint16_t data)
 {
 	int i;
 
@@ -817,75 +833,68 @@ void cd32_state::potgo_w(UINT16 data)
 
 	for (i = 0; i < 8; i += 2)
 	{
-		UINT16 dir = 0x0200 << i;
+		uint16_t dir = 0x0200 << i;
 		if (data & dir)
 		{
-			UINT16 d = 0x0100 << i;
+			uint16_t d = 0x0100 << i;
 			m_potgo_value &= ~d;
 			m_potgo_value |= data & d;
 		}
 	}
 	for (i = 0; i < 2; i++)
 	{
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
 			m_cd32_shifter[i] = 8;
 	}
 }
 
-static void handle_cd32_joystick_cia(running_machine &machine, UINT8 pra, UINT8 dra)
+void cd32_state::handle_joystick_cia(uint8_t pra, uint8_t dra)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT8 but = 0x40 << i;
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint8_t but = 0x40 << i;
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
-		if (!(state->m_potgo_value & p5dir) || !(state->m_potgo_value & p5dat))
+		if (!(m_potgo_value & p5dir) || !(m_potgo_value & p5dat))
 		{
-			if ((dra & but) && (pra & but) != state->m_oldstate[i])
+			if ((dra & but) && (pra & but) != m_oldstate[i])
 			{
 				if (!(pra & but))
 				{
-					state->m_cd32_shifter[i]--;
-					if (state->m_cd32_shifter[i] < 0)
-						state->m_cd32_shifter[i] = 0;
+					m_cd32_shifter[i]--;
+					if (m_cd32_shifter[i] < 0)
+						m_cd32_shifter[i] = 0;
 				}
 			}
 		}
-		state->m_oldstate[i] = pra & but;
+		m_oldstate[i] = pra & but;
 	}
 }
 
-static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
+uint16_t cd32_state::handle_joystick_potgor(uint16_t potgor)
 {
-	cd32_state *state = machine.driver_data<cd32_state>();
-	ioport_port * player_portname[] = { state->m_p1_port, state->m_p2_port };
-	int i;
-
-	for (i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
-		UINT16 p9dir = 0x0800 << (i * 4); /* output enable P9 */
-		UINT16 p9dat = 0x0400 << (i * 4); /* data P9 */
-		UINT16 p5dir = 0x0200 << (i * 4); /* output enable P5 */
-		UINT16 p5dat = 0x0100 << (i * 4); /* data P5 */
+		uint16_t p9dir = 0x0800 << (i * 4); /* output enable P9 */
+		uint16_t p9dat = 0x0400 << (i * 4); /* data P9 */
+		uint16_t p5dir = 0x0200 << (i * 4); /* output enable P5 */
+		uint16_t p5dat = 0x0100 << (i * 4); /* data P5 */
 
 		/* p5 is floating in input-mode */
 		potgor &= ~p5dat;
-		potgor |= state->m_potgo_value & p5dat;
-		if (!(state->m_potgo_value & p9dir))
+		potgor |= m_potgo_value & p5dat;
+		if (!(m_potgo_value & p9dir))
 			potgor |= p9dat;
 		/* P5 output and 1 -> shift register is kept reset (Blue button) */
-		if ((state->m_potgo_value & p5dir) && (state->m_potgo_value & p5dat))
-			state->m_cd32_shifter[i] = 8;
+		if ((m_potgo_value & p5dir) && (m_potgo_value & p5dat))
+			m_cd32_shifter[i] = 8;
 		/* shift at 1 == return one, >1 = return button states */
-		if (state->m_cd32_shifter[i] == 0)
+		if (m_cd32_shifter[i] == 0)
 			potgor &= ~p9dat; /* shift at zero == return zero */
-		if (state->m_cd32_shifter[i] >= 2 && ((player_portname[i])->read() & (1 << (state->m_cd32_shifter[i] - 2))))
+		if (m_cd32_shifter[i] >= 2 && ((m_player_ports[i])->read() & (1 << (m_cd32_shifter[i] - 2))))
 			potgor &= ~p9dat;
 	}
 	return potgor;
@@ -893,13 +902,12 @@ static UINT16 handle_joystick_potgor(running_machine &machine, UINT16 potgor)
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_input )
 {
-	return handle_joystick_potgor(machine(), m_potgo_value) >> 8;
+	return handle_joystick_potgor(m_potgo_value) >> 8;
 }
 
 CUSTOM_INPUT_MEMBER( cd32_state::cd32_sel_mirror_input )
 {
-	ioport_port* ports[2]= { m_p1_port, m_p2_port };
-	UINT8 bits = ports[(int)(FPTR)param]->read();
+	uint8_t bits = m_player_ports[(int)(uintptr_t)param]->read();
 	return (bits & 0x20)>>5;
 }
 
@@ -911,7 +919,7 @@ WRITE8_MEMBER( cd32_state::akiko_cia_0_port_a_write )
 	// bit 1, power led
 	output().set_led_value(0, BIT(data, 1) ? 0 : 1);
 
-	handle_cd32_joystick_cia(machine(), data, m_cia_0->read(space, 2));
+	handle_joystick_cia(data, m_cia_0->read(space, 2));
 }
 
 
@@ -1457,6 +1465,8 @@ static MACHINE_CONFIG_DERIVED_CLASS( a500, amiga_base, a500_state )
 
 	// cpu slot
 	MCFG_EXPANSION_SLOT_ADD("maincpu", a500_expansion_cards, nullptr)
+	MCFG_EXPANSION_SLOT_INT2_HANDLER(WRITELINE(a500_state, side_int2_w))
+	MCFG_EXPANSION_SLOT_INT6_HANDLER(WRITELINE(a500_state, side_int6_w))
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED_CLASS( a500n, a500, a500_state )
@@ -1813,7 +1823,7 @@ static MACHINE_CONFIG_DERIVED_CLASS( cd32, amiga_base, cd32_state )
 
 	MCFG_DEVICE_MODIFY("cia_0")
 	MCFG_MOS6526_PA_OUTPUT_CALLBACK(WRITE8(cd32_state, akiko_cia_0_port_a_write))
-	MCFG_MOS6526_SP_CALLBACK(NULL)
+	MCFG_MOS6526_SP_CALLBACK(NOOP)
 
 	MCFG_CDROM_ADD("cdrom")
 	MCFG_CDROM_INTERFACE("cd32_cdrom")

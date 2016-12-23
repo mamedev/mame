@@ -68,7 +68,7 @@ class ins8154_device :  public device_t
 {
 public:
 	// construction/destruction
-	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	ins8154_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_in_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_in_a_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_out_a_callback(device_t &device, _Object object) { return downcast<ins8154_device &>(device).m_out_a_cb.set_callback(object); }
@@ -99,13 +99,13 @@ private:
 	devcb_write_line    m_out_irq_cb;
 
 	/* registers */
-	UINT8 m_in_a;  /* Input Latch Port A */
-	UINT8 m_in_b;  /* Input Latch Port B */
-	UINT8 m_out_a; /* Output Latch Port A */
-	UINT8 m_out_b; /* Output Latch Port B */
-	UINT8 m_mdr;   /* Mode Definition Register */
-	UINT8 m_odra;  /* Output Definition Register Port A */
-	UINT8 m_odrb;  /* Output Definition Register Port B */
+	uint8_t m_in_a;  /* Input Latch Port A */
+	uint8_t m_in_b;  /* Input Latch Port B */
+	uint8_t m_out_a; /* Output Latch Port A */
+	uint8_t m_out_b; /* Output Latch Port B */
+	uint8_t m_mdr;   /* Mode Definition Register */
+	uint8_t m_odra;  /* Output Definition Register Port A */
+	uint8_t m_odrb;  /* Output Definition Register Port B */
 };
 
 

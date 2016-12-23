@@ -139,7 +139,7 @@ READ8_MEMBER(flstory_state::flstory_mcu_status_r)
 
 WRITE8_MEMBER(flstory_state::onna34ro_mcu_w)
 {
-	UINT16 score_adr = m_workram[0x29e] * 0x100 + m_workram[0x29d];
+	uint16_t score_adr = m_workram[0x29e] * 0x100 + m_workram[0x29d];
 
 	switch (data)
 	{
@@ -181,7 +181,7 @@ READ8_MEMBER(flstory_state::onna34ro_mcu_status_r)
 
 #define VICTNINE_MCU_SEED   (m_workram[0x685])
 
-static const UINT8 victnine_mcu_data[0x100] =
+static const uint8_t victnine_mcu_data[0x100] =
 {
 	0x3e, 0x08, 0xdd, 0x29, 0xcb, 0x14, 0xfd, 0x29,
 	0xcb, 0x15, 0xd9, 0x29, 0xd9, 0x30, 0x0d, 0xd9,
@@ -219,7 +219,7 @@ static const UINT8 victnine_mcu_data[0x100] =
 
 WRITE8_MEMBER(flstory_state::victnine_mcu_w)
 {
-	UINT8 seed = VICTNINE_MCU_SEED;
+	uint8_t seed = VICTNINE_MCU_SEED;
 
 	if (!seed && (data & 0x37) == 0x37)
 	{

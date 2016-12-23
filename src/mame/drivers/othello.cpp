@@ -1,4 +1,4 @@
-// license:LGPL-2.1+
+// license:BSD-3-Clause
 // copyright-holders:Tomasz Slanina
 /*
 
@@ -16,7 +16,7 @@ CPU Board:
  D8243          - I/O Expander for D7751C (8048 based)
 
 Video Board:
- almost empty - 3/4 sodlering pins not populated
+ almost empty - 3/4 soldering pins not populated
 
 
 
@@ -40,9 +40,11 @@ Limit for help/undo (matta):
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
+#include "machine/gen_latch.h"
 #include "machine/i8243.h"
-#include "sound/dac.h"
 #include "sound/ay8910.h"
+#include "sound/dac.h"
+#include "sound/volt_reg.h"
 #include "video/mc6845.h"
 
 
@@ -58,12 +60,13 @@ public:
 		m_maincpu(*this, "maincpu"),
 		m_ay1(*this, "ay1"),
 		m_ay2(*this, "ay2"),
-		m_palette(*this, "palette")
+		m_palette(*this, "palette"),
+		m_soundlatch(*this, "soundlatch")
 	{
 	}
 
 	/* memory pointers */
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 
 	/* video-related */
 	int    m_tile_bank;
@@ -71,8 +74,8 @@ public:
 	/* misc */
 	int   m_ay_select;
 	int   m_ack_data;
-	UINT8 m_n7751_command;
-//  UINT32 m_n7751_rom_address;
+	uint8_t m_n7751_command;
+//  uint32_t m_n7751_rom_address;
 	int m_sound_addr;
 	int m_n7751_busy;
 
@@ -83,6 +86,7 @@ public:
 	mc6845_device *m_mc6845;
 	device_t *m_n7751;
 	required_device<palette_device> m_palette;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(unk_87_r);
 	DECLARE_WRITE8_MEMBER(unk_8a_w);
@@ -112,10 +116,10 @@ MC6845_UPDATE_ROW( othello_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
 	int cx, x;
-	UINT32 data_address;
-	UINT32 tmp;
+	uint32_t data_address;
+	uint32_t tmp;
 
-	const UINT8 *gfx = memregion("gfx")->base();
+	const uint8_t *gfx = memregion("gfx")->base();
 
 	for(cx = 0; cx < x_count; ++cx)
 	{
@@ -212,14 +216,14 @@ static ADDRESS_MAP_START( main_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(0x87, 0x87) AM_READ(unk_87_r)
 	AM_RANGE(0x8a, 0x8a) AM_WRITE(unk_8a_w)
 	AM_RANGE(0x8c, 0x8c) AM_READWRITE(unk_8c_r, unk_8c_w)
-	AM_RANGE(0x8d, 0x8d) AM_READWRITE(sound_ack_r, soundlatch_byte_w)
+	AM_RANGE(0x8d, 0x8d) AM_READ(sound_ack_r) AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(unk_8f_w)
 ADDRESS_MAP_END
 
 READ8_MEMBER(othello_state::latch_r)
 {
-	int retval = soundlatch_byte_r(space, 0);
-	soundlatch_clear_byte_w(space, 0, 0);
+	int retval = m_soundlatch->read(space, 0);
+	m_soundlatch->clear_w(space, 0, 0);
 	return retval;
 }
 
@@ -323,7 +327,7 @@ static ADDRESS_MAP_START( n7751_portmap, AS_IO, 8, othello_state )
 	AM_RANGE(MCS48_PORT_T1,   MCS48_PORT_T1) AM_READ(n7751_t1_r)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_READ(n7751_command_r)
 	AM_RANGE(MCS48_PORT_BUS,  MCS48_PORT_BUS) AM_READ(n7751_rom_r)
-	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_device, write_unsigned8)
+	AM_RANGE(MCS48_PORT_P1,   MCS48_PORT_P1) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(MCS48_PORT_P2,   MCS48_PORT_P2) AM_WRITE(n7751_p2_w)
 	AM_RANGE(MCS48_PORT_PROG, MCS48_PORT_PROG) AM_DEVWRITE("n7751_8243", i8243_device, i8243_prog_w)
 ADDRESS_MAP_END
@@ -432,16 +436,19 @@ static MACHINE_CONFIG_START( othello, othello_state )
 	MCFG_MC6845_UPDATE_ROW_CB(othello_state, crtc_update_row)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.15)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.3) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 ROM_START( othello )

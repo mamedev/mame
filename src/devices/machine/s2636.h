@@ -10,7 +10,7 @@
 #define __S2636_H__
 
 
-#define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? TRUE : FALSE)
+#define S2636_IS_PIXEL_DRAWN(p)     (((p) & 0x08) ? true : false)
 #define S2636_PIXEL_COLOR(p)        ((p) & 0x07)
 
 
@@ -41,7 +41,7 @@ class s2636_device : public device_t,
 				public device_sound_interface
 {
 public:
-	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	s2636_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~s2636_device() {}
 
 	static void set_offsets(device_t &device, int y_offset, int x_offset)
@@ -130,16 +130,16 @@ private:
 
 	static int const OFFS_OBJ[OBJ_COUNT];
 
-	static UINT16 const SCORE_FONT[16][5];
+	static uint16_t const SCORE_FONT[16][5];
 
 	static int const SCORE_START_X[2][SCORE_DIGITS];
 	static int const SCORE_START_Y[2];
 
 	static void mask_offset(offs_t &offset) { offset &= ((offset & 0x0c0) == 0x0c0) ? 0x0cf : 0x0ff; }
 
-	UINT8 object_scale(int obj) const { return (m_registers[REG_OBJ_SIZE] >> (2 * obj)) & 0x03; }
-	UINT8 object_color(int obj) const { return (m_registers[REG_OBJ_CLR_1_2 + (obj >> 1)] >> ((obj & 1) ? 0 : 3)) & 0x07; }
-	UINT8 score_digit(int digit) const { return (m_registers[REG_SCORE_1_2 + (digit >> 1)] >> ((digit & 1) ? 0 : 4)) & 0x0f; }
+	uint8_t object_scale(int obj) const { return (m_registers[REG_OBJ_SIZE] >> (2 * obj)) & 0x03; }
+	uint8_t object_color(int obj) const { return (m_registers[REG_OBJ_CLR_1_2 + (obj >> 1)] >> ((obj & 1) ? 0 : 3)) & 0x07; }
+	uint8_t score_digit(int digit) const { return (m_registers[REG_SCORE_1_2 + (digit >> 1)] >> ((digit & 1) ? 0 : 4)) & 0x0f; }
 
 	void update_intreq(int value);
 
@@ -153,7 +153,7 @@ private:
 	bitmap_ind16        m_bitmap;
 
 	// 256-byte register file (not all of this really exists)
-	UINT8   m_registers[0x100];
+	uint8_t   m_registers[0x100];
 
 	// tracking where we're up to in the screen update
 	bool    m_vrst;

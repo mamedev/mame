@@ -52,7 +52,7 @@ ioport_constructor snes_joypad_device::device_input_ports() const
 //  snes_joypad_device - constructor
 //-------------------------------------------------
 
-snes_joypad_device::snes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+snes_joypad_device::snes_joypad_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 					device_t(mconfig, SNES_JOYPAD, "Nintendo SNES / SFC Control Pad", tag, owner, clock, "snes_joypad", __FILE__),
 					device_snes_control_port_interface(mconfig, *this),
 					m_joypad(*this, "JOYPAD"), m_strobe(0), m_latch(0)
@@ -88,7 +88,7 @@ void snes_joypad_device::device_reset()
 
 void snes_joypad_device::port_poll()
 {
-	UINT16 temp = m_joypad->read();
+	uint16_t temp = m_joypad->read();
 	// avoid sending signals that could crash games
 	// if left, no right
 	if (temp & 0x40)
@@ -104,9 +104,9 @@ void snes_joypad_device::port_poll()
 //  read
 //-------------------------------------------------
 
-UINT8 snes_joypad_device::read_pin4()
+uint8_t snes_joypad_device::read_pin4()
 {
-	UINT8 ret = m_latch & 1;
+	uint8_t ret = m_latch & 1;
 	m_latch >>= 1;
 	return ret;
 }
@@ -115,7 +115,7 @@ UINT8 snes_joypad_device::read_pin4()
 //  write
 //-------------------------------------------------
 
-void snes_joypad_device::write_strobe(UINT8 data)
+void snes_joypad_device::write_strobe(uint8_t data)
 {
 	int old = m_strobe;
 	m_strobe = data & 0x01;

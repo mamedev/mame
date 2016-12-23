@@ -70,7 +70,7 @@ public:
 			m_palette(*this, "palette")
 	{ }
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 protected:
 
@@ -92,7 +92,7 @@ void itgamble_state::video_start()
 {
 }
 
-UINT32 itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t itgamble_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	bitmap.fill(m_palette->black_pen());
 	return 0;
@@ -713,4 +713,4 @@ GAME( 200?, abacus,   0,       itgamble, itgamble, driver_device, 0,   ROT0, "<u
 GAME( 200?, bookthr,  0,       itgamble, itgamble, driver_device, 0,   ROT0, "<unknown>",             "Book Theatre (Ver 1.2)",        MACHINE_IS_SKELETON )
 
 /* different hardware */
-GAME( 200?, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "M.M. - B.R.L.",         "Mystery Number",                MACHINE_IS_SKELETON )
+GAME( 2000, mnumber,  0,       mnumber,  itgamble, driver_device, 0,   ROT0, "MM / BRL Bologna",      "Mystery Number",                MACHINE_IS_SKELETON )

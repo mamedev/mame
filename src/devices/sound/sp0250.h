@@ -9,13 +9,13 @@ class sp0250_device : public device_t,
 									public device_sound_interface
 {
 public:
-	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sp0250_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~sp0250_device() {}
 
 	template<class _Object> static devcb_base &set_drq_callback(device_t &device, _Object object) { return downcast<sp0250_device &>(device).m_drq.set_callback(object); }
 
 	DECLARE_WRITE8_MEMBER( write );
-	UINT8 drq_r();
+	uint8_t drq_r();
 
 protected:
 	// device-level overrides
@@ -26,22 +26,22 @@ protected:
 
 private:
 	// internal state
-	INT16 m_amp;
-	UINT8 m_pitch;
-	UINT8 m_repeat;
+	int16_t m_amp;
+	uint8_t m_pitch;
+	uint8_t m_repeat;
 	int m_pcount, m_rcount;
 	int m_playing;
-	UINT32 m_RNG;
+	uint32_t m_RNG;
 	sound_stream * m_stream;
 	int m_voiced;
-	UINT8 m_fifo[15];
+	uint8_t m_fifo[15];
 	int m_fifo_pos;
 	devcb_write_line m_drq;
 
 	struct
 	{
-		INT16 F, B;
-		INT16 z1, z2;
+		int16_t F, B;
+		int16_t z1, z2;
 	} m_filter[6];
 
 	void load_values();

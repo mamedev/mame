@@ -78,9 +78,9 @@ TILE_GET_INFO_MEMBER(lastduel_state::get_fix_info)
 
 VIDEO_START_MEMBER(lastduel_state,lastduel)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_bg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::ld_get_fg_tile_info),this), TILEMAP_SCAN_ROWS, 16, 16, 64, 64);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this), TILEMAP_SCAN_ROWS, 8, 8, 64, 32);
 
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x0001);
 	m_fg_tilemap->set_transmask(1, 0xf07f, 0x0f81);
@@ -93,9 +93,9 @@ VIDEO_START_MEMBER(lastduel_state,lastduel)
 
 VIDEO_START_MEMBER(lastduel_state,madgear)
 {
-	m_bg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_fg_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
-	m_tx_tilemap = &machine().tilemap().create(m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
+	m_bg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_bg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
+	m_fg_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fg_tile_info),this),TILEMAP_SCAN_COLS,16,16,64,32);
+	m_tx_tilemap = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(lastduel_state::get_fix_info),this),TILEMAP_SCAN_ROWS,8,8,64,32);
 
 	m_fg_tilemap->set_transmask(0, 0xffff, 0x8000);
 	m_fg_tilemap->set_transmask(1, 0x80ff, 0xff00);
@@ -196,7 +196,7 @@ WRITE16_MEMBER(lastduel_state::lastduel_palette_word_w)
 
 void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect, int pri )
 {
-	UINT16 *buffered_spriteram16 = m_spriteram->buffer();
+	uint16_t *buffered_spriteram16 = m_spriteram->buffer();
 	int offs;
 
 	if (!m_sprite_pri_mask)
@@ -243,7 +243,7 @@ void lastduel_state::draw_sprites( bitmap_ind16 &bitmap, const rectangle &clipre
 	}
 }
 
-UINT32 lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	m_bg_tilemap->draw(screen, bitmap, cliprect, 0, 0);
 	m_fg_tilemap->draw(screen, bitmap, cliprect, TILEMAP_DRAW_LAYER1, 0);
@@ -254,7 +254,7 @@ UINT32 lastduel_state::screen_update_lastduel(screen_device &screen, bitmap_ind1
 	return 0;
 }
 
-UINT32 lastduel_state::screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t lastduel_state::screen_update_madgear(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	if (m_tilemap_priority)
 	{

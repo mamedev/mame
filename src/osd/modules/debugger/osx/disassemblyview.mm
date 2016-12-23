@@ -41,14 +41,14 @@
 
 
 - (NSSize)maximumFrameSize {
-	debug_view_xy			max(0, 0);
-	debug_view_source const	*source = view->source();
-	for (debug_view_source const *source = view->first_source(); source != NULL; source = source->next())
+	debug_view_xy           max(0, 0);
+	debug_view_source const *source = view->source();
+	for (debug_view_source const *source = view->first_source(); source != nullptr; source = source->next())
 	{
 		view->set_source(*source);
 		debug_view_xy const current = view->total_size();
-		max.x = MAX(max.x, current.x);
-		max.y = MAX(max.y, current.y);
+		max.x = std::max(max.x, current.x);
+		max.y = std::max(max.y, current.y);
 	}
 	view->set_source(*source);
 	return NSMakeSize(ceil((max.x * fontWidth) + (2 * [textContainer lineFragmentPadding])),
@@ -57,7 +57,7 @@
 
 
 - (void)addContextMenuItemsToMenu:(NSMenu *)menu {
-	NSMenuItem	*item;
+	NSMenuItem  *item;
 
 	[super addContextMenuItemsToMenu:menu];
 
@@ -105,7 +105,7 @@
 
 - (NSString *)selectedSubviewName {
 	const debug_view_source *source = view->source();
-	if (source != NULL)
+	if (source != nullptr)
 		return [NSString stringWithUTF8String:source->name()];
 	else
 		return @"";
@@ -114,7 +114,7 @@
 
 - (int)selectedSubviewIndex {
 	const debug_view_source *source = view->source();
-	if (source != NULL)
+	if (source != nullptr)
 		return view->source_list().indexof(*source);
 	else
 		return -1;
@@ -122,7 +122,7 @@
 
 
 - (void)selectSubviewAtIndex:(int)index {
-	const int	selected = view->source_list().indexof(*view->source());
+	const int   selected = view->source_list().indexof(*view->source());
 	if (selected != index) {
 		view->set_source(*view->source_list().find(index));
 		if ([[self window] firstResponder] != self)
@@ -133,7 +133,7 @@
 
 - (BOOL)selectSubviewForDevice:(device_t *)device {
 	debug_view_source const *const source = view->source_for_device(device);
-	if (source != NULL)
+	if (source != nullptr)
 	{
 		if (view->source() != source)
 		{
@@ -151,11 +151,11 @@
 
 
 - (BOOL)selectSubviewForSpace:(address_space *)space {
-	if (space == NULL) return NO;
+	if (space == nullptr) return NO;
 	debug_view_disasm_source const *source = downcast<debug_view_disasm_source const *>(view->first_source());
-	while ((source != NULL) && (&source->space() != space))
+	while ((source != nullptr) && (&source->space() != space))
 		source = downcast<debug_view_disasm_source *>(source->next());
-	if (source != NULL)
+	if (source != nullptr)
 	{
 		if (view->source() != source)
 		{
@@ -210,8 +210,8 @@
 												atIndex:index++];
 	[disableItem setKeyEquivalentModifierMask:NSShiftKeyMask];
 
-	NSMenu		*runMenu = [[menu itemWithTitle:@"Run"] submenu];
-	NSMenuItem	*runItem;
+	NSMenu      *runMenu = [[menu itemWithTitle:@"Run"] submenu];
+	NSMenuItem  *runItem;
 	if (runMenu != nil) {
 		runItem = [runMenu addItemWithTitle:@"to Cursor"
 									 action:@selector(debugRunToCursor:)
@@ -253,7 +253,7 @@
 
 
 - (void)insertSubviewItemsInMenu:(NSMenu *)menu atIndex:(NSInteger)index {
-	for (const debug_view_source *source = view->source_list().first(); source != NULL; source = source->next())
+	for (const debug_view_source *source = view->source_list().first(); source != nullptr; source = source->next())
 	{
 		[[menu insertItemWithTitle:[NSString stringWithUTF8String:source->name()]
 							action:NULL

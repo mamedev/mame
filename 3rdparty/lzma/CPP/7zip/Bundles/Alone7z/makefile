@@ -1,52 +1,43 @@
 PROG = 7zr.exe
 MY_CONSOLE = 1
-CFLAGS = $(CFLAGS) -I ../../../ \
-  -D_NO_CRYPTO \
+CFLAGS = $(CFLAGS) -DPROG_VARIANT_R
 
 !IFNDEF UNDER_CE
 CFLAGS = $(CFLAGS) -DWIN_LONG_PATH
 !ENDIF
 
-CONSOLE_OBJS = \
-  $O\BenchCon.obj \
-  $O\ConsoleClose.obj \
-  $O\ExtractCallbackConsole.obj \
-  $O\List.obj \
-  $O\Main.obj \
-  $O\MainAr.obj \
-  $O\OpenCallbackConsole.obj \
-  $O\PercentPrinter.obj \
-  $O\UpdateCallbackConsole.obj \
-  $O\UserInputUtils.obj \
-
 COMMON_OBJS = \
   $O\CommandLineParser.obj \
   $O\CRC.obj \
+  $O\CrcReg.obj \
   $O\IntToString.obj \
   $O\ListFileUtils.obj \
   $O\NewHandler.obj \
   $O\StdInStream.obj \
   $O\StdOutStream.obj \
   $O\MyString.obj \
+  $O\Sha256Reg.obj \
   $O\StringConvert.obj \
   $O\StringToInt.obj \
   $O\UTFConvert.obj \
   $O\MyVector.obj \
   $O\Wildcard.obj \
+  $O\XzCrc64Reg.obj \
 
 WIN_OBJS = \
   $O\DLL.obj \
-  $O\Error.obj \
+  $O\ErrorMsg.obj \
   $O\FileDir.obj \
   $O\FileFind.obj \
   $O\FileIO.obj \
+  $O\FileLink.obj \
   $O\FileName.obj \
   $O\MemoryLock.obj \
   $O\PropVariant.obj \
-  $O\PropVariantConversions.obj \
+  $O\PropVariantConv.obj \
   $O\Synchronization.obj \
   $O\System.obj \
-  $O\Time.obj \
+  $O\TimeUtils.obj \
 
 7ZIP_COMMON_OBJS = \
   $O\CreateCoder.obj \
@@ -57,37 +48,17 @@ WIN_OBJS = \
   $O\InOutTempBuffer.obj \
   $O\FilterCoder.obj \
   $O\LimitedStreams.obj \
-  $O\LockedStream.obj \
   $O\MethodId.obj \
   $O\MethodProps.obj \
   $O\OffsetStream.obj \
   $O\OutBuffer.obj \
   $O\ProgressUtils.obj \
+  $O\PropId.obj \
   $O\StreamBinder.obj \
   $O\StreamObjects.obj \
   $O\StreamUtils.obj \
+  $O\UniqBlocks.obj \
   $O\VirtThread.obj \
-
-UI_COMMON_OBJS = \
-  $O\ArchiveCommandLine.obj \
-  $O\ArchiveExtractCallback.obj \
-  $O\ArchiveOpenCallback.obj \
-  $O\Bench.obj \
-  $O\DefaultName.obj \
-  $O\EnumDirItems.obj \
-  $O\Extract.obj \
-  $O\ExtractingFilePath.obj \
-  $O\LoadCodecs.obj \
-  $O\OpenArchive.obj \
-  $O\PropIDUtils.obj \
-  $O\SetProperties.obj \
-  $O\SortUtils.obj \
-  $O\TempFiles.obj \
-  $O\Update.obj \
-  $O\UpdateAction.obj \
-  $O\UpdateCallback.obj \
-  $O\UpdatePair.obj \
-  $O\UpdateProduce.obj \
 
 AR_OBJS = \
   $O\LzmaHandler.obj \
@@ -96,8 +67,6 @@ AR_OBJS = \
 
 AR_COMMON_OBJS = \
   $O\CoderMixer2.obj \
-  $O\CoderMixer2MT.obj \
-  $O\CrossThreadProgress.obj \
   $O\DummyOutStream.obj \
   $O\HandlerOut.obj \
   $O\InStreamWithCRC.obj \
@@ -113,7 +82,6 @@ AR_COMMON_OBJS = \
   $O\7zEncode.obj \
   $O\7zExtract.obj \
   $O\7zFolderInStream.obj \
-  $O\7zFolderOutStream.obj \
   $O\7zHandler.obj \
   $O\7zHandlerOut.obj \
   $O\7zHeader.obj \
@@ -129,7 +97,6 @@ COMPRESS_OBJS = \
   $O\Bcj2Register.obj \
   $O\BcjCoder.obj \
   $O\BcjRegister.obj \
-  $O\BranchCoder.obj \
   $O\BranchMisc.obj \
   $O\BranchRegister.obj \
   $O\ByteSwap.obj \
@@ -143,9 +110,18 @@ COMPRESS_OBJS = \
   $O\LzmaEncoder.obj \
   $O\LzmaRegister.obj \
 
+CRYPTO_OBJS = \
+  $O\7zAes.obj \
+  $O\7zAesRegister.obj \
+  $O\MyAes.obj \
+  $O\MyAesReg.obj \
+  $O\RandGen.obj \
+
 C_OBJS = \
   $O\7zStream.obj \
   $O\Alloc.obj \
+  $O\Bcj2.obj \
+  $O\Bcj2Enc.obj \
   $O\Bra.obj \
   $O\Bra86.obj \
   $O\BraIA64.obj \
@@ -159,54 +135,17 @@ C_OBJS = \
   $O\LzmaEnc.obj \
   $O\MtCoder.obj \
   $O\Sha256.obj \
+  $O\Sort.obj \
   $O\Threads.obj \
   $O\Xz.obj \
-  $O\XzCrc64.obj \
   $O\XzDec.obj \
   $O\XzEnc.obj \
   $O\XzIn.obj \
 
+!include "../../UI/Console/Console.mak"
+
+!include "../../Aes.mak"
 !include "../../Crc.mak"
+!include "../../Crc64.mak"
 
-OBJS = \
-  $O\StdAfx.obj \
-  $(CONSOLE_OBJS) \
-  $(COMMON_OBJS) \
-  $(WIN_OBJS) \
-  $(7ZIP_COMMON_OBJS) \
-  $(UI_COMMON_OBJS) \
-  $(AR_OBJS) \
-  $(AR_COMMON_OBJS) \
-  $(7Z_OBJS) \
-  $(COMPRESS_OBJS) \
-  $(C_OBJS) \
-  $(ASM_OBJS) \
-  $O\resource.res
-
-
-!include "../../../Build.mak"
-
-$(CONSOLE_OBJS): ../../UI/Console/$(*B).cpp
-	$(COMPL)
-
-$(COMMON_OBJS): ../../../Common/$(*B).cpp
-	$(COMPL)
-$(WIN_OBJS): ../../../Windows/$(*B).cpp
-	$(COMPL)
-$(7ZIP_COMMON_OBJS): ../../Common/$(*B).cpp
-	$(COMPL)
-$(UI_COMMON_OBJS): ../../UI/Common/$(*B).cpp
-	$(COMPL)
-$(AR_OBJS): ../../Archive/$(*B).cpp
-	$(COMPL)
-$(AR_COMMON_OBJS): ../../Archive/Common/$(*B).cpp
-	$(COMPL)
-
-$(7Z_OBJS): ../../Archive/7z/$(*B).cpp
-	$(COMPL)
-$(COMPRESS_OBJS): ../../Compress/$(*B).cpp
-	$(COMPL_O2)
-$(C_OBJS): ../../../../C/$(*B).c
-	$(COMPL_O2)
-
-!include "../../Asm.mak"
+!include "../../7zip.mak"

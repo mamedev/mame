@@ -11,7 +11,6 @@
 #include "emu.h"
 #include "includes/advision.h"
 #include "cpu/mcs48/mcs48.h"
-#include "sound/dac.h"
 
 /*
     8048 Ports:
@@ -34,7 +33,8 @@ void advision_state::machine_start()
 
 	/* configure EA banking */
 	m_bank1->configure_entry(0, memregion(I8048_TAG)->base());
-	m_bank1->configure_entry(1, m_cart_rom->base());
+	if (m_cart_rom != nullptr)
+		m_bank1->configure_entry(1, m_cart_rom->base());
 	m_maincpu->space(AS_PROGRAM).install_readwrite_bank(0x0000, 0x03ff, "bank1");
 	m_bank1->set_entry(0);
 
@@ -78,7 +78,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 	m_rambank = (data & 0x03) << 8;
 
 	m_maincpu->set_input_line(MCS48_INPUT_EA, m_ea_bank ? ASSERT_LINE : CLEAR_LINE);
-	if (m_cart_rom)
+	if (m_cart_rom != nullptr)
 		m_bank1->set_entry(m_ea_bank);
 }
 
@@ -86,7 +86,7 @@ WRITE8_MEMBER( advision_state::bankswitch_w )
 
 READ8_MEMBER( advision_state::ext_ram_r )
 {
-	UINT8 data = m_ext_ram[m_rambank + offset];
+	uint8_t data = m_ext_ram[m_rambank + offset];
 
 	if (!m_video_enable)
 	{
@@ -116,12 +116,8 @@ READ8_MEMBER( advision_state::sound_cmd_r )
 
 void advision_state::update_dac()
 {
-	if (m_sound_g == 0 && m_sound_d == 0)
-		m_dac->write_unsigned8(0xff);
-	else if (m_sound_g == 1 && m_sound_d == 1)
-		m_dac->write_unsigned8(0x80);
-	else
-		m_dac->write_unsigned8(0x00);
+	int translate[] = { 2, 0, 0, 1 };
+	m_dac->write(translate[(m_sound_g << 1) | m_sound_d]);
 }
 
 WRITE8_MEMBER( advision_state::sound_g_w )
@@ -180,8 +176,8 @@ READ8_MEMBER( advision_state::vsync_r )
 READ8_MEMBER( advision_state::controller_r )
 {
 	// Get joystick switches
-	UINT8 in = m_joy->read();
-	UINT8 data = in | 0x0f;
+	uint8_t in = m_joy->read();
+	uint8_t data = in | 0x0f;
 
 	// Get buttons
 	if (in & 0x02) data = data & 0xf7; /* Button 3 */

@@ -80,7 +80,7 @@ INTERRUPT_GEN_MEMBER(blockade_state::blockade_interrupt)
 READ8_MEMBER(blockade_state::blockade_input_port_0_r)
 {
 	/* coin latch is bit 7 */
-	UINT8 temp = (ioport("IN0")->read() & 0x7f);
+	uint8_t temp = (ioport("IN0")->read() & 0x7f);
 
 	return (m_coin_latch << 7) | temp;
 }
@@ -477,7 +477,7 @@ static MACHINE_CONFIG_START( blockade, blockade_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", blockade)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 
 	/* sound hardware */

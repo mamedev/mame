@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Nicola Salmoria
+// copyright-holders:Nicola Salmoria,Stephane Humbert
 /***************************************************************************
 
 Fire Trap memory map
@@ -172,7 +172,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/3526intf.h"
-#include "sound/msm5205.h"
 #include "includes/firetrap.h"
 
 #define FIRETRAP_XTAL XTAL_12MHz
@@ -193,8 +192,8 @@ READ8_MEMBER(firetrap_state::firetrap_8751_bootleg_r)
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	UINT8 coin = 0;
-	UINT8 port = ioport("IN2")->read() & 0x70;
+	uint8_t coin = 0;
+	uint8_t port = ioport("IN2")->read() & 0x70;
 
 	if (space.device().safe_pc() == 0x1188)
 		return ~m_coin_command_pending;
@@ -222,7 +221,7 @@ READ8_MEMBER(firetrap_state::firetrap_8751_r)
 
 WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 {
-	static const UINT8 i8751_init_data[]={
+	static const uint8_t i8751_init_data[]={
 		0xf5,0xd5,0xdd,0x21,0x05,0xc1,0x87,0x5f,0x87,0x83,0x5f,0x16,0x00,0xdd,0x19,0xd1,
 		0xf1,0xc9,0xf5,0xd5,0xfd,0x21,0x2f,0xc1,0x87,0x5f,0x16,0x00,0xfd,0x19,0xd1,0xf1,
 		0xc9,0xe3,0xd5,0xc5,0xf5,0xdd,0xe5,0xfd,0xe5,0xe9,0xe1,0xfd,0xe1,0xdd,0xe1,0xf1,
@@ -305,7 +304,7 @@ WRITE8_MEMBER(firetrap_state::firetrap_8751_w)
 
 WRITE8_MEMBER(firetrap_state::firetrap_sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -400,7 +399,7 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, firetrap_state )
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)    /* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)
-	AM_RANGE(0x3400, 0x3400) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0x3400, 0x3400) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank2")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -410,7 +409,7 @@ INPUT_CHANGED_MEMBER(firetrap_state::coin_inserted)
 	/* coin insertion causes an IRQ */
 	if(newval)
 	{
-		m_coin_command_pending = (UINT8)(FPTR)(param);
+		m_coin_command_pending = (uint8_t)(uintptr_t)(param);
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
 		    definitely doesn't expect them as it locks out the coin routine */
@@ -582,8 +581,8 @@ INTERRUPT_GEN_MEMBER(firetrap_state::firetrap_irq)
 
 void firetrap_state::machine_start()
 {
-	UINT8 *MAIN = memregion("maincpu")->base();
-	UINT8 *SOUND = memregion("audiocpu")->base();
+	uint8_t *MAIN = memregion("maincpu")->base();
+	uint8_t *SOUND = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &MAIN[0x10000], 0x4000);
 	membank("bank2")->configure_entries(0, 2, &SOUND[0x10000], 0x4000);
@@ -653,6 +652,8 @@ static MACHINE_CONFIG_START( firetrap, firetrap_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
@@ -690,6 +691,8 @@ static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ymsnd", YM3526, FIRETRAP_XTAL/4)    // 3 MHz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

@@ -27,8 +27,8 @@ void namcond1_state::machine_start()
 void namcond1_state::machine_reset()
 {
 #ifdef MAME_DEBUG
-	/*UINT8   *ROM = memregion(REGION_CPU1)->base();*/
-	/*UINT32 debug_trigger_addr;*/
+	/*uint8_t   *ROM = memregion(REGION_CPU1)->base();*/
+	/*uint32_t debug_trigger_addr;*/
 	/*int             i;*/
 
 #if 0

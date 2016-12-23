@@ -60,14 +60,15 @@ class sega315_5124_device : public device_t,
 {
 public:
 	// construction/destruction
-	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
-	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, UINT8 cram_size, UINT8 palette_offset, bool supports_224_240, const char *shortname, const char *source);
+	sega315_5124_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	sega315_5124_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, uint8_t cram_size, uint8_t palette_offset, bool supports_224_240, const char *shortname, const char *source);
 
 	static void set_signal_type(device_t &device, bool is_pal) { downcast<sega315_5124_device &>(device).m_is_pal = is_pal; }
 
 
 
 	template<class _Object> static devcb_base &set_int_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_int_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_csync_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_csync_cb.set_callback(object); }
 	template<class _Object> static devcb_base &set_pause_callback(device_t &device, _Object object) { return downcast<sega315_5124_device &>(device).m_pause_cb.set_callback(object); }
 
 	DECLARE_READ8_MEMBER( vram_read );
@@ -87,7 +88,7 @@ public:
 	bitmap_ind8 &get_y1_bitmap() { return m_y1_bitmap; };
 
 	/* update the screen */
-	UINT32 screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
+	uint32_t screen_update( screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect );
 
 	virtual void set_sega315_5124_compatibility_mode( bool sega315_5124_compatibility_mode ) { };
 
@@ -95,10 +96,10 @@ protected:
 	void set_display_settings();
 	void set_frame_timing();
 	virtual void update_palette();
-	virtual void cram_write(UINT8 data);
+	virtual void cram_write(uint8_t data);
 	virtual void draw_scanline( int pixel_offset_x, int pixel_plot_y, int line );
 	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line );
-	virtual UINT16 get_name_table_row(int row);
+	virtual uint16_t get_name_table_row(int row);
 	void process_line_timer();
 	void select_sprites( int line );
 	void draw_scanline_mode4( int *line_buffer, int *priority_selected, int line );
@@ -118,44 +119,45 @@ protected:
 
 	void vdp_postload();
 
-	UINT8            m_reg[16];                  /* All the registers */
-	UINT8            m_status;                   /* Status register */
-	UINT8            m_pending_status;           /* Pending status flags */
-	UINT8            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
-	UINT8            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
-	UINT8            m_addrmode;                 /* Type of VDP action */
-	UINT16           m_addr;                     /* Contents of internal VDP address register */
-	UINT8            m_cram_size;                /* CRAM size */
-	UINT8            m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
+	uint8_t            m_reg[16];                  /* All the registers */
+	uint8_t            m_status;                   /* Status register */
+	uint8_t            m_pending_status;           /* Pending status flags */
+	uint8_t            m_reg8copy;                 /* Internal copy of register 8 (X-Scroll) */
+	uint8_t            m_reg9copy;                 /* Internal copy of register 9 (Y-Scroll) */
+	uint8_t            m_addrmode;                 /* Type of VDP action */
+	uint16_t           m_addr;                     /* Contents of internal VDP address register */
+	uint8_t            m_cram_size;                /* CRAM size */
+	uint8_t            m_cram_mask;                /* Mask to switch between SMS and GG CRAM sizes */
 	int              m_cram_dirty;               /* Have there been any changes to the CRAM area */
 	int              m_pending_reg_write;
 	int              m_pending_sprcol_x;
-	UINT8            m_buffer;
+	uint8_t            m_buffer;
 	bool             m_sega315_5124_compatibility_mode;    /* when true, GG VDP behaves as SMS VDP */
 	int              m_irq_state;                /* The status of the IRQ line of the VDP */
 	int              m_vdp_mode;                 /* Current mode of the VDP: 0,1,2,3,4 */
 	int              m_y_pixels;                 /* 192, 224, 240 */
 	int              m_draw_time;
-	UINT8            m_line_counter;
-	UINT8            m_hcounter;
-	UINT8            m_CRAM[SEGA315_5378_CRAM_SIZE];  /* CRAM */
-	const UINT8      *m_frame_timing;
+	uint8_t            m_line_counter;
+	uint8_t            m_hcounter;
+	uint8_t            m_CRAM[SEGA315_5378_CRAM_SIZE];  /* CRAM */
+	const uint8_t      *m_frame_timing;
 	bitmap_rgb32     m_tmpbitmap;
 	bitmap_ind8      m_y1_bitmap;
-	UINT8            m_palette_offset;
+	uint8_t            m_palette_offset;
 	bool             m_supports_224_240;
 	bool             m_display_disabled;
-	UINT16           m_sprite_base;
-	UINT16           m_sprite_pattern_line[8];
+	uint16_t           m_sprite_base;
+	uint16_t           m_sprite_pattern_line[8];
 	int              m_sprite_tile_selected[8];
 	int              m_sprite_x[8];
-	UINT8            m_sprite_flags[8];
+	uint8_t            m_sprite_flags[8];
 	int              m_sprite_count;
 	int              m_sprite_height;
 	int              m_sprite_zoom;
 	int              m_current_palette[32];
 	bool             m_is_pal;             /* false = NTSC, true = PAL */
 	devcb_write_line m_int_cb;       /* Interrupt callback function */
+	devcb_write_line m_csync_cb;     /* C-Sync callback function */
 	devcb_write_line m_pause_cb;     /* Pause callback function */
 	emu_timer        *m_display_timer;
 	emu_timer        *m_hint_timer;
@@ -185,17 +187,17 @@ protected:
 class sega315_5246_device : public sega315_5124_device
 {
 public:
-	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega315_5246_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 protected:
-	virtual UINT16 get_name_table_row(int row) override;
+	virtual uint16_t get_name_table_row(int row) override;
 };
 
 
 class sega315_5378_device : public sega315_5124_device
 {
 public:
-	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sega315_5378_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	DECLARE_PALETTE_INIT( sega315_5378 );
 
@@ -206,9 +208,9 @@ protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	virtual void update_palette() override;
-	virtual void cram_write(UINT8 data) override;
+	virtual void cram_write(uint8_t data) override;
 	virtual void blit_scanline( int *line_buffer, int *priority_selected, int pixel_offset_x, int pixel_plot_y, int line ) override;
-	virtual UINT16 get_name_table_row(int row) override;
+	virtual uint16_t get_name_table_row(int row) override;
 };
 
 
@@ -224,6 +226,9 @@ protected:
 #define MCFG_SEGA315_5124_INT_CB(_devcb) \
 	devcb = &sega315_5124_device::set_int_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_SEGA315_5124_CSYNC_CB(_devcb) \
+	devcb = &sega315_5124_device::set_csync_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_SEGA315_5124_PAUSE_CB(_devcb) \
 	devcb = &sega315_5124_device::set_pause_callback(*device, DEVCB_##_devcb);
 
@@ -236,6 +241,9 @@ protected:
 #define MCFG_SEGA315_5246_INT_CB(_devcb) \
 	devcb = &sega315_5246_device::set_int_callback(*device, DEVCB_##_devcb);
 
+#define MCFG_SEGA315_5246_CSYNC_CB(_devcb) \
+	devcb = &sega315_5246_device::set_csync_callback(*device, DEVCB_##_devcb);
+
 #define MCFG_SEGA315_5246_PAUSE_CB(_devcb) \
 	devcb = &sega315_5246_device::set_pause_callback(*device, DEVCB_##_devcb);
 
@@ -247,6 +255,9 @@ protected:
 
 #define MCFG_SEGA315_5378_INT_CB(_devcb) \
 	devcb = &sega315_5378_device::set_int_callback(*device, DEVCB_##_devcb);
+
+#define MCFG_SEGA315_5378_CSYNC_CB(_devcb) \
+	devcb = &sega315_5378_device::set_csync_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_SEGA315_5378_PAUSE_CB(_devcb) \
 	devcb = &sega315_5378_device::set_pause_callback(*device, DEVCB_##_devcb);

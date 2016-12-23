@@ -51,8 +51,6 @@ struct PS_INPUT
 
 uniform float2 ScreenDims;
 uniform float2 TargetDims;
-uniform float2 SourceRect;
-uniform float2 QuadDims;
 
 VS_OUTPUT vs_main(VS_INPUT Input)
 {
@@ -68,7 +66,7 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 	TexCoord += 0.5f / TargetDims; // half texel offset correction (DX9)
 
 	Output.TexCoord = TexCoord;
-	
+
 	Output.Color = Input.Color;
 
 	return Output;
@@ -78,45 +76,40 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Defocus Pixel Shader
 //-----------------------------------------------------------------------------
 
-float2 Coord1Offset = float2( 0.75f,  0.50f);
-float2 Coord2Offset = float2( 0.25f,  1.00f);
-float2 Coord3Offset = float2(-0.50f,  0.75f);
-float2 Coord4Offset = float2(-1.00f,  0.25f);
-float2 Coord5Offset = float2(-0.75f, -0.50f);
-float2 Coord6Offset = float2(-0.25f, -1.00f);
-float2 Coord7Offset = float2( 0.50f, -0.75f);
-float2 Coord8Offset = float2( 1.00f, -0.25f);
-
 uniform float2 Defocus = float2(0.0f, 0.0f);
 
-uniform bool SwapXY = false;
+// previously this pass was applied two times with offsets of 0.25, 0.5, 0.75, 1.0
+// now this pass is applied only once with offsets of 0.25, 0.55, 1.0, 1.6 to achieve the same appearance as before till a maximum defocus of 2.0
+static const float2 CoordOffset8[8] =
+{
+	// 0.075x² + 0.225x + 0.25
+	float2(-1.60f,  0.25f),
+	float2(-1.00f, -0.55f),
+	float2(-0.55f,  1.00f),
+	float2(-0.25f, -1.60f),
+	float2( 0.25f,  1.60f),
+	float2( 0.55f, -1.00f),
+	float2( 1.00f,  0.55f),
+	float2( 1.60f, -0.25f),
+};
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
-	float2 QuadRatio = 
-		float2(1.0f, SwapXY 
-			? QuadDims.y / QuadDims.x 
-			: QuadDims.x / QuadDims.y);
-
-	// imaginary texel dimensions independed from quad dimensions, but dependend on quad ratio
-	float2 TexelDims = (1.0f / 1024.0) * SourceRect * QuadRatio;
+	// imaginary texel dimensions independed from source and target dimension
+	float2 TexelDims = (1.0f / 1024.0f);
 
 	float2 DefocusTexelDims = Defocus * TexelDims;
 
-	float4 d = tex2D(DiffuseSampler, Input.TexCoord);
-	float3 d1 = tex2D(DiffuseSampler, Input.TexCoord + Coord1Offset * DefocusTexelDims).rgb;
-	float3 d2 = tex2D(DiffuseSampler, Input.TexCoord + Coord2Offset * DefocusTexelDims).rgb;
-	float3 d3 = tex2D(DiffuseSampler, Input.TexCoord + Coord3Offset * DefocusTexelDims).rgb;
-	float3 d4 = tex2D(DiffuseSampler, Input.TexCoord + Coord4Offset * DefocusTexelDims).rgb;
-	float3 d5 = tex2D(DiffuseSampler, Input.TexCoord + Coord5Offset * DefocusTexelDims).rgb;
-	float3 d6 = tex2D(DiffuseSampler, Input.TexCoord + Coord6Offset * DefocusTexelDims).rgb;
-	float3 d7 = tex2D(DiffuseSampler, Input.TexCoord + Coord7Offset * DefocusTexelDims).rgb;
-	float3 d8 = tex2D(DiffuseSampler, Input.TexCoord + Coord8Offset * DefocusTexelDims).rgb;
+	float3 texel = tex2D(DiffuseSampler, Input.TexCoord).rgb;
+	float samples = 1.0f;
 
-	float3 blurred = (d.rgb + d1 + d2 + d3 + d4 + d5 + d6 + d7 + d8) / 9.0f;
-	blurred = lerp(d.rgb, blurred, 1.0f);
+	for (int i = 0; i < 8; i++)
+	{
+		texel += tex2D(DiffuseSampler, Input.TexCoord + CoordOffset8[i] * DefocusTexelDims).rgb;
+		samples += 1.0f;
+	}
 
-	return float4(blurred, d.a);
+	return float4(texel / samples, 1.0f);
 }
 
 //-----------------------------------------------------------------------------
@@ -129,7 +122,7 @@ technique DefaultTechnique
 	{
 		Lighting = FALSE;
 
-		VertexShader = compile vs_2_0 vs_main();
-		PixelShader = compile ps_2_0 ps_main();
+		VertexShader = compile vs_3_0 vs_main();
+		PixelShader = compile ps_3_0 ps_main();
 	}
 }

@@ -3,14 +3,18 @@
 #ifndef __COMMON_STRING_CONVERT_H
 #define __COMMON_STRING_CONVERT_H
 
-#include "MyWindows.h"
 #include "MyString.h"
-#include "Types.h"
+#include "MyWindows.h"
 
 UString MultiByteToUnicodeString(const AString &srcString, UINT codePage = CP_ACP);
+
+// optimized versions that work faster for ASCII strings
+void MultiByteToUnicodeString2(UString &dest, const AString &srcString, UINT codePage = CP_ACP);
+// void UnicodeStringToMultiByte2(AString &dest, const UString &s, UINT codePage, char defaultChar, bool &defaultCharWasUsed);
+void UnicodeStringToMultiByte2(AString &dest, const UString &srcString, UINT codePage);
+
 AString UnicodeStringToMultiByte(const UString &srcString, UINT codePage, char defaultChar, bool &defaultCharWasUsed);
 AString UnicodeStringToMultiByte(const UString &srcString, UINT codePage = CP_ACP);
-
 
 inline const wchar_t* GetUnicodeString(const wchar_t* unicodeString)
   { return unicodeString; }

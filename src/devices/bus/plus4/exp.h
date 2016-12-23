@@ -40,7 +40,7 @@
 #define __PLUS4_EXPANSION_SLOT__
 
 #include "emu.h"
-
+#include "softlist_dev.h"
 
 
 //**************************************************************************
@@ -60,7 +60,7 @@
 	MCFG_DEVICE_SLOT_INTERFACE(_slot_intf, _def_slot, false)
 
 #define MCFG_PLUS4_PASSTHRU_EXPANSION_SLOT_ADD() \
-	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, NULL) \
+	MCFG_PLUS4_EXPANSION_SLOT_ADD(PLUS4_EXPANSION_SLOT_TAG, 0, plus4_expansion_cards, nullptr) \
 	MCFG_PLUS4_EXPANSION_SLOT_IRQ_CALLBACK(DEVWRITELINE(DEVICE_SELF_OWNER, plus4_expansion_slot_device, irq_w)) \
 	MCFG_PLUS4_EXPANSION_SLOT_CD_INPUT_CALLBACK(DEVREAD8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_r)) \
 	MCFG_PLUS4_EXPANSION_SLOT_CD_OUTPUT_CALLBACK(DEVWRITE8(DEVICE_SELF_OWNER, plus4_expansion_slot_device, dma_cd_w)) \
@@ -95,7 +95,7 @@ class plus4_expansion_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	plus4_expansion_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_irq_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_irq.set_callback(object); }
 	template<class _Object> static devcb_base &set_cd_rd_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_read_dma_cd.set_callback(object); }
@@ -103,8 +103,8 @@ public:
 	template<class _Object> static devcb_base &set_aec_wr_callback(device_t &device, _Object object) { return downcast<plus4_expansion_slot_device &>(device).m_write_aec.set_callback(object); }
 
 	// computer interface
-	UINT8 cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
-	void cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	uint8_t cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
+	void cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h);
 
 	// cartridge interface
 	DECLARE_READ8_MEMBER( dma_cd_r ) { return m_read_dma_cd(offset); }
@@ -120,8 +120,8 @@ protected:
 	virtual void device_reset() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual image_init_result call_load() override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 
@@ -132,7 +132,6 @@ protected:
 	virtual bool is_reset_on_load() const override { return 1; }
 	virtual const char *image_interface() const override { return "plus4_cart"; }
 	virtual const char *file_extensions() const override { return "rom,bin"; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
@@ -158,14 +157,14 @@ public:
 	virtual ~device_plus4_expansion_card_interface();
 
 	// runtime
-	virtual UINT8 plus4_cd_r(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; };
-	virtual void plus4_cd_w(address_space &space, offs_t offset, UINT8 data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { };
+	virtual uint8_t plus4_cd_r(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { return data; };
+	virtual void plus4_cd_w(address_space &space, offs_t offset, uint8_t data, int ba, int cs0, int c1l, int c2l, int cs1, int c1h, int c2h) { };
 
 protected:
-	optional_shared_ptr<UINT8> m_c1l;
-	optional_shared_ptr<UINT8> m_c1h;
-	optional_shared_ptr<UINT8> m_c2l;
-	optional_shared_ptr<UINT8> m_c2h;
+	optional_shared_ptr<uint8_t> m_c1l;
+	optional_shared_ptr<uint8_t> m_c1h;
+	optional_shared_ptr<uint8_t> m_c2l;
+	optional_shared_ptr<uint8_t> m_c2h;
 
 	size_t m_c1l_mask;
 	size_t m_c1h_mask;

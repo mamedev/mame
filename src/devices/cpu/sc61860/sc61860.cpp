@@ -49,7 +49,7 @@
 const device_type SC61860 = &device_creator<sc61860_device>;
 
 
-sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: cpu_device(mconfig, SC61860, "SC61860", tag, owner, clock, "sc61860", __FILE__)
 	, m_program_config("program", ENDIANNESS_BIG, 8, 16, 0)
 	, m_reset(*this)
@@ -64,14 +64,14 @@ sc61860_device::sc61860_device(const machine_config &mconfig, const char *tag, d
 }
 
 
-offs_t sc61860_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
+offs_t sc61860_device::disasm_disassemble(std::ostream &stream, offs_t pc, const uint8_t *oprom, const uint8_t *opram, uint32_t options)
 {
 	extern CPU_DISASSEMBLE( sc61860 );
-	return CPU_DISASSEMBLE_NAME(sc61860)(this, buffer, pc, oprom, opram, options);
+	return CPU_DISASSEMBLE_NAME(sc61860)(this, stream, pc, oprom, opram, options);
 }
 
 
-UINT8 *sc61860_device::internal_ram()
+uint8_t *sc61860_device::internal_ram()
 {
 	return m_ram;
 }
@@ -89,8 +89,8 @@ TIMER_CALLBACK_MEMBER(sc61860_device::sc61860_2ms_tick)
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
-#include "scops.inc"
-#include "sctable.inc"
+#include "scops.hxx"
+#include "sctable.hxx"
 
 void sc61860_device::device_reset()
 {
@@ -163,9 +163,9 @@ void sc61860_device::device_start()
 	state_add( SC61860_ZERO,  "Zero" , m_zero          ).mask(1).formatstr("%1u");
 
 	state_add(STATE_GENPC, "GENPC", m_pc).formatstr("%04X").noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_oldpc).formatstr("%04X").noshow();
 	state_add(STATE_GENFLAGS, "GENFLAGS",  m_debugger_temp).formatstr("%2s").noshow();
 	state_add(STATE_GENSP, "GENSP", m_r).mask(0x7f).formatstr("%02X").noshow();
-	state_add(STATE_GENPCBASE, "GENPCBASE", m_oldpc).formatstr("%04X").noshow();
 
 	m_icountptr = &m_icount;
 }
@@ -176,7 +176,7 @@ void sc61860_device::state_string_export(const device_state_entry &entry, std::s
 	switch (entry.index())
 	{
 		case STATE_GENFLAGS:
-			strprintf(str, "%c%c", m_zero ? 'Z' : '.', m_carry ? 'C' : '.');
+			str = string_format("%c%c", m_zero ? 'Z' : '.', m_carry ? 'C' : '.');
 			break;
 	}
 }

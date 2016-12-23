@@ -1,21 +1,8 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Roberto Fresca
-/* Notes: DJH 04 Jan 2008
-
-  fixed gridiron079gre (shared access to spriteram was broken)
-
-  The inputs seem to be a hacky mess (although there was reportedly a
-  hardware joystick hack for tehkanwc via plugin logic subboard, is this
-  attempting to simulate it?
-
-  Also there is a hack to reset the sound CPU...
-
-*/
-
 /***************************************************************************
 
 Tehkan World Cup - (c) Tehkan 1985
-
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -89,9 +76,21 @@ TO DO :
   - Confirm "Difficulty" Dip Switch in 'teedoff'
 
 ***************************************************************************/
+/* Notes: DJH 04 Jan 2008
+
+  fixed gridiron079gre (shared access to spriteram was broken)
+
+  The inputs seem to be a hacky mess (although there was reportedly a
+  hardware joystick hack for tehkanwc via plugin logic subboard, is this
+  attempting to simulate it?
+
+  Also there is a hack to reset the sound CPU...
+
+*/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "gridiron.lh"
 #include "includes/tehkanwc.h"
@@ -150,7 +149,7 @@ WRITE8_MEMBER(tehkanwc_state::track_1_reset_w)
 
 WRITE8_MEMBER(tehkanwc_state::sound_command_w)
 {
-	soundlatch_byte_w(space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
@@ -162,13 +161,13 @@ void tehkanwc_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		m_audiocpu->set_input_line(INPUT_LINE_RESET, PULSE_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in tehkanwc_state::device_timer");
+		assert_always(false, "Unknown id in tehkanwc_state::device_timer");
 	}
 }
 
 WRITE8_MEMBER(tehkanwc_state::sound_answer_w)
 {
-	soundlatch2_byte_w(space, 0, data);
+	m_soundlatch2->write(space, 0, data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
@@ -206,7 +205,7 @@ WRITE8_MEMBER(tehkanwc_state::msm_reset_w)
 
 WRITE_LINE_MEMBER(tehkanwc_state::adpcm_int)
 {
-	UINT8 *SAMPLES = memregion("adpcm")->base();
+	uint8_t *SAMPLES = memregion("adpcm")->base();
 	int msm_data = SAMPLES[m_msm_data_offs & 0x7fff];
 
 	if (m_toggle == 0)
@@ -243,10 +242,10 @@ static ADDRESS_MAP_START( main_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xf810, 0xf811) AM_READWRITE(track_1_r, track_1_reset_w) /* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
 	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
-	AM_RANGE(0xf820, 0xf820) AM_READ(soundlatch2_byte_r) AM_WRITE(sound_command_w)  /* answer from the sound CPU */
+	AM_RANGE(0xf820, 0xf820) AM_DEVREAD("soundlatch2", generic_latch_8_device, read) AM_WRITE(sound_command_w)  /* answer from the sound CPU */
 	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
 	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITENOP           /* ?? writes 0x00 or 0xff */
-	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r) AM_WRITE(flipscreen_x_w)
+	AM_RANGE(0xf860, 0xf860) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r) AM_WRITE(flipscreen_x_w)
 	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(flipscreen_y_w)
 ADDRESS_MAP_END
 
@@ -262,7 +261,7 @@ static ADDRESS_MAP_START( sub_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0xe800, 0xebff) AM_RAM AM_SHARE("spriteram") /* sprites */
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(scroll_y_w)
-	AM_RANGE(0xf860, 0xf860) AM_READ(watchdog_reset_r)
+	AM_RANGE(0xf860, 0xf860) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
@@ -271,7 +270,7 @@ static ADDRESS_MAP_START( sound_mem, AS_PROGRAM, 8, tehkanwc_state )
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(msm_reset_w)/* MSM51xx reset */
 	AM_RANGE(0x8002, 0x8002) AM_WRITENOP    /* ?? written in the IRQ handler */
 	AM_RANGE(0x8003, 0x8003) AM_WRITENOP    /* ?? written in the NMI handler */
-	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_byte_r) AM_WRITE(sound_answer_w)
+	AM_RANGE(0xc000, 0xc000) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(sound_answer_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, tehkanwc_state )
@@ -642,6 +641,8 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))   /* 10 CPU slices per frame - seems enough to keep the CPUs in sync */
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -659,12 +660,15 @@ static MACHINE_CONFIG_START( tehkanwc, tehkanwc_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch2")
+
+	MCFG_SOUND_ADD("ay1", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(tehkanwc_state, portA_w))
 	MCFG_AY8910_PORT_B_WRITE_CB(WRITE8(tehkanwc_state, portB_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MCFG_AY8910_PORT_A_READ_CB(READ8(tehkanwc_state, portA_r))
 	MCFG_AY8910_PORT_B_READ_CB(READ8(tehkanwc_state, portB_r))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
@@ -695,7 +699,7 @@ DRIVER_INIT_MEMBER(tehkanwc_state,teedoff)
 	    023A: 00          nop
 	*/
 
-	UINT8 *ROM = memregion("maincpu")->base();
+	uint8_t *ROM = memregion("maincpu")->base();
 
 	ROM[0x0238] = 0x00;
 	ROM[0x0239] = 0x00;

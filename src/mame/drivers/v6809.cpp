@@ -80,8 +80,8 @@ public:
 	{
 	}
 
-	DECLARE_WRITE8_MEMBER(speaker_en_w);
-	DECLARE_WRITE8_MEMBER(speaker_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_en_w);
+	DECLARE_WRITE_LINE_MEMBER(speaker_w);
 	DECLARE_READ8_MEMBER(pb_r);
 	DECLARE_WRITE8_MEMBER(pa_w);
 	DECLARE_WRITE8_MEMBER(videoram_w);
@@ -93,15 +93,15 @@ public:
 	MC6845_UPDATE_ROW(crtc_update_row);
 	MC6845_ON_UPDATE_ADDR_CHANGED(crtc_update_addr);
 
-	UINT8 *m_p_videoram;
-	const UINT8 *m_p_chargen;
-	UINT16 m_video_address;
+	uint8_t *m_p_videoram;
+	const uint8_t *m_p_chargen;
+	uint16_t m_video_address;
 
 private:
 	bool m_speaker_en;
-	UINT8 m_video_index;
-	UINT8 m_term_data;
-	UINT8 m_vidbyte;
+	uint8_t m_video_index;
+	uint8_t m_term_data;
+	uint8_t m_vidbyte;
 	required_device<pia6821_device> m_pia0;
 	required_device<cpu_device> m_maincpu;
 	required_device<mc6845_device> m_crtc;
@@ -121,14 +121,14 @@ static ADDRESS_MAP_START(v6809_mem, AS_PROGRAM, 8, v6809_state)
 	AM_RANGE(0xf000, 0xf000) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, status_r) AM_WRITE(v6809_address_w)
 	AM_RANGE(0xf001, 0xf001) AM_MIRROR(0xfe) AM_DEVREAD("crtc", mc6845_device, register_r) AM_WRITE(v6809_register_w)
 	AM_RANGE(0xf200, 0xf200) AM_MIRROR(0xff) AM_WRITE(videoram_w)
-	AM_RANGE(0xf504, 0xf504) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // modem
-	AM_RANGE(0xf505, 0xf505) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
-	AM_RANGE(0xf50c, 0xf50c) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // printer
-	AM_RANGE(0xf50d, 0xf50d) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf500, 0xf500) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, status_r, control_w) // modem
+	AM_RANGE(0xf501, 0xf501) AM_MIRROR(0x36) AM_DEVREADWRITE("acia0", acia6850_device, data_r, data_w)
+	AM_RANGE(0xf508, 0xf508) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, status_r, control_w) // printer
+	AM_RANGE(0xf509, 0xf509) AM_MIRROR(0x36) AM_DEVREADWRITE("acia1", acia6850_device, data_r, data_w)
 	AM_RANGE(0xf600, 0xf603) AM_MIRROR(0x3c) AM_DEVREADWRITE("fdc", mb8876_t, read, write)
 	AM_RANGE(0xf640, 0xf64f) AM_MIRROR(0x30) AM_DEVREADWRITE("rtc", mm58274c_device, read, write)
 	AM_RANGE(0xf680, 0xf683) AM_MIRROR(0x3c) AM_DEVREADWRITE("pia0", pia6821_device, read, write)
-	AM_RANGE(0xf6c8, 0xf6cf) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
+	AM_RANGE(0xf6c0, 0xf6c7) AM_MIRROR(0x08) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0xf6d0, 0xf6d3) AM_MIRROR(0x0c) AM_DEVREADWRITE("pia1", pia6821_device, read, write)
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -173,9 +173,9 @@ GFXDECODE_END
 MC6845_UPDATE_ROW( v6809_state::crtc_update_row )
 {
 	const rgb_t *palette = m_palette->palette()->entry_list_raw();
-	UINT8 chr,gfx;
-	UINT16 mem,x;
-	UINT32 *p = &bitmap.pix32(y);
+	uint8_t chr,gfx;
+	uint16_t mem,x;
+	uint32_t *p = &bitmap.pix32(y);
 
 	for (x = 0; x < x_count; x++)
 	{
@@ -218,7 +218,7 @@ WRITE8_MEMBER( v6809_state::v6809_address_w )
 
 WRITE8_MEMBER( v6809_state::v6809_register_w )
 {
-	UINT16 temp = m_video_address;
+	uint16_t temp = m_video_address;
 
 	m_crtc->register_w( space, 0, data );
 
@@ -249,7 +249,7 @@ WRITE_LINE_MEMBER( v6809_state::write_acia_clock )
 
 READ8_MEMBER( v6809_state::pb_r )
 {
-	UINT8 ret = m_term_data;
+	uint8_t ret = m_term_data;
 	m_term_data = 0;
 	return ret;
 }
@@ -276,12 +276,12 @@ WRITE8_MEMBER( v6809_state::pa_w )
 
 // this should output 1 to enable sound, then output 0 after a short time
 // however it continuously outputs 1
-WRITE8_MEMBER( v6809_state::speaker_en_w )
+WRITE_LINE_MEMBER( v6809_state::speaker_en_w )
 {
-	m_speaker_en = data;
+	m_speaker_en = state;
 }
 
-WRITE8_MEMBER( v6809_state::speaker_w )
+WRITE_LINE_MEMBER( v6809_state::speaker_w )
 {
 //  if (m_speaker_en)
 //      m_speaker->level_w(data);
@@ -308,7 +308,7 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_SCREEN_SIZE(640, 480)
 	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MCFG_SCREEN_UPDATE_DEVICE("crtc", sy6545_1_device, screen_update)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", v6809)
 
 	/* sound hardware */
@@ -331,19 +331,18 @@ static MACHINE_CONFIG_START( v6809, v6809_state )
 	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
 	MCFG_PIA_READPB_HANDLER(READ8(v6809_state, pb_r))
 	MCFG_PIA_WRITEPA_HANDLER(WRITE8(v6809_state, pa_w))
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 // no idea what this does
 	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_IRQA_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
-	MCFG_PIA_IRQB_HANDLER(DEVWRITELINE("maincpu", m6809_device, irq_line))
+	MCFG_PIA_IRQA_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
+	MCFG_PIA_IRQB_HANDLER(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
-	MCFG_DEVICE_ADD("ptm", PTM6840, 0)
-	MCFG_PTM6840_INTERNAL_CLOCK(XTAL_16MHz / 4)
+	MCFG_DEVICE_ADD("ptm", PTM6840, XTAL_16MHz / 4)
 	MCFG_PTM6840_EXTERNAL_CLOCKS(4000000/14, 4000000/14, 4000000/14/8)
-	MCFG_PTM6840_OUT1_CB(WRITE8(v6809_state, speaker_w))
-	MCFG_PTM6840_OUT2_CB(WRITE8(v6809_state, speaker_en_w))
+	MCFG_PTM6840_OUT1_CB(WRITELINE(v6809_state, speaker_w))
+	MCFG_PTM6840_OUT2_CB(WRITELINE(v6809_state, speaker_en_w))
 	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", M6809_IRQ_LINE))
 
 	MCFG_DEVICE_ADD("acia0", ACIA6850, 0)

@@ -36,7 +36,7 @@ static const char *const s_mnemonic[] =
 #define _OVER DASMFLAG_STEP_OVER
 #define _OUT  DASMFLAG_STEP_OUT
 
-static const UINT32 s_flags[] = {
+static const uint32_t s_flags[] = {
 	0    ,0    ,0    ,0    ,_OVER,0    ,0    ,
 	0    ,0    ,0    ,0    ,0    ,0    ,_OVER,
 	0    ,0    ,0    ,0    ,0    ,0    ,0    ,
@@ -48,7 +48,7 @@ static const UINT32 s_flags[] = {
 
 struct lr35902dasm
 {
-	UINT8   mnemonic;
+	uint8_t   mnemonic;
 	const char *arguments;
 };
 
@@ -190,18 +190,16 @@ static const lr35902dasm mnemonic_main[256]= {
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
 
-CPU_DISASSEMBLE( lr35902 )
+CPU_DISASSEMBLE(lr35902)
 {
 	const lr35902dasm *d;
 	const char /* *symbol,*/ *src;
-	char *dst;
-	INT8 offset;
-	UINT8 op, op1;
-	UINT16 ea;
+	int8_t offset;
+	uint8_t op, op1;
+	uint16_t ea;
 	int pos = 0;
 
-	dst = buffer;
-	//symbol = NULL;
+	//symbol = nullptr;
 
 	op = oprom[pos++];
 	op1 = 0; /* keep GCC happy */
@@ -214,63 +212,63 @@ CPU_DISASSEMBLE( lr35902 )
 	}
 
 	if( d->arguments ) {
-		dst += sprintf(dst, "%-4s ", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%-4s ", s_mnemonic[d->mnemonic]);
 		src = d->arguments;
 		while( *src ) {
 			switch( *src ) {
 			case '?':   /* illegal opcode */
-				dst += sprintf( dst, "$%02X,$%02X", op, op1);
+				util::stream_format(stream, "$%02X,$%02X", op, op1);
 				break;
 			case 'A':
-				ea = opram[pos] + ( opram[pos+1] << 8);
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'B':   /* Byte op arg */
 				ea = opram[pos++];
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea);
 				break;
 			case '(':   /* Memory byte at (...) */
-				*dst++ = *src;
+				stream << *src;
 				if( !strncmp( src, "(bc)", 4) ) {
 				} else if( !strncmp( src, "(de)", 4) ) {
 				} else if( !strncmp( src, "(hl)", 4) ) {
 				} else if( !strncmp( src, "(sp)", 4) ) {
 				} else if( !strncmp( src, "(F)", 3) ) {
 					ea = 0xFF00 + opram[pos++];
-					dst += sprintf( dst, "$%02X", ea );
+					util::stream_format(stream, "$%02X", ea);
 					src++;
 				} else if( !strncmp( src, "(C)", 3) ) {
-					dst += sprintf( dst, "$FF00+c" );
+					util::stream_format(stream, "$FF00+c");
 					src++;
 				}
 				break;
 			case 'N':   /* Immediate 16 bit */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			case 'O':   /* Offset relative to PC */
-				offset = (INT8) opram[pos++];
-				dst += sprintf( dst, "$%04X", pc + offset + 2 );
+				offset = (int8_t) opram[pos++];
+				util::stream_format(stream, "$%04X", pc + offset + 2);
 				break;
 			case 'V':   /* Restart vector */
 				ea = op & 0x38;
-				dst += sprintf( dst, "$%02X", ea );
+				util::stream_format(stream, "$%02X", ea);
 				break;
 			case 'W':   /* Memory address word */
-				ea = opram[pos] + ( opram[pos+1] << 8 );
+				ea = opram[pos] + (opram[pos+1] << 8);
 				pos += 2;
-				dst += sprintf( dst, "$%04X", ea );
+				util::stream_format(stream, "$%04X", ea);
 				break;
 			default:
-				*dst++ = *src;
+				stream << *src;
+				break;
 			}
 			src++;
 		}
-		*dst = '\0';
 	} else {
-		dst += sprintf(dst, "%s", s_mnemonic[d->mnemonic]);
+		util::stream_format(stream, "%s", s_mnemonic[d->mnemonic]);
 	}
 
 	return pos | s_flags[d->mnemonic] | DASMFLAG_SUPPORTED;

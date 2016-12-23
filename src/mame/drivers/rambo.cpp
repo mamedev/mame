@@ -37,17 +37,17 @@ public:
 	{
 	}
 
-	UINT8 m_port_a;
-	UINT8 m_port_b;
-	UINT8 m_port_c;
-	UINT8 m_port_d;
-	UINT8 m_port_e;
-	UINT8 m_port_f;
-	UINT8 m_port_g;
-	UINT8 m_port_h;
-	UINT8 m_port_j;
-	UINT8 m_port_k;
-	UINT8 m_port_l;
+	uint8_t m_port_a;
+	uint8_t m_port_b;
+	uint8_t m_port_c;
+	uint8_t m_port_d;
+	uint8_t m_port_e;
+	uint8_t m_port_f;
+	uint8_t m_port_g;
+	uint8_t m_port_h;
+	uint8_t m_port_j;
+	uint8_t m_port_k;
+	uint8_t m_port_l;
 	required_device<avr8_device> m_maincpu;
 
 	DECLARE_READ8_MEMBER(port_r);
@@ -88,8 +88,8 @@ WRITE8_MEMBER(rambo_state::port_w)
 			if (data == m_port_a) break;
 
 #if LOG_PORTS
-			UINT8 old_port_a = m_port_a;
-			UINT8 changed = data ^ old_port_a;
+			uint8_t old_port_a = m_port_a;
+			uint8_t changed = data ^ old_port_a;
 #endif
 			m_port_a = data;
 			break;

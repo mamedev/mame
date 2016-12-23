@@ -48,6 +48,7 @@ ICS8080
 
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
+#include "cpu/z80/z80.h"
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 #include "tk80.lh"
@@ -68,11 +69,11 @@ public:
 	DECLARE_WRITE8_MEMBER(mikrolab_serial_w);
 	DECLARE_READ8_MEMBER(display_r);
 	DECLARE_WRITE8_MEMBER(display_w);
-	UINT8 m_term_data;
-	UINT8 m_keyb_press;
-	UINT8 m_keyb_press_flag;
-	UINT8 m_shift_press_flag;
-	UINT8 m_ppi_portc;
+	uint8_t m_term_data;
+	uint8_t m_keyb_press;
+	uint8_t m_keyb_press_flag;
+	uint8_t m_shift_press_flag;
+	uint8_t m_ppi_portc;
 	required_device<cpu_device> m_maincpu;
 };
 
@@ -194,7 +195,7 @@ READ8_MEMBER( tk80_state::key_matrix_r )
 {
 // PA0-7 keyscan in
 
-	UINT8 data = 0xff;
+	uint8_t data = 0xff;
 
 	if (BIT(m_ppi_portc, 4))
 		data &= ioport("X0")->read();
@@ -210,7 +211,7 @@ READ8_MEMBER( tk80_state::nd80z_key_r )
 {
 // PA0-7 keyscan in
 
-	UINT8 data = 0xff, row = m_ppi_portc & 7;
+	uint8_t data = 0xff, row = m_ppi_portc & 7;
 	if (row == 6)
 		data &= ioport("X0")->read();
 	else
@@ -276,13 +277,15 @@ static MACHINE_CONFIG_DERIVED( mikrolab, tk80 )
 	MCFG_I8255_OUT_PORTC_CB(WRITE8(tk80_state, mikrolab_serial_w))
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( nd80z, tk80 )
-	MCFG_CPU_MODIFY("maincpu")
+static MACHINE_CONFIG_START( nd80z, tk80_state )
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_1MHz) // Sharp LH0080A, can't see writing on xtal
 	MCFG_CPU_PROGRAM_MAP(tk85_mem)
 	MCFG_CPU_IO_MAP(nd80z_io)
 
+	/* video hardware */
+	MCFG_DEFAULT_LAYOUT(layout_tk80)
+
 	/* Devices */
-	MCFG_DEVICE_REMOVE("ppi8255")
 	MCFG_DEVICE_ADD("ppi8255", I8255, 0)
 	MCFG_I8255_IN_PORTA_CB(READ8(tk80_state, nd80z_key_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(tk80_state, serial_r))
@@ -330,7 +333,7 @@ ROM_END
 
 ROM_START( nd80z )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
-	ROM_LOAD( "nd80z.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
+	ROM_LOAD( "ndf.bin",  0x0000, 0x0800, CRC(fe829f1d) SHA1(6fff31884b8d984076d4450ca3a3e48efadeb648))
 ROM_END
 
 

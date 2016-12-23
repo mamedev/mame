@@ -36,7 +36,7 @@ void pecom_state::machine_start()
 
 void pecom_state::machine_reset()
 {
-	UINT8 *rom = memregion(CDP1802_TAG)->base();
+	uint8_t *rom = memregion(CDP1802_TAG)->base();
 	address_space &space = m_cdp1802->space(AS_PROGRAM);
 
 
@@ -79,7 +79,7 @@ WRITE8_MEMBER(pecom_state::pecom_cdp1869_pageram_w)
 WRITE8_MEMBER(pecom_state::pecom_bank_w)
 {
 	address_space &space2 = m_cdp1802->space(AS_PROGRAM);
-	UINT8 *rom = memregion(CDP1802_TAG)->base();
+	uint8_t *rom = memregion(CDP1802_TAG)->base();
 	m_cdp1802->space(AS_PROGRAM).install_write_bank(0x0000, 0x3fff, "bank1");
 	m_bank1->set_base(m_ram->pointer() + 0x0000);
 
@@ -109,7 +109,7 @@ READ8_MEMBER(pecom_state::pecom_keyboard_r)
 	   Address is available on address bus during reading of value from port, and that is
 	   used to determine keyboard line reading
 	*/
-	UINT16 addr = m_cdp1802->state_int(COSMAC_R0 + m_cdp1802->state_int(COSMAC_X));
+	uint16_t addr = m_cdp1802->state_int(COSMAC_R0 + m_cdp1802->state_int(COSMAC_X));
 	/* just in case somone is reading non existing ports */
 	if (addr<0x7cca || addr>0x7ce3) return 0;
 	return m_io_ports[addr - 0x7cca]->read() & 0x03;
@@ -135,7 +135,7 @@ static COSMAC_EF_READ( pecom64_ef_r )
 {
     int flags = 0x0f;
     double valcas = (cassette_device_image(device->machine()));->input()
-    UINT8 val = device->machine().root_device().ioport("CNT")->read();
+    uint8_t val = device->machine().root_device().ioport("CNT")->read();
 
     if ((val & 0x04)==0x04 && pecom_prev_caps_state==0)
     {

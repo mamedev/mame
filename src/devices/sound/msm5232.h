@@ -13,23 +13,23 @@
 	devcb = &msm5232_device::set_gate_handler_callback(*device, DEVCB_##_devcb);
 
 struct VOICE {
-	UINT8 mode;
+	uint8_t mode;
 
 	int     TG_count_period;
 	int     TG_count;
 
-	UINT8   TG_cnt;     /* 7 bits binary counter (frequency output) */
-	UINT8   TG_out16;   /* bit number (of TG_cnt) for 16' output */
-	UINT8   TG_out8;    /* bit number (of TG_cnt) for  8' output */
-	UINT8   TG_out4;    /* bit number (of TG_cnt) for  4' output */
-	UINT8   TG_out2;    /* bit number (of TG_cnt) for  2' output */
+	uint8_t   TG_cnt;     /* 7 bits binary counter (frequency output) */
+	uint8_t   TG_out16;   /* bit number (of TG_cnt) for 16' output */
+	uint8_t   TG_out8;    /* bit number (of TG_cnt) for  8' output */
+	uint8_t   TG_out4;    /* bit number (of TG_cnt) for  4' output */
+	uint8_t   TG_out2;    /* bit number (of TG_cnt) for  2' output */
 
 	int     egvol;
 	int     eg_sect;
 	int     counter;
 	int     eg;
 
-	UINT8   eg_arm;     /* attack/release mode */
+	uint8_t   eg_arm;     /* attack/release mode */
 
 	double  ar_rate;
 	double  dr_rate;
@@ -45,7 +45,7 @@ class msm5232_device : public device_t,
 									public device_sound_interface
 {
 public:
-	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	msm5232_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~msm5232_device() {}
 
 	static void static_set_capacitors(device_t &device, double cap1, double cap2, double cap3, double cap4, double cap5, double cap6, double cap7, double cap8);
@@ -69,10 +69,10 @@ protected:
 
 	VOICE   m_voi[8];
 
-	UINT32 m_EN_out16[2]; /* enable 16' output masks for both groups (0-disabled ; ~0 -enabled) */
-	UINT32 m_EN_out8[2];  /* enable 8'  output masks */
-	UINT32 m_EN_out4[2];  /* enable 4'  output masks */
-	UINT32 m_EN_out2[2];  /* enable 2'  output masks */
+	uint32_t m_EN_out16[2]; /* enable 16' output masks for both groups (0-disabled ; ~0 -enabled) */
+	uint32_t m_EN_out8[2];  /* enable 8'  output masks */
+	uint32_t m_EN_out4[2];  /* enable 4'  output masks */
+	uint32_t m_EN_out2[2];  /* enable 2'  output masks */
 
 	int m_noise_cnt;
 	int m_noise_step;
@@ -85,8 +85,8 @@ protected:
 	double  m_ar_tbl[8];
 	double  m_dr_tbl[16];
 
-	UINT8   m_control1;
-	UINT8   m_control2;
+	uint8_t   m_control1;
+	uint8_t   m_control2;
 
 	int     m_gate;       /* current state of the GATE output */
 

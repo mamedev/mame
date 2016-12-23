@@ -1,24 +1,41 @@
 PROG = lzma
-CXX = g++ -O2 -Wall
-CXX_C = gcc -O2 -Wall
-LIB = -lm
-RM = rm -f
-CFLAGS = -c -D_7ZIP_ST
+CXX = g++ -O2
+# -Wall -Werror -Wno-delete-non-virtual-dtor
+CXX_C = gcc -O2 -Wall -Werror
 
 ifdef SystemDrive
 IS_MINGW = 1
 endif
 
 ifdef IS_MINGW
+
+RM = del
+CFLAGS = -c
+LIB2 = -loleaut32 -luuid
+LDFLAGS = -s
+
 FILE_IO =FileIO
 FILE_IO_2 =Windows/$(FILE_IO)
-LIB2 = -luuid
+
+MT_FILES = \
+  LzFindMt.o \
+  Threads.o \
+
 else
+
+RM = rm -f
+CFLAGS = -c -D_7ZIP_ST
+
 FILE_IO =C_FileIO
 FILE_IO_2 =Common/$(FILE_IO)
+
+
 endif
 
+
 OBJS = \
+  $(MT_FILES) \
+  $(FILE_IO).o \
   LzmaAlone.o \
   Bench.o \
   BenchCon.o \
@@ -32,9 +49,9 @@ OBJS = \
   FilterCoder.o \
   MethodProps.o \
   StreamUtils.o \
-  $(FILE_IO).o \
   CommandLineParser.o \
   CRC.o \
+  CrcReg.o \
   IntToString.o \
   MyString.o \
   MyVector.o \
@@ -42,6 +59,7 @@ OBJS = \
   StringConvert.o \
   StringToInt.o \
   PropVariant.o \
+  System.o \
   7zCrc.o \
   7zCrcOpt.o \
   Alloc.o \
@@ -57,7 +75,7 @@ OBJS = \
 all: $(PROG)
 
 $(PROG): $(OBJS)
-	$(CXX) -o $(PROG) $(LDFLAGS) $(OBJS) $(LIB) $(LIB2)
+	$(CXX) -o $(PROG) $(LDFLAGS) $(OBJS) $(LIB2)
 
 LzmaAlone.o: LzmaAlone.cpp
 	$(CXX) $(CFLAGS) LzmaAlone.cpp
@@ -108,6 +126,9 @@ CommandLineParser.o: ../../../Common/CommandLineParser.cpp
 CRC.o: ../../../Common/CRC.cpp
 	$(CXX) $(CFLAGS) ../../../Common/CRC.cpp
 
+CrcReg.o: ../../../Common/CrcReg.cpp
+	$(CXX) $(CFLAGS) ../../../Common/CrcReg.cpp
+
 IntToString.o: ../../../Common/IntToString.cpp
 	$(CXX) $(CFLAGS) ../../../Common/IntToString.cpp
 
@@ -129,6 +150,9 @@ StringToInt.o: ../../../Common/StringToInt.cpp
 PropVariant.o: ../../../Windows/PropVariant.cpp
 	$(CXX) $(CFLAGS) ../../../Windows/PropVariant.cpp
 
+System.o: ../../../Windows/System.cpp
+	$(CXX) $(CFLAGS) ../../../Windows/System.cpp
+
 7zCrc.o: ../../../../C/7zCrc.c
 	$(CXX_C) $(CFLAGS) ../../../../C/7zCrc.c
 
@@ -147,6 +171,14 @@ CpuArch.o: ../../../../C/CpuArch.c
 LzFind.o: ../../../../C/LzFind.c
 	$(CXX_C) $(CFLAGS) ../../../../C/LzFind.c
 
+ifdef MT_FILES
+LzFindMt.o: ../../../../C/LzFindMt.c
+	$(CXX_C) $(CFLAGS) ../../../../C/LzFindMt.c
+
+Threads.o: ../../../../C/Threads.c
+	$(CXX_C) $(CFLAGS) ../../../../C/Threads.c
+endif
+
 LzmaDec.o: ../../../../C/LzmaDec.c
 	$(CXX_C) $(CFLAGS) ../../../../C/LzmaDec.c
 
@@ -161,4 +193,3 @@ Lzma86Enc.o: ../../../../C/Lzma86Enc.c
 
 clean:
 	-$(RM) $(PROG) $(OBJS)
-

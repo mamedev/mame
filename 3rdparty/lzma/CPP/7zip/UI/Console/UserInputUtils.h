@@ -1,9 +1,9 @@
 // UserInputUtils.h
 
-#ifndef __USERINPUTUTILS_H
-#define __USERINPUTUTILS_H
+#ifndef __USER_INPUT_UTILS_H
+#define __USER_INPUT_UTILS_H
 
-#include "Common/StdOutStream.h"
+#include "../../../Common/StdOutStream.h"
 
 namespace NUserAnswerMode {
 

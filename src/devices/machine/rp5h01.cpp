@@ -20,7 +20,7 @@
 #include "machine/rp5h01.h"
 
 // this is the contents of an unprogrammed PROM
-static const UINT8 initial_data[0x10] =
+uint8_t const rp5h01_device::s_initial_data[0x10] =
 {
 	0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
 	0xff, 0xff, 0x00, 0x00, 0xff, 0xff, 0x00, 0x00
@@ -32,9 +32,10 @@ static const UINT8 initial_data[0x10] =
 
 const device_type RP5H01 = &device_creator<rp5h01_device>;
 
-rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+rp5h01_device::rp5h01_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, RP5H01, "RP5H01 6/7-bit Counter", tag, owner, clock, "rp5h01", __FILE__)
-	, m_rom_ptr(*this, DEVICE_SELF)
+	, m_data(nullptr)
+	, m_rom(*this, DEVICE_SELF, 0x10)
 {
 }
 
@@ -54,15 +55,10 @@ void rp5h01_device::device_config_complete()
 
 void rp5h01_device::device_start()
 {
-	if (m_rom_ptr == nullptr)
-	{
-		m_data = initial_data;
-	}
+	if (m_rom.found())
+		m_data = m_rom;
 	else
-	{
-		m_data = m_rom_ptr;
-		assert(region()->bytes() == 0x10);
-	}
+		m_data = s_initial_data;
 
 	/* register for state saving */
 	save_item(NAME(m_counter));

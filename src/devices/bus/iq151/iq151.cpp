@@ -8,7 +8,6 @@
 
 #include "emu.h"
 #include "iq151.h"
-#include "emuopts.h"
 
 #define  LOG    0
 
@@ -53,7 +52,7 @@ device_iq151cart_interface::~device_iq151cart_interface()
 //-------------------------------------------------
 //  iq151cart_slot_device - constructor
 //-------------------------------------------------
-iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+iq151cart_slot_device::iq151cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 		device_t(mconfig, IQ151CART_SLOT, "IQ151 cartridge slot", tag, owner, clock, "iq151cart_slot", __FILE__),
 		device_slot_interface(mconfig, *this),
 		device_image_interface(mconfig, *this),
@@ -110,7 +109,7 @@ void iq151cart_slot_device::device_config_complete()
     read
 -------------------------------------------------*/
 
-void iq151cart_slot_device::read(offs_t offset, UINT8 &data)
+void iq151cart_slot_device::read(offs_t offset, uint8_t &data)
 {
 	if (m_cart)
 		m_cart->read(offset, data);
@@ -120,7 +119,7 @@ void iq151cart_slot_device::read(offs_t offset, UINT8 &data)
     write
 -------------------------------------------------*/
 
-void iq151cart_slot_device::write(offs_t offset, UINT8 data)
+void iq151cart_slot_device::write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->write(offset, data);
@@ -130,7 +129,7 @@ void iq151cart_slot_device::write(offs_t offset, UINT8 data)
     IO read
 -------------------------------------------------*/
 
-void iq151cart_slot_device::io_read(offs_t offset, UINT8 &data)
+void iq151cart_slot_device::io_read(offs_t offset, uint8_t &data)
 {
 	if (m_cart)
 		m_cart->io_read(offset, data);
@@ -141,7 +140,7 @@ void iq151cart_slot_device::io_read(offs_t offset, UINT8 &data)
    IO write
 -------------------------------------------------*/
 
-void iq151cart_slot_device::io_write(offs_t offset, UINT8 data)
+void iq151cart_slot_device::io_write(offs_t offset, uint8_t data)
 {
 	if (m_cart)
 		m_cart->io_write(offset, data);
@@ -163,12 +162,12 @@ void iq151cart_slot_device::video_update(bitmap_ind16 &bitmap, const rectangle &
     call load
 -------------------------------------------------*/
 
-bool iq151cart_slot_device::call_load()
+image_init_result iq151cart_slot_device::call_load()
 {
 	if (m_cart)
 	{
 		offs_t read_length;
-		UINT8 *cart_base = m_cart->get_cart_base();
+		uint8_t *cart_base = m_cart->get_cart_base();
 
 		if (cart_base != nullptr)
 		{
@@ -184,20 +183,10 @@ bool iq151cart_slot_device::call_load()
 			}
 		}
 		else
-			return IMAGE_INIT_FAIL;
+			return image_init_result::FAIL;
 	}
 
-	return IMAGE_INIT_PASS;
-}
-
-/*-------------------------------------------------
-    call softlist load
--------------------------------------------------*/
-
-bool iq151cart_slot_device::call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry)
-{
-	machine().rom_load().load_software_part_region(*this, swlist, swname, start_entry );
-	return TRUE;
+	return image_init_result::PASS;
 }
 
 /*-------------------------------------------------

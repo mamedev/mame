@@ -36,10 +36,10 @@ public:
 	DECLARE_WRITE8_MEMBER(port3a_w);
 	DECLARE_WRITE8_MEMBER(port3b_w);
 private:
-	UINT8 m_port2;
-	UINT8 m_segment;
-	UINT8 m_lamprow;
-	UINT8 m_swrow;
+	uint8_t m_port2;
+	uint8_t m_segment;
+	uint8_t m_lamprow;
+	uint8_t m_swrow;
 	virtual void machine_reset() override;
 	required_device<cpu_device> m_maincpu;
 	optional_device<gottlieb_sound_r0_device> m_r0_sound;
@@ -250,7 +250,7 @@ INPUT_PORTS_END
 READ8_MEMBER( gts80a_state::port1a_r )
 {
 	char kbdrow[8];
-	UINT8 data = 0;
+	uint8_t data = 0;
 	if ((m_lamprow < 4) && (m_segment==0x80))
 	{
 		sprintf(kbdrow,"DSW.%d",m_lamprow);
@@ -280,9 +280,9 @@ WRITE8_MEMBER( gts80a_state::port1b_w )
 WRITE8_MEMBER( gts80a_state::port2a_w )
 {
 	m_port2 = data;
-	static const UINT8 patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
-	UINT16 seg1 = (UINT16)patterns[m_segment & 15];
-	UINT16 seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
+	static const uint8_t patterns[16] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x58,0x4c,0x62,0x69,0x78,0 }; // 7448
+	uint16_t seg1 = (uint16_t)patterns[m_segment & 15];
+	uint16_t seg2 = BITSWAP16(seg1, 8, 8, 8, 8, 8, 8, 7, 7, 6, 6, 5, 4, 3, 2, 1, 0);
 	switch (data & 0x70)
 	{
 		case 0x10: // player 1&2
@@ -314,7 +314,7 @@ WRITE8_MEMBER( gts80a_state::port3a_w )
 //pb0-3 = sound; pb4-7 = lamprow
 WRITE8_MEMBER( gts80a_state::port3b_w )
 {
-	UINT8 sndcmd = data & 15;
+	uint8_t sndcmd = data & 15;
 	m_lamprow = data >> 4;
 	if (m_r0_sound)
 		m_r0_sound->write(space, offset, sndcmd);
@@ -363,18 +363,18 @@ static MACHINE_CONFIG_START( gts80a, gts80a_state )
 
 	/* Sound */
 	MCFG_FRAGMENT_ADD( genpin_audio )
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gts80a_s, gts80a )
-	MCFG_GOTTLIEB_SOUND_R0_ADD("r0sound")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r0sound", GOTTLIEB_SOUND_REV0, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gts80a_ss, gts80a )
-	MCFG_GOTTLIEB_SOUND_R1_ADD("r1sound")
-	//MCFG_GOTTLIEB_SOUND_R1_ADD_VOTRAX("r1sound")  // votrax crashes
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1, 0)
+	//MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)  // votrax crashes
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -390,21 +390,21 @@ public:
 	{ }
 
 
-	UINT32 screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 private:
 	required_device<cpu_device> m_videocpu;
-	required_shared_ptr<UINT8> m_vram;
+	required_shared_ptr<uint8_t> m_vram;
 };
 
-UINT32 caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t caveman_state::screen_update_caveman(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int count = 0;
 	for (int y = 0; y < 256; y++)
 	{
 		for (int x = 0; x < 256; x += 4)
 		{
-			UINT8 pix = m_vram[count];
+			uint8_t pix = m_vram[count];
 
 			bitmap.pix16(y, x+0) = (pix >> 6)&0x3;
 			bitmap.pix16(y, x+1) = (pix >> 4)&0x3;
@@ -482,6 +482,17 @@ ROM_START(amazonh)
 	ROM_LOAD("u2_80a.bin", 0x2000, 0x1000, CRC(241de1d4) SHA1(9d5942704cbdec6565d6335e33e9f7e4c60a41ac))
 	ROM_LOAD("u3_80a.bin", 0x3000, 0x1000, CRC(2d77ccdc) SHA1(47241ccd365e8d74d5aa5b775acf6445cc95b8a8))
 	ROM_LOAD("684-2.cpu", 0x1000, 0x0800, CRC(b0d0c4af) SHA1(e81f568983d95cecb62d34598c40c5a5e6dcb3e2))
+
+	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
+	ROM_LOAD("684-s1.snd", 0x7000, 0x0800, CRC(86d239df) SHA1(f18efdc6b84d18b1cf01e79224284c5180c57d22))
+	ROM_LOAD("684-s2.snd", 0x7800, 0x0800, CRC(4d8ea26c) SHA1(d76d535bf29297247f1e5abd080a52b7dfc3811b))
+ROM_END
+
+ROM_START(amazonha)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("u2_80a.bin", 0x2000, 0x1000, CRC(241de1d4) SHA1(9d5942704cbdec6565d6335e33e9f7e4c60a41ac))
+	ROM_LOAD("u3_80a.bin", 0x3000, 0x1000, CRC(2d77ccdc) SHA1(47241ccd365e8d74d5aa5b775acf6445cc95b8a8))
+	ROM_LOAD("684-1.cpu", 0x1000, 0x0800, CRC(7fac5132) SHA1(2fbcda45935c1817b2230598921b86c6f52564c8))
 
 	ROM_REGION(0x10000, "r1sound:audiocpu", 0)
 	ROM_LOAD("684-s1.snd", 0x7000, 0x0800, CRC(86d239df) SHA1(f18efdc6b84d18b1cf01e79224284c5180c57d22))
@@ -790,6 +801,7 @@ ROM_END
 /* disp3 */GAME(1983,   rflshdlx,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Royal Flush Deluxe",       MACHINE_IS_SKELETON_MECHANICAL)
 /* cust  */GAME(1983,   goinnuts,   0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Goin' Nuts",           MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   amazonh,    0,      gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt",          MACHINE_IS_SKELETON_MECHANICAL)
+/* disp3 */GAME(1983,   amazonha,   amazonh,gts80a_ss,  gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Amazon Hunt (alternate set)", MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   rackempp,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Rack 'em Up! (Pinball)",           MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1983,   raimfire,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Ready...Aim...Fire!",      MACHINE_IS_SKELETON_MECHANICAL)
 /* disp3 */GAME(1984,   jack2opn,   0,      gts80a_s,   gts80a, gts80a_state,   gts80a, ROT0,   "Gottlieb",     "Jacks to Open",            MACHINE_IS_SKELETON_MECHANICAL)

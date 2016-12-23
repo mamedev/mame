@@ -123,7 +123,7 @@ EGL_IMPORT
 
 		~SwapChainGL()
 		{
-			eglMakeCurrent(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+			eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 			eglDestroyContext(m_display, m_context);
 			eglDestroySurface(m_display, m_surface);
 		}
@@ -252,6 +252,8 @@ EGL_IMPORT
 			const bool hasEglKhrCreateContext = !!bx::findIdentifierMatch(extensions, "EGL_KHR_create_context");
 			const bool hasEglKhrNoError       = !!bx::findIdentifierMatch(extensions, "EGL_KHR_create_context_no_error");
 
+			const uint32_t gles = BGFX_CONFIG_RENDERER_OPENGLES;
+
 			for (uint32_t ii = 0; ii < 2; ++ii)
 			{
 				bx::StaticMemoryBlockWriter writer(s_contextAttrs, sizeof(s_contextAttrs) );
@@ -264,10 +266,10 @@ EGL_IMPORT
 				if (hasEglKhrCreateContext)
 				{
 					bx::write(&writer, EGLint(EGL_CONTEXT_MAJOR_VERSION_KHR) );
-					bx::write(&writer, EGLint(BGFX_CONFIG_RENDERER_OPENGLES / 10) );
+					bx::write(&writer, EGLint(gles / 10) );
 
 					bx::write(&writer, EGLint(EGL_CONTEXT_MINOR_VERSION_KHR) );
-					bx::write(&writer, EGLint(BGFX_CONFIG_RENDERER_OPENGLES % 10) );
+					bx::write(&writer, EGLint(gles % 10) );
 
 					flags |= BGFX_CONFIG_DEBUG && hasEglKhrNoError ? 0
 						| EGL_CONTEXT_FLAG_NO_ERROR_BIT_KHR
@@ -314,13 +316,15 @@ EGL_IMPORT
 		}
 
 		import();
+
+		g_internalData.context = m_context;
 	}
 
 	void GlContext::destroy()
 	{
 		if (NULL != m_display)
 		{
-			eglMakeCurrent(EGL_NO_DISPLAY, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+			eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
 			eglDestroyContext(m_display, m_context);
 			eglDestroySurface(m_display, m_surface);
 			eglTerminate(m_display);
@@ -339,6 +343,14 @@ EGL_IMPORT
 #	if BX_PLATFORM_ANDROID
 		if (NULL != m_display)
 		{
+			EGLNativeWindowType nwh = (EGLNativeWindowType )g_platformData.nwh;
+			eglMakeCurrent(m_display, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
+			eglDestroySurface(m_display, m_surface);
+			m_surface = eglCreateWindowSurface(m_display, m_config, nwh, NULL);
+			BGFX_FATAL(m_surface != EGL_NO_SURFACE, Fatal::UnableToInitialize, "Failed to create surface.");
+			EGLBoolean success = eglMakeCurrent(m_display, m_surface, m_surface, m_context);
+			BGFX_FATAL(success, Fatal::UnableToInitialize, "Failed to set context.");
+
 			EGLint format;
 			eglGetConfigAttrib(m_display, m_config, EGL_NATIVE_VISUAL_ID, &format);
 			ANativeWindow_setBuffersGeometry( (ANativeWindow*)g_platformData.nwh, _width, _height, format);

@@ -12,7 +12,7 @@
                  CE*| 5          36| S1
                INT6*| 6          35| S2
                INT5*| 7          34| INT7*  / P15
-               INT4*| 8          33| INT8*  / P14
+               INT4*| 8          33| int8_t*  / P14
                INT3*| 9          32| INT9*  / P13
                 Phi*|10          31| INT10* / P12
              INTREQ*|11          30| INT11* / P11
@@ -134,7 +134,7 @@ TODO: Tests on a real machine
 /*
     Constructor
 */
-tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+tms9901_device::tms9901_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 : device_t(mconfig, TMS9901, "TMS9901 Programmable System Interface", tag, owner, clock, "tms9901", __FILE__),
 	m_read_block(*this),
 	m_write_p0(*this),
@@ -320,7 +320,7 @@ READ8_MEMBER( tms9901_device::read )
 			answer &= ~(m_pio_direction_mirror >> 8);
 			answer |= (m_pio_output_mirror & m_pio_direction_mirror) >> 8;
 		}
-		if (TRACE_PINS) logerror("%s: input on lines INT15..INT8 = %02x\n", tag(), answer);
+		if (TRACE_PINS) logerror("%s: input on lines INT15..int8_t = %02x\n", tag(), answer);
 		break;
 	case 2:
 		/* exit timer mode */
@@ -411,37 +411,53 @@ WRITE8_MEMBER ( tms9901_device::write )
 		switch (offset)
 		{
 		case 0x10:
-			if (!m_write_p0.isnull()) m_write_p0(data); break;
+			if (!m_write_p0.isnull()) m_write_p0(data);
+			break;
 		case 0x11:
-			if (!m_write_p1.isnull()) m_write_p1(data); break;
+			if (!m_write_p1.isnull()) m_write_p1(data);
+			break;
 		case 0x12:
-			if (!m_write_p2.isnull()) m_write_p2(data); break;
+			if (!m_write_p2.isnull()) m_write_p2(data);
+			break;
 		case 0x13:
-			if (!m_write_p3.isnull()) m_write_p3(data); break;
+			if (!m_write_p3.isnull()) m_write_p3(data);
+			break;
 		case 0x14:
-			if (!m_write_p4.isnull()) m_write_p4(data); break;
+			if (!m_write_p4.isnull()) m_write_p4(data);
+			break;
 		case 0x15:
-			if (!m_write_p5.isnull()) m_write_p5(data); break;
+			if (!m_write_p5.isnull()) m_write_p5(data);
+			break;
 		case 0x16:
-			if (!m_write_p6.isnull()) m_write_p6(data); break;
+			if (!m_write_p6.isnull()) m_write_p6(data);
+			break;
 		case 0x17:
-			if (!m_write_p7.isnull()) m_write_p7(data); break;
+			if (!m_write_p7.isnull()) m_write_p7(data);
+			break;
 		case 0x18:
-			if (!m_write_p8.isnull()) m_write_p8(data); break;
+			if (!m_write_p8.isnull()) m_write_p8(data);
+			break;
 		case 0x19:
-			if (!m_write_p9.isnull()) m_write_p9(data); break;
+			if (!m_write_p9.isnull()) m_write_p9(data);
+			break;
 		case 0x1A:
-			if (!m_write_p10.isnull()) m_write_p10(data); break;
+			if (!m_write_p10.isnull()) m_write_p10(data);
+			break;
 		case 0x1B:
-			if (!m_write_p11.isnull()) m_write_p11(data); break;
+			if (!m_write_p11.isnull()) m_write_p11(data);
+			break;
 		case 0x1C:
-			if (!m_write_p12.isnull()) m_write_p12(data); break;
+			if (!m_write_p12.isnull()) m_write_p12(data);
+			break;
 		case 0x1D:
-			if (!m_write_p13.isnull()) m_write_p13(data); break;
+			if (!m_write_p13.isnull()) m_write_p13(data);
+			break;
 		case 0x1E:
-			if (!m_write_p14.isnull()) m_write_p14(data); break;
+			if (!m_write_p14.isnull()) m_write_p14(data);
+			break;
 		case 0x1F:
-			if (!m_write_p15.isnull()) m_write_p15(data); break;
+			if (!m_write_p15.isnull()) m_write_p15(data);
+			break;
 
 		}
 		return;
@@ -574,6 +590,19 @@ void tms9901_device::device_stop(void)
 
 void tms9901_device::device_reset(void)
 {
+	do_reset();
+}
+
+/*
+    RST1 input line (active low; using ASSERT/CLEAR).
+*/
+WRITE_LINE_MEMBER( tms9901_device::rst1_line )
+{
+	if (state==ASSERT_LINE) do_reset();
+}
+
+void tms9901_device::do_reset()
+{
 	m_timer_int_pending = false;
 	m_enabled_ints = 0;
 
@@ -625,6 +654,20 @@ void tms9901_device::device_start(void)
 	m_interrupt.resolve();
 
 	m_clock_register = 0;
+
+	save_item(NAME(m_int_state));
+	save_item(NAME(m_old_int_state));
+	save_item(NAME(m_enabled_ints));
+	save_item(NAME(m_int_pending));
+	save_item(NAME(m_timer_int_pending));
+	save_item(NAME(m_pio_direction));
+	save_item(NAME(m_pio_output));
+	save_item(NAME(m_pio_direction_mirror));
+	save_item(NAME(m_pio_output_mirror));
+	save_item(NAME(m_clock_mode));
+	save_item(NAME(m_clock_register));
+	save_item(NAME(m_decrementer_value));
+	save_item(NAME(m_clock_read_register));
 }
 
 const device_type TMS9901 = &device_creator<tms9901_device>;

@@ -19,8 +19,7 @@ osd_module_manager::~osd_module_manager()
 {
 	for (int i = 0; m_modules[i] != nullptr; i++)
 	{
-		m_modules[i]->~osd_module();
-		osd_free(m_modules[i]);
+		global_free(m_modules[i]);
 	}
 }
 
@@ -32,19 +31,20 @@ void osd_module_manager::register_module(const module_type &mod_type)
 		osd_printf_verbose("===> registered module %s %s\n", module->name(), module->type());
 
 		int i;
-		for (i = 0; m_modules[i] != nullptr; i++)
+		for (i = 0; i < MAX_MODULES && m_modules[i] != nullptr; i++)
 			;
+
+		assert_always(i < MAX_MODULES, "Module registration beyond MAX_MODULES!");
 		m_modules[i] = module;
 	}
 	else
 	{
 		osd_printf_verbose("===> not supported %s %s\n", module->name(), module->type());
-		module->~osd_module();
-		osd_free(module);
+		global_free(module);
 	}
 }
 
-bool osd_module_manager::type_has_name(const char *type, const char *name)
+bool osd_module_manager::type_has_name(const char *type, const char *name) const
 {
 	return (get_module_index(type, name) >= 0);
 }
@@ -91,7 +91,7 @@ void osd_module_manager::exit()
 	}
 }
 
-int osd_module_manager::get_module_index(const char *type, const char *name)
+int osd_module_manager::get_module_index(const char *type, const char *name) const
 {
 	for (int i = 0; m_modules[i] != nullptr; i++)
 	{
@@ -101,7 +101,7 @@ int osd_module_manager::get_module_index(const char *type, const char *name)
 	return -1;
 }
 
-void osd_module_manager::get_module_names(const char *type, const int max, int *num, const char *names[])
+void osd_module_manager::get_module_names(const char *type, const int max, int *num, const char *names[]) const
 {
 	*num = 0;
 	for (int i = 0; m_modules[i] != nullptr; i++)

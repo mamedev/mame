@@ -20,7 +20,7 @@
 class beta_disk_device : public device_t
 {
 public:
-	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	beta_disk_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~beta_disk_device() {}
 
 	DECLARE_READ8_MEMBER(status_r);
@@ -40,13 +40,13 @@ public:
 	void enable();
 	void disable();
 
-	UINT8 m_betadisk_active;
+	uint8_t m_betadisk_active;
 
 protected:
 	// device-level overrides
 	virtual void device_start() override;
 	virtual void device_reset() override;
-	virtual const rom_entry *device_rom_region() const override;
+	virtual const tiny_rom_entry *device_rom_region() const override;
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 private:

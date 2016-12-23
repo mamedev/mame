@@ -62,36 +62,36 @@ public:
 	int m_lines26;
 	int m_multicolor;
 	struct { int x, y; } m_pos[4];
-	UINT8 m_bg[262][16+2*XPOS/8];
-	UINT8 m_rectangle[0x40][8];
-	UINT8 m_chars[0x40][8];
+	uint8_t m_bg[262][16+2*XPOS/8];
+	uint8_t m_rectangle[0x40][8];
+	uint8_t m_chars[0x40][8];
 	int m_breaker;
 	union
 	{
-		UINT8 data[0x400];
+		uint8_t data[0x400];
 		struct
 		{
 			// 0x1800
-			UINT8 chars1[13][16];
-			UINT8 ram1[2][16];
-			struct  { UINT8 y,x; } pos[4];
-			UINT8 ram2[4];
-			UINT8 vpos;
-			UINT8 sound1, sound2;
-			UINT8 char_line;
+			uint8_t chars1[13][16];
+			uint8_t ram1[2][16];
+			struct  { uint8_t y,x; } pos[4];
+			uint8_t ram2[4];
+			uint8_t vpos;
+			uint8_t sound1, sound2;
+			uint8_t char_line;
 			// 0x1900
-			UINT8 pad1a, pad1b, pad1c, pad1d;
-			UINT8 pad2a, pad2b, pad2c, pad2d;
-			UINT8 keys, unmapped3[0x80-9];
-			UINT8 chars[8][8];
-			UINT8 unknown[0x38];
-			UINT8 pal[4];
-			UINT8 collision_bg,
+			uint8_t pad1a, pad1b, pad1c, pad1d;
+			uint8_t pad2a, pad2b, pad2c, pad2d;
+			uint8_t keys, unmapped3[0x80-9];
+			uint8_t chars[8][8];
+			uint8_t unknown[0x38];
+			uint8_t pal[4];
+			uint8_t collision_bg,
 			collision_sprite;
-			UINT8 ad[2];
+			uint8_t ad[2];
 			// 0x1a00
-			UINT8 chars2[13][16];
-			UINT8 ram3[3][16];
+			uint8_t chars2[13][16];
+			uint8_t ram3[3][16];
 		} d;
 	} m_reg;
 	std::unique_ptr<bitmap_ind16> m_bitmap;
@@ -99,7 +99,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(arcadia);
-	UINT32 screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_arcadia(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(video_line);
 
 protected:
@@ -115,8 +115,8 @@ protected:
 	required_ioport m_controller2_extra;
 	required_ioport m_joysticks;
 
-	void draw_char(UINT8 *ch, int charcode, int y, int x);
-	void vh_draw_line(int y, UINT8 chars1[16]);
+	void draw_char(uint8_t *ch, int charcode, int y, int x);
+	void vh_draw_line(int y, uint8_t chars1[16]);
 	int sprite_collision(int n1, int n2);
 	void draw_sprites();
 	required_device<cpu_device> m_maincpu;

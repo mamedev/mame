@@ -221,10 +221,12 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "includes/taitoipt.h"
 #include "audio/taitosnd.h"
+#include "machine/watchdog.h"
 #include "sound/2610intf.h"
-#include "sound/2151intf.h"
+#include "sound/ym2151.h"
 #include "sound/msm5205.h"
 #include "includes/asuka.h"
+#include "machine/bonzeadv.h"
 
 
 /***********************************************************
@@ -239,14 +241,14 @@ void asuka_state::device_timer(emu_timer &timer, device_timer_id id, int param, 
 		m_maincpu->set_input_line(5, HOLD_LINE);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in asuka_state::device_timer");
+		assert_always(false, "Unknown id in asuka_state::device_timer");
 	}
 }
 
 
 INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 {
-	timer_set(downcast<cpu_device *>(&device)->cycles_to_attotime(500), TIMER_CADASH_INTERRUPT5);
+	timer_set(m_maincpu->cycles_to_attotime(500), TIMER_CADASH_INTERRUPT5);
 	device.execute().set_input_line(4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
@@ -257,12 +259,12 @@ INTERRUPT_GEN_MEMBER(asuka_state::cadash_interrupt)
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_w)
 {
-	membank("bank1")->set_entry(data & 0x03);
+	membank("audiobank")->set_entry(data & 0x03);
 }
 
 WRITE8_MEMBER(asuka_state::sound_bankswitch_2151_w)
 {
-	membank("bank1")->set_entry(data & 0x03);
+	membank("audiobank")->set_entry(data & 0x03);
 }
 
 
@@ -321,7 +323,7 @@ static ADDRESS_MAP_START( bonzeadv_map, AS_PROGRAM, 16, asuka_state )
 	AM_RANGE(0x390000, 0x390001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x3a0000, 0x3a0001) AM_WRITE(asuka_spritectrl_w)
 	AM_RANGE(0x3b0000, 0x3b0001) AM_READ_PORT("DSWB")
-	AM_RANGE(0x3c0000, 0x3c0001) AM_WRITE(watchdog_reset16_w)
+	AM_RANGE(0x3c0000, 0x3c0001) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x3d0000, 0x3d0001) AM_READNOP
 	AM_RANGE(0x3e0000, 0x3e0001) AM_DEVWRITE8("tc0140syt", tc0140syt_device, master_port_w, 0x00ff)
 	AM_RANGE(0x3e0002, 0x3e0003) AM_DEVREADWRITE8("tc0140syt", tc0140syt_device, master_comm_r, master_comm_w, 0x00ff)
@@ -382,7 +384,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bonzeadv_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xe003) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 	AM_RANGE(0xe200, 0xe200) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -396,7 +398,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 //  AM_RANGE(0x9002, 0x9100) AM_READNOP
@@ -410,7 +412,7 @@ ADDRESS_MAP_END
 /* no MSM5205 */
 static ADDRESS_MAP_START( cadash_z80_map, AS_PROGRAM, 8, asuka_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
+	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("audiobank")
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9001) AM_DEVREADWRITE("ymsnd", ym2151_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("tc0140syt", tc0140syt_device, slave_port_w)
@@ -766,17 +768,6 @@ static GFXDECODE_START( asuka )
 GFXDECODE_END
 
 
-
-/**************************************************************
-                SOUND
-**************************************************************/
-
-WRITE_LINE_MEMBER(asuka_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
 /***********************************************************
                  MACHINE DRIVERS
 ***********************************************************/
@@ -784,8 +775,7 @@ WRITE_LINE_MEMBER(asuka_state::irqhandler)
 void asuka_state::machine_start()
 {
 	/* configure the banks */
-	membank("bank1")->configure_entry(0, memregion("audiocpu")->base());
-	membank("bank1")->configure_entries(1, 3, memregion("audiocpu")->base() + 0x10000, 0x04000);
+	membank("audiobank")->configure_entries(0, 4, memregion("audiocpu")->base(), 0x04000);
 
 	save_item(NAME(m_adpcm_pos));
 	save_item(NAME(m_adpcm_data));
@@ -835,6 +825,8 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(600))
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
@@ -866,7 +858,7 @@ static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(asuka_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -1221,9 +1213,8 @@ ROM_START( bonzeadv )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
-	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
-	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
@@ -1246,9 +1237,8 @@ ROM_START( bonzeadvo )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
-	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
-	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
@@ -1271,9 +1261,8 @@ ROM_START( bonzeadvu )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
-	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
-	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
@@ -1296,9 +1285,8 @@ ROM_START( jigkmgri )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b41-02.7",  0x00000, 0x80000, CRC(29f205d9) SHA1(9e9f0c2755a9aa5acfe2601911bfa07d8d61164c) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
-	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) )
-	ROM_CONTINUE(        0x10000, 0x0c000 )   /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) /* banked */
 
 	/* CPU3 - CCHIP aka TC0030CMD marked b41-05.43 */
 
@@ -1330,9 +1318,8 @@ ROM_START( bonzeadvp ) /* Labels consists of hand written checksum values of the
 	ROM_LOAD16_BYTE( "03eb.ic16",  0x40000, 0x20000, CRC(39f32715) SHA1(5c555fde1ae0bb1e796e0122157bc694392122f3) ) // ^
 	ROM_LOAD16_BYTE( "b8e1.ic22",  0x40001, 0x20000, CRC(15b836cf) SHA1(0f7e5cb6a57c336125909e28af664fe7387947d4) ) // ^
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )     /* sound cpu */
-	ROM_LOAD( "b41-13.20",  0x00000, 0x04000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump
-	ROM_CONTINUE(           0x10000, 0x0c000)   /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )     /* sound cpu */
+	ROM_LOAD( "b41-13.20", 0x00000, 0x10000, CRC(9e464254) SHA1(b6f6126b54c15320ecaa652d0eeabaa4cd94bd26) ) // missing from dump /* banked */
 
 	/* is the C-Chip the same as the final? */
 
@@ -1358,9 +1345,8 @@ ROM_START( asuka )
 	ROM_LOAD16_BYTE( "b68-07.ic5", 0x80000, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
 	ROM_LOAD16_BYTE( "b68-06.ic4", 0x80001, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b68-11.ic27", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )    /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "b68-11.ic27", 0x00000, 0x10000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) ) /* banked */
 
 	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.ic24", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
@@ -1385,9 +1371,8 @@ ROM_START( asukaj ) /* Known to exist but not dumped: revision 1 with B68 08-1 &
 	ROM_LOAD16_BYTE( "b68-07.ic5", 0x80000, 0x10000, CRC(c113acc8) SHA1(613c61a78df73dcb0b9c9018ae829e865baac772) )
 	ROM_LOAD16_BYTE( "b68-06.ic4", 0x80001, 0x10000, CRC(f517e64d) SHA1(8be491bfe0f7eed58521de9d31da677acf635c23) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "b68-11.ic27", 0x00000, 0x04000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )    /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "b68-11.ic27", 0x00000, 0x10000, CRC(c378b508) SHA1(1b145fe736b924f298e02532cf9f26cc18b42ca7) ) /* banked */
 
 	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "b68-10.ic24", 0x00000, 0x10000, CRC(387aaf40) SHA1(47c583564ef1d49ece15f97221b2e073e8fb0544) )
@@ -1412,9 +1397,8 @@ ROM_START( mofflott )
 	ROM_LOAD16_BYTE( "c17-05.bin", 0x80000, 0x10000, CRC(57ac4741) SHA1(3188ff0866324c68fba8e9745a0cb186784cb53d) )
 	ROM_LOAD16_BYTE( "c17-04.bin", 0x80001, 0x10000, CRC(f4250410) SHA1(1f5f6baca4aa695ce2ae5c65adcb460da872a239) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c17-07.bin", 0x00000, 0x04000, CRC(cdb7bc2c) SHA1(5113055c954a39918436db75cc06b53c29c60728) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )  /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c17-07.bin", 0x00000, 0x10000, CRC(cdb7bc2c) SHA1(5113055c954a39918436db75cc06b53c29c60728) ) /* banked */
 
 	ROM_REGION( 0x10000, "ymsnd", 0 )   /* ADPCM samples */
 	ROM_LOAD( "c17-06.bin", 0x00000, 0x10000, CRC(5c332125) SHA1(408f42df18b38347c8a4e177a9484162a66877e1) )
@@ -1433,9 +1417,8 @@ ROM_START( cadash )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1464,9 +1447,8 @@ ROM_START( cadashp )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x0800, "plds", 0 )
 	ROM_LOAD( "pal16l8b-c21-09.ic34",   0x0000, 0x0104, CRC(4b296700) SHA1(79d6c8fb13e30795d9c1f49885ada658f9722b68) )
@@ -1488,9 +1470,8 @@ ROM_START( cadashj )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", ROMREGION_ERASE00 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1515,9 +1496,8 @@ ROM_START( cadashj1 )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", ROMREGION_ERASE00 )  /* HD64180RP8 code (link) */ // the board this set was from did not have the link section populated
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1542,9 +1522,8 @@ ROM_START( cadashjo )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", ROMREGION_ERASE00 )  /* HD64180RP8 code (link) */ // the board this set was from did not have the link section populated
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1569,9 +1548,8 @@ ROM_START( cadashu )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1596,9 +1574,8 @@ ROM_START( cadashi )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1623,9 +1600,8 @@ ROM_START( cadashf )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1650,9 +1626,8 @@ ROM_START( cadashg )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "c21-01.1",  0x00000, 0x80000, CRC(1ff6f39c) SHA1(742f296efc8073fafa73da2c8d7d26ca9514b6bf) ) /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "c21-08.38",   0x00000, 0x04000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) )
-	ROM_CONTINUE(            0x10000, 0x0c000 ) /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "c21-08.38",   0x00000, 0x10000, CRC(dca495a0) SHA1(4e0f401f1b967da75f33fd7294860ad0b4bf2dce) ) /* banked */
 
 	ROM_REGION( 0x08000, "subcpu", 0 )  /* HD64180RP8 code (link) */
 	ROM_LOAD( "c21-07.57",   0x00000, 0x08000, CRC(f02292bd) SHA1(0a5c06a048ad67f90e0d766b504582e9eef035f7) )
@@ -1677,9 +1652,8 @@ ROM_START( galmedes )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "gm-obj.ic6", 0x00000, 0x80000, CRC(7a4a1315) SHA1(e2010ee4222415fd55ba3102003be4151d29e39b) )    /* Sprites (16 x 16) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "gm-snd.ic27", 0x00000, 0x04000, CRC(d6f56c21) SHA1(ff9743448ac8ce57a2f8c33a26145e7b92cbe3c3) )
-	ROM_CONTINUE(            0x10000, 0x0c000 )  /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "gm-snd.ic27", 0x00000, 0x10000, CRC(d6f56c21) SHA1(ff9743448ac8ce57a2f8c33a26145e7b92cbe3c3) ) /* banked */
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
@@ -1701,9 +1675,8 @@ ROM_START( earthjkr )
 	ROM_LOAD16_BYTE( "ej_1.ic5",   0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "ej_0.ic4",   0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "ej_2.ic27", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )    /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "ej_2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
@@ -1725,9 +1698,8 @@ ROM_START( earthjkrp ) // was production PCB complete with MASK rom, could just 
 	ROM_LOAD16_BYTE( "ej_1.ic5",   0x80000, 0x10000, CRC(cb4891db) SHA1(af1112608cdd897ef6028ef617f5ca69d7964861) )
 	ROM_LOAD16_BYTE( "ej_0.ic4",   0x80001, 0x10000, CRC(b612086f) SHA1(625748fcb698ec57b7b3ce46019cf85de99aaaa1) )
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "ej_2.ic27", 0x00000, 0x04000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) )
-	ROM_CONTINUE(          0x10000, 0x0c000 )    /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "ej_2.ic27", 0x00000, 0x10000, CRC(42ba2566) SHA1(c437388684b565c7504d6bad6accd73aa000faca) ) /* banked */
 
 	ROM_REGION( 0x144, "pals", 0 )
 	ROM_LOAD( "b68-04.ic32", 0x00000, 0x144, CRC(9be618d1) SHA1(61ee33c3db448a05ff8f455e77fe17d51106baec) )
@@ -1747,9 +1719,8 @@ ROM_START( eto )
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "eto-3.ic6", 0x00000, 0x80000, CRC(dd247397) SHA1(53a7bf877fd7e5f3daf295a698f4012447b6f113) )   /* SCR tiles (8 x 8) */
 
-	ROM_REGION( 0x1c000, "audiocpu", 0 )    /* sound cpu */
-	ROM_LOAD( "eto-5.ic27", 0x00000, 0x04000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) )
-	ROM_CONTINUE(           0x10000, 0x0c000 )    /* banked stuff */
+	ROM_REGION( 0x10000, "audiocpu", 0 )    /* sound cpu */
+	ROM_LOAD( "eto-5.ic27", 0x00000, 0x10000, CRC(b3689da0) SHA1(812d2e0a794403df9f0a5035784f14cd070ea080) ) /* banked */
 ROM_END
 
 
@@ -1764,15 +1735,15 @@ GAME( 1988, asukaj,    asuka,    asuka,    asuka, driver_device,    0, ROT270, "
 
 GAME( 1989, mofflott,  0,        mofflott, mofflott, driver_device, 0, ROT270, "Taito Corporation",         "Maze of Flott (Japan)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, cadash,    0,        cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashj,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashj1,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashjo,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashu,   cadash,   cadash,   cadashu, driver_device,  0, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashi,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashf,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashg,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, cadashp,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, cadash,    0,        cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (World)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashj1,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashjo,  cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation",         "Cadash (Japan, oldest version)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashu,   cadash,   cadash,   cadashu, driver_device,  0, ROT0,   "Taito America Corporation", "Cadash (US, version 2)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashi,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Italy)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashf,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (France)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashg,   cadash,   cadash,   cadash, driver_device,   0, ROT0,   "Taito Corporation Japan",   "Cadash (Germany, version 1)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN )
+GAME( 1989, cadashp,   cadash,   cadash,   cadashj, driver_device,  0, ROT0,   "Taito Corporation Japan",   "Cadash (World, prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_NODEVICE_LAN)
 
 GAME( 1992, galmedes,  0,        galmedes, galmedes, driver_device, 0, ROT270, "Visco",                     "Galmedes (Japan)", MACHINE_SUPPORTS_SAVE )
 

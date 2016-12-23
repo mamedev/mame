@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 /* Discrete Sound Input Nodes */
@@ -30,6 +31,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_video_ram(*this, "video_ram"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -39,8 +41,8 @@ public:
 	int m_steering[2];
 	int m_gear[2];
 	int m_game;
-	UINT8 m_dial[2];
-	required_shared_ptr<UINT8> m_video_ram;
+	uint8_t m_dial[2];
+	required_shared_ptr<uint8_t> m_video_ram;
 	tilemap_t* m_bg_tilemap;
 	bitmap_ind16 m_helper;
 	int m_collision[2];
@@ -74,15 +76,16 @@ public:
 	TILE_GET_INFO_MEMBER(get_tile_info);
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(sprint2);
-	UINT32 screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_sprint2(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_sprint2(screen_device &screen, bool state);
 	INTERRUPT_GEN_MEMBER(sprint2);
-	UINT8 collision_check(rectangle& rect);
-	inline int get_sprite_code(UINT8 *video_ram, int n);
-	inline int get_sprite_x(UINT8 *video_ram, int n);
-	inline int get_sprite_y(UINT8 *video_ram, int n);
+	uint8_t collision_check(rectangle& rect);
+	inline int get_sprite_code(uint8_t *video_ram, int n);
+	inline int get_sprite_x(uint8_t *video_ram, int n);
+	inline int get_sprite_y(uint8_t *video_ram, int n);
 	int service_mode();
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

@@ -152,9 +152,9 @@
 
 #define MCFG_CDP1869_SET_SCREEN MCFG_VIDEO_SET_SCREEN
 
-#define CDP1869_CHAR_RAM_READ_MEMBER(name) UINT8 name(UINT16 pma, UINT8 cma, UINT8 pmd)
-#define CDP1869_CHAR_RAM_WRITE_MEMBER(name) void name(UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)
-#define CDP1869_PCB_READ_MEMBER(name) int name(UINT16 pma, UINT8 cma, UINT8 pmd)
+#define CDP1869_CHAR_RAM_READ_MEMBER(name) uint8_t name(uint16_t pma, uint8_t cma, uint8_t pmd)
+#define CDP1869_CHAR_RAM_WRITE_MEMBER(name) void name(uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)
+#define CDP1869_PCB_READ_MEMBER(name) int name(uint16_t pma, uint8_t cma, uint8_t pmd)
 
 #define MCFG_CDP1869_PAL_NTSC_CALLBACK(_read) \
 	devcb = &cdp1869_device::set_pal_ntsc_rd_callback(*device, DEVCB_##_read);
@@ -178,9 +178,9 @@
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-typedef device_delegate<UINT8 (UINT16 pma, UINT8 cma, UINT8 pmd)> cdp1869_char_ram_read_delegate;
-typedef device_delegate<void (UINT16 pma, UINT8 cma, UINT8 pmd, UINT8 data)> cdp1869_char_ram_write_delegate;
-typedef device_delegate<int (UINT16 pma, UINT8 cma, UINT8 pmd)> cdp1869_pcb_read_delegate;
+typedef device_delegate<uint8_t (uint16_t pma, uint8_t cma, uint8_t pmd)> cdp1869_char_ram_read_delegate;
+typedef device_delegate<void (uint16_t pma, uint8_t cma, uint8_t pmd, uint8_t data)> cdp1869_char_ram_write_delegate;
+typedef device_delegate<int (uint16_t pma, uint8_t cma, uint8_t pmd)> cdp1869_pcb_read_delegate;
 
 // ======================> cdp1869_device
 
@@ -191,7 +191,7 @@ class cdp1869_device :  public device_t,
 {
 public:
 	// construction/destruction
-	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	cdp1869_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
 	template<class _Object> static devcb_base &set_pal_ntsc_rd_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_read_pal_ntsc.set_callback(object); }
 	template<class _Object> static devcb_base &set_prd_wr_callback(device_t &device, _Object object) { return downcast<cdp1869_device &>(device).m_write_prd.set_callback(object); }
@@ -221,7 +221,7 @@ public:
 	DECLARE_READ_LINE_MEMBER( predisplay_r );
 	DECLARE_READ_LINE_MEMBER( pal_ntsc_r );
 
-	UINT32 screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 protected:
 	// device-level overrides
@@ -237,20 +237,20 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 	inline bool is_ntsc();
-	inline UINT8 read_page_ram_byte(offs_t address);
-	inline void write_page_ram_byte(offs_t address, UINT8 data);
-	inline UINT8 read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd);
-	inline void write_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd, UINT8 data);
-	inline int read_pcb(offs_t pma, offs_t cma, UINT8 pmd);
+	inline uint8_t read_page_ram_byte(offs_t address);
+	inline void write_page_ram_byte(offs_t address, uint8_t data);
+	inline uint8_t read_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd);
+	inline void write_char_ram_byte(offs_t pma, offs_t cma, uint8_t pmd, uint8_t data);
+	inline int read_pcb(offs_t pma, offs_t cma, uint8_t pmd);
 	inline void update_prd_changed_timer();
 	inline rgb_t get_rgb(int i, int c, int l);
 	inline int get_lines();
-	inline UINT16 get_pmemsize(int cols, int rows);
-	inline UINT16 get_pma();
+	inline uint16_t get_pmemsize(int cols, int rows);
+	inline uint16_t get_pma();
 	inline int get_pen(int ccb0, int ccb1, int pcb);
 
-	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT8 data, int color);
-	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, UINT16 pma);
+	void draw_line(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint8_t data, int color);
+	void draw_char(bitmap_rgb32 &bitmap, const rectangle &rect, int x, int y, uint16_t pma);
 
 private:
 	devcb_read_line        m_read_pal_ntsc;
@@ -276,21 +276,21 @@ private:
 	int m_line16;                   // 16-line hi-res mode
 	int m_line9;                    // 9 line mode
 	int m_cfc;                      // color format control
-	UINT8 m_col;                    // character color control
-	UINT8 m_bkg;                    // background color
-	UINT16 m_pma;                   // page memory address
-	UINT16 m_hma;                   // home memory address
+	uint8_t m_col;                    // character color control
+	uint8_t m_bkg;                    // background color
+	uint16_t m_pma;                   // page memory address
+	uint16_t m_hma;                   // home memory address
 
 	// sound state
-	INT16 m_signal;                 // current signal
+	int16_t m_signal;                 // current signal
 	int m_incr;                     // initial wave state
 	int m_toneoff;                  // tone off
 	int m_wnoff;                    // white noise off
-	UINT8 m_tonediv;                // tone divisor
-	UINT8 m_tonefreq;               // tone range select
-	UINT8 m_toneamp;                // tone output amplitude
-	UINT8 m_wnfreq;                 // white noise range select
-	UINT8 m_wnamp;                  // white noise output amplitude
+	uint8_t m_tonediv;                // tone divisor
+	uint8_t m_tonefreq;               // tone range select
+	uint8_t m_toneamp;                // tone output amplitude
+	uint8_t m_wnfreq;                 // white noise range select
+	uint8_t m_wnamp;                  // white noise output amplitude
 };
 
 

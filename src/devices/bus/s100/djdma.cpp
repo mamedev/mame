@@ -48,7 +48,7 @@ ROM_END
 //  rom_region - device-specific ROM region
 //-------------------------------------------------
 
-const rom_entry *s100_djdma_device::device_rom_region() const
+const tiny_rom_entry *s100_djdma_device::device_rom_region() const
 {
 	return ROM_NAME( djdma );
 }
@@ -102,7 +102,7 @@ machine_config_constructor s100_djdma_device::device_mconfig_additions() const
 //  s100_djdma_device - constructor
 //-------------------------------------------------
 
-s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+s100_djdma_device::s100_djdma_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, S100_DJDMA, "DJDMA", tag, owner, clock, "djdma", __FILE__),
 	device_s100_card_interface(mconfig, *this)
 {

@@ -2150,21 +2150,22 @@ ROM_START( cluclu )
 	PALETTE_2C04_0004
 ROM_END
 
-ROM_START( excitebk ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
+
+ROM_START( excitebk ) /* EB4-3 = Excite Bike, Palette 3, revision 'E' */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-eb4-4 a.6d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
-	ROM_LOAD( "mds-eb4-4 a.6c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
-	ROM_LOAD( "mds-eb4-4 a.6b",  0xc000, 0x2000, CRC(d1afe2dd) SHA1(ef0f44d98464b7dab7c51be4379242f7a4e4fcdd) )
-	ROM_LOAD( "mds-eb4-4 a.6a",  0xe000, 0x2000, CRC(46711d0e) SHA1(6ce2f395b3f407671a87c6e1133ab63a637022f2) )
+	ROM_LOAD( "mds-eb4-3e.1d",  0x8000, 0x2000, CRC(f58a392e) SHA1(ca721e47e5dbe72d6f231d9b20b1ca33304c5370) )
+	ROM_LOAD( "mds-eb4-3e.1c",  0xa000, 0x2000, CRC(6ae01102) SHA1(f3f49644f7e2887e14655e8934c7c75d4b92968e) )
+	ROM_LOAD( "mds-eb4-3e.1b",  0xc000, 0x2000, CRC(fbc53465) SHA1(81c9ebac895dfbc5c451b4b32e5990aba3734714) )
+	ROM_LOAD( "mds-eb4-3e.1a",  0xe000, 0x2000, CRC(e2902b4e) SHA1(f559517c735847e2ad622418b8fa525d9c9adac3) )
 
 	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "mds-eb4-4 a.8b",  0x0000, 0x2000, CRC(62a76c52) SHA1(7ebd0dac976abe8636f4f75a3b2a473d7a54934d) )
-	ROM_LOAD( "mds-eb4-4 a.8a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
+	ROM_LOAD( "mds-eb4-3e.2b",  0x0000, 0x2000, CRC(80be1f50) SHA1(d8544b9a0a9d8719ab601fa9c68c4305385b14c7) )
+	ROM_LOAD( "mds-eb4-3e.2a",  0x2000, 0x2000, CRC(001e8e0b) SHA1(c4c2a11ade7788bac9dd61ea8de319c4111d2592) )
 
-	PALETTE_2C04_0004
+	PALETTE_2C04_0003
 ROM_END
 
-ROM_START( excitebka ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
+ROM_START( excitebko ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "mds-eb4-3.1d",  0x8000, 0x2000, CRC(7e54df1d) SHA1(38d878041976386e8608c73133040b18d0e4b9cd) ) /* Need to verify correct label */
 	ROM_LOAD( "mds-eb4-3.1c",  0xa000, 0x2000, CRC(89baae91) SHA1(6aebf13c415e3246edf7daa847533b7e3ae0425f) ) /* Need to verify correct label */
@@ -2176,6 +2177,20 @@ ROM_START( excitebka ) /* EB4-3 = Excite Bike, Palette 3, unknown revision */
 	ROM_LOAD( "mds-eb4-3.2a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) ) /* Need to verify correct label */
 
 	PALETTE_2C04_0003
+ROM_END
+
+ROM_START( excitebkj ) /* EB4-4 A = Excite Bike, Palette 4, rev A */
+	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
+	ROM_LOAD( "mds-eb4-4 a.6d",  0x8000, 0x2000, CRC(6aa87037) SHA1(f3313700955498800a3d59c523ba2a4e0cf443bc) )
+	ROM_LOAD( "mds-eb4-4 a.6c",  0xa000, 0x2000, CRC(bdb317db) SHA1(a8b3e8deb1e625d764aaffe86a513bc7ede51a46) )
+	ROM_LOAD( "mds-eb4-4 a.6b",  0xc000, 0x2000, CRC(d1afe2dd) SHA1(ef0f44d98464b7dab7c51be4379242f7a4e4fcdd) )
+	ROM_LOAD( "mds-eb4-4 a.6a",  0xe000, 0x2000, CRC(46711d0e) SHA1(6ce2f395b3f407671a87c6e1133ab63a637022f2) )
+
+	ROM_REGION( 0x4000,"gfx1", 0 ) /* PPU memory */
+	ROM_LOAD( "mds-eb4-4 a.8b",  0x0000, 0x2000, CRC(62a76c52) SHA1(7ebd0dac976abe8636f4f75a3b2a473d7a54934d) )
+	ROM_LOAD( "mds-eb4-4 a.8a",  0x2000, 0x2000, CRC(a9b49a05) SHA1(c14706e6a5524f81e79c101e32deef9f3d60de3f) )
+
+	PALETTE_2C04_0004
 ROM_END
 
 ROM_START( jajamaru )
@@ -2262,7 +2277,7 @@ ROM_START( ladygolf )
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( machridr ) /* Set ID should be something like MDS-MR4-2 xx */
+ROM_START( nvs_machrider ) /* Set ID should be something like MDS-MR4-2 xx */
 	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mr-1d",  0x8000, 0x2000, CRC(379c44b9) SHA1(7b148ba7f7eea64509733f94b4eaafe5bfcf3527) ) /* Need to verify correct label */
 	ROM_LOAD( "mr-1c",  0xa000, 0x2000, CRC(cb864802) SHA1(65f06a8eaca3347432f3f2f673a24692415d869f) ) /* Need to verify correct label */
@@ -2276,7 +2291,7 @@ ROM_START( machridr ) /* Set ID should be something like MDS-MR4-2 xx */
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( machridra )
+ROM_START( nvs_machridera )
 	ROM_REGION( 0x10000,"maincpu",0 ) /* 6502 memory */
 	ROM_LOAD( "mds-mr4-1 a.1d or 6d",  0x8000, 0x2000, CRC(ab7e0594) SHA1(fc5982a93791608a20e5ec9e3a4b71d702bda354) )
 	ROM_LOAD( "mds-mr4-1 a.1c or 6c",  0xa000, 0x2000, CRC(d4a341c3) SHA1(c799e40d0ebd1447032d8767fb2caeee6b33f31a) )
@@ -2460,7 +2475,7 @@ ROM_START( vsskykid )
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( platoon )
+ROM_START( nvs_platoon )
 	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "prgver0.ic4",  0x10000, 0x20000, CRC(e2c0a2be) SHA1(1f8e33d6da8402be6a376668a424bfde38471021) )
 
@@ -2499,7 +2514,7 @@ ROM_START( supxevs )
 	PALETTE_2C04_0001
 ROM_END
 
-ROM_START( mightybj )
+ROM_START( nvs_mightybj )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
 	ROM_LOAD( "1d.bin",  0x8000, 0x2000, CRC(55dc8d77) SHA1(eafb8636d994a10caee9eb0ba544260281706058) )
 	ROM_LOAD( "1c.bin",  0xa000, 0x2000, CRC(151a6d15) SHA1(2652aef97aae122711ef471d9dc1d42f6393b91f) )
@@ -2787,13 +2802,14 @@ GAME( 1985, starlstr, 0,        vsnes,   starlstr, vsnes_state, vsnormal, ROT0, 
 GAME( 1987, cstlevna, 0,        vsnes,   cstlevna, vsnes_state, vsvram,   ROT0, "Konami",                 "Vs. Castlevania", 0 )
 GAME( 1984, cluclu,   0,        vsnes,   cluclu, vsnes_state,   vsnormal, ROT0, "Nintendo",               "Vs. Clu Clu Land", 0 )
 GAME( 1990, drmario,  0,        vsnes,   drmario, vsnes_state,  drmario,  ROT0, "Nintendo",               "Vs. Dr. Mario", 0 )
-GAME( 1984, excitebk, 0,        vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)", 0 )
-GAME( 1984, excitebka,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)", 0 )
+GAME( 1984, excitebk, 0,        vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 E)", 0 )
+GAME( 1984, excitebko,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-3 ?)", 0 ) // older
+GAME( 1984, excitebkj,excitebk, vsnes,   excitebk, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Excitebike (set EB4-4 A)", 0 ) // likely Japan
 GAME( 1986, goonies,  0,        vsnes,   goonies, vsnes_state,  vskonami, ROT0, "Konami",                 "Vs. The Goonies (set E)", 0 )
 GAME( 1984, iceclimb, 0,        vsnes,   iceclmbj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 B-1)", 0 )
 GAME( 1984, iceclimba,iceclimb, vsnes,   iceclimb, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Ice Climber (set IC4-4 ?)", 0 )
-GAME( 1985, machridr, 0,        vsnes,   machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1985, machridra,machridr, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machrider, 0,        vsnes,   machridr, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Endurance Course Version)", MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1985, nvs_machridera,nvs_machrider, vsnes,   machridj, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Mach Rider (Fighting Course Version, set MR4-1 A)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1986, rbibb,    0,        vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 1)", 0 )
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb, vsnes_state,    rbibb,    ROT0, "Namco",                  "Vs. Atari R.B.I. Baseball (set 2)", 0 )
 GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Super Mario Bros. (set SM4-4 E)", 0 )
@@ -2814,9 +2830,9 @@ GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnes_state, vsnormal, ROT0, 
 GAME( 1985, vssoccer, 0,        vsnes,   vssoccer, vsnes_state, vsnormal, ROT0, "Nintendo",               "Vs. Soccer (set SC4-2 A)", 0 )
 GAME( 1985, vssoccera,vssoccer, vsnes,   vssoccer, vsnes_state, bnglngby, ROT0, "Nintendo",               "Vs. Soccer (set SC4-3 ?)", 0 )
 GAME( 1986, vsgradus, 0,        vsnes,   vsgradus, vsnes_state, vskonami, ROT0, "Konami",                 "Vs. Gradius (US, set GR E)", 0 )
-GAME( 1987, platoon,  0,        vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
+GAME( 1987, nvs_platoon,  0,    vsnes,   platoon, vsnes_state,  platoon,  ROT0, "Ocean Software Limited", "Vs. Platoon", 0 )
 GAME( 1987, vstetris, 0,        vsnes,   vstetris, vsnes_state, vsnormal, ROT0, "Academysoft-Elorg",      "Vs. Tetris" , 0 )
-GAME( 1986, mightybj, 0,        mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
+GAME( 1986, nvs_mightybj, 0,    mightybj,mightybj, vsnes_state, vsnormal, ROT0, "Tecmo",                  "Vs. Mighty Bomb Jack (Japan)", 0 )
 GAME( 1985, jajamaru, 0,        jajamaru,jajamaru, vsnes_state, vsnormal, ROT0, "Jaleco",                 "Vs. Ninja Jajamaru Kun (Japan)", 0 )
 GAME( 1987, topgun,   0,        topgun,  topgun, vsnes_state,   vsvram,   ROT0, "Konami",                 "Vs. Top Gun", 0)
 GAME( 1985, bnglngby, 0,        vsnes,   bnglngby, vsnes_state, bnglngby, ROT0, "Nintendo / Broderbund Software Inc.",  "Vs. Raid on Bungeling Bay (RD4-2 B)", 0 )

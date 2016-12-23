@@ -131,12 +131,12 @@ Maybe the second area for each layer contains colscroll ?
 
 void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect )
 {
-	UINT16 *spriteram = m_spriteram;
+	uint16_t *spriteram = m_spriteram;
 	int offs, map_offset, x, y, curx, cury, sprite_chunk;
-	UINT16 *spritemap = m_spritemap;
-	UINT16 data, tilenum, code, color;
-	UINT8 flipx, flipy, priority, bad_chunks;
-	UINT8 j, k, px, py, zx, zy, zoomx, zoomy;
+	uint16_t *spritemap = m_spritemap;
+	uint16_t data, tilenum, code, color;
+	uint8_t flipx, flipy, priority, bad_chunks;
+	uint8_t j, k, px, py, zx, zy, zoomx, zoomy;
 	static const int primasks[2] = { 0xff00, 0xfffc };  /* Sprites are over bottom layer or under top layer */
 
 	/* Most of spriteram is not used by the 68000: rest is scratch space for the h/w perhaps ? */
@@ -212,9 +212,9 @@ void topspeed_state::draw_sprites( screen_device &screen, bitmap_ind16 &bitmap, 
 
 /***************************************************************************/
 
-UINT32 topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t topspeed_state::screen_update_topspeed(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	UINT8 layer[4];
+	uint8_t layer[4];
 
 #ifdef MAME_DEBUG
 	if (machine().input().code_pressed_once (KEYCODE_V))

@@ -25,28 +25,28 @@ public:
 	m_maincpu(*this, "maincpu"),
 	m_fdc(*this, "fdc"),
 	m_crtc(*this, "crtc"),
-	m_floppy0(*this, "fdc:0:8dsdd"),
-	m_floppy1(*this, "fdc:1:8dsdd"),
+	m_floppy0(*this, "fdc:0"),
+	m_floppy1(*this, "fdc:1"),
 	m_p_vram(*this, "p_vram"),
 	m_palette(*this, "palette") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<mb8877_t> m_fdc;
 	required_device<mc6845_device> m_crtc;
-	required_device<floppy_image_device> m_floppy0;
-	required_device<floppy_image_device> m_floppy1;
+	required_device<floppy_connector> m_floppy0;
+	required_device<floppy_connector> m_floppy1;
 	DECLARE_WRITE8_MEMBER(myb3k_6845_address_w);
 	DECLARE_WRITE8_MEMBER(myb3k_6845_data_w);
 	DECLARE_WRITE8_MEMBER(myb3k_video_mode_w);
 	DECLARE_WRITE8_MEMBER(myb3k_fdc_output_w);
-	required_shared_ptr<UINT8> m_p_vram;
+	required_shared_ptr<uint8_t> m_p_vram;
 	required_device<palette_device> m_palette;
-	UINT8 m_crtc_vreg[0x100],m_crtc_index;
-	UINT8 m_vmode;
+	uint8_t m_crtc_vreg[0x100],m_crtc_index;
+	uint8_t m_vmode;
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 	virtual void video_start() override;
-	UINT32 screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 };
 
 void myb3k_state::video_start()
@@ -71,7 +71,7 @@ void myb3k_state::video_start()
 #define mc6845_update_addr      (((m_crtc_vreg[0x12]<<8) & 0x3f00) | (m_crtc_vreg[0x13] & 0xff))
 
 
-UINT32 myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t myb3k_state::screen_update_myb3k(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	int x,y;
 	int xi,yi;
@@ -130,8 +130,8 @@ WRITE8_MEMBER( myb3k_state::myb3k_fdc_output_w )
 	/* TODO: complete guesswork! (it just does a 0x24 -> 0x20 in there) */
 	floppy_image_device *floppy = nullptr;
 
-	if (data & 1) floppy = m_floppy0;
-	if (data & 2) floppy = m_floppy1;
+	if (data & 1) floppy = m_floppy0->get_device();
+	if (data & 2) floppy = m_floppy1->get_device();
 
 	if (floppy)
 	{
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( myb3k, myb3k_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", myb3k)
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* devices */
 	MCFG_MC6845_ADD("crtc", H46505, "screen", XTAL_3_579545MHz/4)    /* unknown clock, hand tuned to get ~60 fps */

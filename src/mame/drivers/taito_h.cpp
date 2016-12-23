@@ -150,18 +150,6 @@ some kind of zoom table?
 #include "sound/2610intf.h"
 #include "includes/taito_h.h"
 
-/***************************************************************************
-
-  Interrupt(s)
-
-***************************************************************************/
-
-/* Handler called by the YM2610 emulator when the internal timers cause an IRQ */
-WRITE_LINE_MEMBER(taitoh_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
 
 /***************************************************************************
 
@@ -178,7 +166,7 @@ READ8_MEMBER(taitoh_state::syvalion_input_bypass_r)
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8   port = m_tc0220ioc->port_r(space, 0); /* read port number */
+	uint8_t   port = m_tc0220ioc->port_r(space, 0); /* read port number */
 
 	switch( port )
 	{
@@ -676,13 +664,12 @@ static MACHINE_CONFIG_START( syvalion, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -732,13 +719,12 @@ static MACHINE_CONFIG_START( recordbr, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)
@@ -796,13 +782,12 @@ static MACHINE_CONFIG_START( dleague, taitoh_state )
 	MCFG_TC0080VCO_OFFSETS(1, 1)
 	MCFG_TC0080VCO_BGFLIP_OFFS(-2)
 	MCFG_TC0080VCO_GFXDECODE("gfxdecode")
-	MCFG_TC0080VCO_PALETTE("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_8MHz)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(taitoh_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.25)
 	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 	MCFG_SOUND_ROUTE(2, "mono", 1.0)

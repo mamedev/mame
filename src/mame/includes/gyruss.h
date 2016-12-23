@@ -33,17 +33,17 @@ public:
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_audiocpu_2;
 	required_device<discrete_device> m_discrete;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_flipscreen;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_flipscreen;
+	required_shared_ptr<uint8_t> m_spriteram;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
 
 	tilemap_t *m_tilemap;
-	UINT8 m_master_nmi_mask;
-	UINT8 m_slave_irq_mask;
+	uint8_t m_master_nmi_mask;
+	uint8_t m_slave_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(gyruss_irq_clear_w);
 	DECLARE_WRITE8_MEMBER(gyruss_sh_irqtrigger_w);
@@ -61,7 +61,7 @@ public:
 	virtual void machine_start() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(gyruss);
-	UINT32 screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_gyruss(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(master_vblank_irq);
 	INTERRUPT_GEN_MEMBER(slave_vblank_irq);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );

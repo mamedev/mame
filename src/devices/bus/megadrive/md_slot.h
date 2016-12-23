@@ -3,6 +3,8 @@
 #ifndef __MD_SLOT_H
 #define __MD_SLOT_H
 
+#include "softlist_dev.h"
+
 /***************************************************************************
  TYPE DEFINITIONS
  ***************************************************************************/
@@ -26,10 +28,12 @@ enum
 	XINQIG,                   /* Xin Qigai Wangzi uses different sram start address and has no valid header */
 	BEGGARP,                     /* Beggar Prince uses different sram start address + bankswitch tricks */
 	WUKONG,                      /* Legend of Wukong uses different sram start address + bankswitch trick for last 128K of ROM */
+	STARODYS,                    /* Star Odyssey */
 
 	// EEPROM
 	SEGA_EEPROM,                 /* Wonder Boy V / Evander Holyfield's Boxing / Greatest Heavyweights of the Ring / Sports Talk Baseball / Megaman */
 	NBA_JAM,                     /* NBA Jam */
+	NBA_JAM_ALT,                     /* NBA Jam */
 	NBA_JAM_TE,                  /* NBA Jam TE / NFL Quarterback Club */
 	NFL_QB_96,                   /* NFL Quarterback Club '96 */
 	C_SLAM,                      /* College Slam / Frank Thomas Big Hurt Baseball */
@@ -59,6 +63,7 @@ enum
 	LIONK3,                      /* Lion King 3, Super Donkey Kong 99, Super King Kong 99 */
 	MC_PIRATE,                   /* Super 19 in 1, Super 15 in 1, 12 in 1 and a few more multicarts */
 	MJLOVER,                     /* Mahjong Lover */
+	CJMJCLUB,                    /* Super Mahjong Club */
 	POKEMONA,                    /* Pocket Monster Alt Protection */
 	REALTEC,                     /* Whac a Critter/Mallet legend, Defend the Earth, Funnyworld/Ballonboy */
 	REDCLIFF,                    /* Romance of the Three Kingdoms - Battle of Red Cliffs, already decoded from .mdx format */
@@ -104,16 +109,16 @@ public:
 
 	virtual void rom_alloc(size_t size, const char *tag);
 	virtual void nvram_alloc(size_t size);
-	virtual UINT16* get_rom_base() { return m_rom; };
-	virtual UINT16* get_nvram_base() { return &m_nvram[0]; };
-	virtual UINT32 get_rom_size() { return m_rom_size; };
-	virtual UINT32 get_nvram_size() { return m_nvram.size()*sizeof(UINT16); };
-	virtual void set_bank_to_rom(const char *banktag, UINT32 offset) {};
+	virtual uint16_t* get_rom_base() { return m_rom; };
+	virtual uint16_t* get_nvram_base() { return &m_nvram[0]; };
+	virtual uint32_t get_rom_size() { return m_rom_size; };
+	virtual uint32_t get_nvram_size() { return m_nvram.size()*sizeof(uint16_t); };
+	virtual void set_bank_to_rom(const char *banktag, uint32_t offset) {};
 
 	void save_nvram() { device().save_item(NAME(m_nvram)); }
 
-	void rom_map_setup(UINT32 size);
-	UINT32 get_padded_size(UINT32 size);
+	void rom_map_setup(uint32_t size);
+	uint32_t get_padded_size(uint32_t size);
 
 	int m_nvram_start, m_nvram_end;
 	int m_nvram_active, m_nvram_readonly;
@@ -124,11 +129,11 @@ public:
 	int m_nvram_handlers_installed;
 
 	// internal state
-	UINT16  *m_rom;
-	UINT32  m_rom_size;
-	std::vector<UINT16> m_nvram;
+	uint16_t  *m_rom;
+	uint32_t  m_rom_size;
+	std::vector<uint16_t> m_nvram;
 
-	UINT8 rom_bank_map[128];    // 64K chunks of rom
+	uint8_t rom_bank_map[128];    // 64K chunks of rom
 };
 
 
@@ -140,7 +145,7 @@ class base_md_cart_slot_device : public device_t,
 {
 public:
 	// construction/destruction
-	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, UINT32 clock, const char *shortname, const char *source);
+	base_md_cart_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
 	virtual ~base_md_cart_slot_device();
 
 	// device-level overrides
@@ -148,9 +153,9 @@ public:
 	virtual void device_config_complete() override;
 
 	// image-level overrides
-	virtual bool call_load() override;
+	virtual image_init_result call_load() override;
 	virtual void call_unload() override;
-	virtual bool call_softlist_load(software_list_device &swlist, const char *swname, const rom_entry *start_entry) override;
+	virtual const software_list_loader &get_software_list_loader() const override { return rom_software_list_loader::instance(); }
 
 	virtual iodevice_t image_type() const override { return IO_CARTSLOT; }
 	virtual bool is_readable()  const override { return 1; }
@@ -158,21 +163,20 @@ public:
 	virtual bool is_creatable() const override { return 0; }
 	virtual bool must_be_loaded() const override { return m_must_be_loaded; }
 	virtual bool is_reset_on_load() const override { return 1; }
-	virtual const option_guide *create_option_guide() const override { return nullptr; }
 
 	// slot interface overrides
 	virtual std::string get_default_card_software() override;
 
 	int get_type() { return m_type; }
 
-	int load_list();
-	int load_nonlist();
-	int get_cart_type(UINT8 *ROM, UINT32 len);
+	image_init_result load_list();
+	image_init_result load_nonlist();
+	int get_cart_type(uint8_t *ROM, uint32_t len);
 
 	void setup_custom_mappers();
 	void setup_nvram();
 	void set_must_be_loaded(bool _must_be_loaded) { m_must_be_loaded = _must_be_loaded; }
-	void file_logging(UINT8 *ROM, UINT32 rom_len, UINT32 nvram_len);
+	void file_logging(uint8_t *ROM, uint32_t rom_len, uint32_t nvram_len);
 
 	void save_nvram() { if (m_cart && m_cart->get_nvram_size()) m_cart->save_nvram(); }
 
@@ -201,7 +205,7 @@ class md_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	md_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "megadriv_cart"; }
 	virtual const char *file_extensions() const override { return "smd,bin,md,gen"; }
 };
@@ -212,7 +216,7 @@ class pico_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	pico_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "pico_cart"; }
 	virtual const char *file_extensions() const override { return "bin,md"; }
 };
@@ -223,7 +227,7 @@ class copera_cart_slot_device :  public base_md_cart_slot_device
 {
 public:
 	// construction/destruction
-	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	copera_cart_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual const char *image_interface() const override { return "copera_cart"; }
 	virtual const char *file_extensions() const override { return "bin,md"; }
 };
@@ -256,7 +260,7 @@ extern const device_type COPERA_CART_SLOT;
 
 
 #define MCFG_MD_CARTRIDGE_NOT_MANDATORY                                     \
-	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(FALSE);
+	static_cast<md_cart_slot_device *>(device)->set_must_be_loaded(false);
 
 
 #endif

@@ -22,13 +22,13 @@ Atari Ultra Tank driver
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_collision)
 {
-	return m_collision[(FPTR) param];
+	return m_collision[(uintptr_t) param];
 }
 
 
 CUSTOM_INPUT_MEMBER(ultratnk_state::get_joystick)
 {
-	UINT8 joy = ioport((const char *)param)->read() & 3;
+	uint8_t joy = ioport((const char *)param)->read() & 3;
 
 	if (joy == 1)
 	{
@@ -51,7 +51,7 @@ void ultratnk_state::device_timer(emu_timer &timer, device_timer_id id, int para
 		nmi_callback(ptr, param);
 		break;
 	default:
-		assert_always(FALSE, "Unknown id in ultratnk_state::device_timer");
+		assert_always(false, "Unknown id in ultratnk_state::device_timer");
 	}
 }
 
@@ -65,7 +65,7 @@ TIMER_CALLBACK_MEMBER(ultratnk_state::nmi_callback)
 
 	/* NMI and watchdog are disabled during service mode */
 
-	machine().watchdog_enable(ioport("IN0")->read() & 0x40);
+	m_watchdog->watchdog_enable(ioport("IN0")->read() & 0x40);
 
 	if (ioport("IN0")->read() & 0x40)
 		m_maincpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
@@ -82,7 +82,7 @@ void ultratnk_state::machine_reset()
 
 READ8_MEMBER(ultratnk_state::ultratnk_wram_r)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	return videoram[0x380 + offset];
 }
 
@@ -109,7 +109,7 @@ READ8_MEMBER(ultratnk_state::ultratnk_options_r)
 
 WRITE8_MEMBER(ultratnk_state::ultratnk_wram_w)
 {
-	UINT8 *videoram = m_videoram;
+	uint8_t *videoram = m_videoram;
 	videoram[0x380 + offset] = data;
 }
 
@@ -180,7 +180,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, AS_PROGRAM, 8, ultratnk_state )
 	AM_RANGE(0x2020, 0x2027) AM_MIRROR(0x718) AM_WRITE(ultratnk_collision_reset_w)
 	AM_RANGE(0x2040, 0x2041) AM_MIRROR(0x718) AM_WRITE(ultratnk_da_latch_w)
 	AM_RANGE(0x2042, 0x2043) AM_MIRROR(0x718) AM_WRITE(ultratnk_explosion_w)
-	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x2044, 0x2045) AM_MIRROR(0x718) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w)
 	AM_RANGE(0x2066, 0x2067) AM_MIRROR(0x710) AM_WRITE(ultratnk_lockout_w)
 	AM_RANGE(0x2068, 0x2069) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_1_w)
 	AM_RANGE(0x206a, 0x206b) AM_MIRROR(0x710) AM_WRITE(ultratnk_led_2_w)
@@ -307,7 +307,8 @@ static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 	MCFG_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(ultratnk_cpu_map)
 
-	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)

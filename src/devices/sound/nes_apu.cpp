@@ -9,7 +9,7 @@
   Who Wants to Know? (wwtk@mail.com)
 
   This core is written with the advise and consent of Matthew Conte and is
-  released under the GNU Public License.  This core is freely avaiable for
+  released under the GNU Public License.  This core is freely available for
   use in any freeware project, subject to the following terms:
 
   Any modifications to this code must be duly noted in the source and
@@ -103,15 +103,14 @@ static void create_noise(uint8 *buf, const int bits, int size)
 
 const device_type NES_APU = &device_creator<nesapu_device>;
 
-nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NES_APU, "N2A03 APU", tag, owner, clock, "nesapu", __FILE__),
 		device_sound_interface(mconfig, *this),
 		m_apu_incsize(0.0),
 		m_samps_per_sync(0),
 		m_buffer_size(0),
 		m_real_rate(0),
-		m_stream(nullptr),
-		m_cpu_tag("")
+		m_stream(nullptr)
 {
 	for (auto & elem : m_noise_lut)
 	{
@@ -134,11 +133,39 @@ nesapu_device::nesapu_device(const machine_config &mconfig, const char *tag, dev
 	}
 }
 
-void nesapu_device::set_tag_memory(const char *tag)
+void nesapu_device::device_clock_changed()
 {
-	/* Initialize individual chips */
-	if (tag)
-		(m_APU.dpcm).memory = &machine().device(tag)->memory().space(AS_PROGRAM);
+	calculate_rates();
+}
+
+void nesapu_device::calculate_rates()
+{
+	int rate = clock() / 4;
+
+	screen_device *screen = machine().first_screen();
+	if (screen != nullptr)
+	{
+		m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+		m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
+	}
+	else
+	{
+		m_samps_per_sync = rate / screen_device::DEFAULT_FRAME_RATE;
+		m_real_rate = m_samps_per_sync * screen_device::DEFAULT_FRAME_RATE;
+	}
+	m_buffer_size = m_samps_per_sync;
+	m_apu_incsize = (float) (clock() / (float) m_real_rate);
+
+	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
+	create_syncs(m_samps_per_sync);
+
+	/* Adjust buffer size if 16 bits */
+	m_buffer_size+=m_samps_per_sync;
+
+	if (m_stream != nullptr)
+		m_stream->set_sample_rate(rate);
+	else
+		m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
 }
 
 //-------------------------------------------------
@@ -147,25 +174,11 @@ void nesapu_device::set_tag_memory(const char *tag)
 
 void nesapu_device::device_start()
 {
-	int rate = clock() / 4;
-
-	/* Initialize global variables */
-	m_samps_per_sync = rate / ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
-	m_buffer_size = m_samps_per_sync;
-	m_real_rate = m_samps_per_sync * ATTOSECONDS_TO_HZ(machine().first_screen()->frame_period().attoseconds());
-	m_apu_incsize = (float) (clock() / (float) m_real_rate);
-
-	/* Use initializer calls */
 	create_noise(m_noise_lut, 13, NOISE_LONG);
-	create_vbltimes(m_vbl_times,vbl_length,m_samps_per_sync);
-	create_syncs(m_samps_per_sync);
 
-	/* Adjust buffer size if 16 bits */
-	m_buffer_size+=m_samps_per_sync;
+	(m_APU.dpcm).memory = &downcast<n2a03_device &>(*owner()).space(AS_PROGRAM);
 
-	set_tag_memory(m_cpu_tag);
-
-	m_stream = machine().sound().stream_alloc(*this, 0, 1, rate);
+	calculate_rates();
 
 	/* register for save */
 	for (int i = 0; i < 2; i++)
@@ -239,7 +252,7 @@ int8 nesapu_device::apu_square(square_t *chan)
 	** reg3: 0-2=high freq, 7-4=vbl length counter
 	*/
 
-	if (FALSE == chan->enabled)
+	if (false == chan->enabled)
 		return 0;
 
 	/* enveloping */
@@ -311,15 +324,15 @@ int8 nesapu_device::apu_triangle(triangle_t *chan)
 	** reg3: 7-3=length counter, 2-0=high 3 bits of frequency
 	*/
 
-	if (FALSE == chan->enabled)
+	if (false == chan->enabled)
 		return 0;
 
-	if (FALSE == chan->counter_started && 0 == (chan->regs[0] & 0x80))
+	if (false == chan->counter_started && 0 == (chan->regs[0] & 0x80))
 	{
 		if (chan->write_latency)
 			chan->write_latency--;
 		if (0 == chan->write_latency)
-			chan->counter_started = TRUE;
+			chan->counter_started = true;
 	}
 
 	if (chan->counter_started)
@@ -371,7 +384,7 @@ int8 nesapu_device::apu_noise(noise_t *chan)
 	** reg3: 7-4=vbl length counter
 	*/
 
-	if (FALSE == chan->enabled)
+	if (false == chan->enabled)
 		return 0;
 
 	/* enveloping */
@@ -432,8 +445,8 @@ static inline void apu_dpcmreset(dpcm_t *chan)
 	chan->address = 0xC000 + (uint16) (chan->regs[2] << 6);
 	chan->length = (uint16) (chan->regs[3] << 4) + 1;
 	chan->bits_left = chan->length << 3;
-	chan->irq_occurred = FALSE;
-	chan->enabled = TRUE; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
+	chan->irq_occurred = false;
+	chan->enabled = true; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
 	chan->vol = 0; /* Fixed * DPCM DAC resets itself when restarted */
 }
 
@@ -460,7 +473,7 @@ int8 nesapu_device::apu_dpcm(dpcm_t *chan)
 
 			if (0 == chan->length)
 			{
-				chan->enabled = FALSE; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
+				chan->enabled = false; /* Fixed * Proper DPCM channel ENABLE/DISABLE flag behaviour*/
 				chan->vol=0; /* Fixed * DPCM DAC resets itself when restarted */
 				if (chan->regs[0] & 0x40)
 					apu_dpcmreset(chan);
@@ -468,7 +481,7 @@ int8 nesapu_device::apu_dpcm(dpcm_t *chan)
 				{
 					if (chan->regs[0] & 0x80) /* IRQ Generator */
 					{
-						chan->irq_occurred = TRUE;
+						chan->irq_occurred = true;
 						downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, ASSERT_LINE);
 					}
 					break;
@@ -546,7 +559,7 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 
 		if (m_APU.tri.enabled)
 		{                                          /* ??? */
-			if (FALSE == m_APU.tri.counter_started)
+			if (false == m_APU.tri.counter_started)
 				m_APU.tri.linear_length = m_sync_times2[value & 0x7F];
 		}
 
@@ -584,7 +597,7 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 
 		if (m_APU.tri.enabled)
 		{
-			m_APU.tri.counter_started = FALSE;
+			m_APU.tri.counter_started = false;
 			m_APU.tri.vbl_length = m_vbl_times[value >> 3];
 			m_APU.tri.linear_length = m_sync_times2[m_APU.tri.regs[0] & 0x7F];
 		}
@@ -620,7 +633,7 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 		m_APU.dpcm.regs[0] = value;
 		if (0 == (value & 0x80)) {
 			downcast<n2a03_device &>(m_APU.dpcm.memory->device()).set_input_line(N2A03_APU_IRQ_LINE, CLEAR_LINE);
-			m_APU.dpcm.irq_occurred = FALSE;
+			m_APU.dpcm.irq_occurred = false;
 		}
 		break;
 
@@ -648,53 +661,53 @@ inline void nesapu_device::apu_regwrite(int address, uint8 value)
 
 	case APU_SMASK:
 		if (value & 0x01)
-			m_APU.squ[0].enabled = TRUE;
+			m_APU.squ[0].enabled = true;
 		else
 		{
-			m_APU.squ[0].enabled = FALSE;
+			m_APU.squ[0].enabled = false;
 			m_APU.squ[0].vbl_length = 0;
 		}
 
 		if (value & 0x02)
-			m_APU.squ[1].enabled = TRUE;
+			m_APU.squ[1].enabled = true;
 		else
 		{
-			m_APU.squ[1].enabled = FALSE;
+			m_APU.squ[1].enabled = false;
 			m_APU.squ[1].vbl_length = 0;
 		}
 
 		if (value & 0x04)
-			m_APU.tri.enabled = TRUE;
+			m_APU.tri.enabled = true;
 		else
 		{
-			m_APU.tri.enabled = FALSE;
+			m_APU.tri.enabled = false;
 			m_APU.tri.vbl_length = 0;
 			m_APU.tri.linear_length = 0;
-			m_APU.tri.counter_started = FALSE;
+			m_APU.tri.counter_started = false;
 			m_APU.tri.write_latency = 0;
 		}
 
 		if (value & 0x08)
-			m_APU.noi.enabled = TRUE;
+			m_APU.noi.enabled = true;
 		else
 		{
-			m_APU.noi.enabled = FALSE;
+			m_APU.noi.enabled = false;
 			m_APU.noi.vbl_length = 0;
 		}
 
 		if (value & 0x10)
 		{
 			/* only reset dpcm values if DMA is finished */
-			if (FALSE == m_APU.dpcm.enabled)
+			if (false == m_APU.dpcm.enabled)
 			{
-				m_APU.dpcm.enabled = TRUE;
+				m_APU.dpcm.enabled = true;
 				apu_dpcmreset(&m_APU.dpcm);
 			}
 		}
 		else
-			m_APU.dpcm.enabled = FALSE;
+			m_APU.dpcm.enabled = false;
 
-		m_APU.dpcm.irq_occurred = FALSE;
+		m_APU.dpcm.irq_occurred = false;
 
 		break;
 	default:
@@ -725,10 +738,10 @@ inline uint8 nesapu_device::apu_read(int address)
 		if (m_APU.noi.vbl_length > 0)
 			readval |= 0x08;
 
-		if (m_APU.dpcm.enabled == TRUE)
+		if (m_APU.dpcm.enabled == true)
 			readval |= 0x10;
 
-		if (m_APU.dpcm.irq_occurred == TRUE)
+		if (m_APU.dpcm.irq_occurred == true)
 			readval |= 0x80;
 
 		return readval;

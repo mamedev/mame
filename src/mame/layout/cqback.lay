@@ -1,0 +1,178 @@
+<?xml version="1.0"?>
+<mamelayout version="2">
+
+<!-- define elements -->
+
+	<element name="static_black"><rect><color red="0.0" green="0.0" blue="0.0" /></rect></element>
+	<element name="static_white"><rect><color red="0.8" green="0.8" blue="0.8" /></rect></element>
+	<element name="static_green"><rect><color red="0.1" green="0.5" blue="0.2" /></rect></element>
+	<element name="static_orange"><rect><color red="0.8" green="0.25" blue="0.1" /></rect></element>
+
+	<element name="text_down">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="DOWN"><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+	<element name="text_home">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="HOME"><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+	<element name="text_yards">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="YARDS TO GO"><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+	<element name="text_time">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="TIME REMAINING"><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+	<element name="text_field">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="FIELD POS."><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+	<element name="text_visitor">
+		<rect><color red="0.8" green="0.8" blue="0.8" /></rect>
+		<text string="VISITOR"><color red="0.8" green="0.25" blue="0.1" /></text>
+	</element>
+
+	<element name="text_p1">
+		<rect><color red="0.06" green="0.3" blue="0.12" /></rect>
+		<text string="PL SEL:">
+			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
+			<color red="0.7" green="0.7" blue="0.8" />
+		</text>
+	</element>
+	<element name="text_p2" defstate="0">
+		<rect><color red="0.06" green="0.3" blue="0.12" /></rect>
+		<text state="0" string="RUN/KICK">
+			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
+			<color red="0.82" green="0.82" blue="0.82" />
+		</text>
+		<text state="1" string="PASS">
+			<bounds x="0.0" y="0.17" width="1.0" height="0.6" />
+			<color red="0.82" green="0.82" blue="0.82" />
+		</text>
+	</element>
+
+	<element name="digit" defstate="0">
+		<led7seg><color red="1.0" green="0.25" blue="0.26" /></led7seg>
+	</element>
+	<element name="seg" defstate="0">
+		<rect state="0"><color red="0.13" green="0.0325" blue="0.0338" /></rect>
+		<rect state="1"><color red="1.0" green="0.25" blue="0.26" /></rect>
+	</element>
+
+
+<!-- build screen -->
+
+	<view name="Internal Layout">
+		<bounds left="-9" right="393" top="-130" bottom="156" />
+		<bezel element="static_black">
+			<bounds left="-9" right="393" top="-130" bottom="156" />
+		</bezel>
+
+	<!-- bezel -->
+
+		<bezel element="static_white"><bounds left="-9" right="393" top="-130" bottom="-60" /></bezel>
+		<bezel element="static_green"><bounds left="-9" right="393" top="111" bottom="156" /></bezel>
+
+		<bezel element="text_down"><bounds x="-5" y="-126" width="86" height="19" /></bezel>
+		<bezel element="text_yards"><bounds x="107" y="-126" width="170" height="19" /></bezel>
+		<bezel element="text_field"><bounds x="301" y="-126" width="90" height="19" /></bezel>
+
+		<bezel element="text_home"><bounds x="-5" y="-92" width="86" height="19" /></bezel>
+		<bezel element="text_time"><bounds x="107" y="-92" width="170" height="19" /></bezel>
+		<bezel element="text_visitor"><bounds x="301" y="-92" width="90" height="19" /></bezel>
+
+		<bezel element="text_p1"><bounds x="301" y="130" width="40" height="16" /></bezel>
+		<bezel element="text_p2" inputtag="IN.1" inputmask="0x01">
+			<bounds x="339" y="130" width="50" height="16" />
+		</bezel>
+
+		<bezel element="static_orange"><bounds left="-9" right="393" top="-102" bottom="-96" /></bezel>
+		<bezel element="static_white"><bounds left="-9" right="393" top="-61" bottom="-51" /></bezel>
+		<bezel element="static_green"><bounds left="-9" right="393" top="-67" bottom="-61" /></bezel>
+		<bezel element="static_white"><bounds left="-9" right="393" top="110" bottom="120" /></bezel>
+
+		<bezel element="static_white"><bounds x="-9" y="-52" width="4" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="37" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="81" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="125" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="169" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="213" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="257" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="301" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="345" y="-52" width="2" height="163" /></bezel>
+		<bezel element="static_white"><bounds x="389" y="-52" width="4" height="163" /></bezel>
+
+		<bezel element="static_white"><bounds x="36" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="36" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="36" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="80" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="80" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="80" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="124" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="124" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="124" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="168" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="168" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="168" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="212" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="212" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="212" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="256" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="256" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="256" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="300" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="300" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="300" y="56" width="4" height="1" /></bezel>
+
+		<bezel element="static_white"><bounds x="344" y="2" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="344" y="29" width="4" height="1" /></bezel>
+		<bezel element="static_white"><bounds x="344" y="56" width="4" height="1" /></bezel>
+
+	<!-- leds -->
+
+		<bezel name="digit0" element="digit"><bounds x="3" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="0.8" element="seg"><bounds x="7" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="0.9" element="seg"><bounds x="7" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit1" element="digit"><bounds x="47" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="1.8" element="seg"><bounds x="51" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="1.9" element="seg"><bounds x="51" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit2" element="digit"><bounds x="91" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="2.8" element="seg"><bounds x="95" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="2.9" element="seg"><bounds x="95" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit3" element="digit"><bounds x="135" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="3.8" element="seg"><bounds x="139" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="3.9" element="seg"><bounds x="139" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit4" element="digit"><bounds x="179" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="4.8" element="seg"><bounds x="183" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="4.9" element="seg"><bounds x="183" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit5" element="digit"><bounds x="223" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="5.8" element="seg"><bounds x="227" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="5.9" element="seg"><bounds x="227" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit6" element="digit"><bounds x="267" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="6.8" element="seg"><bounds x="271" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="6.9" element="seg"><bounds x="271" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit7" element="digit"><bounds x="311" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="7.8" element="seg"><bounds x="315" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="7.9" element="seg"><bounds x="315" y="71.5" width="15" height="3" /></bezel>
+
+		<bezel name="digit8" element="digit"><bounds x="355" y="-15.5" width="24" height="32" /></bezel>
+		<bezel name="8.8" element="seg"><bounds x="359" y="42.5" width="15" height="3" /></bezel>
+		<bezel name="8.9" element="seg"><bounds x="359" y="71.5" width="15" height="3" /></bezel>
+
+
+	</view>
+</mamelayout>

@@ -91,7 +91,7 @@ const device_type I8275 = &device_creator<i8275_device>;
 //  i8275_device - constructor
 //-------------------------------------------------
 
-i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+i8275_device::i8275_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, I8275, "I8275 CRTC", tag, owner, clock, "i8275x", __FILE__),
 	device_video_interface(mconfig, *this),
 	m_write_irq(*this),
@@ -315,7 +315,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 				int vsp = 0;
 				int rvv = 0;
 
-				UINT8 data = (end_of_row || m_end_of_screen) ? 0 : m_buffer[!m_buffer_dma][sx];
+				uint8_t data = (end_of_row || m_end_of_screen) ? 0 : m_buffer[!m_buffer_dma][sx];
 
 				if (data & 0x80)
 				{
@@ -367,7 +367,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 							m_hlgt = (data & CA_H) ? 1 : 0;
 							m_vsp = (data & CA_B) ? 1 : 0;
 
-							UINT8 ca;
+							uint8_t ca;
 							int cccc = (data >> 2) & 0x0f;
 
 							if (line_counter < UNDERLINE)
@@ -448,7 +448,7 @@ void i8275_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 READ8_MEMBER( i8275_device::read )
 {
-	UINT8 data;
+	uint8_t data;
 
 	if (offset & 0x01)
 	{
@@ -643,11 +643,11 @@ WRITE_LINE_MEMBER( i8275_device::lpen_w )
 //  screen_update -
 //-------------------------------------------------
 
-UINT32 i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
+uint32_t i8275_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
 	if (!(m_status & ST_VE))
 	{
-		m_bitmap.fill(rgb_t::black);
+		m_bitmap.fill(rgb_t::black(), cliprect);
 	}
 
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);

@@ -39,6 +39,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "machine/rescap.h"
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 #include "includes/nitedrvr.h"
 
@@ -48,7 +49,7 @@ static ADDRESS_MAP_START( nitedrvr_map, AS_PROGRAM, 8, nitedrvr_state )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100) // SCRAM
 	AM_RANGE(0x0200, 0x027f) AM_READNOP AM_WRITE(nitedrvr_videoram_w) AM_MIRROR(0x180) AM_SHARE("videoram") // PFW
 	AM_RANGE(0x0400, 0x042f) AM_READNOP AM_WRITEONLY AM_MIRROR(0x1c0) AM_SHARE("hvc") // POSH, POSV, CHAR
-	AM_RANGE(0x0430, 0x043f) AM_WRITE(watchdog_reset_w) AM_MIRROR(0x1c0)
+	AM_RANGE(0x0430, 0x043f) AM_DEVWRITE("watchdog", watchdog_timer_device, reset_w) AM_MIRROR(0x1c0)
 	AM_RANGE(0x0600, 0x07ff) AM_READ(nitedrvr_in0_r)
 	AM_RANGE(0x0800, 0x09ff) AM_READ(nitedrvr_in1_r)
 	AM_RANGE(0x0a00, 0x0bff) AM_WRITE(nitedrvr_out0_w)
@@ -141,7 +142,9 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 	MCFG_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
 	MCFG_CPU_PROGRAM_MAP(nitedrvr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", nitedrvr_state, irq0_line_hold)
-	MCFG_WATCHDOG_VBLANK_INIT(3)
+
+	MCFG_WATCHDOG_ADD("watchdog")
+	MCFG_WATCHDOG_VBLANK_INIT("screen", 3)
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("crash_timer", nitedrvr_state, nitedrvr_crash_toggle_callback, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)))
 
@@ -156,7 +159,7 @@ static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", nitedrvr)
 
-	MCFG_PALETTE_ADD_BLACK_AND_WHITE("palette")
+	MCFG_PALETTE_ADD_MONOCHROME("palette")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")

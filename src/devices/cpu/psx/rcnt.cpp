@@ -26,7 +26,7 @@ static inline void ATTR_PRINTF(3,4) verboselog( device_t& device, int n_level, c
 
 const device_type PSX_RCNT = &device_creator<psxrcnt_device>;
 
-psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock) :
+psxrcnt_device::psxrcnt_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, PSX_RCNT, "Sony PSX RCNT", tag, owner, clock, "psxrcnt", __FILE__),
 	m_irq0_handler(*this),
 	m_irq1_handler(*this),
@@ -118,7 +118,7 @@ READ32_MEMBER( psxrcnt_device::read )
 {
 	int n_counter = offset / 4;
 	psx_root *root = &root_counter[ n_counter ];
-	UINT32 data;
+	uint32_t data;
 
 	switch( offset % 4 )
 	{
@@ -139,7 +139,7 @@ READ32_MEMBER( psxrcnt_device::read )
 	return data;
 }
 
-UINT64 psxrcnt_device::gettotalcycles( void )
+uint64_t psxrcnt_device::gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
 	return ((cpu_device *)owner())->total_cycles() * 2;
@@ -165,7 +165,7 @@ int psxrcnt_device::root_divider( int n_counter )
 	return 1;
 }
 
-UINT16 psxrcnt_device::root_current( int n_counter )
+uint16_t psxrcnt_device::root_current( int n_counter )
 {
 	psx_root *root = &root_counter[ n_counter ];
 
@@ -175,7 +175,7 @@ UINT16 psxrcnt_device::root_current( int n_counter )
 	}
 	else
 	{
-		UINT64 n_current;
+		uint64_t n_current;
 		n_current = gettotalcycles() - root->n_start;
 		n_current /= root_divider( n_counter );
 		n_current += root->n_count;

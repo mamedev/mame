@@ -1,4 +1,4 @@
-// license:GPL-2.0+
+// license:BSD-3-Clause
 // copyright-holders:Joseph Zbiciak,Tim Lindner
 /**********************************************************************
 
@@ -28,19 +28,6 @@
 
    By Joe Zbiciak. Ported to MESS by tim lindner.
 
- Copyright Joseph Zbiciak, all rights reserved.
- Copyright tim lindner, all rights reserved.
-
- - This source code is released as freeware for non-commercial purposes.
- - You are free to use and redistribute this code in modified or
-   unmodified form, provided you list us in the credits.
- - If you modify this source code, you must add a notice to each
-   modified source file that it has been changed.  If you're a nice
-   person, you will clearly mark each change too.  :)
- - If you wish to use this for commercial purposes, please contact us at
-   intvnut@gmail.com (Joe Zbiciak), tlindner@macmess.org (tim lindner)
- - This entire notice must remain in the source code.
-
 */
 
 #pragma once
@@ -58,12 +45,12 @@
 struct lpc12_t
 {
 	int     rpt, cnt;       /* Repeat counter, Period down-counter.         */
-	UINT32  per, rng;       /* Period, Amplitude, Random Number Generator   */
+	uint32_t  per, rng;       /* Period, Amplitude, Random Number Generator   */
 	int     amp;
-	INT16   f_coef[6];      /* F0 through F5.                               */
-	INT16   b_coef[6];      /* B0 through B5.                               */
-	INT16   z_data[6][2];   /* Time-delay data for the filter stages.       */
-	UINT8   r[16];          /* The encoded register set.                    */
+	int16_t   f_coef[6];      /* F0 through F5.                               */
+	int16_t   b_coef[6];      /* B0 through B5.                               */
+	int16_t   z_data[6][2];   /* Time-delay data for the filter stages.       */
+	uint8_t   r[16];          /* The encoded register set.                    */
 	int     interp;
 };
 
@@ -71,7 +58,7 @@ class sp0256_device : public device_t,
 						public device_sound_interface
 {
 public:
-	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	sp0256_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~sp0256_device() { }
 
 	template<class _Object> static devcb_base &set_data_request_callback(device_t &device, _Object object) { return downcast<sp0256_device &>(device).m_drq_cb.set_callback(object); }
@@ -85,7 +72,7 @@ public:
 
 	TIMER_CALLBACK_MEMBER(set_lrq_timer_proc);
 	void set_clock(int clock);
-	void bitrevbuff(UINT8 *buffer, unsigned int start, unsigned int length);
+	void bitrevbuff(uint8_t *buffer, unsigned int start, unsigned int length);
 
 protected:
 	// device-level overrides
@@ -96,9 +83,9 @@ protected:
 	virtual void sound_stream_update(sound_stream &stream, stream_sample_t **inputs, stream_sample_t **outputs, int samples) override;
 
 private:
-	UINT32 getb(int len);
+	uint32_t getb(int len);
 	void micro();
-	required_region_ptr<UINT8> m_rom; /* 64K ROM.                                     */
+	required_region_ptr<uint8_t> m_rom; /* 64K ROM.                                     */
 	sound_stream  *m_stream;          /* MAME core sound stream                       */
 	devcb_write_line m_drq_cb;       /* Data request callback                        */
 	devcb_write_line m_sby_cb;       /* Standby callback                             */
@@ -108,9 +95,9 @@ private:
 
 	int            m_silent;          /* Flag: SP0256 is silent.                      */
 
-	std::unique_ptr<INT16[]>    m_scratch;         /* Scratch buffer for audio.                    */
-	UINT32         m_sc_head;         /* Head pointer into scratch circular buf       */
-	UINT32         m_sc_tail;         /* Tail pointer into scratch circular buf       */
+	std::unique_ptr<int16_t[]>    m_scratch;         /* Scratch buffer for audio.                    */
+	uint32_t         m_sc_head;         /* Head pointer into scratch circular buf       */
+	uint32_t         m_sc_tail;         /* Tail pointer into scratch circular buf       */
 
 	struct lpc12_t m_filt;            /* 12-pole filter                               */
 	int            m_lrq;             /* Load ReQuest.  == 0 if we can accept a load  */
@@ -119,13 +106,13 @@ private:
 	int            m_stack;           /* Microcontroller's PC stack.                  */
 	int            m_fifo_sel;        /* True when executing from FIFO.               */
 	int            m_halted;          /* True when CPU is halted.                     */
-	UINT32         m_mode;            /* Mode register.                               */
-	UINT32         m_page;            /* Page set by SETPAGE                          */
+	uint32_t         m_mode;            /* Mode register.                               */
+	uint32_t         m_page;            /* Page set by SETPAGE                          */
 
-	UINT32         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
-	UINT32         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
-	UINT32         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
-	UINT16         m_fifo[64];        /* The 64-decle FIFO.                           */
+	uint32_t         m_fifo_head;       /* FIFO head pointer (where new data goes).     */
+	uint32_t         m_fifo_tail;       /* FIFO tail pointer (where data comes from).   */
+	uint32_t         m_fifo_bitp;       /* FIFO bit-pointer (for partial decles).       */
+	uint16_t         m_fifo[64];        /* The 64-decle FIFO.                           */
 
 	emu_timer *m_lrq_timer;
 };

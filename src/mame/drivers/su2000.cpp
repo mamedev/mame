@@ -39,6 +39,7 @@
 #include "machine/idectrl.h"
 #include "video/pc_vga.h"
 #include "machine/pckeybrd.h"
+#include "machine/ds128x.h"
 
 /*************************************
  *
@@ -50,8 +51,6 @@
 #define MC68000_CLOCK       XTAL_10MHz
 #define TMS320C1_CLOCK      XTAL_33_833MHz
 #define MC88110_CLOCK       XTAL_40MHz
-
-#define PC_RAM_SIZE         (4096 * 1024)
 
 
 /*************************************
@@ -66,9 +65,6 @@ public:
 	su2000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: pcat_base_state(mconfig, type, tag){ }
 
-	std::unique_ptr<UINT32[]>      m_pc_ram;
-	virtual void machine_start() override;
-	virtual void machine_reset() override;
 };
 
 
@@ -79,10 +75,11 @@ public:
  *************************************/
 
 static ADDRESS_MAP_START( pcat_map, AS_PROGRAM, 32, su2000_state )
-	AM_RANGE(0x00000000, 0x0009ffff) AM_RAMBANK("mem_bank")
+	AM_RANGE(0x00000000, 0x0009ffff) AM_RAM
 	AM_RANGE(0x000a0000, 0x000bffff) AM_DEVREADWRITE8("vga", vga_device, mem_r, mem_w, 0xffffffff)
 	AM_RANGE(0x000c0000, 0x000c7fff) AM_ROM
 	AM_RANGE(0x000f0000, 0x000fffff) AM_ROM
+	AM_RANGE(0x00100000, 0x003fffff) AM_RAM
 	AM_RANGE(0xffff0000, 0xffffffff) AM_ROM AM_REGION("maincpu", 0x0f0000)
 ADDRESS_MAP_END
 
@@ -118,34 +115,6 @@ static void ide_interrupt(device_t *device, int state)
 
 /*************************************
  *
- *  Initialization
- *
- *************************************/
-
-void su2000_state::machine_start()
-{
-	address_space &space = m_maincpu->space(AS_PROGRAM);
-
-	/* Configure RAM */
-	m_pc_ram = make_unique_clear<UINT32[]>(PC_RAM_SIZE);
-
-	/* Conventional memory */
-	membank("mem_bank")->set_base(m_pc_ram.get());
-
-	/* HMA */
-	offs_t ram_limit = 0x100000 + PC_RAM_SIZE - 0x0a0000;
-	space.install_read_bank(0x100000, ram_limit - 1, "hma_bank");
-	space.install_write_bank(0x100000, ram_limit - 1, "hma_bank");
-	membank("hma_bank")->set_base(m_pc_ram.get() + 0xa0000);
-}
-
-void su2000_state::machine_reset()
-{
-}
-
-
-/*************************************
- *
  *  Machine Configuration
  *
  *************************************/
@@ -173,11 +142,13 @@ static MACHINE_CONFIG_START( su2000, su2000_state )
 
 	/* Video hardware */
 	MCFG_FRAGMENT_ADD(pcvideo_vga)
-	MCFG_SCREEN_MODIFY("screen")
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // TODO
 
 	MCFG_FRAGMENT_ADD(pcat_common)
+
+	MCFG_DEVICE_REMOVE("rtc")
+	MCFG_DS12885_ADD("rtc")
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE("pic8259_2", pic8259_device, ir0_w))
+	MCFG_MC146818_CENTURY_INDEX(0x32)
 MACHINE_CONFIG_END
 
 

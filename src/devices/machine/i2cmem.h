@@ -85,12 +85,11 @@
 
 class i2cmem_device :
 	public device_t,
-	public device_memory_interface,
 	public device_nvram_interface
 {
 public:
 	// construction/destruction
-	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock );
+	i2cmem_device( const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock );
 
 	static void set_address(device_t &device, int address) { downcast<i2cmem_device &>(device).m_slave_address = address; }
 	static void set_page_size(device_t &device, int page_size) { downcast<i2cmem_device &>(device).m_page_size = page_size; }
@@ -111,12 +110,8 @@ public:
 
 protected:
 	// device-level overrides
-	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
-
-	// device_memory_interface overrides
-	virtual const address_space_config *memory_space_config( address_spacenum spacenum = AS_0 ) const override;
 
 	// device_nvram_interface overrides
 	virtual void nvram_default() override;
@@ -128,10 +123,10 @@ protected:
 	int select_device();
 	int data_offset();
 
-	// device-specific configuration
-	address_space_config m_space_config;
+	optional_memory_region m_region;
 
 	// internal state
+	std::unique_ptr<uint8_t[]> m_data;
 	int m_slave_address;
 	int m_page_size;
 	int m_data_size;
@@ -147,7 +142,7 @@ protected:
 	int m_shift;
 	int m_devsel;
 	int m_byteaddr;
-	dynamic_buffer m_page;
+	std::vector<uint8_t> m_page;
 	int m_page_offset;
 };
 

@@ -25,11 +25,12 @@ Known issues:
 // Directives
 
 #include "emu.h"
-#include "cpu/m6809/m6809.h"
+#include "includes/bwing.h"
 #include "cpu/m6502/deco16.h"
+#include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-#include "includes/bwing.h"
+#include "sound/volt_reg.h"
 
 
 //****************************************************************************
@@ -85,7 +86,7 @@ WRITE8_MEMBER(bwing_state::bwp1_ctrl_w)
 				m_subcpu->set_input_line(INPUT_LINE_NMI, ASSERT_LINE); // SNMI
 			else
 			{
-				soundlatch_byte_w(space, 0, data);
+				m_soundlatch->write(space, 0, data);
 				m_audiocpu->set_input_line(DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
@@ -154,13 +155,13 @@ ADDRESS_MAP_END
 // Sound CPU
 static ADDRESS_MAP_START( bwp3_map, AS_PROGRAM, 8, bwing_state )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_device, write_signed8)
+	AM_RANGE(0x0200, 0x0200) AM_DEVWRITE("dac", dac_byte_interface, write)
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bwp3_nmiack_w)
 	AM_RANGE(0x2000, 0x2000) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x4000, 0x4000) AM_DEVWRITE("ay1", ay8910_device, address_w)
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x8000, 0x8000) AM_DEVWRITE("ay2", ay8910_device, address_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_byte_r)
+	AM_RANGE(0xa000, 0xa000) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(bwp3_nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0)
 ADDRESS_MAP_END
@@ -392,16 +393,19 @@ static MACHINE_CONFIG_START( bwing, bwing_state )
 
 
 	// sound hardware
-	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("speaker")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
-	MCFG_DAC_ADD("dac")
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.1) // unknown DAC
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
 //****************************************************************************
@@ -546,7 +550,7 @@ ROM_END
 
 DRIVER_INIT_MEMBER(bwing_state,bwing)
 {
-	UINT8 *rom = memregion("audiocpu")->base();
+	uint8_t *rom = memregion("audiocpu")->base();
 	int j = memregion("audiocpu")->bytes();
 
 	// swap nibbles

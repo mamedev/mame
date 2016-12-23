@@ -6,6 +6,7 @@
 
 *************************************************************************/
 
+#include "machine/watchdog.h"
 #include "sound/discrete.h"
 
 class ultratnk_state : public driver_device
@@ -20,12 +21,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
 		m_maincpu(*this, "maincpu"),
+		m_watchdog(*this, "watchdog"),
 		m_discrete(*this, "discrete"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette") { }
 
-	required_shared_ptr<UINT8> m_videoram;
+	required_shared_ptr<uint8_t> m_videoram;
 	int m_da_latch;
 	int m_collision[4];
 	tilemap_t* m_playfield;
@@ -52,10 +54,11 @@ public:
 	virtual void machine_reset() override;
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(ultratnk);
-	UINT32 screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_ultratnk(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void screen_eof_ultratnk(screen_device &screen, bool state);
 	TIMER_CALLBACK_MEMBER(nmi_callback);
 	required_device<cpu_device> m_maincpu;
+	required_device<watchdog_timer_device> m_watchdog;
 	required_device<discrete_device> m_discrete;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;

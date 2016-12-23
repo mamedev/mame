@@ -19,20 +19,20 @@ public:
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<palette_device> m_palette;
 
-	required_shared_ptr<UINT8> m_txtram;
-	required_shared_ptr<UINT8> m_videoram;
-	required_shared_ptr<UINT8> m_colorram;
-	required_shared_ptr<UINT8> m_spriteram;
+	required_shared_ptr<uint8_t> m_txtram;
+	required_shared_ptr<uint8_t> m_videoram;
+	required_shared_ptr<uint8_t> m_colorram;
+	required_shared_ptr<uint8_t> m_spriteram;
 
 	int m_latch;
-	UINT32 m_timer1;
+	uint32_t m_timer1;
 	int m_e0xx_data[8];
-	UINT8 m_variable_data;
+	uint8_t m_variable_data;
 	tilemap_t *m_bg_tilemap;
 	tilemap_t *m_txt_tilemap;
-	UINT8 m_xscroll[2];
-	UINT8 m_yscroll[2];
-	UINT8 m_irq_mask;
+	uint8_t m_xscroll[2];
+	uint8_t m_yscroll[2];
+	uint8_t m_irq_mask;
 
 	DECLARE_WRITE8_MEMBER(soundlatch_w);
 	DECLARE_WRITE8_MEMBER(e0xx_w);
@@ -54,7 +54,7 @@ public:
 	virtual void video_start() override;
 	DECLARE_PALETTE_INIT(tankbust);
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_sprites(bitmap_ind16 &bitmap, const rectangle &cliprect);
 
 	INTERRUPT_GEN_MEMBER(vblank_irq);

@@ -96,7 +96,7 @@ WRITE16_MEMBER(inufuku_state::inufuku_soundcommand_w)
 			return;
 
 		m_pending_command = 1;
-		soundlatch_byte_w(space, 0, data & 0xff);
+		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -119,7 +119,7 @@ WRITE8_MEMBER(inufuku_state::inufuku_soundrombank_w)
 
 CUSTOM_INPUT_MEMBER(inufuku_state::soundflag_r)
 {
-	UINT16 soundflag = m_pending_command ? 0 : 1;
+	uint16_t soundflag = m_pending_command ? 0 : 1;
 
 	return soundflag;
 }
@@ -177,7 +177,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( inufuku_sound_io_map, AS_IO, 8, inufuku_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(inufuku_soundrombank_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_byte_r) AM_WRITE(pending_command_clear_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("soundlatch", generic_latch_8_device, read) AM_WRITE(pending_command_clear_w)
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ymsnd", ym2610_device, read, write)
 ADDRESS_MAP_END
 
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( inufuku )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("eeprom", eeprom_serial_93cxx_device, do_read)
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, NULL)    // pending sound command
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, inufuku_state,soundflag_r, nullptr)    // pending sound command
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // 3on3dunk cares about something in here, possibly a vblank flag
 
 	PORT_START( "EEPROMOUT" )
@@ -318,25 +318,13 @@ GFXDECODE_END
 
 /******************************************************************************
 
-    Sound definitions
-
-******************************************************************************/
-
-WRITE_LINE_MEMBER(inufuku_state::irqhandler)
-{
-	m_audiocpu->set_input_line(0, state ? ASSERT_LINE : CLEAR_LINE);
-}
-
-
-/******************************************************************************
-
     Machine driver
 
 ******************************************************************************/
 
 void inufuku_state::machine_start()
 {
-	UINT8 *ROM = memregion("audiocpu")->base();
+	uint8_t *ROM = memregion("audiocpu")->base();
 
 	membank("bank1")->configure_entries(0, 4, &ROM[0x00000], 0x8000);
 	membank("bank1")->set_entry(0);
@@ -395,7 +383,6 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	MCFG_VSYSTEM_SPR_SET_TILE_INDIRECT( inufuku_state, inufuku_tile_callback )
 	MCFG_VSYSTEM_SPR_SET_GFXREGION(2)
 	MCFG_VSYSTEM_SPR_GFXDECODE("gfxdecode")
-	MCFG_VSYSTEM_SPR_PALETTE("palette")
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", inufuku)
 	MCFG_PALETTE_ADD("palette", 4096)
@@ -404,8 +391,10 @@ static MACHINE_CONFIG_START( inufuku, inufuku_state )
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+
 	MCFG_SOUND_ADD("ymsnd", YM2610, 32000000/4)
-	MCFG_YM2610_IRQ_HANDLER(WRITELINE(inufuku_state, irqhandler))
+	MCFG_YM2610_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.75)
 	MCFG_SOUND_ROUTE(2, "mono", 0.75)

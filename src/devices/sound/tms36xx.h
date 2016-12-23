@@ -43,7 +43,7 @@ class tms36xx_device : public device_t,
 						public device_sound_interface
 {
 public:
-	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	tms36xx_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	~tms36xx_device() { }
 
 	static void set_subtype(device_t &device, int type)
@@ -124,7 +124,7 @@ private:
 	int m_counter[12];    // tone frequency counter
 	int m_frequency[12];  // tone frequency
 	int m_output;         // output signal bits
-	int m_enable;         // mask which harmoics
+	int m_enable;         // mask which harmonics
 
 	int m_tune_num;       // tune currently playing
 	int m_tune_ofs;       // note currently playing

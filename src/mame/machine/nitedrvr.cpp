@@ -252,7 +252,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(nitedrvr_state::nitedrvr_crash_toggle_callback)
 	if (m_crash_en && m_crash_data_en)
 	{
 		m_crash_data--;
-		address_space &space = machine().driver_data()->generic_space();
+		address_space &space = machine().dummy_space();
 		m_discrete->write(space, NITEDRVR_BANG_DATA, m_crash_data);  // Crash Volume
 		if (!m_crash_data)
 			m_crash_data_en = 0;    // Done counting?

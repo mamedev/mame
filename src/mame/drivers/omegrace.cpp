@@ -220,7 +220,9 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"
+#include "machine/gen_latch.h"
 #include "machine/nvram.h"
+#include "machine/watchdog.h"
 
 #include "omegrace.lh"
 
@@ -232,11 +234,13 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_dvg(*this, "dvg") { }
+		m_dvg(*this, "dvg"),
+		m_soundlatch(*this, "soundlatch") { }
 
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
 	required_device<dvg_device> m_dvg;
+	required_device<generic_latch_8_device> m_soundlatch;
 
 	DECLARE_READ8_MEMBER(omegrace_vg_go_r);
 	DECLARE_READ8_MEMBER(omegrace_spinner1_r);
@@ -257,7 +261,7 @@ void omegrace_state::machine_reset()
 {
 	address_space &space = m_maincpu->space(AS_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
-m_dvg->reset_w(space, 0, 0);
+	m_dvg->reset_w(space, 0, 0);
 }
 
 
@@ -293,7 +297,7 @@ READ8_MEMBER(omegrace_state::omegrace_vg_go_r)
  * 5 4 3 2 1 0 for encoder 2 (not shifted..)
  */
 
-static const UINT8 spinnerTable[64] =
+static const uint8_t spinnerTable[64] =
 {
 	0x00, 0x04, 0x14, 0x10, 0x18, 0x1c, 0x5c, 0x58,
 	0x50, 0x54, 0x44, 0x40, 0x48, 0x4c, 0x6c, 0x68,
@@ -337,7 +341,7 @@ WRITE8_MEMBER(omegrace_state::omegrace_leds_w)
 
 WRITE8_MEMBER(omegrace_state::omegrace_soundlatch_w)
 {
-	soundlatch_byte_w (space, offset, data);
+	m_soundlatch->write(space, offset, data);
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
@@ -361,7 +365,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( port_map, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x08, 0x08) AM_READ(omegrace_vg_go_r)
-	AM_RANGE(0x09, 0x09) AM_READ(watchdog_reset_r)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD("watchdog", watchdog_timer_device, reset_r)
 	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("dvg", dvg_device, reset_w)
 	AM_RANGE(0x0b, 0x0b) AM_READ_PORT("AVGDVG")             /* vg_halt */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")               /* DIP SW C4 */
@@ -389,7 +393,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, AS_IO, 8, omegrace_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_byte_r) // the game reads from ay1 port b, but ay8912 only has port a
+	AM_RANGE(0x00, 0x00) AM_DEVREAD("soundlatch", generic_latch_8_device, read) // the game reads from ay1 port b, but ay8912 only has port a
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("ay1", ay8912_device, address_data_w)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("ay2", ay8912_device, address_data_w)
 ADDRESS_MAP_END
@@ -479,7 +483,7 @@ static INPUT_PORTS_START( omegrace )
 	PORT_BIT( 0x3f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(12) PORT_KEYDELTA(10) PORT_COCKTAIL
 
 	PORT_START("AVGDVG")    /* port 0x0b */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("dvg", dvg_device, done_r, nullptr)
 INPUT_PORTS_END
 
 
@@ -513,6 +517,8 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_WATCHDOG_ADD("watchdog")
+
 	/* video hardware */
 	MCFG_VECTOR_ADD("vector")
 	MCFG_SCREEN_ADD("screen", VECTOR)
@@ -526,6 +532,8 @@ static MACHINE_CONFIG_START( omegrace, omegrace_state )
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
@@ -595,14 +603,14 @@ ROM_END
 
 /*************************************
  *
- *  Game specific initalization
+ *  Game specific initialization
  *
  *************************************/
 
 DRIVER_INIT_MEMBER(omegrace_state,omegrace)
 {
 	int i, len = memregion("user1")->bytes();
-	UINT8 *prom = memregion("user1")->base();
+	uint8_t *prom = memregion("user1")->base();
 
 	/* Omega Race has two pairs of the state PROM output
 	 * lines swapped before going into the decoder.

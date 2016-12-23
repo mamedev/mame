@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 //  INLINE HELPERS
 //**************************************************************************
 
-inline UINT8 i8155_device::get_timer_mode()
+inline uint8_t i8155_device::get_timer_mode()
 {
 	return (m_count_length >> 8) & TIMER_MODE_MASK;
 }
@@ -117,7 +117,7 @@ inline void i8155_device::timer_output()
 {
 	m_out_to_cb(m_to);
 
-	if (LOG) logerror("8155 '%s' Timer Output: %u\n", tag(), m_to);
+	if (LOG) logerror("8155 Timer Output: %u\n", m_to);
 }
 
 inline void i8155_device::pulse_timer_output()
@@ -154,9 +154,9 @@ inline int i8155_device::get_port_mode(int port)
 	return mode;
 }
 
-inline UINT8 i8155_device::read_port(int port)
+inline uint8_t i8155_device::read_port(int port)
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (get_port_mode(port))
 	{
@@ -170,14 +170,14 @@ inline UINT8 i8155_device::read_port(int port)
 
 	default:
 		// strobed mode not implemented yet
-		logerror("8155 '%s' Unsupported Port C mode!\n", tag());
+		logerror("8155 Unsupported Port C mode!\n");
 		break;
 	}
 
 	return data;
 }
 
-inline void i8155_device::write_port(int port, UINT8 data)
+inline void i8155_device::write_port(int port, uint8_t data)
 {
 	switch (get_port_mode(port))
 	{
@@ -202,7 +202,7 @@ inline void i8155_device::write_port(int port, UINT8 data)
 //  i8155_device - constructor
 //-------------------------------------------------
 
-i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock)
+i8155_device::i8155_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, I8155, "8155 RIOT", tag, owner, clock, "i8155", __FILE__),
 		device_memory_interface(mconfig, *this),
 		m_in_pa_cb(*this),
@@ -292,20 +292,11 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 
 	if (m_counter == 0)
 	{
-		if (LOG) logerror("8155 '%s' Timer Count Reached\n", tag());
-
-		switch (m_command & COMMAND_TM_MASK)
-		{
-		case COMMAND_TM_STOP_AFTER_TC:
-			// stop timer
-			m_timer->enable(0);
-
-			if (LOG) logerror("8155 '%s' Timer Stopped\n", tag());
-			break;
-		}
+		if (LOG) logerror("8155 Timer Count Reached\n");
 
 		switch (get_timer_mode())
 		{
+		case TIMER_MODE_LOW:
 		case TIMER_MODE_SQUARE_WAVE:
 			// toggle timer output
 			m_to = !m_to;
@@ -313,15 +304,8 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			break;
 
 		case TIMER_MODE_SINGLE_PULSE:
-			// single pulse upon TC being reached
-			pulse_timer_output();
-
-			// clear timer mode setting
-			m_command &= ~COMMAND_TM_MASK;
-			break;
-
 		case TIMER_MODE_AUTOMATIC_RELOAD:
-			// automatic reload, i.e. single pulse every time TC is reached
+			// pulse upon TC being reached
 			pulse_timer_output();
 			break;
 		}
@@ -329,8 +313,28 @@ void i8155_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 		// set timer flag
 		m_status |= STATUS_TIMER;
 
-		// reload timer counter
-		m_counter = m_count_length & 0x3fff;
+		if ((m_command & COMMAND_TM_MASK) == COMMAND_TM_START)
+		{
+			// load new timer counter
+			m_counter = m_count_length & 0x3fff;
+
+			if (LOG) logerror("8155 Timer New Start\n");
+		}
+		else if ((m_command & COMMAND_TM_MASK) == COMMAND_TM_STOP_AFTER_TC || get_timer_mode() == TIMER_MODE_SINGLE_PULSE)
+		{
+			// stop timer
+			m_timer->enable(0);
+
+			if (LOG) logerror("8155 Timer Stopped\n");
+		}
+		else
+		{
+			// automatically reload the counter
+			m_counter = m_count_length & 0x3fff;
+		}
+
+		// clear timer command
+		m_command &= ~COMMAND_TM_MASK;
 	}
 }
 
@@ -352,7 +356,7 @@ const address_space_config *i8155_device::memory_space_config(address_spacenum s
 
 READ8_MEMBER( i8155_device::io_r )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (offset & 0x07)
 	{
@@ -392,35 +396,35 @@ READ8_MEMBER( i8155_device::io_r )
 //  register_w - register write
 //-------------------------------------------------
 
-void i8155_device::register_w(int offset, UINT8 data)
+void i8155_device::register_w(int offset, uint8_t data)
 {
 	switch (offset & 0x07)
 	{
 	case REGISTER_COMMAND:
 		m_command = data;
 
-		if (LOG) logerror("8155 '%s' Port A Mode: %s\n", tag(), (data & COMMAND_PA) ? "output" : "input");
-		if (LOG) logerror("8155 '%s' Port B Mode: %s\n", tag(), (data & COMMAND_PB) ? "output" : "input");
+		if (LOG) logerror("8155 Port A Mode: %s\n", (data & COMMAND_PA) ? "output" : "input");
+		if (LOG) logerror("8155 Port B Mode: %s\n", (data & COMMAND_PB) ? "output" : "input");
 
-		if (LOG) logerror("8155 '%s' Port A Interrupt: %s\n", tag(), (data & COMMAND_IEA) ? "enabled" : "disabled");
-		if (LOG) logerror("8155 '%s' Port B Interrupt: %s\n", tag(), (data & COMMAND_IEB) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 Port A Interrupt: %s\n", (data & COMMAND_IEA) ? "enabled" : "disabled");
+		if (LOG) logerror("8155 Port B Interrupt: %s\n", (data & COMMAND_IEB) ? "enabled" : "disabled");
 
 		switch (data & COMMAND_PC_MASK)
 		{
 		case COMMAND_PC_ALT_1:
-			if (LOG) logerror("8155 '%s' Port C Mode: Alt 1\n", tag());
+			if (LOG) logerror("8155 Port C Mode: Alt 1\n");
 			break;
 
 		case COMMAND_PC_ALT_2:
-			if (LOG) logerror("8155 '%s' Port C Mode: Alt 2\n", tag());
+			if (LOG) logerror("8155 Port C Mode: Alt 2\n");
 			break;
 
 		case COMMAND_PC_ALT_3:
-			if (LOG) logerror("8155 '%s' Port C Mode: Alt 3\n", tag());
+			if (LOG) logerror("8155 Port C Mode: Alt 3\n");
 			break;
 
 		case COMMAND_PC_ALT_4:
-			if (LOG) logerror("8155 '%s' Port C Mode: Alt 4\n", tag());
+			if (LOG) logerror("8155 Port C Mode: Alt 4\n");
 			break;
 		}
 
@@ -432,7 +436,7 @@ void i8155_device::register_w(int offset, UINT8 data)
 
 		case COMMAND_TM_STOP:
 			// NOP if timer has not started, stop counting if the timer is running
-			if (LOG) logerror("8155 '%s' Timer Command: Stop\n", tag());
+			if (LOG) logerror("8155 Timer Command: Stop\n");
 			m_to = 1;
 			timer_output();
 			m_timer->enable(0);
@@ -440,11 +444,11 @@ void i8155_device::register_w(int offset, UINT8 data)
 
 		case COMMAND_TM_STOP_AFTER_TC:
 			// stop immediately after present TC is reached (NOP if timer has not started)
-			if (LOG) logerror("8155 '%s' Timer Command: Stop after TC\n", tag());
+			if (LOG) logerror("8155 Timer Command: Stop after TC\n");
 			break;
 
 		case COMMAND_TM_START:
-			if (LOG) logerror("8155 '%s' Timer Command: Start\n", tag());
+			if (LOG) logerror("8155 Timer Command: Start\n");
 
 			if (m_timer->enabled())
 			{
@@ -455,6 +459,9 @@ void i8155_device::register_w(int offset, UINT8 data)
 				// load mode and CNT length and start immediately after loading (if timer is not running)
 				m_counter = m_count_length & 0x3fff;
 				m_timer->adjust(attotime::zero, 0, attotime::from_hz(clock()));
+
+				// clear timer command so this won't execute twice
+				m_command &= ~COMMAND_TM_MASK;
 			}
 			break;
 		}
@@ -474,33 +481,33 @@ void i8155_device::register_w(int offset, UINT8 data)
 
 	case REGISTER_TIMER_LOW:
 		m_count_length = (m_count_length & 0xff00) | data;
-		if (LOG) logerror("8155 '%s' Count Length Low: %04x\n", tag(), m_count_length);
+		if (LOG) logerror("8155 Count Length Low: %04x\n", m_count_length);
 		break;
 
 	case REGISTER_TIMER_HIGH:
 		m_count_length = (data << 8) | (m_count_length & 0xff);
-		if (LOG) logerror("8155 '%s' Count Length High: %04x\n", tag(), m_count_length);
+		if (LOG) logerror("8155 Count Length High: %04x\n", m_count_length);
 
 		switch (data & TIMER_MODE_MASK)
 		{
 		case TIMER_MODE_LOW:
 			// puts out LOW during second half of count
-			if (LOG) logerror("8155 '%s' Timer Mode: LOW\n", tag());
+			if (LOG) logerror("8155 Timer Mode: LOW\n");
 			break;
 
 		case TIMER_MODE_SQUARE_WAVE:
 			// square wave, i.e. the period of the square wave equals the count length programmed with automatic reload at terminal count
-			if (LOG) logerror("8155 '%s' Timer Mode: Square wave\n", tag());
+			if (LOG) logerror("8155 Timer Mode: Square wave\n");
 			break;
 
 		case TIMER_MODE_SINGLE_PULSE:
 			// single pulse upon TC being reached
-			if (LOG) logerror("8155 '%s' Timer Mode: Single pulse\n", tag());
+			if (LOG) logerror("8155 Timer Mode: Single pulse\n");
 			break;
 
 		case TIMER_MODE_AUTOMATIC_RELOAD:
 			// automatic reload, i.e. single pulse every time TC is reached
-			if (LOG) logerror("8155 '%s' Timer Mode: Automatic reload\n", tag());
+			if (LOG) logerror("8155 Timer Mode: Automatic reload\n");
 			break;
 		}
 		break;
@@ -557,7 +564,7 @@ WRITE8_MEMBER( i8155_device::ale_w )
 
 READ8_MEMBER( i8155_device::read )
 {
-	UINT8 data = 0;
+	uint8_t data = 0;
 
 	switch (m_io_m)
 	{

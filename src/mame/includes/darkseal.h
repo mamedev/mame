@@ -1,5 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Bryan McPhail
+
+#include "machine/gen_latch.h"
 #include "video/deco16ic.h"
 #include "video/bufsprite.h"
 #include "video/decospr.h"
@@ -16,6 +18,7 @@ public:
 		m_deco_tilegen2(*this, "tilegen2"),
 		m_sprgen(*this, "spritegen"),
 		m_spriteram(*this, "spriteram"),
+		m_soundlatch(*this, "soundlatch"),
 		m_ram(*this, "ram"),
 		m_pf1_rowscroll(*this, "pf1_rowscroll"),
 		m_pf3_rowscroll(*this, "pf3_rowscroll"),
@@ -29,14 +32,15 @@ public:
 	required_device<deco16ic_device> m_deco_tilegen2;
 	required_device<decospr_device> m_sprgen;
 	required_device<buffered_spriteram16_device> m_spriteram;
+	required_device<generic_latch_8_device> m_soundlatch;
 
-	required_shared_ptr<UINT16> m_ram;
-	required_shared_ptr<UINT16> m_pf1_rowscroll;
-	//UINT16 *m_pf2_rowscroll;
-	required_shared_ptr<UINT16> m_pf3_rowscroll;
-	//UINT16 *m_pf4_rowscroll;
-	required_shared_ptr<UINT16> m_generic_paletteram_16;
-	required_shared_ptr<UINT16> m_generic_paletteram2_16;
+	required_shared_ptr<uint16_t> m_ram;
+	required_shared_ptr<uint16_t> m_pf1_rowscroll;
+	//uint16_t *m_pf2_rowscroll;
+	required_shared_ptr<uint16_t> m_pf3_rowscroll;
+	//uint16_t *m_pf4_rowscroll;
+	required_shared_ptr<uint16_t> m_generic_paletteram_16;
+	required_shared_ptr<uint16_t> m_generic_paletteram2_16;
 
 	DECLARE_WRITE16_MEMBER(control_w);
 	DECLARE_READ16_MEMBER(control_r);
@@ -46,6 +50,6 @@ public:
 	DECLARE_DRIVER_INIT(darkseal);
 	virtual void video_start() override;
 
-	UINT32 screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void update_24bitcol(int offset);
 };

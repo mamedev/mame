@@ -48,10 +48,10 @@ public:
 	device_vcs_control_port_interface(const machine_config &mconfig, device_t &device);
 	virtual ~device_vcs_control_port_interface() { }
 
-	virtual UINT8 vcs_joy_r() { return 0xff; };
-	virtual UINT8 vcs_pot_x_r() { return 0xff; };
-	virtual UINT8 vcs_pot_y_r() { return 0xff; };
-	virtual void vcs_joy_w(UINT8 data) { };
+	virtual uint8_t vcs_joy_r() { return 0xff; };
+	virtual uint8_t vcs_pot_x_r() { return 0xff; };
+	virtual uint8_t vcs_pot_y_r() { return 0xff; };
+	virtual void vcs_joy_w(uint8_t data) { };
 
 	virtual bool has_pot_x() { return false; }
 	virtual bool has_pot_y() { return false; }
@@ -68,7 +68,7 @@ class vcs_control_port_device : public device_t,
 {
 public:
 	// construction/destruction
-	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, UINT32 clock);
+	vcs_control_port_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	virtual ~vcs_control_port_device() { }
 
 	// static configuration helpers
@@ -87,14 +87,14 @@ public:
 	//         pin 8 - GND
 	// bit 6 - pin 9 -
 	//
-	UINT8 joy_r() { UINT8 data = 0xff; if (exists()) data = m_device->vcs_joy_r(); return data; }
+	uint8_t joy_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_joy_r(); return data; }
 	DECLARE_READ8_MEMBER( joy_r ) { return joy_r(); }
-	UINT8 pot_x_r() { UINT8 data = 0xff; if (exists()) data = m_device->vcs_pot_x_r(); return data; }
+	uint8_t pot_x_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_x_r(); return data; }
 	DECLARE_READ8_MEMBER( pot_x_r ) { return pot_x_r(); }
-	UINT8 pot_y_r() { UINT8 data = 0xff; if (exists()) data = m_device->vcs_pot_y_r(); return data; }
+	uint8_t pot_y_r() { uint8_t data = 0xff; if (exists()) data = m_device->vcs_pot_y_r(); return data; }
 	DECLARE_READ8_MEMBER( pot_y_r ) { return pot_y_r(); }
 
-	void joy_w( UINT8 data ) { if ( exists() ) m_device->vcs_joy_w( data ); }
+	void joy_w( uint8_t data ) { if ( exists() ) m_device->vcs_joy_w( data ); }
 
 	bool exists() { return m_device != nullptr; }
 	bool has_pot_x() { return exists() && m_device->has_pot_x(); }

@@ -2,32 +2,29 @@
 // copyright-holders:Wilbert Pol, Robbbert
 /***************************************************************************
 
-Driver file to handle emulation of the Tiger Game.com by
-  Wilbert Pol
+Driver file to handle emulation of the Tiger Game.com by Wilbert Pol.
+Various improvements by Robbbert.
 
 Todo:
-- Fix cpu and system problems that prevent the games from working.
+- Fix cpu and system problems that prevent the games from working fully.
+- RS232 port
+- Sound ports 1,2 do not sound anything like the real thing
+- Sound port 3 (noise channel)
+- Sound dac port (mostly works but is the wrong speed in some places)
 
 Game Status:
-- The DAC sound partially works, sound from ports 1,2,3 not done
 - Inbuilt ROM and PDA functions all work
-- On the screen where the cart goes into the slot there is video flicker
+- On the screen where the cart goes into the slot, there are vertical bands of randomness
 - Due to an irritating message, the NVRAM is commented out in the machine config
-- Most of the cart games have severe video issues such as flickering and nonsense gfx
-- Lights Out works
-- Centipede works
-- Wheel of Fortune 1 & 2 are working.
-- Frogger works, but it is difficult to capture the female frog or the insect.
-- Quiz Wiz works, but the end-of-round score doesn't show
-- Jeopardy, playable with bad gfx
-- Tiger Web Link & Internet, they look ok, obviously aren't going to connect to anything
-- Williams Arcade Classics, Robotron works, the rest are no use.
-- Monopoly is starting to show promise. It's playable but the video is terrible.
-- The remaining carts are not functional to any useful degree.
+- All carts appear to work except:
+- - Henry: crash just after "HENRY" button clicked
+- - Lost World: freeze just after entering Stage 2 (the nest)
+- Weblink and Internet are of no use as there is nothing to connect to.
 
 ***************************************************************************/
 
 #include "includes/gamecom.h"
+#include "sound/volt_reg.h"
 #include "softlist.h"
 #include "gamecom.lh"
 
@@ -233,7 +230,7 @@ PALETTE_INIT_MEMBER(gamecom_state, gamecom)
 	palette.set_pen_color(4, 0xDF, 0xFF, 0x8F ); // White
 }
 
-UINT32 gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+uint32_t gamecom_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	copybitmap(bitmap, m_bitmap, 0, 0, 0, 0, cliprect);
 	return 0;
@@ -261,8 +258,8 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_SCREEN_REFRESH_RATE( 59.732155 )
 	MCFG_SCREEN_VBLANK_TIME(500)
 	MCFG_SCREEN_UPDATE_DRIVER(gamecom_state, screen_update)
-	MCFG_SCREEN_SIZE( 208, 160 )
-	MCFG_SCREEN_VISIBLE_AREA( 0, 207, 0, 159 )
+	MCFG_SCREEN_SIZE( 200, 160 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 199, 0, 159 )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_DEFAULT_LAYOUT(layout_gamecom)
@@ -270,11 +267,15 @@ static MACHINE_CONFIG_START( gamecom, gamecom_state )
 	MCFG_PALETTE_INIT_OWNER(gamecom_state, gamecom)
 
 	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_STEREO( "lspeaker", "rspeaker" )
+	MCFG_SPEAKER_STANDARD_MONO( "speaker" )
 	/* TODO: much more complex than this */
-	MCFG_SOUND_ADD("dac", DAC, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
+	MCFG_SOUND_ADD("dac", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC (Digital audio)
+	MCFG_SOUND_ADD("dac0", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_SOUND_ADD("dac1", DAC_4BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.05) // unknown DAC (Frequency modulation)
+	MCFG_DEVICE_ADD("vref", VOLTAGE_REGULATOR, 0) MCFG_VOLTAGE_REGULATOR_OUTPUT(5.0)
+	MCFG_SOUND_ROUTE_EX(0, "dac", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac0", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac0", -1.0, DAC_VREF_NEG_INPUT)
+	MCFG_SOUND_ROUTE_EX(0, "dac1", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac1", -1.0, DAC_VREF_NEG_INPUT)
 
 	/* cartridge */
 	MCFG_GENERIC_CARTSLOT_ADD("cartslot1", generic_linear_slot, "gamecom_cart")
