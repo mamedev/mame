@@ -49,6 +49,18 @@ namespace netlist
 		, m_SELECT(*this, "SELECT")
 		, m_STROBE(*this, "STROBE")
 		{
+			register_subalias("A1", m_1.m_A);
+			register_subalias("B1", m_1.m_B);
+			register_subalias("Y1", m_1.m_Y);
+			register_subalias("A2", m_2.m_A);
+			register_subalias("B2", m_2.m_B);
+			register_subalias("Y2", m_2.m_Y);
+			register_subalias("A3", m_3.m_A);
+			register_subalias("B3", m_3.m_B);
+			register_subalias("Y3", m_3.m_Y);
+			register_subalias("A4", m_4.m_A);
+			register_subalias("B4", m_4.m_B);
+			register_subalias("Y4", m_4.m_Y);
 		}
 
 		NETLIB_UPDATEI();
