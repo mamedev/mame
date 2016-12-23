@@ -192,7 +192,7 @@ MC68705P5 - Motorola MC68705P5 Microcontroller with 2K Internal EPROM,
 
             A71_01.IC1     Sub CPU Program
 
-            A71_24.IC57    68705 Microcontroller Program (Protected, Not Dumped)
+            A71_24.IC57    68705 Microcontroller Program
 
 
 
@@ -1000,7 +1000,7 @@ ROM_START( tokio ) // newer japan set, has -1 revision of roms 02, 03 and 06
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
-	ROM_LOAD( "a71_24.bin",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
+	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
 	ROM_LOAD( "a71-08.ic12",  0x00000, 0x8000, CRC(0439ab13) SHA1(84142220a6a29f0e34f7c7c751b583bf394df8ce) )    /* 1st plane */
@@ -1043,7 +1043,7 @@ ROM_START( tokioo ) // older japan set, has older roms 02, 03, 06
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
-	ROM_LOAD( "a71_24.bin",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
+	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
 	ROM_LOAD( "a71-08.ic12",  0x00000, 0x8000, CRC(0439ab13) SHA1(84142220a6a29f0e34f7c7c751b583bf394df8ce) )    /* 1st plane */
@@ -1086,7 +1086,7 @@ ROM_START( tokiou )
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
 	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
-	ROM_LOAD( "a71_24.bin",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
+	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
 	ROM_LOAD( "a71-08.ic12",  0x00000, 0x8000, CRC(0439ab13) SHA1(84142220a6a29f0e34f7c7c751b583bf394df8ce) )    /* 1st plane */
