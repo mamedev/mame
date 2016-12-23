@@ -368,6 +368,13 @@ void i960_cpu_device::bxx(uint32_t opcode, int mask)
 	}
 }
 
+void i960_cpu_device::fxx(uint32_t opcode, int mask)
+{
+	if(m_AC & mask) {
+		fatalerror("Taking the fault on a FAULT insn not yet supported\n");
+	}
+}
+
 void i960_cpu_device::bxx_s(uint32_t opcode, int mask)
 {
 	if(m_AC & mask) {
@@ -649,6 +656,48 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 		case 0x17: // bo
 			m_icount--;
 			bxx(opcode, 7);
+			break;
+			
+		case 0x18: // faultno
+			m_icount--;
+			if(!(m_AC & 7)) {
+				m_IP += get_disp(opcode);
+			}
+			break;
+
+		case 0x19: // faultg
+			m_icount--;
+			fxx(opcode, 1);
+			break;
+
+		case 0x1a: // faulte
+			m_icount--;
+			fxx(opcode, 2);
+			break;
+
+		case 0x1b: // faultge
+			m_icount--;
+			fxx(opcode, 3);
+			break;
+
+		case 0x1c: // faultl
+			m_icount--;
+			fxx(opcode, 4);
+			break;
+
+		case 0x1d: // faultne
+			m_icount--;
+			fxx(opcode, 5);
+			break;
+
+		case 0x1e: // faultle
+			m_icount--;
+			fxx(opcode, 6);
+			break;
+
+		case 0x1f: // faulto
+			m_icount--;
+			fxx(opcode, 7);
 			break;
 
 		case 0x20: // testno
@@ -1328,6 +1377,17 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 
 		case 0x66:
 			switch((opcode >> 7) & 0xf) {
+			case 0x0: // calls
+				t1 = get_1_ri(opcode);
+				t2 = m_program->read_dword(m_SAT + 152);	// get pointer to system procedure table
+				t2 = m_program->read_dword(t2 + 48 + (t1 * 4));
+				if ((t2 & 3) != 0)
+				{
+					fatalerror("I960: system calls that jump into supervisor mode aren't yet supported\n");
+				}
+				do_call(t2, 0, m_r[I960_SP]); 
+				break;
+				
 			case 0xd: // flushreg
 				if (m_rcache_pos > 4)
 				{
