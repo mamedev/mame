@@ -2581,7 +2581,7 @@ ROM_START( turbofrc ) // New revision: most notable thing in there is the points
 	ROM_RELOAD(         0x10000, 0x20000 )
 
 	ROM_REGION( 0x0a0000, "gfx1", 0 )
-	ROM_LOAD( "lh535ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
+	ROM_LOAD( "lh534ggs.u94", 0x000000, 0x80000, CRC(baa53978) SHA1(7f103122dd0bf675226ccf309fba73f645e0c79b) ) // mask rom
 	ROM_LOAD( "7.u95",        0x080000, 0x20000, CRC(71a6c573) SHA1(f14ebca676d85fabcde27631145933abc376dd12) ) // 27c1001a
 
 	ROM_REGION( 0x0a0000, "gfx2", 0 )
