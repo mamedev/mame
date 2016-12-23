@@ -95,6 +95,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_74365.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
+	$(NLOBJ)/devices/nld_82S115.o \
 	$(NLOBJ)/devices/nld_82S126.o \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9312.o \

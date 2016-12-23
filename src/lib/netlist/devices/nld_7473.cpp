@@ -20,6 +20,7 @@ namespace netlist
 		, m_CLRQ(*this, "CLRQ")
         , m_last_CLK(*this, "m_last_CLK", 0)
         , m_q(*this, "m_q", 0)
+        , m_latched_JK(*this, "m_latched_JK", 0)
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		{
@@ -36,6 +37,7 @@ namespace netlist
 
         state_var<unsigned> m_last_CLK;
         state_var<unsigned> m_q;
+        state_var<unsigned> m_latched_JK;
 
         logic_output_t m_Q;
 		logic_output_t m_QQ;
@@ -107,17 +109,20 @@ namespace netlist
     NETLIB_RESET(7473)
     {
         m_last_CLK = 0;
+        m_latched_JK = 0;
     }
 
     NETLIB_UPDATE(7473)
 	{
-		const auto JK = (m_J() << 1) | m_K();
-
 		if (m_CLRQ())
 		{
-            if (!m_CLK() && m_last_CLK)
+			if (m_CLK() && !m_last_CLK)
+			{
+				m_latched_JK = (m_J() << 1) | m_K();
+			}
+            else if (!m_CLK() && m_last_CLK)
             {
-			    switch (JK)
+			    switch (m_latched_JK)
 			    {
 				    case 1:             // (!m_J) & m_K))
                         m_q = 0;

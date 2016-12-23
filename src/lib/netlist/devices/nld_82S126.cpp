@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 /*
- * nld_82s126.cpp
+ * nld_82S126.cpp
  *
  */
 
@@ -62,7 +62,7 @@ namespace netlist
 		unsigned o = 0xf;
 
 		netlist_time delay = NLTIME_FROM_NS(25);
-		if (m_CE1Q() && m_CE1Q())
+		if (!m_CE1Q() && !m_CE2Q())
 		{
 			unsigned a = 0;
 			for (std::size_t i=0; i<8; i++)
@@ -73,20 +73,7 @@ namespace netlist
 
 			delay = NLTIME_FROM_NS(50);
 		}
-#if 0
-        printf("CE1Q%d CE2Q%d %d%d%d%d%d%d%d%d %x\n",
-            m_CE1Q() ? 1 : 0,
-            m_CE2Q() ? 1 : 0,
-            m_A[0]() ? 1 : 0,
-            m_A[1]() ? 1 : 0,
-            m_A[2]() ? 1 : 0,
-            m_A[3]() ? 1 : 0,
-            m_A[4]() ? 1 : 0,
-            m_A[5]() ? 1 : 0,
-            m_A[6]() ? 1 : 0,
-            m_A[7]() ? 1 : 0,
-            o);
-#endif
+
         // FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<4; i++)
 			m_O[i].push((o >> i) & 1, delay);

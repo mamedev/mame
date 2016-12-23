@@ -48,7 +48,7 @@ NETLIST_START(hazelvid)
 	/* Horizontal/Vertical timing signals */
 
 	/* signal lookup PROM */
-	TTL_82S126(u71, high, high, u70.QA, u70.QB, u70.QC, u70.QD, u69.QA, u69.QB, u69.QC, low)
+	PROM_82S126(u71, low, low, u70.QA, u70.QB, u70.QC, u70.QD, u69.QA, u69.QB, u69.QC, low)
 
 	/* signal decoding */
 	TTL_DM9334(u72, high, u81.Q1Q, u71.O4, u71.O1, u71.O2, u71.O3)
