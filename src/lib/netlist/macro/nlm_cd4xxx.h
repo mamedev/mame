@@ -41,6 +41,9 @@
 #define CD4016_DIP(name)                                                      \
 		NET_REGISTER_DEV(CD4016_DIP, name)
 
+#define CD4316_DIP(name)                                                      \
+		NET_REGISTER_DEV(CD4016_DIP, name)
+
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/
