@@ -20642,7 +20642,8 @@ mole                            // (c) 1982 Yachiyo Electronics, Ltd.
 molecula                        //
 
 @source:momoko.cpp
-momoko                          // (c) 1986 Jaleco
+momoko                          // (c) 1986 Jaleco (Japanese text)
+momokoe                         // (c) 1986 Jaleco (English text)
 
 @source:monacogp.cpp
 monacogp                        // (c) 1980 Sega
