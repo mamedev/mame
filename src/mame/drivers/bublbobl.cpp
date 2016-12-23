@@ -777,7 +777,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_4MHz) // ? Mhz
+	MCFG_CPU_ADD("mcu", M68705_NEW, MAIN_XTAL/8) // 3 Mhz
 	MCFG_M68705_PORTA_R_CB(READ8(bublbobl_state, tokio_mcu_porta_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(bublbobl_state, tokio_mcu_porta_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(bublbobl_state, tokio_mcu_portb_w))
