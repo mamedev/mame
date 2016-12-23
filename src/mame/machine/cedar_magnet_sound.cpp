@@ -79,9 +79,9 @@ WRITE8_MEMBER(cedar_magnet_sound_device::adpcm_fifo_w)
 	// Z80 code first unpacks 8 bytes of ADPCM sample data into nibbles
 	// and, upon receiving interrupt vector E6, fills FIFO at once using OTIR
 	// 4-bit data is shifted out of the FIFO to the MSM5205 by another timer
-	m_fifo->si_w(0);
 	m_fifo->write(data & 0x0f); // only low nibble is used here
 	m_fifo->si_w(1);
+	m_fifo->si_w(0);
 }
 
 WRITE8_MEMBER(cedar_magnet_sound_device::ay0_porta_w)
@@ -194,7 +194,7 @@ static MACHINE_CONFIG_FRAGMENT( cedar_magnet_sound )
 	MCFG_AY8910_PORT_A_WRITE_CB(WRITE8(cedar_magnet_sound_device, ay1_porta_w))
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_DEVICE_ADD("fifo", CD40105, 0) // HCF40105BE at IC13
+	MCFG_DEVICE_ADD("fifo", HC40105, 0) // HCF40105BE at IC13
 	MCFG_40105_DATA_OUT_READY_CB(WRITELINE(cedar_magnet_sound_device, fifo_dor_w))
 	MCFG_40105_DATA_OUT_CB(DEVWRITELINE("adpcm", msm5205_device, data_w))
 

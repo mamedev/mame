@@ -60,6 +60,7 @@ public:
 
 	u8 read();
 	void write(u8 data);
+	DECLARE_WRITE8_MEMBER(write);
 
 	DECLARE_WRITE_LINE_MEMBER( si_w );
 	DECLARE_WRITE_LINE_MEMBER( so_w );
@@ -73,6 +74,11 @@ protected:
 	virtual void device_reset() override;
 
 private:
+	// private helpers
+	void load_input();
+	void output_ready();
+
+	// callbacks
 	devcb_write_line m_write_dir;
 	devcb_write_line m_write_dor;
 	devcb_write8 m_write_q;
@@ -91,7 +97,7 @@ private:
 
 // device type definition
 extern const device_type CD40105;
-
+extern const device_type HC40105;
 
 
 #endif
