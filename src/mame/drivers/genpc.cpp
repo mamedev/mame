@@ -60,7 +60,7 @@ static MACHINE_CONFIG_START( pcmda, genpc_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
 
 	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
 
 	/* internal ram */
 	MCFG_RAM_ADD(RAM_TAG)
@@ -96,69 +96,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pcvga, pcega )
 	MCFG_DEVICE_MODIFY("isa1")
-	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "svga_et4k", false)
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( laser_turbo_xt, genpc_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 4772720)
-	MCFG_CPU_PROGRAM_MAP(pc8_map)
-	MCFG_CPU_IO_MAP(pc8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(cga)
-
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, nullptr, false)
-
-	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,768K,896K,1024K,1408K,1536K,1664K")
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_START( laser_xt3, genpc_state )
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", I8088, 4772720)
-	MCFG_CPU_PROGRAM_MAP(pc8_map)
-	MCFG_CPU_IO_MAP(pc8_io)
-	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("mb:pic8259", pic8259_device, inta_cb)
-
-	MCFG_IBM5160_MOTHERBOARD_ADD("mb","maincpu")
-	MCFG_DEVICE_INPUT_DEFAULTS(cga)
-
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "com", false) // Multi I/O card (includes FDC)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "fdc_xt", false) // floppy drive A is 5.25" 360K and B is 3.5" 720K
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
-	MCFG_ISA8_SLOT_ADD("mb:isa", "isa8", pc_isa8_cards, nullptr, false)
-
-	/* keyboard */
-	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
-
-	/* internal ram */
-	MCFG_RAM_ADD(RAM_TAG)
-	MCFG_RAM_DEFAULT_SIZE("640K")
-	MCFG_RAM_EXTRA_OPTIONS("512K,1024K,1536K,1664K")
-
-	/* software lists */
-	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+	MCFG_DEVICE_SLOT_INTERFACE(pc_isa8_cards, "vga", false)
 MACHINE_CONFIG_END
 
 ROM_START(pc)
@@ -207,18 +145,6 @@ ROM_END
 
 #define rom_pcvga    rom_pc
 
-ROM_START(laser_turbo_xt)
-	ROM_REGION(0x02000, "bios", 0)
-	ROM_LOAD("laser_turbo_xt.bin", 0x00000, 0x02000, CRC(0a6121d3) SHA1(59b1f8dd6fe981ef9a7700adebf6e1adda7cee90)) // version 1.11 - 27c64d
-ROM_END
-
-ROM_START(laser_xt3)
-	ROM_REGION(0x02000, "bios", 0)
-	ROM_LOAD("laser_xt3.bin", 0x00000, 0x02000, CRC(b45a7dd3) SHA1(62f17c408be0036d00a182e94c5c88b83d46b625)) // version 1.26 - 27c64
-ROM_END
-
-
-
 /***************************************************************************
 
   Game driver(s)
@@ -231,6 +157,3 @@ COMP(  1987,    pcega,      ibm5150,    0,      pcega,      0,     driver_device
 COMP ( 1987,    pcmda,      ibm5150,    0,      pcmda,      0,     driver_device,       0,          "<generic>",  "PC (MDA)" , 0)
 COMP ( 1987,    pcherc,     ibm5150,    0,      pcherc,     0,     driver_device,       0,          "<generic>",  "PC (Hercules)" , 0)
 COMP ( 1987,    pcvga,      ibm5150,    0,      pcvga,      0,     driver_device,       0,          "<generic>",  "PC (VGA)" , 0)
-
-COMP ( 1988,    laser_turbo_xt,      ibm5150,    0,      laser_turbo_xt,      0,     driver_device,       0,          "VTech",  "Laser Turbo XT" , 0)
-COMP ( 1989,    laser_xt3,           ibm5150,    0,      laser_xt3,           0,     driver_device,       0,          "VTech",  "Laser XT/3" , 0)
