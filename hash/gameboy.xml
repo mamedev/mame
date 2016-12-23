@@ -24918,7 +24918,7 @@
 		<part name="cart" interface="gameboy_cart">
 			<feature name="slot" value="rom_mbc1" />
 			<dataarea name="rom" size="65536">
-				<rom name="zoop (usa, europe).bin" size="65536" crc="14f8b6bb" sha1="1e0390d456066b9fbe1faff5f7404d4593a2b839" offset="0" />
+				<rom name="zoop (usa, europe).bin" size="65536" crc="14f8b6bb" sha1="1e0390d456066b9fbe1faff5f7404d4593a2b839" offset="000000" />
 			</dataarea>
 		</part>
 	</software>
