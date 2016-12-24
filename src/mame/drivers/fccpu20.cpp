@@ -120,10 +120,14 @@
  *
  *---------------------------------------------------------------------------
  *  TODO:
- *  - Add VxWorks proms
- *  - Add more devices
- *  - Write VME device
- *  - Add variants of boards
+ *  - Find accurate documentation and adjust memory map
+ *  - Add layouts and system description(s)
+ *  - Write & add 68561 UART
+ *  - Write & add VME device
+ *  - Write & add 68153 BIM
+ *  - Add 68230 PIT
+ *  - Add variants of boards in the CPU-20 and CPU-21 family
+ *  - Add FGA, DUSCC devices and CPU-22 variants
  *
  ****************************************************************************/
 
@@ -131,7 +135,6 @@
 #include "cpu/m68000/m68000.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
-//#include "machine/timekpr.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -182,10 +185,6 @@ static ADDRESS_MAP_START (cpu20_mem, AS_PROGRAM, 32, cpu20_state)
 	AM_RANGE (0x00000008, 0x003fffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff040000, 0xff04ffff) AM_RAM /* RAM  installed in machine start */
 	AM_RANGE (0xff000000, 0xff00ffff) AM_ROM AM_REGION("roms", 0x0000)
-//	AM_RANGE (0xffff0000, 0xffffffff) AM_ROM AM_REGION("roms", 0x0000)
-
-//AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
-//AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 
 /* Input ports */
@@ -264,7 +263,7 @@ void cpu20_state::update_irq_to_maincpu()
  */
 static MACHINE_CONFIG_START (cpu20, cpu20_state)
 	/* basic machine hardware */
-	MCFG_CPU_ADD ("maincpu", M68020, XTAL_20MHz)
+	MCFG_CPU_ADD ("maincpu", M68020, XTAL_16MHz) /* Crytstal not verified */
 	MCFG_CPU_PROGRAM_MAP (cpu20_mem)
 MACHINE_CONFIG_END
 
