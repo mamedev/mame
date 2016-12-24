@@ -16,8 +16,6 @@
 #define MCFG_VOTRAX_SC01_REQUEST_CB(_devcb) \
 	devcb = &downcast<votrax_sc01_device *>(device)->set_ar_callback(DEVCB_##_devcb);
 
-#include <assert.h>
-
 class votrax_sc01_device :  public device_t,
 							public device_sound_interface
 {
@@ -141,8 +139,6 @@ private:
 
 	// Apply a filter and compute the result. 'a' is applied to x (inputs) and 'b' to y (outputs)
 	template<u32 Nx, u32 Ny, u32 Na, u32 Nb> static double apply_filter(const double (&x)[Nx], const double (&y)[Ny], const double (&a)[Na], const double (&b)[Nb]) {
-		static_assert(Nx >= Na);
-		static_assert(Ny >= Nb);
 		double total = 0;
 		for(u32 i=0; i<Na; i++)
 			total += x[i] * a[i];
