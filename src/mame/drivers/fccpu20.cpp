@@ -277,11 +277,6 @@ ROM_START (fccpu20) /* This is an original rom dump */
 	ROM_LOAD32_BYTE("UU.BIN", 0x000000, 0x4000, CRC (b54d623b) SHA1 (49b272184a04570b09004de71fae0ed0d1bf5929))
 ROM_END
 
-ROM_START (nodump)
-	ROM_REGION32_BE(0x900000, "roms", 0)
-	ROM_LOAD("rom.bin",  0x800000, 0x10000, NO_DUMP)
-ROM_END
-
 /*
  * System ROM information
  *
