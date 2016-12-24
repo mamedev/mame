@@ -926,9 +926,8 @@ void archimedes_state::vidc_dynamic_res_change()
 			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1,
 			//  m_vidc_vblank_time);
 
-			/* FIXME: pixel clock */
-			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
-
+			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
+			
 			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
 		}
 	}
@@ -1016,7 +1015,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 			case VIDC_HCSR: m_vidc_regs[VIDC_HCSR] = ((val >> 13) & 0x7ff) + 6; break;
 //          #define VIDC_HIR        0x9c
 
-			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1; break;
+			case VIDC_VCR:  m_vidc_regs[VIDC_VCR] = ((val >> 14))+1; break;
 //          #define VIDC_VSWR       0xa4
 			case VIDC_VBSR: m_vidc_regs[VIDC_VBSR] = (val >> 14)+1; break;
 			case VIDC_VDSR: m_vidc_regs[VIDC_VDSR] = (val >> 14)+1; break;
