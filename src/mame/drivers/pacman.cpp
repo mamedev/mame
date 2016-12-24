@@ -6080,22 +6080,21 @@ ROM_START( beastfp )
 ROM_END
 
 
-
-ROM_START( eeekk )
+ROM_START( eeekk ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
 	ROM_REGION( 0x20000, "maincpu", 0 )
-	ROM_LOAD( "pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) 
-	ROM_LOAD( "pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) )
+	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted
+	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted
 
 	ROM_REGION( 0x2000, "gfx1", 0 )
-	ROM_LOAD( "pg03094.5e",   0x0000, 0x1000, CRC(780183a8) SHA1(8466d75d79b3c87db143f5c2e8b58dad1d2e501c) )
-	ROM_LOAD( "pg03094.5f",   0x1000, 0x1000, CRC(418526e4) SHA1(a95764e216ccdaca0631604e1101ba91884effde) )
+	ROM_LOAD( "5_e_eeekk_pg03094.5e",   0x0000, 0x1000, CRC(780183a8) SHA1(8466d75d79b3c87db143f5c2e8b58dad1d2e501c) )
+	ROM_LOAD( "5_f_eeekk_pg03094.5f",   0x1000, 0x1000, CRC(418526e4) SHA1(a95764e216ccdaca0631604e1101ba91884effde) )
 
 	ROM_REGION( 0x002c, "epos_pal10h8", 0)
 	ROM_LOAD( "eeekk.ic4",    0x0000, 0x002c, CRC(f588ba4e) SHA1(07d74da02172789ccd1fead2b5afe8ce72c5149d) ) // pal10h8
 
 	ROM_REGION( 0x0120, "proms", 0 )
-	ROM_LOAD( "eeekk.7f",     0x0000, 0x0020, CRC(c64c8a53) SHA1(55e7b88cb1ce129e8154722a489d76c38924d3f1) ) // 82s123
-	ROM_LOAD( "eeekk.4a",     0x0020, 0x0100, CRC(a5044ded) SHA1(566bd06674bf8069dc633102493c9991b64e4379) ) // 82s126
+	ROM_LOAD( "7_f_eeekk.7f",     0x0000, 0x0020, CRC(c64c8a53) SHA1(55e7b88cb1ce129e8154722a489d76c38924d3f1) ) // 82s123
+	ROM_LOAD( "4_a_eeekk.4a",     0x0020, 0x0100, CRC(a5044ded) SHA1(566bd06674bf8069dc633102493c9991b64e4379) ) // 82s126
 
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
