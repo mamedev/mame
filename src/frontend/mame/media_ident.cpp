@@ -235,7 +235,9 @@ int media_identifier::find_by_hash(const util::hash_collection &hashes, int leng
 							// output information about the match
 							if (found)
 								osd_printf_info("                    ");
-							osd_printf_info("= %s%-20s  %-10s %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), m_drivlist.driver().name, m_drivlist.driver().description);
+							osd_printf_info("= %s%-20s  %-10s %s%s\n", baddump ? "(BAD) " : "",
+								ROM_GETNAME(rom), device.shortname(), device.name(),
+								device.owner() != nullptr ? " (device)" : "");
 							found++;
 						}
 					}
