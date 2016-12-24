@@ -6,9 +6,6 @@
   mostly LED electronic games/toys.
 
   TODO:
-  - non-working games are due to MCU emulation bugs?
-  - better not start on visually dumped games before other games are working
-    (due to possible dump errors, hard to distinguish between that or MCU bug)
   - why does h2hbaskb need a workaround on writing L pins?
 
 ***************************************************************************/
