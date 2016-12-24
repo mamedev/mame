@@ -148,19 +148,23 @@ int vertex_program_disassembler::disassemble_mask(int mask, char *s)
 		return 0;
 	s[0] = '.';
 	l = 1;
-	if ((mask & 8) != 0) {
+	if ((mask & 8) != 0)
+	{
 		s[l] = 'x';
 		l++;
 	}
-	if ((mask & 4) != 0){
+	if ((mask & 4) != 0)
+	{
 		s[l] = 'y';
 		l++;
 	}
-	if ((mask & 2) != 0){
+	if ((mask & 2) != 0)
+	{
 		s[l] = 'z';
 		l++;
 	}
-	if ((mask & 1) != 0){
+	if ((mask & 1) != 0)
+	{
 		s[l] = 'w';
 		l++;
 	}
@@ -911,8 +915,8 @@ void nv2a_renderer::computedilated(void)
 
 	for (b = 0; b < 16; b++)
 		for (a = 0; a < 2048; a++) {
-		dilated0[b][a] = dilate0(a, b);
-		dilated1[b][a] = dilate1(a, b);
+			dilated0[b][a] = dilate0(a, b);
+			dilated1[b][a] = dilate1(a, b);
 		}
 	for (b = 0; b < 16; b++)
 		for (a = 0; a < 16; a++)
@@ -921,6 +925,10 @@ void nv2a_renderer::computedilated(void)
 
 inline uint8_t *nv2a_renderer::direct_access_ptr(offs_t address)
 {
+#ifdef DEBUG_CHECKS
+	if (address >= 512*1024*1024)
+		machine().logerror("Bad address in direct_access_ptr !\n");
+#endif
 	return basemempointer + address;
 }
 
@@ -1326,7 +1334,7 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 	bool stencil_passed;
 	bool depth_passed;
 
-	if ((depth > 0xffffff) || (depth < 0))
+	if ((depth > 0xffffff) || (depth < 0) || (x < 0))
 		return;
 	fb[3] = fb[2] = fb[1] = fb[0] = 0;
 	addr = nullptr;
@@ -1930,23 +1938,29 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 
 void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x;
+	int x, lx;
 
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
-	x = extent.stopx - extent.startx - 1; // number of pixels to draw
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	while (x >= 0) {
 		uint32_t a8r8g8b8;
 		int z;
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		a8r8g8b8 = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1954,30 +1968,36 @@ void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const
 
 void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x;
+	int x, lx;
 	uint32_t a8r8g8b8;
-	int z;
 
 	if (!objectdata.data->texture[0].enabled) {
 		return;
 	}
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
-	x = extent.stopx - extent.startx - 1;
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	while (x >= 0) {
 		int up, vp;
+		int z;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
 		if (objectdata.data->texture[0].rectangle == false) {
-			up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
-			vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx)*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
+			up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx)*(double)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
+			vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx)*(double)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
 		} else
 		{
-			up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx; // x coordinate of texel in texture
-			vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx; // y coordinate of texel in texture
+			up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx; // x coordinate of texel in texture
+			vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx; // y coordinate of texel in texture
 		}
 		a8r8g8b8 = texture_get_texel(0, up, vp);
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1985,7 +2005,7 @@ void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &exte
 
 void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x, xp;
+	int x, lx, xp;
 	int up, vp;
 	int ca, cr, cg, cb;
 	uint32_t color[6];
@@ -1995,30 +2015,36 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &
 
 	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
 
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	std::lock_guard<std::mutex> lock(combiner.lock); // needed since multithreading is not supported yet
-	x = extent.stopx - extent.startx - 1; // number of pixels to draw
 	while (x >= 0) {
 		xp = extent.startx + x;
 		// 1: fetch data
 		// 1.1: interpolated color from vertices
-		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		color[0] = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		color[1] = 0; // lighting not yet
 		// 1.2: color for each of the 4 possible textures
 		for (n = 0; n < 4; n++) {
 			if (texture[n].enabled) {
 				if (texture[n].rectangle == false) {
-					up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
-					vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizev - 1);
+					up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx)*(double)(objectdata.data->texture[n].sizeu - 1);
+					vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx)*(double)(objectdata.data->texture[n].sizev - 1);
 				} else
 				{
-					up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx;
-					vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx;
+					up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx;
+					vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx;
 				}
 				color[n + 2] = texture_get_texel(n, up, vp);
 			}
@@ -2044,7 +2070,7 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &
 		combiner_final_output();
 		a8r8g8b8 = combiner_float_argb8(combiner.output);
 		// 3: write pixel
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -2198,7 +2224,6 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 	l = vertexbuffer_size[attrib];
 	switch (vertexbuffer_kind[attrib]) {
 	case NV2A_VTXBUF_TYPE::FLOAT:
-	default:
 		vertex.attribute[attrib].fv[0] = 0;
 		vertex.attribute[attrib].fv[1] = 0;
 		vertex.attribute[attrib].fv[2] = 0;
@@ -2229,6 +2254,12 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 		vertex.attribute[attrib].fv[2] = ((u & 0xff0000) >> 16) / 255.0;  // r
 		vertex.attribute[attrib].fv[3] = ((u & 0xff000000) >> 24) / 255.0;  // a
 		break;
+	default:
+		vertex.attribute[attrib].fv[0] = 0;
+		vertex.attribute[attrib].fv[1] = 0;
+		vertex.attribute[attrib].fv[2] = 0;
+		vertex.attribute[attrib].fv[3] = 1.0;
+		machine().logerror("Unsupported vertex type in read_vertex !\n");
 	}
 }
 
