@@ -91,6 +91,7 @@ public:
 	uint8_t m_ioc_regs[0x80/4];
 	uint8_t m_vidc_bpp_mode;
 	uint8_t m_vidc_interlace;
+	uint16_t m_vidc_vblank_time;
 
 	uint32_t screen_update(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

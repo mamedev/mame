@@ -116,7 +116,7 @@ void archimedes_state::vidc_vblank()
 	archimedes_request_irq_a(ARCHIMEDES_IRQA_VBL);
 
 	// set up for next vbl
-	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+	m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 }
 
 /* video DMA */
@@ -155,7 +155,7 @@ void archimedes_state::vidc_video_tick()
 
 	if(m_video_dma_on)
 	{
-		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+		m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 	}
 	else
 		m_vid_timer->adjust(attotime::never);
@@ -293,6 +293,9 @@ void archimedes_state::archimedes_reset()
 	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
+	
+	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
+	m_vbl_timer->adjust(attotime::never);
 }
 
 void archimedes_state::archimedes_init()
@@ -621,7 +624,7 @@ WRITE32_MEMBER( archimedes_state::ioc_ctrl_w )
 			archimedes_request_irq_a((data & 0x80) ? ARCHIMEDES_IRQA_FORCE : 0);
 
 			if(data & 0x08) //set up the VBLANK timer
-				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+				m_vbl_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time));
 
 			break;
 
@@ -915,11 +918,13 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.min_y = 0;
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
-
-			//logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+			
+			m_vidc_vblank_time = m_vidc_regs[VIDC_VBER] * (m_vidc_interlace+1);
+			//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
 			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
 			//  visarea.max_x, visarea.max_y,
-			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1);
+			//  m_vidc_regs[VIDC_HDER]-m_vidc_regs[VIDC_HDSR],m_vidc_regs[VIDC_VDER]-m_vidc_regs[VIDC_VDSR]+1,
+			//  m_vidc_vblank_time);
 
 			/* FIXME: pixel clock */
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]*2) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
@@ -987,7 +992,9 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 				m_palette->set_pen_color((reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
 			}
 		}
-
+	
+		// update partials
+		machine().first_screen()->update_partial(machine().first_screen()->vpos());
 	}
 	else if (reg >= 0x60 && reg <= 0x7c)
 	{
@@ -1103,7 +1110,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				if ((data>>10)&1)
 				{
 					m_vidc_vidcur = 0;
-					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_regs[0xb4]));
+					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 				}
 
 				if ((data>>11)&1)
