@@ -29,7 +29,7 @@
         * MTV Rock-N-Roll Trivia (Part 2)
         * Woodpecker
         * Pacman Club / Club Lambada
-
+        * Eeekk!
 
     Known issues:
         * Mystery items in Ali Baba don't work correctly because of protection.
@@ -37,7 +37,6 @@
           Also need 4-players extra inputs.
 
     Known to exist but dumps needed
-        * Eeeek!
         * Ms Pac Plus
         * Ms Pac Man Twin
         * MTV Rock-N-Roll Trivia (Part 2), 1 bad rom. It's not a bad dump, the rom is bad.
