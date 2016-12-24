@@ -35815,6 +35815,7 @@ tnzsj                           // B53 (c) 1988 Taito Corporation (Japan) (new p
 tnzsjo                          // B53 (c) 1988 Taito Corporation (Japan) (old pcb)
 tnzsuo                          // B53 (c) 1988 Taito America Corporation (US) (old pcb)
 tnzso                           // B53 (c) 1988 Taito Corporation Japan (World) (old pcb)
+tnzsoa                          // B53?(c) 1988 Taito Corporation Japan (World?) (unknown revision, prototype?)
 tnzsop                          // B53?(c) 1988 Taito Corporation Japan (World?) (old pcb, prototype)
 
 @source:toaplan1.cpp

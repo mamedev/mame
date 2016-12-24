@@ -2523,12 +2523,40 @@ Seta ID: P0-041A
    There is an M-chip i8x42 (with Taito silkscreen) and no 3rd z80.
    There is no daughter-pcb like the later TNZS pcb has.
    GFX Roms on the pcb are 28 pin 23C1000/TC531000 128K mask roms */
+
+ROM_START( tnzso )
+	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
+	ROM_LOAD( "b53-10.27c1001d.u32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
+	ROM_LOAD( "b53-14.u38", 0x00000, 0x10000, CRC(f269c5f1) SHA1(15e00e5bc6394f55fc6c591754e24842708f49f4) ) // World version old style PCB
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
+	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "b53-08.u8",   0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )
+	ROM_LOAD( "b53-07.u7",   0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )
+	ROM_LOAD( "b53-06.u6",   0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )
+	ROM_LOAD( "b53-05.u5",   0x60000, 0x20000, CRC(edbb9581) SHA1(539396a01ca0b69455f000d446759b232530b542) )
+	ROM_LOAD( "b53-04.u4",   0x80000, 0x20000, CRC(59d2aef6) SHA1(b657b7603c3eb5f169000d38497ebb93f26f7832) )
+	ROM_LOAD( "b53-03.u3",   0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
+	ROM_LOAD( "b53-02.u2",   0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
+	ROM_LOAD( "b53-01.u1",   0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+
+	ROM_REGION( 0x10000, "pal", 0 ) /* these are probably shared with extermination except for u35 */
+	ROM_LOAD( "b06-12.pal16l8a.u26.jed", 0x00000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-13.pal16l8a.u25.jed", 0x01000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b53-12.pal16l8a.u35.jed", 0x02000, 0x01000, NO_DUMP)
+	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
+ROM_END
+
 ROM_START( tnzsjo )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-10.27c1001d.u32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b53-11.27c512.u38", 0x00000, 0x10000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) )
+	ROM_LOAD( "b53-11.27c512.u38", 0x00000, 0x10000, CRC(9784d443) SHA1(bc3647aac9974031dbe4898417fbaa99841f9548) ) // Japan version old style PCB
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
@@ -2556,7 +2584,7 @@ ROM_START( tnzsuo )
 	ROM_LOAD( "b53-10.27c1001d.u32", 0x00000, 0x20000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
 
 	ROM_REGION( 0x10000, "sub", 0 ) /* 64k for the second CPU */
-	ROM_LOAD( "b53-13.27c512.u38", 0x00000, 0x10000, CRC(c09f4d28) SHA1(f1fd3202869738e17abcbb757f9ce7260707dd3d) )
+	ROM_LOAD( "b53-13.27c512.u38", 0x00000, 0x10000, CRC(c09f4d28) SHA1(f1fd3202869738e17abcbb757f9ce7260707dd3d) ) // US version old style PCB
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* M-Chip (i8x42 internal ROM) */
 	ROM_LOAD( "b53-09.u46", 0x0000, 0x0800, CRC(a4bfce19) SHA1(9340862d5bdc1ad4799dc92cae9bce1428b47478) )
@@ -2578,7 +2606,7 @@ ROM_START( tnzsuo )
 	ROM_LOAD( "b06-101.pal16l8a.u36.jed", 0x03000, 0x01000, NO_DUMP)
 ROM_END
 
-ROM_START( tnzso ) // is this a legit set, or a hack, or a near-final (later than tnzsop below) prototype?
+ROM_START( tnzsoa ) // is this a legit set, or a hack, or a near-final (later than tnzsop below) prototype?
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-unknown.27c1001d.u32", 0x00000, 0x20000, CRC(edf3b39e) SHA1(be221c99e50795d569611dba454c3954a259a859) ) // ROM LABEL FOR THIS SET IS UNKNOWN
 
@@ -2773,9 +2801,10 @@ GAME( 1988, chukataij, chukatai, tnzs,     chukatau, driver_device, 0, ROT0,   "
 
 GAME( 1988, tnzs,      0,        tnzsb,    tnzs,     driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsj,     tnzs,     tnzsb,    tnzsj,    driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, new version) (newer PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsjo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito Corporation",         "The NewZealand Story (Japan, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsuo,    tnzs,     tnzs,     tnzsjo,   driver_device, 0,  ROT0,   "Taito America Corporation", "The NewZealand Story (US, old version) (older PCB)",    MACHINE_SUPPORTS_SAVE )
-GAME( 1988, tnzso,     tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, old version) (older PCB)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, tnzsoa,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, unknown version) (older PCB)", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, tnzsop,    tnzs,     tnzs,     tnzsop,   driver_device, 0,  ROT0,   "Taito Corporation Japan",   "The NewZealand Story (World, prototype) (older PCB)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1988, kabukiz,   0,        kabukiz,  kabukiz,  driver_device, 0,  ROT0,   "Kaneko / Taito Corporation Japan", "Kabuki-Z (World)", MACHINE_SUPPORTS_SAVE )
