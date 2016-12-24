@@ -401,10 +401,7 @@ static MACHINE_CONFIG_START( aa310, aa310_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1280, 1024) //TODO: default screen size
-	MCFG_SCREEN_VISIBLE_AREA(0*8, 1280 - 1, 0*16, 1024 - 1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 32768)
