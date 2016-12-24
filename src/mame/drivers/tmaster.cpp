@@ -1723,6 +1723,13 @@ PAL16V8H-15 @ U26   Red dot on it
 PAL16V8H-15 @ U27   Green dot on it
 PAL16V8H-15 @ U45   red dot on it
 
+4 known game carts where produced, these are:
+
+Star Pak 1: Unknown
+Star Pak 2: Pack-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
+Star PaK 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
+Star Pak 4: Unknown
+
 ***************************************************************************/
 
 #define GALGAMES_BIOS_ROMS \
