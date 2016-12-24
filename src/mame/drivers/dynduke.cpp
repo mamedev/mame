@@ -197,7 +197,7 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )  /* "SW2:1,2" - Always OFF according to the manual */
-	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" ) PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
 	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
 	PORT_DIPSETTING(      0x0800, "100K 100K+" )
 	PORT_DIPSETTING(      0x0400, "120K 100K+" )
