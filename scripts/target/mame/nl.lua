@@ -121,8 +121,6 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 
 	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
-	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
-	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 
   MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
