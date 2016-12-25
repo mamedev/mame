@@ -129,6 +129,7 @@ public:
 	DECLARE_CUSTOM_INPUT_MEMBER(c2map_r);
 	DECLARE_WRITE16_MEMBER(oki_bankswitch_w);
 	DECLARE_WRITE16_MEMBER(oki1_bankswitch_w);
+	DECLARE_WRITE16_MEMBER(enmadaio_oki_bank_w);
 	DECLARE_DRIVER_INIT(bbakraid);
 	DECLARE_DRIVER_INIT(pipibibsbl);
 	DECLARE_DRIVER_INIT(dogyuun);
@@ -137,6 +138,7 @@ public:
 	DECLARE_DRIVER_INIT(fixeightbl);
 	DECLARE_DRIVER_INIT(vfive);
 	DECLARE_DRIVER_INIT(batrider);
+	DECLARE_DRIVER_INIT(enmadaio);
 	TILE_GET_INFO_MEMBER(get_text_tile_info);
 	DECLARE_MACHINE_START(toaplan2);
 	DECLARE_MACHINE_RESET(toaplan2);
