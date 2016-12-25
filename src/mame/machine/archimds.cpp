@@ -204,9 +204,9 @@ void archimedes_state::vidc_audio_tick()
 		56,    48,    40,    32,    24,    16,     8,     0
 	};
 
-	for(ch=0;ch<8;ch++)
+	for(ch=0; ch<8; ch++)
 	{
-		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndstart+m_vidc_sndcur + ch)) ^ 0xff;
+		uint8_t ulaw_temp = (space.read_byte(m_vidc_sndcur + ch)) ^ 0xff;
 
 		ulaw_comp = (ulaw_temp>>1) | ((ulaw_temp&1)<<7);
 
@@ -217,18 +217,23 @@ void archimedes_state::vidc_audio_tick()
 
 	m_vidc_sndcur+=8;
 
-	if (m_vidc_sndcur >= (m_vidc_sndend-m_vidc_sndstart)+0x10)
+	if (m_vidc_sndcur >= m_vidc_sndendcur)
 	{
-		m_vidc_sndcur = 0;
 		archimedes_request_irq_b(ARCHIMEDES_IRQB_SOUND_EMPTY);
 
 		if(!m_audio_dma_on)
 		{
 			m_snd_timer->adjust(attotime::never);
-			for(ch=0;ch<8;ch++)
+			for(ch=0; ch<8; ch++)
 			{
 				m_dac[ch & 7]->write(0);
 			}
+		}
+		else
+		{
+			//printf("Chaining to next: start %x end %x\n", m_vidc_sndstart, m_vidc_sndend);
+			m_vidc_sndcur = m_vidc_sndstart;
+			m_vidc_sndendcur = m_vidc_sndend;
 		}
 	}
 }
@@ -1112,16 +1117,22 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 					m_vid_timer->adjust(m_screen->time_until_pos(m_vidc_vblank_time+1));
 				}
 
-				if ((data>>11)&1)
+				if ((data>>11) & 1)
 				{
-					double sndhz;
+					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
+					
+					#if 0	// more correct to manuals, but breaks ertictac/poizone
+					m_snd_timer->adjust(attotime::zero, 0, attotime::from_usec(((m_vidc_regs[0xc0]&0xff)-2)*8));
 
+					#else	// original formula, definitely wrong in at least some cases
+					double sndhz;
 					/* FIXME: is the frequency correct? */
 					sndhz = (250000.0 / 2) / (double)((m_vidc_regs[0xc0]&0xff)+2);
-
-					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, m_vidc_sndstart, m_vidc_sndend);
-
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
+					#endif
+					
+					m_vidc_sndcur = m_vidc_sndstart;
+					m_vidc_sndendcur = m_vidc_sndend;
 				}
 
 				break;
