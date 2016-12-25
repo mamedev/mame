@@ -32,19 +32,19 @@
 
 
 #define MCFG_CBM_IEC_BUS_SRQ_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_srq_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_ATN_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_atn_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_CLK_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_clk_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_DATA_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_data_callback(DEVCB_##_write);
 
 #define MCFG_CBM_IEC_BUS_RESET_CALLBACK(_write) \
-	downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
+	devcb = &downcast<cbm_iec_device *>(device)->set_reset_callback(DEVCB_##_write);
 
 
 #define MCFG_CBM_IEC_SLOT_ADD(_tag, _address, _slot_intf, _def_slot) \
@@ -78,11 +78,11 @@ public:
 	// construction/destruction
 	cbm_iec_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
-	template<class _write> void set_srq_callback(_write wr) { m_write_srq.set_callback(wr); }
-	template<class _write> void set_atn_callback(_write wr) { m_write_atn.set_callback(wr); }
-	template<class _write> void set_clk_callback(_write wr) { m_write_clk.set_callback(wr); }
-	template<class _write> void set_data_callback(_write wr) { m_write_data.set_callback(wr); }
-	template<class _write> void set_reset_callback(_write wr) { m_write_reset.set_callback(wr); }
+	template<class _write> devcb_base &set_srq_callback(_write wr) { return m_write_srq.set_callback(wr); }
+	template<class _write> devcb_base &set_atn_callback(_write wr) { return m_write_atn.set_callback(wr); }
+	template<class _write> devcb_base &set_clk_callback(_write wr) { return m_write_clk.set_callback(wr); }
+	template<class _write> devcb_base &set_data_callback(_write wr) { return m_write_data.set_callback(wr); }
+	template<class _write> devcb_base &set_reset_callback(_write wr) { return m_write_reset.set_callback(wr); }
 
 	void add_device(cbm_iec_slot_device *slot, device_t *target);
 

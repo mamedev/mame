@@ -16,38 +16,38 @@
 
 // 4-bit K input port (pull-down)
 #define MCFG_SM510_READ_K_CB(_devcb) \
-	sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_read_k_callback(*device, DEVCB_##_devcb);
 // when in halt state, any K input going High can wake up the CPU,
 // driver is required to use execute_set_input(SM510_INPUT_LINE_K, state)
 #define SM510_INPUT_LINE_K 0
 
 // 1-bit BA(aka alpha) input pin (pull-up)
 #define MCFG_SM510_READ_BA_CB(_devcb) \
-	sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_read_ba_callback(*device, DEVCB_##_devcb);
 
 // 1-bit B(beta) input pin (pull-up)
 #define MCFG_SM510_READ_B_CB(_devcb) \
-	sm510_base_device::set_read_b_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_read_b_callback(*device, DEVCB_##_devcb);
 
 // 8-bit S strobe output port
 #define MCFG_SM510_WRITE_S_CB(_devcb) \
-	sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_s_callback(*device, DEVCB_##_devcb);
 
 // 2-bit R melody output port
 #define MCFG_SM510_WRITE_R_CB(_devcb) \
-	sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_r_callback(*device, DEVCB_##_devcb);
 
 // LCD segment outputs: H1-4 as offset(low), a/b/c 1-16 as data d0-d15
 #define MCFG_SM510_WRITE_SEGA_CB(_devcb) \
-	sm510_base_device::set_write_sega_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_sega_callback(*device, DEVCB_##_devcb);
 #define MCFG_SM510_WRITE_SEGB_CB(_devcb) \
-	sm510_base_device::set_write_segb_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_segb_callback(*device, DEVCB_##_devcb);
 #define MCFG_SM510_WRITE_SEGC_CB(_devcb) \
-	sm510_base_device::set_write_segc_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_segc_callback(*device, DEVCB_##_devcb);
 
 // LCD bs output: same as above, but only up to 2 bits used
 #define MCFG_SM510_WRITE_SEGBS_CB(_devcb) \
-	sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
+	devcb = &sm510_base_device::set_write_segbs_callback(*device, DEVCB_##_devcb);
 
 enum
 {

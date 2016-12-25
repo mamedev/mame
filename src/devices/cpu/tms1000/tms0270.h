@@ -14,13 +14,13 @@
 
 // TMS0270 was designed to interface with TMS5100, set it up at driver level
 #define MCFG_TMS0270_READ_CTL_CB(_devcb) \
-	tms0270_cpu_device::set_read_ctl_callback(*device, DEVCB_##_devcb);
+	devcb = &tms0270_cpu_device::set_read_ctl_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS0270_WRITE_CTL_CB(_devcb) \
-	tms0270_cpu_device::set_write_ctl_callback(*device, DEVCB_##_devcb);
+	devcb = &tms0270_cpu_device::set_write_ctl_callback(*device, DEVCB_##_devcb);
 
 #define MCFG_TMS0270_WRITE_PDC_CB(_devcb) \
-	tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
+	devcb = &tms0270_cpu_device::set_write_pdc_callback(*device, DEVCB_##_devcb);
 
 
 class tms0270_cpu_device : public tms0980_cpu_device

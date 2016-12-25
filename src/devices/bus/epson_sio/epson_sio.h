@@ -23,10 +23,10 @@
 	MCFG_DEVICE_SLOT_INTERFACE(epson_sio_devices, _def_slot, false)
 
 #define MCFG_EPSON_SIO_RX(_rx) \
-	downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
+	devcb = &downcast<epson_sio_device *>(device)->set_rx_callback(DEVCB_##_rx);
 
 #define MCFG_EPSON_SIO_PIN(_pin) \
-	downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
+	devcb = &downcast<epson_sio_device *>(device)->set_pin_callback(DEVCB_##_pin);
 
 
 //**************************************************************************
@@ -45,8 +45,8 @@ public:
 	virtual ~epson_sio_device();
 
 	// callbacks
-	template<class _rx> void set_rx_callback(_rx rx) { m_write_rx.set_callback(rx); }
-	template<class _pin> void set_pin_callback(_pin pin) { m_write_pin.set_callback(pin); }
+	template<class _rx> devcb_base &set_rx_callback(_rx rx) { return m_write_rx.set_callback(rx); }
+	template<class _pin> devcb_base &set_pin_callback(_pin pin) { return m_write_pin.set_callback(pin); }
 
 	// called from owner
 	DECLARE_WRITE_LINE_MEMBER( tx_w );

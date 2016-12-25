@@ -53,7 +53,7 @@ enum
 #define MCFG_ASC_TYPE(_type) \
 	asc_device::static_set_type(*device, _type);
 #define MCFG_IRQ_FUNC(_irqf) \
-	downcast<asc_device *>(device)->set_irqf(DEVCB_##_irqf);
+	devcb = &downcast<asc_device *>(device)->set_irqf(DEVCB_##_irqf);
 
 //**************************************************************************
 //  TYPE DEFINITIONS
@@ -71,9 +71,9 @@ public:
 	static void static_set_type(device_t &device, int type);
 
 
-	template<class _write> void set_irqf(_write wr)
+	template<class _write> devcb_base &set_irqf(_write wr)
 	{
-		write_irq.set_callback(wr);
+		return write_irq.set_callback(wr);
 	}
 
 	devcb_write_line write_irq;
