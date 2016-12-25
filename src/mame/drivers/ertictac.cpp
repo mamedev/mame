@@ -228,10 +228,7 @@ static MACHINE_CONFIG_START( ertictac, ertictac_state )
 //  MCFG_AAKART_ADD("kart", XTAL_24MHz/3) // TODO: frequency
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MCFG_SCREEN_SIZE(1280, 1024)
-	MCFG_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz,1024,0,735,624/2,0,292) // RiscOS 3 default screen settings
 	MCFG_SCREEN_UPDATE_DRIVER(archimedes_state, screen_update)
 
 	MCFG_PALETTE_ADD("palette", 0x200)

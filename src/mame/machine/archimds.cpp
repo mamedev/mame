@@ -913,7 +913,6 @@ void archimedes_state::vidc_dynamic_res_change()
 		*/
 		if((m_vidc_regs[VIDC_HCR] >= m_vidc_regs[VIDC_HBER]) &&
 			(m_vidc_regs[VIDC_HBER] >= m_vidc_regs[VIDC_HBSR]) &&
-			(m_vidc_regs[VIDC_VCR] >= m_vidc_regs[VIDC_VBER]) &&
 			(m_vidc_regs[VIDC_VBER] >= m_vidc_regs[VIDC_VBSR]))
 		{
 			rectangle visarea;
