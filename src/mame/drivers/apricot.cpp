@@ -5,7 +5,8 @@
     ACT Apricot PC/Xi
 
     TODO:
-    - ASYNC (the terminal program) hangs after loading
+    - External RS232 data transfers to the Apricot are usually garbage (but
+      sending to an external target works fine)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
@@ -442,12 +443,12 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-// note: missing a receive clock callback to support external clock mode
-// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
+	// note: missing a receive clock callback to support external clock mode
+	// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, dcda_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ic15", z80sio0_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio0_device, ctsa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio0_device, ctsa_w))  MCFG_DEVCB_XOR(1)
 
 	// keyboard
 	MCFG_APRICOT_KEYBOARD_INTERFACE_ADD("kbd", "hle")
@@ -505,5 +506,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS
-COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", MACHINE_NOT_WORKING )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", MACHINE_NOT_WORKING )
+COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", 0 )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", 0 )
