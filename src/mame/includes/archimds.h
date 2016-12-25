@@ -131,7 +131,7 @@ private:
 	int m_memc_latchrom;
 	uint32_t m_ioc_timercnt[4], m_ioc_timerout[4];
 	uint32_t m_vidc_vidstart, m_vidc_vidend, m_vidc_vidinit, m_vidc_vidcur,m_vidc_cinit;
-	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur;
+	uint32_t m_vidc_sndstart, m_vidc_sndend, m_vidc_sndcur, m_vidc_sndendcur;
 	uint8_t m_video_dma_on,m_audio_dma_on;
 	uint8_t m_vidc_pixel_clk;
 	uint8_t m_vidc_stereo_reg[8];
