@@ -51,7 +51,7 @@ NETLIST_START(hazelvid)
 	PROM_82S126(u71, low, low, u70.QA, u70.QB, u70.QC, u70.QD, u69.QA, u69.QB, u69.QC, low)
 
 	/* signal decoding */
-	TTL_DM9334(u72, high, u81.Q1Q, u71.O4, u71.O1, u71.O2, u71.O3)
+	TTL_9334(u72, high, u81.Q1Q, u71.O4, u71.O1, u71.O2, u71.O3)
 	ALIAS(hms, u72.Q1)
 	ALIAS(hmsd, u72.Q2)
 	ALIAS(hblank, u72.Q3)
