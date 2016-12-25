@@ -4936,8 +4936,8 @@ GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        R
 GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device,  0,        ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device,  0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
-GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
-GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
+GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     MACHINE_NOT_WORKING ) // MT #00964
+GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1989,  daisyari, 0,        daisyari, daisyari, driver_device,  0,        ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    driver_device,  0,        ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )
