@@ -225,7 +225,7 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8, mc1000_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM
+	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
 	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
@@ -233,8 +233,13 @@ static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8, mc1000_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc1000_banking_mem, AS_DECRYPTED_OPCODES, 8, mc1000_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
+	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
+	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
 	AM_RANGE(0xc000, 0xffff) AM_READ(rom_banking_r)
-	AM_IMPORT_FROM(mc1000_mem)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc1000_io, AS_IO, 8, mc1000_state )
