@@ -25,8 +25,8 @@ public:
 
 	/* misc */
 	int        m_mux;
-	uint8_t	   m_coin_settings;
-	uint8_t	   m_coin_impulse;
+	uint8_t    m_coin_settings;
+	uint8_t    m_coin_impulse;
 	DECLARE_READ8_MEMBER(hanaawas_input_port_0_r);
 	DECLARE_WRITE8_MEMBER(hanaawas_inputs_mux_w);
 	DECLARE_WRITE8_MEMBER(hanaawas_videoram_w);

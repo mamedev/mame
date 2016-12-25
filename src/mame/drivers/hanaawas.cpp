@@ -50,7 +50,7 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 		m_coin_impulse--;
 		return 0x80;
 	}
-	
+
 	switch (m_mux)
 	{
 		case 1: /* start buttons */
