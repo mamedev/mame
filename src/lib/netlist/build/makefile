@@ -143,7 +143,7 @@ clean:
 
 nltool: $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS) 
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
@@ -164,14 +164,14 @@ maketree: $(sort $(OBJDIRS))
 
 .PHONY: clang mingw doc
 
-clang: 
+clang:
 	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
 
-# 
-# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors 
-# 
+#
+# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
+#
 
-mingw: 
+mingw:
 	$(MAKE) LDEXTRAFLAGS="-Wl,--subsystem,console" LIBS= MD=@mkdir.exe SHELL=sh.exe
 
 #
@@ -210,7 +210,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
-$(OBJ)/%.pp: $(SRC)/%.cpp 
+$(OBJ)/%.pp: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 

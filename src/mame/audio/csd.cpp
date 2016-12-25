@@ -2,7 +2,7 @@
 // copyright-holders: Aaron Giles
 /***************************************************************************
 
-	Cheap Squeak Deluxe / Artificial Artist Sound Board
+    Cheap Squeak Deluxe / Artificial Artist Sound Board
 
 ***************************************************************************/
 

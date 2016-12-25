@@ -34,16 +34,16 @@ SCREEN 1 vs. SCREEN 2 IN EMULATION
 // The type of monochrome monitor (VR-210 A, B or C) is selectable via another DIP (coarsly simulates a phosphor color).
 
 BUGS
-- GDC diagnostic disk fails on 9 of 13 tests (tests 4 and 6 - 13). 
+- GDC diagnostic disk fails on 9 of 13 tests (tests 4 and 6 - 13).
 
 Details
 a. (Rainbow driver) : interaction between DEC's external hardware and the NEC 7220 isn't fully understood (see page 173 of AA-AE36A)
-   It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'. 
+   It is also unclear what port $50 actually does when it 'synchronizes R-M-W cycles'.
    For now, we provide sane defaults for both vector and bitmap units without disturbing display mode(s) or the NEC 7220.
 b. the HBLANK / VBLANK ratio is plainly wrong (quick test / subtest #6),
-c. IRQs are flagged as 'erratic' (quick test / subtest #12). 
+c. IRQs are flagged as 'erratic' (quick test / subtest #12).
 d. (7220) : incorrect fifo stati are handed out (GDC reports FIFO_EMPTY instead of _FULL when quick test #4 floods the queue)
-e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel) 
+e. (7220) : RDAT with MOD 2 used extensively here, but unimplemented (modes other than 0 undocumented by NEC / Intel)
 
 UNIMPLEMENTED:
 - Rainbow 100 A palette quirks (2 bit palette... applies to certain modes only)
@@ -61,13 +61,13 @@ To obtain pixel exact graphics use 'Graphics Only' in Video Options  plus comman
 Programs with initialization / redraw / reentrance problems (invocation order after reset matters in emulation):
 
 - CANON (high resolution + vectors), Solitaire (SOLIT.EXE) and GDEMO (from GRPHCS.ARC, interactive graphics interpreter '85),
-  plus 'Monitor Aligment' (from the GDC test disk). 			Sloppy programming or a bug related to a) to e)...?
+  plus 'Monitor Aligment' (from the GDC test disk).             Sloppy programming or a bug related to a) to e)...?
 
  Quote from Haze: "if you have 2 screens running at different refresh rates one of them won't update properly
-                    (the partial update system gets very confused because it expects both the screens to end at the same time 
+                    (the partial update system gets very confused because it expects both the screens to end at the same time
                     and if that isn't the case large parts of one screen end up not updating at all)
 
-The following games work well: MMIND (MasterMind), (G)OTELO (requires GSX), PACMAN, SCRAM (last one uses scroll extensively). 
+The following games work well: MMIND (MasterMind), (G)OTELO (requires GSX), PACMAN, SCRAM (last one uses scroll extensively).
 */
 
 // license:GPL-2.0+
@@ -305,21 +305,21 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 ****************************************************************************/
 #define RD51_MAX_HEAD 8
 #define RD51_MAX_CYLINDER 1024
-#define RD51_SECTORS_PER_TRACK 17 
+#define RD51_SECTORS_PER_TRACK 17
 
 #define RTC_ENABLED
 // Tested drivers (from Suitable Solutions distribution disk and Latrobe archive), preferred first -
 // File.........Version / author ------------------- YY/YYYY ----- Read only RTC_BASE ---- Platform
 // RBCLIK21.COM Author: Vincent Esser. With source.. 4 digits (Y2K)..Y.......$fc000/fe000..100-B (default cfg.)
-// CLIKA.COM .. V1.03A (C) 1987 Suitable Solutions.. 2 digits........N (*)...$ed000........100-A 
+// CLIKA.COM .. V1.03A (C) 1987 Suitable Solutions.. 2 digits........N (*)...$ed000........100-A
 // CLIKCLOK.COM V1.01 (C) 1986,87 Suitable Solutions 2 digits........N (*)...$fc000/fe000..100-B (default   " )
-// CLIKF4.COM . V1.0  (C) 1986 Suitable Solutions... 2 digits........N (*)...$f4000........100-B (alternate " ) 
-// (*)   Time or date changes are not persistent in emulation. To prove the setter works, changes are logged. 
+// CLIKF4.COM . V1.0  (C) 1986 Suitable Solutions... 2 digits........N (*)...$f4000........100-B (alternate " )
+// (*)   Time or date changes are not persistent in emulation. To prove the setter works, changes are logged.
 
-// (Y2K) DS1315 unit only holds 2 digits, so Vincent Esser's freeware employs a windowing technique. 
-//       While Suitable's DOS 3.10 accepts dates > 2000, don't take that for granted with software from the 80s.                             
+// (Y2K) DS1315 unit only holds 2 digits, so Vincent Esser's freeware employs a windowing technique.
+//       While Suitable's DOS 3.10 accepts dates > 2000, don't take that for granted with software from the 80s.
 #ifdef      ASSUME_MODEL_A_HARDWARE
-	#define RTC_BASE 0xED000   
+	#define RTC_BASE 0xED000
 
 	// Define standard and maximum RAM sizes (A model):
 	#define MOTHERBOARD_RAM 0x0ffff  // 64 K base RAM  (100-A)
@@ -329,7 +329,7 @@ W17 pulls J1 serial  port pin 1 to GND when set (chassis to logical GND).
 	#define OLD_RAM_BOARD_PRESENT
 #else
 	#define RTC_BASE 0xFC000 // (default configuration, also covers FE000+)
-//	#define RTC_BASE 0xF4000 // (alternate configuration) - ClikClok V1.0 / CLIKF4.COM  
+//  #define RTC_BASE 0xF4000 // (alternate configuration) - ClikClok V1.0 / CLIKF4.COM
 
 	// DEC-100-B probes until a 'flaky' area is found (BOOT ROM around F400:0E04).
 	// It is no longer possible to key in the RAM size from within the 100-B BIOS.
@@ -725,10 +725,10 @@ private:
 // THIS MACRO * RESETS *  the PATTERN TO DEFAULT.
 // NOTE 2: m_patmult  MUST BE LOADED BEFORE !!
 #define OPTION_RESET_PATTERNS \
-m_vpat = 0xff;				  \
+m_vpat = 0xff;                \
 if(m_patmult == 0)  m_patmult = 0x01;\
 if(m_patcnt == 0)   m_patcnt = m_patmult;\
-if(m_patidx == 0)	m_patidx = 7; 
+if(m_patidx == 0)   m_patidx = 7;
 
 
 // GDC RESET MACRO - used in  "machine_reset"  & GDC_EXTRA_REGISTER_w   !
@@ -741,11 +741,11 @@ m_color_map_changed = true;                                 \
 for(int i=0; i <256; i++) { m_GDC_SCROLL_BUFFER[i] = i; };  \
 m_GDC_scroll_index = 0;                                     \
 m_GDC_write_buffer_index = 0;                               \
-m_GDC_WRITE_MASK = 0x00;									\
+m_GDC_WRITE_MASK = 0x00;                                    \
 m_GDC_ALU_PS_REGISTER = 0x0F;                               \
 m_GDC_FG_BG = 0xF0;                                         \
 m_GDC_MODE_REGISTER &= GDC_MODE_VECTOR | GDC_MODE_HIGHRES | GDC_MODE_ENABLE_WRITES | GDC_MODE_READONLY_SCROLL_MAP;\
-m_GDC_MODE_REGISTER |= GDC_MODE_ENABLE_VIDEO;				\
+m_GDC_MODE_REGISTER |= GDC_MODE_ENABLE_VIDEO;               \
 printf("\n** OPTION GRFX. RESET **\n");
 
 UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
@@ -766,11 +766,11 @@ UPD7220_DISPLAY_PIXELS_MEMBER( rainbow_state::hgdc_display_pixels )
 	uint8_t pen;
 
 	if(m_ONBOARD_GRAPHICS_SELECTED && (m_inp13->read() != DUAL_MONITOR) )
-	{	
+	{
 		for(xi=0;xi<16;xi++) // blank screen when VT102 output active (..)
-		{			
+		{
 			if (bitmap.cliprect().contains(x + xi, y))
-				bitmap.pix32(y, x + xi) = 0; 
+				bitmap.pix32(y, x + xi) = 0;
 		}
 		return; // no output from graphics option
 	}
@@ -852,7 +852,7 @@ void rainbow_state::machine_start()
 		rom[0xf4000 + 0x135e] = 0x00; // Floppy / RX-50 workaround: in case of Z80 RESPONSE FAILURE ($80 bit set in AL), do not block floppy access.
 
 		rom[0xf4000 + 0x198F] = 0xeb; // cond.JMP to uncond.JMP (disables error message 60...)
-		
+
 		rom[0xf4000 + 0x315D] = 0x00; // AND DL,0 (make sure DL is zero before ROM_Initialize7201)
 		rom[0xf4000 + 0x315E] = 0xe2;
 		rom[0xf4000 + 0x315F] = 0x02;
@@ -1090,7 +1090,7 @@ INPUT_PORTS_END
 
 void rainbow_state::machine_reset()
 {
-	// 'F3' (in partial emulation) here replaces 'CTRL-SETUP' (soft reboot on an original Rainbow) 
+	// 'F3' (in partial emulation) here replaces 'CTRL-SETUP' (soft reboot on an original Rainbow)
 	// FIXME: BIOS reports error 19 when CTRL-SETUP is pressed (Z80 or flags aren't fully reset then?)
 	popmessage("Reset");
 
@@ -1117,7 +1117,7 @@ void rainbow_state::machine_reset()
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
 	program.install_read_handler(RTC_BASE, RTC_BASE, read8_delegate(FUNC(rainbow_state::rtc_r), this));
-	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));	
+	program.install_write_handler(RTC_BASE + 0xFE, RTC_BASE + 0xFF, write8_delegate(FUNC(rainbow_state::rtc_w), this));
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-A' ***************************************
 	#endif
 
@@ -1134,7 +1134,7 @@ void rainbow_state::machine_reset()
 
 	#ifdef RTC_ENABLED
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
-	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).	
+	// No address space needed ( -> IRQs must be disabled to block ROM accesses during reads ).
 	program.install_read_handler(RTC_BASE, RTC_BASE + 0x2104, read8_delegate(FUNC(rainbow_state::rtc_r), this));
 	// *********************************** / DS1315 'PHANTOM CLOCK' IMPLEMENTATION FOR 'DEC-100-B' ***************************************
 	#endif
@@ -1196,10 +1196,10 @@ void rainbow_state::machine_reset()
 
 	// *********** NEC 7220 DISPLAY CONTROLLER [ OPTIONAL ]
 	OPTION_GRFX_RESET
-		
+
 	OPTION_RESET_PATTERNS
 
-	for(int i=0; i <32; i++) { m_GDC_COLOR_MAP[i] = 0x00; };  
+	for(int i=0; i <32; i++) { m_GDC_COLOR_MAP[i] = 0x00; };
 	m_GDC_color_map_index = 0;
 	m_color_map_changed = true;
 	// *********** Z80
@@ -1343,7 +1343,7 @@ void rainbow_state::lower_8088_irq(int ref)
 // IRQ service for 7201 (commm / printer)
 void rainbow_state::update_mpsc_irq()
 {
-	if (m_mpsc_irq == 0) 
+	if (m_mpsc_irq == 0)
 		lower_8088_irq(IRQ_COMM_PTR_INTR_L);
 	else
 		raise_8088_irq(IRQ_COMM_PTR_INTR_L);
@@ -1368,7 +1368,7 @@ WRITE8_MEMBER(rainbow_state::comm_bitrate_w)
 // PORT 0x0e : Printer bit rates
 WRITE8_MEMBER(rainbow_state::printer_bitrate_w)
 {
-	m_dbrg_B->str_w(data & 7); // bits 0 - 2 
+	m_dbrg_B->str_w(data & 7); // bits 0 - 2
 	m_dbrg_B->stt_w(data & 7); // TX and RX rate cannot be programmed independently.
 	printf("\n(PRINTER) RECEIVE / TRANSMIT bitrate = %02x HEX\n",data & 7);
 
@@ -1388,7 +1388,7 @@ WRITE_LINE_MEMBER(rainbow_state::com8116_a_ft_w)
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_b_fr_w)
 {
-	m_mpsc->rxcb_w(state); 
+	m_mpsc->rxcb_w(state);
 }
 
 WRITE_LINE_MEMBER(rainbow_state::com8116_b_ft_w)
@@ -1469,8 +1469,8 @@ WRITE8_MEMBER(rainbow_state::ext_ram_w)
 // ------------------------ClikClok (for 100-A; DS1315) ------------------------------------------
 // Version for 100-A plugs into NVRAM chip socket. There is a socket on the ClikClok for the NVRAM
 
-// Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM) 
-// - also needed to set time/date (*).		             Reads $ed000, writes ed0fe/ed0ff.         
+// Requires a short program from the Suitable Solutions ClikClok distribution disk (CLIKA.COM)
+// - also needed to set time/date (*).                   Reads $ed000, writes ed0fe/ed0ff.
 WRITE8_MEMBER(rainbow_state::rtc_w)
 {
 	if((m_inp11->read() == 0x01)) // if enabled...
@@ -1494,9 +1494,9 @@ WRITE8_MEMBER(rainbow_state::rtc_w)
 	}
 	m_p_vol_ram[offset] = data;  // Poke value into VOL_RAM.
 }
- 
+
 // ------------------------ClikClok (for 100-B; DS1315)  ------------------------------------------------
-// Add-on hardware, occupies one of the EPROM sockets of the 100-B. TODO: check address decoders on board 
+// Add-on hardware, occupies one of the EPROM sockets of the 100-B. TODO: check address decoders on board
 // Requires CLIKCLOK.COM or RBCLIK21.COM (freeware from Latrobe).                       Uses FC000/FE000.
 READ8_MEMBER(rainbow_state::rtc_r)
 {
@@ -1505,10 +1505,10 @@ READ8_MEMBER(rainbow_state::rtc_r)
 		switch (offset)
 		{
 #ifdef ASSUME_RAINBOW_A_HARDWARE
-			case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)   
+			case 0x00: // read time/date from 0xED000 (ClikClok for 100-A)
 				if (m_rtc->chip_enable())
 					return m_rtc->read_data(space, 0) & 0x01;
-				 else 
+				 else
 					m_rtc->chip_reset();
 #else
 			// Transfer data to DS1315 (data = offset):
@@ -1548,7 +1548,7 @@ READ8_MEMBER(rainbow_state::rtc_r)
 	}
 
 #ifdef ASSUME_RAINBOW_A_HARDWARE
-	return m_p_vol_ram[offset];  // return volatile RAM 
+	return m_p_vol_ram[offset];  // return volatile RAM
 #else
 	uint8_t *rom = memregion("maincpu")->base();
 	return rom[RTC_BASE + offset];  // return ROM
@@ -2237,7 +2237,7 @@ READ8_MEMBER(rainbow_state::z80_generalstat_r)
 	int fdc_write_gate = 0;
 	int last_dir = 0;
 
-//	printf("\nFLOPPY %02d - ", m_unit);
+//  printf("\nFLOPPY %02d - ", m_unit);
 	if (m_fdc)
 	{
 			track = m_fdc->track_r(space, 0);
@@ -2460,7 +2460,7 @@ IRQ_CALLBACK_MEMBER(rainbow_state::irq_callback)
 				if (i == IRQ_8088_VBL)  // If VBL IRQ acknowledged...
 					m_crtc->MHFU(MHFU_RESET); // ...reset counter (also: DC012_W)
 
-				if (i == IRQ_COMM_PTR_INTR_L) 
+				if (i == IRQ_COMM_PTR_INTR_L)
 					m_mpsc->m1_r();  // serial interrupt acknowledge
 
 				intnum = vectors[i] | m_irq_high;
@@ -2540,8 +2540,8 @@ WRITE_LINE_MEMBER(rainbow_state::GDC_vblank_irq)
 							}
 
 							case COLOR_MONITOR:
-									
-									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO)) 
+
+									if(!(m_GDC_MODE_REGISTER & GDC_MODE_ENABLE_VIDEO))
 										red = blue = 0; // Page 21 of PDF AA-AE36A (PDF) explains why
 									red   = uint8_t( red   * 17 *  ( (255-video_levels[ red ]  )  / 255.0f) );
 									green = uint8_t( mono * 17 *  ( (255-video_levels[ mono ])  / 255.0f) ); // BCC-17 cable (red, mono -> green, blue)
@@ -2597,7 +2597,7 @@ WRITE_LINE_MEMBER(rainbow_state::clear_video_interrupt)
 
 // Reflects bits from 'diagnostic_w' (1:1), except test jumpers
 READ8_MEMBER(rainbow_state::diagnostic_r) // 8088 (port 0A READ). Fig.4-29 + table 4-15
-{	
+{
 	return ((m_diagnostic & (0xf1)) |
 			m_inp1->read() |
 			m_inp2->read() |
@@ -2655,7 +2655,7 @@ WRITE8_MEMBER(rainbow_state::diagnostic_w) // 8088 (port 0A WRITTEN). Fig.4-28 +
 	}
 
 	// BIT 3: PARITY (1 enables parity test on memory board. Usually 64K per bank). -> ext_ram_w.
-	if(data & 0x08) 
+	if(data & 0x08)
 		printf("\n*** PARITY TEST [on RAM EXTENSION] - (bit 3 - diagnostic_w) ");
 
 	// MISSING BITS (* not vital for normal operation, see diag.disk) -
@@ -2941,9 +2941,9 @@ WRITE8_MEMBER(rainbow_state::GDC_EXTRA_REGISTER_w)
 			//        read/modify/write memory cycles of the Graphics Option to those of the GDC." (?)
 
 			if( data & 1 ) // PDF QV069 suggests 1 -> 0 -> 1. Most programs just set bit 0 (PACMAN).
-			{	
+			{
 				// Graphics option software reset (separate from GDC reset...)
-				OPTION_GRFX_RESET 
+				OPTION_GRFX_RESET
 				OPTION_RESET_PATTERNS
 			}
 			break;
@@ -3182,12 +3182,12 @@ MCFG_PALETTE_ADD("palette2", 32)
 MCFG_SCREEN_ADD("screen2", RASTER)
 MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_ALWAYS_UPDATE)
 
-// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate ) 
+// VR241 color monitor is specified for 20 MHz bandwidth ( 60 Hz / 15.72 kHz horizontal rate )
 // - sufficient for 800 x 240 non-interlaced at 60 Hz (non interlaced).
-//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240) 
+//MCFG_SCREEN_RAW_PARAMS(31188000 / 2 , 992, 0, 800, 262, 0, 240)
 
 // Alternate configuration:
-MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240) 
+MCFG_SCREEN_RAW_PARAMS(31188000 / 4 , 496, 0, 400, 262, 0, 240)
 
 MCFG_SCREEN_UPDATE_DEVICE("upd7220", upd7220_device, screen_update)
 
@@ -3228,7 +3228,7 @@ MCFG_DEVICE_ADD("com8116_a", COM8116, XTAL_5_0688MHz)     // Baud rate generator
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_a_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_a_ft_w))
 
-MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL_5_0688MHz) // Baud rate generator B 
+MCFG_DEVICE_ADD("com8116_b", COM8116, XTAL_5_0688MHz) // Baud rate generator B
 MCFG_COM8116_FR_HANDLER(WRITELINE(rainbow_state, com8116_b_fr_w))
 MCFG_COM8116_FT_HANDLER(WRITELINE(rainbow_state, com8116_b_ft_w))
 

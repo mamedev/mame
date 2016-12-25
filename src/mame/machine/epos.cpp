@@ -17,13 +17,13 @@ READ8_MEMBER(pacman_state::epos_decryption_w)
 
 	switch (m_counter)
 	{
-	case 0x08:  
+	case 0x08:
 	case 0x09:
 	case 0x0A:
 	case 0x0B:
 		membank("bank1")->set_entry(m_counter & 3);
 		break;
-	
+
 	default:
 		logerror("Invalid counter = %02X\n", m_counter);
 		break;

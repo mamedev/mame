@@ -76,7 +76,7 @@
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                    \
 		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
 
-#define TTL_74107_DIP(name)								\
+#define TTL_74107_DIP(name)                             \
 		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
 #endif /* NLD_74107_H_ */

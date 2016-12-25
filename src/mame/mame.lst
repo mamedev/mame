@@ -9613,7 +9613,7 @@ cocoe                           // Color Computer (Extended BASIC 1.0)
 cp400                           // Prologica CP400
 lzcolor64                       // Digiponto LZ Color64
 mx1600                          // Dynacom MX-1600
-t4426							// Terco T4426 CNC programming station
+t4426                           // Terco T4426 CNC programming station
 
 @source:coco3.cpp
 coco3                           // Color Computer 3 (NTSC)
@@ -11995,7 +11995,7 @@ sd1                             // 1990 SD-1
 sd132                           // 1991 SD-1 32
 sq1                             // 1990 SQ-1
 sqrack                          // 1990 SQ-Rack
-sq2								// 1991 SQ-2
+sq2                             // 1991 SQ-2
 vfx                             // 1989 VFX
 vfxsd                           // 1989 VFX-SD
 
@@ -13387,7 +13387,7 @@ gkigtez                         //
 gkkey                           //
 igtsc                           //
 ms72c                           //
-ms3								//
+ms3                             //
 
 @source:gladiatr.cpp
 gcastle                         // QB  (c) 1986 Taito Corporation (prototype?)
@@ -17331,7 +17331,7 @@ trojanr                         // 4/1986 (c) 1986 + Romstar
 fball                        //
 
 @source:lwriter.cpp
-lwriter							// Apple LaserWriter
+lwriter                         // Apple LaserWriter
 
 @source:lynx.cpp
 lynx                            // Atari Lynx Handheld
@@ -28864,7 +28864,7 @@ quizkofk                        // 0080 (c) 1995 Saurus
 ragnagrd                        // 0218 (c) 1996 Saurus
 rbff1                           // 0095 (c) 1995 SNK
 rbff1a                          // 0095 (c) 1995 SNK
-rbff1k							// 0095 (c) 1995 SNK
+rbff1k                          // 0095 (c) 1995 SNK
 rbff2                           // 0240 (c) 1998 SNK
 rbff2h                          // 0240 (c) 1998 SNK
 rbff2k                          // 0140 Censored Korean release of rbff2
@@ -29607,8 +29607,8 @@ ssam88s                         //
 sx16                            // Sanyo SX-16
 zdsupers                        //
 ncrpc4i                         // NCR PC4i
-laser_turbo_xt					// 1988 VTech Laser Turbo XT
-laser_xt3						// 1989 VTech Laser XT/3
+laser_turbo_xt                  // 1988 VTech Laser Turbo XT
+laser_xt3                       // 1989 VTech Laser XT/3
 
 @source:pc100.cpp
 pc100                           //
@@ -35841,7 +35841,7 @@ outzonecv                       // TP-O18 (c) 1990 Toaplan (TP-015 conversion)
 rallybik                        // B45 / TP-O12 (c) 1988 Taito
 samesame                        // TP-O17 (c) 1989 Toaplan
 samesame2                       // TP-O17 (c) 1989 Toaplan
-samesamenh						// hack
+samesamenh                      // hack
 truxton                         // B65 / TP-O13B (c) 1988 Taito
 vimana                          // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)
 vimanaj                         // TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)

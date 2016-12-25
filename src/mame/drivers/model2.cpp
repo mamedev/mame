@@ -773,7 +773,7 @@ READ32_MEMBER(model2_state::copro_fifo_r)
 	else
 	{
 		// TODO
-//		printf("FIFO OUT read\n");
+//      printf("FIFO OUT read\n");
 		if (m_tgpx4->is_fifoout0_empty())
 		{
 			/* Reading from empty FIFO causes the i960 to enter wait state */
@@ -840,7 +840,7 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 			}
 			else
 			{
-//				printf("push %08X at %08X\n", data, space.device().safe_pc());
+//              printf("push %08X at %08X\n", data, space.device().safe_pc());
 				m_tgpx4->fifoin_w(data);
 			}
 		}
@@ -3167,7 +3167,7 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_LOAD32_WORD( "mpr-17747.11", 0x000002, 0x200000, CRC(543593fd) SHA1(5ba63a77e9fc70569af21d50b3171bc8ff4522b8) )
 	ROM_LOAD32_WORD( "mpr-17744.8",  0x400000, 0x200000, CRC(71fed098) SHA1(1d187cad375121a45348d640edd3cc7dce658d28) )
 	ROM_LOAD32_WORD( "mpr-17745.9",  0x400002, 0x200000, CRC(8ecca705) SHA1(ed2b3298aad6f4e52dc672a0168183e457564b43) )
-	ROM_LOAD32_WORD( "mpr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) )	// IC 6 and 7 likely EPROMs
+	ROM_LOAD32_WORD( "mpr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) ) // IC 6 and 7 likely EPROMs
 	ROM_LOAD32_WORD( "mpr-17765a.7", 0x800002, 0x200000, CRC(b657dc48) SHA1(ae0f1bc6e2479fa51ca36f8be3a1785981c4dfe9) )
 
 	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
@@ -3221,8 +3221,8 @@ ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player
 	ROM_LOAD32_WORD( "epr-17765.7",  0x800002, 0x100000, CRC(81112ea5) SHA1(a0251b4f5f18ae2e2d0576087a687dd7c2e49c34) ) // NEC D27C8000D EPROM
 
 	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
-	ROM_LOAD32_WORD( "mpr-17754.28", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )	// not present in this rev memory test, why ?
-	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )	//
+	ROM_LOAD32_WORD( "mpr-17754.28", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) ) // not present in this rev memory test, why ?
+	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) ) //
 
 	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
 	ROM_LOAD( "epr-17762.ic12", 0x000000, 0x010000, NO_DUMP ) /* Need to verify actual EPR-xxxx number, might be EPR-17759 */

@@ -29,19 +29,19 @@
 
 #include "nl_setup.h"
 
-#define TTL_74165(name, cCLK, cCLKINH, cSH_LDQ, cSER, cA, cB, cC, cD, cE, cF, cG, cH)	\
-		NET_REGISTER_DEV(TTL_74165, name)	\
-		NET_CONNECT(name, CLK,    cCLK)		\
-		NET_CONNECT(name, CLKINH, cCLKINH)	\
-		NET_CONNECT(name, SH_LDQ, cSH_LDQ)	\
-		NET_CONNECT(name, SER,    cSER)		\
-		NET_CONNECT(name, A,      cA)		\
-		NET_CONNECT(name, B,      cB)		\
-		NET_CONNECT(name, C,      cC)		\
-		NET_CONNECT(name, D,      cD)		\
-		NET_CONNECT(name, E,      cE)		\
-		NET_CONNECT(name, F,      cF)		\
-		NET_CONNECT(name, G,      cG)		\
+#define TTL_74165(name, cCLK, cCLKINH, cSH_LDQ, cSER, cA, cB, cC, cD, cE, cF, cG, cH)   \
+		NET_REGISTER_DEV(TTL_74165, name)   \
+		NET_CONNECT(name, CLK,    cCLK)     \
+		NET_CONNECT(name, CLKINH, cCLKINH)  \
+		NET_CONNECT(name, SH_LDQ, cSH_LDQ)  \
+		NET_CONNECT(name, SER,    cSER)     \
+		NET_CONNECT(name, A,      cA)       \
+		NET_CONNECT(name, B,      cB)       \
+		NET_CONNECT(name, C,      cC)       \
+		NET_CONNECT(name, D,      cD)       \
+		NET_CONNECT(name, E,      cE)       \
+		NET_CONNECT(name, F,      cF)       \
+		NET_CONNECT(name, G,      cG)       \
 		NET_CONNECT(name, H,      cH)
 
 #define TTL_74165_DIP(name)                                                     \

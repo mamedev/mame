@@ -422,7 +422,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 class netlist_mame_int_input_t :  public device_t,
-                                  public netlist_mame_sub_interface
+								  public netlist_mame_sub_interface
 {
 public:
 
@@ -514,7 +514,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 class netlist_mame_rom_t : public device_t,
-                           public netlist_mame_sub_interface
+						   public netlist_mame_sub_interface
 {
 public:
 
@@ -544,7 +544,7 @@ private:
 // ----------------------------------------------------------------------------------------
 
 class netlist_ram_pointer_t: public device_t,
-                             public netlist_mame_sub_interface
+							 public netlist_mame_sub_interface
 {
 public:
 

@@ -298,7 +298,7 @@ void archimedes_state::archimedes_reset()
 	m_ioc_regs[IRQ_STATUS_B] = 0x00; //set up IL[1] On
 	m_ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
 	m_ioc_regs[CONTROL] = 0xff;
-	
+
 	m_vidc_vblank_time = 10000; // set a stupidly high time so it doesn't fire off
 	m_vbl_timer->adjust(attotime::never);
 }
@@ -923,7 +923,7 @@ void archimedes_state::vidc_dynamic_res_change()
 			visarea.min_y = 0;
 			visarea.max_x = m_vidc_regs[VIDC_HBER] - m_vidc_regs[VIDC_HBSR] - 1;
 			visarea.max_y = (m_vidc_regs[VIDC_VBER] - m_vidc_regs[VIDC_VBSR]) * (m_vidc_interlace+1);
-			
+
 			m_vidc_vblank_time = m_vidc_regs[VIDC_VBER] * (m_vidc_interlace+1);
 			//logerror("Configuring: htotal %d vtotal %d border %d x %d display origin %d x %d vblank = %d\n",
 			//  m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR],
@@ -932,7 +932,7 @@ void archimedes_state::vidc_dynamic_res_change()
 			//  m_vidc_vblank_time);
 
 			refresh = HZ_TO_ATTOSECONDS(pixel_rate[m_vidc_pixel_clk]) * m_vidc_regs[VIDC_HCR] * m_vidc_regs[VIDC_VCR];
-			
+
 			m_screen->configure(m_vidc_regs[VIDC_HCR], m_vidc_regs[VIDC_VCR] * (m_vidc_interlace+1), visarea, refresh);
 		}
 	}
@@ -996,7 +996,7 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 				m_palette->set_pen_color((reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
 			}
 		}
-	
+
 		// update partials
 		machine().first_screen()->update_partial(machine().first_screen()->vpos());
 	}
@@ -1120,17 +1120,17 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				if ((data>>11) & 1)
 				{
 					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
-					
-					#if 0	// more correct to manuals, but breaks ertictac/poizone
+
+					#if 0   // more correct to manuals, but breaks ertictac/poizone
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_usec(((m_vidc_regs[0xc0]&0xff)-2)*8));
 
-					#else	// original formula, definitely wrong in at least some cases
+					#else   // original formula, definitely wrong in at least some cases
 					double sndhz;
 					/* FIXME: is the frequency correct? */
 					sndhz = (250000.0 / 2) / (double)((m_vidc_regs[0xc0]&0xff)+2);
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 					#endif
-					
+
 					m_vidc_sndcur = m_vidc_sndstart;
 					m_vidc_sndendcur = m_vidc_sndend;
 				}

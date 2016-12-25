@@ -66,13 +66,13 @@ namespace netlist
 			for (std::size_t i=0; i<5; i++)
 				a |= (m_A[i]() << i);
 
-            if (m_ROM() != nullptr)
-			    o = ((std::uint_fast8_t*)(m_ROM()))[a];
+			if (m_ROM() != nullptr)
+				o = ((std::uint_fast8_t*)(m_ROM()))[a];
 
 			delay = NLTIME_FROM_NS(50);
 		}
 
-        // FIXME: Outputs are tristate. This needs to be properly implemented
+		// FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<8; i++)
 			m_O[i].push((o >> i) & 1, delay);
 	}

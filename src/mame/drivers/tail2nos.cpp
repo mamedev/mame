@@ -26,7 +26,7 @@ WRITE8_MEMBER(tail2nos_state::sound_command_w)
 
 WRITE8_MEMBER(tail2nos_state::sound_semaphore_w)
 {
-	m_pending_command = 0; 
+	m_pending_command = 0;
 }
 
 READ8_MEMBER(tail2nos_state::sound_semaphore_r)
@@ -55,8 +55,8 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, tail2nos_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(sound_semaphore_r,sound_command_w,0x00ff)
-//	AM_RANGE(0xfff020, 0xfff023) V-System CRTC
-//	AM_RANGE(0xfff030, 0xfff031) link comms
+//  AM_RANGE(0xfff020, 0xfff023) V-System CRTC
+//  AM_RANGE(0xfff030, 0xfff031) link comms
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, tail2nos_state )
@@ -78,7 +78,7 @@ CUSTOM_INPUT_MEMBER(tail2nos_state::analog_in_r)
 {
 	int num = (uintptr_t)param;
 	int delta = ioport(num ? "AN1" : "AN0")->read();
-	
+
 	return delta >> 5;
 }
 
@@ -104,9 +104,9 @@ static INPUT_PORTS_START( tail2nos )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0070, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, tail2nos_state,analog_in_r, (void *)1) PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
-	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000) 
+	PORT_BIT( 0x0070, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
 	PORT_BIT( 0xff8f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	
+
 	PORT_START("AN0")
 	PORT_BIT( 0xff, 0, IPT_AD_STICK_Z ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_NAME("Brake (original BD)") PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
@@ -114,7 +114,7 @@ static INPUT_PORTS_START( tail2nos )
 	PORT_START("AN1")
 	PORT_BIT( 0xff, 0, IPT_AD_STICK_Z ) PORT_SENSITIVITY(10) PORT_KEYDELTA(5) PORT_NAME("Accelerate (original BD)")  PORT_CONDITION("DSW", 0x4000, NOTEQUALS, 0x4000)
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED ) PORT_CONDITION("DSW", 0x4000, EQUALS, 0x4000)
-	
+
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x000f, 0x0000, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(      0x0009, DEF_STR( 5C_1C ) )

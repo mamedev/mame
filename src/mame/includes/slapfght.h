@@ -100,7 +100,7 @@ public:
 
 	DECLARE_READ8_MEMBER(tigerh_mcu_porta_r);
 	DECLARE_WRITE8_MEMBER(tigerh_mcu_porta_w);
-	
+
 	DECLARE_WRITE8_MEMBER(tigerh_mcu_portb_w);
 	DECLARE_WRITE8_MEMBER(slapfght_mcu_portb_w);
 

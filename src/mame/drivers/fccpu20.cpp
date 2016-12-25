@@ -91,32 +91,32 @@
  * PIT #1 hardware wiring
  * ----------------------------------------------------------
  * PA0-PA3  TBC
- * PA4-PA7  
- * H1-H4    
- * PB0-PB2  
- * PB3-PB4  
- * PB5      
- * PB6-PB7  
- * PC0,PC1  
- * PC4,PC7  
- * PC2      
- * PC3      
- * PC5      
- * PC6      
+ * PA4-PA7
+ * H1-H4
+ * PB0-PB2
+ * PB3-PB4
+ * PB5
+ * PB6-PB7
+ * PC0,PC1
+ * PC4,PC7
+ * PC2
+ * PC3
+ * PC5
+ * PC6
  *
  * PIT #2 hardware setup wiring
  * ----------------------------------------------------------
  * PA0-PA7  TBC
- * H1-H4    
- * PB0-PB2  
- * PB3-PB7  
- * PC0-PC1  
- * PC2      
- * PC3      
- * PC4      
- * PC5      
- * PC6      
- * PC7      
+ * H1-H4
+ * PB0-PB2
+ * PB3-PB7
+ * PC0-PC1
+ * PC2
+ * PC3
+ * PC4
+ * PC5
+ * PC6
+ * PC7
  *
  *---------------------------------------------------------------------------
  *  TODO:

@@ -171,7 +171,7 @@ public:
 	DECLARE_VIDEO_START(berlwall);
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
-	
+
 	void patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum);
 };
 

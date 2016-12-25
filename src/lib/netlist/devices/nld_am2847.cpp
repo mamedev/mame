@@ -105,7 +105,7 @@ namespace netlist
 			m_C.shift();
 			m_D.shift();
 		}
-        m_last_CP = m_CP();
+		m_last_CP = m_CP();
 	}
 
 	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))

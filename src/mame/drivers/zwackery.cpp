@@ -2,18 +2,18 @@
 // copyright-holders: Aaron Giles, Bryan McPhail
 /***************************************************************************
 
-	Zwackery
+    Zwackery
 
-	© 1984 Midway
+    © 1984 Midway
 
-	The hardware consists of the following boards:
-	- Venus CPU (B084-91668-A385)
-	- Venus Video (B084-91675-A385)
-	- Venus Background (B084-91672-A385)
-	- Artificial Artist (B084-91671-A385)
+    The hardware consists of the following boards:
+    - Venus CPU (B084-91668-A385)
+    - Venus Video (B084-91675-A385)
+    - Venus Background (B084-91672-A385)
+    - Artificial Artist (B084-91671-A385)
 
-	TODO:
-	- Accurate screen timings
+    TODO:
+    - Accurate screen timings
 
 ***************************************************************************/
 

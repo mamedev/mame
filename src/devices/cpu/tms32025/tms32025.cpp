@@ -1798,7 +1798,7 @@ void tms32025_device::device_reset()
 		m_data->install_ram(0x0200, 0x02ff, m_b0);
 	}
 	common_reset();
-	
+
 }
 
 void tms32026_device::device_reset()

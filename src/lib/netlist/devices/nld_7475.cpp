@@ -128,7 +128,7 @@ namespace netlist
 		m_last_Q = 0;
 	}
 
-    NETLIB_UPDATE(7477)
+	NETLIB_UPDATE(7477)
 	{
 		netlist_sig_t c1c2 = m_C1C2();
 		netlist_sig_t c3c4 = m_C3C4();

@@ -991,7 +991,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, tigerh_mcu_portb_w))
 	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, tigerh_mcu_portc_r))
-	
+
 
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")

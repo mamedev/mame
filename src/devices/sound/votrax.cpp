@@ -17,11 +17,11 @@
   0   -   -  -  sram write pulse
 
 i1.o = glottal impulse
-i2.o = white noise 
+i2.o = white noise
 
 tp1 = phi clock (tied to f2q rom access)
 */
-  
+
 #include "emu.h"
 #include "votrax.h"
 
@@ -51,7 +51,7 @@ const char *const votrax_sc01_device::s_phone_table[64] =
 // ladder.  There is first a transistor to ground, then a series of
 // seven transistors one quarter the size of the first one, then it
 // finishes by an active resistor to +9V.
-// 
+//
 // The terminal of the transistor to ground is used as a middle value.
 // Index 0 is at that value. Index 1 is at 0V.  Index 2 to 8 start at
 // just after the resistor down the latter.  Indices 9+ are the middle
@@ -438,23 +438,23 @@ void votrax_sc01_device::chip_update()
 	// The formants are frozen on a pause phone unless both voice and
 	// noise volumes are zero.
 	if(tick_208 && (!m_rom_pause || !(m_filt_fa || m_filt_va))) {
-		//		interpolate(m_cur_va,  m_rom_va);
+		//      interpolate(m_cur_va,  m_rom_va);
 		interpolate(m_cur_fc,  m_rom_fc);
 		interpolate(m_cur_f1,  m_rom_f1);
 		interpolate(m_cur_f2,  m_rom_f2);
 		interpolate(m_cur_f2q, m_rom_f2q);
 		interpolate(m_cur_f3,  m_rom_f3);
-		//		logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
-	}	
+		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+	}
 
 	// Non-formant update. Same bug there, va should be updated, not fc.
 	if(tick_625) {
 		if(m_ticks >= m_rom_vd)
 			interpolate(m_cur_fa, m_rom_fa);
 		if(m_ticks >= m_rom_cld)
-			//			interpolate(m_cur_fc, m_rom_fc);
+			//          interpolate(m_cur_fc, m_rom_fc);
 			interpolate(m_cur_va, m_rom_va);
-		//		logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
+		//      logerror("int fa=%x va=%x fc=%x f1=%x f2=%02x f2q=%02x f3=%x\n", m_cur_fa >> 4, m_cur_va >> 4, m_cur_fc >> 4, m_cur_f1 >> 4, m_cur_f2 >> 3, m_cur_f2q >> 4, m_cur_f3 >> 4);
 	}
 
 	// Closure counter, reset every other tick in theory when not
@@ -466,7 +466,7 @@ void votrax_sc01_device::chip_update()
 	if(!m_cur_closure && (m_filt_fa || m_filt_va))
 		m_closure = 0;
 	else if(m_closure != 7 << 2)
-		m_closure ++;	
+		m_closure ++;
 
 	// Pitch counter.  Equality comparison, so it's possible to make
 	// it miss by manipulating the inflection inputs, but it'll wrap.
@@ -486,7 +486,7 @@ void votrax_sc01_device::chip_update()
 	m_noise = ((m_noise << 1) & 0x7ffe) | inp;
 	m_cur_noise = !(((m_noise >> 14) ^ (m_noise >> 13)) & 1);
 
-	//	logerror("tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 2, m_pitch & 3, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
+	//  logerror("tick %02x.%03x 625=%d 208=%d pitch=%02x.%x ns=%04x ni=%d noise=%d cl=%x.%x clf=%d/%d\n", m_ticks, m_phonetick, tick_625, tick_208, m_pitch >> 2, m_pitch & 3, m_noise, inp, m_cur_noise, m_closure >> 2, m_closure & 3, m_rom_closure, m_cur_closure);
 }
 
 void votrax_sc01_device::filters_commit(bool force)
@@ -600,7 +600,7 @@ stream_sample_t votrax_sc01_device::analog_calc()
 	double n2 = n * m_filt_fc / 15.0;
 	shift_hist(n2, m_noise_3);
 
-	// 8. Apply the f2 filter, noise half, 
+	// 8. Apply the f2 filter, noise half,
 	n2 = apply_filter(m_noise_3, m_noise_4, m_f2n_a, m_f2n_b);
 	shift_hist(n2, m_noise_4);
 
@@ -893,7 +893,7 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
 
 /*
   Used to shape the white noise
-  
+
          +-------------------------------------------------------------------+
          |                                                                   |
          +--|C1|--+---------|C3|----------+--|C4|--+                         |
@@ -902,10 +902,10 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
    -|R0|-+--+-\   |      |        |       |  |\    |      (1)      (1)       |
             |  >--+--(2)-+--|C2|--+---(2)-+--+-\   |       |        |        |
           0-++/          |                   |  >--+--(2)--+--|C5|--+---(2)--+
-            |/          Vo                 0-++/           
+            |/          Vo                 0-++/
                                              |/
    Equivalent:
-   
+
          +------------------|R5|-------------------+
          |                                         |
          +--|C1|--+---------|C3|----------+--|C4|--+
@@ -914,7 +914,7 @@ void votrax_sc01_device::build_lowpass_filter(double *a, double *b,
    -|R0|-+--+-\   |                       |  |\    |
             |  >--+---------|R2|----------+--+-\   |
           0-++/   |                          |  >--+
-            |/   Vo                        0-++/           
+            |/   Vo                        0-++/
                                              |/
 
   We assume r0 = r2
@@ -980,7 +980,7 @@ void votrax_sc01_device::build_injection_filter(double *a, double *b,
 												double c2b, // Switched cap, over first amp-op, bottom
 												double c3,  // Cap between the two op-amps
 												double c4)  // Cap over second op-amp
-{		
+{
 	// First compute the three coefficients of H(s) = (k0 + k2*s)/(k1 - k2*s)
 	double k0 = m_cclock * c2t;
 	double k1 = m_cclock * (c1b * c3 / c2t - c2t);

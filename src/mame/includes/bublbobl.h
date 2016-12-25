@@ -30,7 +30,7 @@ public:
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch")		
+		m_soundlatch(*this, "soundlatch")
 	{ }
 
 	/* memory pointers */

@@ -78,10 +78,10 @@ namespace netlist
 			for (std::size_t i=0; i<11; i++)
 			a |= (m_A[i]() << i);
 
-            if (m_ROM() != nullptr)
-            {
-			    d = ((std::uint_fast8_t*)(m_ROM()))[a];
-            }
+			if (m_ROM() != nullptr)
+			{
+				d = ((std::uint_fast8_t*)(m_ROM()))[a];
+			}
 
 			if (m_last_EPQ)
 				delay = NLTIME_FROM_NS(120);

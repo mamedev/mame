@@ -2567,7 +2567,7 @@ explanation ingame.
 void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum)
 {
 	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
-	
+
 	ROM[bra_offset/2] = bra_value;
 	ROM[0x3fffe/2] = checksum;
 }

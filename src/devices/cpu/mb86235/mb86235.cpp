@@ -17,7 +17,7 @@
 #include "mb86235fe.h"
 
 
-#define ENABLE_DRC		0
+#define ENABLE_DRC      0
 
 
 #define CACHE_SIZE                      (1 * 1024 * 1024)
@@ -243,7 +243,7 @@ void mb86235_device::fifoin_w(uint64_t data)
 	printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
 
 	m_core->fifoin.data[m_core->fifoin.wpos] = data;
-	
+
 	m_core->fifoin.wpos++;
 	m_core->fifoin.wpos &= FIFOIN_SIZE-1;
 	m_core->fifoin.num++;

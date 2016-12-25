@@ -215,7 +215,7 @@ WRITE8_MEMBER(srmp2_state::adpcm_code_w)
 	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
 	//printf("%02x %08x %08x %08x\n",data,m_adpcm_sptr,m_adpcm_eptr,((m_adpcm_bank * 0x10000) + (data << 2) + 0));
-	
+
 	m_msm->reset_w(0);
 	m_adpcm_data = -1;
 }

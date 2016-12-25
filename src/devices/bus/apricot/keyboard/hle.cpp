@@ -5,9 +5,9 @@
     ACT Apricot Keyboard (HLE)
 
     TODO:
-	- MicroScreen emulation
-	- Mouse emulation
-	- LEDs
+    - MicroScreen emulation
+    - Mouse emulation
+    - LEDs
 
     Keyboard to System:
     - 01-60: Key make codes

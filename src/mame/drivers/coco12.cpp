@@ -470,4 +470,4 @@ COMP(  1985?,   coco2b,     coco,   0,      coco2b,    coco, driver_device,     
 COMP(  1984,    cp400,      coco,   0,      cp400,     coco, driver_device,      0,      "Prologica",            "CP400", 0)
 COMP(  1984,    lzcolor64,  coco,   0,      coco,      coco, driver_device,      0,      "Digiponto",            "LZ Color64", 0)
 COMP(  1984,    mx1600,     coco,   0,      coco,      coco, driver_device,      0,      "Dynacom",              "MX-1600", 0)
-COMP(  1986,    t4426,	    coco,   0,      t4426,     coco, driver_device,      0,      "Terco AB",             "Terco 4426 CNC Programming station", MACHINE_NOT_WORKING)
+COMP(  1986,    t4426,      coco,   0,      t4426,     coco, driver_device,      0,      "Terco AB",             "Terco 4426 CNC Programming station", MACHINE_NOT_WORKING)

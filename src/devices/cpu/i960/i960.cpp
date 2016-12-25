@@ -105,8 +105,8 @@ uint32_t i960_cpu_device::get_ea(uint32_t opcode)
 		switch(mode) {
 		case 0x4:
 			return m_r[abase];
-			
-		case 0x5:	// address of this instruction + the offset dword + 8
+
+		case 0x5:   // address of this instruction + the offset dword + 8
 			// which in reality is "address of next instruction + the offset dword"
 			ret = m_direct->read_dword(m_IP);
 			m_IP += 4;
@@ -657,7 +657,7 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			m_icount--;
 			bxx(opcode, 7);
 			break;
-			
+
 		case 0x18: // faultno
 			m_icount--;
 			if(!(m_AC & 7)) {
@@ -1126,10 +1126,10 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 				cmp_s(t1, t2);
 				set_ri(opcode, t2-1);
 				break;
-				
+
 			case 0xc: // scanbyte
 				m_icount -= 2;
-				m_AC &= ~7;		// clear CC
+				m_AC &= ~7;     // clear CC
 				t1 = get_1_ri(opcode);
 				t2 = get_2_ri(opcode);
 				if ((t1 & 0xff000000) == (t2 & 0xff000000) ||
@@ -1379,15 +1379,15 @@ void i960_cpu_device::execute_op(uint32_t opcode)
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // calls
 				t1 = get_1_ri(opcode);
-				t2 = m_program->read_dword(m_SAT + 152);	// get pointer to system procedure table
+				t2 = m_program->read_dword(m_SAT + 152);    // get pointer to system procedure table
 				t2 = m_program->read_dword(t2 + 48 + (t1 * 4));
 				if ((t2 & 3) != 0)
 				{
 					fatalerror("I960: system calls that jump into supervisor mode aren't yet supported\n");
 				}
-				do_call(t2, 0, m_r[I960_SP]); 
+				do_call(t2, 0, m_r[I960_SP]);
 				break;
-				
+
 			case 0xd: // flushreg
 				if (m_rcache_pos > 4)
 				{

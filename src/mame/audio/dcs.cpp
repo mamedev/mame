@@ -246,7 +246,7 @@ enum
 
 #define DSIO_DM_PG      ((m_dsio.reg[2] >> 0) & 0x7ff)
 
-#define DSIO_BANK_END	0x7ff
+#define DSIO_BANK_END   0x7ff
 
 /* these macros are used to reference the DENVER ASIC */
 #define DENV_DSP_SPEED  ((m_dsio.reg[1] >> 2) & 3)    /* read only: 1=33.33MHz */

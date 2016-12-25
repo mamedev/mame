@@ -16,9 +16,9 @@
     strangely features the same encryption as used on the DE-0219 board. It
     also has some edited graphics.
 
-	The DE-0219 PCB seems to have only one 12 MHz XTAL, some images with recognizable XTAL value can be found here:
-	- http://www.jammarcade.net/images/2016/04/Shootout.jpg
-	- http://thumbs.picclick.com/00/s/MTIwMFgxNjAw/z/7iIAAOSw5ClXxbrB/$/Data-East-Shootout-Arcade-Video-Game-Pcb-Circuit-_57.jpg
+    The DE-0219 PCB seems to have only one 12 MHz XTAL, some images with recognizable XTAL value can be found here:
+    - http://www.jammarcade.net/images/2016/04/Shootout.jpg
+    - http://thumbs.picclick.com/00/s/MTIwMFgxNjAw/z/7iIAAOSw5ClXxbrB/$/Data-East-Shootout-Arcade-Video-Game-Pcb-Circuit-_57.jpg
 
 
     Driver by:
@@ -29,8 +29,8 @@
     TODO:
 
     - Lots of unmapped memory reads and writes (sprram or vram mirrors, perhaps...), bg_vram is also read.
-	- Does the korean bootleg really have the DECO 222 CPU? I think it should use the shootclr.003 prom to decrypt the opcodes.
-	  Something like -> rom [addr] = (rom [addr] & 0x0F) | proms [rom [addr] >> 4]]);
+    - Does the korean bootleg really have the DECO 222 CPU? I think it should use the shootclr.003 prom to decrypt the opcodes.
+      Something like -> rom [addr] = (rom [addr] & 0x0F) | proms [rom [addr] >> 4]]);
 
 *******************************************************************************/
 
@@ -76,15 +76,15 @@ WRITE8_MEMBER(shootout_state::flipscreen_w)
 }
 
 /*
-	This is actually a double BCD counter (2 BCD digits packet in a byte)...
-	The first write is always 0x40, then when a coin is inserted it starts to count from 0x01 up to 0x99.
-	When it reaches 99 credits, 0x99 is always written... 
+    This is actually a double BCD counter (2 BCD digits packet in a byte)...
+    The first write is always 0x40, then when a coin is inserted it starts to count from 0x01 up to 0x99.
+    When it reaches 99 credits, 0x99 is always written...
 
-	On the shootoutj and shootoutb sets, it works as above but it counts up to 0x09 instead of 0x99 (Single BCD digit).
+    On the shootoutj and shootoutb sets, it works as above but it counts up to 0x09 instead of 0x99 (Single BCD digit).
 
-	Note:
-	This should be an input for a BCD to 7-segment decoder (e.g. a 74LS47), but all the PCBs I've seen don't have 'onboard'
-	display(s), so this was implemented as normal "coin counter" (after all, they both have the same goal: count credits ;))
+    Note:
+    This should be an input for a BCD to 7-segment decoder (e.g. a 74LS47), but all the PCBs I've seen don't have 'onboard'
+    display(s), so this was implemented as normal "coin counter" (after all, they both have the same goal: count credits ;))
 */
 WRITE8_MEMBER(shootout_state::coincounter_w)
 {
@@ -93,7 +93,7 @@ WRITE8_MEMBER(shootout_state::coincounter_w)
 		// Do a coin pulse
 		machine().bookkeeping().coin_counter_w(0, 0);
 		machine().bookkeeping().coin_counter_w(0, 1);
-	
+
 		m_ccnt_old_val = data;
 	}
 }
@@ -282,9 +282,9 @@ static MACHINE_CONFIG_START( shootout, shootout_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 
- 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
+	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
 	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
-	
+
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootout)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -311,10 +311,10 @@ static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	
- 	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
+
+	// Guessed parameters based on the 12 MHz XTAL, but they seem resonable (TODO: Real PCB measurements)
 	MCFG_SCREEN_RAW_PARAMS (XTAL_12MHz / 2, 384, 0, 256, 262, 8, 248)
-	
+
 	MCFG_SCREEN_UPDATE_DRIVER(shootout_state, screen_update_shootouj)
 	MCFG_SCREEN_PALETTE("palette")
 

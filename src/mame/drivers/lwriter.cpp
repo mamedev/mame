@@ -4,8 +4,8 @@
 
     Apple LaserWriter II NT driver
 
-    TODO: 
-	- Figure out what VIA pins is connected to switch on front that selects LocalTalk
+    TODO:
+    - Figure out what VIA pins is connected to switch on front that selects LocalTalk
     - Let the board identify itself to a emulated mac driver so it displays the printer icon on the desktop
     - Everything else
 
@@ -13,11 +13,11 @@
 /*
  * Hardware: 68000@11.16 MHz
              8530 SCC
-			 6523 TPI or 6522 VIA on newer pcb:s
-			 2MB DRAM
-			 2KB SRAM
-			 custom 335-0022 EEPROM
-			 1MB ROM
+             6523 TPI or 6522 VIA on newer pcb:s
+             2MB DRAM
+             2KB SRAM
+             custom 335-0022 EEPROM
+             1MB ROM
 
    +------------------------------------------------------------------------------------------------------------------------+=====+
    |      1           2            3           4            5          6          7          8        9        10     11    |     #
@@ -58,7 +58,7 @@
    +------------------------------------------------------------------------------------------------------------------------+=====+
  */
 
-#define TPI 0  //The TPI is used on the original M6009 board but the first dump is from a newer that uses a VIA 
+#define TPI 0  //The TPI is used on the original M6009 board but the first dump is from a newer that uses a VIA
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
@@ -69,7 +69,7 @@
 #include "machine/6525tpi.h"
 #else
 #include "machine/6522via.h"
-#endif 
+#endif
 
 class lwriter_state : public driver_device
 {
@@ -105,7 +105,7 @@ static ADDRESS_MAP_START (maincpu_map, AS_PROGRAM, 16, lwriter_state)
 	AM_RANGE(0x00000000, 0x00000007) AM_ROM AM_READ(bootvect_r) /* ROM mirror just during reset */
 	AM_RANGE(0x00000000, 0x00000007) AM_RAM AM_WRITE(bootvect_w) /* After first write we act as RAM */
 	AM_RANGE(0x00000008, 0x001fffff) AM_RAM /* 2 Mb DRAM */
-	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("roms", 0) 
+	AM_RANGE(0x00200000, 0x003fffff) AM_ROM AM_REGION("roms", 0)
 
 	AM_RANGE(0x00c00000, 0x00c00001) AM_DEVWRITE8("scc", scc8530_device, ca_w, 0x00ff)
 	AM_RANGE(0x00c00004, 0x00c00005) AM_DEVWRITE8("scc", scc8530_device, da_w, 0x00ff)
@@ -186,14 +186,14 @@ MACHINE_CONFIG_END
 /* SCC init sequence
  * :scc B Reg 09 <- c0 - Master Interrupt Control - Device reset
  * -
- * :scc A Reg 0f <- 00 - External/Status Control Bits - Disable all 
- * :scc B Reg 05 <- 02 - Tx setup: 5 bits, Tx disable, RTS:1 DTR:0  
- * :scc B Reg 05 <- 00 - Tx setup: 5 bits, Tx disable, RTS:0 DTR:0  
+ * :scc A Reg 0f <- 00 - External/Status Control Bits - Disable all
+ * :scc B Reg 05 <- 02 - Tx setup: 5 bits, Tx disable, RTS:1 DTR:0
+ * :scc B Reg 05 <- 00 - Tx setup: 5 bits, Tx disable, RTS:0 DTR:0
  * -
  * :scc A Reg 09 <- c0 - Master Interrupt Control - Device reset
  *
  * -
- * :scc A Reg 0f <- 00 - External/Status Control Bits - Disable all 
+ * :scc A Reg 0f <- 00 - External/Status Control Bits - Disable all
  * :scc A Reg 04 <- 4c - Setting up Asynchrounous mode: 2 Stop bits, No parity, 16x clock
  * :scc A Reg 0b <- 50 - Clock Mode Control - TTL clk on RTxC, Rx and Tx clks from BRG, TRxC is input
  * :scc A Reg 0e <- 00 - Misc Control Bits - BRG clk is RTxC, BRG is disabled
@@ -202,7 +202,7 @@ MACHINE_CONFIG_END
  * :scc A Reg 0e <- 01 - BRG enabled with external clk from RTxC
  * :scc A Reg 0a <- 00 - Synchronous parameters, all turned off
  * :scc A Reg 03 <- c1 - Rx setup: 8 bits, Rx enabled
- * :scc A Reg 05 <- 6a - Tx setup: 8 bits, Tx enable, RTS:1 DTR:0 
+ * :scc A Reg 05 <- 6a - Tx setup: 8 bits, Tx enable, RTS:1 DTR:0
  * -
  * :scc A Reg 01 <- 00 - Rx interrupt disabled
  * :scc A Reg 01 <- 30 - Wait/Ready on receive, Rx int an all characters, parity affect vector
@@ -212,7 +212,7 @@ MACHINE_CONFIG_END
  * :scc A Reg 00 <- 30 - Error Reset command
  * :scc A Reg 00 <- 30 - Error Reset command
  * - last three loops
-*/ 
+*/
 
 ROM_START(lwriter)
 	ROM_REGION16_BE (0x1000000, "roms", 0)

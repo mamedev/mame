@@ -18,14 +18,14 @@ namespace netlist
 		, m_J(*this, "J")
 		, m_K(*this, "K")
 		, m_CLRQ(*this, "CLRQ")
-        , m_last_CLK(*this, "m_last_CLK", 0)
-        , m_q(*this, "m_q", 0)
+		, m_last_CLK(*this, "m_last_CLK", 0)
+		, m_q(*this, "m_q", 0)
 		, m_Q(*this, "Q")
 		, m_QQ(*this, "QQ")
 		{
 		}
 
-        NETLIB_RESETI();
+		NETLIB_RESETI();
 		NETLIB_UPDATEI();
 
 	public:
@@ -34,10 +34,10 @@ namespace netlist
 		logic_input_t m_K;
 		logic_input_t m_CLRQ;
 
-        state_var<unsigned> m_last_CLK;
-        state_var<unsigned> m_q;
+		state_var<unsigned> m_last_CLK;
+		state_var<unsigned> m_q;
 
-        logic_output_t m_Q;
+		logic_output_t m_Q;
 		logic_output_t m_QQ;
 	};
 
@@ -104,38 +104,38 @@ namespace netlist
 		NETLIB_SUB(7473A) m_2;
 	};
 
-    NETLIB_RESET(7473)
-    {
-        m_last_CLK = 0;
-    }
+	NETLIB_RESET(7473)
+	{
+		m_last_CLK = 0;
+	}
 
-    NETLIB_UPDATE(7473)
+	NETLIB_UPDATE(7473)
 	{
 		const auto JK = (m_J() << 1) | m_K();
 
 		if (m_CLRQ())
 		{
 			if (!m_CLK() && m_last_CLK)
-            {
-			    switch (JK)
-			    {
-				    case 1:             // (!m_J) & m_K))
-                        m_q = 0;
-					    break;
-				    case 2:             // (m_J) & !m_K))
-                        m_q = 1;
-					    break;
-				    case 3:             // (m_J) & m_K))
-                        m_q ^= 1;
-					    break;
-				    default:
-				    case 0:
-					    break;
-			    }
-            }
+			{
+				switch (JK)
+				{
+					case 1:             // (!m_J) & m_K))
+						m_q = 0;
+						break;
+					case 2:             // (m_J) & !m_K))
+						m_q = 1;
+						break;
+					case 3:             // (m_J) & m_K))
+						m_q ^= 1;
+						break;
+					default:
+					case 0:
+						break;
+				}
+			}
 		}
 
-        m_last_CLK = m_CLK();
+		m_last_CLK = m_CLK();
 
 		m_Q.push(m_q, NLTIME_FROM_NS(20)); // FIXME: timing
 		m_QQ.push(m_q ^ 1, NLTIME_FROM_NS(20)); // FIXME: timing

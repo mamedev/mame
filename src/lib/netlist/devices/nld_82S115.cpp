@@ -101,7 +101,7 @@ namespace netlist
 
 		m_last_O = o;
 
-        // FIXME: Outputs are tristate. This needs to be properly implemented
+		// FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<8; i++)
 			m_O[i].push((o >> i) & 1, NLTIME_FROM_NS(40)); // FIXME: Timing
 	}

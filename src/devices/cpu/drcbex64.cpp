@@ -289,7 +289,7 @@ static uint8_t float_register_map[REG_F_COUNT] =
 {
 #ifdef X64_WINDOWS_ABI
 	REG_XMM6, REG_XMM7, REG_XMM8, REG_XMM9, REG_XMM10, REG_XMM11, REG_XMM12, REG_XMM13, REG_XMM14, REG_XMM15
-#else 
+#else
 	// on AMD x64 ABI, XMM0-7 are FP function args.  since this code has no args, and we
 	// save/restore them around CALLC, they should be safe for our use.
 	REG_XMM0, REG_XMM1, REG_XMM2, REG_XMM3, REG_XMM4, REG_XMM5, REG_XMM6, REG_XMM7

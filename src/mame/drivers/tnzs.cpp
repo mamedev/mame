@@ -763,8 +763,8 @@ static ADDRESS_MAP_START( tnzs_sub_map, AS_PROGRAM, 8, tnzs_mcu_state )
 	AM_RANGE(0xc000, 0xc001) AM_READWRITE(mcu_r, mcu_w)   /* not present in insectx */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(bankswitch1_w)
 	AM_RANGE(0xf000, 0xf003) AM_READ(analog_r) /* paddles in arkanoid2/plumppop. The ports are */
-	                                           /* read but not used by the other games, and are not read at */
-	                                           /* all by insectx. */
+											   /* read but not used by the other games, and are not read at */
+											   /* all by insectx. */
 	AM_IMPORT_FROM(base_sub_map)
 ADDRESS_MAP_END
 
@@ -1697,49 +1697,49 @@ MACHINE_CONFIG_END
   PCBs
 
 ***************************************************************************/
-/*	The TNZS/Seta hardware has a variety of somewhat different pcbs, all of
-	which have both Seta and Taito Part numbers.
-	All pcbs have Z80B processors and one 6264 mainram chip and an X1-001
-	and X1-002 video chip and an X1-004 I/O? Chip, and four PALs
+/*  The TNZS/Seta hardware has a variety of somewhat different pcbs, all of
+    which have both Seta and Taito Part numbers.
+    All pcbs have Z80B processors and one 6264 mainram chip and an X1-001
+    and X1-002 video chip and an X1-004 I/O? Chip, and four PALs
 
-Seta#		Taito#s				CPUS	RxM2	ROM1	MCU?	Video ram	PROMs	SETA X1	GFXROMs		QUADRATURE	ESD. PROT	Games							Picture
-P0-022-A	K1100245A J1100108A	2xZ80B	512/256	512/256	8042	4x6116		Yes, 2	03		23c1000		uPD4701AC	3x X2-003	arkanoid2, plumppop(A)			http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
-P0-025-A	K1100241A J1100107A	2xZ80B	512/256	512/256	8042	4x6116		Yes, 2	03		23c1000		N/A			3x X2-003	drtoppel,extermatn,chukatai(B)	http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
-P0-028-A	K1100416A J1100332A	2xZ80B	512/256	512/256	8042	4x6116		No		05,06	23c1000		N/A			3x X2-004	chukatai(B)						http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
-P0-038A 	M6100309A           3xZ80B	512/256	512/256	NONE	1x6164		No		05,06	23c1000		N/A			3x X2-003	kageki							http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
-P0-041-1	CA403001A          	2xZ80B	61256	27c1000	8742	1x6164		No		05,06	27c1000		N/A			5x X2-005	tnzsop(C)						http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
-P0-041-A	K1100356A J1100156A	2xZ80B	61256	27c1000	8042	1x6164		No		05,06	23c1000		N/A			5x X2-005	tnzs(j,u)o						http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
-P0-043A 	M6100356A          	3xZ80B*	61256	27512**	NONE	1x6164		No		05,06	LH534000(C)	N/A			4x X2-004	tnzs(j,u), kabukiz				http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
-P0-056A 	K1100476A J1100201A	3xZ80B	EMPTY*3	27c1000	NONE	1x6164		No		05,06	LH534000	U43???		5x X2-005	insectx(D)						http://www.jammarcade.net/images/2014/04/InsectorX.jpg
+Seta#       Taito#s             CPUS    RxM2    ROM1    MCU?    Video ram   PROMs   SETA X1 GFXROMs     QUADRATURE  ESD. PROT   Games                           Picture
+P0-022-A    K1100245A J1100108A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     uPD4701AC   3x X2-003   arkanoid2, plumppop(A)          http://www.classicarcaderesource.com/RevengeOfDoh3.jpg
+P0-025-A    K1100241A J1100107A 2xZ80B  512/256 512/256 8042    4x6116      Yes, 2  03      23c1000     N/A         3x X2-003   drtoppel,extermatn,chukatai(B)  http://arcade.ym2149.com/pcb/taito/drtoppel_pcb_partside.jpg
+P0-028-A    K1100416A J1100332A 2xZ80B  512/256 512/256 8042    4x6116      No      05,06   23c1000     N/A         3x X2-004   chukatai(B)                     http://i.ebayimg.com/images/g/AhoAAOSw-FZXj5A5/s-l1600.jpg
+P0-038A     M6100309A           3xZ80B  512/256 512/256 NONE    1x6164      No      05,06   23c1000     N/A         3x X2-003   kageki                          http://i.ebayimg.com/images/a/(KGrHqJ,!lwE6C8-G97lBOjOu9mwVw~~/s-l1600.jpg
+P0-041-1    CA403001A           2xZ80B  61256   27c1000 8742    1x6164      No      05,06   27c1000     N/A         5x X2-005   tnzsop(C)                       http://arcade.ym2149.com/pcb/taito/tnzs_pcb3_partside.jpg
+P0-041-A    K1100356A J1100156A 2xZ80B  61256   27c1000 8042    1x6164      No      05,06   23c1000     N/A         5x X2-005   tnzs(j,u)o                      http://arcade.ym2149.com/pcb/taito/tnzs_pcb1_partside.jpg
+P0-043A     M6100356A           3xZ80B* 61256   27512** NONE    1x6164      No      05,06   LH534000(C) N/A         4x X2-004   tnzs(j,u), kabukiz              http://arcade.ym2149.com/pcb/taito/tnzs_pcb2_mainboard_partside.jpg
+P0-056A     K1100476A J1100201A 3xZ80B  EMPTY*3 27c1000 NONE    1x6164      No      05,06   LH534000    U43???      5x X2-005   insectx(D)                      http://www.jammarcade.net/images/2014/04/InsectorX.jpg
 
 (A) It is very likely plumppop also uses this P0-022-A PCB, as the game reads
-	the quadratures the same way as arkanoid2 does.
-	arkanoid2 only has 1 x2-003 ESD protection resistor pack populated, but the
-	PCB can have 3, the other two (for more joysticks/buttons?) are not
-	populated. arkanoid2's second maincpu socket is also empty, but this is
-	clearly not the case for plumppop.
+    the quadratures the same way as arkanoid2 does.
+    arkanoid2 only has 1 x2-003 ESD protection resistor pack populated, but the
+    PCB can have 3, the other two (for more joysticks/buttons?) are not
+    populated. arkanoid2's second maincpu socket is also empty, but this is
+    clearly not the case for plumppop.
 (B) chukatai has one set which unlike its earlier sets uses the P0-025-A
-	PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
-	sockets into 8 27c1000 eprom sockets, and DOES use color PROMs!
-	The other pcb set uses P0-028-A pcb and 23c1000 mask roms and color RAM,
-	but has lower rom id numbers. The higher numbered set  was likely created
-	by Taito to 'use up' a stock of older P0-025-A pcbs.
+    PCB, but with a daughterboard which converts four of the 23c1000 gfx ROM
+    sockets into 8 27c1000 eprom sockets, and DOES use color PROMs!
+    The other pcb set uses P0-028-A pcb and 23c1000 mask roms and color RAM,
+    but has lower rom id numbers. The higher numbered set  was likely created
+    by Taito to 'use up' a stock of older P0-025-A pcbs.
 (C) This is a development/prototype PCB, hence it has 32 pin sockets for the
-	gfx ROMs as 27c1000 eproms, instead of 28 pin sockets for 23c1000 mask
-	ROMs. It also uses an (unprotected?) 8742 MCU.
-	Another curious thing is the Taito ID number may have accidentally been
-	printed in backwards order, i.e should be C1100304A which fits the pattern
-	of the other boards.
+    gfx ROMs as 27c1000 eproms, instead of 28 pin sockets for 23c1000 mask
+    ROMs. It also uses an (unprotected?) 8742 MCU.
+    Another curious thing is the Taito ID number may have accidentally been
+    printed in backwards order, i.e should be C1100304A which fits the pattern
+    of the other boards.
 (D) InsectorX has a lot of rework on its PCB, two greenwires for each of the
-	two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
-	pins 18, 19, 20, and 21, connecting it to 4 pins of a dip16 chip @ U43
-	with its markings sanded off. Is this chip at U43 a tiny MCU?
-*	tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
-	plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
-	Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
-	acts in place of the 8x42 mcu used by the older tnzs sets.
-**	This is a 28-pin 27512 in a 32-pin socket which alternately holds a 27c1000.
-*3	This is unpopulated, but the pcb can accept a 61256 SRAM here.
+    two LH534000 mask ROMs, and four wires connected to the X1-004 I/O chip
+    pins 18, 19, 20, and 21, connecting it to 4 pins of a dip16 chip @ U43
+    with its markings sanded off. Is this chip at U43 a tiny MCU?
+*   tnzs(j,u) uses a sub board with a z80b and 23c1000 mask ROMs on it for gfx,
+    plugged into the four LH534000 mask ROM sockets and the 2nd z80 socket.
+    Like Kageki's P0-038A mainboard, this mainboard has a third z80 on it which
+    acts in place of the 8x42 mcu used by the older tnzs sets.
+**  This is a 28-pin 27512 in a 32-pin socket which alternately holds a 27c1000.
+*3  This is unpopulated, but the pcb can accept a 61256 SRAM here.
 */
 
 

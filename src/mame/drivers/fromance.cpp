@@ -890,7 +890,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));
 	save_item(NAME(m_portselect));
-	
+
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_vclk_left));

@@ -490,7 +490,7 @@ static MACHINE_CONFIG_START( pg685, pg685_state )
 	// MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(zorba_state, fdc_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", pg685_floppies, "525qd", floppy_image_device::default_floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	
+
 	// harddisk
 	MCFG_DEVICE_ADD("hdc", WD2010, XTAL_10MHz / 2) // divider guessed
 	MCFG_WD2010_OUT_INTRQ_CB(DEVWRITELINE("mainpic", pic8259_device, ir3_w))

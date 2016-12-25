@@ -6,19 +6,19 @@
 
     Zorro-II IDE controller
 
-	The 'speed' register is used to select the IDE timing according to
-	the following table (bits 7-5 are used):
+    The 'speed' register is used to select the IDE timing according to
+    the following table (bits 7-5 are used):
 
-	0    497ns   7c  to select, IOR/IOW after 172ns  2c
-	1    639ns   9c  to select, IOR/IOW after 243ns  3c
-	2    781ns  11c  to select, IOR/IOW after 314ns  4c
-	3    355ns   5c  to select, IOR/IOW after 101ns  1c
-	4    355ns   5c  to select, IOR/IOW after 172ns  2c
-	5    355ns   5c  to select, IOR/IOW after 243ns  3c
-	6   1065ns  15c  to select, IOR/IOW after 314ns  4c
-	7    355ns   5c  to select, IOR/IOW after 101ns  1c
+    0    497ns   7c  to select, IOR/IOW after 172ns  2c
+    1    639ns   9c  to select, IOR/IOW after 243ns  3c
+    2    781ns  11c  to select, IOR/IOW after 314ns  4c
+    3    355ns   5c  to select, IOR/IOW after 101ns  1c
+    4    355ns   5c  to select, IOR/IOW after 172ns  2c
+    5    355ns   5c  to select, IOR/IOW after 243ns  3c
+    6   1065ns  15c  to select, IOR/IOW after 314ns  4c
+    7    355ns   5c  to select, IOR/IOW after 101ns  1c
 
-	c = clock cycles. This isn't emulated.
+    c = clock cycles. This isn't emulated.
 
 ***************************************************************************/
 

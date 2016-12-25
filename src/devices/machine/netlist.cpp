@@ -249,7 +249,7 @@ void netlist_ram_pointer_t::device_start()
 		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
 	}
 
-    m_data = (*m_param)();
+	m_data = (*m_param)();
 }
 
 // ----------------------------------------------------------------------------------------
