@@ -1219,7 +1219,7 @@ void lua_engine::initialize()
  * port:active() - get port status
  * port:live() - get port ioport_port_live (TODO: not usable from lua as of now)
  * port:read() - get port value
- * port:write(val, mask) - set port to value & mask
+ * port:write(val, mask) - set port to value & mask (output fields only, for other fields use field:set_value(val))
  * port:field(mask) - get ioport_field for port and mask
  * port.field[] - get ioport_field table
  */
