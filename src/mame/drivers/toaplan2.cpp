@@ -4010,7 +4010,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( enmadaio, toaplan2_state )
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
 	MCFG_CPU_PROGRAM_MAP(enmadaio_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
@@ -4038,7 +4038,7 @@ static MACHINE_CONFIG_START( enmadaio, toaplan2_state )
 	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MCFG_OKIM6295_ADD("oki", XTAL_27MHz/8, OKIM6295_PIN7_HIGH) // not confirmed
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) // pin7 not confirmed
 	MCFG_DEVICE_ADDRESS_MAP(AS_0, enmadaio_oki)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
