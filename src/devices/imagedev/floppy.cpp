@@ -110,6 +110,9 @@ const device_type TEAC_FD_55G = &device_creator<teac_fd_55g>;
 // ALPS 5.25" drives
 const device_type ALPS_3255190x = &device_creator<alps_3255190x>;
 
+// IBM 8" drives
+const device_type IBM_6360 = &device_creator<ibm_6360>;
+
 
 const floppy_format_type floppy_image_device::default_floppy_formats[] = {
 	FLOPPY_D88_FORMAT,
@@ -2258,3 +2261,34 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 	var_count = 0;
 	variants[var_count++] = floppy_image::SSSD;
 }
+
+//-------------------------------------------------
+//  IBM 6360 -- 8" single-sided single density
+//-------------------------------------------------
+
+ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+{
+}
+
+ibm_6360::~ibm_6360()
+{
+}
+
+//ol ibm_6360::trk00_r() { return true; }
+
+void ibm_6360::setup_characteristics()
+{
+	form_factor = floppy_image::FF_8;
+	tracks = 77;
+	sides = 1;
+	motor_always_on = true;
+	set_rpm(360);
+}
+
+void ibm_6360::handled_variants(uint32_t *variants, int &var_count) const
+{
+	var_count = 0;
+	variants[var_count++] = floppy_image::SSSD;
+}
+

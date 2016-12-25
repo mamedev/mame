@@ -245,6 +245,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55e, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55f, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(teac_fd_55g, "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(alps_3255190x, "floppy_5_25")
+DECLARE_FLOPPY_IMAGE_DEVICE(ibm_6360, "floppy_8")
 
 extern const device_type FLOPPYSOUND;
 
@@ -340,5 +341,6 @@ extern const device_type TEAC_FD_55E;
 extern const device_type TEAC_FD_55F;
 extern const device_type TEAC_FD_55G;
 extern const device_type ALPS_3255190x;
+extern const device_type IBM_6360;
 
 #endif /* FLOPPY_H */

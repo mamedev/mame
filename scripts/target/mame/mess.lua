@@ -2028,6 +2028,15 @@ files {
 	MAME_DIR .. "src/mame/drivers/hk68v10.cpp",
 }
 
+createMESSProjects(_target, _subtarget, "ibm6580")
+files {
+	MAME_DIR .. "src/mame/drivers/ibm6580.cpp",
+	MAME_DIR .. "src/mame/machine/ibm6580_kbd.cpp",
+	MAME_DIR .. "src/mame/machine/ibm6580_kbd.h",
+	MAME_DIR .. "src/mame/machine/ibm6580_fdc.cpp",
+	MAME_DIR .. "src/mame/machine/ibm6580_fdc.h",
+}
+
 createMESSProjects(_target, _subtarget, "intel")
 files {
 	MAME_DIR .. "src/mame/drivers/basic52.cpp",
@@ -3306,7 +3315,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/hunter2.cpp",
 	MAME_DIR .. "src/mame/drivers/i7000.cpp",
 	MAME_DIR .. "src/mame/drivers/ibm3153.cpp",
-	MAME_DIR .. "src/mame/drivers/ibm6580.cpp",
 	MAME_DIR .. "src/mame/drivers/icatel.cpp",
 	MAME_DIR .. "src/mame/drivers/ie15.cpp",
 	MAME_DIR .. "src/mame/machine/ie15_kbd.cpp",
