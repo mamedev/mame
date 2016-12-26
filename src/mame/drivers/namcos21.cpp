@@ -2637,7 +2637,11 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-// TODO: emulate neutral state + clutch (apparently done mechanically)
+/*  1 3 5   
+	|-|-|   Gearbox scheme is identical to Ridge Racer deluxe and Ace Driver
+	2 4 6
+*/
+// TODO: convert to namcoio_gearbox_device
 CUSTOM_INPUT_MEMBER(namcos21_state::driveyes_gearbox_r)
 {
 	bool clutch_pressed = (ioport("PORTB")->read() & 8) == 0;
@@ -2646,7 +2650,7 @@ CUSTOM_INPUT_MEMBER(namcos21_state::driveyes_gearbox_r)
 		return m_gearbox_state;
 	
 	m_gearbox_state = ioport("GEARBOX")->read() & 0xf;
-	
+
 	return m_gearbox_state;
 }
 
