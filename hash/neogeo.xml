@@ -2020,6 +2020,39 @@
 		</part>
 	</software>
 
+	<software name="kotm2a" cloneof="kotm2">
+		<description>King of the Monsters 2 - The Next Thing (older)</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="キング・オブ・ザ・モンスターズ2 ―ネクストシング―"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="039_p1.p1" offset="0x000000" size="0x080000" crc="8d186638" sha1="c3874bbb1bfcb220173afb2e0a2123ffaeb7bd2b" />   <!-- TC534200 -->
+				<rom loadflag="load16_word_swap" name="039-p2.p2" offset="0x080000" size="0x080000" crc="28661afe" sha1="6c85ff6ab334b1ca744f726f42dac211537e7315" />   <!-- TC534200 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="039-s1.s1" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="039-m1.m1" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x300000">
+				<rom name="039-v2.v2" offset="0x000000" size="0x200000" crc="86d34b25" sha1="89bdb614b0c63d678962da52e2f596750d20828c" />   <!-- TC5316200 -->
+				<rom name="039-v4.v4" offset="0x200000" size="0x100000" crc="8fa62a0b" sha1="58ac2fdd73c542eb8178cfc4adfa0e5940183283" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x600000">
+				<rom loadflag="load16_byte" name="039-c1.c1" offset="0x000000" size="0x100000" crc="6d1c4aa9" sha1="4fbc9d7cb37522ec298eefbe38c75a2d050fbb4a" />    <!-- TC5316200 -->
+				<rom size="0x100000" offset="0x400000" loadflag="continue" />
+				<rom loadflag="load16_byte" name="039-c2.c2" offset="0x000001" size="0x100000" crc="f7b75337" sha1="4d85f85948c3e6ed38b0b0ccda79de3ce026e2d9" />    <!-- TC5316200 -->
+				<rom size="0x100000" offset="0x400001" loadflag="continue" />
+				<rom loadflag="load16_byte" name="039-c3.c3" offset="0x200000" size="0x080000" crc="bfc4f0b2" sha1="f4abe2b52882b966412f3b503b8f2c8f49b57968" />    <!-- TC534200 -->
+				<rom loadflag="load16_byte" name="039-c4.c4" offset="0x200001" size="0x080000" crc="81c9c250" sha1="e3a34ff69081a8681b5ca895915892dcdccfa7aa" />    <!-- TC534200 -->
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="kotm2p" cloneof="kotm2">
 		<!-- fairly late prototype release, only the code differs from the main set -->
 		<description>King of the Monsters 2 - The Next Thing (prototype)</description>
