@@ -121,8 +121,10 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
 
 	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 
-  MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
+	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
@@ -132,10 +134,10 @@ files{
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 
-  MAME_DIR .. "src/mame/drivers/mario.cpp",
-  MAME_DIR .. "src/mame/includes/mario.h",
-  MAME_DIR .. "src/mame/video/mario.cpp",
-  MAME_DIR .. "src/mame/audio/mario.cpp",
+	MAME_DIR .. "src/mame/drivers/mario.cpp",
+	MAME_DIR .. "src/mame/includes/mario.h",
+	MAME_DIR .. "src/mame/video/mario.cpp",
+	MAME_DIR .. "src/mame/audio/mario.cpp",
 
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",

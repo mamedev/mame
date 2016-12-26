@@ -36,6 +36,7 @@ pong            // (c) 1972 Atari
 pongd           // (c) 1975 Atari
 pongf           // (c) 1972 Atari
 breakout        // (c) 1976 Atari
+stuntcyc        // (c) 1976 Atari
 
 @source:m62.cpp
 battroad                        // (c) 1984
@@ -62,3 +63,4 @@ yanchamr                        // (c) 1986 (Japan)
 youjyudn                        // (c) 1986 (Japan)
 
 hazl1500
+

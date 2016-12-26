@@ -57,7 +57,9 @@
    netlist system per-game:
 
  TM-057 (Stunt Cycle)
-    4136  Quad General-Purpose Operational Amplifiers
+ 	566    Voltage-Controlled Oscillator
+ 	1N751A Zener Diode
+ 	1N752A Zener Diode
 
  TM-055 (Indy 4)
     7406  Hex Inverter Buffers/Drivers with O.C. H.V. Outputs (note: Might not be needed, could just clone from 7404)
@@ -73,6 +75,7 @@
 #include "emu.h"
 
 #include "machine/netlist.h"
+#include "machine/nl_stuntcyc.h"
 #include "netlist/devices/net_lib.h"
 #include "video/fixfreq.h"
 
@@ -84,22 +87,27 @@
 #define H_TOTAL         (0x1C6+1)       // 454
 
 #define HBSTART                 (H_TOTAL)
-#define HBEND                   (80)
+#define HBEND                   (32)
 #define VBSTART                 (V_TOTAL)
 #define VBEND                   (16)
 
 #define HRES_MULT                   (1)
 // end
 
-
+#define SC_HTOTAL		(0x1C8+1)		// 456
+#define SC_VTOTAL		(0x103+1)		// 259
+#define SC_HBSTART		(SC_HTOTAL)
+#define SC_HBEND		(32)
+#define SC_VBSTART		(SC_VTOTAL)
+#define SC_VBEND		(8)
 
 class atarikee_state : public driver_device
 {
 public:
 	atarikee_state(const machine_config &mconfig, device_type type, const char *tag)
-	: driver_device(mconfig, type, tag),
-		m_maincpu(*this, "maincpu"),
-		m_video(*this, "fixfreq")
+		: driver_device(mconfig, type, tag)
+		, m_maincpu(*this, "maincpu")
+		, m_video(*this, "fixfreq")
 	{
 	}
 
@@ -119,7 +127,20 @@ private:
 
 };
 
+class stuntcyc_state : public atarikee_state
+{
+public:
+	stuntcyc_state(const machine_config &mconfig, device_type type, const char *tag)
+		: atarikee_state(mconfig, type, tag)
+		, m_hf1(*this, "maincpu:hf1")
+		, m_d7(*this, "maincpu:d7")
+	{
+	}
 
+private:
+	required_device<netlist_mame_rom_t> m_hf1;
+	required_device<netlist_mame_rom_t> m_d7;
+};
 
 static NETLIST_START(atarikee)
 	SOLVER(Solver, 48000)
@@ -158,6 +179,26 @@ static MACHINE_CONFIG_START( atarikee, atarikee_state )
 	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
 	MCFG_FIXFREQ_HORZ_PARAMS(H_TOTAL-67,H_TOTAL-40,H_TOTAL-8,H_TOTAL)
 	MCFG_FIXFREQ_VERT_PARAMS(V_TOTAL-22,V_TOTAL-19,V_TOTAL-12,V_TOTAL)
+	MCFG_FIXFREQ_FIELDCOUNT(1)
+	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_START( stuntcyc, stuntcyc_state )
+	/* basic machine hardware */
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_NETLIST_SETUP(stuntcyc)
+
+	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "hf1")
+	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "d7")
+
+	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
+
+	/* video hardware */
+	MCFG_FIXFREQ_ADD("fixfreq", "screen")
+	MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	MCFG_FIXFREQ_HORZ_PARAMS(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL)
+	MCFG_FIXFREQ_VERT_PARAMS(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL)
 	MCFG_FIXFREQ_FIELDCOUNT(1)
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
@@ -301,10 +342,10 @@ ROM_END
 ROM_START( stuntcyc )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00 )
 
-	ROM_REGION( 0x0200, "gfx", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0200, "hf1", ROMREGION_ERASE00 )
 	ROM_LOAD( "004275.f1",  0x0000, 0x0200, CRC(4ed5a99d) SHA1(1e5f439bce72e78dfff76fd8f61187c6ef484a64) ) // Motorcycle & Bus
 
-	ROM_REGION( 0x0020, "score", ROMREGION_ERASE00 )
+	ROM_REGION( 0x0020, "d7", ROMREGION_ERASE00 )
 	ROM_LOAD( "004811.d7",  0x0000, 0x0020, CRC(31a09efb) SHA1(fd5d538c9ec1234acf7c74ca0704113d220abbf6) ) // Score Translator
 ROM_END
 
@@ -451,7 +492,7 @@ GAME(1975,  jetfighta, jetfight,  atarikee,   0,  driver_device, 0,  ROT0,  "Ata
 GAME(1976,  outlaw,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Outlaw [TTL]",           MACHINE_IS_SKELETON)
 GAME(1975,  sharkjaw,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Horror Games",    "Shark JAWS [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  steeplec,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Steeplechase [TTL]",     MACHINE_IS_SKELETON)
-GAME(1976,  stuntcyc,  0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
+GAME(1976,  stuntcyc,  0,         stuntcyc,   0,  driver_device, 0,  ROT0,  "Atari",        "Stunt Cycle [TTL]",      MACHINE_IS_SKELETON)
 GAME(1974,  tank,      0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank/Tank Cocktail [TTL]",     MACHINE_IS_SKELETON)
 GAME(1975,  tankii,    0,         atarikee,   0,  driver_device, 0,  ROT0,  "Atari/Kee",    "Tank II [TTL]",          MACHINE_IS_SKELETON)
 

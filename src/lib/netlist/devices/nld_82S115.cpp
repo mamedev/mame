@@ -15,8 +15,8 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR(82S115)
 		, m_A(*this, {{"A0", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"}})
-		, m_CE1(*this, "CE1")
-		, m_CE2Q(*this, "CE2Q")
+		, m_CE1Q(*this, "CE1Q")
+		, m_CE2(*this, "CE2")
 		, m_STROBE(*this, "STROBE")
 		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
 		, m_last_O(*this, "m_last_O", 0)
@@ -29,8 +29,8 @@ namespace netlist
 
 	protected:
 		object_array_t<logic_input_t, 9> m_A;
-		logic_input_t m_CE1;
-		logic_input_t m_CE2Q;
+		logic_input_t m_CE1Q;
+		logic_input_t m_CE2;
 		logic_input_t m_STROBE;
 		object_array_t<logic_output_t, 8> m_O;
 
@@ -53,8 +53,8 @@ namespace netlist
 			register_subalias("5",     m_A[7]);
 			register_subalias("6",     m_A[8]);
 
-			register_subalias("20",    m_CE1);
-			register_subalias("19",    m_CE2Q);
+			register_subalias("20",    m_CE1Q);
+			register_subalias("19",    m_CE2);
 
 			// register_subalias("13",    m_FE1);
 			// register_subalias("11",    m_FE2);
@@ -82,7 +82,7 @@ namespace netlist
 	{
 		unsigned o = 0;
 
-		if (m_CE1() && !m_CE2Q())
+		if (!m_CE1Q() && m_CE2())
 		{
 			if (m_STROBE())
 			{
