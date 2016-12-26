@@ -45,6 +45,15 @@ NETLIST_START(stuntcyc)
 	ALIAS( 32H, L4.QB)
 	ALIAS( 64H, L4.QC)
 	ALIAS(128H, L4.QD)
+	
+	ALIAS(probe_bit0, M4.QA)
+	ALIAS(probe_bit1, M4.QB)
+	ALIAS(probe_bit2, high)
+	ALIAS(probe_bit3, high)
+	ALIAS(probe_bit4, high)
+	ALIAS(probe_bit5, high)
+	ALIAS(probe_bit6, high)
+	ALIAS(probe_clock, CLOCK)
 
 	TTL_74107(K4_1, 128H, P, P, P)
 	ALIAS(256H,  K4_1.Q)
@@ -310,13 +319,15 @@ NETLIST_START(stuntcyc)
 	NET_C(R14.1, V5)
 	RES(R15, RES_K(1))
 	NET_C(R15.1, E4_2.Q)
-	RES(R107, RES_K(1))
+	//RES(R107, RES_K(1))
 
 	DIODE(D17, "1N914")
 	NET_C(D17.K, COMP_SYNC_Q)
-	NET_C(D17.A, R107.1, R13.2, R14.2, R15.2)
+	//NET_C(D17.A, R107.1, R13.2, R14.2, R15.2)
+	NET_C(D17.A, R13.2, R14.2, R15.2)
 
-	ALIAS(VIDEO_OUT, R107.2)
+	//NET_C(R107.2, GND)
+	//ALIAS(VIDEO_OUT, R107.2)
 
 	/* Horizontal movement */
 
