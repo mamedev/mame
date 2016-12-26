@@ -702,6 +702,7 @@ BUSES["VIC10"] = true
 BUSES["VIC20"] = true
 BUSES["VIDBRAIN"] = true
 BUSES["VIP"] = true
+BUSES["VME"] = true
 BUSES["VTECH_IOEXP"] = true
 BUSES["VTECH_MEMEXP"] = true
 BUSES["WANGPC"] = true
@@ -2211,6 +2212,10 @@ files {
 createMESSProjects(_target, _subtarget, "mizar")
 files {
 	MAME_DIR .. "src/mame/drivers/mzr8105.cpp",
+	MAME_DIR .. "src/mame/includes/mzr8105.h",
+	MAME_DIR .. "src/mame/machine/mzr8105.cpp",
+	MAME_DIR .. "src/mame/includes/mzr8300.h",
+	MAME_DIR .. "src/mame/machine/mzr8300.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "morrow")

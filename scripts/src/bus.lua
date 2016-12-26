@@ -1486,6 +1486,23 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/bus/vme/vme.h,BUSES["VME"] = true
+---------------------------------------------------
+
+if (BUSES["VME"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/bus/vme/vme.cpp",
+		MAME_DIR .. "src/devices/bus/vme/vme.h",
+		MAME_DIR .. "src/mame/bus/vme/mzr8105.cpp",
+		MAME_DIR .. "src/mame/bus/vme/mzr8105.h",
+		MAME_DIR .. "src/mame/bus/vme/mzr8300.cpp",
+		MAME_DIR .. "src/mame/bus/vme/mzr8300.h",
+	}
+end
+
+
+---------------------------------------------------
+--
 --@src/devices/bus/wangpc/wangpc.h,BUSES["WANGPC"] = true
 ---------------------------------------------------
 
