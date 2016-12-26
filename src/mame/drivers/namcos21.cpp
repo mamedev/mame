@@ -2630,11 +2630,36 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( winrungp )
 	PORT_INCLUDE(winrun)
-
+	
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x20, 0x00, "PCM ROM")
 	PORT_DIPSETTING(    0x20, "2M" )
 	PORT_DIPSETTING(    0x00, "4M" )
+INPUT_PORTS_END
+
+// TODO: emulate neutral state + clutch (apparently done mechanically)
+static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
+
+static INPUT_PORTS_START( driveyes )
+	PORT_INCLUDE(winrungp)
+
+	PORT_MODIFY("PORTB")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")
+	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_MODIFY("DIAL0")
+	//PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos21_state,driveyes_gearbox_r, nullptr) 
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gearbox_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("GearBox")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	
+	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Red Button")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Green Button")
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 // the default inc/dec analog keys have been chosen to map 'tank' style inputs found on Assault.
@@ -2710,7 +2735,7 @@ INPUT_PORTS_END
 GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, driveyes,  0,        driveyes, winrungp,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starbladj, starblad, namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (Japan)",                     MACHINE_IMPERFECT_GRAPHICS )
