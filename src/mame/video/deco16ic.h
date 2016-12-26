@@ -34,7 +34,7 @@ public:
 	static void set_bank1_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank1_cb = callback; }
 	static void set_bank2_callback(device_t &device, deco16_bank_cb_delegate callback) { downcast<deco16ic_device &>(device).m_bank2_cb = callback; }
 	static void set_split(device_t &device, int split) { downcast<deco16ic_device &>(device).m_split = split; }
-	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_full_width12 = width; }
+	static void set_full_width(device_t &device, int width) { downcast<deco16ic_device &>(device).m_tilemapsizes = width; }
 	static void set_pf1_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_trans_mask = mask; }
 	static void set_pf2_trans_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf2_trans_mask = mask; }
 	static void set_pf1_col_mask(device_t &device, int mask) { downcast<deco16ic_device &>(device).m_pf1_colourmask = mask; }
@@ -142,7 +142,7 @@ private:
 	int m_pf1_8bpp_mode;
 
 	int m_split;
-	int m_full_width12;
+	int m_tilemapsizes;
 	int m_pf1_trans_mask, m_pf2_trans_mask;
 	int m_pf1_colour_bank, m_pf2_colour_bank;
 	int m_pf1_colourmask, m_pf2_colourmask;
