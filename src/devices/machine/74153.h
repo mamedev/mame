@@ -90,6 +90,7 @@ private:
 	bool m_s[2];
 	bool m_ia[4];
 	bool m_ib[4];
+	bool m_z[2];
 };
 
 // device type definition

@@ -31,7 +31,8 @@ ttl153_device::ttl153_device(const machine_config &mconfig, const char *tag, dev
 	m_zb_cb(*this),
 	m_s{ false, false },
 	m_ia{ false, false, false, false },
-	m_ib{ false, false, false, false }
+	m_ib{ false, false, false, false },
+	m_z{ false, false }
 {
 }
 
@@ -49,6 +50,7 @@ void ttl153_device::device_start()
 	save_pointer(NAME(m_s), 2);
 	save_pointer(NAME(m_ia), 4);
 	save_pointer(NAME(m_ib), 4);
+	save_pointer(NAME(m_z), 2);
 }
 
 //-------------------------------------------------
@@ -60,6 +62,7 @@ void ttl153_device::device_reset()
 	std::fill(std::begin(m_s), std::end(m_s), false);
 	std::fill(std::begin(m_ia), std::end(m_ia), false);
 	std::fill(std::begin(m_ib), std::end(m_ib), false);
+	std::fill(std::begin(m_z), std::end(m_z), false);
 }
 
 //-------------------------------------------------
@@ -76,7 +79,10 @@ void ttl153_device::update_a()
 	za |= m_ia[3] &&  m_s[1] &&  m_s[0];
 
 	// output
-	m_za_cb(za ? 1 : 0);
+	if (za != m_z[0])
+		m_za_cb(za ? 1 : 0);
+
+	m_z[0] = za;
 }
 
 //-------------------------------------------------
@@ -93,7 +99,10 @@ void ttl153_device::update_b()
 	zb |= m_ib[3] &&  m_s[1] &&  m_s[0];
 
 	// output
-	m_zb_cb(zb ? 1 : 0);
+	if (zb != m_z[1])
+		m_zb_cb(zb ? 1 : 0);
+
+	m_z[1] = zb;
 }
 
 
