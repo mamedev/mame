@@ -435,6 +435,7 @@ namespace netlist
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
 
 	protected:
+		const logic_family_desc_t *m_logic_family;
 
 		virtual const logic_family_desc_t &logic_family() const
 		{
@@ -442,7 +443,6 @@ namespace netlist
 		}
 
 	private:
-		const logic_family_desc_t *m_logic_family;
 		logic_t *m_term_proxied;
 		detail::core_terminal_t *m_proxy_term;
 	};
@@ -472,7 +472,9 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
+			if (!m_logic_family)
+				m_Q.push(m_I.Q_Analog() > 0.7, NLTIME_FROM_NS(1));
+			else if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 				m_Q.push(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
 				m_Q.push(0, NLTIME_FROM_NS(1));
