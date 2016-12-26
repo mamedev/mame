@@ -35,6 +35,12 @@
 				netlist_analog_output_delegate(& _class :: _member,                 \
 						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
 
+#define MCFG_NETLIST_LOGIC_OUTPUT(_basetag, _tag, _IN, _class, _member, _class_tag) \
+	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_OUTPUT, 0)                    \
+	netlist_mame_logic_output_t::static_set_params(*device, _IN,                   \
+				netlist_logic_output_delegate(& _class :: _member,                 \
+						# _class "::" # _member, _class_tag, (_class *)nullptr)   );
+
 #define MCFG_NETLIST_LOGIC_INPUT(_basetag, _tag, _name, _shift)             \
 	MCFG_DEVICE_ADD(_basetag ":" _tag, NETLIST_LOGIC_INPUT, 0)              \
 	netlist_mame_logic_input_t::static_set_params(*device, _name, _shift);
@@ -75,6 +81,8 @@
 #define NETDEV_ANALOG_CALLBACK_MEMBER(_name) \
 	void _name(const double data, const attotime &time)
 
+#define NETDEV_LOGIC_CALLBACK_MEMBER(_name) \
+	void _name(const int data, const attotime &time)
 
 
 // ----------------------------------------------------------------------------------------
@@ -418,6 +426,33 @@ private:
 };
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_logic_output_t
+// ----------------------------------------------------------------------------------------
+
+typedef device_delegate<void(const int, const attotime &)> netlist_logic_output_delegate;
+
+class netlist_mame_logic_output_t : public device_t,
+	public netlist_mame_sub_interface
+{
+public:
+
+	// construction/destruction
+	netlist_mame_logic_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual ~netlist_mame_logic_output_t() { }
+
+	static void static_set_params(device_t &device, const char *in_name, netlist_logic_output_delegate adelegate);
+
+protected:
+	// device-level overrides
+	virtual void device_start() override;
+	virtual void custom_netlist_additions(netlist::setup_t &setup) override;
+
+private:
+	pstring m_in;
+	netlist_logic_output_delegate m_delegate;
+};
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_int_input_t
 // ----------------------------------------------------------------------------------------
 
@@ -617,8 +652,9 @@ private:
 	uint32_t m_channel;
 	pstring m_out_name;
 };
+
 // ----------------------------------------------------------------------------------------
-// netdev_callback
+// analog_callback
 // ----------------------------------------------------------------------------------------
 
 class NETLIB_NAME(analog_callback) : public netlist::device_t
@@ -663,6 +699,54 @@ private:
 	netlist_analog_output_delegate m_callback;
 	netlist_mame_cpu_device_t *m_cpu_device;
 	netlist::state_var<nl_double> m_last;
+};
+
+// ----------------------------------------------------------------------------------------
+// logic_callback
+// ----------------------------------------------------------------------------------------
+
+class NETLIB_NAME(logic_callback) : public netlist::device_t
+{
+public:
+	NETLIB_NAME(logic_callback)(netlist::netlist_t &anetlist, const pstring &name)
+		: device_t(anetlist, name)
+		, m_in(*this, "IN")
+		, m_cpu_device(nullptr)
+		, m_last(*this, "m_last", 0)
+	{
+		m_cpu_device = downcast<netlist_mame_cpu_device_t *>(&downcast<netlist_mame_t &>(netlist()).parent());
+	}
+
+	ATTR_COLD void reset() override
+	{
+		m_last = 0;
+	}
+
+	ATTR_COLD void register_callback(netlist_logic_output_delegate callback)
+	{
+		m_callback = callback;
+	}
+
+	NETLIB_UPDATEI()
+	{
+		netlist_sig_t cur = m_in();
+
+		// FIXME: make this a parameter
+		// avoid calls due to noise
+		if (cur != m_last)
+		{
+			m_cpu_device->update_time_x();
+			m_callback(cur, m_cpu_device->local_time());
+			m_cpu_device->check_mame_abort_slice();
+			m_last = cur;
+		}
+	}
+
+private:
+	netlist::logic_input_t m_in;
+	netlist_logic_output_delegate m_callback;
+	netlist_mame_cpu_device_t *m_cpu_device;
+	netlist::state_var<netlist_sig_t> m_last;
 };
 
 // ----------------------------------------------------------------------------------------
@@ -832,6 +916,7 @@ extern const device_type NETLIST_INT_INPUT;
 extern const device_type NETLIST_ROM_REGION;
 extern const device_type NETLIST_RAM_POINTER;
 
+extern const device_type NETLIST_LOGIC_OUTPUT;
 extern const device_type NETLIST_ANALOG_OUTPUT;
 extern const device_type NETLIST_STREAM_INPUT;
 extern const device_type NETLIST_STREAM_OUTPUT;

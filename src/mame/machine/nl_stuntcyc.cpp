@@ -21,7 +21,8 @@ NETLIST_START(stuntcyc)
 	TTL_INPUT(high, 1)
 	TTL_INPUT(low, 0)
 
-	MAINCLOCK(main_clk, 14318181.8)
+	MAINCLOCK(main_clk, 14258400)
+	//MAINCLOCK(main_clk, 14318181)
 	ALIAS(Y1, main_clk)
 
 #if 1
@@ -46,15 +47,6 @@ NETLIST_START(stuntcyc)
 	ALIAS( 64H, L4.QC)
 	ALIAS(128H, L4.QD)
 	
-	ALIAS(probe_bit0, M4.QA)
-	ALIAS(probe_bit1, M4.QB)
-	ALIAS(probe_bit2, high)
-	ALIAS(probe_bit3, high)
-	ALIAS(probe_bit4, high)
-	ALIAS(probe_bit5, high)
-	ALIAS(probe_bit6, high)
-	ALIAS(probe_clock, CLOCK)
-
 	TTL_74107(K4_1, 128H, P, P, P)
 	ALIAS(256H,  K4_1.Q)
 	ALIAS(256H_Q, K4_1.QQ)
@@ -126,7 +118,17 @@ NETLIST_START(stuntcyc)
 	TTL_7400_NAND(H2_2, HSYNC_Q, H5)
 
 	TTL_9322(J1, HSYNC, V4, P, V3, 4V, V1, 1V, V2, 2V, GROUND)
-	PROM_82S115(hf1, P, GROUND, J1.Y3, J1.Y4, J1.Y2, J1.Y1, H2_2.Q, H2_1.Q, R2, R3, R4, P)
+	PROM_82S115(hf1, GROUND, P, J1.Y3, J1.Y4, J1.Y2, J1.Y1, H2_2.Q, H2_1.Q, R2, R3, R4, P)
+
+	CLOCK(PROBECLK, 7129200)
+	ALIAS(probe_bit0, WHITE_VIDEO)
+	ALIAS(probe_bit1, WHITE_VIDEO)
+	ALIAS(probe_bit2, WHITE_VIDEO)
+	ALIAS(probe_bit3, WHITE_VIDEO)
+	ALIAS(probe_bit4, BLACK_VIDEO)
+	ALIAS(probe_bit5, BLACK_VIDEO)
+	ALIAS(probe_bit6, BLACK_VIDEO)
+	ALIAS(probe_clock, PROBECLK)
 
 	TTL_7404_INVERT(D3_5, H1)
 	TTL_74194(E1, D3_5.Q, MS_1, MS_2, GROUND,   hf1.O1, hf1.O2, hf1.O3, hf1.O4, E2.QA, CYCLE_RESET_A_Q)
@@ -327,7 +329,7 @@ NETLIST_START(stuntcyc)
 	NET_C(D17.A, R13.2, R14.2, R15.2)
 
 	//NET_C(R107.2, GND)
-	//ALIAS(VIDEO_OUT, R107.2)
+	ALIAS(VIDEO_OUT, R13.2)
 
 	/* Horizontal movement */
 

@@ -33,6 +33,7 @@ const device_type NETLIST_RAM_POINTER = &device_creator<netlist_ram_pointer_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
 
+const device_type NETLIST_LOGIC_OUTPUT = &device_creator<netlist_mame_logic_output_t>;
 const device_type NETLIST_ANALOG_OUTPUT = &device_creator<netlist_mame_analog_output_t>;
 const device_type NETLIST_STREAM_OUTPUT = &device_creator<netlist_mame_stream_output_t>;
 
@@ -80,6 +81,7 @@ void netlist_mame_analog_input_t::device_start()
 
 }
 
+
 // ----------------------------------------------------------------------------------------
 // netlist_mame_analog_output_t
 // ----------------------------------------------------------------------------------------
@@ -110,6 +112,41 @@ void netlist_mame_analog_output_t::custom_netlist_additions(netlist::setup_t &se
 }
 
 void netlist_mame_analog_output_t::device_start()
+{
+	LOG_DEV_CALLS(("start %s\n", tag()));
+}
+
+
+// ----------------------------------------------------------------------------------------
+// netlist_mame_logic_output_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_logic_output_t::netlist_mame_logic_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NETLIST_LOGIC_OUTPUT, "Netlist Logic Output", tag, owner, clock, "netlist_logic_output", __FILE__),
+	netlist_mame_sub_interface(*owner),
+	m_in("")
+{
+}
+
+void netlist_mame_logic_output_t::static_set_params(device_t &device, const char *in_name, netlist_logic_output_delegate adelegate)
+{
+	netlist_mame_logic_output_t &mame_output = downcast<netlist_mame_logic_output_t &>(device);
+	mame_output.m_in = in_name;
+	mame_output.m_delegate = adelegate;
+}
+
+void netlist_mame_logic_output_t::custom_netlist_additions(netlist::setup_t &setup)
+{
+	pstring dname = "OUT_" + m_in;
+	m_delegate.bind_relative_to(owner()->machine().root_device());
+
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), setup.build_fqn(dname));
+	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(m_delegate);
+	setup.netlist().register_dev(std::move(dev));
+	setup.register_link(dname + ".IN", m_in);
+}
+
+void netlist_mame_logic_output_t::device_start()
 {
 	LOG_DEV_CALLS(("start %s\n", tag()));
 }

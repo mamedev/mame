@@ -520,6 +520,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	}
 	else if (inp.is_logic())
 	{
+		netlist().log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(), pstring(inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?"), term.name());
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);

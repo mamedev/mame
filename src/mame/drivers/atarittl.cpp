@@ -94,6 +94,7 @@
 #define HRES_MULT                   (1)
 // end
 
+#define SC_VIDCLOCK		(14318181/2)
 #define SC_HTOTAL		(0x1C8+1)		// 456
 #define SC_VTOTAL		(0x103+1)		// 259
 #define SC_HBSTART		(SC_HTOTAL)
@@ -133,7 +134,8 @@ public:
 	stuntcyc_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_screen(*this, "screen")
+		//, m_video(*this, "fixfreq")
+		, m_probe_screen(*this, "screen")
 		, m_hf1(*this, "maincpu:hf1")
 		, m_d7(*this, "maincpu:d7")
 		, m_probe_bit0(0.0)
@@ -151,14 +153,14 @@ public:
 	{
 	}
 
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit0_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit1_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit2_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit3_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit4_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit5_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_bit6_cb);
-	NETDEV_ANALOG_CALLBACK_MEMBER(probe_clock_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit0_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit1_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit2_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit3_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit4_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit5_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_bit6_cb);
+	NETDEV_LOGIC_CALLBACK_MEMBER(probe_clock_cb);
 
 	uint32_t screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
@@ -170,21 +172,22 @@ protected:
 
 private:
 	required_device<netlist_mame_device_t> m_maincpu;
-	required_device<screen_device> m_screen;
+	//required_device<fixedfreq_device> m_video;
+	required_device<screen_device> m_probe_screen;
 	required_device<netlist_mame_rom_t> m_hf1;
 	required_device<netlist_mame_rom_t> m_d7;
 
-	double m_probe_bit0;
-	double m_probe_bit1;
-	double m_probe_bit2;
-	double m_probe_bit3;
-	double m_probe_bit4;
-	double m_probe_bit5;
-	double m_probe_bit6;
+	int m_probe_bit0;
+	int m_probe_bit1;
+	int m_probe_bit2;
+	int m_probe_bit3;
+	int m_probe_bit4;
+	int m_probe_bit5;
+	int m_probe_bit6;
 	
-	std::unique_ptr<float[]> m_probe_data;
+	std::unique_ptr<int[]> m_probe_data;
 
-	double m_last_beam;
+	int m_last_beam;
 	int m_last_hpos;
 	int m_last_vpos;
 	double m_last_fraction;
@@ -237,7 +240,7 @@ void stuntcyc_state::machine_start()
 	m_probe_bit5 = 0;
 	m_probe_bit6 = 0;
 
-	m_probe_data = std::make_unique<float[]>(SC_HTOTAL * SC_VTOTAL);
+	m_probe_data = std::make_unique<int[]>(SC_HTOTAL * SC_VTOTAL);
 }
 
 void stuntcyc_state::machine_reset()
@@ -251,14 +254,14 @@ void stuntcyc_state::machine_reset()
 	m_probe_bit6 = 0;
 }
 
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit0_cb) { m_probe_bit0 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
-NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit0_cb) { m_probe_bit0 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit1_cb) { m_probe_bit1 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit2_cb) { m_probe_bit2 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit3_cb) { m_probe_bit3 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit4_cb) { m_probe_bit4 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit5_cb) { m_probe_bit5 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_bit6_cb) { m_probe_bit6 = data; }
+NETDEV_LOGIC_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
 {
 	synchronize();
 	attotime second_fraction(0, time.attoseconds());
@@ -274,15 +277,15 @@ NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
 	int last_index = m_last_vpos * SC_HTOTAL + m_last_hpos;
 	if (last_index != curr_index)
 	{
-		m_probe_data[last_index] *= m_last_fraction;
-		m_probe_data[last_index] += float(m_last_beam * (1.0 - m_last_fraction));
+		m_probe_data[last_index] = int(double(m_probe_data[last_index]) * m_last_fraction);
+		m_probe_data[last_index] += int(double(m_last_beam) * (1.0 - m_last_fraction));
 		last_index++;
 		while (last_index <= curr_index)
-			m_probe_data[last_index++] = float(m_last_beam);
+			m_probe_data[last_index++] = m_last_beam;
 	}
 
 	//m_last_beam = float(data);
-	m_last_beam = float(m_probe_bit0 + m_probe_bit1 * 2.0 + m_probe_bit2 * 4.0 + m_probe_bit3 * 8.0 + m_probe_bit4 * 16.0 + m_probe_bit5 * 32.0 + m_probe_bit6 * 64.0);
+	m_last_beam = m_probe_bit0 + m_probe_bit1 * 2 + m_probe_bit2 * 4 + m_probe_bit3 * 8 + m_probe_bit4 * 16 + m_probe_bit5 * 32 + m_probe_bit6 * 64;
 	m_last_hpos = hpos;
 	m_last_vpos = vpos;
 	m_last_fraction = pixel_fraction;
@@ -290,11 +293,6 @@ NETDEV_ANALOG_CALLBACK_MEMBER(stuntcyc_state::probe_clock_cb)
 
 uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect)
 {
-	int last_index = m_last_vpos * SC_HTOTAL + m_last_hpos;
-	while (last_index < SC_HTOTAL * SC_VTOTAL)
-	{
-		m_probe_data[last_index++] = m_last_beam;
-	}
 	m_last_hpos = 0;
 	m_last_vpos = 0;
 
@@ -304,7 +302,7 @@ uint32_t stuntcyc_state::screen_update_stuntcyc(screen_device &screen, bitmap_rg
 		uint32_t *scanline = &bitmap.pix32(y);
 		pixindex = y * SC_HTOTAL;
 		for (int x = 0; x < SC_HTOTAL; x++)
-			*scanline++ = 0xff000000 | (uint8_t(m_probe_data[pixindex++] * 0.5) * 0x010101);
+			*scanline++ = 0xff000000 | (m_probe_data[pixindex++] * 0x010101);
 			//*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);
 	}
 
@@ -325,31 +323,33 @@ static MACHINE_CONFIG_START( atarikee, atarikee_state )
 	MCFG_FIXFREQ_SYNC_THRESHOLD(0.30)
 MACHINE_CONFIG_END
 
+//#define STUNTCYC_NL_CLOCK (14318181*69)
+#define STUNTCYC_NL_CLOCK (SC_HTOTAL*SC_VTOTAL*60*140)
 
 static MACHINE_CONFIG_START( stuntcyc, stuntcyc_state )
 	/* basic machine hardware */
-	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, NETLIST_CLOCK)
+	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)
 
 	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "hf1")
 	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "d7")
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit1",  "probe_bit1",  stuntcyc_state, probe_bit1_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit2",  "probe_bit2",  stuntcyc_state, probe_bit2_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit3",  "probe_bit3",  stuntcyc_state, probe_bit3_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit4",  "probe_bit4",  stuntcyc_state, probe_bit4_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit5",  "probe_bit5",  stuntcyc_state, probe_bit5_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_bit6",  "probe_bit6",  stuntcyc_state, probe_bit6_cb, "")
-	MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit1",  "probe_bit1",  stuntcyc_state, probe_bit1_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit2",  "probe_bit2",  stuntcyc_state, probe_bit2_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit3",  "probe_bit3",  stuntcyc_state, probe_bit3_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit4",  "probe_bit4",  stuntcyc_state, probe_bit4_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit5",  "probe_bit5",  stuntcyc_state, probe_bit5_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit6",  "probe_bit6",  stuntcyc_state, probe_bit6_cb, "")
+	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_clock", "probe_clock", stuntcyc_state, probe_clock_cb, "")
 
 /* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(stuntcyc_state, screen_update_stuntcyc)
-	MCFG_SCREEN_RAW_PARAMS(14318181/2, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL)
+	MCFG_SCREEN_RAW_PARAMS(SC_HTOTAL*SC_VTOTAL*60, SC_HTOTAL, 0, SC_HTOTAL, SC_VTOTAL, 0, SC_VTOTAL)
 	//MCFG_FIXFREQ_ADD("fixfreq", "screen")
-	//MCFG_FIXFREQ_MONITOR_CLOCK(MASTER_CLOCK)
+	//MCFG_FIXFREQ_MONITOR_CLOCK(SC_VIDCLOCK)
 	//MCFG_FIXFREQ_HORZ_PARAMS(SC_HTOTAL-67,SC_HTOTAL-40,SC_HTOTAL-8, SC_HTOTAL)
 	//MCFG_FIXFREQ_VERT_PARAMS(SC_VTOTAL-22,SC_VTOTAL-19,SC_VTOTAL-12,SC_VTOTAL)
 	//MCFG_FIXFREQ_FIELDCOUNT(1)
