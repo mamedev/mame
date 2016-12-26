@@ -347,7 +347,7 @@ WRITE8_MEMBER(cvs_state::cvs_unknown_w)
 
 	if (data != m_dac3_state[offset])
 	{
-		if (offset != 2)
+		if (VERBOSE && offset != 2)
 			popmessage("Unknown: %02x %02x\n", offset, data);
 		m_dac3_state[offset] = data;
 	}
