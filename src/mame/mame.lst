@@ -11357,10 +11357,11 @@ yarunara                        // "55" Mahjong Yarunara 1991 Dynax
 @source:dynduke.cpp
 dbldynj                         // (c) 1989 Seibu Kaihatsu
 dbldynu                         // (c) 1989 Seibu Kaihatsu + Fabtek license
-dynduke                         // (c) 1989 Seibu Kaihatsu
-dyndukea                        // (c) 1989 Seibu Kaihatsu
-dyndukej                        // (c) 1989 Seibu Kaihatsu
-dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license
+dynduke                         // (c) 1989 Seibu Kaihatsu (03SEP89)
+dyndukea                        // (c) 1989 Seibu Kaihatsu (25JUL89)
+dyndukej                        // (c) 1989 Seibu Kaihatsu (03SEP89
+dyndukeja                       // (c) 1989 Seibu Kaihatsu (25JUL89)
+dyndukeu                        // (c) 1989 Seibu Kaihatsu + Fabtek license (25JUL89)
 
 @source:eacc.cpp
 eacc                            //
