@@ -1725,10 +1725,13 @@ PAL16V8H-15 @ U45   red dot on it
 
 4 known game carts where produced, these are:
 
-Star Pak 1: Unknown
+Star Pak 1: Seek the Peaks, 21 Thunder, Solar Solitaire, Prism Poker, Pharaoh's Tomb, Black Jack,
+            Twenty One Thunder Plus, Power Pairs, Prism Poker Plus & Have A Cow
 Star Pak 2: Pack-Man, Ms.Pac-Man, Pharaoh's Tomb, Solar Solitaire, Power Pairs, Seek The peeks & Have A Cow
-Star PaK 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
-Star Pak 4: Unknown
+Star Pak 3: Centipede, Great Wall, Ker-Chunk, Diamond Derby, Word Sleuth, Pull!, Astro Blast & Sweeper
+Star Pak 4: Berzerk, Neon Nightmare, Battle Checkers, Orbit, Deep Sea Shadow, Star Tiger & Orbit Freefall
+
+Copyright notice in rom state: Creative Electronics & Software Written by Keith M. Kolmos May 29,1998
 
 ***************************************************************************/
 
