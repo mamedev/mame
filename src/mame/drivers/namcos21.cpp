@@ -2645,13 +2645,19 @@ INPUT_PORTS_END
 CUSTOM_INPUT_MEMBER(namcos21_state::driveyes_gearbox_r)
 {
 	bool clutch_pressed = (ioport("PORTB")->read() & 8) == 0;
-
+	const char gearbox_output[16] = { '1', '-', '-', '-', 
+									  '-', '6', '5', 'N', 
+									  '-', '2', '1', 'N', 
+									  '-', '4', '3', 'N' };
+	
+	popmessage("%c %c",gearbox_output[m_gearbox_state],clutch_pressed == true ? '*' : '.');
+	
 	if(clutch_pressed == false)
 		return m_gearbox_state;
 	
 	m_gearbox_state = ioport("GEARBOX")->read() & 0xf;
-
-	return m_gearbox_state;
+	
+	return 0xf; // return neutral while changing gear
 }
 
 //static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
