@@ -2638,7 +2638,19 @@ static INPUT_PORTS_START( winrungp )
 INPUT_PORTS_END
 
 // TODO: emulate neutral state + clutch (apparently done mechanically)
-static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
+CUSTOM_INPUT_MEMBER(namcos21_state::driveyes_gearbox_r)
+{
+	bool clutch_pressed = (ioport("PORTB")->read() & 8) == 0;
+
+	if(clutch_pressed == false)
+		return m_gearbox_state;
+	
+	m_gearbox_state = ioport("GEARBOX")->read() & 0xf;
+	
+	return m_gearbox_state;
+}
+
+//static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
 
 static INPUT_PORTS_START( driveyes )
 	PORT_INCLUDE(winrungp)
@@ -2647,9 +2659,15 @@ static INPUT_PORTS_START( driveyes )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")
 	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	PORT_START("GEARBOX")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Shift Up")
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Shift Down")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Shift Left")    // not used in Standard Cabinet
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Shift Right")   // not used in Standard Cabinet
+	
 	PORT_MODIFY("DIAL0")
-	//PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos21_state,driveyes_gearbox_r, nullptr) 
-	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gearbox_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("GearBox")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos21_state,driveyes_gearbox_r, nullptr) 
+	//PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gearbox_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("GearBox")
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 	
 	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
