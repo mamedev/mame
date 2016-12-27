@@ -167,6 +167,8 @@ public:
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_VIDEO_START(namcos21);
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
