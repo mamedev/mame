@@ -226,14 +226,17 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read8_delegate rhan
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
-		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
-			break;
-		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
-			break;
-		default:
-			fatalerror("VME_P1: Bus width %d not supported\n", buswidth);
+	case 32:
+		logerror("A32:D8 handler requires a P2 connector - not implemented yet\n");
+		break;
+	case 24:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	case 16:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
+		break;
+	default:
+		fatalerror("VME_P1 D8: Bus width %d not supported\n", buswidth);
 	}
 }
 
@@ -243,14 +246,17 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read16_delegate rha
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
-		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
-			break;
-		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
-			break;
-		default:
-			fatalerror("VME_P1: Bus width %d not supported\n", buswidth);
+	case 32:
+		logerror("A32:D16 handler requires a P2 connector - not implemented yet\n");
+		break;
+	case 24:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	case 16:
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
+		break;
+	default:
+		fatalerror("VME_P1 D16: Bus width %d not supported\n", buswidth);
 	}
 }
 
@@ -260,14 +266,19 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read32_delegate rha
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
 	switch(buswidth)
 	{
-		case 32:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
-			break;
-		case 64:
-			m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, ((uint64_t)mask<<32)|mask);
-			break;
-		default:
-			fatalerror("VME_P1: Bus width %d not supported\n", buswidth);
+	case 32:
+		logerror("A32:D32 handler requires a P2 connector - not implemented yet\n");
+		break;
+	case 24:
+		logerror("A24:D32 handler requires a P2 connector - not implemented yet\n");
+		//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+		break;
+	case 16:
+		logerror("A16:D32 handler requires a P2 connector - not implemented yet\n");
+		//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
+		break;
+	default:
+		fatalerror("VME_P1 D32: Bus width %d not supported\n", buswidth);
 	}
 }
 
