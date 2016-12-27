@@ -15,6 +15,7 @@
 
 #include "nl_base.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 
 namespace netlist
 {

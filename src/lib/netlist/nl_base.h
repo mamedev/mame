@@ -873,7 +873,7 @@ namespace netlist
 	{
 	public:
 		param_logic_t(device_t &device, const pstring name, const bool val);
-		const bool operator()() const { return m_param; }
+		bool operator()() const { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
 		bool m_param;
@@ -883,7 +883,7 @@ namespace netlist
 	{
 	public:
 		param_int_t(device_t &device, const pstring name, const int val);
-		const int operator()() const { return m_param; }
+		int operator()() const { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
 		int m_param;
@@ -893,7 +893,7 @@ namespace netlist
 	{
 	public:
 		param_double_t(device_t &device, const pstring name, const double val);
-		const double operator()() const { return m_param; }
+		double operator()() const { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
 		double m_param;

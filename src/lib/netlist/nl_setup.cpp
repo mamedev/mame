@@ -18,6 +18,7 @@
 #include "devices/net_lib.h"
 #include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
 
