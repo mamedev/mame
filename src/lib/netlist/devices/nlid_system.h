@@ -472,9 +472,8 @@ namespace netlist
 
 		NETLIB_UPDATEI()
 		{
-			if (!m_logic_family)
-				m_Q.push(m_I.Q_Analog() > 0.7, NLTIME_FROM_NS(1));
-			else if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
+			nl_assert(m_logic_family != nullptr);
+			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
 				m_Q.push(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
 				m_Q.push(0, NLTIME_FROM_NS(1));
