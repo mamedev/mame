@@ -683,6 +683,12 @@ WRITE8_MEMBER(bigfghtr_state::main_sharedram_w)
 	m_sharedram[offset] = data;
 }
 
+WRITE8_MEMBER(bigfghtr_state::mcu_spritelist_w)
+{
+	// add a warning in case it happens for now.
+	popmessage("MCU access spritelist %04x = %02x, contact MAMEdev",offset,data);
+}
+
 static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
@@ -714,9 +720,10 @@ static ADDRESS_MAP_START( bigfghtr_mcu_map, AS_PROGRAM, 8, bigfghtr_state )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigfghtr_mcu_io_map, AS_IO, 8, bigfghtr_state )
-//	AM_RANGE(0x00000, 0x005ff) Sprite RAM, guess shared as well 
+	AM_RANGE(0x00000, 0x005ff) AM_WRITE(mcu_spritelist_w) //Sprite RAM, guess shared as well
 	AM_RANGE(0x00600, 0x03fff) AM_RAM AM_SHARE("sharedram")
-//	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) bit 5: bus contention related?
+	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) AM_READNOP // bit 5: bus contention related?
+	AM_RANGE(MCS51_PORT_P3,MCS51_PORT_P3) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
@@ -1559,7 +1566,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) /* ??? */
+	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) // i8741 disguised as i8751h, clock unknown.
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 	
