@@ -1274,9 +1274,11 @@ GAME( 1995, quizard_10,  quizard,      quizard1,       quizard, driver_device,  
 GAME( 1995, quizard2,    cdibios,      quizard2,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.3)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1995, quizard2_22, quizard2,     quizard2,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 2 (v2.2)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
+// Quizard 3 and 4 will hang after inserting a coin (incomplete protection sims?)
+
+GAME( 1995, quizard3,    cdibios,      quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.4)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1996, quizard3_32, quizard3,     quizard3,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 3 (v3.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 
-GAME( 1998, quizard4,    cdibios,      quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION ) // doesn't boot
+GAME( 1998, quizard4,    cdibios,      quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.2)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1998, quizard4_41, quizard4,     quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.1)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )
 GAME( 1997, quizard4_40, quizard4,     quizard4,       quizard, driver_device,      0, ROT0,     "TAB Austria",  "Quizard 4 Rainbow (v4.0)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND | MACHINE_UNEMULATED_PROTECTION )

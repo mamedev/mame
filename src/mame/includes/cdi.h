@@ -116,7 +116,7 @@ public:
 	DECLARE_READ8_MEMBER(slave_io_r);
 	DECLARE_WRITE8_MEMBER(slave_io_w);
 
-	READ8_MEMBER(quizard_mcu_p1_r);
+	DECLARE_READ8_MEMBER(quizard_mcu_p1_r);
 
 	uint32_t screen_update_cdimono1(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_cdimono1_lcd(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
