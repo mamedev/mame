@@ -17,7 +17,7 @@ namespace netlist
 		, m_A(*this, {{"A0", "A1", "A2", "A3", "A4"}})
 		, m_CEQ(*this, "CEQ")
 		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
-		, m_ROM(*this, "m_ROM", nullptr)
+		, m_ROM(*this, "ROM")
 		{
 		}
 
@@ -28,7 +28,7 @@ namespace netlist
 		logic_input_t m_CEQ;
 		object_array_t<logic_output_t, 8> m_O;
 
-		param_ptr_t m_ROM; // 256 bits, 32x8
+		param_rom_t<uint8_t, 5, 8> m_ROM; // 256 bits, 32x8
 	};
 
 	NETLIB_OBJECT_DERIVED(82S123_dip, 82S123)
@@ -66,8 +66,7 @@ namespace netlist
 			for (std::size_t i=0; i<5; i++)
 				a |= (m_A[i]() << i);
 
-			if (m_ROM() != nullptr)
-				o = ((std::uint_fast8_t*)(m_ROM()))[a];
+			o = m_ROM[a];
 
 			delay = NLTIME_FROM_NS(50);
 		}

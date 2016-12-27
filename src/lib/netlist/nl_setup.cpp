@@ -222,7 +222,7 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 			break;
 			case param_t::STRING:
 			{
-				static_cast<param_str_t &>(param).initial(val);
+				static_cast<param_str_base_t &>(param).initial(val);
 			}
 			break;
 			default:

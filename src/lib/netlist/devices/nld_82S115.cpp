@@ -20,7 +20,7 @@ namespace netlist
 		, m_STROBE(*this, "STROBE")
 		, m_O(*this, {{"O1", "O2", "O3", "O4", "O5", "O6", "O7", "O8"}})
 		, m_last_O(*this, "m_last_O", 0)
-		, m_ROM(*this, "m_ROM", nullptr)
+		, m_ROM(*this, "ROM")
 		{
 		}
 
@@ -36,7 +36,7 @@ namespace netlist
 
 		state_var<unsigned> m_last_O;
 
-		param_ptr_t m_ROM; // 4096 bits, 512x8
+		param_rom_t<uint8_t, 9, 8> m_ROM; // 4096 bits, 512x8
 	};
 
 	NETLIB_OBJECT_DERIVED(82S115_dip, 82S115)
@@ -90,8 +90,7 @@ namespace netlist
 				for (std::size_t i=0; i<9; i++)
 					a |= (m_A[i]() << i);
 
-				if (m_ROM() != nullptr)
-					o = ((std::uint_fast8_t*)(m_ROM()))[a];
+				o = m_ROM[a];
 			}
 			else
 			{
