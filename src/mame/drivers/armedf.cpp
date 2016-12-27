@@ -53,6 +53,8 @@ Notes:
       010178: bra     $f9f0 ;timer over event occurs
   btanb perhaps? Currently patched to work, might also be that DSW2 bit 7 is actually a MCU bit ready flag, so it
   definitely needs PCB tests.
+- Takatae! Big Fighter third attract mode "NIHON BUSSAN" text has wrong colors, happens the same on real HW reference
+  (palette not updated properly, BTANB)
 
 
 Stephh's notes (based on the games M68000 code and some tests) :
@@ -1566,7 +1568,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) // i8741 disguised as i8751h, clock unknown.
+	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) // i8741 disguised as i8751h? Former doesn't match address map, clock unknown.
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 	
@@ -2240,5 +2242,5 @@ GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, RO
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
