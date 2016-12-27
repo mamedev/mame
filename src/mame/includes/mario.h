@@ -83,7 +83,7 @@ public:
 #else
 	optional_device<netlist_mame_logic_input_t> m_audio_snd0;
 	optional_device<netlist_mame_logic_input_t> m_audio_snd7;
-	optional_device<netlist_mame_logic_input_t> m_audio_dac;
+	optional_device<netlist_mame_int_input_t> m_audio_dac;
 #endif
 
 	/* memory pointers */
