@@ -42,12 +42,14 @@ namespace netlist
 			register_subalias("C",   m_RN.m_R.m_N);
 			register_subalias("RC",  m_RN.m_R.m_P);
 
-
 			connect_late(m_RP_Q, m_RP.m_I);
 			connect_late(m_RN_Q, m_RN.m_I);
 
 			connect_late(m_RN.m_R.m_P, m_RP.m_R.m_N);
 			connect_late(m_CV, m_RN.m_R.m_P);
+
+			m_RP.m_RON.setTo(m_RI());
+			m_RN.m_RON.setTo(m_RI());
 		}
 
 		NETLIB_RESETI();
