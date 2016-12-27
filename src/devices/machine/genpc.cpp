@@ -281,7 +281,7 @@ WRITE_LINE_MEMBER( ibm5160_mb_device::keyboard_clock_w )
 		m_ppi_shift_register |= m_ppi_data_signal << 7;
 
 		m_pic8259->ir1_w(m_ppi_shift_enable);
-		m_pc_kbdc->data_write_from_mb(!BIT(m_ppi_portb, 2) && !m_ppi_shift_enable);
+		m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
 	}
 }
 
@@ -365,7 +365,7 @@ WRITE8_MEMBER( ibm5160_mb_device::pc_ppi_portb_w )
 		m_pic8259->ir1_w(m_ppi_shift_enable);
 	}
 
-	m_pc_kbdc->data_write_from_mb(!BIT(m_ppi_portb, 2) && !m_ppi_shift_enable);
+	m_pc_kbdc->data_write_from_mb(!m_ppi_shift_enable);
 	m_ppi_clock_signal = ( m_ppi_keyb_clock ) ? 1 : 0;
 	m_pc_kbdc->clock_write_from_mb(m_ppi_clock_signal);
 }

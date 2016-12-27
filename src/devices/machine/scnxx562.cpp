@@ -2544,13 +2544,13 @@ void duscc_channel::update_serial()
 
 	if (m_brg_rx_rate != 0)
 	{
-		if (m_brg_rx_rate == 1) m_brg_rx_rate = 0; // BRG beeing disabled
+		if (m_brg_rx_rate == 1) m_brg_rx_rate = 0; // BRG being disabled
 		set_rcv_rate(m_brg_rx_rate);
 		LOG(("   - Baud Rate Generator: %d mode: RX:%dx\n", m_brg_rx_rate, get_rx_clock_mode()));
 	}
 	if (m_brg_tx_rate != 0)
 	{
-		if (m_brg_tx_rate == 1) m_brg_tx_rate = 0; // BRG beeing disabled
+		if (m_brg_tx_rate == 1) m_brg_tx_rate = 0; // BRG being disabled
 		set_tra_rate(m_brg_tx_rate);
 		LOG(("   - Baud Rate Generator: %d mode: TX:%dx\n", m_brg_tx_rate, get_tx_clock_mode()));
 	}

@@ -66,29 +66,48 @@ NLOBJS := \
 	$(NLOBJ)/analog/nld_switches.o \
 	$(NLOBJ)/analog/nld_twoterm.o \
 	$(NLOBJ)/analog/nld_opamps.o \
+	$(NLOBJ)/devices/nld_2102A.o \
+	$(NLOBJ)/devices/nld_2716.o \
 	$(NLOBJ)/devices/nld_4020.o \
 	$(NLOBJ)/devices/nld_4066.o \
+	$(NLOBJ)/devices/nld_4316.o \
 	$(NLOBJ)/devices/nld_7448.o \
 	$(NLOBJ)/devices/nld_7450.o \
+	$(NLOBJ)/devices/nld_7473.o \
 	$(NLOBJ)/devices/nld_7474.o \
+	$(NLOBJ)/devices/nld_7475.o \
 	$(NLOBJ)/devices/nld_7483.o \
+	$(NLOBJ)/devices/nld_7485.o \
 	$(NLOBJ)/devices/nld_7490.o \
 	$(NLOBJ)/devices/nld_7493.o \
 	$(NLOBJ)/devices/nld_74107.o \
 	$(NLOBJ)/devices/nld_74123.o \
 	$(NLOBJ)/devices/nld_74153.o \
+	$(NLOBJ)/devices/nld_74161.o \
+	$(NLOBJ)/devices/nld_74165.o \
+	$(NLOBJ)/devices/nld_74166.o \
+	$(NLOBJ)/devices/nld_74174.o \
 	$(NLOBJ)/devices/nld_74175.o \
 	$(NLOBJ)/devices/nld_74192.o \
 	$(NLOBJ)/devices/nld_74193.o \
+	$(NLOBJ)/devices/nld_74194.o \
 	$(NLOBJ)/devices/nld_74279.o \
+	$(NLOBJ)/devices/nld_74365.o \
 	$(NLOBJ)/devices/nld_74ls629.o \
 	$(NLOBJ)/devices/nld_82S16.o \
+	$(NLOBJ)/devices/nld_82S115.o \
+	$(NLOBJ)/devices/nld_82S123.o \
+	$(NLOBJ)/devices/nld_82S126.o \
 	$(NLOBJ)/devices/nld_9310.o \
 	$(NLOBJ)/devices/nld_9312.o \
 	$(NLOBJ)/devices/nld_9316.o \
+	$(NLOBJ)/devices/nld_9322.o \
+	$(NLOBJ)/devices/nld_am2847.o \
+	$(NLOBJ)/devices/nld_dm9334.o \
 	$(NLOBJ)/devices/nld_mm5837.o \
 	$(NLOBJ)/devices/nld_ne555.o \
 	$(NLOBJ)/devices/nld_r2r_dac.o \
+	$(NLOBJ)/devices/nld_tristate.o \
 	$(NLOBJ)/devices/nld_legacy.o \
 	$(NLOBJ)/devices/net_lib.o \
 	$(NLOBJ)/devices/nld_log.o \
@@ -124,7 +143,7 @@ clean:
 
 nltool: $(OBJ)/prg/nltool.o $(OBJS)
 	@echo Linking $@...
-	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS) 
+	$(LD) -o $@ $(LDFLAGS) $^ $(LIBS)
 
 nlwav: $(OBJ)/prg/nlwav.o $(OBJS)
 	@echo Linking $@...
@@ -145,14 +164,14 @@ maketree: $(sort $(OBJDIRS))
 
 .PHONY: clang mingw doc
 
-clang: 
+clang:
 	$(MAKE) CC=clang++ LD=clang++ CEXTRAFLAGS="-Weverything -Werror -Wno-padded -Wno-weak-vtables -Wno-missing-variable-declarations -Wconversion -Wno-c++98-compat -Wno-float-equal -Wno-cast-align -Wno-global-constructors -Wno-c++98-compat-pedantic -Wno-exit-time-destructors -Wno-format-nonliteral -Wno-weak-template-vtables"
 
-# 
-# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors 
-# 
+#
+# FIXME:  -Wno-weak-vtables -Wno-missing-variable-declarations -Wno-conversion -Wno-exit-time-destructors
+#
 
-mingw: 
+mingw:
 	$(MAKE) LDEXTRAFLAGS="-Wl,--subsystem,console" LIBS= MD=@mkdir.exe SHELL=sh.exe
 
 #
@@ -191,7 +210,7 @@ $(OBJ)/%.o: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -c $< -o $@
 
-$(OBJ)/%.pp: $(SRC)/%.cpp 
+$(OBJ)/%.pp: $(SRC)/%.cpp
 	@echo Compiling $<...
 	@$(CC) $(CDEFS) $(CFLAGS) -E $< -o $@
 

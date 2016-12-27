@@ -15,8 +15,6 @@
   - verify the disk images, convert to a better format that can natively store protection
     * RAW data also available if required
     * as mentioned, the disks are copy protected, see notes below
-    * are the bad tiles shortly into the first level of mag_exzi caused by a bad dump or
-      bad comms?
   - Use proper floppy drive emulation code that originally came from MESS (tied with above)
   - verify all clocks and screen params (50hz seems to match original videos)
   - work out why we need a protection hack and replace it with proper emulation
@@ -845,8 +843,8 @@ ROM_END
 ROM_START( mag_exzi )
 	BIOS_ROM
 
-	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) // I don't 100% trust this one
-	ROM_LOAD( "exzisus.img", 0x00000, 0xf0000, BAD_DUMP CRC(1ac7409e) SHA1(b894bd65b0b9699e18a1ab49f309c460488f0ef8) )
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "exzisus.img", 0x00000, 0xf0000, CRC(3705e9dc) SHA1(78c8010d224f5deb202a29bd273ea7dc85ddcdb4) )
 ROM_END
 
 ROM_START( mag_xain )
@@ -909,8 +907,8 @@ DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 	m_prothack = mag_exzi_protection_hack;
 }
 
-GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System (prototype)", MACHINE_IS_BIOS_ROOT )
+GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
-GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
+GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
+GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos

@@ -15,11 +15,6 @@
 #include "sound/votrax.h"
 
 
-// set to 0 to enable Votrax device and disable samples
-#define USE_FAKE_VOTRAX         (1)
-
-
-
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
@@ -108,19 +103,6 @@ private:
 	// internal state
 	//bool            m_populate_votrax;
 	uint8_t           m_last_speech_clock;
-
-#if USE_FAKE_VOTRAX
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
-private:
-	void fake_votrax_data_w(uint8_t data);
-	void trigger_sample(uint8_t data);
-	optional_device<samples_device> m_samples;
-	uint8_t m_score_sample;
-	uint8_t m_random_offset;
-	uint8_t m_votrax_queue[100];
-	uint8_t m_votrax_queuepos;
-#endif
 };
 
 // fully populated rev 1 sound board
@@ -203,10 +185,3 @@ private:
 	uint8_t       m_sp0250_latch;
 };
 
-
-/*----------- defined in audio/gottlieb.c -----------*/
-
-#if USE_FAKE_VOTRAX
-MACHINE_CONFIG_EXTERN( reactor_samples );
-MACHINE_CONFIG_EXTERN( qbert_samples );
-#endif

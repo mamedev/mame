@@ -263,6 +263,8 @@ SOUNDS["AD1848"] = true
 --SOUNDS["UPD1771"] = true
 SOUNDS["VOLT_REG"] = true
 --SOUNDS["MEA8000"] = true
+SOUNDS["DAC76"] = true
+SOUNDS["MM5837"] = true
 
 --------------------------------------------------
 -- specify available video cores
@@ -387,7 +389,7 @@ MACHINES["AY31015"] = true
 MACHINES["BANKDEV"] = true
 MACHINES["CDP1852"] = true
 MACHINES["CDP1871"] = true
---MACHINES["CMOS40105"] = true
+MACHINES["CMOS40105"] = true
 MACHINES["CDU76S"] = true
 MACHINES["COM8116"] = true
 MACHINES["CR589"] = true
@@ -565,6 +567,8 @@ MACHINES["X76F041"] = true
 MACHINES["X76F100"] = true
 MACHINES["Z80CTC"] = true
 MACHINES["Z80DART"] = true
+--MACHINES["Z80SIO"] = true
+MACHINES["Z80SCC"] = true
 MACHINES["Z80DMA"] = true
 MACHINES["Z80PIO"] = true
 MACHINES["Z80STI"] = true
@@ -672,6 +676,7 @@ BUSES["VECTREX"] = true
 --BUSES["VIC20"] = true
 --BUSES["VIDBRAIN"] = true
 --BUSES["VIP"] = true
+--BUSES["VME"] = true
 --BUSES["VTECH_IOEXP"] = true
 --BUSES["VTECH_MEMEXP"] = true
 --BUSES["WANGPC"] = true
@@ -961,6 +966,8 @@ files {
 	MAME_DIR .. "src/mame/video/atarisy2.cpp",
 	MAME_DIR .. "src/mame/drivers/atarisy4.cpp",
 	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
 	MAME_DIR .. "src/mame/drivers/atetris.cpp",
 	MAME_DIR .. "src/mame/includes/atetris.h",
 	MAME_DIR .. "src/mame/video/atetris.cpp",
@@ -2486,10 +2493,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/astrocde.cpp",
 	MAME_DIR .. "src/mame/includes/astrocde.h",
 	MAME_DIR .. "src/mame/video/astrocde.cpp",
-	MAME_DIR .. "src/mame/audio/gorf.cpp",
-	MAME_DIR .. "src/mame/audio/gorf.h",
-	MAME_DIR .. "src/mame/audio/wow.cpp",
-	MAME_DIR .. "src/mame/audio/wow.h",
 	MAME_DIR .. "src/mame/drivers/atlantis.cpp",
 	MAME_DIR .. "src/mame/drivers/balsente.cpp",
 	MAME_DIR .. "src/mame/includes/balsente.h",
@@ -2511,6 +2514,7 @@ files {
 	MAME_DIR .. "src/mame/includes/mcr68.h",
 	MAME_DIR .. "src/mame/machine/mcr68.cpp",
 	MAME_DIR .. "src/mame/video/mcr68.cpp",
+	MAME_DIR .. "src/mame/drivers/zwackery.cpp",
 	MAME_DIR .. "src/mame/drivers/midqslvr.cpp",
 	MAME_DIR .. "src/mame/drivers/midtunit.cpp",
 	MAME_DIR .. "src/mame/includes/midtunit.h",
@@ -2553,6 +2557,8 @@ files {
 	MAME_DIR .. "src/mame/machine/midwayic.h",
 	MAME_DIR .. "src/mame/audio/midway.cpp",
 	MAME_DIR .. "src/mame/audio/midway.h",
+	MAME_DIR .. "src/mame/audio/csd.cpp",
+	MAME_DIR .. "src/mame/audio/csd.h",
 }
 
 createMAMEProjects(_target, _subtarget, "namco")
@@ -2930,14 +2936,12 @@ files {
 	MAME_DIR .. "src/mame/drivers/pacman.cpp",
 	MAME_DIR .. "src/mame/includes/pacman.h",
 	MAME_DIR .. "src/mame/video/pacman.cpp",
-	MAME_DIR .. "src/mame/machine/acitya.cpp",
-	MAME_DIR .. "src/mame/machine/acitya.h",
+	MAME_DIR .. "src/mame/machine/epos.cpp",
+	MAME_DIR .. "src/mame/machine/epos.h",
 	MAME_DIR .. "src/mame/machine/jumpshot.cpp",
 	MAME_DIR .. "src/mame/machine/jumpshot.h",
 	MAME_DIR .. "src/mame/machine/pacplus.cpp",
 	MAME_DIR .. "src/mame/machine/pacplus.h",
-	MAME_DIR .. "src/mame/machine/theglobp.cpp",
-	MAME_DIR .. "src/mame/machine/theglobp.h",
 	MAME_DIR .. "src/mame/drivers/pengo.cpp",
 }
 
@@ -3047,8 +3051,8 @@ files {
 	MAME_DIR .. "src/mame/video/blockade.cpp",
 	MAME_DIR .. "src/mame/drivers/calorie.cpp",
 	MAME_DIR .. "src/mame/drivers/chihiro.cpp",
-	MAME_DIR .. "src/mame/includes/chihiro.h",
-	MAME_DIR .. "src/mame/video/chihiro.cpp",
+	MAME_DIR .. "src/mame/includes/xbox_nv2a.h",
+	MAME_DIR .. "src/mame/video/xbox_nv2a.cpp",
 	MAME_DIR .. "src/mame/drivers/coolridr.cpp",
 	MAME_DIR .. "src/mame/drivers/deniam.cpp",
 	MAME_DIR .. "src/mame/includes/deniam.h",
@@ -3969,10 +3973,6 @@ files {
 createMAMEProjects(_target, _subtarget, "tong")
 files {
 	MAME_DIR .. "src/mame/drivers/beezer.cpp",
-	MAME_DIR .. "src/mame/includes/beezer.h",
-	MAME_DIR .. "src/mame/machine/beezer.cpp",
-	MAME_DIR .. "src/mame/video/beezer.cpp",
-	MAME_DIR .. "src/mame/audio/beezer.cpp",
 }
 
 createMAMEProjects(_target, _subtarget, "unico")

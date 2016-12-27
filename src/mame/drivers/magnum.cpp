@@ -6,6 +6,7 @@
 // http://www.eevblog.com/forum/blog/eevblog-949-vintage-australian-made-laptop-teardown/msg1080508/#msg1080508
 
 #include "emu.h"
+#include "rendlay.h"
 #include "cpu/i86/i186.h"
 #include "machine/cdp1879.h"
 #include "sound/beep.h"
@@ -150,6 +151,8 @@ static MACHINE_CONFIG_START( magnum, magnum_state )
 	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MCFG_SCREEN_SIZE(6*80, 9*16)
 	MCFG_SCREEN_VISIBLE_AREA(0, 6*80-1, 0, 9*16-1)
+
+	MCFG_DEFAULT_LAYOUT(layout_lcd)
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 

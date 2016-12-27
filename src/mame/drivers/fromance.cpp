@@ -37,6 +37,15 @@ Memo:
 
 - 2player's input is not supported.
 
+- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic 
+  changes. Actually same custom component as other V-System games of the era, 
+  @seealso aerofgt.cpp 
+
+- nekkyoku: soft reset enables flip screen without any real reason.
+
+- nekkyoku writes to a VRAM mirror for showing the OL gal, I guess ROM mirroring
+  is the same for all empty slots for this HW.
+
 - Communication between MAIN CPU and SUB CPU can be wrong.
 
 Notes:
@@ -727,7 +736,7 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW1:!2,!3")
 	PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x04, "1,500" )
+	PORT_DIPSETTING(    0x04, "1,500" )
 	PORT_DIPSETTING(    0x02, "2,000" )
 	PORT_DIPSETTING(    0x06, "3,000" )
 	PORT_DIPNAME( 0x18, 0x00, "Computer Difficulty" )   PORT_DIPLOCATION("SW1:!4,!5")
@@ -879,7 +888,6 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	uint8_t *ROM = memregion("sub")->base();
 
 	membank("bank1")->configure_entries(0, 0x100, &ROM[0x10000], 0x4000);
-
 
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));
@@ -1071,7 +1079,14 @@ ROM_START( nekkyoku )
 	ROM_LOAD( "ic8a.bin",    0x000000, 0x080000, CRC(599790d8) SHA1(4e4ade1a89d6cb93b0808867883d70c4c7ed78dd) )
 	ROM_LOAD( "ic9a.bin",    0x080000, 0x040000, CRC(78c1906f) SHA1(54459e0120ec58a962d3f4a1287e68d2fbb28be9) )
 	ROM_LOAD( "5-ic10a.bin", 0x0c0000, 0x008000, CRC(2e78515f) SHA1(397985c082ffc0df07cd44d54e4fef909c30a4f1) )
-	ROM_FILL(                0x0c8000, 0x038000, 0xff )
+	// 'D' OL girl is displayed via one of these mirrors
+	ROM_RELOAD(              0x0c8000, 0x008000 )
+	ROM_RELOAD(              0x0d0000, 0x008000 )
+	ROM_RELOAD(              0x0d8000, 0x008000 )
+	ROM_RELOAD(              0x0e0000, 0x008000 )
+	ROM_RELOAD(              0x0e8000, 0x008000 )
+	ROM_RELOAD(              0x0f0000, 0x008000 )
+	ROM_RELOAD(              0x0f8000, 0x008000 )
 	ROM_FILL(                0x100000, 0x100000, 0xff )
 ROM_END
 
@@ -1253,7 +1268,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )

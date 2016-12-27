@@ -39,6 +39,7 @@ Supported games:
     batsugun    TP-030        Toaplan       Batsugun
     batsuguna   TP-030        Toaplan       Batsugun (older)
     batsugunsp  TP-030        Toaplan       Batsugun (Special Version)
+	enmadaio    TP-031        Toaplan       Enma Daio
     pwrkick     SW931201      Sunwise       Power Kick
     othldrby    ??????        Sunwise       Othello Derby
     snowbro2    TP-033        Hanafram      Snow Bros. 2 - With New Elves
@@ -311,7 +312,7 @@ Graphics Custom 208pin QFP:
 
 Game status:
 
-Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
+Teki Paki                      Working. MCU type is a Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
 Dogyuun                        Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-002-MACH'.*
 Knuckle Bash                   Working. MCU type is a NEC V25. Chip is a PLCC94 stamped 'TS-004-DASH'.*
@@ -477,6 +478,15 @@ DRIVER_INIT_MEMBER(toaplan2_state,bbakraid)
 {
 	m_sndirq_line = 2;
 }
+
+DRIVER_INIT_MEMBER(toaplan2_state,enmadaio)
+{
+	uint8_t *ROM = memregion("oki")->base();
+
+	membank("bank1")->configure_entries(0, 0x60, ROM, 0x40000);
+	membank("bank1")->set_entry(0);
+}
+
 
 
 /***************************************************************************
@@ -659,9 +669,9 @@ CUSTOM_INPUT_MEMBER(toaplan2_state::c2map_r)
 	// For Teki Paki hardware
 	// bit 4 high signifies secondary CPU is ready
 	// bit 5 is tested low before V-Blank bit ???
-	m_mcu_data = 0xff;
+	//m_mcu_data = 0xff;
 
-	return (m_mcu_data == 0xff) ? 0x01 : 0x00;
+	return (m_cmdavailable) ? 0x00 : 0x01;
 }
 
 
@@ -998,8 +1008,9 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
-	AM_RANGE(0x180070, 0x180071) AM_WRITE(toaplan2_hd647180_cpu_w)
+	AM_RANGE(0x180070, 0x180071) AM_WRITE(tekipaki_mcu_w)
 ADDRESS_MAP_END
+
 
 
 static ADDRESS_MAP_START( ghox_68k_mem, AS_PROGRAM, 16, toaplan2_state )
@@ -1243,6 +1254,46 @@ static ADDRESS_MAP_START( othldrby_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 ADDRESS_MAP_END
 
 
+WRITE16_MEMBER(toaplan2_state::enmadaio_oki_bank_w)
+{
+	data &= mem_mask;
+
+	if (data < 0x60)
+	{
+		membank("bank1")->set_entry(data);
+	}
+	else
+	{
+		logerror("enmadaio_oki_bank_w >=0x60 (%04x)\n",data);
+	}
+
+}
+
+static ADDRESS_MAP_START( enmadaio_68k_mem, AS_PROGRAM, 16, toaplan2_state )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x103fff) AM_RAM // AM_SHARE("nvram")
+	AM_RANGE(0x104000, 0x10ffff) AM_RAM
+
+	AM_RANGE(0x200000, 0x20000d) AM_DEVREADWRITE("gp9001", gp9001vdp_device, gp9001_vdp_r, gp9001_vdp_w)
+	AM_RANGE(0x300000, 0x300fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
+	AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("ymsnd", ym2151_device, read, write, 0x00ff)
+	AM_RANGE(0x500000, 0x500001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff)
+
+	AM_RANGE(0x700000, 0x700001) AM_READ(video_count_r)
+
+	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
+	AM_RANGE(0x70000c, 0x70000d) AM_READ_PORT("MISC2")
+	AM_RANGE(0x700010, 0x700011) AM_READ_PORT("MISC3")
+	AM_RANGE(0x700014, 0x700015) AM_READ_PORT("MISC4")
+	AM_RANGE(0x700018, 0x700019) AM_READ_PORT("SYS")
+	AM_RANGE(0x70001c, 0x70001d) AM_READ_PORT("UNK") //AM_READ_PORT("SYS")
+
+	AM_RANGE(0x700020, 0x700021) AM_WRITE(enmadaio_oki_bank_w) // oki bank
+
+	AM_RANGE(0x700028, 0x700029) AM_WRITENOP
+	AM_RANGE(0x70003c, 0x70003d) AM_WRITENOP
+	AM_RANGE(0x70002c, 0x70002d) AM_WRITENOP
+ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snowbro2_68k_mem, AS_PROGRAM, 16, toaplan2_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -1503,6 +1554,48 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fixeightbl_oki, AS_0, 8, toaplan2_state )
 	AM_RANGE(0x00000, 0x2ffff) AM_ROM
 	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( enmadaio_oki, AS_0, 8, toaplan2_state )
+	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
+ 
+
+
+WRITE16_MEMBER(toaplan2_state::tekipaki_mcu_w)
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		m_mcu_data = data & 0xff;
+		m_cmdavailable = 1;
+	}
+};
+
+READ8_MEMBER(toaplan2_state::tekipaki_soundlatch_r)
+{
+	m_cmdavailable = 0;
+	return m_mcu_data;
+};
+
+READ8_MEMBER(toaplan2_state::tekipaki_cmdavailable_r)
+{
+	if (m_cmdavailable) return 0xff;
+	else return 0x00;
+};
+
+static ADDRESS_MAP_START( hd647180_mem_map, AS_PROGRAM, 8, toaplan2_state )
+	AM_RANGE(0x00000, 0x03fff) AM_ROM   /* Internal 16k byte ROM */
+	AM_RANGE(0x0fe00, 0x0ffff) AM_RAM   /* Internal 512 byte RAM */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hd647180_io_map, AS_IO, 8, toaplan2_state )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+
+	AM_RANGE(0x60, 0x60) AM_READ(tekipaki_cmdavailable_r)
+	AM_RANGE(0x84, 0x84) AM_READ(tekipaki_soundlatch_r)
+
+	AM_RANGE(0x82, 0x82) AM_DEVREADWRITE("ymsnd", ym3812_device, status_port_r, control_port_w)
+	AM_RANGE(0x83, 0x83) AM_DEVREADWRITE("ymsnd", ym3812_device, read_port_r, write_port_w)
 ADDRESS_MAP_END
 
 
@@ -2467,6 +2560,218 @@ static INPUT_PORTS_START( othldrby )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( enmadaio )
+	PORT_START("SYS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_TILT )
+	TOAPLAN_TEST_SWITCH( 0x04, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x0001, 0x0000, "Game Mode" )
+	PORT_DIPSETTING(      0x0000, "Normal Game" )
+	PORT_DIPSETTING(      0x0001, "Stop and Slow Mode" )
+	PORT_DIPNAME( 0x0002, 0x0000, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, DEF_STR( Unknown ) ) // unused
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_1C ) )
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Unknown ) ) // unused
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Unknown ) ) // unused
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
+
+	PORT_START("MISC2") // should be DSWB? but not even read in test mode display?
+	PORT_DIPNAME( 0x0001, 0x0001, "2" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("MISC3")
+	PORT_DIPNAME( 0x0001, 0x0001, "3" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("yes")
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("no") 
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("MISC4")
+	PORT_DIPNAME( 0x0001, 0x0001, "4" )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0000, "Status of Something 1" ) // gives error in attract mode otherwise
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0000, "Status of Something 2" ) // turn this off and it comes up with an error
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("UNK")
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) // this is the sensor, not sure what it measures, pulse / heartbeat?
+	PORT_DIPNAME( 0x0100, 0x0100, "Freeze" ) // not sure
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( snowbro2 )
 	PORT_INCLUDE( toaplan2_2b )
 
@@ -3014,10 +3319,7 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
 
-#ifdef USE_HD64x180
-	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)          /* HD647180 CPU actually */
-	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
-#endif
+
 
 	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
 	MCFG_MACHINE_RESET_OVERRIDE(toaplan2_state,toaplan2)
@@ -3045,12 +3347,25 @@ static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-#ifdef USE_HD64x180
-	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
-#endif
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
+
+
+static MACHINE_CONFIG_DERIVED( tekipaki_mcu, tekipaki )
+
+	MCFG_CPU_ADD("audiocpu", Z180, XTAL_10MHz)          /* HD647180 CPU actually */
+	MCFG_CPU_PROGRAM_MAP(hd647180_mem_map)
+	MCFG_CPU_IO_MAP(hd647180_io_map)
+
+	MCFG_QUANTUM_TIME(attotime::from_hz(600)) // GUESSED
+
+	MCFG_DEVICE_REMOVE("ymsnd")
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
+	MCFG_YM3812_IRQ_HANDLER(INPUTLINE("audiocpu", 0))
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ghox, toaplan2_state )
 
@@ -3692,6 +4007,42 @@ static MACHINE_CONFIG_START( othldrby, toaplan2_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_START( enmadaio, toaplan2_state )
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)
+	MCFG_CPU_PROGRAM_MAP(enmadaio_68k_mem)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", toaplan2_state,  toaplan2_vblank_irq4)
+
+	MCFG_MACHINE_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* video hardware */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_SCREEN_RAW_PARAMS(XTAL_27MHz/4,432,0,320,262,0,240)
+	MCFG_SCREEN_UPDATE_DRIVER(toaplan2_state, screen_update_toaplan2)
+	MCFG_SCREEN_VBLANK_DRIVER(toaplan2_state, screen_eof_toaplan2)
+	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_PALETTE_ADD("palette", T2PALETTE_LENGTH)
+	MCFG_PALETTE_FORMAT(xBBBBBGGGGGRRRRR)
+
+	MCFG_DEVICE_ADD("gp9001", GP9001_VDP, 0)
+	MCFG_GFX_PALETTE("palette")
+
+	MCFG_VIDEO_START_OVERRIDE(toaplan2_state,toaplan2)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	MCFG_YM2151_ADD("ymsnd", XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) // pin7 not confirmed
+	MCFG_DEVICE_ADDRESS_MAP(AS_0, enmadaio_oki)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
 	/* basic machine hardware */
@@ -4002,14 +4353,14 @@ ROM_START( tekipaki )
 	ROM_LOAD16_BYTE( "tp020-1.bin", 0x000000, 0x010000, CRC(d8420bd5) SHA1(30c1ad9e053cd7e79adb42aa428ebee28e144755) )
 	ROM_LOAD16_BYTE( "tp020-2.bin", 0x000001, 0x010000, CRC(7222de8e) SHA1(8352ae23efc24a2e20cc24b6d37cb8fc6b1a730c) )
 
-	ROM_REGION( 0x10000, "audiocpu", 0 )            /* Sound HD647180 code */
-	/* sound CPU is a HD647180 (Z180) with internal ROM - not yet supported */
-	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, NO_DUMP )
+	ROM_REGION( 0x8000, "audiocpu", 0 )    /* Sound HD647180 code */
+	ROM_LOAD( "hd647180.020", 0x00000, 0x08000, CRC(d5157c12) SHA1(b2c6c087bb539456a9e562d0b40f05dde26cacd3) )
 
 	ROM_REGION( 0x100000, "gp9001", 0 )
 	ROM_LOAD( "tp020-4.bin", 0x000000, 0x080000, CRC(3ebbe41e) SHA1(cea196c5f83e1a23d5b538a0db9bbbffa7af5118) )
 	ROM_LOAD( "tp020-3.bin", 0x080000, 0x080000, CRC(2d5e2201) SHA1(5846c844eedd48305c1c67dc645b6e070b3f5b98) )
 ROM_END
+
 
 
 ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
@@ -4613,6 +4964,29 @@ ROM_START( othldrby )
 
 	ROM_REGION( 0x080000, "oki", 0 )    /* OKIM6295 samples */
 	ROM_LOAD( "db0.4",        0x00000, 0x80000, CRC(a9701868) SHA1(9ee89556666d358e8d3915622573b3ba660048b8) )
+ROM_END
+
+ROM_START( enmadaio )
+	ROM_REGION( 0x080000, "maincpu", 0 )
+	ROM_LOAD16_WORD_SWAP( "03N_U53.C8",        0x00000, 0x80000, CRC(1a6ca2ee) SHA1(13d34a10004ca172db7953e2be8daa90fc5b62ed) )
+
+	ROM_REGION( 0x200000, "gp9001", 0 )
+	ROM_LOAD( "ROM4_U30.C19",       0x000000, 0x100000, CRC(7a012d8b) SHA1(a33d9490573a9fd1e799d3fe567f991926851c51) )
+	ROM_LOAD( "ROM5_U31.C18",       0x100000, 0x100000, CRC(60b127ab) SHA1(98785dfd6a86b4bd2c9786f6f72796c023b5b73a) )
+
+	ROM_REGION( 0x1800000, "oki", 0 )    /* OKIM6295 samples */ // each rom contains 8 0x40000 banks, there are 12 roms, so 96 (0x60) banks here!
+	ROM_LOAD( "ROM6_U65.A1",   0x0000000, 0x0200000, CRC(f33c6c0b) SHA1(06d73cd5b6d27de4d68f2dde1ed4dfa72b9a9178) )
+	ROM_LOAD( "ROM7_U66.A3",   0x0200000, 0x0200000, CRC(1306f8b3) SHA1(21b0d3180f1f4af77074c35c66844e38a464fea0) )
+	ROM_LOAD( "ROM8_U61.A4",   0x0400000, 0x0200000, CRC(4f211c00) SHA1(b067de95ad595a4915effefb83789e4e3d9db6f9) )
+	ROM_LOAD( "ROM9_U62.A6",   0x0600000, 0x0200000, CRC(292d3ef6) SHA1(d027d4c64e57f46e444ee83b62f6c3bdf02e4eed) )
+	ROM_LOAD( "ROM10_U67.A8",  0x0800000, 0x0200000, CRC(5219bf86) SHA1(946c8fcf3c04a88517d1a66ccd56609d22da945f) )
+	ROM_LOAD( "ROM11_U68.A10", 0x0a00000, 0x0200000, CRC(56fe4b1d) SHA1(2ea0413b435dd178174eb66d38dc9f7ab3d07ba5) )
+	ROM_LOAD( "ROM12_U63.A11", 0x0c00000, 0x0200000, CRC(cc48ff18) SHA1(10f6d9f445c9244b797846450f0c94700ccc7367) )
+	ROM_LOAD( "ROM13_U64.A13", 0x0e00000, 0x0200000, CRC(a3cd181a) SHA1(6a87479c24a61f7ac940e9c9bb62a18f26c9c843) )
+	ROM_LOAD( "ROM14_U69.A14", 0x1000000, 0x0200000, CRC(5d8cddec) SHA1(1912850d065d4ce1a1cdfd5a704218e660b5345b) )
+	ROM_LOAD( "ROM15_U70.A16", 0x1200000, 0x0200000, CRC(c75012f5) SHA1(b1ba0abab3eb8e9e3778eecab4951d828c85cecb) )
+	ROM_LOAD( "ROM16_U71.A18", 0x1400000, 0x0200000, CRC(efd02b0d) SHA1(b23fa3298fc29086f9ab05bc58775ff47b4cb7a9) )
+	ROM_LOAD( "ROM17_U72.A19", 0x1600000, 0x0200000, CRC(6b8717c3) SHA1(b5b7e35deaa2f34bccd1e83844d4bc0be845d0b8) )
 ROM_END
 
 ROM_START( snowbro2 )
@@ -5364,7 +5738,7 @@ ROM_END
 // See list at top of file
 
 //  ( YEAR  NAME        PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS )
-GAME( 1991, tekipaki,   0,        tekipaki, tekipaki, driver_device, 0,        ROT0,   "Toaplan", "Teki Paki", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1991, tekipaki,   0,        tekipaki_mcu, tekipaki, driver_device, 0,        ROT0,   "Toaplan", "Teki Paki", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1991, ghox,       0,        ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (spinner)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,      ghox,     ghox,     ghox, driver_device,     0,        ROT270, "Toaplan", "Ghox (joystick)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE )
@@ -5386,6 +5760,8 @@ GAME( 1991, pipibibsp,  pipibibs, pipibibs, pipibibsp, driver_device,0,        R
 GAME( 1991, whoopee,    pipibibs, tekipaki, whoopee, driver_device,  0,        ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Teki Paki hardware)", MACHINE_NO_SOUND | MACHINE_SUPPORTS_SAVE ) // original Whoopee!! boards have a HD647180 instead of Z80
 
 GAME( 1991, pipibibsbl, pipibibs, pipibibsbl, pipibibsbl, toaplan2_state, pipibibsbl, ROT0, "bootleg (Ryouta Kikaku)", "Pipi & Bibis / Whoopee!! (bootleg)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1993, enmadaio,   0,        enmadaio, enmadaio,toaplan2_state,    enmadaio,       ROT0,   "Toaplan / Taito",  "Enma Daio (Japan)", 0 ) // TP-031
 
 // region is in eeprom (and also requires correct return value from a v25 mapped address??)
 GAME( 1992, fixeight,   0,        fixeight, fixeight, toaplan2_state, fixeight, ROT270, "Toaplan", "FixEight (Europe)",  MACHINE_SUPPORTS_SAVE )

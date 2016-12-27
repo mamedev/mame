@@ -22,11 +22,27 @@
 
 devcb_base::devcb_base(device_t &device, u64 defmask)
 	: m_device(device),
+		m_type(CALLBACK_NONE),
+		m_target_tag(nullptr),
+		m_target_int(0),
+		m_space_tag(nullptr),
+		m_space_num(AS_0),
+		m_space(nullptr),
 		m_rshift(0),
 		m_mask(defmask),
+		m_defmask(defmask),
 		m_xor(0)
 {
-	reset();
+	m_target.ptr = nullptr;
+}
+
+
+//-------------------------------------------------
+//  devcb_base - destructor
+//-------------------------------------------------
+
+devcb_base::~devcb_base()
+{
 }
 
 
@@ -45,6 +61,8 @@ void devcb_base::reset(callback_type type)
 	m_target.ptr = nullptr;
 	m_rshift = 0;
 	m_mask = ~u64(0);
+	m_xor = 0;
+	devcb_reset();
 }
 
 
@@ -59,6 +77,26 @@ void devcb_base::resolve_ioport()
 	m_target.ioport = (m_target_tag != nullptr) ? m_device.owner()->ioport(m_target_tag) : nullptr;
 	if (m_target.ioport == nullptr)
 		throw emu_fatalerror("Unable to resolve I/O port callback reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
+
+	// adjust the mask to match the port bits
+	u64 port_mask = 0;
+	for (const ioport_field &field : m_target.ioport->fields())
+		port_mask |= field.mask();
+	m_mask = shift_mask(port_mask);
+}
+
+
+//-------------------------------------------------
+//  resolve_membank - resolve a memory bank or
+//  fatal error if we can't find it
+//-------------------------------------------------
+
+void devcb_base::resolve_membank()
+{
+	// attempt to resolve, fatal error if fail
+	m_target.membank = (m_target_tag != nullptr) ? m_device.owner()->membank(m_target_tag) : nullptr;
+	if (m_target.membank == nullptr)
+		throw emu_fatalerror("Unable to resolve memory bank callback reference to '%s' in device '%s'\n", m_target_tag, m_device.tag());
 }
 
 
@@ -109,27 +147,37 @@ void devcb_base::resolve_space()
 
 devcb_read_base::devcb_read_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
-		m_adapter(nullptr)
+		m_adapter(&devcb_read_base::read_unresolved_adapter)
 {
 }
 
 
 //-------------------------------------------------
-//  reset - reset/initialize state
+//  devcb_reset - reset/initialize local state
 //-------------------------------------------------
 
-void devcb_read_base::reset(callback_type type)
+void devcb_read_base::devcb_reset()
 {
-	// parent first
-	devcb_base::reset(type);
-
-	// local stuff
 	m_readline = read_line_delegate();
 	m_read8 = read8_delegate();
 	m_read16 = read16_delegate();
 	m_read32 = read32_delegate();
 	m_read64 = read64_delegate();
 	m_adapter = &devcb_read_base::read_unresolved_adapter;
+	m_chain = nullptr;
+}
+
+
+//-------------------------------------------------
+//  chain_alloc - add another callback to the
+//  input chain
+//-------------------------------------------------
+
+devcb_read_base &devcb_read_base::chain_alloc()
+{
+	// set up the chained callback pointer
+	m_chain.reset(new devcb_read_base(m_device, m_defmask));
+	return *m_chain;
 }
 
 
@@ -160,6 +208,7 @@ void devcb_read_base::resolve()
 				m_readline.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_readline.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read_line_adapter;
+				m_mask = shift_mask(1);
 				break;
 
 			case CALLBACK_8:
@@ -167,6 +216,7 @@ void devcb_read_base::resolve()
 				m_read8.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read8.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read8_adapter;
+				m_mask = shift_mask(0xff);
 				break;
 
 			case CALLBACK_16:
@@ -174,6 +224,7 @@ void devcb_read_base::resolve()
 				m_read16.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read16.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read16_adapter;
+				m_mask = shift_mask(0xffff);
 				break;
 
 			case CALLBACK_32:
@@ -181,6 +232,7 @@ void devcb_read_base::resolve()
 				m_read32.bind_relative_to(*m_device.owner());
 				m_target_int = 0;
 				m_adapter = m_read32.isnull() ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read32_adapter;
+				m_mask = shift_mask(0xffffffff);
 				break;
 
 			case CALLBACK_64:
@@ -191,20 +243,30 @@ void devcb_read_base::resolve()
 				break;
 
 			case CALLBACK_IOPORT:
+				name = m_target_tag;
 				resolve_ioport();
 				m_target_int = 0;
-				m_adapter = (m_target.ioport == nullptr) ? &devcb_read_base::read_constant_adapter : &devcb_read_base::read_ioport_adapter;
+				m_adapter = &devcb_read_base::read_ioport_adapter;
 				break;
+
+			case CALLBACK_MEMBANK:
+				throw emu_fatalerror("Device read callbacks can't be connected to bank switches\n");
 
 			case CALLBACK_LOG:
 				m_adapter = &devcb_read_base::read_logged_adapter;
+				m_mask = 0;
 				break;
 
 			case CALLBACK_CONSTANT:
+				if (m_xor != 0)
+					throw emu_fatalerror("devcb_read: Attempt to invert constant value (%lX ^ %lX)\n", (unsigned long)shift_mask(m_target_int), (unsigned long)m_xor);
 				m_adapter = &devcb_read_base::read_constant_adapter;
+				m_mask = shift_mask(m_target_int);
 				break;
 
 			case CALLBACK_INPUTLINE:
+			case CALLBACK_ASSERTLINE:
+			case CALLBACK_CLEARLINE:
 				throw emu_fatalerror("Device read callbacks can't be connected to input lines\n");
 		}
 	}
@@ -212,6 +274,15 @@ void devcb_read_base::resolve()
 	{
 		throw emu_fatalerror("devcb_read: Error performing a late bind of type %s to %s (name=%s)\n", binderr.m_actual_type.name(), binderr.m_target_type.name(), name);
 	}
+
+	// resolve callback chain recursively
+	if (m_chain != nullptr)
+		m_chain->resolve();
+
+	// protect against bus contention (the masks must not overlap)
+	for (const devcb_read_base *chained_cb = m_chain.get(); chained_cb != nullptr; chained_cb = chained_cb->m_chain.get())
+		if ((m_mask & chained_cb->m_mask) != 0)
+			throw emu_fatalerror("Device %s read callback (name=%s) overlaps with chained callback (%lX & %lX)", m_device.tag(), name, (unsigned long)m_mask, (unsigned long)chained_cb->m_mask);
 }
 
 
@@ -305,14 +376,14 @@ u64 devcb_read_base::read_ioport_adapter(address_space &space, offs_t offset, u6
 
 
 //-------------------------------------------------
-//  read_logged_adapter - log a read and return a
-//  constant
+//  read_logged_adapter - log a read and return
+//  zero
 //-------------------------------------------------
 
 u64 devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, u64 mask)
 {
-	m_device.logerror("%s: read %s\n", m_device.machine().describe_context(), m_target_tag);
-	return shift_mask_xor(m_target_int);
+	m_device.logerror("%s: %s\n", m_device.machine().describe_context(), m_target_tag);
+	return 0;
 }
 
 
@@ -322,7 +393,7 @@ u64 devcb_read_base::read_logged_adapter(address_space &space, offs_t offset, u6
 
 u64 devcb_read_base::read_constant_adapter(address_space &space, offs_t offset, u64 mask)
 {
-	return shift_mask_xor(m_target_int);
+	return shift_mask(m_target_int);
 }
 
 
@@ -337,27 +408,37 @@ u64 devcb_read_base::read_constant_adapter(address_space &space, offs_t offset, 
 
 devcb_write_base::devcb_write_base(device_t &device, u64 defmask)
 	: devcb_base(device, defmask),
-		m_adapter(nullptr)
+		m_adapter(&devcb_write_base::write_unresolved_adapter)
 {
 }
 
 
 //-------------------------------------------------
-//  reset - reset/initialize state
+//  devcb_reset - reset/initialize local state
 //-------------------------------------------------
 
-void devcb_write_base::reset(callback_type type)
+void devcb_write_base::devcb_reset()
 {
-	// parent first
-	devcb_base::reset(type);
-
-	// local stuff
 	m_writeline = write_line_delegate();
 	m_write8 = write8_delegate();
 	m_write16 = write16_delegate();
 	m_write32 = write32_delegate();
 	m_write64 = write64_delegate();
 	m_adapter = &devcb_write_base::write_unresolved_adapter;
+	m_chain = nullptr;
+}
+
+
+//-------------------------------------------------
+//  chain_alloc - add another callback to the
+//  output chain
+//-------------------------------------------------
+
+devcb_write_base &devcb_write_base::chain_alloc()
+{
+	// set up the chained callback pointer
+	m_chain.reset(new devcb_write_base(m_device, m_defmask));
+	return *m_chain;
 }
 
 
@@ -418,6 +499,11 @@ void devcb_write_base::resolve()
 				m_adapter = (m_target.ioport == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_ioport_adapter;
 				break;
 
+			case CALLBACK_MEMBANK:
+				resolve_membank();
+				m_adapter = (m_target.membank == nullptr) ? &devcb_write_base::write_noop_adapter : &devcb_write_base::write_membank_adapter;
+				break;
+
 			case CALLBACK_LOG:
 				m_adapter = &devcb_write_base::write_logged_adapter;
 				break;
@@ -430,12 +516,26 @@ void devcb_write_base::resolve()
 				resolve_inputline();
 				m_adapter = &devcb_write_base::write_inputline_adapter;
 				break;
+
+			case CALLBACK_ASSERTLINE:
+				resolve_inputline();
+				m_adapter = &devcb_write_base::write_assertline_adapter;
+				break;
+
+			case CALLBACK_CLEARLINE:
+				resolve_inputline();
+				m_adapter = &devcb_write_base::write_clearline_adapter;
+				break;
 		}
 	}
 	catch (binding_type_exception &binderr)
 	{
 		throw emu_fatalerror("devcb_write: Error performing a late bind of type %s to %s (name=%s)\n", binderr.m_actual_type.name(), binderr.m_target_type.name(), name);
 	}
+
+	// resolve callback chain recursively
+	if (m_chain != nullptr)
+		m_chain->resolve();
 }
 
 
@@ -515,7 +615,7 @@ void devcb_write_base::write64_adapter(address_space &space, offs_t offset, u64 
 
 
 //-------------------------------------------------
-//  write_ioport - write from an I/O port
+//  write_ioport_adapter - write to an I/O port
 //-------------------------------------------------
 
 void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
@@ -526,13 +626,25 @@ void devcb_write_base::write_ioport_adapter(address_space &space, offs_t offset,
 
 
 //-------------------------------------------------
-//  write_logged_adapter - logging unresolved
-//  adapter
+//  write_membank_adapter - switch a memory bank
+//-------------------------------------------------
+
+void devcb_write_base::write_membank_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
+{
+	if (m_target.membank)
+		m_target.membank->set_entry(unshift_mask_xor(data));
+}
+
+
+//-------------------------------------------------
+//  write_logged_adapter - log write if masked
+//  value is nonzero
 //-------------------------------------------------
 
 void devcb_write_base::write_logged_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
-	m_device.logerror("%s: unresolved devcb write\n", m_device.machine().describe_context());
+	if (unshift_mask_xor(data) != 0)
+		m_device.logerror("%s: %s\n", m_device.machine().describe_context(), m_target_tag);
 }
 
 
@@ -547,11 +659,35 @@ void devcb_write_base::write_noop_adapter(address_space &space, offs_t offset, u
 
 
 //-------------------------------------------------
-//  write_inputline_adapter - write to an device's
+//  write_inputline_adapter - write to a device's
 //  input line
 //-------------------------------------------------
 
 void devcb_write_base::write_inputline_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
 {
 	m_target.device->execute().set_input_line(m_target_int, unshift_mask_xor(data) & 1);
+}
+
+
+//-------------------------------------------------
+//  write_assertline_adapter - write to a device's
+//  input line
+//-------------------------------------------------
+
+void devcb_write_base::write_assertline_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
+{
+	if (unshift_mask_xor(data) & 1)
+		m_target.device->execute().set_input_line(m_target_int, ASSERT_LINE);
+}
+
+
+//-------------------------------------------------
+//  write_clearline_adapter - write to a device's
+//  input line
+//-------------------------------------------------
+
+void devcb_write_base::write_clearline_adapter(address_space &space, offs_t offset, u64 data, u64 mask)
+{
+	if (unshift_mask_xor(data) & 1)
+		m_target.device->execute().set_input_line(m_target_int, CLEAR_LINE);
 }

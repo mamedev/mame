@@ -14,16 +14,16 @@
 #include "debugger.h"
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
 
 #define LOG_PCI
 //#define LOG_AUDIO
 
-const xbox_base_state::debugger_constants xbox_base_state::debugp[] = { 
-	{ 0x66232714, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }, 
-	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} } 
+const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
+	{ 0x66232714, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} },
+	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
 int xbox_base_state::find_bios_index(running_machine &mach)

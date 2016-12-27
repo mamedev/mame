@@ -7,7 +7,6 @@
     driver by Bryan McPhail, Aaron Giles
 
     Games supported:
-        * Zwackery (Chip Squeak Deluxe)
         * Xenopohobe (Sounds Good)
         * Spy Hunter II (Sounds Good/Turbo Chip Squeak)
         * Blasted (Sounds Good)
@@ -59,37 +58,6 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/nvram.h"
 #include "includes/mcr68.h"
-
-
-
-/*************************************
- *
- *  Zwackery-specific handlers
- *
- *************************************/
-
-READ8_MEMBER(mcr68_state::zwackery_port_2_r)
-{
-	int result = ioport("IN2")->read();
-	int wheel = ioport("IN5")->read();
-
-	return result | ((wheel >> 2) & 0x3e);
-}
-
-
-READ16_MEMBER(mcr68_state::zwackery_6840_r)
-{
-	/* Zwackery does a timer test:                          */
-	/* It loads $1388 into one of the timers clocked by E   */
-	/* Then it sits in a tight loop counting down from $4E4 */
-	/*       BTST #$1,($2,A0)                               */
-	/*       DBNE D1,*-6                                    */
-	/* It expects D1 to end up between 0 and 5; in order to */
-	/* make this happen, we must assume that reads from the */
-	/* 6840 take 14 additional cycles                       */
-	space.device().execute().adjust_icount(-14);
-	return mcr68_6840_upper_r(space,offset,0xffff);
-}
 
 
 
@@ -308,33 +276,11 @@ static ADDRESS_MAP_START( mcr68_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x090000, 0x09007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0x0a0000, 0x0a000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x0a0000, 0x0a000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x0b0000, 0x0bffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x0d0000, 0x0dffff) AM_READ_PORT("IN0")
 	AM_RANGE(0x0e0000, 0x0effff) AM_READ_PORT("IN1")
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-
-
-/*************************************
- *
- *  Zwackery main CPU memory handlers
- *
- *************************************/
-
-static ADDRESS_MAP_START( zwackery_map, AS_PROGRAM, 16, mcr68_state )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x037fff) AM_ROM
-	AM_RANGE(0x080000, 0x080fff) AM_RAM
-	AM_RANGE(0x084000, 0x084fff) AM_RAM
-	AM_RANGE(0x100000, 0x10000f) AM_READ(zwackery_6840_r) AM_WRITE(mcr68_6840_upper_w)
-	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_device, read, write, 0xff00)
-	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_device, read, write, 0x00ff)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x802000, 0x803fff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
-	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_SHARE("spriteram")
 ADDRESS_MAP_END
 
 
@@ -357,7 +303,7 @@ static ADDRESS_MAP_START( pigskin_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
@@ -380,7 +326,7 @@ static ADDRESS_MAP_START( trisport_map, AS_PROGRAM, 16, mcr68_state )
 	AM_RANGE(0x120000, 0x12007f) AM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_SHARE("spriteram")
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_SHARE("videoram")
-	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
+	AM_RANGE(0x180000, 0x18000f) AM_DEVREADWRITE8("ptm", ptm6840_device, read, write, 0xff00)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_DEVWRITE("watchdog", watchdog_timer_device, reset16_w)
 	AM_RANGE(0x1e0000, 0x1effff) AM_READ_PORT("IN0")
@@ -393,62 +339,6 @@ ADDRESS_MAP_END
  *  Port definitions
  *
  *************************************/
-
-static INPUT_PORTS_START( zwackery )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_SERVICE( 0x0010, IP_ACTIVE_LOW )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )    /* sword */
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )    /* sound communications */
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 )    /* spell up */
-	PORT_BIT( 0x3e, IP_ACTIVE_HIGH, IPT_UNUSED )    /* encoder wheel */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )    /* shield */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )    /* spell down */
-
-	PORT_START("IN3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )      PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x05, DEF_STR( 6C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x00, "Buy-in" )            PORT_DIPLOCATION("SW1:4,5,6")
-	PORT_DIPSETTING(    0x00, "1 coin" )
-	PORT_DIPSETTING(    0x08, "2 coins" )
-	PORT_DIPSETTING(    0x10, "3 coins" )
-	PORT_DIPSETTING(    0x18, "4 coins" )
-	PORT_DIPSETTING(    0x20, "5 coins" )
-	PORT_DIPSETTING(    0x28, "6 coins" )
-	PORT_DIPSETTING(    0x30, "7 coins" )
-	PORT_DIPSETTING(    0x38, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW1:7,8")
-	PORT_DIPSETTING(    0xc0, DEF_STR( Easier ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Harder ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Hardest ) )
-
-	PORT_START("IN5")
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE
-INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( xenophob )
@@ -956,27 +846,9 @@ static const gfx_layout mcr68_sprite_layout =
 	32*32
 };
 
-static const gfx_layout zwackery_layout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	8,
-	{ 0, 0, 0, 0, 0, 0, 0, 0 },
-	{ STEP4(3,-1), STEP4(11,-1), STEP4(19,-1), STEP4(27,-1) },
-	{ 4, RGN_FRAC(1,2)+4, 0, RGN_FRAC(1,2)+0, 36, RGN_FRAC(1,2)+36, 32, RGN_FRAC(1,2)+32,
-		68, RGN_FRAC(1,2)+68, 64, RGN_FRAC(1,2)+64, 100, RGN_FRAC(1,2)+100, 96, RGN_FRAC(1,2)+96 },
-	128
-};
-
 static GFXDECODE_START( mcr68 )
 	GFXDECODE_SCALE( "gfx1", 0, mcr68_bg_layout,     0, 4, 2, 2 )
 	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0, 4 )
-GFXDECODE_END
-
-static GFXDECODE_START( zwackery )
-	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0x800, 32 )
-	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )  /* yes, an extra copy */
 GFXDECODE_END
 
 
@@ -1002,7 +874,6 @@ GFXDECODE_END
 
     Ideal CPU timings, based on counter usage:
 
-        Zwackery:     7652400
         Xenophobe:    7723800
         Spy Hunter II:7723800
         Blasted:      7798800
@@ -1015,67 +886,19 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( zwackery, mcr68_state )
-
-	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, 7652400)    /* should be XTAL_16MHz/2 */
-	MCFG_CPU_PROGRAM_MAP(zwackery_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
-
-		MCFG_WATCHDOG_ADD("watchdog")
-//  MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
-	MCFG_MACHINE_START_OVERRIDE(mcr68_state,zwackery)
-	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,zwackery)
-
-	MCFG_DEVICE_ADD("pia0", PIA6821, 0)
-	MCFG_PIA_READPB_HANDLER(IOPORT("IN0"))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mcr68_state, zwackery_pia0_w))
-	MCFG_PIA_IRQA_HANDLER(WRITELINE(mcr68_state, zwackery_pia_irq))
-	MCFG_PIA_IRQB_HANDLER(WRITELINE(mcr68_state, zwackery_pia_irq))
-
-	MCFG_DEVICE_ADD("pia1", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mcr68_state,zwackery_port_1_r))
-	MCFG_PIA_READPB_HANDLER(READ8(mcr68_state, zwackery_port_2_r))
-	MCFG_PIA_WRITEPA_HANDLER(WRITE8(mcr68_state, zwackery_pia1_w))
-	MCFG_PIA_CA2_HANDLER(WRITELINE(mcr68_state, zwackery_ca2_w))
-
-	MCFG_DEVICE_ADD("pia2", PIA6821, 0)
-	MCFG_PIA_READPA_HANDLER(READ8(mcr68_state, zwackery_port_3_r))
-	MCFG_PIA_READPB_HANDLER(IOPORT("DSW"))
-
-	/* video hardware */
-	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(30)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(32*16, 30*16)
-	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
-	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_zwackery)
-	MCFG_SCREEN_PALETTE("palette")
-
-	MCFG_GFXDECODE_ADD("gfxdecode", "palette", zwackery)
-	MCFG_PALETTE_ADD("palette", 4096)
-	MCFG_PALETTE_FORMAT(xRRRRRBBBBBGGGGG_inverted)
-
-	MCFG_VIDEO_START_OVERRIDE(mcr68_state,zwackery)
-
-	/* sound hardware */
-	MCFG_SPEAKER_STANDARD_MONO("speaker")
-	MCFG_SOUND_ADD("csd", MIDWAY_CHIP_SQUEAK_DELUXE, 0)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-
 static MACHINE_CONFIG_START( mcr68, mcr68_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, 7723800)
 	MCFG_CPU_PROGRAM_MAP(mcr68_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", mcr68_state,  mcr68_interrupt)
 
 	MCFG_WATCHDOG_ADD("watchdog")
 	MCFG_WATCHDOG_VBLANK_INIT("screen", 8)
 	MCFG_MACHINE_START_OVERRIDE(mcr68_state,mcr68)
 	MCFG_MACHINE_RESET_OVERRIDE(mcr68_state,mcr68)
+
+	MCFG_DEVICE_ADD("ptm", PTM6840, 7723800 / 10)
+	MCFG_PTM6840_IRQ_CB(INPUTLINE("maincpu", 2))
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1085,6 +908,8 @@ static MACHINE_CONFIG_START( mcr68, mcr68_state )
 	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
 	MCFG_SCREEN_UPDATE_DRIVER(mcr68_state, screen_update_mcr68)
 	MCFG_SCREEN_PALETTE("palette")
+
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", mcr68_state, scanline_cb, "screen", 0, 1)
 
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", mcr68)
 	MCFG_PALETTE_ADD("palette", 64)
@@ -1163,67 +988,6 @@ MACHINE_CONFIG_END
  *  ROM definitions
  *
  *************************************/
-
-ROM_START( zwackery )
-	ROM_REGION( 0x40000, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "pro0.bin",   0x00000, 0x4000, CRC(6fb9731c) SHA1(ee5b297ef2b4cf20df5e776f1c585b51f174bfa7) )
-	ROM_LOAD16_BYTE( "pro1.bin",   0x00001, 0x4000, CRC(84b92555) SHA1(9b4af81374828c1742c1e13fc425eea2973b0867) )
-	ROM_LOAD16_BYTE( "pro2.bin",   0x08000, 0x4000, CRC(e6977a2a) SHA1(602bf3f7e0f4080cb5b72d8fd3ee9fd11f27c558) )
-	ROM_LOAD16_BYTE( "pro3.bin",   0x08001, 0x4000, CRC(f5d0a60e) SHA1(7e0e4936cb37ac16d6db5533ae4aecdfb07ead93) )
-	ROM_LOAD16_BYTE( "pro4.bin",   0x10000, 0x4000, CRC(ec5841d9) SHA1(4bafe614e8993994b0ea9aedc8dc2474361e4594) )
-	ROM_LOAD16_BYTE( "pro5.bin",   0x10001, 0x4000, CRC(d7d99ce0) SHA1(fdf428ab9c96dae555d49bac47495613ba265452) )
-	ROM_LOAD16_BYTE( "pro6.bin",   0x18000, 0x4000, CRC(b9fe7bf5) SHA1(a94f80f49b4520a2c1098eee8983560b4ecdf3d5) )
-	ROM_LOAD16_BYTE( "pro7.bin",   0x18001, 0x4000, CRC(5e261b3b) SHA1(dcf99f528c9e3b4f8b52d413c088559bfb37d733) )
-	ROM_LOAD16_BYTE( "pro8.bin",   0x20000, 0x4000, CRC(55e380a5) SHA1(e3fef8486858cd714086449327a93b4a70ae73ff) )
-	ROM_LOAD16_BYTE( "pro9.bin",   0x20001, 0x4000, CRC(12249dca) SHA1(154170286047ea78645d45dfdd895a597dad17da) )
-	ROM_LOAD16_BYTE( "pro10.bin",  0x28000, 0x4000, CRC(6a39a8ca) SHA1(8ac9c3e60dc6f1918bfb95acf3ee170cedfb20ea) )
-	ROM_LOAD16_BYTE( "pro11.bin",  0x28001, 0x4000, CRC(ad6b45bc) SHA1(118496e898654b028f008a3d493e693ba000ef38) )
-	ROM_LOAD16_BYTE( "pro12.bin",  0x30000, 0x4000, CRC(e2d25e1f) SHA1(5d8ff303441eccf431422b453a173983a4513630) )
-	ROM_LOAD16_BYTE( "pro13.bin",  0x30001, 0x4000, CRC(e131f9b8) SHA1(08b131f2acc84d4c2c931bfd24e7de3d92a8a817) )
-
-	ROM_REGION( 0x20000, "csd:cpu", 0 )
-	ROM_LOAD16_BYTE( "csd7.bin",  0x00000, 0x2000, CRC(5501f54b) SHA1(84c0851fb868e81400cfe3ebfd7b91fe98a47bac) )
-	ROM_LOAD16_BYTE( "csd17.bin", 0x00001, 0x2000, CRC(2e482580) SHA1(92bd3e64ff580800ee16579d97bcb8b3bd9f755c) )
-	ROM_LOAD16_BYTE( "csd8.bin",  0x04000, 0x2000, CRC(13366575) SHA1(bcf25a7d4c6b2ccd7cd9978edafc66ef0cadfe72) )
-	ROM_LOAD16_BYTE( "csd18.bin", 0x04001, 0x2000, CRC(bcfe5820) SHA1(ca32daa645851a2373b3cdb8a5e63ebda84aa762) )
-
-	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT )
-	ROM_LOAD( "tileh.bin",    0x00000, 0x4000, CRC(a7237eb1) SHA1(197e5838ac2bc732ae9eb33a9257b9391d50abf8) )
-	ROM_LOAD( "tileg.bin",    0x04000, 0x4000, CRC(626cc69b) SHA1(86142bafa78f45d1a0bed0b83f3558b21384fa1a) )
-
-	ROM_REGION( 0x20000, "gfx2", 0 )
-	ROM_LOAD( "spr6h.bin",    0x00000, 0x4000, CRC(a51158dc) SHA1(8d3b0054950443fdf57f83dcb973d05f6c7ad9c8) )
-	ROM_LOAD( "spr7h.bin",    0x04000, 0x4000, CRC(941feecf) SHA1(8e88c956332e78dc7e55139879f2272116415714) )
-	ROM_LOAD( "spr6j.bin",    0x08000, 0x4000, CRC(f3eef316) SHA1(026e18bdfdda8cc9d0774e6d9d758686bf16992c) )
-	ROM_LOAD( "spr7j.bin",    0x0c000, 0x4000, CRC(a8a34033) SHA1(abd9fde84bb079c84126ad04d584ec03b44b60cd) )
-	ROM_LOAD( "spr10h.bin",   0x10000, 0x4000, CRC(a99daea6) SHA1(c323e05f398b7e9e04b75fd8ac5e8ab675236d66) )
-	ROM_LOAD( "spr11h.bin",   0x14000, 0x4000, CRC(c1a767fb) SHA1(c16e09b39b09d409b534ce4c53366e43237a3759) )
-	ROM_LOAD( "spr10j.bin",   0x18000, 0x4000, CRC(4dd04376) SHA1(069b64397e7a961c1fc246671472f759bd9f6c03) )
-	ROM_LOAD( "spr11j.bin",   0x1c000, 0x4000, CRC(e8c6a880) SHA1(dd3d52ddbc36e244b96cfb87e6a80adb94626407) )
-
-	ROM_REGION( 0x8000, "gfx3", 0 ) /* bg color maps */
-	ROM_LOAD16_BYTE( "tilef.bin",  0x0000, 0x4000, CRC(a0dfcd7e) SHA1(0fc6723eddef2a96de9bf1f48006dd067c148540) )
-	ROM_LOAD16_BYTE( "tilee.bin",  0x0001, 0x4000, CRC(ab504dc8) SHA1(4ebdcd42624e94c29ccdb8247bfff2d8e936ddd7) )
-
-	ROM_REGION( 0x000D, "plds", 0 )
-	/* According to the manual these pal's are located on the "Venus CPU" board */
-	ROM_LOAD( "pal.d5",    0x0000, 0x00001, NO_DUMP ) /* marked H-T in manual */
-	ROM_LOAD( "pal.d2",    0x0001, 0x00001, NO_DUMP ) /* marked V-T in manual */
-	ROM_LOAD( "pal.d4",    0x0002, 0x00001, NO_DUMP ) /* marked MISC V&H PAL in manual */
-	ROM_LOAD( "pal.d3",    0x0003, 0x00001, NO_DUMP ) /* marked MISC CUSTOM PAL in manual */
-	ROM_LOAD( "pal.e6",    0x0004, 0x00001, NO_DUMP ) /* marked CPU WTS PAL in manual*/
-	ROM_LOAD( "pal.f8",    0x0005, 0x00001, NO_DUMP ) /* marked CPU IOC PAL in manual*/
-	ROM_LOAD( "pal.a5",    0x0006, 0x00001, NO_DUMP ) /* marked CPU RMD PAL in manual*/
-	/* According to the manual these pal's are located on the "Venus VIDEO" board */
-	ROM_LOAD( "pal.1f",    0x0007, 0x00001, NO_DUMP ) /* marked PAL FGBDCD in manual*/
-	ROM_LOAD( "pal.1d",    0x0008, 0x00001, NO_DUMP ) /* marked PAL HCT in manual*/
-	/* According to the manual these pal's are located on the "Venus BACKGROUND" board */
-	ROM_LOAD( "pal.1c",    0x0009, 0x00001, NO_DUMP ) /* marked BGBPE PAL in manual*/
-	ROM_LOAD( "pal.5c",    0x000a, 0x00001, NO_DUMP ) /* marked HCT PAL in manual*/
-	ROM_LOAD( "pal.5j",    0x000b, 0x00001, NO_DUMP ) /* marked BGBDCD PAL in manual*/
-	/* According to the manual this pal is located on the "Artificial Artist" board */
-	ROM_LOAD( "pal20.u15", 0x000c, 0x00001, NO_DUMP ) /* marked CSD002R0 in manual, pal type not specified */
-ROM_END
 
 /*
     Xenophobe
@@ -1700,15 +1464,6 @@ void mcr68_state::mcr68_common_init(int clip, int xoffset)
 }
 
 
-DRIVER_INIT_MEMBER(mcr68_state,zwackery)
-{
-	mcr68_common_init(0, 0);
-
-	/* Zwackery doesn't care too much about this value; currently taken from Blasted */
-	m_timing_factor = attotime::from_hz(m_maincpu->unscaled_clock() / 10) * (256 + 16);
-}
-
-
 DRIVER_INIT_MEMBER(mcr68_state,xenophob)
 {
 	mcr68_common_init(0, -4);
@@ -1748,7 +1503,7 @@ DRIVER_INIT_MEMBER(mcr68_state,blasted)
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0x0c0000, 0x0cffff, write16_delegate(FUNC(mcr68_state::blasted_control_w),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 DRIVER_INIT_MEMBER(mcr68_state,intlaser)
@@ -1779,7 +1534,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivl)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivl_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 READ16_MEMBER(mcr68_state::archrivlb_port_1_r)
@@ -1801,7 +1556,7 @@ DRIVER_INIT_MEMBER(mcr68_state,archrivlb)
 	m_maincpu->space(AS_PROGRAM).install_read_handler(0x0e0000, 0x0effff, read16_delegate(FUNC(mcr68_state::archrivlb_port_1_r),this));
 
 	/* 6840 is mapped to the lower 8 bits */
-	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read16_delegate(FUNC(mcr68_state::mcr68_6840_lower_r),this), write16_delegate(FUNC(mcr68_state::mcr68_6840_lower_w),this));
+	m_maincpu->space(AS_PROGRAM).install_readwrite_handler(0x0a0000, 0x0a000f, read8_delegate(FUNC(ptm6840_device::read), &(*m_ptm)), write8_delegate(FUNC(ptm6840_device::write), &(*m_ptm)), 0x00ff);
 }
 
 
@@ -1834,8 +1589,6 @@ DRIVER_INIT_MEMBER(mcr68_state,trisport)
  *  Game drivers
  *
  *************************************/
-
-GAME( 1984, zwackery, 0,        zwackery, zwackery, mcr68_state, zwackery, ROT0,   "Bally Midway", "Zwackery", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1987, xenophob, 0,        xenophob, xenophob, mcr68_state, xenophob, ROT0,   "Bally Midway", "Xenophobe", MACHINE_SUPPORTS_SAVE )
 

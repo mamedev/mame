@@ -3707,7 +3707,17 @@ ROM_END
 
 MACHINE_START_MEMBER(konamigx_state,konamigx)
 {
+	save_item(NAME(m_sound_ctrl));
+	save_item(NAME(m_sound_intck));
+
+	save_item(NAME(m_gx_wrport1_0));
 	save_item(NAME(m_gx_wrport1_1));
+	save_item(NAME(m_gx_wrport2));
+
+	save_item(NAME(m_gx_rdport1_3));
+	save_item(NAME(m_gx_syncen));
+	save_item(NAME(m_suspension_active));
+	save_item(NAME(m_prev_pixel_clock));
 }
 
 MACHINE_RESET_MEMBER(konamigx_state,konamigx)

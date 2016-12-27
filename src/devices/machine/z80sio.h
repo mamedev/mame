@@ -62,6 +62,9 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
+#define SIO_CHANA_TAG   "cha"
+#define SIO_CHANB_TAG   "chb"
+
 #define MCFG_Z80SIO_ADD(_tag, _clock, _rxa, _txa, _rxb, _txb) \
 	MCFG_DEVICE_ADD(_tag, Z80SIO, _clock) \
 	MCFG_Z80SIO_OFFSETS(_rxa, _txa, _rxb, _txb)

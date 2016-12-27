@@ -60,7 +60,6 @@ public:
 	uint8_t     m_ay_port_a;
 	uint8_t     m_ay_port_b;
 	uint8_t     m_eq_cymbal_ctrl;
-	emu_timer *m_nmi_timer;
 	emu_timer *m_adjuster_timer;
 	float     m_cymvol;
 	float     m_hihatvol;
@@ -84,8 +83,9 @@ public:
 	DECLARE_WRITE8_MEMBER(equites_c0f8_w);
 	DECLARE_WRITE8_MEMBER(equites_cymbal_ctrl_w);
 	DECLARE_WRITE8_MEMBER(equites_dac_latch_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_porta_w);
 	DECLARE_WRITE8_MEMBER(equites_8155_portb_w);
-	DECLARE_WRITE8_MEMBER(equites_8155_w);
+	DECLARE_WRITE8_MEMBER(equites_8155_portc_w);
 	DECLARE_WRITE16_MEMBER(gekisou_unknown_bit_w);
 	DECLARE_READ16_MEMBER(equites_spriteram_kludge_r);
 	DECLARE_READ8_MEMBER(mcu_ram_r);
@@ -117,7 +117,7 @@ public:
 	DECLARE_PALETTE_INIT(splndrbt);
 	uint32_t screen_update_equites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_splndrbt(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(equites_nmi_callback);
+	DECLARE_WRITE_LINE_MEMBER(equites_8155_timer_pulse);
 	TIMER_CALLBACK_MEMBER(equites_frq_adjuster_callback);
 	TIMER_DEVICE_CALLBACK_MEMBER(equites_scanline);
 	TIMER_DEVICE_CALLBACK_MEMBER(splndrbt_scanline);

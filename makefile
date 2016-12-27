@@ -804,7 +804,7 @@ SCRIPTS += scripts/target/$(TARGET)/mess.lua
 endif
 
 ifndef SOURCES
-ifdef PROJECT 
+ifdef PROJECT
 SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 else
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua

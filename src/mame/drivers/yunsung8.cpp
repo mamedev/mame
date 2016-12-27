@@ -54,19 +54,19 @@ WRITE8_MEMBER(yunsung8_state::bankswitch_w)
 
 READ8_MEMBER(yunsung8_state::sound_command_r)
 {
-	m_audiocpu->set_input_line (0, CLEAR_LINE);
-	return (m_soundlatch->read (space, 0));
+	m_audiocpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch->read(space, 0);
 }
 
-WRITE8_MEMBER (yunsung8_state::sound_command_w)
+WRITE8_MEMBER(yunsung8_state::sound_command_w)
 {
-	m_soundlatch->write (space, 0, data);
-	m_audiocpu->set_input_line (0, ASSERT_LINE);
+	m_soundlatch->write(space, 0, data);
+	m_audiocpu->set_input_line(0, ASSERT_LINE);
 }
 
-WRITE8_MEMBER (yunsung8_state::main_irq_ack_w)
+WRITE8_MEMBER(yunsung8_state::main_irq_ack_w)
 {
-	m_maincpu->set_input_line (0, CLEAR_LINE);
+	m_maincpu->set_input_line(0, CLEAR_LINE);
 }
 
 /*
@@ -118,18 +118,13 @@ WRITE8_MEMBER(yunsung8_state::sound_bankswitch_w)
 		logerror("%s: Bank %02X\n", machine().describe_context(), data);
 }
 
-WRITE8_MEMBER(yunsung8_state::adpcm_w)
-{
-	m_adpcm = data;
-}
-
 
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, yunsung8_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")      // Banked ROM
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(sound_bankswitch_w) // ROM Bank
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(adpcm_w)
+	AM_RANGE(0xe400, 0xe400) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
 	AM_RANGE(0xec00, 0xec01) AM_DEVWRITE("ymsnd", ym3812_device, write)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(sound_command_r) // From Main CPU
@@ -321,13 +316,12 @@ GFXDECODE_END
 
 WRITE_LINE_MEMBER(yunsung8_state::adpcm_int)
 {
-	m_msm->data_w(m_adpcm & 0x0F);
-	m_adpcm >>= 4;
+	if (!state)
+		return;
 
-	m_toggle ^= 1;
-
-	if (m_toggle)
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_toggle = !m_toggle;
+	m_adpcm_select->select_w(m_toggle);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, m_toggle);
 }
 
 void yunsung8_state::machine_start()
@@ -341,7 +335,6 @@ void yunsung8_state::machine_start()
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_layers_ctrl));
 	save_item(NAME(m_videobank));
-	save_item(NAME(m_adpcm));
 	save_item(NAME(m_toggle));
 }
 
@@ -349,8 +342,7 @@ void yunsung8_state::machine_reset()
 {
 	m_videobank = 0;
 	m_layers_ctrl = 0;
-	m_adpcm = 0;
-	m_toggle = 0;
+	m_toggle = false;
 }
 
 
@@ -383,6 +375,9 @@ static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_16MHz/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("msm", msm5205_device, data_w))
 
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MCFG_MSM5205_VCLK_CB(WRITELINE(yunsung8_state, adpcm_int)) /* interrupt function */

@@ -630,6 +630,17 @@ MACHINE_CONFIG_END
 /*--------------------------------------------------------------------------------
 / Back To the Future - CPU Rev 3 /Alpha Type 3 - 32K Roms - 32/64K Sound Roms
 /--------------------------------------------------------------------------------*/
+ROM_START(bttf_a28)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("bttfb5.2-8", 0x4000, 0x4000, CRC(a7dafa3c) SHA1(a29b8986d1886aa7bb7dea2521c3d7143ab75320))
+	ROM_LOAD("bttfc5.2-8", 0x8000, 0x8000, CRC(5dc9928f) SHA1(03de05ed7b04ba86d695f03b1a3d65788faf2d4f))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("bttfsf7.rom", 0x8000, 0x8000, CRC(7673146e) SHA1(d6bd7cf39c78c8aff0b1a0b6cfd46a2a8ce9e086))
+	ROM_REGION(0x1000000, "sound1", 0)
+	ROM_LOAD("bttfsf6.rom", 0x00000, 0x10000, CRC(468a8d9c) SHA1(713cf84cc5f0531e2e9f7aaa58ebeb53c28ba395))
+	ROM_LOAD("bttfsf5.rom", 0x10000, 0x10000, CRC(37a6f6b8) SHA1(ebd603d36527a2af25dcda1fde5cdf9a34d1f9cd))
+ROM_END
+
 ROM_START(bttf_a27)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("bttfb5.2-7", 0x4000, 0x4000, CRC(24b53174) SHA1(00a5e47e70ce4244873980c946479f0bbc414f2e))
@@ -725,6 +736,17 @@ ROM_END
 /*-----------------------------------------------------------------------------------
 / Monday Night Football - CPU Rev 2 /Alpha Type 3 16/32K Roms - 32/64K Sound Roms
 /----------------------------------------------------------------------------------*/
+ROM_START(mnfb_c29)
+	ROM_REGION(0x10000, "maincpu", 0)
+	ROM_LOAD("mnfb2-9.b5", 0x4000, 0x4000, BAD_DUMP CRC(2d6805d1) SHA1(f222cbf30d07975279eea210738f7d4f73b3fcf4)) // patched by PINMAME dev
+	ROM_LOAD("mnfb2-9.c5", 0x8000, 0x8000, CRC(98d50cf5) SHA1(59d3b16f8195ab95cece71a12dab3349dfeb2c2b))
+	ROM_REGION(0x10000, "audiocpu", 0)
+	ROM_LOAD("mnf-f7.256", 0x8000, 0x8000, CRC(fbc2d6f6) SHA1(33173c081de776d32e926481e94b265ec48d770b))
+	ROM_REGION(0x40000, "sound1", 0)
+	ROM_LOAD("mnf-f5-6.512", 0x00000, 0x10000, CRC(0c6ea963) SHA1(8c88fa588222ef8a6c872b8c5b49639b108384d4))
+	ROM_LOAD("mnf-f4-5.512", 0x10000, 0x10000, CRC(efca5d80) SHA1(9655c885dd64aa170205170b6a0c052bd9367379))
+ROM_END
+
 ROM_START(mnfb_c27)
 	ROM_REGION(0x10000, "maincpu", 0)
 	ROM_LOAD("mnfb2-7.b5", 0x4000, 0x4000, CRC(995eb9b8) SHA1(d05d74393fda59ffd8d7b5546313779cdb10d23e))
@@ -924,15 +946,17 @@ ROM_START(torp_a16)
 ROM_END
 
 
-GAME(1990,  bttf_a27,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a20,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1990,  bttf_a21,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",                                     MACHINE_IS_SKELETON_MECHANICAL)
-GAME(199?,  bttf_g27,       bttf_a27,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",                             MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a28,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.8)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a27,       bttf_a28,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a20,       bttf_a28,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.0)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1990,  bttf_a21,       bttf_a28,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To The Future (2.1)",                                     MACHINE_IS_SKELETON_MECHANICAL)
+GAME(199?,  bttf_g27,       bttf_a28,   de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",    "Back To the Future (2.7 Germany)",                             MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  kiko_a10,       0,          de_type3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "King Kong (1.0)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a83,       0,          de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.3)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_a81,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (8.1)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1987,  lwar_e90,       lwar_a83,   de_type1,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Laser War (9.0 Europe)",    MACHINE_IS_SKELETON_MECHANICAL)
-GAME(1989,  mnfb_c27,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  mnfb_c29,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.9, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1989,  mnfb_c27,       mnfb_c29,   de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Monday Night Football (2.7, 50cts)",       MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a32,       0,          de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (3.2)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1990,  poto_a29,       poto_a32,   de_type2_alpha3,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "The Phantom of the Opera (2.9)",           MACHINE_IS_SKELETON_MECHANICAL)
 GAME(1989,  play_a24,       0,          de_type2,   de_2, de_2_state,   de_2,   ROT0,   "Data East",        "Playboy 35th Anniversary (2.4)",           MACHINE_IS_SKELETON_MECHANICAL)

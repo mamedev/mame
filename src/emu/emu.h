@@ -110,7 +110,6 @@ typedef device_t * (*machine_config_constructor)(machine_config &config, device_
 
 // generic helpers
 #include "devcb.h"
-#include "dispatch.h"
 #include "drivers/xtal.h"
 #include "bookkeeping.h"
 #include "video/generic.h"

@@ -71,7 +71,7 @@ VIDEO_START_MEMBER(leland_state,leland)
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_last_scanline));
 	for (uint8_t i = 0; i < 2; i++)
-	{	
+	{
 		save_item(NAME(m_vram_state[i].m_addr), i);
 		save_item(NAME(m_vram_state[i].m_latch), i);
 	}
@@ -90,7 +90,7 @@ VIDEO_START_MEMBER(leland_state,ataxx)
 	save_item(NAME(m_xscroll));
 	save_item(NAME(m_yscroll));
 	for (uint8_t i = 0; i < 2; i++)
-	{	
+	{
 		save_item(NAME(m_vram_state[i].m_addr), i);
 		save_item(NAME(m_vram_state[i].m_latch), i);
 	}

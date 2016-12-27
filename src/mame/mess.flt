@@ -625,6 +625,7 @@ tm990189.cpp
 tmc1800.cpp
 tmc2000e.cpp
 tmc600.cpp
+tosh1000.cpp
 tr606.cpp
 tranz330.cpp
 tricep.cpp

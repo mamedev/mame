@@ -21,6 +21,7 @@
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
+#include "plib/pstream.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -125,6 +126,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
 
 #define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
+#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
@@ -832,13 +834,19 @@ namespace netlist
 			STRING,
 			DOUBLE,
 			INTEGER,
-			LOGIC
+			LOGIC,
+			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
 		param_t(const param_type_t atype, device_t &device, const pstring &name);
 		virtual ~param_t() {}
 
 		param_type_t param_type() const { return m_param_type; }
+
+	protected:
+		virtual void changed() { }
+		void changed_and_update();
+		void register_and_set();
 
 	private:
 		const param_type_t m_param_type;
@@ -847,45 +855,114 @@ namespace netlist
 	template <typename C, param_t::param_type_t T>
 	class param_template_t : public param_t
 	{
-		P_PREVENT_COPYING(param_template_t)
 	public:
 		param_template_t(device_t &device, const pstring name, const C val);
 
 		const C operator()() const { return Value(); }
 
-		void setTo(const C &param);
-		void initial(const C &val) { m_param = val; }
+		void setTo(const C &param)
+		{
+			if (m_param != param)
+			{
+				m_param = param;
+				changed_and_update();
+			}
+		}
+		void initial(const C &val) { m_param = val; changed(); }
 
 	protected:
 		C Value() const { return m_param;   }
-		virtual void changed() { }
 		C m_param;
 	private:
 	};
 
-	using param_double_t = param_template_t<nl_double, param_t::DOUBLE>;
-	using param_int_t = param_template_t<int, param_t::INTEGER>;
-	using param_str_t = param_template_t<pstring, param_t::STRING>;
+	template <typename C, param_t::param_type_t T>
+	class param_template_final_t final : public param_template_t<C, T>
+	{
+	public:
+		param_template_final_t(device_t &device, const pstring name, const C val)
+		: param_template_t<C,T>(device, name, val)
+		  {
+			this->register_and_set();
+		  }
+	};
 
-	using param_logic_t = param_template_t<bool, param_t::LOGIC>;
+	using param_double_t = param_template_final_t<nl_double, param_t::DOUBLE>;
+	using param_int_t = param_template_final_t<int, param_t::INTEGER>;
 
-	class param_model_t : public param_str_t
+	using param_logic_t = param_template_final_t<bool, param_t::LOGIC>;
+	using param_ptr_t = param_template_final_t<std::uint_fast8_t*, param_t::POINTER>;
+	using param_str_base_t = param_template_t<pstring, param_t::STRING>;
+
+	class param_str_t final : public param_str_base_t
+	{
+	public:
+		param_str_t(device_t &device, const pstring name, const pstring val)
+		: param_str_base_t(device, name, val)
+		{
+			register_and_set();
+		}
+	};
+
+	class param_model_t final : public param_str_base_t
 	{
 	public:
 		param_model_t(device_t &device, const pstring name, const pstring val)
-		: param_str_t(device, name, val) { }
+		: param_str_base_t(device, name, val)
+		{
+			register_and_set();
+		}
 
 		/* these should be cached! */
 		nl_double model_value(const pstring &entity);
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		void changed() override
+		virtual void changed() override
 		{
 			m_map.clear();
 		}
 	private:
 		model_map_t m_map;
+	};
+
+	class param_data_t : public param_str_base_t
+	{
+	public:
+
+		typedef uint8_t type;
+
+		param_data_t(device_t &device, const pstring name)
+		: param_str_base_t(device, name, "") { }
+
+		std::unique_ptr<plib::pistream> stream();
+
+	protected:
+		virtual void changed() override { }
+	private:
+	};
+
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name)
+		: param_data_t(device, name)
+		{
+			register_and_set();
+		}
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1207,19 +1284,6 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
-
-	template <class C, param_t::param_type_t T>
-	inline void param_template_t<C, T>::setTo(const C &param)
-	{
-		if (m_param != param)
-		{
-			m_param = param;
-			changed();
-			device().update_param();
-			if (device().needs_update_after_param_change())
-				device().update_dev();
-		}
-	}
 
 	inline bool detail::core_terminal_t::is_logic() const noexcept
 	{

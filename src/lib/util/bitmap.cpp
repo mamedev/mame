@@ -37,7 +37,7 @@ inline int32_t bitmap_t::compute_rowpixels(int width, int xslop)
 
 inline void bitmap_t::compute_base(int xslop, int yslop)
 {
-	m_base = m_alloc + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
+	m_base = m_alloc.get() + (m_rowpixels * yslop + xslop) * (m_bpp / 8);
 }
 
 
@@ -46,8 +46,24 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
 //  BITMAP ALLOCATION/CONFIGURATION
 //**************************************************************************
 
+bitmap_t::bitmap_t(bitmap_t &&that)
+	: m_alloc(std::move(that.m_alloc))
+	, m_allocbytes(that.m_allocbytes)
+	, m_base(that.m_base)
+	, m_rowpixels(that.m_rowpixels)
+	, m_width(that.m_width)
+	, m_height(that.m_height)
+	, m_format(that.m_format)
+	, m_bpp(that.m_bpp)
+	, m_palette(nullptr)
+	, m_cliprect(that.m_cliprect)
+{
+	set_palette(that.m_palette);
+	that.reset();
+}
+
 /**
- * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int xslop, int yslop)
  *
  * @brief   -------------------------------------------------
  *            bitmap_t - basic constructor
@@ -61,19 +77,19 @@ inline void bitmap_t::compute_base(int xslop, int yslop)
  * @param   yslop   The yslop.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xslop, int yslop)
-	: m_alloc(nullptr),
-		m_allocbytes(0),
-		m_format(format),
-		m_bpp(bpp),
-		m_palette(nullptr)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, int width, int height, int xslop, int yslop)
+	: m_alloc()
+	, m_allocbytes(0)
+	, m_format(format)
+	, m_bpp(bpp)
+	, m_palette(nullptr)
 {
 	// allocate intializes all other fields
 	allocate(width, height, xslop, yslop);
 }
 
 /**
- * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int height, int rowpixels)
  *
  * @brief   Constructor.
  *
@@ -85,22 +101,22 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, int width, int height, int xsl
  * @param   rowpixels       The rowpixels.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int height, int rowpixels)
-	: m_alloc(nullptr),
-		m_allocbytes(0),
-		m_base(base),
-		m_rowpixels(rowpixels),
-		m_width(width),
-		m_height(height),
-		m_format(format),
-		m_bpp(bpp),
-		m_palette(nullptr),
-		m_cliprect(0, width - 1, 0, height - 1)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, void *base, int width, int height, int rowpixels)
+	: m_alloc()
+	, m_allocbytes(0)
+	, m_base(base)
+	, m_rowpixels(rowpixels)
+	, m_width(width)
+	, m_height(height)
+	, m_format(format)
+	, m_bpp(bpp)
+	, m_palette(nullptr)
+	, m_cliprect(0, width - 1, 0, height - 1)
 {
 }
 
 /**
- * @fn  bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
+ * @fn  bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, bitmap_t &source, const rectangle &subrect)
  *
  * @brief   Constructor.
  *
@@ -110,17 +126,17 @@ bitmap_t::bitmap_t(bitmap_format format, int bpp, void *base, int width, int hei
  * @param   subrect         The subrect.
  */
 
-bitmap_t::bitmap_t(bitmap_format format, int bpp, bitmap_t &source, const rectangle &subrect)
-	: m_alloc(nullptr),
-		m_allocbytes(0),
-		m_base(source.raw_pixptr(subrect.min_y, subrect.min_x)),
-		m_rowpixels(source.m_rowpixels),
-		m_width(subrect.width()),
-		m_height(subrect.height()),
-		m_format(format),
-		m_bpp(bpp),
-		m_palette(nullptr),
-		m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
+bitmap_t::bitmap_t(bitmap_format format, uint8_t bpp, bitmap_t &source, const rectangle &subrect)
+	: m_alloc()
+	, m_allocbytes(0)
+	, m_base(source.raw_pixptr(subrect.min_y, subrect.min_x))
+	, m_rowpixels(source.m_rowpixels)
+	, m_width(subrect.width())
+	, m_height(subrect.height())
+	, m_format(format)
+	, m_bpp(bpp)
+	, m_palette(nullptr)
+	, m_cliprect(0, subrect.width() - 1, 0, subrect.height() - 1)
 {
 	assert(format == source.m_format);
 	assert(bpp == source.m_bpp);
@@ -139,6 +155,22 @@ bitmap_t::~bitmap_t()
 {
 	// delete any existing stuff
 	reset();
+}
+
+bitmap_t &bitmap_t::operator=(bitmap_t &&that)
+{
+	m_alloc = std::move(that.m_alloc);
+	m_allocbytes = that.m_allocbytes;
+	m_base = that.m_base;
+	m_rowpixels = that.m_rowpixels;
+	m_width = that.m_width;
+	m_height = that.m_height;
+	m_format = that.m_format;
+	m_bpp = that.m_bpp;
+	set_palette(that.m_palette);
+	m_cliprect = that.m_cliprect;
+	that.reset();
+	return *this;
 }
 
 /**
@@ -175,10 +207,10 @@ void bitmap_t::allocate(int width, int height, int xslop, int yslop)
 
 	// allocate memory for the bitmap itself
 	m_allocbytes = m_rowpixels * (m_height + 2 * yslop) * m_bpp / 8;
-	m_alloc = new uint8_t[m_allocbytes];
+	m_alloc.reset(new uint8_t[m_allocbytes]);
 
 	// clear to 0 by default
-	memset(m_alloc, 0, m_allocbytes);
+	memset(m_alloc.get(), 0, m_allocbytes);
 
 	// compute the base
 	compute_base(xslop, yslop);
@@ -242,8 +274,7 @@ void bitmap_t::reset()
 {
 	// delete any existing stuff
 	set_palette(nullptr);
-	delete[] m_alloc;
-	m_alloc = nullptr;
+	m_alloc.reset();
 	m_base = nullptr;
 
 	// reset all fields

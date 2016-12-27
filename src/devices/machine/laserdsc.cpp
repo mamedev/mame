@@ -321,7 +321,7 @@ void laserdisc_device::device_start()
 	init_audio();
 
 	// register callbacks
-	machine().configuration().config_register("laserdisc", config_saveload_delegate(&laserdisc_device::config_load, this), config_saveload_delegate(&laserdisc_device::config_save, this));
+	machine().configuration().config_register("laserdisc", config_load_delegate(&laserdisc_device::config_load, this), config_save_delegate(&laserdisc_device::config_save, this));
 }
 
 
@@ -1142,10 +1142,10 @@ void laserdisc_device::process_track_data()
 //  configuration file
 //-------------------------------------------------
 
-void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentnode)
+void laserdisc_device::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// might not have any data
@@ -1153,13 +1153,13 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 		return;
 
 	// iterate over overlay nodes
-	for (xml_data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
+	for (util::xml::data_node const *ldnode = parentnode->get_child("device"); ldnode != nullptr; ldnode = ldnode->get_next_sibling("device"))
 	{
 		const char *devtag = ldnode->get_attribute_string("tag", "");
 		if (strcmp(devtag, tag()) == 0)
 		{
 			// handle the overlay node
-			xml_data_node const *const overnode = ldnode->get_child("overlay");
+			util::xml::data_node const *const overnode = ldnode->get_child("overlay");
 			if (overnode != nullptr)
 			{
 				// fetch positioning controls
@@ -1178,21 +1178,21 @@ void laserdisc_device::config_load(config_type cfg_type, xml_data_node *parentno
 //  file
 //-------------------------------------------------
 
-void laserdisc_device::config_save(config_type cfg_type, xml_data_node *parentnode)
+void laserdisc_device::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	// we only care about game files
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	// create a node
-	xml_data_node *const ldnode = parentnode->add_child("device", nullptr);
+	util::xml::data_node *const ldnode = parentnode->add_child("device", nullptr);
 	if (ldnode != nullptr)
 	{
 		// output the basics
 		ldnode->set_attribute("tag", tag());
 
 		// add an overlay node
-		xml_data_node *const overnode = ldnode->add_child("overlay", nullptr);
+		util::xml::data_node *const overnode = ldnode->add_child("overlay", nullptr);
 		bool changed = false;
 		if (overnode != nullptr)
 		{

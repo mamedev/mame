@@ -464,26 +464,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-// ----------------------------------------------------------------------------------------
-// Parameters ...
-// ----------------------------------------------------------------------------------------
 
-template <typename C, param_t::param_type_t T>
-param_template_t<C, T>::param_template_t(device_t &device, const pstring name, const C val)
-: param_t(T, device, device.name() + "." + name)
-, m_param(val)
-{
-	/* pstrings not yet supported, these need special logic */
-	if (T != param_t::STRING && T != param_t::MODEL)
-		netlist().save(*this, m_param, "m_param");
-	device.setup().register_and_set_param(device.name() + "." + name, *this);
-}
-
-template class param_template_t<double, param_t::DOUBLE>;
-template class param_template_t<int, param_t::INTEGER>;
-template class param_template_t<bool, param_t::LOGIC>;
-template class param_template_t<pstring, param_t::STRING>;
-template class param_template_t<pstring, param_t::MODEL>;
 
 // ----------------------------------------------------------------------------------------
 // core_device_t
@@ -904,14 +885,44 @@ logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 }
 
 // ----------------------------------------------------------------------------------------
-// param_t & friends
+// Parameters ...
 // ----------------------------------------------------------------------------------------
 
 param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
-	: device_object_t(device, name, PARAM)
+	: device_object_t(device, device.name() + "." + name, PARAM)
 	, m_param_type(atype)
 {
 }
+
+void param_t::register_and_set()
+{
+	dynamic_cast<device_t &>(device()).setup().register_and_set_param(this->name(), *this);
+}
+
+void param_t::changed_and_update()
+{
+	changed();
+	device().update_param();
+	if (device().needs_update_after_param_change())
+		device().update_dev();
+}
+
+template <typename C, param_t::param_type_t T>
+param_template_t<C, T>::param_template_t(device_t &device, const pstring name, const C val)
+: param_t(T, device, name)
+, m_param(val)
+{
+	/* pstrings not yet supported, these need special logic */
+	if (T != param_t::STRING && T != param_t::MODEL)
+		netlist().save(*this, m_param, "m_param");
+}
+
+template class param_template_t<double, param_t::DOUBLE>;
+template class param_template_t<int, param_t::INTEGER>;
+template class param_template_t<bool, param_t::LOGIC>;
+template class param_template_t<std::uint_fast8_t*, param_t::POINTER>;
+template class param_template_t<pstring, param_t::STRING>;
+//template class param_template_t<pstring, param_t::MODEL>;
 
 const pstring param_model_t::model_type()
 {
@@ -934,6 +945,12 @@ nl_double param_model_t::model_value(const pstring &entity)
 		netlist().setup().model_parse(this->Value(), m_map);
 	return netlist().setup().model_value(m_map, entity);
 }
+
+std::unique_ptr<plib::pistream> param_data_t::stream()
+{
+	return device().netlist().setup().get_data_stream(Value());
+}
+
 
 
 	namespace devices

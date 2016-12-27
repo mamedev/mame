@@ -222,7 +222,7 @@ static int get_variable_value(running_machine &machine, const char *string, char
 //  substitution
 //-------------------------------------------------
 
-static const char *xml_get_attribute_string_with_subst(running_machine &machine, xml_data_node const &node, const char *attribute, const char *defvalue)
+static const char *xml_get_attribute_string_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, const char *defvalue)
 {
 	const char *str = node.get_attribute_string(attribute, nullptr);
 	static char buffer[1000];
@@ -259,7 +259,7 @@ static const char *xml_get_attribute_string_with_subst(running_machine &machine,
 //  substitution
 //-------------------------------------------------
 
-static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_node const &node, const char *attribute, int defvalue)
+static int xml_get_attribute_int_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, int defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	int value;
@@ -283,7 +283,7 @@ static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_n
 //  substitution
 //-------------------------------------------------
 
-static float xml_get_attribute_float_with_subst(running_machine &machine, xml_data_node const &node, const char *attribute, float defvalue)
+static float xml_get_attribute_float_with_subst(running_machine &machine, util::xml::data_node const &node, const char *attribute, float defvalue)
 {
 	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, nullptr);
 	float value;
@@ -298,7 +298,7 @@ static float xml_get_attribute_float_with_subst(running_machine &machine, xml_da
 //  parse_bounds - parse a bounds XML node
 //-------------------------------------------------
 
-void parse_bounds(running_machine &machine, xml_data_node const *boundsnode, render_bounds &bounds)
+void parse_bounds(running_machine &machine, util::xml::data_node const *boundsnode, render_bounds &bounds)
 {
 	// skip if nothing
 	if (boundsnode == nullptr)
@@ -339,7 +339,7 @@ void parse_bounds(running_machine &machine, xml_data_node const *boundsnode, ren
 //  parse_color - parse a color XML node
 //-------------------------------------------------
 
-void parse_color(running_machine &machine, xml_data_node const *colornode, render_color &color)
+void parse_color(running_machine &machine, util::xml::data_node const *colornode, render_color &color)
 {
 	// skip if nothing
 	if (colornode == nullptr)
@@ -367,7 +367,7 @@ void parse_color(running_machine &machine, xml_data_node const *colornode, rende
 //  node
 //-------------------------------------------------
 
-static void parse_orientation(running_machine &machine, xml_data_node const *orientnode, int &orientation)
+static void parse_orientation(running_machine &machine, util::xml::data_node const *orientnode, int &orientation)
 {
 	// skip if nothing
 	if (orientnode == nullptr)
@@ -422,7 +422,7 @@ layout_element::make_component_map const layout_element::s_make_component{
 //  layout_element - constructor
 //-------------------------------------------------
 
-layout_element::layout_element(running_machine &machine, xml_data_node const &elemnode, const char *dirname)
+layout_element::layout_element(running_machine &machine, util::xml::data_node const &elemnode, const char *dirname)
 	: m_next(nullptr),
 		m_machine(machine),
 		m_defstate(0),
@@ -440,7 +440,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node const &el
 	// parse components in order
 	bool first = true;
 	render_bounds bounds = { 0 };
-	for (xml_data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
+	for (util::xml::data_node const *compnode = elemnode.get_first_child(); compnode; compnode = compnode->get_next_sibling())
 	{
 		make_component_map::const_iterator const make_func(s_make_component.find(compnode->get_name()));
 		if (make_func == s_make_component.end())
@@ -539,7 +539,7 @@ void layout_element::element_scale(bitmap_argb32 &dest, bitmap_argb32 &source, c
 //-------------------------------------------------
 
 template <typename T>
-layout_element::component::ptr layout_element::make_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 {
 	return std::make_unique<T>(machine, compnode, dirname);
 }
@@ -551,7 +551,7 @@ layout_element::component::ptr layout_element::make_component(running_machine &m
 //-------------------------------------------------
 
 template <int D>
-layout_element::component::ptr layout_element::make_dotmatrix_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::component::ptr layout_element::make_dotmatrix_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 {
 	return std::make_unique<dotmatrix_component>(D, machine, compnode, dirname);
 }
@@ -614,7 +614,7 @@ layout_element::texture &layout_element::texture::operator=(texture &&that)
 //  component - constructor
 //-------------------------------------------------
 
-layout_element::component::component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::component::component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: m_state(0)
 {
 	// fetch common data
@@ -641,7 +641,7 @@ void layout_element::component::normalize_bounds(float xoffs, float yoffs, float
 //  image_component - constructor
 //-------------------------------------------------
 
-layout_element::image_component::image_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::image_component::image_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 	, m_hasalpha(false)
 {
@@ -709,7 +709,7 @@ void layout_element::image_component::load_bitmap()
 //  text_component - constructor
 //-------------------------------------------------
 
-layout_element::text_component::text_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::text_component::text_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	m_string = xml_get_attribute_string_with_subst(machine, compnode, "string", "");
@@ -733,7 +733,7 @@ void layout_element::text_component::draw(running_machine &machine, bitmap_argb3
 //  dotmatrix_component - constructor
 //-------------------------------------------------
 
-layout_element::dotmatrix_component::dotmatrix_component(int dots, running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::dotmatrix_component::dotmatrix_component(int dots, running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname),
 		m_dots(dots)
 {
@@ -769,7 +769,7 @@ void layout_element::dotmatrix_component::draw(running_machine &machine, bitmap_
 //  simplecounter_component - constructor
 //-------------------------------------------------
 
-layout_element::simplecounter_component::simplecounter_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::simplecounter_component::simplecounter_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	m_digits = xml_get_attribute_int_with_subst(machine, compnode, "digits", 2);
@@ -795,7 +795,7 @@ void layout_element::simplecounter_component::draw(running_machine &machine, bit
 //  reel_component - constructor
 //-------------------------------------------------
 
-layout_element::reel_component::reel_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::reel_component::reel_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 	for (auto & elem : m_hasalpha)
@@ -1203,7 +1203,7 @@ void layout_element::reel_component::load_reel_bitmap(int number)
 //  led7seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led7seg_component::led7seg_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led7seg_component::led7seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1264,7 +1264,7 @@ void layout_element::led7seg_component::draw(running_machine &machine, bitmap_ar
 //  led8seg_gts1_component - constructor
 //-------------------------------------------------
 
-layout_element::led8seg_gts1_component::led8seg_gts1_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led8seg_gts1_component::led8seg_gts1_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1331,7 +1331,7 @@ void layout_element::led8seg_gts1_component::draw(running_machine &machine, bitm
 //  led14seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led14seg_component::led14seg_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led14seg_component::led14seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1442,7 +1442,7 @@ void layout_element::led14seg_component::draw(running_machine &machine, bitmap_a
 //  led14segsc_component - constructor
 //-------------------------------------------------
 
-layout_element::led14segsc_component::led14segsc_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led14segsc_component::led14segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1562,7 +1562,7 @@ void layout_element::led14segsc_component::draw(running_machine &machine, bitmap
 //  led16seg_component - constructor
 //-------------------------------------------------
 
-layout_element::led16seg_component::led16seg_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led16seg_component::led16seg_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1683,7 +1683,7 @@ void layout_element::led16seg_component::draw(running_machine &machine, bitmap_a
 //  led16segsc_component - constructor
 //-------------------------------------------------
 
-layout_element::led16segsc_component::led16segsc_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::led16segsc_component::led16segsc_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1813,7 +1813,7 @@ void layout_element::led16segsc_component::draw(running_machine &machine, bitmap
 //  rect_component - constructor
 //-------------------------------------------------
 
-layout_element::rect_component::rect_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::rect_component::rect_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -1859,7 +1859,7 @@ void layout_element::rect_component::draw(running_machine &machine, bitmap_argb3
 //  disk_component - constructor
 //-------------------------------------------------
 
-layout_element::disk_component::disk_component(running_machine &machine, xml_data_node const &compnode, const char *dirname)
+layout_element::disk_component::disk_component(running_machine &machine, util::xml::data_node const &compnode, const char *dirname)
 	: component(machine, compnode, dirname)
 {
 }
@@ -2213,7 +2213,7 @@ const simple_list<layout_view::item> layout_view::s_null_list;
 //  layout_view - constructor
 //-------------------------------------------------
 
-layout_view::layout_view(running_machine &machine, xml_data_node const &viewnode, simple_list<layout_element> &elemlist)
+layout_view::layout_view(running_machine &machine, util::xml::data_node const &viewnode, simple_list<layout_element> &elemlist)
 	: m_next(nullptr)
 	, m_aspect(1.0f)
 	, m_scraspect(1.0f)
@@ -2222,33 +2222,33 @@ layout_view::layout_view(running_machine &machine, xml_data_node const &viewnode
 	m_name = xml_get_attribute_string_with_subst(machine, viewnode, "name", "");
 
 	// if we have a bounds item, load it
-	xml_data_node const *const boundsnode = viewnode.get_child("bounds");
+	util::xml::data_node const *const boundsnode = viewnode.get_child("bounds");
 	m_expbounds.x0 = m_expbounds.y0 = m_expbounds.x1 = m_expbounds.y1 = 0;
 	if (boundsnode != nullptr)
 		parse_bounds(machine, boundsnode, m_expbounds);
 
 	// load backdrop items
-	for (xml_data_node const *itemnode = viewnode.get_child("backdrop"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("backdrop"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("backdrop"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("backdrop"))
 		m_backdrop_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load screen items
-	for (xml_data_node const *itemnode = viewnode.get_child("screen"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("screen"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("screen"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("screen"))
 		m_screen_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load overlay items
-	for (xml_data_node const *itemnode = viewnode.get_child("overlay"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("overlay"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("overlay"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("overlay"))
 		m_overlay_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load bezel items
-	for (xml_data_node const *itemnode = viewnode.get_child("bezel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("bezel"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("bezel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("bezel"))
 		m_bezel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load cpanel items
-	for (xml_data_node const *itemnode = viewnode.get_child("cpanel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("cpanel"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("cpanel"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("cpanel"))
 		m_cpanel_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// load marquee items
-	for (xml_data_node const *itemnode = viewnode.get_child("marquee"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("marquee"))
+	for (util::xml::data_node const *itemnode = viewnode.get_child("marquee"); itemnode != nullptr; itemnode = itemnode->get_next_sibling("marquee"))
 		m_marquee_list.append(*global_alloc(item(machine, *itemnode, elemlist)));
 
 	// recompute the data for the view based on a default layer config
@@ -2410,7 +2410,7 @@ void layout_view::resolve_tags()
 //  item - constructor
 //-------------------------------------------------
 
-layout_view::item::item(running_machine &machine, xml_data_node const &itemnode, simple_list<layout_element> &elemlist)
+layout_view::item::item(running_machine &machine, util::xml::data_node const &itemnode, simple_list<layout_element> &elemlist)
 	: m_next(nullptr)
 	, m_element(nullptr)
 	, m_input_port(nullptr)
@@ -2542,11 +2542,11 @@ void layout_view::item::resolve_tags()
 //  layout_file - constructor
 //-------------------------------------------------
 
-layout_file::layout_file(running_machine &machine, xml_data_node const &rootnode, const char *dirname)
+layout_file::layout_file(running_machine &machine, util::xml::data_node const &rootnode, const char *dirname)
 	: m_next(nullptr)
 {
 	// find the layout node
-	xml_data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
+	util::xml::data_node const *const mamelayoutnode = rootnode.get_child("mamelayout");
 	if (mamelayoutnode == nullptr)
 		throw emu_fatalerror("Invalid XML file: missing mamelayout node");
 
@@ -2556,11 +2556,11 @@ layout_file::layout_file(running_machine &machine, xml_data_node const &rootnode
 		throw emu_fatalerror("Invalid XML file: unsupported version");
 
 	// parse all the elements
-	for (xml_data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode != nullptr; elemnode = elemnode->get_next_sibling("element"))
+	for (util::xml::data_node const *elemnode = mamelayoutnode->get_child("element"); elemnode != nullptr; elemnode = elemnode->get_next_sibling("element"))
 		m_elemlist.append(*global_alloc(layout_element(machine, *elemnode, dirname)));
 
 	// parse all the views
-	for (xml_data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
+	for (util::xml::data_node const *viewnode = mamelayoutnode->get_child("view"); viewnode != nullptr; viewnode = viewnode->get_next_sibling("view"))
 		m_viewlist.append(*global_alloc(layout_view(machine, *viewnode, m_elemlist)));
 }
 

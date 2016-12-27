@@ -292,6 +292,7 @@ Notes:
 #include "includes/armedf.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/volt_reg.h"
@@ -312,6 +313,7 @@ Notes:
     ---- -x-- ---- ---- disable fg layer
     ---- --x- ---- ---- disable sprite
     ---- ---x ---- ---- disable tx layer
+	---- ---- 1--1 ---- unknown
     ---- ---- ---- --x- coin counter 1
     ---- ---- ---- ---x coin counter 0
 */
@@ -521,12 +523,15 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(bigfghtr_state::latch_r)
 {
-	m_read_latch = 1;
+	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 	return 0;
 }
 
+#if 0
+// reference code, in case anything goes bad
 WRITE16_MEMBER(bigfghtr_state::sharedram_w)
 {
+	data &= mem_mask;
 	COMBINE_DATA(&m_sharedram[offset]);
 
 	switch(offset)
@@ -666,11 +671,22 @@ READ16_MEMBER(bigfghtr_state::sharedram_r)
 
 	return m_sharedram[offset];
 }
+#endif
+
+READ8_MEMBER(bigfghtr_state::main_sharedram_r)
+{
+	return m_sharedram[offset];
+}
+
+WRITE8_MEMBER(bigfghtr_state::main_sharedram_w)
+{
+	m_sharedram[offset] = data;
+}
 
 static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_SHARE("sharedram")
+	AM_RANGE(0x080600, 0x083fff) AM_READWRITE8(main_sharedram_r,main_sharedram_w,0xffff)
 	AM_RANGE(0x084000, 0x085fff) AM_RAM //work ram
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(armedf_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(armedf_fg_videoram_w) AM_SHARE("fg_videoram")
@@ -691,6 +707,16 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x08d00e, 0x08d00f) AM_WRITE(irq_lv1_ack_w)
 
 	AM_RANGE(0x400000, 0x400001) AM_READ(latch_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bigfghtr_mcu_map, AS_PROGRAM, 8, bigfghtr_state )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bigfghtr_mcu_io_map, AS_IO, 8, bigfghtr_state )
+//	AM_RANGE(0x00000, 0x005ff) Sprite RAM, guess shared as well 
+	AM_RANGE(0x00600, 0x03fff) AM_RAM AM_SHARE("sharedram")
+//	AM_RANGE(MCS51_PORT_P1,MCS51_PORT_P1) bit 5: bus contention related?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, armedf_state )
@@ -1173,7 +1199,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1224,7 +1250,7 @@ static MACHINE_CONFIG_START( terrafjb, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1280,7 +1306,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1330,7 +1356,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1378,7 +1404,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1428,7 +1454,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1478,7 +1504,7 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1520,17 +1546,6 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(bigfghtr_state,bigfghtr)
-{
-	MACHINE_START_CALL_MEMBER(armedf);
-	save_item(NAME(m_read_latch));
-}
-
-MACHINE_RESET_MEMBER(bigfghtr_state,bigfghtr)
-{
-	MACHINE_RESET_CALL_MEMBER(armedf);
-	m_read_latch = 0;
-}
 
 static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
@@ -1538,20 +1553,21 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_MACHINE_START_OVERRIDE(bigfghtr_state,bigfghtr)
-	MCFG_MACHINE_RESET_OVERRIDE(bigfghtr_state,bigfghtr)
+	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) /* ??? */
+	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
+	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
+	
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
@@ -2047,7 +2063,8 @@ ROM_START( skyrobo )
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* Intel C8751 read protected MCU */
-	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
+	// coming from Takatae Big Fighter, might or might not be correct for this version
+	ROM_LOAD( "i8751.bin", 0x00000, 0x1000, BAD_DUMP CRC(64a0d225) SHA1(ccc5c33c0c412bf9e3a4f7de5e39b042e00c41dd) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "7", 0x00000, 0x08000, CRC(f556ef28) SHA1(2acb83cdf23356091056f2cfbbc2b9828ee25b6f) ) /* Rom location 11C */
@@ -2079,7 +2096,7 @@ ROM_START( bigfghtr )
 	ROM_LOAD( "8.17k", 0x00000, 0x10000, CRC(0aeab61e) SHA1(165e0ad58542b65383fef714578da21f62df7b74) )
 
 	ROM_REGION( 0x10000, "mcu", 0 ) /* Intel C8751 read protected MCU */
-	ROM_LOAD( "i8751.mcu", 0x00000, 0x1000, NO_DUMP )
+	ROM_LOAD( "i8751.bin", 0x00000, 0x1000,  CRC(64a0d225) SHA1(ccc5c33c0c412bf9e3a4f7de5e39b042e00c41dd) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "7.11c", 0x00000, 0x08000, CRC(1809e79f) SHA1(730547771f803857acb552a84a8bc21bd3bda33f) )
@@ -2190,11 +2207,6 @@ DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
 	m_scroll_type = 3;
 }
 
-DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
-{
-	m_scroll_type = 1;
-}
-
 /*************************************
  *
  *  Game driver(s)
@@ -2220,5 +2232,5 @@ GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, RO
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )

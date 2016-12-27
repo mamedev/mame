@@ -11,6 +11,10 @@ namespace netlist
 {
 	namespace devices
 	{
+
+	static const netlist_time delay_107[2] = { NLTIME_FROM_NS(16), NLTIME_FROM_NS(25) };
+	static const netlist_time delay_107A[2] = { NLTIME_FROM_NS(15), NLTIME_FROM_NS(15) };
+
 	NETLIB_OBJECT(74107Asub)
 	{
 		NETLIB_CONSTRUCTOR(74107Asub)
@@ -20,6 +24,7 @@ namespace netlist
 		, m_Q1(*this, "m_Q1", 0)
 		, m_Q2(*this, "m_Q2", 0)
 		, m_F(*this, "m_F", 0)
+		, m_delay(delay_107A)
 		{
 		}
 
@@ -37,6 +42,8 @@ namespace netlist
 		state_var<netlist_sig_t> m_F;
 
 		void newstate(const netlist_sig_t state);
+
+		const netlist_time *m_delay;
 
 	};
 
@@ -67,8 +74,10 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(74107, 74107A)
 	{
 	public:
-		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A) { }
-
+		NETLIB_CONSTRUCTOR_DERIVED(74107, 74107A)
+		{
+			m_sub.m_delay = delay_107;
+		}
 	};
 
 	NETLIB_OBJECT(74107_dip)
@@ -119,10 +128,8 @@ namespace netlist
 
 	inline void NETLIB_NAME(74107Asub)::newstate(const netlist_sig_t state)
 	{
-		const netlist_time delay[2] = { NLTIME_FROM_NS(25), NLTIME_FROM_NS(40) };
-
-		m_Q.push(state, delay[state]);
-		m_QQ.push(state ^ 1, delay[state ^ 1]);
+		m_Q.push(state, m_delay[state]);
+		m_QQ.push(state ^ 1, m_delay[state ^ 1]);
 	}
 
 	NETLIB_UPDATE(74107Asub)

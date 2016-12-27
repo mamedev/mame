@@ -116,8 +116,8 @@ private:
 	void exit();
 	void animate(screen_device &device, bool vblank_state);
 
-	void config_load(config_type cfg_type, xml_data_node *parentnode);
-	void config_save(config_type cfg_type, xml_data_node *parentnode);
+	void config_load(config_type cfg_type, util::xml::data_node const *parentnode);
+	void config_save(config_type cfg_type, util::xml::data_node *parentnode);
 
 	// internal state
 	running_machine &   m_machine;                  // reference to our machine

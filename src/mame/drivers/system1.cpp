@@ -2805,6 +2805,28 @@ ROM_START( flicky )
 	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
 ROM_END
 
+// PCB label: 834-5411-11 FLICKY
+ROM_START( flickya )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr5978a.116",   0x0000, 0x4000, CRC(296f1492) SHA1(52e2c63ce376ab8124b2c68bdfa432b6621cfa78) ) /* encrypted */
+	ROM_LOAD( "epr5979a.109",   0x4000, 0x4000, CRC(64b03ef9) SHA1(7519aa7f036bce6d52a5d4be2418139559f9a8a5) ) /* encrypted */
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "epr-5869.120",   0x0000, 0x2000, CRC(6d220d4e) SHA1(fe02a7a94a1ad046fc775a7f67f460c8d0f6dca6) )
+
+	ROM_REGION( 0xc000, "tiles", 0 )
+	ROM_LOAD( "epr-6001.62",    0x0000, 0x4000, CRC(f1a75200) SHA1(47e57b5dbd687d0fa91de91f35f199e88d5a5d99) )
+	ROM_LOAD( "epr-6000.64",    0x4000, 0x4000, CRC(299aefb7) SHA1(d0301f0bf706807891845f090e4e1f1c38dbbd54) )
+	ROM_LOAD( "epr-5999.66",    0x8000, 0x4000, CRC(1ca53157) SHA1(46b4b9dac3f0506edc3957cee768e41c4754b0f4) )
+
+	ROM_REGION( 0x8000, "sprites", 0 )
+	ROM_LOAD( "epr-5855.117",   0x0000, 0x4000, CRC(b5f894a1) SHA1(2c72dc16739dad155fcd572e1add067a7647f5bd) )
+	ROM_LOAD( "epr-5856.110",   0x4000, 0x4000, CRC(266af78f) SHA1(dcbfce550d10a1f2b3ce3e7e081fc008cb575708) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "pr-5317.76",     0x0000, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) )
+ROM_END
+
 ROM_START( flickys2 )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr-6621.bin",   0x0000, 0x4000, CRC(b21ff546) SHA1(e1d5438eaf0efeaeb4687dcfc12bf325e804182f) )
@@ -5359,8 +5381,8 @@ GAME( 1983, regulusu,   regulus,  sys1ppi,           regulus,   system1_state, b
 GAME( 1984, mrviking,   0,        sys1ppisx_315_5041,mrviking,  system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, mrvikingj,  mrviking, sys1ppisx_315_5041,mrvikingj, system1_state, bank00,       ROT270, "Sega", "Mister Viking (315-5041, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, swat,       0,        sys1ppix_315_5048, swat,      system1_state, bank00,       ROT270, "Coreland / Sega", "SWAT (315-5048)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, System 1, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, System 1, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickyo,    flicky,   sys1ppix_315_5051, flicky,    system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys1,   flicky,   sys1ppix_315_5051, flickys1,  system1_state, bank00,       ROT0,   "Sega", "Flicky (64k Version, 315-5051, set 2)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, wmatch,     0,        sys1ppisx_315_5064,wmatch,    system1_state, bank00,       ROT270, "Sega", "Water Match (315-5064)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, bullfgt,    0,        sys1ppix_315_5065, bullfgt,   system1_state, bank00,       ROT0,   "Coreland / Sega", "Bullfight (315-5065)", MACHINE_SUPPORTS_SAVE )
 GAME( 1985, nprinces,   seganinj, sys1ppix_315_5051, seganinj,  system1_state, bank00,       ROT0,   "bootleg?", "Ninja Princess (315-5051, 64k Ver. bootleg?)", MACHINE_SUPPORTS_SAVE )
@@ -5372,8 +5394,9 @@ GAME( 1986, nob,        0,        nobm,              nob,       system1_state, n
 GAME( 1986, nobb,       nob,      nob,               nob,       system1_state, nobb,         ROT270, "bootleg (Game Electronics)", "Noboranka (Japan, bootleg)", MACHINE_SUPPORTS_SAVE )
 
 /* PIO-based System 1 */
-GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, bank00,        ROT0,   "Sega", "Flicky (128k Version, System 2, 315-5051)", MACHINE_SUPPORTS_SAVE )
-GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, bank00,        ROT0,   "Sega", "Flicky (128k Version, System 2, not encrypted)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flicky,     0,        sys1piox_315_5051, flicky,    system1_state, bank00,        ROT0,   "Sega", "Flicky (128k Version, 315-5051)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickya,    flicky,   sys1piox_315_5051, flicky,    system1_state, bank00,        ROT0,   "Sega", "Flicky (128k Version, 315-5051, larger roms)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, flickys2,   flicky,   sys1pio,           flickys2,  system1_state, bank00,        ROT0,   "Sega", "Flicky (128k Version, not encrypted)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, thetogyu,   bullfgt,  sys1piox_315_5065, bullfgt,   system1_state, bank00,        ROT0,   "Coreland / Sega", "The Togyu (315-5065, Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, spatter,    0,        sys1piosx_315_spat,spatter,   system1_state, bank00,        ROT0,   "Sega", "Spatter (315-xxxx)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, spattera,   spatter,  sys1piosx_315_5099,spatter,   system1_state, bank00,        ROT0,   "Sega", "Spatter (315-5099)", MACHINE_SUPPORTS_SAVE )

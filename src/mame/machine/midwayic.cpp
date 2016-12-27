@@ -91,7 +91,7 @@ void midway_serial_pic_device::generate_serial_data(int upper)
 /*************************************
  *
  *  Original serial number PIC
- *  interface
+ *  interface - simulation
  *
  *************************************/
 
@@ -113,7 +113,7 @@ const device_type MIDWAY_SERIAL_PIC = &device_creator<midway_serial_pic_device>;
 //-------------------------------------------------
 
 midway_serial_pic_device::midway_serial_pic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic", tag, owner, clock, "midway_serial_pic", __FILE__),
+	device_t(mconfig, MIDWAY_SERIAL_PIC2, "Midway Serial Pic Simulation", tag, owner, clock, "midway_serial_pic_sim", __FILE__),
 	m_upper(0),
 	m_buff(0),
 	m_idx(0),
@@ -191,6 +191,91 @@ WRITE8_MEMBER(midway_serial_pic_device::write)
 	}
 }
 
+
+/*************************************
+ *
+ *  Original serial number PIC
+ *  interface - emulation
+ *
+ *************************************/
+
+
+const device_type MIDWAY_SERIAL_PIC_EMU = &device_creator<midway_serial_pic_emu_device>;
+
+
+//-------------------------------------------------
+//  midway_serial_pic_emu_device - constructor
+//-------------------------------------------------
+
+midway_serial_pic_emu_device::midway_serial_pic_emu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, MIDWAY_SERIAL_PIC_EMU, "Midway Serial Pic Emulation", tag, owner, clock, "midway_serial_pic_emu", __FILE__)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void midway_serial_pic_emu_device::device_start()
+{
+}
+
+
+READ_LINE_MEMBER(midway_serial_pic_emu_device::PIC16C5X_T0_clk_r)
+{
+//  printf("%s: PIC16C5X_T0_clk_r\n", machine().describe_context());
+	return 0;
+}
+
+READ8_MEMBER(midway_serial_pic_emu_device::read_a)
+{
+//  printf("%s: read_a\n", space.machine().describe_context());
+	return 0x00;
+}
+
+READ8_MEMBER(midway_serial_pic_emu_device::read_b)
+{
+//  printf("%s: read_b\n", space.machine().describe_context());
+	return 0x00;
+}
+
+READ8_MEMBER(midway_serial_pic_emu_device::read_c)
+{
+//  used
+//  printf("%s: read_c\n", space.machine().describe_context());
+	return 0x00;
+}
+
+WRITE8_MEMBER(midway_serial_pic_emu_device::write_a)
+{
+//  printf("%s: write_a %02x\n", space.machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(midway_serial_pic_emu_device::write_b)
+{
+//  printf("%s: write_b %02x\n", space.machine().describe_context(), data);
+}
+
+WRITE8_MEMBER(midway_serial_pic_emu_device::write_c)
+{
+//  used
+//  printf("%s: write_c %02x\n", space.machine().describe_context(), data);
+}
+
+static MACHINE_CONFIG_FRAGMENT( midway_pic )
+	MCFG_CPU_ADD("pic", PIC16C57, 12000000)    /* ? Mhz */
+	MCFG_PIC16C5x_WRITE_A_CB(WRITE8(midway_serial_pic_emu_device, write_a))
+	MCFG_PIC16C5x_READ_B_CB(READ8(midway_serial_pic_emu_device, read_b))
+	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(midway_serial_pic_emu_device, write_b))
+	MCFG_PIC16C5x_READ_C_CB(READ8(midway_serial_pic_emu_device, read_c))
+	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(midway_serial_pic_emu_device, write_c))
+	MCFG_PIC16C5x_T0_CB(READLINE(midway_serial_pic_emu_device, PIC16C5X_T0_clk_r))
+MACHINE_CONFIG_END
+
+machine_config_constructor midway_serial_pic_emu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( midway_pic );
+}
 
 
 /*************************************
@@ -593,6 +678,7 @@ const device_type MIDWAY_IOASIC = &device_creator<midway_ioasic_device>;
 
 midway_ioasic_device::midway_ioasic_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	midway_serial_pic2_device(mconfig, MIDWAY_IOASIC, "Midway IOASIC", tag, owner, clock, "midway_ioasic", __FILE__),
+	m_serial_tx_cb(*this),
 	m_has_dcs(0),
 	m_has_cage(0),
 	m_dcs_cpu(nullptr),
@@ -657,6 +743,7 @@ void midway_ioasic_device::device_start()
 	m_shuffle_map = &shuffle_maps[m_shuffle_type][0];
 	// resolve callbacks
 	m_irq_callback.resolve_safe();
+	m_serial_tx_cb.resolve_safe();
 
 	/* initialize the PIC */
 	midway_serial_pic2_device::device_start();
@@ -1028,6 +1115,12 @@ WRITE32_MEMBER( midway_ioasic_device::packed_w )
 		write(space, offset*2+1, data >> 16, 0x0000ffff);
 }
 
+WRITE8_MEMBER(midway_ioasic_device::serial_rx_w)
+{
+	m_reg[IOASIC_UARTIN] = data | 0x1000;
+	update_ioasic_irq();
+
+}
 
 WRITE32_MEMBER( midway_ioasic_device::write )
 {
@@ -1068,8 +1161,13 @@ WRITE32_MEMBER( midway_ioasic_device::write )
 				m_reg[IOASIC_UARTIN] = (newreg & 0x00ff) | 0x1000;
 				update_ioasic_irq();
 			}
-			else if (PRINTF_DEBUG)
-				osd_printf_debug("%c", data & 0xff);
+			else {
+				m_serial_tx_cb(data & 0xff);
+				if (PRINTF_DEBUG) {
+					osd_printf_info("%c", data & 0xff);
+					logerror("%c", data & 0xff);
+				}
+			}
 			break;
 
 		case IOASIC_SOUNDCTL:

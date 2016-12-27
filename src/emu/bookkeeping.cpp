@@ -39,7 +39,7 @@ bookkeeping_manager::bookkeeping_manager(running_machine &machine)
 	machine.save().save_item(NAME(m_dispensed_tickets));
 
 	// register for configuration
-	machine.configuration().config_register("counters", config_saveload_delegate(&bookkeeping_manager::config_load, this), config_saveload_delegate(&bookkeeping_manager::config_save, this));
+	machine.configuration().config_register("counters", config_load_delegate(&bookkeeping_manager::config_load, this), config_save_delegate(&bookkeeping_manager::config_save, this));
 }
 
 
@@ -80,19 +80,19 @@ void bookkeeping_manager::increment_dispensed_tickets(int delta)
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_load(config_type cfg_type, util::xml::data_node const *parentnode)
 {
-	xml_data_node const *coinnode, *ticketnode;
+	util::xml::data_node const *coinnode, *ticketnode;
 
 	/* on init, reset the counters */
-	if (cfg_type == config_type::CONFIG_TYPE_INIT)
+	if (cfg_type == config_type::INIT)
 	{
 		memset(m_coin_count, 0, sizeof(m_coin_count));
 		m_dispensed_tickets = 0;
 	}
 
 	/* only care about game-specific data */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	/* might not have any data */
@@ -119,30 +119,32 @@ void bookkeeping_manager::config_load(config_type cfg_type, xml_data_node *paren
     and tickets
 -------------------------------------------------*/
 
-void bookkeeping_manager::config_save(config_type cfg_type, xml_data_node *parentnode)
+void bookkeeping_manager::config_save(config_type cfg_type, util::xml::data_node *parentnode)
 {
 	int i;
 
 	/* only care about game-specific data */
-	if (cfg_type != config_type::CONFIG_TYPE_GAME)
+	if (cfg_type != config_type::GAME)
 		return;
 
 	/* iterate over coin counters */
 	for (i = 0; i < COIN_COUNTERS; i++)
+	{
 		if (m_coin_count[i] != 0)
 		{
-			xml_data_node *coinnode = parentnode->add_child("coins", nullptr);
+			util::xml::data_node *coinnode = parentnode->add_child("coins", nullptr);
 			if (coinnode != nullptr)
 			{
 				coinnode->set_attribute_int("index", i);
 				coinnode->set_attribute_int("number", m_coin_count[i]);
 			}
 		}
+	}
 
 	/* output tickets */
 	if (m_dispensed_tickets != 0)
 	{
-		xml_data_node *tickets = parentnode->add_child("tickets", nullptr);
+		util::xml::data_node *tickets = parentnode->add_child("tickets", nullptr);
 		if (tickets != nullptr)
 			tickets->set_attribute_int("number", m_dispensed_tickets);
 	}

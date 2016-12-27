@@ -32,7 +32,9 @@
  *
  *          This is positive triggered, J and K
  *          are latched during clock high and
- *          transferred when CLK falls.
+ *          transferred when CLK falls. The
+ *          datasheet requires J and K to be
+ *          stable during clock high.
  *
  *          Function table 107A
  *
@@ -51,8 +53,11 @@
  *
  *  Naming conventions follow Texas instruments datasheet
  *
- *  FIXME: Currently, only the 107A is implemented.
- *         The 107 uses the same model.
+ *  TODO:  Currently, only the 107A is implemented.
+ *         The 107 uses the same model, but different timings.
+ *         The requirement that J and K must be stable during
+ *         clock high indicates that the chip may exhibit undefined
+ *         behaviour.
  *
  */
 
@@ -71,7 +76,7 @@
 #define TTL_74107(name, cCLK, cJ, cK, cCLRQ)                                    \
 		TTL_74107A(name, cCLK, cJ, cK, cCLRQ)
 
-#define TTL_74107_DIP(name)                                                     \
+#define TTL_74107_DIP(name)                             \
 		NET_REGISTER_DEV(TTL_74107_DIP, name)
 
 #endif /* NLD_74107_H_ */

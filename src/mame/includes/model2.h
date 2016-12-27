@@ -5,6 +5,7 @@
 #include "audio/segam1audio.h"
 #include "machine/eepromser.h"
 #include "cpu/i960/i960.h"
+#include "cpu/mb86235/mb86235.h"
 #include "sound/scsp.h"
 #include "machine/315-5881_crypt.h"
 #include "machine/315-5838_317-0229_comp.h"
@@ -67,7 +68,7 @@ public:
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<cpu_device> m_tgp;
 	optional_device<cpu_device> m_dsp;
-	optional_device<cpu_device> m_tgpx4;
+	optional_device<mb86235_device> m_tgpx4;
 	optional_device<cpu_device> m_drivecpu;
 	required_device<eeprom_serial_93cxx_device> m_eeprom;
 	required_device<screen_device> m_screen;
