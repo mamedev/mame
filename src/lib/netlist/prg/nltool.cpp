@@ -117,7 +117,7 @@ public:
 			m_setup->register_define(d);
 
 		m_setup->register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(filename));
+				netlist::source_file_t>(*m_setup, filename));
 		m_setup->include(name);
 		log_setup(logs);
 
@@ -316,7 +316,7 @@ static void listdevices(tool_options_t &opts)
 	netlist::factory_list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>("dummy", &netlist_dummy));
+			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 

@@ -15,6 +15,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+#include "plib/palloc.h"
 #include "debugger.h"
 
 //#define LOG_DEV_CALLS(x)   printf x
@@ -225,35 +226,33 @@ void netlist_mame_logic_input_t::device_start()
 netlist_mame_rom_t::netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, NETLIST_ROM_REGION, "Netlist ROM Region", tag, owner, clock, "netlist_rom_region", __FILE__)
 		, netlist_mame_sub_interface(*owner)
-		, m_param(nullptr)
-		, m_param_name("")
-		, m_data_tag(nullptr)
-		, m_data(nullptr)
+		, m_name("")
+		, m_region_tag(nullptr)
+		, m_offset(0)
+		, m_size(0)
 {
 }
 
-void netlist_mame_rom_t::static_set_params(device_t &device, const char *param_name, const char* data_tag)
+void netlist_mame_rom_t::static_set_params(device_t &device, const char *name, const char* region_tag, std::size_t offset, std::size_t size)
 {
-	netlist_mame_rom_t &netlist = downcast<netlist_mame_rom_t&>(device);
+	netlist_mame_rom_t &r = downcast<netlist_mame_rom_t&>(device);
 	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
-	netlist.m_param_name = param_name;
-	netlist.m_data_tag = data_tag;
+	r.m_name = name;
+	r.m_region_tag = region_tag;
+	r.m_offset = offset;
+	r.m_size = size;
+}
+
+void netlist_mame_rom_t::custom_netlist_additions(netlist::setup_t &setup)
+{
+	if (memregion(m_region_tag) == nullptr)
+		fatalerror("device %s region %s not found\n", basetag(), m_region_tag);
+	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_data_memregion_t>(setup,
+			m_name,	memregion(m_region_tag)->base() + m_offset, m_size));
 }
 
 void netlist_mame_rom_t::device_start()
 {
-	LOG_DEV_CALLS(("start %s\n", tag()));
-	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
-	m_param = dynamic_cast<netlist::param_ptr_t *>(p);
-	if (m_param == nullptr)
-	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
-	}
-
-	if (memregion(m_data_tag) != nullptr)
-		m_data = memregion(m_data_tag)->base();
-
-	m_param->setTo(m_data);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -448,6 +447,17 @@ void netlist_mame_device_t::device_start()
 	// register additional devices
 
 	nl_register_devices();
+
+	/* let sub-devices add sources and do stuff prior to parsing */
+	for (device_t &d : subdevices())
+	{
+		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(&d);
+		if( sdev != nullptr )
+		{
+			LOG_DEV_CALLS(("Preparse subdevice %s/%s\n", d.name(), d.shortname()));
+			sdev->pre_parse_action(*m_setup);
+		}
+	}
 
 	m_setup_func(*m_setup);
 
@@ -783,9 +793,17 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-bool netlist_source_memregion_t::parse(netlist::setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	memory_region *mem = downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(m_name.cstr());
-	plib::pimemstream istrm(mem->base(),mem->bytes() );
-	return setup.parse_stream(istrm, name);
+	memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.cstr());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
 }
+
+std::unique_ptr<plib::pistream> netlist_data_memregion_t::stream(const pstring &name)
+{
+	if (name == m_name)
+		return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_ptr, m_size);
+	else
+		return std::unique_ptr<plib::pistream>(nullptr);
+}
+

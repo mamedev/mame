@@ -331,8 +331,8 @@ static MACHINE_CONFIG_START( stuntcyc, stuntcyc_state )
 	MCFG_DEVICE_ADD("maincpu", NETLIST_CPU, STUNTCYC_NL_CLOCK)
 	MCFG_NETLIST_SETUP(stuntcyc)
 
-	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "hf1")
-	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "d7")
+	MCFG_NETLIST_ROM_REGION("maincpu", "hf1", "hf1", "004275.f1", 0x0000, 0x0200)
+	MCFG_NETLIST_ROM_REGION("maincpu", "d7",  "d7",  "004811.d7", 0x0000, 0x0020)
 
 	//MCFG_NETLIST_ANALOG_OUTPUT("maincpu", "vid0", "VIDEO_OUT", fixedfreq_device, update_vid, "fixfreq")
 	MCFG_NETLIST_LOGIC_OUTPUT("maincpu", "probe_bit0",  "probe_bit0",  stuntcyc_state, probe_bit0_cb, "")

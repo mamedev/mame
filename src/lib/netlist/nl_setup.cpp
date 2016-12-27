@@ -221,13 +221,12 @@ void setup_t::register_and_set_param(pstring name, param_t &param)
 				static_cast<param_ptr_t &>(param).initial(nullptr);
 			break;
 			case param_t::STRING:
-			case param_t::MODEL:
 			{
 				static_cast<param_str_t &>(param).initial(val);
 			}
 			break;
-			//default:
-			//  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
+			default:
+			  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
 		}
 	}
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
@@ -975,11 +974,27 @@ void setup_t::include(const pstring &netlist_name)
 {
 	for (auto &source : m_sources)
 	{
-		if (source->parse(*this, netlist_name))
+		if (source->parse(netlist_name))
 			return;
 	}
 	log().fatal("unable to find {1} in source collection", netlist_name);
 }
+
+std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
+{
+	for (auto &source : m_sources)
+	{
+		if (source->type() == source_t::DATA)
+		{
+			auto strm = source->stream(name);
+			if (strm)
+				return strm;
+		}
+	}
+	log().fatal("unable to find data named {1} in source collection", name);
+	return std::unique_ptr<plib::pistream>(nullptr);
+}
+
 
 bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
 {
@@ -1002,22 +1017,27 @@ void setup_t::register_define(pstring defstr)
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_string_t::parse(setup_t &setup, const pstring &name)
+bool source_t::parse(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	if (m_type != SOURCE)
+		return false;
+	else
+		return m_setup.parse_stream(*stream(name), name);
 }
 
-bool source_mem_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
 }
 
-bool source_file_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	plib::pifilestream istrm(m_filename);
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
+}
+
+std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
+{
+	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
 }
