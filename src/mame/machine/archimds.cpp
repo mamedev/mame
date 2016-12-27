@@ -1039,12 +1039,12 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 	}
 	else if (reg == 0xc0)
 	{
-		m_vidc_regs[reg] = val&0xffff;
+		m_vidc_regs[reg] = val & 0xffff;
 
 		if (m_audio_dma_on)
 		{
-			double sndhz = 1000000.0f/(((m_vidc_regs[0xc0]&0xff)+2));
-			sndhz /= 8.0f;
+			double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
+			sndhz /= 8.0;
 			m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 			//printf("VIDC: sound freq to %d, sndhz = %f\n", (val & 0xff)-2, sndhz);
 		}
@@ -1132,8 +1132,8 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				{
 					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
 
-					double sndhz = 1000000.0f/(((m_vidc_regs[0xc0]&0xff)+2));
-					sndhz /= 8.0f;
+					double sndhz = 1e6 / ((m_vidc_regs[0xc0] & 0xff) + 2);
+					sndhz /= 8.0;
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
 					//printf("MEMC: audio DMA start, sound freq %d, sndhz = %f\n", (m_vidc_regs[0xc0] & 0xff)-2, sndhz);
 
