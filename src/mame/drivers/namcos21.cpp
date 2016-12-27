@@ -1492,7 +1492,7 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( am_gpu_winrun, AS_PROGRAM, 16, namcos21_state )
+static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
@@ -2035,7 +2035,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_TMS32025_XF_OUT_CB(NOOP)
 
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
-	MCFG_CPU_PROGRAM_MAP(am_gpu_winrun)
+	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_gpu_vblank)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
