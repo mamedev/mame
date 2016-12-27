@@ -313,7 +313,7 @@ Notes:
     ---- -x-- ---- ---- disable fg layer
     ---- --x- ---- ---- disable sprite
     ---- ---x ---- ---- disable tx layer
-	---- ---- ---x ---- unknown, used by big fighter
+	---- ---- 1--1 ---- unknown
     ---- ---- ---- --x- coin counter 1
     ---- ---- ---- ---x coin counter 0
 */
@@ -330,13 +330,6 @@ WRITE16_MEMBER(armedf_state::terraf_io_w)
 	machine().bookkeeping().coin_counter_w(1, (data & 2) >> 1);
 
 	flip_screen_set(m_vreg & 0x1000);
-}
-
-WRITE16_MEMBER(bigfghtr_state::bigfghtr_io_w)
-{
-	//if(data & 0x10)
-	//	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
-	terraf_io_w(space,offset,data,mem_mask);
 }
 
 WRITE16_MEMBER(armedf_state::terrafjb_io_w)
@@ -705,7 +698,7 @@ static ADDRESS_MAP_START( bigfghtr_map, AS_PROGRAM, 16, bigfghtr_state )
 	AM_RANGE(0x08c002, 0x08c003) AM_READ_PORT("P2")
 	AM_RANGE(0x08c004, 0x08c005) AM_READ_PORT("DSW0")
 	AM_RANGE(0x08c006, 0x08c007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(bigfghtr_io_w)  //807b0
+	AM_RANGE(0x08d000, 0x08d001) AM_WRITE(terraf_io_w)  //807b0
 	AM_RANGE(0x08d002, 0x08d003) AM_WRITE(armedf_bg_scrollx_w)
 	AM_RANGE(0x08d004, 0x08d005) AM_WRITE(armedf_bg_scrolly_w)
 	AM_RANGE(0x08d006, 0x08d007) AM_WRITE(armedf_fg_scrollx_w)

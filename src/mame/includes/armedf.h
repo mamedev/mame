@@ -125,7 +125,6 @@ public:
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
-	DECLARE_WRITE16_MEMBER(bigfghtr_io_w);
 	DECLARE_DRIVER_INIT(bigfghtr);
 	DECLARE_MACHINE_START(bigfghtr);
 	DECLARE_MACHINE_RESET(bigfghtr);
