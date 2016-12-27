@@ -5,7 +5,7 @@
 #ifndef __CLIPPER_H__
 #define __CLIPPER_H__
 
-// enumerate registers (why?)
+// enumerate registers
 enum
 {
 	CLIPPER_R0, CLIPPER_R1, CLIPPER_R2, CLIPPER_R3, CLIPPER_R4, CLIPPER_R5, CLIPPER_R6, CLIPPER_R7,
@@ -20,16 +20,14 @@ enum
 
 enum
 {
-	ADDR_MODE_NONE = 0x00,
 	ADDR_MODE_PC32 = 0x10,
 	ADDR_MODE_ABS32 = 0x30,
 	ADDR_MODE_REL32 = 0x60,
 	ADDR_MODE_PC16 = 0x90,
-	ADDR_MODE_REL12 = 0xA0,
-	ADDR_MODE_ABS16 = 0xB0,
-	ADDR_MODE_PCX = 0xD0,
-	ADDR_MODE_RELX = 0xE0,
-	ADDR_MODE_REL = 0xFF
+	ADDR_MODE_REL12 = 0xa0,
+	ADDR_MODE_ABS16 = 0xb0,
+	ADDR_MODE_PCX = 0xd0,
+	ADDR_MODE_RELX = 0xe0
 };
 
 // branch conditions
@@ -45,12 +43,12 @@ enum
 	BRANCH_GTU = 0x7,
 	BRANCH_GEU = 0x8,
 	BRANCH_LTU = 0x9,
-	BRANCH_LEU = 0xA,
-	BRANCH_V = 0xB,
-	BRANCH_NV = 0xC,
-	BRANCH_N = 0xD,
-	BRANCH_NN = 0xE,
-	BRANCH_FV = 0xF
+	BRANCH_LEU = 0xa,
+	BRANCH_V = 0xb,
+	BRANCH_NV = 0xc,
+	BRANCH_N = 0xd,
+	BRANCH_NN = 0xe,
+	BRANCH_FV = 0xf
 };
 
 class clipper_device : public cpu_device
