@@ -1037,7 +1037,19 @@ WRITE32_MEMBER(archimedes_state::archimedes_vidc_w)
 
 		vidc_dynamic_res_change();
 	}
-	else if(reg == 0xe0)
+	else if (reg == 0xc0)
+	{
+		m_vidc_regs[reg] = val&0xffff;
+
+		if (m_audio_dma_on)
+		{
+			double sndhz = 1000000.0f/(((m_vidc_regs[0xc0]&0xff)+2));
+			sndhz /= 8.0f;
+			m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
+			//printf("VIDC: sound freq to %d, sndhz = %f\n", (val & 0xff)-2, sndhz);
+		}
+	}
+	else if (reg == 0xe0)
 	{
 		m_vidc_bpp_mode = ((val & 0x0c) >> 2);
 		m_vidc_interlace = ((val & 0x40) >> 6);
@@ -1120,15 +1132,10 @@ WRITE32_MEMBER(archimedes_state::archimedes_memc_w)
 				{
 					//printf("MEMC: Starting audio DMA at %d uSec, buffer from %x to %x\n", ((m_vidc_regs[0xc0]&0xff)-2)*8, m_vidc_sndstart, m_vidc_sndend);
 
-					#if 0   // more correct to manuals, but breaks ertictac/poizone
-					m_snd_timer->adjust(attotime::zero, 0, attotime::from_usec(((m_vidc_regs[0xc0]&0xff)-2)*8));
-
-					#else   // original formula, definitely wrong in at least some cases
-					double sndhz;
-					/* FIXME: is the frequency correct? */
-					sndhz = (250000.0 / 2) / (double)((m_vidc_regs[0xc0]&0xff)+2);
+					double sndhz = 1000000.0f/(((m_vidc_regs[0xc0]&0xff)+2));
+					sndhz /= 8.0f;
 					m_snd_timer->adjust(attotime::zero, 0, attotime::from_hz(sndhz));
-					#endif
+					//printf("MEMC: audio DMA start, sound freq %d, sndhz = %f\n", (m_vidc_regs[0xc0] & 0xff)-2, sndhz);
 
 					m_vidc_sndcur = m_vidc_sndstart;
 					m_vidc_sndendcur = m_vidc_sndend;
