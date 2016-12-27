@@ -830,7 +830,6 @@ namespace netlist
 	public:
 
 		enum param_type_t {
-			MODEL,
 			STRING,
 			DOUBLE,
 			INTEGER,
@@ -844,104 +843,108 @@ namespace netlist
 		param_type_t param_type() const { return m_param_type; }
 
 	protected:
-		virtual void changed() { }
-		void changed_and_update();
-		void register_and_set();
+		void update_param();
+
+		template<typename C>
+		void set(C &p, const C v)
+		{
+			if (p != v)
+			{
+				p = v;
+				update_param();
+			}
+		}
 
 	private:
 		const param_type_t m_param_type;
 	};
 
-	template <typename C, param_t::param_type_t T>
-	class param_template_t : public param_t
+	class param_ptr_t final: public param_t
 	{
 	public:
-		param_template_t(device_t &device, const pstring name, const C val);
+		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		std::uint8_t * operator()() const { return m_param; }
+		void setTo(std::uint8_t *param) { set(m_param, param); }
+	private:
+		std::uint8_t* m_param;
+	};
 
-		const C operator()() const { return Value(); }
+	class param_logic_t final: public param_t
+	{
+	public:
+		param_logic_t(device_t &device, const pstring name, const bool val);
+		const bool operator()() const { return m_param; }
+		void setTo(const bool &param) { set(m_param, param); }
+	private:
+		bool m_param;
+	};
 
-		void setTo(const C &param)
+	class param_int_t final: public param_t
+	{
+	public:
+		param_int_t(device_t &device, const pstring name, const int val);
+		const int operator()() const { return m_param; }
+		void setTo(const int &param) { set(m_param, param); }
+	private:
+		int m_param;
+	};
+
+	class param_double_t final: public param_t
+	{
+	public:
+		param_double_t(device_t &device, const pstring name, const double val);
+		const double operator()() const { return m_param; }
+		void setTo(const double &param) { set(m_param, param); }
+	private:
+		double m_param;
+	};
+
+	class param_str_t : public param_t
+	{
+	public:
+		param_str_t(device_t &device, const pstring name, const pstring val);
+		const pstring operator()() const { return Value(); }
+		void setTo(const pstring &param)
 		{
 			if (m_param != param)
 			{
 				m_param = param;
-				changed_and_update();
+				changed();
+				update_param();
 			}
 		}
-		void initial(const C &val) { m_param = val; changed(); }
-
 	protected:
-		C Value() const { return m_param;   }
-		C m_param;
+		virtual void changed() { }
+		pstring Value() const { return m_param; }
 	private:
+		pstring m_param;
 	};
 
-	template <typename C, param_t::param_type_t T>
-	class param_template_final_t final : public param_template_t<C, T>
-	{
-	public:
-		param_template_final_t(device_t &device, const pstring name, const C val)
-		: param_template_t<C,T>(device, name, val)
-		  {
-			this->register_and_set();
-		  }
-	};
-
-	using param_double_t = param_template_final_t<nl_double, param_t::DOUBLE>;
-	using param_int_t = param_template_final_t<int, param_t::INTEGER>;
-
-	using param_logic_t = param_template_final_t<bool, param_t::LOGIC>;
-	using param_ptr_t = param_template_final_t<std::uint_fast8_t*, param_t::POINTER>;
-	using param_str_base_t = param_template_t<pstring, param_t::STRING>;
-
-	class param_str_t final : public param_str_base_t
-	{
-	public:
-		param_str_t(device_t &device, const pstring name, const pstring val)
-		: param_str_base_t(device, name, val)
-		{
-			register_and_set();
-		}
-	};
-
-	class param_model_t final : public param_str_base_t
+	class param_model_t final : public param_str_t
 	{
 	public:
 		param_model_t(device_t &device, const pstring name, const pstring val)
-		: param_str_base_t(device, name, val)
-		{
-			register_and_set();
-		}
+		: param_str_t(device, name, val) { }
 
 		/* these should be cached! */
 		nl_double model_value(const pstring &entity);
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		virtual void changed() override
-		{
-			m_map.clear();
-		}
+		virtual void changed() override { m_map.clear(); }
 	private:
 		model_map_t m_map;
 	};
 
-	class param_data_t : public param_str_base_t
+	class param_data_t : public param_str_t
 	{
 	public:
-
-		typedef uint8_t type;
-
 		param_data_t(device_t &device, const pstring name)
-		: param_str_base_t(device, name, "") { }
-
+		: param_str_t(device, name, "") { }
 		std::unique_ptr<plib::pistream> stream();
-
 	protected:
 		virtual void changed() override { }
-	private:
 	};
-
 
 	template <typename ST, std::size_t AW, std::size_t DW>
 	class param_rom_t final: public param_data_t
@@ -951,7 +954,7 @@ namespace netlist
 		param_rom_t(device_t &device, const pstring name)
 		: param_data_t(device, name)
 		{
-			register_and_set();
+			stream()->read(&m_data[0],1<<AW);
 		}
 
 		const ST & operator[] (std::size_t n) { return m_data[n]; }

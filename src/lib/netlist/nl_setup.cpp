@@ -191,44 +191,45 @@ pstring setup_t::objtype_as_str(detail::device_object_t &in) const
 	return "Error";
 }
 
-void setup_t::register_and_set_param(pstring name, param_t &param)
+pstring setup_t::get_initial_param_val(const pstring name, const pstring def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+		return i->second;
+	else
+		return def;
+}
+
+double setup_t::get_initial_param_val(const pstring name, const double def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		const pstring val = i->second;
-		log().debug("Found parameter ... {1} : {1}\n", name, val);
-		switch (param.param_type())
-		{
-			case param_t::DOUBLE:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_double_t &>(param).initial(vald);
-			}
-			break;
-			case param_t::INTEGER:
-			case param_t::LOGIC:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
-			}
-			break;
-			case param_t::POINTER:
-				static_cast<param_ptr_t &>(param).initial(nullptr);
-			break;
-			case param_t::STRING:
-			{
-				static_cast<param_str_base_t &>(param).initial(val);
-			}
-			break;
-			default:
-			  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
-		}
+		double vald = 0;
+		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return vald;
 	}
+	else
+		return def;
+}
+
+int setup_t::get_initial_param_val(const pstring name, const int def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+	{
+		double vald = 0;
+		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return static_cast<int>(vald);
+	}
+	else
+		return def;
+}
+
+void setup_t::register_param(pstring name, param_t &param)
+{
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
