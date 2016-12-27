@@ -116,16 +116,8 @@ public:
 
 	required_device<cpu_device> m_mcu;
 	required_shared_ptr<uint8_t> m_sharedram;
-	
-	/* misc */
-	int           m_read_latch;
-	uint8_t         m_mcu_input_snippet;
-	uint8_t         m_mcu_jsr_snippet;
 
 	DECLARE_READ16_MEMBER(latch_r);
 	DECLARE_WRITE8_MEMBER(main_sharedram_w);
 	DECLARE_READ8_MEMBER(main_sharedram_r);
-	DECLARE_DRIVER_INIT(bigfghtr);
-	DECLARE_MACHINE_START(bigfghtr);
-	DECLARE_MACHINE_RESET(bigfghtr);
 };

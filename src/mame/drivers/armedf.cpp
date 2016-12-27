@@ -523,7 +523,6 @@ ADDRESS_MAP_END
 
 READ16_MEMBER(bigfghtr_state::latch_r)
 {
-	m_read_latch = 1;
 	m_mcu->set_input_line(MCS51_INT0_LINE, HOLD_LINE);
 	return 0;
 }
@@ -1200,7 +1199,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1251,7 +1250,7 @@ static MACHINE_CONFIG_START( terrafjb, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1307,7 +1306,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1357,7 +1356,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1405,7 +1404,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1455,7 +1454,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1505,7 +1504,7 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1547,17 +1546,6 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-MACHINE_START_MEMBER(bigfghtr_state,bigfghtr)
-{
-	MACHINE_START_CALL_MEMBER(armedf);
-	save_item(NAME(m_read_latch));
-}
-
-MACHINE_RESET_MEMBER(bigfghtr_state,bigfghtr)
-{
-	MACHINE_RESET_CALL_MEMBER(armedf);
-	m_read_latch = 0;
-}
 
 static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
@@ -1565,7 +1553,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)      // 4mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1574,15 +1562,12 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 	
-	MCFG_MACHINE_START_OVERRIDE(bigfghtr_state,bigfghtr)
-	MCFG_MACHINE_RESET_OVERRIDE(bigfghtr_state,bigfghtr)
+	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
+	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(57)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(64*8, 32*8)
-	MCFG_SCREEN_VISIBLE_AREA(12*8, (64-12)*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
@@ -2222,11 +2207,6 @@ DRIVER_INIT_MEMBER(armedf_state,cclimbr2)
 	m_scroll_type = 3;
 }
 
-DRIVER_INIT_MEMBER(bigfghtr_state,bigfghtr)
-{
-	m_scroll_type = 1;
-}
-
 /*************************************
  *
  *  Game driver(s)
@@ -2252,5 +2232,5 @@ GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, RO
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, bigfghtr_state, bigfghtr, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_NOT_WORKING | MACHINE_UNEMULATED_PROTECTION | MACHINE_SUPPORTS_SAVE )
