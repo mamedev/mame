@@ -27,6 +27,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/apricot/expansion/expansion.h"
 #include "bus/apricot/keyboard/keyboard.h"
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -472,6 +473,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "apricot_flop")
 
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
