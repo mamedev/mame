@@ -64,6 +64,67 @@ enum
 	BRANCH_FN = 0xf
 };
 
+enum
+{
+	// data memory trap group
+	EXCEPTION_D_CORRECTED_MEMORY_ERROR = 0x108,
+	EXCEPTION_D_UNCORRECTABLE_MEMORY_ERROR = 0x110,
+	EXCEPTION_D_ALIGNMENT_FAULT = 0x120,
+	EXCEPTION_D_PAGE_FAULT = 0x128,
+	EXCEPTION_D_READ_PROTECT_FAULT = 0x130,
+	EXCEPTION_D_WRITE_PROTECT_FAULT = 0x138,
+
+	// floating-point arithmetic trap group
+	EXCEPTION_FLOATING_INEXACT = 0x180,
+	EXCEPTION_FLOATING_UNDERFLOW = 0x188,
+	EXCEPTION_FLOATING_DIVIDE_BY_ZERO = 0x190,
+	EXCEPTION_FLOATING_OVERFLOW = 0x1a0,
+	EXCEPTION_FLOATING_INVALID_OPERATION = 0x1c0,
+
+	// integer arithmetic trap group
+	EXCEPTION_INTEGER_DIVIDE_BY_ZERO = 0x208,
+
+	// instruction memory trap group
+	EXCEPTION_I_CORRECTED_MEMORY_ERROR = 0x288,
+	EXCEPTION_I_UNCORRECTABLE_MEMORY_ERROR = 0x290,
+	EXCEPTION_I_ALIGNMENT_FAULT = 0x2a0,
+	EXCEPTION_I_PAGE_FAULT = 0x2a8,
+	EXCEPTION_I_EXECUTE_PROTECT_FAULT = 0x2b0,
+
+	// illegal operation trap group
+	EXCEPTION_ILLEGAL_OPERATION = 0x300,
+	EXCEPTION_PRIVILEGED_INSTRUCTION = 0x308,
+
+	// diagnostic trap group
+	EXCEPTION_TRACE = 0x380,
+
+	// supervisor calls (0x400-0x7f8)
+	EXCEPTION_SUPERVISOR_CALL_BASE = 0x400,
+
+	// prioritized interrupts (0x800-0xff8)
+	EXCEPTION_INTERRUPT_BASE = 0x800,
+};
+
+enum
+{
+	CTS_NO_CPU_TRAP = 0,
+	CTS_DIVIDE_BY_ZERO = 2,
+	CTS_ILLEGAL_OPERATION = 4,
+	CTS_PRIVILEGED_INSTRUCTION = 5,
+	CTS_TRACE_TRAP = 7,
+};
+
+enum
+{
+	MTS_NO_MEMORY_TRAP = 0,
+	MTS_CORRECTED_MEMORY_ERROR = 1,
+	MTS_UNCORRECTABLE_MEMORY_ERROR = 2,
+	MTS_ALIGNMENT_FAULT = 4,
+	MTS_PAGE_FAULT = 5,
+	MTS_READ_OR_EXECUTE_PROTECT_FAULT = 6,
+	MTS_WRITE_PROTECT_FAULT = 7,
+};
+
 class clipper_device : public cpu_device
 {
 public:
@@ -98,8 +159,8 @@ protected:
 
 	// core registers
 	uint32_t m_pc;
-	union {
-		struct {
+	union psw {
+		struct fields {
 			uint32_t n : 1; // negative
 			uint32_t z : 1; // zero
 			uint32_t v : 1; // overflow
@@ -125,8 +186,8 @@ protected:
 		} bits;
 		uint32_t d;
 	} m_psw;
-	union {
-		struct {
+	union ssw {
+		struct fields {
 			uint32_t in : 4; // interrupt number
 			uint32_t il : 4; // interrupt level
 			uint32_t ei : 1; // enable interrupts
@@ -185,7 +246,7 @@ private:
 
 	bool clipper_device::evaluate_branch(uint32_t condition);
 
-	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc);
+	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint32_t mts);
 };
 
 extern const device_type CLIPPER;

@@ -122,7 +122,7 @@ void clipper_device::execute_run()
 	{
 		LOG_INTERRUPT("taking interrupt - current pc = %08x\n", m_pc);
 
-		m_pc = intrap(0x800 + m_immediate_vector * 8, m_pc);
+		m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_immediate_vector * 8, m_pc);
 		m_immediate_irq = 0;
 	}
 
@@ -301,6 +301,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_psw.d = m_r[m_ssw.bits.u][R2];
 		else if (m_ssw.bits.u == 0 && (R1 == 1 || R1 == 3))
 			m_ssw.d = m_r[m_ssw.bits.u][R2];
+		// FLAGS: CVZN
 		break;
 	case 0x11: 
 		// movpw: move processor register to word
@@ -312,40 +313,47 @@ int clipper_device::execute_instruction (uint16_t insn)
 		break;
 	case 0x12: 
 		// calls: call supervisor
-		next_pc = intrap(0x400 + (insn & 0x7f) * 8, next_pc);
+		next_pc = intrap(EXCEPTION_SUPERVISOR_CALL_BASE + (insn & 0x7f) * 8, next_pc);
 		break;
 	case 0x13: 
 		// ret: return from subroutine
 		next_pc = m_program->read_dword(m_r[m_ssw.bits.u][R2]);
 		m_r[m_ssw.bits.u][R2] += 4;
+		// TRAPS: C,U,A,P,R
 		break;
 	case 0x14: 
 		// pushw: push word
 		m_r[m_ssw.bits.u][R1] -= 4;
 		m_program->write_dword(m_r[m_ssw.bits.u][R1], m_r[m_ssw.bits.u][R2]);
+		// TRAPS: A,P,W
 		break;
 
 	case 0x16: 
 		// popw: pop word
 		m_r[m_ssw.bits.u][R2] = m_program->read_dword(m_r[m_ssw.bits.u][R1]);
 		m_r[m_ssw.bits.u][R1] += 4;
+		// TRAPS: C,U,A,P,R
 		break;
 
 	case 0x20:
+		// adds: add single floating
+		*((float *)&m_f[R2]) += *((float *)&m_f[R1]);
+		// TRAPS: F_IVUX
+		break;
+	case 0x21:
 		// subs: subtract single floating
 		*((float *)&m_f[R2]) -= *((float *)&m_f[R1]); 
-		break; 
-	case 0x21:
-		// adds: add single floating
-		*((float *)&m_f[R2]) += *((float *)&m_f[R1]); 
+		// TRAPS: F_IVUX
 		break;
 	case 0x22:
 		// addd: add double floating
 		m_f[R2] += m_f[R1]; 
+		// TRAPS: F_IVUX
 		break;
 	case 0x23:
 		// subd: subtract double floating
 		m_f[R2] -= m_f[R1]; 
+		// TRAPS: F_IVUX
 		break;
 	case 0x24:
 		// movs: move single floating
@@ -362,14 +370,27 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x27:
 		// cmpd: compare double floating
 		evaluate_cc2f(m_f[R2], m_f[R1]); 
+		// FLAGS: 00ZN
+		break;
+	case 0x28:
+		// muls: multiply single floating
+		*((float *)&m_f[R2]) *= *((float *)&m_f[R1]);
+		// TRAPS: F_IVUX
+		break;
+	case 0x29:
+		// divs: divide single floating
+		*((float *)&m_f[R2]) /= *((float *)&m_f[R1]);
+		// TRAPS: F_IVDUX
 		break;
 	case 0x2a:
-		// muld: multiple double floating
+		// muld: multiply double floating
 		m_f[R2] *= m_f[R1]; 
+		// TRAPS: F_IVUX
 		break;
 	case 0x2b:
 		// divd: divide double floating
-		m_f[R2] /= m_f[R1]; 
+		m_f[R2] /= m_f[R1];
+		// TRAPS: F_IVDUX
 		break;
 	case 0x2c:
 		// movsw: move single floating to word
@@ -394,6 +415,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] << m_r[m_ssw.bits.u][R1];
 		else
 			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] >> -(int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0VZN
 		break;
 	case 0x31: 
 		// shal: shift arithmetic longword
@@ -401,6 +423,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_r[m_ssw.bits.u][R1];
 		else
 			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -(int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0VZN
 		break;
 	case 0x32: 
 		// shlw: shift logical word
@@ -408,6 +431,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] <<= m_r[m_ssw.bits.u][R1];
 		else
 			m_r[m_ssw.bits.u][R2] >>= -(int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 00ZN
 		break;
 	case 0x33: 
 		// shll: shift logical longword
@@ -415,6 +439,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_r[m_ssw.bits.u][R1];
 		else
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -(int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 00ZN
 		break;
 	case 0x34: 
 		// rotw: rotate word
@@ -422,6 +447,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] = _rotl(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1]);
 		else
 			m_r[m_ssw.bits.u][R2] = _rotr(m_r[m_ssw.bits.u][R2], -(int32_t)m_r[m_ssw.bits.u][R1]);
+		// FLAGS: 00ZN
 		break;
 	case 0x35: 
 		// rotl: rotate longword
@@ -429,6 +455,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotl64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], m_r[m_ssw.bits.u][R1]);
 		else
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], -(int32_t)m_r[m_ssw.bits.u][R1]);
+		// FLAGS: 00ZN
 		break;
 
 	case 0x38: 
@@ -437,6 +464,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] << m_info.op.imm;
 		else
 			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] >> -m_info.op.imm;
+		// FLAGS: 0VZN
+		// TRAPS: I
 		break;
 	case 0x39: 
 		// shali: shift arithmetic longword immediate
@@ -444,6 +473,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_info.op.imm;
 		else
 			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -m_info.op.imm;
+		// FLAGS: 0VZN
+		// TRAPS: I
 		break;
 	case 0x3a: 
 		// shli: shift logical immediate
@@ -451,6 +482,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] <<= m_info.op.imm;
 		else
 			m_r[m_ssw.bits.u][R2] >>= -m_info.op.imm;
+		// FLAGS: 00ZN
+		// TRAPS: I
 		break;
 	case 0x3b: 
 		// shlli: shift logical longword immediate
@@ -458,6 +491,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_info.op.imm;
 		else
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -m_info.op.imm;
+		// FLAGS: 00ZN
+		// TRAPS: I
 		break;
 	case 0x3c: 
 		// roti: rotate immediate
@@ -465,6 +500,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			m_r[m_ssw.bits.u][R2] = _rotl(m_r[m_ssw.bits.u][R2], m_info.op.imm);
 		else
 			m_r[m_ssw.bits.u][R2] = _rotr(m_r[m_ssw.bits.u][R2], -m_info.op.imm);
+		// FLAGS: 00ZN
+		// TRAPS: I
 		break;
 	case 0x3d: 
 		// rotli: rotate longword immediate
@@ -472,6 +509,8 @@ int clipper_device::execute_instruction (uint16_t insn)
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotl64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], m_info.op.imm);
 		else
 			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], -m_info.op.imm);
+		// FLAGS: 00ZN
+		// TRAPS: I
 		break;
 
 	case 0x44: 
@@ -479,14 +518,16 @@ int clipper_device::execute_instruction (uint16_t insn)
 		m_r[m_ssw.bits.u][R2] -= 4;
 		m_program->write_dword(m_r[m_ssw.bits.u][R2], next_pc);
 		next_pc = m_r[m_ssw.bits.u][R1];
+		// TRAPS: A,P,W
 		break;
 	case 0x45: 
 		// call: call subroutine (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] -= 4;
 		m_program->write_dword(m_r[m_ssw.bits.u][m_info.op.r2], next_pc);
 		next_pc = m_info.address;
+		// TRAPS: A,P,W
 		break;
-#ifdef UNIMPLEMENTED
+#ifdef UNIMPLEMENTED_C400
 	case 0x46:
 		// loadd2:
 		break;
@@ -498,13 +539,15 @@ int clipper_device::execute_instruction (uint16_t insn)
 		// b*: branch on condition (relative)
 		if (evaluate_branch(R2))
 			next_pc = m_r[m_ssw.bits.u][R1];
+		// TRAPS: A,I
 		break;
 	case 0x49:
 		// b*: branch on condition (other modes)
 		if (evaluate_branch(m_info.op.r2))
 			next_pc = m_info.address;
+		// TRAPS: A,I
 		break;
-#ifdef UNIMPLEMENTED
+#ifdef UNIMPLEMENTED_C400
 	case 0x4a:
 		// cdb:
 		break;
@@ -535,131 +578,163 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x60: 
 		// loadw: load word (relative)
 		m_r[m_ssw.bits.u][R2] = m_program->read_dword(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x61: 
 		// loadw: load word (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_dword(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x62:
 		// loada: load address (relative)
 		m_r[m_ssw.bits.u][R2] = m_r[m_ssw.bits.u][R1];
+		// TRAPS: I
 		break;
 	case 0x63:
 		// loada: load address (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = m_info.address;
+		// TRAPS: I
 		break;
 	case 0x64: 
 		// loads: load single floating (relative)
 		((uint64_t *)&m_f)[R2] = m_program->read_dword(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x65:
 		// loads: load single floating (other modes)
 		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_dword(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x66: 
 		// loadd: load double floating (relative)
 		((uint64_t *)&m_f)[R2] = m_program->read_qword(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x67:
 		// loadd: load double floating (other modes)
 		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_qword(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x68:
 		// loadb: load byte (relative)
 		m_r[m_ssw.bits.u][R2] = (int8_t)m_program->read_byte(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x69:
 		// loadb: load byte (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = (int8_t)m_program->read_byte(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6a: 
 		// loadbu: load byte unsigned (relative)
 		m_r[m_ssw.bits.u][R2] = (uint8_t)m_program->read_byte(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6b:
 		// loadbu: load byte unsigned (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_byte(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6c: 
 		// loadh: load halfword (relative)
 		m_r[m_ssw.bits.u][R2] = (int16_t)m_program->read_word(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6d:
 		// loadh: load halfword (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = (int16_t)m_program->read_word(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6e:
 		// loadhu: load halfword unsigned (relative)
 		m_r[m_ssw.bits.u][R2] = (uint16_t)m_program->read_word(m_r[m_ssw.bits.u][R1]);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6f:
 		// loadhu: load halfword unsigned (other modes)
 		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_word(m_info.address);
+		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x70: 
 		// storw: store word (relative)
 		m_program->write_dword(m_r[m_ssw.bits.u][R1], m_r[m_ssw.bits.u][R2]);
+		// TRAPS: A,P,W,I
 		break;
 	case 0x71:
 		// storw: store word (other modes)
 		m_program->write_dword(m_info.address, m_r[m_ssw.bits.u][m_info.op.r2]);
+		// TRAPS: A,P,W,I
 		break;
 	case 0x72:
 		// tsts: test and set (relative)
 		m_r[m_ssw.bits.u][R2] = m_program->read_dword(m_r[m_ssw.bits.u][R1]);
 		m_program->write_dword(m_r[m_ssw.bits.u][R1], m_r[m_ssw.bits.u][R2] | 0x80000000);
+		// TRAPS: C,U,A,P,R,W,I
 		break;
 	case 0x73:
 		// tsts: test and set (other modes)
 		m_r[m_ssw.bits.u][R2] = m_program->read_dword(m_info.address);
 		m_program->write_dword(m_info.address, m_r[m_ssw.bits.u][R2] | 0x80000000);
+		// TRAPS: C,U,A,P,R,W,I
 		break;
 	case 0x74:
 		// stors: store single floating (relative)
 		m_program->write_dword(m_r[m_ssw.bits.u][R1], *((uint32_t *)&m_f[R2]));
+		// TRAPS: A,P,W,I
 		break;
 	case 0x75:
 		// stors: store single floating (other modes)
 		m_program->write_dword(m_info.address, *((uint32_t *)&m_f[m_info.op.r2]));
+		// TRAPS: A,P,W,I
 		break;
 	case 0x76:
 		// stord: store double floating (relative)
 		m_program->write_qword(m_r[m_ssw.bits.u][R1], *((uint64_t *)&m_f[R2]));
+		// TRAPS: A,P,W,I
 		break;
 	case 0x77:
 		// stord: store double floating (other modes)
 		m_program->write_qword(m_info.address, *((uint64_t *)&m_f[m_info.op.r2]));
+		// TRAPS: A,P,W,I
 		break;
 	case 0x78:
 		// storb: store byte (relative)
 		m_program->write_byte(m_r[m_ssw.bits.u][R1], (uint8_t)m_r[m_ssw.bits.u][R2]);
+		// TRAPS: A,P,W,I
 		break;
 	case 0x79:
 		// storb: store byte (other modes)
 		m_program->write_byte(m_info.address, (uint8_t)m_r[m_ssw.bits.u][m_info.op.r2]);
+		// TRAPS: A,P,W,I
 		break;
 
 	case 0x7c:
 		// storh: store halfword (relative)
 		m_program->write_word(m_r[m_ssw.bits.u][R1], (uint16_t)m_r[m_ssw.bits.u][R2]);
+		// TRAPS: A,P,W,I
 		break;
 	case 0x7d:
 		// storh: store halfword (other modes)
 		m_program->write_word(m_info.address, (uint16_t)m_r[m_ssw.bits.u][m_info.op.r2]);
+		// TRAPS: A,P,W,I
 		break;
 
 	case 0x80: 
 		// addw: add word
 		m_r[m_ssw.bits.u][R2] += m_r[m_ssw.bits.u][R1];
+		// FLAGS: CVZN
 		break;
 
 	case 0x82:
 		// addq: add quick
 		m_r[m_ssw.bits.u][R2] += R1;
+		// FLAGS: CVZN
 		break;
 	case 0x83:
 		// addi: add immediate
 		m_r[m_ssw.bits.u][R2] += m_info.op.imm;
+		// FLAGS: CVZN
+		// TRAPS: I
 		break;
 	case 0x84:
 		// movw: move word
@@ -670,10 +745,13 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x86:
 		// loadq: load quick
 		m_r[m_ssw.bits.u][R2] = R1;
+		// FLAGS: 00Z0
 		break;
 	case 0x87:
 		// loadi: load immediate
 		m_r[m_ssw.bits.u][R2] = m_info.op.imm;
+		// FLAGS: 00ZN
+		// TRAPS: I
 		break;
 	case 0x88:
 		// andw: and word
@@ -685,6 +763,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		// andi: and immediate
 		m_r[m_ssw.bits.u][R2] &= m_info.op.imm;
 		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
+		// TRAPS: I
 		break;
 	case 0x8c:
 		// orw: or word
@@ -696,56 +775,81 @@ int clipper_device::execute_instruction (uint16_t insn)
 		// ori: or immediate
 		m_r[m_ssw.bits.u][R2] |= m_info.op.imm;
 		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
+		// TRAPS: I
 		break;
-#ifdef UNIMPLEMENTED
 	case 0x90:
 		// addwc: add word with carry
-		m_r[m_ssw.bits.u][r2] += m_r[m_ssw.bits.u][r1] + psw.b.c;
+		m_r[m_ssw.bits.u][R2] += m_r[m_ssw.bits.u][R1] + m_psw.bits.c;
+		// FLAGS: CVZN
 		break;
-	case 0x91: 
+	case 0x91:
 		// subwc: subtract word with carry
-		m_r[m_ssw.bits.u][r2] -= m_r[m_ssw.bits.u][r1] + psw.b.c;
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1] + m_psw.bits.c, FLAGS_CVZN);
+		m_r[m_ssw.bits.u][R2] -= m_r[m_ssw.bits.u][R1] + m_psw.bits.c;
+		// FLAGS: CVZN
 		break;
-#endif
 
 	case 0x93: 
 		// negw: negate word
 		m_r[m_ssw.bits.u][R2] = -(int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: CVZN
 		break;
 
 	case 0x98: 
 		// mulw: multiply word
 		m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] * (int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
 		break;
-#ifdef UNIMPLEMENTED
 	case 0x99:
 		// mulwx: multiply word extended
+		((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = (int64_t)m_r[m_ssw.bits.u][R2] * (int64_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
 		break;
-#endif
 	case 0x9a: 
 		// mulwu: multiply word unsigned
 		m_r[m_ssw.bits.u][R2] = (uint32_t)m_r[m_ssw.bits.u][R2] * (uint32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
 		break;
-#ifdef UNIMPLEMENTED
 	case 0x9b:
 		// mulwux: multiply word unsigned extended
+		((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = (uint64_t)m_r[m_ssw.bits.u][R2] * (uint64_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
 		break;
-#endif
 	case 0x9c: 
 		// divw: divide word
-		m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] / (int32_t)m_r[m_ssw.bits.u][R1];
+		if ((int32_t)m_r[m_ssw.bits.u][R1] == 0)
+			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
+		else
+			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] / (int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
+		// TRAPS: D
 		break;
 	case 0x9d: 
 		// modw: modulus word
-		m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] % (int32_t)m_r[m_ssw.bits.u][R1];
+		if ((int32_t)m_r[m_ssw.bits.u][R1] == 0)
+			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
+		else
+			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] % (int32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0V00
+		// TRAPS: D
 		break;
 	case 0x9e: 
 		// divwu: divide word unsigned
-		m_r[m_ssw.bits.u][R2] = (uint32_t)m_r[m_ssw.bits.u][R2] / (uint32_t)m_r[m_ssw.bits.u][R1];
+		if ((uint32_t)m_r[m_ssw.bits.u][R1] == 0)
+			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
+		else
+			m_r[m_ssw.bits.u][R2] = (uint32_t)m_r[m_ssw.bits.u][R2] / (uint32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0000
+		// TRAPS: D
 		break;
 	case 0x9f: 
 		// modwu: modulus word unsigned
-		m_r[m_ssw.bits.u][R2] = (uint32_t)m_r[m_ssw.bits.u][R2] % (uint32_t)m_r[m_ssw.bits.u][R1];
+		if ((uint32_t)m_r[m_ssw.bits.u][R1] == 0)
+			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
+		else
+			m_r[m_ssw.bits.u][R2] = (uint32_t)m_r[m_ssw.bits.u][R2] % (uint32_t)m_r[m_ssw.bits.u][R1];
+		// FLAGS: 0000
+		// TRAPS: D
 		break;
 	case 0xa0: 
 		// subw: subtract word
@@ -762,6 +866,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		// subi: subtract immediate
 		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_info.op.imm, FLAGS_CVZN);
 		m_r[m_ssw.bits.u][R2] -= m_info.op.imm;
+		// TRAPS: I
 		break;
 	case 0xa4:
 		// cmpw: compare word
@@ -775,6 +880,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0xa7: 
 		// cmpi: compare immediate
 		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_info.op.imm, FLAGS_CVZN);
+		// TRAPS: I
 		break;
 	case 0xa8: 
 		// xorw: exclusive or word
@@ -786,6 +892,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		// xori: exclusive or immediate
 		m_r[m_ssw.bits.u][R2] ^= m_info.op.imm;
 		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
+		// TRAPS: I
 		break;
 	case 0xac: 
 		// notw: not word
@@ -825,6 +932,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[m_ssw.bits.u][15] -= 4 * (15 - R2);
+			// TRAPS: A,P,W
 			break;
 
 		// NOTE: the movc, initc and cmpc macro instructions are implemented in a very basic way because
@@ -842,6 +950,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 				m_r[m_ssw.bits.u][1]++;
 				m_r[m_ssw.bits.u][2]++;
 			}
+			// TRAPS: C,U,P,R,W
 			break;
 
 		case 0x0e:
@@ -854,6 +963,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 				m_r[m_ssw.bits.u][1]++;
 				m_r[m_ssw.bits.u][2] = _rotr(m_r[m_ssw.bits.u][2], 8);
 			}
+			// TRAPS: P,W
 			break;
 
 		case 0x0f:
@@ -880,6 +990,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 				m_r[m_ssw.bits.u][1]++;
 				m_r[m_ssw.bits.u][2]++;
 			}
+			// TRAPS: C,U,P,R
 			break;
 
 		case 0x10: case 0x11: case 0x12: case 0x13:
@@ -894,6 +1005,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[m_ssw.bits.u][15] += 4 * (15 - R2);
+			// TRAPS: C,U,A,P,R
 			break;
 
 		case 0x20: case 0x21: case 0x22: case 0x23: 
@@ -906,6 +1018,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// decrement sp after push to allow restart on exceptions
 			m_r[m_ssw.bits.u][15] -= 8 * (8 - R2);
+			// TRAPS: A,P,W
 			break;
 
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
@@ -918,24 +1031,31 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 			// increment sp after pop to allow restart on exceptions
 			m_r[m_ssw.bits.u][15] += 8 * (8 - R2);
+			// TRAPS: C,U,A,P,R
 			break;
 #ifdef UNIMPLEMENTED
 		case 0x30:
 			// cnvsw
 		case 0x31:
 			// cnvrsw
+			// TRAPS: F_IX
 		case 0x32:
 			// cnvtsw
+			// TRAPS: F_IX
 		case 0x33:
 			// cnvws
+			// TRAPS: F_X
 		case 0x34:
 			// cnvdw
+			// TRAPS: F_IX
 		case 0x35:
 			// cnvrdw
+			// TRAPS: F_IX
 			break;
 #endif
 		case 0x36: // cnvtdw
 			m_r[m_ssw.bits.u][m_info.op.macro & 0xf] = (int32_t)m_f[(m_info.op.macro >> 4) & 0xf];
+			// TRAPS: F_IX
 			break;
 
 		case 0x37: // cnvwd
@@ -944,24 +1064,32 @@ int clipper_device::execute_instruction (uint16_t insn)
 #ifdef UNIMPLEMENTED
 		case 0x38:
 			// cnvsd
+			// TRAPS: F_I
 		case 0x39:
 			// cnvds
+			// TRAPS: F_IVUX
 		case 0x3a:
 			// negs
 		case 0x3b:
 			// negds
 		case 0x3c:
 			// scalbs
+			// TRAPS: F_IVUX
 		case 0x3d:
 			// scalbd
+			// FLAGS: N
+			// TRAPS: F_IVUX
 		case 0x3e:
 			// trapfn
+			// TRAPS: I
 		case 0x3f:
 			// loadfs
 			break;
 #endif
 		default:
-			logerror("illegal macro opcode at 0x%08x\n", m_pc);
+			logerror("illegal unprivileged macro opcode at 0x%08x\n", m_pc);
+			next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
+			machine().debug_break();
 			break;
 		}
 
@@ -977,12 +1105,16 @@ int clipper_device::execute_instruction (uint16_t insn)
 				// movus: move user to supervisor
 				m_r[0][m_info.op.macro & 0xf] = m_r[1][(m_info.op.macro >> 4) & 0xf];
 				// setcc1(m_r[m_ssw.bits.u][r2]);
+				// FLAGS: 00ZN
+				// TRAPS: S
 				break;
 
 			case 0x01: 
 				// movsu: move supervisor to user
 				m_r[1][m_info.op.macro & 0xf] = m_r[0][(m_info.op.macro >> 4) & 0xf];
 				// setcc1(m_r[!m_ssw.bits.u][r2]);
+				// FLAGS: 00ZN
+				// TRAPS: S
 				break;
 
 			case 0x02:
@@ -991,6 +1123,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 					m_program->write_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] - 4 * (i + 1), m_r[1][15 - i]);
 
 				m_r[0][(m_info.op.macro >> 4) & 0xf] -= 64;
+				// TRAPS: A,P,W,S
 				break;
 
 			case 0x03:
@@ -999,6 +1132,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 					m_r[1][i] = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 4 * i);
 
 				m_r[0][(m_info.op.macro >> 4) & 0xf] += 64;
+				// TRAPS: C,U,A,P,R,S
 				break;
 
 			case 0x04: 
@@ -1011,25 +1145,25 @@ int clipper_device::execute_instruction (uint16_t insn)
 				next_pc = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 8);
 
 				m_r[0][(m_info.op.macro >> 4) & 0xf] += 12;
+				// TRAPS: S
 				break;
 
 			case 0x05:
 				// wait: wait for interrupt
 				next_pc = m_pc;
+				// TRAPS: S
 				break;
 
 			default:
 				// illegal operation
-				// TODO: set psw.b.cts
-				logerror("illegal opcode at 0x%08x\n", m_pc);
-				next_pc = intrap(0x300, next_pc);
+				logerror("illegal privileged macro opcode at 0x%08x\n", m_pc);
+				next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 				machine().debug_break();
 				break;
 			}
 		}
 		else
-			// TODO: set psw.b.cts
-			next_pc = intrap(0x308, next_pc);	// illegal operation, privileged instruction
+			next_pc = intrap(EXCEPTION_PRIVILEGED_INSTRUCTION, next_pc, CTS_PRIVILEGED_INSTRUCTION);
 		break;
 
 #ifdef UNIMPLEMENTED
@@ -1044,7 +1178,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 	default:
 		logerror("illegal opcode at 0x%08x\n", m_pc);
-		next_pc = intrap(0x300, next_pc);	// illegal operation, illegal operation
+		next_pc = intrap(EXCEPTION_ILLEGAL_OPERATION, next_pc, CTS_ILLEGAL_OPERATION);
 		machine().debug_break();
 		break;
 
@@ -1056,15 +1190,19 @@ int clipper_device::execute_instruction (uint16_t insn)
 /*
 * Sets up the PC, SSW and PSW to handle an exception.
 */
-uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc)
+uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts = CTS_NO_CPU_TRAP, uint32_t mts = MTS_NO_MEMORY_TRAP)
 {
-	uint32_t next_pc, pmode;
+	uint32_t previous_mode;
 
 	LOG_INTERRUPT("intrap - vector %x, pc = 0x%08x, next_pc = 0x%08x, ssp = 0x%08x\n", vector, pc, m_program->read_dword(vector + 4), m_r[0][15]);
 
+	// set cts and mts to indicate source of exception
+	m_psw.bits.cts = cts;
+	m_psw.bits.mts = mts;
+
 	// push pc, psw and ssw onto supervisor stack
 	m_program->write_dword(m_r[0][15] - 4, pc);
-	m_program->write_dword(m_r[0][15] - 12, m_psw.d); // TODO: set mts or cts bits in saved psw
+	m_program->write_dword(m_r[0][15] - 12, m_psw.d);
 	m_program->write_dword(m_r[0][15] - 8, m_ssw.d);
 
 	// decrement supervisor stack pointer
@@ -1078,18 +1216,15 @@ uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc)
 	m_r[0][15] -= 24;
 
 	// load SSW from trap vector and set previous mode flag
-	pmode = m_ssw.bits.u;
+	previous_mode = m_ssw.bits.u;
 	m_ssw.d = m_program->read_dword(vector + 0);
-	m_ssw.bits.p = pmode;
+	m_ssw.bits.p = previous_mode;
 
 	// clear psw
-	m_psw.d = 0;										
-
-	// fetch target pc
-	next_pc = m_program->read_dword(vector + 4);
+	m_psw.d = 0;
 
 	// return new pc from trap vector
-	return next_pc;
+	return m_program->read_dword(vector + 4);
 }
 
 /*
