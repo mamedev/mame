@@ -1051,7 +1051,19 @@ ROM_START( cdibios ) // for the quizard sets
 	ROM_LOAD( "slave.bin", 0x0000, 0x2000, NO_DUMP ) // Undumped 68HC05 microcontroller, might need decapping
 ROM_END
 
-// Quizard
+/*  Quizard notes
+
+	The MCU controls the protection sequence, which in turn controls the game display language.
+	Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
+	just the CD, but not between games as a new MCU is required.
+
+	The only dumped MCU is a Quizard 4 German MCU.  A Quizard 4 Czech MCU has been located but is a
+	89c51 not a 87c51
+
+*/
+
+
+// Quizard (1)
 
 ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1212,7 +1224,7 @@ ROM_START( quizard4 ) /* CD-ROM printed 09/98 */
 	DISK_IMAGE_READONLY( "quizard4r42", 0, BAD_DUMP SHA1(a5d5c8950b4650b8753f9119dc7f1ccaa2aa5442) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
 ROM_END
 
 ROM_START( quizard4_41 )
@@ -1229,7 +1241,7 @@ ROM_START( quizard4_41 )
 	DISK_IMAGE_READONLY( "quizard4r41", 0, BAD_DUMP SHA1(2c0484c6545aac8e00b318328c6edce6f5dde43d) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
 ROM_END
 
 ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
@@ -1246,7 +1258,7 @@ ROM_START( quizard4_40 ) /* CD-ROM printed 07/97 */
 	DISK_IMAGE_READONLY( "quizard4r40", 0, BAD_DUMP SHA1(288cc37a994e4f1cbd47aa8c92342879c6fc0b87) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard4_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
+	ROM_LOAD( "quizard4_german_d8751.bin", 0x0000, 0x1000, CRC(77be0b40) SHA1(113b5c239480a2259f55e411ba8fb3972e6d4301) )
 ROM_END
 
 
