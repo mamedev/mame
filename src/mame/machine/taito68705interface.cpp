@@ -15,6 +15,8 @@
 	bublbobl.cpp - tokio
 	flstory.cpp - flstory
 	nycaptor.cpp - nycaptor
+	lsasquad.cpp - lsasquad
+	             - daikaiju
 
 	and the following with slight changes:
 	slapfght.cpp - tigerh (inverted status bits read on portC)

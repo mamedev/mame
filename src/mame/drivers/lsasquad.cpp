@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( lsasquad_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_READWRITE(lsasquad_sound_result_r,lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r,lsasquad_mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -200,16 +200,6 @@ static ADDRESS_MAP_START( lsasquad_sound_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xe000, 0xefff) AM_ROM     /* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( lsasquad_m68705_map, AS_PROGRAM, 8, lsasquad_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(lsasquad_68705_port_a_r,lsasquad_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(lsasquad_68705_port_b_r,lsasquad_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(lsasquad_mcu_status_r)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(lsasquad_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(lsasquad_68705_ddr_b_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( storming_map, AS_PROGRAM, 8, lsasquad_state )
@@ -392,7 +382,7 @@ static ADDRESS_MAP_START( daikaiju_map, AS_PROGRAM, 8, lsasquad_state )
 	AM_RANGE(0xea00, 0xea00) AM_WRITE(lsasquad_bankswitch_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(lsasquad_sound_command_w)
 	AM_RANGE(0xec01, 0xec01) AM_READ(lsasquad_sound_status_r)
-	AM_RANGE(0xee00, 0xee00) AM_READWRITE(lsasquad_mcu_r, lsasquad_mcu_w)
+	AM_RANGE(0xee00, 0xee00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( daikaiju_sound_map, AS_PROGRAM, 8, lsasquad_state )
@@ -549,16 +539,6 @@ MACHINE_START_MEMBER(lsasquad_state,lsasquad)
 
 	membank("bank1")->configure_entries(0, 8, &ROM[0x10000], 0x2000);
 
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_mcu_sent));
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
 
 	save_item(NAME(m_sound_pending));
 	save_item(NAME(m_sound_nmi_enable));
@@ -574,17 +554,6 @@ MACHINE_RESET_MEMBER(lsasquad_state,lsasquad)
 	m_pending_nmi = 0;
 	m_sound_cmd = 0;
 	m_sound_result = 0;
-
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_mcu_sent = 0;
-	m_main_sent = 0;
-	m_from_main = 0;
-	m_from_mcu = 0;
 }
 
 /* Note: lsasquad clock values are not verified */
@@ -598,8 +567,8 @@ static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
 	MCFG_CPU_PROGRAM_MAP(lsasquad_sound_map)
 								/* IRQs are triggered by the YM2203 */
-	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
+
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -641,7 +610,7 @@ static MACHINE_CONFIG_DERIVED( storming, lsasquad )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(storming_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
@@ -655,8 +624,7 @@ static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 	MCFG_CPU_PROGRAM_MAP(daikaiju_sound_map)
 	/* IRQs are triggered by the YM2203 */
 
-	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
-	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MASTER_CLOCK / 8)
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(30000)) /* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
@@ -710,7 +678,7 @@ ROM_START( lsasquad )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a64-04.44",    0x0000, 0x8000, CRC(c238406a) SHA1(bb8f9d952c4568edb375328a1f9f6681a1bb5907) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a64-05.35",    0x0000, 0x0800, CRC(572677b9) SHA1(e098d5d842bcc81221ba56652a7019505d8be082) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
@@ -787,7 +755,7 @@ ROM_START( daikaiju )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* 64k for the second CPU */
 	ROM_LOAD( "a74_04.ic44",    0x0000, 0x8000, CRC(98a6a703) SHA1(0c169a7a5f8b26606f67ee7f14bd487951536ac5) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a74_05.ic35",    0x0000, 0x0800, CRC(d66df06f) SHA1(6a61eb15aef7f3b7a66ec9d87c0bdd731d6cb079) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_INVERT )
