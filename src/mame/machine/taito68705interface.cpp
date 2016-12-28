@@ -14,6 +14,7 @@
 	40love.cpp - 40love
 	bublbobl.cpp - tokio
 	flstory.cpp - flstory
+	nycaptor.cpp - nycaptor
 
 	and the following with slight changes:
 	slapfght.cpp - tigerh (inverted status bits read on portC)
