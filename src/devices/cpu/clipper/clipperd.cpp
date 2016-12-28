@@ -29,20 +29,23 @@ enum
 #define ADDR_RX ((insn[1] & 0xf0) >> 4)
 #define ADDR_I12 (((int16_t)insn[1]) >> 4)
 
+// branch condition code mnemonics - the forms beginning with 'c' are
+// supposed to be used for branches following comparison instructions,
+// while those beginning with 'r' are for use after move or logical
+// instructions
 static const char *const cc[] =
 {
 	"",
-	"clt",
-	"cle",
-	"ceq",
-	"cgt",
-	"cge",
-	"cne",
-	"cltu",
-	"cleu",
-	"cgtu",
-	"cgeu",
-
+	"clt",  // rgt
+	"cle",  // rge
+	"ceq",  // req
+	"cgt",  // rlt
+	"cge",  // rle
+	"cne",  // rne
+	"cltu", // rgtu
+	"cleu", // rgeu, nc
+	"cgtu", // rltu, c
+	"cgeu", // rleu
 	"v",
 	"nv",
 	"n",
