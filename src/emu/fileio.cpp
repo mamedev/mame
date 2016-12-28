@@ -650,6 +650,7 @@ osd_file::error emu_file::attempt_zipped()
 	typedef util::archive_file::error (*open_func)(const std::string &filename, util::archive_file::ptr &result);
 	char const *const suffixes[] = { ".zip", ".7z" };
 	open_func const open_funcs[ARRAY_LENGTH(suffixes)] = { &util::archive_file::open_zip, &util::archive_file::open_7z };
+	static std::unordered_set<std::string> ziperr_cache;  // static cache to hold neg file results
 
 	// loop over archive types
 	std::string const savepath(m_fullpath);
@@ -677,7 +678,14 @@ osd_file::error emu_file::attempt_zipped()
 
 			// attempt to open the archive file
 			util::archive_file::ptr zip;
-			util::archive_file::error ziperr = open_funcs[i](m_fullpath, zip);
+			util::archive_file::error ziperr = util::archive_file::error::NONE;
+			auto preverr = ziperr_cache.find(m_fullpath);
+			if (preverr == ziperr_cache.end())
+			{
+				ziperr = open_funcs[i](m_fullpath, zip);
+				if (ziperr == util::archive_file::error::FILE_ERROR)
+					ziperr_cache.insert(m_fullpath);
+			}
 
 			// chop the archive suffix back off the filename before continuing
 			m_fullpath = m_fullpath.substr(0, dirsep);
