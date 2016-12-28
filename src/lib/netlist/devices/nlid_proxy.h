@@ -83,9 +83,13 @@ namespace netlist
 		NETLIB_UPDATEI()
 		{
 			nl_assert(m_logic_family != nullptr);
-			if (m_I.Q_Analog() > logic_family().m_high_thresh_V)
+			// FIXME: Variable supply voltage!
+			double supply_V = logic_family().fixed_V();
+			if (supply_V == 0.0) supply_V = 5.0;
+
+			if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
 				m_Q.push(1, NLTIME_FROM_NS(1));
-			else if (m_I.Q_Analog() < logic_family().m_low_thresh_V)
+			else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
 				m_Q.push(0, NLTIME_FROM_NS(1));
 			else
 			{

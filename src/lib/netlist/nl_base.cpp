@@ -58,11 +58,12 @@ class logic_family_ttl_t : public logic_family_desc_t
 public:
 	logic_family_ttl_t() : logic_family_desc_t()
 	{
-		m_low_thresh_V = 0.8;
-		m_high_thresh_V = 2.0;
+		m_fixed_V = 5.0;
+		m_low_thresh_PCNT = 0.8 / 5.0;
+		m_high_thresh_PCNT = 2.0 / 5.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.1;
-		m_high_V = 4.0;
+		m_low_VO = 0.1;
+		m_high_VO = 1.0; // 4.0
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
@@ -77,11 +78,12 @@ class logic_family_cd4xxx_t : public logic_family_desc_t
 public:
 	logic_family_cd4xxx_t() : logic_family_desc_t()
 	{
-		m_low_thresh_V = 0.8;
-		m_high_thresh_V = 2.0;
+		m_fixed_V = 0.0;
+		m_low_thresh_PCNT = 1.5 / 5.0;
+		m_high_thresh_PCNT = 3.5 / 5.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.05;
-		m_high_V = 4.95;
+		m_low_VO = 0.05;
+		m_high_VO = 0.05; // 4.95
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
