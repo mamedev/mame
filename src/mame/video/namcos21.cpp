@@ -463,5 +463,7 @@ uint32_t namcos21_state::screen_update_winrun(screen_device &screen, bitmap_ind1
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
 	winrun_bitmap_draw(bitmap,cliprect);
 
+	//popmessage("%04x %04x %04x|%04x %04x",m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
+	
 	return 0;
 }

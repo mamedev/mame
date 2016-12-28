@@ -2048,10 +2048,7 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_REFRESH_RATE(60)
-	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MCFG_SCREEN_SIZE(NAMCOS21_POLY_FRAME_WIDTH,NAMCOS21_POLY_FRAME_HEIGHT)
-	MCFG_SCREEN_VISIBLE_AREA(0,495,0,479)
+	MCFG_SCREEN_RAW_PARAMS(12288000*2, 782, 0, 496, 262*2,0,480) // TODO: basic parameters to get 60 Hz, x2 is for interlace
 	MCFG_SCREEN_UPDATE_DRIVER(namcos21_state, screen_update_winrun)
 	MCFG_SCREEN_PALETTE("palette")
 
@@ -2764,7 +2761,7 @@ DRIVER_INIT_MEMBER(namcos21_state,driveyes)
 /*    YEAR, NAME,      PARENT,   MACHINE,  INPUT,                      INIT,     MONITOR, COMPANY, FULLNAME,                                FLAGS */
 GAME( 1988, winrun,    0,        winrun,   winrun,     namcos21_state, winrun,   ROT0,    "Namco", "Winning Run",                           MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1989, winrungp,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run Suzuka Grand Prix (Japan)", MACHINE_IMPERFECT_GRAPHICS )
-GAME( 1991, winrun91,  0,        winrun,   winrungp,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS )
+GAME( 1991, winrun91,  0,        winrun,   winrun91,   namcos21_state, winrun,   ROT0,    "Namco", "Winning Run '91 (Japan)",               MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, driveyes,  0,        driveyes, driveyes,   namcos21_state, driveyes, ROT0,    "Namco", "Driver's Eyes (Japan)",                 MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, solvalou,  0,        namcos21, s21default, namcos21_state, solvalou, ROT0,    "Namco", "Solvalou (Japan)",                      MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1991, starblad,  0,        namcos21, s21default, namcos21_state, starblad, ROT0,    "Namco", "Starblade (World)",                     MACHINE_IMPERFECT_GRAPHICS )
