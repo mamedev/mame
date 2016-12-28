@@ -1,4 +1,4 @@
-// license: BSD-3-Clause
+﻿// license: BSD-3-Clause
 // copyright-holders: Aaron Giles, Bryan McPhail
 /***************************************************************************
 
@@ -489,8 +489,6 @@ static MACHINE_CONFIG_START( zwackery, zwackery_state )
 	// basic machine hardware
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
-
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
