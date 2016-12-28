@@ -30,25 +30,38 @@ enum
 	ADDR_MODE_RELX = 0xe0
 };
 
+enum
+{
+	FLAG_N = 0x1,
+	FLAG_Z = 0x2,
+	FLAG_V = 0x4,
+	FLAG_C = 0x8
+};
+
+#define FLAGS_NONE 0x0
+#define FLAGS_ZN   FLAG_Z | FLAG_N
+#define FLAGS_CZN  FLAG_C | FLAG_Z | FLAG_N
+#define FLAGS_CVZN FLAG_C | FLAG_V | FLAG_Z | FLAG_N
+
 // branch conditions
 enum
 {
 	BRANCH_T = 0x0,
-	BRANCH_GT = 0x1,
-	BRANCH_GE = 0x2,
+	BRANCH_LT = 0x1,
+	BRANCH_LE = 0x2,
 	BRANCH_EQ = 0x3,
-	BRANCH_LT = 0x4,
-	BRANCH_LE = 0x5,
+	BRANCH_GT = 0x4,
+	BRANCH_GE = 0x5,
 	BRANCH_NE = 0x6,
-	BRANCH_GTU = 0x7,
-	BRANCH_GEU = 0x8,
-	BRANCH_LTU = 0x9,
-	BRANCH_LEU = 0xa,
+	BRANCH_LTU = 0x7,
+	BRANCH_LEU = 0x8,
+	BRANCH_GTU = 0x9,
+	BRANCH_GEU = 0xa,
 	BRANCH_V = 0xb,
 	BRANCH_NV = 0xc,
 	BRANCH_N = 0xd,
 	BRANCH_NN = 0xe,
-	BRANCH_FV = 0xf
+	BRANCH_FN = 0xf
 };
 
 class clipper_device : public cpu_device
@@ -147,14 +160,30 @@ private:
 	int m_immediate_irq;
 	int m_immediate_vector;
 
+	struct
+	{
+		// decoded operand information
+		union {
+			int32_t imm;
+			uint32_t r2 : 4;
+			uint16_t macro;
+		} op;
+
+		// total size of instruction in bytes
+		uint32_t size;
+
+		// computed effective address
+		uint32_t address;
+	} m_info;
+
+	void clipper_device::decode_instruction(uint16_t insn);
 	int clipper_device::execute_instruction(uint16_t insn);
 
-	// condition code evaluations
-	void clipper_device::evaluate_cc1(int32_t v0);
-	void clipper_device::evaluate_cc2(int32_t v0, int32_t v1);
-	void clipper_device::evaluate_cc3(int32_t v0, int32_t v1, int32_t v2);
+	// condition code evaluation
+	void clipper_device::evaluate_cc2(int32_t v0, int32_t v1, uint32_t flags);
 	void clipper_device::evaluate_cc2f(double v0, double v1);
-	bool clipper_device::evaluate_branch(uint32_t r2);
+
+	bool clipper_device::evaluate_branch(uint32_t condition);
 
 	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc);
 };

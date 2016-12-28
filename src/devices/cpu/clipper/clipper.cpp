@@ -1,6 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Patrick Mackinlay
 
+/*
+ * Primary source: http://bitsavers.trailing-edge.com/pdf/fairchild/clipper/Clipper_Instruction_Set_Oct85.pdf
+ *
+ * TODO:
+ *   - save/restore state
+ *   - tlb, mmu and cache
+ *   - unimplemented instructions
+ *   - c100, c300, c400 variants
+ *   - boot logic
+ */
+
 #include "emu.h"
 #include "debugger.h"
 #include "clipper.h"
@@ -95,10 +106,10 @@ void clipper_device::state_string_export(const device_state_entry &entry, std::s
 	{
 	case STATE_GENFLAGS:
 		str = string_format("%c%c%c%c", 
-			m_psw.bits.c ? 'C' : ' ',
-			m_psw.bits.v ? 'V' : ' ',
-			m_psw.bits.z ? 'Z' : ' ',
-			m_psw.bits.n ? 'N' : ' ');
+			m_psw.bits.c ? 'C' : '.',
+			m_psw.bits.v ? 'V' : '.',
+			m_psw.bits.z ? 'Z' : '.',
+			m_psw.bits.n ? 'N' : '.');
 		break;
 	}
 }
@@ -162,38 +173,28 @@ const address_space_config * clipper_device::memory_space_config(address_spacenu
 
 #define R1 ((insn & 0x00f0) >> 4)
 #define R2 (insn & 0x000f)
-int clipper_device::execute_instruction(uint16_t insn)
+
+void clipper_device::decode_instruction (uint16_t insn)
 {
-	// this variable is used to return the next execution location to the caller
-	uint32_t next_pc = 0;
+	// initialise the decoding results
+	m_info.op.imm = m_info.op.r2 = m_info.op.macro = 0;
+	m_info.size = 0;
+	m_info.address = 0;
 
-	// this union holds operands used by instructions with immediate
-	// values, complex addressing modes or macro instructions
-	union {
-		int32_t imm;
-		uint32_t r2;
-		uint16_t macro;
-	} op;
-	op.imm = op.r2 = op.macro = 0;
-
-	// holds the effective address for instructions with complex addressing modes
-	uint32_t address = 0;
-
-	// decode complex instruction formats
 	if ((insn & 0xf800) == 0x3800 || (insn & 0xd300) == 0x8300)
 	{
-		// instruction has an immediate operand: decode 16 and 32 bit cases
+		// instruction has an immediate operand, either 16 or 32 bit
 		if (insn & 0x0080)
 		{
 			// fetch 16 bit immediate and sign extend
-			op.imm = (int16_t)m_direct->read_word(m_pc + 2);
-			next_pc = m_pc + 4;
+			m_info.op.imm = (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.size = 4;
 		}
 		else
 		{
 			// fetch 32 bit immediate and sign extend
-			op.imm = (int32_t)m_direct->read_dword(m_pc + 2);
-			next_pc = m_pc + 6;
+			m_info.op.imm = (int32_t)m_direct->read_dword(m_pc + 2);
+			m_info.size = 6;
 		}
 	}
 	else if ((insn & 0xf100) == 0x4100 || (insn & 0xe100) == 0x6100)
@@ -205,57 +206,57 @@ int clipper_device::execute_instruction(uint16_t insn)
 		switch (insn & 0x00f0)
 		{
 		case ADDR_MODE_PC32:
-			op.r2 = R2;
-			address = m_pc + (int32_t)m_direct->read_dword(m_pc + 2);
-			next_pc = m_pc + 6;
+			m_info.op.r2 = R2;
+			m_info.address = m_pc + (int32_t)m_direct->read_dword(m_pc + 2);
+			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_ABS32:
-			op.r2 = R2;
-			address = m_direct->read_dword(m_pc + 2);
-			next_pc = m_pc + 6;
+			m_info.op.r2 = R2;
+			m_info.address = m_direct->read_dword(m_pc + 2);
+			m_info.size = 6;
 			break;
 
 		case ADDR_MODE_REL32:
-			op.r2 = m_direct->read_word(m_pc + 2) & 0xf;
-			address = m_r[m_ssw.bits.u][R2] + (int32_t)m_direct->read_dword(m_pc + 4);
-			next_pc = m_pc + 8;
+			m_info.op.r2 = m_direct->read_word(m_pc + 2) & 0xf;
+			m_info.address = m_r[m_ssw.bits.u][R2] + (int32_t)m_direct->read_dword(m_pc + 4);
+			m_info.size = 8;
 			break;
 
 		case ADDR_MODE_PC16:
-			op.r2 = R2;
-			address = m_pc + (int16_t)m_direct->read_word(m_pc + 2);
-			next_pc = m_pc + 4;
+			m_info.op.r2 = R2;
+			m_info.address = m_pc + (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_REL12:
 			temp = m_direct->read_word(m_pc + 2);
 
-			op.r2 = temp & 0xf;
-			address = m_r[m_ssw.bits.u][R2] + ((int16_t)temp >> 4);
-			next_pc = m_pc + 4;
+			m_info.op.r2 = temp & 0xf;
+			m_info.address = m_r[m_ssw.bits.u][R2] + ((int16_t)temp >> 4);
+			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_ABS16:
-			op.r2 = R2;
-			address = (int16_t)m_direct->read_word(m_pc + 2);
-			next_pc = m_pc + 4;
+			m_info.op.r2 = R2;
+			m_info.address = (int16_t)m_direct->read_word(m_pc + 2);
+			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_PCX:
 			temp = m_direct->read_word(m_pc + 2);
 
-			op.r2 = temp & 0xf;
-			address = m_pc + m_r[m_ssw.bits.u][(temp >> 4) & 0xf];
-			next_pc = m_pc + 4;
+			m_info.op.r2 = temp & 0xf;
+			m_info.address = m_pc + m_r[m_ssw.bits.u][(temp >> 4) & 0xf];
+			m_info.size = 4;
 			break;
 
 		case ADDR_MODE_RELX:
 			temp = m_direct->read_word(m_pc + 2);
 
-			op.r2 = temp & 0xf;
-			address = m_r[m_ssw.bits.u][R2] + m_r[m_ssw.bits.u][(temp >> 4) & 0xf];
-			next_pc = m_pc + 4;
+			m_info.op.r2 = temp & 0xf;
+			m_info.address = m_r[m_ssw.bits.u][R2] + m_r[m_ssw.bits.u][(temp >> 4) & 0xf];
+			m_info.size = 4;
 			break;
 
 		default:
@@ -267,12 +268,25 @@ int clipper_device::execute_instruction(uint16_t insn)
 	else if ((insn & 0xfd00) == 0xb400)
 	{
 		// macro instructions
-		op.macro = m_direct->read_word(m_pc + 2);
-		next_pc = m_pc + 4;
+		m_info.op.macro = m_direct->read_word(m_pc + 2);
+		m_info.size = 4;
 	}
 	else
 		// all other instruction formats are 16 bits
-		next_pc = m_pc + 2;
+		m_info.size = 2;
+}
+
+int clipper_device::execute_instruction (uint16_t insn)
+{
+	// the address of the next instruction
+	uint32_t next_pc;
+
+	// handle complex instruction formats and addressing modes
+	decode_instruction(insn);
+
+	// next instruction follows the current one by default, but
+	// may be changed for branch, call or trap instructions
+	next_pc = m_pc + m_info.size;
 
 	switch (insn >> 8)
 	{
@@ -419,45 +433,45 @@ int clipper_device::execute_instruction(uint16_t insn)
 
 	case 0x38: 
 		// shai: shift arithmetic immediate
-		if (op.imm > 0)
-			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] << op.imm;
+		if (m_info.op.imm > 0)
+			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] << m_info.op.imm;
 		else
-			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] >> -op.imm;
+			m_r[m_ssw.bits.u][R2] = (int32_t)m_r[m_ssw.bits.u][R2] >> -m_info.op.imm;
 		break;
 	case 0x39: 
 		// shali: shift arithmetic longword immediate
-		if (op.imm > 0)
-			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= op.imm;
+		if (m_info.op.imm > 0)
+			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_info.op.imm;
 		else
-			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -op.imm;
+			((int64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -m_info.op.imm;
 		break;
 	case 0x3a: 
 		// shli: shift logical immediate
-		if (op.imm > 0)
-			m_r[m_ssw.bits.u][R2] <<= op.imm;
+		if (m_info.op.imm > 0)
+			m_r[m_ssw.bits.u][R2] <<= m_info.op.imm;
 		else
-			m_r[m_ssw.bits.u][R2] >>= -op.imm;
+			m_r[m_ssw.bits.u][R2] >>= -m_info.op.imm;
 		break;
 	case 0x3b: 
 		// shlli: shift logical longword immediate
-		if (op.imm > 0)
-			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= op.imm;
+		if (m_info.op.imm > 0)
+			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] <<= m_info.op.imm;
 		else
-			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -op.imm;
+			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] >>= -m_info.op.imm;
 		break;
 	case 0x3c: 
 		// roti: rotate immediate
-		if (op.imm > 0)
-			m_r[m_ssw.bits.u][R2] = _rotl(m_r[m_ssw.bits.u][R2], op.imm);
+		if (m_info.op.imm > 0)
+			m_r[m_ssw.bits.u][R2] = _rotl(m_r[m_ssw.bits.u][R2], m_info.op.imm);
 		else
-			m_r[m_ssw.bits.u][R2] = _rotr(m_r[m_ssw.bits.u][R2], -op.imm);
+			m_r[m_ssw.bits.u][R2] = _rotr(m_r[m_ssw.bits.u][R2], -m_info.op.imm);
 		break;
 	case 0x3d: 
 		// rotli: rotate longword immediate
-		if (op.imm > 0)
-			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotl64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], op.imm);
+		if (m_info.op.imm > 0)
+			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotl64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], m_info.op.imm);
 		else
-			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], -op.imm);
+			((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.bits.u])[R2 >> 1], -m_info.op.imm);
 		break;
 
 	case 0x44: 
@@ -468,9 +482,9 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x45: 
 		// call: call subroutine (other modes)
-		m_r[m_ssw.bits.u][op.r2] -= 4;
-		m_program->write_dword(m_r[m_ssw.bits.u][op.r2], next_pc);
-		next_pc = address;
+		m_r[m_ssw.bits.u][m_info.op.r2] -= 4;
+		m_program->write_dword(m_r[m_ssw.bits.u][m_info.op.r2], next_pc);
+		next_pc = m_info.address;
 		break;
 #ifdef UNIMPLEMENTED
 	case 0x46:
@@ -487,8 +501,8 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x49:
 		// b*: branch on condition (other modes)
-		if (evaluate_branch(op.r2))
-			next_pc = address;
+		if (evaluate_branch(m_info.op.r2))
+			next_pc = m_info.address;
 		break;
 #ifdef UNIMPLEMENTED
 	case 0x4a:
@@ -524,7 +538,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x61: 
 		// loadw: load word (other modes)
-		m_r[m_ssw.bits.u][op.r2] = m_program->read_dword(address);
+		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_dword(m_info.address);
 		break;
 	case 0x62:
 		// loada: load address (relative)
@@ -532,7 +546,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x63:
 		// loada: load address (other modes)
-		m_r[m_ssw.bits.u][op.r2] = address;
+		m_r[m_ssw.bits.u][m_info.op.r2] = m_info.address;
 		break;
 	case 0x64: 
 		// loads: load single floating (relative)
@@ -540,7 +554,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x65:
 		// loads: load single floating (other modes)
-		((uint64_t *)&m_f)[op.r2] = m_program->read_dword(address);
+		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_dword(m_info.address);
 		break;
 	case 0x66: 
 		// loadd: load double floating (relative)
@@ -548,7 +562,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x67:
 		// loadd: load double floating (other modes)
-		((uint64_t *)&m_f)[op.r2] = m_program->read_qword(address);
+		((uint64_t *)&m_f)[m_info.op.r2] = m_program->read_qword(m_info.address);
 		break;
 	case 0x68:
 		// loadb: load byte (relative)
@@ -556,7 +570,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x69:
 		// loadb: load byte (other modes)
-		m_r[m_ssw.bits.u][op.r2] = (int8_t)m_program->read_byte(address);
+		m_r[m_ssw.bits.u][m_info.op.r2] = (int8_t)m_program->read_byte(m_info.address);
 		break;
 	case 0x6a: 
 		// loadbu: load byte unsigned (relative)
@@ -564,7 +578,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x6b:
 		// loadbu: load byte unsigned (other modes)
-		m_r[m_ssw.bits.u][op.r2] = m_program->read_byte(address);
+		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_byte(m_info.address);
 		break;
 	case 0x6c: 
 		// loadh: load halfword (relative)
@@ -572,7 +586,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x6d:
 		// loadh: load halfword (other modes)
-		m_r[m_ssw.bits.u][op.r2] = (int16_t)m_program->read_word(address);
+		m_r[m_ssw.bits.u][m_info.op.r2] = (int16_t)m_program->read_word(m_info.address);
 		break;
 	case 0x6e:
 		// loadhu: load halfword unsigned (relative)
@@ -580,7 +594,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x6f:
 		// loadhu: load halfword unsigned (other modes)
-		m_r[m_ssw.bits.u][op.r2] = m_program->read_word(address);
+		m_r[m_ssw.bits.u][m_info.op.r2] = m_program->read_word(m_info.address);
 		break;
 	case 0x70: 
 		// storw: store word (relative)
@@ -588,7 +602,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x71:
 		// storw: store word (other modes)
-		m_program->write_dword(address, m_r[m_ssw.bits.u][op.r2]);
+		m_program->write_dword(m_info.address, m_r[m_ssw.bits.u][m_info.op.r2]);
 		break;
 	case 0x72:
 		// tsts: test and set (relative)
@@ -597,8 +611,8 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x73:
 		// tsts: test and set (other modes)
-		m_r[m_ssw.bits.u][R2] = m_program->read_dword(address);
-		m_program->write_dword(address, m_r[m_ssw.bits.u][R2] | 0x80000000);
+		m_r[m_ssw.bits.u][R2] = m_program->read_dword(m_info.address);
+		m_program->write_dword(m_info.address, m_r[m_ssw.bits.u][R2] | 0x80000000);
 		break;
 	case 0x74:
 		// stors: store single floating (relative)
@@ -606,7 +620,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x75:
 		// stors: store single floating (other modes)
-		m_program->write_dword(address, *((uint32_t *)&m_f[op.r2]));
+		m_program->write_dword(m_info.address, *((uint32_t *)&m_f[m_info.op.r2]));
 		break;
 	case 0x76:
 		// stord: store double floating (relative)
@@ -614,7 +628,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x77:
 		// stord: store double floating (other modes)
-		m_program->write_qword(address, *((uint64_t *)&m_f[op.r2]));
+		m_program->write_qword(m_info.address, *((uint64_t *)&m_f[m_info.op.r2]));
 		break;
 	case 0x78:
 		// storb: store byte (relative)
@@ -622,7 +636,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x79:
 		// storb: store byte (other modes)
-		m_program->write_byte(address, (uint8_t)m_r[m_ssw.bits.u][op.r2]);
+		m_program->write_byte(m_info.address, (uint8_t)m_r[m_ssw.bits.u][m_info.op.r2]);
 		break;
 
 	case 0x7c:
@@ -631,7 +645,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x7d:
 		// storh: store halfword (other modes)
-		m_program->write_word(address, (uint16_t)m_r[m_ssw.bits.u][op.r2]);
+		m_program->write_word(m_info.address, (uint16_t)m_r[m_ssw.bits.u][m_info.op.r2]);
 		break;
 
 	case 0x80: 
@@ -645,12 +659,12 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x83:
 		// addi: add immediate
-		m_r[m_ssw.bits.u][R2] += op.imm;
+		m_r[m_ssw.bits.u][R2] += m_info.op.imm;
 		break;
 	case 0x84:
 		// movw: move word
 		m_r[m_ssw.bits.u][R2] = m_r[m_ssw.bits.u][R1];
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 
 	case 0x86:
@@ -659,29 +673,29 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0x87:
 		// loadi: load immediate
-		m_r[m_ssw.bits.u][R2] = op.imm;
+		m_r[m_ssw.bits.u][R2] = m_info.op.imm;
 		break;
 	case 0x88:
 		// andw: and word
 		m_r[m_ssw.bits.u][R2] &= m_r[m_ssw.bits.u][R1];
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 
 	case 0x8b:
 		// andi: and immediate
-		m_r[m_ssw.bits.u][R2] &= op.imm;
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		m_r[m_ssw.bits.u][R2] &= m_info.op.imm;
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 	case 0x8c:
 		// orw: or word
 		m_r[m_ssw.bits.u][R2] |= m_r[m_ssw.bits.u][R1];
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 
 	case 0x8f: 
 		// ori: or immediate
-		m_r[m_ssw.bits.u][R2] |= op.imm;
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		m_r[m_ssw.bits.u][R2] |= m_info.op.imm;
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 #ifdef UNIMPLEMENTED
 	case 0x90:
@@ -735,54 +749,54 @@ int clipper_device::execute_instruction(uint16_t insn)
 		break;
 	case 0xa0: 
 		// subw: subtract word
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1], FLAGS_CVZN);
 		m_r[m_ssw.bits.u][R2] -= m_r[m_ssw.bits.u][R1];
 		break;
 
 	case 0xa2:
 		// subq: subtract quick
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], R1);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], R1, FLAGS_CVZN);
 		m_r[m_ssw.bits.u][R2] -= R1;
 		break;
 	case 0xa3:
 		// subi: subtract immediate
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], op.imm);
-		m_r[m_ssw.bits.u][R2] -= op.imm;
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_info.op.imm, FLAGS_CVZN);
+		m_r[m_ssw.bits.u][R2] -= m_info.op.imm;
 		break;
 	case 0xa4:
 		// cmpw: compare word
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_r[m_ssw.bits.u][R1], FLAGS_CVZN);
 		break;
 
 	case 0xa6: 
 		// cmpq: compare quick
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], R1);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], R1, FLAGS_CVZN);
 		break;
 	case 0xa7: 
 		// cmpi: compare immediate
-		evaluate_cc2(m_r[m_ssw.bits.u][R2], op.imm);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], m_info.op.imm, FLAGS_CVZN);
 		break;
 	case 0xa8: 
 		// xorw: exclusive or word
 		m_r[m_ssw.bits.u][R2] ^= m_r[m_ssw.bits.u][R1];
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 
 	case 0xab: 
 		// xori: exclusive or immediate
-		m_r[m_ssw.bits.u][R2] ^= op.imm;
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		m_r[m_ssw.bits.u][R2] ^= m_info.op.imm;
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 	case 0xac: 
 		// notw: not word
 		m_r[m_ssw.bits.u][R2] = ~m_r[m_ssw.bits.u][R1];
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAGS_ZN);
 		break;
 
 	case 0xae: 
 		// notq: not quick
 		m_r[m_ssw.bits.u][R2] = ~R1;
-		evaluate_cc1(m_r[m_ssw.bits.u][R2]);
+		evaluate_cc2(m_r[m_ssw.bits.u][R2], 0, FLAG_N);
 		break;
 
 #ifdef UNIMPLEMENTED
@@ -858,7 +872,7 @@ int clipper_device::execute_instruction(uint16_t insn)
 				uint8_t byte2 = m_program->read_byte(m_r[m_ssw.bits.u][2]);
 				if (byte1 != byte2)
 				{
-					evaluate_cc2(byte1, byte2);
+					evaluate_cc2(byte1, byte2, FLAGS_CVZN);
 					break;
 				}
 
@@ -921,11 +935,11 @@ int clipper_device::execute_instruction(uint16_t insn)
 			break;
 #endif
 		case 0x36: // cnvtdw
-			m_r[m_ssw.bits.u][op.macro & 0xf] = (int32_t)m_f[(op.macro >> 4) & 0xf];
+			m_r[m_ssw.bits.u][m_info.op.macro & 0xf] = (int32_t)m_f[(m_info.op.macro >> 4) & 0xf];
 			break;
 
 		case 0x37: // cnvwd
-			m_f[op.macro & 0xf] = (double)m_r[m_ssw.bits.u][(op.macro >> 4) & 0xf];
+			m_f[m_info.op.macro & 0xf] = (double)m_r[m_ssw.bits.u][(m_info.op.macro >> 4) & 0xf];
 			break;
 #ifdef UNIMPLEMENTED
 		case 0x38:
@@ -961,42 +975,42 @@ int clipper_device::execute_instruction(uint16_t insn)
 			{
 			case 0x00: 
 				// movus: move user to supervisor
-				m_r[0][op.macro & 0xf] = m_r[1][(op.macro >> 4) & 0xf];
+				m_r[0][m_info.op.macro & 0xf] = m_r[1][(m_info.op.macro >> 4) & 0xf];
 				// setcc1(m_r[m_ssw.bits.u][r2]);
 				break;
 
 			case 0x01: 
 				// movsu: move supervisor to user
-				m_r[1][op.macro & 0xf] = m_r[0][(op.macro >> 4) & 0xf];
+				m_r[1][m_info.op.macro & 0xf] = m_r[0][(m_info.op.macro >> 4) & 0xf];
 				// setcc1(m_r[!m_ssw.bits.u][r2]);
 				break;
 
 			case 0x02:
 				// saveur: save user registers
 				for (int i = 0; i < 16; i++)
-					m_program->write_dword(m_r[0][(op.macro >> 4) & 0xf] - 4 * (i + 1), m_r[1][15 - i]);
+					m_program->write_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] - 4 * (i + 1), m_r[1][15 - i]);
 
-				m_r[0][(op.macro >> 4) & 0xf] -= 64;
+				m_r[0][(m_info.op.macro >> 4) & 0xf] -= 64;
 				break;
 
 			case 0x03:
 				// restur: restore user registers
 				for (int i = 0; i < 16; i++)
-					m_r[1][i] = m_program->read_dword(m_r[0][(op.macro >> 4) & 0xf] + 4 * i);
+					m_r[1][i] = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 4 * i);
 
-				m_r[0][(op.macro >> 4) & 0xf] += 64;
+				m_r[0][(m_info.op.macro >> 4) & 0xf] += 64;
 				break;
 
 			case 0x04: 
 				// reti: restore psw, ssw and pc from supervisor stack
 				LOG_INTERRUPT("reti r%d, ssp = %08x, pc = %08x, next_pc = %08x\n",
-					(op.macro >> 4) & 0xf, m_r[0][(op.macro >> 4) & 0xf], m_pc, m_program->read_dword(m_r[0][(op.macro >> 4) & 0xf] + 8));
+					(op.macro >> 4) & 0xf, m_r[0][(m_info.op.macro >> 4) & 0xf], m_pc, m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 8));
 
-				m_psw.d = m_program->read_dword(m_r[0][(op.macro >> 4) & 0xf] + 0);
-				m_ssw.d = m_program->read_dword(m_r[0][(op.macro >> 4) & 0xf] + 4);
-				next_pc = m_program->read_dword(m_r[0][(op.macro >> 4) & 0xf] + 8);
+				m_psw.d = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 0);
+				m_ssw.d = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 4);
+				next_pc = m_program->read_dword(m_r[0][(m_info.op.macro >> 4) & 0xf] + 8);
 
-				m_r[0][(op.macro >> 4) & 0xf] += 12;
+				m_r[0][(m_info.op.macro >> 4) & 0xf] += 12;
 				break;
 
 			case 0x05:
@@ -1078,11 +1092,13 @@ uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc)
 	return next_pc;
 }
 
+/*
 void clipper_device::evaluate_cc1(int32_t v0)
 {
 	m_psw.bits.n = v0 < 0;
 	m_psw.bits.z = v0 == 0;
 }
+*/
 
 /*
 evaluation of overflow:
@@ -1100,21 +1116,12 @@ THEORY:
   for move/logical, call evaluate_cc2(r2, 0)
   these instructions should only set N or Z
 */
-void clipper_device::evaluate_cc2(int32_t v0, int32_t v1)
+void clipper_device::evaluate_cc2 (int32_t v0, int32_t v1, uint32_t flags)
 {
-	m_psw.bits.n = (v0 - v1) >> 31;
-	m_psw.bits.z = v0 == v1;
-	m_psw.bits.v = ((v1 < 0) ? (v0 - v1 < v0) : (v0 - v1 > v0));
-	m_psw.bits.c = ((uint32_t)v0 < (uint32_t)v1);
-}
-
-void clipper_device::evaluate_cc3(int32_t v0, int32_t v1, int32_t v2)
-{
-	m_psw.bits.n = v2 >> 31;
-	m_psw.bits.z = v2 == 0;
-	m_psw.bits.v = ((v0 > 0 && v1 > 0 && v2 < 0) || (v0 < 0 && v1 < 0 && v2 > 0));
-	m_psw.bits.v = ((v1 < 0) ? (v0 - v1 < v0) : (v0 - v1 > v0));
-	m_psw.bits.c = ((uint32_t)v0 < (uint32_t)v1);
+	m_psw.bits.n = flags & FLAG_N ? (v0 - v1) >> 31 : 0;
+	m_psw.bits.z = flags & FLAG_Z ? v0 == v1 : 0;
+	m_psw.bits.v = flags & FLAG_V ? ((v1 < 0) ? (v0 - v1 < v0) : (v0 - v1 > v0)) : 0;
+	m_psw.bits.c = flags & FLAG_C ? ((uint32_t)v0 < (uint32_t)v1) : 0;
 }
 
 void clipper_device::evaluate_cc2f(double v0, double v1)
@@ -1127,47 +1134,61 @@ void clipper_device::evaluate_cc2f(double v0, double v1)
 	m_psw.bits.c = 0;
 }
 
-bool clipper_device::evaluate_branch(uint32_t r2)
+bool clipper_device::evaluate_branch (uint32_t condition)
 {
-	switch (r2)
+	switch (condition)
 	{
 	case BRANCH_T:
 		return true;
 
-	case BRANCH_GT:
-		return !((m_psw.bits.n ^ m_psw.bits.v) | m_psw.bits.z);
-	case BRANCH_GE:
-		return !(m_psw.bits.n ^ m_psw.bits.v);
-	case BRANCH_EQ:
-		return m_psw.bits.z;
-
 	case BRANCH_LT:
-		return m_psw.bits.n ^ m_psw.bits.v;
+		return (!m_psw.bits.v && !m_psw.bits.z && !m_psw.bits.n)
+			|| (m_psw.bits.v && !m_psw.bits.z && m_psw.bits.n);
+
 	case BRANCH_LE:
-		return (m_psw.bits.n ^ m_psw.bits.v) | m_psw.bits.z;
+		return (!m_psw.bits.v && !m_psw.bits.n)
+			|| (m_psw.bits.v && !m_psw.bits.z && m_psw.bits.n);
+
+	case BRANCH_EQ:
+		return m_psw.bits.z && !m_psw.bits.n;
+
+	case BRANCH_GT:
+		return (!m_psw.bits.v && !m_psw.bits.z && m_psw.bits.n) 
+			|| (m_psw.bits.v && !m_psw.bits.n);
+
+	case BRANCH_GE:
+		return (m_psw.bits.v && !m_psw.bits.n)
+			|| (!m_psw.bits.v && !m_psw.bits.z && m_psw.bits.n)
+			|| (m_psw.bits.z && !m_psw.bits.n);
+
 	case BRANCH_NE:
-		return !m_psw.bits.z;
+		return (!m_psw.bits.z) 
+			|| (m_psw.bits.z && m_psw.bits.n);
+
+	case BRANCH_LTU:
+		return (!m_psw.bits.c && !m_psw.bits.z);
+
+	case BRANCH_LEU:
+		return !m_psw.bits.c;
 
 	case BRANCH_GTU:
-		return !(m_psw.bits.c | m_psw.bits.z);
-	case BRANCH_GEU:
-		return !m_psw.bits.c;
-	case BRANCH_LTU:
 		return m_psw.bits.c;
-	case BRANCH_LEU:
-		return m_psw.bits.c | m_psw.bits.z;
+
+	case BRANCH_GEU:
+		return m_psw.bits.c || m_psw.bits.z;
 
 	case BRANCH_V:
 		return m_psw.bits.v;
 	case BRANCH_NV:
 		return !m_psw.bits.v;
+
 	case BRANCH_N:
-		return m_psw.bits.n;
+		return !m_psw.bits.z && m_psw.bits.n;
 	case BRANCH_NN:
 		return !m_psw.bits.n;
 
-	case BRANCH_FV:
-		return false;
+	case BRANCH_FN:
+		return m_psw.bits.z && m_psw.bits.n;
 	}
 
 	return false;
