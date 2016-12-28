@@ -3,6 +3,7 @@
 // PINBALL
 // Skeleton driver for Joctronic pinballs.
 
+#include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/74157.h"
 #include "machine/nvram.h"
