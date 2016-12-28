@@ -164,10 +164,15 @@ public:
 	DECLARE_WRITE16_MEMBER(berlwall_spriteregs_w);
 
 	DECLARE_DRIVER_INIT(berlwall);
+	DECLARE_DRIVER_INIT(berlwallk);
+	DECLARE_DRIVER_INIT(berlwallt);
+	DECLARE_DRIVER_INIT(berlwall_common);
 	DECLARE_PALETTE_INIT(berlwall);
 	DECLARE_VIDEO_START(berlwall);
 	uint32_t screen_update_berlwall(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 	void kaneko16_render_15bpp_bitmap(bitmap_rgb32 &bitmap, const rectangle &cliprect);
+
+	void patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum);
 };
 
 class kaneko16_shogwarr_state : public kaneko16_state

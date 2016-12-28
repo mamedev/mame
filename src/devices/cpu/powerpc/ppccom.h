@@ -307,15 +307,15 @@ enum
 
 
 /* DSISR bits for DSI/alignment exceptions */
-#define DSISR_DIRECT        0x00000001      /* DSI: direct-store exception? */
-#define DSISR_NOT_FOUND     0x00000002      /* DSI: not found in HTEG or DBAT */
-#define DSISR_PROTECTED     0x00000010      /* DSI: exception due to protection */
-#define DSISR_CACHE_ERROR   0x00000020      /* DSI: operation on incorrect cache type */
-#define DSISR_STORE         0x00000040      /* DSI: store (1) or load (0) */
-#define DSISR_DABR          0x00000200      /* DSI: DABR match occurred */
-#define DSISR_NO_SEGMENT    0x00000400      /* DSI: no segment match found (64-bit only) */
-#define DSISR_INVALID_ECWX  0x00000800      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
-#define DSISR_INSTRUCTION   0xfffff000      /* align: instruction decoding bits */
+#define DSISR_DIRECT        0x80000000      /* DSI: direct-store error interrupt */
+#define DSISR_NOT_FOUND     0x40000000      /* DSI: not found in HTEG or DBAT */
+#define DSISR_PROTECTED     0x08000000      /* DSI: exception due to protection */
+#define DSISR_CACHE_ERROR   0x04000000      /* DSI: operation on incorrect cache type */
+#define DSISR_STORE         0x02000000      /* DSI: store (1) or load (0) */
+#define DSISR_DABR          0x00400000      /* DSI: DABR match occurred */
+#define DSISR_NO_SEGMENT    0x00200000      /* DSI: no segment match found (64-bit only) */
+#define DSISR_INVALID_ECWX  0x00100000      /* DSI: ECIWX or ECOWX used with EAR[E] = 0 */
+#define DSISR_INSTRUCTION   0x000fffff      /* align: instruction decoding bits FIXME: mask/shift depends on addressing mode */
 
 
 /* PowerPC 4XX IRQ bits */

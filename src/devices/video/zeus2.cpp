@@ -716,7 +716,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					}
 					/* make sure we log anything else */
 					//else if (logit || m_zeusbase[0x50] != 0x0)
-					//	logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
+					//  logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
 				}
 			}
 			break;
@@ -1634,14 +1634,14 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].p[0] += m_state->zeus_point[2];
 		}
 		//if (0)
-		//	//vert[i].p[0] += m_state->zbase;
-		//	vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//  //vert[i].p[0] += m_state->zbase;
+		//  vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
 		//else {
 			int shift;
 			shift = 1024 >> m_state->m_zeusbase[0x6c];
 			vert[i].p[0] += shift;
-		//	//float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
-		//	//vert[i].p[0] += zScale;
+		//  //float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//  //vert[i].p[0] += zScale;
 		//}
 
 		vert[i].p[2] += (texdata >> 16) << 2;

@@ -39,8 +39,20 @@
 
 #include "nl_setup.h"
 
-#define TTL_9312(name)                                                          \
-		NET_REGISTER_DEV(TTL_9312, name)
+#define TTL_9312(name, cA, cB, cC, cD0, cD1, cD2, cD3, cD4, cD5, cD6, cD7, cSTROBE)		\
+		NET_REGISTER_DEV(TTL_9312, name)	\
+		NET_CONNECT(name, A,  cA)		\
+		NET_CONNECT(name, B,  cB)		\
+ 		NET_CONNECT(name, C,  cC)		\
+		NET_CONNECT(name, D0, cD0)		\
+		NET_CONNECT(name, D1, cD1)		\
+		NET_CONNECT(name, D2, cD2)		\
+		NET_CONNECT(name, D3, cD3)		\
+		NET_CONNECT(name, D4, cD4)		\
+		NET_CONNECT(name, D5, cD5)		\
+		NET_CONNECT(name, D6, cD6)		\
+		NET_CONNECT(name, D7, cD7)		\
+		NET_CONNECT(name, G,  cSTROBE)
 
 #define TTL_9312_DIP(name)                                                      \
 		NET_REGISTER_DEV(TTL_9312_DIP, name)

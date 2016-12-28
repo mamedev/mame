@@ -814,6 +814,7 @@ uint8_t z80dart_channel::control_read()
 void z80dart_channel::control_write(uint8_t data)
 {
 	int reg = m_wr[0] & WR0_REGISTER_MASK;
+	uint8_t prev = m_wr[reg];
 
 	LOG(("Z80DART \"%s\" Channel %c : Control Register Write '%02x'\n", m_owner->tag(), 'A' + m_index, data));
 
@@ -944,7 +945,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG(("Z80DART \"%s\" Channel %c : Auto Enables %u\n", m_owner->tag(), 'A' + m_index, (data & WR3_AUTO_ENABLES) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Receiver Bits/Character %u\n", m_owner->tag(), 'A' + m_index, get_rx_word_length()));
 
-		update_serial();
+		if (data != prev)
+			update_serial();
 		break;
 
 	case 4:
@@ -953,7 +955,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG(("Z80DART \"%s\" Channel %c : Stop Bits %s\n", m_owner->tag(), 'A' + m_index, stop_bits_tostring(get_stop_bits())));
 		LOG(("Z80DART \"%s\" Channel %c : Clock Mode %uX\n", m_owner->tag(), 'A' + m_index, get_clock_mode()));
 
-		update_serial();
+		if (data != prev)
+			update_serial();
 		break;
 
 	case 5:
@@ -963,7 +966,8 @@ void z80dart_channel::control_write(uint8_t data)
 		LOG(("Z80DART \"%s\" Channel %c : Request to Send %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_RTS) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Data Terminal Ready %u\n", m_owner->tag(), 'A' + m_index, (data & WR5_DTR) ? 1 : 0));
 
-		update_serial();
+		if (data != prev)
+			update_serial();
 
 		if (data & WR5_RTS)
 		{

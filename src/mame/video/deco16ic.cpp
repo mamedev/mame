@@ -192,7 +192,7 @@ deco16ic_device::deco16ic_device(const machine_config &mconfig, const char *tag,
 		m_pf12_last_big(0),
 		m_pf1_8bpp_mode(0),
 		m_split(0),
-		m_full_width12(1),
+		m_tilemapsizes(1),
 		m_pf1_trans_mask(0xf),
 		m_pf2_trans_mask(0xf),
 		m_pf1_colour_bank(0),
@@ -229,22 +229,23 @@ void deco16ic_device::device_start()
 
 	int fullheight = 0;
 	int fullwidth = 0;
+	int fullheight_8x8 = 0;
 
-	if (m_full_width12&2)
+
+	if (m_tilemapsizes&4)
+		fullheight_8x8 = 1;
+
+	if (m_tilemapsizes&2)
 		fullheight = 1;
 
-	if (m_full_width12&1)
+	if (m_tilemapsizes&1)
 		fullwidth = 1;
 
 	m_pf1_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ?64 : 32);
-//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_full_width12 ? 64 : 32, 32);
-	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , 32); // nitroball
+//  m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, m_tilemapsizes ? 64 : 32, 32);
+	m_pf1_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf1_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, 64 , fullheight_8x8 ? 64 : 32); // nitroball
 
-	if (m_split)
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-	else
-		m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
-
+	m_pf2_tilemap_16x16 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info),this), tilemap_mapper_delegate(FUNC(deco16ic_device::deco16_scan_rows),this), 16, 16, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 	m_pf2_tilemap_8x8 = &machine().tilemap().create(*m_gfxdecode, tilemap_get_info_delegate(FUNC(deco16ic_device::get_pf2_tile_info_b),this), TILEMAP_SCAN_ROWS, 8, 8, fullwidth ? 64 : 32, fullheight ? 64 : 32);
 
 	m_pf1_tilemap_8x8->set_transparent_pen(0);
@@ -678,7 +679,9 @@ static int deco16_pf_update(
 	const uint16_t scrollx,
 	const uint16_t scrolly,
 	const uint16_t control0,
-	const uint16_t control1)
+	const uint16_t control1,
+	const int tilemapsizes
+	)
 {
 	int rows, cols, offs, use_custom = 0;
 
@@ -731,11 +734,17 @@ static int deco16_pf_update(
 
 		if (tilemap_8x8)
 		{
+			int numrows = rows;
+			
+			// wolffang uses a larger 8x8 tilemap for the Japanese intro text, everything else seems to need this logic tho?
+			if (!(tilemapsizes & 4))
+				numrows = rows >> 1;
+
 			tilemap_8x8->set_scroll_cols(1);
-			tilemap_8x8->set_scroll_rows(rows / 2);
+			tilemap_8x8->set_scroll_rows(numrows);
 			tilemap_8x8->set_scrolly(0, scrolly);
 
-			for (offs = 0; offs < rows / 2; offs++)
+			for (offs = 0; offs < numrows; offs++)
 				tilemap_8x8->set_scrollx(offs, scrollx + rowscroll_ptr[offs]);
 		}
 	}
@@ -826,8 +835,8 @@ void deco16ic_device::pf_update( const uint16_t *rowscroll_1_ptr, const uint16_t
 	/* Update scrolling and tilemap enable */
 	m_pf1_rowscroll_ptr = rowscroll_1_ptr;
 	m_pf2_rowscroll_ptr = rowscroll_2_ptr;
-	m_use_custom_pf2 = deco16_pf_update(m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, rowscroll_2_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8);
-	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff);
+	m_use_custom_pf2 = deco16_pf_update(m_pf2_tilemap_8x8, m_pf2_tilemap_16x16, rowscroll_2_ptr, m_pf12_control[3], m_pf12_control[4], m_pf12_control[5] >> 8, m_pf12_control[6] >> 8, m_tilemapsizes);
+	m_use_custom_pf1 = deco16_pf_update(m_pf1_tilemap_8x8, m_pf1_tilemap_16x16, rowscroll_1_ptr, m_pf12_control[1], m_pf12_control[2], m_pf12_control[5] & 0xff, m_pf12_control[6] & 0xff, m_tilemapsizes);
 
 	/* Update banking and global flip state */
 	if (!m_bank1_cb.isnull())

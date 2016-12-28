@@ -21,6 +21,7 @@
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
+#include "plib/pstream.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -125,6 +126,7 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
 
 #define NETLIB_UPDATE(chip) void NETLIB_NAME(chip) :: update(void) NL_NOEXCEPT
+#define NETLIB_PARENT_UPDATE(chip) NETLIB_NAME(chip) :: update();
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
@@ -226,12 +228,21 @@ namespace netlist
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V;   //!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
-		nl_double m_high_thresh_V;  //!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
-		nl_double m_low_V;          //!< low output voltage. This voltage is output if the ouput is "0"
-		nl_double m_high_V;         //!< high output voltage. This voltage is output if the ouput is "1"
-		nl_double m_R_low;          //!< low output resistance. Value of series resistor used for low output
-		nl_double m_R_high;         //!< high output resistance. Value of series resistor used for high output
+		double fixed_V() const { return m_fixed_V; }
+		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
+		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
+		double low_V(const double VN, const double VP) const { return VN + m_low_VO; }
+		double high_V(const double VN, const double VP) const { return VP - m_high_VO; }
+		double R_low() const { return m_R_low; }
+		double R_high() const { return m_R_high; }
+
+		double m_fixed_V;		    //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
+		double m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
+		double m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"
+		double m_high_VO;           //!< high output voltage offset. The supply voltage minus this offset is output if the ouput is "1"
+		double m_R_low;             //!< low output resistance. Value of series resistor used for low output
+		double m_R_high;            //!< high output resistance. Value of series resistor used for high output
 	};
 
 	/*! Base class for devices, terminals, outputs and inputs which support
@@ -828,11 +839,11 @@ namespace netlist
 	public:
 
 		enum param_type_t {
-			MODEL,
 			STRING,
 			DOUBLE,
 			INTEGER,
-			LOGIC
+			LOGIC,
+			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
 		param_t(const param_type_t atype, device_t &device, const pstring &name);
@@ -840,36 +851,85 @@ namespace netlist
 
 		param_type_t param_type() const { return m_param_type; }
 
+	protected:
+		void update_param();
+
+		template<typename C>
+		void set(C &p, const C v)
+		{
+			if (p != v)
+			{
+				p = v;
+				update_param();
+			}
+		}
+
 	private:
 		const param_type_t m_param_type;
 	};
 
-	template <typename C, param_t::param_type_t T>
-	class param_template_t : public param_t
+	class param_ptr_t final: public param_t
 	{
-		P_PREVENT_COPYING(param_template_t)
 	public:
-		param_template_t(device_t &device, const pstring name, const C val);
-
-		const C operator()() const { return Value(); }
-
-		void setTo(const C &param);
-		void initial(const C &val) { m_param = val; }
-
-	protected:
-		C Value() const { return m_param;   }
-		virtual void changed() { }
-		C m_param;
+		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		std::uint8_t * operator()() const { return m_param; }
+		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
+		std::uint8_t* m_param;
 	};
 
-	using param_double_t = param_template_t<nl_double, param_t::DOUBLE>;
-	using param_int_t = param_template_t<int, param_t::INTEGER>;
-	using param_str_t = param_template_t<pstring, param_t::STRING>;
+	class param_logic_t final: public param_t
+	{
+	public:
+		param_logic_t(device_t &device, const pstring name, const bool val);
+		bool operator()() const { return m_param; }
+		void setTo(const bool &param) { set(m_param, param); }
+	private:
+		bool m_param;
+	};
 
-	using param_logic_t = param_template_t<bool, param_t::LOGIC>;
+	class param_int_t final: public param_t
+	{
+	public:
+		param_int_t(device_t &device, const pstring name, const int val);
+		int operator()() const { return m_param; }
+		void setTo(const int &param) { set(m_param, param); }
+	private:
+		int m_param;
+	};
 
-	class param_model_t : public param_str_t
+	class param_double_t final: public param_t
+	{
+	public:
+		param_double_t(device_t &device, const pstring name, const double val);
+		double operator()() const { return m_param; }
+		void setTo(const double &param) { set(m_param, param); }
+	private:
+		double m_param;
+	};
+
+	class param_str_t : public param_t
+	{
+	public:
+		param_str_t(device_t &device, const pstring name, const pstring val);
+		const pstring operator()() const { return Value(); }
+		void setTo(const pstring &param)
+		{
+			if (m_param != param)
+			{
+				m_param = param;
+				changed();
+				update_param();
+			}
+		}
+	protected:
+		virtual void changed() { }
+		pstring Value() const { return m_param; }
+	private:
+		pstring m_param;
+	};
+
+	class param_model_t final : public param_str_t
 	{
 	public:
 		param_model_t(device_t &device, const pstring name, const pstring val)
@@ -880,12 +940,41 @@ namespace netlist
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		void changed() override
-		{
-			m_map.clear();
-		}
+		virtual void changed() override { m_map.clear(); }
 	private:
 		model_map_t m_map;
+	};
+
+	class param_data_t : public param_str_t
+	{
+	public:
+		param_data_t(device_t &device, const pstring name)
+		: param_str_t(device, name, "") { }
+		std::unique_ptr<plib::pistream> stream();
+	protected:
+		virtual void changed() override { }
+	};
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name)
+		: param_data_t(device, name)
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1207,19 +1296,6 @@ namespace netlist
 	// -----------------------------------------------------------------------------
 	// inline implementations
 	// -----------------------------------------------------------------------------
-
-	template <class C, param_t::param_type_t T>
-	inline void param_template_t<C, T>::setTo(const C &param)
-	{
-		if (m_param != param)
-		{
-			m_param = param;
-			changed();
-			device().update_param();
-			if (device().needs_update_after_param_change())
-				device().update_dev();
-		}
-	}
 
 	inline bool detail::core_terminal_t::is_logic() const noexcept
 	{

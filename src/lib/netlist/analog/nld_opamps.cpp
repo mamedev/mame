@@ -48,6 +48,22 @@ namespace netlist
  *        2; opamp with first pole
  *        3: opamp with first pole + output limit
  *        4: opamp with input stage, first pole + output limit
+ *
+ * Type 1 parameters:
+ *     FPF = frequency of first pole in Hz (ony used for open-loop gain)
+ *     UGF = unity gain frequency in Hz (only used for open-loop gain)
+ *     RI = input resistance in Ohms
+ *     RO = output resistance in Ohms
+ *
+ * Type 3 parameters:
+ *     VLH = high supply rail minus high output swing in V
+ *     VLL = low output swing minus low supply rail in V
+ *     FPF = frequency of first pole in Hz
+ *     UGF = unity gain frequency (transition frequency) in Hz
+ *     SLEW = unity gain slew rate in V/s
+ *     RI = input resistance in Ohms
+ *     RO = output resistance in Ohms
+ *     DAB = quiescent supply current in A
  */
 
 /* .model abc OPAMP(VLH=2.0 VLL=0.2 FPF=5 UGF=10k SLEW=0.6u RI=1000k RO=50 DAB=0.002)

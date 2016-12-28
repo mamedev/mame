@@ -642,7 +642,7 @@ ROM_START(sklflite)
 	ROM_LOAD("skflcpu1.rom", 0x0000, 0x2000, CRC(8f833b55) SHA1(1729203582c22b51d1cc401aa8f270aa5cdadabe))
 	ROM_LOAD("skflaudiocpu.rom", 0x2000, 0x2000, CRC(ffc497aa) SHA1(3e88539ae1688322b9268f502d8ca41cffb28df3))
 
-	ROM_REGION(0x8000, "audiocpu", 0) // Z80A soundcard
+	ROM_REGION(0x20000, "audiocpu", 0) // Z80A soundcard
 	ROM_LOAD("skflsnd.rom", 0x0000, 0x8000, CRC(926a1da9) SHA1(16c762fbfe6a55597f26ff55d380192bb8647ee0))
 ROM_END
 
@@ -693,6 +693,30 @@ ROM_START(msdisco)
 	ROM_REGION(0x4000, "audiocpu", ROMREGION_ERASEFF)
 ROM_END
 
+// Eight Ball Champ (Maibesa) on EFO "Z-Pinball" hardware - very different from the Bally original
+// actual year uncertain; schematic in manual says hardware was designed in 1986, so probably not 1985 as claimed
+ROM_START(eballchps)
+	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
+	ROM_LOAD("U18-JEB 5A0 - CPU.BIN", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
+
+	ROM_REGION(0x20000, "audiocpu", 0) // Z80-based
+	ROM_LOAD("U3-EBE A02 - Sonido.BIN", 0x00000, 0x8000, CRC(34be32ee) SHA1(ce0271540164639f28d617753760ecc479b6b0d0))
+	ROM_LOAD("U4-EBE B01 - Sonido.BIN", 0x08000, 0x8000, CRC(d696c4e8) SHA1(501e18c258e6d42819d25d72e1907984a6cfeecb))
+	ROM_LOAD("U5-EBE C01 - Sonido.BIN", 0x10000, 0x8000, CRC(fe78d7ef) SHA1(ed91c51dd230854a007f88446011f786759687ca))
+	ROM_LOAD("U6-EBE D02 - Sonido.BIN", 0x18000, 0x8000, CRC(a507081b) SHA1(72d025852a12f455981c61a405f97eaaac9c6fac))
+ROM_END
+
+// Cobra (Playbar)
+ROM_START(cobrapb)
+	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
+	ROM_LOAD("U18 - JCB 4 A0 - CPU.BIN", 0x0000, 0x8000, CRC(c663910e) SHA1(c38692343f114388259c4e7b7943e5be934189ca))
+
+	ROM_REGION(0x20000, "audiocpu", 0) // Z80-based
+	ROM_LOAD("U3 - SCB 1 A0 - Sonido.BIN", 0x00000, 0x8000, CRC(d3675770) SHA1(882ce748308f2d78cccd28fc8cd64fe69bd223e3))
+	ROM_LOAD("U4 - SCB 1 B0 - Sonido.BIN", 0x08000, 0x8000, CRC(e8e1bdbb) SHA1(215bdfab751cb0ea47aa529df0ac30976de4f772))
+	ROM_LOAD("U5 - SCB 1 C0 - Sonido.BIN", 0x10000, 0x8000, CRC(c36340ab) SHA1(cd662457959de3a929ba02779e2046ed18b797e2))
+ROM_END
+
 GAME(1982,  spain82,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Spain '82",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1983,  megaaton,  0,        megaaton, megaaton, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1983,  megaatona, megaaton, megaaton, megaaton, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton (alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -711,5 +735,8 @@ GAME(1987,  sklflite,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Pl
 // not by Playmatic, but same hardware
 GAME(1986,  ridersrf,  0,        play_3,   play_3,   driver_device, 0, ROT0, "JocMatic",  "Rider's Surf",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  ironball,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+// "Z-Pinball" hardware, Z80 main and sound CPUs - to be split (?)
+GAME(1986,  eballchps, eballchp, play_3,   play_3,   driver_device, 0, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1987,  cobrapb,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playbar",   "Cobra (Playbar)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Miss Disco (Bingo)",        MACHINE_IS_SKELETON_MECHANICAL)

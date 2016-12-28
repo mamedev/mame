@@ -207,7 +207,7 @@
     91658 = Lamp Sequencer (DOTron)
     91659 = Flashing Fluorescent Assembly (DOTron)
     91660 = Squawk & Talk (DOTron, NFLFoot)
-    91671 = Chip Squeak Deluxe (SpyHunt)
+    91671 = Cheap Squeak Deluxe (SpyHunt)
     91673 = Lamp Driver (SpyHunt)
     91695 = IPU laserdisk controller (NFLFoot)
     91794 = Optical Encoder Deluxe (DemoDerb)

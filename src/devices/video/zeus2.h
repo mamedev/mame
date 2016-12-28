@@ -298,6 +298,11 @@ public:
 		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x1f) << 3);
 	}
 
+	inline uint32_t conv_rgb565_to_rgb32(uint16_t color)
+	{
+		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x8000) >> 5) | ((color & 0x1f) << 3);
+	}
+
 #ifdef UNUSED_FUNCTION
 	inline void WAVERAM_plot(int y, int x, uint32_t color)
 	{

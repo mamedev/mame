@@ -50,7 +50,7 @@ public:
 	uint8_t    m_crtc_register;
 	uint8_t    m_crtc_data[0x10];
 	emu_timer *m_crtc_timer;
-	
+
 	/* misc */
 	uint8_t    m_directionflag;
 	uint8_t    m_commanddata;

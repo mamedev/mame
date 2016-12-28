@@ -53,7 +53,7 @@ public:
 	uint8_t       m_oki_control;
 	uint8_t       m_oki_command;
 	uint8_t       m_dispenser_latch;
-	int			m_oki_numbanks;
+	int         m_oki_numbanks;
 	void configure_oki_banks();
 
 	/* devices */

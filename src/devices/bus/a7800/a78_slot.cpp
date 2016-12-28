@@ -432,7 +432,7 @@ image_init_result a78_cart_slot_device::call_load()
 				m_type = A78_ABSOLUTE;
 			// (for now) mirror ram implies no bankswitch format is used
 			else if ((mapper & 0x0080) == 0x0080)
-				m_type = A78_TYPE8; 
+				m_type = A78_TYPE8;
 
 
 			logerror("Cart type: 0x%x\n", m_type);

@@ -48,7 +48,7 @@
 //**************************************************************************
 
 typedef device_delegate<void (int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)> ef9369_color_update_delegate;
-#define EF9369_COLOR_UPDATE(name)	void name(int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)
+#define EF9369_COLOR_UPDATE(name)   void name(int entry, bool m, uint8_t ca, uint8_t cb, uint8_t cc)
 
 // ======================> ef9369_device
 
@@ -76,7 +76,7 @@ private:
 	ef9369_color_update_delegate m_color_update_cb;
 
 	// state
-	uint8_t m_ca[NUMCOLORS], m_cb[NUMCOLORS], m_cc[NUMCOLORS];	// actually 4-bit
+	uint8_t m_ca[NUMCOLORS], m_cb[NUMCOLORS], m_cc[NUMCOLORS];  // actually 4-bit
 	bool m_m[NUMCOLORS];
 	int m_address;
 };
