@@ -678,7 +678,7 @@ osd_file::error emu_file::attempt_zipped()
 
 			// attempt to open the archive file
 			util::archive_file::ptr zip;
-			util::archive_file::error ziperr = util::archive_file::error::NONE;
+			util::archive_file::error ziperr = util::archive_file::error::FILE_ERROR;
 			auto preverr = ziperr_cache.find(m_fullpath);
 			if (preverr == ziperr_cache.end())
 			{
