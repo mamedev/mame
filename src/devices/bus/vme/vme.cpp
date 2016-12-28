@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Joakim Larsson Edstrom
 /*
- * vme.c
+ * vme.cpp
  *
  * The Versabus-E was standardized as the VME bus by VITA 1981 for Europe
  * in the single or double Euroboard form factor. Several standard revs has
@@ -221,9 +221,8 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read8_delegate rhan
 {
 	cpu_device	*m_maincpu = machine().device<cpu_device>("maincpu");
 
-	//	printf("%s", __func__);
-
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+	LOG("%s width:%d\n", FUNCNAME, buswidth);
 	switch(buswidth)
 	{
 	case 32:
@@ -244,6 +243,7 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read16_delegate rha
 {
 	cpu_device *m_maincpu = machine().device<cpu_device>("maincpu");
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+	LOG("%s width:%d\n", FUNCNAME, buswidth);
 	switch(buswidth)
 	{
 	case 32:
@@ -264,6 +264,7 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read32_delegate rha
 {
 	cpu_device *m_maincpu = machine().device<cpu_device>("maincpu");
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
+	LOG("%s width:%d\n", FUNCNAME, buswidth);
 	switch(buswidth)
 	{
 	case 32:
