@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Mike Balfour, Zsolt Vasvari
 
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 #include "machine/gen_latch.h"
 
 class bking_state : public driver_device
@@ -11,7 +11,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_playfield_ram(*this, "playfield_ram"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		//m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
@@ -51,8 +51,8 @@ public:
 
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
-	optional_device<buggychl_mcu_device> m_bmcu;
+	//optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;

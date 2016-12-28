@@ -2,13 +2,22 @@
 // copyright-holders:Ernesto Corvi, Nicola Salmoria
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "machine/buggychl.h"
+#include "machine/taito68705interface.h"
 
+/*
+   Most Taito 68705s share a similar (often identical) hookup.
+   This file encapsulates that.
 
-const device_type BUGGYCHL_MCU = &device_creator<buggychl_mcu_device>;
+	used by:
+	buggychl.cpp - buggychl
+	bking.cpp - bking3
+	40love.cpp - 40love
+*/
 
-buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: device_t(mconfig, BUGGYCHL_MCU, "M68705 MCU Simulation (Buggy Challenge)", tag, owner, clock, "buggychl_mcu", __FILE__),
+const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
+
+taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, TAITO68705_MCU, "Taito M68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__),
 	m_port_a_in(0),
 	m_port_a_out(0),
 	m_ddr_a(0),
@@ -21,9 +30,34 @@ buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const ch
 	m_from_main(0),
 	m_from_mcu(0),
 	m_mcu_sent(0),
-	m_main_sent(0)
+	m_main_sent(0),
+	m_mcu(*this, "mcu")
 {
 }
+
+ADDRESS_MAP_START( taito68705_mcu_map, AS_PROGRAM, 8, taito68705_mcu_device )
+	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
+	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
+	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
+	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
+	AM_RANGE(0x0010, 0x007f) AM_RAM
+	AM_RANGE(0x0080, 0x07ff) AM_ROM
+ADDRESS_MAP_END
+
+
+static MACHINE_CONFIG_FRAGMENT( taito68705 )
+	MCFG_CPU_ADD("mcu", M68705, DERIVED_CLOCK(1,1))
+	MCFG_CPU_PROGRAM_MAP(taito68705_mcu_map)
+MACHINE_CONFIG_END
+
+machine_config_constructor taito68705_mcu_device::device_mconfig_additions() const
+{
+	return MACHINE_CONFIG_NAME( taito68705 );
+}
+
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -31,7 +65,7 @@ buggychl_mcu_device::buggychl_mcu_device(const machine_config &mconfig, const ch
 //  complete
 //-------------------------------------------------
 
-void buggychl_mcu_device::device_config_complete()
+void taito68705_mcu_device::device_config_complete()
 {
 }
 
@@ -39,10 +73,8 @@ void buggychl_mcu_device::device_config_complete()
 //  device_start - device-specific startup
 //-------------------------------------------------
 
-void buggychl_mcu_device::device_start()
+void taito68705_mcu_device::device_start()
 {
-	m_mcu = machine().device("mcu");
-
 	save_item(NAME(m_from_main));
 	save_item(NAME(m_from_mcu));
 	save_item(NAME(m_mcu_sent));
@@ -62,7 +94,7 @@ void buggychl_mcu_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void buggychl_mcu_device::device_reset()
+void taito68705_mcu_device::device_reset()
 {
 	m_mcu_sent = 0;
 	m_main_sent = 0;
@@ -77,6 +109,8 @@ void buggychl_mcu_device::device_reset()
 	m_port_c_in = 0;
 	m_port_c_out = 0;
 	m_ddr_c = 0;
+
+	m_mcu->set_input_line(0, CLEAR_LINE);
 }
 
 
@@ -88,19 +122,19 @@ void buggychl_mcu_device::device_reset()
 
 ***************************************************************************/
 
-READ8_MEMBER( buggychl_mcu_device::buggychl_68705_port_a_r )
+READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_a_r )
 {
 	//logerror("%04x: 68705 port A read %02x\n", m_mcu->safe_pc(), m_port_a_in);
 	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_port_a_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_a_w )
 {
 	//logerror("%04x: 68705 port A write %02x\n", m_mcu->safe_pc(), data);
 	m_port_a_out = data;
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_ddr_a_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_a_w )
 {
 	m_ddr_a = data;
 }
@@ -126,20 +160,20 @@ WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_ddr_a_w )
  */
 
 
-READ8_MEMBER( buggychl_mcu_device::buggychl_68705_port_b_r )
+READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_b_r )
 {
 	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_port_b_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_b_w )
 {
-	logerror("%04x: 68705 port B write %02x\n", m_mcu->safe_pc(), data);
+	logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
 
 	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
 	{
 		m_port_a_in = m_from_main;
 		if (m_main_sent)
-			m_mcu->execute().set_input_line(0, CLEAR_LINE);
+			m_mcu->set_input_line(0, CLEAR_LINE);
 		m_main_sent = 0;
 		logerror("read command %02x from main cpu\n", m_port_a_in);
 	}
@@ -153,7 +187,7 @@ WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_port_b_w )
 	m_port_b_out = data;
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_ddr_b_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_b_w )
 {
 	m_ddr_b = data;
 }
@@ -168,51 +202,51 @@ WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_ddr_b_w )
  *  1   R  0 when pending command 68705->Z80
  */
 
-READ8_MEMBER( buggychl_mcu_device::buggychl_68705_port_c_r )
+READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_c_r )
 {
 	m_port_c_in = 0;
 	if (m_main_sent)
 		m_port_c_in |= 0x01;
 	if (!m_mcu_sent)
 		m_port_c_in |= 0x02;
-	logerror("%04x: 68705 port C read %02x\n", m_mcu->safe_pc(), m_port_c_in);
+	logerror("$s: 68705 port C read %02x\n", machine().describe_context(), m_port_c_in);
 	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_port_c_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_c_w )
 {
-	logerror("%04x: 68705 port C write %02x\n", m_mcu->safe_pc(), data);
+	logerror("%s: 68705 port C write %02x\n", machine().describe_context(), data);
 	m_port_c_out = data;
 }
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_68705_ddr_c_w )
+WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_c_w )
 {
 	m_ddr_c = data;
 }
 
 
-WRITE8_MEMBER( buggychl_mcu_device::buggychl_mcu_w )
+WRITE8_MEMBER( taito68705_mcu_device::mcu_w )
 {
-	logerror("%04x: mcu_w %02x\n", m_mcu->safe_pc(), data);
+	logerror("%s: mcu_w %02x\n", machine().describe_context(), data);
 	m_from_main = data;
 	m_main_sent = 1;
-	m_mcu->execute().set_input_line(0, ASSERT_LINE);
+	m_mcu->set_input_line(0, ASSERT_LINE);
 }
 
-READ8_MEMBER( buggychl_mcu_device::buggychl_mcu_r )
+READ8_MEMBER( taito68705_mcu_device::mcu_r )
 {
-	logerror("%04x: mcu_r %02x\n", m_mcu->safe_pc(), m_from_mcu);
+	logerror("%s: mcu_r %02x\n", machine().describe_context(), m_from_mcu);
 	m_mcu_sent = 0;
 	return m_from_mcu;
 }
 
-READ8_MEMBER( buggychl_mcu_device::buggychl_mcu_status_r )
+READ8_MEMBER( taito68705_mcu_device::mcu_status_r )
 {
 	int res = 0;
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
-	//logerror("%04x: mcu_status_r\n",m_mcu->safe_pc());
+	//logerror("%s: mcu_status_r\n",machine().describe_context());
 	if (!m_main_sent)
 		res |= 0x01;
 	if (m_mcu_sent)
@@ -221,14 +255,3 @@ READ8_MEMBER( buggychl_mcu_device::buggychl_mcu_status_r )
 	return res;
 }
 
-ADDRESS_MAP_START( buggychl_mcu_map, AS_PROGRAM, 8, buggychl_mcu_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_68705_port_a_r, buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_68705_port_b_r, buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_DEVREADWRITE("bmcu", buggychl_mcu_device, buggychl_68705_port_c_r, buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_DEVWRITE("bmcu", buggychl_mcu_device, buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_DEVWRITE("bmcu", buggychl_mcu_device, buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_DEVWRITE("bmcu", buggychl_mcu_device, buggychl_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END

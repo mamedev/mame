@@ -1,14 +1,17 @@
 // license:BSD-3-Clause
 // copyright-holders:Ernesto Corvi, Nicola Salmoria
-class buggychl_mcu_device : public device_t
+
+#include "cpu/m6805/m6805.h"
+
+class taito68705_mcu_device : public device_t
 {
 public:
-	buggychl_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	~buggychl_mcu_device() {}
+	taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	~taito68705_mcu_device() {}
 
-	DECLARE_WRITE8_MEMBER( buggychl_mcu_w );
-	DECLARE_READ8_MEMBER( buggychl_mcu_r );
-	DECLARE_READ8_MEMBER( buggychl_mcu_status_r );
+	DECLARE_WRITE8_MEMBER( mcu_w );
+	DECLARE_READ8_MEMBER( mcu_r );
+	DECLARE_READ8_MEMBER( mcu_status_r );
 	DECLARE_READ8_MEMBER( buggychl_68705_port_a_r );
 	DECLARE_WRITE8_MEMBER( buggychl_68705_port_a_w );
 	DECLARE_WRITE8_MEMBER( buggychl_68705_ddr_a_w );
@@ -21,6 +24,7 @@ public:
 
 protected:
 	// device-level overrides
+	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_config_complete() override;
 	virtual void device_start() override;
 	virtual void device_reset() override;
@@ -40,9 +44,7 @@ private:
 	uint8_t       m_from_mcu;
 	int         m_mcu_sent;
 	int         m_main_sent;
-	device_t *m_mcu;
+	required_device<cpu_device> m_mcu;
 };
 
-ADDRESS_MAP_EXTERN( buggychl_mcu_map, 8 );
-
-extern const device_type BUGGYCHL_MCU;
+extern const device_type TAITO68705_MCU;
