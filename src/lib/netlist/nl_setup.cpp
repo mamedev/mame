@@ -18,6 +18,7 @@
 #include "devices/net_lib.h"
 #include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
 
@@ -853,10 +854,11 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
 
-	ret->m_low_thresh_V = setup_t::model_value(map, "IVL");
-	ret->m_high_thresh_V = setup_t::model_value(map, "IVH");
-	ret->m_low_V = setup_t::model_value(map, "OVL");
-	ret->m_high_V = setup_t::model_value(map, "OVH");
+	ret->m_fixed_V = setup_t::model_value(map, "FV");
+	ret->m_low_thresh_PCNT = setup_t::model_value(map, "IVL");
+	ret->m_high_thresh_PCNT = setup_t::model_value(map, "IVH");
+	ret->m_low_VO = setup_t::model_value(map, "OVL");
+	ret->m_high_VO = setup_t::model_value(map, "OVH");
 	ret->m_R_low = setup_t::model_value(map, "ORL");
 	ret->m_R_high = setup_t::model_value(map, "ORH");
 

@@ -281,10 +281,12 @@ namespace netlist
 		std::unordered_map<pstring, pstring> m_param_values;
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
+		/* needed by proxy */
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
+
 	private:
 
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 

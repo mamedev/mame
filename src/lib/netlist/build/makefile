@@ -111,6 +111,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nld_legacy.o \
 	$(NLOBJ)/devices/net_lib.o \
 	$(NLOBJ)/devices/nld_log.o \
+	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nld_truthtable.o \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \

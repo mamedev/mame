@@ -228,12 +228,21 @@ namespace netlist
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V;   //!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
-		nl_double m_high_thresh_V;  //!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
-		nl_double m_low_V;          //!< low output voltage. This voltage is output if the ouput is "0"
-		nl_double m_high_V;         //!< high output voltage. This voltage is output if the ouput is "1"
-		nl_double m_R_low;          //!< low output resistance. Value of series resistor used for low output
-		nl_double m_R_high;         //!< high output resistance. Value of series resistor used for high output
+		double fixed_V() const { return m_fixed_V; }
+		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
+		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
+		double low_V(const double VN, const double VP) const { return VN + m_low_VO; }
+		double high_V(const double VN, const double VP) const { return VP - m_high_VO; }
+		double R_low() const { return m_R_low; }
+		double R_high() const { return m_R_high; }
+
+		double m_fixed_V;		    //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
+		double m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
+		double m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"
+		double m_high_VO;           //!< high output voltage offset. The supply voltage minus this offset is output if the ouput is "1"
+		double m_R_low;             //!< low output resistance. Value of series resistor used for low output
+		double m_R_high;            //!< high output resistance. Value of series resistor used for high output
 	};
 
 	/*! Base class for devices, terminals, outputs and inputs which support
@@ -873,7 +882,7 @@ namespace netlist
 	{
 	public:
 		param_logic_t(device_t &device, const pstring name, const bool val);
-		const bool operator()() const { return m_param; }
+		bool operator()() const { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
 		bool m_param;
@@ -883,7 +892,7 @@ namespace netlist
 	{
 	public:
 		param_int_t(device_t &device, const pstring name, const int val);
-		const int operator()() const { return m_param; }
+		int operator()() const { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
 		int m_param;
@@ -893,7 +902,7 @@ namespace netlist
 	{
 	public:
 		param_double_t(device_t &device, const pstring name, const double val);
-		const double operator()() const { return m_param; }
+		double operator()() const { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
 		double m_param;

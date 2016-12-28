@@ -11,8 +11,8 @@
     such as Arena(in editmode).
 
     TODO:
+    - configurable RAM size
     - how does dual-CPU work?
-    - EAG IRQ level/timing is unknown
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -593,7 +593,7 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv9, eag )
@@ -601,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( eagv9, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv10, eag )
@@ -609,7 +609,7 @@ static MACHINE_CONFIG_DERIVED( eagv10, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv11, eag )
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_DERIVED( eagv11, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 
