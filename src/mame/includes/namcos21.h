@@ -5,6 +5,7 @@
  */
 
 #include "namcos2.h"
+#include "machine/namcoio_gearbox.h"
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
@@ -52,7 +53,9 @@ public:
 		m_master_dsp_code(*this,"master_dsp_code"),
 		m_ptrom24(*this,"point24"),
 		m_ptrom16(*this,"point16"),
-		m_dsp(*this, "dsp") { }
+		m_dsp(*this, "dsp"),
+		m_io_gearbox(*this, "gearbox")
+		{ }
 
 	optional_shared_ptr<uint16_t> m_winrun_dspbios;
 	optional_shared_ptr<uint16_t> m_winrun_polydata;
@@ -64,7 +67,8 @@ public:
 	optional_region_ptr<uint16_t> m_ptrom16;
 
 	optional_device<cpu_device> m_dsp;
-
+	optional_device<namcoio_gearbox_device> m_io_gearbox;
+	
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
 	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];

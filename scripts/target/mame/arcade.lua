@@ -2692,6 +2692,8 @@ files {
 	MAME_DIR .. "src/mame/machine/namco62.h",
 	MAME_DIR .. "src/mame/machine/namcomcu.cpp",
 	MAME_DIR .. "src/mame/machine/namcomcu.h",
+	MAME_DIR .. "src/mame/machine/namcoio_gearbox.cpp",
+	MAME_DIR .. "src/mame/machine/namcoio_gearbox.h",
 	MAME_DIR .. "src/mame/audio/namco52.cpp",
 	MAME_DIR .. "src/mame/audio/namco52.h",
 	MAME_DIR .. "src/mame/audio/namco54.cpp",

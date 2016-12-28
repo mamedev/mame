@@ -1724,47 +1724,15 @@ static INPUT_PORTS_START( winrungp )
 	PORT_DIPSETTING(    0x00, "4M" )
 INPUT_PORTS_END
 
-/*  1 3 5   
-	|-|-|   Gearbox scheme is identical to Ridge Racer deluxe and Ace Driver
-	2 4 6
-*/
-// TODO: convert to namcoio_gearbox_device
-CUSTOM_INPUT_MEMBER(namcos21_state::driveyes_gearbox_r)
-{
-	bool clutch_pressed = (ioport("PORTB")->read() & 8) == 0;
-	const char gearbox_output[16] = { '1', '-', '-', '-', 
-									  '-', '6', '5', 'N', 
-									  '-', '2', '1', 'N', 
-									  '-', '4', '3', 'N' };
-	
-	popmessage("%c %c",gearbox_output[m_gearbox_state],clutch_pressed == true ? '*' : '.');
-	
-	if(clutch_pressed == false)
-		return m_gearbox_state;
-	
-	m_gearbox_state = ioport("GEARBOX")->read() & 0xf;
-	
-	return 0xf; // return neutral while changing gear
-}
-
-//static const ioport_value gearbox_table[] = { 0x0f, 0x0a, 0x09, 0x0e, 0x0d, 0x06, 0x05 };
-
 static INPUT_PORTS_START( driveyes )
 	PORT_INCLUDE(winrungp)
 
 	PORT_MODIFY("PORTB")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Clutch Pedal")
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE_MEMBER("gearbox", namcoio_gearbox_device, clutch_r )
 	PORT_BIT( 0x37, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("GEARBOX")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP   ) PORT_NAME("Gearbox Up")
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_NAME("Gearbox Down")
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_NAME("Gearbox Left") 
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_NAME("Gearbox Right")
-	
 	PORT_MODIFY("DIAL0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, namcos21_state,driveyes_gearbox_r, nullptr) 
-	//PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gearbox_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1) PORT_NAME("GearBox")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("gearbox", namcoio_gearbox_device, in_r, nullptr )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
 	
 	PORT_MODIFY("PORTH")        /* 63B05Z0 - PORT H */
@@ -1982,6 +1950,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_MACHINE_RESET_OVERRIDE(namcos21_state,namcos2)
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
+	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE(60)
