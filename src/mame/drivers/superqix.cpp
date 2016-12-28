@@ -25,10 +25,11 @@ Super Qix:
 - The sq07.ic108 ROM came from a bootleg where the 8751 MCU was replaced by an
   8031 MCU plus an external ROM (i.e. the sqixb1 romset). The 8031 ROM was bad
   (bit 3 was stuck high). It was originally recovered by carefully checking
-  the disassembly, and this repair was later verified from another dump to be
-  correct. The majority of the bootleg 8031 MCU code matches the decapped
-  sqixu b03__03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
-  derived from code dumped from an original Taito b03__03.l2 8751 MCU somehow.
+  the disassembly, and this repair was later verified from another dump of an
+  intact chip to be correct. The majority of the bootleg 8031 MCU code matches
+  the deprotected sqix b03__03.l2 MCU code, implying the sq07.ic108 8031 MCU
+  code ROM was derived from code dumped from an original Taito b03__03.l2 8751
+  MCU somehow.
   The bootleg MCU code is different from the original b03__03.l2 MCU since
   an 8031 when running in external ROM mode cannot use ports 0 or 2, hence
   the code was extensively patched by the bootleggers to avoid use of those
