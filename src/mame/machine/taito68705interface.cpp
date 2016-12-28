@@ -17,10 +17,30 @@
 	nycaptor.cpp - nycaptor
 	lsasquad.cpp - lsasquad
 	             - daikaiju
+	lkage.cpp    - lkage
 
 	and the following with slight changes:
 	slapfght.cpp - tigerh (inverted status bits read on portC)
 	             - slapfght (extended outputs for scrolling)
+
+	not hooked up here, but possible (needs investigating)
+	pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
+	taitosj.cpp - ^^
+	changela.cpp - ^^
+	arkanoid.cpp - uses 68705 timers (they need to be moved to the 68705 core) and also some portB differences?
+	xain.cpp - not a Taito game (licensed to Taito?) but MCU hookup looks almost the same
+	renegade.cpp - ^^
+	matmania.cpp - ^^
+	bigevglf.cpp - can probably be hooked up
+
+	68705 sets in Taito drivers that are NOT suitable for hookup here?
+	bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
+	mexico86.cpp - knightb, mexico86 - bootleg 68705s
+	retofinv.cpp - the current MCU dump is a bootleg at least
+	sqix.cpp - hotsmash - kaneko hookup, different from Taito ones.
+
+	there are other drivers (and games in existing drivers) that could hookup here, but currently lack MCU dumps.
+
 */
 
 const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
