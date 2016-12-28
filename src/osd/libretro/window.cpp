@@ -409,6 +409,9 @@ int retro_window_info::window_init()
 	//test correct aspect
 		render_layer_config temp=m_target->layer_config();
 		retro_aspect =m_target->current_view()->effective_aspect(temp);
+
+		if(m_target->orientation() & ORIENTATION_SWAP_XY)retro_aspect=1.0/retro_aspect;
+
 		int tempwidth, tempheight;
 		m_target->compute_minimum_size(tempwidth, tempheight);
 		fb_width=tempwidth;
@@ -567,6 +570,7 @@ void retro_window_info::update()
 		if(alternate_renderer==false){
 			render_layer_config temp=m_target->layer_config();
 			view_aspect =m_target->current_view()->effective_aspect(temp);
+			if(m_target->orientation() & ORIENTATION_SWAP_XY)view_aspect=1.0f/view_aspect;
 		}
 
 		// see if the games video mode has changed
@@ -586,11 +590,14 @@ void retro_window_info::update()
 				//if(video_changed==true)
 				{
 				//retro_aspect = (float)tempwidth/(float)tempheight;
+
 				render_layer_config temp=m_target->layer_config();
 				retro_aspect =m_target->current_view()->effective_aspect(temp);
+				if(m_target->orientation() & ORIENTATION_SWAP_XY)retro_aspect=1.0/retro_aspect;
 				view_aspect =retro_aspect;
 				monitor()->refresh();
 				monitor()->update_resolution(tempwidth, tempheight);
+				//osd_printf_info("(%dx%d)as:%f rot:%d %d\n",tempwidth, tempheight,retro_aspect,m_target->orientation(),m_target->orientation() & ORIENTATION_SWAP_XY);
 
 				if(fb_width>max_width || fb_height>max_height)
 					NEWGAME_FROM_OSD = 1;
