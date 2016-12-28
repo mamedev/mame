@@ -183,5 +183,6 @@ public:
 	int init_dsp();
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
+	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init(int game_type);
 };

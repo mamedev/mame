@@ -423,45 +423,45 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 
 }
 
-uint32_t namcos21_state::screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram.get();
-	//int pivot = 3;
-	//int pri;
+	int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
+	int base = 0x1000+0x100*(m_winrun_color&0xf);
+	int sx,sy;
+	for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
+	{
+		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint16_t *pDest = &bitmap.pix16(sy);
+		for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
+		{
+			int pen = pSource[sx];
+			switch( pen )
+			{
+			case 0xff:
+				break;
+			case 0x00:
+				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
+				break;
+			case 0x01:
+				pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
+				break;
+			default:
+				pDest[sx] = base|pen;
+				break;
+			}
+		}
+	}
+}
+
+
+uint32_t namcos21_state::screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
 	bitmap.fill(0xff, cliprect );
 
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
-
 	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
+	winrun_bitmap_draw(bitmap,cliprect);
 
-
-	{ /* winrun bitmap layer */
-		int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
-		int base = 0x1000+0x100*(m_winrun_color&0xf);
-		int sx,sy;
-		for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
-		{
-			const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
-			uint16_t *pDest = &bitmap.pix16(sy);
-			for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
-			{
-				int pen = pSource[sx];
-				switch( pen )
-				{
-				case 0xff:
-					break;
-				case 0x00:
-					pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
-					break;
-				case 0x01:
-					pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
-					break;
-				default:
-					pDest[sx] = base|pen;
-					break;
-				}
-			}
-		}
-	} /* winrun bitmap layer */
 	return 0;
 }
