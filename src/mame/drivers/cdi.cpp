@@ -934,17 +934,6 @@ static MACHINE_CONFIG_DERIVED( quizard, cdimono1_base )
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", cdi_state, mcu_frame)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( quizard1, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( quizard2, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
-MACHINE_CONFIG_END
-
-static MACHINE_CONFIG_DERIVED( quizard3, quizard )
-	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
-MACHINE_CONFIG_END
 
 READ8_MEMBER( cdi_state::quizard_mcu_p1_r )
 {
@@ -956,6 +945,22 @@ static ADDRESS_MAP_START( mcu_io_map, AS_IO, 8, cdi_state )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READ(quizard_mcu_p1_r)
 ADDRESS_MAP_END
 
+static MACHINE_CONFIG_DERIVED( quizard1, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard1 )
+
+	MCFG_CPU_ADD("mcu", I8751, 8000000)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+//	MCFG_DEVICE_VBLANK_INT_DRIVER("screen", cdi_state, irq0_line_pulse)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizard2, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard2 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizard3, quizard )
+	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard3 )
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizard4, quizard )
 	MCFG_MACHINE_RESET_OVERRIDE(cdi_state, quizard4 )
@@ -1057,8 +1062,8 @@ ROM_END
 	Each Quizard game (1,2,3,4) requires it's own MCU, you can upgrade between revisions by changing
 	just the CD, but not between games as a new MCU is required.
 
-	The only dumped MCU is a Quizard 4 German MCU.  A Quizard 4 Czech MCU has been located but is a
-	89c51 not a 87c51
+	The only dumped MCUs are German region ones for Quizard 1 and 4.
+	A Czech Quizard 4 MCU was located but it was an 89c51 type instead
 
 */
 
@@ -1079,8 +1084,9 @@ ROM_START( quizard ) /* CD-ROM printed ??/?? */
 	DISK_IMAGE_READONLY( "quizard18", 0, BAD_DUMP SHA1(ede873b22957f2a707bbd3039e962ef2ca5aedbd) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
 ROM_END
+
 
 ROM_START( quizard_17 )
 	ROM_REGION(0x80000, "maincpu", 0)
@@ -1096,7 +1102,7 @@ ROM_START( quizard_17 )
 	DISK_IMAGE_READONLY( "quizard17", 0, BAD_DUMP SHA1(4bd698f076505b4e17be978481bce027eb47123b) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
 ROM_END
 
 ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
@@ -1113,7 +1119,7 @@ ROM_START( quizard_12 ) /* CD-ROM printed 01/95 */
 	DISK_IMAGE_READONLY( "quizard12", 0, BAD_DUMP SHA1(6e41683b96b74e903040842aeb18437ad7813c82) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
 ROM_END
 
 ROM_START( quizard_10 )
@@ -1133,7 +1139,7 @@ ROM_START( quizard_10 )
 	DISK_IMAGE_READONLY( "quizard10", 0, SHA1(5715db50f0d5ffe06f47c0943f4bf0481ab6048e) )
 
 	ROM_REGION(0x1000, "mcu", 0)
-	ROM_LOAD( "quizard_d8751.bin", 0x0000, 0x1000, NO_DUMP )
+	ROM_LOAD( "quizard1_german_d8751.bin", 0x0000, 0x1000, CRC(95f45b6b) SHA1(51b34956539b1e2cf0306f243a970750f1e18d01) )
 ROM_END
 
 
