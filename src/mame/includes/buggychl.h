@@ -20,7 +20,6 @@ public:
 		m_scrollh(*this, "scrollh"),
 		m_audiocpu(*this, "audiocpu"),
 		m_maincpu(*this, "maincpu"),
-	//	m_mcu(*this, "mcu"),
 		m_bmcu(*this, "bmcu"),
 		m_msm(*this, "msm"),
 		m_gfxdecode(*this, "gfxdecode"),
@@ -53,7 +52,6 @@ public:
 	/* devices */
 	required_device<cpu_device> m_audiocpu;
 	required_device<cpu_device> m_maincpu;
-	//required_device<cpu_device> m_mcu;
 	required_device<taito68705_mcu_device> m_bmcu;
 	required_device<msm5232_device> m_msm;
 	required_device<gfxdecode_device> m_gfxdecode;

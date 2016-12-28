@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ernesto Corvi, Nicola Salmoria
+// copyright-holders:Ernesto Corvi, Nicola Salmoria, David Haywood
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "machine/taito68705interface.h"
@@ -12,45 +12,52 @@
 	buggychl.cpp - buggychl
 	bking.cpp - bking3
 	40love.cpp - 40love
+	bublbobl.cpp - tokio
+	slapfght.cpp - tigerh
+
+	and the following with slight changes:
+	slapfght.cpp - slapfght
 */
 
 const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
+const device_type TAITO68705_MCU_SLAP = &device_creator<taito68705_mcu_slap_device>;
+const device_type TAITO68705_MCU_TIGER = &device_creator<taito68705_mcu_tiger_device>;
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO68705_MCU, "Taito M68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__),
-	m_port_a_in(0),
-	m_port_a_out(0),
-	m_ddr_a(0),
-	m_port_b_in(0),
-	m_port_b_out(0),
-	m_ddr_b(0),
-	m_port_c_in(0),
-	m_port_c_out(0),
-	m_ddr_c(0),
+	m_mcu_sent(false),
+	m_main_sent(false),
 	m_from_main(0),
 	m_from_mcu(0),
-	m_mcu_sent(0),
-	m_main_sent(0),
+	m_from_mcu_latch(0),
+	m_to_mcu_latch(0),
+	m_old_portB(0),
 	m_mcu(*this, "mcu")
 {
 }
 
-ADDRESS_MAP_START( taito68705_mcu_map, AS_PROGRAM, 8, taito68705_mcu_device )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
+taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source)
+	: device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_mcu_sent(false),
+	m_main_sent(false),
+	m_from_main(0),
+	m_from_mcu(0),
+	m_from_mcu_latch(0),
+	m_to_mcu_latch(0),
+	m_old_portB(0),
+	m_mcu(*this, "mcu")
+{
+}
+
+
 
 
 static MACHINE_CONFIG_FRAGMENT( taito68705 )
-	MCFG_CPU_ADD("mcu", M68705, DERIVED_CLOCK(1,1))
-	MCFG_CPU_PROGRAM_MAP(taito68705_mcu_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, DERIVED_CLOCK(1,1)) // 3 Mhz
+	MCFG_M68705_PORTA_R_CB(READ8(taito68705_mcu_device, mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_porta_w))
+	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
+	MCFG_M68705_PORTC_R_CB(READ8(taito68705_mcu_device, mcu_portc_r))
 MACHINE_CONFIG_END
 
 machine_config_constructor taito68705_mcu_device::device_mconfig_additions() const
@@ -75,19 +82,13 @@ void taito68705_mcu_device::device_config_complete()
 
 void taito68705_mcu_device::device_start()
 {
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
 	save_item(NAME(m_mcu_sent));
 	save_item(NAME(m_main_sent));
-	save_item(NAME(m_port_a_in));
-	save_item(NAME(m_port_a_out));
-	save_item(NAME(m_ddr_a));
-	save_item(NAME(m_port_b_in));
-	save_item(NAME(m_port_b_out));
-	save_item(NAME(m_ddr_b));
-	save_item(NAME(m_port_c_in));
-	save_item(NAME(m_port_c_out));
-	save_item(NAME(m_ddr_c));
+	save_item(NAME(m_from_main));
+	save_item(NAME(m_from_mcu));
+	save_item(NAME(m_from_mcu_latch));
+	save_item(NAME(m_to_mcu_latch));
+	save_item(NAME(m_old_portB));
 }
 
 //-------------------------------------------------
@@ -96,19 +97,13 @@ void taito68705_mcu_device::device_start()
 
 void taito68705_mcu_device::device_reset()
 {
-	m_mcu_sent = 0;
-	m_main_sent = 0;
+	m_mcu_sent = false;
+	m_main_sent = false;
 	m_from_main = 0;
 	m_from_mcu = 0;
-	m_port_a_in = 0;
-	m_port_a_out = 0;
-	m_ddr_a = 0;
-	m_port_b_in = 0;
-	m_port_b_out = 0;
-	m_ddr_b = 0;
-	m_port_c_in = 0;
-	m_port_c_out = 0;
-	m_ddr_c = 0;
+	m_from_mcu_latch = 0;
+	m_to_mcu_latch = 0;
+	m_old_portB = 0;
 
 	m_mcu->set_input_line(0, CLEAR_LINE);
 }
@@ -121,24 +116,6 @@ void taito68705_mcu_device::device_reset()
  This is accurate. FairyLand Story seems to be identical.
 
 ***************************************************************************/
-
-READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_a_r )
-{
-	//logerror("%04x: 68705 port A read %02x\n", m_mcu->safe_pc(), m_port_a_in);
-	return (m_port_a_out & m_ddr_a) | (m_port_a_in & ~m_ddr_a);
-}
-
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_a_w )
-{
-	//logerror("%04x: 68705 port A write %02x\n", m_mcu->safe_pc(), data);
-	m_port_a_out = data;
-}
-
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_a_w )
-{
-	m_ddr_a = data;
-}
-
 
 
 /*
@@ -160,85 +137,81 @@ WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_a_w )
  */
 
 
-READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_b_r )
+
+
+
+READ8_MEMBER(taito68705_mcu_device::mcu_r)
 {
-	return (m_port_b_out & m_ddr_b) | (m_port_b_in & ~m_ddr_b);
-}
+	m_mcu_sent = false;
 
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_b_w )
-{
-	logerror("%s: 68705 port B write %02x\n", machine().describe_context(), data);
+//  logerror("%s: mcu_r %02x\n", space.machine().describe_context(), m_from_mcu);
 
-	if ((m_ddr_b & 0x02) && (~data & 0x02) && (m_port_b_out & 0x02))
-	{
-		m_port_a_in = m_from_main;
-		if (m_main_sent)
-			m_mcu->set_input_line(0, CLEAR_LINE);
-		m_main_sent = 0;
-		logerror("read command %02x from main cpu\n", m_port_a_in);
-	}
-	if ((m_ddr_b & 0x04) && (data & 0x04) && (~m_port_b_out & 0x04))
-	{
-		logerror("send command %02x to main cpu\n", m_port_a_out);
-		m_from_mcu = m_port_a_out;
-		m_mcu_sent = 1;
-	}
-
-	m_port_b_out = data;
-}
-
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_b_w )
-{
-	m_ddr_b = data;
-}
-
-
-/*
- *  Port C connections:
- *
- *  all bits are logical 1 when read (+5V pullup)
- *
- *  0   R  1 when pending command Z80->68705
- *  1   R  0 when pending command 68705->Z80
- */
-
-READ8_MEMBER( taito68705_mcu_device::buggychl_68705_port_c_r )
-{
-	m_port_c_in = 0;
-	if (m_main_sent)
-		m_port_c_in |= 0x01;
-	if (!m_mcu_sent)
-		m_port_c_in |= 0x02;
-	logerror("$s: 68705 port C read %02x\n", machine().describe_context(), m_port_c_in);
-	return (m_port_c_out & m_ddr_c) | (m_port_c_in & ~m_ddr_c);
-}
-
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_port_c_w )
-{
-	logerror("%s: 68705 port C write %02x\n", machine().describe_context(), data);
-	m_port_c_out = data;
-}
-
-WRITE8_MEMBER( taito68705_mcu_device::buggychl_68705_ddr_c_w )
-{
-	m_ddr_c = data;
-}
-
-
-WRITE8_MEMBER( taito68705_mcu_device::mcu_w )
-{
-	logerror("%s: mcu_w %02x\n", machine().describe_context(), data);
-	m_from_main = data;
-	m_main_sent = 1;
-	m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
-READ8_MEMBER( taito68705_mcu_device::mcu_r )
-{
-	logerror("%s: mcu_r %02x\n", machine().describe_context(), m_from_mcu);
-	m_mcu_sent = 0;
 	return m_from_mcu;
 }
+
+WRITE8_MEMBER(taito68705_mcu_device::mcu_w)
+{
+//  logerror("%s: mcu_w %02x\n", space.machine().describe_context(), data);
+
+	m_from_main = data;
+	m_main_sent = true;
+	m_mcu->set_input_line(0, ASSERT_LINE);
+
+}
+
+
+READ8_MEMBER(taito68705_mcu_device::mcu_porta_r)
+{
+//  logerror("mcu_porta_r\n");
+	return m_to_mcu_latch;
+}
+
+WRITE8_MEMBER(taito68705_mcu_device::mcu_porta_w)
+{
+//  logerror("mcu_porta_w %02x\n", data);
+	m_from_mcu_latch = data;
+}
+
+
+READ8_MEMBER(taito68705_mcu_device::mcu_portc_r)
+{
+	uint8_t ret = 0;
+
+	if (m_main_sent)
+		ret |= 0x01;
+	if (!m_mcu_sent)
+		ret |= 0x02;
+
+//  logerror("%s: mcu_portc_r %02x\n", space.machine().describe_context(), ret);
+
+	return ret;
+}
+
+
+WRITE8_MEMBER(taito68705_mcu_device::mcu_portb_w)
+{
+//  logerror("mcu_portb_w %02x\n", data);
+
+	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
+	{
+		if (m_main_sent)
+			m_mcu->set_input_line(0, CLEAR_LINE);
+
+		m_to_mcu_latch = m_from_main;
+		m_main_sent = false;
+	}
+	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04))
+	{
+		m_from_mcu = m_from_mcu_latch;
+		m_mcu_sent = true;
+	//  logerror("sent %02x\n", m_from_mcu);
+	}
+
+	m_old_portB = data;
+
+}
+
+/* Status readbacks for MAIN cpu - these hook up in various ways depending on the host (provide 2 lines instead?) */
 
 READ8_MEMBER( taito68705_mcu_device::mcu_status_r )
 {
@@ -255,3 +228,60 @@ READ8_MEMBER( taito68705_mcu_device::mcu_status_r )
 	return res;
 }
 
+CUSTOM_INPUT_MEMBER(taito68705_mcu_device::mcu_sent_r)
+{
+	if (!m_mcu_sent) return 0;
+	else return 1;
+}
+
+CUSTOM_INPUT_MEMBER(taito68705_mcu_device::main_sent_r)
+{
+	if (!m_main_sent) return 0;
+	else return 1;
+}
+
+/* The Slap Fight interface has some extensions, handle them here */
+
+taito68705_mcu_slap_device::taito68705_mcu_slap_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU_SLAP, "Taito M68705 MCU Interface (Slap Fight)", tag, owner, clock, "taito68705slap", __FILE__),
+	m_extension_cb_w(*this)
+{
+}
+
+WRITE8_MEMBER(taito68705_mcu_slap_device::mcu_portb_w)
+{
+	if ((mem_mask & 0x08) && (~data & 0x08) && (m_old_portB & 0x08))
+	{
+		m_extension_cb_w(0,m_from_mcu_latch, 0xff); // m_scrollx_lo
+	}
+	if ((mem_mask & 0x10) && (~data & 0x10) && (m_old_portB & 0x10))
+	{
+		m_extension_cb_w(1,m_from_mcu_latch, 0xff); // m_scrollx_hi
+	}
+
+	taito68705_mcu_device::mcu_portb_w(space,offset,data);
+}
+
+void taito68705_mcu_slap_device::device_start()
+{
+	taito68705_mcu_device::device_start();
+	m_extension_cb_w.resolve_safe();
+}
+
+
+/* The Tiger Heli interface has some extensions, handle them here */
+
+taito68705_mcu_tiger_device::taito68705_mcu_tiger_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU_TIGER, "Taito M68705 MCU Interface (Tiger Heli)", tag, owner, clock, "taito68705tiger", __FILE__)
+{
+}
+
+READ8_MEMBER(taito68705_mcu_tiger_device::mcu_portc_r)
+{
+	uint8_t ret = taito68705_mcu_device::mcu_portc_r(space,offset);
+
+	// Tiger Heli has these status bits inverted MCU-side
+	ret ^= 0x3;
+
+	return ret;
+}
