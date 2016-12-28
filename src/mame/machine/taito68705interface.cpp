@@ -53,7 +53,7 @@ taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, devi
 
 
 static MACHINE_CONFIG_FRAGMENT( taito68705 )
-	MCFG_CPU_ADD("mcu", M68705_NEW, DERIVED_CLOCK(1,1)) // 3 Mhz
+	MCFG_CPU_ADD("mcu", M68705_NEW, DERIVED_CLOCK(1,1))
 	MCFG_M68705_PORTA_R_CB(READ8(taito68705_mcu_device, mcu_porta_r))
 	MCFG_M68705_PORTA_W_CB(WRITE8(taito68705_mcu_device, mcu_porta_w))
 	MCFG_M68705_PORTB_W_CB(WRITE8(taito68705_mcu_device, mcu_portb_w))
