@@ -306,13 +306,8 @@ int z180_device::take_interrupt(int irq)
 
 	if( irq == Z180_INT_IRQ0 )
 	{
-		/* Daisy chain mode? If so, call the requesting device */
-		if (daisy_chain_present())
-			irq_vector = daisy_call_ack_device();
-
-		/* else call back the cpu interface to retrieve the vector */
-		else
-			irq_vector = standard_irq_callback(0);
+		// retrieve the IRQ vector from the daisy chain or CPU interface
+		irq_vector = daisy_call_ack_device();
 
 		LOG(("Z180 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 

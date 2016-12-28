@@ -11,6 +11,8 @@
 #include "emu.h"
 #include "z80daisy.h"
 
+#define VERBOSE 0
+
 
 //**************************************************************************
 //  DEVICE Z80 DAISY INTERFACE
@@ -170,19 +172,20 @@ int z80_daisy_chain_interface::daisy_update_irq_state()
 
 int z80_daisy_chain_interface::daisy_call_ack_device()
 {
-	int vector = 0;
-
 	// loop over all devices; dev[0] is the highest priority
 	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
 	{
 		// if this device is asserting the INT line, that's the one we want
 		int state = intf->z80daisy_irq_state();
-		vector = intf->z80daisy_irq_ack();
 		if (state & Z80_DAISY_INT)
-			return vector;
+			return intf->z80daisy_irq_ack(); // call the requesting device
 	}
-	//logerror("z80daisy_call_ack_device: failed to find an device to ack!\n");
-	return vector;
+
+	if (VERBOSE && daisy_chain_present())
+		device().logerror("Interrupt from outside Z80 daisy chain\n");
+
+	// call back the CPU interface to retrieve the vector
+	return m_irq_callback(device(), 0);
 }
 
 
@@ -204,7 +207,6 @@ void z80_daisy_chain_interface::daisy_call_reti_device()
 			return;
 		}
 	}
-	//logerror("z80daisy_call_reti_device: failed to find an device to reti!\n");
 }
 
 
