@@ -93,10 +93,19 @@ void clipper_device::device_start()
 
 void clipper_device::device_reset()
 {
-	m_ssw.bits.m = 0; // FIXME: turn off mapping
-	m_ssw.bits.u = 0;
+	/* From C300 documentation, on reset:
+	 *   psw: T cleared, BIG set from hardware, others undefined
+	 *   ssw: EI, TP, M, U, K, KU, UU, P cleared, ID set from hardware, others undefined
+	 */
+	m_psw.d = 0;
+	m_ssw.d = 0;
 
-	m_pc = 0x7f100000; // FIXME: start executing boot rom
+	// we'll opt to clear the integer and floating point registers too
+	memset(m_r, 0, sizeof(m_r));
+	memset(m_f, 0, sizeof(m_f));
+
+	// FIXME: figure out how to branch to the boot code properly
+	m_pc = 0x7f100000; 
 	m_immediate_irq = 0;
 }
 

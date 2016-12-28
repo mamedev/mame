@@ -10,7 +10,7 @@
 #include "cpu/clipper/clipper.h"
 
 #include "machine/z80scc.h"
-#include "machine/ds128x.h"
+#include "machine/mc146818.h"
 #include "bus/rs232/rs232.h"
 #include "video/dm9368.h"
 #include "machine/upd765.h"
@@ -55,7 +55,7 @@ public:
 	required_device<z80scc_device> m_scc1;
 	required_device<z80scc_device> m_scc2;
 
-	required_device<ds12885_device> m_rtc;
+	required_device<mc146818_device> m_rtc;
 	required_device<dm9368_device> m_led;
 	required_device<n82077aa_device> m_fdc;
 	required_device<ncr539x_device> m_scsi;

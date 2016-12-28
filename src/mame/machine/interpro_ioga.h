@@ -33,7 +33,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ir6_w) { set_irq_line(8, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir7_w) { set_irq_line(9, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir8_w) { set_irq_line(10, state); }
-	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_irq_line(11, state); }
+	// FIXME: this is a workaround for the mc146818 code which inverts the normal irq state convention
+	DECLARE_WRITE_LINE_MEMBER(ir9_w) { set_irq_line(11, !state); }
 	DECLARE_WRITE_LINE_MEMBER(ir10_w) { set_irq_line(12, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir11_w) { set_irq_line(17, state); }
 	DECLARE_WRITE_LINE_MEMBER(ir12_w) { set_irq_line(18, state); }

@@ -38,7 +38,6 @@ enum
 	FLAG_C = 0x8
 };
 
-#define FLAGS_NONE 0x0
 #define FLAGS_ZN   FLAG_Z | FLAG_N
 #define FLAGS_CZN  FLAG_C | FLAG_Z | FLAG_N
 #define FLAGS_CVZN FLAG_C | FLAG_V | FLAG_Z | FLAG_N

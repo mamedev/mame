@@ -12,13 +12,9 @@
 #else
 #define LOG_EMERALD(...) {}
 #define LOG_MCGA(...) {}
-#define LOG_IDPROM(...) logerror(__VA_ARGS__)
+#define LOG_IDPROM(...) {}
 #endif
 
-// machine start
-void interpro_state::machine_start()
-{
-}
 
 /*
 * MCGA Control Register definitions.
@@ -120,13 +116,18 @@ void interpro_state::machine_start()
 					E_CTRL2_WMASK) | (X)
 #define E_CLR_CTRL2(X)		E_SREG_CTRL2 &= E_CTRL2_WMASK & ~(X)
 
+// machine start
+void interpro_state::machine_start()
+{
+	m_emerald_reg[E_SREG_CTRL2] = E_CTRL2_COLDSTART | E_CTRL2_PWRENA | E_CTRL2_PWRUP;
+}
+
 void interpro_state::machine_reset()
 {
 	// flash rom requires the following values
 	m_emerald_reg[E_SREG_ERROR] = 0x00;
 	m_emerald_reg[E_SREG_STATUS] = 0x00;
 	m_emerald_reg[E_SREG_CTRL1] = E_CTRL1_FLOPRDY; 
-	m_emerald_reg[E_SREG_CTRL2] = E_CTRL2_COLDSTART;
 
 	m_mcga[0] = 0x00ff;  // 0x00
 	m_mcga[2] = MCGA_CTRL_ENREFRESH | MCGA_CTRL_CBITFRCSUB | MCGA_CTRL_CBITFRCRD;  // 0x08 ctrl
@@ -156,9 +157,12 @@ WRITE8_MEMBER(interpro_state::emerald_w)
 
 	case E_SREG_CTRL2:
 		LOG_EMERALD("emerald write offset %d data 0x%x pc 0x%08x\n", offset, data, space.device().safe_pc());
-		if (data & 0x20)
-			// reset
-			m_maincpu->reset();
+		if (data & E_CTRL2_RESET)
+		{
+			m_emerald_reg[E_SREG_CTRL2] &= ~E_CTRL2_COLDSTART;
+
+			machine().schedule_soft_reset();
+		}
 		else
 			m_emerald_reg[offset] = data & 0x0f; // top four bits are not persistent
 		break;
@@ -315,23 +319,44 @@ READ32_MEMBER(interpro_state::slot0_r)
 	return ((uint8_t *)&slot0)[offset];
 }
 
-#if 1
-// data is 0x500 = offset 1
-// addr is 0x600 = offset 0
-// 5 0101 = 1
-// 6 0110 = 0
-
-// mask 0x100
 WRITE8_MEMBER(interpro_state::interpro_rtc_w)
 {
-	m_rtc->write(space, offset == 0 ? 1 : 0, data);
+	switch (offset)
+	{
+	case 0x00:
+		// write to RTC register
+		m_rtc->write(space, 1, data);
+		break;
+
+	case 0x40:
+		// set RTC read/write address
+		m_rtc->write(space, 0, data);
+		break;
+
+	default:
+		logerror("rtc: write to unknown offset 0x%02x data 0x%02x at pc 0x%08x\n", offset, data, space.device().safe_pc());
+		break;
+	}
 }
 
 READ8_MEMBER(interpro_state::interpro_rtc_r)
 {
-	return m_rtc->read(space, offset == 0 ? 1 : 0);
+	switch (offset)
+	{
+	case 0x00:
+		// read from RTC register
+		return m_rtc->read(space, 1);
+
+		// read from InterPro system ID PROM (contains MAC address)
+	case 0x40: return 0x12;
+	case 0x41: return 0x34;
+	case 0x42: return 0x56;
+
+	default:
+		logerror("rtc: read from unknown offset 0x%02x at pc 0x%08x\n", offset, space.device().safe_pc());
+		return 0xff;
+	}
 }
-#endif
 
 /*
 MCGA: 40000xxx - refer iopsysreg.h
@@ -371,12 +396,6 @@ static ADDRESS_MAP_START(ip2800_map, AS_PROGRAM, 32, interpro_state)
 	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE8(emerald_r, emerald_w, 0xff)
 
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(interpro_rtc_r, interpro_rtc_w, 0xff)
-//AM_RANGE(0x7F000500, 0x7F000500) AM_DEVREADWRITE8(INTERPRO_RTC_TAG, ds12885_device, read, write, 0xff) AM_MASK(0x100)
-//AM_RANGE(0x7F000600, 0x7F000600) AM_DEVREADWRITE8(INTERPRO_RTC_TAG, ds12885_device, read, write, 0xff) AM_MASK(0x100)
-
-// 7f000768 -> 41 or 42
-// 7f00076c byte reg
-
 	AM_RANGE(0x7F000700, 0x7F00077f) AM_READ(idprom_r)
 
 	AM_RANGE(0x7F0FFF00, 0x7F0FFFFF) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map) 
@@ -424,8 +443,9 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 
 	MCFG_SCC85230_ADD(INTERPRO_SCC2_TAG, XTAL_4_9152MHz, 0, 0, 0, 0)
 
-	MCFG_DS12885_ADD(INTERPRO_RTC_TAG)
-	//MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w)) // FIXME: boot rom doesn't like this
+	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL_32_768kHz)
+	MCFG_MC146818_UTC(true)
+	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w))
 
 	MCFG_DEVICE_ADD(INTERPRO_LED_TAG, DM9368, 0)
 
