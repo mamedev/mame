@@ -197,7 +197,7 @@ static INPUT_PORTS_START( dynduke )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )  /* "SW2:1,2" - Always OFF according to the manual */
-	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c00, 0x0400, "Bonus D.Punch" ) PORT_DIPLOCATION("SW2:3,4") // smart bomb extends
 	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
 	PORT_DIPSETTING(      0x0800, "100K 100K+" )
 	PORT_DIPSETTING(      0x0400, "120K 100K+" )
@@ -366,16 +366,16 @@ ROM_START( dynduke )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) )
-	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) )
+	ROM_LOAD16_BYTE( "dde3.e8", 0x0c0000, 0x20000, CRC(95336279) SHA1(0218640e57d0a6df03ce51f2afad9862d4b13a50) ) // Euro 03SEP89
+	ROM_LOAD16_BYTE( "dde4.e7", 0x0c0001, 0x20000, CRC(eb2d8fea) SHA1(d6bb718ece9011f7e24ca1c2f70a513e1c13a7a8) ) // Euro 03SEP89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE( "6.p7", 0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8.w8",     0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -414,16 +414,16 @@ ROM_START( dyndukea )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
-	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) )
+	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) ) // Euro 25JUL89
+	ROM_LOAD16_BYTE( "4e.e7", 0x0c0001, 0x20000, CRC(384c0635) SHA1(4b9332d8b91426c17a2b2a58633dc6dde526284d) ) // Euro 25JUL89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE( "6.p7", 0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8.w8",     0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -462,16 +462,64 @@ ROM_START( dyndukej )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(98b9d243) SHA1(db00ffafa1353425adb79f5bf6a0cf9223a0d031) ) // sldh
-	ROM_LOAD16_BYTE( "4.e7",  0x0c0001, 0x20000, CRC(4f575177) SHA1(837e6bab531f16efb0d21ab5b88c529ee16b40d0) )
+	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(98b9d243) SHA1(db00ffafa1353425adb79f5bf6a0cf9223a0d031) ) // Japan 03SEP89
+	ROM_LOAD16_BYTE( "4.e7",  0x0c0001, 0x20000, CRC(4f575177) SHA1(837e6bab531f16efb0d21ab5b88c529ee16b40d0) ) // Japan 03SEP89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE( "6.p7", 0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8.w8",     0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", 0 )
+	ROM_LOAD( "9.5k",   0x000000, 0x04000, CRC(f2bc9af4) SHA1(9092ebe9dced243c3a7f63198a1180143dd42cea) ) /* chars */
+	ROM_LOAD( "10.34k", 0x010000, 0x04000, CRC(c2a9f19b) SHA1(0bcea042386109c277c6c5dbe52a020f9ea5972b) )
+
+	ROM_REGION( 0x180000, "gfx2", 0 )
+	ROM_LOAD( "dd.a2",  0x000000, 0x40000, CRC(598f343f) SHA1(eee794d9d0a92e066f00818bfb63e8ca46bda764) ) /* background */
+	ROM_LOAD( "dd.b2",  0x040000, 0x40000, CRC(41a9088d) SHA1(eb0b7370dc773cb6f5066b044934ffb42bb06587) )
+	ROM_LOAD( "dd.c2",  0x080000, 0x40000, CRC(cc341b42) SHA1(8c3cf09a3a0080a1cd7c1049cb8d11f03de50919) )
+	ROM_LOAD( "dd.d2",  0x0c0000, 0x40000, CRC(4752b4d7) SHA1(4625b7885ff9d302e78d7324b3592ac5a3cead86) )
+	ROM_LOAD( "dd.de3", 0x100000, 0x40000, CRC(44a4cb62) SHA1(70b2043d0428c90ee22ccd479d9710af24d359f6) )
+	ROM_LOAD( "dd.ef3", 0x140000, 0x40000, CRC(aa8aee1a) SHA1(8b2b8dcb2287318e314b256f84c23424cfe29462) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )
+	ROM_LOAD( "dd.mn3", 0x000000, 0x40000, CRC(2ee0ca98) SHA1(2ef2c4fd337e0ee4685e4863909985ee0a4c4b91) ) /* foreground */
+	ROM_LOAD( "dd.mn4", 0x040000, 0x40000, CRC(6c71e2df) SHA1(fe87277a625010c214e05b43572fadb493b3d05d) )
+	ROM_LOAD( "dd.n45", 0x080000, 0x40000, CRC(85d918e1) SHA1(882cdf633288c95f2349d7c86799875b707ca347) )
+	ROM_LOAD( "dd.mn5", 0x0c0000, 0x40000, CRC(e71e34df) SHA1(dce8e3de61f3869da57d476bf861856154365058) )
+
+	ROM_REGION( 0x200000, "gfx4", 0 )
+	ROM_LOAD16_BYTE( "dd.n1", 0x000000, 0x40000, CRC(cf1db927) SHA1(3fde2ca7e7e302773ae01ed89edf0bcf69fc7aa1) ) /* sprites */
+	ROM_LOAD16_BYTE( "dd.n2", 0x000001, 0x40000, CRC(5328150f) SHA1(bb847a2ff7e5ac668e974d2853519d86feb81e03) )
+	ROM_LOAD16_BYTE( "dd.m1", 0x080000, 0x40000, CRC(80776452) SHA1(319bfc90ccf04b9e5aaac5701767d3f7bbb71626) )
+	ROM_LOAD16_BYTE( "dd.m2", 0x080001, 0x40000, CRC(ff61a573) SHA1(cfbe6c017c276d2fc1f083013b5df3686381753b) )
+	ROM_LOAD16_BYTE( "dd.e1", 0x100000, 0x40000, CRC(84a0b87c) SHA1(62075128093f21ee6ea09cc2d4bc8e630b275fce) )
+	ROM_LOAD16_BYTE( "dd.e2", 0x100001, 0x40000, CRC(a9585df2) SHA1(2eeac27dd018dd334447d539fdae2989c731e764) )
+	ROM_LOAD16_BYTE( "dd.f1", 0x180000, 0x40000, CRC(9aed24ba) SHA1(0068b5bc0d7c817eee3bfbf7de6d19652ba78d41) )
+	ROM_LOAD16_BYTE( "dd.f2", 0x180001, 0x40000, CRC(3eb5783f) SHA1(5487ceb4f3241241af1a81b1bb686bd3af10b0d1) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* ADPCM samples */
+	ROM_LOAD( "7.x10", 0x000000, 0x10000, CRC(9cbc7b41) SHA1(107c19d3d71ee6af63d03f7278310c5e3786f91d) )
+ROM_END
+
+ROM_START( dyndukeja )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
+	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
+	ROM_LOAD16_BYTE( "3.e8",  0x0c0000, 0x20000, CRC(2f06ddce) SHA1(b1f8dfb0af6749cdcbca450463c8e70f14278691) ) // Japan 25JUL89
+	ROM_LOAD16_BYTE( "4j.e7", 0x0c0001, 0x20000, CRC(63092078) SHA1(2810d41868340ca0f10ac64499545652841a7c1e) ) // Japan 25JUL89
+
+	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
+	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
+	ROM_LOAD16_BYTE( "6.p7", 0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
+
+	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
+	ROM_LOAD( "8.w8",     0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -510,16 +558,16 @@ ROM_START( dyndukeu )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "dd3.ef8", 0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) )
-	ROM_LOAD16_BYTE( "dd4.ef7", 0x0c0001, 0x20000, CRC(ee4b87b3) SHA1(8e470543bce07cd8682f3745e15c4f1141d9549b) )
+	ROM_LOAD16_BYTE( "dd3.ef8", 0x0c0000, 0x20000, CRC(a56f8692) SHA1(00d86c660efae30c008f8220fdfd397b7d69b2cd) ) // US 25JUL89
+	ROM_LOAD16_BYTE( "dd4.ef7", 0x0c0001, 0x20000, CRC(ee4b87b3) SHA1(8e470543bce07cd8682f3745e15c4f1141d9549b) ) // US 25JUL89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5.p8", 0x0e0000, 0x10000, CRC(883d319c) SHA1(b0df05bfe342a5289a6368be26317fa879975463) )
 	ROM_LOAD16_BYTE( "6.p7", 0x0e0001, 0x10000, CRC(d94cb4ff) SHA1(653247c420a2af037106470556e6801b29bc58e8) )
 
 	ROM_REGION( 0x20000*2, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8.w8",        0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8.w8",     0x000000, 0x08000, CRC(3c29480b) SHA1(031a0b808df32b5ae4f722c9e9f69554d30505c1) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -558,16 +606,16 @@ ROM_START( dbldynj )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8", 0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7", 0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "3x.e8", 0x0c0000, 0x20000, CRC(633db1fe) SHA1(b8d67c3eedaf72a0d85eff878595af212f1246eb) )
-	ROM_LOAD16_BYTE( "4x.e7", 0x0c0001, 0x20000, CRC(dc9ee263) SHA1(786bf36e21d9328662916181ec4b13cce8e14f24) )
+	ROM_LOAD16_BYTE( "3x.e8", 0x0c0000, 0x20000, CRC(633db1fe) SHA1(b8d67c3eedaf72a0d85eff878595af212f1246eb) ) // Japan 13NOV89
+	ROM_LOAD16_BYTE( "4x.e7", 0x0c0001, 0x20000, CRC(dc9ee263) SHA1(786bf36e21d9328662916181ec4b13cce8e14f24) ) // Japan 13NOV89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5x.p8", 0x0e0000, 0x10000, CRC(ea56d719) SHA1(6cade731316c280ef4e809aa700fdbaaabff41d0) )
 	ROM_LOAD16_BYTE( "6x.p7", 0x0e0001, 0x10000, CRC(9ffa0ecd) SHA1(a22c46312ab247cd824dadf840cf1f2b0305bb29) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8x.w8",       0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8x.w8",    0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -606,16 +654,16 @@ ROM_START( dbldynu )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE( "1.cd8",   0x0a0000, 0x10000, CRC(a5e2a95a) SHA1(135d57073d826b9cf46fb43dc49439e1400fb021) )
 	ROM_LOAD16_BYTE( "2.cd7",   0x0a0001, 0x10000, CRC(7e51af22) SHA1(b26103c0d41c469d1e2d1e4e89f591c0d9cdb67c) )
-	ROM_LOAD16_BYTE( "dd3x.8e", 0x0c0000, 0x20000, CRC(9b785028) SHA1(d94c41f9f8969c0effc05d5d6c44474a396a8177) )
-	ROM_LOAD16_BYTE( "dd4x.7e", 0x0c0001, 0x20000, CRC(0d0f6350) SHA1(d289bd9ac308ba1079d5b8931cc913fd326129d3) )
+	ROM_LOAD16_BYTE( "dd3x.8e", 0x0c0000, 0x20000, CRC(9b785028) SHA1(d94c41f9f8969c0effc05d5d6c44474a396a8177) ) // US 13NOV89
+	ROM_LOAD16_BYTE( "dd4x.7e", 0x0c0001, 0x20000, CRC(0d0f6350) SHA1(d289bd9ac308ba1079d5b8931cc913fd326129d3) ) // US 13NOV89
 
 	ROM_REGION( 0x100000, "slave", 0 ) /* v30 sub cpu */
 	ROM_LOAD16_BYTE( "5x.p8", 0x0e0000, 0x10000, CRC(ea56d719) SHA1(6cade731316c280ef4e809aa700fdbaaabff41d0) )
 	ROM_LOAD16_BYTE( "6x.p7", 0x0e0001, 0x10000, CRC(9ffa0ecd) SHA1(a22c46312ab247cd824dadf840cf1f2b0305bb29) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* sound Z80 */
-	ROM_LOAD( "8x.w8",       0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
-	ROM_CONTINUE(            0x010000, 0x08000 )
+	ROM_LOAD( "8x.w8",    0x000000, 0x08000, CRC(f4066081) SHA1(0e5246f4f5513be11e6ed3ea26aada7e0a17a448) )
+	ROM_CONTINUE(         0x010000, 0x08000 )
 	ROM_COPY( "audiocpu", 0x000000, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 )
@@ -653,9 +701,10 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1989, dynduke,  0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 1 03SEP89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukea, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe set 2 25JUL89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukej, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan 03SEP89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dyndukeu, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US 25JUL89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynj,  0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan 13NOV89)", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, dbldynu,  dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dynduke,   0,       dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukea,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Europe, 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukej,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 03SEP89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeja, dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "Dynamite Duke (Japan, 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dyndukeu,  dynduke, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "Dynamite Duke (US, 25JUL89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynj,   0,       dbldyn,  dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu",                  "The Double Dynamites (Japan, 13NOV89)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, dbldynu,   dbldynj, dynduke, dynduke, driver_device, 0, ROT0, "Seibu Kaihatsu (Fabtek license)", "The Double Dynamites (US, 13NOV89)", MACHINE_SUPPORTS_SAVE )

@@ -30,6 +30,7 @@ public:
 		opt_cmd (*this,     "c", "cmd",         "run",      "run:convert:listdevices:static", "run|convert|listdevices|static"),
 		opt_file(*this,     "f", "file",        "-",        "file to process (default is stdin)"),
 		opt_defines(*this,  "D", "define",                  "predefine value as macro, e.g. -Dname=value. If '=value' is omitted predefine it as 1. This option may be specified repeatedly."),
+		opt_rfolders(*this, "r", "rom",                     "where to look for files"),
 		opt_verb(*this,     "v", "verbose",                 "be verbose - this produces lots of output"),
 		opt_quiet(*this,    "q", "quiet",                   "be quiet - no warnings"),
 		opt_version(*this,  "",  "version",                 "display version and exit"),
@@ -53,6 +54,7 @@ public:
 	plib::option_str_limit opt_cmd;
 	plib::option_str    opt_file;
 	plib::option_vec    opt_defines;
+	plib::option_vec    opt_rfolders;
 	plib::option_bool   opt_verb;
 	plib::option_bool   opt_quiet;
 	plib::option_bool   opt_version;
@@ -87,6 +89,36 @@ NETLIST_END()
     CORE IMPLEMENTATION
 ***************************************************************************/
 
+class netlist_data_folder_t : public netlist::source_t
+{
+public:
+	netlist_data_folder_t(netlist::setup_t &setup,
+			pstring folder)
+	: netlist::source_t(setup, netlist::source_t::DATA)
+	, m_folder(folder)
+	{
+	}
+
+	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override
+	{
+		pstring name = m_folder + "/" + file;
+		try
+		{
+			auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
+			return strm;
+		}
+		catch (plib::pexception e)
+		{
+
+		}
+		return std::unique_ptr<plib::pistream>(nullptr);
+	}
+
+private:
+	pstring m_folder;
+};
+
+
 class netlist_tool_t : public netlist::netlist_t
 {
 public:
@@ -109,15 +141,19 @@ public:
 
 	void read_netlist(const pstring &filename, const pstring &name,
 			const std::vector<pstring> &logs,
-			const std::vector<pstring> &defines)
+			const std::vector<pstring> &defines,
+			const std::vector<pstring> &roms)
 	{
 		// read the netlist ...
 
 		for (auto & d : defines)
 			m_setup->register_define(d);
 
+		for (auto & r : roms)
+			m_setup->register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(*m_setup, r));
+
 		m_setup->register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(filename));
+				netlist::source_file_t>(*m_setup, filename));
 		m_setup->include(name);
 		log_setup(logs);
 
@@ -189,8 +225,8 @@ struct input_t
 	{
 		switch (m_param->param_type())
 		{
-			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
+			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
@@ -246,7 +282,7 @@ static void run(tool_options_t &opts)
 
 	nt.read_netlist(opts.opt_file(), opts.opt_name(),
 			opts.opt_logs(),
-			opts.opt_defines());
+			opts.opt_defines(), opts.opt_rfolders());
 
 	std::vector<input_t> inps = read_input(nt.setup(), opts.opt_inp());
 
@@ -289,7 +325,7 @@ static void static_compile(tool_options_t &opts)
 
 	nt.read_netlist(opts.opt_file(), opts.opt_name(),
 			opts.opt_logs(),
-			opts.opt_defines());
+			opts.opt_defines(), opts.opt_rfolders());
 
 	nt.solver()->create_solver_code(pout_strm);
 
@@ -313,7 +349,7 @@ static void listdevices(tool_options_t &opts)
 	netlist::factory_list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
-			netlist::source_proc_t>("dummy", &netlist_dummy));
+			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
 	nt.setup().include("dummy");
 
 

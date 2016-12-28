@@ -697,7 +697,7 @@ static inline uint32_t m68ki_ic_readimm16(m68000_base_device *m68k, uint32_t add
 
 				uint32_t data = m68k->read32(address & ~3);
 
-	            //printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
+				//printf("m68k: doing cache fill at %08x (tag %08x idx %d)\n", address, tag, idx);
 
 				// if no buserror occurred, validate the tag
 				if (!m68k->mmu_tmp_buserror_occurred)

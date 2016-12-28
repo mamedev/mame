@@ -1851,6 +1851,28 @@ ROM_START( kotm2 ) /* MVS AND AES VERSION */
 	ROM_LOAD16_BYTE( "039-c4.c4", 0x200001, 0x080000, CRC(81c9c250) SHA1(e3a34ff69081a8681b5ca895915892dcdccfa7aa) ) /* Plane 2,3 */ /* TC534200 */
 ROM_END
 
+ROM_START( kotm2a ) /* MVS VERSION */
+	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
+	ROM_LOAD16_WORD_SWAP( "039_p1.p1", 0x000000, 0x080000, CRC(8d186638) SHA1(c3874bbb1bfcb220173afb2e0a2123ffaeb7bd2b) ) /* TC534200 */
+	ROM_LOAD16_WORD_SWAP( "039-p2.p2", 0x080000, 0x080000, CRC(28661afe) SHA1(6c85ff6ab334b1ca744f726f42dac211537e7315) ) /* TC534200 */
+
+	NEO_SFIX_128K( "039-s1.s1", CRC(63ee053a) SHA1(7d4b92bd022708975b1470e8f24d1f5a712e1b94) ) /* TC531000 */
+
+	NEO_BIOS_AUDIO_128K( "039-m1.m1", CRC(0c5b2ad5) SHA1(15eb5ea10fecdbdbcfd06225ae6d88bb239592e7) ) /* TC531001 */
+
+	ROM_REGION( 0x300000, "cslot1:ymsnd", 0 )
+	ROM_LOAD( "039-v2.v2", 0x000000, 0x200000, CRC(86d34b25) SHA1(89bdb614b0c63d678962da52e2f596750d20828c) ) /* TC5316200 */
+	ROM_LOAD( "039-v4.v4", 0x200000, 0x100000, CRC(8fa62a0b) SHA1(58ac2fdd73c542eb8178cfc4adfa0e5940183283) ) /* TC538200 */
+
+	ROM_REGION( 0x600000, "cslot1:sprites", 0 )
+	ROM_LOAD16_BYTE( "039-c1.c1", 0x000000, 0x100000, CRC(6d1c4aa9) SHA1(4fbc9d7cb37522ec298eefbe38c75a2d050fbb4a) ) /* Plane 0,1 */ /* TC5316200 */
+	ROM_CONTINUE( 0x400000, 0x100000 )
+	ROM_LOAD16_BYTE( "039-c2.c2", 0x000001, 0x100000, CRC(f7b75337) SHA1(4d85f85948c3e6ed38b0b0ccda79de3ce026e2d9) ) /* Plane 2,3 */ /* TC5316200 */
+	ROM_CONTINUE( 0x400001, 0x100000 )
+	ROM_LOAD16_BYTE( "039-c3.c3", 0x200000, 0x080000, CRC(bfc4f0b2) SHA1(f4abe2b52882b966412f3b503b8f2c8f49b57968) ) /* Plane 0,1 */ /* TC534200 */
+	ROM_LOAD16_BYTE( "039-c4.c4", 0x200001, 0x080000, CRC(81c9c250) SHA1(e3a34ff69081a8681b5ca895915892dcdccfa7aa) ) /* Plane 2,3 */ /* TC534200 */
+ROM_END
+
 ROM_START( kotm2p ) /* fairly late prototype release, only the code differs from the main set */
 	ROM_REGION( 0x100000, "cslot1:maincpu", ROMREGION_BE|ROMREGION_16BIT )
 	ROM_LOAD16_BYTE( "proto_039-p1.p1", 0x000001, 0x080000, CRC(3c1d17e7) SHA1(aeaff465fafa46ded903ed4e8cb8cd05de8dc096) )
@@ -8699,6 +8721,7 @@ GAME( 1991, fatfury1,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   R
 GAME( 1991, roboarmy,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Robo Army", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, fbfrenzy,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Football Frenzy (NGM-034 ~ NGH-034)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kotm2,      neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "King of the Monsters 2 - The Next Thing (NGM-039 ~ NGH-039)", MACHINE_SUPPORTS_SAVE )
+GAME( 1992, kotm2a,     kotm2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "King of the Monsters 2 - The Next Thing (older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, kotm2p,     kotm2,    neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "King of the Monsters 2 - The Next Thing (prototype)", MACHINE_SUPPORTS_SAVE )
 GAME( 1993, sengoku2,   neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Sengoku 2 / Sengoku Denshou 2", MACHINE_SUPPORTS_SAVE )
 GAME( 1992, bstars2,    neogeo,   neobase,   neogeo, neogeo_state,   neogeo,   ROT0, "SNK", "Baseball Stars 2", MACHINE_SUPPORTS_SAVE )

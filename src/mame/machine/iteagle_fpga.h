@@ -9,6 +9,8 @@
 #include "machine/pci.h"
 #include "machine/nvram.h"
 #include "machine/eepromser.h"
+#include "machine/z80scc.h"
+#include "bus/rs232/rs232.h"
 
 //MCFG_PCI_DEVICE_ADD(_tag, _type, _main_id, _revision, _pclass, _subsystem_id)
 
@@ -57,10 +59,14 @@ public:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 
 	required_device<nvram_device> m_rtc;
+	required_device<scc85C30_device> m_scc1;
 
 	void set_init_info(int version, int seq_init) {m_version=version; m_seq_init=seq_init;}
 	void set_irq_info(const char *tag, const int irq_num, const int serial_num) {
 		m_cpu_tag = tag; m_irq_num = irq_num; m_serial_irq_num = serial_num;}
+
+	DECLARE_WRITE_LINE_MEMBER(serial_interrupt);
+	DECLARE_WRITE8_MEMBER(serial_rx_w);
 
 protected:
 	virtual void device_start() override;

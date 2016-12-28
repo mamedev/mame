@@ -2518,9 +2518,81 @@ DRIVER_INIT_MEMBER( kaneko16_state, kaneko16 )
 	kaneko16_unscramble_tiles("gfx3");
 }
 
-DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+/*
+
+berlwallt original bug ?
+
+info from SebV:
+
+After about level 5 or so, if you insert a coin when the continue screen
+pops up, an error message "Copy Board" pops up.
+----------------------------------------
+Happened to me when player dies, at level 4.
+The message is not written in ROM, its sprite ram address is (always?)
+$30fd40
+Routine $337d2 writes it (and routine $5c8c erases it)
+The 'COPY BOARD!' message in stored in ROM directly as sprite number
+($1cfa8)
+
+$20288a : seems to contain the level number (initialized to 2 (?) when a
+game is started, and is incremented by 1 once a level is finished)
+
+01CF3E: move.b  $20288a.l, D0
+01CF44: cmpi.b  #$d, D0
+01CF48: bcs     1cf76                   ; branch not taken -=> 'COPY BOARD!'
+01CF4A: movem.l D0/A0-A2, -(A7)
+01CF4E: movea.l A0, A1
+01CF50: lea     ($4c,PC), A0; ($1cf9e)
+01CF54: nop
+01CF56: lea     ($a,A0), A0             ; A0 = $1cfa8 = 'COPY BOARD!'
+01CF5A: lea     $30e064.l, A1
+01CF60: lea     (-$64,A1), A1
+01CF64: lea     ($1d40,A1), A1
+01CF68: move.b  #$80, D1
+01CF6C: jsr     $33776.l                ; display routine
+01CF72: movem.l (A7)+, D0/A0-A2
+01CF76:
+
+berlwall  levels: 1-1,2,3(anim),...
+berlwallt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
+
+note: berlwall may be genuine while berlwallt may be bootleg! because
+stage 1-1 of berlwallt is stage 1-3 of berlwall, and berlwall has
+explanation ingame.
+(TAFA flyers exist for both berlwall and berlwallt player graphics)
+--------------------------------------------------------------------------------
+*/
+// TODO: this is certainly a protection issue, the level number variable can go up to 0x2f, which is way bigger than 0xd.
+// Sprite DMA decryption? @see berlwall_spriteram_r
+void kaneko16_berlwall_state::patch_protection(uint32_t bra_offset,uint16_t bra_value,uint16_t checksum)
+{
+	uint16_t *ROM = (uint16_t *)memregion("maincpu")->base();
+
+	ROM[bra_offset/2] = bra_value;
+	ROM[0x3fffe/2] = checksum;
+}
+
+DRIVER_INIT_MEMBER(kaneko16_berlwall_state, berlwall_common)
 {
 	kaneko16_unscramble_tiles("gfx2");
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwall )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1a3ea,0x602c,0xc40d);
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallt )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1cf48,0x602c,0xaed4);
+}
+
+DRIVER_INIT_MEMBER( kaneko16_berlwall_state, berlwallk )
+{
+	DRIVER_INIT_CALL(berlwall_common);
+	patch_protection(0x1ceb0,0x602c,0x8364);
 }
 
 DRIVER_INIT_MEMBER( kaneko16_state, samplebank )
@@ -2737,51 +2809,6 @@ ROM_START( berlwall )
 	ROM_LOAD( "bw_u48.u48", 0x200, 0x0117, NO_DUMP)
 	ROM_LOAD( "bw_u54.u54", 0x400, 0x0117, NO_DUMP)
 ROM_END
-
-
-/*
-berlwallt original bug ?
-
-info from SebV:
-
-After about level 5 or so, if you insert a coin when the continue screen
-pops up, an error message "Copy Board" pops up.
-----------------------------------------
-Happened to me when player dies, at level 4.
-The message is not written in ROM, its sprite ram address is (always?)
-$30fd40
-Routine $337d2 writes it (and routine $5c8c erases it)
-The 'COPY BOARD!' message in stored in ROM directly as sprite number
-($1cfa8)
-
-$20288a : seems to contain the level number (initialized to 2 (?) when a
-game is started, and is incremented by 1 once a level is finished)
-
-01CF3E: move.b  $20288a.l, D0
-01CF44: cmpi.b  #$d, D0
-01CF48: bcs     1cf76                   ; branch not taken -=> 'COPY BOARD!'
-01CF4A: movem.l D0/A0-A2, -(A7)
-01CF4E: movea.l A0, A1
-01CF50: lea     ($4c,PC), A0; ($1cf9e)
-01CF54: nop
-01CF56: lea     ($a,A0), A0             ; A0 = $1cfa8 = 'COPY BOARD!'
-01CF5A: lea     $30e064.l, A1
-01CF60: lea     (-$64,A1), A1
-01CF64: lea     ($1d40,A1), A1
-01CF68: move.b  #$80, D1
-01CF6C: jsr     $33776.l                ; display routine
-01CF72: movem.l (A7)+, D0/A0-A2
-01CF76:
-
-berlwall  levels: 1-1,2,3(anim),...
-berlwallt levels: 1-1(anim)2-1/2/3/4/5(anim)3-1/2/3/4/5(anim)4-1(*)
-
-note: berlwall may be genuine while berlwallt may be bootleg! because
-stage 1-1 of berlwallt is stage 1-3 of berlwall, and berlwall has
-explanation ingame.
-(TAFA flyers exist for both berlwall and berlwallt player graphics)
---------------------------------------------------------------------------------
-*/
 
 ROM_START( berlwallt )
 	ROM_REGION( 0x040000, "maincpu", 0 )            /* 68000 Code */
@@ -4441,9 +4468,9 @@ DRIVER_INIT_MEMBER( kaneko16_shogwarr_state, brapboys )
 ***************************************************************************/
 
 GAME( 1991, berlwall, 0,        berlwall, berlwall, kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
-GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwall, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
+GAME( 1991, berlwallt,berlwall, berlwall, berlwallt,kaneko16_berlwall_state, berlwallt, ROT0,  "Kaneko", "The Berlin Wall (bootleg?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1991, berlwallk,berlwall, berlwall, berlwallk,kaneko16_berlwall_state, berlwallk, ROT0,  "Kaneko (Inter license)", "The Berlin Wall (Korea)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, packbang, 0,        berlwall, packbang, kaneko16_berlwall_state, berlwall_common, ROT90, "Kaneko", "Pack'n Bang Bang (prototype)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS ) // priorities between stages?
 
 GAME( 1991, mgcrystl, 0,        mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 92/01/10)", MACHINE_SUPPORTS_SAVE )
 GAME( 1991, mgcrystlo,mgcrystl, mgcrystl, mgcrystl, kaneko16_state,          kaneko16, ROT0,  "Kaneko", "Magical Crystals (World, 91/12/10)", MACHINE_SUPPORTS_SAVE )

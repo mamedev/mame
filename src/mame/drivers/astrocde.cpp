@@ -120,9 +120,7 @@
 #include "machine/z80ctc.h"
 #include "machine/nvram.h"
 #include "sound/ay8910.h"
-
-#include "audio/wow.h"
-#include "audio/gorf.h"
+#include "sound/votrax.h"
 
 #include "gorf.lh"
 #include "seawolf2.lh"
@@ -292,7 +290,6 @@ READ8_MEMBER(astrocde_state::wow_io_r)
 }
 
 
-
 /*************************************
  *
  *  Gorf specific input/output
@@ -313,11 +310,7 @@ READ8_MEMBER(astrocde_state::gorf_io_1_r)
 		case 5: m_sparkle[3] = data;    break;
 		case 6:
 			m_astrocade_sound1->set_output_gain(0, data ? 0.0 : 1.0);
-#if USE_FAKE_VOTRAX
-			m_samples->set_output_gain(0, data ? 1.0 : 0.0);
-#else
 			m_votrax->set_output_gain(0, data ? 1.0 : 0.0);
-#endif
 			break;
 		case 7: osd_printf_debug("io_1:%d\n", data); break;
 	}
@@ -511,6 +504,28 @@ WRITE8_MEMBER(astrocde_state::tenpindx_lights_w)
 	output().set_lamp_value(18, (which == 9));
 }
 
+
+/*************************************
+ *
+ *  Votrax SC01 specific input/output
+ *
+ *************************************/
+
+READ8_MEMBER( astrocde_state::votrax_speech_r )
+{
+	uint8_t data = offset >> 8;
+	m_votrax->inflection_w(space, 0, data >> 6);
+	m_votrax->write(space, 0, data);
+
+	/* Note : We should really also use volume in this as well as frequency */
+	return data;                                   /* Return nicely */
+}
+
+
+CUSTOM_INPUT_MEMBER( astrocde_state::votrax_speech_status_r )
+{
+	return m_votrax->request();
+}
 
 
 /*************************************
@@ -879,7 +894,7 @@ static INPUT_PORTS_START( wow )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, wow_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
 
 	PORT_START("P4HANDLE")
 	/* "If S1:1,2,3 are all ON or all OFF, only coin meter number 1 will count." */
@@ -949,7 +964,7 @@ static INPUT_PORTS_START( gorf )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x60, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, gorf_speech_status_r, nullptr)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, astrocde_state, votrax_speech_status_r, nullptr)
 
 	PORT_START("P4HANDLE")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("S1:1")
@@ -1354,13 +1369,7 @@ static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
 	/* sound hardware */
 	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-#if USE_FAKE_VOTRAX
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(wow_sample_names)
-#else
-	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
-#endif
+	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
@@ -1386,13 +1395,7 @@ static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 	MCFG_ASTROCADE_ADD("astrocade2", ASTROCADE_CLOCK/4)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-#if USE_FAKE_VOTRAX
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(gorf_sample_names)
-#else
-	MCFG_VOTRAX_SC01_ADD("votrax", VOTRAX_SC01, 720000)
-#endif
+	MCFG_SOUND_ADD("votrax", VOTRAX_SC01, 720000)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 
@@ -1709,7 +1712,7 @@ DRIVER_INIT_MEMBER(astrocde_state,wow)
 {
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::wow_io_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::wow_speech_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::votrax_speech_r), this));
 }
 
 
@@ -1718,7 +1721,7 @@ DRIVER_INIT_MEMBER(astrocde_state,gorf)
 	m_video_config = AC_SOUND_PRESENT | AC_LIGHTPEN_INTS | AC_STARS;
 	m_maincpu->space(AS_IO).install_read_handler(0x15, 0x15, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::gorf_io_1_r), this));
 	m_maincpu->space(AS_IO).install_read_handler(0x16, 0x16, 0, 0xf000, 0x0f00, read8_delegate(FUNC(astrocde_state::gorf_io_2_r), this));
-	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::gorf_speech_r), this));
+	m_maincpu->space(AS_IO).install_read_handler(0x17, 0x17, 0, 0x0000, 0xff00, read8_delegate(FUNC(astrocde_state::votrax_speech_r), this));
 }
 
 

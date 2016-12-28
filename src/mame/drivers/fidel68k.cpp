@@ -11,8 +11,8 @@
     such as Arena(in editmode).
 
     TODO:
+    - configurable RAM size
     - how does dual-CPU work?
-    - EAG IRQ level/timing is unknown
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -51,7 +51,8 @@ V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.
 Hardware info:
 --------------
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
-- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
+- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots
+  (V2: slot 2 & 3 64KB, V3: slot 2 & 3 256KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
 - OKI M82C51A-2 USART, 4.9152MHz XTAL
 - other special: magnet sensors, external module slot, serial port
@@ -567,7 +568,7 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
@@ -592,7 +593,7 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv9, eag )
@@ -600,7 +601,7 @@ static MACHINE_CONFIG_DERIVED( eagv9, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv10, eag )
@@ -608,7 +609,7 @@ static MACHINE_CONFIG_DERIVED( eagv10, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( eagv11, eag )
@@ -616,7 +617,7 @@ static MACHINE_CONFIG_DERIVED( eagv11, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 
@@ -632,10 +633,16 @@ ROM_START( fexcel68k ) // model 6094, PCB label 510.1120B01
 ROM_END
 
 
-ROM_START( feagv2 )
+ROM_START( feagv2 ) // from a V2 board
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("6114_e5.u18", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
-	ROM_LOAD16_BYTE("6114_o5.u19", 0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+ROM_END
+
+ROM_START( feagv2a ) // from a V3 board
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
+	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
 ROM_START( feagv7 )
@@ -669,7 +676,8 @@ ROM_END
 /*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1987, fexcel68k, 0,       0,      fexcel68k, fexcel68k, driver_device, 0, "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, feagv2,    0,       0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2,    0,       0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // emulated as V4(1MB RAM)
+CONS( 1989, feagv2a,   feagv2,  0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK ) // "
 CONS( 1990, feagv7,    feagv2,  0,      eagv7,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv9,    feagv2,  0,      eagv9,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 CONS( 1990, feagv10,   feagv2,  0,      eagv10,    eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

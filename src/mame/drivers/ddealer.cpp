@@ -288,7 +288,7 @@ uint32_t ddealer_state::screen_update(screen_device &screen, bitmap_ind16 &bitma
 	   combined, the flipscreen case makes things more
 	   difficult to understand */
 	bool const flip = flip_screen();
-	 
+
 	if (!flip)
 	{
 		if (m_vregs[0xcc / 2] & 0x80)

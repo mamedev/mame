@@ -416,7 +416,7 @@ static ADDRESS_MAP_START( oki_map, AS_0, 8, playmark_state )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("okibank")
 ADDRESS_MAP_END
 
-	
+
 
 static INPUT_PORTS_START( bigtwin )
 	PORT_START("SYSTEM")
@@ -1307,7 +1307,7 @@ static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 	MCFG_PIC16C5x_WRITE_B_CB(WRITE8(playmark_state, playmark_oki_w))
 	MCFG_PIC16C5x_READ_C_CB(READ8(playmark_state, playmark_snd_flag_r))
 	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, playmark_snd_control_w))
-//	MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
+//  MCFG_PIC16C5x_WRITE_C_CB(WRITE8(playmark_state, hrdtimes_snd_control_w)) // probably closer to this, but this only supports 2 sample bank bits
 	MCFG_PIC16C5x_T0_CB(READLINE(playmark_state, PIC16C5X_T0_clk_r))
 
 	MCFG_EEPROM_SERIAL_93C46_ADD("eeprom")

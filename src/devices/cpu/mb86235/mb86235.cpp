@@ -17,6 +17,8 @@
 #include "mb86235fe.h"
 
 
+#define ENABLE_DRC      0
+
 
 #define CACHE_SIZE                      (1 * 1024 * 1024)
 #define COMPILE_BACKWARDS_BYTES         128
@@ -42,7 +44,11 @@ ADDRESS_MAP_END
 /* Execute cycles */
 void mb86235_device::execute_run()
 {
+#if ENABLE_DRC
 	run_drc();
+#else
+	m_core->icount = 0;
+#endif
 }
 
 
@@ -160,6 +166,7 @@ void mb86235_device::device_start()
 	state_add(MB86235_MB6, "MB6", m_core->mb[6]).formatstr("%08X");
 	state_add(MB86235_MB7, "MB7", m_core->mb[7]).formatstr("%08X");
 	state_add(STATE_GENPC, "GENPC", m_core->pc ).noshow();
+	state_add(STATE_GENPCBASE, "CURPC", m_core->pc).noshow();
 
 	m_icountptr = &m_core->icount;
 
@@ -227,6 +234,7 @@ offs_t mb86235_device::disasm_disassemble(std::ostream &stream, offs_t pc, const
 
 void mb86235_device::fifoin_w(uint64_t data)
 {
+#if ENABLE_DRC
 	if (m_core->fifoin.num >= FIFOIN_SIZE)
 	{
 		fatalerror("fifoin_w: pushing to full fifo");
@@ -235,23 +243,46 @@ void mb86235_device::fifoin_w(uint64_t data)
 	printf("FIFOIN push %08X%08X\n", (uint32_t)(data >> 32), (uint32_t)(data));
 
 	m_core->fifoin.data[m_core->fifoin.wpos] = data;
-	
+
 	m_core->fifoin.wpos++;
 	m_core->fifoin.wpos &= FIFOIN_SIZE-1;
 	m_core->fifoin.num++;
+#endif
 }
 
 bool mb86235_device::is_fifoin_full()
 {
+#if ENABLE_DRC
 	return m_core->fifoin.num >= FIFOIN_SIZE;
+#else
+	return false;
+#endif
 }
 
 uint64_t mb86235_device::fifoout0_r()
 {
-	fatalerror("fifoout0_r");
+#if ENABLE_DRC
+	if (m_core->fifoout0.num == 0)
+	{
+		fatalerror("fifoout0_r: reading from empty fifo");
+	}
+
+	uint64_t data = m_core->fifoout0.data[m_core->fifoout0.rpos];
+
+	m_core->fifoout0.rpos++;
+	m_core->fifoout0.rpos &= FIFOOUT0_SIZE - 1;
+	m_core->fifoout0.num--;
+	return data;
+#else
+	return 0;
+#endif
 }
 
 bool mb86235_device::is_fifoout0_empty()
 {
+#if ENABLE_DRC
 	return m_core->fifoout0.num == 0;
+#else
+	return false;
+#endif
 }

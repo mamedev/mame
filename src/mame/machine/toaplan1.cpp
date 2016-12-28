@@ -12,32 +12,6 @@
 #include "includes/toaplan1.h"
 
 
-
-/* List of possible regions for coinage (for games with unemulated sound CPU) */
-enum {
-	TOAPLAN1_REGION_JAPAN=0,
-	TOAPLAN1_REGION_US,
-	TOAPLAN1_REGION_WORLD,
-	TOAPLAN1_REGION_OTHER
-};
-
-static const uint8_t toaplan1_coins_for_credit[TOAPLAN1_REGION_OTHER+1][2][4] =
-{
-	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_JAPAN */
-	{ { 1, 1, 2, 2 }, { 1, 1, 2, 2 } }, /* TOAPLAN1_REGION_US */
-	{ { 1, 2, 3, 4 }, { 1, 1, 1, 1 } }, /* TOAPLAN1_REGION_WORLD */
-	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }  /* TOAPLAN1_REGION_OTHER */
-};
-
-static const uint8_t toaplan1_credits_for_coin[TOAPLAN1_REGION_OTHER+1][2][4] =
-{
-	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_JAPAN */
-	{ { 1, 2, 1, 3 }, { 1, 2, 1, 3 } }, /* TOAPLAN1_REGION_US */
-	{ { 1, 1, 1, 1 }, { 2, 3, 4, 6 } }, /* TOAPLAN1_REGION_WORLD */
-	{ { 1, 1, 1, 1 }, { 1, 1, 1, 1 } }, /* TOAPLAN1_REGION_OTHER */
-};
-
-
 INTERRUPT_GEN_MEMBER(toaplan1_state::toaplan1_interrupt)
 {
 	if (m_intenable)
@@ -179,109 +153,6 @@ READ16_MEMBER(toaplan1_state::samesame_port_6_word_r)
 	return (0x80 | ioport("TJUMP")->read()) & 0xff;
 }
 
-READ16_MEMBER(toaplan1_state::vimana_system_port_r)
-{
-	static const uint8_t vimana_region[16] =
-	{
-		TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   , TOAPLAN1_REGION_WORLD, TOAPLAN1_REGION_JAPAN,
-		TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_US   ,
-		TOAPLAN1_REGION_JAPAN, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER,
-		TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_OTHER, TOAPLAN1_REGION_JAPAN
-	};
-
-	int data, p, r, d, slot, reg, dsw;
-
-	slot = -1;
-	d = ioport("DSWA")->read();
-	r = ioport("TJUMP")->read();
-	p = ioport("SYSTEM")->read();
-	m_vimana_latch ^= p;
-	data = (m_vimana_latch & p);
-
-	/* simulate the mcu keeping track of credits based on region and coinage settings */
-	/* latch so it doesn't add more than one coin per keypress */
-	if (d & 0x04)   /* "test mode" ON */
-	{
-		m_vimana_coins[0] = m_vimana_coins[1] = 0;
-		m_vimana_credits = 0;
-	}
-	else            /* "test mode" OFF */
-	{
-		if (data & 0x02)      /* TILT */
-		{
-			m_vimana_coins[0] = m_vimana_coins[1] = 0;
-			m_vimana_credits = 0;
-		}
-		if (data & 0x01)      /* SERVICE1 */
-		{
-			m_vimana_credits++ ;
-		}
-		if (data & 0x08)      /* COIN1 */
-		{
-			slot = 0;
-		}
-		if (data & 0x10)      /* COIN2 */
-		{
-			slot = 1 ;
-		}
-
-		if (slot != -1)
-		{
-			reg = vimana_region[r];
-			dsw = (d & 0xf0) >> (4 + 2 * slot);
-			m_vimana_coins[slot]++;
-			if (m_vimana_coins[slot] >= toaplan1_coins_for_credit[reg][slot][dsw])
-			{
-				m_vimana_credits += toaplan1_credits_for_coin[reg][slot][dsw];
-				m_vimana_coins[slot] -= toaplan1_coins_for_credit[reg][slot][dsw];
-			}
-			machine().bookkeeping().coin_counter_w(slot, 1);
-			machine().bookkeeping().coin_counter_w(slot, 0);
-		}
-
-		if (m_vimana_credits >= 9)
-			m_vimana_credits = 9;
-	}
-
-	machine().bookkeeping().coin_lockout_global_w((m_vimana_credits >= 9));
-
-	m_vimana_latch = p;
-
-	return p & 0xffff;
-}
-
-READ16_MEMBER(toaplan1_state::vimana_mcu_r)
-{
-	int data = 0 ;
-	switch (offset)
-	{
-		case 0:  data = 0xff; break;
-		case 1:  data = 0x00; break;
-		case 2:
-		{
-			data = m_vimana_credits;
-			break;
-		}
-	}
-	return data & 0xff;
-}
-
-WRITE16_MEMBER(toaplan1_state::vimana_mcu_w)
-{
-	switch (offset)
-	{
-		case 0: break;
-		case 1: break;
-		case 2:
-			if (ACCESSING_BITS_0_7)
-			{
-				m_vimana_credits = data & 0xff;
-				machine().bookkeeping().coin_lockout_global_w((m_vimana_credits >= 9));
-			}
-			break;
-	}
-}
-
 READ16_MEMBER(toaplan1_state::toaplan1_shared_r)
 {
 	return m_sharedram[offset] & 0xff;
@@ -398,9 +269,6 @@ MACHINE_RESET_MEMBER(toaplan1_state,demonwld)
 MACHINE_RESET_MEMBER(toaplan1_state,vimana)
 {
 	MACHINE_RESET_CALL_MEMBER(toaplan1);
-	m_vimana_coins[0] = m_vimana_coins[1] = 0;
-	m_vimana_credits = 0;
-	m_vimana_latch = 0;
 	m_maincpu->set_reset_callback(write_line_delegate(FUNC(toaplan1_state::toaplan1_reset_callback),this));
 }
 
@@ -421,10 +289,3 @@ void toaplan1_state::demonwld_driver_savestate()
 	machine().save().register_postload(save_prepost_delegate(FUNC(toaplan1_state::demonwld_restore_dsp), this));
 }
 
-void toaplan1_state::vimana_driver_savestate()
-{
-	save_item(NAME(m_vimana_coins[0]));
-	save_item(NAME(m_vimana_coins[1]));
-	save_item(NAME(m_vimana_credits));
-	save_item(NAME(m_vimana_latch));
-}

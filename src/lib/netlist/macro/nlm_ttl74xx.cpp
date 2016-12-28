@@ -540,6 +540,44 @@ static NETLIST_START(TTL_7486_DIP)
 	)
 NETLIST_END()
 
+/*
+ *  DM74260: Dual 5-Input NOR Gates
+ *                 _________
+ *             Y = A+B+C+D+E
+ *          +---+---+---+---+---++---+
+ *          | A | B | B | B | B || Y |
+ *          +===+===+===+===+===++===+
+ *          | 0 | 0 | 0 | 0 | 0 || 1 |
+ *          | 0 | 0 | 0 | 0 | 1 || 0 |
+ *          | 0 | 0 | 0 | 1 | 0 || 0 |
+ *          | 0 | 0 | 1 | 0 | 0 || 0 |
+ *          | 0 | 1 | 0 | 0 | 0 || 0 |
+ *          | 1 | 0 | 0 | 0 | 0 || 0 |
+ *          +---+---+---+---+---++---+
+ *
+ *  Naming conventions follow Texas Instruments datasheet
+ *
+ */
+
+static NETLIST_START(TTL_74260_DIP)
+	TTL_74260_GATE(s1)
+	TTL_74260_GATE(s2)
+
+	DUMMY_INPUT(GND)
+	DUMMY_INPUT(VCC)
+
+	DIPPINS(   /*       +--------------+      */
+		s1.C,  /*    C1 |1     ++    14| VCC  */ VCC.I,
+		s1.D,  /*    D1 |2           13| B1   */ s1.B,
+		s1.E,  /*    E1 |3           12| A1   */ s1.A,
+		s2.E,  /*    E2 |4   74260   11| D2   */ s2.D,
+		s1.Q,  /*    Y1 |5           10| C2   */ s2.C,
+		s2.Q,  /*    Y2 |6            9| B2   */ s2.B,
+		GND.I, /*   GND |7            8| A2   */ s2.A
+				/*       +--------------+      */
+	)
+NETLIST_END()
+
 NETLIST_START(TTL74XX_lib)
 
 	TRUTHTABLE_START(TTL_7400_GATE, 2, 1, "")
@@ -788,6 +826,28 @@ NETLIST_START(TTL74XX_lib)
 		TT_FAMILY("74XX")
 	TRUTHTABLE_END()
 
+	TRUTHTABLE_START(TTL_74260_GATE, 5, 1, "")
+		TT_HEAD("A,B,C,D,E|Q ")
+		TT_LINE("0,0,0,0,0|1|10")
+		TT_LINE("X,X,X,X,1|0|12")
+		TT_LINE("X,X,X,1,X|0|12")
+		TT_LINE("X,X,1,X,X|0|12")
+		TT_LINE("X,1,X,X,X|0|12")
+		TT_LINE("1,X,X,X,X|0|12")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
+	TRUTHTABLE_START(TTL_74260_NOR, 5, 1, "A,B,C,D,E")
+		TT_HEAD("A,B,C,D,E|Q ")
+		TT_LINE("0,0,0,0,0|1|10")
+		TT_LINE("X,X,X,X,1|0|12")
+		TT_LINE("X,X,X,1,X|0|12")
+		TT_LINE("X,X,1,X,X|0|12")
+		TT_LINE("X,1,X,X,X|0|12")
+		TT_LINE("1,X,X,X,X|0|12")
+		TT_FAMILY("74XX")
+	TRUTHTABLE_END()
+
 	LOCAL_LIB_ENTRY(TTL_7400_DIP)
 	LOCAL_LIB_ENTRY(TTL_7402_DIP)
 	LOCAL_LIB_ENTRY(TTL_7404_DIP)
@@ -802,4 +862,5 @@ NETLIST_START(TTL74XX_lib)
 	LOCAL_LIB_ENTRY(TTL_7432_DIP)
 	LOCAL_LIB_ENTRY(TTL_7437_DIP)
 	LOCAL_LIB_ENTRY(TTL_7486_DIP)
+	LOCAL_LIB_ENTRY(TTL_74260_DIP)
 NETLIST_END()

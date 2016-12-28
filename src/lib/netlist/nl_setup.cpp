@@ -18,6 +18,7 @@
 #include "devices/net_lib.h"
 #include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
 
@@ -191,42 +192,45 @@ pstring setup_t::objtype_as_str(detail::device_object_t &in) const
 	return "Error";
 }
 
-void setup_t::register_and_set_param(pstring name, param_t &param)
+pstring setup_t::get_initial_param_val(const pstring name, const pstring def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+		return i->second;
+	else
+		return def;
+}
+
+double setup_t::get_initial_param_val(const pstring name, const double def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		const pstring val = i->second;
-		log().debug("Found parameter ... {1} : {1}\n", name, val);
-		switch (param.param_type())
-		{
-			case param_t::DOUBLE:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_double_t &>(param).initial(vald);
-			}
-			break;
-			case param_t::INTEGER:
-			case param_t::LOGIC:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
-			}
-			break;
-			case param_t::STRING:
-			case param_t::MODEL:
-			{
-				static_cast<param_str_t &>(param).initial(val);
-			}
-			break;
-			//default:
-			//  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
-		}
+		double vald = 0;
+		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return vald;
 	}
+	else
+		return def;
+}
+
+int setup_t::get_initial_param_val(const pstring name, const int def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+	{
+		double vald = 0;
+		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return static_cast<int>(vald);
+	}
+	else
+		return def;
+}
+
+void setup_t::register_param(pstring name, param_t &param)
+{
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
@@ -517,6 +521,7 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	}
 	else if (inp.is_logic())
 	{
+		netlist().log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(), pstring(inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?"), term.name());
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
@@ -849,10 +854,11 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
 
-	ret->m_low_thresh_V = setup_t::model_value(map, "IVL");
-	ret->m_high_thresh_V = setup_t::model_value(map, "IVH");
-	ret->m_low_V = setup_t::model_value(map, "OVL");
-	ret->m_high_V = setup_t::model_value(map, "OVH");
+	ret->m_fixed_V = setup_t::model_value(map, "FV");
+	ret->m_low_thresh_PCNT = setup_t::model_value(map, "IVL");
+	ret->m_high_thresh_PCNT = setup_t::model_value(map, "IVH");
+	ret->m_low_VO = setup_t::model_value(map, "OVL");
+	ret->m_high_VO = setup_t::model_value(map, "OVH");
 	ret->m_R_low = setup_t::model_value(map, "ORL");
 	ret->m_R_high = setup_t::model_value(map, "ORH");
 
@@ -971,11 +977,27 @@ void setup_t::include(const pstring &netlist_name)
 {
 	for (auto &source : m_sources)
 	{
-		if (source->parse(*this, netlist_name))
+		if (source->parse(netlist_name))
 			return;
 	}
 	log().fatal("unable to find {1} in source collection", netlist_name);
 }
+
+std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
+{
+	for (auto &source : m_sources)
+	{
+		if (source->type() == source_t::DATA)
+		{
+			auto strm = source->stream(name);
+			if (strm)
+				return strm;
+		}
+	}
+	log().fatal("unable to find data named {1} in source collection", name);
+	return std::unique_ptr<plib::pistream>(nullptr);
+}
+
 
 bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
 {
@@ -998,22 +1020,27 @@ void setup_t::register_define(pstring defstr)
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_string_t::parse(setup_t &setup, const pstring &name)
+bool source_t::parse(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	if (m_type != SOURCE)
+		return false;
+	else
+		return m_setup.parse_stream(*stream(name), name);
 }
 
-bool source_mem_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
 }
 
-bool source_file_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	plib::pifilestream istrm(m_filename);
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
+}
+
+std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
+{
+	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
 }

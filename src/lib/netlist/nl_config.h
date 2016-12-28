@@ -124,8 +124,8 @@
 namespace netlist
 {
 #if NL_KEEP_STATISTICS
-using nperftime_t = plib::timer<plib::exact_ticks, true>;
-using nperfcount_t = plib::counter<true>;
+using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, true>;
+using nperfcount_t = plib::chrono::counter<true>;
 #else
 using nperftime_t = plib::chrono::timer<plib::chrono::exact_ticks, false>;
 using nperfcount_t = plib::chrono::counter<false>;

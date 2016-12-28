@@ -19,8 +19,6 @@
 #define AC_STARS            (0x04)
 #define AC_MONITOR_BW       (0x08)
 
-#define USE_FAKE_VOTRAX     (1)
-
 
 class astrocde_state : public driver_device
 {
@@ -195,13 +193,8 @@ public:
 	void init_sparklestar();
 	virtual void machine_start() override;
 
-	/*----------- defined in audio/wow.c -----------*/
-	DECLARE_READ8_MEMBER( wow_speech_r );
-	CUSTOM_INPUT_MEMBER( wow_speech_status_r );
-
-	/*----------- defined in audio/gorf.c -----------*/
-	DECLARE_READ8_MEMBER( gorf_speech_r );
-	CUSTOM_INPUT_MEMBER( gorf_speech_status_r );
+	DECLARE_READ8_MEMBER( votrax_speech_r );
+	CUSTOM_INPUT_MEMBER( votrax_speech_status_r );
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;

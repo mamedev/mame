@@ -156,6 +156,8 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
 
+	uint8_t m_gearbox_state;
+	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
 	DECLARE_DRIVER_INIT(driveyes);
 	DECLARE_DRIVER_INIT(winrun);
 	DECLARE_DRIVER_INIT(starblad);
@@ -165,6 +167,8 @@ public:
 	DECLARE_MACHINE_START(namcos21);
 	DECLARE_VIDEO_START(namcos21);
 	uint32_t screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
@@ -179,5 +183,6 @@ public:
 	int init_dsp();
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
+	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init(int game_type);
 };

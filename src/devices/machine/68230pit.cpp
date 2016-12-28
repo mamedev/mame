@@ -215,7 +215,7 @@ uint8_t pit68230_device::irq_tiack()
 }
 
 /*
- * trigger_interrupt - called when a potential interrupt condition occurs 
+ * trigger_interrupt - called when a potential interrupt condition occurs
  * but will only generate an interrupt when the PIT is programmed to do so.
  */
 void pit68230_device::trigger_interrupt(int source)
@@ -241,7 +241,7 @@ void pit68230_device::trigger_interrupt(int source)
 void pit68230_device::tick_clock()
 {
 	if (m_tcr & REG_TCR_TIMER_ENABLE)
-    {
+	{
 		if (m_cntr-- == 0) // Zero detect
 		{
 			LOGINT(("Timer reached zero!\n"));
@@ -612,8 +612,8 @@ void pit68230_device::wr_pitreg_tcr(uint8_t data)
 	{
 		m_cntr = 0;
 		if (pen == 1)
-		{ 
-			LOG(("PC2 enable/disable TBD\n")); 
+		{
+			LOG(("PC2 enable/disable TBD\n"));
 		}
 		if (clk == 1)
 		{
@@ -659,7 +659,7 @@ void pit68230_device::wr_pitreg_cprl(uint8_t data)
 void pit68230_device::wr_pitreg_tsr(uint8_t data)
 {
 	LOG(("%s(%02x) \"%s\": \n", FUNCNAME, data, tag()));
-	if (data & 1) 
+	if (data & 1)
 	{
 		m_tsr = 0; // A write resets the TSR;
 		m_tirq_out_cb(CLEAR_LINE);

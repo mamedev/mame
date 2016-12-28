@@ -20,6 +20,9 @@
 	cop400_cpu_device::set_read_l_callback(*device, DEVCB_##_devcb);
 #define MCFG_COP400_WRITE_L_CB(_devcb) \
 	cop400_cpu_device::set_write_l_callback(*device, DEVCB_##_devcb);
+// output state when pins are in tri-state, default 0
+#define MCFG_COP400_READ_L_TRISTATE_CB(_devcb) \
+	cop400_cpu_device::set_read_l_tristate_callback(*device, DEVCB_##_devcb);
 
 // G pins: 4-bit bi-directional
 #define MCFG_COP400_READ_G_CB(_devcb) \
@@ -125,6 +128,7 @@ public:
 
 	// static configuration helpers
 	template<class _Object> static devcb_base &set_read_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l.set_callback(object); }
+	template<class _Object> static devcb_base &set_read_l_tristate_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_l_tristate.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_l_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_l.set_callback(object); }
 	template<class _Object> static devcb_base &set_read_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_read_g.set_callback(object); }
 	template<class _Object> static devcb_base &set_write_g_callback(device_t &device, _Object object) { return downcast<cop400_cpu_device &>(device).m_write_g.set_callback(object); }
@@ -176,6 +180,7 @@ protected:
 
 	// i/o handlers
 	devcb_read8 m_read_l;
+	devcb_read8 m_read_l_tristate;
 	devcb_write8 m_write_l;
 	devcb_read8 m_read_g;
 	devcb_write8 m_write_g;

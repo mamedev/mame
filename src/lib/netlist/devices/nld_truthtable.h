@@ -23,7 +23,7 @@
 	public:                                                                     \
 		template <class C>                                                      \
 		NETLIB_NAME(cname)(C &owner, const pstring &name)                       \
-		: nld_truthtable_t<nIN, nOUT>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
+		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
 		static const char *m_desc[];                                            \

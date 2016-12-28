@@ -36,7 +36,7 @@ static NETLIST_START(MC14584B_DIP)
 		s1.A,  /*    A1 |1     ++    14| VCC  */ VCC.I,
 		s1.Q,  /*    Y1 |2           13| A6   */ s6.A,
 		s2.A,  /*    A2 |3           12| Y6   */ s6.Q,
-		s2.Q,  /*    Y2 |4    7416   11| A5   */ s5.A,
+		s2.Q,  /*    Y2 |4  MC14584B 11| A5   */ s5.A,
 		s3.A,  /*    A3 |5           10| Y5   */ s5.Q,
 		s3.Q,  /*    Y3 |6            9| A4   */ s4.A,
 		GND.I, /*   GND |7            8| Y4   */ s4.Q
@@ -49,7 +49,8 @@ NETLIST_START(otheric_lib)
 		TT_HEAD(" A | Q ")
 		TT_LINE(" 0 | 1 |100")
 		TT_LINE(" 1 | 0 |100")
-		TT_FAMILY("FAMILY(IVL=2.1 IVH=2.7 OVL=0.05 OVH=4.95 ORL=10.0 ORH=10.0)")
+		// 2.1V negative going and 2.7V positive going at 5V
+		TT_FAMILY("FAMILY(FV=0 IVL=0.42 IVH=0.54 OVL=0.05 OVH=0.05 ORL=10.0 ORH=10.0)")
 	TRUTHTABLE_END()
 
 	LOCAL_LIB_ENTRY(MC14584B_DIP)

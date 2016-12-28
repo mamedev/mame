@@ -37,17 +37,31 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 	int i, ordinal = 0;
 	uint16_t buttons = 0;
 
+	// TODO: key matrix seems identical to speedatk.cpp, needs merging
+	if(m_coin_impulse > 0)
+	{
+		m_coin_impulse--;
+		return 0x80;
+	}
+
+	if((ioport("COINS")->read() & 1) || (ioport("COINS")->read() & 2))
+	{
+		m_coin_impulse = m_coin_settings*2;
+		m_coin_impulse--;
+		return 0x80;
+	}
+
 	switch (m_mux)
 	{
-	case 1: /* start buttons */
-		buttons = ioport("START")->read();
-		break;
-	case 2: /* player 1 buttons */
-		buttons = ioport("P1")->read();
-		break;
-	case 4: /* player 2 buttons */
-		buttons = ioport("P2")->read();
-		break;
+		case 1: /* start buttons */
+			buttons = ioport("START")->read();
+			break;
+		case 2: /* player 1 buttons */
+			buttons = ioport("P1")->read();
+			break;
+		case 4: /* player 2 buttons */
+			buttons = ioport("P2")->read();
+			break;
 	}
 
 
@@ -62,7 +76,7 @@ READ8_MEMBER(hanaawas_state::hanaawas_input_port_0_r)
 		}
 	}
 
-	return (ioport("IN0")->read() & 0xf0) | ordinal;
+	return ordinal;
 }
 
 WRITE8_MEMBER(hanaawas_state::hanaawas_inputs_mux_w)
@@ -75,6 +89,11 @@ WRITE8_MEMBER(hanaawas_state::irq_ack_w)
 	m_maincpu->set_input_line(0,CLEAR_LINE);
 }
 
+WRITE8_MEMBER(hanaawas_state::key_matrix_status_w)
+{
+	if((data & 0xf0) == 0x40) //coinage setting command
+		m_coin_settings = data & 0xf;
+}
 
 static ADDRESS_MAP_START( hanaawas_map, AS_PROGRAM, 8, hanaawas_state )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
@@ -90,19 +109,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, AS_IO, 8, hanaawas_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(hanaawas_input_port_0_r, hanaawas_inputs_mux_w)
-	AM_RANGE(0x01, 0x01) AM_READNOP /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
+	AM_RANGE(0x01, 0x01) AM_READNOP AM_WRITE(key_matrix_status_w) /* r bit 1: status ready, presumably of the input mux device / w = configure device? */
 	AM_RANGE(0x10, 0x10) AM_DEVREAD("aysnd", ay8910_device, data_r)
 	AM_RANGE(0x10, 0x11) AM_DEVWRITE("aysnd", ay8910_device, address_data_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITENOP // watchdog
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hanaawas )
-	PORT_START("IN0")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_START("COINS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
@@ -184,6 +200,8 @@ GFXDECODE_END
 void hanaawas_state::machine_start()
 {
 	save_item(NAME(m_mux));
+	save_item(NAME(m_coin_settings));
+	save_item(NAME(m_coin_impulse));
 }
 
 void hanaawas_state::machine_reset()

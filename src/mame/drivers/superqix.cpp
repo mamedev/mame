@@ -25,10 +25,11 @@ Super Qix:
 - The sq07.ic108 ROM came from a bootleg where the 8751 MCU was replaced by an
   8031 MCU plus an external ROM (i.e. the sqixb1 romset). The 8031 ROM was bad
   (bit 3 was stuck high). It was originally recovered by carefully checking
-  the disassembly, and this repair was later verified from another dump to be
-  correct. The majority of the bootleg 8031 MCU code matches the decapped
-  sqixu b03__03.l2 mcu code, implying the sq07.ic108 8031 MCU code ROM was
-  derived from code dumped from an original Taito b03__03.l2 8751 MCU somehow.
+  the disassembly, and this repair was later verified from another dump of an
+  intact chip to be correct. The majority of the bootleg 8031 MCU code matches
+  the deprotected sqix b03__03.l2 MCU code, implying the sq07.ic108 8031 MCU
+  code ROM was derived from code dumped from an original Taito b03__03.l2 8751
+  MCU somehow.
   The bootleg MCU code is different from the original b03__03.l2 MCU since
   an 8031 when running in external ROM mode cannot use ports 0 or 2, hence
   the code was extensively patched by the bootleggers to avoid use of those
@@ -1578,8 +1579,7 @@ ROM_START( sqix ) // It is unclear what this set fixes vs 1.1 below, but the 'ru
 	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1597,8 +1597,7 @@ ROM_START( sqixr1 ) // This set has the coin lockout polarity inverted, and also
 	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1616,8 +1615,7 @@ ROM_START( sqixr0 ) // This set is older than the above two: it has the coin loc
 	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, BAD_DUMP CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* Original Taito ID code for this set's MCU */
-	/* the above file is derived from b03__08.l2 from the sqixu set, by patching 3 bytes, needs verification dump/decap from a real b03__03 MCU */
+	ROM_LOAD( "b03__03.l2",     0x00000, 0x1000, CRC(f0c3af2b) SHA1(6dce2175011b5c8d0f1bce433c53979841d5d1a4) ) /* B03 // 03 C8751-88 MCU, verified from deprotected part */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1635,7 +1633,7 @@ ROM_START( sqixu )
 	ROM_LOAD( "b03__07.h3",    0x10000, 0x10000, CRC(4c417d4a) SHA1(de46551da1b27312dca40240a210e77595cf9dbd) )
 
 	ROM_REGION( 0x1000, "mcu", 0 )  /* I8751 code */
-	ROM_LOAD( "b03__08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) )
+	ROM_LOAD( "b03__08.l2",    0x00000, 0x01000, CRC(7c338c0f) SHA1(b91468c881641f807067835b2dd490cd3e3c577e) ) /* B03 // 08 C8751-88 MCU, verified from deprotected part, 3 bytes different from B03 // 03 */
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "b03__04.s8",    0x00000, 0x08000, CRC(f815ef45) SHA1(4189d455b6ccf3ae922d410fb624c4665203febf) )
@@ -1653,7 +1651,7 @@ ROM_END
    latch on the other ports instead. This bootleg MCU is based on a dump of the
    original b03__03.l2 code, obtained by the pirates through unknown means.
    Barring the bootleg MCU, the actual rom set is an exact copy of sqixr0 above. */
-ROM_START( sqixb1 )
+ROM_START( sqixb1 ) // formerly 'sqixa'
 	ROM_REGION( 0x20000, "maincpu", 0 )
 	ROM_LOAD( "sq01.97",       0x00000, 0x08000, CRC(0888b7de) SHA1(de3e4637436de185f43d2ad4186d4cfdcd4d33d9) ) // == b03__01.ef3
 	ROM_LOAD( "b03__02.h3",     0x10000, 0x10000, CRC(9c23cb64) SHA1(7e04cb18cabdc0031621162cbc228cd95875a022) ) // actual label is something different on the bootleg

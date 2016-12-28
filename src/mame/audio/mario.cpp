@@ -198,11 +198,11 @@ static NETLIST_START(nl_mario)
 	LOCAL_SOURCE(nl_mario_dac)
 
 	SOLVER(Solver, 48000)
-	PARAM(Solver.ACCURACY, 1e-8)
+	PARAM(Solver.ACCURACY, 1e-6)
 	PARAM(Solver.SOR_FACTOR, 1.0)
 	PARAM(Solver.GS_THRESHOLD, 5)
 	PARAM(Solver.GS_LOOPS, 1)
-	//PARAM(Solver.LTE,     5e-2) // Default is not enough for paddle control
+	//PARAM(Solver.LTE,     5e-2)
 	PARAM(Solver.DYNAMIC_TS,  0)
 	ANALOG_INPUT(V5, 5)
 
@@ -898,9 +898,9 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 	MCFG_NETLIST_SETUP(nl_mario)
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd0", "SOUND0.IN", 0, 1)
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd7", "SOUND7.IN", 0, 1)
-	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "dac", "DAC.VAL", 0, 255)
+	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd0", "SOUND0.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT("snd_nl", "snd7", "SOUND7.IN", 0)
+	MCFG_NETLIST_INT_INPUT("snd_nl", "dac", "DAC.VAL", 0, 255)
 
 	MCFG_NETLIST_STREAM_OUTPUT("snd_nl", 0, "ROUT.1")
 	MCFG_NETLIST_ANALOG_MULT_OFFSET(150000.0, 0.0)

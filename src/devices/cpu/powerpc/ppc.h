@@ -243,6 +243,7 @@ public:
 	void ppccom_tlb_flush();
 	void ppccom_execute_mfdcr();
 	void ppccom_execute_mtdcr();
+	void ppccom_get_dsisr();
 
 protected:
 	// device-level overrides

@@ -615,7 +615,7 @@ ROM_START( ladybugb2 ) // bootleg by Model Racing, PCB marked CS299, manual name
 	ROM_LOAD( "l9.f7", 0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
 	ROM_LOAD( "l0.h7", 0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
 
-	ROM_REGION( 0x2000, "gfx2", 0 ) 
+	ROM_REGION( 0x2000, "gfx2", 0 )
 	ROM_LOAD( "l8.l7", 0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
 	ROM_LOAD( "l7.m7", 0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
 

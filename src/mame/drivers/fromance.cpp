@@ -37,7 +37,9 @@ Memo:
 
 - 2player's input is not supported.
 
-- Identify CRT Controller and fix layer misalignment in nekkyoku.
+- Identify CRT Controller and fix layer misalignment in nekkyoku due of dynamic 
+  changes. Actually same custom component as other V-System games of the era, 
+  @seealso aerofgt.cpp 
 
 - nekkyoku: soft reset enables flip screen without any real reason.
 
@@ -734,7 +736,7 @@ static INPUT_PORTS_START( daiyogen )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPNAME( 0x06, 0x00, "Player Initial Score" )  PORT_DIPLOCATION("SW1:!2,!3")
 	PORT_DIPSETTING(    0x00, "1,000" )
-		PORT_DIPSETTING(    0x04, "1,500" )
+	PORT_DIPSETTING(    0x04, "1,500" )
 	PORT_DIPSETTING(    0x02, "2,000" )
 	PORT_DIPSETTING(    0x06, "3,000" )
 	PORT_DIPNAME( 0x18, 0x00, "Computer Difficulty" )   PORT_DIPLOCATION("SW1:!4,!5")
@@ -890,7 +892,7 @@ MACHINE_START_MEMBER(fromance_state,fromance)
 	save_item(NAME(m_directionflag));
 	save_item(NAME(m_commanddata));
 	save_item(NAME(m_portselect));
-	
+
 	save_item(NAME(m_adpcm_reset));
 	save_item(NAME(m_adpcm_data));
 	save_item(NAME(m_vclk_left));
@@ -1266,7 +1268,7 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1988, nekkyoku,  0,       nekkyoku, nekkyoku, driver_device, 0, ROT0, "Video System Co.", "Rettou Juudan Nekkyoku Janshi - Higashi Nippon Hen (Japan)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_GRAPHICS )
 GAME( 1988, idolmj,    0,       idolmj,   idolmj, driver_device,   0, ROT0, "System Service", "Idol-Mahjong Housoukyoku (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, mjnatsu,   0,       fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Mahjong Natsu Monogatari (Japan)", MACHINE_SUPPORTS_SAVE )
 GAME( 1989, natsuiro,  mjnatsu, fromance, mjnatsu, driver_device,  0, ROT0, "Video System Co.", "Natsuiro Mahjong (Japan)", MACHINE_SUPPORTS_SAVE )

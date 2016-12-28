@@ -374,7 +374,9 @@ public:
 		objectdata->data = this;
 		combiner.used = 0;
 		enabled_vertex_attributes = 0;
+		primitives_total_count = 0;
 		indexesleft_count = 0;
+		triangles_bfculled = 0;
 		vertex_pipeline = 4;
 		color_mask = 0xffffffff;
 		backface_culling_enabled = false;
@@ -405,6 +407,8 @@ public:
 		limits_rendertarget.set(0, 0, 640, 480);
 		pitch_rendertarget = 0;
 		pitch_depthbuffer = 0;
+		size_rendertarget = 0;
+		size_depthbuffer = 0;
 		log2height_rendertarget = 0;
 		log2width_rendertarget = 0;
 		dilate_rendertarget = 0;
@@ -483,6 +487,7 @@ public:
 	void savestate_items();
 	void compute_supersample_factors(float &horizontal, float &vertical);
 	void compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel);
+	void compute_size_rendertarget(uint32_t chanel, uint32_t subchannel);
 	void read_vertex(address_space & space, offs_t address, vertex_nv &vertex, int attrib);
 	int read_vertices_0x1800(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	int read_vertices_0x1808(address_space & space, vertex_nv *destination, uint32_t address, int limit);
@@ -490,6 +495,7 @@ public:
 	int read_vertices_0x1818(address_space & space, vertex_nv *destination, uint32_t address, int limit);
 	void convert_vertices_poly(vertex_nv *source, nv2avertex_t *destination, int count);
 	void assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans);
+	int clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo);
 	uint32_t render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	uint32_t render_triangle_culling(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3);
 	void clear_render_target(int what, uint32_t value);
@@ -520,6 +526,8 @@ public:
 	rectangle limits_rendertarget;
 	uint32_t pitch_rendertarget;
 	uint32_t pitch_depthbuffer;
+	uint32_t size_rendertarget;
+	uint32_t size_depthbuffer;
 	int log2height_rendertarget;
 	int log2width_rendertarget;
 	int dilate_rendertarget;
@@ -563,8 +571,10 @@ public:
 		int rectheight;
 		int rectwidth;
 	} texture[4];
+	uint32_t triangles_bfculled;
 	NV2A_BEGIN_END primitive_type;
 	uint32_t primitives_count;
+	uint32_t primitives_total_count;
 	int indexesleft_count;
 	int indexesleft_first;
 	uint32_t indexesleft[1024]; // vertex indices sent by the software to the 3d accelerator
