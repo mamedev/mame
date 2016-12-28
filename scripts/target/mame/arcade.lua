@@ -3608,7 +3608,6 @@ files {
 	MAME_DIR .. "src/mame/drivers/lgp.cpp",
 	MAME_DIR .. "src/mame/drivers/lkage.cpp",
 	MAME_DIR .. "src/mame/includes/lkage.h",
-	MAME_DIR .. "src/mame/machine/lkage.cpp",
 	MAME_DIR .. "src/mame/video/lkage.cpp",
 	MAME_DIR .. "src/mame/drivers/lsasquad.cpp",
 	MAME_DIR .. "src/mame/includes/lsasquad.h",
