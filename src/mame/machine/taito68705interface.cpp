@@ -13,10 +13,11 @@
 	bking.cpp - bking3
 	40love.cpp - 40love
 	bublbobl.cpp - tokio
-	slapfght.cpp - tigerh
+	flstory.cpp - flstory
 
 	and the following with slight changes:
-	slapfght.cpp - slapfght
+	slapfght.cpp - tigerh (inverted status bits read on portC)
+	             - slapfght (extended outputs for scrolling)
 */
 
 const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
