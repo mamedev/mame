@@ -83,27 +83,47 @@
 #include "emu.h"
 #include "includes/mzr8300.h"
 #include "machine/z80sio.h"
+#include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
-#define VERBOSE 0
+#define LOG_GENERAL 0x01
+#define LOG_SETUP   0x02
+#define LOG_PRINTF  0x04
 
-#define LOGPRINT(...) do { if (VERBOSE) logerror(__VA_ARGS__); } while (0)
-#define LOG(...)      LOGPRINT(__VA_ARGS__)
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
-#if VERBOSE >= 2
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+
+#if VERBOSE & LOG_PRINTF
 #define logerror printf
 #endif
 
 #ifdef _MSC_VER
-#define LLFORMAT "%I64%"
 #define FUNCNAME __func__
 #else
-#define LLFORMAT "%lld"
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif
 
+/* These values are borrowed just to get the terminal going and should be replaced
+ * once a proper serial board hardware (ie MZ 8300) is found and emulated. */
+#define BAUDGEN_CLOCK XTAL_19_6608MHz /* fake */
+#define SIO_CLOCK (BAUDGEN_CLOCK / 128) /* This will give prompt */
+
 MACHINE_CONFIG_FRAGMENT( mzr8300 )
-	MCFG_Z80SIO_ADD("sio0", XTAL_4MHz, 0, 0, 0, 0 )
+	MCFG_UPD7201_ADD("sio0", XTAL_4MHz, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK, SIO_CLOCK )
+
+	MCFG_Z80SIO_OUT_TXDB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_txd))
+	MCFG_Z80SIO_OUT_DTRB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_dtr))
+	MCFG_Z80SIO_OUT_RTSB_CB(DEVWRITELINE("rs232p1", rs232_port_device, write_rts))
+
+	MCFG_RS232_PORT_ADD ("rs232p1", default_rs232_devices, "terminal")
+	MCFG_RS232_RXD_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, rxb_w))
+	MCFG_RS232_CTS_HANDLER (DEVWRITELINE ("sio0", upd7201N_device, ctsb_w))
+
 	MCFG_Z80SIO_ADD("sio1", XTAL_4MHz, 0, 0, 0, 0 )
 MACHINE_CONFIG_END
 
@@ -115,14 +135,16 @@ machine_config_constructor vme_p1_mzr8300_device::device_mconfig_additions() con
 }
 
 vme_p1_mzr8300_device::vme_p1_mzr8300_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VME_P1_MZR8300, "Mizar 8300 quad channel SIO board", tag, owner, clock, "vme_mzr8300", __FILE__)
-		,device_vme_p1_card_interface(mconfig, *this)
+	device_t(mconfig, VME_P1_MZR8300, "Mizar 8300 quad channel SIO board", tag, owner, clock, "vme_mzr8300", __FILE__)
+	,device_vme_p1_card_interface(mconfig, *this)
+	,m_sio0(*this, "sio0")
 {
 }
 
 vme_p1_mzr8300_device::vme_p1_mzr8300_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
-		device_t(mconfig, type, name, tag, owner, clock, shortname, source)
-		,device_vme_p1_card_interface(mconfig, *this)
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
+	,device_vme_p1_card_interface(mconfig, *this)
+	,m_sio0(*this, "sio0")
 {
 }
 
@@ -131,32 +153,6 @@ vme_p1_mzr8300_device::vme_p1_mzr8300_device(const machine_config &mconfig, devi
 //-------------------------------------------------
 
 void vme_p1_mzr8300_device::device_start()
-{
-	//	uint32_t slotspace;
-
-	// set_nubus_device makes m_slot valid
-	//set_vme_p1_device();
-
-	//	slotspace = get_slotspace();
-
-	/* Setup r/w handlers for first SIO */
-	//	uint32_t base = 0xFF0000;
-	//	m_vme_p1->install_device(base,     base + 3, 
-	//	read8_delegate(FUNC(vme_p1_mzr8300_device::mzr8300_r), this), 
-	//	write8_delegate(FUNC(vme_p1_mzr8300_device::mzr8300_w), this), 0xffffffff);
-//		read8_delegate(FUNC(z80sio_device::ba_cd_r),  subdevice<z80sio_device>("sio0")), 
-//		write8_delegate(FUNC(z80sio_device::ba_cd_w), subdevice<z80sio_device>("sio0")), 0xffffffff);
-//	m_vme_p1->install_device(base + 3, base + 7, 
-//		read8_delegate(FUNC(z80sio_device::ba_cd_r),  subdevice<z80sio_device>("sio1")), 
-//		write8_delegate(FUNC(z80sio_device::ba_cd_w), subdevice<z80sio_device>("sio1")), 0xffffffff);
-}
-
-READ8_MEMBER(vme_p1_mzr8300_device::mzr8300_r)
-{
-	return 0;
-}
-
-WRITE8_MEMBER(vme_p1_mzr8300_device::mzr8300_w)
 {
 }
 
