@@ -1190,7 +1190,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 /*
 * Sets up the PC, SSW and PSW to handle an exception.
 */
-uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts = CTS_NO_CPU_TRAP, uint32_t mts = MTS_NO_MEMORY_TRAP)
+uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint32_t mts)
 {
 	uint32_t previous_mode;
 

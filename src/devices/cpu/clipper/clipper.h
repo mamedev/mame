@@ -246,7 +246,7 @@ private:
 
 	bool clipper_device::evaluate_branch(uint32_t condition);
 
-	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts, uint32_t mts);
+	uint32_t clipper_device::intrap(uint32_t vector, uint32_t pc, uint32_t cts = CTS_NO_CPU_TRAP, uint32_t mts = MTS_NO_MEMORY_TRAP);
 };
 
 extern const device_type CLIPPER;
