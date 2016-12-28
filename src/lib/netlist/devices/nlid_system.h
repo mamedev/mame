@@ -526,6 +526,7 @@ namespace netlist
 			register_subalias("Q", m_RV.m_P);
 
 			connect_late(m_RV.m_N, m_GNDHack);
+			//printf("%s %s\n", out_proxied->name().cstr(), out_proxied->device().name().cstr());
 		}
 
 		virtual ~nld_d_to_a_proxy() {}

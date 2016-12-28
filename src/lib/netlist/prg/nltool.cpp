@@ -225,8 +225,8 @@ struct input_t
 	{
 		switch (m_param->param_type())
 		{
-			case netlist::param_t::MODEL:
 			case netlist::param_t::STRING:
+			case netlist::param_t::POINTER:
 				throw netlist::nl_exception(plib::pfmt("param {1} is not numeric\n")(m_param->name()));
 			case netlist::param_t::DOUBLE:
 				static_cast<netlist::param_double_t*>(m_param)->setTo(m_value);
@@ -236,9 +236,6 @@ struct input_t
 				break;
 			case netlist::param_t::LOGIC:
 				static_cast<netlist::param_logic_t*>(m_param)->setTo(static_cast<bool>(m_value));
-				break;
-			case netlist::param_t::POINTER:
-				static_cast<netlist::param_ptr_t*>(m_param)->setTo(nullptr);
 				break;
 		}
 	}

@@ -10891,6 +10891,7 @@ ddream95                        // MCE (c) 1996 Data East Corporation
 hoops95                         // MCE (c) 1996 Data East Corporation
 hoops96                         // MCE (c) 1996 Data East Corporation
 skullfng                        // MCH (c) 1996 Data East Corporation (World)
+skullfnga                       // MCH (c) 1996 Data East Corporation (Asia)
 skullfngj                       // MCH (c) 1996 Data East Corporation (Japan)
 stadhr96                        // MCM (c) 1996 Data East Corporation (World)
 stadhr96j                       // MCM (c) 1996 Data East Corporation (Japan)
@@ -12311,6 +12312,7 @@ super9ccsp                      // * Spanish
 feagv10                         //
 feagv11                         //
 feagv2                          //
+feagv2a                         //
 feagv7                          //
 feagv9                          //
 fexcel68k                       //

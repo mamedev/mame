@@ -193,7 +193,10 @@ namespace netlist
 
 		pstring build_fqn(const pstring &obj_name) const;
 
-		void register_and_set_param(pstring name, param_t &param);
+		void register_param(pstring name, param_t &param);
+		pstring get_initial_param_val(const pstring name, const pstring def);
+		double get_initial_param_val(const pstring name, const double def);
+		int get_initial_param_val(const pstring name, const int def);
 
 		void register_term(detail::core_terminal_t &obj);
 

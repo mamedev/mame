@@ -60,7 +60,7 @@ namespace netlist
 
 		NETLIB_RESETI()
 		{
-			m_enableq = 1;
+			m_enableq = 0;
 			m_out = 0;
 			m_inc = netlist_time::zero();
 		}
