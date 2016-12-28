@@ -11,6 +11,7 @@
     such as Arena(in editmode).
 
     TODO:
+    - configurable RAM size
     - how does dual-CPU work?
     - EAG IRQ level/timing is unknown
     - USART is not emulated
