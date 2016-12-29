@@ -11,7 +11,7 @@ public:
 
 	~taito68705_mcu_device() {}
 
-	DECLARE_WRITE8_MEMBER( mcu_w );
+	virtual DECLARE_WRITE8_MEMBER( mcu_w );
 	DECLARE_READ8_MEMBER( mcu_r );
 	DECLARE_READ8_MEMBER( mcu_porta_r );
 	virtual DECLARE_READ8_MEMBER( mcu_portc_r );
@@ -74,3 +74,13 @@ public:
 };
 
 extern const device_type TAITO68705_MCU_TIGER;
+
+class taito68705_mcu_beg_device : public taito68705_mcu_device
+{
+public:
+	taito68705_mcu_beg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	virtual DECLARE_WRITE8_MEMBER(mcu_w) override;
+	virtual DECLARE_WRITE8_MEMBER(mcu_portb_w) override;
+};
+
+extern const device_type TAITO68705_MCU_BEG;

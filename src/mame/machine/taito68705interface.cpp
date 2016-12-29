@@ -22,6 +22,8 @@
 	and the following with slight changes:
 	slapfght.cpp - tigerh (inverted status bits read on portC)
 	             - slapfght (extended outputs for scrolling)
+ 	bigevglf.cpp - writes to mcu aren't latched(?)f
+
 
 	not hooked up here, but possible (needs investigating)
 	pitnrun.cpp - have more functionality on portB, currently using 'instant timers' for latches
@@ -31,7 +33,6 @@
 	xain.cpp - not a Taito game (licensed to Taito?) but MCU hookup looks almost the same
 	renegade.cpp - ^^
 	matmania.cpp - ^^
-	bigevglf.cpp - can probably be hooked up
 
 	68705 sets in Taito drivers that are NOT suitable for hookup here?
 	bublbobl.cpp - bub68705 - this is a bootleg, not an official Taito hookup
@@ -46,6 +47,7 @@
 const device_type TAITO68705_MCU = &device_creator<taito68705_mcu_device>;
 const device_type TAITO68705_MCU_SLAP = &device_creator<taito68705_mcu_slap_device>;
 const device_type TAITO68705_MCU_TIGER = &device_creator<taito68705_mcu_tiger_device>;
+const device_type TAITO68705_MCU_BEG = &device_creator<taito68705_mcu_beg_device>;
 
 taito68705_mcu_device::taito68705_mcu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, TAITO68705_MCU, "Taito M68705 MCU Interface", tag, owner, clock, "taito68705", __FILE__),
@@ -309,3 +311,44 @@ READ8_MEMBER(taito68705_mcu_tiger_device::mcu_portc_r)
 
 	return ret;
 }
+
+
+/* Big Event Golf has some things switched around, handle them here */
+
+taito68705_mcu_beg_device::taito68705_mcu_beg_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: taito68705_mcu_device(mconfig, TAITO68705_MCU_BEG, "Taito M68705 MCU Interface (Big Event Golf)", tag, owner, clock, "taito68705bigevglf", __FILE__)
+{
+}
+
+WRITE8_MEMBER(taito68705_mcu_beg_device::mcu_portb_w)
+{
+	// transitions are reversed
+    if ((mem_mask & 0x02) && (data & 0x02) && (~m_old_portB & 0x02) ) /* positive going transition of the clock */
+    {
+		//if (m_main_sent)
+			m_mcu->set_input_line(0, CLEAR_LINE);
+
+		//m_to_mcu_latch = m_from_main; // this is weird, no latching?!
+		m_main_sent = false;
+    }
+    if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04)  ) /* positive going transition of the clock */
+    {
+		m_from_mcu = m_from_mcu_latch;
+		m_mcu_sent = true;
+	//  logerror("sent %02x\n", m_from_mcu);
+    }
+
+   	m_old_portB = data;
+}
+
+WRITE8_MEMBER(taito68705_mcu_beg_device::mcu_w)
+{
+//  logerror("%s: mcu_w %02x\n", space.machine().describe_context(), data);
+
+	m_to_mcu_latch = data; // this is weird, no latching?!
+	m_main_sent = true;
+	m_mcu->set_input_line(0, ASSERT_LINE);
+
+}
+
+
