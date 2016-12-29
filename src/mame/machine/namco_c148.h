@@ -44,12 +44,22 @@ public:
 	
 	DECLARE_READ8_MEMBER( vblank_irq_level_r );
 	DECLARE_WRITE8_MEMBER( vblank_irq_level_w );
-	DECLARE_READ8_MEMBER( vblank_irq_ack_r );
-	DECLARE_WRITE8_MEMBER( vblank_irq_ack_w );
+	DECLARE_READ16_MEMBER( vblank_irq_ack_r );
+	DECLARE_WRITE16_MEMBER( vblank_irq_ack_w );
+
+	DECLARE_READ8_MEMBER( pos_irq_level_r );
+	DECLARE_WRITE8_MEMBER( pos_irq_level_w );
+	DECLARE_READ16_MEMBER( pos_irq_ack_r );
+	DECLARE_WRITE16_MEMBER( pos_irq_ack_w );
+
+	DECLARE_READ8_MEMBER( ext_posirq_line_r );
+	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
+
 	DECLARE_WRITE8_MEMBER( ext2_w );
 	void vblank_irq_trigger();
-	//uint8_t posirq_line();
-	
+	void pos_irq_trigger();
+	uint8_t get_posirq_line();
+
 protected:
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
@@ -60,12 +70,14 @@ private:
 	const char *m_hostcpu_tag;		/**< host cpu tag name */
 	bool		m_hostcpu_master;	/**< define if host cpu is master */
 	struct{
-		uint8_t cpuirq;
-		uint8_t exirq;
-		uint8_t sciirq;
-		uint8_t posirq;
+		uint8_t cpu;
+		uint8_t ex;
+		uint8_t sci;
+		uint8_t pos;
 		uint8_t vblank;
 	}m_irqlevel;
+	uint8_t m_posirq_line;
+	void flush_irq_acks();
 };
 
 

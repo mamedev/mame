@@ -1497,11 +1497,11 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
@@ -1509,7 +1509,7 @@ static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x600000, 0x6fffff) AM_ROM AM_REGION("gdata", 0)
 	AM_RANGE(0xc00000, 0xcfffff) AM_READWRITE(winrun_gpu_videoram_r,winrun_gpu_videoram_w)
 	AM_RANGE(0xd00000, 0xd0000f) AM_READWRITE(winrun_gpu_register_r,winrun_gpu_register_w)
-//  AM_RANGE(0xe0000c, 0xe0000d) POSIRQ
+	AM_RANGE(0xe0000c, 0xe0000d) AM_DEVREADWRITE8("gpu_intc", namco_c148_device, ext_posirq_line_r,ext_posirq_line_w,0x00ff)
 ADDRESS_MAP_END
 
 
@@ -1979,10 +1979,14 @@ MACHINE_CONFIG_END
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::winrun_gpu_scanline)
 {
 	int scanline = param;
-
-	if(scanline == 240*2) 
+	
+	if(scanline == 240*2)
 		m_gpu_intc->vblank_irq_trigger();
 		
+	if(scanline == m_gpu_intc->get_posirq_line()*2)
+	{
+		m_gpu_intc->pos_irq_trigger();
+	}
 }
 
 static MACHINE_CONFIG_START( winrun, namcos21_state )

@@ -64,15 +64,15 @@ namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *
 DEVICE_ADDRESS_MAP_START( map, 16, namco_c148_device )
 //	AM_RANGE(0x06000, 0x07fff) // CPUIRQ lv
 //	AM_RANGE(0x08000, 0x09fff) // EXIRQ lv
-//	AM_RANGE(0x0a000, 0x0bfff) // POSIRQ lv
+	AM_RANGE(0x0a000, 0x0bfff) AM_READWRITE8(pos_irq_level_r,pos_irq_level_w,0x00ff) // POSIRQ lv
 //	AM_RANGE(0x0c000, 0x0dfff) // SCIRQ lv
 	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE8(vblank_irq_level_r,vblank_irq_level_w,0x00ff) // VBlank IRQ lv
 
 //	AM_RANGE(0x16000, 0x17fff) // CPUIRQ ack
 //	AM_RANGE(0x18000, 0x19fff) // EXIRQ ack
-//	AM_RANGE(0x1a000, 0x1bfff) // POSIRQ ack
+	AM_RANGE(0x1a000, 0x1bfff) AM_READWRITE(pos_irq_ack_r, pos_irq_ack_w) // POSIRQ ack
 //	AM_RANGE(0x1c000, 0x1dfff) // SCIRQ ack
-	AM_RANGE(0x1e000, 0x1ffff) AM_READWRITE8(vblank_irq_ack_r, vblank_irq_ack_w, 0x00ff) // VBlank IRQ ack
+	AM_RANGE(0x1e000, 0x1ffff) AM_READWRITE(vblank_irq_ack_r, vblank_irq_ack_w) // VBlank IRQ ack
 //	AM_RANGE(0x20000, 0x21fff) // EEPROM ready status (*)
 	AM_RANGE(0x22000, 0x23fff) AM_WRITE8(ext2_w,0x00ff) // sound CPU reset (*)
 //	AM_RANGE(0x24000, 0x25fff) // slave & i/o reset (*)
@@ -98,11 +98,23 @@ void namco_c148_device::device_start()
 void namco_c148_device::device_reset()
 {
 	m_irqlevel.vblank = 0;
+	m_irqlevel.pos = 0;
 }
 
 //**************************************************************************
 //  READ/WRITE HANDLERS
 //**************************************************************************
+
+READ8_MEMBER( namco_c148_device::pos_irq_level_r )
+{
+	return m_irqlevel.pos & 0x7;
+}
+
+WRITE8_MEMBER( namco_c148_device::pos_irq_level_w )
+{
+	m_irqlevel.pos = data & 7;
+	flush_irq_acks();
+}
 
 READ8_MEMBER( namco_c148_device::vblank_irq_level_r )
 {
@@ -112,28 +124,71 @@ READ8_MEMBER( namco_c148_device::vblank_irq_level_r )
 WRITE8_MEMBER( namco_c148_device::vblank_irq_level_w )
 {
 	m_irqlevel.vblank = data & 7;
+	flush_irq_acks();
 }
 
-READ8_MEMBER( namco_c148_device::vblank_irq_ack_r )
+READ16_MEMBER( namco_c148_device::vblank_irq_ack_r )
 {
 	m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE);
 	return 0;
 }
 
-WRITE8_MEMBER( namco_c148_device::vblank_irq_ack_w )
+WRITE16_MEMBER( namco_c148_device::vblank_irq_ack_w )
 {
 	m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE);
 }
 
+WRITE16_MEMBER( namco_c148_device::pos_irq_ack_w )
+{
+	m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);
+}
+
+READ16_MEMBER( namco_c148_device::pos_irq_ack_r )
+{
+	m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);
+	return 0;
+}
+
+
+
 WRITE8_MEMBER( namco_c148_device::ext2_w )
 {
-	// TODO: sync flag for GPU in winrun?
-	if(data & 2)
-		m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE);
+	// TODO: bit 1 might be irq enable?
 }
+
+READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
+{
+	return m_posirq_line;
+}
+
+WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
+{
+	m_posirq_line = data;
+}
+
+//**************************************************************************
+//  GETTERS/SETTERS
+//**************************************************************************
 
 void namco_c148_device::vblank_irq_trigger()
 {
 	m_hostcpu->set_input_line(m_irqlevel.vblank, ASSERT_LINE);
 }
 
+void namco_c148_device::pos_irq_trigger()
+{
+	m_hostcpu->set_input_line(m_irqlevel.pos, ASSERT_LINE);
+}
+
+void namco_c148_device::flush_irq_acks()
+{
+	// If writing an IRQ priority register, clear any pending IRQs.
+
+	for(int i=0;i<8;i++)
+		m_hostcpu->set_input_line(i, CLEAR_LINE);
+}
+
+uint8_t namco_c148_device::get_posirq_line()
+{
+	return m_posirq_line;
+}
