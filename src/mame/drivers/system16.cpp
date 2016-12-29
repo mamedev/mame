@@ -122,6 +122,18 @@ WRITE16_MEMBER(segas1x_bootleg_state::sound_command_irq_w)
 	}
 }
 
+READ8_MEMBER(segas1x_bootleg_state::sound_command_irq_r)
+{
+	m_soundcpu->set_input_line(0, CLEAR_LINE);
+	return m_soundlatch->read(space, 0, 0xff);
+}
+
+WRITE8_MEMBER(segas1x_bootleg_state::soundbank_msm_w)
+{
+	m_soundbank->set_entry((data & 7) ^ 6); // probably wrong
+	m_msm->reset_w(BIT(data, 3));
+}
+
 
 static ADDRESS_MAP_START( shinobib_map, AS_PROGRAM, 16, segas1x_bootleg_state )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -424,19 +436,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(shinobi_datsu_sound_map, AS_PROGRAM, 8, segas1x_bootleg_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-
+	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("soundbank")
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ym1", ym2203_device, read, write)
 	AM_RANGE(0xe400, 0xe401) AM_DEVREADWRITE("ym2", ym2203_device, read, write)
-	AM_RANGE(0xe800, 0xe800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
-
+	AM_RANGE(0xe800, 0xe800) AM_READ(sound_command_irq_r)
+	AM_RANGE(0xec00, 0xec00) AM_DEVWRITE("adpcm_select", ls157_device, ba_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundbank_msm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shinobi_datsu_sound_io, AS_IO, 8, segas1x_bootleg_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
+WRITE_LINE_MEMBER(segas1x_bootleg_state::datsu_msm5205_callback)
+{
+	if (!state)
+		return;
 
-
+	m_sample_select = !m_sample_select;
+	m_adpcm_select->select_w(m_sample_select);
+	m_soundcpu->set_input_line(INPUT_LINE_NMI, m_sample_select);
+}
 
 /*******************************************************************************/
 
@@ -817,7 +834,7 @@ static ADDRESS_MAP_START( goldnaxeb2_map, AS_PROGRAM, 16, segas1x_bootleg_state 
 	AM_RANGE(0xc44060, 0xc44067) AM_WRITE(goldnaxeb2_fgpage_w) AM_SHARE("gab2_fgpage")
 	AM_RANGE(0xc46000, 0xc46001) AM_WRITENOP
 	AM_RANGE(0xc43034, 0xc43035) AM_WRITENOP
-	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITENOP
+	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE(sound_command_irq_w)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM // work ram
 ADDRESS_MAP_END
 
@@ -2062,18 +2079,15 @@ static MACHINE_CONFIG_FRAGMENT( datsu_ym2151_msm5205 )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_FRAGMENT( datsu_2x_ym2203 )
+static MACHINE_CONFIG_FRAGMENT( datsu_2x_ym2203_msm5205 )
 	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
-	MCFG_CPU_PERIODIC_INT_DRIVER(segas1x_bootleg_state, nmi_line_pulse,  3000) // or from the YM2203?
 	MCFG_CPU_PROGRAM_MAP(shinobi_datsu_sound_map)
-	MCFG_CPU_IO_MAP(shinobi_datsu_sound_io)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	// 2x YM2203C, one at U57, one at U56
 	MCFG_SOUND_ADD("ym1", YM2203, 4000000)
-//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
@@ -2081,10 +2095,17 @@ static MACHINE_CONFIG_FRAGMENT( datsu_2x_ym2203 )
 
 	MCFG_SOUND_ADD("ym2", YM2203, 4000000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.50)
-//  MCFG_YM2203_IRQ_HANDLER(WRITELINE(segas1x_bootleg_state, datsu_irq_handler))
 	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 	MCFG_SOUND_ROUTE(2, "mono", 0.50)
 	MCFG_SOUND_ROUTE(3, "mono", 0.80)
+
+	MCFG_DEVICE_ADD("adpcm_select", LS157, 0)
+	MCFG_74157_OUT_CB(DEVWRITE8("5205", msm5205_device, data_w))
+
+	MCFG_SOUND_ADD("5205", MSM5205, 384000)
+	MCFG_MSM5205_VCLK_CB(WRITELINE(segas1x_bootleg_state, datsu_msm5205_callback))
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S48_4B)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -2130,7 +2151,7 @@ static MACHINE_CONFIG_DERIVED( shinobi_datsu, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203)
+	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 MACHINE_CONFIG_END
 
 
@@ -2167,7 +2188,9 @@ static MACHINE_CONFIG_DERIVED( passsht4b, system16_base )
 	MCFG_SCREEN_MODIFY("screen")
 	MCFG_SCREEN_UPDATE_DRIVER(segas1x_bootleg_state, screen_update_s16a_bootleg_passht4b)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203)
+	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	MCFG_DEVICE_MODIFY("5205")
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wb3bb, system16_base )
@@ -2231,7 +2254,7 @@ static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb_base )
 	MCFG_CPU_PROGRAM_MAP(goldnaxeb2_map)
 	MCFG_DEVICE_REMOVE_ADDRESS_MAP(AS_DECRYPTED_OPCODES)
 
-	MCFG_FRAGMENT_ADD(datsu_ym2151_msm5205)
+	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
 MACHINE_CONFIG_END
 
 
@@ -2314,7 +2337,9 @@ static MACHINE_CONFIG_DERIVED( altbeastbl, system16_base )
 	MCFG_BOOTLEG_SYS16B_SPRITES_ADD("sprites")
 	MCFG_BOOTLEG_SYS16B_SPRITES_XORIGIN(189-112)
 
-	MCFG_FRAGMENT_ADD(datsu_2x_ym2203)
+	MCFG_FRAGMENT_ADD(datsu_2x_ym2203_msm5205)
+	MCFG_DEVICE_MODIFY("5205")
+	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_S96_4B)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( beautyb, system16_base )
@@ -2512,8 +2537,9 @@ ROM_START( shinobld )
 	ROM_LOAD16_BYTE( "7.bin", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
 	ROM_LOAD16_BYTE( "1.bin", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU + data */
+	ROM_REGION( 0x20000, "soundcpu", 0 ) /* sound CPU + data */
 	ROM_LOAD( "16.bin", 0x0000, 0x10000, CRC(52c8364e) SHA1(01d30b82f92498d155d2e31d43d58dff0285cce3) )
+	ROM_RELOAD( 0x10000, 0x10000 )
 ROM_END
 
 ROM_START( shinoblda )
@@ -2538,8 +2564,9 @@ ROM_START( shinoblda )
 	ROM_LOAD16_BYTE( "7.bin", 0x60001, 0x10000, CRC(41f41063) SHA1(5cc461e9738dddf9eea06831fce3702d94674163) )
 	ROM_LOAD16_BYTE( "1.bin", 0x60000, 0x10000, CRC(b6e1fd72) SHA1(eb86e4bf880bd1a1d9bcab3f2f2e917bcaa06172) )
 
-	ROM_REGION( 0x10000, "soundcpu", 0 ) /* sound CPU + data */
+	ROM_REGION( 0x20000, "soundcpu", 0 ) /* sound CPU + data */
 	ROM_LOAD( "16.bin", 0x0000, 0x10000, CRC(52c8364e) SHA1(01d30b82f92498d155d2e31d43d58dff0285cce3) )
+	ROM_RELOAD( 0x10000, 0x10000 )
 ROM_END
 
 /* Passing Shot Bootleg is a decrypted version of Passing Shot Japanese (passshtj). It has been heavily modified */
@@ -3582,6 +3609,11 @@ DRIVER_INIT_MEMBER(segas1x_bootleg_state,common)
 
 	m_beautyb_unkx = 0;
 
+	if (m_soundbank.found())
+	{
+		m_soundbank->configure_entries(0, 8, memregion("soundcpu")->base(), 0x4000);
+		m_soundbank->set_entry(0);
+	}
 }
 
 /* Sys16A */
@@ -3857,7 +3889,7 @@ GAME( 1988, wb3bble,     wb3,       wb3bb,       wb3b, segas1x_bootleg_state,   
 GAME( 1989, bayrouteb1,  bayroute,  bayrouteb1,  bayroute, segas1x_bootleg_state,  bayrouteb1, ROT0,   "bootleg (Datsu)", "Bay Route (encrypted, protected bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING ) // broken sprites (due to missing/wrong irq code?)
 GAME( 1989, bayrouteb2,  bayroute,  bayrouteb2,  bayroute, segas1x_bootleg_state,  bayrouteb2, ROT0,   "bootleg (Datsu)", "Bay Route (Datsu bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
 GAME( 1989, goldnaxeb1,  goldnaxe,  goldnaxeb1,  goldnaxe, segas1x_bootleg_state,  goldnaxeb1, ROT0,   "bootleg", "Golden Axe (encrypted bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
-GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_NO_SOUND )
+GAME( 1989, goldnaxeb2,  goldnaxe,  goldnaxeb2,  goldnaxe, segas1x_bootleg_state,  goldnaxeb2, ROT0,   "bootleg", "Golden Axe (bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, tturfbl,     tturf,     tturfbl,     tturf, segas1x_bootleg_state,     tturfbl,    ROT0,   "bootleg (Datsu)", "Tough Turf (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )
 GAME( 1989, dduxbl,      ddux,      dduxbl,      ddux, segas1x_bootleg_state,      dduxbl,     ROT0,   "bootleg (Datsu)", "Dynamite Dux (Datsu bootleg)", MACHINE_NOT_WORKING )
 GAME( 1988, altbeastbl,  altbeast,  altbeastbl,  tetris, segas1x_bootleg_state,    altbeastbl, ROT0,   "bootleg (Datsu)", "Altered Beast (Datsu bootleg)", MACHINE_NOT_WORKING | MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND )

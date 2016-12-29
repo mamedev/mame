@@ -4914,12 +4914,13 @@ DRIVER_INIT_MEMBER(royalmah_state,janptr96)
 	machine().device<nvram_device>("nvram")->set_base(m_janptr96_nvram.get(), 0x1000 * 9);
 }
 
+// the original Janputer (Sanritsu) is not yet dumped, basically Royal Mahjong but non-BET type
 GAME( 1981,  royalmj,  0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Nichibutsu",                 "Royal Mahjong (Japan, v1.13)",          0 )
 GAME( 1981?, openmj,   royalmj,  royalmah, royalmah, driver_device,  0,        ROT0,   "Sapporo Mechanic",           "Open Mahjong [BET] (Japan)",            0 )
 GAME( 1982,  royalmah, royalmj,  royalmah, royalmah, driver_device,  0,        ROT0,   "bootleg",                    "Royal Mahjong (Falcon bootleg, v1.01)", 0 )
 GAME( 1983,  janyoup2, royalmj,  ippatsu,  janyoup2, driver_device,  0,        ROT0,   "Cosmo Denshi",               "Janyou Part II (ver 7.03, July 1 1983)",0 )
 GAME( 1985,  tahjong,  royalmj,  tahjong,  tahjong,  driver_device,  0,        ROT0,   "Bally Pond / Nasco",         "Tahjong Yakitori (ver. 2-1)",           0 ) // 1985 Jun. 17
-GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "bootleg (Public Software Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Janputer)", 0 ) // the original Janputer (Sanritsu) is not yet dumped
+GAME( 1981,  janputer, 0,        royalmah, royalmah, driver_device,  0,        ROT0,   "bootleg (Paradise Denshi Ltd. / Mes)", "New Double Bet Mahjong (bootleg of Royal Mahjong) [BET]", 0 ) // MT #05392
 GAME( 1984,  janoh,    0,        royalmah, royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 1)",                        MACHINE_NOT_WORKING )
 GAME( 1984,  janoha,   janoh,    janoh,    royalmah, driver_device,  0,        ROT0,   "Toaplan",                    "Jan Oh (set 2)",                        MACHINE_NOT_WORKING ) // this one is complete?
 GAME( 1985,  jansou,   0,        jansou,   jansou,   driver_device,  0,        ROT0,   "Dyna",                       "Jansou (set 1)",                        MACHINE_NOT_WORKING|MACHINE_NO_SOUND )
@@ -4936,8 +4937,8 @@ GAME( 1987,  tontonb,  0,        tontonb,  tontonb,  driver_device,  0,        R
 GAME( 1987,  makaijan, 0,        makaijan, makaijan, driver_device,  0,        ROT0,   "Dynax",                      "Makaijan [BET] (Japan)",                0 )
 GAME( 1988,  majs101b, 0,        majs101b, majs101b, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Studio 101 [BET] (Japan)",      0 )
 GAME( 1988,  mjapinky, 0,        mjapinky, mjapinky, driver_device,  0,        ROT0,   "Dynax",                      "Almond Pinky [BET] (Japan)",            0 )
-GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     0 )
-GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   0 )
+GAME( 1989,  mjdejavu, 0,        mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu (Japan)",     MACHINE_NOT_WORKING ) // MT #00964
+GAME( 1989,  mjdejav2, mjdejavu, mjdejavu, mjdejavu, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Shinkirou Deja Vu 2 (Japan)",   MACHINE_NOT_WORKING )
 GAME( 1989,  mjderngr, 0,        mjderngr, mjderngr, driver_device,  0,        ROT0,   "Dynax",                      "Mahjong Derringer (Japan)",             0 )
 GAME( 1989,  daisyari, 0,        daisyari, daisyari, driver_device,  0,        ROT0,   "Best System",                "Daisyarin [BET] (Japan)",               0 )
 GAME( 1990,  mjifb,    0,        mjifb,    mjifb,    driver_device,  0,        ROT0,   "Dynax",                      "Mahjong If...? [BET]",                  0 )

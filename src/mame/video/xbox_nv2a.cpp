@@ -5,8 +5,10 @@
 #include "bitmap.h"
 #include "machine/pic8259.h"
 #include "includes/xbox_nv2a.h"
+#include <bitset>
 
 //#define LOG_NV2A
+#define DEBUG_CHECKS // enable for debugging
 
 const char *vertex_program_disassembler::srctypes[] = { "??", "Rn", "Vn", "Cn" };
 const char *vertex_program_disassembler::scaops[] = { "NOP", "IMV", "RCP", "RCC", "RSQ", "EXP", "LOG", "LIT", "???", "???", "???", "???", "???", "???", "???", "???", "???" };
@@ -146,19 +148,23 @@ int vertex_program_disassembler::disassemble_mask(int mask, char *s)
 		return 0;
 	s[0] = '.';
 	l = 1;
-	if ((mask & 8) != 0) {
+	if ((mask & 8) != 0)
+	{
 		s[l] = 'x';
 		l++;
 	}
-	if ((mask & 4) != 0){
+	if ((mask & 4) != 0)
+	{
 		s[l] = 'y';
 		l++;
 	}
-	if ((mask & 2) != 0){
+	if ((mask & 2) != 0)
+	{
 		s[l] = 'z';
 		l++;
 	}
-	if ((mask & 1) != 0){
+	if ((mask & 1) != 0)
+	{
 		s[l] = 'w';
 		l++;
 	}
@@ -909,8 +915,8 @@ void nv2a_renderer::computedilated(void)
 
 	for (b = 0; b < 16; b++)
 		for (a = 0; a < 2048; a++) {
-		dilated0[b][a] = dilate0(a, b);
-		dilated1[b][a] = dilate1(a, b);
+			dilated0[b][a] = dilate0(a, b);
+			dilated1[b][a] = dilate1(a, b);
 		}
 	for (b = 0; b < 16; b++)
 		for (a = 0; a < 16; a++)
@@ -919,6 +925,10 @@ void nv2a_renderer::computedilated(void)
 
 inline uint8_t *nv2a_renderer::direct_access_ptr(offs_t address)
 {
+#ifdef DEBUG_CHECKS
+	if (address >= 512*1024*1024)
+		machine().logerror("Bad address in direct_access_ptr !\n");
+#endif
 	return basemempointer + address;
 }
 
@@ -1267,6 +1277,13 @@ inline uint8_t *nv2a_renderer::read_pixel(int x, int y, int32_t c[4])
 		offset = (dilated0[dilate_rendertarget][x] + dilated1[dilate_rendertarget][y]) * bytespixel_rendertarget;
 	else // type_rendertarget == LINEAR
 		offset = pitch_rendertarget * y + x * bytespixel_rendertarget;
+#ifdef DEBUG_CHECKS
+	if (offset >= size_rendertarget)
+	{
+		machine().logerror("Bad offset computed in read_pixel !\n");
+		offset = 0;
+	}
+#endif
 	switch (colorformat_rendertarget) {
 	case NV2A_COLOR_FORMAT::R5G6B5:
 		addr16 = (uint16_t *)((uint8_t *)rendertarget + offset);
@@ -1317,13 +1334,20 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 	bool stencil_passed;
 	bool depth_passed;
 
-	if ((depth > 0xffffff) || (depth < 0))
+	if ((depth > 0xffffff) || (depth < 0) || (x < 0))
 		return;
 	fb[3] = fb[2] = fb[1] = fb[0] = 0;
 	addr = nullptr;
 	if (color_mask != 0)
 		addr = read_pixel(x, y, fb);
 	if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z24S8) {
+#ifdef DEBUG_CHECKS
+		if (((pitch_depthbuffer / 4) * y + x) >= size_depthbuffer)
+		{
+			machine().logerror("Bad depthbuffer offset computed in write_pixel !\n");
+			return;
+		}
+#endif
 		daddr32 = depthbuffer + (pitch_depthbuffer / 4) * y + x;
 		deptsten = *daddr32;
 		dep = deptsten >> 8;
@@ -1331,6 +1355,13 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 		daddr16 = nullptr;
 	}
 	else if (depthformat_rendertarget == NV2A_RT_DEPTH_FORMAT::Z16) {
+#ifdef DEBUG_CHECKS
+		if (((pitch_depthbuffer / 2) * y + x) >= size_depthbuffer)
+		{
+			machine().logerror("Bad depthbuffer offset computed in write_pixel !\n");
+			return;
+		}
+#endif
 		daddr16 = (uint16_t *)depthbuffer + (pitch_depthbuffer / 2) * y + x;
 		deptsten = *daddr16;
 		dep = (deptsten << 8) | 0xff;
@@ -1907,23 +1938,29 @@ void nv2a_renderer::write_pixel(int x, int y, uint32_t color, int depth)
 
 void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x;
+	int x, lx;
 
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
-	x = extent.stopx - extent.startx - 1; // number of pixels to draw
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	while (x >= 0) {
 		uint32_t a8r8g8b8;
 		int z;
 		int ca, cr, cg, cb;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
-		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		a8r8g8b8 = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1931,30 +1968,36 @@ void nv2a_renderer::render_color(int32_t scanline, const extent_t &extent, const
 
 void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x;
+	int x, lx;
 	uint32_t a8r8g8b8;
-	int z;
 
 	if (!objectdata.data->texture[0].enabled) {
 		return;
 	}
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
-	x = extent.stopx - extent.startx - 1;
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	while (x >= 0) {
 		int up, vp;
+		int z;
 		int xp = extent.startx + x; // x coordinate of current pixel
 
 		if (objectdata.data->texture[0].rectangle == false) {
-			up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx)*(float)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
-			vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx)*(float)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
+			up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx)*(double)(objectdata.data->texture[0].sizeu - 1); // x coordinate of texel in texture
+			vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx)*(double)(objectdata.data->texture[0].sizev - 1); // y coordinate of texel in texture
 		} else
 		{
-			up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx; // x coordinate of texel in texture
-			vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx; // y coordinate of texel in texture
+			up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U].dpdx; // x coordinate of texel in texture
+			vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V].dpdx; // y coordinate of texel in texture
 		}
 		a8r8g8b8 = texture_get_texel(0, up, vp);
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -1962,7 +2005,7 @@ void nv2a_renderer::render_texture_simple(int32_t scanline, const extent_t &exte
 
 void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &extent, const nvidia_object_data &objectdata, int threadid)
 {
-	int x, xp;
+	int x, lx, xp;
 	int up, vp;
 	int ca, cr, cg, cb;
 	uint32_t color[6];
@@ -1972,30 +2015,36 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &
 
 	color[0] = color[1] = color[2] = color[3] = color[4] = color[5] = 0;
 
-	if ((extent.startx < 0) || (extent.stopx > 640*4))
+	lx = limits_rendertarget.right();
+	if ((extent.startx < 0) && (extent.stopx <= 0))
 		return;
+	if ((extent.startx > lx) && (extent.stopx > lx))
+		return;
+	x = extent.stopx - extent.startx; // number of pixels to draw (start inclusive, end exclusive)
+	if (extent.stopx > lx)
+		x = x - (extent.stopx - lx - 1);
+	x--;
 	std::lock_guard<std::mutex> lock(combiner.lock); // needed since multithreading is not supported yet
-	x = extent.stopx - extent.startx - 1; // number of pixels to draw
 	while (x >= 0) {
 		xp = extent.startx + x;
 		// 1: fetch data
 		// 1.1: interpolated color from vertices
-		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
-		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
-		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
-		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
+		cb = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_B].dpdx))*255.0f;
+		cg = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_G].dpdx))*255.0f;
+		cr = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_R].dpdx))*255.0f;
+		ca = ((extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_COLOR_A].dpdx))*255.0f;
 		color[0] = (ca << 24) + (cr << 16) + (cg << 8) + cb; // pixel color obtained by interpolating the colors of the vertices
 		color[1] = 0; // lighting not yet
 		// 1.2: color for each of the 4 possible textures
 		for (n = 0; n < 4; n++) {
 			if (texture[n].enabled) {
 				if (texture[n].rectangle == false) {
-					up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizeu - 1);
-					vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx)*(float)(objectdata.data->texture[n].sizev - 1);
+					up = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx)*(double)(objectdata.data->texture[n].sizeu - 1);
+					vp = (extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx)*(double)(objectdata.data->texture[n].sizev - 1);
 				} else
 				{
-					up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx;
-					vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx;
+					up = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_U + n * 2].dpdx;
+					vp = extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_TEXTURE0_V + n * 2].dpdx;
 				}
 				color[n + 2] = texture_get_texel(n, up, vp);
 			}
@@ -2021,7 +2070,7 @@ void nv2a_renderer::render_register_combiners(int32_t scanline, const extent_t &
 		combiner_final_output();
 		a8r8g8b8 = combiner_float_argb8(combiner.output);
 		// 3: write pixel
-		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (float)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
+		z = (extent.param[(int)VERTEX_PARAMETER::PARAM_Z].start + (double)x*extent.param[(int)VERTEX_PARAMETER::PARAM_Z].dpdx);
 		write_pixel(xp, scanline, a8r8g8b8, z);
 		x--;
 	}
@@ -2175,7 +2224,6 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 	l = vertexbuffer_size[attrib];
 	switch (vertexbuffer_kind[attrib]) {
 	case NV2A_VTXBUF_TYPE::FLOAT:
-	default:
 		vertex.attribute[attrib].fv[0] = 0;
 		vertex.attribute[attrib].fv[1] = 0;
 		vertex.attribute[attrib].fv[2] = 0;
@@ -2206,6 +2254,12 @@ void nv2a_renderer::read_vertex(address_space & space, offs_t address, vertex_nv
 		vertex.attribute[attrib].fv[2] = ((u & 0xff0000) >> 16) / 255.0;  // r
 		vertex.attribute[attrib].fv[3] = ((u & 0xff000000) >> 24) / 255.0;  // a
 		break;
+	default:
+		vertex.attribute[attrib].fv[0] = 0;
+		vertex.attribute[attrib].fv[1] = 0;
+		vertex.attribute[attrib].fv[2] = 0;
+		vertex.attribute[attrib].fv[3] = 1.0;
+		machine().logerror("Unsupported vertex type in read_vertex !\n");
 	}
 }
 
@@ -2627,7 +2681,10 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 	if (backface_culling_enabled == false)
 		return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
 	if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT_AND_BACK)
+	{
+		triangles_bfculled++;
 		return 0;
+	}
 	areax2 = _v1.x*(_v2.y - _v3.y) + _v2.x*(_v3.y - _v1.y) + _v3.x*(_v1.y - _v2.y);
 	if (backface_culling_winding == NV2A_GL_FRONT_FACE::CCW)
 	{
@@ -2648,53 +2705,18 @@ uint32_t nv2a_renderer::render_triangle_culling(const rectangle &cliprect, rende
 	if (face == NV2A_GL_CULL_FACE::BACK)
 		if (backface_culling_culled == NV2A_GL_CULL_FACE::FRONT)
 			return render_triangle(cliprect, callback, paramcount, _v1, _v2, _v3);
+	triangles_bfculled++;
 	return 0;
 }
 
-uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+int nv2a_renderer::clip_triangle_w(nv2avertex_t *vi[3], nv2avertex_t *vo)
 {
-	nv2avertex_t *vi[3];
-	nv2avertex_t vo[16];
 	int idx_prev, idx_curr;
 	int neg_prev, neg_curr;
 	double tfactor;
 	int idx;
-	const double wthreshold = 0.00000001;
+	const double wthreshold = 0.000001;
 
-	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
-		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
-	// assign the elements of the array
-	vi[0] = &_v1;
-	vi[1] = &_v2;
-	vi[2] = &_v3;
-	// go back to the state before perpective divide
-	if (vertex_pipeline == 4)
-	{
-		for (int n = 0; n < 3; n++)
-		{
-			vi[n]->x = (vi[n]->x / (double)supersample_factor_x)*vi[n]->w;
-			vi[n]->y = (vi[n]->y / (double)supersample_factor_y)*vi[n]->w;
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
-		}
-	} else
-	{
-		for (int n = 0; n < 3; n++)
-		{
-			// remove translate
-			vi[n]->x = vi[n]->x - matrix.translate[0];
-			vi[n]->y = vi[n]->y - matrix.translate[1];
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - matrix.translate[2];
-			// remove scale
-			vi[n]->x = vi[n]->x / matrix.translate[0];
-			vi[n]->y = vi[n]->y / matrix.translate[1];
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] / matrix.translate[2];
-			// remove perspective divide
-			vi[n]->x = vi[n]->x * vi[n]->w;
-			vi[n]->y = vi[n]->y * vi[n]->w;
-			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
-		}
-	}
-	// do the clipping
 	idx_prev = 2;
 	idx_curr = 0;
 	idx = 0;
@@ -2726,10 +2748,53 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		idx_prev = idx_curr;
 		idx_curr++;
 	}
+	return idx;
+}
+
+uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, render_delegate callback, int paramcount, nv2avertex_t &_v1, nv2avertex_t &_v2, nv2avertex_t &_v3)
+{
+#if 0
+	nv2avertex_t *vi[3];
+	nv2avertex_t vo[16];
+	int nv;
+#endif
+
+	if ((_v1.w > 0) && (_v2.w > 0) && (_v3.w > 0))
+		return render_triangle_culling(cliprect, callback, paramcount, _v1, _v2, _v3);
+#if 0
+	// assign the elements of the array
+	vi[0] = &_v1;
+	vi[1] = &_v2;
+	vi[2] = &_v3;
+	// go back to the state before perpective divide
+	if (vertex_pipeline == 4)
+	{
+		for (int n = 0; n < 3; n++)
+		{
+			vi[n]->x = (vi[n]->x / (double)supersample_factor_x)*vi[n]->w;
+			vi[n]->y = (vi[n]->y / (double)supersample_factor_y)*vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
+	} else
+	{
+		for (int n = 0; n < 3; n++)
+		{
+			// remove translate
+			vi[n]->x = vi[n]->x - matrix.translate[0];
+			vi[n]->y = vi[n]->y - matrix.translate[1];
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] - matrix.translate[2];
+			// remove perspective divide
+			vi[n]->x = vi[n]->x * vi[n]->w;
+			vi[n]->y = vi[n]->y * vi[n]->w;
+			vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] = vi[n]->p[(int)VERTEX_PARAMETER::PARAM_Z] * vi[n]->w;
+		}
+	}
+	// do the clipping
+	nv = clip_triangle_w(vi, vo);
 	// screen coordinates for the new points
 	if (vertex_pipeline == 4)
 	{
-		for (int n = 0; n < idx; n++)
+		for (int n = 0; n < nv; n++)
 		{
 			vo[n].x = vo[n].x*(double)supersample_factor_x / vo[n].w;
 			vo[n].y = vo[n].y*(double)supersample_factor_y / vo[n].w;
@@ -2737,34 +2802,28 @@ uint32_t nv2a_renderer::render_triangle_clipping(const rectangle &cliprect, rend
 		}
 	} else
 	{
-		for (int n = 0; n < idx; n++)
+		for (int n = 0; n < nv; n++)
 		{
 			// apply perspective divide
 			vo[n].x = vo[n].x / vo[n].w;
 			vo[n].y = vo[n].y / vo[n].w;
 			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] / vo[n].w;
-			// apply scale
-			vo[n].x = vo[n].x * matrix.scale[0];
-			vo[n].y = vo[n].y * matrix.scale[1];
-			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] * matrix.scale[2];
 			// apply translate
 			vo[n].x = vo[n].x + matrix.translate[0];
 			vo[n].y = vo[n].y + matrix.translate[1];
 			vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] = vo[n].p[(int)VERTEX_PARAMETER::PARAM_Z] + matrix.translate[2];
 		}
 	}
-	for (int n = 0; n < (idx - 2); n++)
-	{
-		if ((n & 1) == 0)
-			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 1], vo[n + 2]);
-		else
-			render_triangle_culling(cliprect, callback, paramcount, vo[n], vo[n + 2], vo[n + 1]);
-	}
+	for (int n = 1; n <= (nv - 2); n++)
+		render_triangle_culling(cliprect, callback, paramcount, vo[0], vo[n], vo[n + 1]);
+#endif
 	return 0;
 }
 
 void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_delegate &renderspans)
 {
+	uint32_t pc = primitives_count;
+
 	for (; count > 0; count--) {
 		if (primitive_type == NV2A_BEGIN_END::QUADS) {
 			convert_vertices_poly(source, vertex_xy + vertex_count + vertex_accumulated, 1);
@@ -2872,6 +2931,7 @@ void nv2a_renderer::assemble_primitive(vertex_nv *source, int count, render_dele
 			vertex_count++;
 		}
 	}
+	primitives_total_count += primitives_count - pc;
 }
 
 void nv2a_renderer::compute_limits_rendertarget(uint32_t chanel, uint32_t subchannel)
@@ -2892,6 +2952,12 @@ void nv2a_renderer::compute_limits_rendertarget(uint32_t chanel, uint32_t subcha
 	y = y*supersample_factor_y;
 	h = h*supersample_factor_y;
 	limits_rendertarget.sety(y, y + h - 1);
+}
+
+void nv2a_renderer::compute_size_rendertarget(uint32_t chanel, uint32_t subchannel)
+{
+	size_rendertarget = pitch_rendertarget*(limits_rendertarget.bottom() + 1);
+	size_depthbuffer = pitch_depthbuffer*(limits_rendertarget.bottom() + 1);
 }
 
 int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, uint32_t subchannel, uint32_t method, uint32_t address, int &countlen)
@@ -3062,7 +3128,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	}
 	if ((maddress >= 0x1980) && (maddress < 0x1a00))
 	{
-		int v = maddress - 0x1980; // 16 couples,4 values per couple
+		int v = maddress - 0x1980; // 16 couples,4 values per couple,16*2*4=128
 		int attr = v >> 3;
 		int comp = (v >> 1) & 2;
 		uint16_t d1 = data & 0xffff;
@@ -3217,9 +3283,11 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	}
 	if (maddress == 0x0200) {
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 	}
 	if (maddress == 0x0204) {
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 	}
 	if (maddress == 0x0208) {
 		log2height_rendertarget = (data >> 24) & 255;
@@ -3230,6 +3298,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 		colorformat_rendertarget = (NV2A_COLOR_FORMAT)((data >> 0) & 15);
 		compute_supersample_factors(supersample_factor_x, supersample_factor_y);
 		compute_limits_rendertarget(chanel, subchannel);
+		compute_size_rendertarget(chanel, subchannel);
 		switch (colorformat_rendertarget) {
 		case NV2A_COLOR_FORMAT::R5G6B5:
 			bytespixel_rendertarget = 2;
@@ -3252,6 +3321,7 @@ int nv2a_renderer::geforce_exec_method(address_space & space, uint32_t chanel, u
 	if (maddress == 0x020c) {
 		pitch_rendertarget=data & 0xffff;
 		pitch_depthbuffer=(data >> 16) & 0xffff;
+		compute_size_rendertarget(chanel, subchannel);
 #ifdef LOG_NV2A
 		printf("Pitch color %04X zbuffer %04X\n\r", pitch_rendertarget, pitch_depthbuffer);
 #endif

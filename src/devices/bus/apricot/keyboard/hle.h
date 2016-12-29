@@ -57,7 +57,12 @@ private:
 
 	enum {
 		CMD_REQ_TIME_AND_DATE = 0xe1,
-		CMD_SET_TIME_AND_DATE = 0xe4
+		CMD_SET_TIME_AND_DATE = 0xe4,
+		CMD_KEYBOARD_RESET    = 0xe8
+	};
+
+	enum {
+		ACK_DIAGNOSTICS = 0xfb
 	};
 
 	int m_rtc_index;

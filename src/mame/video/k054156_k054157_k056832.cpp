@@ -291,8 +291,6 @@ void k056832_device::create_tilemaps()
 
 void k056832_device::finalize_init()
 {
-	int i;
-
 	update_page_layout();
 
 	change_rambank();
@@ -301,37 +299,33 @@ void k056832_device::finalize_init()
 	save_item(NAME(m_videoram));
 	save_item(NAME(m_regs));
 	save_item(NAME(m_regsb));
+
+	save_item(NAME(m_cur_gfx_banks));
+
+	save_item(NAME(m_rom_half));
+
+	save_item(NAME(m_layer_assoc_with_page));
+	save_item(NAME(m_layer_offs));
+	save_item(NAME(m_lsram_page));
 	save_item(NAME(m_x));
 	save_item(NAME(m_y));
 	save_item(NAME(m_w));
 	save_item(NAME(m_h));
 	save_item(NAME(m_dx));
 	save_item(NAME(m_dy));
+	save_item(NAME(m_line_dirty));
+	save_item(NAME(m_all_lines_dirty));
+	save_item(NAME(m_page_tile_mode));
+	save_item(NAME(m_last_colorbase));
 	save_item(NAME(m_layer_tile_mode));
-
 	save_item(NAME(m_default_layer_association));
+	save_item(NAME(m_layer_association));
 	save_item(NAME(m_active_layer));
 	save_item(NAME(m_linemap_enabled));
 	save_item(NAME(m_use_ext_linescroll));
 	save_item(NAME(m_uses_tile_banks));
 	save_item(NAME(m_cur_tile_bank));
-	save_item(NAME(m_rom_half));
-	save_item(NAME(m_all_lines_dirty));
-	save_item(NAME(m_page_tile_mode));
 
-	for (i = 0; i < 8; i++)
-	{
-		save_item(NAME(m_layer_offs[i]), i);
-		save_item(NAME(m_lsram_page[i]), i);
-	}
-
-	for (i = 0; i < K056832_PAGE_COUNT; i++)
-	{
-		save_item(NAME(m_line_dirty[i]), i);
-		save_item(NAME(m_all_lines_dirty[i]), i);
-		save_item(NAME(m_page_tile_mode[i]), i);
-		save_item(NAME(m_last_colorbase[i]), i);
-	}
 
 	machine().save().register_postload(save_prepost_delegate(FUNC(k056832_device::postload), this));
 }

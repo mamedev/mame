@@ -28,8 +28,9 @@ namespace netlist
 	namespace devices
 	{
 	#if (USE_TRUTHTABLE)
-	/* The truthtable implementation is a lot faster than
+	/* FIXME: The truthtable implementation is a lot faster than
 	 * the carefully crafted code :-(
+	 * Convert this into a macro module.
 	 */
 	NETLIB_TRUTHTABLE(9312, 12, 2);
 	#else

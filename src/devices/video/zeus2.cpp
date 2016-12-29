@@ -8,6 +8,8 @@
 #include "zeus2.h"
 
 #define LOG_REGS         1
+// Setting ALWAYS_LOG_FIFO will always log the fifo versus having to hold 'L'
+#define ALWAYS_LOG_FIFO  0
 
 /*************************************
 *  Constructor
@@ -86,7 +88,16 @@ void zeus2_device::device_start()
 	vblank_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(zeus2_device::display_irq), this));
 
 	//printf("%s\n", machine().system().name);
-	m_thegrid = strcmp(machine().system().name, "thegrid")==0;
+	// Set system type
+	if (strcmp(machine().system().name, "thegrid") == 0) {
+		m_system = THEGRID;
+	}
+	else if (strcmp(machine().system().name, "crusnexo") == 0) {
+		m_system = CRUSNEXO;
+	}
+	else {
+		m_system = MWSKINS;
+	}
 
 	/* save states */
 	save_pointer(NAME(waveram), WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 2);
@@ -108,8 +119,8 @@ void zeus2_device::device_start()
 	save_item(NAME(zeus_quad_size));
 	save_item(NAME(m_fill_color));
 	save_item(NAME(m_fill_depth));
-	save_item(NAME(m_renderAddr));
 	save_item(NAME(m_yScale));
+	save_item(NAME(m_system));
 }
 
 void zeus2_device::device_reset()
@@ -128,7 +139,6 @@ void zeus2_device::device_reset()
 	zeus_fifo_words = 0;
 	m_fill_color = 0;
 	m_fill_depth = 0;
-	m_renderAddr = 0;
 }
 #if DUMP_WAVE_RAM
 #include <iostream>
@@ -502,8 +512,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				uint32_t temp = m_zeusbase[0x38];
 				m_zeusbase[0x38] = oldval;
 				m_screen->update_partial(m_screen->vpos());
-				log_fifo = machine().input().code_pressed(KEYCODE_L);
-				//log_fifo = 1;
+				log_fifo = machine().input().code_pressed(KEYCODE_L) | ALWAYS_LOG_FIFO;
 				m_zeusbase[0x38] = temp;
 			}
 			break;
@@ -716,13 +725,12 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 					}
 					/* make sure we log anything else */
 					//else if (logit || m_zeusbase[0x50] != 0x0)
-					//	logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
+					//  logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
 				}
 			}
 			break;
 		case 0x51:
-			// Set direct rendering location
-			m_renderAddr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
+			// Set rendering location
 			/* in this mode, crusnexo expects the reads to immediately latch */
 			//if ((m_zeusbase[0x50] == 0x00a20000) || (m_zeusbase[0x50] == 0x00720000))
 			if (m_zeusbase[0x50] == 0x00a20000)
@@ -1174,7 +1182,7 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 		// 0x14: atlantis
 		case 0x14:
 		case 0x1c:
-			if (m_thegrid) {
+			if (m_system == THEGRID) {
 				if (numwords < 3)
 					return false;
 				if (log_fifo)
@@ -1232,7 +1240,9 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 				return false;
 			if (log_fifo)
 				log_fifo_command(data, numwords, "\n");
-			m_renderAddr = frame_addr_from_phys_addr(data[1]);
+			// Need to figure how the 0x40 gets there
+			m_zeusbase[0x5e] = (data[0] << 16) | 0x40;
+			m_zeusbase[0x51] = data[1];
 			//zeus2_draw_model(data[1], data[0] & 0xff, log_fifo);
 			break;
 
@@ -1252,16 +1262,22 @@ bool zeus2_device::zeus2_fifo_process(const uint32_t *data, int numwords)
 			if (data[0] == 0x38000000) {
 				if (numwords < 3)
 					return false;
-				// Direct write to frame buffer
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[1]);
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[1] >> 16));
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)data[2]);
-				m_frameColor[m_renderAddr++] = conv_rgb555_to_rgb32((uint16_t)(data[2] >> 16));
-			} else if (numwords < 12)
+				// mwskins direct write to frame buffer
+				m_zeusbase[0x58] = conv_rgb555_to_rgb32((uint16_t)data[1]);
+				m_zeusbase[0x59] = conv_rgb555_to_rgb32((uint16_t)(data[1] >> 16));
+				frame_write();
+				m_zeusbase[0x58] = conv_rgb555_to_rgb32((uint16_t)data[2]);
+				m_zeusbase[0x59] = conv_rgb555_to_rgb32((uint16_t)(data[2] >> 16));
+				frame_write();
+				if (((m_zeusbase[0x51] & 0xff) == 2) && log_fifo)
+					log_fifo_command(data, numwords, "\n");
+			}
+			else if (numwords < 12) {
 				return false;
-			//print_fifo_command(data, numwords, "\n");
-			if (log_fifo)
-				log_fifo_command(data, numwords, "\n");
+				//print_fifo_command(data, numwords, "\n");
+				if (log_fifo)
+					log_fifo_command(data, numwords, "\n");
+			}
 			break;
 
 		default:
@@ -1634,14 +1650,14 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			vert[i].p[0] += m_state->zeus_point[2];
 		}
 		//if (0)
-		//	//vert[i].p[0] += m_state->zbase;
-		//	vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//  //vert[i].p[0] += m_state->zbase;
+		//  vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
 		//else {
 			int shift;
 			shift = 1024 >> m_state->m_zeusbase[0x6c];
 			vert[i].p[0] += shift;
-		//	//float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
-		//	//vert[i].p[0] += zScale;
+		//  //float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		//  //vert[i].p[0] += zScale;
 		//}
 
 		vert[i].p[2] += (texdata >> 16) << 2;
@@ -1691,7 +1707,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	float xOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6a]);
 	float yOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6b]);
 
-	float oozBase = (m_state->m_atlantis) ? 1024.0f : (m_state->m_thegrid) ? 512.0f : 512.0f;
+	float oozBase = (m_state->m_atlantis) ? 1024.0f : (m_state->m_system == m_state->THEGRID) ? 512.0f : 512.0f;
 	//oozBase = 1 << m_state->m_zeusbase[0x6c];
 	maxx = maxy = -1000.0f;
 	for (i = 0; i < numverts; i++)

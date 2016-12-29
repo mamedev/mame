@@ -125,7 +125,6 @@ static ADDRESS_MAP_START( main_map, AS_PROGRAM, 16, midwunit_state )
 ADDRESS_MAP_END
 
 
-
 /*************************************
  *
  *  Input ports
@@ -645,11 +644,24 @@ static MACHINE_CONFIG_START( wunit, midwunit_state )
 
 	MCFG_VIDEO_START_OVERRIDE(midwunit_state,midwunit)
 
-	MCFG_DEVICE_ADD("serial_pic", MIDWAY_SERIAL_PIC, 0)
-	MCFG_MIDWAY_SERIAL_PIC_UPPER(528);
-
 	/* sound hardware */
 	MCFG_DEVICE_ADD("dcs", DCS_AUDIO_8K, 0)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( wunit_picsim, wunit )
+	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(528); // this is actually a generic code all games check for in addition to their own game specific code!
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( wunit_picemu, wunit )
+	MCFG_DEVICE_ADD("serial_security", MIDWAY_SERIAL_PIC_EMU, 0)
+
+	// todo, REMOVE once the emulated PIC above works!
+	// this just allows it to fall through to the simulation for now
+	MCFG_DEVICE_ADD("serial_security_sim", MIDWAY_SERIAL_PIC, 0)
+	MCFG_MIDWAY_SERIAL_PIC_UPPER(528);
+
 MACHINE_CONFIG_END
 
 
@@ -827,6 +839,9 @@ ROM_START( umk3 )
 	ROM_LOAD16_BYTE( "um312u54.bin",  0x00000, 0x80000, CRC(712b4db6) SHA1(7015a55f3d745c6aeb8630903e2d5cd9554b2766) )
 	ROM_LOAD16_BYTE( "um312u63.bin",  0x00001, 0x80000, CRC(6d301faf) SHA1(18a8e29cc3e8ce5cc0e10f8386d43e7f44fd7b75) )
 
+	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
+	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "mk3-u133.bin",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) )
 	ROM_LOAD32_BYTE( "mk3-u132.bin",  0x0000001, 0x100000, CRC(13e95228) SHA1(405b05f5a5a55667c2be17d4b399129bdacefd90) )
@@ -866,6 +881,9 @@ ROM_START( umk3r11 )
 	ROM_LOAD16_BYTE( "um311u54.bin",  0x00000, 0x80000, CRC(8bb27659) SHA1(a3ffe3d8f21c261b36c7510d620d691a8bbf665b) )
 	ROM_LOAD16_BYTE( "um311u63.bin",  0x00001, 0x80000, CRC(ea731783) SHA1(2915626090650c4b5adf5b26e736c3ec91ce81a6) )
 
+	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
+	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
+
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "mk3-u133.bin",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) )
 	ROM_LOAD32_BYTE( "mk3-u132.bin",  0x0000001, 0x100000, CRC(13e95228) SHA1(405b05f5a5a55667c2be17d4b399129bdacefd90) )
@@ -904,6 +922,9 @@ ROM_START( umk3r10 )
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "um310u54.bin",  0x00000, 0x80000, CRC(dfd735da) SHA1(bcb6d80dbde407d0042ec2f225b2f98740a79203) )
 	ROM_LOAD16_BYTE( "um310u63.bin",  0x00001, 0x80000, CRC(2dff0c83) SHA1(8942ffa3addf134085ea8d77d56e82593312e7a5) )
+
+	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
+	ROM_LOAD( "463 MK3 Ultimate.u64",  0x0000, 0x1009, CRC(4f425218) SHA1(7f26045ed2c9ca94fadcb673ce10f28208aa720e) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "mk3-u133.bin",  0x0000000, 0x100000, CRC(79b94667) SHA1(31bba640c351fdccc6685cadb74dd79a3f910ce8) )
@@ -1094,6 +1115,9 @@ ROM_START( rmpgwt )
 	ROM_LOAD16_BYTE( "1.3_rampage_world_u54_game.u54",  0x00000, 0x80000, CRC(2a8f6e1e) SHA1(7a87ad37fa1d1228c4cdd4704ff0aee42e9c86cb) )
 	ROM_LOAD16_BYTE( "1.3_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(403ae41e) SHA1(c08d9352efe63849f5d10c1bd1efe2b9dd7382e0) )
 
+	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
+	ROM_LOAD( "465 Rampage WT.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
+
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u132_image.u132",  0x0000001, 0x100000, CRC(7b3f09c6) SHA1(477658481ee96d5ce462d5e198d80faff4d4352c) )
@@ -1127,6 +1151,9 @@ ROM_START( rmpgwt11 )
 	ROM_REGION16_LE( 0x100000, "maincpu", 0 )   /* 34010 code */
 	ROM_LOAD16_BYTE( "1.1_rampage_world_u54_game.u54",  0x00000, 0x80000, CRC(3aa514eb) SHA1(4ed8db55f257da6d872586d0f9f0cdf1c30e0d22) )
 	ROM_LOAD16_BYTE( "1.1_rampage_world_u63_game.u63",  0x00001, 0x80000, CRC(031c908f) SHA1(531669b13c33921ff199be1e841dd337c86fec50) )
+
+	ROM_REGION( 0x1009, "serial_security:pic", 0 )   /* security PIC (provides game ID code and serial number) */
+	ROM_LOAD( "465 Rampage WT.u64",  0x0000, 0x1009, CRC(5c14d850) SHA1(f57aef8350e477252bff1fa0f930c1b5d0ceb03f) )
 
 	ROM_REGION( 0x2000000, "gfxrom", 0 )
 	ROM_LOAD32_BYTE( "1.0_rampage_world_tour_u133_image.u133",  0x0000000, 0x100000, CRC(5b5ac449) SHA1(1c01dde9a9dbd9f4a6cd30aea9f6410cab13c2c9) )
@@ -1260,23 +1287,26 @@ ROM_END
  *
  *************************************/
 
-GAME( 1994, mk3,       0,        wunit, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r20,    mk3,      wunit, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3r10,    mk3,      wunit, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, mk3p40,    mk3,      wunit, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3,      0,        wunit, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r11,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
-GAME( 1994, umk3r10,   umk3,     wunit, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3,       0,        wunit_picsim, mk3,      midwunit_state, mk3,      ROT0, "Midway", "Mortal Kombat 3 (rev 2.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r20,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r20,   ROT0, "Midway", "Mortal Kombat 3 (rev 2.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3r10,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, mk3p40,    mk3,      wunit_picsim, mk3,      midwunit_state, mk3r10,   ROT0, "Midway", "Mortal Kombat 3 (rev 1 chip label p4.0)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1994, umk3,      0,        wunit_picemu, mk3,      midwunit_state, umk3,     ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.2)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r11,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1994, umk3r10,   umk3,     wunit_picemu, mk3,      midwunit_state, umk3r11,  ROT0, "Midway", "Ultimate Mortal Kombat 3 (rev 1.0)", MACHINE_SUPPORTS_SAVE )
 // Ultimate Mortal Kombat 3 rev 2.0.35 (TE? Hack?) version known to exist
 
-GAME( 1995, wwfmania,  0,        wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniab, wwfmania, wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, wwfmaniac, wwfmania, wunit, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
-GAME( 1995, openice,   0,        wunit, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmania,  0,        wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.30 08/10/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniab, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.20 08/02/95)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, wwfmaniac, wwfmania, wunit_picsim, wwfmania, midwunit_state, wwfmania, ROT0, "Midway", "WWF: Wrestlemania (rev 1.1 07/11/95)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1996, nbahangt,  0,        wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamht,    nbahangt, wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
-GAME( 1996, nbamht1,   nbahangt, wunit, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+GAME( 1995, openice,   0,        wunit_picsim, openice,  midwunit_state, openice,  ROT0, "Midway", "2 On 2 Open Ice Challenge (rev 1.21)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1997, rmpgwt,    0,        wunit, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
-GAME( 1997, rmpgwt11,  rmpgwt,   wunit, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbahangt,  0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Hangtime (rev L1.1 04/16/96)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1996, nbamht,    0,        wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.03 06/09/97)", MACHINE_SUPPORTS_SAVE )
+GAME( 1996, nbamht1,   nbamht,   wunit_picsim, nbahangt, midwunit_state, nbahangt, ROT0, "Midway", "NBA Maximum Hangtime (rev 1.0 11/08/96)", MACHINE_SUPPORTS_SAVE )
+
+GAME( 1997, rmpgwt,    0,        wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.3)", MACHINE_SUPPORTS_SAVE )
+GAME( 1997, rmpgwt11,  rmpgwt,   wunit_picemu, rmpgwt,   midwunit_state, rmpgwt,   ROT0, "Midway", "Rampage: World Tour (rev 1.1)", MACHINE_SUPPORTS_SAVE )

@@ -3,23 +3,23 @@
 // thanks-to: Jonathan Gevaryahu
 /***************************************************************************
 
-	Beezer
+    Beezer
 
-	(c) 1982 Tong Electronic
+    (c) 1982 Tong Electronic
 
-	Notes:
-	- To enter test mode, hold down 1P Start and 2P Start, then reset
-	- One of the ROMs contains a message that this game was created
-	  by "Pacific Polytechnical Corporation, Santa Cruz"
+    Notes:
+    - To enter test mode, hold down 1P Start and 2P Start, then reset
+    - One of the ROMs contains a message that this game was created
+      by "Pacific Polytechnical Corporation, Santa Cruz"
 
-	TODO:
-	- Improve sound (filters? A reference recording would be nice)
-	- Schematics in the sound area seem incomplete, there are
-	  several unknown connections
-	- Watchdog timing (controlled by a 555)
-	- Figure out differences between the two sets (test mode isn't
-	  working in beezer1, instruction screen is different)
-	- Verify accuracy of colors
+    TODO:
+    - Improve sound (filters? A reference recording would be nice)
+    - Schematics in the sound area seem incomplete, there are
+      several unknown connections
+    - Watchdog timing (controlled by a 555)
+    - Figure out differences between the two sets (test mode isn't
+      working in beezer1, instruction screen is different)
+    - Verify accuracy of colors
 
 ***************************************************************************/
 
@@ -154,8 +154,8 @@ static ADDRESS_MAP_START( sound_map, AS_PROGRAM, 8, beezer_state )
 	AM_RANGE(0x1000, 0x1007) AM_MIRROR(0x07f8) AM_DEVREADWRITE("ptm", ptm6840_device, read, write)
 	AM_RANGE(0x1800, 0x180f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via_u18", via6522_device, read, write)
 	AM_RANGE(0x8000, 0x8003) AM_MIRROR(0x1ffc) AM_WRITE(dac_w)
-//	AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
-//	AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
+//  AM_RANGE(0xa000, 0xbfff) AM_ROM // 2d (can be ram, unpopulated)
+//  AM_RANGE(0xc000, 0xdfff) AM_ROM // 4d (unpopulated)
 	AM_RANGE(0xe000, 0xffff) AM_ROM AM_REGION("audiocpu", 0) // 6d
 ADDRESS_MAP_END
 

@@ -371,7 +371,6 @@ NOTE: There are several unpopulated locations (denoted by *) for additional rom 
 #include "machine/decocrpt.h"
 #include "machine/deco156.h"
 #include "includes/deco32.h"
-#include "sound/ym2151.h"
 
 /**********************************************************************************/
 
@@ -453,6 +452,19 @@ void deco32_state::deco32_sound_cb( address_space &space, uint16_t data, uint16_
 	m_audiocpu->set_input_line(0, HOLD_LINE);
 }
 
+void deco32_state::deco32_set_audio_output(uint8_t raw_data)
+{
+	// TODO: assume linear with a 0.0-1.0 dB scale for now
+	uint8_t raw_vol = 0xff - raw_data;
+	float vol_output = ((float)raw_vol) / 255.0f;
+	
+	m_ym2151->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki1->set_output_gain(ALL_OUTPUTS, vol_output);
+	m_oki2->set_output_gain(ALL_OUTPUTS, vol_output);
+
+	popmessage("%02x %02x %f",raw_data,raw_vol,vol_output);
+}
+
 READ32_MEMBER(deco32_state::_71_r)
 {
 	/* Bit 0x80 goes high when sprite DMA is complete, and low
@@ -478,6 +490,7 @@ READ32_MEMBER(deco32_state::fghthist_control_r)
 	return 0xffffffff;
 }
 
+
 WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
@@ -487,9 +500,11 @@ WRITE32_MEMBER(deco32_state::fghthist_eeprom_w)
 
 		pri_w(space,0,data&0x1,0xffffffff); /* Bit 0 - layer priority toggle */
 	}
-	else if (!ACCESSING_BITS_8_15)
+
+	if (ACCESSING_BITS_8_15)
 	{
 		// Volume port
+		deco32_set_audio_output((data >> 8) & 0xff);
 	}
 }
 
@@ -555,7 +570,7 @@ WRITE32_MEMBER(dragngun_state::eeprom_w)
 WRITE32_MEMBER(deco32_state::tattass_control_w)
 {
 	/* Eprom in low byte */
-	if (mem_mask==0x000000ff) { /* Byte write to low byte only (different from word writing including low byte) */
+	if (ACCESSING_BITS_0_7) { /* Byte write to low byte only (different from word writing including low byte) */
 		/*
 		    The Tattoo Assassins eprom seems strange...  It's 1024 bytes in size, and 8 bit
 		    in width, but offers a 'multiple read' mode where a bit stream can be read
@@ -656,13 +671,12 @@ WRITE32_MEMBER(deco32_state::tattass_control_w)
 		}
 
 		m_lastClock=data&0x20;
-		return;
 	}
 
 	/* Volume in high byte */
-	if (mem_mask==0x0000ff00) {
+	if (ACCESSING_BITS_8_15) {
 		//TODO:  volume attenuation == ((data>>8)&0xff);
-		return;
+		// TODO: is it really there?
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
@@ -720,6 +734,10 @@ WRITE32_MEMBER(deco32_state::nslasher_eeprom_w)
 
 		pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
+	
+//	popmessage("%08x",data);
+	if (ACCESSING_BITS_8_15)
+		deco32_set_audio_output((data >> 8) & 0xff);
 }
 
 
@@ -1031,6 +1049,7 @@ static ADDRESS_MAP_START( lockload_map, AS_PROGRAM, 32, dragngun_state )
 	AM_RANGE(0x300000, 0x3fffff) AM_ROM
 
 //  AM_RANGE(0x400000, 0x400003) AM_DEVREADWRITE8("oki3", okim6295_device, read, write, 0x000000ff)
+	AM_RANGE(0x410000, 0x410003) AM_WRITENOP /* Some kind of serial bit-stream - digital volume control? */
 	AM_RANGE(0x420000, 0x420003) AM_READWRITE(eeprom_r, eeprom_w)
 //  AM_RANGE(0x430000, 0x43001f) AM_WRITE(lightgun_w)
 //  AM_RANGE(0x438000, 0x438003) AM_READ(lightgun_r)

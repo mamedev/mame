@@ -1683,28 +1683,28 @@ READ16_MEMBER(model1_state::r360_r)
 WRITE16_MEMBER(model1_state::r360_w)
 {
 	/*
-		this uses the feedback board protocol
-		command group B - these seem to be gamestates
-		
-		bf = init
-		be = attract
-		bd = setup #1 (lower safety bar etc.)
-		bc = setup #2 (push emergency button)
-		bb = ready to go
-		ba = ingame
-		b9 = game over
+	    this uses the feedback board protocol
+	    command group B - these seem to be gamestates
 
-		results:
-		40 = default status
-		41 = * (setup #1 ack)
-		42 = lowered safety bar
-		43 = closed belt
-		44 = lever up
-		45 = pushed button
-		46 = game start
-		47 = game over
-		48 = lever down
-		49 = released belt
+	    bf = init
+	    be = attract
+	    bd = setup #1 (lower safety bar etc.)
+	    bc = setup #2 (push emergency button)
+	    bb = ready to go
+	    ba = ingame
+	    b9 = game over
+
+	    results:
+	    40 = default status
+	    41 = * (setup #1 ack)
+	    42 = lowered safety bar
+	    43 = closed belt
+	    44 = lever up
+	    45 = pushed button
+	    46 = game start
+	    47 = game over
+	    48 = lever down
+	    49 = released belt
 	*/
 	switch (data & 0xff)
 	{
@@ -1716,7 +1716,7 @@ WRITE16_MEMBER(model1_state::r360_w)
 		case 0xbd:
 			m_r360_state = ~0x44;
 			break;
-			
+
 		case 0xbc:
 			m_r360_state = ~0x45;
 			break;

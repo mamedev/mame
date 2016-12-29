@@ -724,7 +724,7 @@ void pit8253_device::update(pit8253_timer *timer)
 	attotime elapsed_time = now - timer->last_updated;
 	int64_t elapsed_cycles = elapsed_time.as_double() * timer->clockin;
 
-	LOG1(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
+	LOG2(("update(): timer %d, %d elapsed_cycles\n", timer->index, elapsed_cycles));
 
 	if (timer->clockin)
 		timer->last_updated += elapsed_cycles * attotime::from_hz(timer->clockin);
@@ -809,7 +809,15 @@ READ8_MEMBER( pit8253_device::read )
 
 				case 3:
 					/* read bits 0-7 first, then 8-15 */
-					data = (value >> (timer->rmsb ? 8 : 0)) & 0xff;
+
+					// reading back the current count while in the middle of a
+					// 16-bit write returns a xor'ed version of the value written
+					// (apricot diagnostic timer test tests this)
+					if (timer->wmsb)
+						data = ~timer->lowcount;
+					else
+						data = value >> (timer->rmsb ? 8 : 0);
+
 					timer->rmsb = 1 - timer->rmsb;
 					break;
 				}

@@ -20,8 +20,6 @@
 
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
-#undef min
-#undef max
 #include "bgfxutil.h"
 
 #include "chainmanager.h"

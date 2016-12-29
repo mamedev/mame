@@ -110,19 +110,15 @@ class bigfghtr_state : public armedf_state
 public:
 	bigfghtr_state(const machine_config &mconfig, device_type type, const char *tag)
 		: armedf_state(mconfig, type, tag),
-		m_sharedram(*this, "sharedram") { }
+		m_mcu(*this, "mcu"),
+		m_sharedram(*this, "sharedram")
+		{ }
 
-	required_shared_ptr<uint16_t> m_sharedram;
-
-	/* misc */
-	int           m_read_latch;
-	uint8_t         m_mcu_input_snippet;
-	uint8_t         m_mcu_jsr_snippet;
+	required_device<cpu_device> m_mcu;
+	required_shared_ptr<uint8_t> m_sharedram;
 
 	DECLARE_READ16_MEMBER(latch_r);
-	DECLARE_WRITE16_MEMBER(sharedram_w);
-	DECLARE_READ16_MEMBER(sharedram_r);
-	DECLARE_DRIVER_INIT(bigfghtr);
-	DECLARE_MACHINE_START(bigfghtr);
-	DECLARE_MACHINE_RESET(bigfghtr);
+	DECLARE_WRITE8_MEMBER(main_sharedram_w);
+	DECLARE_READ8_MEMBER(main_sharedram_r);
+	DECLARE_WRITE8_MEMBER(mcu_spritelist_w);
 };

@@ -12,18 +12,22 @@ public:
 	epos_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_videoram(*this, "videoram"),
+		m_inputs(*this, { "INPUTS", "INPUTS2" }),
 		m_maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
+	optional_ioport_array<2> m_inputs;
 
 	/* video-related */
 	uint8_t    m_palette;
 
 	/* misc */
 	int      m_counter;
+	int      m_input_multiplex;
 	DECLARE_WRITE8_MEMBER(dealer_decrypt_rom);
 	DECLARE_WRITE8_MEMBER(port_1_w);
+	DECLARE_READ8_MEMBER(read_prta);
 	DECLARE_WRITE8_MEMBER(write_prtc);
 	DECLARE_WRITE8_MEMBER(flip_screen_w);
 	DECLARE_DRIVER_INIT(dealer);

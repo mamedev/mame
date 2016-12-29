@@ -4,16 +4,16 @@
 
     Toshiba T1000 portable
 
-	80C88 CPU @ 5 MHz [OKI MSM80C88A-10GS-K (56 pin PQFP)]
-	512KB RAM + 16KB video RAM
-	32KB BIOS ROM [Toshiba TC54256AD]
-	256KB MS-DOS 2.11 ROM [Toshiba TC534000]
-	SuperIO chip (Toshiba T7885) = 82C84 + 82C88 + 82C59 + upd765 + 82C53 + 82C37 + 82C55
-	Real Time Clock chip: TC8521
-	Keyboard controller: 80C50
-	RS232C controller: 8250
+    80C88 CPU @ 5 MHz [OKI MSM80C88A-10GS-K (56 pin PQFP)]
+    512KB RAM + 16KB video RAM
+    32KB BIOS ROM [Toshiba TC54256AD]
+    256KB MS-DOS 2.11 ROM [Toshiba TC534000]
+    SuperIO chip (Toshiba T7885) = 82C84 + 82C88 + 82C59 + upd765 + 82C53 + 82C37 + 82C55
+    Real Time Clock chip: TC8521
+    Keyboard controller: 80C50
+    RS232C controller: 8250
 
-	NB: dumps of ROM-DOS and CGA chargen are missing.
+    NB: dumps of ROM-DOS and CGA chargen are missing.
 
 ***************************************************************************/
 
@@ -49,7 +49,7 @@ class tosh1000_state : public driver_device
 public:
 	tosh1000_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-		, m_maincpu(*this, "maincpu") 
+		, m_maincpu(*this, "maincpu")
 		, m_bankdev(*this, "romdos")
 		{ }
 
@@ -80,8 +80,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( tosh1000_io, AS_IO, 8, tosh1000_state )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x00ff) AM_DEVICE("mb", ibm5160_mb_device, map)
-	AM_RANGE(0x00c8, 0x00c8) AM_NOP	// ROM-DOS page select [p. B-15]
-	AM_RANGE(0x00e0, 0x00ef) AM_NOP	// ???
+	AM_RANGE(0x00c8, 0x00c8) AM_NOP // ROM-DOS page select [p. B-15]
+	AM_RANGE(0x00e0, 0x00ef) AM_NOP // ???
 	AM_RANGE(0x02c0, 0x02cf) AM_DEVREADWRITE("rtc", rp5c01_device, read, write)
 ADDRESS_MAP_END
 
@@ -112,7 +112,7 @@ static MACHINE_CONFIG_START( tosh1000, tosh1000_state )
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
 	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
 
-//	MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
+//  MCFG_SOFTWARE_LIST_ADD("flop_list","tosh1000")
 
 	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_KEYTRONIC_PC3270)
 

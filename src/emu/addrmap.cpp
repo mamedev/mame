@@ -401,11 +401,13 @@ address_map::~address_map()
 
 void address_map::configure(address_spacenum spacenum, u8 databits)
 {
-	assert(m_spacenum == spacenum);
+	if (spacenum != m_spacenum)
+		osd_printf_error("Space %d configured as address space %d\n", m_spacenum, spacenum);
+
 	if (m_databits == 0xff)
 		m_databits = databits;
-	else
-		assert(m_databits == databits);
+	else if (databits != m_databits)
+		osd_printf_error("Space %d configured with %d data bits when %d expected\n", m_spacenum, databits, m_databits);
 }
 
 

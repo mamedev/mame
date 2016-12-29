@@ -329,9 +329,19 @@ void k054539_device::init_chip()
 
 	stream = stream_alloc(0, 2, clock() / 384);
 
+	save_item(NAME(voltab));
+	save_item(NAME(pantab));
+	save_item(NAME(gain));
+	save_item(NAME(posreg_latch));
+	save_item(NAME(flags));
+
 	save_item(NAME(regs));
 	save_pointer(NAME(ram.get()), 0x4000);
+	save_item(NAME(reverb_pos));
 	save_item(NAME(cur_ptr));
+	save_item(NAME(cur_limit));
+
+	save_item(NAME(m_timer_state));
 }
 
 WRITE8_MEMBER(k054539_device::write)

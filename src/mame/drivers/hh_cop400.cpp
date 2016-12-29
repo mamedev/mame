@@ -6,9 +6,7 @@
   mostly LED electronic games/toys.
 
   TODO:
-  - non-working games are due to MCU emulation bugs?
-  - better not start on visually dumped games before other games are working
-    (due to possible dump errors, hard to distinguish between that or MCU bug)
+  - why does h2hbaskb need a workaround on writing L pins?
 
 ***************************************************************************/
 
@@ -281,7 +279,6 @@ WRITE8_MEMBER(ctstein_state::write_l)
 {
 	// L0-L3: button lamps (strobed)
 	display_matrix(4, 1, data & 0xf, 1);
-	display_matrix(4, 1, 0, 0);
 }
 
 READ8_MEMBER(ctstein_state::read_l)
@@ -612,7 +609,7 @@ WRITE8_MEMBER(funjacks_state::write_d)
 {
 	// D: led grid + input mux
 	m_inp_mux = data;
-	m_d = data ^ 0xf;
+	m_d = ~data & 0xf;
 	display_matrix(2, 4, m_l, m_d);
 }
 
@@ -633,7 +630,7 @@ WRITE8_MEMBER(funjacks_state::write_g)
 READ8_MEMBER(funjacks_state::read_l)
 {
 	// L4,L5: multiplexed inputs
-	return read_inputs(3) & 0x30;
+	return (read_inputs(3) & 0x30) | m_l;
 }
 
 READ8_MEMBER(funjacks_state::read_g)
@@ -648,16 +645,16 @@ READ8_MEMBER(funjacks_state::read_g)
 
 static INPUT_PORTS_START( funjacks )
 	PORT_START("IN.0") // D0 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 
 	PORT_START("IN.1") // D1 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON5 )
 
 	PORT_START("IN.2") // D2 port G
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) // positioned at 1 o'clock on panel, increment clockwise
 
 	PORT_START("IN.3") // port G
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -671,8 +668,8 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( funjacks, funjacks_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=47K, C=56pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=47K, C=56pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funjacks_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funjacks_state, write_l))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funjacks_state, write_g))
@@ -718,6 +715,7 @@ public:
 	DECLARE_WRITE8_MEMBER(write_d);
 	DECLARE_WRITE8_MEMBER(write_l);
 	DECLARE_WRITE8_MEMBER(write_g);
+	DECLARE_READ8_MEMBER(read_l_tristate) { return 0xff; }
 
 	DECLARE_INPUT_CHANGED_MEMBER(reset_button);
 };
@@ -727,7 +725,7 @@ public:
 WRITE8_MEMBER(funrlgl_state::write_d)
 {
 	// D: led grid
-	m_d = data ^ 0xf;
+	m_d = ~data & 0xf;
 	display_matrix(4, 4, m_l, m_d);
 }
 
@@ -735,7 +733,7 @@ WRITE8_MEMBER(funrlgl_state::write_l)
 {
 	// L0-L3: led state
 	// L4-L7: N/C
-	m_l = data & 0xf;
+	m_l = ~data & 0xf;
 	display_matrix(4, 4, m_l, m_d);
 }
 
@@ -771,10 +769,11 @@ INPUT_CHANGED_MEMBER(funrlgl_state::reset_button)
 static MACHINE_CONFIG_START( funrlgl, funrlgl_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", COP410, 2000000) // approximation - RC osc. R=51K, C=91pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=91pf
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_8, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(funrlgl_state, write_d))
 	MCFG_COP400_WRITE_L_CB(WRITE8(funrlgl_state, write_l))
+	MCFG_COP400_READ_L_TRISTATE_CB(READ8(funrlgl_state, read_l_tristate))
 	MCFG_COP400_WRITE_G_CB(WRITE8(funrlgl_state, write_g))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
 
@@ -843,7 +842,7 @@ static MACHINE_CONFIG_START( plus1, plus1_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", COP410, 1000000) // approximation - RC osc. R=51K, C=100pf
-	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, true) // guessed
+	MCFG_COP400_CONFIG(COP400_CKI_DIVISOR_16, COP400_CKO_OSCILLATOR_OUTPUT, false) // guessed
 	MCFG_COP400_WRITE_D_CB(WRITE8(plus1_state, write_d))
 	MCFG_COP400_READ_G_CB(IOPORT("IN.0"))
 	MCFG_COP400_READ_L_CB(IOPORT("IN.1"))
@@ -1152,7 +1151,8 @@ MACHINE_CONFIG_END
 
   National Semiconductor QuizKid Racer (COP420 version)
   * COP420 MCU label COP420-NPG/N
-  
+  * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
+
   This is the COP420 version, the first release was on a MM5799 MCU.
 
 ***************************************************************************/
@@ -1186,23 +1186,22 @@ WRITE8_MEMBER(qkracer_state::write_d)
 {
 	// D: select digit, D3: input mux high bit
 	m_inp_mux = (m_inp_mux & 0xf) | (data << 1 & 0x10);
-	m_d = data;
+	m_d = data & 0xf;
+	prepare_display();
 }
 
 WRITE8_MEMBER(qkracer_state::write_g)
 {
 	// G: select digit, input mux
 	m_inp_mux = (m_inp_mux & 0x10) | (data & 0xf);
-	m_g = data;
+	m_g = data & 0xf;
+	prepare_display();
 }
 
 WRITE8_MEMBER(qkracer_state::write_l)
 {
 	// L0-L6: digit segment data
-	// strobe display
-	m_l = data;
-	prepare_display();
-	m_l = 0;
+	m_l = data & 0x7f;
 	prepare_display();
 }
 
@@ -1341,10 +1340,10 @@ CONS( 1979, ctstein,   0,        0, ctstein,   ctstein,   driver_device, 0, "Cas
 
 CONS( 1980, h2hbaskb,  0,        0, h2hbaskb,  h2hbaskb,  driver_device, 0, "Coleco", "Head to Head Basketball/Hockey/Soccer (COP420L version)", MACHINE_SUPPORTS_SAVE )
 
-CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK | MACHINE_NOT_WORKING )
+CONS( 1981, einvaderc, einvader, 0, einvaderc, einvaderc, driver_device, 0, "Entex", "Space Invader (Entex, COP444L version)", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
-CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
-CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1979, funjacks,  0,        0, funjacks,  funjacks,  driver_device, 0, "Mattel", "Funtronics Jacks", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1979, funrlgl,   0,        0, funrlgl,   funrlgl,   driver_device, 0, "Mattel", "Funtronics Red Light Green Light", MACHINE_SUPPORTS_SAVE )
 
 CONS( 1980, plus1,     0,        0, plus1,     plus1,     driver_device, 0, "Milton Bradley", "Plus One", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING ) // ***
 CONS( 1981, lightfgt,  0,        0, lightfgt,  lightfgt,  driver_device, 0, "Milton Bradley", "Lightfight", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

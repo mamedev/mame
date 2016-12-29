@@ -11,7 +11,6 @@
 
 #if defined(OSD_WINDOWS) || defined(OSD_UWP)
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #include <memory>
@@ -80,7 +79,7 @@ HRESULT SaveBitmap(IWICBitmap* bitmap, GUID pixelFormat, const WCHAR *filename)
 	ComPtr<ID2D1Factory1> d2dfactory;
 	ComPtr<IDWriteFactory> dwriteFactory;
 	ComPtr<IWICImagingFactory> wicFactory;
-	
+
 	OSD_DYNAMIC_API(dwrite, "dwrite.dll");
 	OSD_DYNAMIC_API(d2d1, "d2d1.dll");
 	OSD_DYNAMIC_API_FN(dwrite, HRESULT, WINAPI, DWriteCreateFactory, DWRITE_FACTORY_TYPE, REFIID, IUnknown **);

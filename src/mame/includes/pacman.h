@@ -155,14 +155,14 @@ public:
 	void eyes_decode(uint8_t *data);
 	void mspacman_install_patches(uint8_t *ROM);
 
-	// theglopb.c
-	void theglobp_decrypt_rom_8();
-	void theglobp_decrypt_rom_9();
-	void theglobp_decrypt_rom_A();
-	void theglobp_decrypt_rom_B();
-	DECLARE_READ8_MEMBER(theglobp_decrypt_rom);
+	// epos.c
+	DECLARE_READ8_MEMBER(epos_decryption_w);
 	DECLARE_MACHINE_START(theglobp);
 	DECLARE_MACHINE_RESET(theglobp);
+	DECLARE_MACHINE_START(eeekk);
+	DECLARE_MACHINE_RESET(eeekk);
+	DECLARE_MACHINE_START(acitya);
+	DECLARE_MACHINE_RESET(acitya);
 
 	// pacplus.c
 	uint8_t pacplus_decrypt(int addr, uint8_t e);
@@ -171,13 +171,4 @@ public:
 	// jumpshot.c
 	uint8_t jumpshot_decrypt(int addr, uint8_t e);
 	void jumpshot_decode();
-
-	// acitya.c
-	void acitya_decrypt_rom_8();
-	void acitya_decrypt_rom_9();
-	void acitya_decrypt_rom_A();
-	void acitya_decrypt_rom_B();
-	DECLARE_READ8_MEMBER(acitya_decrypt_rom);
-	DECLARE_MACHINE_START(acitya);
-	DECLARE_MACHINE_RESET(acitya);
 };

@@ -74,11 +74,17 @@ wd_fdc_t::wd_fdc_t(const machine_config &mconfig, device_type type, const char *
 	enmf_cb(*this)
 {
 	force_ready = false;
+	disable_motor_control = false;
 }
 
 void wd_fdc_t::set_force_ready(bool _force_ready)
 {
 	force_ready = _force_ready;
+}
+
+void wd_fdc_t::set_disable_motor_control(bool _disable_motor_control)
+{
+	disable_motor_control = _disable_motor_control;
 }
 
 void wd_fdc_t::device_start()
@@ -177,7 +183,7 @@ void wd_fdc_t::set_floppy(floppy_image_device *_floppy)
 	int next_ready = floppy ? floppy->ready_r() : 1;
 
 	if(floppy) {
-		if(motor_control)
+		if(motor_control && !disable_motor_control)
 			floppy->mon_w(status & S_MON ? 0 : 1);
 		floppy->setup_index_pulse_cb(floppy_image_device::index_pulse_cb(&wd_fdc_t::index_callback, this));
 		floppy->setup_ready_cb(floppy_image_device::ready_cb(&wd_fdc_t::ready_callback, this));
@@ -1243,7 +1249,7 @@ void wd_fdc_t::spinup()
 	}
 
 	status |= S_MON|S_SPIN;
-	if(floppy)
+	if(floppy && !disable_motor_control)
 		floppy->mon_w(0);
 }
 
@@ -1279,7 +1285,7 @@ void wd_fdc_t::index_callback(floppy_image_device *floppy, int state)
 			motor_timeout ++;
 			if(motor_control && motor_timeout >= 5) {
 				status &= ~S_MON;
-				if(floppy)
+				if(floppy && !disable_motor_control)
 					floppy->mon_w(1);
 			}
 
