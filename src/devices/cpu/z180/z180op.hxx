@@ -307,7 +307,8 @@ int z180_device::take_interrupt(int irq)
 	if( irq == Z180_INT_IRQ0 )
 	{
 		// retrieve the IRQ vector from the daisy chain or CPU interface
-		irq_vector = daisy_call_ack_device();
+		device_z80daisy_interface *intf = daisy_get_irq_device();
+		irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
 
 		LOG(("Z180 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 

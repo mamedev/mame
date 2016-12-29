@@ -166,11 +166,11 @@ int z80_daisy_chain_interface::daisy_update_irq_state()
 
 
 //-------------------------------------------------
-//  call_ack_device - acknowledge an interrupt
-//  from a chained device and return the vector
+//  daisy_get_irq_device - return the device
+//  in the chain that requested the interrupt
 //-------------------------------------------------
 
-int z80_daisy_chain_interface::daisy_call_ack_device()
+device_z80daisy_interface *z80_daisy_chain_interface::daisy_get_irq_device()
 {
 	// loop over all devices; dev[0] is the highest priority
 	for (device_z80daisy_interface *intf = m_chain; intf != nullptr; intf = intf->m_daisy_next)
@@ -178,14 +178,12 @@ int z80_daisy_chain_interface::daisy_call_ack_device()
 		// if this device is asserting the INT line, that's the one we want
 		int state = intf->z80daisy_irq_state();
 		if (state & Z80_DAISY_INT)
-			return intf->z80daisy_irq_ack(); // call the requesting device
+			return intf;
 	}
 
 	if (VERBOSE && daisy_chain_present())
 		device().logerror("Interrupt from outside Z80 daisy chain\n");
-
-	// call back the CPU interface to retrieve the vector
-	return m_irq_callback(device(), 0);
+	return nullptr;
 }
 
 
