@@ -1986,6 +1986,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::winrun_gpu_scanline)
 	if(scanline == m_gpu_intc->get_posirq_line()*2)
 	{
 		m_gpu_intc->pos_irq_trigger();
+		m_screen->update_partial(param);
 	}
 }
 
