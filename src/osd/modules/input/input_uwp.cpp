@@ -14,8 +14,6 @@
 #include <agile.h>
 #include <ppltasks.h>
 #include <collection.h>
-#undef min
-#undef max
 #undef interface
 
 // MAME headers
