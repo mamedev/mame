@@ -1761,7 +1761,7 @@
 	</software>
 
 	<software name="roboarmya">
-		<description>Robo Army</description>
+		<description>Robo Army (NGM-032 ~ NGH-032)</description>
 		<year>1991</year>
 		<publisher>SNK</publisher>
 		<info name="serial" value="NGM-032 (MVS), NGH-032 (AES)"/>
@@ -3387,7 +3387,7 @@
 	</software>
 
 	<software name="samsho2k" cloneof="samsho2">
-		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)</description>
+		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 1)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
@@ -3428,7 +3428,7 @@
 	</software>
 
 	<software name="samsho2ka" cloneof="samsho2">
-		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)</description>
+		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 2)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
@@ -3439,7 +3439,7 @@
 				<rom loadflag="load16_word_swap" name="063-p1-kan.p1" offset="0x100000" size="0x100000" crc="147cc6d7" sha1="8e22305f41a0688786ff55437c25948e6c8fda58" />
 				<rom size="0x100000" offset="0x000000" loadflag="continue" />
 	<!-- Basically samsho2k without loading ep1 and ep2 over p1-kan ; The game has been confirmed to exist in this state -->
-
+			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="063-s1-kan.s1" crc="ff08f80b" sha1="240c6a1c52edebb49cc99ea08484c6a2d61ebf84" />
 			</dataarea>
