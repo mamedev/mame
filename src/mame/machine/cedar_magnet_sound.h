@@ -49,9 +49,6 @@ public:
 
 	TIMER_CALLBACK_MEMBER(reset_assert_callback) override;
 
-	int m_fake_counter;
-	INTERRUPT_GEN_MEMBER(fake_irq);
-
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	virtual void device_start() override;
