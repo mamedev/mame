@@ -3202,8 +3202,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<!-- Fatal error: Device 5.25" double density floppy drive load failed: Unable to identify the image format -->
-	<software name="msdos33" supported="no">
+	<software name="msdos33">
 		<description>MS-DOS (Version 3.30)</description>
 		<year>1987</year>
 		<publisher>Microsoft</publisher>
@@ -3296,8 +3295,7 @@ Known PC Booter Games Not Dumped, Or Dumped and Lost when Demonlord's Site went 
 		</part>
 	</software>
 
-	<!-- Fatal error: Device 5.25" double density floppy drive load failed: Unable to identify the image format -->
-	<software name="msdos401m" cloneof="msdos401" supported="no">
+	<software name="msdos401m" cloneof="msdos401">
 		<description>MS-DOS (Version 4.01, 5.25")</description>
 		<year>1988</year>
 		<publisher>Microsoft</publisher>
