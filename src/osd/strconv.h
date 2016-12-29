@@ -17,6 +17,16 @@
 //  FUNCTION PROTOTYPES
 //============================================================
 
+namespace osd
+{
+	namespace text
+	{
+		enum class unicode_normalization_form { C, D, KC, KD };
+
+		std::string normalize_unicode(const std::string &s, unicode_normalization_form normalization_form);
+	};
+};
+
 #if defined(WIN32)
 
 #ifndef WIN32_LEAN_AND_MEAN

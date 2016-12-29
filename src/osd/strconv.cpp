@@ -7,6 +7,7 @@
 //============================================================
 #if defined(SDLMAME_WIN32) || defined(OSD_WINDOWS) || defined(OSD_UWP)
 #define WIN32_LEAN_AND_MEAN
+#define WINVER 0x600
 #include <windows.h>
 #endif
 #undef min
@@ -45,6 +46,52 @@ namespace
 
 namespace osd {
 namespace text {
+
+//============================================================
+//  normalize_unicode
+//============================================================
+
+std::string osd::text::normalize_unicode(const std::string &s, osd::text::unicode_normalization_form normalization_form)
+{
+	// convert this enum to its Win32 equivalent
+	NORM_FORM win32_normalization_form;
+	switch (normalization_form)
+	{
+	case unicode_normalization_form::C:
+		win32_normalization_form = NormalizationC;
+		break;
+	case unicode_normalization_form::D:
+		win32_normalization_form = NormalizationD;
+		break;
+	case unicode_normalization_form::KC:
+		win32_normalization_form = NormalizationKC;
+		break;
+	case unicode_normalization_form::KD:
+		win32_normalization_form = NormalizationKD;
+		break;
+	default:
+		throw false;
+	}
+
+	// convert to wide string for use by Win32 APIs
+	std::wstring wide_string = to_wstring(s);
+	
+	// get the length of the buffer required to do the conversion
+	int required_length = NormalizeString(win32_normalization_form, wide_string.c_str(), wide_string.length(), nullptr, 0);
+
+	// set up a string
+	std::wstring result(required_length, '\0');
+
+	// normalize the string
+	int actual_length = NormalizeString(win32_normalization_form, wide_string.c_str(), wide_string.length(), &result[0], required_length);
+
+	// resize the string - actual_length can be less than required_length
+	result.resize(actual_length);
+
+	// and return it
+	return from_wstring(result);
+}
+
 
 //============================================================
 //  mbstring_from_wstring
@@ -323,5 +370,46 @@ int osd_uchar_from_osdchar(char32_t *uchar, const char *osdchar, size_t count)
 
 	return count;
 }
+
+
+//============================================================
+//  normalize_unicode
+//============================================================
+
+// NOTE - For obvious reasons, not all Win32 platforms use Qt!  This
+// needs to be conditionally compiled
+#include <QtCore/QString>
+
+namespace osd {
+namespace text {
+std::string normalize_unicode(const std::string &s, osd::text::unicode_normalization_form normalization_form)
+{
+	// convert this enum to the Qt equivalent
+	QString::NormalizationForm normalizationForm;
+	switch (normalization_form)
+	{
+	case unicode_normalization_form::C:
+		normalizationForm = QString::NormalizationForm_C;
+		break;
+	case unicode_normalization_form::D:
+		normalizationForm = QString::NormalizationForm_D;
+		break;
+	case unicode_normalization_form::KC:
+		normalizationForm = QString::NormalizationForm_KC;
+		break;
+	case unicode_normalization_form::KD:
+		normalizationForm = QString::NormalizationForm_KD;
+		break;
+	default:
+		throw false;
+	}
+
+	QString qstring = QString::fromUtf8(s.c_str(), s.length());
+	QString normalizedQstring = qstring.normalized(normalizationForm);
+	QByteArray utf8ByteArray = normalizedQstring.toUtf8();
+	return std::string(utf8ByteArray.data(), utf8ByteArray.size());
+}
+};
+};
 
 #endif
