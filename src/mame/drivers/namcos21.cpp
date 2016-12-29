@@ -67,7 +67,7 @@ STATUS:
           - posirq handling broken
 
     Driver's Eyes
-        crashes
+        Left and Right screen
 
 TODO:   (*) Extract DSP BIOS
 
@@ -1501,7 +1501,7 @@ static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
-	AM_RANGE(0x1c0000, 0x1fffff) AM_READWRITE(namcos21_68k_gpu_C148_r,namcos21_68k_gpu_C148_w)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
@@ -2007,6 +2007,8 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_gpu_vblank)
 
+	MCFG_NAMCO_C148_ADD("gpu_intc")
+	
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)

@@ -6,6 +6,7 @@
 
 #include "namcos2.h"
 #include "machine/namcoio_gearbox.h"
+#include "machine/namco_c148.h"
 
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
@@ -54,7 +55,8 @@ public:
 		m_ptrom24(*this,"point24"),
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp"),
-		m_io_gearbox(*this, "gearbox")
+		m_io_gearbox(*this, "gearbox"),
+		m_gpu_intc(*this, "gpu_intc")
 		{ }
 
 	optional_shared_ptr<uint16_t> m_winrun_dspbios;
@@ -68,6 +70,7 @@ public:
 
 	optional_device<cpu_device> m_dsp;
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
+	optional_device<namco_c148_device> m_gpu_intc;
 	
 	std::unique_ptr<uint8_t[]> m_videoram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
