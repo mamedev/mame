@@ -162,6 +162,7 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+	TIMER_DEVICE_CALLBACK_MEMBER(winrun_gpu_scanline);
 
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);

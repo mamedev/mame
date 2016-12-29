@@ -1502,6 +1502,7 @@ static ADDRESS_MAP_START( winrun_gpu_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(winrun_gpu_color_r,winrun_gpu_color_w) /* ? */
 	AM_RANGE(0x180000, 0x19ffff) AM_RAM /* work RAM */
 	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
+	AM_RANGE(0x1c0000, 0x1fffff) AM_DEVICE("gpu_intc", namco_c148_device, map)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_SHARE("gpu_comram")
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x410000, 0x41ffff) AM_RAM_DEVWRITE("palette", palette_device, write_ext) AM_SHARE("palette_ext")
@@ -1975,6 +1976,14 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
+TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::winrun_gpu_scanline)
+{
+	int scanline = param;
+
+	if(scanline == 240*2) 
+		m_gpu_intc->vblank_irq_trigger();
+		
+}
 
 static MACHINE_CONFIG_START( winrun, namcos21_state )
 	MCFG_CPU_ADD("maincpu", M68000,12288000) /* Master */
@@ -2005,9 +2014,10 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 
 	MCFG_CPU_ADD("gpu", M68000,12288000) /* graphics coprocessor */
 	MCFG_CPU_PROGRAM_MAP(winrun_gpu_map)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", namcos21_state,  namcos2_68k_gpu_vblank)
+	// TODO: Needs a single namco_crtc_device
+	MCFG_TIMER_DRIVER_ADD_SCANLINE("scantimer", namcos21_state, winrun_gpu_scanline, "screen", 0, 1)
 
-	MCFG_NAMCO_C148_ADD("gpu_intc")
+	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
 	
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
