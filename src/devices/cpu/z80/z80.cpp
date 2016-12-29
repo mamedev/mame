@@ -3158,7 +3158,8 @@ void z80_device::take_interrupt()
 	m_irqack_cb(true);
 
 	// fetch the IRQ vector
-	int irq_vector = daisy_call_ack_device();
+	device_z80daisy_interface *intf = daisy_get_irq_device();
+	int irq_vector = (intf != nullptr) ? intf->z80daisy_irq_ack() : standard_irq_callback_member(*this, 0);
 	LOG(("Z80 '%s' single int. irq_vector $%02x\n", tag(), irq_vector));
 
 	/* Interrupt mode 2. Call [i:databyte] */
@@ -3409,8 +3410,6 @@ void z80_device::device_start()
 	m_direct = &m_program->direct();
 	m_decrypted_opcodes_direct = &m_decrypted_opcodes->direct();
 	m_io = &space(AS_IO);
-
-	daisy_set_irq_callback(device_irq_acknowledge_delegate(FUNC(z80_device::standard_irq_callback_member), this));
 
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;            /* Zero flag is set */

@@ -1969,8 +1969,6 @@ void z180_device::device_start()
 	m_odirect = &m_oprogram->direct();
 	m_iospace = &space(AS_IO);
 
-	daisy_set_irq_callback(device_irq_acknowledge_delegate(FUNC(z180_device::standard_irq_callback_member), this));
-
 	/* set up the state table */
 	{
 		state_add(Z180_PC,         "PC",        m_PC.w.l);

@@ -94,17 +94,15 @@ protected:
 
 	// initialization
 	void daisy_init(const z80_daisy_config *daisy);
-	void daisy_set_irq_callback(const device_irq_acknowledge_delegate &callback) { m_irq_callback = callback; }
 
 	// callbacks
 	int daisy_update_irq_state();
-	int daisy_call_ack_device();
+	device_z80daisy_interface *daisy_get_irq_device();
 	void daisy_call_reti_device();
 
 private:
 	const z80_daisy_config *m_daisy_config;
 	device_z80daisy_interface *m_chain;     // head of the daisy chain
-	device_irq_acknowledge_delegate m_irq_callback;
 };
 
 
