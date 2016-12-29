@@ -11,7 +11,7 @@
 #include "emu.h" // emu_fatalerror
 #include "formats/upd765_dsk.h"
 
-upd765_format::upd765_format(const format *_formats)
+upd765_format::upd765_format(const format *_formats) : file_header_skip_bytes(0)
 {
 	formats = _formats;
 }
@@ -24,7 +24,7 @@ int upd765_format::find_size(io_generic *io, uint32_t form_factor) const
 		if(form_factor != floppy_image::FF_UNKNOWN && form_factor != f.form_factor)
 			continue;
 
-		if(size == (uint64_t) compute_track_size(f) * f.track_count * f.head_count)
+		if(size == file_header_skip_bytes + (uint64_t) compute_track_size(f) * f.track_count * f.head_count)
 			return i;
 	}
 	return -1;
@@ -220,7 +220,7 @@ bool upd765_format::load(io_generic *io, uint32_t form_factor, floppy_image *ima
 	for(int track=0; track < f.track_count; track++)
 		for(int head=0; head < f.head_count; head++) {
 			build_sector_description(f, sectdata, sectors, track, head);
-			io_generic_read(io, sectdata, (track*f.head_count + head)*track_size, track_size);
+			io_generic_read(io, sectdata, file_header_skip_bytes + (track*f.head_count + head)*track_size, track_size);
 			generate_track(desc, track, head, sectors, f.sector_count, total_size, image);
 		}
 
