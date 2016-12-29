@@ -56,10 +56,9 @@ Hardware info:
 - OKI M82C51A-2 USART, 4.9152MHz XTAL
 - other special: magnet sensors, external module slot, serial port
 
-IRQ source is unknown. Several possibilities:
-- NE555 timer IC
-- MM/SN74HC4060 binary counter IC (near the M82C51A)
-- one of the XTALs, plus divider of course
+IRQ source is a 4,9152MHz quartz crystal (Y3) connected to a 74HC4060 (U8,
+ripple counter/divider). From Q12 output (counter=8192) we obtain the IRQ signal
+applied to IPL1 of 68000 (pin 24) 4,9152 MHz / 8192 = 600 Hz.
 
 The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
