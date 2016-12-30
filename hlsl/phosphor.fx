@@ -99,9 +99,8 @@ uniform bool LCD = false;
 uniform int Mode = 0;
 uniform float DeltaTime = 0.0f;
 uniform float LCDTau = 0.0f;
-uniform float3 Tau = { 0.0f, 0.0f, 0.0f };
+uniform float3 TimeConstant = { 0.0f, 0.0f, 0.0f };
 uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
-uniform float3 Gamma = { 0.0f, 0.0f, 0.0f };
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
@@ -122,17 +121,21 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		b = 0;
 	}
 	else if (Mode == 1) {
-		r *= Tau.r == 0 ? 0 : exp(-DeltaTime / Tau.r);
-		g *= Tau.g == 0 ? 0 : exp(-DeltaTime / Tau.g);
-		b *= Tau.b == 0 ? 0 : exp(-DeltaTime / Tau.b);
+		float3 tau = TimeConstant * 0.4342944819;
+
+		r *= tau.r == 0 ? 0 : exp(-DeltaTime / tau.r);
+		g *= tau.g == 0 ? 0 : exp(-DeltaTime / tau.g);
+		b *= tau.b == 0 ? 0 : exp(-DeltaTime / tau.b);
 	}
 	else {
+		float3 gamma = 1 / (TimeConstant * 0.04342944819);
+
 		if (r != 0.0f)
-			r = pow(Gamma.r * DeltaTime + pow(1 / r, 1 / Beta.r), -Beta.r);
+			r = pow(gamma.r * DeltaTime + pow(1 / r, 1 / Beta.r), -Beta.r);
 		if (g != 0.0f)
-			g = pow(Gamma.g * DeltaTime + pow(1 / g, 1 / Beta.g), -Beta.g);
+			g = pow(gamma.g * DeltaTime + pow(1 / g, 1 / Beta.g), -Beta.g);
 		if (b != 0.0f)
-			b = pow(Gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b), -Beta.b);
+			b = pow(gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b), -Beta.b);
 	}
 	// Prevent burn-in
 	if (DeltaTime > 0.0f) {

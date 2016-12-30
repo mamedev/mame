@@ -69,9 +69,8 @@
 #define WINOPTION_POWER                     "power"
 #define WINOPTION_FLOOR                     "floor"
 #define WINOPTION_PHOSPHOR_MODE             "phosphor_mode"
-#define WINOPTION_PHOSPHOR_TAU              "phosphor_tau"
+#define WINOPTION_PHOSPHOR_TIME             "phosphor_time"
 #define WINOPTION_PHOSPHOR_BETA             "phosphor_beta"
-#define WINOPTION_PHOSPHOR_GAMMA            "phosphor_gamma"
 #define WINOPTION_LCD_PERSISTENCE           "lcd_persistence"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
@@ -202,9 +201,8 @@ public:
 	const char *screen_power() const { return value(WINOPTION_POWER); }
 	const char *screen_floor() const { return value(WINOPTION_FLOOR); }
 	int screen_phosphor_mode() const { return int_value(WINOPTION_PHOSPHOR_MODE); }
-	const char* screen_phosphor_tau() const { return value(WINOPTION_PHOSPHOR_TAU); }
+	const char* screen_phosphor_time() const { return value(WINOPTION_PHOSPHOR_TIME); }
 	const char* screen_phosphor_beta() const { return value(WINOPTION_PHOSPHOR_BETA); }
-	const char* screen_phosphor_gamma() const { return value(WINOPTION_PHOSPHOR_GAMMA); }
 	float screen_lcd_persistence() const { return float_value(WINOPTION_LCD_PERSISTENCE); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
 
