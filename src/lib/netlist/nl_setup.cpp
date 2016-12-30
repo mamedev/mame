@@ -455,6 +455,50 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 	return proxy;
 }
 
+devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
+{
+	nl_assert(inp.is_analog());
+
+	logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
+	devices::nld_base_proxy *proxy = incast.get_proxy();
+
+	if (proxy != nullptr)
+		return proxy;
+	else
+	{
+		log().debug("connect_terminal_input: connecting proxy\n");
+		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
+		auto new_proxy = incast.logic_family()->create_a_d_proxy(netlist(), x, &incast);
+		//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
+		incast.set_proxy(new_proxy.get());
+		m_proxy_cnt++;
+
+		auto ret = new_proxy.get();
+
+#if 1
+		/* connect all existing terminals to new net */
+
+		if (inp.has_net())
+		for (auto & p : inp.net().m_core_terms)
+		{
+			p->clear_net(); // de-link from all nets ...
+			if (!connect(ret->proxy_term(), *p))
+				log().fatal("Error connecting {1} to {2}\n", ret->proxy_term().name(), (*p).name());
+		}
+		inp.net().m_core_terms.clear(); // clear the list
+		ret->out().net().register_con(inp);
+#else
+		if (inp.has_net())
+			//fatalerror("logic inputs can only belong to one net!\n");
+			merge_nets(ret->out().net(), inp.net());
+		else
+			ret->out().net().register_con(inp);
+#endif
+		netlist().register_dev(std::move(new_proxy));
+		return ret;
+	}
+}
+
 void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
 {
 	netlist().log().debug("merging nets ...\n");
@@ -484,17 +528,16 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 {
 	if (out.is_analog() && in.is_logic())
 	{
+#if 0
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
 		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
+#endif
+		auto proxy = get_a_d_proxy(in);
 
-		proxy->m_Q.net().register_con(in);
-		out.net().register_con(proxy->m_I);
-
-		netlist().register_dev(std::move(proxy));
-
+		out.net().register_con(proxy->proxy_term());
 	}
 	else if (out.is_logic() && in.is_analog())
 	{
@@ -522,22 +565,19 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	else if (inp.is_logic())
 	{
 		netlist().log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(), pstring(inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?"), term.name());
+#if 0
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
 		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
+#endif
+		auto proxy = get_a_d_proxy(inp);
 
-		connect_terminals(term, proxy->m_I);
+		//out.net().register_con(proxy->proxy_term());
+		connect_terminals(term, proxy->proxy_term());
 
-		if (inp.has_net())
-			//fatalerror("logic inputs can only belong to one net!\n");
-			merge_nets(proxy->m_Q.net(), inp.net());
-		else
-			proxy->m_Q.net().register_con(inp);
-
-		netlist().register_dev(std::move(proxy));
 	}
 	else
 	{
@@ -835,6 +875,10 @@ public:
 			const pstring &name, logic_output_t *proxied) const override
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 };
 
