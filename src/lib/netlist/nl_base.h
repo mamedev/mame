@@ -169,6 +169,7 @@ namespace netlist
 		class NETLIB_NAME(netlistparams);
 		class NETLIB_NAME(base_proxy);
 		class NETLIB_NAME(base_d_to_a_proxy);
+		class NETLIB_NAME(base_a_to_d_proxy);
 	}
 
 	namespace detail {
@@ -203,6 +204,7 @@ namespace netlist
 	};
 
 	class logic_output_t;
+	class logic_input_t;
 	class analog_net_t;
 	class logic_net_t;
 	class net_t;
@@ -225,8 +227,11 @@ namespace netlist
 	public:
 		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
+
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
+		virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name,
+				logic_input_t *proxied) const = 0;
 
 		double fixed_V() const { return m_fixed_V; }
 		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }

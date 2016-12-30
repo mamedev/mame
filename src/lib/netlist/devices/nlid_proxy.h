@@ -61,20 +61,41 @@ namespace netlist
 	// nld_a_to_d_proxy
 	// -----------------------------------------------------------------------------
 
-	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_proxy)
+	NETLIB_OBJECT_DERIVED(base_a_to_d_proxy, base_proxy)
+	{
+	public:
+
+		virtual ~nld_base_a_to_d_proxy() {}
+
+		virtual logic_output_t &out() { return m_Q; }
+
+	protected:
+
+		nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
+				logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
+				: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
+		, m_Q(*this, "Q")
+		{
+		}
+
+	private:
+
+		logic_output_t m_Q;
+
+	};
+
+	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
 	{
 	public:
 		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
-				: nld_base_proxy(anetlist, name, in_proxied, &m_I)
+				: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
 		, m_I(*this, "I")
-		, m_Q(*this, "Q")
 		{
 		}
 
 		virtual ~nld_a_to_d_proxy() {}
 
 		analog_input_t m_I;
-		logic_output_t m_Q;
 
 	protected:
 
@@ -88,9 +109,9 @@ namespace netlist
 			if (supply_V == 0.0) supply_V = 5.0;
 
 			if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
-				m_Q.push(1, NLTIME_FROM_NS(1));
+				out().push(1, NLTIME_FROM_NS(1));
 			else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
-				m_Q.push(0, NLTIME_FROM_NS(1));
+				out().push(0, NLTIME_FROM_NS(1));
 			else
 			{
 				// do nothing
@@ -140,43 +161,6 @@ namespace netlist
 		state_var<int> m_last_state;
 		bool m_is_timestep;
 	};
-
-
-	class factory_lib_entry_t : public base_factory_t
-	{
-		P_PREVENT_COPYING(factory_lib_entry_t)
-	public:
-
-		factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: base_factory_t(name, classname, def_param), m_setup(setup) {  }
-
-		class wrapper : public device_t
-		{
-		public:
-			wrapper(const pstring &devname, netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name), m_devname(devname)
-			{
-				anetlist.setup().namespace_push(name);
-				anetlist.setup().include(m_devname);
-				anetlist.setup().namespace_pop();
-			}
-		protected:
-			NETLIB_RESETI() { }
-			NETLIB_UPDATEI() { }
-
-			pstring m_devname;
-		};
-
-		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
-		{
-			return plib::owned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
-		}
-
-	private:
-		setup_t &m_setup;
-	};
-
 
 	} //namespace devices
 } // namespace netlist

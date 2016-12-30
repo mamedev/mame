@@ -71,6 +71,10 @@ public:
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	}
 };
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
@@ -90,6 +94,10 @@ public:
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -724,6 +732,10 @@ void detail::net_t::reset()
 
 void detail::net_t::register_con(detail::core_terminal_t &terminal)
 {
+	for (auto t : m_core_terms)
+		if (t == &terminal)
+			netlist().log().fatal("net {1}: duplicate terminal {2}", name(), t->name());
+
 	terminal.set_net(this);
 
 	m_core_terms.push_back(&terminal);

@@ -300,6 +300,7 @@ namespace netlist
 		pstring objtype_as_str(detail::device_object_t &in) const;
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
+		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
 		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
