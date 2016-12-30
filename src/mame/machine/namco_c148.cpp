@@ -5,7 +5,7 @@
 	Namco C148 Interrupt Controller
 
 	TODO: 
-	- vblank is likely to be sent by mast
+	- hookup screen CRTC device
 	
 ***************************************************************************/
 /*
@@ -156,7 +156,7 @@ WRITE16_MEMBER( namco_c148_device::sci_irq_ack_w ) 		{ m_hostcpu->set_input_line
 
 READ8_MEMBER( namco_c148_device::ext_r )
 {
-	return 0xff; // TODO: bit 0 EEPROM bit
+	return 0xff; // TODO: bit 0 EEPROM bit ready
 }
 
 WRITE8_MEMBER( namco_c148_device::ext1_w )
@@ -178,7 +178,8 @@ WRITE16_MEMBER( namco_c148_device::cpu_irq_assert_w)
 
 READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
 {
-	return m_posirq_line;
+	// TODO: same as regular register? winrun91
+	return (m_posirq_line - 32) & 0xff;
 }
 
 WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )

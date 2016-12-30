@@ -11,6 +11,7 @@
 #include "namcoic.h"
 #include "cpu/m6502/m3745x.h"
 #include "video/c45.h"
+#include "machine/namco_c148.h"
 
 /* CPU reference numbers */
 
@@ -101,6 +102,8 @@ public:
 			m_dspmaster(*this, "dspmaster"),
 			m_dspslave(*this, "dspslave"),
 			m_c68(*this, "c68"),
+			m_master_intc(*this, "master_intc"),
+			m_slave_intc(*this, "slave_intc"),
 			m_gpu(*this, "gpu"),
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
@@ -119,6 +122,8 @@ public:
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
 	optional_device<m37450_device> m_c68;
+	required_device<namco_c148_device> m_master_intc;
+	required_device<namco_c148_device> m_slave_intc;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 
 	// game type helpers
@@ -134,6 +139,11 @@ public:
 	uint16_t  m_68k_slave_C148[0x20];
 	uint16_t  m_68k_gpu_C148[0x20];
 
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(system_reset_w);
+	
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	
 	// C123 Tilemap Emulation
 	// TODO: merge with namcos1.cpp implementation and convert to device
 public:
@@ -345,7 +355,8 @@ public:
 	uint16_t get_palette_register( int which );
 
 	int get_pos_irq_scanline() { return (get_palette_register(5) - 32) & 0xff; }
-
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;

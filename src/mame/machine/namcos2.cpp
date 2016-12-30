@@ -71,6 +71,66 @@ READ16_MEMBER( namcos2_state::namcos2_finallap_prot_r )
 
 #define m_eeprom_size 0x2000
 
+WRITE8_MEMBER(namcos2_shared_state::sound_reset_w)
+{
+	address_space &masterspace = m_maincpu->space(AS_PROGRAM);
+
+	if (data & 0x01)
+	{
+		/* Resume execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, CLEAR_LINE);
+		masterspace.device().execute().yield();
+	}
+	else
+	{
+		/* Suspend execution */
+		m_audiocpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+	}
+	
+	if (namcos2_kickstart != nullptr)
+	{
+		//printf( "dspkick=0x%x\n", data );
+		if (data & 0x04)
+		{
+			(*namcos2_kickstart)(space.machine(), 1);
+		}
+	}
+}
+
+WRITE8_MEMBER(namcos2_shared_state::system_reset_w)
+{	
+	address_space &masterspace = m_maincpu->space(AS_PROGRAM);
+
+	m_slave->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	m_mcu->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	
+	switch( m_gametype )
+	{
+	case NAMCOS21_SOLVALOU:
+	case NAMCOS21_STARBLADE:
+	case NAMCOS21_AIRCOMBAT:
+	case NAMCOS21_CYBERSLED:
+		m_dspmaster->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		m_dspslave->set_input_line(INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+		break;
+	}
+	
+	if (data & 0x01)
+		masterspace.device().execute().yield();
+
+	#if 0
+	if (data & 0x01)
+	{ /* Resume execution */
+		//reset_all_subcpus(CLEAR_LINE);
+		/* Give the new CPU an immediate slice of the action */
+	}
+	else
+	{ /* Suspend execution */
+		//reset_all_subcpus(ASSERT_LINE);
+	}
+	#endif
+}
+
 void namcos2_shared_state::reset_all_subcpus(int state)
 {
 	m_slave->set_input_line(INPUT_LINE_RESET, state);
