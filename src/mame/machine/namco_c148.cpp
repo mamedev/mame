@@ -56,7 +56,10 @@ const device_type NAMCO_C148 = &device_creator<namco_c148_device>;
 
 namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, NAMCO_C148, "Namco C148 Interrupt Controller", tag, owner, clock, "namco_c148", __FILE__),
-	m_hostcpu_tag(nullptr)
+	m_out_ext1_cb(*this),
+	m_out_ext2_cb(*this),
+	m_hostcpu_tag(nullptr),
+	m_linked_c148_tag(nullptr)
 {
 }
 
@@ -90,6 +93,9 @@ void namco_c148_device::device_start()
 {
 	m_hostcpu = machine().device<cpu_device>(m_hostcpu_tag);
 	m_linked_c148 = machine().device<namco_c148_device>(m_linked_c148_tag);
+	m_out_ext1_cb.resolve_safe();
+	m_out_ext2_cb.resolve_safe();
+
 	// TODO: link to SCI, EX and the screen device controller devices
 }
 
@@ -102,6 +108,9 @@ void namco_c148_device::device_reset()
 {
 	m_irqlevel.vblank = 0;
 	m_irqlevel.pos = 0;
+	m_irqlevel.sci = 0;
+	m_irqlevel.ex = 0;
+	m_irqlevel.cpu = 0;
 }
 
 //**************************************************************************
@@ -152,11 +161,12 @@ READ8_MEMBER( namco_c148_device::ext_r )
 
 WRITE8_MEMBER( namco_c148_device::ext1_w )
 {
-
+	m_out_ext1_cb(data & 7);
 }
 
 WRITE8_MEMBER( namco_c148_device::ext2_w )
 {
+	m_out_ext2_cb(data & 7);
 	// TODO: bit 1/2 in Winning Run GPU might be irq enable?
 }
 

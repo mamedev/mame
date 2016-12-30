@@ -21,6 +21,13 @@ Template for skeleton device
 	MCFG_DEVICE_ADD(_tag, NAMCO_C148, 0) \
 	namco_c148_device::configure_device(*device, _cputag, _cpumaster);
 
+#define MCFG_NAMCO_C148_EXT1_CB(_cb) \
+	devcb = &namco_c148_device::set_out_ext1_callback(*device, DEVCB_##_cb);
+
+#define MCFG_NAMCO_C148_EXT2_CB(_cb) \
+	devcb = &namco_c148_device::set_out_ext2_callback(*device, DEVCB_##_cb);
+
+	
 //**************************************************************************
 //  TYPE DEFINITIONS
 //**************************************************************************
@@ -48,6 +55,12 @@ public:
 
 		dev.m_linked_c148_tag = tag;
 	}
+	
+	template<class _Object> static devcb_base &set_out_ext1_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext1_cb.set_callback(object); }
+	template<class _Object> static devcb_base &set_out_ext2_callback(device_t &device, _Object object) { return downcast<namco_c148_device &>(device).m_out_ext2_cb.set_callback(object); }
+
+	devcb_write8 m_out_ext1_cb;
+	devcb_write8 m_out_ext2_cb;
 	
 	DECLARE_READ8_MEMBER( vblank_irq_level_r );
 	DECLARE_WRITE8_MEMBER( vblank_irq_level_w );

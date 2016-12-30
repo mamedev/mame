@@ -56,6 +56,8 @@ public:
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp"),
 		m_io_gearbox(*this, "gearbox"),
+		m_master_intc(*this, "master_intc"),
+		m_slave_intc(*this, "slave_intc"),
 		m_gpu_intc(*this, "gpu_intc")
 		{ }
 
@@ -70,6 +72,8 @@ public:
 
 	optional_device<cpu_device> m_dsp;
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
+	required_device<namco_c148_device> m_master_intc;
+	required_device<namco_c148_device> m_slave_intc;
 	optional_device<namco_c148_device> m_gpu_intc;
 	
 	std::unique_ptr<uint8_t[]> m_videoram;
@@ -163,8 +167,12 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
 	
-	TIMER_DEVICE_CALLBACK_MEMBER(winrun_gpu_scanline);
+	DECLARE_WRITE8_MEMBER(sound_reset_w);
+	DECLARE_WRITE8_MEMBER(system_reset_w);
 	
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
+	TIMER_DEVICE_CALLBACK_MEMBER(winrun_gpu_scanline);
+
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
 	DECLARE_DRIVER_INIT(driveyes);
