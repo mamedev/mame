@@ -88,7 +88,6 @@ public:
 	DECLARE_WRITE8_MEMBER(rambank_select_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_00_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_01_w);
-	DECLARE_WRITE8_MEMBER(discoboy_port_03_w);
 	DECLARE_WRITE8_MEMBER(discoboy_port_06_w);
 	DECLARE_WRITE8_MEMBER(rambank_w);
 	DECLARE_READ8_MEMBER(rambank_r);
@@ -249,14 +248,6 @@ WRITE8_MEMBER(discoboy_state::discoboy_port_01_w)
 	membank("bank1")->set_entry(data & 0x07);
 }
 
-WRITE8_MEMBER(discoboy_state::discoboy_port_03_w)// sfx? (to sound cpu)
-{
-	//  printf("unk discoboy_port_03_w %02x\n", data);
-	//  m_audiocpu->set_input_line(INPUT_LINE_NMI, HOLD_LINE);
-	m_soundlatch->write(space, 0, data);
-	m_audiocpu->set_input_line(0, HOLD_LINE);
-}
-
 WRITE8_MEMBER(discoboy_state::discoboy_port_06_w)
 {
 	//printf("unk discoboy_port_06_w %02x\n",data);
@@ -333,7 +324,7 @@ static ADDRESS_MAP_START( io_map, AS_IO, 8, discoboy_state )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(discoboy_port_00_w)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(discoboy_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(discoboy_port_03_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_DEVWRITE("soundlatch", generic_latch_8_device, write)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
 	AM_RANGE(0x06, 0x06) AM_READWRITE(discoboy_port_06_r, discoboy_port_06_w) // ???
 	AM_RANGE(0x07, 0x07) AM_WRITE(rambank_select_w) // 0x20 is palette bank bit.. others?
@@ -512,6 +503,7 @@ static MACHINE_CONFIG_START( discoboy, discoboy_state )
 	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_10MHz/4)   /* 2.5 MHz? */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
