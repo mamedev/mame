@@ -144,9 +144,12 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 ******************************************/
 
 #include "emu.h"
-#include "cpu/z80/z80.h"
-#include "machine/tait8741.h"
 #include "includes/gsword.h"
+
+#include "cpu/z80/z80.h"
+#include "machine/i8255.h"
+#include "machine/tait8741.h"
+
 
 
 #if 0
@@ -371,10 +374,8 @@ static ADDRESS_MAP_START( josvolly_cpu2_map, AS_PROGRAM, 8, gsword_state )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM AM_SHARE("cpu2_ram")
 
-	/* 8000 to 8003 looks MCU */
-	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN1")    // 1PL
-	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN2")    // 2PL / ACK
-	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN0")    // START
+	/* NEC D8255A with silkscreen removed and replaced with "AA 007" */
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("josvolly_aa_007", i8255_device, read, write)
 
 //  AM_RANGE(0x6000, 0x6000) AM_WRITE(adpcm_soundcommand_w)
 	AM_RANGE(0xA000, 0xA001) AM_DEVREADWRITE("josvolly_8741", josvolly8741_4pack_device, read_1, write_1)
@@ -694,6 +695,11 @@ static MACHINE_CONFIG_START( josvolly, gsword_state )
 	MCFG_CPU_PROGRAM_MAP(josvolly_cpu2_map)
 	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", gsword_state,  irq0_line_hold)
+
+	MCFG_DEVICE_ADD("josvolly_aa_007", I8255, 0)
+	MCFG_I8255_IN_PORTA_CB(IOPORT("IN1"))   // 1PL
+	MCFG_I8255_IN_PORTB_CB(IOPORT("IN2"))	// 2PL / ACK
+	MCFG_I8255_IN_PORTC_CB(IOPORT("IN0"))   // START
 
 	MCFG_JOSVOLLY8741_ADD("josvolly_8741")
 	MCFG_JOSVOLLY8741_CONNECT(1,0,0,0)
