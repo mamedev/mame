@@ -1856,6 +1856,7 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 {
 	int scanline = param;
+//	int cur_posirq = get_posirq_scanline()*2;
 	
 	if(scanline == 240*2)
 	{
@@ -1865,20 +1866,15 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 			m_gpu_intc->vblank_irq_trigger();
 	}
 	
-	if(scanline == m_master_intc->get_posirq_line()*2)
+	#if 0
+	if(scanline == cur_posirq)
 	{
 		m_master_intc->pos_irq_trigger();
-		// TODO: wrong place!
-		m_screen->update_partial(param);
-	}
-	
-	if(scanline == m_slave_intc->get_posirq_line()*2)
-	{
 		m_slave_intc->pos_irq_trigger();
 		// TODO: wrong place!
 		m_screen->update_partial(param);
 	}
-	
+	#endif
 	
 	if(m_gpu_intc != nullptr)
 	{

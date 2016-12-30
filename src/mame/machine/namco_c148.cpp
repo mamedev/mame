@@ -194,7 +194,8 @@ WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
 
 void namco_c148_device::vblank_irq_trigger()
 {
-	m_hostcpu->set_input_line(m_irqlevel.vblank, ASSERT_LINE);
+	// TODO: Phelios doesn't ack the vblank irq at all!
+	m_hostcpu->set_input_line(m_irqlevel.vblank, HOLD_LINE);
 }
 
 void namco_c148_device::pos_irq_trigger()

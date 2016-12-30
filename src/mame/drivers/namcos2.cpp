@@ -1695,22 +1695,17 @@ MACHINE_CONFIG_END
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 {
 	int scanline = param;
-	
+	int cur_posirq = get_posirq_scanline();
+
 	if(scanline == 240)
 	{
 		m_master_intc->vblank_irq_trigger();
 		m_slave_intc->vblank_irq_trigger();
 	}
 	
-	if(scanline == m_master_intc->get_posirq_line())
+	if(scanline == cur_posirq)
 	{
 		m_master_intc->pos_irq_trigger();
-		// TODO: wrong place!
-		m_screen->update_partial(param);
-	}
-	
-	if(scanline == m_slave_intc->get_posirq_line())
-	{
 		m_slave_intc->pos_irq_trigger();
 		// TODO: wrong place!
 		m_screen->update_partial(param);
