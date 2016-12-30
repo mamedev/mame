@@ -148,7 +148,7 @@ static void convert(nlwav_options_t &opts)
 	{
 #if 1
 		double t = 0.0; double v = 0.0;
-		sscanf(line.cstr(), "%lf %lf", &t, &v);
+		sscanf(line.c_str(), "%lf %lf", &t, &v);
 		while (t >= ct)
 		{
 			outsam += (ct - lt) * cursam;
@@ -203,7 +203,7 @@ static void convert(nlwav_options_t &opts)
 static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
 {
 	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
-			"nltool [options]").cstr());
+			"nltool [options]").c_str());
 }
 
 

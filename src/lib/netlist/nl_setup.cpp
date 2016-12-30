@@ -207,7 +207,7 @@ double setup_t::get_initial_param_val(const pstring name, const double def)
 	if (i != m_param_values.end())
 	{
 		double vald = 0;
-		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
 			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
 		return vald;
 	}
@@ -221,7 +221,7 @@ int setup_t::get_initial_param_val(const pstring name, const int def)
 	if (i != m_param_values.end())
 	{
 		double vald = 0;
-		if (sscanf(i->second.cstr(), "%lf", &vald) != 1)
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
 			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
 		return static_cast<int>(vald);
 	}
@@ -1076,12 +1076,12 @@ bool source_t::parse(const pstring &name)
 
 std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
 }
 
 std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.cstr(), m_str.len());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
 }
 
 std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)

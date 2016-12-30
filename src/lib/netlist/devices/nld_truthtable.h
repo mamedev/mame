@@ -235,7 +235,7 @@ namespace netlist
 
 			desc.setup(m_desc, disabled_ignore * 0);
 	#if 0
-			printf("%s\n", name().cstr());
+			printf("%s\n", name().c_str());
 			for (int j=0; j < m_size; j++)
 				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);

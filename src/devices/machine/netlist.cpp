@@ -72,7 +72,7 @@ void netlist_mame_analog_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_double_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 	if (m_mult != 1.0 || m_offset != 0.0)
 	{
@@ -183,7 +183,7 @@ void netlist_mame_int_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 }
 
@@ -215,7 +215,7 @@ void netlist_mame_logic_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_logic_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 }
 
@@ -282,7 +282,7 @@ void netlist_ram_pointer_t::device_start()
 	m_param = dynamic_cast<netlist::param_ptr_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 
 	m_data = (*m_param)();
@@ -375,22 +375,22 @@ void netlist_mame_t::vlog(const plib::plog_level &l, const pstring &ls) const
 	switch (l)
 	{
 		case plib::plog_level::DEBUG:
-			m_parent.logerror("netlist DEBUG: %s\n", errstr.cstr());
+			m_parent.logerror("netlist DEBUG: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::INFO:
-			m_parent.logerror("netlist INFO: %s\n", errstr.cstr());
+			m_parent.logerror("netlist INFO: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::VERBOSE:
-			m_parent.logerror("netlist VERBOSE: %s\n", errstr.cstr());
+			m_parent.logerror("netlist VERBOSE: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::WARNING:
-			m_parent.logerror("netlist WARNING: %s\n", errstr.cstr());
+			m_parent.logerror("netlist WARNING: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::ERROR:
-			m_parent.logerror("netlist ERROR: %s\n", errstr.cstr());
+			m_parent.logerror("netlist ERROR: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
+			emu_fatalerror error("netlist ERROR: %s\n", errstr.c_str());
 			throw error;
 	}
 }
@@ -554,38 +554,38 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 {
 	for (auto const & s : netlist().state().save_list())
 	{
-		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
+		netlist().log().debug("saving state for {1}\n", s->m_name.c_str());
 		if (s->m_dt.is_float)
 		{
 			if (s->m_dt.size == sizeof(double))
 			{
 				double *td = s->resolved<double>();
-				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
 			}
 			else if (s->m_dt.size == sizeof(float))
 			{
 				float *td = s->resolved<float>();
-				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
 			}
 			else
-				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.cstr());
+				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.c_str());
 		}
 		else if (s->m_dt.is_integral)
 		{
 			if (s->m_dt.size == sizeof(int64_t))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int32_t))
-				save_pointer((int32_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int32_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int16_t))
-				save_pointer((int16_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int16_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int8_t))
-				save_pointer((int8_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int8_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 #if (PHAS_INT128)
 			else if (s->m_dt.size == sizeof(INT128))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.cstr(), s->m_count * 2);
+				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count * 2);
 #endif
 			else
-				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.c_str());
 		}
 		else if (s->m_dt.is_custom)
 		{
@@ -627,11 +627,11 @@ void netlist_mame_cpu_device_t::device_start()
 		netlist::detail::net_t *n = netlist().m_nets[i].get();
 		if (n->is_logic())
 		{
-			state_add(i*2, n->name().cstr(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
+			state_add(i*2, n->name().c_str(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name().cstr(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name().c_str(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 
@@ -664,7 +664,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(std::ostream &str
 	{
 		int dpc = netlist().queue().size() - relpc - 1;
 		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().cstr(),
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().c_str(),
 				netlist().queue()[dpc].m_exec_time.as_double());
 	}
 
@@ -795,7 +795,7 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 
 std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.cstr());
+	memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.c_str());
 	return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
 }
 

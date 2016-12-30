@@ -26,7 +26,7 @@ pfmt::pfmt(const pstring &fmt)
 		m_allocated = 2 * l;
 		m_str = palloc_array<char>(2 * l);
 	}
-	memcpy(m_str, fmt.cstr(), l);
+	memcpy(m_str, fmt.c_str(), l);
 }
 
 pfmt::pfmt(const char *fmt)

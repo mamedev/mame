@@ -797,7 +797,7 @@ public:
 	{
 		int pos = (upto - m_last_buffer) / m_sample;
 		if (pos >= BUFSIZE)
-			netlist().log().fatal("sound {1}: exceeded BUFSIZE\n", name().cstr());
+			netlist().log().fatal("sound {1}: exceeded BUFSIZE\n", name().c_str());
 		while (m_last_pos < pos )
 		{
 			m_buffer[m_last_pos++] = (stream_sample_t) m_cur;

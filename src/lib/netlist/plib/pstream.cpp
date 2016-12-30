@@ -58,7 +58,7 @@ void postream::write(pistream &strm)
 
 pifilestream::pifilestream(const pstring &fname)
 : pistream(0)
-, m_file(fopen(fname.cstr(), "rb"))
+, m_file(fopen(fname.c_str(), "rb"))
 , m_pos(0)
 , m_actually_close(true)
 , m_filename(fname)
@@ -147,7 +147,7 @@ pstdin::pstdin()
 // -----------------------------------------------------------------------------
 
 pofilestream::pofilestream(const pstring &fname)
-: postream(0), m_file(fopen(fname.cstr(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
+: postream(0), m_file(fopen(fname.c_str(), "wb")), m_pos(0), m_actually_close(true), m_filename(fname)
 {
 	if (m_file == nullptr)
 		throw file_open_e(m_filename);

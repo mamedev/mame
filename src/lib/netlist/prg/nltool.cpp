@@ -181,7 +181,7 @@ protected:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const override
 	{
-		pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.cstr());
+		pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
 		pout("{}", err);
 		if (l == plib::plog_level::FATAL)
 			throw netlist::nl_exception(err);
@@ -199,7 +199,7 @@ void usage(tool_options_t &opts)
 {
 	pout("{}\n", opts.help(
 			"nltool serves as the Swiss Army knife to run, test and convert netlists.",
-			"nltool [options]").cstr());
+			"nltool [options]").c_str());
 }
 
 struct input_t
@@ -214,7 +214,7 @@ struct input_t
 	{
 		char buf[400];
 		double t;
-		int e = sscanf(line.cstr(), "%lf,%[^,],%lf", &t, buf, &m_value);
+		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
 		if ( e!= 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
@@ -409,13 +409,13 @@ static void listdevices(tool_options_t &opts)
 			out += "," + f->param_desc();
 		}
 		out += ")";
-		printf("%s\n", out.cstr());
+		printf("%s\n", out.c_str());
 		if (terms.size() > 0)
 		{
 			pstring t = "";
 			for (auto & j : terms)
 				t += "," + j;
-			printf("Terminals: %s\n", t.substr(1).cstr());
+			printf("Terminals: %s\n", t.substr(1).c_str());
 		}
 		devs.push_back(std::move(d));
 	}
@@ -514,11 +514,11 @@ int main(int argc, char *argv[])
 				result = c.result();
 			}
 			/* present result */
-			pout_strm.write(result.cstr());
+			pout_strm.write(result.c_str());
 		}
 		else
 		{
-			perr("Unknown command {}\n", cmd.cstr());
+			perr("Unknown command {}\n", cmd.c_str());
 			usage(opts);
 			return 1;
 		}
