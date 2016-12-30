@@ -73,6 +73,7 @@ public:
 	optional_device<namco_c148_device> m_gpu_intc;
 	
 	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_colorram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
 	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
