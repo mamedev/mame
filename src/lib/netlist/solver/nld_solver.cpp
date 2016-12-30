@@ -163,7 +163,7 @@ void matrix_solver_t::setup_base(analog_net_t::list_t &nets)
 							nl_assert(p->net().is_analog());
 							net_proxy_output->m_proxied_net = static_cast<analog_net_t *>(&p->net());
 						}
-						net_proxy_output->net().register_con(*p);
+						net_proxy_output->net().add_terminal(*p);
 						// FIXME: repeated
 						net_proxy_output->net().rebuild_list();
 						log().debug("Added input\n");

@@ -261,7 +261,7 @@ namespace netlist
 		}
 
 	public:
-		void inc_active() noexcept override
+		void inc_active() NL_NOEXCEPT override
 		{
 			if (m_NI > 1)
 				if (++m_active == 1)
@@ -270,7 +270,7 @@ namespace netlist
 				}
 		}
 
-		void dec_active() noexcept override
+		void dec_active() NL_NOEXCEPT override
 		{
 			/* FIXME:
 			 * Based on current measurements there is no point to disable

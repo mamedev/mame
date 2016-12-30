@@ -730,7 +730,7 @@ void detail::net_t::reset()
 			m_active++;
 }
 
-void detail::net_t::register_con(detail::core_terminal_t &terminal)
+void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
 	for (auto t : m_core_terms)
 		if (t == &terminal)
@@ -747,7 +747,7 @@ void detail::net_t::register_con(detail::core_terminal_t &terminal)
 void detail::net_t::move_connections(detail::net_t &dest_net)
 {
 	for (auto &ct : m_core_terms)
-		dest_net.register_con(*ct);
+		dest_net.add_terminal(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }
