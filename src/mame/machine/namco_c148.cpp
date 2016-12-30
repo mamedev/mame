@@ -68,14 +68,15 @@ DEVICE_ADDRESS_MAP_START( map, 16, namco_c148_device )
 	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE8(sci_irq_level_r,sci_irq_level_w,0x00ff) // SCIRQ lv
 	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE8(vblank_irq_level_r,vblank_irq_level_w,0x00ff) // VBlank IRQ lv
 
+	AM_RANGE(0x10000, 0x11fff) AM_WRITE(cpu_irq_assert_w)
 	AM_RANGE(0x16000, 0x17fff) AM_READWRITE(cpu_irq_ack_r, cpu_irq_ack_w) // CPUIRQ ack
 	AM_RANGE(0x18000, 0x19fff) AM_READWRITE(ex_irq_ack_r, ex_irq_ack_w) // EXIRQ ack
 	AM_RANGE(0x1a000, 0x1bfff) AM_READWRITE(pos_irq_ack_r, pos_irq_ack_w) // POSIRQ ack
 	AM_RANGE(0x1c000, 0x1dfff) AM_READWRITE(sci_irq_ack_r, sci_irq_ack_w) // SCIRQ ack
 	AM_RANGE(0x1e000, 0x1ffff) AM_READWRITE(vblank_irq_ack_r, vblank_irq_ack_w) // VBlank IRQ ack
-//	AM_RANGE(0x20000, 0x21fff) // EEPROM ready status (*)
-	AM_RANGE(0x22000, 0x23fff) AM_WRITE8(ext2_w,0x00ff) // sound CPU reset (*)
-//	AM_RANGE(0x24000, 0x25fff) // slave & i/o reset (*)
+	AM_RANGE(0x20000, 0x21fff) AM_READ8(ext_r,0x00ff) // EEPROM ready status (*)
+	AM_RANGE(0x22000, 0x23fff) AM_WRITE8(ext1_w,0x00ff) // sound CPU reset (*)
+	AM_RANGE(0x24000, 0x25fff) AM_WRITE8(ext2_w,0x00ff) // slave & i/o reset (*)
 	AM_RANGE(0x26000, 0x27fff) AM_NOP // watchdog
 ADDRESS_MAP_END
 
@@ -88,6 +89,8 @@ ADDRESS_MAP_END
 void namco_c148_device::device_start()
 {
 	m_hostcpu = machine().device<cpu_device>(m_hostcpu_tag);
+	m_linked_c148 = machine().device<namco_c148_device>(m_linked_c148_tag);
+	// TODO: link to SCI, EX and the screen device controller devices
 }
 
 
@@ -116,11 +119,8 @@ inline void namco_c148_device::flush_irq_acks()
 	// If writing an IRQ priority register, clear any pending IRQs.
 	// Dirt Fox and Winning Run require this behaviour
 	// TODO: literal behaviour, Winning Run GPU doesn't seem to care about irq ack ports?
-	m_hostcpu->set_input_line(m_irqlevel.pos, CLEAR_LINE);
-	m_hostcpu->set_input_line(m_irqlevel.vblank, CLEAR_LINE);
-	m_hostcpu->set_input_line(m_irqlevel.cpu, CLEAR_LINE);
-	m_hostcpu->set_input_line(m_irqlevel.ex, CLEAR_LINE);
-	m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE);
+	for(int i=0;i<8;i++)
+		m_hostcpu->set_input_line(i,CLEAR_LINE);
 }
 
 WRITE8_MEMBER( namco_c148_device::pos_irq_level_w ) 	{ m_irqlevel.pos = data & 7; 	flush_irq_acks(); 	}
@@ -142,12 +142,28 @@ WRITE16_MEMBER( namco_c148_device::ex_irq_ack_w ) 		{ m_hostcpu->set_input_line(
 WRITE16_MEMBER( namco_c148_device::sci_irq_ack_w ) 		{ m_hostcpu->set_input_line(m_irqlevel.sci, CLEAR_LINE); }
 
 //**************************************************************************
-//  IRQ section
+//  Comm ports
 //**************************************************************************
+
+READ8_MEMBER( namco_c148_device::ext_r )
+{
+	return 0xff; // TODO: bit 0 EEPROM bit
+}
+
+WRITE8_MEMBER( namco_c148_device::ext1_w )
+{
+
+}
 
 WRITE8_MEMBER( namco_c148_device::ext2_w )
 {
-	// TODO: bit 1 might be irq enable?
+	// TODO: bit 1/2 in Winning Run GPU might be irq enable?
+}
+
+WRITE16_MEMBER( namco_c148_device::cpu_irq_assert_w)
+{
+	// TODO: Starblade relies on this for showing large polygons, is it the right place?
+	m_linked_c148->cpu_irq_trigger();
 }
 
 READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
@@ -159,6 +175,7 @@ WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
 {
 	m_posirq_line = data;
 }
+
 
 //**************************************************************************
 //  GETTERS/SETTERS

@@ -42,6 +42,13 @@ public:
 		dev.m_hostcpu_master = is_master;
 	}
 	
+	static void link_c148_device(device_t &device, const char *tag)
+	{
+		namco_c148_device &dev = downcast<namco_c148_device &>(device);
+
+		dev.m_linked_c148_tag = tag;
+	}
+	
 	DECLARE_READ8_MEMBER( vblank_irq_level_r );
 	DECLARE_WRITE8_MEMBER( vblank_irq_level_w );
 	DECLARE_READ16_MEMBER( vblank_irq_ack_r );
@@ -69,23 +76,28 @@ public:
 
 	DECLARE_READ8_MEMBER( ext_posirq_line_r );
 	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
+	DECLARE_WRITE16_MEMBER( cpu_irq_assert_w );
 
+	DECLARE_READ8_MEMBER( ext_r );
+	DECLARE_WRITE8_MEMBER( ext1_w );
 	DECLARE_WRITE8_MEMBER( ext2_w );
 	void vblank_irq_trigger();
 	void pos_irq_trigger();
-	void cpu_irq_trigger();
 	void ex_irq_trigger();
 	void sci_irq_trigger();
 	uint8_t get_posirq_line();
 
 protected:
+	void cpu_irq_trigger();
 	// device-level overrides
 //  virtual void device_validity_check(validity_checker &valid) const;
 	virtual void device_start() override;
 	virtual void device_reset() override;
 private:
-	cpu_device *m_hostcpu;      	/**< reference to the host cpu */
+	cpu_device *m_hostcpu;      		/**< reference to the host cpu */
+	namco_c148_device *m_linked_c148;	/**< reference to linked master/slave c148 */
 	const char *m_hostcpu_tag;		/**< host cpu tag name */
+	const char *m_linked_c148_tag;	/**< other c148 tag name */
 	bool		m_hostcpu_master;	/**< define if host cpu is master */
 	struct{
 		uint8_t cpu;
