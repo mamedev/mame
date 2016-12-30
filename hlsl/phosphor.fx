@@ -13,6 +13,7 @@ texture Diffuse;
 sampler DiffuseSampler = sampler_state
 {
 	Texture   = <Diffuse>;
+	SRGBTexture = TRUE;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -26,6 +27,7 @@ texture LastPass;
 sampler PreviousSampler = sampler_state
 {
 	Texture   = <LastPass>;
+	SRGBTexture = TRUE;
 	MipFilter = LINEAR;
 	MinFilter = LINEAR;
 	MagFilter = LINEAR;
@@ -134,11 +136,12 @@ float4 ps_main(PS_INPUT Input) : COLOR
 	}
 	// Prevent burn-in
 	if (DeltaTime > 0.0f) {
-		float threshold = 0.5f / 255.0f;  // Half-color increment
+		float threshold = 0.5f / 255.0f / 12.92;  // Half-color increment
 		r = max(0.0f, r - threshold);
 		g = max(0.0f, g - threshold);
 		b = max(0.0f, b - threshold);
 	}
+	
 	float RedMax = max(CurrPix.r, r);
 	float GreenMax = max(CurrPix.g, g);
 	float BlueMax = max(CurrPix.b, b);
@@ -155,6 +158,7 @@ technique DefaultTechnique
 {
 	pass Pass0
 	{
+		SRGBWriteEnable = TRUE;
 		Lighting = FALSE;
 
 		VertexShader = compile vs_2_0 vs_main();
