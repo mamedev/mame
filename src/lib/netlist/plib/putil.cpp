@@ -33,10 +33,10 @@ namespace plib
 
 		const pstring environment(const pstring &var, const pstring &default_val)
 		{
-			if (getenv(var.cstr()) == nullptr)
+			if (getenv(var.c_str()) == nullptr)
 				return default_val;
 			else
-				return pstring(getenv(var.cstr()));
+				return pstring(getenv(var.c_str()));
 		}
 	}
 
@@ -73,7 +73,7 @@ namespace plib
 			std::size_t p = static_cast<std::size_t>(-1);
 			for (std::size_t j=0; j < onstrl.size(); j++)
 			{
-				if (std::memcmp(onstrl[j].cstr(), &(str.cstr()[i]), onstrl[j].blen())==0)
+				if (std::memcmp(onstrl[j].c_str(), &(str.c_str()[i]), onstrl[j].blen())==0)
 				{
 					p = j;
 					break;
@@ -90,7 +90,7 @@ namespace plib
 			}
 			else
 			{
-				pstring::traits::code_t c = pstring::traits::code(str.cstr() + i);
+				pstring::traits::code_t c = pstring::traits::code(str.c_str() + i);
 				col += c;
 				i+=pstring::traits::codelen(c);
 			}

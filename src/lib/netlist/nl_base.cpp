@@ -146,7 +146,7 @@ void detail::queue_t::on_pre_save()
 		pstring p = this->listptr()[i].m_object->name();
 		std::size_t n = p.len();
 		if (n > 63) n = 63;
-		std::strncpy(m_names[i].m_buf, p.cstr(), n);
+		std::strncpy(m_names[i].m_buf, p.c_str(), n);
 		m_names[i].m_buf[n] = 0;
 	}
 }
