@@ -52,6 +52,22 @@ public:
 	DECLARE_READ16_MEMBER( pos_irq_ack_r );
 	DECLARE_WRITE16_MEMBER( pos_irq_ack_w );
 
+	DECLARE_READ8_MEMBER( cpu_irq_level_r );
+	DECLARE_WRITE8_MEMBER( cpu_irq_level_w );
+	DECLARE_READ16_MEMBER( cpu_irq_ack_r );
+	DECLARE_WRITE16_MEMBER( cpu_irq_ack_w );
+	
+	DECLARE_READ8_MEMBER( ex_irq_level_r );
+	DECLARE_WRITE8_MEMBER( ex_irq_level_w );
+	DECLARE_READ16_MEMBER( ex_irq_ack_r );
+	DECLARE_WRITE16_MEMBER( ex_irq_ack_w );
+	
+	DECLARE_READ8_MEMBER( sci_irq_level_r );
+	DECLARE_WRITE8_MEMBER( sci_irq_level_w );
+	DECLARE_READ16_MEMBER( sci_irq_ack_r );
+	DECLARE_WRITE16_MEMBER( sci_irq_ack_w );
+	
+	
 	DECLARE_READ8_MEMBER( ext_posirq_line_r );
 	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
 
@@ -76,6 +92,7 @@ private:
 		uint8_t pos;
 		uint8_t vblank;
 	}m_irqlevel;
+
 	uint8_t m_posirq_line;
 	void flush_irq_acks();
 };
