@@ -132,6 +132,13 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		if (b != 0.0f)
 			b = pow(Gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b), -Beta.b);
 	}
+	// Prevent burn-in
+	if (DeltaTime > 0.0f) {
+		float threshold = 0.5f / 255.0f;  // Half-color increment
+		r = max(0.0f, r - threshold);
+		g = max(0.0f, g - threshold);
+		b = max(0.0f, b - threshold);
+	}
 	float RedMax = max(CurrPix.r, r);
 	float GreenMax = max(CurrPix.g, g);
 	float BlueMax = max(CurrPix.b, b);
