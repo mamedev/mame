@@ -174,6 +174,21 @@ void namco_c148_device::pos_irq_trigger()
 	m_hostcpu->set_input_line(m_irqlevel.pos, ASSERT_LINE);
 }
 
+void namco_c148_device::cpu_irq_trigger()
+{
+	m_hostcpu->set_input_line(m_irqlevel.cpu, ASSERT_LINE);
+}
+
+void namco_c148_device::ex_irq_trigger()
+{
+	m_hostcpu->set_input_line(m_irqlevel.ex, ASSERT_LINE);
+}
+
+void namco_c148_device::sci_irq_trigger()
+{
+	m_hostcpu->set_input_line(m_irqlevel.sci, ASSERT_LINE);
+}
+
 uint8_t namco_c148_device::get_posirq_line()
 {
 	return m_posirq_line;

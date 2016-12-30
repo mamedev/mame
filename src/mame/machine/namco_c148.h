@@ -66,14 +66,16 @@ public:
 	DECLARE_WRITE8_MEMBER( sci_irq_level_w );
 	DECLARE_READ16_MEMBER( sci_irq_ack_r );
 	DECLARE_WRITE16_MEMBER( sci_irq_ack_w );
-	
-	
+
 	DECLARE_READ8_MEMBER( ext_posirq_line_r );
 	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
 
 	DECLARE_WRITE8_MEMBER( ext2_w );
 	void vblank_irq_trigger();
 	void pos_irq_trigger();
+	void cpu_irq_trigger();
+	void ex_irq_trigger();
+	void sci_irq_trigger();
 	uint8_t get_posirq_line();
 
 protected:
