@@ -20,6 +20,10 @@ public:
 
 	template<class _Object> static devcb_base &set_signal_handler(device_t &device, _Object object) { return downcast<clock_device &>(device).m_signal_handler.set_callback(object); }
 
+	// line handlers
+	DECLARE_WRITE_LINE_MEMBER(hold_w);
+	DECLARE_WRITE_LINE_MEMBER(reset_w);
+
 protected:
 	virtual void device_start() override;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
@@ -29,7 +33,7 @@ private:
 	void update_timer();
 	attotime period();
 
-	int m_signal;
+	bool m_signal;
 	emu_timer *m_timer;
 
 	devcb_write_line m_signal_handler;
