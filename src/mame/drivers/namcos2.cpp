@@ -1695,7 +1695,7 @@ MACHINE_CONFIG_END
 TIMER_DEVICE_CALLBACK_MEMBER(namcos2_state::screen_scanline)
 {
 	int scanline = param;
-	int cur_posirq = get_posirq_scanline();
+	int cur_posirq = get_pos_irq_scanline();
 
 	if(scanline == 240)
 	{

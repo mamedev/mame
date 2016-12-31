@@ -73,7 +73,7 @@ public:
 	optional_device<namco_c148_device> m_gpu_intc;
 	
 	std::unique_ptr<uint8_t[]> m_videoram;
-	std::unique_ptr<uint8_t[]> m_colorram;
+	std::unique_ptr<uint8_t[]> m_maskram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
 	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
@@ -168,6 +168,7 @@ public:
 
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
+	
 	DECLARE_DRIVER_INIT(driveyes);
 	DECLARE_DRIVER_INIT(winrun);
 	DECLARE_DRIVER_INIT(starblad);
@@ -182,6 +183,7 @@ public:
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
+	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
 	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable);
 	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
@@ -193,6 +195,5 @@ public:
 	int init_dsp();
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
-	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init(int game_type);
 };

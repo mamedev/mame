@@ -60,14 +60,14 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 		if( mask&(0x01<<i) )
 		{
 			m_videoram[(offset+i)&0x7ffff] = color;
-			m_colorram[(offset+i)&0x7ffff] = mask;
+			m_maskram[(offset+i)&0x7ffff] = mask;
 		}
 	}
 }
 
 READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 {
-	return (m_videoram[offset]<<8) | m_colorram[offset];
+	return (m_videoram[offset]<<8) | m_maskram[offset];
 }
 
 void namcos21_state::allocate_poly_framebuffer()
@@ -362,7 +362,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 	if( m_gametype == NAMCOS21_WINRUN91 )
 	{
 		m_videoram = std::make_unique<uint8_t[]>(0x80000);
-		m_colorram = std::make_unique<uint8_t[]>(0x80000);
+		m_maskram = std::make_unique<uint8_t[]>(0x80000);
 	}
 	allocate_poly_framebuffer();
 	c355_obj_init(
