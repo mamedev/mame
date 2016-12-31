@@ -2982,6 +2982,162 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="sb16">
+		<description>Sound Blaster 16</description>
+		<year>1993</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d1.img" size="1474560" crc="5d83ba59" sha1="36848f98099a197fb961e7a8815d42c85c127d0c" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d2.img" size="1474560" crc="6317ceb2" sha1="9f508e080b322dc367e03144240c78fc4af7e312" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16b_d3.img" size="1474560" crc="7938bbec" sha1="2ba6866eddb6dfd292ca63816bd97157b8f2bfe6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16oem">
+		<description>Sound Blaster 16 (Pioneer OEM)</description>
+		<year>1994</year>
+		<publisher>Pioneer</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<feature name="disk_serial" value="P/N: 1222301080" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16oem_1.img" size="1474560" crc="fceb25dd" sha1="401e8c86d00174a10fa9b70396899e3364b8f527" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories" />
+			<feature name="disk_serial" value="P/N: 1222301090" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16oem_2.img" size="1474560" crc="d7f148ee" sha1="d3624853558eb8c7fae8f9417d64eaaff371ae9a" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications (revision 2)</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation Disk" />
+			<feature name="disk_serial" value="ZC/46/94 P/N : 0401730080" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val1.img" size="1474560" crc="af590635" sha1="eb49575150fce2c791b37b51c747dad73b699260" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications Disk" />
+			<feature name="disk_serial" value="ZC/41/94 P/N : 0401730081" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val2.img" size="1474560" crc="3640d9c1" sha1="13aa2fe8ba08e25c443b118cac9170e0bfc829cf" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories Disk" />
+			<feature name="disk_serial" value="ZC/46/94 P/N: 0401730082" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="sb16val3.img" size="1474560" crc="ad35770e" sha1="2ae17a68c72ae475be82c2be5e687a4634aa4d8d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16vea" cloneof="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications (revision 1)</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation - Disk 1 of 3" />
+			<feature name="disk_serial" value="S16V-STD-01-ENG - P/N: 1217791030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_1.img" size="1474560" crc="bda7a034" sha1="cc78fc43818e7f4c06d1e1480b6ab7aa212c81ef" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications - Disk 2 of 3" />
+			<feature name="disk_serial" value="S16V-APP-01-ENG (Revision 1) - P/N: 1217791031" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_2.img" size="1474560" crc="1f810ee3" sha1="d69193c999056872703d72a3ef363503ef886f16" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories - Disk 3 of 3" />
+			<feature name="disk_serial" value="S16V-ACC-01-ENG (Revision 1) - P/N: 1217791032" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="s16ve1_3.img" size="1474560" crc="c65642a2" sha1="80001e5b86429ec7f26392b68935693056e33afa" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16veb" cloneof="sb16ve">
+		<description>Sound Blaster 16 Value Edition Drivers &amp; Applications</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Installation" />
+			<feature name="disk_serial" value="P/N: 1217791030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791030_INSTALLATION.img" size="1474560" crc="e4ef9a94" sha1="54bd30113860ef7c860ca24422324aaa719a841f" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<feature name="part_id" value="Applications" />
+			<feature name="disk_serial" value="P/N: 1217791031" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791031_APPLICATION.img" size="1474560" crc="4dc5ff1e" sha1="42622ce86fbba9d598dc33f692c9da529fc62d87" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<feature name="part_id" value="Accessories" />
+			<feature name="disk_serial" value="P/N: 1217791032" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1217791032_ACCESSORIES.img" size="1474560" crc="799ca75a" sha1="a7ba36ca9749dbdcc1a3d65bae415e0d5ec53c52" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16cd">
+		<description>Sound Blaster 16 CD-ROM Installation</description>
+		<year>1993</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="CD-ROM_INSTALLATION_(CR563)_PN1213331006.img" size="737280" crc="e085efad" sha1="5fa696bf8eda2abbcfb582faea04fb98cfc3cd22" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16ide">
+		<description>Creative IDE/EIDE - ATAPI drive Installation Disk</description>
+		<year>1993</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="CREATIVE_DRIVERS_DISK_INSTALLATION_DISK_PN1200001301.img" size="1474560" crc="9ca3a1c7" sha1="c6cf3b49433a59f5552a963fdfa8d1099cb36d5b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="sb16tts">
+		<description>Sound Blaster 16 Value Edition Text-to-Speech</description>
+		<year>1994</year>
+		<publisher>Creative Labs</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="disk_serial" value="P/N: 1213501030" />
+			<dataarea name="flop" size = "1474560">
+				<rom name="SB16_Value_PN1213501030_TEXT_TO_SPEECH.img" size="1474560" crc="01a15e2d" sha1="b14333c6174d596152203375efcb8e31304eeaa3" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="sysgwmd">
 		<description>Sysgration Window Mouse Driver (Version 1.01)</description>
 		<year>1996</year>
@@ -3226,7 +3382,20 @@ Missing files come here
 	</software>
 
 	<software name="xmas4win">
-		<description>Christmas For Windows</description>
+		<description>Christmas For Windows (Release 4.0)</description>
+		<year>1995</year>
+		<publisher>TDA Help!</publisher>
+		<info name="developer" value="MakeItSo Software" />
+		<info name="version" value="4.0" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="ChristmasForWindows-Release4.img" size="1474560" crc="dd534c40" sha1="4822e3ac17b76e1940901b6deef018e70473ee8b" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="xmas4win3" cloneof="xmas4win">
+		<description>Christmas For Windows (Release 3.0)</description>
 		<year>1995</year>
 		<publisher>TDA Help!</publisher>
 		<info name="developer" value="Sygenex" />
@@ -3702,10 +3871,86 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="keen45">
+		<description>Commander Keen in Goodbye, Galaxy! (v1.4, EGA, 3.5")</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (3.5'').img" size="1474560" crc="c6d9eac0" sha1="ea1266074d4a9201ba66293b38d652480d4f0ab8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen45_525" cloneof="keen45">
+		<description>Commander Keen in Goodbye, Galaxy! (v1.4, EGA, 5.25")</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 1).img" size="1228800" crc="c19a9f27" sha1="0c5bb1ae622384603ee5b9aafbe26c5429da3d96" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (EGA) (5.25'') (Disk 2).img" size="1228800" crc="dc214a07" sha1="bc9eff392f349dadf379ef7c6296ad2aa01bac24" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen45c" cloneof="keen45">
+		<description>Commander Keen in Goodbye, Galaxy! (v1.4, CGA, 3.5")</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (3.5'').img" size="1474560" crc="ebb5fe47" sha1="4ba724bcc7ca7664c44192fb3a7719f9ec5e186c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen45c525" cloneof="keen45">
+		<description>Commander Keen in Goodbye, Galaxy! (v1.4, CGA, 5.25")</description>
+		<year>1992</year>
+		<publisher>Apogee Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "1228800">
+				<rom name="Commander Keen in Goodbye, Galaxy! (USA) (v1.4) (CGA) (5.25'').img" size="1228800" crc="6e08fec4" sha1="ae808d3833b3a7ea27c26fa39d20c9694c0a0cd0" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="keen6">
+		<!-- Also includes shareware episode of Commander Keen 4 -->
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.5, 3.5")</description>
+		<year>1991</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 1).img" size="737280" crc="495070a8" sha1="d63d0d20025b72f431ecb3b90df2eb54d5651726" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 2).img" size="737280" crc="5e1ad85b" sha1="eb96e4cc6200992ab6a65ac01c1daffb12684ade" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.5) (3.5'') (Disk 3).img" size="737280" crc="2134a756" sha1="788d6b36c389f810384e4ae6969f39bad288cef6" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen6a" cloneof="keen6">
 		<!-- Dumped via Kryoflux, almost all tracks show as modified -->
 		<!-- Also includes shareware episode of Commander Keen 4 -->
-		<description>Commander Keen in: Aliens Ate My Baby Sitter</description>
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.4, 3.5")</description>
 		<year>1991</year>
 		<publisher>FormGen</publisher>
 		<info name="developer" value="id Software" />
@@ -3722,6 +3967,57 @@ Missing files come here
 		<part name="flop3" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk3.img" size="737280" crc="fd482d9e" sha1="6aafbe6d819bb9ea8410a811b2bc253543809858" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen6b" cloneof="keen6">
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.0, 3.5")</description>
+		<year>1991</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 1).img" size="737280" crc="91a56a22" sha1="adbe45f8c69a9a855a71edd601cabe29a2ebd332" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.0) (3.5'') (Disk 2).img" size="737280" crc="9b481464" sha1="c0bb6de99c61b68d5aac8c14076d3129716cd30c" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen6_525" cloneof="keen6">
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.4, 5.25")</description>
+		<year>1991</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 1).img" size="368640" crc="7104af60" sha1="d1a90731b4636771b4116a54ff0be3c7f89af9e3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 2).img" size="368640" crc="ea21f0e3" sha1="213b9421f1d529e28ff7fa94f80a3c4f7822388d" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (v1.4) (5.25'') (Disk 3).img" size="368640" crc="a6a8c7b9" sha1="bd470395c6cd7dc8d467c48184f687c1452d4508" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="keen6dem" cloneof="keen6">
+		<description>Commander Keen in Aliens Ate My Baby Sitter! (v1.0, Demo, 3.5")</description>
+		<year>1991</year>
+		<publisher>GT Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Commander Keen in Aliens Ate My Baby Sitter! (USA) (Demo v1.0) (3.5'').img" size="737280" crc="f8bc360b" sha1="1f98b701c16d4459d012385b3bb766e55694709f" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
@@ -4477,6 +4773,109 @@ Missing files come here
 		</part>
 	</software>
 
+	<software name="spearofd">
+		<description>Spear of Destiny (v1.1, 3.5")</description>
+		<year>1992</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.1) (Disk 1).img" size="737280" crc="614c47e5" sha1="187ebc4c9564de8dfb4c5f2a2302c25480af84e9" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.1) (Disk 2).img" size="737280" crc="79d031a0" sha1="85140230e450619aeebf473287eb5c78b888fd32" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.1) (Disk 3).img" size="737280" crc="d326fcf9" sha1="1f8b48c0db18f62b486481d7ebf948d6b22fdae8" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spearofda" cloneof="spearofd">
+		<description>Spear of Destiny (v1.0, 3.5")</description>
+		<year>1992</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.0) (Disk 1).img" size="737280" crc="10dc9078" sha1="369c70967227e60f09c25b8e976a8c5410fab2ca" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.0) (Disk 2).img" size="737280" crc="2eabc2a6" sha1="3d4e32daaf7acb530929880aa04c8ac3c5689689" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Spear of Destiny (World) (v1.0) (Disk 3).img" size="737280" crc="684ebbc0" sha1="488939a095bdfff96be4139097ed6239282828c4" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spearofd525" cloneof="spearofd">
+		<description>Spear of Destiny (v1.0, 5.25")</description>
+		<year>1992</year>
+		<publisher>FormGen</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 1).img" size="368640" crc="c140e76b" sha1="d46024db962ba10f6598e51450e57ac6e05043e0" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 2).img" size="368640" crc="bafc2c0e" sha1="d58c04bb4df139fdf8cfdd8721c3e17dcd0e39aa" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 3).img" size="368640" crc="706a121c" sha1="d10a0b469d22cfca247dc084c506a19bcb0c456b" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 4).img" size="368640" crc="5ba9b66c" sha1="6f1a164d970fcb55897d2fff42b2cbfa42f329a7" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 5).img" size="368640" crc="80c0599c" sha1="c6772b9c6a767558d9de85b91bdcd21fc2bbe274" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<dataarea name="flop" size = "368640">
+				<rom name="Spear of Destiny (Disk 6).img" size="368640" crc="98228f5a" sha1="df41f04f7bba1178b23234cfa67614d26a450e2d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spearof2">
+		<description>Spear of Destiny Mission 2: Return to Danger</description>
+		<year>1994</year>
+		<publisher>FormGen</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Spear of Destiny Mission 2 - Return to Danger (World) (Add-on).img" size="1474560" crc="b3ae0ea2" sha1="4526cb173c8715477de759c680c0edeae8625011" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="spearof3">
+		<description>Spear of Destiny Mission 3: Ultimate Challenge</description>
+		<year>1994</year>
+		<publisher>FormGen</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Spear of Destiny Mission 3 - Ultimate Challenge (World) (Add-on).img" size="1474560" crc="6046a918" sha1="42f7969a494f82d20c42343f767239fcfe58417d" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="spectrec">
 		<!-- Dumped via Kryoflux, track 0 shows as modified -->
 		<description>Spectre Challenger</description>
@@ -4674,8 +5073,8 @@ Missing files come here
 
 	<software name="wolf3d">
 		<!-- Dumped via Kryoflux, track 0 shows as modified on both disks -->
-		<description>Wolfenstein 3D (Ver. 1.4)</description>
-		<year>1993</year>
+		<description>Wolfenstein 3-D (v1.4)</description>
+		<year>1992</year>
 		<publisher>GT Software</publisher>
 		<info name="developer" value="id Software" />
 		<info name="serial" value="04-30471"/>
@@ -4687,6 +5086,51 @@ Missing files come here
 		<part name="flop2" interface="floppy_3_5">
 			<dataarea name="flop" size="737280">
 				<rom name="disk2.img" size="737280" crc="6e8597bf" sha1="a5a44ce14a04a75104814d501afe54a38965d082" offset="0" status="baddump" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3da" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (v1.4, Alt)</description>
+		<year>1992</year>
+		<publisher>GT Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wolfenstein 3-D (World) (v1.4) (Disk 1).img" size="737280" crc="add7d431" sha1="1d570b3104a387392a4bd53022363a91b908f9a3" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wolfenstein 3-D (World) (v1.4) (Disk 2).img" size="737280" crc="c52ace4a" sha1="942ffa3506c7a4f7a2fd517effa57661979e5104" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3db" cloneof="wolf3d">
+		<description>Wolfenstein 3-D (v1.4, 3.5" HD)</description>
+		<year>1992</year>
+		<publisher>GT Software</publisher>
+		<info name="developer" value="id Software" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wolfenstein 3-D (USA) (v1.4).img" size="1474560" crc="aad21524" sha1="1bc5905e2324cf34ef18aa028b77500e057bd033" offset="0"/>
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="wolf3dsu">
+		<description>Wolfenstein 3-D Super Upgrades!</description>
+		<year>1994</year>
+		<publisher>Apogee Software</publisher>
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size = "737280">
+				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 1).img" size="737280" crc="37203373" sha1="594ac2225f0544739c53cdab1a8e3d3f36d7f373" offset="0"/>
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_3_5">
+			<dataarea name="flop" size = "1474560">
+				<rom name="Wolfenstein 3-D Super Upgrades! (USA) (Disk 2).img" size="1474560" crc="690f2c31" sha1="9a7341e1f8e9e51e37f9400b56290d5ea28b59d4" offset="0"/>
 			</dataarea>
 		</part>
 	</software>
