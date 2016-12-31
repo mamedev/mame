@@ -372,7 +372,13 @@ void natural_keyboard::set_in_use(bool usage)
 		for (auto &port : machine().ioport().ports())
 			for (ioport_field &field : port.second->fields())
 				if (field.type() == IPT_KEYBOARD)
+				{
 					field.live().lockout = usage;
+
+					// clear pressed status when going out of use
+					if (!usage)
+						field.set_value(0);
+				}
 	}
 }
 
