@@ -722,8 +722,23 @@ void natural_keyboard::timer(void *ptr, int param)
 		const bool new_keydown = !m_status_keydown;
 		const keycode_map_entry *const code = find_code(m_buffer[m_bufbegin]);
 		if (code != nullptr)
-			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field) && code->field[fieldnum] != nullptr; fieldnum++)
-				code->field[fieldnum]->set_value(new_keydown);
+		{
+			for (int fieldnum = 0; fieldnum < ARRAY_LENGTH(code->field); fieldnum++)
+			{
+				ioport_field *const field = code->field[fieldnum];
+				if (field == nullptr)
+					break;
+
+				// special handling for toggle fields
+				if (field->live().toggle)
+				{
+					if (new_keydown)
+						field->set_value(!field->digital_value());
+				}
+				else
+					field->set_value(new_keydown);
+			}
+		}
 
 		// proceed to next character when keydown expires
 		if (!new_keydown)
