@@ -1568,7 +1568,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4) // i8741 disguised as i8751h? Former doesn't match address map, clock unknown.
+	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4)
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 	
