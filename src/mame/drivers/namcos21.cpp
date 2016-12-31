@@ -1252,8 +1252,8 @@ static ADDRESS_MAP_START( common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVICE("sci", namco_c139_device, ram_map)
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 	AM_RANGE(0xc00000, 0xcfffff) AM_ROM AM_MIRROR(0x100000) AM_REGION("edata", 0)
 ADDRESS_MAP_END
 
@@ -1481,8 +1481,8 @@ static ADDRESS_MAP_START( winrun_master_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVICE("sci", namco_c139_device, ram_map)	
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
@@ -1493,8 +1493,8 @@ static ADDRESS_MAP_START( winrun_slave_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x87ffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVICE("sci", namco_c139_device, ram_map)	
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
 
@@ -1573,8 +1573,8 @@ static ADDRESS_MAP_START( driveyes_common_map, AS_PROGRAM, 16, namcos21_state )
 	AM_RANGE(0x800000, 0x8fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x900000, 0x90ffff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(namcos2_68k_dualportram_word_r,namcos2_68k_dualportram_word_w)
-	AM_RANGE(0xb00000, 0xb03fff) AM_READWRITE(NAMCO_C139_SCI_buffer_r,NAMCO_C139_SCI_buffer_w)
-	AM_RANGE(0xb80000, 0xb8000f) AM_READWRITE(NAMCO_C139_SCI_register_r,NAMCO_C139_SCI_register_w)
+	AM_RANGE(0xb00000, 0xb03fff) AM_DEVICE("sci", namco_c139_device, ram_map)	
+	AM_RANGE(0xb80000, 0xb8000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 	
 static ADDRESS_MAP_START( driveyes_master_map, AS_PROGRAM, 16, namcos21_state )
@@ -1852,7 +1852,7 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 	namcos2_kickstart = namcos21_kickstart;
 }
 
-// TODO: temp
+// TODO: temp, C116 device
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 {
 	int scanline = param;
@@ -1944,7 +1944,8 @@ static MACHINE_CONFIG_START( namcos21, namcos21_state )
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
-	
+	MCFG_NAMCO_C139_ADD("sci")
+
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", namcos21)
 	MCFG_PALETTE_ADD("palette", NAMCOS21_NUM_COLORS)
 	MCFG_PALETTE_FORMAT(XBRG)
@@ -1999,6 +2000,7 @@ static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MCFG_DEVICE_ADD("gearbox", NAMCOIO_GEARBOX, 0)
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_RAW_PARAMS_NAMCO480I
@@ -2054,7 +2056,8 @@ static MACHINE_CONFIG_START( winrun, namcos21_state )
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
 	MCFG_NAMCO_C148_ADD("gpu_intc","gpu",false)
-	
+	MCFG_NAMCO_C139_ADD("sci")
+
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000)) /* 100 CPU slices per frame */
 
 	MCFG_MACHINE_START_OVERRIDE(namcos21_state,namcos21)

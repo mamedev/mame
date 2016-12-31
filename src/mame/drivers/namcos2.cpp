@@ -599,8 +599,8 @@ static ADDRESS_MAP_START( namcos2_68k_default_cpu_board_am, AS_PROGRAM, 16, namc
 	AM_RANGE(0x440000, 0x44ffff) AM_READWRITE(paletteram_word_r,paletteram_word_w) AM_SHARE("paletteram")
 	AM_RANGE(0x460000, 0x460fff) AM_READWRITE(dpram_word_r,dpram_word_w)
 	AM_RANGE(0x468000, 0x468fff) AM_READWRITE(dpram_word_r,dpram_word_w) /* mirror */
-	AM_RANGE(0x480000, 0x483fff) AM_READWRITE(serial_comms_ram_r,serial_comms_ram_w) AM_SHARE("serialram")
-	AM_RANGE(0x4a0000, 0x4a000f) AM_READWRITE(serial_comms_ctrl_r,serial_comms_ctrl_w)
+	AM_RANGE(0x480000, 0x483fff) AM_DEVICE("sci", namco_c139_device, ram_map)
+	AM_RANGE(0x4a0000, 0x4a000f) AM_DEVICE("sci", namco_c139_device, regs_map)
 ADDRESS_MAP_END
 
 /*************************************************************/
@@ -1736,7 +1736,8 @@ static MACHINE_CONFIG_START( default, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
-
+	MCFG_NAMCO_C139_ADD("sci")
+	
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
 	MCFG_SCREEN_SIZE(384, 264)
@@ -1812,6 +1813,7 @@ static MACHINE_CONFIG_START( gollygho, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1861,6 +1863,7 @@ static MACHINE_CONFIG_START( finallap, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1915,6 +1918,7 @@ static MACHINE_CONFIG_START( sgunner, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -1971,6 +1975,7 @@ static MACHINE_CONFIG_START( sgunner2, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2022,6 +2027,7 @@ static MACHINE_CONFIG_START( luckywld, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )
@@ -2076,6 +2082,7 @@ static MACHINE_CONFIG_START( metlhawk, namcos2_state )
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_FRAGMENT_ADD(configure_c148_standard)
+	MCFG_NAMCO_C139_ADD("sci")
 
 	MCFG_SCREEN_ADD("screen", RASTER)
 	MCFG_SCREEN_REFRESH_RATE( (49152000.0 / 8) / (384 * 264) )

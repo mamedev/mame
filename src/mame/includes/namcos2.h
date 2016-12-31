@@ -12,6 +12,7 @@
 #include "cpu/m6502/m3745x.h"
 #include "video/c45.h"
 #include "machine/namco_c148.h"
+#include "machine/namco_c139.h"
 
 /* CPU reference numbers */
 
@@ -104,6 +105,7 @@ public:
 			m_c68(*this, "c68"),
 			m_master_intc(*this, "master_intc"),
 			m_slave_intc(*this, "slave_intc"),
+			m_sci(*this, "sci"),
 			m_gpu(*this, "gpu"),
 			m_gametype(0),
 			m_c169_roz_videoram(*this, "rozvideoram", 0),
@@ -124,6 +126,7 @@ public:
 	optional_device<m37450_device> m_c68;
 	required_device<namco_c148_device> m_master_intc;
 	required_device<namco_c148_device> m_slave_intc;
+	required_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 
 	// game type helpers

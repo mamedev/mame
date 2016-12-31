@@ -440,6 +440,7 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 			{
 			case 0xff:
 				break;
+			// TODO: additive blending? winrun car select uses register [0xc] for a xscroll value 
 			case 0x00:
 				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
 				break;
