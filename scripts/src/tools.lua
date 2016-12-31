@@ -73,6 +73,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -206,6 +207,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -252,6 +254,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -675,6 +678,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
