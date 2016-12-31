@@ -128,7 +128,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 		b *= tau.b == 0 ? 0 : exp(-DeltaTime / tau.b);
 	}
 	else {
-		float3 gamma = 1 / (TimeConstant * 0.04342944819);
+		float3 gamma = 1 / (TimeConstant * 0.004342944819);
 
 		if (r != 0.0f)
 			r = pow(gamma.r * DeltaTime + pow(1 / r, 1 / Beta.r), -Beta.r);
