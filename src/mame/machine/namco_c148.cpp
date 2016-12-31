@@ -2,22 +2,27 @@
 // copyright-holders:Angelo Salese
 /***************************************************************************
 
-	Namco C148 Interrupt Controller
+	Namco C148 - CPU Bus Manager
 
-	TODO: 
-	- hookup screen CRTC device
+	Does some Memory Decode, Interrupt Handling, 3 bit PIO port, Bus Controller
+
+	Based off implementation from K.Wilkins and Phil Stroffolino
 	
-***************************************************************************/
-/*
+	TODO: 
+	- hookup C116 device, @see mame/includes/namcoic.h
+	
+=============================================================================
 Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
-    ????????                       1C0XXX
+    Bus Controller?                1C0XXX
     ????????                       1C2XXX
-    ????????                       1C4XXX * bit 1: operation mode?
+    ????????                       1C4XXX
+	-x- master priority bit?
     Master/Slave IRQ level         1C6XXX              D00-D02
     EXIRQ level                    1C8XXX              D00-D02
     POSIRQ level                   1CAXXX              D00-D02
     SCIRQ level                    1CCXXX              D00-D02
     VBLANK IRQ level               1CEXXX              D00-D02
+	xxx irq level for specific irq.
     ????????                       1D0XXX
     ????????                       1D4000 trigger master/slave INT?
 
@@ -30,8 +35,11 @@ Interrupt Controller C148          1C0000-1FFFFF  R/W  D00-D02
     EEPROM Ready status            1E0XXX         R    D01
     Sound CPU Reset control        1E2XXX           W  D01
     Slave 68000 & IO CPU Reset     1E4XXX           W  D01
+	xxx PIO ports, per-HW / CPU specific
     Watchdog reset kicker          1E6XXX           W
- */
+	xxx Unknown at current stage if internal or external to the C148
+
+***************************************************************************/
 
 #include "emu.h"
 #include "namco_c148.h"
@@ -65,22 +73,23 @@ namco_c148_device::namco_c148_device(const machine_config &mconfig, const char *
 
 // (*) denotes master CPU only
 DEVICE_ADDRESS_MAP_START( map, 16, namco_c148_device )
-	AM_RANGE(0x06000, 0x07fff) AM_READWRITE8(cpu_irq_level_r,cpu_irq_level_w,0x00ff) // CPUIRQ lv
-	AM_RANGE(0x08000, 0x09fff) AM_READWRITE8(ex_irq_level_r,ex_irq_level_w,0x00ff) // EXIRQ lv
-	AM_RANGE(0x0a000, 0x0bfff) AM_READWRITE8(pos_irq_level_r,pos_irq_level_w,0x00ff) // POSIRQ lv
-	AM_RANGE(0x0c000, 0x0dfff) AM_READWRITE8(sci_irq_level_r,sci_irq_level_w,0x00ff) // SCIRQ lv
-	AM_RANGE(0x0e000, 0x0ffff) AM_READWRITE8(vblank_irq_level_r,vblank_irq_level_w,0x00ff) // VBlank IRQ lv
+	ADDRESS_MAP_GLOBAL_MASK(0x3e000)
+	AM_RANGE(0x06000, 0x06000) AM_READWRITE8(cpu_irq_level_r,cpu_irq_level_w,0x00ff) // CPUIRQ lv
+	AM_RANGE(0x08000, 0x08000) AM_READWRITE8(ex_irq_level_r,ex_irq_level_w,0x00ff) // EXIRQ lv
+	AM_RANGE(0x0a000, 0x0a000) AM_READWRITE8(pos_irq_level_r,pos_irq_level_w,0x00ff) // POSIRQ lv
+	AM_RANGE(0x0c000, 0x0c000) AM_READWRITE8(sci_irq_level_r,sci_irq_level_w,0x00ff) // SCIRQ lv
+	AM_RANGE(0x0e000, 0x0e000) AM_READWRITE8(vblank_irq_level_r,vblank_irq_level_w,0x00ff) // VBlank IRQ lv
 
-	AM_RANGE(0x10000, 0x11fff) AM_WRITE(cpu_irq_assert_w)
-	AM_RANGE(0x16000, 0x17fff) AM_READWRITE(cpu_irq_ack_r, cpu_irq_ack_w) // CPUIRQ ack
-	AM_RANGE(0x18000, 0x19fff) AM_READWRITE(ex_irq_ack_r, ex_irq_ack_w) // EXIRQ ack
-	AM_RANGE(0x1a000, 0x1bfff) AM_READWRITE(pos_irq_ack_r, pos_irq_ack_w) // POSIRQ ack
-	AM_RANGE(0x1c000, 0x1dfff) AM_READWRITE(sci_irq_ack_r, sci_irq_ack_w) // SCIRQ ack
-	AM_RANGE(0x1e000, 0x1ffff) AM_READWRITE(vblank_irq_ack_r, vblank_irq_ack_w) // VBlank IRQ ack
-	AM_RANGE(0x20000, 0x21fff) AM_READ8(ext_r,0x00ff) // EEPROM ready status (*)
-	AM_RANGE(0x22000, 0x23fff) AM_WRITE8(ext1_w,0x00ff) // sound CPU reset (*)
-	AM_RANGE(0x24000, 0x25fff) AM_WRITE8(ext2_w,0x00ff) // slave & i/o reset (*)
-	AM_RANGE(0x26000, 0x27fff) AM_NOP // watchdog
+	AM_RANGE(0x10000, 0x10000) AM_WRITE(cpu_irq_assert_w)
+	AM_RANGE(0x16000, 0x16000) AM_READWRITE(cpu_irq_ack_r, cpu_irq_ack_w) // CPUIRQ ack
+	AM_RANGE(0x18000, 0x18000) AM_READWRITE(ex_irq_ack_r, ex_irq_ack_w) // EXIRQ ack
+	AM_RANGE(0x1a000, 0x1a000) AM_READWRITE(pos_irq_ack_r, pos_irq_ack_w) // POSIRQ ack
+	AM_RANGE(0x1c000, 0x1c000) AM_READWRITE(sci_irq_ack_r, sci_irq_ack_w) // SCIRQ ack
+	AM_RANGE(0x1e000, 0x1e000) AM_READWRITE(vblank_irq_ack_r, vblank_irq_ack_w) // VBlank IRQ ack
+	AM_RANGE(0x20000, 0x20000) AM_READ8(ext_r,0x00ff) // EEPROM ready status (*)
+	AM_RANGE(0x22000, 0x22000) AM_WRITE8(ext1_w,0x00ff) // sound CPU reset (*)
+	AM_RANGE(0x24000, 0x24000) AM_WRITE8(ext2_w,0x00ff) // slave & i/o reset (*)
+	AM_RANGE(0x26000, 0x26000) AM_NOP // watchdog
 ADDRESS_MAP_END
 
 
@@ -127,7 +136,7 @@ inline void namco_c148_device::flush_irq_acks()
 {
 	// If writing an IRQ priority register, clear any pending IRQs.
 	// Dirt Fox and Winning Run require this behaviour
-	// TODO: literal behaviour, Winning Run GPU doesn't seem to care about irq ack ports?
+	// TODO: literal behaviour, Winning Run GPU doesn't seem to care about irq ack ports at all?
 	for(int i=0;i<8;i++)
 		m_hostcpu->set_input_line(i,CLEAR_LINE);
 }
@@ -176,18 +185,6 @@ WRITE16_MEMBER( namco_c148_device::cpu_irq_assert_w)
 	m_linked_c148->cpu_irq_trigger();
 }
 
-READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
-{
-	// TODO: same as regular register? winrun91
-	return (m_posirq_line - 32) & 0xff;
-}
-
-WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
-{
-	m_posirq_line = data;
-}
-
-
 //**************************************************************************
 //  GETTERS/SETTERS
 //**************************************************************************
@@ -218,7 +215,20 @@ void namco_c148_device::sci_irq_trigger()
 	m_hostcpu->set_input_line(m_irqlevel.sci, ASSERT_LINE);
 }
 
+// TODO: these doesn't belong here, needs C116 device
+READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
+{
+	// TODO: same as regular register? winrun91 reads here and subs with integer 0x39 for a new posirq that never gets triggered.
+	return (m_posirq_line - 32) & 0xff;
+}
+
+WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
+{
+	m_posirq_line = data;
+}
+
 uint8_t namco_c148_device::get_posirq_line()
 {
 	return m_posirq_line;
 }
+
