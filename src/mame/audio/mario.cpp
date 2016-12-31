@@ -14,9 +14,6 @@
  *
  ****************************************************************/
 
-/* FIXME: Capacitor aging - only in for calibration now        */
-/* Adjustments are needed to bring this close to recordings    */
-
 #define RUN_VCO_VOLTAGE     (0.0)   /* 5 in schematics */
 
 #define USE_8039    (0)         /* set to 1 to try 8039 hack */
@@ -450,7 +447,7 @@ void mario_state::sound_reset()
 	address_space &space = machine().device("audiocpu")->memory().space(AS_PROGRAM);
 
 #if USE_8039
-	set_ea(machine, 1);
+	set_ea(space, 1);
 #endif
 
 	/* FIXME: convert to latch8 */
