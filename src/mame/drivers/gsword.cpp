@@ -850,7 +850,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( josvolly, josvolly_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
+	MCFG_CPU_ADD("maincpu", Z80, 18000000/4) /* ? */
 	MCFG_CPU_PROGRAM_MAP(cpu1_map)
 	MCFG_CPU_IO_MAP(josvolly_cpu1_io_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(josvolly_state, irq0_line_hold, 2*60)
@@ -860,10 +860,10 @@ static MACHINE_CONFIG_START( josvolly, josvolly_state )
 	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", josvolly_state, irq0_line_assert)
 
-	MCFG_DEVICE_ADD("mcu1", I8741, 18000000/6) /* ? */
+	MCFG_DEVICE_ADD("mcu1", I8741, 18000000/2) /* ? */
 	MCFG_CPU_IO_MAP(josvolly_mcu1_io_map)
 
-	MCFG_DEVICE_ADD("mcu2", I8741, 12000000/4) /* ? */
+	MCFG_DEVICE_ADD("mcu2", I8741, 12000000/2) /* ? */
 	MCFG_CPU_IO_MAP(josvolly_mcu2_io_map)
 
 	MCFG_DEVICE_ADD("aa_007", I8255, 0)
