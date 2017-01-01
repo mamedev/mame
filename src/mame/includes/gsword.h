@@ -98,10 +98,10 @@ public:
 
 private:
 	required_device<generic_latch_8_device> m_soundlatch;
-	required_device<msm5205_device>			m_msm;
+	required_device<msm5205_device>         m_msm;
 
-	bool	m_protect_hack;
-	bool	m_nmi_enable;
+	bool    m_protect_hack;
+	bool    m_nmi_enable;
 };
 
 
@@ -136,8 +136,8 @@ public:
 	virtual void machine_reset() override;
 
 private:
-	bool	m_cpu2_nmi_enable;
-	u8		m_mcu1_p1;
-	u8		m_mcu1_p2;
-	u8		m_mcu2_p1;
+	bool    m_cpu2_nmi_enable;
+	u8      m_mcu1_p1;
+	u8      m_mcu1_p2;
+	u8      m_mcu2_p1;
 };

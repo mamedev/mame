@@ -177,7 +177,7 @@ PALETTE_INIT_MEMBER(gsword_state, gsword)
 
 PALETTE_INIT_MEMBER(josvolly_state, josvolly)
 {
-	u8 const *color_prom = memregion("proms")->base();
+	u8 const *const color_prom = memregion("proms")->base();
 
 	// create a lookup table for the palette
 	for (unsigned i = 0; i < 0x100; i++)
@@ -188,17 +188,11 @@ PALETTE_INIT_MEMBER(josvolly_state, josvolly)
 
 		palette.set_indirect_color(i, rgb_t(r, g, b));
 
-		// characters */
+		// characters
 		palette.set_pen_indirect(i, i);
-	}
 
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x300;
-
-	/* sprites */
-	for (unsigned i = 0; i < 0x100; i++)
-	{
-		uint8_t ctabentry = (BITSWAP8(color_prom[i],7,6,5,4,0,1,2,3) & 0x0f) | 0x80;
+		// sprites
+		u8 const ctabentry = bitswap(color_prom[i + 0x300], 0, 1, 2, 3) | 0x80;
 		palette.set_pen_indirect(i + 0x100, ctabentry);
 	}
 }
