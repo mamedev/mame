@@ -66,7 +66,7 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 */
 
 #include "emu.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 
 //-------------------------------------------------

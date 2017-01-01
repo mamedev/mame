@@ -2702,8 +2702,8 @@ files {
 	MAME_DIR .. "src/mame/audio/namco52.h",
 	MAME_DIR .. "src/mame/audio/namco54.cpp",
 	MAME_DIR .. "src/mame/audio/namco54.h",
-	MAME_DIR .. "src/mame/video/c116.cpp",
-	MAME_DIR .. "src/mame/video/c116.h",
+	MAME_DIR .. "src/mame/video/namco_c116.cpp",
+	MAME_DIR .. "src/mame/video/namco_c116.h",
 	MAME_DIR .. "src/mame/video/c45.cpp",
 	MAME_DIR .. "src/mame/video/c45.h",
 }
