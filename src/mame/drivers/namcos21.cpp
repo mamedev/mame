@@ -1226,12 +1226,6 @@ WRITE8_MEMBER(namcos21_state::namcos2_dualportram_byte_w)
 }
 
 /******************************************************************************/
-WRITE16_MEMBER(namcos21_state::NAMCO_C139_SCI_buffer_w){}
-READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_buffer_r){ return 0; }
-
-WRITE16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_w){}
-READ16_MEMBER(namcos21_state::NAMCO_C139_SCI_register_r){ return 0; }
-/******************************************************************************/
 
 /*************************************************************/
 /* MASTER 68000 CPU Memory declarations                      */
