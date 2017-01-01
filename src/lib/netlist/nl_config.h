@@ -84,7 +84,7 @@
  * Your mileage may vary.
  *
  */
-#define USE_MEMPOOL                 (1)
+#define USE_MEMPOOL                 (0)
 #define USE_TRUTHTABLE              (1)
 
 //============================================================
