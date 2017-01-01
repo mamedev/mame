@@ -290,9 +290,13 @@ static ADDRESS_MAP_START( tigerh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tigerh_map_mcu, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_IMPORT_FROM( tigerh_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tigerhb1_map, AS_PROGRAM, 8, slapfght_state )
@@ -317,9 +321,13 @@ static ADDRESS_MAP_START( slapfigh_map, AS_PROGRAM, 8, slapfght_state )
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(scrollx_lo_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(scrollx_hi_w)
 	AM_RANGE(0xe802, 0xe802) AM_WRITE(scrolly_w)
-	AM_RANGE(0xe803, 0xe803) AM_READWRITE(tigerh_mcu_r, tigerh_mcu_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(fixram_w) AM_SHARE("fixvideoram")
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(fixcol_w) AM_SHARE("fixcolorram")
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slapfigh_map_mcu, AS_PROGRAM, 8, slapfght_state )
+	AM_RANGE(0xe803, 0xe803) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+	AM_IMPORT_FROM( slapfigh_map )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slapfighb1_map, AS_PROGRAM, 8, slapfght_state )
@@ -733,13 +741,7 @@ void slapfght_state::machine_start()
 	m_main_irq_enabled = false;
 	m_sound_nmi_enabled = false;
 
-	m_mcu_sent = false;
-	m_main_sent = false;
-	m_from_main = 0;
-	m_from_mcu = 0;
-	m_from_mcu_latch = 0;
-	m_to_mcu_latch = 0;
-	m_old_portB = 0;
+
 
 	m_getstar_status = 0;
 	m_getstar_sequence_index = 0;
@@ -758,14 +760,6 @@ void slapfght_state::machine_start()
 	save_item(NAME(m_main_irq_enabled));
 	save_item(NAME(m_sound_nmi_enabled));
 
-	save_item(NAME(m_mcu_sent));
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
-
-	save_item(NAME(m_from_mcu_latch));
-	save_item(NAME(m_to_mcu_latch));
-	save_item(NAME(m_old_portB));
 
 	save_item(NAME(m_getstar_status));
 	save_item(NAME(m_getstar_sequence_index));
@@ -791,7 +785,7 @@ void slapfght_state::machine_reset()
 MACHINE_RESET_MEMBER(slapfght_state,getstar)
 {
 	// don't boot the mcu since we don't have a dump yet
-	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
+//	m_mcu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 
 	machine_reset();
 }
@@ -978,7 +972,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(tigerh_map)
+	MCFG_CPU_PROGRAM_MAP(tigerh_map_mcu)
 	MCFG_CPU_IO_MAP(tigerh_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
@@ -986,13 +980,7 @@ static MACHINE_CONFIG_START( tigerh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 360) // music speed, verified with pcb recording
 
-	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
-	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, tigerh_mcu_portb_w))
-	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, tigerh_mcu_portc_r))
-
-
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_TIGER, XTAL_36MHz/12) // 3MHz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1033,7 +1021,7 @@ static MACHINE_CONFIG_DERIVED( tigerhb1, tigerh )
 	MCFG_CPU_PROGRAM_MAP(tigerhb1_map)
 	MCFG_CPU_IO_MAP(tigerhb_io_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tigerhb2, tigerhb1 )
@@ -1048,7 +1036,7 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) // 6MHz
-	MCFG_CPU_PROGRAM_MAP(slapfigh_map)
+	MCFG_CPU_PROGRAM_MAP(slapfigh_map_mcu)
 	MCFG_CPU_IO_MAP(slapfigh_io_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", slapfght_state, vblank_irq)
 
@@ -1056,11 +1044,8 @@ static MACHINE_CONFIG_START( slapfigh, slapfght_state )
 	MCFG_CPU_PROGRAM_MAP(tigerh_sound_map)
 	MCFG_CPU_PERIODIC_INT_DRIVER(slapfght_state, sound_nmi, 180)
 
-	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_36MHz/12) // 3MHz
-	MCFG_M68705_PORTA_R_CB(READ8(slapfght_state, tigerh_mcu_porta_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(slapfght_state, tigerh_mcu_porta_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(slapfght_state, slapfght_mcu_portb_w))
-	MCFG_M68705_PORTC_R_CB(READ8(slapfght_state, slapfght_mcu_portc_r))
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU_SLAP, XTAL_36MHz/12) // 3MHz
+	MCFG_TAITO_M68705_EXTENSION_CB(WRITE8(slapfght_state, scroll_from_mcu_w))
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -1101,7 +1086,7 @@ static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 	MCFG_CPU_PROGRAM_MAP(slapfighb1_map)
 	MCFG_CPU_IO_MAP(slapfighb1_io_map)
 
-	MCFG_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("bmcu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( slapfighb2, slapfighb1 )
@@ -1117,6 +1102,9 @@ static MACHINE_CONFIG_DERIVED( getstar, slapfigh )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(getstar_map)
 	MCFG_CPU_IO_MAP(getstar_io_map)
+
+	MCFG_DEVICE_MODIFY("bmcu:mcu")
+	MCFG_DEVICE_DISABLE()
 
 	MCFG_MACHINE_RESET_OVERRIDE(slapfght_state, getstar)
 MACHINE_CONFIG_END
@@ -1302,7 +1290,7 @@ ROM_START( tigerh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a47_03.12d",  0x0000, 0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1339,7 +1327,7 @@ ROM_START( tigerhj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a47_03.12d",  0x0000,  0x2000, CRC(d105260f) SHA1(f6a0e393e29354bb37fb723828f3267d030a45ea) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a47_14.6a",   0x0000, 0x0800, CRC(4042489f) SHA1(b977e0821b6b1aa5a0a0f349cd78150af1a231df) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1561,7 +1549,7 @@ ROM_START( alcon )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a77_02.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a77_13.6a", 0x0000,  0x0800, CRC(a70c81d9) SHA1(f155ffd25a946b0459216a8f80ded16e6e2f9258) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1595,7 +1583,7 @@ ROM_START( slapfigh )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a77_02.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a77_13.6a", 0x0000,  0x0800, CRC(a70c81d9) SHA1(f155ffd25a946b0459216a8f80ded16e6e2f9258) )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1637,7 +1625,7 @@ ROM_START( slapfigha )
 	ROM_REGION( 0x10000, "audiocpu", 0 )
 	ROM_LOAD( "a76_03.12d",   0x0000,  0x2000, CRC(87f4705a) SHA1(a90d5644ce268f3321047a4f96df96ac294d2f1b) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )
 	ROM_LOAD( "a76_14.6a",    0x0000,  0x0800, NO_DUMP ) /* A77 MCU not compatible with this set */
 
 	ROM_REGION( 0x04000, "gfx1", 0 )
@@ -1899,7 +1887,7 @@ ROM_START( grdian )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03.12d",       0x0000,  0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "a68_14.6a",       0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
@@ -1933,7 +1921,7 @@ ROM_START( getstarj )
 	ROM_REGION( 0x10000, "audiocpu", 0 )        /* Region 3 - sound cpu code */
 	ROM_LOAD( "a68-03.12d",       0x00000, 0x2000, CRC(18daa44c) SHA1(1a3d22a186c591321d1b836ee30d89fba4771122) )
 
-	ROM_REGION( 0x0800, "mcu", 0 )  /* 2k for the microcontroller */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 )  /* 2k for the microcontroller */
 	ROM_LOAD( "68705.6a",    0x0000,  0x0800, NO_DUMP )
 
 	ROM_REGION( 0x04000, "gfx1", 0 )    /* Region 1 - temporary for gfx */
