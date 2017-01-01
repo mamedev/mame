@@ -315,6 +315,7 @@ public:
 
 protected:
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_post_load(void) override;
 
 private:
 	inline void get_tile_info(tile_data &tileinfo, int tile_index, uint16_t *gfx_base);
