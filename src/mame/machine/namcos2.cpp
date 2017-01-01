@@ -178,40 +178,6 @@ READ8_MEMBER( namcos2_shared_state::namcos2_68k_eeprom_r )
 	return m_eeprom[offset];
 }
 
-
-
-/**************************************************************/
-/* 68000 Shared serial communications processor (CPU5?)       */
-/**************************************************************/
-
-READ16_MEMBER( namcos2_state::serial_comms_ram_r ){
-	return m_serial_comms_ram[offset];
-}
-
-WRITE16_MEMBER( namcos2_state::serial_comms_ram_w ){
-	COMBINE_DATA( &m_serial_comms_ram[offset] );
-}
-
-READ16_MEMBER( namcos2_state::serial_comms_ctrl_r )
-{
-	uint16_t retval = m_serial_comms_ctrl[offset];
-
-	switch(offset){
-	case 0x00:
-		retval |= 0x0004;   /* Set READY? status bit */
-		break;
-
-	default:
-		break;
-	}
-	return retval;
-}
-
-WRITE16_MEMBER( namcos2_state::serial_comms_ctrl_w )
-{
-	COMBINE_DATA( &m_serial_comms_ctrl[offset] );
-}
-
 /*************************************************************/
 /* 68000 Shared protection/random key generator              */
 /*************************************************************

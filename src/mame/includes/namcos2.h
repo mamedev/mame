@@ -257,7 +257,6 @@ public:
 			m_dpram(*this, "dpram"),
 			m_paletteram(*this, "paletteram"),
 			m_spriteram(*this, "spriteram"),
-			m_serial_comms_ram(*this, "serialram"),
 			m_rozram(*this, "rozram"),
 			m_roz_ctrl(*this, "rozctrl"),
 			m_c45_road(*this, "c45_road")
@@ -324,10 +323,6 @@ public:
 	DECLARE_WRITE16_MEMBER( rozram_word_w );
 	DECLARE_READ16_MEMBER( gfx_ctrl_r );
 	DECLARE_WRITE16_MEMBER( gfx_ctrl_w );
-	DECLARE_READ16_MEMBER( serial_comms_ram_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ram_w );
-	DECLARE_READ16_MEMBER( serial_comms_ctrl_r );
-	DECLARE_WRITE16_MEMBER( serial_comms_ctrl_w );
 
 	void draw_sprite_init();
 	void update_palette();
@@ -343,7 +338,6 @@ public:
 	required_shared_ptr<uint8_t> m_dpram; /* 2Kx8 */
 	required_shared_ptr<uint16_t> m_paletteram;
 	optional_shared_ptr<uint16_t> m_spriteram;
-	optional_shared_ptr<uint16_t> m_serial_comms_ram;
 	optional_shared_ptr<uint16_t> m_rozram;
 	optional_shared_ptr<uint16_t> m_roz_ctrl;
 	tilemap_t *m_tilemap_roz;

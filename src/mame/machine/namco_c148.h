@@ -91,6 +91,9 @@ public:
 	DECLARE_WRITE8_MEMBER( ext_posirq_line_w );
 	DECLARE_WRITE16_MEMBER( cpu_irq_assert_w );
 
+	DECLARE_READ8_MEMBER( bus_ctrl_r );
+	DECLARE_WRITE8_MEMBER( bus_ctrl_w );
+
 	DECLARE_READ8_MEMBER( ext_r );
 	DECLARE_WRITE8_MEMBER( ext1_w );
 	DECLARE_WRITE8_MEMBER( ext2_w );
@@ -121,6 +124,7 @@ private:
 	}m_irqlevel;
 
 	uint8_t m_posirq_line;
+	uint8_t m_bus_reg;
 	void flush_irq_acks();
 };
 
