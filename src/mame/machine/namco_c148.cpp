@@ -102,6 +102,8 @@ void namco_c148_device::device_start()
 {
 	m_hostcpu = machine().device<cpu_device>(m_hostcpu_tag);
 	m_linked_c148 = machine().device<namco_c148_device>(m_linked_c148_tag);
+	assert(m_hostcpu != nullptr);
+
 	m_out_ext1_cb.resolve_safe();
 	m_out_ext2_cb.resolve_safe();
 

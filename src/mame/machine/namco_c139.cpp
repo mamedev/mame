@@ -1,0 +1,98 @@
+// license:BSD-3-Clause
+// copyright-holders:<author_name>
+/***************************************************************************
+
+	Namco C139 - Serial I/F Controller
+
+	
+	TODO:
+	- Is RAM shared with a specific CPU other than master/slave?
+	
+***************************************************************************/
+
+#include "emu.h"
+#include "namco_c139.h"
+
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// device type definition
+const device_type NAMCO_C139 = &device_creator<namco_c139_device>;
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+static ADDRESS_MAP_START( data_map, AS_DATA, 16, namco_c139_device )
+	AM_RANGE(0x0000, 0x3fff) AM_RAM AM_SHARE("sharedram")
+ADDRESS_MAP_END
+
+DEVICE_ADDRESS_MAP_START( regs_map, 16, namco_c139_device )
+	AM_RANGE(0x00, 0x00) AM_READ(status_r)
+ADDRESS_MAP_END
+
+//-------------------------------------------------
+//  namco_c139_device - constructor
+//-------------------------------------------------
+
+namco_c139_device::namco_c139_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NAMCO_C139, "namco_c139_longname", tag, owner, clock, "namco_c139", __FILE__),
+	device_memory_interface(mconfig, *this),
+	m_space_config("data", ENDIANNESS_BIG, 16, 14, 0, *ADDRESS_MAP_NAME(data_map))
+{
+}
+
+
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void namco_c139_device::device_start()
+{
+	m_ram = (uint16_t*)memshare("sharedram")->ptr();
+
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void namco_c139_device::device_reset()
+{
+}
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *namco_c139_device::memory_space_config(address_spacenum spacenum) const
+{
+	return (spacenum == AS_DATA) ? &m_space_config : nullptr;
+}
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
+
+READ16_MEMBER(namco_c139_device::ram_r)
+{
+	return m_ram[offset];
+}
+
+WRITE16_MEMBER(namco_c139_device::ram_w)
+{
+	COMBINE_DATA(&m_ram[offset]);
+}
+
+READ16_MEMBER(namco_c139_device::status_r)
+{
+	return 4; // STATUS bit?
+}
