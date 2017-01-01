@@ -137,10 +137,6 @@ public:
 	DECLARE_WRITE16_MEMBER(namcos2_68k_dualportram_word_w);
 	DECLARE_READ8_MEMBER(namcos2_dualportram_byte_r);
 	DECLARE_WRITE8_MEMBER(namcos2_dualportram_byte_w);
-	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_buffer_w);
-	DECLARE_READ16_MEMBER(NAMCO_C139_SCI_buffer_r);
-	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_register_w);
-	DECLARE_READ16_MEMBER(NAMCO_C139_SCI_register_r);
 	DECLARE_READ16_MEMBER(winrun_dspcomram_r);
 	DECLARE_WRITE16_MEMBER(winrun_dspcomram_w);
 	DECLARE_READ16_MEMBER(winrun_cuskey_r);

@@ -32,7 +32,11 @@ static ADDRESS_MAP_START( data_map, AS_DATA, 16, namco_c139_device )
 ADDRESS_MAP_END
 
 DEVICE_ADDRESS_MAP_START( regs_map, 16, namco_c139_device )
-	AM_RANGE(0x00, 0x00) AM_READ(status_r)
+	AM_RANGE(0x00, 0x00) AM_READ(status_r) // WRITE clears flags
+//	AM_RANGE(0x02, 0x02) // settings?
+//	AM_RANGE(0x0a, 0x0a) // WRITE tx_w
+//	AM_RANGE(0x0c, 0x0c) // READ rx_r
+// 	AM_RANGE(0x0e, 0x0e) // 
 ADDRESS_MAP_END
 
 //-------------------------------------------------
@@ -94,5 +98,9 @@ WRITE16_MEMBER(namco_c139_device::ram_w)
 
 READ16_MEMBER(namco_c139_device::status_r)
 {
+	/*
+	 x-- RX READY or irq pending?
+	 -x- IRQ direction: 1 RX cause - 0 TX cause
+	*/
 	return 4; // STATUS bit?
 }
