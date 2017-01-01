@@ -1822,38 +1822,6 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-#if USE_FAKE_VOTRAX
-
-static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_PROGRAM_MAP(reactor_map)
-
-	MCFG_DEVICE_REMOVE("nvram")
-
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(reactor_samples)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
-
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(qbert_knocker)
-	MCFG_FRAGMENT_ADD(qbert_samples)
-MACHINE_CONFIG_END
-
-
-static MACHINE_CONFIG_DERIVED( tylz, gottlieb1 )
-
-	/* sound hardware */
-	MCFG_FRAGMENT_ADD(qbert_samples)
-MACHINE_CONFIG_END
-
-
-#else
-
 
 static MACHINE_CONFIG_DERIVED( gottlieb1_votrax, gottlieb_core )
 	MCFG_SOUND_ADD("r1sound", GOTTLIEB_SOUND_REV1_WITH_VOTRAX, 0)
@@ -1880,9 +1848,6 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tylz, gottlieb1_votrax )
 MACHINE_CONFIG_END
-
-
-#endif
 
 
 static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )

@@ -18,6 +18,7 @@
 #include "devices/net_lib.h"
 #include "devices/nld_truthtable.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
 
@@ -191,45 +192,45 @@ pstring setup_t::objtype_as_str(detail::device_object_t &in) const
 	return "Error";
 }
 
-void setup_t::register_and_set_param(pstring name, param_t &param)
+pstring setup_t::get_initial_param_val(const pstring name, const pstring def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+		return i->second;
+	else
+		return def;
+}
+
+double setup_t::get_initial_param_val(const pstring name, const double def)
 {
 	auto i = m_param_values.find(name);
 	if (i != m_param_values.end())
 	{
-		const pstring val = i->second;
-		log().debug("Found parameter ... {1} : {1}\n", name, val);
-		switch (param.param_type())
-		{
-			case param_t::DOUBLE:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_double_t &>(param).initial(vald);
-			}
-			break;
-			case param_t::INTEGER:
-			case param_t::LOGIC:
-			{
-				double vald = 0;
-				if (sscanf(val.cstr(), "%lf", &vald) != 1)
-					log().fatal("Invalid number conversion {1} : {2}\n", name, val);
-				static_cast<param_int_t &>(param).initial(static_cast<int>(vald));
-			}
-			break;
-			case param_t::POINTER:
-				static_cast<param_ptr_t &>(param).initial(nullptr);
-			break;
-			case param_t::STRING:
-			case param_t::MODEL:
-			{
-				static_cast<param_str_t &>(param).initial(val);
-			}
-			break;
-			//default:
-			//  log().fatal("Parameter is not supported {1} : {2}\n", name, val);
-		}
+		double vald = 0;
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return vald;
 	}
+	else
+		return def;
+}
+
+int setup_t::get_initial_param_val(const pstring name, const int def)
+{
+	auto i = m_param_values.find(name);
+	if (i != m_param_values.end())
+	{
+		double vald = 0;
+		if (sscanf(i->second.c_str(), "%lf", &vald) != 1)
+			log().fatal("Invalid number conversion {1} : {2}\n", name, i->second);
+		return static_cast<int>(vald);
+	}
+	else
+		return def;
+}
+
+void setup_t::register_param(pstring name, param_t &param)
+{
 	if (!m_params.insert({param.name(), param_ref_t(param.name(), param.device(), param)}).second)
 		log().fatal("Error adding parameter {1} to parameter list\n", name);
 }
@@ -444,7 +445,7 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		}
 		out.net().m_core_terms.clear(); // clear the list
 
-		out.net().register_con(new_proxy->in());
+		out.net().add_terminal(new_proxy->in());
 		out_cast.set_proxy(proxy);
 
 		proxy = new_proxy.get();
@@ -452,6 +453,52 @@ devices::nld_base_proxy *setup_t::get_d_a_proxy(detail::core_terminal_t &out)
 		netlist().register_dev(std::move(new_proxy));
 	}
 	return proxy;
+}
+
+devices::nld_base_proxy *setup_t::get_a_d_proxy(detail::core_terminal_t &inp)
+{
+	nl_assert(inp.is_analog());
+
+	logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
+	devices::nld_base_proxy *proxy = incast.get_proxy();
+
+	if (proxy != nullptr)
+		return proxy;
+	else
+	{
+		log().debug("connect_terminal_input: connecting proxy\n");
+		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
+		auto new_proxy = incast.logic_family()->create_a_d_proxy(netlist(), x, &incast);
+		//auto new_proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
+		incast.set_proxy(new_proxy.get());
+		m_proxy_cnt++;
+
+		auto ret = new_proxy.get();
+
+#if 1
+		/* connect all existing terminals to new net */
+
+		if (inp.has_net())
+		{
+			for (auto & p : inp.net().m_core_terms)
+			{
+				p->clear_net(); // de-link from all nets ...
+				if (!connect(ret->proxy_term(), *p))
+					log().fatal("Error connecting {1} to {2}\n", ret->proxy_term().name(), (*p).name());
+			}
+			inp.net().m_core_terms.clear(); // clear the list
+		}
+		ret->out().net().add_terminal(inp);
+#else
+		if (inp.has_net())
+			//fatalerror("logic inputs can only belong to one net!\n");
+			merge_nets(ret->out().net(), inp.net());
+		else
+			ret->out().net().add_terminal(inp);
+#endif
+		netlist().register_dev(std::move(new_proxy));
+		return ret;
+	}
 }
 
 void setup_t::merge_nets(detail::net_t &thisnet, detail::net_t &othernet)
@@ -483,17 +530,16 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 {
 	if (out.is_analog() && in.is_logic())
 	{
+#if 0
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
 		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
+#endif
+		auto proxy = get_a_d_proxy(in);
 
-		proxy->m_Q.net().register_con(in);
-		out.net().register_con(proxy->m_I);
-
-		netlist().register_dev(std::move(proxy));
-
+		out.net().add_terminal(proxy->proxy_term());
 	}
 	else if (out.is_logic() && in.is_analog())
 	{
@@ -507,7 +553,7 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 		if (in.has_net())
 			merge_nets(out.net(), in.net());
 		else
-			out.net().register_con(in);
+			out.net().add_terminal(in);
 	}
 }
 
@@ -520,22 +566,20 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	}
 	else if (inp.is_logic())
 	{
+		netlist().log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(), pstring(inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?"), term.name());
+#if 0
 		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
 		log().debug("connect_terminal_input: connecting proxy\n");
 		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
 		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
 		incast.set_proxy(proxy.get());
 		m_proxy_cnt++;
+#endif
+		auto proxy = get_a_d_proxy(inp);
 
-		connect_terminals(term, proxy->m_I);
+		//out.net().register_con(proxy->proxy_term());
+		connect_terminals(term, proxy->proxy_term());
 
-		if (inp.has_net())
-			//fatalerror("logic inputs can only belong to one net!\n");
-			merge_nets(proxy->m_Q.net(), inp.net());
-		else
-			proxy->m_Q.net().register_con(inp);
-
-		netlist().register_dev(std::move(proxy));
 	}
 	else
 	{
@@ -552,7 +596,7 @@ void setup_t::connect_terminal_output(terminal_t &in, detail::core_terminal_t &o
 		if (in.has_net())
 			merge_nets(out.net(), in.net());
 		else
-			out.net().register_con(in);
+			out.net().add_terminal(in);
 	}
 	else if (out.is_logic())
 	{
@@ -577,12 +621,12 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 	else if (t2.has_net())
 	{
 		log().debug("T2 has net\n");
-		t2.net().register_con(t1);
+		t2.net().add_terminal(t1);
 	}
 	else if (t1.has_net())
 	{
 		log().debug("T1 has net\n");
-		t1.net().register_con(t2);
+		t1.net().add_terminal(t2);
 	}
 	else
 	{
@@ -590,8 +634,8 @@ void setup_t::connect_terminals(detail::core_terminal_t &t1, detail::core_termin
 		// FIXME: Nets should have a unique name
 		auto anet = plib::palloc<analog_net_t>(netlist(),"net." + t1.name());
 		t1.set_net(anet);
-		anet->register_con(t2);
-		anet->register_con(t1);
+		anet->add_terminal(t2);
+		anet->add_terminal(t1);
 	}
 }
 
@@ -834,6 +878,10 @@ public:
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	}
 };
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
@@ -852,10 +900,11 @@ const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 
 	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
 
-	ret->m_low_thresh_V = setup_t::model_value(map, "IVL");
-	ret->m_high_thresh_V = setup_t::model_value(map, "IVH");
-	ret->m_low_V = setup_t::model_value(map, "OVL");
-	ret->m_high_V = setup_t::model_value(map, "OVH");
+	ret->m_fixed_V = setup_t::model_value(map, "FV");
+	ret->m_low_thresh_PCNT = setup_t::model_value(map, "IVL");
+	ret->m_high_thresh_PCNT = setup_t::model_value(map, "IVH");
+	ret->m_low_VO = setup_t::model_value(map, "OVL");
+	ret->m_high_VO = setup_t::model_value(map, "OVH");
 	ret->m_R_low = setup_t::model_value(map, "ORL");
 	ret->m_R_high = setup_t::model_value(map, "ORH");
 
@@ -974,11 +1023,27 @@ void setup_t::include(const pstring &netlist_name)
 {
 	for (auto &source : m_sources)
 	{
-		if (source->parse(*this, netlist_name))
+		if (source->parse(netlist_name))
 			return;
 	}
 	log().fatal("unable to find {1} in source collection", netlist_name);
 }
+
+std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
+{
+	for (auto &source : m_sources)
+	{
+		if (source->type() == source_t::DATA)
+		{
+			auto strm = source->stream(name);
+			if (strm)
+				return strm;
+		}
+	}
+	log().fatal("unable to find data named {1} in source collection", name);
+	return std::unique_ptr<plib::pistream>(nullptr);
+}
+
 
 bool setup_t::parse_stream(plib::pistream &istrm, const pstring &name)
 {
@@ -1001,22 +1066,27 @@ void setup_t::register_define(pstring defstr)
 // base sources
 // ----------------------------------------------------------------------------------------
 
-bool source_string_t::parse(setup_t &setup, const pstring &name)
+bool source_t::parse(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	if (m_type != SOURCE)
+		return false;
+	else
+		return m_setup.parse_stream(*stream(name), name);
 }
 
-bool source_mem_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_string_t::stream(const pstring &name)
 {
-	plib::pimemstream istrm(m_str.cstr(), m_str.len());
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
 }
 
-bool source_file_t::parse(setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> source_mem_t::stream(const pstring &name)
 {
-	plib::pifilestream istrm(m_filename);
-	return setup.parse_stream(istrm, name);
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_str.c_str(), m_str.len());
+}
+
+std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
+{
+	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
 }

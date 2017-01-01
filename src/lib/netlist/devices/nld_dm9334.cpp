@@ -11,9 +11,9 @@ namespace netlist
 {
 	namespace devices
 	{
-	NETLIB_OBJECT(DM9334)
+	NETLIB_OBJECT(9334)
 	{
-		NETLIB_CONSTRUCTOR(DM9334)
+		NETLIB_CONSTRUCTOR(9334)
 		, m_CQ(*this, "CQ")
 		, m_EQ(*this, "EQ")
 		, m_D(*this, "D")
@@ -44,9 +44,9 @@ namespace netlist
 		state_var<unsigned> m_last_Q;
 	};
 
-	NETLIB_OBJECT_DERIVED(DM9334_dip, DM9334)
+	NETLIB_OBJECT_DERIVED(9334_dip, 9334)
 	{
-		NETLIB_CONSTRUCTOR_DERIVED(DM9334_dip, DM9334)
+		NETLIB_CONSTRUCTOR_DERIVED(9334_dip, 9334)
 		{
 			register_subalias("1", m_A[0]);
 			register_subalias("2", m_A[1]);
@@ -67,7 +67,7 @@ namespace netlist
 		}
 	};
 
-	NETLIB_RESET(DM9334)
+	NETLIB_RESET(9334)
 	{
 		m_last_CQ = 0;
 		m_last_EQ = 0;
@@ -76,7 +76,7 @@ namespace netlist
 		m_last_Q = 0;
 	}
 
-	NETLIB_UPDATE(DM9334)
+	NETLIB_UPDATE(9334)
 	{
 		uint_fast8_t a = 0;
 		for (std::size_t i=0; i<3; i++)
@@ -142,8 +142,8 @@ namespace netlist
 			m_Q[i].push((q >> i) & 1, delay);
 	}
 
-	NETLIB_DEVICE_IMPL(DM9334)
-	NETLIB_DEVICE_IMPL(DM9334_dip)
+	NETLIB_DEVICE_IMPL(9334)
+	NETLIB_DEVICE_IMPL(9334_dip)
 
 	} //namespace devices
 } // namespace netlist

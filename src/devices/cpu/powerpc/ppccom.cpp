@@ -1505,7 +1505,7 @@ void ppc_device::ppccom_tlb_flush()
 void ppc_device::ppccom_get_dsisr()
 {
 	int intent = 0;
-	
+
 	if (m_core->param1 & 1)
 	{
 		intent = TRANSLATE_WRITE;
@@ -1514,7 +1514,7 @@ void ppc_device::ppccom_get_dsisr()
 	{
 		intent = TRANSLATE_READ;
 	}
-	
+
 	m_core->param1 = ppccom_translate_address_internal(intent, m_core->param0);
 }
 

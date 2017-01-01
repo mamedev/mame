@@ -40,34 +40,38 @@
 // -----------------------------------------------------------------------------
 
 #define RES(name, p_R)                                                         \
-		NET_REGISTER_DEV(RES, name)                                           \
+		NET_REGISTER_DEV(RES, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
 
 #define POT(name, p_R)                                                         \
-		NET_REGISTER_DEV(POT, name)                                           \
+		NET_REGISTER_DEV(POT, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
 
 /* Does not have pin 3 connected */
 #define POT2(name, p_R)                                                        \
-		NET_REGISTER_DEV(POT2, name)                                          \
+		NET_REGISTER_DEV(POT2, name)                                           \
 		NETDEV_PARAMI(name, R, p_R)
 
 
 #define CAP(name, p_C)                                                         \
-		NET_REGISTER_DEV(CAP, name)                                           \
+		NET_REGISTER_DEV(CAP, name)                                            \
 		NETDEV_PARAMI(name, C, p_C)
 
+#define IND(name, p_L)                                                         \
+		NET_REGISTER_DEV(IND, name)                                            \
+		NETDEV_PARAMI(name, L, p_L)
+
 /* Generic Diode */
-#define DIODE(name,  model)                                                  \
-		NET_REGISTER_DEV(DIODE, name)                                         \
+#define DIODE(name,  model)                                                    \
+		NET_REGISTER_DEV(DIODE, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
 
-#define VS(name, pV)                                                          \
-		NET_REGISTER_DEV(VS, name)                                            \
+#define VS(name, pV)                                                           \
+		NET_REGISTER_DEV(VS, name)                                             \
 		NETDEV_PARAMI(name, V, pV)
 
-#define CS(name, pI)                                                          \
-		NET_REGISTER_DEV(CS, name)                                            \
+#define CS(name, pI)                                                           \
+		NET_REGISTER_DEV(CS, name)                                             \
 		NETDEV_PARAMI(name, I, pI)
 
 // -----------------------------------------------------------------------------
@@ -303,6 +307,43 @@ private:
 
 };
 
+// -----------------------------------------------------------------------------
+// nld_L
+// -----------------------------------------------------------------------------
+
+NETLIB_OBJECT_DERIVED(L, twoterm)
+{
+public:
+	NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
+	, m_L(*this, "L", 1e-6)
+	, m_GParallel(0.0)
+	, m_G(0.0)
+	, m_I(0.0)
+	{
+		//register_term("1", m_P);
+		//register_term("2", m_N);
+	}
+
+	NETLIB_TIMESTEP()
+	{
+		/* Gpar should support convergence */
+		m_I = m_I + m_G * deltaV();
+		m_G = step / m_L() + m_GParallel;
+		set(m_G, 0.0, m_I);
+	}
+
+	param_double_t m_L;
+
+protected:
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
+
+private:
+	nl_double m_GParallel;
+	nl_double m_G;
+	nl_double m_I;
+};
 
 // -----------------------------------------------------------------------------
 // A generic diode model to be used in other devices (Diode, BJT ...)

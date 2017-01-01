@@ -336,7 +336,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 
 	// mark first filename entry
 	first = m_entrylist.size() + 1;
-	
+
 	// build the menu for each item
 	if (err == osd_file::error::NONE)
 	{
@@ -361,7 +361,7 @@ void menu_file_selector::populate(float &customtop, float &custombottom)
 	// sort the menu entries
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> conv;
 	const std::collate<wchar_t>& coll = std::use_facet<std::collate<wchar_t>>(std::locale());
-	std::sort(m_entrylist.begin()+first, m_entrylist.end(), [&coll, &conv](file_selector_entry const &x, file_selector_entry const &y) 
+	std::sort(m_entrylist.begin()+first, m_entrylist.end(), [&coll, &conv](file_selector_entry const &x, file_selector_entry const &y)
 		{
 			std::wstring xstr = conv.from_bytes(x.basename);
 			std::wstring ystr = conv.from_bytes(y.basename);

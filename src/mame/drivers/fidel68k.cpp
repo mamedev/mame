@@ -12,7 +12,6 @@
 
     TODO:
     - how does dual-CPU work?
-    - EAG IRQ level/timing is unknown
     - USART is not emulated
     - V9(68030 @ 32MHz) is faster than V10(68040 @ 25MHz) but it should be the other
       way around, culprit is unemulated cache?
@@ -51,15 +50,15 @@ V6-V11 are on model 6117. Older 1986 model 6081/6088/6089 uses a 6502 CPU.
 Hardware info:
 --------------
 - MC68HC000P12F 16MHz CPU, 16MHz XTAL
-- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots(V2: slot 1 and 2 64KB)
+- MB1422A DRAM Controller, 25MHz XTAL near, 4 DRAM slots
+  (V2: slot 2 & 3 64KB, V3: slot 2 & 3 256KB)
 - 2*27C512 64KB EPROM, 2*KM6264AL-10 8KB SRAM, 2*AT28C64X 8KB EEPROM
 - OKI M82C51A-2 USART, 4.9152MHz XTAL
 - other special: magnet sensors, external module slot, serial port
 
-IRQ source is unknown. Several possibilities:
-- NE555 timer IC
-- MM/SN74HC4060 binary counter IC (near the M82C51A)
-- one of the XTALs, plus divider of course
+IRQ source is a 4,9152MHz quartz crystal (Y3) connected to a 74HC4060 (U8,
+ripple counter/divider). From Q12 output (counter=8192) we obtain the IRQ signal
+applied to IPL1 of 68000 (pin 24) 4,9152 MHz / 8192 = 600 Hz.
 
 The module slot pinout is different from SCC series. The data on those appears
 to be compatible with EAG though and will load fine with an adapter.
@@ -157,6 +156,7 @@ B0000x-xxxxxx: see V7, -800000
 #include "emu.h"
 #include "includes/fidelz80.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/ram.h"
 #include "machine/nvram.h"
 #include "sound/volt_reg.h"
 
@@ -169,8 +169,11 @@ class fidel68k_state : public fidelz80base_state
 {
 public:
 	fidel68k_state(const machine_config &mconfig, device_type type, const char *tag)
-		: fidelz80base_state(mconfig, type, tag)
+		: fidelz80base_state(mconfig, type, tag),
+		m_ram(*this, "ram")
 	{ }
+
+	optional_device<ram_device> m_ram;
 
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_on) { m_maincpu->set_input_line(M68K_IRQ_2, ASSERT_LINE); }
 	TIMER_DEVICE_CALLBACK_MEMBER(irq_off) { m_maincpu->set_input_line(M68K_IRQ_2, CLEAR_LINE); }
@@ -179,6 +182,7 @@ public:
 	DECLARE_WRITE8_MEMBER(fexcel68k_mux_w);
 
 	// EAG(6114/6117)
+	DECLARE_DRIVER_INIT(eag);
 	void eag_prepare_display();
 	DECLARE_READ8_MEMBER(eag_input1_r);
 	DECLARE_WRITE8_MEMBER(eag_leds_w);
@@ -288,10 +292,15 @@ ADDRESS_MAP_END
 
 // EAG
 
+DRIVER_INIT_MEMBER(fidel68k_state, eag)
+{
+	// eag_map: DRAM slots at $200000-$2fffff - V1/V2: 128K, V3: 512K, V4: 1M
+	m_maincpu->space(AS_PROGRAM).install_ram(0x200000, 0x200000 + m_ram->size() - 1, m_ram->pointer());
+}
+
 static ADDRESS_MAP_START( eag_map, AS_PROGRAM, 16, fidel68k_state )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x104000, 0x107fff) AM_RAM
-	AM_RANGE(0x200000, 0x2fffff) AM_RAM // DRAM slots
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_READWRITE8(eag_input1_r, eag_leds_w, 0x00ff)
 	AM_RANGE(0x300000, 0x30000f) AM_MIRROR(0x000010) AM_WRITE8(eag_7seg_w, 0xff00) AM_READNOP
 	AM_RANGE(0x400000, 0x407fff) AM_READ8(eag_cart_r, 0xff00)
@@ -567,12 +576,16 @@ static MACHINE_CONFIG_START( eag, fidel68k_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
 	MCFG_CPU_PROGRAM_MAP(eag_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 
 	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", fidelz80base_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_fidel_eag_68k)
+
+	MCFG_RAM_ADD("ram")
+	MCFG_RAM_DEFAULT_SIZE("1M")
+	MCFG_RAM_EXTRA_OPTIONS("128K, 512K, 1M")
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("speaker")
@@ -592,31 +605,33 @@ static MACHINE_CONFIG_DERIVED( eagv7, eag )
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68020, XTAL_20MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
+
+	MCFG_RAM_REMOVE("ram")
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv9, eag )
+static MACHINE_CONFIG_DERIVED( eagv9, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68030, XTAL_32MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv7_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv10, eag )
+static MACHINE_CONFIG_DERIVED( eagv10, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68040, XTAL_25MHz)
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_DERIVED( eagv11, eag )
+static MACHINE_CONFIG_DERIVED( eagv11, eagv7 )
 
 	/* basic machine hardware */
 	MCFG_CPU_REPLACE("maincpu", M68EC040, XTAL_36MHz*2*2) // wrong! should be M68EC060 @ 72MHz
 	MCFG_CPU_PROGRAM_MAP(eagv11_map)
-	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, 600) // complete guess
+	MCFG_CPU_PERIODIC_INT_DRIVER(fidel68k_state, irq2_line_hold, XTAL_4_9152MHz/0x2000) // 600hz
 MACHINE_CONFIG_END
 
 
@@ -632,10 +647,16 @@ ROM_START( fexcel68k ) // model 6094, PCB label 510.1120B01
 ROM_END
 
 
-ROM_START( feagv2 )
+ROM_START( feagv2 ) // from a V2 board
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
-	ROM_LOAD16_BYTE("6114_e5.u18", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
-	ROM_LOAD16_BYTE("6114_o5.u19", 0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+	ROM_LOAD16_BYTE("6114_e5_yellow.u22", 0x00000, 0x10000, CRC(f9c7bada) SHA1(60e545f829121b9a4f1100d9e85ac83797715e80) ) // 27c512
+	ROM_LOAD16_BYTE("6114_o5_green.u19",  0x00001, 0x10000, CRC(04f97b22) SHA1(8b2845dd115498f7b385e8948eca6a5893c223d1) ) // "
+ROM_END
+
+ROM_START( feagv2a ) // from a V3 board
+	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
+	ROM_LOAD16_BYTE("elite_1.6_e.u22", 0x00000, 0x10000, CRC(c8b89ccc) SHA1(d62e0a72f54b793ab8853468a81255b62f874658) )
+	ROM_LOAD16_BYTE("elite_1.6_o.u19", 0x00001, 0x10000, CRC(904c7061) SHA1(742110576cf673321440bc81a4dae4c949b49e38) )
 ROM_END
 
 ROM_START( feagv7 )
@@ -666,11 +687,12 @@ ROM_END
     Drivers
 ******************************************************************************/
 
-/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      INIT              COMPANY, FULLNAME, FLAGS */
-CONS( 1987, fexcel68k, 0,       0,      fexcel68k, fexcel68k, driver_device, 0, "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+/*    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT      INIT                 COMPANY, FULLNAME, FLAGS */
+CONS( 1987, fexcel68k, 0,       0,      fexcel68k, fexcel68k, driver_device,  0,   "Fidelity Electronics", "Excel 68000", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, feagv2,    0,       0,      eag,       eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv7,    feagv2,  0,      eagv7,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv9,    feagv2,  0,      eagv9,     eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 1990, feagv10,   feagv2,  0,      eagv10,    eag,       driver_device, 0, "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
-CONS( 2002, feagv11,   feagv2,  0,      eagv11,    eag,       driver_device, 0, "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2,    0,       0,      eag,       eag,       fidel68k_state, eag, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 1)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1989, feagv2a,   feagv2,  0,      eag,       eag,       fidel68k_state, eag, "Fidelity Electronics", "Elite Avant Garde (model 6114-2/3/4, set 2)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv7,    feagv2,  0,      eagv7,     eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-7)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv9,    feagv2,  0,      eagv9,     eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-9)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1990, feagv10,   feagv2,  0,      eagv10,    eag,       driver_device,  0,   "Fidelity Electronics", "Elite Avant Garde (model 6117-10)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+CONS( 2002, feagv11,   feagv2,  0,      eagv11,    eag,       driver_device,  0,   "hack (Wilfried Bucke)", "Elite Avant Garde (model 6117-11)", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )

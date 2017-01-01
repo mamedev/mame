@@ -5,7 +5,8 @@
     ACT Apricot PC/Xi
 
     TODO:
-    - ASYNC (the terminal program) hangs after loading
+    - External RS232 data transfers to the Apricot are usually garbage (but
+      sending to an external target works fine)
     - Dump of the keyboard MCU ROM needed (can be dumped using test mode)
 
 ***************************************************************************/
@@ -17,6 +18,7 @@
 #include "machine/i8255.h"
 #include "machine/pic8259.h"
 #include "machine/z80dart.h"
+#include "machine/74153.h"
 #include "machine/wd_fdc.h"
 #include "video/mc6845.h"
 #include "sound/sn76496.h"
@@ -26,6 +28,7 @@
 #include "bus/rs232/rs232.h"
 #include "bus/apricot/expansion/expansion.h"
 #include "bus/apricot/keyboard/keyboard.h"
+#include "softlist.h"
 
 
 //**************************************************************************
@@ -52,8 +55,6 @@ public:
 	m_floppy1(*this, "ic68:1"),
 	m_palette(*this, "palette"),
 	m_screen_buffer(*this, "screen_buffer"),
-	m_data_selector_dtr(1),
-	m_data_selector_rts(1),
 	m_video_mode(0),
 	m_display_on(1),
 	m_display_enabled(0),
@@ -70,8 +71,6 @@ public:
 	DECLARE_WRITE8_MEMBER(i8255_portb_w);
 	DECLARE_READ8_MEMBER(i8255_portc_r);
 	DECLARE_WRITE8_MEMBER(i8255_portc_w);
-	DECLARE_WRITE_LINE_MEMBER(timer_out1);
-	DECLARE_WRITE_LINE_MEMBER(timer_out2);
 	DECLARE_WRITE_LINE_MEMBER(fdc_intrq_w);
 	DECLARE_READ8_MEMBER(sio_da_r);
 	DECLARE_READ8_MEMBER(sio_ca_r);
@@ -82,9 +81,6 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(write_centronics_perror);
 
 	DECLARE_WRITE_LINE_MEMBER(apricot_hd6845_de) { m_display_enabled = state; };
-
-	DECLARE_WRITE_LINE_MEMBER(data_selector_dtr_w) { m_data_selector_dtr = state; };
-	DECLARE_WRITE_LINE_MEMBER(data_selector_rts_w) { m_data_selector_rts = state; };
 
 	MC6845_UPDATE_ROW(crtc_update_row);
 	uint32_t screen_update_apricot(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
@@ -108,9 +104,6 @@ private:
 	required_device<floppy_connector> m_floppy1;
 	required_device<palette_device> m_palette;
 	required_shared_ptr<uint16_t> m_screen_buffer;
-
-	int m_data_selector_dtr;
-	int m_data_selector_rts;
 
 	bool m_video_mode;
 	bool m_display_on;
@@ -200,27 +193,6 @@ WRITE8_MEMBER( apricot_state::i8255_portc_w )
 //  schematic page 294 says pc4 outputs to centronics pin 13, which is the "select" output from the printer.
 	m_centronics->write_strobe(BIT(data, 5));
 //  schematic page 294 says pc6 outputs to centronics pin 15, which is unused
-}
-
-WRITE_LINE_MEMBER( apricot_state::timer_out1 )
-{
-	// receive clock via timer 1
-	if (m_data_selector_rts == 0 && m_data_selector_dtr == 0)
-		m_sio->rxca_w(state);
-}
-
-WRITE_LINE_MEMBER( apricot_state::timer_out2 )
-{
-	// transmit clock via timer 2
-	if (m_data_selector_rts == 0 && m_data_selector_dtr == 0)
-		m_sio->txca_w(state);
-
-	// transmit and receive clock via timer 2
-	if (m_data_selector_rts == 1 && m_data_selector_dtr == 0)
-	{
-		m_sio->txca_w(state);
-		m_sio->rxca_w(state);
-	}
 }
 
 READ8_MEMBER( apricot_state::sio_da_r )
@@ -426,9 +398,15 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_PIT8253_CLK0(XTAL_4MHz / 16)
 	MCFG_PIT8253_OUT0_HANDLER(DEVWRITELINE("ic31", pic8259_device, ir6_w))
 	MCFG_PIT8253_CLK1(XTAL_4MHz / 2)
-	MCFG_PIT8253_OUT1_HANDLER(WRITELINE(apricot_state, timer_out1))
+	MCFG_PIT8253_OUT1_HANDLER(DEVWRITELINE("ic14", ttl153_device, i0a_w))
 	MCFG_PIT8253_CLK2(XTAL_4MHz / 2)
-	MCFG_PIT8253_OUT2_HANDLER(WRITELINE(apricot_state, timer_out2))
+	MCFG_PIT8253_OUT2_HANDLER(DEVWRITELINE("ic14", ttl153_device, i0b_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ic14", ttl153_device, i2a_w))
+	MCFG_DEVCB_CHAIN_OUTPUT(DEVWRITELINE("ic14", ttl153_device, i2b_w))
+
+	MCFG_TTL153_ADD("ic14")
+	MCFG_TTL153_ZA_CB(DEVWRITELINE("ic15", z80sio0_device, rxca_w))
+	MCFG_TTL153_ZB_CB(DEVWRITELINE("ic15", z80sio0_device, txca_w))
 
 	MCFG_Z80SIO0_ADD("ic15", XTAL_15MHz / 6, 0, 0, XTAL_4MHz / 16, XTAL_4MHz / 16)
 	MCFG_Z80DART_OUT_TXDA_CB(DEVWRITELINE("rs232", rs232_port_device, write_txd))
@@ -436,18 +414,17 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_Z80DART_OUT_RTSA_CB(DEVWRITELINE("rs232", rs232_port_device, write_rts))
 	MCFG_Z80DART_OUT_WRDYA_CB(DEVWRITELINE("ic71", i8089_device, drq2_w))
 	MCFG_Z80DART_OUT_TXDB_CB(DEVWRITELINE("kbd", apricot_keyboard_bus_device, out_w))
-	MCFG_Z80DART_OUT_DTRB_CB(WRITELINE(apricot_state, data_selector_dtr_w))
-	MCFG_Z80DART_OUT_RTSB_CB(WRITELINE(apricot_state, data_selector_rts_w))
+	MCFG_Z80DART_OUT_DTRB_CB(DEVWRITELINE("ic14", ttl153_device, s0_w))
+	MCFG_Z80DART_OUT_RTSB_CB(DEVWRITELINE("ic14", ttl153_device, s1_w))
 	MCFG_Z80DART_OUT_INT_CB(DEVWRITELINE("ic31", pic8259_device, ir5_w))
 
 	// rs232 port
 	MCFG_RS232_PORT_ADD("rs232", default_rs232_devices, nullptr)
-// note: missing a receive clock callback to support external clock mode
-// (m_data_selector_rts == 1 and m_data_selector_dtr == 0)
+	// note: missing a receive clock callback to support external clock mode (i1 to 153)
 	MCFG_RS232_RXD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, rxa_w))
 	MCFG_RS232_DCD_HANDLER(DEVWRITELINE("ic15", z80sio0_device, dcda_w))
 	MCFG_RS232_DSR_HANDLER(DEVWRITELINE("ic15", z80sio0_device, synca_w))
-	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio0_device, ctsa_w))
+	MCFG_RS232_CTS_HANDLER(DEVWRITELINE("ic15", z80sio0_device, ctsa_w))  MCFG_DEVCB_XOR(1)
 
 	// keyboard
 	MCFG_APRICOT_KEYBOARD_INTERFACE_ADD("kbd", "hle")
@@ -471,6 +448,8 @@ static MACHINE_CONFIG_START( apricot, apricot_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(DEVWRITELINE("ic71", i8089_device, drq1_w))
 	MCFG_FLOPPY_DRIVE_ADD("ic68:0", apricot_floppies, "d32w", apricot_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_ADD("ic68:1", apricot_floppies, "d32w", apricot_state::floppy_formats)
+
+	MCFG_SOFTWARE_LIST_ADD("flop_list", "apricot_flop")
 
 	// expansion bus
 	MCFG_EXPANSION_ADD("exp", "ic91")
@@ -505,5 +484,5 @@ ROM_END
 //**************************************************************************
 
 //    YEAR  NAME       PARENT   COMPAT  MACHINE    INPUT  CLASS          INIT  COMPANY  FULLNAME      FLAGS
-COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", MACHINE_NOT_WORKING )
-COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", MACHINE_NOT_WORKING )
+COMP( 1983, apricot,   0,       0,      apricot,   0,     driver_device, 0,    "ACT",   "Apricot PC", 0 )
+COMP( 1984, apricotxi, apricot, 0,      apricotxi, 0,     driver_device, 0,    "ACT",   "Apricot Xi", 0 )

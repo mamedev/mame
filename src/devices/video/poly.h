@@ -130,6 +130,7 @@ public:
 	// getters
 	running_machine &machine() const { return m_machine; }
 	screen_device &screen() const { assert(m_screen != nullptr); return *m_screen; }
+	uint32_t triangles_drawn() const { return m_triangles; }
 
 	// synchronization
 	void wait(const char *debug_reason = "general");

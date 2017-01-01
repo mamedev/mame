@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz
 /*
- * nld_82s126.cpp
+ * nld_82S126.cpp
  *
  */
 
@@ -18,7 +18,7 @@ namespace netlist
 		, m_CE1Q(*this, "CE1Q")
 		, m_CE2Q(*this, "CE2Q")
 		, m_O(*this, {{"O1", "O2", "O3", "O4" }})
-		, m_ROM(*this, "m_ROM", nullptr)
+		, m_ROM(*this, "ROM")
 		{
 		}
 
@@ -30,7 +30,7 @@ namespace netlist
 		logic_input_t m_CE2Q;
 		object_array_t<logic_output_t, 4> m_O;
 
-		param_ptr_t m_ROM; // 1024 bits, 32x32, used as 256x4
+		param_rom_t<uint8_t, 8, 4> m_ROM; // 1024 bits, 32x32, used as 256x4
 	};
 
 	NETLIB_OBJECT_DERIVED(82S126_dip, 82S126)
@@ -62,32 +62,18 @@ namespace netlist
 		unsigned o = 0xf;
 
 		netlist_time delay = NLTIME_FROM_NS(25);
-		if (m_CE1Q() && m_CE1Q())
+		if (!m_CE1Q() && !m_CE2Q())
 		{
 			unsigned a = 0;
 			for (std::size_t i=0; i<8; i++)
 			a |= (m_A[i]() << i);
 
-            if (m_ROM() != nullptr)
-			    o = ((std::uint_fast8_t*)(m_ROM()))[a];
+			o = m_ROM[a];
 
 			delay = NLTIME_FROM_NS(50);
 		}
-#if 0
-        printf("CE1Q%d CE2Q%d %d%d%d%d%d%d%d%d %x\n",
-            m_CE1Q() ? 1 : 0,
-            m_CE2Q() ? 1 : 0,
-            m_A[0]() ? 1 : 0,
-            m_A[1]() ? 1 : 0,
-            m_A[2]() ? 1 : 0,
-            m_A[3]() ? 1 : 0,
-            m_A[4]() ? 1 : 0,
-            m_A[5]() ? 1 : 0,
-            m_A[6]() ? 1 : 0,
-            m_A[7]() ? 1 : 0,
-            o);
-#endif
-        // FIXME: Outputs are tristate. This needs to be properly implemented
+
+		// FIXME: Outputs are tristate. This needs to be properly implemented
 		for (std::size_t i=0; i<4; i++)
 			m_O[i].push((o >> i) & 1, delay);
 	}

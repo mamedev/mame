@@ -34,8 +34,8 @@ public:
 	int         m_txbank;
 	int         m_txpalette;
 	int         m_video_enable;
-	uint8_t		m_pending_command;
-	
+	uint8_t     m_pending_command;
+
 	/* devices */
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;

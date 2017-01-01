@@ -32,7 +32,7 @@
 		NET_REGISTER_DEV(TTL_74194, name)	\
 		NET_CONNECT(name, CLK,  cCLK)	\
 		NET_CONNECT(name, S0,   cS0)	\
-		NET_CONNECT(name, S1,   cC1)	\
+		NET_CONNECT(name, S1,   cS1)	\
 		NET_CONNECT(name, SRIN, cSRIN)	\
 		NET_CONNECT(name, A,    cA)		\
 		NET_CONNECT(name, B,    cB)		\

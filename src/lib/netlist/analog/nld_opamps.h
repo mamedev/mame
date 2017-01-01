@@ -23,14 +23,9 @@
 		NET_REGISTER_DEV(OPAMP, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
 
-#define LM3900(name)                                                           \
-	SUBMODEL(opamp_lm3900, name)
-
 // ----------------------------------------------------------------------------------------
 // Devices ...
 // ----------------------------------------------------------------------------------------
-
-NETLIST_EXTERNAL(opamp_lm3900)
 
 namespace netlist
 {

@@ -33,7 +33,7 @@ const device_type DAC76 = &device_creator<dac76_device>;
 //  dac76_device - constructor
 //-------------------------------------------------
 
-dac76_device::dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)	:
+dac76_device::dac76_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, DAC76, "DAC-76 COMDAC", tag, owner, clock, "dac76", __FILE__),
 	device_sound_interface(mconfig, *this),
 	m_stream(nullptr),

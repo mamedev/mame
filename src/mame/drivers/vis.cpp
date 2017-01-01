@@ -440,14 +440,15 @@ uint32_t vis_vga_device::screen_update(screen_device &screen, bitmap_rgb32 &bitm
 
 READ8_MEMBER(vis_vga_device::visvgamem_r)
 {
-	if(!m_wina)
+	if(!(vga.sequencer.data[0x25] & 0x40))
 		return mem_r(space, offset, mem_mask);
-	return mem_linear_r(space, (offset + (m_wina * 64)) & 0x3ffff, mem_mask);
+	u16 win = (vga.sequencer.data[0x1e] & 0x0f) == 3 ? m_wina : m_winb; // this doesn't seem quite right
+	return mem_linear_r(space, (offset + (win * 64)) & 0x3ffff, mem_mask);
 }
 
 WRITE8_MEMBER(vis_vga_device::visvgamem_w)
 {
-	if(!m_wina)
+	if(!(vga.sequencer.data[0x25] & 0x40))
 		return mem_w(space, offset, data, mem_mask);
 	return mem_linear_w(space, (offset + (m_wina * 64)) & 0x3ffff, data, mem_mask);
 }
@@ -546,40 +547,40 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 				case 0x00:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_total = data / (m_interlace ? 2 : 1);
+					vga.crtc.horz_total = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					recompute_params();
 					return;
 				case 0x01:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_disp_end = data / (m_interlace ? 2 : 1);
+					vga.crtc.horz_disp_end = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					recompute_params();
 					return;
 				case 0x02:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_blank_start = data / (m_interlace ? 2 : 1);
+					vga.crtc.horz_blank_start = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					return;
 				case 0x03:
 					if(vga.crtc.protect_enable)
 						return;
 					vga.crtc.horz_blank_end = (m_crtc_regs[0x05] & 0x80) >> 2;
 					vga.crtc.horz_blank_end |= data & 0x1f;
-					vga.crtc.horz_blank_end /= (m_interlace ? 2 : 1);
+					vga.crtc.horz_blank_end /= (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					vga.crtc.disp_enable_skew = (data & 0x60) >> 5;
 					vga.crtc.evra = (data & 0x80) >> 7;
 					return;
 				case 0x04:
 					if(vga.crtc.protect_enable)
 						return;
-					vga.crtc.horz_retrace_start = data / (m_interlace ? 2 : 1);
+					vga.crtc.horz_retrace_start = data / (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					return;
 				case 0x05:
 					if(vga.crtc.protect_enable)
 						return;
 					vga.crtc.horz_blank_end = m_crtc_regs[0x05] & 0x1f;
 					vga.crtc.horz_blank_end |= ((data & 0x80) >> 2);
-					vga.crtc.horz_blank_end /= (m_interlace ? 2 : 1);
+					vga.crtc.horz_blank_end /= (m_interlace && !(vga.sequencer.data[0x25] & 0x20) ? 2 : 1);
 					vga.crtc.horz_retrace_skew = ((data & 0x60) >> 5);
 					vga.crtc.horz_retrace_end = data & 0x1f;
 					return;
@@ -649,27 +650,37 @@ WRITE8_MEMBER(vis_vga_device::vga_w)
 				case 0x30:
 					if(data && !m_interlace)
 					{
-						vga.crtc.horz_total /= 2;
-						vga.crtc.horz_disp_end /= 2;
-						vga.crtc.horz_blank_end /= 2;
-						vga.crtc.horz_retrace_start /= 2;
-						vga.crtc.horz_retrace_end /= 2;
+						if(!(vga.sequencer.data[0x25] & 0x20))
+						{
+							vga.crtc.horz_total /= 2;
+							vga.crtc.horz_disp_end /= 2;
+							vga.crtc.horz_blank_end /= 2;
+							vga.crtc.horz_retrace_start /= 2;
+							vga.crtc.horz_retrace_end /= 2;
+						}
 						vga.crtc.vert_total *= 2;
 						vga.crtc.vert_retrace_start *= 2;
 						vga.crtc.vert_disp_end *= 2;
 						vga.crtc.vert_blank_start *= 2;
+						vga.crtc.vert_blank_end *= 2;
+						recompute_params();
 					}
 					else if(!data && m_interlace)
 					{
-						vga.crtc.horz_total *= 2;
-						vga.crtc.horz_disp_end *= 2;
-						vga.crtc.horz_blank_end *= 2;
-						vga.crtc.horz_retrace_start *= 2;
-						vga.crtc.horz_retrace_end *= 2;
+						if(!(vga.sequencer.data[0x25] & 0x20))
+						{
+							vga.crtc.horz_total *= 2;
+							vga.crtc.horz_disp_end *= 2;
+							vga.crtc.horz_blank_end *= 2;
+							vga.crtc.horz_retrace_start *= 2;
+							vga.crtc.horz_retrace_end *= 2;
+						}
 						vga.crtc.vert_total /= 2;
 						vga.crtc.vert_retrace_start /= 2;
 						vga.crtc.vert_disp_end /= 2;
 						vga.crtc.vert_blank_start /= 2;
+						vga.crtc.vert_blank_end /= 2;
+						recompute_params();
 					}
 					m_interlace = data;
 					return;

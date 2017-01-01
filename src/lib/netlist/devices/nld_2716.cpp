@@ -19,7 +19,7 @@ namespace netlist
 		, m_EPQ(*this, "EPQ")
 		, m_D(*this, {{ "D0", "D1", "D2", "D3", "D4", "D5", "D6", "D7" }})
 		, m_last_EPQ(*this, "m_last_EPQ", 1)
-		, m_ROM(*this, "m_ROM", nullptr)
+		, m_ROM(*this, "ROM")
 		{
 		}
 
@@ -33,7 +33,7 @@ namespace netlist
 
 		state_var<unsigned> m_last_EPQ;
 
-		param_ptr_t m_ROM; // 16 Kbits, used as 2 Kbit x 8
+		param_rom_t<uint8_t, 11, 8> m_ROM; // 16 Kbits, used as 2 Kbit x 8
 	};
 
 	NETLIB_OBJECT_DERIVED(2716_dip, 2716)
@@ -78,10 +78,7 @@ namespace netlist
 			for (std::size_t i=0; i<11; i++)
 			a |= (m_A[i]() << i);
 
-            if (m_ROM() != nullptr)
-            {
-			    d = ((std::uint_fast8_t*)(m_ROM()))[a];
-            }
+			d = m_ROM[a];
 
 			if (m_last_EPQ)
 				delay = NLTIME_FROM_NS(120);

@@ -6,9 +6,6 @@
   mostly LED electronic games/toys.
 
   TODO:
-  - non-working games are due to MCU emulation bugs?
-  - better not start on visually dumped games before other games are working
-    (due to possible dump errors, hard to distinguish between that or MCU bug)
   - why does h2hbaskb need a workaround on writing L pins?
 
 ***************************************************************************/
@@ -1155,7 +1152,7 @@ MACHINE_CONFIG_END
   National Semiconductor QuizKid Racer (COP420 version)
   * COP420 MCU label COP420-NPG/N
   * 8-digit 7seg led display(1 custom digit), 1 green led, no sound
-  
+
   This is the COP420 version, the first release was on a MM5799 MCU.
 
 ***************************************************************************/

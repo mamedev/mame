@@ -325,8 +325,14 @@ WRITE8_MEMBER(combatsc_state::combatsc_pf_control_w)
 	k007121->ctrl_w(space, offset, data);
 
 	if (offset == 7)
+	{
 		m_bg_tilemap[m_video_circuit]->set_flip((data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
-
+		if(m_video_circuit == 0)
+		{
+			m_textflip = (data & 0x08) == 0x08;
+			m_textlayer->set_flip((data & 0x08) ? TILEMAP_FLIPY | TILEMAP_FLIPX : 0);
+		}
+	}
 	if (offset == 3)
 	{
 		if (data & 0x08)
@@ -425,13 +431,15 @@ uint32_t combatsc_state::screen_update_combatsc(screen_device &screen, bitmap_in
 	{
 		rectangle clip;
 		clip = cliprect;
-
+		
 		for (i = 0; i < 32; i++)
 		{
 			// scrollram [0x20]-[0x3f]: char enable (presumably bit 0 only)
-			if(m_scrollram[0x20 + i] == 0)
+			uint8_t base_scroll = m_textflip == true ? (0x3f - i) : (0x20 + i);
+			if(m_scrollram[base_scroll] == 0)
 				continue;
 
+		
 			clip.min_y = i * 8;
 			clip.max_y = clip.min_y + 7;
 

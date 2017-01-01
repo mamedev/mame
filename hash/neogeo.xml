@@ -1760,6 +1760,37 @@
 		</part>
 	</software>
 
+	<software name="roboarmya">
+		<description>Robo Army (NGM-032 ~ NGH-032)</description>
+		<year>1991</year>
+		<publisher>SNK</publisher>
+		<info name="serial" value="NGM-032 (MVS), NGH-032 (AES)"/>
+		<info name="release" value="19911030 (MVS), 19911220 (AES)"/>
+		<info name="alt_title" value="ロボアーミー"/>
+		<sharedfeat name="release" value="MVS,AES" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="032-epr.p1" offset="0x000000" size="0x080000" crc="27c773cb" sha1="597ca73f142b1129cc7780540bb9cfacd47bc6ce" />   <!-- D27C4000 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="032-s1.s1" crc="ac0daa1b" sha1="93bae4697dc403fce19422752a514326ccf66a91" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="032-m1.m1" crc="35ec952d" sha1="8aed30e26d7e2c70dbce5de752df416091066f7b" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x200000">
+				<rom name="032-v1.v1" offset="0x000000" size="0x100000" crc="63791533" sha1="4479e9308cdc906b9e03b985303f4ebedd00512f" />   <!-- TC538200 -->
+				<rom name="032-v2.v2" offset="0x100000" size="0x100000" crc="eb95de70" sha1="b34885201116d2b3bbdee15ec7b5961cf5c069e1" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x300000">
+				<rom loadflag="load16_byte" name="032-c1.c1" offset="0x000000" size="0x100000" crc="97984c6c" sha1="deea59c0892f05dc7db98cb57b3eb83688dc57f0" />    <!-- TC538200 -->
+				<rom loadflag="load16_byte" name="032-c2.c2" offset="0x000001" size="0x100000" crc="65773122" sha1="2c0162a8e971e5e57933e4ae16040bf824ffdefe" />    <!-- TC538200 -->
+				<rom loadflag="load16_byte" name="032-c3.c3" offset="0x200000" size="0x080000" crc="40adfccd" sha1="b11f866dd70ba0ed9123424508355cb948b19bdc" />    <!-- TC534200 -->
+				<rom loadflag="load16_byte" name="032-c4.c4" offset="0x200001" size="0x080000" crc="462571de" sha1="5c3d610d492f91564423873b3b434dcda700373f" />    <!-- TC534200 -->
+			</dataarea>
+		</part>
+	</software>
 
 	<!--
 	ID-0033
@@ -1997,6 +2028,39 @@
 		<part name="cart" interface="neo_cart">
 			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
 				<rom loadflag="load16_word_swap" name="039-p1.p1" offset="0x000000" size="0x080000" crc="b372d54c" sha1="b70fc6f72e16a66b6e144cc01370548e3398b8b8" />   <!-- TC534200 -->
+				<rom loadflag="load16_word_swap" name="039-p2.p2" offset="0x080000" size="0x080000" crc="28661afe" sha1="6c85ff6ab334b1ca744f726f42dac211537e7315" />   <!-- TC534200 -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="039-s1.s1" crc="63ee053a" sha1="7d4b92bd022708975b1470e8f24d1f5a712e1b94" />   <!-- TC531000 -->
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="039-m1.m1" crc="0c5b2ad5" sha1="15eb5ea10fecdbdbcfd06225ae6d88bb239592e7" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x300000">
+				<rom name="039-v2.v2" offset="0x000000" size="0x200000" crc="86d34b25" sha1="89bdb614b0c63d678962da52e2f596750d20828c" />   <!-- TC5316200 -->
+				<rom name="039-v4.v4" offset="0x200000" size="0x100000" crc="8fa62a0b" sha1="58ac2fdd73c542eb8178cfc4adfa0e5940183283" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x600000">
+				<rom loadflag="load16_byte" name="039-c1.c1" offset="0x000000" size="0x100000" crc="6d1c4aa9" sha1="4fbc9d7cb37522ec298eefbe38c75a2d050fbb4a" />    <!-- TC5316200 -->
+				<rom size="0x100000" offset="0x400000" loadflag="continue" />
+				<rom loadflag="load16_byte" name="039-c2.c2" offset="0x000001" size="0x100000" crc="f7b75337" sha1="4d85f85948c3e6ed38b0b0ccda79de3ce026e2d9" />    <!-- TC5316200 -->
+				<rom size="0x100000" offset="0x400001" loadflag="continue" />
+				<rom loadflag="load16_byte" name="039-c3.c3" offset="0x200000" size="0x080000" crc="bfc4f0b2" sha1="f4abe2b52882b966412f3b503b8f2c8f49b57968" />    <!-- TC534200 -->
+				<rom loadflag="load16_byte" name="039-c4.c4" offset="0x200001" size="0x080000" crc="81c9c250" sha1="e3a34ff69081a8681b5ca895915892dcdccfa7aa" />    <!-- TC534200 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="kotm2a" cloneof="kotm2">
+		<description>King of the Monsters 2 - The Next Thing (older)</description>
+		<year>1992</year>
+		<publisher>SNK</publisher>
+		<info name="alt_title" value="キング・オブ・ザ・モンスターズ2 ―ネクストシング―"/>
+		<sharedfeat name="release" value="MVS" />
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<dataarea name="maincpu" width="16" endianness="big" size="0x100000">
+				<rom loadflag="load16_word_swap" name="039_p1.p1" offset="0x000000" size="0x080000" crc="8d186638" sha1="c3874bbb1bfcb220173afb2e0a2123ffaeb7bd2b" />   <!-- TC534200 -->
 				<rom loadflag="load16_word_swap" name="039-p2.p2" offset="0x080000" size="0x080000" crc="28661afe" sha1="6c85ff6ab334b1ca744f726f42dac211537e7315" />   <!-- TC534200 -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
@@ -3323,7 +3387,7 @@
 	</software>
 
 	<software name="samsho2k" cloneof="samsho2">
-		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II)</description>
+		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 1)</description>
 		<year>1994</year>
 		<publisher>SNK</publisher>
 		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
@@ -3337,6 +3401,44 @@
 				<rom loadflag="load16_word_swap" name="063-ep1-kan.ep1" offset="0x000000" size="0x080000" crc="fa32e2d8" sha1="94f56759ec04ab3a1e557bc2dc51b92176b3c147" />
 				<rom loadflag="load16_word_swap" name="063-ep2-kan.ep2" offset="0x080000" size="0x080000" crc="70b1a4d9" sha1="387737e87a68d0ea4fd13693f1f30d3227a17c82" />
 				<!-- this is exactly the same data anyway! -->
+			</dataarea>
+			<dataarea name="fixed" size="0x040000">
+				<rom offset="0x000000" size="0x020000" name="063-s1-kan.s1" crc="ff08f80b" sha1="240c6a1c52edebb49cc99ea08484c6a2d61ebf84" />
+			</dataarea>
+			<dataarea name="audiocpu" size="0x020000">
+				<rom offset="0x000000" size="0x020000" name="063-m1.m1" crc="56675098" sha1="90429fc40d056d480d0e2bbefbc691d9fa260fc4" />   <!-- TC531001 -->
+			</dataarea>
+			<dataarea name="ymsnd" size="0x700000">
+				<rom name="063-v1.v1" offset="0x000000" size="0x200000" crc="37703f91" sha1="a373ebef4c33ba1d8340e826981a58769aada238" />   <!-- TC5316200 -->
+				<rom name="063-v2.v2" offset="0x200000" size="0x200000" crc="0142bde8" sha1="0be6c53acac44802bf70b6925452f70289a139d9" />   <!-- TC5316200 -->
+				<rom name="063-v3.v3" offset="0x400000" size="0x200000" crc="d07fa5ca" sha1="1da7f081f8b8fc86a91feacf900f573218d82676" />   <!-- TC5316200 -->
+				<rom name="063-v4.v4" offset="0x600000" size="0x100000" crc="24aab4bb" sha1="10ee4c5b3579865b93dcc1e4079963276aa700a6" />   <!-- TC538200 -->
+			</dataarea>
+			<dataarea name="sprites" size="0x1000000">
+				<rom loadflag="load16_byte" name="063-c1.c1" offset="0x000000" size="0x200000" crc="86cd307c" sha1="0d04336f7c436d74638d8c1cd8651faf436a6bec" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c2.c2" offset="0x000001" size="0x200000" crc="cdfcc4ca" sha1="179dc81432424d68cefedd20cc1c4b2a95deb891" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c3.c3" offset="0x400000" size="0x200000" crc="7a63ccc7" sha1="49d97c543bc2860d493a353ab0d059088c6fbd21" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c4.c4" offset="0x400001" size="0x200000" crc="751025ce" sha1="e1bbaa7cd67fd04e4aab7f7ea77f63ae1cbc90d0" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c5.c5" offset="0x800000" size="0x200000" crc="20d3a475" sha1="28da44a136bd14c73c62c147c3f6e6bcfa1066de" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c6.c6" offset="0x800001" size="0x200000" crc="ae4c0a88" sha1="cc8a7d11daa3821f83a6fd0942534706f939e576" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c7.c7" offset="0xc00000" size="0x200000" crc="2df3cbcf" sha1="e54f9022359963711451c2025825b862d36c6975" />    <!-- TC5316200 -->
+				<rom loadflag="load16_byte" name="063-c8.c8" offset="0xc00001" size="0x200000" crc="1ffc6dfa" sha1="acea18aca76c072e0bac2a364fc96d49cfc86e77" />    <!-- TC5316200 -->
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="samsho2ka" cloneof="samsho2">
+		<description>Saulabi Spirits / Jin Saulabi Tu Hon (Korean release of Samurai Shodown II, set 2)</description>
+		<year>1994</year>
+		<publisher>SNK</publisher>
+		<sharedfeat name="release" value="MVS" /> <!-- Unknown if it was also released on AES -->
+		<sharedfeat name="compatibility" value="MVS,AES" />
+		<part name="cart" interface="neo_cart">
+			<!-- This has corrupt text if used with the Japan bios due to the replacement of the s1 rom to contain the new logo -->
+			<dataarea name="maincpu" width="16" endianness="big" size="0x200000">
+				<rom loadflag="load16_word_swap" name="063-p1-kan.p1" offset="0x100000" size="0x100000" crc="147cc6d7" sha1="8e22305f41a0688786ff55437c25948e6c8fda58" />
+				<rom size="0x100000" offset="0x000000" loadflag="continue" />
+	<!-- Basically samsho2k without loading ep1 and ep2 over p1-kan ; The game has been confirmed to exist in this state -->
 			</dataarea>
 			<dataarea name="fixed" size="0x040000">
 				<rom offset="0x000000" size="0x020000" name="063-s1-kan.s1" crc="ff08f80b" sha1="240c6a1c52edebb49cc99ea08484c6a2d61ebf84" />
@@ -4829,7 +4931,7 @@
 			</dataarea>
 		</part>
 	</software>
-	
+
 	<!--
 	ID-0096
 	. NGM-096

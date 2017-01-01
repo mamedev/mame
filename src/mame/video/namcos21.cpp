@@ -7,6 +7,22 @@ Namco System 21 Video Hardware
 - there are no tilemaps
 - 3d graphics are managed by DSP processors
 */
+/*  Palette:
+        0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
+
+        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
+            (in starblade, some palette animation effects are performed here)
+
+        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
+
+        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
+
+        The polygon-dedicated color sets within a bank typically increase in
+        intensity from very dark to full intensity.
+
+        Probably the selected palette is determined by most significant bits of z-code.
+        This is not yet hooked up.
+    */
 
 #include "emu.h"
 #include "includes/namcoic.h"
@@ -103,101 +119,6 @@ void namcos21_state::copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const r
 	}
 }
 
-VIDEO_START_MEMBER(namcos21_state,namcos21)
-{
-	if( m_gametype == NAMCOS21_WINRUN91 )
-	{
-		m_videoram = std::make_unique<uint8_t[]>(0x80000);
-	}
-	allocate_poly_framebuffer();
-	c355_obj_init(
-		0,      /* gfx bank */
-		0xf,    /* reverse palette mapping */
-		namcos2_shared_state::c355_obj_code2tile_delegate() );
-}
-
-
-/*  Palette:
-        0x0000..0x1fff  sprite palettes (0x10 sets of 0x100 colors)
-
-        0x2000..0x3fff  polygon palette bank0 (0x10 sets of 0x200 colors)
-            (in starblade, some palette animation effects are performed here)
-
-        0x4000..0x5fff  polygon palette bank1 (0x10 sets of 0x200 colors)
-
-        0x6000..0x7fff  polygon palette bank2 (0x10 sets of 0x200 colors)
-
-        The polygon-dedicated color sets within a bank typically increase in
-        intensity from very dark to full intensity.
-
-        Probably the selected palette is determined by most significant bits of z-code.
-        This is not yet hooked up.
-    */
-
-
-uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
-{
-	uint8_t *videoram = m_videoram.get();
-	int pivot = 3;
-	int pri;
-	bitmap.fill(0xff, cliprect );
-
-	if( m_gametype != NAMCOS21_WINRUN91 )
-	{ /* draw low priority 2d sprites */
-		c355_obj_draw(screen, bitmap, cliprect, 2 );
-		c355_obj_draw(screen, bitmap, cliprect, 14 );   //driver's eyes
-	}
-
-	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
-
-	if( m_gametype != NAMCOS21_WINRUN91 )
-	{ /* draw low priority 2d sprites */
-		c355_obj_draw(screen, bitmap, cliprect, 0 );
-		c355_obj_draw(screen, bitmap, cliprect, 1 );
-	}
-
-	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
-
-
-	if( m_gametype != NAMCOS21_WINRUN91 )
-	{ /* draw high priority 2d sprites */
-		for( pri=pivot; pri<8; pri++ )
-		{
-			c355_obj_draw(screen, bitmap, cliprect, pri );
-		}
-			c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
-	}
-	else
-	{ /* winrun bitmap layer */
-		int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
-		int base = 0x1000+0x100*(m_winrun_color&0xf);
-		int sx,sy;
-		for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
-		{
-			const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
-			uint16_t *pDest = &bitmap.pix16(sy);
-			for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
-			{
-				int pen = pSource[sx];
-				switch( pen )
-				{
-				case 0xff:
-					break;
-				case 0x00:
-					pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
-					break;
-				case 0x01:
-					pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
-					break;
-				default:
-					pDest[sx] = base|pen;
-					break;
-				}
-			}
-		}
-	} /* winrun bitmap layer */
-	return 0;
-}
 
 /*********************************************************************************************/
 
@@ -435,4 +356,114 @@ void namcos21_state::draw_quad(int sx[4], int sy[4], int zcode[4], int color)
 
 	rendertri(&a, &b, &c, color, depthcueenable);
 	rendertri(&c, &d, &a, color, depthcueenable);
+}
+
+VIDEO_START_MEMBER(namcos21_state,namcos21)
+{
+	if( m_gametype == NAMCOS21_WINRUN91 )
+	{
+		m_videoram = std::make_unique<uint8_t[]>(0x80000);
+	}
+	allocate_poly_framebuffer();
+	c355_obj_init(
+		0,      /* gfx bank */
+		0xf,    /* reverse palette mapping */
+		namcos2_shared_state::c355_obj_code2tile_delegate() );
+}
+
+uint32_t namcos21_state::screen_update_namcos21(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//uint8_t *videoram = m_videoram.get();
+	int pivot = 3;
+	int pri;
+	bitmap.fill(0xff, cliprect );
+
+	c355_obj_draw(screen, bitmap, cliprect, 2 );
+	//c355_obj_draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
+
+	c355_obj_draw(screen, bitmap, cliprect, 0 );
+	c355_obj_draw(screen, bitmap, cliprect, 1 );
+
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
+
+	/* draw high priority 2d sprites */
+	for( pri=pivot; pri<8; pri++ )
+	{
+		c355_obj_draw(screen, bitmap, cliprect, pri );
+	}
+	// c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	return 0;
+}
+
+uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	//uint8_t *videoram = m_videoram.get();
+	int pivot = 3;
+	int pri;
+	bitmap.fill(0xff, cliprect );
+
+	c355_obj_draw(screen, bitmap, cliprect, 2 );
+	c355_obj_draw(screen, bitmap, cliprect, 14 );   //driver's eyes
+
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
+
+	c355_obj_draw(screen, bitmap, cliprect, 0 );
+	c355_obj_draw(screen, bitmap, cliprect, 1 );
+
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
+
+	for( pri=pivot; pri<8; pri++ )
+		c355_obj_draw(screen, bitmap, cliprect, pri );
+	
+	c355_obj_draw(screen, bitmap, cliprect, 15 );   //driver's eyes
+	
+	return 0;
+
+}
+
+void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	uint8_t *videoram = m_videoram.get();
+	int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
+	int base = 0x1000+0x100*(m_winrun_color&0xf);
+	int sx,sy;
+	for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
+	{
+		const uint8_t *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
+		uint16_t *pDest = &bitmap.pix16(sy);
+		for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
+		{
+			int pen = pSource[sx];
+			switch( pen )
+			{
+			case 0xff:
+				break;
+			case 0x00:
+				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
+				break;
+			case 0x01:
+				pDest[sx] = (pDest[sx]&0x1fff)+0x6000;
+				break;
+			default:
+				pDest[sx] = base|pen;
+				break;
+			}
+		}
+	}
+}
+
+
+uint32_t namcos21_state::screen_update_winrun(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
+{
+	bitmap.fill(0xff, cliprect );
+
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0x7fc0, 0x7ffe);
+	copy_visible_poly_framebuffer(bitmap, cliprect, 0, 0x7fbf);
+	winrun_bitmap_draw(bitmap,cliprect);
+
+	//popmessage("%04x %04x %04x|%04x %04x",m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
+	
+	return 0;
 }

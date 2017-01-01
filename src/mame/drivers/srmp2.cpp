@@ -196,7 +196,7 @@ WRITE16_MEMBER(srmp2_state::mjyuugi_adpcm_bank_w)
 }
 
 
-WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
+WRITE8_MEMBER(srmp2_state::adpcm_code_w)
 {
 /*
     - Received data may be playing ADPCM number.
@@ -214,28 +214,7 @@ WRITE16_MEMBER(srmp2_state::srmp2_adpcm_code_w)
 	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
 	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
 
-	m_msm->reset_w(0);
-	m_adpcm_data = -1;
-}
-
-
-WRITE8_MEMBER(srmp2_state::srmp3_adpcm_code_w)
-{
-/*
-    - Received data may be playing ADPCM number.
-    - 0x000000 - 0x0000ff and 0x010000 - 0x0100ff are offset table.
-    - When the hardware receives the ADPCM number, it refers the offset
-      table and plays the ADPCM for itself.
-*/
-
-	uint8_t *ROM = memregion("adpcm")->base();
-
-	m_adpcm_sptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
-	m_adpcm_eptr = (ROM[((m_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
-	m_adpcm_eptr  = (m_adpcm_eptr - 1) & 0x0ffff;
-
-	m_adpcm_sptr += (m_adpcm_bank * 0x10000);
-	m_adpcm_eptr += (m_adpcm_bank * 0x10000);
+	//printf("%02x %08x %08x %08x\n",data,m_adpcm_sptr,m_adpcm_eptr,((m_adpcm_bank * 0x10000) + (data << 2) + 0));
 
 	m_msm->reset_w(0);
 	m_adpcm_data = -1;
@@ -419,7 +398,7 @@ static ADDRESS_MAP_START( srmp2_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x900000, 0x900001) AM_WRITENOP                        /* ??? */
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0xa00002, 0xa00003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(srmp2_adpcm_code_w)   /* ADPCM number */
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE8(adpcm_code_w,0x00ff)   /* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE8(srmp2_irq2_ack_w,0x00ff)         /* irq ack lv 2 */
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE8(srmp2_irq4_ack_w,0x00ff)         /* irq ack lv 4 */
@@ -454,7 +433,7 @@ static ADDRESS_MAP_START( mjyuugi_map, AS_PROGRAM, 16, srmp2_state )
 	AM_RANGE(0x800000, 0x800001) AM_READNOP             /* ??? */
 	AM_RANGE(0x900000, 0x900001) AM_READWRITE8(iox_mux_r, iox_command_w,0x00ff) /* key matrix | I/O */
 	AM_RANGE(0x900002, 0x900003) AM_READWRITE8(iox_status_r,iox_data_w,0x00ff)
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(srmp2_adpcm_code_w)           /* ADPCM number */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE8(adpcm_code_w,0x00ff)           /* ADPCM number */
 	AM_RANGE(0xb00002, 0xb00003) AM_READ8(vox_status_r,0x00ff)      /* ADPCM voice status */
 	AM_RANGE(0xb00000, 0xb00001) AM_DEVREAD8("aysnd", ay8910_device, data_r, 0x00ff)
 	AM_RANGE(0xb00000, 0xb00003) AM_DEVWRITE8("aysnd", ay8910_device, address_data_w, 0x00ff)
@@ -503,7 +482,7 @@ static ADDRESS_MAP_START( srmp3_io_map, AS_IO, 8, srmp2_state )
 	AM_RANGE(0x20, 0x20) AM_WRITE(srmp3_irq_ack_w)                              /* interrupt acknowledge */
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM") AM_WRITE(srmp3_flags_w)         /* coin, service | GFX bank, counter, lockout */
 	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)                              /* ROM bank select */
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(srmp3_adpcm_code_w)                   /* ADPCM number */
+	AM_RANGE(0xa0, 0xa0) AM_WRITE(adpcm_code_w)                   /* ADPCM number */
 	AM_RANGE(0xa1, 0xa1) AM_READ(vox_status_r)                                  /* ADPCM voice status */
 	AM_RANGE(0xc0, 0xc0) AM_READWRITE(iox_mux_r, iox_command_w)                 /* key matrix | I/O */
 	AM_RANGE(0xc1, 0xc1) AM_READWRITE(iox_status_r,iox_data_w)

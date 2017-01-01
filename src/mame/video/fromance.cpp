@@ -217,7 +217,7 @@ WRITE8_MEMBER(fromance_state::fromance_scroll_w)
 	}
 	else
 	{
-		
+
 		switch (offset)
 		{
 			case 0:
@@ -273,12 +273,12 @@ void fromance_state::crtc_refresh()
 	visarea.min_y = 0;
 	visarea.max_x = ((m_crtc_data[0]+1)*4) - 1;
 	visarea.max_y = 240 - 1;
-	
+
 	refresh = HZ_TO_ATTOSECONDS(60);
-	
-	m_screen->configure(512, 256, visarea, refresh);	
+
+	m_screen->configure(512, 256, visarea, refresh);
 }
- 
+
 WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 {
 	m_crtc_data[m_crtc_register] = data;
@@ -288,7 +288,7 @@ WRITE8_MEMBER(fromance_state::fromance_crtc_data_w)
 		case 0x00:
 			crtc_refresh();
 			break;
-		
+
 		case 0x0b:
 			// TODO: actually is never > 0x80?
 			m_crtc_timer->adjust(m_screen->time_until_vblank_start(), (data > 0x80) ? 2 : 1);

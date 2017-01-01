@@ -51,7 +51,7 @@ void rm380z_state::init_graphic_chars()
 
 void rm380z_state::config_videomode()
 {
-	if (m_port0&0x20)
+	if (m_port0&0x20&m_port0_mask)
 	{
 		// 80 cols
 		m_videomode=RM380Z_VIDEOMODE_80COL;

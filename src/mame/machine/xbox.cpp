@@ -21,9 +21,9 @@
 #define LOG_PCI
 //#define LOG_AUDIO
 
-const xbox_base_state::debugger_constants xbox_base_state::debugp[] = { 
-	{ 0x66232714, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }, 
-	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} } 
+const xbox_base_state::debugger_constants xbox_base_state::debugp[] = {
+	{ 0x66232714, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} },
+	{ 0x49d8055a, {0x8003aae0, 0x5c, 0x1c, 0x28, 0x210, 8, 0x28, 0x1c} }
 };
 
 int xbox_base_state::find_bios_index(running_machine &mach)
@@ -344,18 +344,28 @@ void xbox_base_state::generate_irq_command(int ref, int params, const char **par
 void xbox_base_state::nv2a_combiners_command(int ref, int params, const char **param)
 {
 	debugger_console &con = machine().debugger().console();
-	int en = nvidia_nv2a->toggle_register_combiners_usage();
-	if (en != 0)
+	bool en = nvidia_nv2a->toggle_register_combiners_usage();
+	if (en == true)
 		con.printf("Register combiners enabled\n");
 	else
 		con.printf("Register combiners disabled\n");
 }
 
+void xbox_base_state::nv2a_wclipping_command(int ref, int params, const char **param)
+{
+	debugger_console &con = machine().debugger().console();
+	bool en = nvidia_nv2a->toggle_clipping_w_support();
+	if (en == true)
+		con.printf("W clipping enabled\n");
+	else
+		con.printf("W clipping disabled\n");
+}
+
 void xbox_base_state::waitvblank_command(int ref, int params, const char **param)
 {
 	debugger_console &con = machine().debugger().console();
-	int en = nvidia_nv2a->toggle_wait_vblank_support();
-	if (en != 0)
+	bool en = nvidia_nv2a->toggle_wait_vblank_support();
+	if (en == true)
 		con.printf("Vblank method enabled\n");
 	else
 		con.printf("Vblank method disabled\n");
@@ -458,6 +468,7 @@ void xbox_base_state::help_command(int ref, int params, const char **param)
 	con.printf("  xbox threadlist -- list of currently active threads\n");
 	con.printf("  xbox irq,<number> -- Generate interrupt with irq number 0-15\n");
 	con.printf("  xbox nv2a_combiners -- Toggle use of register combiners\n");
+	con.printf("  xbox nv2a_wclipping -- Toggle use of negative w vertex clipping\n");
 	con.printf("  xbox waitvblank -- Toggle support for wait vblank method\n");
 	con.printf("  xbox grab_texture,<type>,<filename> -- Save to <filename> the next used texture of type <type>\n");
 	con.printf("  xbox grab_vprog,<filename> -- save current vertex program instruction slots to <filename>\n");
@@ -487,6 +498,8 @@ void xbox_base_state::xbox_debug_commands(int ref, int params, const char **para
 		generate_irq_command(ref, params - 1, param + 1);
 	else if (strcmp("nv2a_combiners", param[0]) == 0)
 		nv2a_combiners_command(ref, params - 1, param + 1);
+	else if (strcmp("nv2a_wclipping", param[0]) == 0)
+		nv2a_wclipping_command(ref, params - 1, param + 1);
 	else if (strcmp("waitvblank", param[0]) == 0)
 		waitvblank_command(ref, params - 1, param + 1);
 	else if (strcmp("grab_texture", param[0]) == 0)

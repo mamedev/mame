@@ -34,7 +34,7 @@ References:
 #include "netlist/devices/net_lib.h"
 
 #define CPU_TAG         "maincpu"
-#define NETLIST_TAG		"videobrd"
+#define NETLIST_TAG     "videobrd"
 #define UART_TAG        "uart"
 #define BAUDGEN_TAG     "baudgen"
 #define KBDC_TAG        "ay53600"
@@ -44,16 +44,16 @@ References:
 #define MISCKEYS_TAG    "misc_keys"
 #define SCREEN_TAG      "screen"
 #define BAUD_PROM_TAG   "u39"
-#define NL_PROM_TAG		"videobrd:u71"
-#define NL_EPROM_TAG	"videobrd:u78"
-#define VIDEO_PROM_TAG	"u71"
-#define CHAR_EPROM_TAG	"u78"
-#define VIDEO_OUT_TAG	"videobrd:video_out"
-#define VBLANK_OUT_TAG	"videobrd:vblank"
+#define NL_PROM_TAG     "videobrd:u71"
+#define NL_EPROM_TAG    "videobrd:u78"
+#define VIDEO_PROM_TAG  "u71"
+#define CHAR_EPROM_TAG  "u78"
+#define VIDEO_OUT_TAG   "videobrd:video_out"
+#define VBLANK_OUT_TAG  "videobrd:vblank"
 #define TVINTERQ_OUT_TAG "videobrd:tvinterq"
 
-#define VIDEO_CLOCK		(XTAL_33_264MHz/2)
-#define VIDEOBRD_CLOCK	(XTAL_33_264MHz*30)
+#define VIDEO_CLOCK     (XTAL_33_264MHz/2)
+#define VIDEOBRD_CLOCK  (XTAL_33_264MHz*30)
 
 #define SR2_FULL_DUPLEX (0x01)
 #define SR2_UPPER_ONLY  (0x08)
@@ -97,28 +97,28 @@ public:
 		, m_u27(*this, "videobrd:u27")
 		, m_u28(*this, "videobrd:u28")
 		, m_u29(*this, "videobrd:u29")
-        , m_cpu_db0(*this, "videobrd:cpu_db0")
-        , m_cpu_db1(*this, "videobrd:cpu_db1")
-        , m_cpu_db2(*this, "videobrd:cpu_db2")
-        , m_cpu_db3(*this, "videobrd:cpu_db3")
-        , m_cpu_db4(*this, "videobrd:cpu_db4")
-        , m_cpu_db5(*this, "videobrd:cpu_db5")
-        , m_cpu_db6(*this, "videobrd:cpu_db6")
-        , m_cpu_db7(*this, "videobrd:cpu_db7")
-        , m_cpu_ba4(*this, "videobrd:cpu_ba4")
-        , m_cpu_iowq(*this, "videobrd:cpu_iowq")
-        , m_video_out(*this, VIDEO_OUT_TAG)
-        , m_vblank_out(*this, VBLANK_OUT_TAG)
-        , m_tvinterq_out(*this, TVINTERQ_OUT_TAG)
-        , m_uart(*this, UART_TAG)
+		, m_cpu_db0(*this, "videobrd:cpu_db0")
+		, m_cpu_db1(*this, "videobrd:cpu_db1")
+		, m_cpu_db2(*this, "videobrd:cpu_db2")
+		, m_cpu_db3(*this, "videobrd:cpu_db3")
+		, m_cpu_db4(*this, "videobrd:cpu_db4")
+		, m_cpu_db5(*this, "videobrd:cpu_db5")
+		, m_cpu_db6(*this, "videobrd:cpu_db6")
+		, m_cpu_db7(*this, "videobrd:cpu_db7")
+		, m_cpu_ba4(*this, "videobrd:cpu_ba4")
+		, m_cpu_iowq(*this, "videobrd:cpu_iowq")
+		, m_video_out(*this, VIDEO_OUT_TAG)
+		, m_vblank_out(*this, VBLANK_OUT_TAG)
+		, m_tvinterq_out(*this, TVINTERQ_OUT_TAG)
+		, m_uart(*this, UART_TAG)
 		, m_kbdc(*this, KBDC_TAG)
 		, m_baud_dips(*this, BAUDPORT_TAG)
 		, m_baud_prom(*this, BAUD_PROM_TAG)
 		, m_misc_dips(*this, MISCPORT_TAG)
 		, m_kbd_misc_keys(*this, MISCKEYS_TAG)
 		, m_screen(*this, SCREEN_TAG)
-        , m_iowq_timer(nullptr)
-        , m_status_reg_3(0)
+		, m_iowq_timer(nullptr)
+		, m_status_reg_3(0)
 		, m_kbd_status_latch(0)
 		, m_refresh_address(0)
 		, m_screen_buf(nullptr)
@@ -126,16 +126,16 @@ public:
 		, m_last_hpos(0)
 		, m_last_vpos(0)
 		, m_last_fraction(0.0)
-    {
+	{
 	}
 
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
-    virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
-    static const device_timer_id TIMER_IOWQ = 0;
+	static const device_timer_id TIMER_IOWQ = 0;
 
-    uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_hazl1500(screen_device &screen, bitmap_rgb32 &bitmap, const rectangle &cliprect);
 
 	DECLARE_WRITE_LINE_MEMBER(com5016_fr_w);
 
@@ -157,9 +157,9 @@ public:
 
 	DECLARE_WRITE8_MEMBER(refresh_address_w);
 
-    NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
-    NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
-    NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(video_out_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(vblank_cb);
+	NETDEV_ANALOG_CALLBACK_MEMBER(tvinterq_cb);
 
 private:
 	required_device<cpu_device> m_maincpu;
@@ -182,20 +182,20 @@ private:
 	required_device<netlist_ram_pointer_t> m_u27;
 	required_device<netlist_ram_pointer_t> m_u28;
 	required_device<netlist_ram_pointer_t> m_u29;
-    required_device<netlist_mame_logic_input_t> m_cpu_db0;
-    required_device<netlist_mame_logic_input_t> m_cpu_db1;
-    required_device<netlist_mame_logic_input_t> m_cpu_db2;
-    required_device<netlist_mame_logic_input_t> m_cpu_db3;
-    required_device<netlist_mame_logic_input_t> m_cpu_db4;
-    required_device<netlist_mame_logic_input_t> m_cpu_db5;
-    required_device<netlist_mame_logic_input_t> m_cpu_db6;
-    required_device<netlist_mame_logic_input_t> m_cpu_db7;
-    required_device<netlist_mame_logic_input_t> m_cpu_ba4;
-    required_device<netlist_mame_logic_input_t> m_cpu_iowq;
-    required_device<netlist_mame_analog_output_t> m_video_out;
-    required_device<netlist_mame_analog_output_t> m_vblank_out;
-    required_device<netlist_mame_analog_output_t> m_tvinterq_out;
-    required_device<ay31015_device> m_uart;
+	required_device<netlist_mame_logic_input_t> m_cpu_db0;
+	required_device<netlist_mame_logic_input_t> m_cpu_db1;
+	required_device<netlist_mame_logic_input_t> m_cpu_db2;
+	required_device<netlist_mame_logic_input_t> m_cpu_db3;
+	required_device<netlist_mame_logic_input_t> m_cpu_db4;
+	required_device<netlist_mame_logic_input_t> m_cpu_db5;
+	required_device<netlist_mame_logic_input_t> m_cpu_db6;
+	required_device<netlist_mame_logic_input_t> m_cpu_db7;
+	required_device<netlist_mame_logic_input_t> m_cpu_ba4;
+	required_device<netlist_mame_logic_input_t> m_cpu_iowq;
+	required_device<netlist_mame_analog_output_t> m_video_out;
+	required_device<netlist_mame_analog_output_t> m_vblank_out;
+	required_device<netlist_mame_analog_output_t> m_tvinterq_out;
+	required_device<ay31015_device> m_uart;
 	required_device<ay3600_device> m_kbdc;
 	required_ioport m_baud_dips;
 	required_region_ptr<uint8_t> m_baud_prom;
@@ -204,16 +204,16 @@ private:
 
 	required_device<screen_device> m_screen;
 
-    emu_timer* m_iowq_timer;
+	emu_timer* m_iowq_timer;
 
-    uint8_t m_status_reg_3;
+	uint8_t m_status_reg_3;
 	uint8_t m_kbd_status_latch;
 
 	uint8_t m_refresh_address;
 
 	std::unique_ptr<float[]> m_screen_buf;
 
-    double m_last_beam;
+	double m_last_beam;
 	int m_last_hpos;
 	int m_last_vpos;
 	double m_last_fraction;
@@ -223,10 +223,10 @@ void hazl1500_state::machine_start()
 {
 	m_screen_buf = std::make_unique<float[]>(SCREEN_HTOTAL * SCREEN_VTOTAL);
 
-    m_iowq_timer = timer_alloc(TIMER_IOWQ);
-    m_iowq_timer->adjust(attotime::never);
+	m_iowq_timer = timer_alloc(TIMER_IOWQ);
+	m_iowq_timer->adjust(attotime::never);
 
-    save_item(NAME(m_status_reg_3));
+	save_item(NAME(m_status_reg_3));
 	save_item(NAME(m_kbd_status_latch));
 	save_item(NAME(m_refresh_address));
 	save_item(NAME(m_last_beam));
@@ -243,8 +243,8 @@ void hazl1500_state::machine_reset()
 
 void hazl1500_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-    m_cpu_iowq->write(1);
-    m_cpu_ba4->write(1);
+	m_cpu_iowq->write(1);
+	m_cpu_ba4->write(1);
 }
 
 WRITE_LINE_MEMBER( hazl1500_state::com5016_fr_w )
@@ -269,9 +269,9 @@ uint32_t hazl1500_state::screen_update_hazl1500(screen_device &screen, bitmap_rg
 		uint32_t *scanline = &bitmap.pix32(y);
 		pixindex = y * SCREEN_HTOTAL;
 		for (int x = 0; x < SCREEN_HTOTAL; x++)
-            //*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 0.5) * 0x010101);
-            *scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);
-    }
+			//*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 0.5) * 0x010101);
+			*scanline++ = 0xff000000 | (uint8_t(m_screen_buf[pixindex++] * 63.0) * 0x010101);
+	}
 
 	return 0;
 }
@@ -297,11 +297,11 @@ READ8_MEMBER( hazl1500_state::ram_r )
 
 WRITE8_MEMBER( hazl1500_state::ram_w )
 {
-    uint8_t* chips[2][8] =
-    {
-        { m_u29->ptr(), m_u28->ptr(), m_u27->ptr(), m_u26->ptr(), m_u25->ptr(), m_u24->ptr(), m_u23->ptr(), m_u22->ptr() },
-        { m_u16->ptr(), m_u15->ptr(), m_u14->ptr(), m_u13->ptr(), m_u12->ptr(), m_u11->ptr(), m_u10->ptr(), m_u9->ptr() }
-    };
+	uint8_t* chips[2][8] =
+	{
+		{ m_u29->ptr(), m_u28->ptr(), m_u27->ptr(), m_u26->ptr(), m_u25->ptr(), m_u24->ptr(), m_u23->ptr(), m_u22->ptr() },
+		{ m_u16->ptr(), m_u15->ptr(), m_u14->ptr(), m_u13->ptr(), m_u12->ptr(), m_u11->ptr(), m_u10->ptr(), m_u9->ptr() }
+	};
 
 	int bank = ((offset & 0x400) != 0 ? 1 : 0);
 	const int byte_pos = (offset >> 3) & 0x7f;
@@ -388,30 +388,30 @@ WRITE_LINE_MEMBER(hazl1500_state::ay3600_data_ready_w)
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::vblank_cb)
 {
-    synchronize();
-    if (int(data) > 1)
-    {
-        m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
-    }
-    else
-    {
-        m_kbd_status_latch |= KBD_STATUS_TV_UB;
-    }
+	synchronize();
+	if (int(data) > 1)
+	{
+		m_kbd_status_latch &= ~KBD_STATUS_TV_UB;
+	}
+	else
+	{
+		m_kbd_status_latch |= KBD_STATUS_TV_UB;
+	}
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::tvinterq_cb)
 {
-    synchronize();
-    if (int(data) > 1)
-    {
-        m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
-        m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
-    }
-    else
-    {
-        m_kbd_status_latch |= KBD_STATUS_TV_INT;
-        m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
-    }
+	synchronize();
+	if (int(data) > 1)
+	{
+		m_kbd_status_latch &= ~KBD_STATUS_TV_INT;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, CLEAR_LINE);
+	}
+	else
+	{
+		m_kbd_status_latch |= KBD_STATUS_TV_INT;
+		m_maincpu->set_input_line(INPUT_LINE_IRQ0, ASSERT_LINE);
+	}
 }
 
 NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
@@ -426,8 +426,8 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 	pixel_index -= 16; // take back 16 clock cycles to honor the circuitry god whose ark this is
 	if (pixel_index < 0)
 	{
-        m_last_beam = float(data);
-        m_last_hpos = 0;
+		m_last_beam = float(data);
+		m_last_hpos = 0;
 		m_last_vpos = 0;
 		m_last_fraction = 0.0;
 		return;
@@ -447,27 +447,27 @@ NETDEV_ANALOG_CALLBACK_MEMBER(hazl1500_state::video_out_cb)
 			m_screen_buf[last_index++] = float(m_last_beam);
 	}
 
-    m_last_beam = float(data);
-    m_last_hpos = hpos;
+	m_last_beam = float(data);
+	m_last_hpos = hpos;
 	m_last_vpos = vpos;
 	m_last_fraction = pixel_fraction;
 }
 
 WRITE8_MEMBER(hazl1500_state::refresh_address_w)
 {
-    synchronize();
-    //printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
-    m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
-    m_cpu_iowq->write(0);
-    m_cpu_ba4->write(0);
-    m_cpu_db0->write((data >> 0) & 1);
-    m_cpu_db1->write((data >> 1) & 1);
-    m_cpu_db2->write((data >> 2) & 1);
-    m_cpu_db3->write((data >> 3) & 1);
-    m_cpu_db4->write((data >> 4) & 1);
-    m_cpu_db5->write((data >> 5) & 1);
-    m_cpu_db6->write((data >> 6) & 1);
-    m_cpu_db7->write((data >> 7) & 1);
+	synchronize();
+	//printf("refresh: %02x, %d, %d\n", data, m_screen->hpos(), m_screen->vpos());
+	m_iowq_timer->adjust(attotime::from_hz(XTAL_18MHz/9));
+	m_cpu_iowq->write(0);
+	m_cpu_ba4->write(0);
+	m_cpu_db0->write((data >> 0) & 1);
+	m_cpu_db1->write((data >> 1) & 1);
+	m_cpu_db2->write((data >> 2) & 1);
+	m_cpu_db3->write((data >> 3) & 1);
+	m_cpu_db4->write((data >> 4) & 1);
+	m_cpu_db5->write((data >> 5) & 1);
+	m_cpu_db6->write((data >> 6) & 1);
+	m_cpu_db7->write((data >> 7) & 1);
 }
 
 static ADDRESS_MAP_START(hazl1500_mem, AS_PROGRAM, 8, hazl1500_state)
@@ -694,12 +694,12 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	/* video hardware */
 	MCFG_SCREEN_ADD(SCREEN_TAG, RASTER)
 	MCFG_SCREEN_UPDATE_DRIVER(hazl1500_state, screen_update_hazl1500)
-    //MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
-    //    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
-    //    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
-    MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
-        SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
-        SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
+	//MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+	//    SCREEN_HTOTAL, SCREEN_HSTART, SCREEN_HSTART + SCREEN_HDISP,
+	//    SCREEN_VTOTAL, SCREEN_VSTART, SCREEN_VSTART + SCREEN_VDISP); // TODO: Figure out exact visibility
+	MCFG_SCREEN_RAW_PARAMS(XTAL_33_264MHz / 2,
+		SCREEN_HTOTAL, 0, SCREEN_HTOTAL,
+		SCREEN_VTOTAL, 0, SCREEN_VTOTAL);
 
 	MCFG_PALETTE_ADD_MONOCHROME("palette")
 	MCFG_GFXDECODE_ADD("gfxdecode", "palette", hazl1500)
@@ -712,8 +712,8 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_DEVICE_ADD(NETLIST_TAG, NETLIST_CPU, VIDEOBRD_CLOCK)
 	MCFG_NETLIST_SETUP(hazelvid)
 
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG)
-	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG)
+	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, VIDEO_PROM_TAG, VIDEO_PROM_TAG, "u90_702128_82s129.bin", 0x0000, 0x0100)
+	MCFG_NETLIST_ROM_REGION(NETLIST_TAG, CHAR_EPROM_TAG, CHAR_EPROM_TAG, "u83_chr.bin", 0x0000, 0x0800)
 
 	// First 1K
 	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u22", "u22")
@@ -735,20 +735,20 @@ static MACHINE_CONFIG_START( hazl1500, hazl1500_state )
 	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u15", "u15")
 	MCFG_NETLIST_RAM_POINTER(NETLIST_TAG, "u16", "u16")
 
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_iowq", "cpu_iowq.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_ba4", "cpu_ba4.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db0", "cpu_db0.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db1", "cpu_db1.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db2", "cpu_db2.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db3", "cpu_db3.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db4", "cpu_db4.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db5", "cpu_db5.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db6", "cpu_db6.IN", 0)
-    MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db7", "cpu_db7.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_iowq", "cpu_iowq.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_ba4", "cpu_ba4.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db0", "cpu_db0.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db1", "cpu_db1.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db2", "cpu_db2.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db3", "cpu_db3.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db4", "cpu_db4.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db5", "cpu_db5.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db6", "cpu_db6.IN", 0)
+	MCFG_NETLIST_LOGIC_INPUT(NETLIST_TAG, "cpu_db7", "cpu_db7.IN", 0)
 
-    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "video_out", "video_out", hazl1500_state, video_out_cb, "")
-    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "vblank", "vblank", hazl1500_state, vblank_cb, "")
-    MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "video_out", "video_out", hazl1500_state, video_out_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "vblank", "vblank", hazl1500_state, vblank_cb, "")
+	MCFG_NETLIST_ANALOG_OUTPUT(NETLIST_TAG, "tvinterq", "tvinterq", hazl1500_state, tvinterq_cb, "")
 
 	/* keyboard controller */
 	MCFG_DEVICE_ADD(KBDC_TAG, AY3600, 0)

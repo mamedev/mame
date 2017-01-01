@@ -12,7 +12,6 @@
 #define __DRAWGDI__
 
 // standard windows headers
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 // MAME headers

@@ -216,61 +216,61 @@ class pit68230_device :  public device_t//, public device_execute_interface
 protected:
 
 	enum { // PGCR - Port Global Control register
-		REG_PGCR_MODE_MASK		= 0xc0,
-		REG_PGCR_MODE_0			= 0x00, // 0 0 Unidirectional  8 bit mode
-		REG_PGCR_MODE_1			= 0x40, // 0 1 Unidirectional 16 bit mode
-		REG_PGCR_MODE_2			= 0x80, // 1 0 Bidirectional   8 bit mode
-		REG_PGCR_MODE_3			= 0xc0, // 1 1 Bidirectional  16 bit mode
-		REG_PGCR_H34_ENABLE		= 0x20,
-		REG_PGCR_H12_ENABLE		= 0x10,
-		REG_PGCR_H4_SENSE		= 0x80,
-		REG_PGCR_H3_SENSE		= 0x40,
-		REG_PGCR_H2_SENSE		= 0x20,
-		REG_PGCR_H1_SENSE		= 0x10,
+		REG_PGCR_MODE_MASK      = 0xc0,
+		REG_PGCR_MODE_0         = 0x00, // 0 0 Unidirectional  8 bit mode
+		REG_PGCR_MODE_1         = 0x40, // 0 1 Unidirectional 16 bit mode
+		REG_PGCR_MODE_2         = 0x80, // 1 0 Bidirectional   8 bit mode
+		REG_PGCR_MODE_3         = 0xc0, // 1 1 Bidirectional  16 bit mode
+		REG_PGCR_H34_ENABLE     = 0x20,
+		REG_PGCR_H12_ENABLE     = 0x10,
+		REG_PGCR_H4_SENSE       = 0x80,
+		REG_PGCR_H3_SENSE       = 0x40,
+		REG_PGCR_H2_SENSE       = 0x20,
+		REG_PGCR_H1_SENSE       = 0x10,
 	};
 
 	enum {
-		REG_PACR_SUBMODE_MASK	= 0xc0,
-		REG_PACR_SUBMODE_0		= 0x00, // 0 0
-		REG_PACR_SUBMODE_1		= 0x40, // 0 1
-		REG_PACR_SUBMODE_2		= 0x80, // 1 0
-		REG_PACR_SUBMODE_3		= 0xc0, // 1 1
-		REG_PACR_H2_CTRL_MASK	= 0x38,
-		REG_PACR_H2_CTRL_IN_OUT	= 0x20, // H2 sense always cleared if set
-		REG_PACR_H2_CTRL_OUT_00	= 0x20, // H2 output negated
-		REG_PACR_H2_CTRL_OUT_01	= 0x28, // H2 output asserted
-		REG_PACR_H2_CTRL_OUT_10	= 0x30, // H2 output in interlocked input handshake protocol
-		REG_PACR_H2_CTRL_OUT_11	= 0x38, // H2 output in pulsed input handshake protocol
-		REG_PACR_H2_INT_ENABLE	= 0x04,
-		REG_PACR_H1_SVCR_ENABLE	= 0x02,
-		REG_PACR_H1_STATUS_CTRL	= 0x01,
+		REG_PACR_SUBMODE_MASK   = 0xc0,
+		REG_PACR_SUBMODE_0      = 0x00, // 0 0
+		REG_PACR_SUBMODE_1      = 0x40, // 0 1
+		REG_PACR_SUBMODE_2      = 0x80, // 1 0
+		REG_PACR_SUBMODE_3      = 0xc0, // 1 1
+		REG_PACR_H2_CTRL_MASK   = 0x38,
+		REG_PACR_H2_CTRL_IN_OUT = 0x20, // H2 sense always cleared if set
+		REG_PACR_H2_CTRL_OUT_00 = 0x20, // H2 output negated
+		REG_PACR_H2_CTRL_OUT_01 = 0x28, // H2 output asserted
+		REG_PACR_H2_CTRL_OUT_10 = 0x30, // H2 output in interlocked input handshake protocol
+		REG_PACR_H2_CTRL_OUT_11 = 0x38, // H2 output in pulsed input handshake protocol
+		REG_PACR_H2_INT_ENABLE  = 0x04,
+		REG_PACR_H1_SVCR_ENABLE = 0x02,
+		REG_PACR_H1_STATUS_CTRL = 0x01,
 	};
 
 	enum {
-		REG_PBCR_SUBMODE_MASK	= 0xc0,
-		REG_PBCR_SUBMODE_00		= 0x00, // 0 0
-		REG_PBCR_SUBMODE_01		= 0x40, // 0 1
-		REG_PBCR_SUBMODE_10		= 0x80, // 1 0
-		REG_PBCR_SUBMODE_11		= 0xc0, // 1 1
-		REG_PBCR_SUBMODE_1X		= 0x80, // submode 2 or 3
-		REG_PBCR_H4_CTRL_MASK	= 0x38,
-		REG_PBCR_H4_CTRL_IN_OUT	= 0x20, // H4 sense always cleared if set
-		REG_PBCR_H4_CTRL_OUT_00	= 0x20, // H4 output negated
-		REG_PBCR_H4_CTRL_OUT_01	= 0x28, // H4 output asserted
-		REG_PBCR_H4_CTRL_OUT_10	= 0x30, // H4 output in interlocked input handshake protocol
-		REG_PBCR_H4_CTRL_OUT_11	= 0x38, // H4 output in pulsed input handshake protocol
-		REG_PBCR_H4_INT_ENABLE	= 0x04,
+		REG_PBCR_SUBMODE_MASK   = 0xc0,
+		REG_PBCR_SUBMODE_00     = 0x00, // 0 0
+		REG_PBCR_SUBMODE_01     = 0x40, // 0 1
+		REG_PBCR_SUBMODE_10     = 0x80, // 1 0
+		REG_PBCR_SUBMODE_11     = 0xc0, // 1 1
+		REG_PBCR_SUBMODE_1X     = 0x80, // submode 2 or 3
+		REG_PBCR_H4_CTRL_MASK   = 0x38,
+		REG_PBCR_H4_CTRL_IN_OUT = 0x20, // H4 sense always cleared if set
+		REG_PBCR_H4_CTRL_OUT_00 = 0x20, // H4 output negated
+		REG_PBCR_H4_CTRL_OUT_01 = 0x28, // H4 output asserted
+		REG_PBCR_H4_CTRL_OUT_10 = 0x30, // H4 output in interlocked input handshake protocol
+		REG_PBCR_H4_CTRL_OUT_11 = 0x38, // H4 output in pulsed input handshake protocol
+		REG_PBCR_H4_INT_ENABLE  = 0x04,
 		REG_PBCR_H3_SVCRQ_ENABLE= 0x02,
-		REG_PBCR_H3_STATUS_CTRL	= 0x01,
+		REG_PBCR_H3_STATUS_CTRL = 0x01,
 	};
 
 	enum {
-		REG_PCDR_TIN_BIT		= 2,   // BIT number
-		REG_PCDR_TIN			= 0x04 // bit position
+		REG_PCDR_TIN_BIT        = 2,   // BIT number
+		REG_PCDR_TIN            = 0x04 // bit position
 	};
 
 	enum {
-		REG_TCR_TIMER_ENABLE	= 0x01
+		REG_TCR_TIMER_ENABLE    = 0x01
 	};
 
 	enum { // TCR - Timer Control register
@@ -333,10 +333,10 @@ protected:
 	uint8_t m_pbdr;           // Port B Data register
 	uint8_t m_pcdr;           // Port C Data register
 	uint8_t m_psr;            // Port Status Register
-	uint8_t m_tcr;        	  // Timer Control Register
+	uint8_t m_tcr;            // Timer Control Register
 	uint8_t m_tivr;           // Timer Interrupt Vector register
-	int 	m_cpr;            // Counter Preload Registers (3 x 8 = 24 bits)
-	int   	m_cntr;           // - The 24 bit Counter
+	int     m_cpr;            // Counter Preload Registers (3 x 8 = 24 bits)
+	int     m_cntr;           // - The 24 bit Counter
 	uint8_t m_tsr;            // Timer Status Register
 
 

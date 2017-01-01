@@ -911,6 +911,7 @@ static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, arkanoid_state )
 ADDRESS_MAP_END
 
 /* MCU Hookup based on 'Arkanoid_TAITO_(Japan 1986) PCB.rar' from Taro and others at http://zx-pk.ru forums
+NOTE and TODO: these comments have not been significantly updated since the real taito arkanoid schematics were found. beware of mistakes!
 ic5 = 74ls669
 ic6 = 74ls669
 ic9 = 74ls257
@@ -961,7 +962,7 @@ Clock   : from z80, somehow; also is /oe of ic27
 Q       : N/C
 /Q      : -> 68705 PC1 and z80, somehow
 
-Note: despite having a signal on it (possibly vblank or one of the V counter bits), the TIMER/BOOT pin is seemingly never used by the MCU in input mode, so the signal is ignored.
+Note: despite having a signal on it (/VBLK according to the schematics), the TIMER/BOOT pin is seemingly never used by the MCU in input mode, so the signal is ignored.
 
 Note2: PA0 is connected to bit 0 of both the z80->68705 latch and the 68705->z80 latch. The board trace from http://zx-pk.ru is known to be incomplete, so its likely all of the PAx bits go both ways.
 */

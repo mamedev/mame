@@ -23,7 +23,7 @@
 	public:                                                                     \
 		template <class C>                                                      \
 		NETLIB_NAME(cname)(C &owner, const pstring &name)                       \
-		: nld_truthtable_t<nIN, nOUT>(owner, name, nullptr, &m_ttbl, m_desc) { }   \
+		: nld_truthtable_t<nIN, nOUT>(owner, name, family_TTL(), &m_ttbl, m_desc) { }   \
 	private:                                                                    \
 		static truthtable_t m_ttbl;                                             \
 		static const char *m_desc[];                                            \
@@ -235,7 +235,7 @@ namespace netlist
 
 			desc.setup(m_desc, disabled_ignore * 0);
 	#if 0
-			printf("%s\n", name().cstr());
+			printf("%s\n", name().c_str());
 			for (int j=0; j < m_size; j++)
 				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
@@ -261,7 +261,7 @@ namespace netlist
 		}
 
 	public:
-		void inc_active() noexcept override
+		void inc_active() NL_NOEXCEPT override
 		{
 			if (m_NI > 1)
 				if (++m_active == 1)
@@ -270,7 +270,7 @@ namespace netlist
 				}
 		}
 
-		void dec_active() noexcept override
+		void dec_active() NL_NOEXCEPT override
 		{
 			/* FIXME:
 			 * Based on current measurements there is no point to disable

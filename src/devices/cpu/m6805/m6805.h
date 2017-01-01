@@ -438,9 +438,9 @@ protected:
 	// device-level overrides
 	virtual void device_start() override;
 
-//	virtual void execute_set_input(int inputnum, int state) override;
+//  virtual void execute_set_input(int inputnum, int state) override;
 
-//	virtual void interrupt() override;
+//  virtual void interrupt() override;
 };
 
 // ======================> hd63705_device

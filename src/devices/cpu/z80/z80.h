@@ -276,7 +276,6 @@ protected:
 	uint8_t           m_after_ei;           /* are we in the EI shadow? */
 	uint8_t           m_after_ldair;        /* same, but for LD A,I or LD A,R */
 	uint32_t          m_ea;
-	device_irq_acknowledge_delegate m_irq_callback;
 
 	int             m_icount;
 	uint8_t           m_rtemp;

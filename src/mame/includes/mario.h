@@ -6,7 +6,7 @@
 #include "machine/gen_latch.h"
 #include "machine/z80dma.h"
 
-#define OLD_SOUND   (1)
+#define OLD_SOUND   (0)
 
 #if !OLD_SOUND
 #include "machine/netlist.h"
@@ -61,6 +61,7 @@ public:
 		m_discrete(*this, "discrete"),
 #else
 		m_audio_snd0(*this, "snd_nl:snd0"),
+		m_audio_snd1(*this, "snd_nl:snd1"),
 		m_audio_snd7(*this, "snd_nl:snd7"),
 		m_audio_dac(*this, "snd_nl:dac"),
 #endif
@@ -82,8 +83,9 @@ public:
 	optional_device<discrete_device> m_discrete;
 #else
 	optional_device<netlist_mame_logic_input_t> m_audio_snd0;
+	optional_device<netlist_mame_logic_input_t> m_audio_snd1;
 	optional_device<netlist_mame_logic_input_t> m_audio_snd7;
-	optional_device<netlist_mame_logic_input_t> m_audio_dac;
+	optional_device<netlist_mame_int_input_t> m_audio_dac;
 #endif
 
 	/* memory pointers */

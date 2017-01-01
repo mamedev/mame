@@ -137,8 +137,6 @@ public:
 	float zeus_point2[3];
 	uint32_t zeus_texbase;
 	int zeus_quad_size;
-	uint32_t m_renderAddr;
-	bool m_thegrid;
 
 	uint32_t *waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
@@ -153,6 +151,9 @@ public:
 	int yoffs;
 	int texel_width;
 	float zbase;
+
+	enum { THEGRID, CRUSNEXO, MWSKINS };
+	int m_system;
 
 protected:
 	// device-level overrides
@@ -184,7 +185,6 @@ private:
 	uint32_t m_fill_depth;
 
 	int m_yScale;
-
 
 #if TRACK_REG_USAGE
 	struct reg_info

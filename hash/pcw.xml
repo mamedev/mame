@@ -1513,16 +1513,16 @@
 	</software>
 
 <!--
-	<software name="sirlance">
-		<description>Sir Lancelot (Spa)</description>
-		<year>1985</year>
-		<publisher>OMK</publisher>
-		<part name="flop1" interface="floppy_3">
-			<dataarea name="flop" size="194816">
-				<rom name="sirlancelot_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
-			</dataarea>
-		</part>
-	</software>
+    <software name="sirlance">
+        <description>Sir Lancelot (Spa)</description>
+        <year>1985</year>
+        <publisher>OMK</publisher>
+        <part name="flop1" interface="floppy_3">
+            <dataarea name="flop" size="194816">
+                <rom name="sirlancelot_pcw.dsk" size="194816" crc="c47fb488" sha1="18d09cab70d50e0e9b2682ea751258fa47841120" offset="0" />
+            </dataarea>
+        </part>
+    </software>
 -->
 
 	<software name="sirperce">

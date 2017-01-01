@@ -42,6 +42,8 @@
 #include "nld_74365.h"
 #include "nld_74ls629.h"
 #include "nld_82S16.h"
+#include "nld_82S115.h"
+#include "nld_82S123.h"
 #include "nld_82S126.h"
 #include "nld_9310.h"
 #include "nld_9312.h"

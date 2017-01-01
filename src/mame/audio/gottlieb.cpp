@@ -30,225 +30,6 @@ extern const device_type GOTTLIEB_SOUND_REV1_WITH_VOTRAX = &device_creator<gottl
 extern const device_type GOTTLIEB_SOUND_REV2 = &device_creator<gottlieb_sound_r2_device>;
 
 
-
-//**************************************************************************
-//  OLD CRAPPY SAMPLE PLAYER
-//**************************************************************************
-
-#if USE_FAKE_VOTRAX
-
-void gottlieb_sound_r1_device::trigger_sample(uint8_t data)
-{
-	/* Reactor samples */
-	if (strcmp(machine().system().name, "reactor") == 0)
-	{
-		switch (data)
-		{
-			case 55:
-			case 56:
-			case 57:
-			case 59:
-				m_samples->start(0, data - 53);
-				break;
-
-			case 31:
-				m_score_sample = 7;
-				break;
-
-			case 39:
-				m_score_sample++;
-				if (m_score_sample < 20)
-					m_samples->start(0, m_score_sample);
-				break;
-		}
-	}
-
-	/* Q*Bert samples */
-	else
-	{
-		switch (data)
-		{
-			case 17:
-			case 18:
-			case 19:
-			case 20:
-			case 21:
-				m_samples->start(0, (data - 17) * 8 + m_random_offset);
-				m_random_offset = (m_random_offset + 1) & 7;
-				break;
-
-			case 22:
-				m_samples->start(0,40);
-				break;
-
-			case 23:
-				m_samples->start(0,41);
-				break;
-		}
-	}
-}
-
-void gottlieb_sound_r1_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-}
-
-void gottlieb_sound_r1_device::fake_votrax_data_w(uint8_t data)
-{
-	static const char *const PhonemeTable[0x40] =
-	{
-		"EH3", "EH2", "EH1", "PA0", "DT" , "A1" , "A2" , "ZH",
-		"AH2", "I3" , "I2" , "I1" , "M"  , "N"  , "B"  , "V",
-		"CH" , "SH" , "Z"  , "AW1", "NG" , "AH1", "OO1", "OO",
-		"L"  , "K"  , "J"  , "H"  , "G"  , "F"  , "D"  , "S",
-		"A"  , "AY" , "Y1" , "UH3", "AH" , "P"  , "O"  , "I",
-		"U"  , "Y"  , "T"  , "R"  , "E"  , "W"  , "AE" , "AE1",
-		"AW2", "UH2", "UH1", "UH" , "O2" , "O1" , "IU" , "U1",
-		"THV", "TH" , "ER" , "EH" , "E1" , "AW" , "PA1", "STOP"
-	};
-
-	data ^= 0xff;
-
-logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,PhonemeTable[data & 0x3f]);
-
-	m_votrax_queue[m_votrax_queuepos++] = data;
-
-	if ((data & 0x3f) == 0x3f)
-	{
-		if (m_votrax_queuepos > 1)
-		{
-			int last = -1;
-			int i;
-			char phonemes[200];
-
-			phonemes[0] = 0;
-			for (i = 0;i < m_votrax_queuepos-1;i++)
-			{
-				static const char *const inf[4] = { "[0]", "[1]", "[2]", "[3]" };
-				int phoneme = m_votrax_queue[i] & 0x3f;
-				int inflection = m_votrax_queue[i] >> 6;
-				if (inflection != last) strcat(phonemes, inf[inflection]);
-				last = inflection;
-				if (phoneme == 0x03 || phoneme == 0x3e) strcat(phonemes," ");
-				else strcat(phonemes,PhonemeTable[phoneme]);
-			}
-
-			osd_printf_debug("Votrax played '%s'\n", phonemes);
-
-			if (strcmp(phonemes, "[0] HEH3LOOW     AH1EH3I3YMTERI2NDAHN") == 0)   /* Q-Bert & Tylz - Hello, I am turned on */
-								m_samples->start(0, 42);
-			else if (strcmp(phonemes, "[0]BAH1EH1Y") == 0)                            /* Q-Bert - Bye, bye */
-				m_samples->start(0, 43);
-			else if (strcmp(phonemes, "[0]A2YHT LEH2FTTH") == 0)                      /* Reactor - Eight left */
-				m_samples->start(0, 0);
-			else if (strcmp(phonemes, "[0]SI3KS DTYN LEH2FTTH") == 0)                 /* Reactor - Sixteen left */
-				m_samples->start(0, 1);
-			else if (strcmp(phonemes, "[0]WO2RNYNG KO2R UH1NSDTABUH1L") == 0)         /* Reactor - Warning core unstable */
-				m_samples->start(0, 5);
-			else if (strcmp(phonemes, "[0]CHAMBERR   AE1EH2KTI1VA1I3DTEH1DT ") == 0) /* Reactor - Chamber activated */
-				m_samples->start(0, 7);
-		}
-
-		m_votrax_queuepos = 0;
-	}
-
-	/* generate a NMI after a while to make the CPU continue to send data */
-	timer_set(attotime::from_usec(50));
-}
-
-static const char *const reactor_sample_names[] =
-{
-	"*reactor",
-	"fx_53", /* "8 left" */
-	"fx_54", /* "16 left" */
-	"fx_55", /* "24 left" */
-	"fx_56", /* "32 left" */
-	"fx_57", /* "40 left" */
-	"fx_58", /* "warning, core unstable" */
-	"fx_59", /* "bonus" */
-	"fx_31", /* "chamber activated" */
-	"fx_39a", /* "2000" */
-	"fx_39b", /* "5000" */
-	"fx_39c", /* "10000" */
-	"fx_39d", /* "15000" */
-	"fx_39e", /* "20000" */
-	"fx_39f", /* "25000" */
-	"fx_39g", /* "30000" */
-	"fx_39h", /* "35000" */
-	"fx_39i", /* "40000" */
-	"fx_39j", /* "45000" */
-	"fx_39k", /* "50000" */
-	"fx_39l", /* "55000" */
-	nullptr   /* end of array */
-};
-
-static const char *const qbert_sample_names[] =
-{
-	"*qbert",
-	"fx_17a", /* random speech, voice clock 255 */
-	"fx_17b", /* random speech, voice clock 255 */
-	"fx_17c", /* random speech, voice clock 255 */
-	"fx_17d", /* random speech, voice clock 255 */
-	"fx_17e", /* random speech, voice clock 255 */
-	"fx_17f", /* random speech, voice clock 255 */
-	"fx_17g", /* random speech, voice clock 255 */
-	"fx_17h", /* random speech, voice clock 255 */
-	"fx_18a", /* random speech, voice clock 176 */
-	"fx_18b", /* random speech, voice clock 176 */
-	"fx_18c", /* random speech, voice clock 176 */
-	"fx_18d", /* random speech, voice clock 176 */
-	"fx_18e", /* random speech, voice clock 176 */
-	"fx_18f", /* random speech, voice clock 176 */
-	"fx_18g", /* random speech, voice clock 176 */
-	"fx_18h", /* random speech, voice clock 176 */
-	"fx_19a", /* random speech, voice clock 128 */
-	"fx_19b", /* random speech, voice clock 128 */
-	"fx_19c", /* random speech, voice clock 128 */
-	"fx_19d", /* random speech, voice clock 128 */
-	"fx_19e", /* random speech, voice clock 128 */
-	"fx_19f", /* random speech, voice clock 128 */
-	"fx_19g", /* random speech, voice clock 128 */
-	"fx_19h", /* random speech, voice clock 128 */
-	"fx_20a", /* random speech, voice clock 96 */
-	"fx_20b", /* random speech, voice clock 96 */
-	"fx_20c", /* random speech, voice clock 96 */
-	"fx_20d", /* random speech, voice clock 96 */
-	"fx_20e", /* random speech, voice clock 96 */
-	"fx_20f", /* random speech, voice clock 96 */
-	"fx_20g", /* random speech, voice clock 96 */
-	"fx_20h", /* random speech, voice clock 96 */
-	"fx_21a", /* random speech, voice clock 62 */
-	"fx_21b", /* random speech, voice clock 62 */
-	"fx_21c", /* random speech, voice clock 62 */
-	"fx_21d", /* random speech, voice clock 62 */
-	"fx_21e", /* random speech, voice clock 62 */
-	"fx_21f", /* random speech, voice clock 62 */
-	"fx_21g", /* random speech, voice clock 62 */
-	"fx_21h", /* random speech, voice clock 62 */
-	"fx_22", /* EH2 with decreasing voice clock */
-	"fx_23", /* O1 with varying voice clock */
-	"fx_28",
-	"fx_36",
-	nullptr   /* end of array */
-};
-
-MACHINE_CONFIG_FRAGMENT( reactor_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(reactor_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_FRAGMENT( qbert_samples )
-	MCFG_SOUND_ADD("samples", SAMPLES, 0)
-	MCFG_SAMPLES_CHANNELS(1)
-	MCFG_SAMPLES_NAMES(qbert_sample_names)
-	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0)
-MACHINE_CONFIG_END
-
-#endif
-
-
 //**************************************************************************
 //  REV 0 SOUND BOARD: 6502 + 6530 + DAC
 //**************************************************************************
@@ -390,12 +171,6 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 		m_votrax(*this, "votrax"),
 		//m_populate_votrax(false),
 		m_last_speech_clock(0)
-#if USE_FAKE_VOTRAX
-		, m_samples(*this, ":samples"),
-		m_score_sample(0),
-		m_random_offset(0),
-		m_votrax_queuepos(0)
-#endif
 {
 }
 
@@ -407,12 +182,6 @@ gottlieb_sound_r1_device::gottlieb_sound_r1_device(const machine_config &mconfig
 		m_votrax(*this, "votrax"),
 		//m_populate_votrax(populate_votrax),
 		m_last_speech_clock(0)
-#if USE_FAKE_VOTRAX
-		, m_samples(*this, ":samples"),
-		m_score_sample(0),
-		m_random_offset(0),
-		m_votrax_queuepos(0)
-#endif
 {
 }
 
@@ -427,11 +196,6 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::write )
 	uint8_t pa7 = (data & 0x0f) != 0xf;
 	uint8_t pa0_5 = ~data & 0x3f;
 	m_riot->porta_in_set(pa0_5 | (pa7 << 7), 0xbf);
-
-#if USE_FAKE_VOTRAX
-	if (pa7 && m_samples != nullptr)
-		trigger_sample(pa0_5);
-#endif
 }
 
 
@@ -469,10 +233,6 @@ WRITE8_MEMBER( gottlieb_sound_r1_device::votrax_data_w )
 		m_votrax->inflection_w(space, offset, data >> 6);
 		m_votrax->write(space, offset, ~data & 0x3f);
 	}
-
-#if USE_FAKE_VOTRAX
-	fake_votrax_data_w(data);
-#endif
 }
 
 

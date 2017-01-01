@@ -88,7 +88,7 @@ protected:
 	required_ioport m_in2;
 
 	int      m_input_select;
-	bool	 m_lockout_level;
+	bool     m_lockout_level;
 };
 
 class tnzs_state : public tnzs_mcu_state

@@ -100,5 +100,5 @@ WRITE8_MEMBER( ef9369_device::data_w )
 
 WRITE8_MEMBER( ef9369_device::address_w )
 {
-	m_address = data & 0x1f;	// 5-bit
+	m_address = data & 0x1f;    // 5-bit
 }

@@ -41,6 +41,11 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
     Imgtool initialization and basics
 
 ***************************************************************************/
+
+//-------------------------------------------------
+//  rtrim
+//-------------------------------------------------
+
 void rtrim(char *buf)
 {
 	size_t buflen;
@@ -54,6 +59,11 @@ void rtrim(char *buf)
 	}
 }
 
+
+//-------------------------------------------------
+//  strncpyz
+//-------------------------------------------------
+
 char *strncpyz(char *dest, const char *source, size_t len)
 {
 	char *s;
@@ -66,6 +76,33 @@ char *strncpyz(char *dest, const char *source, size_t len)
 	}
 	return s;
 }
+
+
+//-------------------------------------------------
+//  extract_padded_string
+//-------------------------------------------------
+
+static std::string extract_padded_string(const char *source, size_t len)
+{
+	while ((len > 0) && (source[len - 1] == ' '))
+		len--;
+	return std::string(source, len);
+}
+
+
+//-------------------------------------------------
+//  extract_padded_filename - this is a common
+//	enough scenario that it is justified to have
+//	this in common code
+//-------------------------------------------------
+
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length)
+{
+	std::string filename = extract_padded_string(source, filename_length);
+	std::string extension = extract_padded_string(source + filename_length, extension_length);
+	return extension.empty() ? filename : filename + "." + extension;
+}
+
 
 //-------------------------------------------------
 //  markerrorsource - marks where an error source

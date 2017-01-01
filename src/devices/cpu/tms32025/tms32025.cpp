@@ -186,7 +186,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 const device_type TMS32025 = &device_creator<tms32025_device>;
 const device_type TMS32026 = &device_creator<tms32026_device>;
 
-static ADDRESS_MAP_START( tms32025_data, AS_PROGRAM, 16, tms32025_device )
+static ADDRESS_MAP_START( tms32025_data, AS_DATA, 16, tms32025_device )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( tms32025_data, AS_PROGRAM, 16, tms32025_device )
 	AM_RANGE(0x0300, 0x03ff) AM_RAM AM_SHARE("b1")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tms32026_data, AS_PROGRAM, 16, tms32025_device )
+static ADDRESS_MAP_START( tms32026_data, AS_DATA, 16, tms32025_device )
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(drr_r, drr_w)
 	AM_RANGE(0x0001, 0x0001) AM_READWRITE(dxr_r, dxr_w)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(tim_r, tim_w)
@@ -1798,7 +1798,7 @@ void tms32025_device::device_reset()
 		m_data->install_ram(0x0200, 0x02ff, m_b0);
 	}
 	common_reset();
-	
+
 }
 
 void tms32026_device::device_reset()

@@ -421,7 +421,7 @@ m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *
 {
 }
 
- 
+
 
 void m6805_base_device::device_start()
 {
@@ -1110,7 +1110,7 @@ void m68705_new_device::device_start()
 	m_portA_cb_w.resolve_safe();
 	m_portB_cb_w.resolve_safe();
 	m_portC_cb_w.resolve_safe();
-	
+
 	m_portA_cb_r.resolve_safe(0xff);
 	m_portB_cb_r.resolve_safe(0xff);
 	m_portC_cb_r.resolve_safe(0xff);

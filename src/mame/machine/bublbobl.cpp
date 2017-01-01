@@ -78,7 +78,7 @@ READ8_MEMBER(bublbobl_state::tokio_mcu_r)
 
 	m_mcu_sent = false;
 
-//	printf("%s: tokio_mcu_r %02x\n", space.machine().describe_context(), m_from_mcu);
+//  printf("%s: tokio_mcu_r %02x\n", space.machine().describe_context(), m_from_mcu);
 
 	return m_from_mcu;
 }
@@ -88,7 +88,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_mcu_w)
 	if (!m_mcu)
 		return;
 
-//	printf("%s: tokio_mcu_w %02x\n", space.machine().describe_context(), data);
+//  printf("%s: tokio_mcu_w %02x\n", space.machine().describe_context(), data);
 
 	m_from_main = data;
 	m_main_sent = true;
@@ -99,13 +99,13 @@ WRITE8_MEMBER(bublbobl_state::tokio_mcu_w)
 
 READ8_MEMBER(bublbobl_state::tokio_mcu_porta_r)
 {
-//	printf("tokio_mcu_porta_r\n");
+//  printf("tokio_mcu_porta_r\n");
 	return m_to_mcu_latch;
 }
 
 WRITE8_MEMBER(bublbobl_state::tokio_mcu_porta_w)
 {
-//	printf("tokio_mcu_porta_w %02x\n", data);
+//  printf("tokio_mcu_porta_w %02x\n", data);
 	m_from_mcu_latch = data;
 }
 
@@ -121,7 +121,7 @@ READ8_MEMBER(bublbobl_state::tokio_mcu_portc_r)
 
 	ret ^= 0x3; // inverted logic compared to tigerh
 
-//	printf("%s: tokio_mcu_portc_r %02x\n", space.machine().describe_context(), ret);
+//  printf("%s: tokio_mcu_portc_r %02x\n", space.machine().describe_context(), ret);
 
 	return ret;
 }
@@ -129,7 +129,7 @@ READ8_MEMBER(bublbobl_state::tokio_mcu_portc_r)
 
 WRITE8_MEMBER(bublbobl_state::tokio_mcu_portb_w)
 {
-//	printf("tokio_mcu_portb_w %02x\n", data);
+//  printf("tokio_mcu_portb_w %02x\n", data);
 
 	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
 	{
@@ -143,7 +143,7 @@ WRITE8_MEMBER(bublbobl_state::tokio_mcu_portb_w)
 	{
 		m_from_mcu = m_from_mcu_latch;
 		m_mcu_sent = true;
-	//	printf("sent %02x\n", m_from_mcu);
+	//  printf("sent %02x\n", m_from_mcu);
 	}
 
 	m_old_portB = data;

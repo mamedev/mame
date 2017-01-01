@@ -15,6 +15,7 @@
 #include "netlist/nl_factory.h"
 #include "netlist/nl_parser.h"
 #include "netlist/devices/net_lib.h"
+#include "plib/palloc.h"
 #include "debugger.h"
 
 //#define LOG_DEV_CALLS(x)   printf x
@@ -33,6 +34,7 @@ const device_type NETLIST_RAM_POINTER = &device_creator<netlist_ram_pointer_t>;
 const device_type NETLIST_LOGIC_INPUT = &device_creator<netlist_mame_logic_input_t>;
 const device_type NETLIST_STREAM_INPUT = &device_creator<netlist_mame_stream_input_t>;
 
+const device_type NETLIST_LOGIC_OUTPUT = &device_creator<netlist_mame_logic_output_t>;
 const device_type NETLIST_ANALOG_OUTPUT = &device_creator<netlist_mame_analog_output_t>;
 const device_type NETLIST_STREAM_OUTPUT = &device_creator<netlist_mame_stream_output_t>;
 
@@ -70,7 +72,7 @@ void netlist_mame_analog_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_double_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 	if (m_mult != 1.0 || m_offset != 0.0)
 	{
@@ -79,6 +81,7 @@ void netlist_mame_analog_input_t::device_start()
 	}
 
 }
+
 
 // ----------------------------------------------------------------------------------------
 // netlist_mame_analog_output_t
@@ -116,6 +119,41 @@ void netlist_mame_analog_output_t::device_start()
 
 
 // ----------------------------------------------------------------------------------------
+// netlist_mame_logic_output_t
+// ----------------------------------------------------------------------------------------
+
+netlist_mame_logic_output_t::netlist_mame_logic_output_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
+	: device_t(mconfig, NETLIST_LOGIC_OUTPUT, "Netlist Logic Output", tag, owner, clock, "netlist_logic_output", __FILE__),
+	netlist_mame_sub_interface(*owner),
+	m_in("")
+{
+}
+
+void netlist_mame_logic_output_t::static_set_params(device_t &device, const char *in_name, netlist_logic_output_delegate adelegate)
+{
+	netlist_mame_logic_output_t &mame_output = downcast<netlist_mame_logic_output_t &>(device);
+	mame_output.m_in = in_name;
+	mame_output.m_delegate = adelegate;
+}
+
+void netlist_mame_logic_output_t::custom_netlist_additions(netlist::setup_t &setup)
+{
+	pstring dname = "OUT_" + m_in;
+	m_delegate.bind_relative_to(owner()->machine().root_device());
+
+	plib::owned_ptr<netlist::device_t> dev = plib::owned_ptr<netlist::device_t>::Create<NETLIB_NAME(logic_callback)>(setup.netlist(), setup.build_fqn(dname));
+	static_cast<NETLIB_NAME(logic_callback) *>(dev.get())->register_callback(m_delegate);
+	setup.netlist().register_dev(std::move(dev));
+	setup.register_link(dname + ".IN", m_in);
+}
+
+void netlist_mame_logic_output_t::device_start()
+{
+	LOG_DEV_CALLS(("start %s\n", tag()));
+}
+
+
+// ----------------------------------------------------------------------------------------
 // netlist_mame_int_input_t
 // ----------------------------------------------------------------------------------------
 
@@ -145,7 +183,7 @@ void netlist_mame_int_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_int_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 }
 
@@ -177,7 +215,7 @@ void netlist_mame_logic_input_t::device_start()
 	m_param = dynamic_cast<netlist::param_logic_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 }
 
@@ -188,35 +226,33 @@ void netlist_mame_logic_input_t::device_start()
 netlist_mame_rom_t::netlist_mame_rom_t(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 		: device_t(mconfig, NETLIST_ROM_REGION, "Netlist ROM Region", tag, owner, clock, "netlist_rom_region", __FILE__)
 		, netlist_mame_sub_interface(*owner)
-		, m_param(nullptr)
-		, m_param_name("")
-		, m_data_tag(nullptr)
-		, m_data(nullptr)
+		, m_name("")
+		, m_region_tag(nullptr)
+		, m_offset(0)
+		, m_size(0)
 {
 }
 
-void netlist_mame_rom_t::static_set_params(device_t &device, const char *param_name, const char* data_tag)
+void netlist_mame_rom_t::static_set_params(device_t &device, const char *name, const char* region_tag, std::size_t offset, std::size_t size)
 {
-	netlist_mame_rom_t &netlist = downcast<netlist_mame_rom_t&>(device);
+	netlist_mame_rom_t &r = downcast<netlist_mame_rom_t&>(device);
 	LOG_DEV_CALLS(("static_set_params %s\n", device.tag()));
-	netlist.m_param_name = param_name;
-	netlist.m_data_tag = data_tag;
+	r.m_name = name;
+	r.m_region_tag = region_tag;
+	r.m_offset = offset;
+	r.m_size = size;
+}
+
+void netlist_mame_rom_t::custom_netlist_additions(netlist::setup_t &setup)
+{
+	if (memregion(m_region_tag) == nullptr)
+		fatalerror("device %s region %s not found\n", basetag(), m_region_tag);
+	setup.register_source(plib::make_unique_base<netlist::source_t, netlist_data_memregion_t>(setup,
+			m_name,	memregion(m_region_tag)->base() + m_offset, m_size));
 }
 
 void netlist_mame_rom_t::device_start()
 {
-	LOG_DEV_CALLS(("start %s\n", tag()));
-	netlist::param_t *p = downcast<netlist_mame_device_t *>(this->owner())->setup().find_param(m_param_name);
-	m_param = dynamic_cast<netlist::param_ptr_t *>(p);
-	if (m_param == nullptr)
-	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
-	}
-
-	if (memregion(m_data_tag) != nullptr)
-		m_data = memregion(m_data_tag)->base();
-
-	m_param->setTo(m_data);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -246,10 +282,10 @@ void netlist_ram_pointer_t::device_start()
 	m_param = dynamic_cast<netlist::param_ptr_t *>(p);
 	if (m_param == nullptr)
 	{
-		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.cstr());
+		fatalerror("device %s wrong parameter type for %s\n", basetag(), m_param_name.c_str());
 	}
 
-    m_data = (*m_param)();
+	m_data = (*m_param)();
 }
 
 // ----------------------------------------------------------------------------------------
@@ -339,22 +375,22 @@ void netlist_mame_t::vlog(const plib::plog_level &l, const pstring &ls) const
 	switch (l)
 	{
 		case plib::plog_level::DEBUG:
-			m_parent.logerror("netlist DEBUG: %s\n", errstr.cstr());
+			m_parent.logerror("netlist DEBUG: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::INFO:
-			m_parent.logerror("netlist INFO: %s\n", errstr.cstr());
+			m_parent.logerror("netlist INFO: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::VERBOSE:
-			m_parent.logerror("netlist VERBOSE: %s\n", errstr.cstr());
+			m_parent.logerror("netlist VERBOSE: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::WARNING:
-			m_parent.logerror("netlist WARNING: %s\n", errstr.cstr());
+			m_parent.logerror("netlist WARNING: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::ERROR:
-			m_parent.logerror("netlist ERROR: %s\n", errstr.cstr());
+			m_parent.logerror("netlist ERROR: %s\n", errstr.c_str());
 			break;
 		case plib::plog_level::FATAL:
-			emu_fatalerror error("netlist ERROR: %s\n", errstr.cstr());
+			emu_fatalerror error("netlist ERROR: %s\n", errstr.c_str());
 			throw error;
 	}
 }
@@ -411,6 +447,17 @@ void netlist_mame_device_t::device_start()
 	// register additional devices
 
 	nl_register_devices();
+
+	/* let sub-devices add sources and do stuff prior to parsing */
+	for (device_t &d : subdevices())
+	{
+		netlist_mame_sub_interface *sdev = dynamic_cast<netlist_mame_sub_interface *>(&d);
+		if( sdev != nullptr )
+		{
+			LOG_DEV_CALLS(("Preparse subdevice %s/%s\n", d.name(), d.shortname()));
+			sdev->pre_parse_action(*m_setup);
+		}
+	}
 
 	m_setup_func(*m_setup);
 
@@ -507,38 +554,38 @@ ATTR_COLD void netlist_mame_device_t::save_state()
 {
 	for (auto const & s : netlist().state().save_list())
 	{
-		netlist().log().debug("saving state for {1}\n", s->m_name.cstr());
+		netlist().log().debug("saving state for {1}\n", s->m_name.c_str());
 		if (s->m_dt.is_float)
 		{
 			if (s->m_dt.size == sizeof(double))
 			{
 				double *td = s->resolved<double>();
-				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
 			}
 			else if (s->m_dt.size == sizeof(float))
 			{
 				float *td = s->resolved<float>();
-				if (td != nullptr) save_pointer(td, s->m_name.cstr(), s->m_count);
+				if (td != nullptr) save_pointer(td, s->m_name.c_str(), s->m_count);
 			}
 			else
-				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.cstr());
+				netlist().log().fatal("Unknown floating type for {1}\n", s->m_name.c_str());
 		}
 		else if (s->m_dt.is_integral)
 		{
 			if (s->m_dt.size == sizeof(int64_t))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int32_t))
-				save_pointer((int32_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int32_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int16_t))
-				save_pointer((int16_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int16_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 			else if (s->m_dt.size == sizeof(int8_t))
-				save_pointer((int8_t *) s->m_ptr, s->m_name.cstr(), s->m_count);
+				save_pointer((int8_t *) s->m_ptr, s->m_name.c_str(), s->m_count);
 #if (PHAS_INT128)
 			else if (s->m_dt.size == sizeof(INT128))
-				save_pointer((int64_t *) s->m_ptr, s->m_name.cstr(), s->m_count * 2);
+				save_pointer((int64_t *) s->m_ptr, s->m_name.c_str(), s->m_count * 2);
 #endif
 			else
-				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.cstr());
+				netlist().log().fatal("Unknown integral type size {1} for {2}\n", s->m_dt.size, s->m_name.c_str());
 		}
 		else if (s->m_dt.is_custom)
 		{
@@ -580,11 +627,11 @@ void netlist_mame_cpu_device_t::device_start()
 		netlist::detail::net_t *n = netlist().m_nets[i].get();
 		if (n->is_logic())
 		{
-			state_add(i*2, n->name().cstr(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
+			state_add(i*2, n->name().c_str(), downcast<netlist::logic_net_t *>(n)->Q_state_ptr());
 		}
 		else
 		{
-			state_add(i*2+1, n->name().cstr(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
+			state_add(i*2+1, n->name().c_str(), downcast<netlist::analog_net_t *>(n)->Q_Analog_state_ptr()).formatstr("%20s");
 		}
 	}
 
@@ -617,7 +664,7 @@ ATTR_COLD offs_t netlist_mame_cpu_device_t::disasm_disassemble(std::ostream &str
 	{
 		int dpc = netlist().queue().size() - relpc - 1;
 		// FIXME: 50 below fixes crash in mame-debugger. It's based on try on error.
-		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().cstr(),
+		util::stream_format(stream, "%c %s @%10.7f", (relpc == 0) ? '*' : ' ', netlist().queue()[dpc].m_object->name().c_str(),
 				netlist().queue()[dpc].m_exec_time.as_double());
 	}
 
@@ -746,9 +793,17 @@ void netlist_mame_sound_device_t::sound_stream_update(sound_stream &stream, stre
 // memregion source support
 // ----------------------------------------------------------------------------------------
 
-bool netlist_source_memregion_t::parse(netlist::setup_t &setup, const pstring &name)
+std::unique_ptr<plib::pistream> netlist_source_memregion_t::stream(const pstring &name)
 {
-	memory_region *mem = downcast<netlist_mame_t &>(setup.netlist()).machine().root_device().memregion(m_name.cstr());
-	plib::pimemstream istrm(mem->base(),mem->bytes() );
-	return setup.parse_stream(istrm, name);
+	memory_region *mem = downcast<netlist_mame_t &>(setup().netlist()).machine().root_device().memregion(m_name.c_str());
+	return plib::make_unique_base<plib::pistream, plib::pimemstream>(mem->base(), mem->bytes());
 }
+
+std::unique_ptr<plib::pistream> netlist_data_memregion_t::stream(const pstring &name)
+{
+	if (name == m_name)
+		return plib::make_unique_base<plib::pistream, plib::pimemstream>(m_ptr, m_size);
+	else
+		return std::unique_ptr<plib::pistream>(nullptr);
+}
+

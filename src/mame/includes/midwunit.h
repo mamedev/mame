@@ -13,13 +13,15 @@ class midwunit_state : public midtunit_state
 public:
 	midwunit_state(const machine_config &mconfig, device_type type, const char *tag)
 		: midtunit_state(mconfig, type, tag),
-			m_midway_serial_pic(*this, "serial_pic"),
+			m_midway_serial_pic(*this, "serial_security_sim"),
+			m_midway_serial_pic_emu(*this, "serial_security"),
 			m_nvram(*this, "nvram"),
 			m_mainram(*this, "mainram"),
 			m_ports(*this, { { "IN0", "IN1", "DSW", "IN2" } })
 			{ }
 
-	required_device<midway_serial_pic_device> m_midway_serial_pic;
+	optional_device<midway_serial_pic_device> m_midway_serial_pic;
+	optional_device<midway_serial_pic_emu_device> m_midway_serial_pic_emu;
 	required_shared_ptr<uint16_t> m_nvram;
 	required_shared_ptr<uint16_t> m_mainram;
 	required_ioport_array<4> m_ports;

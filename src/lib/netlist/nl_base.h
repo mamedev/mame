@@ -21,6 +21,7 @@
 #include "plib/pdynlib.h"
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
+#include "plib/pstream.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -168,6 +169,7 @@ namespace netlist
 		class NETLIB_NAME(netlistparams);
 		class NETLIB_NAME(base_proxy);
 		class NETLIB_NAME(base_d_to_a_proxy);
+		class NETLIB_NAME(base_a_to_d_proxy);
 	}
 
 	namespace detail {
@@ -202,6 +204,7 @@ namespace netlist
 	};
 
 	class logic_output_t;
+	class logic_input_t;
 	class analog_net_t;
 	class logic_net_t;
 	class net_t;
@@ -224,15 +227,27 @@ namespace netlist
 	public:
 		logic_family_desc_t() {}
 		virtual ~logic_family_desc_t() {}
+
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
+		virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name,
+				logic_input_t *proxied) const = 0;
 
-		nl_double m_low_thresh_V;   //!< low input threshhold. If the input voltage is below this value, a "0" input is signalled
-		nl_double m_high_thresh_V;  //!< high input threshhold. If the input voltage is above this value, a "0" input is signalled
-		nl_double m_low_V;          //!< low output voltage. This voltage is output if the ouput is "0"
-		nl_double m_high_V;         //!< high output voltage. This voltage is output if the ouput is "1"
-		nl_double m_R_low;          //!< low output resistance. Value of series resistor used for low output
-		nl_double m_R_high;         //!< high output resistance. Value of series resistor used for high output
+		double fixed_V() const { return m_fixed_V; }
+		double low_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_low_thresh_PCNT; }
+		double high_thresh_V(const double VN, const double VP) const { return VN + (VP - VN) * m_high_thresh_PCNT; }
+		double low_V(const double VN, const double VP) const { return VN + m_low_VO; }
+		double high_V(const double VN, const double VP) const { return VP - m_high_VO; }
+		double R_low() const { return m_R_low; }
+		double R_high() const { return m_R_high; }
+
+		double m_fixed_V;		    //!< For variable voltage families, specify 0. For TTL this would be 5. */
+		double m_low_thresh_PCNT;   //!< low input threshhold offset. If the input voltage is below this value times supply voltage, a "0" input is signalled
+		double m_high_thresh_PCNT;  //!< high input threshhold offset. If the input voltage is above the value times supply voltage, a "0" input is signalled
+		double m_low_VO;            //!< low output voltage offset. This voltage is output if the ouput is "0"
+		double m_high_VO;           //!< high output voltage offset. The supply voltage minus this offset is output if the ouput is "1"
+		double m_R_low;             //!< low output resistance. Value of series resistor used for low output
+		double m_R_high;            //!< high output resistance. Value of series resistor used for high output
 	};
 
 	/*! Base class for devices, terminals, outputs and inputs which support
@@ -287,9 +302,9 @@ namespace netlist
 				const T &value          //!< Initial value after construction
 				);
 		//! Copy Constructor.
-		state_var(const state_var &rhs) noexcept = default;
+		state_var(const state_var &rhs) NL_NOEXCEPT = default;
 		//! Move Constructor.
-		state_var(state_var &&rhs) noexcept = default;
+		state_var(state_var &&rhs) NL_NOEXCEPT = default;
 		//! Assignment operator to assign value of a state var.
 		state_var &operator=(state_var rhs) { std::swap(rhs.m_value, this->m_value); return *this; }
 		//! Assignment operator to assign value of type T.
@@ -317,8 +332,8 @@ namespace netlist
 	{
 	public:
 		state_var(device_t &dev, const pstring name, const T & value);
-		state_var(const state_var &rhs) noexcept = default;
-		state_var(state_var &&rhs) noexcept = default;
+		state_var(const state_var &rhs) NL_NOEXCEPT = default;
+		state_var(state_var &&rhs) NL_NOEXCEPT = default;
 		state_var &operator=(const state_var rhs) { m_value = rhs.m_value; return *this; }
 		state_var &operator=(const T rhs) { m_value = rhs; return *this; }
 		T & operator[](const std::size_t i) { return m_value[i]; }
@@ -481,8 +496,8 @@ namespace netlist
 		const net_t & net() const { return *m_net;}
 		net_t & net() { return *m_net;}
 
-		bool is_logic() const noexcept;
-		bool is_analog() const noexcept;
+		bool is_logic() const NL_NOEXCEPT;
+		bool is_analog() const NL_NOEXCEPT;
 
 		bool is_state(const state_e astate) const { return (m_state == astate); }
 		state_e state() const { return m_state; }
@@ -509,8 +524,8 @@ namespace netlist
 		{
 		}
 
-		const analog_net_t & net() const noexcept;
-		analog_net_t & net() noexcept;
+		const analog_net_t & net() const NL_NOEXCEPT;
+		analog_net_t & net() NL_NOEXCEPT;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -594,8 +609,8 @@ namespace netlist
 		devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
 		void set_proxy(devices::nld_base_proxy *proxy) { m_proxy = proxy; }
 
-		logic_net_t & net() noexcept;
-		const logic_net_t &  net() const noexcept;
+		logic_net_t & net() NL_NOEXCEPT;
+		const logic_net_t &  net() const NL_NOEXCEPT;
 
 	protected:
 
@@ -612,7 +627,7 @@ namespace netlist
 	public:
 		logic_input_t(core_device_t &dev, const pstring &aname);
 
-		netlist_sig_t Q() const noexcept;
+		netlist_sig_t Q() const NL_NOEXCEPT;
 
 		netlist_sig_t operator()() const NL_NOEXCEPT
 		{
@@ -652,7 +667,7 @@ namespace netlist
 		/*! returns voltage at terminal.
 		 *  \returns voltage at terminal.
 		 */
-		nl_double Q_Analog() const noexcept;
+		nl_double Q_Analog() const NL_NOEXCEPT;
 
 	};
 
@@ -672,16 +687,16 @@ namespace netlist
 
 		void reset();
 
-		void register_con(core_terminal_t &terminal);
+		void add_terminal(core_terminal_t &terminal);
 
-		bool is_logic() const noexcept;
-		bool is_analog() const noexcept;
+		bool is_logic() const NL_NOEXCEPT;
+		bool is_analog() const NL_NOEXCEPT;
 
 		void toggle_new_Q()             { m_new_Q ^= 1;   }
 		void force_queue_execution()    { m_new_Q = (m_cur_Q ^ 1);   }
 
-		void push_to_queue(const netlist_time delay) noexcept;
-		void reschedule_in_queue(const netlist_time delay) noexcept;
+		void push_to_queue(const netlist_time delay) NL_NOEXCEPT;
+		void reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT;
 		bool is_queued() const { return m_in_queue == 1; }
 
 		void update_devs() NL_NOEXCEPT;
@@ -692,7 +707,7 @@ namespace netlist
 		bool isRailNet() const { return !(m_railterminal == nullptr); }
 		core_terminal_t & railterminal() const { return *m_railterminal; }
 
-		std::size_t num_cons() const noexcept { return m_core_terms.size(); }
+		std::size_t num_cons() const NL_NOEXCEPT { return m_core_terms.size(); }
 
 		void inc_active(core_terminal_t &term) NL_NOEXCEPT;
 		void dec_active(core_terminal_t &term) NL_NOEXCEPT;
@@ -732,7 +747,7 @@ namespace netlist
 		netlist_sig_t new_Q() const     { return m_new_Q; }
 		void initial(const netlist_sig_t val) { m_cur_Q = m_new_Q = val; }
 
-		void set_Q(const netlist_sig_t newQ, const netlist_time delay) noexcept
+		void set_Q(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -741,7 +756,7 @@ namespace netlist
 			}
 		}
 
-		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) noexcept
+		void set_Q_time(const netlist_sig_t newQ, const netlist_time at) NL_NOEXCEPT
 		{
 			if (newQ != m_new_Q)
 			{
@@ -796,7 +811,7 @@ namespace netlist
 
 		void initial(const netlist_sig_t val);
 
-		void push(const netlist_sig_t newQ, const netlist_time delay) noexcept
+		void push(const netlist_sig_t newQ, const netlist_time delay) NL_NOEXCEPT
 		{
 			m_my_net.set_Q(newQ, delay); // take the shortcut
 		}
@@ -811,11 +826,11 @@ namespace netlist
 	public:
 		analog_output_t(core_device_t &dev, const pstring &aname);
 
-		void push(const nl_double val) noexcept { set_Q(val); }
+		void push(const nl_double val) NL_NOEXCEPT { set_Q(val); }
 		void initial(const nl_double val);
 
 	private:
-		void set_Q(const nl_double newQ) noexcept;
+		void set_Q(const nl_double newQ) NL_NOEXCEPT;
 		analog_net_t m_my_net;
 	};
 
@@ -829,7 +844,6 @@ namespace netlist
 	public:
 
 		enum param_type_t {
-			MODEL,
 			STRING,
 			DOUBLE,
 			INTEGER,
@@ -842,37 +856,85 @@ namespace netlist
 
 		param_type_t param_type() const { return m_param_type; }
 
+	protected:
+		void update_param();
+
+		template<typename C>
+		void set(C &p, const C v)
+		{
+			if (p != v)
+			{
+				p = v;
+				update_param();
+			}
+		}
+
 	private:
 		const param_type_t m_param_type;
 	};
 
-	template <typename C, param_t::param_type_t T>
-	class param_template_t : public param_t
+	class param_ptr_t final: public param_t
 	{
-		P_PREVENT_COPYING(param_template_t)
 	public:
-		param_template_t(device_t &device, const pstring name, const C val);
-
-		const C operator()() const { return Value(); }
-
-		void setTo(const C &param);
-		void initial(const C &val) { m_param = val; }
-
-	protected:
-		C Value() const { return m_param;   }
-		virtual void changed() { }
-		C m_param;
+		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		std::uint8_t * operator()() const { return m_param; }
+		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
+		std::uint8_t* m_param;
 	};
 
-	using param_double_t = param_template_t<nl_double, param_t::DOUBLE>;
-	using param_int_t = param_template_t<int, param_t::INTEGER>;
-	using param_str_t = param_template_t<pstring, param_t::STRING>;
+	class param_logic_t final: public param_t
+	{
+	public:
+		param_logic_t(device_t &device, const pstring name, const bool val);
+		bool operator()() const { return m_param; }
+		void setTo(const bool &param) { set(m_param, param); }
+	private:
+		bool m_param;
+	};
 
-	using param_logic_t = param_template_t<bool, param_t::LOGIC>;
-	using param_ptr_t = param_template_t<std::uint_fast8_t*, param_t::POINTER>;
+	class param_int_t final: public param_t
+	{
+	public:
+		param_int_t(device_t &device, const pstring name, const int val);
+		int operator()() const { return m_param; }
+		void setTo(const int &param) { set(m_param, param); }
+	private:
+		int m_param;
+	};
 
-	class param_model_t : public param_str_t
+	class param_double_t final: public param_t
+	{
+	public:
+		param_double_t(device_t &device, const pstring name, const double val);
+		double operator()() const { return m_param; }
+		void setTo(const double &param) { set(m_param, param); }
+	private:
+		double m_param;
+	};
+
+	class param_str_t : public param_t
+	{
+	public:
+		param_str_t(device_t &device, const pstring name, const pstring val);
+		const pstring operator()() const { return Value(); }
+		void setTo(const pstring &param)
+		{
+			if (m_param != param)
+			{
+				m_param = param;
+				changed();
+				update_param();
+			}
+		}
+	protected:
+		virtual void changed() { }
+		pstring Value() const { return m_param; }
+	private:
+		pstring m_param;
+	};
+
+	class param_model_t final : public param_str_t
 	{
 	public:
 		param_model_t(device_t &device, const pstring name, const pstring val)
@@ -883,12 +945,41 @@ namespace netlist
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		void changed() override
-		{
-			m_map.clear();
-		}
+		virtual void changed() override { m_map.clear(); }
 	private:
 		model_map_t m_map;
+	};
+
+	class param_data_t : public param_str_t
+	{
+	public:
+		param_data_t(device_t &device, const pstring name)
+		: param_str_t(device, name, "") { }
+		std::unique_ptr<plib::pistream> stream();
+	protected:
+		virtual void changed() override { }
+	};
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name)
+		: param_data_t(device, name)
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------
@@ -928,7 +1019,7 @@ namespace netlist
 		void set_delegate_pointer();
 		void stop_dev();
 
-		void do_inc_active() noexcept
+		void do_inc_active() NL_NOEXCEPT
 		{
 			if (m_hint_deactivate)
 			{
@@ -937,7 +1028,7 @@ namespace netlist
 			}
 		}
 
-		void do_dec_active() noexcept
+		void do_dec_active() NL_NOEXCEPT
 		{
 			if (m_hint_deactivate)
 				dec_active();
@@ -953,8 +1044,8 @@ namespace netlist
 	protected:
 
 		virtual void update() NL_NOEXCEPT { }
-		virtual void inc_active() noexcept {  }
-		virtual void dec_active() noexcept {  }
+		virtual void inc_active() NL_NOEXCEPT {  }
+		virtual void dec_active() NL_NOEXCEPT {  }
 		virtual void stop() { }
 		virtual void reset() { }
 
@@ -1091,7 +1182,7 @@ namespace netlist
 		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
 		nl_double gmin() const;
 
-		void push_to_queue(detail::net_t &out, const netlist_time attime) noexcept;
+		void push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT;
 		void remove_from_queue(detail::net_t &out) NL_NOEXCEPT;
 
 		void process_queue(const netlist_time &delta);
@@ -1211,35 +1302,22 @@ namespace netlist
 	// inline implementations
 	// -----------------------------------------------------------------------------
 
-	template <class C, param_t::param_type_t T>
-	inline void param_template_t<C, T>::setTo(const C &param)
-	{
-		if (m_param != param)
-		{
-			m_param = param;
-			changed();
-			device().update_param();
-			if (device().needs_update_after_param_change())
-				device().update_dev();
-		}
-	}
-
-	inline bool detail::core_terminal_t::is_logic() const noexcept
+	inline bool detail::core_terminal_t::is_logic() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const logic_t *>(this) != nullptr;
 	}
 
-	inline bool detail::core_terminal_t::is_analog() const noexcept
+	inline bool detail::core_terminal_t::is_analog() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const analog_t *>(this) != nullptr;
 	}
 
-	inline bool detail::net_t::is_logic() const noexcept
+	inline bool detail::net_t::is_logic() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const logic_net_t *>(this) != nullptr;
 	}
 
-	inline bool detail::net_t::is_analog() const noexcept
+	inline bool detail::net_t::is_analog() const NL_NOEXCEPT
 	{
 		return dynamic_cast<const analog_net_t *>(this) != nullptr;
 	}
@@ -1280,7 +1358,7 @@ namespace netlist
 		}
 	}
 
-	inline void detail::net_t::push_to_queue(const netlist_time delay) noexcept
+	inline void detail::net_t::push_to_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if (!is_queued() && (num_cons() != 0))
 		{
@@ -1293,7 +1371,7 @@ namespace netlist
 		}
 	}
 
-	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) noexcept
+	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if (is_queued())
 			netlist().remove_from_queue(*this);
@@ -1306,39 +1384,39 @@ namespace netlist
 		}
 	}
 
-	inline const analog_net_t & analog_t::net() const noexcept
+	inline const analog_net_t & analog_t::net() const NL_NOEXCEPT
 	{
 		return static_cast<const analog_net_t &>(core_terminal_t::net());
 	}
 
-	inline analog_net_t & analog_t::net() noexcept
+	inline analog_net_t & analog_t::net() NL_NOEXCEPT
 	{
 		return static_cast<analog_net_t &>(core_terminal_t::net());
 	}
 
 	inline nl_double terminal_t::operator ()() const { return net().Q_Analog(); }
 
-	inline logic_net_t & logic_t::net() noexcept
+	inline logic_net_t & logic_t::net() NL_NOEXCEPT
 	{
 		return *static_cast<logic_net_t *>(&core_terminal_t::net());
 	}
 
-	inline const logic_net_t & logic_t::net() const noexcept
+	inline const logic_net_t & logic_t::net() const NL_NOEXCEPT
 	{
 		return static_cast<const logic_net_t &>(core_terminal_t::net());
 	}
 
-	inline netlist_sig_t logic_input_t::Q() const noexcept
+	inline netlist_sig_t logic_input_t::Q() const NL_NOEXCEPT
 	{
 		return net().Q();
 	}
 
-	inline nl_double analog_input_t::Q_Analog() const noexcept
+	inline nl_double analog_input_t::Q_Analog() const NL_NOEXCEPT
 	{
 		return net().Q_Analog();
 	}
 
-	inline void analog_output_t::set_Q(const nl_double newQ) noexcept
+	inline void analog_output_t::set_Q(const nl_double newQ) NL_NOEXCEPT
 	{
 		if (newQ != net().Q_Analog())
 		{
@@ -1348,7 +1426,7 @@ namespace netlist
 		}
 	}
 
-	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) noexcept
+	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT
 	{
 		m_queue.push(attime, &out);
 	}

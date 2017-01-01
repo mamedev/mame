@@ -15,6 +15,7 @@
 
 #include "nl_base.h"
 #include "devices/nlid_system.h"
+#include "devices/nlid_proxy.h"
 
 namespace netlist
 {
@@ -57,17 +58,22 @@ class logic_family_ttl_t : public logic_family_desc_t
 public:
 	logic_family_ttl_t() : logic_family_desc_t()
 	{
-		m_low_thresh_V = 0.8;
-		m_high_thresh_V = 2.0;
+		m_fixed_V = 5.0;
+		m_low_thresh_PCNT = 0.8 / 5.0;
+		m_high_thresh_PCNT = 2.0 / 5.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.1;
-		m_high_V = 4.0;
+		m_low_VO = 0.1;
+		m_high_VO = 1.0; // 4.0
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -76,17 +82,22 @@ class logic_family_cd4xxx_t : public logic_family_desc_t
 public:
 	logic_family_cd4xxx_t() : logic_family_desc_t()
 	{
-		m_low_thresh_V = 0.8;
-		m_high_thresh_V = 2.0;
+		m_fixed_V = 0.0;
+		m_low_thresh_PCNT = 1.5 / 5.0;
+		m_high_thresh_PCNT = 3.5 / 5.0;
 		// m_low_V  - these depend on sinked/sourced current. Values should be suitable for typical applications.
-		m_low_V = 0.05;
-		m_high_V = 4.95;
+		m_low_VO = 0.05;
+		m_high_VO = 0.05; // 4.95
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -135,7 +146,7 @@ void detail::queue_t::on_pre_save()
 		pstring p = this->listptr()[i].m_object->name();
 		std::size_t n = p.len();
 		if (n > 63) n = 63;
-		std::strncpy(m_names[i].m_buf, p.cstr(), n);
+		std::strncpy(m_names[i].m_buf, p.c_str(), n);
 		m_names[i].m_buf[n] = 0;
 	}
 }
@@ -464,27 +475,7 @@ void netlist_t::print_stats() const
 	}
 }
 
-// ----------------------------------------------------------------------------------------
-// Parameters ...
-// ----------------------------------------------------------------------------------------
 
-template <typename C, param_t::param_type_t T>
-param_template_t<C, T>::param_template_t(device_t &device, const pstring name, const C val)
-: param_t(T, device, device.name() + "." + name)
-, m_param(val)
-{
-	/* pstrings not yet supported, these need special logic */
-	if (T != param_t::STRING && T != param_t::MODEL)
-		netlist().save(*this, m_param, "m_param");
-	device.setup().register_and_set_param(device.name() + "." + name, *this);
-}
-
-template class param_template_t<double, param_t::DOUBLE>;
-template class param_template_t<int, param_t::INTEGER>;
-template class param_template_t<bool, param_t::LOGIC>;
-template class param_template_t<std::uint_fast8_t*, param_t::POINTER>;
-template class param_template_t<pstring, param_t::STRING>;
-template class param_template_t<pstring, param_t::MODEL>;
 
 // ----------------------------------------------------------------------------------------
 // core_device_t
@@ -739,8 +730,12 @@ void detail::net_t::reset()
 			m_active++;
 }
 
-void detail::net_t::register_con(detail::core_terminal_t &terminal)
+void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
+	for (auto t : m_core_terms)
+		if (t == &terminal)
+			netlist().log().fatal("net {1}: duplicate terminal {2}", name(), t->name());
+
 	terminal.set_net(this);
 
 	m_core_terms.push_back(&terminal);
@@ -752,7 +747,7 @@ void detail::net_t::register_con(detail::core_terminal_t &terminal)
 void detail::net_t::move_connections(detail::net_t &dest_net)
 {
 	for (auto &ct : m_core_terms)
-		dest_net.register_con(*ct);
+		dest_net.add_terminal(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }
@@ -905,13 +900,21 @@ logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 }
 
 // ----------------------------------------------------------------------------------------
-// param_t & friends
+// Parameters ...
 // ----------------------------------------------------------------------------------------
 
 param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
-	: device_object_t(device, name, PARAM)
+	: device_object_t(device, device.name() + "." + name, PARAM)
 	, m_param_type(atype)
 {
+	device.setup().register_param(this->name(), *this);
+}
+
+void param_t::update_param()
+{
+	device().update_param();
+	if (device().needs_update_after_param_change())
+		device().update_dev();
 }
 
 const pstring param_model_t::model_type()
@@ -921,6 +924,39 @@ const pstring param_model_t::model_type()
 	return m_map["COREMODEL"];
 }
 
+param_str_t::param_str_t(device_t &device, const pstring name, const pstring val)
+: param_t(param_t::STRING, device, name)
+{
+	m_param = device.setup().get_initial_param_val(this->name(),val);
+}
+
+param_double_t::param_double_t(device_t &device, const pstring name, const double val)
+: param_t(param_t::DOUBLE, device, name)
+{
+	m_param = device.setup().get_initial_param_val(this->name(),val);
+	netlist().save(*this, m_param, "m_param");
+}
+
+param_int_t::param_int_t(device_t &device, const pstring name, const int val)
+: param_t(param_t::INTEGER, device, name)
+{
+	m_param = device.setup().get_initial_param_val(this->name(),val);
+	netlist().save(*this, m_param, "m_param");
+}
+
+param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
+: param_t(param_t::LOGIC, device, name)
+{
+	m_param = device.setup().get_initial_param_val(this->name(),val);
+	netlist().save(*this, m_param, "m_param");
+}
+
+param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
+: param_t(param_t::POINTER, device, name)
+{
+	m_param = val; //device.setup().get_initial_param_val(this->name(),val);
+	//netlist().save(*this, m_param, "m_param");
+}
 
 const pstring param_model_t::model_value_str(const pstring &entity)
 {
@@ -935,6 +971,12 @@ nl_double param_model_t::model_value(const pstring &entity)
 		netlist().setup().model_parse(this->Value(), m_map);
 	return netlist().setup().model_value(m_map, entity);
 }
+
+std::unique_ptr<plib::pistream> param_data_t::stream()
+{
+	return device().netlist().setup().get_data_stream(Value());
+}
+
 
 
 	namespace devices

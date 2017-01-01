@@ -50,7 +50,7 @@ DIMM controller registers
 20 5F7048 |
 24 5F704C   16bit  Interrupt register
                    -------c ---b---a
-                    a - IRQ to DIMM (SH4 IRL3): 0 set / 1 clear 
+                    a - IRQ to DIMM (SH4 IRL3): 0 set / 1 clear
                     b - unk, mask of a ???
                     c - IRQ to NAOMI (HOLLY EXT 3): 0 set / 1 clear (write 0 from NAOMI seems ignored)
 
@@ -60,18 +60,18 @@ DIMM controller registers
                     c - unk, set to 1 in VxWorks, 0 in 1.02
                     d - unk, checked for == 1 in 1.02
 
-2A			 8bit  possible DES decryption area size 8 MSB bits (16MB units number)
+2A           8bit  possible DES decryption area size 8 MSB bits (16MB units number)
                    VxWorks firmwares set this to ((DIMMsize >> 24) - 1), 1.02 set it to FF
 
-2C			32bit  SDRAM config
-30			32bit  DES key low
-34			32bit  DES key high
+2C          32bit  SDRAM config
+30          32bit  DES key low
+34          32bit  DES key high
 
 SH4 IO port A bits
 -------------------
 9 select input, 0 - main/lower board, 1 - option/upper board (IDE, Net, PIC)
      0             1
-0 DIMM SPD clk   JP? 0 - enable IDE 
+0 DIMM SPD clk   JP? 0 - enable IDE
 1 DIMM SPD data  JP? 0 - enable Network
 2 93C46 DI       PIC16 D0
 3 93C46 CS       PIC16 D1

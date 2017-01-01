@@ -67,7 +67,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 #define NETLIST_END()  }
 
 #define LOCAL_SOURCE(name)                                                     \
-		setup.register_source(plib::make_unique_base<netlist::source_t, netlist::source_proc_t>(# name, &NETLIST_NAME(name)));
+		setup.register_source(plib::make_unique_base<netlist::source_t, netlist::source_proc_t>(setup, # name, &NETLIST_NAME(name)));
 
 #define LOCAL_LIB_ENTRY(name)                                                  \
 		LOCAL_SOURCE(name)                                                     \
@@ -149,16 +149,28 @@ namespace netlist
 	class source_t
 	{
 	public:
+		enum type_t
+		{
+			SOURCE,
+			DATA
+		};
+
 		using list_t = std::vector<std::unique_ptr<source_t>>;
 
-		source_t()
+		source_t(setup_t &setup, const type_t type = SOURCE)
+		: m_setup(setup), m_type(type)
 		{}
 
 		virtual ~source_t() { }
 
-		virtual bool parse(setup_t &setup, const pstring &name) = 0;
+		virtual bool parse(const pstring &name);
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) = 0;
 
+		setup_t &setup() { return m_setup; }
+		type_t type() const { return m_type; }
 	private:
+		setup_t &m_setup;
+		const type_t m_type;
 	};
 
 	// ----------------------------------------------------------------------------------------
@@ -181,7 +193,10 @@ namespace netlist
 
 		pstring build_fqn(const pstring &obj_name) const;
 
-		void register_and_set_param(pstring name, param_t &param);
+		void register_param(pstring name, param_t &param);
+		pstring get_initial_param_val(const pstring name, const pstring def);
+		double get_initial_param_val(const pstring name, const double def);
+		int get_initial_param_val(const pstring name, const int def);
 
 		void register_term(detail::core_terminal_t &obj);
 
@@ -223,6 +238,7 @@ namespace netlist
 		/* parse a source */
 
 		void include(const pstring &netlist_name);
+		std::unique_ptr<plib::pistream> get_data_stream(const pstring name);
 
 		bool parse_stream(plib::pistream &istrm, const pstring &name);
 
@@ -265,10 +281,12 @@ namespace netlist
 		std::unordered_map<pstring, pstring> m_param_values;
 		std::unordered_map<pstring, detail::core_terminal_t *> m_terminals;
 
+		/* needed by proxy */
+		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
+
 	private:
 
 		detail::core_terminal_t *find_terminal(const pstring &outname_in, bool required = true);
-		detail::core_terminal_t *find_terminal(const pstring &outname_in, detail::device_object_t::type_t atype, bool required = true);
 
 		void merge_nets(detail::net_t &thisnet, detail::net_t &othernet);
 
@@ -282,6 +300,7 @@ namespace netlist
 		pstring objtype_as_str(detail::device_object_t &in) const;
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
+		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
 		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
@@ -307,12 +326,12 @@ namespace netlist
 	{
 	public:
 
-		source_string_t(const pstring &source)
-		: source_t(), m_str(source)
+		source_string_t(setup_t &setup, const pstring &source)
+		: source_t(setup), m_str(source)
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -322,12 +341,12 @@ namespace netlist
 	{
 	public:
 
-		source_file_t(const pstring &filename)
-		: source_t(), m_filename(filename)
+		source_file_t(setup_t &setup, const pstring &filename)
+		: source_t(setup), m_filename(filename)
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_filename;
@@ -336,12 +355,12 @@ namespace netlist
 	class source_mem_t : public source_t
 	{
 	public:
-		source_mem_t(const char *mem)
-		: source_t(), m_str(mem)
+		source_mem_t(setup_t &setup, const char *mem)
+		: source_t(setup), m_str(mem)
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
 	private:
 		pstring m_str;
@@ -350,22 +369,28 @@ namespace netlist
 	class source_proc_t : public source_t
 	{
 	public:
-		source_proc_t(pstring name, void (*setup_func)(setup_t &))
-		: source_t(),
+		source_proc_t(setup_t &setup, pstring name, void (*setup_func)(setup_t &))
+		: source_t(setup),
 			m_setup_func(setup_func),
 			m_setup_func_name(name)
 		{
 		}
 
-		bool parse(setup_t &setup, const pstring &name) override
+		virtual bool parse(const pstring &name) override
 		{
 			if (name == m_setup_func_name)
 			{
-				m_setup_func(setup);
+				m_setup_func(setup());
 				return true;
 			}
 			else
 				return false;
+		}
+
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override
+		{
+			std::unique_ptr<plib::pistream> p(nullptr);
+			return p;
 		}
 	private:
 		void (*m_setup_func)(setup_t &);

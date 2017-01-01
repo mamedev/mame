@@ -116,6 +116,9 @@
 #define MCFG_WD_FDC_FORCE_READY \
 	downcast<wd_fdc_t *>(device)->set_force_ready(true);
 
+#define MCFG_WD_FDC_DISABLE_MOTOR_CONTROL \
+	downcast<wd_fdc_t *>(device)->set_disable_motor_control(true);
+
 #define MCFG_WD_FDC_INTRQ_CALLBACK(_write) \
 	devcb = &wd_fdc_t::set_intrq_wr_callback(*device, DEVCB_##_write);
 
@@ -146,6 +149,7 @@ public:
 	void dden_w(bool dden);
 	void set_floppy(floppy_image_device *floppy);
 	void set_force_ready(bool force_ready);
+	void set_disable_motor_control(bool _disable_motor_control);
 
 	void cmd_w(uint8_t val);
 	uint8_t status_r();
@@ -369,7 +373,7 @@ private:
 
 	emu_timer *t_gen, *t_cmd, *t_track, *t_sector;
 
-	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready;
+	bool dden, status_type_1, intrq, drq, hld, hlt, enp, force_ready, disable_motor_control;
 	int main_state, sub_state;
 	uint8_t command, track, sector, data, status, intrq_cond;
 	int last_dir;

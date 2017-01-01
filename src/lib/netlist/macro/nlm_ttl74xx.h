@@ -189,15 +189,15 @@
 #define TTL_74260_GATE(name)                                                   \
 		NET_REGISTER_DEV(TTL_74260_GATE, name)
 
-#define TTL_74260_NOR(name, cA, cB, cC, cD, cE)	\
-		NET_REGISTER_DEV(TTL_74260_NOR, name)	\
-		NET_CONNECT(name, A, cA)	\
-		NET_CONNECT(name, B, cB)	\
-		NET_CONNECT(name, C, cC)	\
-		NET_CONNECT(name, D, cD)	\
+#define TTL_74260_NOR(name, cA, cB, cC, cD, cE) \
+		NET_REGISTER_DEV(TTL_74260_NOR, name)   \
+		NET_CONNECT(name, A, cA)    \
+		NET_CONNECT(name, B, cB)    \
+		NET_CONNECT(name, C, cC)    \
+		NET_CONNECT(name, D, cD)    \
 		NET_CONNECT(name, E, cE)
 
-#define TTL_74260_DIP(name)	\
+#define TTL_74260_DIP(name) \
 		NET_REGISTER_DEV(TTL_74260_DIP, name)
 
 /* ----------------------------------------------------------------------------

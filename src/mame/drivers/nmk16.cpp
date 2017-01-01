@@ -1134,7 +1134,7 @@ static ADDRESS_MAP_START( atombjt_map, AS_PROGRAM, 16, nmk16_state )
 	AM_RANGE(0x0c2014, 0x0c2015) AM_READ(atombjt_unkr_r)
 	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
-//	AM_RANGE(0x0c201c, 0x0c201d) // oki banking related?
+//  AM_RANGE(0x0c201c, 0x0c201d) // oki banking related?
 	AM_RANGE(0x0c201e, 0x0c201f) AM_DEVREADWRITE8("oki1", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0f0000, 0x0fffff) AM_RAM AM_SHARE("mainram")
 	AM_RANGE(0x100000, 0x101fff) AM_RAM

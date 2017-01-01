@@ -5,6 +5,7 @@
     Generic 8bit and 16 bit latch devices
 
 ***************************************************************************/
+
 #include "emu.h"
 #include "gen_latch.h"
 
@@ -13,26 +14,70 @@
 //**************************************************************************
 
 const device_type GENERIC_LATCH_8 = &device_creator<generic_latch_8_device>;
-
+const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
 
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
 
 //-------------------------------------------------
+//  generic_latch_base_device - constructor
+//-------------------------------------------------
+
+generic_latch_base_device::generic_latch_base_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, u32 clock, const char *shortname, const char *source) :
+	device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_latch_read(false),
+	m_data_pending_cb(*this)
+{
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void generic_latch_base_device::device_start()
+{
+	m_data_pending_cb.resolve_safe();
+	save_item(NAME(m_latch_read));
+}
+
+//-------------------------------------------------
+//  pending_r - tell whether the latch is waiting
+//  to be read
+//-------------------------------------------------
+
+READ_LINE_MEMBER(generic_latch_base_device::pending_r)
+{
+	return !m_latch_read;
+}
+
+//-------------------------------------------------
+//  set_latch_read - helper to signal that latch
+//  has been read or is waiting to be read
+//-------------------------------------------------
+
+void generic_latch_base_device::set_latch_read(bool latch_read)
+{
+	if (m_latch_read != latch_read)
+	{
+		m_latch_read = latch_read;
+		m_data_pending_cb(!latch_read);
+	}
+}
+
+//-------------------------------------------------
 //  generic_latch_8_device - constructor
 //-------------------------------------------------
 
-generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GENERIC_LATCH_8, "Generic 8-bit latch", tag, owner, clock, "generic_latch_8", __FILE__),
-	m_latched_value(0),
-	m_latch_read(0)
+generic_latch_8_device::generic_latch_8_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	generic_latch_base_device(mconfig, GENERIC_LATCH_8, "Generic 8-bit latch", tag, owner, clock, "generic_latch_8", __FILE__),
+	m_latched_value(0)
 {
 }
 
 READ8_MEMBER( generic_latch_8_device::read )
 {
-	m_latch_read = 1;
+	set_latch_read(true);
 	return m_latched_value;
 }
 
@@ -66,17 +111,17 @@ WRITE_LINE_MEMBER( generic_latch_8_device::clear_w )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_8_device::sync_callback(void *ptr, int32_t param)
+void generic_latch_8_device::sync_callback(void *ptr, s32 param)
 {
-	uint8_t value = param;
+	u8 value = param;
 
 	// if the latch hasn't been read and the value is changed, log a warning
-	if (!m_latch_read && m_latched_value != value)
-		logerror("Warning: latch %s written before being read. Previous: %02x, new: %02x\n", tag(), m_latched_value, value);
+	if (!is_latch_read() && m_latched_value != value)
+		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;
-	m_latch_read = 0;
+	set_latch_read(false);
 }
 
 //-------------------------------------------------
@@ -86,35 +131,23 @@ void generic_latch_8_device::sync_callback(void *ptr, int32_t param)
 void generic_latch_8_device::device_start()
 {
 	// register for state saving
+	generic_latch_base_device::device_start();
 	save_item(NAME(m_latched_value));
-	save_item(NAME(m_latch_read));
 }
-
-//**************************************************************************
-//  DEVICE DEFINITIONS
-//**************************************************************************
-
-const device_type GENERIC_LATCH_16 = &device_creator<generic_latch_16_device>;
-
-
-//**************************************************************************
-//  LIVE DEVICE
-//**************************************************************************
 
 //-------------------------------------------------
 //  generic_latch_16_device - constructor
 //-------------------------------------------------
 
-generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, GENERIC_LATCH_16, "Generic 16-bit latch", tag, owner, clock, "generic_latch_16", __FILE__),
-	m_latched_value(0),
-	m_latch_read(0)
+generic_latch_16_device::generic_latch_16_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock) :
+	generic_latch_base_device(mconfig, GENERIC_LATCH_16, "Generic 16-bit latch", tag, owner, clock, "generic_latch_16", __FILE__),
+	m_latched_value(0)
 {
 }
 
 READ16_MEMBER( generic_latch_16_device::read )
 {
-	m_latch_read = 1;
+	set_latch_read(true);
 	return m_latched_value;
 }
 
@@ -148,17 +181,17 @@ WRITE_LINE_MEMBER( generic_latch_16_device::clear_w )
 //  callback to set a latch value
 //-------------------------------------------------
 
-void generic_latch_16_device::sync_callback(void *ptr, int32_t param)
+void generic_latch_16_device::sync_callback(void *ptr, s32 param)
 {
-	uint16_t value = param;
+	u16 value = param;
 
 	// if the latch hasn't been read and the value is changed, log a warning
-	if (!m_latch_read && m_latched_value != value)
-		logerror("Warning: latch %s written before being read. Previous: %02x, new: %02x\n", tag(), m_latched_value, value);
+	if (!is_latch_read() && m_latched_value != value)
+		logerror("Warning: latch written before being read. Previous: %02x, new: %02x\n", m_latched_value, value);
 
 	// store the new value and mark it not read
 	m_latched_value = value;
-	m_latch_read = 0;
+	set_latch_read(false);
 }
 
 //-------------------------------------------------
@@ -168,6 +201,6 @@ void generic_latch_16_device::sync_callback(void *ptr, int32_t param)
 void generic_latch_16_device::device_start()
 {
 	// register for state saving
+	generic_latch_base_device::device_start();
 	save_item(NAME(m_latched_value));
-	save_item(NAME(m_latch_read));
 }
