@@ -33,7 +33,7 @@ static const char32_t iso_8859_1_code_page[128] =
 	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
 };
 
-imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(iso_8859_1_code_page);
+imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(nullptr, iso_8859_1_code_page);
 
 
 //-------------------------------------------------
@@ -42,26 +42,49 @@ imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(iso_8859_1_code_
 
 void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const std::string &src) const
 {
-	const util::contiguous_sequence_wrapper<const char32_t> lookup(m_highpage, 0x80);
+	// normalize the incoming unicode
+	std::string normalized_src = normalize_unicode(src, m_norm);
 
-	auto iter = src.begin();
-	while(iter != src.end())
+	auto iter = normalized_src.begin();
+	while(iter != normalized_src.end())
 	{
+		// get the next character
 		char32_t ch;
-		iter += uchar_from_utf8(&ch, &*iter, src.end() - iter);
+		iter += uchar_from_utf8(&ch, &*iter, normalized_src.end() - iter);
 
-		if (ch <= 0x7F)
-		{
-			dest << (char)ch;
-		}
-		else
-		{
-			auto lookup_iter = std::find(lookup.begin(), lookup.end(), ch);
-			if (lookup_iter == lookup.end())
-				throw charconverter_exception();
+		// look in all pages
+		const char32_t *pages[2];
+		pages[0] = m_lowpage;
+		pages[1] = m_highpage;
 
-			dest << (char)(0x80 + (lookup_iter - lookup.begin()));
+		bool found = false;
+		for (int i = 0; !found && i < ARRAY_LENGTH(pages); i++)
+		{
+			if (pages[i] == nullptr)
+			{
+				// null page; perhaps we can just emit this
+				if (ch >= i * 0x80 && (ch < (i + 1) * 0x80))
+				{
+					dest << (char)ch;
+					found = true;
+				}
+			}
+			else
+			{
+				// non-null page; perform a lookup
+				// if we have a page, perform the lookup
+				const util::contiguous_sequence_wrapper<const char32_t> lookup(pages[i], 0x80);
+				auto lookup_iter = std::find(lookup.begin(), lookup.end(), ch);
+				if (lookup_iter != lookup.end())
+				{
+					// and emit the result
+					dest << (char)((i * 0x80) + (lookup_iter - lookup.begin()));
+					found = true;
+				}
+			}
 		}
+		if (!found)
+			throw charconverter_exception();
 	}
 }
 
@@ -74,15 +97,20 @@ void imgtool::simple_charconverter::to_utf8(std::ostream &dest, const std::strin
 {
 	for (auto iter = src.begin(); iter != src.end(); iter++)
 	{
+		// which page is this in?
+		const char32_t *page = ((*iter & 0x80) == 0) ? m_lowpage : m_highpage;
+
+		// is this page present?
 		if ((*iter & 0x80) == 0)
 		{
-			// low page (0x00 - 0x7F) - pass it on
+			// no - pass it on
 			dest << *iter;
 		}
 		else
 		{
-			// high page (0x80 - 0xFF) - we need to do a lookup
-			char32_t ch = m_highpage[((unsigned char)(*iter)) - 0x80];
+			// yes - we need to do a lookup
+			size_t base = ((*iter & 0x80) == 0) ? 0x00 : 0x80;
+			char32_t ch = page[((unsigned char)(*iter)) - base];
 			if (ch == 0)
 				throw charconverter_exception();
 

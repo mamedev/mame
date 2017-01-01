@@ -12,6 +12,8 @@
 #ifndef IMGTOOL_CHARCONV_H
 #define IMGTOOL_CHARCONV_H
 
+#include "unicode.h"
+
 namespace imgtool
 {
 	// ======================> charconverter
@@ -47,8 +49,13 @@ namespace imgtool
 	class simple_charconverter : public charconverter
 	{
 	public:
-		constexpr simple_charconverter(const char32_t highpage[0x80])
-			: m_highpage(highpage)
+		constexpr simple_charconverter(const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C)
+			: m_norm(norm), m_lowpage(nullptr), m_highpage(highpage)
+		{
+		}
+
+		constexpr simple_charconverter(const char32_t lowpage[0x80], const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C)
+			: m_norm(norm), m_lowpage(lowpage), m_highpage(highpage)
 		{
 		}
 
@@ -56,6 +63,8 @@ namespace imgtool
 		virtual void to_utf8(std::ostream &dest, const std::string &src) const override;
 
 	private:
+		unicode_normalization_form m_norm;
+		const char32_t *m_lowpage;
 		const char32_t *m_highpage;
 	};
 
