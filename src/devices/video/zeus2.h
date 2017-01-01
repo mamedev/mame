@@ -22,6 +22,7 @@
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
+#define PRINT_TEX_INFO		0
 
 #define WAVERAM0_WIDTH      1024
 #define WAVERAM0_HEIGHT     2048
@@ -154,6 +155,10 @@ public:
 
 	enum { THEGRID, CRUSNEXO, MWSKINS };
 	int m_system;
+#if PRINT_TEX_INFO
+	void check_tex(uint32_t &texmode, float &zObj, float &zMat, float &zOff);
+	std::string tex_info(void);
+#endif
 
 protected:
 	// device-level overrides
@@ -173,6 +178,7 @@ private:
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void print_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_render_info(uint32_t texdata);
+
 	/*************************************
 	*  Member variables
 	*************************************/
@@ -185,6 +191,10 @@ private:
 	uint32_t m_fill_depth;
 
 	int m_yScale;
+
+#if PRINT_TEX_INFO
+	std::map<uint32_t, std::string> tex_map;
+#endif
 
 #if TRACK_REG_USAGE
 	struct reg_info
