@@ -623,6 +623,8 @@ static INPUT_PORTS_START( schmeisr )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x0800, 0x0800, "SW2:4" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x1000, 0x1000, "SW2:5" ) /* Listed as "Unused" */
 	PORT_DIPUNUSED_DIPLOC( 0x2000, 0x2000, "SW2:6" ) /* Listed as "Unused" */
