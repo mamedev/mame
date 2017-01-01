@@ -1657,7 +1657,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
-	bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x2);
+	//bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x2);
 	//float clipVal = enable_perspective ? 1.0f / 512.0f / 4.0f : 0.0f;
 	float clipVal = m_state->m_zbufmin / 4096.0f;
 	if (1) {
