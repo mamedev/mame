@@ -132,6 +132,8 @@ void mc68681_base_device::device_start()
 	write_irq.resolve_safe();
 	write_a_tx.resolve_safe();
 	write_b_tx.resolve_safe();
+	write_c_tx.resolve_safe();
+	write_d_tx.resolve_safe();
 	read_inport.resolve();
 	write_outport.resolve_safe();
 
@@ -351,6 +353,34 @@ TIMER_CALLBACK_MEMBER( mc68681_base_device::duart_timer_callback )
 
 }
 
+READ8_MEMBER( sc28c94_device::read )
+{
+	uint8_t r = 0;
+	offset &= 0x1f;
+	
+	if (offset < 0x10)
+	{
+		return mc68681_base_device::read(space, offset, mem_mask);
+	}
+	
+	switch (offset)
+	{
+		case 0x10: /* MR1A/MR2C */
+		case 0x11: /* SRC */
+		case 0x13: /* Rx Holding Register C */
+			r = m_chanC->read_chan_reg(offset & 3);
+			break;
+			
+		case 0x18: /* MR1D/MR2D */
+		case 0x19: /* SRD */
+		case 0x1b: /* RHRD */
+			r = m_chanD->read_chan_reg(offset & 3);
+			break;
+	}
+	
+	return r;
+}
+
 READ8_MEMBER( mc68681_base_device::read )
 {
 	uint8_t r = 0xff;
@@ -453,6 +483,33 @@ READ8_MEMBER( mc68681_base_device::read )
 	LOG(("returned %02x\n", r));
 
 	return r;
+}
+
+WRITE8_MEMBER( sc28c94_device::write )
+{
+	offset &= 0x1f;
+	
+	if (offset < 0x10)
+	{
+		mc68681_base_device::write(space, offset, data, mem_mask);
+	}
+	
+	switch(offset)
+	{
+		case 0x10: /* MRC */
+		case 0x11: /* CSRC */
+		case 0x12: /* CRC */
+		case 0x13: /* THRC */
+			m_chanC->write_chan_reg(offset&3, data);
+			break;
+			
+		case 0x18: /* MRC */
+		case 0x19: /* CSRC */
+		case 0x1a: /* CRC */
+		case 0x1b: /* THRC */
+			m_chanD->write_chan_reg(offset&3, data);
+			break;
+	}
 }
 
 WRITE8_MEMBER( mc68681_base_device::write )
@@ -692,7 +749,7 @@ int mc68681_base_device::calc_baud(int ch, uint8_t data)
 		LOG(( "Unsupported transmitter clock: channel %d, clock select = %02x\n", ch, data ));
 	}
 
-//	printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
+	//printf("%s ch %d setting baud to %d\n", tag(), ch, baud_rate);
 	return baud_rate;
 }
 
@@ -830,9 +887,17 @@ void mc68681_channel::tra_callback()
 		{
 			m_uart->write_a_tx(bit);
 		}
-		else
+		else if (m_ch == 1)
 		{
 			m_uart->write_b_tx(bit);
+		}
+		else if (m_ch == 2)
+		{
+			m_uart->write_c_tx(bit);
+		}
+		else if (m_ch == 3)
+		{
+			m_uart->write_d_tx(bit);
 		}
 	}
 	else    // must call this to advance the transmitter

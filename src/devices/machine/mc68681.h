@@ -120,8 +120,8 @@ public:
 	static void static_set_clocks(device_t &device, int clk3, int clk4, int clk5, int clk6);
 
 	// API
-	DECLARE_READ8_MEMBER(read);
-	DECLARE_WRITE8_MEMBER(write);
+	virtual DECLARE_READ8_MEMBER(read);
+	virtual DECLARE_WRITE8_MEMBER(write);
 	uint8_t get_irq_vector() { m_read_vector = true; return IVR; }
 
 	DECLARE_WRITE_LINE_MEMBER( rx_a_w ) { m_chanA->device_serial_interface::rx_w((uint8_t)state); }
@@ -220,6 +220,9 @@ public:
 	DECLARE_WRITE_LINE_MEMBER( rx_c_w ) { m_chanC->device_serial_interface::rx_w((uint8_t)state); }
 	DECLARE_WRITE_LINE_MEMBER( rx_d_w ) { m_chanD->device_serial_interface::rx_w((uint8_t)state); }
 
+	virtual DECLARE_READ8_MEMBER(read) override;
+	virtual DECLARE_WRITE8_MEMBER(write) override;
+	
 protected:
 	virtual machine_config_constructor device_mconfig_additions() const override;
 	
