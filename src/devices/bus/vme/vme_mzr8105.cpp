@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edstrom
 
 #include "emu.h"
-#include "mzr8105.h"
+#include "vme_mzr8105.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
