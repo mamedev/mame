@@ -2,7 +2,7 @@
 // copyright-holders:Joakim Larsson Edstrom
 
 #include "emu.h"
-#include "mzr8300.h"
+#include "vme_mzr8300.h"
 #include "machine/z80sio.h"
 
 #define LOG_GENERAL 0x01
