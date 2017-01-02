@@ -7,7 +7,7 @@
     Rogha Armour Attack         (c) 1991 Data East Corporation
     Wizard Fire                 (c) 1992 Data East Corporation
     Nitro Ball/Gun Ball         (c) 1992 Data East Corporation
-	Hangzo (prototype)          (c) 1992 Hot-B
+    Hangzo (prototype)          (c) 1992 Hot-B
     Schmeiser Robo              (c) 1993 Hot-B
 
     This hardware is capable of alpha-blending on sprites and playfields
