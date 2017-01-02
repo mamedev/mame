@@ -112,7 +112,7 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	if (f == nullptr)
 		log().fatal("Class {1} not found!\n", classname);
 	/* make sure we parse macro library entries */
-	f->macro_actions(netlist(), build_fqn(name));
+	f->macro_actions(netlist(), name);
 	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
