@@ -429,23 +429,25 @@ namespace netlist
 		class wrapper : public device_t
 		{
 		public:
-			wrapper(const pstring &devname, netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name), m_devname(devname)
+			wrapper(netlist_t &anetlist, const pstring &name)
+			: device_t(anetlist, name)
 			{
-				anetlist.setup().namespace_push(name);
-				anetlist.setup().include(m_devname);
-				anetlist.setup().namespace_pop();
 			}
 		protected:
 			NETLIB_RESETI() { }
 			NETLIB_UPDATEI() { }
-
-			pstring m_devname;
 		};
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
-			return plib::owned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
+			return plib::owned_ptr<device_t>::Create<wrapper>(anetlist, name);
+		}
+
+		void macro_actions(netlist_t &anetlist, const pstring &name) override
+		{
+			anetlist.setup().namespace_push(name);
+			anetlist.setup().include(this->name());
+			anetlist.setup().namespace_pop();
 		}
 
 	private:

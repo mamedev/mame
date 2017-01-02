@@ -52,7 +52,7 @@ static NETLIST_START(opamp_layout_2_13_9_4)
 		A.GND,      /*   |4           11|   */ NC,
 		B.N1,       /*   |5           10|   */ B.OUT,
 		B.PLUS,     /*   |6            9|   */ B.VCC,
-		B.MINUS     /*   |7            8|   */ B.N2
+		B.MINUS,    /*   |7            8|   */ B.N2
 					/*   +--------------+   */
 	)
 	NET_C(A.GND, B.GND)

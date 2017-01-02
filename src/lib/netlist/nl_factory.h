@@ -37,12 +37,11 @@ namespace netlist
 		virtual ~base_factory_t() {}
 
 		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
+		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {};
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
 		const pstring &param_desc() const { return m_def_param; }
-		const plib::pstring_vector_t term_param_list();
-		const plib::pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */

@@ -18,23 +18,6 @@ namespace netlist
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-const plib::pstring_vector_t base_factory_t::term_param_list()
-{
-	if (m_def_param.startsWith("+"))
-		return plib::pstring_vector_t(m_def_param.substr(1), ",");
-	else
-		return plib::pstring_vector_t();
-}
-
-const plib::pstring_vector_t base_factory_t::def_params()
-{
-	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return plib::pstring_vector_t();
-	else
-		return plib::pstring_vector_t(m_def_param, ",");
-}
-
-
 factory_list_t::factory_list_t( setup_t &setup)
 : m_setup(setup)
 {

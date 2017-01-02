@@ -960,28 +960,6 @@ namespace netlist
 		virtual void changed() override { }
 	};
 
-	template <typename ST, std::size_t AW, std::size_t DW>
-	class param_rom_t final: public param_data_t
-	{
-	public:
-
-		param_rom_t(device_t &device, const pstring name)
-		: param_data_t(device, name)
-		{
-			stream()->read(&m_data[0],1<<AW);
-		}
-
-		const ST & operator[] (std::size_t n) { return m_data[n]; }
-
-	protected:
-		virtual void changed() override
-		{
-			stream()->read(&m_data[0],1<<AW);
-		}
-	private:
-		ST m_data[1 << AW];
-	};
-
 	// -----------------------------------------------------------------------------
 	// core_device_t
 	// -----------------------------------------------------------------------------
@@ -1296,6 +1274,36 @@ namespace netlist
 			for (std::size_t i = 0; i<N; i++)
 				this->emplace(i, dev, names.p[i]);
 		}
+	};
+
+	// -----------------------------------------------------------------------------
+	// rom parameter
+	// -----------------------------------------------------------------------------
+
+	template <typename ST, std::size_t AW, std::size_t DW>
+	class param_rom_t final: public param_data_t
+	{
+	public:
+
+		param_rom_t(device_t &device, const pstring name)
+		: param_data_t(device, name)
+		{
+			auto f = stream();
+			if (f != nullptr)
+				f->read(&m_data[0],1<<AW);
+			else
+				device.netlist().log().warning("Rom {1} not found", Value());
+		}
+
+		const ST & operator[] (std::size_t n) { return m_data[n]; }
+
+	protected:
+		virtual void changed() override
+		{
+			stream()->read(&m_data[0],1<<AW);
+		}
+	private:
+		ST m_data[1 << AW];
 	};
 
 	// -----------------------------------------------------------------------------

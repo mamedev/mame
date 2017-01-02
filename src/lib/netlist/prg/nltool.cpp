@@ -363,6 +363,7 @@ static void listdevices(tool_options_t &opts)
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		std::vector<pstring> terms;
 
+		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
 
@@ -395,18 +396,13 @@ static void listdevices(tool_options_t &opts)
 			}
 		}
 
-		if (f->param_desc().startsWith("+"))
+		out += "," + f->param_desc();
+		for (auto p : plib::pstring_vector_t(f->param_desc(),",") )
 		{
-			out += "," + f->param_desc().substr(1);
-			terms.clear();
-		}
-		else if (f->param_desc() == "-")
-		{
-			/* no params at all */
-		}
-		else
-		{
-			out += "," + f->param_desc();
+			if (p.startsWith("+"))
+			{
+				plib::container::remove(terms, p.substr(1));
+			}
 		}
 		out += ")";
 		printf("%s\n", out.c_str());
