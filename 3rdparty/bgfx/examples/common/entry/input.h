@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -12,6 +12,24 @@ typedef void (*InputBindingFn)(const void* _userData);
 
 struct InputBinding
 {
+	void set(entry::Key::Enum _key, uint8_t _modifiers, uint8_t _flags, InputBindingFn _fn, const void* _userData = NULL)
+	{
+		m_key = _key;
+		m_modifiers = _modifiers;
+		m_flags     = _flags;
+		m_fn        = _fn;
+		m_userData  = _userData;
+	}
+
+	void end()
+	{
+		m_key = entry::Key::None;
+		m_modifiers = entry::Modifier::None;
+		m_flags     = 0;
+		m_fn        = NULL;
+		m_userData  = NULL;
+	}
+
 	entry::Key::Enum m_key;
 	uint8_t m_modifiers;
 	uint8_t m_flags;

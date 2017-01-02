@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -318,6 +318,7 @@ namespace bgfx { namespace gl
 	void GlContext::destroySwapChain(SwapChainGL*  _swapChain)
 	{
 		BX_DELETE(g_allocator, _swapChain);
+		wglMakeCurrent(m_hdc, m_context);
 	}
 
 	void GlContext::swap(SwapChainGL* _swapChain)
