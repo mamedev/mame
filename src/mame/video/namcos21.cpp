@@ -48,11 +48,11 @@ READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
 WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 {
-	uint8_t *videoram = m_videoram.get();
 	int color = data>>8;
 	int mask  = data&0xff;
 	int i;
@@ -60,15 +60,15 @@ WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
 	{
 		if( mask&(0x01<<i) )
 		{
-			videoram[(offset+i)&0x7ffff] = color;
+			m_videoram[(offset+i)&0x7ffff] = color;
+			m_maskram[(offset+i)&0x7ffff] = mask;
 		}
 	}
 }
 
 READ16_MEMBER(namcos21_state::winrun_gpu_videoram_r)
 {
-	uint8_t *videoram = m_videoram.get();
-	return videoram[offset]<<8;
+	return (m_videoram[offset]<<8) | m_maskram[offset];
 }
 
 void namcos21_state::allocate_poly_framebuffer()
@@ -363,6 +363,7 @@ VIDEO_START_MEMBER(namcos21_state,namcos21)
 	if( m_gametype == NAMCOS21_WINRUN91 )
 	{
 		m_videoram = std::make_unique<uint8_t[]>(0x80000);
+		m_maskram = std::make_unique<uint8_t[]>(0x80000);
 	}
 	allocate_poly_framebuffer();
 	c355_obj_init(
@@ -426,7 +427,10 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram.get();
+	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.min_y,cliprect.max_y,m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
+
 	int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
+	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
 	int base = 0x1000+0x100*(m_winrun_color&0xf);
 	int sx,sy;
 	for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
@@ -435,11 +439,12 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 		uint16_t *pDest = &bitmap.pix16(sy);
 		for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
 		{
-			int pen = pSource[sx];
+			int pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )
 			{
 			case 0xff:
 				break;
+			// TODO: additive blending? winrun car select uses register [0xc] for a xscroll value 
 			case 0x00:
 				pDest[sx] = (pDest[sx]&0x1fff)+0x4000;
 				break;

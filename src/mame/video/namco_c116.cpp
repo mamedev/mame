@@ -66,8 +66,9 @@ i960 CPU, needs to write its clip and raster values byteswapped.
 */
 
 #include "emu.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
+const device_type NAMCO_C116 = &device_creator<namco_c116_device>;
 
 //-------------------------------------------------
 //  namco_c116_device -- constructor
@@ -158,6 +159,3 @@ WRITE8_MEMBER(namco_c116_device::write)
 	RAM[color] = data;
 	palette().set_pen_color(color,m_ram_r[color],m_ram_g[color],m_ram_b[color]);
 }
-
-
-const device_type NAMCO_C116 = &device_creator<namco_c116_device>;
