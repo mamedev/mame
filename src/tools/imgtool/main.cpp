@@ -13,27 +13,32 @@
 #include <ctype.h>
 #include <stdlib.h>
 #include <time.h>
+#include <iostream>
+
+#ifdef _WIN32
+#include <io.h>
+#include <fcntl.h>
+#endif
 
 #include "imgtool.h"
 #include "main.h"
 #include "modules.h"
 #include "strformat.h"
 
-/* ---------------------------------------------------------------------- */
+// ----------------------------------------------------------------------
 
-static void writeusage(FILE *f, int write_word_usage, const struct command *c, char *argv[])
+static void writeusage(std::wostream &output, int write_word_usage, const struct command *c, char *argv[])
 {
 	std::string cmdname = core_filename_extract_base(argv[0]);
-	fprintf(f, "%s %s %s %s\n",
-		(write_word_usage ? "Usage:" : "      "),
-		cmdname.c_str(),
-		c->name,
-		c->usage ? c->usage : "");
+	output << (write_word_usage ? L"Usage: " : L"       ")
+		<< wstring_from_utf8(cmdname)
+		<< L" "
+		<< c->name
+		<< c->usage ? wstring_from_utf8(c->usage) : L"";
 }
 
 
-
-/* ----------------------------------------------------------------------- */
+// ----------------------------------------------------------------------
 
 static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 	util::option_resolution *resolution, filter_getinfoproc *filter, const char **fork)
@@ -106,15 +111,15 @@ static int parse_options(int argc, char *argv[], int minunnamed, int maxunnamed,
 	return lastunnamed;
 
 filternotfound:
-	fprintf(stderr, "%s: Unknown filter type\n", value);
+	std::wcerr << wstring_from_utf8(value) << L": Unknown filter type" << std::endl;
 	return -1;
 
 optionalreadyspecified:
-	fprintf(stderr, "Cannot specify multiple %ss\n", name);
+	std::wcerr << L"Cannot specify multiple " << wstring_from_utf8(name) << L"s" << std::endl;
 	return -1;
 
 error:
-	fprintf(stderr, "%s: Unrecognized option\n", argv[i]);
+	std::wcerr << wstring_from_utf8(argv[i]) << L": Unrecognized option" << std::endl;
 	return -1;
 }
 
@@ -150,7 +155,7 @@ void reporterror(imgtoolerr_t err, const struct command *c, const char *format, 
 
 	if (!src)
 		src = c->name;
-	fprintf(stderr, "%s: %s\n", src, err_name);
+	std::wcerr << wstring_from_utf8(src) << L": " << wstring_from_utf8(err_name) << std::endl;
 }
 
 
@@ -166,7 +171,7 @@ static const char *interpret_filename(const char *filename)
 
 
 
-/* ----------------------------------------------------------------------- */
+// ----------------------------------------------------------------------
 
 static int cmd_dir(const struct command *c, int argc, char *argv[])
 {
@@ -213,13 +218,13 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	total_count = 0;
 	total_size = 0;
 
-	fprintf(stdout, "Contents of %s:%s\n", argv[1], path.c_str());
+	std::wcout << L"Contents of " << wstring_from_utf8(argv[1]) << L":" << wstring_from_utf8(path) << std::endl;;
 
 	info = image->info();
 	if (!info.empty())
-		fprintf(stdout, "%s\n", info.c_str());
+		std::wcout << wstring_from_utf8(info) << std::endl;
 
-	fprintf(stdout, "%s\n", separator.c_str());
+	std::wcout << wstring_from_utf8(separator) << std::endl;
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{
@@ -234,17 +239,18 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 		if (ent.hardlink)
 			strcat(ent.filename, " <hl>");
 
-		fprintf(stdout, "%*s %*s %*s %*s\n",
+		std::wcout << wstring_from_utf8(util::string_format(
+			"%*s %*s %*s %*s",
 			-columnwidth_filename, ent.filename,
-			columnwidth_filesize, filesize_string.c_str(),
+			columnwidth_filesize, filesize_string,
 			columnwidth_attributes, ent.attr,
-			columnwidth_lastmodified, last_modified);
+			columnwidth_lastmodified, last_modified)) << std::endl;
 
 		if (ent.softlink && ent.softlink[0] != '\0')
-			fprintf(stdout, "-> %s\n", ent.softlink);
+			std::wcout << L"-> " << wstring_from_utf8(ent.softlink) << std::endl;
 
 		if (ent.comment && ent.comment[0] != '\0')
-			fprintf(stdout, ": %s\n", ent.comment);
+			std::wcout << L": " << wstring_from_utf8(ent.comment) << std::endl;
 
 		total_count++;
 		total_size += ent.filesize;
@@ -257,10 +263,10 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 	if (err)
 		goto done;
 
-	fprintf(stdout, "%s\n", separator.c_str());
-	fprintf(stdout, "%8i File(s)        %8i bytes\n", total_count, total_size);
+	std::wcout << wstring_from_utf8(separator) << std::endl;
+	std::wcout << wstring_from_utf8(util::string_format("%8i File(s)        %8i bytes", total_count, total_size)) << std::endl;
 	if (!freespace_err)
-		fprintf(stdout, "                        %8u bytes free\n", (unsigned int) freespace);
+		std::wcout << wstring_from_utf8(util::string_format("                        %8u bytes free", (unsigned int)freespace)) << std::endl;
 
 done:
 	if (err)
@@ -381,7 +387,7 @@ static int cmd_put(const struct command *c, int argc, char *argv[])
 	for (i = 0; i < filename_count; i++)
 	{
 		filename = filename_list[i];
-		printf("Putting file '%s'...\n", filename);
+		std::wcout << L"Putting file '" << wstring_from_utf8(filename) << L"'..." << std::endl;
 		err = partition->put_file(new_filename, fork, filename, resolution.get(), filter);
 		if (err)
 			goto done;
@@ -434,7 +440,7 @@ static int cmd_getall(const struct command *c, int argc, char *argv[])
 
 	while (((err = imgenum->get_next(ent)) == 0) && !ent.eof)
 	{
-		fprintf(stdout, "Retrieving %s (%u bytes)\n", ent.filename, (unsigned int) ent.filesize);
+		std::wcout << L"Retrieving " << wstring_from_utf8(ent.filename) << L" (" << (unsigned int)ent.filesize << L" bytes)" << std::endl;
 
 		err = partition->get_file(ent.filename, nullptr, nullptr, filter);
 		if (err)
@@ -546,7 +552,7 @@ static int cmd_identify(const struct command *c, int argc, char *argv[])
 	{
 		for (i = 0; modules[i]; i++)
 		{
-			printf("%.16s %s\n", modules[i]->name, modules[i]->description);
+			std::wcout << wstring_from_utf8(util::string_format("%.16s %s", modules[i]->name, modules[i]->description)) << std::endl;
 		}
 
 		return 0;
@@ -679,11 +685,11 @@ done:
 
 static int cmd_listformats(const struct command *c, int argc, char *argv[])
 {
-	fprintf(stdout, "Image formats supported by imgtool:\n\n");
+	std::wcout << L"Image formats supported by imgtool:" << std::endl << std::endl;
 
 	for (const auto &module : imgtool_get_modules())
 	{
-		fprintf(stdout, "  %-25s%s\n", module->name, module->description);
+		std::wcout << wstring_from_utf8(util::string_format("  %-25s%s", module->name, module->description)) << std::endl;
 	}
 
 	return 0;
@@ -695,13 +701,14 @@ static int cmd_listfilters(const struct command *c, int argc, char *argv[])
 {
 	int i;
 
-	fprintf(stdout, "Filters supported by imgtool:\n\n");
+	std::wcout << L"Filters supported by imgtool:" << std::endl << std::endl;
 
 	for (i = 0; filters[i]; i++)
 	{
-		fprintf(stdout, "  %-11s%s\n",
+		std::wcout << wstring_from_utf8(util::string_format(
+			"  %-11s%s",
 			filter_get_info_string(filters[i], FILTINFO_STR_NAME),
-			filter_get_info_string(filters[i], FILTINFO_STR_HUMANNAME));
+			filter_get_info_string(filters[i], FILTINFO_STR_HUMANNAME))) << std::endl;
 	}
 
 	return 0;
@@ -712,8 +719,8 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 	util::option_resolution resolution(opt_guide);
 	resolution.set_specification(opt_spec);
 
-	fprintf(stdout, "Option           Allowed values                 Description\n");
-	fprintf(stdout, "---------------- ------------------------------ -----------\n");
+	std::wcout << L"Option           Allowed values                 Description" << std::endl;
+	std::wcout << L"---------------- ------------------------------ -----------" << std::endl;
 
 	for (auto iter = resolution.entries_begin(); iter != resolution.entries_end(); iter++)
 	{
@@ -760,10 +767,11 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 			break;
 		}
 
-		fprintf(stdout, "%16s %-30s %s\n",
-			opt_name.c_str(),
-			description_buffer.str().c_str(),
-			opt_desc);
+		std::wcout << wstring_from_utf8(util::string_format(
+			"%16s %-30s %s",
+			opt_name,
+			description_buffer.str(),
+			opt_desc)) << std::endl;
 	}
 }
 
@@ -782,33 +790,33 @@ static int cmd_listdriveroptions(const struct command *c, int argc, char *argv[]
 		return -1;
 	}
 
-	fprintf(stdout, "Driver specific options for module '%s':\n\n", argv[0]);
+	std::wcout << L"Driver specific options for module '" << wstring_from_utf8(argv[0]) << L":" << std::endl << std::endl;
 
 	/* list write options */
 	opt_guide = (const util::option_guide *) imgtool_get_info_ptr(&mod->imgclass, IMGTOOLINFO_PTR_WRITEFILE_OPTGUIDE);
 	opt_spec = imgtool_get_info_string(&mod->imgclass, IMGTOOLINFO_STR_WRITEFILE_OPTSPEC);
 	if (opt_guide)
 	{
-		fprintf(stdout, "Image specific file options (usable on the 'put' command):\n\n");
+		std::wcout << L"Image specific file options (usable on the 'put' command):" << std::endl << std::endl;
 		listoptions(*opt_guide, opt_spec);
-		puts("\n");
+		std::wcout << std::endl;
 	}
 	else
 	{
-		fprintf(stdout, "No image specific file options\n\n");
+		std::wcout << L"No image specific file options" << std::endl << std::endl;
 	}
 
 	/* list create options */
 	opt_guide = mod->createimage_optguide;
 	if (opt_guide)
 	{
-		fprintf(stdout, "Image specific creation options (usable on the 'create' command):\n\n");
+		std::wcout << L"Image specific creation options (usable on the 'create' command):" << std::endl << std::endl;
 		listoptions(*opt_guide, mod->createimage_optspec);
-		puts("\n");
+		std::wcout << std::endl;
 	}
 	else
 	{
-		fprintf(stdout, "No image specific creation options\n\n");
+		std::wcout << L"No image specific creation options" << std::endl << std::endl;
 	}
 
 	return 0;
@@ -836,7 +844,10 @@ static const struct command cmds[] =
 	{ "listdriveroptions",  cmd_listdriveroptions, "<format>", 1, 1, 0 }
 };
 
-int CLIB_DECL main(int argc, char *argv[])
+
+// ----------------------------------------------------------------------
+
+int main(int argc, char *argv[])
 {
 	int i;
 	int result;
@@ -844,12 +855,16 @@ int CLIB_DECL main(int argc, char *argv[])
 	const char *sample_format = "coco_jvc_rsdos";
 	std::string cmdname = core_filename_extract_base(argv[0]);
 
+#ifdef _WIN32
+	_setmode(_fileno(stdout), _O_U16TEXT);
+#endif // _WIN32
+
 #ifdef MAME_DEBUG
 	if (imgtool_validitychecks())
 		return -1;
-#endif /* MAME_DEBUG */
+#endif // MAME_DEBUG
 
-	putchar('\n');
+	std::wcout << std::endl;
 
 	if (argc > 1)
 	{
@@ -891,25 +906,26 @@ int CLIB_DECL main(int argc, char *argv[])
 		}
 	}
 
-	/* Usage */
-	fprintf(stderr, "imgtool - Generic image manipulation tool for use with MAME\n\n");
+	// Usage
+	std::wcerr << L"imgtool - Generic image manipulation tool for use with MAME" << std::endl << std::endl;
 	for (i = 0; i < ARRAY_LENGTH(cmds); i++)
 	{
-		writeusage(stdout, (i == 0), &cmds[i], argv);
+		writeusage(std::wcout, (i == 0), &cmds[i], argv);
 	}
+	std::wcerr << std::endl;
+	std::wcerr << L"<format> is the image format, e.g. " << wstring_from_utf8(sample_format) << std::endl;
+	std::wcerr << L"<imagename> is the image filename; can specify a ZIP file for image name" << std::endl;
 
-	fprintf(stderr, "\n<format> is the image format, e.g. %s\n", sample_format);
-	fprintf(stderr, "<imagename> is the image filename; can specify a ZIP file for image name\n");
-
-	fprintf(stderr, "\nExample usage:\n");
-	fprintf(stderr, "\t%s dir %s myimageinazip.zip\n", cmdname.c_str(), sample_format);
-	fprintf(stderr, "\t%s get %s myimage.dsk myfile.bin mynewfile.txt\n", cmdname.c_str(), sample_format);
-	fprintf(stderr, "\t%s getall %s myimage.dsk\n", cmdname.c_str(), sample_format);
+	std::wcerr << std::endl;
+	std::wcerr << L"Example usage:" << std::endl;
+	std::wcerr << L"\t" << wstring_from_utf8(cmdname) << L" dir "    << wstring_from_utf8(sample_format) << L" myimageinazip.zip" << std::endl;
+	std::wcerr << L"\t" << wstring_from_utf8(cmdname) << L" get "    << wstring_from_utf8(sample_format) << L" myimage.dsk myfile.bin mynewfile.txt" << std::endl;
+	std::wcerr << L"\t" << wstring_from_utf8(cmdname) << L" getall " << wstring_from_utf8(sample_format) << L" myimage.dsk" << std::endl;
 	result = 0;
 	goto done;
 
 cmderror:
-	writeusage(stdout, 1, &cmds[i], argv);
+	writeusage(std::wcout, 1, &cmds[i], argv);
 	result = -1;
 
 done:
