@@ -805,6 +805,7 @@ WRITE16_MEMBER(namcos21_state::dspram16_w)
 
 int namcos21_state::init_dsp()
 {
+	// TODO: what actually tests this?
 	uint16_t *pMem = (uint16_t *)memregion("dspmaster")->base();
 	/**
 	 * DSP BIOS tests "CPU ID" on startup
@@ -1846,7 +1847,6 @@ MACHINE_START_MEMBER(namcos21_state,namcos21)
 	namcos2_kickstart = namcos21_kickstart;
 }
 
-// TODO: temp, C116 device
 TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 {
 	int scanline = param;
@@ -1859,16 +1859,6 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 		if(m_gpu_intc)
 			m_gpu_intc->vblank_irq_trigger();
 	}
-	
-	#if 0
-	if(scanline == cur_posirq)
-	{
-		m_master_intc->pos_irq_trigger();
-		m_slave_intc->pos_irq_trigger();
-		// TODO: wrong place!
-		m_screen->update_partial(param);
-	}
-	#endif
 	
 	if(m_gpu_intc != nullptr)
 	{
