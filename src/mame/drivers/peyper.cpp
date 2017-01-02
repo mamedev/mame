@@ -15,6 +15,7 @@
   Nemesis (Peyper)
   Odisea Paris-Dakar (Peyper)
   Hang-On (Sonic)
+  Ator (Videodens)
 
   Others not emulated (need roms):
   Night Fever (Sonic)
@@ -831,6 +832,15 @@ ROM_START(wolfman)
 ROM_END
 
 /*-------------------------------------------------------------------
+/ Ator (198?)
+/-------------------------------------------------------------------*/
+ROM_START(ator)
+	ROM_REGION(0x6000, "maincpu", 0)
+	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
+	ROM_LOAD("Ator 2 _0xBA29.BIN", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
+ROM_END
+
+/*-------------------------------------------------------------------
 / Sir Lancelot (1994)
 /-------------------------------------------------------------------*/
 ROM_START(lancelot)
@@ -855,5 +865,6 @@ GAME( 1987, sonstwr2, sonstwar, peyper,   sonstwar, peyper_state, peyper,   ROT0
 GAME( 1987, wolfman,  0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Wolf Man", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1986, nemesisp, 0,        peyper,   wolfman,  peyper_state, wolfman,  ROT0, "Peyper", "Nemesis", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
 GAME( 1987, odisea,   0,        peyper,   odisea,   peyper_state, wolfman,  ROT0, "Peyper", "Odisea Paris-Dakar", MACHINE_MECHANICAL | MACHINE_NOT_WORKING )
-GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,  ROT0,  "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
+GAME( 1988, hangonp,  0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Sonic",  "Hang-On (Sonic)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // inputs to be checked
+GAME( 198?, ator,     0,        peyper,   sonstwar, peyper_state, peyper,   ROT0, "Videodens", "Ator", MACHINE_MECHANICAL | MACHINE_NOT_WORKING ) // initial program ROM missing; no manual found
 GAME( 1994, lancelot, 0,        peyper,   sonstwar, driver_device,0,       ROT0,  "Peyper", "Sir Lancelot", MACHINE_IS_SKELETON_MECHANICAL) // different hardware (see top of file)
