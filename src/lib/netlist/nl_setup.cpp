@@ -103,7 +103,7 @@ void setup_t::namespace_pop()
 
 void setup_t::register_lib_entry(const pstring &name)
 {
-	factory().register_device(plib::make_unique_base<base_factory_t, devices::factory_lib_entry_t>(*this, name, name, ""));
+	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, ""));
 }
 
 void setup_t::register_dev(const pstring &classname, const pstring &name)
@@ -113,7 +113,7 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 		log().fatal("Class {1} not found!\n", classname);
 	/* make sure we parse macro library entries */
 	f->macro_actions(netlist(), build_fqn(name));
-	m_device_factory.push_back(std::pair<pstring, base_factory_t *>(build_fqn(name), f));
+	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
 bool setup_t::device_exists(const pstring name) const

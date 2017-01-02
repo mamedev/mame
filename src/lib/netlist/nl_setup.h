@@ -252,8 +252,8 @@ namespace netlist
 		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
 		void register_define(pstring defstr);
 
-		factory_list_t &factory() { return m_factory; }
-		const factory_list_t &factory() const { return m_factory; }
+		factory::list_t &factory() { return m_factory; }
+		const factory::list_t &factory() const { return m_factory; }
 
 		/* model / family related */
 
@@ -273,7 +273,7 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log();
 		const plib::plog_base<NL_DEBUG> &log() const;
 
-		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
+		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 
 		std::unordered_map<pstring, pstring> m_alias;
 		std::unordered_map<pstring, pstring> m_param_values;
@@ -303,7 +303,7 @@ namespace netlist
 		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::vector<link_t>                         m_links;
-		factory_list_t                              m_factory;
+		factory::list_t                             m_factory;
 		std::unordered_map<pstring, pstring>        m_models;
 
 		std::stack<pstring>                         m_namespace_stack;

@@ -356,7 +356,7 @@ void parser_t::netdev_hint()
 
 void parser_t::device(const pstring &dev_type)
 {
-	base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
+	factory::element_t *f = m_setup.factory().factory_by_name(dev_type);
 	auto paramlist = plib::pstring_vector_t(f->param_desc(), ",");
 
 	pstring devname = get_identifier();

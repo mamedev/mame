@@ -81,7 +81,7 @@ NETLIST_EXTERNAL(bjt_models)
 NETLIST_EXTERNAL(family_models)
 
 namespace netlist {
-	void initialize_factory(netlist::factory_list_t &factory);
+	void initialize_factory(factory::list_t &factory);
 }
 
 #endif
