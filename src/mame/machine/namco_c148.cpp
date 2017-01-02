@@ -235,7 +235,7 @@ void namco_c148_device::sci_irq_trigger()
 READ8_MEMBER( namco_c148_device::ext_posirq_line_r )
 {
 	// TODO: same as regular register? winrun91 reads here and subs with integer 0x39 for a new posirq that never gets triggered.
-	return (m_posirq_line - 32) & 0xff;
+	return (m_posirq_line) & 0xff;
 }
 
 WRITE8_MEMBER( namco_c148_device::ext_posirq_line_w )
