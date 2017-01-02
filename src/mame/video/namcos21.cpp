@@ -48,6 +48,7 @@ READ16_MEMBER(namcos21_state::winrun_gpu_register_r)
 WRITE16_MEMBER(namcos21_state::winrun_gpu_register_w)
 {
 	COMBINE_DATA( &m_winrun_gpu_register[offset] );
+	m_screen->update_partial(m_screen->vpos());
 }
 
 WRITE16_MEMBER(namcos21_state::winrun_gpu_videoram_w)
@@ -426,7 +427,10 @@ uint32_t namcos21_state::screen_update_driveyes(screen_device &screen, bitmap_in
 void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
 	uint8_t *videoram = m_videoram.get();
+	//printf("%d %d (%d %d) - %04x %04x %04x|%04x %04x\n",cliprect.min_y,cliprect.max_y,m_screen->vpos(),m_gpu_intc->get_posirq_line(),m_winrun_gpu_register[0],m_winrun_gpu_register[2/2],m_winrun_gpu_register[4/2],m_winrun_gpu_register[0xa/2],m_winrun_gpu_register[0xc/2]);
+
 	int yscroll = -cliprect.min_y+(int16_t)m_winrun_gpu_register[0x2/2];
+	int xscroll = 0;//m_winrun_gpu_register[0xc/2] >> 7;
 	int base = 0x1000+0x100*(m_winrun_color&0xf);
 	int sx,sy;
 	for( sy=cliprect.min_y; sy<=cliprect.max_y; sy++ )
@@ -435,7 +439,7 @@ void namcos21_state::winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &c
 		uint16_t *pDest = &bitmap.pix16(sy);
 		for( sx=cliprect.min_x; sx<=cliprect.max_x; sx++ )
 		{
-			int pen = pSource[sx];
+			int pen = pSource[(sx+xscroll) & 0x1ff];
 			switch( pen )
 			{
 			case 0xff:

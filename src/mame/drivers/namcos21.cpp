@@ -1872,12 +1872,8 @@ TIMER_DEVICE_CALLBACK_MEMBER(namcos21_state::screen_scanline)
 	
 	if(m_gpu_intc != nullptr)
 	{
-		if(scanline == m_gpu_intc->get_posirq_line()*2)
-		{
+		if(scanline == (0xff-m_gpu_intc->get_posirq_line())*2)
 			m_gpu_intc->pos_irq_trigger();
-			// TODO: wrong place!
-			m_screen->update_partial(param);
-		}
 	}
 }
 
