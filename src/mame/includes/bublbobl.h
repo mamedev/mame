@@ -2,6 +2,7 @@
 // copyright-holders:Chris Moore, Nicola Salmoria
 
 #include "machine/gen_latch.h"
+#include "machine/taito68705interface.h"
 
 class bublbobl_state : public driver_device
 {
@@ -17,13 +18,6 @@ public:
 		m_videoram(*this, "videoram"),
 		m_objectram(*this, "objectram"),
 		m_mcu_sharedram(*this, "mcu_sharedram"),
-		m_mcu_sent(false),
-		m_main_sent(false),
-		m_from_main(0),
-		m_from_mcu(0),
-		m_from_mcu_latch(0),
-		m_to_mcu_latch(0),
-		m_old_portB(0),
 		m_maincpu(*this, "maincpu"),
 		m_mcu(*this, "mcu"),
 		m_audiocpu(*this, "audiocpu"),
@@ -73,14 +67,6 @@ public:
 	/* Bobble Bobble */
 	int      m_ic43_a;
 	int      m_ic43_b;
-	/* Tokio */
-	bool m_mcu_sent;
-	bool m_main_sent;
-	uint8_t m_from_main;
-	uint8_t m_from_mcu;
-	uint8_t m_from_mcu_latch;
-	uint8_t m_to_mcu_latch;
-	uint8_t m_old_portB;
 
 	/* devices */
 	required_device<cpu_device> m_maincpu;
@@ -95,8 +81,6 @@ public:
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-	DECLARE_READ8_MEMBER(tokio_mcu_r);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_w);
 
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_sound_command_w);
@@ -132,20 +116,6 @@ public:
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_b_w);
 
-
-
-
-	DECLARE_CUSTOM_INPUT_MEMBER(tokio_mcu_sent_r);
-	DECLARE_CUSTOM_INPUT_MEMBER(tokio_main_sent_r);
-
-
-	DECLARE_READ8_MEMBER(tokio_mcu_porta_r);
-	DECLARE_READ8_MEMBER(tokio_mcu_portc_r);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_porta_w);
-	DECLARE_WRITE8_MEMBER(tokio_mcu_portb_w);
-
-
-	DECLARE_DRIVER_INIT(tokiob);
 	DECLARE_DRIVER_INIT(tokio);
 	DECLARE_DRIVER_INIT(dland);
 	DECLARE_DRIVER_INIT(bublbobl);

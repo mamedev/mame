@@ -194,32 +194,22 @@ void aerofgt_state::setbank( tilemap_t *tmap, int num, int bank )
 	}
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::pspikes_gfxbank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0xf0) >> 4);
-		setbank(m_bg1_tilemap, 1, data & 0x0f);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0xf0) >> 4);
+	setbank(m_bg1_tilemap, 1, data & 0x0f);
 }
 
-
-WRITE16_MEMBER(aerofgt_state::karatblz_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::karatblz_gfxbank_w)
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0x0100) >> 8);
-		setbank(m_bg2_tilemap, 1, (data & 0x0800) >> 11);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0x01));
+	setbank(m_bg2_tilemap, 1, (data & 0x08) >> 3);
 }
 
-WRITE16_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
+WRITE8_MEMBER(aerofgt_state::spinlbrk_gfxbank_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		setbank(m_bg1_tilemap, 0, (data & 0x07));
-		setbank(m_bg2_tilemap, 1, (data & 0x38) >> 3);
-	}
+	setbank(m_bg1_tilemap, 0, (data & 0x07));
+	setbank(m_bg2_tilemap, 1, (data & 0x38) >> 3);
 }
 
 WRITE16_MEMBER(aerofgt_state::turbofrc_gfxbank_w)
@@ -264,16 +254,13 @@ WRITE16_MEMBER(aerofgt_state::aerofgt_bg2scrolly_w)
 	COMBINE_DATA(&m_bg2scrolly);
 }
 
-WRITE16_MEMBER(aerofgt_state::pspikes_palette_bank_w)
+WRITE8_MEMBER(aerofgt_state::pspikes_palette_bank_w)
 {
-	if (ACCESSING_BITS_0_7)
+	m_spritepalettebank = data & 0x03;
+	if (m_charpalettebank != (data & 0x1c) >> 2)
 	{
-		m_spritepalettebank = data & 0x03;
-		if (m_charpalettebank != (data & 0x1c) >> 2)
-		{
-			m_charpalettebank = (data & 0x1c) >> 2;
-			m_bg1_tilemap->mark_all_dirty();
-		}
+		m_charpalettebank = (data & 0x1c) >> 2;
+		m_bg1_tilemap->mark_all_dirty();
 	}
 }
 

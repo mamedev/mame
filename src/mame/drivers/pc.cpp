@@ -19,11 +19,213 @@ Driver file for IBM PC, IBM PC XT, and related machines.
     F0000-FDFFF   NOP       or ROM Basic + other Extensions
     FE000-FFFFF   ROM
 
+Data General One / DG-1
+=======================
+Links: http://www.1000bit.it/ad/bro/datageneral/DG-ONE-PersonalSystem.pdf , http://www.1000bit.it/ad/bro/datageneral/DG-ONE-Interduction-PR.pdf , http://www.oldcomputers.net/data-general-one.html , http://forums.bannister.org/ubbthreads.php?ubb=showflat&Number=30897&page=all
+Info: According to the discussion in the thread, the ROM we have is from the original version. Specs for later permutations can be found on oldcomputers.net
+Form Factor: Laptop
+CPU: 80C88 @ 4 MHz
+RAM: 128K - 256K - 384K - 512K internally
+Bus: no internal slots
+Video: On board, Text mode 80x25 with 8x8 or 8x10 characters, CGA
+Display: non-backlit LCD 640x256 pixels
+Mass storage: 1/2x Floppy 3.5" 720K
+On board Ports: Floppy, RTC, 1x RS232C + 1x RS232C/RS422 via 8251, speaker
+Options: ext. 5.25" Floppy, int. Bell 103A 300 Baud Modem, 8087 maths cpu
+Expansion: Expansion box, with 5 ISA slots and space for a 5.25" drive and a harddisk; specifically mentioned are the 5.25" drive, color graphics and memory expansion via ISA cards
+
+
+Commodore PC-1
+=============
+Links: http://www.amiga-stuff.com/hardware/pc-i.html , http://www.zimmers.net/cbmpics/cpci.html
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 512K / 640K
+Bus: Proprietary expansion slot, carrying almost all ISA signals
+Video: On board, MDA/Hercules/CGA
+Mass storage: 1x 5.25" 360K
+On board ports: Floppy, floppy expansion (for Amiga A1010/1011 (720 KB, 3.5") or A1020 (360 KB, 5.25" drives), speaker (but no speaker fitted), mouse, 
+Options: 8087 maths CPU
+Expansion: Expansion box: 2x ISA
+
+
+Commodore PC-10 III
+=============
+Links: http://dostalgie.de/downloads/pc10III-20III/PC10III_OM_COMMODORE_EN_DE.pdf
+Info: PC10-III and PC20-III are the same machines - PC10 has two floppies, PC20 one floppy and one harddisk
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz / 7.16 MHz / 9.54 MHz
+RAM: 640K
+Bus: 3x ISA
+Video: On board: MDA/CGA/Hercules/Plantronics
+Mass storage: 1x Floppy 5.25" 360K and (PC10) another 360K or (PC20) 3.5" harddisk
+On board ports: Floppy, XT-IDE Harddisk, Mouse, serial, parallel, RTC, Speaker
+Options: 8087 maths CPU
+
+
+Zenith SuperSport
+=======================
+Links: http://www.focushacks.com/zenith/myzenith.html , http://retro-computing.blogspot.de/2006/08/zds-supersport-laptop.html
+Info: ZWL-184 to distinguish it from the later 80286 based models
+Form Factor: Laptop
+CPU: 80C88 @ 4.77 MHz or 8 MHz
+RAM: 640 KB
+Bus: no internal slots
+Video: CGA
+Display: The second link has a picture of a working SuperSport. This shows the LCD display with a green background and blue text/graphics.
+Mass storage: 1x 3.5" 720K floppy and 1x720K floppy or 20MB harddisk
+On board ports: serial, parallel, ext. keyboard, ext. CGA video, ext. floppy
+Options: 2400 Baud Modem, 8087 maths CPU
+
+
+Siemens Sicomp PC16-05
+=======================
+Links: http://www.computerwoche.de/a/siemens-erweitert-pc-16-programm,1169752 , http://www.phantom.sannata.ru/museum/siemens_pc_16_05.shtml
+Info: Multitech PC/700 mainboard
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz / 8 MHz
+RAM: 640KB
+Bus: 6x ISA:	1) MDA/Hercules/CGA and parallel port
+				2) Floppy, RTC and serial port
+				3) (optional) MFM harddisk controller
+Video: MDA/Hercules, exchangable via ISA-slot
+Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or MFM hard drive (10MB or 20MB)
+On board ports: parallel, serial, beeper
+Options: 8087 maths cpu
+
+
+NCR PC4i
+========
+Links: http://www.minuszerodegrees.net/manuals/NCR/NCR%20PC4i%20-%20Technical%20Reference%20Manual%20-%20January%201986.pdf
+Info:	The earlier PC4 is not quite IBM compatible, the "i" in PC4i indicates full IBM compatibility.
+		The NCR Graphics card supports a special 640x400 video mode
+Form Factor: All-in-one desktop
+CPU: 8088 @ 4.77 MHz
+RAM: 256K, expandable to 640K
+Bus: 7x ISA:	1)	(optional) RAM expansion board
+				2)	empty
+				3)	32K Video/Graphics board (64K option)
+				4)	(optional) Alpha board
+				5)	empty
+				6)	(optional) MFM harddisk controller
+				7)	empty
+Video: K510: 4KB Alpha for internal monitor; K511: 32KB Graphics for internal monitor; K512: 32KB upgrade for K512; K140: 16KB Graphics for external monitor; K141: 4KB Alpha for external monitor
+Display: Mono or color CRT 640x400 pixel
+Mass storage: 1x 5.25" 360K floppy and 1x 5.25" 360K floppy or 10 MB harddisk
+On board ports: parallel, serial, speaker, floppy
+Options: 8087 maths CPU, K101 memory upgrade in 64K steps, 1.2MB floppy and controller board
+
+
+Olivetti M15
+============
+Links: http://www.1000bit.it/ad/bro/olivetti/olivettiM15.pdf , http://electrickery.xs4all.nl/comp/m15/ , http://electrickery.xs4all.nl/comp/m15/doc/M15_InstallationAndOperationsGuide.pdf
+Info: The info brochure has a picture of a working M15. This shows the LCD display with a green background and blue text/graphics.
+Form Factor: Laptop
+CPU: 80C88 @ 4.77 MHz
+RAM: 256K / 512K
+Bus: no internal slots
+Video: 80x25 text mode, CGA
+Display: LCD
+Mass storage: 2x 3.5" 720K drives
+Ports: serial, parallel, ext. floppy, RTC
+Expansion: External 5.25" 360K floppy drive
+
+	
 IBM5550
 =======
 Information can be found at http://homepage3.nifty.com/ibm5550/index-e.html
 It's a heavily modified IBM PC-XT machine, with a completely different
 video HW too.
+
+
+Sharp PC-7000
+=============
+Links: http://oldcomputers.net/sharp-pc7000.html , http://curtamania.com/curta/database/brand/sharp/Sharp%20PC-7000/index.html , http://pcmuseum.de/pc7000.html
+Form Factor: Luggable
+CPU: 8086 @ 4.77 MHz or 7.37 MHz
+RAM: 320K / 704K
+Bus: no internal slots
+Video: 80x24 text, 600x200 pixel graphics
+Display: electroluminescent mono backlit (blue) LCD
+Mass storage: 2x 5.25" 360K floppies
+On board ports: serial, parallel
+Options: Modem, color video output
+
+
+Sanyo MBC-16
+============
+Links: 
+Info: In the MBC-16 I had, the graphics card had a Sanyo sticker on it, so I assume that was the original graphics card for the machine.
+Form Factor: Desktop
+CPU: 8088 @ 8MHz
+RAM: 640KB
+Bus: 3x ISA:	1)	ATI Graphics Solution SR https://sites.google.com/site/atiwonderseriesdatabase/
+Video: MDA/CGA/Plantronics
+Mass storage: 1 or 2 5.25" 360K floppies, MFM harddisk on hardcard or via seperate controller
+On board ports: serial, parallel, floppy
+
+
+Atari PC-3
+=======================
+Links: http://www.atari-computermuseum.de/pc1.htm , http://trelohra.blogspot.de/2015/06/atari-pc3.html , http://www.ataripc.net/pc3-8088/
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz or 8 MHz
+RAM: 640K
+Bus: 5x ISA:	1) Adaptec ACB-2072 RLL Controller Card
+Video: On-board MDA/CGA/Hercules/EGA
+Mass storage: 1x 5.25" 360K floppy + 30MB RLL harddisk
+On board ports: floppy, parallel, serial, mouse, speaker
+Options: 8087 maths CPU
+
+
+Eagle 1600
+==========
+Links: https://archive.org/details/bitsavers_eagleCompu00Brochure_9975235 , http://www.vcfed.org/forum/showthread.php?49510-Eagle-Computer-model-list , http://bitsavers.trailing-edge.com/pdf/eagleComputer/1600/1600_Series_Training_Notes.pdf
+Info:	Eagle 1620 - 8086/128K, 2 Quad density floppy drives, 4 Expansion slots available, ~1983, Eagle 1630 - 8086/128K, 1 Quad density floppy drive, 10MB HD, 3 Expansion Slots available (Same as 1620 with hard drive), ~1983Eagle 1640 - 8086/512K, 1 Quad density floppy drive, 32MB HD, 3 Expansion Slots available, ~1984
+		The native floppy format is 780K, 2 sides, 80 tracks/side, 1024 bytes/sector, 5 sectors per track. Standard 360K disks can be read 
+		Holding "T" and resetting starts a system diagnostics test
+Form Factor: Desktop
+CPU: 8086 @ 8 MHz
+RAM: 128K / 512K
+Bus: 8xISA:		1) SASI board, connects to a XEBEC Sl410 SASI => MFM bridge board
+				2) Floppy controller
+				3) empty
+				4) Video/graphics controller board
+				5) empty
+				6) empty
+				7) Serial board: 2x serial, one sync/async, one async only
+				8) Parallel board
+Video: 80x25 text mode, 720x352 pixel graphics mode
+Mass storage: 1x 5.25" QD 780K floppy and 1x 5.25" QD 820K floppy or 10/30MB MFM harddisk
+Options: 8087 maths CPU, EagleNet File server, EightPort serial card, High Resolution color board and video, Video Cassette Adapter board for 80MB backup on video cassette
+
+VTech Laser Turbo XT
+=======================
+Links: http://minuszerodegrees.net/manuals.htm#VTech , http://minuszerodegrees.net/manuals/VTech/VTech%20-%20Laser%20Turbo%20XT%20-%20Brochure.pdf
+Form Factor: Desktop
+CPU: 8088 @ 4.77 MHz or 10 MHz
+RAM: 512K / 640K, additionally 512K or 1M EMS on board
+Bus: 8xISA:		1) Monochrome graphics/color graphics card
+				2) Multi I/O Card (Floppy, 2x serial, parallel, game, RTC)
+				3) (optional) hard disk controller
+Video: MDA/CGA/Hercules
+Mass storage: 2x 5.25" 360K floppies and 1 or 2 harddisks (20MB / 30MB / 40MB)
+On board ports: speaker
+Options: 8087 maths CPU
+
+VTech Laser XT/3
+=======================
+Links: http://minuszerodegrees.net/manuals.htm#VTech , http://th99.classic-computing.de/src/v/U-Z/52547.htm
+Form Factor: Desktop
+CPU: 8088 @ 4.77MHz or 10 MHz
+RAM: 512K / 640K, additionally 512K or 1M EMS on board
+Bus: 8x ISA:	1) Monochrome graphics/color graphics card http://th99.classic-computing.de/src/v/U-Z/52547.htm , alternatively an EGA card
+				2) Multi I/O Card (Floppy, 2x serial, 1x parallel, game, RTC) http://th99.classic-computing.de/src/i/U-Z/52519.htm
+				3) (optional) hard disk controller
+Video: MDA/Hercules/CGA
+Mass storage: 2x 5.25" 360K or 1x 5.25" 360K and 1x 3.5" 720K, additional harddisk optional
+On board ports: speaker
+Options: 8087 maths CPU
 
 ***************************************************************************/
 
@@ -185,6 +387,31 @@ static MACHINE_CONFIG_START( pccga, pc_state )
 
 	/* software lists */
 	MCFG_SOFTWARE_LIST_ADD("disk_list","ibm5150")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( ncrpc4i, pc_state )
+	/* basic machine hardware */
+	MCFG_CPU_PC(pc8, pc8, I8088, 4772720)   /* 4,77 MHz */
+
+	MCFG_IBM5160_MOTHERBOARD_ADD("mb", "maincpu")
+	MCFG_DEVICE_INPUT_DEFAULTS(pccga)
+
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa1", pc_isa8_cards, "cga", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa2", pc_isa8_cards, "fdc_xt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa3", pc_isa8_cards, "lpt", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa4", pc_isa8_cards, "com", false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa5", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa6", pc_isa8_cards, nullptr, false)
+	MCFG_ISA8_SLOT_ADD("mb:isa", "isa7", pc_isa8_cards, nullptr, false)
+
+	/* keyboard */
+	MCFG_PC_KBDC_SLOT_ADD("mb:pc_kbdc", "kbd", pc_xt_keyboards, STR_KBD_IBM_PC_XT_83)
+	/* internal ram */
+	MCFG_RAM_ADD(RAM_TAG)
+	MCFG_RAM_DEFAULT_SIZE("640K")
+	MCFG_RAM_EXTRA_OPTIONS("64K, 128K, 256K, 512K")
+
+	/* software lists */
 MACHINE_CONFIG_END
 
 static DEVICE_INPUT_DEFAULTS_START( iskr3104 )
@@ -581,7 +808,7 @@ COMP( 1990, mc1702,     ibm5150,    0,          pccga,      pccga, driver_device
 
 COMP( 1987, zdsupers,   ibm5150,    0,          zenith,     pccga, driver_device,      0,      "Zenith Data Systems", "SuperSport", 0)
 COMP( 1985, sicpc1605,  ibm5150,    0,          siemens,    pccga, driver_device,      0,      "Siemens", "Sicomp PC16-05", MACHINE_NOT_WORKING)
-COMP( 1985, ncrpc4i,    ibm5150,    0,          pccga,      pccga, driver_device,      0,      "NCR","PC4i", MACHINE_NOT_WORKING)
+COMP( 1985, ncrpc4i,    ibm5150,    0,          ncrpc4i,    pccga, driver_device,      0,      "NCR","PC4i", MACHINE_NOT_WORKING)
 
 COMP( 198?, olivm15,    ibm5150,    0,          m15,        pccga, driver_device,      0,      "Olivetti", "M15", 0)
 
