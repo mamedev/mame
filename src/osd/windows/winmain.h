@@ -71,7 +71,8 @@
 #define WINOPTION_PHOSPHOR_MODE             "phosphor_mode"
 #define WINOPTION_PHOSPHOR_TIME             "phosphor_time"
 #define WINOPTION_PHOSPHOR_BETA             "phosphor_beta"
-#define WINOPTION_LCD_PERSISTENCE           "lcd_persistence"
+#define WINOPTION_LCD_RISE_TIME             "lcd_rise_time"
+#define WINOPTION_LCD_FALL_TIME             "lcd_fall_time"
 #define WINOPTION_SATURATION                "saturation"
 #define WINOPTION_YIQ_ENABLE                "yiq_enable"
 #define WINOPTION_YIQ_JITTER                "yiq_jitter"
@@ -203,7 +204,8 @@ public:
 	int screen_phosphor_mode() const { return int_value(WINOPTION_PHOSPHOR_MODE); }
 	const char* screen_phosphor_time() const { return value(WINOPTION_PHOSPHOR_TIME); }
 	const char* screen_phosphor_beta() const { return value(WINOPTION_PHOSPHOR_BETA); }
-	float screen_lcd_persistence() const { return float_value(WINOPTION_LCD_PERSISTENCE); }
+	const char* screen_lcd_rise_time() const { return value(WINOPTION_LCD_RISE_TIME); }
+	const char* screen_lcd_fall_time() const { return value(WINOPTION_LCD_FALL_TIME); }
 	float screen_saturation() const { return float_value(WINOPTION_SATURATION); }
 
 	// full screen options

@@ -81,7 +81,8 @@ public:
 		CU_PHOSPHOR_TIME,
 		CU_PHOSPHOR_BETA,
 
-		CU_LCD_PERSISTENCE,
+		CU_LCD_RISE_TIME,
+		CU_LCD_FALL_TIME,
 
 		CU_POST_VIGNETTING,
 		CU_POST_DISTORTION,
@@ -210,7 +211,8 @@ struct hlsl_options
 	int                     phosphor_mode;
 	float                   phosphor_time[3];
 	float                   phosphor_beta[3];
-	float                   lcd_persistence;
+	float                   lcd_rise_time[3];
+	float                   lcd_fall_time[3];
 	float                   saturation;
 
 	// NTSC
@@ -339,6 +341,7 @@ private:
 	int                     deconverge_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     defocus_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
+	int                     ghosting_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     post_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum, bool prepare_bloom);
 	int                     downsample_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
 	int                     bloom_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum);
@@ -388,6 +391,7 @@ private:
 	effect *                distortion_effect;          // pointer to the distortion-effect object
 	effect *                focus_effect;               // pointer to the focus-effect object
 	effect *                phosphor_effect;            // pointer to the phosphor-effect object
+	effect *                ghosting_effect;            // pointer te the LCD ghosting effect object
 	effect *                deconverge_effect;          // pointer to the deconvergence-effect object
 	effect *                color_effect;               // pointer to the color-effect object
 	effect *                ntsc_effect;                // pointer to the NTSC effect object
