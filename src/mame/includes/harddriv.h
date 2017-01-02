@@ -393,6 +393,12 @@ protected:
 	uint8_t                   m_st68k_sloop_bank;
 	offs_t                  m_st68k_last_alt_sloop_offset;
 
+	uint8_t                   m_sel_select;
+	uint8_t                   m_sel1_data;
+	uint8_t                   m_sel2_data;
+	uint8_t                   m_sel3_data;
+	uint8_t                   m_sel4_data;
+
 	#define MAX_MSP_SYNC    16
 	uint32_t *                m_dataptr[MAX_MSP_SYNC];
 	uint32_t                  m_dataval[MAX_MSP_SYNC];
