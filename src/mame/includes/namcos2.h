@@ -124,9 +124,9 @@ public:
 	optional_device<cpu_device> m_dspmaster;
 	optional_device<cpu_device> m_dspslave;
 	optional_device<m37450_device> m_c68;
-	required_device<namco_c148_device> m_master_intc;
-	required_device<namco_c148_device> m_slave_intc;
-	required_device<namco_c139_device> m_sci;
+	optional_device<namco_c148_device> m_master_intc;
+	optional_device<namco_c148_device> m_slave_intc;
+	optional_device<namco_c139_device> m_sci;
 	optional_device<cpu_device> m_gpu; //to be moved to namco21_state after disentangling
 
 	// game type helpers
