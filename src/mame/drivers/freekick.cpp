@@ -961,17 +961,17 @@ ROM_END
 
 /*
 
-The original Counter Run set doesn't work, it's missing the main CPU code which is inside a custom CPU "block"
-just like the original Freekick boards. Hopefully an original Counter Run board can be found and dumped (using
-the same method as used for Freekick) before they all die, batteries don't last for ever :-(
+The original Counter Run is missing the main CPU code which is inside a custom CPU "block"
+just like the original Freekick boards so we use the bootleg CPU for now.Hopefully an original Counter Run board
+can be found and dumped (using the same method as used for Freekick) before they all die, batteries don't last for ever :-(
 
 */
 
 ROM_START( countrun )
 	ROM_REGION( 0x10000, "maincpu", 0 ) /* Z80 Code */
-	//  Custom CPU (pack) No. NS6201-A 1988.3 COUNTER RUN
-	ROM_LOAD( "ns6201-a_1988.3_counter_run.cpu", 0x00000, 0x10000, NO_DUMP ) // Need to find a working PCB module to dump!!
-
+	// Use the bootleg CPU from set 1 for now until the proper CPU for this set is dumped
+        ROM_LOAD( "rom_cpu.bin", 0x00000, 0x10000, BAD_DUMP CRC(f65639ae) SHA1(faa81607858d49559098c887ac847722df955a76) )
+	
 	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
 	ROM_LOAD( "c-run.e1", 0x00000, 0x08000, CRC(2c3b6f8f) SHA1(ee7d71e6d8bb7138d5d029a10a95471d387b5f29) ) // rom 1
 
@@ -1229,6 +1229,6 @@ GAME( 1987, freekicka, freekick, freekickb, freekck,  driver_device, 0,        R
 GAME( 1987, freekickb1,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1987, freekickb2,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 2)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1987, freekickb3,freekick, freekickb, freekck,  driver_device, 0,        ROT270, "bootleg",                      "Free Kick (bootleg set 3)",  MACHINE_SUPPORTS_SAVE )
-GAME( 1988, countrun,  0,        freekickb, countrun, driver_device, 0,        ROT0,   "Nihon System (Sega license)",  "Counter Run (NS6201-A 1988.3)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE ) // CPU module not dumped
+GAME( 1988, countrun,  0,        freekickb, countrun, driver_device, 0,        ROT0,   "Nihon System (Sega license)",  "Counter Run (NS6201-A 1988.3)", MACHINE_SUPPORTS_SAVE ) // CPU module not dumped
 GAME( 1988, countrunb, countrun, freekickb, countrun, driver_device, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 1)",  MACHINE_SUPPORTS_SAVE )
 GAME( 1988, countrunb2,countrun, freekickb, countrun, driver_device, 0,        ROT0,   "bootleg",                      "Counter Run (bootleg set 2)",  MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
