@@ -143,14 +143,11 @@ WRITE8_MEMBER(crshrace_state::crshrace_sh_bankswitch_w)
 	m_z80bank->set_entry(data & 0x03);
 }
 
-WRITE16_MEMBER(crshrace_state::sound_command_w)
+WRITE8_MEMBER(crshrace_state::sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_pending_command = 1;
+	m_soundlatch->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
 CUSTOM_INPUT_MEMBER(crshrace_state::country_sndpending_r)
@@ -162,7 +159,6 @@ WRITE8_MEMBER(crshrace_state::pending_command_clear_w)
 {
 	m_pending_command = 0;
 }
-
 
 
 static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
@@ -180,7 +176,7 @@ static ADDRESS_MAP_START( crshrace_map, AS_PROGRAM, 16, crshrace_state )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_WRITE8(sound_command_w, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
