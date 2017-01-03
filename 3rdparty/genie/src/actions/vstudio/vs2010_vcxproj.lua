@@ -1214,7 +1214,7 @@
 			_p(4, 'Description="' .. prj.name .. '"')
 			_p(4, 'ForegroundText="light"')
 			_p(4, 'BackgroundColor="transparent">')
-			_p(4, '<m3:SplashScreen Image="' .. prj.name .. '\\SplashScreen.png"')
+			_p(4, '<m3:SplashScreen Image="' .. prj.name .. '\\SplashScreen.png" />')
 			png1x1(prj, "%%/SplashScreen.png")
 			_p(3, '</m3:VisualElements>')
 		end

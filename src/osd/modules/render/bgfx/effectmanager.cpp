@@ -12,12 +12,12 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include "emu.h"
-
-#include <bgfx/bgfxplatform.h>
-#include <bgfx/bgfx.h>
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
+
+#include "emu.h"
+
+#include <bgfx/bgfx.h>
 
 #include "effectmanager.h"
 #include "effectreader.h"

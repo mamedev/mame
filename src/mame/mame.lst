@@ -29597,7 +29597,8 @@ pbaction4                       // (c) 1985 Tehkan
 pbaction5                       // (c) 1985 Tehkan
 
 @source:pc.cpp
-ataripc3                        //
+ataripc1						// Atari PC1 
+ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
 dgone                           // 1984 Data General/One
@@ -30389,6 +30390,7 @@ pet8032                         //
 superpet                        //
 
 @source:peyper.cpp
+ator                            //
 gamatros                        //
 hangonp                         //
 lancelot                        //
@@ -31701,6 +31703,8 @@ rltennis                        // (c) 1993 TCH
 
 @source:rm380z.cpp
 rm380z                          //
+rm380z34d                       //
+rm380z34e                       //
 
 @source:rmhaihai.cpp
 rmhaihai                        // (c) 1985 Alba

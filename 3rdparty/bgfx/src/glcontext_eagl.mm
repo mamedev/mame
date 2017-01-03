@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -122,7 +122,8 @@ namespace bgfx { namespace gl
 
 		void resize(GLint _width, GLint _height)
 		{
-			if(m_width == _width && m_height == _height)
+			if (m_width  == _width
+			&&  m_height == _height)
 			{
 				return;
 			}

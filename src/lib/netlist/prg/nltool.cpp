@@ -346,7 +346,7 @@ static void listdevices(tool_options_t &opts)
 	if (opts.opt_quiet())
 		nt.log().warning.set_enabled(false);
 
-	netlist::factory_list_t &list = nt.setup().factory();
+	netlist::factory::list_t &list = nt.setup().factory();
 
 	nt.setup().register_source(plib::make_unique_base<netlist::source_t,
 			netlist::source_proc_t>(nt.setup(), "dummy", &netlist_dummy));
@@ -363,6 +363,7 @@ static void listdevices(tool_options_t &opts)
 		pstring out = plib::pfmt("{1} {2}(<id>")(f->classname(),"-20")(f->name());
 		std::vector<pstring> terms;
 
+		f->macro_actions(nt.setup().netlist(), f->name() + "_lc");
 		auto d = f->Create(nt.setup().netlist(), f->name() + "_lc");
 		// get the list of terminals ...
 
@@ -381,10 +382,12 @@ static void listdevices(tool_options_t &opts)
 			if (t.first.startsWith(d->name()))
 			{
 				pstring tn(t.first.substr(d->name().len()+1));
+				//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), tn.c_str());
 				if (tn.find(".") == tn.end())
 				{
 					terms.push_back(tn);
 					pstring resolved = nt.setup().resolve_alias(t.first);
+					//printf("\t%s %s %s\n", t.first.c_str(), t.second.c_str(), resolved.c_str());
 					if (resolved != t.first)
 					{
 						auto found = std::find(terms.begin(), terms.end(), resolved.substr(d->name().len()+1));
@@ -395,18 +398,13 @@ static void listdevices(tool_options_t &opts)
 			}
 		}
 
-		if (f->param_desc().startsWith("+"))
+		out += "," + f->param_desc();
+		for (auto p : plib::pstring_vector_t(f->param_desc(),",") )
 		{
-			out += "," + f->param_desc().substr(1);
-			terms.clear();
-		}
-		else if (f->param_desc() == "-")
-		{
-			/* no params at all */
-		}
-		else
-		{
-			out += "," + f->param_desc();
+			if (p.startsWith("+"))
+			{
+				plib::container::remove(terms, p.substr(1));
+			}
 		}
 		out += ")";
 		printf("%s\n", out.c_str());
@@ -415,7 +413,7 @@ static void listdevices(tool_options_t &opts)
 			pstring t = "";
 			for (auto & j : terms)
 				t += "," + j;
-			printf("Terminals: %s\n", t.substr(1).c_str());
+			printf("\tTerminals: %s\n", t.substr(1).c_str());
 		}
 		devs.push_back(std::move(d));
 	}

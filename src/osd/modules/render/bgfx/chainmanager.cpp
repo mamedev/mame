@@ -9,6 +9,9 @@
 //
 //============================================================
 
+#include <bx/readerwriter.h>
+#include <bx/crtimpl.h>
+
 #include "emu.h"
 #include "../frontend/mame/ui/slider.h"
 
@@ -18,8 +21,6 @@
 #include <rapidjson/document.h>
 #include <rapidjson/error/en.h>
 
-#include <bx/readerwriter.h>
-#include <bx/crtimpl.h>
 #include "bgfxutil.h"
 
 #include "chainmanager.h"

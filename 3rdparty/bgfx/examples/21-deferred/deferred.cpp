@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -159,7 +159,7 @@ static const uint16_t s_cubeIndices[36] =
 
 void screenSpaceQuad(float _textureWidth, float _textureHeight, float _texelHalf, bool _originBottomLeft, float _width = 1.0f, float _height = 1.0f)
 {
-	if (bgfx::checkAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
+	if (3 == bgfx::getAvailTransientVertexBuffer(3, PosTexCoord0Vertex::ms_decl) )
 	{
 		bgfx::TransientVertexBuffer vb;
 		bgfx::allocTransientVertexBuffer(&vb, 3, PosTexCoord0Vertex::ms_decl);
@@ -578,7 +578,7 @@ class ExampleDeferred : public entry::AppI
 					lightPosRadius.m_radius = 2.0f;
 
 					Aabb aabb;
-					sphereToAabb(aabb, lightPosRadius);
+					toAabb(aabb, lightPosRadius);
 
 					float box[8][3] =
 					{
@@ -686,8 +686,8 @@ class ExampleDeferred : public entry::AppI
 						bgfx::setUniform(u_mtx, invMvp);
 						const uint16_t scissorHeight = uint16_t(y1-y0);
 						bgfx::setScissor(uint16_t(x0), m_height-scissorHeight-uint16_t(y0), uint16_t(x1-x0), scissorHeight);
-						bgfx::setTexture(0, s_normal, m_gbuffer, 1);
-						bgfx::setTexture(1, s_depth,  m_gbuffer, 2);
+						bgfx::setTexture(0, s_normal, bgfx::getTexture(m_gbuffer, 1) );
+						bgfx::setTexture(1, s_depth,  bgfx::getTexture(m_gbuffer, 2) );
 						bgfx::setState(0
 								| BGFX_STATE_RGB_WRITE
 								| BGFX_STATE_ALPHA_WRITE
@@ -699,8 +699,8 @@ class ExampleDeferred : public entry::AppI
 				}
 
 				// Combine color and light buffers.
-				bgfx::setTexture(0, s_albedo, m_gbuffer,     0);
-				bgfx::setTexture(1, s_light,  m_lightBuffer, 0);
+				bgfx::setTexture(0, s_albedo, bgfx::getTexture(m_gbuffer,     0) );
+				bgfx::setTexture(1, s_light,  bgfx::getTexture(m_lightBuffer, 0) );
 				bgfx::setState(0
 						| BGFX_STATE_RGB_WRITE
 						| BGFX_STATE_ALPHA_WRITE

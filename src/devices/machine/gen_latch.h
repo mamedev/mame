@@ -46,12 +46,13 @@ public:
 
 protected:
 	virtual void device_start() override;
+	virtual void device_reset() override;
 
-	bool is_latch_read() const { return m_latch_read; }
-	void set_latch_read(bool latch_read);
+	bool is_latch_written() const { return m_latch_written; }
+	void set_latch_written(bool latch_written);
 
 private:
-	bool                    m_latch_read;
+	bool                    m_latch_written;
 	devcb_write_line        m_data_pending_cb;				
 };
 

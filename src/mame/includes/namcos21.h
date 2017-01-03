@@ -54,7 +54,8 @@ public:
 		m_ptrom24(*this,"point24"),
 		m_ptrom16(*this,"point16"),
 		m_dsp(*this, "dsp"),
-		m_io_gearbox(*this, "gearbox")
+		m_io_gearbox(*this, "gearbox"),
+		m_gpu_intc(*this, "gpu_intc")
 		{ }
 
 	optional_shared_ptr<uint16_t> m_winrun_dspbios;
@@ -68,8 +69,10 @@ public:
 
 	optional_device<cpu_device> m_dsp;
 	optional_device<namcoio_gearbox_device> m_io_gearbox;
+	optional_device<namco_c148_device> m_gpu_intc;
 	
 	std::unique_ptr<uint8_t[]> m_videoram;
+	std::unique_ptr<uint8_t[]> m_maskram;
 	std::unique_ptr<uint16_t[]> m_winrun_dspcomram;
 	uint16_t m_winrun_poly_buf[WINRUN_MAX_POLY_PARAM];
 	int m_winrun_poly_index;
@@ -134,10 +137,6 @@ public:
 	DECLARE_WRITE16_MEMBER(namcos2_68k_dualportram_word_w);
 	DECLARE_READ8_MEMBER(namcos2_dualportram_byte_r);
 	DECLARE_WRITE8_MEMBER(namcos2_dualportram_byte_w);
-	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_buffer_w);
-	DECLARE_READ16_MEMBER(NAMCO_C139_SCI_buffer_r);
-	DECLARE_WRITE16_MEMBER(NAMCO_C139_SCI_register_w);
-	DECLARE_READ16_MEMBER(NAMCO_C139_SCI_register_r);
 	DECLARE_READ16_MEMBER(winrun_dspcomram_r);
 	DECLARE_WRITE16_MEMBER(winrun_dspcomram_w);
 	DECLARE_READ16_MEMBER(winrun_cuskey_r);
@@ -159,9 +158,12 @@ public:
 	DECLARE_WRITE16_MEMBER(winrun_gpu_register_w);
 	DECLARE_WRITE16_MEMBER(winrun_gpu_videoram_w);
 	DECLARE_READ16_MEMBER(winrun_gpu_videoram_r);
+		
+	TIMER_DEVICE_CALLBACK_MEMBER(screen_scanline);
 
 	uint8_t m_gearbox_state;
 	DECLARE_CUSTOM_INPUT_MEMBER(driveyes_gearbox_r);
+	
 	DECLARE_DRIVER_INIT(driveyes);
 	DECLARE_DRIVER_INIT(winrun);
 	DECLARE_DRIVER_INIT(starblad);
@@ -176,6 +178,7 @@ public:
 	void allocate_poly_framebuffer();
 	void clear_poly_framebuffer();
 	void copy_visible_poly_framebuffer(bitmap_ind16 &bitmap, const rectangle &clip, int zlo, int zhi);
+	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void renderscanline_flat(const edge *e1, const edge *e2, int sy, unsigned color, int depthcueenable);
 	void rendertri(const n21_vertex *v0, const n21_vertex *v1, const n21_vertex *v2, unsigned color, int depthcueenable);
 	void draw_quad(int sx[4], int sy[4], int zcode[4], int color);
@@ -187,6 +190,5 @@ public:
 	int init_dsp();
 	void render_slave_output(uint16_t data);
 	void winrun_flush_poly();
-	void winrun_bitmap_draw(bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void init(int game_type);
 };

@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -64,6 +64,16 @@ class ExampleHelloWorld : public entry::AppI
 							 );
 			bgfx::dbgTextPrintf(0, 1, 0x4f, "bgfx/examples/00-helloworld");
 			bgfx::dbgTextPrintf(0, 2, 0x6f, "Description: Initialization and debug text.");
+
+			bgfx::dbgTextPrintf(0, 4, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
+
+			const bgfx::Stats* stats = bgfx::getStats();
+			bgfx::dbgTextPrintf(0, 6, 0x0f, "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters."
+					, stats->width
+					, stats->height
+					, stats->textWidth
+					, stats->textHeight
+					);
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.

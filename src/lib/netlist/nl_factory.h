@@ -17,32 +17,31 @@
 #include "plib/putil.h"
 #include "nl_base.h"
 
-#define NETLIB_DEVICE_IMPL(chip) factory_creator_ptr_t decl_ ## chip = factory_creator_t< NETLIB_NAME(chip) >;
+#define NETLIB_DEVICE_IMPL(chip) factory::constructor_ptr_t decl_ ## chip = factory::constructor_t< NETLIB_NAME(chip) >;
 
-namespace netlist
+namespace netlist { namespace factory
 {
 	// -----------------------------------------------------------------------------
 	// net_dev class factory
 	// -----------------------------------------------------------------------------
 
-	class base_factory_t
+	class element_t
 	{
-		P_PREVENT_COPYING(base_factory_t)
+		P_PREVENT_COPYING(element_t)
 	public:
-		base_factory_t(const pstring &name, const pstring &classname,
+		element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: m_name(name), m_classname(classname), m_def_param(def_param)
 		{}
 
-		virtual ~base_factory_t() {}
+		virtual ~element_t() {}
 
 		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
+		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {};
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
 		const pstring &param_desc() const { return m_def_param; }
-		const plib::pstring_vector_t term_param_list();
-		const plib::pstring_vector_t def_params();
 
 	protected:
 		pstring m_name;                             /* device name */
@@ -51,13 +50,13 @@ namespace netlist
 	};
 
 	template <class C>
-	class factory_t : public base_factory_t
+	class device_element_t : public element_t
 	{
-		P_PREVENT_COPYING(factory_t)
+		P_PREVENT_COPYING(device_element_t)
 	public:
-		factory_t(const pstring &name, const pstring &classname,
+		device_element_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
-		: base_factory_t(name, classname, def_param) { }
+		: element_t(name, classname, def_param) { }
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
 		{
@@ -65,20 +64,20 @@ namespace netlist
 		}
 	};
 
-	class factory_list_t : public std::vector<std::unique_ptr<base_factory_t>>
+	class list_t : public std::vector<std::unique_ptr<element_t>>
 	{
 	public:
-		factory_list_t(setup_t &m_setup);
-		~factory_list_t();
+		list_t(setup_t &m_setup);
+		~list_t();
 
 		template<class device_class>
 		void register_device(const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		{
-			register_device(std::unique_ptr<base_factory_t>(new factory_t<device_class>(name, classname, def_param)));
+			register_device(std::unique_ptr<element_t>(new device_element_t<device_class>(name, classname, def_param)));
 		}
 
-		void register_device(std::unique_ptr<base_factory_t> factory)
+		void register_device(std::unique_ptr<element_t> factory)
 		{
 			for (auto & e : *this)
 				if (e->name() == factory->name())
@@ -86,12 +85,12 @@ namespace netlist
 			push_back(std::move(factory));
 		}
 
-		base_factory_t * factory_by_name(const pstring &devname);
+		element_t * factory_by_name(const pstring &devname);
 
 		template <class C>
-		bool is_class(base_factory_t *f)
+		bool is_class(element_t *f)
 		{
-			return dynamic_cast<factory_t<C> *>(f) != nullptr;
+			return dynamic_cast<device_element_t<C> *>(f) != nullptr;
 		}
 
 	private:
@@ -104,16 +103,49 @@ namespace netlist
 	// factory_creator_ptr_t
 	// -----------------------------------------------------------------------------
 
-	using factory_creator_ptr_t = std::unique_ptr<base_factory_t> (*)(const pstring &name, const pstring &classname,
+	using constructor_ptr_t = std::unique_ptr<element_t> (*)(const pstring &name, const pstring &classname,
 			const pstring &def_param);
 
 	template <typename T>
-	std::unique_ptr<base_factory_t> factory_creator_t(const pstring &name, const pstring &classname,
+	std::unique_ptr<element_t> constructor_t(const pstring &name, const pstring &classname,
 			const pstring &def_param)
 	{
-		return std::unique_ptr<base_factory_t>(new factory_t<T>(name, classname, def_param));
+		return std::unique_ptr<element_t>(new device_element_t<T>(name, classname, def_param));
 	}
 
-}
+	// -----------------------------------------------------------------------------
+	// factory_lib_entry_t: factory class to wrap macro based chips/elements
+	// -----------------------------------------------------------------------------
+
+	class library_element_t : public element_t
+	{
+		P_PREVENT_COPYING(library_element_t)
+	public:
+
+		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
+				const pstring &def_param)
+		: element_t(name, classname, def_param), m_setup(setup) {  }
+
+		class wrapper : public device_t
+		{
+		public:
+			wrapper(netlist_t &anetlist, const pstring &name)
+			: device_t(anetlist, name)
+			{
+			}
+		protected:
+			NETLIB_RESETI() { }
+			NETLIB_UPDATEI() { }
+		};
+
+		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
+
+		void macro_actions(netlist_t &anetlist, const pstring &name) override;
+
+	private:
+		setup_t &m_setup;
+	};
+
+} }
 
 #endif /* NLFACTORY_H_ */

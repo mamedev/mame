@@ -3,7 +3,7 @@
 #include "machine/c117.h"
 #include "sound/dac.h"
 #include "sound/namco.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 class namcos1_state : public driver_device
 {

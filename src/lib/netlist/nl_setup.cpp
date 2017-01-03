@@ -103,27 +103,17 @@ void setup_t::namespace_pop()
 
 void setup_t::register_lib_entry(const pstring &name)
 {
-	if (plib::container::contains(m_lib, name))
-		log().warning("Lib entry collection already contains {1}. IGNORED", name);
-	else
-		m_lib.push_back(name);
+	factory().register_device(plib::make_unique_base<factory::element_t, factory::library_element_t>(*this, name, name, ""));
 }
 
 void setup_t::register_dev(const pstring &classname, const pstring &name)
 {
-	if (plib::container::contains(m_lib, classname))
-	{
-		namespace_push(name);
-		include(classname);
-		namespace_pop();
-	}
-	else
-	{
-		auto f = factory().factory_by_name(classname);
-		if (f == nullptr)
-			log().fatal("Class {1} not found!\n", classname);
-		m_device_factory.push_back(std::pair<pstring, base_factory_t *>(build_fqn(name), f));
-	}
+	auto f = factory().factory_by_name(classname);
+	if (f == nullptr)
+		log().fatal("Class {1} not found!\n", classname);
+	/* make sure we parse macro library entries */
+	f->macro_actions(netlist(), build_fqn(name));
+	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
 bool setup_t::device_exists(const pstring name) const
@@ -165,7 +155,7 @@ void setup_t::register_dippins_arr(const pstring &terms)
 {
 	plib::pstring_vector_t list(terms,", ");
 	if (list.size() == 0 || (list.size() % 2) == 1)
-		log().fatal("You must pass an equal number of pins to DIPPINS");
+		log().fatal("You must pass an equal number of pins to DIPPINS {1}" , build_fqn(""));
 	std::size_t n = list.size();
 	for (std::size_t i = 0; i < n / 2; i++)
 	{
@@ -349,7 +339,7 @@ const pstring setup_t::resolve_alias(const pstring &name) const
 		ret = temp;
 		auto p = m_alias.find(ret);
 		temp = (p != m_alias.end() ? p->second : "");
-	} while (temp != "");
+	} while (temp != "" && temp != ret);
 
 	log().debug("{1}==>{2}\n", name, ret);
 	return ret;
@@ -1040,7 +1030,8 @@ std::unique_ptr<plib::pistream> setup_t::get_data_stream(const pstring name)
 				return strm;
 		}
 	}
-	log().fatal("unable to find data named {1} in source collection", name);
+	//log().fatal("unable to find data named {1} in source collection", name);
+	log().warning("unable to find data named {1} in source collection", name);
 	return std::unique_ptr<plib::pistream>(nullptr);
 }
 

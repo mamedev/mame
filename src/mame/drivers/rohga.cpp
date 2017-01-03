@@ -7,6 +7,7 @@
     Rogha Armour Attack         (c) 1991 Data East Corporation
     Wizard Fire                 (c) 1992 Data East Corporation
     Nitro Ball/Gun Ball         (c) 1992 Data East Corporation
+    Hangzo (prototype)          (c) 1992 Hot-B
     Schmeiser Robo              (c) 1993 Hot-B
 
     This hardware is capable of alpha-blending on sprites and playfields
@@ -729,8 +730,8 @@ static INPUT_PORTS_START( hangzo )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

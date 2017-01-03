@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -8,6 +8,7 @@
 
 #include "bx.h"
 #include "fpumath.h"
+#include "uint32_t.h"
 
 namespace bx
 {
@@ -94,36 +95,47 @@ namespace bx
 	};
 
 	/// Returns random number between 0.0f and 1.0f.
-	template <typename Ty>
-	inline float frnd(Ty* _rng)
+	template <typename Rng>
+	inline float frnd(Rng* _rng)
 	{
 		uint32_t rnd = _rng->gen() & UINT16_MAX;
 		return float(rnd) * 1.0f/float(UINT16_MAX);
 	}
 
 	/// Returns random number between -1.0f and 1.0f.
-	template <typename Ty>
-	inline float frndh(Ty* _rng)
+	template <typename Rng>
+	inline float frndh(Rng* _rng)
 	{
 		return 2.0f * bx::frnd(_rng) - 1.0f;
 	}
 
-	/// Generate random point on unit sphere.
-	template <typename Ty>
-	static inline void randUnitSphere(float _result[3], Ty* _rng)
+	/// Generate random point on unit circle.
+	template <typename Rng>
+	inline void randUnitCircle(float _result[3], Rng* _rng)
 	{
-		float rand0 = frnd(_rng) * 2.0f - 1.0f;
-		float rand1 = frnd(_rng) * pi * 2.0f;
+		const float angle = frnd(_rng) * pi * 2.0f;
 
-		float sqrtf1 = sqrtf(1.0f - rand0*rand0);
-		_result[0] = sqrtf1 * cosf(rand1);
-		_result[1] = sqrtf1 * sinf(rand1);
+		_result[0] = fcos(angle);
+		_result[1] = 0.0f;
+		_result[2] = fsin(angle);
+	}
+
+	/// Generate random point on unit sphere.
+	template <typename Rng>
+	inline void randUnitSphere(float _result[3], Rng* _rng)
+	{
+		const float rand0  = frnd(_rng) * 2.0f - 1.0f;
+		const float rand1  = frnd(_rng) * pi * 2.0f;
+		const float sqrtf1 = fsqrt(1.0f - rand0*rand0);
+
+		_result[0] = sqrtf1 * fcos(rand1);
+		_result[1] = sqrtf1 * fsin(rand1);
 		_result[2] = rand0;
 	}
 
 	/// Generate random point on unit hemisphere.
 	template <typename Ty>
-	static inline void randUnitHemisphere(float _result[3], Ty* _rng, const float _normal[3])
+	inline void randUnitHemisphere(float _result[3], Ty* _rng, const float _normal[3])
 	{
 		float dir[3];
 		randUnitSphere(dir, _rng);
@@ -148,7 +160,7 @@ namespace bx
 	/// Sampling with Hammersley and Halton Points
 	/// http://www.cse.cuhk.edu.hk/~ttwong/papers/udpoint/udpoints.html
 	///
-	static inline void generateSphereHammersley(void* _data, uint32_t _stride, uint32_t _num, float _scale = 1.0f)
+	inline void generateSphereHammersley(void* _data, uint32_t _stride, uint32_t _num, float _scale = 1.0f)
 	{
 		uint8_t* data = (uint8_t*)_data;
 
@@ -164,16 +176,29 @@ namespace bx
 
 			tt = 2.0f * tt - 1.0f;
 
-			const float phi = (ii + 0.5f) / _num;
+			const float phi    = (ii + 0.5f) / _num;
 			const float phirad =  phi * 2.0f * pi;
-			const float st = sqrtf(1.0f-tt*tt) * _scale;
+			const float st     = fsqrt(1.0f-tt*tt) * _scale;
 
 			float* xyz = (float*)data;
 			data += _stride;
 
-			xyz[0] = st * cosf(phirad);
-			xyz[1] = st * sinf(phirad);
+			xyz[0] = st * fcos(phirad);
+			xyz[1] = st * fsin(phirad);
 			xyz[2] = tt * _scale;
+		}
+	}
+
+	/// Fisher-Yates shuffle.
+	template<typename Rng, typename Ty>
+	inline void shuffle(Rng* _rng, Ty* _array, uint32_t _num)
+	{
+		BX_CHECK(_num != 0, "Number of elements can't be 0!");
+
+		for (uint32_t ii = 0, num = _num-1; ii < num; ++ii)
+		{
+			uint32_t jj = ii + 1 + _rng->gen() % (num - ii);
+			bx::xchg(_array[ii], _array[jj]);
 		}
 	}
 

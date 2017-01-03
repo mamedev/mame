@@ -413,45 +413,6 @@ namespace netlist
 		state_var<netlist_sig_t> m_last_state;
 	};
 
-	// -----------------------------------------------------------------------------
-	// factory class to wrap macro based chips/elements
-	// -----------------------------------------------------------------------------
-
-	class factory_lib_entry_t : public base_factory_t
-	{
-		P_PREVENT_COPYING(factory_lib_entry_t)
-	public:
-
-		factory_lib_entry_t(setup_t &setup, const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: base_factory_t(name, classname, def_param), m_setup(setup) {  }
-
-		class wrapper : public device_t
-		{
-		public:
-			wrapper(const pstring &devname, netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name), m_devname(devname)
-			{
-				anetlist.setup().namespace_push(name);
-				anetlist.setup().include(m_devname);
-				anetlist.setup().namespace_pop();
-			}
-		protected:
-			NETLIB_RESETI() { }
-			NETLIB_UPDATEI() { }
-
-			pstring m_devname;
-		};
-
-		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override
-		{
-			return plib::owned_ptr<device_t>::Create<wrapper>(this->name(), anetlist, name);
-		}
-
-	private:
-		setup_t &m_setup;
-	};
-
 	} //namespace devices
 } // namespace netlist
 
