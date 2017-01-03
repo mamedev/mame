@@ -170,12 +170,18 @@ static MACHINE_CONFIG_START( rm380z, rm380z_state )
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(rm380z_state, keyboard_put))
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( rm480z, rm380z )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(64*8, 24*11)
+	MCFG_SCREEN_VISIBLE_AREA(0, 64*8-1, 0, 24*11-1)
+	MCFG_SCREEN_UPDATE_DRIVER(rm380z_state, screen_update_rm480z)
+MACHINE_CONFIG_END
 
 
 /* ROM definitions */
 
 ROM_START( rm380z34d )
-	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )	
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
 	ROM_LOAD( "cos34d-f.bin", 0x0000, 0x1000, CRC(eb128b40) SHA1(c46f358fb76459987e41750d052995563f2f7d53))
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "chargen", 0 )
@@ -199,15 +205,22 @@ ROM_START( rm380z )
 	// chargen ROM is undumped, afaik
 	ROM_REGION( 0x1680, "chargen", 0 )
 	ROM_LOAD( "ch3.raw", 0x0000, 0x1680, BAD_DUMP CRC(c223622b) SHA1(185ef24896419d7ff46f71a760ac217de3811684))
-	// The characters on the 480Z are very close (or identical) to the 380Z ones
-	//ROM_REGION( 0x2000, "chargen", 0 )
-	//ROM_LOAD( "CG06.BIN", 0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289))
+ROM_END
+
+ROM_START( rm480z )
+	ROM_REGION( 0x10000, RM380Z_MAINCPU_TAG, 0 )
+	ROM_LOAD( "cos40b-m.bin", 0x0000, 0x1000, CRC(1f0b3a5c) SHA1(0b29cb2a3b7eaa3770b34f08c4fd42844f42700f))
+	ROM_LOAD( "cos40b-m_f600-f9ff.bin", 0x1000, 0x400, CRC(e3397d9d) SHA1(490a0c834b0da392daf782edc7d51ca8f0668b1a))
+	ROM_LOAD( "cos40b-m_1c00-1dff.bin", 0x1400, 0x200, CRC(0f759f44) SHA1(9689c1c1faa62c56def999cbedbbb0c8d928dcff))
+	ROM_REGION( 0x2000, "chargen", 0 )
+	ROM_LOAD( "cg06.bin", 0x0000, 0x2000, CRC(15d40f7e) SHA1(a7266357eb9be849f77a97ff3013b236c0af8289) )
 ROM_END
 
 
 /* Driver */
 /*   YEAR  NAME        PARENT    COMPAT   MACHINE     INPUT     CLASS            INIT        COMPANY                 FULLNAME */
-COMP(1978, rm380z,       0,        0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B", MACHINE_NO_SOUND_HW)
+COMP(1978, rm380z,      0,         0,     rm380z,     rm380z,   rm380z_state,    rm380z,     "Research Machines",    "RM-380Z, COS 4.0B", MACHINE_NO_SOUND_HW)
 COMP(1978, rm380z34d,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34d,  "Research Machines",    "RM-380Z, COS 3.4D", MACHINE_BTANB_FLAGS)
 COMP(1978, rm380z34e,   rm380z,    0,     rm380z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "RM-380Z, COS 3.4E", MACHINE_BTANB_FLAGS)
+COMP(1981, rm480z,      rm380z,    0,     rm480z,     rm380z,   rm380z_state,    rm380z34e,  "Research Machines",    "LINK RM-480Z", MACHINE_NOT_WORKING | MACHINE_NO_SOUND_HW)
 
