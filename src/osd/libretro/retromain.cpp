@@ -243,10 +243,12 @@ void retro_osd_interface::init(running_machine &machine)
 	// call our parent
 	osd_common_t::init(machine);
 
+#if 0
 	const char *stemp;
 
 	/* get number of processors */
 	stemp = options().numprocessors();
+#endif
 
 	osd_num_processors = 0;
 

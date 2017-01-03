@@ -472,80 +472,27 @@ void retro_window_info::destroy()
 
 osd_dim retro_window_info::pick_best_mode()
 {
-	int minimum_width, minimum_height, target_width, target_height;
-	int i;
-	int num;
-	float size_score, best_score = 0.0f;
-	osd_dim ret(0,0);
+   int minimum_width, minimum_height, target_width, target_height;
 
-	// determine the minimum width/height for the selected target
-	m_target->compute_minimum_size(minimum_width, minimum_height);
+   osd_dim ret(0,0);
 
-	// use those as the target for now
-	target_width = minimum_width * std::max(1, prescale());
-	target_height = minimum_height * std::max(1, prescale());
+   // determine the minimum width/height for the selected target
+   m_target->compute_minimum_size(minimum_width, minimum_height);
 
-	// if we're not stretching, allow some slop on the minimum since we can handle it
-	{
-		minimum_width -= 4;
-		minimum_height -= 4;
-	}
+   // use those as the target for now
+   target_width = minimum_width * std::max(1, prescale());
+   target_height = minimum_height * std::max(1, prescale());
 
-//FIXME RETRO
-ret = osd_dim(target_width,target_height);
-osd_printf_verbose("**********************%4dx%4d@%2d -> %f\n", (int)target_width, (int)target_height,0,(double)0);
-return ret;
+   // if we're not stretching, allow some slop on the minimum since we can handle it
+   {
+      minimum_width -= 4;
+      minimum_height -= 4;
+   }
 
-#if 0
-
-	// FIXME: this should be provided by monitor !
-	num = SDL_GetNumDisplayModes(m_monitor->oshandle());
-
-	if (num == 0)
-	{
-		osd_printf_error("SDL: No modes available?!\n");
-		exit(-1);
-	}
-	else
-	{
-		for (i = 0; i < num; ++i)
-		{
-			SDL_DisplayMode mode;
-			SDL_GetDisplayMode(m_monitor->oshandle(), i, &mode);
-
-			// compute initial score based on difference between target and current
-			size_score = 1.0f / (1.0f + abs((int32_t)mode.w - target_width) + abs((int32_t)mode.h - target_height));
-
-			// if the mode is too small, give a big penalty
-			if (mode.w < minimum_width || mode.h < minimum_height)
-				size_score *= 0.01f;
-
-			// if mode is smaller than we'd like, it only scores up to 0.1
-			if (mode.w < target_width || mode.h < target_height)
-				size_score *= 0.1f;
-
-			// if we're looking for a particular mode, that's a winner
-			if (mode.w == m_win_config.width && mode.h == m_win_config.height)
-				size_score = 2.0f;
-
-			// refresh adds some points
-			if (m_win_config.refresh)
-				size_score *= 1.0f / (1.0f + abs(m_win_config.refresh - mode.refresh_rate) / 10.0f);
-
-			osd_printf_verbose("%4dx%4d@%2d -> %f\n", (int)mode.w, (int)mode.h, (int) mode.refresh_rate, (double) size_score);
-
-			// best so far?
-			if (size_score > best_score)
-			{
-				best_score = size_score;
-				ret = osd_dim(mode.w, mode.h);
-			}
-
-		}
-	}
-	return ret;
-#endif
-
+   //FIXME RETRO
+   ret = osd_dim(target_width,target_height);
+   osd_printf_verbose("**********************%4dx%4d@%2d -> %f\n", (int)target_width, (int)target_height,0,(double)0);
+   return ret;
 }
 
 //============================================================
@@ -733,13 +680,11 @@ int retro_window_info::complete_create()
 		m_extra_flags = 0;
 
 
+#if 0
 	// get monitor work area for centering
 	osd_rect work = monitor()->usuable_position_size();
-
-
-
 	//set_platform_window(retrowindow);
-
+#endif
 
 	// set main window
 	if (m_index > 0)
