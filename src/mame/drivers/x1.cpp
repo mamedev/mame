@@ -574,6 +574,62 @@ uint16_t x1_state::check_keyboard_press()
 	uint32_t f_key = ioport("f_keys")->read();
 	scancode = 0;
 
+	static const uint8_t kanatable[52][3] = {
+		// normal, kana, kana + shift
+		{0x2c,0xc8,0xa4}, // , / ne / japanese comma
+		{0x2d,0xce,0x00}, // - / ho
+		{0x2e,0xd9,0xa1}, // . / ru / japanese period
+		{0x2f,0xd2,0xa5}, // / / me / nakaguro
+		{0x30,0xdc,0xa6}, // 0 / wa / wo
+		{0x31,0xc7,0x00}, // 1 / nu
+		{0x32,0xcc,0x00}, // 2 / fu
+		{0x33,0xb1,0xa7}, // 3 / a / small a
+		{0x34,0xb3,0xa9}, // 4 / u / small u
+		{0x35,0xb4,0xaa}, // 5 / e / small e
+		{0x36,0xb5,0xab}, // 6 / o / small o
+		{0x37,0xd4,0xac}, // 7 / ya / small ya
+		{0x38,0xd5,0xad}, // 8 / yu / small yu
+		{0x39,0xd6,0xae}, // 9 / yo / small yo
+		{0x3a,0xb9,0x00}, // : / ke
+		{0x3b,0xda,0x00}, // ; / re
+		{0x3c,0x00,0x00},
+		{0x3d,0x00,0x00},
+		{0x3e,0x00,0x00},
+		{0x3f,0x00,0x00},
+		{0x40,0xde,0x00}, // @ / dakuten
+		{0x41,0xc1,0x00}, // A / chi
+		{0x42,0xba,0x00}, // B / ko
+		{0x43,0xbf,0x00}, // C / so
+		{0x44,0xbc,0x00}, // D / shi
+		{0x45,0xb2,0xa8}, // E / i / small i
+		{0x46,0xca,0x00}, // F / ha
+		{0x47,0xb7,0x00}, // G / ki
+		{0x48,0xb8,0x00}, // H / ku
+		{0x49,0xc6,0x00}, // I / ni
+		{0x4a,0xcf,0x00}, // J / ma
+		{0x4b,0xc9,0x00}, // K / no
+		{0x4c,0xd8,0x00}, // L / ri
+		{0x4d,0xd3,0x00}, // M / mo
+		{0x4e,0xd0,0x00}, // N / mi
+		{0x4f,0xd7,0x00}, // O / ra
+		{0x50,0xbe,0x00}, // P / se
+		{0x51,0xc0,0x00}, // Q / ta
+		{0x52,0xbd,0x00}, // R / su
+		{0x53,0xc4,0x00}, // S / to
+		{0x54,0xb6,0x00}, // T / ka
+		{0x55,0xc5,0x00}, // U / na
+		{0x56,0xcb,0x00}, // V / hi
+		{0x57,0xc3,0x00}, // W / te
+		{0x58,0xbb,0x00}, // X / sa
+		{0x59,0xdd,0x00}, // Y / n
+		{0x5a,0xc2,0xaf}, // Z / tsu / small tsu
+		{0x5b,0xdf,0xa2}, // [ / handakuten / opening quotation mark
+		{0x5c,0xb0,0x00}, // yen symbol / long vowel mark
+		{0x5d,0xd1,0xa3}, // ] / mu / closing quotation mark
+		{0x5e,0xcd,0x00}, // ^ / he
+		{0x5f,0xdb,0x00}  // _ / ro
+	};
+
 	for(port_i=0;port_i<3;port_i++)
 	{
 		for(i=0;i<32;i++)
@@ -583,11 +639,26 @@ uint16_t x1_state::check_keyboard_press()
 				//key_flag = 1;
 				if(keymod & 0x02)  // shift not pressed
 				{
-					if(scancode >= 0x41 && scancode < 0x5a)
+					if ((keymod & 0x04) == 0) // kana on
+					{
+						if (scancode >= 0x2c && scancode <= 0x5f)
+							scancode = kanatable[scancode - 0x2c][1];
+					}
+					
+					if (scancode >= 0x41 && scancode < 0x5a)
 						scancode += 0x20;  // lowercase
 				}
 				else
 				{
+					if ((keymod & 0x04) == 0) // kana on
+					{
+						if (scancode >= 0x2c && scancode <= 0x5f)
+						{
+							if (kanatable[scancode - 0x2c][2] != 0)
+								scancode = kanatable[scancode - 0x2c][2];
+						}
+					}
+					
 					if(scancode >= 0x31 && scancode < 0x3a)
 						scancode -= 0x10;
 					if(scancode == 0x30)
@@ -595,6 +666,9 @@ uint16_t x1_state::check_keyboard_press()
 						scancode = 0x3d;
 					}
 				}
+
+
+
 				if((keymod & 0x10) == 0) // graph on
 					scancode |= 0x80;
 
@@ -2026,10 +2100,10 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x00000200,IP_ACTIVE_HIGH,IPT_UNUSED) //0x29 )
 	PORT_BIT(0x00000400,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2a *
 	PORT_BIT(0x00000800,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2b +
-	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2c ,
+	PORT_BIT(0x00001000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
 	PORT_BIT(0x00002000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("-") PORT_CODE(KEYCODE_MINUS) PORT_CHAR('-')
-	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2e .
-	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_UNUSED) //0x2f /
+	PORT_BIT(0x00004000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(".") PORT_CODE(KEYCODE_STOP) PORT_CHAR('.')
+	PORT_BIT(0x00008000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("/") PORT_CODE(KEYCODE_SLASH) PORT_CHAR('/')
 
 	PORT_BIT(0x00010000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("0") PORT_CODE(KEYCODE_0) PORT_CHAR('0')
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("1") PORT_CODE(KEYCODE_1) PORT_CHAR('1')
@@ -2077,7 +2151,7 @@ INPUT_PORTS_START( x1 )
 	PORT_BIT(0x02000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Y") PORT_CODE(KEYCODE_Y) PORT_CHAR('Y')
 	PORT_BIT(0x04000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("Z") PORT_CODE(KEYCODE_Z) PORT_CHAR('Z')
 	PORT_BIT(0x08000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("[") PORT_CODE(KEYCODE_CLOSEBRACE) PORT_CHAR('[')
-	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_UNUSED)
+	PORT_BIT(0x10000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("\xc2\xa5") // yen
 	PORT_BIT(0x20000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("]") PORT_CODE(KEYCODE_BACKSLASH) PORT_CHAR(']')
 	PORT_BIT(0x40000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("^") PORT_CODE(KEYCODE_EQUALS) PORT_CHAR('^')
 	PORT_BIT(0x80000000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME("_")
@@ -2108,9 +2182,9 @@ INPUT_PORTS_START( x1 )
 	PORT_START("key_modifiers")
 	PORT_BIT(0x00000001,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CTRL") PORT_CODE(KEYCODE_LCONTROL)
 	PORT_BIT(0x00000002,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("SHIFT") PORT_CODE(KEYCODE_LSHIFT)
-	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL)
+	PORT_BIT(0x00000004,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("KANA") PORT_CODE(KEYCODE_RCONTROL) PORT_TOGGLE
 	PORT_BIT(0x00000008,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("CAPS") PORT_CODE(KEYCODE_CAPSLOCK) PORT_TOGGLE
-	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRPH") PORT_CODE(KEYCODE_LALT)
+	PORT_BIT(0x00000010,IP_ACTIVE_LOW,IPT_KEYBOARD) PORT_NAME("GRAPH") PORT_CODE(KEYCODE_LALT)
 
 #if 0
 	PORT_BIT(0x00020000,IP_ACTIVE_HIGH,IPT_KEYBOARD) PORT_NAME(",") PORT_CODE(KEYCODE_COMMA) PORT_CHAR(',')
