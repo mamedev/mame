@@ -247,6 +247,7 @@ extern const device_type IEEE488_SLOT;
 
 
 SLOT_INTERFACE_EXTERN( cbm_ieee488_devices );
+SLOT_INTERFACE_EXTERN( hp_ieee488_devices );
 
 
 
