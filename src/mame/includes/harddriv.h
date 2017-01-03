@@ -16,6 +16,7 @@
 #include "machine/mc68681.h"
 #include "machine/asic65.h"
 #include "machine/timekpr.h"
+#include "bus/rs232/rs232.h"
 
 #define HARDDRIV_MASTER_CLOCK   XTAL_32MHz
 #define HARDDRIV_GSP_CLOCK      XTAL_48MHz
@@ -452,6 +453,8 @@ protected:
 	optional_device<palette_device> m_palette;
 	int get_hblank(screen_device &screen) const { return (screen.hpos() > (screen.width() * 9 / 10)); }
 	optional_device<atari_slapstic_device> m_slapstic_device;
+
+	optional_device<rs232_port_device> m_rs232;
 
 protected:
 	//virtual machine_config_constructor device_mconfig_additions() const;
