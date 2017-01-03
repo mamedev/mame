@@ -159,6 +159,18 @@ const char *pc_format::extensions() const
 	return "dsk,ima,img,ufi,360";
 }
 
+int pc_format::identify(io_generic *io, uint32_t form_factor)
+{
+	uint64_t size = io_generic_size(io);
+
+	/* some 360K images have a 512-byte header */
+	if (size == 368640 + 0x200) {
+		file_header_skip_bytes = 0x200;
+	}
+
+	return upd765_format::identify(io, form_factor);
+}
+
 const pc_format::format pc_format::formats[] = {
 	{   /*  160K 5 1/4 inch double density single sided */
 		floppy_image::FF_525, floppy_image::SSDD, floppy_image::MFM,

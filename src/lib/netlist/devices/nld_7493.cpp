@@ -71,7 +71,7 @@ namespace netlist
 	{
 		NETLIB_CONSTRUCTOR_DERIVED(7493_dip, 7493)
 		{
-			register_subalias("1", B.m_I);
+			register_subalias("1", "CLKB");
 			register_subalias("2", m_R1);
 			register_subalias("3", m_R2);
 
@@ -80,13 +80,13 @@ namespace netlist
 			// register_subalias("6", ); --> NC
 			// register_subalias("7", ); --> NC
 
-			register_subalias("8", C.m_Q);
-			register_subalias("9", B.m_Q);
+			register_subalias("8", "QC");
+			register_subalias("9", "QB");
 			// register_subalias("10", ); -. GND
-			register_subalias("11", D.m_Q);
-			register_subalias("12", A.m_Q);
+			register_subalias("11", "QD");
+			register_subalias("12", "QA");
 			// register_subalias("13", ); -. NC
-			register_subalias("14", A.m_I);
+			register_subalias("14", "CLKA");
 		}
 	};
 

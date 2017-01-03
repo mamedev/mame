@@ -204,7 +204,7 @@ public:
 
 		void verror(const pstring &msg, int line_num, const pstring &line) override
 		{
-			m_convert.out("{} (line {}): {}\n", msg.cstr(), line_num, line.cstr());
+			m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
 		}
 
 
@@ -273,7 +273,7 @@ public:
 
 		void verror(const pstring &msg, int line_num, const pstring &line) override
 		{
-			m_convert.out("{} (line {}): {}\n", msg.cstr(), line_num, line.cstr());
+			m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
 		}
 
 

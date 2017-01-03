@@ -30,6 +30,8 @@ public:
 		virtual const tiny_rom_entry *device_rom_region() const override;
 
 		virtual uint8_t* get_cart_base() override;
+		DECLARE_WRITE8_MEMBER( pia_A_w );
+
 protected:
 		// device-level overrides
 		virtual void device_start() override;
@@ -38,6 +40,7 @@ protected:
 		// internal state
 		device_image_interface *m_cart;
 		cococart_slot_device *m_owner;
+		uint8_t m_select;
 
 		optional_ioport m_autostart;
 

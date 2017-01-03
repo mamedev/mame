@@ -4,12 +4,14 @@
  */
 
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
 #include <bx/allocator.h>
 #include <bx/fpumath.h>
 #include <bx/timer.h>
 #include <ocornut-imgui/imgui.h>
 #include "imgui.h"
 #include "ocornut_imgui.h"
+#include "../bgfx_utils.h"
 
 #ifndef USE_ENTRY
 #	if defined(SCI_NAMESPACE)
@@ -35,6 +37,14 @@
 #include "robotomono_regular.ttf.h"
 #include "icons_kenney.ttf.h"
 #include "icons_font_awesome.ttf.h"
+
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
+	BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
 
 struct FontRangeMerge
 {
@@ -67,43 +77,6 @@ struct OcornutImguiContext
 			bgfx::setViewTransform(m_viewId, NULL, ortho);
 		}
 
-#if USE_ENTRY
-		for (uint32_t ii = 1; ii < BX_COUNTOF(m_window); ++ii)
-		{
-			Window& window = m_window[ii];
-			if (bgfx::isValid(window.m_fbh) )
-			{
-				const uint8_t viewId = window.m_viewId;
-				bgfx::setViewClear(viewId
-					, BGFX_CLEAR_COLOR|BGFX_CLEAR_DEPTH
-					, 0x303030ff
-					, 1.0f
-					, 0
-					);
-				bgfx::setViewFrameBuffer(viewId, window.m_fbh);
-				bgfx::setViewRect(viewId
-					, 0
-					, 0
-					, window.m_state.m_width
-					, window.m_state.m_height
-					);
-				float ortho[16];
-				bx::mtxOrtho(ortho
-					, 0.0f
-					, float(window.m_state.m_width)
-					, float(window.m_state.m_height)
-					, 0.0f
-					, -1.0f
-					, 1.0f
-					);
-				bgfx::setViewTransform(viewId
-					, NULL
-					, ortho
-					);
-			}
-		}
-#endif // USE_ENTRY
-
 		// Render command lists
 		for (int32_t ii = 0, num = _drawData->CmdListsCount; ii < num; ++ii)
 		{
@@ -114,8 +87,7 @@ struct OcornutImguiContext
 			uint32_t numVertices = (uint32_t)drawList->VtxBuffer.size();
 			uint32_t numIndices  = (uint32_t)drawList->IdxBuffer.size();
 
-			if (!bgfx::checkAvailTransientVertexBuffer(numVertices, m_decl)
-			||  !bgfx::checkAvailTransientIndexBuffer(numIndices) )
+			if (!checkAvailTransientBuffers(numVertices, m_decl, numIndices) )
 			{
 				// not enough space in transient buffer just quit drawing the rest...
 				break;
@@ -227,36 +199,12 @@ struct OcornutImguiContext
 		io.KeyMap[ImGuiKey_Z]          = (int)entry::Key::KeyZ;
 #endif // defined(SCI_NAMESPACE)
 
-		const bgfx::Memory* vsmem;
-		const bgfx::Memory* fsmem;
-
-		switch (bgfx::getRendererType() )
-		{
-		case bgfx::RendererType::Direct3D9:
-			vsmem = bgfx::makeRef(vs_ocornut_imgui_dx9, sizeof(vs_ocornut_imgui_dx9) );
-			fsmem = bgfx::makeRef(fs_ocornut_imgui_dx9, sizeof(fs_ocornut_imgui_dx9) );
-			break;
-
-		case bgfx::RendererType::Direct3D11:
-		case bgfx::RendererType::Direct3D12:
-			vsmem = bgfx::makeRef(vs_ocornut_imgui_dx11, sizeof(vs_ocornut_imgui_dx11) );
-			fsmem = bgfx::makeRef(fs_ocornut_imgui_dx11, sizeof(fs_ocornut_imgui_dx11) );
-			break;
-
-		case bgfx::RendererType::Metal:
-			vsmem = bgfx::makeRef(vs_ocornut_imgui_mtl, sizeof(vs_ocornut_imgui_mtl) );
-			fsmem = bgfx::makeRef(fs_ocornut_imgui_mtl, sizeof(fs_ocornut_imgui_mtl) );
-			break;
-
-		default:
-			vsmem = bgfx::makeRef(vs_ocornut_imgui_glsl, sizeof(vs_ocornut_imgui_glsl) );
-			fsmem = bgfx::makeRef(fs_ocornut_imgui_glsl, sizeof(fs_ocornut_imgui_glsl) );
-			break;
-		}
-
-		bgfx::ShaderHandle vsh = bgfx::createShader(vsmem);
-		bgfx::ShaderHandle fsh = bgfx::createShader(fsmem);
-		m_program = bgfx::createProgram(vsh, fsh, true);
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
+		m_program = bgfx::createProgram(
+			  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_ocornut_imgui")
+			, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_ocornut_imgui")
+			, true
+			);
 
 		m_decl
 			.begin()

@@ -126,7 +126,7 @@ public:
 
 	void write(const pstring &text)
 	{
-		write(text.cstr(), text.blen());
+		write(text.c_str(), text.blen());
 	}
 
 	void write(const char c)
@@ -325,7 +325,7 @@ class pistringstream : public pimemstream
 	P_PREVENT_COPYING(pistringstream)
 public:
 
-	pistringstream(const pstring &str) : pimemstream(str.cstr(), str.len()), m_str(str) { }
+	pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
 
 private:
 	/* only needed for a reference till destruction */

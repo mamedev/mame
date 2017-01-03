@@ -389,8 +389,18 @@ static ADDRESS_MAP_START( tokio_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0xfb00, 0xfb00) AM_WRITE(tokio_videoctrl_w)
 	AM_RANGE(0xfb80, 0xfb80) AM_WRITE(bublbobl_nmitrigger_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(bublbobl_sound_status_r, bublbobl_sound_command_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(tokio_mcu_r, tokio_mcu_w)
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tokio_map_mcu, AS_PROGRAM, 8, bublbobl_state )
+	AM_IMPORT_FROM(tokio_map)
+	AM_RANGE(0xfe00, 0xfe00) AM_DEVREADWRITE("bmcu", taito68705_mcu_device, mcu_r, mcu_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tokio_map_bootleg, AS_PROGRAM, 8, bublbobl_state )
+	AM_IMPORT_FROM(tokio_map)
+	AM_RANGE(0xfe00, 0xfe00) AM_READ( tokiob_mcu_r )
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( tokio_slave_map, AS_PROGRAM, 8, bublbobl_state )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -619,7 +629,7 @@ static INPUT_PORTS_START( dland )
 	PORT_DIPSETTING(    0x20, "100 (Cheat)")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tokio )
+static INPUT_PORTS_START( tokio_base )
 	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW A:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -669,8 +679,8 @@ static INPUT_PORTS_START( tokio )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bublbobl_state,tokio_main_sent_r, nullptr)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM_MEMBER(DEVICE_SELF, bublbobl_state,tokio_mcu_sent_r, nullptr)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) // see INPUT_PORTS_START( tokio )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) // see INPUT_PORTS_START( tokio )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -695,7 +705,13 @@ static INPUT_PORTS_START( tokio )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tokio )
+	PORT_INCLUDE( tokio_base )
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, main_sent_r, nullptr)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM_MEMBER("bmcu", taito68705_mcu_device, mcu_sent_r, nullptr)
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -744,15 +760,6 @@ MACHINE_RESET_MEMBER(bublbobl_state,common)
 MACHINE_START_MEMBER(bublbobl_state,tokio)
 {
 	MACHINE_START_CALL_MEMBER(common);
-
-
-	save_item(NAME(m_mcu_sent));
-	save_item(NAME(m_main_sent));
-	save_item(NAME(m_from_main));
-	save_item(NAME(m_from_mcu));
-	save_item(NAME(m_from_mcu_latch));
-	save_item(NAME(m_to_mcu_latch));
-	save_item(NAME(m_old_portB));
 }
 
 
@@ -767,7 +774,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	/* basic machine hardware */
 	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
-	MCFG_CPU_PROGRAM_MAP(tokio_map)
+	MCFG_CPU_PROGRAM_MAP(tokio_map_mcu)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 
 	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4) // 6 MHz
@@ -777,12 +784,7 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8) // 3 MHz
 	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MCFG_CPU_ADD("mcu", M68705_NEW, MAIN_XTAL/8) // 3 Mhz
-	MCFG_M68705_PORTA_R_CB(READ8(bublbobl_state, tokio_mcu_porta_r))
-	MCFG_M68705_PORTA_W_CB(WRITE8(bublbobl_state, tokio_mcu_porta_w))
-	MCFG_M68705_PORTB_W_CB(WRITE8(bublbobl_state, tokio_mcu_portb_w))
-	MCFG_M68705_PORTC_R_CB(READ8(bublbobl_state, tokio_mcu_portc_r))
-
+	MCFG_DEVICE_ADD("bmcu", TAITO68705_MCU, MAIN_XTAL/8) // 3 Mhz
 
 	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
@@ -816,8 +818,15 @@ static MACHINE_CONFIG_START( tokio, bublbobl_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tokiob, tokio )
-	MCFG_DEVICE_REMOVE("mcu")
+	
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_DEVICE_REMOVE("bmcu")
+
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4) // 6 MHz
+	MCFG_CPU_PROGRAM_MAP(tokio_map_bootleg)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", bublbobl_state, irq0_line_hold)
 MACHINE_CONFIG_END
+
 
 MACHINE_START_MEMBER(bublbobl_state,bublbobl)
 {
@@ -999,7 +1008,7 @@ ROM_START( tokio ) // newer japan set, has -1 revision of roms 02, 03 and 06
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 ) /* 2k for the microcontroller (68705P5) */
 	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
@@ -1042,7 +1051,7 @@ ROM_START( tokioo ) // older japan set, has older roms 02, 03, 06
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 ) /* 2k for the microcontroller (68705P5) */
 	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
@@ -1085,7 +1094,7 @@ ROM_START( tokiou )
 	ROM_REGION( 0x10000, "audiocpu", 0 )    /* audio CPU */
 	ROM_LOAD( "a71-07.ic10",  0x0000, 0x08000, CRC(f298cc7b) SHA1(ebf5c804aa07b7f198ec3e1f8d1e111cd89ebdf3) )
 
-	ROM_REGION( 0x0800, "mcu", 0 ) /* 2k for the microcontroller (68705P5) */
+	ROM_REGION( 0x0800, "bmcu:mcu", 0 ) /* 2k for the microcontroller (68705P5) */
 	ROM_LOAD( "a71__24.ic57",  0x0000, 0x0800, CRC(0f4b25de) SHA1(e2d82aa8d8cc6a86aaf5715ef9cb62f526fd5b11) )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_INVERT ) /* gfx roms, on gfx board */
@@ -1871,12 +1880,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,tokio)
 	m_video_enable = 1;
 }
 
-DRIVER_INIT_MEMBER(bublbobl_state,tokiob)
-{
-	DRIVER_INIT_CALL(tokio);
 
-	m_maincpu->space(AS_PROGRAM).install_read_handler(0xfe00, 0xfe00, read8_delegate(FUNC(bublbobl_state::tokiob_mcu_r),this) );
-}
 
 DRIVER_INIT_MEMBER(bublbobl_state,dland)
 {
@@ -1902,7 +1906,7 @@ DRIVER_INIT_MEMBER(bublbobl_state,dland)
 GAME( 1986, tokio,      0,        tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokioo,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito Corporation", "Tokio / Scramble Formation (older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, tokiou,     tokio,    tokio,    tokio,      bublbobl_state, tokio,    ROT90, "Taito America Corporation (Romstar license)", "Tokio / Scramble Formation (US)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, tokiob,     tokio,    tokiob,   tokio,      bublbobl_state, tokiob,   ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, tokiob,     tokio,    tokiob,   tokio_base, bublbobl_state, tokio,    ROT90, "bootleg", "Tokio / Scramble Formation (bootleg)", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1986, bublbobl,   0,        bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.1)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, bublbobl1,  bublbobl, bublbobl, bublbobl,   bublbobl_state, bublbobl, ROT0,  "Taito Corporation", "Bubble Bobble (Japan, Ver 0.0)", MACHINE_SUPPORTS_SAVE )

@@ -62,7 +62,7 @@ namespace netlist
 			register_subalias("2", m_C);
 			register_subalias("3", m_LTQ);
 			register_subalias("4", m_BIQ);
-			register_subalias("5",m_RBIQ);
+			register_subalias("5", m_RBIQ);
 			register_subalias("6", m_D);
 			register_subalias("7", m_A);
 

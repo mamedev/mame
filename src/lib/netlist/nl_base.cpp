@@ -71,6 +71,10 @@ public:
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
 	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+	}
 };
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
@@ -90,6 +94,10 @@ public:
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
 	{
 		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+	}
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
+	{
+		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
 	}
 };
 
@@ -138,7 +146,7 @@ void detail::queue_t::on_pre_save()
 		pstring p = this->listptr()[i].m_object->name();
 		std::size_t n = p.len();
 		if (n > 63) n = 63;
-		std::strncpy(m_names[i].m_buf, p.cstr(), n);
+		std::strncpy(m_names[i].m_buf, p.c_str(), n);
 		m_names[i].m_buf[n] = 0;
 	}
 }
@@ -722,8 +730,12 @@ void detail::net_t::reset()
 			m_active++;
 }
 
-void detail::net_t::register_con(detail::core_terminal_t &terminal)
+void detail::net_t::add_terminal(detail::core_terminal_t &terminal)
 {
+	for (auto t : m_core_terms)
+		if (t == &terminal)
+			netlist().log().fatal("net {1}: duplicate terminal {2}", name(), t->name());
+
 	terminal.set_net(this);
 
 	m_core_terms.push_back(&terminal);
@@ -735,7 +747,7 @@ void detail::net_t::register_con(detail::core_terminal_t &terminal)
 void detail::net_t::move_connections(detail::net_t &dest_net)
 {
 	for (auto &ct : m_core_terms)
-		dest_net.register_con(*ct);
+		dest_net.add_terminal(*ct);
 	m_core_terms.clear();
 	m_active = 0;
 }

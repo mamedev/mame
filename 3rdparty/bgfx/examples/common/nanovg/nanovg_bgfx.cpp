@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -27,6 +27,7 @@
 #include "nanovg.h"
 
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
 
 #include <bx/bx.h>
 #include <bx/allocator.h>
@@ -35,11 +36,19 @@
 
 BX_PRAGMA_DIAGNOSTIC_IGNORED_MSVC(4244); // warning C4244: '=' : conversion from '' to '', possible loss of data
 
-namespace
-{
 #include "vs_nanovg_fill.bin.h"
 #include "fs_nanovg_fill.bin.h"
 
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
+{
+	BGFX_EMBEDDED_SHADER(vs_nanovg_fill),
+	BGFX_EMBEDDED_SHADER(fs_nanovg_fill),
+
+	BGFX_EMBEDDED_SHADER_END()
+};
+
+namespace
+{
 	static bgfx::VertexDecl s_nvgDecl;
 
 	enum GLNVGshaderType
@@ -234,36 +243,10 @@ namespace
 	{
 		struct GLNVGcontext* gl = (struct GLNVGcontext*)_userPtr;
 
-		const bgfx::Memory* vs_nanovg_fill;
-		const bgfx::Memory* fs_nanovg_fill;
-
-		switch (bgfx::getRendererType() )
-		{
-		case bgfx::RendererType::Direct3D9:
-			vs_nanovg_fill = bgfx::makeRef(vs_nanovg_fill_dx9, sizeof(vs_nanovg_fill_dx9) );
-			fs_nanovg_fill = bgfx::makeRef(fs_nanovg_fill_dx9, sizeof(fs_nanovg_fill_dx9) );
-			break;
-
-		case bgfx::RendererType::Direct3D11:
-		case bgfx::RendererType::Direct3D12:
-			vs_nanovg_fill = bgfx::makeRef(vs_nanovg_fill_dx11, sizeof(vs_nanovg_fill_dx11) );
-			fs_nanovg_fill = bgfx::makeRef(fs_nanovg_fill_dx11, sizeof(fs_nanovg_fill_dx11) );
-			break;
-
-		case bgfx::RendererType::Metal:
-			vs_nanovg_fill = bgfx::makeRef(vs_nanovg_fill_mtl, sizeof(vs_nanovg_fill_mtl) );
-			fs_nanovg_fill = bgfx::makeRef(fs_nanovg_fill_mtl, sizeof(fs_nanovg_fill_mtl) );
-			break;
-
-		default:
-			vs_nanovg_fill = bgfx::makeRef(vs_nanovg_fill_glsl, sizeof(vs_nanovg_fill_glsl) );
-			fs_nanovg_fill = bgfx::makeRef(fs_nanovg_fill_glsl, sizeof(fs_nanovg_fill_glsl) );
-			break;
-		}
-
+		bgfx::RendererType::Enum type = bgfx::getRendererType();
 		gl->prog = bgfx::createProgram(
-						  bgfx::createShader(vs_nanovg_fill)
-						, bgfx::createShader(fs_nanovg_fill)
+						  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_nanovg_fill")
+						, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_nanovg_fill")
 						, true
 						);
 

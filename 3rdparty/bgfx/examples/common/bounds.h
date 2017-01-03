@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -67,19 +67,25 @@ struct Intersection
 void aabbToObb(Obb& _obb, const Aabb& _aabb);
 
 /// Convert sphere to axis aligned bounding box.
-void sphereToAabb(Aabb& _aabb, const Sphere& _sphere);
+void toAabb(Aabb& _aabb, const Sphere& _sphere);
 
-/// Calculate surface area of axis aligned bounding box.
-float calcAabbArea(Aabb& _aabb);
+/// Convert disk to axis aligned bounding box.
+void toAabb(Aabb& _aabb, const Disk& _disk);
+
+/// Convert cylinder to axis aligned bounding box.
+void toAabb(Aabb& _aabb, const Cylinder& _cylinder);
 
 /// Calculate axis aligned bounding box.
-void calcAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
+void toAabb(Aabb& _aabb, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
 
 /// Transform vertices and calculate axis aligned bounding box.
-void calcAabb(Aabb& _aabb, const float* _mtx, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
+void toAabb(Aabb& _aabb, const float* _mtx, const void* _vertices, uint32_t _numVertices, uint32_t _stride);
 
 /// Expand AABB.
 void aabbExpand(Aabb& _aabb, float _factor);
+
+/// Calculate surface area of axis aligned bounding box.
+float calcAreaAabb(const Aabb& _aabb);
 
 /// Returns 0 is two AABB don't overlap, otherwise returns flags of overlap
 /// test.
@@ -93,9 +99,6 @@ void calcMaxBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _num
 
 /// Calculate minimum bounding sphere.
 void calcMinBoundingSphere(Sphere& _sphere, const void* _vertices, uint32_t _numVertices, uint32_t _stride, float _step = 0.01f);
-
-/// Calculate coplanar U/V vectors.
-void calcPlaneUv(const Plane& _plane, float* _udir, float* _vdir);
 
 /// Returns 6 (near, far, left, right, top, bottom) planes representing frustum planes.
 void buildFrustumPlanes(Plane* _planes, const float* _viewProj);

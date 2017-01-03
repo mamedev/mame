@@ -316,7 +316,7 @@ void parser_t::dippins()
 			error(plib::pfmt("expected a comma, found <{1}>")(n.str()) );
 	}
 	if ((pins.size() % 2) == 1)
-		error("You must pass an equal number of pins to DIPPINS");
+		error(plib::pfmt("You must pass an equal number of pins to DIPPINS, first pin is {}")(pins[0]));
 	std::size_t n = pins.size();
 	for (std::size_t i = 0; i < n / 2; i++)
 	{
@@ -356,35 +356,29 @@ void parser_t::netdev_hint()
 
 void parser_t::device(const pstring &dev_type)
 {
-	if (m_setup.is_library_item(dev_type))
+	factory::element_t *f = m_setup.factory().factory_by_name(dev_type);
+	auto paramlist = plib::pstring_vector_t(f->param_desc(), ",");
+
+	pstring devname = get_identifier();
+
+	m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
+	m_setup.log().debug("Parser: IC: {1}\n", devname);
+
+	for (pstring tp : paramlist)
 	{
-		pstring devname = get_identifier();
-		m_setup.namespace_push(devname);
-		m_setup.include(dev_type);
-		m_setup.namespace_pop();
-		require_token(m_tok_param_right);
-	}
-	else
-	{
-		base_factory_t *f = m_setup.factory().factory_by_name(dev_type);
-		plib::pstring_vector_t termlist = f->term_param_list();
-		plib::pstring_vector_t def_params = f->def_params();
-
-		std::size_t cnt;
-
-		pstring devname = get_identifier();
-
-		m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
-
-		m_setup.log().debug("Parser: IC: {1}\n", devname);
-
-		cnt = 0;
-		while (cnt < def_params.size())
+		require_token(m_tok_comma);
+		if (tp.startsWith("+"))
 		{
-			pstring paramfq = devname + "." + def_params[cnt];
+			pstring output_name = get_identifier();
+			m_setup.log().debug("Link: {1} {2}\n", tp, output_name);
+
+			m_setup.register_link(devname + "." + tp.substr(1), output_name);
+		}
+		else
+		{
+			pstring paramfq = devname + "." + tp;
 
 			m_setup.log().debug("Defparam: {1}\n", paramfq);
-			require_token(m_tok_comma);
 			token_t tok = get_token();
 			if (tok.is_type(STRING))
 			{
@@ -395,24 +389,11 @@ void parser_t::device(const pstring &dev_type)
 				nl_double val = eval_param(tok);
 				m_setup.register_param(paramfq, val);
 			}
-			cnt++;
 		}
-
-		token_t tok = get_token();
-		cnt = 0;
-		while (tok.is(m_tok_comma) && cnt < termlist.size())
-		{
-			pstring output_name = get_identifier();
-
-			m_setup.register_link(devname + "." + termlist[cnt], output_name);
-
-			cnt++;
-			tok = get_token();
-		}
-		if (cnt != termlist.size())
-			error(plib::pfmt("Input count mismatch for {1} - expected {2} found {3}")(devname)(termlist.size())(cnt));
-		require_token(tok, m_tok_param_right);
 	}
+
+	// error(plib::pfmt("Input count mismatch for {1} - expected {2} found {3}")(devname)(termlist.size())(cnt));
+	require_token(m_tok_param_right);
 }
 
 

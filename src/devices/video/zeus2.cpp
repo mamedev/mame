@@ -279,8 +279,9 @@ uint32_t zeus2_device::screen_update(screen_device &screen, bitmap_rgb32 &bitmap
 READ32_MEMBER( zeus2_device::zeus2_r )
 {
 	int logit = (offset != 0x00 && offset != 0x01 &&
-		offset != 0x48 && offset != 0x49 &&
-		offset != 0x54 && offset != 0x58 && offset != 0x59 && offset != 0x5a);
+		offset != 0x48 && offset != 0x49
+		&& offset != 0x54 && offset != 0x58 && offset != 0x59 && offset != 0x5a
+		);
 	logit &= LOG_REGS;
 	uint32_t result = m_zeusbase[offset];
 #if TRACK_REG_USAGE
@@ -331,8 +332,8 @@ WRITE32_MEMBER( zeus2_device::zeus2_w )
 {
 	int logit = (offset != 0x08 &&
 					(offset != 0x20 || data != 0) &&
-					offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
-					offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e
+					offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e
+					&& offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e
 		);
 	logit &= LOG_REGS;
 	if (logit)
@@ -461,7 +462,7 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 			break;
 
 		case 0x2a:
-			// 0x000000c0 = bilenear off
+			// 0x000000c0 = bilinear off
 			if (logit) logerror("\tRend Force Off");
 			break;
 
@@ -665,11 +666,29 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 				logerror("\t[40]=%08X [4E]=%08X\n", m_zeusbase[0x40], m_zeusbase[0x4e]);
 			break;
 
-		case 0x50:
-			{
+		case 0x50: case 0x51: case 0x58: case 0x59: case 0x5a: case 0x5b: case 0x5e:
+			// m_zeusbase[0x5e]:
+			// bits 3:0 select which offset triggers an access
+			// bit 4:   clear error
+			// bit 5:   24 bit (1) / 32 bit mode (0)
+			// bit 6:   enable autoincrement wave address
+			// bit 7    autoincrement desination address?
+			// bit 8    autoincrement row/col address by 1 (0) or 2 (1)
+			if ((offset & 0xf) == (m_zeusbase[0x5e] & 0xf)) {
+
 				int code = (m_zeusbase[0x50] >> 16) & 0xf;
 
-				if (code == 0x1) {
+				// If the address is auto-increment then don't load new value
+				// In reality address is latched by a write to 0x50
+				if (offset == 0x51 && (m_zeusbase[0x5e] &  0x40)) {
+					m_zeusbase[0x51] = oldval;
+				}
+
+				switch (code) {
+				case 0:
+					// NOP
+					break;
+				case 1:
 					// SGRAM Special Mode Register Write
 					if (m_zeusbase[0x51] == 0x00200000) {
 						// SGRAM Mask Register
@@ -684,106 +703,39 @@ void zeus2_device::zeus2_register_update(offs_t offset, uint32_t oldval, int log
 						if (m_zeusbase[0x58] != m_zeusbase[0x59])
 							logerror("zeus2_register_update: Warning! Different fill colors are set.\n");
 					}
-				}
-				else if (code == 0x8) {
-					// Fast fill
-					// Unknown what the exact bit fields are, this is a just a guess
-					// Atlantis: 0x00983FFF => clear entire frame buffer, 0x00981FFF => clear one frame
-					// crusnexo: 0x007831FF => clear one frame
-					// thegrid:  0x008831FF => clear one frame
-					// thegrid:  0x0079FFFF => clear entire frame buffer at 51=0 then 51=00800000, only seen at initial tests in thegrid
-					uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
-					uint32_t numBytes = (m_zeusbase[0x50] & 0xffff) + 1;
-					numBytes *= 0x40;
-					if (m_zeusbase[0x50] & 0x10000) {
-						addr = 0x0;
-						numBytes = WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8;
-						//printf("Clearing buffer: numBytes: %08X addr: %08X reg50: %08X\n", numBytes, addr, m_zeusbase[0x50]);
-					}
-					if (logit)
-						logerror(" -- Clearing buffer: numBytes: %08X addr: %08X reg51: %08X", numBytes, addr, m_zeusbase[0x51]);
-					memset(&m_frameColor[addr], m_fill_color, numBytes);
-					memset(&m_frameDepth[addr], m_fill_depth, numBytes);
-				}
-				else if ((m_zeusbase[0x5e] >> 16) != 0xf208 && !(m_zeusbase[0x5e] & 0xffff)) {
-					/* If 0x5e==0xf20a0000 (atlantis) or 0xf20d0000 (the grid) then process the read/write now */
-						/*
-						m_zeusbase[0x5e]:
-						bit 0-1: which register triggers write through
-						bit 3:   enable write through via these registers
-						bit 4:   seems to be set during reads, when 0x51 is used for latching
-						bit 5:   unknown, currently used to specify ordering, but this is suspect
-						bit 6:   enable autoincrement on write through
-						*/
-					if (code == 0x9)
+					break;
+				case 0x2:
+					frame_read();
+					break;
+				case 0x8:
 					{
-						frame_write();
+						// Fast fill
+						// Atlantis: 0x00983FFF => clear entire frame buffer, 0x00981FFF => clear one frame
+						// crusnexo: 0x007831FF => clear one frame
+						// thegrid:  0x008831FF => clear one frame
+						// thegrid:  0x0079FFFF => clear entire frame buffer at 51=0 then 51=00800000, only seen at initial tests in thegrid
+						uint32_t addr = frame_addr_from_phys_addr(m_zeusbase[0x51]);
+						uint32_t numBytes = (m_zeusbase[0x50] & 0xffff) + 1;
+						numBytes *= 0x40;
+						if (m_zeusbase[0x50] & 0x10000) {
+							addr = 0x0;
+							numBytes = WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8;
+							//printf("Clearing buffer: numBytes: %08X addr: %08X reg50: %08X\n", numBytes, addr, m_zeusbase[0x50]);
+						}
+						if (logit)
+							logerror(" -- Clearing buffer: numBytes: %08X addr: %08X reg51: %08X", numBytes, addr, m_zeusbase[0x51]);
+						memset(&m_frameColor[addr], m_fill_color, numBytes);
+						memset(&m_frameDepth[addr], m_fill_depth, numBytes);
 					}
-					else if (code == 0x2) {
-						/* Do the read */
-						frame_read();
-					}
-					/* make sure we log anything else */
-					//else if (logit || m_zeusbase[0x50] != 0x0)
-					//  logerror("\tw[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
-				}
-			}
-			break;
-		case 0x51:
-			// Set rendering location
-			/* in this mode, crusnexo expects the reads to immediately latch */
-			//if ((m_zeusbase[0x50] == 0x00a20000) || (m_zeusbase[0x50] == 0x00720000))
-			if (m_zeusbase[0x50] == 0x00a20000)
-				oldval = m_zeusbase[0x51];
-
-			/* this is the address, except in read mode, where it latches values */
-			if ((m_zeusbase[0x5e] & 0x10) || (m_zeusbase[0x50] == 0x00a20000))
-			{
-				m_zeusbase[0x51] = oldval;
-				frame_read();
-			}
-			break;
-
-		case 0x57:
-			/* thegrid uses this to write either left or right halves of pixels */
-			//if (m_zeusbase[0x50] == 0x00e90000)
-			//{
-			//  uint32_t addr = frame_addr_from_reg51();
-			//  if (m_zeusbase[0x57] & 1)
-			//      m_frameColor[addr] = m_zeusbase[0x58];
-			//  if (m_zeusbase[0x57] & 4)
-			//      m_frameColor[addr+1] = m_zeusbase[0x59];
-			//}
-
-			///* make sure we log anything else */
-			//else if (logit)
-			//  logerror("\t[50]=%08X [5E]=%08X\n", m_zeusbase[0x50], m_zeusbase[0x5e]);
-			break;
-
-		case 0x58:
-		case 0x59:
-		case 0x5a:
-			/* if we're in write mode, process it */
-			if (m_zeusbase[0x50] == 0x00890000)
-			{
-				/*
-				    m_zeusbase[0x5e]:
-				        bit 0-1: which register triggers write through
-				        bit 3:   enable write through via these registers
-				        bit 4:   seems to be set during reads, when 0x51 is used for latching
-				        bit 5:   unknown, currently used to specify ordering, but this is suspect
-				        bit 6:   enable autoincrement on write through
-				*/
-				if ((m_zeusbase[0x5e] & 0x08) && (offset & 3) == (m_zeusbase[0x5e] & 3))
-				{
+					break;
+				case 0x9:
 					frame_write();
+					break;
+				default:
+					logerror("unknown code = %x offset = %x", code, offset);
+					break;
 				}
 			}
-
-			/* make sure we log anything else */
-			else if ((m_zeusbase[0x5e] >> 16) == 0xf208)
-				if (logit)
-					logerror("\t[50]=%08X [5E]=%08X", m_zeusbase[0x50], m_zeusbase[0x5e]);
 			break;
 
 		// 0x60, 0x61, 0x62 Translation matrix, set using fifo command
@@ -1025,7 +977,7 @@ if (subregdata_count[which] < 256)
 			break;
 
 		case 0x0b:
-			if (logit) logerror("\t(R%02X) = %4i Pixel ALU IntB", which, value);
+			if (logit) logerror("\t(R%02X) = %4i Pixel ALU IntB (Obj Light Color)", which, value);
 			break;
 
 		case 0x0c:
@@ -1365,7 +1317,7 @@ void zeus2_device::zeus2_draw_model(uint32_t baseaddr, uint16_t count, int logit
 								logerror("texdata\n");
 						}
 						else if (logit)
-							logerror("unknown offset\n");
+							logerror("unknown offset %08X %08X\n", databuffer[0], databuffer[1]);
 						break;
 
 					case 0x31:  /* thegrid */
@@ -1469,9 +1421,14 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//  int16_t normal[3];
 	//  int32_t rotnormal[3];
 
-	if (logit)
-		m_state->logerror("quad %d\n", m_state->zeus_quad_size);
-
+	if (logit) {
+		m_state->logerror("quad %d", m_state->zeus_quad_size);
+#if PRINT_TEX_INFO
+		m_state->logerror(" %s\n", m_state->tex_info());
+#else
+		m_state->logerror("\n");
+#endif
+	}
 	//if (machine().input().code_pressed(KEYCODE_Q) && (m_state->m_renderRegs[0x5] != 0x1fdf00)) return;
 	//if (machine().input().code_pressed(KEYCODE_E) && (m_state->m_renderRegs[0x5] != 0x07f540)) return;
 	//if (machine().input().code_pressed(KEYCODE_R) && (m_state->m_renderRegs[0x5] != 0x081580)) return;
@@ -1640,48 +1597,51 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 		  y *= fScale;
 		  z *= fScale;
 		}
+#if PRINT_TEX_INFO
+		if (logit && i == 0) {
+			m_state->check_tex(texdata, z, m_state->zeus_matrix[2][2], m_state->zeus_point[2]);
+		}
+#endif
 		vert[i].x = x * m_state->zeus_matrix[0][0] + y * m_state->zeus_matrix[0][1] + z * m_state->zeus_matrix[0][2];
 		vert[i].y = x * m_state->zeus_matrix[1][0] + y * m_state->zeus_matrix[1][1] + z * m_state->zeus_matrix[1][2];
 		vert[i].p[0] = x * m_state->zeus_matrix[2][0] + y * m_state->zeus_matrix[2][1] + z * m_state->zeus_matrix[2][2];
 
-		if (1 || !(m_state->m_renderRegs[0x14] & 0x000001)) {
+		if (1) {
 			vert[i].x += m_state->zeus_point[0];
 			vert[i].y += m_state->zeus_point[1];
 			vert[i].p[0] += m_state->zeus_point[2];
 		}
-		//if (0)
-		//  //vert[i].p[0] += m_state->zbase;
-		//  vert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
-		//else {
+
+		if (0) {
 			int shift;
 			shift = 1024 >> m_state->m_zeusbase[0x6c];
 			vert[i].p[0] += shift;
-		//  //float zScale = reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
-		//  //vert[i].p[0] += zScale;
-		//}
+		}
 
 		vert[i].p[2] += (texdata >> 16) << 2;
 		vert[i].p[1] *= 256.0f / 4.0f;
 		vert[i].p[2] *= 256.0f / 4.0f;
 
 		// back face cull using polygon normal and first vertex
-		if (1 && i == 0)
+		if (0 && i == 0)
 		{
-			int8_t normal[3];
 			float rotnormal[3];
 
+			int8_t normal[3];
 			normal[0] = databuffer[0] >> 0;
 			normal[1] = databuffer[0] >> 8;
 			normal[2] = databuffer[0] >> 16;
+			//m_state->logerror("norm: %i %i %i\n", normal[0], normal[1], normal[2]);
+			if (normal[2] != -128) {
+				rotnormal[0] = normal[0] * m_state->zeus_matrix[0][0] + normal[1] * m_state->zeus_matrix[0][1] + normal[2] * m_state->zeus_matrix[0][2];
+				rotnormal[1] = normal[0] * m_state->zeus_matrix[1][0] + normal[1] * m_state->zeus_matrix[1][1] + normal[2] * m_state->zeus_matrix[1][2];
+				rotnormal[2] = normal[0] * m_state->zeus_matrix[2][0] + normal[1] * m_state->zeus_matrix[2][1] + normal[2] * m_state->zeus_matrix[2][2];
 
-			rotnormal[0] = normal[0] * m_state->zeus_matrix[0][0] + normal[1] * m_state->zeus_matrix[0][1] + normal[2] * m_state->zeus_matrix[0][2];
-			rotnormal[1] = normal[0] * m_state->zeus_matrix[1][0] + normal[1] * m_state->zeus_matrix[1][1] + normal[2] * m_state->zeus_matrix[1][2];
-			rotnormal[2] = normal[0] * m_state->zeus_matrix[2][0] + normal[1] * m_state->zeus_matrix[2][1] + normal[2] * m_state->zeus_matrix[2][2];
+				float dot = rotnormal[0] * vert[0].x + rotnormal[1] * vert[0].y + rotnormal[2] * vert[0].p[0];
 
-			float dot = rotnormal[0] * vert[0].x + rotnormal[1] * vert[0].y + rotnormal[2] * vert[0].p[0];
-
-			if (dot >= 0)
-				return;
+				if (dot >= 0)
+					return;
+			}
 		}
 
 
@@ -1697,13 +1657,21 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 			unknown[0], unknown[1], unknown[2], unknown[3], unknown[4], unknown[5], unknown[6], unknown[7],
 			unknownFloat[0], unknownFloat[1], unknownFloat[2], unknownFloat[3]);
 	}
-	bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x2);
-	float clipVal = enable_perspective ? 1.0f / 512.0f / 4.0f : 0.0f;
-	//float clipVal = m_state->m_zbufmin / 4096.0f;
-	numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
-	if (numverts < 3)
-		return;
-
+	//bool enable_perspective = true; // !(m_state->m_renderRegs[0x14] & 0x2);
+	//float clipVal = enable_perspective ? 1.0f / 512.0f / 4.0f : 0.0f;
+	float clipVal = m_state->m_zbufmin / 4096.0f;
+	if (1) {
+		numverts = this->zclip_if_less(4, &vert[0], &clipvert[0], 4, clipVal);
+		if (numverts < 3)
+			return;
+	}
+	else {
+		numverts = 4;
+		clipvert[0] = vert[0];
+		clipvert[1] = vert[1];
+		clipvert[2] = vert[2];
+		clipvert[3] = vert[3];
+	}
 	float xOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6a]);
 	float yOrigin = reinterpret_cast<float&>(m_state->m_zeusbase[0x6b]);
 
@@ -1712,31 +1680,38 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	maxx = maxy = -1000.0f;
 	for (i = 0; i < numverts; i++)
 	{
+		if (0 && (m_state->m_renderRegs[0x14] & 0x1)) {
+			clipvert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+		}
 		// mwskinsa has R14=0x40a1 for tips box which has z=0
 		//if (!(m_state->m_renderRegs[0x14] & 0x1)) {
-		if (enable_perspective) {
+		//if (enable_perspective) {
 			// 412.0f here works for crusnexo
 			// 1024.0f works for mwskinsa
-			 float ooz = oozBase / clipvert[i].p[0];
+			 float ooz = oozBase / (clipvert[i].p[0] + (1024 >> m_state->m_zeusbase[0x6c]));
+			 //ooz = oozBase / (oozBase - clipvert[i].p[0]);
 			//float ooz = 1024.0f / clipvert[i].p[0];
 			//float ooz = float(1 << m_state->m_zeusbase[0x6c]) / clipvert[i].p[0];
 			 clipvert[i].x *= ooz;
 			 clipvert[i].y *= ooz;
-		}
+		//}
 
 		if (1) {
 			//clipvert[i].x += 256.5f / 1.0f;
 			//clipvert[i].y += 200.5f / 1.0f;
 			clipvert[i].x += xOrigin;
 			clipvert[i].y += yOrigin;
+			//clipvert[i].p[0] += reinterpret_cast<float&>(m_state->m_zeusbase[0x63]);
+			//clipvert[i].p[0] *= -1.0f;
 		}
 
-		clipvert[i].p[0] *= 65536.0f * 16.0f;
+		//clipvert[i].p[0] *= 65536.0f * 16.0f;
+		clipvert[i].p[0] *= 4096.0f;
 
 		maxx = std::max(maxx, clipvert[i].x);
 		maxy = std::max(maxy, clipvert[i].y);
 		if (logextra & logit)
-			m_state->logerror("\t\t\tTranslated=(%f,%f)\n", (double)clipvert[i].x, (double)clipvert[i].y);
+			m_state->logerror("\t\t\tTranslated=(%f,%f, %f) scale = %f\n", (double)clipvert[i].x, (double)clipvert[i].y, (double)clipvert[i].p[0], ooz);
 	}
 	for (i = 0; i < numverts; i++)
 	{
@@ -1807,7 +1782,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	extra.solidcolor = 0;//m_zeusbase[0x00] & 0x7fff;
 	extra.zbufmin = m_state->m_zbufmin;
 	extra.alpha = 0;//m_zeusbase[0x4e];
-	extra.transcolor = 0x100; // (texmode & 0x100) ? 0 : 0x100;
+	extra.transcolor = 0; // (texmode & 0x100) ? 0 : 0x100;
 	extra.texbase = WAVERAM_BLOCK0_EXT(m_state->zeus_texbase);
 	extra.palbase = m_state->waveram0_ptr_from_expanded_addr(m_state->m_zeusbase[0x41]);
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x020000);
@@ -1817,7 +1792,7 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x000002);
 	//extra.depth_test_enable = true; // (texmode & 0x0010);
 	extra.depth_write_enable = true;
-	extra.get_texel = (m_state->m_palSize==256) ? m_state->get_texel_8bit : m_state->get_texel_4bit;
+	extra.get_texel = ((texmode & 0x3) == 0) ? m_state->get_texel_4bit : m_state->get_texel_8bit;
 	// Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
 	//       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided
@@ -1872,12 +1847,14 @@ void zeus2_renderer::render_poly_8bit(int32_t scanline, const extent_t& extent, 
 			int u1 = (u0 + 1);
 			int v1 = (v0 + 1);
 			uint8_t texel0 = object.get_texel(texbase, v0, u0, texwidth);
-			if (texel0 == transcolor)
-				continue;
+			//if (texel0 == transcolor)
+			//	continue;
 			uint8_t texel1 = object.get_texel(texbase, v0, u1, texwidth);
 			uint8_t texel2 = object.get_texel(texbase, v1, u0, texwidth);
 			uint8_t texel3 = object.get_texel(texbase, v1, u1, texwidth);
 			//if (texel0 != transcolor)
+			if ((texel0 != transcolor) && (texel1 != transcolor) && (texel2 != transcolor) && (texel3 != transcolor))
+			//if (1)
 			{
 				uint32_t color0 = m_state->m_pal_table[texel0];
 				uint32_t color1 = m_state->m_pal_table[texel1];
@@ -1929,3 +1906,123 @@ void zeus2_device::log_render_info(uint32_t texdata)
 		logerror(" %02X=%08X", i, m_zeusbase[i]);
 	logerror("\n");
 }
+
+#if PRINT_TEX_INFO
+#include <iomanip>
+
+void zeus2_device::check_tex(uint32_t &texmode, float &zObj, float &zMat, float &zOff)
+{
+	if (tex_map.count(zeus_texbase) == 0) {
+		std::string infoStr;
+		std::stringstream infoStream;
+		infoStream << "tex=0x" << std::setw(8) << std::setfill('0') << std::hex << zeus_texbase << " ";
+		infoStream << "pal=0x" << std::setw(4) << std::setfill('0') << (m_curPalTableSrc>>16) << ", 0x" << std::setw(4) << (m_curPalTableSrc & 0xffff) << " ";
+		infoStream << "texdata=" << std::setw(8) << std::hex << texmode << " ";
+		infoStream << "(6c)=" << m_zeusbase[0x6c] << " ";
+		infoStream << "(63)=" << std::dec << reinterpret_cast<float&>(m_zeusbase[0x63]) << " ";
+		infoStream << "zObj=" << std::dec << zObj << " ";
+		infoStream << "zMat=" << std::dec << zMat << " ";
+		infoStream << "zOff=" << std::dec << zOff << " ";
+		infoStream << "R40=" << std::setw(6) << std::hex << m_renderRegs[0x40] << " ";
+		infoStream << "R14=" << m_renderRegs[0x14] << " ";
+		infoStream << "R0C=" << std::setw(3) << m_renderRegs[0x0c] << " ";
+		infoStream << "R0D=" << std::setw(3) << m_renderRegs[0x0d] << " ";
+		infoStr += infoStream.str();
+		infoStr += tex_info();
+
+		tex_map.insert(std::pair<uint32_t, std::string>(zeus_texbase, infoStr));
+		osd_printf_info("%s\n", infoStr.c_str());
+	}
+}
+
+std::string zeus2_device::tex_info(void)
+{
+	std::string retVal;
+	switch (zeus_texbase) {
+		// crusnexo
+		case 0x01fc00:		retVal = "credits / insert coin"; break;
+		case 0x1dc000:		retVal = "copywrite text"; break;
+		case 0x0e7400:		retVal = "tire"; break;
+		case 0x0e8800:		retVal = "star behind tire"; break;
+		case 0x0e6800:		retVal = "crusn exotica text"; break;
+		case 0x02a400:		retVal = "Yellow Letters / Numbers"; break;
+		case 0x1fd000:		retVal = "Star burst in license plate screen"; break;
+		case 0x1e9800:		retVal = "Red Letter in license plate screen"; break;
+		case 0x0c1c00:		retVal = "Car parts"; break;
+		case 0x0006f000:	retVal = "license plate background"; break;
+		case 0x0006f400:	retVal = "blue on white license plate names"; break;
+		case 0x00047800:	retVal = "baby body"; break;
+		case 0x000e7000:	retVal = "crusn exotica yellow glow"; break;
+		case 0x0002b000:	retVal = "blue crusn stencil behind leader list"; break;
+		case 0x001f4800:    retVal = "number keypad"; break;
+		case 0x001e7800:    retVal = "register now logo"; break;
+		case 0x001e5000:    retVal = "blue start game / enter code / earn miles"; break;
+		case 0x0001c800:    retVal = "black letters silver back track select / crusn"; break;
+		case 0x001df400:    retVal = "first place / free race logo"; break;
+		case 0x001ddc00:    retVal = "secret car logo"; break;
+		case 0x0006e800:    retVal = "???"; break;
+		case 0x001f1c00:    retVal = "black 0-9 on silver background"; break;
+		case 0x001ec800:    retVal = "black on silver holland/amazon/sahara"; break;
+		case 0x001f7800:    retVal = "license plate background white"; break;
+		case 0x001f7000:    retVal = "red Hot Times writing"; break;
+		case 0x001eb000:    retVal = "black numbers 0-10 on silver background"; break;
+		case 0x00100800:    retVal = "sunset and stars sky background"; break;
+		case 0x00108c00:    retVal = "asphalt surface"; break;
+		case 0x0010c000:    retVal = "wood surface?"; break;
+		case 0x0010e400:    retVal = "palm tree"; break;
+		case 0x00118c00:    retVal = "highway green signs"; break;
+		case 0x000f6400:    retVal = "glowing feather?"; break;
+		case 0x00112c00:    retVal = "fancy street lamps"; break;
+		case 0x00032400:    retVal = "lady driver body"; break;
+		case 0x000b5400:    retVal = "blue firebird car"; break;
+		case 0x00089c00:    retVal = "brown hummer car"; break;
+		case 0x00110c00:    retVal = "oak tree"; break;
+		case 0x00115400:    retVal = "welcome to las vegas sign"; break;
+		case 0x000f3c00:    retVal = "star or headlight?"; break;
+		case 0x00127400:    retVal = "another (lod) star or headlight?"; break;
+
+
+		// mwskinsa
+		case 0x1fdf00:      retVal = "Skins Tip Box, s=256"; break;
+		case 0x07f540:		retVal = "Left main intro"; break;
+		case 0x081580:		retVal = "Right main intro"; break;
+		case 0x14db00:		retVal = "silver letter b, s=64"; break;
+		case 0x14d880:		retVal = "letter a"; break;
+		case 0x14e000:		retVal = "letter d"; break;
+		case 0x0014dd80:	retVal = "silver letter c, s=64"; break;
+		case 0x0014fb80:	retVal = "silver letter o, s=64"; break;
+		case 0x0014ec80:	retVal = "silver letter i, s=64"; break;
+		case 0x0014f900:	retVal = "silver letter n, s=64"; break;
+		case 0x00150580:	retVal = "silver letter s, s=64"; break;
+		case 0x00150800:	retVal = "silver letter t, s=64"; break;
+		case 0x00150300:	retVal = "silver letter r, s=64"; break;
+		case 0x0014e780:	retVal = "silver letter g, s=64"; break;
+		case 0x00153280:	retVal = "silver letter C, s=64"; break;
+		case 0x0014e280:	retVal = "silver letter e, s=64"; break;
+		case 0x0014b800:	retVal = "silver letter O, s=64"; break;
+		case 0x00152d80:	retVal = "silver letter A, s=64"; break;
+		case 0x0014f680:	retVal = "silver letter m, s=64"; break;
+		case 0x00142b40:	retVal = "black screen?"; break;
+		case 0x00004740:	retVal = "picture bridge over water, s=256"; break;
+		case 0x00005c80:	retVal = "picture water shore, s=256"; break;
+		case 0x000030c0:	retVal = "left leaderboard background graphics, s=256"; break;
+		case 0x00003c00:	retVal = "right leaderboard background graphics, s=256"; break;
+		case 0x00040bc0:	retVal = "extreme mode, s=256"; break;
+		case 0x00091630:	retVal = "photo wild eye guy, s=64"; break;
+		case 0x00159d80:	retVal = "white M s=32, t=4"; break;
+		case 0x0015a080:	retVal = "white 9 s=32, t=4"; break;
+		case 0x00159f00:	retVal = "white P s=32, t=4"; break;
+		case 0x00145a40:	retVal = "white crossbar? s=32, t=4"; break;
+		case 0x00145c40:	retVal = "white crossbar2? s=32, t=4"; break;
+		case 0x00159300:	retVal = "white _ s=32, t=4"; break;
+		case 0x00158d00:	retVal = "white 1 s=32, t=4"; break;
+		case 0x00158e80:	retVal = "white 4 s=32, t=4"; break;
+		case 0x0001c080:	retVal = "maybe checkboard"; break;
+
+		// thegrid
+		//case 0x0001c080:	retVal = "maybe checkboard"; break;
+		default: retVal = "Unknown"; break;
+	}
+	return retVal;
+}
+#endif

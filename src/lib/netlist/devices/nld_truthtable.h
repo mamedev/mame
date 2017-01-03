@@ -235,7 +235,7 @@ namespace netlist
 
 			desc.setup(m_desc, disabled_ignore * 0);
 	#if 0
-			printf("%s\n", name().cstr());
+			printf("%s\n", name().c_str());
 			for (int j=0; j < m_size; j++)
 				printf("%05x %04x %04x %04x\n", j, m_ttp->m_outs[j] & ((1 << m_NO)-1),
 						m_ttp->m_outs[j] >> m_NO, m_ttp->m_timing[j * m_NO + 0]);
@@ -261,7 +261,7 @@ namespace netlist
 		}
 
 	public:
-		void inc_active() noexcept override
+		void inc_active() NL_NOEXCEPT override
 		{
 			if (m_NI > 1)
 				if (++m_active == 1)
@@ -270,7 +270,7 @@ namespace netlist
 				}
 		}
 
-		void dec_active() noexcept override
+		void dec_active() NL_NOEXCEPT override
 		{
 			/* FIXME:
 			 * Based on current measurements there is no point to disable
@@ -366,13 +366,13 @@ namespace netlist
 		plib::pstring_vector_t m_desc;
 	};
 
-	class netlist_base_factory_truthtable_t : public base_factory_t
+	class netlist_base_factory_truthtable_t : public factory::element_t
 	{
 		P_PREVENT_COPYING(netlist_base_factory_truthtable_t)
 	public:
 		netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
 				const pstring &def_param)
-		: base_factory_t(name, classname, def_param), m_family(family_TTL())
+		: factory::element_t(name, classname, def_param), m_family(family_TTL())
 		{}
 
 		virtual ~netlist_base_factory_truthtable_t()

@@ -845,15 +845,37 @@
 	local function cfg_excluded_files(prj, cfg)
 		local excluded = {}
 
+		-- Converts a file path to a pattern with no relative parts, prefixed with `*`.
+		local function exclude_pattern(file)
+			if path.isabsolute(file) then
+				return file
+			end
+
+			-- handle `foo/../bar`
+			local start, term = file:findlast("/%.%./")
+			if term then
+				return path.join("*", file:sub(term + 1))
+			end
+
+			-- handle `../foo/bar`
+			start, term = file:find("%.%./")
+			if start == 1 then
+				return path.join("*", file:sub(term + 1))
+			end
+
+			-- handle `foo/bar`
+			return path.join("*", file)
+		end
+
 		local function add_file(file)
-			local name = path.getname(file)
+			local name = exclude_pattern(file)
 			if not table.icontains(excluded, name) then
 				table.insert(excluded, name)
 			end
 		end
 
 		local function verify_file(file)
-			local name = path.getname(file)
+			local name = exclude_pattern(file)
 			if table.icontains(excluded, name) then
 				-- xcode only allows us to exclude files based on filename, not path...
 				error("'" .. file .. "' would be excluded by the rule to exclude '" .. name .. "'")

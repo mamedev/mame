@@ -134,14 +134,12 @@ public:
 	uint16_t m_automat_scroll_regs[4];
 
 	DECLARE_WRITE16_MEMBER(automat_control_w);
-	DECLARE_WRITE16_MEMBER(secretab_sound_w);
 	DECLARE_READ16_MEMBER( automat_palette_r );
 	DECLARE_WRITE16_MEMBER( automat_palette_w );
 	DECLARE_WRITE16_MEMBER( automat_scroll_w )
 	{
 		COMBINE_DATA(&m_automat_scroll_regs[offset]);
 	}
-	DECLARE_READ8_MEMBER(sound_command_r);
 	DECLARE_WRITE8_MEMBER(sound_bankswitch_w);
 	DECLARE_WRITE_LINE_MEMBER(msm1_vclk_cb);
 	DECLARE_WRITE_LINE_MEMBER(msm2_vclk_cb);

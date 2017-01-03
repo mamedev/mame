@@ -68,8 +68,8 @@
 
 #include "emu.h"
 #include "vme.h"
-#include "bus/vme/mzr8105.h"
-#include "bus/vme/mzr8300.h"
+#include "bus/vme/vme_mzr8105.h"
+#include "bus/vme/vme_mzr8300.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02

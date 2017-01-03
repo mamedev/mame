@@ -3,7 +3,7 @@
 
 #include "emu.h"
 #include "includes/mzr8105.h"
-#include "bus/vme/mzr8300.h"
+#include "bus/vme/vme_mzr8300.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/clock.h"
 

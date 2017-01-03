@@ -33,6 +33,9 @@ WRITE8_MEMBER( rm380z_state::port_write )
 	case 0xFC:      // PORT0
 		//printf("FBFCw[%2.2x] FBFD [%2.2x] FBFE [%2.2x] PC [%4.4x] writenum [%4.4x]\n",data,m_fbfd,m_fbfe,m_maincpu->safe_pc(),writenum);
 		m_port0 = data;
+		
+		m_cassette->output((m_port0 & 0xEF) ? +1.0 : -1.0);	// set 2400hz, bit 4
+
 		if (data&0x01)
 		{
 			//printf("WARNING: bit0 of port0 reset\n");
@@ -57,9 +60,11 @@ WRITE8_MEMBER( rm380z_state::port_write )
 
 		break;
 
+	// port 1
 	case 0xFE:      // line on screen to write to divided by 2
 		//printf("FBFC [%2.2x] FBFD [%2.2x] FBFEw[%2.2x] PC [%4.4x] writenum [%4.4x]\n",m_port0,m_fbfd,data,m_maincpu->safe_pc(),writenum);
 		m_fbfe=data;
+		
 		break;
 
 	case 0xFF:      // user I/O port
@@ -92,6 +97,11 @@ READ8_MEMBER( rm380z_state::port_read )
 		break;
 
 	case 0xFE:      // PORT1
+		if ((m_cassette)->input() < +0.0)
+			m_port1 &= 0xDF;	// bit 5 off
+		else
+			m_port1 |= 0x20;	// bit 5 on
+			
 		data = m_port1;
 		//printf("read of port1 from PC [%x]\n",m_maincpu->safe_pc());
 		break;
@@ -230,6 +240,28 @@ void rm380z_state::machine_start()
 	machine().scheduler().timer_pulse(attotime::from_hz(TIMER_SPEED), timer_expired_delegate(FUNC(rm380z_state::static_vblank_timer),this));
 }
 
+DRIVER_INIT_MEMBER( rm380z_state, rm380z )
+{
+	m_videomode=RM380Z_VIDEOMODE_80COL;
+	m_old_videomode=m_videomode;
+	m_port0_mask=0xff;
+}
+
+DRIVER_INIT_MEMBER( rm380z_state, rm380z34d )
+{
+	m_videomode=RM380Z_VIDEOMODE_40COL;
+	m_old_videomode=m_videomode;
+	m_port0_mask=0xdf;		// disable 80 column mode
+}
+
+DRIVER_INIT_MEMBER( rm380z_state, rm380z34e )
+{
+	m_videomode=RM380Z_VIDEOMODE_40COL;
+	m_old_videomode=m_videomode;
+	m_port0_mask=0xdf;		// disable 80 column mode
+}
+
+
 void rm380z_state::machine_reset()
 {
 	m_port0=0x00;
@@ -241,8 +273,8 @@ void rm380z_state::machine_reset()
 	m_old_old_fbfd=0x00;
 	writenum=0;
 
-	m_videomode=RM380Z_VIDEOMODE_80COL;
-	m_old_videomode=m_videomode;
+//	m_videomode=RM380Z_VIDEOMODE_80COL;
+//	m_old_videomode=m_videomode;
 	m_rasterlineCtr=0;
 
 	// note: from COS 4.0 videos, screen seems to show garbage at the beginning

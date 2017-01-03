@@ -51,7 +51,7 @@
  */
 
 // This will be autodetected
-//#define NL_PMF_TYPE 0
+// #define NL_PMF_TYPE 0
 
 #define NL_PMF_TYPE_VIRTUAL         0
 #define NL_PMF_TYPE_GNUC_PMF        1
@@ -82,16 +82,16 @@
  * linear memory pool. This is based of the assumption that
  * due to enhanced locality there will be less cache misses.
  * Your mileage may vary.
+ * This will cause crashes on OSX and thus is ignored on OSX.
  *
  */
-#define USE_MEMPOOL                 (1)
+#define USE_MEMPOOL                 (0)
 #define USE_TRUTHTABLE              (1)
 
 //============================================================
 //  Solver defines
 //============================================================
 
-#define USE_MATRIX_GS               (0)
 #define USE_GABS                    (1)
 // savings are eaten up by effort
 // FIXME: Convert into solver parameter
@@ -165,5 +165,9 @@ using nl_double = double;
 #endif
 #endif
 
+#ifdef __APPLE__
+#undef  USE_MEMPOOL
+#define USE_MEMPOOL                 (0)
+#endif
 
 #endif /* NLCONFIG_H_ */

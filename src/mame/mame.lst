@@ -28880,6 +28880,7 @@ rbffspeck                       // 0124 (c) 1996 SNK
 ridhero                         // 0006 (c) 1990 SNK
 ridheroh                        // 0006 (c) 1990 SNK
 roboarmy                        // 0032 (c) 1991 SNK
+roboarma                        // 0032 (c) 1991 SNK
 rotd                            // 0264 (c) 2002 Evoga
 rotdh                           // 0264 (c) 2002 Evoga
 s1945p                          // 0254 (c) 1999 Psikyo
@@ -28889,6 +28890,7 @@ samsh5spho                      // 0272 (c) 2004 Playmore
 samsho                          // 0045 (c) 1993 SNK
 samsho2                         // 0063 (c) 1994 SNK
 samsho2k                        // 0063 (c) 1994 SNK (Korean hack)
+samsho2ka                       // 0063 (c) 1994 SNK (Korean hack)
 samsho3                         // 0087 (c) 1995 SNK
 samsho3h                        // 0087 (c) 1995 SNK
 samsho4                         // 0222 (c) 1996 SNK
@@ -29595,7 +29597,8 @@ pbaction4                       // (c) 1985 Tehkan
 pbaction5                       // (c) 1985 Tehkan
 
 @source:pc.cpp
-ataripc3                        //
+ataripc1						// Atari PC1 
+ataripc3                        // Atari PC3
 bw230                           // 1985 Bondwell (CGA)
 compc1                          // 1984 Commodore PC-1
 dgone                           // 1984 Data General/One
@@ -30387,6 +30390,7 @@ pet8032                         //
 superpet                        //
 
 @source:peyper.cpp
+ator                            //
 gamatros                        //
 hangonp                         //
 lancelot                        //
@@ -31699,6 +31703,8 @@ rltennis                        // (c) 1993 TCH
 
 @source:rm380z.cpp
 rm380z                          //
+rm380z34d                       //
+rm380z34e                       //
 
 @source:rmhaihai.cpp
 rmhaihai                        // (c) 1985 Alba
@@ -31738,6 +31744,7 @@ schmeisr                        // (c) 1993 Hot B
 wizdfire                        // MAS (c) 1992 Data East Corporation (Over Sea)
 wizdfireu                       // MAS (c) 1992 Data East Corporation (US)
 wolffang                        // MAM (c) 1991 Data East Corporation (Japan)
+hangzo
 
 @source:rollerg.cpp
 rollerg                         // GX999 (c) 1991 (US)

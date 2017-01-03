@@ -46,7 +46,7 @@ void pstring_t<F>::pcat(const pstring_t &s)
 	if (m_ptr->len() > 0)
 		std::memcpy(n->str(), m_ptr->str(), m_ptr->len());
 	if (slen > 0)
-		std::memcpy(n->str() + m_ptr->len(), s.cstr(), slen);
+		std::memcpy(n->str() + m_ptr->len(), s.c_str(), slen);
 	*(n->str() + n->len()) = 0;
 	sfree(m_ptr);
 	m_ptr = n;
@@ -65,7 +65,7 @@ int pstring_t<F>::pcmp(const pstring_t &right) const
 		else
 			return -1;
 	}
-	int ret = memcmp(m_ptr->str(), right.cstr(), l);
+	int ret = memcmp(m_ptr->str(), right.c_str(), l);
 	if (ret == 0)
 	{
 		if (this->blen() > right.blen())
@@ -102,7 +102,7 @@ template<typename F>
 const pstring_t<F> pstring_t<F>::ucase() const
 {
 	pstring_t ret = *this;
-	ret.pcopy(cstr(), blen());
+	ret.pcopy(c_str(), blen());
 	for (std::size_t  i=0; i<ret.len(); i++)
 		ret.m_ptr->str()[i] = static_cast<char>(toupper(static_cast<int>(ret.m_ptr->str()[i])));
 	return ret;
@@ -230,7 +230,7 @@ double pstring_t<F>::as_double(bool *error) const
 
 	if (error != nullptr)
 		*error = false;
-	ret = strtod(cstr(), &e);
+	ret = strtod(c_str(), &e);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -246,9 +246,9 @@ long pstring_t<F>::as_long(bool *error) const
 	if (error != nullptr)
 		*error = false;
 	if (startsWith("0x"))
-		ret = strtol(substr(2).cstr(), &e, 16);
+		ret = strtol(substr(2).c_str(), &e, 16);
 	else
-		ret = strtol(cstr(), &e, 10);
+		ret = strtol(c_str(), &e, 10);
 	if (*e != 0)
 		if (error != nullptr)
 			*error = true;
@@ -279,7 +279,7 @@ bool pstring_t<F>::startsWith(const pstring_t &arg) const
 	if (arg.blen() > blen())
 		return false;
 	else
-		return (memcmp(arg.cstr(), cstr(), arg.blen()) == 0);
+		return (memcmp(arg.c_str(), c_str(), arg.blen()) == 0);
 }
 
 template<typename F>
@@ -288,7 +288,7 @@ bool pstring_t<F>::endsWith(const pstring_t &arg) const
 	if (arg.blen() > blen())
 		return false;
 	else
-		return (memcmp(cstr()+this->blen()-arg.blen(), arg.cstr(), arg.blen()) == 0);
+		return (memcmp(c_str()+this->blen()-arg.blen(), arg.c_str(), arg.blen()) == 0);
 }
 
 
@@ -299,7 +299,7 @@ bool pstring_t<F>::startsWith(const mem_t *arg) const
 	if (alen > blen())
 		return false;
 	else
-		return (memcmp(arg, cstr(), alen) == 0);
+		return (memcmp(arg, c_str(), alen) == 0);
 }
 
 template<typename F>
@@ -351,7 +351,7 @@ void pstringbuffer::pcopy(const pstring &from)
 {
 	std::size_t nl = from.blen() + 1;
 	resize(nl);
-	std::memcpy(m_ptr, from.cstr(), nl);
+	std::memcpy(m_ptr, from.c_str(), nl);
 }
 
 void pstringbuffer::pcat(const char *s)
@@ -377,7 +377,7 @@ void pstringbuffer::pcat(const pstring &s)
 	const std::size_t slen = s.blen();
 	const std::size_t nl = m_len + slen + 1;
 	resize(nl);
-	std::memcpy(m_ptr + m_len, s.cstr(), slen);
+	std::memcpy(m_ptr + m_len, s.c_str(), slen);
 	m_len += slen;
 	m_ptr[m_len] = 0;
 }
