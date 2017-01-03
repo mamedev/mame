@@ -256,6 +256,13 @@ void mame_ui_manager::initialize(running_machine &machine)
 	{
 		slider_current = nullptr;
 	}
+
+	if (!m_machine_info->has_test_switch())
+	{
+		ioport_field *service_mode_sw = m_machine_info->find_dipname(ioport_configurer::string_from_token(DEF_STR(Service_Mode)));
+		if (service_mode_sw != nullptr)
+			service_mode_sw->set_defseq(machine.ioport().type_seq(IPT_SERVICE));
+	}
 }
 
 

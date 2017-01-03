@@ -29,6 +29,9 @@ public:
 	bool has_dips() const { return m_has_dips; }
 	bool has_bioses() const { return m_has_bioses; }
 	bool has_keyboard() const { return m_has_keyboard; }
+	bool has_test_switch() const { return m_has_test_switch; }
+
+	ioport_field *find_dipname(const char *name) const;
 
 	// text generators
 	std::string warnings_string();
@@ -46,6 +49,7 @@ private:
 	bool                    m_has_dips;
 	bool                    m_has_bioses;
 	bool                    m_has_keyboard;
+	bool                    m_has_test_switch;
 };
 
 class menu_game_info : public menu
