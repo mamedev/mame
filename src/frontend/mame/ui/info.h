@@ -31,8 +31,6 @@ public:
 	bool has_keyboard() const { return m_has_keyboard; }
 	bool has_test_switch() const { return m_has_test_switch; }
 
-	ioport_field *find_dipname(const char *name) const;
-
 	// text generators
 	std::string warnings_string();
 	std::string game_info_string();

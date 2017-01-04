@@ -54,24 +54,6 @@ machine_info::machine_info(running_machine &machine)
 }
 
 
-//-------------------------------------------------
-//  find_dipname - look up DIP switch by name
-//-------------------------------------------------
-
-ioport_field *machine_info::find_dipname(const char *name) const
-{
-	if (!m_has_dips)
-		return nullptr;
-
-	for (auto &port : m_machine.ioport().ports())
-		for (ioport_field &field : port.second->fields())
-			if (field.type() == IPT_DIPSWITCH && strcmp(field.name(), name) == 0)
-				return &field;
-
-	return nullptr;
-}
-
-
 /***************************************************************************
     TEXT GENERATORS
 ***************************************************************************/
