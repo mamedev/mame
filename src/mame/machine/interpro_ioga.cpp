@@ -72,6 +72,47 @@ void interpro_ioga_device::device_reset()
 	//m_timer[0]->adjust(attotime::from_hz(60), IOGA_TIMER_0, attotime::from_hz(60));
 }
 
+/******************************************************************************
+  Timers
+******************************************************************************/
+void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_id id)
+{
+	switch (id)
+	{
+	case IOGA_TIMER_1:
+		// disable the timer
+		m_timer[timer]->enable(false);
+
+		// store the value
+		m_timer_reg[timer] = value & IOGA_TIMER1_VMASK;
+
+		// start the timer if necessary
+		if (value & IOGA_TIMER1_START)
+			m_timer[timer]->adjust(attotime::zero, id, attotime::from_usec(m_prescaler));
+		break;
+
+	case IOGA_TIMER_3:
+		// write the value without the top two bits to the register
+		m_timer_reg[timer] = value & IOGA_TIMER3_VMASK;
+
+		// start the timer if necessary
+		if (value & IOGA_TIMER3_START)
+			m_timer[timer]->adjust(attotime::zero, id, attotime::from_hz(IOGA_TIMER3_CLOCK));
+		else
+			m_timer[timer]->enable(false);
+		break;
+
+	default:
+		// save the value
+		m_timer_reg[timer] = value;
+
+		// timer_set(attotime::from_usec(500), id);
+
+		logerror("timer %d set to 0x%x (%d)\n", timer, m_timer_reg[timer], m_timer_reg[timer]);
+		break;
+	}
+}
+
 void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	LOG_TIMER("interpro_ioga_device::device_timer(id = %d)\n", id);
@@ -246,41 +287,9 @@ C8 : ethernet address C 4039f088 // IOGA_ETHADDR_C
 	17 timer 0
 */
 
-void interpro_ioga_device::update_irq(int state)
-{
-	switch (state)
-	{
-	case CLEAR_LINE:
-		if (m_irq_active)
-		{
-			// the cpu has acknowledged the active interrupt, deassert the irq line
-			m_irq_active = false;
-			m_out_int_func(CLEAR_LINE);
-
-		}
-		// fall through to handle any pending interrupts
-
-	case ASSERT_LINE:
-		// if an irq is currently active, don't do anything
-		if (!m_irq_active)
-		{
-			// check for any pending interrupts
-			for (int irq = 0; irq < 19; irq++)
-			{
-				if (m_vectors[irq] & IOGA_INTERRUPT_PENDING)
-				{
-					m_irq_active = true;
-					m_irq_current = irq;
-
-					m_out_int_func(ASSERT_LINE);
-					return;
-				}
-			}
-		}
-		break;
-	}
-}
-
+/******************************************************************************
+ Interrupts
+******************************************************************************/
 void interpro_ioga_device::set_irq_line(int irq, int state)
 {
 	LOG_INTERRUPT("set_irq_line(%d, %d)\n", irq, state);
@@ -339,51 +348,37 @@ IRQ_CALLBACK_MEMBER(interpro_ioga_device::inta_cb)
 	}
 }
 
-WRITE_LINE_MEMBER(interpro_ioga_device::drq)
+void interpro_ioga_device::update_irq(int state)
 {
-	if (state)
+	switch (state)
 	{
-		// TODO: check if dma is enabled
-		m_dma_timer->adjust(attotime::from_usec(10));
-	}
+	case CLEAR_LINE:
+		if (m_irq_active)
+		{
+			// the cpu has acknowledged the active interrupt, deassert the irq line
+			m_irq_active = false;
+			m_out_int_func(CLEAR_LINE);
 
-	m_state_drq = state;
-}
+		}
+		// fall through to handle any pending interrupts
 
-void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_id id)
-{
-	switch (id)
-	{
-	case IOGA_TIMER_1:
-		// disable the timer
-		m_timer[timer]->enable(false);
+	case ASSERT_LINE:
+		// if an irq is currently active, don't do anything
+		if (!m_irq_active)
+		{
+			// check for any pending interrupts
+			for (int irq = 0; irq < 19; irq++)
+			{
+				if (m_vectors[irq] & IOGA_INTERRUPT_PENDING)
+				{
+					m_irq_active = true;
+					m_irq_current = irq;
 
-		// store the value
-		m_timer_reg[timer] = value & IOGA_TIMER1_VMASK;
-
-		// start the timer if necessary
-		if (value & IOGA_TIMER1_START)
-			m_timer[timer]->adjust(attotime::zero, id, attotime::from_usec(m_prescaler));
-		break;
-
-	case IOGA_TIMER_3:
-		// write the value without the top two bits to the register
-		m_timer_reg[timer] = value & IOGA_TIMER3_VMASK;
-
-		// start the timer if necessary
-		if (value & IOGA_TIMER3_START)
-			m_timer[timer]->adjust(attotime::zero, id, attotime::from_hz(IOGA_TIMER3_CLOCK));
-		else
-			m_timer[timer]->enable(false);
-		break;
-
-	default:
-		// save the value
-		m_timer_reg[timer] = value;
-
-		// timer_set(attotime::from_usec(500), id);
-
-		logerror("timer %d set to 0x%x (%d)\n", timer, m_timer_reg[timer], m_timer_reg[timer]);
+					m_out_int_func(ASSERT_LINE);
+					return;
+				}
+			}
+		}
 		break;
 	}
 }
@@ -409,4 +404,18 @@ WRITE16_MEMBER(interpro_ioga_device::icr_w)
 	}
 	else
 		m_vectors[offset] = data;
+}
+
+/******************************************************************************
+ DMA
+******************************************************************************/
+WRITE_LINE_MEMBER(interpro_ioga_device::drq)
+{
+	if (state)
+	{
+		// TODO: check if dma is enabled
+		m_dma_timer->adjust(attotime::from_usec(10));
+	}
+
+	m_state_drq = state;
 }
