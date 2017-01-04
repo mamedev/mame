@@ -15,11 +15,12 @@ class vme_mzr8300_card_device :
 public:
 	vme_mzr8300_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 	vme_mzr8300_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source);
-	// optional information overrides
 
+	// optional information overrides
 	virtual machine_config_constructor device_mconfig_additions() const override;
-	virtual DECLARE_READ8_MEMBER (read8) override;
-	virtual DECLARE_WRITE8_MEMBER (write8) override;
+
+//	virtual DECLARE_READ8_MEMBER (read8) override;
+//	virtual DECLARE_WRITE8_MEMBER (write8) override;
 protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
