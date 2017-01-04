@@ -14106,6 +14106,9 @@ howzat                          //
 orbit1                          //
 shark                           //
 
+@source:hapyfish.cpp
+hapyfsh2						// bootleg
+
 @source:harddriv.cpp
 harddriv                        // 136052           (c) 1988
 harddriv1                       // 136052           (c) 1988
