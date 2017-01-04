@@ -219,7 +219,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_PHOSPHOR_TIME";fs_phosphor_time",               "0.5,0.5,0.5",       OPTION_STRING,     "exponential time constant" },
 	{ WINOPTION_PHOSPHOR_BETA";fs_phosphor_beta",               "1.0,1.0,1.0",       OPTION_STRING,     "inverse power order" },
 	{ WINOPTION_LCD_RISE_TIME";fs_lcd_rise_time",               "0.0,0.0,0.0",       OPTION_STRING,     "LCD persistence rise time constant" },
-	{ WINOPTION_LCD_FALL_TIME";fs_lcd_fall_time",               "0.5,0.5,0.5",       OPTION_STRING,     "LCD persistence fall time constant" },
+	{ WINOPTION_LCD_FALL_TIME";fs_lcd_fall_time",               "0.0,0.0,0.0",       OPTION_STRING,     "LCD persistence fall time constant" },
 	/* NTSC simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
