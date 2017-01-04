@@ -290,14 +290,40 @@ C8 : ethernet address C 4039f088 // IOGA_ETHADDR_C
 /******************************************************************************
  Interrupts
 ******************************************************************************/
+
+static const uint16_t irq_enable_mask[19] =
+{
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL, // external interrupt 0: SCSI
+	IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL, // external interrupt 1: floppy
+	IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL, // external interrupt 2: plotter
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+
+	// internal interrupt 5: serial DMA - one interrupt enable per DMA channel
+	IOGA_INTERRUPT_ENABLE_EXTERNAL << 0 | IOGA_INTERRUPT_ENABLE_EXTERNAL << 1 | IOGA_INTERRUPT_ENABLE_EXTERNAL << 2,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL,
+	IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL // external interrupt 12: Ethernet
+};
+
 void interpro_ioga_device::set_irq_line(int irq, int state)
 {
 	LOG_INTERRUPT("set_irq_line(%d, %d)\n", irq, state);
 	switch (state)
 	{
 	case ASSERT_LINE:
-		// FIXME: handle internal/external interrupts properly
-		if (m_vectors[irq] & (IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL))
+		if (m_vectors[irq] & irq_enable_mask[irq])
 		{
 			// set interrupt pending bit
 			m_vectors[irq] |= IOGA_INTERRUPT_PENDING;
@@ -404,6 +430,16 @@ WRITE16_MEMBER(interpro_ioga_device::icr_w)
 	}
 	else
 		m_vectors[offset] = data;
+}
+
+WRITE8_MEMBER(interpro_ioga_device::softint_w)
+{
+	logerror("soft interrupt write 0x%02x\n", data); 
+	
+	// FIXME: appears that forced interrupts work the same way, by
+	// writing bits in this register on and then off again. Don't
+	// know how the actual interrupt should be directed.
+	m_softint = data;
 }
 
 /******************************************************************************

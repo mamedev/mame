@@ -73,11 +73,11 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(drq);
 
-	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; };
-	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; };
-	DECLARE_READ32_MEMBER(timer1_r) { return m_timer_reg[1]; };
-	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; };
-	DECLARE_READ32_MEMBER(timer3_r) { return m_timer_reg[3]; };
+	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; }
+	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; }
+	DECLARE_READ32_MEMBER(timer1_r) { return m_timer_reg[1]; }
+	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
+	DECLARE_READ32_MEMBER(timer3_r) { return m_timer_reg[3]; }
 
 	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { m_prescaler = data; }
 	DECLARE_WRITE32_MEMBER(timer0_w) { write_timer(0, data, IOGA_TIMER_0); }
@@ -87,16 +87,16 @@ public:
 
 	DECLARE_READ16_MEMBER(icr_r);
 	DECLARE_WRITE16_MEMBER(icr_w);
-	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); };
-	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); };
+	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
+	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
 
 	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
-	DECLARE_WRITE8_MEMBER(softint_w) { m_softint = data; }
+	DECLARE_WRITE8_MEMBER(softint_w);
 	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
 	DECLARE_WRITE8_MEMBER(nmictrl_w) { m_nmictrl = data; }
-
-	DECLARE_READ32_MEMBER(fdc_dma_r) { return m_fdc_dma[offset]; };
-	DECLARE_WRITE32_MEMBER(fdc_dma_w) { m_fdc_dma[offset] = data; };
+	
+	DECLARE_READ32_MEMBER(fdc_dma_r) { return m_fdc_dma[offset]; }
+	DECLARE_WRITE32_MEMBER(fdc_dma_w) { m_fdc_dma[offset] = data; }
 
 protected:
 	// device-level overrides
