@@ -30,6 +30,7 @@ machine_info::machine_info(running_machine &machine)
 	m_has_dips = false;
 	m_has_bioses = false;
 	m_has_keyboard = false;
+	m_has_test_switch = false;
 
 	// scan the input port array to see what options we need to enable
 	for (auto &port : machine.ioport().ports())
@@ -43,6 +44,8 @@ machine_info::machine_info(running_machine &machine)
 				m_has_analog = true;
 			if (field.type() == IPT_KEYBOARD)
 				m_has_keyboard = true;
+			if (field.type() == IPT_SERVICE)
+				m_has_test_switch = true;
 		}
 
 	for (device_t &device : device_iterator(machine.root_device()))
