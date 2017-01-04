@@ -106,7 +106,8 @@ void clipper_device::device_reset()
 
 	// FIXME: figure out how to branch to the boot code properly
 	m_pc = 0x7f100000; 
-	m_immediate_irq = 0;
+	m_irq = 0;
+	m_nmi = 0;
 }
 
 void clipper_device::state_string_export(const device_state_entry &entry, std::string &str) const
@@ -127,12 +128,36 @@ void clipper_device::execute_run()
 {
 	uint16_t insn;
 	
-	if (m_immediate_irq)
+	// check for non-maskable and prioritised interrupts
+	if (m_nmi)
 	{
-		LOG_INTERRUPT("taking interrupt - current pc = %08x\n", m_pc);
+		// acknowledge non-maskable interrupt
+		standard_irq_callback(INPUT_LINE_NMI);
 
-		m_pc = intrap(EXCEPTION_INTERRUPT_BASE + m_immediate_vector * 8, m_pc);
-		m_immediate_irq = 0;
+		LOG_INTERRUPT("non-maskable interrupt - current pc = 0x%08x\n", m_pc);
+		m_pc = intrap(EXCEPTION_INTERRUPT_BASE, m_pc);
+
+		// FIXME: should m_nmi be cleared by the ioga doing CLEAR_LINE after acknowledgement?
+		m_nmi = 0;
+	}
+	else if (m_ssw.bits.ei && m_irq)
+	{
+		// FIXME: sample interrupt vector without acknowledging the interrupt
+		uint8_t ivec = standard_irq_callback(-1);
+		LOG_INTERRUPT("received prioritised interrupt with vector 0x%04x\n", ivec);
+
+		// allow equal/higher priority interrupts
+		if ((ivec >> 4) <= m_ssw.bits.il)
+		{
+			// acknowledge interrupt
+			standard_irq_callback(INPUT_LINE_IRQ0);
+
+			LOG_INTERRUPT("accepting interrupt vector 0x%04x - current pc = %08x\n", ivec, m_pc);
+			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + ivec * 8, m_pc);
+
+			// FIXME: should m_irq be cleared by the ioga doing CLEAR_LINE after acknowledgement?
+			m_irq = 0;
+		}
 	}
 
 	while (m_icount > 0) {
@@ -151,27 +176,15 @@ void clipper_device::execute_run()
 
 void clipper_device::execute_set_input(int inputnum, int state)
 {
-	if (state)
+	switch (inputnum)
 	{
-		// clock is vector  0e29 0000 1110
-		// floppy is vector 0621 0000 0110
+	case INPUT_LINE_IRQ0:
+		m_irq = state;
+		break;
 
-		uint16_t vector = standard_irq_callback(inputnum);
-
-		uint8_t ivec = vector & 0xff;
-		uint8_t il = ivec >> 4;
-		uint8_t in = ivec & 0xf;
-
-		LOG_INTERRUPT("received interrupt with vector %04x\n", vector);
-
-		// allow NMI or equal/higher priority interrupts
-		if (ivec == 0 || (m_ssw.bits.ei && (il <= m_ssw.bits.il)))
-		{
-			m_immediate_irq = 1;
-			m_immediate_vector = ivec;
-			
-			LOG_INTERRUPT("accepting interrupt %x\n", m_immediate_vector);
-		}
+	case INPUT_LINE_NMI:
+		m_nmi = state;
+		break;
 	}
 }
 
@@ -656,7 +669,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		break;
 	case 0x6e:
 		// loadhu: load halfword unsigned (relative)
-		m_r[m_ssw.bits.u][R2] = (uint16_t)m_program->read_word(m_r[m_ssw.bits.u][R1]);
+		m_r[m_ssw.bits.u][R2] = m_program->read_word(m_r[m_ssw.bits.u][R1]);
 		// TRAPS: C,U,A,P,R,I
 		break;
 	case 0x6f:

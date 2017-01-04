@@ -137,7 +137,7 @@ protected:
 	// device_execute_interface overrides
 	virtual uint32_t execute_min_cycles() const override { return 1; };
 	virtual uint32_t execute_max_cycles() const override { return 1; }; // FIXME: don't know, especially macro instructions
-	virtual uint32_t execute_input_lines() const override { return 16; }; // FIXME: number of input/interrupt lines
+	virtual uint32_t execute_input_lines() const override { return 2; }; // number of input/interrupt lines (irq/nmi)
 	virtual void execute_run() override;
 	virtual void execute_set_input(int inputnum, int state) override;
 
@@ -217,8 +217,8 @@ private:
 	int m_icount;
 	int m_interrupt_cycles;
 
-	int m_immediate_irq;
-	int m_immediate_vector;
+	int m_irq;
+	int m_nmi;
 
 	struct
 	{
