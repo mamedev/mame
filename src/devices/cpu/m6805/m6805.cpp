@@ -1145,13 +1145,13 @@ WRITE8_MEMBER(m68705_new_device::internal_68705_tcr_w)
 	{
 		/* logerror("timer enable state changed!\n"); */
 		if (data&0x20) m_68705_timer->adjust(attotime::never, TIMER_68705_PRESCALER_EXPIRED);
-		else m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+		else m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 	}
 	// prescaler check: if timer prescaler has changed, or the PSC bit is set, adjust the timer length for the prescaler expired timer, but only if the timer would be running
 	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) )
 	{
 		/* logerror("timer reset due to PSC or prescaler change!\n"); */
-		m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+		m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 	}
 	m_tcr = data;
 	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
@@ -1182,7 +1182,7 @@ TIMER_CALLBACK_MEMBER(m68705_new_device::timer_68705_increment)
 		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
 	else
 		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
-	m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+	m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
 }
 
 
@@ -1308,8 +1308,7 @@ void m68705_new_device::device_reset()
 	m_tcr = 0x7F;
 
 	//set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-	m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<7)));
-
+	m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<7)));
 }
 
 /****************************************************************************
