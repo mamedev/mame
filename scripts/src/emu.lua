@@ -39,6 +39,7 @@ includedirs {
 files {
 	MAME_DIR .. "src/emu/emu.h",
 	MAME_DIR .. "src/emu/main.h",
+	MAME_DIR .. "src/emu/main.cpp",
 	MAME_DIR .. "src/emu/gamedrv.h",
 	MAME_DIR .. "src/emu/hashfile.cpp",
 	MAME_DIR .. "src/emu/hashfile.h",
