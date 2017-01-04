@@ -13,6 +13,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "pfmtlog.h"
+#include "pexception.h"
 
 namespace plib {
 // -----------------------------------------------------------------------------

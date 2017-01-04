@@ -49,6 +49,7 @@ POBJS := \
 	$(POBJ)/palloc.o \
 	$(POBJ)/pchrono.o \
 	$(POBJ)/pdynlib.o \
+	$(POBJ)/pexception.o \
 	$(POBJ)/pfmtlog.o \
 	$(POBJ)/poptions.o \
 	$(POBJ)/pparser.o \

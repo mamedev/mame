@@ -22,6 +22,7 @@
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
+#include "plib/pexception.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
