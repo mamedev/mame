@@ -70,6 +70,11 @@ namespace webpp {
 			});
 		}
 	};
+
+	class wss_server : public SocketServer<WSS> {
+	public:
+		wss_server(const std::string& cert_file, const std::string& private_key_file,const std::string& verify_file = std::string()) : SocketServer<WSS>::SocketServer(cert_file, private_key_file, verify_file) {}
+	};
 }
 
 

@@ -11,6 +11,7 @@ Controls execution of the core MAME system.
 #include "emu.h"
 #include "emuopts.h"
 #include "main.h"
+#include "server_ws.hpp"
 #include "server_http.hpp"
 #include <fstream>
 
@@ -132,9 +133,13 @@ void machine_manager::start_http_server()
 		m_server = std::make_unique<webpp::http_server>();
 		m_server->m_config.port = options().http_port();
 		m_server->set_io_context(m_io_context);
-		std::string doc_root = options().http_root();
+		m_wsserver = std::make_unique<webpp::ws_server>();
 
-		m_server->on_get([this, doc_root](auto response, auto request) {
+		auto& endpoint = m_wsserver->endpoint["/"];
+
+		m_server->on_get([this](auto response, auto request) {
+			std::string doc_root = this->options().http_root();
+
 			std::string path = request->path;
 			// If path ends in slash (i.e. is a directory) then add "index.html".
 			if (path[path.size() - 1] == '/')
@@ -173,6 +178,23 @@ void machine_manager::start_http_server()
 			response->status(200).send(content);
 
 		});
+
+		endpoint.on_open = [&](auto connection) {
+			auto send_stream = std::make_shared<webpp::ws_server::SendStream>();
+			*send_stream << "update_machine";
+			m_wsserver->send(connection, send_stream, [](const std::error_code& ec) { });
+		};
+	
+		m_server->on_upgrade = [this](auto socket, auto request) {
+			auto connection = std::make_shared<webpp::ws_server::Connection>(socket);
+			connection->method = std::move(request->method);
+			connection->path = std::move(request->path);
+			connection->http_version = std::move(request->http_version);
+			connection->header = std::move(request->header);
+			connection->remote_endpoint_address = std::move(request->remote_endpoint_address);
+			connection->remote_endpoint_port = request->remote_endpoint_port;
+			m_wsserver->upgrade(connection);
+		};
 		m_server->start();
 	}
 }

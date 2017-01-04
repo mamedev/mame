@@ -64,6 +64,7 @@ namespace webpp {
 			}
 		};
 
+		
 		class Connection {
 			friend class SocketServerBase<socket_type>;
 			friend class SocketServer<socket_type>;
@@ -141,7 +142,7 @@ namespace webpp {
 				catch (...) {}
 			}
 		};
-
+		
 		class Message : public std::istream {
 			friend class SocketServerBase<socket_type>;
 
@@ -703,6 +704,11 @@ namespace webpp {
 				}
 			});
 		}
+	};
+
+	class ws_server : public SocketServer<WS> {
+	public:
+		ws_server() : SocketServer<WS>::SocketServer() {}
 	};
 }
 #endif  /* SERVER_WS_HPP */

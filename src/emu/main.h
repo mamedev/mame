@@ -73,6 +73,7 @@ namespace asio
 namespace webpp
 {
 	class http_server;
+	class ws_server;
 }
 
 class machine_manager
@@ -104,8 +105,9 @@ protected:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
 	running_machine *       m_machine;
-	std::shared_ptr<asio::io_context>  m_io_context;
+	std::shared_ptr<asio::io_context>   m_io_context;
 	std::unique_ptr<webpp::http_server> m_server;
+	std::unique_ptr<webpp::ws_server>   m_wsserver;
 	std::thread						    m_server_thread;
 };
 

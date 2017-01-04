@@ -507,6 +507,11 @@ namespace webpp {
 			});
 		}
 	};
+
+	class ws_client : public SocketClient<WS> {
+	public:
+		explicit ws_client(const std::string& server_port_path) : SocketClient<WS>::SocketClient(server_port_path) {}
+	};
 }
 
 #endif  /* CLIENT_WS_HPP */

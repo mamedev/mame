@@ -70,6 +70,13 @@ namespace webpp {
 			});
 		}
 	};
+
+	class wss_client : public SocketClient<WSS> {
+	public:
+		explicit wss_client(const std::string& server_port_path, bool verify_certificate = true,
+			const std::string& cert_file = std::string(), const std::string& private_key_file = std::string(),
+			const std::string& verify_file = std::string()) : SocketClient<WSS>::SocketClient(server_port_path, verify_certificate, cert_file, private_key_file, verify_file) {}
+	};
 }
 
 #endif  /* CLIENT_WSS_HPP */
