@@ -7,7 +7,6 @@
 #define INTERPRO_IOGA_H_
 
 #include "emu.h"
-#include "machine/upd765.h"
 
 #define MCFG_INTERPRO_IOGA_ADD(_tag) \
 	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0)
@@ -17,6 +16,10 @@
 
 #define MCFG_INTERPRO_IOGA_IRQ_CB(_out_int) \
 	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_int);
+
+#define MCFG_INTERPRO_IOGA_DMA_CB(_channel, _dma_r, _dma_w) \
+	devcb = &interpro_ioga_device::static_set_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
+	devcb = &interpro_ioga_device::static_set_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
 
 // timer 0 seem to be a 60Hz cycle
 #define IOGA_TIMER0_IRQ     14
@@ -42,6 +45,12 @@
 // FIXME: hack for forced interrupts
 #define IOGA_INTERRUPT_FORCED          0x8000
 
+#define IOGA_DMA_CHANNELS 4
+#define IOGA_DMA_CHANNEL_PLOTTER 0
+#define IOGA_DMA_CHANNEL_SCSI    1
+#define IOGA_DMA_CHANNEL_FLOPPY  2
+#define IOGA_DMA_CHANNEL_SERIAL  3
+
 class interpro_ioga_device : public device_t
 {
 public:
@@ -50,6 +59,9 @@ public:
 
 	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_int_func.set_callback(object); }
+
+	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_r_func[channel].set_callback(object); }
+	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_w_func[channel].set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -122,8 +134,8 @@ private:
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
 
-	// a hack to get hold of the dma devices
-	upd765_family_device *m_fdc;
+	devcb_read8 m_dma_r_func[IOGA_DMA_CHANNELS];
+	devcb_write8 m_dma_w_func[IOGA_DMA_CHANNELS];
 
 	bool m_irq_active;
 	uint32_t m_irq_current;

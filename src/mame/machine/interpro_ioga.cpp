@@ -35,17 +35,25 @@ const device_type INTERPRO_IOGA = &device_creator<interpro_ioga_device>;
 interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, INTERPRO_IOGA, "InterPro IOGA", tag, owner, clock, "ioga", __FILE__),
 	m_out_nmi_func(*this),
-	m_out_int_func(*this)
-{
+	m_out_int_func(*this),
+	m_dma_r_func{ { *this }, { *this }, { *this }, { *this } },
+	m_dma_w_func{ { *this }, { *this }, { *this }, { *this } }
+	{
 }
 
 void interpro_ioga_device::device_start()
 {
 	// resolve callbacks
+	m_out_nmi_func.resolve();
 	m_out_int_func.resolve();
 
+	for (auto & r : m_dma_r_func)
+		r.resolve_safe(0xff);
+
+	for (auto & w : m_dma_w_func)
+		w.resolve();
+
 	m_cpu = machine().device<cpu_device>("cpu");
-	m_fdc = machine().device<upd765_family_device>("fdc");
 
 	// allocate ioga timers
 	m_timer[0] = timer_alloc(IOGA_TIMER_0);
@@ -164,7 +172,7 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 	{
 		address_space &space = m_cpu->space(AS_PROGRAM);
 
-		space.write_byte(m_fdc_dma[0]++, m_fdc->dma_r());
+		space.write_byte(m_fdc_dma[0]++, m_dma_r_func[IOGA_DMA_CHANNEL_FLOPPY]());
 		if (--m_fdc_dma[2])
 			m_dma_timer->adjust(attotime::from_usec(10));
 		else
