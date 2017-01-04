@@ -70,7 +70,7 @@ namespace netlist
 		//m_V0.initial(0.0);
 		//m_RV.do_reset();
 		m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
-		m_inc = netlist_time::from_hz(m_FREQ());
+		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
 			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
 
@@ -80,7 +80,7 @@ namespace netlist
 
 	NETLIB_UPDATE_PARAM(MM5837_dip)
 	{
-		m_inc = netlist_time::from_hz(m_FREQ());
+		m_inc = netlist_time::from_double(1.0 / m_FREQ());
 		if (m_FREQ() < 24000 || m_FREQ() > 56000)
 			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
 	}

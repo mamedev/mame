@@ -68,7 +68,7 @@ fpsignalenabler::fpsignalenabler(unsigned fpexceptions)
 #if HAS_FEENABLE_EXCEPT
 	if (m_enable)
 	{
-		unsigned b = 0;
+		int b = 0;
 		if (fpexceptions & plib::FP_INEXACT) b = b | FE_INEXACT;
 		if (fpexceptions & plib::FP_DIVBYZERO) b = b | FE_DIVBYZERO;
 		if (fpexceptions & plib::FP_UNDERFLOW) b = b | FE_UNDERFLOW;

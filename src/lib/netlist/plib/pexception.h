@@ -101,7 +101,7 @@ public:
 	static bool global_enable(bool enable);
 
 private:
-	unsigned m_last_enabled;
+	int m_last_enabled;
 
 	static bool m_enable;
 };

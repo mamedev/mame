@@ -37,7 +37,7 @@ namespace netlist { namespace factory
 		virtual ~element_t() {}
 
 		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
-		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {};
+		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {}
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
