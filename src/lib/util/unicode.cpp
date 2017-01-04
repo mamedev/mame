@@ -8,9 +8,6 @@
 
 ***************************************************************************/
 
-#include <codecvt>
-#include <locale>
-
 #include "unicode.h"
 
 #ifdef _WIN32
@@ -19,6 +16,9 @@
 #endif
 
 #include "utf8proc/utf8proc.h"
+
+#include <codecvt>
+#include <locale>
 
 
 //-------------------------------------------------
