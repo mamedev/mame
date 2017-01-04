@@ -131,9 +131,9 @@ protected:
 	uint8_t m_data;       // ADD/DATA pins output
 	int m_m0;
 	int m_m1;
-	int m_cs;           // chipselect pin
-	int m_clk;          // CLK pin
-	int m_rck;          // RCK pin (mask/gate to CLK?)
+	int m_cs;             // chipselect pin
+	int m_clk;            // CLK pin
+	int m_rck;            // RCK pin (mask/gate to CLK?)
 };
 
 

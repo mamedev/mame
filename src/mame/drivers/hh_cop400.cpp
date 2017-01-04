@@ -19,7 +19,7 @@
 #include "bship82.lh" // clickable
 #include "ctstein.lh" // clickable
 #include "einvaderc.lh" // test-layout(but still playable)
-#include "funjacks.lh"
+#include "funjacks.lh" // clickable
 #include "funrlgl.lh"
 #include "h2hbaskb.lh"
 #include "lightfgt.lh" // clickable
@@ -48,16 +48,16 @@ public:
 	uint8_t m_l;                          // MCU port L write data
 	uint8_t m_g;                          // MCU port G write data
 	uint8_t m_d;                          // MCU port D write data
-	int m_so;                           // MCU SO line state
-	int m_sk;                           // MCU SK line state
+	int m_so;                             // MCU SO line state
+	int m_sk;                             // MCU SK line state
 	uint16_t m_inp_mux;                   // multiplexed inputs mask
 
 	uint16_t read_inputs(int columns);
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                   // display matrix number of rows
+	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
 
 	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments

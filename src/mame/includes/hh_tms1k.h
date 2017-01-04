@@ -51,9 +51,9 @@ public:
 	virtual DECLARE_WRITE_LINE_MEMBER(auto_power_off);
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                   // display matrix number of rows
+	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
 
 	uint32_t m_grid;                      // VFD/LED current row data
 	uint32_t m_plate;                     // VFD/LED current column data

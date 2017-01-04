@@ -34,7 +34,7 @@ public:
 	optional_device<speaker_sound_device> m_speaker;
 
 	// misc common
-	uint16_t m_inp_mux;                   // multiplexed inputs mask
+	uint16_t m_inp_mux;                 // multiplexed inputs mask
 	int m_inp_lines;                    // number of input mux columns
 	uint8_t m_lcd_output_cache[0x100];
 

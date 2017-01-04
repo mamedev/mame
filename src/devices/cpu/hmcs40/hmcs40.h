@@ -182,22 +182,22 @@ protected:
 	address_space *m_program;
 	address_space *m_data;
 
-	int m_pcwidth;      // Program Counter bit-width
+	int m_pcwidth;        // Program Counter bit-width
 	int m_prgwidth;
 	int m_datawidth;
 	int m_pcmask;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;       // MCU family (42-47)
+	int m_family;         // MCU family (42-47)
 	uint16_t m_polarity;  // i/o polarity (pmos vs cmos)
-	int m_stack_levels; // number of callstack levels
+	int m_stack_levels;   // number of callstack levels
 	uint16_t m_stack[4];  // max 4
 	uint16_t m_op;        // current opcode
 	uint16_t m_prev_op;
 	uint8_t m_i;          // 4-bit immediate opcode param
-	int m_eint_line;    // which input_line caused an interrupt
+	int m_eint_line;      // which input_line caused an interrupt
 	emu_timer *m_timer;
-	int m_halt;         // internal HLT state
+	int m_halt;           // internal HLT state
 	attotime m_timer_halted_remain;
 	int m_icount;
 

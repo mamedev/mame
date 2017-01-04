@@ -21,10 +21,11 @@
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
- *MP0168   TMS1000   1979, Conic Basketball/Tandy Sports Arena
+ *MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
+ *MP0907   TMS1000   1979, Conic/Cardinal Basketball
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)

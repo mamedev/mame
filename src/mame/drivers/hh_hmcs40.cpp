@@ -133,9 +133,9 @@ public:
 	DECLARE_INPUT_CHANGED_MEMBER(single_interrupt_line);
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 47 for now)
+	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                   // display matrix number of rows
+	int m_display_maxx;                   // display matrix number of columns (max 47 for now)
 
 	uint32_t m_grid;                      // VFD current row data
 	uint64_t m_plate;                     // VFD current column data
