@@ -16,6 +16,7 @@
 #ifndef MAME_EMU_MAIN_H
 #define MAME_EMU_MAIN_H
 
+#include <thread>
 #include <time.h>
 
 //**************************************************************************
