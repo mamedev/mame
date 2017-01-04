@@ -1286,7 +1286,7 @@ void m68705_new_device::device_start()
 	m_portB_in = 0xff;
 	m_portC_in = 0xff;
 
-	// allocate the MCU timer, even if we have no MCU, and set it to fire NEVER.
+	// allocate the MCU timer, and set it to fire NEVER.
 	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68705_new_device::timer_68705_increment),this));
 	m_68705_timer->adjust(attotime::never);
 
