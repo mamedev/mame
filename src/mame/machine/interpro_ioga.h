@@ -9,9 +9,38 @@
 #include "emu.h"
 #include "machine/upd765.h"
 
-#define MCFG_INTERPRO_IOGA_ADD(_tag, _out_int) \
-	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0) \
-	devcb = &interpro_ioga_device::static_set_out_int_callback( *device, DEVCB_##_out_int );
+#define MCFG_INTERPRO_IOGA_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0)
+
+#define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
+	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_nmi);
+
+#define MCFG_INTERPRO_IOGA_IRQ_CB(_out_int) \
+	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_int);
+
+// timer 0 seem to be a 60Hz cycle
+#define IOGA_TIMER0_IRQ     14
+
+// best guess for timer 1 is 10MHz based on typical prescaler value of 1000 and timer value of 100 for a delay of 100ms
+#define IOGA_TIMER1_IRQ     15
+#define IOGA_TIMER1_VMASK   0xffff
+#define IOGA_TIMER1_START   0x10000
+#define IOGA_TIMER1_EXPIRED 0x20000
+
+// best guess for timer 3 is 12.5MHz based on typical value of 12500 for a delay of 1ms
+#define IOGA_TIMER3_CLOCK	XTAL_12_5MHz
+#define IOGA_TIMER3_IRQ     1
+#define IOGA_TIMER3_VMASK   0x3fffffff
+#define IOGA_TIMER3_START	0x40000000
+#define IOGA_TIMER3_EXPIRED 0x80000000
+
+#define IOGA_INTERRUPT_PENDING         0x0100
+#define IOGA_INTERRUPT_ENABLE_EXTERNAL 0x0200
+#define IOGA_INTERRUPT_EDGE            0x0400
+#define IOGA_INTERRUPT_NEGPOL          0x0800
+#define IOGA_INTERRUPT_ENABLE_INTERNAL 0x1000
+// FIXME: hack for forced interrupts
+#define IOGA_INTERRUPT_FORCED          0x8000
 
 class interpro_ioga_device : public device_t
 {
@@ -19,6 +48,7 @@ public:
 	// construction/destruction
 	interpro_ioga_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
 
+	template<class _Object> static devcb_base &static_set_out_nmi_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_nmi_func.set_callback(object); }
 	template<class _Object> static devcb_base &static_set_out_int_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_out_int_func.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
@@ -43,19 +73,27 @@ public:
 
 	DECLARE_WRITE_LINE_MEMBER(drq);
 
-	DECLARE_READ32_MEMBER(read);
-	DECLARE_WRITE32_MEMBER(write);
+	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; };
+	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; };
+	DECLARE_READ32_MEMBER(timer1_r) { return m_timer_reg[1]; };
+	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; };
+	DECLARE_READ32_MEMBER(timer3_r) { return m_timer_reg[3]; };
 
-	DECLARE_READ32_MEMBER(timer0_r) { return m_timer[0]; };
-	DECLARE_READ32_MEMBER(timer1_r) { return m_timer[1]; };
-	DECLARE_READ32_MEMBER(timer3_r) { return m_timer[3]; };
-
-	DECLARE_WRITE32_MEMBER(timer0_w) { set_timer(0, data, IOGA_TIMER_0); }
-	DECLARE_WRITE32_MEMBER(timer1_w) { set_timer(1, data, IOGA_TIMER_1); }
-	DECLARE_WRITE32_MEMBER(timer3_w) { set_timer(3, data, IOGA_TIMER_3); }
+	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { m_prescaler = data; }
+	DECLARE_WRITE32_MEMBER(timer0_w) { write_timer(0, data, IOGA_TIMER_0); }
+	DECLARE_WRITE32_MEMBER(timer1_w) { write_timer(1, data, IOGA_TIMER_1); }
+	DECLARE_WRITE32_MEMBER(timer2_w) { write_timer(2, data, IOGA_TIMER_2); }
+	DECLARE_WRITE32_MEMBER(timer3_w) { write_timer(3, data, IOGA_TIMER_3); }
 
 	DECLARE_READ16_MEMBER(icr_r);
 	DECLARE_WRITE16_MEMBER(icr_w);
+	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); };
+	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); };
+
+	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
+	DECLARE_WRITE8_MEMBER(softint_w) { m_softint = data; }
+	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
+	DECLARE_WRITE8_MEMBER(nmictrl_w) { m_nmictrl = data; }
 
 	DECLARE_READ32_MEMBER(fdc_dma_r) { return m_fdc_dma[offset]; };
 	DECLARE_WRITE32_MEMBER(fdc_dma_w) { m_fdc_dma[offset] = data; };
@@ -77,18 +115,21 @@ private:
 	static const device_timer_id IOGA_TIMER_DMA = 4;
 
 	void set_irq_line(int irq, int state);
-	void set_timer(int timer, uint32_t value, device_timer_id id);
+	void write_timer(int timer, uint32_t value, device_timer_id id);
 
+	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
 
 	// a hack to get hold of the dma devices
 	upd765_family_device *m_fdc;
 
-	uint32_t m_irq_lines;
 	uint8_t m_interrupt;
 	uint16_t m_vectors[19];
+	uint8_t m_softint, m_nmictrl;
 
-	uint32_t m_timer[4];
+	uint32_t m_prescaler;
+	uint32_t m_timer_reg[4];
+	emu_timer *m_timer[4];
 
 	emu_timer *m_dma_timer;
 	uint32_t m_state_drq;
