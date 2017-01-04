@@ -22,9 +22,12 @@ namespace imgtool
 	class charconverter
 	{
 	public:
-		virtual void from_utf8(std::ostream &dest, const std::string &src) const = 0;
-		virtual void to_utf8(std::ostream &dest, const std::string &src) const = 0;
-		
+		virtual void from_utf8(std::ostream &dest, const char *src, size_t src_length) const = 0;
+		virtual void to_utf8(std::ostream &dest, const char *src, size_t src_length) const = 0;
+
+		void from_utf8(std::ostream &dest, const std::string &src) const;
+		void to_utf8(std::ostream &dest, const std::string &src) const;
+
 		std::string from_utf8(const std::string &src) const
 		{
 			// inlining so that the return value can potentially be removed by return value optimization
@@ -59,8 +62,8 @@ namespace imgtool
 		{
 		}
 
-		virtual void from_utf8(std::ostream &dest, const std::string &src) const override;
-		virtual void to_utf8(std::ostream &dest, const std::string &src) const override;
+		virtual void from_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
+		virtual void to_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
 
 	private:
 		unicode_normalization_form m_norm;

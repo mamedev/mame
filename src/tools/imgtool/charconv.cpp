@@ -13,44 +13,50 @@
 #include "unicode.h"
 #include "coretmpl.h"
 
-static const char32_t iso_8859_1_code_page[128] =
-{
-	// 0x80 - 0x8F
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	// 0x90 - 0x9F
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-	// 0xA0 - 0xAF
-	0xA0, 0xA1, 0xA2, 0xA3, 0xA4, 0xA5, 0xA6, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAC, 0xAD, 0xAE, 0xAF,
-	// 0xB0 - 0xBF
-	0xB0, 0xB1, 0xB2, 0xB3, 0xB4, 0xB5, 0xB6, 0xB7, 0xB8, 0xB9, 0xBA, 0xBB, 0xBC, 0xBD, 0xBE, 0xBF,
-	// 0xC0 - 0xCF
-	0xC0, 0xC1, 0xC2, 0xC3, 0xC4, 0xC5, 0xC6, 0xC7, 0xC8, 0xC9, 0xCA, 0xCB, 0xCC, 0xCD, 0xCE, 0xCF,
-	// 0xD0 - 0xDF
-	0xD0, 0xD1, 0xD2, 0xD3, 0xD4, 0xD5, 0xD6, 0xD7, 0xD8, 0xD9, 0xDA, 0xDB, 0xDC, 0xDD, 0xDE, 0xDF,
-	// 0xE0 - 0xEF
-	0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE7, 0xE8, 0xE9, 0xEA, 0xEB, 0xEC, 0xED, 0xEE, 0xEF,
-	// 0xF0 - 0xFF
-	0xF0, 0xF1, 0xF2, 0xF3, 0xF4, 0xF5, 0xF6, 0xF7, 0xF8, 0xF9, 0xFA, 0xFB, 0xFC, 0xFD, 0xFE, 0xFF
-};
-
-imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(nullptr, iso_8859_1_code_page);
+imgtool::simple_charconverter imgtool::charconverter_iso_8859_1(nullptr, nullptr);
 
 
 //-------------------------------------------------
 //  from_utf8
 //-------------------------------------------------
 
-void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const std::string &src) const
+void imgtool::charconverter::from_utf8(std::ostream &dest, const std::string &src) const
+{
+	from_utf8(dest, src.c_str(), src.size());
+}
+
+
+//-------------------------------------------------
+//  to_utf8
+//-------------------------------------------------
+
+void imgtool::charconverter::to_utf8(std::ostream &dest, const std::string &src) const
+{
+	to_utf8(dest, src.c_str(), src.size());
+}
+
+
+//-------------------------------------------------
+//  from_utf8
+//-------------------------------------------------
+
+void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *src, size_t src_length) const
 {
 	// normalize the incoming unicode
-	std::string normalized_src = normalize_unicode(src, m_norm);
+	std::string normalized_src = normalize_unicode(src, src_length, m_norm);
 
 	auto iter = normalized_src.begin();
 	while(iter != normalized_src.end())
 	{
 		// get the next character
 		char32_t ch;
-		iter += uchar_from_utf8(&ch, &*iter, normalized_src.end() - iter);
+		int rc = uchar_from_utf8(&ch, &*iter, normalized_src.end() - iter);
+		if (rc < 0)
+		{
+			ch = 0xFFFD;
+			rc = 1;
+		}	
+		iter += rc;
 
 		// look in all pages
 		const char32_t *pages[2];
@@ -93,24 +99,24 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const std::str
 //  to_utf8
 //-------------------------------------------------
 
-void imgtool::simple_charconverter::to_utf8(std::ostream &dest, const std::string &src) const
+void imgtool::simple_charconverter::to_utf8(std::ostream &dest, const char *src, size_t src_length) const
 {
-	for (auto iter = src.begin(); iter != src.end(); iter++)
+	for (size_t i = 0; i < src_length; i++)
 	{
 		// which page is this in?
-		const char32_t *page = ((*iter & 0x80) == 0) ? m_lowpage : m_highpage;
+		const char32_t *page = ((src[i] & 0x80) == 0) ? m_lowpage : m_highpage;
 
 		// is this page present?
-		if ((*iter & 0x80) == 0)
+		if ((src[i] & 0x80) == 0)
 		{
 			// no - pass it on
-			dest << *iter;
+			dest << src[i];
 		}
 		else
 		{
 			// yes - we need to do a lookup
-			size_t base = ((*iter & 0x80) == 0) ? 0x00 : 0x80;
-			char32_t ch = page[((unsigned char)(*iter)) - base];
+			size_t base = ((src[i] & 0x80) == 0) ? 0x00 : 0x80;
+			char32_t ch = page[((unsigned char)(src[i])) - base];
 			if (ch == 0)
 				throw charconverter_exception();
 
