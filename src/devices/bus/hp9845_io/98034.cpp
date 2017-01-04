@@ -132,6 +132,9 @@ READ16_MEMBER(hp98034_io_card::reg_r)
 	m_force_flg = true;
 
 	update_flg();
+	// PPU yields to let NP see FLG=0 immediately
+	// (horrible race conditions lurking...)
+	space.device().execute().yield();
 
 	LOG(("read R%u=%04x\n" , offset + 4 , res));
 	return res;
@@ -152,6 +155,9 @@ WRITE16_MEMBER(hp98034_io_card::reg_w)
 	m_force_flg = true;
 
 	update_flg();
+	// PPU yields to let NP see FLG=0 immediately
+	// (horrible race conditions lurking...)
+	space.device().execute().yield();
 	LOG(("write R%u=%04x\n" , offset + 4 , data));
 }
 

@@ -42,9 +42,32 @@ public:
 	virtual void ieee488_atn(int state) override;
 	virtual void ieee488_ren(int state) override;
 
+	// PHI write CBs
+	DECLARE_WRITE_LINE_MEMBER(phi_eoi_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_dav_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_nrfd_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ndac_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ifc_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_srq_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_atn_w);
+	DECLARE_WRITE_LINE_MEMBER(phi_ren_w);
+
+	// PHI DIO r/w CBs
+	DECLARE_READ8_MEMBER(phi_dio_r);
+	DECLARE_WRITE8_MEMBER(phi_dio_w);
+
+	// PHI IRQ/Z80 NMI
+	DECLARE_WRITE_LINE_MEMBER(phi_int_w);
+
+	// PHI register read & Z80 IRQ
+	DECLARE_READ8_MEMBER(phi_reg_r);
+	DECLARE_WRITE16_MEMBER(z80_m1_w);
+
 private:
 	required_device<z80_device> m_cpu;
 	required_device<phi_device> m_phi;
+
+	bool m_cpu_irq;
 };
 
 // device type definition

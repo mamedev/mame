@@ -17,28 +17,28 @@
 	phi_device::set_dio_write_cb(*device , DEVCB_##_write);
 
 // Set write callbacks to access uniline signals on IEEE-488
-#define MCFG_PHI_EOI_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_EOI_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_EOI , DEVCB_##_write);
 
-#define MCFG_PHI_DAV_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_DAV_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_DAV , DEVCB_##_write);
 
-#define MCFG_PHI_NRFD_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_NRFD_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NRFD , DEVCB_##_write);
 
-#define MCFG_PHI_NDAC_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_NDAC_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_NDAC , DEVCB_##_write);
 
-#define MCFG_PHI_IFC_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_IFC_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_IFC , DEVCB_##_write);
 
-#define MCFG_PHI_SRQ_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_SRQ_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_SRQ , DEVCB_##_write);
 
-#define MCFG_PHI_ATN_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_ATN_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_ATN , DEVCB_##_write);
 
-#define MCFG_PHI_REN_WRITE_CB(_read , _write)	\
+#define MCFG_PHI_REN_WRITE_CB(_write)	\
 	phi_device::set_488_signal_write_cb(*device , phi_device::PHI_488_REN , DEVCB_##_write);
 
 // Set write callback for INT signal

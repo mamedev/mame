@@ -244,6 +244,15 @@ void phi_device::set_ext_signal(phi_488_signal_t signal , int state)
 	state = !state;
 	if (m_ext_signals[ signal ] != state) {
 		m_ext_signals[ signal ] = state;
+		LOG(("EXT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+			 m_ext_signals[ PHI_488_EOI ] ,
+			 m_ext_signals[ PHI_488_DAV ] ,
+			 m_ext_signals[ PHI_488_NRFD ] ,
+			 m_ext_signals[ PHI_488_NDAC ] ,
+			 m_ext_signals[ PHI_488_IFC ] ,
+			 m_ext_signals[ PHI_488_SRQ ] ,
+			 m_ext_signals[ PHI_488_ATN ] ,
+			 m_ext_signals[ PHI_488_REN ]));
 		update_fsm();
 	}
 }
@@ -309,7 +318,7 @@ READ16_MEMBER(phi_device::reg16_r)
 			((res & REG_D0D1_MASK) >> (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT));
 	}
 
-	LOG(("R %u=%04x\n" , offset , res));
+	//LOG(("R %u=%04x\n" , offset , res));
 	return res;
 }
 
@@ -405,7 +414,7 @@ void phi_device::int_reg_w(offs_t offset , uint16_t data)
 		data = (data & REG_D08D15_MASK) | ((m_reg_status << (REG_D0D1_SHIFT - REG_STATUS_D0D1_BIT)) & REG_D0D1_MASK);
 	}
 
-	LOG(("W %u=%04x\n" , offset , data));
+	//LOG(("W %u=%04x\n" , offset , data));
 
 	switch (offset) {
 	case REG_W_INT_COND:
@@ -525,7 +534,7 @@ void phi_device::set_signal(phi_488_signal_t signal , bool state)
 {
 	if (state != m_signals[ signal ]) {
 		m_signals[ signal ] = state;
-		LOG(("EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
+		LOG(("INT EOI %d DAV %d NRFD %d NDAC %d IFC %d SRQ %d ATN %d REN %d\n" ,
 			 m_signals[ PHI_488_EOI ] ,
 			 m_signals[ PHI_488_DAV ] ,
 			 m_signals[ PHI_488_NRFD ] ,
@@ -1026,6 +1035,7 @@ void phi_device::update_fsm(void)
 
 phi_device::nba_origin_t phi_device::nba_msg(uint8_t& new_byte , bool& new_eoi) const
 {
+	// TODO: consider CIC
 	if (!m_fifo_out.empty()) {
 		uint16_t word = m_fifo_out.peek();
 		if ((word & REG_D0D1_MASK) == REG_OFIFO_IFCMD_MASK) {
