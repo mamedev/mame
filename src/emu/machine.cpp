@@ -1194,7 +1194,7 @@ void running_machine::export_http_api()
 		writer.Key("devices");
 		writer.StartArray();
 				
-		device_iterator iter(root_device());
+		device_iterator iter(this->root_device());
 		for (device_t &device : iter)
 			writer.String(device.tag());
 
