@@ -275,4 +275,25 @@ void retro_osd_interface::customize_input_type_list(simple_list<input_type_entry
 	// configuration from disk. Scan the list, and change the
 	// default control mappings you want. It is quite possible
 	// you won't need to change a thing.
+
+	// loop over the defaults
+	for (input_type_entry &entry : typelist)
+		switch (entry.type())
+		{
+			// Retro:  Select + X => UI_CONFIGURE (Menu)
+			case IPT_UI_CONFIGURE:
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_TAB, input_seq::or_code, JOYCODE_SELECT, JOYCODE_BUTTON3);
+				break;
+
+			// Retro:  Select + Start => CANCEL
+			case IPT_UI_CANCEL:
+				entry.defseq(SEQ_TYPE_STANDARD).set(KEYCODE_ESC, input_seq::or_code, JOYCODE_SELECT, JOYCODE_START);
+				break;
+
+			// leave everything else alone
+			default:
+				break;
+		}
+
+
 }
