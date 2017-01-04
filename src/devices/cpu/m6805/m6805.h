@@ -406,6 +406,11 @@ public:
 	DECLARE_WRITE8_MEMBER(pc_w);
 
 protected:
+	enum
+	{
+		TIMER_68705_PRESCALER_EXPIRED,
+	};
+
 	DECLARE_ADDRESS_MAP(internal_map, 8);
 
 	DECLARE_READ8_MEMBER(internal_portA_r);
@@ -419,6 +424,11 @@ protected:
 	DECLARE_WRITE8_MEMBER(internal_ddrA_w);
 	DECLARE_WRITE8_MEMBER(internal_ddrB_w);
 	DECLARE_WRITE8_MEMBER(internal_ddrC_w);
+
+	DECLARE_READ8_MEMBER(internal_68705_tdr_r);
+	DECLARE_WRITE8_MEMBER(internal_68705_tdr_w);
+	DECLARE_READ8_MEMBER(internal_68705_tcr_r);
+	DECLARE_WRITE8_MEMBER(internal_68705_tcr_w);
 
 	void update_portA_state();
 	void update_portB_state();
@@ -436,6 +446,9 @@ protected:
 	u8 m_ddrB;
 	u8 m_ddrC;
 
+	u8 m_tdr;
+	u8 m_tcr;
+
 	/* Callbacks */
 	devcb_write8 m_portA_cb_w;
 	devcb_write8 m_portB_cb_w;
@@ -445,6 +458,12 @@ protected:
 	devcb_read8 m_portB_cb_r;
 	devcb_read8 m_portC_cb_r;
 
+	/* Timers */
+	emu_timer *m_68705_timer;
+
+	TIMER_CALLBACK_MEMBER(timer_68705_increment);
+	
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 
 	// device-level overrides
 	virtual void device_start() override;

@@ -32,98 +32,17 @@ WRITE8_MEMBER(arkanoid_state::arkanoid_Z80_mcu_w)
 	m_mcu->set_input_line(M68705_IRQ_LINE, ASSERT_LINE);
 }
 
-READ8_MEMBER(arkanoid_state::arkanoid_68705_port_a_r)
+READ8_MEMBER(arkanoid_state::mcu_porta_r)
 {
-	return (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+	return m_portA_in;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_a_w)
+WRITE8_MEMBER(arkanoid_state::mcu_porta_w)
 {
 	m_portA_out = data;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_a_w)
-{
-	m_ddrA = data;
-}
-
-READ8_MEMBER(arkanoid_state::arkanoid_68705_tdr_r)
-{
-	//logerror("arkanoid_68705 TDR read, returning %02X\n", m_tdr);
-	return m_tdr;
-}
-
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tdr_w)
-{
-	//logerror("arkanoid_68705 TDR written with %02X, was %02X\n", data, m_tdr);
-	m_tdr = data;
-}
-
-READ8_MEMBER(arkanoid_state::arkanoid_68705_tcr_r)
-{
-	//logerror("arkanoid_68705 TCR read, returning %02X\n", (m_tcr&0xF7));
-	return (m_tcr & 0xF7);
-}
-
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_tcr_w)
-{
-/*
-    logerror("arkanoid_68705 TCR written with %02X\n", data);
-    if (data&0x80) logerror("  TIR=1, Timer Interrupt state is set\n"); else logerror("  TIR=0; Timer Interrupt state is cleared\n");
-    if (data&0x40) logerror("  TIM=1, Timer Interrupt is now masked\n"); else logerror("  TIM=0, Timer Interrupt is now unmasked\n");
-    if (data&0x20) logerror("  TIN=1, Timer Clock source is set to external\n"); else logerror("  TIN=0, Timer Clock source is set to internal\n");
-    if (data&0x10) logerror("  TIE=1, Timer External pin is enabled\n"); else logerror("  TIE=0, Timer External pin is disabled\n");
-    if (data&0x08) logerror("  PSC=1, Prescaler counter cleared\n"); else logerror("  PSC=0, Prescaler counter left alone\n");
-    logerror("  Prescaler: %d\n", (1<<(data&0x7)));
-*/
-	// if timer was enabled but now isn't, shut it off.
-	// below is a hack assuming the TIMER pin isn't going anywhere except tied to +5v, so basically TIN is acting as an active-low timer enable, and TIE is ignored even in the case where TIE=1, the timer will end up being 5v ANDED against the internal timer clock which == the internal timer clock.
-	// Note this hack is incorrect; the timer pin actually does connect somewhere (vblank or maybe one of the V counter bits?), but the game never actually uses the timer pin in external clock mode, so the TIMER connection must be left over from development. We can apparently safely ignore it.
-	if ((m_tcr^data)&0x20)// check if TIN state changed
-	{
-		/* logerror("timer enable state changed!\n"); */
-		if (data&0x20) m_68705_timer->adjust(attotime::never, TIMER_68705_PRESCALER_EXPIRED);
-		else m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
-	}
-	// prescaler check: if timer prescaler has changed, or the PSC bit is set, adjust the timer length for the prescaler expired timer, but only if the timer would be running
-	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) )
-	{
-		/* logerror("timer reset due to PSC or prescaler change!\n"); */
-		m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
-	}
-	m_tcr = data;
-	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
-	if ((m_tcr&0xC0) == 0x80)
-		m_mcu->set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		m_mcu->set_input_line(M68705_INT_TIMER, CLEAR_LINE);
-
-}
-
-void arkanoid_state::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
-{
-	switch (id)
-	{
-	case TIMER_68705_PRESCALER_EXPIRED:
-		timer_68705_increment(ptr, param);
-		break;
-	default:
-		assert_always(false, "Unknown id in arkanoid_state::device_timer");
-	}
-}
-
-TIMER_CALLBACK_MEMBER(arkanoid_state::timer_68705_increment)
-{
-	m_tdr++;
-	if (m_tdr == 0x00) m_tcr |= 0x80; // if we overflowed, set the int bit
-	if ((m_tcr&0xC0) == 0x80)
-		m_mcu->set_input_line(M68705_INT_TIMER, ASSERT_LINE);
-	else
-		m_mcu->set_input_line(M68705_INT_TIMER, CLEAR_LINE);
-	m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
-}
-
-READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
+READ8_MEMBER(arkanoid_state::mcu_portc_r)
 {
 	int portC_in = 0;
 
@@ -138,73 +57,45 @@ READ8_MEMBER(arkanoid_state::arkanoid_68705_port_c_r)
 	/* bit 2 is an output, to clear latch 1, return whatever state it was set to in m_portC_out */
 	/* bit 3 is an output, to set latch 2, return whatever state it was set to in m_portC_out */
 
-	return (m_portC_internal & m_ddrC) | (portC_in & ~m_ddrC);
+	return portC_in;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_port_c_w)
+READ8_MEMBER(arkanoid_state::mcu_portb_r)
 {
-	m_portC_internal = data|0xF0;
-	uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~m_ddrC)));
-	m_portC_out = (m_portC_internal|(~m_ddrC));
+	return ioport("MUX")->read();
+}
 
+
+WRITE8_MEMBER(arkanoid_state::mcu_portc_w)
+{
 	/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
 	/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
 	// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
-	if ((changed_m_portC_out&0x04) && (m_portC_out&0x04))
+	if ((~m_old_portC_out&0x04) && (data&0x04))
 	{
 		m_Z80HasWritten = 0;
 		m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 	}
 
 	// if 0x04 low, enable the m_portA_in latch, otherwise set the latch value to 0xFF
-	if (~m_portC_out&0x04)
+	if (~data&0x04)
 		m_portA_in = m_fromZ80;
 	else
 		m_portA_in = 0xFF;
 
 	/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
 	// if 0x08 low, set m_MCUHasWritten/latch 2
-	if (~m_portC_out&0x08)
+	if (~data&0x08)
 	{
 		/* a write from the 68705 to the Z80; remember its value */
 		m_MCUHasWritten = 1;
 		m_fromMCU = m_portA_out;
 	}
+
+	m_old_portC_out = data;
 }
 
-WRITE8_MEMBER(arkanoid_state::arkanoid_68705_ddr_c_w)
-{
-	if ((data|0xF0)^m_ddrC) // if ddr changed, recalculate the port c output
-	{
-		uint8_t changed_m_portC_out = (m_portC_out^(m_portC_internal|(~(data|0xF0))));
-		m_portC_out = (m_portC_internal|(~(data|0xF0)));
 
-		/* bits 0 and 1 are inputs, should never be set as outputs here. if they are, ignore them. */
-		/* bit 2 is an output, to clear latch 1(m_Z80HasWritten) on rising edge, and enable the z80->68705 communication latch on level low */
-		// if 0x04 rising edge, clear m_Z80HasWritten/latch 1 (and clear the irq line)
-		if ((changed_m_portC_out&0x04) && (m_portC_out&0x04))
-		{
-			m_Z80HasWritten = 0;
-			m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-		}
-
-		// if 0x04 low, enable the m_portA_in latch, otherwise set the latch value to 0xFF
-		if (~m_portC_out&0x04)
-			m_portA_in = m_fromZ80;
-		else
-			m_portA_in = 0xFF;
-
-		/* bit 3 is an output, to set latch 2(m_MCUHasWritten) and latch the port_a value into the 68705->z80 latch, on falling edge or low level */
-		// if 0x08 low, set m_MCUHasWritten/latch 2
-		if (~m_portC_out&0x08)
-		{
-			/* a write from the 68705 to the Z80; remember its value */
-			m_MCUHasWritten = 1;
-			m_fromMCU = m_portA_out;
-		}
-	}
-	m_ddrC = data|0xF0;
-}
 
 CUSTOM_INPUT_MEMBER(arkanoid_state::arkanoid_semaphore_input_r)
 {
