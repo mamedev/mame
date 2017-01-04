@@ -88,29 +88,35 @@ class NETLIB_NAME(name) : public device_t
 	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
 	*  of the Newton-Raphson step of solving the linear equations.
 	*/
-#define NETLIB_DYNAMIC()                                                       \
+#define NETLIB_IS_DYNAMIC()                                                       \
 	public: virtual bool is_dynamic() const override { return true; }
 
-	/*! Add this to a device definition to mark the device as a time-stepping device
-	*  and add code.
-	*  If this is added to device definition the device is treated as an analog
-	*  time-stepping device. Currently, only the capacitor device uses this. An other
-	*  example would be an inductor device.
-	*
-	*  Example:
-	*
-	*   NETLIB_TIMESTEP()
-	*       {
-	*           // Gpar should support convergence
-	*           const nl_double G = m_C.Value() / step +  m_GParallel;
-	*           const nl_double I = -G * deltaV();
-	*           set(G, 0.0, I);
-	*       }
-	*
-	*/
-#define NETLIB_TIMESTEP()                                                      \
-	public: virtual bool is_timestep() const override { return true; } \
-	public: virtual void step_time(const nl_double step) override
+	/*! Add this to a device definition to mark the device as a time-stepping device.
+     *
+	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
+	 *  the capacitor and inductor devices uses this.
+	 *
+	 *  Example:
+	 *
+	 *   NETLIB_TIMESTEP_IS_TIMESTEP()
+	 *   NETLIB_TIMESTEPI()
+	 *       {
+	 *           // Gpar should support convergence
+	 *           const nl_double G = m_C.Value() / step +  m_GParallel;
+	 *           const nl_double I = -G * deltaV();
+	 *           set(G, 0.0, I);
+	 *       }
+	 *
+	 */
+#define NETLIB_IS_TIMESTEP()                                                   \
+	public: virtual bool is_timestep() const override { return true; }
+
+	/*! Used to implement the time stepping code.
+	 *
+	 * Please see NETLIB_IS_TIMESTEP for an example.
+	 */
+#define NETLIB_TIMESTEPI()                                                     \
+	public: virtual void timestep(const nl_double step) override
 
 #define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                     \
 	public: virtual bool needs_update_after_param_change() const override { return true; }
@@ -121,6 +127,8 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATEI() protected: virtual void update() NL_NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
 #define NETLIB_RESETI() protected: virtual void reset() override
+
+#define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
 #define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
@@ -1028,7 +1036,7 @@ namespace netlist
 		virtual void reset() { }
 
 	public:
-		virtual void step_time(ATTR_UNUSED const nl_double st) { }
+		virtual void timestep(ATTR_UNUSED const nl_double st) { }
 		virtual void update_terminals() { }
 
 		virtual void update_param() {}

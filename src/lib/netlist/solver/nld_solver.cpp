@@ -408,7 +408,7 @@ void matrix_solver_t::step(const netlist_time &delta)
 {
 	const nl_double dd = delta.as_double();
 	for (std::size_t k=0; k < m_step_devices.size(); k++)
-		m_step_devices[k]->step_time(dd);
+		m_step_devices[k]->timestep(dd);
 }
 
 void matrix_solver_t::solve_base()
@@ -510,6 +510,7 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			const nl_double DD_n = (n->Q_Analog() - t->m_last_V);
 			const nl_double hn = cur_ts;
 
+			//printf("%f %f %f %f\n", DD_n, t->m_DD_n_m_1, hn, t->m_h_n_m_1);
 			nl_double DD2 = (DD_n / hn - t->m_DD_n_m_1 / t->m_h_n_m_1) / (hn + t->m_h_n_m_1);
 			nl_double new_net_timestep;
 
@@ -526,7 +527,10 @@ netlist_time matrix_solver_t::compute_next_timestep(const double cur_ts)
 			t->m_last_V = n->Q_Analog();
 		}
 		if (new_solver_timestep < m_params.m_min_timestep)
+		{
+			//log().warning("Dynamic timestep below min timestep. Consider decreasing MIN_TIMESTEP: {1} us", new_solver_timestep*1.0e6);
 			new_solver_timestep = m_params.m_min_timestep;
+		}
 	}
 	//if (new_solver_timestep > 10.0 * hn)
 	//    new_solver_timestep = 10.0 * hn;
