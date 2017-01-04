@@ -63,7 +63,8 @@ void interpro_ioga_device::device_start()
 
 void interpro_ioga_device::device_reset()
 {
-	m_interrupt = 0;
+	m_irq_active = false;
+
 	m_state_drq = 0;
 
 	// configure timer 0 at 60Hz
@@ -89,7 +90,7 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		if (m_timer_reg[1] == 0)
 		{
 			// disable timer
-			m_timer[3]->enable(false);
+			timer.enable(false);
 
 			// set expired flag
 			m_timer_reg[1] |= IOGA_TIMER1_EXPIRED;
@@ -104,7 +105,7 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		if (m_timer_reg[3] == 0)
 		{
 			// disable timer
-			m_timer[3]->enable(false);
+			timer.enable(false);
 
 			// set expired flag
 			m_timer_reg[3] |= IOGA_TIMER3_EXPIRED;
@@ -245,19 +246,55 @@ C8 : ethernet address C 4039f088 // IOGA_ETHADDR_C
 	17 timer 0
 */
 
+void interpro_ioga_device::update_irq(int state)
+{
+	switch (state)
+	{
+	case CLEAR_LINE:
+		if (m_irq_active)
+		{
+			// the cpu has acknowledged the active interrupt, deassert the irq line
+			m_irq_active = false;
+			m_out_int_func(CLEAR_LINE);
+
+		}
+		// fall through to handle any pending interrupts
+
+	case ASSERT_LINE:
+		// if an irq is currently active, don't do anything
+		if (!m_irq_active)
+		{
+			// check for any pending interrupts
+			for (int irq = 0; irq < 19; irq++)
+			{
+				if (m_vectors[irq] & IOGA_INTERRUPT_PENDING)
+				{
+					m_irq_active = true;
+					m_irq_current = irq;
+
+					m_out_int_func(ASSERT_LINE);
+					return;
+				}
+			}
+		}
+		break;
+	}
+}
+
 void interpro_ioga_device::set_irq_line(int irq, int state)
 {
 	LOG_INTERRUPT("set_irq_line(%d, %d)\n", irq, state);
 	switch (state)
 	{
 	case ASSERT_LINE:
+		// FIXME: handle internal/external interrupts properly
 		if (m_vectors[irq] & (IOGA_INTERRUPT_ENABLE_EXTERNAL | IOGA_INTERRUPT_ENABLE_INTERNAL))
 		{
 			// set interrupt pending bit
 			m_vectors[irq] |= IOGA_INTERRUPT_PENDING;
 
-			m_interrupt = irq;
-			m_out_int_func(ASSERT_LINE);
+			// update irq line state
+			update_irq(state);
 		}
 		else
 			LOG_INTERRUPT("received disabled interrupt irq %d vector 0x%04x\n", irq, m_vectors[irq]);
@@ -267,7 +304,8 @@ void interpro_ioga_device::set_irq_line(int irq, int state)
 		// clear interrupt pending bit
 		m_vectors[irq] &= ~IOGA_INTERRUPT_PENDING;
 
-		m_out_int_func(CLEAR_LINE);
+		// update irq line state
+		update_irq(state);
 		break;
 	}
 }
@@ -277,16 +315,24 @@ IRQ_CALLBACK_MEMBER(interpro_ioga_device::inta_cb)
 	switch (irqline)
 	{
 	case -1:
-		// return vector for current interrupt without acknowledgement
-		return m_vectors[m_interrupt] & 0xff;
+		// return vector for current interrupt without clearing irq line
+		return m_vectors[m_irq_current] & 0xff;
 
 	case INPUT_LINE_IRQ0:
-		// acknowledge interrupt
-		// FIXME: clear IRQ
-		return m_vectors[m_interrupt] & 0xff;
+		// FIXME: clear pending bit - can't rely on device callbacks
+		m_vectors[m_irq_current] &= ~IOGA_INTERRUPT_PENDING;
+
+		// clear irq line
+		update_irq(CLEAR_LINE);
+
+		// return interrupt vector
+		return m_vectors[m_irq_current] & 0xff;
 
 	case INPUT_LINE_NMI:
-		//return m_nmictrl;
+		// clear nmi line
+		m_out_nmi_func(CLEAR_LINE);
+
+		return 0;
 
 	default:
 		return 0;
@@ -351,6 +397,8 @@ WRITE16_MEMBER(interpro_ioga_device::icr_w)
 {
 	LOG_INTERRUPT("interrupt vector %d set to 0x%04x at pc 0x%08x\n", offset, data, space.device().safe_pc());
 
+	// FIXME: now that the interrupt handling only depends on IOGA_INTERRUPT_PENDING, we might be able
+	// to avoid this hack
 	if (data & IOGA_INTERRUPT_PENDING)
 		m_vectors[offset] = (data | IOGA_INTERRUPT_FORCED) & ~IOGA_INTERRUPT_PENDING;
 	else if (m_vectors[offset] & IOGA_INTERRUPT_FORCED)

@@ -117,15 +117,20 @@ private:
 	void set_irq_line(int irq, int state);
 	void write_timer(int timer, uint32_t value, device_timer_id id);
 
+	void update_irq(int state);
+
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
 
 	// a hack to get hold of the dma devices
 	upd765_family_device *m_fdc;
 
-	uint8_t m_interrupt;
+	bool m_irq_active;
+	uint32_t m_irq_current;
+
 	uint16_t m_vectors[19];
-	uint8_t m_softint, m_nmictrl;
+	uint8_t m_softint;
+	uint8_t m_nmictrl;
 
 	uint32_t m_prescaler;
 	uint32_t m_timer_reg[4];

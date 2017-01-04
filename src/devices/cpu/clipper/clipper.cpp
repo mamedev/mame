@@ -136,9 +136,6 @@ void clipper_device::execute_run()
 
 		LOG_INTERRUPT("non-maskable interrupt - current pc = 0x%08x\n", m_pc);
 		m_pc = intrap(EXCEPTION_INTERRUPT_BASE, m_pc);
-
-		// FIXME: should m_nmi be cleared by the ioga doing CLEAR_LINE after acknowledgement?
-		m_nmi = 0;
 	}
 	else if (m_ssw.bits.ei && m_irq)
 	{
@@ -154,9 +151,6 @@ void clipper_device::execute_run()
 
 			LOG_INTERRUPT("accepting interrupt vector 0x%04x - current pc = %08x\n", ivec, m_pc);
 			m_pc = intrap(EXCEPTION_INTERRUPT_BASE + ivec * 8, m_pc);
-
-			// FIXME: should m_irq be cleared by the ioga doing CLEAR_LINE after acknowledgement?
-			m_irq = 0;
 		}
 	}
 
