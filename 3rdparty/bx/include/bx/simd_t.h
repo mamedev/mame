@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -402,8 +402,14 @@ namespace bx
 
 	struct simd256_ref_t
 	{
-		simd128_t simd128_0;
-		simd128_t simd128_1;
+#if BX_COMPILER_MSVC
+		typedef simd128_ref_t type;
+#else
+		typedef simd128_t type;
+#endif // BX_COMPILER_MSVC
+
+		type simd128_0;
+		type simd128_1;
 	};
 
 #if !BX_SIMD_AVX

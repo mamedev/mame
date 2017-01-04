@@ -52,7 +52,7 @@ static NETLIST_START(opamp_layout_2_13_9_4)
 		A.GND,      /*   |4           11|   */ NC,
 		B.N1,       /*   |5           10|   */ B.OUT,
 		B.PLUS,     /*   |6            9|   */ B.VCC,
-		B.MINUS     /*   |7            8|   */ B.N2
+		B.MINUS,    /*   |7            8|   */ B.N2
 					/*   +--------------+   */
 	)
 	NET_C(A.GND, B.GND)
@@ -186,6 +186,37 @@ static NETLIST_START(LM747A_DIP)
 
 NETLIST_END()
 
+static NETLIST_START(LM3900)
+
+	/*
+	 *  Fast norton opamp model without bandwidth
+	 */
+
+	/* Terminal definitions for calling netlists */
+
+	ALIAS(PLUS, R1.1) // Positive input
+	ALIAS(MINUS, R2.1) // Negative input
+	ALIAS(OUT, G1.OP) // Opamp output ...
+	ALIAS(VM, G1.ON)  // V- terminal
+	ALIAS(VP, DUMMY.I)  // V+ terminal
+
+	DUMMY_INPUT(DUMMY)
+
+	/* The opamp model */
+
+	RES(R1, 1)
+	RES(R2, 1)
+	NET_C(R1.1, G1.IP)
+	NET_C(R2.1, G1.IN)
+	NET_C(R1.2, R2.2, G1.ON)
+	VCVS(G1)
+	PARAM(G1.G, 10000000)
+	//PARAM(G1.RI, 1)
+	PARAM(G1.RO, RES_K(8))
+
+NETLIST_END()
+
+
 NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(opamp_layout_4_4_11)
 	LOCAL_LIB_ENTRY(opamp_layout_2_8_4)
@@ -209,5 +240,6 @@ NETLIST_START(OPAMP_lib)
 	LOCAL_LIB_ENTRY(UA741_DIP14)
 	LOCAL_LIB_ENTRY(LM747_DIP)
 	LOCAL_LIB_ENTRY(LM747A_DIP)
+	LOCAL_LIB_ENTRY(LM3900)
 
 NETLIST_END()

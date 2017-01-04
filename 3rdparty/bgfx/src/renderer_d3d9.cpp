@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -274,6 +274,18 @@ namespace bgfx { namespace d3d9
 	static PFN_D3DPERF_SET_MARKER  D3DPERF_SetMarker;
 	static PFN_D3DPERF_BEGIN_EVENT D3DPERF_BeginEvent;
 	static PFN_D3DPERF_END_EVENT   D3DPERF_EndEvent;
+
+	inline bool isLost(HRESULT _hr)
+	{
+		return false
+			|| _hr == D3DERR_DEVICELOST
+			|| _hr == D3DERR_DRIVERINTERNALERROR
+#if !defined(D3D_DISABLE_9EX)
+			|| _hr == D3DERR_DEVICEHUNG
+			|| _hr == D3DERR_DEVICEREMOVED
+#endif // !defined(D3D_DISABLE_9EX)
+			;
+	}
 
 	struct RendererContextD3D9 : public RendererContextI
 	{
@@ -1206,7 +1218,7 @@ namespace bgfx { namespace d3d9
 			uint32_t height = m_params.BackBufferHeight;
 
 			FrameBufferHandle fbh = BGFX_INVALID_HANDLE;
-			setFrameBuffer(fbh, false);
+			setFrameBuffer(fbh, false, false);
 
 			D3DVIEWPORT9 vp;
 			vp.X = 0;
@@ -1347,7 +1359,7 @@ namespace bgfx { namespace d3d9
 			}
 		}
 
-		void setFrameBuffer(FrameBufferHandle _fbh, bool _msaa = true)
+		void setFrameBuffer(FrameBufferHandle _fbh, bool _msaa = true, bool _needPresent = true)
 		{
 			if (isValid(m_fbh)
 			&&  m_fbh.idx != _fbh.idx)
@@ -1358,6 +1370,7 @@ namespace bgfx { namespace d3d9
 
 			if (!isValid(_fbh) )
 			{
+				m_needPresent |= _needPresent;
 				DX_CHECK(m_device->SetRenderTarget(0, m_backBufferColor) );
 				for (uint32_t ii = 1, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
 				{
@@ -1369,35 +1382,7 @@ namespace bgfx { namespace d3d9
 			}
 			else
 			{
-				const FrameBufferD3D9& frameBuffer = m_frameBuffers[_fbh.idx];
-
-				// If frame buffer has only depth attachment D3DFMT_NULL
-				// render target is created.
-				const uint32_t fbnum = bx::uint32_max(2, frameBuffer.m_numTh);
-				const uint8_t  dsIdx = frameBuffer.m_dsIdx;
-
-				DX_CHECK(m_device->SetDepthStencilSurface(UINT8_MAX == dsIdx
-						? m_backBufferDepthStencil
-						: frameBuffer.m_surface[dsIdx]
-						) );
-
-				uint32_t rtIdx = 0;
-				for (uint32_t ii = 0; ii < fbnum; ++ii)
-				{
-					IDirect3DSurface9* surface = frameBuffer.m_surface[ii];
-					if (ii != dsIdx)
-					{
-						DX_CHECK(m_device->SetRenderTarget(rtIdx, surface) );
-						++rtIdx;
-					}
-				}
-
-				for (uint32_t ii = rtIdx, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
-				{
-					DX_CHECK(m_device->SetRenderTarget(ii, NULL) );
-				}
-
-				DX_CHECK(m_device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE) );
+				m_frameBuffers[_fbh.idx].set();
 			}
 
 			m_fbh = _fbh;
@@ -1440,15 +1425,10 @@ namespace bgfx { namespace d3d9
 			postReset();
 		}
 
-		static bool isLost(HRESULT _hr)
+		void flush()
 		{
-			return D3DERR_DEVICELOST == _hr
-				|| D3DERR_DRIVERINTERNALERROR == _hr
-#if !defined(D3D_DISABLE_9EX)
-				|| D3DERR_DEVICEHUNG == _hr
-				|| D3DERR_DEVICEREMOVED == _hr
-#endif // !defined(D3D_DISABLE_9EX)
-				;
+			m_flushQuery->Issue(D3DISSUE_END);
+			m_flushQuery->GetData(NULL, 0, D3DGETDATA_FLUSH);
 		}
 
 		void flip(HMD& /*_hmd*/) BX_OVERRIDE
@@ -1462,10 +1442,18 @@ namespace bgfx { namespace d3d9
 
 				for (uint32_t ii = 0, num = m_numWindows; ii < num; ++ii)
 				{
-					HRESULT hr;
+					HRESULT hr = S_OK;
 					if (0 == ii)
 					{
-						hr = m_swapChain->Present(NULL, NULL, (HWND)g_platformData.nwh, NULL, 0);
+						if (m_needPresent)
+						{
+							hr = m_swapChain->Present(NULL, NULL, (HWND)g_platformData.nwh, NULL, 0);
+							m_needPresent = false;
+						}
+						else
+						{
+							flush();
+						}
 					}
 					else
 					{
@@ -1501,6 +1489,8 @@ namespace bgfx { namespace d3d9
 
 		void preReset()
 		{
+			m_needPresent = false;
+
 			invalidateSamplerState();
 
 			for (uint32_t stage = 0; stage < BGFX_CONFIG_MAX_TEXTURE_SAMPLERS; ++stage)
@@ -2062,6 +2052,8 @@ namespace bgfx { namespace d3d9
 		D3DPOOL m_pool;
 
 		IDirect3DSwapChain9* m_swapChain;
+
+		bool m_needPresent;
 		uint16_t m_numWindows;
 		FrameBufferHandle m_windows[BGFX_CONFIG_MAX_FRAME_BUFFERS];
 
@@ -2427,7 +2419,7 @@ namespace bgfx { namespace d3d9
 				}
 				else if (0 == (BGFX_UNIFORM_SAMPLERBIT & type) )
 				{
-					const UniformInfo* info = s_renderD3D9->m_uniformReg.find(name);
+					const UniformRegInfo* info = s_renderD3D9->m_uniformReg.find(name);
 					BX_WARN(NULL != info, "User defined uniform '%s' is not found, it won't be set.", name);
 
 					if (NULL != info)
@@ -3245,6 +3237,7 @@ namespace bgfx { namespace d3d9
 		m_denseIdx = _denseIdx;
 		m_num = 1;
 		m_needResolve = false;
+		m_needPresent = false;
 	}
 
 	uint16_t FrameBufferD3D9::destroy()
@@ -3274,6 +3267,7 @@ namespace bgfx { namespace d3d9
 		m_hwnd  = NULL;
 		m_num   = 0;
 		m_numTh = 0;
+		m_needPresent = false;
 
 		uint16_t denseIdx = m_denseIdx;
 		m_denseIdx = UINT16_MAX;
@@ -3283,7 +3277,14 @@ namespace bgfx { namespace d3d9
 
 	HRESULT FrameBufferD3D9::present()
 	{
-		return m_swapChain->Present(NULL, NULL, m_hwnd, NULL, 0);
+		if (m_needPresent)
+		{
+			HRESULT hr = m_swapChain->Present(NULL, NULL, m_hwnd, NULL, 0);
+			m_needPresent = false;
+			return hr;
+		}
+
+		return S_OK;
 	}
 
 	void FrameBufferD3D9::resolve() const
@@ -3382,6 +3383,41 @@ namespace bgfx { namespace d3d9
 			) );
 	}
 
+	void FrameBufferD3D9::set()
+	{
+		m_needPresent = UINT16_MAX != m_denseIdx;
+
+		// If frame buffer has only depth attachment D3DFMT_NULL
+		// render target is created.
+		const uint32_t fbnum = bx::uint32_max(2, m_numTh);
+		const uint8_t  dsIdx = m_dsIdx;
+
+		IDirect3DDevice9* device = s_renderD3D9->m_device;
+
+		DX_CHECK(device->SetDepthStencilSurface(UINT8_MAX == dsIdx
+			? s_renderD3D9->m_backBufferDepthStencil
+			: m_surface[dsIdx]
+			) );
+
+		uint32_t rtIdx = 0;
+		for (uint32_t ii = 0; ii < fbnum; ++ii)
+		{
+			IDirect3DSurface9* surface = m_surface[ii];
+			if (ii != dsIdx)
+			{
+				DX_CHECK(device->SetRenderTarget(rtIdx, surface) );
+				++rtIdx;
+			}
+		}
+
+		for (uint32_t ii = rtIdx, num = g_caps.limits.maxFBAttachments; ii < num; ++ii)
+		{
+			DX_CHECK(device->SetRenderTarget(ii, NULL) );
+		}
+
+		DX_CHECK(device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE) );
+	}
+
 	void TimerQueryD3D9::postReset()
 	{
 		IDirect3DDevice9* device = s_renderD3D9->m_device;
@@ -3440,8 +3476,10 @@ namespace bgfx { namespace d3d9
 			Frame& frame = m_frame[m_control.m_read];
 
 			uint64_t timeEnd;
-			HRESULT hr = frame.m_end->GetData(&timeEnd, sizeof(timeEnd), 0);
-			if (S_OK == hr)
+			const bool flush = BX_COUNTOF(m_frame)-1 == m_control.available();
+			HRESULT hr = frame.m_end->GetData(&timeEnd, sizeof(timeEnd), flush ? D3DGETDATA_FLUSH : 0);
+			if (S_OK == hr
+			||  isLost(hr) )
 			{
 				m_control.consume(1);
 
@@ -3598,7 +3636,8 @@ namespace bgfx { namespace d3d9
 		{
 			for (uint32_t item = 0, numItems = _render->m_num; item < numItems; ++item)
 			{
-				const bool isCompute = key.decode(_render->m_sortKeys[item], _render->m_viewRemap);
+				const uint64_t encodedKey = _render->m_sortKeys[item];
+				const bool isCompute = key.decode(encodedKey, _render->m_viewRemap);
 				statsKeyType[isCompute]++;
 
 				if (isCompute)
@@ -3680,7 +3719,8 @@ namespace bgfx { namespace d3d9
 					DX_CHECK(device->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE) );
 					DX_CHECK(device->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATER) );
 
-					for (; blitItem < numBlitItems && blitKey.m_view <= view; blitItem++)
+					const uint8_t blitView = SortKey::decodeView(encodedKey);
+					for (; blitItem < numBlitItems && blitKey.m_view <= blitView; blitItem++)
 					{
 						const BlitItem& blit = _render->m_blitItem[blitItem];
 						blitKey.decode(_render->m_blitKeys[blitItem+1]);
@@ -4169,8 +4209,7 @@ namespace bgfx { namespace d3d9
 			{
 				if (0 != (m_resolution.m_flags & BGFX_RESET_FLUSH_AFTER_RENDER) )
 				{
-					m_flushQuery->Issue(D3DISSUE_END);
-					m_flushQuery->GetData(NULL, 0, D3DGETDATA_FLUSH);
+					flush();
 				}
 
 				captureElapsed = -bx::getHPCounter();
@@ -4220,11 +4259,14 @@ namespace bgfx { namespace d3d9
 
 		const int64_t timerFreq = bx::getHPFrequency();
 
-		perfStats.cpuTimeEnd   = now;
-		perfStats.cpuTimerFreq = timerFreq;
-		perfStats.gpuTimeBegin = m_gpuTimer.m_begin;
-		perfStats.gpuTimeEnd   = m_gpuTimer.m_end;
-		perfStats.gpuTimerFreq = m_gpuTimer.m_frequency;
+		perfStats.cpuTimeEnd    = now;
+		perfStats.cpuTimerFreq  = timerFreq;
+		perfStats.gpuTimeBegin  = m_gpuTimer.m_begin;
+		perfStats.gpuTimeEnd    = m_gpuTimer.m_end;
+		perfStats.gpuTimerFreq  = m_gpuTimer.m_frequency;
+		perfStats.numDraw       = statsKeyType[0];
+		perfStats.numCompute    = statsKeyType[1];
+		perfStats.maxGpuLatency = maxGpuLatency;
 
 		if (_render->m_debug & (BGFX_DEBUG_IFH|BGFX_DEBUG_STATS) )
 		{

@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont, ElSemi
 #include "namcos2.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 #define NAMCOFL_HTOTAL      (288)   /* wrong */
 #define NAMCOFL_HBSTART (288)

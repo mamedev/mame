@@ -92,7 +92,7 @@ void NETLIST_NAME(name)(netlist::setup_t &setup)                               \
 		desc.classname = #cname ; \
 		desc.ni = in; \
 		desc.no = out; \
-		desc.def_param = pstring("+") + def_params; \
+		desc.def_param = def_params; \
 		desc.family = "";
 
 #define TT_HEAD(x) \
@@ -252,10 +252,8 @@ namespace netlist
 		void register_define(pstring def, pstring val) { m_defines.push_back(plib::ppreprocessor::define_t(def, val)); }
 		void register_define(pstring defstr);
 
-		factory_list_t &factory() { return m_factory; }
-		const factory_list_t &factory() const { return m_factory; }
-
-		bool is_library_item(const pstring &name) const { return plib::container::contains(m_lib, name); }
+		factory::list_t &factory() { return m_factory; }
+		const factory::list_t &factory() const { return m_factory; }
 
 		/* model / family related */
 
@@ -275,7 +273,7 @@ namespace netlist
 		plib::plog_base<NL_DEBUG> &log();
 		const plib::plog_base<NL_DEBUG> &log() const;
 
-		std::vector<std::pair<pstring, base_factory_t *>> m_device_factory;
+		std::vector<std::pair<pstring, factory::element_t *>> m_device_factory;
 
 		std::unordered_map<pstring, pstring> m_alias;
 		std::unordered_map<pstring, pstring> m_param_values;
@@ -300,17 +298,17 @@ namespace netlist
 		pstring objtype_as_str(detail::device_object_t &in) const;
 
 		devices::nld_base_proxy *get_d_a_proxy(detail::core_terminal_t &out);
+		devices::nld_base_proxy *get_a_d_proxy(detail::core_terminal_t &inp);
 
 		netlist_t                                   &m_netlist;
 		std::unordered_map<pstring, param_ref_t>    m_params;
 		std::vector<link_t>                         m_links;
-		factory_list_t                              m_factory;
+		factory::list_t                             m_factory;
 		std::unordered_map<pstring, pstring>        m_models;
 
 		std::stack<pstring>                         m_namespace_stack;
 		source_t::list_t                            m_sources;
 		std::vector<plib::ppreprocessor::define_t>  m_defines;
-		std::vector<pstring>                        m_lib;
 
 		unsigned m_proxy_cnt;
 		unsigned m_frontier_cnt;

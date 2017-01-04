@@ -229,10 +229,7 @@ WRITE16_MEMBER(dec0_automat_state::automat_control_w)
 	{
 		case 0xe: /* z80 sound cpu */
 			if (ACCESSING_BITS_0_7)
-			{
 				m_soundlatch->write(space, 0, data & 0xff);
-				m_audiocpu->set_input_line(0, HOLD_LINE);
-			}
 			break;
 
 		case 12: /* DMA flag */
@@ -279,15 +276,6 @@ WRITE16_MEMBER(dec0_state::midres_sound_w)
 	{
 		m_soundlatch->write(space, 0, data & 0xff);
 		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
-}
-
-WRITE16_MEMBER(dec0_automat_state::secretab_sound_w)
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-		m_audiocpu->set_input_line(0, HOLD_LINE);
 	}
 }
 
@@ -621,7 +609,7 @@ static ADDRESS_MAP_START( secretab_map, AS_PROGRAM, 16, dec0_automat_state )
 //  AM_RANGE(0x340400, 0x3407ff) AM_DEVREADWRITE("tilegen1", deco_bac06_device, pf_rowscroll_r, pf_rowscroll_w)
 
 	AM_RANGE(0x314008, 0x31400f) AM_READ(slyspy_controls_r)
-	AM_RANGE(0x314000, 0x314001) AM_WRITE(secretab_sound_w)
+	AM_RANGE(0x314000, 0x314001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 
 	AM_RANGE(0x300000, 0x300007) AM_RAM
 	AM_RANGE(0x300010, 0x300017) AM_RAM
@@ -640,7 +628,7 @@ static ADDRESS_MAP_START( automat_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("2203a", ym2203_device, read, write)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("2203b", ym2203_device, read, write)
-	AM_RANGE(0xd800, 0xd800) AM_READ(sound_command_r)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
@@ -652,7 +640,7 @@ static ADDRESS_MAP_START( secretab_s_map, AS_PROGRAM, 8, dec0_automat_state )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc801) AM_DEVREADWRITE("2203a", ym2203_device, read, write)
 	AM_RANGE(0xd000, 0xd001) AM_DEVREADWRITE("ym3812", ym3812_device, read, write)
-	AM_RANGE(0xd800, 0xd800) AM_READ(sound_command_r)
+	AM_RANGE(0xd800, 0xd800) AM_DEVREAD("soundlatch", generic_latch_8_device, read)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("adpcm_select2", ls157_device, ba_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_bankswitch_w)
 	AM_RANGE(0xf000, 0xf000) AM_DEVWRITE("adpcm_select1", ls157_device, ba_w)
@@ -1385,12 +1373,6 @@ static MACHINE_CONFIG_DERIVED( dec1, dec0_base )
 MACHINE_CONFIG_END
 
 
-READ8_MEMBER(dec0_automat_state::sound_command_r)
-{
-	m_audiocpu->set_input_line(0, CLEAR_LINE);
-	return m_soundlatch->read(space, 0);
-}
-
 WRITE8_MEMBER(dec0_automat_state::sound_bankswitch_w)
 {
 	m_msm1->reset_w(BIT(data, 3));
@@ -1462,6 +1444,7 @@ static MACHINE_CONFIG_START( automat, dec0_automat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)
@@ -1536,6 +1519,7 @@ static MACHINE_CONFIG_START( secretab, dec0_automat_state )
 	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
+	MCFG_GENERIC_LATCH_DATA_PENDING_CB(INPUTLINE("audiocpu", 0))
 
 	MCFG_SOUND_ADD("2203a", YM2203, 1250000)
 	MCFG_SOUND_ROUTE(0, "mono", 0.90)

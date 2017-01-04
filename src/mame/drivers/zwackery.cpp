@@ -490,8 +490,6 @@ static MACHINE_CONFIG_START( zwackery, zwackery_state )
 	MCFG_CPU_ADD("maincpu", M68000, 7652400)    // based on counter usage, should be XTAL_16MHz/2
 	MCFG_CPU_PROGRAM_MAP(zwackery_map)
 
-	MCFG_QUANTUM_PERFECT_CPU("maincpu")
-
 	MCFG_WATCHDOG_ADD("watchdog")
 
 	MCFG_DEVICE_ADD("ptm", PTM6840, 7652400 / 10)

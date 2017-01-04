@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -30,8 +30,7 @@ namespace bx
 
 		void add(const void* _data, int _len)
 		{
-			if (BX_ENABLED(BX_PLATFORM_EMSCRIPTEN)
-			&&  BX_UNLIKELY(!isPtrAligned(_data, 4) ) )
+			if (BX_UNLIKELY(!isPtrAligned(_data, 4) ) )
 			{
 				addUnaligned(_data, _len);
 				return;

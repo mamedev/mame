@@ -12,45 +12,28 @@
 #include "nl_setup.h"
 #include "plib/putil.h"
 
-namespace netlist
+namespace netlist { namespace factory
 {
 // ----------------------------------------------------------------------------------------
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
 
-const plib::pstring_vector_t base_factory_t::term_param_list()
-{
-	if (m_def_param.startsWith("+"))
-		return plib::pstring_vector_t(m_def_param.substr(1), ",");
-	else
-		return plib::pstring_vector_t();
-}
-
-const plib::pstring_vector_t base_factory_t::def_params()
-{
-	if (m_def_param.startsWith("+") || m_def_param.equals("-"))
-		return plib::pstring_vector_t();
-	else
-		return plib::pstring_vector_t(m_def_param, ",");
-}
-
-
-factory_list_t::factory_list_t( setup_t &setup)
+list_t::list_t( setup_t &setup)
 : m_setup(setup)
 {
 }
 
-factory_list_t::~factory_list_t()
+list_t::~list_t()
 {
 	clear();
 }
 
-void factory_list_t::error(const pstring &s)
+void list_t::error(const pstring &s)
 {
 	m_setup.log().fatal("{1}", s);
 }
 
-base_factory_t * factory_list_t::factory_by_name(const pstring &devname)
+factory::element_t * list_t::factory_by_name(const pstring &devname)
 {
 	for (auto & e : *this)
 	{
@@ -62,4 +45,21 @@ base_factory_t * factory_list_t::factory_by_name(const pstring &devname)
 	return nullptr; // appease code analysis
 }
 
+// -----------------------------------------------------------------------------
+// factory_lib_entry_t: factory class to wrap macro based chips/elements
+// -----------------------------------------------------------------------------
+
+plib::owned_ptr<device_t> library_element_t::Create(netlist_t &anetlist, const pstring &name)
+{
+	return plib::owned_ptr<device_t>::Create<wrapper>(anetlist, name);
 }
+
+void library_element_t::macro_actions(netlist_t &anetlist, const pstring &name)
+{
+	anetlist.setup().namespace_push(name);
+	anetlist.setup().include(this->name());
+	anetlist.setup().namespace_pop();
+}
+
+
+} }

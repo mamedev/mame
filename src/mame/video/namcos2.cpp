@@ -348,10 +348,9 @@ WRITE16_MEMBER( namcos2_state::paletteram_word_w )
 
 			/* register 5: POSIRQ scanline (only 8 bits used) */
 			/*case 0x180a:*/ case 0x180b:
-				if (data^m_paletteram[offset]) {
+				//if (data^m_paletteram[offset]) {
 					m_paletteram[offset] = data;
-					adjust_posirq_timer(get_pos_irq_scanline());
-				}
+				//}
 				break;
 
 			/* registers 6,7: nothing? */

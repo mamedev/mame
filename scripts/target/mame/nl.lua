@@ -136,6 +136,8 @@ files{
 
 	MAME_DIR .. "src/mame/drivers/mario.cpp",
 	MAME_DIR .. "src/mame/includes/mario.h",
+  MAME_DIR .. "src/mame/audio/nl_mario.cpp",
+  MAME_DIR .. "src/mame/audio/nl_mario.h",
 	MAME_DIR .. "src/mame/video/mario.cpp",
 	MAME_DIR .. "src/mame/audio/mario.cpp",
 

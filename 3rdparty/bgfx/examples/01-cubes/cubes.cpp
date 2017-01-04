@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -27,7 +27,7 @@ struct PosColorVertex
 
 bgfx::VertexDecl PosColorVertex::ms_decl;
 
-static PosColorVertex s_cubeVertices[8] =
+static PosColorVertex s_cubeVertices[] =
 {
 	{-1.0f,  1.0f,  1.0f, 0xff000000 },
 	{ 1.0f,  1.0f,  1.0f, 0xff0000ff },
@@ -39,7 +39,7 @@ static PosColorVertex s_cubeVertices[8] =
 	{ 1.0f, -1.0f, -1.0f, 0xffffffff },
 };
 
-static const uint16_t s_cubeIndices[36] =
+static const uint16_t s_cubeTriList[] =
 {
 	0, 1, 2, // 0
 	1, 3, 2,
@@ -55,10 +55,28 @@ static const uint16_t s_cubeIndices[36] =
 	6, 3, 7,
 };
 
+static const uint16_t s_cubeTriStrip[] =
+{
+	0, 1, 2,
+	3,
+	7,
+	1,
+	5,
+	0,
+	4,
+	2,
+	6,
+	7,
+	4,
+	5,
+};
+
 class ExampleCubes : public entry::AppI
 {
 	void init(int _argc, char** _argv) BX_OVERRIDE
 	{
+		BX_UNUSED(s_cubeTriList, s_cubeTriStrip);
+
 		Args args(_argc, _argv);
 
 		m_width  = 1280;
@@ -93,7 +111,7 @@ class ExampleCubes : public entry::AppI
 		// Create static index buffer.
 		m_ibh = bgfx::createIndexBuffer(
 				// Static data can be passed with bgfx::makeRef
-				bgfx::makeRef(s_cubeIndices, sizeof(s_cubeIndices) )
+				bgfx::makeRef(s_cubeTriStrip, sizeof(s_cubeTriStrip) )
 				);
 
 		// Create program from shaders.
@@ -187,7 +205,10 @@ class ExampleCubes : public entry::AppI
 					bgfx::setIndexBuffer(m_ibh);
 
 					// Set render states.
-					bgfx::setState(BGFX_STATE_DEFAULT);
+					bgfx::setState(0
+						| BGFX_STATE_DEFAULT
+						| BGFX_STATE_PT_TRISTRIP
+						);
 
 					// Submit primitive for rendering to view 0.
 					bgfx::submit(0, m_program);

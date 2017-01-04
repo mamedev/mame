@@ -12,26 +12,6 @@
 #include "includes/slapfght.h"
 
 
-/***************************************************************************
-
-    Tiger Heli MCU
-
-***************************************************************************/
-
-READ8_MEMBER(slapfght_state::tigerh_mcu_r)
-{
-	m_mcu_sent = false;
-	return m_from_mcu;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_mcu_w)
-{
-	m_from_main = data;
-	m_main_sent = true;
-	m_mcu->set_input_line(0, ASSERT_LINE);
-}
-
-
 /**************************************************************************/
 
 READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
@@ -39,115 +19,24 @@ READ8_MEMBER(slapfght_state::tigerh_mcu_status_r)
 	// d0 is vblank
 	uint8_t res = m_screen->vblank() ? 1 : 0;
 
-	if (!m_main_sent)
-		res |= 0x02;
-	if (!m_mcu_sent)
-		res |= 0x04;
+	if (m_bmcu)
+	{
+		if (!m_bmcu->get_main_sent())
+			res |= 0x02;
+		if (!m_bmcu->get_mcu_sent())
+			res |= 0x04;
+	}
 
 	return res;
 }
 
-
-/***************************************************************************
-
-    MCU port handlers (general)
-
-***************************************************************************/
-
-
-READ8_MEMBER(slapfght_state::tigerh_mcu_porta_r)
+WRITE8_MEMBER(slapfght_state::scroll_from_mcu_w)
 {
-	return m_to_mcu_latch;
-}
-
-WRITE8_MEMBER(slapfght_state::tigerh_mcu_porta_w)
-{
-	m_from_mcu_latch = data;
-}
-
-
-/***************************************************************************
-
-    MCU port handlers (Tiger Heli)
-
-***************************************************************************/
-
-WRITE8_MEMBER(slapfght_state::tigerh_mcu_portb_w)
-{
-	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
+	switch (offset)
 	{
-		if (m_main_sent)
-			m_mcu->set_input_line(0, CLEAR_LINE);
-
-		m_to_mcu_latch = m_from_main;
-		m_main_sent = false;
+	case 0x00: m_scrollx_lo = data; break;
+	case 0x01: m_scrollx_hi = data; break;
 	}
-	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04))
-	{
-		m_from_mcu = m_from_mcu_latch;
-		m_mcu_sent = true;
-	}
-
-	m_old_portB = data;
-}
-
-READ8_MEMBER(slapfght_state::tigerh_mcu_portc_r)
-{
-	uint8_t ret = 0;
-
-	if (!m_main_sent)
-		ret |= 0x01;
-	if (m_mcu_sent)
-		ret |= 0x02;
-
-	return ret;
-}
-
-/***************************************************************************
-
-    MCU port handlers (Slap Fight)
-
-***************************************************************************/
-
-WRITE8_MEMBER(slapfght_state::slapfght_mcu_portb_w)
-{
-	if ((mem_mask & 0x02) && (~data & 0x02) && (m_old_portB & 0x02))
-	{
-		if (m_main_sent)
-			m_mcu->set_input_line(0, CLEAR_LINE);
-
-		m_to_mcu_latch = m_from_main;
-		m_main_sent = false;
-	}
-	if ((mem_mask & 0x04) && (data & 0x04) && (~m_old_portB & 0x04))
-	{
-		m_from_mcu = m_from_mcu_latch;
-		m_mcu_sent = true;
-	}
-	if ((mem_mask & 0x08) && (~data & 0x08) && (m_old_portB & 0x08))
-	{
-		m_scrollx_lo = m_from_mcu_latch;
-	}
-	if ((mem_mask & 0x10) && (~data & 0x10) && (m_old_portB & 0x10))
-	{
-		m_scrollx_hi = m_from_mcu_latch;
-	}
-
-	m_old_portB = data;
-}
-
-READ8_MEMBER(slapfght_state::slapfght_mcu_portc_r)
-{
-	uint8_t ret = 0;
-
-	if (!m_main_sent)
-		ret |= 0x01;
-	if (m_mcu_sent)
-		ret |= 0x02;
-
-	ret ^= 0x3; // inverted logic compared to tigerh
-
-	return ret;
 }
 
 /***************************************************************************

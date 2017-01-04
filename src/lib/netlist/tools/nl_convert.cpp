@@ -121,7 +121,7 @@ void nl_convert_base_t::dump_nl()
 	{
 		net_t *net = m_nets[m_ext_alias[i]].get();
 		// use the first terminal ...
-		out("ALIAS({}, {})\n", m_ext_alias[i].cstr(), net->terminals()[0].cstr());
+		out("ALIAS({}, {})\n", m_ext_alias[i].c_str(), net->terminals()[0].c_str());
 		// if the aliased net only has this one terminal connected ==> don't dump
 		if (net->terminals().size() == 1)
 			net->set_no_export();
@@ -138,14 +138,14 @@ void nl_convert_base_t::dump_nl()
 		std::size_t j = sorted[i];
 
 		if (m_devs[j]->has_value())
-			out("{}({}, {})\n", m_devs[j]->type().cstr(),
-					m_devs[j]->name().cstr(), get_nl_val(m_devs[j]->value()).cstr());
+			out("{}({}, {})\n", m_devs[j]->type().c_str(),
+					m_devs[j]->name().c_str(), get_nl_val(m_devs[j]->value()).c_str());
 		else if (m_devs[j]->has_model())
-			out("{}({}, \"{}\")\n", m_devs[j]->type().cstr(),
-					m_devs[j]->name().cstr(), m_devs[j]->model().cstr());
+			out("{}({}, \"{}\")\n", m_devs[j]->type().c_str(),
+					m_devs[j]->name().c_str(), m_devs[j]->model().c_str());
 		else
-			out("{}({})\n", m_devs[j]->type().cstr(),
-					m_devs[j]->name().cstr());
+			out("{}({})\n", m_devs[j]->type().c_str(),
+					m_devs[j]->name().c_str());
 	}
 	// print nets
 	for (auto & i : m_nets)
@@ -153,11 +153,11 @@ void nl_convert_base_t::dump_nl()
 		net_t * net = i.second.get();
 		if (!net->is_no_export())
 		{
-			//printf("Net {}\n", net->name().cstr());
-			out("NET_C({}", net->terminals()[0].cstr() );
+			//printf("Net {}\n", net->name().c_str());
+			out("NET_C({}", net->terminals()[0].c_str() );
 			for (std::size_t j=1; j<net->terminals().size(); j++)
 			{
-				out(", {}", net->terminals()[j].cstr() );
+				out(", {}", net->terminals()[j].c_str() );
 			}
 			out(")\n");
 		}
@@ -178,7 +178,7 @@ const pstring nl_convert_base_t::get_nl_val(const double val)
 				break;
 			i++;
 		}
-		return plib::pfmt(m_units[i].m_func.cstr())(val / m_units[i].m_mult);
+		return plib::pfmt(m_units[i].m_func.c_str())(val / m_units[i].m_mult);
 	}
 }
 double nl_convert_base_t::get_sp_unit(const pstring &unit)
@@ -190,7 +190,7 @@ double nl_convert_base_t::get_sp_unit(const pstring &unit)
 			return m_units[i].m_mult;
 		i++;
 	}
-	fprintf(stderr, "Unit %s unknown\n", unit.cstr());
+	fprintf(stderr, "Unit %s unknown\n", unit.c_str());
 	return 0.0;
 }
 
@@ -269,12 +269,12 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				out("// {}\n", line.substr(1));
 				break;
 			case '*':
-				out("// {}\n", line.substr(1).cstr());
+				out("// {}\n", line.substr(1).c_str());
 				break;
 			case '.':
 				if (tt[0].equals(".SUBCKT"))
 				{
-					out("NETLIST_START({})\n", tt[1].cstr());
+					out("NETLIST_START({})\n", tt[1].c_str());
 					for (std::size_t i=2; i<tt.size(); i++)
 						add_ext_alias(tt[i]);
 				}
@@ -284,7 +284,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					out("NETLIST_END()\n");
 				}
 				else
-					out("// {}\n", line.cstr());
+					out("// {}\n", line.c_str());
 				break;
 			case 'Q':
 			{
@@ -304,7 +304,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				if (m.size() == 2)
 				{
 					if (m[1].len() != 4)
-						fprintf(stderr, "error with model desc %s\n", model.cstr());
+						fprintf(stderr, "error with model desc %s\n", model.c_str());
 					pins = m[1].left(m[1].begin() + 3);
 				}
 				add_device("QBJT_EB", tt[0], m[0]);
@@ -346,7 +346,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 					//add_term(tt[2], tt[0] + ".2");
 				}
 				else
-					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].cstr());
+					fprintf(stderr, "Voltage Source %s not connected to GND\n", tt[0].c_str());
 				break;
 			case 'I': // Input pin special notation
 				{
@@ -379,7 +379,7 @@ void nl_convert_spice_t::process_line(const pstring &line)
 				break;
 			}
 			default:
-				out("// IGNORED {}: {}\n", tt[0].cstr(), line.cstr());
+				out("// IGNORED {}: {}\n", tt[0].c_str(), line.c_str());
 		}
 	}
 }
@@ -485,7 +485,7 @@ void nl_convert_eagle_t::convert(const pstring &contents)
 		}
 		else
 		{
-			out("Unexpected {}\n", token.str().cstr());
+			out("Unexpected {}\n", token.str().c_str());
 			return;
 		}
 	}

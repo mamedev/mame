@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -102,16 +102,6 @@ namespace bx
 		return _a < 0.0f ? -1.0f : 1.0f;
 	}
 
-	inline float fstep(float _edge, float _a)
-	{
-		return _a < _edge ? 0.0f : 1.0f;
-	}
-
-	inline float fpulse(float _a, float _start, float _end)
-	{
-		return fstep(_a, _start) - fstep(_a, _end);
-	}
-
 	inline float fabsolute(float _a)
 	{
 		return fabsf(_a);
@@ -127,9 +117,19 @@ namespace bx
 		return sinf(_a);
 	}
 
+	inline float fasin(float _a)
+	{
+		return asinf(_a);
+	}
+
 	inline float fcos(float _a)
 	{
 		return cosf(_a);
+	}
+
+	inline float facos(float _a)
+	{
+		return acosf(_a);
 	}
 
 	inline float fpow(float _a, float _b)
@@ -195,6 +195,21 @@ namespace bx
 		const float mod    = fmod(_a, _wrap);
 		const float result = mod < 0.0f ? _wrap + mod : mod;
 		return result;
+	}
+
+	inline float fstep(float _edge, float _a)
+	{
+		return _a < _edge ? 0.0f : 1.0f;
+	}
+
+	inline float fpulse(float _a, float _start, float _end)
+	{
+		return fstep(_a, _start) - fstep(_a, _end);
+	}
+
+	inline float fsmoothstep(float _a)
+	{
+		return fsq(_a)*(3.0f - 2.0f*_a);
 	}
 
 	// References:
@@ -341,6 +356,7 @@ namespace bx
 		_result[2] = 1.0f / _a[2];
 	}
 
+	/// Calculate tangent frame from normal.
 	inline void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b)
 	{
 		const float nx = _n[0];
@@ -361,6 +377,21 @@ namespace bx
 			_t[1] =  nz * invLen;
 			_t[2] = -ny * invLen;
 		}
+
+		bx::vec3Cross(_b, _n, _t);
+	}
+
+	/// Calculate tangent frame from normal and angle.
+	inline void vec3TangentFrame(const float* __restrict _n, float* __restrict _t, float* __restrict _b, float _angle)
+	{
+		vec3TangentFrame(_n, _t, _b);
+
+		const float sa = fsin(_angle);
+		const float ca = fcos(_angle);
+
+		_t[0] = -sa * _b[0] + ca * _t[0];
+		_t[1] = -sa * _b[1] + ca * _t[1];
+		_t[2] = -sa * _b[2] + ca * _t[2];
 
 		bx::vec3Cross(_b, _n, _t);
 	}
@@ -560,6 +591,25 @@ namespace bx
 		float tangent[3];
 		float bitangent[3];
 		vec3TangentFrame(_normal, tangent, bitangent);
+
+		vec3Mul(&_result[ 0], bitangent, _scale);
+		vec3Mul(&_result[ 4], _normal,   _scale);
+		vec3Mul(&_result[ 8], tangent,   _scale);
+
+		_result[ 3] = 0.0f;
+		_result[ 7] = 0.0f;
+		_result[11] = 0.0f;
+		_result[12] = _pos[0];
+		_result[13] = _pos[1];
+		_result[14] = _pos[2];
+		_result[15] = 1.0f;
+	}
+
+	inline void mtxFromNormal(float* __restrict _result, const float* __restrict _normal, float _scale, const float* __restrict _pos, float _angle)
+	{
+		float tangent[3];
+		float bitangent[3];
+		vec3TangentFrame(_normal, tangent, bitangent, _angle);
 
 		vec3Mul(&_result[ 0], bitangent, _scale);
 		vec3Mul(&_result[ 4], _normal,   _scale);

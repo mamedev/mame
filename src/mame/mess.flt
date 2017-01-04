@@ -187,6 +187,7 @@ fanucs15.cpp
 fanucspmg.cpp
 fb01.cpp
 fc100.cpp
+fccpu20.cpp
 fccpu30.cpp
 fcisio.cpp
 fcscsi.cpp

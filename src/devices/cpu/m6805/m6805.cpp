@@ -415,7 +415,7 @@ m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *
 {
 }
 
-m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_constructor internal_map, const char *shortname, const char *source)
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_delegate internal_map, const char *shortname, const char *source)
 	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
 	m_program_config("program", ENDIANNESS_BIG, 8, addr_width, 0, internal_map)
 {
@@ -965,63 +965,146 @@ void m68705_device::execute_set_input(int inputnum, int state)
 
 /* ddr - direction registers */
 
-WRITE8_MEMBER(m68705_new_device::mc68705_ddrA_w)
+WRITE8_MEMBER(m68705_new_device::internal_ddrA_w)
 {
+	const u8 ddr_old = m_ddrA;
 	m_ddrA = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrA & ~ddr_old) != 0)
+		update_portA_state();
 }
 
-WRITE8_MEMBER(m68705_new_device::mc68705_ddrB_w)
+WRITE8_MEMBER(m68705_new_device::internal_ddrB_w)
 {
+	const u8 ddr_old = m_ddrB;
 	m_ddrB = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrB & ~ddr_old) != 0)
+		update_portB_state();
 }
 
-WRITE8_MEMBER(m68705_new_device::mc68705_ddrC_w)
+WRITE8_MEMBER(m68705_new_device::internal_ddrC_w)
 {
+	const u8 ddr_old = m_ddrC;
 	m_ddrC = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrC & ~ddr_old) != 0)
+		update_portC_state();
 }
 
 /* read ports */
 
-READ8_MEMBER(m68705_new_device::mc68705_portA_r)
+READ8_MEMBER(m68705_new_device::internal_portA_r)
 {
-	m_portA_in = m_portA_cb_r(0, ~m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pulled
-	uint8_t res = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
-	return res;
-
-}
-
-READ8_MEMBER(m68705_new_device::mc68705_portB_r)
-{
-	m_portB_in = m_portB_cb_r(0, ~m_ddrB);
-	uint8_t res = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	if (!m_portA_cb_r.isnull())
+		m_portA_in = m_portA_cb_r(space, 0, ~m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pulled
+	u8 res = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
 	return res;
 }
 
-READ8_MEMBER(m68705_new_device::mc68705_portC_r)
+READ8_MEMBER(m68705_new_device::internal_portB_r)
 {
-	m_portC_in = m_portC_cb_r(0, ~m_ddrC);
-	uint8_t res = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+	if (!m_portB_cb_r.isnull())
+		m_portB_in = m_portB_cb_r(space, 0, ~m_ddrB);
+	u8 res = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	return res;
+}
+
+READ8_MEMBER(m68705_new_device::internal_portC_r)
+{
+	if (!m_portC_cb_r.isnull())
+		m_portC_in = m_portC_cb_r(space, 0, ~m_ddrC);
+	u8 res = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
 	return res;
 }
 
 /* write ports */
 
-WRITE8_MEMBER(m68705_new_device::mc68705_portA_w)
+WRITE8_MEMBER(m68705_new_device::internal_portA_w)
 {
-	m_portA_cb_w(0, data, m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pushed
+	// load the output latch
 	m_portA_out = data;
+
+	// update the output lines
+	update_portA_state();
 }
 
-WRITE8_MEMBER(m68705_new_device::mc68705_portB_w)
+void m68705_new_device::update_portA_state()
 {
-	m_portB_cb_w(0, data, m_ddrB);
+	// pass bits through DDR output mask
+	m_portA_in = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portA_cb_w(space(AS_PROGRAM), 0, m_portA_in, m_ddrA);
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_portB_w)
+{
+	// load the output latch
 	m_portB_out = data;
+
+	// update the output lines
+	update_portB_state();
 }
 
-WRITE8_MEMBER(m68705_new_device::mc68705_portC_w)
+void m68705_new_device::update_portB_state()
 {
-	m_portC_cb_w(0, data, m_ddrC);
+	// pass bits through DDR output mask
+	m_portB_in = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portB_cb_w(space(AS_PROGRAM), 0, m_portB_in, m_ddrB);
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_portC_w)
+{
+	// load the output latch
 	m_portC_out = data;
+
+	// update the output lines
+	update_portC_state();
+}
+
+void m68705_new_device::update_portC_state()
+{
+	// pass bits through DDR output mask
+	m_portC_in = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portC_cb_w(space(AS_PROGRAM), 0, m_portC_in, m_ddrC);
+}
+
+READ8_MEMBER(m68705_new_device::pa_r)
+{
+	return m_portA_in;
+}
+
+READ8_MEMBER(m68705_new_device::pb_r)
+{
+	return m_portB_in;
+}
+
+READ8_MEMBER(m68705_new_device::pc_r)
+{
+	return m_portC_in;
+}
+
+WRITE8_MEMBER(m68705_new_device::pa_w)
+{
+	COMBINE_DATA(&m_portA_in);
+}
+
+WRITE8_MEMBER(m68705_new_device::pb_w)
+{
+	COMBINE_DATA(&m_portB_in);
+}
+
+WRITE8_MEMBER(m68705_new_device::pc_w)
+{
+	COMBINE_DATA(&m_portC_in);
 }
 
 /*
@@ -1079,13 +1162,13 @@ selftest rom at similar area; selftest roms differ between the U2 and U3 version
 
 */
 
-ADDRESS_MAP_START( m68705_internal_map, AS_PROGRAM, 8, m68705_new_device )
-	AM_RANGE(0x000, 0x000) AM_READWRITE(mc68705_portA_r, mc68705_portA_w)
-	AM_RANGE(0x001, 0x001) AM_READWRITE(mc68705_portB_r, mc68705_portB_w)
-	AM_RANGE(0x002, 0x002) AM_READWRITE(mc68705_portC_r, mc68705_portC_w)
-	AM_RANGE(0x004, 0x004) AM_WRITE(mc68705_ddrA_w)
-	AM_RANGE(0x005, 0x005) AM_WRITE(mc68705_ddrB_w)
-	AM_RANGE(0x006, 0x006) AM_WRITE(mc68705_ddrC_w)
+DEVICE_ADDRESS_MAP_START( internal_map, 8, m68705_new_device )
+	AM_RANGE(0x000, 0x000) AM_READWRITE(internal_portA_r, internal_portA_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(internal_portB_r, internal_portB_w)
+	AM_RANGE(0x002, 0x002) AM_READWRITE(internal_portC_r, internal_portC_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE(internal_ddrA_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE(internal_ddrB_w)
+	AM_RANGE(0x006, 0x006) AM_WRITE(internal_ddrC_w)
 
 	AM_RANGE(0x010, 0x07f) AM_RAM
 	AM_RANGE(0x080, 0x7ff) AM_ROM
@@ -1111,10 +1194,23 @@ void m68705_new_device::device_start()
 	m_portB_cb_w.resolve_safe();
 	m_portC_cb_w.resolve_safe();
 
-	m_portA_cb_r.resolve_safe(0xff);
-	m_portB_cb_r.resolve_safe(0xff);
-	m_portC_cb_r.resolve_safe(0xff);
+	m_portA_cb_r.resolve();
+	m_portB_cb_r.resolve();
+	m_portC_cb_r.resolve();
 
+	m_portA_in = 0xff;
+	m_portB_in = 0xff;
+	m_portC_in = 0xff;
+}
+
+void m68705_new_device::device_reset()
+{
+	m68705_device::device_reset();
+
+	// all bits of ports A, B and C revert to inputs on reset
+	m_ddrA = 0;
+	m_ddrB = 0;
+	m_ddrC = 0;
 }
 
 /****************************************************************************

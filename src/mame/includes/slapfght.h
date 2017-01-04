@@ -8,7 +8,7 @@
 
 #include "cpu/z80/z80.h"
 #include "video/bufsprite.h"
-
+#include "machine/taito68705interface.h"
 
 class slapfght_state : public driver_device
 {
@@ -17,7 +17,7 @@ public:
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_mcu(*this, "mcu"),
+		m_bmcu(*this, "bmcu"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_screen(*this, "screen"),
 		m_palette(*this, "palette"),
@@ -31,7 +31,7 @@ public:
 	// devices, memory pointers
 	required_device<cpu_device> m_maincpu;
 	required_device<cpu_device> m_audiocpu;
-	optional_device<cpu_device> m_mcu;
+	optional_device<taito68705_mcu_device> m_bmcu;
 	required_device<gfxdecode_device> m_gfxdecode;
 	required_device<screen_device> m_screen;
 	required_device<palette_device> m_palette;
@@ -61,15 +61,6 @@ public:
 	bool m_main_irq_enabled;
 	bool m_sound_nmi_enabled;
 
-	bool m_mcu_sent;
-	bool m_main_sent;
-	uint8_t m_from_main;
-	uint8_t m_from_mcu;
-
-	uint8_t m_from_mcu_latch;
-	uint8_t m_to_mcu_latch;
-	uint8_t m_old_portB;
-
 	int m_getstar_status;
 	int m_getstar_sequence_index;
 	int m_getstar_status_state;
@@ -79,6 +70,7 @@ public:
 	uint8_t m_gs_e;
 	uint8_t m_tigerhb_cmd;
 
+	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
 	DECLARE_WRITE8_MEMBER(sound_reset_w);
 	DECLARE_WRITE8_MEMBER(irq_enable_w);
 	DECLARE_WRITE8_MEMBER(prg_bank_w);
@@ -94,19 +86,7 @@ public:
 	DECLARE_WRITE8_MEMBER(flipscreen_w);
 	DECLARE_WRITE8_MEMBER(palette_bank_w);
 
-	DECLARE_WRITE8_MEMBER(tigerh_mcu_w);
-	DECLARE_READ8_MEMBER(tigerh_mcu_r);
-	DECLARE_READ8_MEMBER(tigerh_mcu_status_r);
-
-	DECLARE_READ8_MEMBER(tigerh_mcu_porta_r);
-	DECLARE_WRITE8_MEMBER(tigerh_mcu_porta_w);
-
-	DECLARE_WRITE8_MEMBER(tigerh_mcu_portb_w);
-	DECLARE_WRITE8_MEMBER(slapfght_mcu_portb_w);
-
-	DECLARE_READ8_MEMBER(tigerh_mcu_portc_r);
-	DECLARE_READ8_MEMBER(slapfght_mcu_portc_r);
-
+	DECLARE_WRITE8_MEMBER(scroll_from_mcu_w);
 
 	DECLARE_READ8_MEMBER(getstar_mcusim_r);
 	DECLARE_WRITE8_MEMBER(getstar_mcusim_w);
