@@ -64,8 +64,8 @@ public:
 
 	DECLARE_DRIVER_INIT(ip2800);
 
-	DECLARE_WRITE8_MEMBER(emerald_w);
-	DECLARE_READ8_MEMBER(emerald_r);
+	DECLARE_WRITE16_MEMBER(emerald_w);
+	DECLARE_READ16_MEMBER(emerald_r);
 
 	DECLARE_WRITE16_MEMBER(mcga_w);
 	DECLARE_READ16_MEMBER(mcga_r);
@@ -83,7 +83,7 @@ protected:
 	virtual void machine_reset() override;
 
 private:
-	uint8_t m_emerald_reg[4];
+	uint16_t m_emerald_reg[4];
 	uint16_t m_mcga[32];
 };
 

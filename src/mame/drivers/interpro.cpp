@@ -126,8 +126,8 @@ void interpro_state::machine_reset()
 {
 	// flash rom requires the following values
 	m_emerald_reg[E_SREG_ERROR] = 0x00;
-	m_emerald_reg[E_SREG_STATUS] = 0x00;
-	m_emerald_reg[E_SREG_CTRL1] = E_CTRL1_FLOPRDY; 
+	m_emerald_reg[E_SREG_STATUS] = 0x400;
+	m_emerald_reg[E_SREG_CTRL1] = E_CTRL1_FLOPRDY;
 
 	m_mcga[0] = 0x00ff;  // 0x00
 	m_mcga[2] = MCGA_CTRL_ENREFRESH | MCGA_CTRL_CBITFRCSUB | MCGA_CTRL_CBITFRCRD;  // 0x08 ctrl
@@ -136,7 +136,7 @@ void interpro_state::machine_reset()
 	m_mcga[14] = 0x0340; // 0x38 memsize
 }
 
-WRITE8_MEMBER(interpro_state::emerald_w)
+WRITE16_MEMBER(interpro_state::emerald_w)
 {
 	switch (offset)
 	{
@@ -146,6 +146,8 @@ WRITE8_MEMBER(interpro_state::emerald_w)
 		break;
 
 	case E_SREG_STATUS: // not sure if writable?
+		break;
+
 	case E_SREG_CTRL1:
 		LOG_EMERALD("emerald write offset %d data 0x%x pc 0x%08x\n", offset, data, space.device().safe_pc());
 
@@ -169,7 +171,7 @@ WRITE8_MEMBER(interpro_state::emerald_w)
 	}
 }
 
-READ8_MEMBER(interpro_state::emerald_r)
+READ16_MEMBER(interpro_state::emerald_r)
 {
 	LOG_EMERALD("emerald read offset %d pc 0x%08x\n", offset, space.device().safe_pc());
 	switch (offset)
@@ -393,7 +395,7 @@ static ADDRESS_MAP_START(ip2800_map, AS_PROGRAM, 32, interpro_state)
 	AM_RANGE(0x7f000400, 0x7f00040f) AM_DEVREADWRITE8(INTERPRO_SCC1_TAG, scc85C30_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 	AM_RANGE(0x7f000410, 0x7f00041f) AM_DEVREADWRITE8(INTERPRO_SCC2_TAG, scc85230_device, ba_cd_inv_r, ba_cd_inv_w, 0xff)
 
-	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE8(emerald_r, emerald_w, 0xff)
+	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(emerald_r, emerald_w, 0xffff)
 
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(interpro_rtc_r, interpro_rtc_w, 0xff)
 	AM_RANGE(0x7F000700, 0x7F00077f) AM_READ(idprom_r)
@@ -421,7 +423,7 @@ static INPUT_PORTS_START(ip2800)
 INPUT_PORTS_END
 
 static MACHINE_CONFIG_START(ip2800, interpro_state)
-	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER, 70000000)
+	MCFG_CPU_ADD(INTERPRO_CPU_TAG, CLIPPER, 10000000)
 	MCFG_CPU_PROGRAM_MAP(ip2800_map)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, inta_cb)
 
@@ -462,7 +464,9 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 	MCFG_LEGACY_SCSI_PORT("scsiport")
 	MCFG_NCR539X_OUT_IRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
 
-	MCFG_INTERPRO_IOGA_ADD(INTERPRO_IOGA_TAG, INPUTLINE(INTERPRO_CPU_TAG, 0))
+	MCFG_INTERPRO_IOGA_ADD(INTERPRO_IOGA_TAG)
+	MCFG_INTERPRO_IOGA_NMI_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_NMI))
+	MCFG_INTERPRO_IOGA_IRQ_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_IRQ0))
 
 	// use callbacks to tell the ioga what the dma read and write methods of each device are
 	// MCFG_INTERPRO_IOGA_DMA_CALLBACK(channel, n82077aa_device, dma_r, dma_w)
