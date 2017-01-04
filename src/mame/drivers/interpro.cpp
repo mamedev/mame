@@ -15,7 +15,6 @@
 #define LOG_IDPROM(...) {}
 #endif
 
-
 /*
 * MCGA Control Register definitions.
 */
@@ -141,8 +140,7 @@ WRITE16_MEMBER(interpro_state::emerald_w)
 	switch (offset)
 	{
 	case E_SREG_LED:
-		LOG_EMERALD("led: value %d at pc 0x%08x\n", data, space.device().safe_pc());
-		m_led->a_w(data);
+		LOG_EMERALD("LED value %d at pc 0x%08x\n", data, space.device().safe_pc());
 		break;
 
 	case E_SREG_STATUS: // not sure if writable?
@@ -152,7 +150,7 @@ WRITE16_MEMBER(interpro_state::emerald_w)
 		LOG_EMERALD("emerald write offset %d data 0x%x pc 0x%08x\n", offset, data, space.device().safe_pc());
 
 		if ((data ^ m_emerald_reg[offset]) & E_CTRL1_LEDDP)
-			LOG_EMERALD("emerald led decimal point %s\n", data & E_CTRL1_LEDDP ? "on" : "off");
+			LOG_EMERALD("LED decimal point %s\n", data & E_CTRL1_LEDDP ? "on" : "off");
 
 		m_emerald_reg[offset] = data;
 		break;
@@ -448,8 +446,6 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 	MCFG_MC146818_ADD(INTERPRO_RTC_TAG, XTAL_32_768kHz)
 	MCFG_MC146818_UTC(true)
 	MCFG_MC146818_IRQ_HANDLER(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir9_w))
-
-	MCFG_DEVICE_ADD(INTERPRO_LED_TAG, DM9368, 0)
 
 	MCFG_N82077AA_ADD(INTERPRO_FDC_TAG, n82077aa_device::MODE_PS2)
 	MCFG_UPD765_INTRQ_CALLBACK(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir1_w))

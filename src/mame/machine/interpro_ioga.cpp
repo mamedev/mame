@@ -317,7 +317,7 @@ void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_i
 
 		// start the timer if necessary
 		if (value & IOGA_TIMER1_START)
-			m_timer[timer]->adjust(attotime::from_usec(m_prescaler), id, attotime::from_usec(m_prescaler));
+			m_timer[timer]->adjust(attotime::zero, id, attotime::from_usec(m_prescaler));
 		break;
 
 	case IOGA_TIMER_3:
@@ -326,7 +326,7 @@ void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_i
 
 		// start the timer if necessary
 		if (value & IOGA_TIMER3_START)
-			m_timer[timer]->adjust(attotime::from_hz(IOGA_TIMER3_CLOCK), id, attotime::from_hz(IOGA_TIMER3_CLOCK));
+			m_timer[timer]->adjust(attotime::zero, id, attotime::from_hz(IOGA_TIMER3_CLOCK));
 		else
 			m_timer[timer]->enable(false);
 		break;

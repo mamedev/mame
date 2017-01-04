@@ -12,7 +12,6 @@
 #include "machine/z80scc.h"
 #include "machine/mc146818.h"
 #include "bus/rs232/rs232.h"
-#include "video/dm9368.h"
 #include "machine/upd765.h"
 #include "machine/interpro_ioga.h"
 #include "machine/ncr539x.h"
@@ -26,7 +25,6 @@
 #define INTERPRO_ROM_TAG "rom"
 #define INTERPRO_EEPROM_TAG "eeprom"
 #define INTERPRO_TERMINAL_TAG "terminal"
-#define INTERPRO_LED_TAG "led"
 #define INTERPRO_FDC_TAG "fdc"
 #define INTERPRO_SCSI_TAG "scsi"
 #define INTERPRO_IOGA_TAG "ioga"
@@ -43,7 +41,6 @@ public:
 		m_scc1(*this, INTERPRO_SCC1_TAG),
 		m_scc2(*this, INTERPRO_SCC2_TAG),
 		m_rtc(*this, INTERPRO_RTC_TAG),
-		m_led(*this, INTERPRO_LED_TAG),
 		m_fdc(*this, INTERPRO_FDC_TAG),
 		m_scsi(*this, INTERPRO_SCSI_TAG),
 		m_ioga(*this, INTERPRO_IOGA_TAG)
@@ -56,7 +53,6 @@ public:
 	required_device<z80scc_device> m_scc2;
 
 	required_device<mc146818_device> m_rtc;
-	required_device<dm9368_device> m_led;
 	required_device<n82077aa_device> m_fdc;
 	required_device<ncr539x_device> m_scsi;
 
