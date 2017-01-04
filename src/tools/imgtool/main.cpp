@@ -34,7 +34,7 @@ static void writeusage(std::wostream &output, bool write_word_usage, const struc
 	util::stream_format(output,
 		L"%s %s %s %s\n",
 		(write_word_usage ? L"Usage:" : L"      "),
-		cmdname,
+		wstring_from_utf8(cmdname),
 		c->name,
 		c->usage ? wstring_from_utf8(c->usage) : std::wstring());
 }
@@ -224,7 +224,7 @@ static int cmd_dir(const struct command *c, int argc, char *argv[])
 
 	info = image->info();
 	if (!info.empty())
-		util::stream_format(std::wcout, L"%s\n", info);
+		util::stream_format(std::wcout, L"%s\n", wstring_from_utf8(info));
 
 	util::stream_format(std::wcout, L"%s\n", wstring_from_utf8(separator));
 
@@ -769,9 +769,9 @@ static void listoptions(const util::option_guide &opt_guide, const char *opt_spe
 		}
 
 		util::stream_format(std::wcout, L"%16s %-30s %s\n",
-			opt_name,
-			description_buffer.str(),
-			opt_desc);
+			wstring_from_utf8(opt_name),
+			wstring_from_utf8(description_buffer.str()),
+			wstring_from_utf8(opt_desc));
 	}
 }
 
