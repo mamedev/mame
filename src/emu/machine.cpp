@@ -1183,6 +1183,8 @@ running_machine::logerror_callback_item::logerror_callback_item(logerror_callbac
 
 void running_machine::export_http_api()
 {
+	if (!options().http()) return;
+	
 	m_manager.http_server()->on_get("/api/machine", [this](auto response, auto request)
 	{
 		rapidjson::StringBuffer s;
