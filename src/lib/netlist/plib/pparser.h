@@ -22,11 +22,9 @@ class ptokenizer
 {
 	P_PREVENT_COPYING(ptokenizer)
 public:
-	virtual ~ptokenizer() {}
+	explicit ptokenizer(pistream &strm);
 
-	explicit ptokenizer(pistream &strm)
-	: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
-	{}
+	virtual ~ptokenizer();
 
 	enum token_type
 	{

@@ -14,6 +14,18 @@
 
 namespace netlist { namespace factory
 {
+
+element_t::element_t(const pstring &name, const pstring &classname,
+		const pstring &def_param)
+	: m_name(name), m_classname(classname), m_def_param(def_param)
+{
+}
+
+element_t::~element_t()
+{
+}
+
+
 // ----------------------------------------------------------------------------------------
 // net_device_t_base_factory
 // ----------------------------------------------------------------------------------------
@@ -51,7 +63,7 @@ factory::element_t * list_t::factory_by_name(const pstring &devname)
 
 plib::owned_ptr<device_t> library_element_t::Create(netlist_t &anetlist, const pstring &name)
 {
-	return plib::owned_ptr<device_t>::Create<wrapper>(anetlist, name);
+	return plib::owned_ptr<device_t>::Create<NETLIB_NAME(wrapper)>(anetlist, name);
 }
 
 void library_element_t::macro_actions(netlist_t &anetlist, const pstring &name)
@@ -59,6 +71,14 @@ void library_element_t::macro_actions(netlist_t &anetlist, const pstring &name)
 	anetlist.setup().namespace_push(name);
 	anetlist.setup().include(this->name());
 	anetlist.setup().namespace_pop();
+}
+
+NETLIB_RESET(wrapper)
+{
+}
+
+NETLIB_UPDATE(wrapper)
+{
 }
 
 

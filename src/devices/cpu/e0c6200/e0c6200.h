@@ -54,10 +54,10 @@ protected:
 	uint16_t m_op;
 	uint16_t m_prev_op;
 	uint8_t m_irq_vector;     // low 4 bits for new programcounter after interrupt
-	int m_irq_id;           // for standard_irq_callback(id)
-	bool m_possible_irq;    // indicates interrupts need to be re-checked
-	bool m_halt;            // cpu halt state
-	bool m_sleep;           // cpu sleep state
+	int m_irq_id;             // for standard_irq_callback(id)
+	bool m_possible_irq;      // indicates interrupts need to be re-checked
+	bool m_halt;              // cpu halt state
+	bool m_sleep;             // cpu sleep state
 	int m_icount;
 
 	uint16_t m_pc;            // 13-bit programcounter: 1-bit bank, 4-bit page, 8-bit 'step'

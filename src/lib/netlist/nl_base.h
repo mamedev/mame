@@ -22,6 +22,7 @@
 #include "plib/pstate.h"
 #include "plib/pfmtlog.h"
 #include "plib/pstream.h"
+#include "plib/pexception.h"
 
 // ----------------------------------------------------------------------------------------
 // Type definitions
@@ -88,29 +89,35 @@ class NETLIB_NAME(name) : public device_t
 	*  dynamic device, i.e. #NETLIB_UPDATE_TERMINALSI is called on a each step
 	*  of the Newton-Raphson step of solving the linear equations.
 	*/
-#define NETLIB_DYNAMIC()                                                       \
+#define NETLIB_IS_DYNAMIC()                                                       \
 	public: virtual bool is_dynamic() const override { return true; }
 
-	/*! Add this to a device definition to mark the device as a time-stepping device
-	*  and add code.
-	*  If this is added to device definition the device is treated as an analog
-	*  time-stepping device. Currently, only the capacitor device uses this. An other
-	*  example would be an inductor device.
-	*
-	*  Example:
-	*
-	*   NETLIB_TIMESTEP()
-	*       {
-	*           // Gpar should support convergence
-	*           const nl_double G = m_C.Value() / step +  m_GParallel;
-	*           const nl_double I = -G * deltaV();
-	*           set(G, 0.0, I);
-	*       }
-	*
-	*/
-#define NETLIB_TIMESTEP()                                                      \
-	public: virtual bool is_timestep() const override { return true; } \
-	public: virtual void step_time(const nl_double step) override
+	/*! Add this to a device definition to mark the device as a time-stepping device.
+     *
+	 *  You have to implement NETLIB_TIMESTEP in this case as well. Currently, only
+	 *  the capacitor and inductor devices uses this.
+	 *
+	 *  Example:
+	 *
+	 *   NETLIB_TIMESTEP_IS_TIMESTEP()
+	 *   NETLIB_TIMESTEPI()
+	 *       {
+	 *           // Gpar should support convergence
+	 *           const nl_double G = m_C.Value() / step +  m_GParallel;
+	 *           const nl_double I = -G * deltaV();
+	 *           set(G, 0.0, I);
+	 *       }
+	 *
+	 */
+#define NETLIB_IS_TIMESTEP()                                                   \
+	public: virtual bool is_timestep() const override { return true; }
+
+	/*! Used to implement the time stepping code.
+	 *
+	 * Please see NETLIB_IS_TIMESTEP for an example.
+	 */
+#define NETLIB_TIMESTEPI()                                                     \
+	public: virtual void timestep(const nl_double step) override
 
 #define NETLIB_UPDATE_AFTER_PARAM_CHANGE()                                     \
 	public: virtual bool needs_update_after_param_change() const override { return true; }
@@ -121,6 +128,8 @@ class NETLIB_NAME(name) : public device_t
 #define NETLIB_UPDATEI() protected: virtual void update() NL_NOEXCEPT override
 #define NETLIB_UPDATE_PARAMI() public: virtual void update_param() override
 #define NETLIB_RESETI() protected: virtual void reset() override
+
+#define NETLIB_TIMESTEP(chip) void NETLIB_NAME(chip) :: timestep(const nl_double step)
 
 #define NETLIB_SUB(chip) nld_ ## chip
 #define NETLIB_SUBXX(chip) std::unique_ptr< nld_ ## chip >
@@ -200,7 +209,7 @@ namespace netlist
 		: plib::pexception(text) { }
 		/*! Copy constructor. */
 		nl_exception(const nl_exception &e) : plib::pexception(e) { }
-		virtual ~nl_exception() {}
+		virtual ~nl_exception();
 	};
 
 	class logic_output_t;
@@ -225,8 +234,8 @@ namespace netlist
 	class logic_family_desc_t
 	{
 	public:
-		logic_family_desc_t() {}
-		virtual ~logic_family_desc_t() {}
+		logic_family_desc_t();
+		virtual ~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -487,7 +496,7 @@ namespace netlist
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
 				const type_t type, const state_e state);
-		virtual ~core_terminal_t() { }
+		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
 		void clear_net();
@@ -523,6 +532,7 @@ namespace netlist
 		: core_terminal_t(dev, aname, type, state)
 		{
 		}
+		virtual ~analog_t();
 
 		const analog_net_t & net() const NL_NOEXCEPT;
 		analog_net_t & net() NL_NOEXCEPT;
@@ -604,6 +614,7 @@ namespace netlist
 			, m_proxy(nullptr)
 		{
 		}
+		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
 		devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
@@ -626,6 +637,7 @@ namespace netlist
 	{
 	public:
 		logic_input_t(core_device_t &dev, const pstring &aname);
+		virtual ~logic_input_t();
 
 		netlist_sig_t Q() const NL_NOEXCEPT;
 
@@ -741,7 +753,7 @@ namespace netlist
 	public:
 
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
-		virtual ~logic_net_t() { }
+		virtual ~logic_net_t();
 
 		netlist_sig_t Q() const { return m_cur_Q; }
 		netlist_sig_t new_Q() const     { return m_new_Q; }
@@ -785,7 +797,7 @@ namespace netlist
 
 		analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
-		virtual ~analog_net_t() { }
+		virtual ~analog_net_t();
 
 		nl_double Q_Analog() const { return m_cur_Analog; }
 		nl_double &Q_Analog_state_ptr() { return m_cur_Analog; }
@@ -808,6 +820,7 @@ namespace netlist
 	public:
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
+		virtual ~logic_output_t();
 
 		void initial(const netlist_sig_t val);
 
@@ -825,6 +838,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_output_t)
 	public:
 		analog_output_t(core_device_t &dev, const pstring &aname);
+		virtual ~analog_output_t();
 
 		void push(const nl_double val) NL_NOEXCEPT { set_Q(val); }
 		void initial(const nl_double val);
@@ -852,7 +866,7 @@ namespace netlist
 		};
 
 		param_t(const param_type_t atype, device_t &device, const pstring &name);
-		virtual ~param_t() {}
+		virtual ~param_t();
 
 		param_type_t param_type() const { return m_param_type; }
 
@@ -928,7 +942,7 @@ namespace netlist
 			}
 		}
 	protected:
-		virtual void changed() { }
+		virtual void changed();
 		pstring Value() const { return m_param; }
 	private:
 		pstring m_param;
@@ -945,7 +959,7 @@ namespace netlist
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		virtual void changed() override { m_map.clear(); }
+		virtual void changed() override;
 	private:
 		model_map_t m_map;
 	};
@@ -957,7 +971,7 @@ namespace netlist
 		: param_str_t(device, name, "") { }
 		std::unique_ptr<plib::pistream> stream();
 	protected:
-		virtual void changed() override { }
+		virtual void changed() override;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1028,7 +1042,7 @@ namespace netlist
 		virtual void reset() { }
 
 	public:
-		virtual void step_time(ATTR_UNUSED const nl_double st) { }
+		virtual void timestep(ATTR_UNUSED const nl_double st) { }
 		virtual void update_terminals() { }
 
 		virtual void update_param() {}

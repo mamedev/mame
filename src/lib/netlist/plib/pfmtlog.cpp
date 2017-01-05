@@ -17,6 +17,11 @@
 #include "palloc.h"
 
 namespace plib {
+
+plog_dispatch_intf::~plog_dispatch_intf()
+{
+}
+
 pfmt::pfmt(const pstring &fmt)
 : m_str(m_str_buf), m_allocated(0), m_arg(0)
 {

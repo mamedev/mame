@@ -112,7 +112,7 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	if (f == nullptr)
 		log().fatal("Class {1} not found!\n", classname);
 	/* make sure we parse macro library entries */
-	f->macro_actions(netlist(), build_fqn(name));
+	f->macro_actions(netlist(), name);
 	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
@@ -1080,4 +1080,22 @@ std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
+bool source_proc_t::parse(const pstring &name)
+{
+	if (name == m_setup_func_name)
+	{
+		m_setup_func(setup());
+		return true;
+	}
+	else
+		return false;
 }
+
+std::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
+{
+	std::unique_ptr<plib::pistream> p(nullptr);
+	return p;
+}
+
+}
+

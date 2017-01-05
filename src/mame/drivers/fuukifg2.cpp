@@ -73,15 +73,12 @@ WRITE16_MEMBER(fuuki16_state::vregs_w)
 	}
 }
 
-WRITE16_MEMBER(fuuki16_state::sound_command_w)
+WRITE8_MEMBER( fuuki16_state::sound_command_w )
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space,0,data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
+	m_soundlatch->write(space,0,data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 //      space.device().execute().spin_until_time(attotime::from_usec(50));   // Allow the other CPU to reply
-		machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
-	}
+	machine().scheduler().boost_interleave(attotime::zero, attotime::from_usec(50)); // Fixes glitching in rasters
 }
 
 static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
@@ -96,7 +93,7 @@ static ADDRESS_MAP_START( fuuki16_map, AS_PROGRAM, 16, fuuki16_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x810000, 0x810001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("DSW")
-	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE(sound_command_w)                                          // To Sound CPU
+	AM_RANGE(0x8a0000, 0x8a0001) AM_WRITE8(sound_command_w, 0x00ff)                                          // To Sound CPU
 	AM_RANGE(0x8c0000, 0x8c001f) AM_RAM_WRITE(vregs_w) AM_SHARE("vregs")                        // Video Registers
 	AM_RANGE(0x8d0000, 0x8d0003) AM_RAM AM_SHARE("unknown")                                         //
 	AM_RANGE(0x8e0000, 0x8e0001) AM_RAM AM_SHARE("priority")                                            //

@@ -177,32 +177,32 @@ protected:
 	int m_d_pins;           // number of D port pins and bitmask: 11 on '40,'41,'42,'44, 8 on '43, 12 on '45,'46, 16 on '47
 	int m_d_mask;           // "
 
-	uint8_t m_sm_page;        // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
-	uint8_t m_int_page;       // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
-	uint8_t m_xami_mask;      // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
-	uint16_t m_sp_mask;       // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
-	uint16_t m_ba_op;         // BA opcode location: 1 on '40 to '46, N/A on '47
-	uint8_t m_stack_levels;   // 3 levels on MELPS 4, 12 levels on MELPS 41/42
+	uint8_t m_sm_page;      // subroutine default page: 14 on '40 to '44, 2 on '45,'46, 0 on '47
+	uint8_t m_int_page;     // interrupt routine page: 12 on '40 to '44, 1 on '45,'46, 2 on '47
+	uint8_t m_xami_mask;    // mask option for XAMI opcode on '40,'41,'45 (0xf for others)
+	uint16_t m_sp_mask;     // SP opcode location(middle 4 bits): 7 on '40 to '46, 3 on '47
+	uint16_t m_ba_op;       // BA opcode location: 1 on '40 to '46, N/A on '47
+	uint8_t m_stack_levels; // 3 levels on MELPS 4, 12 levels on MELPS 41/42
 
 	// internal state, misc regs
-	uint16_t m_pc;            // program counter (11 or 10-bit)
+	uint16_t m_pc;          // program counter (11 or 10-bit)
 	uint16_t m_prev_pc;
-	uint16_t m_stack[12];     // callstack (SK0-SKx, same size as PC)
+	uint16_t m_stack[12];   // callstack (SK0-SKx, same size as PC)
 	uint16_t m_op;
 	uint16_t m_prev_op;
-	uint8_t m_bitmask;        // opcode bit argument
+	uint8_t m_bitmask;      // opcode bit argument
 
-	uint16_t m_port_d;        // last written port data
-	uint8_t m_port_s;         // "
-	uint8_t m_port_f;         // "
-	uint8_t m_port_t;         // "
+	uint16_t m_port_d;      // last written port data
+	uint8_t m_port_s;       // "
+	uint8_t m_port_f;       // "
+	uint8_t m_port_t;       // "
 
 	bool m_sm, m_sms;       // subroutine mode flag + irq stack
 	bool m_ba_flag;         // temp flag indicates BA opcode was executed
-	uint8_t m_sp_param;       // temp register holding SP opcode parameter
-	uint8_t m_cps;            // DP,CY or DP',CY' selected
+	uint8_t m_sp_param;     // temp register holding SP opcode parameter
+	uint8_t m_cps;          // DP,CY or DP',CY' selected
 	bool m_skip;            // skip next opcode
-	uint8_t m_inte;           // interrupt enable flag
+	uint8_t m_inte;         // interrupt enable flag
 	int m_intp;             // external interrupt polarity ('40 to '44)
 	bool m_irqflag[3];      // irq flags: exf, 1f, 2f (external, timer 1, timer 2)
 	int m_int_state;        // INT pin state
@@ -210,24 +210,24 @@ protected:
 	bool m_prohibit_irq;    // interrupt is prohibited during certain opcodes
 	bool m_possible_irq;    // indicate that irq needs to be rechecked
 
-	uint8_t m_tmr_count[2];   // timer active count
-	uint8_t m_tmr_reload;     // timer(2) auto reload
+	uint8_t m_tmr_count[2]; // timer active count
+	uint8_t m_tmr_reload;   // timer(2) auto reload
 	bool m_tmr_irq_enabled[2];
 
 	// work registers (unless specified, each is 4-bit)
-	uint8_t m_a;              // accumulator
-	uint8_t m_b;              // generic
-	uint8_t m_e;              // 8-bit register, hold data for S output
-	uint8_t m_y, m_y2;        // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
-	uint8_t m_x, m_x2;        // RAM index X, X', 2-bit
-	uint8_t m_z, m_z2;        // RAM index Z, Z', 1-bit, optional
-	uint8_t m_cy, m_cy2;      // carry flag(s)
+	uint8_t m_a;            // accumulator
+	uint8_t m_b;            // generic
+	uint8_t m_e;            // 8-bit register, hold data for S output
+	uint8_t m_y, m_y2;      // RAM index Y, Y' (Z.XX.YYYY is DP aka Data Pointer)
+	uint8_t m_x, m_x2;      // RAM index X, X', 2-bit
+	uint8_t m_z, m_z2;      // RAM index Z, Z', 1-bit, optional
+	uint8_t m_cy, m_cy2;    // carry flag(s)
 
-	uint8_t m_h;              // A/D converter H or generic
-	uint8_t m_l;              // A/D converter L or generic
-	uint8_t m_c;              // A/D converter counter
-	uint8_t m_v;              // timer control V
-	uint8_t m_w;              // timer control W
+	uint8_t m_h;            // A/D converter H or generic
+	uint8_t m_l;            // A/D converter L or generic
+	uint8_t m_c;            // A/D converter counter
+	uint8_t m_v;            // timer control V
+	uint8_t m_w;            // timer control W
 
 	// i/o handlers
 	devcb_read16 m_read_k;

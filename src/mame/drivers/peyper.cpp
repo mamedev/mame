@@ -201,8 +201,10 @@ static ADDRESS_MAP_START( peyper_io, AS_IO, 8, peyper_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("i8279", i8279_device, read, write)
 	AM_RANGE(0x04, 0x04) AM_DEVWRITE("ay1", ay8910_device, address_w)
+	AM_RANGE(0x05, 0x05) AM_DEVREAD("ay1", ay8910_device, data_r) // only read by Ator?
 	AM_RANGE(0x06, 0x06) AM_DEVWRITE("ay1", ay8910_device, data_w)
 	AM_RANGE(0x08, 0x08) AM_DEVWRITE("ay2", ay8910_device, address_w)
+	AM_RANGE(0x09, 0x09) AM_DEVREAD("ay2", ay8910_device, data_r) // never actually read?
 	AM_RANGE(0x0a, 0x0a) AM_DEVWRITE("ay2", ay8910_device, data_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(sol_w)
 	AM_RANGE(0x10, 0x18) AM_WRITE(lamp_w)
@@ -838,6 +840,7 @@ ROM_START(ator)
 	ROM_REGION(0x6000, "maincpu", 0)
 	ROM_LOAD("1.bin", 0x0000, 0x2000, NO_DUMP)
 	ROM_LOAD("Ator 2 _0xBA29.BIN", 0x2000, 0x2000, CRC(21aad5c4) SHA1(e78da5d80682710db34cbbfeae5af54241c73371))
+	// probably no ROM 3 (PCB photo shows location unpopulated)
 ROM_END
 
 /*-------------------------------------------------------------------

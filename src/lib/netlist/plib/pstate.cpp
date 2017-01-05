@@ -60,4 +60,9 @@ template<> void state_manager_t::save_item(const void *owner, callback_t &state,
 	state.register_state(*this, stname);
 }
 
+state_manager_t::callback_t::~callback_t()
+{
+}
+
+
 }

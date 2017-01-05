@@ -100,28 +100,28 @@ protected:
 
 	uint8_t m_bu_bits;
 	uint16_t m_bu_mask;
-	uint8_t m_callstack_bits;     // number of program counter bits held in callstack
+	uint8_t m_callstack_bits;   // number of program counter bits held in callstack
 	uint16_t m_callstack_mask;
-	uint8_t m_callstack_depth;    // callstack levels: 3 on 2000/2150, 5 on 2200/2400
-	uint16_t m_callstack[5];      // max 5
+	uint8_t m_callstack_depth;  // callstack levels: 3 on 2000/2150, 5 on 2200/2400
+	uint16_t m_callstack[5];    // max 5
 	int m_icount;
-	uint16_t m_pc;                // 13-bit program counter
-	uint8_t m_ppr;                // prepared page register (PP 1)
-	uint8_t m_pbr;                // prepared bank register (PP 2)
+	uint16_t m_pc;              // 13-bit program counter
+	uint8_t m_ppr;              // prepared page register (PP 1)
+	uint8_t m_pbr;              // prepared bank register (PP 2)
 	bool m_skip;                // skip next opcode, including PP prefixes
 	uint8_t m_op;
-	uint8_t m_prev_op;            // previous opcode, needed for PP, LAI, LB*
-	uint8_t m_f;                  // generic flags: 2 on 2000/2150, 6 on 2200/2400
-	uint8_t m_carry;              // carry flag
-	uint8_t m_bl;                 // 4-bit ram index x
-	uint8_t m_bu;                 // 2/3-bit ram index y
-	uint8_t m_acc;                // 4-bit accumulator
-	uint8_t m_e;                  // 4-bit generic register
-	uint8_t m_ki_mask;            // 4-bit k/i-pins select latch
-	uint8_t m_d;                  // 8-bit d-pins latch
+	uint8_t m_prev_op;          // previous opcode, needed for PP, LAI, LB*
+	uint8_t m_f;                // generic flags: 2 on 2000/2150, 6 on 2200/2400
+	uint8_t m_carry;            // carry flag
+	uint8_t m_bl;               // 4-bit ram index x
+	uint8_t m_bu;               // 2/3-bit ram index y
+	uint8_t m_acc;              // 4-bit accumulator
+	uint8_t m_e;                // 4-bit generic register
+	uint8_t m_ki_mask;          // 4-bit k/i-pins select latch
+	uint8_t m_d;                // 8-bit d-pins latch
 	bool m_d_active;            // d-pins available for direct i/o(floating), or outputting d-latch
-	uint8_t m_d_polarity;         // invert d-latch output
-	uint16_t m_a;                 // 13-bit a-pins latch (master strobe latch)
+	uint8_t m_d_polarity;       // invert d-latch output
+	uint16_t m_a;               // 13-bit a-pins latch (master strobe latch)
 
 	// i/o handlers
 	const uint8_t *m_7seg_table;

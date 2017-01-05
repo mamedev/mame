@@ -39,17 +39,14 @@ WRITE8_MEMBER(f1gp_state::f1gp_sh_bankswitch_w)
 }
 
 
-WRITE16_MEMBER(f1gp_state::sound_command_w)
+WRITE8_MEMBER(f1gp_state::sound_command_w)
 {
-	if (ACCESSING_BITS_0_7)
-	{
-		m_pending_command = 1;
-		m_soundlatch->write(space, offset, data & 0xff);
-		m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
-	}
+	m_pending_command = 1;
+	m_soundlatch->write(space, offset, data & 0xff);
+	m_audiocpu->set_input_line(INPUT_LINE_NMI, PULSE_LINE);
 }
 
-READ16_MEMBER(f1gp_state::command_pending_r)
+READ8_MEMBER(f1gp_state::command_pending_r)
 {
 	return (m_pending_command ? 0xff : 0);
 }
@@ -83,8 +80,7 @@ static ADDRESS_MAP_START( f1gp_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff002, 0xfff005) AM_WRITE(f1gp_fgscroll_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READ(command_pending_r)
-	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(command_pending_r, sound_command_w, 0x00ff)
 	AM_RANGE(0xfff040, 0xfff05f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xfff050, 0xfff051) AM_READ_PORT("DSW3")
 ADDRESS_MAP_END
@@ -103,7 +99,7 @@ static ADDRESS_MAP_START( f1gp2_cpu1_map, AS_PROGRAM, 16, f1gp_state )
 //  AM_RANGE(0xfff002, 0xfff003)    analog wheel?
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
-	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE(command_pending_r, sound_command_w)
+	AM_RANGE(0xfff008, 0xfff009) AM_READWRITE8(command_pending_r, sound_command_w, 0x00ff)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW3")
 	AM_RANGE(0xfff020, 0xfff03f) AM_DEVWRITE("k053936", k053936_device, ctrl_w)
 	AM_RANGE(0xfff044, 0xfff047) AM_WRITE(f1gp_fgscroll_w)

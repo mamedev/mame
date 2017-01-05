@@ -70,6 +70,7 @@
 #include "vme.h"
 #include "bus/vme/vme_mzr8105.h"
 #include "bus/vme/vme_mzr8300.h"
+#include "bus/vme/vme_mvme350.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -107,7 +108,6 @@ vme_p1_slot_device::vme_p1_slot_device(const machine_config &mconfig, const char
 		,m_vme_p1_slottag(nullptr)
 		,m_vme_j1_callback(*this)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
 vme_p1_slot_device::vme_p1_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
@@ -137,7 +137,10 @@ void vme_p1_slot_device::device_start()
 {
 	device_vme_p1_card_interface *dev = dynamic_cast<device_vme_p1_card_interface *>(get_card_device());
 	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_p1_tag, m_vme_p1_slottag);
-	if (dev) device_vme_p1_card_interface::static_set_vme_p1_tag(*dev, m_vme_p1_tag, m_vme_p1_slottag);
+	if (dev) 
+	{
+		device_vme_p1_card_interface::static_set_vme_p1_tag(*dev, m_vme_p1_tag, m_vme_p1_slottag);
+	}
 
 	//	m_card = dynamic_cast<device_vme_p1_card_interface *>(get_card_device());
 }
@@ -174,13 +177,18 @@ WRITE8_MEMBER(vme_p1_slot_device::write8)
 	//	if (m_card)		m_card->write8(space, offset, data);
 }
 
+/* The following two slot collections be combined once we intriduce capabilities for each board */
+/* Usually a VME formware supports only a few boards so it will have its own slot collection defined */
+// Controller capable boards that can go into slot1 ( or has an embedded VME bus )
 SLOT_INTERFACE_START( vme_p1_slot1 )
 	SLOT_INTERFACE("mzr8105", VME_MZR8105)
 SLOT_INTERFACE_END
 
+// All boards that can be non-controller boards, eg not driving the VME CLK etc
 SLOT_INTERFACE_START( vme_p1_slots )
 	SLOT_INTERFACE("mzr8105", VME_MZR8105)
 	SLOT_INTERFACE("mzr8300", VME_MZR8300)
+	SLOT_INTERFACE("mvme350", VME_MVME350)
 SLOT_INTERFACE_END
 
 //

@@ -122,7 +122,7 @@ uint32_t tms0980_cpu_device::decode_micro(uint8_t sel)
 
 	// M_RSTR is specific to TMS02x0/TMS1980, it redirects to F_RSTR
 	// M_UNK1 is specific to TMS0270, unknown/unused yet and apparently not connected on every TMS0270
-	//                      _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
+	//                        _______  ______                                _____  _____  _____  _____  ______  _____  ______  _____                            _____
 	const uint32_t md[22] = { M_NDMTP, M_DMTP, M_AUTY, M_AUTA, M_CKM, M_SSE, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_SSS, M_CME, M_CIN, M_STO, M_RSTR, M_UNK1 };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)

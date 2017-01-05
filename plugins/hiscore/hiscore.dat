@@ -1647,6 +1647,108 @@ sdtennis:
 
 ;@s:bublbobl.cpp
 
+bublcave10:
+bublcave11:
+@:maincpu,program,e654,23,00,48
+@:maincpu,program,e67b,3,1f,13
+@:maincpu,program,e64c,3,00,00
+@:maincpu,program,e5df,1,00,00
+@:maincpu,program,e5e0,1,00,00
+@:maincpu,program,e5e4,1,00,00
+@:maincpu,program,e5e6,1,00,00
+@:maincpu,program,e5e1,1,00,00
+@:maincpu,program,e5e2,1,00,00
+@:maincpu,program,e5e3,1,00,00
+@:maincpu,program,e5e7,1,00,00
+@:maincpu,program,e5e8,1,00,00
+@:maincpu,program,e5e9,1,00,00
+@:maincpu,program,e5ea,1,00,00
+@:maincpu,program,e5eb,1,00,00
+@:maincpu,program,e5f6,1,00,00
+@:maincpu,program,e5f7,1,00,00
+@:maincpu,program,e5ee,1,00,00
+@:maincpu,program,e5ef,1,00,00
+@:maincpu,program,e5f0,1,00,00
+@:maincpu,program,e5ec,1,00,00
+@:maincpu,program,e5ed,1,00,00
+@:maincpu,program,e5f3,1,00,00
+@:maincpu,program,e5f4,1,00,00
+@:maincpu,program,e5d9,1,00,00
+@:maincpu,program,e5da,1,00,00
+@:maincpu,program,f457,1,00,00
+@:maincpu,program,f458,1,00,00
+@:maincpu,program,e601,1,00,00
+@:maincpu,program,e602,1,00,00
+@:maincpu,program,e600,1,00,00
+@:maincpu,program,e5ff,1,00,00
+@:maincpu,program,e5fd,1,00,00
+@:maincpu,program,e5fc,1,00,00
+@:maincpu,program,e5fb,1,00,00
+@:maincpu,program,e5fa,1,00,00
+@:maincpu,program,e5f9,1,00,00
+@:maincpu,program,e5f8,1,00,00
+@:maincpu,program,e5fe,1,00,00
+@:maincpu,program,e604,1,00,00
+@:maincpu,program,e605,1,00,00
+@:maincpu,program,e606,1,00,00
+@:maincpu,program,e607,1,00,00
+@:maincpu,program,e609,1,00,00
+@:maincpu,program,e60a,1,00,00
+@:maincpu,program,e611,1,00,00
+@:maincpu,program,e60b,2,00,00
+
+
+boblcave:
+bublcave:
+@:maincpu,program,e654,23,00,4e
+@:maincpu,program,e67b,3,1f,13
+@:maincpu,program,e64c,3,00,00
+@:maincpu,program,e5df,1,00,00
+@:maincpu,program,e5e0,1,00,00
+@:maincpu,program,e5e4,1,00,00
+@:maincpu,program,e5e6,1,00,00
+@:maincpu,program,e5e1,1,00,00
+@:maincpu,program,e5e2,1,00,00
+@:maincpu,program,e5e3,1,00,00
+@:maincpu,program,e5e7,1,00,00
+@:maincpu,program,e5e8,1,00,00
+@:maincpu,program,e5e9,1,00,00
+@:maincpu,program,e5ea,1,00,00
+@:maincpu,program,e5eb,1,00,00
+@:maincpu,program,e5f6,1,00,00
+@:maincpu,program,e5f7,1,00,00
+@:maincpu,program,e5ee,1,00,00
+@:maincpu,program,e5ef,1,00,00
+@:maincpu,program,e5f0,1,00,00
+@:maincpu,program,e5ec,1,00,00
+@:maincpu,program,e5ed,1,00,00
+@:maincpu,program,e5f3,1,00,00
+@:maincpu,program,e5f4,1,00,00
+@:maincpu,program,e5d9,1,00,00
+@:maincpu,program,e5da,1,00,00
+@:maincpu,program,f457,1,00,00
+@:maincpu,program,f458,1,00,00
+@:maincpu,program,e601,1,00,00
+@:maincpu,program,e602,1,00,00
+@:maincpu,program,e600,1,00,00
+@:maincpu,program,e5ff,1,00,00
+@:maincpu,program,e5fd,1,00,00
+@:maincpu,program,e5fc,1,00,00
+@:maincpu,program,e5fb,1,00,00
+@:maincpu,program,e5fa,1,00,00
+@:maincpu,program,e5f9,1,00,00
+@:maincpu,program,e5f8,1,00,00
+@:maincpu,program,e5fe,1,00,00
+@:maincpu,program,e604,1,00,00
+@:maincpu,program,e605,1,00,00
+@:maincpu,program,e606,1,00,00
+@:maincpu,program,e607,1,00,00
+@:maincpu,program,e609,1,00,00
+@:maincpu,program,e60a,1,00,00
+@:maincpu,program,e611,1,00,00
+@:maincpu,program,e60b,2,00,00
+
+
 sboblbobla:
 sboblboblb:
 @:maincpu,program,e654,23,00,48
@@ -3065,10 +3167,10 @@ forgottn:
 forgottnu:
 forgottnua:
 forgottnuaa:
-lostwrld:
-lostwrldo:
 forgottnuc:
 forgottnue:
+lostwrld:
+lostwrldo:
 @:maincpu,program,ffe142,50,00,20
 @:maincpu,program,ffb2a0,04,00,00
 
@@ -5068,6 +5170,10 @@ fax2:
 
 ;@s:expro02.cpp
 
+missw02:
+@:maincpu,program,f825b6,63,30,20
+
+
 smissw:
 @:maincpu,program,c025b6,63,30,20
 
@@ -5671,6 +5777,7 @@ galaxiac:
 
 ;@s:galaxian.cpp
 
+mltiwars:
 uniwarsa:
 @:maincpu,program,40a8,3,00,00
 
@@ -6425,6 +6532,13 @@ rushatck:
 
 
 ;@s:gcpinbal.cpp
+
+pwrflip:
+@:maincpu,program,ff231a,6c,00,00
+@:maincpu,program,ff000e,6d,00,00
+@:maincpu,program,ff2384,1,4f,4f
+@:maincpu,program,ff0079,1,4f,4f
+
 
 ;(grand cross) (by GeoMan)
 gcpinbal:
@@ -7208,7 +7322,7 @@ snapjack:
 
 
 ;ladybgb2:******Lady Bug (bootleg Set 2)
-ladybgb2:
+ladybugb2:
 ladybug:
 ladybugb:
 @:maincpu,program,6073,1b,01,00
@@ -8177,10 +8291,6 @@ pigskinb:
 @:maincpu,program,142b4d,157,05,03
 
 
-zwackery:
-@:maincpu,program,842c2,48,42,00
-
-
 archrivl:
 @:maincpu,program,62cf1,319,09,05
 @:maincpu,program,61ed5,1,03,03
@@ -8742,6 +8852,7 @@ mole:
 
 ;(momoko 120%)
 momoko:
+momokoe:
 @:maincpu,program,ce01,9f,20,20
 @:maincpu,program,c049,7,20,30
 
@@ -11143,6 +11254,7 @@ raidena:
 raidenk:
 raident:
 raidenu:
+raidenkb:
 @:maincpu,program,000bd7,b4,50,00
 
 
@@ -12667,6 +12779,10 @@ starforce:
 
 ;@s:seta.cpp
 
+simpsonjr:
+@:maincpu,program,20561e,4f,00,20
+
+
 daiohp:
 @:maincpu,program,206c96,99,00,05
 
@@ -14174,6 +14290,11 @@ suratkj:
 
 
 ;@s:system1.cpp
+
+flickya:
+@:maincpu,program,e700,31,00,41
+@:maincpu,program,c0d5,3,00,00
+
 
 myherok:
 sscandal:
@@ -15781,6 +15902,7 @@ glfgreat:
 
 ;@s:tnzs.cpp
 
+tnzsoa:
 tnzsuo:
 @:maincpu,program,e68d,23,00,55
 
@@ -15856,6 +15978,12 @@ tnzsjo:
 
 
 ;@s:toaplan1.cpp
+
+samesamenh:
+@:maincpu,program,c1778,194,00,01
+@:maincpu,program,c18b9,1,26,26
+@:maincpu,program,c1a4f,21,2d,00
+
 
 demonwld4:
 @:maincpu,program,c001c2,c8,00,2d
@@ -17521,5 +17649,11 @@ percuss:
 ;Moguchan (by GeoMan)
 moguchan:
 @:maincpu,program,5eda,6,0,0
+
+
+;@s:zwackery.cpp
+
+zwackery:
+@:maincpu,program,842c2,48,42,00
 
 

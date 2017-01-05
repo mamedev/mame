@@ -114,7 +114,7 @@ void tms1000_cpu_device::device_reset()
 
 	for (int op = 0; op < 0x100; op++)
 	{
-		//                                              _____              _____  ______  _____  ______  _____  _____  _____  _____
+		//                                                _____              _____  ______  _____  ______  _____  _____  _____  _____
 		const uint32_t md[16] = { M_STSL, M_AUTY, M_AUTA, M_CIN, M_C8, M_NE, M_CKN, M_15TN, M_MTN, M_NATN, M_ATN, M_MTP, M_YTP, M_CKP, M_CKM, M_STO };
 		uint16_t mask = m_mpla->read(op);
 		mask ^= 0x3fc8; // invert active-negative

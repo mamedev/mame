@@ -23,13 +23,8 @@ class nl_convert_base_t
 {
 public:
 
-	nl_convert_base_t() : out(m_buf), m_numberchars("0123456789-+e.") {}
-	virtual ~nl_convert_base_t()
-	{
-		m_nets.clear();
-		m_devs.clear();
-		m_pins.clear();
-	}
+	nl_convert_base_t();
+	virtual ~nl_convert_base_t();
 
 	const pstringbuffer &result() { return m_buf.str(); }
 
@@ -168,32 +163,10 @@ public:
 	{
 	}
 
-	class eagle_tokenizer : public plib::ptokenizer
+	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		eagle_tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm)
-		: plib::ptokenizer(strm), m_convert(convert)
-		{
-			set_identifier_chars("abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_.-");
-			set_number_chars(".0123456789", "0123456789eE-."); //FIXME: processing of numbers
-			char ws[5];
-			ws[0] = ' ';
-			ws[1] = 9;
-			ws[2] = 10;
-			ws[3] = 13;
-			ws[4] = 0;
-			set_whitespace(ws);
-			/* FIXME: gnetlist doesn't print comments */
-			set_comment("/*", "*/", "//");
-			set_string_char('\'');
-			m_tok_ADD = register_token("ADD");
-			m_tok_VALUE = register_token("VALUE");
-			m_tok_SIGNAL = register_token("SIGNAL");
-			m_tok_SEMICOLON = register_token(";");
-			/* currently not used, but required for parsing */
-			register_token(")");
-			register_token("(");
-		}
+		tokenizer(nl_convert_eagle_t &convert, plib::pistream &strm);
 
 		token_id_t m_tok_ADD;
 		token_id_t m_tok_VALUE;
@@ -202,11 +175,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override
-		{
-			m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
-		}
-
+		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_eagle_t &m_convert;
@@ -233,31 +202,7 @@ public:
 	class tokenizer : public plib::ptokenizer
 	{
 	public:
-		tokenizer(nl_convert_rinf_t &convert, plib::pistream &strm)
-		: plib::ptokenizer(strm), m_convert(convert)
-		{
-			set_identifier_chars(".abcdefghijklmnopqrstuvwvxyzABCDEFGHIJKLMNOPQRSTUVWXYZ01234567890_-");
-			set_number_chars("0123456789", "0123456789eE-."); //FIXME: processing of numbers
-			char ws[5];
-			ws[0] = ' ';
-			ws[1] = 9;
-			ws[2] = 10;
-			ws[3] = 13;
-			ws[4] = 0;
-			set_whitespace(ws);
-			/* FIXME: gnetlist doesn't print comments */
-			set_comment("","","//"); // FIXME:needs to be confirmed
-			set_string_char('"');
-			m_tok_HEA = register_token(".HEA");
-			m_tok_APP = register_token(".APP");
-			m_tok_TIM = register_token(".TIM");
-			m_tok_TYP = register_token(".TYP");
-			m_tok_ADDC = register_token(".ADD_COM");
-			m_tok_ATTC = register_token(".ATT_COM");
-			m_tok_NET = register_token(".ADD_TER");
-			m_tok_TER = register_token(".TER");
-			m_tok_END = register_token(".END");
-		}
+		tokenizer(nl_convert_rinf_t &convert, plib::pistream &strm);
 
 		token_id_t m_tok_HEA;
 		token_id_t m_tok_APP;
@@ -271,11 +216,7 @@ public:
 
 	protected:
 
-		void verror(const pstring &msg, int line_num, const pstring &line) override
-		{
-			m_convert.out("{} (line {}): {}\n", msg.c_str(), line_num, line.c_str());
-		}
-
+		virtual void verror(const pstring &msg, int line_num, const pstring &line) override;
 
 	private:
 		nl_convert_rinf_t &m_convert;

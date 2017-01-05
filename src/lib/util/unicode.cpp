@@ -11,10 +11,14 @@
 #include "unicode.h"
 
 #ifdef _WIN32
+#include "strconv.h"
 #define UTF8PROC_DLLEXPORT
 #endif
 
 #include "utf8proc/utf8proc.h"
+
+#include <codecvt>
+#include <locale>
 
 
 //-------------------------------------------------
@@ -348,6 +352,38 @@ int utf16f_from_uchar(char16_t *utf16string, size_t count, char32_t uchar)
 	if (rc >= 2)
 		utf16string[1] = flipendian_int16(buf[1]);
 	return rc;
+}
+
+
+//-------------------------------------------------
+// wstring_from_utf8
+//-------------------------------------------------
+
+std::wstring wstring_from_utf8(const std::string &utf8string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::to_wstring(utf8string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.from_bytes(utf8string);
+#endif
+}
+
+
+//-------------------------------------------------
+// utf8_from_wstring
+//-------------------------------------------------
+
+std::string utf8_from_wstring(const std::wstring &string)
+{
+#ifdef WIN32
+	// for some reason, using codecvt yields bad results on MinGW (but not MSVC)
+	return osd::text::from_wstring(string);
+#else
+	std::wstring_convert<std::codecvt_utf8<wchar_t>> converter;
+	return converter.to_bytes(string);
+#endif
 }
 
 
