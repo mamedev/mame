@@ -1299,7 +1299,7 @@ void arkanoid_state::machine_reset()
 	m_portA_out = 0;
 	m_old_portC_out = 0;
 	
-	m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 }
 
 /*
@@ -1444,7 +1444,7 @@ MACHINE_CONFIG_END
 
 /* ROMs */
 /* rom numbering, with guesses for version numbers and missing roms:
-    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED)
+    A75 01   = Z80 code 1/2 v1.0 Japan (NOT DUMPED, arkatayt and arkangc and maybe arkanoidjbl may actually be bootlegs of this undumped version, so it might be possible to 'restore' this version by 'de-bootlegging' those sets?)
     A75 01-1 = Z80 code 1/2 v1.1 Japan and USA/Romstar and World
     A75 02   = Z80 code 2/2 v1.0 Japan (has 'Notice: This game is for use in Japan only' screen)
     A75 03   = GFX 1/3
@@ -2139,6 +2139,7 @@ DRIVER_INIT_MEMBER(arkanoid_state,brixian)
 /* Game Drivers */
 
 // original sets of Arkanoid
+//    YEAR, NAME,       PARENT,   MACHINE,  INPUT,    STATE,         INIT,     MONITOR,COMPANY,FULLNAME,FLAGS
 GAME( 1986, arkanoid,   0,        arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito Corporation Japan", "Arkanoid (World, older)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoidu,  arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, newer)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, arkanoiduo, arkanoid, arkanoid, arkanoid, driver_device, 0,        ROT90, "Taito America Corporation (Romstar license)", "Arkanoid (US, older)", MACHINE_SUPPORTS_SAVE )
