@@ -896,19 +896,6 @@ static ADDRESS_MAP_START( brixian_map, AS_PROGRAM, 8, arkanoid_state )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( mcu_map, AS_PROGRAM, 8, arkanoid_state )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(arkanoid_68705_port_a_r, arkanoid_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("MUX")
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(arkanoid_68705_port_c_r, arkanoid_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(arkanoid_68705_ddr_a_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(arkanoid_68705_ddr_c_w)
-	AM_RANGE(0x0008, 0x0008) AM_READWRITE(arkanoid_68705_tdr_r, arkanoid_68705_tdr_w)
-	AM_RANGE(0x0009, 0x0009) AM_READWRITE(arkanoid_68705_tcr_r, arkanoid_68705_tcr_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 /* MCU Hookup based on 'Arkanoid_TAITO_(Japan 1986) PCB.rar' from Taro and others at http://zx-pk.ru forums
 NOTE and TODO: these comments have not been significantly updated since the real taito arkanoid schematics were found. beware of mistakes!
@@ -1271,9 +1258,6 @@ GFXDECODE_END
 
 void arkanoid_state::machine_start()
 {
-	// allocate the MCU timer, even if we have no MCU, and set it to fire NEVER.
-	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(arkanoid_state::timer_68705_increment),this));
-	m_68705_timer->adjust(attotime::never);
 
 	save_item(NAME(m_gfxbank));
 	save_item(NAME(m_palettebank));
@@ -1290,12 +1274,9 @@ void arkanoid_state::machine_start()
 
 	save_item(NAME(m_portA_in));
 	save_item(NAME(m_portA_out));
-	save_item(NAME(m_ddrA));
-	save_item(NAME(m_portC_internal));
-	save_item(NAME(m_portC_out));
-	save_item(NAME(m_ddrC));
-	save_item(NAME(m_tdr));
-	save_item(NAME(m_tcr));
+	save_item(NAME(m_old_portC_out));
+
+
 }
 
 void arkanoid_state::machine_reset()
@@ -1313,17 +1294,12 @@ void arkanoid_state::machine_reset()
 	// the following 3 are all part of the 74ls74 at ic26 and are cleared on reset
 	m_Z80HasWritten = 0;
 	m_MCUHasWritten = 0;
-	if (m_mcu.found()) m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
-	if (m_mcu.found()) m_68705_timer->adjust(attotime::from_hz(((XTAL_12MHz/4)/4)/(1<<7)));
 
 	m_portA_in = 0;
 	m_portA_out = 0;
-	m_ddrA = 0;
-	m_portC_internal = 0;
-	m_portC_out = 0;
-	m_ddrC = 0;
-	m_tdr = 0xFF;
-	m_tcr = 0x7F;
+	m_old_portC_out = 0;
+	
+	m_mcu->set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
 }
 
 /*
@@ -1346,8 +1322,13 @@ static MACHINE_CONFIG_START( arkanoid, arkanoid_state )
 
 	MCFG_WATCHDOG_ADD("watchdog")
 
-	MCFG_CPU_ADD("mcu", M68705, XTAL_12MHz/4) /* verified on pcb */
-	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705_NEW, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_M68705_PORTA_R_CB(READ8(arkanoid_state, mcu_porta_r))
+	MCFG_M68705_PORTA_W_CB(WRITE8(arkanoid_state, mcu_porta_w))
+	MCFG_M68705_PORTB_R_CB(READ8(arkanoid_state, mcu_portb_r))
+	MCFG_M68705_PORTC_R_CB(READ8(arkanoid_state, mcu_portc_r))
+	MCFG_M68705_PORTC_W_CB(WRITE8(arkanoid_state, mcu_portc_w))
+
 
 	MCFG_QUANTUM_TIME(attotime::from_hz(6000))                  // 100 CPU slices per second to synchronize between the MCU and the main CPU
 
