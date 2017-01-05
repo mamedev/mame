@@ -95,9 +95,9 @@ public:
 	required_shared_ptr<uint32_t> m_nvram;
 	required_shared_ptr<uint32_t> m_spriteram;
 	DECLARE_READ32_MEMBER(in0_r);
-	DECLARE_WRITE32_MEMBER(output_w);
+	DECLARE_WRITE16_MEMBER(output_w);
+	DECLARE_WRITE16_MEMBER(output2_w);
 	DECLARE_DRIVER_INIT(feversoc);
-	virtual void video_start() override;
 	uint32_t screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	INTERRUPT_GEN_MEMBER(feversoc_irq);
 	required_device<sh2_device> m_maincpu;
@@ -111,9 +111,6 @@ public:
 
 #define MASTER_CLOCK XTAL_28_63636MHz
 
-void feversoc_state::video_start()
-{
-}
 
 uint32_t feversoc_state::screen_update_feversoc(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
@@ -153,41 +150,40 @@ READ32_MEMBER(feversoc_state::in0_r)
 	return io0 | io1;
 }
 
-WRITE32_MEMBER(feversoc_state::output_w)
+WRITE16_MEMBER( feversoc_state::output_w )
 {
-	if(ACCESSING_BITS_16_31)
-	{
-		machine().bookkeeping().coin_lockout_w(0,~data>>16 & 0x40);
-		machine().bookkeeping().coin_lockout_w(1,~data>>16 & 0x40);
-		machine().bookkeeping().coin_counter_w(0,data>>16 & 1);
-		//data>>16 & 2 coin out
-		machine().bookkeeping().coin_counter_w(1,data>>16 & 4);
-		//data>>16 & 8 coin hopper
-		m_oki->set_rom_bank(((data>>16) & 0x20)>>5);
+	machine().bookkeeping().coin_lockout_w(0, ~data & 0x40);
+	machine().bookkeeping().coin_lockout_w(1, ~data & 0x40);
+	machine().bookkeeping().coin_counter_w(0, data & 1);
+	// data & 2 coin out
+	machine().bookkeeping().coin_counter_w(1, data & 4);
+	// data & 8 coin hopper
+	m_oki->set_rom_bank((data & 0x20) >> 5);
 
-		m_eeprom->di_write((data & 0x80000000) ? 1 : 0);
-		m_eeprom->clk_write((data & 0x40000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_eeprom->cs_write((data & 0x20000000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->di_write((data & 0x8000) ? 1 : 0);
+	m_eeprom->clk_write((data & 0x4000) ? ASSERT_LINE : CLEAR_LINE);
+	m_eeprom->cs_write((data & 0x2000) ? ASSERT_LINE : CLEAR_LINE);
 
-		m_rtc->data_w((data & 0x08000000) ? 1 : 0);
-		m_rtc->wr_w((data & 0x04000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_rtc->clk_w((data & 0x02000000) ? ASSERT_LINE : CLEAR_LINE);
-		m_rtc->ce_w((data & 0x01000000) ? ASSERT_LINE : CLEAR_LINE);
-	}
-	if(ACCESSING_BITS_0_15)
-	{
-		machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
-		machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
-		machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
-		machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
-		machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
-		machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
-		machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
-
-		machine().bookkeeping().coin_counter_w(2,data & 0x2000); //key in
-		//data & 0x4000 key out
-	}
+	m_rtc->data_w((data & 0x0800) ? 1 : 0);
+	m_rtc->wr_w((data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->clk_w((data & 0x0200) ? ASSERT_LINE : CLEAR_LINE);
+	m_rtc->ce_w((data & 0x0100) ? ASSERT_LINE : CLEAR_LINE);
 }
+
+WRITE16_MEMBER( feversoc_state::output2_w )
+{
+	machine().output().set_lamp_value(1, BIT(data, 0)); // LAMP1
+	machine().output().set_lamp_value(2, BIT(data, 1)); // LAMP2
+	machine().output().set_lamp_value(3, BIT(data, 2)); // LAMP3
+	machine().output().set_lamp_value(4, BIT(data, 3)); // LAMP4
+	machine().output().set_lamp_value(5, BIT(data, 4)); // LAMP5
+	machine().output().set_lamp_value(6, BIT(data, 5)); // LAMP6
+	machine().output().set_lamp_value(7, BIT(data, 6)); // LAMP7
+
+	machine().bookkeeping().coin_counter_w(2, data & 0x2000); // key in
+	//data & 0x4000 key out
+}
+
 
 static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x00000000, 0x0003ffff) AM_ROM
@@ -195,7 +191,8 @@ static ADDRESS_MAP_START( feversoc_map, AS_PROGRAM, 32, feversoc_state )
 	AM_RANGE(0x02030000, 0x0203ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x02034000, 0x0203dfff) AM_RAM AM_SHARE("workram2") //work ram
 	AM_RANGE(0x0203e000, 0x0203ffff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x06000000, 0x06000003) AM_WRITE(output_w)
+	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output_w, 0xffff0000)
+	AM_RANGE(0x06000000, 0x06000003) AM_WRITE16(output2_w, 0x0000ffff)
 	AM_RANGE(0x06000004, 0x06000007) AM_WRITENOP //???
 	AM_RANGE(0x06000008, 0x0600000b) AM_READ(in0_r)
 	AM_RANGE(0x0600000c, 0x0600000f) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff0000)
