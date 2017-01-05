@@ -851,6 +851,8 @@ files {
 	MAME_DIR .. "src/mame/audio/dcs.h",
 	MAME_DIR .. "src/mame/audio/decobsmt.cpp",
 	MAME_DIR .. "src/mame/audio/decobsmt.h",
+	MAME_DIR .. "src/mame/audio/efo_zsu.cpp",
+	MAME_DIR .. "src/mame/audio/efo_zsu.h",
 	MAME_DIR .. "src/mame/audio/segam1audio.cpp",
 	MAME_DIR .. "src/mame/audio/segam1audio.h",
 }
@@ -4351,7 +4353,6 @@ files {
 	MAME_DIR .. "src/mame/machine/cdicdic.cpp",
 	MAME_DIR .. "src/mame/machine/cdicdic.h",
 	MAME_DIR .. "src/mame/drivers/cedar_magnet.cpp",
-	MAME_DIR .. "src/mame/machine/cedar_magnet_sound.cpp",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_plane.cpp",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_sprite.cpp",
 	MAME_DIR .. "src/mame/machine/cedar_magnet_board.cpp",

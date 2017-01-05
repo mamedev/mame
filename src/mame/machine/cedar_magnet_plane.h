@@ -7,6 +7,7 @@
 #define CEDAR_MAGNET_PLANE_DEF
 
 #include "machine/cedar_magnet_board.h"
+#include "machine/z80pio.h"
 
 extern const device_type CEDAR_MAGNET_PLANE;
 
@@ -14,7 +15,7 @@ extern const device_type CEDAR_MAGNET_PLANE;
 	MCFG_DEVICE_ADD(_tag, CEDAR_MAGNET_PLANE, 0)
 
 
-class cedar_magnet_plane_device :  public cedar_magnet_board_device
+class cedar_magnet_plane_device : public device_t, public cedar_magnet_board_interface
 {
 public:
 	// construction/destruction
@@ -34,6 +35,8 @@ public:
 	DECLARE_WRITE8_MEMBER(plane_portcd_w);
 	DECLARE_WRITE8_MEMBER(plane_portce_w);
 	DECLARE_WRITE8_MEMBER(plane_portcf_w);
+
+	INTERRUPT_GEN_MEMBER(vblank_irq);
 
 	uint8_t m_framebuffer[0x10000];
 	int m_curline;

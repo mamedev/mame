@@ -11,15 +11,12 @@ Status:
 - Lots of loud siren-like noises when there should be silence
 - Mechanical sounds to add
 - Most games work
--- Spain82: not working (no manual available)
+-- Spain82: not working (no manual available; uses same sound board as Cerberus)
 -- Nautilus: sound is broken (runs into the weeds)
--- Skill Flight: not working
+-- Skill Flight, Phantom Ship: not working
+-- Eight Ball Champ, Cobra: not working (different hardware)
 -- Miss Disco: not working (no manual available)
--- Phantom Ship: no sound (no manual available)
 -- Meg Aaton: Ball number doesn't show
-
-It looks like Skill Flight and Phantom Ship use a new sound card that contains
-Z80A, 5205, 2x AY-3-8910, 2x Z80CTC, 2x MF10.
 
 Note: The input lines INT, EF1-4 are inverted (not true voltage).
 
@@ -51,6 +48,7 @@ The manual is not that clear, there's a lot we don't know, this *seems* to work.
 #include "machine/clock.h"
 #include "machine/7474.h"
 #include "sound/ay8910.h"
+#include "audio/efo_zsu.h"
 #include "play_3.lh"
 
 
@@ -65,6 +63,7 @@ public:
 		, m_4013b(*this, "4013b")
 		, m_aysnd1(*this, "aysnd1")
 		, m_aysnd2(*this, "aysnd2")
+		, m_zsu(*this, "zsu")
 		, m_keyboard(*this, "X.%u", 0)
 	{ }
 
@@ -72,6 +71,7 @@ public:
 	DECLARE_WRITE8_MEMBER(megaaton_port01_w);
 	DECLARE_WRITE8_MEMBER(port02_w);
 	DECLARE_WRITE8_MEMBER(port03_w);
+	DECLARE_WRITE8_MEMBER(sklflite_port03_w);
 	DECLARE_READ8_MEMBER(port04_r);
 	DECLARE_READ8_MEMBER(port05_r);
 	DECLARE_WRITE8_MEMBER(port06_w);
@@ -87,22 +87,24 @@ public:
 	DECLARE_READ_LINE_MEMBER(clear_a_r);
 
 private:
-	uint16_t m_clockcnt;
-	uint16_t m_resetcnt;
-	uint16_t m_resetcnt_a;
-	uint8_t m_soundlatch;
-	uint8_t m_a_irqset;
-	uint16_t m_a_irqcnt;
-	uint8_t m_kbdrow;
-	uint8_t m_segment[5];
+	u16 m_clockcnt;
+	u16 m_resetcnt;
+	u16 m_resetcnt_a;
+	u8 m_soundlatch;
+	u8 m_port03_old;
+	u8 m_a_irqset;
+	u16 m_a_irqcnt;
+	u8 m_kbdrow;
+	u8 m_segment[5];
 	bool m_disp_sw;
 	virtual void machine_reset() override;
 	required_device<cosmac_device> m_maincpu;
-	required_device<cosmac_device> m_audiocpu;
+	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
 	required_device<ttl7474_device> m_4013b;
-	required_device<ay8910_device> m_aysnd1;
-	required_device<ay8910_device> m_aysnd2;
+	optional_device<ay8910_device> m_aysnd1;
+	optional_device<ay8910_device> m_aysnd2;
+	optional_device<efo_zsu_device> m_zsu;
 	required_ioport_array<10> m_keyboard;
 };
 
@@ -124,12 +126,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( megaaton_io, AS_IO, 8, play_3_state )
 	AM_RANGE(0x01, 0x01) AM_WRITE(megaaton_port01_w) // digits, scan-lines
-	AM_RANGE(0x02, 0x02) AM_WRITE(port02_w) // sound code
-	AM_RANGE(0x03, 0x03) AM_WRITE(port03_w) //
-	AM_RANGE(0x04, 0x04) AM_READ(port04_r) // switches
-	AM_RANGE(0x05, 0x05) AM_READ(port05_r) // more switches
-	AM_RANGE(0x06, 0x06) AM_WRITE(port06_w) // segments
-	AM_RANGE(0x07, 0x07) AM_WRITE(port07_w) // flipflop clear
+	AM_IMPORT_FROM(play_3_io)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sklflite_io, AS_IO, 8, play_3_state )
+	AM_RANGE(0x03, 0x03) AM_WRITE(sklflite_port03_w) //
+	AM_IMPORT_FROM(play_3_io)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( play_3_audio_map, AS_PROGRAM, 8, play_3_state )
@@ -258,6 +260,7 @@ void play_3_state::machine_reset()
 	m_disp_sw = 0;
 	for (uint8_t i = 0; i < 5; i++)
 		m_segment[i] = 0;
+	m_port03_old = 0;
 }
 
 WRITE8_MEMBER( play_3_state::port01_w )
@@ -318,6 +321,21 @@ WRITE8_MEMBER( play_3_state::port03_w )
 			//m_samples->start(0, 6); // no knocker?
 	}
 
+}
+
+WRITE8_MEMBER( play_3_state::sklflite_port03_w )
+{
+	if (BIT(data, 6) && !BIT(m_port03_old, 6))
+		m_zsu->sound_command_w(space, 0, m_soundlatch);
+	if (BIT(data, 5))
+	{
+		if (m_soundlatch == 11)
+			m_samples->start(0, 5); // outhole
+		//if (m_soundlatch == 13)
+			//m_samples->start(0, 6); // no knocker?
+	}
+
+	m_port03_old = data;
 }
 
 READ8_MEMBER( play_3_state::port04_r )
@@ -405,15 +423,18 @@ WRITE_LINE_MEMBER( play_3_state::clock_w )
 		if ((m_clockcnt & 0x3ff) == 0)
 			m_4013b->preset_w(BIT(m_clockcnt, 10)); // Q10 output
 
-		// sound irq
-		m_a_irqcnt--;
-		if (m_a_irqcnt == 1)
-			m_audiocpu->int_w(1); // inverted
-		else
-		if (m_a_irqcnt == 0)
+		if (m_audiocpu.found())
 		{
-			m_a_irqcnt = (m_a_irqset << 3) | 7;
-			m_audiocpu->int_w(0); // inverted
+			// sound irq
+			m_a_irqcnt--;
+			if (m_a_irqcnt == 1)
+				m_audiocpu->int_w(1); // inverted
+			else
+			if (m_a_irqcnt == 0)
+			{
+				m_a_irqcnt = (m_a_irqset << 3) | 7;
+				m_audiocpu->int_w(0); // inverted
+			}
 		}
 	}
 }
@@ -480,6 +501,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( megaaton, play_3 )
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_IO_MAP(megaaton_io)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sklflite, play_3 )
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sklflite_io)
+
+	MCFG_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("aysnd1")
+	MCFG_DEVICE_REMOVE("aysnd2")
+	MCFG_DEVICE_REMOVE("lspeaker")
+	MCFG_DEVICE_REMOVE("rspeaker")
+
+	MCFG_DEVICE_ADD("zsu", EFO_ZSU1, 0)
 MACHINE_CONFIG_END
 
 
@@ -642,7 +676,7 @@ ROM_START(sklflite)
 	ROM_LOAD("skflcpu1.rom", 0x0000, 0x2000, CRC(8f833b55) SHA1(1729203582c22b51d1cc401aa8f270aa5cdadabe))
 	ROM_LOAD("skflaudiocpu.rom", 0x2000, 0x2000, CRC(ffc497aa) SHA1(3e88539ae1688322b9268f502d8ca41cffb28df3))
 
-	ROM_REGION(0x20000, "audiocpu", 0) // Z80A soundcard
+	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80A soundcard
 	ROM_LOAD("skflsnd.rom", 0x0000, 0x8000, CRC(926a1da9) SHA1(16c762fbfe6a55597f26ff55d380192bb8647ee0))
 ROM_END
 
@@ -654,7 +688,7 @@ ROM_START(phntmshp)
 	ROM_LOAD("video1.bin", 0x0000, 0x2000, CRC(2b61a8d2) SHA1(1b5cabbab252b2ffb6ed12fb7e4181de7695ed9a))
 	ROM_LOAD("video2.bin", 0x2000, 0x2000, CRC(50126db1) SHA1(58d89e44131554cb087c4cad62869f90366704ad))
 
-	ROM_REGION(0x20000, "audiocpu", 0) // Z80A soundcard
+	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80A soundcard
 	ROM_LOAD("sonido1.bin", 0x00000, 0x8000, CRC(3294611d) SHA1(5f790b41bcb6d87418c80e61ac8ae69c57864b1d))
 	ROM_LOAD("sonido2.bin", 0x08000, 0x8000, CRC(c2efc826) SHA1(44ee144b902627745853011968e0d654b35b3b08))
 	ROM_LOAD("sonido3.bin", 0x10000, 0x8000, CRC(13d50f39) SHA1(70624de2dd8412c83866183a83f16cc5b8bdccb8))
@@ -699,7 +733,7 @@ ROM_START(eballchps)
 	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
 	ROM_LOAD("U18-JEB 5A0 - CPU.BIN", 0x0000, 0x8000, CRC(87615a7d) SHA1(b27ca2d863040a2641f88f9bd3143467a83f181b))
 
-	ROM_REGION(0x20000, "audiocpu", 0) // Z80-based
+	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80-based
 	ROM_LOAD("U3-EBE A02 - Sonido.BIN", 0x00000, 0x8000, CRC(34be32ee) SHA1(ce0271540164639f28d617753760ecc479b6b0d0))
 	ROM_LOAD("U4-EBE B01 - Sonido.BIN", 0x08000, 0x8000, CRC(d696c4e8) SHA1(501e18c258e6d42819d25d72e1907984a6cfeecb))
 	ROM_LOAD("U5-EBE C01 - Sonido.BIN", 0x10000, 0x8000, CRC(fe78d7ef) SHA1(ed91c51dd230854a007f88446011f786759687ca))
@@ -711,11 +745,24 @@ ROM_START(cobrapb)
 	ROM_REGION(0x8000, "maincpu", 0) // Z80-based
 	ROM_LOAD("U18 - JCB 4 A0 - CPU.BIN", 0x0000, 0x8000, CRC(c663910e) SHA1(c38692343f114388259c4e7b7943e5be934189ca))
 
-	ROM_REGION(0x20000, "audiocpu", 0) // Z80-based
+	ROM_REGION(0x28000, "zsu:soundcpu", 0) // Z80-based
 	ROM_LOAD("U3 - SCB 1 A0 - Sonido.BIN", 0x00000, 0x8000, CRC(d3675770) SHA1(882ce748308f2d78cccd28fc8cd64fe69bd223e3))
 	ROM_LOAD("U4 - SCB 1 B0 - Sonido.BIN", 0x08000, 0x8000, CRC(e8e1bdbb) SHA1(215bdfab751cb0ea47aa529df0ac30976de4f772))
 	ROM_LOAD("U5 - SCB 1 C0 - Sonido.BIN", 0x10000, 0x8000, CRC(c36340ab) SHA1(cd662457959de3a929ba02779e2046ed18b797e2))
 ROM_END
+
+#ifdef UNUSED_DEFINITION
+// Come Back (Nondum)
+ROM_START(comeback)
+	ROM_REGION(0x8000, "maincpu", 0)
+	ROM_LOAD("JCO_6a0.u18", 0x0000, 0x8000, NO_DUMP)
+
+	ROM_REGION(0x28000, "zsu:soundcpu", 0)
+	ROM_LOAD("CBS_3a0.u3", 0x00000, 0x8000, NO_DUMP)
+	ROM_LOAD("CBS_3b0.u4", 0x08000, 0x8000, NO_DUMP)
+	ROM_LOAD("CBS_1c0.u5", 0x10000, 0x8000, NO_DUMP)
+ROM_END
+#endif
 
 GAME(1982,  spain82,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Spain '82",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
 GAME(1983,  megaaton,  0,        megaaton, megaaton, driver_device, 0, ROT0, "Playmatic", "Meg-Aaton",                 MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
@@ -730,13 +777,14 @@ GAME(1985,  starfirpa, starfirp, play_3,   play_3,   driver_device, 0, ROT0, "Pl
 GAME(1985,  trailer,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Trailer",                   MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1986,  fldragon,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Flash Dragon",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1986,  fldragona, fldragon, play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Flash Dragon (alternate set)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
-GAME(1987,  phntmshp,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Phantom Ship",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1987,  sklflite,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Skill Flight (Playmatic)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1987,  phntmshp,  0,        sklflite, play_3,   driver_device, 0, ROT0, "Playmatic", "Phantom Ship",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
+GAME(1987,  sklflite,  0,        sklflite, play_3,   driver_device, 0, ROT0, "Playmatic", "Skill Flight (Playmatic)",  MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // not by Playmatic, but same hardware
 GAME(1986,  ridersrf,  0,        play_3,   play_3,   driver_device, 0, ROT0, "JocMatic",  "Rider's Surf",              MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 GAME(1987,  ironball,  0,        play_3,   play_3,   driver_device, 0, ROT0, "Stargame",  "Iron Balls",                MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_IMPERFECT_SOUND)
 // "Z-Pinball" hardware, Z80 main and sound CPUs - to be split (?)
-GAME(1986,  eballchps, eballchp, play_3,   play_3,   driver_device, 0, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
-GAME(1987,  cobrapb,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playbar",   "Cobra (Playbar)",           MACHINE_MECHANICAL | MACHINE_NOT_WORKING | MACHINE_NO_SOUND)
+GAME(1986,  eballchps, eballchp, sklflite, play_3,   driver_device, 0, ROT0, "Bally (Maibesa license)", "Eight Ball Champ (Spain, Z-Pinball hardware)", MACHINE_IS_SKELETON_MECHANICAL)
+GAME(1987,  cobrapb,   0,        sklflite, play_3,   driver_device, 0, ROT0, "Playbar",   "Cobra (Playbar)",           MACHINE_IS_SKELETON_MECHANICAL)
+//GAME(198?, comeback, 0,        sklflite, play_3,   driver_device, 0, ROT0, "Nondum",    "Come Back",           MACHINE_IS_SKELETON_MECHANICAL) // undumped
 // bingo hardware, to be split (?)
 GAME(1983,  msdisco,   0,        play_3,   play_3,   driver_device, 0, ROT0, "Playmatic", "Miss Disco (Bingo)",        MACHINE_IS_SKELETON_MECHANICAL)
