@@ -355,15 +355,15 @@ namespace netlist
 	// State variables - predefined and c++11 non-optional
 	// -----------------------------------------------------------------------------
 
-	/*! predefined state variable type for uint_fast8_t */
-	using state_var_u8 = state_var<std::uint_fast8_t>;
-	/*! predefined state variable type for int_fast8_t */
-	using state_var_s8 = state_var<std::int_fast8_t>;
+	/*! predefined state variable type for uint8_t */
+	using state_var_u8 = state_var<std::uint8_t>;
+	/*! predefined state variable type for int8_t */
+	using state_var_s8 = state_var<std::int8_t>;
 
-	/*! predefined state variable type for uint_fast32_t */
-	using state_var_u32 = state_var<std::uint_fast32_t>;
-	/*! predefined state variable type for int_fast32_t */
-	using state_var_s32 = state_var<std::int_fast32_t>;
+	/*! predefined state variable type for uint32_t */
+	using state_var_u32 = state_var<std::uint32_t>;
+	/*! predefined state variable type for int32_t */
+	using state_var_s32 = state_var<std::int32_t>;
 
 	// -----------------------------------------------------------------------------
 	// object_t
