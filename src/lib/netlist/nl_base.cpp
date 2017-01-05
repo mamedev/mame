@@ -81,15 +81,18 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
 {
@@ -105,15 +108,18 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 const logic_family_desc_t *family_TTL()
 {
@@ -850,6 +856,9 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+terminal_t::~terminal_t()
+{
+}
 
 void terminal_t::schedule_solve()
 {
@@ -904,6 +913,10 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 : analog_t(dev, aname, INPUT, STATE_INP_ACTIVE)
 {
 	netlist().setup().register_term(*this);
+}
+
+analog_input_t::~analog_input_t()
+{
 }
 
 // ----------------------------------------------------------------------------------------
@@ -979,11 +992,23 @@ param_str_t::param_str_t(device_t &device, const pstring name, const pstring val
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 }
 
+param_str_t::~param_str_t()
+{
+}
+
+void param_str_t::changed()
+{
+}
+
 param_double_t::param_double_t(device_t &device, const pstring name, const double val)
 : param_t(param_t::DOUBLE, device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
+}
+
+param_double_t::~param_double_t()
+{
 }
 
 param_int_t::param_int_t(device_t &device, const pstring name, const int val)
@@ -993,11 +1018,19 @@ param_int_t::param_int_t(device_t &device, const pstring name, const int val)
 	netlist().save(*this, m_param, "m_param");
 }
 
+param_int_t::~param_int_t()
+{
+}
+
 param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
 : param_t(param_t::LOGIC, device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
+}
+
+param_logic_t::~param_logic_t()
+{
 }
 
 param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
@@ -1007,7 +1040,7 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
 	//netlist().save(*this, m_param, "m_param");
 }
 
-void param_str_t::changed()
+param_ptr_t::~param_ptr_t()
 {
 }
 

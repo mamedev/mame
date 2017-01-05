@@ -173,17 +173,8 @@ public:
 	}
 
 protected:
-	NETLIB_RESETI()
-	{
-		NETLIB_NAME(twoterm)::reset();
-		set_R(1.0 / netlist().gmin());
-	}
-
-	NETLIB_UPDATEI()
-	{
-		NETLIB_NAME(twoterm)::update();
-	}
-
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
 
 };
 
@@ -200,15 +191,7 @@ protected:
 
 	//NETLIB_RESETI() { }
 	//NETLIB_UPDATEI() { }
-	NETLIB_UPDATE_PARAMI()
-	{
-		update_dev();
-		if (m_R() > 1e-9)
-			set_R(m_R());
-		else
-			set_R(1e-9);
-	}
-
+	NETLIB_UPDATE_PARAMI();
 };
 
 // -----------------------------------------------------------------------------

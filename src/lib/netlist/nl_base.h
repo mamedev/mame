@@ -548,6 +548,7 @@ namespace netlist
 	public:
 
 		terminal_t(core_device_t &dev, const pstring &aname);
+		virtual ~terminal_t();
 
 		nl_double operator ()() const;
 
@@ -670,6 +671,9 @@ namespace netlist
 		analog_input_t(core_device_t &dev, /*!< owning device */
 				const pstring &aname       /*!< name of terminal */
 		);
+
+		/*! Destructor */
+		virtual ~analog_input_t();
 
 		/*! returns voltage at terminal.
 		 *  \returns voltage at terminal.
@@ -891,6 +895,7 @@ namespace netlist
 	{
 	public:
 		param_ptr_t(device_t &device, const pstring name, std::uint8_t* val);
+		virtual ~param_ptr_t();
 		std::uint8_t * operator()() const { return m_param; }
 		void setTo(std::uint8_t *param) { set(m_param, param); }
 	private:
@@ -901,6 +906,7 @@ namespace netlist
 	{
 	public:
 		param_logic_t(device_t &device, const pstring name, const bool val);
+		virtual ~param_logic_t();
 		bool operator()() const { return m_param; }
 		void setTo(const bool &param) { set(m_param, param); }
 	private:
@@ -911,6 +917,7 @@ namespace netlist
 	{
 	public:
 		param_int_t(device_t &device, const pstring name, const int val);
+		virtual ~param_int_t();
 		int operator()() const { return m_param; }
 		void setTo(const int &param) { set(m_param, param); }
 	private:
@@ -921,6 +928,7 @@ namespace netlist
 	{
 	public:
 		param_double_t(device_t &device, const pstring name, const double val);
+		virtual ~param_double_t();
 		double operator()() const { return m_param; }
 		void setTo(const double &param) { set(m_param, param); }
 	private:
@@ -931,6 +939,7 @@ namespace netlist
 	{
 	public:
 		param_str_t(device_t &device, const pstring name, const pstring val);
+		virtual ~param_str_t();
 		const pstring operator()() const { return Value(); }
 		void setTo(const pstring &param)
 		{

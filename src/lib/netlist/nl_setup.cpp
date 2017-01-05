@@ -864,15 +864,19 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 public:
 	logic_family_std_proxy_t() { }
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+			const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
+		const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {

@@ -259,6 +259,17 @@ void truthtable_desc_t::setup(const plib::pstring_vector_t &truthtable, uint_lea
 
 }
 
+netlist_base_factory_truthtable_t::netlist_base_factory_truthtable_t(const pstring &name, const pstring &classname,
+		const pstring &def_param)
+: factory::element_t(name, classname, def_param), m_family(family_TTL())
+{
+}
+
+netlist_base_factory_truthtable_t::~netlist_base_factory_truthtable_t()
+{
+}
+
+
 #define ENTRYY(n, m)    case (n * 100 + m): \
 	{ using xtype = netlist_factory_truthtable_t<n, m>; \
 		ret = new xtype(desc.name, desc.classname, desc.def_param); } break
