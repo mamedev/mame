@@ -928,6 +928,9 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// if we have an 0x prefix, we must be a hex value
 	if (buffer[0] == '0' && buffer[1] == 'x')
 		return parse_number(token, buffer.c_str() + 2, 16, expression_error::INVALID_NUMBER);
+	// if we have an 0 prefix, we must be an octal value
+	else if (buffer[0] == '0')
+		return parse_number(token, buffer.c_str() + 1, 8, expression_error::INVALID_NUMBER);
 
 	// if we have a # prefix, we must be a decimal value
 	if (buffer[0] == '#')
