@@ -19,6 +19,12 @@
 	* C1,C2,C3,C4,C5
 	* HP non-standard IDENTIFY sequence
 
+	Fun fact: PHI has no clock input, its FSMs are driven only by
+	changes in input signals and by a few internal monostables
+
+	Main reference for this ASIC:
+	HP 12009-90001, sep 82, HP12009A HP-IB Interface Reference Manual
+
 *********************************************************************/
 
 #include "emu.h"
@@ -514,10 +520,12 @@ uint8_t phi_device::get_dio(void)
 
 void phi_device::set_dio(uint8_t data)
 {
-	LOG(("DIO=%02x\n" , data));
-	m_dio = data;
-	if (!m_loopback) {
-		m_dio_write_func(~data);
+	if (data != m_dio) {
+		LOG(("DIO=%02x\n" , data));
+		m_dio = data;
+		if (!m_loopback) {
+			m_dio_write_func(~data);
+		}
 	}
 }
 

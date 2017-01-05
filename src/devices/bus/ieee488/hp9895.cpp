@@ -6,6 +6,9 @@
 
 	HP9895 floppy disk drive
 
+	Reference manual:
+	HP 09895-90030, feb 81, 9895A Flexible Disc Memory Service Manual
+
 *********************************************************************/
 
 #include "hp9895.h"
@@ -28,6 +31,7 @@ hp9895_device::hp9895_device(const machine_config &mconfig, const char *tag, dev
 #if 0
 ioport_constructor hp9895_device::device_input_ports() const
 {
+	// TODO: inputs=HPIB address, "S" & "W" switches, "loop" pin
 }
 #endif
 void hp9895_device::device_start()
@@ -170,8 +174,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START(z80_io_map , AS_IO , 8 , hp9895_device)
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	// TODO: TEMP!
 	AM_RANGE(0x10 , 0x17) AM_DEVWRITE("phi" , phi_device , reg8_w) AM_READ(phi_reg_r)
+	// TODO: 60-67 range
 ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT(hp9895)
