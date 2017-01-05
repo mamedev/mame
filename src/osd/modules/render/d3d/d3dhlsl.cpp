@@ -169,9 +169,9 @@ shaders::shaders() :
 	snap_copy_target(nullptr), snap_copy_texture(nullptr), snap_target(nullptr), snap_texture(nullptr),
 	snap_width(0), snap_height(0), initialized(false), backbuffer(nullptr), curr_effect(nullptr),
 	default_effect(nullptr), prescale_effect(nullptr), post_effect(nullptr), distortion_effect(nullptr),
-	focus_effect(nullptr), phosphor_effect(nullptr), ghosting_effect(nullptr), deconverge_effect(nullptr),
-	color_effect(nullptr), ntsc_effect(nullptr), bloom_effect(nullptr), downsample_effect(nullptr),
-	vector_effect(nullptr), curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
+	focus_effect(nullptr), phosphor_effect(nullptr), deconverge_effect(nullptr), color_effect(nullptr),
+	ntsc_effect(nullptr), bloom_effect(nullptr), downsample_effect(nullptr), vector_effect(nullptr),
+	curr_texture(nullptr), curr_render_target(nullptr), curr_poly(nullptr),
 	d3dx_create_effect_from_file_ptr(nullptr)
 {
 }
@@ -518,15 +518,7 @@ bool shaders::init(d3d_base *d3dintf, running_machine *machine, renderer_d3d9 *r
 		get_vector(winoptions.screen_scale(), 3, options->scale, true);
 		get_vector(winoptions.screen_power(), 3, options->power, true);
 		get_vector(winoptions.screen_floor(), 3, options->floor, true);
-		options->phosphor_mode = winoptions.screen_phosphor_mode();
-		get_vector(winoptions.screen_phosphor_time(), 3,
-		           options->phosphor_time, true);
-		get_vector(winoptions.screen_phosphor_beta(), 3,
-		           options->phosphor_beta, true);
-		get_vector(winoptions.screen_lcd_rise_time(), 3,
-		           options->lcd_rise_time, true);
-		get_vector(winoptions.screen_lcd_fall_time(), 3,
-		           options->lcd_fall_time, true);
+		get_vector(winoptions.screen_phosphor(), 3, options->phosphor, true);
 		options->saturation = winoptions.screen_saturation();
 		options->yiq_enable = winoptions.screen_yiq_enable();
 		options->yiq_jitter = winoptions.screen_yiq_jitter();
@@ -717,7 +709,6 @@ int shaders::create_resources()
 	distortion_effect = new effect(this, d3d->get_device(), "distortion.fx", fx_dir);
 	prescale_effect = new effect(this, d3d->get_device(), "prescale.fx", fx_dir);
 	phosphor_effect = new effect(this, d3d->get_device(), "phosphor.fx", fx_dir);
-	ghosting_effect = new effect(this, d3d->get_device(), "ghosting.fx", fx_dir);
 	focus_effect = new effect(this, d3d->get_device(), "focus.fx", fx_dir);
 	deconverge_effect = new effect(this, d3d->get_device(), "deconverge.fx", fx_dir);
 	color_effect = new effect(this, d3d->get_device(), "color.fx", fx_dir);
@@ -731,7 +722,6 @@ int shaders::create_resources()
 		!distortion_effect->is_valid() ||
 		!prescale_effect->is_valid() ||
 		!phosphor_effect->is_valid() ||
-		!ghosting_effect->is_valid() ||
 		!focus_effect->is_valid() ||
 		!deconverge_effect->is_valid() ||
 		!color_effect->is_valid() ||
@@ -743,13 +733,12 @@ int shaders::create_resources()
 		return 1;
 	}
 
-	effect *effects[14] = {
+	effect *effects[13] = {
 		default_effect,
 		post_effect,
 		distortion_effect,
 		prescale_effect,
 		phosphor_effect,
-		ghosting_effect,
 		focus_effect,
 		deconverge_effect,
 		color_effect,
@@ -760,7 +749,7 @@ int shaders::create_resources()
 		vector_effect
 	};
 
-	for (int i = 0; i < 14; i++)
+	for (int i = 0; i < 13; i++)
 	{
 		effects[i]->add_uniform("SourceDims", uniform::UT_VEC2, uniform::CU_SOURCE_DIMS);
 		effects[i]->add_uniform("TargetDims", uniform::UT_VEC2, uniform::CU_TARGET_DIMS);
@@ -797,12 +786,7 @@ int shaders::create_resources()
 
 	focus_effect->add_uniform("Defocus", uniform::UT_VEC2, uniform::CU_FOCUS_SIZE);
 
-	phosphor_effect->add_uniform("Mode", uniform::UT_INT, uniform::CU_PHOSPHOR_MODE);
-	phosphor_effect->add_uniform("TimeConstant", uniform::UT_VEC3, uniform::CU_PHOSPHOR_TIME);
-	phosphor_effect->add_uniform("Beta", uniform::UT_VEC3, uniform::CU_PHOSPHOR_BETA);
-
-	ghosting_effect->add_uniform("LCDRise", uniform::UT_FLOAT, uniform::CU_LCD_RISE_TIME);
-	ghosting_effect->add_uniform("LCDFall", uniform::UT_FLOAT, uniform::CU_LCD_FALL_TIME);
+	phosphor_effect->add_uniform("Phosphor", uniform::UT_VEC3, uniform::CU_PHOSPHOR_LIFE);
 
 	post_effect->add_uniform("ShadowAlpha", uniform::UT_FLOAT, uniform::CU_POST_SHADOW_ALPHA);
 	post_effect->add_uniform("ShadowCount", uniform::UT_VEC2, uniform::CU_POST_SHADOW_COUNT);
@@ -855,7 +839,6 @@ void shaders::begin_draw()
 	distortion_effect->set_technique("DefaultTechnique");
 	prescale_effect->set_technique("DefaultTechnique");
 	phosphor_effect->set_technique("DefaultTechnique");
-	ghosting_effect->set_technique("DefaultTechnique");
 	focus_effect->set_technique("DefaultTechnique");
 	deconverge_effect->set_technique("DefaultTechnique");
 	color_effect->set_technique("DefaultTechnique");
@@ -1085,64 +1068,31 @@ int shaders::defocus_pass(d3d_render_target *rt, int source_index, poly_info *po
 int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
 {
 	int next_index = source_index;
-	auto stype = machine->first_screen()->screen_type();
 
-	// skip if screen doesn't use phosphors
-	if ((stype != SCREEN_TYPE_RASTER && stype != SCREEN_TYPE_VECTOR) ||
-	    options->phosphor_mode == 0)
+	// skip phosphor if no influencing settings
+	if (options->phosphor[0] == 0.0f && options->phosphor[1] == 0.0f && options->phosphor[2] == 0.0f)
 	{
 		return next_index;
 	}
 
+	// Shader needs time between last update
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
+	curr_effect->set_texture("LastPass", rt->cache_texture);
 	curr_effect->set_bool("Passthrough", false);
 	curr_effect->set_float("DeltaTime", delta_time());
 
-	rt->next_cache_index();
-	blit(rt->cache_surface[rt->cache_index], false, D3DPT_TRIANGLELIST, 0, 2);
-
-	// copy cached texture to target texture
-	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->cache_texture[rt->cache_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
-	curr_effect->set_bool("Passthrough", true);
-
+	next_index = rt->next_index(next_index);
 	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
-	return next_index;
-}
-
-int shaders::ghosting_pass(d3d_render_target *rt, int source_index, poly_info *poly, int vertnum)
-{
-	int next_index = source_index;
-	auto stype = machine->first_screen()->screen_type();
-
-	if (stype != SCREEN_TYPE_LCD ||
-	    (options->lcd_rise_time == 0 && options->lcd_fall_time == 0))
-	{
-		return next_index;
-	}
-
-	curr_effect = ghosting_effect;
+	// Pass along our phosphor'd screen
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
-	curr_effect->set_bool("Passthrough", false);
-	curr_effect->set_float("DeltaTime", delta_time());
-
-	rt->next_cache_index();
-	blit(rt->cache_surface[rt->cache_index], false, D3DPT_TRIANGLELIST, 0, 2);
-
-	// copy cached texture to target texture
-	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->cache_texture[rt->cache_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
+	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
 	curr_effect->set_bool("Passthrough", true);
 
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->cache_surface, false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1414,10 +1364,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = deconverge_pass(rt, next_index, poly, vertnum); // handled in bgfx
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, next_index, poly, vertnum);
-		next_index = ghosting_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		// This may be phosphor or ghosting, depending on screen type
 		int phosphor_index = next_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, true);
 		next_index = downsample_pass(rt, next_index, poly, vertnum);
@@ -1495,10 +1443,8 @@ void shaders::render_quad(poly_info *poly, int vertnum)
 		next_index = deconverge_pass(rt, next_index, poly, vertnum);
 		next_index = defocus_pass(rt, next_index, poly, vertnum);
 		next_index = phosphor_pass(rt, next_index, poly, vertnum);
-		next_index = ghosting_pass(rt, next_index, poly, vertnum);
 
 		// create bloom textures
-		// This may be phosphor or ghosting, depending on screen type
 		int phosphor_index = next_index;
 		next_index = post_pass(rt, next_index, poly, vertnum, true);
 		next_index = downsample_pass(rt, next_index, poly, vertnum);
@@ -1789,11 +1735,6 @@ void shaders::delete_resources()
 		delete phosphor_effect;
 		phosphor_effect = nullptr;
 	}
-	if (ghosting_effect != nullptr)
-	{
-		delete ghosting_effect;
-		ghosting_effect = nullptr;
-	}
 	if (focus_effect != nullptr)
 	{
 		delete focus_effect;
@@ -2008,11 +1949,7 @@ enum slider_option
 	SLIDER_SCALE,
 	SLIDER_POWER,
 	SLIDER_FLOOR,
-	SLIDER_PHOSPHOR_MODE,
-	SLIDER_PHOSPHOR_TIME,
-	SLIDER_PHOSPHOR_BETA,
-	SLIDER_LCD_RISE_TIME,
-	SLIDER_LCD_FALL_TIME,
+	SLIDER_PHOSPHOR,
 	SLIDER_BLOOM_BLEND_MODE,
 	SLIDER_BLOOM_SCALE,
 	SLIDER_BLOOM_OVERDRIVE,
@@ -2045,7 +1982,6 @@ enum slider_screen_type
 	SLIDER_SCREEN_TYPE_RASTER = 1,
 	SLIDER_SCREEN_TYPE_VECTOR = 2,
 	SLIDER_SCREEN_TYPE_LCD = 4,
-	SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR,
 	SLIDER_SCREEN_TYPE_LCD_OR_RASTER = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_LCD,
 	SLIDER_SCREEN_TYPE_ANY = SLIDER_SCREEN_TYPE_RASTER | SLIDER_SCREEN_TYPE_VECTOR | SLIDER_SCREEN_TYPE_LCD
 };
@@ -2091,11 +2027,7 @@ slider_desc shaders::s_sliders[] =
 	{ "Signal Scale,",                   -200,   100,   200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_SCALE,                   0.01f,    "%2.2f", {} },
 	{ "Signal Exponent,",                -800,     0,   800, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_POWER,                   0.01f,    "%2.2f", {} },
 	{ "Signal Floor,",                      0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_FLOOR,                   0.01f,    "%2.2f", {} },
-	{ "Phosphor Persistence Mode,",         0,     0,     2, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_MODE,        0,        "%s", { "Off", "Exponential", "Inverse Power" } },
-	{ "Phosphor Persistence Time Constant,",1,  5000, 10000,10, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_TIME,        0.0001f,  "%4.4f", {} },
-	{ "Phosphor Persistence beta,",        50,    100,  200, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_RASTER_OR_VECTOR, SLIDER_PHOSPHOR_BETA,        0.01f,    "%2.2f", {} },
-	{ "LCD Rise Time Constant,",            0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_LCD,           SLIDER_LCD_RISE_TIME,           0.01f,   "%2.2f", {} },
-	{ "LCD Fall Time Constant,",            0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_LCD,           SLIDER_LCD_FALL_TIME,           0.01f,   "%2.2f", {} },
+	{ "Phosphor Persistence,",              0,     0,   100, 1, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_PHOSPHOR,                0.01f,    "%2.2f", {} },
 	{ "Bloom Blend Mode",                   0,     0,     1, 1, SLIDER_INT_ENUM, SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_BLEND_MODE,        0,        "%s",    { "Brighten", "Darken" } },
 	{ "Bloom Scale",                        0,     0,  2000, 5, SLIDER_FLOAT,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_SCALE,             0.001f,   "%1.3f", {} },
 	{ "Bloom Overdrive,",                   0,     0,  2000, 5, SLIDER_COLOR,    SLIDER_SCREEN_TYPE_ANY,           SLIDER_BLOOM_OVERDRIVE,         0.001f,   "%1.3f", {} },
@@ -2167,11 +2099,7 @@ void *shaders::get_slider_option(int id, int index)
 		case SLIDER_SCALE: return &(options->scale[index]);
 		case SLIDER_POWER: return &(options->power[index]);
 		case SLIDER_FLOOR: return &(options->floor[index]);
-		case SLIDER_PHOSPHOR_MODE: return &(options->phosphor_mode);
-		case SLIDER_PHOSPHOR_TIME: return &(options->phosphor_time[index]);
-		case SLIDER_PHOSPHOR_BETA: return &(options->phosphor_beta[index]);
-		case SLIDER_LCD_RISE_TIME: return &(options->lcd_rise_time[index]);
-		case SLIDER_LCD_FALL_TIME: return &(options->lcd_fall_time[index]);
+		case SLIDER_PHOSPHOR: return &(options->phosphor[index]);
 		case SLIDER_BLOOM_BLEND_MODE: return &(options->bloom_blend_mode);
 		case SLIDER_BLOOM_SCALE: return &(options->bloom_scale);
 		case SLIDER_BLOOM_OVERDRIVE: return &(options->bloom_overdrive[index]);
@@ -2458,21 +2386,8 @@ void uniform::update()
 			m_shader->set_vector("Defocus", 2, &options->defocus[0]);
 			break;
 
-		case CU_PHOSPHOR_MODE:
-			m_shader->set_int("Mode", options->phosphor_mode);
-			break;
-		case CU_PHOSPHOR_TIME:
-			m_shader->set_vector("TimeConstant", 3, options->phosphor_time);
-			break;
-		case CU_PHOSPHOR_BETA:
-			m_shader->set_vector("Beta", 3, options->phosphor_beta);
-			break;
-		
-		case CU_LCD_RISE_TIME:
-			m_shader->set_vector("LCDRise", 3, options->lcd_rise_time);
-			break;
-		case CU_LCD_FALL_TIME:
-			m_shader->set_vector("LCDFall", 3, options->lcd_fall_time);
+		case CU_PHOSPHOR_LIFE:
+			m_shader->set_vector("Phosphor", 3, options->phosphor);
 			break;
 
 		case CU_POST_REFLECTION:

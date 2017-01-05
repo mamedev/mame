@@ -1120,13 +1120,6 @@ bool renderer_d3d9::device_verify_caps()
 		success = false;
 	}
 
-	result = d3dintf->d3dobj->CheckDeviceFormat(m_adapter, D3DDEVTYPE_HAL, m_pixformat, 0, D3DRTYPE_TEXTURE, D3DFMT_A16B16G16R16F);
-	if (FAILED(result))
-	{
-		osd_printf_error("Direct3D Error: Your graphics card does not support the A16B16G16R16F texture format.\n");
-		success = false;
-	}
-
 	if (!success)
 	{
 		osd_printf_error("This feature or features are required to use the Direct3D renderer. Please\n");
@@ -2669,13 +2662,13 @@ d3d_render_target::~d3d_render_target()
 
 		if (target_surface[index] != nullptr)
 			target_surface[index]->Release();
-
-		if (cache_texture[index] != nullptr)
-			cache_texture[index]->Release();
-
-		if (cache_surface[index] != nullptr)
-			cache_surface[index]->Release();
 	}
+
+	if (cache_texture != nullptr)
+		cache_texture->Release();
+
+	if (cache_surface != nullptr)
+		cache_surface->Release();
 }
 
 
@@ -2708,13 +2701,13 @@ bool d3d_render_target::init(renderer_d3d9 *d3d, int source_width, int source_he
 			return false;
 
 		target_texture[index]->GetSurfaceLevel(0, &target_surface[index]);
-
-		result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A16B16G16R16F, D3DPOOL_DEFAULT, &cache_texture[index], nullptr);
-		if (FAILED(result))
-			return false;
-
-		cache_texture[index]->GetSurfaceLevel(0, &cache_surface[index]);
 	}
+
+	result = d3d->get_device()->CreateTexture(target_width, target_height, 1, D3DUSAGE_RENDERTARGET, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &cache_texture, nullptr);
+	if (FAILED(result))
+		return false;
+
+	cache_texture->GetSurfaceLevel(0, &cache_surface);
 
 	auto win = d3d->assert_window();
 
