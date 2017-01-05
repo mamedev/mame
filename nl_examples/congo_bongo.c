@@ -3,9 +3,14 @@
 /* € */ // ABC
 
 #include "netlist/devices/net_lib.h"
-#include "netlist/devices/nld_system.h"
-#include "netlist/analog/nld_bjt.h"
-#include "netlist/analog/nld_twoterm.h"
+
+/* ----------------------------------------------------------------------------
+ *  Define
+ * ---------------------------------------------------------------------------*/
+
+/* set to 1 to use optimizations increasing performance significantly */
+
+#define USE_OPTMIZATIONS	1
 
 /* ----------------------------------------------------------------------------
  *  Library section header START
@@ -37,29 +42,33 @@ NETLIST_START(dummy)
 // IGNORED O_AUDIO0: O_AUDIO0  64 0
 // .END
 
-	/* €€ */ SOLVER(Solver, 24000)
 	PARAM(Solver.ACCURACY, 1e-8)
 	PARAM(Solver.NR_LOOPS, 9000)
 	PARAM(Solver.SOR_FACTOR, 0.001)
 	PARAM(Solver.GS_LOOPS, 1)
 	//PARAM(Solver.GS_THRESHOLD, 99)
-	PARAM(Solver.ITERATIVE, "SOR")
+	PARAM(Solver.ITERATIVE, "MAT_CR")
+
+#if USE_OPTMIZATIONS
+	SOLVER(Solver, 24000)
+	PARAM(Solver.DYNAMIC_TS, 0)
+#else
+	SOLVER(Solver, 24000)
+	PARAM(Solver.DYNAMIC_TS, 1)
+	PARAM(Solver.DYNAMIC_LTE, 1e-4)
+	PARAM(Solver.MIN_TIMESTEP, 5e-7)
 	PARAM(Solver.PARALLEL, 0)
 	PARAM(Solver.PIVOT, 0)
+#endif
 
 	LOCAL_SOURCE(congob_lib)
 	INCLUDE(congob_lib)
 
 	TTL_INPUT(I_BASS_DRUM0, 0)
-	//CLOCK(I_BASS_DRUM0, 2)
 	TTL_INPUT(I_CONGA_H0, 0)
-	//CLOCK(I_CONGA_H0, 2)
 	TTL_INPUT(I_CONGA_L0, 0)
-	//CLOCK(I_CONGA_L0, 2)
 	TTL_INPUT(I_GORILLA0, 0)
-	//CLOCK(I_GORILLA0, 2)
 	TTL_INPUT(I_RIM0, 0)
-	//CLOCK(I_RIM0, 2)
 
 	ALIAS(I_V0.Q, GND.Q)
 
@@ -80,6 +89,16 @@ NETLIST_START(dummy)
 	NET_MODEL("2SC1941 NPN(IS=46.416f BF=210 NF=1.0022 VAF=600 IKF=500m ISE=60f NE=1.5 BR=2.0122 NR=1.0022 VAR=10G IKR=10G ISC=300p NC=2 RB=13.22 IRB=10G RBM=13.22 RE=100m RC=790m CJE=26.52p VJE=900m MJE=518m TF=1.25n XTF=10 VTF=10 ITF=500m PTF=0 CJC=4.89p VJC=750m MJC=237m XCJC=500m TR=100n CJS=0 VJS=750m MJS=500m XTB=1.5 EG=1.11 XTI=3 KF=0 AF=1 FC=500m)")
 
 	INCLUDE(CongoBongo_schematics)
+
+#if USE_OPTMIZATIONS
+	/* provide resistance feedback loop. This helps convergence for
+	 * Newton-Raphson a lot. This puts a resistor of 1e100 Ohms in parallel
+	 * to the feedback loop consisting of D9 and Q2.
+	 */
+
+	RES(RX1, 1e100)
+	NET_C(RX1.1, Q2.C)
+	NET_C(RX1.2, XU16.7)
 
 	/* The opamp actually has an FPF of about 500k. This doesn't work here and causes oscillations.
 	 * FPF here therefore about half the Solver clock.
@@ -113,6 +132,7 @@ NETLIST_START(dummy)
 
 	OPTIMIZE_FRONTIER(R90.2, RES_K(100), 50)
 	OPTIMIZE_FRONTIER(R92.2, RES_K(15), 50)
+#endif
 #endif
 NETLIST_END()
 
