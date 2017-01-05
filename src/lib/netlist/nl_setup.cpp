@@ -1080,4 +1080,22 @@ std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
+bool source_proc_t::parse(const pstring &name)
+{
+	if (name == m_setup_func_name)
+	{
+		m_setup_func(setup());
+		return true;
+	}
+	else
+		return false;
 }
+
+std::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
+{
+	std::unique_ptr<plib::pistream> p(nullptr);
+	return p;
+}
+
+}
+

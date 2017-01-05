@@ -49,9 +49,23 @@ void object_t::operator delete (void * mem)
 
 }
 
+nl_exception::~nl_exception()
+{
+}
+
+
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t
 // ----------------------------------------------------------------------------------------
+
+logic_family_desc_t::logic_family_desc_t()
+{
+}
+
+logic_family_desc_t::~logic_family_desc_t()
+{
+}
+
 
 class logic_family_ttl_t : public logic_family_desc_t
 {
@@ -761,6 +775,9 @@ logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, detail::core_termi
 {
 }
 
+logic_net_t::~logic_net_t()
+{
+}
 
 // ----------------------------------------------------------------------------------------
 // analog_net_t
@@ -769,6 +786,10 @@ logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, detail::core_termi
 analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr)
 	: net_t(nl, aname, mr)
 	, m_solver(nullptr)
+{
+}
+
+analog_net_t::~analog_net_t()
 {
 }
 
@@ -782,6 +803,10 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
+{
+}
+
+detail::core_terminal_t::~core_terminal_t()
 {
 }
 
@@ -803,6 +828,13 @@ void detail::core_terminal_t::set_net(net_t *anet)
 	m_net = nullptr;
 }
 
+analog_t::~analog_t()
+{
+}
+
+logic_t::~logic_t()
+{
+}
 
 // ----------------------------------------------------------------------------------------
 // terminal_t
@@ -854,6 +886,11 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+logic_output_t::~logic_output_t()
+{
+}
+
+
 void logic_output_t::initial(const netlist_sig_t val)
 {
 	net().initial(val);
@@ -883,6 +920,10 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+analog_output_t::~analog_output_t()
+{
+}
+
 void analog_output_t::initial(const nl_double val)
 {
 	net().m_cur_Analog = val;
@@ -899,6 +940,10 @@ logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+logic_input_t::~logic_input_t()
+{
+}
+
 // ----------------------------------------------------------------------------------------
 // Parameters ...
 // ----------------------------------------------------------------------------------------
@@ -908,6 +953,10 @@ param_t::param_t(const param_type_t atype, device_t &device, const pstring &name
 	, m_param_type(atype)
 {
 	device.setup().register_param(this->name(), *this);
+}
+
+param_t::~param_t()
+{
 }
 
 void param_t::update_param()
@@ -958,6 +1007,15 @@ param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
 	//netlist().save(*this, m_param, "m_param");
 }
 
+void param_str_t::changed()
+{
+}
+
+void param_model_t::changed()
+{
+	m_map.clear();
+}
+
 const pstring param_model_t::model_value_str(const pstring &entity)
 {
 	if (m_map.size() == 0)
@@ -970,6 +1028,10 @@ nl_double param_model_t::model_value(const pstring &entity)
 	if (m_map.size() == 0)
 		netlist().setup().model_parse(this->Value(), m_map);
 	return netlist().setup().model_value(m_map, entity);
+}
+
+void param_data_t::changed()
+{
 }
 
 std::unique_ptr<plib::pistream> param_data_t::stream()

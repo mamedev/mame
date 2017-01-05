@@ -17,9 +17,81 @@ namespace netlist
 	namespace devices
 	{
 
+	// -----------------------------------------------------------------------------
+	// nld_base_proxy
+	// -----------------------------------------------------------------------------
+
+	nld_base_proxy::nld_base_proxy(netlist_t &anetlist, const pstring &name,
+			logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
+			: device_t(anetlist, name)
+	{
+		m_logic_family = inout_proxied->logic_family();
+		m_term_proxied = inout_proxied;
+		m_proxy_term = proxy_inout;
+	}
+
+	nld_base_proxy::~nld_base_proxy()
+	{
+	}
+
+	// ----------------------------------------------------------------------------------------
+	// nld_a_to_d_proxy
+	// ----------------------------------------------------------------------------------------
+
+	nld_base_a_to_d_proxy::nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
+			logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
+			: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
+	, m_Q(*this, "Q")
+	{
+	}
+
+	nld_base_a_to_d_proxy::~nld_base_a_to_d_proxy() {}
+
+	nld_a_to_d_proxy::nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
+			: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
+	, m_I(*this, "I")
+	{
+	}
+
+	nld_a_to_d_proxy::~nld_a_to_d_proxy()
+	{
+	}
+
+	NETLIB_RESET(a_to_d_proxy)
+	{
+	}
+
+	NETLIB_UPDATE(a_to_d_proxy)
+	{
+		nl_assert(m_logic_family != nullptr);
+		// FIXME: Variable supply voltage!
+		double supply_V = logic_family().fixed_V();
+		if (supply_V == 0.0) supply_V = 5.0;
+
+		if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
+			out().push(1, NLTIME_FROM_NS(1));
+		else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
+			out().push(0, NLTIME_FROM_NS(1));
+		else
+		{
+			// do nothing
+		}
+	}
+
 	// ----------------------------------------------------------------------------------------
 	// nld_d_to_a_proxy
 	// ----------------------------------------------------------------------------------------
+
+	nld_base_d_to_a_proxy::nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
+			logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
+	: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
+	, m_I(*this, "I")
+	{
+	}
+
+	nld_base_d_to_a_proxy::~nld_base_d_to_a_proxy()
+	{
+	}
 
 	nld_d_to_a_proxy::nld_d_to_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *out_proxied)
 	: nld_base_d_to_a_proxy(anetlist, name, out_proxied, m_RV.m_P)

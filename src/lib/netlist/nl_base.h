@@ -209,7 +209,7 @@ namespace netlist
 		: plib::pexception(text) { }
 		/*! Copy constructor. */
 		nl_exception(const nl_exception &e) : plib::pexception(e) { }
-		virtual ~nl_exception() {}
+		virtual ~nl_exception();
 	};
 
 	class logic_output_t;
@@ -234,8 +234,8 @@ namespace netlist
 	class logic_family_desc_t
 	{
 	public:
-		logic_family_desc_t() {}
-		virtual ~logic_family_desc_t() {}
+		logic_family_desc_t();
+		virtual ~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -496,7 +496,7 @@ namespace netlist
 
 		core_terminal_t(core_device_t &dev, const pstring &aname,
 				const type_t type, const state_e state);
-		virtual ~core_terminal_t() { }
+		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
 		void clear_net();
@@ -532,6 +532,7 @@ namespace netlist
 		: core_terminal_t(dev, aname, type, state)
 		{
 		}
+		virtual ~analog_t();
 
 		const analog_net_t & net() const NL_NOEXCEPT;
 		analog_net_t & net() NL_NOEXCEPT;
@@ -613,6 +614,7 @@ namespace netlist
 			, m_proxy(nullptr)
 		{
 		}
+		virtual ~logic_t();
 
 		bool has_proxy() const { return (m_proxy != nullptr); }
 		devices::nld_base_proxy *get_proxy() const  { return m_proxy; }
@@ -635,6 +637,7 @@ namespace netlist
 	{
 	public:
 		logic_input_t(core_device_t &dev, const pstring &aname);
+		virtual ~logic_input_t();
 
 		netlist_sig_t Q() const NL_NOEXCEPT;
 
@@ -750,7 +753,7 @@ namespace netlist
 	public:
 
 		logic_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
-		virtual ~logic_net_t() { }
+		virtual ~logic_net_t();
 
 		netlist_sig_t Q() const { return m_cur_Q; }
 		netlist_sig_t new_Q() const     { return m_new_Q; }
@@ -794,7 +797,7 @@ namespace netlist
 
 		analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr = nullptr);
 
-		virtual ~analog_net_t() { }
+		virtual ~analog_net_t();
 
 		nl_double Q_Analog() const { return m_cur_Analog; }
 		nl_double &Q_Analog_state_ptr() { return m_cur_Analog; }
@@ -817,6 +820,7 @@ namespace netlist
 	public:
 
 		logic_output_t(core_device_t &dev, const pstring &aname);
+		virtual ~logic_output_t();
 
 		void initial(const netlist_sig_t val);
 
@@ -834,6 +838,7 @@ namespace netlist
 		P_PREVENT_COPYING(analog_output_t)
 	public:
 		analog_output_t(core_device_t &dev, const pstring &aname);
+		virtual ~analog_output_t();
 
 		void push(const nl_double val) NL_NOEXCEPT { set_Q(val); }
 		void initial(const nl_double val);
@@ -861,7 +866,7 @@ namespace netlist
 		};
 
 		param_t(const param_type_t atype, device_t &device, const pstring &name);
-		virtual ~param_t() {}
+		virtual ~param_t();
 
 		param_type_t param_type() const { return m_param_type; }
 
@@ -937,7 +942,7 @@ namespace netlist
 			}
 		}
 	protected:
-		virtual void changed() { }
+		virtual void changed();
 		pstring Value() const { return m_param; }
 	private:
 		pstring m_param;
@@ -954,7 +959,7 @@ namespace netlist
 		const pstring model_value_str(const pstring &entity);
 		const pstring model_type();
 	protected:
-		virtual void changed() override { m_map.clear(); }
+		virtual void changed() override;
 	private:
 		model_map_t m_map;
 	};
@@ -966,7 +971,7 @@ namespace netlist
 		: param_str_t(device, name, "") { }
 		std::unique_ptr<plib::pistream> stream();
 	protected:
-		virtual void changed() override { }
+		virtual void changed() override;
 	};
 
 	// -----------------------------------------------------------------------------

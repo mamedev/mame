@@ -102,25 +102,26 @@ public:
 	{
 	}
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override
-	{
-		pstring name = m_folder + "/" + file;
-		try
-		{
-			auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
-			return strm;
-		}
-		catch (plib::pexception e)
-		{
-
-		}
-		return std::unique_ptr<plib::pistream>(nullptr);
-	}
+	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
 };
 
+std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
+{
+	pstring name = m_folder + "/" + file;
+	try
+	{
+		auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
+		return strm;
+	}
+	catch (plib::pexception e)
+	{
+
+	}
+	return std::unique_ptr<plib::pistream>(nullptr);
+}
 
 class netlist_tool_t : public netlist::netlist_t
 {
@@ -182,17 +183,19 @@ public:
 
 protected:
 
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
-	{
-		pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
-		pout("{}", err);
-		if (l == plib::plog_level::FATAL)
-			throw netlist::nl_exception(err);
-	}
+	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
 	netlist::setup_t *m_setup;
 };
+
+void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
+{
+	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
+	pout("{}", err);
+	if (l == plib::plog_level::FATAL)
+		throw netlist::nl_exception(err);
+}
 
 
 // FIXME: usage should go elsewhere
