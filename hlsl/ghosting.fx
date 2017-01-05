@@ -1,7 +1,7 @@
 // license:BSD-3-Clause
 // copyright-holders:Ryan Holtz, Westley M. Martinez
 //-----------------------------------------------------------------------------
-// Phosphor Effect
+// Ghosting Effect
 //-----------------------------------------------------------------------------
 
 //-----------------------------------------------------------------------------
@@ -95,50 +95,50 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 // Phosphor Pixel Shader
 //-----------------------------------------------------------------------------
 
-uniform int Mode = 0;
 uniform float DeltaTime = 0.0f;
-uniform float3 TimeConstant = { 0.0f, 0.0f, 0.0f };
-uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
-static const float TAU_FACTOR = 0.4342944819;
-static const float GAMMA_INV_FACTOR = TAU_FACTOR / 100;
+uniform float3 LCDRise = { 0.0f, 0.0f, 0.0f };
+uniform float3 LCDFall = { 0.0f, 0.0f, 0.0f };
+static const float TAU_FACTOR = 0.159154943;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
 	float4 CurrPix = tex2D(DiffuseSampler, Input.TexCoord);
 	float3 PrevPix = tex2D(PreviousSampler, Input.PrevCoord).rgb;
+	float3 tau = { 0.0f, 0.0f, 0.0f };
 	float r = PrevPix.r;
 	float g = PrevPix.g;
 	float b = PrevPix.b;
 
-	if (Mode == 0) {
-		r = 0;
-		g = 0;
-		b = 0;
-	}
-	else if (Mode == 1) {
-		float3 tau = TimeConstant * TAU_FACTOR;
-
-		r *= tau.r == 0 ? 0 : exp(-DeltaTime / tau.r);
-		g *= tau.g == 0 ? 0 : exp(-DeltaTime / tau.g);
-		b *= tau.b == 0 ? 0 : exp(-DeltaTime / tau.b);
+	if (CurrPix.r > r) {
+		tau.r = LCDRise.r * TAU_FACTOR;
+		r = tau.r == 0 ? CurrPix.r : (CurrPix.r - r) *
+		    (1 - exp(-DeltaTime / tau.r)) + r;
 	}
 	else {
-		float3 gamma = 1 / (TimeConstant * GAMMA_INV_FACTOR);
-
-		if (r != 0.0f)
-			r = pow(gamma.r * DeltaTime + pow(1 / r, 1 / Beta.r),
-			        -Beta.r);
-		if (g != 0.0f)
-			g = pow(gamma.g * DeltaTime + pow(1 / g, 1 / Beta.g),
-			        -Beta.g);
-		if (b != 0.0f)
-			b = pow(gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b),
-			        -Beta.b);
+		tau.r = LCDFall.r * TAU_FACTOR;
+		r = tau.r == 0 ? CurrPix.r : (r - CurrPix.r) *
+		    exp(-DeltaTime / tau.r) + CurrPix.r;
 	}
-
-	r = max(CurrPix.r, r);
-	g = max(CurrPix.g, g);
-	b = max(CurrPix.b, b);
+	if (CurrPix.g > g) {
+		tau.g = LCDRise.g * TAU_FACTOR;
+		g = tau.g == 0 ? CurrPix.g : (CurrPix.g - g) *
+		    (1 - exp(-DeltaTime / tau.g)) + g;
+	}
+	else {
+		tau.g = LCDFall.g * TAU_FACTOR;
+		g = tau.g == 0 ? CurrPix.g : (g - CurrPix.g) *
+		    exp(-DeltaTime / tau.g) + CurrPix.g;
+	}
+	if (CurrPix.b > b) {
+		tau.b = LCDRise.b * TAU_FACTOR;
+		b = tau.b == 0 ? CurrPix.b : (CurrPix.b - b) *
+		    (1 - exp(-DeltaTime / tau.b)) + b;
+	}
+	else {
+		tau.b = LCDFall.b * TAU_FACTOR;
+		b = tau.b == 0 ? CurrPix.b : (b - CurrPix.b) *
+		    exp(-DeltaTime / tau.b) + CurrPix.b;
+	}
 	return Passthrough ?  CurrPix : float4(r, g, b, CurrPix.a);
 }
 
