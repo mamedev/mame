@@ -215,11 +215,7 @@ const options_entry windows_options::s_option_entries[] =
 	{ WINOPTION_SCALE";fs_scale",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal scaling value (multiplicative)" },
 	{ WINOPTION_POWER";fs_power",                               "1.0,1.0,1.0",       OPTION_STRING,     "signal power value (exponential)" },
 	{ WINOPTION_FLOOR";fs_floor",                               "0.0,0.0,0.0",       OPTION_STRING,     "signal floor level" },
-	{ WINOPTION_PHOSPHOR_MODE";fs_phosphor_mode",               "0",                 OPTION_STRING,     "phosphorescence decay mode (0: off, 1: exponential, 2: inverse-power)" },
-	{ WINOPTION_PHOSPHOR_TIME";fs_phosphor_time",               "0.5,0.5,0.5",       OPTION_STRING,     "exponential time constant" },
-	{ WINOPTION_PHOSPHOR_BETA";fs_phosphor_beta",               "1.0,1.0,1.0",       OPTION_STRING,     "inverse power order" },
-	{ WINOPTION_LCD_RISE_TIME";fs_lcd_rise_time",               "0.0,0.0,0.0",       OPTION_STRING,     "LCD persistence rise time constant" },
-	{ WINOPTION_LCD_FALL_TIME";fs_lcd_fall_time",               "0.0,0.0,0.0",       OPTION_STRING,     "LCD persistence fall time constant" },
+	{ WINOPTION_PHOSPHOR";fs_phosphor",                         "0.0,0.0,0.0",       OPTION_STRING,     "phosphorescence decay rate (0.0 is instant, 1.0 is forever)" },
 	/* NTSC simulation below this line */
 	{ nullptr,                                                  nullptr,             OPTION_HEADER,     "NTSC POST-PROCESSING OPTIONS" },
 	{ WINOPTION_YIQ_ENABLE";yiq",                               "0",                 OPTION_BOOLEAN,    "enables YIQ-space HLSL post-processing" },
