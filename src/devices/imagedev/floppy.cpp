@@ -596,7 +596,7 @@ void floppy_image_device::index_resync()
 		if(idx && ready) {
 			ready_counter--;
 			if(!ready_counter) {
-				logerror("Drive spun up\n");
+				// logerror("Drive spun up\n");
 				ready = false;
 				if(!cur_ready_cb.isnull())
 					cur_ready_cb(this, ready);
