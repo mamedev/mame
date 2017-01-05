@@ -101,8 +101,6 @@ uniform float3 TimeConstant = { 0.0f, 0.0f, 0.0f };
 uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
 static const float TAU_FACTOR = 0.4342944819;
 static const float GAMMA_INV_FACTOR = TAU_FACTOR / 100;
-// sRGB half-step for small intensities
-float THRESHOLD = 0.5f / 255.0f / 12.92f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
@@ -137,12 +135,7 @@ float4 ps_main(PS_INPUT Input) : COLOR
 			b = pow(gamma.b * DeltaTime + pow(1 / b, 1 / Beta.b),
 			        -Beta.b);
 	}
-	// Prevent burn-in
-	if (DeltaTime > 0.0f) {
-		r = max(0.0f, r - THRESHOLD);
-		g = max(0.0f, g - THRESHOLD);
-		b = max(0.0f, b - THRESHOLD);
-	}
+
 	r = max(CurrPix.r, r);
 	g = max(CurrPix.g, g);
 	b = max(CurrPix.b, b);

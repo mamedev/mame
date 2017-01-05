@@ -1097,20 +1097,20 @@ int shaders::phosphor_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect = phosphor_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture);
+	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
 	curr_effect->set_bool("Passthrough", false);
 	curr_effect->set_float("DeltaTime", delta_time());
 
-	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	rt->next_cache_index();
+	blit(rt->cache_surface[rt->cache_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
-	// Pass along our phosphor'd screen
+	// copy cached texture to target texture
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->cache_texture[rt->cache_index]);
+	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
 	curr_effect->set_bool("Passthrough", true);
 
-	blit(rt->cache_surface, false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
@@ -1129,20 +1129,20 @@ int shaders::ghosting_pass(d3d_render_target *rt, int source_index, poly_info *p
 	curr_effect = ghosting_effect;
 	curr_effect->update_uniforms();
 	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->cache_texture);
+	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
 	curr_effect->set_bool("Passthrough", false);
 	curr_effect->set_float("DeltaTime", delta_time());
 
-	next_index = rt->next_index(next_index);
-	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
+	rt->next_cache_index();
+	blit(rt->cache_surface[rt->cache_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
-	// Pass along our ghost'd screen
+	// copy cached texture to target texture
 	curr_effect->update_uniforms();
-	curr_effect->set_texture("Diffuse", rt->target_texture[next_index]);
-	curr_effect->set_texture("LastPass", rt->target_texture[next_index]);
+	curr_effect->set_texture("Diffuse", rt->cache_texture[rt->cache_index]);
+	curr_effect->set_texture("LastPass", rt->cache_texture[rt->cache_index]);
 	curr_effect->set_bool("Passthrough", true);
 
-	blit(rt->cache_surface, false, D3DPT_TRIANGLELIST, 0, 2);
+	blit(rt->target_surface[next_index], false, D3DPT_TRIANGLELIST, 0, 2);
 
 	return next_index;
 }
