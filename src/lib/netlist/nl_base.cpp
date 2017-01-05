@@ -899,7 +899,6 @@ logic_output_t::~logic_output_t()
 {
 }
 
-
 void logic_output_t::initial(const netlist_sig_t val)
 {
 	net().initial(val);

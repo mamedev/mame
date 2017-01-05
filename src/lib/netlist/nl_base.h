@@ -235,7 +235,7 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		virtual ~logic_family_desc_t();
+		~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
@@ -386,7 +386,7 @@ namespace netlist
 		 *  Every class derived from the object_t class must have a name.
 		 */
 		object_t(const pstring &aname /*!< string containing name of the object */);
-		~object_t();
+		virtual ~object_t();
 
 		/*! return name of the object
 		 *
@@ -406,6 +406,7 @@ namespace netlist
 	struct detail::netlist_ref
 	{
 		netlist_ref(netlist_t &nl) : m_netlist(nl) { }
+		~netlist_ref() {}
 
 		netlist_t & netlist() { return m_netlist; }
 		const netlist_t & netlist() const { return m_netlist; }
