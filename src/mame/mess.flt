@@ -189,8 +189,6 @@ fb01.cpp
 fc100.cpp
 fccpu20.cpp
 fccpu30.cpp
-fcisio.cpp
-fcscsi.cpp
 fidel6502.cpp
 fidel68k.cpp
 fidelz80.cpp

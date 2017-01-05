@@ -12229,15 +12229,6 @@ fccpu30senr
 fccpu30senr501
 fccpu33
 
-//@source:fccpu40.cpp
-//fccpu40                         //
-
-@source:fcscsi.cpp
-fcscsi1                         //
-
-@source:fcisio.cpp
-fcisio1                         //
-
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 

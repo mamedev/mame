@@ -188,6 +188,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
+#include "bus/vme/vme_fcisio.h"
+#include "bus/vme/vme_fcscsi.h"
 #include "machine/msm6242.h"
 #include "machine/ram.h" // For variants that only differs in amount of RAM
 #include "machine/scnxx562.h"
@@ -198,15 +201,25 @@
 #include "machine/clock.h"
 //#include "machine/timekpr.h"
 
-#define VERBOSE 0
+#define LOG_GENERAL 0x01
+#define LOG_SETUP   0x02
+#define LOG_PRINTF  0x04
+#define LOG_INIT    0x08
+#define LOG_READ    0x10
+#define LOG_INT     0x20
 
-#define LOGPRINT(x)  { do { if (VERBOSE) logerror x; } while (0); }
-#define LOG(x)      {} LOGPRINT(x)
-#define LOGINIT(x)  {} LOGPRINT(x)
-#define LOGR(x)     {}
-#define LOGSETUP(x) {}
-#define LOGINT(x)   {}
-#if VERBOSE >= 2
+#define VERBOSE 0 // (LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
+
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
+
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
+#define LOGINIT(...)  LOGMASK(LOG_INIT,   __VA_ARGS__)
+#define LOGR(...)     LOGMASK(LOG_READ,   __VA_ARGS__)
+#define LOGINT(...)   LOGMASK(LOG_INT,   __VA_ARGS__)
+
+#if VERBOSE & LOG_PRINTF
 #define logerror printf
 #endif
 
@@ -333,7 +346,7 @@ INPUT_PORTS_END
 /* Start it up */
 void cpu30_state::machine_start ()
 {
-	LOGINIT(("%s\n", FUNCNAME));
+	LOGINIT("%s\n", FUNCNAME);
 
 	save_pointer (NAME (m_sysrom), sizeof(m_sysrom));
 	save_pointer (NAME (m_sysram), sizeof(m_sysram));
@@ -347,7 +360,7 @@ void cpu30_state::machine_start ()
 
 void cpu30_state::machine_reset ()
 {
-	LOGINIT(("%s\n", FUNCNAME));
+	LOGINIT("%s\n", FUNCNAME);
 
 	/* Reset pointer to bootvector in ROM for bootvector handler bootvect_r */
 	if (m_sysrom == &m_sysram[0]) /* Condition needed because memory map is not setup first time */
@@ -355,50 +368,50 @@ void cpu30_state::machine_reset ()
 }
 
 /*                                                                              setup board ID */
-DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x50; }
-DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT(("%s\n", FUNCNAME)); m_board_id = 0x68; } // 0x60 skips FGA prompt
+DRIVER_INIT_MEMBER( cpu30_state, cpu30x )      { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30xa )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30za )     { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30zbe )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be8 )    { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30be16 )   { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite4 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu30lite8 )  { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x50; }
+DRIVER_INIT_MEMBER( cpu30_state, cpu33 )       { LOGINIT("%s\n", FUNCNAME); m_board_id = 0x68; } // 0x60 skips FGA prompt
 
 /* Mock FDC driver */
 READ8_MEMBER (cpu30_state::fdc_r){
-	LOG(("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset));
+	LOG("%s\n * FDC read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
 WRITE8_MEMBER (cpu30_state::fdc_w){
-	LOG(("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+	LOG("%s\n * FDC write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* Mock SCSI driver */
 READ8_MEMBER (cpu30_state::scsi_r){
-	LOG(("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset));
+	LOG("%s\n * SCSI read Offset: %04x\n", FUNCNAME, offset);
 	return 1;
 }
 
 WRITE8_MEMBER (cpu30_state::scsi_w){
-	LOG(("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data));
+	LOG("%s\n * SCSI write Offset: %04x Data: %02x\n", FUNCNAME, offset, data);
 }
 
 /* 1 = board is in slot 1, 0 = board is NOT in slot 1 */
 READ8_MEMBER (cpu30_state::slot1_status_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 1;
 }
 
 /* Boot vector handler, the PCB hardwires the first 8 bytes from 0xff800000 to 0x0 at reset*/
 READ32_MEMBER (cpu30_state::bootvect_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return m_sysrom[offset];
 }
 
 WRITE32_MEMBER (cpu30_state::bootvect_w){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	m_sysram[offset % sizeof(m_sysram)] &= ~mem_mask;
 	m_sysram[offset % sizeof(m_sysram)] |= (data & mem_mask);
 	m_sysrom = &m_sysram[0]; // redirect all upcomming accesses to masking RAM until reset.
@@ -459,42 +472,42 @@ WRITE32_MEMBER (cpu30_state::bootvect_w){
  * "To start VMEPROM, the rotary switches must both be set to 'F':" Hmm...
  */
 READ8_MEMBER (cpu30_state::rotary_rd){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xff; // TODO: make this configurable from commandline or artwork
 }
 
 // PIT#1 Port B TODO: implement floppy and dma control
 READ8_MEMBER (cpu30_state::flop_dmac_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xff;
 }
 
 WRITE8_MEMBER (cpu30_state::flop_dmac_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #define FPCP_SENSE 0x40 /* Port C bit 6 is low if a Floating Point Co Processor is installed */
 // PIT#1 Port C TODO: implement timer+port interrupts
 // TODO: Connect PC0, PC1, PC4 and PC7 to B5 and/or P2 connector
 READ8_MEMBER (cpu30_state::pit1c_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	m_maincpu->set_fpu_enable(1);    // Lets assume the FPCP is always installed ( which is default for 68030 atm )
 	return 0xff & ~FPCP_SENSE; // Should really be command line for the edge cases...
 }
 
 WRITE8_MEMBER (cpu30_state::pit1c_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 // PIT#2 Port A TODO: Connect to B5 and /or P2 connector
 READ8_MEMBER (cpu30_state::pit2a_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 	return 0xff;
 }
 
 WRITE8_MEMBER (cpu30_state::pit2a_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 	logerror("Unsupported user i/o on PIT2 port A detected\n");
 }
 
@@ -519,7 +532,7 @@ WRITE8_MEMBER (cpu30_state::pit2a_w){
 READ8_MEMBER (cpu30_state::board_mem_id_rd)
 {
 	int sz;
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	switch (m_ram->size())
 	{
 	case (1024 * 1024 * 32): sz = 0; break;
@@ -557,56 +570,56 @@ READ8_MEMBER (cpu30_state::board_mem_id_rd)
 	//  return 0x10 + sz;// CPU-22 p4
 	//  return 0x20 + sz;// p1: Wait until hard disk is up to speed
 	//  printf("SIZE:%02x\n", sz);
-	LOG(("- Board ID:%02x Size:%02x\n", m_board_id, sz));
+	LOG("- Board ID:%02x Size:%02x\n", m_board_id, sz);
 	return m_board_id + sz;
 }
 
 // PIT#2 Port C TODO: implement timer interrupt, DMA i/o, memory control and Hardware ID
 READ8_MEMBER (cpu30_state::pit2c_r){
-	LOG(("%s\n", FUNCNAME));
+	LOG("%s\n", FUNCNAME);
 	return 0xfe;
 }
 
 WRITE8_MEMBER (cpu30_state::pit2c_w){
-	LOG(("%s(%02x)\n", FUNCNAME, data));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 #if 0
 /* Dummy VME access methods until the VME bus device is ready for use */
 READ16_MEMBER (cpu30_state::vme_a24_r){
-	LOG (logerror ("vme_a24_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (cpu30_state::vme_a24_w){
-	LOG (logerror ("vme_a24_w\n"));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 
 READ16_MEMBER (cpu30_state::vme_a16_r){
-	LOG (logerror ("vme_16_r\n"));
+	LOG("%s\n", FUNCNAME);
 	return (uint16_t) 0;
 }
 
 WRITE16_MEMBER (cpu30_state::vme_a16_w){
-	LOG (logerror ("vme_a16_w\n"));
+	LOG("%s(%02x)\n", FUNCNAME, data);
 }
 #endif
 
 WRITE_LINE_MEMBER(cpu30_state::fga_irq_callback)
 {
-	LOGINT(("%s(%02x)\n", FUNCNAME, state));
+	LOGINT("%s(%02x)\n", FUNCNAME, state);
 
 	fga_irq_state = state;
 	fga_irq_level = m_fga002->get_irq_level();
-	LOGINT((" - FGA irq level  %02x\n", fga_irq_level));
+	LOGINT(" - FGA irq level  %02x\n", fga_irq_level);
 	update_irq_to_maincpu();
 }
 
 void cpu30_state::update_irq_to_maincpu()
 {
-	LOGINT(("%s()\n", FUNCNAME));
-	LOGINT((" - fga_irq_level: %02x\n", fga_irq_level));
-	LOGINT((" - fga_irq_state: %02x\n", fga_irq_state));
+	LOGINT("%s()\n", FUNCNAME);
+	LOGINT(" - fga_irq_level: %02x\n", fga_irq_level);
+	LOGINT(" - fga_irq_state: %02x\n", fga_irq_state);
 	switch (fga_irq_level & 0x07)
 	{
 	case 1: m_maincpu->set_input_line(M68K_IRQ_1, fga_irq_state); break;
@@ -620,6 +633,11 @@ void cpu30_state::update_irq_to_maincpu()
 	}
 }
 
+static SLOT_INTERFACE_START(fccpu30_vme_cards)
+	SLOT_INTERFACE("fcisio", VME_FCISIO1)
+	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
+SLOT_INTERFACE_END	
+
 /*
  * Machine configuration
  */
@@ -630,6 +648,8 @@ static MACHINE_CONFIG_START (cpu30, cpu30_state)
 	MCFG_CPU_IRQ_ACKNOWLEDGE_DEVICE("fga002", fga002_device, iack)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu30_vme_cards, nullptr)
 	/* Terminal Port config */
 	/* Force CPU30 series of boards has up to four serial ports, p1-p4, the FGA boot uses p4 as console and subsequent
 	   firmware uses p1 as console and in an operating system environment there may be user login shells on the other.

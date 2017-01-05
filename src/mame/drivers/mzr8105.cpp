@@ -198,7 +198,6 @@ INPUT_PORTS_END
 
 static SLOT_INTERFACE_START(mzr8105_vme_cards)
 	SLOT_INTERFACE("mzr8300", VME_MZR8300)
-	SLOT_INTERFACE("mvme350", VME_MVME350)
 SLOT_INTERFACE_END	
 
 /*
@@ -207,8 +206,8 @@ SLOT_INTERFACE_END
 MACHINE_CONFIG_START (mzr8105, mzr8105_state)
 	MCFG_CPU_ADD ("maincpu", M68000, XTAL_10MHz)
 	MCFG_CPU_PROGRAM_MAP (mzr8105_mem)
-	MCFG_VME_P1_DEVICE_ADD("vme")
-	MCFG_VME_P1_SLOT_ADD ("vme", "slot1", mzr8105_vme_cards, nullptr)
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", "slot1", mzr8105_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */
