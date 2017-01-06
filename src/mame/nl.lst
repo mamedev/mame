@@ -66,9 +66,6 @@ popeyebl        // bootleg
 
 /* Do not use CPUs */
 
-// aleisttl.cpp
-//sburners                      // (c) 1975 Allied Leisure
-
 // atarittl.cpp
 stuntcyc                        // (c) 1976 Atari
 //antiairc                      // (c) 1975 Atari
@@ -105,6 +102,28 @@ stuntcyc                        // (c) 1976 Atari
 //touchme                       // (c) 1974 Atari
 //worldcup                      // (c) 1974 Atari
 
+// pong.cpp
+breakout                        // (c) 1976 Atari
+pong                            // (c) 1972 Atari
+pongd                           // (c) 1973 Atari
+pongf                           // (c) 1972 Atari
+//coupedav                      // (c) 1973 Atari France
+//pongbarl                      // (c) 1973 Atari
+//cktpong                       // (c) 1974 Atari / National Entertainment Co.
+//drpong                        // (c) 1974 Atari
+//pupppong                      // (c) 1974 Atari
+//snoopong                      // (c) 1974 Atari
+//suprpong                      // (c) 1974 Atari
+//breakckt                      // (c) 1976 Atari
+//consolet                      // (c) 1976 Atari Europe
+
+/******************************************************************************/
+
+/* Does not use netlist code yet - placeholder */
+
+// aleisttl.cpp
+//sburners                      // (c) 1975 Allied Leisure
+
 // bailey.cpp
 //fun4                          // (c) 1976 Bailey
 //fun4a                         // (c) 1976 Bailey
@@ -133,21 +152,6 @@ stuntcyc                        // (c) 1976 Atari
 // monacogp.cpp
 //monacogp                      // (c) 1980 Sega
 //monacogpa                     // (c) 1980 Sega
-
-// pong.cpp
-breakout                        // (c) 1976 Atari
-pong                            // (c) 1972 Atari
-pongd                           // (c) 1973 Atari
-pongf                           // (c) 1972 Atari
-//coupedav                      // (c) 1973 Atari France
-//pongbarl                      // (c) 1973 Atari
-//cktpong                       // (c) 1974 Atari / National Entertainment Co.
-//drpong                        // (c) 1974 Atari
-//pupppong                      // (c) 1974 Atari
-//snoopong                      // (c) 1974 Atari
-//suprpong                      // (c) 1974 Atari
-//breakckt                      // (c) 1976 Atari
-//consolet                      // (c) 1976 Atari Europe
 
 // pse.cpp
 //bazooka                       // (c) 1976 PSE
