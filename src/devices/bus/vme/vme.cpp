@@ -68,8 +68,11 @@
 
 #include "emu.h"
 #include "vme.h"
-#include "bus/vme/vme_mzr8105.h"
+//#include "bus/vme/vme_mzr8105.h"
 #include "bus/vme/vme_mzr8300.h"
+#include "bus/vme/vme_mvme350.h"
+#include "bus/vme/vme_fcisio.h"
+#include "bus/vme/vme_fcscsi.h"
 
 #define LOG_GENERAL 0x01
 #define LOG_SETUP   0x02
@@ -95,26 +98,25 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
-const device_type VME_P1_SLOT = &device_creator<vme_p1_slot_device>;
+const device_type VME_SLOT = &device_creator<vme_slot_device>;
 
 //-------------------------------------------------
-//  vme_p1_slot_device - constructor
+//  vme_slot_device - constructor
 //-------------------------------------------------
-vme_p1_slot_device::vme_p1_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VME_P1_SLOT, "VME_P1_SLOT", tag, owner, clock, "vme_p1_slot", __FILE__)
+vme_slot_device::vme_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+		device_t(mconfig, VME_SLOT, "VME_SLOT", tag, owner, clock, "vme_slot", __FILE__)
 		,device_slot_interface(mconfig, *this)
-		,m_vme_p1_tag(nullptr)
-		,m_vme_p1_slottag(nullptr)
+		,m_vme_tag(nullptr)
+		,m_vme_slottag(nullptr)
 		,m_vme_j1_callback(*this)
 {
-	LOG("%s %s\n", tag, FUNCNAME);
 }
 
-vme_p1_slot_device::vme_p1_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
+vme_slot_device::vme_slot_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
 		device_slot_interface(mconfig, *this)
-		,m_vme_p1_tag(nullptr)
-		,m_vme_p1_slottag(nullptr)
+		,m_vme_tag(nullptr)
+		,m_vme_slottag(nullptr)
 		,m_vme_j1_callback(*this)
 {
 }
@@ -122,24 +124,27 @@ vme_p1_slot_device::vme_p1_slot_device(const machine_config &mconfig, device_typ
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-void vme_p1_slot_device::static_set_vme_p1_slot(device_t &device, const char *tag, const char *slottag)
+void vme_slot_device::static_set_vme_slot(device_t &device, const char *tag, const char *slottag)
 {
 	LOG("%s %s - %s\n", FUNCNAME, tag, slottag);
-	vme_p1_slot_device &vme_card = dynamic_cast<vme_p1_slot_device&>(device);
-	vme_card.m_vme_p1_tag = tag;
-	vme_card.m_vme_p1_slottag = slottag;
+	vme_slot_device &vme_card = dynamic_cast<vme_slot_device&>(device);
+	vme_card.m_vme_tag = tag;
+	vme_card.m_vme_slottag = slottag;
 }
 
 //-------------------------------------------------
 //  device_start - device-specific startup
 //-------------------------------------------------
-void vme_p1_slot_device::device_start()
+void vme_slot_device::device_start()
 {
-	device_vme_p1_card_interface *dev = dynamic_cast<device_vme_p1_card_interface *>(get_card_device());
-	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_p1_tag, m_vme_p1_slottag);
-	if (dev) device_vme_p1_card_interface::static_set_vme_p1_tag(*dev, m_vme_p1_tag, m_vme_p1_slottag);
+	device_vme_card_interface *dev = dynamic_cast<device_vme_card_interface *>(get_card_device());
+	LOG("%s %s - %s:%s\n", tag(), FUNCNAME, m_vme_tag, m_vme_slottag);
+	if (dev) 
+	{
+		device_vme_card_interface::static_set_vme_tag(*dev, m_vme_tag, m_vme_slottag);
+	}
 
-	//	m_card = dynamic_cast<device_vme_p1_card_interface *>(get_card_device());
+	//	m_card = dynamic_cast<device_vme_card_interface *>(get_card_device());
 }
 
 //-------------------------------------------------
@@ -147,7 +152,7 @@ void vme_p1_slot_device::device_start()
 //  operations now that the configuration is
 //  complete
 //-------------------------------------------------
-void vme_p1_slot_device::device_config_complete()
+void vme_slot_device::device_config_complete()
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
 }
@@ -155,7 +160,7 @@ void vme_p1_slot_device::device_config_complete()
 //-------------------------------------------------
 //  P1 D8 read
 //-------------------------------------------------
-READ8_MEMBER(vme_p1_slot_device::read8)
+READ8_MEMBER(vme_slot_device::read8)
 {
 	uint16_t result = 0x00;
 	LOG("%s %s\n", tag(), FUNCNAME);
@@ -167,57 +172,65 @@ READ8_MEMBER(vme_p1_slot_device::read8)
 //-------------------------------------------------
 //  P1 D8 write
 //-------------------------------------------------
-WRITE8_MEMBER(vme_p1_slot_device::write8)
+WRITE8_MEMBER(vme_slot_device::write8)
 {
 	LOG("%s %s\n", tag(), FUNCNAME);
 	//	printf("%s %s\n", tag(), FUNCNAME);
 	//	if (m_card)		m_card->write8(space, offset, data);
 }
 
-SLOT_INTERFACE_START( vme_p1_slot1 )
-	SLOT_INTERFACE("mzr8105", VME_MZR8105)
+#if 0 // Disabled until we know how to make a board driver also a slot device
+/* The following two slot collections be combined once we intriduce capabilities for each board */
+/* Usually a VME firmware supports only a few boards so it will have its own slot collection defined */
+// Controller capable boards that can go into slot1 ( or has an embedded VME bus )
+SLOT_INTERFACE_START( vme_slot1 )
+//	SLOT_INTERFACE("mzr8105", VME_MZR8105)
 SLOT_INTERFACE_END
+#endif
 
-SLOT_INTERFACE_START( vme_p1_slots )
-	SLOT_INTERFACE("mzr8105", VME_MZR8105)
+// All boards that can be non-controller boards, eg not driving the VME CLK etc
+SLOT_INTERFACE_START( vme_slots )
 	SLOT_INTERFACE("mzr8300", VME_MZR8300)
+	SLOT_INTERFACE("mvme350", VME_MVME350)
+	SLOT_INTERFACE("fcisio1", VME_FCISIO1)
+	SLOT_INTERFACE("fcscsi1", VME_FCSCSI1)
 SLOT_INTERFACE_END
 
 //
 // VME device P1
 //
 
-const device_type VME_P1 = &device_creator<vme_p1_device>;
+const device_type VME = &device_creator<vme_device>;
 
-vme_p1_device::vme_p1_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	device_t(mconfig, VME_P1, "VME_P1", tag, owner, clock, "vme_p1", __FILE__)
+vme_device::vme_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VME, "VME", tag, owner, clock, "vme", __FILE__)
 {
 }
 
-vme_p1_device::vme_p1_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
+vme_device::vme_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
 	device_t(mconfig, type, name, tag, owner, clock, shortname, source)
 {
 }
 
-vme_p1_device::~vme_p1_device()
+vme_device::~vme_device()
 {
 	m_device_list.detach_all();
 }
 
-void vme_p1_device::device_start()
+void vme_device::device_start()
 {
 }
 
-void vme_p1_device::device_reset()
+void vme_device::device_reset()
 {
 }
 
-void vme_p1_device::add_vme_p1_card(device_vme_p1_card_interface *card)
+void vme_device::add_vme_card(device_vme_card_interface *card)
 {
 	m_device_list.append(*card);
 }
 
-void vme_p1_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
+void vme_device::install_device(offs_t start, offs_t end, read8_delegate rhandler, write8_delegate whandler, uint32_t mask)
 {
 	cpu_device	*m_maincpu = machine().device<cpu_device>("maincpu");
 
@@ -226,7 +239,7 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read8_delegate rhan
 	switch(buswidth)
 	{
 	case 32:
-		logerror("A32:D8 handler requires a P2 connector - not implemented yet\n");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	case 24:
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
@@ -235,11 +248,11 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read8_delegate rhan
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
 		break;
 	default:
-		fatalerror("VME_P1 D8: Bus width %d not supported\n", buswidth);
+		fatalerror("VME D8: Bus width %d not supported\n", buswidth);
 	}
 }
 
-void vme_p1_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
+void vme_device::install_device(offs_t start, offs_t end, read16_delegate rhandler, write16_delegate whandler, uint32_t mask)
 {
 	cpu_device *m_maincpu = machine().device<cpu_device>("maincpu");
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
@@ -247,7 +260,7 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read16_delegate rha
 	switch(buswidth)
 	{
 	case 32:
-		logerror("A32:D16 handler requires a P2 connector - not implemented yet\n");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	case 24:
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
@@ -256,11 +269,11 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read16_delegate rha
 		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
 		break;
 	default:
-		fatalerror("VME_P1 D16: Bus width %d not supported\n", buswidth);
+		fatalerror("VME D16: Bus width %d not supported\n", buswidth);
 	}
 }
 
-void vme_p1_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask)
+void vme_device::install_device(offs_t start, offs_t end, read32_delegate rhandler, write32_delegate whandler, uint32_t mask)
 {
 	cpu_device *m_maincpu = machine().device<cpu_device>("maincpu");
 	int buswidth = m_maincpu->space_config(AS_PROGRAM)->m_databus_width;
@@ -268,29 +281,27 @@ void vme_p1_device::install_device(offs_t start, offs_t end, read32_delegate rha
 	switch(buswidth)
 	{
 	case 32:
-		logerror("A32:D32 handler requires a P2 connector - not implemented yet\n");
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	case 24:
-		logerror("A24:D32 handler requires a P2 connector - not implemented yet\n");
-		//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, mask);
 		break;
 	case 16:
-		logerror("A16:D32 handler requires a P2 connector - not implemented yet\n");
-		//		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
+		m_maincpu->space(AS_PROGRAM).install_readwrite_handler(start, end, rhandler, whandler, (uint16_t)(mask & 0xffff));
 		break;
 	default:
-		fatalerror("VME_P1 D32: Bus width %d not supported\n", buswidth);
+		fatalerror("VME D32: Bus width %d not supported\n", buswidth);
 	}
 }
 
 //
 // Card interface
 //
-device_vme_p1_card_interface::device_vme_p1_card_interface(const machine_config &mconfig, device_t &device)
+device_vme_card_interface::device_vme_card_interface(const machine_config &mconfig, device_t &device)
 	: device_slot_card_interface(mconfig, device)
-	,m_vme_p1(nullptr)
-	,m_vme_p1_tag(nullptr)
-	,m_vme_p1_slottag(nullptr)
+	,m_vme(nullptr)
+	,m_vme_tag(nullptr)
+	,m_vme_slottag(nullptr)
 	,m_slot(0)
 	,m_next(nullptr)
 {
@@ -298,41 +309,40 @@ device_vme_p1_card_interface::device_vme_p1_card_interface(const machine_config 
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
 }
 
-device_vme_p1_card_interface::~device_vme_p1_card_interface()
+device_vme_card_interface::~device_vme_card_interface()
 {
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
 }
 
-void device_vme_p1_card_interface::static_set_vme_p1_tag(device_t &device, const char *tag, const char *slottag)
+void device_vme_card_interface::static_set_vme_tag(device_t &device, const char *tag, const char *slottag)
 {
-	device_vme_p1_card_interface &vme_p1_card = dynamic_cast<device_vme_p1_card_interface &>(device);
-	vme_p1_card.m_vme_p1_tag = tag;
-	vme_p1_card.m_vme_p1_slottag = slottag;
+	device_vme_card_interface &vme_card = dynamic_cast<device_vme_card_interface &>(device);
+	vme_card.m_vme_tag = tag;
+	vme_card.m_vme_slottag = slottag;
 }
 
-void device_vme_p1_card_interface::set_vme_p1_device()
+void device_vme_card_interface::set_vme_device()
 {
 	LOG("%s %s\n", m_device->tag(), FUNCNAME);
-	m_vme_p1 = dynamic_cast<vme_p1_device *>(device().machine().device(m_vme_p1_tag));
-	//	printf("*** %s %sfound\n", m_vme_p1_tag, m_vme_p1 ? "" : "not ");
-	if (m_vme_p1) m_vme_p1->add_vme_p1_card(this);
+	m_vme = dynamic_cast<vme_device *>(device().machine().device(m_vme_tag));
+	//	printf("*** %s %sfound\n", m_vme_tag, m_vme ? "" : "not ");
+	if (m_vme) m_vme->add_vme_card(this);
 }
 
 /* VME D8 accesses */
-READ8_MEMBER(device_vme_p1_card_interface::read8)
+READ8_MEMBER(device_vme_card_interface::read8)
 {
 	uint8_t result = 0x00;
 	LOG("%s %s Offset:%08x\n", m_device->tag(), FUNCNAME, offset);
 	return result;
 }
 
-WRITE8_MEMBER(device_vme_p1_card_interface::write8)
+WRITE8_MEMBER(device_vme_card_interface::write8)
 {
 	LOG("%s %s Offset:%08x\n", m_device->tag(), FUNCNAME, offset);
 }
 
 //--------------- P2 connector below--------------------------
-#if 0
 /*
 The VME P2 connector only specifies the mid row B of the connector
 and leaves row A and C to be system specific. This has resulted in
@@ -356,56 +366,3 @@ http://www.interfacebus.com/Design_Connector_VME_P2_Buses.html
 TODO: Figure out a good way to let all these variants coexist and interconnect in a VME system
 
 */
-//**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-const device_type VME_P2_SLOT = &device_creator<vme_p2_slot_device>;
-
-//-------------------------------------------------
-//  vme_p2_slot_device - constructor
-//-------------------------------------------------
-vme_p2_slot_device::vme_p2_slot_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-		device_t(mconfig, VME_P2_SLOT, "VME P2 connector", tag, owner, clock, "vme_p2_connector", __FILE__),
-		device_slot_interface(mconfig, *this),
-		m_vme_j2_callback(*this)
-{
-}
-
-void vme_p2_slot_device::device_start()
-{
-	m_vme_p2 = dynamic_cast<device_vme_p2_interface *>(get_card_device());
-}
-
-//-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
-//-------------------------------------------------
-
-void vme_p2_slot_device::device_config_complete()
-{
-	// set brief and instance name
-	update_names();
-}
-
-//-------------------------------------------------
-//  P2 read
-//-------------------------------------------------
-READ32_MEMBER(vme_p2_slot_device::write32)
-{
-	uint8_t result = 0x00;
-	if (m_vme_p2)
-		result = m_vme_p2->read32(space, offset);
-	return result;
-}
-
-//-------------------------------------------------
-//  P2 write
-//-------------------------------------------------
-WRITE32_MEMBER(vme_p2_slot_device::read32)
-{
-	if (m_vme_p2)
-		m_vme_p2->write32(space, offset, data);
-}
-#endif

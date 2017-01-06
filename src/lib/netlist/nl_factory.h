@@ -30,14 +30,11 @@ namespace netlist { namespace factory
 		P_PREVENT_COPYING(element_t)
 	public:
 		element_t(const pstring &name, const pstring &classname,
-				const pstring &def_param)
-		: m_name(name), m_classname(classname), m_def_param(def_param)
-		{}
-
-		virtual ~element_t() {}
+				const pstring &def_param);
+		virtual ~element_t();
 
 		virtual plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) = 0;
-		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {};
+		virtual void macro_actions(netlist_t &anetlist, const pstring &name) {}
 
 		const pstring &name() const { return m_name; }
 		const pstring &classname() const { return m_classname; }
@@ -117,6 +114,18 @@ namespace netlist { namespace factory
 	// factory_lib_entry_t: factory class to wrap macro based chips/elements
 	// -----------------------------------------------------------------------------
 
+	class NETLIB_NAME(wrapper) : public device_t
+	{
+	public:
+		NETLIB_NAME(wrapper)(netlist_t &anetlist, const pstring &name)
+		: device_t(anetlist, name)
+		{
+		}
+	protected:
+		NETLIB_RESETI();
+		NETLIB_UPDATEI();
+	};
+
 	class library_element_t : public element_t
 	{
 		P_PREVENT_COPYING(library_element_t)
@@ -125,18 +134,6 @@ namespace netlist { namespace factory
 		library_element_t(setup_t &setup, const pstring &name, const pstring &classname,
 				const pstring &def_param)
 		: element_t(name, classname, def_param), m_setup(setup) {  }
-
-		class wrapper : public device_t
-		{
-		public:
-			wrapper(netlist_t &anetlist, const pstring &name)
-			: device_t(anetlist, name)
-			{
-			}
-		protected:
-			NETLIB_RESETI() { }
-			NETLIB_UPDATEI() { }
-		};
 
 		plib::owned_ptr<device_t> Create(netlist_t &anetlist, const pstring &name) override;
 

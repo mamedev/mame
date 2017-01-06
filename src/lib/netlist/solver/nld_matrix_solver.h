@@ -41,22 +41,9 @@ class terms_t
 	P_PREVENT_COPYING(terms_t)
 
 public:
-	terms_t()
-	: m_railstart(0)
-	, m_last_V(0.0)
-	, m_DD_n_m_1(0.0)
-	, m_h_n_m_1(1e-6)
-	{}
+	terms_t();
 
-	void clear()
-	{
-		m_term.clear();
-		m_net_other.clear();
-		m_gt.clear();
-		m_go.clear();
-		m_Idr.clear();
-		m_other_curanalog.clear();
-	}
+	void clear();
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
@@ -100,6 +87,7 @@ public:
 	: analog_output_t(dev, aname)
 	, m_proxied_net(nullptr)
 	{ }
+	virtual ~proxied_analog_output_t();
 
 	analog_net_t *m_proxied_net; // only for proxy nets in analog input logic
 };
@@ -118,21 +106,7 @@ public:
 	};
 
 	matrix_solver_t(netlist_t &anetlist, const pstring &name,
-			const eSortType sort, const solver_parameters_t *params)
-	: device_t(anetlist, name)
-	, m_params(*params)
-	, m_stat_calculations(*this, "m_stat_calculations", 0)
-	, m_stat_newton_raphson(*this, "m_stat_newton_raphson", 0)
-	, m_stat_vsolver_calls(*this, "m_stat_vsolver_calls", 0)
-	, m_iterative_fail(*this, "m_iterative_fail", 0)
-	, m_iterative_total(*this, "m_iterative_total", 0)
-	, m_last_step(*this, "m_last_step", netlist_time::zero())
-	, m_fb_sync(*this, "FB_sync")
-	, m_Q_sync(*this, "Q_sync")
-	, m_sort(sort)
-	{
-		connect_post_start(m_fb_sync, m_Q_sync);
-	}
+			const eSortType sort, const solver_parameters_t *params);
 
 	virtual ~matrix_solver_t();
 

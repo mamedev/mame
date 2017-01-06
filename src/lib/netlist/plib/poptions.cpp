@@ -22,8 +22,20 @@ namespace plib {
 	{
 	}
 
+	option_group::~option_group()
+	{
+	}
+
+	option_example::~option_example()
+	{
+	}
+
 	option::option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument)
 	: option_base(parent, help), m_short(ashort), m_long(along),  m_has_argument(has_argument)
+	{
+	}
+
+	option::~option()
 	{
 	}
 

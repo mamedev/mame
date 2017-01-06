@@ -49,9 +49,23 @@ void object_t::operator delete (void * mem)
 
 }
 
+nl_exception::~nl_exception()
+{
+}
+
+
 // ----------------------------------------------------------------------------------------
 // logic_family_ttl_t
 // ----------------------------------------------------------------------------------------
+
+logic_family_desc_t::logic_family_desc_t()
+{
+}
+
+logic_family_desc_t::~logic_family_desc_t()
+{
+}
+
 
 class logic_family_ttl_t : public logic_family_desc_t
 {
@@ -67,15 +81,18 @@ public:
 		m_R_low = 1.0;
 		m_R_high = 130.0;
 	}
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_ttl_t::create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_ttl_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 class logic_family_cd4xxx_t : public logic_family_desc_t
 {
@@ -91,15 +108,18 @@ public:
 		m_R_low = 10.0;
 		m_R_high = 10.0;
 	}
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_cd4xxx_t::create_d_a_proxy(netlist_t &anetlist, const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_cd4xxx_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 const logic_family_desc_t *family_TTL()
 {
@@ -761,6 +781,9 @@ logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, detail::core_termi
 {
 }
 
+logic_net_t::~logic_net_t()
+{
+}
 
 // ----------------------------------------------------------------------------------------
 // analog_net_t
@@ -769,6 +792,10 @@ logic_net_t::logic_net_t(netlist_t &nl, const pstring &aname, detail::core_termi
 analog_net_t::analog_net_t(netlist_t &nl, const pstring &aname, detail::core_terminal_t *mr)
 	: net_t(nl, aname, mr)
 	, m_solver(nullptr)
+{
+}
+
+analog_net_t::~analog_net_t()
 {
 }
 
@@ -782,6 +809,10 @@ detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &anam
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
+{
+}
+
+detail::core_terminal_t::~core_terminal_t()
 {
 }
 
@@ -803,6 +834,13 @@ void detail::core_terminal_t::set_net(net_t *anet)
 	m_net = nullptr;
 }
 
+analog_t::~analog_t()
+{
+}
+
+logic_t::~logic_t()
+{
+}
 
 // ----------------------------------------------------------------------------------------
 // terminal_t
@@ -818,6 +856,9 @@ terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+terminal_t::~terminal_t()
+{
+}
 
 void terminal_t::schedule_solve()
 {
@@ -854,6 +895,10 @@ logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+logic_output_t::~logic_output_t()
+{
+}
+
 void logic_output_t::initial(const netlist_sig_t val)
 {
 	net().initial(val);
@@ -869,6 +914,10 @@ analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+analog_input_t::~analog_input_t()
+{
+}
+
 // ----------------------------------------------------------------------------------------
 // analog_output_t
 // ----------------------------------------------------------------------------------------
@@ -881,6 +930,10 @@ analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
 
 	net().m_cur_Analog = NL_FCONST(0.0);
 	netlist().setup().register_term(*this);
+}
+
+analog_output_t::~analog_output_t()
+{
 }
 
 void analog_output_t::initial(const nl_double val)
@@ -899,6 +952,10 @@ logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
 	netlist().setup().register_term(*this);
 }
 
+logic_input_t::~logic_input_t()
+{
+}
+
 // ----------------------------------------------------------------------------------------
 // Parameters ...
 // ----------------------------------------------------------------------------------------
@@ -908,6 +965,10 @@ param_t::param_t(const param_type_t atype, device_t &device, const pstring &name
 	, m_param_type(atype)
 {
 	device.setup().register_param(this->name(), *this);
+}
+
+param_t::~param_t()
+{
 }
 
 void param_t::update_param()
@@ -930,11 +991,23 @@ param_str_t::param_str_t(device_t &device, const pstring name, const pstring val
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 }
 
+param_str_t::~param_str_t()
+{
+}
+
+void param_str_t::changed()
+{
+}
+
 param_double_t::param_double_t(device_t &device, const pstring name, const double val)
 : param_t(param_t::DOUBLE, device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
+}
+
+param_double_t::~param_double_t()
+{
 }
 
 param_int_t::param_int_t(device_t &device, const pstring name, const int val)
@@ -944,6 +1017,10 @@ param_int_t::param_int_t(device_t &device, const pstring name, const int val)
 	netlist().save(*this, m_param, "m_param");
 }
 
+param_int_t::~param_int_t()
+{
+}
+
 param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
 : param_t(param_t::LOGIC, device, name)
 {
@@ -951,11 +1028,24 @@ param_logic_t::param_logic_t(device_t &device, const pstring name, const bool va
 	netlist().save(*this, m_param, "m_param");
 }
 
+param_logic_t::~param_logic_t()
+{
+}
+
 param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
 : param_t(param_t::POINTER, device, name)
 {
 	m_param = val; //device.setup().get_initial_param_val(this->name(),val);
 	//netlist().save(*this, m_param, "m_param");
+}
+
+param_ptr_t::~param_ptr_t()
+{
+}
+
+void param_model_t::changed()
+{
+	m_map.clear();
 }
 
 const pstring param_model_t::model_value_str(const pstring &entity)
@@ -970,6 +1060,10 @@ nl_double param_model_t::model_value(const pstring &entity)
 	if (m_map.size() == 0)
 		netlist().setup().model_parse(this->Value(), m_map);
 	return netlist().setup().model_value(m_map, entity);
+}
+
+void param_data_t::changed()
+{
 }
 
 std::unique_ptr<plib::pistream> param_data_t::stream()

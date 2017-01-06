@@ -603,7 +603,7 @@ void info_xml_creator::output_rom(device_t &device)
 				if (bios_name[0] != 0)
 					util::stream_format(output, " bios=\"%s\"", util::xml::normalize_string(bios_name));
 				if (!is_disk)
-					util::stream_format(output, " size=\"%d\"", rom_file_size(rom));
+					util::stream_format(output, " size=\"%u\"", rom_file_size(rom));
 
 				// dump checksum information only if there is a known dump
 				if (!hashes.flag(util::hash_collection::FLAG_NO_DUMP))

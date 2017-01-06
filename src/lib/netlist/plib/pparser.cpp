@@ -15,6 +15,16 @@ namespace plib {
 // A simple tokenizer
 // ----------------------------------------------------------------------------------------
 
+ptokenizer::ptokenizer(pistream &strm)
+: m_strm(strm), m_lineno(0), m_cur_line(""), m_px(m_cur_line.begin()), m_unget(0), m_string('"')
+{
+}
+
+ptokenizer::~ptokenizer()
+{
+}
+
+
 pstring ptokenizer::currentline_str()
 {
 	return m_cur_line;

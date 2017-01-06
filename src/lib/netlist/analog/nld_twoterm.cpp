@@ -45,6 +45,44 @@ void generic_diode::set_param(const nl_double Is, const nl_double n, nl_double g
 	m_VtInv = 1.0 / m_Vt;
 }
 
+void generic_diode::update_diode(const nl_double nVd)
+{
+#if 1
+	if (nVd < NL_FCONST(-5.0) * m_Vt)
+	{
+		m_Vd = nVd;
+		m_G = m_gmin;
+		m_Id = - m_Is;
+	}
+	else if (nVd < m_Vcrit)
+	{
+		m_Vd = nVd;
+		//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
+		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
+		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
+		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+	}
+	else
+	{
+#if 1
+		const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(-0.99));
+		m_Vd = m_Vd + std::log1p(a) * m_Vt;
+#else
+		m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
+#endif
+		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
+		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
+
+		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+	}
+#else
+	m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
+	const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
+	m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
+	m_G = m_Is * m_VtInv * eVDVt + m_gmin;
+#endif
+}
+
 // ----------------------------------------------------------------------------------------
 // nld_twoterm
 // ----------------------------------------------------------------------------------------
@@ -57,6 +95,34 @@ NETLIB_UPDATE(twoterm)
 		m_P.schedule_solve();
 	else if (m_N.has_net() && !m_N.net().isRailNet())
 		m_N.schedule_solve();
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_R_base
+// ----------------------------------------------------------------------------------------
+
+NETLIB_RESET(R_base)
+{
+	NETLIB_NAME(twoterm)::reset();
+	set_R(1.0 / netlist().gmin());
+}
+
+NETLIB_UPDATE(R_base)
+{
+	NETLIB_NAME(twoterm)::update();
+}
+
+// ----------------------------------------------------------------------------------------
+// nld_R
+// ----------------------------------------------------------------------------------------
+
+NETLIB_UPDATE_PARAM(R)
+{
+	update_dev();
+	if (m_R() > 1e-9)
+		set_R(m_R());
+	else
+		set_R(1e-9);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -101,19 +167,27 @@ NETLIB_UPDATE_PARAM(POT2)
 
 NETLIB_RESET(C)
 {
+	// FIXME: Startup conditions
 	set(netlist().gmin(), 0.0, -5.0 / netlist().gmin());
-	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
+	//set(netlist().gmin(), 0.0, 0.0);
 }
 
 NETLIB_UPDATE_PARAM(C)
 {
-	//step_time(1.0/48000.0);
-	m_GParallel = netlist().gmin() * m_C();
+	m_GParallel = netlist().gmin();
 }
 
 NETLIB_UPDATE(C)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+NETLIB_TIMESTEP(C)
+{
+	/* Gpar should support convergence */
+	const nl_double G = m_C() / step +  m_GParallel;
+	const nl_double I = -G * deltaV();
+	set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -128,13 +202,20 @@ NETLIB_RESET(L)
 
 NETLIB_UPDATE_PARAM(L)
 {
-	//step_time(1.0/48000.0);
-	//m_GParallel = netlist().gmin() / m_L();
+	m_GParallel = netlist().gmin();
 }
 
 NETLIB_UPDATE(L)
 {
 	NETLIB_NAME(twoterm)::update();
+}
+
+NETLIB_TIMESTEP(L)
+{
+	/* Gpar should support convergence */
+	m_I += m_I + m_G * deltaV();
+	m_G = step / m_L() + m_GParallel;
+	set(m_G, 0.0, m_I);
 }
 
 // ----------------------------------------------------------------------------------------

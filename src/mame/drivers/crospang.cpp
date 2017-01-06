@@ -40,14 +40,6 @@
 #include "includes/crospang.h"
 
 
-WRITE16_MEMBER(crospang_state::crospang_soundlatch_w)
-{
-	if(ACCESSING_BITS_0_7)
-	{
-		m_soundlatch->write(space, 0, data & 0xff);
-	}
-}
-
 /* main cpu */
 
 static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
@@ -57,7 +49,7 @@ static ADDRESS_MAP_START( crospang_base_map, AS_PROGRAM, 16, crospang_state )
 	AM_RANGE(0x122000, 0x1227ff) AM_RAM_WRITE(crospang_bg_videoram_w) AM_SHARE("bg_videoram")
 	AM_RANGE(0x200000, 0x2005ff) AM_RAM_DEVWRITE("palette", palette_device, write) AM_SHARE("palette")
 	AM_RANGE(0x210000, 0x2107ff) AM_RAM AM_SHARE("spriteram")
-	AM_RANGE(0x270000, 0x270001) AM_WRITE(crospang_soundlatch_w)
+	AM_RANGE(0x270000, 0x270001) AM_DEVWRITE8("soundlatch", generic_latch_8_device, write, 0x00ff)
 	AM_RANGE(0x270004, 0x270007) AM_WRITENOP // ??
 	AM_RANGE(0x280000, 0x280001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280002, 0x280003) AM_READ_PORT("COIN")

@@ -60,11 +60,8 @@ private:
 
 	int writenum;
 
-protected:
 	virtual void machine_reset() override;
 	virtual void machine_start() override;
-
-public:
 
 	uint8_t m_port0;
 	uint8_t m_port0_mask;
@@ -90,12 +87,13 @@ public:
 	int m_old_videomode;
 
 	required_device<cpu_device> m_maincpu;
-	required_device<cassette_image_device> m_cassette;
-	required_device<ram_device> m_messram;
-	required_device<fd1771_t> m_fdc;
-	required_device<floppy_connector> m_floppy0;
-	required_device<floppy_connector> m_floppy1;
+	optional_device<cassette_image_device> m_cassette;
+	optional_device<ram_device> m_messram;
+	optional_device<fd1771_t> m_fdc;
+	optional_device<floppy_connector> m_floppy0;
+	optional_device<floppy_connector> m_floppy1;
 
+public:
 	rm380z_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 		m_maincpu(*this, RM380Z_MAINCPU_TAG),
@@ -132,10 +130,12 @@ public:
 	DECLARE_DRIVER_INIT(rm380z34d);
 	DECLARE_DRIVER_INIT(rm380z34e);
 	DECLARE_DRIVER_INIT(rm480z);
+	DECLARE_MACHINE_RESET(rm480z);
 
 	void config_memory_map();
 	void update_screen(bitmap_ind16 &bitmap);
 	uint32_t screen_update_rm380z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_rm480z(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	TIMER_CALLBACK_MEMBER(static_vblank_timer);
 };
 

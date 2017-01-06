@@ -263,7 +263,7 @@ class plog_dispatch_intf
 	template<plog_level::e, bool> friend class plog_channel;
 
 public:
-	virtual ~plog_dispatch_intf() { }
+	virtual ~plog_dispatch_intf();
 protected:
 	virtual void vlog(const plog_level &l, const pstring &ls) const = 0;
 };

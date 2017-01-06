@@ -15,11 +15,14 @@
 #include "plib/pstring.h"
 #include "plib/plists.h"
 #include "plib/ptypes.h"
+#include "plib/pexception.h"
 #include "nl_setup.h"
 #include "nl_factory.h"
 #include "nl_parser.h"
 #include "devices/net_lib.h"
 #include "tools/nl_convert.h"
+
+#include <cfenv>
 
 class tool_options_t : public plib::options
 {
@@ -99,25 +102,26 @@ public:
 	{
 	}
 
-	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override
-	{
-		pstring name = m_folder + "/" + file;
-		try
-		{
-			auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
-			return strm;
-		}
-		catch (plib::pexception e)
-		{
-
-		}
-		return std::unique_ptr<plib::pistream>(nullptr);
-	}
+	virtual std::unique_ptr<plib::pistream> stream(const pstring &file) override;
 
 private:
 	pstring m_folder;
 };
 
+std::unique_ptr<plib::pistream> netlist_data_folder_t::stream(const pstring &file)
+{
+	pstring name = m_folder + "/" + file;
+	try
+	{
+		auto strm = plib::make_unique_base<plib::pistream, plib::pifilestream>(name);
+		return strm;
+	}
+	catch (plib::pexception e)
+	{
+
+	}
+	return std::unique_ptr<plib::pistream>(nullptr);
+}
 
 class netlist_tool_t : public netlist::netlist_t
 {
@@ -179,17 +183,19 @@ public:
 
 protected:
 
-	void vlog(const plib::plog_level &l, const pstring &ls) const override
-	{
-		pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
-		pout("{}", err);
-		if (l == plib::plog_level::FATAL)
-			throw netlist::nl_exception(err);
-	}
+	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
 	netlist::setup_t *m_setup;
 };
+
+void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
+{
+	pstring err = plib::pfmt("{}: {}\n")(l.name())(ls.c_str());
+	pout("{}", err);
+	if (l == plib::plog_level::FATAL)
+		throw netlist::nl_exception(err);
+}
 
 
 // FIXME: usage should go elsewhere
@@ -440,8 +446,13 @@ int main(int argc, char *argv[])
 	tool_options_t opts;
 	int ret;
 
+	/* make SIGFPE actually deliver signals on supoorted platforms */
+	plib::fpsignalenabler::global_enable(true);
+	plib::fpsignalenabler sigen(plib::FP_ALL & ~plib::FP_INEXACT & ~plib::FP_UNDERFLOW);
+
 	//perr("{}", "WARNING: This is Work In Progress! - It may fail anytime\n");
 	//perr("Update dispatching using method {}\n", pmf_verbose[NL_PMF_TYPE]);
+	//printf("test2 %f\n", std::exp(-14362.38064713));
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		perr("Error parsing {}\n", argv[ret]);

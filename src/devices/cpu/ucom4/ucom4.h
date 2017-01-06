@@ -169,15 +169,15 @@ protected:
 	int m_datawidth;
 	int m_prgmask;
 	int m_datamask;
-	int m_family;           // MCU family (43/44/45)
-	int m_stack_levels;     // number of callstack levels
+	int m_family;             // MCU family (43/44/45)
+	int m_stack_levels;       // number of callstack levels
 	uint16_t m_stack[3];      // max 3
 	uint8_t m_port_out[0x10]; // last value written to output port
 	uint8_t m_op;
 	uint8_t m_prev_op;        // previous opcode
 	uint8_t m_arg;            // opcode argument for 2-byte opcodes
 	uint8_t m_bitmask;        // opcode bit argument
-	bool m_skip;            // skip next opcode
+	bool m_skip;              // skip next opcode
 	int m_icount;
 	emu_timer *m_timer;
 
@@ -192,7 +192,7 @@ protected:
 	uint8_t m_timer_f;        // timer out flag
 	uint8_t m_int_f;          // interrupt flag
 	uint8_t m_inte_f;         // interrupt enable flag
-	int m_int_line;         // interrupt pin state
+	int m_int_line;           // interrupt pin state
 
 	// i/o handlers
 	devcb_read8 m_read_a;

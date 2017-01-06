@@ -133,6 +133,9 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "bus/vme/vme.h"
+#include "bus/vme/vme_fcisio.h"
+#include "bus/vme/vme_fcscsi.h"
 #include "bus/rs232/rs232.h"
 #include "machine/clock.h"
 
@@ -258,6 +261,11 @@ void cpu20_state::update_irq_to_maincpu()
 }
 #endif
 
+static SLOT_INTERFACE_START(fccpu20_vme_cards)
+	SLOT_INTERFACE("fcisio", VME_FCISIO1)
+	SLOT_INTERFACE("fcscsi", VME_FCSCSI1)
+SLOT_INTERFACE_END
+
 /*
  * Machine configuration
  */
@@ -265,6 +273,9 @@ static MACHINE_CONFIG_START (cpu20, cpu20_state)
 	/* basic machine hardware */
 	MCFG_CPU_ADD ("maincpu", M68020, XTAL_16MHz) /* Crytstal not verified */
 	MCFG_CPU_PROGRAM_MAP (cpu20_mem)
+
+	MCFG_VME_DEVICE_ADD("vme")
+	MCFG_VME_SLOT_ADD ("vme", "slot1", fccpu20_vme_cards, nullptr)
 MACHINE_CONFIG_END
 
 /* ROM definitions */

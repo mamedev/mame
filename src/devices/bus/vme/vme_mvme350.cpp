@@ -2,8 +2,7 @@
 // copyright-holders:Joakim Larsson Edstrom
 /***************************************************************************
  *
- *  Motorola MVME-350 6U Intelligent Tape Controller driver, initially derived
- *  from hk68v10.c
+ *  Motorola MVME-350 6U Intelligent Tape Controller driver
  *
  *  31/08/2015
  *
@@ -68,17 +67,8 @@
  * ||
  *
  * History of Motorola VME division (https://en.wikipedia.org/wiki/VMEbus)
- *---------------------------------
- * When Motorola released the 68000 processor 1979 the ambition of the deisgners
- * was also to standardize a versatile CPU bus to be able to build computer
- * systems without constructing PCB:s from scratch. This become VersaBus but the
- * boards was really too big and the computer world already saw the systems shrink
- * in size. Motorola's design center in Munich proposed to use the smaller and
- * already used Euroboard form factor and call it Versabus-E. This later became
- * VME which was standardized in the VITA organization 1981
- *
- * Misc links about Motorola VME division and this board:
- * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
+ *------------------------------------------------------------------------
+ *  See mvme147.cpp
  *
  * Description
  * ------------
@@ -110,6 +100,8 @@
  * 0x040000               PIT device?
  * 0x060000               RAM?
  * 0x080000               PIT device?
+ *           0xffff5000   MVME350 - Streaming Tape Controller CLUN $04 - From MVME-166 installation manual
+ *           0xffff5100   MVME350 - Streaming Tape Controller CLUN $05    probably base of shared RAM
  * --------------------------------------------------------------------------
  *
  * Interrupt sources MVME
@@ -123,17 +115,13 @@
  *
  * ----------------------------------------------------------
  *
- * DMAC Channel Assignments
- * ----------------------------------------------------------
- * Channel         M10            V10
- * ----------------------------------------------------------
- *
- *
  *  TODO:
  *  - Dump the ROMs (DONE)
  *  - Setup a working address map (STARTED)
  *  - Get documentation for VME interface
  *  - Add VME bus driver
+ *  - Hook up the PITs correctly
+ *  - Add a configurable shared memory window between local CPU and the VME bus
  *  - Hook up a CPU board that supports boot from tape (ie MVME-162, MVME 147)
  *  - Get a tape file with a bootable data on it.
  *
@@ -142,116 +130,139 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/68230pit.h"
+#include "vme_mvme350.h"
 
-#define LOG(x) x
+#define LOG_GENERAL 0x01
+#define LOG_SETUP   0x02
+#define LOG_PRINTF  0x04
 
-class mvme350_state : public driver_device
-{
-public:
-mvme350_state(const machine_config &mconfig, device_type type, const char *tag) :
-		driver_device (mconfig, type, tag),
-				m_maincpu (*this, "maincpu"),
-				m_pit(*this, "pit")
-{
-}
+#define VERBOSE 0 //(LOG_PRINTF | LOG_SETUP  | LOG_GENERAL)
 
-//DECLARE_READ16_MEMBER (vme_a24_r);
-//DECLARE_WRITE16_MEMBER (vme_a24_w);
-//DECLARE_READ16_MEMBER (vme_a16_r);
-//DECLARE_WRITE16_MEMBER (vme_a16_w);
-virtual void machine_start () override;
-virtual void machine_reset () override;
-protected:
+#define LOGMASK(mask, ...)   do { if (VERBOSE & mask) logerror(__VA_ARGS__); } while (0)
+#define LOGLEVEL(mask, level, ...) do { if ((VERBOSE & mask) >= level) logerror(__VA_ARGS__); } while (0)
 
-private:
-		required_device<cpu_device> m_maincpu;
-	required_device<pit68230_device> m_pit;
+#define LOG(...)      LOGMASK(LOG_GENERAL, __VA_ARGS__)
+#define LOGSETUP(...) LOGMASK(LOG_SETUP,   __VA_ARGS__)
 
-};
+#if VERBOSE & LOG_PRINTF
+#define logerror printf
+#endif
 
-static ADDRESS_MAP_START (mvme350_mem, AS_PROGRAM, 16, mvme350_state)
-ADDRESS_MAP_UNMAP_HIGH
-		AM_RANGE (0x000000, 0x01ffff) AM_ROM /* 128 Mb ROM */
-		AM_RANGE (0x020000, 0x03ffff) AM_RAM /* 128 Mb RAM */
-#if 1
-		AM_RANGE(0x040000,  0x040035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
-		AM_RANGE(0x060000,  0x06001f) AM_RAM /* Area is cleared on start */
-		AM_RANGE(0x080000,  0x080035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
+#ifdef _MSC_VER
+#define FUNCNAME __func__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif
+
+//**************************************************************************
+//	GLOBAL VARIABLES
+//**************************************************************************
+
+const device_type VME_MVME350 = &device_creator<vme_mvme350_card_device>;
+
+#define MVME350_CPU_TAG "mvme350_cpu"
+#define MVME350_ROM "mvme350_rom"
+
+static ADDRESS_MAP_START( mvme350_mem, AS_PROGRAM, 16, vme_mvme350_card_device )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM AM_REGION(MVME350_ROM, 0)
+	AM_RANGE(0x020000, 0x03ffff) AM_RAM
+
+#if 0
+	AM_RANGE(0x040000,  0x040035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
+	AM_RANGE(0x060000,  0x06001f) AM_RAM /* Area is cleared on start */
+	AM_RANGE(0x080000,  0x080035) AM_DEVREADWRITE8("pit", pit68230_device, read, write, 0x00ff) /* PIT ?*/
 #endif
 //AM_RANGE(0x100000, 0xfeffff)  AM_READWRITE(vme_a24_r, vme_a24_w) /* VMEbus Rev B addresses (24 bits) - not verified */
 //AM_RANGE(0xff0000, 0xffffff)  AM_READWRITE(vme_a16_r, vme_a16_w) /* VMEbus Rev B addresses (16 bits) - not verified */
 ADDRESS_MAP_END
 
-/* Input ports */
-static INPUT_PORTS_START (mvme350)
-INPUT_PORTS_END
+//-------------------------------------------------
+//	machine_config_additions - device-specific
+//	machine configurations
+//-------------------------------------------------
 
-/* Start it up */
-void mvme350_state::machine_start ()
+MACHINE_CONFIG_FRAGMENT( mvme350 )
+	/* basic machine hardware */
+	MCFG_CPU_ADD (MVME350_CPU_TAG, M68010, XTAL_10MHz)
+	MCFG_CPU_PROGRAM_MAP (mvme350_mem)
+	/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
+	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
+MACHINE_CONFIG_END
+
+ROM_START( mvme350 )
+	ROM_REGION (0x20000, MVME350_ROM, 0)
+	ROM_LOAD16_BYTE ("mvme350U40v2.3.bin", 0x0001, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
+	ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0000, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
+ROM_END
+
+machine_config_constructor vme_mvme350_card_device::device_mconfig_additions() const
 {
-		LOG (logerror ("machine_start\n"));
+	LOG("%s %s\n", tag(), FUNCNAME);
+	return MACHINE_CONFIG_NAME( mvme350 );
 }
 
-void mvme350_state::machine_reset ()
+const tiny_rom_entry *vme_mvme350_card_device::device_rom_region() const
 {
-		LOG (logerror ("machine_reset\n"));
+	LOG("%s\n", FUNCNAME);
+	return ROM_NAME( mvme350 );
+}
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, device_type type, const char *name, const char *tag, device_t *owner, uint32_t clock, const char *shortname, const char *source) :
+		device_t(mconfig, type, name, tag, owner, clock, shortname, source),
+		device_vme_card_interface(mconfig, *this)
+{
+	LOG("%s %s\n", tag, FUNCNAME);
+}
+
+vme_mvme350_card_device::vme_mvme350_card_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
+	device_t(mconfig, VME_MVME350, "Motorola MVME-350 Intelligent Tape Controller", tag, owner, clock, "mvme350", __FILE__),
+	device_vme_card_interface(mconfig, *this)
+{
+	LOG("%s %s\n", tag, FUNCNAME);
+}
+
+void vme_mvme350_card_device::device_start()
+{
+	LOG("%s %s\n", tag(), FUNCNAME);
+	set_vme_device();
+
+	/* Setup r/w handlers for shared memory area */
+#if 0
+	/* From MVME166 Single Board Computer Installation Guide:
+
+	   Controller Type     First board    Second board
+                           CLUN Address   CLUN Address
+	  ---------------------------------------------------
+	   MVME350 - Streaming $04  $FFFF5000 $05  $FFFF5100
+	   Tape Controller 
+	  ---------------------------------------------------
+	*/
+	uint32_t base = 0xFFFF5000;
+	m_vme->install_device(base + 0, base + 1, // Channel B - Data
+							 read8_delegate(FUNC(z80sio_device::db_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::db_w), subdevice<z80sio_device>("pit")), 0x00ff);
+	m_vme->install_device(base + 2, base + 3, // Channel B - Control
+							 read8_delegate(FUNC(z80sio_device::cb_r),  subdevice<z80sio_device>("pit")), write8_delegate(FUNC(z80sio_device::cb_w), subdevice<z80sio_device>("pit")), 0x00ff);
+#endif
+
+}
+
+void vme_mvme350_card_device::device_reset()
+{
+	LOG("%s %s\n", tag(), FUNCNAME);
 }
 
 #if 0
-/* Dummy VME access methods until the VME bus device is ready for use */
-READ16_MEMBER (mvme350_state::vme_a24_r){
-		LOG (logerror ("vme_a24_r\n"));
-		return (uint16_t) 0;
+READ16_MEMBER (vme_mvme350_card_device::read16){
+	LOG("%s()\n", FUNCNAME);
+	return (uint8_t) 0;
 }
 
-WRITE16_MEMBER (mvme350_state::vme_a24_w){
-		LOG (logerror ("vme_a24_w\n"));
-}
-
-READ16_MEMBER (mvme350_state::vme_a16_r){
-		LOG (logerror ("vme_16_r\n"));
-		return (uint16_t) 0;
-}
-
-WRITE16_MEMBER (mvme350_state::vme_a16_w){
-		LOG (logerror ("vme_a16_w\n"));
+WRITE16_MEMBER (vme_mvme350_card_device::write16){
+	LOG("%s()\n", FUNCNAME);
 }
 #endif
-
-/*
- * Machine configuration
- */
-static MACHINE_CONFIG_START (mvme350, mvme350_state)
-		/* basic machine hardware */
-		MCFG_CPU_ADD ("maincpu", M68010, XTAL_10MHz)
-		MCFG_CPU_PROGRAM_MAP (mvme350_mem)
-		/* PIT Parallel Interface and Timer device, assuming strapped for on board clock */
-	MCFG_DEVICE_ADD("pit", PIT68230, XTAL_16MHz / 2)
-
-MACHINE_CONFIG_END
-
-/* ROM definitions */
-ROM_START (mvme350)
-ROM_REGION (0x1000000, "maincpu", 0)
-
-ROM_LOAD16_BYTE ("mvme350U40v2.3.bin", 0x0000, 0x4000, CRC (bcef82ef) SHA1 (e6fdf26e4714cbaeb3e97d7b5acf02d64d8ad744))
-ROM_LOAD16_BYTE ("mvme350U47v2.3.bin", 0x0001, 0x4000, CRC (582ce095) SHA1 (d0929dbfeb0cfda63df6b5bc29ee27fbf665def7))
-
-/*
- * System ROM information
- *
- * The ROMs known commands from different sources:
- *
- *  It communicates with the master through data buffers in shared memory and VME bus interrupts
- * as desribed in
- * http://bitsavers.trailing-edge.com/pdf/motorola/_dataBooks/1987_Microcomputer_Systems_and_Components.pdf
- *
- * The board is pretty boring as stand alone, it initializes everything and then executes a STOP instruction
- * awaiting a CPU on the VME bus to request its services. However, it enables boot from tape devices, we just
- * need a MVME-131 and a dump of a VersaDOS or Motorola UNIX System V system tape and some work.
- */
-ROM_END
-
-/* Driver */
-/*    YEAR  NAME          PARENT  COMPAT   MACHINE         INPUT     CLASS          INIT COMPANY                  FULLNAME          FLAGS */
-COMP (1984, mvme350,      0,      0,       mvme350,        mvme350, driver_device, 0,   "Motorola",   "MVME-350", MACHINE_NO_SOUND_HW | MACHINE_TYPE_COMPUTER )

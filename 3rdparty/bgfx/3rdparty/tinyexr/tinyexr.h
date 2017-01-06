@@ -7076,6 +7076,7 @@ static const char *ReadString(std::string *s, const char *ptr) {
 static bool ReadAttribute(std::string *name, std::string *type,
                           std::vector<unsigned char> *data, size_t *marker_size,
                           const char *marker, size_t size) {
+  using namespace bx;
   size_t name_len = strnlen(marker, size);
   if (name_len == size) {
     // String does not have a terminating character.

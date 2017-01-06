@@ -137,7 +137,9 @@ public:
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
+	void set_mat(const nl_double a11, const nl_double a12,
+			     const nl_double a21, const nl_double a22,
+				 const nl_double r1, const nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, -r1);
@@ -171,17 +173,8 @@ public:
 	}
 
 protected:
-	NETLIB_RESETI()
-	{
-		NETLIB_NAME(twoterm)::reset();
-		set_R(1.0 / netlist().gmin());
-	}
-
-	NETLIB_UPDATEI()
-	{
-		NETLIB_NAME(twoterm)::update();
-	}
-
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
 
 };
 
@@ -198,15 +191,7 @@ protected:
 
 	//NETLIB_RESETI() { }
 	//NETLIB_UPDATEI() { }
-	NETLIB_UPDATE_PARAMI()
-	{
-		update_dev();
-		if (m_R() > 1e-9)
-			set_R(m_R());
-		else
-			set_R(1e-9);
-	}
-
+	NETLIB_UPDATE_PARAMI();
 };
 
 // -----------------------------------------------------------------------------
@@ -286,14 +271,8 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_TIMESTEP()
-	{
-		/* Gpar should support convergence */
-		const nl_double G = m_C() / step +  m_GParallel;
-		const nl_double I = -G * deltaV();
-		set(G, 0.0, I);
-	}
-
+	NETLIB_IS_TIMESTEP()
+	NETLIB_TIMESTEPI();
 
 	param_double_t m_C;
 
@@ -324,13 +303,8 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_TIMESTEP()
-	{
-		/* Gpar should support convergence */
-		m_I = m_I + m_G * deltaV();
-		m_G = step / m_L() + m_GParallel;
-		set(m_G, 0.0, m_I);
-	}
+	NETLIB_IS_TIMESTEP()
+	NETLIB_TIMESTEPI();
 
 	param_double_t m_L;
 
@@ -354,43 +328,7 @@ class generic_diode
 public:
 	generic_diode(device_t &dev, pstring name);
 
-	inline void update_diode(const nl_double nVd)
-	{
-#if 1
-		if (nVd < NL_FCONST(-5.0) * m_Vt)
-		{
-			m_Vd = nVd;
-			m_G = m_gmin;
-			m_Id = - m_Is;
-		}
-		else if (nVd < m_Vcrit)
-		{
-			m_Vd = nVd;
-			//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-		}
-		else
-		{
-#if 1
-			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(0.5) - NL_FCONST(1.0));
-			m_Vd = m_Vd + std::log1p(a) * m_Vt;
-#else
-			m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-#endif
-			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-
-			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-		}
-#else
-		m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-#endif
-	}
+	void update_diode(const nl_double nVd);
 
 	void set_param(const nl_double Is, const nl_double n, nl_double gmin);
 
@@ -430,7 +368,7 @@ public:
 		register_subalias("K", m_N);
 	}
 
-	NETLIB_DYNAMIC()
+	NETLIB_IS_DYNAMIC()
 
 	NETLIB_UPDATE_TERMINALSI();
 

@@ -361,7 +361,7 @@ void parser_t::device(const pstring &dev_type)
 
 	pstring devname = get_identifier();
 
-	m_setup.register_dev(dev_type, m_setup.build_fqn(devname));
+	m_setup.register_dev(dev_type, devname);
 	m_setup.log().debug("Parser: IC: {1}\n", devname);
 
 	for (pstring tp : paramlist)

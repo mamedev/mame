@@ -14,9 +14,18 @@
 #include "palloc.h"
 
 namespace plib {
+
+pstream::~pstream()
+{
+}
+
 // -----------------------------------------------------------------------------
 // pistream: input stream
 // -----------------------------------------------------------------------------
+
+pistream::~pistream()
+{
+}
 
 bool pistream::readline(pstring &line)
 {
@@ -43,6 +52,10 @@ bool pistream::readline(pstring &line)
 // -----------------------------------------------------------------------------
 // postream: output stream
 // -----------------------------------------------------------------------------
+
+postream::~postream()
+{
+}
 
 void postream::write(pistream &strm)
 {
@@ -142,6 +155,10 @@ pstdin::pstdin()
 	/* nothing to do */
 }
 
+pstdin::~pstdin()
+{
+}
+
 // -----------------------------------------------------------------------------
 // Output file stream
 // -----------------------------------------------------------------------------
@@ -209,6 +226,11 @@ pstream::pos_type pofilestream::vtell()
 		return static_cast<pos_type>(ret);
 }
 
+postringstream::~postringstream()
+{
+}
+
+
 // -----------------------------------------------------------------------------
 // pstderr: write to stderr
 // -----------------------------------------------------------------------------
@@ -218,12 +240,20 @@ pstderr::pstderr()
 {
 }
 
+pstderr::~pstderr()
+{
+}
+
 // -----------------------------------------------------------------------------
 // pstdout: write to stdout
 // -----------------------------------------------------------------------------
 
 pstdout::pstdout()
 : pofilestream(stdout, "<stdout>", false)
+{
+}
+
+pstdout::~pstdout()
 {
 }
 
@@ -271,6 +301,10 @@ void pimemstream::vseek(const pos_type n)
 pimemstream::pos_type pimemstream::vtell()
 {
 	return m_pos;
+}
+
+pistringstream::~pistringstream()
+{
 }
 
 // -----------------------------------------------------------------------------
@@ -332,5 +366,10 @@ pstream::pos_type pomemstream::vtell()
 {
 	return m_pos;
 }
+
+pstream_fmt_writer_t::~pstream_fmt_writer_t()
+{
+}
+
 
 }

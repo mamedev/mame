@@ -39,9 +39,9 @@ private:
 
 	// internal state
 	int m_bus;                      // shared RAM bus direction
-	uint16_t m_mcu_address;           // MCU side RAM address
-	uint16_t m_mcu_d;                 // MCU D output data
-	uint8_t m_mcu_r[4];               // MCU R0-R3 output data
+	uint16_t m_mcu_address;         // MCU side RAM address
+	uint16_t m_mcu_d;               // MCU D output data
+	uint8_t m_mcu_r[4];             // MCU R0-R3 output data
 	std::unique_ptr<uint8_t[]> m_shared_ram;            // 1KB RAM
 
 	void mcu_update_address();

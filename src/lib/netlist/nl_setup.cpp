@@ -112,7 +112,7 @@ void setup_t::register_dev(const pstring &classname, const pstring &name)
 	if (f == nullptr)
 		log().fatal("Class {1} not found!\n", classname);
 	/* make sure we parse macro library entries */
-	f->macro_actions(netlist(), build_fqn(name));
+	f->macro_actions(netlist(), name);
 	m_device_factory.push_back(std::pair<pstring, factory::element_t *>(build_fqn(name), f));
 }
 
@@ -864,15 +864,19 @@ class logic_family_std_proxy_t : public logic_family_desc_t
 public:
 	logic_family_std_proxy_t() { }
 	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-	}
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override
-	{
-		return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-	}
+			const pstring &name, logic_output_t *proxied) const override;
+	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
 };
+
+plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
+		const pstring &name, logic_output_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
+}
+plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
+{
+	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
+}
 
 const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
 {
@@ -1080,4 +1084,22 @@ std::unique_ptr<plib::pistream> source_file_t::stream(const pstring &name)
 	return plib::make_unique_base<plib::pistream, plib::pifilestream>(m_filename);
 }
 
+bool source_proc_t::parse(const pstring &name)
+{
+	if (name == m_setup_func_name)
+	{
+		m_setup_func(setup());
+		return true;
+	}
+	else
+		return false;
 }
+
+std::unique_ptr<plib::pistream> source_proc_t::stream(const pstring &name)
+{
+	std::unique_ptr<plib::pistream> p(nullptr);
+	return p;
+}
+
+}
+

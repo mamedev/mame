@@ -189,8 +189,6 @@ fb01.cpp
 fc100.cpp
 fccpu20.cpp
 fccpu30.cpp
-fcisio.cpp
-fcscsi.cpp
 fidel6502.cpp
 fidel68k.cpp
 fidelz80.cpp
@@ -373,7 +371,6 @@ mtx.cpp
 multi16.cpp
 multi8.cpp
 mvme147.cpp
-mvme350.cpp
 mx2178.cpp
 myb3k.cpp
 mycom.cpp

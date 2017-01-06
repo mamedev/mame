@@ -56,7 +56,7 @@ public:
 	emu_timer   *m_raster_interrupt_timer;
 
 	DECLARE_WRITE16_MEMBER(vregs_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(sound_rombank_w);
 	DECLARE_WRITE16_MEMBER(vram_0_w);
 	DECLARE_WRITE16_MEMBER(vram_1_w);

@@ -3,6 +3,9 @@
 /*
     Hitachi HD63450 DMA Controller
 */
+#ifndef HD63450_H
+#define HD63450_H
+#pragma once
 
 #include "emu.h"
 
@@ -153,3 +156,4 @@ private:
 };
 
 extern const device_type HD63450;
+#endif // HD63450_H
