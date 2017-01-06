@@ -119,24 +119,37 @@ NETLIB_UPDATE(R_base)
 NETLIB_UPDATE_PARAM(R)
 {
 	update_dev();
-	if (m_R() > 1e-9)
-		set_R(m_R());
-	else
-		set_R(1e-9);
+	set_R(std::max(m_R(), netlist().gmin()));
+}
+
+NETLIB_RESET(R)
+{
+	NETLIB_NAME(twoterm)::reset();
+	set_R(std::max(m_R(), netlist().gmin()));
 }
 
 // ----------------------------------------------------------------------------------------
 // nld_POT
 // ----------------------------------------------------------------------------------------
 
-NETLIB_UPDATE_PARAM(POT)
+NETLIB_RESET(POT)
 {
 	nl_double v = m_Dial();
 	if (m_DialIsLog())
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
+}
+
+NETLIB_UPDATE_PARAM(POT)
+{
 	m_R1.update_dev();
 	m_R2.update_dev();
+
+	nl_double v = m_Dial();
+	if (m_DialIsLog())
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 
 	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
 	m_R2.set_R(std::max(m_R() * (NL_FCONST(1.0) - v), netlist().gmin()));
@@ -147,7 +160,7 @@ NETLIB_UPDATE_PARAM(POT)
 // nld_POT2
 // ----------------------------------------------------------------------------------------
 
-NETLIB_UPDATE_PARAM(POT2)
+NETLIB_RESET(POT2)
 {
 	nl_double v = m_Dial();
 
@@ -155,9 +168,20 @@ NETLIB_UPDATE_PARAM(POT2)
 		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
 	if (m_Reverse())
 		v = 1.0 - v;
+	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
+}
 
+
+NETLIB_UPDATE_PARAM(POT2)
+{
 	m_R1.update_dev();
 
+	nl_double v = m_Dial();
+
+	if (m_DialIsLog())
+		v = (std::exp(v) - 1.0) / (std::exp(1.0) - 1.0);
+	if (m_Reverse())
+		v = 1.0 - v;
 	m_R1.set_R(std::max(m_R() * v, netlist().gmin()));
 }
 
@@ -221,6 +245,15 @@ NETLIB_TIMESTEP(L)
 // ----------------------------------------------------------------------------------------
 // nld_D
 // ----------------------------------------------------------------------------------------
+
+NETLIB_RESET(D)
+{
+	nl_double Is = m_model.model_value("IS");
+	nl_double n = m_model.model_value("N");
+
+	m_D.set_param(Is, n, netlist().gmin());
+	set(m_D.G(), 0.0, m_D.Ieq());
+}
 
 NETLIB_UPDATE_PARAM(D)
 {

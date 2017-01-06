@@ -87,6 +87,9 @@ NETLIB_UPDATE(solver)
 	if (m_params.m_dynamic)
 		return;
 
+	/* force solving during start up if there are no time-step devices */
+	/* FIXME: Needs a more elegant solution */
+	bool force_solve = (netlist().time() < netlist_time::from_double(2 * m_params.m_max_timestep));
 
 #if HAS_OPENMP && USE_OPENMP
 	const std::size_t t_cnt = m_mat_solvers.size();
@@ -114,7 +117,7 @@ NETLIB_UPDATE(solver)
 			}
 #else
 	for (auto & solver : m_mat_solvers)
-		if (solver->has_timestep_devices())
+		if (solver->has_timestep_devices() || force_solve)
 			// Ignore return value
 			ATTR_UNUSED const netlist_time ts = solver->solve();
 #endif

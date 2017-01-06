@@ -189,7 +189,7 @@ NETLIB_OBJECT_DERIVED(R, R_base)
 
 protected:
 
-	//NETLIB_RESETI() { }
+	NETLIB_RESETI();
 	//NETLIB_UPDATEI() { }
 	NETLIB_UPDATE_PARAMI();
 };
@@ -216,7 +216,7 @@ NETLIB_OBJECT(POT)
 	}
 
 	//NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -243,7 +243,7 @@ NETLIB_OBJECT(POT2)
 	}
 
 	//NETLIB_UPDATEI();
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATE_PARAMI();
 
 private:
@@ -375,7 +375,7 @@ public:
 	param_model_t m_model;
 
 protected:
-	//NETLIB_RESETI();
+	NETLIB_RESETI();
 	NETLIB_UPDATEI();
 	NETLIB_UPDATE_PARAMI();
 

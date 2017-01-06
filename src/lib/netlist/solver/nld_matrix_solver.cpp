@@ -449,7 +449,6 @@ const netlist_time matrix_solver_t::solve()
 	step(delta);
 	solve_base();
 	const netlist_time next_time_step = compute_next_timestep(delta.as_double());
-
 	update_inputs();
 
 	return next_time_step;
