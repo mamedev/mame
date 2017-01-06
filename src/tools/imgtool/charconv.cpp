@@ -37,6 +37,29 @@ void imgtool::charconverter::to_utf8(std::ostream &dest, const std::string &src)
 
 
 //-------------------------------------------------
+//  simple_charconverter::simple_charconverter
+//-------------------------------------------------
+
+imgtool::simple_charconverter::simple_charconverter(const char32_t lowpage[0x80], const char32_t highpage[0x80], unicode_normalization_form norm)
+	: m_norm(norm), m_lowpage(lowpage), m_highpage(highpage)
+{
+	// build the reverse lookup table
+	for (int i = 0; i < 256; i++)
+	{
+		const char32_t *page = i >= 128 ? m_highpage : m_lowpage;
+		char32_t unicode_char = page ? page[i % 128] : i;
+		m_reverse_lookup.emplace_back(unicode_char, (char)i);
+	}
+
+	// and sort it
+	std::sort(m_reverse_lookup.begin(), m_reverse_lookup.end(), [](const std::pair<char32_t, char> &a, const std::pair<char32_t, char> &b)
+	{
+		return b.first > a.first;
+	});
+}
+
+
+//-------------------------------------------------
 //  from_utf8
 //-------------------------------------------------
 
@@ -58,39 +81,16 @@ void imgtool::simple_charconverter::from_utf8(std::ostream &dest, const char *sr
 		}	
 		iter += rc;
 
-		// look in all pages
-		const char32_t *pages[2];
-		pages[0] = m_lowpage;
-		pages[1] = m_highpage;
-
-		bool found = false;
-		for (int i = 0; !found && i < ARRAY_LENGTH(pages); i++)
+		// do the reverse lookup
+		auto lookup = std::lower_bound(m_reverse_lookup.begin(), m_reverse_lookup.end(), ch, [](const std::pair<char32_t, char> &a, const char32_t &b)
 		{
-			if (pages[i] == nullptr)
-			{
-				// null page; perhaps we can just emit this
-				if (ch >= i * 0x80 && (ch < (i + 1) * 0x80))
-				{
-					dest << (char)ch;
-					found = true;
-				}
-			}
-			else
-			{
-				// non-null page; perform a lookup
-				// if we have a page, perform the lookup
-				const util::contiguous_sequence_wrapper<const char32_t> lookup(pages[i], 0x80);
-				auto lookup_iter = std::find(lookup.begin(), lookup.end(), ch);
-				if (lookup_iter != lookup.end())
-				{
-					// and emit the result
-					dest << (char)((i * 0x80) + (lookup_iter - lookup.begin()));
-					found = true;
-				}
-			}
-		}
-		if (!found)
+			return a.first < b;
+		});
+		if (lookup == m_reverse_lookup.end())
 			throw charconverter_exception();
+
+		// and output the results
+		dest << lookup->second;
 	}
 }
 

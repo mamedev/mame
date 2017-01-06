@@ -52,20 +52,18 @@ namespace imgtool
 	class simple_charconverter : public charconverter
 	{
 	public:
-		constexpr simple_charconverter(const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C)
-			: m_norm(norm), m_lowpage(nullptr), m_highpage(highpage)
+		simple_charconverter(const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C)
+			: simple_charconverter(nullptr, highpage, norm)
 		{
 		}
 
-		constexpr simple_charconverter(const char32_t lowpage[0x80], const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C)
-			: m_norm(norm), m_lowpage(lowpage), m_highpage(highpage)
-		{
-		}
+		simple_charconverter(const char32_t lowpage[0x80], const char32_t highpage[0x80], unicode_normalization_form norm = unicode_normalization_form::C);
 
 		virtual void from_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
 		virtual void to_utf8(std::ostream &dest, const char *src, size_t src_length) const override;
 
 	private:
+		std::vector<std::pair<char32_t, char> > m_reverse_lookup;
 		unicode_normalization_form m_norm;
 		const char32_t *m_lowpage;
 		const char32_t *m_highpage;
