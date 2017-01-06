@@ -20,7 +20,7 @@ special thanks to:
 - Camilty for precious hardware information and screenshots
 - Jason Richmond for hardware information and misc. notes
 - Joe Rounceville for schematics
-- JunoMan for measuring and tracing signals on a bootleg
+- JunoMan for measuring and tracing signals
 - and everyone else who's offered support along the way!
 
 
@@ -185,8 +185,6 @@ TODO:
 - Ports 60,61,80,81 not fully understood yet...
 - The four 8741 dumps come from an unprotected bootleg, we need dumps from
   original boards.
-- TCLK and comms MCU clocks were measured on a bootleg board, we should
-  confirm that it's the same on original boards.
 
 ***************************************************************************/
 
@@ -707,12 +705,12 @@ static MACHINE_CONFIG_START( ppking, ppking_state )
 	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
 	MCFG_CPU_IO_MAP(ppking_cpu1_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 	MCFG_CPU_IO_MAP(ppking_cpu2_io)
-	MCFG_CPU_VBLANK_INT_DRIVER("screen", gladiatr_state,  irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_DRIVER("screen", ppking_state,  irq0_line_hold)
 
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
