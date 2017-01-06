@@ -82,6 +82,8 @@ public:
 		, m_in1(*this, "IN1")
 		, m_in2(*this, "IN2")
 		, m_coins(*this, "COINS")
+		, m_coins_val(0x00)
+		, m_credits(0)
 		, m_tclk_val(false)
 		, m_in0_val(0xff)
 		, m_in1_val(0xff)
@@ -140,6 +142,8 @@ private:
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
 	required_ioport m_coins;
+
+	u8      m_coins_val, m_credits;
 
 	bool    m_tclk_val;
 	u8      m_in0_val, m_in1_val;

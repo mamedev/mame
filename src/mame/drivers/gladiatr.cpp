@@ -208,31 +208,45 @@ WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 }
 
 
-READ8_MEMBER(gladiatr_state::gladiator_dsw1_r )
+READ8_MEMBER(gladiatr_state::gladiator_dsw1_r)
 {
 	return BITSWAP8(~m_dsw1->read(), 0,1,2,3,4,5,6,7);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_dsw2_r )
+READ8_MEMBER(gladiatr_state::gladiator_dsw2_r)
 {
 	return BITSWAP8(~m_dsw2->read(), 2,3,4,5,6,7,1,0);
 }
 
-READ8_MEMBER(gladiatr_state::gladiator_controls_r )
+READ8_MEMBER(gladiatr_state::gladiator_controls_r)
 {
-	u8 const coins = (~m_coins->read() & 0x07) ? 0x80 : 0x00;
+	// hack to simulate the way the MCUs counts edges on coin inputs
+	u8 const coins = ~m_coins->read() & 0x07;
+	u8 const changed = (m_coins_val ^ coins) & coins;
+	m_credits += 2 * (BIT(changed, 0) + BIT(changed, 1) + BIT(changed, 2));
+	m_coins_val = coins;
 
+	u8 result = 0;
 	switch(offset)
 	{
-	case 0x01: // start button , coins
-		return ((~m_in0->read() >> 6) & 0x03) | coins;
-	case 0x02: // Player 1 Controller , coins
-		return (~m_in0->read() & 0x3f) | coins;
-	case 0x04: // Player 2 Controller , coins
-		return (~m_in1->read() & 0x3f) | coins;
+	case 0x01:  // start button, coins
+		result = (~m_in0->read() >> 6) & 0x03;
+		break;
+	case 0x02:  // Player 1 Controller , coins
+		result = ~m_in0->read() & 0x3f;
+		break;
+	case 0x04:  // Player 2 Controller , coins
+		result = ~m_in1->read() & 0x3f;
+		break;
+	default:    // unknown
+		return 0;
 	}
-	// unknown
-	return 0;
+	if (m_credits)
+	{
+		result |= 0x80;
+		--m_credits;
+	}
+	return result;
 }
 
 READ8_MEMBER(gladiatr_state::gladiator_button3_r)
@@ -705,9 +719,9 @@ static INPUT_PORTS_START( gladiatr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )                    PORT_COCKTAIL
 
 	PORT_START("COINS") // ccpu test, cctl test
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )      PORT_IMPULSE(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )      PORT_IMPULSE(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )   PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -1187,6 +1201,12 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 
 	/* make sure bank is valid in cpu-reset */
 	membank("bank2")->set_entry(0);
+
+	m_coins_val = 0x00;
+	m_credits = 0;
+
+	save_item(NAME(m_coins_val));
+	save_item(NAME(m_credits));
 
 	m_tclk_val = false;
 	m_in0_val = 0xff;
