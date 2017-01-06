@@ -247,8 +247,10 @@ READ32_MEMBER(interpro_state::idprom_r)
 
 	uint32_t speed = 70000000;
 
+	// idprom is copied to 0x2258 by boot rom
+
 	static uint8_t idprom[] = {
-#if 0
+#if 1
 		// module type id
 		'M', 'P', 'C', 'B',
 		'*', '*', '*', '*',
@@ -261,7 +263,7 @@ READ32_MEMBER(interpro_state::idprom_r)
 		// the feature bytes contain a 32 bit word which is divided by 40000
 		// if they're empty, a default value of 50 000 000 is used
 		// perhaps this is a system speed (50MHz)?
-		0x12, 0x34, 0x56, 0x78,
+		0x2, 0x34, 0x56, 0x78,
 		(speed >> 24) & 0xff, (speed >> 16) & 0xff, (speed >> 8) & 0xff, (speed >> 0) & 0xff,
 
 		// reserved bytes
@@ -271,14 +273,15 @@ READ32_MEMBER(interpro_state::idprom_r)
 		// boot rom tests for family == 0x41 or 0x42
 		// if so, speed read from feature bytes 2 & 3
 		// if not, read speed from feature bytes 4-7
-		0x00, 0x40,
+		//0x41, 0x00, // 2800-series CPU
+		0x24, 0x00, // 2000-series system board
 #else
 		// Carl Friend's 2020
 		0x00, 0x00, 0x00, 0x00, '9',  '6',  '2',  'A',  // board
 		0x00, 0xfe, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // eco
 		0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // feature
 		0xff, 0xff,										// reserved
-		0x24, 0x00,										// family
+		0x24, 0x00,										// family: 2000-series system board
 #endif
 		// footprint and checksum
 		0x55, 0xaa, 0x55, 0x00
@@ -396,12 +399,12 @@ static ADDRESS_MAP_START(ip2800_map, AS_PROGRAM, 32, interpro_state)
 	AM_RANGE(0x7f000300, 0x7f00030f) AM_READWRITE16(emerald_r, emerald_w, 0xffff)
 
 	AM_RANGE(0x7f000500, 0x7f0006ff) AM_READWRITE8(interpro_rtc_r, interpro_rtc_w, 0xff)
-	AM_RANGE(0x7F000700, 0x7F00077f) AM_READ(idprom_r)
+	AM_RANGE(0x7f000700, 0x7f00077f) AM_READ(idprom_r)
 
-	AM_RANGE(0x7F0FFF00, 0x7F0FFFFF) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map) 
+	AM_RANGE(0x7f0fff00, 0x7f0fffff) AM_DEVICE(INTERPRO_IOGA_TAG, interpro_ioga_device, map) 
 
-	AM_RANGE(0x7F100000, 0x7F11FFFF) AM_ROM AM_REGION(INTERPRO_ROM_TAG, 0)
-	AM_RANGE(0x7F180000, 0x7F1BFFFF) AM_ROM AM_REGION(INTERPRO_EEPROM_TAG, 0)
+	AM_RANGE(0x7f100000, 0x7f11ffff) AM_ROM AM_REGION(INTERPRO_ROM_TAG, 0)
+	AM_RANGE(0x7f180000, 0x7f1bffff) AM_ROM AM_REGION(INTERPRO_EEPROM_TAG, 0)
 
 	AM_RANGE(0x8f007f80, 0x8f007fff) AM_READ(slot0_r)
 
@@ -459,6 +462,7 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 	MCFG_DEVICE_ADD(INTERPRO_SCSI_TAG, NCR539X, 12500000)
 	MCFG_LEGACY_SCSI_PORT("scsiport")
 	MCFG_NCR539X_OUT_IRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, ir0_w))
+	//MCFG_NCR539X_OUT_DRQ_CB(DEVWRITELINE(INTERPRO_IOGA_TAG, interpro_ioga_device, drq))
 
 	MCFG_INTERPRO_IOGA_ADD(INTERPRO_IOGA_TAG)
 	MCFG_INTERPRO_IOGA_NMI_CB(INPUTLINE(INTERPRO_CPU_TAG, INPUT_LINE_NMI))
@@ -467,6 +471,7 @@ static MACHINE_CONFIG_START(ip2800, interpro_state)
 	//MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_CHANNEL_SCSI, DEVREAD8(INTERPRO_SCSI_TAG, ncr539x_device, dma_read_data), DEVWRITE8(INTERPRO_SCSI_TAG, ncr539x_device, dma_write_data))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_CHANNEL_FLOPPY, DEVREAD8(INTERPRO_FDC_TAG, n82077aa_device, mdma_r), DEVWRITE8(INTERPRO_FDC_TAG, n82077aa_device, mdma_w))
 	MCFG_INTERPRO_IOGA_DMA_CB(IOGA_DMA_CHANNEL_SERIAL, DEVREAD8(INTERPRO_SCC1_TAG, z80scc_device, da_r), DEVWRITE8(INTERPRO_SCC1_TAG, z80scc_device, da_w))
+	MCFG_INTERPRO_IOGA_FDCTC_CB(DEVWRITELINE(INTERPRO_FDC_TAG, n82077aa_device, tc_line_w))
 
 MACHINE_CONFIG_END
 

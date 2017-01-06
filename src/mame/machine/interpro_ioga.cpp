@@ -37,7 +37,8 @@ interpro_ioga_device::interpro_ioga_device(const machine_config &mconfig, const 
 	m_out_nmi_func(*this),
 	m_out_int_func(*this),
 	m_dma_r_func{ { *this }, { *this }, { *this }, { *this } },
-	m_dma_w_func{ { *this }, { *this }, { *this }, { *this } }
+	m_dma_w_func{ { *this }, { *this }, { *this }, { *this } },
+	m_fdc_tc_func(*this)
 	{
 }
 
@@ -52,6 +53,8 @@ void interpro_ioga_device::device_start()
 
 	for (auto & w : m_dma_w_func)
 		w.resolve();
+
+	m_fdc_tc_func.resolve();
 
 	m_cpu = machine().device<cpu_device>("cpu");
 
@@ -101,13 +104,14 @@ void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_i
 
 	case IOGA_TIMER_3:
 		// write the value without the top two bits to the register
-		m_timer_reg[timer] = value & IOGA_TIMER3_VMASK;
+		m_timer[timer]->enable(false);
+		m_timer_reg[timer] = value;
 
 		// start the timer if necessary
 		if (value & IOGA_TIMER3_START)
+		{
 			m_timer[timer]->adjust(attotime::zero, id, attotime::from_hz(IOGA_TIMER3_CLOCK));
-		else
-			m_timer[timer]->enable(false);
+		}
 		break;
 
 	default:
@@ -150,11 +154,14 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		break;
 
 	case IOGA_TIMER_3:
-		m_timer_reg[3]--;
-		if (m_timer_reg[3] == 0)
+		m_timer_reg[3] = m_timer_reg[3] & ~IOGA_TIMER3_VMASK | ((m_timer_reg[3] & IOGA_TIMER3_VMASK) - 1);
+		if ((m_timer_reg[3] & IOGA_TIMER3_VMASK) == 0)
 		{
 			// disable timer
 			timer.enable(false);
+
+			// clear start flag
+			m_timer_reg[3] &= ~IOGA_TIMER3_START;
 
 			// set expired flag
 			m_timer_reg[3] |= IOGA_TIMER3_EXPIRED;
@@ -169,14 +176,29 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		// TODO: vice-versa
 		// TODO: get the dma transfer address and count
 		// TODO: implement multiple dma channels
+
+		// TODO: must send "terminal count" (TC) signal to FDC to avoid end of cylinder errors :(
 	{
 		address_space &space = m_cpu->space(AS_PROGRAM);
 
-		space.write_byte(m_fdc_dma[0]++, m_dma_r_func[IOGA_DMA_CHANNEL_FLOPPY]());
-		if (--m_fdc_dma[2])
-			m_dma_timer->adjust(attotime::from_usec(10));
-		else
-			m_dma_timer->adjust(attotime::never);
+		// while the device has data and the DMA count is not empty
+		while (m_state_drq && m_fdc_dma[2])
+		{
+			// if this is the last byte, terminate the transfer
+			if (m_fdc_dma[2] == 1)
+				m_fdc_tc_func(ASSERT_LINE);
+
+			// read a byte from the device
+			uint8_t byte = m_dma_r_func[IOGA_DMA_CHANNEL_FLOPPY]();
+
+			// store it in memory
+			space.write_byte(m_fdc_dma[0], byte);
+
+			// increment address and decrement counter
+			m_fdc_dma[0]++;
+			m_fdc_dma[2]--;
+		}
+
 	}
 	break;
 	}
@@ -455,11 +477,13 @@ WRITE8_MEMBER(interpro_ioga_device::softint_w)
 ******************************************************************************/
 WRITE_LINE_MEMBER(interpro_ioga_device::drq)
 {
+	// this member is called when the device has data ready for reading via dma
+	m_state_drq = state;
+
 	if (state)
 	{
 		// TODO: check if dma is enabled
-		m_dma_timer->adjust(attotime::from_usec(10));
+		m_fdc_tc_func(CLEAR_LINE);
+		m_dma_timer->adjust(attotime::zero);
 	}
-
-	m_state_drq = state;
 }

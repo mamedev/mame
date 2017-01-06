@@ -21,6 +21,9 @@
 	devcb = &interpro_ioga_device::static_set_dma_r_callback(*device, _channel, DEVCB_##_dma_r); \
 	devcb = &interpro_ioga_device::static_set_dma_w_callback(*device, _channel, DEVCB_##_dma_w);
 
+#define MCFG_INTERPRO_IOGA_FDCTC_CB(_tc) \
+	devcb = &interpro_ioga_device::static_set_fdc_tc_callback(*device, DEVCB_##_tc);
+
 // timer 0 seem to be a 60Hz cycle
 #define IOGA_TIMER0_IRQ     14
 
@@ -62,6 +65,8 @@ public:
 
 	template<class _Object> static devcb_base &static_set_dma_r_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_r_func[channel].set_callback(object); }
 	template<class _Object> static devcb_base &static_set_dma_w_callback(device_t &device, int channel, _Object object) { return downcast<interpro_ioga_device &>(device).m_dma_w_func[channel].set_callback(object); }
+
+	template<class _Object> static devcb_base &static_set_fdc_tc_callback(device_t &device, _Object object) { return downcast<interpro_ioga_device &>(device).m_fdc_tc_func.set_callback(object); }
 
 	virtual DECLARE_ADDRESS_MAP(map, 8);
 
@@ -136,6 +141,8 @@ private:
 
 	devcb_read8 m_dma_r_func[IOGA_DMA_CHANNELS];
 	devcb_write8 m_dma_w_func[IOGA_DMA_CHANNELS];
+
+	devcb_write_line m_fdc_tc_func;
 
 	bool m_irq_active;
 	uint32_t m_irq_current;
