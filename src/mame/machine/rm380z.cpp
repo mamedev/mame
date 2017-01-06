@@ -308,3 +308,7 @@ void rm380z_state::config_memory_map()
 		program.install_ram( 0x4000, 0xDFFF, m_ram_p );
 	}
 }
+
+MACHINE_RESET_MEMBER( rm380z_state, rm480z )
+{
+}
