@@ -596,6 +596,7 @@ void floppy_image_device::index_resync()
 		if(idx && ready) {
 			ready_counter--;
 			if(!ready_counter) {
+				// logerror("Drive spun up\n");
 				ready = false;
 				if(!cur_ready_cb.isnull())
 					cur_ready_cb(this, ready);
@@ -627,6 +628,9 @@ bool floppy_image_device::twosid_r()
 
 void floppy_image_device::stp_w(int state)
 {
+	// Before spin-up is done, ignore step pulses
+	if (ready_counter > 0) return;
+
 	if ( stp != state ) {
 		stp = state;
 		if ( stp == 0 ) {
@@ -748,7 +752,8 @@ attotime floppy_image_device::get_next_index_time(std::vector<uint32_t> &buf, in
 
 attotime floppy_image_device::get_next_transition(const attotime &from_when)
 {
-	if(!image || mon)
+	// If the drive is still spinning up, pretend that no transitions will come
+	if(!image || mon || ready_counter > 0)
 		return attotime::never;
 
 	std::vector<uint32_t> &buf = image->get_buffer(cyl, ss, subcyl);

@@ -397,3 +397,14 @@ SLOT_INTERFACE_START( cbm_ieee488_devices )
 	SLOT_INTERFACE("shark", SHARK)
 	SLOT_INTERFACE("c4023", C4023)
 SLOT_INTERFACE_END
+
+//-------------------------------------------------
+//  SLOT_INTERFACE( hp_ieee488_devices )
+//-------------------------------------------------
+
+// slot devices
+#include "hp9895.h"
+
+SLOT_INTERFACE_START(hp_ieee488_devices)
+	SLOT_INTERFACE("hp9895", HP9895)
+SLOT_INTERFACE_END

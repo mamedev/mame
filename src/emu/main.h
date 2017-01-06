@@ -16,6 +16,7 @@
 #ifndef MAME_EMU_MAIN_H
 #define MAME_EMU_MAIN_H
 
+#include <thread>
 #include <time.h>
 
 //**************************************************************************
@@ -65,15 +66,24 @@ public:
 
 // ======================> machine_manager
 class ui_manager;
+namespace asio
+{
+	class io_context;
+}
+namespace webpp
+{
+	class http_server;
+	class ws_server;
+}
 
 class machine_manager
 {
 	DISABLE_COPYING(machine_manager);
 protected:
 	// construction/destruction
-	machine_manager(emu_options &options, osd_interface &osd) : m_osd(osd), m_options(options), m_machine(nullptr) { }
+	machine_manager(emu_options& options, osd_interface& osd);
 public:
-	virtual  ~machine_manager() { }
+	virtual ~machine_manager();
 
 	osd_interface &osd() const { return m_osd; }
 	emu_options &options() const { return m_options; }
@@ -87,10 +97,18 @@ public:
 	virtual void ui_initialize(running_machine& machine) { }
 
 	virtual void update_machine() { }
+
+	void start_http_server();
+	void start_context();
+	webpp::http_server* http_server() const { return m_server.get(); }
 protected:
 	osd_interface &         m_osd;                  // reference to OSD system
 	emu_options &           m_options;              // reference to options
 	running_machine *       m_machine;
+	std::shared_ptr<asio::io_context>   m_io_context;
+	std::unique_ptr<webpp::http_server> m_server;
+	std::unique_ptr<webpp::ws_server>   m_wsserver;
+	std::thread						    m_server_thread;
 };
 
 

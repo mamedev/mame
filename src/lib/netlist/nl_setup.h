@@ -373,22 +373,9 @@ namespace netlist
 		{
 		}
 
-		virtual bool parse(const pstring &name) override
-		{
-			if (name == m_setup_func_name)
-			{
-				m_setup_func(setup());
-				return true;
-			}
-			else
-				return false;
-		}
+		virtual bool parse(const pstring &name) override;
+		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override;
 
-		virtual std::unique_ptr<plib::pistream> stream(const pstring &name) override
-		{
-			std::unique_ptr<plib::pistream> p(nullptr);
-			return p;
-		}
 	private:
 		void (*m_setup_func)(setup_t &);
 		pstring m_setup_func_name;

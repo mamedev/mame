@@ -31,15 +31,9 @@ namespace netlist
 	{
 	public:
 		nld_base_proxy(netlist_t &anetlist, const pstring &name,
-				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout)
-				: device_t(anetlist, name)
-		{
-			m_logic_family = inout_proxied->logic_family();
-			m_term_proxied = inout_proxied;
-			m_proxy_term = proxy_inout;
-		}
+				logic_t *inout_proxied, detail::core_terminal_t *proxy_inout);
 
-		virtual ~nld_base_proxy() {}
+		virtual ~nld_base_proxy();
 
 		logic_t &term_proxied() const { return *m_term_proxied; }
 		detail::core_terminal_t &proxy_term() const { return *m_proxy_term; }
@@ -65,18 +59,14 @@ namespace netlist
 	{
 	public:
 
-		virtual ~nld_base_a_to_d_proxy() {}
+		virtual ~nld_base_a_to_d_proxy();
 
 		virtual logic_output_t &out() { return m_Q; }
 
 	protected:
 
 		nld_base_a_to_d_proxy(netlist_t &anetlist, const pstring &name,
-				logic_input_t *in_proxied, detail::core_terminal_t *in_proxy)
-				: nld_base_proxy(anetlist, name, in_proxied, in_proxy)
-		, m_Q(*this, "Q")
-		{
-		}
+				logic_input_t *in_proxied, detail::core_terminal_t *in_proxy);
 
 	private:
 
@@ -87,36 +77,17 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(a_to_d_proxy, base_a_to_d_proxy)
 	{
 	public:
-		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied)
-				: nld_base_a_to_d_proxy(anetlist, name, in_proxied, &m_I)
-		, m_I(*this, "I")
-		{
-		}
+		nld_a_to_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *in_proxied);
 
-		virtual ~nld_a_to_d_proxy() {}
+		virtual ~nld_a_to_d_proxy();
 
 		analog_input_t m_I;
 
 	protected:
 
-		NETLIB_RESETI() { }
+		NETLIB_RESETI();
+		NETLIB_UPDATEI();
 
-		NETLIB_UPDATEI()
-		{
-			nl_assert(m_logic_family != nullptr);
-			// FIXME: Variable supply voltage!
-			double supply_V = logic_family().fixed_V();
-			if (supply_V == 0.0) supply_V = 5.0;
-
-			if (m_I.Q_Analog() > logic_family().high_thresh_V(0.0, supply_V))
-				out().push(1, NLTIME_FROM_NS(1));
-			else if (m_I.Q_Analog() < logic_family().low_thresh_V(0.0, supply_V))
-				out().push(0, NLTIME_FROM_NS(1));
-			else
-			{
-				// do nothing
-			}
-		}
 	private:
 	};
 
@@ -127,17 +98,13 @@ namespace netlist
 	NETLIB_OBJECT_DERIVED(base_d_to_a_proxy, base_proxy)
 	{
 	public:
-		virtual ~nld_base_d_to_a_proxy() {}
+		virtual ~nld_base_d_to_a_proxy();
 
 		virtual logic_input_t &in() { return m_I; }
 
 	protected:
 		nld_base_d_to_a_proxy(netlist_t &anetlist, const pstring &name,
-				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out)
-		: nld_base_proxy(anetlist, name, out_proxied, &proxy_out)
-		, m_I(*this, "I")
-		{
-		}
+				logic_output_t *out_proxied, detail::core_terminal_t &proxy_out);
 
 		logic_input_t m_I;
 

@@ -12229,15 +12229,6 @@ fccpu30senr
 fccpu30senr501
 fccpu33
 
-//@source:fccpu40.cpp
-//fccpu40                         //
-
-@source:fcscsi.cpp
-fcscsi1                         //
-
-@source:fcisio.cpp
-fcisio1                         //
-
 @source:fcombat.cpp
 fcombat                         // (c) 1985 Jaleco
 
@@ -14271,12 +14262,13 @@ bcheetah                        // Bandai
 bigtrak                         // Milton Bradley
 bship                           // Milton Bradley
 bshipb                          // Milton Bradley
-copycat                         // Tiger Electronics
-copycatm2                       // Tiger Electronics
+cmsport                         // Conic
 cnfball                         // Conic
 cnfball2                        // Conic
 cnsector                        // Parker Bros
 comp4                           // Milton Bradley
+copycat                         // Tiger Electronics
+copycatm2                       // Tiger Electronics
 cqback                          // Coleco
 ditto                           // Tiger Electronics
 ebaskb2                         // Entex
@@ -27690,9 +27682,6 @@ mustachei                       // (c) 1987 IG SPA
 @source:mvme147.cpp
 mvme147                         // (c) 1989 Motorola
 
-@source:mvme350.cpp
-mvme350                         //
-
 @source:mw18w.cpp
 18w                             // 653 (c) 1979 Midway
 18w2                            // 653 (c) 1979 Midway
@@ -31709,6 +31698,7 @@ rm380z                          //
 rm380z34d                       //
 rm380z34e                       //
 rm480z                          //
+rm480za                         //
 
 @source:rmhaihai.cpp
 rmhaihai                        // (c) 1985 Alba

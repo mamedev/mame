@@ -48,7 +48,7 @@ public:
 	{
 	}
 
-	NETLIB_DYNAMIC()
+	NETLIB_IS_DYNAMIC()
 
 	//NETLIB_RESETI();
 	NETLIB_UPDATEI();

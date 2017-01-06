@@ -21,10 +21,11 @@
  *MP0057   TMS1000   1978, APH Student Speech+ (same ROM contents as TSI Speech+?)
  @MP0158   TMS1000   1979, Entex Soccer (6003)
  @MP0163   TMS1000   1979, A-One LSI Match Number/LJN Electronic Concentration
- *MP0168   TMS1000   1979, Conic Basketball/Tandy Sports Arena
+ @MP0168   TMS1000   1979, Conic Multisport/Tandy Sports Arena (model 60-2158)
  @MP0170   TMS1000   1979, Conic Football
  *MP0230   TMS1000   1980, Entex Blast It (6015)
  @MP0271   TMS1000   1982, Tandy Radio Shack Monkey See
+ *MP0907   TMS1000   1979, Conic/Cardinal Basketball
  @MP0914   TMS1000   1979, Entex Baseball 1
  @MP0915   TMS1000   1979, Bandai System Control Car: Cheetah/The Incredible Brain Buggy
  @MP0919   TMS1000   1979, Tiger Copy Cat (model 7-520)
@@ -139,6 +140,7 @@
 #include "bcheetah.lh"
 #include "bigtrak.lh"
 #include "bship.lh" // clickable
+#include "cmsport.lh"
 #include "cnfball.lh"
 #include "cnfball2.lh"
 #include "cnsector.lh" // clickable
@@ -1745,6 +1747,119 @@ static MACHINE_CONFIG_START( tc4, tc4_state )
 
 	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
 	MCFG_DEFAULT_LAYOUT(layout_tc4)
+
+	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+MACHINE_CONFIG_END
+
+
+
+
+
+/***************************************************************************
+
+  Conic Electronic Multisport
+  * TMS1000 MP0168 (die label same)
+  * PCB label: 101-027(1979), or 101-021 REV A(1980, with DS8871N)
+  * 2 7seg LEDs, 33 other LEDs, 1-bit sound
+
+  This handheld includes 3 games: Basketball, Ice Hockey, Soccer.
+  MAME external artwork is needed for the switchable overlays.
+
+  known releases:
+  - Hong Kong: Electronic Multisport
+  - Hong Kong: Basketball/Ice Hockey/Soccer (3 separate handhelds)
+  - USA(1): Electronic Multisport, distributed by Innocron
+  - USA(2): Sports Arena, distributed by Tandy (model 60-2158)
+
+***************************************************************************/
+
+class cmsport_state : public hh_tms1k_state
+{
+public:
+	cmsport_state(const machine_config &mconfig, device_type type, const char *tag)
+		: hh_tms1k_state(mconfig, type, tag)
+	{ }
+
+	void prepare_display();
+	DECLARE_WRITE16_MEMBER(write_r);
+	DECLARE_WRITE16_MEMBER(write_o);
+	DECLARE_READ8_MEMBER(read_k);
+};
+
+// handlers
+
+void cmsport_state::prepare_display()
+{
+	// R5,R6 are 7segs
+	set_display_segmask(0x60, 0x7f);
+	display_matrix(8, 9, m_o, m_r & ~0x80);
+}
+
+WRITE16_MEMBER(cmsport_state::write_r)
+{
+	// R7: speaker out
+	m_speaker->level_w(data >> 7 & 1);
+
+	// R0,R9,R10: input mux
+	m_inp_mux = (data & 1) | (data >> 8 & 6);
+
+	// R0-R6,R8: led select
+	m_r = data;
+	prepare_display();
+}
+
+WRITE16_MEMBER(cmsport_state::write_o)
+{
+	// O0-O7: led data
+	m_o = data;
+	prepare_display();
+}
+
+READ8_MEMBER(cmsport_state::read_k)
+{
+	// K: multiplexed inputs
+	return read_inputs(3);
+}
+
+
+// config
+
+static INPUT_PORTS_START( cmsport )
+	PORT_START("IN.0") // R0
+	PORT_CONFNAME( 0x05, 0x01, "Game Select" )
+	PORT_CONFSETTING(    0x01, "Basketball" )
+	PORT_CONFSETTING(    0x00, "Soccer" )
+	PORT_CONFSETTING(    0x04, "Ice Hockey" )
+	PORT_BIT( 0x0a, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN.1") // R9
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_16WAY
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_16WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_16WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_16WAY
+
+	PORT_START("IN.2") // R10
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Shoot")
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Score")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_CONFNAME( 0x08, 0x00, "Skill Level" )
+	PORT_CONFSETTING(    0x00, "1" ) // amateur
+	PORT_CONFSETTING(    0x08, "2" ) // professional
+INPUT_PORTS_END
+
+static MACHINE_CONFIG_START( cmsport, cmsport_state )
+
+	/* basic machine hardware */
+	MCFG_CPU_ADD("maincpu", TMS1000, 375000) // approximation - RC osc. R=47K, C=47pf
+	MCFG_TMS1XXX_READ_K_CB(READ8(cmsport_state, read_k))
+	MCFG_TMS1XXX_WRITE_R_CB(WRITE16(cmsport_state, write_r))
+	MCFG_TMS1XXX_WRITE_O_CB(WRITE16(cmsport_state, write_o))
+
+	MCFG_TIMER_DRIVER_ADD_PERIODIC("display_decay", hh_tms1k_state, display_decay_tick, attotime::from_msec(1))
+	MCFG_DEFAULT_LAYOUT(layout_cmsport)
 
 	/* sound hardware */
 	MCFG_SPEAKER_STANDARD_MONO("mono")
@@ -7479,6 +7594,17 @@ ROM_START( tc4 )
 ROM_END
 
 
+ROM_START( cmsport )
+	ROM_REGION( 0x0400, "maincpu", 0 )
+	ROM_LOAD( "mp0168.u1", 0x0000, 0x0400, CRC(0712a268) SHA1(bd4e23e5c17b28c52e7e769e44773cc9c8839bed) )
+
+	ROM_REGION( 867, "maincpu:mpla", 0 )
+	ROM_LOAD( "tms1000_common2_micro.pla", 0, 867, CRC(d33da3cf) SHA1(13c4ebbca227818db75e6db0d45b66ba5e207776) )
+	ROM_REGION( 365, "maincpu:opla", 0 )
+	ROM_LOAD( "tms1000_cmsport_output.pla", 0, 365, CRC(7defa140) SHA1(477e3cb55e79938d6acaa911e410f6dcb974c218) )
+ROM_END
+
+
 ROM_START( cnfball )
 	ROM_REGION( 0x0400, "maincpu", 0 )
 	ROM_LOAD( "mp0170", 0x0000, 0x0400, CRC(50e8a44f) SHA1(fea6ae03c4ef329d825f8688e6854df15023d47e) )
@@ -8019,6 +8145,7 @@ CONS( 1980, h2hbaseb,  0,        0, h2hbaseb,  h2hbaseb,  driver_device, 0, "Col
 CONS( 1981, h2hboxing, 0,        0, h2hboxing, h2hboxing, driver_device, 0, "Coleco", "Head to Head Boxing", MACHINE_SUPPORTS_SAVE )
 CONS( 1981, tc4,       0,        0, tc4,       tc4,       driver_device, 0, "Coleco", "Total Control 4", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 
+CONS( 1979, cmsport,   0,        0, cmsport,   cmsport,   driver_device, 0, "Conic", "Electronic Multisport", MACHINE_SUPPORTS_SAVE | MACHINE_REQUIRES_ARTWORK )
 CONS( 1979, cnfball,   0,        0, cnfball,   cnfball,   driver_device, 0, "Conic", "Electronic Football (Conic, TMS1000 version)", MACHINE_SUPPORTS_SAVE )
 CONS( 1979, cnfball2,  0,        0, cnfball2,  cnfball2,  driver_device, 0, "Conic", "Electronic Football II (Conic)", MACHINE_SUPPORTS_SAVE )
 

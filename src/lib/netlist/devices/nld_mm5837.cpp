@@ -19,15 +19,15 @@ namespace netlist
 	NETLIB_OBJECT(MM5837_dip)
 	{
 		NETLIB_CONSTRUCTOR(MM5837_dip)
-		, m_RV(*this, "RV")
+		, m_RV(*this, "_RV")
 		, m_VDD(*this, "1")
 		, m_VGG(*this, "2")
 		, m_VSS(*this, "4")
-		, m_V0(*this, "_Q")
+		, m_FREQ(*this, "FREQ", 24000)
 		/* clock */
-		, m_feedback(*this, "FB")
-		, m_Q(*this, "Q")
-		, m_inc(netlist_time::from_hz(56000))
+		, m_feedback(*this, "_FB")
+		, m_Q(*this, "_Q")
+		, m_inc(netlist_time::from_hz(24000))
 		, m_shift(*this, "m_shift", 0)
 		, m_is_timestep(false)
 		{
@@ -36,7 +36,7 @@ namespace netlist
 			/* output */
 			//register_term("_RV1", m_RV.m_P);
 			//register_term("_RV2", m_RV.m_N);
-			connect_late(m_RV.m_N, m_V0);
+			connect_late(m_RV.m_N, m_VDD);
 
 			/* device */
 			register_subalias("3", m_RV.m_P);
@@ -44,20 +44,19 @@ namespace netlist
 
 		NETLIB_RESETI();
 		NETLIB_UPDATEI();
+		NETLIB_UPDATE_PARAMI();
 
 	protected:
 		NETLIB_SUB(twoterm) m_RV;
 		analog_input_t m_VDD;
 		analog_input_t m_VGG;
 		analog_input_t m_VSS;
-
-		/* output stage */
-		analog_output_t m_V0; /* could be gnd as well */
+		param_double_t m_FREQ;
 
 		/* clock stage */
 		logic_input_t m_feedback;
 		logic_output_t m_Q;
-		const netlist_time m_inc;
+		netlist_time m_inc;
 
 		/* state */
 		state_var_u32 m_shift;
@@ -71,14 +70,24 @@ namespace netlist
 		//m_V0.initial(0.0);
 		//m_RV.do_reset();
 		m_RV.set(NL_FCONST(1.0) / R_LOW, 0.0, 0.0);
+		m_inc = netlist_time::from_double(1.0 / m_FREQ());
+		if (m_FREQ() < 24000 || m_FREQ() > 56000)
+			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
 
 		m_shift = 0x1ffff;
 		m_is_timestep = m_RV.m_P.net().solver()->is_timestep();
 	}
 
+	NETLIB_UPDATE_PARAM(MM5837_dip)
+	{
+		m_inc = netlist_time::from_double(1.0 / m_FREQ());
+		if (m_FREQ() < 24000 || m_FREQ() > 56000)
+			netlist().log().warning("MM5837: Frequency outside of specs.", m_FREQ());
+	}
+
 	NETLIB_UPDATE(MM5837_dip)
 	{
-		m_Q.push(!m_Q.net().new_Q(), m_inc);
+		m_Q.push(!m_feedback.Q(), m_inc);
 
 		/* shift register
 		 *

@@ -38,7 +38,6 @@
  *   Then reboot / reset the machine, and use cat to (attempt) to load a floppy contents.
  *
  *  TODO:
- *  - Make floppies to work;
  *  - RISC OS Alarm app crash the whole OS
  *  - RISC OS Draw app uses unimplemented copro instructions
  *
@@ -125,9 +124,7 @@ protected:
 WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_intrq_w)
 {
 	if (state)
-	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY);
-	}
 	else
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY);
 }
@@ -135,9 +132,7 @@ WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_intrq_w)
 WRITE_LINE_MEMBER(aa310_state::aa310_wd177x_drq_w)
 {
 	if (state)
-	{
 		archimedes_request_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
-	}
 	else
 		archimedes_clear_fiq(ARCHIMEDES_FIQ_FLOPPY_DRQ);
 }
@@ -352,12 +347,6 @@ static INPUT_PORTS_START( aa310 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP) PORT_4WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN) PORT_4WAY
-
-	PORT_START("tape")/* tape control */
-	PORT_BIT(0x01, 0x00, IPT_KEYBOARD) PORT_NAME("TAPE STOP") PORT_CODE(KEYCODE_F5)
-	PORT_BIT(0x02, 0x00, IPT_KEYBOARD) PORT_NAME("TAPE PLAY") PORT_CODE(KEYCODE_F6)
-	PORT_BIT(0x04, 0x00, IPT_KEYBOARD) PORT_NAME("TAPE REW") PORT_CODE(KEYCODE_F7)
-	PORT_BIT (0xf8, 0x80, IPT_UNUSED)
 INPUT_PORTS_END
 
 FLOPPY_FORMATS_MEMBER( aa310_state::floppy_formats )
@@ -415,7 +404,7 @@ static MACHINE_CONFIG_START( aa310, aa310_state )
 	MCFG_WD_FDC_DRQ_CALLBACK(WRITELINE(aa310_state, aa310_wd177x_drq_w))
 	MCFG_FLOPPY_DRIVE_ADD("fdc:0", aa310_floppies, "35dd", aa310_state::floppy_formats)
 	MCFG_FLOPPY_DRIVE_SOUND(true)
-	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, "35dd", aa310_state::floppy_formats)
+	MCFG_FLOPPY_DRIVE_ADD("fdc:1", aa310_floppies, nullptr, aa310_state::floppy_formats) // rarely had 2nd FDD installed, space was used for HDD
 	MCFG_FLOPPY_DRIVE_SOUND(true)
 
 	MCFG_SOFTWARE_LIST_ADD("flop_list", "archimedes")
@@ -521,6 +510,10 @@ static MACHINE_CONFIG_DERIVED( aa4, aa5000 )
 	MCFG_CPU_MODIFY("maincpu") // ARM3
 	MCFG_CPU_CLOCK(XTAL_24MHz)
 
+	/* video hardware */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_TYPE(LCD)
+
 	/* 765 FDC */
 
 	/* 60MB HDD */
@@ -586,6 +579,11 @@ ROM_START( aa305 )
 	ROMX_LOAD( "0296,044-02.ic27", 0x180000, 0x80000, CRC(707b0c6c) SHA1(345199a33fed23996374b9db8170a52ab63f0380), ROM_BIOS(7) )
 	ROM_SYSTEM_BIOS( 7, "319", "RISC OS 3.19 (09 Jun 1993)" ) /* Parts 0296,241-01, 0296,242-01, 0296,243-01, 0296,244-01, */
 	ROMX_LOAD( "riscos319.bin", 0x000000, 0x200000, CRC(00c7a3d3) SHA1(be7a8cba5d6c6c0e1c4838712524056cf4b8c8cb), ROM_BIOS(8) )
+	ROM_SYSTEM_BIOS( 8, "test", "Diagnostic Test ROMs" ) /* Usage described in Archimedes 300 Series Service Manual */
+	ROMX_LOAD( "0276,146-01.ic24", 0x000000, 0x10000, CRC(9c45283c) SHA1(9eb5bd7ad0958f194a3416d79d7e01e4c45741e1), ROM_BIOS(9) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,147-01.ic25", 0x000001, 0x10000, CRC(ad94e17f) SHA1(1c8e39c69d4ae1b674e0f732aaa62a4403998f41), ROM_BIOS(9) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,148-01.ic26", 0x000002, 0x10000, CRC(1ab02f2d) SHA1(dd7d216967524e64d1a03076a6081461ec8528c3), ROM_BIOS(9) | ROM_SKIP(3) )
+	ROMX_LOAD( "0276,149-01.ic27", 0x000003, 0x10000, CRC(5fd6a406) SHA1(790af8a4c74d0f6714d528f7502443ce5898a618), ROM_BIOS(9) | ROM_SKIP(3) )
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
 	ROM_REGION( 0x400000, "extension", ROMREGION_ERASE00 )
@@ -710,7 +708,7 @@ ROM_END
 COMP( 1987, aa305,   aa310,  0,      aa305,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 305",    MACHINE_NOT_WORKING)
 COMP( 1987, aa310,   0,      0,      aa310,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 310",    MACHINE_NOT_WORKING)
 COMP( 1987, aa440,   aa310,  0,      aa440,   aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440",    MACHINE_NOT_WORKING)
-COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 3000",   MACHINE_NOT_WORKING)
+COMP( 1989, aa3000,  aa310,  0,      aa3000,  aa310,  aa310_state, aa310,  "Acorn", "BBC A3000",         MACHINE_NOT_WORKING)
 COMP( 1989, aa4101,  aa310,  0,      aa4101,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 410/1",  MACHINE_NOT_WORKING)
 COMP( 1989, aa4201,  aa310,  0,      aa4201,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 420/1",  MACHINE_NOT_WORKING)
 COMP( 1989, aa4401,  aa310,  0,      aa4401,  aa310,  aa310_state, aa310,  "Acorn", "Archimedes 440/1",  MACHINE_NOT_WORKING)

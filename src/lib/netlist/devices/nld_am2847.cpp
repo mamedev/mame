@@ -27,7 +27,7 @@ namespace netlist
 		logic_input_t m_RC;
 		logic_input_t m_IN;
 
-		state_var<uint_fast16_t[5]> m_buffer;
+		state_var<uint16_t[5]> m_buffer;
 
 		logic_output_t m_OUT;
 	};
@@ -66,7 +66,7 @@ namespace netlist
 		NETLIB_SUB(Am2847_shifter) m_D;
 		logic_input_t m_CP;
 
-		state_var<uint_fast32_t> m_last_CP;
+		state_var<uint32_t> m_last_CP;
 	};
 
 	NETLIB_OBJECT_DERIVED(AM2847_dip, AM2847)
@@ -111,10 +111,10 @@ namespace netlist
 	inline NETLIB_FUNC_VOID(Am2847_shifter, shift, (void))
 	{
 		unsigned out = m_buffer[0] & 1;
-		uint_fast32_t in = (m_RC() ? out : m_IN());
+		uint32_t in = (m_RC() ? out : m_IN());
 		for (std::size_t i=0; i < 5; i++)
 		{
-			uint_fast16_t shift_in = (i == 4) ? in : m_buffer[i + 1];
+			uint16_t shift_in = (i == 4) ? in : m_buffer[i + 1];
 			m_buffer[i] >>= 1;
 			m_buffer[i] |= shift_in << 15;
 		}

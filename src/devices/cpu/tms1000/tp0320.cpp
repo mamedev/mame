@@ -74,7 +74,7 @@ uint32_t tp0320_cpu_device::decode_micro(uint8_t sel)
 	uint32_t mask = m_mpla->read(sel);
 	mask ^= 0x0bff0; // invert active-negative
 
-	//                                                    _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
+	//                                                      _____  _______  ______  _____  _____  ______  _____  _____  ______  _____         _____
 	const uint32_t md[22] = { M_AUTA, M_AUTY, M_SSS, M_STO, M_YTP, M_NDMTP, M_DMTP, M_MTP, M_CKP, M_15TN, M_CKN, M_MTN, M_NATN, M_ATN, M_CME, M_CIN, M_SSE, M_CKM, M_NE, M_C8, M_SETR, M_RSTR };
 
 	for (int bit = 0; bit < 22 && bit < m_mpla->outputs(); bit++)

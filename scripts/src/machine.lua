@@ -1930,6 +1930,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/phi.h,MACHINES["PHI"] = true
+---------------------------------------------------
+
+if (MACHINES["PHI"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/phi.cpp",
+		MAME_DIR .. "src/devices/machine/phi.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/pic8259.h,MACHINES["PIC8259"] = true
 ---------------------------------------------------
 

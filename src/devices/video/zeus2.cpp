@@ -1726,9 +1726,8 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	// 0x014d == atlantis initial screen and scoreboard background
 	//if (texmode != 0x014D) return;
 	// Just a guess but seems to work
-	//extra.texwidth = 2 << ((texmode >> 2) & 7);
 	extra.texwidth = 0x20 << ((texmode >> 2) & 3);
-	//extra.texwidth = 0x2 << ((texmode >> 2) & 0xf);
+	//if (texmode & 0x80) extra.texwidth <<= 1;
 	//if (m_state->m_palSize == 16) extra.texwidth *= 2;
 	//switch (texmode)
 	//{
@@ -1792,7 +1791,19 @@ void zeus2_renderer::zeus2_draw_quad(const uint32_t *databuffer, uint32_t texdat
 	//extra.depth_test_enable = !(m_state->m_renderRegs[0x40] & 0x000002);
 	//extra.depth_test_enable = true; // (texmode & 0x0010);
 	extra.depth_write_enable = true;
-	extra.get_texel = ((texmode & 0x3) == 0) ? m_state->get_texel_4bit : m_state->get_texel_8bit;
+	switch (texmode & 0x3) {
+	case 0:
+		extra.get_texel = m_state->get_texel_alt_4bit;
+		break;
+	case 1:
+		extra.get_texel = m_state->get_texel_8bit;
+		break;
+	default:
+		extra.get_texel = m_state->get_texel_alt_8bit;
+		break;
+	}
+	//extra.get_texel = ((texmode & 0x1) == 0) ? m_state->get_texel_alt_4bit : m_state->get_texel_8bit;
+	//extra.get_texel = m_state->get_texel_alt_4bit;
 	// Note: Before being converted to the "poly.h" interface, this used to call the polylgcy function
 	//       poly_render_quad_fan.  The behavior seems to be the same as it once was after a few short
 	//       tests, but the (numverts == 5) statement below may actually be a quad fan instead of a 5-sided

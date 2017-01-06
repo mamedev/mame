@@ -73,7 +73,7 @@ namespace netlist
 	// FIXME: Timing
 	NETLIB_UPDATE(7485)
 	{
-		for (std::int_fast32_t i = 3; i >= 0; i--)
+		for (std::size_t i = 4; i-- > 0; )
 		{
 			if (m_A[i]() > m_B[i]())
 			{

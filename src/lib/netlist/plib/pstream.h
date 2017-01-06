@@ -13,6 +13,7 @@
 #include "pconfig.h"
 #include "pstring.h"
 #include "pfmtlog.h"
+#include "pexception.h"
 
 namespace plib {
 // -----------------------------------------------------------------------------
@@ -31,9 +32,7 @@ public:
 	explicit pstream(const unsigned flags) : m_flags(flags)
 	{
 	}
-	virtual ~pstream()
-	{
-	}
+	virtual ~pstream();
 
 	bool seekable() const { return ((m_flags & FLAG_SEEKABLE) != 0); }
 
@@ -78,7 +77,7 @@ class pistream : public pstream
 public:
 
 	explicit pistream(const unsigned flags) : pstream(flags) {}
-	virtual ~pistream() {}
+	virtual ~pistream();
 
 	bool eof() const { return ((flags() & FLAG_EOF) != 0); }
 
@@ -114,7 +113,7 @@ class postream : public pstream
 public:
 
 	explicit postream(unsigned flags) : pstream(flags) {}
-	virtual ~postream() {}
+	virtual ~postream();
 
 	/* this digests linux & dos/windows text files */
 
@@ -183,7 +182,7 @@ class postringstream : public postream
 public:
 
 	postringstream() : postream(0) { }
-	virtual ~postringstream() { }
+	virtual ~postringstream();
 
 	const pstringbuffer &str() { return m_buf; }
 
@@ -237,6 +236,7 @@ class pstderr : public pofilestream
 	P_PREVENT_COPYING(pstderr)
 public:
 	pstderr();
+	virtual ~pstderr();
 };
 
 // -----------------------------------------------------------------------------
@@ -248,6 +248,7 @@ class pstdout : public pofilestream
 	P_PREVENT_COPYING(pstdout)
 public:
 	pstdout();
+	virtual ~pstdout();
 };
 
 // -----------------------------------------------------------------------------
@@ -289,6 +290,7 @@ class pstdin : public pifilestream
 public:
 
 	pstdin();
+	virtual ~pstdin();
 };
 
 // -----------------------------------------------------------------------------
@@ -324,8 +326,8 @@ class pistringstream : public pimemstream
 {
 	P_PREVENT_COPYING(pistringstream)
 public:
-
 	pistringstream(const pstring &str) : pimemstream(str.c_str(), str.len()), m_str(str) { }
+	virtual ~pistringstream();
 
 private:
 	/* only needed for a reference till destruction */
@@ -342,7 +344,7 @@ class pstream_fmt_writer_t : public plib::pfmt_writer_t<>
 public:
 
 	explicit pstream_fmt_writer_t(postream &strm) : m_strm(strm) {}
-	virtual ~pstream_fmt_writer_t() { }
+	virtual ~pstream_fmt_writer_t();
 
 protected:
 	virtual void vdowrite(const pstring &ls) const override
