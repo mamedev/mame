@@ -95,7 +95,10 @@ VS_OUTPUT vs_main(VS_INPUT Input)
 
 uniform float3 Phosphor = float3(0.0f, 0.0f, 0.0f);
 uniform float DeltaTime = 0.0f;
-static const float F = 30.0f;
+uniform float3 TimeConstant = { 0.0f, 0.0f, 0.0f };
+uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
+static const float TAU_FACTOR = 0.4342944819f;
+static const float GAMMA_INV_FACTOR = 1.0f / 900.0f;
 
 float4 ps_main(PS_INPUT Input) : COLOR
 {
