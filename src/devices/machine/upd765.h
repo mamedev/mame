@@ -130,6 +130,8 @@ public:
 	void tc_w(bool val) override;
 	void ready_w(bool val);
 
+	DECLARE_WRITE_LINE_MEMBER(tc_line_w) { tc_w(state == ASSERT_LINE); } 
+
 	void set_rate(int rate); // rate in bps, to be used when the fdc is externally frequency-controlled
 
 	void set_mode(int mode);
