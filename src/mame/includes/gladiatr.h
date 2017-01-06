@@ -82,8 +82,6 @@ public:
 		, m_in1(*this, "IN1")
 		, m_in2(*this, "IN2")
 		, m_coins(*this, "COINS")
-		, m_coins_val(0x00)
-		, m_credits(0)
 		, m_tclk_val(false)
 		, m_in0_val(0xff)
 		, m_in1_val(0xff)
@@ -97,13 +95,9 @@ public:
 	{
 	}
 
-	// gladiator specific
-	DECLARE_READ8_MEMBER(gladiator_dsw1_r);
-	DECLARE_READ8_MEMBER(gladiator_dsw2_r);
-	DECLARE_READ8_MEMBER(gladiator_controls_r);
-	DECLARE_READ8_MEMBER(gladiator_button3_r);
 	DECLARE_WRITE8_MEMBER(gladiatr_spritebank_w);
 	DECLARE_WRITE8_MEMBER(gladiatr_video_registers_w);
+
 	DECLARE_WRITE8_MEMBER(gladiatr_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(gladiator_cpu_sound_command_w);
 	DECLARE_READ8_MEMBER(gladiator_cpu_sound_command_r);
@@ -113,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(gladiator_adpcm_w);
 	DECLARE_WRITE_LINE_MEMBER(gladiator_ym_irq);
 
-	// greatgur MCU hookup
 	DECLARE_WRITE_LINE_MEMBER(tclk_w);
 	DECLARE_READ8_MEMBER(cctl_t_r);
 	DECLARE_READ8_MEMBER(cctl_p1_r);
@@ -142,8 +135,6 @@ private:
 	required_ioport m_dsw1, m_dsw2;
 	required_ioport m_in0, m_in1, m_in2;
 	required_ioport m_coins;
-
-	u8      m_coins_val, m_credits;
 
 	bool    m_tclk_val;
 	u8      m_in0_val, m_in1_val;

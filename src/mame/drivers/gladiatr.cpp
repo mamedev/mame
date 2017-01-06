@@ -165,8 +165,11 @@ Notes:
 - The fg tilemap is a 1bpp layer which selects the second palette bank when
   active, so it could be used for some cool effects. Gladiator just sets the
   whole palette to white so we can just treat it as a monochromatic layer.
-- tilemap Y scroll is not implemented because the game doesn't use it so I can't
-  verify it's right.
+- Tilemap Y scroll is not implemented because the game doesn't use it so I
+  can't verify it's right.
+- gladiatr and clones start with one credit due to the way MAME initialises
+  memory and the dodgy code the bootleg MCUs use to synchronise with the host
+  CPUs.  On an F3 reset they randomly start with one credit or no credits.
 
 TODO:
 -----
@@ -180,8 +183,10 @@ TODO:
 - YM2203 some sound effects just don't sound correct
 - Audio Filter Switch not hooked up (might solve YM2203 mixing issue)
 - Ports 60,61,80,81 not fully understood yet...
-- The four 8741 ROMs are available but not used.
-
+- The four 8741 dumps come from an unprotected bootleg, we need dumps from
+  original boards.
+- TCLK and comms MCU clocks were measured on a bootleg board, we should
+  confirm that it's the same on original boards.
 
 ***************************************************************************/
 
@@ -195,78 +200,21 @@ TODO:
 #include "machine/clock.h"
 #include "machine/nvram.h"
 
-#include "machine/tait8741.h"
-
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
 
-/*Rom bankswitching*/
 WRITE8_MEMBER(gladiatr_state::gladiatr_bankswitch_w)
 {
+	// ROM bankswitching
 	membank("bank1")->set_entry(data & 0x01);
-}
-
-
-READ8_MEMBER(gladiatr_state::gladiator_dsw1_r)
-{
-	return BITSWAP8(~m_dsw1->read(), 0,1,2,3,4,5,6,7);
-}
-
-READ8_MEMBER(gladiatr_state::gladiator_dsw2_r)
-{
-	return BITSWAP8(~m_dsw2->read(), 2,3,4,5,6,7,1,0);
-}
-
-READ8_MEMBER(gladiatr_state::gladiator_controls_r)
-{
-	// hack to simulate the way the MCUs counts edges on coin inputs
-	u8 const coins = ~m_coins->read() & 0x07;
-	u8 const changed = (m_coins_val ^ coins) & coins;
-	m_credits += 2 * (BIT(changed, 0) + BIT(changed, 1) + BIT(changed, 2));
-	m_coins_val = coins;
-
-	u8 result = 0;
-	switch(offset)
-	{
-	case 0x01:  // start button, coins
-		result = (~m_in0->read() >> 6) & 0x03;
-		break;
-	case 0x02:  // Player 1 Controller , coins
-		result = ~m_in0->read() & 0x3f;
-		break;
-	case 0x04:  // Player 2 Controller , coins
-		result = ~m_in1->read() & 0x3f;
-		break;
-	default:    // unknown
-		return 0;
-	}
-	if (m_credits)
-	{
-		result |= 0x80;
-		--m_credits;
-	}
-	return result;
-}
-
-READ8_MEMBER(gladiatr_state::gladiator_button3_r)
-{
-	switch(offset)
-	{
-	case 0x01: /* button 3 */
-		return (~m_in2->read() >> 6) & 0x03;
-	}
-	/* unknown */
-	return 0;
 }
 
 MACHINE_RESET_MEMBER(gladiatr_state,gladiator)
 {
-	/* 6809 bank memory set */
-	{
-		membank("bank2")->set_entry(0);
-		m_audiocpu->reset();
-	}
+	// 6809 bank memory set
+	membank("bank2")->set_entry(0);
+	m_audiocpu->reset();
 }
 
 /* YM2203 port B handler (output) */
@@ -286,12 +234,12 @@ WRITE_LINE_MEMBER(gladiatr_state::gladiator_ym_irq)
 /*Sound Functions*/
 WRITE8_MEMBER(gladiatr_state::gladiator_adpcm_w)
 {
-	/* bit6 = bank offset */
+	// bit 6 = bank offset
 	membank("bank2")->set_entry((data & 0x40) ? 1 : 0);
 
-	m_msm->data_w(data);         /* bit0..3  */
-	m_msm->reset_w(BIT(data, 5)); /* bit 5    */
-	m_msm->vclk_w (BIT(data, 4)); /* bit4     */
+	m_msm->data_w(data);            // bit 0..3
+	m_msm->reset_w(BIT(data, 5));   // bit 5
+	m_msm->vclk_w (BIT(data, 4));   // bit 4
 }
 
 WRITE8_MEMBER(gladiatr_state::gladiator_cpu_sound_command_w)
@@ -564,33 +512,11 @@ static ADDRESS_MAP_START( gladiatr_cpu1_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
 	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
 	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
-	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_0, write_0)
-	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
-	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_1, write_1)
-	AM_RANGE(0x40, 0x40) AM_NOP // WRITE(sub_irq_ack_w)
-	AM_RANGE(0x60, 0x61) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_2, write_2)
-	AM_RANGE(0x80, 0x81) AM_DEVREADWRITE("taito8741", taito8741_4pack_device, read_3, write_3)
-	AM_RANGE(0xa0, 0xa7) AM_NOP // filters on sound output
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( greatgur_cpu1_io, AS_IO, 8, gladiatr_state )
-//  ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(spritebuffer_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(gladiatr_spritebank_w)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(gladiatr_bankswitch_w)
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(gladiatr_irq_patch_w) /* !!! patch to 2nd CPU IRQ !!! */
-	AM_RANGE(0xc007, 0xc007) AM_WRITE(gladiatr_flipscreen_w)
 	AM_RANGE(0xc09e, 0xc09f) AM_DEVREADWRITE("ucpu", upi41_cpu_device, upi41_master_r, upi41_master_w)
 	AM_RANGE(0xc0bf, 0xc0bf) AM_NOP // watchdog_reset_w doesn't work
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( greatgur_cpu2_io, AS_IO, 8, gladiatr_state )
+static ADDRESS_MAP_START( gladiatr_cpu2_io, AS_IO, 8, gladiatr_state )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_DEVREADWRITE("ymsnd", ym2203_device, read, write)
 	AM_RANGE(0x20, 0x21) AM_DEVREADWRITE("csnd", upi41_cpu_device, upi41_master_r, upi41_master_w)
@@ -600,7 +526,6 @@ static ADDRESS_MAP_START( greatgur_cpu2_io, AS_IO, 8, gladiatr_state )
 	AM_RANGE(0xa0, 0xa7) AM_NOP // filters on sound output
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(gladiator_cpu_sound_command_w)
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START( cctl_io_map, AS_IO, 8, gladiatr_state )
@@ -844,15 +769,26 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
 	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	MCFG_QUANTUM_TIME(attotime::from_hz(600))
-
 	MCFG_MACHINE_RESET_OVERRIDE(gladiatr_state,gladiator)
 	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MCFG_TAITO8741_ADD("taito8741")
-	MCFG_TAITO8741_MODES(TAITO8741_MASTER,TAITO8741_SLAVE,TAITO8741_PORT,TAITO8741_PORT)
-	MCFG_TAITO8741_CONNECT(1,0,0,0)
-	MCFG_TAITO8741_PORT_HANDLERS(READ8(gladiatr_state,gladiator_dsw1_r),READ8(gladiatr_state,gladiator_dsw2_r),READ8(gladiatr_state,gladiator_button3_r),READ8(gladiatr_state,gladiator_controls_r))
+	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_IO_MAP(cctl_io_map)
+
+	MCFG_DEVICE_ADD("ccpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_IO_MAP(ccpu_io_map)
+
+	MCFG_DEVICE_ADD("ucpu", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_IO_MAP(ucpu_io_map)
+
+	MCFG_DEVICE_ADD("csnd", I8741, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_IO_MAP(csnd_io_map)
+
+	/* lazy way to make polled serial between MCUs work */
+	MCFG_QUANTUM_PERFECT_CPU("ucpu")
+
+	MCFG_CLOCK_ADD("tclk", XTAL_12MHz/8/128/2) /* verified on pcb */
+	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -885,36 +821,6 @@ static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MCFG_MSM5205_PRESCALER_SELECTOR(MSM5205_SEX_4B)  /* vclk input mode    */
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_CONFIG_END
-
-MACHINE_CONFIG_DERIVED( greatgur, gladiatr )
-
-	/* basic machine hardware */
-	MCFG_CPU_MODIFY("maincpu")
-	MCFG_CPU_IO_MAP(greatgur_cpu1_io)
-
-	MCFG_CPU_MODIFY("sub")
-	MCFG_CPU_IO_MAP(greatgur_cpu2_io)
-
-	MCFG_DEVICE_ADD("cctl", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(cctl_io_map)
-
-	MCFG_DEVICE_ADD("ccpu", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(ccpu_io_map)
-
-	MCFG_DEVICE_ADD("ucpu", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(ucpu_io_map)
-
-	MCFG_DEVICE_ADD("csnd", I8741, XTAL_12MHz/2) /* verified on pcb */
-	MCFG_CPU_IO_MAP(csnd_io_map)
-
-	MCFG_CLOCK_ADD("tclk", XTAL_12MHz/8/128/2) /* verified on pcb */
-	MCFG_CLOCK_SIGNAL_HANDLER(WRITELINE(gladiatr_state, tclk_w));
-
-	/* lazy way to make polled serial between MCUs work */
-	MCFG_QUANTUM_PERFECT_CPU("ucpu")
-
-	MCFG_DEVICE_REMOVE("taito8741")
 MACHINE_CONFIG_END
 
 
@@ -1005,6 +911,18 @@ ROM_START( gladiatr )
 	ROM_REGION( 0x00040, "proms", 0 )   /* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) ) /* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
+
+	ROM_REGION( 0x0400, "cctl", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_002.9b",      0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ccpu", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_003.xx",      0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 ROM_END
 
 ROM_START( ogonsiro )
@@ -1048,6 +966,18 @@ ROM_START( ogonsiro )
 	ROM_REGION( 0x00040, "proms", 0 ) /* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) ) /* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
+
+	ROM_REGION( 0x0400, "cctl", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_002.9b",      0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ccpu", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_003.xx",      0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 ROM_END
 
 ROM_START( greatgur )
@@ -1146,6 +1076,18 @@ ROM_START( gcastle )
 	ROM_REGION( 0x00040, "proms", 0 ) /* unused */
 	ROM_LOAD( "q3.2b",          0x00000, 0x0020, CRC(6a7c3c60) SHA1(5125bfeb03752c8d76b140a4e74d5cac29dcdaa6) ) /* address decoding */
 	ROM_LOAD( "q4.5s",          0x00020, 0x0020, CRC(e325808e) SHA1(5fd92ad4eff24f6ccf2df19d268a6cafba72202e) )
+
+	ROM_REGION( 0x0400, "cctl", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_002.9b",      0x00000, 0x0400, CRC(b30d225f) SHA1(f383286530975c440589c276aa8c46fdfe5292b6) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ccpu", 0 ) /* I/O MCU */
+	ROM_LOAD( "aq_003.xx",      0x00000, 0x0400, CRC(1d02cd5f) SHA1(f7242039788c66a1d91b01852d7d447330b847c4) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "ucpu", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.3a",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
+
+	ROM_REGION( 0x0400, "csnd", 0 ) /* comms MCU */
+	ROM_LOAD( "aq_006.6c",      0x00000, 0x0400, CRC(3c5ca4c6) SHA1(0d8c2e1c2142ada11e30cfb9a48663386fee9cb8) BAD_DUMP )
 ROM_END
 
 
@@ -1202,12 +1144,6 @@ DRIVER_INIT_MEMBER(gladiatr_state,gladiatr)
 	/* make sure bank is valid in cpu-reset */
 	membank("bank2")->set_entry(0);
 
-	m_coins_val = 0x00;
-	m_credits = 0;
-
-	save_item(NAME(m_coins_val));
-	save_item(NAME(m_credits));
-
 	m_tclk_val = false;
 	m_in0_val = 0xff;
 	m_in1_val = 0xff;
@@ -1259,5 +1195,5 @@ DRIVER_INIT_MEMBER(ppking_state, ppking)
 GAME( 1985, ppking,   0,        ppking,   0,        ppking_state,   ppking,   ROT90, "Taito America Corporation", "Ping-Pong King", MACHINE_NOT_WORKING | MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gladiatr, 0,        gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito America Corporation", "Gladiator (US)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, ogonsiro, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Ougon no Shiro (Japan)", MACHINE_SUPPORTS_SAVE )
-GAME( 1986, greatgur, gladiatr, greatgur, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
+GAME( 1986, greatgur, gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Great Gurianos (Japan?)", MACHINE_SUPPORTS_SAVE )
 GAME( 1986, gcastle,  gladiatr, gladiatr, gladiatr, gladiatr_state, gladiatr, ROT0,  "Allumer / Taito Corporation", "Golden Castle (prototype?)", MACHINE_SUPPORTS_SAVE ) // incomplete dump
