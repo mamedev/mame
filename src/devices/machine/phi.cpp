@@ -1037,7 +1037,7 @@ void phi_device::update_fsm(void)
 		m_int_write_func(m_int_line);
 	}
 
-	// TODO: update DMARQ
+	(void)m_dmarq_line; // TODO: update DMARQ
 	m_no_recursion = false;
 }
 
