@@ -18,7 +18,7 @@ public:
 	mes_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
 	m_maincpu(*this, "maincpu"),
-	m_p_videoram(*this, "p_videoram"){ }
+	m_p_videoram(*this, "videoram"){ }
 
 	required_device<cpu_device> m_maincpu;
 	const uint8_t *m_p_chargen;
@@ -34,7 +34,7 @@ static ADDRESS_MAP_START(mes_mem, AS_PROGRAM, 8, mes_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("videoram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mes_io, AS_IO, 8, mes_state)

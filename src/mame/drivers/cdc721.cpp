@@ -18,17 +18,17 @@ class cdc721_state : public driver_device
 public:
 	cdc721_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
-	, m_p_videoram(*this, "videoram")
-	, m_maincpu(*this, "maincpu")
-	{ }
+		, m_p_videoram(*this, "videoram")
+		, m_maincpu(*this, "maincpu")
+		{ }
 
-public:
-	virtual void machine_reset() override;
-	DECLARE_PALETTE_INIT(cdc721);
-	const uint8_t *m_p_chargen;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	required_shared_ptr<uint8_t> m_p_videoram;
+	DECLARE_PALETTE_INIT(cdc721);
+
 private:
+	virtual void machine_reset() override;
+	const uint8_t *m_p_chargen;
+	required_shared_ptr<uint8_t> m_p_videoram;
 	required_device<cpu_device> m_maincpu;
 
 

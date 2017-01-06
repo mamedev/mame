@@ -41,8 +41,6 @@
 #include "machine/ins8250.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 #define H19_CLOCK (XTAL_12_288MHz / 6)
 #define H19_BEEP_FRQ (H19_CLOCK / 1024)
 
@@ -407,7 +405,7 @@ static MACHINE_CONFIG_START( h19, h19_state )
 	MCFG_DEVICE_ADD("ins8250", INS8250, XTAL_12_288MHz / 4) // 3.072mhz clock which gets divided down for the various baud rates
 	MCFG_INS8250_OUT_INT_CB(INPUTLINE("maincpu", 0)) // interrupt
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(h19_state, h19_kbd_put))
 
 	/* sound hardware */
