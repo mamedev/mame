@@ -20375,6 +20375,9 @@ miniboy7a                       // (c) 1983, Bonanza Enterprises
 mcom4_02                        //
 minicom                         //
 
+@source:miniforce.cpp
+miniforce                       // D26 cabinet test board
+
 @source:minivadr.cpp
 minivadr                        // D26 cabinet test board
 
