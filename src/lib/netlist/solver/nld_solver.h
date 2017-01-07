@@ -49,7 +49,6 @@ NETLIB_OBJECT(solver)
 	, m_sor(*this, "SOR_FACTOR", 1.059)
 	, m_iterative_solver(*this, "ITERATIVE", "SOR")
 	, m_accuracy(*this, "ACCURACY", 1e-7)
-	, m_gs_threshold(*this, "GS_THRESHOLD", 6)      // below this value, gaussian elimination is used
 	, m_gs_loops(*this, "GS_LOOPS",9)              // Gauss-Seidel loops
 
 	/* general parameters */
@@ -92,7 +91,6 @@ protected:
 	param_double_t m_sor;
 	param_str_t m_iterative_solver;
 	param_double_t m_accuracy;
-	param_int_t m_gs_threshold;
 	param_int_t m_gs_loops;
 	param_double_t m_gmin;
 	param_logic_t  m_pivot;

@@ -91,11 +91,9 @@ CIRCUIT_LAYOUT( breakout )
 #if (SLOW_BUT_ACCURATE)
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-8) // less accuracy and diode will not work
-	PARAM(Solver.GS_THRESHOLD, 6)
 #else
 	SOLVER(Solver, 48000)
 	PARAM(Solver.ACCURACY, 1e-6)
-	PARAM(Solver.GS_THRESHOLD, 6)
 	PARAM(Solver.DYNAMIC_TS, 0)
 	//PARAM(Solver.LTE, 1e-10)
 	PARAM(Solver.MIN_TIMESTEP, 1e-8)

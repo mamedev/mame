@@ -18,7 +18,6 @@ NETLIST_START(main)
     PARAM(Solver.NR_LOOPS, 30000	)
     //PARAM(Solver.CONVERG, 1.0)
     PARAM(Solver.GS_LOOPS, 30)
-	PARAM(Solver.GS_THRESHOLD, 99)
 
     // Tie up +5 to opamps thought it's not currently needed
     // Stay compatible
