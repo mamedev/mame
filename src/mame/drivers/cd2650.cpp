@@ -36,8 +36,6 @@ TODO
 #include "sound/wave.h"
 #include "sound/beep.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class cd2650_state : public driver_device
 {
 public:
@@ -291,7 +289,7 @@ static MACHINE_CONFIG_START( cd2650, cd2650_state )
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* Devices */
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(cd2650_state, kbd_put))
 	MCFG_CASSETTE_ADD( "cassette" )
 MACHINE_CONFIG_END

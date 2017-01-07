@@ -13,8 +13,6 @@
 #include "video/i8275.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class ipds_state : public driver_device
 {
 public:
@@ -146,7 +144,7 @@ static MACHINE_CONFIG_START( ipds, ipds_state )
 	MCFG_I8275_CHARACTER_WIDTH(6)
 	MCFG_I8275_DRAW_CHARACTER_CALLBACK_OWNER(ipds_state, crtc_display_pixels)
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(ipds_state, kbd_put))
 MACHINE_CONFIG_END
 

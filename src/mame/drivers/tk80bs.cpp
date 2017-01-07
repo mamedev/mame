@@ -27,8 +27,6 @@ TODO:
 #include "machine/i8255.h"
 #include "machine/keyboard.h"
 
-#define KEYBOARD_TAG "keyboard"
-
 class tk80bs_state : public driver_device
 {
 public:
@@ -189,7 +187,7 @@ static MACHINE_CONFIG_START( tk80bs, tk80bs_state )
 	MCFG_I8255_IN_PORTA_CB(READ8(tk80bs_state, port_a_r))
 	MCFG_I8255_IN_PORTB_CB(READ8(tk80bs_state, port_b_r))
 
-	MCFG_DEVICE_ADD(KEYBOARD_TAG, GENERIC_KEYBOARD, 0)
+	MCFG_DEVICE_ADD("keyboard", GENERIC_KEYBOARD, 0)
 	MCFG_GENERIC_KEYBOARD_CB(WRITE8(tk80bs_state, kbd_put))
 MACHINE_CONFIG_END
 
