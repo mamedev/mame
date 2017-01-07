@@ -689,7 +689,7 @@ void detail::net_t::rebuild_list()
 {
 	/* rebuild m_list */
 
-	unsigned cnt = 0;
+	int cnt = 0;
 	m_list_active.clear();
 	for (auto & term : m_core_terms)
 		if (term->state() != logic_t::STATE_INP_PASSIVE)

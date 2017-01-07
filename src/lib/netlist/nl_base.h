@@ -235,7 +235,7 @@ namespace netlist
 	{
 	public:
 		logic_family_desc_t();
-		~logic_family_desc_t();
+		virtual ~logic_family_desc_t();
 
 		virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist, const pstring &name,
 				logic_output_t *proxied) const = 0;
