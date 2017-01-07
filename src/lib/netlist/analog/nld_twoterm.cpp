@@ -211,7 +211,9 @@ NETLIB_TIMESTEP(C)
 	/* Gpar should support convergence */
 	const nl_double G = m_C() / step +  m_GParallel;
 	const nl_double I = -G * deltaV();
-	set(G, 0.0, I);
+	set_mat( G, -G, -I,
+			-G,  G,  I);
+	//set(G, 0.0, I);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -220,13 +222,16 @@ NETLIB_TIMESTEP(C)
 
 NETLIB_RESET(L)
 {
-	set(netlist().gmin(), 0.0, 5.0 / netlist().gmin());
+	m_GParallel = netlist().gmin();
+	m_I = 0.0;
+	m_G = m_GParallel;
+	set_mat( m_G, -m_G, -m_I,
+			-m_G,  m_G,  m_I);
 	//set(1.0/NETLIST_GMIN, 0.0, -5.0 * NETLIST_GMIN);
 }
 
 NETLIB_UPDATE_PARAM(L)
 {
-	m_GParallel = netlist().gmin();
 }
 
 NETLIB_UPDATE(L)
@@ -239,7 +244,9 @@ NETLIB_TIMESTEP(L)
 	/* Gpar should support convergence */
 	m_I += m_I + m_G * deltaV();
 	m_G = step / m_L() + m_GParallel;
-	set(m_G, 0.0, m_I);
+	set_mat( m_G, -m_G, -m_I,
+			-m_G,  m_G,  m_I);
+	//set(m_G, 0.0, m_I);
 }
 
 // ----------------------------------------------------------------------------------------
@@ -271,7 +278,11 @@ NETLIB_UPDATE(D)
 NETLIB_UPDATE_TERMINALS(D)
 {
 	m_D.update_diode(deltaV());
-	set(m_D.G(), 0.0, m_D.Ieq());
+	const nl_double G = m_D.G();
+	const nl_double I = m_D.Ieq();
+	set_mat( G, -G, -I,
+			-G,  G,  I);
+	//set(m_D.G(), 0.0, m_D.Ieq());
 }
 
 // ----------------------------------------------------------------------------------------
@@ -296,7 +307,11 @@ NETLIB_UPDATE(VS)
 NETLIB_RESET(CS)
 {
 	NETLIB_NAME(twoterm)::reset();
-	this->set(0.0, 0.0, m_I());
+	const nl_double I = m_I();
+
+	set_mat(0.0, 0.0, -I,
+			0.0, 0.0,  I);
+	//this->set(0.0, 0.0, m_I());
 }
 
 NETLIB_UPDATE(CS)

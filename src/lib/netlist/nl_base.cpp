@@ -138,7 +138,6 @@ const logic_family_desc_t *family_CD4XXX()
 
 detail::queue_t::queue_t(netlist_t &nl)
 	: timed_queue<net_t *, netlist_time>(512)
-	, object_t("QUEUE")
 	, netlist_ref(nl)
 	, plib::state_manager_t::callback_t()
 	, m_qsize(0)

@@ -36,25 +36,25 @@ namespace netlist
 	};
 
 
-class terms_t
+class terms_for_net_t
 {
-	P_PREVENT_COPYING(terms_t)
+	P_PREVENT_COPYING(terms_for_net_t)
 
 public:
-	terms_t();
+	terms_for_net_t();
 
 	void clear();
 
 	void add(terminal_t *term, int net_other, bool sorted);
 
-	inline std::size_t count() { return m_term.size(); }
+	inline std::size_t count() { return m_terms.size(); }
 
-	inline terminal_t **terms() { return m_term.data(); }
-	inline int *net_other() { return m_net_other.data(); }
+	inline terminal_t **terms() { return m_terms.data(); }
+	inline int *connected_net_idx() { return m_connected_net_idx.data(); }
 	inline nl_double *gt() { return m_gt.data(); }
 	inline nl_double *go() { return m_go.data(); }
 	inline nl_double *Idr() { return m_Idr.data(); }
-	inline nl_double **other_curanalog() { return m_other_curanalog.data(); }
+	inline nl_double **connected_net_V() { return m_connected_net_V.data(); }
 
 	void set_pointers();
 
@@ -70,12 +70,12 @@ public:
 	nl_double m_h_n_m_1;
 
 private:
-	std::vector<int> m_net_other;
+	std::vector<int> m_connected_net_idx;
 	std::vector<nl_double> m_go;
 	std::vector<nl_double> m_gt;
 	std::vector<nl_double> m_Idr;
-	std::vector<nl_double *> m_other_curanalog;
-	std::vector<terminal_t *> m_term;
+	std::vector<nl_double *> m_connected_net_V;
+	std::vector<terminal_t *> m_terms;
 
 };
 
@@ -163,11 +163,11 @@ protected:
 	template <typename T>
 	void build_LE_RHS();
 
-	std::vector<terms_t *> m_terms;
+	std::vector<terms_for_net_t *> m_terms;
 	std::vector<analog_net_t *> m_nets;
 	std::vector<std::unique_ptr<proxied_analog_output_t>> m_inps;
 
-	std::vector<terms_t *> m_rails_temp;
+	std::vector<terms_for_net_t *> m_rails_temp;
 
 	const solver_parameters_t &m_params;
 
@@ -244,7 +244,7 @@ void matrix_solver_t::build_LE_A()
 		}
 
 		const nl_double * RESTRICT go = m_terms[k]->go();
-		const int * RESTRICT net_other = m_terms[k]->net_other();
+		const int * RESTRICT net_other = m_terms[k]->connected_net_idx();
 
 		for (std::size_t i = 0; i < railstart; i++)
 			child.A(k,net_other[i]) -= go[i];
@@ -266,7 +266,7 @@ void matrix_solver_t::build_LE_RHS()
 		const std::size_t terms_count = m_terms[k]->count();
 		const nl_double * RESTRICT go = m_terms[k]->go();
 		const nl_double * RESTRICT Idr = m_terms[k]->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->other_curanalog();
+		const nl_double * const * RESTRICT other_cur_analog = m_terms[k]->connected_net_V();
 
 		for (std::size_t i = 0; i < terms_count; i++)
 			rhsk_a = rhsk_a + Idr[i];

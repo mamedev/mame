@@ -150,7 +150,7 @@ void matrix_solver_GCR_t<m_N, storage_N>::vsetup(analog_net_t::list_t &nets)
 		/* build pointers into the compressed row format matrix for each terminal */
 		for (unsigned j=0; j< this->m_terms[k]->m_railstart;j++)
 		{
-			int other = this->m_terms[k]->net_other()[j];
+			int other = this->m_terms[k]->connected_net_idx()[j];
 			for (unsigned i = mat.ia[k]; i < nz; i++)
 				if (other == static_cast<int>(mat.ja[i]))
 				{
@@ -251,7 +251,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 
 	for (unsigned k = 0; k < iN; k++)
 	{
-		terms_t *t = this->m_terms[k];
+		terms_for_net_t *t = this->m_terms[k];
 		nl_double gtot_t = 0.0;
 		nl_double RHS_t = 0.0;
 
@@ -260,7 +260,7 @@ unsigned matrix_solver_GCR_t<m_N, storage_N>::vsolve_non_dynamic(const bool newt
 		const nl_double * const RESTRICT gt = t->gt();
 		const nl_double * const RESTRICT go = t->go();
 		const nl_double * const RESTRICT Idr = t->Idr();
-		const nl_double * const * RESTRICT other_cur_analog = t->other_curanalog();
+		const nl_double * const * RESTRICT other_cur_analog = t->connected_net_V();
 
 #if (0 ||NL_USE_SSE)
 		__m128d mg = mm_set_pd(0.0, 0.0);
