@@ -134,9 +134,13 @@
 		// 
 		// limit (required by type "time"): The range of time across which to loop. 0.0 means run indefinitely.
 		// value: Any numeric value.
+		//
+		// reset (required by type "time"): When true, the amount of time is always the difference between frames.
+		// value: true or false
 
 		{ "name": "jitter", "type": "frame", "period": 2 },
-		{ "name": "time",   "type": "time",  "limit": 0.0 }
+		{ "name": "time",   "type": "time",  "limit": 0.0, "reset": false },
+		{ "name": "delta_time", "type": "time", "limit": 0.0, "reset": true }
 	],
 
 	// targets (optional): A list of all render targets that will be used by the chain entries in this chain.
@@ -408,11 +412,13 @@
 			"name": "Phosphor Decay",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
-				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor_mode", "value": 0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_passthrough", "value": [ 0 ] },
-				{ "uniform": "u_phosphor", "slider": "phosphor" }
+				{ "uniform": "u_phosphor_mode", "slider": "phosphor_mode" },
+				{ "uniform": "u_phosphor_time", "slider": "phosphor_time" },
+				{ "uniform": "u_phosphor_beta", "silder": "phosphor_beta" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" },
@@ -424,11 +430,14 @@
 			"name": "Phosphor Store",
 			"disablewhen": [
 				{ "type": "slider", "condition": "equal", "combine": "or", "name": "adjustments", "value": 0 },
-				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor",    "value": [ 0, 0, 0 ] }
+				{ "type": "slider", "condition": "equal", "combine": "or", "name": "phosphor_mode", "value": 0 }
 			],
 			"uniforms": [
 				{ "uniform": "u_passthrough", "value": [ 1 ] },
-				{ "uniform": "u_phosphor", "slider": "phosphor" }
+				{ "uniform": "u_phosphor_mode", "slider": "phosphor_mode" },
+				{ "uniform": "u_phosphor_time", "slider": "phosphor_time" },
+				{ "uniform": "u_phosphor_beta", "silder": "phosphor_beta" },
+				{ "uniform": "u_delta_time", "parameter": "delta_time" }
 			],
 			"input": [
 				{ "sampler": "s_tex", "target": "internal" },

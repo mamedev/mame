@@ -99,7 +99,7 @@ uniform int Mode = 0;
 uniform float DeltaTime = 0.0f;
 uniform float3 TimeConstant = { 0.0f, 0.0f, 0.0f };
 uniform float3 Beta = { 0.0f, 0.0f, 0.0f };
-static const float TAU_FACTOR = 0.4342944819f;
+static const float TAU_FACTOR = -1.0f / log(0.1f);
 static const float GAMMA_INV_FACTOR = 1.0f / 900.0f;
 
 float4 ps_main(PS_INPUT Input) : COLOR

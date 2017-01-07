@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Ryan Holtz
+// copyright-holders:Ryan Holtz & Westley M. Martinez
 //============================================================
 //
 //  timeparameter.h - Time-based dynamic shader param
@@ -20,13 +20,14 @@
 class bgfx_time_parameter : public bgfx_parameter
 {
 public:
-	bgfx_time_parameter(std::string name, parameter_type type, double limit);
+	bgfx_time_parameter(std::string name, parameter_type type, bool reset, double limit);
 	virtual ~bgfx_time_parameter() { }
 
 	virtual float value() override;
 	virtual void tick(double delta) override;
 
 private:
+	bool m_reset;
 	double m_current_time;
 	double m_limit;
 };
