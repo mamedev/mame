@@ -42,7 +42,7 @@ public:
 		m_pit(*this, "pit8253"),
 		m_cassette(*this, "cassette"),
 		m_ram(*this, RAM_TAG),
-		m_p_videoram(*this, "p_videoram"),
+		m_p_videoram(*this, "videoram"),
 		m_region_maincpu(*this, "maincpu"),
 		m_bank1(*this, "bank1"),
 		m_bank2(*this, "bank2"),
@@ -84,6 +84,26 @@ public:
 	DECLARE_WRITE8_MEMBER(specialist_8255_porta_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portb_w);
 	DECLARE_WRITE8_MEMBER(specialist_8255_portc_w);
+	DECLARE_DRIVER_INIT(erik);
+	DECLARE_DRIVER_INIT(special);
+	DECLARE_MACHINE_RESET(special);
+	DECLARE_VIDEO_START(special);
+	DECLARE_MACHINE_RESET(erik);
+	DECLARE_VIDEO_START(erik);
+	DECLARE_PALETTE_INIT(erik);
+	DECLARE_VIDEO_START(specialp);
+	DECLARE_MACHINE_START(specimx);
+	DECLARE_MACHINE_RESET(specimx);
+	DECLARE_VIDEO_START(specimx);
+	DECLARE_PALETTE_INIT(specimx);
+	uint32_t screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	uint32_t screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
+	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
+
+private:
 	void specimx_set_bank(offs_t i, uint8_t data);
 	void erik_set_bank();
 	std::unique_ptr<uint8_t[]> m_specimx_colorram;
@@ -105,26 +125,6 @@ public:
 	optional_device<ram_device> m_ram;
 	optional_shared_ptr<uint8_t> m_p_videoram;
 	int m_drive;
-	DECLARE_DRIVER_INIT(erik);
-	DECLARE_DRIVER_INIT(special);
-	DECLARE_MACHINE_RESET(special);
-	DECLARE_VIDEO_START(special);
-	DECLARE_MACHINE_RESET(erik);
-	DECLARE_VIDEO_START(erik);
-	DECLARE_PALETTE_INIT(erik);
-	DECLARE_VIDEO_START(specialp);
-	DECLARE_MACHINE_START(specimx);
-	DECLARE_MACHINE_RESET(specimx);
-	DECLARE_VIDEO_START(specimx);
-	DECLARE_PALETTE_INIT(specimx);
-	uint32_t screen_update_special(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_erik(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_specialp(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	uint32_t screen_update_specimx(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	DECLARE_WRITE_LINE_MEMBER(fdc_drq);
-	DECLARE_FLOPPY_FORMATS( specimx_floppy_formats );
-
-protected:
 	required_memory_region m_region_maincpu;
 	required_memory_bank m_bank1;
 	optional_memory_bank m_bank2;
@@ -145,7 +145,6 @@ protected:
 	required_ioport m_io_line10;
 	required_ioport m_io_line11;
 	required_ioport m_io_line12;
-
 	required_device<palette_device> m_palette;
 	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

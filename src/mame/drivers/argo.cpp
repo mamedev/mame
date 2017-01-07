@@ -146,7 +146,7 @@ static ADDRESS_MAP_START(argo_mem, AS_PROGRAM, 8, argo_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xf7af) AM_RAM
-	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf7b0, 0xf7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM AM_WRITE(argo_videoram_w)
 ADDRESS_MAP_END
 
