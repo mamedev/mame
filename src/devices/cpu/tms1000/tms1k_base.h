@@ -261,14 +261,14 @@ protected:
 
 	uint8_t   m_ram_in;
 	uint8_t   m_dam_in;
-	int     m_ram_out; // signed!
+	int       m_ram_out; // signed!
 	uint8_t   m_ram_address;
 	uint16_t  m_rom_address;
 	uint16_t  m_opcode;
 	uint32_t  m_fixed;
 	uint32_t  m_micro;
-	int     m_subcycle;
-	int     m_icount;
+	int       m_subcycle;
+	int       m_icount;
 	uint8_t   m_o_index;
 
 	uint8_t   m_o_pins;    // how many O pins

@@ -1,6 +1,6 @@
 /*
  * Copyright 2011-2015 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include "common.h"
@@ -11,6 +11,19 @@
 #include "camera.h"
 
 #include <bx/uint32_t.h>
+
+void imageCheckerboard(void* _dst, uint32_t _width, uint32_t _height, uint32_t _step, uint32_t _0, uint32_t _1)
+{
+	uint32_t* dst = (uint32_t*)_dst;
+	for (uint32_t yy = 0; yy < _height; ++yy)
+	{
+		for (uint32_t xx = 0; xx < _width; ++xx)
+		{
+			uint32_t abgr = ( (xx/_step)&1) ^ ( (yy/_step)&1) ? _1 : _0;
+			*dst++ = abgr;
+		}
+	}
+}
 
 class DebugDrawApp : public entry::AppI
 {
@@ -46,10 +59,17 @@ class DebugDrawApp : public entry::AppI
 		cameraSetVerticalAngle(0.0f);
 
 		ddInit();
+
+		uint8_t data[32*32*4];
+		imageCheckerboard(data, 32, 32, 4, 0xff808080, 0xffc0c0c0);
+
+		m_sprite = ddCreateSprite(32, 32, data);
 	}
 
 	virtual int shutdown() BX_OVERRIDE
 	{
+		ddDestroy(m_sprite);
+
 		ddShutdown();
 
 		cameraDestroy();
@@ -171,13 +191,18 @@ class DebugDrawApp : public entry::AppI
 			ddSetColor(0xffffffff);
 
 			ddPush();
-				ddSetStipple(true, 1.0f, time*0.1f);
-				ddSetColor(0xff0000ff);
-				{
-					float normal[3] = {  0.0f, 0.0f, 1.0f };
-					float center[3] = { -8.0f, 0.0f, 0.0f };
+			{
+				float normal[3] = {  0.0f, 0.0f, 1.0f };
+				float center[3] = { -8.0f, 0.0f, 0.0f };
+				ddPush();
+					ddSetStipple(true, 1.0f, time*0.1f);
+					ddSetColor(0xff0000ff);
 					ddDrawCircle(normal, center, 1.0f, 0.5f + bx::fsin(time*10.0f) );
-				}
+				ddPop();
+
+				ddSetSpin(time);
+				ddDrawQuad(m_sprite, normal, center, 2.0f);
+			}
 			ddPop();
 
 			ddPush();
@@ -187,17 +212,21 @@ class DebugDrawApp : public entry::AppI
 
 			ddPush();
 				ddSetLod(UINT8_MAX);
-				{
-					float from[3] = { -11.0f, 4.0f,  0.0f };
-					float to[3]   = { -13.0f, 6.0f,  1.0f };
-					ddDrawCone(from, to, 1.0f );
-				}
 
-				{
-					float from[3] = {  -9.0f, 2.0f, -1.0f };
-					float to[3]   = { -11.0f, 4.0f,  0.0f };
-					ddDrawCylinder(from, to, 0.5f );
-				}
+				ddPush();
+					ddSetSpin(time*0.3f);
+					{
+						float from[3] = { -11.0f, 4.0f,  0.0f };
+						float to[3]   = { -13.0f, 6.0f,  1.0f };
+						ddDrawCone(from, to, 1.0f );
+					}
+
+					{
+						float from[3] = {  -9.0f, 2.0f, -1.0f };
+						float to[3]   = { -11.0f, 4.0f,  0.0f };
+						ddDrawCylinder(from, to, 0.5f );
+					}
+				ddPop();
 
 				{
 					float from[3] = {  0.0f, 7.0f, 0.0f };
@@ -206,7 +235,34 @@ class DebugDrawApp : public entry::AppI
 				}
 			ddPop();
 
+			ddPush();
+
+				float mtx[16];
+				bx::mtxSRT(mtx
+					, 1.0f, 1.0f, 1.0f
+					, 0.0f, time, time*0.53f
+					, -10.0f, 1.0f, 10.0f
+					);
+
+				Cylinder cylinder =
+				{
+					{ -10.0f, 1.0f, 10.0f },
+					{ 0.0f, 0.0f, 0.0f },
+					1.0f
+				};
+
+				float up[3] = { 0.0f, 4.0f, 0.0f };
+				bx::vec3MulMtx(cylinder.m_end, up, mtx);
+				ddDraw(cylinder);
+
+				toAabb(aabb, cylinder);
+				ddSetColor(0xff0000ff);
+				ddDraw(aabb);
+
+			ddPop();
+
 			ddDrawOrb(-11.0f, 0.0f, 0.0f, 1.0f);
+
 			ddEnd();
 
 			// Advance to next frame. Rendering thread will be kicked to
@@ -220,6 +276,7 @@ class DebugDrawApp : public entry::AppI
 	}
 
 	entry::MouseState m_mouseState;
+	SpriteHandle m_sprite;
 
 	int64_t m_timeOffset;
 

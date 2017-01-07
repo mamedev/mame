@@ -18,7 +18,7 @@
 //**************************************************************************
 
 #define VERBOSE      1
-#define VERBOSE_DMA  1
+#define VERBOSE_DMA  0
 
 // channel control register fields
 #define CC_TMC     ((m_r[CC].w >>  0) & 0x07)   // terminate on masked compare
@@ -835,13 +835,14 @@ WRITE_LINE_MEMBER( i8089_channel::ext_w )
 {
 	if (VERBOSE)
 		logerror("%s('%s'): ext_w: %d\n", shortname(), tag(), state);
-	if(transferring() && state)
+
+	if (transferring() && state)
 		terminate_dma((CC_TX - 1) * 4);
 }
 
 WRITE_LINE_MEMBER( i8089_channel::drq_w )
 {
-	if (VERBOSE)
+	if (VERBOSE_DMA)
 		logerror("%s('%s'): drq_w: %d\n", shortname(), tag(), state);
 
 	m_drq = state;

@@ -9929,8 +9929,8 @@ more investigation needed...
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="hirom" />
 			<dataarea name="rom" size="3145728">
-				<rom name="shvc-adkj-0 p0.u1" size="2097152" crc="5b606ef7" sha1="6b47084fba80ce07347010a7bb4af063f058936b" offset="0x000000" />
-				<rom name="shvc-adkj-0 p3.u2" size="1048576" crc="5b379b50" sha1="83b0507f1a84e686d76b5b869c1a5f2e22278097" offset="0x200000" />
+				<rom name="SHVC-ADKJ-0 P0.u1" size="2097152" crc="5b606ef7" sha1="6b47084fba80ce07347010a7bb4af063f058936b" offset="0x000000" />
+				<rom name="SHVC-ADKJ-0 P3.u2" size="1048576" crc="5b379b50" sha1="83b0507f1a84e686d76b5b869c1a5f2e22278097" offset="0x200000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -11930,7 +11930,7 @@ more investigation needed...
 			<feature name="cart_back_label" value="901121" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shvc-eh-0.u1" size="1048576" crc="5cb9bc35" sha1="745ebf8164ca7be58829c6130c0e06f330cd0748" offset="0x000000" />
+				<rom name="SHVC-EH-0.u1" size="1048576" crc="5cb9bc35" sha1="745ebf8164ca7be58829c6130c0e06f330cd0748" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -19340,17 +19340,17 @@ more investigation needed...
 		<description>Nintendo Scope 6 (Euro)</description>
 		<year>1992</year>
 		<publisher>Nintendo</publisher>
-		<info name="serial" value="SNSP-LR-FAH, SNSP-LR-FAH-1" />
+		<info name="serial" value="SNSP-LR-FAH, SNSP-LR-FAH-1, SNSP-LR-UKV" />
 		<part name="cart" interface="snes_cart">
 			<feature name="pcb" value="SHVC-1A0N-02" />
 			<feature name="u1" value="U1 MASK ROM" />
 			<feature name="u2" value="U2 CIC" />
 			<feature name="lockout" value="" />
 			<feature name="cart_model" value="SNSP-006" />
-			<feature name="cart_back_label" value="SNSP-FAH" />
+			<feature name="cart_back_label" value="SNSP-FAH, SNSP-UKV" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="spal-lr-0.u1" size="1048576" crc="b1859ca4" sha1="e5efb589e2dd783ef2d99f01caa866d8a3a04d16" offset="0x000000" />
+				<rom name="SPAL-LR-0.u1" size="1048576" crc="b1859ca4" sha1="e5efb589e2dd783ef2d99f01caa866d8a3a04d16" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -25243,7 +25243,7 @@ more investigation needed...
 			<feature name="cart_back_label" value="920214" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
-				<rom name="shvc-fc-0.u1" size="1048576" crc="7c94c86c" sha1="9d60d55b690c02413aa668ed9da196b4f1449e81" offset="0x000000" />
+				<rom name="SHVC-FC-0.u1" size="1048576" crc="7c94c86c" sha1="9d60d55b690c02413aa668ed9da196b4f1449e81" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
 			</dataarea>
@@ -28147,7 +28147,7 @@ Alternate board (XL-1)
 			<feature name="cart_back_label" value="SNSP-EUR, SNSP-FAH" />
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="524288">
-				<rom name="spal-fs-0.u1" size="524288" crc="442c47cb" sha1="6eb6dd6da1e8eefad24c30b59ededbd671b9db2c" offset="0x000000" />
+				<rom name="SPAL-FS-0.u1" size="524288" crc="442c47cb" sha1="6eb6dd6da1e8eefad24c30b59ededbd671b9db2c" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -33283,6 +33283,26 @@ Alternate board (XL-1)
 				<rom name="shvc-7m-1.u1" size="2097152" crc="cb148365" sha1="a90412a32828fdf02968bf7b1f2efd57453ef031" offset="0x000000" />
 			</dataarea>
 			<dataarea name="nvram" size="8192">
+			</dataarea>
+		</part>
+	</software>
+  
+  <software name="lostvik">
+		<description>The Lost Vikings (Euro)</description>
+		<year>1993</year>
+		<publisher>Interplay</publisher>
+		<info name="serial" value="SNSP-LV-SCN" />
+		<info name="release" value="19931028" />
+		<part name="cart" interface="snes_cart">
+			<feature name="pcb" value="SHVC-1A0N-20" />
+			<feature name="u1" value="U1 MASK ROM" />
+			<feature name="u2" value="U2 CIC" />
+			<feature name="lockout" value="" />
+			<feature name="cart_model" value="SNSP-006" />
+			<feature name="cart_back_label" value="SNSP-UKV" />
+			<feature name="slot" value="lorom" />
+			<dataarea name="rom" size="1048576">
+				<rom name="SPAL-LV-0.u1" size="1048576" crc="66989491" sha1="2bd4c2af6e5d7252d16342fd1a64454dca3ce557" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -46109,18 +46129,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="lost vikings ii, the (usa).sfc" size="1048576" crc="3aa01dbd" sha1="7a461513fcea58e3c8c9dbaa431ab6635dbb3ffd" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="lostvik">
-		<description>The Lost Vikings (Euro)</description>
-		<year>1993</year>
-		<publisher>Interplay</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="lost vikings, the (europe).sfc" size="1048576" crc="66989491" sha1="2bd4c2af6e5d7252d16342fd1a64454dca3ce557" offset="0x000000" />
 			</dataarea>
 		</part>
 	</software>
@@ -59516,19 +59524,6 @@ to ensure nothing has been touched in the Retro Quest cart production in 2013/20
 			<feature name="slot" value="lorom" />
 			<dataarea name="rom" size="1048576">
 				<rom name="syndicate (usa).sfc" size="1048576" crc="d74570d3" sha1="591527865e2b90521e36d460148f7482bc94b6a0" offset="0x000000" />
-			</dataarea>
-		</part>
-	</software>
-
-  <!-- Most likely this is simply a bad dump of syvalionp. -->
-	<software name="syvalionp2" cloneof="syvalion">
-		<description>Syvalion (Euro, Prototype 2)</description>
-		<year>1992</year>
-		<publisher>Toshiba EMI</publisher>
-		<part name="cart" interface="snes_cart">
-			<feature name="slot" value="lorom" />
-			<dataarea name="rom" size="1048576">
-				<rom name="syvalion (europe) (beta).sfc" size="1048576" crc="be122755" sha1="ddfa611f1177f371c1107dbd8e8ecdb19011a232" offset="0x000000" status="baddump" />
 			</dataarea>
 		</part>
 	</software>

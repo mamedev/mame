@@ -50,9 +50,11 @@ public:
 	uint8_t m_car_border_collision_cause;
 	uint8_t m_priority_0_extension;
 	uint8_t m_last_wheel_value[4];
+	int m_ls153_za;
+	int m_ls153_zb;
 	required_device<cpu_device> m_maincpu;
 	required_device<ttl74148_device> m_ttl74148_3s;
-	required_device<ttl74153_device> m_ttl74153_1k;
+	required_device<ttl153_device> m_ttl74153_1k;
 	required_device<ttl7474_device> m_ttl7474_2s_1;
 	required_device<ttl7474_device> m_ttl7474_2s_2;
 	required_device<ttl7474_device> m_ttl7474_2u_1;
@@ -108,6 +110,8 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2s_2_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_1_q_cb);
 	DECLARE_WRITE_LINE_MEMBER(carpolo_7474_2u_2_q_cb);
+	DECLARE_WRITE_LINE_MEMBER(ls153_za_w);
+	DECLARE_WRITE_LINE_MEMBER(ls153_zb_w);
 
 	TTL74148_OUTPUT_CB(ttl74148_3s_cb);
 

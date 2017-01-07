@@ -23,7 +23,7 @@ namespace imgtool
 
 		~stream();
 
-		static imgtool::stream::ptr open(const char *fname, int read_or_write);  /* similar params to mame_fopen */
+		static imgtool::stream::ptr open(const std::string &filename, int read_or_write);  /* similar params to mame_fopen */
 		static imgtool::stream::ptr open_write_stream(int filesize);
 		static imgtool::stream::ptr open_mem(void *buf, size_t sz);
 
@@ -61,7 +61,6 @@ namespace imgtool
 
 		imgtype_t       imgtype;
 		bool            write_protect;
-		const char      *name; // needed for clear
 		std::uint64_t   position;
 		std::uint64_t   filesize;
 
@@ -75,7 +74,7 @@ namespace imgtool
 		stream(bool wp, std::size_t size, void *buf);
 
 		// private methods
-		static stream::ptr open_zip(const char *zipname, const char *subname, int read_or_write);
+		static stream::ptr open_zip(const std::string &zipname, const char *subname, int read_or_write);
 	};
 }
 

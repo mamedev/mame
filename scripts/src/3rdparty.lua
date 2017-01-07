@@ -1585,3 +1585,42 @@ project "linenoise-ng"
 		MAME_DIR .. "3rdparty/linenoise-ng/src/wcwidth.cpp",
 	}
 end
+
+
+--------------------------------------------------
+-- utf8proc library objects
+--------------------------------------------------
+
+if not _OPTIONS["with-system-utf8proc"] then
+project "utf8proc"
+	uuid "1f881f09-0395-4483-ac37-2935fb092187"
+	kind "StaticLib"
+
+  defines {
+    "UTF8PROC_DLLEXPORT="
+  }
+  
+	configuration "Debug"
+		defines {
+			"verbose=-1",
+		}
+
+	configuration { "gmake or ninja" }
+		buildoptions_c {
+			"-Wno-strict-prototypes",
+		}
+
+	configuration { }
+		defines {
+			"ZLIB_CONST",
+		}
+
+	files {
+		MAME_DIR .. "3rdparty/utf8proc/utf8proc.c"
+	}
+else
+links {
+	ext_lib("utf8proc"),
+}
+end
+

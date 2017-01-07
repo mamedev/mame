@@ -22,7 +22,7 @@
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
 

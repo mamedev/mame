@@ -40,34 +40,38 @@
 // -----------------------------------------------------------------------------
 
 #define RES(name, p_R)                                                         \
-		NET_REGISTER_DEV(RES, name)                                           \
+		NET_REGISTER_DEV(RES, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
 
 #define POT(name, p_R)                                                         \
-		NET_REGISTER_DEV(POT, name)                                           \
+		NET_REGISTER_DEV(POT, name)                                            \
 		NETDEV_PARAMI(name, R, p_R)
 
 /* Does not have pin 3 connected */
 #define POT2(name, p_R)                                                        \
-		NET_REGISTER_DEV(POT2, name)                                          \
+		NET_REGISTER_DEV(POT2, name)                                           \
 		NETDEV_PARAMI(name, R, p_R)
 
 
 #define CAP(name, p_C)                                                         \
-		NET_REGISTER_DEV(CAP, name)                                           \
+		NET_REGISTER_DEV(CAP, name)                                            \
 		NETDEV_PARAMI(name, C, p_C)
 
+#define IND(name, p_L)                                                         \
+		NET_REGISTER_DEV(IND, name)                                            \
+		NETDEV_PARAMI(name, L, p_L)
+
 /* Generic Diode */
-#define DIODE(name,  model)                                                  \
-		NET_REGISTER_DEV(DIODE, name)                                         \
+#define DIODE(name,  model)                                                    \
+		NET_REGISTER_DEV(DIODE, name)                                          \
 		NETDEV_PARAMI(name, MODEL, model)
 
-#define VS(name, pV)                                                          \
-		NET_REGISTER_DEV(VS, name)                                            \
+#define VS(name, pV)                                                           \
+		NET_REGISTER_DEV(VS, name)                                             \
 		NETDEV_PARAMI(name, V, pV)
 
-#define CS(name, pI)                                                          \
-		NET_REGISTER_DEV(CS, name)                                            \
+#define CS(name, pI)                                                           \
+		NET_REGISTER_DEV(CS, name)                                             \
 		NETDEV_PARAMI(name, I, pI)
 
 // -----------------------------------------------------------------------------
@@ -133,7 +137,9 @@ public:
 		return m_P.net().Q_Analog() - m_N.net().Q_Analog();
 	}
 
-	void set_mat(nl_double a11, nl_double a12, nl_double a21, nl_double a22, nl_double r1, nl_double r2)
+	void set_mat(const nl_double a11, const nl_double a12,
+			     const nl_double a21, const nl_double a22,
+				 const nl_double r1, const nl_double r2)
 	{
 		/*      GO, GT, I                */
 		m_P.set(-a12, a11, -r1);
@@ -167,17 +173,8 @@ public:
 	}
 
 protected:
-	NETLIB_RESETI()
-	{
-		NETLIB_NAME(twoterm)::reset();
-		set_R(1.0 / netlist().gmin());
-	}
-
-	NETLIB_UPDATEI()
-	{
-		NETLIB_NAME(twoterm)::update();
-	}
-
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
 
 };
 
@@ -194,15 +191,7 @@ protected:
 
 	//NETLIB_RESETI() { }
 	//NETLIB_UPDATEI() { }
-	NETLIB_UPDATE_PARAMI()
-	{
-		update_dev();
-		if (m_R() > 1e-9)
-			set_R(m_R());
-		else
-			set_R(1e-9);
-	}
-
+	NETLIB_UPDATE_PARAMI();
 };
 
 // -----------------------------------------------------------------------------
@@ -282,14 +271,8 @@ public:
 		//register_term("2", m_N);
 	}
 
-	NETLIB_TIMESTEP()
-	{
-		/* Gpar should support convergence */
-		const nl_double G = m_C() / step +  m_GParallel;
-		const nl_double I = -G * deltaV();
-		set(G, 0.0, I);
-	}
-
+	NETLIB_IS_TIMESTEP()
+	NETLIB_TIMESTEPI();
 
 	param_double_t m_C;
 
@@ -303,6 +286,38 @@ private:
 
 };
 
+// -----------------------------------------------------------------------------
+// nld_L
+// -----------------------------------------------------------------------------
+
+NETLIB_OBJECT_DERIVED(L, twoterm)
+{
+public:
+	NETLIB_CONSTRUCTOR_DERIVED(L, twoterm)
+	, m_L(*this, "L", 1e-6)
+	, m_GParallel(0.0)
+	, m_G(0.0)
+	, m_I(0.0)
+	{
+		//register_term("1", m_P);
+		//register_term("2", m_N);
+	}
+
+	NETLIB_IS_TIMESTEP()
+	NETLIB_TIMESTEPI();
+
+	param_double_t m_L;
+
+protected:
+	NETLIB_RESETI();
+	NETLIB_UPDATEI();
+	NETLIB_UPDATE_PARAMI();
+
+private:
+	nl_double m_GParallel;
+	nl_double m_G;
+	nl_double m_I;
+};
 
 // -----------------------------------------------------------------------------
 // A generic diode model to be used in other devices (Diode, BJT ...)
@@ -313,43 +328,7 @@ class generic_diode
 public:
 	generic_diode(device_t &dev, pstring name);
 
-	inline void update_diode(const nl_double nVd)
-	{
-#if 1
-		if (nVd < NL_FCONST(-5.0) * m_Vt)
-		{
-			m_Vd = nVd;
-			m_G = m_gmin;
-			m_Id = - m_Is;
-		}
-		else if (nVd < m_Vcrit)
-		{
-			m_Vd = nVd;
-			//m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-		}
-		else
-		{
-#if 1
-			const nl_double a = std::max((nVd - m_Vd) * m_VtInv, NL_FCONST(0.5) - NL_FCONST(1.0));
-			m_Vd = m_Vd + std::log1p(a) * m_Vt;
-#else
-			m_Vd = m_Vd + 10.0 * m_Vt * std::tanh((nVd - m_Vd) / 10.0 / m_Vt);
-#endif
-			const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-			m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-
-			m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-		}
-#else
-		m_Vd = m_Vd + 20.0 * m_Vt * std::tanh((nVd - m_Vd) / 20.0 / m_Vt);
-		const nl_double eVDVt = std::exp(m_Vd * m_VtInv);
-		m_Id = m_Is * (eVDVt - NL_FCONST(1.0));
-		m_G = m_Is * m_VtInv * eVDVt + m_gmin;
-#endif
-	}
+	void update_diode(const nl_double nVd);
 
 	void set_param(const nl_double Is, const nl_double n, nl_double gmin);
 
@@ -389,7 +368,7 @@ public:
 		register_subalias("K", m_N);
 	}
 
-	NETLIB_DYNAMIC()
+	NETLIB_IS_DYNAMIC()
 
 	NETLIB_UPDATE_TERMINALSI();
 

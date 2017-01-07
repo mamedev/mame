@@ -50,9 +50,9 @@ public:
 	DECLARE_DEVICE_IMAGE_LOAD_MEMBER(scc_cartridge);
 
 	// display common
-	int m_display_wait;                 // led/lamp off-delay in microseconds (default 33ms)
-	int m_display_maxy;                 // display matrix number of rows
-	int m_display_maxx;                 // display matrix number of columns (max 31 for now)
+	int m_display_wait;                   // led/lamp off-delay in microseconds (default 33ms)
+	int m_display_maxy;                   // display matrix number of rows
+	int m_display_maxx;                   // display matrix number of columns (max 31 for now)
 
 	uint32_t m_display_state[0x20];       // display matrix rows data (last bit is used for always-on)
 	uint16_t m_display_segmask[0x20];     // if not 0, display matrix row is a digit, mask indicates connected segments

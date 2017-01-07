@@ -56,13 +56,13 @@ Games on this system include....
 | | 2005     | Sega Network Taisen Mahjong MJ 3 (Rev E)           | Sega                     | GDROM  | GDX-0017E  | 317-0414-JPN |
 |*| 2005     | Sega Network Taisen Mahjong MJ 3 (Rev F)           | Sega                     | GDROM  | GDX-0017F  | 317-0414-JPN |
 | | 2005     | Sega Club Golf 2006: Next Tours                    | Sega                     | GDROM  | GDX-0018   |              |
-|*| 2005     | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  |              |
+|*| 2005     | Sega Club Golf 2006: Next Tours (Rev A)            | Sega                     | GDROM  | GDX-0018A  | ?            |
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution         | Sega                     | GDROM  | GDX-0021   |              |
 | | 2006     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev A) | Sega                     | GDROM  | GDX-0021A  |              |
-|*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  |              |
+|*| 2007     | Sega Network Taisen Mahjong MJ 3 Evolution (Rev B) | Sega                     | GDROM  | GDX-0021B  | ?            |
 | | 2009     | Firmware Update For Compact Flash Box              | Sega                     | GDROM  | GDX-0024   |              |
 |*| 2009     | Firmware Update For Compact Flash Box (Rev A)      | Sega                     | GDROM  | GDX-0024A  | 317-0567-EXP |
-|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C |              |
+|*| 2004     | Quest Of D Ver.1.01C                               | Sega                     | CDROM  | CDV-10005C | 317-0376-JPN |
 |*| 2005     | Sangokushi Taisen Ver.1.002                        | Sega                     | DVDROM | CDV-10009D |              |
 |*| 2005     | Mobile Suit Gundam 0079 Card Builder               | Banpresto                | DVDROM | CDV-10010  | 317-0415-JPN |
 |*| 2006     | Sangokushi Taisen 2 Ver.2.007                      | Sega                     | DVDROM | CDV-10019A |              |
@@ -385,7 +385,7 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcon.h"
 #include "debug/debugcmd.h"
 #include "debugger.h"
-#include "includes/chihiro.h"
+#include "includes/xbox_nv2a.h"
 #include "includes/xbox.h"
 #include "includes/xbox_usb.h"
 #include "machine/jvshost.h"
@@ -2027,8 +2027,8 @@ ROM_START( questofd )
 	DISK_IMAGE_READONLY( "cdv-10005c", 0, SHA1(b30238cf8697fb7313fedbe75b70641e9418090f) )
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
-	//PIC16C621A brute-forced key, label is unknown
-	ROM_LOAD("317-xxxx-xxx.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
+	//PIC16C621A (317-0376-JPN)
+	ROM_LOAD("317-0376-jpn.pic", 0x00, 0x4000, CRC(c6914d97) SHA1(e86897efcca86f303117d1ead6ede53ac410add8) )
 ROM_END
 
 ROM_START( gundcb79 )

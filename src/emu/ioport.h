@@ -654,6 +654,7 @@ enum
 //**************************************************************************
 
 // forward declarations
+namespace util { namespace xml { class data_node; } }
 class ioport_list;
 class ioport_port;
 struct ioport_port_live;
@@ -661,7 +662,6 @@ class ioport_field;
 struct ioport_field_live;
 class ioport_manager;
 class natural_keyboard;
-class xml_data_node;
 class analog_field;
 
 // constructor function pointer
@@ -1058,6 +1058,8 @@ public:
 	const input_seq &seq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	const input_seq &defseq(input_seq_type seqtype = SEQ_TYPE_STANDARD) const;
 	const input_seq &defseq_unresolved(input_seq_type seqtype = SEQ_TYPE_STANDARD) const { return m_seq[seqtype]; }
+	void set_defseq(const input_seq &newseq) { set_defseq(SEQ_TYPE_STANDARD, newseq); }
+	void set_defseq(input_seq_type seqtype, const input_seq &newseq);
 	bool has_dynamic_read() const { return !m_read.isnull(); }
 	bool has_dynamic_write() const { return !m_write.isnull(); }
 
@@ -1436,16 +1438,16 @@ private:
 	input_seq_type token_to_seq_type(const char *string);
 	static const char *const seqtypestrings[];
 
-	void load_config(config_type cfg_type, xml_data_node *parentnode);
-	void load_remap_table(xml_data_node const *parentnode);
-	bool load_default_config(xml_data_node const *portnode, int type, int player, const input_seq *newseq);
-	bool load_game_config(xml_data_node const *portnode, int type, int player, const input_seq *newseq);
+	void load_config(config_type cfg_type, util::xml::data_node const *parentnode);
+	void load_remap_table(util::xml::data_node const *parentnode);
+	bool load_default_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
+	bool load_game_config(util::xml::data_node const *portnode, int type, int player, const input_seq *newseq);
 
-	void save_config(config_type cfg_type, xml_data_node *parentnode);
-	void save_sequence(xml_data_node *parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
+	void save_config(config_type cfg_type, util::xml::data_node *parentnode);
+	void save_sequence(util::xml::data_node &parentnode, input_seq_type type, ioport_type porttype, const input_seq &seq);
 	bool save_this_input_field_type(ioport_type type);
-	void save_default_inputs(xml_data_node *parentnode);
-	void save_game_inputs(xml_data_node *parentnode);
+	void save_default_inputs(util::xml::data_node &parentnode);
+	void save_game_inputs(util::xml::data_node &parentnode);
 
 	template<typename _Type> _Type playback_read(_Type &result);
 	time_t playback_init();

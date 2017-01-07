@@ -9,13 +9,13 @@
 //
 //============================================================
 
-#include "emu.h"
-
-#include <bgfx/bgfxplatform.h>
-#include <bgfx/bgfx.h>
 #include <bx/fpumath.h>
 #include <bx/readerwriter.h>
 #include <bx/crtimpl.h>
+
+#include "emu.h"
+
+#include <bgfx/bgfx.h>
 
 #include "shadermanager.h"
 

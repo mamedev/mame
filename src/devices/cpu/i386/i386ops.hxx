@@ -1224,8 +1224,9 @@ void i386_device::i386_repeat(int invert_flag)
 			return;
 
 		default:
-			fatalerror("i386: Invalid REP/opcode %02X combination\n",opcode);
-			break;
+			logerror("i386: Invalid REP/opcode %02X combination at %08x\n",opcode, m_pc - 2);
+			m_pc--;
+			return;
 	}
 
 	if( m_address_size ) {

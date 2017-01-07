@@ -77,6 +77,8 @@ public:
 	required_ioport m_modifiers;
 	required_ioport_array<2> m_joykeymap;
 
+	std::unique_ptr<uint8_t[]> m_banked_ram;
+
 	virtual void machine_start() override;
 	virtual void machine_reset() override;
 
@@ -89,7 +91,7 @@ public:
 	DECLARE_READ8_MEMBER( videoram_r );
 	DECLARE_WRITE8_MEMBER( keylatch_w );
 	DECLARE_READ8_MEMBER( keydata_r );
-	DIRECT_UPDATE_MEMBER(mc1000_direct_update_handler);
+	DECLARE_READ8_MEMBER( rom_banking_r );
 
 	void bankswitch();
 
@@ -223,11 +225,21 @@ WRITE8_MEMBER( mc1000_state::mc6847_attr_w )
 static ADDRESS_MAP_START( mc1000_mem, AS_PROGRAM, 8, mc1000_state )
 	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
 	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
-	AM_RANGE(0x2800, 0x3fff) AM_RAM
+	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
 	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
 	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
 	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
-	AM_RANGE(0xc000, 0xffff) AM_ROM
+	AM_RANGE(0xc000, 0xffff) AM_ROM AM_REGION(Z80_TAG, 0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mc1000_banking_mem, AS_DECRYPTED_OPCODES, 8, mc1000_state )
+	AM_RANGE(0x0000, 0x1fff) AM_RAMBANK("bank1")
+	AM_RANGE(0x2000, 0x27ff) AM_RAMBANK("bank2") AM_SHARE("mc6845_vram")
+	AM_RANGE(0x2800, 0x3fff) AM_RAM AM_SHARE("ram2800")
+	AM_RANGE(0x4000, 0x7fff) AM_RAMBANK("bank3")
+	AM_RANGE(0x8000, 0x97ff) AM_RAMBANK("bank4") AM_SHARE("mc6847_vram")
+	AM_RANGE(0x9800, 0xbfff) AM_RAMBANK("bank5")
+	AM_RANGE(0xc000, 0xffff) AM_READ(rom_banking_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mc1000_io, AS_IO, 8, mc1000_state )
@@ -411,40 +423,45 @@ READ8_MEMBER( mc1000_state::keydata_r )
 	return data;
 }
 
+
+READ8_MEMBER( mc1000_state::rom_banking_r )
+{
+	membank("bank1")->set_entry(0);
+	m_rom0000 = 0;
+	return m_rom->base()[offset];
+}
+
 /* Machine Initialization */
 
 void mc1000_state::machine_start()
 {
-	address_space &program = m_maincpu->space(AS_PROGRAM);
-
 	/* setup memory banking */
-	uint8_t *rom = m_rom->base();
+	m_banked_ram = make_unique_clear<uint8_t[]>(0xc000);
 
-	program.install_readwrite_bank(0x0000, 0x1fff, "bank1");
-	membank("bank1")->configure_entry(0, rom);
-	membank("bank1")->configure_entry(1, rom + 0xc000);
+	membank("bank1")->configure_entry(0, m_banked_ram.get());
+	membank("bank1")->configure_entry(1, m_rom->base());
 	membank("bank1")->set_entry(1);
 
 	m_rom0000 = 1;
 
-	program.install_readwrite_bank(0x2000, 0x27ff, "bank2");
-	membank("bank2")->configure_entry(0, rom + 0x2000);
+	membank("bank2")->configure_entry(0, m_banked_ram.get() + 0x2000);
 	membank("bank2")->configure_entry(1, m_mc6845_video_ram);
 	membank("bank2")->set_entry(0);
 
-	membank("bank3")->configure_entry(0, rom + 0x4000);
+	membank("bank3")->configure_entry(0, m_banked_ram.get() + 0x4000);
 	membank("bank3")->set_entry(0);
 
 	membank("bank4")->configure_entry(0, m_mc6847_video_ram);
-	membank("bank4")->configure_entry(1, rom + 0x8000);
+	membank("bank4")->configure_entry(1, m_banked_ram.get() + 0x8000);
 	membank("bank4")->set_entry(0);
 
-	membank("bank5")->configure_entry(0, rom + 0x9800);
+	membank("bank5")->configure_entry(0, m_banked_ram.get() + 0x9800);
 	membank("bank5")->set_entry(0);
 
 	bankswitch();
 
 	/* register for state saving */
+	save_pointer(NAME(m_banked_ram.get()), 0xc000);
 	save_item(NAME(m_rom0000));
 	save_item(NAME(m_mc6845_bank));
 	save_item(NAME(m_mc6847_bank));
@@ -514,6 +531,7 @@ static MACHINE_CONFIG_START( mc1000, mc1000_state )
 	/* basic machine hardware */
 	MCFG_CPU_ADD(Z80_TAG, Z80, 3579545)
 	MCFG_CPU_PROGRAM_MAP(mc1000_mem)
+	MCFG_CPU_DECRYPTED_OPCODES_MAP(mc1000_banking_mem)
 	MCFG_CPU_IO_MAP(mc1000_io)
 
 	/* timers */
@@ -562,34 +580,13 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( mc1000 )
-	ROM_REGION( 0x10000, Z80_TAG, 0 )
-	ROM_LOAD( "mc1000.ic17", 0xc000, 0x2000, CRC(8e78d80d) SHA1(9480270e67a5db2e7de8bc5c8b9e0bb210d4142b) )
-	ROM_LOAD( "mc1000.ic12", 0xe000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
+	ROM_REGION( 0x4000, Z80_TAG, 0 )
+	ROM_LOAD( "mc1000.ic17", 0x0000, 0x2000, CRC(8e78d80d) SHA1(9480270e67a5db2e7de8bc5c8b9e0bb210d4142b) )
+	ROM_LOAD( "mc1000.ic12", 0x2000, 0x2000, CRC(750c95f0) SHA1(fd766f5ea4481ef7fd4df92cf7d8397cc2b5a6c4) )
 ROM_END
 
-
-/* Driver Initialization */
-
-DIRECT_UPDATE_MEMBER(mc1000_state::mc1000_direct_update_handler)
-{
-	if (m_rom0000)
-	{
-		if (address >= 0xc000)
-		{
-			membank("bank1")->set_entry(0);
-			m_rom0000 = 0;
-		}
-	}
-
-	return address;
-}
-
-DRIVER_INIT_MEMBER(mc1000_state,mc1000)
-{
-	m_maincpu->space(AS_PROGRAM).set_direct_update_handler(direct_update_delegate(&mc1000_state::mc1000_direct_update_handler, this));
-}
 
 /* System Drivers */
 
 /*    YEAR  NAME        PARENT      COMPAT  MACHINE     INPUT       INIT        COMPANY             FULLNAME        FLAGS */
-COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, mc1000_state,       mc1000,     "CCE",              "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )
+COMP( 1985, mc1000,     0,          0,      mc1000,     mc1000, driver_device, 0, "CCE",            "MC-1000",      MACHINE_IMPERFECT_GRAPHICS | MACHINE_SUPPORTS_SAVE )

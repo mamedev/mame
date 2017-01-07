@@ -761,6 +761,8 @@ if (BUSES["IEEE488"]~=null) then
 		MAME_DIR .. "src/devices/bus/ieee488/hardbox.h",
 		MAME_DIR .. "src/devices/bus/ieee488/shark.cpp",
 		MAME_DIR .. "src/devices/bus/ieee488/shark.h",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9895.cpp",
+		MAME_DIR .. "src/devices/bus/ieee488/hp9895.h",
 	}
 end
 
@@ -1480,6 +1482,27 @@ if (BUSES["VIP"]~=null) then
 		MAME_DIR .. "src/devices/bus/vip/vp595.h",
 		MAME_DIR .. "src/devices/bus/vip/vp700.cpp",
 		MAME_DIR .. "src/devices/bus/vip/vp700.h",
+	}
+end
+
+
+---------------------------------------------------
+--
+--@src/devices/bus/vme/vme.h,BUSES["VME"] = true
+---------------------------------------------------
+
+if (BUSES["VME"]~=null) then
+	files {
+    MAME_DIR .. "src/devices/bus/vme/vme.cpp",
+    MAME_DIR .. "src/devices/bus/vme/vme.h",
+    MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.cpp",
+    MAME_DIR .. "src/devices/bus/vme/vme_mzr8300.h",
+    MAME_DIR .. "src/devices/bus/vme/vme_mvme350.cpp",
+    MAME_DIR .. "src/devices/bus/vme/vme_mvme350.h",
+    MAME_DIR .. "src/devices/bus/vme/vme_fcisio.cpp",
+    MAME_DIR .. "src/devices/bus/vme/vme_fcisio.h",
+    MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.cpp",
+    MAME_DIR .. "src/devices/bus/vme/vme_fcscsi.h",
 	}
 end
 
@@ -2416,6 +2439,7 @@ if (BUSES["COCO"]~=null) then
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.cpp",
 		MAME_DIR .. "src/devices/bus/coco/coco_dwsock.h",
 		MAME_DIR .. "src/devices/bus/coco/dragon_fdc.cpp",
+		MAME_DIR .. "src/devices/bus/coco/coco_t4426.cpp",
 	}
 end
 

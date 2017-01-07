@@ -415,6 +415,14 @@ m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *
 {
 }
 
+m6805_base_device::m6805_base_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock, const device_type type, const char *name, uint32_t addr_width, address_map_delegate internal_map, const char *shortname, const char *source)
+	: cpu_device(mconfig, type, name, tag, owner, clock, shortname, source),
+	m_program_config("program", ENDIANNESS_BIG, 8, addr_width, 0, internal_map)
+{
+}
+
+
+
 void m6805_base_device::device_start()
 {
 	m_program = &space(AS_PROGRAM);
@@ -446,6 +454,7 @@ void m6805_base_device::device_start()
 	save_item(NAME(m_irq_state));
 	save_item(NAME(m_nmi_state));
 }
+
 
 
 void m6805_base_device::device_reset()
@@ -954,6 +963,353 @@ void m68705_device::execute_set_input(int inputnum, int state)
 	}
 }
 
+/* ddr - direction registers */
+
+WRITE8_MEMBER(m68705_new_device::internal_ddrA_w)
+{
+	const u8 ddr_old = m_ddrA;
+	m_ddrA = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrA & ~ddr_old) != 0)
+		update_portA_state();
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_ddrB_w)
+{
+	const u8 ddr_old = m_ddrB;
+	m_ddrB = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrB & ~ddr_old) != 0)
+		update_portB_state();
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_ddrC_w)
+{
+	const u8 ddr_old = m_ddrC;
+	m_ddrC = data;
+
+	// update outputs if lines switched to output
+	if ((m_ddrC & ~ddr_old) != 0)
+		update_portC_state();
+}
+
+/* read ports */
+
+READ8_MEMBER(m68705_new_device::internal_portA_r)
+{
+	if (!m_portA_cb_r.isnull())
+		m_portA_in = m_portA_cb_r(space, 0, ~m_ddrA); // pass the direction register as mem_mask so that externally we know which lines were actually pulled
+	u8 res = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+	return res;
+}
+
+READ8_MEMBER(m68705_new_device::internal_portB_r)
+{
+	if (!m_portB_cb_r.isnull())
+		m_portB_in = m_portB_cb_r(space, 0, ~m_ddrB);
+	u8 res = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+	return res;
+}
+
+READ8_MEMBER(m68705_new_device::internal_portC_r)
+{
+	if (!m_portC_cb_r.isnull())
+		m_portC_in = m_portC_cb_r(space, 0, ~m_ddrC);
+	u8 res = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+	return res;
+}
+
+/* write ports */
+
+WRITE8_MEMBER(m68705_new_device::internal_portA_w)
+{
+	// load the output latch
+	m_portA_out = data;
+
+	// update the output lines
+	update_portA_state();
+}
+
+void m68705_new_device::update_portA_state()
+{
+	// pass bits through DDR output mask
+	m_portA_in = (m_portA_out & m_ddrA) | (m_portA_in & ~m_ddrA);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portA_cb_w(space(AS_PROGRAM), 0, m_portA_in, m_ddrA);
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_portB_w)
+{
+	// load the output latch
+	m_portB_out = data;
+
+	// update the output lines
+	update_portB_state();
+}
+
+void m68705_new_device::update_portB_state()
+{
+	// pass bits through DDR output mask
+	m_portB_in = (m_portB_out & m_ddrB) | (m_portB_in & ~m_ddrB);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portB_cb_w(space(AS_PROGRAM), 0, m_portB_in, m_ddrB);
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_portC_w)
+{
+	// load the output latch
+	m_portC_out = data;
+
+	// update the output lines
+	update_portC_state();
+}
+
+void m68705_new_device::update_portC_state()
+{
+	// pass bits through DDR output mask
+	m_portC_in = (m_portC_out & m_ddrC) | (m_portC_in & ~m_ddrC);
+
+	// pass the direction register as mem_mask as mem_mask so that externally we know which lines were actually pushed
+	m_portC_cb_w(space(AS_PROGRAM), 0, m_portC_in, m_ddrC);
+}
+
+READ8_MEMBER(m68705_new_device::pa_r)
+{
+	return m_portA_in;
+}
+
+READ8_MEMBER(m68705_new_device::pb_r)
+{
+	return m_portB_in;
+}
+
+READ8_MEMBER(m68705_new_device::pc_r)
+{
+	return m_portC_in;
+}
+
+WRITE8_MEMBER(m68705_new_device::pa_w)
+{
+	COMBINE_DATA(&m_portA_in);
+}
+
+WRITE8_MEMBER(m68705_new_device::pb_w)
+{
+	COMBINE_DATA(&m_portB_in);
+}
+
+WRITE8_MEMBER(m68705_new_device::pc_w)
+{
+	COMBINE_DATA(&m_portC_in);
+}
+
+
+READ8_MEMBER(m68705_new_device::internal_68705_tdr_r)
+{
+	//logerror("internal_68705 TDR read, returning %02X\n", m_tdr);
+	return m_tdr;
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_68705_tdr_w)
+{
+	//logerror("internal_68705 TDR written with %02X, was %02X\n", data, m_tdr);
+	m_tdr = data;
+}
+
+
+READ8_MEMBER(m68705_new_device::internal_68705_tcr_r)
+{
+	//logerror("internal_68705 TCR read, returning %02X\n", (m_tcr&0xF7));
+	return (m_tcr & 0xF7);
+}
+
+WRITE8_MEMBER(m68705_new_device::internal_68705_tcr_w)
+{
+/*
+    logerror("internal_68705 TCR written with %02X\n", data);
+    if (data&0x80) logerror("  TIR=1, Timer Interrupt state is set\n"); else logerror("  TIR=0; Timer Interrupt state is cleared\n");
+    if (data&0x40) logerror("  TIM=1, Timer Interrupt is now masked\n"); else logerror("  TIM=0, Timer Interrupt is now unmasked\n");
+    if (data&0x20) logerror("  TIN=1, Timer Clock source is set to external\n"); else logerror("  TIN=0, Timer Clock source is set to internal\n");
+    if (data&0x10) logerror("  TIE=1, Timer External pin is enabled\n"); else logerror("  TIE=0, Timer External pin is disabled\n");
+    if (data&0x08) logerror("  PSC=1, Prescaler counter cleared\n"); else logerror("  PSC=0, Prescaler counter left alone\n");
+    logerror("  Prescaler: %d\n", (1<<(data&0x7)));
+*/
+	// if timer was enabled but now isn't, shut it off.
+	// below is a hack assuming the TIMER pin isn't going anywhere except tied to +5v, so basically TIN is acting as an active-low timer enable, and TIE is ignored even in the case where TIE=1, the timer will end up being 5v ANDED against the internal timer clock which == the internal timer clock.
+	// Note this hack is incorrect; the timer pin actually does connect somewhere (vblank or maybe one of the V counter bits?), but the game never actually uses the timer pin in external clock mode, so the TIMER connection must be left over from development. We can apparently safely ignore it.
+	if ((m_tcr^data)&0x20)// check if TIN state changed
+	{
+		/* logerror("timer enable state changed!\n"); */
+		if (data&0x20) m_68705_timer->adjust(attotime::never, TIMER_68705_PRESCALER_EXPIRED);
+		else m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+	}
+	// prescaler check: if timer prescaler has changed, or the PSC bit is set, adjust the timer length for the prescaler expired timer, but only if the timer would be running
+	if ( (((m_tcr&0x07)!=(data&0x07))||(data&0x08)) && ((data&0x20)==0) )
+	{
+		/* logerror("timer reset due to PSC or prescaler change!\n"); */
+		m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(data&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+	}
+	m_tcr = data;
+	// if int state is set, and TIM is unmasked, assert an interrupt. otherwise clear it.
+	if ((m_tcr&0xC0) == 0x80)
+		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
+	else
+		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
+
+}
+
+void m68705_new_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	switch (id)
+	{
+	case TIMER_68705_PRESCALER_EXPIRED:
+		timer_68705_increment(ptr, param);
+		break;
+	default:
+		assert_always(false, "Unknown id in m68705_new_device::device_timer");
+	}
+}
+
+TIMER_CALLBACK_MEMBER(m68705_new_device::timer_68705_increment)
+{
+	m_tdr++;
+	if (m_tdr == 0x00) m_tcr |= 0x80; // if we overflowed, set the int bit
+	if ((m_tcr&0xC0) == 0x80)
+		set_input_line(M68705_INT_TIMER, ASSERT_LINE);
+	else
+		set_input_line(M68705_INT_TIMER, CLEAR_LINE);
+	m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<(m_tcr&0x7))), TIMER_68705_PRESCALER_EXPIRED);
+}
+
+
+
+/*
+
+The 68(7)05 peripheral memory map:
+Common for Px, Rx, Ux parts:
+0x00: Port A data (RW)
+0x01: Port B data (RW)
+0x02: Port C data (RW) [top 4 bits do nothing (read as 1s) on Px parts, work as expected on Rx, Ux parts]
+0x03: [Port D data (RW), only on Rx, Ux parts]
+0x04: Port A DDR (Write only, reads as 0xFF)
+0x05: Port B DDR (Write only, reads as 0xFF)
+0x06: Port C DDR (Write only, reads as 0xFF) [top 4 bits do nothing on Px parts, work as expected on Rx, Ux parts]
+0x07: Unused (reads as 0xFF?)
+0x08: Timer Data Register (RW; acts as ram when timer isn't counting, otherwise decrements once per prescaler expiry)
+0x09: Timer Control Register (RW; on certain mask part and when MOR bit 6 is not set, all bits are RW except bit 3 which
+always reads as zero. when MOR bit 6 is set and on all mask parts except one listed in errata in the 6805 daatsheet,
+the top two bits are RW, bottom 6 always read as 1 and writes do nothing; on the errata chip, bit 3 is writable and
+clears the prescaler, reads as zero)
+0x0A: [Miscellaneous Register, only on Rx, Sx, Ux parts]
+0x0B: [Eprom parts: Programming Control Register (write only?, low 3 bits; reads as 0xFF?); Unused (reads as 0xFF?) on
+Mask parts]
+0x0C: Unused (reads as 0xFF?)
+0x0D: Unused (reads as 0xFF?)
+0x0E: [A/D control register, only on Rx, Ux, Sx parts]
+0x0F: [A/D result register, only on Rx, Ux, Sx parts]
+0x10-0x7f: internal ram; SP can only point to 0x60-0x7F. Rx parts have an unused hole from 0x10-0x3F (reads as 0xFF?)
+0x80-0xFF: Page 0 user rom
+The remainder of the memory map differs here between parts, see appropriate datasheet for each part.
+The four vectors are always stored in big endian form as the last 8 bytes of the address space.
+
+Sx specific differences:
+0x02: Port C data (RW) [top 6 bits do nothing (read as 1s) on Sx parts]
+0x06: Port C DDR (Write only, reads as 0xFF) [top 6 bits do nothing on Sx parts]
+0x0B: Timer 2 Data Register MSB
+0x0C: Timer 2 Data Register LSB
+0x0D: Timer 2 Control Register
+0x10: SPI Data Register
+0x11: SPI Control Register
+0x12-0x3F: Unused (reads as 0xFF?)
+
+MOR ADDRESS: Mask Option Register; does not exist on R2 and several other but not all mask parts, located at 0x784 on Px parts
+
+Rx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x10-0x3f and and 0x100-0x7BF; has A/D converter, Ports A-D;
+eprom parts have MOR at 0xF38; mask parts have selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+Px Parts: 28 pins; address space is 0x000-0x7ff; eprom parts have MOR at 0x784 and bootstrap rom at 0x785-0x7f7; mask parts have a
+selftest rom at similar area; port c is just 4 bits.
+
+Sx Parts: 40 pins; address space is 0x000-0xfff with an unused hole at 0x12-0x3f and and 0x100-0x9BF; has A/D converter; has SPI
+serial; port C is just two bits; has an extra 16-bit timer compared to Ux/Rx; selftest rom at 0xF00-0xFF7
+
+Ux Parts: 40 pins; address space is 0x000-0xfff; has A/D converter, Ports A-D; eprom parts have MOR at 0xF38; mask parts have
+selftest rom at similar area; selftest roms differ between the U2 and U3 versions
+
+*/
+
+DEVICE_ADDRESS_MAP_START( internal_map, 8, m68705_new_device )
+	AM_RANGE(0x000, 0x000) AM_READWRITE(internal_portA_r, internal_portA_w)
+	AM_RANGE(0x001, 0x001) AM_READWRITE(internal_portB_r, internal_portB_w)
+	AM_RANGE(0x002, 0x002) AM_READWRITE(internal_portC_r, internal_portC_w)
+	AM_RANGE(0x004, 0x004) AM_WRITE(internal_ddrA_w)
+	AM_RANGE(0x005, 0x005) AM_WRITE(internal_ddrB_w)
+	AM_RANGE(0x006, 0x006) AM_WRITE(internal_ddrC_w)
+
+	AM_RANGE(0x008, 0x008) AM_READWRITE(internal_68705_tdr_r, internal_68705_tdr_w)
+	AM_RANGE(0x009, 0x009) AM_READWRITE(internal_68705_tcr_r, internal_68705_tcr_w)
+
+
+	AM_RANGE(0x010, 0x07f) AM_RAM
+	AM_RANGE(0x080, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+void m68705_new_device::device_start()
+{
+	m68705_device::device_start();
+
+	save_item(NAME(m_portA_in));
+	save_item(NAME(m_portB_in));
+	save_item(NAME(m_portC_in));
+
+	save_item(NAME(m_portA_out));
+	save_item(NAME(m_portB_out));
+	save_item(NAME(m_portC_out));
+
+	save_item(NAME(m_ddrA));
+	save_item(NAME(m_ddrB));
+	save_item(NAME(m_ddrC));
+
+	m_portA_cb_w.resolve_safe();
+	m_portB_cb_w.resolve_safe();
+	m_portC_cb_w.resolve_safe();
+
+	m_portA_cb_r.resolve();
+	m_portB_cb_r.resolve();
+	m_portC_cb_r.resolve();
+
+	m_portA_in = 0xff;
+	m_portB_in = 0xff;
+	m_portC_in = 0xff;
+
+	// allocate the MCU timer, and set it to fire NEVER.
+	m_68705_timer = machine().scheduler().timer_alloc(timer_expired_delegate(FUNC(m68705_new_device::timer_68705_increment),this));
+	m_68705_timer->adjust(attotime::never);
+
+	save_item(NAME(m_tdr));
+	save_item(NAME(m_tcr));
+
+}
+
+void m68705_new_device::device_reset()
+{
+	m68705_device::device_reset();
+
+	// all bits of ports A, B and C revert to inputs on reset
+	m_ddrA = 0;
+	m_ddrB = 0;
+	m_ddrC = 0;
+
+	m_tdr = 0xFF;
+	m_tcr = 0x7F;
+
+	//set_input_line(M68705_IRQ_LINE, CLEAR_LINE);
+	m_68705_timer->adjust(attotime::from_hz(((clock())/4)/(1<<7)));
+}
 
 /****************************************************************************
  * HD63705 section
@@ -1000,4 +1356,5 @@ void hd63705_device::execute_set_input(int inputnum, int state)
 const device_type M6805 = &device_creator<m6805_device>;
 const device_type M68HC05EG = &device_creator<m68hc05eg_device>;
 const device_type M68705 = &device_creator<m68705_device>;
+const device_type M68705_NEW = &device_creator<m68705_new_device>;
 const device_type HD63705 = &device_creator<hd63705_device>;

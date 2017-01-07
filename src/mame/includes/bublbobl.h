@@ -2,6 +2,7 @@
 // copyright-holders:Chris Moore, Nicola Salmoria
 
 #include "machine/gen_latch.h"
+#include "machine/taito68705interface.h"
 
 class bublbobl_state : public driver_device
 {
@@ -23,7 +24,8 @@ public:
 		m_slave(*this, "slave"),
 		m_gfxdecode(*this, "gfxdecode"),
 		m_palette(*this, "palette"),
-		m_soundlatch(*this, "soundlatch") { }
+		m_soundlatch(*this, "soundlatch")
+	{ }
 
 	/* memory pointers */
 	required_shared_ptr<uint8_t> m_videoram;
@@ -39,8 +41,7 @@ public:
 	int      m_sound_status;
 
 	/* mcu-related */
-	/* Tokio*/
-	int      m_tokio_prot_count;
+
 	/* Bubble Bobble MCU */
 	uint8_t    m_ddr1;
 	uint8_t    m_ddr2;
@@ -80,7 +81,7 @@ public:
 	DECLARE_WRITE8_MEMBER(tokio_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(tokio_videoctrl_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_nmitrigger_w);
-	DECLARE_READ8_MEMBER(tokio_mcu_r);
+
 	DECLARE_READ8_MEMBER(tokiob_mcu_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_sound_command_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_sh_nmi_disable_w);
@@ -114,7 +115,7 @@ public:
 	DECLARE_READ8_MEMBER(bublbobl_68705_port_b_r);
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_port_b_w);
 	DECLARE_WRITE8_MEMBER(bublbobl_68705_ddr_b_w);
-	DECLARE_DRIVER_INIT(tokiob);
+
 	DECLARE_DRIVER_INIT(tokio);
 	DECLARE_DRIVER_INIT(dland);
 	DECLARE_DRIVER_INIT(bublbobl);

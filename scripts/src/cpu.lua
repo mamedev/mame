@@ -13,7 +13,7 @@
 -- Dynamic recompiler objects
 --------------------------------------------------
 
-if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null) then
+if (CPUS["SH2"]~=null or CPUS["MIPS"]~=null or CPUS["POWERPC"]~=null or CPUS["RSP"]~=null or CPUS["ARM7"]~=null or CPUS["ADSP21062"]~=null or CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/drcbec.cpp",
 		MAME_DIR .. "src/devices/cpu/drcbec.h",
@@ -1064,6 +1064,9 @@ if (CPUS["MB86235"]~=null) then
 	files {
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235.cpp",
 		MAME_DIR .. "src/devices/cpu/mb86235/mb86235.h",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235drc.cpp",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.cpp",
+		MAME_DIR .. "src/devices/cpu/mb86235/mb86235fe.h",
 	}
 end
 

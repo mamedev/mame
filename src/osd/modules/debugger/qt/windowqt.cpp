@@ -257,7 +257,7 @@ void WindowQtConfig::applyToQWidget(QWidget* widget)
 }
 
 
-void WindowQtConfig::addToXmlDataNode(xml_data_node &node) const
+void WindowQtConfig::addToXmlDataNode(util::xml::data_node &node) const
 {
 	node.set_attribute_int("type", m_type);
 	node.set_attribute_int("position_x", m_position.x());
@@ -267,7 +267,7 @@ void WindowQtConfig::addToXmlDataNode(xml_data_node &node) const
 }
 
 
-void WindowQtConfig::recoverFromXmlNode(xml_data_node const &node)
+void WindowQtConfig::recoverFromXmlNode(util::xml::data_node const &node)
 {
 	m_size.setX(node.get_attribute_int("size_x", m_size.x()));
 	m_size.setY(node.get_attribute_int("size_y", m_size.y()));

@@ -39,6 +39,7 @@ includedirs {
 files {
 	MAME_DIR .. "src/emu/emu.h",
 	MAME_DIR .. "src/emu/main.h",
+	MAME_DIR .. "src/emu/main.cpp",
 	MAME_DIR .. "src/emu/gamedrv.h",
 	MAME_DIR .. "src/emu/hashfile.cpp",
 	MAME_DIR .. "src/emu/hashfile.h",
@@ -93,8 +94,6 @@ files {
 	MAME_DIR .. "src/emu/dislot.h",
 	MAME_DIR .. "src/emu/disound.cpp",
 	MAME_DIR .. "src/emu/disound.h",
-	MAME_DIR .. "src/emu/dispatch.cpp",
-	MAME_DIR .. "src/emu/dispatch.h",
 	MAME_DIR .. "src/emu/distate.cpp",
 	MAME_DIR .. "src/emu/distate.h",
 	MAME_DIR .. "src/emu/divideo.cpp",
@@ -183,7 +182,6 @@ files {
 	MAME_DIR .. "src/emu/video.h",
 	MAME_DIR .. "src/emu/rendersw.hxx",
 	MAME_DIR .. "src/emu/ui/uimain.h",
-	MAME_DIR .. "src/emu/ui/cmdrender.h", -- TODO: remove
 	MAME_DIR .. "src/emu/ui/cmddata.h",   -- TODO: remove
 	MAME_DIR .. "src/emu/debug/debugcmd.cpp",
 	MAME_DIR .. "src/emu/debug/debugcmd.h",

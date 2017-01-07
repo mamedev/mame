@@ -1,5 +1,5 @@
 // license:BSD-3-Clause
-// copyright-holders:Aaron Giles
+// copyright-holders:Aaron Giles, Vas Crabb
 /***************************************************************************
 
     rendfont.h
@@ -8,8 +8,8 @@
 
 ***************************************************************************/
 
-#ifndef __RENDFONT_H__
-#define __RENDFONT_H__
+#ifndef MAME_EMU_RENDFONT_H
+#define MAME_EMU_RENDFONT_H
 
 #include "render.h"
 
@@ -53,11 +53,15 @@ private:
 	{
 	public:
 		glyph()
-			: width(0),
-				xoffs(0), yoffs(0),
-				bmwidth(0), bmheight(0),
-				rawdata(nullptr),
-				texture(nullptr) { }
+			: width(-1)
+			, xoffs(-1), yoffs(-1)
+			, bmwidth(0), bmheight(0)
+			, rawdata(nullptr)
+			, texture(nullptr)
+			, bitmap()
+			, color()
+		{
+		}
 
 		s32                 width;              // width from this character to the next
 		s32                 xoffs, yoffs;       // X and Y offset from baseline to top,left of bitmap
@@ -67,16 +71,15 @@ private:
 		bitmap_argb32       bitmap;             // pointer to the bitmap containing the raw data
 
 		rgb_t               color;
-
 	};
 
 	// internal format
-	enum format
+	enum class format
 	{
-		FF_UNKNOWN,
-		FF_TEXT,
-		FF_CACHED,
-		FF_OSD
+		UNKNOWN,
+		TEXT,
+		CACHED,
+		OSD
 	};
 
 	// helpers
@@ -84,9 +87,8 @@ private:
 	void char_expand(char32_t chnum, glyph &ch);
 	bool load_cached_bdf(const char *filename);
 	bool load_bdf();
-	bool load_cached(emu_file &file, u32 hash);
-	bool load_cached_cmd(emu_file &file, u32 hash);
-	bool save_cached(const char *filename, u32 hash);
+	bool load_cached(emu_file &file, u64 length, u32 hash);
+	bool save_cached(const char *filename, u64 length, u32 hash);
 
 	void render_font_command_glyph();
 
@@ -95,6 +97,7 @@ private:
 	format              m_format;           // format of font data
 	int                 m_height;           // height of the font, from ascent to descent
 	int                 m_yoffs;            // y offset from baseline to descent
+	int                 m_defchar;          // default substitute character
 	float               m_scale;            // 1 / height precomputed
 	glyph               *m_glyphs[17*256];  // array of glyph subtables
 	std::vector<char>   m_rawdata;          // pointer to the raw data for the font
@@ -107,11 +110,9 @@ private:
 	std::vector<char>   m_rawdata_cmd;      // pointer to the raw data for the font
 
 	// constants
-	static const int CACHED_CHAR_SIZE       = 12;
-	static const int CACHED_HEADER_SIZE     = 16;
 	static const u64 CACHED_BDF_HASH_SIZE   = 1024;
 };
 
 void convert_command_glyph(std::string &s);
 
-#endif  /* __RENDFONT_H__ */
+#endif  /* MAME_EMU_RENDFONT_H */

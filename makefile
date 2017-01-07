@@ -235,7 +235,9 @@ SUBTARGET_FULL := $(subst -,_,$(SUBTARGET))
 
 CONFIG = release
 ifdef DEBUG
+ifneq '$(DEBUG)' '0'
 CONFIG := debug
+endif
 endif
 
 ifdef VERBOSE
@@ -511,8 +513,10 @@ endif
 
 # profiler defaults to on for DEBUG builds
 ifdef DEBUG
+ifneq '$(DEBUG)' '0'
 ifndef PROFILER
 PROFILER = 1
+endif
 endif
 endif
 
@@ -521,9 +525,6 @@ endif
 ifdef PROFILE
 PROFILER =
 SYMBOLS = 1
-ifndef SYMLEVEL
-SYMLEVEL = 1
-endif
 endif
 
 # specify a default optimization level if none explicitly stated
@@ -533,10 +534,14 @@ endif
 
 # set the symbols level
 ifdef SYMBOLS
+PARAMS += --SYMBOLS='$(SYMBOLS)'
+ifneq '$(SYMBOLS)' '0'
 ifndef SYMLEVEL
-SYMLEVEL = 1
 ifdef SOURCES
 SYMLEVEL = 2
+else
+SYMLEVEL = 1
+endif
 endif
 endif
 endif
@@ -557,10 +562,6 @@ ifdef BENCHMARKS
 ifneq '$(BENCHMARKS)' '0'
 PARAMS += --with-benchmarks
 endif
-endif
-
-ifdef SYMBOLS
-PARAMS += --SYMBOLS='$(SYMBOLS)'
 endif
 
 ifdef SYMLEVEL
@@ -804,7 +805,7 @@ SCRIPTS += scripts/target/$(TARGET)/mess.lua
 endif
 
 ifndef SOURCES
-ifdef PROJECT 
+ifdef PROJECT
 SCRIPTS += projects/$(PROJECT)/scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
 else
 SCRIPTS += scripts/target/$(TARGET)/$(SUBTARGET_FULL).lua
@@ -1535,14 +1536,14 @@ endif
 
 ifeq (posix,$(SHELLTYPE))
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc | $(GEN_FOLDERS)
-	@echo '#define BARE_BUILD_VERSION "0.180"' > $@
+	@echo '#define BARE_BUILD_VERSION "0.181"' > $@
 	@echo 'extern const char bare_build_version[];' >> $@
 	@echo 'extern const char build_version[];' >> $@
 	@echo 'const char bare_build_version[] = BARE_BUILD_VERSION;' >> $@
 	@echo 'const char build_version[] = BARE_BUILD_VERSION " ($(NEW_GIT_VERSION))";' >> $@
 else
 $(GENDIR)/version.cpp: $(GENDIR)/git_desc
-	@echo #define BARE_BUILD_VERSION "0.180" > $@
+	@echo #define BARE_BUILD_VERSION "0.181" > $@
 	@echo extern const char bare_build_version[]; >> $@
 	@echo extern const char build_version[]; >> $@
 	@echo const char bare_build_version[] = BARE_BUILD_VERSION; >> $@

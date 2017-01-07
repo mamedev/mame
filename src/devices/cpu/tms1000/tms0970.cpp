@@ -119,7 +119,7 @@ void tms0970_cpu_device::device_reset()
 		uint32_t mmask = m_mpla->read(msel);
 		mmask ^= 0x09fe; // invert active-negative
 
-		//                             _____  _____  _____  _____  ______  _____  ______  _____              _____
+		//                               _____  _____  _____  _____  ______  _____  ______  _____              _____
 		const uint32_t md[15] = { M_CKM, M_CKP, M_YTP, M_MTP, M_ATN, M_NATN, M_MTN, M_15TN, M_CKN, M_NE, M_C8, M_CIN, M_AUTA, M_AUTY, M_STO };
 
 		for (int bit = 0; bit < 15; bit++)

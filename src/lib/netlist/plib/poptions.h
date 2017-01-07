@@ -39,6 +39,7 @@ class option_group : public option_base
 public:
 	option_group(options &parent, pstring group, pstring help)
 	: option_base(parent, help), m_group(group) { }
+	~option_group();
 
 	pstring group() { return m_group; }
 private:
@@ -50,6 +51,7 @@ class option_example : public option_base
 public:
 	option_example(options &parent, pstring group, pstring help)
 	: option_base(parent, help), m_example(group) { }
+	~option_example();
 
 	pstring example() { return m_example; }
 private:
@@ -61,6 +63,7 @@ class option : public option_base
 {
 public:
 	option(options &parent, pstring ashort, pstring along, pstring help, bool has_argument);
+	~option();
 
 	/* no_argument options will be called with "" argument */
 

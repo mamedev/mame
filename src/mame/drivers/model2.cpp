@@ -752,14 +752,42 @@ WRITE32_MEMBER(model2_state::copro_function_port_w)
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
 	if (m_dsp_type == DSP_TYPE_SHARC)
 		copro_fifoin_push(machine().device("dsp"), d,offset,mem_mask);
-	else
+	else if (m_dsp_type == DSP_TYPE_TGP)
 		copro_fifoin_push(machine().device("tgp"), d,offset,mem_mask);
+	else if (m_dsp_type == DSP_TYPE_TGPX4)
+	{
+		if (m_tgpx4->is_fifoin_full())
+			printf("trying to push to full fifo! (function port)\n");
+
+		m_tgpx4->fifoin_w(d);
+	}
 }
 
 READ32_MEMBER(model2_state::copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop(space,offset,mem_mask);
+	if (m_dsp_type == DSP_TYPE_SHARC || m_dsp_type == DSP_TYPE_TGP)
+	{
+		return copro_fifoout_pop(space, offset, mem_mask);
+	}
+	else
+	{
+		// TODO
+//      printf("FIFO OUT read\n");
+		if (m_tgpx4->is_fifoout0_empty())
+		{
+			/* Reading from empty FIFO causes the i960 to enter wait state */
+			downcast<i960_cpu_device &>(space.device()).i960_stall();
+			/* spin the main cpu and let the TGP catch up */
+			space.device().execute().spin_until_time(attotime::from_usec(100));
+			printf("stalled\n");
+		}
+		else
+		{
+			return (uint32_t)(m_tgpx4->fifoout0_r());
+		}
+	}
+	return 0;
 }
 
 WRITE32_MEMBER(model2_state::copro_fifo_w)
@@ -774,6 +802,19 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 		{
 			m_tgp_program[m_coprocnt] = data;
 		}
+		else if (m_dsp_type == DSP_TYPE_TGPX4)
+		{
+			if (m_coprocnt & 1)
+			{
+				m_tgpx4_program[m_coprocnt / 2] &= 0xffffffffU;
+				m_tgpx4_program[m_coprocnt / 2] |= u64(data) << 32;
+			}
+			else
+			{
+				m_tgpx4_program[m_coprocnt / 2] &= 0xffffffff00000000U;
+				m_tgpx4_program[m_coprocnt / 2] |= data;
+			}
+		}
 
 		m_coprocnt++;
 	}
@@ -785,8 +826,24 @@ WRITE32_MEMBER(model2_state::copro_fifo_w)
 		//osd_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, space.device().safe_pc());
 		if (m_dsp_type == DSP_TYPE_SHARC)
 			copro_fifoin_push(machine().device("dsp"), data,offset,mem_mask);
-		else
+		else if (m_dsp_type == DSP_TYPE_TGP)
 			copro_fifoin_push(machine().device("tgp"), data,offset,mem_mask);
+		else if (m_dsp_type == DSP_TYPE_TGPX4)
+		{
+			if (m_tgpx4->is_fifoin_full())
+			{
+				/* Writing to full FIFO causes the i960 to enter wait state */
+				downcast<i960_cpu_device &>(space.device()).i960_stall();
+				/* spin the main cpu and let the TGP catch up */
+				space.device().execute().spin_until_time(attotime::from_usec(100));
+				printf("write stalled\n");
+			}
+			else
+			{
+//              printf("push %08X at %08X\n", data, space.device().safe_pc());
+				m_tgpx4->fifoin_w(data);
+			}
+		}
 	}
 }
 
@@ -1624,7 +1681,8 @@ static ADDRESS_MAP_START( model2c_crx_mem, AS_PROGRAM, 32, model2_state )
 	AM_RANGE(0x00200000, 0x0023ffff) AM_RAM
 
 	AM_RANGE(0x00804000, 0x00807fff) AM_READWRITE(geo_prg_r, geo_prg_w)
-	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_prg_r, copro_prg_w)
+	AM_RANGE(0x00880000, 0x00883fff) AM_WRITE(copro_function_port_w)
+	AM_RANGE(0x00884000, 0x00887fff) AM_READWRITE(copro_fifo_r, copro_fifo_w)
 
 	AM_RANGE(0x00980000, 0x00980003) AM_READWRITE(copro_ctl1_r,copro_ctl1_w)
 	AM_RANGE(0x00980008, 0x0098000b) AM_WRITE(geo_ctl1_w )
@@ -3109,7 +3167,7 @@ ROM_START( srallycdx ) /* Sega Rally Championship DX Revision A, Model 2A - Sing
 	ROM_LOAD32_WORD( "mpr-17747.11", 0x000002, 0x200000, CRC(543593fd) SHA1(5ba63a77e9fc70569af21d50b3171bc8ff4522b8) )
 	ROM_LOAD32_WORD( "mpr-17744.8",  0x400000, 0x200000, CRC(71fed098) SHA1(1d187cad375121a45348d640edd3cc7dce658d28) )
 	ROM_LOAD32_WORD( "mpr-17745.9",  0x400002, 0x200000, CRC(8ecca705) SHA1(ed2b3298aad6f4e52dc672a0168183e457564b43) )
-	ROM_LOAD32_WORD( "mpr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) )	// IC 6 and 7 likely EPROMs
+	ROM_LOAD32_WORD( "mpr-17764a.6", 0x800000, 0x200000, CRC(dcb91e31) SHA1(2725268e97b9f4c14d56c040af38bc82f5020e3e) ) // IC 6 and 7 likely EPROMs
 	ROM_LOAD32_WORD( "mpr-17765a.7", 0x800002, 0x200000, CRC(b657dc48) SHA1(ae0f1bc6e2479fa51ca36f8be3a1785981c4dfe9) )
 
 	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
@@ -3163,8 +3221,8 @@ ROM_START( srallycdxa ) // Sega Rally Championship DX, Model 2A? - Single player
 	ROM_LOAD32_WORD( "epr-17765.7",  0x800002, 0x100000, CRC(81112ea5) SHA1(a0251b4f5f18ae2e2d0576087a687dd7c2e49c34) ) // NEC D27C8000D EPROM
 
 	ROM_REGION( 0x800000, "tgp", 0 ) // TGP program? (COPRO socket)
-	ROM_LOAD32_WORD( "mpr-17754.28", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) )	// not present in this rev memory test, why ?
-	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) )	//
+	ROM_LOAD32_WORD( "mpr-17754.28", 0x000000, 0x200000, CRC(81a84f67) SHA1(c0a9b690523a529e4015e9af10dc3fb2a1726f08) ) // not present in this rev memory test, why ?
+	ROM_LOAD32_WORD( "mpr-17755.29", 0x000002, 0x200000, CRC(2a6e7da4) SHA1(e60803ae951489fe47d66731d15c32249ca547b4) ) //
 
 	ROM_REGION( 0x010000, "drivecpu", 0 ) // Drive I/O program
 	ROM_LOAD( "epr-17762.ic12", 0x000000, 0x010000, NO_DUMP ) /* Need to verify actual EPR-xxxx number, might be EPR-17759 */

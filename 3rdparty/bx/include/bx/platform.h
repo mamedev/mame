@@ -1,5 +1,5 @@
 /*
- * Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2010-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bx#license-bsd-2-clause
  */
 
@@ -202,7 +202,7 @@
 #	undef  BX_PLATFORM_RPI
 #	define BX_PLATFORM_RPI 1
 #elif  defined(__linux__) \
-	|| defined(__riscv__)
+	|| BX_CPU_RISCV
 #	undef  BX_PLATFORM_LINUX
 #	define BX_PLATFORM_LINUX 1
 #elif  defined(__ENVIRONMENT_IPHONE_OS_VERSION_MIN_REQUIRED__) \
@@ -265,7 +265,9 @@
 				BX_STRINGIZE(__clang_minor__) "." \
 				BX_STRINGIZE(__clang_patchlevel__)
 #elif BX_COMPILER_MSVC
-#	if BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
+#	if BX_COMPILER_MSVC >= 1910 // Visual Studio 2017
+#		define BX_COMPILER_NAME "MSVC 15.0"
+#	elif BX_COMPILER_MSVC >= 1900 // Visual Studio 2015
 #		define BX_COMPILER_NAME "MSVC 14.0"
 #	elif BX_COMPILER_MSVC >= 1800 // Visual Studio 2013
 #		define BX_COMPILER_NAME "MSVC 12.0"

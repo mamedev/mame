@@ -15,7 +15,7 @@
  *      VSS |7            8| INOUTC
  *          +--------------+
  *
- *  FIXME: These devices are slow (~125 ns). THis is currently not reflected
+ *  FIXME: These devices are slow (~125 ns). This is currently not reflected
  *
  *  Naming conventions follow National semiconductor datasheet
  *

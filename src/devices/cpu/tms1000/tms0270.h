@@ -54,7 +54,7 @@ private:
 	uint8_t   m_chipsel;
 	uint8_t   m_ctl_out;
 	uint8_t   m_ctl_dir;
-	int     m_pdc;
+	int       m_pdc;
 
 	uint8_t   m_o_latch_low;
 	uint8_t   m_o_latch;

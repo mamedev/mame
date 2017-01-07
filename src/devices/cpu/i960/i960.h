@@ -161,6 +161,7 @@ private:
 	void cmp_d(double v1, double v2);
 	void bxx(uint32_t opcode, int mask);
 	void bxx_s(uint32_t opcode, int mask);
+	void fxx(uint32_t opcode, int mask);
 	void test(uint32_t opcode, int mask);
 	void execute_op(uint32_t opcode);
 	void take_interrupt(int vector, int lvl);

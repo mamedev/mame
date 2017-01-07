@@ -384,30 +384,54 @@ uint32_t atvtrack_state::screen_update_atvtrack(screen_device &screen, bitmap_rg
 	return 0;
 }
 
+void get_altera10ke_eab(u8* dst, u8 *pof, int eab)
+{
+	// extract Altera FLEX 10KE 4kbit Embedded Array Block (EAB)
+	u32 startbit = 0x45b * 8 + 1 + (0x25e6 * 8) * eab;	// base ofsset actually depends on POF header size, however this EPC1PC8 dump havent it (bad dumper software?)
+
+	for (u32 bit = 0; bit < 4096; bit++)
+	{
+		u32 tbit = BITSWAP16(bit, 15, 14, 13, 12,
+			9, 8, 7, 6, 5, 4, 3,
+			11, 10,
+			2, 1, 0);
+		tbit ^= 0x0fc0;
+		u32 pofbit = startbit + (tbit & 0x1f) + (((tbit >> 5) & 1) * 63) + (((tbit >> 6) & 0x3f) * 0x4D * 8);
+		dst[bit / 8] &= ~(1 << (bit & 7));
+		dst[bit / 8] |= ((pof[pofbit / 8] >> (pofbit & 7)) & 1) << (bit & 7);
+	}
+}
+
 void atvtrack_state::machine_start()
 {
-	uint8_t *src, *dst;
-
 	m_nandaddressstep = 0;
 	m_nandregion = memregion("maincpu");
-	address_space &as = m_maincpu->space(AS_PROGRAM);
-	dst = (uint8_t *)(as.get_write_ptr(0x0c7f0000));
-	src = m_nandregion->base()+0x10;
-	// copy 0x10000 bytes from region "maincpu" offset 0x10 to 0x0c7f0000
-	memcpy(dst, src, 0x10000);
 }
 
 void atvtrack_state::machine_reset()
 {
-	// Probably just after reset the cpu executes some bootsrtap routine from a memory inside the fpga.
-	// The routine initializes the cpu, copies the boot program from the flash memories into the cpu sdram
-	// and finally executes it.
-	// Here there is the setup of the cpu, the boot program is copied in machine_start
-	address_space &as = m_maincpu->space(AS_PROGRAM);
-	// set cpu PC register to 0x0c7f0000
-	m_maincpu->set_pc(0x0c7f0000);
-	// set BCR2 to 1
-	m_maincpu->sh4_internal_w(as, 0x3001, 1, 0xffffffff);
+	std::vector<u8> tdata(1024);
+	u8 *pof = memregion("fpga")->base();
+
+	// first 2 Altera's EABs is 2xSH4s shared RAM, its initial content is boot loader
+	// extract EABs 0 and 1 from POF
+	get_altera10ke_eab(&tdata[0], pof, 0);
+	get_altera10ke_eab(&tdata[512], pof, 1);
+
+	// deshuffle data bits and put it to shared RAM
+	u8 *dst = (u8*)(m_maincpu->space(AS_PROGRAM).get_write_ptr(0));
+	for (u32 i = 0; i < 256; i++)
+	{
+		u16 lword = tdata[i * 2 + 512] | (tdata[i * 2 + 513] << 8);
+		u16 hword = tdata[i * 2] | (tdata[i * 2 + 1] << 8);
+		lword = BITSWAP16(lword, 7, 9, 0, 10, 3, 11, 4, 12, 2, 15, 1, 13, 6, 8, 5, 14);
+		hword = BITSWAP16(hword, 5, 10, 7, 9, 6, 13, 3, 15, 2, 11, 1, 8, 0, 12, 4, 14);
+		dst[i * 4 + 0] = lword & 0xff;
+		dst[i * 4 + 1] = lword >> 8;
+		dst[i * 4 + 2] = hword & 0xff;
+		dst[i * 4 + 3] = hword >> 8;
+	}
+
 	m_subcpu->set_input_line(INPUT_LINE_RESET, ASSERT_LINE);
 }
 
@@ -533,8 +557,8 @@ ROM_START( atvtrack )
 	ROM_LOAD32_BYTE("14.bin", 0x0000002, 0x1080000, CRC(67983453) SHA1(05389a0ffc1a1bae9bac16a53a97d78b6eccc626) )
 	ROM_LOAD32_BYTE("19.bin", 0x0000003, 0x1080000, CRC(9fc5c579) SHA1(8829329ef229564952aea2108ef1750dc226cbac) )
 
-	ROM_REGION( 0x20000, "eeprom", ROMREGION_ERASEFF)
-	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga, maybe used for some form of protection
+	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
 ROM_END
 
 ROM_START( atvtracka )
@@ -543,6 +567,9 @@ ROM_START( atvtracka )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic20", 0x0000001, 0x1080000, CRC(b0c34433) SHA1(852c79bb3d7082cd2c056140071ae7d71679ec1d) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic14", 0x0000002, 0x1080000, CRC(02a12085) SHA1(acb112c9c7b29d92610465fb92268ce787ca06f4) )
 	ROM_LOAD32_BYTE("k9f2808u0b.ic19", 0x0000003, 0x1080000, CRC(856c1e6a) SHA1(a6b2839120d61811c36cc6b4095de9cefceb394b) )
+
+	ROM_REGION( 0x20000, "fpga", ROMREGION_ERASEFF)
+	ROM_LOAD("epc1pc8.ic23", 0x0000000, 0x1ff01, CRC(752444c7) SHA1(c77e8fcfcbe15b53eda25553763bdac45f0ef7df) ) // contains configuration data for the fpga
 ROM_END
 
 /*

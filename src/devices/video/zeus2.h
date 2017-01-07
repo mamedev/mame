@@ -22,6 +22,7 @@
 
 #define DUMP_WAVE_RAM       0
 #define TRACK_REG_USAGE     0
+#define PRINT_TEX_INFO		0
 
 #define WAVERAM0_WIDTH      1024
 #define WAVERAM0_HEIGHT     2048
@@ -137,20 +138,27 @@ public:
 	float zeus_point2[3];
 	uint32_t zeus_texbase;
 	int zeus_quad_size;
-	uint32_t m_renderAddr;
-	bool m_thegrid;
 
 	uint32_t *waveram;
 	std::unique_ptr<uint32_t[]> m_frameColor;
 	std::unique_ptr<uint32_t[]> m_frameDepth;
 	uint32_t m_pal_table[0x100];
 	uint32_t m_ucode[0x200];
+	uint32_t m_curUCodeSrc;
+	uint32_t m_curPalTableSrc;
 
 	emu_timer *int_timer;
 	emu_timer *vblank_timer;
 	int yoffs;
 	int texel_width;
 	float zbase;
+
+	enum { THEGRID, CRUSNEXO, MWSKINS };
+	int m_system;
+#if PRINT_TEX_INFO
+	void check_tex(uint32_t &texmode, float &zObj, float &zMat, float &zOff);
+	std::string tex_info(void);
+#endif
 
 protected:
 	// device-level overrides
@@ -170,6 +178,7 @@ private:
 	void log_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void print_fifo_command(const uint32_t *data, int numwords, const char *suffix);
 	void log_render_info(uint32_t texdata);
+
 	/*************************************
 	*  Member variables
 	*************************************/
@@ -183,6 +192,9 @@ private:
 
 	int m_yScale;
 
+#if PRINT_TEX_INFO
+	std::map<uint32_t, std::string> tex_map;
+#endif
 
 #if TRACK_REG_USAGE
 	struct reg_info
@@ -296,6 +308,11 @@ public:
 		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x1f) << 3);
 	}
 
+	inline uint32_t conv_rgb565_to_rgb32(uint16_t color)
+	{
+		return ((color & 0x7c00) << 9) | ((color & 0x3e0) << 6) | ((color & 0x8000) >> 5) | ((color & 0x1f) << 3);
+	}
+
 #ifdef UNUSED_FUNCTION
 	inline void WAVERAM_plot(int y, int x, uint32_t color)
 	{
@@ -344,16 +361,30 @@ public:
 	/*************************************
 	*  Inlines for texel accesses
 	*************************************/
+	// 4x2 block size
+	static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
+	{
+		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
+		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
+	}
+
 	static inline uint8_t get_texel_8bit(const void *base, int y, int x, int width)
 	{
 		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 4) << 3) + ((y & 1) << 2) + (x & 3);
 		return WAVERAM_READ8(base, byteoffs);
 	}
 
-	static inline uint8_t get_texel_4bit(const void *base, int y, int x, int width)
+	// 2x2 block size
+	static inline uint8_t get_texel_alt_4bit(const void *base, int y, int x, int width)
 	{
-		uint32_t byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);
+		uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 4) << 3) + ((y & 3) << 1) + ((x / 2) & 1);
 		return (WAVERAM_READ8(base, byteoffs) >> (4 * (x & 1))) & 0x0f;
+	}
+
+	static inline uint8_t get_texel_alt_8bit(const void *base, int y, int x, int width)
+	{
+		uint32_t byteoffs = (y / 4) * (width * 4) + ((x / 2) << 3) + ((y & 3) << 1) + (x & 1);
+		return WAVERAM_READ8(base, byteoffs);
 	}
 
 };

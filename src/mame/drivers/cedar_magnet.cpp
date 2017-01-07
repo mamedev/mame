@@ -15,8 +15,6 @@
   - verify the disk images, convert to a better format that can natively store protection
     * RAW data also available if required
     * as mentioned, the disks are copy protected, see notes below
-    * are the bad tiles shortly into the first level of mag_exzi caused by a bad dump or
-      bad comms?
   - Use proper floppy drive emulation code that originally came from MESS (tied with above)
   - verify all clocks and screen params (50hz seems to match original videos)
   - work out why we need a protection hack and replace it with proper emulation
@@ -112,7 +110,7 @@ I suspect the additional memory was an afterthought.
 #include "machine/z80ctc.h"
 #include "sound/ay8910.h"
 
-#include "machine/cedar_magnet_sound.h"
+#include "audio/efo_zsu.h"
 #include "machine/cedar_magnet_plane.h"
 #include "machine/cedar_magnet_sprite.h"
 #include "machine/cedar_magnet_flop.h"
@@ -187,8 +185,6 @@ public:
 	DECLARE_READ8_MEMBER(port7c_r);
 
 	// other ports
-	DECLARE_WRITE8_MEMBER(soundlatch_w);
-	uint8_t portff_data;
 
 	DECLARE_READ8_MEMBER(other_cpu_r);
 	DECLARE_WRITE8_MEMBER(other_cpu_w);
@@ -205,7 +201,7 @@ public:
 	DECLARE_WRITE8_MEMBER(palette_g_w);
 	DECLARE_WRITE8_MEMBER(palette_b_w);
 
-	void handle_sub_board_cpu_lines(cedar_magnet_board_device* dev, int old_data, int data);
+	void handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data);
 	INTERRUPT_GEN_MEMBER(irq);
 	void(*m_prothack)(cedar_magnet_state*);
 
@@ -273,7 +269,7 @@ static ADDRESS_MAP_START( cedar_magnet_io, AS_IO, 8, cedar_magnet_state )
 	AM_RANGE(0x78, 0x78) AM_READWRITE(watchdog_r, paladdr_w)
 	AM_RANGE(0x7c, 0x7c) AM_READ(port7c_r) // protection??
 
-	AM_RANGE(0xff, 0xff) AM_WRITE(soundlatch_w)
+	AM_RANGE(0xff, 0xff) AM_DEVWRITE("cedtop", cedar_magnet_sound_device, sound_command_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cedar_bank0, AS_PROGRAM, 8, cedar_magnet_state )
@@ -443,13 +439,6 @@ void cedar_magnet_state::video_start()
 
 ***********************/
 
-WRITE8_MEMBER(cedar_magnet_state::soundlatch_w)
-{
-//  printf("%s: writing soundlatch_w! %02x\n", machine().describe_context(), data);
-	portff_data = data;
-	m_cedsound->write_command(data);
-}
-
 READ8_MEMBER(cedar_magnet_state::other_cpu_r)
 {
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
@@ -546,19 +535,19 @@ WRITE8_MEMBER(cedar_magnet_state::other_cpu_w)
 }
 
 
-void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_device* dev, int old_data, int data)
+void cedar_magnet_state::handle_sub_board_cpu_lines(cedar_magnet_board_interface &dev, int old_data, int data)
 {
 	if (old_data != data)
 	{
 		if (data & 0x04)
-			dev->reset_assert();
+			dev.reset_assert();
 		else
-			dev->reset_clear();
+			dev.reset_clear();
 
 		if (data & 0x02)
-			dev->halt_clear();
+			dev.halt_clear();
 		else
-			dev->halt_assert();
+			dev.halt_assert();
 	}
 }
 
@@ -607,7 +596,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic48_pio_pa_w ) // 0x20
 
 	int plane0select = (m_ic48_pio_pa_val & 0x07) >> 0;
 
-	handle_sub_board_cpu_lines(m_cedplane0, oldplane0select, plane0select);
+	handle_sub_board_cpu_lines(*m_cedplane0, oldplane0select, plane0select);
 }
 
 
@@ -646,8 +635,8 @@ WRITE8_MEMBER(cedar_magnet_state::ic48_pio_pb_w) // 0x22
 	int plane1select = (m_ic48_pio_pb_val & 0x07) >> 0;
 	int spriteselect = (m_ic48_pio_pb_val & 0x70) >> 4;
 
-	handle_sub_board_cpu_lines(m_cedplane1, oldplane1select, plane1select);
-	handle_sub_board_cpu_lines(m_cedsprite, oldspriteselect, spriteselect);
+	handle_sub_board_cpu_lines(*m_cedplane1, oldplane1select, plane1select);
+	handle_sub_board_cpu_lines(*m_cedsprite, oldspriteselect, spriteselect);
 }
 
 /***********************
@@ -690,7 +679,7 @@ WRITE8_MEMBER( cedar_magnet_state::ic49_pio_pb_w ) // 0x42
 
 	int soundselect = (m_ic49_pio_pb_val & 0x70) >> 4;
 
-	handle_sub_board_cpu_lines(m_cedsound, oldsoundselect, soundselect);
+	handle_sub_board_cpu_lines(*m_cedsound, oldsoundselect, soundselect);
 }
 
 /***********************
@@ -707,7 +696,6 @@ void cedar_magnet_state::machine_start()
 void cedar_magnet_state::machine_reset()
 {
 	m_ic48_pio_pa_val = 0xff;
-	portff_data = 0x00;
 
 	int bankbit0 = (m_ic48_pio_pa_val & 0x60) >> 5;
 	m_bank0->set_bank(bankbit0);
@@ -754,7 +742,9 @@ INTERRUPT_GEN_MEMBER(cedar_magnet_state::irq)
 		m_prothack(this);
 
 	m_maincpu->set_input_line(0, HOLD_LINE);
-	// maybe generate the irqs for the other PCBs here?
+	m_cedplane0->irq_hold();
+	m_cedplane1->irq_hold();
+	m_cedsprite->irq_hold();
 }
 
 static MACHINE_CONFIG_START( cedar_magnet, cedar_magnet_state )
@@ -845,8 +835,8 @@ ROM_END
 ROM_START( mag_exzi )
 	BIOS_ROM
 
-	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 ) // I don't 100% trust this one
-	ROM_LOAD( "exzisus.img", 0x00000, 0xf0000, BAD_DUMP CRC(1ac7409e) SHA1(b894bd65b0b9699e18a1ab49f309c460488f0ef8) )
+	ROM_REGION( 0x100000, "flop:disk", ROMREGION_ERASE00 )
+	ROM_LOAD( "exzisus.img", 0x00000, 0xf0000, CRC(3705e9dc) SHA1(78c8010d224f5deb202a29bd273ea7dc85ddcdb4) )
 ROM_END
 
 ROM_START( mag_xain )
@@ -909,8 +899,8 @@ DRIVER_INIT_MEMBER(cedar_magnet_state, mag_exzi)
 	m_prothack = mag_exzi_protection_hack;
 }
 
-GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System (prototype)", MACHINE_IS_BIOS_ROOT )
+GAME( 1987, cedmag,    0,         cedar_magnet, cedar_magnet, driver_device,       0,        ROT0,  "EFO SA / Cedar", "Magnet System", MACHINE_IS_BIOS_ROOT )
 
-GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
-GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
-GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System, prototype)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos
+GAME( 1987, mag_time,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_time, ROT90, "EFO SA / Cedar", "Time Scanner (TS 2.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Sega
+GAME( 1987, mag_exzi,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_exzi, ROT0,  "EFO SA / Cedar", "Exzisus (EX 1.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Taito
+GAME( 1987, mag_xain,  cedmag,    cedar_magnet, cedar_magnet, cedar_magnet_state,  mag_xain, ROT0,  "EFO SA / Cedar", "Xain'd Sleena (SC 3.0, Magnet System)", MACHINE_IMPERFECT_GRAPHICS | MACHINE_IMPERFECT_SOUND ) // original game was by Technos

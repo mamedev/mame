@@ -240,7 +240,7 @@ public:
 	required_device<kaneko16_sprite_device> m_kaneko_spr;
 	required_shared_ptr<uint16_t> m_spriteram;
 
-	DECLARE_WRITE16_MEMBER(expro02_6295_bankswitch_w);
+	DECLARE_WRITE8_MEMBER(expro02_6295_bankswitch_w);
 
 	DECLARE_DRIVER_INIT(expro02);
 	virtual void machine_start() override;
@@ -254,7 +254,6 @@ public:
 	// comad
 	READ16_MEMBER(comad_timer_r);
 	READ8_MEMBER(comad_okim6295_r);
-	WRITE16_MEMBER(galpanica_6295_bankswitch_w);
 };
 
 
@@ -617,18 +616,16 @@ static INPUT_PORTS_START( zipzap )
 	SYSTEM_NO_TILT
 INPUT_PORTS_END
 
+
 /*************************************
  *
  *  Sound handlers
  *
  *************************************/
 
-WRITE16_MEMBER(expro02_state::expro02_6295_bankswitch_w)
+WRITE8_MEMBER( expro02_state::expro02_6295_bankswitch_w )
 {
-	if (ACCESSING_BITS_8_15)
-	{
-		membank("okibank")->set_entry((data >> 8) & 0x0f);
-	}
+	membank("okibank")->set_entry(data & 0x0f);
 }
 
 
@@ -672,7 +669,7 @@ static ADDRESS_MAP_START( expro02_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xe00000, 0xe00015) AM_DEVREADWRITE("calc1_mcu", kaneko_hit_device, kaneko_hit_r,kaneko_hit_w)
@@ -687,7 +684,7 @@ static ADDRESS_MAP_START( fantasia_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(expro02_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* ??? */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
@@ -704,7 +701,7 @@ static ADDRESS_MAP_START( comad_map, AS_PROGRAM, 16, expro02_state )
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x80000a, 0x80000b) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x80000c, 0x80000d) AM_READ(comad_timer_r) /* missw96 bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xf00000, 0xf00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
@@ -719,7 +716,7 @@ static ADDRESS_MAP_START( fantsia2_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x800006, 0x800007)    ??
 	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r) /* bits 8-a = timer? palette update code waits for them to be 111 */
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP    /* coin counters, + ? */
 	AM_RANGE(0xc80000, 0xc80001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
@@ -735,7 +732,7 @@ static ADDRESS_MAP_START( galhustl_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP // ?
 	AM_RANGE(0xd00000, 0xd00001) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0xff00)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_RAM
@@ -752,7 +749,7 @@ static ADDRESS_MAP_START( zipzap_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)
 	AM_RANGE(0xc00000, 0xc00001) AM_READ8(comad_okim6295_r, 0xff00) AM_DEVWRITE8("oki", okim6295_device, write, 0xff00) /* fantasia, missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM     // main ram
 
@@ -770,7 +767,7 @@ static ADDRESS_MAP_START( supmodel_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
 	AM_RANGE(0x800008, 0x800009) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
@@ -788,7 +785,7 @@ static ADDRESS_MAP_START( smissw_map, AS_PROGRAM, 16, expro02_state )
 	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x800006, 0x800007) AM_READ(comad_timer_r)
 	AM_RANGE(0x80000e, 0x80000f) AM_READ(comad_timer_r)
-	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)  /* not sure */
+	AM_RANGE(0x900000, 0x900001) AM_WRITE8(expro02_6295_bankswitch_w, 0xff00)  /* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
@@ -839,15 +836,6 @@ READ8_MEMBER(expro02_state::comad_okim6295_r)
 	retvalue = machine().rand();
 	return retvalue;
 }
-
-WRITE16_MEMBER(expro02_state::galpanica_6295_bankswitch_w)
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		membank("okibank")->set_entry((data >> 8) & 0x0f);
-	}
-}
-
 
 
 

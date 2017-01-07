@@ -479,6 +479,7 @@ gyruss.cpp
 halleys.cpp
 hanaawas.cpp
 hankin.cpp
+hapyfish.cpp
 harddriv.cpp
 hazelgr.cpp
 hcastle.cpp
@@ -1330,6 +1331,7 @@ zerozone.cpp
 zn.cpp
 zodiack.cpp
 zr107.cpp
+zwackery.cpp
 //exceptions + to add - to remove from imported list
 //3do.cpp
 -3do

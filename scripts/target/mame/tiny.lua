@@ -139,8 +139,6 @@ files{
 	MAME_DIR .. "src/mame/audio/williams.cpp",
 	MAME_DIR .. "src/mame/audio/williams.h",
 	MAME_DIR .. "src/mame/video/williams.cpp",
-	MAME_DIR .. "src/mame/audio/gorf.cpp",
-	MAME_DIR .. "src/mame/audio/wow.cpp",
 	MAME_DIR .. "src/mame/drivers/gaelco.cpp",
 	MAME_DIR .. "src/mame/includes/gaelco.h",
 	MAME_DIR .. "src/mame/video/gaelco.cpp",

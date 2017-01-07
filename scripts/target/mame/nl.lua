@@ -21,6 +21,7 @@ CPUS["M6800"] = true
 CPUS["M6803"] = true
 CPUS["M6809"] = true
 CPUS["MCS48"] = true
+CPUS["I8085"] = true
 --CPUS["MCS51"] = true
 --CPUS["M6800"] = true
 --CPUS["M6809"] = true
@@ -60,6 +61,10 @@ VIDEOS["FIXFREQ"] = true
 MACHINES["NETLIST"] = true
 MACHINES["Z80DMA"] = true
 MACHINES["GEN_LATCH"] = true
+MACHINES["AY31015"] = true
+MACHINES["KB3600"] = true
+MACHINES["COM8116"] = true
+
 --MACHINES["6821PIA"] = true
 --MACHINES["TTL74148"] = true
 --MACHINES["TTL74153"] = true
@@ -112,6 +117,14 @@ files{
 	MAME_DIR .. "src/mame/machine/nl_pongd.h",
 	MAME_DIR .. "src/mame/machine/nl_breakout.cpp",
 	MAME_DIR .. "src/mame/machine/nl_breakout.h",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.cpp",
+	MAME_DIR .. "src/mame/machine/nl_hazelvid.h",
+
+	MAME_DIR .. "src/mame/drivers/atarittl.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.cpp",
+	MAME_DIR .. "src/mame/machine/nl_stuntcyc.h",
+
+	MAME_DIR .. "src/mame/drivers/hazeltin.cpp",
 
 	MAME_DIR .. "src/mame/drivers/1942.cpp",
 	MAME_DIR .. "src/mame/includes/1942.h",
@@ -121,10 +134,12 @@ files{
 	MAME_DIR .. "src/mame/includes/popeye.h",
 	MAME_DIR .. "src/mame/video/popeye.cpp",
 
-  MAME_DIR .. "src/mame/drivers/mario.cpp",
-  MAME_DIR .. "src/mame/includes/mario.h",
-  MAME_DIR .. "src/mame/video/mario.cpp",
-  MAME_DIR .. "src/mame/audio/mario.cpp",
+	MAME_DIR .. "src/mame/drivers/mario.cpp",
+	MAME_DIR .. "src/mame/includes/mario.h",
+  MAME_DIR .. "src/mame/audio/nl_mario.cpp",
+  MAME_DIR .. "src/mame/audio/nl_mario.h",
+	MAME_DIR .. "src/mame/video/mario.cpp",
+	MAME_DIR .. "src/mame/audio/mario.cpp",
 
 	MAME_DIR .. "src/mame/drivers/m62.cpp",
 	MAME_DIR .. "src/mame/includes/m62.h",
@@ -133,6 +148,7 @@ files{
 	MAME_DIR .. "src/mame/audio/irem.h",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.cpp",
 	MAME_DIR .. "src/mame/audio/nl_kidniki.h",
+
 }
 end
 

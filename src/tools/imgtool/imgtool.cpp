@@ -41,6 +41,11 @@ void CLIB_DECL ATTR_PRINTF(1,2) logerror(const char *format, ...)
     Imgtool initialization and basics
 
 ***************************************************************************/
+
+//-------------------------------------------------
+//  rtrim
+//-------------------------------------------------
+
 void rtrim(char *buf)
 {
 	size_t buflen;
@@ -53,6 +58,11 @@ void rtrim(char *buf)
 			*s = '\0';
 	}
 }
+
+
+//-------------------------------------------------
+//  strncpyz
+//-------------------------------------------------
 
 char *strncpyz(char *dest, const char *source, size_t len)
 {
@@ -67,17 +77,32 @@ char *strncpyz(char *dest, const char *source, size_t len)
 	return s;
 }
 
-char *strncatz(char *dest, const char *source, size_t len)
+
+//-------------------------------------------------
+//  extract_padded_string
+//-------------------------------------------------
+
+static std::string extract_padded_string(const char *source, size_t len)
 {
-	size_t l;
-	l = strlen(dest);
-	dest += l;
-	if (len > l)
-		len -= l;
-	else
-		len = 0;
-	return strncpyz(dest, source, len);
+	while ((len > 0) && (source[len - 1] == ' '))
+		len--;
+	return std::string(source, len);
 }
+
+
+//-------------------------------------------------
+//  extract_padded_filename - this is a common
+//	enough scenario that it is justified to have
+//	this in common code
+//-------------------------------------------------
+
+std::string extract_padded_filename(const char *source, size_t filename_length, size_t extension_length)
+{
+	std::string filename = extract_padded_string(source, filename_length);
+	std::string extension = extract_padded_string(source + filename_length, extension_length);
+	return extension.empty() ? filename : filename + "." + extension;
+}
+
 
 //-------------------------------------------------
 //  markerrorsource - marks where an error source
@@ -881,7 +906,7 @@ char *imgtool_temp_str(void)
 
 ***************************************************************************/
 
-imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const char *fname,
+imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const std::string &filename,
 	int read_or_write, util::option_resolution *createopts, imgtool::image::ptr &outimg)
 {
 	imgtoolerr_t err;
@@ -908,7 +933,7 @@ imgtoolerr_t imgtool::image::internal_open(const imgtool_module *module, const c
 	}
 
 	// open the stream
-	stream = imgtool::stream::open(fname, read_or_write);
+	stream = imgtool::stream::open(filename, read_or_write);
 	if (!stream)
 	{
 		err = (imgtoolerr_t)(IMGTOOLERR_FILENOTFOUND | IMGTOOLERR_SRC_IMAGEFILE);
@@ -964,7 +989,7 @@ done:
 //  open - open an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::open(const imgtool_module *module, const char *filename, int read_or_write, ptr &outimg)
+imgtoolerr_t imgtool::image::open(const imgtool_module *module, const std::string &filename, int read_or_write, ptr &outimg)
 {
 	read_or_write = read_or_write ? OSD_FOPEN_RW : OSD_FOPEN_READ;
 	return internal_open(module, filename, read_or_write, nullptr, outimg);
@@ -975,7 +1000,7 @@ imgtoolerr_t imgtool::image::open(const imgtool_module *module, const char *file
 //  imgtool::image::open_byname - open an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::open(const std::string &modulename, const char *filename, int read_or_write, ptr &outimg)
+imgtoolerr_t imgtool::image::open(const std::string &modulename, const std::string &filename, int read_or_write, ptr &outimg)
 {
 	const imgtool_module *module;
 
@@ -1016,7 +1041,7 @@ imgtool::image::~image()
 //  create - creates an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::create(const imgtool_module *module, const char *fname,
+imgtoolerr_t imgtool::image::create(const imgtool_module *module, const std::string &filename,
 	util::option_resolution *opts, ptr &image)
 {
 	std::unique_ptr<util::option_resolution> alloc_resolution;
@@ -1033,7 +1058,7 @@ imgtoolerr_t imgtool::image::create(const imgtool_module *module, const char *fn
 		opts = alloc_resolution.get();
 	}
 
-	return internal_open(module, fname, OSD_FOPEN_RW_CREATE, opts, image);
+	return internal_open(module, filename, OSD_FOPEN_RW_CREATE, opts, image);
 }
 
 
@@ -1041,7 +1066,7 @@ imgtoolerr_t imgtool::image::create(const imgtool_module *module, const char *fn
 //  create - creates an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *fname, util::option_resolution *opts, ptr &image)
+imgtoolerr_t imgtool::image::create(const std::string &modulename, const std::string &filename, util::option_resolution *opts, ptr &image)
 {
 	const imgtool_module *module;
 
@@ -1049,7 +1074,7 @@ imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *f
 	if (!module)
 		return (imgtoolerr_t)(IMGTOOLERR_MODULENOTFOUND | IMGTOOLERR_SRC_MODULE);
 
-	return create(module, fname, opts, image);
+	return create(module, filename, opts, image);
 }
 
 
@@ -1057,11 +1082,11 @@ imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *f
 //  create - creates an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::create(const imgtool_module *module, const char *fname,
+imgtoolerr_t imgtool::image::create(const imgtool_module *module, const std::string &filename,
 	util::option_resolution *opts)
 {
 	std::unique_ptr<image> image;
-	return create(module, fname, opts, image);
+	return create(module, filename, opts, image);
 }
 
 
@@ -1069,10 +1094,10 @@ imgtoolerr_t imgtool::image::create(const imgtool_module *module, const char *fn
 //  create - creates an image
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::image::create(const std::string &modulename, const char *fname, util::option_resolution *opts)
+imgtoolerr_t imgtool::image::create(const std::string &modulename, const std::string &filename, util::option_resolution *opts)
 {
 	std::unique_ptr<image> image;
-	return create(modulename, fname, opts, image);
+	return create(modulename, filename, opts, image);
 }
 
 
@@ -2416,8 +2441,9 @@ imgtool::directory::directory(imgtool::partition &partition)
 //  enumerating files on a partition
 //-------------------------------------------------
 
-imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const char *path, imgtool::directory::ptr &outenum)
+imgtoolerr_t imgtool::directory::open(imgtool::partition &partition, const std::string &path_string, imgtool::directory::ptr &outenum)
 {
+	const char *path = path_string.c_str();
 	imgtoolerr_t err = (imgtoolerr_t)IMGTOOLERR_SUCCESS;
 	imgtool::directory::ptr enumeration;
 	char *alloc_path = nullptr;

@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2016 Branimir Karadzic. All rights reserved.
+-- Copyright 2010-2017 Branimir Karadzic. All rights reserved.
 -- License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
 --
 
@@ -30,7 +30,6 @@ project "texturec"
 		path.join(BGFX_DIR, "3rdparty/nvtt/**.h"),
 		path.join(BGFX_DIR, "3rdparty/pvrtc/**.cpp"),
 		path.join(BGFX_DIR, "3rdparty/pvrtc/**.h"),
-		path.join(BGFX_DIR, "3rdparty/tinyexr/**.cc"),
 		path.join(BGFX_DIR, "3rdparty/tinyexr/**.h"),
 		path.join(BGFX_DIR, "3rdparty/iqa/include/**.h"),
 		path.join(BGFX_DIR, "3rdparty/iqa/source/**.c"),

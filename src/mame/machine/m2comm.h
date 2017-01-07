@@ -55,9 +55,9 @@ protected:
 
 private:
 	uint8_t m_shared[0x4000]; // 16k shared memory
-	uint8_t	m_zfg;            // z80 flip gate - bit 0 switches memory banks, bit7 is connected to FG bit 0
-	uint8_t	m_cn;             // bit0 is used to enable/disable the comm board
-	uint8_t	m_fg;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
+	uint8_t m_zfg;            // z80 flip gate - bit 0 switches memory banks, bit7 is connected to FG bit 0
+	uint8_t m_cn;             // bit0 is used to enable/disable the comm board
+	uint8_t m_fg;             // i960 flip gate - bit0 is stored, bit7 is connected to ZFG bit 0
 
 	emu_file m_line_rx;       // rx line - can be either differential, simple serial or toslink
 	emu_file m_line_tx;       // tx line - is differential, simple serial and toslink

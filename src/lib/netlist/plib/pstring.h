@@ -90,7 +90,7 @@ public:
 	iterator end() const { return iterator(m_ptr->str() + blen()); }
 
 	// C string conversion helpers
-	const mem_t *cstr() const { return m_ptr->str(); }
+	const mem_t *c_str() const { return m_ptr->str(); }
 
 	// concatenation operators
 	pstring_t& operator+=(const pstring_t &string) { pcat(string); return *this; }
@@ -356,7 +356,7 @@ public:
 	pstringbuffer &operator=(const pstringbuffer &string) { pcopy(string); return *this; }
 
 	// C string conversion helpers
-	const char *cstr() const { return m_ptr; }
+	const char *c_str() const { return m_ptr; }
 
 	operator pstring() const { return pstring(m_ptr); }
 
@@ -405,7 +405,7 @@ namespace std
 		typedef std::size_t result_type;
 		result_type operator()(argument_type const& s) const
 		{
-			const pstring::mem_t *string = s.cstr();
+			const pstring::mem_t *string = s.c_str();
 			result_type result = 5381;
 			for (pstring::mem_t c = *string; c != 0; c = *string++)
 				result = ((result << 5) + result ) ^ (result >> (32 - 5)) ^ static_cast<result_type>(c);

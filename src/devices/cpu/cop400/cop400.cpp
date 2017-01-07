@@ -150,7 +150,10 @@ static ADDRESS_MAP_START( program_2kb, AS_PROGRAM, 8, cop400_cpu_device )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_32b, AS_DATA, 8, cop400_cpu_device )
-	AM_RANGE(0x00, 0x1f) AM_RAM
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x10, 0x17) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x20, 0x27) AM_MIRROR(0x08) AM_RAM
+	AM_RANGE(0x30, 0x37) AM_MIRROR(0x08) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( data_64b, AS_DATA, 8, cop400_cpu_device )
@@ -173,6 +176,7 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 	, m_program_config("program", ENDIANNESS_LITTLE, 8, program_addr_bits, 0, internal_map_program)
 	, m_data_config("data", ENDIANNESS_LITTLE, 8, data_addr_bits, 0, internal_map_data) // data width is really 4
 	, m_read_l(*this)
+	, m_read_l_tristate(*this)
 	, m_write_l(*this)
 	, m_read_g(*this)
 	, m_write_g(*this)
@@ -231,17 +235,17 @@ cop400_cpu_device::cop400_cpu_device(const machine_config &mconfig, device_type 
 }
 
 cop401_cpu_device::cop401_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP401, "COP401", tag, owner, clock, "cop401", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, nullptr, ADDRESS_MAP_NAME(data_32b))
 {
 }
 
 cop410_cpu_device::cop410_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 5, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP410, "COP410", tag, owner, clock, "cop410", __FILE__, 9, 6, COP410_FEATURE, 0xf, 0xf, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 
 cop411_cpu_device::cop411_cpu_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
-	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 5, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
+	: cop400_cpu_device(mconfig, COP411, "COP411", tag, owner, clock, "cop411", __FILE__, 9, 6, COP410_FEATURE, 0x7, 0x3, 0, false, false, ADDRESS_MAP_NAME(program_512b), ADDRESS_MAP_NAME(data_32b))
 {
 }
 
@@ -901,6 +905,7 @@ void cop400_cpu_device::device_start()
 	/* find i/o handlers */
 
 	m_read_l.resolve_safe(0);
+	m_read_l_tristate.resolve_safe(0);
 	m_write_l.resolve_safe();
 	m_read_g.resolve_safe(0);
 	m_write_g.resolve_safe();

@@ -402,8 +402,8 @@ Guilty Gear X                                   841-0013C    23356   14 (64Mb)  
 Gun Spike                                       841-0012C    23210   12 (64Mb)   present     315-6213  317-5060-COM   \same ROM board
 Cannon Spike                                    841-0012C-01 23210   12 (64Mb)   present     315-6213  317-5060-COM   /
 Heavy Metal Geomatrix (Rev B)                   HMG016007    23716A  11 (64Mb)   present     315-6213  317-5071-COM   joystick + 2 buttons
-House of the Dead 2                             834-13636    21385   20 (64Mb)   not present 315-6213  not present
-House of the Dead 2 (USA)                       834-13636    21585   20 (64Mb)   not present 315-6213  not present    PCB s/n is 834-13636-01
+House of the Dead 2                             834-13636    21385   20 (64Mb)   not present           not present    \ ROM board type is 837-13390
+House of the Dead 2 (USA)                       834-13636-01 21585   20 (64Mb)   not present           not present    / uses Lattice ispLSI 2032 80LJ instead of Xilinx
 Idol Janshi Suchie-Pai 3                        841-0002C    21979   14 (64Mb)   ?           315-6213  317-5047-JPN   requires mahjong panel
 Jambo! Safari (Rev A)                           840-0013C    22826A   8 (64Mb)   ?           315-6213  317-0264-COM
 Mars TV                                         840-0025C    22993   15 (64Mb)   present     315-6213  317-0274-JPN

@@ -20,6 +20,9 @@
 #define LM358_DIP(name)                                                       \
 		NET_REGISTER_DEV(LM358_DIP, name)
 
+#define LM3900(name)                                                           \
+		NET_REGISTER_DEV(LM3900, name)
+
 /* ----------------------------------------------------------------------------
  *  External declarations
  * ---------------------------------------------------------------------------*/

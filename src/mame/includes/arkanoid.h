@@ -15,10 +15,7 @@ enum {
 class arkanoid_state : public driver_device
 {
 public:
-	enum
-	{
-		TIMER_68705_PRESCALER_EXPIRED,
-	};
+
 
 	arkanoid_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag),
@@ -56,13 +53,13 @@ public:
 	/* mcu internal related */
 	uint8_t    m_portA_in;
 	uint8_t    m_portA_out;
-	uint8_t    m_ddrA;
-	uint8_t    m_portC_internal;
-	uint8_t    m_portC_out;
-	uint8_t    m_ddrC;
-	uint8_t    m_tdr;
-	uint8_t    m_tcr;
-	emu_timer *m_68705_timer;
+	uint8_t    m_old_portC_out;
+
+	DECLARE_READ8_MEMBER( mcu_porta_r );
+	DECLARE_READ8_MEMBER( mcu_portb_r );
+	DECLARE_READ8_MEMBER( mcu_portc_r );
+	DECLARE_WRITE8_MEMBER( mcu_porta_w );
+	DECLARE_WRITE8_MEMBER( mcu_portc_w );
 
 	/* hexaa */
 	uint8_t m_hexaa_from_main;
@@ -76,16 +73,8 @@ public:
 
 	DECLARE_READ8_MEMBER(arkanoid_Z80_mcu_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_Z80_mcu_w);
-	DECLARE_READ8_MEMBER(arkanoid_68705_port_a_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_port_a_w);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_ddr_a_w);
-	DECLARE_READ8_MEMBER(arkanoid_68705_port_c_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_port_c_w);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_ddr_c_w);
-	DECLARE_READ8_MEMBER(arkanoid_68705_tdr_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_tdr_w);
-	DECLARE_READ8_MEMBER(arkanoid_68705_tcr_r);
-	DECLARE_WRITE8_MEMBER(arkanoid_68705_tcr_w);
+
+
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f000_r);
 	DECLARE_READ8_MEMBER(arkanoid_bootleg_f002_r);
 	DECLARE_WRITE8_MEMBER(arkanoid_bootleg_d018_w);
@@ -118,10 +107,7 @@ public:
 	virtual void video_start() override;
 	uint32_t screen_update_arkanoid(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	uint32_t screen_update_hexa(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
-	TIMER_CALLBACK_MEMBER(timer_68705_increment);
 	void draw_sprites( bitmap_ind16 &bitmap, const rectangle &cliprect );
 	void arkanoid_bootleg_init(  );
 
-protected:
-	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr) override;
 };

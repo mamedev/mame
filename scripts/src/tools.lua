@@ -31,6 +31,7 @@ links {
 	"7z",
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -73,6 +74,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -118,6 +120,7 @@ links {
 	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -161,6 +164,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -206,6 +210,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -252,6 +257,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -296,6 +302,7 @@ links {
 	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -336,6 +343,7 @@ links {
 	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -376,6 +384,7 @@ links {
 	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -418,6 +427,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -458,6 +468,7 @@ links {
 	ext_lib("expat"),
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -501,6 +512,7 @@ links {
 	"netlist",
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -585,6 +597,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -630,6 +643,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {
@@ -675,6 +689,7 @@ links {
 	"ocore_" .. _OPTIONS["osd"],
 	ext_lib("zlib"),
 	ext_lib("flac"),
+	ext_lib("utf8proc"),
 }
 
 includedirs {

@@ -1,15 +1,19 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
- * License: http://www.opensource.org/licenses/BSD-2-Clause
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
+ * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
 #include <bgfx/bgfx.h>
+#include <bgfx/embedded_shader.h>
 #include "debugdraw.h"
+#include "../bgfx_utils.h"
+#include "../packrect.h"
 
 #include <bx/fpumath.h>
 #include <bx/radixsort.h>
 #include <bx/uint32_t.h>
 #include <bx/crtimpl.h>
+#include <bx/handlealloc.h>
 
 struct DebugVertex
 {
@@ -33,6 +37,30 @@ struct DebugVertex
 };
 
 bgfx::VertexDecl DebugVertex::ms_decl;
+
+struct DebugUvVertex
+{
+	float m_x;
+	float m_y;
+	float m_z;
+	float m_u;
+	float m_v;
+	uint32_t m_abgr;
+
+	static void init()
+	{
+		ms_decl
+			.begin()
+			.add(bgfx::Attrib::Position,  3, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+			.add(bgfx::Attrib::Color0,    4, bgfx::AttribType::Uint8, true)
+			.end();
+	}
+
+	static bgfx::VertexDecl ms_decl;
+};
+
+bgfx::VertexDecl DebugUvVertex::ms_decl;
 
 struct DebugShapeVertex
 {
@@ -276,51 +304,68 @@ void getPoint(float* _result, Axis::Enum _axis, float _x, float _y)
 #include "fs_debugdraw_fill.bin.h"
 #include "vs_debugdraw_fill_lit.bin.h"
 #include "fs_debugdraw_fill_lit.bin.h"
+#include "vs_debugdraw_fill_texture.bin.h"
+#include "fs_debugdraw_fill_texture.bin.h"
 
-struct EmbeddedShader
+static const bgfx::EmbeddedShader s_embeddedShaders[] =
 {
-	bgfx::RendererType::Enum type;
-	const uint8_t* data;
-	uint32_t size;
+	BGFX_EMBEDDED_SHADER(vs_debugdraw_lines),
+	BGFX_EMBEDDED_SHADER(fs_debugdraw_lines),
+	BGFX_EMBEDDED_SHADER(vs_debugdraw_lines_stipple),
+	BGFX_EMBEDDED_SHADER(fs_debugdraw_lines_stipple),
+	BGFX_EMBEDDED_SHADER(vs_debugdraw_fill),
+	BGFX_EMBEDDED_SHADER(fs_debugdraw_fill),
+	BGFX_EMBEDDED_SHADER(vs_debugdraw_fill_lit),
+	BGFX_EMBEDDED_SHADER(fs_debugdraw_fill_lit),
+	BGFX_EMBEDDED_SHADER(vs_debugdraw_fill_texture),
+	BGFX_EMBEDDED_SHADER(fs_debugdraw_fill_texture),
+
+	BGFX_EMBEDDED_SHADER_END()
 };
 
-#define BGFX_DECLARE_SHADER_EMBEDDED(_name) \
-			{ \
-				{ bgfx::RendererType::Direct3D9,  BX_CONCATENATE(_name, _dx9 ),  sizeof(BX_CONCATENATE(_name, _dx9 ) ) }, \
-				{ bgfx::RendererType::Direct3D11, BX_CONCATENATE(_name, _dx11),  sizeof(BX_CONCATENATE(_name, _dx11) ) }, \
-				{ bgfx::RendererType::Direct3D12, BX_CONCATENATE(_name, _dx11),  sizeof(BX_CONCATENATE(_name, _dx11) ) }, \
-				{ bgfx::RendererType::OpenGL,     BX_CONCATENATE(_name, _glsl),  sizeof(BX_CONCATENATE(_name, _glsl) ) }, \
-				{ bgfx::RendererType::OpenGLES,   BX_CONCATENATE(_name, _glsl),  sizeof(BX_CONCATENATE(_name, _glsl) ) }, \
-				{ bgfx::RendererType::Vulkan,     BX_CONCATENATE(_name, _glsl),  sizeof(BX_CONCATENATE(_name, _glsl) ) }, \
-				{ bgfx::RendererType::Metal,      BX_CONCATENATE(_name, _mtl ),  sizeof(BX_CONCATENATE(_name, _mtl ) ) }, \
-				{ bgfx::RendererType::Count,      NULL,                          0                                     }, \
-			}
+#define SPRITE_TEXTURE_SIZE 1024
 
-static const EmbeddedShader s_embeddedShaders[][8] =
+template<uint16_t MaxHandlesT = 256, uint16_t TextureSizeT = 1024>
+struct SpriteT
 {
-	BGFX_DECLARE_SHADER_EMBEDDED(vs_debugdraw_lines),
-	BGFX_DECLARE_SHADER_EMBEDDED(fs_debugdraw_lines),
-	BGFX_DECLARE_SHADER_EMBEDDED(vs_debugdraw_lines_stipple),
-	BGFX_DECLARE_SHADER_EMBEDDED(fs_debugdraw_lines_stipple),
-	BGFX_DECLARE_SHADER_EMBEDDED(vs_debugdraw_fill),
-	BGFX_DECLARE_SHADER_EMBEDDED(fs_debugdraw_fill),
-	BGFX_DECLARE_SHADER_EMBEDDED(vs_debugdraw_fill_lit),
-	BGFX_DECLARE_SHADER_EMBEDDED(fs_debugdraw_fill_lit),
-};
-
-static bgfx::ShaderHandle createEmbeddedShader(bgfx::RendererType::Enum _type, uint32_t _index)
-{
-	for (const EmbeddedShader* es = s_embeddedShaders[_index]; bgfx::RendererType::Count != es->type; ++es)
+	SpriteT()
+		: m_ra(TextureSizeT, TextureSizeT)
 	{
-		if (_type == es->type)
-		{
-			return bgfx::createShader(bgfx::makeRef(es->data, es->size) );
-		}
 	}
 
-	bgfx::ShaderHandle handle = BGFX_INVALID_HANDLE;
-	return handle;
-}
+	SpriteHandle create(uint16_t _width, uint16_t _height)
+	{
+		SpriteHandle handle = { bx::HandleAlloc::invalid };
+
+		if (m_handleAlloc.getNumHandles() < m_handleAlloc.getMaxHandles() )
+		{
+			Pack2D pack;
+			if (m_ra.find(_width, _height, pack) )
+			{
+				handle.idx = m_handleAlloc.alloc();
+				m_pack[handle.idx] = pack;
+			}
+		}
+
+		return handle;
+	}
+
+	void destroy(SpriteHandle _sprite)
+	{
+		const Pack2D& pack = m_pack[_sprite.idx];
+		m_ra.clear(pack);
+		m_handleAlloc.free(_sprite.idx);
+	}
+
+	const Pack2D& get(SpriteHandle _sprite) const
+	{
+		return m_pack[_sprite.idx];
+	}
+
+	bx::HandleAllocT<MaxHandlesT> m_handleAlloc;
+	Pack2D                        m_pack[MaxHandlesT];
+	RectPack2DT<256>              m_ra;
+};
 
 struct DebugDraw
 {
@@ -344,35 +389,49 @@ struct DebugDraw
 #endif // BX_CONFIG_ALLOCATOR_CRT
 
 		DebugVertex::init();
+		DebugUvVertex::init();
 		DebugShapeVertex::init();
 
 		bgfx::RendererType::Enum type = bgfx::getRendererType();
 
 		m_program[Program::Lines] =
-			bgfx::createProgram(createEmbeddedShader(type, 0)
-							, createEmbeddedShader(type, 1)
-							, true
-							);
+			bgfx::createProgram(
+				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines")
+				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines")
+				, true
+				);
 
 		m_program[Program::LinesStipple] =
-			bgfx::createProgram(createEmbeddedShader(type, 2)
-							, createEmbeddedShader(type, 3)
-							, true
-							);
+			bgfx::createProgram(
+				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_lines_stipple")
+				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_lines_stipple")
+				, true
+				);
 
 		m_program[Program::Fill] =
-			bgfx::createProgram(createEmbeddedShader(type, 4)
-							, createEmbeddedShader(type, 5)
-							, true
-							);
+			bgfx::createProgram(
+				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill")
+				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill")
+				, true
+				);
 
 		m_program[Program::FillLit] =
-			bgfx::createProgram(createEmbeddedShader(type, 6)
-							, createEmbeddedShader(type, 7)
-							, true
-							);
+			bgfx::createProgram(
+				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_lit")
+				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_lit")
+				, true
+				);
 
-		u_params = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, 4);
+		m_program[Program::FillTexture] =
+			bgfx::createProgram(
+				  bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_debugdraw_fill_texture")
+				, bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_debugdraw_fill_texture")
+				, true
+				);
+
+		u_params   = bgfx::createUniform("u_params", bgfx::UniformType::Vec4, 4);
+		s_texColor = bgfx::createUniform("s_texColor", bgfx::UniformType::Int1);
+		m_texture  = bgfx::createTexture2D(SPRITE_TEXTURE_SIZE, SPRITE_TEXTURE_SIZE, false, 1, bgfx::TextureFormat::BGRA8);
 
 		void* vertices[Mesh::Count] = {};
 		uint16_t* indices[Mesh::Count] = {};
@@ -679,6 +738,7 @@ struct DebugDraw
 		m_pos       = 0;
 		m_indexPos  = 0;
 		m_vertexPos = 0;
+		m_posQuad   = 0;
 	}
 
 	void shutdown()
@@ -690,6 +750,35 @@ struct DebugDraw
 			bgfx::destroyProgram(m_program[ii]);
 		}
 		bgfx::destroyUniform(u_params);
+		bgfx::destroyUniform(s_texColor);
+		bgfx::destroyTexture(m_texture);
+	}
+
+	SpriteHandle createSprite(uint16_t _width, uint16_t _height, const void* _data)
+	{
+		SpriteHandle handle = m_sprite.create(_width, _height);
+
+		if (isValid(handle) )
+		{
+			const Pack2D& pack = m_sprite.get(handle);
+			bgfx::updateTexture2D(
+				  m_texture
+				, 0
+				, 0
+				, pack.m_x
+				, pack.m_y
+				, pack.m_width
+				, pack.m_height
+				, bgfx::copy(_data, pack.m_width*pack.m_height*4)
+				);
+		}
+
+		return handle;
+	}
+
+	void destroy(SpriteHandle _handle)
+	{
+		m_sprite.destroy(_handle);
 	}
 
 	void begin(uint8_t _viewId)
@@ -709,6 +798,7 @@ struct DebugDraw
 			| BGFX_STATE_DEPTH_WRITE
 			;
 		attrib.m_scale     = 1.0f;
+		attrib.m_spin      = 0.0f;
 		attrib.m_offset    = 0.0f;
 		attrib.m_abgr      = UINT32_MAX;
 		attrib.m_stipple   = false;
@@ -720,6 +810,7 @@ struct DebugDraw
 	{
 		BX_CHECK(0 == m_stack, "Invalid stack %d.", m_stack);
 
+		flushQuad();
 		flush();
 
 		m_state  = State::Count;
@@ -780,27 +871,34 @@ struct DebugDraw
 			: BGFX_STATE_DEPTH_TEST_GREATER
 			;
 
-		m_attrib[m_stack].m_state &= ~(0
+		uint64_t state = m_attrib[m_stack].m_state & ~(0
 			| BGFX_STATE_DEPTH_TEST_MASK
 			| BGFX_STATE_DEPTH_WRITE
 			| BGFX_STATE_CULL_CW
 			| BGFX_STATE_CULL_CCW
 			);
 
-		m_attrib[m_stack].m_state |= _depthTest
+		state |= _depthTest
 			? depthTest
 			: 0
 			;
 
-		m_attrib[m_stack].m_state |= _depthWrite
+		state |= _depthWrite
 			? BGFX_STATE_DEPTH_WRITE
 			: 0
 			;
 
-		m_attrib[m_stack].m_state |= _clockwise
+		state |= _clockwise
 			? BGFX_STATE_CULL_CW
 			: BGFX_STATE_CULL_CCW
 			;
+
+		if (m_attrib[m_stack].m_state != state)
+		{
+			flush();
+		}
+
+		m_attrib[m_stack].m_state = state;
 	}
 
 	void setColor(uint32_t _abgr)
@@ -835,6 +933,12 @@ struct DebugDraw
 		attrib.m_stipple = _stipple;
 		attrib.m_offset  = _offset;
 		attrib.m_scale   = _scale;
+	}
+
+	void setSpin(float _spin)
+	{
+		Attrib& attrib = m_attrib[m_stack];
+		attrib.m_spin = _spin;
 	}
 
 	void moveTo(float _x, float _y, float _z = 0.0f)
@@ -985,7 +1089,7 @@ struct DebugDraw
 
 	void draw(const Disk& _disk)
 	{
-		BX_UNUSED(_disk);
+		drawCircle(_disk.m_normal, _disk.m_center, _disk.m_radius, 0.0f);
 	}
 
 	void draw(const Obb& _obb)
@@ -1143,10 +1247,9 @@ struct DebugDraw
 		const float step = bx::pi * 2.0f / num;
 		_weight = bx::fclamp(_weight, 0.0f, 2.0f);
 
-		Plane plane = { { _normal[0], _normal[1], _normal[2] }, 0.0f };
 		float udir[3];
 		float vdir[3];
-		calcPlaneUv(plane, udir, vdir);
+		bx::vec3TangentFrame(_normal, udir, vdir, attrib.m_spin);
 
 		float pos[3];
 		float tmp0[3];
@@ -1218,6 +1321,138 @@ struct DebugDraw
 		close();
 	}
 
+	void drawQuad(const float* _normal, const float* _center, float _size)
+	{
+		const Attrib& attrib = m_attrib[m_stack];
+
+		float udir[3];
+		float vdir[3];
+
+		bx::vec3TangentFrame(_normal, udir, vdir, attrib.m_spin);
+
+		const float halfExtent = _size*0.5f;
+
+		float umin[3];
+		bx::vec3Mul(umin, udir, -halfExtent);
+
+		float umax[3];
+		bx::vec3Mul(umax, udir,  halfExtent);
+
+		float vmin[3];
+		bx::vec3Mul(vmin, vdir, -halfExtent);
+
+		float vmax[3];
+		bx::vec3Mul(vmax, vdir,  halfExtent);
+
+		float pt[3];
+		float tmp[3];
+		bx::vec3Add(tmp, umin, vmin);
+		bx::vec3Add(pt, _center, tmp);
+		moveTo(pt);
+
+		bx::vec3Add(tmp, umax, vmin);
+		bx::vec3Add(pt, _center, tmp);
+		lineTo(pt);
+
+		bx::vec3Add(tmp, umax, vmax);
+		bx::vec3Add(pt, _center, tmp);
+		lineTo(pt);
+
+		bx::vec3Add(tmp, umin, vmax);
+		bx::vec3Add(pt, _center, tmp);
+		lineTo(pt);
+
+		close();
+	}
+
+	void drawQuad(SpriteHandle _handle, const float* _normal, const float* _center, float _size)
+	{
+		if (m_posQuad == BX_COUNTOF(m_cacheQuad) )
+		{
+			flushQuad();
+		}
+
+		const Attrib& attrib = m_attrib[m_stack];
+
+		float udir[3];
+		float vdir[3];
+
+		bx::vec3TangentFrame(_normal, udir, vdir, attrib.m_spin);
+
+		const Pack2D& pack = m_sprite.get(_handle);
+		const float invTextureSize = 1.0f/SPRITE_TEXTURE_SIZE;
+		const float us =  pack.m_x                  * invTextureSize;
+		const float vs =  pack.m_y                  * invTextureSize;
+		const float ue = (pack.m_x + pack.m_width ) * invTextureSize;
+		const float ve = (pack.m_y + pack.m_height) * invTextureSize;
+
+		const float aspectRatio = float(pack.m_width)/float(pack.m_height);
+		const float halfExtentU =      aspectRatio*_size*0.5f;
+		const float halfExtentV = 1.0f/aspectRatio*_size*0.5f;
+
+		float umin[3];
+		bx::vec3Mul(umin, udir, -halfExtentU);
+
+		float umax[3];
+		bx::vec3Mul(umax, udir,  halfExtentU);
+
+		float vmin[3];
+		bx::vec3Mul(vmin, vdir, -halfExtentV);
+
+		float vmax[3];
+		bx::vec3Mul(vmax, vdir,  halfExtentV);
+
+		DebugUvVertex* vertex = &m_cacheQuad[m_posQuad];
+		m_posQuad += 4;
+
+		float pt[3];
+		float tmp[3];
+		bx::vec3Add(tmp, umin, vmin);
+		bx::vec3Add(pt, _center, tmp);
+		vertex->m_x = pt[0];
+		vertex->m_y = pt[1];
+		vertex->m_z = pt[2];
+		vertex->m_u = us;
+		vertex->m_v = vs;
+		vertex->m_abgr = attrib.m_abgr;
+		++vertex;
+
+		bx::vec3Add(tmp, umax, vmin);
+		bx::vec3Add(pt, _center, tmp);
+		vertex->m_x = pt[0];
+		vertex->m_y = pt[1];
+		vertex->m_z = pt[2];
+		vertex->m_u = ue;
+		vertex->m_v = vs;
+		vertex->m_abgr = attrib.m_abgr;
+		++vertex;
+
+		bx::vec3Add(tmp, umin, vmax);
+		bx::vec3Add(pt, _center, tmp);
+		vertex->m_x = pt[0];
+		vertex->m_y = pt[1];
+		vertex->m_z = pt[2];
+		vertex->m_u = us;
+		vertex->m_v = ve;
+		vertex->m_abgr = attrib.m_abgr;
+		++vertex;
+
+		bx::vec3Add(tmp, umax, vmax);
+		bx::vec3Add(pt, _center, tmp);
+		vertex->m_x = pt[0];
+		vertex->m_y = pt[1];
+		vertex->m_z = pt[2];
+		vertex->m_u = ue;
+		vertex->m_v = ve;
+		vertex->m_abgr = attrib.m_abgr;
+		++vertex;
+	}
+
+	void drawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* _center, float _size)
+	{
+		BX_UNUSED(_handle, _normal, _center, _size);
+	}
+
 	void drawCone(const float* _from, const float* _to, float _radius)
 	{
 		const Attrib& attrib = m_attrib[m_stack];
@@ -1229,7 +1464,7 @@ struct DebugDraw
 		bx::vec3Norm(normal, tmp0);
 
 		float mtx[2][16];
-		bx::mtxFromNormal(mtx[0], normal, _radius, _from);
+		bx::mtxFromNormal(mtx[0], normal, _radius, _from, attrib.m_spin);
 
 		memcpy(mtx[1], mtx[0], 64);
 		mtx[1][12] = _to[0];
@@ -1259,7 +1494,7 @@ struct DebugDraw
 		bx::vec3Norm(normal, tmp0);
 
 		float mtx[2][16];
-		bx::mtxFromNormal(mtx[0], normal, _radius, _from);
+		bx::mtxFromNormal(mtx[0], normal, _radius, _from, attrib.m_spin);
 
 		memcpy(mtx[1], mtx[0], 64);
 		mtx[1][12] = _to[0];
@@ -1357,10 +1592,11 @@ struct DebugDraw
 
 	void drawGrid(const float* _normal, const float* _center, uint32_t _size, float _step)
 	{
+		const Attrib& attrib = m_attrib[m_stack];
+
 		float udir[3];
 		float vdir[3];
-		Plane plane = { { _normal[0], _normal[1], _normal[2] }, 0.0f };
-		calcPlaneUv(plane, udir, vdir);
+		bx::vec3TangentFrame(_normal, udir, vdir, attrib.m_spin);
 
 		bx::vec3Mul(udir, udir, _step);
 		bx::vec3Mul(vdir, vdir, _step);
@@ -1526,6 +1762,7 @@ private:
 			LinesStipple,
 			Fill,
 			FillLit,
+			FillTexture,
 
 			Count
 		};
@@ -1602,7 +1839,7 @@ private:
 	{
 		if (0 != m_pos)
 		{
-			if (bgfx::checkAvailTransientBuffers(m_pos, DebugVertex::ms_decl, m_indexPos) )
+			if (checkAvailTransientBuffers(m_pos, DebugVertex::ms_decl, m_indexPos) )
 			{
 				bgfx::TransientVertexBuffer tvb;
 				bgfx::allocTransientVertexBuffer(&tvb, m_pos, DebugVertex::ms_decl);
@@ -1635,6 +1872,48 @@ private:
 		}
 	}
 
+	void flushQuad()
+	{
+		if (0 != m_posQuad)
+		{
+			const uint32_t numIndices = m_posQuad/4*6;
+			if (checkAvailTransientBuffers(m_posQuad, DebugUvVertex::ms_decl, numIndices) )
+			{
+				bgfx::TransientVertexBuffer tvb;
+				bgfx::allocTransientVertexBuffer(&tvb, m_posQuad, DebugUvVertex::ms_decl);
+				memcpy(tvb.data, m_cacheQuad, m_posQuad * DebugUvVertex::ms_decl.m_stride);
+
+				bgfx::TransientIndexBuffer tib;
+				bgfx::allocTransientIndexBuffer(&tib, numIndices);
+				uint16_t* indices = (uint16_t*)tib.data;
+				for (uint16_t ii = 0, num = m_posQuad/4; ii < num; ++ii)
+				{
+					uint16_t startVertex = ii*4;
+					indices[0] = startVertex+0;
+					indices[1] = startVertex+1;
+					indices[2] = startVertex+2;
+					indices[3] = startVertex+1;
+					indices[4] = startVertex+3;
+					indices[5] = startVertex+2;
+					indices += 6;
+				}
+
+				const Attrib& attrib = m_attrib[m_stack];
+
+				bgfx::setVertexBuffer(&tvb);
+				bgfx::setIndexBuffer(&tib);
+				bgfx::setState(0
+						| (attrib.m_state & ~BGFX_STATE_CULL_MASK)
+						);
+				bgfx::setTransform(m_mtx);
+				bgfx::setTexture(0, s_texColor, m_texture);
+				bgfx::submit(m_viewId, m_program[Program::FillTexture]);
+			}
+
+			m_posQuad = 0;
+		}
+	}
+
 	struct State
 	{
 		enum Enum
@@ -1651,11 +1930,16 @@ private:
 	static const uint32_t stackSize = 16;
 	BX_STATIC_ASSERT(cacheSize >= 3, "Cache must be at least 3 elements.");
 	DebugVertex m_cache[cacheSize+1];
-	uint32_t m_mtx;
 	uint16_t m_indices[cacheSize*2];
 	uint16_t m_pos;
 	uint16_t m_indexPos;
 	uint16_t m_vertexPos;
+
+	static const uint32_t cacheQuadSize = 1024;
+	DebugUvVertex m_cacheQuad[cacheQuadSize];
+	uint16_t m_posQuad;
+
+	uint32_t m_mtx;
 	uint8_t  m_viewId;
 	uint8_t  m_stack;
 	bool     m_depthTestLess;
@@ -1665,6 +1949,7 @@ private:
 		uint64_t m_state;
 		float    m_offset;
 		float    m_scale;
+		float    m_spin;
 		uint32_t m_abgr;
 		bool     m_stipple;
 		bool     m_wireframe;
@@ -1677,6 +1962,11 @@ private:
 
 	Mesh m_mesh[Mesh::Count];
 
+	typedef SpriteT<256, SPRITE_TEXTURE_SIZE> Sprite;
+	Sprite m_sprite;
+
+	bgfx::UniformHandle s_texColor;
+	bgfx::TextureHandle m_texture;
 	bgfx::ProgramHandle m_program[Program::Count];
 	bgfx::UniformHandle u_params;
 
@@ -1696,6 +1986,16 @@ void ddInit(bool _depthTestLess, bx::AllocatorI* _allocator)
 void ddShutdown()
 {
 	s_dd.shutdown();
+}
+
+SpriteHandle ddCreateSprite(uint16_t _width, uint16_t _height, const void* _data)
+{
+	return s_dd.createSprite(_width, _height, _data);
+}
+
+void ddDestroy(SpriteHandle _handle)
+{
+	s_dd.destroy(_handle);
 }
 
 void ddBegin(uint8_t _viewId)
@@ -1741,6 +2041,11 @@ void ddSetWireframe(bool _wireframe)
 void ddSetStipple(bool _stipple, float _scale, float _offset)
 {
 	s_dd.setStipple(_stipple, _scale, _offset);
+}
+
+void ddSetSpin(float _spin)
+{
+	s_dd.setSpin(_spin);
 }
 
 void ddSetTransform(const void* _mtx)
@@ -1821,6 +2126,21 @@ void ddDrawCircle(const void* _normal, const void* _center, float _radius, float
 void ddDrawCircle(Axis::Enum _axis, float _x, float _y, float _z, float _radius, float _weight)
 {
 	s_dd.drawCircle(_axis, _x, _y, _z, _radius, _weight);
+}
+
+void ddDrawQuad(const float* _normal, const float* _center, float _size)
+{
+	s_dd.drawQuad(_normal, _center, _size);
+}
+
+void ddDrawQuad(SpriteHandle _handle, const float* _normal, const float* _center, float _size)
+{
+	s_dd.drawQuad(_handle, _normal, _center, _size);
+}
+
+void ddDrawQuad(bgfx::TextureHandle _handle, const float* _normal, const float* _center, float _size)
+{
+	s_dd.drawQuad(_handle, _normal, _center, _size);
 }
 
 void ddDrawCone(const void* _from, const void* _to, float _radius)

@@ -8,7 +8,7 @@
 
 #include "namcos2.h"
 #include "machine/eeprompar.h"
-#include "video/c116.h"
+#include "video/namco_c116.h"
 
 #define NAMCONB1_HTOTAL     (288)   /* wrong */
 #define NAMCONB1_HBSTART    (288)

@@ -7,6 +7,7 @@
 #include "machine/eepromser.h"
 #include "machine/gen_latch.h"
 #include "sound/okim6295.h"
+#include "sound/ym2151.h"
 #include "machine/deco146.h"
 #include "machine/deco104.h"
 #include "video/deco_zoomspr.h"
@@ -27,6 +28,7 @@ public:
 		m_sprgen2(*this, "spritegen2"),
 		m_sprgenzoom(*this, "spritegen_zoom"),
 		m_eeprom(*this, "eeprom"),
+		m_ym2151(*this, "ymsnd"),
 		m_oki1(*this, "oki1"),
 		m_oki2(*this, "oki2"),
 		m_deco_tilegen1(*this, "tilegen1"),
@@ -55,6 +57,7 @@ public:
 	optional_device<decospr_device> m_sprgen2;
 	optional_device<deco_zoomspr_device> m_sprgenzoom;
 	optional_device<eeprom_serial_93cxx_device> m_eeprom;
+	optional_device<ym2151_device> m_ym2151;
 	optional_device<okim6295_device> m_oki1;
 	optional_device<okim6295_device> m_oki2;
 	required_device<deco16ic_device> m_deco_tilegen1;
@@ -182,7 +185,8 @@ public:
 	void nslasher_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
 	uint16_t port_b_tattass(int unused);
 	void tattass_sound_cb( address_space &space, uint16_t data, uint16_t mem_mask );
-
+	void deco32_set_audio_output(uint8_t raw_data);
+	
 	DECO16IC_BANK_CB_MEMBER(fghthist_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(captaven_bank_callback);
 	DECO16IC_BANK_CB_MEMBER(tattass_bank_callback);

@@ -54,7 +54,7 @@ public:
 
 	/* devices */
 	DECLARE_WRITE8_MEMBER(crshrace_sh_bankswitch_w);
-	DECLARE_WRITE16_MEMBER(sound_command_w);
+	DECLARE_WRITE8_MEMBER(sound_command_w);
 	DECLARE_WRITE8_MEMBER(pending_command_clear_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram1_w);
 	DECLARE_WRITE16_MEMBER(crshrace_videoram2_w);

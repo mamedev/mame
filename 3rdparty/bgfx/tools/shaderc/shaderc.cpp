@@ -1,5 +1,5 @@
 /*
- * Copyright 2011-2016 Branimir Karadzic. All rights reserved.
+ * Copyright 2011-2017 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause
  */
 
@@ -113,14 +113,15 @@ namespace bgfx
 		NULL
 	};
 
-	const char* s_uniformTypeName[UniformType::Count] =
+	const char* s_uniformTypeName[] =
 	{
-		"int",
-		NULL,
-		"vec4",
-		"mat3",
-		"mat4",
+		"int",  "int",
+		NULL,   NULL,
+		"vec4", "float4",
+		"mat3", "float3x3",
+		"mat4", "float4x4",
 	};
+	BX_STATIC_ASSERT(BX_COUNTOF(s_uniformTypeName) == UniformType::Count*2);
 
 	const char* interpolationDx11(const char* _glsl)
 	{
@@ -149,12 +150,12 @@ namespace bgfx
 
 	UniformType::Enum nameToUniformTypeEnum(const char* _name)
 	{
-		for (uint32_t ii = 0; ii < UniformType::Count; ++ii)
+		for (uint32_t ii = 0; ii < UniformType::Count*2; ++ii)
 		{
 			if (NULL != s_uniformTypeName[ii]
 			&&  0 == strcmp(_name, s_uniformTypeName[ii]) )
 			{
-				return UniformType::Enum(ii);
+				return UniformType::Enum(ii/2);
 			}
 		}
 
@@ -699,7 +700,7 @@ namespace bgfx
 
 		fprintf(stderr
 			, "shaderc, bgfx shader compiler tool\n"
-			  "Copyright 2011-2016 Branimir Karadzic. All rights reserved.\n"
+			  "Copyright 2011-2017 Branimir Karadzic. All rights reserved.\n"
 			  "License: https://github.com/bkaradzic/bgfx#license-bsd-2-clause\n\n"
 			);
 
@@ -914,6 +915,7 @@ namespace bgfx
 		preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_HLSL");
 		preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_METAL");
 		preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_PSSL");
+		preprocessor.setDefaultDefine("BGFX_SHADER_LANGUAGE_SPIRV");
 
 		preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_COMPUTE");
 		preprocessor.setDefaultDefine("BGFX_SHADER_TYPE_FRAGMENT");
@@ -922,9 +924,7 @@ namespace bgfx
 		char glslDefine[128];
 		bx::snprintf(glslDefine, BX_COUNTOF(glslDefine)
 				, "BGFX_SHADER_LANGUAGE_GLSL=%d"
-				, essl  ? 1
-				: spirv ? 130
-				: glsl
+				, essl ? 1 : glsl
 				);
 
 		if (0 == bx::stricmp(platform, "android") )
@@ -945,7 +945,14 @@ namespace bgfx
 		else if (0 == bx::stricmp(platform, "linux") )
 		{
 			preprocessor.setDefine("BX_PLATFORM_LINUX=1");
-			preprocessor.setDefine(glslDefine);
+			if (0 != spirv)
+			{
+				preprocessor.setDefine("BGFX_SHADER_LANGUAGE_SPIRV=1");
+			}
+			else
+			{
+				preprocessor.setDefine(glslDefine);
+			}
 		}
 		else if (0 == bx::stricmp(platform, "nacl") )
 		{
@@ -1250,8 +1257,7 @@ namespace bgfx
 				{
 					if (0 != glsl
 					||  0 != essl
-					||  0 != metal
-					||  0 != spirv)
+					||  0 != metal)
 					{
 					}
 					else
@@ -1438,8 +1444,7 @@ namespace bgfx
 				{
 					if (0 != glsl
 					||  0 != essl
-					||  0 != metal
-					||  0 != spirv)
+					||  0 != metal)
 					{
 						if (0 == essl)
 						{
@@ -1821,8 +1826,7 @@ namespace bgfx
 
 							if (0 != glsl
 							||  0 != essl
-							||  0 != metal
-							||  0 != spirv )
+							||  0 != metal)
 							{
 								std::string code;
 
@@ -1843,10 +1847,6 @@ namespace bgfx
 									if (0 != metal)
 									{
 										bx::stringPrintf(code, "#version 120\n");
-									}
-									else if (0 != spirv)
-									{
-										bx::stringPrintf(code, "#version 130\n");
 									}
 									else
 									{
@@ -1977,22 +1977,19 @@ namespace bgfx
 
 								code += preprocessor.m_preprocessed;
 
-								if (0 != spirv)
-								{
-									compiled = compileSPIRVShader(cmdLine
-										, 0
-										, code
-										, writer
-										);
-								}
-								else
-								{
-									compiled = compileGLSLShader(cmdLine
-										, metal ? BX_MAKEFOURCC('M', 'T', 'L', 0) : essl
-										, code
-										, writer
-										);
-								}
+								compiled = compileGLSLShader(cmdLine
+									, metal ? BX_MAKEFOURCC('M', 'T', 'L', 0) : essl
+									, code
+									, writer
+									);
+							}
+							else if (0 != spirv)
+							{
+								compiled = compileSPIRVShader(cmdLine
+									, 0
+									, preprocessor.m_preprocessed
+									, writer
+									);
 							}
 							else if (0 != pssl)
 							{

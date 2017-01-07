@@ -38,7 +38,7 @@ public:
 	plan80_state(const machine_config &mconfig, device_type type, const char *tag)
 		: driver_device(mconfig, type, tag)
 		, m_maincpu(*this, "maincpu")
-		, m_p_videoram(*this, "p_videoram")
+		, m_p_videoram(*this, "videoram")
 	{ }
 
 	required_device<cpu_device> m_maincpu;
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START(plan80_mem, AS_PROGRAM, 8, plan80_state)
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x07ff) AM_RAMBANK("boot")
 	AM_RANGE(0x0800, 0xefff) AM_RAM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("p_videoram")
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("videoram")
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 

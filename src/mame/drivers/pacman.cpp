@@ -29,7 +29,7 @@
         * MTV Rock-N-Roll Trivia (Part 2)
         * Woodpecker
         * Pacman Club / Club Lambada
-
+        * Eeekk!
 
     Known issues:
         * Mystery items in Ali Baba don't work correctly because of protection.
@@ -37,7 +37,6 @@
           Also need 4-players extra inputs.
 
     Known to exist but dumps needed
-        * Eeeek!
         * Ms Pac Plus
         * Ms Pac Man Twin
         * MTV Rock-N-Roll Trivia (Part 2), 1 bad rom. It's not a bad dump, the rom is bad.
@@ -345,10 +344,9 @@ Boards:
 #include "machine/watchdog.h"
 #include "sound/ay8910.h"
 #include "sound/sn76496.h"
-#include "machine/acitya.h"
+#include "machine/epos.h"
 #include "machine/jumpshot.h"
 #include "machine/pacplus.h"
-#include "machine/theglobp.h"
 
 
 /*************************************
@@ -1428,13 +1426,8 @@ static ADDRESS_MAP_START( nmouse_portmap, AS_IO, 8, pacman_state )
 	AM_RANGE(0x00, 0x00) AM_WRITE(nmouse_interrupt_vector_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( theglobp_portmap, AS_IO, 8, pacman_state )
-	AM_RANGE(0x00, 0xff) AM_READ(theglobp_decrypt_rom)   /* Switch protection logic */
-	AM_IMPORT_FROM(writeport)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( acitya_portmap, AS_IO, 8, pacman_state )
-	AM_RANGE(0x00, 0xff) AM_READ(acitya_decrypt_rom) /* Switch protection logic */
+static ADDRESS_MAP_START( epos_portmap, AS_IO, 8, pacman_state )
+	AM_RANGE(0x00, 0xff) AM_READ(epos_decryption_w)   /* Switch protection logic */
 	AM_IMPORT_FROM(writeport)
 ADDRESS_MAP_END
 
@@ -2375,6 +2368,39 @@ static INPUT_PORTS_START( theglobp )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( eeekk )
+	PORT_INCLUDE(pacman)
+	PORT_MODIFY("IN0")
+	PORT_SERVICE_NO_TOGGLE( 0x10, 0x10 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Attack" )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "P1 Attack/2 Player Start" )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR(Lives) )      PORT_DIPLOCATION("SW:1,2")
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+	PORT_DIPNAME( 0x1c, 0x10, DEF_STR( Difficulty ) )        PORT_DIPLOCATION("SW:3,4,5")
+	PORT_DIPSETTING(    0x00, "8 (Hard)" )
+	PORT_DIPSETTING(    0x04, "7" )
+	PORT_DIPSETTING(    0x08, "6" )
+	PORT_DIPSETTING(    0x0c, "5" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x14, "3" )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x1c, "1 (Easy)" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR(Demo_Sounds) )      PORT_DIPLOCATION("SW:6")
+	PORT_DIPSETTING(    0x00, DEF_STR(On) )
+	PORT_DIPSETTING(    0x20, DEF_STR(Off) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( vanvan )
 	PORT_START("IN0")
@@ -3651,7 +3677,7 @@ static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(theglobp_portmap)
+	MCFG_CPU_IO_MAP(epos_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pacman_state,theglobp)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,theglobp)
@@ -3663,10 +3689,22 @@ static MACHINE_CONFIG_DERIVED( acitya, pacman )
 	/* basic machine hardware */
 	MCFG_CPU_MODIFY("maincpu")
 	MCFG_CPU_PROGRAM_MAP(epos_map)
-	MCFG_CPU_IO_MAP(acitya_portmap)
+	MCFG_CPU_IO_MAP(epos_portmap)
 
 	MCFG_MACHINE_START_OVERRIDE(pacman_state,acitya)
 	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,acitya)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( eeekk, pacman )
+
+	/* basic machine hardware */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(epos_map)
+	MCFG_CPU_IO_MAP(epos_portmap)
+
+	MCFG_MACHINE_START_OVERRIDE(pacman_state,eeekk)
+	MCFG_MACHINE_RESET_OVERRIDE(pacman_state,eeekk)
 MACHINE_CONFIG_END
 
 
@@ -6029,6 +6067,9 @@ ROM_START( beastfp )
 	ROM_LOAD( "beastf.5e",    0x0000, 0x1000, CRC(5654dc34) SHA1(fc2336b951a3ab48d4fc4f36a8dd80e79e8ca1a0) )
 	ROM_LOAD( "beastf.5f",    0x1000, 0x1000, CRC(1b30ca61) SHA1(8495d8a280346246f00c4f1dc42ab5a2a02c5863) )
 
+	ROM_REGION( 0x002c, "epos_pal10h8", 0)
+	ROM_LOAD( "beastf.ic4",   0x0000, 0x002c, CRC(a6ab926d) SHA1(a8c2ddce2d595cecf057b37916f2f897de8a0e4e) ) // pal10h8
+
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "glob.7f",      0x0000, 0x0020, CRC(1f617527) SHA1(448845cab63800a05fcb106897503d994377f78f) )
 	ROM_LOAD( "glob.4a",      0x0020, 0x0100, CRC(28faa769) SHA1(7588889f3102d4e0ca7918f536556209b2490ea1) )
@@ -6036,6 +6077,28 @@ ROM_START( beastfp )
 	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
 	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
 	ROM_LOAD( "82s126.3m"  ,  0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )    /* timing - not used */
+ROM_END
+
+
+ROM_START( eeekk ) // Pac-Man PCB conversion kit. Includes a small daughtercard (2 roms + 4 PLDs, plugs in through the Z80 socket), 2 roms + 2 BPROMs
+	ROM_REGION( 0x20000, "maincpu", 0 )
+	ROM_LOAD( "u_2_eeekk_pg03094.u2",   0x0000, 0x2000, CRC(701e37f2) SHA1(15bbd983e9112ce15dd229f126f2bccfa8b9807c) ) // encrypted
+	ROM_LOAD( "u_3_eeekk_pg03094.u3",   0x2000, 0x2000, CRC(bcf524ae) SHA1(be2a1a2984ea1439c63d8c353e4ae85bf42c8a55) ) // encrypted
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "5_e_eeekk_pg03094.5e",   0x0000, 0x1000, CRC(780183a8) SHA1(8466d75d79b3c87db143f5c2e8b58dad1d2e501c) )
+	ROM_LOAD( "5_f_eeekk_pg03094.5f",   0x1000, 0x1000, CRC(418526e4) SHA1(a95764e216ccdaca0631604e1101ba91884effde) )
+
+	ROM_REGION( 0x002c, "epos_pal10h8", 0)
+	ROM_LOAD( "eeekk.ic4",    0x0000, 0x002c, CRC(f588ba4e) SHA1(07d74da02172789ccd1fead2b5afe8ce72c5149d) ) // pal10h8
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "7_f_eeekk.7f",     0x0000, 0x0020, CRC(c64c8a53) SHA1(55e7b88cb1ce129e8154722a489d76c38924d3f1) ) // 82s123
+	ROM_LOAD( "4_a_eeekk.4a",     0x0020, 0x0100, CRC(a5044ded) SHA1(566bd06674bf8069dc633102493c9991b64e4379) ) // 82s126
+
+	ROM_REGION( 0x0200, "namco", 0 )    /* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) ) // 82s126
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) ) // 82s126 - timing - not used
 ROM_END
 
 
@@ -7284,6 +7347,7 @@ GAME( 1983, theglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT
 GAME( 1983, sprglobp, suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Super Glob (Pac-Man hardware)", MACHINE_SUPPORTS_SAVE )
 GAME( 1983, sprglbpg, suprglob, pacman,   theglobp, driver_device, 0,        ROT90,  "bootleg", "Super Glob (Pac-Man hardware) (German bootleg)", MACHINE_SUPPORTS_SAVE )
 GAME( 1984, beastfp,  suprglob, theglobp, theglobp, driver_device, 0,        ROT90,  "Epos Corporation", "Beastie Feastie (conversion kit)", MACHINE_SUPPORTS_SAVE )
+GAME( 1984, eeekk,    0,        eeekk,    eeekk,    driver_device, 0,        ROT90,  "Epos Corporation", "Eeekk!", MACHINE_SUPPORTS_SAVE )
 
 GAME( 1984, drivfrcp, 0,        drivfrcp, drivfrcp, pacman_state,  drivfrcp, ROT90,  "Shinkai Inc. (Magic Electronics Inc. license)", "Driving Force (Pac-Man conversion)", MACHINE_SUPPORTS_SAVE )
 

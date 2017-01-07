@@ -16,7 +16,6 @@
 
   TODO:
   - external module support (no dumps yet)
-  - SC-01 frog speech is why this driver is marked NOT_WORKING
 
 ***************************************************************************/
 
@@ -277,7 +276,7 @@ WRITE8_MEMBER(k28_state::mcu_p0_w)
 
 	// d3: SC-01 strobe, latch phoneme on rising edge
 	int strobe = data >> 3 & 1;
-	if (!strobe && m_speech_strobe)
+	if (strobe && !m_speech_strobe)
 		m_speech->write(space, 0, m_phoneme);
 	m_speech_strobe = strobe;
 
@@ -377,7 +376,7 @@ WRITE8_MEMBER(k28_state::mcu_prog_w)
 READ8_MEMBER(k28_state::mcu_t1_r)
 {
 	// 8021 T1: SC-01 A/R pin
-	return m_speech->request();
+	return m_speech->request() ? 1 : 0;
 }
 
 
@@ -516,4 +515,4 @@ ROM_END
 
 
 /*    YEAR  NAME PARENT COMPAT MACHINE INPUT INIT              COMPANY, FULLNAME, FLAGS */
-COMP( 1981, k28, 0,     0,     k28,    k28,  driver_device, 0, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND | MACHINE_NOT_WORKING )
+COMP( 1981, k28, 0,     0,     k28,    k28,  driver_device, 0, "Tiger Electronics", "K28: Talking Learning Computer (model 7-230)", MACHINE_SUPPORTS_SAVE | MACHINE_IMPERFECT_SOUND )

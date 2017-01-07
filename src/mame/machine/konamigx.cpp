@@ -468,6 +468,7 @@ if((data1=obj[0])&0x80000000)\
 void konamigx_state::fantjour_dma_install()
 {
 	save_item(NAME(m_fantjour_dma));
+	save_item(NAME(m_prot_data));
 	m_maincpu->space(AS_PROGRAM).install_write_handler(0xdb0000, 0xdb001f, write32_delegate(FUNC(konamigx_state::fantjour_dma_w),this));
 	memset(m_fantjour_dma, 0, sizeof(m_fantjour_dma));
 }
