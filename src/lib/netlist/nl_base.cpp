@@ -550,7 +550,7 @@ void core_device_t::stop_dev()
 	//NOTE: stop_dev is not removed. It remains so it can be reactivated in case
 	//      we run into a situation were RAII and noexcept dtors force us to
 	//      to have a device stop() routine which may throw.
-	//stop();
+	stop();
 }
 
 // ----------------------------------------------------------------------------------------

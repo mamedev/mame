@@ -46,7 +46,7 @@ NETLIB_OBJECT(solver)
 
 	/* iteration parameters */
 	, m_gs_sor(*this, "SOR_FACTOR", 1.059)
-	, m_method(*this, "ITERATIVE", "MAT_CR")
+	, m_method(*this, "METHOD", "MAT_CR")
 	, m_accuracy(*this, "ACCURACY", 1e-7)
 	, m_gs_loops(*this, "GS_LOOPS",9)              // Gauss-Seidel loops
 
