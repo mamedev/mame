@@ -141,7 +141,7 @@ private:
 
 };
 
-static void convert(nlwav_options_t &opts)
+static void convert()
 {
 	plib::postream *fo = (opts.opt_out() == "-" ? &pout_strm : new plib::pofilestream(opts.opt_out()));
 	plib::pistream *fin = (opts.opt_inp() == "-" ? &pin_strm : new plib::pifilestream(opts.opt_inp()));
@@ -227,7 +227,7 @@ static void convert(nlwav_options_t &opts)
 	}
 }
 
-static void usage(plib::pstream_fmt_writer_t &fw, nlwav_options_t &opts)
+static void usage(plib::pstream_fmt_writer_t &fw)
 {
 	fw("{}\n", opts.help("Convert netlist log files into wav files.\n",
 			"nltool [options]").c_str());
@@ -241,13 +241,13 @@ int main(int argc, char *argv[])
 	if ((ret = opts.parse(argc, argv)) != argc)
 	{
 		perr("Error parsing {}\n", argv[ret]);
-		usage(perr, opts);
+		usage(perr);
 		return 1;
 	}
 
 	if (opts.opt_help())
 	{
-		usage(pout, opts);
+		usage(pout);
 		return 0;
 	}
 
@@ -263,7 +263,7 @@ int main(int argc, char *argv[])
 		return 0;
 	}
 
-	convert(opts);
+	convert();
 
 	return 0;
 }

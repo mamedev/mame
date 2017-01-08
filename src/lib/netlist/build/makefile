@@ -115,6 +115,7 @@ NLOBJS := \
 	$(NLOBJ)/devices/nlid_proxy.o \
 	$(NLOBJ)/devices/nld_system.o \
 	$(NLOBJ)/devices/nld_truthtable.o \
+	$(NLOBJ)/macro/nlm_base.o \
 	$(NLOBJ)/macro/nlm_cd4xxx.o \
 	$(NLOBJ)/macro/nlm_opamp.o \
 	$(NLOBJ)/macro/nlm_other.o \

@@ -21,31 +21,7 @@
 #include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
-
-static NETLIST_START(base)
-	TTL_INPUT(ttlhigh, 1)
-	TTL_INPUT(ttllow, 0)
-	NET_REGISTER_DEV(GND, GND)
-	NET_REGISTER_DEV(PARAMETER, NETLIST)
-
-	LOCAL_SOURCE(diode_models)
-	LOCAL_SOURCE(bjt_models)
-	LOCAL_SOURCE(family_models)
-	LOCAL_SOURCE(TTL74XX_lib)
-	LOCAL_SOURCE(CD4XXX_lib)
-	LOCAL_SOURCE(OPAMP_lib)
-	LOCAL_SOURCE(otheric_lib)
-
-	INCLUDE(diode_models);
-	INCLUDE(bjt_models);
-	INCLUDE(family_models);
-	INCLUDE(TTL74XX_lib);
-	INCLUDE(CD4XXX_lib);
-	INCLUDE(OPAMP_lib);
-	INCLUDE(otheric_lib);
-
-NETLIST_END()
-
+#include "macro/nlm_base.h"
 
 // ----------------------------------------------------------------------------------------
 // setup_t

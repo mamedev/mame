@@ -439,7 +439,6 @@ namespace netlist
 		 *
 		 * \param dev  device owning the object.
 		 * \param name string holding the name of the device
-		 * \param type type   of this object.
 		 */
 		device_object_t(core_device_t &dev, const pstring &name);
 		/*! returns reference to owning device.
@@ -452,7 +451,7 @@ namespace netlist
 		 */
 		type_t type() const;
 		/*! Checks if object is of specified type.
-		 * \param type type to check object against.
+		 * \param atype type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
 		bool is_type(const type_t atype) const { return (type() == atype); }
