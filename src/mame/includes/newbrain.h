@@ -45,8 +45,8 @@ public:
 		m_userint(1),
 		m_clkint(1),
 		m_copint(1),
-		m_keylatch(0),
-		m_keydata(0xf)
+		m_405_q(0),
+		m_403_q(0xf)
 	{
 	}
 
@@ -122,9 +122,10 @@ protected:
 	int m_cop_g3;
 	int m_cop_k6;
 
-	int m_keylatch;
-	int m_keydata;
-	uint16_t m_segment_data;
+	int m_405_q;
+	uint8_t m_403_q;
+	uint8_t m_403_d;
+	uint16_t m_402_q;
 
 	int m_rv;
 	int m_fs;

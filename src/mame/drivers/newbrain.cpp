@@ -35,7 +35,6 @@
         - only key 7 is recognized
         - escape key mapping
     - VFD
-    - reset/powerup time constants
     - bitmapped video
     - accurate video timing
     - cassette
@@ -375,7 +374,7 @@ READ8_MEMBER( newbrain_state::cop_in_r )
 	uint8_t data = 0xe;
 
 	// keyboard
-	data |= BIT(m_keydata, 2);
+	data |= BIT(m_403_q, 2);
 
 	if (LOG_COP) logerror("%s %s IN %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
@@ -403,9 +402,9 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 	uint8_t data = 0x1;
 
 	// keyboard
-	data |= BIT(m_keydata, 1) << 1;
-	data |= BIT(m_keydata, 0) << 2;
-	data |= BIT(m_keydata, 3) << 3;
+	data |= BIT(m_403_q, 1) << 1;
+	data |= BIT(m_403_q, 0) << 2;
+	data |= BIT(m_403_q, 3) << 3;
 
 	if (LOG_COP) logerror("%s %s G %01x\n", machine().time().as_string(), machine().describe_context(), data);
 
@@ -476,32 +475,29 @@ WRITE8_MEMBER( newbrain_state::cop_d_w )
 	m_cassette2->output(m_cop_tdo ? -1.0 : +1.0);
 
 	if (k4) {
-		// CD4024 RST
-		m_keylatch = 0;
+		m_405_q = 0;
 
 		if (LOG_COP) logerror("%s %s keylatch reset\n", machine().time().as_string(), machine().describe_context());
 	} else if (m_cop_k6 && !k6) {
-		// CD4024 CLK
-		m_keylatch++;
-		m_keylatch &= 0x0f;
+		m_405_q++;
+		m_405_q &= 0x7f;
 
-		if (LOG_COP) logerror("%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_keylatch);
+		if (LOG_COP) logerror("%s %s keylatch %u\n", machine().time().as_string(), machine().describe_context(), m_405_q);
 	}
 
 	if (!m_cop_k6 && k6) {
-		//CD4076 CLK
-		m_keydata = m_y[m_keylatch]->read();
+		m_403_d = m_y[m_405_q & 0x0f]->read() & 0x0f;
+		
+		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_403_d);
+	}
 
-		if (LOG_COP) logerror("%s %s keydata %01x\n", machine().time().as_string(), machine().describe_context(), m_keydata);
-	} else if (m_cop_k6 && k6) {
-		m_keydata = 0;
-	} else if (!k6) {
-		m_keydata = 0x0f;
-
-		if (LOG_COP) logerror("%s %s keydata disabled\n", machine().time().as_string(), machine().describe_context());
-
-		output().set_digit_value(m_keylatch, m_segment_data);
+	if (k6) {
+		m_403_q = m_403_d;
 	} else {
+		m_403_q = 0xf;
+		output().set_digit_value(m_405_q & 0x0f, m_402_q);
+		
+		if (LOG_COP) logerror("%s %s keydata disabled\n", machine().time().as_string(), machine().describe_context());
 	}
 
 	m_cop_k6 = k6;
@@ -531,10 +527,10 @@ WRITE_LINE_MEMBER( newbrain_state::k2_w )
 
 	if (state)
 	{
-		m_segment_data >>= 1;
-		m_segment_data = (m_cop_so << 15) | (m_segment_data & 0x7fff);
+		m_402_q >>= 1;
+		m_402_q = (m_cop_so << 15) | (m_402_q & 0x7fff);
 
-		if (LOG_VFD) logerror("%s %s SEGMENT %04x\n", machine().time().as_string(), machine().describe_context(), m_segment_data);
+		if (LOG_VFD) logerror("%s %s SEGMENT %04x\n", machine().time().as_string(), machine().describe_context(), m_402_q);
 	}
 }
 
@@ -732,9 +728,9 @@ void newbrain_state::machine_start()
 	save_item(NAME(m_cop_g1));
 	save_item(NAME(m_cop_g3));
 	save_item(NAME(m_cop_k6));
-	save_item(NAME(m_keylatch));
-	save_item(NAME(m_keydata));
-	save_item(NAME(m_segment_data));
+	save_item(NAME(m_405_q));
+	save_item(NAME(m_403_q));
+	save_item(NAME(m_402_q));
 }
 
 
