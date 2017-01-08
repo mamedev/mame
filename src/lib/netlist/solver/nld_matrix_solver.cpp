@@ -425,7 +425,7 @@ void matrix_solver_t::solve_base()
 		{
 			log().warning("NEWTON_LOOPS exceeded on net {1}... reschedule", this->name());
 			m_Q_sync.net().toggle_new_Q();
-			m_Q_sync.net().reschedule_in_queue(m_params.m_nt_sync_delay);
+			m_Q_sync.net().reschedule_in_queue(m_params.m_nr_recalc_delay);
 		}
 	}
 	else

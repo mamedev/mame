@@ -31,7 +31,7 @@ namespace netlist
 		bool m_dynamic;
 		unsigned m_gs_loops;
 		unsigned m_nr_loops;
-		netlist_time m_nt_sync_delay;
+		netlist_time m_nr_recalc_delay;
 		bool m_log_stats;
 	};
 

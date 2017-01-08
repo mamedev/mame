@@ -147,47 +147,47 @@ std::unique_ptr<matrix_solver_t> NETLIB_NAME(solver)::create_solver(unsigned siz
 		return plib::make_unique<matrix_solver_direct2_t>(netlist(), solvername, &m_params);
 	else
 	{
-		if (pstring("SOR_MAT").equals(m_iterative_solver()))
+		if (pstring("SOR_MAT").equals(m_method()))
 		{
 			return create_it<matrix_solver_SOR_mat_t<m_N, storage_N>>(netlist(), solvername, m_params, size);
 			//typedef matrix_solver_SOR_mat_t<m_N,storage_N> solver_sor_mat;
 			//return plib::make_unique<solver_sor_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("MAT_CR").equals(m_iterative_solver()))
+		else if (pstring("MAT_CR").equals(m_method()))
 		{
 			typedef matrix_solver_GCR_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("MAT").equals(m_iterative_solver()))
+		else if (pstring("MAT").equals(m_method()))
 		{
 			typedef matrix_solver_direct_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("SM").equals(m_iterative_solver()))
+		else if (pstring("SM").equals(m_method()))
 		{
 			/* Sherman-Morrison Formula */
 			typedef matrix_solver_sm_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("W").equals(m_iterative_solver()))
+		else if (pstring("W").equals(m_method()))
 		{
 			/* Woodbury Formula */
 			typedef matrix_solver_w_t<m_N,storage_N> solver_mat;
 			return plib::make_unique<solver_mat>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("SOR").equals(m_iterative_solver()))
+		else if (pstring("SOR").equals(m_method()))
 		{
 			typedef matrix_solver_SOR_t<m_N,storage_N> solver_GS;
 			return plib::make_unique<solver_GS>(netlist(), solvername, &m_params, size);
 		}
-		else if (pstring("GMRES").equals(m_iterative_solver()))
+		else if (pstring("GMRES").equals(m_method()))
 		{
 			typedef matrix_solver_GMRES_t<m_N,storage_N> solver_GMRES;
 			return plib::make_unique<solver_GMRES>(netlist(), solvername, &m_params, size);
 		}
 		else
 		{
-			netlist().log().fatal("Unknown solver type: {1}\n", m_iterative_solver());
+			netlist().log().fatal("Unknown solver type: {1}\n", m_method());
 			return nullptr;
 		}
 	}
@@ -255,12 +255,12 @@ void NETLIB_NAME(solver)::post_start()
 	/* FIXME: Throw when negative */
 	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
 	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
-	m_params.m_nt_sync_delay = netlist_time::from_double(m_sync_delay());
-	m_params.m_lte = m_lte();
-	m_params.m_sor = m_sor();
+	m_params.m_nr_recalc_delay = netlist_time::from_double(m_nr_recalc_delay());
+	m_params.m_lte = m_dynamic_lte();
+	m_params.m_sor = m_gs_sor();
 
-	m_params.m_min_timestep = m_min_timestep();
-	m_params.m_dynamic = (m_dynamic() == 1 ? true : false);
+	m_params.m_min_timestep = m_dynamic_min_ts();
+	m_params.m_dynamic = (m_dynamic_ts() == 1 ? true : false);
 	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
 
 	if (m_params.m_dynamic)
