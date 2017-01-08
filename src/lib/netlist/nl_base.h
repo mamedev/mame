@@ -441,7 +441,7 @@ namespace netlist
 		 * \param name string holding the name of the device
 		 * \param type type   of this object.
 		 */
-		device_object_t(core_device_t &dev, const pstring &name, const type_t type);
+		device_object_t(core_device_t &dev, const pstring &name);
 		/*! returns reference to owning device.
 		 * \returns reference to owning device.
 		 */
@@ -450,21 +450,21 @@ namespace netlist
 		/*! The object type.
 		 * \returns type of the object
 		 */
-		type_t type() const { return m_type; }
+		type_t type() const;
 		/*! Checks if object is of specified type.
 		 * \param type type to check object against.
 		 * \returns true if object is of specified type else false.
 		 */
-		bool is_type(const type_t type) const { return (m_type == type); }
+		bool is_type(const type_t atype) const { return (type() == atype); }
 
 		/*! The netlist owning the owner of this object.
 		 * \returns reference to netlist object.
 		 */
 		netlist_t &netlist();
+		const netlist_t &netlist() const;
 
 	private:
 		core_device_t & m_device;
-		const type_t    m_type;
 	};
 
 
@@ -493,8 +493,7 @@ namespace netlist
 			STATE_BIDIR = 256
 		};
 
-		core_terminal_t(core_device_t &dev, const pstring &aname,
-				const type_t type, const state_e state);
+		core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state);
 		virtual ~core_terminal_t();
 
 		void set_net(net_t *anet);
@@ -526,9 +525,8 @@ namespace netlist
 	{
 	public:
 
-		analog_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-		: core_terminal_t(dev, aname, type, state)
+		analog_t(core_device_t &dev, const pstring &aname, const state_e state)
+		: core_terminal_t(dev, aname, state)
 		{
 		}
 		virtual ~analog_t();
@@ -607,9 +605,8 @@ namespace netlist
 	class logic_t : public detail::core_terminal_t, public logic_family_t
 	{
 	public:
-		logic_t(core_device_t &dev, const pstring &aname, const type_t type,
-				const state_e state)
-			: core_terminal_t(dev, aname, type, state)
+		logic_t(core_device_t &dev, const pstring &aname, const state_e state)
+			: core_terminal_t(dev, aname, state)
 			, logic_family_t()
 			, m_proxy(nullptr)
 		{
@@ -1480,6 +1477,11 @@ namespace netlist
 	}
 
 	inline netlist_t &detail::device_object_t::netlist()
+	{
+		return m_device.netlist();
+	}
+
+	inline const netlist_t &detail::device_object_t::netlist() const
 	{
 		return m_device.netlist();
 	}

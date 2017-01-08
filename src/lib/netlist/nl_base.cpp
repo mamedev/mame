@@ -206,13 +206,32 @@ const pstring &detail::object_t::name() const
 // device_object_t
 // ----------------------------------------------------------------------------------------
 
-detail::device_object_t::device_object_t(core_device_t &dev, const pstring &aname, const type_t atype)
+detail::device_object_t::device_object_t(core_device_t &dev, const pstring &aname)
 : object_t(aname)
 , m_device(dev)
-, m_type(atype)
 {
 }
 
+detail::device_object_t::type_t detail::device_object_t::type() const
+{
+	if (dynamic_cast<const terminal_t *>(this) != nullptr)
+		return type_t::TERMINAL;
+	else if (dynamic_cast<const param_t *>(this) != nullptr)
+		return param_t::PARAM;
+	else if (dynamic_cast<const logic_input_t *>(this) != nullptr)
+		return param_t::INPUT;
+	else if (dynamic_cast<const logic_output_t *>(this) != nullptr)
+		return param_t::OUTPUT;
+	else if (dynamic_cast<const analog_input_t *>(this) != nullptr)
+		return param_t::INPUT;
+	else if (dynamic_cast<const analog_output_t *>(this) != nullptr)
+		return param_t::OUTPUT;
+	else
+	{
+		netlist().log().fatal("Unknown type for object {1} ", name());
+		return type_t::TERMINAL; // please compiler
+	}
+}
 
 // ----------------------------------------------------------------------------------------
 // netlist_t
@@ -791,9 +810,8 @@ analog_net_t::~analog_net_t()
 // core_terminal_t
 // ----------------------------------------------------------------------------------------
 
-detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname,
-		const type_t type, const state_e state)
-: device_object_t(dev, dev.name() + "." + aname, type)
+detail::core_terminal_t::core_terminal_t(core_device_t &dev, const pstring &aname, const state_e state)
+: device_object_t(dev, dev.name() + "." + aname)
 , plib::linkedlist_t<core_terminal_t>::element_t()
 , m_net(nullptr)
 , m_state(*this, "m_state", state)
@@ -835,7 +853,7 @@ logic_t::~logic_t()
 // ----------------------------------------------------------------------------------------
 
 terminal_t::terminal_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, TERMINAL, STATE_BIDIR)
+: analog_t(dev, aname, STATE_BIDIR)
 , m_otherterm(nullptr)
 , m_Idr1(*this, "m_Idr1", nullptr)
 , m_go1(*this, "m_go1", nullptr)
@@ -875,7 +893,7 @@ void terminal_t::schedule_after(const netlist_time &after)
 // ----------------------------------------------------------------------------------------
 
 logic_output_t::logic_output_t(core_device_t &dev, const pstring &aname)
-	: logic_t(dev, aname, OUTPUT, STATE_OUT)
+	: logic_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
@@ -897,7 +915,7 @@ void logic_output_t::initial(const netlist_sig_t val)
 // ----------------------------------------------------------------------------------------
 
 analog_input_t::analog_input_t(core_device_t &dev, const pstring &aname)
-: analog_t(dev, aname, INPUT, STATE_INP_ACTIVE)
+: analog_t(dev, aname, STATE_INP_ACTIVE)
 {
 	netlist().setup().register_term(*this);
 }
@@ -911,7 +929,7 @@ analog_input_t::~analog_input_t()
 // ----------------------------------------------------------------------------------------
 
 analog_output_t::analog_output_t(core_device_t &dev, const pstring &aname)
-	: analog_t(dev, aname, OUTPUT, STATE_OUT)
+	: analog_t(dev, aname, STATE_OUT)
 	, m_my_net(dev.netlist(), name() + ".net", this)
 {
 	this->set_net(&m_my_net);
@@ -934,7 +952,7 @@ void analog_output_t::initial(const nl_double val)
 // -----------------------------------------------------------------------------
 
 logic_input_t::logic_input_t(core_device_t &dev, const pstring &aname)
-		: logic_t(dev, aname, INPUT, STATE_INP_ACTIVE)
+		: logic_t(dev, aname, STATE_INP_ACTIVE)
 {
 	set_logic_family(dev.logic_family());
 	netlist().setup().register_term(*this);
@@ -949,7 +967,7 @@ logic_input_t::~logic_input_t()
 // ----------------------------------------------------------------------------------------
 
 param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
-	: device_object_t(device, device.name() + "." + name, PARAM)
+	: device_object_t(device, device.name() + "." + name)
 	, m_param_type(atype)
 {
 	device.setup().register_param(this->name(), *this);
