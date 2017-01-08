@@ -72,7 +72,7 @@ NETLIB_RESET(solver)
 		m_mat_solvers[i]->do_reset();
 }
 
-NETLIB_STOP(solver)
+void NETLIB_NAME(solver)::stop()
 {
 	for (std::size_t i = 0; i < m_mat_solvers.size(); i++)
 		m_mat_solvers[i]->log_stats();

@@ -324,11 +324,8 @@ void netlist_t::start()
 
 void netlist_t::stop()
 {
-	/* find the main clock and solver ... */
-
-	log().debug("Stopping all devices ...\n");
-	for (auto & dev : m_devices)
-		dev->stop_dev();
+	log().debug("Stopping solver device ...\n");
+	m_solver->stop();
 }
 
 detail::net_t *netlist_t::find_net(const pstring &name)
@@ -543,14 +540,6 @@ void core_device_t::set_delegate_pointer()
 #elif (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL)
 	m_static_update = plib::mfp::get_mfp<net_update_delegate>(&core_device_t::update, this);
 #endif
-}
-
-void core_device_t::stop_dev()
-{
-	//NOTE: stop_dev is not removed. It remains so it can be reactivated in case
-	//      we run into a situation were RAII and noexcept dtors force us to
-	//      to have a device stop() routine which may throw.
-	stop();
 }
 
 // ----------------------------------------------------------------------------------------

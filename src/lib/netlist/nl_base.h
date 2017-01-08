@@ -139,8 +139,6 @@ class NETLIB_NAME(name) : public device_t
 
 #define NETLIB_RESET(chip) void NETLIB_NAME(chip) :: reset(void)
 
-#define NETLIB_STOP(chip) void NETLIB_NAME(chip) :: stop(void)
-
 #define NETLIB_UPDATE_PARAM(chip) void NETLIB_NAME(chip) :: update_param(void)
 #define NETLIB_FUNC_VOID(chip, name, params) void NETLIB_NAME(chip) :: name params
 
@@ -1019,7 +1017,6 @@ namespace netlist
 		}
 
 		void set_delegate_pointer();
-		void stop_dev();
 
 		void do_inc_active() NL_NOEXCEPT
 		{
@@ -1048,7 +1045,6 @@ namespace netlist
 		virtual void update() NL_NOEXCEPT { }
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
-		virtual void stop() { }
 		virtual void reset() { }
 
 	public:

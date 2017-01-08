@@ -72,7 +72,7 @@ NETLIB_OBJECT(solver)
 	virtual ~NETLIB_NAME(solver)();
 
 	void post_start();
-	void stop() override;
+	void stop();
 
 	inline nl_double gmin() { return m_gmin(); }
 
