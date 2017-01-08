@@ -422,6 +422,7 @@ ROM_END
 / Space Shuttle (S9) 12/84 (#535)
 /----------------------------------*/
 ROM_START(sshtl_l7)
+	// Spanish licensed version by Stargame is identical to this set
 	ROM_REGION(0x4000, "roms", 0)
 	ROM_LOAD("cpu_u20.128", 0x0000, 0x4000, CRC(848ad54c) SHA1(4e4ce5fb970da37706472f94a27fd912e1ecb1a0))
 
