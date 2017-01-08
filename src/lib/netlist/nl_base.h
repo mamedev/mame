@@ -865,10 +865,10 @@ namespace netlist
 			POINTER // Special-case which is always initialized at MAME startup time
 		};
 
-		param_t(const param_type_t atype, device_t &device, const pstring &name);
+		param_t(device_t &device, const pstring &name);
 		virtual ~param_t();
 
-		param_type_t param_type() const { return m_param_type; }
+		param_type_t param_type() const;
 
 	protected:
 		void update_param();
@@ -883,8 +883,6 @@ namespace netlist
 			}
 		}
 
-	private:
-		const param_type_t m_param_type;
 	};
 
 	class param_ptr_t final: public param_t

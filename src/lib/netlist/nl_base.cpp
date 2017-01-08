@@ -966,9 +966,8 @@ logic_input_t::~logic_input_t()
 // Parameters ...
 // ----------------------------------------------------------------------------------------
 
-param_t::param_t(const param_type_t atype, device_t &device, const pstring &name)
+param_t::param_t(device_t &device, const pstring &name)
 	: device_object_t(device, device.name() + "." + name)
-	, m_param_type(atype)
 {
 	device.setup().register_param(this->name(), *this);
 }
@@ -976,6 +975,26 @@ param_t::param_t(const param_type_t atype, device_t &device, const pstring &name
 param_t::~param_t()
 {
 }
+
+param_t::param_type_t param_t::param_type() const
+{
+	if (dynamic_cast<const param_str_t *>(this) != nullptr)
+		return STRING;
+	else if (dynamic_cast<const param_double_t *>(this) != nullptr)
+		return DOUBLE;
+	else if (dynamic_cast<const param_int_t *>(this) != nullptr)
+		return INTEGER;
+	else if (dynamic_cast<const param_logic_t *>(this) != nullptr)
+		return LOGIC;
+	else if (dynamic_cast<const param_ptr_t *>(this) != nullptr)
+		return POINTER;
+	else
+	{
+		netlist().log().fatal("Can not determine param_type for {1}", name());
+		return POINTER; /* Please compiler */
+	}
+}
+
 
 void param_t::update_param()
 {
@@ -992,7 +1011,7 @@ const pstring param_model_t::model_type()
 }
 
 param_str_t::param_str_t(device_t &device, const pstring name, const pstring val)
-: param_t(param_t::STRING, device, name)
+: param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 }
@@ -1006,7 +1025,7 @@ void param_str_t::changed()
 }
 
 param_double_t::param_double_t(device_t &device, const pstring name, const double val)
-: param_t(param_t::DOUBLE, device, name)
+: param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
@@ -1017,7 +1036,7 @@ param_double_t::~param_double_t()
 }
 
 param_int_t::param_int_t(device_t &device, const pstring name, const int val)
-: param_t(param_t::INTEGER, device, name)
+: param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
@@ -1028,7 +1047,7 @@ param_int_t::~param_int_t()
 }
 
 param_logic_t::param_logic_t(device_t &device, const pstring name, const bool val)
-: param_t(param_t::LOGIC, device, name)
+: param_t(device, name)
 {
 	m_param = device.setup().get_initial_param_val(this->name(),val);
 	netlist().save(*this, m_param, "m_param");
@@ -1039,7 +1058,7 @@ param_logic_t::~param_logic_t()
 }
 
 param_ptr_t::param_ptr_t(device_t &device, const pstring name, uint8_t * val)
-: param_t(param_t::POINTER, device, name)
+: param_t(device, name)
 {
 	m_param = val; //device.setup().get_initial_param_val(this->name(),val);
 	//netlist().save(*this, m_param, "m_param");
