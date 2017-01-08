@@ -395,11 +395,13 @@ MACHINE_CONFIG_END
 / Punky Willy (1986)
 /-------------------------------------------------------------------*/
 ROM_START(punkywil)
+	// Both ROMs are 27128, according to a text file accompanying
+	// the bad dump (which had a 512K overdump of the sound ROM)
 	ROM_REGION(0x4000, "maincpu", 0)
-	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // underdumped 2764, 27128 or 27256
+	ROM_LOAD("PUNKIY C.P.U", 0x0000, 0x1200, BAD_DUMP CRC(c46ba6e7) SHA1(d2dd1139bc1f59937b40662f8563c68c87d8e2af)) // 0c6c (???)
 
 	ROM_REGION(0x4000, "soundcpu", 0)
-	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee))
+	ROM_LOAD("pw_sound.bin", 0x0000, 0x4000, CRC(b2e3a201) SHA1(e3b0a5b22827683382b61c21607201cd470062ee)) // d55c (???)
 ROM_END
 
 
