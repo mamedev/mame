@@ -934,14 +934,6 @@ ROM_START( mwskinsa )
 	DISK_IMAGE( "mwskinsa", 0, SHA1(72497917b31156eb11a46bbcc6f22a254dcec044) )
 ROM_END
 
-ROM_START(mwskinsa_mod)
-	ROM_REGION32_LE(0x80000, PCI_ID_NILE":rom", 0)  /* 512k for R4310 code */
-	ROM_LOAD("skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f))
-
-	DISK_REGION(PCI_ID_IDE":ide:0:hdd:image")
-	DISK_IMAGE( "mwskinsc", 0, SHA1(437bc145b7b852f7b4a1da35cab6569f4c357658) )
-ROM_END
-
 ROM_START( mwskinso )
 	ROM_REGION32_LE( 0x80000, PCI_ID_NILE":rom", 0 )  /* 512k for R4310 code */
 	ROM_LOAD( "skins_game_u4_boot_1.00.u4", 0x000000, 0x080000, CRC(0fe87720) SHA1(4b24abbe662a2d7b61e6a3f079e28b73605ba19f) )
