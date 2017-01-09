@@ -182,8 +182,8 @@ protected:
 			uint32_t t : 1; // trace trap
 			uint32_t cts : 4; // cpu trap status
 			uint32_t mts : 4; // memory trap status
-		} bits;
-		uint32_t d;
+		} fields;
+		uint32_t all;
 	} m_psw;
 	union ssw {
 		struct fields {
@@ -202,8 +202,8 @@ protected:
 			uint32_t k : 1; // protect key
 			uint32_t u : 1; // user mode
 			uint32_t p : 1; // previous mode
-		} bits;
-		uint32_t d;
+		} fields;
+		uint32_t all;
 	} m_ssw;
 	int32_t m_r[2][16];
 	double m_f[16];
