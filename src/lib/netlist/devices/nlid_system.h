@@ -386,7 +386,7 @@ namespace netlist
 	{
 	public:
 		NETLIB_CONSTRUCTOR(res_sw)
-		, m_R(*this, "R")
+		, m_R(*this, "_R")
 		, m_I(*this, "I")
 		, m_RON(*this, "RON", 1.0)
 		, m_ROFF(*this, "ROFF", 1.0E20)
@@ -396,16 +396,12 @@ namespace netlist
 			register_subalias("2", m_R.m_N);
 		}
 
-		NETLIB_SUB(R) m_R;
+		NETLIB_SUB(R_base) m_R;
 		logic_input_t m_I;
 		param_double_t m_RON;
 		param_double_t m_ROFF;
 
-		NETLIB_RESETI()
-		{
-			m_last_state = 0;
-			m_R.set_R(m_ROFF());
-		}
+		NETLIB_RESETI();
 		//NETLIB_UPDATE_PARAMI();
 		NETLIB_UPDATEI();
 

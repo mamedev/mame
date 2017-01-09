@@ -79,6 +79,8 @@ NETLIB_RESET(OPAMP)
 		double RP = 0.5 / 3.1459 / CP / m_model.model_value("FPF");
 		double G = m_model.model_value("UGF") / m_model.model_value("FPF") / RP;
 
+		printf("Min Freq %s: %f\n", name().c_str(), 1.0 / (CP*RP / (G*RP)));
+
 		m_CP->m_C.setTo(CP);
 		m_RP.set_R(RP);
 		m_G1.m_G.setTo(G);

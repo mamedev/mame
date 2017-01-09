@@ -44,10 +44,10 @@ namespace netlist
 		NETLIB_RESETI();
 
 	protected:
-		NETLIB_SUB(R) m_R1;
-		NETLIB_SUB(R) m_R2;
-		NETLIB_SUB(R) m_R3;
-		NETLIB_SUB(R) m_RDIS;
+		NETLIB_SUB(R_base) m_R1;
+		NETLIB_SUB(R_base) m_R2;
+		NETLIB_SUB(R_base) m_R3;
+		NETLIB_SUB(R_base) m_RDIS;
 
 		logic_input_t m_RESET;
 		analog_input_t m_THRES;

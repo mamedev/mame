@@ -243,19 +243,20 @@ netlist_t::netlist_t(const pstring &aname)
 	, m_queue(*this)
 	, m_mainclock(nullptr)
 	, m_solver(nullptr)
-	, m_gnd(nullptr)
 	, m_params(nullptr)
 	, m_name(aname)
-	, m_setup(nullptr)
 	, m_log(this)
 	, m_lib(nullptr)
 {
 	state().save_item(this, static_cast<plib::state_manager_t::callback_t &>(m_queue), "m_queue");
 	state().save_item(this, m_time, "m_time");
+	m_setup = new setup_t(*this);
 }
 
 netlist_t::~netlist_t()
 {
+	if (m_setup != nullptr)
+		delete m_setup;
 	m_nets.clear();
 	m_devices.clear();
 
@@ -278,15 +279,15 @@ void netlist_t::register_dev(plib::owned_ptr<device_t> dev)
 
 void netlist_t::start()
 {
+	setup().start_devices1();
+
 	/* load the library ... */
 
 	/* make sure the solver and parameters are started first! */
 
 	for (auto & e : setup().m_device_factory)
 	{
-		if ( setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				|| setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
+		if ( setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				|| setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
@@ -296,24 +297,23 @@ void netlist_t::start()
 
 	log().debug("Searching for mainclock and solver ...\n");
 
-	m_mainclock = get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
 	m_solver = get_single_device<devices::NETLIB_NAME(solver)>("solver");
-	m_gnd = get_single_device<devices::NETLIB_NAME(gnd)>("gnd");
 	m_params = get_single_device<devices::NETLIB_NAME(netlistparams)>("parameter");
 
 	/* create devices */
 
 	for (auto & e : setup().m_device_factory)
 	{
-		if ( !setup().factory().is_class<devices::NETLIB_NAME(mainclock)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
-				&& !setup().factory().is_class<devices::NETLIB_NAME(gnd)>(e.second)
+		if ( !setup().factory().is_class<devices::NETLIB_NAME(solver)>(e.second)
 				&& !setup().factory().is_class<devices::NETLIB_NAME(netlistparams)>(e.second))
 		{
 			auto dev = plib::owned_ptr<device_t>(e.second->Create(*this, e.first));
 			register_dev(std::move(dev));
 		}
 	}
+
+	log().debug("Searching for mainclock\n");
+	m_mainclock = get_single_device<devices::NETLIB_NAME(mainclock)>("mainclock");
 
 	bool use_deactivate = (m_params->m_use_deactivate() ? true : false);
 
@@ -333,16 +333,35 @@ void netlist_t::start()
 			d->set_hint_deactivate(false);
 	}
 
-
 	pstring libpath = plib::util::environment("NL_BOOSTLIB", plib::util::buildpath({".", "nlboost.so"}));
-
 	m_lib = plib::palloc<plib::dynlib>(libpath);
 
+	/* resolve inputs */
+	setup().resolve_inputs1();
+
+	log().verbose("initialize solver ...\n");
+
+	if (m_solver == nullptr)
+	{
+		for (auto &p : m_nets)
+			if (p->is_analog())
+				log().fatal("No solver found for this net although analog elements are present\n");
+	}
+	else
+		m_solver->post_start();
+
+	/* finally, set the pointers */
+
+	log().debug("Setting delegate pointers ...\n");
+	for (auto &dev : m_devices)
+		dev->set_delegate_pointer();
 
 }
 
 void netlist_t::stop()
 {
+	log().debug("Printing statistics ...\n");
+	print_stats();
 	log().debug("Stopping solver device ...\n");
 	m_solver->stop();
 }

@@ -91,6 +91,11 @@ namespace netlist
 	// nld_res_sw
 	// -----------------------------------------------------------------------------
 
+	NETLIB_RESET(res_sw)
+	{
+		m_last_state = 0;
+		m_R.set_R(m_ROFF());
+	}
 
 	NETLIB_UPDATE(res_sw)
 	{

@@ -58,7 +58,7 @@ NETLIB_OBJECT(VCCS)
 public:
 	NETLIB_CONSTRUCTOR(VCCS)
 	, m_G(*this, "G", 1.0)
-	, m_RI(*this, "RI", NL_FCONST(1.0) / netlist().gmin())
+	, m_RI(*this, "RI", 1e9)
 	, m_OP(*this, "OP")
 	, m_ON(*this, "ON")
 	, m_IP(*this, "IP")

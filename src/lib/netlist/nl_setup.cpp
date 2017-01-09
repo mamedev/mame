@@ -35,7 +35,6 @@ setup_t::setup_t(netlist_t &netlist)
 	, m_proxy_cnt(0)
 	, m_frontier_cnt(0)
 {
-	netlist.set_setup(this);
 	initialize_factory(m_factory);
 	NETLIST_NAME(base)(*this);
 }
@@ -48,7 +47,6 @@ setup_t::~setup_t()
 	m_terminals.clear();
 	m_param_values.clear();
 
-	netlist().set_setup(nullptr);
 	m_sources.clear();
 
 	pstring::resetmem();
@@ -703,10 +701,8 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	return ret;
 }
 
-void setup_t::resolve_inputs()
+void setup_t::resolve_inputs1()
 {
-	bool has_twoterms = false;
-
 	log().verbose("Resolving inputs ...");
 
 	/* Netlist can directly connect input to input.
@@ -776,31 +772,13 @@ void setup_t::resolve_inputs()
 	log().verbose("looking for two terms connected to rail nets ...\n");
 	for (auto & t : netlist().get_device_list<devices::NETLIB_NAME(twoterm)>())
 	{
-		has_twoterms = true;
 		if (t->m_N.net().isRailNet() && t->m_P.net().isRailNet())
 			log().warning("Found device {1} connected only to railterminals {2}/{3}\n",
 				t->name(), t->m_N.net().name(), t->m_P.net().name());
 	}
-
-	log().verbose("initialize solver ...\n");
-
-	if (netlist().solver() == nullptr)
-	{
-		if (has_twoterms)
-			log().fatal("No solver found for this net although analog elements are present\n");
-	}
-	else
-		netlist().solver()->post_start();
-
-	/* finally, set the pointers */
-
-	log().debug("Initializing devices ...\n");
-	for (auto &dev : netlist().m_devices)
-		dev->set_delegate_pointer();
-
 }
 
-void setup_t::start_devices()
+void setup_t::start_devices1()
 {
 	pstring env = plib::util::environment("NL_LOGS");
 
@@ -817,8 +795,6 @@ void setup_t::start_devices()
 			netlist().register_dev(std::move(nc));
 		}
 	}
-
-	netlist().start();
 }
 
 plib::plog_base<NL_DEBUG> &setup_t::log()

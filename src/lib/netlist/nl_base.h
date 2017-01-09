@@ -1166,11 +1166,10 @@ namespace netlist
 		void start();
 		void stop();
 
-		const detail::queue_t &queue() const { return m_queue; }
-		detail::queue_t &queue() { return m_queue; }
 		const netlist_time time() const { return m_time; }
 		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
-		devices::NETLIB_NAME(gnd) *gnd() const { return m_gnd; }
+
+		/* never use this in constructors! */
 		nl_double gmin() const;
 
 		void push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT;
@@ -1181,7 +1180,6 @@ namespace netlist
 
 		void rebuild_lists(); /* must be called after post_load ! */
 
-		void set_setup(setup_t *asetup) { m_setup = asetup;  }
 		setup_t &setup() { return *m_setup; }
 
 		void register_dev(plib::owned_ptr<device_t> dev);
@@ -1237,13 +1235,17 @@ namespace netlist
 
 		plib::dynlib &lib() { return *m_lib; }
 
-		void print_stats() const;
-
 		std::vector<plib::owned_ptr<core_device_t>>                           m_devices;
 		/* sole use is to manage lifetime of net objects */
 		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
 		/* sole use is to manage lifetime of family objects */
 		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
+
+		const detail::queue_t &queue() const { return m_queue; }
+		detail::queue_t &queue() { return m_queue; }
+
+	protected:
+		void print_stats() const;
 
 	private:
 		plib::state_manager_t               m_state;
@@ -1255,7 +1257,6 @@ namespace netlist
 
 		devices::NETLIB_NAME(mainclock) *    m_mainclock;
 		devices::NETLIB_NAME(solver) *       m_solver;
-		devices::NETLIB_NAME(gnd) *          m_gnd;
 		devices::NETLIB_NAME(netlistparams) *m_params;
 
 		pstring                             m_name;

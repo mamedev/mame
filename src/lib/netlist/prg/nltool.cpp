@@ -128,19 +128,16 @@ class netlist_tool_t : public netlist::netlist_t
 public:
 
 	netlist_tool_t(const pstring &aname)
-	: netlist::netlist_t(aname), m_setup(nullptr)
+	: netlist::netlist_t(aname)
 	{
 	}
 
 	~netlist_tool_t()
 	{
-		if (m_setup != nullptr)
-			plib::pfree(m_setup);
 	}
 
 	void init()
 	{
-		m_setup = plib::palloc<netlist::setup_t>(*this);
 	}
 
 	void read_netlist(const pstring &filename, const pstring &name,
@@ -151,19 +148,18 @@ public:
 		// read the netlist ...
 
 		for (auto & d : defines)
-			m_setup->register_define(d);
+			setup().register_define(d);
 
 		for (auto & r : roms)
-			m_setup->register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(*m_setup, r));
+			setup().register_source(plib::make_unique_base<netlist::source_t, netlist_data_folder_t>(setup(), r));
 
-		m_setup->register_source(plib::make_unique_base<netlist::source_t,
-				netlist::source_file_t>(*m_setup, filename));
-		m_setup->include(name);
+		setup().register_source(plib::make_unique_base<netlist::source_t,
+				netlist::source_file_t>(setup(), filename));
+		setup().include(name);
 		log_setup(logs);
 
 		// start devices
-		m_setup->start_devices();
-		m_setup->resolve_inputs();
+		this->start();
 		// reset
 		this->reset();
 	}
@@ -174,19 +170,16 @@ public:
 		for (auto & log : logs)
 		{
 			pstring name = "log_" + log;
-			/*netlist_device_t *nc = */ m_setup->register_dev("LOG", name);
-			m_setup->register_link(name + ".I", log);
+			/*netlist_device_t *nc = */ setup().register_dev("LOG", name);
+			setup().register_link(name + ".I", log);
 		}
 	}
-
-	netlist::setup_t &setup() { return *m_setup; }
 
 protected:
 
 	void vlog(const plib::plog_level &l, const pstring &ls) const override;
 
 private:
-	netlist::setup_t *m_setup;
 };
 
 void netlist_tool_t::vlog(const plib::plog_level &l, const pstring &ls) const
@@ -210,18 +203,12 @@ void usage(tool_options_t &opts)
 
 struct input_t
 {
-#if 0
-	input_t()
-	: m_param(nullptr), m_value(0.0)
-	{
-	}
-#endif
 	input_t(const netlist::setup_t &setup, const pstring &line)
 	{
 		char buf[400];
 		double t;
 		int e = sscanf(line.c_str(), "%lf,%[^,],%lf", &t, buf, &m_value);
-		if ( e!= 3)
+		if (e != 3)
 			throw netlist::nl_exception(plib::pfmt("error {1} scanning line {2}\n")(e)(line));
 		m_time = netlist::netlist_time::from_double(t);
 		m_param = setup.find_param(buf, true);
@@ -249,7 +236,6 @@ struct input_t
 	netlist::netlist_time m_time;
 	netlist::param_t *m_param;
 	double m_value;
-
 };
 
 static std::vector<input_t> read_input(const netlist::setup_t &setup, pstring fname)
@@ -359,8 +345,7 @@ static void listdevices(tool_options_t &opts)
 	nt.setup().include("dummy");
 
 
-	nt.setup().start_devices();
-	nt.setup().resolve_inputs();
+	nt.start();
 
 	std::vector<plib::owned_ptr<netlist::core_device_t>> devs;
 
