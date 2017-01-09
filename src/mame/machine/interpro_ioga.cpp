@@ -8,10 +8,12 @@
 #define LOG_TIMER(...) logerror(__VA_ARGS__)
 #define LOG_INTERRUPT(...) logerror(__VA_ARGS__)
 #define LOG_IOGA(...) logerror(__VA_ARGS__)
+#define LOG_DMA(...) logerror(__VA_ARGS__)
 #else
 #define LOG_TIMER(...)
 #define LOG_INTERRUPT(...)
 #define LOG_IOGA(...)
+#define LOG_DMA(...)
 #endif
 
 DEVICE_ADDRESS_MAP_START(map, 32, interpro_ioga_device)
@@ -70,6 +72,7 @@ void interpro_ioga_device::device_start()
 	// allocate timer for DMA controller
 	m_dma_timer = timer_alloc(IOGA_TIMER_DMA);
 	m_dma_timer->adjust(attotime::never);
+	m_dma_active = false;
 }
 
 void interpro_ioga_device::device_reset()
@@ -103,15 +106,15 @@ void interpro_ioga_device::write_timer(int timer, uint32_t value, device_timer_i
 		break;
 
 	case IOGA_TIMER_3:
-		// write the value without the top two bits to the register
+		// stop the timer so it won't trigger while we're fiddling with it
 		m_timer[timer]->enable(false);
-		m_timer_reg[timer] = value;
+
+		// write the new value to the timer register
+		m_timer3_reg.all = value;
 
 		// start the timer if necessary
-		if (value & IOGA_TIMER3_START)
-		{
+		if (m_timer3_reg.fields.start)
 			m_timer[timer]->adjust(attotime::zero, id, attotime::from_hz(IOGA_TIMER3_CLOCK));
-		}
 		break;
 
 	default:
@@ -154,17 +157,18 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		break;
 
 	case IOGA_TIMER_3:
-		m_timer_reg[3] = m_timer_reg[3] & ~IOGA_TIMER3_VMASK | ((m_timer_reg[3] & IOGA_TIMER3_VMASK) - 1);
-		if ((m_timer_reg[3] & IOGA_TIMER3_VMASK) == 0)
+		// decrement the counter field of the timer
+		m_timer3_reg.fields.count--;
+
+		// check for expiry
+		if (m_timer3_reg.fields.count == 0)
 		{
 			// disable timer
 			timer.enable(false);
 
-			// clear start flag
-			m_timer_reg[3] &= ~IOGA_TIMER3_START;
-
-			// set expired flag
-			m_timer_reg[3] |= IOGA_TIMER3_EXPIRED;
+			// clear start flag and set expired flag
+			m_timer3_reg.fields.start = 0;
+			m_timer3_reg.fields.expired = 1;
 
 			// throw an interrupt
 			set_irq_line(IOGA_TIMER3_IRQ, ASSERT_LINE);
@@ -176,18 +180,17 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 		// TODO: vice-versa
 		// TODO: get the dma transfer address and count
 		// TODO: implement multiple dma channels
-
-		// TODO: must send "terminal count" (TC) signal to FDC to avoid end of cylinder errors :(
 	{
+		if (!m_dma_active)
+		{
+			LOG_DMA("dma transfer started, control 0x%08x, real address 0x%08x count 0x%08x\n", m_fdc_dma[3], m_fdc_dma[0], m_fdc_dma[2]);
+			m_dma_active = true;
+		}
 		address_space &space = m_cpu->space(AS_PROGRAM);
 
 		// while the device has data and the DMA count is not empty
 		while (m_state_drq && m_fdc_dma[2])
 		{
-			// if this is the last byte, terminate the transfer
-			if (m_fdc_dma[2] == 1)
-				m_fdc_tc_func(ASSERT_LINE);
-
 			// read a byte from the device
 			uint8_t byte = m_dma_r_func[IOGA_DMA_CHANNEL_FLOPPY]();
 
@@ -199,6 +202,17 @@ void interpro_ioga_device::device_timer(emu_timer &timer, device_timer_id id, in
 			m_fdc_dma[2]--;
 		}
 
+		// if there are no more bytes remaining, terminate the transfer
+		if (m_fdc_dma[2] == 0)
+		{
+			LOG_DMA("dma transfer stopped, control 0x%08x, real address 0x%08x count 0x%08x\n", m_fdc_dma[3], m_fdc_dma[0], m_fdc_dma[2]);
+			LOG_DMA("dma controller asserting fdc terminal count line\n");
+
+			m_fdc_tc_func(ASSERT_LINE);
+			m_fdc_tc_func(CLEAR_LINE);
+
+			m_dma_active = false;
+		}
 	}
 	break;
 	}
@@ -483,7 +497,6 @@ WRITE_LINE_MEMBER(interpro_ioga_device::drq)
 	if (state)
 	{
 		// TODO: check if dma is enabled
-		m_fdc_tc_func(CLEAR_LINE);
 		m_dma_timer->adjust(attotime::zero);
 	}
 }

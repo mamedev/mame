@@ -94,7 +94,7 @@ public:
 	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; }
 	DECLARE_READ32_MEMBER(timer1_r) { return m_timer_reg[1]; }
 	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
-	DECLARE_READ32_MEMBER(timer3_r) { return m_timer_reg[3]; }
+	DECLARE_READ32_MEMBER(timer3_r) { return m_timer3_reg.all; }
 
 	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { m_prescaler = data; }
 	DECLARE_WRITE32_MEMBER(timer0_w) { write_timer(0, data, IOGA_TIMER_0); }
@@ -152,12 +152,23 @@ private:
 	uint8_t m_nmictrl;
 
 	uint32_t m_prescaler;
-	uint32_t m_timer_reg[4];
+	uint32_t m_timer_reg[3];
+	union timer3
+	{
+		struct fields
+		{
+			uint32_t count : 30;
+			uint32_t start : 1;
+			uint32_t expired : 1;
+		} fields;
+		uint32_t all;
+	} m_timer3_reg;
 	emu_timer *m_timer[4];
 
 	emu_timer *m_dma_timer;
 	uint32_t m_state_drq;
 	uint32_t m_fdc_dma[4];
+	bool m_dma_active;
 };
 
 // device type definition
