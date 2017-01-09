@@ -52,7 +52,6 @@ public:
 	/* misc */
 	uint8_t          m_ddragon_sub_port;
 	uint8_t          m_sprite_irq;
-	uint8_t          m_sound_irq;
 	uint8_t          m_ym_irq;
 	uint8_t          m_adpcm_sound_irq;
 	uint32_t         m_adpcm_pos[2];
@@ -108,7 +107,6 @@ public:
 	DECLARE_WRITE8_MEMBER(ddragon_bankswitch_w);
 	DECLARE_WRITE8_MEMBER(toffy_bankswitch_w);
 	DECLARE_READ8_MEMBER(darktowr_mcu_bank_r);
-	DECLARE_READ8_MEMBER(soundlatch_ack_r);
 	DECLARE_WRITE8_MEMBER(darktowr_mcu_bank_w);
 	DECLARE_WRITE8_MEMBER(darktowr_bankswitch_w);
 	DECLARE_READ8_MEMBER(ddragon_interrupt_r);
