@@ -20497,8 +20497,6 @@ megaiv                          // 1989 Mephisto Mega IV Schachcomputer
 milano                          // 1989 Mephisto Milano Schachcomputer
 monteciv                        // 1990 Mephisto Monte Carlo IV LE Schachcomputer
 polgar                          // 1986 Mephisto Polgar Schachcomputer
-sexpertb                        // 1988 Novag Expert B Chess Computer
-sexpertc                        // 1989 Novag Super Expert C Chess Computer
 sfortea                         // 1987 Novag Super Forte A Chess Computer
 sforteb                         // 1988 Novag Super Forte B Chess Computer
 sforteba                        // 1988 Novag Super Forte B Chess Computer (ALT)
@@ -29204,6 +29202,8 @@ raiders5                        // UPL-85004 (c) 1985
 raiders5t                       // UPL-85004 (c) 1985 Taito license
 
 @source:novag6502.cpp
+sexpertb                        //
+sexpertc                        //
 supercon                        //
 
 @source:nsm.cpp

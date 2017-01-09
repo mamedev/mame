@@ -1681,13 +1681,6 @@ ROM_START(sforteba)
 	ROM_LOAD("forte_b.hi0", 0x10000, 0x8000, BAD_DUMP CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6))
 ROM_END
 
-ROM_START(sexpertb)
-	ROM_REGION(0x18000,"maincpu",0)
-	ROM_LOAD("seb69u3.bin", 0x0000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02))
-	ROM_LOAD("seb69u1.bin", 0x8000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356))
-	ROM_LOAD("seb605u2.bin", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6))
-ROM_END
-
 ROM_START(academy)
 	ROM_REGION(0x10000,"maincpu",0)
 	ROM_LOAD("acad8000.bin", 0x8000, 0x8000, CRC(a967922b) SHA1(1327903ff89bf96d72c930c400f367ae19e3ec68))
@@ -1713,13 +1706,6 @@ ROM_START(sfortec)
 	ROM_LOAD("sfcbook.bin", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8))
 ROM_END
 
-
-ROM_START(sexpertc)
-	ROM_REGION(0x18000,"maincpu",0) // Version 3.6 of firmware
-	ROM_LOAD("seclow.bin", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7))
-	ROM_LOAD("sechi.bin", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa))
-	ROM_LOAD("secbook.bin", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af))
-ROM_END
 
 ROM_START( lyon16 )
 	ROM_REGION16_BE( 0x20000, "maincpu", 0 )
@@ -1801,13 +1787,11 @@ DRIVER_INIT_MEMBER(polgar_state,polgar)
 	CONS(  1988, alm32,    van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Alimera 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1988, sforteb,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1988, sforteba, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1988, sexpertb, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, academy,  0,       0,      academy,   academy, driver_device,  0,       "Hegener & Glaser",          "Mephisto Academy Schachcomputer", MACHINE_REQUIRES_ARTWORK|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, megaiv,   0,       0,      megaiv,    megaiv, driver_device,   0,       "Hegener & Glaser",          "Mephisto Mega IV Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, milano,   polgar,  0,      milano,    polgar, polgar_state,   polgar,  "Hegener & Glaser",          "Mephisto Milano Schachcomputer", MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 //CONS(  1989, montec4,  0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1989, sfortec,  sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
-	CONS(  1989, sexpertc, sfortea, 0,      sfortea,   sfortea, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon16,   van16,   0,      alm16,     van16, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68000", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, lyon32,   van16,   0,      alm32,     van32, driver_device,    0,       "Hegener & Glaser Muenchen", "Mephisto Lyon 68020", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )
 	CONS(  1990, monteciv, 0,       0,      monteciv,  monteciv, driver_device, 0,       "Hegener & Glaser",          "Mephisto Monte Carlo IV LE Schachcomputer", MACHINE_NOT_WORKING|MACHINE_REQUIRES_ARTWORK | MACHINE_CLICKABLE_ARTWORK )

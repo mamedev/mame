@@ -453,6 +453,21 @@ ROM_START( supercon )
 ROM_END
 
 
+ROM_START( sexpertc )
+	ROM_REGION( 0x18000, "maincpu", 0 ) // Version 3.6 of firmware
+	ROM_LOAD("seclow.bin", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7) )
+	ROM_LOAD("sechi.bin", 0x8000, 0x8000, CRC(0085c2c4) SHA1(d84bf4afb022575db09dd9dc12e9b330acce35fa) )
+	ROM_LOAD("secbook.bin", 0x10000, 0x8000, CRC(2d085064) SHA1(76162322aa7d23a5c07e8356d0bbbb33816419af) )
+ROM_END
+
+ROM_START( sexpertb )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("seb69u3.bin", 0x0000, 0x8000, CRC(92002eb6) SHA1(ed8ca16701e00b48fa55c856fa4a8c6613079c02) )
+	ROM_LOAD("seb69u1.bin", 0x8000, 0x8000, CRC(814b4420) SHA1(c553e6a8c048dcc1cf48d410111a86e06b99d356) )
+	ROM_LOAD("seb605u2.bin", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
+ROM_END
+
+
 
 /******************************************************************************
     Drivers
@@ -460,3 +475,6 @@ ROM_END
 
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1984, supercon, 0,      0,      supercon, supercon, driver_device, 0, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
+
+CONS( 1989, sexpertc, 0, 0,      supercon,   supercon, driver_device,  0,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
+CONS( 1988, sexpertb, sexpertc, 0,      supercon,   supercon, driver_device,  0,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_NO_SOUND|MACHINE_NOT_WORKING | MACHINE_CLICKABLE_ARTWORK )
