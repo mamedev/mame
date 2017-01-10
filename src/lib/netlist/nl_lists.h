@@ -47,7 +47,7 @@ namespace netlist
 			std::size_t capacity() const { return m_list.size(); }
 			bool empty() const { return (m_end == &m_list[1]); }
 
-		void push(const Time t, Element o) noexcept
+		void push(Element o, const Time t) noexcept
 		{
 	#if HAS_OPENMP && USE_OPENMP
 			/* Lock */
@@ -97,10 +97,10 @@ namespace netlist
 	#endif
 		}
 
-		void retime(const Time t, const Element &elem) noexcept
+		void retime(const Element &elem, const Time t) noexcept
 		{
 			remove(elem);
-			push(t, elem);
+			push(elem, t);
 		}
 
 		void clear()

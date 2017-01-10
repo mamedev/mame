@@ -84,7 +84,7 @@ NETLIB_NAME(solver)::~NETLIB_NAME(solver)()
 
 NETLIB_UPDATE(solver)
 {
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 		return;
 
 	/* force solving during start up if there are no time-step devices */
@@ -256,14 +256,14 @@ void NETLIB_NAME(solver)::post_start()
 	m_params.m_gs_loops = static_cast<unsigned>(m_gs_loops());
 	m_params.m_nr_loops = static_cast<unsigned>(m_nr_loops());
 	m_params.m_nr_recalc_delay = netlist_time::from_double(m_nr_recalc_delay());
-	m_params.m_lte = m_dynamic_lte();
-	m_params.m_sor = m_gs_sor();
+	m_params.m_dynamic_lte = m_dynamic_lte();
+	m_params.m_gs_sor = m_gs_sor();
 
 	m_params.m_min_timestep = m_dynamic_min_ts();
-	m_params.m_dynamic = (m_dynamic_ts() == 1 ? true : false);
+	m_params.m_dynamic_ts = (m_dynamic_ts() == 1 ? true : false);
 	m_params.m_max_timestep = netlist_time::from_double(1.0 / m_freq()).as_double();
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
 		m_params.m_max_timestep *= 1;//NL_FCONST(1000.0);
 	}

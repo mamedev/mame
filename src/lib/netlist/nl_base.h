@@ -999,17 +999,6 @@ namespace netlist
 			m_stat_total_time.stop();
 		}
 
-		void do_update() NL_NOEXCEPT
-		{
-			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
-				(this->*m_static_update)();
-			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
-				m_static_update(this);
-			#else
-				update();
-			#endif
-		}
-
 		void set_delegate_pointer();
 
 		void do_inc_active() NL_NOEXCEPT
@@ -1026,6 +1015,7 @@ namespace netlist
 			if (m_hint_deactivate)
 				dec_active();
 		}
+
 		void do_reset() { reset(); }
 		void set_hint_deactivate(bool v) { m_hint_deactivate = v; }
 
@@ -1040,6 +1030,17 @@ namespace netlist
 		virtual void inc_active() NL_NOEXCEPT {  }
 		virtual void dec_active() NL_NOEXCEPT {  }
 		virtual void reset() { }
+
+		void do_update() NL_NOEXCEPT
+		{
+			#if (NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF)
+				(this->*m_static_update)();
+			#elif ((NL_PMF_TYPE == NL_PMF_TYPE_GNUC_PMF_CONV) || (NL_PMF_TYPE == NL_PMF_TYPE_INTERNAL))
+				m_static_update(this);
+			#else
+				update();
+			#endif
+		}
 
 	public:
 		virtual void timestep(ATTR_UNUSED const nl_double st) { }
@@ -1161,10 +1162,7 @@ namespace netlist
 		explicit netlist_t(const pstring &aname);
 		virtual ~netlist_t();
 
-		pstring name() const { return m_name; }
-
-		void start();
-		void stop();
+		/* run functions */
 
 		const netlist_time time() const { return m_time; }
 		devices::NETLIB_NAME(solver) *solver() const { return m_solver; }
@@ -1172,19 +1170,26 @@ namespace netlist
 		/* never use this in constructors! */
 		nl_double gmin() const;
 
-		void push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT;
-		void remove_from_queue(detail::net_t &out) NL_NOEXCEPT;
-
 		void process_queue(const netlist_time &delta);
-		void abort_current_queue_slice() { m_queue.retime(m_time, nullptr); }
+		void abort_current_queue_slice() { m_queue.retime(nullptr, m_time); }
 
-		void rebuild_lists(); /* must be called after post_load ! */
+		/* Control functions */
+
+		void start();
+		void stop();
+		void reset();
+
+		const detail::queue_t &queue() const { return m_queue; }
+		detail::queue_t &queue() { return m_queue; }
+
+		/* netlist build functions */
 
 		setup_t &setup() { return *m_setup; }
 
-		void register_dev(plib::owned_ptr<device_t> dev);
+		void register_dev(plib::owned_ptr<core_device_t> dev);
 
 		detail::net_t *find_net(const pstring &name);
+		const logic_family_desc_t *family_from_model(const pstring &model);
 
 		template<class device_class>
 		std::vector<device_class *> get_device_list()
@@ -1217,38 +1222,36 @@ namespace netlist
 			return ret;
 		}
 
+		/* logging and name */
+
+		pstring name() const { return m_name; }
 		plib::plog_base<NL_DEBUG> &log() { return m_log; }
 		const plib::plog_base<NL_DEBUG> &log() const { return m_log; }
+
+		/* state related */
 
 		plib::state_manager_t &state() { return m_state; }
 
 		template<typename O, typename C> void save(O &owner, C &state, const pstring &stname)
 		{
-			this->state().save_item(static_cast<void *>(&owner), state, pstring(owner.name()) + "." + stname);
+			this->state().save_item(static_cast<void *>(&owner), state, owner.name() + pstring(".") + stname);
 		}
 		template<typename O, typename C> void save(O &owner, C *state, const pstring &stname, const std::size_t count)
 		{
-			this->state().save_state_ptr(static_cast<void *>(&owner), pstring(owner.name()) + "." + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
+			this->state().save_state_ptr(static_cast<void *>(&owner), owner.name() + pstring(".") + stname, plib::state_manager_t::datatype_f<C>::f(), count, state);
 		}
 
-		virtual void reset();
+		void rebuild_lists(); /* must be called after post_load ! */
 
 		plib::dynlib &lib() { return *m_lib; }
 
-		std::vector<plib::owned_ptr<core_device_t>>                           m_devices;
 		/* sole use is to manage lifetime of net objects */
 		std::vector<plib::owned_ptr<detail::net_t>>                           m_nets;
-		/* sole use is to manage lifetime of family objects */
-		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
-
-		const detail::queue_t &queue() const { return m_queue; }
-		detail::queue_t &queue() { return m_queue; }
 
 	protected:
 		void print_stats() const;
 
 	private:
-		plib::state_manager_t               m_state;
 		/* mostly rw */
 		netlist_time                        m_time;
 		detail::queue_t                     m_queue;
@@ -1264,11 +1267,17 @@ namespace netlist
 		plib::plog_base<NL_DEBUG>           m_log;
 		plib::dynlib *                      m_lib; // external lib needs to be loaded as long as netlist exists
 
+		plib::state_manager_t               m_state;
+
 		// performance
 		nperftime_t     m_stat_mainloop;
 		nperfcount_t    m_perf_out_processed;
 		nperfcount_t    m_perf_inp_processed;
 		nperfcount_t    m_perf_inp_active;
+
+		std::vector<plib::owned_ptr<core_device_t>> m_devices;
+		/* sole use is to manage lifetime of family objects */
+		std::vector<std::pair<pstring, std::unique_ptr<logic_family_desc_t>>> m_family_cache;
 	};
 
 	// -----------------------------------------------------------------------------
@@ -1387,23 +1396,19 @@ namespace netlist
 			m_time = netlist().time() + delay;
 			m_in_queue = (m_active > 0);     /* queued ? */
 			if (m_in_queue)
-			{
-				netlist().push_to_queue(*this, m_time);
-			}
+				netlist().queue().push(this, m_time);
 		}
 	}
 
 	inline void detail::net_t::reschedule_in_queue(const netlist_time delay) NL_NOEXCEPT
 	{
 		if (is_queued())
-			netlist().remove_from_queue(*this);
+			netlist().queue().remove(this);
 
 		m_time = netlist().time() + delay;
 		m_in_queue = (m_active > 0);     /* queued ? */
 		if (m_in_queue)
-		{
-			netlist().push_to_queue(*this, m_time);
-		}
+			netlist().queue().push(this, m_time);
 	}
 
 	inline const analog_net_t & analog_t::net() const NL_NOEXCEPT
@@ -1446,16 +1451,6 @@ namespace netlist
 			net().toggle_new_Q();
 			net().push_to_queue(NLTIME_FROM_NS(1));
 		}
-	}
-
-	inline void netlist_t::push_to_queue(detail::net_t &out, const netlist_time attime) NL_NOEXCEPT
-	{
-		m_queue.push(attime, &out);
-	}
-
-	inline void netlist_t::remove_from_queue(detail::net_t &out) NL_NOEXCEPT
-	{
-		m_queue.remove(&out);
 	}
 
 	template <typename T>

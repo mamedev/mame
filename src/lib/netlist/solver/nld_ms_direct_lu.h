@@ -170,7 +170,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 {
 	nl_double new_solver_timestep = m_params.m_max_timestep;
 
-	if (m_params.m_dynamic)
+	if (m_params.m_dynamic_ts)
 	{
 		/*
 		 * FIXME: We should extend the logic to use either all nets or
@@ -189,7 +189,7 @@ nl_double matrix_solver_direct_t<m_N, storage_N>::compute_next_timestep()
 			n->m_h_n_m_1 = hn;
 			n->m_DD_n_m_1 = DD_n;
 			if (std::abs(DD2) > NL_FCONST(1e-30)) // avoid div-by-zero
-				new_net_timestep = std::sqrt(m_params.m_lte / std::abs(NL_FCONST(0.5)*DD2));
+				new_net_timestep = std::sqrt(m_params.m_dynamic_lte / std::abs(NL_FCONST(0.5)*DD2));
 			else
 				new_net_timestep = m_params.m_max_timestep;
 

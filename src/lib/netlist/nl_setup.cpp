@@ -21,7 +21,6 @@
 #include "devices/nlid_proxy.h"
 #include "analog/nld_twoterm.h"
 #include "solver/nld_solver.h"
-#include "macro/nlm_base.h"
 
 // ----------------------------------------------------------------------------------------
 // setup_t
@@ -36,7 +35,6 @@ setup_t::setup_t(netlist_t &netlist)
 	, m_frontier_cnt(0)
 {
 	initialize_factory(m_factory);
-	NETLIST_NAME(base)(*this);
 }
 
 setup_t::~setup_t()
@@ -494,13 +492,6 @@ void setup_t::connect_input_output(detail::core_terminal_t &in, detail::core_ter
 {
 	if (out.is_analog() && in.is_logic())
 	{
-#if 0
-		logic_input_t &incast = dynamic_cast<logic_input_t &>(in);
-		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(in.name())( m_proxy_cnt);
-		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
-		incast.set_proxy(proxy.get());
-		m_proxy_cnt++;
-#endif
 		auto proxy = get_a_d_proxy(in);
 
 		out.net().add_terminal(proxy->proxy_term());
@@ -531,14 +522,6 @@ void setup_t::connect_terminal_input(terminal_t &term, detail::core_terminal_t &
 	else if (inp.is_logic())
 	{
 		netlist().log().verbose("connect terminal {1} (in, {2}) to {3}\n", inp.name(), pstring(inp.is_analog() ? "analog" : inp.is_logic() ? "logic" : "?"), term.name());
-#if 0
-		logic_input_t &incast = dynamic_cast<logic_input_t &>(inp);
-		log().debug("connect_terminal_input: connecting proxy\n");
-		pstring x = plib::pfmt("proxy_ad_{1}_{2}")(inp.name())(m_proxy_cnt);
-		auto proxy = plib::owned_ptr<devices::nld_a_to_d_proxy>::Create(netlist(), x, &incast);
-		incast.set_proxy(proxy.get());
-		m_proxy_cnt++;
-#endif
 		auto proxy = get_a_d_proxy(inp);
 
 		//out.net().register_con(proxy->proxy_term());
@@ -701,7 +684,7 @@ bool setup_t::connect(detail::core_terminal_t &t1_in, detail::core_terminal_t &t
 	return ret;
 }
 
-void setup_t::resolve_inputs1()
+void setup_t::resolve_inputs()
 {
 	log().verbose("Resolving inputs ...");
 
@@ -778,7 +761,7 @@ void setup_t::resolve_inputs1()
 	}
 }
 
-void setup_t::start_devices1()
+void setup_t::start_devices()
 {
 	pstring env = plib::util::environment("NL_LOGS");
 
@@ -808,58 +791,8 @@ const plib::plog_base<NL_DEBUG> &setup_t::log() const
 
 
 // ----------------------------------------------------------------------------------------
-// Model / family
+// Model
 // ----------------------------------------------------------------------------------------
-
-class logic_family_std_proxy_t : public logic_family_desc_t
-{
-public:
-	logic_family_std_proxy_t() { }
-	virtual plib::owned_ptr<devices::nld_base_d_to_a_proxy> create_d_a_proxy(netlist_t &anetlist,
-			const pstring &name, logic_output_t *proxied) const override;
-	virtual plib::owned_ptr<devices::nld_base_a_to_d_proxy> create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const override;
-};
-
-plib::owned_ptr<devices::nld_base_d_to_a_proxy> logic_family_std_proxy_t::create_d_a_proxy(netlist_t &anetlist,
-		const pstring &name, logic_output_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_d_to_a_proxy>::Create<devices::nld_d_to_a_proxy>(anetlist, name, proxied);
-}
-plib::owned_ptr<devices::nld_base_a_to_d_proxy> logic_family_std_proxy_t::create_a_d_proxy(netlist_t &anetlist, const pstring &name, logic_input_t *proxied) const
-{
-	return plib::owned_ptr<devices::nld_base_a_to_d_proxy>::Create<devices::nld_a_to_d_proxy>(anetlist, name, proxied);
-}
-
-const logic_family_desc_t *setup_t::family_from_model(const pstring &model)
-{
-	model_map_t map;
-	model_parse(model, map);
-
-	if (setup_t::model_value_str(map, "TYPE") == "TTL")
-		return family_TTL();
-	if (setup_t::model_value_str(map, "TYPE") == "CD4XXX")
-		return family_CD4XXX();
-
-	for (auto & e : netlist().m_family_cache)
-		if (e.first == model)
-			return e.second.get();
-
-	auto ret = plib::make_unique_base<logic_family_desc_t, logic_family_std_proxy_t>();
-
-	ret->m_fixed_V = setup_t::model_value(map, "FV");
-	ret->m_low_thresh_PCNT = setup_t::model_value(map, "IVL");
-	ret->m_high_thresh_PCNT = setup_t::model_value(map, "IVH");
-	ret->m_low_VO = setup_t::model_value(map, "OVL");
-	ret->m_high_VO = setup_t::model_value(map, "OVH");
-	ret->m_R_low = setup_t::model_value(map, "ORL");
-	ret->m_R_high = setup_t::model_value(map, "ORH");
-
-	auto retp = ret.get();
-
-	netlist().m_family_cache.emplace_back(model, std::move(ret));
-
-	return retp;
-}
 
 static pstring model_string(model_map_t &map)
 {
