@@ -181,6 +181,7 @@ floppy_image_device::floppy_image_device(const machine_config &mconfig, device_t
 		form_factor(0),
 		motor_always_on(false),
 		dskchg_writable(false),
+		has_trk00_sensor(true),
 		dir(0), stp(0), wtg(0), mon(0), ss(0), idx(0), wpt(0), rdy(0), dskchg(0),
 		ready(false),
 		rpm(0),
@@ -316,6 +317,7 @@ void floppy_image_device::device_start()
 	rpm = 0;
 	motor_always_on = false;
 	dskchg_writable = false;
+	has_trk00_sensor = true;
 
 	idx = 0;
 
@@ -2283,14 +2285,13 @@ ibm_6360::~ibm_6360()
 {
 }
 
-//ol ibm_6360::trk00_r() { return true; }
-
 void ibm_6360::setup_characteristics()
 {
 	form_factor = floppy_image::FF_8;
 	tracks = 77;
 	sides = 1;
 	motor_always_on = true;
+	has_trk00_sensor = false;
 	set_rpm(360);
 }
 
