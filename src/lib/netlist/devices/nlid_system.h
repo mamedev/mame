@@ -327,6 +327,8 @@ namespace netlist
 					rc.m_cmd = MULT;
 				else if (cmd == "/")
 					rc.m_cmd = DIV;
+				else if (cmd == "pow")
+					rc.m_cmd = POW;
 				else if (cmd.startsWith("A"))
 				{
 					rc.m_cmd = PUSH_INPUT;
@@ -359,6 +361,7 @@ namespace netlist
 			MULT,
 			SUB,
 			DIV,
+			POW,
 			PUSH_CONST,
 			PUSH_INPUT
 		};

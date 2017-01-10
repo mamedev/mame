@@ -158,6 +158,10 @@ namespace netlist
 					ptr--;
 					stack[ptr-1] = stack[ptr-1] / stack[ptr];
 					break;
+				case POW:
+					ptr--;
+					stack[ptr-1] = std::pow(stack[ptr-1], stack[ptr]);
+					break;
 				case PUSH_INPUT:
 					stack[ptr++] = (*m_I[static_cast<unsigned>(rc.m_param)])();
 					break;
