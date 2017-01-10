@@ -31,9 +31,6 @@
 
     TODO:
 
-    - keyboard
-        - only key 7 is recognized
-        - escape key mapping
     - VFD
     - bitmapped video
     - accurate video timing
@@ -392,14 +389,14 @@ READ8_MEMBER( newbrain_state::cop_g_r )
 
 	    bit     description
 
-	    G0      +5V
+	    G0
 	    G1      K9 (CD4076 Q1)
 	    G2      K7 (CD4076 Q0)
 	    G3      K3 (CD4076 Q3)
 
 	*/
 
-	uint8_t data = 0x1;
+	uint8_t data = 0;
 
 	// keyboard
 	data |= BIT(m_403_q, 1) << 1;
@@ -587,7 +584,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( newbrain )
 	PORT_START("Y0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_END) PORT_CHAR(UCHAR_MAMEKEY(END))
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_KEYBOARD ) PORT_NAME("STOP") PORT_CODE(KEYCODE_ESC) PORT_CHAR(UCHAR_MAMEKEY(ESC))
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
