@@ -46,7 +46,7 @@ public:
 	DECLARE_WRITE_LINE_MEMBER(ack_w);
 
 private:
-	uint8_t m_dip, m_bus, m_t0, m_t1, m_p1, m_p2;
+	uint8_t m_bus, m_t0, m_t1, m_p1, m_p2;
 	emu_timer *m_reset_timer;
 
 	devcb_write_line m_out_data;
