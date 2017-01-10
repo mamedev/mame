@@ -22,7 +22,7 @@ CPU_DISASSEMBLE(cop420)
 	{
 		int page = pc >> 6;
 
-		if (page == 2 | page == 3) //JP pages 2,3
+		if (page == 2 || page == 3) //JP pages 2,3
 		{
 			address = (uint16_t)((pc & 0x380) | (opcode & 0x7F));
 			util::stream_format(stream, "JP %03x", address);
