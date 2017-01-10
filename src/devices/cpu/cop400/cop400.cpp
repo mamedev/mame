@@ -49,10 +49,6 @@
     TODO:
 
     - remove InstLen
-    - run interrupt test suite
-    - run production test suite
-    - run microbus test suite
-    - when is the microbus int cleared?
     - opcode support for 2048x8 and 128x4/160x4 memory sizes
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
