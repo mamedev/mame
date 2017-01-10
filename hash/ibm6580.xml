@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <!DOCTYPE softwarelist SYSTEM "softwarelist.dtd">
-<softwarelist name="ibm5170" description="IBM Displaywriter disk images">
+<softwarelist name="ibm6580" description="IBM Displaywriter disk images">
 
 	<software name="abc0051">
 		<description>Displaywriter System Communications Diagnostics (ABC005-1, P/N 4466806)</description>
@@ -15,7 +15,7 @@
 	</software>
 
 	<software name="abc0051d">
-		<description>Displaywriter System Communications Diagnostics (ABC005-1, P/N 4466806)</description>
+		<description>Displaywriter System Communications Diagnostics (ABC005-1D, P/N 4466806)</description>
 		<year>1983</year>
 		<publisher>IBM</publisher>
 
@@ -40,7 +40,7 @@
 
 	<software name="ced112d">
 		<description>Displaywriter System Diagnostics (CED011-2D)</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>IBM</publisher>
 
 		<part name="flop1" interface="floppy_8">
@@ -136,7 +136,7 @@
 
 	<software name="1aanfa">
 		<description>Displaywriter Textpack 1 (1AANFA)</description>
-		<year>198x</year>
+		<year>198?</year>
 		<publisher>IBM</publisher>
 
 		<part name="flop1" interface="floppy_8">
