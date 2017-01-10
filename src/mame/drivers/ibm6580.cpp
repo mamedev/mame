@@ -612,7 +612,7 @@ WRITE8_MEMBER(ibm6580_state::floppy_w)
 
 	case 5:	// 815A
 		m_fdc->fifo_w(space, offset, data);
-		if (m_floppy_idle);
+		if (m_floppy_idle)
 			m_floppy_idle = false;
 		break;
 
