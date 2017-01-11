@@ -236,6 +236,18 @@ end
 
 ---------------------------------------------------
 --
+--@src/devices/machine/68153bim.h,MACHINES["BIM68153"] = true
+---------------------------------------------------
+
+if (MACHINES["BIM68153"]~=null) then
+	files {
+		MAME_DIR .. "src/devices/machine/68153bim.cpp",
+		MAME_DIR .. "src/devices/machine/68153bim.h",
+	}
+end
+
+---------------------------------------------------
+--
 --@src/devices/machine/68230pit.h,MACHINES["PIT68230"] = true
 ---------------------------------------------------
 
