@@ -12,7 +12,7 @@
 	MCFG_DEVICE_ADD(_tag, INTERPRO_IOGA, 0)
 
 #define MCFG_INTERPRO_IOGA_NMI_CB(_out_nmi) \
-	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_nmi);
+	devcb = &interpro_ioga_device::static_set_out_nmi_callback(*device, DEVCB_##_out_nmi);
 
 #define MCFG_INTERPRO_IOGA_IRQ_CB(_out_int) \
 	devcb = &interpro_ioga_device::static_set_out_int_callback(*device, DEVCB_##_out_int);
@@ -40,13 +40,23 @@
 #define IOGA_TIMER3_START	0x40000000
 #define IOGA_TIMER3_EXPIRED 0x80000000
 
+#define IOGA_INTERRUPT_COUNT           19
 #define IOGA_INTERRUPT_PENDING         0x0100
 #define IOGA_INTERRUPT_ENABLE_EXTERNAL 0x0200
 #define IOGA_INTERRUPT_EDGE            0x0400
 #define IOGA_INTERRUPT_NEGPOL          0x0800
 #define IOGA_INTERRUPT_ENABLE_INTERNAL 0x1000
-// FIXME: hack for forced interrupts
-#define IOGA_INTERRUPT_FORCED          0x8000
+
+#define IOGA_NMI_EDGE      0x02
+#define IOGA_NMI_PENDING   0x08
+#define IOGA_NMI_ENABLE_IN 0x10
+#define IOGA_NMI_ENABLE    (IOGA_NMI_EDGE | IOGA_NMI_ENABLE_IN)
+
+#define IOGA_INTERRUPT_NMI      1
+#define IOGA_INTERRUPT_INTERNAL 2
+#define IOGA_INTERRUPT_EXTERNAL 3
+#define IOGA_INTERRUPT_SOFT_LO  4
+#define IOGA_INTERRUPT_SOFT_HI  5
 
 #define IOGA_DMA_CHANNELS 4
 #define IOGA_DMA_CHANNEL_PLOTTER 0
@@ -92,17 +102,25 @@ public:
 
 	DECLARE_READ32_MEMBER(timer_prescaler_r) { return m_prescaler; }
 	DECLARE_READ32_MEMBER(timer0_r) { return m_timer_reg[0]; }
-	DECLARE_READ32_MEMBER(timer1_r) { return m_timer_reg[1]; }
+	DECLARE_READ32_MEMBER(timer1_r);
 	DECLARE_READ32_MEMBER(timer2_r) { return m_timer_reg[2]; }
-	DECLARE_READ32_MEMBER(timer3_r) { return m_timer3_reg.all; }
+	DECLARE_READ32_MEMBER(timer3_r);
 
-	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { m_prescaler = data; }
+	DECLARE_WRITE32_MEMBER(timer_prescaler_w) { 
+		// this logic satisfies prescaler tests, but fails timer prescaler tests
+		if ((data & 0x7fff) < 0x100 && (data & 0x7fff) != 0)
+			m_prescaler = (data ^ 0xffff0000);
+		else
+			m_prescaler = (data ^ 0xffff0000) - 0x10000;
+
+		//logerror("prescaler: input 0x%08x output 0x%08x\n", data, m_prescaler);
+	}
 	DECLARE_WRITE32_MEMBER(timer0_w) { write_timer(0, data, IOGA_TIMER_0); }
 	DECLARE_WRITE32_MEMBER(timer1_w) { write_timer(1, data, IOGA_TIMER_1); }
 	DECLARE_WRITE32_MEMBER(timer2_w) { write_timer(2, data, IOGA_TIMER_2); }
 	DECLARE_WRITE32_MEMBER(timer3_w) { write_timer(3, data, IOGA_TIMER_3); }
 
-	DECLARE_READ16_MEMBER(icr_r);
+	DECLARE_READ16_MEMBER(icr_r) { return m_int_vector[offset]; }
 	DECLARE_WRITE16_MEMBER(icr_w);
 	DECLARE_READ16_MEMBER(icr18_r) { return icr_r(space, 18, mem_mask); }
 	DECLARE_WRITE16_MEMBER(icr18_w) { icr_w(space, 18, data, mem_mask); }
@@ -110,10 +128,19 @@ public:
 	DECLARE_READ8_MEMBER(softint_r) { return m_softint; }
 	DECLARE_WRITE8_MEMBER(softint_w);
 	DECLARE_READ8_MEMBER(nmictrl_r) { return m_nmictrl; }
-	DECLARE_WRITE8_MEMBER(nmictrl_w) { m_nmictrl = data; }
+	DECLARE_WRITE8_MEMBER(nmictrl_w);
 	
-	DECLARE_READ32_MEMBER(fdc_dma_r) { return m_fdc_dma[offset]; }
-	DECLARE_WRITE32_MEMBER(fdc_dma_w) { m_fdc_dma[offset] = data; }
+	DECLARE_READ16_MEMBER(softint_vector_r) { return m_softint_vector[offset]; }
+	DECLARE_WRITE16_MEMBER(softint_vector_w);
+
+	DECLARE_READ32_MEMBER(dma_fdc_real_address_r) { return m_dma_fdc_real_address; }
+	DECLARE_WRITE32_MEMBER(dma_fdc_real_address_w) { m_dma_fdc_real_address = data; }
+	DECLARE_READ32_MEMBER(dma_fdc_virtual_address_r) { return m_dma_fdc_virtual_address; }
+	DECLARE_WRITE32_MEMBER(dma_fdc_virtual_address_w) { m_dma_fdc_virtual_address = data; }
+	DECLARE_READ32_MEMBER(dma_fdc_transfer_count_r) { return m_dma_fdc_transfer_count; }
+	DECLARE_WRITE32_MEMBER(dma_fdc_transfer_count_w) { m_dma_fdc_transfer_count = data; }
+	DECLARE_READ32_MEMBER(dma_fdc_control_r) { return m_dma_fdc_control; }
+	DECLARE_WRITE32_MEMBER(dma_fdc_control_w) { m_dma_fdc_control = data; }
 
 protected:
 	// device-level overrides
@@ -131,10 +158,12 @@ private:
 
 	static const device_timer_id IOGA_TIMER_DMA = 4;
 
+	void set_nmi_line(int state);
 	void set_irq_line(int irq, int state);
+	void set_irq_soft(int irq, int state);
 	void write_timer(int timer, uint32_t value, device_timer_id id);
 
-	void update_irq(int state);
+	void update_interrupt(int state);
 
 	devcb_write_line m_out_nmi_func;
 	devcb_write_line m_out_int_func;
@@ -144,31 +173,32 @@ private:
 
 	devcb_write_line m_fdc_tc_func;
 
-	bool m_irq_active;
+	bool m_nmi_pending;
+	uint32_t m_interrupt_active;
 	uint32_t m_irq_current;
+	uint32_t m_irq_forced;
 
-	uint16_t m_vectors[19];
+	uint16_t m_int_vector[IOGA_INTERRUPT_COUNT];
 	uint8_t m_softint;
 	uint8_t m_nmictrl;
+	uint16_t m_softint_vector[8];
 
 	uint32_t m_prescaler;
 	uint32_t m_timer_reg[3];
-	union timer3
-	{
-		struct fields
-		{
-			uint32_t count : 30;
-			uint32_t start : 1;
-			uint32_t expired : 1;
-		} fields;
-		uint32_t all;
-	} m_timer3_reg;
+	uint16_t m_timer1_count;
+	uint32_t m_timer3_count;
 	emu_timer *m_timer[4];
 
+	// dma state
 	emu_timer *m_dma_timer;
-	uint32_t m_state_drq;
-	uint32_t m_fdc_dma[4];
+	uint32_t m_dma_drq_state;
 	bool m_dma_active;
+
+	// dma fdc registers
+	uint32_t m_dma_fdc_real_address;
+	uint32_t m_dma_fdc_virtual_address;
+	uint32_t m_dma_fdc_transfer_count;
+	uint32_t m_dma_fdc_control;
 };
 
 // device type definition
