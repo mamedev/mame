@@ -2267,7 +2267,7 @@ void alps_3255190x::handled_variants(uint32_t *variants, int &var_count) const
 //-------------------------------------------------
 
 ibm_6360::ibm_6360(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock) :
-	floppy_image_device(mconfig, FLOPPY_8_SSSD, "8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
+	floppy_image_device(mconfig, FLOPPY_8_SSSD, "IBM 6360 8\" single density single sided floppy drive", tag, owner, clock, "ibm_6360", __FILE__)
 {
 }
 
