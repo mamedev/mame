@@ -17,6 +17,9 @@ Crazy Climber 2
 Armed Formation
 (c)1988 Nichibutsu
 
+Sky Robo / Tatakae! Big Fighter
+(c)1989 Nichibutsu
+
 Based on the notes below I suspect several of the supported sets are
 actually bootlegs.
 
@@ -207,85 +210,104 @@ Tatakae! Big Fighter (c)1989 Nichibutsu
 
 
 ------------------------------------------------------------------------
-Tatakae! Big Fighter
+
+Guru Readme for Tatakae! Big Fighter
 Nichibutsu, 1989
 
 This is a horizontal shoot'em-up similar to R-Type.
-
-It appears this PCB is re-used? Sticker says PCB number is 1706 and (C) 1989
+It appears this PCB is re-used from an older Nichibutsu game.
+A sticker on the main board says the PCB number is 1706 and (C) 1989
 On the PCB under the sticker is written 1605 and (C) 1988
+There is an extra sub-board with PCB number '1706-3' that plugs
+into the 68000 socket and the 68000 CPU, program ROMs and an i8751
+MCU are located on the sub-board. There are 4 unused sockets
+on the main board where the program ROMs would be located for a
+different game when the sub-board is not be present.
+No good reference pics are available for Armed Formation but the
+original game on this hardware is probably Armed Formation as
+the top PCB looks identical. The bottom PCB is identified as
+matching Terra Force and possibly also used with Armed Formation.
 
 
 PCB Layout
 ----------
 
-
 1605A-1 (1706-1)
--------------------------------------------------------------------
-|                     2018                                        |
-|              6.15F  2018                                        |
-|  PROM.13H    5.13F                                              |
+|-----------------------------------------------------------------|
+| J       H        F        E        D        C        B         A|
+|                         2018                                  17|
+|                         2018                                  16|
 |                                                                 |
+|               6.15F                                           15|
 |                                                                 |
-|                            5814                                 |
-|                            5814                                 |
-|                                                                 |
-|                     5814                                        |
-|                     5814                                        |
-|                                           7.11C                 |
-|                                                                 |
-|                     6264   6264                                 |
-|                     6264   6264                                 |
-|                   ----------------                              |
-|                   |1706-3        |                              |
-|                   |              |                  PAL         |
-|                   | PAL  8751    |                              |
-|                   |          PAL |                              |
-|                   |              |                              |
-|                   |              |                  PAL         |
-|                   | 2.IC4  4.IC5 |                              |
-|                   | 1.IC2  3.IC3 |                              |
-| DSW2              |              |                              |
-| DSW1              |    68000     |    16MHz         PAL         |
-|                   ----------------                              |
--------------------------------------------------------------------
+|                                           5814                14|
+|     PROM.13H  5.13F                       5814                13|
+|VOLUME                                                           |
+|                        5814                                   12|
+|                        5814               7.11C               11|
+|                   |--------------------|                        |
+|                   |1706-3              |                      10|
+|                   |                    |                       9|
+|                   | PAL       8751.IC13|                       8|
+|                   |                PAL |                        |
+|                   |     6264      6264 |                       7|
+|                   |                    |                        |
+|                   |     6264      6264 |            PAL.6B     6|
+|                   |    DIP32.5E   DIP32.5D                     5|
+|                   |   2.IC4     4.IC5  |                        |
+|                   |   1.IC2     3.IC3  |                       4|
+|                   |                    |                        |
+|                   |    DIP32.3E   DIP32.3D          PAL.3B     3|
+| DSW2              |                    |                       2|
+|                   |        68000       16MHz                    |
+| DSW1              |--------------------|            PAL.1B     1|
+|-----------------------------------------------------------------|
+Notes:
+      68000     - Clock 8.000MHz [16/2], located at IC1 on the sub-board
+      8751      - Clock 8.000MHz [16/2], located at IC13 on the sub-board
+      HSync     - 15.0735kHz
+      VSync     - 59.1358Hz
+      2018/5814 - 2kx8 SRAM
+      6264      - 8kx8 SRAM (all located on main board underneath the sub-board)
+      DIP32     - Empty DIP32 sockets (all located on main board underneath the sub-board)
+      PROM      - 82S129 Bipolar PROM
 
 
 1605B (1706-2)
--------------------------------------------------------------------
+|-----------------------------------------------------------------|
+|K     J      H       F       E        D       C       B        A |
+| 8.17K         Z80A                  2018                      17|
+|                                     2018                      16|
+| YM3812        2018                  2018                      15|
+| YM3014B                                                         |
+|                                                               14|
 |                                                                 |
-| 8.17K  Z80A                2018                                 |
-|                            2018                                 |
-| YM3812  2018               2018                                 |
-| Y3014B                                                          |
+| LM324                                                         13|
+|                                                               12|
 |                                                                 |
+| LM324                                                         11|
+|                                            2018               10|
 |                                                                 |
+| MB3730                        10.9ED       2018                9|
+|                               9.8ED                      12.8A 8|
+|                           PAL                                  7|
+|  2018    2018                                            11.6A 6|
+|  2018    2018                                                  5|
 |                                                                 |
+|                                                                4|
 |                                                                 |
+|                                                                3|
 |                                                                 |
-|                                                                 |
-|                                                                 |
-|                                  2018                           |
-|                          10.9D   2018                           |
-|                           9.8D                          12.8A   |
-|                           PAL                           11.6A   |
-|                                                                 |
-|                                                                 |
-|                                                                 |
-|                                                                 |
-| 2018  2018                                                      |
-| 2018  2018                                                      |
-|                                                                 |
-|               24MHz                                             |
-|                                                                 |
--------------------------------------------------------------------
-
-
+|                     24MHz                                      2|
+|                                                                1|
+|-----------------------------------------------------------------|
 Notes:
-      Horizontal Sync: 15.08kHz
-        Vertical Sync: 60Hz
-            68K Clock: 7.998MHz
-            Z80 Clock: ? (unstable, probably 6MHz or less)
+      Z80A    - Clock 4.000MHz [24/6]
+      YM3812  - Yamaha YM3812 FM Operator TYPE L2 (OPL2) sound chip. Clock 4.000MHz [24/6]
+      YM3014B - Yamaha YM3014B Serial Input Floating D/A Converter
+      2018    - 2kx8 SRAM
+      LM324   - Texas Instruments LM324 Quad Operational Amplifier with True Differential Inputs
+      MB3730  - Fujitsi MB3730 12W BTL Single Channel Amplifier
 
 
 ***********************************************************************/
@@ -1209,7 +1231,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz?
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1243,7 +1265,7 @@ static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz?
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
@@ -1256,16 +1278,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( terrafjb, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(terraf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_CPU_ADD("extra", Z80, XTAL_8MHz/2)         // 4mhz?
+	MCFG_CPU_ADD("extra", Z80, XTAL_16MHz/4)         // 4mhz?
 	MCFG_CPU_PROGRAM_MAP(terrafjb_extraz80_map)
 	MCFG_CPU_IO_MAP(terrafjb_extraz80_portmap)
 
@@ -1295,7 +1317,7 @@ static MACHINE_CONFIG_START( terrafjb, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.8) // unknown DAC
@@ -1312,11 +1334,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kozure, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(kozure_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1349,7 +1371,7 @@ static MACHINE_CONFIG_START( kozure, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1362,11 +1384,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(armedf_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1397,7 +1419,7 @@ static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5) // unknown DAC
@@ -1410,11 +1432,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1447,7 +1469,7 @@ static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1460,11 +1482,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( legion, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legion_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
@@ -1497,7 +1519,7 @@ static MACHINE_CONFIG_START( legion, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1510,18 +1532,17 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( legionjb, armedf_state )
 
 	/* basic machine hardware */
-	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz?
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // 8mhz
 	MCFG_CPU_PROGRAM_MAP(legionjb_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq2_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)      // 4mhz
 	MCFG_CPU_PROGRAM_MAP(cclimbr2_soundmap)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
 	MCFG_MACHINE_START_OVERRIDE(armedf_state,armedf)
 	MCFG_MACHINE_RESET_OVERRIDE(armedf_state,armedf)
-
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
@@ -1546,7 +1567,7 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)      // 4mhz
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.4) // unknown DAC
@@ -1556,19 +1577,18 @@ static MACHINE_CONFIG_START( legionjb, armedf_state )
 	MCFG_SOUND_ROUTE_EX(0, "dac2", 1.0, DAC_VREF_POS_INPUT) MCFG_SOUND_ROUTE_EX(0, "dac2", -1.0, DAC_VREF_NEG_INPUT)
 MACHINE_CONFIG_END
 
-
 static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_map)
 	MCFG_CPU_VBLANK_INT_DRIVER("screen", armedf_state,  irq1_line_assert)
 
-	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/4)      // 6mhz?
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)   // verified
 	MCFG_CPU_PROGRAM_MAP(sound_map)
 	MCFG_CPU_IO_MAP(sound_portmap)
 	MCFG_CPU_PERIODIC_INT_DRIVER(armedf_state, irq0_line_hold,  XTAL_8MHz/2/512)    // ?
 
-	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/4)
+	MCFG_CPU_ADD("mcu", I8751, XTAL_16MHz/2)   // verified
 	MCFG_CPU_PROGRAM_MAP(bigfghtr_mcu_map)
 	MCFG_CPU_IO_MAP(bigfghtr_mcu_io_map)
 	
@@ -1577,7 +1597,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	/* video hardware */
 	MCFG_SCREEN_ADD("screen", RASTER)
-	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference
+	MCFG_SCREEN_RAW_PARAMS(XTAL_16MHz/2,531,12*8,(64-12)*8, 254, 1*8, 31*8) // guess, matches 59.3 Hz from reference - measured at 59.1358Hz
 	MCFG_SCREEN_PALETTE("palette")
 
 	MCFG_VIDEO_START_OVERRIDE(armedf_state,armedf)
@@ -1595,7 +1615,7 @@ static MACHINE_CONFIG_START( bigfghtr, bigfghtr_state )
 
 	MCFG_GENERIC_LATCH_8_ADD("soundlatch")
 
-	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_8MHz/2)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_24MHz/6)   // verified
 	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 0.5)
 
 	MCFG_SOUND_ADD("dac1", DAC_8BIT_R2R, 0) MCFG_SOUND_ROUTE(ALL_OUTPUTS, "speaker", 1.0) // unknown DAC
@@ -2242,5 +2262,5 @@ GAME( 1988, cclimbr2a,cclimbr2, cclimbr2, cclimbr2, armedf_state,   cclimbr2, RO
 GAME( 1988, armedf,   0,        armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu",                    "Armed Formation", MACHINE_SUPPORTS_SAVE )
 GAME( 1988, armedff,  armedf,   armedf,   armedf,   armedf_state,   armedf,   ROT270, "Nichibutsu (Fillmore license)", "Armed Formation (Fillmore license)", MACHINE_SUPPORTS_SAVE )
 
-GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state, armedf, ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,  0,        bigfghtr, bigfghtr, armedf_state,   armedf,   ROT0,   "Nichibutsu",                    "Sky Robo", MACHINE_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo,  bigfghtr, bigfghtr, armedf_state,   armedf,   ROT0,   "Nichibutsu",                    "Tatakae! Big Fighter (Japan)", MACHINE_SUPPORTS_SAVE )
