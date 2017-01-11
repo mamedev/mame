@@ -895,6 +895,7 @@ function linkProjects_mame_mess(_target, _subtarget)
 		"ccs",
 		"chromatics",
 		"coleco",
+		"compugraphic",
 		"cromemco",
 		"comx",
 		"concept",
@@ -1644,6 +1645,11 @@ files {
 	MAME_DIR .. "src/mame/includes/coleco.h",
 	MAME_DIR .. "src/mame/machine/coleco.cpp",
 	MAME_DIR .. "src/mame/machine/coleco.h",
+}
+
+createMESSProjects(_target, _subtarget, "compugraphic")
+files {
+	MAME_DIR .. "src/mame/drivers/pwrview.cpp",
 }
 
 createMESSProjects(_target, _subtarget, "cromemco")

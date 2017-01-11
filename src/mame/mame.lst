@@ -31376,6 +31376,9 @@ pv9234                          //
 @source:pve500.cpp
 pve500                          // SONY PVE-500
 
+@source:pwrview.cpp
+pwrview                         // Compugraphic MCS PowerView 10
+
 @source:px4.cpp
 px4                             // 1985 Epson PX-4
 px4p                            // 1985 Epson PX-4+
