@@ -1,5 +1,6 @@
 // license:BSD-3-Clause
 // copyright-holders:hap
+// thanks-to:Berger
 /******************************************************************************
 
     Novag generic 6502 based chess computer driver
@@ -751,6 +752,35 @@ ROM_START( supercon )
 ROM_END
 
 
+ROM_START( sfortea )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("sfalo.bin", 0x0000, 0x8000, CRC(86e0230a) SHA1(0d6e18a17e636b8c7292c8f331349d361892d1a8) )
+	ROM_LOAD("sfahi.bin", 0x8000, 0x8000, CRC(81c02746) SHA1(0bf68b68ade5a3263bead88da0a8965fc71483c1) )
+	ROM_LOAD("sfabook.bin", 0x10000, 0x8000, CRC(3e42cf7c) SHA1(b2faa36a127e08e5755167a25ed4a07f12d62957) )
+ROM_END
+
+ROM_START( sforteb )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("forte_b.lo", 0x0000, 0x8000, CRC(48bfe5d6) SHA1(323642686b6d2fb8db2b7d50c6cd431058078ce1) )
+	ROM_LOAD("forte_b.hi1", 0x8000, 0x8000, CRC(9778ca2c) SHA1(d8b88b9768a1a9171c68cbb0892b817d68d78351) )
+	ROM_LOAD("forte_b.hi0", 0x10000, 0x8000, CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
+ROM_END
+
+ROM_START( sforteba )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("forte b_l.bin", 0x0000, 0x8000, CRC(e3d194a1) SHA1(80457580d7c57e07895fd14bfdaf14b30952afca) )
+	ROM_LOAD("forte b_h.bin", 0x8000, 0x8000, CRC(dd824be8) SHA1(cd8666b6b525887f9fc48a730b71ceabcf07f3b9) )
+	ROM_LOAD("forte_b.hi0", 0x10000, 0x8000, BAD_DUMP CRC(bb07ad52) SHA1(30cf9005021ab2d7b03facdf2d3588bc94dc68a6) )
+ROM_END
+
+ROM_START( sfortec )
+	ROM_REGION( 0x18000, "maincpu", 0 )
+	ROM_LOAD("sfclow.bin", 0x0000, 0x8000, CRC(f040cf30) SHA1(1fc1220b8ed67cdffa3866d230ce001721cf684f) )
+	ROM_LOAD("sfchi.bin", 0x8000, 0x8000, CRC(0f926b32) SHA1(9c7270ecb3f41dd9172a9a7928e6e04e64b2a340) )
+	ROM_LOAD("sfcbook.bin", 0x10000, 0x8000, CRC(c6a1419a) SHA1(017a0ffa9aa59438c879624a7ddea2071d1524b8) )
+ROM_END
+
+
 ROM_START( sexpertc )
 	ROM_REGION( 0x18000, "maincpu", 0 ) // Version 3.6 of firmware
 	ROM_LOAD("seclow.bin", 0x0000, 0x8000, CRC(5a29105e) SHA1(be37bb29b530dbba847a5e8d27d81b36525e47f7) )
@@ -774,5 +804,10 @@ ROM_END
 /*    YEAR  NAME      PARENT  COMPAT  MACHINE   INPUT     INIT              COMPANY, FULLNAME, FLAGS */
 CONS( 1984, supercon, 0,      0,      supercon, supercon, driver_device, 0, "Novag", "Super Constellation", MACHINE_SUPPORTS_SAVE | MACHINE_CLICKABLE_ARTWORK )
 
-CONS( 1989, sexpertc, 0, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_SUPPORTS_SAVE )
-CONS( 1988, sexpertb, sexpertc, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_SUPPORTS_SAVE )
+CONS( 1987, sfortea,  0,       0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version A)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, sforteb,  sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, sforteba, sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version B, alt)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1989, sfortec,  sfortea, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Forte Chess Computer (version C)", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+
+CONS( 1989, sexpertc, 0, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert C Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
+CONS( 1988, sexpertb, sexpertc, 0,      sexpert,   sexpert, novag6502_state,  sexpert,       "Novag",                     "Novag Super Expert B Chess Computer", MACHINE_SUPPORTS_SAVE | MACHINE_NOT_WORKING )
