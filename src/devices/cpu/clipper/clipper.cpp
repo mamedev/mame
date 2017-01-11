@@ -433,53 +433,53 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 	case 0x30: 
 		// shaw: shift arithmetic word
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] << m_r[m_ssw.fields.u][R1];
+		if (m_r[m_ssw.fields.u][R1] > 0)
+			m_r[m_ssw.fields.u][R2] <<= m_r[m_ssw.fields.u][R1];
 		else
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] >> -(int32_t)m_r[m_ssw.fields.u][R1];
+			m_r[m_ssw.fields.u][R2] >>= -m_r[m_ssw.fields.u][R1];
 		// FLAGS: 0VZN
 		break;
 	case 0x31: 
 		// shal: shift arithmetic longword
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
+		if (m_r[m_ssw.fields.u][R1] > 0)
 			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] <<= m_r[m_ssw.fields.u][R1];
 		else
-			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -(int32_t)m_r[m_ssw.fields.u][R1];
+			((int64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -m_r[m_ssw.fields.u][R1];
 		// FLAGS: 0VZN
 		break;
 	case 0x32: 
 		// shlw: shift logical word
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
+		if (m_r[m_ssw.fields.u][R1] > 0)
 			m_r[m_ssw.fields.u][R2] <<= m_r[m_ssw.fields.u][R1];
 		else
-			m_r[m_ssw.fields.u][R2] >>= -(int32_t)m_r[m_ssw.fields.u][R1];
+			((uint32_t *)m_r[m_ssw.fields.u])[R2] >>= -m_r[m_ssw.fields.u][R1];
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		break;
 	case 0x33: 
 		// shll: shift logical longword
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
+		if (m_r[m_ssw.fields.u][R1] > 0)
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] <<= m_r[m_ssw.fields.u][R1];
 		else
-			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -(int32_t)m_r[m_ssw.fields.u][R1];
+			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -m_r[m_ssw.fields.u][R1];
 		// FLAGS: 00ZN
 		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		break;
 	case 0x34: 
 		// rotw: rotate word
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
+		if (m_r[m_ssw.fields.u][R1] > 0)
 			m_r[m_ssw.fields.u][R2] = _rotl(m_r[m_ssw.fields.u][R2], m_r[m_ssw.fields.u][R1]);
 		else
-			m_r[m_ssw.fields.u][R2] = _rotr(m_r[m_ssw.fields.u][R2], -(int32_t)m_r[m_ssw.fields.u][R1]);
+			m_r[m_ssw.fields.u][R2] = _rotr(m_r[m_ssw.fields.u][R2], -m_r[m_ssw.fields.u][R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		break;
 	case 0x35: 
 		// rotl: rotate longword
-		if ((int32_t)m_r[m_ssw.fields.u][R1] > 0)
+		if (m_r[m_ssw.fields.u][R1] > 0)
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] = _rotl64(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], m_r[m_ssw.fields.u][R1]);
 		else
-			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], -(int32_t)m_r[m_ssw.fields.u][R1]);
+			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], -m_r[m_ssw.fields.u][R1]);
 		// FLAGS: 00ZN
 		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		break;
@@ -487,9 +487,9 @@ int clipper_device::execute_instruction (uint16_t insn)
 	case 0x38: 
 		// shai: shift arithmetic immediate
 		if (m_info.op.imm > 0)
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] << m_info.op.imm;
+			m_r[m_ssw.fields.u][R2] <<= m_info.op.imm;
 		else
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] >> -m_info.op.imm;
+			m_r[m_ssw.fields.u][R2] >>= -m_info.op.imm;
 		// FLAGS: 0VZN
 		// TRAPS: I
 		break;
@@ -507,7 +507,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		if (m_info.op.imm > 0)
 			m_r[m_ssw.fields.u][R2] <<= m_info.op.imm;
 		else
-			m_r[m_ssw.fields.u][R2] >>= -m_info.op.imm;
+			((uint32_t *)m_r[m_ssw.fields.u])[R2] >>= -m_info.op.imm;
 		// FLAGS: 00ZN
 		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		// TRAPS: I
@@ -821,13 +821,13 @@ int clipper_device::execute_instruction (uint16_t insn)
 
 	case 0x93: 
 		// negw: negate word
-		m_r[m_ssw.fields.u][R2] = -(int32_t)m_r[m_ssw.fields.u][R1];
+		m_r[m_ssw.fields.u][R2] = -m_r[m_ssw.fields.u][R1];
 		// FLAGS: CVZN
 		break;
 
 	case 0x98: 
 		// mulw: multiply word
-		m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] * (int32_t)m_r[m_ssw.fields.u][R1];
+		m_r[m_ssw.fields.u][R2] = m_r[m_ssw.fields.u][R2] * m_r[m_ssw.fields.u][R1];
 		// FLAGS: 0V00
 		break;
 	case 0x99:
@@ -847,19 +847,19 @@ int clipper_device::execute_instruction (uint16_t insn)
 		break;
 	case 0x9c: 
 		// divw: divide word
-		if ((int32_t)m_r[m_ssw.fields.u][R1] == 0)
+		if (m_r[m_ssw.fields.u][R1] == 0)
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
 		else
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] / (int32_t)m_r[m_ssw.fields.u][R1];
+			m_r[m_ssw.fields.u][R2] = m_r[m_ssw.fields.u][R2] / m_r[m_ssw.fields.u][R1];
 		// FLAGS: 0V00
 		// TRAPS: D
 		break;
 	case 0x9d: 
 		// modw: modulus word
-		if ((int32_t)m_r[m_ssw.fields.u][R1] == 0)
+		if (m_r[m_ssw.fields.u][R1] == 0)
 			next_pc = intrap(EXCEPTION_INTEGER_DIVIDE_BY_ZERO, next_pc, CTS_DIVIDE_BY_ZERO);
 		else
-			m_r[m_ssw.fields.u][R2] = (int32_t)m_r[m_ssw.fields.u][R2] % (int32_t)m_r[m_ssw.fields.u][R1];
+			m_r[m_ssw.fields.u][R2] = m_r[m_ssw.fields.u][R2] % m_r[m_ssw.fields.u][R1];
 		// FLAGS: 0V00
 		// TRAPS: D
 		break;
