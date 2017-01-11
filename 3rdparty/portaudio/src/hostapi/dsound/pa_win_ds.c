@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_ds.c 1945 2015-01-21 06:24:32Z rbencina $
+ * $Id$
  * Portable Audio I/O Library DirectSound implementation
  *
  * Authors: Phil Burk, Robert Marsanyi & Ross Bencina
@@ -47,11 +47,11 @@
 */
 //#define PA_WIN_DS_USE_WMME_TIMER
 
-#define _WIN32_WINNT 0x0400 /* required to get waitable timer APIs */
 #include <assert.h>
 #include <stdio.h>
 #include <string.h> /* strlen() */
 
+#define _WIN32_WINNT 0x0400 /* required to get waitable timer APIs */
 #include <initguid.h> /* make sure ds guids get defined */
 #include <windows.h>
 #include <objbase.h>
@@ -279,7 +279,7 @@ typedef struct PaWinDsStream
     UINT                 inputBufferSizeBytes;
 
     
-    unsigned long    hostBufferSizeFrames; /* input and output host ringbuffers have the same number of frames */
+    int              hostBufferSizeFrames; /* input and output host ringbuffers have the same number of frames */
     double           framesWritten;
     double           secondsPerHostByte; /* Used to optimize latency calculation for outTime */
     double           pollingPeriodSeconds;

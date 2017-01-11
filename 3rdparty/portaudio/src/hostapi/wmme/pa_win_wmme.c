@@ -1,5 +1,5 @@
 /*
- * $Id: pa_win_wmme.c 1948 2015-01-21 06:52:11Z rbencina $
+ * $Id$
  * pa_win_wmme.c
  * Implementation of PortAudio for Windows MultiMedia Extensions (WMME)       
  *                                                                                         
@@ -463,7 +463,7 @@ PaWinMmeDeviceInfo;
 #define PA_ENV_BUF_SIZE_  (32)
 #define PA_REC_IN_DEV_ENV_NAME_  ("PA_RECOMMENDED_INPUT_DEVICE")
 #define PA_REC_OUT_DEV_ENV_NAME_  ("PA_RECOMMENDED_OUTPUT_DEVICE")
-static PaDeviceIndex GetEnvDefaultDeviceID( const char *envName )
+static PaDeviceIndex GetEnvDefaultDeviceID( char *envName )
 {
     PaDeviceIndex recommendedIndex = paNoDevice;
     DWORD   hresult;

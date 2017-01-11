@@ -1,5 +1,5 @@
-/** @file patest_write_stop.c
-	@brief Play a few seconds of silence followed by a few cycles of a sine wave. Tests to make sure that pa_StopStream() completes playback in blocking I/O
+/** @file patest_write_stop_threads.c
+	@brief Call Pa_StopStream() from another thread to see if PortAudio hangs.
 	@author Bjorn Roche of XO Audio (www.xoaudio.com)
 	@author Ross Bencina
 	@author Phil Burk
@@ -32,30 +32,65 @@
  */
 
 /*
- * The text above constitutes the entire PortAudio license; however, 
+ * The text above constitutes the entire PortAudio license; however,
  * the PortAudio community also makes the following non-binding requests:
  *
  * Any person wishing to distribute modifications to the Software is
  * requested to send the modifications to the original developer so that
- * they can be incorporated into the canonical version. It is also 
- * requested that these non-binding requests be included along with the 
+ * they can be incorporated into the canonical version. It is also
+ * requested that these non-binding requests be included along with the
  * license above.
  */
 
 #include <stdio.h>
+#include <unistd.h>
 #include <math.h>
+#include <memory.h>
+/* pthread may only be available on Mac and Linux. */
+#include <pthread.h>
 #include "portaudio.h"
 
-#define NUM_SECONDS         (5)
 #define SAMPLE_RATE         (44100)
-#define FRAMES_PER_BUFFER   (1024)
+#define FRAMES_PER_BUFFER   (2048)
 
-#ifndef M_PI
-#define M_PI  (3.14159265)
-#endif
+static float s_buffer[FRAMES_PER_BUFFER][2]; /* stereo output buffer */
 
-#define TABLE_SIZE   (200)
+/**
+ * WARNING: PortAudio is NOT thread safe. DO NOT call PortAudio
+ * from multiple threads without synchronization. This test uses
+ * PA in an ILLEGAL WAY in order to try to flush out potential hang bugs.
+ * The test calls Pa_WriteStream() and Pa_StopStream() simultaneously
+ * from separate threads in order to try to cause Pa_StopStream() to hang.
+ * In the main thread we write to the stream in a loop.
+ * Then try stopping PA from another thread to see if it hangs.
+ *
+ * @note: Do not expect this test to pass. The test is only here
+ * as a debugging aid for hang bugs. Since this test uses PA in an
+ * illegal way, it may fail for reasons that are not PA bugs.
+ */
 
+/* Wait for awhile then abort the stream. */
+void *stop_thread_proc(void *arg)
+{
+    PaStream *stream = (PaStream *)arg;
+    PaTime time;
+    for (int i = 0; i < 20; i++)
+    {
+        /* ILLEGAL unsynchronised call to PA, see comment above */
+        time = Pa_GetStreamTime( stream );
+        printf("Stream time = %f\n", time);
+        fflush(stdout);
+        usleep(100 * 1000);
+    }
+    printf("Call Pa_StopStream()\n");
+    fflush(stdout);
+    /* ILLEGAL unsynchronised call to PA, see comment above */
+    PaError err = Pa_StopStream( stream );
+    printf("Pa_StopStream() returned %d\n", err);
+    fflush(stdout);
+
+    return stream;
+}
 
 int main(void);
 int main(void)
@@ -63,28 +98,12 @@ int main(void)
     PaStreamParameters outputParameters;
     PaStream *stream;
     PaError err;
-    float buffer[FRAMES_PER_BUFFER][2]; /* stereo output buffer */
-    float sine[TABLE_SIZE]; /* sine wavetable */
-    int left_phase = 0;
-    int right_phase = 0;
-    int left_inc = 1;
-    int right_inc = 3; /* higher pitch so we can distinguish left and right. */
-    int i, j;
-    int bufferCount;
-    const int   framesBy2  = FRAMES_PER_BUFFER >> 1;
-    const float framesBy2f = (float) framesBy2 ;
+    int result;
+    pthread_t thread;
 
-    
-    printf( "PortAudio Test: output silence, followed by one buffer of a ramped sine wave. SR = %d, BufSize = %d\n",
+    printf( "PortAudio Test: output silence and stop from another thread. SR = %d, BufSize = %d\n",
             SAMPLE_RATE, FRAMES_PER_BUFFER);
-    
-    /* initialise sinusoidal wavetable */
-    for( i=0; i<TABLE_SIZE; i++ )
-    {
-        sine[i] = (float) sin( ((double)i/(double)TABLE_SIZE) * M_PI * 2. );
-    }
 
-    
     err = Pa_Initialize();
     if( err != paNoError ) goto error;
 
@@ -106,55 +125,39 @@ int main(void)
               NULL ); /* no callback, so no callback userData */
     if( err != paNoError ) goto error;
 
+    result = pthread_create(&thread, NULL /* attributes */, stop_thread_proc, stream);
+
     /* start the stream */
     err = Pa_StartStream( stream );
     if( err != paNoError ) goto error;
 
-    printf("Playing %d seconds of silence followed by one buffer of a ramped sinusoid.\n", NUM_SECONDS );
-
-    bufferCount = ((NUM_SECONDS * SAMPLE_RATE) / FRAMES_PER_BUFFER);
-
     /* clear buffer */
-    for( j=0; j < FRAMES_PER_BUFFER; j++ )
+    memset( s_buffer, 0, sizeof(s_buffer) );
+
+    /* play the silent buffer many times */
+    while( Pa_IsStreamActive(stream) > 0 )
     {
-        buffer[j][0] = 0;  /* left */
-        buffer[j][1] = 0;  /* right */
+        err = Pa_WriteStream( stream, s_buffer, FRAMES_PER_BUFFER );
+        printf("Pa_WriteStream returns %d = %s\n", err, Pa_GetErrorText( err ));
+        if( err != paNoError )
+        {
+            err = paNoError;
+            break;
+        };
     }
-    /* play the silent buffer a bunch o' times */
-    for( i=0; i < bufferCount; i++ )
-    {
-        err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
-        if( err != paNoError ) goto error;
-    }   
-    /* play a non-silent buffer once */
-    for( j=0; j < FRAMES_PER_BUFFER; j++ )
-    {
-        float ramp = 1;
-        if( j < framesBy2 )
-           ramp = j / framesBy2f;
-        else
-           ramp = (FRAMES_PER_BUFFER - j) / framesBy2f ;
 
-        buffer[j][0] = sine[left_phase] * ramp;  /* left */
-        buffer[j][1] = sine[right_phase] * ramp;  /* right */
-        left_phase += left_inc;
-        if( left_phase >= TABLE_SIZE ) left_phase -= TABLE_SIZE;
-        right_phase += right_inc;
-        if( right_phase >= TABLE_SIZE ) right_phase -= TABLE_SIZE;
-    }
-    err = Pa_WriteStream( stream, buffer, FRAMES_PER_BUFFER );
-    if( err != paNoError ) goto error;
+    printf("Try to join the thread that called Pa_StopStream().\n");
+    result = pthread_join( thread, NULL );
+    printf("pthread_join returned %d\n", result);
 
-    /* stop stream, close, and terminate */
-    err = Pa_StopStream( stream );
-    if( err != paNoError ) goto error;
-
+    /* close, and terminate */
+    printf("Call Pa_CloseStream\n");
     err = Pa_CloseStream( stream );
     if( err != paNoError ) goto error;
 
     Pa_Terminate();
     printf("Test finished.\n");
-    
+
     return err;
 error:
     Pa_Terminate();
