@@ -23,6 +23,12 @@
 #define LOG_INTERRUPT(...)
 #endif
 
+#define FLAGS(C,V,Z,N) \
+	m_psw.fields.c = C; \
+	m_psw.fields.v = V; \
+	m_psw.fields.z = Z; \
+	m_psw.fields.n = N;
+
 const device_type CLIPPER = &device_creator<clipper_device>;
 
 clipper_device::clipper_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
@@ -448,6 +454,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			m_r[m_ssw.fields.u][R2] >>= -(int32_t)m_r[m_ssw.fields.u][R1];
 		// FLAGS: 00ZN
+		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		break;
 	case 0x33: 
 		// shll: shift logical longword
@@ -456,6 +463,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -(int32_t)m_r[m_ssw.fields.u][R1];
 		// FLAGS: 00ZN
+		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		break;
 	case 0x34: 
 		// rotw: rotate word
@@ -464,6 +472,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			m_r[m_ssw.fields.u][R2] = _rotr(m_r[m_ssw.fields.u][R2], -(int32_t)m_r[m_ssw.fields.u][R1]);
 		// FLAGS: 00ZN
+		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		break;
 	case 0x35: 
 		// rotl: rotate longword
@@ -472,6 +481,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], -(int32_t)m_r[m_ssw.fields.u][R1]);
 		// FLAGS: 00ZN
+		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		break;
 
 	case 0x38: 
@@ -499,6 +509,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			m_r[m_ssw.fields.u][R2] >>= -m_info.op.imm;
 		// FLAGS: 00ZN
+		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		// TRAPS: I
 		break;
 	case 0x3b: 
@@ -508,6 +519,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] >>= -m_info.op.imm;
 		// FLAGS: 00ZN
+		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		// TRAPS: I
 		break;
 	case 0x3c: 
@@ -517,6 +529,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			m_r[m_ssw.fields.u][R2] = _rotr(m_r[m_ssw.fields.u][R2], -m_info.op.imm);
 		// FLAGS: 00ZN
+		FLAGS(0, 0, m_r[m_ssw.fields.u][R2] == 0, BIT(m_r[m_ssw.fields.u][R2], 31));
 		// TRAPS: I
 		break;
 	case 0x3d: 
@@ -526,6 +539,7 @@ int clipper_device::execute_instruction (uint16_t insn)
 		else
 			((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] = _rotr64(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], -m_info.op.imm);
 		// FLAGS: 00ZN
+		FLAGS(0, 0, ((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1] == 0, BIT(((uint64_t *)m_r[m_ssw.fields.u])[R2 >> 1], 63));
 		// TRAPS: I
 		break;
 
