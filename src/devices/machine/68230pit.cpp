@@ -137,9 +137,9 @@ void pit68230_device::device_start ()
 
 	// resolve callbacks
 	m_pa_out_cb.resolve_safe();
-	m_pa_in_cb.resolve_safe(0);
+	m_pa_in_cb.resolve();
 	m_pb_out_cb.resolve_safe();
-	m_pb_in_cb.resolve_safe(0);
+	m_pb_in_cb.resolve();
 	m_pc_out_cb.resolve_safe();
 	m_pc_in_cb.resolve(); // A temporary way to check if handler is installed with isnull(). TODO: Need better fix.
 	m_h1_out_cb.resolve_safe();
@@ -292,9 +292,15 @@ void pit68230_device::pa_update_bit(uint8_t bit, uint8_t state)
 		return;
 	}
 	if (state)
+	{
 		m_padr |= (1 << bit);
+		m_pail |= (1 << bit);
+	}
 	else
+	{
 		m_padr &= ~(1 << bit);
+		m_pail &= ~(1 << bit);
+	}
 }
 
 void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state)
@@ -307,9 +313,15 @@ void pit68230_device::pb_update_bit(uint8_t bit, uint8_t state)
 		return;
 	}
 	if (state)
+	{
 		m_pbdr |= (1 << bit);
+		m_pbil |= (1 << bit);
+	}
 	else
+	{
 		m_pbdr &= ~(1 << bit);
+		m_pbil &= ~(1 << bit);
+	}
 }
 
 // TODO: Make sure port C is in the right alternate mode
@@ -323,9 +335,15 @@ void pit68230_device::pc_update_bit(uint8_t bit, uint8_t state)
 		return;
 	}
 	if (state)
+	{
 		m_pcdr |= (1 << bit);
+		m_pcil |= (1 << bit);
+	}
 	else
+	{
 		m_pcdr &= ~(1 << bit);
+		m_pcil &= ~(1 << bit);
+	}
 }
 
 void pit68230_device::update_tin(uint8_t state)
@@ -772,7 +790,14 @@ uint8_t pit68230_device::rr_pitreg_pbcr()
 uint8_t pit68230_device::rr_pitreg_padr()
 {
 	m_padr &= m_paddr;
-	m_padr |= (m_pa_in_cb() & ~m_paddr);
+	if (!m_pa_in_cb.isnull())
+	{
+		m_padr |= (m_pa_in_cb() & ~m_paddr);
+	}
+	else
+	{
+		m_padr |= (m_pail & ~m_paddr);
+	}
 	LOGDR(("%s %s <- %02x\n",tag(), FUNCNAME, m_padr));
 	return m_padr;
 }
@@ -787,19 +812,31 @@ uint8_t pit68230_device::rr_pitreg_padr()
 uint8_t pit68230_device::rr_pitreg_pbdr()
 {
 	m_pbdr &= m_pbddr;
-	m_pbdr |= (m_pb_in_cb() & ~m_pbddr);
+	if (!m_pb_in_cb.isnull())
+	{
+		m_pbdr |= (m_pb_in_cb() & ~m_pbddr);
+	}
+	else
+	{
+		m_pbdr |= (m_pbil & ~m_pbddr);
+	}
 
-	LOGDR(("%s %s <- %02x\n",tag(), FUNCNAME, m_pbdr));
+	//LOGDR(("%s %s <- %02x\n",tag(), FUNCNAME, m_pbdr));
 	return m_pbdr;
 }
 
 uint8_t pit68230_device::rr_pitreg_pcdr()
 {
+	m_pcdr &= m_pcddr;
 	if (!m_pc_in_cb.isnull()) // Port C has alternate functions that may set bits apart from callback
 	{
-		m_pcdr &= m_pcddr;
 		m_pcdr |= (m_pc_in_cb() & ~m_pcddr);
 	}
+	else
+	{
+		m_pcdr |= (m_pcil & ~m_pcddr);
+	}
+	
 	if (m_pcdr != 0) { LOGDR(("%s %s <- %02x\n",tag(), FUNCNAME, m_pcdr)); }
 	return m_pcdr;
 }
