@@ -16,6 +16,14 @@
         one of the last existing Poly-Play arcade automatons. He also
         provided me with schematics and service manuals.
 
+
+TODO:
+  - check PIO PortB wiring in real machines
+  - write some own code for the ZRE-PP to find the SIO in address space and then do something cool with it :)
+  - get other rom versions and games
+  - document the light-organ related stuff
+
+		
 NOTES: 
   The hardware is based on the K1520 PC system, with video output coming through a standard Colormat TV. 
 	  
@@ -156,13 +164,13 @@ READ8_MEMBER(polyplay_state::pio_porta_r)
 
 WRITE8_MEMBER(polyplay_state::pio_porta_w)
 {
-	osd_printf_verbose("pio_porta_w: %02x\n", data);
+	//osd_printf_verbose("pio_porta_w: %02x\n", data);
 }
 
 READ8_MEMBER(polyplay_state::pio_portb_r)
 {
 	uint8_t result = 0x00;
-	osd_printf_verbose("pio_portb_r: %02x\n", result);
+	//osd_printf_verbose("pio_portb_r: %02x\n", result);
 	return result;
 }
 
